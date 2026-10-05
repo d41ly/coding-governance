@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-5 — each leg reading is stamped faithful or contended by a foreign-load census, and only faithful readings argue a ceiling
 
-**Status:** SPECCED · rev-4 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 7 · advances TOOL-aSurfacedLexicon-22 · ratified 2026-10-04
+**Status:** SPECCED · rev-5 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 7 · advances TOOL-aSurfacedLexicon-22 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -280,8 +280,9 @@ named below by its basename.
   `foreign` field reads `unknown`.
   Red when: a census that could not read the process table, or could not see its observer, stamps
   any row `0`, or a stub moves the verdict.
-- **AC4** — When `$S` runs with `GATE_JOBS=1` and two legs, both legs report, and a `$(...)`
-  capture of the runner returns within 30 s of the runner's own exit while `CENSUS_EVERY` is 60.
+- **AC4** — When `$S` runs with `GATE_JOBS=1`, the wall off (`GATE_WALL=0`) and two legs, both legs
+  report, and a `$(...)` capture of the runner returns within 30 s of the runner's own exit while
+  `CENSUS_EVERY` is 60.
   Red when: the sampler is a live job, so the serial pool never dispatches its second leg, or it
   holds the caller's stdout until its `sleep` ends.
 - **AC5** — When `$S` runs with `GATE_CENSUS_EVERY=2` over one leg that writes a start marker
@@ -408,6 +409,12 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · AC14's lingering ticker a
   only their release, so every bar left its ticker sleeping up to a sixth of the TTL, and the next
   bar's census read it as foreign load. S2 now has `cleanup` stop the ticker and the sampler, and
   AC14 observes that no process naming a finished fixture bar's runner path remains.
+- rev-5 · 2026-10-05 · §6 · AC4 · AC4's 30 s bound was at the mercy of a different detached
+  sleeper: the wall watcher's subshell keeps the caller's stdout, and its `sleep` poll, up to 30 s
+  at the shipped wall, outlives the kill that disarms it. Measured on one two-leg fixture at
+  `GATE_JOBS=1`: a `$(...)` capture returned 28 s after the verdict's `ended` stamp with the wall on,
+  0 s with `GATE_WALL=0`. That is the wall's defect and not this unit's, so AC4 runs with the wall
+  off, which leaves the census sampler the only detached sleeper whose hold it could measure.
 
 ## 10. Reuse audit
 
