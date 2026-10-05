@@ -13866,6 +13866,77 @@ fi   # ---- region two continues below: one compound block past about 3000 comma
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
 if in_shard 2; then
 
+# ==================================================================================================
+# TOOL-aGraftedHelix-24 — THE `prior-session` ADD RUNS BEFORE write_lease. A mktemp shim on PATH
+# forwards to the real mktemp until the run-state file's `session:` line reads s2, then exits 1 once,
+# so an s2 holder call's write_lease stops after its session line at the same place every time, with
+# no sleep. Each leg first sets the record's lease-utc ten minutes back and commits it, so the
+# unmoved stamp is a witness that can red: a write_lease run whole moves it. AC1: the call whose
+# claim push exits 124, and over a fresh base the call with the remote away, each leave session s2,
+# prior-session s1 and lease-utc unmoved; the next s2 calls read the claim `mine` through the set
+# with no check 108, a still-unreachable one writing nothing. RED against driver copies with the add
+# moved back after write_lease, and with the unreadable-claim path's add alone moved back. Unit 20's
+# helpers reused.
+# ==================================================================================================
+GR_BIN=$(mktemp -d); GR_MKTEMP=$(command -v mktemp)
+cat > "$GR_BIN/git.124" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) exit 124 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+cat > "$GR_BIN/mktemp" <<EOF
+#!/usr/bin/env bash
+if [ ! -e "$GR_BIN/mktemp.fired" ] && grep -qx 'session: s2' "$TMP/memory/builds/tRun/RUN.md" 2>/dev/null; then
+  : > "$GR_BIN/mktemp.fired"; exit 1
+fi
+exec "$GR_MKTEMP" "\$@"
+EOF
+chmod +x "$GR_BIN/git.124" "$GR_BIN/mktemp"
+# Unit 20's base with its lease stamp aged and committed, then one s2 holder call under the mktemp
+# shim, with the claim push exiting 124 or the bare origin away for that call alone.
+check_prior_interrupted() { # label · 124|away
+  build_prior_base
+  sed -i "s/^lease-utc: .*/lease-utc: $(derive_claim_ago 600)/" memory/builds/tRun/RUN.md
+  git add -A >/dev/null && git commit -q -m gr-aged --no-verify
+  GR_LU=$(read_run_fact lease-utc); rm -f "$GR_BIN/mktemp.fired"
+  case "$2" in 124) cp "$GR_BIN/git.124" "$GR_BIN/git" ;; away) mv "$ORIGIN" "$ORIGIN.away" ;; esac
+  CLAUDE_CODE_SESSION_ID=s2 PATH="$GR_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 >/dev/null 2>&1
+  case "$2" in 124) rm -f "$GR_BIN/git" ;; away) mv "$ORIGIN.away" "$ORIGIN" ;; esac
+  n=$((n+1)); [ -e "$GR_BIN/mktemp.fired" ] || { echo "FAIL $1 the mktemp shim never fired, so the call was not interrupted"; st=1; }
+  same "$1 the interrupted call leaves session s2" "$(read_run_fact session)" "s2"
+  same "$1 ...prior-session s1" "$(read_run_fact prior-session)" "s1"
+  same "$1 ...and lease-utc at its pre-call value" "$(read_run_fact lease-utc)" "$GR_LU"
+  same "$1 ...while the claim still names s1" "$(read_claim_field tRun session)" "s1"
+}
+# A later s2 call with no shim, the remote reachable: it reads the claim `mine` and lands it.
+check_prior_landed() { # label
+  out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+  same "$1 the s2 call exits 0" "$rc" "0"
+  miss "$out" "UNATTENDED check 108 FAILED"
+  same "$1 ...leaves the claim naming s2" "$(read_claim_field tRun session)" "s2"
+  same "$1 ...empties the prior-session set" "$(read_run_fact prior-session)" ""
+  same "$1 ...and leaves no unstaged run-state file" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
+}
+# ---- AC1, the 124 leg: the interrupted call, then a second s2 call with no shim.
+check_prior_interrupted "GH24 AC1 124" 124
+check_prior_landed "GH24 AC1 124 second"
+# ---- AC1, the unreachable leg: the interrupted call, a second s2 call still unreachable, which reads
+# ---- no claim and writes nothing, then a third with the remote restored.
+check_prior_interrupted "GH24 AC1 away" away
+mv "$ORIGIN" "$ORIGIN.away"
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+mv "$ORIGIN.away" "$ORIGIN"
+same "GH24 AC1 away the still-unreachable s2 call exits 0" "$rc" "0"
+miss "$out" "UNATTENDED check 108 FAILED"
+same "GH24 AC1 away ...and leaves the set s1" "$(read_run_fact prior-session)" "s1"
+same "GH24 AC1 away ...and the claim at s1" "$(read_claim_field tRun session)" "s1"
+check_prior_landed "GH24 AC1 away restored"
+rm -rf "$GR_BIN"; remove_claim_refs; reset_tree
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
 # ---- AC6: `--hold` refuses, numbered and before any record write, while a recorded bar is alive under
 # ---- a LIVE driver — this suite's own shell stands in for it — and proceeds once the bar has exited.
 init_pl_fixture
@@ -15055,7 +15126,13 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # executed 181 against the prologue's own 20 and the slice's one setup `mutate`, green against the
 # kit and red under staged driver copies, one break or one disjoint group of breaks per run; unit
 # 20's block, re-read for the set's empty cleared state, kept its 51; no suite ran.
-FLOOR_ASSERTIONS=2344
+# RAISED 2344 -> 2370 by TOOL-aGraftedHelix-24: the interruption arm's 26 executed assertions in
+# region two, its two `mutate` calls included, MEASURED: that block run alone behind this prologue,
+# the claim block's gh_ helpers and unit 20's prior-session helpers on node a, 2026-10-05, executed
+# 46 against the prologue's own 20, green against the kit and red under the parent's driver, a
+# driver copy moving back the unreadable-claim path's add alone, and a shim that never fires; no
+# suite ran.
+FLOOR_ASSERTIONS=2370
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -15193,7 +15270,8 @@ FLOOR_SHARD_1=209
 # RAISED 1930 -> 1981: the same 51 region-two prior-session assertions, see FLOOR_ASSERTIONS.
 # RAISED 1981 -> 1987: the same 6 region-two read-axis refusal assertions, see FLOOR_ASSERTIONS.
 # RAISED 1987 -> 2147: the same 160 region-two prior-session set assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=2147
+# RAISED 2147 -> 2173: the same 26 region-two interruption assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=2173
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

@@ -50,7 +50,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.71   # gov:kit unattended@1.71 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.72   # gov:kit unattended@1.72 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -7824,6 +7824,11 @@ verb_resume() { # slug
     # only grows until a claim write of THIS row lands, which empties it, written only when non-empty
     # and staged. No other writer writes or empties it, so a landed `--beat` or `--dispatch` between
     # two incomplete calls leaves every member a later read may still need.
+    # TOOL-aGraftedHelix-24 - THE ORDER: the add runs BEFORE `write_lease`, the clear after it.
+    # `write_lease` writes `session` and then four more facts, so an add after it could be cut off by
+    # a failure between them, leaving the record at the new session, the claim at the old one and no
+    # member naming it: the next call reads its own claim foreign. An interrupted clear leaves only
+    # members this keepalive's claim no longer carries, and the next landed claim write empties them.
     cw=""; cas=""
     if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
       check_claim_writable "$slug" holder "$ka" "${ls_sid:-absent}" "$ka" "$rel"; cw=$?
@@ -7833,17 +7838,16 @@ verb_resume() { # slug
       os=$ls_sid; op=$ls_pid
       lu=$(read_utc_now) || lu=""
       if [ -n "$cw" ]; then write_claim "$slug" live "$ka" holder "" "$lu"; cas=$?; [ "$cas" != 1 ] || return 1; fi
-      write_lease "$rel" "$KID" "$lu" || return 1
-      if [ "$RUN_CLAIMS" = on ]; then
+      if [ "$RUN_CLAIMS" = on ] && [ "$cas" != 0 ]; then
         ps=$(fact "$rel" prior-session) || :
-        if [ "$cas" = 0 ]; then
-          [ -z "$ps" ] || set_fact "$rel" prior-session "" || return 1
-        else
-          for pv in "$ls_sid" ${cw:+"$CW_SESS"}; do
-            [ -z "$pv" ] || [[ " $ps " == *" $pv "* ]] || ps="${ps:+$ps }$pv"
-          done
-          [ -z "$ps" ] || set_fact "$rel" prior-session "$ps" || return 1
-        fi
+        for pv in "$ls_sid" ${cw:+"$CW_SESS"}; do
+          [ -z "$pv" ] || [[ " $ps " == *" $pv "* ]] || ps="${ps:+$ps }$pv"
+        done
+        [ -z "$ps" ] || set_fact "$rel" prior-session "$ps" || return 1
+      fi
+      write_lease "$rel" "$KID" "$lu" || return 1
+      if [ "$cas" = 0 ] && [ -n "$(fact "$rel" prior-session)" ]; then
+        set_fact "$rel" prior-session "" || return 1
       fi
       stage_or_fail "$rel" || return 1
       echo "unattended: lease recorded · keepalive $KID · session ${os:-none} -> $(fact "$rel" session) · pid ${op:-none} -> $(fact "$rel" pid) · this resume passes the keepalive the record names, so it is the holder"

@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-24 — the `prior-session` add runs before `write_lease` moves the record's session, and the criteria that certify the set's readers start from the state and the session they need
 
-**Status:** SPECCED · rev-6 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 6
+**Status:** CLOSED · rev-6 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
