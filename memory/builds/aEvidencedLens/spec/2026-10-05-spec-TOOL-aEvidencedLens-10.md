@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-10 — `review_replay.py` scores a spec-audit report against a past one by file and section
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-1 · base 028b5cac · streams tooling · order 6
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 028b5cac · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -103,6 +103,11 @@ Read at base `028b5cac`.
 | `extract_section_ref` | `py.function` | new function: ref -> `(path, section)` or None |
 | `read_record_kind` | `py.function` | new function: text -> `spec-audit`, `diff-review` or None |
 | `extract_subject_pins` | `py.function` | new function: text -> `[(path, hex)]` |
+| `measure_replay` | `py.function` | new function: known text, candidate text, window -> the mode, both sides, the forced window and the score, or the refused side and its error |
+
+`measure_replay` is the one path from two texts to a score, called by `main` and by the `window-0`,
+`kind-mismatch` and `per-lens-known` arms alike, so the S3 window forcing and the S4 kind check are
+exercised where the CLI runs them rather than re-stated in an arm.
 
 Each was checked with `python tools/lexicon/lexicon.py --suggest <name> --as py.function` and
 answered OK. `parse_record_findings`, `parse_candidates` and `print_score` take the mode as a
@@ -197,6 +202,9 @@ New arm: tools/workflows/review_replay.py · `per-lens-known` an appendix known 
   reads the pins after the binding line, never from it, one line or one per bullet, and AC6's
   fixtures open with the binding line, one copied from this build's round-1 record. Id 21 (LOW): AC5
   observes `kind-mismatch` in both directions and an unbound candidate beside a spec record.
+- rev-3 · 2026-10-05 · §4 · build pass. The Inventory adds `measure_replay`: the S3 window forcing
+  lived in `main` alone, where no fixture-only arm can reach it, so `window-0` could not go red on a
+  build that dropped it. One function now carries the known-to-score path for `main` and the arms.
 
 ## 10. Reuse audit
 
