@@ -38,7 +38,7 @@ Cite ids, never line numbers.
 | [TOOL-aBoundedVerdict-32](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-20 | TOOL-cBriefedPilot-18 AC9 was CLAIMED at a close it was not met at. It… |
 | [TOOL-aBranchedMandate-5](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | adopt-drift-audit.sh diffs its render with no [ -s ] test, so… |
 | [TOOL-aBranchedMandate-8](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | --preflight OVERWRITES a live non-terminal run-state file, losing the… |
-| [TOOL-aBranchedMandate-9](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | --preflight's rotation and scaffold run BEFORE checks that can return… |
+| [TOOL-aBranchedMandate-9](../builds/aBranchedMandate/BACKLOG.md) | SPECCED | — | TOOL-aGraftedHelix-32 | 2026-08-17 | --preflight's rotation and scaffold run BEFORE checks that can return… |
 | [TOOL-aBranchedMandate-10](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | map_extractors.template.py unions the two JS scans with a bare +,… |
 | [TOOL-aBranchedMandate-11](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | govkit.py's blocked skip reason is unreachable behind cmd_apply's early… |
 | [TOOL-aCandidStub-1](../builds/aCandidStub/BACKLOG.md) | OPEN | — | — | 2026-08-10 | tools/hooks/agent-cap.js blesses an identifier bound from an EMPTY… |
