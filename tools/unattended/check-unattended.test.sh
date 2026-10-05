@@ -1307,10 +1307,10 @@ miss "$(run)" "check 2 FAILED"
 # ...and the closing review folds nothing, at the fold cutoff and after it (round 1, L7: both dates armed)
 reset_tree; dispconf 2000-01-01
 DISPDATE="2026-09-15T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2 · disposition fold\n'
-hit "$(run)" "record disposition fold on a row carrying highs and minors, and the closing diff review folds nothing"
+hit "$(run)" "record disposition fold on a row carrying highs and minors, and a counted exit folds nothing on any subject"
 reset_tree; dispconf 2000-01-01
 DISPDATE="2026-10-04T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2 · disposition fold\n'
-hit "$(run)" "record disposition fold on a row carrying highs and minors, and the closing diff review folds nothing"
+hit "$(run)" "record disposition fold on a row carrying highs and minors, and a counted exit folds nothing on any subject"
 # ...and the floors SUM across subjects in one record (round 1, L6 id 9): 1 (a spec subject without
 # counts) + 2 (a closing row, one high plus the minors) = 3, so a per-subject maximum would pass two
 reset_tree; dispconf 2000-01-01
@@ -1320,6 +1320,33 @@ D_FOUR='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n| TOOL-tDisp-3 | C
 reset_tree; dispconf 2000-01-01
 mkdisp "$D_ONE" "$D_FOUR" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote\n\n2026-08-20T02:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 1 · disposition promote\n'
 miss "$(run)" "check 2 FAILED"
+
+# ---- TOOL-aEvidencedLens-9 S7: A SPEC SUBJECT'S TERMINAL ROW COUNTS AND NEVER FOLDS from the
+# ---- driver's SPEC_COUNTS_CUTOFF on (2026-10-06). The base check 2 passes both red rows below: a
+# ---- countless converged row is the ordinary converged round, and a fold beside zero blockers
+# ---- demands nothing. A record first-committed before the cutoff keeps that reading.
+SC_MSG="record a terminal row with no highs and minors counts or with disposition fold in a record first-committed on or after SPEC_COUNTS_CUTOFF"
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-10-06T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-10-06T01:00:00Z review · item S1 · reason verdict CLEAN · blockers 0 · CONVERGED\n'
+hit "$(run)" "spec subject(s) S1 $SC_MSG"
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-10-06T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-10-06T01:00:00Z review · item S1 · reason verdict CLEAN · blockers 0 · CONVERGED · disposition fold\n'
+hit "$(run)" "spec subject(s) S1 $SC_MSG"
+# ...its green control: the counted row passes after the cutoff
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-10-06T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-10-06T01:00:00Z review · item S1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0\n'
+miss "$(run)" "check 2 FAILED"
+# ...a record first-committed before the cutoff is not re-graded, and the build-slug subject is not a spec one
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-10-04T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-10-04T01:00:00Z review · item S1 · reason verdict CLEAN · blockers 0 · CONVERGED · disposition fold\n'
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-10-06T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-10-06T01:00:00Z review · item tDisp · reason verdict CLEAN · blockers 0 · CONVERGED\n'
+miss "$(run)" "check 2 FAILED"
+# ...and a SPEC_COUNTS_CUTOFF the leg cannot read is named inside check 2, as FOLD_CUTOFF's is
+reset_tree; mkconf
+mutate $KIT_REL/unattended.sh 's|^SPEC_COUNTS_CUTOFF=.*|SPEC_COUNTS_CUTOFF=2026-10-06|'
+hit "$(run)" "the driver declares no readable ISO-date SPEC_COUNTS_CUTOFF, so the counted-spec-row clause cannot tell"
 
 # ---- TOOL-aProbedUnit-6: BOUNDED is a terminal exit that OWES a disposition and, on promote, an
 # ---- id, exactly as NON-CONVERGENT does. At base the first fixture printed NOTHING: the `needs`
@@ -5600,6 +5627,39 @@ MA_RUN=$(git -C "$ma22" log --format=%H --grep='^run grants$' -1)
 out=$(ma_leg "$ma22")
 hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
 miss "$out" "$MA_OWN_RD"
+
+# ==== TOOL-aEvidencedLens-9: NO RUN COMMIT CHANGES THE ROUND BOUND ===============================
+# The same own-commit list as the grant arm, so the same builder: the run's raise must red on a live
+# and on a terminal record, and an OWNER raise merged into the run branch must not. The fixture conf
+# declares no REVIEW_ROUNDS, so the bound before every raise is the driver's default of 1. At base
+# no arm below printed a round line. Every graph still carries the run's grant, so the grant arm
+# hitting in the quiet group proves the leg graded that range rather than finding nothing.
+MA_ROUNDS="a commit among a run's own commits changes the effective REVIEW_ROUNDS bound in .unattended.conf, and the round bound is the owner's, set by an owner commit outside any run (run mandate memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-0-run-mandate.md, decision 4) - commit and bound follow:"
+ma_rounds() { sed -i '/^REVIEW_ROUNDS=/d' "$1/.unattended.conf"; printf 'REVIEW_ROUNDS="%s"\n' "$2" >> "$1/.unattended.conf"; }
+# ---- R1: a live record whose own commit raises the bound
+ma_init gr1; mar="$ma_root/gr1"
+ma_rounds "$mar" 2; ma_commit "$mar" "run raises rounds"; MA_RR=$(ma_sha "$mar" HEAD)
+hit "$(ma_leg "$mar")" "$MA_ROUNDS $MA_RR 1 -> 2, run memory/builds/tRun/RUN.md"
+# ---- R2: the owner raises it on main and the run branch merges main. The merge's FIRST-parent diff
+# ---- carries the raise, so a scan reading it would red; the merge took one side's value, and the
+# ---- owner's commit is on the advertised tip, so nothing is named.
+ma_init gr2; mar="$ma_root/gr2"
+( cd "$mar" && git checkout -q main ) >/dev/null 2>&1; ma_rounds "$mar" 2; ma_commit "$mar" "owner raises rounds"
+( cd "$mar" && git push -q origin main && git checkout -q unit && git merge -q --no-edit main ) >/dev/null 2>&1
+MA_RUN=$(git -C "$mar" log --format=%H --grep='^run grants$' -1)
+same "fixture: the reconcile's first-parent diff carries the owner's raise" \
+  "$(git -C "$mar" diff --name-only HEAD^1 HEAD -- .unattended.conf)" ".unattended.conf"
+out=$(ma_leg "$mar")
+miss "$out" "changes the effective REVIEW_ROUNDS bound"
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+# ---- R3: a TERMINAL record, landed by a --no-ff merge named as its witness, whose range holds the
+# ---- run's raise. A live-only fixture never reaches the terminal arm of the range.
+ma_init gr3; mar="$ma_root/gr3"
+ma_rounds "$mar" 2; ma_commit "$mar" "run raises rounds"; MA_RR=$(ma_sha "$mar" HEAD)
+( cd "$mar" && git checkout -q main && git merge -q --no-ff --no-edit -m "land tRun" unit ) >/dev/null 2>&1
+ma_facts "$mar" tRun LANDED HEAD "$(ma_base "$mar")"
+printf 'landed-anchor: remote\n' >> "$mar/memory/builds/tRun/RUN.md"; ma_commit "$mar" "landed record"
+hit "$(ma_leg "$mar")" "$MA_ROUNDS $MA_RR 1 -> 2, run memory/builds/tRun/RUN.md"
 rm -rf "$ma_root"
 
 

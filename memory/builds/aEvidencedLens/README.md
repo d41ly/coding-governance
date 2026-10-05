@@ -86,7 +86,7 @@ ids TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16
 | [TOOL-aEvidencedLens-10 — `review_replay.py` scores a spec-audit report against a past one by file and section](spec/2026-10-05-spec-TOOL-aEvidencedLens-10.md) | 6 | 1 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aEvidencedLens-5 — the build harness hands the audit its context, sibling specs, checklist and prior findings](spec/2026-10-05-spec-TOOL-aEvidencedLens-5.md) | 6 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-7 — `--review` takes highs and minors on a spec subject's exit and requires `promote` when any stood](spec/2026-10-05-spec-TOOL-aEvidencedLens-7.md) | 6 | 2 | CLOSED | rev-2 | 2026-10-05 |
-| [TOOL-aEvidencedLens-9 — the bar refuses a run commit that changes `REVIEW_ROUNDS`](spec/2026-10-05-spec-TOOL-aEvidencedLens-9.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-05 |
+| [TOOL-aEvidencedLens-9 — the bar refuses a run commit that changes `REVIEW_ROUNDS`](spec/2026-10-05-spec-TOOL-aEvidencedLens-9.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aEvidencedLens-12 — the spec skeptic line carries a finding's evidence through a line-break-only fold, so a pipe survives](spec/2026-10-05-spec-TOOL-aEvidencedLens-12.md) | 7 | 2 | SPECCED | rev-3 | 2026-10-05 |
 | [TOOL-aEvidencedLens-14 — check 19 walks a terminal record's exclusions when EITHER owner-held scan hits, so an owner's round raise never reds an archived record](spec/2026-10-05-spec-TOOL-aEvidencedLens-14.md) | 7 | 2 | SPECCED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-8 — the build harness promotes spec-audit minors, batched, and records the counts](spec/2026-10-05-spec-TOOL-aEvidencedLens-8.md) | 7 | 2 | SPECCED | rev-2 | 2026-10-05 |

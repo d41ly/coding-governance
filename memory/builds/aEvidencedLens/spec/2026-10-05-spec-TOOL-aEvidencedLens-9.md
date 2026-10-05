@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-9 — the bar refuses a run commit that changes `REVIEW_ROUNDS`
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -26,8 +26,8 @@ definition of a run's own commits.
 
 - **S1** — `read_rounds_of`, beside `read_may_of`, reads a `.unattended.conf` blob and prints the
   EFFECTIVE round bound: the value of the LAST `REVIEW_ROUNDS=` line, because the driver sources the
-  conf and the last assignment wins, with surrounding quotes, trailing whitespace and a CR stripped;
-  or, when no such line exists, the driver's `REVIEW_ROUNDS_DEFAULT`, read from `$DRIVER`. A comment
+  conf and the last assignment wins, with surrounding quotes, a trailing ` # comment`, trailing
+  whitespace and a CR stripped; or, when no such line exists or the last one is empty, the driver's `REVIEW_ROUNDS_DEFAULT`, read from `$DRIVER`. A comment
   line spelling the key is not an assignment. Observed by AC1.
 - **S2** — `scan_round_writes`, beside `scan_grant_writes`, takes commit ids on stdin and prints
   `<commit> <old> <new>` for each commit whose effective bound differs from the effective bound at
@@ -258,6 +258,9 @@ New arm: tools/unattended/check-unattended.test.sh · a post-cutoff countless an
   `TOOL-aEvidencedLens-7`'s id 46 fold, S7 and AC6 add check 2's `SPEC_COUNTS_CUTOFF` clause and the
   §3 consumes-from edge names the constant. §3 gains the hands-off edge to `TOOL-aEvidencedLens-14`,
   the unit id 37 (HIGH) was promoted to.
+- rev-3 · 2026-10-05 · S1 · build pass. S1 now strips a trailing ` # comment` and reads an
+  EMPTY last assignment as the default, because the driver sources the conf and `read_bound_key`
+  takes an empty value as unset; the raw reading would have called `REVIEW_ROUNDS=""` a change from 1.
 
 ## 10. Reuse audit
 
