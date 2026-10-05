@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-39 — a harness-hooks inventory, and `git-hooks` holds real hook names only
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 39 · advances TOOL-aProbedToolkit-15
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 39 · advances TOOL-aProbedToolkit-15
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-39-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-39-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -145,6 +147,9 @@ and the remedy the error prints is to add the name to the constant.
 - `memory/map/features/session-kickoff.md`
 - `memory/map/features/run-gates.md`
 - `memory/map/features/memory-tree-hygiene.md`
+- every other dossier under `memory/map/features/`, each gaining an empty `harness-hooks = []` line:
+  `parse_dossier` in `tools/codebase-map/map_lib.py` refuses a `[claims]` table that does not carry
+  exactly the inventory ids, so a new inventory is a line in every dossier
 - `memory/map/generated/inventories.json`
 - `memory/map/generated/MAP.md`
 
@@ -240,6 +245,11 @@ AC4 stage its refusals. No arm is added or moved.
   so the Non-goals, Edges and F1 name them; and the claims this unit adds to `agent-cap` and
   `unattended` would breach the dossier cap that `TOOL-aMendedFleet-89`, ordered after this unit,
   is the first to relieve, so S6 and AC7 make the room in this commit.
+- rev-3 · 2026-10-05 · §4 Files touched · the build pass: `parse_dossier` requires every dossier's
+  `[claims]` to carry exactly the inventory ids, so every dossier gains an empty `harness-hooks`
+  line, not only the claimants the estimate listed; and S4's "stays reachable through its dossier's
+  path globs" held only for `straggler-guard.sh`, so the `run-gates` dossier's globs gain
+  `.githooks/pre_push_bar_selftest.py` and `FOUNDATION.md`'s gain `.githooks/gate-env.sh`.
 
 ## 10. Reuse audit
 

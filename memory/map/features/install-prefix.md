@@ -17,6 +17,7 @@ gate-legs = [
 ]
 kits = []
 git-hooks = []
+harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []

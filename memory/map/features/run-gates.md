@@ -15,7 +15,8 @@ gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring"
   "leg ceilings clear their evidenced maximum", "run-gates run-log line",
   "receipt sync (installed files match the receipt)", "pre-push bar self-test"]
 kits = ["run-gates"]
-git-hooks = ["pre_push_bar_selftest.py"]
+git-hooks = []
+harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -36,6 +37,7 @@ backlog-shards = []
 lexicon-verbs = []
 [paths]
 globs = [
+  ".githooks/pre_push_bar_selftest.py",
   "tools/run-gates/run-gates.sh",
   "tools/run-gates/run-selftests.sh",
   "tools/run-gates/lib-attribute.sh",

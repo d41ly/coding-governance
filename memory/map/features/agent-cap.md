@@ -21,6 +21,7 @@ gate-legs = [
 ]
 kits = ["hooks"]
 git-hooks = []
+harness-hooks = ["PreToolUse tools/hooks/agent-cap.js", "PreToolUse tools/hooks/scratch-guard.js"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -91,8 +92,7 @@ advertised that override for two releases after it stopped deciding anything —
 knob survives.
 
 **The runtime half claims a NUMBERED SLOT with `O_EXCL`; it does not count.** Read-then-decide loses
-updates — measured, a four-call burst overlapped its hook processes and two of four read the same
-count. Create-a-token-then-count does not fix it: six concurrent processes each observe a count
+updates, as `TOOL-aNumeralWarden-1` measured. Create-a-token-then-count does not fix it: six concurrent processes each observe a count
 between their own ordinal and six, so several deny where exactly one must. Only the atomic
 create decides. The budget is keyed per `session_id` + `prompt_id` under the git common dir, so a new
 user prompt resets it with no cleanup step, and it is idempotent per `tool_use_id` so a re-invoked
@@ -110,14 +110,15 @@ they cannot parse, and both are matched on a `|`-joined pair of exact tool names
 wired to one modality leaves the same act available through the other — the lesson `agent-cap`
 learned when `Workflow` alone left direct `Agent` spawns unguarded. The kit entry is still named
 `agent-cap` and versions the whole home: `version_from` is entry-level and single-valued, so a
-second constant would be invisible to govkit rather than gated by it.
+second constant would be invisible to govkit rather than gated by it. Each wiring is a
+`harness-hooks` claim.
 
 **`scratch-guard.js` carries a SECOND check, and it rides the process that already spawns.**
 `TOOL-aReplayedCard-1`: after the scratch verdict, `checkOriented` refuses a main-loop `git commit`
 while the session's orientation card under `<git-common-dir>/orientation/` still holds the kickoff
 writer's sentinel `READY — none yet`, or names another tree than the commit targets. It is inside
-this file and not a third hook because a node spawn was measured at 0.8–1.1 s on node `a`, so a
-second file on the `Bash|PowerShell` matcher doubles every shell call. The predicate has ONE
+this file and not a third hook because a second file on the `Bash|PowerShell` matcher doubles
+every shell call's spawn cost, which that unit's spec measured. The predicate has ONE
 evaluation order, written above the function: shape, `agent_id`, missing fields, an unwalkable
 target, an absent or replay-written card, then the sentinel-or-mismatch test, and only then the
 exemption — the commit that CREATES a build README carrying `authorized-by:` with a value in the
@@ -211,8 +212,7 @@ turns the cap rules off with no diff.
 - **Agents spawned INSIDE a workflow sidechain are uncounted, and always will be.** The script's
   `agent()` is a runtime call and not a TOOL call, so the `Workflow|Agent` matcher has nothing to
   match, and a sidechain agent holds neither tool to re-fan-out with. NOT because a sidechain runs no
-  hooks — it does, MEASURED 2026-09-12: a project `PreToolUse` guard on `Bash|PowerShell` denied a
-  Bash command issued from inside one. Declared here and in the protocol; it is why the `Workflow`
+  hooks — it does (`TOOL-cRefutedPremise-1`). Declared here and in the protocol; it is why the `Workflow`
   half is static.
 - **A `Workflow({name:'…'})` run supplies no source to the hook.** Covered second-hand by the
   merge-bar leg over `tools/workflows/`, which is why that leg exists. The spec-audit rule needs no

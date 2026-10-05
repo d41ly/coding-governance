@@ -15,6 +15,7 @@ gate-legs = ["runlog selftest", "pre-push run-log line", "runlog record schema",
   "runlog skill wiring"]
 kits = ["runlog"]
 git-hooks = []
+harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = ["runlog"]

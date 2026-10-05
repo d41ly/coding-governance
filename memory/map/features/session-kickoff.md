@@ -11,6 +11,7 @@ decisions = []
 gate-legs = ["kickoff engine size <=18KiB"]
 kits = []
 git-hooks = []
+harness-hooks = ["SessionStart skills/session-kickoff/manifest-check.sh"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -94,6 +95,8 @@ preflight line states the posture.
   copy can differ with nothing to notice. `check-wiring.sh` now compares them by content and reports
   at SessionStart; it is deliberately not a merge-bar leg, because machine state travels with no
   commit and would red the bar for a reason no diff can fix.
+- **`manifest-check.sh` is wired at `SessionStart`** to write or replay the orientation card, two
+  matchers on one event and so one `harness-hooks` claim; no path glob here covers it.
 - **The `governance-template:` marker fallback is engine-only.** The checker does not implement it, so
   it is absent from `--locations` and is documented as engine behaviour instead. That is one fact in
   two documents, which is the shape this feature otherwise exists to remove; it survives because

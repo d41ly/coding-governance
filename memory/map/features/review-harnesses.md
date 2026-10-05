@@ -18,6 +18,7 @@ gate-legs = [
 ]
 kits = []
 git-hooks = []
+harness-hooks = []
 workflow-scripts = [
   "check-workflow-syntax.js",
   "drift-audit-code.js",

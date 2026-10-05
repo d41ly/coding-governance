@@ -95,20 +95,78 @@ def _tool_kits() -> list[str]:
     return names
 
 
-def _git_hooks() -> list[str]:
-    """The tracked git hooks in .githooks/ (core.hooksPath points here).
+#: The hook names githooks(5) documents. A name git never runs is not a hook, so a misspelt one
+#: must not be inventoried as live; a hook git adds later fails loudly in _git_hooks until it is
+#: added here (TOOL-aMendedFleet-39).
+GIT_HOOK_NAMES = frozenset({
+    "applypatch-msg", "pre-applypatch", "post-applypatch", "pre-commit", "pre-merge-commit",
+    "prepare-commit-msg", "commit-msg", "post-commit", "pre-rebase", "post-checkout", "post-merge",
+    "pre-push", "pre-receive", "update", "proc-receive", "post-receive", "post-update",
+    "reference-transaction", "push-to-checkout", "pre-auto-gc", "post-rewrite",
+    "sendemail-validate", "fsmonitor-watchman", "p4-changelist", "p4-prepare-changelist",
+    "p4-post-changelist", "p4-pre-submit", "post-index-change",
+})
 
-    A hook's sibling `<stem>.test.sh` is its TEST, not a hook, and is excluded by suffix so a new
-    hook-plus-test pair needs no patch here.
+
+def _git_hooks() -> list[str]:
+    """The tracked git hooks in .githooks/ (core.hooksPath points here) — the files git RUNS.
+
+    A hook's sibling `<stem>.test.sh` is its TEST, and any other file with an extension is a helper
+    a hook sources or calls; neither is a key. An extension-less file whose name is not in
+    GIT_HOOK_NAMES raises, because git will never run it.
     """
     base = ROOT / ".githooks"
     m.no_subdirs(base, "git-hooks")
-    names = sorted(
-        p.name for p in base.iterdir() if p.is_file() and not p.name.endswith(".test.sh")
-    )
+    names = []
+    for p in base.iterdir():
+        if not p.is_file() or p.name.endswith(".test.sh") or p.suffix:
+            continue
+        if p.name not in GIT_HOOK_NAMES:
+            raise m.MapError(
+                f"git-hooks: .githooks/{p.name} is not a hook name git runs (githooks(5)) — "
+                "rename it, give a helper an extension, or add a new git hook to GIT_HOOK_NAMES"
+            )
+        names.append(p.name)
     if not names:
         raise m.MapError("git-hooks: .githooks/ holds no hook files")
-    return names
+    return sorted(names)
+
+
+_PROJECT_SCRIPT = re.compile(r"\$\{CLAUDE_PROJECT_DIR\}/([^\"'\s]+)")
+
+
+def _derive_harness_hooks(doc: object) -> object:
+    """`<event> <script>` for every command hook .claude/settings.json wires.
+
+    The script is the repo-relative path the command runs under ${CLAUDE_PROJECT_DIR}/; several
+    matchers wiring one script on one event are one key. Fail-closed: a non-command hook, a command
+    naming no project script or more than one, and a script not in the tree each raise naming the
+    event and the command.
+    """
+    events = doc["hooks"] if isinstance(doc, dict) else None
+    if not isinstance(events, dict):
+        raise m.MapError("harness-hooks: expected a `hooks` table of events")
+    keys = set()
+    for event, groups in events.items():
+        if not isinstance(groups, list):
+            raise m.MapError(f"harness-hooks: {event}: expected a list of matcher groups")
+        for group in groups:
+            for hook in (group.get("hooks") if isinstance(group, dict) else None) or [None]:
+                cmd = hook.get("command") if isinstance(hook, dict) else None
+                if not isinstance(hook, dict) or hook.get("type") != "command" or not isinstance(cmd, str):
+                    raise m.MapError(f"harness-hooks: {event}: not a command hook: {hook!r}")
+                scripts = _PROJECT_SCRIPT.findall(cmd)
+                if len(scripts) != 1:
+                    raise m.MapError(
+                        f"harness-hooks: {event}: command names {len(scripts)} "
+                        f"${{CLAUDE_PROJECT_DIR}}/ scripts, expected one: {cmd}"
+                    )
+                if not (ROOT / scripts[0]).is_file():
+                    raise m.MapError(
+                        f"harness-hooks: {event}: {scripts[0]} is not a file in the tree: {cmd}"
+                    )
+                keys.add(f"{event} {scripts[0]}")
+    return keys
 
 
 def _gate_legs(doc: object) -> object:
@@ -139,6 +197,10 @@ EXTRACTORS: dict[str, object] = {
     "kits": _tool_kits,
     # The tracked hooks that enforce the bar at the git boundary.
     "git-hooks": _git_hooks,
+    # The harness hooks that steer a session, one key per event and script (TOOL-aMendedFleet-39).
+    "harness-hooks": lambda: m.json_artifact_inventory(
+        ROOT / ".claude" / "settings.json", "harness-hooks", _derive_harness_hooks
+    ),
     # The multi-agent harnesses and the gates over them.
     "workflow-scripts": lambda: m.glob_inventory(
         resolve_kit_dir("workflows", "tier2-review.js", TOOLS), "*.js", "workflow-scripts"

@@ -11,6 +11,7 @@ decisions = []
 gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history", "brief-recorded", "unattended protocol size"]
 kits = ["unattended"]
 git-hooks = []
+harness-hooks = ["PreToolUse tools/unattended/gate-guard.js", "Stop tools/unattended/stop-guard.js", "StopFailure tools/unattended/stall-recorder.js"]
 workflow-scripts = ["unattended-build.js", "unattended-unit.js"]
 skill-engines = ["session-kickoff"]
 rendered-skills = ["unattended"]
@@ -87,7 +88,7 @@ three actors outside the session, reading one predicate, `--liveness`, whose clo
 queued at the turnstile by the runner's heartbeat (`TOOL-dDerivedDocket-64`) and a session waiting
 on its Workflow by its sub-agents' transcripts (`TOOL-dDerivedDocket-65`). The tick launches only
 on a lease the INDEX holds, on the node that took it; the reap is read back at `--landed` against
-the stop-guard's listing.
+the stop-guard's listing. The three hooks are this dossier's `harness-hooks` claims.
 
 **How a run stops, who drives it and which processes are its own has its own dossier.** HELD, the
 lease and the process ledger are `unattended-stops`.
@@ -141,11 +142,9 @@ never a DoD item and never a gate.
 
 **Every remote observation is BOUNDED, and the bound is a file constant.** The kit makes remote
 round-trips on the authorization path — the default-branch HEAD advertisement, the per-branch tip
-under the published anchor, and the leg's own two — and until 2026-08-20 none had a
-deadline. A partitioned endpoint therefore turned `--close` into a silent wait, and the
-same calls inside the leg turned a `git push` into a HUNG push rather than a red one, because the leg
-runs under `.githooks/pre-push`. The tracked incident is a driver selftest that produced zero output
-at 240 s and wedged the bar.
+under the published anchor, and the leg's own two. Unbounded, a partitioned endpoint turned
+`--close` into a silent wait and a `git push` into a HUNG one rather than a red one, since the leg
+runs under `.githooks/pre-push` (`TOOL-aBoundedVerdict-10`).
 
 Three bounds, because no single mechanism covers every transport: an outer wall clock for blackholed
 packets, `http.lowSpeed{Limit,Time}` for a server that ACCEPTS and then stalls — which no wall clock
@@ -156,9 +155,8 @@ observation and cannot disable credentials for the landing push.
 
 **The load-bearing detail is the CAPTURE, not the deadline.** `out=$(timeout N cmd)` does not bound
 the clock: the substitution reads until EOF, EOF arrives only when the last inherited write end
-closes, and a surviving descendant holds the pipe while `timeout` reports 124 on schedule. Measured
-on node `c` inside the suite that grades it — 8 s through a substitution against a declared 1 s
-bound, 0 s through a file. So the helper redirects to a file and reads it after `timeout` returns,
+closes, and a surviving descendant holds the pipe while `timeout` reports 124 on schedule, as
+`TOOL-aBoundedVerdict-13` measured. So the helper redirects to a file and reads it after `timeout` returns,
 with `-k` for the child that ignores SIGTERM. The gate runner carries the identical fix for the
 identical reason, found independently, which is why the arm that proves it MEASURES elapsed time
 rather than asserting a message.

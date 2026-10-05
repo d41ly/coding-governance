@@ -16,6 +16,7 @@ gate-legs = [
 ]
 kits = ["memory-recall"]
 git-hooks = []
+harness-hooks = ["PostToolUse tools/memory-recall/recall-opened.js"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = ["memory-recall"]
@@ -33,7 +34,8 @@ globs = [
 The kit answers "why is this repo the way it is" from its own records, offline and stdlib-only:
 `extract.py` walks the corpus once, `bench.py` scores retrieval substrates, `query.py` serves the
 CLI and the rendered Skill, and `check-recall.py` grades a committed question set against a declared
-floor on the merge bar.
+floor on the merge bar. `recall-opened.js`, the opt-in `PostToolUse` observer on `Read`, is this
+dossier's `harness-hooks` claim.
 
 ## Constraints & why
 
