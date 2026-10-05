@@ -467,7 +467,7 @@ def read_spec_probes(root: pathlib.Path) -> list[dict]:
     mem = extract.CONF.memory_root
     try:
         listed = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", f"{mem}/builds"],
-                                capture_output=True, text=True, check=True).stdout
+                                capture_output=True, text=True, encoding="utf-8", check=True).stdout
     except (OSError, subprocess.CalledProcessError) as exc:
         raise CheckRefused(f"git ls-files under {root.as_posix()} failed: {exc}") from exc
     spec_re = re.compile(rf"^{re.escape(mem)}/builds/([^/]+)/spec/.+\.md$")
