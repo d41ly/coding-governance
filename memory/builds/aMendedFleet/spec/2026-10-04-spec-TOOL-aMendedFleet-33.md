@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-33 — the recall README and Skill stop typing corpus figures, and a miss re-queries before grep
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 33
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 33
 
 <!-- gen:spec-records -->
 
@@ -42,6 +42,13 @@ grep".
   checks. Observed by AC4.
   **Readers:** by name: `tools/memory-recall/README.md` alone spells the count. by value:
   NO VALUE READERS — the test computes its own count and reads nothing from the README.
+- **S4** — The comment above `DEFAULT_CACHE_BUDGET_MB` in `tools/memory-recall/recall_conf.py`
+  stops typing "one cache here is 2.4 MB" and stops calling the default measured on this tree. It
+  keeps the upstream figure, labelled as upstream's, and says a cache's size here is read off its
+  directory under `<git-common-dir>/recall/cache/` rather than typed. The constant's value does not
+  move. Observed by AC5.
+  **Readers:** by name: `tools/memory-recall/recall_conf.py` alone spells the figure. by value:
+  NO VALUE READERS — a comment; the constant below it is unchanged.
 
 ## 3. Non-goals (OUT)
 
@@ -86,6 +93,7 @@ with `git diff --stat`.
 - `tools/memory-recall/README.md`
 - `tools/memory-recall/SKILL.template.md`
 - `.claude/skills/memory-recall/SKILL.md`
+- `tools/memory-recall/recall_conf.py` (a comment only, S4)
 
 ### Rollout
 
@@ -126,6 +134,10 @@ This unit builds after units 31 and 32, which also write `tools/memory-recall/RE
   "8 cases" line, and the `--stats` hit sits in the `Notes` bullet saying it prints the manifest
   beside a question.
   Red when: the typed count survives, or the bullet points at no live count.
+- **AC5** — When `grep -n -E "2\.4 MB|MEASURED on this tree" tools/memory-recall/recall_conf.py`
+  runs, it prints nothing, and `python -c "import sys; sys.path.insert(0, 'tools/memory-recall'); import recall_conf; print(recall_conf.DEFAULT_CACHE_BUDGET_MB)"`
+  prints `512.0`.
+  Red when: the typed cache size survives, or the constant moved.
 
 ## 7. Gates
 
@@ -147,6 +159,10 @@ excluded as broad, and its Skill-drift arm reads the same render.
 
 - rev-1 · 2026-10-04 · initial draft, from the README, the Skill template and a re-measure of the
   corpus.
+- rev-2 · 2026-10-05 · S4 and AC5 added: the unit's own brief names a second copy of the stale cache
+  figure, "one cache here is 2.4 MB" in `recall_conf.py`, which unit 32 found outside its write set;
+  a cache here now measures over 100 MB. The README `Notes` bullet §4 cites at lines 255 to 261 sits
+  at 288 to 294 after units 31 and 32; its text is unchanged.
 
 ## 10. Reuse audit
 

@@ -288,3 +288,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T05:00:23Z brief · item TOOL-aMendedFleet-33 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
 
 2026-10-05T05:01:04Z brief · item TOOL-aMendedFleet-33 · reason 7dc71b65fe63 memory/builds/aMendedFleet/prompts/2026-10-05-prompt-TOOL-aMendedFleet-33-1-build-brief.md
+
+2026-10-05T05:05:24Z dispatch · item 56ccb974 TOOL-aMendedFleet-33 · reason tools/memory-recall/README.md tools/memory-recall/SKILL.template.md .claude/skills/memory-recall/SKILL.md tools/memory-recall/recall_conf.py memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-33.md memory/builds/aMendedFleet/README.md memory/LIVE.md
