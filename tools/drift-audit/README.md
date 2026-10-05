@@ -132,6 +132,7 @@ never is.
 | `backlog_asks_contested` | does an ask carry both closing and declining evidence, or terminal evidence beside a live spec? Not asked under `shards`. | no |
 | `backlog_evidence_sha` | does every `by <sha>` closing an ask resolve to a commit in this clone? Not asked under `shards`. | no |
 | `backlog_asks_unlabelled` | how many live asks carry no severity row? Not asked under `shards`. | no |
+| `open_asks_cited_by_product_source` | does a live ask name work that already shipped? Counts the asks of the generator's live projection whose id tracked `EVIDENCE_GLOBS` source cites, by signal 2's whole-word match in one `git grep`; the detail names each with its status and up to three citing paths. DEAD PROBE when the projection cannot be read or the globs resolve to no file; not asked under `shards`. Report-only until a sampled precision exists, because source legitimately cites an ask it has not fixed yet. | no |
 | `backlog_stragglers` | does a ref still carry backlog row changes unaccounted against the default branch? | no |
 | `asks_disposed_overrides` | how often did a run buy the `asks-disposed` Definition-of-Done item with an override? | no |
 | `run_records_nonterminal_but_merged` | does a run record still read live after its work reached the default branch? | no |

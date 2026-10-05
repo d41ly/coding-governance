@@ -1954,6 +1954,46 @@ def build_backlog_asks_unlabelled(ctx) -> dict:
             "live": len(judged) > 0, "detail": [{"id": i} for i in hits[:20]]}
 
 
+# Signal 2's sibling for asks (TOOL-aMendedFleet-55): a LIVE ask whose id tracked product source
+# cites may describe work that already shipped. REPORT-ONLY and pinless, because source legitimately
+# cites an ask it has not fixed yet — a forward reference reads exactly like a fix here — and no
+# sampled precision exists to gate on. The population is the generator's live projection with no
+# status rule of this kit's own; the citation test is signal 2's whole-word `-w -F` over
+# EVIDENCE_GLOBS, run ONCE with the ids on stdin so the argument list does not grow with the backlog.
+def build_open_asks_cited_by_source(ctx) -> dict:
+    """Live asks whose id is cited by tracked product source, each with up to three citing paths."""
+    name = "open_asks_cited_by_product_source"
+    rows, skip = read_asks_or_skip(ctx, name, all_rows=False)
+    if skip:
+        return skip
+    judged = [r for r in rows if isinstance(r.get("id"), str) and r["id"].strip()]
+    ids = sorted({r["id"].strip() for r in judged})
+    cited: dict = {}
+    if ids:
+        # `-z` so a path is split from its match by NUL, not by a ':' a path may hold. Exit 1 is
+        # "no match", a clean zero; anything above it is git failing, which judges nothing.
+        hit = subprocess.run(["git", "-C", str(ctx.root), "grep", "-o", "-z", "-w", "-F", "-f", "-",
+                              "--", *ctx.evidence_globs],
+                             input="".join(i + "\n" for i in ids), capture_output=True, text=True,
+                             encoding="utf-8", errors="replace")
+        if hit.returncode > 1:
+            said = ((hit.stderr or "").strip().splitlines() or [f"exit {hit.returncode}"])[-1]
+            return {"signal": name, "value": 0, "of": 0, "tolerance": None, "gateable": False,
+                    "live": False, "detail": [{"note": f"git grep failed: {said[:240]}"}]}
+        for line in hit.stdout.splitlines():
+            path, _, match = line.partition("\0")
+            cited.setdefault(match.strip(), set()).add(path)
+    seen = ctx.git.run("ls-files", "--", *ctx.evidence_globs)
+    evidence_files = len(seen.stdout.split()) if seen.returncode == 0 else 0
+    detail = sorted(({"id": r["id"].strip(), "status": r.get("status"),
+                      "cited_in": sorted(cited[r["id"].strip()])[:3]}
+                     for r in judged if r["id"].strip() in cited), key=lambda d: d["id"])
+    return {"signal": name, "value": len(detail), "of": len(judged),
+            "evidence_files": evidence_files, "tolerance": None, "gateable": False,
+            # Signal 2's two liveness halves: a population, AND evidence globs that resolve.
+            "live": len(judged) > 0 and evidence_files > 0, "detail": detail}
+
+
 # --------------------------------------------------------------------------------------------
 # Signal — armed `*_CUTOFF` keys across the tracked root confs (TOOL-aMendedFleet-21)
 #
@@ -2754,6 +2794,7 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            build_readme_mechanism_drift,
            build_backlog_asks_contested, build_backlog_evidence_sha,
            build_backlog_asks_unlabelled,
+           build_open_asks_cited_by_source,
            build_cutoff_keys_armed,
            build_source_cited_ids_with_no_record,
            build_backlog_stragglers,

@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-55 — drift reports `open_asks_cited_by_product_source`, report-only
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 55
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 55
 
 <!-- gen:spec-records -->
 

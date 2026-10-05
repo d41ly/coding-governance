@@ -1718,6 +1718,11 @@
       "file": "tools/check-testsuite-counts.test.sh"
     },
     {
+      "id": "build_open_asks_cited_by_source",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_owned_fixture",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"

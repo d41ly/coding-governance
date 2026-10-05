@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 352
+CHECK_FLOOR = 357
+# 352 -> 357, TOOL-aMendedFleet-55: the five `open_asks_cited_by_product_source` checks.
 # 345 -> 352, TOOL-aMendedFleet-54: the seven checks of `test_live_builds_without_activity`.
 # 330 -> 339, TOOL-aMendedFleet-52: the nine checks of `test_handkept_name_sets`.
 # 339 -> 345, TOOL-aMendedFleet-53: the six checks of `test_auto_memory_pointers`.
@@ -1362,6 +1363,34 @@ def test_backlog_ask_signals(tmp: pathlib.Path) -> None:
         dead = report(r)[name]
         check(f"[dDD-34] a projection lacking `{field}` makes {name} a DEAD PROBE, not a 0",
               dead["live"] is False and not dead.get("not_asked"), f"{dead}")
+
+    # TOOL-aMendedFleet-55: live asks cited by product source, over the same stub projection. The
+    # fixture's EVIDENCE_GLOBS is `src` minus `*.test.sh`; `-4` appears only inside `-41`.
+    name = "open_asks_cited_by_product_source"
+    asks = [{"id": f"ARCH-aFoo-{n}", "status": "OPEN"} for n in (2, 3, 4)]
+    (r / "projection.json").write_text(json.dumps(asks), encoding="utf-8", newline="\n")
+    (r / "src").mkdir(exist_ok=True)
+    (r / "src" / "cites.py").write_text("# fixes ARCH-aFoo-2\n# and ARCH-aFoo-41, a longer sibling\n",
+                                        encoding="utf-8", newline="\n")
+    (r / "src" / "only.test.sh").write_text("# ARCH-aFoo-3\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "asks cited from source and from a test", "--no-verify"], r)
+    got = report(r)[name]
+    ids = [d["id"] for d in got.get("detail", [])]
+    check("[aMF-55] cited asks: 1 of 3 live, report-only and pinless",
+          (got["value"], got["of"], got["live"], got["gateable"], got["tolerance"])
+          == (1, 3, True, False, None), f"{got}")
+    check("[aMF-55] an ask cited from product source counts, with its status and path",
+          {"id": "ARCH-aFoo-2", "status": "OPEN", "cited_in": ["src/cites.py"]} in got["detail"],
+          f"{got['detail']}")
+    check("[aMF-55] an ask cited only from a *.test.sh file does not count",
+          "ARCH-aFoo-3" not in ids, f"{ids}")
+    check("[aMF-55] a sibling id one digit longer does not count for the shorter id",
+          "ARCH-aFoo-4" not in ids, f"{ids}")
+    (r / "projection.json").write_text("not json", encoding="utf-8", newline="\n")
+    dead = report(r)[name]
+    check("[aMF-55] an unreadable projection reads not live, never not asked",
+          dead["live"] is False and not dead.get("not_asked"), f"{dead}")
 
 
 NL_ = chr(10)
