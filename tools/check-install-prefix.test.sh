@@ -44,7 +44,7 @@ GK_SRC=$(git ls-files -- "${PFX}*/govkit.py" | head -1)
 GK=${GK_SRC%/*}; GK=${GK##*/}
 TL=tool   # gov's own prefix is "${TL}s", assembled so that this file does not spell it
 T=$(printf '\t')
-FLOOR_ASSERTIONS=40
+FLOOR_ASSERTIONS=39
 fails=0; passed=0; GRADED=0
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 

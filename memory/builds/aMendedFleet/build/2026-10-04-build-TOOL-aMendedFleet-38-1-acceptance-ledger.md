@@ -19,6 +19,11 @@ suite's own `check`: `ok`. Staged red by deleting the `return 2` after the refus
 `map_diff.main`: `FAIL ... map_diff exited 0, not a refusal`; restored, `ok`. The census and fixture
 edit in `tools/check-install-prefix.test.sh` was not run: it is a `*.test.sh` suite. Neither suite ran.
 
+The post-commit bug-class pass (retirement-inventory-misses-readers-by-value) found that suite's
+`FLOOR_ASSERTIONS` at 40 against an executed count, enumerated statically from every `good` and
+`run_arm` call site and loop width, of 40 before the census site left and 39 after. The floor falls
+to 39 in a second commit, with spec rev-3 naming it in S6; the suite's own count is the close's.
+
 ## Owed at the close
 
 - `codebase-map kit selftest`, `codebase-map gate coverage`, `codebase-map adopter e2e`,

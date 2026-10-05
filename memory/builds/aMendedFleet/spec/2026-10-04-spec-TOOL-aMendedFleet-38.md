@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-38 — `map_diff --converge`, its sink and its prescriptions are deleted
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 38 · closes TOOL-aScouredKit-17
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 38 · closes TOOL-aScouredKit-17
 
 <!-- gen:spec-records -->
 
@@ -73,9 +73,10 @@ its sink on node a and the prescriptions, so the kit stops advertising a check t
   shape, because the only tree site of it is `derive_backlog_path`, which S1 deletes, and the census
   exists to refuse a homonym arm for a spelling nobody writes. The `tools/codebase-map/selftest.py`
   row of `memory/project/encoding-posture-sites.txt` takes the count the scan measures after S5,
-  since that registry is set-equal in both directions. Observed by AC5.
+  since that registry is set-equal in both directions. The suite's `FLOOR_ASSERTIONS` falls 40 -> 39,
+  because the census arm executed once per site and the floor sat at the count it ran. Observed by AC5.
   **Readers:** by name: `tools/check-install-prefix.test.sh` alone spells the census site.
-  by value: NO VALUE READERS — the site string is matched against the tree and nothing else reads it.
+  by value: `FLOOR_ASSERTIONS` in the same file, which counts every executed arm, the census ones included.
 - **S7** — Node a's sink, the file `reinvention-backlog.md` in the `codebase-map` directory of this
   clone's git common dir, is deleted after the unit's acceptance ledger records how many rows it held.
   One sentence in the `map_diff.py` entry of `tools/codebase-map/README.md` names that path as
@@ -220,6 +221,9 @@ The eight arms S5 deletes are not moved anywhere: their subject is gone, so thei
   `reinvention-backlog` under `tools` while S7 writes one sentence naming that path into the kit
   README, so AC2 now expects exactly that line; AC3 ran the lookup at the default byte budget
   `TOOL-aMendedFleet-36` lands first, which can cut every `SEAM` row, so it now passes `--budget 0`, and §3 Edges declares the edge it rests on.
+- rev-3 · 2026-10-04 · S6 · the post-commit bug-class pass: S6 said the census site had no value
+  readers, but the suite's `FLOOR_ASSERTIONS` counted its executed arms and sat at exactly 40, so
+  deleting one census site would red the suite at 39; S6 now lowers the floor with the site.
 
 ## 10. Reuse audit
 
