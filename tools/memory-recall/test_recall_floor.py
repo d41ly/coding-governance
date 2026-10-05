@@ -627,7 +627,7 @@ def test_spec_probes_dead_harvest():
 def test_spec_probes_matched_delimiter():
     import importlib.util  # noqa: PLC0415
 
-    root = build_spec_root('`python tools/memory-recall/query.py "why does the gate refuse a\n'
+    root = build_spec_root('`python query.py "why does the gate refuse a\n'
                            "caller's bound\" --terms \"alpha beta gamma delta epsilon zeta eta\n"
                            'theta"` returned ' + INSIDE + '.')
     spec = importlib.util.spec_from_file_location("check_recall_arm", CHECK)
