@@ -210,3 +210,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T01:32:10Z dispatch · item 586b7b48 TOOL-aMendedFleet-19 · reason tools/memory-tree/gen_build_index.py tools/memory-tree/README.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-19.md memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-19-1-acceptance-ledger.md memory/builds/aMendedFleet/README.md
 
 2026-10-05T01:43:33Z brief · item TOOL-aMendedFleet-20 · reason ca9f6d277d8a memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
+
+2026-10-05T01:48:09Z dispatch · item 5014c3ac TOOL-aMendedFleet-20 · reason tools/memory-tree/gen_build_index.py tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/README.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-20.md memory/guides/SESSION-KICKOFF.md memory/builds/aMendedFleet/README.md

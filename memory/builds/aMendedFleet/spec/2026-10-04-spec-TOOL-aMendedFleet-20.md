@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-20 — `--new-spec` writes a skeleton that already carries every shape a cutoff demands
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 20
+**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 20
 
 <!-- gen:spec-records -->
 

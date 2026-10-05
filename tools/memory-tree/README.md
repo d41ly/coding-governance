@@ -310,6 +310,17 @@ revision. `--new-build <slug> --asks <IDLIST>` scaffolds the build README an own
 the readiness table first, refuses when an id is filed nowhere or every id grades `no`, and
 otherwise writes and stages that README and its contract row, then renders.
 
+`--new-spec <ID> --tier <1|2> [--order <n>] [--base <sha>]` writes one spec skeleton,
+`<MEMORY_ROOT>/builds/<slug>/spec/<today>-spec-<ID>.md`, and prints its path and its slot count. The
+header is filled: status `OPEN`, `rev-1`, today, the node from the slug, `--tier`, `base` from
+`--base` or `HEAD`, `streams` from the id's family, and `order` only when `--order` is given. The
+`##` headings are read from the skeleton fence of the installed `TEMPLATE-SPEC.md`, and the body
+already carries every shape a dated cutoff in the conf demands. Each part only an author can write
+is a slot opening with the fill marker `<fill:`, which hygiene check 12 refuses as an unfilled
+skeleton placeholder on both tiers. It refuses before writing on a bad tier, id, family, slug,
+duplicate id, existing file, `--base` or `--order`, and it stages nothing and renders nothing. After
+filling every slot, run `git add <the printed path>` and then `python <kit>/gen_build_index.py --write`.
+
 `--doctor <slug>` prints every failing rule one build folder owes, in one run, and writes nothing.
 `--doctor` runs two graders past their first failure: `hygiene`, the gate's full `--offenders` run
 filtered to keys naming the folder or an id of its slug, and `slot-contract`, the registry row,

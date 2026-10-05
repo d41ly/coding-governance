@@ -196,7 +196,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-17 — `tier2-review.js` keeps each finding's bug-class label in the committed appendix](spec/2026-10-04-spec-TOOL-aMendedFleet-17.md) | 17 | 2 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-18 — `tier2-review.js` prints one machine shape line with severity counts and output tokens](spec/2026-10-04-spec-TOOL-aMendedFleet-18.md) | 18 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-19 — `gen_build_index.py --doctor <slug>` prints every failing build-folder rule in one pass](spec/2026-10-04-spec-TOOL-aMendedFleet-19.md) | 19 | 2 | CLOSED | rev-3 | 2026-10-05 |
-| [TOOL-aMendedFleet-20 — `--new-spec` writes a skeleton that already carries every shape a cutoff demands](spec/2026-10-04-spec-TOOL-aMendedFleet-20.md) | 20 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-20 — `--new-spec` writes a skeleton that already carries every shape a cutoff demands](spec/2026-10-04-spec-TOOL-aMendedFleet-20.md) | 20 | 1 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aMendedFleet-21 — a cutoff budget: armed `*_CUTOFF` keys are a pinned drift signal, so a new one must displace an old one](spec/2026-10-04-spec-TOOL-aMendedFleet-21.md) | 21 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-22 — the generated views merge by taking one side](spec/2026-10-04-spec-TOOL-aMendedFleet-22.md) | 22 | 1 | SPECCED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-23 — check 19 reports the gotcha anchors that select no tracked path](spec/2026-10-04-spec-TOOL-aMendedFleet-23.md) | 23 | 1 | SPECCED | rev-2 | 2026-10-04 |

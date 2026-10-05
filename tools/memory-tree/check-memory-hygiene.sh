@@ -1521,7 +1521,8 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       print f " (missing/invalid **Status:** header in lines 1-5)"
       next      # header unparseable — the per-field assertions below have no anchor
     }
-    for (i = 1; i <= n; i++) if (body[i] ~ /<FAMILY-slug-seq>|YYYY-MM-DD/) { print f " (unfilled skeleton placeholder)"; break }
+    # ---- `<fill:` is the slot opener `gen_build_index.py --new-spec` writes (TOOL-aMendedFleet-20).
+    for (i = 1; i <= n; i++) if (body[i] ~ /<FAMILY-slug-seq>|YYYY-MM-DD|<fill:/) { print f " (unfilled skeleton placeholder)"; break }
     if (hdr ~ /^\*\*Status:\*\* WONTDO/ && hdr !~ /base [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]* · ./)
       print f " (WONTDO needs a successor id or reason pointer in the header tail)"
     # ---- the FILENAME date, computed once. Not the first date in the PATH: a build folder used to

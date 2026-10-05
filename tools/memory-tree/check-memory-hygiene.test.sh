@@ -202,6 +202,7 @@ printf '# t1\n\n**Status:** OPEN · rev-1 · 2026-08-01 · node a · Tier-1 · b
 - rev-1 · first\n' \
   > "$D/spec/2026-08-01-spec-tFixture-5.md"                                      # Tier-1 light profile -> silent
 good | sed 's/^A goal\.$/Ship on YYYY-MM-DD./' > "$D/spec/2026-08-01-spec-tFixture-6.md"                # placeholder -> red
+good | sed 's/^A goal\.$/<fill: the goal>/' > "$D/spec/2026-08-01-spec-tFixture-222.md"             # --new-spec fill slot -> red
 good | sed '/^The design\.$/d' > "$D/spec/2026-08-01-spec-tFixture-7.md"          # empty section body -> red
 good | sed 's/rev-1 · 2026-08-01 · node/rev-2 · 2026-08-01 · node/' > "$D/spec/2026-08-01-spec-tFixture-8.md"  # header rev not in §9 -> red
 good | sed 's/^\*\*Status:\*\* SPECCED/**Status:** WONTDO/' > "$D/spec/2026-08-01-spec-tFixture-9.md"   # bare WONTDO tail -> red
@@ -1051,6 +1052,7 @@ hit  'tFixture-3.md (missing/invalid'
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 hit  'tFixture-4.md (## sections differ'
 hit  'tFixture-6.md (unfilled skeleton placeholder'
+hit  'tFixture-222.md (unfilled skeleton placeholder'
 hit  'tFixture-7.md (section with an empty body'
 hit  'tFixture-8.md (header rev-2 not logged'
 hit  'tFixture-9.md (WONTDO needs'

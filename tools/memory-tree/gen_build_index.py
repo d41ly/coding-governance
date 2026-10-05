@@ -6,6 +6,7 @@
     python <prefix>/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
     python <prefix>/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
     python <prefix>/memory-tree/gen_build_index.py --doctor <slug> # every failing rule for one build folder
+    python <prefix>/memory-tree/gen_build_index.py --new-spec <ID> --tier <1|2>  # a spec skeleton
     python <prefix>/memory-tree/gen_build_index.py --selftest      # fixtures, in a temp dir
 
 WHAT --check-format DOES NOT CHECK. It grades POSITION for every tracked build README and SHAPE — the
@@ -5994,6 +5995,33 @@ def cmd_selftest() -> int:
             {"grader": "hygiene", "answered": True, "why": "", "code": 1, "mine": [], "elsewhere": 3},
             _d_slot])[0]))
 
+    # TOOL-aMendedFleet-20 AC5 — the skeleton follows a FIXTURE template's fence, renamed heading and
+    # all, writes one §5 bullet per fixture row, and carries `order` only when given. The heading list
+    # is compared whole and in order, so a render that drops or reorders one cannot pass.
+    _n_tpl = ("# T\n\n## 1. Prose outside the fence\n\n```markdown\n# <FAMILY-slug-seq> — <title>\n\n"
+              "## 1. Aim\n\n## 2. Scope (IN)\n\n## 5. Production-readiness checklist\n\n"
+              "```markdown\n- AC1 example\n```\n\n## 6. Acceptance criteria\n\n## 11. Extra\n```\n")
+    _n_args = ("memory/TEMPLATE-SPEC.md", "ARCH-aFix-3", "2", "0123abcd", "2026-10-04", "arch")
+    _n_out = render_spec_skeleton(_n_tpl, *_n_args, "", ["alpha", "beta / gamma"])
+    _n_ord = render_spec_skeleton(_n_tpl, *_n_args, "7", ["alpha"])
+    arm("TOOL-aMendedFleet-20 AC5 — the fixture fence's headings, in order, and nothing else",
+        "['## 1. Aim', '## 2. Scope (IN)', '## 5. Production-readiness checklist', "
+        "'## 6. Acceptance criteria', '## 11. Extra']",
+        lambda: str([ln for ln in _n_out.split("\n") if ln.startswith("## ")]))
+    arm("TOOL-aMendedFleet-20 AC5 — one §5 bullet per fixture READINESS_ROWS row",
+        "['- alpha — ', '- beta / gamma — ']",
+        lambda: str([ln[:ln.index("— ") + 2] for ln in _n_out.split("## 5.")[1].split("## 6.")[0]
+                     .split("\n") if ln.startswith("- ")]))
+    arm("TOOL-aMendedFleet-20 AC5 — the header parses, and carries order only when passed",
+        "True True False True",
+        lambda: "%s %s %s %s" % (bool(HDR_RE.match(_n_out.split("\n")[2])),
+                                 bool(HDR_RE.match(_n_ord.split("\n")[2])),
+                                 "order" in _n_out.split("\n")[2],
+                                 _n_ord.split("\n")[2].endswith("· streams arch · order 7")))
+    arm("TOOL-aMendedFleet-20 S3 — a template with no skeleton fence is refused, never guessed",
+        "carries no skeleton fence",
+        lambda: render_spec_skeleton("# T\n\n## 1. Goal\n", *_n_args, "", []))
+
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it
     # would be one more row in the manifest for a file this one already imports. Its arms print
@@ -6164,15 +6192,145 @@ def cmd_doctor(root: str, conf: dict, slug: str) -> int:
     return code
 
 
+# ---------------------------------------------------------------- --new-spec (TOOL-aMendedFleet-20)
+# Every dated cutoff in the conf adds a shape a new spec must carry, and a copied template skeleton
+# learns the missing ones from a red leg, one bar cycle each. This writes a spec that already carries
+# every one of those shapes, with each part only an author can write left as a FILL_MARKER slot that
+# check 12 refuses until it is filled. It writes one file; it stages nothing and renders nothing,
+# because a render rewrites shared generated files that concurrent spec writers contend on (F3).
+#
+# WHAT IT DOES NOT CHECK. The §7 leg line is a slot, never derived from the paths an author will
+# touch: that guard join lives outside this kit and the paths do not exist yet. Nothing here asks
+# whether a filled slot says anything true; check 12 grades the shapes and the marker, no more.
+NEW_SPEC_USAGE = "usage: gen_build_index.py --new-spec <ID> --tier <1|2> [--order <n>] [--base <sha>]"
+#: The slot opener. Check 12's placeholder pattern carries it as its third alternative, both tiers.
+FILL_MARKER = "<fill:"
+
+
+def read_new_spec_args(argv: list) -> dict:
+    """`--new-spec`'s own parse: one positional id, `--tier`, and optional `--order` and `--base`."""
+    out = {"id": "", "tier": "", "order": "", "base": "HEAD"}
+    rest = list(argv)
+    if rest and not rest[0].startswith("--"):
+        out["id"] = rest.pop(0)
+    while rest:
+        token = rest.pop(0)
+        if token not in ("--tier", "--order", "--base") or not rest:
+            raise Problem(f"--new-spec: unknown option or missing value at {token}. {NEW_SPEC_USAGE}")
+        out[token[2:]] = rest.pop(0)
+    if not out["id"]:
+        raise Problem(f"--new-spec takes a unit id. {NEW_SPEC_USAGE}")
+    if out["tier"] not in ("1", "2"):
+        raise Problem(f"--new-spec takes --tier 1 or --tier 2, got `{out['tier']}`. {NEW_SPEC_USAGE}")
+    if out["order"] and not re.fullmatch(r"[1-9][0-9]*", out["order"]):
+        raise Problem(f"--new-spec: --order takes a positive integer, got `{out['order']}`. "
+                      f"{NEW_SPEC_USAGE}")
+    return out
+
+
+def render_spec_skeleton(template: str, template_rel: str, spec_id: str, tier: str, base: str,
+                         today: str, streams: str, order: str, rows: list) -> str:
+    """The new spec's bytes: a filled header, the template's `##` headings, a slot per authored part.
+
+    The headings are READ from the skeleton fence of the installed template (F2), so the section
+    canon keeps one spelling; a section's body is chosen by its NUMBER, so a renamed heading is
+    followed. A template with no skeleton fence is a refusal, never a guess.
+    """
+    lines = template.split("\n")
+    start = next((i for i in range(len(lines) - 1) if lines[i].startswith("```")
+                  and lines[i + 1].startswith("# <FAMILY-slug-seq>")), None)
+    end = max((i for i, line in enumerate(lines) if line.startswith("```")), default=-1)
+    headings = [line.rstrip() for line in lines[start + 1:end]
+                if line.startswith("## ")] if start is not None else []
+    if not headings:
+        raise Problem(f"--new-spec: {template_rel} carries no skeleton fence opening on "
+                      f"`# <FAMILY-slug-seq>` with `##` headings under it; nothing was written")
+    fill = FILL_MARKER + " {}>"
+    bodies = {
+        1: [fill.format("the change and why it is worth building, in one or two sentences")],
+        2: [f"- **S1** — {fill.format('what this unit builds, verifiable at done')}. Observed by AC1."],
+        3: [f"- {fill.format('what an eager builder might include but must not')}", "",
+            "### Edges", "", "none"],
+        4: [fill.format("the mechanism: data shapes, contracts, flows"), "",
+            "### Files touched (estimate)", "",
+            f"- {fill.format('each path this unit writes, backticked')}"],
+        5: [f"- {r} — {fill.format('what is needed, or N/A and why')}" for r in rows]
+           or [f"- {fill.format('one line per cross-cutting concern')}"],
+        6: [f"- **AC1** — When `{fill.format('the command or file that observes it')}` runs, "
+            f"{fill.format('the observable result')}.",
+            f"  Red when: {fill.format('the break that turns it red')}."],
+        7: [f"`{fill.format('leg')}`"],
+        8: ["none"],
+        9: [f"- rev-1 · {today} · initial draft."],
+        10: [fill.format("the seam this unit extends by path and the probe that named it, or no "
+                         "existing seam fits with the evidence"), "",
+             f"Recall terms used: {fill.format('the query and its 8-14 terms, verbatim')}"],
+    }
+    header = (f"**Status:** OPEN · rev-1 · {today} · node {spec_id.split('-')[1][0]} · Tier-{tier} "
+              f"· base {base} · streams {streams}" + (f" · order {order}" if order else ""))
+    out = [f"# {spec_id} — {fill.format('title')}", "", header]
+    for h in headings:
+        num = re.match(r"## (\d+)\.", h)
+        out += ["", h, ""] + bodies.get(int(num.group(1)) if num else 0,
+                                        [fill.format("this section")])
+    return "\n".join(out) + "\n"
+
+
+def cmd_new_spec(root: str, conf: dict, args: dict) -> int:
+    """Write one spec skeleton under its build's `spec/` folder; refuse before writing on any conflict."""
+    m = conf["MEMORY_ROOT"]
+    spec_id = args["id"]
+    parts = re.fullmatch(r"([A-Z]+)-([a-z][A-Za-z0-9]*)-([1-9][0-9]*)", spec_id)
+    if not parts or not backlog.SLUG_RE.match(parts.group(2)):
+        raise Problem(f"--new-spec: `{spec_id}` is not a unit id, FAMILY-<slug>-<seq> with a node-led "
+                      f"CamelCase slug. {NEW_SPEC_USAGE}")
+    family, slug = parts.group(1), parts.group(2)
+    disciplines = read_discipline_map(conf)
+    if family not in disciplines:
+        raise Problem(f"--new-spec: family {family} is not declared in FAMILIES "
+                      f"(`{conf.get('FAMILIES', '')}`)")
+    folder = f"{m}/builds/{slug}"
+    if not run("git", "ls-files", "--", f"{folder}/README.md", cwd=root).strip():
+        raise Problem(f"--new-spec: {folder}/README.md is not tracked, so {slug} is not a build")
+    for rel in run("git", "ls-files", "--", f"{folder}/spec/", cwd=root).split("\n"):
+        text, _why = read_text_or_none(os.path.join(root, rel)) if rel else (None, "")
+        hit = parse_spec_h1(rel, text, m, list(disciplines)) if text else None
+        if hit and hit[1] == spec_id:
+            raise Problem(f"--new-spec: {rel} already carries {spec_id} in its H1")
+    today = datetime.date.today().isoformat()
+    rel = f"{folder}/spec/{today}-spec-{spec_id}.md"
+    if os.path.exists(os.path.join(root, rel)):
+        raise Problem(f"--new-spec: {rel} already exists")
+    try:
+        base = run("git", "rev-parse", "--verify", "--quiet", f"{args['base']}^{{commit}}",
+                   cwd=root).strip()[:8]
+    except subprocess.CalledProcessError:
+        base = ""
+    if not base:
+        raise Problem(f"--new-spec: --base `{args['base']}` does not resolve to a commit")
+    template_rel = f"{m}/TEMPLATE-SPEC.md"
+    template, why = read_text_or_none(os.path.join(root, template_rel))
+    if template is None:
+        raise Problem(f"--new-spec: {template_rel} {why}")
+    rows = [r for r in conf.get("READINESS_ROWS", "").split("|") if r]
+    text = render_spec_skeleton(template, template_rel, spec_id, args["tier"], base, today,
+                                disciplines[family], args["order"], rows)
+    write_text(os.path.join(root, rel), text)
+    print(f"build-index: wrote {rel} carrying {text.count(FILL_MARKER)} fill slot(s); check 12 "
+          f"refuses it until every `{FILL_MARKER} …>` is filled. Then: git add {rel} && "
+          f"python {kit_rel()}/gen_build_index.py --write")
+    return 0
+
+
 def main(argv: list) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
         return cmd_selftest()
     if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey",
-                    "--report", "--bump", "--asks", "--new-build", "--doctor"):
+                    "--report", "--bump", "--asks", "--new-build", "--new-spec", "--doctor"):
         print("usage: gen_build_index.py "
               "[--check|--write|--check-format|--survey|--report|--bump|"
-              "--print-bindings|--asks|--new-build|--doctor|--selftest]")
+              "--print-bindings|--asks|--new-build|--new-spec|--doctor|--selftest]")
         return 2
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
@@ -6204,6 +6362,8 @@ def main(argv: list) -> int:
     try:
         if mode == "--new-build":
             return cmd_new_build(root, conf, read_new_build_args(argv[2:]))
+        if mode == "--new-spec":
+            return cmd_new_spec(root, conf, read_new_spec_args(argv[2:]))
         if mode == "--check-format":
             return cmd_check_format(root, conf)
         if mode == "--survey":
