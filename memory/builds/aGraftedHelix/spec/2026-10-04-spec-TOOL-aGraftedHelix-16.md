@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-16 — the spec commit stage re-stages the authored specs after the generator renders them, and a real-git arm runs the prompt's own git block
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 11
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 11
 
 <!-- gen:spec-records -->
 

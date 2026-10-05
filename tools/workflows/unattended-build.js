@@ -1,6 +1,6 @@
 export const meta = {
   name: 'unattended-build',
-  version: '1.4', // gov:kit unattended-build@1.4 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
+  version: '1.5', // gov:kit unattended-build@1.5 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
     'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal. The SPEC stage ends in ONE commit of the specs its writers authored, so the audit pins them at HEAD in the same call. AUDIT is opt-in: with no `specAudit` arg the stage announces itself OFF by declaration and the roster follows SPEC completion.',
   phases: [
@@ -825,6 +825,38 @@ if (!authoredIds.length) {
 } else if (Array.isArray(a.subjects)) {
   log('spec stage: no commit — the caller pinned `subjects`, so ' + authoredIds.join(', ') + ' is left to the caller to commit')
 } else {
+  // TOOL-aGraftedHelix-16 — THE GIT SEQUENCE IS ONE FENCED BLOCK, and the prose around it names each
+  // line's PURPOSE without spelling a command of it a second time: the block is the one copy an agent
+  // runs and the suite's real-git arm extracts and runs, so the two cannot diverge. `set -e` stops it
+  // at the first failing step instead of committing past a failed render. THE RE-ADD after the render
+  // is the fix: the generator rewrites every tracked spec's records region, so a spec staged before it
+  // went into the commit as its pre-render blob and the resolver's `HEAD:` compare refused it. While
+  // the delta loop compares whole lines, an authored spec's `??` line becomes `AM`, so the loop
+  // stages it too; the re-add is what still stages it once the loop compares paths. THE INPUT CHECK
+  // refuses before anything is staged when a generator input carries an unstaged change, because the
+  // generator reads tracked bytes off the DISK and would render views the commit does not hold
+  // (`TOOL-dMendedRecall-2` rev-3 S3's rule); `-B` keeps its bytecode out of the delta (its rev-2 S2).
+  // `<attribution trailer>` is a placeholder because the charter's trailer is the agent's to know.
+  // The loop's membership test sits in its own `if`: a no-match `grep` in a command substitution
+  // would end the block under `set -e` on a call with no foreign change.
+  const commitBlock = [
+    'set -e',
+    'before=$(git status --porcelain --untracked-files=all)',
+    'root=$(set -- <spec paths>; printf \'%s\' "${1%%/builds/*}")',
+    'changed=$(git diff --name-only -- "$root" .memory-tree.conf tools/memory-tree)',
+    'dirty=\'\'',
+    'for f in $changed; do case " <spec paths> " in *" $f "*) ;; *) dirty="$dirty $f" ;; esac; done',
+    'if [ -n "$(git ls-files --others -- .memory-tree.conf)" ]; then dirty="$dirty .memory-tree.conf"; fi',
+    'if [ -n "$dirty" ]; then echo "refused, nothing staged or rendered: an input of the build-index generator carries a change the index does not hold:$dirty" >&2; exit 1; fi',
+    'git add -- <spec paths>',
+    'python -B tools/memory-tree/gen_build_index.py --write',
+    'git add -- <spec paths>',
+    'git status --porcelain | while IFS= read -r line; do',
+    '  if printf \'%s\\n\' "$before" | grep -xF -- "$line" >/dev/null; then :; else git add -- "${line#???}"; fi',
+    'done',
+    'git commit -q -m \'spec(' + slug + '): ' + authoredIds.join(' ') + '\' -m \'Committed by the spec commit stage of the build harness.\' --trailer \'Pass: none\' --trailer \'<attribution trailer>\'',
+    'git status --porcelain -- <spec paths>',
+  ].join('\n')
   const sc = await agent(
     GROUND +
       'COMMIT the specs this build\'s SPEC writers just authored, in ONE commit: ' + authoredIds.join(', ') +
@@ -833,20 +865,29 @@ if (!authoredIds.length) {
       '1. Find each id\'s spec: the file under `' + specFolder + '` whose H1 line opens `# <id> —`, which is ' +
       'the key `gen_build_index.py` reads the id from; its basename ends `-spec-<id>.md`, and the status ' +
       'header carries no id. Return them as `specs`, one `{id, path}` per id, repo-relative and forward-slashed.\n' +
-      '2. BEFORE anything is staged, record `git status --porcelain --untracked-files=all`. Every path it ' +
-      'lists other than those specs is FOREIGN, and is never staged by this stage.\n' +
-      '3. `git add -- <the spec paths>`, then `python tools/memory-tree/gen_build_index.py --write`, then ' +
-      'stage each path that step 2 did not list and that is changed now: those are the generator\'s ' +
-      'outputs. Never `git add -A` or `git add -u`. The order is load-bearing: the generator renders over ' +
-      'tracked specs only, so an untracked spec leaves the index stale and the pre-commit hook refuses it.\n' +
-      '4. Commit ONCE on the checked-out branch. The subject is `spec(' + slug + '): ' + authoredIds.join(' ') +
-      '`, a body line says this is the build harness\'s spec commit stage, and the FINAL trailer block ' +
-      'carries `Pass: none` and the attribution trailer the charter mandates. Never --no-verify, never ' +
-      'amend, never push or merge.\n' +
-      '5. A refusal from a hook, the generator or git returns `committed: false` with its first lines in ' +
-      '`why`. Do not edit a spec to clear it, and do not retry around it.\n' +
-      '6. Return `sha` as the full 40-hex `git rev-parse HEAD`.\n' +
-      '7. Run `' + CHECKLIST + '` over the commit just made and return its stdout VERBATIM as `checklist`. ' +
+      '2. Run the block below in ' + repo + ' exactly as written, except that every `<spec paths>` becomes ' +
+      'those paths, space-separated, and `<attribution trailer>` becomes the attribution trailer the ' +
+      'charter mandates. It is the only copy of this stage\'s git sequence: add no step to it. Its lines, ' +
+      'in order: record the tree before anything is staged, and every path that record lists other than ' +
+      'those specs is FOREIGN, and is never staged by this stage; refuse, with nothing staged or rendered, ' +
+      'when an input of the build-index generator carries a change the index does not hold, the inputs ' +
+      'being the memory root the specs sit under, the memory-tree conf and the generator\'s own directory, ' +
+      'because the generator reads tracked bytes off the disk and would render views the commit does not ' +
+      'hold; stage the specs, because the generator renders over tracked specs only; render the generated ' +
+      'views without writing bytecode caches; stage the specs AGAIN, because the render rewrote their ' +
+      'records region after they were staged; stage each path the render changed that the record did not ' +
+      'list, which are the generator\'s outputs; commit ONCE on the checked-out branch, the message closing ' +
+      'on one trailer block of `Pass: none` and the attribution trailer; and list the specs\' own status, ' +
+      'which must be empty. Never `git add -A` or `git add -u`, never --no-verify, never amend, never push ' +
+      'or merge.\n' +
+      '```sh\n' + commitBlock + '\n```\n' +
+      '3. A step that exits non-zero stops the block: return `committed: false` with that step\'s output ' +
+      'in `why`. That is how a refusal from the input check, a hook, the generator or git reaches this ' +
+      'program. Do not edit a spec to clear it, and do not retry around it.\n' +
+      '4. When the block\'s last line prints anything, a spec is left dirty after the commit: return ' +
+      '`committed: false` and quote those porcelain lines in `why`.\n' +
+      '5. Return `sha` as the full 40-hex `git rev-parse HEAD`.\n' +
+      '6. Run `' + CHECKLIST + '` over the commit just made and return its stdout VERBATIM as `checklist`. ' +
       'It always exits 0; an empty selection returns an empty string.',
     { label: 'commit:specs:' + slug, phase: 'Spec', schema: SPEC_COMMIT_SCHEMA },
   )

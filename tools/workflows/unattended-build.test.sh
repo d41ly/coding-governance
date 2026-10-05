@@ -168,6 +168,12 @@ run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RES
       // that refuse without a run-state file, and no gate downstream of here reads a prompt. A double
       // recording only labels cannot see the difference between the two modes at all.
       trace.push("prompt:" + label + ":" + String(prompt).replace(/\n/g, " "))
+      // TOOL-aGraftedHelix-16 S7 - the SAME prompt a second time, JSON-encoded on one line, because the
+      // flattened line above holds no block that can run: the spec commit arm decodes its fenced git
+      // block from here. The `prompt:` line stays byte-identical, so every `^prompt:<label>:` read
+      // reads what it read before; a scan over the WHOLE trace drops these lines, or it reads every
+      // prompt twice and JSON escapes besides.
+      trace.push("promptjson:" + label + ":" + JSON.stringify(String(prompt)))
       for (const k of Object.keys(returns)) if (label.indexOf(k) === 0) return schemaShaped(returns[k], opts && opts.schema)
       return null
     }
@@ -1406,7 +1412,7 @@ ag=$(printf '%s\n' "$o" | grep '^agent:' | tr '\n' ' ')
 has    "GH15 the commit stage runs after the writers and before the resolver" "$ag" "agent:spec:tB:g0 agent:commit:specs:tB agent:audit:subjects:r1"
 same   "GH15 ...exactly once" "$(printf '%s\n' "$o" | grep -c '^agent:commit:')" "1"
 p=$(printf '%s\n' "$o" | grep '^prompt:commit:specs:tB:')
-has    "GH15 its prompt runs the rendered build-index generator" "$p" "python ${PFX}${MT_KIT}/gen_build_index.py --write"
+has    "GH15 its prompt runs the rendered build-index generator" "$p" "python -B ${PFX}${MT_KIT}/gen_build_index.py --write"
 has    "GH15 ...commits with the Pass: none trailer" "$p" '`Pass: none`'
 has    "GH15 ...names the authored id" "$p" "spec(tB): A-tB-1"
 has    "GH15 ...locates a spec by its H1 line" "$p" "whose H1 line opens"
@@ -1613,9 +1619,9 @@ hasnt_ "BT3-AC6 declared: nothing announces the audit off" "$o" "OFF by declarat
 o=$(run_wf "$(printf '%s' "$T_UNITS" | sed 's#"specAudit":"2026-09-20",##; s#"subjects":\[[^]]*\],##')" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"}}')
 has    "BT3 attended, OFF, every unit terminal: the exit carries the audit object" "$o" '"audit":{"ran":false,"verdict":"NOT-OWED"'
 has    "BT3 ...with an empty roster, by filtering" "$o" '"roster":[]'
-# ---- AC7: both carriers read 1.4 — the render is byte-compared to the template by the parity leg,
+# ---- AC7: both carriers read 1.5 — the render is byte-compared to the template by the parity leg,
 # ---- so the marker moving in one file and not the other reds there; this arm reads the render.
-has    "BT3-AC7 the render carries the engine version 1.4" "$(sed -n '3p' "$F")" "version: '1.4', // gov:kit unattended-build@1.4"
+has    "BT3-AC7 the render carries the engine version 1.5" "$(sed -n '3p' "$F")" "version: '1.5', // gov:kit unattended-build@1.5"
 
 # ================================== TOOL-dPolishedVitrine-1 — THE HARNESS IS RENDERED AT INSTALL
 # The harness shipped as an ENGINE file, and apply writes those verbatim, so every install path it
@@ -1691,7 +1697,7 @@ check_layout() { # label · dir · kit dir · tool root · checklist dir · five
   [ "$(read_field "$res" dispatch.args.checklist)" = "python $mt/gotchas.py --for-diff HEAD~1..HEAD" ] && got="${got}G" || got="${got}R"
   # The population is every path-shaped token in the whole output, NOT the four sites above, and its
   # size is asserted: fewer than four means the extraction found nothing to grade.
-  toks=$(printf '%s\n' "$o" | grep -oE '(^|[^A-Za-z0-9_./~-])[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)+\.(js|sh|py)' \
+  toks=$(printf '%s\n' "$o" | grep -v '^promptjson:' | grep -oE '(^|[^A-Za-z0-9_./~-])[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)+\.(js|sh|py)' \
          | sed -E 's#^[^A-Za-z0-9_.-]##' | sort -u)
   pop=$(printf '%s\n' "$toks" | grep -c . || true)
   while IFS= read -r tok; do
@@ -1937,6 +1943,103 @@ else
   echo "SKIP PV-AC12 -- no unattended adopter at $UK, so the two carriers were NOT compared on this run"
 fi
 
+# ---- TOOL-aGraftedHelix-16: THE SPEC COMMIT BLOCK, RUN FOR REAL. Every GH15 arm grades the stage through
+# ---- a commit DOUBLE, so none of them could see that the generator rewrote each staged spec and the
+# ---- commit held its pre-render blob. These arms decode the commit prompt off its `promptjson:` line,
+# ---- extract its ONE fenced block — never a typed copy, which would stay green over a prompt that
+# ---- drifted — and run it in a `_b1`-shaped repository holding the WHOLE memory-tree kit at the path
+# ---- the block's own render line names, plus two foreign paths. `PYTHONDONTWRITEBYTECODE` is unset
+# ---- for the run: a host that sets it hides the `-B` break, and node `a` sets it. Each arm read RED on
+# ---- a staged copy of the render: step 5 removed whole, the loop's filter inverted, `-B` removed, the
+# ---- input check removed, the channel flattened. The re-add removed ALONE reds no real-git row,
+# ---- measured: the loop compares whole lines, so an authored spec's `??` line, `AM` after the render,
+# ---- is staged by the loop too. The order arm below is that line's red until the loop compares paths.
+o=$(run_pathless "$P_OFF" "$P_SPEC" "$COMMIT_OK")
+pj=$(printf '%s\n' "$o" | sed -n 's/^promptjson:commit:specs:tB://p')
+same   "GH16 the promptjson channel decodes a multi-line prompt to a string holding a newline" \
+  "$(node -e 'process.stdout.write(String(JSON.parse(process.argv[1]).includes("\n")))' "${pj:-null}" 2>&1)" "true"
+GB=$(node -e '
+  const s = JSON.parse(process.argv[1])
+  const m = s.match(/^```sh\n[\s\S]*?\n```$/gm) || []
+  if (m.length === 1 && (s.match(/^```/gm) || []).length === 2) process.stdout.write(m[0].split("\n").slice(1, -1).join("\n"))
+' "${pj:-null}" 2>/dev/null)
+same   "GH16 the commit prompt holds exactly one fenced shell block, and it opens with set -e" "$(printf '%s\n' "$GB" | head -1)" "set -e"
+same   "GH16 the block stages the specs again on the line after the render" \
+  "$(printf '%s\n' "$GB" | sed -n '/gen_build_index[.]py --write$/{n;p;}')" "git add -- <spec paths>"
+same   "GH16 the prose around the block spells none of its commands a second time" "$(node -e '
+  const s = JSON.parse(process.argv[1]), m = s.match(/^```sh\n[\s\S]*?\n```$/m)
+  const out = m ? s.replace(m[0], "") : s
+  process.stdout.write(["git add -- <spec paths>", "git commit", "git status --porcelain", "gen_build_index.py --write"]
+    .filter((c) => out.includes(c)).join(", ") || "none")
+' "${pj:-null}" 2>&1)" "none"
+# The kit's directory, DERIVED from the block's render line and never typed here; `-B` optional, so
+# the `-B`-removed break reds the cache row rather than this derivation.
+GKD=$(printf '%s\n' "$GB" | sed -n 's#^python \(-B \)\{0,1\}\(.*\)/gen_build_index[.]py --write$#\2#p' | head -1)
+build_spec_commit_repo() { # dir -> the `_b1` shape, the whole kit at $GKD, the generator's views committed; then the planted paths
+  local d=$1
+  mkdir -p "$d/memory/project" "$d/memory/builds/tB/spec" "$d/$GKD"
+  ( cd "$d" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
+      && git config core.autocrlf false && git config core.hooksPath .git/no-hooks )
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:A"\nCHARTER="AGENTS.md"\n' > "$d/.memory-tree.conf"
+  printf '# charter\n\nRead `memory/README.md` first.\n' > "$d/AGENTS.md"
+  printf '# r\n' > "$d/memory/README.md"
+  printf '# d\n' > "$d/memory/DECISIONS.md"
+  printf '# stale-header-waiver.txt -- EMPTY is expected; the file must exist.\n' > "$d/memory/project/stale-header-waiver.txt"
+  printf -- '---\nslug: tB\nnode: a\nopened: 2026-10-04\nstreams: arch\nroster: A\nids: A-tB-2\n---\n\n# tB\n\n<!-- gen:build-index -->\n\n<!-- /gen:build-index -->\n' \
+    > "$d/memory/builds/tB/README.md"
+  printf '# A-tB-2 — a tracked sibling\n\n**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 0123abcd · streams arch\n\nbody\n' \
+    > "$d/memory/builds/tB/spec/2026-10-04-spec-A-tB-2.md"
+  printf 'notes\n' > "$d/notes.txt"
+  cp -r "$ROOT/$MT_KIT_DIR/." "$d/$GKD/" && rm -rf "$d/$GKD/__pycache__"
+  ( cd "$d" && git add -A && git commit -q -m fixture \
+      && "$_rkd_py" -B "$GKD/gen_build_index.py" --write >/dev/null 2>&1 && git add -A && git commit -q -m gen )
+  printf 'edited\n' >> "$d/notes.txt"
+  printf 'scratch\n' > "$d/scratch.txt"
+  printf '# A-tB-1 — the authored unit\n\n**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 0123abcd · streams arch\n\nbody\n' \
+    > "$d/$CPATH"
+}
+run_spec_commit_block() { # dir -> the extracted block's output with both placeholders filled, then `rc=<exit>`
+  local b=${GB//"<spec paths>"/$CPATH}
+  printf '%s\n' "${b//"<attribution trailer>"/Co-Authored-By: t <t@t.test>}" > "$LAY/gh16-block.sh"
+  ( cd "$1" && env -u PYTHONDONTWRITEBYTECODE GH16_PY="$_rkd_py" \
+      bash -c 'python() { command "$GH16_PY" "$@"; }; . "$1"' gh16 "$LAY/gh16-block.sh" 2>&1; echo "rc=$?" )
+}
+G16="$LAY/gh16"
+if [ -n "$GKD" ] && build_spec_commit_repo "$G16" && [ "$(git -C "$G16" rev-list --count HEAD)" = 2 ]; then
+  out=$(run_spec_commit_block "$G16")
+  same   "GH16 the block exits 0" "$(printf '%s\n' "$out" | tail -1)" "rc=0"
+  same   "GH16 the authored spec is clean after the commit" "$(cd "$G16" && git status --porcelain -- "$CPATH")" ""
+  same   "GH16 HEAD holds the spec's rendered blob, not its pre-render one" \
+    "$(cd "$G16" && git rev-parse "HEAD:$CPATH" 2>&1)" "$(cd "$G16" && git hash-object "$CPATH")"
+  has    "GH16 ...and the generator ran: HEAD's spec carries its records region" "$(cd "$G16" && git show "HEAD:$CPATH" 2>&1)" "<!-- gen:spec-records -->"
+  names=$(cd "$G16" && git show --name-only --format= HEAD)
+  has    "GH16 the commit holds the authored spec" "$names" "$CPATH"
+  has    "GH16 ...and the build README the render moved" "$names" "memory/builds/tB/README.md"
+  hasnt_ "GH16 ...and not the foreign tracked edit" "$names" "notes.txt"
+  hasnt_ "GH16 ...nor the foreign untracked file" "$names" "scratch.txt"
+  same   "GH16 the foreign paths are left exactly as planted" "$(cd "$G16" && git status --porcelain)" "$(printf ' M notes.txt\n?? scratch.txt')"
+  same   "GH16 no bytecode cache is committed" "$(cd "$G16" && git ls-tree -r --name-only HEAD | grep -c __pycache__)" "0"
+  same   "GH16 the subject is the one the program filled" "$(cd "$G16" && git log -1 --format=%s)" "spec(tB): A-tB-1"
+  same   "GH16 Pass: none is a trailer of the commit" "$(cd "$G16" && git log -1 --format='%(trailers:key=Pass,valueonly)')" "none"
+  same   "GH16 ...and so is the attribution trailer the placeholder carried" \
+    "$(cd "$G16" && git log -1 --format='%(trailers:key=Co-Authored-By,valueonly)')" "t <t@t.test>"
+  git clone -q "$G16" "$G16.clone" 2>/dev/null
+  same   "GH16 a clean clone of HEAD renders no drift" \
+    "$(cd "$G16.clone" 2>/dev/null && "$_rkd_py" -B "$GKD/gen_build_index.py" --check >/dev/null 2>&1; echo $?)" "0"
+  # THE VARIANT: another writer's unstaged edit to a sibling spec's status header is an input the
+  # commit would not hold, so the block refuses before it stages or renders anything.
+  G16V="$LAY/gh16v"; build_spec_commit_repo "$G16V"
+  sed -i 's/SPECCED/INPROGRESS/' "$G16V/memory/builds/tB/spec/2026-10-04-spec-A-tB-2.md"
+  h0=$(git -C "$G16V" rev-parse HEAD)
+  out=$(run_spec_commit_block "$G16V")
+  hasnt_ "GH16 a dirty generator input: the block exits non-zero" "$(printf '%s\n' "$out" | tail -1)" "rc=0"
+  has    "GH16 ...naming that input" "$out" "memory/builds/tB/spec/2026-10-04-spec-A-tB-2.md"
+  same   "GH16 ...with HEAD unmoved" "$(git -C "$G16V" rev-parse HEAD)" "$h0"
+  same   "GH16 ...and nothing staged" "$(cd "$G16V" && git diff --cached --name-only)" ""
+else
+  n=$((n+1)); echo "FAIL GH16 the real-git arm could not start: block '$(printf '%s' "$GB" | head -1)', kit dir '$GKD' -- every arm it holds went UNRUN"; st=1
+fi
+
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
 # over it, 326 at 1d8530e7 (TOOL-aWokenSentinel-21) — at ~10 % headroom, rounded down, because the
@@ -1951,7 +2054,10 @@ fi
 # RAISED 301 -> 365 by TOOL-aGraftedHelix-15: its 64 static sites, counted with the grep above as 443 at
 # the unit's parent and 507 after — the GH15 block's 63 and the writers' arm's new absence. The block's
 # refusal loop runs five of them five times, so it executes 83, and the floor stays a lower bound.
-FLOOR_ASSERTIONS=365
+# RAISED 365 -> 387 by TOOL-aGraftedHelix-16: its 22 static sites, counted with the grep above as 507 at
+# the unit's parent and 529 after — the channel canary, the block's shape (3), the real-git run (14)
+# and the dirty-input variant (4). All of them sit on the path a green run takes.
+FLOOR_ASSERTIONS=387
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The
