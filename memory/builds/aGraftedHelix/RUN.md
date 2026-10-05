@@ -187,3 +187,5 @@ base: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 2026-10-05T11:24:31Z brief · item TOOL-aGraftedHelix-7 · reason a2e60ebbeb07 memory/builds/aGraftedHelix/prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md
 
 2026-10-05T11:25:21Z dispatch · item e28ae419 TOOL-aGraftedHelix-7 · reason memory/builds/aGraftedHelix/spec/2026-10-04-spec-TOOL-aGraftedHelix-7.md tools/run-gates/run-gates.sh tools/run-gates/run-selftests.sh tools/run-gates/gate-profiles.txt tools/run-gates/derive-ceilings.py tools/run-gates/README.md tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.evidence.test.sh tools/run-gates/run-gates.runlog.test.sh tools/run-gates/run-selftests.test.sh tools/lib/resolve-python.test.sh memory/map/features/run-gates.md memory/map/generated memory/guides/SESSION-KICKOFF.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md memory/backlog/TOOL.md
+
+2026-10-05T12:37:34Z dispatch · item e6891f05 TOOL-aGraftedHelix-7 · reason tools/run-gates/run-gates.sh tools/run-gates/README.md memory/guides/SESSION-KICKOFF.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md memory/backlog/TOOL.md
