@@ -1,10 +1,12 @@
 # TOOL-aEvidencedLens-15 — the diff-kind resume probe is observed from BASE with every REVIEW_SHAPE-derived value masked, its review key and its input print
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 9
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-05-review-TOOL-aEvidencedLens-15-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-15-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -63,6 +65,10 @@ pass by masking nothing. It closes ids 1, 5 and 14 (HIGH) of that audit.
 - **consumes-from** `TOOL-aEvidencedLens-13` — the BASE-comparison rule, the two diff-kind arg sets
   and the stub driver shape this unit extends with the class mask; that unit hands this one the
   `resume:probe` label its key mask cannot reach.
+- **hands-off** `TOOL-aEvidencedLens-18` — the completion of this unit's observation: the HEAD
+  render read from the object database, a staged break on step 3's masked line, every print per arg
+  set, and the edges and closing write set the spec audit of this unit found missing. That unit
+  re-runs `u15-check.js` and names `resume:probe` in each red.
 
 ## 4. Design
 
@@ -169,6 +175,10 @@ none
 - rev-1 · 2026-10-05 · initial draft, promoted from the spec audit of units 12 to 14
   (`reviews/2026-10-05-review-TOOL-aEvidencedLens-12-spec-audit-round1.md`), ids 1, 5 and 14 (HIGH),
   repairing `TOOL-aEvidencedLens-13`.
+- rev-2 · 2026-10-05 · §3 · gains the hands-off to `TOOL-aEvidencedLens-18`, the minors batch the
+  spec audit of this unit (`reviews/2026-10-05-review-TOOL-aEvidencedLens-15-spec-audit-round1.md`)
+  promoted for ids 4 and 5 (MEDIUM) and 1, 2, 3 and 6 (LOW). Nothing else moves; this unit builds as
+  written.
 
 ## 10. Reuse audit
 

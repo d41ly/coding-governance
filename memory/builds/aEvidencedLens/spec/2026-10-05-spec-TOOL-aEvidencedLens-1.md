@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-1 — the spec-audit lens catalogue: five lenses aimed at the measured classes, the harness its one source
 
-**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -75,6 +75,8 @@ harness the one source of the catalogue.
 - **hands-off** `TOOL-aEvidencedLens-13` — the `REVIEW_SHAPE` move of S3, which changes the review
   key every DURABILITY line carries; that unit's criterion that a comparison against BASE reds on a
   correct build rests on this move.
+- **hands-off** `TOOL-aEvidencedLens-18` — the `REVIEW_SHAPE` move of S3, which makes each diff-kind
+  arg set's BASE and HEAD prints differ; that unit's per-arg-set red under the key mask rests on it.
 
 ## 4. Design
 
@@ -295,6 +297,8 @@ New arm: tools/workflows/tier2-review.test.sh · `spec catalogue:` five spec-kin
   could not see. Id 48 (LOW): §10 names `TOOL-dUnstalledConvoy-16` and dTieredTribunal's parked P3.
   Id 30 (LOW, its unit-1 half): S6 and §7 raise the floor by assertions added, not by arms. §3 gains
   the hands-off edge to `TOOL-aEvidencedLens-13`, the unit id 25 (HIGH) was promoted to.
+- rev-3 · 2026-10-05 · §3 · gains the hands-off to `TOOL-aEvidencedLens-18`, the minors batch promoted
+  from the spec audit of unit 15, which consumes from this unit.
 
 ## 10. Reuse audit
 
