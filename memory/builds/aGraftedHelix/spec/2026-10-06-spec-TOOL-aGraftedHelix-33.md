@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-33 — the spec commit stage places every spec a writer authored, named by id or by path, and refuses an entry it cannot place
 
-**Status:** SPECCED · rev-2 · 2026-10-06 · node a · Tier-1 · base 018b5675 · streams tooling · order 17 · ratified 2026-10-06
+**Status:** CLOSED · rev-2 · 2026-10-06 · node a · Tier-1 · base 018b5675 · streams tooling · order 17 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 

@@ -1,6 +1,6 @@
 export const meta = {
   name: 'unattended-build',
-  version: '1.9', // gov:kit unattended-build@1.9 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
+  version: '1.10', // gov:kit unattended-build@1.10 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
     'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal. The SPEC stage ends in ONE commit of the specs its writers authored, so the audit pins them at HEAD in the same call. AUDIT is opt-in: with no `specAudit` arg the stage announces itself OFF by declaration and the roster follows SPEC completion.',
   phases: [
@@ -536,14 +536,18 @@ function renderChecklistUnion(first, label, second) {
 // AUDIT's `verdict` is REQUIRED for one specific reason: an absent verdict would otherwise read as
 // "nothing blocking", which is the one absence that would let this harness build on an unreviewed
 // spec set.
+//
+// TOOL-aGraftedHelix-33 S6 - the three lists take ONE item schema whose enum is the roster's ids,
+// derived from `units` and never typed, so the platform bounces a path or a typo back to its writer.
+const SPEC_ENTRY = { type: 'string', enum: units.map(function (u) { return u.id }) }
 const SPEC_SCHEMA = {
   type: 'object',
   required: ['authored', 'alreadyPresent', 'refused', 'summary'],
   additionalProperties: true,
   properties: {
-    authored: { type: 'array', items: { type: 'string' } },
-    alreadyPresent: { type: 'array', items: { type: 'string' } },
-    refused: { type: 'array', items: { type: 'string' } },
+    authored: { type: 'array', items: SPEC_ENTRY },
+    alreadyPresent: { type: 'array', items: SPEC_ENTRY },
+    refused: { type: 'array', items: SPEC_ENTRY },
     summary: { type: 'string' },
   },
 }
@@ -818,7 +822,9 @@ const specResults = await boundedParallel(
           'regenerates the index once: this program\'s commit stage, or the caller when it pinned ' +
           '`subjects`. A writer that commits contends with its siblings on one git ' +
           'index, which is the experiment this repository has NOT run. ' +
-          'NAME every unit you could not spec, in `refused`, with the reason in your summary.',
+          'NAME every unit you could not spec, in `refused`, with the reason in your summary. ' +
+          'Name every unit in `authored`, `alreadyPresent` and `refused` by its unit id, exactly as this ' +
+          'roster spells it, never by a path.',
         { label: 'spec:' + slug + ':g' + gi, phase: 'Spec', schema: SPEC_SCHEMA },
       )
     }
@@ -833,7 +839,49 @@ const specResults = await boundedParallel(
 // object is always truthy, so without this an entirely dead spec stage would present as a clean
 // object with empty arrays and reach AUDIT and the hand-out on whatever specs already existed. That is
 // the refusal this file spends six lines justifying, deleted by accident.
+//
+// TOOL-aGraftedHelix-33 S1, S2 - WHICH UNIT AN `authored` ENTRY DENOTES, whatever its spelling. Run
+// `wf_dff1cb65-954`'s writers returned one id and three spec paths, and a merge matching ids alone
+// committed one spec of four and handed out three empty `specPath`s with nothing refused.
+// `deriveRepoPath` is the ONE fold of a path an agent or the caller spelled, `repoFold` reused for the
+// prefix; it keeps case and every `..`, so the third arm can refuse a path that climbs.
+const specFolder = 'memory/builds/' + slug + '/spec/'
+function deriveRepoPath(p) {
+  if (typeof p !== 'string') return ''
+  let s = p.trim()
+  s = s.replace(/\\/g, '/') // the backslash fold
+  s = s.replace(/^\/([A-Za-z])(?=\/|$)/, '$1:') // the MSYS drive fold
+  if (s.toLowerCase().indexOf(repoFold + '/') === 0) s = s.slice(repoFold.length + 1)
+  while (s.indexOf('./') === 0) s = s.slice(2)
+  return s
+}
+// Three arms, the first match winning, and an arm matching two units resolves to none: the id; the
+// folded caller `specPath`; a basename under `specFolder` in hygiene check 5's recording grammar written
+// in terms of the unit's id - `<date>-spec-[<F>-]<rest>[-<tail>].md`. That grammar is copied into a
+// second language here, and the commit stage's H1 agreement below turns its drift into a refusal.
+function resolveSpecEntry(entry) {
+  const id = typeof entry === 'string' ? entry.trim() : ''
+  const byId = units.filter(function (u) { return id && u.id === id })
+  if (byId.length) return byId.length === 1 ? byId[0] : null
+  const p = deriveRepoPath(entry)
+  if (!p) return null
+  const byPath = units.filter(function (u) { return deriveRepoPath(u.specPath) === p }) // the second arm
+  if (byPath.length) return byPath.length === 1 ? byPath[0] : null
+  const m = /^[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-(.+)\.md$/.exec(p.split('/').pop())
+  if (!m || p.indexOf(specFolder) !== 0 || p.split('/').indexOf('..') !== -1) return null
+  const byName = units.filter(function (u) {
+    const uid = String(u.id)
+    const dash = uid.indexOf('-')
+    if (dash === -1) return false
+    return [uid, uid.slice(dash + 1)].some(function (h) { // the family is optional
+      return m[1] === h || (m[1].indexOf(h + '-') === 0 && /^[a-z0-9][a-z0-9-]*$/.test(m[1].slice(h.length + 1))) // so is the tail
+    })
+  })
+  return byName.length === 1 ? byName[0] : null
+}
 const specced = { authored: [], alreadyPresent: [], refused: [], summary: '' }
+const pathEntries = []
+const unplaced = []
 let liveWriters = 0
 specResults.forEach(function (r, gi) {
   const gUnits = [].concat.apply([], specGroups[gi] || [])
@@ -843,11 +891,32 @@ specResults.forEach(function (r, gi) {
     return
   }
   liveWriters++
-  ;['authored', 'alreadyPresent', 'refused'].forEach(function (k) {
+  ;['alreadyPresent', 'refused'].forEach(function (k) {
     if (Array.isArray(r[k])) specced[k] = specced[k].concat(r[k])
+  })
+  // TOOL-aGraftedHelix-33 S3 - `authored` is RESOLVED here, so every later reader of it reads unit ids:
+  // `authoredIds`, the attended exemption `speccedNow` and `speccedCount`. It stays BENEATH the schema's
+  // enum: the suite's doubles and a resumed run's replay reach this merge without the platform's
+  // validation, the reason `tier2-review.js` gives for re-testing its own enums.
+  ;(Array.isArray(r.authored) ? r.authored : []).forEach(function (entry) {
+    const u = resolveSpecEntry(entry)
+    if (!u) {
+      unplaced.push('group ' + gi + ' authored ' + JSON.stringify(entry) + ' (folded ' +
+        JSON.stringify(deriveRepoPath(entry)) + '), which names no roster unit by id and no unit\'s spec by path')
+      return
+    }
+    if (u.id !== String(entry).trim()) {
+      pathEntries.push({ id: u.id, entry: entry, path: deriveRepoPath(entry) })
+      log('spec stage: group ' + gi + ' authored ' + JSON.stringify(entry) + ', resolved by path to ' + u.id)
+    }
+    if (specced.authored.indexOf(u.id) === -1) specced.authored.push(u.id)
   })
   specced.summary += 'group ' + gi + ': ' + (r.summary || '(no summary)') + '; '
 })
+if (unplaced.length) {
+  throw new Error('unattended-build: ' + unplaced.join('; ') + '. Refusing before the commit stage: a spec ' +
+    'no unit owns would be left uncommitted while the run reported it specced.' + resumeRemedy)
+}
 if (!specResults.length || liveWriters === 0) {
   throw new Error(
     'unattended-build: EVERY spec writer returned nothing (' + specGroups.length + ' group(s)), so ' +
@@ -877,9 +946,9 @@ if (specRefused.length) log('spec stage: ' + specRefused.length + ' unit(s) REFU
 // WHAT IT CANNOT VERIFY, said where a reader looks: this runtime has no filesystem, so `committed` and
 // `sha` are the agent's claim. The cross-check is the resolver's own read at `HEAD` on the audit
 // route, and `--dispatch`'s MISSING refusal off it.
-const specFolder = 'memory/builds/' + slug + '/spec/'
-const authoredIds = (Array.isArray(specced.authored) ? specced.authored : []).filter(function (id, i, all) {
-  return all.indexOf(id) === i && units.some(function (u) { return u.id === id }) && specRefused.indexOf(id) === -1
+// ONE test, the refused exclusion: the merge settled roster membership and duplicates (TOOL-aGraftedHelix-33 S3).
+const authoredIds = specced.authored.filter(function (id) {
+  return specRefused.indexOf(id) === -1
 })
 let specCommit = null
 if (!authoredIds.length) {
@@ -976,7 +1045,18 @@ if (!authoredIds.length) {
   // S3 — FIVE REFUSALS, in the order the spec's table states, each before the resolver can spawn and
   // each ending in the one remedy. Nothing past this line can verify the commit, so a return that
   // does not read as one is refused by name rather than trusted.
-  const committedSpecs = sc && Array.isArray(sc.specs) ? sc.specs : []
+  // TOOL-aGraftedHelix-33 S4 - each returned path is FOLDED once, here, so the outside test, the fill
+  // and the log all read the one repo-relative spelling `deriveRepoPath` gives.
+  const committedSpecs = (sc && Array.isArray(sc.specs) ? sc.specs : []).map(function (s) {
+    return s && typeof s === 'object' ? Object.assign({}, s, { path: deriveRepoPath(s.path) }) : s
+  })
+  // A unit placed by PATH must have committed THAT file: the agent finds an id's spec by its H1, the
+  // key `gen_build_index.py` reads, so a basename route the H1 disagrees with refuses and never places
+  // a file the H1 does not define.
+  const strayed = pathEntries.filter(function (pe) {
+    const row = committedSpecs.find(function (s) { return s && s.id === pe.id })
+    return authoredIds.indexOf(pe.id) !== -1 && row && row.path !== pe.path
+  })
   let refusal = ''
   if (!sc) {
     refusal = 'the spec commit stage returned nothing, so the authored specs (' + authoredIds.join(', ') + ') are on disk and uncommitted'
@@ -996,6 +1076,12 @@ if (!authoredIds.length) {
     } else if (outside.length) {
       refusal = 'the spec commit stage named a path outside `' + specFolder + '`: ' +
         outside.map(function (s) { return (s && s.id) + ' at ' + JSON.stringify(s && s.path) }).join('; ')
+    } else if (strayed.length) {
+      refusal = strayed.map(function (pe) {
+        const row = committedSpecs.find(function (s) { return s && s.id === pe.id })
+        return 'a writer named ' + pe.id + ' by ' + JSON.stringify(pe.entry) + ' (folded ' + JSON.stringify(pe.path) +
+          '), but the spec whose H1 defines ' + pe.id + ' was committed at ' + JSON.stringify(row.path) + ' in ' + sc.sha
+      }).join('; ')
     }
   }
   if (refusal) {
@@ -1009,11 +1095,14 @@ if (!authoredIds.length) {
   // and `auditUnits` and `buildUnits` both filter `ordered` after this line, so the resolver's roster
   // and the hand-out's read it. A caller path that differs loses, because the committed one is the file
   // history holds, and the log names both.
+  // TOOL-aGraftedHelix-33 S5 - the caller's path is folded for the COMPARE only: an absolute spelling
+  // of the committed file is rewritten without being called a difference.
   for (const s of committedSpecs) {
     const u = ordered.find(function (x) { return x.id === s.id })
     if (!u || u.specPath === s.path) continue
+    const differs = deriveRepoPath(u.specPath) !== s.path
     log('spec stage: ' + u.id + ' specPath ' + (u.specPath
-      ? u.specPath + ' -> ' + s.path + ' — the caller\'s path differs, and the committed one wins'
+      ? u.specPath + ' -> ' + s.path + (differs ? ' — the caller\'s path differs, and the committed one wins' : '')
       : '-> ' + s.path))
     u.specPath = s.path
   }
@@ -1980,8 +2069,9 @@ if (disposeFirst) await writeRound(promotedIds.length ? ' --disposition promote'
 // `authored` ALONE, and the distinction is the whole point of the exemption. Only the units THIS
 // invocation wrote have a stale entry-time state; a unit the stage reported as `alreadyPresent` is
 // one it did NOT touch, so its entry-time grade is current and exempting it would bypass the
-// THIN/FORKED refusal on an agent's say-so.
-const speccedNow = Array.isArray(specced.authored) ? specced.authored : []
+// THIN/FORKED refusal on an agent's say-so. The list holds unit ids: the merge resolved a path-named
+// entry to its unit (TOOL-aGraftedHelix-33 S3), so a path entry is exempted like an id.
+const speccedNow =Array.isArray(specced.authored) ? specced.authored : []
 let planRefusal = ''
 const skippedDone = []
 if (attended) {

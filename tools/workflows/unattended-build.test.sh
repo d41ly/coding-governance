@@ -604,7 +604,7 @@ S3='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","su
   {"id":"A-tB-1","order":1,"specPath":"s1","specBriefPath":"bf1"},
   {"id":"A-tB-2","order":2,"specPath":"s2","specBriefPath":"bf2"},
   {"id":"A-tB-3","order":3,"specPath":"s3","specBriefPath":"bf3"}]}'
-o=$(run_wf "$S3" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
+o=$(run_wf "$S3" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has "fan: three slices spawn three writers" "$o" "3 slice(s) -> 3 writer(s)"
 has "fan: writer 0 spawned" "$o" "agent:spec:tB:g0"
 has "fan: writer 2 spawned" "$o" "agent:spec:tB:g2"
@@ -624,7 +624,7 @@ S7='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","su
   {"id":"A-tB-3","order":3,"specPath":"s3"},{"id":"A-tB-4","order":4,"specPath":"s4"},
   {"id":"A-tB-5","order":5,"specPath":"s5"},{"id":"A-tB-6","order":6,"specPath":"s6"},
   {"id":"A-tB-7","order":7,"specPath":"s7"}]}'
-o=$(run_wf "$S7" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
+o=$(run_wf "$S7" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 # FOUR, not five, and not seven. `chunk(x, ceil(N/K))` chunks by SIZE, so 7 slices at a cap of 5
 # give groups of 2 and therefore 4 groups. The RULE is that the writer total never EXCEEDS the
 # cap, not that it equals it; asserting 5 would have been asserting my arithmetic, not the bound.
@@ -645,7 +645,7 @@ has "fallback: the unit with no brief is named" "$o" "A-tB-1 has no specBriefPat
 # ---- `specAudit` IS DECLARED in all three fixtures (VERIFYING, dDerivedDocket): they carry `subjects`,
 # ---- and TOOL-aBlindedTrial-3 refuses `subjects` beside no `specAudit` before any stage runs, so
 # ---- without it both controls threw and the byte comparison compared two empty prompts.
-CL_RET='{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}'
+CL_RET='{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}'
 CL_WITH='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
   {"id":"A-tB-1","order":1,"specPath":"s1","closes":["EXMP-aFoo-3","EXMP-aFoo-4"]},
   {"id":"A-tB-2","order":2,"specPath":"s2"}]}'
@@ -667,7 +667,7 @@ o=$(run_wf '{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09
 has "closes: a string in place of a list THROWS by name" "$o" "carries a \`closes\` that is not a non-empty array of ask ids"
 
 # ---- AC4: one dead writer is REFUSED, not dropped, and its siblings still return.
-o=$(run_wf "$S3" '{"spec:tB:g0":null,"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
+o=$(run_wf "$S3" '{"spec:tB:g0":null,"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has "one dead writer: reported as DEGRADED" "$o" "DEGRADED — 1 of 3 writer(s) returned nothing"
 has "one dead writer: its unit lands in refused" "$o" "A-tB-1"
 has "one dead writer: the run still reaches the hand-out" "$o" '"roster":[{'
@@ -683,7 +683,7 @@ hasnt_ "ALL writers dead: no roster is ever handed out" "$o" '"roster"'
 
 # ---- AC7/S3c: the writers are told to AUTHOR and never COMMIT, and not to run the generator. That is
 # ---- half of clause 3 of the disjointness proof, and no gate downstream of here reads a prompt.
-o=$(run_wf "$S3" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
+o=$(run_wf "$S3" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has "writers: told to author and NOT commit" "$o" "AUTHOR ONLY — DO NOT COMMIT"
 has    "writers: told one committer commits once after them" "$o" "one committer commits once after all of you return"
 hasnt_ "writers: ...and never the old answer beside it" "$o" "the caller commits once after all of you"
@@ -1836,7 +1836,7 @@ has    "BT3 attended, OFF, every unit terminal: the exit carries the audit objec
 has    "BT3 ...with an empty roster, by filtering" "$o" '"roster":[]'
 # ---- AC7: both carriers read 1.8 — the render is byte-compared to the template by the parity leg,
 # ---- so the marker moving in one file and not the other reds there; this arm reads the render.
-has    "BT3-AC7 the render carries the engine version 1.9" "$(sed -n '3p' "$F")" "version: '1.9', // gov:kit unattended-build@1.9"
+has    "BT3-AC7 the render carries the engine version 1.10" "$(sed -n '3p' "$F")" "version: '1.10', // gov:kit unattended-build@1.10"
 
 # ================================== TOOL-dPolishedVitrine-1 — THE HARNESS IS RENDERED AT INSTALL
 # The harness shipped as an ENGINE file, and apply writes those verbatim, so every install path it
@@ -2340,6 +2340,78 @@ has    "GH32 ...naming the file and its line" "$o" "gh32-pathless.js:3 — a git
 o=$(node "$HERE/check-workflow-syntax.js" "$LAY/gh32-pathspec.js" 2>&1; echo "rc=$?")
 has    "GH32 the same line with a pathspec passes" "$o" "rc=0"
 
+# ---- TOOL-aGraftedHelix-33: EVERY `authored` ENTRY IS PLACED, by id, by the caller's path or by a basename
+# ---- in the recording grammar, and an entry no unit owns refuses by name. The fixture repo is spelled with
+# ---- a drive letter, its units are pathless and one writer holds each. Each arm read RED on a staged copy of
+# ---- the render: the merge's resolver call bypassed; the backslash fold, the drive fold and the second arm
+# ---- each removed, and the third arm narrowed to `-spec-<id>.md`; the throw deleted; the H1 agreement test
+# ---- deleted; the commit return and the fill each read unfolded; the resolution moved to `authoredIds`;
+# ---- the writers' id sentence deleted.
+GH33_SF=memory/builds/tB/spec
+build_gh33_args() { # units-json · [top-level keys, comma-terminated] -> args over C:/w/r, no audit, no subjects
+  printf '{"repo":"C:/w/r","slug":"tB","scratch":"/tmp/s",%s"units":%s}' "${2:-}" "$1"
+}
+build_gh33_writer() { # group · authored-json -> one writer double
+  printf '"spec:tB:g%s":{"authored":%s,"alreadyPresent":[],"refused":[],"summary":"s"}' "$1" "$2"
+}
+run_gh33() { # args · writer doubles · commit specs-json -> the run, its commit double and disposal clean
+  run_wf "$1" "$(printf '{%s,"commit:":{"committed":true,"sha":"%s","why":"","specs":%s,"summary":"ok"},"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$2" "$CSHA" "$3" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")"
+}
+# AC1 - an id, an absolute path and two relative paths reach ONE commit naming all four, and four roster paths.
+GH33_U4='[{"id":"A-tB-1","order":1},{"id":"A-tB-2","order":2},{"id":"A-tB-3","order":3},{"id":"A-tB-4","order":4}]'
+GH33_S4='[{"id":"A-tB-1","path":"'$GH33_SF'/2026-10-06-spec-A-tB-1.md"},{"id":"A-tB-2","path":"'$GH33_SF'/2026-10-06-spec-A-tB-2.md"},{"id":"A-tB-3","path":"'$GH33_SF'/2026-10-06-spec-A-tB-3.md"},{"id":"A-tB-4","path":"'$GH33_SF'/2026-10-06-spec-A-tB-4.md"}]'
+o=$(run_gh33 "$(build_gh33_args "$GH33_U4")" "$(build_gh33_writer 0 '["A-tB-1"]'),$(build_gh33_writer 1 '["C:/w/r/'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]'),$(build_gh33_writer 2 '["'$GH33_SF'/2026-10-06-spec-A-tB-3.md"]'),$(build_gh33_writer 3 '["'$GH33_SF'/2026-10-06-spec-A-tB-4.md"]')" "$GH33_S4")
+same   "GH33 four spellings reach ONE commit stage" "$(printf '%s\n' "$o" | grep -c '^agent:commit:')" "1"
+has    "GH33 ...whose commit names all four ids" "$(printf '%s\n' "$o" | grep '^prompt:commit:specs:tB:')" "spec(tB): A-tB-1 A-tB-2 A-tB-3 A-tB-4"
+has    "GH33 ...committing four specs" "$o" "log:spec stage: committed 4 spec(s) at $CSHA"
+same   "GH33 ...the three path entries each logged as resolved by path" "$(printf '%s\n' "$o" | grep -c '^log:spec stage: group [0-9] authored .*, resolved by path to A-tB-[234]$')" "3"
+has    "GH33 ...the roster is handed out" "$o" '"roster":[{"id":"A-tB-1"'
+hasnt_ "GH33 ...and no roster row is pathless" "$o" '"specPath":""'
+has    "GH33 ...the absolute entry's unit carries its repo-relative path" "$o" '"id":"A-tB-2","order":2,"specPath":"'$GH33_SF'/2026-10-06-spec-A-tB-2.md"'
+same   "GH33 every writer is asked for ids, never paths" "$(printf '%s\n' "$o" | grep '^prompt:spec:tB:' | grep -c 'by its unit id, exactly as this roster spells it, never by a path')" "4"
+# AC2 - five more spellings, each placed: backslashes, the MSYS drive form, no family, a tail, the caller's path.
+GH33_U5='[{"id":"A-tB-1","order":1},{"id":"A-tB-2","order":2},{"id":"A-tB-3","order":3},{"id":"A-tB-4","order":4},{"id":"A-tB-5","order":5,"specPath":"'$GH33_SF'/notes-five.md"}]'
+GH33_S5='[{"id":"A-tB-1","path":"'$GH33_SF'/2026-10-06-spec-A-tB-1.md"},{"id":"A-tB-2","path":"'$GH33_SF'/2026-10-06-spec-A-tB-2.md"},{"id":"A-tB-3","path":"'$GH33_SF'/2026-10-06-spec-tB-3.md"},{"id":"A-tB-4","path":"'$GH33_SF'/2026-10-06-spec-A-tB-4-u6-indexed-join.md"},{"id":"A-tB-5","path":"'$GH33_SF'/notes-five.md"}]'
+o=$(run_gh33 "$(build_gh33_args "$GH33_U5")" "$(build_gh33_writer 0 '["C:\\w\\r\\memory\\builds\\tB\\spec\\2026-10-06-spec-A-tB-1.md"]'),$(build_gh33_writer 1 '["/c/w/r/'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]'),$(build_gh33_writer 2 '["'$GH33_SF'/2026-10-06-spec-tB-3.md"]'),$(build_gh33_writer 3 '["'$GH33_SF'/2026-10-06-spec-A-tB-4-u6-indexed-join.md"]'),$(build_gh33_writer 4 '["'$GH33_SF'/notes-five.md"]')" "$GH33_S5")
+same   "GH33 five more spellings: nothing refuses" "$(printf '%s\n' "$o" | grep -c '^THROW')" "0"
+has    "GH33 ...and the commit names all five ids" "$(printf '%s\n' "$o" | grep '^prompt:commit:specs:tB:')" "spec(tB): A-tB-1 A-tB-2 A-tB-3 A-tB-4 A-tB-5"
+# AC3 - an entry no unit owns THROWS by name before any commit stage, once per spelling.
+GH33_U1='[{"id":"A-tB-1","order":1}]'
+for c in "A-tB-9|$GH33_U1" \
+         "$GH33_SF/2026-10-06-spec-A-tB-7.md|$GH33_U1" \
+         "memory/builds/tB/prompts/2026-10-06-spec-A-tB-1.md|$GH33_U1" \
+         "$GH33_SF/../spec/2026-10-06-spec-A-tB-1.md|$GH33_U1" \
+         "D:/elsewhere/$GH33_SF/2026-10-06-spec-A-tB-1.md|$GH33_U1" \
+         "C:/w/rx/$GH33_SF/2026-10-06-spec-A-tB-1.md|$GH33_U1" \
+         "$GH33_SF/2026-10-06-spec-tB-1.md|"'[{"id":"A-tB-1","order":1},{"id":"B-tB-1","order":2}]'; do
+  e=${c%%|*}
+  o=$(run_gh33 "$(build_gh33_args "${c#*|}")" "$(build_gh33_writer 0 '["'"$e"'"]'),$(build_gh33_writer 1 '[]')" '[]')
+  t=$(printf '%s\n' "$o" | grep '^THROW')
+  has    "GH33 unplaceable [$e]: THROWS with the phrase" "$t" "names no roster unit by id and no unit's spec by path"
+  has    "GH33 unplaceable [$e]: ...quoting the entry as JSON" "$t" "authored \"$e\""
+  hasnt_ "GH33 unplaceable [$e]: ...before any commit stage" "$o" "agent:commit:"
+done
+# AC4 - a path routed to a unit whose committed spec, found by its H1, is another file THROWS after the commit.
+o=$(run_gh33 "$(build_gh33_args '[{"id":"A-tB-1","order":1},{"id":"A-tB-2","order":2}]')" "$(build_gh33_writer 0 '["A-tB-1"]'),$(build_gh33_writer 1 '["'$GH33_SF'/2026-10-06-spec-A-tB-2.md"]')" \
+  '[{"id":"A-tB-1","path":"'$GH33_SF'/2026-10-06-spec-A-tB-1.md"},{"id":"A-tB-2","path":"'$GH33_SF'/2026-10-05-spec-A-tB-2-other.md"}]')
+t=$(printf '%s\n' "$o" | grep '^THROW')
+has    "GH33 H1 disagreement: THROWS naming the H1" "$t" "the spec whose H1 defines A-tB-2"
+has    "GH33 ...the entry and the committed path" "$t" "\"$GH33_SF/2026-10-06-spec-A-tB-2.md\"), but the spec whose H1 defines A-tB-2 was committed at \"$GH33_SF/2026-10-05-spec-A-tB-2-other.md\" in $CSHA"
+has    "GH33 ...before any audit or hand-out" "$t" "Refusing before any audit or hand-out reads a spec"
+hasnt_ "GH33 ...and no roster is handed out" "$o" '"roster"'
+# AC5 - an absolute caller path and an absolute commit path fold equal: placed, repo-relative, no difference logged.
+GH33_ABS="C:/w/r/$GH33_SF/2026-10-06-spec-A-tB-1.md"
+o=$(run_gh33 "$(build_gh33_args '[{"id":"A-tB-1","order":1,"specPath":"'$GH33_ABS'"}]')" "$(build_gh33_writer 0 '["A-tB-1"]')" '[{"id":"A-tB-1","path":"'$GH33_ABS'"}]')
+same   "GH33 absolute caller and commit paths: nothing refuses" "$(printf '%s\n' "$o" | grep -c '^THROW')" "0"
+has    "GH33 ...the roster row carries the repo-relative path" "$o" '"id":"A-tB-1","order":1,"specPath":"'$GH33_SF'/2026-10-06-spec-A-tB-1.md"'
+hasnt_ "GH33 ...and no difference is logged" "$o" "the caller's path differs"
+# AC6 - attended, a path entry passes the plan-state exemption as its unit.
+o=$(run_wf "$N_UNITS" '{"spec":{"authored":["s1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"}}')
+has    "GH33 attended path entry: rostered despite entry-time MISSING" "$o" '"roster":[{"id":"A-tB-1"'
+has    "GH33 ...and left to the caller to commit by its id" "$o" "so A-tB-1 is left to the caller to commit"
+same   "GH33 ...its writer asked for ids" "$(printf '%s\n' "$o" | grep '^prompt:spec:tB:' | grep -c 'by its unit id')" "1"
+
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
 # over it, 326 at 1d8530e7 (TOOL-aWokenSentinel-21) — at ~10 % headroom, rounded down, because the
@@ -2379,7 +2451,11 @@ has    "GH32 the same line with a pathspec passes" "$o" "rc=0"
 # RAISED 502 -> 509 by TOOL-aGraftedHelix-32: its 7 static sites — the pre-staged entries run of the
 # spec commit block (4) and the pathless-commit ban over its two fixture scripts (3). All of them sit
 # on the path a green run takes.
-FLOOR_ASSERTIONS=509
+# RAISED 509 -> 532 by TOOL-aGraftedHelix-33: its 23 static sites, counted with the grep above as 633 at
+# the unit's parent and 656 after — four spellings to one commit (8), five more placed (2), the
+# unplaceable loop (3, run seven times, so it executes 21), the H1 disagreement (4), the absolute pair
+# folding equal (3) and the attended path entry (3). All of them sit on the path a green run takes.
+FLOOR_ASSERTIONS=532
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

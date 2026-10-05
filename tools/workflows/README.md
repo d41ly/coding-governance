@@ -229,7 +229,11 @@ Its SPEC stage ends in ONE commit (TOOL-aGraftedHelix-15): when the writers auth
 caller pinned no `subjects`, one agent commits the authored specs with `Pass: none` and the program
 writes each committed path onto its unit, so the audit pins them at `HEAD` in the same call. That
 commit's `--for-diff` checklist is merged into the audit's, under one by-design head; with the audit
-off it rides the hand-out as `specCommit`. Every refusal that asks for a commit names a fresh
+off it rides the hand-out as `specCommit`. Each writer's `authored` entry is resolved to its roster
+unit before that commit, whether it is spelled as an id, a repo-relative path or an absolute one
+(TOOL-aGraftedHelix-33): an entry that names no roster unit by id and no unit's spec by path refuses
+the run, and a unit placed by path whose committed spec, found by its H1, is another file refuses
+after the commit. Every refusal that asks for a commit names a fresh
 re-invoke, never a `resumeFromRunId` resume, because a resume replays the cached answer that refused.
 
 `intensity` is `'full'` or `'light'`, and absent it is `'full'`. Only the caller picks it; the harness

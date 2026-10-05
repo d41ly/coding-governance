@@ -2803,6 +2803,16 @@
       "file": "tools/workflows/drift-audit-state.template.js"
     },
     {
+      "id": "deriveRepoPath",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "deriveRepoPath",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "deriveReviewKey",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -7366,6 +7376,16 @@
       "id": "resolveRunPhase",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "resolveSpecEntry",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "resolveSpecEntry",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
     },
     {
       "id": "resolveStamp",
