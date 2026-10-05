@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-5 — each leg reading is stamped faithful or contended by a foreign-load census, and only faithful readings argue a ceiling
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 7 · advances TOOL-aSurfacedLexicon-22 · ratified 2026-10-04
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 7 · advances TOOL-aSurfacedLexicon-22 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -25,8 +25,8 @@ rules, and is declared as the one uncensused path.
 ## 2. Scope (IN)
 
 - **S1** — `measure_foreign` in `tools/run-gates/run-gates.sh` reads ONE `ps -ef` snapshot and
-  prints the number of foreign process trees doing this repository's gate work, then the trees'
-  roots. A row is gate work when its line names a script some manifest leg runs, the runner itself
+  prints one census line in one write: the epoch second it was taken, the number of foreign process
+  trees doing this repository's gate work, then the trees' roots. A row is gate work when its line names a script some manifest leg runs, the runner itself
   or its sibling `run-selftests.sh`, or carries a word ending `.test.sh` or `selftest.py`. The
   runner's own ancestors and descendants are never foreign, and a tree counts once, at its topmost
   matching process. It prints `unknown` when `ps` fails, when the header names no PID or PPID
@@ -42,10 +42,12 @@ rules, and is declared as the one uncensused path.
 - **S3** — `runleg` writes the eighth field of every `.leg` and `.retry.leg` row from
   `derive_foreign`: over the samples stamped inside `[start − 3 × CENSUS_EVERY, end]`, the largest
   positive count; else `unknown` when any sample there reads `unknown` or none exists; else `0`.
+  It sets the field in the worker's own shell rather than printing it, reads the census with
+  builtins, and skips an unterminated last line, which is a sample still being appended.
   Observed by AC1, AC3, AC5 and AC12.
-- **S4** — Every reader of a `.leg` row in the runner keeps its arity: the ledger block's read at
-  `tools/run-gates/run-gates.sh:3128` takes field 7 alone, so `gate-ledger.tsv` stays five fields.
-  Observed by AC6.
+- **S4** — Every reader of a `.leg` row in the runner keeps its arity: the ledger block's `read` of
+  a `.leg` row names seven variables, so it folded any eighth field into the key it keeps; it takes
+  field 7 alone, so `gate-ledger.tsv` stays five fields. Observed by AC6.
 - **S5** — `read_runs` in `tools/run-gates/derive-ceilings.py` sets aside every reading its
   admission rule admits whose eighth field is not `0`, under one reason each, first match: a
   positive integer is `contended`, and anything else, a seven-field row included, is `uncensused`.
@@ -259,11 +261,13 @@ named below by its basename.
   outside process's pid with that leg's script as its token.
   Red when: the outside process is not a root, or the field reads `0`.
   fixture: built per run; the tree holds none today.
-- **AC2** — When the same fixture runs with no outside process, started through a `bash -c`
-  wrapper whose argv names the runner's path, with a leg that starts a nested run of `b.sh` and
-  writes its own and the nested pid to files, no root in the `census` file is the wrapper's, the
-  runner's, the leg's or the nested pid.
-  Red when: an ancestor or a descendant of the runner is counted as foreign.
+- **AC2** — When the same fixture runs with no outside process and `GATE_CENSUS_EVERY=1`, started
+  through a `bash -c` wrapper whose argv names the runner's path, with a leg running `b.sh` that
+  starts a nested run of `b.sh`, writes its own and the nested pid to files and lives 5 s, the
+  `census` file holds a line after its first, and no root in it is the wrapper's, the runner's, the
+  leg's or the nested pid.
+  Red when: an ancestor or a descendant of the runner is counted as foreign, or no sample was taken
+  after the first, so the leg and its nested run were never in a snapshot.
 - **AC3** — When `$S` runs with a `ps` stub that exits 1 first on `PATH`, every `.leg` row's
   `foreign` field reads `unknown`, every `census` line reads `unknown`, stderr carries one
   `run-gates: NOTE` line naming the census, and the verdict equals the same fixture's without the
@@ -276,9 +280,10 @@ named below by its basename.
   capture of the runner returns within 30 s of the runner's own exit while `CENSUS_EVERY` is 60.
   Red when: the sampler is a live job, so the serial pool never dispatches its second leg, or it
   holds the caller's stdout until its `sleep` ends.
-- **AC5** — When `$S` runs with `GATE_CENSUS_EVERY=2` over one leg that sleeps 15 s, and the arm
-  starts an outside run of `a.sh` 4 s after the runner that lives 8 s, the `census` file holds at
-  least four sample lines and the leg's `foreign` field is 1 or more.
+- **AC5** — When `$S` runs with `GATE_CENSUS_EVERY=2` over one leg that writes a start marker
+  outside the tree and then sleeps 15 s, and the arm starts an outside run of `a.sh` that lives 8 s
+  once that marker exists, the `census` file holds at least four sample lines, a line after the
+  first names the outside process's pid, and the leg's `foreign` field is 1 or more.
   Red when: the loop never samples after its first line, so load arriving mid-leg is missed.
   cost: about 20 s, most of it the leg's own sleep.
 - **AC6** — When a two-leg bar has run in `$S`, `awk -F'\t' 'NF != 5' "$GD/gate-ledger.tsv"`
@@ -375,6 +380,17 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · AC3's two blind-census st
   S6, §4 "The manual reading", AC13); 18 (AC3's two blind-census stubs); 19 (AC12, the retry
   row's eighth field and the mixed window); and 45 (the header advances
   `TOOL-aSurfacedLexicon-22`, and §4 says which candidate the field answers).
+- rev-3 · 2026-10-05 · §2 §6 · S1 S3 S4 · AC2 AC5 · the build pass's divergences, before the code,
+  from the runner as merged from origin/main at 909c5e0b9: S4 cited the ledger block's read by a
+  line number that merge moved, and now names it by what it does; S1 has `measure_foreign` print
+  the whole census line, its stamp included, so a sample is one write and a worker reading
+  mid-append never sees a stamp without its count; S3 has `derive_foreign` set the field in the
+  worker's shell, because a function that printed it would be read through a subshell, a spawn §5
+  rules out. AC2 at the default period held only the pre-dispatch sample, in which neither the leg
+  nor its nested run exists, so it passed by finding nothing; it now samples every second and
+  asserts a line after the first. AC5 started its outside run 4 s after a runner whose startup on
+  node `a` takes 5 to 17 s, so the first sample could already see it and the staged break would stay
+  green; the arm now waits for the leg's start marker, and asserts the pid on a line after the first.
 
 ## 10. Reuse audit
 
