@@ -21,9 +21,11 @@ its units' statuses, so nothing here is authored and nothing rots.
 FOUR SOURCES, NOTHING ELSE
   * each build's README front matter (slug node opened streams roster [status])
   * every `**Status:**` header under that build's spec/, at any depth
-  * for the ROSTER only, every tracked file under the memory root EXCEPT this field's own outputs —
-    the build's own README and the generated index and shards. `ids` is therefore an OUTPUT, not a
-    source: `--write` overwrites whatever was authored there.
+  * for the ROSTER, and for the date of a build's last record, every tracked file under the memory
+    root EXCEPT this field's own outputs — the build's own README and the generated index and shards.
+    `ids` is therefore an OUTPUT, not a source: `--write` overwrites whatever was authored there. The
+    last-record date reads only the leading date of each record FILENAME, never a file's mtime, and
+    LIVE.md renders it only under a set LIVE_DORMANT_DAYS (TOOL-aMendedFleet-12).
   * under `BACKLOG_MODE=builds` ONLY, every tracked `builds/<slug>/BACKLOG.md`, read through
     `backlog.py`'s grammar and folded into the family views. Under `shards` that source does not
     exist and not one branch below it is reached, which is what keeps this change dark.
@@ -1488,7 +1490,34 @@ def apply_region(readme_text: str, region: str, readme: str,
     return "\n".join(lines[: opens[0]] + region.split("\n") + lines[closes[0] + 1 :])
 
 
-def render_live(builds: list, m: str) -> str:
+def derive_last_record(build: dict, asks) -> str:
+    """TOOL-aMendedFleet-12 S1 — the newest date this build's own tracked records carry.
+
+    Four sources, every one already in hand: the front matter's `opened`, each unit's status-header
+    date, the leading date of each tracked record filename, and the `filed` date of each ask homed in
+    the build's `BACKLOG.md`. No git history and no clock, so the module docstring's no-history
+    contract still holds. A date that is not a real calendar date is a named refusal, not a traceback.
+    """
+    dates = [build["fm"]["opened"]] + [u["date"] for u in build["units"]]
+    dates += [mo.group(0) for mo in (re.match(r"\d{4}-\d{2}-\d{2}", os.path.basename(p))
+                                     for p in build["docs"]) if mo]
+    dates += [a.filed for a in asks]
+    for d in dates:
+        try:
+            datetime.date.fromisoformat(d)
+        except ValueError:
+            raise Problem(f"{build['readme']}: '{d}' is a record date of this build and not a real "
+                          f"calendar date, so LIVE_DORMANT_DAYS cannot measure from it") from None
+    return max(dates)
+
+
+def render_live(builds: list, m: str, conf: dict | None = None, reading: dict | None = None) -> str:
+    # LIVE_DORMANT_DAYS (TOOL-aMendedFleet-12): blank or absent renders the file this function always
+    # rendered, byte for byte; anything else must be a positive whole number of days or it refuses.
+    raw = ((conf or {}).get("LIVE_DORMANT_DAYS") or "").strip()
+    if raw and (not re.fullmatch(r"[0-9]+", raw) or int(raw) == 0):
+        raise Problem(f"LIVE_DORMANT_DAYS='{raw}' is not a positive whole number of days; LIVE.md "
+                      f"marks a build dormant by it, so an unusable value must name itself")
     live = [b for b in builds if b["status"] not in TERMINAL]
     out = [
         GEN_HEADER,
@@ -1498,16 +1527,36 @@ def render_live(builds: list, m: str) -> str:
         "terminal status. Nothing here is edited by hand.",
         "",
     ]
+    head, rule, extra = "| Build | Status | Node | Opened | Streams | Ids (n) |", "|---|---|---|---|---|---|", {}
+    if live and raw:
+        # The ANCHOR is the newest last-record date across EVERY build, terminal ones included, and
+        # never the clock: a clock anchor would stale this file with no commit. ONE table, active rows
+        # first, because the kickoff card counts rows under one header (S3).
+        corpus = (reading or {}).get("corpus")
+        homes = {f.path: f.asks for f in corpus.files} if corpus else {}
+        last = {b["slug"]: derive_last_record(b, homes.get(f"{m}/builds/{b['slug']}/BACKLOG.md", ()))
+                for b in builds}
+        anchor = max(last.values())
+        who = min(s for s, d in last.items() if d == anchor)
+        day = datetime.date.fromisoformat(anchor)
+        for b in live:
+            gap = (day - datetime.date.fromisoformat(last[b["slug"]])).days
+            extra[b["slug"]] = (last[b["slug"]], "dormant" if gap > int(raw) else "active")
+        live = sorted(live, key=lambda b: extra[b["slug"]][1] == "dormant")   # stable: slug order kept
+        out += [f"Dormant: no record dated within {raw} days of {anchor}, the newest record date in "
+                f"this tree ({who}).", ""]
+        head, rule = head + " Last record | Activity |", rule + "---|---|"
     if live:
         # A COUNT, not the list. This file is in check 7's entry-budget population and the build
         # README's region is not, so the full roster renders there and a bounded number renders here:
         # a ten-id row measured 316 chars against a 300-char cap, on a file with no slack.
-        out += ["| Build | Status | Node | Opened | Streams | Ids (n) |", "|---|---|---|---|---|---|"]
+        out += [head, rule]
         for b in live:
             fm = b["fm"]
+            tail = " {} | {} |".format(*extra[b["slug"]]) if extra else ""
             out.append(
                 f"| [{b['slug']}](builds/{b['slug']}/README.md) | {b['status']} | {fm['node']} | "
-                f"{fm['opened']} | {fm['streams']} | {len(b['roster'])} |"
+                f"{fm['opened']} | {fm['streams']} | {len(b['roster'])} |{tail}"
             )
     else:
         out.append("*No live build.*")
@@ -2105,7 +2154,7 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
             artifacts[rel] = apply_region(
                 stext, render_spec_records(u["id"], inverted.get(u["id"], []), rel), rel,
                 SPEC_RECORDS_OPEN, SPEC_RECORDS_CLOSE)
-    artifacts[f"{m}/LIVE.md"] = render_live(builds, m)
+    artifacts[f"{m}/LIVE.md"] = render_live(builds, m, conf, reading)
     artifacts.update(render_shards(builds, m))
     # Orphans: a tracked file under ledger/ that this render does not produce. The DELETABLE set is
     # bounded to the month-shard NAME; anything else is reported and left alone.
@@ -5740,6 +5789,70 @@ def cmd_selftest() -> int:
         "carries no `## Backlog modes",
         lambda: scan_modes_doc_drift(_d_source, _d_readme.replace(MODES_HEADING, "## Elsewhere"),
                                      GUARD_CODES)[0])
+
+    # TOOL-aMendedFleet-12 — LIVE.md's `Last record` and `Activity` columns, three arms (S7).
+    _l_spec = "memory/builds/{0}/spec/2026-09-01-spec-{0}-1.md"
+    _l_none = ("---\nslug: aNone\nnode: a\nopened: 2026-08-01\nstreams: tool\nroster: EXMP\n"
+               "ids: EXMP-aNone-1\nstatus: OPEN\n---\n\n# aNone\n\n" + MARK_OPEN + "\n" + MARK_CLOSE + "\n")
+    _l_files = {
+        # aSpec's newest date is a status-header date, and it is the anchor.
+        "memory/builds/aSpec/README.md": _render_backlog_readme("aSpec"),
+        _l_spec.format("aSpec"): _render_backlog_spec("EXMP-aSpec-1").replace("2026-09-01 ·", "2026-09-30 ·"),
+        # aFile's is a record FILENAME, exactly 21 days before the anchor: active.
+        "memory/builds/aFile/README.md": _render_backlog_readme("aFile"),
+        _l_spec.format("aFile"): _render_backlog_spec("EXMP-aFile-1"),
+        "memory/builds/aFile/build/2026-09-09-build-EXMP-aFile-1-1-note.md": "# a note\n",
+        # aAsk's is an ask's `filed` date, 22 days before the anchor: dormant.
+        "memory/builds/aAsk/README.md": _render_backlog_readme("aAsk"),
+        _l_spec.format("aAsk"): _render_backlog_spec("EXMP-aAsk-1"),
+        "memory/builds/aAsk/BACKLOG.md": _render_backlog_file(
+            "aAsk", [backlog.render_ask_row("EXMP-aAsk-2", "2026-09-08", "an ask")]),
+        # aNone carries no dated record at all: its cell is its `opened`.
+        "memory/builds/aNone/README.md": _l_none,
+        "memory/builds/aNone/spec/legacy-note.md": "# no header here\n",
+    }
+    with tempfile.TemporaryDirectory() as _l_base:
+        _l_t = os.path.join(_l_base, "dormant"); os.makedirs(_l_t)
+        _l_conf = dict(_build_backlog_fixture(_l_t, _l_files), LIVE_DORMANT_DAYS="21")
+        _l_live = plan(_l_t, _l_conf)[0]["memory/LIVE.md"]
+        arm("AC3 — every date source reaches its row, the 21-day boundary is active and 22 is dormant",
+            "| [aFile](builds/aFile/README.md) | SPECCED | a | 2026-09-01 | tool | 1 | 2026-09-09 | active |\n"
+            "| [aSpec](builds/aSpec/README.md) | SPECCED | a | 2026-09-01 | tool | 1 | 2026-09-30 | active |\n"
+            "| [aAsk](builds/aAsk/README.md) | SPECCED | a | 2026-09-01 | tool | 2 | 2026-09-08 | dormant |\n"
+            "| [aNone](builds/aNone/README.md) | OPEN | a | 2026-08-01 | tool | 1 | 2026-08-01 | dormant |\n",
+            lambda: _l_live)
+        arm("AC3 — the anchor sentence names the threshold, the newest date and the build that set it",
+            "Dormant: no record dated within 21 days of 2026-09-30, the newest record date in this "
+            "tree (aSpec).", lambda: _l_live)
+        arm("AC3 — a zero LIVE_DORMANT_DAYS refuses by name",
+            "LIVE_DORMANT_DAYS='0' is not a positive whole number",
+            lambda: plan(_l_t, dict(_l_conf, LIVE_DORMANT_DAYS="0")))
+        # AC4 — blank renders the pre-unit file. The oracle is that render, frozen here as it shipped.
+        _l_blank = dict(_l_conf, LIVE_DORMANT_DAYS="")
+        _l_rows = [f"| [{b['slug']}](builds/{b['slug']}/README.md) | {b['status']} | {b['fm']['node']} | "
+                   f"{b['fm']['opened']} | {b['fm']['streams']} | {len(b['roster'])} |"
+                   for b in collect(_l_t, _l_blank) if b["status"] not in TERMINAL]
+        _l_old = "\n".join([
+            GEN_HEADER, "# memory/LIVE.md — builds with at least one non-terminal unit", "",
+            "Derived, never authored: a build leaves this file when every one of its units reaches a",
+            "terminal status. Nothing here is edited by hand.", "",
+            "| Build | Status | Node | Opened | Streams | Ids (n) |", "|---|---|---|---|---|---|"]
+            + _l_rows) + "\n"
+        arm("AC4 — a blank LIVE_DORMANT_DAYS renders the pre-unit LIVE.md byte for byte", "True",
+            lambda: str(len(_l_rows) == 4 and plan(_l_t, _l_blank)[0]["memory/LIVE.md"] == _l_old))
+        # AC2 — the same tracked bytes committed a year apart render one LIVE.md. The commit dates are
+        # asserted apart first, so an arm whose fixtures collapsed to one date cannot pass vacuously.
+        _l_renders, _l_dates = [], []
+        for _l_n, _l_when in (("y1", "2025-01-15T12:00:00"), ("y2", "2026-01-15T12:00:00")):
+            _l_r = os.path.join(_l_base, _l_n); os.makedirs(_l_r)
+            _l_c = dict(_build_backlog_fixture(_l_r, _l_files), LIVE_DORMANT_DAYS="21")
+            subprocess.run(("git", "commit", "-q", "--no-verify", "-m", "f"), cwd=_l_r, check=True,
+                           capture_output=True,
+                           env=dict(_build_git_env(), GIT_AUTHOR_DATE=_l_when, GIT_COMMITTER_DATE=_l_when))
+            _l_dates.append(run("git", "log", "-1", "--format=%ad %cd", "--date=short", cwd=_l_r).strip())
+            _l_renders.append(plan(_l_r, _l_c)[0]["memory/LIVE.md"])
+        arm("AC2 — two trees a year apart in commit dates render one LIVE.md", "apart=True same=True",
+            lambda: f"apart={_l_dates[0] != _l_dates[1]} same={_l_renders[0] == _l_renders[1]}")
 
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it

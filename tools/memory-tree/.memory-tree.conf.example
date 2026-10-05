@@ -394,3 +394,12 @@ BACKLOG_EXCERPT_CHARS=""
 #
 #   PROBE_ALLOW="python3 <prefix>/check-one-thing.py|git --version"
 PROBE_ALLOW=""
+
+# LIVE_DORMANT_DAYS — a positive whole number of days. Set, `gen_build_index.py` gives LIVE.md two
+# trailing columns: `Last record`, the newest date a build's own tracked records carry (spec header
+# dates, record filename dates, its asks' `filed` dates, its `opened`), and `Activity`, `dormant`
+# when that date is more than this many days before the newest record date in the whole tree and
+# `active` otherwise, active rows first. The anchor is that newest date, never the clock, so the
+# file does not go stale between commits. BLANK OR ABSENT RENDERS TODAY'S LIVE.md, byte for byte;
+# a value that is not a positive whole number refuses by name before anything is written.
+LIVE_DORMANT_DAYS=""
