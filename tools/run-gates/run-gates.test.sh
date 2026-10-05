@@ -121,7 +121,8 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=288
+FLOOR_ASSERTIONS=289
+# RAISED 288 -> 289 by TOOL-dThriftyLanding-8: section 3i2's merged-side-branch assertion.
 # RAISED 278 -> 288 by TOOL-dThriftyLanding-1: arm 1a's `doc_reads` control and section 3i2's nine
 # docs-mode assertions.
 # RAISED 273 -> 278 by TOOL-dUnstuckLanding-16: section 7's five new assertions (AC1's attr line and
@@ -1168,6 +1169,17 @@ o=$( cd "$D" && GATE_FULL= GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=$_db GATE_J
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^GATE ok    reads b only$' \
   || { echo "canary: a doc path touched and restored inside the range read as unmoved"; fail=1; }
+# ...and the same touch on a SIDE branch merged with --no-ff (TOOL-dThriftyLanding-8). Git's default
+# history simplification drops a side branch that nets to nothing on the path, and every landing here
+# is a --no-ff merge, so the linear arm above cannot see this one.
+_db2=$( cd "$D" && git rev-parse HEAD )
+( cd "$D" && git checkout -q -b side && printf 'b3\n' > notes/b.md && git commit -qam b3 \
+  && printf 'b\n' > notes/b.md && git commit -qam b && git checkout -q main \
+  && printf 'a3\n' > notes/a.md && git commit -qam a3 && git merge -q --no-ff -m land side ) >/dev/null 2>&1
+o=$( cd "$D" && GATE_FULL= GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=$_db2 GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    reads b only$' \
+  || { echo "canary: a doc path touched and restored on a merged side branch read as unmoved"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 o=$( cd "$D" && GATE_FULL= GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=no-such-rev GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 printf '%s\n' "$o" | grep -q 'docs mode is OFF' \

@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: f765eb8e96d5243e1d15377bd9afc6789ce6bd80
-phase: REVIEWING
+witness: 7f1fa5f1d7dc446c49b6d4d47a9fef723dd45787
+phase: BUILDING
 branch-sha: 9c49bed108a9407d278b1ad701b86613f1046f0b
 branch-ref: refs/heads/branch/push-main-gate-optimization-3d9780
 may: none
@@ -76,3 +76,7 @@ base: 9c49bed108a9407d278b1ad701b86613f1046f0b
 2026-10-05T13:01:00Z rescope · item add TOOL-dThriftyLanding-11 · reason promoted from closing review round 1, id 10 (HIGH): the policy selftest grades one spelling only
 
 2026-10-05T13:01:15Z rescope · item add TOOL-dThriftyLanding-12 · reason promoted from closing review round 1: the eighteen mediums and lows, batched
+
+2026-10-05T13:07:14Z brief · item TOOL-dThriftyLanding-8 · reason d7283f2af231 memory/builds/dThriftyLanding/prompts/2026-10-05-prompt-TOOL-dThriftyLanding-8-1-build-brief.md
+
+2026-10-05T13:07:31Z dispatch · item 7f1fa5f1 TOOL-dThriftyLanding-8 · reason memory/builds/dThriftyLanding/README.md memory/builds/dThriftyLanding/build/2026-10-05-build-TOOL-dThriftyLanding-8-1-acceptance-ledger.md memory/builds/dThriftyLanding/prompts/2026-10-05-prompt-TOOL-dThriftyLanding-8-1-build-brief.md memory/builds/dThriftyLanding/spec/2026-10-05-spec-TOOL-dThriftyLanding-8.md memory/guides/SESSION-KICKOFF.md tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh

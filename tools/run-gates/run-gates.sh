@@ -296,13 +296,15 @@ unset GATE_DOCS_BASE
 # A DOC PATH MOVED when it differs between DOCS_BASE and the working tree, OR when any commit in
 # DOCS_BASE..HEAD touched it. The second half is not redundant: a path changed in one commit and
 # restored in a later one has no net diff, and a leg that grades COMMITS (a pass-order or brief rule)
-# still has something to grade. Every failure reads as MOVED, so the leg runs: the one direction this
+# still has something to grade. `--full-history` is load-bearing (TOOL-dThriftyLanding-8): without it
+# git simplifies away a `--no-ff` merge's side branch that nets to nothing on these paths, and every
+# landing here is such a merge. Every failure reads as MOVED, so the leg runs: the one direction this
 # predicate may err in is doing more work.
 check_doc_moved() {
   local hit
   [ -n "$DOCS_BASE" ] || return 0
   ! git diff --quiet "$DOCS_BASE" -- "$@" 2>/dev/null && return 0
-  hit=$(git log --format=%h -1 "$DOCS_BASE..HEAD" -- "$@" 2>/dev/null) || return 0
+  hit=$(git log --full-history --format=%h -1 "$DOCS_BASE..HEAD" -- "$@" 2>/dev/null) || return 0
   [ -n "$hit" ]
 }
 
