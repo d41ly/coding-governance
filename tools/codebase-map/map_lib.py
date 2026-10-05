@@ -584,8 +584,9 @@ def enumerate_exports(
 # nearly every commit (that is why symbols.json is {id,kind,file}-only), so it is computed on
 # demand OUTSIDE the freshness gate.
 
-#: default fan-in at/above which a symbol counts as a reusable "seam" (referenced from >= this
-#: many distinct files). Override per repo as SEAM_FANIN_THRESHOLD in .codebase-map.conf.
+#: default fan-in + install sites at/above which a symbol counts as a reusable "seam" (files
+#: referencing it plus files carrying an inlined canonical copy, `TOOL-aMendedFleet-42`). Override
+#: per repo as SEAM_FANIN_THRESHOLD in .codebase-map.conf.
 SEAM_FANIN_THRESHOLD_DEFAULT = 3
 
 #: english glue dropped from a stem set so it never drives a match.

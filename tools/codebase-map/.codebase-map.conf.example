@@ -41,8 +41,9 @@ MAP_DIFF_CMD="python <prefix>/codebase-map/map_diff.py"   # the pre-stamp shape;
 # Leave empty when every present layer has an extractor. Quote it — it has spaces.
 RECALL_DARK_LAYERS=""
 
-# Fan-in at/above which a symbol counts as a reusable "seam": referenced from >= this many distinct
-# files (import/identifier positions). Used by reuse_lookup's hot-seam ranking. Integer >= 1;
+# Fan-in + install sites at/above which a symbol counts as a reusable "seam": files referencing it
+# (import/identifier positions) plus files carrying an inlined canonical copy of it (a `# >>> <name>`
+# marker). Used by reuse_lookup and gen_map --seed-affordances alike. Integer >= 1;
 # default 3. Raise it in a big repo where 3 files is common, lower it in a small one.
 SEAM_FANIN_THRESHOLD=3
 
