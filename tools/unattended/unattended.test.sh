@@ -12448,51 +12448,70 @@ if in_shard 2; then
 # check number (`-` for none), whether the claim ref's sha `moved` or stayed the `same`, whether the
 # run-state file `changed` or stayed the `same`, and the line the call printed: `taken` for `claim
 # taken over`, `announced` for the announce row's `claim not written`, `lost` for a write the push
-# lost, `-` for none of them. A cell no path reaches is written
-# `unreached` and its reason, and prints a SKIP naming both rather than passing. Before driving one,
-# the arm asserts its table holds every pair of GC_ROWS and GC_MODES exactly once, so a deleted cell
-# reds rather than shrinking the arm. WHAT THIS DOES NOT CHECK: that those two lists are the driver's.
-# A row or mode the driver gains reds nothing here; deriving them from it is TOOL-aGraftedHelix-19's.
-# Each cell starts from its mode's committed base with every claim cleared, then seeds its row as a
-# real gov-claim commit, so no cell's write is the next one's input. The reachers: --preflight of
-# tFresh under a new session and keepalive; a new session's --resume of a presumed-stopped tRun,
-# which reaches run_takeover; the holder's own --resume; and --hold, the status write. A failing cell
-# names its row and mode. It reuses the claim block's gh_ helpers.
+# lost, `renewed` and `declined` for the two `beat —` lines, `-` for none of them. A cell no path
+# reaches is written `unreached` and its reason, and prints a SKIP naming both rather than passing.
+# THE CELLS ARE DERIVED, not typed twice (TOOL-aGraftedHelix-19): the rows and modes are the
+# driver's own CLAIM_READS and CLAIM_MODES lines, read the way the verb arms read VERBS_SLUG, and
+# before any cell is driven the arm asserts its table types exactly their product, naming every cell
+# on one side only. A class or mode the driver gains without a typed cell reds here, and so does a
+# deleted cell. Each cell starts from its mode's committed base with every claim cleared, then seeds
+# its row as a real gov-claim commit, so no cell's write is the next one's input. The reachers:
+# --preflight of tFresh under a new session and keepalive; a new session's --resume of a
+# presumed-stopped tRun, which reaches run_takeover; the holder's own --resume; --hold, the status
+# write; and --beat. A failing cell names its row and mode. It reuses the claim block's gh_ helpers.
 # ==================================================================================================
-GC_ROWS="none mine same live held stale terminal unknown"
-GC_MODES="preflight take-over holder status"
-GC_CELLS='none     preflight 0 -  moved changed -
-mine     preflight 0 -  moved changed -
-same     preflight 0 -  moved changed -
-live     preflight 1 89 same  same    -
-held     preflight 1 89 same  same    -
-stale    preflight 0 -  moved changed taken
-terminal preflight 0 -  moved changed -
-unknown  preflight 1 89 same  same    -
-none     take-over 0 -  moved changed -
-mine     take-over 0 -  moved changed -
-same     take-over 0 -  moved changed -
-live     take-over 1 89 same  same    -
-held     take-over 0 -  moved changed -
-stale    take-over 0 -  moved changed taken
-terminal take-over 1 89 same  same    -
-unknown  take-over 1 89 same  same    -
-none     holder    0 -  moved same    -
-mine     holder    0 -  moved same    -
-same     holder    0 -  moved same    -
-live     holder    1 90 same  same    -
-held     holder    1 90 same  same    -
-stale    holder    1 90 same  same    -
-terminal holder    1 90 same  same    -
-unknown  holder    1 90 same  same    -
-none     status    0 -  moved changed -
-mine     status    0 -  moved changed -
-same     status    0 -  moved changed -
-live     status    0 -  same  changed announced
-held     status    0 -  same  changed announced
-stale    status    0 -  moved changed -
-terminal status    0 -  moved changed -
-unknown  status    0 -  same  changed announced'
+GC_CELLS='none             preflight 0 -  moved changed -
+mine             preflight 0 -  moved changed -
+same             preflight 0 -  moved changed -
+foreign-live     preflight 1 89 same  same    -
+foreign-held     preflight 1 89 same  same    -
+foreign-stale    preflight 0 -  moved changed taken
+foreign-terminal preflight 0 -  moved changed -
+foreign-unknown  preflight 1 89 same  same    -
+none             take-over 0 -  moved changed -
+mine             take-over 0 -  moved changed -
+same             take-over 0 -  moved changed -
+foreign-live     take-over 1 89 same  same    -
+foreign-held     take-over 0 -  moved changed -
+foreign-stale    take-over 0 -  moved changed taken
+foreign-terminal take-over 1 89 same  same    -
+foreign-unknown  take-over 1 89 same  same    -
+none             holder    0 -  moved same    -
+mine             holder    0 -  moved same    -
+same             holder    0 -  moved same    -
+foreign-live     holder    1 90 same  same    -
+foreign-held     holder    1 90 same  same    -
+foreign-stale    holder    1 90 same  same    -
+foreign-terminal holder    1 90 same  same    -
+foreign-unknown  holder    1 90 same  same    -
+none             status    0 -  moved changed -
+mine             status    0 -  moved changed -
+same             status    0 -  moved changed -
+foreign-live     status    0 -  same  changed announced
+foreign-held     status    0 -  same  changed announced
+foreign-stale    status    0 -  moved changed -
+foreign-terminal status    0 -  moved changed -
+foreign-unknown  status    0 -  same  changed announced
+none             beat      0 -  moved same    renewed
+mine             beat      0 -  moved same    renewed
+same             beat      0 -  same  same    declined
+foreign-live     beat      0 -  same  same    declined
+foreign-held     beat      0 -  same  same    declined
+foreign-stale    beat      0 -  same  same    declined
+foreign-terminal beat      0 -  same  same    declined
+foreign-unknown  beat      0 -  same  same    declined'
+mapfile -t gc_lines <<<"$GC_CELLS"
+gc_rows=$(sed -n 's/^CLAIM_READS="\(.*\)"$/\1/p' "$SCRIPT")
+gc_modes=$(sed -n 's/^CLAIM_MODES="\(.*\)"$/\1/p' "$SCRIPT")
+gc_want=""
+for r in $gc_rows; do for m in $gc_modes; do gc_want="$gc_want$r/$m"$'\n'; done; done
+gc_have=""
+for l in "${gc_lines[@]}"; do
+  read -r r m _ <<<"$l"; gc_have="$gc_have$r/$m"$'\n'
+done
+gc_odd=$(comm -3 <(printf '%s' "$gc_want" | sort) <(printf '%s' "$gc_have" | sort) \
+  | awk -F'\t' '{ if ($1 != "") print $1 " has no typed outcome;"; else print $2 " is typed beyond the driver cells;" }' | tr '\n' ' ')
+same "GH19 the cell table types exactly the driver's CLAIM_READS by CLAIM_MODES, once each" "$gc_odd" ""
 # A row's claim, seeded against the reacher's own lease: `mine` carries its keepalive and session,
 # aged a third of the bound so the holder's renewal is due; `same` carries only its session.
 seed_claim_row() { # row · slug · the reacher's session · its keepalive
@@ -12500,11 +12519,11 @@ seed_claim_row() { # row · slug · the reacher's session · its keepalive
     none) ;;
     mine) seed_claim "$2" "$3" "$4" live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)" ;;
     same) seed_claim "$2" "$3" k-other live "$(derive_claim_now)" ;;
-    live) seed_claim "$2" s-other k-other live "$(derive_claim_now)" ;;
-    held) seed_claim "$2" s-other k-other held "$(derive_claim_now)" ;;
-    stale) seed_claim "$2" s-other k-other live "$(derive_claim_ago $((GH_BOUND + 600)))" ;;
-    terminal) seed_claim "$2" s-other k-other landed "$(derive_claim_now)" ;;
-    unknown) seed_claim "$2" s-other k-other live "" ;;
+    foreign-live) seed_claim "$2" s-other k-other live "$(derive_claim_now)" ;;
+    foreign-held) seed_claim "$2" s-other k-other held "$(derive_claim_now)" ;;
+    foreign-stale) seed_claim "$2" s-other k-other live "$(derive_claim_ago $((GH_BOUND + 600)))" ;;
+    foreign-terminal) seed_claim "$2" s-other k-other landed "$(derive_claim_now)" ;;
+    foreign-unknown) seed_claim "$2" s-other k-other live "" ;;
     *) echo "FAIL GH12 the cell table names a row no seed builds: $1"; st=1; return 1 ;;
   esac
 }
@@ -12514,7 +12533,7 @@ run_claim_cell() { # row · mode -> GC_GOT
   case "$mode" in
     preflight) base=$GC_FRESH; slug=tFresh; me=s-new; ka=k2 ;;
     take-over) base=$GC_AGED; slug=tRun; me=s-new; ka=k2 ;;
-    holder|status) base=$GC_HELD; slug=tRun; me=fixture-session; ka=k1 ;;
+    holder|status|beat) base=$GC_HELD; slug=tRun; me=fixture-session; ka=k1 ;;
     *) GC_GOT="no reacher drives mode $mode"; return 1 ;;
   esac
   git checkout -q -f unit; git reset -q --hard "$base"; git clean -qfd; remove_claim_refs
@@ -12526,6 +12545,7 @@ run_claim_cell() { # row · mode -> GC_GOT
     take-over) out=$(CLAUDE_CODE_SESSION_ID=$me run --resume "$slug" --keepalive-id "$ka"); rc=$? ;;
     holder) out=$(run --resume "$slug" --keepalive-id "$ka"); rc=$? ;;
     status) out=$(run --hold "$slug" --code platform-limit --until owner --reason "the cell table" --reaped "$ka"); rc=$? ;;
+    beat) out=$(run --beat "$slug"); rc=$? ;;
   esac
   r1=$(git ls-remote "$ORIGIN" "refs/gov/runs/$slug" | cut -f1)
   h1=$(git hash-object "memory/builds/$slug/RUN.md" 2>/dev/null) || h1=absent
@@ -12538,8 +12558,11 @@ run_claim_cell() { # row · mode -> GC_GOT
   # written` line too - only the sentence tells the table's decision from a race the push lost.
   case "$out" in
     *"the claim moved on the remote between"*|*"unattended: claim not written — $slug · "*) line=lost ;;
+    *"unattended: beat — $slug · skipped: the claim moved, so the run's own next verb decides it"*) line=lost ;;
     *"unattended: claim taken over — "*) line=taken ;;
     *"unattended: claim not written — $slug is held "*) line=announced ;;
+    *"unattended: beat — $slug · renewed "*) line=renewed ;;
+    *"unattended: beat — $slug · skipped: the claim is not this run's: "*) line=declined ;;
   esac
   GC_GOT="$rc $ck $ref $rec $line"
   [ "$GC_GOT" = "$3" ] || GC_GOT="$GC_GOT · output: $(printf '%s' "$out" | head -c 300)"
@@ -12548,14 +12571,6 @@ arm_claim_fixture; GC_FRESH=$(git rev-parse HEAD)
 build_claim_held; GC_HELD=$(git rev-parse HEAD)
 GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -q --allow-empty -m gc-aged --no-verify
 GC_AGED=$(git rev-parse HEAD)
-mapfile -t gc_lines <<<"$GC_CELLS"
-gc_want=""; for r in $GC_ROWS; do for m in $GC_MODES; do gc_want="$gc_want$r/$m"$'\n'; done; done
-gc_have=""
-for l in "${gc_lines[@]}"; do
-  read -r r m _ <<<"$l"; gc_have="$gc_have$r/$m"$'\n'
-done
-same "GH12 the cell table holds every row and mode pair exactly once" \
-  "$(printf '%s' "$gc_have" | sort | tr '\n' ' ')" "$(printf '%s' "$gc_want" | sort | tr '\n' ' ')"
 for l in "${gc_lines[@]}"; do
   read -r r m want <<<"$l"
   case "$want" in unreached*) echo "SKIP GH12 cell $r/$m is unreached: ${want#unreached }"; continue ;; esac
@@ -12576,6 +12591,30 @@ out=$(run --beat tRun)
 hit  "$out" "unattended: beat — tRun · skipped: the claim is not this run's: tRun · node other · session s-other"
 miss "$out" "skipped: verdict"
 same "GH12 AC2 --beat over another session's live claim moves no ref" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gc_sha"
+# ---- TOOL-aGraftedHelix-19 S5: a mode outside CLAIM_MODES is refused before any claim write. The
+# ---- scratch driver REMOVES the existing member `status`, so the value keeps its case branch and
+# ---- only the membership test stands between `--hold` and the write: red when that test is gone.
+build_claim_held
+gc_drv=$(mktemp -d)
+sed 's/^\(CLAIM_MODES=".*\) status\(.*"\)$/\1\2/' "$SCRIPT" >"$gc_drv/unattended.sh"
+cp "$HERE/lib-unattended.sh" "$gc_drv/lib-unattended.sh"
+gc_m0=$(sed -n 's/^CLAIM_MODES="\(.*\)"$/\1/p' "$SCRIPT")
+gc_m1=$(sed -n 's/^CLAIM_MODES="\(.*\)"$/\1/p' "$gc_drv/unattended.sh")
+hit  " $gc_m0 " " status "
+same "GH19 S5 the scratch driver's CLAIM_MODES is the kit's less status" " $gc_m1 " "$(printf ' %s ' "$gc_m0" | sed 's/ status / /')"
+gc_sha=$(read_claim_ref tRun)
+# ---- ...and `--beat`'s site, which never met a refusal before S2, maps it to one skip line and
+# ---- writes nothing: over NO claim, where a fall-through would create one. Red when that line goes.
+sed 's/^\(CLAIM_MODES=".*\) beat"$/\1"/' "$SCRIPT" >"$gc_drv/nobeat.sh"
+remove_claim_refs
+out=$(bash "$gc_drv/nobeat.sh" --beat tRun 2>&1)
+hit  "$out" "unattended: beat — tRun · skipped: the claim write table refused the call"
+same "GH19 S2 a refused --beat creates no claim" "$(read_claim_ref tRun)" ""
+git --git-dir="$ORIGIN" update-ref refs/gov/runs/tRun "$gc_sha"
+out=$(bash "$gc_drv/unattended.sh" --hold tRun --code platform-limit --until owner --reason "the mode axis" --reaped k1 2>&1)
+hit  "$out" "UNATTENDED check 92 FAILED — this call passed a claim mode the driver does not declare, so the claim write table has no column for it and nothing was written; declare the mode in CLAIM_MODES beside its case branch, or pass a declared one: mode status · CLAIM_MODES $gc_m1"
+same "GH19 S5 the refused status write moves no claim ref" "$(read_claim_ref tRun)" "$gc_sha"
+rm -rf "$gc_drv"
 remove_claim_refs; reset_tree
 
 # ==================================================================================================
@@ -13080,7 +13119,13 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # region two, its two `mutate` calls included, MEASURED: that block run alone behind this prologue
 # and the claim block's gh_ helpers on node a, 2026-10-05, executed 33 against the prologue's own 20,
 # green against the kit and red under the parent's driver and one staged driver copy; no suite ran.
-FLOOR_ASSERTIONS=2099
+# RAISED 2099 -> 2114 by TOOL-aGraftedHelix-19: the claim-cell block's 8 new `beat` cells and the
+# mode-refusal arm's 7 executed assertions, its one `mutate` call included, all in region two,
+# MEASURED: the cell block run alone behind this prologue and the claim block's gh_ helpers on node
+# a, 2026-10-05, executed 74 against the prologue's own 20 before the refused-`--beat` pair landed,
+# and the mode-refusal arm alone executed 27 against the same 20, green against the kit and red under
+# staged driver copies; no suite ran.
+FLOOR_ASSERTIONS=2114
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -13213,7 +13258,8 @@ FLOOR_SHARD_1=209
 # RAISED 1836 -> 1848: the same 12 region-two lease-identity assertions, see FLOOR_ASSERTIONS.
 # RAISED 1848 -> 1889: the same 41 region-two claim-cell assertions, see FLOOR_ASSERTIONS.
 # RAISED 1889 -> 1902: the same 13 region-two holder-order assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1902
+# RAISED 1902 -> 1917: the same 15 region-two claim-cell and mode-refusal assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1917
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

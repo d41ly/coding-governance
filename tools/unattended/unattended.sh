@@ -48,7 +48,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.65   # gov:kit unattended@1.65 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.66   # gov:kit unattended@1.66 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -1805,6 +1805,14 @@ print_claims() { # -> the rows on stdout; rc 2 when the remote does not answer
   return 0
 }
 
+# THE TABLE'S TWO AXES, declared once (TOOL-aGraftedHelix-19): the claim-read classes the function
+# below derives, in the table's row order, and the modes its callers pass, the table's four columns
+# then `beat`. The function refuses a mode outside CLAIM_MODES, and the suite's per-cell arm reads
+# both lines to derive its cells, so a class or mode added here without a typed cell reds that arm.
+# WHAT THIS DOES NOT CHECK: a derived class outside CLAIM_READS (TOOL-aGraftedHelix-22's).
+CLAIM_READS="none mine same foreign-live foreign-held foreign-stale foreign-terminal foreign-unknown"
+CLAIM_MODES="preflight take-over holder status beat"
+
 # WHO MAY WRITE THIS SLUG'S CLAIM, by the table in the stops guide's section 7. The identity rows are
 # tested FIRST - none, `mine` (keepalive AND session equal the lease handed in; `absent` compares
 # literally, so two absent sessions fall back on the keepalive), `same session` (the claim's session
@@ -1813,7 +1821,7 @@ print_claims() { # -> the rows on stdout; rc 2 when the remote does not answer
 # which is due. Modes are the table's columns plus `beat`, which writes only through the none and
 # `mine` rows of the holder column and declines every other row in silence for `--beat` to name.
 # rc 0: write (CW_ACT create|renew|rewrite|take|take-announced|write) · rc 2: `mine` and not due ·
-# rc 1: refused, check 89 or 90 printed · rc 3: not written, announced (status) or declined (beat).
+# rc 1: refused, check 89, 90 or 92 printed · rc 3: not written, announced (status) or declined (beat).
 # TOOL-aGraftedHelix-11 - THE RUN-STATE FILE, sixth, is where a write that does not take the claim
 # copies its identity from, the one `write_claim` is handed too: `--preflight` and a take-over pass
 # none, every other writer passes the record. `mine` keeps the claim's own `node`.
@@ -1821,6 +1829,11 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
   local slug="$1" mode="$2" ka="$3" sid="$4" wka="$5" rel="${6:-}" me="${CLAUDE_CODE_SESSION_ID:-}" row cls due
   local c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_btxt=unknown r_host r_sess r_lease
   CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""
+  case " $CLAIM_MODES " in
+    *" $mode "*) ;;
+    *) fail 92 "this call passed a claim mode the driver does not declare, so the claim write table has no column for it and nothing was written; declare the mode in CLAIM_MODES beside its case branch, or pass a declared one: mode $mode · CLAIM_MODES $CLAIM_MODES"
+       return 1 ;;
+  esac
   row=""
   case $'\n'"$CLAIM_ROWS" in
     *$'\n'"$slug"$'\t'*) row=$'\n'"$CLAIM_ROWS"; row=${row#*$'\n'"$slug"$'\t'}; row="$slug"$'\t'"${row%%$'\n'*}" ;;
@@ -1975,6 +1988,7 @@ write_claim_beat() { # slug -> exactly one `beat —` line
   ka=$(fact "$rel" keepalive)
   check_claim_writable "$slug" beat "$ka" "$(fact "$rel" session)" "$ka" "$rel"
   case "$?" in
+    1) echo "unattended: beat — $slug · skipped: the claim write table refused the call"; return 0 ;;
     2) echo "unattended: beat — $slug · skipped: the beat is not yet due, a quarter of ${RESUME_STALE_BOUND}s"; return 0 ;;
     3) echo "unattended: beat — $slug · skipped: the claim is not this run's: $CW_WHO"; return 0 ;;
   esac

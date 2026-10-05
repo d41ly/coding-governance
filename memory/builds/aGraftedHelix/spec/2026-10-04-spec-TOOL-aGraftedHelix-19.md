@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-19 — the claim write table's rows and modes are driver constants the decision refuses outside of, and the per-cell arm derives its cells from them
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 3
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
