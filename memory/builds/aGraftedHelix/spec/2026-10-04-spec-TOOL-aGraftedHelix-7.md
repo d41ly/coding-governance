@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-7 — the gate runner stops dispatching legs above a declared memory fraction and records the pause
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 8 · ratified 2026-10-04
+**Status:** SPECCED · rev-4 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 8 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -315,7 +315,7 @@ re-rendered with `python tools/codebase-map/gen_map.py --write` in the same comm
   `paused` 1, and stdout carries exactly one line opening `memory: 1 pause(s)`.
   Red when: B or C dispatches while the reading is above 90 and A runs.
 - **AC6** — When `$S` runs at width 3 with `GATE_MEMPAUSE_HOLD=2` and the fixture at 10 % used,
-  over leg A sleeping 8 s, leg B sleeping 1 s that first rewrites the fixture to 95 %, leg C
+  over leg A sleeping 8 s, leg B sleeping 1 s that rewrites the fixture to 95 % as it ends, leg C
   sleeping 4 s and instant legs D and E, the `pauses` file holds a row ending `bound` and a row
   ending `drained`, every leg reports, and the exit code equals the same fixture's run with
   `GATE_MEMPAUSE=0`. Traced: B ends at 1 s and D is held; C ends at 4 s, past D's 2 s bound, and
@@ -360,13 +360,16 @@ re-rendered with `python tools/codebase-map/gen_map.py --write` in the same comm
   Red when: a wall-stopped run omits its open episode, its verdict keys or its summary line.
 - **AC14** — When the block, extracted by the AC3 `awk`, is sourced with an episode open and the
   reading above the threshold, `check_dispatch_pause 0` returns 1 and adds one `pauses` row ending
-  `drained`. When `$S` runs twenty times at width 2 with `GATE_MEMPAUSE=90` and `GATE_MEMINFO` at
-  95 % over an instant leg A and a leg B the pressure holds, no run's `pauses` file holds a row
-  ending `wall`.
+  `drained`. When `$S` runs at width 2 over legs C (instant), A (3 s) and Y (0.5 s), in that
+  manifest order, after a seed bar with the pause off has written the ledger that dispatches them
+  A, Y, C, with `GATE_MEMPAUSE=90` and `GATE_MEMINFO` naming a FIFO whose writer answers the first
+  three reads 10 % and the fourth 95 % only once A's `.leg` row exists and a second more has
+  passed, the `pauses` file holds exactly one row, ending `drained`, and the bar exits 0. Traced:
+  Y's completion starts a pass whose first candidate is C; its decision blocks until A's worker is
+  gone and then holds C with nothing running, so the next dispatch is the forced branch's.
   Red when: the forced-progress branch dispatches a held leg with no decision, so its episode
   closes `wall` with no wall fired.
-  cost: twenty fixture bars of about a second each; the race the runner's comment measures at 6 of
-  30 legs is what the repetition samples.
+  cost: two fixture bars of about 4 s each; a host with no `mkfifo` announces the half skipped.
 
 ## 7. Gates
 
@@ -428,6 +431,14 @@ New arm: tools/run-gates/run-gates.test.sh · AC12's deleted meminfo, AC13's wal
   `MEMPAUSE_READ` so a decision forks nothing; the sweep decides INERT with one read of its own and
   reads off with no runner beside it; an unread peak prints `?`; the inventory names the four
   variables a caller sets for the block.
+- rev-4 · 2026-10-05 · AC6 AC14 · observed while building the arms. AC14's twenty runs could not
+  red: an instant A dispatched first puts the hold on the pass's SECOND candidate, so the
+  forced-progress branch, which needs the hold on a pass's FIRST, was never reached, and twenty
+  runs with the branch's call deleted stayed green. Its second half is now a fixture that reaches
+  the branch by construction, a FIFO holding the decision until the last runner is gone, observed
+  red with the call deleted. AC6's B wrote its pressure at its START, which races C's own dispatch
+  decision; held there, every later episode read `drained` (two runs in five). It writes as it
+  ends, the trace unchanged.
 
 ## 10. Reuse audit
 
