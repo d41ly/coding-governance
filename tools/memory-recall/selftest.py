@@ -79,7 +79,10 @@ CORPUS = """# Tooling decisions
 """
 Q = ("why was the frobnicator chosen", "--terms", "frobnicator quibbler leaks snark boojum")
 
-INDEX_RE = re.compile(r"index (\d+) records \+ (\d+) chunks \((rebuilt|cached)")
+# The `superseded` clause is REQUIRED by the pattern, not skipped over: an index line without it is
+# a manifest without the map (TOOL-aGraftedHelix-4), and every arm reading the line would say so.
+INDEX_RE = re.compile(r"index (\d+) records \+ (\d+) chunks · superseded \d+ \(\d+ whole, \d+ "
+                      r"partial\) \((rebuilt|cached)")
 # `python3?` on purpose: every launcher this kit prints is resolved python3-first, so a pattern
 # anchored on bare `python ` silently matched nothing on a python3 host — the arm below would then
 # have folded an empty set and passed vacuously.
@@ -127,7 +130,7 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 75
+SELFTEST_ARMS = 78
 # 34 -> 58 on 2026-08-24 (adopter ic's recall contrib branch): twenty-four arms — twenty-three ported from
 #   adopter ic's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
@@ -157,6 +160,10 @@ SELFTEST_ARMS = 75
 #   its states, three of which no run in a repo with a readable log produces. Both this line and
 #   the one above it were written as `71 -> 73` on two branches that did not know about each
 #   other; the merge renumbered this one, which is the whole reason the chain is checked.
+# 75 -> 78 on 2026-10-05 (TOOL-aGraftedHelix-4): THREE arms over supersession - the extracted
+#   edges and the map (each grammar rule, the self-edge skip and the unresolved drop), the order
+#   step (five placement cases), and the header tag in both renderers. Each case was observed red
+#   with its rule disabled in the working tree before the unit landed.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -1747,6 +1754,9 @@ def test_one_walk_two_callers():
 # `emit`, `parse`, `query_expr`, `rrf` and `render` diff to ZERO changed lines against adopter ic's copy.
 # A digest is not a check of behaviour; these are. Every arm below either drives a verbatim file or
 # drives a query.py function that is byte-identical to the one it was written against.
+# (Since TOOL-aGraftedHelix-4, `render` and `emit` also print the supersession tag, `query.py`'s
+# eighth forked construct; the arms below were written against the unforked bodies and still drive
+# everything else in them.)
 #
 # WHAT WAS REPATHED, and it is only ever one of three things: adopter ic's `_throwaway_repo()` becomes
 # gov's `make_repo()` plus `run()` over the fixture's own copy of the kit, for every arm that drives
@@ -3038,6 +3048,119 @@ def test_spec_h1_record_outranks_a_citation():
     return f"{hits[0]}; the citation comes back as {cite.split(' ', 1)[0]}"
 
 
+# --- TOOL-aGraftedHelix-4: supersession, extracted and mapped, ordered, and tagged ----------------
+SUP_SPEC_REL = "builds/bQuill/spec/2026-10-04-spec-TOOL-aQuill-7.md"
+SUP_ROWS = (
+    "- TOOL-aQuill-1 · the original rule\n"
+    "- TOOL-aQuill-2 · SUPERSEDES TOOL-aQuill-1's premise, not its value\n"
+    "- TOOL-aQuill-3 · supersedes `TOOL-aQuill-1` for the read path only\n"
+    "- TOOL-aQuill-4 · SUPERSEDES **TOOL-aQuill-1**: the whole rule\n"
+    "- TOOL-aQuill-5 · superseded by TOOL-aQuill-6\n"
+    "- TOOL-aQuill-6 · supersedes TOOL-aQuill-6 in place, which is no edge\n"
+    "- TOOL-aQuill-8 · one successor\n"
+    "- TOOL-aQuill-9 · another successor\n"
+    "- TOOL-aQuill-10 · supersedes TOOL-aQuill-99, which nothing anchors\n"
+)
+SUP_SPEC = ("# TOOL-aQuill-7 — the retired rule\n\n"
+            "**Status:** WONTDO · superseded by TOOL-aQuill-8, TOOL-aQuill-9\n")
+
+
+@check("supersession: P1 possessive, for and bare, P2, a two-id P3 header, a self-edge, an undefined id")
+def test_supersession_edges_and_map():
+    """AC7. One fixture case per rule, named, so disabling a rule reds exactly its own case."""
+    import extract as E
+    m = resolve_memory_root()
+    edges, defined = [], set()
+    for path, text in ((f"{m}/tooling/rows.md", SUP_ROWS), (f"{m}/{SUP_SPEC_REL}", SUP_SPEC)):
+        recs = E.extract_records(path, text)
+        defined |= {r["id"] for r in recs}
+        edges += E.extract_supersessions(path, text, recs)
+    got = set(edges)
+    cases = {
+        "P1 possessive is partial": ("TOOL-aQuill-1", "TOOL-aQuill-2", "partial", "P1"),
+        "P1 `for` is partial": ("TOOL-aQuill-1", "TOOL-aQuill-3", "partial", "P1"),
+        "bare P1 is whole": ("TOOL-aQuill-1", "TOOL-aQuill-4", "whole", "P1"),
+        "P2 is whole": ("TOOL-aQuill-5", "TOOL-aQuill-6", "whole", "P2"),
+        "P3 first id": ("TOOL-aQuill-7", "TOOL-aQuill-8", "whole", "P3"),
+        "P3 second id": ("TOOL-aQuill-7", "TOOL-aQuill-9", "whole", "P3"),
+        "undefined id is a candidate": ("TOOL-aQuill-99", "TOOL-aQuill-10", "whole", "P1"),
+    }
+    bad = [name for name, e in cases.items() if e not in got]
+    bad += [f"unexpected edge {e}" for e in sorted(got - set(cases.values()))]
+    assert not bad, f"{bad}; extracted {sorted(got)}"
+    assert "TOOL-aQuill-7" in defined, "the spec H1 did not anchor, so P3's old end is undefined"
+    smap, counts = E.derive_supersession_map(edges, defined)
+    assert counts["unresolved"] == ["TOOL-aQuill-99"], f"unresolved {counts['unresolved']}"
+    assert "TOOL-aQuill-99" not in smap and "TOOL-aQuill-10" not in json.dumps(smap), (
+        f"an edge naming an undefined id was kept: {smap}")
+    assert smap["TOOL-aQuill-1"] == [["TOOL-aQuill-2", "partial"], ["TOOL-aQuill-3", "partial"],
+                                     ["TOOL-aQuill-4", "whole"]], smap["TOOL-aQuill-1"]
+    assert (counts["ids"], counts["whole"], counts["partial"]) == (3, 3, 0), counts
+    assert counts["patterns"]["P1"] == {"whole": 1, "partial": 2}, counts["patterns"]
+    return f"{len(cases)} cases; map {counts['ids']} ids, unresolved {counts['unresolved']}"
+
+
+@check("supersession order: a whole hit moves under its lowest listed successor, and nothing else moves")
+def test_supersession_order_moves_only_past_a_successor():
+    """AC10. Five placement cases; each expected list pins every other hit's relative order too."""
+    import query as QRY
+    a, b, c = "TOOL-aQuill-1", "TOOL-aQuill-2", "TOOL-aQuill-3"
+    whole = {a: [[b, "whole"]]}
+    cases = {
+        "successor below: moves directly after it": (
+            [("o", a), ("x", ""), ("s", b), ("y", "")], whole, ["x", "s", "o", "y"]),
+        "successor above: keeps its rank": (
+            [("s", b), ("x", ""), ("o", a), ("y", "")], whole, ["s", "x", "o", "y"]),
+        "successor absent: keeps its rank": (
+            [("o", a), ("x", "")], {a: [[c, "whole"]]}, ["o", "x"]),
+        "two successors: after the lower-ranked": (
+            [("o", a), ("s1", b), ("x", ""), ("s2", c), ("y", "")],
+            {a: [[b, "whole"], [c, "whole"]]}, ["s1", "x", "s2", "o", "y"]),
+        "partial: keeps its rank": (
+            [("o", a), ("x", ""), ("s", b)], {a: [[b, "partial"]]}, ["o", "x", "s"]),
+    }
+    bad, last = [], []
+    for name, (spec, smap, want) in cases.items():
+        hits = [{"set": "records", "id": rid, "path": f"{n}.md", "line": 1, "text": n}
+                for n, rid in spec]
+        last = QRY.derive_supersession_order(hits, smap)
+        got = [h["text"] for h in last]
+        if got != want:
+            bad.append(f"{name}: {got} != {want}")
+    assert not bad, "; ".join(bad)
+    o = next(h for h in last if h["text"] == "o")
+    x = next(h for h in last if h["text"] == "x")
+    assert (o["supersession"], o["superseded_by"]) == ("partial", [b]), o
+    assert (x["supersession"], x["superseded_by"]) == (None, []), x
+    return f"{len(cases)} placement cases; every unmoved hit kept its relative order"
+
+
+@check("supersession tag: emit's full branch tags a superseded hit, and two successors share one tag")
+def test_supersession_tag_in_both_renderers():
+    """AC11. `emit(full=True)` builds its own header, so a tag only `render` printed would vanish
+    from the one branch the kit uses to MEASURE output; and a tag cut to its first id hides a
+    successor."""
+    import query as QRY
+    a, b, c = "TOOL-aQuill-1", "TOOL-aQuill-2", "TOOL-aQuill-3"
+    hits = [{"set": "records", "id": rid, "path": f"{rid}.md", "line": 1,
+             "snippet": "the latch closes on flush", "text": "the latch closes on flush"}
+            for rid in (a, b)]
+    hits = QRY.derive_supersession_order(hits, {a: [[b, "whole"]]})
+    want = f"{a} · {a}.md:1  [superseded by {b}]"
+    full, _, _, _ = QRY.emit(hits, "latch flush", 10_000_000, full=True)
+    snip, _, _, _ = QRY.emit(hits, "latch flush", 10_000_000)
+    assert want in full, f"the full branch dropped the tag:\n{full}"
+    assert want in snip, f"the snippet branch dropped the tag:\n{snip}"
+    old = next(h for h in hits if h["id"] == a)
+    two = dict(old, superseded_by=[b, c], supersession="whole")
+    head = QRY.render(two, "latch flush")[0].splitlines()[0]
+    assert head.endswith(f"[superseded by {b}, {c}]"), f"two successors, one shown: {head}"
+    part = dict(old, superseded_by=[b], supersession="partial")
+    head = QRY.render(part, "latch flush")[0].splitlines()[0]
+    assert head.endswith(f"[partly superseded by {b}]"), head
+    return "full and snippet headers tagged; two successors in one tag; partial says partly"
+
+
 def main() -> int:
     # The live-log baseline is NOT taken here. It is taken at module scope, above the first `@check`,
     # because every arm runs at decoration time and a baseline taken in this function brackets
@@ -3085,6 +3208,9 @@ def main() -> int:
         # TOOL-dHashedPrelude-2: the guard that brackets this suite, gated
         test_the_live_log_baseline_is_taken_before_any_arm_runs,
         test_the_live_log_verdict_is_total_over_its_states,
+        # TOOL-aGraftedHelix-4: supersession
+        test_supersession_edges_and_map, test_supersession_order_moves_only_past_a_successor,
+        test_supersession_tag_in_both_renderers,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
     # DECLARED-versus-RAN above is satisfied by deleting an arm from both halves; this is the

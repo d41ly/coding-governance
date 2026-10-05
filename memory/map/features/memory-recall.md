@@ -71,6 +71,13 @@ floor on the merge bar.
   rebuild after a `sqlite3.DatabaseError`, so a change applied to one and not the other made the
   served shape depend on whether the cache was healthy — a state every acceptance arm misses,
   because they all run the healthy path.
+- **A superseded record is LABELLED and MOVED, never scored down** (`TOOL-aGraftedHelix-4`). The
+  index build derives a supersession map from three spellings in the corpus's own prose and keeps
+  it in the cache manifest; `run_fusion` then moves a WHOLE-superseded hit to sit directly after
+  its listed successor, and a partial one keeps its rank. A score multiplier was rejected by
+  arithmetic over `RRF_K`: it sinks every single-source superseded hit below every other one, far
+  from the successor its label names. The recall floor cannot see this step, because it grades
+  `bench.py`'s records path, which never calls `run_fusion`.
 - **A rebuild NAMES its cause.** `conf_digest` moving is a kit-version or conf edit and costs one
   rebuild per node; a corpus digest moving is routine. Until the line said which, a criterion about
   caching could only assert that a rebuild happened, and one in this build asserted the opposite of

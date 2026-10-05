@@ -3288,6 +3288,16 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "derive_supersession_map",
+      "kind": "function",
+      "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "derive_supersession_order",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
+    },
+    {
       "id": "derive_table",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -3681,6 +3691,11 @@
       "id": "extract_stated_count",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
+    },
+    {
+      "id": "extract_supersessions",
+      "kind": "function",
+      "file": "tools/memory-recall/extract.py"
     },
     {
       "id": "extract_text",
@@ -6941,6 +6956,11 @@
       "id": "render_summary_cell",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "render_supersession_tag",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "render_swapped_name",
@@ -10301,6 +10321,21 @@
       "id": "test_summary_counts_are_derived",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_supersession_edges_and_map",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_supersession_order_moves_only_past_a_successor",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_supersession_tag_in_both_renderers",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_survivor_is_derived_from_a_re_read",

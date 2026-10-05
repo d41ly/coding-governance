@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-4 — recall labels a superseded record and ranks it under its successor
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 4 · ratified 2026-10-04
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 4 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
