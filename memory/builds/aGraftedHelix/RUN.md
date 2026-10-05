@@ -203,3 +203,7 @@ base: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 2026-10-05T14:18:38Z brief · item TOOL-aGraftedHelix-16 · reason a2e60ebbeb07 memory/builds/aGraftedHelix/prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md
 
 2026-10-05T14:19:59Z dispatch · item 41c646a8 TOOL-aGraftedHelix-16 · reason memory/builds/aGraftedHelix/spec/2026-10-04-spec-TOOL-aGraftedHelix-16.md tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js memory/map/generated memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md memory/backlog/TOOL.md
+
+2026-10-05T14:56:29Z dispatch · item e68e936a TOOL-aGraftedHelix-21 · reason memory/builds/aGraftedHelix/spec/2026-10-04-spec-TOOL-aGraftedHelix-21.md tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js memory/map/generated memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md memory/backlog/TOOL.md
+
+2026-10-05T14:56:37Z brief · item TOOL-aGraftedHelix-21 · reason a2e60ebbeb07 memory/builds/aGraftedHelix/prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md
