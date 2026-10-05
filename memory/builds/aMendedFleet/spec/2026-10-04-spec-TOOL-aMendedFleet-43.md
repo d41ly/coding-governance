@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-43 — the map renders a card of at most 1 KB per feature from its dossier's toml fence
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 43
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 43
 
 <!-- gen:spec-records -->
 
@@ -29,9 +29,11 @@ dossiers near the cap, is a separate mechanism with a disjoint write set, and §
   at a character boundary with `...` appended when cut; one line naming status, streams and the
   dossier's repo-relative path; then one list line each for decisions, for every non-empty claims
   inventory in `inventory_ids` order, and for the path globs, each line naming its full item count
-  before its items. Items are added one at a time while the card stays within
-  `FEATURE_CARD_CAP_BYTES`, 1024, counted in UTF-8 bytes from the heading through the card's last line, with room reserved
-  for the cut line. Every item that did not fit is counted, and the card ends with one line,
+  before its items. Every one of those list lines is always present with its count; items are
+  added one at a time while the card stays within
+  `FEATURE_CARD_CAP_BYTES`, 1024, counted in UTF-8 bytes from the heading through the card's last
+  line plus that line's newline and the blank line after it, with room reserved for every list
+  line's count and for the cut line. Every item that did not fit is counted, and the card ends with one line,
   `cut <n> item(s) to fit 1024 bytes; the dossier's toml fence lists them all`, when n is above
   zero. Observed by AC1 and AC2.
 - **S3** — Nothing outside the toml fence enters a card, so a prose-only edit to a dossier never
@@ -110,8 +112,10 @@ Read at base `7af5f564`, whose bytes for every file below equal HEAD's at `fee9f
 - cut <c> item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 ```
 
-A list line whose first item does not fit is left out whole and its items join the cut count; a line
-already started keeps its header count, so a reader always learns how many items exist.
+Every list line is written with its count even when none of its items fits, which then reads
+`- <label> <n>` with no colon, and its items join the cut count; a line stops at its first item
+that does not fit, and a later line may still take shorter items. A reader always learns how many
+items exist.
 
 ### Inventory
 
@@ -229,6 +233,12 @@ New arm: `tools/codebase-map/selftest.py` · a fixture tree with an ordinary dos
   spelled `CARD_CAP_BYTES`, the name the session card's 8,192-byte cap already carries in
   `skills/session-kickoff/manifest-check.sh` and units 76, 77 and 96 cite, so S2 and the Inventory
   spell it `FEATURE_CARD_CAP_BYTES`.
+- rev-3 · 2026-10-05 · S2 §4 Data model · the build pass: S2 and the data model left a list line out
+  whole when its first item did not fit, while AC2 reads the `globs` line's count and the data model
+  promised a reader always learns every count; on the AC2 fixture the claims filled the card and
+  the `globs` line vanished. Every list line now keeps its count and room is reserved for each, and
+  the byte count names the trailing newline and blank line so a reader splitting on `## ` headings
+  never sees a section over the cap.
 
 ## 10. Reuse audit
 
