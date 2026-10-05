@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-40 — the coverage gate refuses a `baseline.toml` that gained a key against its base
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 40 · closes TOOL-aHoistedPass-30 · advances TOOL-aProbedToolkit-8
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 40 · closes TOOL-aHoistedPass-30 · advances TOOL-aProbedToolkit-8
 
 <!-- gen:spec-records -->
 
@@ -40,12 +40,16 @@ constraint rather than a convention.
   claim the key in a dossier or `FOUNDATION.md`. Observed by AC1, AC2 and AC3.
 - **S4** — The prose follows the mechanism. The gate docstring's remedy line, the header of
   `render_baseline` and of `memory/map/baseline.toml`, and the kit README sentence calling the rule
-  socially enforced each say the gate refuses an addition against the base. The baseline header's
+  socially enforced, and the matching accepted-residual line of
+  `tools/codebase-map/INVENTORY-DERIVATION.md`, each say the gate refuses an addition against the
+  base. The baseline header's
   2026-08-16 exception paragraph stays as a record and loses the sentence saying nothing enforces the
   rule. The `codebase-map` dossier's baseline paragraph is refreshed. Observed by AC5.
   **Readers:** by name: `memory/map/baseline.toml`, `tools/codebase-map/README.md`,
-  `tools/codebase-map/map_lib.py` and `memory/map/features/codebase-map.md` carry the sentence that
-  goes.
+  `tools/codebase-map/INVENTORY-DERIVATION.md`, `tools/codebase-map/map_lib.py` and
+  `memory/map/features/codebase-map.md` carry the sentence that goes; the `playbook` dossier's
+  Gaps line on the template high-water is reworded, its claim unchanged, because AC5's grep
+  spans `memory/map`.
   by value: NO VALUE READERS — the sentence is prose and no program parses it.
 - **S5** — A kit selftest arm builds a fixture repository with a committed baseline, adds a key in the
   working tree, and asserts `derive_baseline_additions` names it, returns nothing for an unchanged
@@ -107,8 +111,10 @@ itself, and the printed line says so. A clone with no `origin` prints `UNGRADED`
 - `tools/codebase-map/test_codebase_map.py`
 - `tools/codebase-map/selftest.py`
 - `tools/codebase-map/README.md`
+- `tools/codebase-map/INVENTORY-DERIVATION.md`
 - `memory/map/baseline.toml`
 - `memory/map/features/codebase-map.md`
+- `memory/map/features/playbook.md`
 
 ### Alternatives rejected
 
@@ -185,6 +191,12 @@ New arm: tools/codebase-map/selftest.py · a fixture repository whose working ba
 - rev-2 · 2026-10-04 · §3 · the M2 cross-read: the digest-figure Non-goal said only that unit 39
   hands it on, while `TOOL-aMendedFleet-86` holds it and declares a consumes-from on this unit; the
   Non-goal and Edges now name it.
+- rev-3 · 2026-10-05 · §2 S4, §4 · the build pass re-ran AC5's grep at the tree and it also hit
+  `tools/codebase-map/INVENTORY-DERIVATION.md`'s accepted-residual line "Baseline additions are
+  socially enforced", which S4's reader list missed; S4 and the files-touched list now name it.
+  It also hit `memory/map/features/playbook.md`'s Gaps line "Nothing enforces that the high-water
+  record shrinks", true and about the template high-water rather than the baseline; S4 rewords it
+  without changing its claim so AC5's grep, which spans all of `memory/map`, stays literal.
 
 ## 10. Reuse audit
 

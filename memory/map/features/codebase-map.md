@@ -43,7 +43,9 @@ in `map_extractors.py` is gone and must not be reintroduced — the kit's selfte
 with `map_lib.kit_dir()` about the prefix stamped into byte-compared artifacts.
 
 `baseline.toml` holds the shrink-only backfill of the keys no dossier claims yet: a new key must be claimed
-in a dossier, never appended to the baseline. The gate proved this on its own first run — adding the
+in a dossier, never appended to the baseline, and `test_baseline_never_gains_a_key` refuses an appended key by
+comparing the working file with the baseline at the branch's base (`map_lib.resolve_compare_base`, the merge
+bar's merge-base rule; `UNGRADED` when no `origin` default branch or no baseline at the base). The gate proved this on its own first run — adding the
 `codebase-map coverage + freshness` leg failed the coverage assert until this dossier claimed it, and
 again when `codebase-map adopter e2e` arrived from main.
 

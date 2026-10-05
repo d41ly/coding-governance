@@ -108,8 +108,9 @@ can discover an existing seam instead of reinventing it. It is a separate plane:
 
 ## 5. Accepted residuals (know them; don't rediscover them)
 
-- Baseline additions are socially enforced — stateless CI can't tell backfill from evasion;
-  the baseline lives where diffs are conspicuous.
+- Baseline additions are refused against the branch's base, which CI can read only where an
+  `origin` default branch is fetched; without one the gate prints `UNGRADED` and the baseline
+  lives where diffs are conspicuous.
 - Dossier PROSE can rot; keyed claims cannot. Refresh prose when touching the feature.
 - DB/content-defined surfaces (provisioned pages, user data) are not file-enumerable: record
   them as prose notes or an explicit non-goal.

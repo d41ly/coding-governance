@@ -216,7 +216,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-37 — dossier freshness is derived from git, and drift-audit reports the dossiers older than their paths](spec/2026-10-04-spec-TOOL-aMendedFleet-37.md) | 37 | 2 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-38 — `map_diff --converge`, its sink and its prescriptions are deleted](spec/2026-10-04-spec-TOOL-aMendedFleet-38.md) | 38 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-39 — a harness-hooks inventory, and `git-hooks` holds real hook names only](spec/2026-10-04-spec-TOOL-aMendedFleet-39.md) | 39 | 2 | CLOSED | rev-3 | 2026-10-04 |
-| [TOOL-aMendedFleet-40 — the coverage gate refuses a `baseline.toml` that gained a key against its base](spec/2026-10-04-spec-TOOL-aMendedFleet-40.md) | 40 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-40 — the coverage gate refuses a `baseline.toml` that gained a key against its base](spec/2026-10-04-spec-TOOL-aMendedFleet-40.md) | 40 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-41 — `replay-phrases.py --floor` grades a frozen phrase population against recorded floors](spec/2026-10-04-spec-TOOL-aMendedFleet-41.md) | 41 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-42 — the reuse probe counts canonical-copy install sites beside fan-in](spec/2026-10-04-spec-TOOL-aMendedFleet-42.md) | 42 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-43 — the map renders a card of at most 1 KB per feature from its dossier's toml fence](spec/2026-10-04-spec-TOOL-aMendedFleet-43.md) | 43 | 1 | SPECCED | rev-2 | 2026-10-04 |

@@ -1443,6 +1443,48 @@ def test_dossier_staleness_from_git(tmp: Path):
         "a whole history touching no claimed path is not a clean all-fresh answer"
 
 
+def test_baseline_additions_from_git(tmp: Path):
+    """TOOL-aMendedFleet-40 S5: the baseline is graded against its own copy at a base sha, over a
+    REAL git fixture. An added key is named, an unchanged file gains nothing, and a base with no
+    baseline is NO comparison — never an empty one that would read every key as added."""
+    import os
+    import subprocess
+
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull,
+               GIT_CONFIG_NOSYSTEM="1")
+
+    def run_git(*a):
+        r = subprocess.run(["git", "-C", str(tmp), *a], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        assert r.returncode == 0, f"git {' '.join(a)} failed: {r.stderr.strip()[:200]}"
+        return r.stdout.strip()
+
+    run_git("init", "--template=", "-q")
+    run_git("config", "user.email", "t@t")
+    run_git("config", "user.name", "t")
+    run_git("config", "commit.gpgsign", "false")
+    (tmp / "README").write_text("x\n", encoding="utf-8")
+    run_git("add", "-A")
+    run_git("commit", "-qm", "no map yet")
+    bare = run_git("rev-parse", "HEAD")
+    baseline = tmp / "memory" / "map" / "baseline.toml"
+    baseline.parent.mkdir(parents=True)
+    baseline.write_text(m.render_baseline({"flags": ["a"]}, IDS), encoding="utf-8")
+    run_git("add", "-A")
+    run_git("commit", "-qm", "seed the baseline")
+    seeded = run_git("rev-parse", "HEAD")
+
+    same, note = m.derive_baseline_additions(tmp, seeded)
+    assert same == {} and "base carried 1 key(s), working carries 1" in note, (same, note)
+    baseline.write_text(m.render_baseline({"flags": ["a", "b"], "routes": ["r"]}, IDS), encoding="utf-8")
+    added, _ = m.derive_baseline_additions(tmp, seeded)
+    assert added == {"flags": ["b"], "routes": ["r"]}, f"an added key must be named: {added}"
+    none, why = m.derive_baseline_additions(tmp, bare)
+    assert none is None and "no memory/map/baseline.toml" in why, (none, why)
+    gone, reason = m.resolve_compare_base(tmp)
+    assert gone is None and "origin/main" in reason, (gone, reason)
+
+
 def test_identifier_tokens_per_language():
     """TOOL-aLexedStripper-1 §4 + -6: one arm per over-strip class, each asserting an identifier the
     LANGUAGE-BLIND chain deleted. Every fixture below was observed RED against the three-regex
@@ -1775,6 +1817,11 @@ def main() -> int:
         failures += check(
             "stale dossiers: ancestry, whole and by range, map-root excluded (aMendedFleet-37)",
             lambda: test_dossier_staleness_from_git(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "baseline additions: graded against the base, absent base is no comparison (aMendedFleet-40)",
+            lambda: test_baseline_additions_from_git(Path(td)),
         )
     failures += check("identifier tokens: one arm per over-strip class", test_identifier_tokens_per_language)
     failures += check("map_imports: the rescued resolver's case table", test_map_imports_resolution)

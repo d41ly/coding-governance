@@ -1306,6 +1306,62 @@ def compute_coverage(
     return Coverage(unclaimed, stale_claims, stale_baseline, lazy_baseline)
 
 
+def _read_git_text(root: Path, *args: str) -> str | None:
+    """stdout of one `git -C root ...` call, or None when git is absent or the call fails."""
+    try:
+        r = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
+    except (FileNotFoundError, OSError):
+        return None
+    return r.stdout if r.returncode == 0 else None
+
+
+def resolve_compare_base(root: Path) -> tuple[str | None, str]:
+    """The sha the baseline's shrink-only assert compares against, and why — or None and why not.
+
+    THE MERGE BAR'S OWN RULE, copied rather than imported because a kit may not read a sibling
+    kit: the default branch `refs/remotes/origin/HEAD` names (`main` when it names none), its
+    merge-base with HEAD where that is a PROPER ancestor of HEAD, else the remote tip itself. So a
+    branch is graded on what IT changed, and a key the default branch deleted after the branch
+    opened is not misread as one the branch added. Fetches nothing: no `origin` ref, no answer."""
+    ref = (_read_git_text(root, "symbolic-ref", "--short", "refs/remotes/origin/HEAD") or "").strip()
+    branch = ref.removeprefix("origin/") or "main"
+    tip = (_read_git_text(root, "rev-parse", "--verify", "-q", f"refs/remotes/origin/{branch}^{{commit}}") or "").strip()
+    if not tip:
+        return None, f"no origin/{branch} ref to compare against (no remote, or never fetched)"
+    head = (_read_git_text(root, "rev-parse", "--verify", "-q", "HEAD") or "").strip()
+    mb = (_read_git_text(root, "merge-base", "HEAD", tip) or "").strip()
+    if mb and mb != head:
+        return mb, f"merge-base of HEAD and origin/{branch}"
+    return tip, f"origin/{branch} tip"
+
+
+def derive_baseline_additions(root: Path, base: str) -> tuple[dict[str, list[str]] | None, str]:
+    """Per inventory id of the WORKING baseline, the keys `base`'s baseline did not carry — or
+    None with the reason when there is no comparison to make. A baseline absent at `base`, or one
+    that does not parse there, is NO comparison, never an empty one: read as empty, every key would
+    read as added. An inventory id absent at `base` counts every key as added, so a new inventory
+    cannot open with a baselined key. The note carries both sides' key counts, so a comparison over
+    nothing is visible as such."""
+    path = map_root(root) / "baseline.toml"
+    rel = path.relative_to(root).as_posix()
+    text = _read_git_text(root, "show", f"{base}:./{rel}")  # `./`: relative to root, not the git top
+    if text is None:
+        return None, f"no {rel} at {base[:12]}"
+    try:
+        old = tomllib.loads(text)
+    except tomllib.TOMLDecodeError as exc:
+        return None, f"{rel} does not parse at {base[:12]}: {exc}"
+    try:
+        new = tomllib.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+    except tomllib.TOMLDecodeError as exc:  # the WORKING file raises, as load_map_tree does
+        raise MapError(f"{rel}: toml parse error: {exc}") from exc
+    added = {inv: sorted(set(keys) - set(old.get(inv, ()))) for inv, keys in sorted(new.items())}
+    note = (f"base carried {sum(len(v) for v in old.values())} key(s), "
+            f"working carries {sum(len(v) for v in new.values())}")
+    return {inv: keys for inv, keys in added.items() if keys}, note
+
+
 def owners_of(tree: MapTree) -> dict[str, dict[str, tuple[str, ...]]]:
     owners = {d.feature: d.claims for d in tree.dossiers}
     owners["foundation"] = tree.foundation.claims
@@ -1419,7 +1475,8 @@ def render_baseline(baseline: dict[str, list[str]], inventory_ids: tuple[str, ..
         "# baseline.toml — the shrink-only ratchet baseline (codebase-map kit).",
         "# Items inventoried from code but not yet claimed by a dossier or FOUNDATION.md.",
         "# This file only SHRINKS: claim an item, delete its line. New keys belong in a",
-        "# dossier, not here — additions are reserved for the initial backfill and reviewed.",
+        "# dossier, not here — the coverage gate refuses a key the baseline at the branch's",
+        "# base did not carry; this seed is the one write with no base to compare against.",
         "",
     ]
     for inv_id in inventory_ids:

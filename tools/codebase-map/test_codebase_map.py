@@ -10,7 +10,8 @@ Remedies when this gate fails on your change:
 - claim the new key in the owning `<MAP_ROOT>/features/<feature>.md` (create it from any
   existing dossier — headings are pinned, prose is free), or
 - claim it in `<MAP_ROOT>/FOUNDATION.md` if it is shared substrate;
-- `baseline.toml` additions are reserved for the initial backfill — do not add new keys;
+- `baseline.toml` never gains a key: the gate refuses one the baseline at the branch's base did not
+  carry (the merge-base with the remote default branch) — claim it in a dossier instead;
 - claim edits: regen artifacts with the command the failure prints (`map_lib.regen_cmd()`).
 
 WHAT THIS GATE DOES NOT CHECK, stated here because a structural check reads as a semantic one to
@@ -145,6 +146,31 @@ def test_every_inventory_key_is_claimed_or_baselined() -> None:
         f"STALE CLAIMS (a dossier names a key that no longer exists): {cov.stale_claims}\n"
         f"STALE BASELINE (delete the line — the item is gone): {cov.stale_baseline}\n"
         f"LAZY BASELINE (now claimed — delete its baseline line): {cov.lazy_baseline}"
+    )
+
+
+def test_baseline_never_gains_a_key() -> None:
+    """The baseline is SHRINK-ONLY, graded against its own earlier self: a key the baseline at the
+    branch's base did not carry is a refusal. The four coverage asserts above cannot see it, since
+    moving a claim from a dossier into the baseline keeps every one of them clean.
+
+    UNGRADED, AND SAYS SO, when there is no base to read — no fetched `origin` default branch, or
+    no baseline at the base. The compared sha and both sides' key counts print on every graded run,
+    so a comparison of the committed file against itself (CI on the landed tip) is visible."""
+    root = m.repo_root()
+    base, why = m.resolve_compare_base(root)
+    if base is None:
+        print(f"     UNGRADED: {why}")
+        return
+    added, note = m.derive_baseline_additions(root, base)
+    if added is None:
+        print(f"     UNGRADED: {note} ({why})")
+        return
+    print(f"     compared against {base[:12]} ({why}): {note}")
+    assert not added, (
+        "baseline.toml GAINED keys its base did not carry — claim each in a feature dossier, or "
+        "FOUNDATION.md for shared substrate, and delete it from the baseline:\n"
+        + "\n".join(f"  {inv}: {key}" for inv, keys in added.items() for key in keys)
     )
 
 
@@ -289,6 +315,7 @@ if __name__ == "__main__":
     failures = 0
     for fn in (
         test_every_inventory_key_is_claimed_or_baselined,
+        test_baseline_never_gains_a_key,
         test_dossier_prose_headings_pinned,
         test_dossier_affordance_present_or_graced,
         test_dossier_decisions_are_declining,

@@ -84,7 +84,9 @@ over a population that was never read is the failure this kit exists to prevent.
 ## The contract in one paragraph
 
 Claims are exact keys, gated BOTH directions; path globs are digest-only and never gated;
-baseline additions are reserved for the initial backfill (shrink-only, socially enforced);
+baseline additions are reserved for the initial backfill (shrink-only: the gate refuses a key the
+baseline at the branch's merge-base with the remote default branch did not carry, and says
+`UNGRADED` when no such base resolves);
 dossiers carry three pinned prose sections (`## Constraints & why`, `## Shared seams`,
 `## Gaps`) plus a GRACED `## Reuse affordance` section (list the seams this feature is reused
 through — `seam: <id> — reuse for <need>; extend via <point>` — or `none — <why>`; presence

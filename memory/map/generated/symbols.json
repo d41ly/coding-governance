@@ -4808,6 +4808,11 @@
       "file": "tools/check-install-prefix.sh"
     },
     {
+      "id": "derive_baseline_additions",
+      "kind": "function",
+      "file": "tools/codebase-map/map_lib.py"
+    },
+    {
       "id": "derive_bases",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -12243,6 +12248,11 @@
       "file": "tools/workflows/review_replay.py"
     },
     {
+      "id": "resolve_compare_base",
+      "kind": "function",
+      "file": "tools/codebase-map/map_lib.py"
+    },
+    {
       "id": "resolve_consumer_paths",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -15623,9 +15633,19 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_baseline_additions_from_git",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_baseline_green",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_baseline_never_gains_a_key",
+      "kind": "function",
+      "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
       "id": "test_blank_roots_refuses",
