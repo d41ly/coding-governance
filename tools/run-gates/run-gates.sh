@@ -29,7 +29,9 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.26   # gov:kit run-gates@1.26
+KIT_RUN_GATES_VERSION=1.27   # gov:kit run-gates@1.27
+# 1.26 -> 1.27: the same unit's follow-up moved the kit's bytes after 1.26 was cut — its suites' bars
+# run with the pause off and its prose stops restating the table's figures; no behaviour moved.
 # 1.25 -> 1.26: the profile knob `mempause`, on every shipped row: dispatch HOLDS while used memory
 # is above it and a leg runs (TOOL-aGraftedHelix-7). The run record gains `pauses`, the verdict
 # `paused` and `paused_s`, the header and `--print-profile` `mempause`, the profile line a field, and
