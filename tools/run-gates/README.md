@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.27` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.28` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -178,6 +178,12 @@ and HUP: a run whose beacon was reaped can never delete its successor's.
 It FAILS OPEN. The wait is bounded at a declared multiple of the TTL; on expiry the run says so
 loudly, drops its ticket and proceeds unqueued. `GATE_TURNSTILE=0` disables it entirely. It never
 contributes to the exit code — a turnstile that can wedge a bar is worse than two bars.
+
+Every repair the runner makes on its own also appends one line to the health log under the git
+common dir, which the orientation card counts (`TOOL-aGraftedHelix-8`): `beacon-reaped`,
+`ticket-swept`, `scratch-swept`, `turnstile-expired`, `retry-passed` for a serial retry that passed,
+and one `dispatch-paused` per bar the memory pause held; the line format is the header of the
+`health_log_sh` block in `run-gates.sh`.
 
 ## `--print-profile` — the resolved profile, for a second reader
 

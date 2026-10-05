@@ -122,6 +122,8 @@ fail=0
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
 FLOOR_ASSERTIONS=309
+# NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
+# `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
 # RAISED 278 -> 309 by TOOL-aGraftedHelix-7: arm 3a's `memory: ` presence check and section 11's
 # thirty memory-pause assertions, the FIFO half of 11g counted on a host with no mkfifo as well.
 # RAISED 273 -> 278 by TOOL-dUnstuckLanding-16: section 7's five new assertions (AC1's attr line and
@@ -2778,14 +2780,21 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   check_hv_line "AC2 the retry line carries the final verdict" '^---- retry: green  \(1 retried, 0 failed\)$'
   check_hv_value "S2 its ledger row reads retried, which reuse never accepts" \
     "$(awk -F'\t' '$1 == "contended" { print $3 }' "$H1/.git/gate-ledger.tsv" 2>/dev/null)" retried
+  # TOOL-aGraftedHelix-8: a serial retry that PASSES healed a contended timeout, so it appends ONE I3
+  # line naming the leg and its first attempt's ceiling; the lone hang below FAILS its retry and adds none.
+  check_hv_value "AGH8 the passing retry appends one retry-passed line naming the leg and its first timeout" \
+    "$(awk -F'\t' '$2 == "run-gates" && $3 == "retry-passed" { print $4 }' "$H1/.git/health.log" 2>/dev/null)" "contended after a 2s timeout"
   unset HV_FLAG
   # ...and a leg that hangs ALONE, with no floor for this clone: zero neighbours, FAIL on its retry.
   printf '[{"name": "lone", "argv": ["bash", "fx/hang.sh"], "ceiling": 1}]\n' > "$HV/lone.json"
   rm -f "$HV/nofloor"
+  hv_rp0=$(awk -F'\t' '$3 == "retry-passed"' "$H1/.git/health.log" 2>/dev/null | wc -l | tr -d ' ')
   run_hv_bar "$H1" "$HV/lone.json" GATE_SPAWN_FLOOR="$HV/nofloor"
   check_hv_value "AC1 the lone hang exits 1" "$HV_RC" 1
   check_hv_line "AC1 its first timeout names ZERO neighbours" '^GATE retry  lone  \(timed out after 1s beside 0 neighbours; '
   check_hv_line "AC4 its second timeout is FAIL naming the missing calibration" '^GATE FAIL  lone  \(timed out after 1s, again on its serial retry; no spawn floor is recorded for this clone, so HOST was not measured\)$'
+  check_hv_value "AGH8 a retry that FAILS appends no retry-passed line" \
+    "$(awk -F'\t' '$3 == "retry-passed"' "$H1/.git/health.log" 2>/dev/null | wc -l | tr -d ' ')" "$hv_rp0"
 
   # 9g. AC4 — HOST. A planted 1 ms floor and a spawn seamed to cost 50 ms: a leg that times out twice
   #     is HOST and the bar exits 4.

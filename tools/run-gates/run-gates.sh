@@ -29,7 +29,9 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.27   # gov:kit run-gates@1.27
+KIT_RUN_GATES_VERSION=1.28   # gov:kit run-gates@1.28
+# 1.27 -> 1.28: every repair the runner makes on its own appends one line to the health log under the
+# git common dir (TOOL-aGraftedHelix-8): the `health_log_sh` block, inlined byte-identical, and seven sites.
 # 1.26 -> 1.27: the same unit's follow-up moved the kit's bytes after 1.26 was cut — its suites' bars
 # run with the pause off and its prose stops restating the table's figures; no behaviour moved.
 # 1.25 -> 1.26: the profile knob `mempause`, on every shipped row: dispatch HOLDS while used memory
@@ -499,6 +501,55 @@ render_pause_summary() {
 }
 # <<< mempause_sh
 
+# >>> health_log_sh — canonical copy: health-log.sh in gov's lib dir (byte-identical; gated)
+# I3, THE HEALTH LOG (TOOL-aGraftedHelix-8): `<git-common-dir>/health.log`, one LF-terminated UTF-8
+# line per automatic self-heal, four TAB-separated fields: utc (`YYYY-MM-DDTHH:MM:SS+00:00`), source
+# and event (each `^[a-z][a-z0-9-]*$`), and a detail whose TAB, CR and LF are each folded to one space
+# and which is cut to 240 characters. At HEALTH_LOG_CAP_LINES lines the appender first keeps the
+# newest half, through a temp file and a rename, then appends. `derive_health_log <common-dir>` prints
+# the path and spawns nothing; `resolve_health_log <repo-dir>` asks git once and prints it, or fails
+# printing nothing; `add_health_event <log> <source> <event> <detail>` is the only writer. A refused
+# token, an empty path or a failed write prints ONE `health: NOTE -` line on stderr and returns 0: it
+# never fails its caller. WHAT IT DOES NOT DO: serialize concurrent writers (a trim racing an append
+# can lose that line; ponytail: one rename, a lock file if a lost line is ever observed); validate
+# what a detail means; or tell a repository with no writer installed from one where nothing healed.
+HEALTH_LOG_CAP_LINES=500
+derive_health_log() { printf '%s/health.log\n' "$1"; }
+resolve_health_log() {
+  local _hl_c
+  _hl_c=$(git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
+  _hl_c=${_hl_c%$'\r'}
+  [ -n "$_hl_c" ] || return 1
+  derive_health_log "$_hl_c"
+}
+add_health_event() {
+  local _hl_log=${1:-} _hl_src=${2:-} _hl_ev=${3:-} _hl_d=${4:-} _hl_why="" _hl_n=0 _hl_t
+  local _hl_a=abcdefghijklmnopqrstuvwxyz
+  case "$_hl_src" in ''|[!$_hl_a]*|*[!$_hl_a'0123456789-']*) _hl_why="source '$_hl_src' is not a lowercase token" ;; esac
+  case "$_hl_ev" in ''|[!$_hl_a]*|*[!$_hl_a'0123456789-']*) _hl_why="event '$_hl_ev' is not a lowercase token" ;; esac
+  [ -n "$_hl_log" ] || _hl_why="no log path resolved"
+  if [ -z "$_hl_why" ]; then
+    _hl_d=${_hl_d//$'\t'/ }; _hl_d=${_hl_d//$'\r'/ }; _hl_d=${_hl_d//$'\n'/ }; _hl_d=${_hl_d:0:240}
+    _hl_t=$(date -u +%Y-%m-%dT%H:%M:%S+00:00 2>/dev/null) || _hl_t=""
+    [ -n "$_hl_t" ] || _hl_why="date printed no UTC stamp"
+  fi
+  if [ -z "$_hl_why" ] && [ -f "$_hl_log" ]; then
+    _hl_n=$(wc -l < "$_hl_log" 2>/dev/null) || _hl_n=0
+    _hl_n=${_hl_n//[!0-9]/}
+    if [ "${_hl_n:-0}" -ge "$HEALTH_LOG_CAP_LINES" ]; then
+      { tail -n $((HEALTH_LOG_CAP_LINES / 2)) "$_hl_log" > "$_hl_log.trim.$$" && mv -f "$_hl_log.trim.$$" "$_hl_log"; } 2>/dev/null \
+        || { rm -f "$_hl_log.trim.$$" 2>/dev/null; _hl_why="the trim to the newest $((HEALTH_LOG_CAP_LINES / 2)) lines failed"; }
+    fi
+  fi
+  if [ -z "$_hl_why" ]; then
+    { printf '%s\t%s\t%s\t%s\n' "$_hl_t" "$_hl_src" "$_hl_ev" "$_hl_d" >> "$_hl_log"; } 2>/dev/null && return 0
+    _hl_why="the append failed"
+  fi
+  printf 'health: NOTE - %s: %s; nothing written\n' "${_hl_log:-(no path)}" "$_hl_why" >&2
+  return 0
+}
+# <<< health_log_sh
+
 PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_WALL=0; PROF_MEMPAUSE=0; PROF_TAG=""; PROF_WHERE=""
 if [ -f "$PROFILES" ]; then
   # GATE_PROFILE names a row and SKIPS detection; otherwise the first row both thresholds satisfy.
@@ -949,6 +1000,10 @@ if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
   TS_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || TS_COMMON=""
   [ -n "$TS_COMMON" ] && TS_COMMON=$(cd "$TS_COMMON" 2>/dev/null && pwd) || TS_COMMON=""
 fi
+# THE HEALTH LOG (I3, TOOL-aGraftedHelix-8), derived from the common dir this runner already holds,
+# so no self-heal site below spawns git: the turnstile's here, WORK_COMMON's once it is resolved.
+RG_HEALTH_LOG=""
+[ -z "$TS_COMMON" ] || RG_HEALTH_LOG=$(derive_health_log "$TS_COMMON")
 
 TS_TICK=${GATE_TURNSTILE_TICK:-2}
 # The heartbeat cadence is DERIVED from the TTL and declared nowhere else, so the pair cannot drift —
@@ -1041,13 +1096,15 @@ ts_try_reap() {
   hb=$(cat "$TS_DIR_C/heartbeat" 2>/dev/null)
   if [ -n "$hpid" ] && ! ts_alive "$hpid"; then
     printf 'run-gates: reaping the beacon of a dead holder (pid %s)\n' "$hpid" >&2
-    rm -rf "$TS_DIR_C" 2>/dev/null; return 0
+    rm -rf "$TS_DIR_C" 2>/dev/null
+    add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "dead holder pid $hpid"; return 0
   fi
   case "$hb" in ''|*[!0-9]*) hb=0 ;; esac
   age=$(( $(ts_now) - hb ))
   if [ "$hb" != 0 ] && [ "$age" -gt "$TS_TTL" ]; then
     printf 'run-gates: reaping the beacon of a stalled holder (heartbeat %ss old, ttl %ss)\n' "$age" "$TS_TTL" >&2
-    rm -rf "$TS_DIR_C" 2>/dev/null; return 0
+    rm -rf "$TS_DIR_C" 2>/dev/null
+    add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "stalled holder heartbeat ${age}s ttl ${TS_TTL}s"; return 0
   fi
   return 1
 }
@@ -1106,12 +1163,12 @@ ts_sweep_queue() {
     case "$pid" in ''|*[!0-9]*) pid="" ;; esac
     if [ -n "$pid" ] && ! ts_alive "$pid"; then
       printf 'run-gates: sweeping the queue ticket of a dead waiter (pid %s)\n' "$pid" >&2
-      rm -f "$t" 2>/dev/null && swept=1
+      rm -f "$t" 2>/dev/null && { swept=1; add_health_event "$RG_HEALTH_LOG" run-gates ticket-swept "dead waiter pid $pid"; }
       continue
     fi
     if [ -n "$cutoff" ] && [ "$stamp" \< "$cutoff" ]; then
       printf 'run-gates: sweeping a queue ticket past the bounded wait (stamp %s, cutoff %s)\n' "$stamp" "$cutoff" >&2
-      rm -f "$t" 2>/dev/null && swept=1
+      rm -f "$t" 2>/dev/null && { swept=1; add_health_event "$RG_HEALTH_LOG" run-gates ticket-swept "stamp $stamp past $cutoff"; }
     fi
   done
   [ "$swept" = 1 ]
@@ -1262,6 +1319,7 @@ if [ -n "$TS_COMMON" ]; then
       # its ticket and proceeds unqueued rather than becoming the outage. It contributes nothing to
       # the exit code, ever.
       echo "run-gates: turnstile WAIT EXPIRED after ${TS_WAITED}s (bound ${TS_MAXWAIT}s) — running UNQUEUED alongside whatever holds the beacon" >&2
+      add_health_event "$RG_HEALTH_LOG" run-gates turnstile-expired "waited ${TS_WAITED}s bound ${TS_MAXWAIT}s"
       ts_drop_ticket
       break
     fi
@@ -1382,6 +1440,7 @@ if [ -z "$WORK_COMMON" ]; then
   WORK_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || WORK_COMMON=""
   [ -n "$WORK_COMMON" ] && WORK_COMMON=$(cd "$WORK_COMMON" 2>/dev/null && pwd) || WORK_COMMON=""
 fi
+[ -n "$RG_HEALTH_LOG" ] || [ -z "$WORK_COMMON" ] || RG_HEALTH_LOG=$(derive_health_log "$WORK_COMMON")
 
 write_work_owner() { # -> $WORK/owner, one line: pid TAB common dir TAB start epoch; rc 1 when unwritten
   printf '%s\t%s\t%s\n' "$$" "$WORK_COMMON" "${EPOCHSECONDS:-$(date +%s)}" > "$WORK/owner.tmp" 2>/dev/null \
@@ -1414,7 +1473,7 @@ scan_dead_work() { # -> removes each gate-work dir under the ambient TMPDIR that
       doomed+=("$f")
     done
     if { [ "${#doomed[@]}" = 0 ] || rm -rf "${doomed[@]}" 2>/dev/null; } && rm -rf "$d" 2>/dev/null; then
-      :
+      add_health_event "$RG_HEALTH_LOG" run-gates scratch-swept "dead bar pid $pid"
     else
       printf 'run-gates: NOTE - the scratch of dead bar %s was not removed whole; its owner record stays, so the next bar retries: %s\n' "$pid" "$d" >&2
     fi
@@ -2870,7 +2929,11 @@ run_leg_retry() {
       continue
     fi
     rc=$(cat "$WORK/$i.retry.rc")
-    if [ "$rc" = 0 ]; then printf 'GATE ok    %s  (retried after timeout)\n' "${names[$i]}"; continue; fi
+    if [ "$rc" = 0 ]; then
+      printf 'GATE ok    %s  (retried after timeout)\n' "${names[$i]}"
+      add_health_event "$RG_HEALTH_LOG" run-gates retry-passed "${names[$i]} after a $(cat "$WORK/$i.bound" 2>/dev/null || printf '?')s timeout"
+      continue
+    fi
     fails=$((fails + 1)); RETRY_FAILS=$((RETRY_FAILS + 1)); RED_LEGS="$RED_LEGS $i"
     fired=$(cat "$WORK/$i.retry.bound" 2>/dev/null) || fired=0
     secs=$(cat "$WORK/$i.retry.sec" 2>/dev/null) || secs=""
@@ -3431,6 +3494,9 @@ chunk_close                                # the last chunk has no successor to 
 # THE MEMORY PAUSE'S ONE LINE, after the pool drains and before the serial retry, so a run the wall
 # stopped prints it too. Its peak varies with the host, so a whole-output reader filters it by name.
 render_pause_summary
+# ONE I3 LINE PER BAR THAT PAUSED, never one per episode (TOOL-aGraftedHelix-8): the summary's counts.
+[ "$MEMPAUSE_N" = 0 ] || add_health_event "$RG_HEALTH_LOG" run-gates dispatch-paused \
+  "$MEMPAUSE_N pause(s) ${MEMPAUSE_HELD_S}s held peak ${MEMPAUSE_PEAK:-?}% threshold ${MEMPAUSE:-0}% fell $MEMPAUSE_FELL bound $MEMPAUSE_BOUND drained $MEMPAUSE_DRAINED unread $MEMPAUSE_UNREAD wall $MEMPAUSE_WALL"
 # THE SERIAL RETRY, after the pool drains and INSIDE the wall (TOOL-dDerivedDocket-26 S1), and before
 # the attribution below, which reads the red set the retry decides and each red leg's FIRST attempt.
 run_leg_retry

@@ -34,7 +34,7 @@
 #          verb with no session id, a path-shaped one, a card over its byte cap, an append whose
 #          READY line pins a BASE that is not HEAD, or an id reader that could not answer).
 set -u
-KIT_MANIFEST_VERSION="1.17"   # gov:kit kickoff-manifest@1.17 — the registry id
+KIT_MANIFEST_VERSION="1.18"   # gov:kit kickoff-manifest@1.18 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -132,6 +132,58 @@ CARD_CAP_BYTES=${CARD_CAP_BYTES:-8192}
 CARD_CLAIMS_BOUND=${CARD_CLAIMS_BOUND:-15}
 CARD_CLAIMS_HIDE_S=86400
 CARD_CLAIMS_ROWS=8
+# The `health —` cell's window (TOOL-aGraftedHelix-8): every card counts the same last 24 hours of the
+# health log, because cards are per session and "since the previous card" would be whichever card
+# another session wrote seconds earlier and never read. Not an adopter knob.
+HEALTH_WINDOW_S=86400
+# >>> health_log_sh — canonical copy: health-log.sh in gov's lib dir (byte-identical; gated)
+# I3, THE HEALTH LOG (TOOL-aGraftedHelix-8): `<git-common-dir>/health.log`, one LF-terminated UTF-8
+# line per automatic self-heal, four TAB-separated fields: utc (`YYYY-MM-DDTHH:MM:SS+00:00`), source
+# and event (each `^[a-z][a-z0-9-]*$`), and a detail whose TAB, CR and LF are each folded to one space
+# and which is cut to 240 characters. At HEALTH_LOG_CAP_LINES lines the appender first keeps the
+# newest half, through a temp file and a rename, then appends. `derive_health_log <common-dir>` prints
+# the path and spawns nothing; `resolve_health_log <repo-dir>` asks git once and prints it, or fails
+# printing nothing; `add_health_event <log> <source> <event> <detail>` is the only writer. A refused
+# token, an empty path or a failed write prints ONE `health: NOTE -` line on stderr and returns 0: it
+# never fails its caller. WHAT IT DOES NOT DO: serialize concurrent writers (a trim racing an append
+# can lose that line; ponytail: one rename, a lock file if a lost line is ever observed); validate
+# what a detail means; or tell a repository with no writer installed from one where nothing healed.
+HEALTH_LOG_CAP_LINES=500
+derive_health_log() { printf '%s/health.log\n' "$1"; }
+resolve_health_log() {
+  local _hl_c
+  _hl_c=$(git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
+  _hl_c=${_hl_c%$'\r'}
+  [ -n "$_hl_c" ] || return 1
+  derive_health_log "$_hl_c"
+}
+add_health_event() {
+  local _hl_log=${1:-} _hl_src=${2:-} _hl_ev=${3:-} _hl_d=${4:-} _hl_why="" _hl_n=0 _hl_t
+  local _hl_a=abcdefghijklmnopqrstuvwxyz
+  case "$_hl_src" in ''|[!$_hl_a]*|*[!$_hl_a'0123456789-']*) _hl_why="source '$_hl_src' is not a lowercase token" ;; esac
+  case "$_hl_ev" in ''|[!$_hl_a]*|*[!$_hl_a'0123456789-']*) _hl_why="event '$_hl_ev' is not a lowercase token" ;; esac
+  [ -n "$_hl_log" ] || _hl_why="no log path resolved"
+  if [ -z "$_hl_why" ]; then
+    _hl_d=${_hl_d//$'\t'/ }; _hl_d=${_hl_d//$'\r'/ }; _hl_d=${_hl_d//$'\n'/ }; _hl_d=${_hl_d:0:240}
+    _hl_t=$(date -u +%Y-%m-%dT%H:%M:%S+00:00 2>/dev/null) || _hl_t=""
+    [ -n "$_hl_t" ] || _hl_why="date printed no UTC stamp"
+  fi
+  if [ -z "$_hl_why" ] && [ -f "$_hl_log" ]; then
+    _hl_n=$(wc -l < "$_hl_log" 2>/dev/null) || _hl_n=0
+    _hl_n=${_hl_n//[!0-9]/}
+    if [ "${_hl_n:-0}" -ge "$HEALTH_LOG_CAP_LINES" ]; then
+      { tail -n $((HEALTH_LOG_CAP_LINES / 2)) "$_hl_log" > "$_hl_log.trim.$$" && mv -f "$_hl_log.trim.$$" "$_hl_log"; } 2>/dev/null \
+        || { rm -f "$_hl_log.trim.$$" 2>/dev/null; _hl_why="the trim to the newest $((HEALTH_LOG_CAP_LINES / 2)) lines failed"; }
+    fi
+  fi
+  if [ -z "$_hl_why" ]; then
+    { printf '%s\t%s\t%s\t%s\n' "$_hl_t" "$_hl_src" "$_hl_ev" "$_hl_d" >> "$_hl_log"; } 2>/dev/null && return 0
+    _hl_why="the append failed"
+  fi
+  printf 'health: NOTE - %s: %s; nothing written\n' "${_hl_log:-(no path)}" "$_hl_why" >&2
+  return 0
+}
+# <<< health_log_sh
 
 # The session id, in PRECEDENCE order: `--session` answers FIRST and SUPPRESSES the stdin read;
 # only a caller that passed none falls through to the `{"session_id": …}` JSON the SessionStart hook
@@ -274,9 +326,49 @@ render_card() {
   printf 'worktrees — %s\n' "$(git worktree list 2>/dev/null | wc -l | tr -d '[:space:]')"
   printf '%s\n' "$live"
   derive_claims_line "$verb"
+  render_health_cell
   printf 'recent —\n'
   git log --oneline -5 2>/dev/null
   printf 'READY — none yet\n'
+}
+
+# The `health —` cell (TOOL-aGraftedHelix-8): the I3 health log under the common dir `--card` already
+# resolved for CARD_DIR, so the cell spawns no git, counted over the last HEALTH_WINDOW_S seconds. The
+# window's start is a UTC stamp of I3's own spelling (GNU `date -d @<epoch>`, then BSD `-r`), and the
+# stamps compare as text. At most four `<source> <event> ×<k>` pairs from the window, by count then by
+# name. A line that is not four TAB fields or whose stamp is not I3's is `unreadable`, never an event.
+# It sits ABOVE `recent —` because CARD_PARTS_AWK files everything after that block into the TAIL an
+# append replaces. No time bound: one local file the appender caps at 500 lines, no network, no lock.
+# WHAT THIS DOES NOT CHECK: whether a logged event was a real repair, or that any writer kit is
+# installed here; an absent log says so (`none recorded`) rather than reporting a zero it never read.
+render_health_cell() {
+  local log now since
+  log=$(derive_health_log "${CARD_DIR%/orientation}")
+  [ -e "$log" ] || { printf 'health — none recorded: no health.log in the git common dir\n'; return 0; }
+  { [ -f "$log" ] && [ -r "$log" ]; } || { printf 'health — skipped: health.log exists and cannot be read\n'; return 0; }
+  now=${EPOCHSECONDS:-$(date -u +%s)}
+  since=$(date -u -d "@$((now - HEALTH_WINDOW_S))" +%Y-%m-%dT%H:%M:%S+00:00 2>/dev/null) \
+    || since=$(date -u -r "$((now - HEALTH_WINDOW_S))" +%Y-%m-%dT%H:%M:%S+00:00 2>/dev/null) || since=""
+  [ -n "$since" ] || { printf 'health — skipped: date computes no UTC stamp for the window start on this host\n'; return 0; }
+  awk -F '\t' -v since="$since" -v hours="$((HEALTH_WINDOW_S / 3600))" '
+    { sub(/\r$/, "") }
+    NF != 4 || $1 !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9][+]00:00$/ { bad++; next }
+    { all++; if ($1 >= since) { n++; k = $2 " " $3; if (!(k in c)) keys[++nk] = k; c[k]++ } }
+    END {
+      line = sprintf("health — %d in the last %dh of %d logged", n, hours, all)
+      for (s = 1; s <= 4 && s <= nk; s++) {
+        b = 0
+        for (i = 1; i <= nk; i++) {
+          if (keys[i] in done) continue
+          if (!b || c[keys[i]] > c[keys[b]] || (c[keys[i]] == c[keys[b]] && keys[i] < keys[b])) b = i
+        }
+        done[keys[b]] = 1
+        line = line sprintf(" · %s ×%d", keys[b], c[keys[b]])
+      }
+      if (nk > 4) line = line sprintf(" · +%d more kinds", nk - 4)
+      if (bad) line = line sprintf(" · %d unreadable", bad)
+      print line
+    }' "$log"
 }
 
 # The `claims —` cell (TOOL-aGraftedHelix-2): the remote's run claims, read through the unattended

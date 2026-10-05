@@ -1264,7 +1264,8 @@ seed_claim() {
 }
 remove_claims() { git -C "$CLB" for-each-ref --format='delete %(refname)' refs/gov/runs/ | git -C "$CLB" update-ref --stdin; }
 # The stored card's `claims —` cell, every numeric beat age masked: the clock moves between seed and read.
-read_claims_cell() { awk '/^claims — /{f=1} /^recent —/{exit} f' "$CARD_HOME/$1.md" | sed -E 's/ · beat [0-9]+s · / · beat Ns · /'; }
+# It ends at the `health —` line TOOL-aGraftedHelix-8 puts between it and `recent —`.
+read_claims_cell() { awk '/^claims — /{f=1} /^(health|recent) —/{exit} f' "$CARD_HOME/$1.md" | sed -E 's/ · beat [0-9]+s · / · beat Ns · /'; }
 read_lines() { if [ -f "$1" ]; then awk 'END{print NR}' "$1"; else echo 0; fi; }   # 0 for an absent file
 
 # AC1, AC2, AC6 — seven claims: a fresh live one, a held one three days old, a live one two hours
@@ -1383,6 +1384,27 @@ check_eq "AGH2 AC14 a card write adds no line to the driver's journal" "$cl_j0" 
   || { echo "FAIL AGH2 AC14 liveness: the driver called directly wrote no journal line at $CLJ, so the arm above observes nothing"; fail=$((fail+1)); }
 git -C "$CCLONE" remote set-url origin "$CLURL0"
 
+# ---- TOOL-aGraftedHelix-8: the `health —` cell, each arm observed RED on a staged break first -----
+# The log is the card clone's own `<common-dir>/health.log`, seeded here and removed after; nothing
+# else in this suite writes one. Stamps count back from one clock read: two events an hour old, one
+# thirty hours old (outside the 24-hour window), and one line of three fields. The cell is read as
+# the line DIRECTLY ABOVE `recent —`, the position the startup split needs. WHAT THIS DOES NOT CHECK:
+# any writer, whose own suite owns its call site, or the BSD `date -r` fallback no node here takes.
+HLOG="$CCLONE/.git/health.log"; HLNOW=$(date -u +%s)
+hl_h1=$(date -u -d "@$((HLNOW - 3600))" +%Y-%m-%dT%H:%M:%S+00:00)
+hl_h30=$(date -u -d "@$((HLNOW - 108000))" +%Y-%m-%dT%H:%M:%S+00:00)
+printf '%s\tcheck-wiring\thookspath-set\tcore.hooksPath -> .githooks · mode session\n%s\trun-gates\tretry-passed\tx after a 3s timeout\n%s\treap\ttree-killed\ttarget 1 killed 1 survivors 0 unsignalable 0\n%s\tthree\tfields\n' \
+  "$hl_h1" "$hl_h1" "$hl_h30" "$hl_h1" > "$HLOG"
+run_card "AGH8 AC7 --card --write over a seeded health log" "$CWT" 0 - --card --write --session "$NONCE-h7"
+check_eq "AGH8 AC7 the health — line counts the window, names its kinds and the unreadable line, directly above recent —" \
+  "health — 2 in the last 24h of 3 logged · check-wiring hookspath-set ×1 · run-gates retry-passed ×1 · 1 unreadable" \
+  "$(awk '/^recent —/{print prev; exit} {prev=$0}' "$CARD_HOME/$NONCE-h7.md")"
+rm -f "$HLOG"
+run_card "AGH8 AC8 --card --write with no health log" "$CWT" 0 - --card --write --session "$NONCE-h8"
+check_eq "AGH8 AC8 an absent log reads none recorded on the same line position, never a zero it did not read" \
+  "health — none recorded: no health.log in the git common dir" \
+  "$(awk '/^recent —/{print prev; exit} {prev=$0}' "$CARD_HOME/$NONCE-h8.md")"
+
 # C12 — the manifest carries no CR byte. Round 3's M1: the §B bullet ABOUT raw CR bytes had its own
 # CR eaten twice by text-mode rewrites, leaving a sentence that said a newline becomes a newline.
 # BOTH directions, because a check that has only ever been seen pass is an assertion about nothing,
@@ -1416,7 +1438,8 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +2: C12's pair, the CR-byte check's green and red cases (round 3 M1's left-shift).
 # +2: L3's pair, the junction-copy setup and its graded-ids arm (aRepatriatedFork round 1 L3).
 # +25: TOOL-aGraftedHelix-2's `claims —` block, every arm of which runs on every node.
-FLOOR_ASSERTIONS=205
+# +4: TOOL-aGraftedHelix-8's `health —` block, two writes and the two cells they wrote.
+FLOOR_ASSERTIONS=209
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

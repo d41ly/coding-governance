@@ -171,6 +171,8 @@ derive_kit_paths|$ROOT/$KIT_REL/render-doc.sh|$KIT_REL/render-doc
 resolve_prefix_token|$ROOT/$KIT_REL/resolve_prefix_token.py|$KIT_REL/resolve_prefix_token
 resolve_prefix_sh|$ROOT/$KIT_REL/kit-rel.sh|$KIT_REL/kit-rel
 mempause_sh|$ROOT/$RUNGATES_DIR/run-gates.sh|$RUNGATES_DIR/run-gates.sh
+health_log_sh|$ROOT/$KIT_REL/health-log.sh|$KIT_REL/health-log
+health_log_py|$ROOT/$KIT_REL/health_log.py|$KIT_REL/health_log
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -184,8 +186,10 @@ mempause_sh|$ROOT/$RUNGATES_DIR/run-gates.sh|$RUNGATES_DIR/run-gates.sh
 # resolve_prefix_token and resolve_prefix_sh (TOOL-aRepatriatedFork-47) are the `{prefix}` token's
 # two canonicals, one per language; §2b below holds them to one answer. mempause_sh
 # (TOOL-aGraftedHelix-7) is the memory pause both of the run-gates kit's dispatchers carry inline; like
-# kickoff_region its canonical is a kit file, the bar's runner, and the self-test runner holds the copy. The runbook's embedded
-# migration program carries the Python one, so the population grep reads that one Markdown file too.
+# kickoff_region its canonical is a kit file, the bar's runner, and the self-test runner holds the copy.
+# health_log_sh and health_log_py (TOOL-aGraftedHelix-8) are the health log's appender, one canonical
+# per language beside this file; every writer kit and the card engine carry one inline, and §2c below
+# holds the two canonicals to one format. The runbook's embedded migration program carries the Python one, so the population grep reads that one Markdown file too.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
@@ -234,6 +238,34 @@ pfx_sh=$(printf '%s\n' "$PFX_ROWS" | bash -c '. "$1"; while IFS="|" read -r s t 
 [ "$(printf '%s\n' "$pfx_want" | grep -c .)" = 6 ] || bad "the {prefix} contract table did not read as six rows"; ok
 [ "$pfx_py" = "$pfx_want" ] || bad "the Python {prefix} canonical disagrees with the contract table: $(printf '%s' "$pfx_py" | tr '\n' ' ')"; ok
 [ "$pfx_sh" = "$pfx_want" ] || bad "the shell {prefix} canonical disagrees with the contract table: $(printf '%s' "$pfx_sh" | tr '\n' ' ')"; ok
+
+# ---- 2c. THE HEALTH LOG, BEHAVIOUR (TOOL-aGraftedHelix-8) ------------------------------------------
+# Parity holds each inline copy to its canonical; this holds the two CANONICALS to one I3 format. Both
+# append to one scratch log, and every line must be four TAB fields under I3's stamp with its detail
+# folded; then each language over both sides of the cap: a 499-line log takes one append untrimmed,
+# a 500-line one keeps its newest 250 and then appends. WHAT THIS DOES NOT CHECK: any writer's call
+# site, which belongs to the suite of the kit that writes it, nor a refused write's NOTE line.
+hl="$TMP/health.log"; : > "$hl"
+bash -c '. "$1"; add_health_event "$2" check-wiring hookspath-set "$3"' _ "$HERE/health-log.sh" "$hl" $'a\tb\nc'
+"$REALPY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import health_log; health_log.add_health_event(sys.argv[2], "reap", "tree-killed", sys.argv[3])' "$HERE" "$hl" $'c\rd'
+[ "$(grep -c . "$hl")" = 2 ] || bad "the two canonicals did not append two lines to one log: $(grep -c . "$hl")"; ok
+[ -z "$(awk -F'\t' 'NF != 4' "$hl")" ] || bad "a health line is not four TAB fields: $(awk -F'\t' 'NF != 4' "$hl" | head -1)"; ok
+[ "$(cut -f1 "$hl" | grep -cE '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[+]00:00$')" = 2 ] \
+  || bad "a canonical stamps outside I3's spelling: $(cut -f1 "$hl" | tr '\n' ' ')"; ok
+[ "$(cut -f2- "$hl" | tr '\t\n' '|;')" = "check-wiring|hookspath-set|a b c;reap|tree-killed|c d;" ] \
+  || bad "the canonicals disagree on the source, event or folded detail: $(cut -f2- "$hl" | tr '\t\n' '|;')"; ok
+for lang in sh py; do
+  for start in 499 500; do
+    seq 1 "$start" > "$hl"
+    case "$lang" in
+      sh) bash -c '. "$1"; add_health_event "$2" run-gates retry-passed x' _ "$HERE/health-log.sh" "$hl" ;;
+      py) "$REALPY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import health_log; health_log.add_health_event(sys.argv[2], "reap", "tree-killed", "x")' "$HERE" "$hl" ;;
+    esac
+    case "$start" in 499) want="500 1 4" ;; *) want="251 251 4" ;; esac
+    got="$(grep -c . "$hl") $(head -1 "$hl") $(tail -1 "$hl" | awk -F'\t' '{print NF}')"
+    [ "$got" = "$want" ] || bad "the $lang appender over a $start-line log left '$got' (lines, first line, last line's fields), not '$want'"; ok
+  done
+done
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

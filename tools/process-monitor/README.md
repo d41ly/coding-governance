@@ -1,6 +1,6 @@
 # process-monitor — find, report and kill the processes an agent session forgot
 
-<!-- gov:kit process-monitor@0.13 -->
+<!-- gov:kit process-monitor@0.14 -->
 
 Every deadline a repo like this owns bounds a command a CHECKER launched. Nothing bounds a process
 an AGENT launched — a `Bash run_in_background` job, a `Monitor` pipeline, a suite invoked by hand —
@@ -26,6 +26,10 @@ hours after it was stopped, with its children.
 Attribution is a property of the TREE, not of a row: a process is yours because its ancestry starts
 at a path you declared, which is what makes a `sleep 900` with a bare argv reapable and an unrelated
 editor invisible.
+
+Every kill is logged: `reap.py` appends one `tree-killed` line per kill target, after the read-back,
+to the health log under the git common dir that the orientation card counts (`TOOL-aGraftedHelix-8`).
+The line format is the header of the `health_log_py` block in `reap.py`.
 
 ## Adopting it
 

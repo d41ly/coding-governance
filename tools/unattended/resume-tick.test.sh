@@ -322,6 +322,11 @@ check_same "AC1 the sidecar line starts with a UTC stamp" "$(grep -cE "$UTC_RE" 
 check_hit "$(cat "$SIDECAR/resume.tRun.log")" " attempt 1 session $SID pid 999999999 pid-alive no out $SIDECAR/resume.tRun." "AC1 the sidecar line's fields"
 check_same "AC1 the launcher exists beside the log" "$(ls "$SIDECAR"/resume.tRun.*.sh 2>/dev/null | grep -c '')" "1"
 check_same "AC1 the launcher records the argv" "$(grep -c -- '--dangerously-skip-permissions --max-turns 40' "$SIDECAR"/resume.tRun.*.sh)" "1"
+# TOOL-aGraftedHelix-8: the relaunch IS the self-heal, so the fixture's health log (I3, under its git
+# common dir) holds ONE run-resumed line naming the slug, the attempt, the session and the kill —
+# `none`, because the recorded pid is dead and nothing was killed.
+check_same "AGH8 the relaunch appended one run-resumed line" \
+  "$(awk -F'\t' '$2 == "resume-tick" && $3 == "run-resumed" { print $4 }' "$FX_GITDIR/health.log" 2>/dev/null)" "tRun attempt 1 session $SID killed none"
 OUT_PATH=$(sed -n 's/.* out //p' "$SIDECAR/resume.tRun.log" | head -n 1); OUT_PATH=${OUT_PATH%% launched *}
 check_same "AC1 the .out the line names is the one the launcher writes" "$(grep -c -- ">$OUT_PATH" "$SIDECAR"/resume.tRun.*.sh)" "1"
 # ...AC13, the LAUNCHED PID (closing review id 3): the line ends `launched <pid> <utc> <image>` —
@@ -340,6 +345,7 @@ check_same "AC13 a second STALE tick exits 0" "$RC" "0"
 check_hit "$OUT" "resume-tick: tRun · $FX · skip · IN-FLIGHT · launched $LAUNCHED alive since " "AC13 the second tick reads the launch as in flight"
 check_same "AC13 the second tick launched nothing" "$(grep -c 'argv -p' "$STUB_LOG")" "1"
 check_same "AC13 the second tick wrote no attempt line" "$(grep -c '' "$SIDECAR/resume.tRun.log")" "1"
+check_same "AGH8 the in-flight skip appended no health line" "$(grep -c '' "$FX_GITDIR/health.log" 2>/dev/null)" "1"
 
 # ---- AC3: the cap is CONSECUTIVE, not lifetime. Six lines newer than the last move (the hour-old
 # ---- commit) exhaust it and invoke nothing; six lines OLDER than it launch attempt 7, because a
@@ -510,6 +516,9 @@ case "$(uname -s)" in
     check_same "AC17 the attempt line carries no launched token" "$(grep -c ' launched ' "$SIDECAR/resume.tRun.log")" "0"
     check_same "AC17 the attempt line still counts" "$(grep -c ' attempt 1 session ' "$SIDECAR/resume.tRun.log")" "1"
     check_same "AC17 the stub was not launched" "$(grep -c 'argv -p' "$STUB_LOG")" "0"
+    # TOOL-aGraftedHelix-8: a relaunch that failed is ONE resume-failed line, never a run-resumed one.
+    check_same "AGH8 the failed launch appended one resume-failed line and no run-resumed one" \
+      "$(awk -F'\t' '$2 == "resume-tick" { print $3 "|" substr($4, 1, 15) }' "$FX_GITDIR/health.log" 2>/dev/null | tr '\n' ';')" "resume-failed|tRun attempt 1 ;"
     rm -rf "$TMP/stubcp" ;;
   *) echo "skip AC17 · the POSIX detach records \$! and cannot fail the way Start-Process does; the arm runs under MSYS only" ;;
 esac
@@ -1005,7 +1014,12 @@ n=$((pass+fail))
 # the AC12 block, COUNTED off its own `check_*` lines, every one unconditional. The pass that wrote
 # it ran no suite; the block was run alone over a replica of this prologue, against the kit, against
 # a driver whose claim write reads the session from the environment, and against the parent's driver.
-FLOOR_ASSERTIONS=190
+# RAISED 190 -> 192 by TOOL-aGraftedHelix-8: the health-log lines of AC1 and AC13, COUNTED off their
+# own `check_*` lines and unconditional; AC17's third is MSYS-only and stays out of the floor, as
+# AC17's own arms do. The pass that wrote them ran no suite; the AC1, AC13 and AC17 blocks were run
+# alone over a replica of this prologue, against the kit and against a tick whose call sat above
+# the pid check.
+FLOOR_ASSERTIONS=192
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 # THE TRAILER IS UNCONDITIONAL. `run-selftests.sh --pooled` reads a completed run by its trailer

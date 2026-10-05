@@ -246,6 +246,16 @@ cleanup
 newrepo
 chk --session >/dev/null; rc=$?; got=$(git config core.hooksPath)
 { [ "$rc" = 0 ] && [ "$got" = ".githooks" ]; } && ck "AC6 --session wires + exit 0" 1 || ck "AC6 --session wires + exit 0" 0
+# TOOL-aGraftedHelix-8 AC4 — the auto-wire is a self-heal, so it appends ONE I3 line to the health log
+# under the common dir, and only on the branch that ran `git config`: a second SessionStart over the
+# wired tree prints `ok` and appends nothing, or the card would count a heal on every session start.
+# WHAT THIS DOES NOT CHECK: the line's stamp or fold, which the resolver suite's §2c owns.
+hl="$(git rev-parse --path-format=absolute --git-common-dir)/health.log"
+ck "U8 AC4 --session's hooks auto-wire appends one check-wiring hookspath-set line" \
+   "$([ "$(awk -F'\t' '$2 == "check-wiring" && $3 == "hookspath-set" && $4 ~ /mode session$/' "$hl" 2>/dev/null | wc -l | tr -d ' ')" = 1 ] && [ "$(grep -c . "$hl")" = 1 ] && echo 1 || echo 0)"
+nb=$(grep -c . "$hl" 2>/dev/null); out=$(chk --session)
+ck "U8 AC4 ...and a second --session over the wired tree prints ok and appends none" \
+   "$(printf '%s\n' "$out" | grep -q '^ok       hooks' && [ "$(grep -c . "$hl" 2>/dev/null)" = "$nb" ] && echo 1 || echo 0)"
 cleanup
 
 # AC7 — agent-cap adopted but unwired -> --check UNWIRED (exit 1); --session still exits 0
@@ -911,10 +921,20 @@ before=$(git config merge.rows.driver); chk --fix >/dev/null; after=$(git config
 # state 7 — --session wires the unset case too. Setting a repo-local config is exactly the class of
 # act --session exists for; the eol arm's session exemption is not copied because that one rewrites
 # file bytes.
+hl="$(git rev-parse --path-format=absolute --git-common-dir)/health.log"
+n0=$(awk -F'\t' '$3 == "merge-driver-set"' "$hl" 2>/dev/null | wc -l | tr -d ' ')
 git config --unset merge.rows.driver
 chk --session >/dev/null; rc=$?; got=$(git config merge.rows.driver)
 { [ "$rc" = 0 ] && [ "$got" = "$WANT" ]; } \
   && ck "AC10 --session wires the driver + exit 0" 1 || ck "AC10 --session wires the driver + exit 0" 0
+# TOOL-aGraftedHelix-8 AC4, the merge arm: one merge-driver-set line naming the session mode, and a
+# second --session over the wired driver appends none.
+n1=$(awk -F'\t' '$3 == "merge-driver-set"' "$hl" 2>/dev/null | wc -l | tr -d ' ')
+last=$(awk -F'\t' '$3 == "merge-driver-set" { d = $4 } END { print d }' "$hl" 2>/dev/null)
+chk --session >/dev/null
+n2=$(awk -F'\t' '$3 == "merge-driver-set"' "$hl" 2>/dev/null | wc -l | tr -d ' ')
+ck "U8 AC4 --session's merge auto-wire appends one merge-driver-set line, and a second run none" \
+   "$([ "$n1" = "$((n0 + 1))" ] && [ "$n2" = "$n1" ] && [ "$last" = "merge.rows.driver · mode session" ] && echo 1 || echo 0)"
 cleanup
 
 # AC11 — the `merge=rows` ATTRIBUTE, asserted against THIS repo's REAL tree.

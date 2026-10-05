@@ -50,7 +50,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.74   # gov:kit unattended@1.74 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.75   # gov:kit unattended@1.75 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -1794,7 +1794,7 @@ CLAIM_NS="refs/gov/runs"
 CLAIM_CACHE="refs/gov/remote/runs"
 CR_NAME=""; CR_URL=""
 CLAIM_ROWS=""; CL_WHY=""
-CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""
+CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""
 WC_WHY=""; WC_BEAT=""
 
 # THE ONE REMOTE, counted once. SETS rather than prints, because check 24 is a `fail` and a `fail`
@@ -1937,7 +1937,7 @@ CLAIM_MODES="preflight take-over holder status beat"
 check_claim_writable() { # slug · mode · lease keepalive · lease session · the keepalive a write sets · [run-state file]
   local slug="$1" mode="$2" ka="$3" sid="$4" wka="$5" rel="${6:-}" me="${CLAUDE_CODE_SESSION_ID:-}" row cls due ps=""
   local c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_btxt=unknown r_host r_sess r_lease
-  CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""
+  CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""
   case " $CLAIM_MODES " in
     *" $mode "*) ;;
     *) fail 110 "this call passed a claim mode the driver does not declare, so the claim write table has no column for it and nothing was written; declare the mode in CLAIM_MODES beside its case branch, or pass a declared one: mode $mode · CLAIM_MODES $CLAIM_MODES"
@@ -1954,6 +1954,7 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     CW_SHA="$c_sha"; CW_SESS="$c_sess"
     c_btxt="${c_age}s"; [ "$c_age" != - ] || c_btxt=unknown
     CW_WHO="$slug · node $c_node · session $c_sess · beat $c_btxt · status $c_status · verdict $c_verdict"
+    CW_FROM="$slug from node $c_node session $c_sess beat-age $c_btxt"
     if [ -n "$rel" ]; then ps=$(fact "$rel" prior-session) || :; fi
     if [ "$c_ka" = "$ka" ] && [ "$c_sess" = "$sid" ]; then cls=mine
     elif [ -n "$ps" ] && [ "$mode" != take-over ] && [ "$c_ka" = "$ka" ] && [[ " $ps " == *" $c_sess "* ]]; then cls=mine
@@ -2069,7 +2070,12 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
   fi
   [ -z "${d:-}" ] || rm -f "$d"
   if [ "$rc" = 0 ]; then
-    [ "$CW_ACT" = take-announced ] && echo "unattended: claim taken over — $CW_WHO"
+    # A TAKE-OVER OF A STALE CLAIM IS A SELF-HEAL, logged once per write that landed (I3,
+    # TOOL-aGraftedHelix-8); the claim's own row, read before the write, is the detail.
+    if [ "$CW_ACT" = take-announced ]; then
+      echo "unattended: claim taken over — $CW_WHO"
+      add_health_event "$(resolve_health_log "$ROOT")" unattended claim-taken-over "$CW_FROM"
+    fi
     return 0
   fi
   case "$rc:$pol" in

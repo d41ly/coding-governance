@@ -288,6 +288,16 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "add_health_event",
+      "kind": "function",
+      "file": "tools/lib/health_log.py"
+    },
+    {
+      "id": "add_health_event",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
+    },
+    {
       "id": "add_kit_to_path",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -2986,6 +2996,16 @@
       "id": "derive_guarded_legs",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "derive_health_log",
+      "kind": "function",
+      "file": "tools/lib/health_log.py"
+    },
+    {
+      "id": "derive_health_log",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
     },
     {
       "id": "derive_id_families",
@@ -7393,6 +7413,16 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "resolve_health_log",
+      "kind": "function",
+      "file": "tools/lib/health_log.py"
+    },
+    {
+      "id": "resolve_health_log",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
+    },
+    {
       "id": "resolve_hits",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -9478,6 +9508,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_health_appender_failures_return_none_with_one_note",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_hits_disagreement_reds",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -10474,6 +10509,11 @@
     },
     {
       "id": "test_sweep_counts_are_derived_and_complete",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_sweep_logs_one_tree_killed_per_target_and_none_dry",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
     },

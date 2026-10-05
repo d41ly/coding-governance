@@ -263,7 +263,7 @@ read_liveness() { # worktree · slug
 # with cwd in the worktree so it answers THAT tree's git dir, made absolute because the main
 # worktree's answer is the relative `.git`.
 run_tick() { # worktree · slug · session · host
-  local wt="$1" slug="$2" sid="$3" host="$4" me sidecar log utc stamp launcher out n payload kitrel lastutc lastout boundcut lalive limg lutc
+  local wt="$1" slug="$2" sid="$3" host="$4" me sidecar log utc stamp launcher out n payload kitrel lastutc lastout boundcut lalive limg lutc killed=""
   # THE NODE FIRST: a record leased on another node is not this tick's to probe, kill or launch —
   # its pid is a number in another process table (closing review id 2). A lease with no host
   # recorded (`absent`, or written before the fact existed) is judged as it always was.
@@ -336,8 +336,8 @@ run_tick() { # worktree · slug · session · host
   if ! check_login "$sidecar/resume.$slug.$stamp.auth"; then
     echo "resume-tick: $slug · $wt · SKIP — the CLI is not logged in on this node; nothing can resume $slug"; return 0
   fi
-  [ "$RL_ALIVE" = yes ] && run_kill_tree "$RL_PID"
-  [ "$lalive" = yes ] && run_kill_tree "$RT_LAUNCHED"
+  [ "$RL_ALIVE" = yes ] && { run_kill_tree "$RL_PID"; killed="$RL_PID"; }
+  [ "$lalive" = yes ] && { run_kill_tree "$RT_LAUNCHED"; killed="${killed:+$killed }$RT_LAUNCHED"; }
   # THE CONTINUE PAYLOAD, one string. The kit's repo-relative path is derived, never spelled; a kit
   # outside the root keeps its absolute path, which still runs.
   kitrel=${KIT_DIR#"$ROOT"/}
@@ -358,7 +358,13 @@ run_tick() { # worktree · slug · session · host
   run_detached "$launcher" "$sidecar/resume.$slug.$stamp.pid"
   # A launch that reported no pid is announced as a failure, never as `resumed`; its line stays and
   # counts, because the cap is what ends a launch that fails every time (round 2, defect C).
-  if [ -z "$RD_PID" ]; then print_decision "$slug" "$wt" "launch failed: $RD_FIRST"; return 0; fi
+  # BOTH OUTCOMES ARE LOGGED (I3, TOOL-aGraftedHelix-8), each beside the line it already prints:
+  # a relaunch is the self-heal, and a relaunch that failed is the heal the card must not miss.
+  TICK_HEALTH_LOG=${TICK_HEALTH_LOG:-$(resolve_health_log "$ROOT")}
+  if [ -z "$RD_PID" ]; then
+    add_health_event "$TICK_HEALTH_LOG" resume-tick resume-failed "$slug attempt $n $RD_FIRST"
+    print_decision "$slug" "$wt" "launch failed: $RD_FIRST"; return 0
+  fi
   # THE LAUNCHED FIELD: the pid, the stamp taken now that the launch has returned — the process
   # existed before it, so a holder that started after it is not the launch — and the image holding
   # the pid, LAST because `System Idle Process` has spaces. `absent` where a probe answered nothing.
@@ -367,6 +373,7 @@ run_tick() { # worktree · slug · session · host
   lutc=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   limg=$(read_pid_image "$RD_PID") || limg=absent
   sed -i "\$ s|\$| launched $RD_PID $lutc ${limg:-absent}|" "$log"
+  add_health_event "$TICK_HEALTH_LOG" resume-tick run-resumed "$slug attempt $n session $sid killed ${killed:-none}"
   print_decision "$slug" "$wt" "resumed · attempt $n · out $out"
   return 0
 }

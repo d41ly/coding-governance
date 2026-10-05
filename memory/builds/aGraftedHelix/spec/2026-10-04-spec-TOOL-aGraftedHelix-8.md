@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-8 — every automatic self-heal appends one line to a health log the orientation card counts
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling+kickoff · order 9 · ratified 2026-10-04
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling+kickoff · order 9 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
