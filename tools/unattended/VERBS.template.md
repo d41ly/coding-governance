@@ -730,7 +730,7 @@ Read the run-state file before anything else (`UNATTENDED-STOPS.md` §8 and §9 
 
 ### Record the run
 
-Binds only where the tool root's `runlog/runlog.py` exists; test for it first, and where absent skip
+Binds only where the tool root holds the runlog kit; test for it first, and where absent skip
 every step and say so in the wrap-up. `runlog.py record <slug> --write` writes ONE closed-schema
 record into the build folder and prints its two follow-ups: re-render the build index, and commit
 under a subject naming the slug and no unit id. A run that served no spec-defined unit gets the
