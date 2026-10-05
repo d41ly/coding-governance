@@ -320,3 +320,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T06:52:07Z dispatch · item 67d3b341 TOOL-aMendedFleet-38 · reason memory/backlog/TOOL.md
 
 2026-10-05T06:56:38Z dispatch · item 67d3b341 TOOL-aMendedFleet-38 · reason memory/backlog/TOOL.md .codebase-map.conf WIRE-INTO-PROJECT.md memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-38-1-acceptance-ledger.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-38.md memory/builds/aMendedFleet/README.md memory/map/features/codebase-map.md memory/map/features/install-prefix.md memory/map/generated/symbols.json memory/project/encoding-posture-sites.txt tools/check-install-prefix.test.sh tools/codebase-map/.codebase-map.conf.example tools/codebase-map/INVENTORY-DERIVATION.md tools/codebase-map/README.md tools/codebase-map/map_diff.py tools/codebase-map/map_lib.py tools/codebase-map/reuse-lookup.agent.md tools/codebase-map/reuse_lookup.py tools/codebase-map/scen-adversarial.json tools/codebase-map/selftest.py
+
+2026-10-05T07:05:53Z brief · item TOOL-aMendedFleet-39 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
