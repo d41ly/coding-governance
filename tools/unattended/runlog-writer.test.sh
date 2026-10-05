@@ -706,7 +706,7 @@ check_ac13_units() {
   check "AC13 --dispatch END unit" "$(read_field $(measure_lines) unit)" "X-$SLUG-1"
   run_driver --rescope "$SLUG" --act add --item "X-$SLUG-2" --reason r13
   check "AC13 --rescope END unit" "$(read_field $(measure_lines) unit)" "X-$SLUG-2"
-  run_driver --review "$SLUG" --subject "X-$SLUG-1" --verdict CLEAN --blockers 0
+  run_driver --review "$SLUG" --subject "X-$SLUG-1" --verdict CLEAN --blockers 0 --highs 0 --minors 0
   check "AC13 --review END unit" "$(read_field $(measure_lines) unit)" "X-$SLUG-1"
   run_driver --phase "$SLUG" BUILDING --witness "$BASE"
   check "AC13 --phase END slug" "$(read_field $(measure_lines) slug)" "$SLUG"

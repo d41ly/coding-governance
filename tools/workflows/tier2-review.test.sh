@@ -81,7 +81,9 @@ ck(true, 'the prelude extraction is live (' + (stop - metaEnd - 1) + ' lines, al
 // ---- one arm ----------------------------------------------------------------------------------
 const BLOB = 'abc1234'
 const SHA = 'a'.repeat(40)
-const base = { repo: '/tmp/r', reviewDir: 'memory/reviews', unitIds: ['TOOL-x-1'], base: SHA, head: SHA }
+// `scratch` rides every arm (TOOL-aEvidencedLens-2 S7): a spec audit refuses without it, and a diff
+// review never reads it, so carrying it here reds no arm and leaves every proceeding spec arm proceeding.
+const base = { repo: '/tmp/r', reviewDir: 'memory/reviews', unitIds: ['TOOL-x-1'], base: SHA, head: SHA, scratch: '/tmp/s' }
 function arm(name, extra, want) {
   let threw = null
   try {
@@ -158,6 +160,53 @@ armIntensity('intensity: absent proceeds', {}, 'full')
 armIntensity('intensity: light on a spec audit is refused', Object.assign({ intensity: 'light' }, GOOD_SPEC), 'refused')
 armIntensity('intensity: full on a spec audit proceeds', Object.assign({ intensity: 'full' }, GOOD_SPEC), 'full')
 
+// ---- TOOL-aEvidencedLens-2 AC3 — `scratch`, required on a spec audit and refused by shape ---------
+// The proceeding arms read the RESOLVED value back, so none passes over a prelude that never reads
+// `scratch`: on the base render the read throws `scratch is not defined`, a harness fault. A refusal
+// must START `tier2-review:` and name `scratch`, so an unrelated throw cannot satisfy one.
+function armScratch(name, extra, want) {
+  let got = null
+  let threw = null
+  try {
+    got = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn scratch')(Object.assign({}, base, extra), () => {}, null, null, null)
+  } catch (e) { threw = e.message }
+  if (threw && /has already been declared|is not defined|Unexpected|Invalid or unexpected/.test(threw)) {
+    console.log('HARNESS-BROKEN ' + name + ' -> ' + threw)
+    fail++
+    return
+  }
+  ck(want === 'refused' ? !!threw && threw.indexOf('tier2-review:') === 0 && threw.indexOf('`scratch`') !== -1 : !threw && got === want,
+    name + (threw ? ' (threw: ' + threw + ')' : ' (resolved ' + JSON.stringify(got) + ')'))
+}
+armScratch('spec scratch: absent is refused', Object.assign({ scratch: undefined }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: a relative path is refused', Object.assign({ scratch: 'tmp/s' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: a multi-line value is refused', Object.assign({ scratch: '/tmp/s\nX' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: equal to repo is refused', Object.assign({ scratch: '/tmp/r' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: repo with a trailing slash is refused', Object.assign({ scratch: '/tmp/r/' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: under repo is refused', Object.assign({ scratch: '/tmp/r/sub' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: under repo by case and backslash is refused', Object.assign({ repo: 'c:/r', scratch: 'C:\\R\\x' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: an absolute path outside repo proceeds', GOOD_SPEC, '/tmp/s')
+armScratch('spec scratch: a sibling sharing the repo prefix proceeds', Object.assign({ scratch: '/tmp/rs' }, GOOD_SPEC), '/tmp/rs')
+armScratch('spec scratch: a Windows path proceeds, folded to forward slashes', Object.assign({ scratch: 'C:\\t\\s' }, GOOD_SPEC), 'C:/t/s')
+armScratch('spec scratch: a diff review never reads it', { scratch: 7 }, '')
+// TOOL-aEvidencedLens-21 AC1 (closing review M1, replay id 38) - the under-`repo` test is textual, so a
+// relative `repo`, either MSYS spelling and a `..` segment are refused by name. Each of the four proceeded
+// on the base render; the two controls and the diff kind's relative `repo` still proceed.
+armScratch('spec scratch: a relative repo is refused', Object.assign({ repo: '.', scratch: 'C:/projects/x/tmp' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: under a drive repo by its MSYS spelling is refused', Object.assign({ repo: 'C:/p/x', scratch: '/c/p/x/t' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: under an MSYS repo by its drive spelling is refused', Object.assign({ repo: '/c/p/x', scratch: 'C:/p/x/t' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: a .. segment is refused', Object.assign({ repo: '/tmp/r', scratch: '/tmp/q/../r/x' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: a drive path outside a drive repo proceeds', Object.assign({ repo: 'C:/p/x', scratch: 'C:/t/s' }, GOOD_SPEC), 'C:/t/s')
+armScratch('spec scratch: a diff review keeps a relative repo', { repo: '.', scratch: 7 }, '')
+
+// ---- TOOL-aEvidencedLens-4 AC1 — `prevBlob`, refused malformed and refused at round 1 (spec F1) ----
+// A refusal names `prevBlob`, so the subject ladder's own `needs \`subjects\`` throw cannot satisfy one.
+const PREV = '`prevBlob`'
+arm('fold: a malformed prevBlob at round 2 -> refused', { kind: 'spec-audit', round: 2, subjects: [{ path: 'a.md', blob: BLOB, prevBlob: 'zz' }] }, PREV)
+arm('fold: a well-formed prevBlob at round 1 -> refused', { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB, prevBlob: 'abc1235' }] }, PREV)
+arm('fold: a well-formed prevBlob at round 2 -> proceeds', { kind: 'spec-audit', round: 2, subjects: [{ path: 'a.md', blob: BLOB, prevBlob: 'abc1235' }] }, null)
+arm('fold: a diff review ignores a bad prevBlob', { round: 1, subjects: [{ path: 'a.md', blob: BLOB, prevBlob: 'zz' }] }, null)
+
 // ---- D9 — the `args` header must carry every field the file reads --------------------------------
 // BUILD-METHOD M4 sends a reader to that block for the spec-audit spelling, and it named neither
 // `kind` nor `subjects` when the rule was written to point at it. An omitted `kind` DEFAULTS rather
@@ -217,7 +266,7 @@ async function runReview(args, stubs, source) {
 const B = 'b'.repeat(40)
 const H = 'c'.repeat(40)
 const DIFF = { repo: '/tmp/r', base: B, head: H, round: 1, context: 'ctx', reviewDir: 'memory/reviews' }
-const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 's.md', blob: 'abc1234' }] }
+const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 's.md', blob: 'abc1234' }], scratch: '/tmp/s' }
 const buildProbe = (finds, verifies, base, head) => ({ commonDir: '/cd', base: base || B, head: head || H, finds: finds || [], verifies: verifies || [] })
 // One finding per lens, so five lenses make five ids and five batches of one: verify:ids-1-1 .. 5-5.
 const buildLensReturn = (label) => {
@@ -279,9 +328,38 @@ async function runWholeScriptArms() {
       const items = t.schema && t.schema.properties && t.schema.properties.findings && t.schema.properties.findings.items
       return (items && items.required) || []
     }
-    ck(sf.length === 4 && sf.every((t) => t.schema && t.schema.required.indexOf('path') !== -1 && extractItemRequired(t).indexOf('where') !== -1 &&
+    ck(sf.length === 5 && sf.every((t) => t.schema && t.schema.required.indexOf('path') !== -1 && extractItemRequired(t).indexOf('where') !== -1 &&
       t.prompt.indexOf('/review-lenses/' + rs.result.key + '/find-' + t.label.slice(5) + '.json') !== -1),
       'AC1 the spec finding schema lists path in required, and every spec lens prompt names its file')
+    // ---- TOOL-aEvidencedLens-2 AC1/AC4 — the probe policy and the evidence field, spec kind only.
+    ck(sf.length === 5 && sf.every((t) => {
+      const at = t.prompt.indexOf('PROBE POLICY')
+      return at !== -1 && t.prompt.indexOf('PROBE POLICY', at + 1) === -1 && at > t.prompt.indexOf('LENS: ') && t.prompt.indexOf('LENS: ') !== -1 &&
+        ['scratch directory /tmp/s.', '120 seconds', 'DURABILITY', '--selftest'].every((w) => t.prompt.indexOf(w, at) !== -1)
+    }) && rs.trace.filter((t) => t.label === 'synth').length === 1 && rs.trace.filter((t) => t.label === 'synth').every((t) => t.prompt.indexOf('PROBE POLICY') === -1),
+      'the probe policy sits once under LENS: in every spec find: prompt, naming the scratch, the bound, the DURABILITY exception and --selftest, and not in synth')
+    const df = r.trace.filter((t) => t.label.indexOf('find:') === 0)
+    ck(sf.length === 5 && sf.every((t) => extractItemRequired(t).indexOf('evidence') !== -1 && t.prompt.indexOf('impact,fix,evidence}]') !== -1) &&
+      df.length === 5 && df.every((t) => extractItemRequired(t).indexOf('evidence') === -1 && t.prompt.indexOf('PROBE POLICY') === -1),
+      'the spec finding schema requires evidence and its return line names it; the diff schema and prompts carry neither')
+    // AC6 - the rules are in the print and `scratch` is not.
+    const rs2 = await runReview(Object.assign({}, SPEC, { scratch: '/tmp/s2' }), ALL_OK)
+    const ruleRe = /'Time a stated wall-clock goal once, when one run of it is bounded\.'/
+    const ruled = whole.replace(ruleRe, "'Time a stated wall-clock goal twice.'")
+    const rs3 = await runReview(SPEC, ALL_OK, ruled)
+    ck(!rs2.threw && rs2.result.key === rs.result.key && ruleRe.test(whole) && ruled !== whole && !rs3.threw && rs3.result.key !== rs.result.key,
+      'the review key moves with a PROBE_RULES edit and not with scratch')
+    const rw = await runReview(Object.assign({}, SPEC, { scratch: 'C:\\t\\s' }), ALL_OK)
+    ck(!rw.threw && rw.trace.filter((t) => t.label.indexOf('find:') === 0).every((t) => t.prompt.indexOf('PROBE POLICY — repository /tmp/r, scratch directory C:/t/s.') !== -1) &&
+      rw.trace.some((t) => t.label.indexOf('find:') === 0), 'a Windows scratch reaches the PROBE POLICY line folded to C:/t/s')
+    // TOOL-aEvidencedLens-21 AC6 (replay id 37) - the per-role scratch rule is constant text, so it rides
+    // every probing prompt, both PROBE POLICY slices stay byte-identical, and no diff prompt carries it.
+    const ROLE_RULE = 'named for your own role, <lens key> for a finder or verify-<batch> for a skeptic'
+    const sv6 = rs.trace.filter((t) => t.label.indexOf('verify:') === 0)
+    const extractPolicySlice = (p) => { const at = p.indexOf('PROBE POLICY'); return at === -1 ? null : p.slice(at, p.indexOf('\n\n', at)) }
+    ck(sf.length === 5 && sv6.length > 0 && sf.concat(sv6).every((t) => t.prompt.indexOf(ROLE_RULE) !== -1 && extractPolicySlice(t.prompt) === extractPolicySlice(sf[0].prompt)) &&
+      r.trace.length > 0 && r.trace.every((t) => t.prompt.indexOf(ROLE_RULE) === -1),
+      'the per-role scratch rule is in every spec find: and verify: prompt, the two PROBE POLICY slices identical, and in no diff prompt')
   }
 
   // ---- AC4: a DEAD probe reuses nothing, dispatches every lens and says so.
@@ -331,9 +409,9 @@ async function runWholeScriptArms() {
   }
   const s1 = await runReview(SPEC, ALL_OK)
   const specMoved = Object.assign({}, SPEC, { subjects: [{ path: 's.md', blob: 'abc1235' }] })
-  const s2 = await runReview(specMoved, buildStubs({ 'resume:probe': buildProbe([buildLensFile('prior-art', s1.result ? s1.result.key : '')]) }))
+  const s2 = await runReview(specMoved, buildStubs({ 'resume:probe': buildProbe([buildLensFile('reuse', s1.result ? s1.result.key : '')]) }))
   if (checkNoThrow(s1, 'AC3 spec base') && checkNoThrow(s2, 'AC3 spec moved')) {
-    ck(s2.result.key !== s1.result.key && s2.scanSpawned('find:prior-art').length === 1,
+    ck(s2.result.key !== s1.result.key && s2.scanSpawned('find:reuse').length === 1,
       'AC3 one spec-audit subject blob moved: the lens file under the old key is dispatched')
   }
   // The key is compared to the FILE's own key field, never to the name alone.
@@ -400,6 +478,13 @@ async function runWholeScriptArms() {
     ck(r.scanSpawned('find:').join(' ') === 'find:security find:correctness find:seams find:verification find:intent',
       'the diff lens set is security correctness seams verification intent: ' + r.scanSpawned('find:').join(' '))
   }
+  // ---- TOOL-aEvidencedLens-1 AC1: the spec catalogue and its ORDER, off what a spec audit spawns. RED
+  // ---- against the base render, which spawns the four retired lenses.
+  r = await runReview(SPEC, ALL_OK)
+  if (checkNoThrow(r, 'five spec lenses')) {
+    ck(r.scanSpawned('find:').join(' ') === 'find:coherence find:grounding find:reuse find:blast-radius find:failure-envelope',
+      'spec catalogue: the spec lens set is coherence grounding reuse blast-radius failure-envelope: ' + r.scanSpawned('find:').join(' '))
+  }
 
   // ---- AC3: a note reaches its OWN lens and no other prompt. The count of five is asserted beside
   // ---- the absence, so "no other prompt carries it" cannot pass over a run that spawned fewer lenses.
@@ -416,7 +501,7 @@ async function runWholeScriptArms() {
   // ---- AC4: six malformed values refuse BEFORE any agent spawns, naming the field and the legal
   // ---- keys of the run's own kind; the control is a legal spec-kind key, which proceeds.
   const DIFF_KEYS = 'security | correctness | seams | verification | intent'
-  const SPEC_KEYS = 'underspecification | contradiction | unstated-assumption | prior-art'
+  const SPEC_KEYS = 'coherence | grounding | reuse | blast-radius | failure-envelope'
   const malformed = [
     ['a string', DIFF, 'note', DIFF_KEYS],
     ['an array', DIFF, ['security'], DIFF_KEYS],
@@ -424,6 +509,9 @@ async function runWholeScriptArms() {
     // The retired key is spelled by concatenation, so this file keeps no literal of it (spec AC7).
     ['the retired key on a diff review', DIFF, { ['regress' + 'ions']: 'n' }, DIFF_KEYS],
     ['a diff key on a spec audit', SPEC, { verification: 'n' }, SPEC_KEYS],
+    // TOOL-aEvidencedLens-1 - the retired spec key, spelled by concatenation for the same reason.
+    // RED against the base render, whose catalogue still carries it and accepts the note.
+    ['spec catalogue: the retired spec key on a spec audit', SPEC, { ['prior-' + 'art']: 'n' }, SPEC_KEYS],
     ['an empty note', DIFF, { security: '' }, DIFF_KEYS],
   ]
   for (const [what, args, notes, keys] of malformed) {
@@ -431,8 +519,8 @@ async function runWholeScriptArms() {
     ck(typeof r.threw === 'string' && r.threw.indexOf('lensNotes') !== -1 && r.threw.indexOf(keys) !== -1 && r.trace.length === 0,
       'a malformed lensNotes refuses before any agent spawns: ' + what + (r.threw ? '' : ' (accepted)'))
   }
-  r = await runReview(Object.assign({}, SPEC, { lensNotes: { 'prior-art': 'n' } }), ALL_OK)
-  ck(!r.threw && r.result && r.result.exit === 'complete' && r.scanSpawned('find:').length === 4,
+  r = await runReview(Object.assign({}, SPEC, { lensNotes: { reuse: 'n' } }), ALL_OK)
+  ck(!r.threw && r.result && r.result.exit === 'complete' && r.scanSpawned('find:').length === 5,
     'a malformed lensNotes refuses before any agent spawns: control, a spec-kind key on a spec audit, proceeds')
 
   // ---- AC5: the absence is ANNOUNCED in the log and in RUN INTEGRITY; a supplied note silences the
@@ -493,9 +581,9 @@ async function runWholeScriptArms() {
     const sv = scanPrompts(rsp, 'verify:')
     ck(dv.length === 5 && dv.every((t) => t.prompt.indexOf('PRE-EXISTING') !== -1 && t.prompt.indexOf('refute any finding one of these covers') !== -1) &&
       scanPrompts(r, 'find:').length === 5 && scanPrompts(r, 'find:').every((t) => t.prompt.indexOf('PRE-EXISTING') === -1) &&
-      sv.length === 4 && sv.every((t) => t.prompt.indexOf('PRE-EXISTING') === -1),
+      sv.length === 5 && sv.every((t) => t.prompt.indexOf('PRE-EXISTING') === -1),
       'a diff skeptic is told to refute a pre-existing defect and a by-design one')
-    ck(sv.every((t) => t.prompt.indexOf('/tmp/r') !== -1 && t.prompt.indexOf('s.md') !== -1 && t.prompt.indexOf('abc1234') !== -1) && sv.length === 4,
+    ck(sv.every((t) => t.prompt.indexOf('/tmp/r') !== -1 && t.prompt.indexOf('s.md') !== -1 && t.prompt.indexOf('abc1234') !== -1) && sv.length === 5,
       'a spec-audit skeptic prompt names the repo and every subject at its blob')
   }
   r = await runReview(Object.assign({}, DIFF, { round: 2, priorFindings: [{ ref: 'p.js:9', claim: 'PRIOR-MARK' }] }), ALL_OK)
@@ -558,7 +646,7 @@ async function runWholeScriptArms() {
   r = await runReview(Object.assign({}, SPEC, { specs: ['overview.md'] }), ALL_OK)
   if (checkNoThrow(r, 'spec sibling context')) {
     const sf = scanPrompts(r, 'find:')
-    ck(sf.length === 4 && sf.every((t) => t.prompt.indexOf('SIBLING CONTEXT') !== -1 && t.prompt.indexOf('  - overview.md') !== -1 && t.prompt.indexOf('log --format=%B') === -1),
+    ck(sf.length === 5 && sf.every((t) => t.prompt.indexOf('SIBLING CONTEXT') !== -1 && t.prompt.indexOf('  - overview.md') !== -1 && t.prompt.indexOf('log --format=%B') === -1),
       'spec-audit: specs render as sibling context')
   }
 
@@ -590,7 +678,7 @@ async function runWholeScriptArms() {
     return true
   }
   const DIFF_ORDER = ['security', 'correctness', 'seams', 'verification', 'intent']
-  const SPEC_ORDER = ['underspecification', 'contradiction', 'unstated-assumption', 'prior-art']
+  const SPEC_ORDER = ['coherence', 'grounding', 'reuse', 'blast-radius', 'failure-envelope']
   // ---- AC1: a string checklist, preamble and seven items.
   const rcl = await runReview(Object.assign({}, DIFF, { checklist: CL_STR }), ALL_OK)
   if (checkNoThrow(rcl, 'checklist string')) {
@@ -666,7 +754,7 @@ async function runWholeScriptArms() {
     ck(typeof r.threw === 'string' && r.threw.indexOf('checklist') !== -1 && r.trace.length === 0,
       'checklist refused before any agent: ' + what + (r.threw ? '' : ' (accepted)'))
   }
-  // ---- AC6: a spec audit splits over its own four lenses and sweeps the spec set.
+  // ---- AC6: a spec audit splits over its own five lenses and sweeps the spec set.
   r = await runReview(Object.assign({}, SPEC, { checklist: CL_STR }), ALL_OK)
   if (checkNoThrow(r, 'spec-audit checklist')) {
     const fp = scanPrompts(r, 'find:')
@@ -699,7 +787,7 @@ async function runWholeScriptArms() {
   const rfs = await runReview(SPEC, buildStubs({ 'find:': buildFixLens }))
   if (checkNoThrow(rfd, 'fix verdict diff') && checkNoThrow(rfs, 'fix verdict spec')) {
     const vp = scanPrompts(rfd, 'verify:').concat(scanPrompts(rfs, 'verify:'))
-    ck(vp.length === 9 && vp.every((t) => /FIXMARK-[a-z-]+/.test(t.prompt) && t.prompt.indexOf('"sound"') !== -1 &&
+    ck(vp.length === 10 && vp.every((t) => /FIXMARK-[a-z-]+/.test(t.prompt) && t.prompt.indexOf('"sound"') !== -1 &&
       t.prompt.indexOf('"unsound"') !== -1 && t.prompt.indexOf('fixVerdict') !== -1),
       'fix verdict: every verify prompt shows each finding\'s fix and asks for fixVerdict')
   }
@@ -792,7 +880,9 @@ async function runWholeScriptArms() {
   // uncertain verdict is held as neither confirmed, refuted nor unverified, and no `regraded` returns.
   const RUBRIC_END = 'how alarming the defect looks.'
   const scanRubric = (p) => {
-    const i = p.indexOf('SEVERITY RUBRIC')
+    // Anchored on the rubric's own opening: TOOL-aEvidencedLens-4's spec acquire sentence names the
+    // rubric ("graded by the SEVERITY RUBRIC below"), and a bare-name search took that line instead.
+    const i = p.indexOf('SEVERITY RUBRIC - grade')
     const j = i === -1 ? -1 : p.indexOf(RUBRIC_END, i)
     return j === -1 ? null : p.slice(i, j + RUBRIC_END.length)
   }
@@ -815,7 +905,7 @@ async function runWholeScriptArms() {
       const texts = [...new Set(rp.map((t) => scanRubric(t.prompt)))]
       return rp.length === n && texts.length === 1 && !!texts[0] && ['blocker:', 'high:', 'medium:', 'low:'].every((g) => texts[0].indexOf(g) !== -1)
     }
-    ck(scanRubricOk(rrd, 11) && scanRubricOk(rrs, 9), 'severity: one rubric reaches every finder, skeptic and synthesis prompt')
+    ck(scanRubricOk(rrd, 11) && scanRubricOk(rrs, 11), 'severity: one rubric reaches every finder, skeptic and synthesis prompt')
   }
   // ---- AC2: the item schema the skeptic was handed.
   const vs6 = scanPrompts(rrd, 'verify:')[0]
@@ -862,7 +952,7 @@ async function runWholeScriptArms() {
   }
   // ---- AC7: every verify prompt, both kinds, answers uncertain only for a blocker or high finding.
   const uvp = scanPrompts(rrd, 'verify:').concat(scanPrompts(rrs, 'verify:'))
-  ck(uvp.length === 9 && uvp.every((t) => t.prompt.indexOf('graded blocker or high is answered "uncertain"') !== -1 &&
+  ck(uvp.length === 10 && uvp.every((t) => t.prompt.indexOf('graded blocker or high is answered "uncertain"') !== -1 &&
     t.prompt.indexOf('graded medium or low (the bracketed grade) is "refuted"') !== -1 && t.prompt.indexOf('Default to refuted when uncertain') === -1),
     'severity: the uncertain rule follows the finder\'s grade')
 
@@ -1169,6 +1259,253 @@ async function runLedgerArms() {
   }
   ck(regradedSeen === 6 && regradedWrong.length === 0,
     'severity: regraded is returned only where a synthesis ran, over the six exit paths' + (regradedWrong.length ? ' — wrong on: ' + regradedWrong.join(', ') : ''))
+
+  // ==== TOOL-aEvidencedLens-3 — the spec skeptic confirms by the rubric, re-runs the evidence, and an
+  // ==== ORPHANED duplicate is demoted. One finding per lens carries one-line, two-line or no evidence;
+  // ==== two per lens put ids 1 and 2 in one batch, verify:ids-1-2.
+  const EVID = { coherence: 'cmd: grep -c x a.md -> 0', grounding: 'line one\nline two' }
+  const buildEvidenceLens = (label) => {
+    const out = buildLensReturn(label)
+    if (EVID[out.lens]) out.findings[0].evidence = EVID[out.lens]
+    return out
+  }
+  const buildPairLens = (label) => {
+    const lens = label.slice('find:'.length)
+    const mk = (n) => ({ file: lens + '.md', line: n, where: 'section ' + n, severity: 'medium', claim: lens + ' claim ' + n, impact: 'i', fix: 'f', evidence: 'read: x.md:' + n })
+    return { lens: lens, path: '/p', findings: [mk(1), mk(2)] }
+  }
+  const buildSkepticAnswers = (over) => (label, prompt) => {
+    const m = /ids ([0-9, ]+)\)/.exec(prompt)
+    const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
+    return { path: '/v', verdicts: ids.map((id) => Object.assign({ id: id, verdict: 'confirmed', reason: 'r', severity: 'medium', fixVerdict: 'sound' }, over[id] || {})) }
+  }
+  const extractProbeSlice = (p) => { const at = p.indexOf('PROBE POLICY'); return at === -1 ? null : p.slice(at, p.indexOf('\n\n', at)) }
+  r = await runReview(SPEC, buildStubs({ 'find:': buildEvidenceLens }))
+  if (checkNoThrow(r, 'spec skeptic evidence run')) {
+    const sv = r.trace.filter((t) => t.label.indexOf('verify:') === 0)
+    const sfp = r.trace.filter((t) => t.label.indexOf('find:') === 0)
+    const marks = ['AT ANY RUBRIC SEVERITY', 'NON-GOAL', 'ALREADY SAYS', 'FALSE ON RE-PROBE', 'BY DESIGN', 'duplicate of id=', 'duplicate of prior', 'PREFERENCE',
+      'could not run inside its bound', "apply the default by the finder's grade", 'a claim about code or a record is checked against that code or record',
+      "re-run the finding's evidence", "never confirm on the finder's word"]
+    ck(sv.length === 5 && sv.every((t) => marks.every((w) => t.prompt.indexOf(w) !== -1) && t.prompt.indexOf('unbuildable or wrong') === -1 && t.prompt.indexOf('not a refutation') === -1),
+      'spec skeptic: every verify prompt confirms at any rubric severity, names the six refutation cases and the grade default, and drops the old test')
+    const lineOf = (id) => sv.map((t) => t.prompt.split('\n').find((l) => l.indexOf('id=' + id + ' [') === 0)).find(Boolean) || ''
+    ck(/ \| fix: f \| evidence: cmd: grep -c x a\.md -> 0$/.test(lineOf(1)) && / \| fix: f \| evidence: line one line two$/.test(lineOf(2)) &&
+      / \| fix: f \| evidence: -$/.test(lineOf(3)) && !sv.some((t) => /^line two/m.test(t.prompt)),
+      'spec skeptic: one-line, two-line and absent evidence ride the verify line after fix, folded to one line, absent as -')
+    const fslice = sfp.length ? extractProbeSlice(sfp[0].prompt) : null
+    ck(!!fslice && sv.every((t) => extractProbeSlice(t.prompt) === fslice && t.prompt.indexOf('PROBE POLICY') < t.prompt.indexOf('Findings to judge:')),
+      'spec skeptic: the verify prompt carries the finders\' PROBE POLICY bytes, before Findings to judge:')
+  }
+  // ==== TOOL-aEvidencedLens-12 — the skeptic RE-RUNS the evidence, so it is folded by renderPromptLine:
+  // ==== line breaks only. RED against the unit's predecessor render, whose renderCell wrote `\|`.
+  const PIPED = { coherence: 'cmd: git ls-files | grep -c spec -> 11', grounding: 'cmd: git ls-files | grep x\n-> 2', reuse: '\n' }
+  r = await runReview(SPEC, buildStubs({ 'find:': (label) => { const out = buildLensReturn(label); if (PIPED[out.lens] !== undefined) out.findings[0].evidence = PIPED[out.lens]; return out } }))
+  if (checkNoThrow(r, 'spec evidence: pipe run')) {
+    const pv = r.trace.filter((t) => t.label.indexOf('verify:') === 0)
+    const pline = (id) => pv.map((t) => t.prompt.split('\n').find((l) => l.indexOf('id=' + id + ' [') === 0)).find(Boolean) || ''
+    ck(pline(1).endsWith(' | fix: f | evidence: cmd: git ls-files | grep -c spec -> 11') && pline(2).endsWith(' | evidence: cmd: git ls-files | grep x -> 2') &&
+      !pv.some((t) => t.prompt.indexOf('\\|') !== -1 || /^-> 2/m.test(t.prompt)),
+      'spec evidence: a pipe in evidence reaches the verify line unescaped, byte for byte, and a line break folds to one space')
+    ck(pline(3).endsWith(' | fix: f | evidence: -'), 'spec evidence: evidence that is only a line break reads | evidence: -')
+  }
+  r = await runReview(SPEC, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers({ 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }) }))
+  if (checkNoThrow(r, 'spec skeptic kept duplicate')) {
+    const row = (r.result.ledger || []).find((e) => e.id === 2) || {}
+    ck(r.trace.some((t) => t.label === 'verify:ids-1-2') && row.verdict === 'refuted' && row.reason === 'duplicate of id=1' && !r.logs.some((l) => /DUPLICATE of an id/.test(l)),
+      'spec skeptic: a duplicate of a confirmed survivor in its batch stays refuted, unannounced')
+  }
+  const runOrphanArm = async (over, what) => {
+    r = await runReview(SPEC, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers(over) }))
+    if (!checkNoThrow(r, 'spec skeptic orphan ' + what)) return
+    const row = (r.result.ledger || []).find((e) => e.id === 2) || {}
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+    ck(r.result.unverified >= 1 && row.verdict === 'unverified' && row.reason === 'duplicate of an unconfirmed id' &&
+      r.logs.some((l) => l.indexOf('WARNING:') === 0 && /DUPLICATE of an id/.test(l) && / ids 2$/.test(l)) &&
+      ri.indexOf('1 orphaned duplicate refutation(s) demoted to unverified') !== -1,
+      'spec skeptic: a duplicate of ' + what + ' is demoted to unverified, ledgered, warned and counted in RUN INTEGRITY')
+  }
+  await runOrphanArm({ 1: { verdict: 'refuted', reason: 'r' }, 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }, 'a refuted survivor')
+  await runOrphanArm({ 2: { verdict: 'refuted', reason: 'duplicate of id=2' } }, 'its own id')
+  await runOrphanArm({ 2: { verdict: 'refuted', reason: 'duplicate of id=3' } }, 'an id in another batch')
+  r = await runReview(DIFF, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers({ 1: { verdict: 'refuted', reason: 'r' }, 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }) }))
+  if (checkNoThrow(r, 'spec skeptic diff kind')) {
+    const row = (r.result.ledger || []).find((e) => e.id === 2) || {}
+    const dv = r.trace.filter((t) => t.label.indexOf('verify:') === 0)
+    ck(dv.length > 0 && dv.every((t) => t.prompt.indexOf(' | evidence: ') === -1 && t.prompt.indexOf('PROBE POLICY') === -1) &&
+      row.verdict === 'refuted' && !r.logs.some((l) => /DUPLICATE of an id/.test(l)),
+      'spec skeptic: a diff-kind verify prompt carries no evidence field and no probe policy, and its duplicate refutation is not scanned')
+  }
+
+  // ==== TOOL-aEvidencedLens-4 — a spec fold round reads its diff, and a moved subject is graded, not
+  // ==== fixed at BLOCKER. Every arm is RED against the parent render, which prints no FOLD DIFF, no
+  // ==== DEGRADED, no `move check:` clause and asks the probe for no hash.
+  const extractIntegrity = (run) => { const sp = run.trace.find((t) => t.label === 'synth'); return sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : '' }
+  const P40 = 'a'.repeat(40)
+  const D40 = 'd'.repeat(40)
+  const E40 = 'e'.repeat(40)
+  const THREE = [{ path: 'one.md', blob: D40, prevBlob: P40 }, { path: 'two.md', blob: E40, prevBlob: E40.slice(0, 9) }, { path: 'three.md', blob: 'abc1234' }]
+  r = await runReview(Object.assign({}, SPEC, { round: 2, subjects: THREE, priorFindings: [{ ref: 'one.md:section 2', claim: 'PRIOR' }] }), ALL_OK)
+  if (checkNoThrow(r, 'fold three shapes')) {
+    const fv = scanPrompts(r, 'find:').concat(scanPrompts(r, 'verify:'))
+    const extractFoldLine = (p, path) => p.split('\n').find((l) => l.indexOf('  - ' + path + ': ') === 0) || ''
+    ck(fv.length === 10 && fv.every((t) => t.prompt.indexOf('FOLD DIFF') !== -1 && t.prompt.indexOf('first-round') === -1 &&
+      extractFoldLine(t.prompt, 'one.md') === '  - one.md: git -C /tmp/r diff ' + P40 + ' ' + D40 &&
+      extractFoldLine(t.prompt, 'two.md') === '  - two.md: unchanged since the previous round' &&
+      extractFoldLine(t.prompt, 'three.md') === '  - three.md: no prevBlob was supplied - review this file whole'),
+      'fold: a round-2 spec run carries each subject\'s FOLD DIFF line in every find: and verify: prompt')
+    ck(r.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('three.md') !== -1) && !r.logs.some((l) => l.indexOf('WARNING:') === 0 && /\b(one|two)\.md/.test(l)) &&
+      extractIntegrity(r).indexOf('fold diff: 2 of 3 subject(s) carried prevBlob.') !== -1,
+      'fold: a WARNING names the subject lacking prevBlob, and RUN INTEGRITY says 2 of 3')
+  }
+  r = await runReview(Object.assign({}, SPEC, { round: 2 }), ALL_OK)
+  if (checkNoThrow(r, 'fold degraded')) {
+    const ff = scanPrompts(r, 'find:')
+    ck(ff.length === 5 && r.trace.every((t) => t.prompt.indexOf('first-round review') === -1) &&
+      ff.every((t) => t.prompt.indexOf('DEGRADED fold review') !== -1 && t.prompt.indexOf('none supplied for this round-2 review') !== -1 && t.prompt.indexOf('FOLD DIFF') === -1) &&
+      r.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('DEGRADED') !== -1) && extractIntegrity(r).indexOf('DEGRADED') !== -1,
+      'fold: a round-2 run with neither input is a DEGRADED fold review, warned and in RUN INTEGRITY, never first-round')
+  }
+  const MOVED40 = 'f0' + '1'.repeat(38)
+  const TWO = Object.assign({}, SPEC, { subjects: [{ path: 'm.md', blob: 'abc1234' }, { path: 'u.md', blob: 'abc9999' }] })
+  r = await runReview(TWO, buildStubs({ 'resume:probe': Object.assign(buildProbe(), { blobs: [{ path: 'm.md', now: MOVED40 }, { path: 'u.md', now: '' }] }) }))
+  if (checkNoThrow(r, 'fold moved')) {
+    const ri = extractIntegrity(r)
+    ck(r.logs.some((l) => l.indexOf('WARNING: m.md MOVED') === 0 && l.indexOf('abc1234') !== -1 && l.indexOf(MOVED40) !== -1) && !r.logs.some((l) => l.indexOf('u.md MOVED') !== -1) &&
+      scanPrompts(r, 'find:').length === 5 && scanPrompts(r, 'find:').every((t) => t.prompt.indexOf('  - m.md  blob abc1234  MOVED since pinned, now ' + MOVED40) !== -1 && t.prompt.indexOf('  - u.md  blob abc9999\n') !== -1) &&
+      ri.indexOf('m.md MOVED from pinned abc1234 to ' + MOVED40) !== -1 && ri.indexOf('UNCHECKED, no usable current blob: u.md.') !== -1,
+      'fold: a moved and an unusable blob: the WARNING, the MOVED SUBJECT line and RUN INTEGRITY name each')
+    const pp = r.trace.find((t) => t.label === 'resume:probe')
+    ck(!!pp && pp.prompt.indexOf('hash-object') !== -1 && pp.prompt.indexOf('  - m.md') !== -1 && pp.prompt.indexOf('  - u.md') !== -1 &&
+      !!pp.schema.properties.blobs && pp.schema.required.indexOf('blobs') === -1 &&
+      r.trace.every((t) => t.prompt.indexOf('as a BLOCKER finding') === -1 && t.prompt.indexOf('diff -u - ') === -1) &&
+      scanPrompts(r, 'find:').every((t) => t.prompt.indexOf('diff <blob> -- <path>') !== -1 && t.prompt.indexOf('SEVERITY RUBRIC') !== -1),
+      'fold: the spec probe asks for hash-object per subject with blobs optional, and no prompt carries the fixed BLOCKER')
+  }
+  r = await runReview(TWO, buildStubs({ 'resume:probe': null }))
+  if (checkNoThrow(r, 'fold null probe')) ck(extractIntegrity(r).indexOf('move check: the resume probe died') !== -1, 'fold: a null probe reads as the resume probe died, never as no move')
+  r = await runReview(TWO, ALL_OK)
+  if (checkNoThrow(r, 'fold no blobs key')) {
+    const ri = extractIntegrity(r)
+    ck(ri.indexOf('UNCHECKED, no usable current blob: m.md, u.md.') !== -1 && ri.indexOf('the resume probe died') === -1,
+      'fold: a live probe with no blobs key leaves every subject UNCHECKED, not died')
+  }
+  // TOOL-aEvidencedLens-21 AC9 (closing review L2) - the NOT-MOVED arm: a 40-hex `now` that BEGINS with the
+  // pin is the same blob. Red on a render copy whose MOVED predicate always holds.
+  const SAME40 = 'abc1234' + '0'.repeat(33)
+  const PAIR = Object.assign({}, SPEC, { subjects: [{ path: 'm.md', blob: 'abc1234' }, { path: 'v.md', blob: 'abc9999' }] })
+  r = await runReview(PAIR, buildStubs({ 'resume:probe': Object.assign(buildProbe(), { blobs: [{ path: 'm.md', now: SAME40 }, { path: 'v.md', now: MOVED40 }] }) }))
+  if (checkNoThrow(r, 'fold unmoved beside moved')) {
+    ck(!r.logs.some((l) => l.indexOf('m.md MOVED') !== -1) && r.logs.some((l) => l.indexOf('WARNING: v.md MOVED') === 0) &&
+      scanPrompts(r, 'find:').length === 5 && scanPrompts(r, 'find:').every((t) => t.prompt.indexOf('  - m.md  blob abc1234\n') !== -1),
+      'fold: a now beginning with the pin is NOT MOVED beside a moved subject: no WARNING and no MOVED suffix')
+  }
+  r = await runReview(Object.assign({}, SPEC, { subjects: [{ path: 'm.md', blob: 'abc1234' }] }),
+    buildStubs({ 'resume:probe': Object.assign(buildProbe(), { blobs: [{ path: 'm.md', now: SAME40 }] }) }))
+  if (checkNoThrow(r, 'fold unmoved alone')) {
+    ck(!r.logs.some((l) => l.indexOf('m.md MOVED') !== -1) && scanPrompts(r, 'find:').length === 5 &&
+      scanPrompts(r, 'find:').every((t) => t.prompt.indexOf('  - m.md  blob abc1234\n') !== -1) && extractIntegrity(r).indexOf('no checked subject moved') !== -1,
+      'fold: the sole subject, unmoved, reads no checked subject moved in RUN INTEGRITY')
+  }
+  const deriveFoldKey = async (pb) => {
+    const x = await runReview(Object.assign({}, SPEC, { round: 2, priorFindings: [{ ref: 'a', claim: 'b' }], subjects: [{ path: 's.md', blob: 'abc1234', prevBlob: pb }] }), ALL_OK)
+    return x.result ? x.result.key : 'threw'
+  }
+  const k0 = await deriveFoldKey(undefined)
+  const k1 = await deriveFoldKey('abc1230')
+  const k2b = await deriveFoldKey('abc1231')
+  ck(k1 !== 'threw' && k0 !== k1 && k1 !== k2b && k0 !== k2b, 'fold: the review key moves with prevBlob')
+  await runLensYieldArms()
+}
+
+// ==== TOOL-aEvidencedLens-6 — `lensYield`, one row per running lens, unique defects counted by ITEM ====
+// Every arm is RED against the parent render, which returns no `lensYield` on any path, logs no
+// `lens yield:` line and puts no LENS YIELD block in the synthesis prompt.
+async function runLensYieldArms() {
+  const LORDER = ['security', 'correctness', 'seams', 'verification', 'intent']
+  const scanYield = (run, n) => !!run.result && Array.isArray(run.result.lensYield) && run.result.lensYield.length === n
+  const buildSynthOwn = (label, prompt) => ({ path: 'memory/reviews/r.md', summary: 's',
+    items: [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => ({ severity: 'HIGH', ids: [parseInt(x[1], 10)] })) })
+  const buildVerdictById = (pick) => (label, prompt) => {
+    const m = /ids ([0-9, ]+)\)/.exec(prompt)
+    const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
+    return { path: '/cd/v.json', verdicts: ids.map((id) => ({ id: id, verdict: pick(id), reason: 'r' })) }
+  }
+  // ---- AC1: each id in its own item credits every lens one unique defect; one item holding all five
+  // ---- credits none, which a raw-finding `unique` would credit five times.
+  let r = await runReview(DIFF, buildStubs({ synth: buildSynthOwn }))
+  if (checkNoThrow(r, 'lens yield own items')) {
+    ck(scanYield(r, 5) && r.result.lensYield.every((e, i) => e.lens === LORDER[i] && e.returned === true && e.raw === 1 && e.confirmed === 1 &&
+      e.precision === 1 && e.defects === 1 && e.unique === 1), 'lens yield: each id in its own item reads raw, confirmed, precision, defects and unique 1 per lens')
+  }
+  r = await runReview(DIFF, ALL_OK)
+  if (checkNoThrow(r, 'lens yield shared item')) {
+    ck(scanYield(r, 5) && r.result.lensYield.every((e) => e.defects === 1 && e.unique === 0), 'lens yield: one item holding all five ids reads defects 1 and unique 0 on every row')
+  }
+  // ---- AC2: a refuted lens reads precision 0; an uncertain one reads precision null, and unverified holds it.
+  r = await runReview(DIFF, buildStubs({ 'verify:': buildVerdictById((id) => (id === 1 ? 'refuted' : id === 2 ? 'uncertain' : 'confirmed')) }))
+  if (checkNoThrow(r, 'lens yield mixed verdicts')) {
+    const y = scanYield(r, 5) ? r.result.lensYield : []
+    ck(y.length === 5 && y[0].refuted === 1 && y[0].precision === 0 && y[0].defects === 0 &&
+      y[1].uncertain === 1 && y[1].unverified === 1 && y[1].precision === null && y[1].raw === 1,
+      'lens yield: a refuted lens reads precision 0 and defects 0, an uncertain one unverified 1 and precision null')
+  }
+  // ---- AC3: a tally fault nulls defects and unique on every row; confirmed stays an integer.
+  r = await runReview(DIFF, buildStubs({ synth: buildSynth(3) }))
+  if (checkNoThrow(r, 'lens yield tally fault')) {
+    ck(r.logs.some((l) => l.indexOf('WARNING: the synthesis item list') === 0) && scanYield(r, 5) &&
+      r.result.lensYield.every((e) => e.defects === null && e.unique === null && Number.isInteger(e.confirmed)),
+      'lens yield: a tally fault nulls defects and unique on every row rather than guessing a split')
+  }
+  // ---- AC4: a dead synthesis keeps the ledger counts and nulls the item figures; a dead lens keeps its row.
+  r = await runReview(DIFF, buildStubs({ synth: null }))
+  if (checkNoThrow(r, 'lens yield dead synth')) {
+    ck(scanYield(r, 5) && r.result.exit === 'deferred-platform' && r.result.lensYield.every((e) => e.confirmed === 1 && e.defects === null && e.unique === null),
+      'lens yield: a dead synthesis returns the ledger counts and null defects and unique')
+  }
+  r = await runReview(DIFF, buildStubs({ 'find:seams': null }))
+  if (checkNoThrow(r, 'lens yield dead lens')) {
+    ck(scanYield(r, 5) && r.result.exit === 'deferred-platform' && r.result.lensYield[2].lens === 'seams' && r.result.lensYield[2].returned === false &&
+      r.result.lensYield[2].raw === 0 && r.result.lensYield[0].returned === true, 'lens yield: a dead lens keeps its row, returned false, on the deferred return')
+  }
+  // ---- AC5: the no-finding, every-refuted and every-lens-dead exits each carry one row per running lens.
+  r = await runReview(DIFF, buildStubs({ 'find:': buildEmptyLens }))
+  if (checkNoThrow(r, 'lens yield no finding')) {
+    ck(scanYield(r, 5) && r.result.note === 'clean: 0 findings' && r.result.lensYield.every((e) => e.returned && e.raw === 0 && e.defects === null),
+      'lens yield: the no-finding exit carries a row per lens')
+  }
+  r = await runReview(DIFF, buildStubs({ 'verify:': buildVerdicts('refuted') }))
+  if (checkNoThrow(r, 'lens yield every refuted')) {
+    ck(scanYield(r, 5) && r.result.note === 'all findings adjudicated and refuted' && r.result.lensYield.every((e) => e.refuted === 1 && e.precision === 0 && e.defects === null),
+      'lens yield: the every-refuted exit carries a row per lens')
+  }
+  r = await runReview(DIFF, buildStubs({ 'find:': null }))
+  if (checkNoThrow(r, 'lens yield every lens dead')) {
+    ck(scanYield(r, 5) && r.result.lensYield.every((e) => e.returned === false && e.raw === 0 && e.confirmed === 0 && e.precision === null),
+      'lens yield: the every-lens-dead exit carries a returned-false row of zeros per lens')
+  }
+  // ---- AC6: the spec synthesis prompt carries the block after the review-shape sentence, and the log a line per lens.
+  r = await runReview(SPEC, ALL_OK)
+  if (checkNoThrow(r, 'lens yield spec block')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const at = sp ? sp.prompt.indexOf('<<<LENS YIELD\n') : -1
+    const end = at === -1 ? -1 : sp.prompt.indexOf('\nLENS YIELD>>>', at)
+    const block = end === -1 ? '' : sp.prompt.slice(at, end)
+    const keys = scanYield(r, 5) ? r.result.lensYield.map((e) => e.lens) : []
+    ck(keys.length === 5 && block !== '' && sp.prompt.indexOf('precision 1.00. \n\nLENS YIELD') !== -1 &&
+      keys.every((k) => block.indexOf('| ' + k + ' | yes | 1 | 1 | 0 | 0 | 0 | 1.00 |') !== -1),
+      'lens yield: the spec synthesis prompt carries the marked block, a row per running lens with its precision')
+    const yl = r.logs.filter((l) => l.indexOf('lens yield: ') === 0)
+    ck(yl.length === 5 && keys.every((k) => yl.some((l) => l.indexOf('lens yield: ' + k + ' returned yes') === 0 && l.indexOf('defects 1') !== -1 && l.indexOf('unique 0') !== -1)),
+      'lens yield: one log line per lens names defects and unique')
+  }
+  // ---- AC9: a light run has no row for a skipped lens.
+  r = await runReview(Object.assign({}, DIFF, { intensity: 'light' }), ALL_OK)
+  if (checkNoThrow(r, 'lens yield light')) {
+    ck(scanYield(r, 3) && r.result.skippedLenses.length === 2 && r.result.lensYield.every((e) => r.result.skippedLenses.indexOf(e.lens) === -1),
+      'lens yield: a light run carries a row per running lens and none for a skipped one')
+  }
 }
 
 runWholeScriptArms().then(() => {
@@ -1223,7 +1560,27 @@ printf '%s\n' "$out"
 # RAISED 175 -> 180 by TOOL-aSightedSkeptic-10: 5 assertions, counted off the block — the synthesis-death
 # log's binding grade and rendered fix (2), the deferred log's binding grade (1), one uncertain answer
 # apart from no verdict (1) and an all-uncertain note (1).
-FLOOR_ASSERTIONS=180
+# RAISED 180 -> 182 by TOOL-aEvidencedLens-1: 2 assertions, counted off the block — the retired spec
+# key refused by lensNotes (1) and the five spec lenses in catalogue order (1).
+# RAISED 182 -> 197 by TOOL-aEvidencedLens-2: 15 assertions, counted off the block — eleven prelude
+# `spec scratch:` arms (11), the probe policy under LENS: (1), the evidence field on the spec kind only
+# (1), the print moving with the rules and not with scratch (1) and the folded Windows scratch (1).
+# RAISED 197 -> 205 by TOOL-aEvidencedLens-3: 8 assertions, counted off the block — the skeptic sentence
+# (1), the evidence on the verify line (1), the shared probe-policy bytes (1), a kept duplicate (1), three
+# orphaned duplicates (3) and the untouched diff kind (1).
+# RAISED 205 -> 217 by TOOL-aEvidencedLens-4: 12 assertions, counted off the block — four prelude `fold:`
+# prevBlob arms (4), the three FOLD DIFF shapes and their WARNING and count (2), the DEGRADED round (1),
+# the moved and unusable blobs and the probe's hash-object ask (2), a null probe (1), a probe with no
+# blobs key (1) and the key over prevBlob (1).
+# RAISED 217 -> 229 by TOOL-aEvidencedLens-6: 12 assertions, counted off the block — own and shared items (2),
+# mixed verdicts (1), a tally fault (1), a dead synthesis and a dead lens (2), the no-finding, every-refuted
+# and every-lens-dead exits (3), the spec synthesis block and its log lines (2) and a light run (1).
+# RAISED 229 -> 231 by TOOL-aEvidencedLens-12: 2 assertions, counted off the `spec evidence:` block — a
+# piped one-line and two-line evidence unescaped on one line (1) and line-break-only evidence as - (1).
+# RAISED 231 -> 240 by TOOL-aEvidencedLens-21: 9 assertions, counted off the block — six prelude `spec
+# scratch:` arms for a relative repo, both MSYS spellings, a .. segment and two controls (6), the per-role
+# scratch rule (1) and the unmoved subject beside a moved one and alone (2).
+FLOOR_ASSERTIONS=240
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
