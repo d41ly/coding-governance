@@ -180,3 +180,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T00:30:05Z decision · item TOOL-aMendedFleet-14 has no triage ask id to hold its aged unlabelled asks on · reason Options: the main loop mints one TOOL-aMendedFleet ask id for the triage ask and writes it into this unit's brief, then re-dispatches; or a child mints it. Refused: the unit's spec (design step 1 and its consumes-from edge) parks a pass whose brief names no minted id, and fan-out children never mint ids under template section 2, since only the orchestrator holds the family high-water. Nothing was built or dispatched.
 
 2026-10-05T00:32:33Z brief · item TOOL-aMendedFleet-14 · reason ad4bf7f9b3ec memory/builds/aMendedFleet/prompts/2026-10-05-prompt-TOOL-aMendedFleet-14-1-build-brief.md
+
+2026-10-05T00:34:44Z dispatch · item 7604b576 TOOL-aMendedFleet-14 · reason memory/builds/aMendedFleet/BACKLOG.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-14.md memory/builds/aMendedFleet/README.md memory/backlog/TOOL.md memory/backlog/DEPL.md

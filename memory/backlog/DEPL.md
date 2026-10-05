@@ -16,29 +16,29 @@ Cite ids, never line numbers.
 
 | Ask | Status | Sev | Decided by | Filed | Summary |
 |---|---|---|---|---|---|
-| [DEPL-aFerriedDossier-2](../builds/aFerriedDossier/BACKLOG.md) | OPEN | — | — | 2026-08-16 | Widen unit 3 S5's fixture family with a non-default-prefix entry and… |
-| [DEPL-aFerriedDossier-3](../builds/aFerriedDossier/BACKLOG.md) | OPEN | — | — | 2026-08-16 | 13 defects inCMS measured in this tree with line numbers: the discarded… |
-| [DEPL-aHoistedPass-2](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE ADOPTER GAP IS NARROWED, NOT CLOSED — three clauses left: an… |
-| [DEPL-aHoistedPass-5](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | A MIS-SPELLED KEY IS INVISIBLE TO BOTH ARMS. requires and requires_if… |
-| [DEPL-aHoistedPass-6](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | cmd_apply's installed-set arm has no standing BEHAVIOURAL reader: its… |
-| [DEPL-aHoistedPass-7](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | RECIPE MODE IS UNRESOLVED AND THE CARRIER AND THE REGISTRY DISAGREE… |
-| [DEPL-aHoistedPass-8](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | whether a runId survives a compaction is UNVERIFIED, so the prefix… |
-| [DEPL-aHoistedPass-9](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | refusal_join.py's SHRINK-ONLY FLOOR TRAILS ITS POPULATION: BRANCH_PIN… |
+| [DEPL-aFerriedDossier-2](../builds/aFerriedDossier/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-16 | Widen unit 3 S5's fixture family with a non-default-prefix entry and… |
+| [DEPL-aFerriedDossier-3](../builds/aFerriedDossier/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-16 | 13 defects inCMS measured in this tree with line numbers: the discarded… |
+| [DEPL-aHoistedPass-2](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | THE ADOPTER GAP IS NARROWED, NOT CLOSED — three clauses left: an… |
+| [DEPL-aHoistedPass-5](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | A MIS-SPELLED KEY IS INVISIBLE TO BOTH ARMS. requires and requires_if… |
+| [DEPL-aHoistedPass-6](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | cmd_apply's installed-set arm has no standing BEHAVIOURAL reader: its… |
+| [DEPL-aHoistedPass-7](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | RECIPE MODE IS UNRESOLVED AND THE CARRIER AND THE REGISTRY DISAGREE… |
+| [DEPL-aHoistedPass-8](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | whether a runId survives a compaction is UNVERIFIED, so the prefix… |
+| [DEPL-aHoistedPass-9](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | refusal_join.py's SHRINK-ONLY FLOOR TRAILS ITS POPULATION: BRANCH_PIN… |
 | [DEPL-aHoistedPass-10](../builds/aHoistedPass/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-64 | 2026-09-05 | A NINTH unattended VERSION CARRIER IS OUTSIDE BOTH POPULATIONS… |
 | [DEPL-aRepatriatedFork-22](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-24 | govkit check takes ~4 min at inCMS: DEPL-13's print-mode probes run its… |
 | [DEPL-aRepatriatedFork-23](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-26 | nc runs its own recall hook outside the kit, beside a copy gov now… |
-| [DEPL-aSealedCaravan-3](../builds/aSealedCaravan/BACKLOG.md) | OPEN | — | — | 2026-08-11 | WIRE-INTO-PROJECT.md sends the reader to a section 2a for the… |
-| [DEPL-aTetheredConvoy-9](../builds/aTetheredConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-17 | apply over the DEFAULT selection ran needs unit 5's [[outcome]]… |
-| [DEPL-dCarriedReceipt-16](../builds/dCarriedReceipt/BACKLOG.md) | OPEN | — | — | 2026-08-24 | memory-tree renders a record's whole Serves id list into one… |
+| [DEPL-aSealedCaravan-3](../builds/aSealedCaravan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | WIRE-INTO-PROJECT.md sends the reader to a section 2a for the… |
+| [DEPL-aTetheredConvoy-9](../builds/aTetheredConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | apply over the DEFAULT selection ran needs unit 5's [[outcome]]… |
+| [DEPL-dCarriedReceipt-16](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-24 | memory-tree renders a record's whole Serves id list into one… |
 | [DEPL-dPolishedVitrine-1](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | update keeps a schema-3 row's role, so an engine-to-rendered move stays… |
 | [DEPL-dPolishedVitrine-2](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | a [[regenerate]] runs only when a row verdict touched its kit, so one… |
-| [DEPL-dRatifiedSeam-2](../builds/dRatifiedSeam/BACKLOG.md) | OPEN | — | — | 2026-09-04 | LANDED SOURCES SIT OUTSIDE THE VERIFY AND ROLLBACK PASS, so a kit whose… |
-| [DEPL-dRatifiedSeam-3](../builds/dRatifiedSeam/BACKLOG.md) | OPEN | — | — | 2026-09-04 | rename_dests IS POPULATED LAZILY, so a rename destination whose row… |
-| [DEPL-dRatifiedSeam-4](../builds/dRatifiedSeam/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE TRACKED-COUNT PREDICATE NEEDS A SET AND THE OBVIOUS FIX IS WRONG:… |
-| [DEPL-dRatifiedSeam-5](../builds/dRatifiedSeam/BACKLOG.md) | OPEN | — | — | 2026-09-04 | index_read HAS NO LIVENESS ON GIT'S EXIT CODE: it batches 400 paths… |
-| [DEPL-dRatifiedSeam-6](../builds/dRatifiedSeam/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE GOVKIT SELFTEST GRADES COMMIT TOPOLOGY RATHER THAN THE TREE: update… |
-| [DEPL-dRetiredFork-11](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | govkit update names a --add-kits flag the parser does not define… |
-| [DEPL-dRetiredFork-12](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | gov intake leaves gov-identical files in no register: 11 at NicoCares,… |
-| [DEPL-dSealedTally-6](../builds/dSealedTally/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE _decided LOOP EXISTS TWICE and only an arm keeps the copies honest:… |
-| [DEPL-dSettledRoster-1](../builds/dSettledRoster/BACKLOG.md) | OPEN | — | — | 2026-08-20 | govkit apply appends its eol=lf pins LAST to a target's .gitattributes… |
-| [DEPL-dSettledRoster-2](../builds/dSettledRoster/BACKLOG.md) | OPEN | — | — | 2026-08-20 | a govkit apply against a kind = "manifest" target runs that target's… |
+| [DEPL-dRatifiedSeam-2](../builds/dRatifiedSeam/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | LANDED SOURCES SIT OUTSIDE THE VERIFY AND ROLLBACK PASS, so a kit whose… |
+| [DEPL-dRatifiedSeam-3](../builds/dRatifiedSeam/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | rename_dests IS POPULATED LAZILY, so a rename destination whose row… |
+| [DEPL-dRatifiedSeam-4](../builds/dRatifiedSeam/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE TRACKED-COUNT PREDICATE NEEDS A SET AND THE OBVIOUS FIX IS WRONG:… |
+| [DEPL-dRatifiedSeam-5](../builds/dRatifiedSeam/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | index_read HAS NO LIVENESS ON GIT'S EXIT CODE: it batches 400 paths… |
+| [DEPL-dRatifiedSeam-6](../builds/dRatifiedSeam/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE GOVKIT SELFTEST GRADES COMMIT TOPOLOGY RATHER THAN THE TREE: update… |
+| [DEPL-dRetiredFork-11](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | govkit update names a --add-kits flag the parser does not define… |
+| [DEPL-dRetiredFork-12](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | gov intake leaves gov-identical files in no register: 11 at NicoCares,… |
+| [DEPL-dSealedTally-6](../builds/dSealedTally/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE _decided LOOP EXISTS TWICE and only an arm keeps the copies honest:… |
+| [DEPL-dSettledRoster-1](../builds/dSettledRoster/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | govkit apply appends its eol=lf pins LAST to a target's .gitattributes… |
+| [DEPL-dSettledRoster-2](../builds/dSettledRoster/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | a govkit apply against a kind = "manifest" target runs that target's… |

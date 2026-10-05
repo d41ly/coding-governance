@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-14 — bulk backlog triage: aged unlabelled asks deferred on one triage ask, and five fixed-but-OPEN asks disposed
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 14
+**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · advances TOOL-aMendedFleet-106 · ratified 2026-10-04 · order 14
 
 <!-- gen:spec-records -->
 
@@ -156,7 +156,9 @@ The last three are generated; the dispatch declares them as the generator's writ
   `TOOL-aReplayedCard-9`; and `TOOL-aProbedToolkit-10` is not terminal.
   Red when: any of the five reads otherwise, or the duplicate's survivor was closed with it.
 - **AC4** — When `python tools/memory-tree/gen_build_index.py --asks <triage-id>` runs after the
-  pass, it prints `sev LOW`, an `accept` clause, and `TOOL-aMendedFleet-14` among its live specs.
+  pass, it prints `sev LOW` and an `accept` clause; and with this spec's status read as `SPECCED`,
+  it prints `TOOL-aMendedFleet-14` among its live specs and as its decider. A CLOSED spec is not
+  live, so the pass commit's own header cannot show the second half; the KEEP row carries it.
   Red when: the ask carries no severity or acceptance, or this spec's header does not advance it.
 - **AC5** — When `wc -c` runs over this build's `BACKLOG.md` after the pass, the byte count is below
   the `INDEX_CAP_BYTES` value `.memory-tree.conf` declares.
@@ -203,6 +205,12 @@ reads the same ask projection through its backlog signals.
 
 - rev-1 · 2026-10-04 · initial draft, from the live ask projection, the fold and the row-kinds rule
   at base.
+- rev-2 · 2026-10-05 · S4's header verb: the status header advances `TOOL-aMendedFleet-106`, the
+  triage ask id the orchestrator minted into this unit's brief. The pass re-derived S1 at 2026-10-05
+  with a cutoff of 2026-09-05: 298 asks, 277 TOOL and 21 DEPL across 61 home folders, above the
+  pinned 266 chiefly because the cutoff moved a day and admitted the 50 asks filed 2026-09-05.
+  AC4 reworded: its live-spec half reads a status this same commit flips to CLOSED, so it is now
+  observed with the header read as `SPECCED`, which is what it always measured.
 
 ## 10. Reuse audit
 

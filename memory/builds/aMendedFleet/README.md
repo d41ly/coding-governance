@@ -190,7 +190,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-11 — the review protocol and the review harness point reviewers at the filtered asks call](spec/2026-10-04-spec-TOOL-aMendedFleet-11.md) | 11 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-12 — LIVE.md carries each build's last record date and splits ACTIVE from DORMANT](spec/2026-10-04-spec-TOOL-aMendedFleet-12.md) | 12 | 2 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-13 — LIVE.md counts each build's landed-unclosed units from drift-audit's own join](spec/2026-10-04-spec-TOOL-aMendedFleet-13.md) | 13 | 2 | CLOSED | rev-2 | 2026-10-04 |
-| [TOOL-aMendedFleet-14 — bulk backlog triage: aged unlabelled asks deferred on one triage ask, and five fixed-but-OPEN asks disposed](spec/2026-10-04-spec-TOOL-aMendedFleet-14.md) | 14 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-14 — bulk backlog triage: aged unlabelled asks deferred on one triage ask, and five fixed-but-OPEN asks disposed](spec/2026-10-04-spec-TOOL-aMendedFleet-14.md) | 14 | 1 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aMendedFleet-15 — the shrink-only pin on `backlog_asks_unlabelled` is re-armed](spec/2026-10-04-spec-TOOL-aMendedFleet-15.md) | 15 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-16 — `gotchas.py --for-diff` ranks classes by anchor specificity and cuts in tiers](spec/2026-10-04-spec-TOOL-aMendedFleet-16.md) | 16 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-17 — `tier2-review.js` keeps each finding's bug-class label in the committed appendix](spec/2026-10-04-spec-TOOL-aMendedFleet-17.md) | 17 | 2 | SPECCED | rev-2 | 2026-10-04 |
