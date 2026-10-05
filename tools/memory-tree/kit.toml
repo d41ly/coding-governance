@@ -294,6 +294,7 @@ name = "marker contracts"
 subject = "repo"
 argv = ["bash", "{kit}/marker-contract.test.sh"]
 guard = []
+doc_reads = []
 
 [[gate_leg]]
 name = "harness arms (fail branches armed or pinned)"

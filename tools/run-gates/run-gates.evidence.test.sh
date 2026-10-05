@@ -146,8 +146,10 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=112
+FLOOR_ASSERTIONS=115
+# MERGED 112 / 87 -> 115 at the reconcile with origin/main 290d0d2d5: base 84, plus this branch's 28, plus main's 3.
 # RAISED 110 -> 112 by TOOL-aGraftedHelix-7: AC10's two assertions over a reading taken during a memory pause.
+# RAISED 84 -> 87 by TOOL-dThriftyLanding-2: the shared-stamp control and its two assertions.
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -331,7 +333,7 @@ rec_repo() {  # -> sets REC_T (worktree) and REC_GD (git dir)
 #
 # This is the `inputs-inside-the-subjects-reach` class: the harness measuring the subject shares an
 # input with it. Every call site's own `KEY=VALUE` still wins, because `-u` is applied first.
-rec_run()  { ( cd "$REC_T" && env -u GATE_BASE -u GATE_FULL -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES "$@" bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1; echo $? ); }
+rec_run()  { ( cd "$REC_T" && env -u GATE_BASE -u GATE_FULL -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES -u GATE_DOCS_BASE "$@" bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1; echo $? ); }
 rec_legs() { printf '%s\n' "$1" > "$REC_T/${PFX}gate-legs.json"
              ( cd "$REC_T" && git add -A && git commit -qm legs ) >/dev/null 2>&1; }
 rec_dir()  { printf '%s/gate-run/%s' "$REC_GD" "$(cat "$REC_GD/gate-run/current" 2>/dev/null)"; }
@@ -450,6 +452,29 @@ else
   nope "the control failed: a clean fully-green run did not stamp, so every arm below proves nothing"
 fi
 rec_done
+
+# --- TOOL-dThriftyLanding-2: a green earned in a LINKED worktree is shared through the common dir ---
+# Its own git dir keeps its stamp, the common dir gains `gate-full-green.shared` carrying the same sha,
+# and the common dir's OWN stamp, which is the primary tree's, is never written from a worktree.
+rec_repo
+# autocrlf OFF before the checkout: on a host that converts, the worktree's copy of the profile table
+# reads CRLF and the runner refuses it, so the control would fail for a reason outside this unit.
+( cd "$REC_T" && git config core.autocrlf false && git worktree add -q "$REC_T.wt" -b side ) >/dev/null 2>&1
+( cd "$REC_T.wt" && env -u GATE_BASE -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES -u GATE_DOCS_BASE GATE_FULL=1 \
+    bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1 )
+_wgd=$( cd "$REC_T.wt" && git rev-parse --git-dir 2>/dev/null )
+_ws1=$(awk -F'\t' '$1=="sha"{print $2}' "$_wgd/gate-full-green" 2>/dev/null)
+_ws2=$(awk -F'\t' '$1=="sha"{print $2}' "$REC_GD/gate-full-green.shared" 2>/dev/null)
+if [ -n "$_ws1" ]; then
+  ok "control: a fully-green run in a linked worktree stamps its own git dir"
+  [ "$_ws1" = "$_ws2" ] && ok "the common dir's gate-full-green.shared carries the worktree green's sha" \
+                        || nope "no shared stamp, or one naming another sha ([$_ws1] vs [$_ws2])"
+  [ -f "$REC_GD/gate-full-green" ] && nope "a linked worktree's green wrote the primary tree's own stamp" \
+                                   || ok "the primary tree's own stamp is untouched by a worktree's green"
+else
+  nope "the control failed: the linked worktree's run stamped nothing, so the sharing arms prove nothing"
+fi
+rm -rf "$REC_T.wt"; rec_done
 
 rec_repo
 rc=$(rec_run GATE_FULL=)     # guards live: the guarded leg is unchanged vs origin/main

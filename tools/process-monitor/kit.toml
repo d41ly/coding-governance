@@ -81,6 +81,7 @@ name = "process-monitor wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-process-monitor.sh", "--check"]
 guard = []
+doc_reads = []
 
 # THE ONE HOLE, and it is an authoring hole rather than a measurement one: PROCMON_ROOTS is the
 # adopter's own paths and cannot be seeded from this tree. It BLOCKS the gate, because the failure

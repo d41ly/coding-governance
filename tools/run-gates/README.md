@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.28` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.29` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -142,6 +142,26 @@ The baseline a guard diffs against is the MERGE-BASE with the default branch, so
 on what it changed rather than on everything that landed while it was open — used only where the
 merge-base is a proper ancestor of `HEAD`, with the origin tip standing otherwise. `GATE_BASE`
 outranks both, and an unresolvable baseline runs every leg.
+
+## The docs mode — `doc_reads` and `GATE_DOCS_BASE`
+
+A leg may declare `doc_reads`: the repo paths of the repository's doc class it reads, each a file or a
+directory ending in `/`. `GATE_DOCS_BASE=<rev>` turns the docs mode on. In it, a leg that declares the
+key runs only when one of those paths moved since `<rev>`, in the net diff or in any commit of the
+range, and a declared `[]` skips. A leg that declares nothing is decided as before, so a missing
+declaration costs time and never coverage. Each docs skip prints `GATE skip  <leg>  (docs-only: …)`
+and counts as a skip, so a docs run never stamps `gate-full-green`. `GATE_FULL` outranks the mode; an
+unresolvable `<rev>` turns it off and says so; the runner withholds the variable from its legs.
+
+`.githooks/pre-push` sets it, to the remote tip R, on a push it classifies doc-only against the
+`GATE_DOC_PATHS` declared in the gate-env file at R. The deployer carries a kit leg's `doc_reads` into
+an adopter's manifest, all or nothing, only once the adopter's runner reads the key (1.25 and up).
+
+A full green earned in a LINKED worktree is copied to `gate-full-green.shared` in the common git dir,
+and the hook reads it after its own git dir's stamp and the primary's, so a green earned in a run's
+worktree serves the primary tree's push. It is one slot per clone, last writer wins: a second
+worktree's green evicts the first, which costs that push its saving and never its verdict.
+TOOL-dThriftyLanding-1, -2, -3.
 
 ## The turnstile — one bar per repository
 

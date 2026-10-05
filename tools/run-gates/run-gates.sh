@@ -29,7 +29,9 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.28   # gov:kit run-gates@1.28
+KIT_RUN_GATES_VERSION=1.29   # gov:kit run-gates@1.29
+# 1.28 + 1.27 -> 1.29: the reconcile with origin/main 290d0d2d5. Both lines moved the kit from 1.24, so
+# each spelled its own 1.25 onward: this branch's notes are first, then main's, each under its own numbers.
 # 1.27 -> 1.28: every repair the runner makes on its own appends one line to the health log under the
 # git common dir (TOOL-aGraftedHelix-8): the `health_log_sh` block, inlined byte-identical, and seven sites.
 # 1.26 -> 1.27: the same unit's follow-up moved the kit's bytes after 1.26 was cut — its suites' bars
@@ -42,6 +44,11 @@ KIT_RUN_GATES_VERSION=1.28   # gov:kit run-gates@1.28
 # taken while the legs run, and the header gains `census_every` (TOOL-aGraftedHelix-5). A reader that
 # splits a row by position keeps working; one that reads the seventh field with a trailing catch-all
 # variable folds the eighth into it, which is why the ledger block's read gained one.
+# --- origin/main's line from 1.24, numbered as it landed there:
+# 1.24 -> 1.25: the manifest's NINTH field, `doc_reads`, and the docs mode `GATE_DOCS_BASE` that reads
+# it (TOOL-dThriftyLanding-1); a full green is also shared through the common git dir
+# (TOOL-dThriftyLanding-2). The canary's key-set pin admits the new key, which is the floor the
+# deployer reads before it emits one.
 # 1.21 -> 1.22: KITREL is asked of git when the prefix strip leaves it absolute, the MSYS mount
 # spelling (`/tmp/x` beside git's `C:/…/Temp/x`) the `cd … && pwd` fold does not reach; with it the
 # attribution's KF3 matched nothing for a tree under `/tmp`. Absorbed by aSightedSkeptic.
@@ -284,6 +291,37 @@ fi
 # early signal rather than a wrong merge verdict. Both fail-safes below keep their meaning — an
 # unresolvable BASE runs everything, and so does a guard that errors.
 changed() { [ -n "${GATE_FULL:-}" ] && return 0; [ -z "$BASE" ] && return 0; ! git diff --quiet "$BASE" -- "$@" 2>/dev/null; }
+
+# THE DOCS MODE (TOOL-dThriftyLanding-1). `GATE_DOCS_BASE=<rev>` says every path this run's push
+# changed since <rev> is in the repository's declared doc class, so a leg that DECLARES which doc paths
+# it reads (`doc_reads`) runs only when one of them moved. `.githooks/pre-push` sets it on a doc-only
+# push and scrubs it from the environment on every other; a developer may set it by hand to ask the
+# same question locally. GATE_FULL outranks it: a run that asked for the whole bar gets the whole bar.
+# Unresolvable, it is OFF and says so, because a mode that silently fails to engage reads exactly
+# like one that engaged and found nothing to skip.
+DOCS_BASE=""
+if [ -n "${GATE_DOCS_BASE:-}" ] && [ -z "${GATE_FULL:-}" ]; then
+  DOCS_BASE=$(git rev-parse --verify -q "${GATE_DOCS_BASE}^{commit}" 2>/dev/null) || DOCS_BASE=""
+  [ -n "$DOCS_BASE" ] || echo "run-gates: GATE_DOCS_BASE '${GATE_DOCS_BASE}' resolves to no commit, so the docs mode is OFF and every leg is decided as usual" >&2
+fi
+# READ ONCE, THEN WITHHELD FROM EVERY LEG. A leg that drives a nested runner over its own scratch repo
+# would otherwise inherit a sha that does not exist there and print the OFF line into output it
+# compares; the mode is a fact about THIS run, and no leg has a use for it.
+unset GATE_DOCS_BASE
+# A DOC PATH MOVED when it differs between DOCS_BASE and the working tree, OR when any commit in
+# DOCS_BASE..HEAD touched it. The second half is not redundant: a path changed in one commit and
+# restored in a later one has no net diff, and a leg that grades COMMITS (a pass-order or brief rule)
+# still has something to grade. `--full-history` is load-bearing (TOOL-dThriftyLanding-8): without it
+# git simplifies away a `--no-ff` merge's side branch that nets to nothing on these paths, and every
+# landing here is such a merge. Every failure reads as MOVED, so the leg runs: the one direction this
+# predicate may err in is doing more work.
+check_doc_moved() {
+  local hit
+  [ -n "$DOCS_BASE" ] || return 0
+  ! git diff --quiet "$DOCS_BASE" -- "$@" 2>/dev/null && return 0
+  hit=$(git log --full-history --format=%h -1 "$DOCS_BASE..HEAD" -- "$@" 2>/dev/null) || return 0
+  [ -n "$hit" ]
+}
 
 # ONE git-dir resolution for the whole runner. `GD` above and a second `gd` here used to resolve the
 # same thing twice; the run record adds four more git-dir-rooted paths, and four paths hanging off
@@ -1943,18 +1981,25 @@ rows += [l["name"] + "\x1e" + ",".join(resolve_prefix_token(g, troot) for g in l
          # as absent, which is the byte-identical rule and the safe direction.
          + "\x1e" + ("\x1f".join(str(a) for a in l["signature"])
                             if isinstance(l.get("signature"), list) else "")
+         # THE NINTH FIELD, `doc_reads`, appended after `signature` for the same reason. ABSENT and
+         # DECLARED-EMPTY must stay two values, because they mean opposite things on a doc push: no
+         # declaration runs the leg, an empty one says it reads no doc path and skips it. So a
+         # declared list rides behind a leading `=` and an absent one is the empty string. A non-list
+         # reads as absent, which is the direction that runs the leg (TOOL-dThriftyLanding-1).
+         + "\x1e" + ("=" + ",".join(resolve_prefix_token(g, troot) for g in l["doc_reads"])
+                            if isinstance(l.get("doc_reads"), list) else "")
          for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
 ' "$LEGS_FILE" "$TIMINGS" "$(dirname "$KITREL")") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
-names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); signatures=(); ORDER=""; first=1
+names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); signatures=(); docreads=(); ORDER=""; first=1
 while IFS= read -r line; do
   if [ "$first" = 1 ]; then ORDER=$line; first=0; continue; fi
-  IFS=$'\x1e' read -r nm gd_ av im ch sj ce sg <<<"$line"
+  IFS=$'\x1e' read -r nm gd_ av im ch sj ce sg dr <<<"$line"
   names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}"); chunks+=("${ch:-default}")
-  subjects+=("${sj:-repo}"); ceilings+=("${ce:-}"); signatures+=("${sg:-}")
+  subjects+=("${sj:-repo}"); ceilings+=("${ce:-}"); signatures+=("${sg:-}"); docreads+=("${dr:-}")
 done <<<"$legs"
 total=${#names[@]}
 
@@ -2037,6 +2082,17 @@ for ((i=0; i<total; i++)); do
      && [ -z "${GATE_SELFTESTS:-}" ]; then
     printf 'ondemand' > "$WORK/$i.rc"; continue
   fi
+  # THE DOCS MODE DECIDES A DECLARING LEG BY ITS DOC READS ALONE. Its guard is a statement about
+  # every path it reads, code included, and on a doc-only push no code path moved, so the narrower
+  # declaration is the one that answers. A leg that declares nothing falls through to its guard, or
+  # runs, exactly as before. `=` alone is a declared empty list: it reads no doc path.
+  if [ -n "$DOCS_BASE" ] && [ -n "${docreads[$i]}" ]; then
+    _dr=${docreads[$i]#=}
+    if [ -z "$_dr" ]; then printf 'docskip' > "$WORK/$i.rc"; continue; fi
+    IFS=, read -ra gp <<<"$_dr"
+    check_doc_moved "${gp[@]}" || printf 'docskip' > "$WORK/$i.rc"
+    continue
+  fi
   [ -z "${guards[$i]}" ] && continue
   IFS=, read -ra gp <<<"${guards[$i]}"
   changed "${gp[@]}" || printf 'skip' > "$WORK/$i.rc"
@@ -2109,6 +2165,7 @@ if [ -n "$RUNDIR" ]; then
     printf 'manifest\t%s\n' "$LEGS_FILE"
     printf 'manifest_blob\t%s\n' "$(git hash-object -- "$LEGS_FILE" 2>/dev/null)"
     printf 'full\t%s\n' "${GATE_FULL:+1}"
+    printf 'docs_base\t%s\n' "$DOCS_BASE"
     printf 'full_from\t%s\n' "${GATE_FULL:+GATE_FULL}"
     # THE RUN ENVELOPE IS FOUR KEYS, NOT ONE. The width alone was what an earlier draft recorded,
     # written when the width was a number this script computed. It is now a DECLARED row, so a
@@ -2466,6 +2523,11 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     printf 'GATE held  %s  (self-test, set GATE_SELFTESTS=1 to run)\n' "${names[$i]}"
   elif [ "$rc" = skip ]; then
     skips=$((skips+1)); c_skip=$((c_skip+1)); printf 'GATE skip  %s  (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
+  elif [ "$rc" = docskip ]; then
+    # A SKIP, counted as one: `skips` is conjoined into the full-green stamp, so a docs run can never
+    # stamp a green it did not earn. Its tail names the mode, because `unchanged vs <branch>` would be
+    # a claim about the guard this leg was NOT decided by.
+    skips=$((skips+1)); c_skip=$((c_skip+1)); printf 'GATE skip  %s  (docs-only: no path it reads moved)\n' "${names[$i]}"
   elif [ "$rc" = reuse ]; then
     # THE FOURTH VERB, padded to the same column as the other three and following the two-space tail
     # contract: a reader splits the remainder on a double space and gets the bare leg name back.
@@ -3762,6 +3824,21 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   } > "$gd/gate-full-green.tmp" 2>/dev/null \
     && mv -f "$gd/gate-full-green.tmp" "$gd/gate-full-green" 2>/dev/null || true
+  # SHARED FROM A LINKED WORKTREE (TOOL-dThriftyLanding-2). The common dir's own `gate-full-green` is
+  # the PRIMARY tree's stamp and is never written from here: a branch's green that is no ancestor of
+  # the default branch would replace the primary's valid one. A separate `.shared` file, which the push
+  # boundary reads LAST, never displaces the primary's record. It is ONE slot per clone:
+  # last writer wins, so one linked worktree's green can evict another's; that costs a saving, never a verdict,
+  # because the boundary validates it with the same predicates as its own.
+  _gcd=$(git rev-parse --git-common-dir 2>/dev/null) || _gcd=""
+  if [ -n "$_gcd" ] && [ -f "$gd/gate-full-green" ]; then
+    _gcd_abs=$(cd "$_gcd" 2>/dev/null && pwd -P) || _gcd_abs=""
+    _gd_abs=$(cd "$gd" 2>/dev/null && pwd -P) || _gd_abs=""
+    if [ -n "$_gcd_abs" ] && [ -n "$_gd_abs" ] && [ "$_gcd_abs" != "$_gd_abs" ]; then
+      cp "$gd/gate-full-green" "$_gcd_abs/gate-full-green.shared.tmp" 2>/dev/null \
+        && mv -f "$_gcd_abs/gate-full-green.shared.tmp" "$_gcd_abs/gate-full-green.shared" 2>/dev/null || true
+    fi
+  fi
 fi
 
 # THE INHERITED-GREEN STAMP (TOOL-dDerivedDocket-24, KF2). A DIFFERENT FILE from the full green, and

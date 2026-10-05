@@ -251,6 +251,7 @@ name = "unattended kit gate"
 subject = "repo"
 argv = ["bash", "{kit}/check-unattended.sh"]
 guard = []
+doc_reads = ["{memory_root}/builds/", "{memory_root}/guides/", "{memory_root}/archive/"]
 red_after_land = true
 
 # the playbook validity leg. No guard: it grades an adopter's playbooks and
@@ -268,6 +269,7 @@ name = "pass-order history"
 subject = "repo"
 argv = ["bash", "{kit}/check-pass-order.sh"]
 guard = []
+doc_reads = ["{memory_root}/builds/", "{memory_root}/project/"]
 red_after_land = true
 
 # the brief-recorded leg. No guard, for `pass-order history`'s reason: its subject is the
@@ -282,6 +284,7 @@ name = "brief-recorded"
 subject = "repo"
 argv = ["bash", "{kit}/check-brief-recorded.sh"]
 guard = []
+doc_reads = ["{memory_root}/builds/", "{memory_root}/project/"]
 red_after_land = true
 
 [[gate_leg]]
