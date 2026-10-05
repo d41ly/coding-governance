@@ -100,7 +100,7 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 32 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
+**Build status:** SPECCED · 33 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
 ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13
 ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-26
 ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33
@@ -140,13 +140,14 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraf
 | [TOOL-aGraftedHelix-30 — a verb grades `authorization-reachable` alone, and every reconciling merge runs it before the run spends more](spec/2026-10-05-spec-TOOL-aGraftedHelix-30.md) | 14 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aGraftedHelix-31 — `--settle` writes the run claim, and a terminal-phase writer that writes no claim reds](spec/2026-10-05-spec-TOOL-aGraftedHelix-31.md) | 15 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aGraftedHelix-32 — the closing review's 21 MEDIUM and LOW findings, fixed as one batch](spec/2026-10-05-spec-TOOL-aGraftedHelix-32.md) | 16 | 2 | CLOSED | rev-3 | 2026-10-05 |
+| [TOOL-aGraftedHelix-33 — the spec commit stage places every spec a writer authored, named by id or by path, and refuses an entry it cannot place](spec/2026-10-06-spec-TOOL-aGraftedHelix-33.md) | 17 | 1 | SPECCED | rev-1 | 2026-10-06 |
 <!-- /gen:build-units -->
 
 Records: 47 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-26 TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32.
+Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-26 TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -169,6 +170,7 @@ Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-26 TOOL-aGraftedHe
 | 14 | `TOOL-aGraftedHelix-30` | no |
 | 15 | `TOOL-aGraftedHelix-31` | no |
 | 16 | `TOOL-aGraftedHelix-32` | no |
+| 17 | `TOOL-aGraftedHelix-33` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
