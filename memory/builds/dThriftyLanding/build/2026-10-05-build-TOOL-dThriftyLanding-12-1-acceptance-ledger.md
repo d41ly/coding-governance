@@ -11,8 +11,8 @@ linked-worktree arms pass on both, as coverage of behaviour units 2 and 3 alread
 **Evidences:** TOOL-dThriftyLanding-12
 - AC1 — `GATE ok    reads b only` — units 8 and 9's merged-side-branch arms pass, which closes M1's findings 6, 7 and 23
 - AC2 — `reads park, so it is not scoped as doc-only` — printed for a doc push under park at R, with no `docs-only`; the prior hook scoped it doc-only
-- AC3 — `differs from what the receipt recorded` — reported by apply after a hand-edit of an owned row's doc_reads, and the edit kept; the prior govkit overwrote it
-- AC4 — `notes/a bad` — the component-boundary rule fails a string prefix of a tracked file and passes the directory; arm 1b uses that rule
+- AC3 — `doc_reads` — hand-edited on an owned row: `differs from what the receipt recorded` reported by apply after a hand-edit of an owned row's doc_reads, and the edit kept; the prior govkit overwrote it
+- AC4 — `doc_reads` — a manifest element `notes/a` reads bad under the component-boundary rule, which fails a string prefix of a tracked file and passes the directory; arm 1b uses that rule
 - AC5 — `not a plain repo path` — printed for `GATE_DOC_PATHS="."`, and a code push stays out of the doc class; the prior hook classified it doc-only
 - AC6 — `"doc_reads": []` — on the `kit version markers` row a fixture apply of check-kit-versions wrote; D1 refuses 1.24
 - AC7 — `last writer wins` — in the README and in the runner comment; the hook's FULL path no longer re-reads the own record

@@ -72,14 +72,14 @@ ids TOOL-dThriftyLanding-13
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dThriftyLanding-1 — the runner skips a leg whose declared doc reads did not move](spec/2026-10-05-spec-TOOL-dThriftyLanding-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-05 |
+| [TOOL-dThriftyLanding-1 — the runner skips a leg whose declared doc reads did not move](spec/2026-10-05-spec-TOOL-dThriftyLanding-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-dThriftyLanding-2 — a full green earned in any worktree serves every worktree's push](spec/2026-10-05-spec-TOOL-dThriftyLanding-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-dThriftyLanding-3 — the push boundary recognises a doc-only push and scopes its bar to it](spec/2026-10-05-spec-TOOL-dThriftyLanding-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-dThriftyLanding-4 — the deployer carries a leg's doc reads to an adopter's manifest](spec/2026-10-05-spec-TOOL-dThriftyLanding-4.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-dThriftyLanding-5 — gov declares its doc class and what its bar legs read of it](spec/2026-10-05-spec-TOOL-dThriftyLanding-5.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-dThriftyLanding-6 — the carriers state how a doc-only push is scoped](spec/2026-10-05-spec-TOOL-dThriftyLanding-6.md) | 6 | 1 | CLOSED | rev-2 | 2026-10-05 |
-| [TOOL-dThriftyLanding-8 — the runner's docs mode sees a doc path touched on a merged side branch](spec/2026-10-05-spec-TOOL-dThriftyLanding-8.md) | 8 | 2 | CLOSED | rev-1 | 2026-10-05 |
-| [TOOL-dThriftyLanding-9 — the hook's doc-only classification sees code touched on a merged side branch](spec/2026-10-05-spec-TOOL-dThriftyLanding-9.md) | 9 | 2 | CLOSED | rev-1 | 2026-10-05 |
+| [TOOL-dThriftyLanding-8 — the runner's docs mode sees a doc path touched on a merged side branch](spec/2026-10-05-spec-TOOL-dThriftyLanding-8.md) | 8 | 2 | CLOSED | rev-2 | 2026-10-05 |
+| [TOOL-dThriftyLanding-9 — the hook's doc-only classification sees code touched on a merged side branch](spec/2026-10-05-spec-TOOL-dThriftyLanding-9.md) | 9 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-dThriftyLanding-10 — govkit's policy-key scan sees a quoted multi-path value](spec/2026-10-05-spec-TOOL-dThriftyLanding-10.md) | 10 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-dThriftyLanding-11 — the policy selftest grades every spelling of a doc class](spec/2026-10-05-spec-TOOL-dThriftyLanding-11.md) | 11 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-dThriftyLanding-12 — the closing review's batched minors, round 1](spec/2026-10-05-spec-TOOL-dThriftyLanding-12.md) | 12 | 2 | CLOSED | rev-2 | 2026-10-05 |

@@ -7,4 +7,4 @@ standalone it passed 19 checks against the engine; with the f765eb8e pattern inj
 the three multi-path arms and gov's real line failed and every other check held.
 
 **Evidences:** TOOL-dThriftyLanding-11
-- AC1 — `GATE_DOC_PATHS='a/ b/'` — caught, with the double-quoted, exported-and-commented and gov's own multi-path lines, by the builder; all four missed by the f765eb8e pattern; `GATE_DOC_PATHS="a b" bash x` stays an invocation
+- AC1 — `f765eb8e` — its pattern missed all four multi-path arms; `GATE_DOC_PATHS='a/ b/'` is caught, with the double-quoted, exported-and-commented and gov's own multi-path lines, by the builder; all four missed by the f765eb8e pattern; `GATE_DOC_PATHS="a b" bash x` stays an invocation

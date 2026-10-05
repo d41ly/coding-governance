@@ -4596,7 +4596,7 @@ user_skills = "/tmp/gk-fake-skills"
               bad_g.returncode == 1 and "declared classes" in bad_g.stdout, bad_g.stdout)
 
         # ---- D3 (TOOL-dThriftyLanding-4): 7h holds a descriptor's doc_reads and the manifest's equal
-        _d3 = scratch_gov("true", f"{PFX}demo/")
+        _d3 = scratch_gov("true", f"{PFX}demo/", tag="d3")
         _d3k = _d3 / PFX / "demo" / "kit.toml"
         _d3l = _d3 / PFX / "gate-legs.json"
         _d3rows = json.loads(_d3l.read_text(encoding="utf-8"))

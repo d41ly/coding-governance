@@ -1198,7 +1198,9 @@ cd "$pfx_home" || exit 2
 #   GATE_ATTRIBUTE GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE — the hook clears the policy pair
 #     and sets all three from R itself (TOOL-dDerivedDocket-23, -24), and attribution is report-only.
 #   GATE_AMBIENT_TMP GATE_HOST_RATIO — assigned in the runner, from TMPDIR and as a source constant.
-BAR_INERT_KNOBS="GATE_AMBIENT_TMP GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_HELD GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+#   GATE_DOCS_BASE — the hook clears it for every bar, a STUB included, and sets it only on a doc-only
+#     decision (TOOL-dThriftyLanding-3), as it sets GATE_BASE on the path where that matters.
+BAR_INERT_KNOBS="GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_HELD GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
 read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
 check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
   local knobs cleared scrubbed k n

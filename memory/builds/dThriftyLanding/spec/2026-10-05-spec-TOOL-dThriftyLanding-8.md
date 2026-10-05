@@ -1,6 +1,6 @@
 # TOOL-dThriftyLanding-8 — the runner's docs mode sees a doc path touched on a merged side branch
 
-**Status:** CLOSED · rev-1 · 2026-10-05 · node d · Tier-2 · base f765eb8e · streams tooling · order 8
+**Status:** CLOSED · rev-2 · 2026-10-05 · node d · Tier-2 · base f765eb8e · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -34,6 +34,7 @@ land. This unit makes the read see every commit in the range.
 ### Edges
 
 - **hands-off** `TOOL-dThriftyLanding-9` — the hook's read of the same range.
+- **hands-off** `TOOL-dThriftyLanding-12` — the batch closes M1's duplicates on this fix.
 
 ## 4. Design
 
@@ -83,6 +84,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-05 · promoted from the closing diff review, round 1.
+- rev-2 · 2026-10-05 · §3 gains the hands-off to unit 12, whose consumes-from had no matching end; the close bar named it.
 
 ## 10. Reuse audit
 

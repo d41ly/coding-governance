@@ -1,6 +1,6 @@
 # TOOL-dThriftyLanding-9 — the hook's doc-only classification sees code touched on a merged side branch
 
-**Status:** CLOSED · rev-1 · 2026-10-05 · node d · Tier-2 · base f765eb8e · streams tooling · order 9
+**Status:** CLOSED · rev-2 · 2026-10-05 · node d · Tier-2 · base f765eb8e · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -30,7 +30,8 @@ predicate 5 is waived over a second parent that carried code. This unit makes th
 
 ### Edges
 
-- **hands-off** `TOOL-dThriftyLanding-8` — the runner's read of the same range.
+- **consumes-from** `TOOL-dThriftyLanding-8` — the runner's read of the same range, fixed first.
+- **hands-off** `TOOL-dThriftyLanding-12` — the batch closes M1's duplicates on this fix.
 
 ## 4. Design
 
@@ -80,6 +81,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-05 · promoted from the closing diff review, round 1.
+- rev-2 · 2026-10-05 · §3: the edge to unit 8 becomes consumes-from, matching its order, and the hands-off to unit 12 joins; the close bar named both.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dThriftyLanding-1 — the runner skips a leg whose declared doc reads did not move
 
-**Status:** CLOSED · rev-1 · 2026-10-05 · node d · Tier-2 · base c3ef6742 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-10-05 · node d · Tier-2 · base c3ef6742 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -53,6 +53,7 @@ mode is `TOOL-dThriftyLanding-3`; this unit is the runner half and stands alone.
 
 - **hands-off** `TOOL-dThriftyLanding-3` — the hook sets `GATE_DOCS_BASE` to R on a doc-only push.
 - **hands-off** `TOOL-dThriftyLanding-4` — the deployer emits `doc_reads` above runner 1.25.
+- **hands-off** `TOOL-dThriftyLanding-5` — gov declares the `doc_reads` values this unit reads.
 
 ## 4. Design
 
@@ -131,6 +132,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-05 · initial draft, from the owner's prompt and the runner's guard pass at base.
+- rev-2 · 2026-10-05 · §3 gains the hands-off to unit 5, whose consumes-from had no matching end; the close bar named it.
 
 ## 10. Reuse audit
 
