@@ -1130,9 +1130,19 @@ const auUnverified = !specAudit ? null : cleanRound ? 0 : auRaw.unverified
 // knows that exit before the driver names it: at zero blockers with something to dispose, the
 // DISPOSAL stage runs FIRST and the record carries `promote` iff `promotedIds` is non-empty. At a
 // positive count the driver's token decides whether the loop even ended, so the record comes first
-// there, and every such terminal exit records `promote` on the driver's own refusal-and-retry.
-// The record is therefore a function, called at one of two points.
-async function writeRound(disposition) {
+// there, and every such terminal exit records its counts and `promote` on the driver's own
+// refusal-and-retry. The record is therefore a function, called at one of two points.
+//
+// TOOL-aEvidencedLens-8 S4/S5 - A TERMINAL SPEC EXIT CARRIES `--highs` AND `--minors`, which the
+// driver requires there and refuses on a `CONVERGING` round. At zero blockers the exit is CONVERGED,
+// so the counts ride from the start; at a positive count only the driver knows, so the first command
+// carries none and the retry adds them. `<m>` is the review's confirmed MEDIUM and LOW, plus the
+// UNVERIFIED findings the disposal promoted (`adjudicated`) on the record that follows a disposal;
+// a record before the disposal cannot know those and omits them, which understates check 2's floor
+// and never overstates it.
+async function writeRound(disposition, adjudicated) {
+  const minorsCount = au.confirmed - au.blockers - au.highs + (adjudicated || 0)
+  const counts = ' --highs ' + au.highs + ' --minors ' + minorsCount
   const rv = attended
     ? { token: au.blockers === 0 ? 'CONVERGED' : 'CONVERGING', exitCode: 0 }
     : await agent(
@@ -1140,13 +1150,16 @@ async function writeRound(disposition) {
       'Record AUDIT round ' + roundNo + ' with the driver and return its convergence token.\n\n' +
       'Run exactly:\n  ' + DRIVER + ' --review ' + slug + ' --subject ' + subject +
       ' --verdict ' + (au.blockers > 0 ? '"BLOCKED"' : '"CLEAN"') +
-      ' --blockers ' + au.blockers + disposition + '\n\n' +
+      ' --blockers ' + au.blockers + (au.blockers === 0 ? counts : '') + disposition + '\n\n' +
       'Return the CONVERGENCE token it prints — one of CONVERGING, CONVERGED, NON-CONVERGENT, ' +
       'CEILING, BOUNDED — verbatim, and the command\'s exit code. Do not infer the token from the ' +
       'blocker count: it is a property of the SEQUENCE of rounds, which only the driver can see. ' +
-      'If the command REFUSES naming --disposition, this round is a terminal exit: run the SAME ' +
-      'command once more with --disposition promote appended, and return THAT run\'s token and ' +
-      'exit code. If the command REFUSES saying the subject already carries a terminal review ' +
+      (au.blockers === 0
+        ? ''
+        : 'If the command REFUSES naming --disposition, --highs or --minors, this round is a terminal ' +
+          'exit: run the SAME command once more with' + counts + ' --disposition promote appended, ' +
+          'and return THAT run\'s token and exit code. ') +
+      'If the command REFUSES saying the subject already carries a terminal review ' +
       'round, return terminalSubject: true with its stderr and no token — do not retry under another ' +
       'subject. If the command fails for any other reason, return its stderr rather than a token.',
     { label: 'audit:record:r' + roundNo, phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
@@ -1266,7 +1279,10 @@ if (verdict === 'CONVERGING') {
       'FOLD the confirmed findings in ' + lastReport + ' as rev-N bumps with their section 9 lines, ' +
       'then re-invoke this harness with round: ' + (roundNo + 1) + ', subjectRound: ' + subjectRound +
       (auditIds.length ? ', auditIds: ' + JSON.stringify(auditIds) : '') +
-      ', and copy this return\'s prevSubjects' + (handPrior ? ' and priorFindings' : '') + ' as those args. Do not build.',
+      ', and copy this return\'s prevSubjects' + (handPrior ? ' and priorFindings' : '') + ' as those args. Do not build. ' +
+      // TOOL-aEvidencedLens-8 S7 - the boundary, stated where the fold is ordered.
+      'This in-loop fold is the review loop\'s own fix step and not the exit\'s disposition: only a ' +
+      'terminal exit disposes, and it PROMOTES whatever stands.',
     note: 'HELD AT AUDIT — the review loop has not ended, so no unit was built' +
       (attended ? ' · ATTENDED, so no driver-side check ran' : ''),
   }
@@ -1289,7 +1305,8 @@ if (verdict === 'CONVERGING') {
 // over fifteen confirmed findings.
 //
 // THE STAGE RUNS ON ANY OUTSTANDING FINDING AND DISPOSES BY SEVERITY (TOOL-aProbedUnit-7): a BLOCKER
-// or HIGH is PROMOTED to a unit, a MEDIUM or LOW is FOLDED into its spec. OUTSTANDING is the
+// or HIGH is PROMOTED to a unit of its own, and since TOOL-aEvidencedLens-8 (owner, 2026-10-05) the
+// MEDIUMs and LOWs are PROMOTED too, batched into one unit or two disjoint ones. OUTSTANDING is the
 // callee's word and it covers two populations: the CONFIRMED findings and the UNVERIFIED ones, which
 // came back with no usable skeptic verdict and are not cleared — a verify stage degraded by dead
 // skeptic batches used to read as clean here, because only `confirmed` was counted (closing review
@@ -1346,9 +1363,15 @@ if (!specAudit) {
       'IS RENUMBERED. A promotion that repairs no unit in particular takes an order ABOVE EVERY ' +
       'unit in this build — the honest append-past-the-end default, and the only case in which a ' +
       'promotion may land there. Never guess a position for one. ' +
-      'FOLD every MEDIUM and every ' +
-      'LOW into the spec it belongs to, as a rev-N bump with its ' +
-      'section 9 line. ' +
+      'PROMOTE every MEDIUM and every LOW too, BATCHED: all of them go into ONE unit whose spec ' +
+      'names every finding by report id in its §1 and gives each its own §2 item. Use TWO units ' +
+      'only when the minors split into two disjoint write sets by BUILD-METHOD M6\'s clauses, so ' +
+      'the halves build concurrently — never one unit per minor. Add each batch unit by the same ' +
+      (attended ? 'README roster row' : '`--rescope --act add`') + ' a promoted blocker takes, its ' +
+      'reason naming every report id it closes. A finding is not an ask, so it is named in scope ' +
+      'and never through the `closes` verb, which joins a spec to a `BACKLOG.md` ask. In ' +
+      '`placements`, `repairs` names the one unit every minor in the batch lands on, or `none` ' +
+      'when they land on several. Nothing is folded: return `folded` as 0. ' +
       'EVERY §3 EDGE YOU WRITE GETS BOTH OF ITS ENDS, in the same pass: a **consumes-from** `X` in ' +
       'one spec is a **hands-off** back in X\'s own §3, amended there as a rev-N bump with its ' +
       'section 9 line. A bullet written at one end only reds the hygiene gate\'s §3 edge join and ' +
@@ -1382,15 +1405,18 @@ if (!specAudit) {
   // audit gate, and this guard simply did not get the pattern.
   //
   // AND THE COUNTS MUST RECONCILE, IN SUM AND IN SPLIT. Every outstanding finding is promoted,
-  // folded or named standing — the prompt says so — so a return whose three numbers do not add to
-  // confirmed + unverified is the same self-contradiction with the contradiction moved into two
-  // integers. The sum alone was `containment-tested-one-way` (closing review round 1, cluster D):
-  // `promoted 0, folded 10` reconciled against confirmed 10 with two blockers and three highs in
-  // it, and the roster went out over two blockers folded into prose. The severity rule implies the
-  // split: every BLOCKER and HIGH is promoted, so `promoted` is AT LEAST `blockers + highs` and
-  // `folded` AT LEAST the confirmed rest — equalities when nothing is unverified, floors when an
-  // unverified finding was adjudicated into either. The reason is chosen in the order the existing
-  // arms read it; the refusal keeps their shape, an empty roster and a note.
+  // refuted or named standing — the prompt says so — so a return whose numbers do not add to
+  // confirmed + unverified is the same self-contradiction with the contradiction moved into the
+  // integers. `folded` stays in the sum so the reconciliation keeps its shape, and it must be 0. The
+  // sum alone was `containment-tested-one-way` (closing review round 1, cluster D): `promoted 0,
+  // folded 10` reconciled against confirmed 10 with two blockers and three highs in it, and the
+  // roster went out over two blockers folded into prose. TOOL-aEvidencedLens-8 S2/S3 - the
+  // promotion rule implies the split: every confirmed finding is promoted, so `promoted` is at least
+  // `confirmed`, and the UNITS are bounded both ways — one per blocker and high plus one for the
+  // minors at the floor, and at the ceiling two for the confirmed minors plus one per UNVERIFIED
+  // finding the stage promoted, whose severity is unknown and may owe a unit of its own. The ceiling
+  // refuses the shape it exists for, five minors promoted into five units. The reason is chosen in
+  // the order the existing arms read it; the refusal keeps their shape, an empty roster and a note.
   //
   // AND A PROMOTION NAMES ITS UNIT. `promoted` above zero beside an empty `promotedIds` is a
   // promotion the caller cannot route to an audit; a named unit beside `promoted` 0 is a unit no
@@ -1399,8 +1425,8 @@ if (!specAudit) {
   // AND `refuted` IS BOUNDED BY THE UNVERIFIED COUNT (closing review round 2, cluster F). It is the
   // one verdict a dead skeptic batch left unsupplied, so it may cover the UNVERIFIED population and
   // nothing else; a `refuted` above `unverified` has refuted a CONFIRMED finding, which is the
-  // re-review M4 forbids. It joins the sum and leaves the severity floors alone: a confirmed
-  // BLOCKER or HIGH is still promoted, and a confirmed MEDIUM or LOW still folded.
+  // re-review M4 forbids. It joins the sum and leaves the promotion floors alone: every confirmed
+  // finding is still promoted.
   stood = Array.isArray(d && d.standing) ? d.standing : []
   const counted = Number.isInteger(d && d.promoted) && Number.isInteger(d && d.folded)
   promoted = counted ? d.promoted : null
@@ -1453,17 +1479,21 @@ if (!specAudit) {
       ' repairing ' + JSON.stringify(p && p.repairs)
   })
   // ONE UNIT ON BOTH SIDES OF THE SUBTRACTION (TOOL-dMergedTally-1). `confirmed` counts RAW findings,
-  // so `blockers` and `highs` must too, or `mustFold` is raw minus items and demands more folds than
-  // the MEDIUM and LOW findings exist to fill. The synthesis used to type both integers and counted
+  // so `blockers` and `highs` must too, or `confirmedMinors` is raw minus items and miscounts the
+  // MEDIUM and LOW findings the batch closes. The synthesis used to type both integers and counted
   // the ITEMS it merged raw findings into: 13 confirmed in 10 items read blockers 1, highs 5 against a
   // raw 3 and 6, and no honest disposal passed. `tier2-review.js` now derives both from the raw ids
   // each item lists, and returns null when an id is placed in no item or in two.
-  const mustPromote = au.blockers + au.highs
-  const mustFold = au.confirmed - mustPromote
+  const confirmedMinors = au.confirmed - au.blockers - au.highs
+  const adjudicated = counted ? Math.max(d.promoted - au.confirmed, 0) : 0  // UNVERIFIED findings promoted
+  const minors = confirmedMinors + adjudicated
+  const unitFloor = au.blockers + au.highs + (minors > 0 ? 1 : 0)
+  const unitCeiling = au.blockers + au.highs + adjudicated + (confirmedMinors > 0 ? 2 : 0)
   const refutedOk = Number.isInteger(refuted) && refuted >= 0 && refuted <= au.unverified
   if (!d || d.disposed !== true || stood.length || !counted || !refutedOk ||
       d.promoted + d.folded + refuted + stood.length !== outstanding ||
-      d.promoted < mustPromote || d.folded < mustFold ||
+      d.folded !== 0 || d.promoted < au.confirmed ||
+      promotedIds.length < unitFloor || promotedIds.length > unitCeiling ||
       (d.promoted > 0) !== (promotedIds.length > 0) ||
       edges === null || oneWay.length || unplaced.length || misplaced.length) {
     const why = !d ? 'the disposal stage returned nothing at all'
@@ -1477,10 +1507,19 @@ if (!specAudit) {
         ? 'the counts do not reconcile — promoted ' + d.promoted + ' + folded ' + d.folded +
           ' + refuted ' + refuted + ' + standing ' + stood.length + ' is not confirmed ' + au.confirmed +
           ' + unverified ' + au.unverified
-      : d.promoted < mustPromote || d.folded < mustFold
-        ? 'the counts do not split by severity — promoted ' + d.promoted + ' is below blockers ' +
-          au.blockers + ' + highs ' + au.highs + ', or folded ' + d.folded + ' is below the ' +
-          mustFold + ' confirmed at MEDIUM or LOW'
+      : d.folded !== 0
+        ? 'folded ' + d.folded + ' — a spec audit\'s MEDIUM and LOW are PROMOTED, batched, never ' +
+          'folded (owner, 2026-10-05)'
+      : d.promoted < au.confirmed
+        ? 'promoted ' + d.promoted + ' is below the ' + au.confirmed + ' confirmed — every confirmed ' +
+          'finding is promoted'
+      : promotedIds.length < unitFloor
+        ? promotedIds.length + ' unit(s) for ' + au.blockers + ' blocker(s), ' + au.highs +
+          ' high(s) and ' + minors + ' minor(s), below the floor of ' + unitFloor + ' — one unit per ' +
+          'blocker and high, plus one for the minors'
+      : promotedIds.length > unitCeiling
+        ? promotedIds.length + ' unit(s) where at most ' + unitCeiling + ' fit — the minors are ' +
+          'batched into one unit or two, never one per minor'
       : (d.promoted > 0) !== (promotedIds.length > 0)
         ? 'promoted ' + d.promoted + ' beside promotedIds ' + JSON.stringify(promotedIds) +
           ' — a promotion names the unit it became, and a unit names the finding that made it'
@@ -1523,8 +1562,10 @@ if (!specAudit) {
           ? ' The round was NOT recorded: at zero blockers the driver\'s row follows the disposal so its ' +
             'disposition field is what was promoted. Dispose the findings by hand under BUILD-METHOD M4, ' +
             'then record it yourself — `' + DRIVER + ' --review ' + slug + ' --subject ' + subject +
-            ' --verdict "CLEAN" --blockers 0`, with ` --disposition promote` appended iff any finding ' +
-            'became a unit — and dispatch from `' + DRIVER + ' --plan ' + slug + ' --paths`, the resume route.'
+            ' --verdict "CLEAN" --blockers 0 --highs ' + au.highs + ' --minors ' + confirmedMinors +
+            '`, adding to `--minors` every promoted UNVERIFIED finding, with ` --disposition promote` ' +
+            'appended iff any finding became a unit — and dispatch from `' + DRIVER + ' --plan ' + slug +
+            ' --paths`, the resume route.'
           : ''),
     }
   }
@@ -1538,7 +1579,7 @@ if (!specAudit) {
 }
 // THE RECORD FOLLOWS THE DISPOSAL AT ZERO BLOCKERS (cluster B, above): the field is derived from what
 // was actually promoted, so a unit the stage made out of an UNVERIFIED finding reaches check 2.
-if (disposeFirst) await writeRound(promotedIds.length ? ' --disposition promote' : '')
+if (disposeFirst) await writeRound(promotedIds.length ? ' --disposition promote' : '', Math.max(promoted - au.confirmed, 0))
 // ==================================================== THE HAND-OUT, and what is graded before it
 // S4/S4b - THE PER-UNIT REFUSAL, and in attended mode it happens HERE rather than at `--dispatch`.
 // IT DID NOT LEAVE WITH THE BUILD AGENT (TOOL-aHoistedPass-6): it grades which units may be

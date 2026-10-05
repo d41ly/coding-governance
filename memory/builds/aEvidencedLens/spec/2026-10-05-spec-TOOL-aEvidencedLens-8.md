@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-8 — the build harness promotes spec-audit minors, batched, and records the counts
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7 · ratified 2026-10-05
+**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
