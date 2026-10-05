@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-35 — the map's symbol tier reads shell definitions through the lexicon's tokenizer
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes TOOL-aWeighedCompass-8 · order 35
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes TOOL-aWeighedCompass-8 · order 35
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-35-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-35-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -97,11 +99,13 @@ Read at base `7af5f564`, whose bytes for every file below equal HEAD's at `580dc
 ```python
 SHELL_ROOTS = (TOOLS, ROOT / ".githooks", ROOT / "skills")
 
-def scan_shell_layer(layer, roots):
+def scan_shell_layer(layer, roots, *, root=None):
     # resolve the lexicon kit as _read_lexicon_verbs does, but RAISE MapError when it is absent
+    # a root that is not a directory -> MapError, as python_symbols refuses one
     # walk each root with the map's skip set; for each *.sh, parse_shell_defs(text)
     # SyntaxError -> MapError("<layer>: shell parse error in <rel>: <message>")
     # keep names not starting with "_"; rows {"id", "kind": "function", "file": <posix rel>}
+    # rel is against `root` (the repo root by default); a file outside it keeps its absolute POSIX path
     # zero rows over all roots -> MapError, the _live_py liveness rule
 ```
 
@@ -210,6 +214,9 @@ New arm: tools/codebase-map/selftest.py · a fixture root holding a public defin
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#38], `map_extractors.py` and a
   tokenizer probe over every tracked shell file at base.
+- rev-2 · 2026-10-05 · built: `scan_shell_layer` takes a keyword `root` so the §7 fixture arm
+  can name rows relative to a scratch root, keeps an out-of-tree file's absolute POSIX path so AC3's
+  call without it still raises `MapError`, and refuses a missing root as `python_symbols` does.
 
 ## 10. Reuse audit
 

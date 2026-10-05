@@ -78,9 +78,10 @@ repo-wide python-launcher seam rather than anything this feature owns.
   ratcheted but not yet described. The map enforces "nothing new goes unclaimed"; it does not yet
   answer "what is this repo made of". Read the live counts from `reuse_lookup.py`'s corpus header,
   never from this line — it is prose and this gap is exactly where prose rots.
-- **bash is recall-dark.** It carries the product here — the gates, adopters and hooks — and
-  `map_lib` ships no shell symbol extractor. Declared in `.codebase-map.conf` `RECALL_DARK_LAYERS`
-  so `reuse_lookup.py` prints a partial-recall notice rather than a falsely confident miss.
+- **Shell is in the symbol layer.** It carries the product here — the gates, adopters and hooks —
+  and the project-owned `kit-sh` layer reads every `*.sh` under the tool root, `.githooks/` and
+  `skills/` through the lexicon kit's tokenizer, failing closed. `RECALL_DARK_LAYERS` is empty, so
+  no layer is dark; a shell file with no `.sh` suffix, such as the `pre-push` hook, is not indexed.
 - **`*.template.py` is excluded from the symbol layer** because a template and its instantiated twin
   define the same names in two files, and `fan_in()` counts the twin as a reference. Measured: with
   the templates indexed, two `test_*` functions outranked `walk_dir_keys` in the reuse shortlist.

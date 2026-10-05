@@ -15,8 +15,8 @@ pinned by what they are NOT — `build` not `create`, `load` not `fetch`. A tabl
 definitions is decoration.
 
 COVERAGE MODES, and the law behind them. `map_extractors.py` refuses to ship a regex extractor for
-shell and declares that language recall-dark instead, because a regex over shell definitions would
-look like coverage while silently skipping what it forgot. That law binds here, so every extension
+shell and reads it through `parse_shell_defs` below instead, because a regex over shell definitions
+would look like coverage while silently skipping what it forgot. That law binds here, so every extension
 in the corpus carries a DECLARED mode and an undeclared one is a named refusal:
 
     parser  a real parse                  complete over its extension

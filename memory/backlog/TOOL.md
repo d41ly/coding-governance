@@ -289,7 +289,6 @@ Cite ids, never line numbers.
 | [TOOL-aWalkedCorpus-10](../builds/aWalkedCorpus/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | codebase-map's seeded-extractors-or-crashed outcome stays unmarked… |
 | [TOOL-aWeighedCompass-4](../builds/aWeighedCompass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE RECALL FIXTURE CARRIES NO TERMS, SO EVERY PUBLISHED CHUNK NUMBER… |
 | [TOOL-aWeighedCompass-7](../builds/aWeighedCompass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE REUSE PROBE RANKS ON NAME STEMS, AT PRECISION 0.056. Graded against… |
-| [TOOL-aWeighedCompass-8](../builds/aWeighedCompass/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-35 | 2026-09-04 | SHELL IS DARK TO THE SYMBOL INDEX AND SHELL IS MOST OF THE GATE… |
 | [TOOL-aWeighedCompass-9](../builds/aWeighedCompass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | 211 OF 889 CITED IDS (23.7%) HAVE NO RECORD OF THEIR OWN. From… |
 | [TOOL-aWeighedCompass-13](../builds/aWeighedCompass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE SYMBOL INDEX EXCLUDES EVERY PRIVATE HELPER.… |
 | [TOOL-aWeighedCompass-18](../builds/aWeighedCompass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE FIXTURE SATURATES, SO IT CANNOT PRICE THE CHUNK HALF AT ALL.… |

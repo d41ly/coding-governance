@@ -216,11 +216,60 @@ def _read_lexicon_verbs() -> list[str]:
 # SYMBOL_EXTRACTORS — the reuse RECALL tier. Feeds generated/symbols.json only, never the
 # ratchet, so a new symbol never fails CI.
 #
-# bash is DECLARED RECALL-DARK in .codebase-map.conf rather than covered here: map_lib ships a
-# real parser for Python and an enumeration floor for JS, and nothing for shell. A regex over
-# shell function definitions would be exactly the silently-skips-what-it-forgot extractor the
-# fail-closed law bans, and it would look like coverage.
+# Shell is COVERED by `kit-sh`, through the lexicon kit's tokenizer `parse_shell_defs` rather than
+# a regex: a regex over shell function definitions would be exactly the silently-skips-what-it-forgot
+# extractor the fail-closed law bans, and it reports a function inside a heredoc body as shell.
+# PROJECT-OWNED and never in the template: an adopter without the lexicon has no tokenizer to call.
 # --------------------------------------------------------------------------------------
+
+#: The PRODUCT shell roots (TOOL-aMendedFleet-35 F1): the tool root, the tracked hooks and the
+#: skills. Shell under `memory/builds/` is evidence in a build record, not a seam, and stays out.
+SHELL_ROOTS = (TOOLS, ROOT / ".githooks", ROOT / "skills")
+
+
+def scan_shell_layer(layer: str, roots, *, root: Path | None = None) -> list[dict[str, str]]:
+    """One `function` row per PUBLIC shell definition in every `*.sh` under `roots`.
+
+    Read through the lexicon kit's `parse_shell_defs`, a tokenizer, so a heredoc-embedded function
+    is not a definition. A name starting with `_` is private and skipped, the rule `python_symbols`
+    applies to Python. `file` is POSIX-relative to `root` (the repo root by default).
+
+    FAIL CLOSED, none of which yields a smaller index: a lexicon kit the resolver cannot find, a
+    root that is not a directory, a file the tokenizer refuses, and a layer that yields zero rows
+    over all roots (the `_live_py` liveness rule) each raise MapError.
+    """
+    import sys as _sys
+    root = root or ROOT
+    try:
+        kit = str(resolve_kit_dir("lexicon", "lexicon.py", TOOLS))
+    except LookupError as exc:
+        raise m.MapError(f"{layer}: the shell layer needs the lexicon kit's tokenizer: {exc}") from exc
+    if kit not in _sys.path:
+        _sys.path.insert(0, kit)
+    from lexicon import parse_shell_defs  # noqa: E402
+
+    out: list[dict[str, str]] = []
+    for base in roots:
+        if not Path(base).is_dir():
+            raise m.MapError(f"{layer}: expected directory missing: {Path(base).as_posix()}")
+        for dirpath, dirnames, files in os.walk(base):
+            dirnames[:] = sorted(d for d in dirnames if d not in m._SKIP_DIRS)
+            for name in sorted(files):
+                if not name.endswith(".sh"):
+                    continue
+                path = Path(dirpath) / name
+                # A root outside the tree (a fixture) keeps its absolute POSIX spelling.
+                rel = (path.relative_to(root) if root in path.parents else path).as_posix()
+                try:
+                    defs = parse_shell_defs(path.read_text(encoding="utf-8"))[0]
+                except (SyntaxError, UnicodeDecodeError) as exc:
+                    raise m.MapError(f"{layer}: shell parse error in {rel}: {exc}") from exc
+                for ident in dict.fromkeys(n for n, _line in defs if not n.startswith("_")):
+                    out.append({"id": ident, "kind": "function", "file": rel})
+    if not out:
+        raise m.MapError(f"{layer}: no public shell definition under {[Path(b).as_posix() for b in roots]}")
+    return out
+
 
 def _live_py(layer: str) -> list[dict[str, str]]:
     """Python symbols under tools/, minus the `*.template.py` scaffolding sources.
@@ -271,6 +320,8 @@ SYMBOL_EXTRACTORS: dict[str, object] = {
     "kit-py": lambda: _live_py("kit-py"),
     # Export scan UNION definition probe — see _build_js_layer for why one of them alone indexed 3 of 33.
     "kit-js": lambda: _build_js_layer("kit-js"),
+    # Tokenizer-backed (the lexicon's parse_shell_defs); raises MapError on a file it refuses.
+    "kit-sh": lambda: scan_shell_layer("kit-sh", SHELL_ROOTS),
 }
 
 

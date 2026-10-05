@@ -1842,6 +1842,9 @@ def main() -> int:
     failures += check_guarded("dark layers: every declared layer is present here (AC5)",
                               test_every_declared_layer_is_present_on_this_tree)
     with tempfile.TemporaryDirectory() as td:
+        failures += check("shell layer: public definitions only, untokenizable refuses (aMendedFleet-35)",
+                          lambda: test_shell_layer_indexes_public_definitions_only(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
         failures += check("gate-coverage: an uncompared artifact fails (AC1)",
                           lambda: test_gate_coverage_fails_on_an_uncompared_artifact(Path(td)))
     with tempfile.TemporaryDirectory() as td:
@@ -2441,6 +2444,30 @@ def test_every_declared_layer_is_present_on_this_tree():
     for token in declared:
         assert token.startswith("."), f"{token} is the OLD language-name spelling"
         assert token in present, f"{token} is declared dark and is not present in the corpus"
+
+
+def test_shell_layer_indexes_public_definitions_only(tmp: Path):
+    """TOOL-aMendedFleet-35 S1/S2 — the project-owned `kit-sh` layer, over a fixture root.
+
+    A public definition is indexed; a `_`-private one and a function inside a heredoc body are not;
+    an untokenizable file raises MapError naming it rather than yielding a smaller index.
+    """
+    import map_extractors as mx
+    good, bad = tmp / "good", tmp / "bad"
+    good.mkdir()
+    bad.mkdir()
+    (good / "lib.sh").write_text(
+        "build_thing() {\n  echo hi\n}\n_private_helper() {\n  :\n}\n"
+        "cat <<'EOF'\nfunction embedded() { return 1; }\nEOF\n", encoding="utf-8")
+    (bad / "broken.sh").write_text('f() {\n  echo "oops\n}\n', encoding="utf-8")
+    rows = mx.scan_shell_layer("kit-sh", (good,), root=tmp)
+    assert rows == [{"id": "build_thing", "kind": "function", "file": "good/lib.sh"}], rows
+    try:
+        mx.scan_shell_layer("kit-sh", (bad,), root=tmp)
+    except m.MapError as exc:
+        assert "bad/broken.sh" in str(exc), exc
+    else:
+        raise AssertionError("an untokenizable shell file was indexed as nothing, not refused")
 
 
 # --- left-shifts from the closing diff review (dTracedLattice round 1) ----------------------------

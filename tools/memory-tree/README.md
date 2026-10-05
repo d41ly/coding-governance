@@ -499,9 +499,9 @@ method.
 **Never read a probe's exit status as a verdict — these exit 0 on a miss.** A clean "nothing found" is an ANSWER:
 record it as the no-seam evidence, and do not re-run with softer words until it says something.
 
-**A partial-recall or blind-layer notice means the probe cannot see that layer at all.** In this repo **bash is
-recall-dark**, so the gates, adopters and hooks that ARE the product never surface as seams; `grep` that layer
-specifically and say so in §10.
+**A partial-recall or blind-layer notice means the probe cannot see that layer at all.** Its banner names
+every unscanned layer, derived from the tree; where it names one, `grep` that layer specifically and say so
+in §10.
 
 **A miss on one phrasing is not absence.** Try the behaviour, then the artifact noun, once.
 
