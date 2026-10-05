@@ -13933,6 +13933,41 @@ same "GH24 AC1 away ...and the claim at s1" "$(read_claim_field tRun session)" "
 check_prior_landed "GH24 AC1 away restored"
 rm -rf "$GR_BIN"; remove_claim_refs; reset_tree
 
+# ==================================================================================================
+# TOOL-aGraftedHelix-25 — THE `prior-session` ADD'S OWN FAILURE RETURNS THE HOLDER ROW BEFORE
+# write_lease. The git shim makes the claim push exit 124 and leaves a marker; a mktemp shim forwards
+# until that marker exists, then exits 1 once, so the first temporary file taken after the CAS's
+# outcome, the add's set_fact, fails, with no sleep and no count. AC1: over unit 24's aged base the s2
+# call prints the announce line and leaves session s1, an empty set and lease-utc unmoved; the next
+# s2 call with no shim reads the claim `mine`, lands it under s2 with no check 108 and leaves the set
+# empty. RED against a driver copy with the add's `|| return 1` dropped: write_lease moves the record
+# to s2 with no s1 in the set, and the second call answers check 108. Units 20's and 24's helpers.
+# ==================================================================================================
+GS_BIN=$(mktemp -d)
+cat > "$GS_BIN/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) : > "$GS_BIN/git.fired"; exit 124 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+cat > "$GS_BIN/mktemp" <<EOF
+#!/usr/bin/env bash
+if [ -e "$GS_BIN/git.fired" ] && [ ! -e "$GS_BIN/mktemp.fired" ]; then : > "$GS_BIN/mktemp.fired"; exit 1; fi
+exec "$GR_MKTEMP" "\$@"
+EOF
+chmod +x "$GS_BIN/git" "$GS_BIN/mktemp"
+build_prior_base
+sed -i "s/^lease-utc: .*/lease-utc: $(derive_claim_ago 600)/" memory/builds/tRun/RUN.md
+git add -A >/dev/null && git commit -q -m gs-aged --no-verify
+GS_LU=$(read_run_fact lease-utc)
+out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GS_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1)
+rm -rf "$GS_BIN"
+hit  "$out" "unattended: claim not written — tRun · the push was killed by this kit's own"
+same "GH25 AC1 the failed add leaves session s1" "$(read_run_fact session)" "s1"
+same "GH25 AC1 ...an empty prior-session set" "$(read_run_fact prior-session)" ""
+same "GH25 AC1 ...and lease-utc at its pre-call value" "$(read_run_fact lease-utc)" "$GS_LU"
+check_prior_landed "GH25 AC1 second"
+remove_claim_refs; reset_tree
+
 fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
 if in_shard 2; then
@@ -15132,7 +15167,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # 46 against the prologue's own 20, green against the kit and red under the parent's driver, a
 # driver copy moving back the unreadable-claim path's add alone, and a shim that never fires; no
 # suite ran.
-FLOOR_ASSERTIONS=2370
+# RAISED 2370 -> 2380 by TOOL-aGraftedHelix-25: the failed-add arm's 10 executed assertions in
+# region two, its one `mutate` call included, MEASURED: that arm run alone behind this prologue, the
+# claim block's gh_ helpers and the helpers of units 20 and 24 on node a, 2026-10-05, executed 30
+# against the prologue's own 20, green against the kit and red under a driver copy with the add's
+# `|| return 1` dropped; no suite ran.
+FLOOR_ASSERTIONS=2380
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -15271,7 +15311,8 @@ FLOOR_SHARD_1=209
 # RAISED 1981 -> 1987: the same 6 region-two read-axis refusal assertions, see FLOOR_ASSERTIONS.
 # RAISED 1987 -> 2147: the same 160 region-two prior-session set assertions, see FLOOR_ASSERTIONS.
 # RAISED 2147 -> 2173: the same 26 region-two interruption assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=2173
+# RAISED 2173 -> 2183: the same 10 region-two failed-add assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=2183
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

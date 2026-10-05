@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-25 — the `prior-session` add's own failure returns the holder row before `write_lease`, observed by a criterion that fails the add itself
 
-**Status:** SPECCED · rev-5 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 7
+**Status:** CLOSED · rev-5 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
