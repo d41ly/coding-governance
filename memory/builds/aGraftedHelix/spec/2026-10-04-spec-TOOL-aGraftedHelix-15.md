@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-15 — the build harness commits the specs its writers authored before AUDIT pins them, and its commit-first refusals name a remedy a resume cannot replay
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 10 · advances TOOL-aHoistedPass-35 · ratified 2026-10-04
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 10 · advances TOOL-aHoistedPass-35 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -62,7 +62,8 @@ a build whose specs the harness authors.
   runs no suite (shared invariant 11).
 - **S10** — The commit stage's checklist output reaches whoever acts on it, because moving the spec
   commit into the program moves the checklist BUILD-METHOD M6 owes after it. On the audit route it is
-  appended to the checklist the audit receives, beside the resolver's. On the audit-OFF route the
+  merged into the checklist the audit receives, after the resolver's, as ONE checker-shaped string
+  carrying ONE by-design block. On the audit-OFF route the
   hand-out carries it with the stage's sha as `specCommit`, with the instruction to act on it before
   the first dispatch. Observed by AC1.
 
@@ -201,8 +202,17 @@ indexes and the shared records, and that exclusion alone would also suffice.
 
 On success the stage logs `spec stage: committed <n> spec(s) at <sha>`.
 
-**The checklist (S10).** A non-empty `checklist` is appended, under a label naming the spec commit,
-to the checklist the audit receives, after the resolver's own. On the audit-OFF route the hand-out
+**The checklist (S10).** A non-empty `checklist` is merged, under a `# ` label line naming the spec
+commit, into the checklist the audit receives, after the resolver's own. It is MERGED and never
+appended, because unit 3's parser in `tools/workflows/tier2-review.template.js` reads one checker
+output per string: `extractByDesign` cuts out the FIRST by-design head only, and `parseChecklist`
+folds every later line that does not open `- ` into the item above it. A plain append would hand
+the lenses the second block's invariants as bug classes and glue its header lines onto the
+resolver's last item. So `renderChecklistUnion` writes ONE checker-shaped string: both inputs'
+header lines first with the label between them, then both item sets with a repeat of an item
+already listed dropped by its first line, then ONE by-design head whose count is the union of both
+blocks' entries, then those entries. Where no caller or resolver checklist exists, the merge over
+an empty first input is the spec commit's checklist under its label. On the audit-OFF route the hand-out
 gains `specCommit: {sha, checklist}`, and the hand-out's instruction says to act on that checklist
 before the first `--dispatch`. M8's closing checklist over `<BASE>..HEAD` still runs; this one is the
 per-pass obligation M6 attaches to the spec pass.
@@ -306,10 +316,14 @@ same way. One constant serves every such site, so the sites cannot drift into tw
 | `checklist` | optional commit-stage return field | `SPEC_COMMIT_SCHEMA` |
 | `specCommit` | hand-out field, `{sha, checklist}` | the audit-OFF hand-out |
 | `commit:specs:<slug>` | agent label | the commit stage |
+| `renderChecklistUnion` | function | the template, top level, beside `renderCloses` |
+| `BY_DESIGN_HEAD` | constant | the template, a copy of `tools/workflows/tier2-review.template.js`'s |
 
-No new named function, so no `.lexicon.conf` cell grades this unit. A helper the builder finds it
-needs is named through `python tools/lexicon/lexicon.py --suggest <name> --as <cell>` first. No key
-the codebase map's ratchet reads is added: no file, leg or conf key.
+One new named function, `renderChecklistUnion`. `python tools/lexicon/lexicon.py --suggest
+renderChecklistUnion --as js.function` answered `OK`: it leads with `render`, the verb this file's
+`renderRoster` and `renderCloses` already use for text it composes. No key the codebase map's
+ratchet reads is added: no file, leg or conf key. The map's generated symbol index gains the
+function's two rows, one per carrier, re-rendered with `gen_map.py --write` in the same commit.
 
 The harness's emitted install paths gain `{{MEMORY_TREE_DIR}}/gen_build_index.py`, through the
 render token the `CHECKLIST` constant already uses, so shared invariant 2 holds. The parity renderer
@@ -324,6 +338,7 @@ install layouts.
 - `tools/workflows/README.md`
 - `tools/workflows/tier2-review.template.js`, the version line only
 - `tools/workflows/tier2-review.js`, by the render
+- `memory/map/generated/symbols.json`, by the map's generator
 
 ### Rollout
 
@@ -426,9 +441,10 @@ Each staged break is made in a scratch COPY of the render and observed once.
   trailer `Pass: none`, `A-tB-1`, the H1 line as the locator, and `gotchas.py --for-diff HEAD~1..HEAD`,
   and orders every path listed before staging left unstaged as the literal `FOREIGN`. The log
   carries `spec stage: committed 1 spec(s) at` with the sha. With the commit double returning a
-  `checklist` string, the traced audit call's `checklist` argument carries that string after the
-  resolver's. With `specAudit` absent the stage still runs once, the roster is handed out, and the
-  hand-out's `specCommit` carries the sha and that string.
+  checker-shaped `checklist` string, the traced audit call's `checklist` argument carries that
+  string's item lines after the resolver's, a repeated item once, and exactly one by-design head,
+  whose count is both blocks' entries together. With `specAudit` absent the stage still runs once,
+  the roster is handed out, and the hand-out's `specCommit` carries the sha and that string.
   Red when: the stage is missing or runs after the resolver, or its checklist reaches nobody. Staged:
   the stage's `agent(` call deleted in the copy leaves no `agent:commit:` line in the trace.
   cost: an end-to-end call through the Workflow runtime cannot run inside a pass, because a sidechain
@@ -503,7 +519,7 @@ Each staged break is made in a scratch COPY of the render and observed once.
 
 ## 7. Gates
 
-`unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `workflow script syntax` · `review-protocol parity (kit vs dogfood)` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `method carriers (every pointer declared)` · `pass-order history` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `workflow script syntax` · `review-protocol parity (kit vs dogfood)` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `method carriers (every pointer declared)` · `pass-order history` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms`
 
 New arm: tools/workflows/unattended-build.test.sh · the commit stage's placement, prompt, log and checklist routing over a SPEC double authoring a pathless unit, with the audit declared and absent; stage the stage call deleted · the suite's floor rises by the arms added
 
@@ -516,9 +532,11 @@ New arm: tools/workflows/unattended-build.test.sh · the notAtHead, partial, pat
 Moved arms, in the same suite. The writers' "the caller commits once after them" arm is repointed at
 the new sentence. Every arm that reaches the resolver or the audit-OFF hand-out without caller
 `subjects` gains a commit double: the `NOSUBJ` arms, the round-1 `OFF_UNITS` arms, and the
-checklist arms unit 3 adds. Arm (v)'s layout fixture gains a stub generator beside its checklist
-script, because the render now emits that path. The engine-identity arm's version literal moves with
-S8.
+checklist arms unit 3 adds. Their commit double returns no `checklist`, so unit 3's arms keep
+reading the resolver's string unmerged. Arm (v)'s layout fixture is unchanged: its run carries
+caller `subjects`, so the stage does not run there and the render emits no generator path on that
+run; the generator path rides the `{{MEMORY_TREE_DIR}}` token arm (iv) already grades. The
+engine-identity arm's version literal moves with S8.
 
 The close runs the legs and the suite. A pass runs the probe and the commands of §6 as its check.
 
@@ -558,6 +576,14 @@ The close runs the legs and the suite. A pass runs the probe and the commands of
   refusal, and the empty-subject cause over unrefused units); 11 (AC7's carriers); 30 and 37
   (`build_commit` and `read_attribution_tokens` replace a dead name); and 36 (the header's
   `advances` verb). §3 gains the hands-off to the unit promoted from finding 21.
+- rev-3 · 2026-10-05 · §2 §4 §6 §7 · S10 · AC1 · the builder, against unit 3's landed parser: S10
+  appended the spec commit's checklist to the audit's, and `tools/workflows/tier2-review.template.js`
+  reads ONE by-design block per string (`extractByDesign` takes the first head) and folds later
+  non-item lines into the item above (`parseChecklist`), so an append handed the lenses a second
+  block's invariants as bug classes. The checklist is now MERGED by `renderChecklistUnion` into one
+  checker-shaped string; §4's inventory gains that function and `BY_DESIGN_HEAD`, and the symbol
+  index joins Files touched, so the leg line gains the two recall-floor legs that path trips. §7: arm (v)'s run carries caller `subjects`, so its fixture needs no
+  stub generator, and the moved arms' commit double returns no checklist.
 
 ## 10. Reuse audit
 
