@@ -92,3 +92,5 @@ base: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 2026-10-05T01:13:52Z dispatch · item a1f965e6 TOOL-aEvidencedLens-10 · reason tools/workflows/review_replay.py tools/workflows/README.md memory/map/generated/symbols.json memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-10.md memory/builds/aEvidencedLens/README.md
 
 2026-10-05T01:13:56Z brief · item TOOL-aEvidencedLens-10 · reason 61f076199a07 memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-10-2-build-brief.md
+
+2026-10-05T01:24:12Z brief · item TOOL-aEvidencedLens-13 · reason 3ba2376096ef memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-13-2-build-brief.md
