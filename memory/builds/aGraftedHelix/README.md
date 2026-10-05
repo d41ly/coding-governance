@@ -134,7 +134,7 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28
 | [TOOL-aGraftedHelix-28 — a parity gate holds the by-design head the catalogue renders equal to the pattern the review harness parses](spec/2026-10-05-spec-TOOL-aGraftedHelix-28.md) | 12 | 1 | SPECCED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 25 bound to this build, across 4 record folder(s).
+Records: 26 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-aGraftedHelix-26.
 
