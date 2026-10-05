@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-12 — the spec skeptic line carries a finding's evidence through a line-break-only fold, so a pipe survives
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -179,6 +179,10 @@ none
 
 - rev-1 · 2026-10-05 · initial draft, promoted from the round-1 spec audit's finding 36 (HIGH),
   repairing `TOOL-aEvidencedLens-3`.
+- rev-2 · 2026-10-05 · §3 · the status header's order moves from 4 to 7. The main loop moved it so that units 6 and 5
+  build before the promoted units are audited. At order 4, check 49 refuses unit 6 until this unit is
+  dispatched. Unit 2 refuses a spec audit without `scratch` until unit 5 supplies one. And the
+  build's mandate tests the improved harness on the promoted units. It still follows unit 3.
 
 ## 10. Reuse audit
 
