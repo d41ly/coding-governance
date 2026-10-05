@@ -13,9 +13,11 @@
 ## The suite arm
 
 S5's arms in `tools/workflows/tier2-review.test.sh` are written and not run as a suite: `bash -n`
-passed and `node --check` over its extracted JavaScript passed. The arm records `agentType` per
-spawn, checks the default run carries none, the `Plan` run routes all ten judges and neither
-orchestrating agent, and three malformed values refuse before a spawn. The tier2-review self-test,
+passed, and its extracted JavaScript parsed under `vm.Script`, which reds on a truncated file where
+`node --check` cannot. The arm records `agentType` per spawn, checks the default run carries none,
+the `Plan` run routes all ten judges and neither orchestrating agent, tells each judge to return
+`path` empty, and three malformed values refuse before a spawn. The stub runner observed the
+empty-path instruction on all seven judges of the AC1 run. The tier2-review self-test,
 the review-join and verifier fan-out self-tests, the unattended-build self-test, install-prefix,
 kit epoch and spec tokens are owed at the close; `bash tools/check-line-length.sh` and the
 encoding-posture checker ran here, both exit 0.

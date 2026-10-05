@@ -301,6 +301,7 @@ async function runWholeScriptArms() {
     ck(judges.length === 10 && judges.every((t) => t.agentType === 'Plan'), 'workerType: all five finders and five skeptic batches spawn as Plan')
     ck(orch.length === 2 && orch.every((t) => t.agentType === undefined), 'workerType: the probe and the synthesis carry none: ' + orch.map((t) => t.label).join(' '))
     ck(judges.every((t) => t.prompt.indexOf('DURABILITY') === -1), 'workerType: no judge is told to write a lens or verify file')
+    ck(judges.every((t) => t.prompt.indexOf('Set path to an empty string') !== -1), 'workerType: every judge is told to return path empty')
     ck(r.logs.some((l) => l.indexOf('worker type Plan') === 0 && l.indexOf('NOT durable') !== -1), 'workerType: the log says the results are not durable')
     ck(r.result.key !== K, 'workerType: the key differs from the default run\'s, so no default lens file answers it')
   }
