@@ -31,9 +31,10 @@ Usage:
 or the fan-in it reads (the codebase-map dossier's `## Constraints & why`). It is still on no leg.
 
 `--predictors` is what earns, or refuses, a runtime miss line in `reuse_lookup.py`
-(TOOL-aMendedFleet-46). It reads eight quantities off each shortlist, grades each by its AUC against
-the hit label over two populations -- every graded phrase, and those whose truth is reachable --
-beside a shuffled-label band, and prints exactly one `miss predictor:` verdict. Re-run it after
+(TOOL-aMendedFleet-46). It reads the PREDICTORS quantities off each shortlist, grades each by
+its AUC against the hit label over two populations -- every graded phrase, and those whose truth
+is reachable -- beside a shuffled-label band, and prints exactly one `miss predictor:` verdict.
+Re-run it after
 every ranker or corpus change; the codebase-map dossier's `## Gaps` holds the last reading.
 """
 
@@ -118,7 +119,7 @@ _RECORD_DATE = re.compile(r"^(\d{4}-\d{2}-\d{2})-")
 # THE MISS-PREDICTOR RULE (TOOL-aMendedFleet-46 S3). A predictor qualifies over one population only
 # when its AUC is at or beyond 0.70 / 0.30, lies outside that population's shuffled-label band, and
 # the population holds at least PREDICTOR_MIN_LABELS hits AND misses: a threshold fitted to eleven
-# misses is a guess with a number attached. The eight names are the row keys `measure_predictors`
+# misses is a guess with a number attached. These names are the row keys `measure_predictors`
 # adds, in the order they print.
 PREDICTORS = ("seed_coverage", "best_overlap", "union_coverage", "n_seeds", "n_ranked",
               "idf_coverage", "best_idf", "q_len")
@@ -269,7 +270,7 @@ def measure_phrase(corpus, ref, phrase: str, truth: list[str], budget: int = 0,
 def measure_predictors(corpus, ref, phrase: str, truth: list[str], budget: int = 0,
                        scan: dict | None = None, corpus_files: set[str] | None = None,
                        name_df: dict | None = None) -> dict:
-    """`measure_phrase`'s row, plus `reachable` and the eight PREDICTORS read off ONE shortlist.
+    """`measure_phrase`'s row, plus `reachable` and every one of PREDICTORS read off ONE shortlist.
 
     Every value is a property of the seeds and the query's stems, because `assemble_shortlist`
     carries no score: there is no second ranker here. A seed's shared stems are its NAME stems
