@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-6 — the review returns a per-lens yield over defect clusters, unique defects counted
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 5
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -48,8 +48,8 @@ and scores each lens on the DEFECTS it found and the ones only it found, not on 
   synthesis is told to copy into the report directly after its review-shape sentence. `defects` and
   `unique` are derived after the synthesis returns, so they are returned and logged and never in the
   report. Observed by AC6.
-- **S7** — Every path that returns `lensYield` logs it as one `lens yield:` line per row. Observed by
-  AC6.
+- **S7** — Every path that returns `lensYield` logs it as one `lens yield:` line per row, through
+  `printLensYield(rows)`. Observed by AC6.
 - **S8** — Both kinds. The block is a synthesis-prompt input and a return field; no lens or skeptic
   prompt moves on either kind, and `REVIEW_SHAPE` and `inputPrint` do not move, because neither the
   lens files nor the verify files a review key guards change. Observed by AC7.
@@ -134,9 +134,10 @@ uncertain u · unverified v · precision <p|-> · defects <d|-> · unique <q|->`
 |---|---|---|
 | `deriveLensYield` | `js.function` | new function |
 | `renderLensYield` | `js.function` | new function |
+| `printLensYield` | `js.function` | new function |
 | `lensYield` | return field | new key on every return |
 
-Both names were checked with `python tools/lexicon/lexicon.py --suggest <name> --as js.function` and
+All three names were checked with `python tools/lexicon/lexicon.py --suggest <name> --as js.function` and
 answered OK.
 
 ### Files touched (estimate)
@@ -254,6 +255,9 @@ New arm: tools/workflows/tier2-review.test.sh · every return site, the no-findi
   Id 35 (LOW): S6 no longer calls six counts four. Id 49 (LOW): §10 cites `TOOL-aWeldedTribunal-4`
   as the built precedent. §3 gains the hands-off edge to `TOOL-aEvidencedLens-13`, the unit the
   same defect's HIGH, id 25, was promoted to.
+- rev-3 · 2026-10-05 · S7 §4 Inventory · build pass. The five return sites each log the rows, so the
+  log line is one function, `printLensYield(rows)`, rather than five copies of its template; S7 names
+  it and the inventory carries it as a third new function, checked with the lexicon like the other two.
 
 ## 10. Reuse audit
 
