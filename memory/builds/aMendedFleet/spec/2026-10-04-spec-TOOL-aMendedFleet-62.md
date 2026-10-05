@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-62 — the two history legs grade the run's own range, reusing node d's bytes
 
-**Status:** SPECCED · rev-4 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 61
+**Status:** CLOSED · rev-4 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 61
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-62-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-62-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

@@ -700,5 +700,73 @@ has   "a truncated probe: the ordinary violation" "$o" "NO brief row"
 hasnt "a truncated probe: no built-before-its-run skip" "$o" "built before its run"
 rm -rf "$T"
 
+# ---- RANGE MODE (TOOL-dUnstuckLanding-17 S2/S4, AC3). A CLOSED unit already on the tip the remote
+# ---- advertises was graded when it landed, so a closing run grades only what it adds. The fixture is
+# ---- a clone of a bare origin whose tip carries ARCH-tBR-1 built with NO brief row, and the unpushed
+# ---- run adds ARCH-tBR-2 built with one. `write_br_build <n> <row|norow>` makes unit n's build commit.
+write_br_build() { # unit number · row|norow -> one build commit for that unit, with or without its brief row
+  printf 'the brief for unit %s\n' "$1" > memory/builds/tBR/prompts/b$1.md
+  if [ "$2" = row ]; then
+    printf '\n2026-06-02T00:00:00Z brief · item ARCH-tBR-%s · reason %s memory/builds/tBR/prompts/b%s.md\n' \
+      "$1" "$(git hash-object memory/builds/tBR/prompts/b$1.md | cut -c1-12)" "$1" >> memory/builds/tBR/RUN.md
+  fi
+  printf 'product %s\n' "$1" > ${PFX}p$1.sh
+  git add -A >/dev/null; git commit -q -m "ARCH-tBR-$1: build the thing" --no-verify
+}
+seed_brange_fixture() { # -> prints the fixture root; the clone is <root>/work, its origin <root>/origin.git
+  local T
+  T=$(mktemp -d) || exit 2
+  ( cd "$T" || exit 2
+    git init -q --bare origin.git
+    git --git-dir=origin.git symbolic-ref HEAD refs/heads/main
+    git init -q work && cd work || exit 2
+    git config user.email t@t; git config user.name t; git config commit.gpgsign false
+    git checkout -q -b main
+    mkdir -p ${PFX}${KIT_NAME} memory/builds/tBR/spec memory/builds/tBR/prompts
+    cp "$KIT/lib-unattended.sh" "$KIT/unattended.sh" "$KIT/check-brief-recorded.sh" ${PFX}${KIT_NAME}/
+    printf 'MEMORY_ROOT=memory\nBRIEF_RECORDED_CUTOFF="2026-01-01"\nSHARED_RECORDS="memory/DECISIONS.md memory/backlog"\n' > .unattended.conf
+    { printf -- '---\nslug: tBR\nnode: t\nopened: 2026-06-01\nstreams: tooling\nroster: ARCH\nids: ARCH-tBR-1\n---\n# tBR\n'
+      printf '<!-- gen:build-index -->\n<!-- gen:build-units -->\n| Unit | Order | Tier | Status | Rev | Last change |\n|---|---|---|---|---|---|\n'
+      for u in 1 2 3; do printf '| [ARCH-tBR-%s — unit](spec/s%s.md) | %s | 2 | CLOSED | rev-1 | 2026-06-01 |\n' "$u" "$u" "$u"; done
+      printf '<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n'; } > memory/builds/tBR/README.md
+    git add -A >/dev/null; git commit -q -m "fixture base" --no-verify
+    printf '# tBR — run state\n<!-- run:generated -->\n<!-- /run:generated -->\n## Run facts\nbase: %s\n## Parked\n' "$(git rev-parse HEAD)" > memory/builds/tBR/RUN.md
+    git add -A >/dev/null; git commit -q -m "run state" --no-verify
+    write_br_build 1 norow
+    git remote add origin ../origin.git; git push -q origin main
+    write_br_build 2 row
+  ) >/dev/null 2>&1
+  printf '%s' "$T"
+}
+T=$(seed_brange_fixture)
+RG_TIP=$(git -C "$T/work" rev-parse origin/main)
+o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
+same  "range: a briefless unit on the advertised tip is not re-graded, exit code" "$rc" "0"
+has   "range: the summary names the mode and the tip" "$o" "range ${RG_TIP:0:8}.."
+hasnt "range: the pushed unit is not named" "$o" "ARCH-tBR-1 — BUILT at"
+# ...an UNPUSHED CLOSED unit with no row is graded and named, and the pushed one still is not
+( cd "$T/work" && write_br_build 3 norow ) >/dev/null 2>&1
+o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
+same  "range: an unpushed briefless unit reds, exit code" "$rc" "1"
+has   "range: the unpushed unit is named" "$o" "ARCH-tBR-3 — BUILT at"
+hasnt "range: the pushed unit is still not named" "$o" "ARCH-tBR-1 — BUILT at"
+# ...and an UNRESOLVED tip widens to the whole history: the pushed unit reds as it always did
+git --git-dir="$T/origin.git" symbolic-ref HEAD refs/heads/nothing-here
+o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
+same  "range unresolved: WHOLE mode reds the pushed unit, exit code" "$rc" "1"
+has   "range unresolved: the summary says WHOLE and why" "$o" "range whole (the tip did not resolve: "
+has   "range unresolved: the pushed unit is graded" "$o" "ARCH-tBR-1 — BUILT at"
+rm -rf "$T"
+# ...a WAIVER ROW naming the pushed unit is NOT JUDGED stale in RANGE mode, and is counted (rev-2)
+T=$(seed_brange_fixture)
+( cd "$T/work" && git reset -q --hard origin/main && mkdir -p memory/project \
+  && printf 'ARCH-tBR-1\tbuilt without a recorded brief, landed as-is\n' > memory/project/brief-recorded-waiver.txt \
+  && git add -A >/dev/null && git commit -q -m "waive ARCH-tBR-1" --no-verify && git push -q origin main \
+  && write_br_build 2 row ) >/dev/null 2>&1
+o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
+same  "range waiver: a row naming a pushed unit is not judged stale, exit code" "$rc" "0"
+has   "range waiver: the row is counted as not judged" "$o" "1 waivers not judged"
+rm -rf "$T"
+
 echo "--- $n arms, exit $st"
 exit $st

@@ -24,8 +24,9 @@
 # the driver and the pass-order leg share; `read_host_name`, `read_pid_image` and `check_pid_alive`, the one reading
 # of "which node, which process" the lease writer and both pid probes share; `parse_gate_profile` and
 # `check_gate_wall`, the one reading of the gate runner's profile the driver and the leg both ask; the
-# anchored id tests; path containment; and "has this pass committed yet". The same rule admits the
-# resume tick as a third sourcer.
+# anchored id tests; path containment; "has this pass committed yet"; and `read_advertised_head` with
+# `read_history_range`, the one observation of the remote's tip and the one range rule the two history
+# legs share. The same rule admits the resume tick as a third sourcer.
 
 # --------------------------------------------------------------------------------- git, once
 # Replace refs and graft advice are both OFF: a leg that reads history must see the history that is
@@ -954,6 +955,117 @@ read_run_commits() {  # endpoint · base · exclusion-tip…
     _rrc_ex="$_rrc_ex ^$_rrc_t"
   done
   GIT rev-list "$_rrc_end" "^$_rrc_base" $_rrc_ex 2>/dev/null
+}
+
+# ------------------------------------------------- the advertised tip, for the two history legs
+# TOOL-dUnstuckLanding-17 S1. `pass-order history` and `brief-recorded` grade only the commits the
+# closing run adds on top of the tip the REMOTE advertises, and this is the one place either learns
+# that tip. ONE bounded `ls-remote --symref --exit-code <remote> HEAD`, and nothing else is read: never
+# a local ref, never `refs/remotes/<remote>/HEAD`, never an environment variable. Every one of those is
+# a value the graded run controls, and a range the run names is a range the run can empty.
+#
+# THE BOUNDS ARE THE DRIVER'S, READ AS DATA. `REMOTE_BOUND`, `REMOTE_CONNECT_BOUND` and
+# `REMOTE_LOWSPEED_BYTES` are file constants in the driver; this reads their quoted values out of the
+# file named by the first argument, the way the kit gate's `core_of` does, and never sources it, since
+# a script whose tail runs a verb would run the verb. A constant that does not read is a refusal and
+# never a default.
+#
+# EVERY FAILURE IS A RETURN OF 1 WITH THE REASON IN `ADVH_WHY`, and the caller widens to grading the
+# WHOLE history, never to an empty range. An unanswered observation that narrowed the range would be a
+# probe reading zero. The six refusals: no remote or more than one, a constant that does not read, no
+# working `timeout -k` (the bound would be inert), the bound firing, a remote advertising no HEAD, and
+# an advertised object this clone does not hold.
+#
+# WHAT THIS DOES NOT DO: share the kit gate's observation or the driver's `read_advertised_tip`. Three
+# bounded observations of one advertisement is a known residual, stated in the unit's spec.
+ADVH_SHA=""; ADVH_WHY=""
+read_advertised_head() { # driver path -> 0 with ADVH_SHA set · 1 with ADVH_WHY set
+  local _ah_drv=${1:-} _ah_k _ah_l _ah_v _ah_b="" _ah_cb="" _ah_lb="" _ah_rems _ah_n _ah_rem _ah_f _ah_rc _ah_sha
+  ADVH_SHA=""; ADVH_WHY=""
+  if [ -z "$_ah_drv" ] || [ ! -f "$_ah_drv" ]; then
+    ADVH_WHY="the driver that holds the remote bounds is not readable: ${_ah_drv:-<none given>}"; return 1
+  fi
+  for _ah_k in REMOTE_BOUND REMOTE_CONNECT_BOUND REMOTE_LOWSPEED_BYTES; do
+    _ah_v=""
+    while IFS= read -r _ah_l || [ -n "$_ah_l" ]; do
+      _ah_l=${_ah_l%$'\r'}
+      case "$_ah_l" in "$_ah_k=\""*'"') _ah_v=${_ah_l#"$_ah_k=\""}; _ah_v=${_ah_v%\"}; break ;; esac
+    done < "$_ah_drv"
+    # A POSITIVE integer, not merely digits: `timeout 0` DISABLES the bound, and the driver is a
+    # tracked file the graded run can commit, so a zero is the unbounded observation by another name.
+    case "$_ah_v" in
+      ''|*[!0-9]*) ADVH_WHY="the driver's $_ah_k does not read as a single integer, so the remote observation would run unbounded: $_ah_drv"; return 1 ;;
+    esac
+    if [ "${#_ah_v}" -gt 9 ] || [ "$_ah_v" -le 0 ]; then
+      ADVH_WHY="the driver's $_ah_k is not a positive integer a bound can use, and a zero bound is no bound: $_ah_drv"; return 1
+    fi
+    case "$_ah_k" in
+      REMOTE_BOUND) _ah_b=$_ah_v ;;
+      REMOTE_CONNECT_BOUND) _ah_cb=$_ah_v ;;
+      *) _ah_lb=$_ah_v ;;
+    esac
+  done
+  _ah_rems=$(GIT remote 2>/dev/null)
+  _ah_n=$(printf '%s' "$_ah_rems" | grep -c . || true)
+  case "${_ah_n:-0}" in
+    0) ADVH_WHY="this clone declares no remote to observe"; return 1 ;;
+    1) _ah_rem=$_ah_rems ;;
+    *) ADVH_WHY="this clone declares $_ah_n remotes, and which one the landing reaches is not this reader's to guess"; return 1 ;;
+  esac
+  if ! timeout -k 1s 10 true >/dev/null 2>&1; then
+    ADVH_WHY="this node has no working 'timeout -k', so the remote observation cannot be bounded"; return 1
+  fi
+  _ah_f=$(mktemp 2>/dev/null) || { ADVH_WHY="no scratch file could be created to capture the remote advertisement"; return 1; }
+  # CAPTURED THROUGH A FILE, never a command substitution, for the driver's measured reason: a
+  # substitution waits for the last inherited write end, which a surviving descendant holds while
+  # `timeout` reports on schedule.
+  timeout -k 5s "$_ah_b" \
+    env GIT_TERMINAL_PROMPT=0 \
+        "GIT_SSH_COMMAND=ssh -o ConnectTimeout=$_ah_cb -o BatchMode=yes" \
+    git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" \
+        -c credential.interactive=never \
+        -c "http.lowSpeedLimit=$_ah_lb" -c "http.lowSpeedTime=$_ah_b" \
+        ls-remote --symref --exit-code "$_ah_rem" HEAD >"$_ah_f" 2>/dev/null
+  _ah_rc=$?
+  _ah_sha=$(awk -F'\t' '{ sub(/\r$/, "", $2) } $2 == "HEAD" && $1 ~ /^[0-9a-f]+$/ { print $1; exit }' "$_ah_f" 2>/dev/null)
+  rm -f "$_ah_f"
+  case "$_ah_rc" in
+    0) ;;
+    124) ADVH_WHY="the remote observation was killed by the driver's own ${_ah_b}s bound, so the tip is unknown"; return 1 ;;
+    2) ADVH_WHY="the remote $_ah_rem answered and advertised no HEAD, so it names no default-branch tip"; return 1 ;;
+    *) ADVH_WHY="the remote $_ah_rem did not answer"; return 1 ;;
+  esac
+  if [ -z "$_ah_sha" ]; then
+    ADVH_WHY="the remote $_ah_rem answered and advertised no HEAD, so it names no default-branch tip"; return 1
+  fi
+  if ! GIT rev-parse --verify --quiet "$_ah_sha^{commit}" >/dev/null 2>&1; then
+    ADVH_WHY="the remote $_ah_rem advertises ${_ah_sha:0:8}, a tip this clone does not hold; fetch and read again"; return 1
+  fi
+  ADVH_SHA=$_ah_sha
+  return 0
+}
+
+# THE RANGE RULE, ONE SPELLING FOR BOTH HISTORY LEGS (TOOL-dUnstuckLanding-17 S2). RANGE mode when the
+# advertised tip resolves AND HEAD carries at least one commit the tip does not; every commit walk the
+# leg makes then excludes the tip's history. Otherwise WHOLE mode, which grades what the leg always
+# graded, and the reason is named so WHOLE is never silent. Sets HR_MODE (range|whole), HR_TIP (the
+# tip, RANGE only), HR_EXCL (the `^<tip>` token, empty in WHOLE) and HR_FIELD, the summary field.
+HR_MODE=whole; HR_TIP=""; HR_EXCL=""; HR_FIELD=""
+read_history_range() { # driver path -> sets HR_MODE, HR_TIP, HR_EXCL, HR_FIELD; always returns 0
+  local _hr_n _hr_h
+  HR_MODE=whole; HR_TIP=""; HR_EXCL=""
+  if ! read_advertised_head "$1"; then
+    HR_FIELD="range whole (the tip did not resolve: $ADVH_WHY)"; return 0
+  fi
+  _hr_n=$(GIT rev-list --count "$ADVH_SHA..HEAD" 2>/dev/null)
+  case "$_hr_n" in ''|*[!0-9]*) _hr_n=0 ;; esac
+  if [ "$_hr_n" -eq 0 ]; then
+    HR_FIELD="range whole (HEAD carries nothing the tip ${ADVH_SHA:0:8} lacks)"; return 0
+  fi
+  _hr_h=$(GIT rev-parse HEAD 2>/dev/null)
+  HR_MODE=range; HR_TIP=$ADVH_SHA; HR_EXCL="^$ADVH_SHA"
+  HR_FIELD="range ${ADVH_SHA:0:8}..${_hr_h:0:8}"
+  return 0
 }
 
 # ----------------------------------------------- is a commit touching a path reachable from here
