@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.128 -->
+<!-- gov:kit memory-tree@2.129 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -644,8 +644,8 @@ Its stdout IS the checklist. A checklist nobody can finish is not a checklist.
 A record is a `kind: class` (the default), a `note`, a `superseded` class, or a `kind: invariant`: a
 ruling a reviewer keeps mistaking for a bug. An invariant carries a `decision:` key naming the ruling
 and five sections, `## Looks wrong`, `## Actually`, `## Do`, `## Do not` and `## Guarded by`; its
-anchors select it exactly as a class's do. It is never a checklist item. The checklist ends with the
-by-design block instead, printed on every non-empty selection, `0` included:
+anchors select it exactly as a class's do. The checklist ends with the by-design block, printed on
+every non-empty selection, `0` included:
 
 ```text
 # by design — 1 invariant(s) this selection touches
@@ -654,6 +654,17 @@ by-design block instead, printed on every non-empty selection, `0` included:
 
 The review harness cuts that block out of `checklist` and hands it to every lens and skeptic as
 intended behaviour, so a reviewer refutes a finding the ruling covers instead of re-reporting it.
+
+The block is read at the subject's BASE, so a change cannot write its own exemption: `--for-diff`
+reads it at the commit its range diffs from, and `--for-paths --base <rev>` at that revision. An
+invariant the subject adds, edits or takes out prints as a checklist item instead, and a header line
+names the base and how many there were:
+
+```text
+- [ ] NEW/CHANGED invariant <name> — verify the ruling before treating it as by design
+```
+
+`--for-paths` with no base reads the working tree, and its header line says so.
 
 ## Codebase-map interop
 

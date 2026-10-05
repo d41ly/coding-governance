@@ -1,6 +1,6 @@
 export const meta = {
   name: 'unattended-build',
-  version: '1.7', // gov:kit unattended-build@1.7 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
+  version: '1.8', // gov:kit unattended-build@1.8 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
     'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal. The SPEC stage ends in ONE commit of the specs its writers authored, so the audit pins them at HEAD in the same call. AUDIT is opt-in: with no `specAudit` arg the stage announces itself OFF by declaration and the roster follows SPEC completion.',
   phases: [
@@ -163,7 +163,7 @@ function chunk(a, n) {
 // { repo: "/abs/path/to/worktree",                 // REQUIRED
 //   slug: "<build slug>",                           // REQUIRED
 //   scratch: "<absolute session scratchpad>",       // REQUIRED — the path the caller's OWN system prompt names
-//   base: "<immutable sha>",                        // the review anchor, for the record
+//   base: "<immutable sha>",                        // the review anchor; the spec audit's checklist reads invariants at it
 //   units: [{ id, order, specPath, briefPath,      // ORDERED by the caller, from --plan
 //            specBriefPath,                        //   optional: the per-unit SPEC brief
 //            closes,                               //   optional: [<ask id>], the asks this unit answers
@@ -454,6 +454,10 @@ const resumeRemedy =
 // TOOL-aEvidencedLens-5 S3 - the spec audit's checklist. A spec precedes its code, so there is no diff:
 // the resolver runs this over the paths the subjects' `Files touched (estimate)` sections declare.
 const AUDIT_CHECKLIST = 'python tools/memory-tree/gotchas.py --for-paths'
+// TOOL-aGraftedHelix-29 S9 - the checker reads the audit's by-design block AT THE RUN'S PINNED BASE, so
+// an invariant this build added or edited is an item on its own audit and never an exemption. Only a
+// `base` of the shape `badSubject` tests is forwarded; any other value pins nothing and is warned of.
+const auditBase = /^[0-9a-f]{7,40}$/.test(base) ? base : ''
 const ordered = units.slice().sort(function (x, y) {
   const ox = Number.isInteger(x.order) ? x.order : 1e9
   const oy = Number.isInteger(y.order) ? y.order : 1e9
@@ -1135,7 +1139,8 @@ if (specAudit && !subjects) {
       '`{path}`, and never in `subjects`: it is a spec nothing has committed, so no blob can pin it.\n\n' +
       'Then the bug-class checklist: read each resolved spec\'s `### Files touched (estimate)` section, ' +
       'the sub-head spelled with or without ` (estimate)`, ' +
-      'collect its backticked paths, union them, and run `' + AUDIT_CHECKLIST + ' <paths>` in ' + repo +
+      'collect its backticked paths, union them, and run `' + AUDIT_CHECKLIST +
+      (auditBase ? ' --base ' + auditBase : '') + ' <paths>` in ' + repo +
       ' with a 120-second timeout. Return its stdout verbatim as `checklist` and the paths as ' +
       '`checklistPaths`. Return NO `checklist` and a `checklistError` naming why instead when no path ' +
       'was declared, the command exits non-zero (name the code), it times out, or its stdout carries no ' +
@@ -1149,7 +1154,13 @@ if (specAudit && !subjects) {
   if (checklist === null) {
     if (res && typeof res.checklist === 'string' && /^- /m.test(res.checklist)) {
       checklist = res.checklist
-      checklistFrom = '--for-paths over ' + (Array.isArray(res.checklistPaths) ? res.checklistPaths.length : 0) + ' path(s)'
+      checklistFrom = '--for-paths over ' + (Array.isArray(res.checklistPaths) ? res.checklistPaths.length : 0) + ' path(s)' +
+        (auditBase ? ' at base ' + auditBase.slice(0, 12) : '')
+      // The one route on which the audit's by-design block is the stdout of the command this stage ran.
+      if (!auditBase) {
+        log('WARNING: the audit\'s checklist reads invariants from the working tree — no pinned `base` was passed, ' +
+          'so an invariant this build added can stand as by design')
+      }
     } else checklistWhy = res && typeof res.checklist === 'string' && res.checklist.trim()
       ? 'no bug class selected'
       : (res && typeof res.checklistError === 'string' && res.checklistError) || 'the resolver returned neither `checklist` nor `checklistError`'

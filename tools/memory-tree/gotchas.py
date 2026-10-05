@@ -5,7 +5,7 @@
     python <prefix>/memory-tree/gotchas.py --write                 # render INDEX.md
     python <prefix>/memory-tree/gotchas.py --report                # the counts the budget is measured on
     python <prefix>/memory-tree/gotchas.py --for-diff <base>..<head>   # STDOUT IS THE CHECKLIST
-    python <prefix>/memory-tree/gotchas.py --for-paths <path>...       # the same checklist, no diff yet
+    python <prefix>/memory-tree/gotchas.py --for-paths [--base <rev>] <path>...   # the same checklist, no diff yet
     python <prefix>/memory-tree/gotchas.py --declares < record.md   # prints `declares: yes|no`; rc 0 / 1, 2 unreadable
     python <prefix>/memory-tree/gotchas.py --selftest
 
@@ -23,8 +23,16 @@ AN INVARIANT IS THE OTHER HALF OF A REVIEWER'S BRIEF (TOOL-aGraftedHelix-3). A `
 names a ruling a reviewer keeps mistaking for a bug, by its `decision:` id, in five sections. It is
 selected by the same anchors, and printed AFTER the checklist as the by-design block
 (`# by design — <n> invariant(s) this selection touches`, the head printed on every non-empty
-selection, `0` included), never as a checklist item. The review harness cuts the block back out of
-`checklist` and hands it to every lens and skeptic as `byDesign`.
+selection, `0` included). The review harness cuts the block back out of `checklist` and hands it to
+every lens and skeptic as `byDesign`.
+
+THE BLOCK IS READ AT THE SUBJECT'S BASE (TOOL-aGraftedHelix-29). Read from the tree under review, a
+range that added or edited an invariant handed its own review an instruction to refute whatever that
+ruling covers. `--for-diff` reads the block from the records as they stood at the commit its range
+diffs from, and `--for-paths --base <rev>` at that revision. An invariant the subject adds, edits or
+takes out is never by design there: it prints as a `NEW/CHANGED invariant` checklist item, because
+an item can only widen a review. `--for-paths` with no base reads the working tree and says so on a
+header line. Classes keep reading the working tree for the same reason.
 
 THREE UPSTREAM HARVEST DEFECTS ARE CARRIED, each with its own arm in --selftest — TWO as behaviour
 this implementation shares, ONE as a difference:
@@ -72,6 +80,15 @@ KINDS = ("class", "note", "superseded", "invariant")
 # `checklist` and hands its lenses as `byDesign`. One spelling of the head: the harness matches it.
 INVARIANT_SECTIONS = ("Looks wrong", "Actually", "Do", "Do not", "Guarded by")
 BY_DESIGN_HEAD = "# by design — {n} invariant(s) this selection touches"
+# TOOL-aGraftedHelix-29 — where the block was read from, said on every checklist. Each opens `# `, so
+# the review harness reads it as preamble and the build harness's union as a head line; none opens
+# `# by design —`, so no pattern takes it for the block's head.
+INVARIANTS_AT_BASE = ("# invariants are read at {sha}; {n} that this subject adds, edits or takes out "
+                      "are listed as items, never by design")
+INVARIANTS_UNPINNED = ("# invariants are read from the working tree; with no --base, a record this "
+                       "subject adds or edits can stand as by design")
+INVARIANTS_UNPARSED = "# {n} record(s) at {sha} did not parse, so none of them is by design: {paths}"
+MOVED_INVARIANT_ITEM = "- [ ] NEW/CHANGED invariant {name} — verify the ruling before treating it as by design"
 GUARD_TOKEN_RE = re.compile(r"`([^`]+)`")
 
 
@@ -245,6 +262,24 @@ def declares(text: str) -> bool:
     return bool(DECLARES_RE.search(text[m.end():] if m else text))
 
 
+def build_record(rel: str, text: str) -> dict:
+    """ONE record from its repo-relative path and its LF-folded text: the shape `records` builds from
+    the working tree and `load_records_at` from a commit (TOOL-aGraftedHelix-29). `text` is kept so the
+    two can be compared. A record that does not parse raises `Problem`."""
+    fm = parse_front_matter(rel, text)
+    body = text[FM_RE.match(text).end():]
+    return {
+        "path": rel, "name": fm["name"], "description": fm["description"],
+        "kind": fm["kind"], "universal": fm["universal"],
+        "declares": declares(text),
+        "anchors": sorted(set(ANCHOR_RE.findall(body))),
+        # Read for an invariant only; a class carries neither key's meaning.
+        "decision": fm.get("decision", ""),
+        "sections": parse_sections(body) if fm["kind"] == "invariant" else {},
+        "text": text,
+    }
+
+
 def records(root: str, m: str) -> list:
     d = os.path.join(root, m, "gotchas")
     out = []
@@ -253,20 +288,47 @@ def records(root: str, m: str) -> list:
     for name in sorted(os.listdir(d)):
         if not name.endswith(".md") or name == "INDEX.md":
             continue
-        rel = f"{m}/gotchas/{name}"
-        text = read(os.path.join(d, name))
-        fm = parse_front_matter(rel, text)
-        body = text[FM_RE.match(text).end():]
-        out.append({
-            "path": rel, "name": fm["name"], "description": fm["description"],
-            "kind": fm["kind"], "universal": fm["universal"],
-            "declares": declares(text),
-            "anchors": sorted(set(ANCHOR_RE.findall(body))),
-            # Read for an invariant only; a class carries neither key's meaning.
-            "decision": fm.get("decision", ""),
-            "sections": parse_sections(body) if fm["kind"] == "invariant" else {},
-        })
+        out.append(build_record(f"{m}/gotchas/{name}", read(os.path.join(d, name))))
     return out
+
+
+def load_records_at(root: str, m: str, sha: str) -> tuple:
+    """`(records, unparsed)`: the catalogue as it stood at commit `sha` (TOOL-aGraftedHelix-29).
+
+    ONE `git ls-tree` lists it and ONE `git cat-file --batch` reads every record, never a spawn per
+    record. The batch is parsed as BYTES by each header's size field, then decoded and LF-folded as
+    `read` does: a text-mode read misaligns the sizes on any multibyte character. A base with no
+    catalogue holds zero records. A base record that does not parse is named in `unparsed`; it
+    exempts nothing and never refuses the checklist.
+    """
+    try:
+        listing = subprocess.run(["git", "ls-tree", "-z", sha, "--", f"{m}/gotchas/"], cwd=root,
+                                 capture_output=True, check=True).stdout
+        want = []
+        for entry in listing.split(b"\0"):
+            meta, tab, path = entry.partition(b"\t")
+            name = path.decode("utf-8", "replace").rsplit("/", 1)[-1]
+            if tab and meta.split()[1:2] == [b"blob"] and name.endswith(".md") and name != "INDEX.md":
+                want.append((f"{m}/gotchas/{name}", meta.split()[2]))
+        batch = subprocess.run(["git", "cat-file", "--batch"], cwd=root, capture_output=True, check=True,
+                               input=b"".join(oid + b"\n" for _, oid in want)).stdout if want else b""
+    except subprocess.CalledProcessError as exc:
+        raise Problem(f"gotchas: could not read the catalogue at {sha[:12]} — "
+                      f"{exc.stderr.decode('utf-8', 'replace').strip()}") from None
+    recs, unparsed, pos = [], [], 0
+    for rel, oid in want:
+        try:
+            nl = batch.index(b"\n", pos)
+            size = int(batch[pos:nl].split()[2])
+        except (ValueError, IndexError):
+            raise Problem(f"gotchas: git cat-file returned no blob for {rel} at {sha[:12]}") from None
+        text = batch[nl + 1:nl + 1 + size].decode("utf-8", "replace").replace("\r\n", "\n")
+        pos = nl + 1 + size + 1
+        try:
+            recs.append(build_record(rel, text))
+        except Problem:
+            unparsed.append(rel)
+    return recs, unparsed
 
 
 def selectable(anchor: str, paths, m: str) -> set:
@@ -523,8 +585,17 @@ def normalise_paths(root: str, paths) -> list:
     return out
 
 
-def cmd_for_paths(root: str, conf: dict, paths, label: str = None, noun: str = "file") -> int:
-    """STDOUT IS THE CHECKLIST. The ONE selection path; `cmd_for_diff` delegates into it."""
+def cmd_for_paths(root: str, conf: dict, paths, label: str = None, noun: str = "file",
+                  base: str = None, changed=None) -> int:
+    """STDOUT IS THE CHECKLIST. The ONE selection path; `cmd_for_diff` delegates into it.
+
+    With `base`, a full sha, the by-design block is read from the invariant records AT THAT COMMIT,
+    less every record the subject changed, and each invariant the subject moved prints as a checklist
+    item instead (TOOL-aGraftedHelix-29). `changed` is the range's paths under `--for-diff`; under
+    `--for-paths --base` it is derived here: every record whose text differs between the base and the
+    working tree, exists on one side only, or did not parse at the base. Without `base` the block is
+    read from the working tree and a header line says so. Classes always read the working tree.
+    """
     m = conf["MEMORY_ROOT"]
     recs = records(root, m)
     paths = normalise_paths(root, paths)
@@ -542,13 +613,68 @@ def cmd_for_paths(root: str, conf: dict, paths, label: str = None, noun: str = "
             if selectable(a, paths, m):
                 (inv if r["kind"] == "invariant" else hit).append(r)
                 break
+    head, moved = [INVARIANTS_UNPINNED], []
+    if base:
+        at_base, unparsed = load_records_at(root, m, base)
+        if changed is None:
+            now = {r["path"]: r["text"] for r in recs}
+            then = {r["path"]: r["text"] for r in at_base}
+            changed = {p for p in set(now) | set(then) if now.get(p) != then.get(p)} | set(unparsed)
+        changed = set(normalise_paths(root, changed))
+        moved = derive_moved_invariants(recs, at_base, changed, paths, m)
+        inv = [r for r in at_base if r["kind"] == "invariant" and r["path"] not in changed
+               and any(selectable(a, paths, m) for a in r["anchors"])]
+        head = [INVARIANTS_AT_BASE.format(sha=base[:12], n=len(moved))]
+        if unparsed:
+            head.append(INVARIANTS_UNPARSED.format(n=len(unparsed), sha=base[:12], paths=" ".join(unparsed)))
     print(f"# recurring-bug-class checklist for {label or f'{len(paths)} path(s)'} ({len(paths)} {noun}(s))")
     print(f"# {len(hit)} class(es) selected by an anchor + {len(uni)} universal")
+    for line in head:
+        print(line)
     for r in uni + hit:
         print(f"\n- [ ] {r['name']}{' (universal)' if r['universal'] else ''}\n      {r['description']}\n      {r['path']}")
+    for r in moved:
+        print(f"\n{MOVED_INVARIANT_ITEM.format(name=r['name'])}\n      {r['description']}\n      {r['path']}")
+    # The block stays LAST: the review harness ends it at the first line not opening `- `.
     for line in render_by_design(inv):
         print(line)
     return 0
+
+
+def derive_moved_invariants(recs: list, at_base: list, changed, paths, m: str) -> list:
+    """The invariants a subject MOVED, to print as items (TOOL-aGraftedHelix-29): every record of kind
+    `invariant` at either end whose path is in `changed`, and whose own path is one of `paths` or
+    whose anchors at either end select one. The own-path clause is what keeps the anchors from
+    deciding: under `--for-diff` a moved record's path is always one of `paths`, so a range cannot
+    write anchors that keep its own ruling off its review. Named from the working tree's record where
+    one exists, else from the base's; sorted by path. `m` is the memory root `selectable` excludes."""
+    now = {r["path"]: r for r in recs if r["kind"] == "invariant"}
+    then = {r["path"]: r for r in at_base if r["kind"] == "invariant"}
+    out = []
+    for p in sorted((set(now) | set(then)) & set(changed)):
+        ends = [r for r in (now.get(p), then.get(p)) if r]
+        if p in paths or any(selectable(a, paths, m) for r in ends for a in r["anchors"]):
+            out.append(ends[0])
+    return out
+
+
+def resolve_range_base(root: str, rng: str) -> str:
+    """The full sha a range DIFFS FROM (TOOL-aGraftedHelix-29): the merge base of `A...B`, the left side
+    of `A..B`, and the revision itself for a single revision, an empty side read as `HEAD` as git
+    reads it. A range or side opening `-` is refused before any git call, because git would read it
+    as an option; a value git cannot resolve is a named `Problem`, never a traceback."""
+    sep = "..." if "..." in rng else ".." if ".." in rng else None
+    sides = [s or "HEAD" for s in rng.split(sep, 1)] if sep else [rng]
+    if any(s.startswith("-") for s in [rng] + sides):
+        raise Problem(f"gotchas: '{rng}' opens with '-', which git would read as an option — pass a "
+                      f"range or a revision")
+    try:
+        if sep == "...":
+            return run("git", "merge-base", sides[0], sides[1], cwd=root).strip()
+        return run("git", "rev-parse", "--verify", sides[0] + "^{commit}", cwd=root).strip()
+    except subprocess.CalledProcessError as exc:
+        raise Problem(f"gotchas: '{rng}' does not resolve to a base commit — "
+                      f"{((exc.stderr or '').strip().splitlines() or [f'git exited {exc.returncode}'])[0]}") from None
 
 
 def render_by_design(inv: list) -> list:
@@ -568,12 +694,23 @@ def cmd_for_diff(root: str, conf: dict, rng: str) -> int:
 
     `noun` keeps this caller's header BYTE-IDENTICAL to what it printed before the split. A refactor
     is not allowed to change existing output, and an arm asserts it rather than trusting it.
+
+    The by-design block is read at the commit the range diffs from (TOOL-aGraftedHelix-29). A range
+    opening `-` is refused before `git diff` sees it, since `--output=<file>` would write a file, and a
+    range git refuses is a named `Problem` where it was a traceback.
     """
-    changed = [p for p in run("git", "diff", "--name-only", rng, cwd=root).split("\n") if p]
+    if rng.startswith("-"):
+        raise Problem(f"gotchas: '{rng}' opens with '-', which git would read as an option — pass a range")
+    try:
+        changed = [p for p in run("git", "diff", "--name-only", rng, cwd=root).split("\n") if p]
+    except subprocess.CalledProcessError as exc:
+        raise Problem(f"gotchas: git diff cannot read the range '{rng}' — "
+                      f"{((exc.stderr or '').strip().splitlines() or [f'git exited {exc.returncode}'])[0]}") from None
     if not changed:
         print(f"gotchas: {rng} touches no file — nothing to check")
         return 0
-    return cmd_for_paths(root, conf, changed, label=rng, noun="changed file")
+    base = resolve_range_base(root, rng)
+    return cmd_for_paths(root, conf, changed, label=rng, noun="changed file", base=base, changed=changed)
 
 
 # ----------------------------------------------------------------------------------------- selftest
@@ -883,6 +1020,116 @@ def cmd_selftest() -> int:
             lambda: 0 if pm.returncode == 1 and pm.stdout.startswith("HYGIENE gotchas: LEG_MANIFEST names missing.json")
             and "Traceback" not in pm.stdout + pm.stderr else 1)
 
+        # ---- TOOL-aGraftedHelix-29: the by-design block is read at the subject's BASE, and an invariant
+        # ---- the subject moved is a checklist ITEM. Each arm read `arm FAIL` against the parent's
+        # ---- checker with these arms grafted in, which read every invariant from the working tree.
+        def run_capture(fn):
+            buf = io.StringIO()
+            try:
+                with contextlib.redirect_stdout(buf):
+                    fn()
+            except Exception as exc:  # noqa: BLE001 — a grafted parent's TypeError is the arm's finding
+                buf.write(f"\nUNEXPECTED {type(exc).__name__}: {exc}\n")
+            return buf.getvalue()
+
+        def write_commit(t, files):
+            for rel, text in files.items():
+                if text is None:
+                    os.remove(os.path.join(t, rel))
+                else:
+                    write(os.path.join(t, rel), text)
+            run("git", "add", "-A", cwd=t); run("git", "commit", "-q", "-m", "c", "--no-verify", cwd=t)
+
+        def extract_block(text):
+            lines = text.rstrip("\n").split("\n")
+            at = [i for i, line in enumerate(lines) if line.startswith("# by design — ")]
+            return lines[at[0]:] if at else ["(no block)"]
+
+        gate, cat, item = f"{PFX}some-gate.sh", "memory/gotchas/", "- [ ] NEW/CHANGED invariant "
+        head0, head1 = BY_DESIGN_HEAD.format(n=0), BY_DESIGN_HEAD.format(n=1)
+
+        def run_cli(t, *args):
+            return subprocess.run([sys.executable, os.path.abspath(__file__), *args], cwd=t,
+                                  capture_output=True, text=True, encoding="utf-8")
+
+        # --for-paths --base over a working tree holding an UNCOMMITTED invariant; then with no base.
+        tb, cb = build_tree("bd-base", {"inv-one.md": build_invariant("inv-one")})
+        x = run("git", "rev-parse", "HEAD", cwd=tb).strip()
+        write(os.path.join(tb, cat, "inv-new.md"), build_invariant("inv-new"))
+        ptext = run_capture(lambda: cmd_for_paths(tb, cb, [gate], base=x))
+        arm("--for-paths --base: an uncommitted invariant is an item, and the block holds the base's alone", "[rc=0]",
+            lambda: 0 if extract_block(ptext) == [head1, want_line]
+            and item + "inv-new" in ptext.split("# by design")[0] else 1)
+        utext = run_capture(lambda: cmd_for_paths(tb, cb, [gate]))
+        arm("--for-paths with no base says the block was read from the working tree", "[rc=0]",
+            lambda: 0 if "\n# invariants are read from the working tree; with no --base" in utext else 1)
+        os.remove(os.path.join(tb, cat, "inv-new.md"))
+        pu = run_cli(tb, "--for-paths", "--base")
+        arm("--for-paths --base with no revision is the usage line at exit 2", "[rc=0]",
+            lambda: 0 if pu.returncode == 2 and pu.stdout.startswith("usage: gotchas.py --for-paths [--base <rev>]") else 1)
+
+        # A range touching only the script, beside an UNCOMMITTED edit to the base's ruling.
+        write_commit(tb, {gate: "#!/usr/bin/env bash\n# edit 1\n"})
+        write(os.path.join(tb, cat, "inv-one.md"), build_invariant("inv-one", over={"Actually": "UNCOMMITTED ruling."}))
+        dtext = run_capture(lambda: cmd_for_diff(tb, cb, "HEAD~1..HEAD"))
+        arm("--for-diff: a block line carries the base's committed text, never a working-tree edit", "[rc=0]",
+            lambda: 0 if extract_block(dtext) == [head1, want_line] else 1)
+        run("git", "checkout", "-q", "--", f"{cat}inv-one.md", cwd=tb)
+
+        # A range that EDITS the ruling, then one that TAKES IT OUT, each beside a script edit.
+        write_commit(tb, {gate: "#!/usr/bin/env bash\n# edit 2\n",
+                          f"{cat}inv-one.md": build_invariant("inv-one", over={"Actually": "It is the edited ruling."})})
+        etext = run_capture(lambda: cmd_for_diff(tb, cb, "HEAD~1..HEAD"))
+        arm("--for-diff: an invariant the range EDITS is an item and never in the block", "[rc=0]",
+            lambda: 0 if extract_block(etext) == [head0] and item + "inv-one" in etext else 1)
+        write_commit(tb, {gate: "#!/usr/bin/env bash\n# edit 3\n", f"{cat}inv-one.md": None})
+        rtext = run_capture(lambda: cmd_for_diff(tb, cb, "HEAD~1..HEAD"))
+        arm("--for-diff: an invariant the range TAKES OUT is an item named from the base's text", "[rc=0]",
+            lambda: 0 if extract_block(rtext) == [head0] and item + "inv-one" in rtext else 1)
+
+        # Two refusals, through the process: a range git cannot resolve, and one git would read as an option.
+        pb = run_cli(tb, "--for-diff", "nosuchrev..HEAD")
+        arm("--for-diff over a range git cannot resolve is a HYGIENE line at exit 1, not a traceback", "[rc=0]",
+            lambda: 0 if pb.returncode == 1 and pb.stdout.startswith("HYGIENE gotchas:")
+            and "Traceback" not in pb.stdout + pb.stderr else 1)
+        target = os.path.join(tb, "injected.txt")
+        po = run_cli(tb, "--for-diff", f"--output={target}")
+        arm("--for-diff refuses a range opening '-' before git can read it as an option", "[rc=0]",
+            lambda: 0 if po.returncode == 1 and po.stdout.startswith("HYGIENE gotchas:")
+            and not os.path.exists(target) else 1)
+
+        # A range that ADDS an invariant; then a three-dot range from a side branch over that tree.
+        tc, cc = build_tree("bd-add", {"inv-one.md": build_invariant("inv-one")})
+        write_commit(tc, {gate: "#!/usr/bin/env bash\n# add\n", f"{cat}inv-new.md": build_invariant("inv-new")})
+        atext = run_capture(lambda: cmd_for_diff(tc, cc, "HEAD~1..HEAD"))
+        arm("--for-diff: an invariant the range ADDS is an item before the block, which holds the base's", "[rc=0]",
+            lambda: 0 if extract_block(atext) == [head1, want_line]
+            and item + "inv-new" in atext.split("# by design")[0] else 1)
+        run("git", "branch", "side", cwd=tc)
+        write_commit(tc, {f"{cat}inv-one.md": build_invariant("inv-one", over={"Actually": "It is the newer ruling."})})
+        left = run("git", "rev-parse", "HEAD", cwd=tc).strip()
+        run("git", "checkout", "-q", "side", cwd=tc)
+        write_commit(tc, {gate: "#!/usr/bin/env bash\n# side\n", f"{cat}inv-side.md": build_invariant("inv-side")})
+        sblk = extract_block(run_capture(lambda: cmd_for_diff(tc, cc, f"{left}...HEAD")))
+        arm("--for-diff A...B reads the block at the merge base, never at the left side", "[rc=0]",
+            lambda: 0 if want_line in sblk and not any("inv-side" in s or "newer" in s for s in sblk) else 1)
+
+        # A base with no catalogue at all; then a base record whose front matter does not parse.
+        td = os.path.join(base, "bd-none"); os.makedirs(td)
+        cd = _scratch(td, {})
+        write_commit(td, {gate: "#!/usr/bin/env bash\n# first\n", f"{cat}inv-new.md": build_invariant("inv-new")})
+        ntext = run_capture(lambda: cmd_for_diff(td, cd, "HEAD~1..HEAD"))
+        arm("--for-diff over a base with no catalogue prints a block of 0 and itemises the invariant", "[rc=0]",
+            lambda: 0 if extract_block(ntext) == [head0] and item + "inv-new" in ntext else 1)
+        te = os.path.join(base, "bd-bad"); os.makedirs(te)
+        ce = _scratch(te, {"inv-bad.md": "---\nname: inv-bad\nkind: invariant\n---\n\nno description key\n"})
+        write_commit(te, {gate: "#!/usr/bin/env bash\n# fixed\n", f"{cat}inv-bad.md": build_invariant("inv-bad")})
+        ftext = run_capture(lambda: cmd_for_diff(te, ce, "HEAD~1..HEAD"))
+        arm("--for-diff: a base record that does not parse is announced, exempts nothing and is an item", "[rc=0]",
+            lambda: 0 if any(s.startswith("# 1 record(s) at ") and s.endswith(f": {cat}inv-bad.md")
+                             for s in ftext.split("\n"))
+            and extract_block(ftext) == [head0] and item + "inv-bad" in ftext else 1)
+
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
         return 1
@@ -930,12 +1177,18 @@ def main(argv: list) -> int:
                 return 2
             return cmd_for_diff(root, conf, argv[2])
         if mode == "--for-paths":
-            if len(argv) < 3:
-                print("usage: gotchas.py --for-paths <path>...")
+            args, base = argv[2:], None
+            if args[:1] == ["--base"]:
+                if len(args) < 3:
+                    print("usage: gotchas.py --for-paths [--base <rev>] <path>...")
+                    return 2
+                base, args = resolve_range_base(root, args[1]), args[2:]
+            if not args:
+                print("usage: gotchas.py --for-paths [--base <rev>] <path>...")
                 return 2
-            return cmd_for_paths(root, conf, argv[2:])
+            return cmd_for_paths(root, conf, args, base=base)
         print("usage: gotchas.py [--check|--write|--report|--for-diff <range>|"
-              "--for-paths <path>...|--declares|--selftest]")
+              "--for-paths [--base <rev>] <path>...|--declares|--selftest]")
         return 2
     except Problem as exc:
         print(f"HYGIENE {exc}")

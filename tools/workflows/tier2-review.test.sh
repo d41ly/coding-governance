@@ -809,6 +809,26 @@ async function runWholeScriptArms() {
       'by-design: a remainder of header lines alone is zero items, and a block of 0 is said')
   }
 
+  // ==== TOOL-aGraftedHelix-29 — the REAL checker's --for-diff over a range that ADDS an invariant =======
+  // The shell block before this runner ran the memory-tree kit's gotchas.py over a two-commit fixture:
+  // `bd-base` at the base, `bd-new` added by the range, both anchored on the script it edits. Every arm
+  // is RED against the parent checker, which read the block from the working tree and listed both.
+  const BD_RANGE = process.argv[3] ? fs.readFileSync(process.argv[3], 'utf8') : 'PRODUCER-FAILED no output file was passed'
+  const bdRan = BD_RANGE.indexOf('PRODUCER-FAILED') !== 0
+  ck(bdRan, 'by-design range: the real checker ran over the fixture range' + (bdRan ? '' : ' - ' + BD_RANGE.trim()))
+  r = await runReview(Object.assign({}, DIFF, { checklist: BD_RANGE }), ALL_OK)
+  if (checkNoThrow(r, 'by-design range')) {
+    const fp = scanPrompts(r, 'find:')
+    ck(r.logs.indexOf('by-design: 1 invariant(s) from the checklist\'s by-design block') !== -1,
+      'by-design range: the harness logs one invariant, the base\'s, from the real checker\'s block')
+    ck(fp.length === 5 &&
+      fp.every((t) => t.prompt.indexOf('Intended behaviour — invariants this change touches:\nbd-base — ') !== -1) &&
+      r.trace.every((t) => t.prompt.indexOf('BDNEWLOOKS') === -1),
+      'by-design range: every lens reads bd-base as intended behaviour, and no prompt carries bd-new\'s ruling')
+    ck(fp.filter((t) => t.prompt.indexOf('NEW/CHANGED invariant bd-new') !== -1).length === 1,
+      'by-design range: exactly one lens sweeps the added invariant as a NEW/CHANGED item')
+  }
+
   // ==== TOOL-aSightedSkeptic-2 — the skeptic judges each finding's proposed fix as well as its claim ====
   // Every arm is RED against the parent render: its verify prompt shows no fix, its schema has no
   // fixVerdict, its synthesis prints the finder's fix unmarked, and its batch print ignores the fix.
@@ -1565,7 +1585,133 @@ runWholeScriptArms().then(() => {
 })
 JSEOF
 
-out=$(node "$TMP/run.js" "$ROOT/$FILE"); rc=$?
+# ---- TOOL-aGraftedHelix-29 S10: the REAL checker over a range that ADDS an invariant, fed to the harness.
+# A typed copy of the checker's new output would pass on the parent as well, because the harness reads
+# any `- ` line as an item whatever it says (the unit's spec, section 8 F2). So this block runs the
+# memory-tree kit's own gotchas.py `--for-diff` over a two-commit fixture whose second commit adds
+# invariant `bd-new` beside the base's `bd-base`, both anchored on the script it edits, and the
+# whole-script arms feed that stdout to the harness as `checklist`. The producer is found the way the
+# parity leg finds it: the `MEMORY_TREE_DIR` override, else the sibling-kit resolver. A producer that
+# cannot be resolved or run FAILS those arms and names why rather than skipping: this kit's self-tests
+# ship nowhere (`kit.toml` withholds them), so the one tree that runs this suite holds that kit.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+BD_OUT="$TMP/bd-range.out"; BD_FX="$TMP/bd-fx"; bd_why=""; bd_mtd=""
+bd_py=$(resolve_python 2>&1) || bd_why="no usable python: $(printf '%s\n' "$bd_py" | head -1)"
+if [ -z "$bd_why" ]; then
+  if [ -n "${MEMORY_TREE_DIR:-}" ]; then bd_mtd=${MEMORY_TREE_DIR%/}
+  elif ! bd_mtd=$(resolve_kit_dir "$bd_py" memory-tree gotchas.py "$HERE" 2>&1); then
+    bd_why="the memory-tree kit did not resolve: $bd_mtd"
+  fi
+  # The producer runs inside the fixture, so a repo-relative answer is made absolute here.
+  case "$bd_mtd" in /*|?:[/\\]*) ;; *) bd_mtd="$ROOT/$bd_mtd" ;; esac
+fi
+[ -n "$bd_why" ] || [ -f "$bd_mtd/gotchas.py" ] || bd_why="'$bd_mtd/gotchas.py' is not a file"
+build_bd_record() { # name · looks-wrong text -> an invariant record anchored on the fixture script
+  printf -- '---\nname: %s\ndescription: a fixture invariant\nkind: invariant\ndecision: TOOL-x-1\n---\n\n## Looks wrong\n%s in `bd-fixture.sh`.\n\n## Actually\nIt is the ruling.\n\n## Do\nKeep it.\n\n## Do not\nChange it.\n\n## Guarded by\nno machine gate\n' "$1" "$2"
+}
+if [ -z "$bd_why" ]; then
+  mkdir -p "$BD_FX/memory/gotchas"
+  printf 'MEMORY_ROOT=memory\n' > "$BD_FX/.memory-tree.conf"
+  printf '#!/usr/bin/env bash\necho one\n' > "$BD_FX/bd-fixture.sh"
+  build_bd_record bd-base BDBASELOOKS > "$BD_FX/memory/gotchas/bd-base.md"
+  ( cd "$BD_FX" && git init -q . && git config user.email t@t.test && git config user.name t \
+      && git config core.autocrlf false && git config core.hooksPath .git/no-hooks \
+      && git add -A && git commit -q -m base ) >/dev/null 2>&1 || bd_why="the fixture's base commit failed"
+fi
+if [ -z "$bd_why" ]; then
+  printf 'echo two\n' >> "$BD_FX/bd-fixture.sh"
+  build_bd_record bd-new BDNEWLOOKS > "$BD_FX/memory/gotchas/bd-new.md"
+  ( cd "$BD_FX" && git add -A && git commit -q -m add ) >/dev/null 2>&1 || bd_why="the fixture's second commit failed"
+fi
+if [ -z "$bd_why" ]; then
+  ( cd "$BD_FX" && "$bd_py" "$bd_mtd/gotchas.py" --for-diff HEAD~1..HEAD ) > "$BD_OUT" 2>&1 \
+    || bd_why="gotchas.py --for-diff exited non-zero: $(head -1 "$BD_OUT")"
+fi
+[ -z "$bd_why" ] || printf 'PRODUCER-FAILED %s\n' "$bd_why" > "$BD_OUT"
+
+out=$(node "$TMP/run.js" "$ROOT/$FILE" "$BD_OUT"); rc=$?
 printf '%s\n' "$out"
 
 # The arms run inside a node process, so the count crosses a process boundary and this shell cannot
@@ -1632,7 +1778,10 @@ printf '%s\n' "$out"
 # scratch:` arms for a relative repo, both MSYS spellings, a .. segment and two controls (6), the per-role
 # scratch rule (1) and the unmoved subject beside a moved one and alone (2).
 # MERGED at the second reconcile with origin/main: this side 186 plus main's 60 over 180 = 246.
-FLOOR_ASSERTIONS=246
+# RAISED 246 -> 250 by TOOL-aGraftedHelix-29: 4 assertions, counted off the block — the real checker
+# ran over the fixture range (1), one invariant logged (1), bd-base as intended behaviour with no
+# prompt carrying bd-new's ruling (1) and the added invariant swept as one lens's item (1).
+FLOOR_ASSERTIONS=250
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

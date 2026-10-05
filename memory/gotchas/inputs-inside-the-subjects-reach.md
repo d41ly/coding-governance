@@ -26,6 +26,14 @@ The fix was not better logic. It was moving the inputs out of reach: the BASE is
 remote's own advertisement rather than read from a local ref, and the mandate is asserted by the merge
 bar rather than only by the driver that benefits from it.
 
+It bit again in `tools/memory-tree/gotchas.py`, on the review's by-design block. Every lens and
+skeptic `tools/workflows/tier2-review.template.js` primes is told to refute a finding an invariant
+covers, and the checker read those invariants from the tree under review, so a range that added or
+edited one wrote its own exemption. The closing review of the build that made the block found all
+three of its entries were records that build had added. The fix again moved the input out of reach:
+the block is read at the range's base, and an invariant the range moves is a checklist item, which
+can only widen a review.
+
 ## Cause
 
 Writing a check is an act of reasoning about LOGIC, and the logic is usually fine. Provenance is a

@@ -197,7 +197,11 @@ are parsed, so no lens sweeps intended behaviour as a bug class, and it becomes 
 label `Intended behaviour — invariants this change touches:`, after a caller's own `byDesign` under
 `Known and tracked — do not re-report:`. Neither replaces the other. A head whose count disagrees with
 its entry lines refuses before any agent spawns. Each source is logged as a `by-design:` line, and
-RUN INTEGRITY's `By design:` clause names the same sources. The array form carries no block.
+RUN INTEGRITY's `By design:` clause names the same sources. The array form carries no block. The
+checker reads that block at the range's base, so an invariant the diff adds, edits or takes out never
+reaches `byDesign`: it arrives as an ordinary `- [ ] NEW/CHANGED invariant <name>` item, swept by one
+lens like any class, and the checker's header line naming the base is preamble. This suite's
+by-design range arm runs the real checker over a fixture range and holds that end to end.
 
 That head is spelled twice, in two kits: the memory-tree kit's `gotchas.py` prints it and this
 harness's `BY_DESIGN_HEAD` pattern finds it. `check_by_design_parity.py` holds the pair. It renders
@@ -211,7 +215,11 @@ outcome.
 `unattended-build.js` hands its spec audit a checklist the same way: the subject resolver runs
 `gotchas.py --for-paths` over the paths the specs' `### Files touched` sub-heads name and returns its
 stdout, which the stage forwards as `checklist`; a caller's `checklist` argument wins, and none at
-all logs a `WARNING:`.
+all logs a `WARNING:`. A `base` of 7-40 hex is forwarded as `--for-paths --base <sha>`, so the
+checker reads the by-design block at the run's pinned base and lists every invariant this build
+moved as a `NEW/CHANGED invariant` item; the `checklist from` line names that base. With no such
+`base`, the stage that takes the resolver's checklist logs a `WARNING:` that the block was read from
+the working tree.
 
 Its SPEC stage ends in ONE commit (TOOL-aGraftedHelix-15): when the writers authored a unit and the
 caller pinned no `subjects`, one agent commits the authored specs with `Pass: none` and the program

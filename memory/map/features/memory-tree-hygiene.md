@@ -44,6 +44,9 @@ verdicts datable. How many numbered checks it carries is derivable from the engi
 written here, for the same reason the H1 stopped saying it. Several of them delegate to sibling
 Python modules (`gen_build_index.py`, `corpus_ids.py`, `gotchas.py`, `row_grammar.py`, `transition_audit.py`);
 this dossier owns the engine, its self-test, the epoch and the transition audit, not the other modules.
+Of those, `gotchas.py` is the one a review reads: it reads the by-design block at the subject's base
+(`TOOL-aGraftedHelix-29`), so an invariant a change moves reaches that change's review as a checklist
+item and never as an exemption.
 
 **One leg here belongs to a module this dossier does NOT own**, and that is deliberate rather than
 an oversight to tidy away. `backlog migration selftest` runs `migrate_backlog.py --selftest`, the

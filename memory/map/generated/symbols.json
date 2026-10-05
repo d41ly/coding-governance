@@ -1013,6 +1013,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "build_record",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "build_record_checks",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -3198,6 +3203,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "derive_moved_invariants",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "derive_nearest_vintage",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -4231,6 +4241,11 @@
       "id": "load_recall_kit",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "load_records_at",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "load_registry",
@@ -7731,6 +7746,11 @@
       "id": "resolve_projects_root",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "resolve_range_base",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "resolve_recall_kit",

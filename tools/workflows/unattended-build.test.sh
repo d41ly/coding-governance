@@ -1493,6 +1493,32 @@ w=$(printf '%s\n' "$o" | grep '^wargs:')
 hasnt_ "GH3 a caller checklist with no - item never reaches the audit" "$w" "CALLERCLX"
 has    "GH3 ...and the resolver's reaches it instead" "$w" '"checklist":"- [ ] RESOLVERCLX"'
 
+# ---- TOOL-aGraftedHelix-29 S9: the audit's checker reads invariants AT THE PINNED BASE. A 7-40 hex
+# ---- `base` reaches the resolver's command as `--for-paths --base <sha>` and is named on the
+# ---- `checklist from` line; no `base`, or a value of another shape, forwards nothing and WARNS that the
+# ---- block was read from the working tree. Each arm read RED on a scratch copy of the render with one
+# ---- break staged: the forward cut, the log suffix cut, the WARNING deleted or made unconditional,
+# ---- and the shape test dropped so any `base` is forwarded.
+GH29_B=a1b2c3d4e5f60718293a4b5c6d7e8f9012345678
+GH29_WT="log:WARNING: the audit's checklist reads invariants from the working tree — no pinned \`base\` was passed"
+build_gh29_args() { printf '%s' "$NOSUBJ" | sed 's#"slug":"tB",#"slug":"tB","base":"'"$1"'",#'; }
+GH29_RET=$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")
+o=$(run_wf "$(build_gh29_args "$GH29_B")" "$GH29_RET")
+p=$(printf '%s\n' "$o" | grep '^prompt:audit:subjects:r2:')
+has    "GH29 a pinned base reaches the resolver's checker as --for-paths --base" "$p" \
+    "python ${PFX}${MT_KIT}/gotchas.py --for-paths --base $GH29_B <paths>"
+has    "GH29 ...and the checklist line names the base" "$o" \
+    "log:audit round 2: checklist from --for-paths over 2 path(s) at base ${GH29_B:0:12}"
+hasnt_ "GH29 ...and no working-tree WARNING prints" "$o" "$GH29_WT"
+o=$(run_wf "$NOSUBJ" "$GH29_RET")
+p=$(printf '%s\n' "$o" | grep '^prompt:audit:subjects:r2:')
+has    "GH29 no base keeps the unpinned command" "$p" "python ${PFX}${MT_KIT}/gotchas.py --for-paths <paths>"
+has    "GH29 ...and WARNS that the block was read from the working tree" "$o" "$GH29_WT"
+o=$(run_wf "$(build_gh29_args origin/main)" "$GH29_RET")
+p=$(printf '%s\n' "$o" | grep '^prompt:audit:subjects:r2:')
+hasnt_ "GH29 a base that is no sha forwards nothing" "$p" "--base"
+has    "GH29 ...and WARNS the same" "$o" "$GH29_WT"
+
 # ---- TOOL-aGraftedHelix-15: THE SPEC COMMIT STAGE, its path fill, its refusals and the one remedy. The
 # ---- fixture carrying the weight is a PATHLESS authored unit: it is what `--plan <slug> --paths` hands a
 # ---- caller for a MISSING spec, and the unit the resolver could not pin before the stage existed. Each
@@ -1806,9 +1832,9 @@ hasnt_ "BT3-AC6 declared: nothing announces the audit off" "$o" "OFF by declarat
 o=$(run_wf "$(printf '%s' "$T_UNITS" | sed 's#"specAudit":"2026-09-20",##; s#"subjects":\[[^]]*\],##')" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"}}')
 has    "BT3 attended, OFF, every unit terminal: the exit carries the audit object" "$o" '"audit":{"ran":false,"verdict":"NOT-OWED"'
 has    "BT3 ...with an empty roster, by filtering" "$o" '"roster":[]'
-# ---- AC7: both carriers read 1.7 — the render is byte-compared to the template by the parity leg,
+# ---- AC7: both carriers read 1.8 — the render is byte-compared to the template by the parity leg,
 # ---- so the marker moving in one file and not the other reds there; this arm reads the render.
-has    "BT3-AC7 the render carries the engine version 1.7" "$(sed -n '3p' "$F")" "version: '1.7', // gov:kit unattended-build@1.7"
+has    "BT3-AC7 the render carries the engine version 1.8" "$(sed -n '3p' "$F")" "version: '1.8', // gov:kit unattended-build@1.8"
 
 # ================================== TOOL-dPolishedVitrine-1 — THE HARNESS IS RENDERED AT INSTALL
 # The harness shipped as an ENGINE file, and apply writes those verbatim, so every install path it
@@ -2322,7 +2348,11 @@ fi
 # MERGED 293 + 114 (aGraftedHelix) + 86 (aEvidencedLens) = 493, then RAISED 493 -> 495 by the merge's
 # two new GH3 sites, a caller checklist with no `- ` item refused (2); no arm was dropped. Counted with
 # the grep above: 435 at the merge base, 549 on aGraftedHelix, 503 on origin/main, 619 merged.
-FLOOR_ASSERTIONS=495
+# RAISED 495 -> 502 by TOOL-aGraftedHelix-29: its 7 static sites, counted with the grep above as 619 at
+# the unit's parent and 626 after — the pinned base forwarded, logged and unwarned (3), no base kept
+# and warned (2), and a base of another shape forwarding nothing and warned (2). All of them sit on the
+# path a green run takes.
+FLOOR_ASSERTIONS=502
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

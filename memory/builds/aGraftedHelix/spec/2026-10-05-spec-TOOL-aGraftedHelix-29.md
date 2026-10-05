@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-29 — the by-design block is rendered from the invariant records at the review's base, so a change cannot write its own exemption
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 018b5675 · streams tooling · order 13 · ratified 2026-10-05
+**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 018b5675 · streams tooling · order 13 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
