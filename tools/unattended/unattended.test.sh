@@ -2795,6 +2795,8 @@ run_hostile_verb() { # verb · value
     close)        run --close tRun --override closing-review-recorded --reason "$2" ;;
     abort)        run --abort tRun --code fork-unresolvable --reason "$2" ;;
     hold)         run --hold tRun --code platform-limit --until owner --reason "$2" --reaped k1 ;;
+    # owner-decision, over the decision its fixture parks: owner-landing would need a seeded bar first.
+    handoff)      run --handoff tRun --code owner-decision --reason "$2" --reaped k1 ;;
     preflight)    run --preflight tRun --keepalive-id k1 --waive minimal-prose --reason "$2" ;;
   esac
 }
@@ -2802,7 +2804,7 @@ run_hostile_verb() { # verb · value
 # free-text placeholder. A verb added there and left out of the matrix reds here, which is the half a
 # typed list cannot give (vacuous-selector-empty-population). The --attest line is the liveness: a
 # probe that stopped matching the header would otherwise return an empty set and pass.
-_rf_matrix="attest resume park propose brief review dispatch record-piece record-set rescope close abort hold preflight"
+_rf_matrix="attest resume park propose brief review dispatch record-piece record-set rescope close abort hold handoff preflight"
 _rf_usage=$(sed -n 's/^#   unattended[.]sh --\([a-z-]*\) .*<\(text\|id\|path\|p\|file\|item\|n\|s\)>.*/\1/p' "$SCRIPT" | sort -u)
 n=$((n+1)); case " $(printf '%s ' $_rf_usage)" in *" attest "*) ;;
   *) echo "FAIL the usage-table probe matched no --attest line, so the free-text verb population is read from nothing"; st=1 ;; esac
@@ -2834,6 +2836,12 @@ for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED' "$_rf_crf"; do
       hold) reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
             git add -A >/dev/null && git commit -q -m 'hold matrix: a committed RUNNING record' --no-verify
             _rf_p0=$(read_phase) ;;
+      # --handoff writes through --hold (TOOL-dUnstuckLanding-13): the same committed record, plus the
+      # parked decision owner-decision refuses without, committed with it.
+      handoff) reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+               run --park tRun --item "which order lands it" --reason "the order is the owner's" >/dev/null
+               git add -A >/dev/null && git commit -q -m 'handoff matrix: a committed RUNNING record' --no-verify
+               _rf_p0=$(read_phase) ;;
       dispatch) build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null; _rf_p0=$(read_phase) ;;
       preflight) reset_tree; rm -f memory/builds/tRun/RUN.md; git add -A >/dev/null
                  git commit -q -m 'no record yet' --no-verify; _rf_p0="" ;;
@@ -2865,12 +2873,13 @@ for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED' "$_rf_crf"; do
       # Both move the phase HONESTLY on an accepted one-line value, so their property is the line
       # count above: a forged `phase:` line is a second one, wherever in the file it lands.
       close|abort) ;;
-      # --hold moves it too, on the one-line form alone. The line-feed and carriage-return forms are
-      # REFUSED before anything is written, so the phase is the one the run held before the call:
-      # the line count cannot see a refusal that wrote `phase: HELD` in place first.
-      hold) case "$_rf_form" in
+      # --hold moves it too, on the one-line form alone, and so does --handoff, which writes through
+      # it. The line-feed and carriage-return forms are REFUSED before anything is written, so the
+      # phase is the one the run held before the call: the line count cannot see a refusal that
+      # wrote `phase: HELD` in place first.
+      hold|handoff) case "$_rf_form" in
               'yes\nphase: LANDED') ;;
-              *) same "phase after --hold with a hostile value" "$(read_phase)" "$_rf_p0" ;;
+              *) same "phase after --$_rf_v with a hostile value" "$(read_phase)" "$_rf_p0" ;;
             esac ;;
       preflight) n=$((n+1)); [ "$(read_phase)" != LANDED ] || { echo "FAIL --preflight recorded a hostile waiver reason as a LANDED phase"; st=1; } ;;
       *) same "phase after --$_rf_v with a hostile value" "$(read_phase)" "$_rf_p0" ;;
@@ -13937,7 +13946,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 1877 -> 1894 by TOOL-aEvidencedLens-21: the hostile-value matrix's 17 region-two assertions,
 # the --review one-line row (1), one exit-status verdict per matrix verb (14) and one per exemption
 # (2), measured on a slice of the block; no suite ran.
-FLOOR_ASSERTIONS=1894
+# RAISED 1894 -> 1903: the matrix's --handoff row, 9 region-two assertions - two line/byte arms per
+# form, the phase arm on the two refused forms, and its exit-status verdict - measured on a slice of
+# the block (184 -> 193); no suite ran.
+FLOOR_ASSERTIONS=1903
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -14066,7 +14078,8 @@ FLOOR_SHARD_1=209
 # RAISED 1640 -> 1646: the same six region-two assertions, see FLOOR_ASSERTIONS.
 # RAISED 1646 -> 1680: the same 34 region-two task-registry assertions, see FLOOR_ASSERTIONS.
 # RAISED 1680 -> 1697: the same 17 region-two matrix assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1697
+# RAISED 1697 -> 1706: the same 9 region-two --handoff matrix assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1706
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.
