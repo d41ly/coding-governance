@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-13 — an engine arm observes hygiene check 28 red the leg, and print its summary on a green run
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 7
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 7
 
 <!-- gen:spec-records -->
 

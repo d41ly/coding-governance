@@ -3514,6 +3514,65 @@ else
   [ "$r27rc" = 0 ] || { echo "FAIL check 27 through the engine: an exported GOV_DEFAULT_BRANCH naming no branch reached the pinned run (rc=$r27rc), so these arms grade the shell rather than the block:"; printf '%s\n' "$o27" | sed 's/^/      /'; st=1; }
 fi
 
+# ---- TOOL-aGraftedHelix-13 — CHECK 28's DISPATCH BLOCK, observed THROUGH THE ENGINE, for the reason
+# ---- the check-27 arms above exist: `row_grammar.py --selftest` arms the predicate and never runs
+# ---- this script, and the one grep that observed the block (`check-content`) is satisfied by a
+# ---- comment or a dead block. A block that swallowed the module's exit would leave the leg green
+# ---- over a duplicated record. COPY-INSTALLED as the check-27 fixture is, because the build index
+# ---- and the gotcha catalogue render against the generator's own path: a kit copy outside the
+# ---- tree reds checks 9 and 17-19, and this kit's own engine resolves check 26's conf above
+# ---- itself, so either would let a check other than 28 hold the exit. No recall kit: check 28
+# ---- reads none, and 27 is NOT ARMED with NEAR_MATCH_GATE blank. Otherwise clean on the _b1
+# ---- shape; the branch adds a gotcha whose body is main's, so 28 is its only offence. Every run
+# ---- pins GOV_DEFAULT_BRANCH=main, because the content base is derived from it.
+C28=$TMP/cont28
+mkdir -p "$C28/$KIT_REL"
+cp "$HERE"/*.sh "$HERE"/*.py "$C28/$KIT_REL"/
+(
+  cd "$C28" || exit 1
+  git init -q . && git symbolic-ref HEAD refs/heads/main
+  git config user.email t@t.test; git config user.name t; git config core.autocrlf false
+  mkdir -p memory/builds/tOne/spec memory/project memory/gotchas
+  printf '/%s/\n__pycache__/\n' "${KIT_REL%%/*}" > .gitignore
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n' > .memory-tree.conf
+  printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
+  printf '# r\n' > memory/README.md
+  printf '# d\n\n- ARCH-tOne-1 - a decision\n' > memory/DECISIONS.md
+  printf '# stale-header-waiver.txt -- EMPTY is expected; the file must exist.\n' > memory/project/stale-header-waiver.txt
+  printf -- '---\nslug: tOne\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\nids: ARCH-tOne-1\nstatus: OPEN\n---\n\n# tOne\n\n<!-- gen:build-index -->\n\n<!-- /gen:build-index -->\n' > memory/builds/tOne/README.md
+  printf '# ARCH-tOne-1 - a unit\n\nbody\n' > memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md
+  printf -- '---\nname: held-once\ndescription: a fixture class\nkind: class\nuniversal: true\n---\n\n# A class\n\nA fixture body naming its resolution. No machine gate.\n' > memory/gotchas/held-once.md
+  git add -A && git -c commit.gpgsign=false commit -q -m base --no-verify
+  "$_PY" "$KIT_REL/gen_build_index.py" --write && "$_PY" "$KIT_REL/gotchas.py" --write
+  git add -A && git -c commit.gpgsign=false commit -q -m gen --no-verify
+  git checkout -q -b arm
+  printf -- '---\nname: held-twice\ndescription: a fixture class\nkind: class\nuniversal: true\n---\n\n# A class\n\nA fixture body naming its resolution. No machine gate.\n' > memory/gotchas/held-twice.md
+  "$_PY" "$KIT_REL/gotchas.py" --write
+  git add -A && git -c commit.gpgsign=false commit -q -m copy --no-verify
+) >/dev/null 2>&1
+run_cont28_gate() { local _b=$1; shift; ( cd "$C28" && git checkout -q "$_b" && GOV_DEFAULT_BRANCH=main bash "$C28/$KIT_REL/check-memory-hygiene.sh" "$@" 2>&1 ); }
+o28=$(run_cont28_gate arm); r28rc=$?
+_c28l=$(grep -E '^check 28: ' <<<"$o28")
+_c28x=$(grep -E '^check [0-9]+:' <<<"$o28" | grep -vE '^check 28: ')
+n=$((n+1))
+if [ "$r28rc" != 0 ] && grep -qF 'memory/gotchas/held-once.md (held-once)' <<<"$_c28l" \
+   && grep -qF 'memory/gotchas/held-twice.md (held-twice)' <<<"$_c28l" && [ -z "$_c28x" ]; then
+  echo "ok   check 28 through the engine: a branch adding a gotcha whose body main holds reds the leg, naming both, and no other check"
+else
+  echo "FAIL check 28 through the engine: the branch adding a duplicated gotcha exited $r28rc without one check 28 line naming held-once and held-twice and no other check line - the block swallowed the module's exit, never ran it, or another check holds the exit:"; printf '%s\n' "$o28" | sed 's/^/      /'; st=1
+fi
+# --offenders, as the check-27 arm reads it: it keys every check's offence the same way, and it is
+# the only reader of the block's own add_offender_keys line.
+_c28k=$(run_cont28_gate arm --offenders | cut -f1 | sort -u)
+n=$((n+1))
+[ "$_c28k" = "check 28" ] || { echo "FAIL check 28 through the engine: --offenders keyed the branch as [$(printf '%s' "$_c28k" | tr '\n' ',')] rather than check 28 alone - another check offends, so the exit is not 28's to claim, or the block keys nothing under 28"; st=1; }
+o28=$(run_cont28_gate main); r28rc=$?
+n=$((n+1))
+case "$r28rc:$o28" in
+  0:*"row-grammar: check 28 graded 2 record(s)"*) echo "ok   check 28 through the engine: the clean main exits 0 and prints the module's graded summary" ;;
+  *) echo "FAIL check 28 through the engine: the clean main exited $r28rc, or the green run did not print the 'row-grammar: check 28 graded 2' summary - the block drops its capture on exit 0:"; printf '%s\n' "$o28" | sed 's/^/      /'; st=1 ;;
+esac
+
 # THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
 # 235; the merged suite measures 251, so 235 is satisfied and 224 would be a silent LOWERING of a
 # shrink-only pin. A discount from the new measurement would give ~202, which is lower still - the
@@ -3554,7 +3613,9 @@ fi
 # arms skipped aloud when no playbook-render engine sits beside the kit.
 # RAISED 531 -> 535 by TOOL-aGraftedHelix-14: its four check-27 engine arms, each top-level and
 # skipped aloud with n_skip carrying the four when no memory-recall kit sits beside this one.
-FLOOR_ASSERTIONS=535
+# RAISED 535 -> 538 by TOOL-aGraftedHelix-13: its three check-28 engine arms, each top-level and
+# never skipped, because that fixture needs no sibling kit.
+FLOOR_ASSERTIONS=538
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
