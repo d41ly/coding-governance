@@ -3688,6 +3688,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_shrink_row",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "check_signature_shape",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -5271,6 +5276,11 @@
       "id": "derive_live_rows",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
+      "id": "derive_low_waters",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "derive_marker_coupling",
@@ -17241,6 +17251,11 @@
       "id": "test_shown_paths_make_every_rank_recoverable",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_shrink_low_water",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_signals_can_move",

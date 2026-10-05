@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-57 — shrink-only lists are graded against their low-water mark
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 57
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 57
 
 <!-- gen:spec-records -->
 
@@ -42,7 +42,7 @@ reading's one other case, a list that never drained at all, stays an offender.
   README's row for the signal asks whether a list rose above the lowest count it reached. Observed by
   AC5.
 - **S5** — Self-test arms in `tools/drift-audit/selftest.py`: a truth table over S2, and a fixture
-  list committed at 2, 1, then 2 entries that reads `regrown` where the seed reading reads shrinking.
+  list committed at 3, 1, then 2 entries that reads `regrown` where the seed reading reads shrinking.
   NOT OBSERVED by a criterion here: the suite runs once at the close, and the arms are declared under
   `New arm:` in §7.
 - **S6** — `memory/map/generated/symbols.json` is regenerated for the two new definitions.
@@ -147,7 +147,7 @@ Read at the worktree HEAD `725b1449`, whose bytes under `tools/drift-audit/` equ
   `memory/project/corpus-path-unresolved.txt` and `memory/project/id-orphan-waiver.txt` read reason
   null.
   Red when: a list seeded empty and still empty, or one drained to its low-water, is an offender.
-- **AC4** — When `grep -n "first-parent" tools/drift-audit/drift_report.py` runs, its only hits sit
+- **AC4** — When `grep -n -e "--first-parent" tools/drift-audit/drift_report.py` runs, its only hits sit
   inside `derive_low_waters` on one `git log` call, and the record AC1 printed carries
   `unjudgeable` 0.
   Red when: the walk spawns once per commit or per list, or a faithful replay is reported as
@@ -160,7 +160,7 @@ Read at the worktree HEAD `725b1449`, whose bytes under `tools/drift-audit/` equ
 
 `drift-audit selftest` · `drift-audit records` · `drift-audit wiring` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/drift-audit/selftest.py` · a truth table over `check_shrink_row`, and a fixture list committed at 2, 1 and 2 entries, staged red by making the predicate compare against the seed · `CHECK_FLOOR` moves by the checks the arms add
+New arm: `tools/drift-audit/selftest.py` · a truth table over `check_shrink_row`, and a fixture list committed at 3, 1 and 2 entries, staged red by making the predicate compare against the seed · `CHECK_FLOOR` moves by the checks the arms add
 
 ## 8. Open questions
 
@@ -185,6 +185,11 @@ New arm: `tools/drift-audit/selftest.py` · a truth table over `check_shrink_row
 - rev-2 · 2026-10-04 · §3 · M2 cross-read: the non-goal and the hands-off edge sent the records-only
   declaration to an unnamed unit the run would add; `TOOL-aMendedFleet-91` is that unit and is now
   named in both.
+- rev-3 · 2026-10-05 · §6 AC4, §2 S5, §7 · build: AC4's bare `first-parent` grep was red before
+  any code, on the prose of `build_landing_index` and its escape-ratio siblings, so it greps the git
+  argument spelling `--first-parent` instead; the S5 fixture moves from 2, 1, 2 to 3, 1, 2, because
+  at 2, 1, 2 the seed reading also flags the list (`shrunk_by` 0) and the arm could not tell the
+  two readings apart.
 
 ## 10. Reuse audit
 

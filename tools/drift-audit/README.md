@@ -123,7 +123,7 @@ never is. A gateable signal whose rows each name their offender by `id` may take
 | `lexicon_marginal_offense_rate` | how many naming offenders came in per definition added since the commit that adopted the lexicon declaration? Both operands are derived by the lexicon's own extractor at both shas. | no |
 | `ledger_rows_contradicting_git` | does an in-flight row claim "not merged" about a landed sha? | yes |
 | `non_terminal_specs_cited_by_product_source` | does a SPECCED/INPROGRESS spec describe shipped work? | yes |
-| `shrink_only_lists_not_shrinking` | are the lists that promise to shrink actually shrinking? | no |
+| `shrink_only_lists_not_shrinking` | has a list that promises to shrink risen above the lowest count its first-parent history reached (`regrown`), or held at least the rows it was seeded with (`never drained`)? A row whose history cannot be replayed is `unjudgeable`, never an offender. | no |
 | `handkept_inventories_disagreeing_with_source` | does a hand-kept list still match what generates it? | yes |
 | `dangling_pointers_in_own_ledger` | do this node's auto-memory notes (`AUTO_MEMORY_DIR`) name repo paths that `git ls-files` still carries? | no |
 | `closed_specs_with_no_product_commit` | does a CLOSED spec have a commit that names it and changed the product? | yes |

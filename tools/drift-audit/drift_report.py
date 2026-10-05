@@ -763,8 +763,60 @@ def _entries(p: pathlib.Path) -> int:
                if ln.strip() and not ln.strip().startswith("#"))
 
 
+def derive_low_waters(git: Git, paths: list) -> dict:
+    """path -> the smallest count of `_entries`-style rows the file held after any commit on the
+    first-parent line, from ONE patch walk over every path together; `None` where the path has no
+    such history, or where the replay ever goes negative, which means a patch was misread and the
+    row cannot be judged. `--no-renames`, so a rename shows as a whole add and the replay stays
+    a count of the file's own lines, not a rename's delta."""
+    out = {p: None for p in paths}
+    if not paths:
+        return out
+    walk = git.run("log", "--first-parent", "--diff-merges=first-parent", "--no-renames", "-p",
+                   "--reverse", "--format=%x01%H", "--", *paths)
+    if walk.returncode != 0:
+        return out
+    headers = {f"diff --git a/{p} b/{p}": p for p in paths}
+    count = {p: 0 for p in paths}
+    broken: set = set()
+    cur, in_hunk, touched = None, False, set()
+    # A trailing commit marker settles the last commit the way every earlier marker does.
+    for ln in walk.stdout.split("\n") + ["\x01"]:
+        if ln.startswith("\x01"):
+            for p in touched:
+                if count[p] < 0:
+                    broken.add(p)
+                elif out[p] is None or count[p] < out[p]:
+                    out[p] = count[p]
+            touched.clear()
+            cur, in_hunk = None, False
+        elif ln.startswith("diff --git "):
+            cur, in_hunk = headers.get(ln), False
+            if cur is not None:
+                touched.add(cur)
+        elif ln.startswith("@@"):
+            in_hunk = cur is not None
+        elif in_hunk and ln[:1] in ("+", "-"):
+            body = ln[1:].strip()
+            if body and not body.startswith("#"):
+                count[cur] += 1 if ln[0] == "+" else -1
+    return {p: (None if p in broken else v) for p, v in out.items()}
+
+
+def check_shrink_row(seed, low_water, entries):
+    """Why a shrink-only row is an offender, or `None`. `regrown`: it holds more rows than the
+    lowest count its history reached. `never drained`: it was seeded with rows and holds at least as
+    many today. A list seeded empty and still empty is neither."""
+    if low_water is not None and entries > low_water:
+        return "regrown"
+    if seed is not None and seed > 0 and entries >= seed:
+        return "never drained"
+    return None
+
+
 def signal_shrink_only(ctx) -> dict:
     rows = []
+    low_waters = derive_low_waters(ctx.git, list(ctx.shrink_only))
     for rel, what in ctx.shrink_only.items():
         p = ctx.root / rel
         now = _entries(p)
@@ -775,25 +827,31 @@ def signal_shrink_only(ctx) -> dict:
             if blob.returncode == 0:
                 seed = sum(1 for ln in blob.stdout.splitlines()
                            if ln.strip() and not ln.strip().startswith("#"))
+        low = low_waters.get(rel)
         rows.append({"file": rel, "what": what, "entries": now, "seed": seed,
-                     "shrunk_by": (seed - now) if seed is not None else None})
-    # TOOL-aScouredKit-3's sibling finding. A list SEEDED EMPTY and still empty has nothing to
-    # drain and never had: `shrunk_by` is pinned at 0 for it, so a bare `<= 0` marked it an offender
-    # forever and the signal could never reach the tolerance of 0 it declares below.
+                     "shrunk_by": (seed - now) if seed is not None else None,
+                     "low_water": low,
+                     "reason": check_shrink_row(seed, low, now) if low is not None else None})
+    # TOOL-aMendedFleet-57. Two reasons, from `check_shrink_row`. `regrown` grades a list against
+    # its LOW-WATER MARK, the smallest count its first-parent history reached: the seed reading alone
+    # let a list seeded at 9 that drained to 0 and grew back to 3 read "shrunk by 6", because 3 was
+    # still under its seed. `never drained` is the seed reading's one surviving case, a list seeded
+    # with rows that holds at least as many today.
     #
-    # The obvious tightening — `shrunk_by < 0` — is WRONG and is refused here rather than left for
-    # someone to re-propose. It would drop the seed>0, now==seed case, which is a list nobody has
-    # drained since the day it was written and is the single case this signal exists for. No row in
-    # this corpus is in that state today, so the regression would have been invisible: a predicate
-    # narrowed past its own subject with no fixture to notice, which is this repo's own
-    # vacuous-selector class. The exclusion is therefore the empty-seeded row alone.
-    stalled = [r for r in rows
-               if r["shrunk_by"] is not None and r["shrunk_by"] <= 0
-               and not (r["seed"] == 0 and r["entries"] == 0)]
+    # TOOL-aScouredKit-3's sibling finding still binds `never drained`: a list SEEDED EMPTY and
+    # still empty has nothing to drain, so it is excluded by `seed > 0`. The obvious tightening of
+    # the seed case to `entries > seed` is WRONG and is refused here rather than left for someone to
+    # re-propose. It would drop the seed>0, now==seed case, which is a list nobody has drained since
+    # the day it was written and is the case this signal first existed for. A predicate narrowed
+    # past its own subject with no fixture to notice is this repo's own vacuous-selector class.
+    #
+    # A row whose low-water could not be replayed is UNJUDGEABLE: counted, and never an offender.
+    stalled = [r for r in rows if r["reason"] is not None]
     return {
         "signal": "shrink_only_lists_not_shrinking",
         "value": len(stalled),
         "of": len(rows),
+        "unjudgeable": sum(1 for r in rows if r["low_water"] is None),
         "tolerance": 0,
         # Report, never gate: a list can legitimately sit still for a week. What it must not do is
         # sit still for a quarter while its own header calls it shrink-only.

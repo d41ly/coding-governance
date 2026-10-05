@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 365
+CHECK_FLOOR = 377
+# 365 -> 377, TOOL-aMendedFleet-57: the twelve checks of `test_shrink_low_water`.
 # 357 -> 365, TOOL-aMendedFleet-56: the eight checks of `test_baselines`.
 # 352 -> 357, TOOL-aMendedFleet-55: the five `open_asks_cited_by_product_source` checks.
 # 345 -> 352, TOOL-aMendedFleet-54: the seven checks of `test_live_builds_without_activity`.
@@ -1973,6 +1974,44 @@ def test_baselines(tmp: pathlib.Path) -> None:
     sig.write_text(seeded, encoding="utf-8", newline="\n")
 
 
+def test_shrink_low_water(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-57: a shrink-only list is graded against the lowest count its first-parent
+    history reached, so one that drained and grew back is `regrown` while still under its seed."""
+    import types
+    print("shrink-only low-water (truth table + a list committed at 3, 1, 2)")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    # The truth table over the predicate: (seed, low_water, entries) -> reason.
+    for args, want in (((3, 1, 2), "regrown"), ((0, 0, 4), "regrown"), ((2, 2, 2), "never drained"),
+                       ((2, 1, 1), None), ((0, 0, 0), None), ((4, 0, 0), None), ((2, 2, -1), None)):
+        check(f"check_shrink_row{args} reads {want!r}", dr.check_shrink_row(*args) == want,
+              repr(dr.check_shrink_row(*args)))
+
+    r = tmp / "low-water"
+    r.mkdir()
+    run(["git", "init", "-q", "-b", "main"], r)
+    run(["git", "config", "user.email", "selftest@example.com"], r)
+    run(["git", "config", "user.name", "selftest"], r)
+    lst = r / "list.txt"
+    for n in (3, 1, 2):
+        lst.write_text("# header\n\n" + "".join(f"row-{i}\n" for i in range(n)),
+                       encoding="utf-8", newline="\n")
+        run(["git", "add", "-A"], r)
+        run(["git", "commit", "-q", "-m", f"list at {n}", "--no-verify"], r)
+    ctx = types.SimpleNamespace(root=r, git=dr.Git(r, "main"),
+                                shrink_only={"list.txt": "a list", "never.txt": "never committed"})
+    got = dr.derive_low_waters(ctx.git, list(ctx.shrink_only))
+    check("the replay reads the list's low-water as 1", got.get("list.txt") == 1, repr(got))
+    check("a path with no history has no low-water", got.get("never.txt") is None, repr(got))
+    sig = dr.signal_shrink_only(ctx)
+    row = next(x for x in sig["detail"] if x["file"] == "list.txt")
+    check("the seed reading calls the list shrinking (shrunk_by 1)", row["shrunk_by"] == 1, repr(row))
+    check("...and the low-water reading names it regrown", row["reason"] == "regrown", repr(row))
+    check("the regrown list is the one offender, the historyless one unjudgeable",
+          sig["value"] == 1 and sig["unjudgeable"] == 1, repr(sig))
+
+
 def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
     """The comparison base is the REMOTE-TRACKING ref — TOOL-dDerivedDocket-21 S1 and S2, AC1 and AC2.
 
@@ -3575,6 +3614,7 @@ def main() -> int:
         test_handkept_name_sets(tmp)
         test_ratchet_guard(tmp)
         test_baselines(tmp)
+        test_shrink_low_water(tmp)
         test_base_is_remote_tracking(tmp)
         test_ratchet_lookback(tmp)
         test_ratchet_message_states_its_window(tmp)
