@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-9 — a newly added decision row or gotcha that ranks as a near match must name its relation
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 5 · ratified 2026-10-04
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 5 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -179,6 +179,7 @@ swallowed-delegate-reads-as-clean > aBatchedTribunal-6k T
 | `ident` | the row's id | the file stem |
 | `names` | the id | the stem and the front-matter `name` |
 | `where` | `<path>:<line>` | `<path>` |
+| `path` | the row document's path | `<path>` |
 | `summary` | the line after the keyed prefix | the front-matter `description` |
 | `full` | the whole line | the whole file, front matter included |
 | `slug` | the id's middle segment | none |
@@ -187,11 +188,18 @@ swallowed-delegate-reads-as-clean > aBatchedTribunal-6k T
 invariant record of `TOOL-aGraftedHelix-3` whose `decision:` key names its ruling's id satisfies a
 near match against that ruling's row. The front-matter `description` is read from the block `FM_RE`
 matches, with the column-0 `key: value` rule `gotchas.py` already enforces in check 17-19's parse.
+That parse is LENIENT here: an indented or colon-less line is skipped and a block that does not
+match reads as an empty description, because refusing a malformed record is checks 17-19's, and a
+second refusal of it here would be two findings for one fact. `path` is the document path the
+index's head column reads in step 1 below.
 
 At a base, a row's identity is present when the row grammar keys its id in the row documents as
 they stood there, each read with `git show <base>:<path>` after `git ls-tree -r --name-only <base>`
 lists them, and a gotcha's when `git ls-tree --name-only <base>` lists its path. Texts are always
-read at `HEAD`.
+read at `HEAD`. The base's row documents are selected by `row_docs(root, m, conf, rev=<base>)`, the
+one selection rule gaining a `rev` that lists through `git ls-tree` instead of `git ls-files`, and
+`scan_added_records(root, conf, base, recs)` returns `(added, eligible)` as the same dicts
+`scan_records` returned.
 
 ### The predicate
 
@@ -226,13 +234,20 @@ file `extract.corpus_inputs(root)` lists, against that file's `extract_records`,
 that unit's cache builder makes in `query.py`'s `_docs`, so the map is the one a session is served.
 It costs a corpus walk, so it is derived LAZILY: only when at least one near match is unsatisfied by
 its names and the relation tokens, and once per run. A finding's tag is that unit's:
-`[superseded by <id>, …]` for a whole edge, `[partly superseded by <id>, …]` otherwise.
+`[superseded by <id>, …]` for a whole edge, `[partly superseded by <id>, …]` otherwise. The walk is
+`derive_relation_successors(root)`, and `load_recall_kit()` is the one place the recall kit is
+resolved and `bench.py` imported, refusing by name when it is absent, unimportable or older than the
+four names step 1 and step 2 read. `extract.py` is imported only inside the lazy walk, so an armed
+run whose near matches are all satisfied never loads it.
 
 `extract.py` binds its id grammar to the repository the recall kit is installed in, which is the
 audited repository on every real run. An arm that reaches this map therefore runs a copy-install
 fixture, the kit directories copied into the fixture repository, so that the fixture IS the kit's
 repository. An arm calling it against a foreign root would grade the wrong grammar and pass, which is
-`memory/gotchas/grammar-bound-to-the-wrong-root.md`.
+`memory/gotchas/grammar-bound-to-the-wrong-root.md`. EVERY check-27 arm runs that way, as a
+subprocess of the fixture's own copy of this module, and not only the AC12 arms: AC1's finding is an
+unsatisfied near match, so it reaches the map too. The copy is each kit's `*.py`, which is every
+module either import chain loads.
 
 ### The replay
 
@@ -241,10 +256,17 @@ commit in `git log --reverse -m -p` over the decision index and its archives who
 the row grammar keys with that id, and a gotcha's is the first `--diff-filter=A` commit naming its
 path in the same walk. The `-m` matters: two rows at `5266d22e` entered in a merge's own resolution
 and have no other add commit.
+"The same walk" means the same flags, not one invocation: the row walk is
+`git log --reverse -m --no-renames -p -U0 -- <row documents>` and the gotcha walk a second
+`git log --reverse -m --no-renames --diff-filter=A --name-only -- <memory>/gotchas/`, exactly as
+§8 F1's probe ran them. A record with neither is neither ranked nor ranked against, and the count of
+them is printed.
 OLDER means an add commit with an earlier committer time. Only records present at `HEAD` are ranked
 or ranked against, texts are read at `HEAD`, and each record is ranked against the older records
-with steps 1 to 5 above. It prints, per band edge 0.10, 0.125, 0.15, 0.175 and 0.20, how many records
-would be flagged, then every flagged pair at the floor it was given.
+with steps 1 to 5 above, the superseded-by map included. F1's probe predates that map; the replay
+at the build commit flags the same 30 pairs with it, so step 5's third clause moves none of them. It
+prints, per band edge 0.10, 0.125, 0.15, 0.175 and 0.20 (and the given floor when it is not one),
+how many records would be flagged, then every flagged pair at the floor it was given.
 
 ### Output
 
@@ -276,14 +298,20 @@ row-grammar: check 27 NOT ARMED — NEAR_MATCH_GATE is blank, so no added record
 | `cmd_check_relations` | function | `py.function` |
 | `cmd_measure_relations` | function | `py.function` |
 | `read_relation_gate` | function | `py.function` |
+| `load_recall_kit` | function | `py.function` |
+| `derive_relation_successors` | function | `py.function` |
+| `resolve_kit_dir` | function, the canonical block carried inline | `py.function` |
 | `RELATION_CHECK` | module constant | none graded |
+| `RELATION_KEY`, `RELATION_TOKEN_RE`, `RELATION_BANDS`, `NAME_EDGE` | module constants | none graded |
 | `FM_RE` | module constant, moved | none graded |
 | `NEAR_MATCH_GATE` | conf key | none graded |
 | `--check-relations`, `--measure-relations` | CLI flags | none graded |
 
 Every function name was answered `OK` by `lexicon.py --suggest <name> --as py.function`. The
 constants and the conf key sit in no declared naming cell, which `py.constant` being undeclared
-confirms.
+confirms. `resolve_kit_dir` is the block `tools/lib/resolve_kit_dir.py` holds canonically, copied
+byte for byte; the resolver parity row of `tools/lib/resolve-python.test.sh` discovers every inline
+copy by its marker and reds one that drifts.
 
 ### Rollout
 
@@ -481,6 +509,14 @@ New arm: `tools/memory-tree/row_grammar.py --selftest` · fixture repos with a b
   remedy text in §4 now names `supersedes <id>`; the hands-off to `TOOL-aGraftedHelix-6` adds the
   base derivation that unit now uses (finding 48); and a hands-off to the unit promoted from
   finding 27 is added.
+- rev-3 · 2026-10-05 · §4 Data model, The superseded-by map, The replay, Inventory · the build
+  pass's divergences, recorded before the code: three functions the inventory lacked
+  (`load_recall_kit`, `derive_relation_successors`, and the canonical `resolve_kit_dir` block §4
+  Evidence already names), four constants, and a `path` field the index head reads; `row_docs`
+  gains `rev` for the presence test; the gotcha front-matter parse is lenient, leaving the refusal
+  to checks 17-19; the replay's two walks are spelled out with F1's flags and an undated record is
+  counted rather than ranked; every check-27 arm runs a copy-install fixture, since AC1's finding
+  reaches the map too; and the replay's step 5 includes the map, measured to move none of F1's pairs.
 
 ## 10. Reuse audit
 
