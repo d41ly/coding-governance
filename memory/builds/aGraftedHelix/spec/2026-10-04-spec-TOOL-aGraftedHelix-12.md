@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-12 — every cell of the claim write table, and every write `--beat` declines, is observed
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -33,9 +33,11 @@ findings 2 and 3 (HIGH) of the round-1 spec audit.
   the table `check_claim_writable` implements: the claim-read row, the mode, the reacher that drives
   that mode, and the outcome. The outcome is the exit, the check number, whether the claim ref's
   sha moved, whether the run-state file changed and the line the call printed (`taken` for `claim
-  taken over`, `announced` for `claim not written`), or `unreached` with the reason no path reaches
-  the cell. The line field is what tells a `take, announced` cell from a `take` one and an
-  `announce` cell from a refusal that wrote nothing. The arm seeds each claim state with real
+  taken over`, `announced` for the announce row's `claim not written`, `lost` for a write whose
+  push lost), or `unreached` with the reason no path reaches the cell. The line field is what tells
+  a `take, announced` cell from a `take` one, an `announce` cell from a refusal that wrote nothing,
+  and the table's own check 90 or announcement from a race lost by a row misread as `none`, whose
+  exit, check, ref and record coincide with them. The arm seeds each claim state with real
   `gov-claim` messages over a bare remote. It
   asserts that its own table holds rows × columns cells before it drives one, so a missing row reds
   rather than shrinking the arm. That count reads only the arm's own rows; deriving the cell set from
@@ -151,6 +153,10 @@ none
   since a per-cell reset leaves the slug no run-state file, and AC1 says "tree" for "clone". The
   `mine` seed is aged so the holder cell is observed due. AC2 runs in the driver suite's claim
   fixture, the file §4 names, rather than the tick suite's.
+- rev-4 · 2026-10-05 · §2 · S3 · the line field gains `lost`. A staged break making every claim
+  read as `none` left eight cells green: the five foreign holder cells and the three status
+  announce cells, because a create pushed against the empty lease loses, and that is check 90 or a
+  `claim not written` line with the ref unmoved, the same tuple the table's own refusal gives.
 
 ## 10. Reuse audit
 
