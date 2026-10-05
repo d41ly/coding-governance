@@ -4,7 +4,7 @@
 
 Build exactly what the unit's spec states (`memory/builds/aEvidencedLens/spec/`, the file whose
 status header carries `TOOL-aEvidencedLens-14`), and read the shared invariants in
-`2026-10-05-prompt-TOOL-aEvidencedLens-14-1-spec-brief.md` beside this file first. Where the spec and
+`2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md` beside this file first. Where the spec and
 that brief disagree, the spec wins, and you say so in your return.
 
 This is a PROMOTED unit from the round-1 spec audit. Its spec names the files it edits, and the direct check its §6 requires. Where it edits a workflow template, re-render with `bash tools/workflows/check-protocol-parity.test.sh --render` and check with a scratch stub run, as units 1 to 6 did. Where it edits a checker, observe its new clause RED on a staged break. Update the suite arms that pin what you changed; do not run the suites.

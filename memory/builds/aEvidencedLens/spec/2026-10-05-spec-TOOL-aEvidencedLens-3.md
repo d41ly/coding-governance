@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-3 — the spec skeptic confirms by the rubric, re-runs the evidence, and refutes duplicates and by-design
 
-**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 3 · ratified 2026-10-05
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 3 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
@@ -33,7 +33,7 @@ judged by RE-RUNNING the evidence unit 2 makes every spec finding carry.
   for an in-batch survivor or `duplicate of prior <ref>` for a prior original; (6) a PREFERENCE that
   names no defect the rubric grades, not even a low. The sixth is §8 F1. Observed by AC1.
 - **S3** — Every spec-kind skeptic line carries the finder's evidence after the fix, as
-  ` | evidence: <text>`, folded to one line by the existing `renderCell`, so an absent evidence reads
+  ` | evidence: <text>`, folded to one line by `renderPromptLine` (`TOOL-aEvidencedLens-12`; built here as `renderCell`), so an absent evidence reads
   `-`. The skeptic is told to RE-RUN the command or RE-READ the `read: <path>:<line>` the evidence
   names, say in `reason` what it observed, and refute a finding whose evidence does not reproduce.
   "Does not reproduce" means the observation contradicts the claim. A probe the skeptic could not run
@@ -137,7 +137,7 @@ default by the finder's grade, and never call it evidence that does not reproduc
 spec finder ── finding {file, where, severity, claim, impact, fix, evidence}   (unit 2)
       │
       ▼
-skeptic line: id=<n> [<grade>] lens=<lens> <ref> — <claim> | impact | fix | evidence: renderCell(evidence)
+skeptic line: id=<n> [<grade>] lens=<lens> <ref> — <claim> | impact | fix | evidence: renderPromptLine(evidence)
       │
       ▼
 verdict {id, verdict, reason, …}  ── join (unchanged) ── conflicts demoted (unchanged)
@@ -296,6 +296,10 @@ version bump at the close; that is shared invariant 7, not a defect of this unit
   028b5cac, with §4 Evidence restated against it. Id 45 (MEDIUM, its unit-3 half): §5 says
   confirming at any severity slows M4's precision bound. §3 gains the hands-off edge to
   `TOOL-aEvidencedLens-12`, the unit id 36 (HIGH) was promoted to.
+- rev-3 · 2026-10-05 · S3 §4 · the evidence fold is `renderPromptLine` since
+  `TOOL-aEvidencedLens-12` (e9028d73d), which keeps a pipe; this unit built it through `renderCell`.
+  The main loop restated the two lines that still named `renderCell`, so this spec and unit 12's no
+  longer disagree.
 
 ## 10. Reuse audit
 
