@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: yes, 2 surfaced
+keepalive-reaped: yes
 refreshed-at: fd82e883102c570ea66f4f3244a92c70f7c19083 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 94d99c6cad84d7ccc78e01f8a5b64f7826397b45
@@ -178,3 +180,5 @@ base: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 2026-10-05T05:20:39Z dispatch · item 13971198 TOOL-aEvidencedLens-21 · reason memory/LIVE.md memory/ledger/2026-10.md memory/builds/aEvidencedLens/build/2026-10-05-build-TOOL-aEvidencedLens-21-1-ab-replay.md memory/builds/aEvidencedLens/build/2026-10-05-build-TOOL-aEvidencedLens-21-2-acceptance-ledger.md tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/unattended.test.sh tools/workflows/tier2-review.js tools/workflows/tier2-review.template.js tools/workflows/tier2-review.test.sh tools/workflows/unattended-build.js tools/workflows/unattended-build.template.js tools/workflows/unattended-build.test.sh memory/map/generated/symbols.json memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-21.md memory/builds/aEvidencedLens/README.md
 
 2026-10-05T05:20:42Z brief · item TOOL-aEvidencedLens-21 · reason 1573e2a20228 memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-21-2-build-brief.md
+
+2026-10-05T07:46:07Z brief · item TOOL-aEvidencedLens-12 · reason 28c1f9da20ea memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-12-2-build-brief.md

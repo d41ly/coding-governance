@@ -47,8 +47,8 @@ evidence no lens was allowed to gather. The owner's prompt and the one answered 
 ## Parked decisions
 
 - The spec-audit promotion chain's generation bound: should M4 bound a chain of promotions by
-  generation as well as by precision? Parked in `RUN.md` at 2026-10-05T03:59:40Z, when the run
-  stopped the chain after round 4.
+  generation as well as by precision? Parked in `RUN.md` at 2026-10-04T23:32:23Z by the round-1
+  disposal, and again at 2026-10-05T03:59:40Z when the run stopped the chain after round 4.
 - Options seen: a generation bound in M4, building a promotion of a promotion unaudited under M4's
   `specs-audited` override; a size floor, folding the minors of an observation-only unit; keeping
   the precision bound alone; or an owner-set generation cap.
@@ -110,7 +110,7 @@ ids TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16 TOOL-aE
 | [TOOL-aEvidencedLens-21 — the closing diff review's batched minors, round 1](spec/2026-10-05-spec-TOOL-aEvidencedLens-21.md) | 12 | 2 | CLOSED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 46 bound to this build, across 4 record folder(s).
+Records: 47 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
