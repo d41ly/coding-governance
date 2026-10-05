@@ -63,3 +63,5 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-05T21:09:13Z brief · item TOOL-aGraftedHelix-33 · reason a2e60ebbeb07 memory/builds/aGraftedHelix/prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md
 
 2026-10-05T21:09:48Z dispatch · item 0bc5f0f8 TOOL-aGraftedHelix-33 · reason tools/workflows memory/map/generated memory/map/features/review-harnesses.md memory/guides/SESSION-KICKOFF.md memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-33.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md
+
+2026-10-05T21:40:52Z rescope · item add TOOL-aGraftedHelix-34 · reason discovery at VERIFYING: the owed unattended suites ran pooled on a frozen clone at 90a6f6fae and came back red (driver 12 arms, cross-component 1, gate shard 1 one, shard 8 killed after a fixture no-op, resume-tick 2); the Definition of Done cannot be met with them red, so the fixes join the build
