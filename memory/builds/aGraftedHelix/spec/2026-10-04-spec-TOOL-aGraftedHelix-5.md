@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-5 — each leg reading is stamped faithful or contended by a foreign-load census, and only faithful readings argue a ceiling
 
-**Status:** SPECCED · rev-5 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 7 · advances TOOL-aSurfacedLexicon-22 · ratified 2026-10-04
+**Status:** CLOSED · rev-5 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 7 · advances TOOL-aSurfacedLexicon-22 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 

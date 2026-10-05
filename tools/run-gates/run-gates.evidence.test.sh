@@ -142,7 +142,7 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=84
+FLOOR_ASSERTIONS=109
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -595,6 +595,222 @@ for prof in capable minimal; do
   fi
   rec_done
 done
+
+# =================================================================================================
+# THE FOREIGN-LOAD CENSUS (TOOL-aGraftedHelix-5). Every arm drives the real runner in its own scratch
+# repo and reads what it recorded: the run's `census` file and the eighth field of its `.leg` rows,
+# `foreign`. NO ARM ASSERTS A TOTAL: another session's suite on this host is foreign gate work, so an
+# arm reading the census's count would red on a busy host for a reason that is not its own. The arms
+# assert ROOTS BY PID, a process the arm started or one it must never see, and the fields a census
+# that could not see must write.
+#
+# load.sh sleeps its first argument, after touching its second when one is given, and takes its
+# sleep down with it on TERM, so an arm that stops its outside load leaves no orphan behind.
+write_load_fixture() { printf '%s\n' '#!/usr/bin/env bash' '[ -n "${2:-}" ] && : > "$2"' 'trap "kill \$! 2>/dev/null; exit 0" TERM' \
+              'sleep "${1:-5}" & wait' 'exit 0' > "$REC_T/fx/load.sh"; }
+# check_census_root <census file> <pid:token> [<first line to read>] — rc 0 when a sample names that root
+check_census_root() { awk -F'\t' -v w="$2" -v from="${3:-1}" 'NR >= from { n = split($3, r, " "); for (i = 1; i <= n; i++) if (r[i] == w) f = 1 } END { exit !f }' "$1" 2>/dev/null; }
+read_foreign_field() { awk -F'\t' 'NR == 1 { print $8 }' "$1" 2>/dev/null; }
+# The stub `ps` dirs go FIRST on PATH, and PATH is colon-separated, so a drive-letter spelling of the
+# scratch dir (`C:/...`, which `mktemp` returns under a Windows-spelled TMPDIR) would split the stub
+# dir in two and put no stub first.
+cn_pd=$(cygpath -u "$tmp" 2>/dev/null) || cn_pd=$tmp
+
+# --- AC1: an outside run of the leg's own script, alive beside the bar, is a foreign root ----------
+# STARTED THROUGH `exec`, so the pid the arm holds is the process the census sees: a subshell that
+# did not exec would be a fork of this harness, whose own line ends `.test.sh`.
+rec_repo; write_load_fixture
+rec_legs '[ {"name": "loaded", "argv": ["bash", "fx/load.sh", "5"]} ]'
+( cd "$REC_T" && exec bash fx/load.sh 120 ) & cn_out=$!
+rc=$(rec_run GATE_FULL=1)
+d=$(rec_dir); cn_f=$(read_foreign_field "$d/0.leg")
+case "$cn_f" in ''|*[!0-9]*) cn_n=0 ;; *) cn_n=$cn_f ;; esac
+[ "$rc" = 0 ] && [ "$cn_n" -ge 1 ] \
+  && ok "AC1 a leg run beside an outside run of its own script records foreign $cn_f" \
+  || { nope "AC1 the leg's foreign field reads '$cn_f' (rc=$rc) with an outside run of its script alive"; sed 's/^/      /' "$d/census" 2>/dev/null; }
+check_census_root "$d/census" "$cn_out:fx/load.sh" \
+  && ok "AC1 the census names the outside process as a root, by pid $cn_out and the leg's script as its token" \
+  || { nope "AC1 no census line names $cn_out:fx/load.sh — the outside process was not a root"; sed 's/^/      /' "$d/census" 2>/dev/null; }
+kill "$cn_out" 2>/dev/null; wait "$cn_out" 2>/dev/null
+rec_done
+
+# --- AC2: the runner's ancestors and descendants are never foreign --------------------------------
+# The wrapper is a `bash -c` whose argv names the runner's path, which is exactly what an agent
+# session's wrapper looks like; the leg runs nest.sh, which starts a nested nest.sh, so both match
+# a manifest token and both are descendants. Sampled every second so a snapshot holds them.
+rec_repo
+printf '#!/usr/bin/env bash\nif [ "${1:-}" = outer ]; then echo $$ > .git/cn-leg.pid; bash fx/nest.sh inner & echo $! > .git/cn-nested.pid; sleep 5; wait; else sleep 6; fi\nexit 0\n' > "$REC_T/fx/nest.sh"
+rec_legs '[ {"name": "nest", "argv": ["bash", "fx/nest.sh", "outer"]} ]'
+( cd "$REC_T" && env -u GATE_BASE -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES GATE_FULL=1 GATE_CENSUS_EVERY=1 \
+    bash -c 'echo $$ > .git/cn-wrapper.pid; bash "$1"; true' _ "$REC_T/$KIT_REL/run-gates.sh" ) >"$REC_OUT" 2>&1
+d=$(rec_dir); cn_id=$(cat "$REC_GD/gate-run/current" 2>/dev/null)
+cn_lines=$(wc -l < "$d/census" 2>/dev/null | tr -d ' ')
+[ "${cn_lines:-0}" -ge 2 ] \
+  && ok "AC2 control: the census took $cn_lines samples, so a snapshot held the leg and its nested run" \
+  || nope "AC2 the census holds ${cn_lines:-0} line(s), so no snapshot ever held the leg — the arm below would pass by finding nothing"
+cn_bad=""
+for cn_p in "$(cat "$REC_GD/cn-wrapper.pid" 2>/dev/null)" "${cn_id##*-}" "$(cat "$REC_GD/cn-leg.pid" 2>/dev/null)" "$(cat "$REC_GD/cn-nested.pid" 2>/dev/null)"; do
+  [ -n "$cn_p" ] || { cn_bad="$cn_bad (a pid file is missing)"; continue; }
+  awk -F'\t' -v p="$cn_p" '{ n = split($3, r, " "); for (i = 1; i <= n; i++) if (r[i] ~ "^" p ":") f = 1 } END { exit !f }' "$d/census" 2>/dev/null \
+    && cn_bad="$cn_bad $cn_p"
+done
+[ -z "$cn_bad" ] \
+  && ok "AC2 no root is the wrapper's, the runner's, the leg's or its nested run's pid" \
+  || { nope "AC2 the census counted an ancestor or descendant of the runner as foreign:$cn_bad"; sed 's/^/      /' "$d/census" 2>/dev/null; }
+rec_done
+
+# --- AC3 and AC6: a census that cannot see writes `unknown`, never `0`, and moves no verdict --------
+rec_repo
+rec_legs '[ {"name": "one", "argv": ["bash", "fx/a.sh"]}, {"name": "two", "argv": ["bash", "fx/a.sh"]} ]'
+rc=$(rec_run GATE_FULL=1)
+cn_v0=$(grep '^gates ' "$REC_OUT")
+# AC6 rides this control run: the ledger block's read of a `.leg` row takes field 7 alone.
+[ "$(grep -c . "$REC_GD/gate-ledger.tsv" 2>/dev/null)" = 2 ] && [ -z "$(awk -F'\t' 'NF != 5' "$REC_GD/gate-ledger.tsv" 2>/dev/null)" ] \
+  && ok "AC6 every gate-ledger row stays five fields, so no key absorbed the eighth" \
+  || { nope "AC6 the ledger lost its five-field shape"; cat -A "$REC_GD/gate-ledger.tsv" 2>/dev/null | sed 's/^/      /'; }
+mkdir -p "$tmp/ps-fail" "$tmp/ps-nocol" "$tmp/ps-noself"
+printf '#!/bin/sh\nexit 1\n' > "$tmp/ps-fail/ps"
+printf '#!/bin/sh\necho "  UID  TTY  STIME COMMAND"\necho "  u    ?    10:00 bash fx/a.sh"\n' > "$tmp/ps-nocol/ps"
+printf '#!/bin/sh\necho "  UID   PID  PPID  TTY  STIME COMMAND"\necho "  u       7     1  ?    10:00 bash fx/a.sh"\n' > "$tmp/ps-noself/ps"
+chmod +x "$tmp/ps-fail/ps" "$tmp/ps-nocol/ps" "$tmp/ps-noself/ps"
+for cn_s in fail nocol noself; do
+  rc=$(rec_run GATE_FULL=1 PATH="$cn_pd/ps-$cn_s:$PATH")
+  d=$(rec_dir)
+  cn_rows=$(awk -F'\t' '{ print $8 }' "$d"/*.leg 2>/dev/null | sort -u | tr '\n' ' ')
+  [ "$cn_rows" = "unknown " ] && [ "$(grep '^gates ' "$REC_OUT")" = "$cn_v0" ] \
+    && ok "AC3 with a ps that $cn_s, every leg's foreign field reads unknown and the verdict is the stub-free one" \
+    || { nope "AC3 with a ps that $cn_s the foreign fields read '$cn_rows' and the verdict '$(grep '^gates ' "$REC_OUT")' against '$cn_v0'"; sed 's/^/      /' "$d/census" 2>/dev/null; }
+  if [ "$cn_s" = fail ]; then
+    [ "$(cut -f2 "$d/census" 2>/dev/null | sort -u)" = unknown ] && [ "$(grep -c 'run-gates: NOTE.*census' "$REC_OUT")" = 1 ] \
+      && ok "AC3 every census line reads unknown, and stderr carries one NOTE naming the census" \
+      || { nope "AC3 the census lines or the NOTE are wrong under a failing ps"; sed 's/^/      /' "$d/census" "$REC_OUT" 2>/dev/null; }
+  fi
+done
+rec_done
+
+# --- AC4: the sampler is no live job and holds no caller's stdout ---------------------------------
+# The WALL IS OFF: its own watcher holds a captured stdout for up to its 30 s poll, a defect that is
+# not the census's, and with it off the census sampler is the only sleeper this bound can measure.
+# Bounded, because a sampler counted by `live()` wedges a serial pool for good.
+rec_repo
+rec_legs '[ {"name": "one", "argv": ["bash", "fx/a.sh"]}, {"name": "two", "argv": ["bash", "fx/a.sh"]} ]'
+cn_cap=$( cd "$REC_T" && env -u GATE_BASE -u GATE_REUSE -u GATE_PROFILES -u GATE_CENSUS_EVERY GATE_FULL=1 GATE_JOBS=1 GATE_WALL=0 \
+            timeout -k 5s 240 bash $KIT_REL/run-gates.sh 2>&1 ); cn_back=$(date +%s)
+cn_end=$(awk -F'\t' '$1 == "ended" { print $2 }' "$(rec_dir)/verdict" 2>/dev/null)
+cn_ende=""; [ -n "$cn_end" ] && cn_ende=$(date -d "$cn_end" +%s 2>/dev/null)
+if [ -z "$cn_end" ]; then
+  nope "AC4 the runner wrote no verdict inside its 240 s bound — a sampler counted as a live job wedged the serial pool"
+  printf '%s\n' "$cn_cap" | grep '^GATE\|^gates' | sed 's/^/      /'
+elif [ -z "$cn_ende" ]; then
+  skipped "AC4 this host's date cannot read the verdict's ended stamp '$cn_end', so the stdout hold went UNMEASURED"
+else
+  printf '%s\n' "$cn_cap" | grep -q '^GATE ok    one$' && printf '%s\n' "$cn_cap" | grep -q '^GATE ok    two$' \
+    && [ $(( cn_back - cn_ende )) -le 30 ] \
+    && ok "AC4 at GATE_JOBS=1 both legs report and the capture returns $(( cn_back - cn_ende ))s after the runner ended" \
+    || { nope "AC4 the serial pool or the capture wedged: returned $(( cn_back - cn_ende ))s after the runner ended"; printf '%s\n' "$cn_cap" | grep '^GATE\|^gates' | sed 's/^/      /'; }
+fi
+rec_done
+
+# --- AC5: load arriving mid-leg is sampled ---------------------------------------------------------
+# THE OUTSIDE LOAD WAITS FOR A FACT, the leg's start marker, never a clock: the runner's startup here
+# varies by seconds, so a clock could start it before the first sample and leave the loop ungraded.
+rec_repo; write_load_fixture
+rec_legs '[ {"name": "long", "argv": ["bash", "fx/load.sh", "15", ".git/cn-started"]} ]'
+( cd "$REC_T" && i=0; while [ ! -f .git/cn-started ] && [ "$i" -lt 1200 ]; do sleep 0.1; i=$((i + 1)); done
+  exec bash fx/load.sh 8 ) & cn_out=$!
+rc=$(rec_run GATE_FULL=1 GATE_CENSUS_EVERY=2)
+wait "$cn_out" 2>/dev/null
+d=$(rec_dir); cn_lines=$(wc -l < "$d/census" 2>/dev/null | tr -d ' '); cn_f=$(read_foreign_field "$d/0.leg")
+case "$cn_f" in ''|*[!0-9]*) cn_n=0 ;; *) cn_n=$cn_f ;; esac
+[ "${cn_lines:-0}" -ge 4 ] && check_census_root "$d/census" "$cn_out:fx/load.sh" 2 && [ "$cn_n" -ge 1 ] \
+  && ok "AC5 $cn_lines samples, a line after the first names the mid-leg load $cn_out, and the leg records foreign $cn_f" \
+  || { nope "AC5 load arriving mid-leg was missed: $cn_lines samples, foreign '$cn_f'"; sed 's/^/      /' "$d/census" 2>/dev/null; }
+rec_done
+
+# --- AC11: the first sample precedes a sub-second first wave --------------------------------------
+# Each leg looks for the census AS IT STARTS. The runner writes the first sample before it dispatches
+# anything, so a correct runner can never fail this; one that left the first sample to the detached
+# loop races its own legs. The race is made one a loaded host loses: `ps` takes two seconds here, as
+# a loaded `ps -ef` has been measured to, so an asynchronous first sample lands after the legs ended.
+# A census that can see prints no NOTE, which is the other half of keeping the first sample's NOTE
+# in the runner's shell: a NOTE written from a file the loop has not filled yet would print always.
+rec_repo
+printf '%s\n' '#!/usr/bin/env bash' 'id=$(cat .git/gate-run/current 2>/dev/null)' \
+  'if [ -s ".git/gate-run/$id/census" ]; then echo seen; else echo unseen; fi > ".git/cn-peek-$1"' 'exit 0' > "$REC_T/fx/peek.sh"
+rec_legs '[ {"name": "one", "argv": ["bash", "fx/peek.sh", "one"]}, {"name": "two", "argv": ["bash", "fx/peek.sh", "two"]} ]'
+cn_ps=$(command -v ps); mkdir -p "$tmp/ps-slow"
+printf '#!/bin/sh\nsleep 2\nexec "%s" "$@"\n' "$cn_ps" > "$tmp/ps-slow/ps"; chmod +x "$tmp/ps-slow/ps"
+rc=$(rec_run GATE_FULL=1 GATE_JOBS=2 PATH="$cn_pd/ps-slow:$PATH")
+d=$(rec_dir); cn_first=$(awk -F'\t' 'NR == 1 { print $1 }' "$d/census" 2>/dev/null); cn_bad=""
+for cn_p in one two; do
+  [ "$(cat "$REC_GD/cn-peek-$cn_p" 2>/dev/null)" = seen ] || cn_bad="$cn_bad $cn_p:census-not-yet-written-at-start"
+done
+[ "$(grep -c 'run-gates: NOTE.*census' "$REC_OUT")" = 0 ] || cn_bad="$cn_bad a-census-NOTE-on-a-host-it-can-see"
+for cn_l in "$d/0.leg" "$d/1.leg"; do
+  cn_f=$(read_foreign_field "$cn_l"); cn_s=$(awk -F'\t' '{ print $5 }' "$cn_l" 2>/dev/null)
+  case "$cn_f" in ''|*[!0-9]*) cn_bad="$cn_bad ${cn_l##*/}:foreign=$cn_f" ;; esac
+  case "$cn_first$cn_s" in ''|*[!0-9]*) cn_bad="$cn_bad ${cn_l##*/}:unstamped" ;;
+    *) [ "$cn_first" -le $(( cn_s / 1000000000 )) ] || cn_bad="$cn_bad ${cn_l##*/}:first-sample-after-start" ;; esac
+done
+[ -z "$cn_bad" ] \
+  && ok "AC11 both first-wave legs found the census already written, carry a numeric foreign field, and start no earlier than its first stamp" \
+  || { nope "AC11 a first-wave leg went uncensused:$cn_bad"; sed 's/^/      /' "$d/census" 2>/dev/null; }
+rec_done
+
+# --- AC12: a retried leg's row is eight fields, and a positive count outranks `unknown` -----------
+# The fixture is the canary's contended pair: a leg that hangs while the spinner holds its flag and
+# passes once it is gone, so its first attempt times out beside the spinner and its retry is green.
+if command -v timeout >/dev/null 2>&1; then
+  rec_repo
+  export HV_FLAG="$tmp/cn-spinner"; rm -f "$HV_FLAG" "$HV_FLAG.done" "$HV_FLAG.hung"
+  printf '#!/usr/bin/env bash\n: > "$HV_FLAG"\ni=0; while [ ! -f "$HV_FLAG.hung" ] && [ "$i" -lt 600 ]; do sleep 0.1; i=$((i + 1)); done\nsleep 3\nrm -f "$HV_FLAG"\n: > "$HV_FLAG.done"\n' > "$REC_T/fx/spin.sh"
+  printf '#!/usr/bin/env bash\nwhile [ ! -f "$HV_FLAG" ] && [ ! -f "$HV_FLAG.done" ]; do sleep 0.1; done\nif [ -f "$HV_FLAG" ]; then : > "$HV_FLAG.hung"; sleep 60; fi\nexit 0\n' > "$REC_T/fx/contended.sh"
+  rec_legs '[ {"name": "spinner", "argv": ["bash", "fx/spin.sh"]}, {"name": "contended", "argv": ["bash", "fx/contended.sh"], "ceiling": 2} ]'
+  rc=$(rec_run GATE_FULL=1)
+  d=$(rec_dir)
+  if grep -q '^GATE ok    contended  (retried after timeout)$' "$REC_OUT"; then
+    awk -F'\t' 'NF == 8 && ($8 == "unknown" || $8 ~ /^[0-9]+$/) { f = 1 } END { exit !f }' "$d/1.retry.leg" 2>/dev/null \
+      && ok "AC12 the serial retry's row holds eight fields with a census verdict in the eighth" \
+      || { nope "AC12 the retry row is not eight fields with a census verdict"; cat -A "$d/1.retry.leg" 2>/dev/null | sed 's/^/      /'; }
+  else
+    nope "AC12 control: the contended leg did not pass on its serial retry, so no retry row was graded"; grep '^GATE\|^gates' "$REC_OUT" | sed 's/^/      /'
+  fi
+  unset HV_FLAG
+  rec_done
+else
+  skipped "AC12 no runnable timeout here, so no ceiling fires and the retry row went UNEXERCISED"
+fi
+# `derive_foreign`, SLICED out of the runner, over a census of one `unknown` and one `2` inside the
+# window; the zeros-only and unknown-only controls are what stop a constant answer passing. The
+# fourth census holds its one sample 15 s BEFORE the leg starts, inside the three-period reach at a
+# 10 s period, which is the sample a short leg with no sample of its own depends on.
+awk '/^derive_foreign\(\) \{/,/^}/' "$RUNNER" > "$tmp/cn-derive.sh"
+cn_got=$( RUNDIR="$tmp/cn-rec"; CENSUS_EVERY=10; mkdir -p "$RUNDIR"; . "$tmp/cn-derive.sh"
+  printf '1000\tunknown\t\n1010\t2\t7:fx/a.sh\n' > "$RUNDIR/census"; derive_foreign 1005000000000 1030000000000; printf '%s ' "$FOREIGN"
+  printf '1000\t0\t\n1010\t0\t\n' > "$RUNDIR/census"; derive_foreign 1005000000000 1030000000000; printf '%s ' "$FOREIGN"
+  printf '1000\tunknown\t\n1010\t0\t\n' > "$RUNDIR/census"; derive_foreign 1005000000000 1030000000000; printf '%s ' "$FOREIGN"
+  printf '1000\t2\t7:fx/a.sh\n' > "$RUNDIR/census"; derive_foreign 1015000000000 1016000000000; printf '%s' "$FOREIGN" )
+[ "$cn_got" = "2 0 unknown 2" ] \
+  && ok "AC12 derive_foreign stamps 2 over an unknown and a 2, 0 over zeros, unknown over an unknown and a 0, and reaches back three periods" \
+  || nope "AC12 derive_foreign read '$cn_got' for (unknown+2, zeros, unknown+0, a sample 15 s before the leg), want '2 0 unknown 2'"
+
+# --- AC14: neither the turnstile ticker nor the census sampler outlives the bar --------------------
+# The DEFAULT TTL on purpose: its ticker sleeps a sixth of it, so a ticker the exit does not stop is
+# still alive when this looks. The snapshot is taken to a file first, so the pattern grep reads is
+# not on the command line the snapshot lists.
+rec_repo
+rc=$(rec_run GATE_FULL=1 GATE_TURNSTILE=1 GATE_CENSUS_EVERY=60)
+sleep 2
+ps -ef > "$tmp/cn-ps.txt" 2>/dev/null
+cn_left=$(grep -F -- "${REC_T##*/}/$KIT_REL/run-gates.sh" "$tmp/cn-ps.txt")
+if [ ! -s "$tmp/cn-ps.txt" ]; then
+  skipped "AC14 ps -ef printed nothing here, so a lingering ticker went UNSEEN"
+elif [ -z "$cn_left" ]; then
+  ok "AC14 no process naming the finished bar's runner path remains (rc=$rc)"
+else
+  nope "AC14 the finished bar left processes the next bar's census would count as foreign:"; printf '%s\n' "$cn_left" | cut -c1-160 | sed 's/^/      /'
+fi
+rec_done
 rm -f "$REC_OUT"
 
 # =================================================================================================
@@ -777,10 +993,13 @@ printf '%s\n' '[' \
   '  {"name": "kill-overhead", "argv": ["true"], "ceiling": 2}' \
   ']' > "$DC_T/${PFX}gate-legs.json"
 mkdir -p "$DC_T/.git/gate-run/r1"
-{ printf 'at-ceiling\tfail\t124\t100.4\t0\t0\t-\n'
-  printf 'below-ceiling\tfail\t1\t40.0\t0\t0\t-\n'
-  printf 'way-over\tfail\t137\t400.0\t0\t0\t-\n'
-  printf 'kill-overhead\tfail\t124\t12.0\t0\t0\t-\n'; } > "$DC_T/.git/gate-run/r1/1.leg"
+# EVERY RUN ROW IN THIS FIXTURE CARRIES AN EIGHTH FIELD OF `0`, the census's faithful value
+# (TOOL-aGraftedHelix-5). A seven-field row is `uncensused` and set aside, so without it every arm
+# below would grade the census rather than the rule it names.
+{ printf 'at-ceiling\tfail\t124\t100.4\t0\t0\t-\t0\n'
+  printf 'below-ceiling\tfail\t1\t40.0\t0\t0\t-\t0\n'
+  printf 'way-over\tfail\t137\t400.0\t0\t0\t-\t0\n'
+  printf 'kill-overhead\tfail\t124\t12.0\t0\t0\t-\t0\n'; } > "$DC_T/.git/gate-run/r1/1.leg"
 
 dc_out=$("$DC_PY" "$DC_SCRIPT" --report 2>&1)
 printf '%s\n' "$dc_out" | awk -F'\t' '$1=="at-ceiling" && $2=="100.0" {f=1} END{exit !f}' \
@@ -863,7 +1082,7 @@ printf 'below-ceiling\t40.0\t1\ta\t2026-09-10\n' > "$DC_EV"
 # --- the admitted failing row must reach the number the gate consumes ------------------------------
 # An `ok` reading BELOW the ceiling, alongside the failing one at it: admission that never reaches
 # the maximum is admission that changed nothing.
-printf 'at-ceiling\tok\t0\t20.0\t0\t0\t-\n' >> "$DC_T/.git/gate-run/r1/1.leg"
+printf 'at-ceiling\tok\t0\t20.0\t0\t0\t-\t0\n' >> "$DC_T/.git/gate-run/r1/1.leg"
 dc_out=$("$DC_PY" "$DC_SCRIPT" --report 2>&1)
 printf '%s\n' "$dc_out" | awk -F'\t' '$1=="at-ceiling" && $2=="100.0" && $3=="2" {f=1} END{exit !f}' \
   && ok "with an ok row below the ceiling too, the reported max is the FAILING row's seconds over both readings" \
@@ -966,7 +1185,7 @@ dc_ac_later=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
 # produces a one-leg bar, guards scope a run to a handful, and resetting every leg that currently
 # has a retained reading is the plain case. The fixture above cannot see it, because `at-ceiling`
 # keeps an `ok` row there and `runs` is never empty.
-printf 'at-ceiling\tfail\t124\t100.4\t0\t0\t-\n' > "$DC_T/.git/gate-run/r1/1.leg"
+printf 'at-ceiling\tfail\t124\t100.4\t0\t0\t-\t0\n' > "$DC_T/.git/gate-run/r1/1.leg"
 "$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
 dc_lonely_pre=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
 awk -v a="$dc_lonely_pre" 'BEGIN{exit !(a != "" && a+0 >= 100)}' \
@@ -1040,7 +1259,7 @@ awk -F'\t' '$1=="at-ceiling" && $4=="z" && $6=="quiet re-run, nothing else on th
   || { nope "the out-of-band row does not carry its node and conditions — the reading is indistinguishable from one the runner produced"; sed 's/^/      /' "$DC_EV" 2>/dev/null; }
 # THE CONTROL, and the arm above is a claim about nothing without it: a source column that said the
 # same thing on every row would satisfy that grep and tell two kinds of reading apart for nobody.
-printf 'below-ceiling\tok\t0\t30.0\t0\t0\t-\n' > "$DC_T/.git/gate-run/r1/1.leg"
+printf 'below-ceiling\tok\t0\t30.0\t0\t0\t-\t0\n' > "$DC_T/.git/gate-run/r1/1.leg"
 "$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
 awk -F'\t' '$1=="below-ceiling" && $6=="runner" {f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
   && ok "control: a row this tool derived from the run record spells a different source, so the column separates the two kinds" \
@@ -1057,7 +1276,7 @@ awk -F'\t' '$1=="at-ceiling" && $2=="853.0" && $6=="quiet re-run, nothing else o
 # — so the row is carried by the monotone hold instead, which is where a rebuilt tuple can quietly
 # relabel a typed number as a runner's. Staging exactly that relabel left every arm here green until
 # this fixture line existed, which is the could-not-fail shape one level up.
-printf 'at-ceiling\tfail\t124\t100.4\t0\t0\t-\n' >> "$DC_T/.git/gate-run/r1/1.leg"
+printf 'at-ceiling\tfail\t124\t100.4\t0\t0\t-\t0\n' >> "$DC_T/.git/gate-run/r1/1.leg"
 "$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
 awk -F'\t' '$1=="at-ceiling" && $2=="853.0" && $6=="quiet re-run, nothing else on the box" {f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
   && ok "the out-of-band row outranks the leg's own killed reading and keeps its source through the monotone hold" \
@@ -1130,6 +1349,72 @@ printf '%s\n' "$dc_chk" | grep 'at-ceiling' | grep -q 'does not clear its eviden
   && ok "it gets the headroom sentence instead, which states the floor such a ceiling has to clear" \
   || { nope "an out-of-band reading above its ceiling produced neither sentence — the row fails with no target to raise the ceiling to"; printf '%s\n' "$dc_chk" | sed 's/^/      /'; }
 rm -rf "$DC_T"
+
+# --- ONLY A CENSUSED-CLEAN READING ARGUES A CEILING (TOOL-aGraftedHelix-5) -------------------------
+# A fixture of its own, for the reason the one above gives: `--write` writes beside the script. One
+# run holds four `ok` readings of L, one per census state — 10 s at foreign 0, 50 s at 2, 60 s at
+# `unknown`, 70 s as a seven-field row — and one of M at foreign 1, so every count below is PINNED.
+CN_T=$(mktemp -d)
+mkdir -p "$CN_T/${PFX}${KIT}" "$CN_T/.git/gate-run/r1"
+cp "$ROOT/${PFX}${KIT}/derive-ceilings.py" "$ROOT/${PFX}${KIT}/ceiling-margin.txt" "$CN_T/${PFX}${KIT}/" \
+  || { echo "evidence-test: cannot copy the ceiling kit for the census arms"; exit 2; }
+( cd "$CN_T" && git init -q -b main . ) >/dev/null 2>&1
+CN_SCRIPT="$CN_T/${PFX}${KIT}/derive-ceilings.py"; CN_EV="$CN_T/${PFX}${KIT}/ceiling-evidence.txt"
+printf '%s\n' '[' '  {"name": "L", "argv": ["true"], "ceiling": 100},' '  {"name": "M", "argv": ["true"], "ceiling": 100}' ']' \
+  > "$CN_T/${PFX}gate-legs.json"
+{ printf 'L\tok\t0\t10.0\t0\t0\t-\t0\n'
+  printf 'L\tok\t0\t50.0\t0\t0\t-\t2\n'
+  printf 'L\tok\t0\t60.0\t0\t0\t-\tunknown\n'
+  printf 'L\tok\t0\t70.0\t0\t0\t-\n'
+  printf 'M\tok\t0\t30.0\t0\t0\t-\t1\n'; } > "$CN_T/.git/gate-run/r1/1.leg"
+cn_rep=$( cd "$CN_T" && "$DC_PY" "$CN_SCRIPT" --report 2>&1 )
+# AC7. The `aside` column is LAST, so a reason a later unit inserts leaves it where it is read.
+printf '%s\n' "$cn_rep" | awk -F'\t' '$1 == "L" && $2 == "10.0" && $3 == "1" && $NF == "3" { f = 1 } END { exit !f }' \
+  && ok "AC7 L argues from its one faithful reading, max 10.0, with 3 readings set aside" \
+  || { nope "AC7 L's row admits a contended or uncensused reading"; printf '%s\n' "$cn_rep" | sed 's/^/      /'; }
+# The two counts asserted APART, so a reason inserted between them leaves this arm standing.
+cn_set=$(printf '%s\n' "$cn_rep" | grep '^# set aside:')
+printf '%s' "$cn_set" | grep -q '[^0-9]2 contended' && printf '%s' "$cn_set" | grep -q '[^0-9]2 uncensused' \
+  && ok "AC7 the set-aside line names 2 contended and 2 uncensused" \
+  || { nope "AC7 the set-aside line reads '$cn_set'"; printf '%s\n' "$cn_rep" | sed 's/^/      /'; }
+printf '%s\n' "$cn_rep" | grep 'SET ASIDE' | grep -qw M && ! printf '%s\n' "$cn_rep" | grep 'UNBACKED' | grep -qw M \
+  && ok "AC7 M, every reading set aside, is named on its own line and not as UNBACKED" \
+  || { nope "AC7 M is reported as UNBACKED, or not at all"; printf '%s\n' "$cn_rep" | sed 's/^/      /'; }
+# AC8. A set-aside reading moves no row, and the summary line counts it.
+printf '# hdr\nL\t40.0\t1\ta\t2026-09-10\trunner\nM\t25.0\t1\ta\t2026-09-10\trunner\n' > "$CN_EV"
+cn_w=$( cd "$CN_T" && "$DC_PY" "$CN_SCRIPT" --write 2>&1 )
+awk -F'\t' '$1 == "L" && $2 == "40.0" { f = 1 } END { exit !f }' "$CN_EV" 2>/dev/null \
+  && printf '%s' "$cn_w" | grep -q '[^0-9]2 contended' && printf '%s' "$cn_w" | grep -q '[^0-9]2 uncensused' \
+  && ok "AC8 L's row holds at 40.0 and the summary names 2 contended and 2 uncensused" \
+  || { nope "AC8 a set-aside reading moved L's row, or the summary does not count them"; printf '%s\n' "$cn_w" | sed 's/^/      /'; sed 's/^/      /' "$CN_EV"; }
+# AC9 reads the header that write rendered: the tracked artifact's must be the same bytes.
+[ "$(grep '^#' "$CN_EV")" = "$(grep '^#' "$ROOT/${PFX}${KIT}/ceiling-evidence.txt")" ] \
+  && ok "AC9 the tracked evidence file carries the header --write renders" \
+  || nope "AC9 the tracked ceiling-evidence.txt header differs from the one --write renders — re-render it"
+awk '/^## The run record/ { s = 1; next } /^## / { s = 0 } s && /foreign/ && /key · foreign/ { f = 1 } END { exit !f }' "$ROOT/${PFX}${KIT}/README.md" \
+  && ok "AC9 the README's run-record section lists the eighth field, foreign" \
+  || nope "AC9 the README's run-record section does not list foreign among the .leg fields"
+printf 'M\tok\t0\t30.0\t0\t0\t-\t1\n' > "$CN_T/.git/gate-run/r1/1.leg"
+cn_rows=$(grep -v '^#' "$CN_EV"); cn_w=$( cd "$CN_T" && "$DC_PY" "$CN_SCRIPT" --write 2>&1 ); cn_rc=$?
+[ "$cn_rc" = 0 ] && ! printf '%s' "$cn_w" | grep -q 'DEAD PROBE' && [ "$(grep -v '^#' "$CN_EV")" = "$cn_rows" ] \
+  && ok "AC8 with every reading set aside --write exits 0, says no DEAD PROBE, and holds every row" \
+  || { nope "AC8 a record of set-aside readings read as DEAD PROBE or moved a row (rc=$cn_rc)"; printf '%s\n' "$cn_w" | sed 's/^/      /'; }
+# AC13. The manual route stays admitted, and the header it renders says it is uncensused.
+cn_w=$( cd "$CN_T" && GOV_NODE=z "$DC_PY" "$CN_SCRIPT" --write --observed 'L=55' --how 'quiet host, no other session' 2>&1 ); cn_rc=$?
+[ "$cn_rc" = 0 ] && awk -F'\t' '$1 == "L" && $2 == "55.0" && $6 == "quiet host, no other session" { f = 1 } END { exit !f }' "$CN_EV" 2>/dev/null \
+  && grep '^#' "$CN_EV" | grep -q 'admitted uncensused' \
+  && ok "AC13 --observed still writes L from its reading, and the rendered header says that route is admitted uncensused" \
+  || { nope "AC13 the manual route was refused, or no header line says it is uncensused (rc=$cn_rc)"; printf '%s\n' "$cn_w" | sed 's/^/      /'; }
+awk '/^## Every leg may declare a `ceiling`/ { s = 1; next } /^## / { s = 0 } s && /TOOL-cMendedVintage-17/ && /uncensused/ { f = 1 } END { exit !f }' "$ROOT/${PFX}${KIT}/README.md" \
+  && ok "AC13 the README's ceiling section names the --observed route uncensused under TOOL-cMendedVintage-17" \
+  || nope "AC13 the README's ceiling section does not say the --observed route is uncensused"
+# THE LIVENESS CONTROL: a record holding no reading at all is still a DEAD PROBE.
+rm -f "$CN_T/.git/gate-run/r1/1.leg"
+cn_w=$( cd "$CN_T" && "$DC_PY" "$CN_SCRIPT" --write 2>&1 ); cn_rc=$?
+[ "$cn_rc" = 2 ] && printf '%s' "$cn_w" | grep -q 'DEAD PROBE' \
+  && ok "AC8 control: a record holding no reading still exits 2 with DEAD PROBE" \
+  || nope "AC8 control: an empty record no longer reports DEAD PROBE (rc=$cn_rc)"
+rm -rf "$CN_T"
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "run-gates evidence: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }

@@ -29,7 +29,11 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.24   # gov:kit run-gates@1.24
+KIT_RUN_GATES_VERSION=1.25   # gov:kit run-gates@1.25
+# 1.24 -> 1.25: every `.leg` row gains an eighth field, `foreign`, from a census of foreign gate work
+# taken while the legs run, and the header gains `census_every` (TOOL-aGraftedHelix-5). A reader that
+# splits a row by position keeps working; one that reads the seventh field with a trailing catch-all
+# variable folds the eighth into it, which is why the ledger block's read gained one.
 # 1.21 -> 1.22: KITREL is asked of git when the prefix strip leaves it absolute, the MSYS mount
 # spelling (`/tmp/x` beside git's `C:/…/Temp/x`) the `cd … && pwd` fold does not reach; with it the
 # attribution's KF3 matched nothing for a tree under `/tmp`. Absorbed by aSightedSkeptic.
@@ -1553,7 +1557,11 @@ write_runlog_verdict() { # the status the EXIT trap saw -> one ev=once line appe
 # an orphan line naming a path that no longer exists (the dDerivedDocket closing diff review's F5,
 # the sibling runner's instance of the same class).
 ATTR_WT=""
-cleanup() { write_runlog_verdict "$?"; run_outstanding_reap; if [ -n "${ATTR_WT:-}" ]; then if remove_scratch_worktree "$ATTR_WT"; then ATTR_WT=""; else echo "run-gates: the R worktree at $ATTR_WT could not be removed — remove it by hand" >&2; fi; fi; rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
+# THE TICKER AND THE CENSUS SAMPLER STOP HERE TOO (TOOL-aGraftedHelix-5). The claim-time handlers this
+# trap supersedes each run `ts_tick_stop` before the release, and this one kept only the release, so
+# every bar left its ticker sleeping for up to TS_TICK_EVERY, reparented to pid 1 with this runner's
+# argv, and the next bar's foreign-load census on the host counted it as somebody else's gate work.
+cleanup() { write_runlog_verdict "$?"; run_outstanding_reap; remove_census_watcher; if [ -n "${ATTR_WT:-}" ]; then if remove_scratch_worktree "$ATTR_WT"; then ATTR_WT=""; else echo "run-gates: the R worktree at $ATTR_WT could not be removed — remove it by hand" >&2; fi; fi; rm -rf "$WORK" 2>/dev/null || true; ts_tick_stop; ts_release; ts_drop_ticket; }
 trap cleanup EXIT
 trap 'RUNLOG_RC=130; cleanup; exit 130' INT
 trap 'RUNLOG_RC=143; cleanup; exit 143' TERM
@@ -1743,6 +1751,48 @@ while IFS= read -r line; do
 done <<<"$legs"
 total=${#names[@]}
 
+# ---- THE FOREIGN-LOAD CENSUS. TOOL-aGraftedHelix-5 ------------------------------------------------
+# `derive-ceilings.py` argues every ceiling from the `.leg` readings this runner records, and a reading
+# taken while ANOTHER session's suite or another clone's bar loaded the host reads exactly like a slow
+# leg. So the run takes a census of foreign gate work while its legs run, and each `.leg` row carries
+# what it found as its eighth field, `foreign`: the largest count of foreign trees a sample inside the
+# leg's window saw, `unknown` when the census could not see, `0` when it saw none. The evidence tool
+# argues a ceiling only from `0` rows.
+#
+# WHAT COUNTS. A process-table row is gate work when its WHOLE line names a script some manifest leg
+# runs, this runner or its sibling self-test runner, or carries a word ending `.test.sh` or
+# `selftest.py`. The tokens are derived HERE, once, from the parsed argvs: every word carrying a `/`
+# and ending `.sh`, `.py` or `.js`. This runner's own ancestors and descendants are never foreign, and
+# the ancestors are not decoration: an agent session's `bash -c` wrapper carries its whole command
+# text, so the wrapper of the session that started THIS bar names the runner's path. A tree counts
+# once, at its topmost matching process.
+#
+# WHAT IT CANNOT SEE, said here because a `0` reads as "quiet host": load not shaped like this
+# repository's gate work — another repository's build under other script names, an on-access scanner,
+# an agent's own CPU — and on Windows any process no MSYS shell spawned. Contention from this bar's
+# OWN neighbours is not foreign either; `measure_neighbours` and the serial retry own that. It can
+# over-count, which only sets a reading aside: a bar queued on the turnstile, a short command whose
+# text names a gate script, and on Windows an orphan of this bar's own legs whose parent reads 1.
+#
+# THE PERIOD IS A CONSTANT, and `GATE_CENSUS_EVERY` overrides it for the fixtures: no host has asked
+# for another, and a profile knob would cost the canary's pinned set.
+CENSUS_EVERY=60
+if [ -n "${GATE_CENSUS_EVERY:-}" ]; then
+  if num_ok "$GATE_CENSUS_EVERY"; then CENSUS_EVERY=$((10#$GATE_CENSUS_EVERY))
+  else echo "run-gates: NOTE - GATE_CENSUS_EVERY='$GATE_CENSUS_EVERY' is not a positive integer, so the foreign-load census samples every ${CENSUS_EVERY}s" >&2; fi
+fi
+CENSUS_TOKENS="$WORK/census.tokens"
+{
+  printf '%s\n' "$KITREL/run-gates.sh" "$KITREL/run-selftests.sh"
+  for ((i=0; i<total; i++)); do
+    IFS=$'\x1f' read -ra _ct_av <<<"${argvs[$i]}"
+    for _ct_w in ${_ct_av[@]+"${_ct_av[@]}"}; do
+      case "$_ct_w" in *[[:space:]]*) ;; */*.sh|*/*.py|*/*.js) printf '%s\n' "$_ct_w" ;; esac
+    done
+  done
+} > "$CENSUS_TOKENS" 2>/dev/null || CENSUS_TOKENS=""
+unset _ct_av _ct_w
+
 # UNBOUNDED LEGS ARE REPORTED, NEVER REFUSED. TOOL-aBoundedCeiling-1 S6. The runner cannot know
 # whether a row with no ceiling is a gov leg somebody forgot or an adopter leg the deployer has no
 # business bounding, and a refusal it cannot justify is a refusal that reds a tree for a field it
@@ -1882,6 +1932,10 @@ if [ -n "$RUNDIR" ]; then
     # The ambient TMPDIR count the bar printed, measured once after its sweep (TOOL-dDerivedDocket-25
     # S3). Outside the run-envelope block for the reason the queue keys above give.
     printf 'tmpdir_entries\t%s\n' "$TMPDIR_ENTRIES"
+    # The census period every `.leg` row's `foreign` field was derived under (TOOL-aGraftedHelix-5): a
+    # leg's window reaches three periods before its start. Outside the run-envelope block for the
+    # reason the queue keys above give.
+    printf 'census_every\t%s\n' "$CENSUS_EVERY"
     # The RESOLVED dispatch order, recorded here because this is the point at which it is in
     # scope. The chunking unit's ordering criteria read it from the record rather than
     # re-deriving it, which is what keeps the record's key set single-sourced.
@@ -2032,7 +2086,7 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
   # The suffix is empty on a leg's first attempt and `.retry` on its serial retry (TOOL-dDerivedDocket-26
   # S2), so every file a retry writes sits BESIDE the first attempt's and the red attribution still
   # reads that first attempt exactly as it was written.
-  local i=$1 sfx=${2:-} s e out rc tpid=""
+  local i=$1 sfx=${2:-} s e out rc tpid="" FOREIGN=unknown
   # THE WALL'S HANDLE ON THIS LEG. `$BASHPID`, never `$$`: inside a backgrounded function `$$` is
   # still the RUNNER's pid, and a wall that killed that would kill the shell that has to print the
   # verdict. Written before anything else so a leg that wedges on its first line is still reachable.
@@ -2118,9 +2172,11 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
     [ "$fired" = 1 ] && st=timeout
     # TAB-SEPARATED and NEWLINE-FREE by construction: every field is a leg name, a token, a
     # number or a digest. The leg name is the only one an author controls, and the canary
-    # already forbids a tab inside one.
-    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-      "${names[$i]}" "$st" "$rc" "$secs" "$s" "$e" "$(input_key "$i")" \
+    # already forbids a tab inside one. The EIGHTH field is `foreign`, the census's verdict on this
+    # attempt's window (TOOL-aGraftedHelix-5), appended so no positional reader moves.
+    derive_foreign "$s" "$e"
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+      "${names[$i]}" "$st" "$rc" "$secs" "$s" "$e" "$(input_key "$i")" "$FOREIGN" \
       > "$RUNDIR/$i$sfx.leg.tmp" 2>/dev/null \
       && mv -f "$RUNDIR/$i$sfx.leg.tmp" "$RUNDIR/$i$sfx.leg" 2>/dev/null || true
   fi
@@ -2367,6 +2423,107 @@ remove_wall_watcher() {
   : > "$WORK/wall.disarm" 2>/dev/null || true
   [ -n "$WALL_PID" ] && kill "$WALL_PID" 2>/dev/null
   WALL_PID=""; WALL_ARMED=0
+}
+
+# ---- THE CENSUS'S FOUR FUNCTIONS. TOOL-aGraftedHelix-5; what the census counts is stated where its
+# ---- tokens are derived, above the run header.
+#
+# measure_foreign — ONE census line on stdout, in ONE write: the epoch second, TAB, the count of
+# foreign gate-work trees or `unknown`, TAB, each tree's root as <pid>:<token>, space-separated. A root
+# is written as its pid and the token that matched it, NEVER its command line, which can carry a
+# credential. `unknown` when `ps` fails, when its header names no PID or PPID column, or when the
+# snapshot holds no row for this runner: a snapshot that cannot see its observer is not a census of
+# the observer's host. The columns are found by the header's own names, so procps and MSYS `ps -ef`
+# both parse, and the WHOLE row is matched, because a start time printed with a space shifts every
+# later column. `$$` is the RUNNER's pid in the detached sampler too, which is the point. Two spawns.
+measure_foreign() {
+  local snap ts=${EPOCHSECONDS:-0}
+  if [ -z "${CENSUS_TOKENS:-}" ] || ! snap=$(ps -ef 2>/dev/null); then
+    printf '%s\tunknown\t\n' "$ts"; return 0
+  fi
+  awk -v me="$$" -v ts="$ts" '
+    FILENAME == ARGV[1] { if ($0 != "") tok[++nt] = $0; next }
+    !hdr { hdr = 1; for (k = 1; k <= NF; k++) { if ($k == "PID") pc = k; if ($k == "PPID") qc = k }; next }
+    # A PID or PPID that is not a number continues a multi-line argv, the guard scan_descendants wears.
+    !pc || !qc || $pc !~ /^[0-9]+$/ || $qc !~ /^[0-9]+$/ { next }
+    { p = $pc; par[p] = $qc
+      for (i = 1; i <= nt; i++) if (index($0, tok[i])) { hit[p] = tok[i]; next }
+      for (k = 1; k <= NF; k++) if ($k ~ /\.test\.sh$/ || $k ~ /selftest\.py$/) { hit[p] = $k; next } }
+    END {
+      if (!pc || !qc || !(me in par)) { printf "%s\tunknown\t\n", ts; exit }
+      for (a = me; (a in par) && !(a in ex); a = par[a]) ex[a] = 1      # the ancestors, this runner included
+      for (p in hit) {
+        if (p in ex) continue
+        d = 0; b = p
+        while ((b in par) && b != me && d < 256) { b = par[b]; d++ }
+        if (b != me) cand[p] = 1                                           # a descendant reaches this runner
+      }
+      for (p in cand) if (!(par[p] in cand)) { n++; r = r (r == "" ? "" : " ") p ":" hit[p] }
+      printf "%s\t%d\t%s\n", ts, n, r
+    }' "$CENSUS_TOKENS" - <<<"$snap"
+}
+
+# arm_census — the first sample is the RUNNER's, taken in this shell before the first leg dispatches,
+# so every first-wave leg has a sample inside its window however short it is, and its `unknown` is
+# announced from here: a backgrounded subshell gives no ordering against its parent and has no stderr.
+# Truncating at arm means a run id reused through GATE_RUN_ID never reads a stale sample. Only the
+# periodic loop is detached, and it copies `ts_tick_start` property by property: stdio to /dev/null,
+# disowned so `live()` never counts it, and two exits, the runner gone or the run's disarm marker. A
+# `kill -9` on the runner leaves it to exit at its next tick, holding no descriptor of the caller's.
+CENSUS_ARMED=0; CENSUS_PID=""
+arm_census() {
+  [ "$CENSUS_ARMED" = 0 ] || return 0
+  CENSUS_ARMED=1
+  [ -n "$RUNDIR" ] || return 0
+  local _f="$RUNDIR/census" _c="" _me=$$ _every=$CENSUS_EVERY _work=$WORK
+  measure_foreign > "$_f" 2>/dev/null
+  chmod 600 "$_f" 2>/dev/null || true
+  { IFS=$'\t' read -r _ _c _ < "$_f"; } 2>/dev/null
+  case "$_c" in
+    ''|*[!0-9]*) echo "run-gates: NOTE - the foreign-load census's first sample reads unknown (ps -ef failed, named no PID or PPID column, or did not list this runner), so a leg's foreign field reads unknown and derive-ceilings sets its reading aside" >&2 ;;
+  esac
+  (
+    while :; do
+      sleep "$_every"
+      kill -0 "$_me" 2>/dev/null || exit 0
+      [ -f "$_work/census.disarm" ] && exit 0
+      measure_foreign >> "$_f" 2>/dev/null || exit 0
+    done
+  ) >/dev/null 2>&1 &
+  CENSUS_PID=$!
+  disown "$CENSUS_PID" 2>/dev/null || true
+}
+
+remove_census_watcher() {
+  [ -n "${CENSUS_PID:-}" ] || return 0
+  : > "$WORK/census.disarm" 2>/dev/null || true
+  kill "$CENSUS_PID" 2>/dev/null
+  CENSUS_PID=""
+}
+
+# derive_foreign <started-ns> <ended-ns> — FOREIGN, one leg attempt's `foreign` field, from the census
+# samples stamped inside [start − 3 × CENSUS_EVERY, end]: their largest positive count; else `unknown`
+# when one of them reads unknown or none exists; else 0. The reach is three periods because `sleep`
+# on node `a` delivered 1.65 to 1.93 times its nominal seconds under load (the wall's measurement
+# above), and one period would leave a short leg with no sample at all. SET, never printed, and
+# builtins only: the worker would read a printed value through a subshell, which is a spawn per leg.
+# An unterminated last line is a sample still being appended, and `read` skips it.
+derive_foreign() {
+  local lo hi ts c max=0 unk=0 any=0
+  FOREIGN=unknown
+  case "${1:-}${2:-}" in ''|*[!0-9]*) return 0 ;; esac
+  [ -n "$RUNDIR" ] && [ -f "$RUNDIR/census" ] || return 0
+  lo=$(( $1 / 1000000000 - 3 * CENSUS_EVERY )); hi=$(( $2 / 1000000000 ))
+  while IFS=$'\t' read -r ts c _; do
+    case "$ts" in ''|*[!0-9]*) continue ;; esac
+    [ "$ts" -ge "$lo" ] && [ "$ts" -le "$hi" ] || continue
+    any=1
+    case "$c" in ''|*[!0-9]*) unk=1; continue ;; esac
+    [ "$c" -gt "$max" ] && max=$c
+  done < "$RUNDIR/census" 2>/dev/null
+  if [ "$max" -gt 0 ]; then FOREIGN=$max
+  elif [ "$any" = 1 ] && [ "$unk" = 0 ]; then FOREIGN=0; fi
+  return 0
 }
 
 # ---- RED ATTRIBUTION, REPORT-ONLY. TOOL-dDerivedDocket-23 ----------------------------------------
@@ -3079,6 +3236,7 @@ while [ "$wi" -lt "$nwalk" ]; do
     k=${disp[$di]}; di=$((di+1))
     { [ -z "${names[$k]}" ] || [ -f "$WORK/$k.rc" ]; } && continue   # sentinel, or already decided by the guard pass
     arm_wall
+    arm_census
     runleg "$k" &
   done
   if [ -f "$WORK/$next.rc" ]; then report_one "$next"; wi=$((wi+1)); continue; fi
@@ -3116,6 +3274,7 @@ run_leg_retry
 # the bar and its attribution together (TOOL-dDerivedDocket-23 F6). A no-op unless asked and red.
 run_attribution
 remove_wall_watcher
+remove_census_watcher
 
 # THE LEDGER. It replaces the old `gate-timings.tsv` rather than sitting beside it: two stores of
 # one fact, with the older one read by the only tool that grades the newer, is exactly the shape
@@ -3131,7 +3290,9 @@ if [ -n "$LEDGER" ]; then
     [ -f "$WORK/$i.sec" ] || continue
     lst=ok; lkey=-; lend=""; lsec="$WORK/$i.sec"
     if [ -n "$RUNDIR" ] && [ -f "$RUNDIR/$i.leg" ]; then
-      IFS=$'\t' read -r _ lst _ _ _ lend lkey < "$RUNDIR/$i.leg" 2>/dev/null || { lst=ok; lkey=-; }
+      # THE TRAILING `_` takes field 8, `foreign` (TOOL-aGraftedHelix-5): without it the key read
+      # absorbed `<key>TAB<foreign>`, and a TAB inside the key breaks the ledger's five-field grammar.
+      IFS=$'\t' read -r _ lst _ _ _ lend lkey _ < "$RUNDIR/$i.leg" 2>/dev/null || { lst=ok; lkey=-; }
     fi
     # A RETRIED LEG takes its retry's seconds and the status `retried`, whatever the retry did
     # (TOOL-dDerivedDocket-26 S2). The seconds are the leg's cost ALONE, which is the better dispatch

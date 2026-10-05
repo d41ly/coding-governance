@@ -15,7 +15,20 @@ THE READING SOURCE IS `gate-run`, NOT THE LEDGER. `<git-dir>/gate-ledger.tsv` ke
 per leg -- it is rebuilt and moved over on every run -- so it holds no history at all, and a rev of
 this spec that derived a per-leg spread from it had an empty population by construction.
 `<git-dir>/gate-run/<runid>/<i>.leg` keeps one file per leg PER RUN, several runs retained, which is
-the history. Fields, from the runner: name, status, rc, seconds, started, ended, key.
+the history. Fields, from the runner: name, status, rc, seconds, started, ended, key, foreign.
+
+ONLY A READING TAKEN ON A HOST THE CENSUS FOUND FREE OF FOREIGN GATE WORK ARGUES A CEILING
+(TOOL-aGraftedHelix-5). A reading taken while another session's suite or another clone's bar loaded
+the host reads exactly like a slow leg, and this file is monotone, so one contended reading admitted
+holds a floor under its ceiling for good. The runner therefore stamps each row's eighth field,
+`foreign`, from a census of the process table taken while the leg ran: `0` when it found none, a
+positive count when it found some, `unknown` when it could not see. `read_runs` admits a row only
+when that field reads `0`, and sets every other one aside under the first reason in `ASIDE_REASONS`
+that fits it: a positive count is `contended`, and anything else, a seven-field row written before
+the census existed included, is `uncensused`. `--report` and `--write` say how many they set aside,
+because a reading withheld silently is a probe that reads zero. WHAT THE CENSUS CANNOT SEE: load not
+shaped like this repository's gate work, and on Windows any process no MSYS shell spawned, so a `0`
+is "no foreign gate work", never "a quiet host".
 
 THE GATE READS TRACKED FILES ONLY. Both `gate-run` and the ledger are untracked, per-worktree and
 node-local -- measured, 46 rows in one worktree against 96 in the primary -- so a leg whose verdict
@@ -31,6 +44,11 @@ need it. It was broken by hand twice -- two healthy legs measured quiet, two cei
 numbers nothing in the tree recorded -- and a hand-edit is what `--observed` replaces.
 
   GOV_NODE=<tag> ... --write --observed '<leg>=<seconds>' --how '<how it was taken>'
+
+AND IT IS THE ONE UNCENSUSED ROUTE, kept on purpose. `--observed` writes an evidence row directly and
+never reads a run record, so no census reaches it and there is nothing to filter it on; the `--how`
+text is the only record of the load it was taken under. Closing the route would reverse the ruling
+above, so it stays admitted and unfiltered, and every document that names the census says so.
 
 A FLAG, not a second tracked file and not a forged run row. A run row would make the reading
 indistinguishable from one the runner saw, which is the exact failure the margin file's header
@@ -94,6 +112,12 @@ CEILING_WINDOW_S = 5 + 30
 # existed reads as this value, because every one of them was runner-derived.
 RUNNER_SOURCE = "runner"
 
+# WHY A READING THE ADMISSION RULE ADMITTED STILL ARGUES NO CEILING, in first-match order: a `foreign`
+# field holding a positive count is `contended`, and anything but `0` after that is `uncensused`. A
+# later reason is inserted where its precedence puts it, and every reader prints the counts by
+# walking this tuple, so a new reason reaches every report without a second list to keep in step.
+ASIDE_REASONS = ("contended", "uncensused")
+
 
 def resolve_repo_root() -> pathlib.Path:
     out = subprocess.run(["git", "-C", str(HERE), "rev-parse", "--show-toplevel"],
@@ -147,8 +171,13 @@ def read_margin() -> tuple[int, float, str]:
              f"<floor seconds>, tab, <fraction> row")
 
 
-def read_runs(gd: pathlib.Path, legs: dict, reset) -> dict:
-    """Every recorded reading per leg, from the per-run leg files. Returns {name: [seconds, ...]}.
+def read_runs(gd: pathlib.Path, legs: dict, reset) -> tuple[dict, dict]:
+    """Every admitted reading per leg, from the per-run leg files, and what the census set aside.
+
+    Returns `({name: [seconds, ...]}, {name: {reason: count}})`: the readings that argue a ceiling,
+    and per leg how many readings the admission rule below admitted and the census then set aside,
+    counted under the first reason in `ASIDE_REASONS` that fits. The census runs SECOND, so a row the
+    admission rule refuses was never evidence and is never counted as set aside.
 
     THE ADMISSION RULE. An `ok` row counts at any duration, because a completed run measured the
     work whatever bound was or was not in force around it. A NON-`ok` row counts only when its
@@ -181,10 +210,12 @@ def read_runs(gd: pathlib.Path, legs: dict, reset) -> dict:
 
     WHAT THIS CANNOT TELL APART, because the record holds one signature for all three: a leg that
     is merely slow, a leg that was contended by its neighbours on a wide bar, and a leg that hung.
-    The runner records nothing that would separate them — no pool width, no neighbour count, no
-    bound. The evidence file is MONOTONE, so a contended or hung reading admitted once holds a
-    floor under that ceiling until somebody lowers it, and lowering one is `--write --reset <leg>`,
-    which exists for exactly this and records that somebody chose it.
+    The census separates exactly one case from the rest, a leg contended by FOREIGN gate work, which
+    it sets aside; a leg contended by its own bar's neighbours, or by load the census cannot see,
+    still reads as slow, and the runner records no pool width and no bound in the row. The evidence
+    file is MONOTONE, so a contended or hung reading admitted once holds a floor under that ceiling
+    until somebody lowers it, and lowering one is `--write --reset <leg>`, which exists for exactly
+    this and records that somebody chose it.
 
     `reset` IS THAT ESCAPE, AND WHAT IT DOES HERE IS THE PREVIEW OF IT, NOT THE DISCARD. A named
     leg admits its `ok` readings ONLY, so the reset re-derives from the runs where the leg finished
@@ -205,6 +236,7 @@ def read_runs(gd: pathlib.Path, legs: dict, reset) -> dict:
     reason `legs` is.
     """
     per: dict[str, list[float]] = {}
+    aside: dict[str, dict[str, int]] = {}
     reset = set(reset or ())
     for f in glob.glob(str(gd / "gate-run" / "*" / "*.leg")):
         try:
@@ -228,8 +260,18 @@ def read_runs(gd: pathlib.Path, legs: dict, reset) -> dict:
                 if not ceiling <= secs <= ceiling + CEILING_WINDOW_S:
                     continue
                 secs = min(secs, float(ceiling))
+            # THE CENSUS, after admission. `0` is the only faithful value: a positive count is
+            # foreign gate work beside the leg, and `unknown`, junk or a seven-field row is a
+            # reading nobody graded, which is not known faithful.
+            foreign = p[7].strip() if len(p) >= 8 else ""
+            if foreign != "0":
+                why = ("contended" if foreign.isascii() and foreign.isdigit() and int(foreign) > 0
+                       else "uncensused")
+                counts = aside.setdefault(p[0], dict.fromkeys(ASIDE_REASONS, 0))
+                counts[why] += 1
+                continue
             per.setdefault(p[0], []).append(secs)
-    return per
+    return per, aside
 
 
 def remove_reset_rows(gd: pathlib.Path, reset) -> int:
@@ -348,22 +390,30 @@ def parse_observed(spec: str, how: str, legs: dict) -> tuple[str, float]:
 
 def cmd_report(root, gd, args) -> int:
     legs = read_legs(root)
-    runs = read_runs(gd, legs, args.reset)
+    runs, aside = read_runs(gd, legs, args.reset)
     floor, frac, mline = read_margin()
-    if not runs:
+    # DEAD PROBE IS FOR A RECORD HOLDING NO READING AT ALL. Readings the census set aside were
+    # measured, so a run record holding only those is a report with every row withheld, and it says
+    # so below rather than claiming nothing was measured.
+    if not runs and not aside:
         print(f"derive-ceilings: DEAD PROBE — no readings under {gd}/gate-run/. Nothing was "
               f"measured, so nothing below would be evidence. Run a bar first; a report over an "
               f"empty population is not a small report, it is a false one.", file=sys.stderr)
         return 2
     print(f"# headroom max({floor}s, {frac} x max) — {mline}")
     print(f"# {len(runs)} leg(s) with a reading, over {len(set(os.path.dirname(f) for f in glob.glob(str(gd / 'gate-run' / '*' / '*.leg'))))} retained run(s)")
-    print("# leg\tmax_s\treadings\tceiling\thave\tneed\tstate")
-    unbacked = []
+    print("# set aside: " + ", ".join(f"{sum(a[r] for a in aside.values())} {r}" for r in ASIDE_REASONS)
+          + " — readings that argue no ceiling")
+    print("# leg\tmax_s\treadings\tceiling\thave\tneed\tstate\taside")
+    unbacked, withheld = [], []
     for name in sorted(legs):
         ceiling = legs[name].get("ceiling")
         vals = runs.get(name) or []
+        n_aside = sum((aside.get(name) or {}).values())
         if not vals:
-            unbacked.append(name)
+            # A LEG WHOSE EVERY READING WAS SET ASIDE IS NOT UNBACKED: it ran, and the census says
+            # why none of its runs may argue the ceiling. Two states, two lines.
+            (withheld if n_aside else unbacked).append(name)
             continue
         mx = max(vals)
         need = max(floor, frac * mx)
@@ -384,7 +434,11 @@ def cmd_report(root, gd, args) -> int:
             state = "UNDER"          # the ceiling does not clear the evidenced max by the headroom
         cells = ("-", "-") if state == "REACHED" else (
             ("%.0f" % over) if over is not None else "-", "%.0f" % need)
-        print(f"{name}\t{mx:.1f}\t{len(vals)}\t{ceiling}\t{cells[0]}\t{cells[1]}\t{state}")
+        print(f"{name}\t{mx:.1f}\t{len(vals)}\t{ceiling}\t{cells[0]}\t{cells[1]}\t{state}\t{n_aside}")
+    if withheld:
+        print(f"# {len(withheld)} leg(s) with every reading SET ASIDE — measured, but "
+              f"{' or '.join(ASIDE_REASONS)}, so no reading argues their ceiling: "
+              f"{', '.join(withheld[:6])}{' …' if len(withheld) > 6 else ''}", file=sys.stderr)
     # REPORTED, never silent: a leg with no reading is a leg whose ceiling nothing supports, and it
     # is a different state from a leg whose ceiling is wrong.
     if unbacked:
@@ -410,13 +464,16 @@ def cmd_write(root, gd, args) -> int:
     # verb exists for: a reset naming the only leg with a reading emptied the map, and the early
     # return fired forty lines above the drop path documented below, so the run exited 2 saying
     # nothing was measured — of readings it had just excluded itself — and the stale row survived.
-    live = read_runs(gd, legs, ())
+    live, live_aside = read_runs(gd, legs, ())
     # AN `--observed` READING IS ITSELF A READING, so it satisfies liveness on its own. The state
     # this flag exists for is a run record holding nothing admissible for the leg being raised — a
     # leg killed at its ceiling contributes only that ceiling back — and on a fresh worktree it
     # holds nothing at all. A DEAD PROBE return above the flag would refuse the one case it was
     # built for, which is the shape `read_runs`'s own liveness split was already repaired once for.
-    if not live and not args.observed:
+    # A READING THE CENSUS SET ASIDE SATISFIES IT TOO, for the same reason the liveness split above
+    # gives: it was measured, and this call is what withheld it. Every evidence row is then held,
+    # and the summary line names how many readings were withheld and why.
+    if not live and not live_aside and not args.observed:
         print("derive-ceilings: DEAD PROBE — no readings to write.", file=sys.stderr)
         return 2
     # THE DISCARD IS PERSISTED BEFORE THE READ, so nothing downstream can re-admit it. `read_runs`
@@ -427,7 +484,7 @@ def cmd_write(root, gd, args) -> int:
     # admission rule compares against them, and this is the only path that produces the tracked
     # artifact — a write path still holding an `ok`-only filter is invisible to `--check`, which
     # reads no run file at all.
-    runs = read_runs(gd, legs, reset) if reset else live
+    runs, aside = read_runs(gd, legs, reset) if reset else (live, live_aside)
     have = read_evidence()
     node = os.environ.get("GOV_NODE") or "a"
     date = subprocess.run(["git", "-C", str(root), "log", "-1", "--format=%cs"],
@@ -518,6 +575,14 @@ def cmd_write(root, gd, args) -> int:
         "# at its ceiling can produce no in-band reading above that ceiling, which is why the",
         "# out-of-band path exists — and why it is never allowed to look like the in-band one.",
         "#",
+        "# THE CENSUS. A run record's reading argues a row only when its `.leg` row's eighth field,",
+        "# `foreign`, reads 0: the runner's census of foreign gate work found none while the leg ran.",
+        "# A positive count is set aside as contended, and `unknown` or a row with no such field as",
+        "# uncensused; `--report` and `--write` print how many. The census sees only processes shaped",
+        "# like this repository's gate work, so a 0 says no foreign gate work, never a quiet host. An",
+        "# `--observed` reading is admitted uncensused: no run record reaches it, and its `--how` text",
+        "# is the only record of the load it was taken under (TOOL-cMendedVintage-17).",
+        "#",
         "# <leg>\t<max seconds>\t<readings>\t<node>\t<date>\t<source>",
     ]
     for name in sorted(rows):
@@ -532,7 +597,9 @@ def cmd_write(root, gd, args) -> int:
           f"({raised} raised, {lowered} lowered by --reset, {dropped} dropped by --reset, "
           f"{removed} killed reading(s) removed by --reset, "
           f"{observed} raised by --observed, "
-          f"{held} held at a previous maximum)")
+          f"{held} held at a previous maximum; set aside "
+          + ", ".join(f"{sum(a[r] for a in aside.values())} {r}" for r in ASIDE_REASONS)
+          + " reading(s))")
     return 0
 
 

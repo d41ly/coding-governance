@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.24` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.25` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -238,6 +238,29 @@ row and one redacted `<i>.out` copy land per leg; the `verdict` is written last,
 the crash signal. `GATE_RUN_KEEP` run directories are kept, swept after the verdict and never before
 dispatch, so a crashed run's record survives the next few ordinary runs.
 
+A `<i>.leg` row, and a `<i>.retry.leg` row beside it for a leg retried alone, holds eight TAB-separated
+fields: `name · status · rc · seconds · started · ended · key · foreign`. `started` and `ended` are
+epoch nanoseconds. `foreign` is the run's census of foreign gate work over that attempt: the largest
+count of foreign process trees any sample saw from three census periods before the leg started until
+it ended, `0` when every sample saw none, `unknown` when the census could not see. The samples land in
+the record's `census` file, one line each: epoch second, count or `unknown`, and each tree's root as
+`<pid>:<token>`, never its command line, which can carry a credential. The first sample is taken
+before the first leg dispatches, then one every 60 s, which `GATE_CENSUS_EVERY` overrides with a
+positive integer; the header records the period as `census_every`. A first sample reading `unknown`
+prints one `run-gates: NOTE` line on stderr.
+
+**What the census counts, and what it cannot see.** One `ps -ef` snapshot per sample: a row is gate
+work when its whole line names a script some manifest leg runs, this runner or `run-selftests.sh`,
+or carries a word ending `.test.sh` or `selftest.py`. This bar's own ancestors and descendants never
+count, and a tree counts once, at its topmost matching process. It cannot see load shaped otherwise —
+another repository's build, an on-access scanner, an agent's own CPU — nor, on Windows, any process
+no MSYS shell spawned, so `0` means no foreign gate work and never a quiet host. Contention from this
+bar's own neighbours is the serial retry's to answer. It over-counts in the safe direction: a bar
+queued on the turnstile or a short command whose text names a gate script reads as foreign, which
+only sets a reading aside. `ps` failing, a header naming no PID or PPID column, or a snapshot holding
+no row for this runner reads `unknown`, never `0`. The bar's exit stops the sampler and the turnstile
+ticker, so neither outlives it to be counted by the next bar.
+
 A caller may pin the run id with `GATE_RUN_ID`, and the pre-push hook does, so its push line joins
 this run's line exactly. The runner reads the pin and then REMOVES it from its environment before any
 leg starts: left set, every leg would inherit it, and a leg that drives a nested runner, as this
@@ -317,6 +340,21 @@ It refuses a reading with no stated conditions, one for a leg the manifest does 
 node would have to be defaulted, and one that raises nothing. The row lands in the evidence file
 carrying its source, so a number somebody measured by hand never reads as one the runner watched,
 and `--check` names those legs apart from the rest.
+
+**Only a reading the census found free of foreign gate work argues a ceiling.** `derive-ceilings.py`
+admits a run-record reading only when its `foreign` field reads `0`, and sets the rest aside under
+one reason each, first match: a positive count is `contended`, and anything else, `unknown` or a
+seven-field row written before the census existed, is `uncensused`. `--report` prints a
+`# set aside:` line with the count per reason and an `aside` column per leg, and names a leg whose
+every reading was set aside on its own line rather than as UNBACKED; `--write` names the same counts
+on its summary line and, when everything was set aside, holds every evidence row rather than
+reporting DEAD PROBE, which stays for a record holding no reading at all. The census never lowers a
+ceiling: the evidence file stays monotone, and `--check` reads tracked files only.
+
+**`--observed` is the one uncensused route, and it stays admitted.** A reading taken outside the
+runner is admissible and uncensused, as TOOL-cMendedVintage-17 rules: it never passes through a run
+record, so no census reaches it and nothing filters it, and its `--how` text is the only record of
+the load it was taken under. Say in that text what else was running.
 
 **On a host with no runnable `timeout -k`, every ceiling is INERT** and the runner says so on
 stderr. Legs still run. A bound may cost you speed and may turn a hang into a verdict; it may never
