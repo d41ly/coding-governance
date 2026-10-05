@@ -156,7 +156,7 @@ SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import (  # noqa: E402  the kit's shared helpers
     STATUS_TOKENS, TERMINAL, build_spec_path_re, kit_rel, parse_conf, parse_spec_h1,
-    unfenced_lines,
+    scan_missing_citations, unfenced_lines,
 )
 
 
@@ -799,6 +799,8 @@ def rosters(root: str, tracked: list, m: str, families: set,
             # A roster is built from ids in PROSE, so a file that is not text cannot contribute one
             # and skipping it changes no output. Verified by artifact equality, not by assertion.
             continue
+        # A `missing:` id declares that it has no record (TOOL-aMendedFleet-26), so it joins no roster.
+        _marked, text = scan_missing_citations(text, id_re)
         for mm in id_re.finditer(text):
             slug = mm.group(1)
             if p == f"{m}/builds/{slug}/README.md":
@@ -4783,6 +4785,14 @@ def cmd_selftest() -> int:
         arm("the shards-mode roster scan still reads it — the control", "True",
             lambda: str(any("EXMP-aBar-99" in v for v in
                             rosters(bt, _tracked9, "memory", set(BL_FAMILIES)).values())))
+        # TOOL-aMendedFleet-26 — a `missing:` id joins no roster; the plain citation beside it is the
+        # control that the scan read the file at all.
+        tm = os.path.join(base, "missing-form")
+        os.makedirs(os.path.join(tm, "memory/builds/aFoo/spec"))
+        with open(os.path.join(tm, "memory/builds/aFoo/spec/s.md"), "w", encoding="utf-8") as fh:
+            fh.write("# EXMP-aFoo-1 — a unit\n\nCites EXMP-aBar-7 and missing:EXMP-aBar-8.\n")
+        arm("a `missing:` id joins no roster, a plain citation still does", "['EXMP-aBar-7']",
+            lambda: rosters(tm, ["memory/builds/aFoo/spec/s.md"], "memory", {"EXMP"}).get("aBar"))
         _ids_b = plan(bt, _build_backlog_fixture(bt, NOHOME))[0]
         _ids_s = plan(bt, _build_backlog_fixture(bt, NOHOME, mode="shards"))[0]
         arm("every build README's ids: renders identically in both modes", "True",

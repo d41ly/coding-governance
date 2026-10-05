@@ -154,6 +154,7 @@ def read(path) -> str:
 # Re-imported here so every caller reaching it as `corpus_ids.parse_conf` keeps working.
 sys.path.insert(0, str(HERE))
 from tree_lib import parse_conf, parse_conf_line  # noqa: E402,F401  the kit's ONE conf parser
+from tree_lib import scan_missing_citations  # noqa: E402  the `missing:` citation form
 
 
 def load_conf(root: str) -> dict:
@@ -528,7 +529,9 @@ def walk(root: str, conf: dict) -> dict:
     defs: dict = {}          # id -> set(paths)
     def_builds: dict = {}    # id -> set(build slugs)
     cites: dict = {}         # id -> set(paths)
-    dead: dict = {}          # (citing file, cited path) -> [count, first line]
+    missing: dict = {}       # id -> set(paths) citing it in the `missing:` form, every file read
+    missing_now: dict = {}   # the same, present-tense files only — check 14's stale clause
+    dead: dict = {}        # (citing file, cited path) -> [count, first line]
     advisory: dict = {}      # the same shape, for live build READMEs — reported, never gated
     live_readmes, live_links = read_live_readmes(root, m, tracked_set)
 
@@ -551,6 +554,13 @@ def walk(root: str, conf: dict) -> dict:
         admitted = not now and p in live_readmes
         sink = dead if now else advisory
         for lineno, line in enumerate(text.split("\n"), 1):
+            # The `missing:` form (TOOL-aMendedFleet-26) is blanked out of the line before anything
+            # reads it, so a marked id is neither a citation for check 14 nor an anchor.
+            marked, line = scan_missing_citations(line, E.ID_RE)
+            for i in marked:
+                missing.setdefault(i, set()).add(p)
+                if now:
+                    missing_now.setdefault(i, set()).add(p)
             anchor = anchor_of(line)
             if anchor is None:
                 h = h1_re.match(line)
@@ -656,7 +666,7 @@ def walk(root: str, conf: dict) -> dict:
                      f"{len(live_readmes)} live build README(s) — corpus_ids.py --report lists them")
     return {
         "tracked": tracked_set, "corpus": corpus, "defs": defs, "def_builds": def_builds,
-        "cites": cites, "dead": dead, "advisory": advisory, "root": root, "conf": conf, "m": m,
+        "cites": cites, "missing": missing, "missing_now": missing_now, "dead": dead, "advisory": advisory, "root": root, "conf": conf, "m": m,
         "notes": notes,
     }
 
@@ -840,6 +850,12 @@ def checks(w: dict) -> list:
         for i in orphans:
             if i not in waived:
                 bad.append(f"check 14: id {i} is cited but never defined, and is not in {m}/{WAIVER}")
+        # The `missing:` form's stale clause: a present-tense file declaring a gap the corpus has
+        # since filled. A record of a moment is not graded — the id was missing when it was written.
+        for i, citers in sorted(w["missing_now"].items()):
+            if i in w["defs"]:
+                bad.append(f"check 14: id {i} is marked missing but defined — cited missing: in "
+                           f"{', '.join(sorted(citers))}, defined in {', '.join(sorted(w['defs'][i]))}")
         for i in waived:
             if i in w["defs"]:
                 bad.append(f"check 14: {m}/{WAIVER} waives {i}, which now resolves — stale row")
@@ -894,6 +910,7 @@ def cmd_report(root: str, conf: dict) -> int:
     print(f"ids defined      : {len(w['defs'])}")
     print(f"ids cited        : {len(w['cites'])}")
     print(f"orphan ids       : {len(orphans)}  {orphans}")
+    print(f"missing-form ids : {len(w['missing'])}  {sorted(w['missing'])}")
     print(f"build collisions : {len(coll)}  {coll}")
     print(f"dead path cites  : {len(w['dead'])}")
     for note in w["notes"]:
@@ -1398,6 +1415,25 @@ def cmd_selftest() -> int:
         arm("--measure's pin equals check 14's orphan count", "1 == 1",
             lambda: "%s == %d" % (_measure_lines(tM, cM)[0].split('"')[1],
                                   sum("never defined" in l for l in checks(walk(tM, cM)))))
+
+        # TOOL-aMendedFleet-26 — the `missing:` form. The same undefined id as the orphan arm above,
+        # written in the form, is no orphan and is counted on its own; the form naming an id the
+        # corpus DEFINES reds in a present-tense file and is ignored in a record of a moment.
+        tX = os.path.join(base, "missing-form"); os.makedirs(tX)
+        cX = _scratch(tX, extra={
+            "memory/README.md": "# r\n\nContext lives in missing:ARCH-tGhost-9 upstream.\n"})
+        arm("a `missing:` id is not an orphan for check 14", None, lambda: checks(walk(tX, cX)))
+        arm("...and the walk counts it on its own", "{'ARCH-tGhost-9': {'memory/README.md'}}",
+            lambda: walk(tX, cX)["missing"])
+        tY = os.path.join(base, "missing-defined"); os.makedirs(tY)
+        cY = _scratch(tY, extra={
+            "memory/README.md": "# r\n\nSee missing:ARCH-tOne-1 for now.\n",
+            "memory/builds/tOne/spec/2026-08-02-spec-tOne-2.md": "# ARCH-tOne-2 — b\n\nmissing:ARCH-tOne-1\n"})
+        arm("a `missing:` id the corpus defines reds check 14 in a present-tense file",
+            "ARCH-tOne-1 is marked missing but defined — cited missing: in memory/README.md, defined in",
+            lambda: "\n".join(checks(walk(tY, cY))))
+        arm("...and only there: the spec's own marker is a record of a moment", "findings=1;",
+            lambda: "findings=%d;" % sum("marked missing" in l for l in checks(walk(tY, cY))))
 
         # 15 — the four rules.
         DEAD = "# r\n\nSee `memory/gone/never-existed.md` for detail.\n"

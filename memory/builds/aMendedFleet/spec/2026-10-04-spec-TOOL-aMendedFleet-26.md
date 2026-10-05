@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-26 — a `missing:` citation form names an id that has no record, with its own count
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 26
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 26
 
 <!-- gen:spec-records -->
 
@@ -67,8 +67,10 @@ Read at base `7af5f564`; none of the files below moved between it and `580dc980`
 
 - `walk` in `tools/memory-tree/corpus_ids.py` adds every `E.ID_RE` match on a present-tense line to
   its citation map, after the line's anchor test and before its path tokens. The present-tense
-  corpus is the decision log, the memory root's own documents, the build `BACKLOG.md` files under
-  `builds` mode, the ledger, `project/` and `guides/`; specs and reviews are records of a moment.
+  corpus is the memory root's own documents, the build `BACKLOG.md` files under `builds` mode, the
+  ledger, `project/` and `guides/`, LESS every append-only path: the hygiene gate's
+  `--print-append-only-ere` names `DECISIONS.md` here, so the decision log is NOT graded by check
+  14. Specs and reviews are records of a moment.
 - `E.ID_RE` is word-bounded, and a colon is a word boundary, so a plain regex cannot tell a marked
   id from a cited one; the reader has to see the prefix.
 - `rosters` in `tools/memory-tree/gen_build_index.py` scans EVERY tracked file with its own
@@ -133,7 +135,7 @@ missing-form ids : <n>  [<ids>]
 ## 6. Acceptance criteria
 
 - **AC1** — When, in a `git clone --local` of the unit's branch under `%TEMP%`, one line citing an
-  id whose slug and sequence no record defines is appended to `memory/DECISIONS.md` and committed,
+  id whose slug and sequence no record defines is appended to `memory/README.md` and committed,
   `python tools/memory-tree/corpus_ids.py --check` reds check 14 naming that id as an orphan; when
   the same line is rewritten with the `missing:` prefix, `--check` exits 0, and
   `python tools/memory-tree/corpus_ids.py --report` prints a marked count of 1 naming that id.
@@ -181,6 +183,9 @@ New arm: tools/memory-tree/gen_build_index.py --selftest · a fixture whose spec
 - rev-2 · 2026-10-04 · §2 S7 · §4 · §7 · M2 cross-read: the definitions this unit adds
   move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
   code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
+- rev-3 · 2026-10-05 · §4 Evidence · §6 AC1 · the build pass: the decision log is append-only here,
+  so `walk` never grades it and AC1 as written could not red; AC1 now appends to `memory/README.md`,
+  a present-tense file check 14 does grade, and AC2 inherits it as "that clone".
 
 ## 10. Reuse audit
 

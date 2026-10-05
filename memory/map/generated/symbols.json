@@ -8323,6 +8323,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "scan_missing_citations",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "scan_mode_guard",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"

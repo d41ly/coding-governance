@@ -202,7 +202,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-23 — check 19 reports the gotcha anchors that select no tracked path](spec/2026-10-04-spec-TOOL-aMendedFleet-23.md) | 23 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-24 — dead repo paths in live build READMEs are reported, and the decision log's dead pointer is repaired](spec/2026-10-04-spec-TOOL-aMendedFleet-24.md) | 24 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-25 — live specs carry a declared byte ceiling, and a spec already over it is held at its recorded high-water](spec/2026-10-04-spec-TOOL-aMendedFleet-25.md) | 25 | 2 | CLOSED | rev-3 | 2026-10-04 |
-| [TOOL-aMendedFleet-26 — a `missing:` citation form names an id that has no record, with its own count](spec/2026-10-04-spec-TOOL-aMendedFleet-26.md) | 26 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-26 — a `missing:` citation form names an id that has no record, with its own count](spec/2026-10-04-spec-TOOL-aMendedFleet-26.md) | 26 | 1 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aMendedFleet-27 — recall excludes archived versioned snapshots by a declared pattern, and an arm proves a live line answers instead](spec/2026-10-04-spec-TOOL-aMendedFleet-27.md) | 27 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-28 — the recall floor grades the served path, terms plus fusion](spec/2026-10-04-spec-TOOL-aMendedFleet-28.md) | 28 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-29 — a recall gold set harvested from spec §10 probes, de-contaminated, graded at hit@10](spec/2026-10-04-spec-TOOL-aMendedFleet-29.md) | 29 | 2 | SPECCED | rev-2 | 2026-10-04 |

@@ -303,6 +303,9 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     a record of a moment or an append-only file is not a claim about now. The waiver is not a
     citation. It carries a shrink-only pin (`ORPHAN_ID_PIN`) and a stale-entry guard: a waived
     id that now resolves, or that no present-tense file cites, is a stale row and reds.
+    An id with no record is cited as `missing:` written immediately before the id: it is no orphan,
+    joins no build's roster, and `--report` counts it on its own line. That form naming an id the
+    corpus DEFINES reds in a present-tense file, as marked missing but defined, naming both files.
 15. **dead repo-path citations** — a rooted repo-path citation in the PRESENT-tense corpus that
     resolves to nothing must be registered in `project/corpus-path-unresolved.txt`. A DIRECTORY
     citation counts: it is exactly as broken when it does not resolve, and the flatten left four of
