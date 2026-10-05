@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-64 — `govkit selfcheck --fix` writes every kit-version carrier from its `version_from` constant
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes DEPL-aHoistedPass-10 · advances TOOL-aBoundedVerdict-29 · order 64
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes DEPL-aHoistedPass-10 · advances TOOL-aBoundedVerdict-29 · order 64
 
 <!-- gen:spec-records -->
 
@@ -34,7 +34,9 @@ mint versions itself.
     pattern followed by an optional quote and a dotted number, that number, and every
     `gov:kit <alias>@<n>` marker on the same line whose alias is not another registry entry's id,
     when either that line carries this entry's marker, or the file carries this entry's marker on
-    another line and no other registry entry's marker anywhere.
+    another line and no other registry entry's marker anywhere;
+  - on the constant's own line, when it carries this entry's marker, every such alias marker too.
+    Its number is the source and is never rewritten.
   Observed by AC1, AC2 and AC3.
 - **S3** — BYTES PRESERVED. Each file is read and written with `newline=""` in UTF-8, written only
   when a byte changed, so a CRLF working copy keeps its line endings and an untouched file keeps its
@@ -227,6 +229,10 @@ New arm: `tools/govkit/selftest.py` · a fixture entry whose constant is bumped 
 - rev-2 · 2026-10-04 · S8 · §4 · §7 · M2 cross-read: the two Python definitions move
   `memory/map/generated/symbols.json`, which the build's other Python-adding units declare with the
   coverage leg and this spec omitted.
+- rev-3 · 2026-10-05 · S2 · the build pass: `tier2-review.template.js` holds review-harness's
+  constant AND a `gov:kit tier2-review@` alias on that one line, and rev-2 excluded the whole
+  constant line, so a bump left the template's alias on the old number while the rendered `.js`
+  moved; the alias clause now reaches the constant's own line, never its number.
 
 ## 10. Reuse audit
 
