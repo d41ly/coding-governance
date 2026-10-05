@@ -48,7 +48,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.69   # gov:kit unattended@1.69 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.70   # gov:kit unattended@1.70 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -1694,7 +1694,7 @@ CLAIM_NS="refs/gov/runs"
 CLAIM_CACHE="refs/gov/remote/runs"
 CR_NAME=""; CR_URL=""
 CLAIM_ROWS=""; CL_WHY=""
-CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""
+CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""
 WC_WHY=""; WC_BEAT=""
 
 # THE ONE REMOTE, counted once. SETS rather than prints, because check 24 is a `fail` and a `fail`
@@ -1827,15 +1827,17 @@ CLAIM_MODES="preflight take-over holder status beat"
 # TOOL-aGraftedHelix-11 - THE RUN-STATE FILE, sixth, is where a write that does not take the claim
 # copies its identity from, the one `write_claim` is handed too: `--preflight` and a take-over pass
 # none, every other writer passes the record. `mine` keeps the claim's own `node`.
-# TOOL-aGraftedHelix-20 - THE `prior-session` FACT, read from that file: the session a holder-row
-# claim push that did not land left the published claim under. Handed the record, a holder, `--beat`
-# or status write also reads `mine` a claim of the lease's keepalive under that session, and the take-
-# over handed it - the restart row alone - reads `same session` one under the record's keepalive.
-# `absent` or a missing line is no fact.
+# TOOL-aGraftedHelix-20 - THE `prior-session` FACT, read from that file HERE and never handed in by a
+# caller (TOOL-aGraftedHelix-23): a SET, its members separated by one space, of the sessions a
+# `--resume` holder-row claim write that did not land may have left the published claim under. The
+# empty value and a missing line are the empty set; `absent` is a member like any other. Handed the
+# record, a holder, `--beat` or status write also reads `mine` a claim of the lease's keepalive under
+# ANY member, and the take-over handed it - the restart row alone - reads `same session` one under the
+# record's keepalive. CW_SESS is the claim's own session when a claim was found, for that holder row.
 check_claim_writable() { # slug · mode · lease keepalive · lease session · the keepalive a write sets · [run-state file]
   local slug="$1" mode="$2" ka="$3" sid="$4" wka="$5" rel="${6:-}" me="${CLAUDE_CODE_SESSION_ID:-}" row cls due ps=""
   local c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_btxt=unknown r_host r_sess r_lease
-  CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""
+  CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""
   case " $CLAIM_MODES " in
     *" $mode "*) ;;
     *) fail 92 "this call passed a claim mode the driver does not declare, so the claim write table has no column for it and nothing was written; declare the mode in CLAIM_MODES beside its case branch, or pass a declared one: mode $mode · CLAIM_MODES $CLAIM_MODES"
@@ -1849,14 +1851,14 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     cls=none
   else
     IFS=$'\t' read -r c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat <<<"$row"
-    CW_SHA="$c_sha"
+    CW_SHA="$c_sha"; CW_SESS="$c_sess"
     c_btxt="${c_age}s"; [ "$c_age" != - ] || c_btxt=unknown
     CW_WHO="$slug · node $c_node · session $c_sess · beat $c_btxt · status $c_status · verdict $c_verdict"
-    if [ -n "$rel" ]; then ps=$(fact "$rel" prior-session) || :; [ "$ps" != absent ] || ps=""; fi
+    if [ -n "$rel" ]; then ps=$(fact "$rel" prior-session) || :; fi
     if [ "$c_ka" = "$ka" ] && [ "$c_sess" = "$sid" ]; then cls=mine
-    elif [ -n "$ps" ] && [ "$mode" != take-over ] && [ "$c_ka" = "$ka" ] && [ "$c_sess" = "$ps" ]; then cls=mine
+    elif [ -n "$ps" ] && [ "$mode" != take-over ] && [ "$c_ka" = "$ka" ] && [[ " $ps " == *" $c_sess "* ]]; then cls=mine
     elif [ -n "$me" ] && [ "$me" != absent ] && [ "$c_sess" = "$me" ]; then cls=same
-    elif [ -n "$ps" ] && [ "$mode" = take-over ] && [ "$c_sess" = "$ps" ] && [ "$c_ka" = "$(fact "$rel" keepalive)" ]; then cls=same
+    elif [ -n "$ps" ] && [ "$mode" = take-over ] && [[ " $ps " == *" $c_sess "* ]] && [ "$c_ka" = "$(fact "$rel" keepalive)" ]; then cls=same
     else cls="foreign-$c_verdict"; fi
   fi
   case " $CLAIM_READS " in
@@ -6888,7 +6890,7 @@ check_holder_worktree() { # slug · run-state file -> 0 passes, 1 with its own r
 # run-state lease and keeps its build folder's clock against the same bound (§8 F13).
 verb_resume() { # slug
   local slug="$1" rel p cond age bound rhc rc ka _rs_at _rs_bt _rs_rc ok os op
-  local ls_utc ls_sid ls_pid ls_hat live me rb cur restart lu cw cas ps
+  local ls_utc ls_sid ls_pid ls_hat live me rb cur restart lu cw cas ps pv
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to resume: $rel"; return 1; }
@@ -7049,8 +7051,11 @@ verb_resume() { # slug
     # TOOL-aGraftedHelix-20 - and the claim CAS runs BEFORE `write_lease` too, writing the values it is
     # about to record under the one stamp both are handed, so a race lost here writes nothing local.
     # A push that does not complete, or a claim that could not be read, still records the lease and
-    # leaves `prior-session` naming the session the published claim still carries, set only while it
-    # is `absent` or missing; the next holder-row claim write that lands sets it `absent`, staged.
+    # ADDS to the `prior-session` set (TOOL-aGraftedHelix-23) the record's session from before this
+    # call and the read claim's session, each once, on this `write_lease`-due branch alone: the set
+    # only grows until a claim write of THIS row lands, which empties it, written only when non-empty
+    # and staged. No other writer writes or empties it, so a landed `--beat` or `--dispatch` between
+    # two incomplete calls leaves every member a later read may still need.
     cw=""; cas=""
     if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
       check_claim_writable "$slug" holder "$ka" "${ls_sid:-absent}" "$ka" "$rel"; cw=$?
@@ -7064,9 +7069,12 @@ verb_resume() { # slug
       if [ "$RUN_CLAIMS" = on ]; then
         ps=$(fact "$rel" prior-session) || :
         if [ "$cas" = 0 ]; then
-          case "$ps" in ""|absent) ;; *) set_fact "$rel" prior-session absent || return 1 ;; esac
+          [ -z "$ps" ] || set_fact "$rel" prior-session "" || return 1
         else
-          case "$ps" in ""|absent) set_fact "$rel" prior-session "${ls_sid:-absent}" || return 1 ;; esac
+          for pv in "$ls_sid" ${cw:+"$CW_SESS"}; do
+            [ -z "$pv" ] || [[ " $ps " == *" $pv "* ]] || ps="${ps:+$ps }$pv"
+          done
+          [ -z "$ps" ] || set_fact "$rel" prior-session "$ps" || return 1
         fi
       fi
       stage_or_fail "$rel" || return 1
@@ -7074,11 +7082,8 @@ verb_resume() { # slug
     elif [ "$cw" = 0 ]; then
       write_claim "$slug" live "$ka" holder "$rel"; cas=$?
       [ "$cas" != 1 ] || return 1
-      if [ "$cas" = 0 ]; then
-        case "$(fact "$rel" prior-session)" in
-          ""|absent) ;;
-          *) { set_fact "$rel" prior-session absent && stage_or_fail "$rel"; } || return 1 ;;
-        esac
+      if [ "$cas" = 0 ] && [ -n "$(fact "$rel" prior-session)" ]; then
+        { set_fact "$rel" prior-session "" && stage_or_fail "$rel"; } || return 1
       fi
     fi
     # TOOL-dDerivedDocket-28 S3 - THE HOLDER'S OWN ORPHANS: i26's harness killed the driver mid-bar

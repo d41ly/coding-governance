@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-23 — the `prior-session` fact is the set of sessions an incomplete holder write may have left the claim under, read by `check_claim_writable` itself and emptied by the next `--resume` holder-row claim write that lands
 
-**Status:** SPECCED · rev-6 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 5
+**Status:** CLOSED · rev-6 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 5
 
 <!-- gen:spec-records -->
 

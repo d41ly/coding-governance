@@ -12772,7 +12772,7 @@ remove_claim_refs; reset_tree
 # preflighted under s1 and calls the holder's --resume under s2, so its write_lease is due. AC2: a
 # claim push made to exit 124, and a remote renamed away, each leave the record at s2 with
 # `prior-session: s1` and the claim at s1, staged; a second s2 call reads that claim `mine`, lands it
-# under s2 and sets the fact `absent`. AC1: a lost race is check 90 with the record and the index
+# under s2 and empties the set. AC1: a lost race is check 90 with the record and the index
 # untouched. AC3: under a date shim advancing every clock read, the claim and the record carry one
 # stamp, and a renewal over a record without the fact writes nothing. AC6: the session's restart under
 # a new keepalive takes the run over through `same session`, and an s3 take-over through the
@@ -12805,7 +12805,7 @@ out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
 same "GH20 AC2 the second s2 call exits 0" "$rc" "0"
 miss "$out" "UNATTENDED check 90 FAILED"
 same "GH20 AC2 ...lands the claim under s2" "$(read_claim_field tRun session)" "s2"
-same "GH20 AC2 ...sets prior-session absent" "$(read_run_fact prior-session)" "absent"
+same "GH20 AC2 ...empties the prior-session set (TOOL-aGraftedHelix-23 S7)" "$(read_run_fact prior-session)" ""
 same "GH20 AC2 ...and stages the record it cleared" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
 # ---- AC2, the unreachable arm: the bare origin renamed away for the first s2 call, restored for the
 # ---- second. Red when prior-session is left unwritten: the second call then reads s1 as foreign.
@@ -12823,7 +12823,7 @@ out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
 same "GH20 AC2 the second s2 call with the remote restored exits 0" "$rc" "0"
 miss "$out" "UNATTENDED check 90 FAILED"
 same "GH20 AC2 ...lands the claim under s2" "$(read_claim_field tRun session)" "s2"
-same "GH20 AC2 ...sets prior-session absent" "$(read_run_fact prior-session)" "absent"
+same "GH20 AC2 ...empties the prior-session set (TOOL-aGraftedHelix-23 S7)" "$(read_run_fact prior-session)" ""
 same "GH20 AC2 ...and stages the record it cleared" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
 # ---- AC1: the s2 call that loses the race is check 90, and the run-state file and the index are
 # ---- untouched. Red when the CAS runs after write_lease: the record moved on a call that lost.
@@ -12895,6 +12895,164 @@ hit  "$out" "unattended: presumed-stopped — "
 hit  "$out" "unattended: claim taken over — tRun · node "
 hit  "$out" " · session s1 · beat "
 rm -rf "$GP_BIN"; remove_claim_refs; reset_tree
+
+# ==================================================================================================
+# TOOL-aGraftedHelix-23 — `prior-session` IS A SET THE `--resume` HOLDER ROW ALONE GROWS AND EMPTIES,
+# AND EVERY READER TESTS MEMBERSHIP. Every arm starts from unit 20's base, record and claim
+# preflighted under s1. "124" is unit 20's git shim making the claim push exit 124; "away" renames the
+# bare origin away for that one call. AC1: sequences a to d of the spec's section 4 leave the line
+# `prior-session: s1 s2` before a closing s3 call that lands with no check 90 and empties the set; the
+# landed `--beat` of a and c and `--dispatch` of b move the claim to s2 and leave the set at s1. AC2:
+# sequences e and f, two incomplete calls in a row, keep s1; a landed renewal over a record without
+# the fact, and an incomplete one whose write_lease is not due, each leave the tree clean. AC3: a set
+# holding `absent` is a member. AC4: `--dispatch` (sequence b) and `--hold` read the set themselves.
+# AC5: the restart row tests membership, every position and an `absent` member. `--beat` runs with no
+# session, as the OS-scheduled tick does; `--dispatch` and `--hold` run under s2, so neither can reach
+# the `same session` row. RED against driver copies with unit 20's absent-only write, `--beat` and
+# `--dispatch` emptying the set, the set written as the read claim's session alone, the pre-call
+# session written unconditionally, `absent` read as no fact, the clear written while empty, the add
+# unscoped from write_lease due, the set read at the `--resume` row only, and the restart widening
+# comparing the whole value, the first member alone, or skipping `absent`. Unit 20's helpers reused.
+# ==================================================================================================
+GQ_BIN=$(mktemp -d)
+cat > "$GQ_BIN/git.124" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) exit 124 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+chmod +x "$GQ_BIN/git.124"
+# One holder `--resume`: no shim, the claim push exiting 124, or the bare origin away for this call
+# alone. Every call exits 0 and leaves no unstaged run-state file, the spec's fixture rule.
+run_prior_resume() { # label · session · none|124|away · [keepalive] · [pid] -> GQ_OUT
+  local p="$PATH" rc
+  case "$3" in 124) cp "$GQ_BIN/git.124" "$GQ_BIN/git"; p="$GQ_BIN:$PATH" ;; away) mv "$ORIGIN" "$ORIGIN.away" ;; esac
+  GQ_OUT=$(CLAUDE_CODE_SESSION_ID="$2" CLAUDE_PID="${5:-$CLAUDE_PID}" PATH="$p" bash "$SCRIPT" --resume tRun --keepalive-id "${4:-k1}" 2>&1); rc=$?
+  case "$3" in 124) rm -f "$GQ_BIN/git" ;; away) mv "$ORIGIN.away" "$ORIGIN" ;; esac
+  same "$1 the $2 call ($3) exits 0" "$rc" "0"
+  same "$1 ...and leaves no unstaged run-state file" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
+}
+# The closing call of a sequence: no shim, under its last session and pid, lands and empties the set.
+check_prior_close() { # label · session · [pid]
+  run_prior_resume "$1" "$2" none k1 "${3:-$CLAUDE_PID}"
+  miss "$GQ_OUT" "UNATTENDED check 90 FAILED"
+  same "$1 ...leaves the claim naming $2" "$(read_claim_field tRun session)" "$2"
+  same "$1 ...and the prior-session set empty" "$(read_run_fact prior-session)" ""
+}
+# The calls of one sequence of the spec's section 4 before its closing one, over a fresh base.
+build_prior_seq() { # a|b|c|d|e|f
+  build_prior_base
+  if [ "$1" = b ]; then
+    mkdir -p memory/builds/tRun/spec
+    printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+    git add -A >/dev/null && git commit -q -m gq-spec --no-verify
+  fi
+  case "$1" in d) run_prior_resume "GH23 $1" s2 away ;; *) run_prior_resume "GH23 $1" s2 124 ;; esac
+  same "GH23 $1 the first incomplete call leaves the set s1" "$(read_run_fact prior-session)" "s1"
+  case "$1" in
+    a|c) out=$(env -u CLAUDE_CODE_SESSION_ID bash "$SCRIPT" --beat tRun 2>&1)
+         hit  "$out" "unattended: beat — tRun · renewed " ;;
+    b)   out=$(CLAUDE_CODE_SESSION_ID=s2 run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh); rc=$?
+         same "GH23 AC1 b and AC4 the --dispatch under s2 exits 0" "$rc" "0"
+         miss "$out" "UNATTENDED check 90 FAILED"
+         same "GH23 AC4 ...and leaves no unstaged run-state file" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" "" ;;
+  esac
+  case "$1" in
+    a|b|c) same "GH23 $1 ...the landed write moves the claim to s2" "$(read_claim_field tRun session)" "s2"
+           same "GH23 $1 ...and leaves the set s1" "$(read_run_fact prior-session)" "s1" ;;
+  esac
+  case "$1" in
+    a|b|f) run_prior_resume "GH23 $1" s3 124 ;;
+    c|d)   run_prior_resume "GH23 $1" s3 away ;;
+    e)     run_prior_resume "GH23 $1" s2 124 k1 4243 ;;
+  esac
+  same "GH23 $1 the record carries prior-session: s1 s2 byte for byte" "$(grep '^prior-session:' memory/builds/tRun/RUN.md)" "prior-session: s1 s2"
+}
+# A record and claim leased with no session, so both name `absent`.
+build_prior_absent() { arm_claim_fixture; env -u CLAUDE_CODE_SESSION_ID bash "$SCRIPT" --preflight tRun --keepalive-id k1 >/dev/null 2>&1; git add -A >/dev/null && git commit -q -m gq-absent --no-verify; }
+# ---- AC1: sequences a to d, each ending in a closing s3 call that answers no check 90.
+for gq_s in a b c d; do
+  build_prior_seq "$gq_s"
+  case "$gq_s" in d) gq_c=s1 ;; *) gq_c=s2 ;; esac
+  same "GH23 AC1 $gq_s the claim before the closing call names $gq_c" "$(read_claim_field tRun session)" "$gq_c"
+  check_prior_close "GH23 AC1 $gq_s closing" s3
+done
+# ---- AC2: sequences e and f, two incomplete calls in a row, keep s1 in the set; e closes under s2 at
+# ---- the pid of its second call, f under s3.
+build_prior_seq e
+same "GH23 AC2 e the claim before the closing call names s1" "$(read_claim_field tRun session)" "s1"
+check_prior_close "GH23 AC2 e closing" s2 4243
+build_prior_seq f
+same "GH23 AC2 f the claim before the closing call names s1" "$(read_claim_field tRun session)" "s1"
+check_prior_close "GH23 AC2 f closing" s3
+# ---- AC2, the renewal legs: over the committed base, which carries no prior-session line, with its
+# ---- claim re-seeded at an aged beat. A landed renewal writes nothing local; an incomplete one whose
+# ---- write_lease is not due announces its push and adds nothing.
+build_prior_base
+seed_claim tRun s1 k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+gq_sha=$(read_claim_ref tRun)
+run_prior_resume "GH23 AC2 renewal" s1 none
+n=$((n+1)); [ "$(read_claim_ref tRun)" != "$gq_sha" ] || { echo "FAIL GH23 AC2 the landed renewal did not move the claim ref"; st=1; }
+same "GH23 AC2 ...and over a record without the fact writes nothing local" "$(git status --porcelain)" ""
+build_prior_base
+seed_claim tRun s1 k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+run_prior_resume "GH23 AC2 incomplete renewal" s1 124
+hit  "$GQ_OUT" "unattended: claim not written — tRun · the push was killed by this kit's own"
+same "GH23 AC2 ...writes nothing local" "$(git status --porcelain)" ""
+same "GH23 AC2 ...and no prior-session line" "$(grep -c '^prior-session:' memory/builds/tRun/RUN.md)" "0"
+# ---- AC3: an `absent` lease, then an s2 call whose push exits 124, leaves the set `absent`, which
+# ---- the closing s2 call reads as a member.
+build_prior_absent
+same "GH23 AC3 the record names session absent" "$(read_run_fact session)" "absent"
+same "GH23 AC3 ...and so does the claim" "$(read_claim_field tRun session)" "absent"
+run_prior_resume "GH23 AC3" s2 124
+same "GH23 AC3 ...the incomplete call leaves the set absent" "$(read_run_fact prior-session)" "absent"
+check_prior_close "GH23 AC3 closing" s2
+# ---- AC4: `--hold` under s2 after one incomplete s2 call. The staged record is committed and the run
+# ---- branch pushed first, build_hold_fixture's shape, for --hold's clean-tree and published-tip
+# ---- refusals; that push moves no claim ref. The --dispatch leg is sequence b's, in AC1.
+build_prior_base
+gq_unit=$(git --git-dir="$ORIGIN" rev-parse -q --verify refs/heads/unit) || gq_unit=""
+git push -q -f origin HEAD:refs/heads/unit
+run_prior_resume "GH23 AC4" s2 124
+same "GH23 AC4 ...the incomplete call stages the record" "$(git diff --cached --name-only -- memory/builds/tRun/RUN.md)" "memory/builds/tRun/RUN.md"
+git commit -q -m gq-hold --no-verify; git push -q -f origin HEAD:refs/heads/unit
+same "GH23 AC4 the branch push leaves the claim at s1" "$(read_claim_field tRun session)" "s1"
+same "GH23 AC4 ...and the set s1" "$(read_run_fact prior-session)" "s1"
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --hold tRun --code platform-limit --until owner --reason "the status-write widening" --reaped k1)
+miss "$out" "UNATTENDED check 2 FAILED"
+miss "$out" "unattended: claim not written"
+same "GH23 AC4 --hold under s2 writes held" "$(read_claim_field tRun status)" "held"
+same "GH23 AC4 ...and leaves the set s1" "$(read_run_fact prior-session)" "s1"
+# The bare origin outlives reset_tree, so the run branch this arm pushed is put back as it found it.
+if [ -n "$gq_unit" ]; then git --git-dir="$ORIGIN" update-ref refs/heads/unit "$gq_unit"; else git --git-dir="$ORIGIN" update-ref -d refs/heads/unit; fi
+# ---- AC5: the restart row's take-over tests membership. Each leg commits its record under a 2000 date,
+# ---- as unit 20's AC6 does, then restarts under a new pid and keepalive with the remote restored.
+# ---- d stops short of its closing call, so the claim is s1, the set's first member; c's claim is s2,
+# ---- its second; the absent lease's is `absent`.
+build_prior_seq d
+same "GH23 AC5 d the claim before the restart names s1" "$(read_claim_field tRun session)" "s1"
+write_aged_commit
+run_prior_resume "GH23 AC5 d restart" s3 none k3 4244
+miss "$GQ_OUT" "UNATTENDED check 89 FAILED"
+hit  "$GQ_OUT" "this resume TAKES THE RUN OVER in its place"
+same "GH23 AC5 d ...leaves the claim under the new keepalive" "$(read_claim_field tRun keepalive)" "k3"
+same "GH23 AC5 d ...and session s3" "$(read_claim_field tRun session)" "s3"
+build_prior_seq c
+same "GH23 AC5 c the claim before the restart names s2" "$(read_claim_field tRun session)" "s2"
+write_aged_commit
+run_prior_resume "GH23 AC5 c restart" s3 none k3 4244
+miss "$GQ_OUT" "UNATTENDED check 89 FAILED"
+same "GH23 AC5 c ...leaves the claim under the new keepalive" "$(read_claim_field tRun keepalive)" "k3"
+same "GH23 AC5 c ...and session s3" "$(read_claim_field tRun session)" "s3"
+build_prior_absent
+run_prior_resume "GH23 AC5 absent" s2 124
+same "GH23 AC5 absent ...leaves the set absent" "$(read_run_fact prior-session)" "absent"
+write_aged_commit
+run_prior_resume "GH23 AC5 absent restart" s2 none k2 4244
+miss "$GQ_OUT" "UNATTENDED check 89 FAILED"
+same "GH23 AC5 absent ...leaves the claim under the new keepalive" "$(read_claim_field tRun keepalive)" "k2"
+same "GH23 AC5 absent ...and session s2" "$(read_claim_field tRun session)" "s2"
+rm -rf "$GQ_BIN"; remove_claim_refs; reset_tree
 
 fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
@@ -13381,7 +13539,13 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # region two, its one `mutate` call included, MEASURED: that arm run alone behind this prologue and
 # the claim block's gh_ helpers on node a, 2026-10-05, executed 26 against the prologue's own 20,
 # green against the kit and red, three of them, with the read-axis membership test removed; no suite ran.
-FLOOR_ASSERTIONS=2184
+# RAISED 2184 -> 2344 by TOOL-aGraftedHelix-23: the prior-session set block's 160 executed assertions
+# in region two, its thirteen `mutate` calls included, MEASURED: that block run alone behind this
+# prologue, the claim block's gh_ helpers and unit 20's prior-session helpers on node a, 2026-10-05,
+# executed 181 against the prologue's own 20 and the slice's one setup `mutate`, green against the
+# kit and red under staged driver copies, one break or one disjoint group of breaks per run; unit
+# 20's block, re-read for the set's empty cleared state, kept its 51; no suite ran.
+FLOOR_ASSERTIONS=2344
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -13518,7 +13682,8 @@ FLOOR_SHARD_1=209
 # RAISED 1917 -> 1930: the same 13 region-two hook, linked-kit and announcement assertions, see FLOOR_ASSERTIONS.
 # RAISED 1930 -> 1981: the same 51 region-two prior-session assertions, see FLOOR_ASSERTIONS.
 # RAISED 1981 -> 1987: the same 6 region-two read-axis refusal assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1987
+# RAISED 1987 -> 2147: the same 160 region-two prior-session set assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=2147
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.69 -->
+<!-- gov:kit unattended@1.70 -->
 # The unattended stop contract — HELD, the hold codes and the lease
 
 *Installed beside `UNATTENDED-PROTOCOL.md` from the unattended kit and byte-compared against the
@@ -144,7 +144,7 @@ once stated a gate verdict and a reader took it for one.
 ## 7. The lease
 
 The lease is the run-state facts `write_lease` writes together, `keepalive`, `session`, `pid`,
-`host`, `pid-image` and `lease-utc`, and `prior-session`, which the holder row writes beside them
+`host`, `pid-image` and `lease-utc`, and `prior-session`, a set the holder row writes beside them
 when its claim push does not land. `lease-utc` says a record carries one: a
 record without it predates the run-state lease and is graded by the newest commit touching its build
 folder. The holder is the `keepalive` fact; freshness is `--liveness`'s clock against
@@ -180,8 +180,9 @@ driver, as the lease does; a run holding the push credential can force or delete
 A claim is `mine` when its `keepalive` AND `session` equal the run's lease (`absent` compares
 literally); `same session` when its `session` is this harness's session; `foreign` otherwise, read
 by its verdict. The rows are tested in that order. A holder or status write also reads `mine` a
-claim of the lease's `keepalive` whose `session` is the record's `prior-session`, and the restart
-row's take-over reads such a claim `same session`; `absent` or a missing line is no fact.
+claim of the lease's `keepalive` whose `session` is ANY member of the record's `prior-session`, and
+the restart row's take-over reads such a claim `same session`. That fact is a SET: members separated
+by one space, `absent` a member like any other, and the empty value or a missing line the empty set.
 
 | claim read | `--preflight` | take-over | holder | status write |
 |---|---|---|---|---|
@@ -201,9 +202,11 @@ reads, so a lost claim is found on every call. A race lost between the read and 
 take-over and at `--close`, and one announced line at the holder's `--resume` and `--dispatch`, which
 work offline. The holder row whose `write_lease` is due pushes first, under the values and the one
 stamp `write_lease` then records, so a lost race leaves the record untouched; a push that does not
-land, or a claim it could not read, sets `prior-session` to the record's session from before the
-call, only while that reads `absent` or is missing, and its next claim write that lands sets it
-`absent`. A holder refused at check 90 ends with `--abort <slug> --code claim-lost`. The status
+land, or a claim it could not read, ADDS to `prior-session` the record's session from before the
+call and the read claim's session, each once. That row is the set's one writer: the next claim
+write of that row that lands empties it, writing the empty value only when the set is non-empty, and
+a landed `--beat`, `--dispatch` or status write leaves it as it is. A holder refused at check 90
+ends with `--abort <slug> --code claim-lost`. The status
 writes are `--hold` (`held`), `--landed` (`landed`), `--abort` (`aborted`) and the landing re-bind
 (`live`, its new keepalive), each after its own staging and never failing its verb. The resume tick
 renews a `LIVE` run's claim through `--beat`, which writes only the none and `mine` rows.
