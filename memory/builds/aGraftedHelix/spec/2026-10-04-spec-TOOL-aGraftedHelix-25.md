@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-25 — the `prior-session` add's own failure returns the holder row before `write_lease`, observed by a criterion that fails the add itself
 
-**Status:** SPECCED · rev-4 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 7
+**Status:** SPECCED · rev-5 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -19,7 +19,7 @@ of unit 24 confirmed one HIGH finding on that order.
 - Finding 11: unit 24 S1 states no rule for the add's own failure. `set_fact` returns 2 without
   writing when `mktemp` fails, and returns `mv`'s status otherwise. A build that lets the row go on
   past a failed add runs `write_lease`, which moves the record to `s2` while the claim stays at
-  `s1` and the set holds no `s1`. The next `s2` call answers check 90, or check 89 at the restart
+  `s1` and the set holds no `s1`. The next `s2` call answers check 108, or check 107 at the restart
   row, and the live run is forced to `--abort --code claim-lost`. Unit 24 AC1's shim fires only
   once the record reads `s2`, after the add, so no criterion separates that build from a correct
   one.
@@ -37,6 +37,10 @@ closes finding 11 (HIGH) of the round-1 spec audit of unit 24.
   `write_lease`'s own facts takes (`tools/unattended/unattended.sh:5559` to `:5569`). `mv` is
   `set_fact`'s last command, so the one return covers a failed `mv` as well as a failed `mktemp`.
   The add's place is unit 24's; this adds its failure rule to unit 24 §4 "The order"'s add row.
+  The return is already the code's: unit 23's build (`aeab6521`) wrote the add `|| return 1`, and
+  unit 24's (`73dc1dbf`) moved it ahead of `write_lease` with the return kept, so this unit moves no
+  driver byte. What it lands is the criterion: until AC1, no arm fails the add itself, so a later
+  change dropping the return stays green.
   Observed by AC1 on the first trigger, which drives the `mktemp` half. The second trigger is NOT
   OBSERVED by a criterion here: `TOOL-aGraftedHelix-26` gives both triggers one call site and
   drives the unreadable one with a leg of its own (§3). The `mv` half is NOT OBSERVED by a criterion
@@ -51,7 +55,9 @@ closes finding 11 (HIGH) of the round-1 spec audit of unit 24.
   here: the suite is the main loop's to run at VERIFYING, and the arm's red on its staged break is
   observed there (§7).
 - **S3** — The unattended kit version moves once after this unit's last move, in every carrier
-  `tools/check-kit-versions.sh` pairs. Observed by AC2.
+  `tools/check-kit-versions.sh` pairs: the suite is an `engine` file of the kit
+  (`python tools/govkit/govkit.py shipped`), so S2 alone moves the kit's shipped bytes. Observed by
+  AC2.
 
 ## 3. Non-goals (OUT)
 
@@ -106,12 +112,11 @@ retries the CAS from the same state.
 
 ### Inventory
 
-No new fact, function, check, conf key or file. The add gains a return. No lexicon cell and no
-codebase-map key is minted.
+No new fact, function, check, conf key or file. The add's return already stands (S1); the suite
+gains one arm. No lexicon cell and no codebase-map key is minted.
 
 ### Files touched (estimate)
 
-- `tools/unattended/unattended.sh`
 - `tools/unattended/unattended.test.sh`
 - every other carrier of the unattended version marker, which `tools/check-kit-versions.sh`
   enumerates
@@ -160,22 +165,22 @@ under the session named, with `CLAUDE_PID` unchanged from the fixture's. The cla
   witness that the shim failed the add itself: a shim that fires inside the CAS step's outcome
   either stops the row before the announce or lets the add run and write `s1`, and one that fires
   after the add leaves `s1` in the set, so each reds this criterion. A second `s2` call with no shim
-  exits 0, prints no `UNATTENDED check 90 FAILED`, leaves a claim naming `session: s2`, leaves
+  exits 0, prints no `UNATTENDED check 108 FAILED`, leaves a claim naming `session: s2`, leaves
   `fact` printing nothing for `prior-session`, and leaves `git diff --name-only` naming no run-state
   file. The first call's exit status is not asserted here: the dispatcher discards the verb's
   return (§4 Evidence), and `TOOL-aGraftedHelix-26` AC1 asserts it as exactly 1.
   Red when: the add's failure does not stop the row, so `write_lease` moves the record to `s2` with
-  no `s1` in the set and the second call answers check 90.
+  no `s1` in the set and the second call answers check 108.
 - **AC2** — When `bash tools/check-kit-versions.sh` runs at the pass's commit it exits 0, and
   `python tools/govkit/govkit.py epoch --base <the pass's parent sha>` names no unattended carrier
   left behind.
-  Red when: the driver's bytes moved and the unattended version did not.
+  Red when: the kit's shipped bytes moved and the unattended version did not.
 
 ## 7. Gates
 
 `unattended kit gate` · `unattended skill wiring` · `recall floor` · `recall floor arms` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `harness arms (fail branches armed or pinned)` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `line length` · `shell hygiene (a loop fed by a command substitution)` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/unattended/unattended.test.sh · an s2 holder call whose claim push exits 124 and whose add a mktemp shim keyed on the git shim's 124 marker fails, asserting the announce line, session s1 and an empty set, then a second s2 call with no check 90; stage the add's return dropped · the suite's floor rises by its new arm count
+New arm: tools/unattended/unattended.test.sh · an s2 holder call whose claim push exits 124 and whose add a mktemp shim keyed on the git shim's 124 marker fails, asserting the announce line, session s1 and an empty set, then a second s2 call with no check 108; stage the add's return dropped · the suite's floor rises by its new arm count
 
 The unattended suites are not on the bar (`tools/unattended/README.md`). A pass runs its criteria
 directly, and the main loop runs the suite once at VERIFYING.
@@ -203,6 +208,13 @@ none
 - rev-4 · 2026-10-04 · §2 · S1 · from the bug-class checklist over the promoting commit, which
   selected `retirement-inventory-misses-readers-by-value`. S1's by-value readers line spells the
   NO VALUE READERS answer the grammar names and says why: the exit is 0 with or without the rule.
+- rev-5 · 2026-10-05 · §1 §2 §4 §6 §7 · S1 S3 · AC1 AC2 · the build pass's divergences, before the
+  code. The claim refusals were renumbered before the reconciling merge at `909c5e0b`, because
+  main's own driver already uses 89 to 106: check 90 reads as check 108 and check 89 as check 107
+  throughout. The driver at this unit's start already returns the row on a failed add (unit 23's
+  build wrote the `|| return 1`, unit 24's kept it), so S1 says so and §4 drops the driver from the
+  files touched; the unit lands the arm. S3 and AC2 name the kit's shipped bytes rather than the
+  driver's, since the suite is an `engine` file and moves the version alone.
 
 ## 10. Reuse audit
 
