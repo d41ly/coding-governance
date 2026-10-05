@@ -3090,16 +3090,16 @@ def test_drift_history(tmp: pathlib.Path) -> None:
     check("history: --offenders, --json and --json --check write nothing", after == lines,
           f"{len(lines)} -> {len(after)} lines")
 
-    def hash_of(detail):
+    def measure_key_hash(detail):
         rec = {"signal": "s", "value": len(detail), "of": 9, "live": True, "detail": detail}
         return dr.build_history_rows([rec], set(), "t", "h", "b", "bs")[0].split("\t")[8]
 
-    one = hash_of([{"path": "a.md"}, {"path": "b.md"}])
+    one = measure_key_hash([{"path": "a.md"}, {"path": "b.md"}])
     check("history: a member swap at an equal count moves key_hash",
-          one != hash_of([{"path": "a.md"}, {"path": "c.md"}]), one)
+          one != measure_key_hash([{"path": "a.md"}, {"path": "c.md"}]), one)
     check("history: a moved line locator does not move key_hash",
-          hash_of([{"path": "a.md:3"}, {"path": "b.md", "line": 4}])
-          == hash_of([{"path": "a.md:7"}, {"path": "b.md", "line": 9}]), one)
+          measure_key_hash([{"path": "a.md:3"}, {"path": "b.md", "line": 4}])
+          == measure_key_hash([{"path": "a.md:7"}, {"path": "b.md", "line": 9}]), one)
 
     hist.unlink()
     hist.mkdir()
