@@ -49,6 +49,11 @@ bar's merge-base rule; `UNGRADED` when no `origin` default branch or no baseline
 `codebase-map coverage + freshness` leg failed the coverage assert until this dossier claimed it, and
 again when `codebase-map adopter e2e` arrived from main.
 
+A change to the reuse probe's ranking, its candidate lines or the fan-in it reads runs
+`python tools/codebase-map/replay-phrases.py --floor` before it lands, and records the line it printed.
+That grades a population FROZEN by record date against floors recorded in the script, exits 1 on a
+breach and 2 when the population moved. It is on no leg, by the 2026-08-23 owner ruling.
+
 ## Shared seams
 
 `map_lib.py` is the portable engine and is shared substrate rather than this feature's private code:

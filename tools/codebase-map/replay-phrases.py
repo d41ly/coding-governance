@@ -23,7 +23,11 @@ Usage:
     {cli}            # grade every phrase, print the summary
     {cli} --json     # the same, machine-readable
     {cli} --limit 20 # grade only the first N, for a quick before/after
+    {cli} --floor    # grade the FROZEN population against the recorded floors; exit 1 on a breach
     {cli}            # with no args it also prints the ceiling
+
+`--floor` is the definition-of-done check for a change to the probe's ranking, its candidate lines
+or the fan-in it reads (the codebase-map dossier's `## Constraints & why`). It is still on no leg.
 """
 
 from __future__ import annotations
@@ -76,6 +80,31 @@ __doc__ = (__doc__ or "").replace("{cli}", _resolve_self())
 # Re-declare it with --ceiling and say why; do not quietly raise it.
 CEILING_S = 60.0
 
+# THE FLOOR, over a FROZEN population (TOOL-aMendedFleet-41). The live harvest moves on record
+# traffic alone -- 335 phrases at hit rate 0.672 became 378 at 0.696 with no ranker change -- so a
+# floor over it reds or passes on records, not on ranking. `--floor` grades only the phrases from
+# records whose FILENAME date is on or before FLOOR_CORPUS_DATE (an undated record is outside), and
+# refuses at exit 2 when that population no longer counts FLOOR_PHRASES: a floor graded over a
+# different population compares nothing. What is left to move the readings is the ranker and the
+# symbol corpus, which is what a floor exists to grade.
+#
+# MEASURED 2026-10-05 on node a at base ef0995af8, after units 35 and 36 landed, over the population
+# dated on or before 2026-10-04, at the default budget 24576 B: 431 graded
+# phrases (439 in the live harvest), hit rate 0.842, hit@5 0.452, hit@10 0.529, hit@budget 0.833.
+# Each floor below is its reading.
+#
+# MOVING A FLOOR. Raising one is free. Lowering one writes the old value, the new value and the
+# reason on the line beside it, so the move is read in review rather than discovered later.
+FLOOR_CORPUS_DATE = "2026-10-04"
+FLOOR_PHRASES = 431
+FLOOR = {
+    "hit_rate": 0.842,
+    "hit5_rate": 0.452,
+    "hit10_rate": 0.529,
+    "hit_at_budget": 0.833,
+}
+_RECORD_DATE = re.compile(r"^(\d{4}-\d{2}-\d{2})-")
+
 # A probe invocation inside a build record. The phrase may WRAP across lines, which is the whole
 # reason this is a parser and not a grep: the parent measurement graded 133 phrases and a
 # single-line pattern reaches only about half of them.
@@ -98,6 +127,18 @@ def scan_tracked_specs(root: pathlib.Path) -> list[str]:
         capture_output=True, text=True, check=True,
     ).stdout.split()
     return [p for p in out if p.endswith(".md")]
+
+
+def derive_record_date(rel: str) -> str | None:
+    """The `YYYY-MM-DD` a record's BASENAME opens with, or None for an undated record."""
+    mo = _RECORD_DATE.match(pathlib.PurePosixPath(rel).name)
+    return mo.group(1) if mo else None
+
+
+def derive_floor_breaches(summary: dict, floor: dict) -> list[tuple[str, float, float]]:
+    """Every (metric, reading, floor) whose reading sits under its floor. A missing reading breaches."""
+    return [(k, summary.get(k), f) for k, f in floor.items()
+            if summary.get(k) is None or summary[k] < f]
 
 
 def extract_phrases(root: pathlib.Path, rel: str) -> list[tuple[str, list[str]]]:
@@ -203,7 +244,19 @@ def main() -> int:
     ap.add_argument("--budget", type=int, default=rl.DEFAULT_BUDGET,
                     help=f"byte budget hit@budget is read at (default {rl.DEFAULT_BUDGET}); "
                          "0 = unbounded")
+    ap.add_argument("--floor", action="store_true",
+                    help=f"grade the population dated on or before {FLOOR_CORPUS_DATE} against "
+                         "the recorded floors; exit 1 on a breach, 2 if the population moved")
     args = ap.parse_args()
+
+    if args.floor and args.limit:
+        print("replay-phrases: REFUSING — --floor with --limit: a partial population cannot be "
+              "graded against a floor of the whole.", file=sys.stderr)
+        return 2
+    if args.floor and args.budget != rl.DEFAULT_BUDGET:
+        print(f"replay-phrases: REFUSING — --floor at --budget {args.budget}: the hit_at_budget "
+              f"floor was read at the default {rl.DEFAULT_BUDGET}.", file=sys.stderr)
+        return 2
 
     if not args.json:
         print(f"# replay-phrases: declared wall-clock ceiling {args.ceiling:g}s "
@@ -213,6 +266,9 @@ def main() -> int:
     root = _resolve_repo_root()
     pairs: list[tuple[str, list[str]]] = []
     for rel in scan_tracked_specs(root):
+        # the date cut runs BEFORE the de-duplication, so no ground truth comes from a later record
+        if args.floor and (derive_record_date(rel) or "9999") > FLOOR_CORPUS_DATE:
+            continue
         pairs.extend(extract_phrases(root, rel))
     # de-duplicate on the phrase, keeping the first ground truth seen
     seen: dict[str, list[str]] = {}
@@ -222,6 +278,12 @@ def main() -> int:
     ungraded = len(seen) - len(graded)
     if args.limit:
         graded = graded[: args.limit]
+    if args.floor and len(graded) != FLOOR_PHRASES:
+        print(f"replay-phrases: REFUSING — the floor population dated on or before "
+              f"{FLOOR_CORPUS_DATE} counts {len(graded)} graded phrase(s), pinned at "
+              f"{FLOOR_PHRASES}; a floor graded over a different population compares nothing.",
+              file=sys.stderr)
+        return 2
 
     corpus = rl.load_corpus()
     # The scan stats ride each shortlist so its header -- which the budget charges -- carries the
@@ -264,8 +326,21 @@ def main() -> int:
         "corpus_symbols": measure_corpus_symbols(corpus),
     }
 
+    breaches = derive_floor_breaches(summary, FLOOR) if args.floor else []
+    floor_obj = {
+        "corpus_date": FLOOR_CORPUS_DATE,
+        "phrases": len(rows),
+        "phrases_pinned": FLOOR_PHRASES,
+        "budget": args.budget,
+        "metrics": {k: {"reading": summary[k], "floor": f} for k, f in FLOOR.items()},
+        "breaches": [k for k, _, _ in breaches],
+    }
+
     if args.json:
-        print(json.dumps({"summary": summary, "rows": rows}, indent=2, sort_keys=True))
+        out = {"summary": summary, "rows": rows}
+        if args.floor:
+            out["floor"] = floor_obj
+        print(json.dumps(out, indent=2, sort_keys=True))
     else:
         print(f"# graded {summary['phrases_graded']} phrase(s); "
               f"{summary['phrases_without_ground_truth']} carried no section-10 ground truth")
@@ -277,17 +352,24 @@ def main() -> int:
         print(f"phrases that CANNOT hit (truth outside the corpus) "
               f"{summary['phrases_truth_unreachable']}")
         print(f"elapsed                     {summary['elapsed_s']}s against a {args.ceiling:g}s ceiling")
+        if args.floor:
+            print(f"# floor: population dated on or before {FLOOR_CORPUS_DATE} · "
+                  f"{len(rows)} phrase(s), pinned {FLOOR_PHRASES} · budget {args.budget} B")
+            for k, f in FLOOR.items():
+                print(f"floor {k:<14} {summary[k]}  floor {f}")
 
     if not rows:
         print("replay-phrases: REFUSING — graded 0 phrases, so every figure above is vacuous. "
               "A run that finds nothing is not a passing run.", file=sys.stderr)
         return 2
+    for k, reading, f in breaches:
+        print(f"replay-phrases: FLOOR BREACHED — {k} {reading} under its floor {f}", file=sys.stderr)
     if elapsed > args.ceiling:
         print(f"replay-phrases: CEILING BREACHED — {elapsed:.1f}s against {args.ceiling:g}s. "
               "Fix the cost or re-declare the ceiling with a reason; do not raise it quietly.",
               file=sys.stderr)
         return 1
-    return 0
+    return 1 if breaches else 0
 
 
 def measure_corpus_symbols(corpus) -> int:
