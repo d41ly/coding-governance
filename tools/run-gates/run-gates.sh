@@ -29,7 +29,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.25   # gov:kit run-gates@1.25
+KIT_RUN_GATES_VERSION=1.26   # gov:kit run-gates@1.26
 # 1.24 -> 1.25: the manifest's NINTH field, `doc_reads`, and the docs mode `GATE_DOCS_BASE` that reads
 # it (TOOL-dThriftyLanding-1); a full green is also shared through the common git dir
 # (TOOL-dThriftyLanding-2). The canary's key-set pin admits the new key, which is the floor the

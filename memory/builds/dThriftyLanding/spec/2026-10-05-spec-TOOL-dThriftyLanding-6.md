@@ -1,10 +1,13 @@
 # TOOL-dThriftyLanding-6 — the carriers state how a doc-only push is scoped
 
-**Status:** OPEN · rev-1 · 2026-10-05 · node d · Tier-1 · base c3ef6742 · streams tooling · order 6
+**Status:** CLOSED · rev-2 · 2026-10-05 · node d · Tier-1 · base c3ef6742 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-05-build-TOOL-dThriftyLanding-6-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-dThriftyLanding-6-1-acceptance-ledger.md) | journal | — |
+| [2026-10-05-prompt-TOOL-dThriftyLanding-6-1-build-brief.md](../prompts/2026-10-05-prompt-TOOL-dThriftyLanding-6-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -25,6 +28,10 @@ mechanism into each, once, pointing at the source that owns it rather than resta
   class and their own legs' `doc_reads`. Observed by AC1 and AC3.
 - **S4** — `AGENTS.md`'s merge-bar section says the push boundary scopes a doc-only push, and that a
   green earned in any worktree serves every push. Observed by AC1 and AC3.
+- **S5** — Every kit whose shipped bytes this build moved advances its version once, in this unit,
+  because it is the last to touch them: run-gates to 1.26, lexicon 1.18, memory-tree 2.125,
+  process-monitor 0.14, review-harness 1.32 and unattended 1.68, each marker carrier with it.
+  Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -77,10 +84,13 @@ describes the lander and the hook.
   Red when: the key is declared without its grammar.
 - **AC3** — When the `charter size`, `line length` and `govkit runbook parity` legs run, they are green.
   Red when: an addition breaks a size or parity bound.
+- **AC4** — When `bash tools/check-kit-versions.sh` and `python tools/govkit/govkit.py epoch` run after
+  this unit's commit, the first prints `clean` and the second reports no `FAILED` kit.
+  Red when: a kit's shipped bytes moved and its version did not.
 
 ## 7. Gates
 
-`charter size` · `line length` · `govkit runbook parity` · `spec tokens (a spec's own names resolve)`
+`charter size` · `line length` · `govkit runbook parity` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
 
 ## 8. Open questions
 
@@ -89,6 +99,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-05 · initial draft.
+- rev-2 · 2026-10-05 · S5 and AC4: the version bumps the kit epoch owes ride the last unit to touch the
+  kits; the charter's addition is paid for by a trimmed clause, the cap having 73 bytes left.
 
 ## 10. Reuse audit
 

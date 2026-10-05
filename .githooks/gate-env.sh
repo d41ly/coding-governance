@@ -66,6 +66,11 @@
 #   GOV_BRANCH_GATE_CMD=<cmd> a bar for a push that does NOT touch the default branch, vetted by the
 #                             same rule at HEAD and fed git's pre-push ref lines on stdin. Unset, such
 #                             a push is ungated. It can only add a refusal, never remove one.
+#   GATE_DOC_PATHS="<paths>"  the doc class: space-separated repo paths, each a file or a directory
+#                             ending in `/`, no glob, no leading `:` or `/`, no `..`. A push that changes
+#                             nothing outside it is doc-only, and its bar runs only the legs whose
+#                             declared `doc_reads` moved. PARSED at the remote's tip by the hook, never
+#                             read from the sourced value; empty or absent is no doc class.
 #   INHERITED_RED=park|land   whether a push may land over a red its default branch already carries.
 #                             PARSED at the remote's tip by the hook and the unattended driver, never
 #                             read from the sourced value; see the policy block below.
