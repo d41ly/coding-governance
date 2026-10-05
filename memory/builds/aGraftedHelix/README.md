@@ -142,7 +142,7 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraf
 | [TOOL-aGraftedHelix-32 — the closing review's 21 MEDIUM and LOW findings, fixed as one batch](spec/2026-10-05-spec-TOOL-aGraftedHelix-32.md) | 16 | 2 | CLOSED | rev-3 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 46 bound to this build, across 4 record folder(s).
+Records: 47 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
