@@ -99,7 +99,7 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 28 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
+**Build status:** SPECCED · 29 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
 ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13
 ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-26
 ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32
@@ -135,13 +135,14 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraf
 | [TOOL-aGraftedHelix-16 — the spec commit stage re-stages the authored specs after the generator renders them, and a real-git arm runs the prompt's own git block](spec/2026-10-04-spec-TOOL-aGraftedHelix-16.md) | 11 | 1 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aGraftedHelix-21 — the spec commit block's delta loop lists untracked paths as its record does, compares paths, and refuses when its record is unset](spec/2026-10-04-spec-TOOL-aGraftedHelix-21.md) | 12 | 1 | CLOSED | rev-4 | 2026-10-05 |
 | [TOOL-aGraftedHelix-28 — a parity gate holds the by-design head the catalogue renders equal to the pattern the review harness parses](spec/2026-10-05-spec-TOOL-aGraftedHelix-28.md) | 12 | 1 | CLOSED | rev-2 | 2026-10-05 |
+| [TOOL-aGraftedHelix-29 — the by-design block is rendered from the invariant records at the review's base, so a change cannot write its own exemption](spec/2026-10-05-spec-TOOL-aGraftedHelix-29.md) | 13 | 2 | SPECCED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
 Records: 42 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-26 TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28.
+Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-26 TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -160,6 +161,7 @@ Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-26 TOOL-aGraftedHe
 | 10 | `TOOL-aGraftedHelix-15` | no |
 | 11 | `TOOL-aGraftedHelix-16` | no |
 | 12 | `TOOL-aGraftedHelix-21`, `TOOL-aGraftedHelix-28` | yes |
+| 13 | `TOOL-aGraftedHelix-29` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
