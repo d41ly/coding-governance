@@ -54,6 +54,13 @@ A change to the reuse probe's ranking, its candidate lines or the fan-in it read
 That grades a population FROZEN by record date against floors recorded in the script, exits 1 on a
 breach and 2 when the population moved. It is on no leg, by the 2026-08-23 owner ruling.
 
+`generated/CARDS.md` gives each feature a card of at most `FEATURE_CARD_CAP_BYTES` (1024), rendered
+by `map_lib.render_cards_md` from the toml fence ALONE, so a reader learns a dossier's title, status
+and claims without paying for its prose (TOOL-aMendedFleet-43). It reads no prose by design: a prose
+edit never stales it, and a fence edit stales it exactly when it stales `MAP.md`. A card past the
+cap drops items one at a time and its `cut <n> item(s)` line counts them; every list line keeps its
+full count. `FOUNDATION.md` gets no card.
+
 ## Shared seams
 
 `map_lib.py` is the portable engine and is shared substrate rather than this feature's private code:

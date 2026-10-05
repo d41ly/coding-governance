@@ -271,6 +271,7 @@ def test_generated_artifacts_are_fresh() -> None:
     fresh = {
         gen_dir / "inventories.json": m.render_inventories_json(inventories, INVENTORY_IDS),
         gen_dir / "MAP.md": m.render_map_md(inventories, INVENTORY_IDS, owners, tree.baseline),
+        gen_dir / "CARDS.md": m.render_cards_md(tree, INVENTORY_IDS),
     }
     # CONDITIONAL tiers, one record each. A tier that does not run is REPORTED, never omitted: an
     # `if population:` with no `else` compares nothing and passes, which reads exactly like a tier

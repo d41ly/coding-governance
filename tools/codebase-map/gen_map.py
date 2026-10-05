@@ -102,7 +102,8 @@ inventories: `{kit}/map_extractors.py`; gate: see `.codebase-map.conf` GATE_FILE
   (seeded at adoption; a new dossier is never graced, a touch drops entries).
 - `features/<feature>.md` — one dossier per feature: first ```toml fence = machine claims,
   then `## Constraints & why` · `## Shared seams` · `## Gaps` · `## Reuse affordance` prose.
-- `generated/` — `inventories.json` (keys-only) + `MAP.md` (claimant-annotated) + `symbols.json`
+- `generated/` — `inventories.json` (keys-only) + `MAP.md` (claimant-annotated) + `CARDS.md`
+  (one card of at most 1 KB per feature, from its toml fence alone) + `symbols.json`
   (reuse-recall index — only when the SYMBOL tier is declared in map_extractors.py); regenerate
   with `{regen}`, never hand-edit.
 
@@ -135,6 +136,7 @@ def _artifacts() -> dict[Path, str]:
     arts = {
         gen_dir / "inventories.json": m.render_inventories_json(inventories, IDS),
         gen_dir / "MAP.md": m.render_map_md(inventories, IDS, owners, tree.baseline),
+        gen_dir / "CARDS.md": m.render_cards_md(tree, IDS),
     }
     # SYMBOL recall tier (optional): render symbols.json only when the project declares symbol
     # extractors and they yield symbols — an opted-out repo gets no artifact and no gate demand.
