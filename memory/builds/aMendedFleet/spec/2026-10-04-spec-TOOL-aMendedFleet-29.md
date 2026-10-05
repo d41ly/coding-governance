@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-29 — a recall gold set harvested from spec §10 probes, de-contaminated, graded at hit@10
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 29
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 29
 
 <!-- gen:spec-records -->
 
@@ -27,15 +27,16 @@ person has checked its labels.
   question does not truncate it. A probe with no `--terms` takes them from a `Recall terms used:`
   line in the same section; a probe with neither is set aside and counted, since the CLI refuses a
   question without terms. Observed by AC1 and AC4.
-- **S2** — `derive_probe_labels(spec, probe)` labels a question with every id in the conf's id
+- **S2** — `derive_probe_labels(spec)` labels a question with every id in the conf's id
   grammar, `extract.ID_RE`, that the same spec cites OUTSIDE §10 and whose slug is not the spec's own
-  build slug. Observed by AC1 and AC2.
+  build slug. Every probe of one spec shares that set. Observed by AC1 and AC2.
 - **S3** — de-contamination: every id the spec's §10 itself cites is excluded from that question's
   labels, because §10 is where the author recorded what the probe returned, and grading the probe on
   what it returned is circular. An id no record in the served `records` set anchors is excluded and
   counted as unresolved. A question left with no label is set aside and counted. Observed by AC2.
 - **S4** — `check-recall.py --spec-probes` grades each surviving question through unit 28's
-  `measure_served` at `k` 10, `SPEC_PROBE_K`, and prints one row per question, then one summary line:
+  `measure_served` at `k` 10, `SPEC_PROBE_K`, over the `terms` slice alone (a `slices` parameter,
+  defaulting to both), and prints one row per question, then one summary line:
   probes found, the count set aside for each reason, `n` graded, and hit@10 with `n` beside it. It
   exits 0 whenever at least one question was graded. Observed by AC1 and AC4.
 - **S5** — liveness: when the harvest finds no probe, or no question survives de-contamination,
@@ -194,6 +195,11 @@ New arm: tools/memory-recall/test_recall_floor.py · a fixture root with no §10
 - rev-2 · 2026-10-04 · §2 S8 · §4 · §7 · M2 cross-read: the definitions this unit adds
   move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
   code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
+- rev-3 · 2026-10-05 · §2 S2 · S4 · built: `derive_probe_labels` takes the spec alone, because S2
+  and S3 label per spec and the probe argument carried nothing; `measure_served` gains a `slices`
+  parameter defaulting to both lists, because a harvested probe has no `naive_terms`. The harvest
+  matches single quotes and curly quotes as well as double, so it finds more probes than §4's
+  double-quote floor; every figure is derived at run time, per AC1.
 
 ## 10. Reuse audit
 

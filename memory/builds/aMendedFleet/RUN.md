@@ -266,3 +266,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T04:07:12Z dispatch · item 8e84f7ff TOOL-aMendedFleet-28 · reason tools/memory-recall/query.py tools/memory-recall/selftest.py
 
 2026-10-05T04:09:58Z brief · item TOOL-aMendedFleet-29 · reason 37e2c28ec58f memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
+
+2026-10-05T04:14:29Z dispatch · item 3eff0503 TOOL-aMendedFleet-29 · reason tools/memory-recall/check-recall.py tools/memory-recall/test_recall_floor.py tools/memory-recall/README.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-29.md memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-29-1-acceptance-ledger.md memory/builds/aMendedFleet/README.md memory/LIVE.md
