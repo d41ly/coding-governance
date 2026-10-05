@@ -1,10 +1,15 @@
 # TOOL-aMendedFleet-73 — the vague-brief trial arm: a full spec against a short plan, on a three-sentence brief
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 73
+**Status:** INPROGRESS · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 73
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-06-build-TOOL-aMendedFleet-73-brief.md](../build/2026-10-06-build-TOOL-aMendedFleet-73-brief.md) | journal | — |
+| [2026-10-06-build-TOOL-aMendedFleet-73-harness.py](../build/2026-10-06-build-TOOL-aMendedFleet-73-harness.py) | journal | — |
+| [2026-10-06-build-TOOL-aMendedFleet-73-hidden-suite.py](../build/2026-10-06-build-TOOL-aMendedFleet-73-hidden-suite.py) | journal | — |
+| [2026-10-06-build-TOOL-aMendedFleet-73-trial.js](../build/2026-10-06-build-TOOL-aMendedFleet-73-trial.js) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -29,12 +34,16 @@ decision rule is written down before any arm runs. It reports; it changes no rul
   hint, and holds at least the fourteen rows §4 lists. Observed by AC1.
 - **S2** — THE HARNESS. One Python file under `build/`, standard library plus the installed pytest,
   with six verbs. `cells` makes ten cell repositories under a short `%TEMP%` root, each holding only
-  the vague brief, and the S cells also the spec skeleton from `memory/TEMPLATE-SPEC.md`. `freeze`
+  the vague brief, and the S cells also the spec skeleton from `memory/TEMPLATE-SPEC.md`, plus an
+  eleventh for the pilot; `cells --blind` copies the ten built tools and the exit-0 stub under salted
+  code names and keeps the key outside the blind directory. `freeze`
   writes the sha256 of the hidden suite and of the decision list to a committed rows file. `stub` runs
   the suite against an exit-0 stub. `hidden` runs the suite against each cell's tool and writes
   per-tool pass counts by tag. `tokens` sums each agent's output tokens and joins them to a cell by
   the prompt tag. `aggregate` reads committed rows only and prints the per-arm means, the exact
-  two-sided permutation p over all 252 five-against-five splits, and the verdict word of §4.
+  two-sided permutation p over all 252 five-against-five splits, and the verdict word of §4;
+  `aggregate --collect` first unblinds the scorers' marks and records them with the judges' marks.
+  `--selftest` asserts the permutation p and the verdict rule.
   Observed by AC2, AC3, AC6 and AC7.
 - **S3** — THE HIDDEN SUITE, written from the full brief by an agent that has seen no implementation,
   because none exists when the unit pass writes it. Its tests reach a tool only through what the
@@ -45,7 +54,8 @@ decision rule is written down before any arm runs. It reports; it changes no rul
 - **S4** — THE TRIAL WORKFLOW. One Workflow script under `build/`, run once by the main loop, in six
   stages. Fan-out goes only through `boundedParallel(thunks, 5)`, inlined from
   `tools/workflows/tier2-review.js`, and every agent's prompt opens with a tag naming its cell or
-  stage. Observed by AC4, AC5 and AC8.
+  stage. A script runs no command, so two runner agents run the harness verbs between stages: one
+  grades the pilot, one grades the arms and blinds the tools. Observed by AC4, AC5 and AC8.
   1. A suite verifier re-tags any test asserting more than its tag allows, then runs `freeze` and
      `stub`.
   2. A pilot agent builds from the vague brief with no document, and `hidden` grades it. Above 0.8
@@ -59,7 +69,7 @@ decision rule is written down before any arm runs. It reports; it changes no rul
   5. At most two blind scorers mark each tool and decision met, unmet or contradicted, from those
      observations and the full brief alone.
   6. At most two document judges mark each P plan and S spec, per decision, decided-compatible,
-     decided-incompatible or silent.
+     decided-incompatible or silent; one judge reads the five plans, the other the five specs.
 - **S5** — THE RECORD. The result rows and a trial-report journal under `build/`. Every figure names
   the committed rows file and the harness verb that derives it, the report carries an acceptance
   ledger, and a section says what the arm cannot show. Observed by AC6 and AC7.
@@ -185,7 +195,8 @@ declared table in `.lexicon.conf`; `python3 tools/lexicon/lexicon.py --suggest` 
 
 ### Cost
 
-About 26 agents: one verifier, one pilot, five P, ten S, four probes, two scorers and two judges.
+About 27 agents: one verifier, one pilot, two runners, five P, ten S, four probes, two scorers and
+two judges.
 Output tokens are estimated at 0.6 to 0.7 million from the first trial's per-step means, which is
 UNVERIFIED for a vaguer brief. Concurrency never exceeds five.
 
@@ -286,6 +297,11 @@ New arm: none · the instruments carry their own liveness controls (AC2, AC3, AC
 
 - rev-1 · 2026-10-04 · initial draft; the first trial's record re-read, its scratch root found empty,
   and the arm designed with a decision rule registered before it runs.
+- rev-2 · 2026-10-06 · S2 · S4 · §4 · the unit pass found three things the design needed and did not
+  name: the pilot needs a cell of its own, so `cells` makes eleven; the scorers must not see which
+  cell built a tool, so `cells --blind` and `aggregate --collect` carry the salted names and the
+  unblinding inside the six verbs; and a Workflow script runs no command, so two runner agents run
+  the grading verbs, which moves the agent estimate from 26 to 27.
 
 ## 10. Reuse audit
 
