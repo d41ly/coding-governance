@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-65 — the lander mints kit versions, so a branch owes no bump
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 65
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 65
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-65-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-65-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -36,11 +38,12 @@ and the two epoch legs stop demanding a bump anywhere but at the push boundary.
   `derive_epoch_state`, that `cmd_epoch` and S1 both call, so the verb that mints and the leg that
   grades cannot disagree about which entry owes a bump. `cmd_epoch`'s printed lines and exit codes are
   unchanged by the extraction. Observed by AC2.
-- **S3** — `tools/push-main.sh --prepare` makes its merge with `--no-commit`, runs the minter with
-  `--base` set to the advertised tip, adds what it wrote, and commits the merge with today's subject.
-  The minted value therefore enters through the prepared merge itself, which `cmd_epoch` already
-  counts as a bump for every move the merge contains, and the idempotency check and
-  `check_prepared_merge` still see one merge whose first parent is the tip. A minter exit other than
+- **S3** — `tools/push-main.sh --prepare` makes its merge as today, runs the minter with `--base`
+  set to the advertised tip and `--head` set to the branch tip, and, when the minter wrote anything,
+  adds it and rewrites that merge in place with `git commit-tree`: the same two parents, today's
+  subject, the minted tree. The minted value therefore enters through the prepared merge itself,
+  which `cmd_epoch` already counts as a bump for every move the merge contains, and the idempotency
+  check and `check_prepared_merge` still see one merge whose first parent is the tip. A minter exit other than
   0 aborts the merge, checks the branch back out unmoved, prints the minter's lines and returns 1,
   the shape of the CONFLICT refusal. Unit 3's merge-loss check keeps the place its S5 gives it, after
   a merge commit exists and before the compare-and-swap `update-ref`, so it grades the committed,
@@ -48,21 +51,26 @@ and the two epoch legs stop demanding a bump anywhere but at the push boundary.
 - **S4** — The attended landing, `push-main.sh` with no argument, runs the minter after its reconcile
   step on every attempt, with `--base` set to the fetched remote tip. When the minter wrote anything,
   it commits the writes on the default branch with the subject
-  `mint: kit versions onto <remote>/<branch> at <sha8>`, which names no unit id. Observed by AC4.
+  `mint: kit versions onto <remote>/<branch> at <sha8>`, which names no unit id, with `--no-verify`
+  for S3's reason; the pre-push bar grades it. A minter exit other than 0 restores the tree to `HEAD`
+  and exits 1. Observed by AC4.
 - **S5** — THE MINTER IS RESOLVED, NEVER SPELLED. The lander finds the deployer the way unit 3's
   merge-loss call finds its kit from this script, with the python resolver that unit adds. Where no
   deployer resolves, which is every adopter because govkit stays in gov, both landing paths print one
   line saying versions were not minted and why, and land as they do today. Observed by AC5.
 - **S6** — THE OBLIGATION BINDS AT THE PUSH BOUNDARY ONLY. `cmd_epoch` reads `GATE_PUSH_BASE`, which
   `.githooks/pre-push` exports from git's own ref line and unsets for a branch push. When it is set and
-  no `--base` is given, it is the base, and every FAILED line stands as today. When it is unset, an
-  entry whose only fault is a move no bump dates prints
+  no `--base` is given, it is the base, and every FAILED line stands as today. An explicit `--base`
+  grades as today too, whatever the environment: it is the caller asking for the whole verdict. When
+  neither is given, an entry whose only fault is a move no bump dates prints
   `epoch: <eid> · owed at the lander · moved in <sha10> (<n> files)` and does not count as failed;
   every other FAILED line, an unresolvable base included, stands. Observed by AC7, AC8.
 - **S7** — `tools/memory-tree/check-verdict-epoch.sh` takes the same rule: with `GATE_PUSH_BASE` set
-  and no argument it grades over that base as today, and with it unset its engine-moved-constant-did-
-  not finding prints one `owed at the lander` line and exits 0. Its misconfiguration exit 2 is
-  unchanged. Observed by AC9.
+  and no argument, or with an explicit base argument, it grades as today, and with neither its
+  engine-moved-constant-did-not finding prints one `owed at the lander` line and exits 0. Its
+  misconfiguration exit 2 is unchanged. Its bump search reads a merge against its FIRST parent, as
+  `cmd_epoch`'s does, so the value S3 mints into the prepared merge dates the branch's moves at the
+  push boundary. Observed by AC9.
 - **S8** — The `push-main.sh` usage header, `cmd_epoch`'s docstring and the `check-verdict-epoch.sh`
   header each say where the bump is now made and what the off-boundary run does NOT check. Observed
   by AC10.
@@ -84,6 +92,10 @@ and the two epoch legs stop demanding a bump anywhere but at the push boundary.
   as `skip` today and the minter does the same.
 - Rewriting the version history of any landed commit, or renumbering a value main already carries.
 - Any change to `check-kit-versions.sh`; it grades agreement, which the carrier writer keeps.
+- Re-stamping the kickoff manifest. A minted carrier on its `watch:` line, such as
+  `check-memory-hygiene.sh`, is a watched move the lander cannot audit, so its C5 reds at the push
+  bar; the remedy is the one it prints, a re-stamp committed on the prepared branch, and a later
+  unit owns making the lander say so before the bar does.
 
 ### Edges
 
@@ -277,6 +289,12 @@ New arm: `tools/memory-tree/check-verdict-epoch.test.sh` · an unbumped engine m
   check after the minted merge is committed, so the two edits to `cmd_prepare` compose. S10, §4 and
   §7: the two Python definitions move `memory/map/generated/symbols.json`, which the build's other
   Python-adding units declare with the coverage leg and this spec omitted.
+- rev-3 · 2026-10-05 · S3, S4, S6, S7, §3 · found building. S3: `--no-commit` concluded by
+  `git commit` fires the pre-commit staged legs over the whole landing diff, which `git merge` never
+  fires, so the merge is made as today and rewritten with the minted tree by `git commit-tree`; S4's
+  commit skips the hooks for the same reason. S6, S7: an explicit base grades as today, because the
+  existing epoch self-test arms pass one and expect FAILED. S7: its `-G` search skipped merges, so
+  the minted merge would not have dated the move at the push boundary. §3: the manifest seam.
 
 ## 10. Reuse audit
 

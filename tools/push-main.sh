@@ -23,6 +23,14 @@
 #                                            belonging to another build.
 #   push-main.sh --prepared --slug <slug>    exit 0 when HEAD carries a prepared merge; read-only.
 #
+# KIT VERSIONS ARE MINTED HERE, NOT ON A BRANCH (TOOL-aMendedFleet-65). The minting `--prepare` runs
+# the deployer's `govkit.py mint` over the advertised tip..the branch tip and writes each kit version
+# the landing owes INTO the prepared merge; the attended landing mints over the fetched tip and
+# commits the result as `mint: kit versions onto <remote>/<branch> at <sha8>`. A branch therefore
+# owes no bump: the epoch legs grade one only at the push boundary. Where no deployer resolves beside
+# this lander, which is every adopter, both paths say so in one line and land as before. What a mint
+# does NOT do: re-stamp the kickoff manifest, so a minted carrier on its watch line still reds C5.
+#
 # WHY THE FLAGS EXIST — TOOL-dDerivedDocket-2. The attended path lands only from the primary tree
 # with the default branch checked out, and it pushes that branch, which every build on the node
 # shares. A run that is never on it therefore had to leave its own tree to land, and its landing
@@ -543,13 +551,40 @@ check_merge_losses() {  # R · T -> 1 when a merge in R..T loses a definition; 0
   return 0
 }
 
+# ---- KIT VERSIONS, minted at the landing — TOOL-aMendedFleet-65 ----------------------------------
+# `run_minter <base> [<head>]` runs the deployer's `mint` verb, which writes the next version of every
+# kit whose shipped bytes moved in <base>..<head> with no bump dating the move, into the WORKING TREE;
+# the caller commits what it wrote. Found the way the merge-loss check finds its kit, from this
+# script's own directory. No python or no deployer, which is every adopter because govkit stays in
+# gov, prints one line and returns 0: the landing proceeds exactly as it did before this existed.
+# The minter's lines go to stdout on success; on a refusal to stderr, and this returns 1.
+run_minter() {  # base · [head] -> 0 minted, clean or announced-skipped · 1 the minter refused
+  local py dir out rc
+  if ! py=$(resolve_python 2>/dev/null); then
+    echo "push-main: kit versions were NOT minted — no usable python launcher; the push bar's epoch legs grade the landing."
+    return 0
+  fi
+  if ! dir=$(resolve_kit_dir "$py" govkit govkit.py "$self_dir" 2>/dev/null); then
+    echo "push-main: kit versions were NOT minted — no govkit deployer beside this lander; the push bar's epoch legs grade the landing."
+    return 0
+  fi
+  out=$("$py" "$top/$dir/govkit.py" mint --base "$1" ${2:+--head "$2"} 2>&1); rc=$?
+  if [ "$rc" -eq 0 ]; then
+    printf '%s\n' "$out" | grep -v -e ' · clean$' -e ' · skip · ' || true
+    return 0
+  fi
+  echo "push-main: the version minter REFUSED (exit $rc):" >&2
+  printf '%s\n' "$out" | sed 's/^/  /' >&2
+  return 1
+}
+
 # `--prepare`: merge THIS branch onto the advertised tip, in place, and move the branch to it.
 #
 # THE SUBJECT NAMES THE SLUG AND NO UNIT ID. `build_commit` in the unattended kit joins a commit to
 # a unit by the unit id as a whole token in its subject, so a unit id here would make the landing
 # merge that unit's build commit and move every verdict derived from it.
 cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing could be observed
-  local branch oldb R t dirt
+  local branch oldb R t dirt msg
   branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
   if [ -z "$branch" ]; then
     echo "push-main: HEAD is detached, and preparing a landing moves the branch it is made on — check the run's branch out first." >&2
@@ -584,7 +619,8 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     echo "push-main: could not check out the advertised tip ${R:0:8} to merge onto; nothing was changed." >&2
     return 1
   fi
-  if ! git merge --no-ff "$oldb" -m "merge: $SLUG — land onto $remote/$def at ${R:0:8}" >/dev/null 2>&1; then
+  msg="merge: $SLUG — land onto $remote/$def at ${R:0:8}"
+  if ! git merge --no-ff "$oldb" -m "$msg" >/dev/null 2>&1; then
     git merge --abort >/dev/null 2>&1 || true
     git checkout "$branch" >/dev/null 2>&1 || true
     echo "push-main: merging '$branch' onto $remote/$def at ${R:0:8} CONFLICTS. Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
@@ -598,6 +634,27 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     git checkout "$branch" >/dev/null 2>&1 || true
     echo "push-main: '$branch' is already contained in $remote/$def at ${R:0:8} — there is nothing to land." >&2
     return 1
+  fi
+  # MINT INTO THE MERGE (TOOL-aMendedFleet-65 S3): the versions this landing owes are written over
+  # the merged tree and the merge is REWRITTEN with them, same parents and subject, so the value
+  # enters through the prepared merge itself and the idempotency check above still sees one merge
+  # on the tip. `commit-tree`, not `--no-commit` and `git commit`: concluding a merge with
+  # `git commit` fires the pre-commit staged legs over the whole landing diff, which `git merge`
+  # never fires. A refusal takes the CONFLICT path's exit shape: the branch is left unmoved.
+  if ! run_minter "$R" "$oldb"; then
+    git reset -q --hard "$t" >/dev/null 2>&1 || true
+    git checkout "$branch" >/dev/null 2>&1 || true
+    echo "push-main: the kit versions this landing owes could not be minted (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+    return 1
+  fi
+  if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
+    git add -A
+    if ! t=$(git commit-tree "$(git write-tree)" -p "$R" -p "$oldb" -m "$msg") || ! git update-ref --no-deref HEAD "$t"; then
+      git reset -q --hard HEAD >/dev/null 2>&1 || true
+      git checkout "$branch" >/dev/null 2>&1 || true
+      echo "push-main: could not commit the minted versions into the merge. Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+      return 1
+    fi
   fi
   # MERGE LOSS (TOOL-aMendedFleet-3): the CONFLICT path's exit shape, so a refused landing leaves the
   # branch exactly where it was. `R..t` holds this merge and every merge the branch carries past R.
@@ -733,6 +790,24 @@ while [ "$attempt" -le "$max" ]; do
     if ! git merge --no-ff "$remote/$def" -m "Merge $remote/$def into $def (push-main reconcile)"; then
       git merge --abort
       echo "push-main: reconcile CONFLICT — resolve manually, commit, then re-run push-main. Aborted (no push)." >&2
+      exit 1
+    fi
+  fi
+
+  # MINT, on every attempt (TOOL-aMendedFleet-65 S4): this path has no prepared merge, so the versions
+  # this landing owes over the fetched tip are their own commit. Its subject names no unit id, for
+  # the reason --prepare's does. `--no-verify` for the reason --prepare uses `commit-tree`; the
+  # pre-push bar below grades the commit like every other one it pushes.
+  mt=$(git rev-parse --verify "refs/remotes/$remote/$def")
+  if ! run_minter "$mt"; then
+    git reset -q --hard HEAD >/dev/null 2>&1 || true
+    echo "push-main: the kit versions this landing owes could not be minted (named above). Aborted (no push)." >&2
+    exit 1
+  fi
+  if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
+    git add -A
+    if ! git commit -q --no-verify -m "mint: kit versions onto $remote/$def at ${mt:0:8}"; then
+      echo "push-main: could not commit the minted versions. Aborted (no push)." >&2
       exit 1
     fi
   fi

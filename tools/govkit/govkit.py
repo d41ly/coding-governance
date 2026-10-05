@@ -1632,13 +1632,8 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         fixed = write_version_carriers(root, fdescs, derive_marker_basis(root, fdescs))
         for f, _eid, cid, old, new in fixed:
             print(f"govkit: fix {f} · {cid} {old} -> {new}")
-        troot = derive_tool_root(root)
         for eid in sorted({row[1] for row in fixed}):
-            fd = fdescs[eid][0]
-            ctx = {**canonical_ctx(eid), "kit": (fd.get("home") or "").rstrip("/") or troot}
-            argvs = list(dict.fromkeys(resolve_tokens(" ".join(str(a) for a in (g.get("argv") or [])),
-                                                      ctx)[0]
-                                       for g in (fd.get("regenerate") or [])))
+            argvs = [" ".join(a) for a in derive_regenerate_argvs(root, eid, fdescs[eid][0])]
             if argvs:
                 print(f"govkit: fix {eid} moved · next: {' ; '.join(argvs)}")
             else:
@@ -12243,10 +12238,92 @@ def resolve_version_value_at(root: pathlib.Path, desc: dict, commit: str) -> str
     `check-verdict-epoch.sh` makes about its own candidates, so the first dotted number after the
     pattern is the value. A line with none keeps its whole text, which still compares honestly.
     """
-    line = resolve_entry_version_at(root, desc, commit)
+    return derive_version_value(desc, resolve_entry_version_at(root, desc, commit))
+
+
+def derive_version_value(desc: dict, line: str) -> str:
+    """The first dotted number after an entry's version pattern on `line`, else `line` itself.
+
+    ONE reading for the value at a commit and the value in the working tree, which `mint` grades
+    the merge it is about to commit by; two would let the minter and the leg disagree on a number.
+    """
     m = re.search((desc.get("version_from") or {}).get("pattern") or "^", line)
     v = re.search(r"\d+(?:\.\d+)+", line[m.end():] if m else line)
     return v.group(0) if v else line
+
+
+def derive_regenerate_argvs(root: pathlib.Path, eid: str, desc: dict) -> list[list[str]]:
+    """An entry's declared `[[regenerate]]` argvs, tokens resolved, duplicates dropped, in order.
+
+    `{kit}` is the entry's home, else the tool root, and every other token comes from
+    `canonical_ctx`, so each argv runs from the repo root. `selfcheck --fix` prints these and
+    `mint` runs them: one resolution, so the command printed is the command a landing runs.
+    """
+    ctx = {**canonical_ctx(eid), "kit": (desc.get("home") or "").rstrip("/") or derive_tool_root(root)}
+    out: list[list[str]] = []
+    for g in desc.get("regenerate") or []:
+        argv = [resolve_tokens(str(a), ctx)[0] for a in (g.get("argv") or [])]
+        if argv and argv not in out:
+            out.append(argv)
+    return out
+
+
+def derive_epoch_state(root: pathlib.Path, eid: str, desc: dict, base: str, head: str = "HEAD",
+                       now: str | None = None) -> tuple[str, str, str, int]:
+    """One entry's epoch verdict over `<base>..<head>`: `(kind, text, mover, files)`.
+
+    `kind` is `clean`, `skip`, `moved` (a move no bump dates, the one fault a minted value cures) or
+    `broken` (no source to measure, an unreadable version). `text` is the line `epoch` prints after
+    `epoch: <eid> · `. `now` is the value to grade as the head's; None reads it at `head`, and
+    `mint` passes the working tree's. TOOL-aMendedFleet-65 S2: the leg that grades and the verb
+    that mints call this one function, so they cannot disagree about which entry owes a bump.
+    """
+    rng = f"{base}..{head}"
+    paths = sorted({row["src"] for row in resolve_entry(root, desc, canonical_ctx(eid))["survivors"]
+                    if row.get("src") and row["role"] in EPOCH_ROLES})
+    if not paths:
+        return "broken", f"FAILED · no {'/'.join(EPOCH_ROLES)} source to measure", "", 0
+    vf = desc.get("version_from") or {}
+    if "none" in vf or not vf.get("file"):
+        moved = sorted({p for p in git(root, "-c", "core.quotePath=false", "log", "--format=",
+                                       "--name-only", "--full-history", "--no-merges", rng,
+                                       "--", *paths).splitlines() if p})
+        return "skip", f"skip · no declared version · moved: {' '.join(moved) or 'none'}", "", 0
+    where = head if now is None else "the working tree"
+    if now is None:
+        now = resolve_version_value_at(root, desc, head)
+    if now.startswith("("):
+        return "broken", f"FAILED · version {now} at {where}", "", 0
+    movers = git(root, "rev-list", "--full-history", "--no-merges", rng, "--", *paths).split()
+    if not movers:
+        return "clean", f"clean · {now}", "", 0
+    # THE BASE VOTES FIRST. A branch that moved bytes and then reconciled a mainline that had
+    # bumped the kit carries a merge whose value differs from its first parent, which reads as a
+    # bump below — yet the base already holds the value HEAD holds, with other bytes. Two trees,
+    # one number: the defect itself, so an unchanged value against the base is a FAILED outright.
+    same = resolve_version_value_at(root, desc, base) == now
+    home = (desc.get("home") or "").rstrip("/")
+    vsrc = f"{home}/{vf['file']}" if home else vf["file"]
+    # S is VALIDATED, not matched: `-G` finds commits touching the version line, and only one
+    # whose value differs from its FIRST parent's is a bump. A decoy edit must not launder a
+    # move. Merges are diffed against their first parent, because a value can enter a range
+    # only through a merge — measured: check-wiring's 1.4 -> 1.5 over fd240496..a7c78ad2.
+    bumps = [] if same else [
+        c for c in git(root, "log", "--format=%H", "--no-patch", "--full-history",
+                       "--diff-merges=first-parent", "-G", vf["pattern"], rng, "--", vsrc).split()
+        if resolve_version_value_at(root, desc, c) != resolve_version_value_at(root, desc, c + "^")]
+    loose = movers if not bumps else git(
+        root, "rev-list", "--full-history", "--no-merges", head, f"^{base}",
+        *(f"^{s}" for s in bumps), "--", *paths).split()
+    if not loose:
+        return "clean", f"clean · {now}", "", 0
+    w = loose[0]
+    n = len([p for p in git(root, "diff-tree", "--no-commit-id", "--name-only", "-r", w,
+                            "--", *paths).splitlines() if p])
+    if not bumps:
+        return "moved", (f"FAILED · moved in {w[:10]} ({n} files) · no value change in "
+                         f"{base[:10]}..{head[:10]} (still {now})"), w, n
+    return "moved", f"FAILED · last bump {bumps[0][:10]} precedes last move {w[:10]}", w, n
 
 
 def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
@@ -12270,6 +12347,13 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
     Nor a move made inside a merge's own resolution, and a merge that brings a new value in counts
     as a bump for every move it contains: over a long branchy range that is lenient, and on the
     push-boundary range the base check above is what closes it.
+
+    WHERE THE BUMP IS MADE (TOOL-aMendedFleet-65 S6). The lander mints it, `govkit.py mint`, into the
+    prepared merge or the attended landing's mint commit, so a branch owes none. The obligation
+    therefore binds at the PUSH BOUNDARY: `GATE_PUSH_BASE`, which `.githooks/pre-push` exports for a
+    default-branch push, is the base, and every FAILED line stands. An explicit `--base` grades the
+    same way. With neither, a move no bump dates prints `owed at the lander` and does not fail, so
+    an off-boundary run does NOT check that a branch bumped — only that nothing else is broken.
     Exit 1 on any FAILED line or an unresolvable base, 2 on an unreadable registry, else 0.
     """
     r = Report()
@@ -12278,6 +12362,9 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
         for p in r.problems:
             sys.stderr.write(f"govkit: {p}\n")
         return 2
+    boundary = base is not None
+    if base is None and os.environ.get("GATE_PUSH_BASE"):
+        base, boundary = os.environ["GATE_PUSH_BASE"], True
     if base is None:
         # The default base is `check-verdict-epoch.sh`'s: the merge-base with the default branch,
         # the remote's first. No base is a FAILED exit 1 and never a zero-status skip, because
@@ -12296,63 +12383,116 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
               " · fetch full history, set GOV_DEFAULT_BRANCH, or pass --base <rev>")
         return 1
     base = rb.stdout.strip()
-    rng = f"{base}..HEAD"
+    failed = 0
+    for eid in sorted(descs):
+        kind, text, w, n = derive_epoch_state(root, eid, descs[eid][0], base)
+        if kind == "moved" and not boundary:
+            print(f"epoch: {eid} · owed at the lander · moved in {w[:10]} ({n} files)")
+            continue
+        print(f"epoch: {eid} · {text}")
+        failed += kind in ("moved", "broken")
+    return 1 if failed else 0
+
+
+def cmd_mint(root: pathlib.Path, base: str, head: str | None) -> int:
+    """TOOL-aMendedFleet-65 S1 — the lander's half of the epoch rule: mint what `epoch` would fail.
+
+    For every entry declaring a version, the `derive_epoch_state` verdict over `<base>..<head>` with
+    the value read from the WORKING TREE, which is the tree the lander is about to commit. A `moved`
+    entry gets its value's last dotted component plus one, written on its `version_from` line; then
+    `write_version_carriers` moves every other carrier and each minted entry's `[[regenerate]]`
+    argvs run from the repo root. `--head` defaults to `MERGE_HEAD` mid-merge, else `HEAD`.
+
+    DOES NOT: choose a bump size, mint an entry with no declared version (announced `skip`), stage or
+    commit anything — the lander does — or undo a partial write on failure; the lander discards the
+    tree when this exits non-zero. Exit 1 on an unresolvable base or head, a `broken` entry, a failed
+    write or a regenerate exiting non-zero; 2 on an unreadable registry; else 0.
+    """
+    r = Report()
+    descs = read_descriptors(root, load_registry(root), r)
+    if r.problems:
+        for p in r.problems:
+            sys.stderr.write(f"govkit: {p}\n")
+        return 2
+    if head is None:
+        mh = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet", "MERGE_HEAD"],
+                            capture_output=True, text=True, encoding="utf-8")
+        head = mh.stdout.strip() if mh.returncode == 0 and mh.stdout.strip() else "HEAD"
+    shas = []
+    for what, rev in (("base", base), ("head", head)):
+        rv = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet", f"{rev}^{{commit}}"],
+                            capture_output=True, text=True, encoding="utf-8")
+        if rv.returncode != 0 or not rv.stdout.strip():
+            print(f"mint: FAILED · no {what} to compare against ({rev})")
+            return 1
+        shas.append(rv.stdout.strip())
+    base, head = shas
+    minted: list[str] = []
     failed = 0
     for eid in sorted(descs):
         desc = descs[eid][0]
-        paths = sorted({row["src"] for row in resolve_entry(root, desc, canonical_ctx(eid))["survivors"]
-                        if row.get("src") and row["role"] in EPOCH_ROLES})
-        if not paths:
-            print(f"epoch: {eid} · FAILED · no {'/'.join(EPOCH_ROLES)} source to measure")
+        now = derive_version_value(desc, entry_version(root, desc))
+        kind, text, _w, _n = derive_epoch_state(root, eid, desc, base, head, now=now)
+        if kind == "skip":
+            print(f"mint: {eid} · skip · no declared version")
+            continue
+        if kind == "clean":
+            print(f"mint: {eid} · clean")
+            continue
+        if kind == "broken":
+            print(f"mint: {eid} · {text}")
             failed += 1
             continue
-        vf = desc.get("version_from") or {}
-        if "none" in vf or not vf.get("file"):
-            moved = sorted({p for p in git(root, "-c", "core.quotePath=false", "log", "--format=",
-                                           "--name-only", "--full-history", "--no-merges", rng,
-                                           "--", *paths).splitlines() if p})
-            print(f"epoch: {eid} · skip · no declared version · moved: {' '.join(moved) or 'none'}")
-            continue
-        now = resolve_version_value_at(root, desc, "HEAD")
-        if now.startswith("("):
-            print(f"epoch: {eid} · FAILED · version {now} at HEAD")
+        if not re.fullmatch(r"\d+(?:\.\d+)+", now):
+            print(f"mint: {eid} · FAILED · version {now} has no dotted number to move")
             failed += 1
             continue
-        movers = git(root, "rev-list", "--full-history", "--no-merges", rng, "--", *paths).split()
-        if not movers:
-            print(f"epoch: {eid} · clean · {now}")
-            continue
-        # THE BASE VOTES FIRST. A branch that moved bytes and then reconciled a mainline that had
-        # bumped the kit carries a merge whose value differs from its first parent, which reads as a
-        # bump below — yet the base already holds the value HEAD holds, with other bytes. Two trees,
-        # one number: the defect itself, so an unchanged value against the base is a FAILED outright.
-        same = resolve_version_value_at(root, desc, base) == now
+        parts = now.split(".")
+        new = ".".join(parts[:-1] + [str(int(parts[-1]) + 1)])
+        vf = desc["version_from"]
         home = (desc.get("home") or "").rstrip("/")
-        vsrc = f"{home}/{vf['file']}" if home else vf["file"]
-        # S is VALIDATED, not matched: `-G` finds commits touching the version line, and only one
-        # whose value differs from its FIRST parent's is a bump. A decoy edit must not launder a
-        # move. Merges are diffed against their first parent, because a value can enter a range
-        # only through a merge — measured: check-wiring's 1.4 -> 1.5 over fd240496..a7c78ad2.
-        bumps = [] if same else [
-            c for c in git(root, "log", "--format=%H", "--no-patch", "--full-history",
-                           "--diff-merges=first-parent", "-G", vf["pattern"], rng, "--", vsrc).split()
-            if resolve_version_value_at(root, desc, c) != resolve_version_value_at(root, desc, c + "^")]
-        loose = movers if not bumps else git(
-            root, "rev-list", "--full-history", "--no-merges", "HEAD", f"^{base}",
-            *(f"^{s}" for s in bumps), "--", *paths).split()
-        if not loose:
-            print(f"epoch: {eid} · clean · {now}")
+        fp = root / (f"{home}/{vf['file']}" if home else vf["file"])
+        wrote = False
+        try:
+            with open(fp, encoding="utf-8", newline="") as fh:
+                lines = fh.read().split("\n")
+            rx = re.compile(vf["pattern"])
+            for i, ln in enumerate(lines):
+                m = rx.search(ln)
+                v = re.search(r"\d+(?:\.\d+)+", ln[m.end():]) if m else None
+                if v:
+                    lines[i] = ln[:m.end() + v.start()] + new + ln[m.end() + v.end():]
+                    with open(fp, "w", encoding="utf-8", newline="") as fh:
+                        fh.write("\n".join(lines))
+                    wrote = True
+                    break
+        except (OSError, UnicodeDecodeError, re.error):
+            pass
+        if not wrote:
+            print(f"mint: {eid} · FAILED · could not write {new} on the version line of {fp.relative_to(root).as_posix()}")
+            failed += 1
             continue
-        failed += 1
-        w = loose[0]
-        if not bumps:
-            n = len([p for p in git(root, "diff-tree", "--no-commit-id", "--name-only", "-r", w,
-                                    "--", *paths).splitlines() if p])
-            print(f"epoch: {eid} · FAILED · moved in {w[:10]} ({n} files) · no value change in "
-                  f"{base[:10]}..HEAD (still {now})")
-        else:
-            print(f"epoch: {eid} · FAILED · last bump {bumps[0][:10]} precedes last move {w[:10]}")
-    return 1 if failed else 0
+        print(f"mint: {eid} · {now} -> {new}")
+        minted.append(eid)
+    if failed:
+        return 1
+    if not minted:
+        return 0
+    write_version_carriers(root, descs, derive_marker_basis(root, descs))
+    for eid in minted:
+        for argv in derive_regenerate_argvs(root, eid, descs[eid][0]):
+            try:
+                p = subprocess.run(resolve_shell_argv(argv), cwd=str(root), capture_output=True,
+                                   text=True, encoding="utf-8", errors="replace")
+                rc, tail = p.returncode, (p.stdout + p.stderr).strip().splitlines()[-5:]
+            except OSError as e:
+                rc, tail = 127, [str(e)]
+            if rc != 0:
+                print(f"mint: {eid} · FAILED · regenerate exited {rc}: {' '.join(argv)}")
+                for ln in tail:
+                    print(f"  {ln}")
+                return 1
+    return 0
 
 
 # ------------------------------------------------------------------------------------------- main
@@ -12360,6 +12500,7 @@ USAGE = """usage:
   govkit.py selfcheck [--write] [--fix]
   govkit.py shipped
   govkit.py epoch [--base <rev>]
+  govkit.py mint --base <rev> [--head <rev>]
   govkit.py plan --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
   govkit.py check --target <path> [--run-discharge]
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
@@ -12371,6 +12512,10 @@ USAGE = """usage:
 `selfcheck --fix` writes every kit-version carrier in check 5c's basis (markers, same-line constant
 copies, a harness `version:` field) from its entry's `version_from` constant, then grades as plain
 `selfcheck`; it prints each moved entry's `[[regenerate]]` argv and leaves running it to you.
+`epoch` with no `--base` and no `GATE_PUSH_BASE` reports a move no bump dates as `owed at the
+lander` and passes it: `mint`, which `push-main.sh` runs while it prepares a landing, writes the
+next value of every kit `epoch` would fail over `<base>..<head>` into the working tree, every
+carrier and `[[regenerate]]` argv included. It stages and commits nothing.
 `plan`, `check`, `update` and `adopt` are READ-ONLY and none writes a byte; `update --write` performs
 what `update` printed. `adopt` is the BOOTSTRAP: it writes the receipt an already-installed tree
 never had, by measuring that tree against gov's own history, and `--write` is what records it. It
@@ -12831,6 +12976,18 @@ def main(argv: list[str]) -> int:
             if len(argv) not in (1, 3) or (len(argv) == 3 and argv[1] != "--base"):
                 raise Refusal("epoch takes no arguments except --base <rev>")
             return cmd_epoch(repo_root(), argv[2] if len(argv) == 3 else None)
+        if argv[0] == "mint":
+            # TOOL-aMendedFleet-65 S1. `--base` is required: the lander names the tip it lands
+            # onto, and a minter that guessed one could mint against a tip nobody is landing on.
+            opts: dict[str, str] = {}
+            rest = argv[1:]
+            while rest:
+                if rest[0] not in ("--base", "--head") or rest[0] in opts or len(rest) < 2:
+                    raise Refusal("mint takes --base <rev> and an optional --head <rev>, nothing else")
+                opts[rest[0]], rest = rest[1], rest[2:]
+            if "--base" not in opts:
+                raise Refusal("mint needs --base <rev>, the tip the landing sits on")
+            return cmd_mint(repo_root(), opts["--base"], opts.get("--head"))
         (verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV, WRITE_WD,
          PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE, STAGED, ACCEPT_ROLE_MOVES,
          SUGGEST_PINS) = parse_args(argv)

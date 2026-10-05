@@ -610,4 +610,37 @@ else
   bad "23 no directory beside this lander holds the lexicon kit, so the merge-loss arm did not run"
 fi
 
+# 24 — TOOL-aMendedFleet-65 AC1: --prepare MINTS the kit versions the landing owes INTO the prepared
+#      merge. A clone of this repository at its committed HEAD, pushed to a bare remote as main; a
+#      branch adds a comment line to the runlog kit's extract.py and is prepared. The merge's diff
+#      against its first parent moves KIT_RUNLOG_VERSION to the tip's value plus one, and the lander
+#      prints one `mint: runlog` line. Observed RED against the base lander, which merged the move
+#      under the old value. Needs gov's deployer beside the lander; an install without one says so.
+_mt_gk=$(cd "$HERE" && for d in */; do [ -f "$d/govkit.py" ] && [ -f "$d/registry.toml" ] && { printf '%s' "${d%/}"; break; }; done)
+_mt_rl=$(cd "$HERE" && for d in */; do [ -f "$d/runlog_lib.py" ] && { printf '%s' "${d%/}"; break; }; done)
+if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ]; then
+  git clone -q --bare "$SRC" "$tmp/remote4.git"
+  git clone -q "$tmp/remote4.git" "$tmp/work4"
+  (
+    cd "$tmp/work4" || exit 1
+    git config user.email t@e; git config user.name t; git config core.autocrlf false
+    git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
+    git push -q -f origin main
+    git -C "$tmp/remote4.git" symbolic-ref HEAD refs/heads/main
+    R4=$(git rev-parse HEAD)
+    v0=$(sed -n 's/^KIT_RUNLOG_VERSION = "\([0-9.]*\)".*/\1/p' "${KIT_REL}$_mt_rl/runlog_lib.py")
+    v1="${v0%.*}.$(( ${v0##*.} + 1 ))"
+    git checkout -q -b feat
+    printf '# a comment line, push-main.test case 24\n' >> "${KIT_REL}$_mt_rl/extract.py"
+    git commit -q -am "move runlog"
+    out24=$(unset GATE_PUSH_BASE; bash "$lander" --prepare --slug tMint 2>/dev/null); rc24=$?
+    moved=$(git diff HEAD^1 HEAD -- "${KIT_REL}$_mt_rl/runlog_lib.py" | grep -c "^+KIT_RUNLOG_VERSION = \"$v1\"")
+    [ "$rc24" = 0 ] && [ "$(git rev-parse HEAD^1)" = "$R4" ] && [ "$moved" = 1 ] \
+      && [ "$(printf '%s\n' "$out24" | grep -c '^mint: runlog')" = 1 ] && [ -z "$(git status --porcelain)" ]
+  ) && ok "24 --prepare mints runlog's next version into the prepared merge and says so once" \
+    || bad "24 the prepared merge does not carry the minted runlog version (or the tree was left dirty)"
+else
+  echo "  skip — 24 no govkit deployer or runlog kit beside this lander, so the mint arm did not run"
+fi
+
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

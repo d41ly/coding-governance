@@ -1,10 +1,19 @@
 #!/usr/bin/env bash
 # check-verdict-epoch.sh — the kit version DATES the engine's verdicts, so it must move when they do.
 #
-#   bash <prefix>/memory-tree/check-verdict-epoch.sh [<base>]     # default base: the mainline merge-base
+#   bash <prefix>/memory-tree/check-verdict-epoch.sh [<base>]     # default base: GATE_PUSH_BASE, else the mainline merge-base
 #
-# Exit 0 = the constant is honest for this range · 1 = the engine moved and the constant did not ·
-# 2 = misconfigured.
+# Exit 0 = the constant is honest for this range, or the bump is owed at the lander · 1 = the engine
+# moved and the constant did not, at the push boundary · 2 = misconfigured.
+#
+# THE BUMP IS MINTED BY THE LANDER, NOT MADE ON A BRANCH (TOOL-aMendedFleet-65 S7). gov's
+# `push-main.sh` writes the next value into the prepared merge, so the obligation binds at the PUSH
+# BOUNDARY: with `GATE_PUSH_BASE` set, which `.githooks/pre-push` exports for a default-branch push,
+# or with an explicit <base>, every finding below fails as it always did. With neither, an engine
+# move the constant does not date prints one `owed at the lander` line and exits 0 — so an
+# off-boundary run does NOT check that a branch bumped, only that the gate is configured and has a
+# base. The bump search reads a merge against its FIRST parent, which is how a minted merge dates
+# the moves it carries.
 #
 # WHY. `hygiene-parity.test.sh` derives its baseline floor from the first commit introducing the
 # CURRENT `KIT_MEMORY_TREE_VERSION`, on the stated ground that the constant marks when the verdicts
@@ -174,7 +183,10 @@ SCAN="$ENGINE"
 for _d in $DELEGATES; do [ -f "$_d" ] && SCAN="$SCAN $_d"; done
 
 BASE="${1:-}"
+BOUNDARY=1
+[ -z "$BASE" ] && [ -n "${GATE_PUSH_BASE:-}" ] && BASE=$GATE_PUSH_BASE
 if [ -z "$BASE" ]; then
+  BOUNDARY=0
   DEF="${GOV_DEFAULT_BRANCH:-main}"
   BASE=$(git merge-base "origin/$DEF" HEAD 2>/dev/null || git merge-base "$DEF" HEAD 2>/dev/null || true)
 fi
@@ -256,8 +268,15 @@ while IFS= read -r cand; do
   prev=$(verat "$cand^")
   if [ -n "$cur" ] && [ "$cur" != "$prev" ]; then S="$cand"; break; fi
 done <<EOF
-$(git log --format=%H -G'^KIT_MEMORY_TREE_VERSION=' "$BASE"..HEAD -- "$ENGINE" 2>/dev/null)
+$(git log --format=%H --diff-merges=first-parent -G'^KIT_MEMORY_TREE_VERSION=' "$BASE"..HEAD -- "$ENGINE" 2>/dev/null)
 EOF
+
+# OFF THE PUSH BOUNDARY a move the constant does not date is the lander's to mint, not a failure.
+check_owed_at_lander() {
+  [ "$BOUNDARY" = 1 ] && return 0
+  echo "verdict-epoch: owed at the lander — $moved behaviour-bearing line(s) moved in $W and the version is still $now; push-main.sh mints it"
+  exit 0
+}
 
 remedy() {
   echo "verdict-epoch: Bump it in ALL THREE places, which must move together, in a commit at or after"
@@ -265,9 +284,11 @@ remedy() {
   echo "verdict-epoch:   $ENGINE (the constant AND the gov:kit marker on that same line)"
   echo "verdict-epoch:   ${_kit}HYGIENE.template.md (line 1)"
   echo "verdict-epoch:   memory/HYGIENE.md (line 1) — then: bash ${_kit}kit-dogfood-parity.test.sh --render"
+  echo "verdict-epoch: Or re-land through push-main.sh, whose --prepare mints it into the prepared merge."
 }
 
 if [ -z "$S" ]; then
+  check_owed_at_lander
   echo "verdict-epoch: FAILED — $moved behaviour-bearing line(s) of the engine moved in $W, and NO"
   echo "verdict-epoch: commit in ${BASE}..HEAD changes KIT_MEMORY_TREE_VERSION (still $now)."
   echo "verdict-epoch:   moved: $(moved_files "$W")"
@@ -279,6 +300,7 @@ if [ -z "$S" ]; then
 fi
 
 if ! git merge-base --is-ancestor "$W" "$S" 2>/dev/null; then
+  check_owed_at_lander
   echo "verdict-epoch: FAILED — the bump is OLDER than the change it claims to date."
   echo "verdict-epoch:   last behaviour-bearing engine change: $W ($moved line(s))"
   echo "verdict-epoch:   moved: $(moved_files "$W")"

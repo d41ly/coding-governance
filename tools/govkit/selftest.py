@@ -944,6 +944,85 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
           p.returncode == 2 and "epoch takes no arguments except --base" in p.stderr, p.stderr)
 
 
+def check_mint_verb(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-65 S1, S6 — `mint` over a fixture registry with one moved kit.
+
+    `vk` moves a shipped byte with no bump; `nk` declares no version. Off the push boundary `epoch`
+    reports `vk` owed at the lander and exits 0; with GATE_PUSH_BASE it FAILS. `mint` then writes
+    1.1 on the constant AND its same-line marker, after which `epoch` grades the tree clean and a
+    second `mint` writes nothing. Observed RED against the base govkit, which has no `mint` verb and
+    printed FAILED with exit 1 off the boundary.
+    """
+    fx = tmp / "mint-fx"
+    for d in (f"{PFX}{KIT_NAMES['govkit']}/entries", f"{PFX}vk", f"{PFX}nk"):
+        (fx / d).mkdir(parents=True, exist_ok=True)
+    gk = fx / PFX / KIT_NAMES["govkit"] / "govkit.py"
+    shutil.copy(GOVKIT, gk)
+    shutil.copy2(GOVKIT.parent / "adopters.toml", gk.parent / "adopters.toml")
+    files = {
+        f"{PFX}{KIT_NAMES['govkit']}/registry.toml":
+            '[[entry]]\nid = "vk"\ndescriptor = "{prefix}/govkit/entries/vk.kit.toml"\n\n'
+            '[[entry]]\nid = "nk"\ndescriptor = "{prefix}/govkit/entries/nk.kit.toml"\n',
+        f"{PFX}{KIT_NAMES['govkit']}/entries/vk.kit.toml":
+            'id = "vk"\nhome = "vk"\n'
+            'version_from = { file = "vk.sh", pattern = "^KIT_VK_VERSION=" }\n\n'
+            '[[files]]\ninclude = ["vk.sh", "lib.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n',
+        f"{PFX}{KIT_NAMES['govkit']}/entries/nk.kit.toml":
+            'id = "nk"\nhome = "nk"\nversion_from = { none = "a fixture kit" }\n\n'
+            '[[files]]\ninclude = ["nk.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n',
+        f"{PFX}vk/vk.sh": "KIT_VK_VERSION=1.0   # gov:kit vk@1.0\n",
+        f"{PFX}vk/lib.sh": "echo one\n",
+        f"{PFX}nk/nk.sh": "echo nk\n",
+    }
+    for rel, text in files.items():
+        (fx / rel).write_text(text, encoding="utf-8", newline="\n")
+    git(fx, "init", "-q")
+    git(fx, "config", "user.email", "fixture@example.invalid")
+    git(fx, "config", "user.name", "fixture")
+    settle(fx, "base")
+    base = subprocess.run(["git", "-C", str(fx), "rev-parse", "HEAD"],
+                          capture_output=True, text=True, encoding="utf-8").stdout.strip()
+    git(fx, "branch", "landed", base)
+    env = {k: v for k, v in os.environ.items() if k != "GATE_PUSH_BASE"}
+    env["GOV_DEFAULT_BRANCH"] = "landed"
+
+    def run_gk(*args: str, push_base: str = "") -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, str(gk), *args], capture_output=True, text=True,
+                              encoding="utf-8",
+                              env={**env, "GATE_PUSH_BASE": push_base} if push_base else env)
+
+    (fx / PFX / "vk" / "lib.sh").write_text("echo two\n", encoding="utf-8", newline="\n")
+    (fx / PFX / "nk" / "nk.sh").write_text("echo nk2\n", encoding="utf-8", newline="\n")
+    settle(fx, "move, no bump")
+    p = run_gk("epoch")
+    check("[aMF-65 S6] off the push boundary an undated move is `owed at the lander`, exit 0",
+          p.returncode == 0 and "epoch: vk · owed at the lander · moved in" in p.stdout
+          and "FAILED" not in p.stdout, p.stdout + p.stderr)
+    p = run_gk("epoch", push_base=base)
+    check("[aMF-65 S6] ...and with GATE_PUSH_BASE set the same move is FAILED, exit 1",
+          p.returncode == 1 and "epoch: vk · FAILED · moved in" in p.stdout, p.stdout + p.stderr)
+    p = run_gk("mint", "--base", base)
+    vk = (fx / PFX / "vk" / "vk.sh").read_text(encoding="utf-8")
+    check("[aMF-65 S1] `mint` writes the next value on the constant and its marker, naming it",
+          p.returncode == 0 and "mint: vk · 1.0 -> 1.1" in p.stdout
+          and "mint: nk · skip · no declared version" in p.stdout
+          and vk == "KIT_VK_VERSION=1.1   # gov:kit vk@1.1\n", p.stdout + p.stderr + vk)
+    settle(fx, "minted")
+    p = run_gk("epoch", push_base=base)
+    check("[aMF-65 S2] ...and the leg that grades reads the minted tree as clean",
+          p.returncode == 0 and "epoch: vk · clean · 1.1" in p.stdout, p.stdout + p.stderr)
+    p = run_gk("mint", "--base", base)
+    check("[aMF-65 S1] a second `mint` over the bumped range writes nothing",
+          p.returncode == 0 and "mint: vk · clean" in p.stdout
+          and (fx / PFX / "vk" / "vk.sh").read_text(encoding="utf-8") == vk, p.stdout + p.stderr)
+    p = run_gk("mint")
+    check("[aMF-65 S1] `mint` without --base is an argument refusal, exit 2",
+          p.returncode == 2 and "mint needs --base" in p.stderr, p.stderr)
+    p = run_gk("mint", "--base", "no-such-rev")
+    check("[aMF-65 S1] an unresolvable base is a FAILED exit 1",
+          p.returncode == 1 and "mint: FAILED · no base" in p.stdout, p.stdout + p.stderr)
+
+
 def check_fix_carriers(tmp: pathlib.Path) -> None:
     """TOOL-aMendedFleet-64 S7 — `write_version_carriers` over a two-entry fixture, then again.
 
@@ -2092,6 +2171,7 @@ def main() -> int:
         check_answers_parity(tmp / "ap")
         check_shipped_verb(tmp)
         check_epoch_verb(tmp)
+        check_mint_verb(tmp)
         check_fix_carriers(tmp)
         check_adopter_owned(tmp / "own")
         check_apply_owned(tmp / "ao")
