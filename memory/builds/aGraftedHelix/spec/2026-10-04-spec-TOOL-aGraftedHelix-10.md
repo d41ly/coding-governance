@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-10 — a claim push names the remote, so the tracked pre-push hook observes its default branch and takes the non-default exit
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 2 · ratified 2026-10-04
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 2 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 

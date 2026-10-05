@@ -12314,6 +12314,82 @@ fi   # ---- region two continues below: one compound block past about 3000 comma
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
 if in_shard 2; then
 
+# ==================================================================================================
+# TOOL-aGraftedHelix-10 — THE CLAIM PUSH THROUGH THE TRACKED PRE-PUSH HOOK. Every other arm here runs
+# hookless with GOV_DEFAULT_BRANCH=main exported, which is how a claim pushed to the URL passed this
+# suite and was refused on node a, where the variable is unset
+# (memory/gotchas/fixture-lacks-a-gate-the-consumer-has.md). This block alone unsets it and points
+# core.hooksPath at a COPY of this repository's tracked hook, OUTSIDE the work tree: `reset_tree`
+# cleans an untracked copy inside it, and one left there dirties the tree --preflight refuses.
+# `git remote add` records no origin/HEAD, so the block records it, and deletes it again on the way
+# out. It reuses the claim block's gh_ helpers. WHAT THIS DOES NOT DRIVE: the hook's gate-env.sh,
+# straggler guard and branch bar, which this fixture does not carry; the unit's acceptance ledger
+# records the same push measured once against a clone of this repository, which carries all three.
+# ==================================================================================================
+GK_SRC="${HERE%/"$KIT_REL"}/.githooks/pre-push"
+if [ ! -f "$GK_SRC" ]; then
+  echo "SKIP TOOL-aGraftedHelix-10 hooked claim arms: no tracked pre-push hook at $GK_SRC, so no claim push in this tree meets one"
+else
+GK_HOOKS=$(mktemp -d); GK_BIN=$(mktemp -d); GK_GIT=$(command -v git)
+GK_GD=$(git rev-parse --absolute-git-dir)
+GK_JOURNAL="$(cd "$(git rev-parse --git-common-dir)" && pwd)/runlog/pushes.log"
+cp "$GK_SRC" "$GK_HOOKS/pre-push"; chmod +x "$GK_HOOKS/pre-push"
+run_hooked() { env -u GOV_DEFAULT_BRANCH -u GOV_RUNLOG -u GOV_BRANCH_GATE_CMD bash "$SCRIPT" "$@" 2>&1; }
+build_hooked_fixture() { gh_on; git config core.hooksPath "$GK_HOOKS"; git remote set-head origin -a >/dev/null 2>&1
+          rm -f "$GK_BIN/git" "$GK_GD/pre-push-refusal" "$GK_JOURNAL"; }
+read_hooked_journal() { tail -n 1 "$GK_JOURNAL" 2>/dev/null; }
+# ---- AC1: by the remote's NAME the hook observes origin/HEAD, takes `skip-nondefault`, and the claim
+# ---- lands with no refusal file - with GOV_DEFAULT_BRANCH unset. A URL push is refused right here.
+build_hooked_fixture
+same "AC1 the fixture records origin/HEAD" "$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null)" "origin/main"
+out=$(run_hooked --preflight tFresh --keepalive-id k1); rc=$?
+same "AC1 a hooked preflight exits 0" "$rc" "0"
+hit  "$out" "preflight OK"
+same "AC1 ...and the claim is on the remote" "$(git ls-remote "$ORIGIN" refs/gov/runs/tFresh | grep -c .)" "1"
+n=$((n+1)); [ ! -e "$GK_GD/pre-push-refusal" ] || { echo "FAIL AC1 a landed claim push left a refusal file: $(cat "$GK_GD/pre-push-refusal")"; st=1; }
+hit  "$(read_hooked_journal)" "decision=skip-nondefault"
+# ---- AC2: the holder's due beat moves through the hooked compare-and-swap.
+git add -A >/dev/null && git commit -q -m gk_hold --no-verify
+gh_seed tFresh fixture-session k1 live "$(gh_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+gk_old=$(gh_field tFresh beat-utc)
+rm -f "$GK_JOURNAL"   # so the journal arm below reads THIS push's line, never AC1's
+out=$(run_hooked --resume tFresh --keepalive-id k1); rc=$?
+same "AC2 the hooked holder resume exits 0" "$rc" "0"
+n=$((n+1)); [ "$(gh_field tFresh beat-utc)" != "$gk_old" ] || { echo "FAIL AC2 a due beat did not move through the hooked push: $out"; st=1; }
+n=$((n+1)); [ ! -e "$GK_GD/pre-push-refusal" ] || { echo "FAIL AC2 the hooked update left a refusal file"; st=1; }
+hit  "$(read_hooked_journal)" "decision=skip-nondefault"
+# ---- AC3: no recorded origin/HEAD is the hook's `default-branch` refusal - check 91, never 90, the
+# ---- remedy composed from the remote's name, no record - and the driver supplies no default.
+build_hooked_fixture; git remote set-head origin -d
+out=$(run_hooked --preflight tFresh --keepalive-id k1); rc=$?
+n=$((n+1)); [ "$rc" != 0 ] || { echo "FAIL AC3 a hook-refused claim push preflighted"; st=1; }
+hit  "$out" "UNATTENDED check 91 FAILED"
+miss "$out" "UNATTENDED check 90 FAILED"
+hit  "$out" "the pre-push hook refused it: default-branch"
+hit  "$out" "git remote set-head origin -a"
+same "AC3 ...and nothing reached the remote" "$(git ls-remote "$ORIGIN" refs/gov/runs/tFresh | grep -c .)" "0"
+n=$((n+1)); [ ! -e memory/builds/tFresh/RUN.md ] || { echo "FAIL AC3 a hook-refused claim push wrote the run-state file"; st=1; }
+# ---- AC5: a refusal file an EARLIER push left is removed before the claim push, so a push that
+# ---- never reached the hook is check 91 with git's exit and no token.
+build_hooked_fixture
+printf 'gate-red\tpre-push: merge bar RED - push blocked\n' > "$GK_GD/pre-push-refusal"
+cat > "$GK_BIN/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) exit 128 ;; esac
+exec "$GK_GIT" "\$@"
+EOF
+chmod +x "$GK_BIN/git"
+out=$(PATH="$GK_BIN:$PATH" run_hooked --preflight tFresh --keepalive-id k1); rc=$?
+hit  "$out" "UNATTENDED check 91 FAILED"
+hit  "$out" "git push exited 128"
+miss "$out" "gate-red"
+miss "$out" "set-head"
+n=$((n+1)); [ ! -e "$GK_GD/pre-push-refusal" ] || { echo "FAIL AC5 the stale refusal file survived the claim push"; st=1; }
+n=$((n+1)); [ ! -e memory/builds/tFresh/RUN.md ] || { echo "FAIL AC5 a push that never ran wrote the run-state file"; st=1; }
+git config --unset core.hooksPath; git remote set-head origin -d 2>/dev/null
+gh_clear; rm -rf "$GK_HOOKS" "$GK_BIN"; rm -f "$GK_GD/pre-push-refusal"; reset_tree
+fi
+
 # ---- AC6: `--hold` refuses, numbered and before any record write, while a recorded bar is alive under
 # ---- a LIVE driver — this suite's own shell stands in for it — and proceeds once the bar has exited.
 init_pl_fixture
@@ -12759,7 +12835,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # on node a, 2026-10-05, executed 146 against the prologue's own 20, plus the in-place landed arm's 4
 # run alone the same way, green against the kit and red
 # arm by arm against two driver copies carrying nineteen staged breaks; no suite ran in the pass.
-FLOOR_ASSERTIONS=2007
+# RAISED 2007 -> 2033 by TOOL-aGraftedHelix-10: the hooked claim block's 26 executed assertions in
+# region two, its three `mutate` calls included, MEASURED: that block run alone behind this prologue
+# and the claim block's gh_ helpers on node a, 2026-10-05, executed 46 against the prologue's own 20,
+# green against the kit and red under three staged driver breaks and one fixture break; no suite ran.
+FLOOR_ASSERTIONS=2033
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -12888,7 +12968,8 @@ FLOOR_SHARD_1=209
 # RAISED 1640 -> 1646: the same six region-two assertions, see FLOOR_ASSERTIONS.
 # RAISED 1646 -> 1680: the same 34 region-two task-registry assertions, see FLOOR_ASSERTIONS.
 # RAISED 1680 -> 1810: the same 130 region-two run-claim assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1810
+# RAISED 1810 -> 1836: the same 26 region-two hooked claim assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1836
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

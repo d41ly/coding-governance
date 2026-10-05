@@ -48,7 +48,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.61   # gov:kit unattended@1.61 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.62   # gov:kit unattended@1.62 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -1873,9 +1873,19 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # so a clone with none configured still writes and the claim publishes no address the run's commits
 # do not already carry. The policy says what a failure prints: `strict` checks 90 and 91, `holder`
 # check 90 and a line, `soft` two lines, `quiet` nothing - `--beat` names its own skip.
+# THE PUSH NAMES THE REMOTE, `CR_NAME`, never its URL (TOOL-aGraftedHelix-10). Given a name, the
+# tracked pre-push hook observes `<name>/HEAD` as the default branch, the pushed ref is not that
+# branch, and the hook exits `skip-nondefault`, or runs the branch bar a repository declares as
+# `GOV_BRANCH_GATE_CMD`. Given a URL it observes nothing and, with GOV_DEFAULT_BRANCH unset, refuses
+# every claim. The driver never supplies that variable, so a remote with no recorded HEAD is a
+# `default-branch` refusal and NOT COMPLETED, its message carrying `git remote set-head <name> -a`,
+# which the hook prints only to the stderr this push discards. The hook's refusal file is removed
+# before the push, as push-main removes it, so a token read after it came from THIS push's hook.
 write_claim() { # slug · status · keepalive · strict|holder|soft|quiet -> 0 written, 1 lost, 2 not completed; WC_WHY
-  local slug="$1" st="$2" ka="$3" pol="$4" d t c rc l line flag lease node host sid msg
+  local slug="$1" st="$2" ka="$3" pol="$4" d t c rc l line flag lease node host sid msg rf="" tok=""
   WC_WHY=""; WC_BEAT=$(read_utc_now)
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  [ -z "$RUNLOG_GITDIR" ] || rf="$RUNLOG_GITDIR/pre-push-refusal"
   lease="$WC_BEAT"; [ -n "$CW_KEEP" ] && [ "$CW_LEASE" != - ] && [ -n "$CW_LEASE" ] && lease="$CW_LEASE"
   node="${USERNAME:-${USER:-absent}}"; host=$(read_host_name) || host=""; sid="${CLAUDE_CODE_SESSION_ID:-absent}"
   msg=$(printf 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s' \
@@ -1885,7 +1895,8 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet -> 0 w
   elif ! t=$(GIT mktree </dev/null) || ! c=$(GIT_AUTHOR_NAME=gov-claim GIT_AUTHOR_EMAIL=gov-claim@invalid GIT_COMMITTER_NAME=gov-claim GIT_COMMITTER_EMAIL=gov-claim@invalid GIT commit-tree "$t" -m "$msg" 2>/dev/null); then
     WC_WHY="the claim commit could not be built in this clone"; rc=2
   else
-    observe_remote "$d" push --porcelain "--force-with-lease=$CLAIM_NS/$slug:$CW_SHA" "$CR_URL" "$c:$CLAIM_NS/$slug" && rc=0 || rc=$?
+    [ -z "$rf" ] || rm -f "$rf"
+    observe_remote "$d" push --porcelain "--force-with-lease=$CLAIM_NS/$slug:$CW_SHA" "$CR_NAME" "$c:$CLAIM_NS/$slug" && rc=0 || rc=$?
     line=""
     while IFS= read -r l; do
       case "$l" in ?$'\t'*":$CLAIM_NS/$slug"$'\t'*) line=${l%$'\r'} ;; esac
@@ -1899,6 +1910,11 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet -> 0 w
         *"(stale info)"*|*"(fetch first)"*) WC_WHY="the push was rejected: ${line##*$'\t'}"; rc=1 ;;
         *) WC_WHY="the push was refused: ${line##*$'\t'}"; rc=2 ;;
       esac
+    fi
+    if [ "$rc" = 2 ] && [ -n "$rf" ] && [ -f "$rf" ]; then
+      IFS=$'\t' read -r tok _ <"$rf" || :
+      WC_WHY="$WC_WHY · the pre-push hook refused it: ${tok:-an empty refusal file}"
+      [ "$tok" != default-branch ] || WC_WHY="$WC_WHY · fix once: git remote set-head $CR_NAME -a"
     fi
   fi
   [ -z "${d:-}" ] || rm -f "$d"

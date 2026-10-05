@@ -23,6 +23,14 @@ commit. The fold modelled that hook. Round 3: core also runs a `commit-msg` rule
 attribution line, the fixture did not, and no commit the runbook made could land there. Each round
 fixed the gate it was shown, which is fixing the instance.
 
+The unattended driver, build `aGraftedHelix`, 2026-10-04. Its run claim was pushed to the remote's
+URL from `tools/unattended/unattended.sh`, and every arm of `tools/unattended/unattended.test.sh`
+passed: that suite's fixture is a `git init` repository with no `core.hooksPath`, and it exports
+`GOV_DEFAULT_BRANCH=main` for every arm. On node `a`, where the variable is unset, the tracked
+pre-push hook observes no default branch for a URL push and refused every claim, so no unattended
+run could start. The spec had stated which hook branch the push took without naming the invocation
+it measured that with.
+
 ## The fix
 
 Declare the consumer's gate SET, not the gate that just bit. `tools/govkit/selftest.py` lists every
@@ -34,3 +42,9 @@ describes another repository and nothing here can re-read it.
 Gated by that PRECONDITION for the migration's fixture only. For a new runbook aimed at a consumer,
 this is a documented check: list the consumer's commit-time and push-time gates before writing the
 first arm, and model each, or say why it cannot fire.
+
+For a push the unattended driver makes, the documented check is narrower and binds every reviewer
+of a driver diff: observe the push through the tracked hook, with `core.hooksPath` wired and
+`GOV_DEFAULT_BRANCH` unset, and have the spec name the invocation its claim about the hook's branch
+was measured with. The driver suite's hooked claim block is the one fixture that does both; an arm
+anywhere else in that suite proves nothing about the hook.
