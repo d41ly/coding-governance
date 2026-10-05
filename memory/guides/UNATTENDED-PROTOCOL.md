@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.65 -->
+<!-- gov:kit unattended@1.66 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -115,7 +115,8 @@ Preflight pins it as `may:`, absent reading `none`, and refuses it under any oth
 a run commit writing one into any build README.
 
 The spec-audit opt-in is the OWNER's on the same reading (`TOOL-aWardedAudit-4`): a `spec-audit:`
-line counts only from a `slug` README, and preflight refuses one elsewhere (check 89);
+line counts only from a `slug` README, or from a `prompt` README whose prompt record at BASE quotes
+the owner asking for the audit (owner, 2026-10-05); preflight refuses one elsewhere (check 89);
 `SPEC_AUDIT_DEFAULT` is read at the default-branch side of BASE; the bar reds a run commit writing
 either. The fan-out hook admits an audit in a live run only on the pinned `spec-audit` fact.
 

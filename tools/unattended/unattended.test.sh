@@ -3761,6 +3761,51 @@ hit "$(cat memory/builds/tBr/RUN.md)" "anchor-kind: run-branch"
 same "the owner's default pins its date" "$(sed -n 's/^spec-audit: //p' memory/builds/tBr/RUN.md)" "2026-09-21"
 git checkout -qf main; git reset -q --hard "$_aw_main0"; git push -q -f origin main
 git checkout -qf unit
+# ---- OWNER RULING 2026-10-05 (aEvidencedLens): a PROMPT README's spec-audit: is admitted when its
+# ---- prompt record AT THE PINNED BASE quotes the owner asking for the audit. The ask wraps across two
+# ---- quote lines, so only the join matches; the non-asking record DESCRIBES the opt-in in its prompt
+# ---- (aWardedAudit's own wording, no "for this build") and quotes the ask only in a LATER section,
+# ---- so the phrase set and the section boundary must both hold to refuse it. Each arm was observed
+# ---- RED against HEAD's driver first.
+_ev_rec=memory/builds/tBr/prompts/2026-10-05-prompt-mandate.md
+_ev_ask=$'# Run mandate\n\n## The prompt\n\n> Build it per the protocol, and opt\n> in to the spec reviews for this build.\n\n## Notes\n'
+_ev_noask=$'# Run mandate\n\n## The prompt\n\n> Build it per the protocol. The OWNER can opt-in to the spec reviews.\n\n## Notes\n\n> opt-in into spec reviews for this build\n'
+# ---- AC5: a prompt README whose BASE record quotes the ask is admitted, announced, and pins the date.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt\nspec-audit: 2026-10-05'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_ev_ask" > "$_ev_rec"
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "unattended: spec-audit — admitted under prompt mode, the opt-in quoted from the owner's prompt in $_ev_rec at the pinned BASE"
+hit  "$out" "preflight OK"
+miss "$out" "UNATTENDED check 89 FAILED"
+same "the admitted opt-in pins its date" "$(sed -n 's/^spec-audit: //p' memory/builds/tBr/RUN.md 2>/dev/null)" "2026-10-05"
+# ---- AC6: a record whose quoted prompt does not ask is refused 89, naming the admission rule.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt\nspec-audit: 2026-10-05'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_ev_noask" > "$_ev_rec"
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "mode prompt; delete the line, and leave the opt-in to the owner - a prompt-mode README is admitted only when its prompt record at the pinned BASE quotes the owner asking for the audit"
+miss "$out" "admitted under prompt mode"
+same "a refused opt-in created no run-state file" "$([ -f memory/builds/tBr/RUN.md ] && echo yes || echo no)" "no"
+# ---- AC7: `recipe` carries no owner prompt, so a quoting record admits nothing.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: recipe\nspec-audit: 2026-10-05'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_ev_ask" > "$_ev_rec"
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "mode recipe; delete the line, and leave the opt-in to the owner - a prompt-mode README is admitted only when its prompt record at the pinned BASE quotes the owner asking for the audit"
+miss "$out" "admitted under prompt mode"
+# ---- AC8: the evidence is read at the BASE - a quoting record committed after the pushed tip is not there.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt\nspec-audit: 2026-10-05'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_ev_ask" > "$_ev_rec"
+git add -A >/dev/null && git commit -q -m after-base --no-verify
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "mode prompt; delete the line, and leave the opt-in to the owner - a prompt-mode README is admitted only when its prompt record at the pinned BASE quotes the owner asking for the audit"
+miss "$out" "admitted under prompt mode"
 
 # ---- TOOL-aWardedAudit-6 S4: a record whose BASE README carries a prompt-mode `spec-audit:` line - the
 # ---- state a run preflighted under a driver before check 89 is left in - reads NOT GRADABLE at the
@@ -14010,7 +14055,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 1894 -> 1903: the matrix's --handoff row, 9 region-two assertions - two line/byte arms per
 # form, the phase arm on the two refused forms, and its exit-status verdict - measured on a slice of
 # the block (184 -> 193); no suite ran.
-FLOOR_ASSERTIONS=1903
+# RAISED 1903 -> 1918 by the owner ruling of 2026-10-05 (aEvidencedLens): the prompt-record check-89
+# admission arms AC5-AC8, 15 region-two hit/miss/same/mutate lines counted off the block, green on a
+# slice of the aWardedAudit block and each new arm observed red against HEAD's driver; no suite ran.
+FLOOR_ASSERTIONS=1918
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -14140,7 +14188,8 @@ FLOOR_SHARD_1=209
 # RAISED 1646 -> 1680: the same 34 region-two task-registry assertions, see FLOOR_ASSERTIONS.
 # RAISED 1680 -> 1697: the same 17 region-two matrix assertions, see FLOOR_ASSERTIONS.
 # RAISED 1697 -> 1706: the same 9 region-two --handoff matrix assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1706
+# RAISED 1706 -> 1721: the same 15 region-two check-89 admission assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1721
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

@@ -5530,6 +5530,27 @@ miss "$out" "$MASA_BLANK in .unattended.conf"
 miss "$out" "$MASA_OWN in memory/builds/tOther/README.md"
 # ...and the may: arm keeps its own message on the same graph.
 hit  "$out" "$MA_WRITES $(git -C "$masa" log --format=%H --grep='^run grants$' -1) $MA_RUN_RD"
+# ---- A LIVE RECORD IS GRADED ONLY IN A TREE ON ITS OWN RUN BRANCH. Its range is HEAD past the
+# ---- advertised tip, so a tree on another branch charged the record with that branch's commits (the
+# ---- aEvidencedLens close bar named aClosedDocket and aUnblockedFleet). Same graph, same three writes:
+# ---- a record naming ANOTHER branch skips all three own-commit arms, announced; one naming the
+# ---- checked-out branch, or any record on a detached HEAD, is graded as before.
+sed -i '/^may: none$/a branch-ref: refs/heads/elsewhere' "$masa/memory/builds/tRun/RUN.md"; ma_commit "$masa" "record on another branch"
+out=$(ma_leg "$masa")
+miss "$out" "$MASA_KEY in memory/builds/tOther3/README.md"
+miss "$out" "$MASA_DATE in .unattended.conf"
+miss "$out" "$MA_WRITES"
+hit  "$out" "check 19 SKIPPED the grant-write and round-bound arms for memory/builds/tRun/RUN.md - it is live on its run branch refs/heads/elsewhere and this tree has refs/heads/unit checked out"
+sed -i 's|^branch-ref: .*|branch-ref: refs/heads/unit|' "$masa/memory/builds/tRun/RUN.md"; ma_commit "$masa" "record on its own branch"
+out=$(ma_leg "$masa")
+hit  "$out" "commit and README follow: $MASA_KEY in memory/builds/tOther3/README.md, run memory/builds/tRun/RUN.md"
+miss "$out" "it is live on its run branch"
+sed -i 's|^branch-ref: .*|branch-ref: refs/heads/elsewhere|' "$masa/memory/builds/tRun/RUN.md"; ma_commit "$masa" "record on another branch again"
+( cd "$masa" && git checkout -q --detach ) >/dev/null 2>&1
+out=$(ma_leg "$masa")
+hit  "$out" "commit and README follow: $MASA_KEY in memory/builds/tOther3/README.md, run memory/builds/tRun/RUN.md"
+miss "$out" "it is live on its run branch"
+( cd "$masa" && git checkout -q unit ) >/dev/null 2>&1
 # ---- G1: A LIVE RECORD, AND AN IN-PLACE TERMINAL ONE, over unit 2's prepared merge T - first parent
 # ---- the advertised tip, which carries the owner's grant, second parent the run branch.
 ma_init g1; ma1="$ma_root/g1"

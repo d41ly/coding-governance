@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.65 -->
+<!-- gov:kit unattended@1.66 -->
 
 # Unattended runs
 
@@ -248,7 +248,8 @@ It schedules no idle-wake, and the section above does not bind it: there is an o
    project default at the default-branch side of it, so a working-copy edit opts nothing in or out, and a value that is not a date is a refusal.
    **The opt-in is the OWNER's, never yours** (`TOOL-aWardedAudit-4`). Do not write `spec-audit:`
    into a README you author: preflight refuses it under `authorized-by: prompt` or `recipe`
-   (check 89), and reads a project default only from the default branch. The `not owed` line names
+   (check 89). The one exception is a `prompt` README whose prompt record at BASE quotes the
+   owner asking for the audit (owner, 2026-10-05); write the key only then. Preflight reads a project default only from the default branch. The `not owed` line names
    the owner's cue, two or more units or a FORKED spec: carry it to the wrap-up and decide nothing.
    Keep the line: the harness call needs it.
    After a compaction, `--status` carries the same fact as `· spec-audit <date>`.

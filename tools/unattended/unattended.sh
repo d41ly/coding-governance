@@ -48,7 +48,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.65   # gov:kit unattended@1.65 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.66   # gov:kit unattended@1.66 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -2383,6 +2383,30 @@ check_single_live() {
   return 0
 }
 
+# The CLOSED set of owner phrasings that ask for the pre-code spec audit (owner ruling 2026-10-05,
+# build aEvidencedLens): the literal key `spec-audit:`, or "opt in" / "opt-in" / "optin" followed by
+# in|into|to, an optional "the", "spec review(s)" / "spec audit(s)", and "for this build". The last
+# phrase is what separates an ASK from a prompt that describes the rule: aWardedAudit's own prompt
+# says "OWNER can opt-in to the spec reviews" and asks for nothing. Matched case-insensitively
+# against the quoted prompt only; widen it here and nowhere else.
+SPEC_AUDIT_ASK_RE='spec-audit:|(^|[^[:alpha:]])opt[ -]?in[[:space:]]+(in|into|to)[[:space:]]+(the[[:space:]]+)?spec[ -]?(review|audit)s?[[:space:]]+for[[:space:]]+this[[:space:]]+build'
+# Prints the first prompt record under <build dir>/prompts/ AT <base> whose `## The prompt` section
+# quotes an ask in SPEC_AUDIT_ASK_RE, or returns 1. The quote is the `> ` lines up to the next `## `
+# heading, prefixes stripped and joined with single spaces, because a prompt wraps across lines.
+read_audit_ask_record() { # build dir · base
+  local rec quote
+  while IFS= read -r rec; do
+    quote=$(GIT show "$2:$rec" 2>/dev/null | awk '
+      /^## The prompt[[:space:]]*\r?$/ { on = 1; next }
+      on && /^## / { exit }
+      on && /^> / { l = $0; sub(/\r$/, "", l); sub(/^> /, "", l); printf "%s%s", sep, l; sep = " " }')
+    if [ -n "$quote" ] && grep -Eiq "$SPEC_AUDIT_ASK_RE" <<<"$quote"; then
+      printf '%s\n' "$rec"; return 0
+    fi
+  done < <(GIT ls-tree --name-only --full-tree "$2" -- "$1/prompts/" 2>/dev/null)
+  return 1
+}
+
 # ONE comparison enforces BOTH provenance properties. At a pinned merge-base, "was it reachable from
 # the BASE" and "did the run author it" are the same question, so there is one answer and one place
 # for it to be wrong.
@@ -2404,7 +2428,7 @@ check_single_live() {
 # and a run that lands a NEW build README authorizes the next run. All five are enumerated in
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
-  local slug="$1" base="$2" rel blob fmslug _fm _pb _mg _sa_shown _cf _sad _cb
+  local slug="$1" base="$2" rel blob fmslug _fm _pb _mg _sa_shown _cf _sad _cb _pr
   rel=$(readme_of "$slug")
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
   # replaces: an empty one makes the line below read `git show ":path"` - the git INDEX, i.e. bytes
@@ -2571,10 +2595,24 @@ check_authorization() { # slug · base
   # attempt invisible in every record. Presence is the test, as check 52's is - a bare key is the
   # same attempt. AUTH_SPEC_AUDIT_DERIVED is cleared so the specs-audited grader reads NOT GRADABLE
   # rather than grading a source this refusal just declined.
+  #
+  # OWNER RULING 2026-10-05, build aEvidencedLens - supersedes the PROMPT-MODE half of
+  # TOOL-aWardedAudit-1/4's refusal. A `prompt` README's `spec-audit:` is ADMITTED when the owner's
+  # own prompt, quoted verbatim in the build's prompt record, asks for the audit. The record is read
+  # at the SAME pinned BASE as the README blob, never the working tree or HEAD, and the ask is the
+  # closed set SPEC_AUDIT_ASK_RE. `recipe` is refused exactly as before: it carries no owner prompt.
+  # Admitted, AUTH_SPEC_AUDIT_DERIVED keeps its slug-README value and the admission is announced.
+  # WHAT THIS DOES NOT CHECK: in prompt mode the run itself writes the prompt record (the protocol has
+  # it copy the owner's prompt verbatim), so this admits on the record's word. It moves the evidence
+  # from a front-matter key to the verbatim owner text; it does not make that evidence unforgeable.
   if [ "$AUTH_MODE" != slug ] && printf '%s\n' "$_fm" | grep -q '^spec-audit='; then
-    AUTH_SPEC_AUDIT_DERIVED=""
-    fail 89 "the build README declares spec-audit: under an authorization mode that resolves at the second anchor, so the run could have written its own opt-in - only the owner opts a build into the pre-code spec audit, by a spec-audit: line in a slug-mode README landed on the default branch or a SPEC_AUDIT_DEFAULT there: mode $AUTH_MODE; delete the line, and leave the opt-in to the owner"
-    return 1
+    if [ "$AUTH_MODE" = prompt ] && _pr=$(read_audit_ask_record "$(dirname "$rel")" "$base"); then
+      echo "unattended: spec-audit — admitted under prompt mode, the opt-in quoted from the owner's prompt in $_pr at the pinned BASE"
+    else
+      AUTH_SPEC_AUDIT_DERIVED=""
+      fail 89 "the build README declares spec-audit: under an authorization mode that resolves at the second anchor, so the run could have written its own opt-in - only the owner opts a build into the pre-code spec audit, by a spec-audit: line in a slug-mode README landed on the default branch or a SPEC_AUDIT_DEFAULT there: mode $AUTH_MODE; delete the line, and leave the opt-in to the owner - a prompt-mode README is admitted only when its prompt record at the pinned BASE quotes the owner asking for the audit"
+      return 1
+    fi
   fi
   # the declaration seam, evaluated where the MODE exists and nowhere else.
   # Each refusal is its own message: a single ANDed verdict would send a reader to diff a parse

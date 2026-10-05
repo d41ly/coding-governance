@@ -50,7 +50,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.65   # gov:kit unattended@1.65 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.66   # gov:kit unattended@1.66 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -1304,6 +1304,10 @@ fi
 # per record, 36 times, always about the same sha.
 ADV_HEAD_OK=0
 if [ -n "$ADV_HEAD" ] && GIT cat-file -e "$ADV_HEAD^{commit}" 2>/dev/null; then ADV_HEAD_OK=1; fi
+# THE RUN THIS TREE DRIVES (TOOL-aWindowedPass-5): the record whose run branch is the branch checked
+# out here. A detached HEAD binds none. Read once, here, because check 19's live own-commit arms and
+# check 23 below both compare every record against it.
+DS_HEAD_REF=$(GIT symbolic-ref -q HEAD 2>/dev/null || true)
 
 declare -A _PUB_REACH
 _PUB_WARMED=0
@@ -2481,8 +2485,21 @@ while IFS= read -r f; do
     # ---- rotated archive will have. Read as live instead, its range would be whatever this tree has
     # ---- not pushed, which after a landing is nothing at all.
     # ----
+    # ---- A LIVE RECORD IS GRADED ONLY IN A TREE ON ITS OWN RUN BRANCH. Its range is HEAD past the
+    # ---- advertised tip, so in a tree on ANOTHER branch that range is the other branch's unlanded
+    # ---- commits, and a run whose record rides the default branch was charged with them (the close
+    # ---- bar of aEvidencedLens named aClosedDocket and aUnblockedFleet). The run branch is read the
+    # ---- way check 23 reads it - `run-branch:`, else `branch-ref:` - and compared against
+    # ---- `symbolic-ref HEAD`; on a mismatch all three own-commit arms skip, announced. A detached
+    # ---- HEAD, or a record naming no run branch, is graded as before, the fail-closed direction.
+    # ---- This clause does NOT check a live run's commits from any other tree: a bar run elsewhere
+    # ---- does not see them, and they are graded by the run's own close and its lander's bar, which
+    # ---- run on its branch. Terminal and derived-landed records walk from a commit, not HEAD, and
+    # ---- are unaffected.
+    # ----
     # ---- A SKIP ANNOUNCES ITSELF. A terminal record with no witness, a witness this clone cannot
-    # ---- resolve, or a live one with no tip to exclude is named on the report channel, never passed.
+    # ---- resolve, a live one on another branch, or a live one with no tip to exclude is named on
+    # ---- the report channel, never passed.
     # ----
     # ---- WHAT IT TRUSTS, because its inputs are the graded record's own. The witness and the BASE
     # ---- bound the range and the run writes both, so a forged pair moves the range: check 9 grades
@@ -2512,8 +2529,11 @@ while IFS= read -r f; do
         mayend=HEAD
         maylc=""
         [ "$ph" = LANDING ] && maylc=$(read_landing_commit "$f" 2>/dev/null)
+        mayrbr=$(fact_of "$f" run-branch); [ -n "$mayrbr" ] || mayrbr=$(fact_of "$f" branch-ref)
         if [ -n "$maylc" ] && check_adv_reaches "$maylc"; then
           mayend=$maylc; maywalk=1
+        elif [ -n "$DS_HEAD_REF" ] && [ -n "$mayrbr" ] && [ "$mayrbr" != "$DS_HEAD_REF" ]; then
+          maywhy="it is live on its run branch $mayrbr and this tree has $DS_HEAD_REF checked out, so the commits HEAD holds past the advertised tip are this branch's, not that run's; its own close and its lander's bar grade them on its branch"
         elif [ "$ADV_HEAD_OK" = 1 ]; then
           mayex=$ADV_HEAD
         elif [ -n "$ADV_NAME" ] && GIT rev-parse --verify --quiet "refs/heads/$ADV_NAME^{commit}" >/dev/null 2>&1; then
@@ -3914,9 +3934,7 @@ check_generated_render() { # commit · path -> 0, printing what generated it, wh
   printf 'a change inside its gen regions only'
 }
 ds_fleet_n=0; ds_graded=0; ds_unavail=0; ds_records=0; ds_fleet_over=""
-# THE RUN THIS TREE DRIVES (TOOL-aWindowedPass-5): the record whose run branch is the branch checked
-# out here. A detached HEAD binds none. Read once; every record below is compared against it.
-DS_HEAD_REF=$(GIT symbolic-ref -q HEAD 2>/dev/null || true)
+# DS_HEAD_REF, the run this tree drives, is read once beside ADV_HEAD_OK above.
 # ---- THE BUDGET IS READ BEFORE THE LOOP (TOOL-dUnstuckLanding-17 S7/S8), because the run this tree
 # ---- drives is judged against it as the loop leaves that record. MANDATORY, in the shape its sibling
 # ---- pins take: undeclared or not a single integer is a refusal, never a defaulted value. The RETIRED

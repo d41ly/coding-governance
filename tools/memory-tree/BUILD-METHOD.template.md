@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.123 -->
+<!-- gov:kit memory-tree@2.124 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -116,7 +116,7 @@ AGAINST the better measurement for that reason, so a testing rule without this e
 **When**, and `specs-reviewed` is owed only then: the front matter of a `slug` README the owner landed carries
 `spec-audit: <date>`, or `.unattended.conf` on the default branch declares a dated `SPEC_AUDIT_DEFAULT` and the README declares no key
 (TOOL-aBlindedTrial-7). Under neither, none is owed, and the tooling says so instead of running one. **The opt-in is
-the OWNER's** (TOOL-aWardedAudit-4): a run never writes the key nor passes `specAudit` on its own reading; an audit that
+the OWNER's** (TOOL-aWardedAudit-4): a run never writes the key nor passes `specAudit` on its own reading, unless its prompt record quotes the owner asking (check 89); an audit that
 seems owed goes to the wrap-up. **Which**, once declared: every spec with no review record naming it; a spec whose rev moved since its last review —
 by anything but that review's own fold — or that you authored this run, is unreviewed.
 
