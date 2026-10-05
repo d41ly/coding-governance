@@ -40,6 +40,15 @@ notes and this builds over tracked files only. The `--budget` byte cut `emit` ap
 list: this grades the ranked list, not the emitted text. And the `k`: the CLI's default is 20,
 the pin's is whatever it names, so a pin at `@5` grades a shallower read than a default query.
 
+`--spec-probes` IS A REPORT, NOT A FLOOR. It harvests the `query.py` question and `--terms` every
+tracked spec's section 10 records, labels each with the foreign ids the same spec cites OUTSIDE
+section 10 (any id section 10 cites is excluded: that is where the author wrote what the probe
+returned), and prints hit@10 of the served path with `n` beside it. Nobody has checked those labels,
+so it pins nothing. What it cannot see: a probe return the author never wrote into section 10
+survives as a label; the corpus graded is today's, records written after the probe included; and
+only ids in the conf's declared families are labels. An empty harvest, or none left after
+de-contamination, prints DEAD PROBE naming the stage and exits 1.
+
 PRECONDITION 3 REPLACED A CHECK THAT COULD NOT FAIL. The spec's rev-3 had it as a predicate asking
 whether the pinned `<metric>@<k>` appeared in the report. Measured while building: `score()` emits
 `r@k` and `f@k` for whatever `k` it is handed, and the pin grammar admits only those two metrics, so
@@ -277,8 +286,12 @@ def build_served_dir(root: pathlib.Path) -> pathlib.Path:
     return out
 
 
-def measure_served(dirp: pathlib.Path, queries: list[dict], pin: dict) -> dict:
+def measure_served(dirp: pathlib.Path, queries: list[dict], pin: dict,
+                   slices: tuple = SLICES) -> dict:
     """One graded ROW per (question, slice), ranked by the CLI's own `query_expr` and `run_fusion`.
+
+    `slices` defaults to both term lists; `--spec-probes` passes `("terms",)`, because a harvested
+    probe carries only the terms its author ran.
 
     A fused hit satisfies an expected id by `bench.expected_by_target`'s two rules. The anchor map
     is the served `records.db` `meta` table, and a hit whose `id` column is EMPTY -- how `_write_set`
@@ -305,13 +318,13 @@ def measure_served(dirp: pathlib.Path, queries: list[dict], pin: dict) -> dict:
         anchors.setdefault(d["id"], []).append(d["path"])
     key = f"{pin['metric']}@{pin['k']}"
     per, unresolved = [], []
-    slices = {s: {"h": 0, "R": 0} for s in SLICES}
+    counts = {s: {"h": 0, "R": 0} for s in slices}
     for q in queries:
         # Predicate 4 and the overlap audit read the RECORD-level resolution, once per question.
         targets = bench.expected_by_target(docs, q, anchors)
         declared = [i.strip() for i in q.get("expected_ids", []) if i.strip()]
         unresolved.extend(i for i in declared if i not in targets)
-        for s in SLICES:
+        for s in slices:
             expr = query.query_expr(q["query"], q[s])
             fused = query.run_fusion(dirp, expr, pin["k"]) if expr else []
             judged = [{k: v for k, v in h.items() if k != "id" or v} for h in fused]
@@ -321,13 +334,13 @@ def measure_served(dirp: pathlib.Path, queries: list[dict], pin: dict) -> dict:
                 judged, list(range(len(judged))), want, [pin["k"]])[key] == 1.0
             per.append({"q": q, "slice": s, "targets": targets, "hit": hit,
                         "resolves": bool(targets)})
-            slices[s]["R"] += bool(targets)
-            slices[s]["h"] += hit
+            counts[s]["R"] += bool(targets)
+            counts[s]["h"] += hit
     n = len(per)
     resolved = sum(1 for p in per if p["resolves"])
     hits = sum(1 for p in per if p["hit"])
     return {
-        "docs": docs, "per": per, "n": n, "slices": slices,
+        "docs": docs, "per": per, "n": n, "slices": counts,
         "unresolved": unresolved, "R": resolved, "h": hits,
         "ceiling": resolved / n, "cell_value": hits / n,
     }
@@ -421,6 +434,134 @@ def check_audit(run: dict, pin: dict) -> list[str]:
     return failures
 
 
+# -------------------------------------------------------------- --spec-probes: a report, no floor
+
+SPEC_PROBE_K = 10
+SPEC_PROBE_BLIND = (
+    "a REPORT that sets no floor: hit@10 of the served path over the query.py probes recorded in "
+    "every tracked spec's section 10, labelled by the foreign ids the same spec cites outside it. "
+    "It cannot see: a probe return the author never wrote into section 10 (it survives as a label); "
+    "that the corpus graded is today's, including records written after the probe; and any id "
+    "outside the conf's declared families (only those are labels)"
+)
+S10_RE = re.compile(r"^##\s*10\.\s*Reuse audit\b.*$", re.M)
+NEXT_H2_RE = re.compile(r"^##\s", re.M)
+# The closing quote MATCHES the opening one. A character-class close cuts "a spec's question" at the
+# apostrophe -- the rule node d's reuse_lookup harvester recorded; the rule is reused, not the code.
+_QUOTED = r"(?:(?P<{0}d>[\"'])(?P<{0}>.{{1,800}}?)(?P={0}d)|“(?P<{0}c>.{{1,800}}?)”)"
+PROBE_RE = re.compile(
+    r"query\.py\s+" + _QUOTED.format("q")
+    + r"(?:(?:\s+--(?!terms\b)[a-z-]+(?:[ =]\d+)?)*\s+--terms[ =]" + _QUOTED.format("t") + r")?"
+)
+RECALL_LINE_RE = re.compile(r"Recall terms used[^:\n]*:\s*(.+?)(?:\n[ \t]*\n|\Z)", re.S)
+
+
+def read_spec_probes(root: pathlib.Path) -> list[dict]:
+    """Every tracked spec under `<memory root>/builds/*/spec/` (any depth) holding a section-10 probe.
+
+    One dict per spec: its path, build slug, section-10 body, the text OUTSIDE section 10, and its
+    probes, each a question plus the `--terms` it ran -- or the section's `Recall terms used:` list
+    when the invocation carries none, or None when neither exists (the CLI refuses that question).
+    Hard wraps are flattened first; the question itself is the matched-delimiter span.
+    """
+    mem = extract.CONF.memory_root
+    try:
+        listed = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", f"{mem}/builds"],
+                                capture_output=True, text=True, check=True).stdout
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise CheckRefused(f"git ls-files under {root.as_posix()} failed: {exc}") from exc
+    spec_re = re.compile(rf"^{re.escape(mem)}/builds/([^/]+)/spec/.+\.md$")
+    specs = []
+    for rel in sorted(filter(None, listed.split("\0"))):
+        m = spec_re.match(rel)
+        if not m or not (root / rel).is_file():
+            continue
+        text = (root / rel).read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n")
+        head = S10_RE.search(text)
+        if not head:
+            continue
+        nxt = NEXT_H2_RE.search(text, head.end())
+        stop = nxt.start() if nxt else len(text)
+        body = text[head.end():stop]
+        line = RECALL_LINE_RE.search(body)
+        fallback = None
+        if line and "query.py" not in line.group(1):
+            fallback = re.findall(r"[^\s,;`\"']+", line.group(1)) or None
+        probes: dict[tuple, dict] = {}
+        for p in PROBE_RE.finditer(re.sub(r"\s+", " ", body)):
+            question = (p["q"] or p["qc"]).strip()
+            raw = p["t"] or p["tc"]
+            terms = raw.split() if raw and raw.split() else fallback
+            probes.setdefault((question, tuple(terms or ())), {"question": question, "terms": terms})
+        if probes:
+            specs.append({"path": rel, "slug": m.group(1), "s10": body,
+                          "outside": text[:head.start()] + text[stop:],
+                          "probes": list(probes.values())})
+    return specs
+
+
+def derive_probe_labels(spec: dict) -> list[str]:
+    """The ids this spec cites OUTSIDE section 10, minus its own build's, minus any section 10 cites.
+
+    Section 10 is where the author wrote down what the probe returned, so grading the probe on those
+    ids is circular. Every probe of one spec shares this set.
+    """
+    inside = set(extract.ID_RE.findall(spec["s10"]))
+    return [i for i in dict.fromkeys(extract.ID_RE.findall(spec["outside"]))
+            if i.split("-")[1] != spec["slug"] and i not in inside]
+
+
+def print_spec_probes(root: pathlib.Path) -> int:
+    """`--spec-probes`. One row per graded question, one summary line; DEAD PROBE when nothing grades."""
+    specs = read_spec_probes(root)
+    found = sum(len(s["probes"]) for s in specs)
+    if not found:
+        print("check-recall: DEAD PROBE -- the harvest stage found no query.py probe in any tracked "
+              "spec's section 10; a figure over nothing is not a clean zero", file=sys.stderr)
+        return 1
+    dirp = build_served_dir(root)
+    try:
+        try:
+            db = sqlite3.connect(f"file:{(dirp / 'records.db').as_posix()}?mode=ro", uri=True)
+            try:
+                known = {r[0] for r in db.execute("SELECT DISTINCT id FROM meta WHERE id != ''")}
+            finally:
+                db.close()
+        except sqlite3.Error as exc:
+            raise CheckRefused(f"served set unreadable under {dirp.as_posix()}: {exc}") from exc
+        aside: Counter = Counter()
+        unresolved: set[str] = set()
+        queries = []
+        for s in specs:
+            labels = derive_probe_labels(s)
+            unresolved.update(i for i in labels if i not in known)
+            live = [i for i in labels if i in known]
+            for p in s["probes"]:
+                if not p["terms"]:
+                    aside["no-terms"] += 1
+                elif not live:
+                    aside["no-label"] += 1
+                else:
+                    queries.append({"query": p["question"], "terms": p["terms"],
+                                    "expected_ids": live, "path": s["path"]})
+        drops = f"no-terms {aside['no-terms']} · no-label {aside['no-label']}"
+        if not queries:
+            print(f"check-recall: DEAD PROBE -- the de-contamination stage left no question with a "
+                  f"label ({found} probes; {drops})", file=sys.stderr)
+            return 1
+        run = measure_served(dirp, queries, {"metric": "r", "k": SPEC_PROBE_K}, slices=("terms",))
+        for p in run["per"]:
+            print(f"{'hit ' if p['hit'] else 'miss'}  {p['q']['path']}  "
+                  f"[{' '.join(p['q']['expected_ids'])}]  \"{p['q']['query']}\"")
+        n = run["n"]
+        print(f"check-recall: spec-probes -- probes {found} · set aside: {drops} · "
+              f"unresolved ids {len(unresolved)} · n {n} · hit@{SPEC_PROBE_K} "
+              f"{run['h'] / n:.4f} (h {run['h']}, n {n}) -- a report, no floor")
+        return 0
+    finally:
+        shutil.rmtree(dirp, ignore_errors=True)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(add_help=True, description=__doc__.splitlines()[0])
     ap.add_argument("--data-dir", default=None,
@@ -430,9 +571,16 @@ def main() -> int:
     ap.add_argument("--fixture", default=None, help="fixture path; defaults to the kit's own")
     ap.add_argument("--audit-fixture", action="store_true",
                     help="report per-question homes, hits and overlap; red above OVERLAP_MAX")
+    ap.add_argument("--spec-probes", action="store_true", help=SPEC_PROBE_BLIND)
     args = ap.parse_args()
 
     root = pathlib.Path(args.repo).resolve() if args.repo else recall_conf.repo_root()
+    if args.spec_probes:
+        try:
+            return print_spec_probes(root)
+        except CheckRefused as exc:
+            print(f"check-recall: REFUSED -- {exc}", file=sys.stderr)
+            return 2
     fixture_path = pathlib.Path(args.fixture) if args.fixture else KIT / FIXTURE_NAME
 
     scratch = None

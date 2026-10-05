@@ -1218,6 +1218,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "build_spec_root",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
       "id": "build_spec_text",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -3218,6 +3223,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_probe_labels",
+      "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
+    },
+    {
       "id": "derive_project_name",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -5178,6 +5188,11 @@
       "file": "tools/workflows/review_replay.py"
     },
     {
+      "id": "print_spec_probes",
+      "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
+    },
+    {
       "id": "print_summary",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -6171,6 +6186,11 @@
       "id": "read_spec_marks",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_spec_probes",
+      "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
     },
     {
       "id": "read_spec_uids",
@@ -10456,6 +10476,16 @@
       "id": "test_spec_h1_record_outranks_a_citation",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_spec_probes_dead_harvest",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_spec_probes_matched_delimiter",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
       "id": "test_spine_flat_layout",

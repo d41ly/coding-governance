@@ -168,7 +168,17 @@ program imports its scoring functions and edits nothing.
 python check-recall.py                  # the merge-bar leg
 python check-recall.py --audit-fixture  # per-question homes, hits and overlap, plus the derivation
 python check-recall.py --data-dir DIR   # grade an already-built dir: extract.py's under a single-pair pin, build_cache's under served
+python check-recall.py --spec-probes    # a REPORT, no floor: hit@10 over the probes every spec's section 10 records
 ```
+
+**`--spec-probes` is a second, larger question set, and it pins nothing.** It harvests the
+`query.py` question and `--terms` each tracked spec's section 10 records, labels each with the
+foreign ids the same spec cites OUTSIDE section 10 (an id section 10 also cites is dropped, since
+that is where the author wrote what the probe returned), and prints hit@10 of the served path with
+`n` beside it and every set-aside counted by reason. No person has checked those labels. It cannot
+see a probe return the author never wrote into section 10, it grades today's corpus including records
+written after the probe, and only ids in the declared families are labels. An empty harvest, or
+nothing left after de-contamination, prints `DEAD PROBE` naming the stage and exits 1.
 
 **The pin names a CELL, as one token**, because `bench.py` emits a matrix that spans 0.17 to 0.83 in
 a single run and a bare scalar names none of it. The default head is `served`:

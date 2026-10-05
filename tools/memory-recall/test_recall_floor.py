@@ -591,6 +591,59 @@ def test_rm3_is_seed_stable():
         + " | ".join(f"{k}={v[3:6]}" for k, v in seen.items()))
     return f"identical across {len(seeds)} seeds"
 
+# Built by concatenation, so no id-shaped literal names a record this repo does not define.
+FOREIGN = "TOOL-" + "aFixtureOther-1"
+INSIDE = "TOOL-" + "aFixtureInside-1"
+
+
+def build_spec_root(section_10: str) -> pathlib.Path:
+    """A throwaway git repo holding ONE tracked spec whose section 10 is `section_10`."""
+    import extract  # noqa: PLC0415 — the memory root is the conf's, read where the harvester reads it
+
+    root = pathlib.Path(tempfile.mkdtemp(prefix="specprobe-"))
+    _SCRATCH.append(root)
+    spec = root / extract.CONF.memory_root / "builds" / "xFixtureBuild" / "spec" / "s.md"
+    spec.parent.mkdir(parents=True)
+    spec.write_text("# fixture\n\n## 3. Design\n\nCites " + FOREIGN + ".\n\n"
+                    "## 10. Reuse audit\n\n" + section_10 + "\n", encoding="utf-8", newline="\n")
+    subprocess.run(["git", "init", "-q", str(root)], check=True)
+    subprocess.run(["git", "-C", str(root), "-c", "core.autocrlf=false", "add", "-A"], check=True)
+    return root
+
+
+@check("spec-probes: a root with no section-10 probe prints DEAD PROBE at the harvest")
+def test_spec_probes_dead_harvest():
+    root = build_spec_root("No recall probe was run here.")
+    p = subprocess.run([sys.executable, str(CHECK), "--spec-probes", "--repo", str(root)],
+                       capture_output=True, text=True, cwd=str(ROOT))
+    out = read_lines(p)
+    assert p.returncode == 1, f"exit {p.returncode}, want 1\n{out}"
+    assert "DEAD PROBE" in out and "harvest" in out, f"no DEAD PROBE naming the harvest:\n{out}"
+    assert "hit@" not in out, f"printed a hit@10 over nothing:\n{out}"
+    return "exit 1, DEAD PROBE at the harvest"
+
+
+@check("spec-probes: a question with an apostrophe across a wrap parses whole")
+def test_spec_probes_matched_delimiter():
+    import importlib.util  # noqa: PLC0415
+
+    root = build_spec_root('`python tools/memory-recall/query.py "why does the gate refuse a\n'
+                           "caller's bound\" --terms \"alpha beta gamma delta epsilon zeta eta\n"
+                           'theta"` returned ' + INSIDE + '.')
+    spec = importlib.util.spec_from_file_location("check_recall_arm", CHECK)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    specs = mod.read_spec_probes(root)
+    # LIVENESS: a harvest that found nothing would make every assertion below vacuous.
+    assert len(specs) == 1 and len(specs[0]["probes"]) == 1, f"harvested {specs!r}"
+    probe = specs[0]["probes"][0]
+    assert probe["question"] == "why does the gate refuse a caller's bound", probe["question"]
+    assert len(probe["terms"]) == 8, probe["terms"]
+    labels = mod.derive_probe_labels(specs[0])
+    assert labels == [FOREIGN], f"labels {labels}"
+    return "question whole through the apostrophe; section-10 id excluded"
+
+
 def main() -> int:
     for state, name, detail in _checks:
         mark = {"ok": "ok  ", "FAIL": "FAIL"}[state]
@@ -598,6 +651,11 @@ def main() -> int:
     bad = [c for c in _checks if c[0] == "FAIL"]
     print(f"\n{len(_checks) - len(bad)}/{len(_checks)} arms green")
     for d in _SCRATCH:
+        # A fixture repo's git objects are read-only, and rmtree cannot unlink those on Windows.
+        if (d / ".git").is_dir():
+            for f in (d / ".git").rglob("*"):
+                if f.is_file():
+                    f.chmod(0o666)
         shutil.rmtree(d, ignore_errors=True)
     if _BASE is not None:
         shutil.rmtree(_BASE, ignore_errors=True)
