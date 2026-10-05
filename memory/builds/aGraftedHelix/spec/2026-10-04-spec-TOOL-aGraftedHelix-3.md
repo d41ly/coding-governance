@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-3 — invariant records in the bug-class catalogue become the review's by-design list
 
-**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 3 · ratified 2026-10-04
+**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 3 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -217,11 +217,11 @@ matches the existing rule for `subjects`.
 Primary seeds, in the order tried. Each verification command is re-run at the pass's HEAD, and its
 output goes into the ledger.
 
-| ruling | record | anchors | guard | verified at writing by |
+| record | ruling | anchors | guard | verified at writing by |
 |---|---|---|---|---|
-| `TOOL-cSteadyMetronome-1` | `canary-waits-on-a-rendezvous-not-a-clock.md` | `tools/run-gates/run-gates.test.sh` | `run-gates canary` | `git grep -n "a fact about the NODE" -- tools/run-gates/run-gates.test.sh`; a spec audit's F18 (aPacedTurnstile review) caught a spec re-proposing the refuted interval form |
-| `TOOL-aPooledSweep-1` | `sweep-issues-no-cost-verdict.md` | `tools/run-gates/run-selftests.sh` | `run-selftests self-test` | `git grep -n "TOOL-aPooledSweep-1" -- tools/run-gates/run-selftests.sh` (603, 854) |
-| `TOOL-aUnblockedFleet-1` | `concurrent-runs-are-announced-not-refused.md` | `tools/unattended/unattended.sh` | `tools/unattended/unattended.test.sh`, whose arm at line 695 pins the announcement; no bar leg runs that suite, so the guard names the file | `git grep -n "ANNOUNCED, NEVER REFUSED" -- tools/unattended/unattended.sh` (2180); the aDeferredBar spec audit's L5 caught a spec asserting the retired one-live-run rule |
+| `canary-waits-on-a-rendezvous-not-a-clock.md` | `TOOL-cSteadyMetronome-1` | `tools/run-gates/run-gates.test.sh` | `run-gates canary` | `git grep -n "a fact about the NODE" -- tools/run-gates/run-gates.test.sh`; a spec audit's F18 (aPacedTurnstile review) caught a spec re-proposing the refuted interval form |
+| `sweep-issues-no-cost-verdict.md` | `TOOL-aPooledSweep-1` | `tools/run-gates/run-selftests.sh` | `run-selftests self-test` | `git grep -n "TOOL-aPooledSweep-1" -- tools/run-gates/run-selftests.sh` (603, 854) |
+| `concurrent-runs-are-announced-not-refused.md` | `TOOL-aUnblockedFleet-1` | `tools/unattended/unattended.sh` | `tools/unattended/unattended.test.sh`, whose arm at line 695 pins the announcement; no bar leg runs that suite, so the guard names the file | `git grep -n "ANNOUNCED, NEVER REFUSED" -- tools/unattended/unattended.sh` (2180); the aDeferredBar spec audit's L5 caught a spec asserting the retired one-live-run rule |
 
 The third seed is checked after unit 1 lands, because unit 1 adds a same-slug claim refusal to
 `tools/unattended/`. A same-slug refusal is not what `TOOL-aUnblockedFleet-1` retired, since that
@@ -486,6 +486,9 @@ New arm: tools/workflows/unattended-build.test.sh · a caller checklist beside t
   bytes under its 20480-byte dossier cap, and Files touched names that dossier in place of the
   unattended one. The Inventory gains the two constants the grading reads (`INVARIANT_SECTIONS`,
   `GUARD_TOKEN_RE`) and the two nested self-test helpers.
+- rev-4 · 2026-10-05 · §4 · the seed table leads each row with its record, not its ruling id: a
+  row leading with an id anchors it under this build folder, and hygiene check 13 read the three
+  rulings as claimed by two build folders. Columns reordered; no content moved.
 
 ## 10. Reuse audit
 
