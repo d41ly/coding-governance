@@ -1178,6 +1178,86 @@ def load_dossier_texts(map_dir: Path) -> dict[str, str]:
 
 
 # ======================================================================================
+# Typed counts — a present-tense digit count of an inventory population in dossier prose
+# ======================================================================================
+#
+# The charter's §7: no count of a derived population is written in prose. The map derives every
+# inventory's size into MAP.md, so a dossier sentence saying "the 86 legs" is a second answer that
+# goes stale on the next leg. A candidate is a digit count followed by an inventory noun; it is
+# FROZEN, and passes, when its sentence reads as a past measurement (ANNOTATION-STYLE A4's first
+# disposition). Digits only: a count spelled as a word is not read (TOOL-aMendedFleet-44 F3).
+# Reads prose only — fenced blocks (the toml fence included) and inline code spans are blanked
+# first, offsets kept, so line numbers stay true.
+
+FROZEN_MARKERS = (
+    re.compile(r"\b\d{4}-\d{2}-\d{2}\b"),                 # a date
+    re.compile(r"\b[0-9a-f]{7,40}\b"),                    # a hex run: a sha
+    re.compile(r"\bnode\s+[a-z]\b"),                      # node <tag>
+    re.compile(r"\bPINNED\b"),
+    re.compile(r"\b(?:measured|at\s+review|on\s+the\s+day)\b", re.IGNORECASE),
+    re.compile(r"\b(?:was|were|had|shipped|landed|found|named|redded|left|read)\b", re.IGNORECASE),
+)
+# A COUNT: one to five digits not preceded by a word character, `§`, `#`, `.`, `/`, `-` or a backtick.
+_TYPED_COUNT_DIGITS = r"(?<![\w§#./\-`])\d{1,5}(?!\d)"
+# The one word allowed between count and noun may not be a determiner: "43 the Skill" is a check
+# number followed by a noun phrase, not a count of skills.
+_TYPED_COUNT_DETERMINERS = ("the", "a", "an", "its", "this", "that", "their")
+_TYPED_COUNT_EXTRA_NOUNS = ("key", "keys", "dossier", "dossiers")
+_FENCE_LINE_RE = re.compile(r"^ {0,3}(```|~~~)")
+_CODE_SPAN_RE = re.compile(r"(`+)(?:(?!\n[ \t]*\n).)+?(?<!`)\1(?!`)", re.DOTALL)
+_SENTENCE_END_RE = re.compile(r"(?<=[.;])\s+")
+_PARAGRAPH_RE = re.compile(r"(?:[ \t]*\S[^\n]*(?:\n|$))+")
+
+
+def _build_blank(text: str) -> str:
+    return re.sub(r"[^\n]", " ", text)
+
+
+def measure_typed_counts(text: str, inventory_ids) -> tuple[list[tuple[int, str]], int]:
+    """([(line, matched text)] of every UNFROZEN typed count in `text`'s prose, frozen count).
+
+    Pure. The nouns are the last hyphen segment of each inventory id, as written and singular,
+    plus key/dossier in both numbers, each optionally preceded by `inventory`.
+    """
+    nouns: set[str] = set(_TYPED_COUNT_EXTRA_NOUNS)
+    for inv_id in inventory_ids:
+        noun = inv_id.rsplit("-", 1)[-1]
+        nouns.add(noun)
+        nouns.add(noun[:-2] if noun.endswith("sses") else noun[:-1] if noun.endswith("s") else noun)
+    noun_alt = "|".join(sorted((re.escape(n) for n in nouns if n), key=len, reverse=True))
+    determiners = "|".join(_TYPED_COUNT_DETERMINERS)
+    count_re = re.compile(
+        rf"{_TYPED_COUNT_DIGITS}(?:\s+of\s+the\s+\d{{1,5}})?"
+        rf"(?:\s+(?!(?:{determiners})\b)[^\s`]+)??"
+        rf"\s+(?:inventory\s+)?(?:{noun_alt})\b",
+        re.IGNORECASE,
+    )
+    # Fences blanked: what the freezing markers read. Code spans blanked too: what counts read.
+    lines = text.split("\n")
+    in_fence = False
+    for i, line in enumerate(lines):
+        is_fence = bool(_FENCE_LINE_RE.match(line))
+        if in_fence or is_fence:
+            lines[i] = _build_blank(line)
+        if is_fence:
+            in_fence = not in_fence
+    fenceless = "\n".join(lines)
+    prose = _CODE_SPAN_RE.sub(lambda mt: _build_blank(mt.group(0)), fenceless)
+    hits: list[tuple[int, str]] = []
+    frozen = 0
+    for para in _PARAGRAPH_RE.finditer(prose):
+        start = para.start()
+        bounds = [start, *(e.end() for e in _SENTENCE_END_RE.finditer(prose, start, para.end())), para.end()]
+        for lo, hi in zip(bounds, bounds[1:]):
+            for mt in count_re.finditer(prose, lo, hi):
+                if any(rx.search(fenceless, lo, hi) for rx in FROZEN_MARKERS):
+                    frozen += 1
+                else:
+                    hits.append((prose.count("\n", 0, mt.start()) + 1, " ".join(mt.group(0).split())))
+    return hits, frozen
+
+
+# ======================================================================================
 # Affordance — the forward reuse menu (graced presence check, NOT a keyed inventory)
 # ======================================================================================
 #

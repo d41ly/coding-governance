@@ -244,6 +244,32 @@ def test_dossier_decisions_are_declining() -> None:
     )
 
 
+def test_dossier_prose_carries_no_typed_count() -> None:
+    """No present-tense digit count of an inventory population in dossier prose.
+
+    The map derives every inventory's size into MAP.md, so "the 86 legs" in a dossier is a second
+    answer that goes stale on the next leg (charter §7). A sentence reading as a past measurement
+    is frozen and passes. NOT checked: counts spelled as words, counts inside fences (the toml
+    title included) or code spans, and nouns outside the map's inventories.
+    """
+    texts = m.load_dossier_texts(m.map_root())
+    hits: list[str] = []
+    candidates = frozen = 0
+    for name, text in texts.items():
+        found, n_frozen = m.measure_typed_counts(text, INVENTORY_IDS)
+        candidates += len(found) + n_frozen
+        frozen += n_frozen
+        source = "FOUNDATION.md" if name == "foundation" else f"{name}.md"
+        hits.extend(f"{source}:{line}: {match}" for line, match in found)
+    print(f"     typed-count lint: {candidates} candidate(s) read in {len(texts)} dossier(s), {frozen} frozen")
+    assert not hits, (
+        "a present-tense count of an inventory population in dossier prose:\n  "
+        + "\n  ".join(hits)
+        + "\nRemedy, one of: freeze it as a past-tense reading that cites the record which measured "
+        "it; point at the file that owns it; or rewrite the sentence without it."
+    )
+
+
 def test_path_derived_keys_are_posix() -> None:
     for inv_id, keys in ext.all_inventories().items():
         offenders = [k for k in keys if "\\" in k]
@@ -320,6 +346,7 @@ if __name__ == "__main__":
         test_dossier_prose_headings_pinned,
         test_dossier_affordance_present_or_graced,
         test_dossier_decisions_are_declining,
+        test_dossier_prose_carries_no_typed_count,
         test_path_derived_keys_are_posix,
         test_generated_artifacts_are_fresh,
     ):

@@ -21,6 +21,15 @@ project specifics live in exactly two files the adopting repo owns.
   `INVENTORY-DERIVATION.md`.
 - `test_codebase_map.template.py` — the gate; copied into the project's existing test dir
   (zero CI changes: a test file is its own deployment). Also runs standalone (`python <file>`).
+
+  Its `test_dossier_prose_carries_no_typed_count` arm refuses a present-tense typed count of an
+  inventory population in dossier prose: a digit run before an inventory noun, `key` or `dossier`,
+  found by `measure_typed_counts`, unless its sentence reads as a past measurement (a date, a sha,
+  `node <tag>`, `measured`, `PINNED`, or a past-tense verb in `FROZEN_MARKERS`). It prints its
+  candidate and frozen counts on every run. The gap it states: it reads digits only, so a count
+  spelled as a word ("two legs") passes, and so does a count inside a fence, the toml `title`
+  included, or a code span. The template reaches a project only when absent, so an existing
+  adopter gets the arm by copying it in.
 - `map_imports.py` — an import target to the repo paths it may DENOTE, by AST: `resolve_import`
   plus the module index it resolves against, language-branched on the IMPORTER's extension because a
   dot means different things in Python and JS. Returns CANDIDATE paths; an empty list means external

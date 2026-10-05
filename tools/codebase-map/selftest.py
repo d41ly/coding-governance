@@ -666,6 +666,50 @@ def _test_feature_cards():
     assert cut and int(cut.group(1)) == 61 - shown, (lines[-1], shown)
 
 
+def _test_typed_counts():
+    """TOOL-aMendedFleet-44: measure_typed_counts raises a present-tense digit count of an
+    inventory noun in prose, and nothing else — every S2 clause, positive and negative."""
+    ids = ("gate-legs", "rendered-skills", "gotcha-classes")
+
+    def read_hits(text):
+        return [mt for _, mt in m.measure_typed_counts(text, ids)[0]]
+
+    positives = {
+        "Seven of the 86 legs name a network verb.": ["86 legs"],
+        "The bar runs 124 gate legs.": ["124 gate legs"],
+        "It holds 1 leg.": ["1 leg"],
+        "There are 9 classes and 3 inventory keys.": ["9 classes", "3 inventory keys"],
+        "Three of the 27 dossiers remain.": ["27 dossiers"],
+        "It ships 4 rendered skills.": ["4 rendered skills"],
+        "one\n\nThe bar runs 12\ngate legs; it ran 5 legs on 2026-01-01.": ["12 gate legs"],
+    }
+    for text, want in positives.items():
+        assert read_hits(text) == want, (text, read_hits(text))
+    negatives = (
+        "see the §7 leg line",
+        "Check 42 grades the wall, 43 the Skill's hold routing.",
+        "a code span holding `86 legs` here.",
+        "before\n\n```\n86 legs\n```\n\nafter",
+        "~~~\n86 legs\n~~~",
+        "issue #12 legs, path a/12 legs, v1.12 legs, x-12 legs, a12 legs",
+        "86 of those legs",
+        "two legs and 123456 legs",
+        "The bar runs 124 legs, measured at base.",
+        "It ran 124 legs at `abc1234`.",
+        "node a counts 124 legs.",
+        "124 legs, PINNED.",
+        "124 legs at review.",
+        "124 legs on the day.",
+        "There were 124 legs.",
+    )
+    for text in negatives:
+        assert read_hits(text) == [], (text, read_hits(text))
+    found, frozen = m.measure_typed_counts("A 3 legs read. B 4 legs.", ids)
+    assert [h[1] for h in found] == ["4 legs"] and frozen == 1, (found, frozen)
+    assert m.measure_typed_counts("line\n\nnext\n9 legs", ids)[0] == [(4, "9 legs")]
+    assert m.measure_typed_counts("", ids) == ([], 0)
+
+
 def test_conf_grammar(tmp: Path):
     (tmp / ".codebase-map.conf").write_text(
         '# c\nMAP_ROOT=docs/map\nGATE_FILE="tests/test map.py"\n'
@@ -1793,6 +1837,7 @@ def main() -> int:
         "symbols.json deterministic + fail-closed render", test_symbols_render_deterministic_and_fail_closed
     )
     failures += check("feature cards: fence-only, capped, cut counted (TOOL-aMendedFleet-43)", _test_feature_cards)
+    failures += check("typed counts: prose digits of inventory nouns, frozen pass (TOOL-aMendedFleet-44)", _test_typed_counts)
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "extractor helpers fail closed", lambda: test_extractor_helpers_fail_closed(Path(td))

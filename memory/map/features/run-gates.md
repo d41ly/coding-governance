@@ -121,8 +121,9 @@ empty manifest and an unwritten verdict file are REFUSED, and the pre-push hook 
 after every exit 0. Two whole-output readers filter the timestamped `gate queue: acquired` line.
 `TOOL-dDerivedDocket-26`.
 
-**Exactly one leg is impure, and it is the gate rather than a self-test.** Seven of the 86 legs name
-a network verb in their own script; six build their origin under `mktemp -d`. The seventh,
+**Exactly one leg is impure, and it is the gate rather than a self-test.** When
+`TOOL-aPacedTurnstile-5` read the manifest, seven of the 86 legs named a network verb in their own
+script, and six of those built their origin under `mktemp -d`. The seventh,
 `unattended kit gate`, runs `ls-remote` against the real remote and fails closed, so its verdict is a
 function of the remote as well as of the tree. That is the population the `impure` key declares —
 measured 2026-08-20, and both the "all four unattended legs" guess and the "none of them" reading

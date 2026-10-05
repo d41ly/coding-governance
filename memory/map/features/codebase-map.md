@@ -101,6 +101,13 @@ repo-wide python-launcher seam rather than anything this feature owns.
   `FOUNDATION.md` is not measured. Its one `git log` restates every default a config key could
   change (`--no-show-signature`, `--no-color`, `--no-renames`), because the parse reads that
   stdout as data and `log.showSignature` alone would print gpg text into it.
+- **One shape of dossier prose IS gated: a present-tense typed count of an inventory population.**
+  The map derives every inventory's size into `MAP.md`, so a digit count of legs or keys in a
+  dossier is a second answer that goes stale (TOOL-aMendedFleet-44). `measure_typed_counts` in
+  `map_lib.py` reads prose only — fences and code spans blanked — and passes a sentence that reads
+  as a past measurement; `test_dossier_prose_carries_no_typed_count` asserts no unfrozen hit and
+  prints its candidate and frozen counts every run, so "read nothing" never looks like "clean".
+  Digits only: a spelled count and a count in the toml `title` are not read.
 - **No closing loop catches reinvention that already shipped.** `map_diff.py --converge` was that
   loop; no gate leg, hook or workflow ran it, every token-stem collision it had appended on node a
   was a false positive, and it was deleted with its sink, its `CLONE_COUNT_FILE` key and the

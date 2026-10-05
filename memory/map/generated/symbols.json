@@ -7983,6 +7983,11 @@
       "file": "tools/runlog/extract.py"
     },
     {
+      "id": "measure_typed_counts",
+      "kind": "function",
+      "file": "tools/codebase-map/map_lib.py"
+    },
+    {
       "id": "measure_view_delta",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -15869,6 +15874,11 @@
     },
     {
       "id": "test_dossier_decisions_are_declining",
+      "kind": "function",
+      "file": "tools/codebase-map/test_codebase_map.py"
+    },
+    {
+      "id": "test_dossier_prose_carries_no_typed_count",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
     },

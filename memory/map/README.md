@@ -34,3 +34,6 @@ inventories: `codebase-map/map_extractors.py`; gate: see `.codebase-map.conf` GA
   or `none — <why feature-specific>` (presence gated, content not). BEFORE building, run
   `python codebase-map/reuse_lookup.py "<behaviour>"` to find an existing seam to wire through
   instead of reinventing it (see `codebase-map/reuse-lookup.agent.md`).
+- Dossier prose carries no present-tense typed count of an inventory population (gate-enforced,
+  digits only). Remedy, one of: freeze it as a past-tense reading that cites the record which
+  measured it; point at the file that owns it; or rewrite the sentence without it.
