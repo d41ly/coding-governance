@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-17 — check 27's engine arm asserts its branch run prints no check 28 line, observed once check 28 exists
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 7
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 7
 
 <!-- gen:spec-records -->
 

@@ -3459,7 +3459,7 @@ grep -qF 'is not F-item shaped' <<<"$out_fi" && { echo "FAIL the F-item shape ar
 # ---- GOV_DEFAULT_BRANCH=main, because the relation base is derived from it.
 R27_KIT=$(resolve_kit_dir "$_PY" memory-recall bench.py "$HERE" 2>/dev/null) || R27_KIT=""
 if [ -z "$R27_KIT" ]; then
-  echo "skip check 27 through the engine: no memory-recall kit beside this one, so its four arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+4))
+  echo "skip check 27 through the engine: no memory-recall kit beside this one, so its five arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+5))
 else
   R27=$TMP/rel27
   _r27host=${HERE%/"$KIT_REL"}
@@ -3497,6 +3497,16 @@ else
     echo "ok   check 27 through the engine: a paraphrased decision row reds the leg, naming itself and the base row"
   else
     echo "FAIL check 27 through the engine: the branch adding a paraphrased row exited $r27rc without a check 27 line naming ARCH-tTwo-1 and ARCH-tOne-1 - the block swallowed the module's exit, or never ran it:"; printf '%s\n' "$o27" | sed 's/^/      /'; st=1
+  fi
+  # TOOL-aGraftedHelix-17: the paraphrase is all that keeps check 28 off this branch. A branch row
+  # whose body restates the base row's is a content duplicate, check 28 reds the same run, and the
+  # exit is no longer 27's to claim. The --offenders arm below reds then too, but its message is
+  # about the offending check; this one names the fixture's row as the cause.
+  n=$((n+1))
+  if grep -qE '^check 28:' <<<"$o27"; then
+    echo "FAIL check 27 through the engine: the branch run printed a check 28 line - the fixture's branch row ARCH-tTwo-1 is a content duplicate of its base row ARCH-tOne-1, so the exit belongs to check 28 and not to 27; paraphrase the row again:"; grep -E '^check 28:' <<<"$o27" | sed 's/^/      /'; st=1
+  else
+    echo "ok   check 27 through the engine: the branch run prints no check 28 line, so its row is no content duplicate of the base row"
   fi
   # --offenders, not a grep of the prose: it keys EVERY check's offence the same way, a delegated
   # module's and corpus_ids' refusal included, and it is the only reader of the block's own key line.
@@ -3615,7 +3625,9 @@ esac
 # skipped aloud with n_skip carrying the four when no memory-recall kit sits beside this one.
 # RAISED 535 -> 538 by TOOL-aGraftedHelix-13: its three check-28 engine arms, each top-level and
 # never skipped, because that fixture needs no sibling kit.
-FLOOR_ASSERTIONS=538
+# RAISED 538 -> 539 by TOOL-aGraftedHelix-17: its no-check-28 arm on the check-27 branch run,
+# top-level and skipped aloud with that block's other four.
+FLOOR_ASSERTIONS=539
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
