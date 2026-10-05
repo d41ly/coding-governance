@@ -36,3 +36,4 @@ Arg sets, both diff-kind, `base` 40×`b` and `head` 40×`c`, `repo /tmp/r`, `con
   render with the first diff lens brief's `'Security: trust boundaries` changed to
   `'Security: trust limits` (one occurrence, asserted): RED, rc 1, naming
   `find:security differs with the key masked` in both arg sets and no other label.
+- AC4 — this record, under the build's `build/` folder, names both blobs of `tools/workflows/tier2-review.js` read with `git rev-parse`, BASE `54cf03a3` and pass HEAD `3faf8662`, the label counts of AC1, and the outcomes of AC2 and AC3 above; it carries the journal Serves line and this Evidences block, so check 23 reads it.
