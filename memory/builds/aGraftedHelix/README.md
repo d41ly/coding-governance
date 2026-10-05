@@ -96,7 +96,7 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 26 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
+**Build status:** SPECCED · 28 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
 ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13
 ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-26
 ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28
@@ -114,6 +114,7 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28
 | [TOOL-aGraftedHelix-3 — invariant records in the bug-class catalogue become the review's by-design list](spec/2026-10-04-spec-TOOL-aGraftedHelix-3.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aGraftedHelix-20 — the holder row's claim CAS runs before its `write_lease` under one stamp, and a CAS that does not land leaves a `prior-session` fact the `mine` test accepts](spec/2026-10-04-spec-TOOL-aGraftedHelix-20.md) | 4 | 2 | SPECCED | rev-6 | 2026-10-04 |
 | [TOOL-aGraftedHelix-22 — the claim write decision refuses a derived claim-read class outside `CLAIM_READS`, observed by a criterion and kept by a standing arm](spec/2026-10-04-spec-TOOL-aGraftedHelix-22.md) | 4 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aGraftedHelix-27 — the driver resolves generated indexes the same inside a git hook as outside one, so a pass commits the index its generator rewrote](spec/2026-10-05-spec-TOOL-aGraftedHelix-27.md) | 4 | 2 | SPECCED | rev-1 | 2026-10-05 |
 | [TOOL-aGraftedHelix-4 — recall labels a superseded record and ranks it under its successor](spec/2026-10-04-spec-TOOL-aGraftedHelix-4.md) | 4 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-23 — the `prior-session` fact is the set of sessions an incomplete holder write may have left the claim under, read by `check_claim_writable` itself and emptied by the next `--resume` holder-row claim write that lands](spec/2026-10-04-spec-TOOL-aGraftedHelix-23.md) | 5 | 2 | SPECCED | rev-5 | 2026-10-04 |
 | [TOOL-aGraftedHelix-9 — a newly added decision row or gotcha that ranks as a near match must name its relation](spec/2026-10-04-spec-TOOL-aGraftedHelix-9.md) | 5 | 2 | SPECCED | rev-2 | 2026-10-04 |
@@ -130,13 +131,14 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28
 | [TOOL-aGraftedHelix-15 — the build harness commits the specs its writers authored before AUDIT pins them, and its commit-first refusals name a remedy a resume cannot replay](spec/2026-10-04-spec-TOOL-aGraftedHelix-15.md) | 10 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-16 — the spec commit stage re-stages the authored specs after the generator renders them, and a real-git arm runs the prompt's own git block](spec/2026-10-04-spec-TOOL-aGraftedHelix-16.md) | 11 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-21 — the spec commit block's delta loop lists untracked paths as its record does, compares paths, and refuses when its record is unset](spec/2026-10-04-spec-TOOL-aGraftedHelix-21.md) | 12 | 1 | SPECCED | rev-3 | 2026-10-04 |
+| [TOOL-aGraftedHelix-28 — a parity gate holds the by-design head the catalogue renders equal to the pattern the review harness parses](spec/2026-10-05-spec-TOOL-aGraftedHelix-28.md) | 12 | 1 | SPECCED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
 Records: 20 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-aGraftedHelix-26.
 
-Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-26.
+Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-26 TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -146,7 +148,7 @@ Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-26.
 | 1 | `TOOL-aGraftedHelix-1` | no |
 | 2 | `TOOL-aGraftedHelix-10`, `TOOL-aGraftedHelix-11`, `TOOL-aGraftedHelix-12`, `TOOL-aGraftedHelix-2` | yes |
 | 3 | `TOOL-aGraftedHelix-18`, `TOOL-aGraftedHelix-19`, `TOOL-aGraftedHelix-3` | yes |
-| 4 | `TOOL-aGraftedHelix-20`, `TOOL-aGraftedHelix-22`, `TOOL-aGraftedHelix-4` | yes |
+| 4 | `TOOL-aGraftedHelix-20`, `TOOL-aGraftedHelix-22`, `TOOL-aGraftedHelix-27`, `TOOL-aGraftedHelix-4` | yes |
 | 5 | `TOOL-aGraftedHelix-23`, `TOOL-aGraftedHelix-9` | yes |
 | 6 | `TOOL-aGraftedHelix-14`, `TOOL-aGraftedHelix-24`, `TOOL-aGraftedHelix-6` | yes |
 | 7 | `TOOL-aGraftedHelix-13`, `TOOL-aGraftedHelix-17`, `TOOL-aGraftedHelix-25`, `TOOL-aGraftedHelix-5` | yes |
@@ -154,7 +156,7 @@ Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-26.
 | 9 | `TOOL-aGraftedHelix-8` | no |
 | 10 | `TOOL-aGraftedHelix-15` | no |
 | 11 | `TOOL-aGraftedHelix-16` | no |
-| 12 | `TOOL-aGraftedHelix-21` | no |
+| 12 | `TOOL-aGraftedHelix-21`, `TOOL-aGraftedHelix-28` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
