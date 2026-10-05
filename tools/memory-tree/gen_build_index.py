@@ -18,7 +18,7 @@ It replaces the retired directory-listing generator. A listing carried paths, wh
 prints better; this carries STATUS, which git does not — and a build's status is a PURE FUNCTION of
 its units' statuses, so nothing here is authored and nothing rots.
 
-FOUR SOURCES, NOTHING ELSE
+FIVE SOURCES, NOTHING ELSE
   * each build's README front matter (slug node opened streams roster [status])
   * every `**Status:**` header under that build's spec/, at any depth
   * for the ROSTER, and for the date of a build's last record, every tracked file under the memory
@@ -29,6 +29,10 @@ FOUR SOURCES, NOTHING ELSE
   * under `BACKLOG_MODE=builds` ONLY, every tracked `builds/<slug>/BACKLOG.md`, read through
     `backlog.py`'s grammar and folded into the family views. Under `shards` that source does not
     exist and not one branch below it is reached, which is what keeps this change dark.
+  * under `LIVE_LANDED_UNCLOSED=1` ONLY, the drift-audit kit's `non_terminal_specs_cited_by_product_source`
+    join, called in-process through that kit's own signal and restated nowhere here, which greps
+    tracked product source; LIVE.md renders its rows as a per-build `Landed-unclosed` count
+    (TOOL-aMendedFleet-13). Blank or absent, the drift kit is never imported.
 No git history and no mtimes. A source the renderer does not read cannot make the render drift; a
 source the renderer WRITES must not also be read, or a wrong value defends itself forever.
 
@@ -1511,7 +1515,63 @@ def derive_last_record(build: dict, asks) -> str:
     return max(dates)
 
 
-def render_live(builds: list, m: str, conf: dict | None = None, reading: dict | None = None) -> str:
+def read_landed_unclosed(root: str, conf: dict, resolve=None) -> dict | None:
+    """TOOL-aMendedFleet-13 S1, S4, S5 — drift-audit's own spec-status signal record, or None.
+
+    Blank or absent returns None and never resolves, let alone imports, the drift kit (S6). Set to
+    `1`, it calls `signal_spec_status` through the kit's own `Ctx`, `load_conf` and
+    `load_project_layer`, base ref `HEAD` because the signal never reads it, so the join is the drift
+    kit's and is restated nowhere here. Every failure is a named Problem before anything is written:
+    an illegal value, an unresolvable kit, a drift-kit refusal carried with its own text, and an
+    EMPTY evidence population, whose every zero would be a reassuring one.
+    """
+    raw = (conf.get("LIVE_LANDED_UNCLOSED") or "").strip()
+    if raw not in ("", "1"):
+        raise Problem(f"LIVE_LANDED_UNCLOSED='{raw}' is not one of its two legal values, "
+                      f"blank (off) or 1 (on)")
+    if not raw:
+        return None
+    try:
+        kit = (resolve or backlog.resolve_kit_dir)("drift-audit", "drift_report.py",
+                                                   os.path.dirname(os.path.abspath(__file__)))
+    except LookupError as exc:
+        raise Problem(f"LIVE_LANDED_UNCLOSED=1 needs the drift-audit kit, which does not "
+                      f"resolve: {exc}") from None
+    sys.path.insert(0, str(kit))
+    import drift_report  # noqa: PLC0415 — deferred: only a set key may import the sibling kit
+    rootp = pathlib.Path(root)
+    try:
+        ctx = drift_report.Ctx(rootp, drift_report.load_conf(rootp),
+                               drift_report.load_project_layer(rootp), "HEAD")
+        record = drift_report.signal_spec_status(ctx)
+    except drift_report.DriftError as exc:
+        raise Problem(f"LIVE_LANDED_UNCLOSED=1: the drift-audit kit refused: {exc}") from None
+    if not record.get("evidence_files"):
+        raise Problem(f"LIVE_LANDED_UNCLOSED=1: drift-audit's {record.get('signal')} join read an EMPTY "
+                      f"evidence population (EVIDENCE_GLOBS resolves to no tracked file), so every "
+                      f"Landed-unclosed count would be a reassuring zero")
+    return record
+
+
+def derive_landed_counts(record: dict, builds: list, m: str) -> dict:
+    """TOOL-aMendedFleet-13 S2 — the signal's detail rows counted per build, every build keyed.
+
+    A row counts for a non-terminal build only when its (file, id) pair is one of that build's units
+    in this generator's TRACKED reading: the signal globs the filesystem, so an untracked spec reaches
+    it, and the pair keeps the render a function of the tracked tree. Terminal builds count zero.
+    """
+    counts = {}
+    rows = {(r["file"], r["id"]) for r in record.get("detail") or ()}
+    for b in builds:
+        marker = "/builds/" + b["slug"] + "/"
+        own = {(f"{m}{marker}{u['path'].replace(os.sep, '/').split(marker, 1)[1]}", u["id"])
+               for u in b["units"]}
+        counts[b["slug"]] = 0 if b["status"] in TERMINAL else len(own & rows)
+    return counts
+
+
+def render_live(builds: list, m: str, conf: dict | None = None, reading: dict | None = None,
+                landed: dict | None = None) -> str:
     # LIVE_DORMANT_DAYS (TOOL-aMendedFleet-12): blank or absent renders the file this function always
     # rendered, byte for byte; anything else must be a positive whole number of days or it refuses.
     raw = ((conf or {}).get("LIVE_DORMANT_DAYS") or "").strip()
@@ -1546,6 +1606,12 @@ def render_live(builds: list, m: str, conf: dict | None = None, reading: dict | 
         out += [f"Dormant: no record dated within {raw} days of {anchor}, the newest record date in "
                 f"this tree ({who}).", ""]
         head, rule = head + " Last record | Activity |", rule + "---|---|"
+    if live and landed is not None:
+        # TOOL-aMendedFleet-13 S3: after TOOL-aMendedFleet-12's column pair and its sentence.
+        out += ["Landed-unclosed: the build's non-terminal units whose id tracked product source cites, "
+                "by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to "
+                "close, not a verdict.", ""]
+        head, rule = head + " Landed-unclosed |", rule + "---|"
     if live:
         # A COUNT, not the list. This file is in check 7's entry-budget population and the build
         # README's region is not, so the full roster renders there and a bounded number renders here:
@@ -1554,6 +1620,7 @@ def render_live(builds: list, m: str, conf: dict | None = None, reading: dict | 
         for b in live:
             fm = b["fm"]
             tail = " {} | {} |".format(*extra[b["slug"]]) if extra else ""
+            tail += f" {landed.get(b['slug'], 0)} |" if landed is not None else ""
             out.append(
                 f"| [{b['slug']}](builds/{b['slug']}/README.md) | {b['status']} | {fm['node']} | "
                 f"{fm['opened']} | {fm['streams']} | {len(b['roster'])} |{tail}"
@@ -2058,7 +2125,7 @@ def remove_dead_regions(readme_text: str) -> str:
     return readme_text
 
 
-def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
+def plan(root: str, conf: dict, create_missing: bool = False, resolve=None) -> tuple:
     """Return (artifacts, orphans, unmanaged) — the whole render, computed without touching disk.
 
     `create_missing` is the ONE asymmetry between the two verbs (S7). `--write` passes true and adds
@@ -2154,7 +2221,9 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
             artifacts[rel] = apply_region(
                 stext, render_spec_records(u["id"], inverted.get(u["id"], []), rel), rel,
                 SPEC_RECORDS_OPEN, SPEC_RECORDS_CLOSE)
-    artifacts[f"{m}/LIVE.md"] = render_live(builds, m, conf, reading)
+    record = read_landed_unclosed(root, conf, resolve)
+    artifacts[f"{m}/LIVE.md"] = render_live(
+        builds, m, conf, reading, None if record is None else derive_landed_counts(record, builds, m))
     artifacts.update(render_shards(builds, m))
     # Orphans: a tracked file under ledger/ that this render does not produce. The DELETABLE set is
     # bounded to the month-shard NAME; anything else is reported and left alone.
@@ -5840,6 +5909,50 @@ def cmd_selftest() -> int:
             + _l_rows) + "\n"
         arm("AC4 — a blank LIVE_DORMANT_DAYS renders the pre-unit LIVE.md byte for byte", "True",
             lambda: str(len(_l_rows) == 4 and plan(_l_t, _l_blank)[0]["memory/LIVE.md"] == _l_old))
+        # TOOL-aMendedFleet-13 — LIVE.md's `Landed-unclosed` column. The resolvers are dict lookups
+        # that raise KeyError, a LookupError, so the AC5 one is exactly what resolve_kit_dir raises.
+        arm("TOOL-aMendedFleet-13 AC6 — a blank LIVE_LANDED_UNCLOSED never resolves the drift kit and "
+            "moves no byte, with and without the dormancy pair", "True True",
+            lambda: "{} {}".format(
+                plan(_l_t, dict(_l_blank, LIVE_LANDED_UNCLOSED=""),
+                     resolve=lambda *_a: {}["a blank key resolved the drift kit"])[0]["memory/LIVE.md"]
+                == _l_old,
+                plan(_l_t, dict(_l_conf, LIVE_LANDED_UNCLOSED=" "),
+                     resolve=lambda *_a: {}["a blank key resolved the drift kit"])[0]["memory/LIVE.md"]
+                == _l_live))
+        arm("TOOL-aMendedFleet-13 AC5 — a set key whose drift kit does not resolve refuses by name",
+            "LIVE_LANDED_UNCLOSED=1 needs the drift-audit kit, which does not resolve",
+            lambda: plan(_l_t, dict(_l_conf, LIVE_LANDED_UNCLOSED="1"),
+                         resolve=lambda *_a: {}["no drift-audit kit in this fixture"]))
+        arm("TOOL-aMendedFleet-13 S5 — a value other than blank or 1 refuses by name",
+            "LIVE_LANDED_UNCLOSED='yes' is not one of its two legal values",
+            lambda: plan(_l_t, dict(_l_conf, LIVE_LANDED_UNCLOSED="yes")))
+        _k_read: dict = {}
+        _k_live = render_live(collect(_l_t, _l_conf, backlog_out=_k_read), "memory", _l_conf, _k_read,
+                              {"aSpec": 2})
+        arm("TOOL-aMendedFleet-13 S3 — the sentence follows the dormancy sentence",
+            "tree (aSpec).\n\nLanded-unclosed: the build's non-terminal units", lambda: _k_live)
+        arm("TOOL-aMendedFleet-13 S3 — the column trails the dormancy pair, zero included",
+            "| Last record | Activity | Landed-unclosed |\n|---|---|---|---|---|---|---|---|---|\n"
+            "| [aFile](builds/aFile/README.md) | SPECCED | a | 2026-09-01 | tool | 1 | 2026-09-09 | active | 0 |\n"
+            "| [aSpec](builds/aSpec/README.md) | SPECCED | a | 2026-09-01 | tool | 1 | 2026-09-30 | active | 2 |\n",
+            lambda: _k_live)
+        # AC2 — the pure mapping over a live build and a terminal one. The third row carries the live
+        # unit's OWN id at a path the fixture never tracked, so only the (file, id) pair rejects it.
+        _k_t = os.path.join(_l_base, "landed"); os.makedirs(_k_t)
+        _k_conf = _build_backlog_fixture(_k_t, {
+            "memory/builds/aLive/README.md": _render_backlog_readme("aLive"),
+            _l_spec.format("aLive"): _render_backlog_spec("EXMP-aLive-1"),
+            "memory/builds/aDone/README.md": _render_backlog_readme("aDone"),
+            _l_spec.format("aDone"): _render_backlog_spec("EXMP-aDone-1", "CLOSED"),
+        })
+        _k_rows = [{"file": _l_spec.format("aLive"), "id": "EXMP-aLive-1"},
+                   {"file": _l_spec.format("aDone"), "id": "EXMP-aDone-1"},
+                   {"file": "memory/builds/aLive/spec/2026-09-02-spec-aLive-1-copy.md", "id": "EXMP-aLive-1"}]
+        arm("TOOL-aMendedFleet-13 AC2 — a terminal or untracked row counts nowhere, the live one once",
+            "[('aDone', 0), ('aLive', 1)]",
+            lambda: str(sorted(derive_landed_counts({"detail": _k_rows}, collect(_k_t, _k_conf),
+                                                    "memory").items())))
         # AC2 — the same tracked bytes committed a year apart render one LIVE.md. The commit dates are
         # asserted apart first, so an arm whose fixtures collapsed to one date cannot pass vacuously.
         _l_renders, _l_dates = [], []

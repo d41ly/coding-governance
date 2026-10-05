@@ -3068,6 +3068,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "derive_landed_counts",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "derive_last_record",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -5776,6 +5781,11 @@
       "id": "read_kwarg",
       "kind": "function",
       "file": "tools/gate-lint/encoding_posture.py"
+    },
+    {
+      "id": "read_landed_unclosed",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "read_lang_modes",

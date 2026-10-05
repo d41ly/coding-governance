@@ -403,3 +403,13 @@ PROBE_ALLOW=""
 # file does not go stale between commits. BLANK OR ABSENT RENDERS TODAY'S LIVE.md, byte for byte;
 # a value that is not a positive whole number refuses by name before anything is written.
 LIVE_DORMANT_DAYS=""
+
+# LIVE_LANDED_UNCLOSED — blank (off) or 1 (on). Set to 1, `gen_build_index.py` gives LIVE.md one more
+# trailing column, `Landed-unclosed`: per live build, how many of its non-terminal units carry an id
+# that tracked product source cites, read by calling the drift-audit kit's own
+# non_terminal_specs_cited_by_product_source signal in-process, so the count and the drift report
+# cannot disagree. A candidate to close, not a verdict. Setting it DECLARES that this tree carries
+# the drift-audit kit and its filled project layer: an unresolvable kit, a refusing project layer
+# and an EVIDENCE_GLOBS that resolves to no tracked file each refuse by name before anything is
+# written. BLANK OR ABSENT RENDERS LIVE.md AS BEFORE, byte for byte, and never imports that kit.
+LIVE_LANDED_UNCLOSED=""
