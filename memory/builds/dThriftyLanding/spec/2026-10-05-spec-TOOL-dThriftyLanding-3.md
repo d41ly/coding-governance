@@ -1,10 +1,13 @@
 # TOOL-dThriftyLanding-3 — the push boundary recognises a doc-only push and scopes its bar to it
 
-**Status:** OPEN · rev-1 · 2026-10-05 · node d · Tier-2 · base c3ef6742 · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-10-05 · node d · Tier-2 · base c3ef6742 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-05-build-TOOL-dThriftyLanding-3-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-dThriftyLanding-3-1-acceptance-ledger.md) | journal | — |
+| [2026-10-05-prompt-TOOL-dThriftyLanding-3-1-build-brief.md](../prompts/2026-10-05-prompt-TOOL-dThriftyLanding-3-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -31,11 +34,14 @@ that only the legs reading a changed doc path run (`TOOL-dThriftyLanding-1`).
   exclude pathspecs. Any git call that fails reads as not doc-only. Observed by AC1 to AC3.
 - **S3** — On a doc-only push, `check_green_record` is called with predicate 5 waived, for the full
   green and for the inherited green alike; every other predicate still forces. When the decision is
-  then scoped, the hook also exports `GATE_DOCS_BASE` set to R, and the decision line reads
-  `scoped gate (docs-only: <n> path(s) in GATE_DOC_PATHS at <R8>)`. When a predicate still forces,
-  the FULL line adds `doc-only, but` and the reason. Observed by AC1, AC4 and AC7.
-- **S4** — `GATE_DOCS_BASE` joins `BAR_SCRUBBED_KNOBS`, so an exported value never reaches a bar
-  that is not a STUB; the hook sets it after the scrub, on a doc-only decision only. Observed by AC8.
+  then scoped, the hook also exports `GATE_DOCS_BASE` set to R, and the decision line carries
+  `docs-only: <n> path(s) in GATE_DOC_PATHS at <R8>` after the pushed sha, so every reader that greps
+  `gate on <branch> push` still matches. When a predicate still forces, the FULL line carries
+  `doc-only, but` before the reason. Observed by AC1, AC4 and AC7.
+- **S4** — An exported `GATE_DOCS_BASE` is cleared for EVERY bar, a STUB included, and named among
+  the knobs not honoured; the hook sets it after that, on a doc-only decision only. It is not added to
+  `BAR_SCRUBBED_KNOBS`, whose STUB exemption exists for fixture manifests this knob has no part in.
+  Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -126,6 +132,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-05 · initial draft, from the hook's decision block and this clone's push log.
+- rev-2 · 2026-10-05 · S3 puts the docs clause after the pushed sha, because the suite's `decide` and
+  the run log grep `gate on <branch> push`; S4 clears the knob for a STUB bar too, so AC8 is observable.
 
 ## 10. Reuse audit
 

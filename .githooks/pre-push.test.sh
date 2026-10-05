@@ -1344,4 +1344,114 @@ else
 fi
 cd "$pfx_home" || exit 2
 
+# ---- TOOL-dThriftyLanding-3: A DOC-ONLY PUSH, CLASSIFIED AGAINST THE DOC CLASS AT R ---------------
+# A scratch repo whose gate-env file at R declares `GATE_DOC_PATHS`, a stub bar that records the docs
+# base it was handed, and a record stamped at R so the decision is scoped unless a predicate forces.
+# Each arm grades the DECISION LINE and what reached the bar, against the declaration at R.
+docs_env="$tmp/docs-env.txt"
+docstub="$tmp/docstub.sh"
+printf '#!/usr/bin/env bash\nprintf "docs=%%s\\n" "${GATE_DOCS_BASE:-}" > "$DOCS_ENV"\nexit 0\n' > "$docstub"
+build_docs_fixture() { # tag · gate-env body (printf %b) -> a pushed main at R carrying that body
+  local d="$tmp/docs-$1"
+  mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
+  git init -q --bare "$d/remote.git"; git init -q "$d/work"
+  cd "$d/work" || return 1
+  git config user.email t@example.com; git config user.name t; git config core.autocrlf false
+  git config core.hooksPath "$d/hooks"
+  mkdir -p .githooks "$KIT_REL" notes src
+  printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
+  printf '%b' "$2" > .githooks/gate-env.sh
+  printf 'GOV_KITROOT=%s\n' "$KIT_REL" >> .githooks/gate-env.sh
+  printf 'a\n' > notes/a.md; printf 'b\n' > notes/b.md; printf 'x\n' > src/x.sh
+  git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+  git remote add origin "$d/remote.git"
+  touch "$(git rev-parse --git-dir)/push-main-active"
+  GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
+}
+docs_stamp_r() { # a full green naming the remote tip, which the arms then push past
+  printf 'sha\t%s\nfingerprint\t\nmanifest_blob\t\nrun_id\ttest\n' \
+    "$(git ls-remote origin refs/heads/main | cut -f1)" > "$(git rev-parse --git-dir)/gate-full-green"
+}
+docs_push() { # [env…] -> the push's merged output, then the docs base the bar received
+  rm -f "$docs_env"
+  local o; o=$( env GATE_SELFTESTS= DOCS_ENV="$docs_env" GOV_GATE_CMD="bash $docstub" "$@" git push origin main 2>&1 )
+  printf '%s\n%s\n' "$o" "$(cat "$docs_env" 2>/dev/null || echo 'docs=<bar did not run>')"
+}
+docs_r() { git ls-remote origin refs/heads/main | cut -f1; }
+
+build_docs_fixture ac1 'GATE_DOC_PATHS="notes/"\n' || bad "DOCS AC1 could not build its fixture"
+_r=$(docs_r); docs_stamp_r
+printf 'a2\n' > notes/a.md; git commit -qam "doc edit"
+_o=$(docs_push)
+case "$_o" in
+  *"scoped gate on main push"*"docs-only: 1 path(s) in GATE_DOC_PATHS at ${_r:0:8}"*"docs=$_r"*) ok "DOCS AC1 a doc-only push is named docs-only and the bar receives R as its docs base" ;;
+  *) bad "DOCS AC1 expected a docs-only scoped decision and docs=$_r, got: $_o" ;;
+esac
+_r=$(docs_r); docs_stamp_r
+printf 'a3\n' > notes/a.md; printf 'x2\n' > src/x.sh; git commit -qam "mixed"
+_o=$(docs_push)
+case "$_o" in
+  *"docs-only"*) bad "DOCS AC2 a push changing src/x.sh was classified doc-only: $_o" ;;
+  *"scoped gate on main push"*"docs=") ok "DOCS AC2 a mixed push is not doc-only and receives no docs base" ;;
+  *) bad "DOCS AC2 expected a plain scoped decision with no docs base, got: $_o" ;;
+esac
+_r=$(docs_r); docs_stamp_r
+printf 'y\n' > src/y.sh; git add src/y.sh; git commit -qm "add code"
+git rm -q src/y.sh; printf 'a4\n' > notes/a.md; git commit -qam "remove it again"
+_o=$(docs_push)
+case "$_o" in
+  *"docs-only"*) bad "DOCS AC3 a code file added and removed inside the range read as doc-only: $_o" ;;
+  *"gate on main push"*) ok "DOCS AC3 a code touch inside the range keeps the push out of the doc class" ;;
+  *) bad "DOCS AC3 no decision line: $_o" ;;
+esac
+# AC4: a doc-only MERGE whose second parent the record does not cover. Predicate 5 forces it at base.
+_r=$(docs_r); docs_stamp_r
+git checkout -q -b side; printf 'b2\n' > notes/b.md; git commit -qam "side doc"
+git checkout -q main; printf 'a5\n' > notes/a.md; git commit -qam "main doc"
+git merge -q --no-ff -m "land side" side >/dev/null 2>&1
+_o=$(docs_push)
+case "$_o" in
+  *"scoped gate on main push"*"docs-only"*) ok "DOCS AC4 a doc-only merge is not forced FULL by its second parent" ;;
+  *) bad "DOCS AC4 expected a docs-only scoped decision over the merge, got: $_o" ;;
+esac
+# AC7: the lag bound still forces a doc-only push.
+_r=$(docs_r); docs_stamp_r
+_lag=$(grep -m1 -oE 'GATE_FULL_MAX_LAG=[0-9]+' "$SRC/.githooks/pre-push" | grep -oE '[0-9]+')
+for _i in $(seq 0 "${_lag:-10}"); do printf '%s\n' "$_i" > notes/a.md; git commit -qam "lag $_i"; done
+_o=$(docs_push)
+case "$_o" in
+  *"FULL gate on main push"*"doc-only, but"*"commits behind"*) ok "DOCS AC7 the lag bound still forces FULL on a doc-only push, and says so" ;;
+  *) bad "DOCS AC7 expected FULL with doc-only, but and the lag reason, got: $_o" ;;
+esac
+# AC8: an exported GATE_DOCS_BASE never reaches the bar of a push that is not doc-only.
+_r=$(docs_r); docs_stamp_r
+printf 'x3\n' > src/x.sh; git commit -qam "code"
+_o=$(docs_push GATE_DOCS_BASE="$_r")
+case "$_o" in
+  *"not honoured from the environment"*"GATE_DOCS_BASE"*"docs=") ok "DOCS AC8 an exported docs base is cleared and named, and the bar receives none" ;;
+  *) bad "DOCS AC8 expected the knob cleared and named with no docs base at the bar, got: $_o" ;;
+esac
+# AC5: a class declared only in the pushed tree is not read.
+build_docs_fixture ac5 '' || bad "DOCS AC5 could not build its fixture"
+docs_stamp_r
+printf 'GATE_DOC_PATHS="notes/ .githooks/"\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
+printf 'a2\n' > notes/a.md; git commit -qam "the branch declares its own doc class"
+_o=$(docs_push)
+case "$_o" in
+  *"docs-only"*) bad "DOCS AC5 a doc class declared only in the pushed tree was honoured: $_o" ;;
+  *"scoped gate on main push"*) ok "DOCS AC5 the doc class is read at R, never from the pushed tree" ;;
+  *) bad "DOCS AC5 expected a plain scoped decision, got: $_o" ;;
+esac
+# AC6: a glob element invalidates the whole declaration, aloud.
+build_docs_fixture ac6 'GATE_DOC_PATHS="notes/*"\n' || bad "DOCS AC6 could not build its fixture"
+docs_stamp_r
+printf 'a2\n' > notes/a.md; git commit -qam "doc edit"
+_o=$(docs_push)
+case "$_o" in
+  *"docs-only"*) bad "DOCS AC6 a glob element was honoured: $_o" ;;
+  *"not a plain repo path"*"gate on main push"*) ok "DOCS AC6 a glob element voids the doc class and the hook says so" ;;
+  *) bad "DOCS AC6 expected the invalid-element notice, got: $_o" ;;
+esac
+cd "$pfx_home" || exit 2
+
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

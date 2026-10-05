@@ -1154,8 +1154,12 @@ check_green_record() { # sha · fingerprint · manifest blob · selftests · lab
   #    whose recorded green was not earned on that exact second parent — not only on a retry. Kept at
   #    that width deliberately: a merge tip the record does not cover is precisely the case the record
   #    cannot speak for.
+  #    WAIVED ON A DOC-ONLY PUSH (TOOL-dThriftyLanding-3). What the record cannot speak for here is
+  #    the CODE the second parent brings in; on a doc-only push nothing outside the doc class moved,
+  #    and every leg reading a doc that did move still runs. Predicates 2 to 4 and 6 to 8, the lag
+  #    bound among them, still force.
   p2=$(git rev-parse -q --verify "$main_local^2" 2>/dev/null || true)
-  if [ -n "$p2" ] && ! git merge-base --is-ancestor "$p2" "$r_sha" 2>/dev/null; then
+  if [ -z "$DOCS_ONLY" ] && [ -n "$p2" ] && ! git merge-base --is-ancestor "$p2" "$r_sha" 2>/dev/null; then
     force="the pushed tip is a merge whose second parent ${p2:0:8} the recorded green does not cover"; return 0
   fi
   # 6. the diff touches the LEG MANIFEST, so the scoping decision itself has changed. A guard added,
@@ -1184,6 +1188,42 @@ check_green_record() { # sha · fingerprint · manifest blob · selftests · lab
   fi
   return 0
 }
+
+# ---- THE DOC CLASS, READ AT R — TOOL-dThriftyLanding-3 -----------------------------------------
+# Whether this push changes only non-code paths. Which paths are non-code is a per-repository answer,
+# so it is DECLARED: `GATE_DOC_PATHS` in the gate-env file, a space-separated list of repo paths, each a
+# file or a directory ending in `/`. It is PARSED at R exactly as the inherited-red keys are, and never
+# read from the pushed tree, which could otherwise classify its own code as a doc. The push is doc-only
+# when R is an ancestor of the pushed tip, something differs between them, and no path outside the class
+# appears in their net diff OR in any commit between them: a code file added and removed again inside
+# the range is still code a leg should have seen. Every failure, and every element that is not a plain
+# repo path, reads as NOT doc-only, which is the decision this hook made before the class existed.
+DOCS_ONLY=""; DOCS_N=0; DOCS_WHY=""
+classify_docs() {
+  local blob spec all nd nl
+  local -a specs=() excl=()
+  [ -n "$main_remote" ] && [ -n "${main_remote//0/}" ] && [ -n "$main_local" ] || return 0
+  blob=$(git show "$main_remote:$_gate_env_rel" 2>/dev/null) || return 0
+  read -ra specs <<<"$(read_policy_key "$blob" GATE_DOC_PATHS)"
+  [ "${#specs[@]}" -gt 0 ] || return 0
+  for spec in "${specs[@]}"; do
+    case "$spec" in
+      :*|/*|*'*'*|*'?'*|*'['*|..|../*|*/..|*/../*)
+        DOCS_WHY="GATE_DOC_PATHS at ${main_remote:0:8} holds '$spec', which is not a plain repo path, so no doc class applies"
+        return 0 ;;
+    esac
+    excl+=(":(exclude,literal)$spec")
+  done
+  git merge-base --is-ancestor "$main_remote" "$main_local" 2>/dev/null || return 0
+  all=$(git diff --no-renames --name-only "$main_remote" "$main_local" -- 2>/dev/null) || return 0
+  [ -n "$all" ] || return 0
+  nd=$(git diff --no-renames --name-only "$main_remote" "$main_local" -- . "${excl[@]}" 2>/dev/null) || return 0
+  nl=$(git log --no-renames --format= --name-only "$main_remote..$main_local" -- . "${excl[@]}" 2>/dev/null) || return 0
+  [ -z "$nd$nl" ] || return 0
+  DOCS_ONLY=1; DOCS_N=$(printf '%s\n' "$all" | grep -c .)
+}
+classify_docs
+[ -n "$DOCS_WHY" ] && echo "pre-push: $DOCS_WHY" >&2
 
 # 1. no record at all — nothing has ever proven this bar here. Then predicates 2 to 8, per candidate
 #    (TOOL-dThriftyLanding-2). The FIRST candidate's refusal keeps its exact wording, so a clone with
@@ -1324,6 +1364,11 @@ if [ "$bar_class" != stub ]; then
     [ -f "$top/$_legs" ] && check_reviewed_file "$_legs" "$main_local" "is the leg manifest the bar's runner reads"
   fi
 fi
+# THE DOCS KNOB IS THIS HOOK'S ALONE, for every bar a STUB included (TOOL-dThriftyLanding-3): it can
+# only narrow a run, and the STUB exemption above exists for fixture manifests, which it has no part in.
+# It is set again below, on a doc-only decision and nowhere else.
+[ -n "${GATE_DOCS_BASE+x}" ] && ENV_CLEARED+=" GATE_DOCS_BASE"
+unset GATE_DOCS_BASE
 [ -n "$ENV_CLEARED" ] \
   && echo "pre-push: not honoured from the environment by this bar:$ENV_CLEARED" >&2
 
@@ -1339,16 +1384,20 @@ fi
 # THE DECISION AND ITS REASON, on one line, always. A boundary that silently chooses the cheap path
 # is indistinguishable from one that is broken, and this line is the only place the choice is
 # visible to the person whose push it is.
+_docs_clause=""
+[ -n "$DOCS_ONLY" ] && _docs_clause=" docs-only: $DOCS_N path(s) in GATE_DOC_PATHS at ${main_remote:0:8};"
 if [ -n "$inh_sha" ]; then
-  echo "pre-push: scoped gate on $def push (${main_local:0:8}) — inherited green ${inh_sha:0:8} at base ${main_remote:0:8} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG; the full green was not usable: $full_force — bar: $bar_label"
+  [ -n "$DOCS_ONLY" ] && export GATE_DOCS_BASE="$main_remote"
+  echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause inherited green ${inh_sha:0:8} at base ${main_remote:0:8} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG; the full green was not usable: $full_force — bar: $bar_label"
   export GATE_BASE="$inh_sha"
   RUNLOG_DECISION=scoped
 elif [ -n "$force" ]; then
-  echo "pre-push: FULL gate on $def push (${main_local:0:8}) — $force${inh_why:+; $inh_why} — bar: $bar_label"
+  echo "pre-push: FULL gate on $def push (${main_local:0:8}) — ${DOCS_ONLY:+doc-only, but }$force${inh_why:+; $inh_why} — bar: $bar_label"
   export GATE_FULL=1
   RUNLOG_DECISION=full
 else
-  echo "pre-push: scoped gate on $def push (${main_local:0:8}) — full green ${rec_sha:0:8}${rec_from:+ from $rec_from} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG — bar: $bar_label"
+  [ -n "$DOCS_ONLY" ] && export GATE_DOCS_BASE="$main_remote"
+  echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause full green ${rec_sha:0:8}${rec_from:+ from $rec_from} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG — bar: $bar_label"
   export GATE_BASE="$rec_sha"
   RUNLOG_DECISION=scoped
 fi
