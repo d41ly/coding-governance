@@ -758,6 +758,15 @@ def signal_handkept(ctx) -> dict:
             rows.append({"record": spec["record"], "claims": None, "actual": None,
                          "agrees": False, "error": repr(exc)})
             continue
+        if isinstance(claims, (set, frozenset)) and isinstance(actual, (set, frozenset)):
+            # A NAME-SET pair (TOOL-aMendedFleet-52 S1): a count pair cannot see a stale row standing
+            # in for a missing one, so the row names both halves and stores counts, which `--json`
+            # serialises where a set would not.
+            rows.append({"record": spec["record"], "source": spec.get("source", "?"),
+                         "claims": len(claims), "actual": len(actual),
+                         "missing": sorted(actual - claims), "extra": sorted(claims - actual),
+                         "agrees": claims == actual})
+            continue
         rows.append({"record": spec["record"], "source": spec.get("source", "?"),
                      "claims": claims, "actual": actual, "agrees": claims == actual})
     # A MAGNITUDE, not a per-row boolean. Scored as a boolean over a one-row population the value
@@ -767,7 +776,11 @@ def signal_handkept(ctx) -> dict:
     gap = 0
     pop = 0
     for r in rows:
-        if isinstance(r.get("claims"), int) and isinstance(r.get("actual"), int) and r["claims"] >= 0:
+        if "missing" in r:
+            # Symmetric difference over union: the union is every actual name plus each stale one.
+            gap += len(r["missing"]) + len(r["extra"])
+            pop += r["actual"] + len(r["extra"])
+        elif isinstance(r.get("claims"), int) and isinstance(r.get("actual"), int) and r["claims"] >= 0:
             gap += max(0, r["actual"] - r["claims"])
             pop += r["actual"]
         elif not r["agrees"]:
@@ -3271,7 +3284,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     ctx = Ctx(root, conf, proj, base_ref)
     ctx.offline = bool(args.check or args.offenders)
-    out = [s(ctx) for s in SIGNALS]
+    # The hand-kept signal runs LAST and is handed the names every other signal reported, so a
+    # hand-kept list of signal names compares against the engine's own output (TOOL-aMendedFleet-52
+    # S2); the records keep SIGNALS order. Running every signal twice would double the report.
+    by_fn = {fn: fn(ctx) for fn in SIGNALS if fn is not signal_handkept}
+    ctx.signal_names = {s["signal"] for s in by_fn.values()} | {"handkept_inventories_disagreeing_with_source"}
+    out = [by_fn[fn] if fn in by_fn else fn(ctx) for fn in SIGNALS]
     for s in out:
         # A None tolerance is a report-only signal with NO PIN BY DESIGN (TOOL-aMendedFleet-51): its
         # pin stays None unless PINS declares one, and the table prints `report only, no pin`. A

@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 330
+CHECK_FLOOR = 339
+# 330 -> 339, TOOL-aMendedFleet-52: the nine checks of `test_handkept_name_sets`.
 # 327 -> 330, TOOL-aMendedFleet-51: the readme-drift all-CLOSED arm and the two pinless checks.
 # 318 -> 327, TOOL-aMendedFleet-50: the nine checks of `test_escape_ratio`.
 # 309 -> 318, TOOL-aMendedFleet-49: the nine checks of `test_drift_delta`.
@@ -1724,6 +1725,57 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
           f"stderr={fires.stderr.strip()[:200]}")
 
 
+def test_handkept_name_sets(tmp: pathlib.Path) -> None:
+    """A HANDKEPT probe returning two SETS scores their symmetric difference and names both halves
+    (TOOL-aMendedFleet-52). The fixture row's actual half is `ctx.signal_names`, so the arm also
+    proves `main` hands the hand-kept signal the names every other signal reported."""
+    import json
+
+    print("HANDKEPT name sets (equal reads 0 and live; a missing and a stale name each count one)")
+    r = make_repo(tmp, name="namesets")
+    names = sorted(report(r))
+    claims = r / "names.txt"
+    sig = r / KIT_NAME / "drift_signals.py"
+    text = sig.read_text(encoding="utf-8")
+    assert text.count("HANDKEPT = []\n") == 1, "fixture HANDKEPT literal moved; this arm would test nothing"
+    sig.write_text(text.replace("HANDKEPT = []\n", (
+        "def read_fixture_names(ctx):\n"
+        "    import pathlib\n"
+        "    got = (pathlib.Path(ctx.root) / 'names.txt').read_text(encoding='utf-8').split()\n"
+        "    return set(got), set(ctx.signal_names)\n"
+        "HANDKEPT = [{'record': 'names.txt', 'source': 'the engine', 'probe': read_fixture_names}]\n")),
+        encoding="utf-8", newline="\n")
+
+    def read_row(claimed: list[str]) -> tuple[dict, dict]:
+        claims.write_text("\n".join(claimed) + "\n", encoding="utf-8", newline="\n")
+        rec = report(r)["handkept_inventories_disagreeing_with_source"]
+        return rec, (rec["detail"][0] if rec["detail"] else {})
+
+    rec, row = read_row(names)
+    check("name sets: equal sets read 0 and live", rec["value"] == 0 and rec["live"] is True,
+          f"value={rec['value']} live={rec['live']} row={json.dumps(row)[:200]}")
+    check("name sets: the population is every reported name", rec["of"] == len(names),
+          f"of={rec['of']} names={len(names)}")
+    check("name sets: claims and actual are serialised as counts",
+          row.get("claims") == len(names) and row.get("actual") == len(names), json.dumps(row)[:200])
+
+    dropped = "closed_specs_with_no_product_commit"
+    assert dropped in names, f"{dropped} is not a reported signal; this arm would drop nothing"
+    rec, row = read_row([n for n in names if n != dropped])
+    check("name sets: a name missing from the claims counts one", rec["value"] == 1,
+          f"value={rec['value']}")
+    check("name sets: ...and is named under missing", row.get("missing") == [dropped],
+          json.dumps(row)[:200])
+    check("name sets: ...and nothing under extra", row.get("extra") == [], json.dumps(row)[:200])
+
+    rec, row = read_row(names + ["no_such_signal"])
+    check("name sets: a stale extra name counts one", rec["value"] == 1, f"value={rec['value']}")
+    check("name sets: ...and is named under extra", row.get("extra") == ["no_such_signal"],
+          json.dumps(row)[:200])
+    check("name sets: ...and the population is the union", rec["of"] == len(names) + 1,
+          f"of={rec['of']}")
+
+
 def test_ratchet_guard(tmp: pathlib.Path) -> None:
     """A pin RAISE and a population DRAIN look identical to `value > pin` — TOOL-aNumeralWarden-3.
 
@@ -3308,6 +3360,7 @@ def main() -> int:
         test_backlog_stragglers(tmp)
         test_readme_mechanism_drift(tmp)
         test_declared_empty(tmp)
+        test_handkept_name_sets(tmp)
         test_ratchet_guard(tmp)
         test_base_is_remote_tracking(tmp)
         test_ratchet_lookback(tmp)

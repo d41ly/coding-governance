@@ -145,8 +145,8 @@ DECLARED_EMPTY: set[str] = {
     # ledger — and the declaration is not a muzzle: put one row back and the probe goes live and
     # scores again. selftest.py asserts both directions over one fixture.
     "ledger_rows_contradicting_git",
-    # its one HANDKEPT row retired with the charter section it graded, 2026-08-18
-    "handkept_inventories_disagreeing_with_source",
+    # `handkept_inventories_disagreeing_with_source` left this set when HANDKEPT gained the README
+    # signal-table row below (TOOL-aMendedFleet-52 S4): its population is live again.
 }
 
 # --------------------------------------------------------------------------------------------
@@ -201,7 +201,30 @@ def _charter_mentions_every_leg(ctx) -> tuple[int, int]:
 #
 # The probe function above is deliberately left defined and unreferenced: it is the record of what
 # was being asked, and re-arming it is a one-line change if the charter ever re-enumerates.
-HANDKEPT: list[dict] = []
+
+
+def read_signal_table_names(ctx) -> tuple[set[str], set[str]]:
+    """The README's signal-table names against the names the engine reported, as SETS.
+
+    Only the table under `## The signals`, up to the next heading of ANY level: the harness-note
+    table under a `### ` subheading of that same section lists the states `clean`, `partial` and
+    `dead`, and a read to the next `## ` heading counts them as three extra signals. No heading reads as an empty claim set, so every engine name is
+    `missing` rather than the comparison passing. `ctx.signal_names` is set by the engine's `main`
+    before this runs; a caller that never sets it raises, which the signal reports as an error row.
+    """
+    text = (_HERE.parent / "README.md").read_text(encoding="utf-8", errors="replace")
+    m = re.search(r"^## The signals[^\n]*\n(.*?)(?=^#+ |\Z)", text, re.M | re.S)
+    claims = set(re.findall(r"^\|\s*`([^`]+)`\s*\|", m.group(1), re.M)) if m else set()
+    return claims, set(ctx.signal_names)
+
+
+# THE README'S SIGNAL TABLE (TOOL-aMendedFleet-52): its first-column names, compared as a set with
+# the names the engine reports, so a signal added without a README row, or a row its deleted signal
+# left behind, counts one each — named under `missing` or `extra` in the detail.
+HANDKEPT: list[dict] = [
+    {"record": "drift-audit README `## The signals` table", "source": "the engine's reported signal names",
+     "probe": read_signal_table_names},
+]
 
 # --------------------------------------------------------------------------------------------
 # PINS — seeded at MEASURED values, never guessed. Lower each as its population drains; raising one

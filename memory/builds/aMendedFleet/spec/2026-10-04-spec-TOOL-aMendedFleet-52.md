@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-52 — the hand-kept signal compares the drift README's signal names against the names the engine reports
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 52
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 52
 
 <!-- gen:spec-records -->
 
@@ -34,10 +34,11 @@ replaced by a pointer, so there is one list to keep.
   makes the probe raise, which `signal_handkept` already reports as an error row. Observed by AC1.
 - **S3** — THE ROW. `HANDKEPT` in `tools/drift-audit/drift_signals.py` gains one row whose probe,
   `read_signal_table_names`, reads the README beside that file, takes the first-column backticked
-  names of the table under the `## The signals` heading and nothing after the next `## ` heading,
-  and returns them with `ctx.signal_names`. The section bound matters: a later table in the same
+  names of the table under the `## The signals` heading and nothing after the next heading of ANY
+  level, and returns them with `ctx.signal_names`. The bound matters: a later table in the same
   README holds the harness note states `clean`, `partial` and `dead`, and a whole-file read counts
-  them as three extra signals. Observed by AC1, AC3.
+  them as three extra signals; that table sits under a `### ` subheading INSIDE the `## The signals`
+  section, so a bound at the next `## ` heading counts them too. Observed by AC1, AC3.
 - **S4** — The hand-kept signal is no longer empty by declaration: its name leaves
   `DECLARED_EMPTY` in `tools/drift-audit/drift_signals.py`, and the comment above `HANDKEPT` says
   what the row grades. Its pin stays 0 and its existing `RATCHETS` row stays. Observed by AC1.
@@ -95,7 +96,9 @@ Read at the worktree HEAD `fee9f62b`, whose bytes under `tools/` and `.claude/` 
   `source_cited_ids_resolving_to_no_record`; the Skill's table carries 6. A scratch probe compared
   the name sets. PINNED, measured 2026-10-04, matching the source synthesis's 2 of 19 and 6 of 19.
 - A whole-file read of the README returned 20 names, three of them `clean`, `partial` and `dead`
-  from the harness-note table under a later heading, which is why S3 bounds the section.
+  from the harness-note table under a later heading, which is why S3 bounds the section. That
+  heading is `### The harness note is a DERIVED contract, not prose`, a subsection of `## The
+  signals`, so the bound is the next heading of any level (re-read at the build, rev-3).
 - `signal_handkept` counts an integer pair by `max(0, actual - claims)`, and any other pair as one
   offender when the two differ, so a set pair today scores at most 1 and names nothing.
 - Node d's live branch adds three signals and three README rows; after its reconcile the set
@@ -189,6 +192,11 @@ New arm: `tools/drift-audit/selftest.py` · a fixture `HANDKEPT` row returning e
   and its README row before this unit too, and units 54, 55 and 92 add rows after it; and the new
   definition owes `symbols.json`, which units 57, 59 and 90 regenerate for theirs and this spec
   omitted.
+- rev-3 · 2026-10-05 · S3 · §4 · build: S3 bounded the table at the next `## ` heading, but the
+  harness-note table sits under a `### ` subheading inside `## The signals`, so that bound still
+  counts `clean`, `partial` and `dead`; the bound is the next heading of any level. Re-measured at
+  the build: the engine reports 22 signals and the README table names 20, lacking exactly the two
+  S5 adds.
 
 ## 10. Reuse audit
 

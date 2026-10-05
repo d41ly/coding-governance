@@ -10718,6 +10718,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_signal_table_names",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_signals.py"
+    },
+    {
       "id": "read_signed_keeps",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -16306,6 +16311,11 @@
       "id": "test_gov_only_files_are_withheld_on_both_paths",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_handkept_name_sets",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_harness_liveness_note_is_derived",
