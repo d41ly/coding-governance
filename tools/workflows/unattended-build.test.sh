@@ -1516,7 +1516,9 @@ has    "GH29 no base keeps the unpinned command" "$p" "python ${PFX}${MT_KIT}/go
 has    "GH29 ...and WARNS that the block was read from the working tree" "$o" "$GH29_WT"
 o=$(run_wf "$(build_gh29_args origin/main)" "$GH29_RET")
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:subjects:r2:')
-hasnt_ "GH29 a base that is no sha forwards nothing" "$p" "--base"
+# A POSITIVE read of the unpinned command, never an absence of `--base`: an absence passes on a prompt
+# line the grep did not find at all (fixture-passes-by-finding-nothing).
+has    "GH29 a base that is no sha forwards nothing" "$p" "python ${PFX}${MT_KIT}/gotchas.py --for-paths <paths>"
 has    "GH29 ...and WARNS the same" "$o" "$GH29_WT"
 
 # ---- TOOL-aGraftedHelix-15: THE SPEC COMMIT STAGE, its path fill, its refusals and the one remedy. The
