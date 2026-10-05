@@ -1259,7 +1259,7 @@ printf '\nNew arm: `x.test.sh` · covers none AC1 · none beside an id · none\n
 arm "covers none beside an id REDS naming none" 1 "$d" "[covers] \`covers <- $cs none\`"
 git -C "$d" reset -q --hard "$cvbase"
 printf '\nNew arm: `x.test.sh` · AC9 named in prose only · none\n' >> "$d/$cs"
-arm "an id in the line's prose with no covers field is not graded" 0 "$d" "0 carry a covers field" "[covers]"
+arm "an id in the line's prose with no covers field is not graded" 0 "$d" "1 New arm line(s) in 1 live spec(s) · 0 carry a covers field" "[covers]"
 git -C "$d" reset -q --hard "$cvbase"
 printf '\nNew arm: `x.test.sh` · a field on the next line\n  · covers AC9 · none\n' >> "$d/$cs"
 arm "a covers field on an indented continuation line is graded" 1 "$d" "[covers] \`covers <- $cs AC9\`"
