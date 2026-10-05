@@ -5,7 +5,7 @@ opened: 2026-10-05
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6 TOOL-dThriftyLanding-7 TOOL-dThriftyLanding-8 TOOL-dThriftyLanding-9 TOOL-dThriftyLanding-10 TOOL-dThriftyLanding-11 TOOL-dThriftyLanding-12
+ids: TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6 TOOL-dThriftyLanding-7 TOOL-dThriftyLanding-8 TOOL-dThriftyLanding-9 TOOL-dThriftyLanding-10 TOOL-dThriftyLanding-11 TOOL-dThriftyLanding-12 TOOL-dThriftyLanding-13
 ---
 
 # dThriftyLanding — a doc-only push runs only the legs that read what it changed
@@ -65,8 +65,9 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 11 unit(s) · node d · opened 2026-10-05 · streams tooling
+**Build status:** CLOSED · 11 unit(s) · node d · opened 2026-10-05 · streams tooling
 ids TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6 TOOL-dThriftyLanding-7 TOOL-dThriftyLanding-8 TOOL-dThriftyLanding-9 TOOL-dThriftyLanding-10 TOOL-dThriftyLanding-11 TOOL-dThriftyLanding-12
+ids TOOL-dThriftyLanding-13
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -81,12 +82,12 @@ ids TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dT
 | [TOOL-dThriftyLanding-9 — the hook's doc-only classification sees code touched on a merged side branch](spec/2026-10-05-spec-TOOL-dThriftyLanding-9.md) | 9 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-dThriftyLanding-10 — govkit's policy-key scan sees a quoted multi-path value](spec/2026-10-05-spec-TOOL-dThriftyLanding-10.md) | 10 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-dThriftyLanding-11 — the policy selftest grades every spelling of a doc class](spec/2026-10-05-spec-TOOL-dThriftyLanding-11.md) | 11 | 2 | CLOSED | rev-1 | 2026-10-05 |
-| [TOOL-dThriftyLanding-12 — the closing review's batched minors, round 1](spec/2026-10-05-spec-TOOL-dThriftyLanding-12.md) | 12 | 2 | OPEN | rev-1 | 2026-10-05 |
+| [TOOL-dThriftyLanding-12 — the closing review's batched minors, round 1](spec/2026-10-05-spec-TOOL-dThriftyLanding-12.md) | 12 | 2 | CLOSED | rev-2 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 22 bound to this build, across 4 record folder(s).
+Records: 24 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dThriftyLanding-12.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-10 TOOL-dThriftyLanding-11 TOOL-dThriftyLanding-12 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6 TOOL-dThriftyLanding-8 TOOL-dThriftyLanding-9.
 <!-- /gen:build-index -->

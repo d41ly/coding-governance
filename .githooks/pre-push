@@ -1210,7 +1210,7 @@ classify_docs() {
   [ "${#specs[@]}" -gt 0 ] || return 0
   for spec in "${specs[@]}"; do
     case "$spec" in
-      :*|/*|*'*'*|*'?'*|*'['*|..|../*|*/..|*/../*)
+      :*|/*|*'*'*|*'?'*|*'['*|..|../*|*/..|*/../*|.|./*)
         DOCS_WHY="GATE_DOC_PATHS at ${main_remote:0:8} holds '$spec', which is not a plain repo path, so no doc class applies"
         return 0 ;;
     esac
@@ -1222,6 +1222,15 @@ classify_docs() {
   nd=$(git diff --no-renames --name-only "$main_remote" "$main_local" -- . "${excl[@]}" 2>/dev/null) || return 0
   nl=$(git log --full-history --no-renames --format= --name-only "$main_remote..$main_local" -- . "${excl[@]}" 2>/dev/null) || return 0
   [ -z "$nd$nl" ] || return 0
+  # ONLY UNDER `land` AT R (TOOL-dThriftyLanding-12, closing review M2). The docs mode grades against
+  # R while the record it scopes from may sit below R, so a leg already red at an unproven R could be
+  # docskipped and a push land over it. Under `land` that red lands anyway, as INHERITED; under `park`
+  # it must not, so a park repository keeps today's decision for every push.
+  read_policy_at "$main_remote"
+  if [ "$PP_POLICY" != land ]; then
+    DOCS_WHY="the push changes only GATE_DOC_PATHS, but the inherited-red policy at ${main_remote:0:8} reads $PP_POLICY, so it is not scoped as doc-only"
+    return 0
+  fi
   DOCS_ONLY=1; DOCS_N=$(printf '%s\n' "$all" | grep -c .)
 }
 classify_docs
@@ -1245,10 +1254,7 @@ for _gi in "${!green_candidates[@]}"; do
   fi
   if [ "$_gi" = 0 ]; then _green_why=$force; else _green_why="$_green_why; $(green_label "$_gi"): $force"; fi
 done
-if [ -n "$force" ]; then
-  force=$_green_why
-  read_green_file "${green_candidates[0]}"   # a FULL decision reports the own record, as before
-fi
+[ -n "$force" ] && force=$_green_why
 
 # THE POLICY AT R, announced on every gated push whatever it reads, because the difference between
 # the two answers is whether an inherited red lands.

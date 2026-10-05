@@ -92,3 +92,7 @@ base: 9c49bed108a9407d278b1ad701b86613f1046f0b
 2026-10-05T13:12:44Z brief · item TOOL-dThriftyLanding-11 · reason 6bb6da4d0b6c memory/builds/dThriftyLanding/prompts/2026-10-05-prompt-TOOL-dThriftyLanding-11-1-build-brief.md
 
 2026-10-05T13:13:19Z dispatch · item 079a947c TOOL-dThriftyLanding-11 · reason memory/builds/dThriftyLanding/README.md memory/builds/dThriftyLanding/build/2026-10-05-build-TOOL-dThriftyLanding-11-1-acceptance-ledger.md memory/builds/dThriftyLanding/prompts/2026-10-05-prompt-TOOL-dThriftyLanding-11-1-build-brief.md memory/builds/dThriftyLanding/spec/2026-10-05-spec-TOOL-dThriftyLanding-11.md tools/govkit/selftest.py
+
+2026-10-05T13:32:21Z brief · item TOOL-dThriftyLanding-12 · reason d245e546d8b1 memory/builds/dThriftyLanding/prompts/2026-10-05-prompt-TOOL-dThriftyLanding-12-1-build-brief.md
+
+2026-10-05T13:33:43Z dispatch · item cd2e441e TOOL-dThriftyLanding-12 · reason .githooks/gate-env.sh .githooks/pre-push .githooks/pre-push.test.sh AGENTS.md memory/LIVE.md memory/builds/dThriftyLanding/README.md memory/builds/dThriftyLanding/build/2026-10-05-build-TOOL-dThriftyLanding-12-1-acceptance-ledger.md memory/builds/dThriftyLanding/prompts/2026-10-05-prompt-TOOL-dThriftyLanding-12-1-build-brief.md memory/builds/dThriftyLanding/spec/2026-10-05-spec-TOOL-dThriftyLanding-12.md memory/guides/SESSION-KICKOFF.md memory/ledger/2026-10.md tools/govkit/govkit.py tools/govkit/selftest.py tools/run-gates/README.md tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh

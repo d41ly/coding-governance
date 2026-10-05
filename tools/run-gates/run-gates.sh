@@ -29,7 +29,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.26   # gov:kit run-gates@1.26
+KIT_RUN_GATES_VERSION=1.27   # gov:kit run-gates@1.27
 # 1.24 -> 1.25: the manifest's NINTH field, `doc_reads`, and the docs mode `GATE_DOCS_BASE` that reads
 # it (TOOL-dThriftyLanding-1); a full green is also shared through the common git dir
 # (TOOL-dThriftyLanding-2). The canary's key-set pin admits the new key, which is the floor the
@@ -3426,8 +3426,9 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
   # SHARED FROM A LINKED WORKTREE (TOOL-dThriftyLanding-2). The common dir's own `gate-full-green` is
   # the PRIMARY tree's stamp and is never written from here: a branch's green that is no ancestor of
   # the default branch would replace the primary's valid one. A separate `.shared` file, which the push
-  # boundary reads LAST, can only add a usable record. Same bytes, so the boundary validates it with
-  # the same predicates; a failed copy costs a shared record and nothing else.
+  # boundary reads LAST, never displaces the primary's record. It is ONE slot per clone:
+  # last writer wins, so one linked worktree's green can evict another's; that costs a saving, never a verdict,
+  # because the boundary validates it with the same predicates as its own.
   _gcd=$(git rev-parse --git-common-dir 2>/dev/null) || _gcd=""
   if [ -n "$_gcd" ] && [ -f "$gd/gate-full-green" ]; then
     _gcd_abs=$(cd "$_gcd" 2>/dev/null && pwd -P) || _gcd_abs=""

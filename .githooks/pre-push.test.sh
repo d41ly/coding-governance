@@ -1465,6 +1465,55 @@ case "$_o" in
   *"not a plain repo path"*"gate on main push"*) ok "DOCS AC6 a glob element voids the doc class and the hook says so" ;;
   *) bad "DOCS AC6 expected the invalid-element notice, got: $_o" ;;
 esac
+# TOOL-dThriftyLanding-12, closing review M5: `.` excludes the whole tree, so it voids the class too.
+build_docs_fixture dot 'GATE_DOC_PATHS="."\n' || bad "DOCS M5 could not build its fixture"
+set_docs_stamp
+printf 'x2\n' > src/x.sh; git commit -qam "code"
+_o=$(run_docs_push)
+case "$_o" in
+  *"docs-only"*) bad "DOCS M5 a code push under GATE_DOC_PATHS=. was classified doc-only: $_o" ;;
+  *"not a plain repo path"*"gate on main push"*) ok "DOCS M5 a '.' element voids the doc class and the hook says so" ;;
+  *) bad "DOCS M5 expected the invalid-element notice, got: $_o" ;;
+esac
+# TOOL-dThriftyLanding-12, closing review M2: under INHERITED_RED=park at R a doc push is not scoped as
+# doc-only, because the docs base may sit above an unproven record; the hook names the policy.
+build_docs_fixture park 'GATE_DOC_PATHS="notes/"\nINHERITED_RED=park\n' || bad "DOCS M2 could not build its fixture"
+set_docs_stamp
+printf 'a2\n' > notes/a.md; git commit -qam "doc edit"
+_o=$(run_docs_push)
+case "$_o" in
+  *"docs-only"*) bad "DOCS M2 a doc push under park was scoped as doc-only: $_o" ;;
+  *"reads park, so it is not scoped as doc-only"*"gate on main push"*) ok "DOCS M2 under park a doc push keeps today's decision, and the hook names the policy" ;;
+  *) bad "DOCS M2 expected the park notice, got: $_o" ;;
+esac
+# TOOL-dThriftyLanding-12, closing review L3: the inherited-green branch exports the docs base too.
+build_docs_fixture inh 'GATE_DOC_PATHS="notes/"\n' || bad "DOCS L3a could not build its fixture"
+_r=$(read_docs_tip)
+rm -f "$(git rev-parse --git-dir)/gate-full-green"
+write_ir_stamp "$_r" "$_r" ""
+printf 'a2\n' > notes/a.md; git commit -qam "doc edit"
+_o=$(run_docs_push)
+case "$_o" in
+  *"scoped gate on main push"*"docs-only"*"inherited green"*"docs=$_r") ok "DOCS L3a an inherited-green doc push is docs-only and hands the bar R" ;;
+  *) bad "DOCS L3a expected an inherited-green docs-only decision and docs=$_r, got: $_o" ;;
+esac
+# ...and a LINKED worktree adopts the primary's own stamp, the common dir's gate-full-green.
+build_docs_fixture wt 'GATE_DOC_PATHS="notes/"\n' || bad "DOCS L3b could not build its fixture"
+_r=$(read_docs_tip); set_docs_stamp
+_wt="$tmp/docs-wt-linked"
+git worktree add -q "$_wt" -b wtb >/dev/null 2>&1
+(
+  cd "$_wt" || exit 1
+  touch "$(git rev-parse --git-dir)/push-main-active"
+  rm -f "$(git rev-parse --git-dir)/gate-full-green"
+  printf 'a3\n' > notes/a.md; git commit -qam "doc edit from a linked worktree"
+  rm -f "$docs_env"
+  env GATE_SELFTESTS= DOCS_ENV="$docs_env" GOV_GATE_CMD="bash $docstub" git push origin HEAD:main 2>&1
+) > "$tmp/docs-wt.out"
+case "$(cat "$tmp/docs-wt.out")" in
+  *"scoped gate on main push"*"from the common dir's gate-full-green "*) ok "DOCS L3b a linked worktree adopts the primary's stamp and names it" ;;
+  *) bad "DOCS L3b expected the common dir's own stamp adopted, got: $(cat "$tmp/docs-wt.out")" ;;
+esac
 cd "$pfx_home" || exit 2
 
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

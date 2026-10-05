@@ -44,7 +44,7 @@ import sys
 import tempfile
 import time
 
-KIT_GOVKIT_VERSION = "1.13"  # gov:kit govkit@1.13 — kit identity; set HERE, never from a conf
+KIT_GOVKIT_VERSION = "1.14"  # gov:kit govkit@1.14 — kit identity; set HERE, never from a conf
 
 RECEIPT_SCHEMA = 3  # bumped by any unit that adds a per-role row field; readers accept 1, 2 and 3
 
@@ -3862,7 +3862,10 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     # this defect one level up rather than a stricter version of the fix.
                     tgt = existing[by_name[nm]]
                     if prev and (tgt.get("argv") != prev.get("argv")
-                                 or tgt.get("guard", []) != prev.get("guard", [])):
+                                 or tgt.get("guard", []) != prev.get("guard", [])
+                                 # a hand-widened doc_reads is the adopter's coverage; overwriting it
+                                 # with gov's narrower list skips their leg (TOOL-dThriftyLanding-12)
+                                 or tgt.get("doc_reads") != prev.get("doc_reads")):
                         r.fail(f"leg '{nm}' in the target differs from what the receipt recorded — "
                                f"reporting drift rather than replacing it; ownership of the NAME is "
                                f"not ownership of the ROW")

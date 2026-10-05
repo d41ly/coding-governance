@@ -5116,6 +5116,51 @@ user_skills = "/tmp/gk-fake-skills"
               "derive_doc_reads(leg, ctx, have)" in _gk_src_d
               and "floor=DOC_READS_FLOOR_RUN_GATES" in _gk_src_d, "")
 
+        # ---- D4 (TOOL-dThriftyLanding-12, closing review M6 and M3): the writer, INSTALLED ---------
+        # D2 reads the helper and the source; this applies a real entry whose leg declares
+        # `doc_reads = []` into a fixture target and reads the row it wrote. Then it hand-edits that
+        # row's doc_reads and applies again: the edit is the adopter's coverage, so it must be reported
+        # as drift and kept, never overwritten. The below-floor half stays D1's: a target holding a
+        # run-gates install needs a receipt claiming it, which a fixture cannot plant without tripping
+        # the converge refusal the deployer is right to raise.
+        _d4 = tmp / "doc-reads-install"
+        (_d4 / PFX).mkdir(parents=True, exist_ok=True)
+        (_d4 / ".governance").mkdir(exist_ok=True)
+        (_d4 / PFX / "legs.json").write_text(
+            json.dumps([{"name": "control", "argv": ["true"]}], indent=2) + "\n",
+            encoding="utf-8", newline="\n")
+        (_d4 / PFX / "runner.sh").write_text('echo "GATE ok    control"\n', encoding="utf-8", newline="\n")
+        (_d4 / ".governance" / "deploy.toml").write_text(
+            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["check-kit-versions"]\n\n'
+            '[answers]\nmemory_root = "memory"\n\n'
+            f'[gate_runner]\nkind = "manifest"\nfile = "{PFX}legs.json"\n'
+            'grammar = "json-array"\ndedupe_key = "name"\n'
+            f'command = ["bash", "{PFX}runner.sh"]\n'
+            'run_all_env = { GATE_FULL = "1" }\n'
+            'observed_ran = ["GATE ok    {name}"]\n'
+            'observed_failed = ["GATE FAIL  {name}"]\n',
+            encoding="utf-8", newline="\n")
+        git(_d4, "init", "-q", "-b", "main"); git(_d4, "config", "user.email", "t@e")
+        git(_d4, "config", "user.name", "t"); git(_d4, "add", "-A"); git(_d4, "commit", "-qm", "b")
+        _p4 = run("apply", "--target", str(_d4), "--kits", "check-kit-versions")
+        _rows4 = json.loads((_d4 / PFX / "legs.json").read_text(encoding="utf-8"))
+        _kv = next((r for r in _rows4 if r.get("name") == "kit version markers"), None)
+        check("D4: an applied entry's leg carries the doc_reads its descriptor declares",
+              _kv is not None and _kv.get("doc_reads") == [], str(_rows4) + _p4.stdout[-600:])
+        for _r in _rows4:
+            if _r.get("name") == "kit version markers":
+                _r["doc_reads"] = ["memory/"]
+        (_d4 / PFX / "legs.json").write_text(json.dumps(_rows4, indent=2) + "\n",
+                                              encoding="utf-8", newline="\n")
+        _p4b = run("apply", "--target", str(_d4), "--kits", "check-kit-versions")
+        _rows4b = json.loads((_d4 / PFX / "legs.json").read_text(encoding="utf-8"))
+        _kvb = next((r for r in _rows4b if r.get("name") == "kit version markers"), {})
+        check("D4: a hand-edited doc_reads on an owned row is reported as drift",
+              "differs from what the receipt recorded" in (_p4b.stdout + _p4b.stderr),
+              _p4b.stdout[-600:] + _p4b.stderr[-300:])
+        check("D4: and the adopter's doc_reads is kept, not overwritten",
+              _kvb.get("doc_reads") == ["memory/"], str(_kvb))
+
         # AC5 — the header says what the check does NOT decide, in the generated file itself, where
         # a reader who found the pin will actually be looking.
         run_in_gov(rg, "selfcheck", "--write")

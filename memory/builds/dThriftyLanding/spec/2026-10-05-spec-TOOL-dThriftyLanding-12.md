@@ -1,10 +1,13 @@
 # TOOL-dThriftyLanding-12 — the closing review's batched minors, round 1
 
-**Status:** OPEN · rev-1 · 2026-10-05 · node d · Tier-2 · base f765eb8e · streams tooling · order 12
+**Status:** CLOSED · rev-2 · 2026-10-05 · node d · Tier-2 · base f765eb8e · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-05-build-TOOL-dThriftyLanding-12-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-dThriftyLanding-12-1-acceptance-ledger.md) | journal | — |
+| [2026-10-05-prompt-TOOL-dThriftyLanding-12-1-build-brief.md](../prompts/2026-10-05-prompt-TOOL-dThriftyLanding-12-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -28,7 +31,9 @@ and listed here so every id has a home.
   component boundary, as the runner's pathspecs and the deployer do. Observed by AC4.
 - **S5** — M5, finding 12: an element `.` or one starting `./` voids the doc class. Observed by AC5.
 - **S6** — M6, finding 17: an install-level selftest arm applies a kit whose leg declares `doc_reads` to
-  a fixture target and reads the emitted row, at and below the runner floor. Observed by AC6.
+  a fixture target and reads the emitted row; the below-floor half stays the unit-level D1 arm,
+  because a target holding a run-gates install needs a receipt claiming it, which a fixture cannot
+  plant without tripping the converge refusal. Observed by AC6.
 - **S7** — L1, finding 14: the runner comment and the run-gates README state that the shared stamp is
   one slot per clone, last writer wins. Observed by AC7.
 - **S8** — L2, finding 15: the hook drops the dead re-read of the own record on the FULL path. Observed
@@ -106,9 +111,9 @@ location, reproduction and judged-sound fix.
 - **AC5** — When R declares `GATE_DOC_PATHS="."`, the hook prints `not a plain repo path` and no
   `docs-only`.
   Red when: the hook at `f765eb8e` classifies the push doc-only.
-- **AC6** — When the install-level arm applies to a target at run-gates 1.25, the emitted row carries
-  `doc_reads`; at 1.24 it does not.
-  Red when: the emitted row does not follow the floor.
+- **AC6** — When the install-level arm applies `check-kit-versions` to a fresh fixture target, the
+  emitted `kit version markers` row carries `"doc_reads": []`, and D1 still refuses the key at 1.24.
+  Red when: the emitted row drops the descriptor's declaration.
 - **AC7** — When `grep -n 'last writer wins' tools/run-gates/README.md tools/run-gates/run-gates.sh` runs,
   each file prints a line, and the hook no longer re-reads the own record after a FULL decision.
   Red when: either statement is absent.
@@ -133,6 +138,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-05 · promoted from the closing diff review, round 1.
+- rev-2 · 2026-10-05 · S6 and AC6: the below-floor half stays at the unit level, measured — a fixture
+  holding run-gates without a claiming receipt is refused by the deployer before it writes anything.
+  The two kits this unit and units 8 to 11 moved, run-gates and govkit, advance to 1.27 and 1.14.
 
 ## 10. Reuse audit
 

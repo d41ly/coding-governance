@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.26` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.27` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -159,7 +159,9 @@ an adopter's manifest, all or nothing, only once the adopter's runner reads the 
 
 A full green earned in a LINKED worktree is copied to `gate-full-green.shared` in the common git dir,
 and the hook reads it after its own git dir's stamp and the primary's, so a green earned in a run's
-worktree serves the primary tree's push. TOOL-dThriftyLanding-1, -2, -3.
+worktree serves the primary tree's push. It is one slot per clone, last writer wins: a second
+worktree's green evicts the first, which costs that push its saving and never its verdict.
+TOOL-dThriftyLanding-1, -2, -3.
 
 ## The turnstile — one bar per repository
 

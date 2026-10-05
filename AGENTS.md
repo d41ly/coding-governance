@@ -538,8 +538,8 @@ refuses a dirty tree and a `HEAD` the bar moved, hands the bar `GATE_PUSH_BASE` 
 line, and leaves each refusal as a token in `<git-dir>/pre-push-refusal`, which the lander reads
 instead of the push's output. A repository may declare a branch bar, `GOV_BRANCH_GATE_CMD`, in
 `.githooks/gate-env.sh`; undeclared, a branch push stays ungated (`TOOL-aRepatriatedFork-8`).
-A doc-only push, every path in `GATE_DOC_PATHS` at R, runs only legs whose `doc_reads` moved, and
-any worktree's full green serves it. The `core.hooksPath` in effect decides whose
+A doc-only push, every path in `GATE_DOC_PATHS` at R, skips a DECLARED leg whose `doc_reads`
+did not move; any worktree's full green serves every push. The `core.hooksPath` in effect decides whose
 hook gates your push, a per-worktree fact (the hookspath-resolves-into-another-checkout gotcha); check H REPORTS a divergence. A tracked pre-commit fast leg sits beside it and also enforces the
 branch guard, refusing a primary-tree commit off the default branch (`GOV_DEFAULT_BRANCH` pins it).
 A SessionStart hook runs `tools/check-wiring.sh --session`, which auto-sets an unset
