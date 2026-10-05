@@ -12,7 +12,7 @@ Run `adopt-unattended.sh` from this directory; `--check` verifies without writin
 
 | artifact | how it is produced |
 |---|---|
-| the `unattended` Skill | **rendered** from `SKILL.template.md` + `.unattended.conf` |
+| the `unattended` Skill | **rendered** from `SKILL.template.md` + `.unattended.conf`: a ROUTER, size-gated, into the verb carrier's `The paths, in order` section |
 | the protocol | copied from `PROTOCOL.template.md` |
 | the verb carrier | copied from `VERBS.template.md` |
 | the playbook template | copied from `PLAYBOOK-TEMPLATE.template.md` |

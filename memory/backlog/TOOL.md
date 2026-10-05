@@ -234,7 +234,7 @@ Cite ids, never line numbers.
 | [TOOL-aScouredKit-19](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | FIVE PYTHON READERS RE-PARSE .memory-tree.conf WITH A NAIVE… |
 | [TOOL-aScouredKit-21](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | tools/check-testsuite-counts.sh hardcodes MANIFEST=tools/gate-legs.json… |
 | [TOOL-aScouredKit-22](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | memory/HYGIENE.md's numbered catalog — the file whose own line 115… |
-| [TOOL-aScouredKit-23](../builds/aScouredKit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-68 | 2026-08-30 | WIRE-INTO-PROJECT.md (59833 B / 816 lines) and… |
+| [TOOL-aScouredKit-23](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | WIRE-INTO-PROJECT.md (59833 B / 816 lines) and… |
 | [TOOL-aScouredKit-24](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | ELEVEN OF 25 REGISTRY ENTRIES ARE NEVER PASSED TO apply BY ANY GATE,… |
 | [TOOL-aScouredKit-26](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | A CROSS-ENTRY DESTINATION TOKEN DOES NOT EXIST, and TOOL-aScouredKit-15… |
 | [TOOL-aScouredKit-27](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | chunk DECIDES WHETHER A LEG RUNS AND DOES NOT TRAVEL TO ADOPTERS.… |

@@ -136,6 +136,17 @@
     "ceiling": 300
   },
   {
+    "name": "unattended skill size",
+    "argv": [
+      "bash",
+      "{prefix}/check-template-size.sh",
+      ".claude/skills/unattended/SKILL.md"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "kickoff engine size <=18KiB",
     "argv": [
       "bash",

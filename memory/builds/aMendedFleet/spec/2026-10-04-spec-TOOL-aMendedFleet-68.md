@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-68 — the unattended Skill becomes a router of at most 10 KiB
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · advances TOOL-aScouredKit-23 · order 68
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · advances TOOL-aScouredKit-23 · order 68
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-68-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-68-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -43,6 +45,15 @@ itself. A ceiling and a leg keep it there, which is half of what `TOOL-aScouredK
   with its `M<n>` carriers and the scope rule beside it; the paragraph opening `TWO items have NO
   override`; the sentence that a process not in the ledger is never killed; and, under a `## Close`
   heading, the paragraph opening with the hold lead check 43 finds. Observed by AC2, AC3, AC4, AC5.
+  The checker reads the Skill template in more places than those four, so each of these stays too:
+  the first `unattended.sh --preflight` line above the first `/session-kickoff` line (check 18); the
+  prompt path's `RUN the orientation probes`, `Write the build folder`, `AskUserQuestion`,
+  `PUSH THE BRANCH` and bolded `Preflight` lines in that order under `## Start a run from a PROMPT`
+  (check 20); the routing table's backticked modes under `## Which path` (check 24); `there is no
+  machine half` and `ordinary code build` under `## Start a PLAYBOOK run` (check 25); an
+  `unattended.sh <verb> ` invocation for every declared verb (check 26); and a `## Land` section
+  naming `--prepare` and `--land` (check 44). The step leads the kit suite's fixtures mutate stay
+  spelled as they are, so no arm becomes a fixture no-op.
 - **S4** — EVERY PLACEHOLDER STAYS. Each `{{...}}` token the template carries at the pass's starting
   commit appears at least once in the router, because a placeholder is a value only the render can give a run and the
   companion cannot carry one. Observed by AC6.
@@ -131,6 +142,10 @@ Read at base `7af5f564`.
 - `tools/template-size-limits.txt`
 - `tools/gate-legs.json`
 - `memory/guides/SESSION-KICKOFF.md`
+- `tools/template-size-highwater.txt`, `tools/govkit/registry.toml`, `tools/govkit/subject-pins.tsv`
+  and `memory/map/features/unattended.md` with its generated map: the new leg's high-water row, its
+  `[[exempt_leg]]` row, its subject pin and its map claim, the four places the `unattended protocol
+  size` leg was declared when it landed.
 
 ### Rollout
 
@@ -241,6 +256,10 @@ New arm: `tools/unattended/adopt-unattended.test.sh` · the rendered router read
   before this unit, so S4 and every base-against-tip criterion now compare against the pass's
   starting commit; and `tools/gate-legs.json` is a watched path, which unit 78 and unit 94 re-stamp
   for and this spec did not, so S8 re-stamps the manifest and AC11 observes it.
+- rev-3 · 2026-10-04 · S3 · Files touched · build pass: the evidence named four Skill reads in
+  `check-unattended.sh`, and the tree at the pass's base holds six more (checks 18, 20, 24, 25, 26
+  and 44), each failing or going silent if its block left the Skill; S3 now keeps them. A new leg is
+  also declared in the exempt-leg registry, the subject pins and the map, as its sibling's was.
 
 ## 10. Reuse audit
 

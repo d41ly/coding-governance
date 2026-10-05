@@ -8,7 +8,7 @@ streams = ["tooling", "playbook", "kickoff", "deployer"]
 decisions = []
 
 [claims]
-gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history", "brief-recorded", "unattended protocol size"]
+gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history", "brief-recorded", "unattended protocol size", "unattended skill size"]
 kits = ["unattended"]
 git-hooks = []
 harness-hooks = ["PreToolUse tools/unattended/gate-guard.js", "Stop tools/unattended/stop-guard.js", "StopFailure tools/unattended/stall-recorder.js"]

@@ -272,16 +272,16 @@ Unattended runs — a mandate on disk, not a block of chat
 
 - status `shipped` · streams `tooling`, `playbook`, `kickoff`, `deployer` · dossier `memory/map/features/unattended.md`
 - decisions 0
-- gate-legs 5: `unattended kit gate`, `unattended skill wiring`, `pass-order history`, `brief-recorded`, `unattended protocol size`
+- gate-legs 6: `unattended kit gate`, `unattended skill wiring`, `pass-order history`, `brief-recorded`, `unattended protocol size`, `unattended skill size`
 - kits 1: `unattended`
 - harness-hooks 3: `PreToolUse tools/unattended/gate-guard.js`, `Stop tools/unattended/stop-guard.js`, `StopFailure tools/unattended/stall-recorder.js`
 - workflow-scripts 2: `unattended-build.js`, `unattended-unit.js`
 - skill-engines 1: `session-kickoff`
 - rendered-skills 1: `unattended`
 - gotcha-classes 24: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`, `second-implementation-is-not-a-second-opinion.md`, `inputs-inside-the-subjects-reach.md`
-- guides 4: `UNATTENDED-PROTOCOL.md`
+- guides 4
 - globs 3
-- cut 25 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 26 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## unattended-mandate
 

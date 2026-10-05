@@ -114,6 +114,14 @@ memory/guides/BUILD-METHOD.md	30720
 # WHAT THIS DOES NOT COVER: the file's line count, which only the adopter's GUIDE_CAP_LINES reads.
 memory/guides/UNATTENDED-PROTOCOL.md	65692
 
+# --- the unattended Skill, as rendered ----------------------------------------------------------
+# 10240 bytes = 10 KiB, CR-stripped (TOOL-aMendedFleet-68 S5). The Skill is the first file every
+# unattended run loads, and it is a ROUTER into the verbs carrier's `The paths, in order` section:
+# the path choice, the rendered commands, and the blocks the kit gate reads from the Skill itself.
+# Growth past this row means prose is coming back that belongs in that section. THE LEG IS
+# `unattended skill size`, an `[[exempt_leg]]` for `unattended protocol size`'s reason above.
+.claude/skills/unattended/SKILL.md	10240
+
 # --- every LIVE spec, a CLASS row (TOOL-aMendedFleet-25) --------------------------------------
 # 49152 bytes = 48 KiB, CR-stripped, the charter template's own ceiling, so no spec costs more to
 # re-read than the ruleset does. A unit builder re-reads its current spec whole at every pass
