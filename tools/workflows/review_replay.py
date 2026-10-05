@@ -29,6 +29,22 @@ admits the basename-only refs older records carry, at a known ceiling: two files
 basename can match. Upgrade, if a scored run ever shows the collision: require the longer path on
 both sides.
 
+When the known set came from an appendix, a `per-lens known:` line follows the candidate-side
+`per-lens:` line, giving each known-side lens its confirmed count and how many a candidate matched.
+
+SPEC MODE. A known record whose first non-blank line is the `**Serves:** spec-audit` binding is read
+from its appendix ONLY: with none it is refused `no-appendix`, never scored as zero, and there is no
+legacy fallback, because no spec-audit record carries the legacy table's raw-id column. A spec ref is
+`<file>:<where>`, split at the first `:` after the path (a drive prefix handled as above). The
+SECTION is the first `§<n>` or `section <n>`, case ignored; failing both, the first `S<n>`, `AC<n>`
+or `F<n>` reads as §2, §6 or §8, where the spec format puts those items. An address naming none is
+UNSCORABLE. A match is the same file and the same section: the window is forced to 0, `--window` is
+ignored, and the candidate line prints `address section`. The known line names the kind and the
+subject pins — every `<path>@<hex>` after the binding line and before the first `## ` heading — or
+`subjects none-stated`; no range is read or required. A candidate opening with the OTHER kind's
+binding is refused `kind-mismatch`, naming both; an unbound one is read in the known record's mode.
+Spec records are not listed by `--corpus`.
+
 WHAT THE SCORE DOES NOT MEAN. Recall is against what ONE past review proved real, not against every
 defect in the range. A candidate-only finding may be a real defect the past review missed, so it is
 listed and never counted as a false positive: there is no precision figure here. The tool decides
@@ -47,6 +63,12 @@ import sys
 
 APPENDIX_HEADING = "## Appendix — every finding"
 SERVES_PREFIX = "**Serves:** diff-review"
+SPEC_SERVES_PREFIX = "**Serves:** spec-audit"
+SECTION_REF = re.compile(r"(?:§|\bsection\s+)\s*(\d+)", re.IGNORECASE)
+ITEM_SECTION = re.compile(r"\b(S|AC|F)(\d+)\b")
+#: The spec format's section for each item kind: scope §2, acceptance §6, open questions §8.
+ITEM_SECTIONS = {"S": 2, "AC": 6, "F": 8}
+SUBJECT_PIN = re.compile(r"([^\s`@,()]+)@([0-9a-fA-F]{7,40})\b")
 CELL_SPLIT = re.compile(r"(?<!\\)\|")
 BACKTICKED = re.compile(r"`([^`]+)`")
 LINE_REF = re.compile(r"([^\s:]*[./][^\s:]*):(\d+)")
@@ -59,7 +81,7 @@ ROUND_LINE = re.compile(r"\bRound:\W{0,4}(\d+)")
 ROUND_FILE = re.compile(r"round(\d+)\.md$", re.IGNORECASE)
 #: The arm count `--selftest` must reach. An arm stranded past an early exit is the one defect a
 #: per-arm verdict cannot see, so the runner compares what ran against this.
-ARMS_DECLARED = 19
+ARMS_DECLARED = 25
 
 
 def extract_line_ref(text):
@@ -73,6 +95,45 @@ def extract_line_ref(text):
         s = s[2:]
     m = LINE_REF.match(s)
     return (m.group(1), int(m.group(2))) if m else None
+
+
+def extract_section_ref(text):
+    """`(path, section)` from a spec ref like `x.md:§2 S5` or `C:/r/x.md:section 4`, else None."""
+    if text is None:
+        return None
+    s = text.strip().strip("`").replace("\\", "/")
+    s = re.sub(r"^[A-Za-z]:/", "/", s)
+    while s.startswith("./"):
+        s = s[2:]
+    path, sep, where = s.partition(":")
+    if not (sep and path):
+        return None
+    m = SECTION_REF.search(where)
+    if m:
+        return path, int(m.group(1))
+    m = ITEM_SECTION.search(where)
+    return (path, ITEM_SECTIONS[m.group(1)]) if m else None
+
+
+def read_record_kind(text):
+    """`spec-audit` or `diff-review` from the first non-blank line's `**Serves:**` binding, else None."""
+    first = next((line.strip() for line in text.splitlines() if line.strip()), "")
+    for prefix in (SPEC_SERVES_PREFIX, SERVES_PREFIX):
+        if first.startswith(prefix):
+            return prefix.split()[-1]
+    return None
+
+
+def extract_subject_pins(text):
+    """Every `(path, hex)` pin AFTER the binding line and before the first `## `, one line or one per bullet."""
+    lines = text.replace("\r\n", "\n").split("\n")
+    start = next((i for i, line in enumerate(lines) if line.strip()), len(lines))
+    pins = []
+    for line in lines[start + 1:]:
+        if line.startswith("## "):
+            break
+        pins += SUBJECT_PIN.findall(line)
+    return pins
 
 
 def extract_range(text):
@@ -121,14 +182,18 @@ def parse_appendix_rows(text):
     return confirmed, None
 
 
-def parse_record_findings(text):
-    """A past diff-review record's known set: `({items, range, stated}, None)` or `(None, error)`.
+def parse_record_findings(text, mode="diff-review"):
+    """A past record's known set: `({items, range, stated, unit, subjects}, None)` or `(None, error)`.
 
-    Each item is `{id, path, line}`, path and line None when the item is UNSCORABLE. `unit` names
-    what one item is: `raw-finding` from an appendix, `adjudicated-item` from a legacy table.
+    Each item is `{id, path, line}`, path and line None when the item is UNSCORABLE; in `spec-audit`
+    mode `line` holds the SECTION. `unit` names what one item is: `raw-finding` from an appendix,
+    `adjudicated-item` from a legacy table. An appendix item also carries its `lens`.
     """
-    rng = extract_range(text)
-    if APPENDIX_HEADING in text:
+    spec = mode == "spec-audit"
+    read_ref = extract_section_ref if spec else extract_line_ref
+    rng = None if spec else extract_range(text)
+    # Spec mode has no legacy fallback: a missing appendix is refused by parse_appendix_rows.
+    if spec or APPENDIX_HEADING in text:
         unit = "raw-finding"
         rows, err = parse_appendix_rows(text)
         if err:
@@ -136,8 +201,8 @@ def parse_record_findings(text):
         stated = len(rows)
         items = []
         for r in rows:
-            loc = extract_line_ref(r.get("ref"))
-            items.append({"id": r.get("id") or "?", "path": loc and loc[0], "line": loc and loc[1]})
+            loc = read_ref(r.get("ref"))
+            items.append({"id": r.get("id") or "?", "lens": r.get("lens") or "-", "path": loc and loc[0], "line": loc and loc[1]})
     else:
         unit = "adjudicated-item"
         stated = extract_stated_count(text)
@@ -156,29 +221,37 @@ def parse_record_findings(text):
             items.append({"id": cells[0], "path": loc and loc[0], "line": loc and loc[1]})
         if len(raw) != stated:
             return None, f"liveness: the item rows' raw ids union to {len(raw)} against a stated confirmed count of {stated}"
+    where = "section" if spec else "line"
     if not any(i["path"] for i in items):
-        return None, f"no-scorable: {len(items)} item(s), none with a file-and-line location"
-    if rng is None:
+        return None, f"no-scorable: {len(items)} item(s), none with a file-and-{where} location"
+    if rng is None and not spec:
         return None, "no-range: no hex..hex range token"
-    return {"items": items, "range": rng, "stated": stated, "unit": unit}, None
+    return {"items": items, "range": rng, "stated": stated, "unit": unit,
+            "subjects": extract_subject_pins(text) if spec else None}, None
 
 
-def parse_candidates(text):
+def parse_candidates(text, mode="diff-review"):
     """A report's confirmed appendix rows as candidates `{lens, ref, path, line}`: `(list, None)` or `(None, error)`.
 
     The ONE row-to-candidate mapping, called by `main` and the self-test alike. Refused when confirmed
-    rows exist and none names a file and line: a ref shape the parser cannot read would otherwise
-    score every candidate as a miss and print a recall of zero at exit 0.
+    rows exist and none names a file and line (a section, in `spec-audit` mode): a ref shape the
+    parser cannot read would otherwise score every candidate as a miss and print a recall of zero at
+    exit 0. Refused `kind-mismatch` when the report opens with the OTHER kind's binding.
     """
+    kind = read_record_kind(text)
+    if kind and kind != mode:
+        return None, f"kind-mismatch: the known record is {mode} and the candidate opens with the {kind} binding"
     rows, err = parse_appendix_rows(text)
     if err:
         return None, err
+    spec = mode == "spec-audit"
+    read_ref = extract_section_ref if spec else extract_line_ref
     candidates = []
     for r in rows:
-        loc = extract_line_ref(r.get("ref"))
+        loc = read_ref(r.get("ref"))
         candidates.append({"lens": r.get("lens"), "ref": r.get("ref") or "-", "path": loc and loc[0], "line": loc and loc[1]})
     if candidates and not any(c["path"] for c in candidates):
-        return None, f"no-scorable: {len(candidates)} confirmed row(s), none with a file-and-line ref"
+        return None, f"no-scorable: {len(candidates)} confirmed row(s), none with a file-and-{'section' if spec else 'line'} ref"
     return candidates, None
 
 
@@ -211,21 +284,54 @@ def measure_recall(items, candidates, window):
     }
 
 
-def print_score(known_path, known, candidate_path, candidates, window, score):
-    base, head = known["range"]
-    print(f"replay: known {known_path} · unit {known['unit']} · range {base}..{head} · items {len(known['items'])} · "
+def measure_replay(known_text, cand_text, window):
+    """Two texts to a score: `({mode, known, candidates, window, score}, None)` or `(None, (side, error))`.
+
+    The ONE known-to-score path, called by `main` and the self-test alike. The mode is the known
+    record's binding, `diff-review` when it states none; `spec-audit` forces the window to 0, so a
+    match is the same file and the same section whatever `--window` said. `side` is `known` or
+    `candidate`.
+    """
+    mode = read_record_kind(known_text) or "diff-review"
+    known, err = parse_record_findings(known_text, mode)
+    if err:
+        return None, ("known", err)
+    candidates, err = parse_candidates(cand_text, mode)
+    if err:
+        return None, ("candidate", err)
+    if mode == "spec-audit":
+        window = 0
+    return {"mode": mode, "known": known, "candidates": candidates, "window": window,
+            "score": measure_recall(known["items"], candidates, window)}, None
+
+
+def print_score(known_path, known, candidate_path, candidates, window, score, mode="diff-review"):
+    if mode == "spec-audit":
+        pins = ", ".join(f"{p}@{h}" for p, h in known["subjects"]) or "none-stated"
+        where, reach, sep = f"kind spec-audit · unit {known['unit']} · subjects {pins}", "address section", ":§"
+    else:
+        base, head = known["range"]
+        where, reach, sep = f"unit {known['unit']} · range {base}..{head}", f"window {window}", ":"
+    print(f"replay: known {known_path} · {where} · items {len(known['items'])} · "
           f"scorable {score['scorable']} · unscorable {len(score['unscorable'])}")
     print(f"replay: candidate {candidate_path} · confirmed {len(candidates)} · "
-          f"unscorable {sum(1 for c in candidates if not c['path'])} · window {window}")
+          f"unscorable {sum(1 for c in candidates if not c['path'])} · {reach}")
     for it, c in score["matched"]:
-        print(f"MATCHED         {it['path']}:{it['line']}  <-  {c['ref']}  [{c['lens']}]")
+        print(f"MATCHED         {it['path']}{sep}{it['line']}  <-  {c['ref']}  [{c['lens']}]")
     for it in score["missed"]:
-        print(f"MISSED          {it['path']}:{it['line']}  {it['id']}")
+        print(f"MISSED          {it['path']}{sep}{it['line']}  {it['id']}")
     for it in score["unscorable"]:
         print(f"UNSCORABLE      {it['id']}")
     for c in score["candidate_only"]:
         print(f"CANDIDATE-ONLY  {c['ref']}  [{c['lens']}]")
     print("per-lens: " + " · ".join(f"{lens} confirmed {t[0]} matched {t[1]}" for lens, t in sorted(score["lenses"].items())))
+    if known["unit"] == "raw-finding":
+        known_lenses = {}
+        for it in known["items"]:
+            known_lenses.setdefault(it["lens"], [0, 0])[0] += 1
+        for it, _ in score["matched"]:
+            known_lenses[it["lens"]][1] += 1
+        print("per-lens known: " + " · ".join(f"{lens} confirmed {t[0]} matched {t[1]}" for lens, t in sorted(known_lenses.items())))
     k, m = len(score["matched"]), score["scorable"]
     print(f"replay: recall {k}/{m} = {k / m:.2f}")
 
@@ -258,8 +364,7 @@ def scan_corpus(dirs, repo):
             # Not classifiable, so outside `scanned` — but named, never skipped in silence.
             print(f"replay: unreadable, not scanned: {path.as_posix()} ({exc})", file=sys.stderr)
             continue
-        first = next((line.strip() for line in text.splitlines() if line.strip()), "")
-        if not first.startswith(SERVES_PREFIX):
+        if read_record_kind(text) != "diff-review":
             continue
         scanned += 1
         known, err = parse_record_findings(text)
@@ -314,6 +419,35 @@ CANDIDATE_ROWS = ("| confirmed | src/a.sh:14 | real \\| reached | 1 | correctnes
                   "| refuted | mod/b.py:40 | not reachable | 2 | security |\n"
                   "| confirmed | mod/c.py:7 | real | 3 | security |")
 
+SPEC_RECORD = """{binding}
+
+# x — spec audit, round 1
+
+{pins}
+
+Review shape: raw 4, confirmed {stated}, refuted 1.
+
+## Verdict: CLEAN WITH FIXES
+
+## Appendix — every finding
+
+| id | lens | ref | verdict |
+|---|---|---|---|
+{rows}
+"""
+
+# The head of reviews/2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md in the
+# aEvidencedLens build, copied: the binding line first, then one pin per bullet under the round line.
+ROUND1_PINS = "**Round: 1.** Range reviewed: the eleven subjects below, each pinned at the blob it was read at, plus the tree they cite.\n\n" + "\n".join(
+    f"- `memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-{n}.md@{blob}`" for n, blob in (
+        (1, "de140c3ea4acd5571eb7ee42f9cf4ebbb669e34c"), (2, "1ea5a3a513b452f2072c8ab8825d2ba371e8c87e"),
+        (3, "075af74ddcb7603efee1e08d2eb2cbb5955616f9"), (4, "099033058fe14bfe3407d038ddd4efaf0af34895"),
+        (6, "3f4fafd20ffdec3b119b9f4ab319f51e654717e0"), (10, "88b6a0f1477ab70a89d33b09b05cf89c824a9b66"),
+        (5, "6d1c0773338495d741eccfa96cb18b2573507948"), (7, "7d4dce07d8899d54bfff2a1e1515aa297b090950"),
+        (9, "9e4e4704eaa6dd5ea1795bcce1019ac1ea03e28a"), (8, "629cc42227ce6bb803160f25f74a9ce1fc3db2c4"),
+        (11, "69275b8ac283e870a83a368db20a8222fa0263fc")))
+ROUND1_BINDING = "**Serves:** spec-audit " + " ".join(f"TOOL-aEvidencedLens-{n}" for n in range(1, 12))
+
 
 def run_selftest():
     legacy3 = LEGACY.format(stated=3, extra="")
@@ -339,6 +473,29 @@ def run_selftest():
     one_scorable = APPENDIX.format(stated=2, rows="| confirmed | src/a.sh:1 | x | 1 | l |\n| confirmed | x.js:undefined | y | 2 | l |")
     # chr(), never a typed escape: the character itself is the fixture. CRLF pins the normalisation.
     split_cell = APPENDIX.format(stated=2, rows="| confirmed | src/a.sh:1 | a" + chr(0x2028) + "b | 1 | l |\r\n| confirmed | mod/c.py:7 | y | 2 | l |")
+
+    def render_replay(known_text, cand_text):
+        """`measure_replay` at `--window 10`, then its printed score: `(replay, refusal, output)`."""
+        replay, refusal = measure_replay(known_text, cand_text, 10)
+        out = io.StringIO()
+        if replay:
+            with contextlib.redirect_stdout(out):
+                print_score("k.md", replay["known"], "c.md", replay["candidates"], replay["window"], replay["score"], replay["mode"])
+        return replay, refusal, out.getvalue()
+
+    def build_spec_record(rows, stated, pins="", binding=SPEC_SERVES_PREFIX + " X-1"):
+        return SPEC_RECORD.format(binding=binding, pins=pins, stated=stated, rows=rows)
+
+    spec_known = build_spec_record("| 1 | coherence | x.md:§2 S1 | confirmed |", 1)
+    spec_rows2 = "| 1 | coherence | x.md:section 2, S4 | confirmed |\n| 2 | reuse | x.md:§3 | confirmed |"
+    spec_cand = build_spec_record(spec_rows2, 2)
+    # The same rows with no binding line: the diff fixture's shape, which carries none.
+    unbound_cand = APPENDIX.format(stated=2, rows="| confirmed | x.md:section 2, S4 | a | 1 | coherence |\n| confirmed | x.md:§3 | b | 2 | reuse |")
+    section_refs = [("x.md:§2 S5", ("x.md", 2)), ("x.md:section 2, S5", ("x.md", 2)), ("x.md:S5", ("x.md", 2)),
+                    ("x.md:AC3", ("x.md", 6)), ("x.md:F1", ("x.md", 8)), ("C:/r/x.md:§4 Design", ("/r/x.md", 4)),
+                    ("x.md:status header", None)]
+    lens_known = build_spec_record("| 1 | coherence | x.md:§2 S1 | confirmed |\n| 2 | coherence | x.md:AC1 | confirmed |\n"
+                                   "| 3 | reuse | x.md:§4 | confirmed |", 3)
     arms = [
         ("known-legacy-parse", lambda: None if known3 and [i["id"] for i in known3["items"]] == ["F1", "M1"]
             and known3["items"][0]["path"] == "src/a.sh" else f"got {known3!r}"),
@@ -394,6 +551,45 @@ def run_selftest():
             else f"got {r!r} and {mixed!r}")(parse_candidates(none_scorable), parse_candidates(one_scorable))),
         ("appendix-u2028-row", lambda: (lambda r: None if r[0] and [x["id"] for x in r[0]] == ["1", "2"] and chr(0x2028) in r[0][0]["reason"]
             else f"a U+2028 in a cell cut the table: {r!r}")(parse_appendix_rows(split_cell))),
+        # The legacy fixture under a spec binding: diff mode scores it (known3), so a fallback would too.
+        ("no-appendix", lambda: (lambda r: None if r[0] is None and r[1][0] == "known" and r[1][1].startswith("no-appendix")
+            else f"a spec record with no appendix was not refused no-appendix: {r[:2]!r}")(
+            render_replay(legacy3.replace(SERVES_PREFIX, SPEC_SERVES_PREFIX), spec_cand))),
+        ("section-ref", lambda: next((f"{ref!r} read as {extract_section_ref(ref)!r}, not {want!r}"
+            for ref, want in section_refs if extract_section_ref(ref) != want), None)),
+        ("window-0", lambda: (lambda r: None if r[0] and r[0]["window"] == 0
+            and [c["ref"] for _, c in r[0]["score"]["matched"]] == ["x.md:section 2, S4"]
+            and [c["ref"] for c in r[0]["score"]["candidate_only"]] == ["x.md:§3"]
+            and "· address section" in r[2] and "MATCHED         x.md:§2  <-  x.md:section 2, S4" in r[2]
+            else f"a §3 candidate matched a §2 item under --window 10, or the line kept its window: {r!r}")(
+            render_replay(spec_known, spec_cand))),
+        ("kind-mismatch", lambda: (lambda spec_diff, diff_spec, unbound: None
+            if all(r[0] is None and r[1][0] == "candidate" and r[1][1].startswith("kind-mismatch")
+                   and "spec-audit" in r[1][1] and "diff-review" in r[1][1] for r in (spec_diff, diff_spec))
+            and unbound[0] and unbound[0]["mode"] == "spec-audit" and len(unbound[0]["score"]["matched"]) == 1
+            else f"got {spec_diff[:2]!r} / {diff_spec[:2]!r} / {unbound[:2]!r}")(
+            render_replay(spec_known, SERVES_PREFIX + " X-1\n\n" + unbound_cand),
+            render_replay(legacy3, spec_cand), render_replay(spec_known, unbound_cand))),
+        ("subject-pins", lambda: (lambda one, bullets, none: None
+            if "· kind spec-audit · unit raw-finding · subjects a.md@abc1234, b.md@def5678 ·" in one[2]
+            and bullets[0] and len(bullets[0]["known"]["subjects"]) == 11
+            and "TOOL-aEvidencedLens-11.md@69275b8ac283e870a83a368db20a8222fa0263fc ·" in bullets[2]
+            and "· subjects none-stated ·" in none[2] and "replay: recall 1/1 = 1.00" in none[2] and "range" not in none[2]
+            else f"got {one[2]!r} / {bullets[:2]!r} / {none[2]!r}")(
+            render_replay(build_spec_record("| 1 | coherence | x.md:§2 S1 | confirmed |", 1, "a.md@abc1234, b.md@def5678",
+                                            SPEC_SERVES_PREFIX + " x"), spec_cand),
+            render_replay(build_spec_record("| 1 | coherence | x.md:§2 S1 | confirmed |", 1, ROUND1_PINS, ROUND1_BINDING), spec_cand),
+            # A pin-shaped token ON the binding line must not be read: the binding line is never the pin line.
+            render_replay(build_spec_record("| 1 | coherence | x.md:§2 S1 | confirmed |", 1, "", SPEC_SERVES_PREFIX + " z.md@1234567"),
+                          spec_cand))),
+        ("per-lens-known", lambda: (lambda spec, raw: None
+            if "\nper-lens known: coherence confirmed 2 matched 1 · reuse confirmed 1 matched 0\n" in spec[2]
+            and "\nper-lens: coherence confirmed 1 matched 1 · reuse confirmed 1 matched 0\n" in spec[2]
+            and "\nper-lens known: correctness confirmed 1 matched 0 · seams confirmed 1 matched 0\n" in raw
+            and "\nper-lens: correctness confirmed 1 matched 1 · security confirmed 1 matched 0\n" in printed.getvalue()
+            and "per-lens known:" not in printed.getvalue()
+            else f"got {spec[2]!r} / {raw!r} / {printed.getvalue()!r}")(
+            render_replay(lens_known, spec_cand), render_score(parse_record_findings(twin)[0], []))),
     ]
     passed = ran = 0
     for name, arm in arms:
@@ -446,15 +642,12 @@ def main(argv):
     except (OSError, UnicodeDecodeError) as exc:
         print(f"replay: REFUSED — {exc}", file=sys.stderr)
         return 2
-    known, err = parse_record_findings(known_text)
-    if err:
-        print(f"replay: REFUSED known {args.known} — {err}", file=sys.stderr)
+    replay, refusal = measure_replay(known_text, cand_text, args.window)
+    if refusal:
+        side, err = refusal
+        print(f"replay: REFUSED {side} {args.known if side == 'known' else args.candidate} — {err}", file=sys.stderr)
         return 2
-    candidates, err = parse_candidates(cand_text)
-    if err:
-        print(f"replay: REFUSED candidate {args.candidate} — {err}", file=sys.stderr)
-        return 2
-    print_score(args.known, known, args.candidate, candidates, args.window, measure_recall(known["items"], candidates, args.window))
+    print_score(args.known, replay["known"], args.candidate, replay["candidates"], replay["window"], replay["score"], replay["mode"])
     return 0
 
 

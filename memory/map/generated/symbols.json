@@ -2718,6 +2718,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "deriveLensYield",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveLensYield",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "deriveLiveness",
       "kind": "function",
       "file": "tools/workflows/drift-audit-code.js"
@@ -3668,6 +3678,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "extract_section_ref",
+      "kind": "function",
+      "file": "tools/workflows/review_replay.py"
+    },
+    {
       "id": "extract_segments",
       "kind": "function",
       "file": "tools/runlog/extract.py"
@@ -3679,6 +3694,11 @@
     },
     {
       "id": "extract_stated_count",
+      "kind": "function",
+      "file": "tools/workflows/review_replay.py"
+    },
+    {
+      "id": "extract_subject_pins",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
     },
@@ -4583,6 +4603,11 @@
       "file": "tools/workflows/review_replay.py"
     },
     {
+      "id": "measure_replay",
+      "kind": "function",
+      "file": "tools/workflows/review_replay.py"
+    },
+    {
       "id": "measure_row_classes",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -5031,6 +5056,16 @@
       "id": "population",
       "kind": "function",
       "file": "tools/govkit/refusal_join.py"
+    },
+    {
+      "id": "printLensYield",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "printLensYield",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "print_canon_posture",
@@ -5918,6 +5953,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_record_kind",
+      "kind": "function",
+      "file": "tools/workflows/review_replay.py"
+    },
+    {
       "id": "read_records",
       "kind": "function",
       "file": "tools/runlog/extract.py"
@@ -6518,6 +6558,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderLensYield",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderLensYield",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "renderLexedView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -6556,6 +6606,16 @@
       "id": "renderPrompt",
       "kind": "function",
       "file": "tools/workflows/orient-counterfactual.js"
+    },
+    {
+      "id": "renderPromptLine",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderPromptLine",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "renderRoster",

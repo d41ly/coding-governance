@@ -1307,10 +1307,10 @@ miss "$(run)" "check 2 FAILED"
 # ...and the closing review folds nothing, at the fold cutoff and after it (round 1, L7: both dates armed)
 reset_tree; dispconf 2000-01-01
 DISPDATE="2026-09-15T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2 · disposition fold\n'
-hit "$(run)" "record disposition fold on a row carrying highs and minors, and the closing diff review folds nothing"
+hit "$(run)" "record disposition fold on a row carrying highs and minors, and a counted exit folds nothing on any subject"
 reset_tree; dispconf 2000-01-01
 DISPDATE="2026-10-04T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2 · disposition fold\n'
-hit "$(run)" "record disposition fold on a row carrying highs and minors, and the closing diff review folds nothing"
+hit "$(run)" "record disposition fold on a row carrying highs and minors, and a counted exit folds nothing on any subject"
 # ...and the floors SUM across subjects in one record (round 1, L6 id 9): 1 (a spec subject without
 # counts) + 2 (a closing row, one high plus the minors) = 3, so a per-subject maximum would pass two
 reset_tree; dispconf 2000-01-01
@@ -1320,6 +1320,33 @@ D_FOUR='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n| TOOL-tDisp-3 | C
 reset_tree; dispconf 2000-01-01
 mkdisp "$D_ONE" "$D_FOUR" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote\n\n2026-08-20T02:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 1 · disposition promote\n'
 miss "$(run)" "check 2 FAILED"
+
+# ---- TOOL-aEvidencedLens-9 S7: A SPEC SUBJECT'S TERMINAL ROW COUNTS AND NEVER FOLDS from the
+# ---- driver's SPEC_COUNTS_CUTOFF on (2026-10-06). The base check 2 passes both red rows below: a
+# ---- countless converged row is the ordinary converged round, and a fold beside zero blockers
+# ---- demands nothing. A record first-committed before the cutoff keeps that reading.
+SC_MSG="record a terminal row with no highs and minors counts or with disposition fold in a record first-committed on or after SPEC_COUNTS_CUTOFF"
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-10-06T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-10-06T01:00:00Z review · item S1 · reason verdict CLEAN · blockers 0 · CONVERGED\n'
+hit "$(run)" "spec subject(s) S1 $SC_MSG"
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-10-06T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-10-06T01:00:00Z review · item S1 · reason verdict CLEAN · blockers 0 · CONVERGED · disposition fold\n'
+hit "$(run)" "spec subject(s) S1 $SC_MSG"
+# ...its green control: the counted row passes after the cutoff
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-10-06T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-10-06T01:00:00Z review · item S1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0\n'
+miss "$(run)" "check 2 FAILED"
+# ...a record first-committed before the cutoff is not re-graded, and the build-slug subject is not a spec one
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-10-04T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-10-04T01:00:00Z review · item S1 · reason verdict CLEAN · blockers 0 · CONVERGED · disposition fold\n'
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-10-06T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-10-06T01:00:00Z review · item tDisp · reason verdict CLEAN · blockers 0 · CONVERGED\n'
+miss "$(run)" "check 2 FAILED"
+# ...and a SPEC_COUNTS_CUTOFF the leg cannot read is named inside check 2, as FOLD_CUTOFF's is
+reset_tree; mkconf
+mutate $KIT_REL/unattended.sh 's|^SPEC_COUNTS_CUTOFF=.*|SPEC_COUNTS_CUTOFF=2026-10-06|'
+hit "$(run)" "the driver declares no readable ISO-date SPEC_COUNTS_CUTOFF, so the counted-spec-row clause cannot tell"
 
 # ---- TOOL-aProbedUnit-6: BOUNDED is a terminal exit that OWES a disposition and, on promote, an
 # ---- id, exactly as NON-CONVERGENT does. At base the first fixture printed NOTHING: the `needs`
@@ -5391,7 +5418,7 @@ ma_grant() { # dir · slug · value -> a `may:` line added to that build's READM
 # THE BUILDER. BASE is `second` on main; the run branch `unit` opens with the record's first commit
 # (its facts), then the RUN'S grant to tOther2, then ordinary work; main then takes the OWNER'S grant
 # to tOther and is pushed. What each group does after that is the thing it tests.
-ma_init() { # name -> $ma_root/<name>, built to the shape above
+ma_init() { # name · [bare] -> $ma_root/<name>, built to the shape above; `bare` commits neither grant
   local d="$ma_root/$1"
   mkdir -p "$d/$KIT_REL" "$d/memory/guides"
   cp "$TMP/$KIT_REL/check-unattended.sh" "$TMP/$KIT_REL/unattended.sh" "$TMP/$KIT_REL/lib-unattended.sh" \
@@ -5413,10 +5440,10 @@ ma_init() { # name -> $ma_root/<name>, built to the shape above
     git remote add origin "$d.git" && git push -q origin main
     git checkout -q -b unit ) >/dev/null 2>&1
   ma_facts "$d" tRun RUNNING main "$(ma_base "$d")"; ma_commit "$d" facts
-  ma_grant "$d" tOther2 bin/run-granted.sh; ma_commit "$d" "run grants"
+  [ "${2:-}" = bare ] || { ma_grant "$d" tOther2 bin/run-granted.sh; ma_commit "$d" "run grants"; }
   ( cd "$d" && git commit -q --allow-empty -m "unit work" --no-verify )
   ( cd "$d" && git checkout -q main ) >/dev/null 2>&1
-  ma_grant "$d" tOther bin/owner-granted.sh; ma_commit "$d" "owner grants"
+  [ "${2:-}" = bare ] || { ma_grant "$d" tOther bin/owner-granted.sh; ma_commit "$d" "owner grants"; }
   ( cd "$d" && git push -q origin main && git checkout -q unit ) >/dev/null 2>&1
 }
 MA_RUN_RD="in memory/builds/tOther2/README.md, run memory/builds/tRun/RUN.md"
@@ -5625,6 +5652,112 @@ MA_RUN=$(git -C "$ma22" log --format=%H --grep='^run grants$' -1)
 out=$(ma_leg "$ma22")
 hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
 miss "$out" "$MA_OWN_RD"
+
+# ==== TOOL-aEvidencedLens-9: NO RUN COMMIT CHANGES THE ROUND BOUND ===============================
+# The same own-commit list as the grant arm, so the same builder: the run's raise must red on a live
+# and on a terminal record, and an OWNER raise merged into the run branch must not. The fixture conf
+# declares no REVIEW_ROUNDS, so the bound before every raise is the driver's default of 1. At base
+# no arm below printed a round line. Every graph still carries the run's grant, so the grant arm
+# hitting in the quiet group proves the leg graded that range rather than finding nothing.
+MA_ROUNDS="a commit among a run's own commits changes the effective REVIEW_ROUNDS bound in .unattended.conf, and the round bound is the owner's, set by an owner commit outside any run (run mandate memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-0-run-mandate.md, decision 4) - commit and bound follow:"
+ma_rounds() { sed -i '/^REVIEW_ROUNDS=/d' "$1/.unattended.conf"; printf 'REVIEW_ROUNDS="%s"\n' "$2" >> "$1/.unattended.conf"; }
+# ---- R1: a live record whose own commit raises the bound
+ma_init gr1; mar="$ma_root/gr1"
+ma_rounds "$mar" 2; ma_commit "$mar" "run raises rounds"; MA_RR=$(ma_sha "$mar" HEAD)
+hit "$(ma_leg "$mar")" "$MA_ROUNDS $MA_RR 1 -> 2, run memory/builds/tRun/RUN.md"
+# ---- R2: the owner raises it on main and the run branch merges main. The merge's FIRST-parent diff
+# ---- carries the raise, so a scan reading it would red; the merge took one side's value, and the
+# ---- owner's commit is on the advertised tip, so nothing is named.
+ma_init gr2; mar="$ma_root/gr2"
+( cd "$mar" && git checkout -q main ) >/dev/null 2>&1; ma_rounds "$mar" 2; ma_commit "$mar" "owner raises rounds"
+( cd "$mar" && git push -q origin main && git checkout -q unit && git merge -q --no-edit main ) >/dev/null 2>&1
+MA_RUN=$(git -C "$mar" log --format=%H --grep='^run grants$' -1)
+same "fixture: the reconcile's first-parent diff carries the owner's raise" \
+  "$(git -C "$mar" diff --name-only HEAD^1 HEAD -- .unattended.conf)" ".unattended.conf"
+out=$(ma_leg "$mar")
+miss "$out" "changes the effective REVIEW_ROUNDS bound"
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+# ---- R3: a TERMINAL record, landed by a --no-ff merge named as its witness, whose range holds the
+# ---- run's raise. A live-only fixture never reaches the terminal arm of the range.
+ma_init gr3; mar="$ma_root/gr3"
+ma_rounds "$mar" 2; ma_commit "$mar" "run raises rounds"; MA_RR=$(ma_sha "$mar" HEAD)
+( cd "$mar" && git checkout -q main && git merge -q --no-ff --no-edit -m "land tRun" unit ) >/dev/null 2>&1
+ma_facts "$mar" tRun LANDED HEAD "$(ma_base "$mar")"
+printf 'landed-anchor: remote\n' >> "$mar/memory/builds/tRun/RUN.md"; ma_commit "$mar" "landed record"
+hit "$(ma_leg "$mar")" "$MA_ROUNDS $MA_RR 1 -> 2, run memory/builds/tRun/RUN.md"
+# ---- TOOL-aEvidencedLens-21 S6 (closing review L1). R4: a run commit writes a DECOY conf, `4` sourced
+# ---- and a dead `1` after it; the last-assignment read saw `1`, the default, and named nothing.
+ma_init gr4; mar="$ma_root/gr4"
+sed -i '/^REVIEW_ROUNDS=/d' "$mar/.unattended.conf"; printf 'REVIEW_ROUNDS=4\nif false; then\nREVIEW_ROUNDS=1\nfi\n' >> "$mar/.unattended.conf"
+ma_commit "$mar" "run writes a decoy"; MA_RR=$(ma_sha "$mar" HEAD)
+hit "$(ma_leg "$mar")" "$MA_ROUNDS $MA_RR 1 -> multi:4,1, run memory/builds/tRun/RUN.md"
+# ---- R5: `1` then `01` is one bound, so neither run commit is a round write; the grant hit is the
+# ---- liveness, proving the leg graded that range rather than finding nothing.
+ma_init gr5; mar="$ma_root/gr5"
+ma_rounds "$mar" 1; ma_commit "$mar" "run spells rounds"; ma_rounds "$mar" 01; ma_commit "$mar" "run zero-pads rounds"
+MA_RUN=$(git -C "$mar" log --format=%H --grep='^run grants$' -1)
+out=$(ma_leg "$mar")
+miss "$out" "changes the effective REVIEW_ROUNDS bound"
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+# ---- The four reports that skip or narrow the walk name BOTH arms it gates.
+same "round reports: no skip report names the grant-write arm alone" \
+  "$(grep -cF 'SKIPPED the grant-write arm for' "$TMP/$KIT_REL/check-unattended.sh")" "0"
+same "round reports: both skip reports name both arms" \
+  "$(grep -cF 'SKIPPED the grant-write and round-bound arms for' "$TMP/$KIT_REL/check-unattended.sh")" "2"
+hit "$(grep -F 'excludes the LOCAL ref' "$TMP/$KIT_REL/check-unattended.sh")" "grant-write and round-bound arms"
+hit "$(grep -F 'examined NO own commit' "$TMP/$KIT_REL/check-unattended.sh")" "grant-write and round-bound arms"
+
+# ==== TOOL-aEvidencedLens-14: THE WALK FIRES ON EITHER SCAN'S HIT =================================
+# A BARE graph carries no grant, so the grant scan never hits and only the round scan can trigger the
+# terminal walk. The owner raises the bound on main; the run branch reconciles main (plainly, or by an
+# evil merge), optionally raises it itself, and lands by a --no-ff merge named as the witness. Against
+# the grant-only trigger the unwalked superset names the owner's commit.
+ma_round_walk() { # name · run raise or "" · evil merge value or "" -> $mar, a landed terminal record
+  ma_init "$1" bare; mar="$ma_root/$1"
+  ( cd "$mar" && git checkout -q main ) >/dev/null 2>&1; ma_rounds "$mar" 2; ma_commit "$mar" "owner raises rounds"
+  ( cd "$mar" && git push -q origin main && git checkout -q unit ) >/dev/null 2>&1
+  if [ -n "$3" ]; then
+    ( cd "$mar" && git merge -q --no-ff --no-commit main ) >/dev/null 2>&1
+    ma_rounds "$mar" "$3"; ma_commit "$mar" "evil reconcile"
+  else
+    ( cd "$mar" && git merge -q --no-edit main ) >/dev/null 2>&1
+  fi
+  [ -z "$2" ] || { ma_rounds "$mar" "$2"; ma_commit "$mar" "run raises rounds"; }
+  ( cd "$mar" && git checkout -q main && git merge -q --no-ff --no-edit -m "land tRun" unit ) >/dev/null 2>&1
+  ma_facts "$mar" tRun LANDED HEAD "$(ma_base "$mar")"
+  printf 'landed-anchor: remote\n' >> "$mar/memory/builds/tRun/RUN.md"; ma_commit "$mar" "landed record"
+  MA_OWNR=$(git -C "$mar" log --format=%H --grep='^owner raises rounds$' -1)
+}
+ma_round_count() { printf '%s\n' "$1" | grep -cF -- "$MA_ROUNDS"; }
+# ---- round walk: AC1 - an owner raise merged into a terminal record's run names no round write
+ma_round_walk grw1 "" ""
+same "round walk: fixture, the owner raise and the run's reconcile of it are in base..witness" \
+  "$(git -C "$mar" log --format=%s -1 "$MA_OWNR")|$(git -C "$mar" log --format=%s -1 'HEAD~1^2')" "owner raises rounds|Merge branch 'main' into unit"
+out=$(ma_leg "$mar")
+miss "$out" "$MA_ROUNDS $MA_OWNR"
+miss "$out" "changes the effective REVIEW_ROUNDS bound"
+# ---- round walk: AC2 - the same record with a run raise beside it: named once, the owner's dropped.
+# ---- Also the liveness of AC1's `miss`: the same leg on the same graph does name a round write.
+ma_round_walk grw2 3 ""
+MA_RR=$(git -C "$mar" log --format=%H --grep='^run raises rounds$' -1)
+out=$(ma_leg "$mar")
+hit  "$out" "$MA_ROUNDS $MA_RR 2 -> 3, run memory/builds/tRun/RUN.md"
+miss "$out" "$MA_ROUNDS $MA_OWNR"
+same "round walk: a run raise beside an owner raise fails check 19 once" "$(ma_round_count "$out")" 1
+# ---- round walk: AC3 - an EVIL run merge whose resolution sets 3 over parents 1 (run) and 2 (owner)
+# ---- is a run write the walk keeps. Its red is a staged break: a walk that drops merge commits
+# ---- themselves, the superset read untouched, names nothing on the same graph.
+ma_round_walk grw3 "" 3
+MA_EM=$(git -C "$mar" log --format=%H --grep='^evil reconcile$' -1)
+out=$(ma_leg "$mar")
+hit  "$out" "$MA_ROUNDS $MA_EM 1 -> 3, run memory/builds/tRun/RUN.md"
+miss "$out" "$MA_ROUNDS $MA_OWNR"
+same "round walk: an evil run merge fails check 19 once" "$(ma_round_count "$out")" 1
+mutate "$mar/$KIT_REL/lib-unattended.sh" 's/GIT rev-list "\$_rrc_end" "^\$_rrc_base" \$_rrc_ex 2>/GIT rev-list "$_rrc_end" "^$_rrc_base" $_rrc_ex ${_rrc_ex:+--no-merges} 2>/'
+same "round walk: a walk that drops the merge itself names nothing" "$(ma_round_count "$(ma_leg "$mar")")" 0
+# ...and the broken leg is alive, not mute: on AC2's graph it still walks and names the run's plain raise
+cp "$mar/$KIT_REL/lib-unattended.sh" "$ma_root/grw2/$KIT_REL/lib-unattended.sh"
+hit "$(ma_leg "$ma_root/grw2")" "$MA_ROUNDS $MA_RR 2 -> 3, run memory/builds/tRun/RUN.md"
 rm -rf "$ma_root"
 
 

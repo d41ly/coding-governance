@@ -1,13 +1,13 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.30', // gov:kit tier2-review@1.30 // gov:kit review-harness@1.30 — BOTH ids: the
+  version: '1.31', // gov:kit tier2-review@1.31 // gov:kit review-harness@1.31 — BOTH ids: the
   // second is this entry's REGISTRY id, and without it a deployer grepping the id the
   // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
     'Consolidated, concurrency-capped (≤{{FANOUT_CAP}}) Tier-2 adversarial review, ≤{{FANOUT_CAP}} verify agents TOTAL: find → batched-verify → synth, joined on an ORCHESTRATOR-ASSIGNED INTEGER id. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
   phases: [
     { title: 'Resume', detail: 'one probe reads the key directory; a lens or batch whose file carries the key is reused' },
-    { title: 'Find', detail: '5 finder lenses (3 on a light run), one wave, ≤{{FANOUT_CAP}} concurrent' },
+    { title: 'Find', detail: '5 finder lenses on either kind (3 on a light diff run), one wave, ≤{{FANOUT_CAP}} concurrent' },
     { title: 'Verify', detail: 'skeptics refute findings in ≤{{FANOUT_CAP}} BATCHES — agent count fixed' },
     { title: 'Synthesize', detail: 'one pass → report file' },
   ],
@@ -76,7 +76,15 @@ function buildKeyedSchema(schema, extra) {
 //   byDesign: "known/tracked issues reviewers must NOT re-report",
 //   reviewDir: "where synth writes the report (repo-relative)",
 //   kind: "diff-review" | "spec-audit",   // DEFAULTS to "diff-review" when absent
-//   subjects: [{ path, blob }],           // spec-audit ONLY; blob is 7-40 hex, per subject
+//   subjects: [{ path, blob, prevBlob }], // spec-audit ONLY; blob is 7-40 hex, per subject; prevBlob, optional
+//                                         // and legal at round > 1 only, is the 7-40 hex blob of that path
+//                                         // the previous round audited, and names the fold diff
+//   scratch: "<absolute session scratchpad>", // spec-audit ONLY and REQUIRED there: where a probing lens
+//                                         // writes its temporary files; refused if relative, multi-line,
+//                                         // carrying a .. segment, or equal to or under `repo` once both
+//                                         // fold /c/ to c:/, so this kind also needs an ABSOLUTE `repo`;
+//                                         // an 8.3 name or a link aliasing `repo` is not seen; a diff
+//                                         // review never reads it
 //   round: <integer>,                     // inferred as 2 when priorFindings arrive without one
 //   priorFindings: [ ... ],               // a previous round's confirmed set
 //   specs: ["<repo-relative path>", ...], // intent documents: a diff review's statement of intent, a spec audit's
@@ -220,7 +228,59 @@ if (isSpec) {
     if (round > 1) throw new Error(why)
     log('WARNING: ' + why)
   }
+  // TOOL-aEvidencedLens-4 S1 - `prevBlob`, the blob the previous round audited. Refused when malformed
+  // and refused at round 1 at any shape (spec F1): it has no meaning there, so it is a caller error, and
+  // ignoring it would drop the caller's input silently. The diff kind never reads it.
+  const prevBadIdx = subjects.findIndex(
+    (x) => !!x && typeof x === 'object' && x.prevBlob !== undefined && (round === 1 || !PINNED_SHA.test(String(x.prevBlob)))
+  )
+  if (prevBadIdx !== -1)
+    throw new Error('tier2-review: subject ' + prevBadIdx + "'s `prevBlob` must be an immutable 7-40 hex object id, the blob " +
+      'of that path the previous round audited, and is legal at round > 1 only. Got ' +
+      JSON.stringify(subjects[prevBadIdx].prevBlob) + ' at round ' + round + '.')
 }
+// S3 - how many subjects name their fold diff, and whether a fold round has nothing naming its fold text.
+const prevBlobCount = isSpec ? subjects.filter((x) => !!x && typeof x === 'object' && x.prevBlob !== undefined).length : 0
+const foldDegraded = isSpec && round > 1 && prevBlobCount === 0 && priorFindings.length === 0
+if (foldDegraded)
+  log('WARNING: a DEGRADED fold review: round ' + round + ' with no subject carrying prevBlob and no priorFindings, so nothing ' +
+    "names the text the previous round's fixes introduced; every subject is reviewed whole")
+else if (isSpec && round > 1 && prevBlobCount < subjects.length)
+  log('WARNING: no prevBlob was supplied for ' + subjects.filter((x) => !x || typeof x !== 'object' || x.prevBlob === undefined)
+    .map((x) => (x && typeof x === 'object' ? x.path : String(x))).join(', ') + ', so the fold diff of each is unknown and it is reviewed whole')
+// TOOL-aEvidencedLens-2 S4 - `scratch`, the one place a PROBING spec lens may write. REQUIRED on the
+// spec kind (spec F1: a lens briefed to probe with no scratch has nowhere legal to write, and owner
+// ruling TOOL-aProbedUnit-10 makes it required on every harness agent), refused by the build harness's
+// own SHAPE test (TOOL-aProbedUnit-4), plus two refusals of its own (spec F2): a control character,
+// because the value reaches a prompt line and a newline would start a forged one (the `specs` rule's L1
+// precedent below), and a path equal to or under `repo`, because a lens writing there writes the tree.
+// That comparison folds slashes, case, a trailing slash and an MSYS `/<letter>/` to `<letter>:/`, so it
+// errs toward refusing. It is TEXTUAL, so two more refusals make it answerable (TOOL-aEvidencedLens-21
+// S1): on this kind `repo` must be absolute too, since `"."` cannot be compared in a runtime with no
+// filesystem, and a `..` segment in either value is refused, since `/tmp/q/../r/x` resolves under
+// `/tmp/r`. An 8.3 short name or a link aliasing `repo` is still not seen. The diff kind never reads
+// `a.scratch`, and its `repo` stays as accepted.
+const scratchRule = 'an ABSOLUTE path (a leading / or a drive letter and a separator) with no control character and no .. segment, not equal to or under `repo`'
+if (isSpec && (typeof a.scratch !== 'string' || !/^(\/|[A-Za-z]:[\\/])/.test(a.scratch)))
+  throw new Error('tier2-review: a spec-audit needs `scratch`, ' + scratchRule + '. Got ' + JSON.stringify(a.scratch) +
+    '. Refusing to default it: a probing lens with no scratch directory has nowhere legal to write.')
+if (isSpec && /[\x00-\x1f]/.test(a.scratch))
+  throw new Error('tier2-review: `scratch` must be ' + scratchRule + '. Got ' + JSON.stringify(a.scratch) +
+    ', which carries a control character; it reaches a prompt line, where a newline would start a forged one.')
+if (isSpec && !/^(\/|[A-Za-z]:[\\/])/.test(String(repo)))
+  throw new Error('tier2-review: a spec-audit needs an ABSOLUTE `repo` (a leading / or a drive letter and a separator). Got ' +
+    JSON.stringify(repo) + '; `scratch` is refused when it is under `repo`, and a relative `repo` cannot be compared in a runtime with no filesystem.')
+if (isSpec && /(^|[\\/])\.\.([\\/]|$)/.test(a.scratch + '\n' + String(repo)))
+  throw new Error('tier2-review: `scratch` and `repo` must carry no .. segment. Got `scratch` ' + JSON.stringify(a.scratch) +
+    ' beside `repo` ' + JSON.stringify(repo) + '; the under-`repo` test is textual, and a .. segment resolves where the text does not say.')
+const scratchFold = isSpec ? a.scratch.replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '').replace(/^\/([a-z])(?=\/|$)/, '$1:') : ''
+const repoFold = String(repo).replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '').replace(/^\/([a-z])(?=\/|$)/, '$1:')
+if (isSpec && (scratchFold === repoFold || scratchFold.indexOf(repoFold + '/') === 0))
+  throw new Error('tier2-review: `scratch` must be ' + scratchRule + '. Got ' + JSON.stringify(a.scratch) + ' beside `repo` ' +
+    JSON.stringify(repo) + '; a lens writing its temporary files there writes the tree the read-only rule exists to protect.')
+// Folded to forward slashes ONCE, here, as the build harness folds its own; never lowercased, so the
+// prompt names the directory the caller spelled.
+const scratch = isSpec ? a.scratch.replace(/\\/g, '/') : ''
 // TOOL-aSightedSkeptic-3 S1/S3 - `specs`, the intent documents the caller names. Validated here,
 // before the base-shape ladder and the first agent, so a bad value refuses in milliseconds. A path
 // reaches a prompt as text an agent then reads, so anything that could point a reviewer outside the
@@ -385,6 +445,30 @@ const SEVERITY_RUBRIC =
   `low: ${isSpec ? 'the design, built as written, would differ only cosmetically or in a comment' : 'cosmetic, or a comment'}, with no effect on behaviour. ` +
   `A grade follows the consequence, never the confidence or how alarming the defect looks.`
 
+// TOOL-aEvidencedLens-2 S2 - the PROBE POLICY, spec-kind data. A spec lens may now establish a claim
+// from anywhere in the tree, read-only: about two in five of the defects that got past the audit needed
+// a command run, a consumer grepped or a goal timed (measured 2026-10-05, session study). The rules
+// interpolate NOTHING, so they join the input print; the block's header line carries `scratch`, which
+// changes every session and therefore does not (a resumed run must reuse its lens files). The one write
+// the READ-ONLY rule excepts is the DURABILITY file the same prompt demands two lines later.
+const PROBE_RULES = [
+  'Establish every claim with a read-only command, and record the command and what it printed.',
+  'Run each section-6 criterion\'s own command or check when it is read-only and bounded, and record what it printed: a criterion already green before the unit is built cannot fail.',
+  'Grep the consumers of every name, value or path the spec renames, retires or changes.',
+  'Time a stated wall-clock goal once, when one run of it is bounded.',
+  'READ-ONLY: write nothing under the repository, with ONE exception, the DURABILITY file this prompt names. Never run a command that writes the tree or the index: no --write, --render, --fix or --in-place, no git add, commit, checkout, switch, reset, restore, stash, merge, rebase, clone or worktree, and no redirect into the repository. Read another revision with git show <rev>:<path>.',
+  'Every temporary file goes under the scratch directory named above, spelled absolute; never $TMPDIR, $TMP, $TEMP, /tmp or a bare mktemp.',
+  // TOOL-aEvidencedLens-21 S5 (replay id 37): every probing agent shares that one directory, so two lenses
+  // writing a same-named probe file overwrote each other. Constant text, so the print and the two slices hold.
+  'Write temporary files only under a subdirectory of the scratch directory named for your own role, <lens key> for a finder or verify-<batch> for a skeptic, created on first use.',
+  'Bound every command at 120 seconds. Never run a merge bar, a *.test.sh suite or a self-test runner, a --selftest flag included.',
+  'A probe that needs a write, such as a staged break, or one of the runs banned above, is DESCRIBED in the finding\'s fix as the probe the build must run. It is never performed.',
+]
+// Built once, after `scratch` is validated; '' on the diff kind, whose prompts stay byte-identical.
+const probeBlock = isSpec
+  ? `PROBE POLICY — repository ${repo}, scratch directory ${scratch}.\n- ` + PROBE_RULES.join('\n- ') + `\n`
+  : ''
+
 // S3 - the spec kind's schema. `where` replaces `line` and is REQUIRED, so the address obligation is
 // machine-enforced on both kinds rather than relaxed on one.
 const SPEC_FINDING_SCHEMA = {
@@ -398,7 +482,8 @@ const SPEC_FINDING_SCHEMA = {
       type: 'array',
       items: {
         type: 'object',
-        required: ['file', 'where', 'severity', 'claim', 'impact', 'fix'],
+        // TOOL-aEvidencedLens-2 S3 - `evidence` is REQUIRED: what a skeptic re-runs to check the claim.
+        required: ['file', 'where', 'severity', 'claim', 'impact', 'fix', 'evidence'],
         properties: {
           file: { type: 'string' },
           where: { type: 'string' },
@@ -406,6 +491,7 @@ const SPEC_FINDING_SCHEMA = {
           claim: { type: 'string' },
           impact: { type: 'string' },
           fix: { type: 'string' },
+          evidence: { type: 'string' },
         },
       },
     },
@@ -456,28 +542,35 @@ const DIFF_LENSES = [
 // skip happens inside the Find thunk, so the receiver the agent-cap hook sizes keeps its shape.
 const LIGHT_LENSES = ['correctness', 'seams', 'verification']
 
-// TOOL-dTieredTribunal-11 S2 - the M4 spec-audit catalogue, COPIED from <prefix>/memory-tree/README.md
-// rather than re-invented, so the method and the engine cannot drift into two answers.
+// TOOL-aEvidencedLens-1 - this array IS the M4 spec-audit catalogue, its one source. The method and
+// the memory-tree README point here rather than list lens names, so there is no second copy to drift.
+// Five lenses aimed at the measured escape classes; `coherence` keeps the first slot so a fixture
+// keyed on the first lens keeps its ids.
 const SPEC_LENSES = [
   {
-    key: 'underspecification',
+    key: 'coherence',
     brief:
-      'Underspecification: which section-2 item has no section-6 criterion, and which section-6 criterion names no observation that could fail.',
+      'Coherence: does the spec set agree with itself, and can its acceptance decide anything? Report a section-2 item no section-6 criterion observes; a criterion whose observation cannot FAIL on today\'s tree, because it is already green before the unit is built; a criterion that cannot PASS on a correct build, because it demands what the design does not produce or a figure the build cannot reach; section 2 against section 3; section 4 Design against section 7 Gates; and, across the subjects and the sibling context, the four axes scope, interface, ordering and acceptance: a name, path or key spelled two ways, a unit depending on one ordered after it, two units claiming one file or one landing slot, and an overview acceptance no unit\'s criteria imply.',
   },
   {
-    key: 'contradiction',
+    key: 'grounding',
     brief:
-      'Contradiction: section 2 against section 3; a sub-spec against the main spec on the four axes scope, interface, ordering and acceptance; section 4 Design against section 7 Gates.',
+      'Grounding: is every claim sections 4 and 10 make about the world TRUE where the subjects stand? Check each claim about existing code, a tool\'s flags or output, a record, a count, a platform behaviour or a cost against the source, never against the spec. Hunt the traps this platform sets: MSYS argument and path rewriting, drive-letter and backslash paths, CRLF in a working copy and a text-mode read that drops a CR, and a stated wall-clock goal nobody timed. A claim marked UNVERIFIED is a finding only where the design rests on it.',
   },
   {
-    key: 'unstated-assumption',
+    key: 'reuse',
     brief:
-      'Unstated assumption: what must be true of existing code for section 4 to work that section 4 never says and section 10 never checked.',
+      'Reuse: functionality is reused and extended, never rebuilt. Report a design that builds what already exists, such as a function, a checker, a gate leg, a driver verb or a record shape, instead of extending it; a section-10 seam that is cited but is not the one section 4 extends, or that does not exist; and a question a decision record or an ask already decided, decided asks included. Probe before you claim: the codebase-map kit\'s reuse_lookup.py with a behaviour phrase, the memory-recall kit\'s query.py with a plain-English question and 8-14 --terms in this corpus\'s own jargon, and grep, because the lookup cannot see every layer and prints the ones it skipped. Locate each tool with git ls-files; where one is absent, say so in the finding and use grep. Read the asks through the memory-tree kit\'s gen_build_index.py --asks --json --all, falling back to the backlog shards when its mode field says shards. THE BAR: a reuse finding names the existing seam or record by path or id AND quotes the spec text that duplicates or contradicts it. That a related record exists is not a finding.',
   },
   {
-    key: 'prior-art',
+    key: 'blast-radius',
     brief:
-      'Prior art: has a record already decided this? That is the recall probe — search the decision logs and the build records, and read the asks, decided ones included, through `gen_build_index.py --asks --json --all`, falling back to the backlog shards when its `mode` field says `shards`, before accepting a design as new.',
+      'Blast radius: what does this change trip that the spec does not list? For every name, value or rule the spec renames, retires or changes, grep the name AND the value, and report each consumer, carrier, test arm or document the spec does not name. Join section 4\'s files-touched list against the gate-leg manifest (gate-legs.json, where the project keeps one) and report a guarded leg section 7 omits; report a declared size or time budget the change will cross; and report the repo\'s own machinery the spec forgets: version carriers, codebase-map keys, record and filename rules, a --dispatch write set, and a render an adopter regenerates.',
+  },
+  {
+    key: 'failure-envelope',
+    brief:
+      'Failure envelope: what will the built thing meet that the spec never says it handles? Report the input classes the design is silent on (empty, malformed, multi-line, unterminated, huge, concurrent), signals, partial failure and a dead dependency; a security or write surface section 5 did not price; and a spec that names one INSTANCE where the class was meant, such as one file of two or one caller of three. A spec is built as a ceiling: in this kit\'s own trial (aBlindedTrial, report section 4.3), when a spec named the class for one input file and not the other, the builder handled exactly the file it named.',
   },
 ]
 
@@ -606,12 +699,18 @@ else log('WARNING: `checklist` was supplied with no item — no lens sweeps the 
 // whole aSightedSkeptic build (its shared invariant 5); a later change to a prompt, a schema or the
 // lens set moves this literal again. It rides the print rather than the key's string, so the probe
 // prompt's hand-spelled directory follows without a second edit.
-const REVIEW_SHAPE = 'lenses5-r1'
+// TOOL-aEvidencedLens-1 S3 - r2, ONE bump for the whole aEvidencedLens build (its shared invariant 5).
+const REVIEW_SHAPE = 'lenses5-r2'
 // TOOL-aSightedSkeptic-3 S5 - `specs` is interpolated by renderIntent(), so it joins the print too.
 // TOOL-aSightedSkeptic-4 S7 - so does the PARSED checklist: a CRLF string and its LF twin are one key,
 // and a lens swept under one checklist is never reused under another.
 // TOOL-aSightedSkeptic-7 S8 - and so does `intensity`: a light run and a full run never share a lens file.
-const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity }))
+// TOOL-aEvidencedLens-2 S5 - and, on the spec kind only, PROBE_RULES, spread so the diff print object is
+// unchanged. `scratch` is a location, not content, and stays out: a resumed run has a new scratchpad.
+// TOOL-aEvidencedLens-4 S7 - and `prevBlobs`, one per subject in order, null where absent, ONLY when some
+// subject carries one: a run carrying none, the diff kind included, keeps its print and so its key.
+const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}),
+  ...(prevBlobCount ? { prevBlobs: subjects.map((x) => (x && typeof x === 'object' && x.prevBlob !== undefined ? x.prevBlob : null)) } : {}) }))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -625,7 +724,10 @@ const probe = await agent(
     `1. Run \`git -C ${repo} rev-parse --git-common-dir\`. Turn the answer into an ABSOLUTE path with ` +
     `forward slashes (a relative answer is relative to ${repo}) and return it as commonDir.\n` +
     (isSpec
-      ? ''
+      // TOOL-aEvidencedLens-4 S4 - the move check's read half. The probe reports; the HARNESS compares.
+      ? `2. For EACH path below, run \`git -C ${repo} hash-object <path>\` and return blobs: one {path, now} per path, ` +
+        `now being the hash it prints, or an empty string when the command fails. Compare nothing:\n` +
+        subjects.map((x) => `  - ${x && typeof x === 'object' ? x.path : String(x)}`).join('\n') + `\n`
       : `2. Run \`git -C ${repo} rev-parse --verify ${base}^{commit}\` and \`git -C ${repo} rev-parse --verify ${head}^{commit}\` ` +
         `and return the two FULL shas as base and head. Return an empty string for one that does not resolve.\n`) +
     `3. The review directory is <commonDir>/review-lenses/` +
@@ -637,7 +739,7 @@ const probe = await agent(
     `find file's JSON in finds and each verify file's JSON in verifies, EXACTLY as it is on disk plus ` +
     `a name field holding its file name. Do not repair, complete or re-judge anything: a file that ` +
     `does not parse, or lacks a field the schema requires, is left out and its name listed in skipped.\n` +
-    `Return JSON {commonDir, ${isSpec ? '' : 'base, head, '}finds:[...], verifies:[...], skipped:[...]}.`,
+    `Return JSON {commonDir, ${isSpec ? 'blobs:[...], ' : 'base, head, '}finds:[...], verifies:[...], skipped:[...]}.`,
   {
     label: 'resume:probe',
     phase: 'Resume',
@@ -651,6 +753,8 @@ const probe = await agent(
         finds: { type: 'array', items: buildKeyedSchema(isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA, []) },
         verifies: { type: 'array', items: buildKeyedSchema(VERDICT_SCHEMA, ['batch']) },
         skipped: { type: 'array', items: { type: 'string' } },
+        // Optional (spec F2): a probe that omits it reads as every subject UNCHECKED, never as none moved.
+        ...(isSpec ? { blobs: { type: 'array', items: { type: 'object', required: ['path', 'now'], properties: { path: { type: 'string' }, now: { type: 'string' } } } } } : {}),
       },
     },
   },
@@ -669,6 +773,21 @@ if (!isSpec && probeLive && FULL_SHA.test(String(probe.base)) && FULL_SHA.test(S
   log(`WARNING: the resume probe did not resolve ${base}...${head} to two full shas — nothing can be reused, and the lenses are handed the refs as given`)
 }
 if (!probeLive) log('WARNING: the resume probe died — nothing could be reused, so every lens is dispatched with the refs as given')
+// TOOL-aEvidencedLens-4 S4/S6 - the move check's judging half. A subject is MOVED when the probe read a
+// 40-hex hash that does not begin with the pinned blob, and UNCHECKED when no usable hash came back: a
+// dead probe, a missing `blobs` key or row, or an empty `now` never reads as "none moved".
+const probeBlobs = isSpec && probeLive && Array.isArray(probe.blobs) ? probe.blobs : []
+const movedSubjects = []
+const uncheckedSubjects = []
+for (const x of isSpec ? subjects : []) {
+  if (!x || typeof x !== 'object') continue
+  const row = probeBlobs.find((b) => b && b.path === x.path)
+  const now = row && typeof row.now === 'string' ? row.now : ''
+  if (!/^[0-9a-f]{40}$/.test(now)) uncheckedSubjects.push(x.path)
+  else if (now.indexOf(String(x.blob)) !== 0) movedSubjects.push({ path: x.path, blob: x.blob, now: now })
+}
+for (const m of movedSubjects)
+  log(`WARNING: ${m.path} MOVED since it was pinned: pinned ${m.blob}, now ${m.now} — every lens reviews it as it now stands and reads the moved text as unreviewed fold text`)
 const reviewKey = deriveReviewKey(baseSha, headSha)
 const keyDir = probeLive
   ? `${String(probe.commonDir).replace(/\\/g, '/').replace(/\/+$/, '')}/review-lenses/${reviewKey}`
@@ -730,11 +849,28 @@ function renderBrief(role) {
   const lines = [
     `REPO: ${repo} — run every git command as \`git -C ${repo} …\`; every path below is relative to it.`,
     isSpec
-      ? `SUBJECT: the spec set, each file at its pinned blob:\n` + subjects.map((x) => `  - ${x.path}  blob ${x.blob}`).join('\n')
+      ? `SUBJECT: the spec set, each file at its pinned blob:\n` + subjects.map((x) => {
+        const mv = movedSubjects.find((m) => m.path === x.path)
+        return `  - ${x.path}  blob ${x.blob}` + (mv ? `  MOVED since pinned, now ${mv.now}` : '')
+      }).join('\n')
       : `SUBJECT: the diff \`${diffCmd}\`.`,
     `CONTEXT: ${context}`,
     renderIntent(),
-    `REVIEW ROUND: ${round}${round > 1 ? (isSpec ? ' - this is a FOLD review. Aim at the text the previous round\'s fixes introduced, which is the only text in these documents nobody has reviewed.' : ' - this is a FOLD review. The diff above is what the previous round\'s fixes introduced, not the whole build.') : ''}`,
+    // TOOL-aEvidencedLens-4 S2/S3 - a spec fold round NAMES its fold text: one diff per subject from the
+    // blob the previous round audited, or says plainly that nothing names it. Round 1 is unchanged.
+    `REVIEW ROUND: ${round}${round > 1
+      ? (isSpec
+        ? (foldDegraded
+          ? ' - a DEGRADED fold review: no subject carries prevBlob and no priorFindings were supplied, so nothing names the text the previous round\'s fixes introduced. Review every subject whole.'
+          : ' - this is a FOLD review.\nFOLD DIFF - the PRIMARY subject is the text the previous round\'s fixes introduced. Read each diff\n' +
+            'below FIRST, then each file whole for agreement. A diff command that fails means its file is\nreviewed whole.\n' +
+            subjects.map((x) => `  - ${x.path}: ` + (x.prevBlob === undefined
+              ? 'no prevBlob was supplied - review this file whole'
+              : String(x.prevBlob).indexOf(String(x.blob)) === 0 || String(x.blob).indexOf(String(x.prevBlob)) === 0
+                ? 'unchanged since the previous round'
+                : `git -C ${repo} diff ${x.prevBlob} ${x.blob}`)).join('\n'))
+        : ' - this is a FOLD review. The diff above is what the previous round\'s fixes introduced, not the whole build.')
+      : ''}`,
   ]
   if (skeptic && !isSpec)
     lines.push(`SCOPE: a finding is in scope only if this diff introduced its defect or made it reachable. A defect present unchanged at the base is PRE-EXISTING: refute it. Check with \`git -C ${repo} show ${baseSha}:<path>\`.`)
@@ -744,7 +880,9 @@ function renderBrief(role) {
       ? `PRIOR ROUND'S CONFIRMED FINDINGS - these were RAISED AND FIXED. A finding that re-raises one of these originals, rather than a defect in its fix, is refuted as a duplicate:\n`
       : `PRIOR ROUND'S CONFIRMED FINDINGS - these were RAISED AND FIXED. Judge the FIX, and do not re-raise the original:\n`) +
       priorFindings.map((f) => `  - ${f.ref || '(no ref)'} - ${f.claim || f.title || '(no claim)'}`).join('\n')
-    : `PRIOR ROUND'S FINDINGS: none - this is a first-round review of ${isSpec ? 'the whole spec set' : 'the whole diff'}.`)
+    : isSpec && round > 1
+      ? `PRIOR ROUND'S FINDINGS: none supplied for this round-${round} review.`
+      : `PRIOR ROUND'S FINDINGS: none - this is a first-round review of ${isSpec ? 'the whole spec set' : 'the whole diff'}.`)
   return lines.join('\n') + '\n\n'
 }
 
@@ -762,20 +900,25 @@ const finderResults = await boundedParallel(
       (isSpec
         // S6 - the spec kind's acquire sentence. The lens holds a filesystem and the orchestrator does
         // not, so the BLOB COMPARISON happens here. Without it S5 is a string test any caller
-        // satisfies; with it, a spec that moved since the caller pinned it is a blocker finding.
+        // satisfies. TOOL-aEvidencedLens-4 S5 - the move is no longer a fixed BLOCKER: the resume probe
+        // reports it to RUN INTEGRITY, and a defect IN the moved text is graded by the rubric like any other.
         ? `You are the ${L.key} reviewer of a SPEC SET. For EACH subject listed under SUBJECT above: first run ` +
-          `\`git hash-object <path>\` in ${repo} and compare the result to the pinned blob. A mismatch ` +
-          `means the spec MOVED since this review was commissioned — report it as a BLOCKER finding ` +
-          `and review the file as it now stands. Then Read the file WHOLE.\n\n`
+          `\`git -C ${repo} hash-object <path>\` and compare the result to the pinned blob. A mismatch ` +
+          `means the spec MOVED since this review was commissioned: review the file as it now stands, and read ` +
+          `the moved text with \`git -C ${repo} diff <blob> -- <path>\` as unreviewed fold text. Report a defect IN ` +
+          `that text as a finding graded by the SEVERITY RUBRIC below; the move itself is not a finding. ` +
+          `Then Read the file WHOLE.\n\n`
         : `You are the ${L.key} reviewer. Review ONLY the diff named under SUBJECT above (run \`${diffCmd}\`, then Read/Grep the touched files + their immediate callers).\n\n`) +
         `LENS: ${L.brief}\n` +
+        // TOOL-aEvidencedLens-2 S2 - the probe policy directly under the brief; '' on the diff kind.
+        probeBlock +
         // TOOL-aSightedSkeptic-5 S5 - this lens's note and no other's, directly under its brief.
         (notedLenses.indexOf(L.key) !== -1 ? `PROJECT NOTE FOR THIS LENS (from the caller's lensNotes): ${lensNotes[L.key]}\n` : '') +
         // TOOL-aSightedSkeptic-4 S3 - this lens's checklist share, and no other's.
         checklistBlock[L.key] +
         `\n` +
         (isSpec
-          ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, and a proposed fix. A spec finding is often the ABSENCE of a line, so address it by section. No speculation, no style nits, nothing outside the spec set. If nothing real, return findings: [].\n`
+          ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, a proposed fix, and evidence: the command you ran and what it printed, or read: <path>:<line> for a finding that rests on reading alone. A spec finding is often the ABSENCE of a line, so address it by section. Every finding is ABOUT the spec set; its evidence may come from anywhere in ${repo} at HEAD. No speculation, no style nits. If nothing real, return findings: [].\n`
           : `Emit CONCRETE findings only — each needs file, line, severity (blocker|high|medium|low), a one-line claim, the impact, and a proposed fix. No speculation, no style nits, nothing outside the diff. If nothing real, return findings: [].\n`) +
         // TOOL-aSightedSkeptic-6 S2 - the rubric beside the instruction that asks for a severity.
         SEVERITY_RUBRIC + `\n` +
@@ -783,7 +926,7 @@ const finderResults = await boundedParallel(
         // every structured return with it; a file on disk survives, and the next run's probe reuses it.
         `\nDURABILITY — BEFORE you return, whatever you found, Write the exact JSON object you are about to return, plus one more field "key":"${reviewKey}", to ${keyDir}/find-${L.key}.json, creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.\n` +
         (isSpec
-          ? `Return JSON {lens:"${L.key}", path, findings:[{file,where,severity,claim,impact,fix}]}.`
+          ? `Return JSON {lens:"${L.key}", path, findings:[{file,where,severity,claim,impact,fix,evidence}]}.`
           : `Return JSON {lens:"${L.key}", path, findings:[{file,line,severity,claim,impact,fix}]}.`),
         { label: `find:${L.key}`, phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA },
       ),
@@ -812,6 +955,51 @@ const allFindings = finderResults
     ({ ...f, lens: LENSES[i].key, ref: `${f.file}:${isSpec ? f.where : f.line}` }))))
   .map((f, i) => ({ ...f, id: i + 1 }))
 
+// TOOL-aEvidencedLens-6 - THE PER-LENS YIELD, one row per lens that RAN, in dispatch order. `rows` is
+// the ledger (or [] before the verify stage); `items` the synthesis's item list, or null when none can
+// be trusted (no synthesis, a dead one, or a tally fault), which nulls `defects` and `unique` rather
+// than guessing a split the tally itself refused. Items are read with the tally's own rules: a
+// severity outside the closed four skips its item, and an id that is not confirmed is ignored.
+// `unique` counts ITEMS whose every confirmed id is this lens's, so two lenses confirming one defect
+// are one shared item and neither is credited. `precision` is null, never 0, where nothing was judged.
+function deriveLensYield(rows, items) {
+  const confirmedLens = new Map(rows.filter((e) => e.verdict === 'confirmed').map((e) => [e.id, e.lens]))
+  const defects = {}
+  const unique = {}
+  for (const it of Array.isArray(items) ? items : []) {
+    if (['BLOCKER', 'HIGH', 'MEDIUM', 'LOW'].indexOf(it ? String(it.severity).toUpperCase() : '') === -1) continue
+    const owners = new Set((Array.isArray(it.ids) ? it.ids : []).filter((id) => confirmedLens.has(id)).map((id) => confirmedLens.get(id)))
+    for (const k of owners) defects[k] = (defects[k] || 0) + 1
+    if (owners.size === 1) for (const k of owners) unique[k] = (unique[k] || 0) + 1
+  }
+  return runningLensKeys.map((k) => {
+    const mine = rows.filter((e) => e.lens === k)
+    const n = { confirmed: 0, refuted: 0, uncertain: 0, unverified: 0 }
+    for (const e of mine) n[e.verdict]++
+    return {
+      lens: k, returned: !!finderResults[LENS_KEYS.indexOf(k)], raw: mine.length, confirmed: n.confirmed, refuted: n.refuted,
+      uncertain: n.uncertain, unverified: mine.length - n.confirmed - n.refuted,
+      precision: n.confirmed + n.refuted ? n.confirmed / (n.confirmed + n.refuted) : null,
+      defects: items ? defects[k] || 0 : null, unique: items ? unique[k] || 0 : null,
+    }
+  })
+}
+// The counts known BEFORE the synthesis, as the verbatim block its prompt carries; `defects` and
+// `unique` need its items, so they are returned and logged and never in the report.
+function renderLensYield(rows) {
+  const cols = ['lens', 'returned', 'raw', 'confirmed', 'refuted', 'uncertain', 'unverified', 'precision']
+  return ['| ' + cols.join(' | ') + ' |', '|' + cols.map(() => '---').join('|') + '|']
+    .concat(rows.map((e) => '| ' + [e.lens, e.returned ? 'yes' : 'no', e.raw, e.confirmed, e.refuted, e.uncertain, e.unverified,
+      e.precision === null ? '-' : e.precision.toFixed(2)].join(' | ') + ' |'))
+    .join('\n')
+}
+function printLensYield(rows) {
+  for (const e of rows)
+    log(`lens yield: ${e.lens} returned ${e.returned ? 'yes' : 'no'} · raw ${e.raw} · confirmed ${e.confirmed} · refuted ${e.refuted} · ` +
+      `uncertain ${e.uncertain} · unverified ${e.unverified} · precision ${e.precision === null ? '-' : e.precision.toFixed(2)} · ` +
+      `defects ${e.defects === null ? '-' : e.defects} · unique ${e.unique === null ? '-' : e.unique}`)
+}
+
 // ---- TOOL-dDerivedDocket-29 S5 — THE `exit` FIELD, on every return. `complete` when every agent
 // ---- returned, `deferred-platform` when any lens, skeptic batch or the synthesis came back null. A
 // ---- deferred return always carries `blockers: null`, the key, and `pending`: the labels a re-run
@@ -820,6 +1008,8 @@ const allFindings = finderResults
 // ---- cannot repair an adjudication, so that path keeps the refusal its callers already make.
 if (lensesDead === lensesRunning) {
   log(`UNVERIFIED — all ${lensesRunning} lenses failed to return. Nothing was reviewed. Deferred: re-run with identical args.`)
+  const lensYield = deriveLensYield([], null) // TOOL-aEvidencedLens-6 S5 - every row returned: false, zeros
+  printLensYield(lensYield)
   return {
     // TOOL-dTieredTribunal-1 S3 - null, never 0. No synthesis ran, so there is no adjudicated count.
     exit: 'deferred-platform', key: reviewKey, pending: deadLensLabels,
@@ -828,7 +1018,7 @@ if (lensesDead === lensesRunning) {
     note: `DEFERRED: no lens completed (${lensesDead}/${lensesRunning} died) — nothing was reviewed; re-run with identical args`,
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
     // TOOL-aSightedSkeptic-8 S5 - nothing was judged on this path.
-    ledger: [], confirmedFindings: [], appendix: '',
+    ledger: [], confirmedFindings: [], appendix: '', lensYield,
   }
 }
 if (allFindings.length === 0) {
@@ -839,12 +1029,14 @@ if (allFindings.length === 0) {
     ? `DEFERRED: ${lensesDead}/${lensesRunning} lenses died and the survivors found nothing — re-run with identical args to dispatch only ${deadLensLabels.join(', ')}`
     : 'clean: 0 findings'
   log(note)
+  const lensYield = deriveLensYield([], null) // TOOL-aEvidencedLens-6 S5
+  printLensYield(lensYield)
   // TOOL-dTieredTribunal-1 S3 - null, never 0: no synthesis ran on this path either.
   return {
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
     lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, skippedLenses,
-    ledger: [], confirmedFindings: [], appendix: '', // TOOL-aSightedSkeptic-8 S5 - no finding raised
+    ledger: [], confirmedFindings: [], appendix: '', lensYield, // TOOL-aSightedSkeptic-8 S5 - no finding raised
   }
 }
 log(`${allFindings.length} raw findings across ${lensesRunning} lenses — verifying in batches.`)
@@ -885,8 +1077,22 @@ const verdictResults = await boundedParallel(
       ? Promise.resolve(reusedBatch[gi])
       : agent(
       renderBrief('skeptic') +
+      // TOOL-aEvidencedLens-3 S1-S5 - the spec skeptic confirms by the rubric, at any grade, re-runs the
+      // finder's evidence under the SAME probe-policy bytes the finders read (spec section 8 F3: one copy
+      // of one rule), and refutes in six named cases only. The old test, "unbuildable or wrong", made a
+      // LOW unreachable beside a rubric that defines one. The diff kind is untouched (shared invariant 2).
       (isSpec
-        ? `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — Read the cited spec at the cited section, and the siblings it names, and decide "confirmed" (real, and it makes the spec unbuildable or wrong) or "refuted" (asks for detail a non-goal withholds / cites a section that says what the finding claims it does not / is a style preference).\n\n`
+        ? probeBlock + `\n` +
+          `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it. Read the cited spec at the cited section and the siblings it names; ` +
+          `a claim about code or a record is checked against that code or record, never against the spec's account of it. ` +
+          `Then re-run the finding's evidence under the PROBE POLICY above: run the command it names, or re-read the path and line it names, and say in \`reason\` what you observed.\n` +
+          `"confirmed" when the claim is TRUE of the spec set, and of the tree where it makes a claim about the tree, AT ANY RUBRIC SEVERITY: the rubric grades it, confirmation does not.\n` +
+          `"refuted" in these cases only: (1) a NON-GOAL or a PARKED FORK withholds what it asks; (2) the cited section ALREADY SAYS it; ` +
+          `(3) the premise is FALSE ON RE-PROBE, including evidence that does not reproduce, meaning what you observed contradicts the claim; ` +
+          `(4) BY DESIGN, a case the BY DESIGN block covers; (5) a DUPLICATE, opening \`reason\` with \`duplicate of id=<n>\` for another finding in this batch that you CONFIRM in this same answer, ` +
+          `or \`duplicate of prior <ref>\` for a prior round's original; (6) a PREFERENCE that names no defect the rubric grades, not even a low.\n` +
+          `Evidence that reads \`-\` was not recorded: probe the claim yourself and never confirm on the finder's word. ` +
+          `A probe you could not run inside its bound is a finding you cannot establish; apply the default by the finder's grade, and never call it evidence that does not reproduce.\n\n`
         : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate).\n\n`) +
         // TOOL-aSightedSkeptic-6 S4 - the default follows the FINDER's grade (spec section 8 F3). An
         // unsure skeptic refuting a real blocker loses the defect; one answering uncertain on every
@@ -898,8 +1104,12 @@ const verdictResults = await boundedParallel(
         `For each finding you CONFIRM, also return \`severity\`, graded by this rubric against what you read, independent of the finder's bracketed grade.\n\n` +
         `Findings to judge:\n` +
         // TOOL-aSightedSkeptic-8 S2 - `lens=` after the grade; `id=<n> [` stays first for the stubs' id pattern.
+        // TOOL-aEvidencedLens-3 S3 - the spec kind appends the finder's evidence, folded to one line
+        // (absent or blank reads `-`). TOOL-aEvidencedLens-12 S2 - renderPromptLine, never renderCell:
+        // the skeptic RE-RUNS this command, so a pipe in it must reach the prompt unescaped.
         group
-          .map((f) => `id=${f.id} [${f.severity}] lens=${f.lens} ${f.ref} — ${f.claim} | impact: ${f.impact} | fix: ${f.fix}`)
+          .map((f) => `id=${f.id} [${f.severity}] lens=${f.lens} ${f.ref} — ${f.claim} | impact: ${f.impact} | fix: ${f.fix}` +
+            (isSpec ? ` | evidence: ${renderPromptLine(f.evidence)}` : ''))
           .join('\n') +
         // TOOL-aSightedSkeptic-2 S2 - the fix is judged as a SECOND, separate question. It never moves
         // the claim's verdict (spec section 8 F1): a real defect with a bad fix is still a real defect.
@@ -952,6 +1162,24 @@ for (const r of liveVerdicts)
     else conflicts.add(v.id)
   }
 for (const id of conflicts) verdictById.delete(id)
+// TOOL-aEvidencedLens-3 S6 - an ORPHANED duplicate, spec kind only (spec section 8 F2). A refutation
+// opening `duplicate of id=<n>` drops the finding on the strength of another one, so it holds only when
+// <n> is a DIFFERENT id in the SAME batch that stands CONFIRMED after the conflict demotion above.
+// Otherwise the defect would leave the confirmed set with nothing kept in its place: it is demoted to
+// UNVERIFIED exactly as a contradicted verdict is. The diff kind's duplicate names no surviving id.
+const orphanDuplicates = new Set()
+if (isSpec)
+  for (const group of batches) {
+    const batchIds = new Set(group.map((f) => f.id))
+    for (const f of group) {
+      const v = verdictById.get(f.id)
+      const m = v && v.verdict === 'refuted' ? /^duplicate of id=(\d+)/i.exec(String(v.reason || '').trim()) : null
+      if (!m) continue
+      const n = Number(m[1])
+      if (n === f.id || !batchIds.has(n) || verdictById.get(n)?.verdict !== 'confirmed') orphanDuplicates.add(f.id)
+    }
+  }
+for (const id of orphanDuplicates) verdictById.delete(id)
 
 // TOOL-aSightedSkeptic-2 S3/S6 - a confirmed finding's fix as the synthesis and the death log carry it.
 // Read at call time, so it is called only after the join above. Absent or outside FIX_VERDICTS is
@@ -993,6 +1221,8 @@ if (noVerdict.length)
   log(`WARNING: ${noVerdict.length} finding(s) came back with NO usable verdict — counted UNVERIFIED, not refuted: ids ${noVerdict.map((f) => f.id).join(', ')}`)
 if (conflicts.size)
   log(`WARNING: ${conflicts.size} finding(s) got CONTRADICTORY verdicts — demoted to UNVERIFIED: ids ${[...conflicts].join(', ')}`)
+if (orphanDuplicates.size)
+  log(`WARNING: ${orphanDuplicates.size} finding(s) refuted as a DUPLICATE of an id that is not a confirmed survivor in their batch — demoted to UNVERIFIED: ids ${[...orphanDuplicates].join(', ')}`)
 if (duplicates) log(`note: ${duplicates} repeat verdict(s) agreed with the standing one — idempotent.`)
 if (spurious) log(`WARNING: ${spurious} verdict(s) carried an id this run never assigned — discarded.`)
 // TOOL-aSightedSkeptic-2 S4 - the fix verdicts over CONFIRMED findings only, since a refuted
@@ -1040,7 +1270,7 @@ const ledger = allFindings.map((f) => {
     severity: f.severity,
     skepticSeverity: v && SEVERITIES.indexOf(v.severity) !== -1 ? v.severity : null,
     verdict: v && ['confirmed', 'refuted', 'uncertain'].indexOf(v.verdict) !== -1 ? v.verdict : 'unverified',
-    reason: conflicts.has(f.id) ? 'contradictory verdicts' : v ? String(v.reason || '') : '',
+    reason: conflicts.has(f.id) ? 'contradictory verdicts' : orphanDuplicates.has(f.id) ? 'duplicate of an unconfirmed id' : v ? String(v.reason || '') : '',
     fixVerdict: v && FIX_VERDICTS.indexOf(v.fixVerdict) !== -1 ? v.fixVerdict : null,
     claim: f.claim,
   }
@@ -1058,8 +1288,15 @@ const confirmedFindings = confirmed.map((f) => {
 // S6 - one cell: absent as `-`, a pipe escaped, and a run of any character Python's str.splitlines
 // breaks on folded to one space, so no claim or reason can forge or cut a row in the table
 // TOOL-aSightedSkeptic-9 parses (closing review round 1, L2: CR/LF alone let a U+2028 cut one).
+// TOOL-aEvidencedLens-12 S1 - the line-break fold alone, for a prompt line: nothing else is rewritten,
+// and a value blank once folded reads `-` like an absent one. renderCell is this plus the pipe escape.
+function renderPromptLine(v) {
+  if (v === null || v === undefined) return '-'
+  const s = String(v).replace(/[\r\n\x0b\x0c\x1c-\x1e\x85\u2028\u2029]+/g, ' ')
+  return s.trim() === '' ? '-' : s
+}
 function renderCell(v) {
-  return v === null || v === undefined || v === '' ? '-' : String(v).replace(/[\r\n\x0b\x0c\x1c-\x1e\x85\u2028\u2029]+/g, ' ').replace(/\|/g, '\\|')
+  return renderPromptLine(v).replace(/\|/g, '\\|')
 }
 // The eight columns are the hand-off to TOOL-aSightedSkeptic-9; `claim` rides the ledger only (spec F4).
 function renderAppendix(rows) {
@@ -1083,6 +1320,8 @@ if (confirmed.length + unverified.length === 0) {
   // A REFUTATION OVER A PARTIAL FAN DEFERS. It used to return `… treat as partial` beside a null
   // count, which a caller had to parse prose to tell from the clean result on the line below it.
   const deferred = pendingLabels.length > 0
+  const lensYield = deriveLensYield(ledger, null) // TOOL-aEvidencedLens-6 S4 - no synthesis, no items
+  printLensYield(lensYield)
   return {
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: pendingLabels,
     // TOOL-dTieredTribunal-1 S3 - null, never 0. Every finding was refuted, which is a RESULT, but
@@ -1096,7 +1335,7 @@ if (confirmed.length + unverified.length === 0) {
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
     // TOOL-aSightedSkeptic-8 S5 - no report is written on this path (spec F3), so the return is the
     // only place this ledger and appendix exist; a caller may write them.
-    ledger, confirmedFindings, appendix,
+    ledger, confirmedFindings, appendix, lensYield,
   }
 }
 
@@ -1110,6 +1349,8 @@ if (pendingLabels.length) {
     `The ${confirmed.length} confirmed and ${unverified.length} unverified finding(s) so far:`)
   for (const f of confirmed) log(`  CONFIRMED [${deriveBindingSeverity(f)}] lens=${f.lens} ${f.ref} - ${f.claim}`)
   for (const f of unverified) log(`  UNVERIFIED [${f.severity}] lens=${f.lens} ${f.ref} - ${f.claim}`)
+  const lensYield = deriveLensYield(ledger, null) // TOOL-aEvidencedLens-6 S4/S5 - a dead lens's row reads returned: false
+  printLensYield(lensYield)
   return {
     exit: 'deferred-platform', key: reviewKey, pending: pendingLabels,
     root: repo, raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length,
@@ -1118,11 +1359,13 @@ if (pendingLabels.length) {
     report: null, summary: '', blockers: null, highs: null,
     note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`,
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
-    ledger, confirmedFindings, appendix, // TOOL-aSightedSkeptic-8 S5 - what was judged so far; `exit` says partial
+    ledger, confirmedFindings, appendix, lensYield, // TOOL-aSightedSkeptic-8 S5 - what was judged so far; `exit` says partial
   }
 }
 
 // --- Phase 3: SYNTHESIZE — one agent writes the report ------------------
+// TOOL-aEvidencedLens-6 S6 - the per-lens counts that exist before the synthesis, for its verbatim block.
+const preSynthYield = deriveLensYield(ledger, null)
 phase('Synthesize')
 const synth = await agent(
   `Write the Tier-2 review report for: ${context}\n\n` +
@@ -1161,6 +1404,10 @@ const synth = await agent(
     `designed. Where it is NOT JUDGED, present it as the finder's proposal only. ` +
     // TOOL-aSightedSkeptic-7 S6 - the intensity, in the review-shape sentence, on every run.
     `State the review shape near the top — intensity ${intensity}, raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, unverified ${unverified.length} (${uncertainFindings.length} uncertain), precision ${precision.toFixed(2)}. ` +
+    // TOOL-aEvidencedLens-6 S6 - copied, as the appendix is, and not verified; the return holds the rows.
+    `\n\nLENS YIELD - the table between the two marker lines below goes into the report directly after the review-shape ` +
+    `sentence, copied VERBATIM: unedited, no row added, dropped, reordered or reworded, and neither marker line copied.\n` +
+    `<<<LENS YIELD\n${renderLensYield(preSynthYield)}\nLENS YIELD>>>` +
     // TOOL-aWeldedTribunal-4 — RUN INTEGRITY. This harness computes every counter below and logged
     // them to stdout, which is not the record; the AGENT writes the record, so a run whose lenses
     // half died wrote a durable report that could not say so. The two drift-audit siblings were
@@ -1178,6 +1425,8 @@ const synth = await agent(
     `lenses ${liveResults.length}/${lensesRunning} returned, ${lensesDead} DIED; ` +
     `skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ` +
     `${conflicts.size} contradictory verdict(s) demoted to unverified, ` +
+    // TOOL-aEvidencedLens-3 S6 - spec kind only, so the diff kind's prompt stays byte-identical.
+    (isSpec ? `${orphanDuplicates.size} orphaned duplicate refutation(s) demoted to unverified, ` : '') +
     `${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s); ` +
     // TOOL-aSightedSkeptic-2 S4 - how many confirmed fixes a skeptic actually judged.
     `fixes on confirmed findings: ${fixCounts.sound} judged sound, ${fixCounts.unsound} judged UNSOUND, ` +
@@ -1207,6 +1456,17 @@ const synth = await agent(
         runningLensKeys.map((k) => `${k} ${checklistShares[k].length}`).join(', ') + `.\n`
       : `Checklist: NONE swept — ${a.checklist === undefined ? 'absent' : 'supplied with no item'}; a zero count is not ` +
         `evidence the project's recurring bug classes are absent.\n`) +
+    // TOOL-aEvidencedLens-4 S6 - spec kind only: the move check, and at round > 1 how the fold text was named.
+    (isSpec
+      ? `move check: ` + (!probeLive
+        ? 'the resume probe died, so no subject\'s current blob was checked.\n'
+        : (movedSubjects.length ? movedSubjects.map((m) => `${m.path} MOVED from pinned ${m.blob} to ${m.now}`).join('; ') : 'no checked subject moved') +
+          (uncheckedSubjects.length ? `; UNCHECKED, no usable current blob: ${uncheckedSubjects.join(', ')}` : '') + `.\n`) +
+        (round > 1
+          ? `fold diff: ${prevBlobCount} of ${subjects.length} subject(s) carried prevBlob` +
+            (foldDegraded ? ` - a DEGRADED fold review: no priorFindings either, so nothing named the text the previous round's fixes introduced and every subject was reviewed whole` : '') + `.\n`
+          : '')
+      : '') +
     `If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. ` +
     `Say so where you would otherwise call a zero positive evidence.\n\n` +
     // The range line is what the unattended kit's `closing-review-recorded` joins on, so the value
@@ -1372,6 +1632,9 @@ if (!synth) {
   for (const f of unverified) log(`  UNVERIFIED [${f.severity}] lens=${f.lens} ${f.ref} - ${f.claim}`)
 }
 
+// TOOL-aEvidencedLens-6 S4 - defects and unique only over an item list the tally accepted.
+const lensYield = deriveLensYield(ledger, synth && !tallyFault ? synth.items || [] : null)
+printLensYield(lensYield)
 // H1: the SUCCESS return carries the same trust counts as the early ones. A caller that only ever
 // sees {confirmed, precision} cannot tell a full review from one where half the lenses died.
 // TOOL-dDerivedDocket-29 S5 - past the partial-fan return above, the synthesis is the only agent left
@@ -1436,4 +1699,6 @@ return {
   ledger,
   confirmedFindings,
   appendix,
+  // TOOL-aEvidencedLens-6 S5 - on every return; README "return fields" states the row shape.
+  lensYield,
 }
