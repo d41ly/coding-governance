@@ -24,8 +24,8 @@ project specifics live in exactly two files the adopting repo owns.
 
   Its `test_dossier_prose_carries_no_typed_count` arm refuses a present-tense typed count of an
   inventory population in dossier prose: a digit run before an inventory noun, `key` or `dossier`,
-  found by `measure_typed_counts`, unless its sentence reads as a past measurement (a date, a sha,
-  `node <tag>`, `measured`, `PINNED`, or a past-tense verb in `FROZEN_MARKERS`). It prints its
+  found by `measure_typed_counts`, unless its sentence reads as a past measurement, which is a hit
+  of any pattern in `FROZEN_MARKERS` and is listed there, not here. It prints its
   candidate and frozen counts on every run. The gap it states: it reads digits only, so a count
   spelled as a word ("two legs") passes, and so does a count inside a fence, the toml `title`
   included, or a code span. The template reaches a project only when absent, so an existing
