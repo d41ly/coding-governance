@@ -80,3 +80,7 @@ base: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 2026-10-05T00:21:29Z dispatch · item 9f4101fe TOOL-aEvidencedLens-6 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/README.md memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-6.md memory/builds/aEvidencedLens/README.md
 
 2026-10-05T00:30:18Z dispatch · item 62a1cf2a TOOL-aEvidencedLens-6 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/README.md memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-6.md memory/builds/aEvidencedLens/README.md memory/map/generated/symbols.json
+
+2026-10-05T00:33:24Z dispatch · item 2704dbf0 TOOL-aEvidencedLens-5 · reason tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh tools/workflows/README.md memory/map/generated/symbols.json memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-5.md memory/builds/aEvidencedLens/README.md
+
+2026-10-05T00:33:28Z brief · item TOOL-aEvidencedLens-5 · reason f050c40d95ce memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-5-2-build-brief.md
