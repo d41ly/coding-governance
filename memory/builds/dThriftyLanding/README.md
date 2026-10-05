@@ -5,7 +5,7 @@ opened: 2026-10-05
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6 TOOL-dThriftyLanding-7
+ids: TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6 TOOL-dThriftyLanding-7 TOOL-dThriftyLanding-8 TOOL-dThriftyLanding-9 TOOL-dThriftyLanding-10 TOOL-dThriftyLanding-11 TOOL-dThriftyLanding-12
 ---
 
 # dThriftyLanding — a doc-only push runs only the legs that read what it changed
@@ -56,12 +56,17 @@ None yet.
 | 4 | `TOOL-dThriftyLanding-4` | 2 | the deployer carries `doc_reads` from a kit descriptor to an adopter's manifest, above the runner floor |
 | 5 | `TOOL-dThriftyLanding-5` | 2 | gov declares its doc class and the `doc_reads` of its bar legs, in the manifest and the descriptors |
 | 6 | `TOOL-dThriftyLanding-6` | 1 | the run-gates README, the runbook, the charter's merge-bar section and the gate-env notes state the mechanism |
+| 8 | `TOOL-dThriftyLanding-8` | 2 | promoted from the closing review's id 1: the runner's docs read walks a merged side branch |
+| 9 | `TOOL-dThriftyLanding-9` | 2 | promoted from the closing review's id 22: the hook's doc-only read walks a merged side branch |
+| 10 | `TOOL-dThriftyLanding-10` | 2 | promoted from the closing review's id 5: govkit's policy pattern sees a quoted multi-path value |
+| 11 | `TOOL-dThriftyLanding-11` | 2 | promoted from the closing review's id 10: the policy selftest grades every spelling of a doc class |
+| 12 | `TOOL-dThriftyLanding-12` | 2 | promoted from the closing review: round 1's twelve mediums and six lows, batched |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 6 unit(s) · node d · opened 2026-10-05 · streams tooling
-ids TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6 TOOL-dThriftyLanding-7
+**Build status:** OPEN · 11 unit(s) · node d · opened 2026-10-05 · streams tooling
+ids TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6 TOOL-dThriftyLanding-7 TOOL-dThriftyLanding-8 TOOL-dThriftyLanding-9 TOOL-dThriftyLanding-10 TOOL-dThriftyLanding-11 TOOL-dThriftyLanding-12
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -72,13 +77,18 @@ ids TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dT
 | [TOOL-dThriftyLanding-4 — the deployer carries a leg's doc reads to an adopter's manifest](spec/2026-10-05-spec-TOOL-dThriftyLanding-4.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-dThriftyLanding-5 — gov declares its doc class and what its bar legs read of it](spec/2026-10-05-spec-TOOL-dThriftyLanding-5.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-dThriftyLanding-6 — the carriers state how a doc-only push is scoped](spec/2026-10-05-spec-TOOL-dThriftyLanding-6.md) | 6 | 1 | CLOSED | rev-2 | 2026-10-05 |
+| [TOOL-dThriftyLanding-8 — the runner's docs mode sees a doc path touched on a merged side branch](spec/2026-10-05-spec-TOOL-dThriftyLanding-8.md) | 8 | 2 | OPEN | rev-1 | 2026-10-05 |
+| [TOOL-dThriftyLanding-9 — the hook's doc-only classification sees code touched on a merged side branch](spec/2026-10-05-spec-TOOL-dThriftyLanding-9.md) | 9 | 2 | OPEN | rev-1 | 2026-10-05 |
+| [TOOL-dThriftyLanding-10 — govkit's policy-key scan sees a quoted multi-path value](spec/2026-10-05-spec-TOOL-dThriftyLanding-10.md) | 10 | 2 | OPEN | rev-1 | 2026-10-05 |
+| [TOOL-dThriftyLanding-11 — the policy selftest grades every spelling of a doc class](spec/2026-10-05-spec-TOOL-dThriftyLanding-11.md) | 11 | 2 | OPEN | rev-1 | 2026-10-05 |
+| [TOOL-dThriftyLanding-12 — the closing review's batched minors, round 1](spec/2026-10-05-spec-TOOL-dThriftyLanding-12.md) | 12 | 2 | OPEN | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 13 bound to this build, across 3 record folder(s).
+Records: 14 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dThriftyLanding-10 TOOL-dThriftyLanding-11 TOOL-dThriftyLanding-12 TOOL-dThriftyLanding-8 TOOL-dThriftyLanding-9.
 
-Ids no `spec-audit` record has ever named: TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6.
+Ids no `spec-audit` record has ever named: TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-10 TOOL-dThriftyLanding-11 TOOL-dThriftyLanding-12 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6 TOOL-dThriftyLanding-8 TOOL-dThriftyLanding-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -91,6 +101,11 @@ Ids no `spec-audit` record has ever named: TOOL-dThriftyLanding-1 TOOL-dThriftyL
 | 4 | `TOOL-dThriftyLanding-4` | no |
 | 5 | `TOOL-dThriftyLanding-5` | no |
 | 6 | `TOOL-dThriftyLanding-6` | no |
+| 8 | `TOOL-dThriftyLanding-8` | no |
+| 9 | `TOOL-dThriftyLanding-9` | no |
+| 10 | `TOOL-dThriftyLanding-10` | no |
+| 11 | `TOOL-dThriftyLanding-11` | no |
+| 12 | `TOOL-dThriftyLanding-12` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

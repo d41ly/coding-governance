@@ -9,6 +9,7 @@
 | [2026-10-05-build-TOOL-dThriftyLanding-1-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-dThriftyLanding-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-05-prompt-TOOL-dThriftyLanding-1-0-run-mandate.md](../prompts/2026-10-05-prompt-TOOL-dThriftyLanding-1-0-run-mandate.md) | journal | — |
 | [2026-10-05-prompt-TOOL-dThriftyLanding-1-1-build-brief.md](../prompts/2026-10-05-prompt-TOOL-dThriftyLanding-1-1-build-brief.md) | journal | — |
+| [2026-10-05-review-TOOL-dThriftyLanding-1-closing-diff-round1.md](../reviews/2026-10-05-review-TOOL-dThriftyLanding-1-closing-diff-round1.md) | diff-review | TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6 |
 
 <!-- /gen:spec-records -->
 
