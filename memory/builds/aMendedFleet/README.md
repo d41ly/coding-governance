@@ -251,7 +251,7 @@ ids TOOL-aMendedFleet-109
 | [TOOL-aMendedFleet-71 — one sweep gives every present-tense count in a code comment one of ANNOTATION-STYLE A4's three dispositions](spec/2026-10-04-spec-TOOL-aMendedFleet-71.md) | 71 | 1 | CLOSED | rev-3 | 2026-10-06 |
 | [TOOL-aMendedFleet-72 — the gate runner reaps the dead `gate-timings.tsv` it no longer reads](spec/2026-10-04-spec-TOOL-aMendedFleet-72.md) | 72 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-73 — the vague-brief trial arm: a full spec against a short plan, on a three-sentence brief](spec/2026-10-04-spec-TOOL-aMendedFleet-73.md) | 73 | 2 | CLOSED | rev-3 | 2026-10-04 |
-| [TOOL-aMendedFleet-74 — a unit can be handed the bug-class checklist for its write set before it writes code](spec/2026-10-04-spec-TOOL-aMendedFleet-74.md) | 74 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-74 — a unit can be handed the bug-class checklist for its write set before it writes code](spec/2026-10-04-spec-TOOL-aMendedFleet-74.md) | 74 | 2 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-75 — a `New arm:` line declares the acceptance criteria its arm keeps observed](spec/2026-10-04-spec-TOOL-aMendedFleet-75.md) | 75 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [KICK-aMendedFleet-1 — the orientation card shows the last drift reading from the node's history](spec/2026-10-04-spec-KICK-aMendedFleet-1.md) | 76 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [KICK-aMendedFleet-2 — the orientation card shows which unmerged remote refs share paths with this tree's branch](spec/2026-10-04-spec-KICK-aMendedFleet-2.md) | 77 | 1 | SPECCED | rev-3 | 2026-10-04 |
@@ -286,14 +286,14 @@ ids TOOL-aMendedFleet-109
 | [TOOL-aMendedFleet-105 — the reaper's verification settles, so a member dying as it is signalled is not a survivor](spec/2026-10-05-spec-TOOL-aMendedFleet-105.md) | 106 | 1 | SPECCED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 50 bound to this build, across 3 record folder(s).
+Records: 51 bound to this build, across 3 record folder(s).
 
 Ids no record names: KICK-aMendedFleet-1 KICK-aMendedFleet-2 KICK-aMendedFleet-3 KICK-aMendedFleet-4 PLAY-aMendedFleet-1 PLAY-aMendedFleet-2 PLAY-aMendedFleet-3 PLAY-aMendedFleet-4 TOOL-aMendedFleet-11 TOOL-aMendedFleet-15 TOOL-aMendedFleet-18 TOOL-aMendedFleet-20 TOOL-aMendedFleet-22
 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-30 TOOL-aMendedFleet-34 TOOL-aMendedFleet-36 TOOL-aMendedFleet-4 TOOL-aMendedFleet-40 TOOL-aMendedFleet-41 TOOL-aMendedFleet-42 TOOL-aMendedFleet-43 TOOL-aMendedFleet-44 TOOL-aMendedFleet-45
 TOOL-aMendedFleet-46 TOOL-aMendedFleet-47 TOOL-aMendedFleet-49 TOOL-aMendedFleet-5 TOOL-aMendedFleet-51 TOOL-aMendedFleet-52 TOOL-aMendedFleet-53 TOOL-aMendedFleet-54 TOOL-aMendedFleet-55 TOOL-aMendedFleet-57 TOOL-aMendedFleet-58 TOOL-aMendedFleet-59 TOOL-aMendedFleet-6 TOOL-aMendedFleet-63
-TOOL-aMendedFleet-66 TOOL-aMendedFleet-69 TOOL-aMendedFleet-70 TOOL-aMendedFleet-72 TOOL-aMendedFleet-74 TOOL-aMendedFleet-75 TOOL-aMendedFleet-8 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83 TOOL-aMendedFleet-84 TOOL-aMendedFleet-85 TOOL-aMendedFleet-86 TOOL-aMendedFleet-87
-TOOL-aMendedFleet-88 TOOL-aMendedFleet-89 TOOL-aMendedFleet-90 TOOL-aMendedFleet-91 TOOL-aMendedFleet-92 TOOL-aMendedFleet-93 TOOL-aMendedFleet-94 TOOL-aMendedFleet-100 TOOL-aMendedFleet-101 TOOL-aMendedFleet-102 TOOL-aMendedFleet-103 TOOL-aMendedFleet-104 TOOL-aMendedFleet-105 TOOL-aMendedFleet-97
-TOOL-aMendedFleet-98 TOOL-aMendedFleet-99.
+TOOL-aMendedFleet-66 TOOL-aMendedFleet-69 TOOL-aMendedFleet-70 TOOL-aMendedFleet-72 TOOL-aMendedFleet-75 TOOL-aMendedFleet-8 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83 TOOL-aMendedFleet-84 TOOL-aMendedFleet-85 TOOL-aMendedFleet-86 TOOL-aMendedFleet-87 TOOL-aMendedFleet-88
+TOOL-aMendedFleet-89 TOOL-aMendedFleet-90 TOOL-aMendedFleet-91 TOOL-aMendedFleet-92 TOOL-aMendedFleet-93 TOOL-aMendedFleet-94 TOOL-aMendedFleet-100 TOOL-aMendedFleet-101 TOOL-aMendedFleet-102 TOOL-aMendedFleet-103 TOOL-aMendedFleet-104 TOOL-aMendedFleet-105 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98
+TOOL-aMendedFleet-99.
 
 Ids no `spec-audit` record has ever named: KICK-aMendedFleet-1 KICK-aMendedFleet-2 KICK-aMendedFleet-3 KICK-aMendedFleet-4 PLAY-aMendedFleet-1 PLAY-aMendedFleet-2 PLAY-aMendedFleet-3 PLAY-aMendedFleet-4 TOOL-aMendedFleet-1 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12
 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-2 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25
