@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-20 — the holder row's claim CAS runs before its `write_lease` under one stamp, and a CAS that does not land leaves a `prior-session` fact the `mine` test accepts
 
-**Status:** SPECCED · rev-7 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 4
+**Status:** CLOSED · rev-7 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 4
 
 <!-- gen:spec-records -->
 

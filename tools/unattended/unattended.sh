@@ -48,7 +48,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.67   # gov:kit unattended@1.67 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.68   # gov:kit unattended@1.68 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -1241,7 +1241,8 @@ read_recorded_phase() { # run-state file -> the phase fact, exactly as written
 # ------------------------------------------------------------------------------- the landed log
 # THE LEASE IS THE RUN-STATE FACTS, and there is no second record of it (TOOL-dDerivedDocket-61, the
 # owner's ruling of 2026-09-22 as the build's brief relays it). `write_lease` writes six facts
-# together, `keepalive`, `session`, `pid`, `host`, `pid-image` and `lease-utc`: a record carrying
+# together, `keepalive`, `session`, `pid`, `host`, `pid-image` and `lease-utc`, and the holder row
+# writes a seventh beside them, `prior-session` (TOOL-aGraftedHelix-20): a record carrying
 # `lease-utc` is leased, its holder is the `keepalive` fact, its freshness is `check_lease_fresh`
 # over `--liveness`'s own clock and bound, and HELD is its released state. The per-slug lease FILE
 # this section used to hold under the git common dir is retired and nothing reads or writes one, so
@@ -1825,8 +1826,13 @@ CLAIM_MODES="preflight take-over holder status beat"
 # TOOL-aGraftedHelix-11 - THE RUN-STATE FILE, sixth, is where a write that does not take the claim
 # copies its identity from, the one `write_claim` is handed too: `--preflight` and a take-over pass
 # none, every other writer passes the record. `mine` keeps the claim's own `node`.
+# TOOL-aGraftedHelix-20 - THE `prior-session` FACT, read from that file: the session a holder-row
+# claim push that did not land left the published claim under. Handed the record, a holder, `--beat`
+# or status write also reads `mine` a claim of the lease's keepalive under that session, and the take-
+# over handed it - the restart row alone - reads `same session` one under the record's keepalive.
+# `absent` or a missing line is no fact.
 check_claim_writable() { # slug · mode · lease keepalive · lease session · the keepalive a write sets · [run-state file]
-  local slug="$1" mode="$2" ka="$3" sid="$4" wka="$5" rel="${6:-}" me="${CLAUDE_CODE_SESSION_ID:-}" row cls due
+  local slug="$1" mode="$2" ka="$3" sid="$4" wka="$5" rel="${6:-}" me="${CLAUDE_CODE_SESSION_ID:-}" row cls due ps=""
   local c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_btxt=unknown r_host r_sess r_lease
   CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""
   case " $CLAIM_MODES " in
@@ -1845,8 +1851,11 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     CW_SHA="$c_sha"
     c_btxt="${c_age}s"; [ "$c_age" != - ] || c_btxt=unknown
     CW_WHO="$slug · node $c_node · session $c_sess · beat $c_btxt · status $c_status · verdict $c_verdict"
+    if [ -n "$rel" ]; then ps=$(fact "$rel" prior-session) || :; [ "$ps" != absent ] || ps=""; fi
     if [ "$c_ka" = "$ka" ] && [ "$c_sess" = "$sid" ]; then cls=mine
+    elif [ -n "$ps" ] && [ "$mode" != take-over ] && [ "$c_ka" = "$ka" ] && [ "$c_sess" = "$ps" ]; then cls=mine
     elif [ -n "$me" ] && [ "$me" != absent ] && [ "$c_sess" = "$me" ]; then cls=same
+    elif [ -n "$ps" ] && [ "$mode" = take-over ] && [ "$c_sess" = "$ps" ] && [ "$c_ka" = "$(fact "$rel" keepalive)" ]; then cls=same
     else cls="foreign-$c_verdict"; fi
   fi
   if [ "$cls" = mine ]; then
@@ -2310,7 +2319,7 @@ scan_dirty_paths() {
   GIT ls-files --others --exclude-standard
 }
 
-# THE OPTIONAL ARGUMENT EXEMPTS ONE FILE, and only while it differs from HEAD in its six lease-fact
+# THE OPTIONAL ARGUMENT EXEMPTS ONE FILE, and only while it differs from HEAD in its seven lease-fact
 # lines alone (`check_lease_only_diff`, TOOL-dDerivedDocket-61 S8). `--landed`'s `primary` branch is
 # its one caller: a pushed landing re-bound by `--resume --keepalive-id` stays uncommitted, because
 # committing it would move HEAD off the pushed tip. `--hold` and `--preflight` pass nothing, so both
@@ -4784,7 +4793,7 @@ WTS
     return 1
   fi
   # S5 - THE PRIMARY CLEAN CHECK EXEMPTS THE RUN-STATE FILE, and only when it differs from HEAD in
-  # its six lease-fact lines alone (`check_lease_only_diff`, TOOL-dDerivedDocket-61 S8): a pushed
+  # its seven lease-fact lines alone (`check_lease_only_diff`, TOOL-dDerivedDocket-61 S8): a pushed
   # landing re-bound by `--resume --keepalive-id` carries exactly that difference, and `fail 55`
   # names that re-bind as its remedy. No other caller of the clean check passes the file.
   check_clean "$rel" || return 1
@@ -6721,8 +6730,8 @@ print_resume_orientation() { # run-state file · phase
 # THE TAKE-OVER, in S5's order, and the order is the whole of it: every refusal runs BEFORE the lease
 # is taken, so a refused take-over writes nothing at all — not the lease, not the phase, not the id.
 # A take-over that half-wrote would leave the slug holding a lease for a session that then stopped.
-run_takeover() { # slug · run-state file · keepalive id · held|working · phase
-  local slug="$1" rel="$2" kid="$3" mode="$4" ph="$5" unp hf head how prun ok os op lu
+run_takeover() { # slug · run-state file · keepalive id · held|working · phase · [restart]
+  local slug="$1" rel="$2" kid="$3" mode="$4" ph="$5" rs="${6:-}" unp hf head how prun ok os op lu
   if [ -z "$kid" ]; then
     verb_status "$slug" || true
     fail 59 "a take-over is a change of driver and the new driver has to name itself, because the lease is keyed on the keepalive id and a blank one wedges the slug until the bound expires — the holder's own later resume would then meet the different-id refusal and --replaces cannot name a blank; nothing was written: pass --keepalive-id"
@@ -6761,10 +6770,12 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
   # lost to one check 90, a write that did not complete check 91, and each leaves the record alone.
   # One lease stamp for the claim and `write_lease` below (TOOL-aGraftedHelix-11 S6), read at the
   # push and not before the claim read, so `lease-utc` still dates this take as closely as it can.
+  # THE RESTART ROW ALONE hands the record (TOOL-aGraftedHelix-20 S8): the recorded session's own
+  # relaunch reads `same session` a claim an incomplete holder push left under `prior-session`.
   lu=""
   if [ "$RUN_CLAIMS" = on ]; then
     read_claims strict || return 1
-    check_claim_writable "$slug" take-over "$kid" "${CLAUDE_CODE_SESSION_ID:-absent}" "$kid" || return 1
+    check_claim_writable "$slug" take-over "$kid" "${CLAUDE_CODE_SESSION_ID:-absent}" "$kid" ${rs:+"$rel"} || return 1
     lu=$(read_utc_now) || lu=""
     write_claim "$slug" live "$kid" strict "" "$lu" || return 1
   fi
@@ -6871,7 +6882,7 @@ check_holder_worktree() { # slug · run-state file -> 0 passes, 1 with its own r
 # run-state lease and keeps its build folder's clock against the same bound (§8 F13).
 verb_resume() { # slug
   local slug="$1" rel p cond age bound rhc rc ka _rs_at _rs_bt _rs_rc ok os op
-  local ls_utc ls_sid ls_pid ls_hat live me rb cur restart lu cw
+  local ls_utc ls_sid ls_pid ls_hat live me rb cur restart lu cw cas ps
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to resume: $rel"; return 1; }
@@ -7027,25 +7038,43 @@ verb_resume() { # slug
     # TOOL-aGraftedHelix-1 S7 - THE HOLDER READS ITS CLAIM on every call, so a lost one is found.
     # Another session's claim is check 90 and nothing is written; a read or a write that does not
     # complete is announced and the holder goes on, as it does offline at base.
-    # TOOL-aGraftedHelix-18 - THE ORDER, as the `--replaces` block below states its own: the claim
-    # read, the `mine` test and check 90 read the record's lease facts as they stood BEFORE this row's
-    # `write_lease`; the claim write that follows copies the facts AFTER it, and its due test compares
-    # the claim with those after-facts. Copied before, a moved session leaves the claim naming the old
-    # one, and the holder's next call reads its own claim as foreign and refuses at check 90.
-    cw=""
+    # TOOL-aGraftedHelix-18 - THE ORDER: the claim read, the `mine` test and check 90 read the
+    # record's lease facts as they stood BEFORE this row's `write_lease`.
+    # TOOL-aGraftedHelix-20 - and the claim CAS runs BEFORE `write_lease` too, writing the values it is
+    # about to record under the one stamp both are handed, so a race lost here writes nothing local.
+    # A push that does not complete, or a claim that could not be read, still records the lease and
+    # leaves `prior-session` naming the session the published claim still carries, set only while it
+    # is `absent` or missing; the next holder-row claim write that lands sets it `absent`, staged.
+    cw=""; cas=""
     if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
       check_claim_writable "$slug" holder "$ka" "${ls_sid:-absent}" "$ka" "$rel"; cw=$?
       [ "$cw" != 1 ] || return 1
     fi
     if [ -z "$ls_utc" ] || [ "$ls_sid" != "${me:-absent}" ] || [ "$ls_pid" != "${CLAUDE_PID:-absent}" ]; then
       os=$ls_sid; op=$ls_pid
-      write_lease "$rel" "$KID" || return 1
+      lu=$(read_utc_now) || lu=""
+      if [ -n "$cw" ]; then write_claim "$slug" live "$ka" holder "" "$lu"; cas=$?; [ "$cas" != 1 ] || return 1; fi
+      write_lease "$rel" "$KID" "$lu" || return 1
+      if [ "$RUN_CLAIMS" = on ]; then
+        ps=$(fact "$rel" prior-session) || :
+        if [ "$cas" = 0 ]; then
+          case "$ps" in ""|absent) ;; *) set_fact "$rel" prior-session absent || return 1 ;; esac
+        else
+          case "$ps" in ""|absent) set_fact "$rel" prior-session "${ls_sid:-absent}" || return 1 ;; esac
+        fi
+      fi
       stage_or_fail "$rel" || return 1
       echo "unattended: lease recorded · keepalive $KID · session ${os:-none} -> $(fact "$rel" session) · pid ${op:-none} -> $(fact "$rel" pid) · this resume passes the keepalive the record names, so it is the holder"
-      # The same claim row, `mine` still against the before-facts; only its due test reads the record anew.
-      if [ -n "$cw" ]; then check_claim_writable "$slug" holder "$ka" "${ls_sid:-absent}" "$ka" "$rel"; cw=$?; fi
+    elif [ "$cw" = 0 ]; then
+      write_claim "$slug" live "$ka" holder "$rel"; cas=$?
+      [ "$cas" != 1 ] || return 1
+      if [ "$cas" = 0 ]; then
+        case "$(fact "$rel" prior-session)" in
+          ""|absent) ;;
+          *) { set_fact "$rel" prior-session absent && stage_or_fail "$rel"; } || return 1 ;;
+        esac
+      fi
     fi
-    if [ "$cw" = 0 ]; then write_claim "$slug" live "$ka" holder "$rel" || [ "$?" = 2 ] || return 1; fi
     # TOOL-dDerivedDocket-28 S3 - THE HOLDER'S OWN ORPHANS: i26's harness killed the driver mid-bar
     # while the session lived on, so the holder resuming under its own id is the one who finds them.
     # Every row that does NOT hold the lease only counts them, through the status block.
@@ -7104,10 +7133,12 @@ verb_resume() { # slug
     # holder against the record's own facts, so the holder's own claim reads `mine` and never foreign.
     # TOOL-aGraftedHelix-11 - it DECIDES `mine` against the facts as they stood before this block and
     # WRITES the facts it leaves: the values `write_lease` records below, under the one stamp both are
-    # handed. The push stays before that write, so a race lost here still writes nothing.
+    # handed. The push stays before that write, so a race lost here still writes nothing. Handed the
+    # record, so a claim an incomplete holder push left under `prior-session` reads `mine` here too
+    # (TOOL-aGraftedHelix-20 S3); the write itself still carries the values `write_lease` records.
     lu=""
     if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
-      check_claim_writable "$slug" holder "$ka" "${ls_sid:-absent}" "$KID"
+      check_claim_writable "$slug" holder "$ka" "${ls_sid:-absent}" "$KID" "$rel"
       case "$?" in
         1) return 1 ;;
         0) lu=$(read_utc_now) || lu=""
@@ -7137,7 +7168,7 @@ verb_resume() { # slug
       return 1
     fi
     echo "unattended: the session this record names resumes under a new keepalive, so its process restarted and this resume TAKES THE RUN OVER in its place"
-    run_takeover "$slug" "$rel" "$KID" working "$p" || return 1
+    run_takeover "$slug" "$rel" "$KID" working "$p" restart || return 1
     return 0
   fi
   if [ "$live" = 1 ] && [ -z "$ls_utc" ]; then

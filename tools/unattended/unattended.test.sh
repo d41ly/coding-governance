@@ -12746,6 +12746,136 @@ same "GH18 AC2 the next call under that pid exits 0" "$rc" "0"
 same "GH18 AC2 ...and pushes nothing" "$(read_claim_ref tRun)" "$go_sha"
 remove_claim_refs; reset_tree
 
+# ==================================================================================================
+# TOOL-aGraftedHelix-20 — THE HOLDER ROW PUSHES ITS CLAIM BEFORE ITS write_lease, UNDER ONE STAMP, AND
+# A PUSH THAT DOES NOT LAND LEAVES `prior-session`. Every arm starts from a record and claim
+# preflighted under s1 and calls the holder's --resume under s2, so its write_lease is due. AC2: a
+# claim push made to exit 124, and a remote renamed away, each leave the record at s2 with
+# `prior-session: s1` and the claim at s1, staged; a second s2 call reads that claim `mine`, lands it
+# under s2 and sets the fact `absent`. AC1: a lost race is check 90 with the record and the index
+# untouched. AC3: under a date shim advancing every clock read, the claim and the record carry one
+# stamp, and a renewal over a record without the fact writes nothing. AC6: the session's restart under
+# a new keepalive takes the run over through `same session`, and an s3 take-over through the
+# presumed-stopped row still announces the claim taken over from s1. RED against driver copies with
+# S3's widening removed, `prior-session` left unwritten, the CAS moved back after write_lease, the
+# claim reading its own clock, S8's widening removed, and S8 handed the record off the restart row.
+# The lost race is unit 1's git shim; nothing here sleeps. It reuses the claim block's gh_ helpers.
+# ==================================================================================================
+GP_BIN=$(mktemp -d); GP_DATE=$(command -v date)
+read_run_fact() { sed -n "s/^$1: //p" memory/builds/tRun/RUN.md; }
+build_prior_base() { arm_claim_fixture; CLAUDE_CODE_SESSION_ID=s1 run --preflight tRun --keepalive-id k1 >/dev/null; git add -A >/dev/null && git commit -q -m gp-s1 --no-verify; }
+cat > "$GP_BIN/git.124" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) exit 124 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+chmod +x "$GP_BIN/git.124"
+# ---- AC2, the 124 arm: the s2 call whose claim push exits 124, then a second s2 call with no shim.
+build_prior_base
+cp "$GP_BIN/git.124" "$GP_BIN/git"
+out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GP_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
+rm -f "$GP_BIN/git"
+same "GH20 AC2 the s2 call whose claim push exits 124 exits 0" "$rc" "0"
+hit  "$out" "unattended: claim not written — tRun · the push was killed by this kit's own"
+same "GH20 AC2 ...the record reads session s2" "$(read_run_fact session)" "s2"
+same "GH20 AC2 ...and prior-session s1" "$(read_run_fact prior-session)" "s1"
+same "GH20 AC2 ...while the claim still names s1" "$(read_claim_field tRun session)" "s1"
+same "GH20 AC2 ...and the record is staged" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+same "GH20 AC2 the second s2 call exits 0" "$rc" "0"
+miss "$out" "UNATTENDED check 90 FAILED"
+same "GH20 AC2 ...lands the claim under s2" "$(read_claim_field tRun session)" "s2"
+same "GH20 AC2 ...sets prior-session absent" "$(read_run_fact prior-session)" "absent"
+same "GH20 AC2 ...and stages the record it cleared" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
+# ---- AC2, the unreachable arm: the bare origin renamed away for the first s2 call, restored for the
+# ---- second. Red when prior-session is left unwritten: the second call then reads s1 as foreign.
+build_prior_base
+mv "$ORIGIN" "$ORIGIN.away"
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+mv "$ORIGIN.away" "$ORIGIN"
+same "GH20 AC2 the s2 call with the remote unreachable exits 0" "$rc" "0"
+hit  "$out" "unattended: claims not read — "
+same "GH20 AC2 ...the record reads session s2" "$(read_run_fact session)" "s2"
+same "GH20 AC2 ...and prior-session s1" "$(read_run_fact prior-session)" "s1"
+same "GH20 AC2 ...while the claim still names s1" "$(read_claim_field tRun session)" "s1"
+same "GH20 AC2 ...and the record is staged" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+same "GH20 AC2 the second s2 call with the remote restored exits 0" "$rc" "0"
+miss "$out" "UNATTENDED check 90 FAILED"
+same "GH20 AC2 ...lands the claim under s2" "$(read_claim_field tRun session)" "s2"
+same "GH20 AC2 ...sets prior-session absent" "$(read_run_fact prior-session)" "absent"
+same "GH20 AC2 ...and stages the record it cleared" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
+# ---- AC1: the s2 call that loses the race is check 90, and the run-state file and the index are
+# ---- untouched. Red when the CAS runs after write_lease: the record moved on a call that lost.
+build_prior_base
+GP_RACER=$(git --git-dir="$ORIGIN" commit-tree "$(git --git-dir="$ORIGIN" mktree </dev/null)" -m "gov-claim racer")
+cat > "$GP_BIN/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) "$GH_GIT" --git-dir="$ORIGIN" update-ref refs/gov/runs/tRun $GP_RACER ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+chmod +x "$GP_BIN/git"
+before=$(sum)
+out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GP_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
+rm -f "$GP_BIN/git"
+n=$((n+1)); [ "$rc" != 0 ] || { echo "FAIL GH20 AC1 the s2 call that lost its race exited 0"; st=1; }
+hit  "$out" "UNATTENDED check 90 FAILED"
+same "GH20 AC1 the record's session still reads s1" "$(read_run_fact session)" "s1"
+same "GH20 AC1 ...the record is byte-unchanged" "$(sum)" "$before"
+same "GH20 AC1 ...the working copy names no run-state file" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
+same "GH20 AC1 ...nor does the index" "$(git diff --cached --name-only -- memory/builds/tRun/RUN.md)" ""
+same "GH20 AC1 the racer's claim stands" "$(read_claim_ref tRun)" "$GP_RACER"
+# ---- AC3: the landing s2 call under a date shim that advances each clock read by one more second, so
+# ---- two reads always differ: the claim's lease-utc is the record's, and no prior-session line is
+# ---- written. Then a renewal whose write_lease is not due moves the ref and writes nothing local.
+build_prior_base
+cat > "$GP_BIN/date" <<EOF
+#!/usr/bin/env bash
+if [ "\$*" = "-u +%Y-%m-%dT%H:%M:%SZ" ]; then
+  k=\$(( \$(cat "$GP_BIN/date.count" 2>/dev/null || echo 0) + 1 )); echo "\$k" > "$GP_BIN/date.count"
+  exec "$GP_DATE" -u -d "@\$(( \$("$GP_DATE" -u +%s) + k ))" +%Y-%m-%dT%H:%M:%SZ
+fi
+exec "$GP_DATE" "\$@"
+EOF
+chmod +x "$GP_BIN/date"; rm -f "$GP_BIN/date.count"
+out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GP_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
+rm -f "$GP_BIN/date"
+same "GH20 AC3 the landing s2 call under the date shim exits 0" "$rc" "0"
+n=$((n+1)); [ "$(cat "$GP_BIN/date.count" 2>/dev/null || echo 0)" -ge 2 ] || { echo "FAIL GH20 AC3 the date shim answered fewer than two clock reads, so this arm graded no stamp it shimmed"; st=1; }
+same "GH20 AC3 the claim's lease-utc is the record's byte for byte" "$(read_claim_field tRun lease-utc)" "$(read_run_fact lease-utc)"
+same "GH20 AC3 ...and the record carries no prior-session line" "$(grep -c '^prior-session:' memory/builds/tRun/RUN.md)" "0"
+git add -A >/dev/null && git commit -q -m gp-landed --no-verify
+seed_claim tRun s2 k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+gp_sha=$(read_claim_ref tRun)
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+same "GH20 AC3 the renewing s2 call exits 0" "$rc" "0"
+n=$((n+1)); [ "$(read_claim_ref tRun)" != "$gp_sha" ] || { echo "FAIL GH20 AC3 the due renewal did not move the claim ref"; st=1; }
+same "GH20 AC3 ...and over a record without the fact writes nothing local" "$(git status --porcelain)" ""
+# ---- AC6: after an incomplete s2 push, the s2 restart under a new keepalive and pid takes the run over
+# ---- with no check 89. Then, over the same record and claim aged by date, an s3 take-over through the
+# ---- presumed-stopped row announces the claim taken over from s1.
+build_prior_base
+cp "$GP_BIN/git.124" "$GP_BIN/git"
+CLAUDE_CODE_SESSION_ID=s2 PATH="$GP_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 >/dev/null 2>&1
+rm -f "$GP_BIN/git"
+same "GH20 AC6 the incomplete push left prior-session s1" "$(read_run_fact prior-session)" "s1"
+GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -q -m gp-aged --no-verify
+gp_aged=$(git rev-parse HEAD)
+out=$(CLAUDE_CODE_SESSION_ID=s2 CLAUDE_PID=4242 run --resume tRun --keepalive-id k2); rc=$?
+same "GH20 AC6 the s2 restart under a new keepalive exits 0" "$rc" "0"
+hit  "$out" "this resume TAKES THE RUN OVER in its place"
+miss "$out" "UNATTENDED check 89 FAILED"
+same "GH20 AC6 ...and leaves the claim under the new keepalive" "$(read_claim_field tRun keepalive)" "k2"
+same "GH20 AC6 ...and session s2" "$(read_claim_field tRun session)" "s2"
+git reset -q --hard "$gp_aged"; git clean -qfd
+seed_claim tRun s1 k1 live "$(derive_claim_ago $((GH_BOUND + 600)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+out=$(CLAUDE_CODE_SESSION_ID=s3 run --resume tRun --keepalive-id k3); rc=$?
+same "GH20 AC6 the s3 take-over exits 0" "$rc" "0"
+hit  "$out" "unattended: presumed-stopped — "
+hit  "$out" "unattended: claim taken over — tRun · node "
+hit  "$out" " · session s1 · beat "
+rm -rf "$GP_BIN"; remove_claim_refs; reset_tree
+
 fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
 if in_shard 2; then
@@ -13223,7 +13353,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # `build_check_commit_fixture` on node a, 2026-10-05, executed 33 against the prologue's own 20,
 # green against the kit and red under the parent's lib and driver, a lib whose kit-dir derivation
 # asked git again, and a lib without the announcement line; no suite ran.
-FLOOR_ASSERTIONS=2127
+# RAISED 2127 -> 2178 by TOOL-aGraftedHelix-20: the prior-session block's 51 executed assertions in
+# region two, its five `mutate` calls included, MEASURED: that block run alone behind this prologue
+# and the claim block's gh_ helpers on node a, 2026-10-05, executed 71 against the prologue's own 20,
+# green against the kit and red under six staged driver breaks, one per arm; no suite ran.
+FLOOR_ASSERTIONS=2178
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -13358,7 +13492,8 @@ FLOOR_SHARD_1=209
 # RAISED 1889 -> 1902: the same 13 region-two holder-order assertions, see FLOOR_ASSERTIONS.
 # RAISED 1902 -> 1917: the same 15 region-two claim-cell and mode-refusal assertions, see FLOOR_ASSERTIONS.
 # RAISED 1917 -> 1930: the same 13 region-two hook, linked-kit and announcement assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1930
+# RAISED 1930 -> 1981: the same 51 region-two prior-session assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1981
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

@@ -1189,8 +1189,9 @@ read_run_exclusions() { # witness · base · run-state path -> the exclusion tip
 # landing commit and cannot derive, which is right: no history a remote could carry holds it. An
 # unreadable HEAD copy is NOT LANDING, never read as one. Status 1 prints nothing.
 #
-# THE SIX LEASE-FACT LINES, and nothing else, may differ. `keepalive`, `session`, `pid`, `host`,
-# `pid-image` and `lease-utc` are the lines `write_lease` writes together; a difference that adds,
+# THE SEVEN LEASE-FACT LINES, and nothing else, may differ. `keepalive`, `session`, `pid`, `host`,
+# `pid-image` and `lease-utc` are the lines `write_lease` writes together, and `prior-session` the
+# one the holder row writes beside them (TOOL-aGraftedHelix-20); a difference that adds,
 # removes or rewrites only those holds, and an equal file holds trivially. The header lines before
 # the first hunk are git's, never the file's, so the scan starts at the first `@@`. Two callers and
 # no third: `read_landing_commit` below, and `--landed`'s `primary` clean check in the driver.
@@ -1204,14 +1205,14 @@ check_lease_only_diff() { # run-state file -> 0 when it differs from HEAD in lea
     !h { next }
     /^\\/ { next }
     /^[+-]/ { l = substr($0, 2); sub(/\r$/, "", l)
-              if (l !~ /^(keepalive|session|pid|host|pid-image|lease-utc):( |$)/) bad = 1 }
+              if (l !~ /^(keepalive|session|pid|host|pid-image|lease-utc|prior-session):( |$)/) bad = 1 }
     END { exit bad ? 1 : 0 }'
 }
 
 # "MATCH" IS `check_lease_only_diff`, not byte equality (TOOL-dDerivedDocket-61 S8). `--resume
 # --keepalive-id` re-binds a pushed landing `--landed` has not yet observed, and that re-bind rewrites
-# the six lease-fact lines of a record the push already carried. Committing it would move HEAD off
-# the pushed tip, so it stays a working-copy difference, and a difference confined to those six lines
+# the lease-fact lines of a record the push already carried. Committing it would move HEAD off
+# the pushed tip, so it stays a working-copy difference, and a difference confined to those seven lines
 # is read as none. Every other byte, the phase line among them, must still match.
 read_landing_commit() { # run-state file -> the commit that carries it at LANDING, or status 1
   local _lc_f="${1:-}" _lc_ph _lc_c
