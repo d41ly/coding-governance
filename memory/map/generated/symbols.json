@@ -9308,6 +9308,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_size_note",
+      "kind": "function",
+      "file": "tools/agent-instructions/adopt-agent-instructions.sh"
+    },
+    {
       "id": "print_spec_audit_line",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
