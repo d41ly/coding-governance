@@ -270,3 +270,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T04:14:29Z dispatch · item 3eff0503 TOOL-aMendedFleet-29 · reason tools/memory-recall/check-recall.py tools/memory-recall/test_recall_floor.py tools/memory-recall/README.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-29.md memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-29-1-acceptance-ledger.md memory/builds/aMendedFleet/README.md memory/LIVE.md
 
 2026-10-05T04:23:56Z decision · item TOOL-aMendedFleet-29 spec-probe labels have had no human check · reason Options: the owner hand-checks every harvested label before any figure is quoted or pinned; or the 20-question agent spot-check stands alone. The agent spot-check kept 5 of 20, so the hit@10 figure is noisy. Refused: checking every label is an owner act, which spec section 8 F2 parks.
+
+2026-10-05T04:27:21Z brief · item TOOL-aMendedFleet-31 · reason 37e2c28ec58f memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
