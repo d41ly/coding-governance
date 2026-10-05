@@ -28,7 +28,7 @@ Ported from adopter ic's `scripts/recall/` implementation at `5318064`.
 | `SKILL.template.md` | the agent-facing Skill, with the project values as placeholders. Rendered, never copied. |
 | `recall-opened.js` | **optional** PostToolUse hook that infers which hit was read. **Forked**. |
 | `recall-opened.fragment.json` | the settings block that wires that hook: event, matcher, dedup marker, hook path. |
-| `recall-opened.test.sh` | the hook's own check — 8 cases, including a non-`memory` corpus root and a sibling worktree. |
+| `recall-opened.test.sh` | the hook's own check, including a non-`memory` corpus root and a sibling worktree. Its closing `passed` line reports how many cases ran — no count is written here, for the reason the `selftest.py` row gives. |
 | `verbatim.json` | LF-normalised digests of the two verbatim files, so a silent edit to one reds the selftest. |
 
 ## Configure
@@ -285,10 +285,10 @@ measures their own value.
   corpus it does not describe and the un-forked upstream prints `index 0 records + N chunks` and
   exits 0. This kit prints a `ZERO RECORDS` diagnosis naming the resolved families, the conf path and
   `--rebuild`, on the query path and on `extract.py`'s own.
-- **On a small corpus, retrieval buys precision, not speed.** Measured on this repo — 66 tracked
-  corpus files, 496,153 bytes, 9 anchored records, 1,033 chunks — a full-corpus
-  `grep -rIl "adopt" memory/` takes 0.077 s / 0.092 s / 0.447 s across three warm runs and returns
-  31 of 66 files. The kit's index build is 0.18 s and a warm query is 1.58–2.27 s wall, dominated by
-  interpreter start-up and `git` calls, so it is **slower** than the grep at this size. What it
-  returns is a ranked handful instead of half the tree. Adopt it for the ranking, not the clock;
-  upstream's 40 MB corpus is where the 6 s cold build starts paying for itself.
+- **Retrieval buys precision, not speed.** A warm query is not faster than a full-corpus
+  `grep -rIl` over the memory root: its wall clock is dominated by interpreter start-up and `git`
+  calls, and the grep lists every file that spells the word. What a query returns instead is a
+  ranked list. Adopt it for the ranking, not the clock. The corpus is not sized here, because a
+  size typed beside the thing it measures is stale on the next edit: every query prints an
+  `index <records> records + <chunks> chunks` line, and `--stats` given beside a question prints
+  the whole cache manifest, file count included. Alone, `--stats` exits 2 with no question given.

@@ -177,10 +177,11 @@ def refusal(root: pathlib.Path, why: str) -> str:
 
 _FAMILY_RE = re.compile(r"^[A-Z][A-Z0-9]*$")
 
-# The default cache budget, MEASURED on this tree rather than inherited: one cache here is 2.4 MB,
-# and upstream measured ~110 MB per LIVE worktree on a far larger corpus. 512 sits well above any
-# plausible single-corpus cache, so the cap protects an adopter carrying many worktrees without ever
-# firing on a normal one. Blank in the conf = uncapped; absent = this.
+# The default cache budget. Upstream measured ~110 MB per LIVE worktree; a cache's size here is
+# read off its directory under `<git-common-dir>/recall/cache/`, never typed in this comment,
+# because it moves with every corpus edit. 512 sits above a single cache of that order, so the cap
+# protects an adopter carrying many worktrees without firing on a normal one. Blank in the conf =
+# uncapped; absent = this.
 DEFAULT_CACHE_BUDGET_MB = 512.0
 
 
