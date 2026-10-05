@@ -75,6 +75,10 @@ HOOK_LEAD_RE = re.compile(r"\s*(?:Pre|Post)ToolUse:")
 LEAD_TAG_RE = re.compile(r"\s*<([a-z][a-z0-9-]{0,40})>")
 EPOCH_RE = re.compile(r"[0-9]{1,12}(?:\.[0-9]{1,9})?")
 
+# The READY witnesses `derive_ready_point` reads: the charter's READY micro-format, list marker
+# optional, never the injected placeholder card; and the two words of the kickoff's card append.
+READY_TEXT_RE = re.compile(r"^(?:- )?READY — (?!none yet)\S+ · node ", re.M)
+READY_CARD_WORDS = ("--card", "--append")
 INTERRUPT_LEAD = "[Request interrupted by user"
 DRIVER_SCRIPT = "unattended.sh"
 BAR_SCRIPT = "run-gates.sh"
@@ -1143,3 +1147,90 @@ def measure_tree(root) -> dict:
     return {"sessions": sessions, "bytes": size, "records": records, "events": events,
             "seconds": round(wall, 3), "rate_mb_s": round(size / 1e6 / wall, 2) if wall > 0 else None,
             "peak_mb": round(peak / 1e6, 1) if peak else None}
+
+
+def derive_ready_point(tree: SessionTree) -> tuple | None:
+    """`(t, witness, first)` for a session's first READY, or None: `witness` is `card` for a shell
+    call carrying `--card` and `--append` as words, `text` for an assistant text line in the READY
+    micro-format, the earlier winning; `first` is the main file's first timed record. MAIN file only,
+    a sidechain record excluded, and nothing of either text is kept. Once `first` is known, a line
+    holding neither witness's bytes is skipped unparsed, as `scan_preflights` does; a repeated uuid
+    needs no join, because the earliest witness wins whichever copy carries it."""
+    if tree.main is None:
+        return None
+    try:
+        fh = open(tree.main, "rb")
+    except OSError:
+        return None
+    first = best = None
+    with fh:
+        for lineno, raw in enumerate(fh, 1):
+            if first is not None and b"READY" not in raw and b"--card" not in raw:
+                continue
+            try:
+                rec = parse_record(raw)
+            except ValueError:
+                continue
+            t = parse_time(rec.get("timestamp"))
+            if t is None or rec.get("isSidechain") is True:
+                continue
+            first = t if first is None else first
+            best = _derive_ready_witness(rec, t, lineno, best)
+    return None if best is None else (round(best[0], 3), best[3], round(first, 3))
+
+
+def _derive_ready_witness(rec, t, lineno, best) -> tuple | None:
+    """`best`, or this record's earlier READY witness as `(t, lineno, sub, witness)`."""
+    msg = rec.get("message")
+    if rec.get("type") != "assistant" or not isinstance(msg, dict):
+        return best
+    for sub, block in enumerate(msg.get("content") if isinstance(msg.get("content"), list) else ()):
+        if not isinstance(block, dict):
+            continue
+        witness = None
+        if block.get("type") == "tool_use" and block.get("name") in SHELL_TOOLS:
+            inp = block.get("input") if isinstance(block.get("input"), dict) else {}
+            words = inp.get("command").split() if isinstance(inp.get("command"), str) else ()
+            if all(w in words for w in READY_CARD_WORDS):
+                witness = "card"
+        elif (block.get("type") == "text" and isinstance(block.get("text"), str)
+              and READY_TEXT_RE.search(block["text"])):
+            witness = "text"
+        if witness and (best is None or (t, lineno, sub) < best[:3]):
+            best = (t, lineno, sub, witness)
+    return best
+
+
+def measure_ready_tree(root) -> dict:
+    """What every session under a projects root spent before READY: per READY session its minutes,
+    requests and summed tokens over every source, and the main context at its first request and its
+    last before READY; plus the sessions scanned and the count per witness. Writes nothing."""
+    root = pathlib.Path(root)
+    mains = sorted(p for p in root.glob("*/*.jsonl") if SID_RE.fullmatch(p.name[:-len(".jsonl")]))
+    out = {"sessions": 0, "ready": 0, "card": 0, "text": 0, "rows": []}
+    for main in mains:
+        tree = build_session_tree(main)
+        out["sessions"] += 1
+        point = derive_ready_point(tree)
+        if point is None:
+            continue
+        t_ready, witness, first = point
+        out["ready"] += 1
+        out[witness] += 1
+        row = {"sid": tree.sid, "witness": witness, "minutes": round((t_ready - first) / 60, 2),
+               "requests": 0, "in": 0, "out": 0, "cache_read": 0, "cache_write": 0,
+               "context_first": None, "context_ready": None}
+        # ponytail: extract_session runs only for a READY session, so a session without one costs one scan.
+        for ev in extract_session(tree)["events"]:
+            if ev["kind"] != "usage" or ev["t"] > t_ready:
+                continue
+            row["requests"] += 1
+            for f in ("in", "out", "cache_read", "cache_write"):
+                row[f] += ev[f]
+            if ev["src"] == "main":
+                context = ev["in"] + ev["cache_read"] + ev["cache_write"]
+                if row["context_first"] is None:
+                    row["context_first"] = context
+                row["context_ready"] = context
+        out["rows"].append(row)
+    return out

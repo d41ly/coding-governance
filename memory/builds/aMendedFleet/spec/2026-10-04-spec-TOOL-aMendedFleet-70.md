@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-70 — runlog's extractor reports what a session spends in tokens and minutes before it reaches READY
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 70
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 70
 
 <!-- gen:spec-records -->
 
@@ -21,7 +21,8 @@ quartiles, so the baseline is a command instead of a sentence.
 ## 2. Scope (IN)
 
 - **S1** — `derive_ready_point(tree)` in `tools/runlog/extract.py` returns the time and the witness
-  of a session's first READY, or `None`, reading the MAIN file only, a sidechain record excluded.
+  of a session's first READY with the time of the main file's first timed record, which S2's
+  minutes start from, or `None`, reading the MAIN file only, a sidechain record excluded.
   Two witnesses are read, in memory, and nothing of either text is kept:
   - `card` — a shell tool call whose command carries both `--card` and `--append` as words, which
     is how the kickoff engine's Step 5 appends the READY card;
@@ -190,6 +191,9 @@ New arm: `tools/runlog/selftest.py` · the `ready` scenario with its witness rem
 - rev-2 · 2026-10-04 · §1 · §3 · M2 cross-read: this spec said the A/B unit reads and may extend
   this mode; `TOOL-aMendedFleet-93` reads judge transcripts directly and puts extending the mode
   out of its scope, so the goal, the sidechain non-goal and the hands-off edge now agree with it.
+- rev-3 · 2026-10-05 · §2 S1 · build pass: S2's minutes start at the first timed record, which no
+  extract event carries, so S1's one scan of the main file returns that time beside READY's rather
+  than S2 paying a second pass over the file.
 
 ## 10. Reuse audit
 

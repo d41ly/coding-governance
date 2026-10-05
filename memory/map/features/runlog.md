@@ -89,7 +89,7 @@ The reader holds one parsed record per open file, which the self-test counts thr
 seam over a generated tree, with a hold-everything reader through the same counter as its liveness.
 A keepalive is JOINED to its `CronCreate` rather than matched by wording, which drifted. The
 self-test's `main` aims every ambient root at a decoy before any arm runs, so an arm that forgot one
-cannot reach the owner's real store.
+cannot reach the owner's real store. `extract --ready` prints spend before READY, counts only.
 
 **The run model keys a run on the commit that STARTED it, and bounds every read to that run's era.**
 The driver rotates a finished record in its successor's preflight commit, so a path's creation commit

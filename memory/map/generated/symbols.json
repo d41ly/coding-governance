@@ -5443,6 +5443,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "derive_ready_point",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "derive_receipt_miss",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -8073,6 +8078,11 @@
       "file": "tools/codebase-map/rank_harness.py"
     },
     {
+      "id": "measure_ready_tree",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "measure_recall",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
@@ -9256,6 +9266,11 @@
       "id": "print_populations",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "print_ready",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
     },
     {
       "id": "print_reap_targets",
@@ -16391,6 +16406,11 @@
       "id": "test_extract_failure_refuses",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_extract_ready",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_extract_rejects_flag_in_path_slot",

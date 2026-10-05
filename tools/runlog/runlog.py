@@ -6,6 +6,7 @@
     python <this kit>/runlog.py extract --slug <slug> | --session <sid> | --discover [--slug <slug>]
                                         [--transcripts <projects dir>]
     python <this kit>/runlog.py extract --measure <projects dir>
+    python <this kit>/runlog.py extract --ready <projects dir>
     python <this kit>/runlog.py narration --session <sid> --from <t> --to <t> [--transcripts <dir>]
     python <this kit>/runlog.py model <slug> [--run <n>] [--json] [--journals <dir>] [--transcripts <dir>]
     python <this kit>/runlog.py record <slug> [--run <n>] [--write] [--journals <dir>] [--transcripts <dir>]
@@ -25,7 +26,7 @@ recomputes a record's journal commitment on this machine: exit 0 when it matches
 `none`, 1 when the journal changed after the render, 2 when the record or its journals cannot be read.
 
 `extract` writes one structural extract per session to the user-profile store and prints one JSON
-object per session on stdout; `--measure` writes nothing and prints a report. `narration` prints a
+object per session on stdout; `--measure` and `--ready` write nothing and print a report. `narration` prints a
 window of redacted text framed as data and writes nothing. The extractor's rules are the kit README's.
 `model` joins one run's sources into the run model and prints it, the whole JSON with `--json`, and
 writes a local copy beside the extracts; it exits 2 when the build has no committed run-state file or
@@ -55,6 +56,7 @@ import json
 import os
 import pathlib
 import re
+import statistics
 import sys
 import time
 
@@ -203,9 +205,37 @@ def print_measure(root) -> int:
     return 0
 
 
+def _derive_quartiles(values) -> str:
+    if not values:
+        return "q1=n/a median=n/a q3=n/a"
+    qs = [values[0]] * 3 if len(values) == 1 else statistics.quantiles(values, n=4, method="inclusive")
+    return " ".join(f"{k}={round(q, 2)}" for k, q in zip(("q1", "median", "q3"), qs))
+
+
+def print_ready(root) -> int:
+    report = ex.measure_ready_tree(root)
+    if report["sessions"] == 0:
+        print(f"runlog: ready DEAD PROBE \u2014 no session under {root}")
+        return 2
+    print("runlog: ready (report-only, grades nothing) " + " ".join(
+        f"{k}={report[k]}" for k in ("sessions", "ready", "card", "text")))
+    rows = report["rows"]
+    for label, values in (
+            ("spent_tokens", [r["in"] + r["out"] + r["cache_read"] + r["cache_write"] for r in rows]),
+            ("context_growth", [r["context_ready"] - r["context_first"] for r in rows
+                                if r["context_first"] is not None]),
+            ("minutes", [r["minutes"] for r in rows])):
+        print(f"runlog: ready quartiles {label} {_derive_quartiles(values)}")
+    for r in rows:
+        print("runlog: ready row " + " ".join(f"{k}={'n/a' if v is None else v}" for k, v in r.items()))
+    return 0
+
+
 def cmd_extract(args) -> int:
     if args.measure:
         return print_measure(args.measure)
+    if args.ready:
+        return print_ready(args.ready)
     # The store resolves FIRST: a machine with no store refuses before a single transcript is read.
     # One named session that cannot be read is the whole request, so it exits 2; among several, a
     # session refused for its shape or its location is counted and the rest are still extracted.
@@ -451,6 +481,8 @@ def main(argv=None) -> int:
                     help="find sessions by a preflight call, attributed heuristically")
     pe.add_argument("--measure", metavar="DIR", help="report rate and peak memory over a projects "
                     "dir; writes nothing")
+    pe.add_argument("--ready", metavar="DIR", help="report what each session under a projects dir "
+                    "spent before READY; writes nothing")
     pe.add_argument("--transcripts", help="the projects dir to read instead of Claude Code's own")
     pn = sub.add_parser("narration", help="print a window of redacted narration; writes nothing")
     pn.add_argument("--session", required=True)
@@ -484,12 +516,12 @@ def main(argv=None) -> int:
     if args.cmd == "verify":
         return cmd_verify(args)
     if args.cmd == "extract":
-        modes = sum((bool(args.session), args.discover, bool(args.measure)))
-        if modes > 1 or (args.slug and (args.session or args.measure)):
-            ap.error("extract takes ONE of --slug, --session, --discover and --measure; only "
-                     "--discover combines with --slug")
+        modes = sum((bool(args.session), args.discover, bool(args.measure), bool(args.ready)))
+        if modes > 1 or (args.slug and (args.session or args.measure or args.ready)):
+            ap.error("extract takes ONE of --slug, --session, --discover, --measure and --ready; "
+                     "only --discover combines with --slug")
         if modes == 0 and not args.slug:
-            ap.error("extract needs --slug, --session, --discover or --measure")
+            ap.error("extract needs --slug, --session, --discover, --measure or --ready")
         return cmd_extract(args)
     if args.cmd == "narration":
         return cmd_narration(args)

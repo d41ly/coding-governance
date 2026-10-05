@@ -1974,6 +1974,34 @@ def test_extract_ac9_usage():
           ([("fixture-review", "completed", 42000, 1, 3, 999)], 1))
 
 
+def test_extract_ready():
+    """TOOL-aMendedFleet-70: the READY point and what a session spent to reach it."""
+    _base, projects = build_projects("runlog-ready-")
+    sid = build_scenario(projects, "ready")
+    point = rx.derive_ready_point(rx.resolve_session_tree(sid, projects))
+    check("extract ready: the card append is the READY point, two minutes after the first record",
+          (point[1], round(point[0] - point[2], 3)) if point else None, ("card", 120.0))
+    report = rx.measure_ready_tree(projects)
+    row = report["rows"][0] if report["rows"] else {}
+    check("extract ready: three requests to READY are summed, the one after it is not",
+          ({k: report[k] for k in ("sessions", "ready", "card", "text")},
+           [row.get(k) for k in ("requests", "in", "out", "cache_read", "cache_write",
+                                 "context_first", "context_ready", "minutes")]),
+          ({"sessions": 1, "ready": 1, "card": 1, "text": 0}, [3, 112, 60, 3700, 310, 1300, 1467, 2.0]))
+    _base, text = build_projects("runlog-ready-text-")
+    build_scenario(text, "ready", plant={"--card --append": "--card",
+                                         "Kickoff fixture note.": "- READY — fixture · node a · …"})
+    got = rx.measure_ready_tree(text)
+    check("extract ready: a READY text line is the witness when no card is appended",
+          (got["ready"], got["text"]), (1, 1))
+    _base, none = build_projects("runlog-ready-none-")
+    build_scenario(none, "ready", plant={"--card --append": "--card",
+                                         "Kickoff fixture note.": "READY — none yet"})
+    got = rx.measure_ready_tree(none)
+    check("extract ready liveness: with the witness removed and only the placeholder line, ready=0",
+          (got["sessions"], got["ready"]), (1, 0))
+
+
 def test_extract_ac10_members():
     for row in TOOL_CLASS_ROWS:
         got = rx.derive_tool_class(row["tool"], row["input"])
