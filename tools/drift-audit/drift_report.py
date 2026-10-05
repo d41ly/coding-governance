@@ -3187,7 +3187,8 @@ def render_drift_offenders(over: list, dead: list, ratchets: list) -> list[str]:
     answers that. So each line is a KEY: every detail row of every gateable signal over its pin, every
     gateable signal that is DEAD, and every weakened ratchet — the three things `--check` exits 1 on,
     and nothing else. No count, no header, no cut: `--check` shows ten detail rows per signal, and a
-    set built from ten can hide the eleventh.
+    set built from ten can hide the eleventh. A signal bounded by `BASELINES` keys only what moved:
+    each of its `new` rows, and `{"stale": "<id>"}` per stale id, never a row its set lists.
 
     A detail row's key is its JSON with sorted keys and its LINE LOCATORS dropped — the `line` field,
     and a trailing `:<digits>` on any string — because an unrelated edit above a finding moves its
