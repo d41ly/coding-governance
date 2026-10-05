@@ -4621,6 +4621,7 @@ unattended.sh	asks:	the build README's front matter, a scan its `---` close boun
 unattended.sh	may:	the build README's front matter, a scan its `---` close bounds
 check-unattended.sh	asks:	the build README's front matter, a scan its `---` close bounds
 check-unattended.sh	may:	the build README's front matter or a commit's diff of it, never a run-state file
+check-unattended.sh	spec-audit:	the build README's front matter or a commit's diff of it, never a run-state file (TOOL-aWardedAudit-5)
 lib-unattended.sh	(keepalive|	check_lease_only_diff grades git diff -U0 hunk lines, which carry no section to scope to
 resume-tick.sh	pid: 	the driver's --liveness stdout, not a run-state file
 stop-guard.js	' + key	parseLiveness reads the driver's --liveness stdout, not a run-state file
