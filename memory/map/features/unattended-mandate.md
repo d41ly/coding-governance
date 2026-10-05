@@ -14,7 +14,7 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["concurrent-runs-are-announced-not-refused.md", "inherited-git-dir-pins-the-work-tree-to-the-cwd.md"]
+gotcha-classes = ["a-merged-in-check-can-refuse-a-pinned-record.md", "concurrent-runs-are-announced-not-refused.md", "inherited-git-dir-pins-the-work-tree-to-the-cwd.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -36,6 +36,9 @@ seam. That dossier is how a run proceeds; this one is what lets it start and wha
 The class `inherited-git-dir-pins-the-work-tree-to-the-cwd.md` is claimed here for the same
 reason (TOOL-aGraftedHelix-27): its instance is the library's kit-dir derivation, which the commit-time
 check reads under a linked worktree's hook, and that dossier was 2 bytes under its cap.
+The class `a-merged-in-check-can-refuse-a-pinned-record.md` is claimed here on its own merits
+(TOOL-aGraftedHelix-30): it is about what authorizes a run, a README pinned at BASE that a merged-in
+check refuses, and its answer is `--authorization`, which grades that one item alone.
 
 ## Constraints & why
 

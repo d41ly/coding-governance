@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.76 -->
+<!-- gov:kit unattended@1.77 -->
 
 # Unattended runs
 
@@ -1001,11 +1001,14 @@ moved:
 
 ```bash
 {{LANDER}} --prepare --slug <slug>
+bash {{KIT_DIR}}/unattended.sh --authorization <slug>
 bash {{KIT_DIR}}/unattended.sh --close <slug>
 ```
 
 Make NO second move after the prepare: a move stages the record, and this close refuses a non-empty
-porcelain. A resume after the prepare reads a range that also holds what the merge brought in from
+porcelain. `--authorization` is not one: it stages and writes nothing, and it grades the one
+non-overridable item the prepared merge can break before the close spends its bar. A refusal there
+ends the landing; take one of the two exits it prints. A resume after the prepare reads a range that also holds what the merge brought in from
 the default branch, so it can announce a surface another landing touched: one flagged bar more than
 owed, never one fewer.
 
@@ -1193,7 +1196,11 @@ run-state file for the flag.
 **Reconcile from the remote's own default branch, onto the run branch.** If `--prepare` reports a
 conflict, run `git merge <remote>/<default-branch>` on the run branch, resolve it, commit, and
 `--prepare` again. Nothing in this mode routes through your node's own default branch: that is a ref
-this session can move, and it carries whatever else on this node has not been pushed.
+this session can move, and it carries whatever else on this node has not been pushed. After ANY
+merge of the remote's default branch into the run branch, mid-build included, run
+`bash {{KIT_DIR}}/unattended.sh --authorization <slug>` before the next pass and before `--prepare`
+again: the merge can bring in a check the README pinned at BASE cannot satisfy, and nothing else
+reads that item until the close, after its bar.
 
 **If the lander cannot COMPLETE the landing, nothing is merged anywhere.** That is the remote
 reported unreachable, the race retries exhausted, or a `--close` refused because the lander could

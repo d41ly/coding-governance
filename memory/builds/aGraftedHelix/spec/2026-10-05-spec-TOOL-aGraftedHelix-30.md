@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-30 — a verb grades `authorization-reachable` alone, and every reconciling merge runs it before the run spends more
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 018b5675 · streams tooling · order 14 · ratified 2026-10-05
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-2 · base 018b5675 · streams tooling · order 14 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 

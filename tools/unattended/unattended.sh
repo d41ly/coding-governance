@@ -12,6 +12,7 @@
 #   unattended.sh --liveness <slug>                        # key: value lines and ONE verdict, for an out-of-session reader
 #   unattended.sh --resume <slug> [--keepalive-id <id> [--replaces <id>]]    # the same line, plus the next action; with the id, the resume matrix decides who drives
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
+#   unattended.sh --authorization <slug>                   # grade authorization-reachable alone, as --close would; writes nothing
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
 #   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
@@ -50,7 +51,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.76   # gov:kit unattended@1.76 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.77   # gov:kit unattended@1.77 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -95,7 +96,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief --beat"
+VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --check-commit --claims --version"
@@ -8942,6 +8943,40 @@ check_handoff_override() { # override count -> 0 when none is refused; 1 after f
   return 1
 }
 
+# TOOL-aGraftedHelix-30 - `authorization-reachable`, GRADED ALONE, by the arm --close grades it with.
+# A merge of the remote's default branch can bring in a check the running record cannot satisfy,
+# because the README it grades is pinned at BASE; nothing read that item again until --close, after
+# its bar, so one run built nine more hours on a record that could not close. This verb is that one
+# item, asked at the merge. ONE PREDICATE, ONE SPELLING: it calls `dod_met` and nothing else that
+# grades, so it and the close cannot disagree (the source arm in the suite holds that), and it
+# redirects nothing, which is the defect TOOL-aBoundedVerdict-12 records on this same chain.
+# `TB` tells the two unmet states apart: the base derivation clears it on entry and sets it only on
+# success, so a set `TB` means the README at a derived BASE was read and refused (exit 1, the exits
+# printed), and an empty one means the predicate never reached it (exit 2, no exits).
+# What this does NOT check: every other Definition-of-Done item, and whether the merge is what
+# changed the answer. It writes nothing but the run log's START and END lines.
+print_authorization() { # slug -> 0 met · 1 refused · 2 not evaluated
+  local slug="$1" rel
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run whose authorization can be graded: $rel"; return 1; }
+  refuse_if_terminal "$rel" --authorization || return 1
+  # Its refusals print and are not fatal here, as at --close: no anchor leaves ASHA empty, and the
+  # item below then reads unmet with TB empty, which is the not-evaluated row.
+  observe_anchor || true
+  TB=""
+  if dod_met "$slug" "$rel" authorization-reachable machine; then
+    echo "unattended: authorization-reachable — met · base $TB · anchor $AREF at $ASHA"
+    return 0
+  fi
+  if [ -n "$TB" ]; then
+    echo "unattended: authorization-reachable — refused at base $TB, and --close will refuse this run too, with no override, while the refusal above stands; where that refusal names a working-tree remedy, apply it first. Otherwise the run has two exits. Rotate: commit a build README this driver admits, then --abort $slug --code repo-state-out-of-mandate --reason <text>, then --preflight $slug --keepalive-id <id> onto the new BASE. Hand off: --park $slug --item <the question> --reason <text>, then --handoff $slug --code owner-decision --reason <text> --reaped <id>. Under a slug-mode README, which is the owner's, only the hand-off is the run's to take."
+    status=1; return 1
+  fi
+  echo "unattended: authorization-reachable — not evaluated: the refusal above stopped the predicate before it read the build README at a derived BASE, so it says nothing about this record; answer that refusal and run --authorization $slug again"
+  status=2; return 2
+}
+
 verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   local slug="$1" rel item ck unmet=0 i=0 n ov reason _why _ck _lnrec _lnwant
   n=${#OV_ITEMS[@]}
@@ -12372,6 +12407,7 @@ case "$VERB" in
   --liveness)  print_liveness "$SLUG" ;;
   --resume)    verb_resume "$SLUG" "$KID" ;;
   --close)     verb_close "$SLUG" ;;
+  --authorization) print_authorization "$SLUG" ;;
   --landed)    verb_landed "$SLUG" ;;
   --abort)     verb_abort "$SLUG" "$REASON" "$HALT_CODE" ;;
   --hold)      run_hold "$SLUG" "$HALT_CODE" "$HOLD_UNTIL" "$REASON" "$HOLD_REAPED" "$HOLD_UNREACH" "$HOLD_RUN" ;;

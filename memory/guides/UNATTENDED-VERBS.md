@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.76 -->
+<!-- gov:kit unattended@1.77 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -176,6 +176,17 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   Where `RUN_CLAIMS` is `on`, before any item is graded, a run that does not hold its claim
   on the remote is check 108 and a claim that cannot be read or renewed is check 109: a close
   that lands a claim it never read is a double landing.
+- `--authorization` — `--authorization <slug>` grades `authorization-reachable` alone, by the arm
+  `--close` grades it with, so it answers what the close would from the same tree. Run it after any
+  merge of the remote's default branch into the run branch, mid-build included, and under
+  `in-place` between the lander's `--prepare` and `--close`: a merged-in check can refuse a README
+  pinned at BASE, and the close reads that item only after its bar. Met prints one
+  `authorization-reachable — met` line and exits 0. A README refused at a derived BASE prints the
+  numbered refusal, then one line naming the two exits — rotate by `--abort --code
+  repo-state-out-of-mandate` and a fresh `--preflight`, or `--park` then `--handoff --code
+  owner-decision` — and exits 1. A predicate that never reached the README, the anchor or the base
+  derivation refusing, prints that refusal and `not evaluated` with no exits, and exits 2. It
+  writes nothing to the tree, the record or the remote, and grades no other Definition-of-Done item.
 - `--landed` — an OBSERVATION rather than a claim, guarded on the RECORDED phase. It accepts a record
   only at `LANDING` and re-observes the anchor. Under `primary` it is the one writer of `LANDED` and
   refuses unless HEAD is an ancestor of the tip the remote advertises; where `LANDER_MARKER` is

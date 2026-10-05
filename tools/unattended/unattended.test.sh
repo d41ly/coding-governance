@@ -3821,10 +3821,59 @@ git push -q -f origin unit 2>/dev/null
 run --preflight tBr2 --keepalive-id k1 >/dev/null
 sed 's/tBr2/tBr/g' memory/builds/tBr2/RUN.md > memory/builds/tBr/RUN.md
 git add -A >/dev/null && git commit -q -m "a record borrowed from a pre-89 preflight" --no-verify
+# ---- TOOL-aGraftedHelix-30: `--authorization` grades `authorization-reachable` ALONE, by the arm
+# ---- --close grades it with, so a reconciling merge learns at the merge what the close would say.
+# ---- AC1: the sibling's BASE README carries no key, so the item is met, and the verb moves nothing:
+# ---- the tree, the record and the remote read the same after it as before.
+read_authorization_witness() { # slug -> the three reads the verb may not move
+  git status --porcelain; git hash-object "memory/builds/$1/RUN.md"; git ls-remote origin
+}
+_az_tip=$(git rev-parse HEAD~1)
+_az_w0=$(read_authorization_witness tBr2)
+out=$(run --authorization tBr2); _az_rc=$?
+hit  "$out" "unattended: authorization-reachable — met · base $_az_tip · anchor refs/heads/main at "
+same "GH30 AC1 a met record exits 0" "$_az_rc" "0"
+same "GH30 AC1 a met record moved nothing" "$(read_authorization_witness tBr2)" "$_az_w0"
+out=$(run --authorization tAbsent); _az_rc=$?
+hit  "$out" "no run-state file, so there is no run whose authorization can be graded"
+same "GH30 AC1 an absent record exits 1" "$_az_rc" "1"
+# ---- AC2: the borrowed record is check 89's, and ONE line then names both exits and not owner-landing.
+_az_w0=$(read_authorization_witness tBr)
+_az_ref=$(run --authorization tBr); _az_rc=$?
+hit  "$_az_ref" "mode prompt; delete the line"
+miss "$_az_ref" "owner-landing"
+same "GH30 AC2 one line names both exits" "$(printf '%s\n' "$_az_ref" | grep -F -- '--abort tBr --code repo-state-out-of-mandate' | grep -cF -- '--handoff tBr --code owner-decision')" "1"
+same "GH30 AC2 a refused record exits 1" "$_az_rc" "1"
+same "GH30 AC2 a refused record moved nothing" "$(read_authorization_witness tBr)" "$_az_w0"
+# ---- AC4: a predicate that never reached the README is NOT EVALUATED - exit 2 and no exits - when the
+# ---- remote does not answer and when the run branch is unpublished; pushed again, the answer returns.
+git remote set-url origin "$ORIGIN_DIR/nope.git"
+out=$(run --authorization tBr2); _az_rc=$?
+hit  "$out" "the remote did not answer, and the anchor is an observation of it"
+hit  "$out" "unattended: authorization-reachable — not evaluated"
+miss "$out" "--handoff"
+same "GH30 AC4 an unanswered remote exits 2" "$_az_rc" "2"
+git remote set-url origin "$ORIGIN"
+git push -q origin --delete unit 2>/dev/null
+out=$(run --authorization tBr2); _az_rc=$?
+hit  "$out" "the remote advertises no tip for the branch this run is on"
+hit  "$out" "unattended: authorization-reachable — not evaluated"
+miss "$out" "--handoff"
+same "GH30 AC4 an unpublished run branch exits 2" "$_az_rc" "2"
+git push -q -f origin "$_az_tip:refs/heads/unit" 2>/dev/null
+out=$(run --authorization tBr2); _az_rc=$?
+hit  "$out" "unattended: authorization-reachable — met · base $_az_tip"
+same "GH30 AC4 the branch pushed again reads met" "$_az_rc" "0"
 out=$(run --close tBr)
 hit  "$out" "the build README declares spec-audit: under an authorization mode that resolves at the second anchor"
 hit  "$out" "specs-audited — not gradable"
 miss "$out" "specs-audited — not owed"
+# ---- GH30 AC3: the close and the verb print ONE check 89 line, byte for byte, because the verb's
+# ---- body grades through a single `dod_met` call and carries no copy of the chain it would refuse on.
+same "GH30 AC3 --close and --authorization print one check 89 line" "$(printf '%s\n' "$out" | grep -F 'check 89 FAILED')" "$(printf '%s\n' "$_az_ref" | grep -F 'check 89 FAILED')"
+_az_body=$(sed -n '/^print_authorization() {/,/^}/p' "$SCRIPT" | grep -v '^[[:space:]]*#')
+same "GH30 AC3 the verb grades through one dod_met call" "$(printf '%s\n' "$_az_body" | grep -c 'dod_met "$slug" "$rel" authorization-reachable')" "1"
+same "GH30 AC3 the verb carries no copy of the chain" "$(printf '%s\n' "$_az_body" | grep -cE 'check_authorization|trusted_base')" "0"
 
 # ---- 50: THE SECOND ANCHOR IS ADMISSIBLE PER MODE. Four arms, because a refusal needs a companion
 # ---- saying it refused the right thing and a companion saying it did not refuse everything.
@@ -15355,7 +15404,13 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # admission arms AC5-AC8, 15 region-two hit/miss/same/mutate lines counted off the block, green on a
 # slice of the aWardedAudit block and each new arm observed red against HEAD's driver; no suite ran.
 # MERGED at the second reconcile with origin/main: this side 2399 plus main's 41 over 1877 = 2440.
-FLOOR_ASSERTIONS=2440
+# RAISED 2440 -> 2463 by TOOL-aGraftedHelix-30: the --authorization arms' 23 region-two assertions,
+# met and moving nothing (5), check 89 with one exits line (5), not evaluated twice and met again
+# (10), and the close's check 89 line plus the source arm (3), MEASURED on a slice of the borrowed-
+# record block behind this prologue on node a, 2026-10-05: 48 executed, green against the kit, every
+# arm red under the parent's driver (check 14), and each staged break - a fact write in the met
+# branch, the not-evaluated branch deleted, the chain inlined - red on its own arms alone; no suite ran.
+FLOOR_ASSERTIONS=2463
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -15500,7 +15555,8 @@ FLOOR_SHARD_1=209
 # RAISED 1697 -> 1706: the same 9 region-two --handoff matrix assertions, see FLOOR_ASSERTIONS.
 # RAISED 1706 -> 1721: the same 15 region-two check-89 admission assertions, see FLOOR_ASSERTIONS.
 # MERGED at the second reconcile with origin/main: this side 2202 plus main's 41 over 1680 = 2243.
-FLOOR_SHARD_2=2243
+# RAISED 2243 -> 2266: the same 23 region-two --authorization assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=2266
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.
