@@ -1,10 +1,13 @@
 # TOOL-dThriftyLanding-4 — the deployer carries a leg's doc reads to an adopter's manifest
 
-**Status:** OPEN · rev-1 · 2026-10-05 · node d · Tier-2 · base c3ef6742 · streams tooling · order 4
+**Status:** CLOSED · rev-2 · 2026-10-05 · node d · Tier-2 · base c3ef6742 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-05-build-TOOL-dThriftyLanding-4-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-dThriftyLanding-4-1-acceptance-ledger.md) | journal | — |
+| [2026-10-05-prompt-TOOL-dThriftyLanding-4-1-build-brief.md](../prompts/2026-10-05-prompt-TOOL-dThriftyLanding-4-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -18,7 +21,8 @@ selfcheck hold a descriptor's `doc_reads` and gov's manifest row equal, as it al
 
 ## 2. Scope (IN)
 
-- **S1** — `write_gate_legs` resolves each `doc_reads` element with `resolve_tokens`. When every
+- **S1** — `write_gate_legs` asks a pure helper, `derive_doc_reads`, which resolves each `doc_reads`
+  element with `resolve_tokens`. When every
   element resolves and each matches a tracked path in the target, the row carries the resolved list;
   a declared empty list is carried as `[]`. When any element fails, the row carries NO `doc_reads`,
   so the leg runs on every doc push. Dropping one element instead would narrow the leg. Observed by
@@ -29,6 +33,9 @@ selfcheck hold a descriptor's `doc_reads` and gov's manifest row equal, as it al
 - **S3** — Selfcheck's leg-correspondence block, 7h, fails when a descriptor's `doc_reads`, with
   `{memory_root}` resolved to gov's memory root, differs from gov's manifest row for that leg, in
   either direction, presence included. Observed by AC4.
+- **S4** — `GATE_DOC_PATHS` joins `POLICY_KEYS`, the repo-local gate-policy keys selfcheck 7h3 refuses
+  in any file a kit ships: which paths are non-code is each repository's answer, and an adopter must
+  never inherit gov's by a kit copying the file that holds it. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -77,17 +84,22 @@ manifest row with none. The descriptors spell repo paths with `{memory_root}` an
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a fixture descriptor's leg declares `doc_reads = ["{memory_root}/builds/"]` and the
-  target tracks a file under memory/builds/ and runs runner 1.25, the emitted row carries `["memory/builds/"]`.
-  Red when: the base writer emits no `doc_reads`.
-- **AC2** — When one element names a path the target does not track, the emitted row carries no
-  `doc_reads` and the run prints `doc_reads omitted`.
-  Red when: the writer emits a narrowed list.
-- **AC3** — When the target's runner declares 1.24, the row carries no `doc_reads`.
+- **AC1** — When `derive_doc_reads` is handed a leg declaring `{memory_root}/builds/` against a target
+  tracking a file under memory/builds/, it returns `["memory/builds/"]`; a declared empty list returns
+  `[]`; and the writer routes every leg through it at the doc-reads floor.
+  Red when: the base module has no such helper and the writer emits no `doc_reads`.
+- **AC2** — When one element names a path the target does not track, or carries an unresolved token,
+  the helper returns no list and a reason, which the writer prints as `doc_reads omitted`.
+  Red when: a narrowed list is returned.
+- **AC3** — When the target's runner declares 1.24, `check_target_reads_subject` at the doc-reads floor
+  answers no, while the same target still answers yes for `subject`.
   Red when: the key reaches a runner whose canary refuses it.
 - **AC4** — When gov's manifest row and its descriptor disagree on `doc_reads`, selfcheck fails
   naming the leg; when they agree, it passes.
   Red when: the two spellings drift with selfcheck green.
+- **AC5** — When the selftest's policy predicate reads `GATE_DOC_PATHS="memory/"`, it matches, and
+  `POLICY_KEYS` names the key.
+  Red when: a kit could ship gov's doc class.
 
 ## 7. Gates
 
@@ -102,6 +114,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-05 · initial draft, from `write_gate_legs` and selfcheck 7h at base.
+- rev-2 · 2026-10-05 · S1 names the helper the writer calls, so AC1 to AC3 observe it directly
+  rather than through a full fixture install; S4 and AC5 add the doc class to the policy keys.
 
 ## 10. Reuse audit
 

@@ -2893,6 +2893,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "derive_doc_reads",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_entries",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"

@@ -4594,6 +4594,28 @@ user_skills = "/tmp/gk-fake-skills"
         bad_g = run_in(scratch_gov("true", "docs/nowhere/"))
         check("a guard in no declared class reds",
               bad_g.returncode == 1 and "declared classes" in bad_g.stdout, bad_g.stdout)
+
+        # ---- D3 (TOOL-dThriftyLanding-4): 7h holds a descriptor's doc_reads and the manifest's equal
+        _d3 = scratch_gov("true", f"{PFX}demo/")
+        _d3k = _d3 / PFX / "demo" / "kit.toml"
+        _d3l = _d3 / PFX / "gate-legs.json"
+        _d3rows = json.loads(_d3l.read_text(encoding="utf-8"))
+        _d3rows[0]["doc_reads"] = ["memory/builds/"]
+        _d3l.write_text(json.dumps(_d3rows, indent=2) + "\n", encoding="utf-8", newline="\n")
+        _r3 = run_in(_d3)
+        check("D3: a manifest doc_reads the descriptor does not declare REDS",
+              _r3.returncode == 1 and "disagree about which doc paths" in _r3.stdout, _r3.stdout)
+        _d3k.write_text(_d3k.read_text(encoding="utf-8").replace(
+            'subject = "repo"\n', 'subject = "repo"\ndoc_reads = ["{memory_root}/builds/"]\n', 1),
+            encoding="utf-8", newline="\n")
+        _r3 = run_in(_d3)
+        check("D3 control: the same paths, spelled through {memory_root}, agree",
+              "disagree about which doc paths" not in _r3.stdout, _r3.stdout)
+        _d3k.write_text(_d3k.read_text(encoding="utf-8").replace(
+            '{memory_root}/builds/', '{memory_root}/gotchas/'), encoding="utf-8", newline="\n")
+        _r3 = run_in(_d3)
+        check("D3: a descriptor naming OTHER doc paths REDS",
+              _r3.returncode == 1 and "disagree about which doc paths" in _r3.stdout, _r3.stdout)
         check("that message says the taxonomy must partition its own input",
               "does not partition its own input" in bad_g.stdout, bad_g.stdout)
 
@@ -4995,9 +5017,12 @@ user_skills = "/tmp/gk-fake-skills"
         _gk_src = (HERE / "govkit.py").read_text(encoding="utf-8")
         check("M5: the predicate this arm grades is the one govkit.py actually compiles",
               '"|".join(re.escape(k) for k in POLICY_KEYS)' in _gk_src, "")
-        check("M5: POLICY_KEYS names the self-test switch and both inherited-red keys",
-              set(_gk_mod.POLICY_KEYS) == {"GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE"},
+        check("M5: POLICY_KEYS names the self-test switch, both inherited-red keys and the doc class",
+              set(_gk_mod.POLICY_KEYS) == {"GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE",
+                                           "GATE_DOC_PATHS"},
               repr(_gk_mod.POLICY_KEYS))
+        check("M5: a doc-class line is caught as policy — 'GATE_DOC_PATHS=\"memory/\"'",
+              bool(_pol_re.match('GATE_DOC_PATHS="memory/"')), "")
         for _s in ("export GATE_SELFTESTS=1", "GATE_SELFTESTS=1",
                    "export GATE_SELFTESTS=1  # gov only", ": ${GATE_SELFTESTS:=1}",
                    "INHERITED_RED=land", "export INHERITED_RED_MAX_AGE=10  # gov only",
@@ -5037,6 +5062,49 @@ user_skills = "/tmp/gk-fake-skills"
             check("M6: the floor is the version the canary's key set moved in",
                   govkit.SUBJECT_FLOOR_RUN_GATES == (1, 1),
                   str(govkit.SUBJECT_FLOOR_RUN_GATES))
+            # D1 (TOOL-dThriftyLanding-4): `doc_reads` rides the same reader at its own floor, the
+            # runner version whose canary admits the key. 1.24 is the last one that refuses it.
+            _rgs.write_text("#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION=1.24\n",
+                            encoding="utf-8", newline="\n")
+            check("D1: a target at run-gates 1.24 does not get doc_reads",
+                  not govkit.check_target_reads_subject(_vp, {"prefix": PFX[:-1]},
+                                                        floor=govkit.DOC_READS_FLOOR_RUN_GATES),
+                  "1.24 accepted")
+            check("D1 control: the same 1.24 target still gets subject",
+                  govkit.check_target_reads_subject(_vp, {"prefix": PFX[:-1]}), "1.24 refused")
+            _rgs.write_text("#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION=1.25\n",
+                            encoding="utf-8", newline="\n")
+            check("D1: a target at run-gates 1.25 does",
+                  govkit.check_target_reads_subject(_vp, {"prefix": PFX[:-1]},
+                                                    floor=govkit.DOC_READS_FLOOR_RUN_GATES),
+                  "1.25 refused")
+            check("D1: the doc_reads floor is the runner version that reads the key",
+                  govkit.DOC_READS_FLOOR_RUN_GATES == (1, 25), str(govkit.DOC_READS_FLOOR_RUN_GATES))
+
+        # ---- D2 (TOOL-dThriftyLanding-4): derive_doc_reads is ALL OR NOTHING ---------------------
+        # A guard that loses an element runs less often; a doc_reads list that loses one SKIPS on the
+        # doc push touching the lost path. So one bad element omits the key, and the leg runs.
+        _have = {"memory/builds/x/README.md", "memory/gotchas/a.md", "tools/k/k.sh"}
+        _ctx = {"memory_root": "memory", "kit": "tools/k"}
+        _got, _why = govkit.derive_doc_reads({"doc_reads": ["{memory_root}/builds/"]}, _ctx, _have)
+        check("D2: a resolvable, tracked element is carried resolved",
+              _got == ["memory/builds/"] and _why == "", f"{_got!r} {_why!r}")
+        _got, _why = govkit.derive_doc_reads({"doc_reads": []}, _ctx, _have)
+        check("D2: a declared EMPTY list is carried as []", _got == [] and _why == "", repr(_got))
+        _got, _why = govkit.derive_doc_reads({}, _ctx, _have)
+        check("D2: no declaration carries nothing and says nothing", _got is None and _why == "",
+              repr(_got))
+        _got, _why = govkit.derive_doc_reads(
+            {"doc_reads": ["{memory_root}/builds/", "{memory_root}/nowhere/"]}, _ctx, _have)
+        check("D2: one untracked element omits the WHOLE key, never a narrowed list",
+              _got is None and "matches no tracked path" in _why, f"{_got!r} {_why!r}")
+        _got, _why = govkit.derive_doc_reads({"doc_reads": ["{map_root}/x/"]}, _ctx, _have)
+        check("D2: an unresolved token omits the key and names the token",
+              _got is None and "map_root" in _why, f"{_got!r} {_why!r}")
+        _gk_src_d = (HERE / "govkit.py").read_text(encoding="utf-8")
+        check("D2: the manifest writer routes doc_reads through derive_doc_reads at the floor",
+              "derive_doc_reads(leg, ctx, have)" in _gk_src_d
+              and "floor=DOC_READS_FLOOR_RUN_GATES" in _gk_src_d, "")
 
         # AC5 — the header says what the check does NOT decide, in the generated file itself, where
         # a reader who found the pin will actually be looking.

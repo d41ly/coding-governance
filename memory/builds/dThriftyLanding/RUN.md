@@ -46,3 +46,13 @@ base: 9c49bed108a9407d278b1ad701b86613f1046f0b
 2026-10-05T11:55:46Z brief · item TOOL-dThriftyLanding-3 · reason 83004d56e8af memory/builds/dThriftyLanding/prompts/2026-10-05-prompt-TOOL-dThriftyLanding-3-1-build-brief.md
 
 2026-10-05T11:55:54Z dispatch · item 501e0a9a TOOL-dThriftyLanding-3 · reason .githooks/pre-push .githooks/pre-push.test.sh memory/builds/dThriftyLanding/spec/2026-10-05-spec-TOOL-dThriftyLanding-3.md memory/builds/dThriftyLanding/build/2026-10-05-build-TOOL-dThriftyLanding-3-1-acceptance-ledger.md memory/builds/dThriftyLanding/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-05T12:04:57Z brief · item TOOL-dThriftyLanding-4 · reason b673ca879f6f memory/builds/dThriftyLanding/prompts/2026-10-05-prompt-TOOL-dThriftyLanding-4-1-build-brief.md
+
+2026-10-05T12:05:08Z dispatch · item ff628c54 TOOL-dThriftyLanding-4 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dThriftyLanding/spec/2026-10-05-spec-TOOL-dThriftyLanding-4.md memory/builds/dThriftyLanding/build/2026-10-05-build-TOOL-dThriftyLanding-4-1-acceptance-ledger.md memory/builds/dThriftyLanding/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-05T12:05:22Z brief · item TOOL-dThriftyLanding-4 · reason f951ade9084a memory/builds/dThriftyLanding/prompts/2026-10-05-prompt-TOOL-dThriftyLanding-4-1-build-brief.md
+
+2026-10-05T12:06:20Z dispatch · item ff628c54 TOOL-dThriftyLanding-4 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dThriftyLanding/spec/2026-10-05-spec-TOOL-dThriftyLanding-4.md memory/builds/dThriftyLanding/build/2026-10-05-build-TOOL-dThriftyLanding-4-1-acceptance-ledger.md memory/builds/dThriftyLanding/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/symbols.json
+
+2026-10-05T12:06:43Z dispatch · item ff628c54 TOOL-dThriftyLanding-4 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dThriftyLanding/spec/2026-10-05-spec-TOOL-dThriftyLanding-4.md memory/builds/dThriftyLanding/build/2026-10-05-build-TOOL-dThriftyLanding-4-1-acceptance-ledger.md memory/builds/dThriftyLanding/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/symbols.json memory/map/generated/symbols.json
