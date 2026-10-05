@@ -312,3 +312,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T05:59:33Z brief · item TOOL-aMendedFleet-37 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
 
 2026-10-05T06:06:50Z dispatch · item 2829d460 TOOL-aMendedFleet-37 · reason tools/codebase-map/map_lib.py tools/codebase-map/map_diff.py tools/codebase-map/selftest.py tools/codebase-map/README.md tools/drift-audit/drift_report.py tools/drift-audit/drift_signals.py tools/drift-audit/selftest.py tools/drift-audit/README.md memory/map/generated/symbols.json memory/map/features/codebase-map.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-37.md memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-37-1-acceptance-ledger.md memory/backlog/TOOL.md memory/builds/aMendedFleet/README.md
+
+2026-10-05T06:33:12Z brief · item TOOL-aMendedFleet-38 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
