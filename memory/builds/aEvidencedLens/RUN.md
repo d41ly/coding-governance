@@ -174,3 +174,7 @@ base: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 2026-10-05T04:39:47Z review · item aEvidencedLens · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 9 · disposition promote
 
 2026-10-05T04:42:24Z rescope · item add TOOL-aEvidencedLens-21 · reason closing diff review round 1 (2026-10-05-review-TOOL-aEvidencedLens-1-closing-diff-review-round1.md): its 4 MEDIUM and 5 LOW findings, ids 1 2 4 5 6 7 8 10 11, promoted as one batched unit
+
+2026-10-05T05:20:39Z dispatch · item 13971198 TOOL-aEvidencedLens-21 · reason memory/LIVE.md memory/ledger/2026-10.md memory/builds/aEvidencedLens/build/2026-10-05-build-TOOL-aEvidencedLens-21-1-ab-replay.md memory/builds/aEvidencedLens/build/2026-10-05-build-TOOL-aEvidencedLens-21-2-acceptance-ledger.md tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/unattended.test.sh tools/workflows/tier2-review.js tools/workflows/tier2-review.template.js tools/workflows/tier2-review.test.sh tools/workflows/unattended-build.js tools/workflows/unattended-build.template.js tools/workflows/unattended-build.test.sh memory/map/generated/symbols.json memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-21.md memory/builds/aEvidencedLens/README.md
+
+2026-10-05T05:20:42Z brief · item TOOL-aEvidencedLens-21 · reason 1573e2a20228 memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-21-2-build-brief.md
