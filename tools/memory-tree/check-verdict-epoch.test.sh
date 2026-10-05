@@ -37,7 +37,8 @@ fails=0
 arm() { # label · want-rc · expected-substring · dir · [base]
   local label=$1 wantrc=$2 want=$3 dir=$4 base=${5:-}
   local out rc bad=0
-  out=$(cd "$dir" && unset GATE_PUSH_BASE && { [ -z "${ARM_GPB:-}" ] || export GATE_PUSH_BASE=$ARM_GPB; }         && bash "$GATE" $base 2>&1); rc=$?
+  out=$(cd "$dir" && unset GATE_PUSH_BASE && { [ -z "${ARM_GPB:-}" ] || export GATE_PUSH_BASE=$ARM_GPB; } \
+        && bash "$GATE" $base 2>&1); rc=$?
   [ "$rc" = "$wantrc" ] || bad=1
   case "$out" in *"$want"*) ;; *) bad=1 ;; esac
   if [ "$bad" = 0 ]; then printf 'arm ok    %s\n' "$label"; return; fi
@@ -210,11 +211,9 @@ ARM_GPB=$BASE_G arm '...and a bump minted INTO the merge onto the base dates it'
 # never a FAILED, is what this arm accepts.
 live=$(cd "$(git -C "$HERE" rev-parse --show-toplevel)" && unset GATE_PUSH_BASE && bash "$GATE" 2>&1); lrc=$?
 case "$lrc:$live" in
-  0:*"clean —"*|0:*"owed at the lander"*) printf 'arm ok    %s
-' 'the live tree passes, and says so as a clean or owed verdict' ;;
-  *) fails=$((fails+1)); printf 'arm FAIL  %s — got rc=%s
-' 'the live tree passes' "$lrc"; printf '%s
-' "$live" | sed 's/^/      /' ;;
+  0:*"clean —"*|0:*"owed at the lander"*) printf 'arm ok    %s\n' 'the live tree passes, and says so as a clean or owed verdict' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  %s — got rc=%s\n' 'the live tree passes' "$lrc"
+     printf '%s\n' "$live" | sed 's/^/      /' ;;
 esac
 
 if [ "$fails" = 0 ]; then echo "PASS — check-verdict-epoch: all arms held"; exit 0; fi
