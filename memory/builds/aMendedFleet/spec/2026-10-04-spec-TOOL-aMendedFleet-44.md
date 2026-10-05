@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-44 — the map gate refuses a present-tense count of an inventory population in dossier prose
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 44
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 44
 
 <!-- gen:spec-records -->
 

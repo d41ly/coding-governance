@@ -366,3 +366,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T09:22:30Z dispatch · item 4740c13e TOOL-aMendedFleet-44 · reason tools/codebase-map/map_lib.py tools/codebase-map/test_codebase_map.py tools/codebase-map/test_codebase_map.template.py tools/codebase-map/selftest.py tools/codebase-map/README.md memory/map/README.md memory/map/features/run-gates.md memory/map/features/codebase-map.md memory/map/generated/symbols.json
 
 2026-10-05T09:28:45Z dispatch · item 4740c13e TOOL-aMendedFleet-44 · reason tools/codebase-map/map_lib.py tools/codebase-map/test_codebase_map.py tools/codebase-map/test_codebase_map.template.py tools/codebase-map/selftest.py tools/codebase-map/README.md memory/map/README.md memory/map/features/run-gates.md memory/map/features/codebase-map.md memory/map/generated/symbols.json memory/LIVE.md
+
+2026-10-05T09:32:36Z dispatch · item 53cfc60c TOOL-aMendedFleet-44 · reason tools/codebase-map/gen_map.py memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-44.md memory/LIVE.md memory/ledger/2026-10.md
