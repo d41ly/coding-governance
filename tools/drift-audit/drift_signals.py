@@ -264,16 +264,15 @@ PINS: dict[str, int] = {
     # (TOOL-dDerivedDocket-34 S10): no backlog status is authored once BACKLOG_MODE is builds, so a
     # row token compared with its spec's status has nothing left to read. The stance it counted is
     # superseded in `memory/DECISIONS.md` under that unit's id.
-    # 3 — MEASURED on the day the table was ratified, and non-zero BY CONSTRUCTION rather than as
-    # tolerated rot. `--scaffold` seeds a concept only where the corpus has a live site, spells it the
-    # canon's way, and a human then curates; curation ADDS verbs the corpus does not use yet: `measure`, `print`
-    # and `set` are declared because that is what this repo should call those operations, not because
-    # anything is already called that. Reading this 3 as debt inverts what it records.
+    # DRAINED to 0 at TOOL-aMendedFleet-47. It was seeded at 3 for the aspirational verbs curation
+    # declared before any definition led with them; every one of them is in use now, and the signal
+    # reads 0 of the declared table. GATEABLE, so a NEW aspirational verb reds `--check` until a
+    # definition uses it, which is the intended price of declaring one.
     #
     # It is the DELETION direction that earns the signal: a verb outliving the code that justified it
-    # is the one thing neither the map ratchet nor the lexicon gate can see. Lower the pin when a verb
-    # genuinely comes into use — never raise it to admit a new aspirational one without saying which.
-    "lexicon_verbs_declared_but_unused": 3,
+    # is the one thing neither the map ratchet nor the lexicon gate can see. Raising this pin to admit
+    # an aspirational verb is the RATCHETS row below, which needs the move written here with a reason.
+    "lexicon_verbs_declared_but_unused": 0,
     # 0, and it can move: the stamp is a date and the language surface is a commit date, so adding a
     # LANGS entry without re-ratifying turns this to 1 the same day.
     # 81 — the live (non-terminal) row count of the LARGEST backlog shard, measured 2026-08-18 on
@@ -319,7 +318,10 @@ PINS: dict[str, int] = {
     # nothing. What the pin buys is the status column, which reads `ok` at the measured value and
     # `over pin` once it rises. The records are not named here, for the reason the non-terminal-specs
     # pin above gives: read the signal's own `detail`.
-    "run_records_nonterminal_but_merged": 5,
+    # RE-SEEDED at the drained value by TOOL-aMendedFleet-47, which stopped counting a `LANDING`
+    # record whose landing commit is on the base ref (owner ruling D12-i2, derived LANDED). What
+    # remains is non-`LANDING` records only; the detail's summary line counts the derived ones.
+    "run_records_nonterminal_but_merged": 2,
     # MEASURED at TOOL-aMendedFleet-15, after the prior unit's five dispositions. It stands in
     # for check 20's `SEVERITY_UNLABELLED_PIN`, which the backlog switch-over blanked because the
     # shard census reads a generated view as zero rows; this signal shipped with no pin, so it read
@@ -400,6 +402,9 @@ RATCHETS: list[dict] = [
     {"file": _THIS_FILE, "key": "backlog_asks_unlabelled", "weakens": "up"},
     {"file": _THIS_FILE, "key": "cutoff_keys_armed", "weakens": "up"},
     {"file": _THIS_FILE, "key": "dossiers_older_than_their_paths", "weakens": "up"},
+    # Gateable at 0: without this row, raising it to admit a new aspirational verb would look like
+    # a drain to `--check` (TOOL-aNumeralWarden-3).
+    {"file": _THIS_FILE, "key": "lexicon_verbs_declared_but_unused", "weakens": "up"},
     # A pin in ANOTHER kit's conf. The ratchet does not care which file a scalar lives in, and
     # codebase-map has no shrink-only mechanism of its own - so an adopter without drift-audit
     # gets a declared pin and no enforcement, which the conf example states rather than hides.

@@ -2124,24 +2124,37 @@ def build_backlog_stragglers(ctx) -> dict:
 # the table instead.
 #
 # WHAT IT COUNTS, from the record at HEAD and never from the working tree:
-#   - its phase is not terminal;
+#   - its phase is not terminal, and it is not derived LANDED (below);
 #   - its witness is an ancestor of the base ref;
 #   - its witness is neither equal to nor an ancestor of the record's own `base:`.
 # The third is the one that needs saying. The witness is HEAD at the last verb that writes one, and
 # `--close` writes none, so a run that went from preflight to close leaves its witness AT its base
 # even when its own commits merged. That record is UNJUDGEABLE: counted apart with its reason, never
-# scored clean and never counted, because judging it needs the run's own commits, which three git
+# scored clean and never counted, because judging it needs the run's own commits, which these git
 # calls do not read. The run model reads them.
 #
-# THREE GIT CALLS, whatever the record count: one `ls-tree` to enumerate, one `rev-list --parents`
-# of the base ref, and one `cat-file --batch` HELD OPEN, because the witnesses are only known once the
-# records it returns are read. `cat-file` flushes after every object, so one question and one answer
-# at a time cannot deadlock on a buffer. The witness-to-base order is walked on the parent graph the
-# rev-list printed: the SET of reachable commits alone cannot order two of its members.
+# derived LANDED (owner ruling D12-i2, TOOL-aMendedFleet-47). A `LANDING` record whose landing
+# commit is on the base ref IS landed, and the driver and its gate leg already read it so through
+# `read_landing_commit` in the unattended kit's library. That rule is RE-SPELLED here, offline,
+# because this kit is copy-installed without that one: the landing commit is the newest commit in
+# HEAD's history that changed the record's path. Such a record is excluded BEFORE its witness is
+# placed, so it is neither counted nor unjudgeable, and the detail's summary line counts it.
+#
+# FOUR GIT CALLS AT MOST, whatever the record count: one `ls-tree` to enumerate, one `rev-list
+# --parents` of the base ref, one `cat-file --batch` HELD OPEN, because the witnesses are only known
+# once the records it returns are read, and one `log --name-only` over every `LANDING` record's
+# path, made only where such a record exists. `cat-file` flushes after every object, so one question
+# and one answer at a time cannot deadlock on a buffer. The witness-to-base order is walked on the
+# parent graph the rev-list printed: the SET of reachable commits alone cannot order two of its
+# members. A landing commit is on the base ref exactly when it is a key of that same graph.
 #
 # WHAT IT DOES NOT SEE, said here because a structural count reads as a semantic one. A refused
 # landing leaves no tracked row, so no sub-class can name one, and the detail says so on every run.
 # A shallow clone truncates the rev-list, which can drop a record from the count and never add one.
+# The batched `log` disagrees with the driver's per-record `git log -1` in one shape: a record whose
+# newest change is a MERGE that resolved it, because a merge prints no names without `-m`. It then
+# names an older commit on one side of that merge, which is still on any base ref holding the merge,
+# so the disagreement can only leave a record counted, never derive one the driver would not.
 # --------------------------------------------------------------------------------------------
 
 # The driver's own declarations, SPELLED HERE because this kit is copy-installed and must run in a
@@ -2311,10 +2324,30 @@ def build_nonterminal_merged_runs(ctx) -> dict:
         if shas:
             parents[shas[0]] = shas[1:]
 
-    counted, stale, detail = 0, 0, []
+    # CALL 4 — derived LANDED: each `LANDING` record's landing commit, from ONE `log` over all their
+    # paths. The first commit printed above a path is the newest that changed it.
+    landing_paths = [path for path, rec in parsed if rec["phase"] == "LANDING"]
+    landing: dict = {}
+    if landing_paths:
+        log = ctx.git.run("log", "--format=%x01%H", "--name-only", "--no-renames", "HEAD", "--",
+                          *landing_paths)
+        if log.returncode != 0:
+            return _build_run_dead(name, len(records), "DEAD PROBE — `git log` of the LANDING records "
+                                                       "failed, so no landing commit was read")
+        want, sha = set(landing_paths), ""
+        for line in log.stdout.split("\n"):
+            if line.startswith("\x01"):
+                sha = line[1:].strip()
+            elif line in want and line not in landing:
+                landing[line] = sha
+
+    counted, stale, derived, detail = 0, 0, 0, []
     for path, rec in parsed:
         phase = rec["phase"]
         if phase in _RUN_PHASES_TERMINAL:
+            continue
+        if landing.get(path) in parents:
+            derived += 1                      # derived LANDED: neither counted nor unjudgeable
             continue
         w_in, b_in = rec["witness"], rec["base"]
         why, rel = None, "unknown"
@@ -2353,6 +2386,9 @@ def build_nonterminal_merged_runs(ctx) -> dict:
             continue
         counted += 1
         detail.append(f"{path} {phase} {w_in[:8]} {rel} {_derive_run_subclass(rec['last'])}")
+    # Printed at 0 too, so a drained value is told apart from a probe that stopped reading them.
+    detail.append(f"derived — {derived} of {len(landing_paths)} LANDING records read LANDED: "
+                  f"their landing commit is on {ctx.git.base_ref}")
     detail.append(_RUN_REFUSED_NOTE)
     return {
         "signal": name,
@@ -2365,6 +2401,7 @@ def build_nonterminal_merged_runs(ctx) -> dict:
         # an empty population returned NOT ASKED or DEAD before reaching this line.
         "live": bool(parsed),
         "unjudgeable": stale,
+        "derived_landed": derived,
         "detail": detail,
     }
 

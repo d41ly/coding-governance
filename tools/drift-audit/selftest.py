@@ -93,7 +93,9 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 295
+CHECK_FLOOR = 302
+# 295 -> 302, TOOL-aMendedFleet-47: the run-records arm's derived-LANDED checks — three derived
+# fixtures left unlisted, their count, the summary line, and the LANDING call-count size's two.
 # 289 -> 295, TOOL-aMendedFleet-37: the six checks of `test_stale_dossiers`.
 # 284 -> 289, TOOL-aMendedFleet-21: the five checks of `test_cutoff_keys_armed`.
 # 277 -> 284, TOOL-aMendedFleet-8: the seven checks of `test_remote_ci_red_streak`.
@@ -2868,17 +2870,27 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
     # A kind the driver does not declare is not a parked row, so it cannot be the last one.
     add_counted("tUndeclaredKind", "surfaced-park",
                 [P("decision", "asked"), P("heartbeat", "no driver writes this kind")])
-    add_counted("tLanding", "surfaced-park", [P("decision", "asked")], phase="LANDING")
+    # ---- TOOL-aMendedFleet-47, derived LANDED: a `LANDING` record whose landing commit is on `main`
+    # is neither counted nor unjudgeable, whatever its witness says. Without the derivation these
+    # three read as a counted row and as the two witness-at-or-behind-base rows below, which is what
+    # makes them discriminate.
+    derived = [
+        _write_run_record(r, f"{B}/tLanding/RUN.md", {"phase": "LANDING", "witness": tip, "base": early},
+                          [P("decision", "asked")]),
+        _write_run_record(r, f"{B}/tLandingAtBase/RUN.md", {"phase": "LANDING", "witness": tip, "base": tip}),
+        _write_run_record(r, f"{B}/tLandingBehind/RUN.md", {"phase": "LANDING", "witness": early, "base": tip}),
+    ]
 
     # ---- AC3, the unjudgeable half: counted apart with the reason, never scored clean, never counted.
+    # The two stale-witness rows are BUILDING, since a LANDING one on `main` now derives LANDED.
     stale: dict = {}
 
     def add_stale(slug: str, facts: dict, relation: str, why: str) -> None:
         stale[_write_run_record(r, f"{B}/{slug}/RUN.md", facts)] = (relation, why)
 
-    add_stale("tClosedAtBase", {"phase": "LANDING", "witness": tip, "base": tip},
+    add_stale("tClosedAtBase", {"phase": "BUILDING", "witness": tip, "base": tip},
               "equal", "witness not re-written since preflight")
-    add_stale("tBehindBase", {"phase": "LANDING", "witness": early, "base": tip},
+    add_stale("tBehindBase", {"phase": "BUILDING", "witness": early, "base": tip},
               "behind", "witness not re-written since preflight")
     add_stale("tNoPhase", {"witness": tip, "base": early}, "unknown", "no phase: fact")
     add_stale("tNoWitness", {"phase": "BUILDING", "base": early}, "unknown", "no witness: fact")
@@ -2907,6 +2919,13 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
     add_counted("tWorktreeDone", "no-rows")
     run_commit("chore: run records")
 
+    # ...and a LANDING record whose landing commit is NOT on `main`: committed on a branch HEAD now
+    # sits on, so the derivation must read the base ref and never HEAD. It stays counted.
+    run(["git", "checkout", "-q", "-b", "landing-ahead"], r)
+    add_counted("tLandingAhead", "surfaced-park", [P("decision", "asked")], phase="LANDING")
+    run(["git", "add", "--", f"{B}/tLandingAhead/RUN.md"], r)
+    run(["git", "commit", "-q", "-m", "chore: a landing not yet on main", "--no-verify"], r)
+
     # AFTER the commit the working tree contradicts HEAD for two records, and a third record exists in
     # the working tree alone. Every one of these is read at HEAD or not at all.
     _write_run_record(r, f"{B}/tWorktreeLive/RUN.md", {"phase": "BUILDING", "witness": tip, "base": early})
@@ -2916,7 +2935,7 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
 
     got = read_signal()
     rows = {d.split(" ", 1)[0]: d for d in got["detail"] if not d.startswith("note")}
-    tracked = len(counted) + len(stale) + len(quiet)
+    tracked = len(counted) + len(stale) + len(quiet) + len(derived)
     check("run records: the population is every TRACKED record, the archive in and the untracked out",
           got["of"] == tracked, f"of {got['of']}, wanted {tracked}")
     check("run records: live over a non-empty population", got["live"] is True, f"live={got['live']}")
@@ -2932,9 +2951,14 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
         row = rows.get(rel, "")
         check(f"run records: {rel.split('/')[2]} is unjudgeable, {relation}, with its reason",
               f" {relation} unjudgeable \u2014 {why}" in row, f"got {row!r}")
-    for rel in quiet + [untracked]:
+    for rel in quiet + derived + [untracked]:
         check(f"run records: {rel.split('/')[2]} is neither counted nor listed",
               rel not in rows, f"got {rows.get(rel)!r}")
+    check("run records: every LANDING record landed on main reads derived LANDED, and only those",
+          got.get("derived_landed") == len(derived), f"derived_landed {got.get('derived_landed')}")
+    want_sum = f"derived \u2014 {len(derived)} of {len(derived) + 1} LANDING records read LANDED"
+    check("run records: the derived summary line sits just before the closing note",
+          got["detail"][-2].startswith(want_sum), f"got {got['detail'][-2]!r}, wanted {want_sum!r}")
     check("run records: the refused-landing note closes the detail",
           got["detail"][-1].startswith("note \u2014 a refused landing"), f"last {got['detail'][-1]!r}")
 
@@ -2968,19 +2992,25 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
         run(["git", "commit", "-q", "-m", name, "--no-verify"], small)
     wit = run(["git", "rev-parse", "HEAD"], small).stdout.strip()
     bas = run(["git", "rev-parse", "HEAD~1"], small).stdout.strip()
+    # TOOL-aMendedFleet-47: the third size adds FIVE `LANDING` records, each derived LANDED, so one
+    # batched `log` costs a fourth call where a per-record lookup would cost eight.
     per_size = {}
-    for lo, hi in ((0, 5), (5, 50)):
+    for lo, hi, phase in ((0, 5, "BUILDING"), (5, 50, "BUILDING"), (50, 55, "LANDING")):
         for i in range(lo, hi):
             _write_run_record(small, f"{B}/tCall{i}/RUN.md",
-                              {"phase": "BUILDING", "witness": wit, "base": bas}, [P("decision", "x")])
+                              {"phase": phase, "witness": wit, "base": bas}, [P("decision", "x")])
         run(["git", "add", "-A"], small)
         run(["git", "commit", "-q", "-m", f"{hi} records", "--no-verify"], small)
         seen = dr.build_nonterminal_merged_runs(_build_run_ctx(dr, small))
-        per_size[hi] = (_measure_git_calls(dr, small), seen["value"])
-    for size, (calls, value) in sorted(per_size.items()):
-        check(f"run records: {size} records are all read and counted (the premise)",
-              value == size, f"value {value}")
-        check(f"run records: {size} records cost three git calls", calls == 3, f"{calls} calls")
+        per_size[hi] = (_measure_git_calls(dr, small), seen["value"], seen.get("derived_landed"))
+    for size, (calls, value, got_derived) in sorted(per_size.items()):
+        landings = max(0, size - 50)
+        check(f"run records: {size} records are all read, {landings} derived LANDED (the premise)",
+              value == size - landings and got_derived == landings,
+              f"value {value} derived_landed {got_derived}")
+        want_calls = 4 if landings else 3
+        check(f"run records: {size} records cost {want_calls} git calls", calls == want_calls,
+              f"{calls} calls")
 
 
 def _extract_driver_set(text: str, name: str):
