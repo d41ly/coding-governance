@@ -516,8 +516,9 @@ const ITER_CALL = /\.\s*(map|flatMap|forEach|filter|reduce|reduceRight|some|ever
 // or `do\s*\{` can never match there. The `do` spelling is deliberately absent from the tail form: a
 // `do` block opens with a BRACE, so it never appears as an enclosing paren opener.
 //
-// Measured before wiring, over all eight tracked *.js: ZERO lines match the widened form and not the
-// old one, so nothing currently admitted becomes denied. The widening reaches the evasions only.
+// Measured before wiring, at 3ff9cc140 (2026-09-05), over all eight tracked *.js: ZERO lines
+// matched the widened form and not the old one, so nothing admitted when this was written became
+// denied. The widening reaches the evasions only.
 const LOOP_KEYWORDS = 'for(?:\\s+await)?|while'
 const LOOP_HEADER = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*\\(|\\bdo\\s*\\{')
 const LOOP_HEADER_G = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*\\(|\\bdo\\s*\\{', 'g')

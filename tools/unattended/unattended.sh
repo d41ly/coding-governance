@@ -2563,8 +2563,8 @@ check_authorization() { # slug · base
   AUTH_MAY=$(printf '%s\n' "$_fm" | sed -n 's/^may=//p' | head -1)
   AUTH_MAY_SET=0
   case $'\n'"$_fm" in *$'\n'may=*) AUTH_MAY_SET=1 ;; esac
-  # ABSENT is `slug` - every build README in every adopter's tree today declares nothing, and that
-  # is the ordinary case, not a defect. A value OUTSIDE the closed set is a refusal rather than a
+  # ABSENT is `slug` - a build README that declares nothing is the ordinary case, not a defect.
+  # A value OUTSIDE the closed set is a refusal rather than a
   # default: defaulting an unrecognised mode to either member lets a typo select a discipline
   # nobody declared, which is the failure shape ANCHOR_SCOPE's own value guard exists to avoid.
   [ -n "$AUTH_MODE" ] || AUTH_MODE=slug
@@ -4181,14 +4181,15 @@ verb_plan() { # slug
   load_spec_facts $specs
   # S6 - THE TWO `NOT A UNIT` DIAGNOSTICS, reported FIRST and from the spec files, because the region
   # cannot carry them: `render_region` emits rows only for specs whose status header parsed, so a file
-  # with none has no row to appear in. Five tracked specs produce the first row today and ZERO produce
-  # the second, which the driver's own comment below already states - so the second is armed by
-  # fixture or not at all.
+  # with none has no row to appear in. At c80d92333 (2026-08-25) five tracked specs produced the
+  # first row and ZERO produced the second, which the driver's own comment below already states -
+  # so the second is armed by fixture or not at all.
   # R3-M4 — the renderable count comes from `spec_ids`, which is this driver's OWN answer to "does
   # this spec parse as a unit" and whose comment says it exists so two callers cannot disagree. The
   # inline count that stood here was a third spelling of that predicate, looser than the generator's,
   # so the stale-region refusal could name an inert repair. Latent — zero of 277 tracked specs
-  # disagree today — and removed rather than left to be discovered by the first one that does.
+  # disagreed at 1ce89563a (2026-08-25) — and removed rather than left to be discovered by the
+  # first one that does.
   # TOOL-aCollapsedScan-1 - both readers below are map lookups now, and the count comes off those
   # maps rather than being priced with a sort and a grep. `basename` went too: it is an exec and
   # the expansion is not.
@@ -5537,8 +5538,8 @@ verb_preflight() { # slug · keepalive-id
   [ -n "$(fact "$rel" mode)" ] || set_fact "$rel" mode "${AUTH_MODE:-slug}" || return 1
   # TOOL-dDerivedDocket-19 S1 - THE GRANT, PINNED ONCE for the reason the mode is. Only a `slug` README
   # can reach here carrying one, because the check above refuses the key under every other mode, so
-  # every other run pins `none` - and so does a `slug` README that declares nothing, which is every
-  # README in this tree today. Printed, because the leg re-reads it and a reader should not have to.
+  # every other run pins `none` - and so does a `slug` README that declares nothing, the ordinary
+  # case. Printed, because the leg re-reads it and a reader should not have to.
   [ -n "$(fact "$rel" may)" ] || set_fact "$rel" may "${AUTH_MAY:-none}" || return 1
   echo "unattended: preflight — grant pinned as may: $(fact "$rel" may)"
   # TOOL-dDerivedDocket-16 S3 - THE THREE ASK FACTS, pinned ONCE for the reason `base` and the anchor
@@ -8663,8 +8664,9 @@ $_bcnon"
       # ---- The grade is a single token by design.
       # ----
       # ---- DATE-GRANDFATHERED on the spec's FILENAME date against SPEC_THIN_CUTOFF, the same idiom
-      # ---- UNITS_REGION_CUTOFF uses. Two of 307 tracked CLOSED specs grade THIN today, both from a
-      # ---- pre-kit July build, and a term that reds a landed spec no run may rewrite is unlandable.
+      # ---- UNITS_REGION_CUTOFF uses. Two of 307 tracked CLOSED specs graded THIN at 788908bcb
+      # ---- (2026-08-31), both from a pre-kit July build, and a term that reds a landed spec no
+      # ---- run may rewrite is unlandable.
       # ---- BLANK or absent turns the term off entirely, which is announced rather than silent.
       local _bcthin="" _bcid _bcsp _bcdate
       if [ -z "${SPEC_THIN_CUTOFF:-}" ]; then

@@ -633,7 +633,7 @@ def write_vintage_receipt(govroot: pathlib.Path, target: pathlib.Path,
     through the engine's own helpers, so the fixture and the thing it grades cannot disagree about
     what a blob is named. `version` and `oid` stay as `apply` wrote them at HEAD, so any comparison
     of either against a vintage reads as if the target were at HEAD, whichever `--to` a run names.
-    No arm grades either field over these fixtures today; one that does must rewind them first.
+    An arm that grades either field over these fixtures must rewind them first.
 
     A row with no `source` is left as `apply` wrote it. `apply` emits one -- the synthesized
     `attributes` row -- when its selection or a kit the receipt already records declares an `lf_pin`,
@@ -2313,8 +2313,8 @@ def main() -> int:
               any(u["dest"] == dest and u["role"] == "project-owned"
                   for u in with_co["unlanded"]), "")
 
-        # AC2 — the precedence note reports BOTH figures. Zero carve-outs-that-change is the true
-        # state of gov today and must NOT red; hiding it behind a single number is what let the first
+        # AC2 — the precedence note reports BOTH figures. Zero carve-outs-that-change is a true
+        # state gov has been in and must NOT red; hiding it behind a single number is what let the first
         # fold claim a byte-level effect the resolver does not have.
         ps = run("selfcheck")
         check("selfcheck's precedence note reports carve-outs declared AND how many change a write",

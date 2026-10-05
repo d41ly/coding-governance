@@ -88,7 +88,8 @@ class Candidate:
     detail: str = ""                # inventory id / owning dossier — human context
 
 
-# MULTI-LINE and COMMENTED arrays are legal TOML. This corpus has NEITHER today — measured, and
+# MULTI-LINE and COMMENTED arrays are legal TOML. This corpus had NEITHER when this was written, at
+# 504533fb4 (2026-09-05) — measured, and
 # said plainly, because an earlier revision of this comment claimed it had both in the build that
 # shipped the rule against assertions with no observation behind them. The handling is kept anyway:
 # the field is authored by hand, both shapes are legal, and without the strip a `# why` comment was

@@ -684,7 +684,8 @@ def derive_marker_basis(root: pathlib.Path, descs: dict[str, tuple[dict, str]]) 
     """
     # `-z` AND A NUL SPLIT, never a whitespace one: git quotes a non-ASCII path and prints a spaced
     # one raw, so a bare `.split()` here loses both. Same defect as the renormalize guards, one
-    # repository over — gov's own tree today has no such path, which is exactly why it would rot.
+    # repository over — a tree carrying no such path never exercises the split, which is exactly
+    # why it would rot.
     tracked_gov = [f for f in subprocess.run(
         ["git", "-C", str(root), "ls-files", "-z"],
         capture_output=True, text=True).stdout.split("\0") if f]
@@ -2032,7 +2033,8 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     _numv = re.compile(r"([0-9]+(?:\.[0-9]+)+)")
     # `-z` AND A NUL SPLIT, never a whitespace one: git quotes a non-ASCII path and prints a spaced
     # one raw, so a bare `.split()` here loses both. Same defect as the renormalize guards, one
-    # repository over — gov's own tree today has no such path, which is exactly why it would rot.
+    # repository over — a tree carrying no such path never exercises the split, which is exactly
+    # why it would rot.
     # The basis is `derive_marker_basis`, which `selfcheck --fix` writes through too
     # (TOOL-aMendedFleet-64 S1): one population, so the fixer writes exactly what is graded.
     _claimed = derive_marker_basis(root, descs)
@@ -2500,9 +2502,9 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                    f"must supply no bytes for a carved source, and this is the shape that landed "
                    f"gov's own filled extractors in a target")
         # Does the carve-out change any WRITE, or is it redundant with destination last-wins? Both
-        # figures are reported, and a zero on the second does NOT red. Measured on gov today it IS
-        # zero: both shipped carve-outs sit in front of a seed rule that already wins the same
-        # destination. Reporting only the first figure would hide that; reddening on the second would
+        # figures are reported, and a zero on the second does NOT red. Measured on gov at 0dfc56ffa
+        # (2026-08-16) it WAS zero: both shipped carve-outs sat in front of a seed rule that already
+        # won the same destination. Reporting only the first figure would hide that; reddening on the second would
         # red a true state, which is how a gate teaches its operator to waive it.
         if res["carved"]:
             bare = dict(d, files=[x for x in d.get("files", [])
@@ -3442,9 +3444,9 @@ def check_entry_producer(desc: dict) -> bool:
     performed by the parity gate's own --render mode rather than by a separate adopter"). Previewing
     it as a side-effect would be the same over-promise this unit deletes, moved one mark over.
 
-    A `blocks_adopt` hole makes CONFIGURE skip too. No descriptor here declares one today, so that
-    half is correct and unexercised by the shipped tree; `selftest.py` arms it with a FIXTURE, which
-    is the difference between a guard and a claim.
+    A `blocks_adopt` hole makes CONFIGURE skip too. Whether a shipped descriptor declares one is the
+    descriptors' fact and not this docstring's, so that half is armed by a FIXTURE in `selftest.py`
+    rather than by the shipped tree, which is the difference between a guard and a claim.
     """
     if not ((desc.get("adopt") or {}).get("argv") or []):
         return False
@@ -4200,8 +4202,9 @@ SHELL_EXEC_SITES = {
     # ---- resolve from the argv node, which is now a HIT rather than a silent allowlist entry: the
     # ---- old predicate read literal elements only, so gov's own `git` wrapper presented as
     # ---- `['git', '-C']` and was allowlisted unconditionally -- defeating the `git hook run`
-    # ---- exclusion that IS the guarantee this table's header sells. Every one is gov-controlled
-    # ---- TODAY, and each row exists so the next reader has to re-answer that when a caller changes.
+    # ---- exclusion that IS the guarantee this table's header sells. Each was gov-controlled when
+    # ---- its row was written, and each row exists so the next reader has to re-answer that when a
+    # ---- caller changes.
     # DEPL-dRetiredFork-4. The pathspec-over-stdin runner. Its ARGV is gov's own literal in every
     # caller; what crosses from the target is the PATH LIST, and it crosses on STDIN rather than
     # the command line -- which is the whole point, since the argv form died at 32 KiB after a
@@ -7909,8 +7912,9 @@ def derive_carry_rung(base: bytes, needles: dict[str, str], read_ours,
     """THE LADDER: `verbatim`, `eol`, `relocate`, tried in that order, and the first proof wins (S1).
 
     A LADDER AND NOT A LATTICE (§8 F2). The rungs do not compose, so `relocate` is proved on RAW
-    bytes and never on eol-normalised ones. The spec's grounds, attributed: on the live target every
-    `relocate` row proves on raw bytes and none needs the composition, so composing buys nothing today
+    bytes and never on eol-normalised ones. The spec's grounds, attributed, as measured when this
+    was written at 1f84f5841 (2026-08-25): on the live target every `relocate` row proved on raw
+    bytes and none needed the composition, so composing bought nothing then
     and adds a fourth rung's worth of surface. The cost is stated rather than hidden: an adopter whose
     checkout is CRLF and whose prefix is ALSO non-default falls to local delta on those rows and gets
     the three-way instead of a raw write.

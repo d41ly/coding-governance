@@ -48,7 +48,7 @@ KIT_RUN_GATES_VERSION=1.23   # gov:kit run-gates@1.23
 # some. A 1.5 runner reading a 1.4 table is fine, because an absent knob defaults. The two
 # files ship in one kit and one `include = "**"` rule, so an ordinary apply moves them
 # together; what is NOT covered is a partial update or a hand copy of one file, and unlike the
-# 1.1 case above no govkit floor withholds the table today. TOOL-aQuenchedHarness-1.
+# 1.1 case above no govkit floor was written to withhold the table. TOOL-aQuenchedHarness-1.
 # THIS SCRIPT'S OWN DIRECTORY, RESOLVED BEFORE THE `cd`. A relative `$0` is relative to the caller's
 # cwd, so deriving it after `cd "$ROOT"` resolves it against the repo root instead: invoked as
 # `bash ../<prefix>/run-gates/run-gates.sh` from a subdirectory the kit dir collapsed to the root, the

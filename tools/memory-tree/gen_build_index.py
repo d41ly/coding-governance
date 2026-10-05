@@ -1957,8 +1957,8 @@ def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
     if not spans:
         # TOOL-dFramedEntrypoint-1 S4 — the TOTAL-EXEMPTION hole. This returned [] unconditionally,
         # so a README carrying no generated pair passed every trigger however much prose it held:
-        # measured on a 45,185-byte fixture with two invented sections, which reported clean. No file
-        # in the live corpus reaches it today, which is exactly why it went unnoticed.
+        # measured on a 45,185-byte fixture with two invented sections, which reported clean. It went
+        # unnoticed because no file in the live corpus reached it.
         return [(1, "no generated region pair, so every slot trigger would pass vacuously — "
                     "run --write to create the pairs")]
     first_open = min(o for o, _c in spans)
@@ -3043,8 +3043,8 @@ def cmd_probe(root: str, conf: dict, corpus, ask_id: str) -> int:
 def cmd_asks(root: str, conf: dict, args: dict) -> int:
     """The print modes. They write no file, and stdout carries the mode's VALUE and nothing else.
 
-    THE REDIRECT IS AROUND THE WHOLE READ, not around the two notices this file happens to print
-    today. `collect()` prints a tolerated-header line and a liveness line on every run, and a JSON
+    THE REDIRECT IS AROUND THE WHOLE READ, not around whichever notices this file happens to
+    print. `collect()` prints a tolerated-header line and a liveness line on every run, and a JSON
     consumer handed either of them ahead of the object gets a decode error — the class the hygiene
     engine's own ON STDERR note records. Redirecting the read wholesale means a notice added to any
     callee later is on stderr by construction rather than by somebody remembering this rule. Under

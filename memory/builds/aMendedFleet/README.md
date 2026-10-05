@@ -247,7 +247,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-68 — the unattended Skill becomes a router of at most 10 KiB](spec/2026-10-04-spec-TOOL-aMendedFleet-68.md) | 68 | 2 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-69 — the agent-instructions kit announces a canonical file past 32 KiB and states both tool facts as verified](spec/2026-10-04-spec-TOOL-aMendedFleet-69.md) | 69 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-70 — runlog's extractor reports what a session spends in tokens and minutes before it reaches READY](spec/2026-10-04-spec-TOOL-aMendedFleet-70.md) | 70 | 1 | CLOSED | rev-3 | 2026-10-04 |
-| [TOOL-aMendedFleet-71 — one sweep gives every present-tense count in a code comment one of ANNOTATION-STYLE A4's three dispositions](spec/2026-10-04-spec-TOOL-aMendedFleet-71.md) | 71 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-71 — one sweep gives every present-tense count in a code comment one of ANNOTATION-STYLE A4's three dispositions](spec/2026-10-04-spec-TOOL-aMendedFleet-71.md) | 71 | 1 | CLOSED | rev-3 | 2026-10-06 |
 | [TOOL-aMendedFleet-72 — the gate runner reaps the dead `gate-timings.tsv` it no longer reads](spec/2026-10-04-spec-TOOL-aMendedFleet-72.md) | 72 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-73 — the vague-brief trial arm: a full spec against a short plan, on a three-sentence brief](spec/2026-10-04-spec-TOOL-aMendedFleet-73.md) | 73 | 2 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-74 — a unit can be handed the bug-class checklist for its write set before it writes code](spec/2026-10-04-spec-TOOL-aMendedFleet-74.md) | 74 | 2 | SPECCED | rev-2 | 2026-10-04 |
@@ -285,7 +285,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-105 — the reaper's verification settles, so a member dying as it is signalled is not a survivor](spec/2026-10-05-spec-TOOL-aMendedFleet-105.md) | 106 | 1 | SPECCED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 40 bound to this build, across 3 record folder(s).
+Records: 42 bound to this build, across 3 record folder(s).
 
 Ids no record names: KICK-aMendedFleet-1 KICK-aMendedFleet-2 KICK-aMendedFleet-3 KICK-aMendedFleet-4 PLAY-aMendedFleet-1 PLAY-aMendedFleet-2 PLAY-aMendedFleet-3 PLAY-aMendedFleet-4 TOOL-aMendedFleet-11 TOOL-aMendedFleet-15 TOOL-aMendedFleet-18 TOOL-aMendedFleet-20 TOOL-aMendedFleet-22
 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-30 TOOL-aMendedFleet-34 TOOL-aMendedFleet-36 TOOL-aMendedFleet-4 TOOL-aMendedFleet-40 TOOL-aMendedFleet-41 TOOL-aMendedFleet-42 TOOL-aMendedFleet-43 TOOL-aMendedFleet-44 TOOL-aMendedFleet-45

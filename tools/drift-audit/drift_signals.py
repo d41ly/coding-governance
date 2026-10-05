@@ -62,7 +62,7 @@ TRACE_CUTOFF: str = "2026-08-11"
 # NARROWER than PRODUCT_GLOBS, deliberately. `.claude/` and the kickoff manifest are product
 # CONFIGURATION that a records or kickoff commit routinely touches, so leaving them in lets the
 # house's own bookkeeping certify the bookkeeping — the exact hole the path restriction exists to
-# close. Today the narrowing changes no verdict; it is taken before it costs something, not after.
+# close. It is taken before it changes a verdict, not after one.
 TRACE_GLOBS: list[str] = [
     _TOOLS,
     "skills",

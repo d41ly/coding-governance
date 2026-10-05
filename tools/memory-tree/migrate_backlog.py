@@ -1138,8 +1138,8 @@ def build_spec_index(specs: dict) -> dict:
     """The spec index in the shape the fold reads: id -> `backlog.Spec`.
 
     The two backlog header verbs come from the generator's own parse and are deliberately NOT
-    re-read here; today no spec in a shards-mode corpus carries either, and a second reader of them
-    would be a second answer the day one does.
+    re-read here: a second reader of them would be a second answer the first day a spec in a
+    shards-mode corpus carries either.
     """
     return {i: backlog.Spec(i, s["path"], s["status"], (), ()) for i, s in specs.items()}
 

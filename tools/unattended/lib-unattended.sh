@@ -1512,8 +1512,9 @@ pinned_units() {  # commit · build-README-path · [cutoff-date]
   # THE EMPTY-ROSTER REFUSAL, which the sibling also carries and for the same reason: `region` exits
   # 0 with empty stdout for a well-formed pair enclosing nothing, so a BASE README with an id-less
   # units region would otherwise return SUCCESS with an empty roster — and every caller's membership
-  # test then answers "absent" for every unit in the build. Seven tracked build READMEs are in that
-  # state today. Counting the two functions' refusal branches would NOT catch this: both have seven,
+  # test then answers "absent" for every unit in the build. Seven tracked build READMEs were in that
+  # state at ed281374b (2026-08-31).
+  # Counting the two functions' refusal branches would NOT catch this: both have seven,
   # and the sets differ rather than the sizes.
   _pu_ids=$(printf '%s\n' "$_pu_was" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u)
   if [ -z "$_pu_ids" ]; then

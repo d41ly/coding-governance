@@ -2285,8 +2285,9 @@ def test_conditional_tier_refuses_an_orphaned_artifact():
 def test_a_new_conditional_tier_reports_itself():
     """AC1 and AC4 in one arm, because they are one mechanism.
 
-    AC4 first: `symbols.json` is the ONLY conditional tier today, so a criterion that enumerated
-    the tiers would grade a population of one and could not fail. This introduces a SECOND tier in
+    AC4 first: `symbols.json` was the ONLY conditional tier when this was written (7ad94fbb2,
+    2026-09-06), so a criterion that enumerated the tiers would grade a population of one and could
+    not fail. This introduces a SECOND tier in
     a fixture and asserts it is reported with no reporting line written for it — the list IS the
     mechanism. AC1 rides on it: that tier's artifact does not exist, so its empty population is a
     NAMED skip and not a refusal, which is the legal state an adopter declaring no such extractor

@@ -2665,7 +2665,7 @@ reset_tree
 # ---- by noticing two `fail 16` branches had lost their positive assertion. That is the whole reason
 # ---- the arms meta-gate is keyed on branches rather than on a suite's exit code.
 
-# GREEN CONTROL: undeclared is the empty set, which is every adopter today, and is what keeps this
+# GREEN CONTROL: undeclared is the empty set, an adopter's ordinary case, and is what keeps this
 # change from reddening anyone who uses no extras.
 reset_tree
 same "an undeclared row source changes nothing" "$(remove_announcements "$(run)")" ""

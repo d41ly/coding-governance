@@ -945,8 +945,8 @@ if [ -n "$sel7" ]; then
         # build. It cannot be wrapped — parse_front_matter refuses an indented continuation and
         # check-unattended.sh check 13 parses the same block — so measuring it would cap a value no
         # author controls and no renderer may reflow. This is scoping WITHIN a file, which is what
-        # the fence handling below already does. Measured: no index-set member opens with front
-        # matter today, so this changes no current verdict.
+        # the fence handling below already does. Measured at 20f7f2a40 (2026-08-17): no index-set
+        # member opened with front matter when this was written, so it changed no verdict then.
         if (nl == 1 && line == "---") { fm = 1; continue }
         if (fm) { if (line == "---") fm = 0; continue }
         if (line ~ /^[[:space:]]*(```|~~~)/) {

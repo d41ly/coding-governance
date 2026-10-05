@@ -195,7 +195,7 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
     # accepted stop cannot reintroduce it. Run over the 27 shipped descriptors before wiring, it
     # reported 0 hits and 1 near-miss pair, and it reds that same pair with the pre-fix probe staged
     # back in -- both measured. A descriptor that legitimately discriminates two accepted stops by
-    # one file takes a named exemption here rather than a silent widening; none does today.
+    # one file takes a named exemption here rather than a silent widening.
     def derive_probe_paths(block, key):
         spec = (block.get("probe") or {}).get(key) or []
         return set(spec if isinstance(spec, list) else [spec])

@@ -1,11 +1,13 @@
 # TOOL-aMendedFleet-71 — one sweep gives every present-tense count in a code comment one of ANNOTATION-STYLE A4's three dispositions
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 71
+**Status:** CLOSED · rev-3 · 2026-10-06 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 71
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-06-build-TOOL-aMendedFleet-71-1-count-census.py](../build/2026-10-06-build-TOOL-aMendedFleet-71-1-count-census.py) | journal | — |
+| [2026-10-06-build-TOOL-aMendedFleet-71-2-count-dispositions.md](../build/2026-10-06-build-TOOL-aMendedFleet-71-2-count-dispositions.md) | journal | — |
 | [2026-10-06-prompt-TOOL-aMendedFleet-71-1-build-brief.md](../prompts/2026-10-06-prompt-TOOL-aMendedFleet-71-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -32,14 +34,16 @@ comment edits that apply it.
   reports a sentence as a CANDIDATE when it carries a COUNT and a PRESENT-TENSE marker and is not
   FROZEN:
   - a COUNT is a digit run not preceded by a word character, `-`, `.`, `#`, `§`, `/`, `$` or `{`,
-    or one of the words zero to twenty, `none`, `every` or `no` before a noun;
-  - a PRESENT-TENSE marker is `today`, `currently`, `now`, `at present`, `right now`, `live` or
-    `tracked`;
+    or one of the words zero to twenty or `none`, or `every` or `no` before a following word, the
+    script's stand-in for "before a noun";
+  - a PRESENT-TENSE marker is `today`, `currently`, `at present` or `right now`. The words `now`,
+    `live` and `tracked` are not markers: a sentence carrying a count and only one of them is
+    counted as `wide-only` on the population line, never listed (rev-3, §9);
   - FROZEN is a sentence carrying a date, a hex run of 7 to 40 characters, `node <tag>`, `PINNED`,
     `at review` or `at base`; `measured` alone does not freeze, since "measured today" is the defect.
   It prints every candidate as `<path>:<line>: <sentence>`, then every frozen near-miss, then the
-  population sizes: files read, paragraphs read, candidates, near-misses, each split product and
-  test. `--selftest` runs the predicate over literal strings, one candidate and one frozen
+  population sizes: files read, paragraphs read, candidates, near-misses and wide-only sentences,
+  each split product and test. `--selftest` runs the predicate over literal strings, one candidate and one frozen
   near-miss per marker. Observed by AC1 and AC2.
 - **S2** — THE DISPOSITIONS. A journal record beside the script lists every candidate the script
   prints at the pass's STARTING COMMIT, the tip the unit pass begins from, recorded with
@@ -114,23 +118,39 @@ The census decides the set; these are the files the trial read found a probable 
 file the census adds outside this list is added here, with its owed legs in §7, by a rev bump
 before it is edited.
 
+Rev-3 replaces the estimate with the census's set at the starting commit. `test_recall_floor.py` and
+`drift_report.py` left it: the trial's hits there carried no marker the narrowed predicate keeps, or
+were read as NOT-A-COUNT. The rest are the census's additions plus the brief's config row.
+
 - `tools/unattended/unattended.sh`
 - `tools/unattended/check-unattended.sh`
+- `tools/unattended/check-unattended.test.sh`
 - `tools/unattended/lib-unattended.sh`
 - `tools/unattended/adopt-unattended.sh`
 - `tools/govkit/govkit.py`
 - `tools/govkit/matrix.py`
+- `tools/govkit/selftest.py`
 - `tools/memory-tree/row_grammar.py`
 - `tools/memory-tree/merge-rows.py`
-- `tools/memory-recall/test_recall_floor.py`
-- `tools/drift-audit/drift_report.py`
+- `tools/memory-tree/gen_build_index.py`
+- `tools/memory-tree/migrate_backlog.py`
+- `tools/memory-tree/check-memory-hygiene.sh`
+- `tools/codebase-map/map_lib.py`
+- `tools/codebase-map/reuse_lookup.py`
+- `tools/codebase-map/selftest.py`
+- `tools/drift-audit/drift_signals.py`
+- `tools/hooks/agent-cap.js`
 - `tools/lib/resolve-python.test.sh`
 - `tools/run-gates/run-gates.runlog.test.sh`
+- `tools/run-gates/run-gates.sh`
+- `.memory-tree.conf`
+- `memory/guides/SESSION-KICKOFF.md`
 
 ### Rollout
 
 Comment-only. A touched file that the kickoff manifest's `watch:` line names owes that manifest's
-re-stamp in the same commit, per the Definition of Done; none in the estimate is watched.
+re-stamp in the same commit, per the Definition of Done: `.memory-tree.conf`,
+`tools/memory-tree/check-memory-hygiene.sh` and `tools/run-gates/run-gates.sh` are watched.
 
 ### Alternatives rejected
 
@@ -180,13 +200,14 @@ re-stamp in the same commit, per the Definition of Done; none in the estimate is
   template and render prints at the tip what it printed at that starting commit.
   Red when: the sweep moved behaviour, or a render was edited by hand.
 - **AC6** — When, for each edited sentence, `git grep -F` of a distinctive six-word fragment of its
-  base wording runs over the tree at base, the only hit is the edited file itself, and that check
-  is recorded in the sentence's row.
+  base wording runs over the tree at the starting commit, the only hit outside `memory/` is the
+  edited file itself, and that check is recorded in the sentence's row, with the count of memory
+  records that quote it.
   Red when: a gate or a test reads the comment text the sweep changed.
 
 ## 7. Gates
 
-`unattended kit gate` · `unattended skill wiring` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `row-keyed merge driver replay` · `row-grammar selftest` · `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `run-gates run-log line` · `lexicon naming predicates` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `unattended skill wiring` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `row-keyed merge driver replay` · `row-grammar selftest` · `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `run-gates run-log line` · `lexicon naming predicates` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `backlog migration selftest` · `kickoff-manifest ratchet`
 
 The held self-test legs above are owed by the guards the estimate trips and run once, at the close.
 
@@ -214,6 +235,16 @@ The held self-test legs above are owed by the guards the estimate trips and run 
   behaviour diff were anchored at base `7af5f564`, but unit 61 and other units ordered first edit
   files in this sweep, so a base diff reds on their code and a tip census finds their new comments
   with no row; all three now anchor at the pass's starting commit, which S2 records.
+- rev-3 · 2026-10-06 · S1 · AC6 · §4 Files touched · Rollout · §7, at the unit pass: the rev-2
+  predicate printed 1414 candidates at the starting commit, 1321 of them carrying only `now`, `live`
+  or `tracked`, which here narrate a change ("now refuses") or name a population in a rule ("every
+  tracked file"); a read of every ninth or nineteenth of them, 74 sentences, found three true counts,
+  and 1414 rows is more than one sweep can read honestly. The markers narrow to the four temporal ones and the census
+  prints the dropped set's size as `wide-only`, so the loss is visible on every run. AC6's literal
+  "only hit" was red on eight rows whose base wording a spec, review or brief under `memory/`
+  quotes; a record is not a reader that a comment edit can break, so the join excludes `memory/`
+  and the row counts the quotes. The estimate gave way to the census's file set, and §7 gains the
+  legs the spec-tokens guards join owes for the added files.
 
 ## 10. Reuse audit
 

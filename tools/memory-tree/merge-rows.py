@@ -1287,7 +1287,8 @@ def merge(o_lines, a_lines, b_lines, *, path=None) -> tuple[list[str], bool]:
     # THE AUDIT LINE. Every number is derived from the written bytes and the three inputs AFTER the
     # fact — never from a counter incremented at an emit site, which is how the retired line came to
     # print `38 row(s) from ours … clean` on a merge that had just deleted one. `k` and `h` are what
-    # make an inert grammar visible during a real merge: on the governed indexes `h` is 0 today, and
+    # make an inert grammar visible during a real merge: on the governed indexes `h` reads 0 while
+    # the grammar is in step, and
     # a FAMILIES drift turns every row hashed without moving any other number.
     clean = settled(merged)
     written = [ln for ln in clean if _ROW_RE.match(ln)]

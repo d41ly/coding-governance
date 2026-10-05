@@ -450,8 +450,9 @@ def scan_js_definitions(
     inside a template literal (the ceiling ``enumerate_exports`` documents for itself). What it does
     guarantee is a LIVENESS floor: a scanned file yielding ZERO symbols raises MapError naming it,
     because a probe that silently reads nothing is exactly how the hole above stayed invisible.
-    Measured: every one of the six files under ``tools/`` yields at least one definition today
-    (19, 4, 1, 2, 2, 2), so the floor is a measurement rather than an assumption.
+    Measured at 5966e3109 (2026-08-17): every one of the six files under ``tools/`` yielded at
+    least one definition when this was written (19, 4, 1, 2, 2, 2), so the floor is a measurement
+    rather than an assumption.
 
     Comments are stripped the same way ``enumerate_exports`` strips them — block spans replaced by
     their own newline count so removing one never merges two statements onto one line.

@@ -134,12 +134,12 @@ KEEPALIVE_DELETE="{{KEEPALIVE_DELETE}}"; KEEPALIVE_INTERVAL="{{KEEPALIVE_INTERVA
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE="{{RESUME_SCHEDULE_CREATE}}"
 RESUME_SCHEDULE_DELETE="{{RESUME_SCHEDULE_DELETE}}"
 # TOOL-aPromptedMandate-5 - ANCHOR_SCOPE is the ONE interpolated key that must NOT keep its
-# placeholder when undeclared. Every adopter shipped today declares it blank, which is legal and
-# means the strict anchor; a placeholder there would red the placeholder arm for the majority case.
+# placeholder when undeclared. An adopter that declares it blank is the common case, which is
+# legal and means the strict anchor; a placeholder there would red the placeholder arm for it.
 ANCHOR_SCOPE=""
 # TOOL-aNamedGesture-1 - AUTH_PARAM is the SECOND such key, and for the reason ANCHOR_SCOPE gives:
-# no adopter declares it today, so keeping the placeholder would red the placeholder arm for every
-# one of them. Pre-set EMPTY rather than to the default, because the default is written once, below,
+# an adopter that declares nothing is the ordinary case, so keeping the placeholder would red the
+# placeholder arm for every such adopter. Pre-set EMPTY rather than to the default, because the default is written once, below,
 # in the derivation - a pre-set default plus a blank-normalisation writes the same literal twice.
 AUTH_PARAM=""
 # MEMORY_TREE_DIR's override is read from the ENVIRONMENT, captured before the conf is sourced so a
