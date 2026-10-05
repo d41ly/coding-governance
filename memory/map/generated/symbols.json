@@ -4558,6 +4558,11 @@
       "file": "tools/workflows/orient-counterfactual.js"
     },
     {
+      "id": "measure_answer_used",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
+    },
+    {
       "id": "measure_census",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -5571,6 +5576,11 @@
       "id": "read_charter_table",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_cited_ids",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "read_class_values",
@@ -7811,6 +7821,11 @@
       "id": "resolve_view_layer",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "resolve_worktree_reflog",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "roles_from_kits_json",
@@ -10651,6 +10666,11 @@
       "id": "test_unreadable_input_is_not_a_clean_report",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_used_joins_answers_to_the_next_commit",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_verbatim_files",

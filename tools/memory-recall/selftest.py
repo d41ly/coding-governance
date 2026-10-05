@@ -127,7 +127,7 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 80
+SELFTEST_ARMS = 81
 # 34 -> 58 on 2026-08-24 (adopter ic's recall contrib branch): twenty-four arms — twenty-three ported from
 #   adopter ic's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
@@ -166,6 +166,9 @@ SELFTEST_ARMS = 80
 # 77 -> 80 on 2026-10-05 (TOOL-aMendedFleet-32): THREE arms over cache eviction - live siblings whose
 #   last-query order inverts their built_at order, a husk worktree with no .git, and the query-log
 #   reader with its empty-map fallback to built_at order.
+# 80 -> 81 on 2026-10-05 (TOOL-aMendedFleet-34): ONE arm, `--used` over a linked-worktree fixture -
+#   a rank-2 citation counts, an id the row's own terms spell does not, a reflog-less row is
+#   unattributed, an absent log and an all-unattributed log both exit 2, and the log is unchanged.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -3209,6 +3212,57 @@ def test_spec_h1_record_outranks_a_citation():
     return f"{hits[0]}; the citation comes back as {cite.split(' ', 1)[0]}"
 
 
+@check("--used joins logged answers to the worktree's next commit, held ids excluded, read-only")
+def test_used_joins_answers_to_the_next_commit():
+    """TOOL-aMendedFleet-34 AC1, AC3, AC4. Row 1's rank-2 id is cited by the linked worktree's next
+    commit; row 2's only cited id is in its own terms, so the caller already held it; row 3 names a
+    worktree with no reflog. Observed RED as `2 of 2` with the terms exclusion removed."""
+    root, kitdir = make_repo()
+    wt = root.parent / (root.name + "-wt")
+    try:
+        log = git_common_dir(root) / "recall" / "queries.jsonl"
+        p = run(root, kitdir, "--used")
+        assert p.returncode == 2 and log.as_posix() in p.stderr, (
+            f"an absent log did not exit 2 naming {log.as_posix()}: {p.returncode} {p.stderr}")
+        git = ["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t"]
+        subprocess.run([*git, "commit", "-qm", "seed"], check=True, capture_output=True)
+        subprocess.run([*git, "worktree", "add", "-q", "-b", "wt", str(wt)], check=True, capture_output=True)
+        log.parent.mkdir(parents=True, exist_ok=True)
+        gone = root.parent / (root.name + "-gone")
+        # (worktree, terms, result ids in rank order) per row.
+        rows = [(gone, [], ["TOOL-aFoo-2"]),
+                (wt, ["x"], ["TOOL-aFoo-1", "TOOL-aFoo-2"]),
+                (wt, ["TOOL-aBar-3"], ["TOOL-aBar-3"]),
+                (gone, [], ["TOOL-aFoo-2"])]
+        lines = [json.dumps({"qid": n, "at": "2000-01-01T00:00:00+00:00", "type": "query",
+                             "query": "q", "terms": terms, "worktree": str(w),
+                             "results": [{"set": "records", "id": i} for i in ids]}) + "\n"
+                 for n, (w, terms, ids) in enumerate(rows, 1)]
+        log.write_text(lines[0], encoding="utf-8", newline="\n")
+        p = run(root, kitdir, "--used")
+        assert p.returncode == 2 and "not measured" in p.stderr, (
+            f"nothing attributable did not exit 2 as not measured: {p.returncode} {p.stdout}{p.stderr}")
+        log.write_text("".join(lines[1:]), encoding="utf-8", newline="\n")
+        (wt / "notes.md").write_text("cites TOOL-aFoo-2 and TOOL-aBar-3\n", encoding="utf-8", newline="\n")
+        wgit = ["git", "-C", str(wt), "-c", "user.email=t@t", "-c", "user.name=t"]
+        subprocess.run([*wgit, "add", "notes.md"], check=True, capture_output=True)
+        subprocess.run([*wgit, "commit", "-qm", "add notes"], check=True, capture_output=True)
+        before = hashlib.sha256(log.read_bytes()).hexdigest()
+        p = run(root, kitdir, "--used")
+        out = p.stdout
+        assert p.returncode == 0 and "answer-used: 1 of 2" in out, f"wrong figure: {out}{p.stderr}"
+        assert "of 3 query rows: 1 unattributed" in out and " 2:1 " in out, f"wrong buckets: {out}"
+        assert hashlib.sha256(log.read_bytes()).hexdigest() == before, "--used wrote to the log"
+        for t in (root, wt):
+            st = subprocess.run(["git", "-C", str(t), "status", "--porcelain"],
+                                capture_output=True, text=True, encoding="utf-8", check=True).stdout
+            assert not st.strip(), f"--used left the tree dirty: {st}"
+        return out.splitlines()[0]
+    finally:
+        cleanup(wt)  # a SIBLING of root, so both go, as in test_repo_root_linked_worktree
+        cleanup(root)
+
+
 def main() -> int:
     # The live-log baseline is NOT taken here. It is taken at module scope, above the first `@check`,
     # because every arm runs at decoration time and a baseline taken in this function brackets
@@ -3260,6 +3314,8 @@ def main() -> int:
         # TOOL-dHashedPrelude-2: the guard that brackets this suite, gated
         test_the_live_log_baseline_is_taken_before_any_arm_runs,
         test_the_live_log_verdict_is_total_over_its_states,
+        # TOOL-aMendedFleet-34: the offline answer-used join
+        test_used_joins_answers_to_the_next_commit,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
     # DECLARED-versus-RAN above is satisfied by deleting an arm from both halves; this is the

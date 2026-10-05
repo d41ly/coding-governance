@@ -65,7 +65,12 @@ python3 <prefix>/memory-recall/query.py "why did the gate start refusing my push
 python3 <prefix>/memory-recall/query.py --opened <rank> --qid <N>  # record which hit answered it
 python3 <prefix>/memory-recall/query.py "<question>" --rebuild     # force a cache rebuild
 python3 <prefix>/memory-recall/query.py --export --tag a           # aggregate the log, outside the tree
+python3 <prefix>/memory-recall/query.py --used                     # was each answer cited? writes nothing
 ```
+
+`--used` joins each logged query's result ids to the ids its worktree's next commit cites, in the
+message or the added lines, and reads only live reflogs, so a removed worktree's rows are counted
+unattributed rather than guessed at.
 
 `--terms` is **required**. Rewriting is the measured half of the retrieval gain upstream (records
 recall@20 0.71 → 0.84 on its hard slice) and the CLI cannot produce the terms itself — it is offline

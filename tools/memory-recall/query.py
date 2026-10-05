@@ -26,6 +26,7 @@ Usage:
   {cli} "<question>" --rebuild       # force a cache rebuild, ignoring the freshness manifest
   {cli} --opened <rank> [--qid N]    # record which hit you actually read
   {cli} --export --tag <letter>      # aggregate the log beside itself, outside the worktree
+  {cli} --used                       # was each answer cited by its worktree's next commit? writes nothing
 
 ``--terms`` is REQUIRED. Rewriting is the measured half of the retrieval gain (records recall@20
 0.71 -> 0.84, MRR 0.389 -> 0.530, for zero committed bytes) and the CLI cannot generate the terms
@@ -200,6 +201,7 @@ KNOWN_FLAGS = (
     "--no-terms",
     "--export",
     "--tag",
+    "--used",
 )
 
 REFUSAL = """refused: this CLI requires rewrite terms alongside the question.
@@ -1212,11 +1214,145 @@ def export(repo: pathlib.Path, tag: str) -> int:
     return 0
 
 
+# ------------------------------------------------------- answer used (TOOL-aMendedFleet-34)
+# `--opened` is recorded by hand almost never, so the outcome signal is thin. This joins each logged
+# query's result ids to the ids its worktree's NEXT commit cites. Offline and read-only: no index,
+# no log row, no file anywhere. A removed worktree's reflog is gone with it, so its rows are counted
+# UNATTRIBUTED rather than guessed at; a time window over `git log --all` would credit a query with
+# a concurrent session's citation.
+
+
+def resolve_worktree_reflog(common: pathlib.Path, worktree: str) -> pathlib.Path | None:
+    """The HEAD reflog of the tree a query row names, or None when there is none to read.
+
+    A linked worktree's admin dir under ``<common>/worktrees/`` holds a ``gitdir`` file naming
+    ``<worktree>/.git``; the primary tree's reflog is the common dir's own. Both sides go through
+    ``normcase(abspath())`` because the log spells Windows paths with either separator.
+    """
+    want = os.path.normcase(os.path.abspath(worktree))
+    if want == os.path.normcase(os.path.abspath(common.parent)):
+        log = common / "logs" / "HEAD"
+        return log if log.is_file() else None
+    admin = common / "worktrees"
+    if not admin.is_dir():
+        return None
+    for d in admin.iterdir():
+        try:
+            named = (d / "gitdir").read_text(encoding="utf-8").strip()
+        except OSError:
+            continue
+        if os.path.normcase(os.path.abspath(os.path.dirname(named))) == want:
+            log = d / "logs" / "HEAD"
+            return log if log.is_file() else None
+    return None
+
+
+def read_cited_ids(repo: pathlib.Path, shas: list[str]) -> dict[str, tuple[str, set[str]]]:
+    """``sha -> (subject, ids cited in its message or added lines)``, from ONE ``git log`` spawn.
+
+    One call, not one per commit: a spawn costs most of a second on some nodes. A sha the object
+    store no longer holds is skipped by ``--ignore-missing`` and reads as citing nothing.
+    """
+    if not shas:
+        return {}
+    out = subprocess.run(
+        ["git", "-C", str(repo), "log", "--no-walk=unsorted", "--stdin", "--ignore-missing",
+         "-p", "-U0", "--no-color", "--format=%x1e%H%n%B"],
+        input="\n".join(shas) + "\n", capture_output=True, text=True, encoding="utf-8",
+        errors="replace", check=True,
+    ).stdout
+    cited: dict[str, tuple[str, set[str]]] = {}
+    for block in out.split("\x1e")[1:]:
+        sha, _, rest = block.partition("\n")
+        msg, sep, patch = rest.partition("\ndiff --git ")
+        ids = set(E.ID_RE.findall(msg))
+        if sep:
+            added = "\n".join(ln[1:] for ln in patch.splitlines()
+                              if ln.startswith("+") and not ln.startswith("+++"))
+            ids.update(E.ID_RE.findall(added))
+        cited[sha.strip()] = (msg.lstrip("\n").split("\n", 1)[0], ids)
+    return cited
+
+
+def measure_answer_used(repo: pathlib.Path) -> int:
+    """Print how many attributable query rows' answers the worktree's next commit cites."""
+    log = log_path(repo)
+    if not log.exists():
+        print(f"no query log at {log.as_posix()} — answer-used not measured", file=sys.stderr)
+        return 2
+    common = common_git_dir(repo)
+    rows = [r for r in read_log(repo) if r.get("type") == "query"]
+    reflogs: dict[str, list[tuple[int, str]] | None] = {}  # worktree -> commit entries, None = no reflog
+    no_id = unattributed = no_commit = 0
+    pending: list[tuple[dict, list[str], str]] = []  # (row, record ids in rank order, next sha)
+    for row in rows:
+        ranked = [res.get("id") or "" for res in row.get("results") or []]
+        if not any(E.ID_RE.fullmatch(i) for i in ranked):
+            no_id += 1
+            continue
+        wt = str(row.get("worktree") or "")
+        try:
+            at = datetime.fromisoformat(row["at"]).timestamp()
+        except (KeyError, TypeError, ValueError):
+            at = None
+        if wt and wt not in reflogs:
+            entries = []
+            path = resolve_worktree_reflog(common, wt)
+            if path is not None:
+                for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+                    head, _, msg = line.partition("\t")
+                    parts = head.split(" ")
+                    if msg.startswith("commit") and len(parts) >= 4:
+                        try:
+                            entries.append((int(parts[-2]), parts[1]))
+                        except ValueError:
+                            continue
+            reflogs[wt] = entries if path is not None else None
+        entries = reflogs.get(wt) if wt else None
+        if entries is None or at is None:
+            unattributed += 1
+            continue
+        nxt = next((sha for ts, sha in entries if ts >= at), None)
+        if nxt is None:
+            no_commit += 1
+            continue
+        pending.append((row, ranked, nxt))
+
+    if not pending:
+        print(f"answer-used: not measured — none of {len(rows)} query row(s) is attributable "
+              f"({unattributed} unattributed, {no_commit} no commit after the query, "
+              f"{no_id} no record id in results); a removed worktree's reflog is gone",
+              file=sys.stderr)
+        return 2
+    cited = read_cited_ids(repo, sorted({sha for _, _, sha in pending}))
+    used = 0
+    hist = collections.Counter()
+    for row, ranked, sha in pending:
+        subject, ids = cited.get(sha, ("", set()))
+        # The caller already held an id its own question or terms spell, or one from the build its
+        # commit's subject names, so citing it says nothing about the answer.
+        held = " ".join([str(row.get("query") or ""), *map(str, row.get("terms") or [])])
+        for rank, rid in enumerate(ranked, 1):
+            parts = rid.split("-")
+            slug = parts[1] if len(parts) == 3 and parts[1].isalpha() else None
+            if rid in ids and rid not in held and not (slug and slug in subject):
+                used += 1
+                hist[rank] += 1
+                break
+    print(f"answer-used: {used} of {len(pending)} attributable query row(s) cite a shown record id "
+          "in the worktree's next commit")
+    print(f"  of {len(rows)} query rows: {unattributed} unattributed (reflog gone) · {no_commit} "
+          f"no commit after the query · {no_id} no record id in results")
+    print("  used at rank: " + " ".join(f"{r}:{hist[r]}" for r in range(1, RESULT_CAP + 1))
+          + " — a deeper rank is not logged")
+    return 0
+
+
 # ---------------------------------------------------------------------------------- main
 
 
 VALUE_FLAGS = ("--k", "--budget", "--opened", "--qid", "--terms", "--tag")
-BARE_FLAGS = ("--stats", "--rebuild", "--help", "--no-terms", "--export")
+BARE_FLAGS = ("--stats", "--rebuild", "--help", "--no-terms", "--export", "--used")
 
 
 def parse(argv: list[str]) -> tuple[dict[str, str], list[str], str | None]:
@@ -1288,6 +1424,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"--tag takes one letter from the node registry, got {tag!r}", file=sys.stderr)
             return 2
         return export(repo, tag)
+
+    if "--used" in flags:
+        return measure_answer_used(repo)
 
     if "--opened" in flags:
         rank = num("--opened", 0)

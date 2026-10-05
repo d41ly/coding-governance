@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-34 — recall measures offline whether an answer was used, from the query log and the worktree's next commit
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes TOOL-aWeighedCompass-11 · order 34
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes TOOL-aWeighedCompass-11 · order 34
 
 <!-- gen:spec-records -->
 
