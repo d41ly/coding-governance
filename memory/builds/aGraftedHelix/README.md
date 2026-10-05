@@ -139,7 +139,7 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraf
 | [TOOL-aGraftedHelix-29 — the by-design block is rendered from the invariant records at the review's base, so a change cannot write its own exemption](spec/2026-10-05-spec-TOOL-aGraftedHelix-29.md) | 13 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aGraftedHelix-30 — a verb grades `authorization-reachable` alone, and every reconciling merge runs it before the run spends more](spec/2026-10-05-spec-TOOL-aGraftedHelix-30.md) | 14 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aGraftedHelix-31 — `--settle` writes the run claim, and a terminal-phase writer that writes no claim reds](spec/2026-10-05-spec-TOOL-aGraftedHelix-31.md) | 15 | 2 | CLOSED | rev-1 | 2026-10-05 |
-| [TOOL-aGraftedHelix-32 — the closing review's 21 MEDIUM and LOW findings, fixed as one batch](spec/2026-10-05-spec-TOOL-aGraftedHelix-32.md) | 16 | 2 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aGraftedHelix-32 — the closing review's 21 MEDIUM and LOW findings, fixed as one batch](spec/2026-10-05-spec-TOOL-aGraftedHelix-32.md) | 16 | 2 | SPECCED | rev-2 | 2026-10-05 |
 <!-- /gen:build-units -->
 
 Records: 46 bound to this build, across 4 record folder(s).

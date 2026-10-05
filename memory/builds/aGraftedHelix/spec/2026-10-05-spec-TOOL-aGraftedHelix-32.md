@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-32 — the closing review's 21 MEDIUM and LOW findings, fixed as one batch
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 018b5675 · streams tooling+kickoff · order 16 · closes TOOL-aBranchedMandate-9 · ratified 2026-10-05
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 018b5675 · streams tooling+kickoff · order 16 · closes TOOL-aBranchedMandate-9 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
@@ -357,10 +357,12 @@ which is why the check is documented rather than gated.
 The leg runs after the existing one with the bare origin in place. `PATH` carries only a git shim
 that fails `fetch ... refs/gov/runs/*` with exit 1 and logs every argument list. It runs the same
 `s2` holder call and asserts three things: `grep -c ' push ' <log>` is 0, `git ls-remote origin
-refs/gov/runs/tRun` prints the pre-call sha, and the call does not exit 0. The staged break is a
-driver copy routing the unread claim into a CAS with an empty expected sha. Under it the push is
-attempted and rejected `(stale info)`, so the ref does not move and the push-count assertion reds
-alone. The existing leg keeps its add-failure assertions.
+refs/gov/runs/tRun` prints the pre-call sha, and the call exits 0, its unread claim announced and its
+lease recorded, as GH24's still-unreachable leg already asserts for the remote away. The staged break
+is a driver copy routing the unread claim into a CAS with an empty expected sha. Under it the push is
+attempted and rejected `(stale info)`, so the ref does not move and that assertion stays green, while
+the push-count assertion reds; the exit reds beside it, because the rejected CAS is check 108 under
+the holder policy. The existing leg keeps its add-failure assertions.
 
 ### S13 — the banner and the `superseded` line
 
@@ -591,10 +593,10 @@ pass's base, and bumps each kit once more after its own last move.
   `a-spelling-change-strands-its-readers`. `--for-paths memory/builds/aGraftedHelix/RUN.md` lists
   `orchestrator-hand-off-owed-a-disposition`.
   Red when: a record's new section declares no gate or documented check, or no anchor selects it.
-- **AC18** — When the driver suite's GH26 block runs as a scratchpad slice, the new push leg passes.
-  Against a scratchpad copy of the driver routing an unread claim into a CAS with an empty expected
-  sha, its `git ls-remote` and exit assertions stay green and its push-count assertion is the one
-  that reds.
+- **AC18** — When the driver suite's GH26 block runs as a scratchpad slice, the new push leg passes,
+  its call exiting 0. Against a scratchpad copy of the driver routing an unread claim into a CAS with
+  an empty expected sha, its `git ls-remote` assertion stays green and its push-count assertion reds,
+  beside the exit assertion, since the rejected CAS is check 108.
   Red when: the push-count assertion stays green under that break.
 - **AC19** — When a slice of the recall kit's self-test module runs, its source executed through
   `test_spine_nested_layout` with `__file__` set to the shipped module's path, every check the slice
@@ -687,6 +689,10 @@ criterion lives in a suite, and the main loop runs those suites once at VERIFYIN
 - rev-1 · 2026-10-05 · initial draft, from the unit-29-to-32 spec brief and the closing review's M1
   to M9 and L1 to L4 sections, grounded at `9024901c`, with the rotation probe and the pathspec
   measurement run on node `a`.
+- rev-2 · 2026-10-05 · S12 and AC18 disagreed with the driver: a holder call over an unread claim
+  exits 0 on the correct driver, so "does not exit 0" would red it. Measured in the pass's slice of
+  the driver suite, the leg asserts exit 0, and under the staged CAS break the exit reds beside the
+  push count while the ref assertion stays green.
 
 ## 10. Reuse audit
 
