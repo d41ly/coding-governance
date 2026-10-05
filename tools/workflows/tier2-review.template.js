@@ -946,8 +946,22 @@ const verdictResults = await boundedParallel(
       ? Promise.resolve(reusedBatch[gi])
       : agent(
       renderBrief('skeptic') +
+      // TOOL-aEvidencedLens-3 S1-S5 - the spec skeptic confirms by the rubric, at any grade, re-runs the
+      // finder's evidence under the SAME probe-policy bytes the finders read (spec section 8 F3: one copy
+      // of one rule), and refutes in six named cases only. The old test, "unbuildable or wrong", made a
+      // LOW unreachable beside a rubric that defines one. The diff kind is untouched (shared invariant 2).
       (isSpec
-        ? `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — Read the cited spec at the cited section, and the siblings it names, and decide "confirmed" (real, and it makes the spec unbuildable or wrong) or "refuted" (asks for detail a non-goal withholds / cites a section that says what the finding claims it does not / is a style preference).\n\n`
+        ? probeBlock + `\n` +
+          `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it. Read the cited spec at the cited section and the siblings it names; ` +
+          `a claim about code or a record is checked against that code or record, never against the spec's account of it. ` +
+          `Then re-run the finding's evidence under the PROBE POLICY above: run the command it names, or re-read the path and line it names, and say in \`reason\` what you observed.\n` +
+          `"confirmed" when the claim is TRUE of the spec set, and of the tree where it makes a claim about the tree, AT ANY RUBRIC SEVERITY: the rubric grades it, confirmation does not.\n` +
+          `"refuted" in these cases only: (1) a NON-GOAL or a PARKED FORK withholds what it asks; (2) the cited section ALREADY SAYS it; ` +
+          `(3) the premise is FALSE ON RE-PROBE, including evidence that does not reproduce, meaning what you observed contradicts the claim; ` +
+          `(4) BY DESIGN, a case the BY DESIGN block covers; (5) a DUPLICATE, opening \`reason\` with \`duplicate of id=<n>\` for another finding in this batch that you CONFIRM in this same answer, ` +
+          `or \`duplicate of prior <ref>\` for a prior round's original; (6) a PREFERENCE that names no defect the rubric grades, not even a low.\n` +
+          `Evidence that reads \`-\` was not recorded: probe the claim yourself and never confirm on the finder's word. ` +
+          `A probe you could not run inside its bound is a finding you cannot establish; apply the default by the finder's grade, and never call it evidence that does not reproduce.\n\n`
         : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate).\n\n`) +
         // TOOL-aSightedSkeptic-6 S4 - the default follows the FINDER's grade (spec section 8 F3). An
         // unsure skeptic refuting a real blocker loses the defect; one answering uncertain on every
@@ -959,8 +973,11 @@ const verdictResults = await boundedParallel(
         `For each finding you CONFIRM, also return \`severity\`, graded by this rubric against what you read, independent of the finder's bracketed grade.\n\n` +
         `Findings to judge:\n` +
         // TOOL-aSightedSkeptic-8 S2 - `lens=` after the grade; `id=<n> [` stays first for the stubs' id pattern.
+        // TOOL-aEvidencedLens-3 S3 - the spec kind appends the finder's evidence, folded to one line by
+        // renderCell (absent reads `-`). renderCell also escapes `|`; TOOL-aEvidencedLens-12 owns that.
         group
-          .map((f) => `id=${f.id} [${f.severity}] lens=${f.lens} ${f.ref} — ${f.claim} | impact: ${f.impact} | fix: ${f.fix}`)
+          .map((f) => `id=${f.id} [${f.severity}] lens=${f.lens} ${f.ref} — ${f.claim} | impact: ${f.impact} | fix: ${f.fix}` +
+            (isSpec ? ` | evidence: ${renderCell(f.evidence)}` : ''))
           .join('\n') +
         // TOOL-aSightedSkeptic-2 S2 - the fix is judged as a SECOND, separate question. It never moves
         // the claim's verdict (spec section 8 F1): a real defect with a bad fix is still a real defect.
@@ -1013,6 +1030,24 @@ for (const r of liveVerdicts)
     else conflicts.add(v.id)
   }
 for (const id of conflicts) verdictById.delete(id)
+// TOOL-aEvidencedLens-3 S6 - an ORPHANED duplicate, spec kind only (spec section 8 F2). A refutation
+// opening `duplicate of id=<n>` drops the finding on the strength of another one, so it holds only when
+// <n> is a DIFFERENT id in the SAME batch that stands CONFIRMED after the conflict demotion above.
+// Otherwise the defect would leave the confirmed set with nothing kept in its place: it is demoted to
+// UNVERIFIED exactly as a contradicted verdict is. The diff kind's duplicate names no surviving id.
+const orphanDuplicates = new Set()
+if (isSpec)
+  for (const group of batches) {
+    const batchIds = new Set(group.map((f) => f.id))
+    for (const f of group) {
+      const v = verdictById.get(f.id)
+      const m = v && v.verdict === 'refuted' ? /^duplicate of id=(\d+)/i.exec(String(v.reason || '').trim()) : null
+      if (!m) continue
+      const n = Number(m[1])
+      if (n === f.id || !batchIds.has(n) || verdictById.get(n)?.verdict !== 'confirmed') orphanDuplicates.add(f.id)
+    }
+  }
+for (const id of orphanDuplicates) verdictById.delete(id)
 
 // TOOL-aSightedSkeptic-2 S3/S6 - a confirmed finding's fix as the synthesis and the death log carry it.
 // Read at call time, so it is called only after the join above. Absent or outside FIX_VERDICTS is
@@ -1054,6 +1089,8 @@ if (noVerdict.length)
   log(`WARNING: ${noVerdict.length} finding(s) came back with NO usable verdict — counted UNVERIFIED, not refuted: ids ${noVerdict.map((f) => f.id).join(', ')}`)
 if (conflicts.size)
   log(`WARNING: ${conflicts.size} finding(s) got CONTRADICTORY verdicts — demoted to UNVERIFIED: ids ${[...conflicts].join(', ')}`)
+if (orphanDuplicates.size)
+  log(`WARNING: ${orphanDuplicates.size} finding(s) refuted as a DUPLICATE of an id that is not a confirmed survivor in their batch — demoted to UNVERIFIED: ids ${[...orphanDuplicates].join(', ')}`)
 if (duplicates) log(`note: ${duplicates} repeat verdict(s) agreed with the standing one — idempotent.`)
 if (spurious) log(`WARNING: ${spurious} verdict(s) carried an id this run never assigned — discarded.`)
 // TOOL-aSightedSkeptic-2 S4 - the fix verdicts over CONFIRMED findings only, since a refuted
@@ -1101,7 +1138,7 @@ const ledger = allFindings.map((f) => {
     severity: f.severity,
     skepticSeverity: v && SEVERITIES.indexOf(v.severity) !== -1 ? v.severity : null,
     verdict: v && ['confirmed', 'refuted', 'uncertain'].indexOf(v.verdict) !== -1 ? v.verdict : 'unverified',
-    reason: conflicts.has(f.id) ? 'contradictory verdicts' : v ? String(v.reason || '') : '',
+    reason: conflicts.has(f.id) ? 'contradictory verdicts' : orphanDuplicates.has(f.id) ? 'duplicate of an unconfirmed id' : v ? String(v.reason || '') : '',
     fixVerdict: v && FIX_VERDICTS.indexOf(v.fixVerdict) !== -1 ? v.fixVerdict : null,
     claim: f.claim,
   }
@@ -1239,6 +1276,8 @@ const synth = await agent(
     `lenses ${liveResults.length}/${lensesRunning} returned, ${lensesDead} DIED; ` +
     `skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ` +
     `${conflicts.size} contradictory verdict(s) demoted to unverified, ` +
+    // TOOL-aEvidencedLens-3 S6 - spec kind only, so the diff kind's prompt stays byte-identical.
+    (isSpec ? `${orphanDuplicates.size} orphaned duplicate refutation(s) demoted to unverified, ` : '') +
     `${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s); ` +
     // TOOL-aSightedSkeptic-2 S4 - how many confirmed fixes a skeptic actually judged.
     `fixes on confirmed findings: ${fixCounts.sound} judged sound, ${fixCounts.unsound} judged UNSOUND, ` +

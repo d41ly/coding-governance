@@ -1232,6 +1232,72 @@ async function runLedgerArms() {
   }
   ck(regradedSeen === 6 && regradedWrong.length === 0,
     'severity: regraded is returned only where a synthesis ran, over the six exit paths' + (regradedWrong.length ? ' — wrong on: ' + regradedWrong.join(', ') : ''))
+
+  // ==== TOOL-aEvidencedLens-3 — the spec skeptic confirms by the rubric, re-runs the evidence, and an
+  // ==== ORPHANED duplicate is demoted. One finding per lens carries one-line, two-line or no evidence;
+  // ==== two per lens put ids 1 and 2 in one batch, verify:ids-1-2.
+  const EVID = { coherence: 'cmd: grep -c x a.md -> 0', grounding: 'line one\nline two' }
+  const buildEvidenceLens = (label) => {
+    const out = buildLensReturn(label)
+    if (EVID[out.lens]) out.findings[0].evidence = EVID[out.lens]
+    return out
+  }
+  const buildPairLens = (label) => {
+    const lens = label.slice('find:'.length)
+    const mk = (n) => ({ file: lens + '.md', line: n, where: 'section ' + n, severity: 'medium', claim: lens + ' claim ' + n, impact: 'i', fix: 'f', evidence: 'read: x.md:' + n })
+    return { lens: lens, path: '/p', findings: [mk(1), mk(2)] }
+  }
+  const buildSkepticAnswers = (over) => (label, prompt) => {
+    const m = /ids ([0-9, ]+)\)/.exec(prompt)
+    const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
+    return { path: '/v', verdicts: ids.map((id) => Object.assign({ id: id, verdict: 'confirmed', reason: 'r', severity: 'medium', fixVerdict: 'sound' }, over[id] || {})) }
+  }
+  const extractProbeSlice = (p) => { const at = p.indexOf('PROBE POLICY'); return at === -1 ? null : p.slice(at, p.indexOf('\n\n', at)) }
+  r = await runReview(SPEC, buildStubs({ 'find:': buildEvidenceLens }))
+  if (checkNoThrow(r, 'spec skeptic evidence run')) {
+    const sv = r.trace.filter((t) => t.label.indexOf('verify:') === 0)
+    const sfp = r.trace.filter((t) => t.label.indexOf('find:') === 0)
+    const marks = ['AT ANY RUBRIC SEVERITY', 'NON-GOAL', 'ALREADY SAYS', 'FALSE ON RE-PROBE', 'BY DESIGN', 'duplicate of id=', 'duplicate of prior', 'PREFERENCE',
+      'could not run inside its bound', "apply the default by the finder's grade", 'a claim about code or a record is checked against that code or record',
+      "re-run the finding's evidence", "never confirm on the finder's word"]
+    ck(sv.length === 5 && sv.every((t) => marks.every((w) => t.prompt.indexOf(w) !== -1) && t.prompt.indexOf('unbuildable or wrong') === -1 && t.prompt.indexOf('not a refutation') === -1),
+      'spec skeptic: every verify prompt confirms at any rubric severity, names the six refutation cases and the grade default, and drops the old test')
+    const lineOf = (id) => sv.map((t) => t.prompt.split('\n').find((l) => l.indexOf('id=' + id + ' [') === 0)).find(Boolean) || ''
+    ck(/ \| fix: f \| evidence: cmd: grep -c x a\.md -> 0$/.test(lineOf(1)) && / \| fix: f \| evidence: line one line two$/.test(lineOf(2)) &&
+      / \| fix: f \| evidence: -$/.test(lineOf(3)) && !sv.some((t) => /^line two/m.test(t.prompt)),
+      'spec skeptic: one-line, two-line and absent evidence ride the verify line after fix, folded to one line, absent as -')
+    const fslice = sfp.length ? extractProbeSlice(sfp[0].prompt) : null
+    ck(!!fslice && sv.every((t) => extractProbeSlice(t.prompt) === fslice && t.prompt.indexOf('PROBE POLICY') < t.prompt.indexOf('Findings to judge:')),
+      'spec skeptic: the verify prompt carries the finders\' PROBE POLICY bytes, before Findings to judge:')
+  }
+  r = await runReview(SPEC, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers({ 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }) }))
+  if (checkNoThrow(r, 'spec skeptic kept duplicate')) {
+    const row = (r.result.ledger || []).find((e) => e.id === 2) || {}
+    ck(r.trace.some((t) => t.label === 'verify:ids-1-2') && row.verdict === 'refuted' && row.reason === 'duplicate of id=1' && !r.logs.some((l) => /DUPLICATE of an id/.test(l)),
+      'spec skeptic: a duplicate of a confirmed survivor in its batch stays refuted, unannounced')
+  }
+  const runOrphanArm = async (over, what) => {
+    r = await runReview(SPEC, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers(over) }))
+    if (!checkNoThrow(r, 'spec skeptic orphan ' + what)) return
+    const row = (r.result.ledger || []).find((e) => e.id === 2) || {}
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+    ck(r.result.unverified >= 1 && row.verdict === 'unverified' && row.reason === 'duplicate of an unconfirmed id' &&
+      r.logs.some((l) => l.indexOf('WARNING:') === 0 && /DUPLICATE of an id/.test(l) && / ids 2$/.test(l)) &&
+      ri.indexOf('1 orphaned duplicate refutation(s) demoted to unverified') !== -1,
+      'spec skeptic: a duplicate of ' + what + ' is demoted to unverified, ledgered, warned and counted in RUN INTEGRITY')
+  }
+  await runOrphanArm({ 1: { verdict: 'refuted', reason: 'r' }, 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }, 'a refuted survivor')
+  await runOrphanArm({ 2: { verdict: 'refuted', reason: 'duplicate of id=2' } }, 'its own id')
+  await runOrphanArm({ 2: { verdict: 'refuted', reason: 'duplicate of id=3' } }, 'an id in another batch')
+  r = await runReview(DIFF, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers({ 1: { verdict: 'refuted', reason: 'r' }, 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }) }))
+  if (checkNoThrow(r, 'spec skeptic diff kind')) {
+    const row = (r.result.ledger || []).find((e) => e.id === 2) || {}
+    const dv = r.trace.filter((t) => t.label.indexOf('verify:') === 0)
+    ck(dv.length > 0 && dv.every((t) => t.prompt.indexOf(' | evidence: ') === -1 && t.prompt.indexOf('PROBE POLICY') === -1) &&
+      row.verdict === 'refuted' && !r.logs.some((l) => /DUPLICATE of an id/.test(l)),
+      'spec skeptic: a diff-kind verify prompt carries no evidence field and no probe policy, and its duplicate refutation is not scanned')
+  }
 }
 
 runWholeScriptArms().then(() => {
@@ -1291,7 +1357,10 @@ printf '%s\n' "$out"
 # RAISED 182 -> 197 by TOOL-aEvidencedLens-2: 15 assertions, counted off the block — eleven prelude
 # `spec scratch:` arms (11), the probe policy under LENS: (1), the evidence field on the spec kind only
 # (1), the print moving with the rules and not with scratch (1) and the folded Windows scratch (1).
-FLOOR_ASSERTIONS=197
+# RAISED 197 -> 205 by TOOL-aEvidencedLens-3: 8 assertions, counted off the block — the skeptic sentence
+# (1), the evidence on the verify line (1), the shared probe-policy bytes (1), a kept duplicate (1), three
+# orphaned duplicates (3) and the untouched diff kind (1).
+FLOOR_ASSERTIONS=205
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
