@@ -22,6 +22,9 @@ red at per-id, so a short-circuiting program could never show the floor verdict 
   predicate 4     per-id resolution       every expected id resolves, or red naming it
   predicate 5     the floor               r@k / ceiling vs the pin, or `not evaluated`
 
+The numbers name roles, not run order: the pin is READ before the fixture, because the pin's head
+decides which term lists a question owes.
+
 `not evaluated` is an explicit rule, not a side effect of stopping early: with a `ceiling` of 0
 there is nothing to divide, and printing that beats a 0/0 or a silent skip.
 
@@ -421,7 +424,8 @@ def check_audit(run: dict, pin: dict) -> list[str]:
 def main() -> int:
     ap = argparse.ArgumentParser(add_help=True, description=__doc__.splitlines()[0])
     ap.add_argument("--data-dir", default=None,
-                    help="grade an already-extracted dir instead of extracting (the arms' seam)")
+                    help="grade an already-built dir instead of building one: an extract.py dir "
+                         "under a single-pair pin (the arms' seam), a build_cache dir under served")
     ap.add_argument("--repo", default=None, help="repo root; defaults to the kit's own")
     ap.add_argument("--fixture", default=None, help="fixture path; defaults to the kit's own")
     ap.add_argument("--audit-fixture", action="store_true",
@@ -451,8 +455,8 @@ def main() -> int:
             run = (measure_served if pin["served"] else measure_run)(data, queries, pin)
         except CheckRefused as exc:
             # ONE handler over BOTH preconditions. Splitting them left `build_data_dir`'s refusal
-            # escaping as a traceback and exit 1, and it is the only branch the leg's own argv
-            # reaches -- every arm passes --data-dir.
+            # escaping as a traceback and exit 1. The builders are the branch the leg's own argv
+            # reaches; the single-pair arms pass --data-dir and skip them, the served arms do not.
             print(f"check-recall: REFUSED -- {exc}", file=sys.stderr)
             return 2
 

@@ -167,7 +167,7 @@ program imports its scoring functions and edits nothing.
 ```bash
 python check-recall.py                  # the merge-bar leg
 python check-recall.py --audit-fixture  # per-question homes, hits and overlap, plus the derivation
-python check-recall.py --data-dir DIR   # grade an already-extracted dir (what the arms use)
+python check-recall.py --data-dir DIR   # grade an already-built dir: extract.py's under a single-pair pin, build_cache's under served
 ```
 
 **The pin names a CELL, as one token**, because `bench.py` emits a matrix that spans 0.17 to 0.83 in
