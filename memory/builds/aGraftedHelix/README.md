@@ -129,7 +129,7 @@ ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraf
 | [TOOL-aGraftedHelix-21 — the spec commit block's delta loop lists untracked paths as its record does, compares paths, and refuses when its record is unset](spec/2026-10-04-spec-TOOL-aGraftedHelix-21.md) | 12 | 1 | SPECCED | rev-3 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 4 record folder(s).
+Records: 13 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-aGraftedHelix-26.
 
