@@ -5660,6 +5660,27 @@ ma_rounds "$mar" 2; ma_commit "$mar" "run raises rounds"; MA_RR=$(ma_sha "$mar" 
 ma_facts "$mar" tRun LANDED HEAD "$(ma_base "$mar")"
 printf 'landed-anchor: remote\n' >> "$mar/memory/builds/tRun/RUN.md"; ma_commit "$mar" "landed record"
 hit "$(ma_leg "$mar")" "$MA_ROUNDS $MA_RR 1 -> 2, run memory/builds/tRun/RUN.md"
+# ---- TOOL-aEvidencedLens-21 S6 (closing review L1). R4: a run commit writes a DECOY conf, `4` sourced
+# ---- and a dead `1` after it; the last-assignment read saw `1`, the default, and named nothing.
+ma_init gr4; mar="$ma_root/gr4"
+sed -i '/^REVIEW_ROUNDS=/d' "$mar/.unattended.conf"; printf 'REVIEW_ROUNDS=4\nif false; then\nREVIEW_ROUNDS=1\nfi\n' >> "$mar/.unattended.conf"
+ma_commit "$mar" "run writes a decoy"; MA_RR=$(ma_sha "$mar" HEAD)
+hit "$(ma_leg "$mar")" "$MA_ROUNDS $MA_RR 1 -> multi:4,1, run memory/builds/tRun/RUN.md"
+# ---- R5: `1` then `01` is one bound, so neither run commit is a round write; the grant hit is the
+# ---- liveness, proving the leg graded that range rather than finding nothing.
+ma_init gr5; mar="$ma_root/gr5"
+ma_rounds "$mar" 1; ma_commit "$mar" "run spells rounds"; ma_rounds "$mar" 01; ma_commit "$mar" "run zero-pads rounds"
+MA_RUN=$(git -C "$mar" log --format=%H --grep='^run grants$' -1)
+out=$(ma_leg "$mar")
+miss "$out" "changes the effective REVIEW_ROUNDS bound"
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+# ---- The four reports that skip or narrow the walk name BOTH arms it gates.
+same "round reports: no skip report names the grant-write arm alone" \
+  "$(grep -cF 'SKIPPED the grant-write arm for' "$TMP/$KIT_REL/check-unattended.sh")" "0"
+same "round reports: both skip reports name both arms" \
+  "$(grep -cF 'SKIPPED the grant-write and round-bound arms for' "$TMP/$KIT_REL/check-unattended.sh")" "2"
+hit "$(grep -F 'excludes the LOCAL ref' "$TMP/$KIT_REL/check-unattended.sh")" "grant-write and round-bound arms"
+hit "$(grep -F 'examined NO own commit' "$TMP/$KIT_REL/check-unattended.sh")" "grant-write and round-bound arms"
 
 # ==== TOOL-aEvidencedLens-14: THE WALK FIRES ON EITHER SCAN'S HIT =================================
 # A BARE graph carries no grant, so the grant scan never hits and only the round scan can trigger the

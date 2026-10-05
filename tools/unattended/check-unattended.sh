@@ -1682,15 +1682,22 @@ scan_grant_writes() { # stdin: commit ids -> `<commit> <README>` per commit that
 # ---- falls to `REVIEW_ROUNDS_DEFAULT`, read from `$DRIVER` because that line is unquoted and
 # ---- `core_of` reads only `KEY="…"`. A comment spelling the key is no assignment. Quotes, a trailing
 # ---- `# comment`, trailing whitespace and a CR are stripped, so `1` and `"1"` are one bound.
+# ---- TOOL-aEvidencedLens-21 S6 (closing review L1): leading zeros of an all-digit value are stripped
+# ---- too, an all-zero value reading `0`, so `01` and `1` are one bound and `00` never reads as
+# ---- absent. MORE THAN ONE assignment line prints `rounds=multi:<v1>,<v2>…`, every value in file
+# ---- order: which one the driver sources is not decidable without running the blob, so the string
+# ---- differs from any single-line parent's and the scan names the commit, fail-closed.
 read_rounds_of() { # conf blob text -> `rounds=<effective bound>`
   printf '%s\n' "$1" | DRV="${DRIVER:-}" awk '
     function clean(v) {
       sub(/\r$/, "", v); sub(/[[:space:]]+#.*$/, "", v); sub(/[[:space:]]+$/, "", v)
       if (v ~ /^".*"$/ || v ~ /^\047.*\047$/) v = substr(v, 2, length(v) - 2)
+      if (v ~ /^[0-9]+$/) { sub(/^0+/, "", v); if (v == "") v = "0" }
       return v
     }
-    /^[[:space:]]*REVIEW_ROUNDS=/ { v = $0; sub(/^[[:space:]]*REVIEW_ROUNDS=/, "", v); r = clean(v) }
+    /^[[:space:]]*REVIEW_ROUNDS=/ { v = $0; sub(/^[[:space:]]*REVIEW_ROUNDS=/, "", v); r = clean(v); all = all (n++ ? "," : "") r }
     END {
+      if (n > 1) { print "rounds=multi:" all; exit }
       if (r == "" && ENVIRON["DRV"] != "")
         while ((getline l < ENVIRON["DRV"]) > 0)
           if (l ~ /^REVIEW_ROUNDS_DEFAULT=/) { sub(/^REVIEW_ROUNDS_DEFAULT=/, "", l); r = clean(l); break }
@@ -2468,15 +2475,15 @@ while IFS= read -r f; do
           mayex=$ADV_HEAD
         elif [ -n "$ADV_NAME" ] && GIT rev-parse --verify --quiet "refs/heads/$ADV_NAME^{commit}" >/dev/null 2>&1; then
           mayex="refs/heads/$ADV_NAME"
-          report "check 19 excludes the LOCAL ref $ADV_NAME from the own commits of $f - the advertised default-branch tip is not in this clone, and a local ref is the weaker reading: a run that merged into it hides its own commits from the grant-write arm"
+          report "check 19 excludes the LOCAL ref $ADV_NAME from the own commits of $f - the advertised default-branch tip is not in this clone, and a local ref is the weaker reading: a run that merged into it hides its own commits from the grant-write and round-bound arms"
         else
           maywhy="it is live and neither the advertised default-branch tip nor a local ref of the advertised name can be read, so its own commits cannot be told from the default branch's"
         fi ;;
     esac
     if [ -n "$maywhy" ]; then
-      report "check 19 SKIPPED the grant-write arm for $f - $maywhy"
+      report "check 19 SKIPPED the grant-write and round-bound arms for $f - $maywhy"
     elif ! maycs=$(read_run_commits "$mayend" "$rb" $mayex); then
-      report "check 19 SKIPPED the grant-write arm for $f - its own commits could not be enumerated from $mayend over base $rb, and an empty list here would read as a run that wrote nothing"
+      report "check 19 SKIPPED the grant-write and round-bound arms for $f - its own commits could not be enumerated from $mayend over base $rb, and an empty list here would read as a run that wrote nothing"
     else
       maywr=$(printf '%s\n' "$maycs" | scan_grant_writes)
       mayrw=$(printf '%s\n' "$maycs" | scan_round_writes)
@@ -2493,7 +2500,7 @@ while IFS= read -r f; do
       # AN EMPTY RANGE IS SAID OUT LOUD. It is honest for a run that has committed nothing past its
       # BASE, and it is what a live record reads as once everything it wrote is on the advertised
       # tip without a committed LANDING to walk from - a skip that looks like a pass otherwise.
-      [ -n "$maycs" ] || report "check 19's grant-write arm examined NO own commit of $f - the range from $mayend over base $rb past its exclusions is empty"
+      [ -n "$maycs" ] || report "check 19's grant-write and round-bound arms examined NO own commit of $f - the range from $mayend over base $rb past its exclusions is empty"
       while read -r maysha mayrd; do
         [ -n "$maysha" ] || continue
         fail 19 "a commit among a run's own commits writes a may: line into a build README, so a run could land the grant the next run would be authorized by - commit and README follow: $maysha in $mayrd, run $f"
@@ -2512,7 +2519,10 @@ while IFS= read -r f; do
       # ---- a value set by a shell construct other than a
       # ---- `REVIEW_ROUNDS=` assignment line, a second file the conf sources, a change in the driver's
       # ---- own REVIEW_ROUNDS_DEFAULT, or an uncommitted working-copy edit the driver sources for the
-      # ---- current run, which raises that run's bound and leaves no commit to read. The terminal walk
+      # ---- current run, which raises that run's bound and leaves no commit to read. An assignment
+      # ---- masked by a later one inside a dead block, a function body or a heredoc is not resolved:
+      # ---- a blob with more than one assignment line reads FAIL-CLOSED as `multi:` (TOOL-aEvidencedLens-21
+      # ---- S6), so the commit writing it is named even where the bound the driver sources held. The terminal walk
       # ---- fires on a hit by EITHER scan (TOOL-aEvidencedLens-14), so a round write is graded over
       # ---- the walked list, never the unwalked superset.
       while read -r maysha mayold maynew; do

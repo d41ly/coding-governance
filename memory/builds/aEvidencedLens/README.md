@@ -46,7 +46,14 @@ evidence no lens was allowed to gather. The owner's prompt and the one answered 
 
 ## Parked decisions
 
-- None yet.
+- The spec-audit promotion chain's generation bound: should M4 bound a chain of promotions by
+  generation as well as by precision? Parked in `RUN.md` at 2026-10-04T23:32:23Z, and re-parked at
+  2026-10-05T03:59:40Z when the run stopped the chain after round 4.
+- Options those rows record: a generation bound in M4, closing a promotion of a promotion unaudited
+  under M4's `specs-audited` override; a size floor, folding the minors of an observation-only unit;
+  keeping the precision bound alone; or an owner-set generation cap.
+- Refused because each changes M4, a governance carrier (M3 veto 2). Units 19 and 20 are built
+  unaudited, and `specs-audited` is overridden at the close, naming this park.
 
 <!-- roster:units -->
 
@@ -75,7 +82,7 @@ evidence no lens was allowed to gather. The owner's prompt and the one answered 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 19 unit(s) · node a · opened 2026-10-05 · streams tooling
+**Build status:** CLOSED · 19 unit(s) · node a · opened 2026-10-05 · streams tooling
 ids TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 TOOL-aEvidencedLens-12 TOOL-aEvidencedLens-13
 ids TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16 TOOL-aEvidencedLens-17 TOOL-aEvidencedLens-18 TOOL-aEvidencedLens-19 TOOL-aEvidencedLens-20 TOOL-aEvidencedLens-21
 
@@ -100,10 +107,10 @@ ids TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16 TOOL-aE
 | [TOOL-aEvidencedLens-18 — unit 15's observation is completed: the HEAD bytes tied to their blob, a break on the masked line, all four prints, both edges, and the closing pass's write set](spec/2026-10-05-spec-TOOL-aEvidencedLens-18.md) | 10 | 2 | CLOSED | rev-4 | 2026-10-05 |
 | [TOOL-aEvidencedLens-19 — unit 18's byte tie is observed with filters off: each saved harness file equals its blob byte for byte, and a CRLF copy and a one-byte append each red it](spec/2026-10-05-spec-TOOL-aEvidencedLens-19.md) | 11 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aEvidencedLens-20 — the minors batch of unit 18's audit: each of its criteria observed live, unit 15's prints and break reused by name, the revs it expects, its false prose corrected, and a closing write set derived rather than asserted](spec/2026-10-05-spec-TOOL-aEvidencedLens-20.md) | 11 | 2 | CLOSED | rev-1 | 2026-10-05 |
-| [TOOL-aEvidencedLens-21 — the closing diff review's batched minors, round 1](spec/2026-10-05-spec-TOOL-aEvidencedLens-21.md) | 12 | 2 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aEvidencedLens-21 — the closing diff review's batched minors, round 1](spec/2026-10-05-spec-TOOL-aEvidencedLens-21.md) | 12 | 2 | CLOSED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 32 bound to this build, across 4 record folder(s).
+Records: 34 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

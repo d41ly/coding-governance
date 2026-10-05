@@ -189,6 +189,15 @@ armScratch('spec scratch: an absolute path outside repo proceeds', GOOD_SPEC, '/
 armScratch('spec scratch: a sibling sharing the repo prefix proceeds', Object.assign({ scratch: '/tmp/rs' }, GOOD_SPEC), '/tmp/rs')
 armScratch('spec scratch: a Windows path proceeds, folded to forward slashes', Object.assign({ scratch: 'C:\\t\\s' }, GOOD_SPEC), 'C:/t/s')
 armScratch('spec scratch: a diff review never reads it', { scratch: 7 }, '')
+// TOOL-aEvidencedLens-21 AC1 (closing review M1, replay id 38) - the under-`repo` test is textual, so a
+// relative `repo`, either MSYS spelling and a `..` segment are refused by name. Each of the four proceeded
+// on the base render; the two controls and the diff kind's relative `repo` still proceed.
+armScratch('spec scratch: a relative repo is refused', Object.assign({ repo: '.', scratch: 'C:/projects/x/tmp' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: under a drive repo by its MSYS spelling is refused', Object.assign({ repo: 'C:/p/x', scratch: '/c/p/x/t' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: under an MSYS repo by its drive spelling is refused', Object.assign({ repo: '/c/p/x', scratch: 'C:/p/x/t' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: a .. segment is refused', Object.assign({ repo: '/tmp/r', scratch: '/tmp/q/../r/x' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: a drive path outside a drive repo proceeds', Object.assign({ repo: 'C:/p/x', scratch: 'C:/t/s' }, GOOD_SPEC), 'C:/t/s')
+armScratch('spec scratch: a diff review keeps a relative repo', { repo: '.', scratch: 7 }, '')
 
 // ---- TOOL-aEvidencedLens-4 AC1 — `prevBlob`, refused malformed and refused at round 1 (spec F1) ----
 // A refusal names `prevBlob`, so the subject ladder's own `needs \`subjects\`` throw cannot satisfy one.
@@ -343,6 +352,14 @@ async function runWholeScriptArms() {
     const rw = await runReview(Object.assign({}, SPEC, { scratch: 'C:\\t\\s' }), ALL_OK)
     ck(!rw.threw && rw.trace.filter((t) => t.label.indexOf('find:') === 0).every((t) => t.prompt.indexOf('PROBE POLICY — repository /tmp/r, scratch directory C:/t/s.') !== -1) &&
       rw.trace.some((t) => t.label.indexOf('find:') === 0), 'a Windows scratch reaches the PROBE POLICY line folded to C:/t/s')
+    // TOOL-aEvidencedLens-21 AC6 (replay id 37) - the per-role scratch rule is constant text, so it rides
+    // every probing prompt, both PROBE POLICY slices stay byte-identical, and no diff prompt carries it.
+    const ROLE_RULE = 'named for your own role, <lens key> for a finder or verify-<batch> for a skeptic'
+    const sv6 = rs.trace.filter((t) => t.label.indexOf('verify:') === 0)
+    const extractPolicySlice = (p) => { const at = p.indexOf('PROBE POLICY'); return at === -1 ? null : p.slice(at, p.indexOf('\n\n', at)) }
+    ck(sf.length === 5 && sv6.length > 0 && sf.concat(sv6).every((t) => t.prompt.indexOf(ROLE_RULE) !== -1 && extractPolicySlice(t.prompt) === extractPolicySlice(sf[0].prompt)) &&
+      r.trace.length > 0 && r.trace.every((t) => t.prompt.indexOf(ROLE_RULE) === -1),
+      'the per-role scratch rule is in every spec find: and verify: prompt, the two PROBE POLICY slices identical, and in no diff prompt')
   }
 
   // ---- AC4: a DEAD probe reuses nothing, dispatches every lens and says so.
@@ -1372,6 +1389,23 @@ async function runLedgerArms() {
     ck(ri.indexOf('UNCHECKED, no usable current blob: m.md, u.md.') !== -1 && ri.indexOf('the resume probe died') === -1,
       'fold: a live probe with no blobs key leaves every subject UNCHECKED, not died')
   }
+  // TOOL-aEvidencedLens-21 AC9 (closing review L2) - the NOT-MOVED arm: a 40-hex `now` that BEGINS with the
+  // pin is the same blob. Red on a render copy whose MOVED predicate always holds.
+  const SAME40 = 'abc1234' + '0'.repeat(33)
+  const PAIR = Object.assign({}, SPEC, { subjects: [{ path: 'm.md', blob: 'abc1234' }, { path: 'v.md', blob: 'abc9999' }] })
+  r = await runReview(PAIR, buildStubs({ 'resume:probe': Object.assign(buildProbe(), { blobs: [{ path: 'm.md', now: SAME40 }, { path: 'v.md', now: MOVED40 }] }) }))
+  if (checkNoThrow(r, 'fold unmoved beside moved')) {
+    ck(!r.logs.some((l) => l.indexOf('m.md MOVED') !== -1) && r.logs.some((l) => l.indexOf('WARNING: v.md MOVED') === 0) &&
+      scanPrompts(r, 'find:').length === 5 && scanPrompts(r, 'find:').every((t) => t.prompt.indexOf('  - m.md  blob abc1234\n') !== -1),
+      'fold: a now beginning with the pin is NOT MOVED beside a moved subject: no WARNING and no MOVED suffix')
+  }
+  r = await runReview(Object.assign({}, SPEC, { subjects: [{ path: 'm.md', blob: 'abc1234' }] }),
+    buildStubs({ 'resume:probe': Object.assign(buildProbe(), { blobs: [{ path: 'm.md', now: SAME40 }] }) }))
+  if (checkNoThrow(r, 'fold unmoved alone')) {
+    ck(!r.logs.some((l) => l.indexOf('m.md MOVED') !== -1) && scanPrompts(r, 'find:').length === 5 &&
+      scanPrompts(r, 'find:').every((t) => t.prompt.indexOf('  - m.md  blob abc1234\n') !== -1) && extractIntegrity(r).indexOf('no checked subject moved') !== -1,
+      'fold: the sole subject, unmoved, reads no checked subject moved in RUN INTEGRITY')
+  }
   const deriveFoldKey = async (pb) => {
     const x = await runReview(Object.assign({}, SPEC, { round: 2, priorFindings: [{ ref: 'a', claim: 'b' }], subjects: [{ path: 's.md', blob: 'abc1234', prevBlob: pb }] }), ALL_OK)
     return x.result ? x.result.key : 'threw'
@@ -1541,7 +1575,10 @@ printf '%s\n' "$out"
 # and every-lens-dead exits (3), the spec synthesis block and its log lines (2) and a light run (1).
 # RAISED 229 -> 231 by TOOL-aEvidencedLens-12: 2 assertions, counted off the `spec evidence:` block — a
 # piped one-line and two-line evidence unescaped on one line (1) and line-break-only evidence as - (1).
-FLOOR_ASSERTIONS=231
+# RAISED 231 -> 240 by TOOL-aEvidencedLens-21: 9 assertions, counted off the block — six prelude `spec
+# scratch:` arms for a relative repo, both MSYS spellings, a .. segment and two controls (6), the per-role
+# scratch rule (1) and the unmoved subject beside a moved one and alone (2).
+FLOOR_ASSERTIONS=240
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

@@ -295,6 +295,14 @@ hasnt_ "scratch: no backslash spelling reaches a prompt" "$p" 'C:\tmp'
 d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
 has    "scratch: the folded path is what dispatch.args carries" "$d" '"scratch":"C:/tmp/s"'
 hasnt_ "scratch: no backslash spelling reaches the hand-out" "$d" 'C:\\tmp'
+# TOOL-aEvidencedLens-21 AC2 (closing review M1, replay id 38) - the prelude keeps the review harness's
+# answer: a relative `repo`, either MSYS spelling and a `..` segment refuse before any stage spends work.
+# Each pair reached `agent:spec:` on the base render; `/tmp/r` beside `/tmp/s` is the control above.
+for u21 in '.|C:/projects/x/tmp' 'C:/p/x|/c/p/x/t' '/c/p/x|C:/p/x/t' '/tmp/r|/tmp/q/../r/x'; do
+  o=$(run_wf "$(printf '%s' "$UNITS" | sed "s#\"repo\":\"/tmp/r\"#\"repo\":\"${u21%%|*}\"#; s#\"scratch\":\"/tmp/s\"#\"scratch\":\"${u21#*|}\"#")" "$(returns CONVERGED 0)")
+  has    "scratch: repo ${u21%%|*} beside scratch ${u21#*|} is REFUSED at the prelude" "$o" "THROW unattended-build:"
+  hasnt_ "scratch: ...repo ${u21%%|*} reaches no stage" "$o" "agent:spec:"
+done
 # THE SENTENCE IS IN GROUND, so every parent-side prompt carries it: each spec writer, the audit
 # recorder, and — on the verdict that spawns it — the disposal agent. OTHER is the load-bearing
 # word: the scratchpad is itself outside the repository. The rev-3 `core.longpaths` clause is armed
@@ -1183,6 +1191,18 @@ o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"disp
     "$SPEC_OK" "$(review_out 1 1 0)" "$(rec BOUNDED)" '{"disposed":true,"standing":[],"promoted":1,"folded":0,"promotedIds":[],"summary":"x"}')")
 has    "D a promotion naming no unit is REFUSED, at the unit floor since TOOL-aEvidencedLens-8" "$o" '0 unit(s) for 1 blocker(s), 0 high(s) and 0 minor(s), below the floor of 1'
 has    "D ...with an empty roster" "$o" '"roster":[]'
+# ---- TOOL-aEvidencedLens-21 AC3 (closing review M2): two raw HIGH ids the report merged into one item.
+# The prompt and the floor agree on RAW ids, and no count changes basis.
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$(review_out 0 2 2)" "$(rec CONVERGED)" "$(dispose_units 2 1)")")
+has    "D21 the disposal prompt makes each merged raw id its own unit" "$(printf '%s\n' "$o" | grep '^prompt:dispose:tB:')" "even where the report merged several ids into one item"
+has    "D21 one unit for two raw HIGH ids in one item: REFUSED at the floor" "$o" "1 unit(s) for 0 blocker(s), 2 high(s) and 0 minor(s), below the floor of 2"
+has    "D21 ...naming raw ids, merged items included" "$o" "one unit per RAW blocker and high id, merged items included"
+has    "D21 ...with an empty roster" "$o" '"roster":[]'
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$(review_out 0 2 2)" "$(rec CONVERGED)" "$(dispose_units 2 2)")")
+has    "D21 ...two units are ACCEPTED" "$o" "disposal: done — promoted 2 · folded 0"
+has    "D21 ...and the record counts stay raw" "$(printf '%s\n' "$o" | grep '^prompt:audit:record')" "--highs 2 --minors 0"
 
 # ---- P (TOOL-cMendedVintage-19): AN EDGE IS A PAIR, AND A REPAIR SITS BESIDE WHAT IT REPAIRS.
 # The round-1 audit of `cMendedVintage` promoted seven findings into units, appended every one past
@@ -1945,8 +1965,9 @@ fi
 # `n=$((n+1))` sites — the PV-AC12 branch's among them, the one region that can SKIP — are not in
 # the static count, so it is a LOWER bound on what a green run executes. Lower it in a reviewed
 # diff or not at all. TOOL-aEvidencedLens-8 raised it by the 17 static sites its arms added (478 to
-# 495), its seven-arm S1 loop counted once.
-FLOOR_ASSERTIONS=371
+# 495), its seven-arm S1 loop counted once. TOOL-aEvidencedLens-21 raised it by the 8 static sites its
+# arms added, 371 to 379: the four-pair prelude loop's two sites counted once, and six D21 sites.
+FLOOR_ASSERTIONS=379
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

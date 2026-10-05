@@ -80,8 +80,11 @@ function buildKeyedSchema(schema, extra) {
 //                                         // and legal at round > 1 only, is the 7-40 hex blob of that path
 //                                         // the previous round audited, and names the fold diff
 //   scratch: "<absolute session scratchpad>", // spec-audit ONLY and REQUIRED there: where a probing lens
-//                                         // writes its temporary files; refused if relative, multi-line
-//                                         // or equal to or under `repo`; a diff review never reads it
+//                                         // writes its temporary files; refused if relative, multi-line,
+//                                         // carrying a .. segment, or equal to or under `repo` once both
+//                                         // fold /c/ to c:/, so this kind also needs an ABSOLUTE `repo`;
+//                                         // an 8.3 name or a link aliasing `repo` is not seen; a diff
+//                                         // review never reads it
 //   round: <integer>,                     // inferred as 2 when priorFindings arrive without one
 //   priorFindings: [ ... ],               // a previous round's confirmed set
 //   specs: ["<repo-relative path>", ...], // intent documents: a diff review's statement of intent, a spec audit's
@@ -250,19 +253,29 @@ else if (isSpec && round > 1 && prevBlobCount < subjects.length)
 // ruling TOOL-aProbedUnit-10 makes it required on every harness agent), refused by the build harness's
 // own SHAPE test (TOOL-aProbedUnit-4), plus two refusals of its own (spec F2): a control character,
 // because the value reaches a prompt line and a newline would start a forged one (the `specs` rule's L1
-// precedent below), and a path equal to or under an absolute `repo`, because a lens writing there writes
-// the tree. That comparison folds slashes, case and a trailing slash, so it errs toward refusing; an 8.3
-// short name or a link aliasing `repo` is not seen. The diff kind never reads `a.scratch`.
-const scratchRule = 'an ABSOLUTE path (a leading / or a drive letter and a separator) with no control character, not equal to or under `repo`'
+// precedent below), and a path equal to or under `repo`, because a lens writing there writes the tree.
+// That comparison folds slashes, case, a trailing slash and an MSYS `/<letter>/` to `<letter>:/`, so it
+// errs toward refusing. It is TEXTUAL, so two more refusals make it answerable (TOOL-aEvidencedLens-21
+// S1): on this kind `repo` must be absolute too, since `"."` cannot be compared in a runtime with no
+// filesystem, and a `..` segment in either value is refused, since `/tmp/q/../r/x` resolves under
+// `/tmp/r`. An 8.3 short name or a link aliasing `repo` is still not seen. The diff kind never reads
+// `a.scratch`, and its `repo` stays as accepted.
+const scratchRule = 'an ABSOLUTE path (a leading / or a drive letter and a separator) with no control character and no .. segment, not equal to or under `repo`'
 if (isSpec && (typeof a.scratch !== 'string' || !/^(\/|[A-Za-z]:[\\/])/.test(a.scratch)))
   throw new Error('tier2-review: a spec-audit needs `scratch`, ' + scratchRule + '. Got ' + JSON.stringify(a.scratch) +
     '. Refusing to default it: a probing lens with no scratch directory has nowhere legal to write.')
 if (isSpec && /[\x00-\x1f]/.test(a.scratch))
   throw new Error('tier2-review: `scratch` must be ' + scratchRule + '. Got ' + JSON.stringify(a.scratch) +
     ', which carries a control character; it reaches a prompt line, where a newline would start a forged one.')
-const scratchFold = isSpec ? a.scratch.replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '') : ''
-const repoFold = String(repo).replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '')
-if (isSpec && /^(\/|[A-Za-z]:[\\/])/.test(String(repo)) && (scratchFold === repoFold || scratchFold.indexOf(repoFold + '/') === 0))
+if (isSpec && !/^(\/|[A-Za-z]:[\\/])/.test(String(repo)))
+  throw new Error('tier2-review: a spec-audit needs an ABSOLUTE `repo` (a leading / or a drive letter and a separator). Got ' +
+    JSON.stringify(repo) + '; `scratch` is refused when it is under `repo`, and a relative `repo` cannot be compared in a runtime with no filesystem.')
+if (isSpec && /(^|[\\/])\.\.([\\/]|$)/.test(a.scratch + '\n' + String(repo)))
+  throw new Error('tier2-review: `scratch` and `repo` must carry no .. segment. Got `scratch` ' + JSON.stringify(a.scratch) +
+    ' beside `repo` ' + JSON.stringify(repo) + '; the under-`repo` test is textual, and a .. segment resolves where the text does not say.')
+const scratchFold = isSpec ? a.scratch.replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '').replace(/^\/([a-z])(?=\/|$)/, '$1:') : ''
+const repoFold = String(repo).replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '').replace(/^\/([a-z])(?=\/|$)/, '$1:')
+if (isSpec && (scratchFold === repoFold || scratchFold.indexOf(repoFold + '/') === 0))
   throw new Error('tier2-review: `scratch` must be ' + scratchRule + '. Got ' + JSON.stringify(a.scratch) + ' beside `repo` ' +
     JSON.stringify(repo) + '; a lens writing its temporary files there writes the tree the read-only rule exists to protect.')
 // Folded to forward slashes ONCE, here, as the build harness folds its own; never lowercased, so the
@@ -445,6 +458,9 @@ const PROBE_RULES = [
   'Time a stated wall-clock goal once, when one run of it is bounded.',
   'READ-ONLY: write nothing under the repository, with ONE exception, the DURABILITY file this prompt names. Never run a command that writes the tree or the index: no --write, --render, --fix or --in-place, no git add, commit, checkout, switch, reset, restore, stash, merge, rebase, clone or worktree, and no redirect into the repository. Read another revision with git show <rev>:<path>.',
   'Every temporary file goes under the scratch directory named above, spelled absolute; never $TMPDIR, $TMP, $TEMP, /tmp or a bare mktemp.',
+  // TOOL-aEvidencedLens-21 S5 (replay id 37): every probing agent shares that one directory, so two lenses
+  // writing a same-named probe file overwrote each other. Constant text, so the print and the two slices hold.
+  'Write temporary files only under a subdirectory of the scratch directory named for your own role, <lens key> for a finder or verify-<batch> for a skeptic, created on first use.',
   'Bound every command at 120 seconds. Never run a merge bar, a *.test.sh suite or a self-test runner, a --selftest flag included.',
   'A probe that needs a write, such as a staged break, or one of the runs banned above, is DESCRIBED in the finding\'s fix as the probe the build must run. It is never performed.',
 ]

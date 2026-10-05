@@ -231,12 +231,20 @@ if (typeof cfg.scratch !== 'string' || !/^(\/|[A-Za-z]:[\\/])/.test(cfg.scratch)
 }
 // TOOL-aEvidencedLens-5 S4 - the callee's two extra refusals, applied HERE so a scratch `tier2-review.js`
 // would refuse dies at this prelude and not after the spec stage and the resolver have spent their work:
-// a control character, and a value equal to or under an absolute `repo` after the same fold (slashes,
-// case, trailing slash) that harness applies.
-const scratchFold = cfg.scratch.replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '')
-const repoFold = String(cfg.repo).replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '')
-if (/[\x00-\x1f]/.test(cfg.scratch) || (/^(\/|[A-Za-z]:[\\/])/.test(String(cfg.repo)) &&
-    (scratchFold === repoFold || scratchFold.indexOf(repoFold + '/') === 0))) {
+// a control character, and a value equal to or under `repo` after the same fold (slashes, case, trailing
+// slash, an MSYS `/<letter>/` to `<letter>:/`) that harness applies. TOOL-aEvidencedLens-21 S1 copies its
+// other two, so both scripts keep one answer: a relative `repo` and a `..` segment in either value are
+// refused, because the comparison is textual. An 8.3 short name or a link aliasing `repo` is not seen.
+if (!/^(\/|[A-Za-z]:[\\/])/.test(String(cfg.repo)) || /(^|[\\/])\.\.([\\/]|$)/.test(cfg.scratch + '\n' + String(cfg.repo))) {
+  throw new Error(
+    'unattended-build: `repo` must be ABSOLUTE and neither `repo` nor `scratch` may carry a .. segment. Got `repo` ' +
+      JSON.stringify(cfg.repo) + ' beside `scratch` ' + JSON.stringify(cfg.scratch) + '; the review harness refuses ' +
+      'both on a spec audit, because its under-`repo` test is textual, so this refuses before any stage spends work.',
+  )
+}
+const scratchFold = cfg.scratch.replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '').replace(/^\/([a-z])(?=\/|$)/, '$1:')
+const repoFold = String(cfg.repo).replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '').replace(/^\/([a-z])(?=\/|$)/, '$1:')
+if (/[\x00-\x1f]/.test(cfg.scratch) || scratchFold === repoFold || scratchFold.indexOf(repoFold + '/') === 0) {
   throw new Error(
     'unattended-build: `scratch` must carry no control character and must not be equal to or under `repo`. Got ' +
       JSON.stringify(cfg.scratch) + ' beside `repo` ' + JSON.stringify(cfg.repo) + '; the review harness refuses ' +
@@ -1344,7 +1352,10 @@ if (!specAudit) {
       ' unverified. Open the report and take each confirmed finding at the severity the report ' +
       'gives it. Every count above is of RAW findings by report id and never of the items a report ' +
       'may merge them into, so a finding merged into an item takes that item\'s severity and still ' +
-      'counts once, by its own id. An UNVERIFIED finding came back with no usable skeptic verdict and is OUTSTANDING, ' +
+      'counts once, by its own id. Each BLOCKER or HIGH id is its own unit even where the report merged ' +
+      'several ids into one item, because the unit floor, the driver\'s owed count and check 2 all count ' +
+      'raw ids: ids sharing an item each take a unit, and each unit\'s spec names its id and the item it ' +
+      'shares. An UNVERIFIED finding came back with no usable skeptic verdict and is OUTSTANDING, ' +
       'not cleared — read the code yourself and take it at the severity you adjudicate. ' +
       'BUILD-METHOD M4 disposes BY SEVERITY and admits no third ' +
       'route. PROMOTE every BLOCKER and every HIGH: ' +
@@ -1522,7 +1533,7 @@ if (!specAudit) {
       : promotedIds.length < unitFloor
         ? promotedIds.length + ' unit(s) for ' + au.blockers + ' blocker(s), ' + au.highs +
           ' high(s) and ' + minors + ' minor(s), below the floor of ' + unitFloor + ' — one unit per ' +
-          'blocker and high, plus one for the minors'
+          'RAW blocker and high id, merged items included, plus one for the minors'
       : promotedIds.length > unitCeiling
         ? promotedIds.length + ' unit(s) where at most ' + unitCeiling + ' fit — the minors are ' +
           'batched into one unit or two, never one per minor'

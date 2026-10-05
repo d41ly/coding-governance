@@ -1,11 +1,13 @@
 # TOOL-aEvidencedLens-21 — the closing diff review's batched minors, round 1
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 12
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-05-build-TOOL-aEvidencedLens-21-1-ab-replay.md](../build/2026-10-05-build-TOOL-aEvidencedLens-21-1-ab-replay.md) | journal | — |
+| [2026-10-05-build-TOOL-aEvidencedLens-21-2-acceptance-ledger.md](../build/2026-10-05-build-TOOL-aEvidencedLens-21-2-acceptance-ledger.md) | journal | — |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-21-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-21-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

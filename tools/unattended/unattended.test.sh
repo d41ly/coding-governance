@@ -2779,11 +2779,15 @@ same "phase after a backslash-n attestation" "$(read_phase)" "$_rf_p0"
 run_hostile_verb() { # verb · value
   case "$1" in
     attest)       run --attest tRun --item keepalive-reaped --value "$2" ;;
-    resume)       run --resume tRun --keepalive-id "$2" ;;
+    # --replaces names bcopen's lease: without it check 58 refused every form as a second driver, before
+    # the value was read (TOOL-aEvidencedLens-21 S3, measured on a slice of this block).
+    resume)       run --resume tRun --keepalive-id "$2" --replaces KA-1234 ;;
     park)         run --park tRun --item "$2" --reason "a hostile item" ;;
     propose)      run --propose tRun --item "$2" --step F4 --reason "a hostile item" ;;
     brief)        run --brief tRun --unit ARCH-tRun-1 --path "$2" ;;
-    review)       run --review tRun --subject "$2" --verdict CLEAN --blockers 0 ;;
+    # The counts since TOOL-aEvidencedLens-7: a terminal exit with none is refused before park(), so
+    # this row passed by a refusal unrelated to the value (closing review M3, TOOL-aEvidencedLens-21).
+    review)       run --review tRun --subject "$2" --verdict CLEAN --blockers 0 --highs 0 --minors 0 ;;
     dispatch)     run --dispatch tRun --pass ARCH-tRun-1 --writes "$2" ;;
     record-piece) run --record-piece tRun --records-root recs --path memory/builds/tRun/README.md --leg "$2" --verdict PASS ;;
     record-set)   run --record-set tRun --records-root recs2 --leg "$2" --verdict PASS ;;
@@ -2811,6 +2815,7 @@ done
 # BYTE, not a phase count - `grep -c '^phase: '` splits on line feeds only and cannot see it. Carried
 # in variables, because a `$'\r'` spelled inside a command substitution loses the byte on this node.
 _rf_crf=$'yes\rphase: LANDED'
+_rf_oneline=""
 for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED' "$_rf_crf"; do
   # ONE open run per form, not one per verb: a preflight costs a process tree, and the property is
   # per-call (phase unchanged by THIS verb), so the verbs share the run. --close and --abort each END
@@ -2833,7 +2838,15 @@ for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED' "$_rf_crf"; do
       preflight) reset_tree; rm -f memory/builds/tRun/RUN.md; git add -A >/dev/null
                  git commit -q -m 'no record yet' --no-verify; _rf_p0="" ;;
     esac
-    run_hostile_verb "$_rf_v" "$_rf_form" >/dev/null 2>&1
+    run_hostile_verb "$_rf_v" "$_rf_form" >/dev/null 2>&1; _rf_rc=$?
+    # The one-line form's EXIT STATUS, per verb, graded after the loops (TOOL-aEvidencedLens-21 S3).
+    case "$_rf_form" in 'yes\nphase: LANDED') _rf_oneline="$_rf_oneline $_rf_v=$_rf_rc" ;; esac
+    # LIVENESS for --review, the shape the record verbs carry below: the accepted one-line form lands
+    # as ONE row, or "phase unchanged" is a read of a file the verb never wrote.
+    case "$_rf_v$_rf_form" in 'reviewyes\nphase: LANDED')
+      same "rows the one-line form of --review wrote" \
+        "$(grep -cF 'review · item yes\nphase: LANDED · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0' memory/builds/tRun/RUN.md 2>/dev/null)" 1 ;;
+    esac
     case "$_rf_v" in record-piece|record-set)
       _rf_rec=$(grep -rh '' recs recs2 2>/dev/null)
       same "phase lines in the records --$_rf_v wrote from a hostile value" "$(grep -c '^phase: ' <<<"$_rf_rec")" 0
@@ -2863,6 +2876,31 @@ for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED' "$_rf_crf"; do
       *) same "phase after --$_rf_v with a hostile value" "$(read_phase)" "$_rf_p0" ;;
     esac
   done
+done
+# ---- TOOL-aEvidencedLens-21 S3 (closing review M3): A REFUSAL IS NOT A PASS. The one-line form is the
+# ---- value every verb must STORE as written; a verb that refused it passed "phase unchanged" by never
+# ---- reaching the write, which is how --review passed with no counts. Each refusal reds here unless
+# ---- the list below names the verb and the reason it refuses the value ITSELF, and a listed verb that
+# ---- accepted the form reds too, so the list cannot go stale. Its members were MEASURED on a slice of
+# ---- this block, not typed from the spec.
+_rf_exempt='brief|check 49: the value is the --path, and a path that is not a file in the tree has nothing to hash
+dispatch|check 49: the value is a --writes path, and the form carries a space, whitespace the declaration cannot carry'
+_rf_exempt_verbs=$(printf '%s\n' "$_rf_exempt" | cut -d'|' -f1)
+for _rf_v in $_rf_matrix; do
+  _rf_rc=$(printf '%s\n' $_rf_oneline | sed -n "s/^$_rf_v=//p")
+  _rf_x=0; printf '%s\n' "$_rf_exempt_verbs" | grep -qx -- "$_rf_v" && _rf_x=1
+  n=$((n+1))
+  if [ -z "$_rf_rc" ]; then
+    echo "FAIL --$_rf_v recorded no exit status for the one-line hostile form, so the matrix never drove it"; st=1
+  elif [ "$_rf_rc" != 0 ] && [ "$_rf_x" = 0 ]; then
+    echo "FAIL --$_rf_v REFUSED the one-line hostile form (exit $_rf_rc), so its phase arm passed by a refusal; fix its call or name it in the exemption list with the reason"; st=1
+  elif [ "$_rf_rc" = 0 ] && [ "$_rf_x" = 1 ]; then
+    echo "FAIL the exemption for --$_rf_v is stale: it ACCEPTED the one-line hostile form"; st=1
+  fi
+done
+for _rf_v in $_rf_exempt_verbs; do
+  n=$((n+1)); case " $_rf_matrix " in *" $_rf_v "*) ;;
+    *) echo "FAIL the exemption list names --$_rf_v, which the matrix does not drive"; st=1 ;; esac
 done
 # ---- ...and the two refusals by name, each form. The file is byte-identical after each (AC4's rule).
 # ---- The CR values ride variables: a `$'\r'` spelled inside a command substitution loses the byte
@@ -13896,7 +13934,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 1843 -> 1877 by TOOL-aRepatriatedFork-53: the task-registry block's 34 unconditional
 # hit/miss/same/mutate lines in region two beside the `--audit` arms, COUNTED off the block; no suite
 # ran in the pass, and each case was observed by a scratch fixture driving the driver itself.
-FLOOR_ASSERTIONS=1877
+# RAISED 1877 -> 1894 by TOOL-aEvidencedLens-21: the hostile-value matrix's 17 region-two assertions,
+# the --review one-line row (1), one exit-status verdict per matrix verb (14) and one per exemption
+# (2), measured on a slice of the block; no suite ran.
+FLOOR_ASSERTIONS=1894
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -14024,7 +14065,8 @@ FLOOR_SHARD_1=209
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
 # RAISED 1640 -> 1646: the same six region-two assertions, see FLOOR_ASSERTIONS.
 # RAISED 1646 -> 1680: the same 34 region-two task-registry assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1680
+# RAISED 1680 -> 1697: the same 17 region-two matrix assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1697
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.
