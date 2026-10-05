@@ -83,7 +83,9 @@ repo-wide python-launcher seam rather than anything this feature owns.
   drift-audit reports the count as `dossiers_older_than_their_paths` against a shrink-only pin
   (TOOL-aMendedFleet-37). It says a dossier was not re-read after its code moved, never that its
   prose is false. Map-root paths are not claims, a merge commit carries no paths, and
-  `FOUNDATION.md` is not measured.
+  `FOUNDATION.md` is not measured. Its one `git log` restates every default a config key could
+  change (`--no-show-signature`, `--no-color`, `--no-renames`), because the parse reads that
+  stdout as data and `log.showSignature` alone would print gpg text into it.
 - **Shell is in the symbol layer.** It carries the product here — the gates, adopters and hooks —
   and the project-owned `kit-sh` layer reads every `*.sh` under the tool root, `.githooks/` and
   `skills/` through the lexicon kit's tokenizer, failing closed. `RECALL_DARK_LAYERS` is empty, so

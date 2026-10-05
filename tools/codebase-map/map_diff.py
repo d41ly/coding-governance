@@ -361,9 +361,12 @@ def read_commit_paths(root: Path, base: str | None, head: str = "HEAD"):
     if lines[0] == "true":
         return None
     shas = lines[1:]
+    # Every flag below that restates a default is there because a config key can change it, and
+    # the parse reads stdout as data: `log.showSignature` prints gpg text into it.
     out = subprocess.run(
         ["git", "-C", str(root), "-c", "core.quotePath=false", "log", "--topo-order",
-         "--no-renames", "--format=%x00%H %P", "--name-only", *shas, "--"],
+         "--no-renames", "--no-show-signature", "--no-color", "--format=%x00%H %P", "--name-only",
+         *shas, "--"],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     if out.returncode != 0:
