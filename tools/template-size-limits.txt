@@ -119,8 +119,9 @@ memory/guides/UNATTENDED-PROTOCOL.md	65692
 # re-read than the ruleset does. A unit builder re-reads its current spec whole at every pass
 # boundary (the build method's M7, step 4), so a spec's bytes are a read cost paid once per pass.
 # Measured at 580dc980 over every tracked spec: median 17,121 bytes, 90th percentile 46,302,
-# largest 156,459 (terminal). Of 68 live specs, 11 exceeded 32768 and 5 exceeded 49152; 32768 was
-# rejected because it held eleven, and the largest live spec was rejected because it bounds nothing.
+# largest 156,459 (terminal). At landing 5 live specs exceeded 49152 and twice as many exceeded
+# 32768, which was rejected for that reason; the largest live spec was rejected because it bounds
+# nothing. The live count is the size join's own report line, never a figure typed here.
 #
 # THIS KEY IS A CLASS LABEL that no measured file's key equals, so check-template-size.sh never
 # reads it. Its reader is <prefix>/check-spec-tokens.py's size join, whose population is that
