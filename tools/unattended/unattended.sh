@@ -48,7 +48,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.68   # gov:kit unattended@1.68 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.69   # gov:kit unattended@1.69 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -1808,9 +1808,10 @@ print_claims() { # -> the rows on stdout; rc 2 when the remote does not answer
 
 # THE TABLE'S TWO AXES, declared once (TOOL-aGraftedHelix-19): the claim-read classes the function
 # below derives, in the table's row order, and the modes its callers pass, the table's four columns
-# then `beat`. The function refuses a mode outside CLAIM_MODES, and the suite's per-cell arm reads
+# then `beat`. The function refuses a mode outside CLAIM_MODES, and a class it derives outside
+# CLAIM_READS (TOOL-aGraftedHelix-22), each before any claim write; the suite's per-cell arm reads
 # both lines to derive its cells, so a class or mode added here without a typed cell reds that arm.
-# WHAT THIS DOES NOT CHECK: a derived class outside CLAIM_READS (TOOL-aGraftedHelix-22's).
+# WHAT THIS DOES NOT CHECK: that a member here has a case branch below; the per-cell arm owns that.
 CLAIM_READS="none mine same foreign-live foreign-held foreign-stale foreign-terminal foreign-unknown"
 CLAIM_MODES="preflight take-over holder status beat"
 
@@ -1822,7 +1823,7 @@ CLAIM_MODES="preflight take-over holder status beat"
 # which is due. Modes are the table's columns plus `beat`, which writes only through the none and
 # `mine` rows of the holder column and declines every other row in silence for `--beat` to name.
 # rc 0: write (CW_ACT create|renew|rewrite|take|take-announced|write) · rc 2: `mine` and not due ·
-# rc 1: refused, check 89, 90 or 92 printed · rc 3: not written, announced (status) or declined (beat).
+# rc 1: refused, check 89, 90, 92 or 93 printed · rc 3: not written, announced (status) or declined (beat).
 # TOOL-aGraftedHelix-11 - THE RUN-STATE FILE, sixth, is where a write that does not take the claim
 # copies its identity from, the one `write_claim` is handed too: `--preflight` and a take-over pass
 # none, every other writer passes the record. `mine` keeps the claim's own `node`.
@@ -1858,6 +1859,11 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     elif [ -n "$ps" ] && [ "$mode" = take-over ] && [ "$c_sess" = "$ps" ] && [ "$c_ka" = "$(fact "$rel" keepalive)" ]; then cls=same
     else cls="foreign-$c_verdict"; fi
   fi
+  case " $CLAIM_READS " in
+    *" $cls "*) ;;
+    *) fail 93 "this call derived a claim-read class the driver does not declare, so the claim write table has no row for it and nothing was written; declare the class in CLAIM_READS beside its case branch: class $cls · CLAIM_READS $CLAIM_READS"
+       return 1 ;;
+  esac
   if [ "$cls" = mine ]; then
     [ "$c_node" = - ] || CW_NODE="$c_node"
     # DUE at a quarter of the stale bound, or when a field the write would set differs - so a holder

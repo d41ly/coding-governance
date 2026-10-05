@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-22 — the claim write decision refuses a derived claim-read class outside `CLAIM_READS`, observed by a criterion and kept by a standing arm
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 4
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 4
 
 <!-- gen:spec-records -->
 

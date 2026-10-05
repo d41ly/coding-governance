@@ -12709,6 +12709,26 @@ hit  "$out" "UNATTENDED check 92 FAILED — this call passed a claim mode the dr
 same "GH19 S5 the refused status write moves no claim ref" "$(read_claim_ref tRun)" "$gc_sha"
 rm -rf "$gc_drv"
 remove_claim_refs; reset_tree
+# ---- TOOL-aGraftedHelix-22 S2: a claim-read class the decision derives outside CLAIM_READS is
+# ---- refused before any claim write. The scratch driver REMOVES the existing member `foreign-stale`,
+# ---- so the class keeps its case branch and only the read-axis membership test stands between a
+# ---- foreign stale claim and `--preflight`'s take, announced write: red when that test is gone.
+arm_claim_fixture
+gc_drv=$(mktemp -d)
+sed 's/^\(CLAIM_READS=".*\) foreign-stale\(.*"\)$/\1\2/' "$SCRIPT" >"$gc_drv/unattended.sh"
+cp "$HERE/lib-unattended.sh" "$gc_drv/lib-unattended.sh"
+gc_r0=$(sed -n 's/^CLAIM_READS="\(.*\)"$/\1/p' "$SCRIPT")
+gc_r1=$(sed -n 's/^CLAIM_READS="\(.*\)"$/\1/p' "$gc_drv/unattended.sh")
+hit  " $gc_r0 " " foreign-stale "
+same "GH22 S2 the scratch driver's CLAIM_READS is the kit's less foreign-stale" " $gc_r1 " "$(printf ' %s ' "$gc_r0" | sed 's/ foreign-stale / /')"
+seed_claim_row foreign-stale tFresh s-new k2
+gc_sha=$(read_claim_ref tFresh)
+out=$(CLAUDE_CODE_SESSION_ID=s-new bash "$gc_drv/unattended.sh" --preflight tFresh --keepalive-id k2 2>&1)
+hit  "$out" "UNATTENDED check 93 FAILED — this call derived a claim-read class the driver does not declare, so the claim write table has no row for it and nothing was written; declare the class in CLAIM_READS beside its case branch: class foreign-stale · CLAIM_READS $gc_r1"
+same "GH22 S2 the refused preflight moves no claim ref" "$(read_claim_ref tFresh)" "$gc_sha"
+same "GH22 S2 ...and writes no run-state file" "$([ -e memory/builds/tFresh/RUN.md ] && echo present || echo absent)" "absent"
+rm -rf "$gc_drv"
+remove_claim_refs; reset_tree
 
 # ==================================================================================================
 # TOOL-aGraftedHelix-18 — THE HOLDER ROW DECIDES `mine` BEFORE ITS write_lease AND COPIES THE CLAIM'S
@@ -13357,7 +13377,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # region two, its five `mutate` calls included, MEASURED: that block run alone behind this prologue
 # and the claim block's gh_ helpers on node a, 2026-10-05, executed 71 against the prologue's own 20,
 # green against the kit and red under six staged driver breaks, one per arm; no suite ran.
-FLOOR_ASSERTIONS=2178
+# RAISED 2178 -> 2184 by TOOL-aGraftedHelix-22: the read-axis refusal arm's 6 executed assertions in
+# region two, its one `mutate` call included, MEASURED: that arm run alone behind this prologue and
+# the claim block's gh_ helpers on node a, 2026-10-05, executed 26 against the prologue's own 20,
+# green against the kit and red, three of them, with the read-axis membership test removed; no suite ran.
+FLOOR_ASSERTIONS=2184
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -13493,7 +13517,8 @@ FLOOR_SHARD_1=209
 # RAISED 1902 -> 1917: the same 15 region-two claim-cell and mode-refusal assertions, see FLOOR_ASSERTIONS.
 # RAISED 1917 -> 1930: the same 13 region-two hook, linked-kit and announcement assertions, see FLOOR_ASSERTIONS.
 # RAISED 1930 -> 1981: the same 51 region-two prior-session assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1981
+# RAISED 1981 -> 1987: the same 6 region-two read-axis refusal assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1987
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.
