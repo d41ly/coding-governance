@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-13 — an engine arm observes hygiene check 28 red the leg, and print its summary on a green run
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 7
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -32,10 +32,11 @@ audit.
   manifest's `last-audit` is then re-stamped, because the engine is on its watch list. Observed by
   AC1 and AC2.
 - **S3** — `tools/memory-tree/check-memory-hygiene.test.sh` gains the two cases as an engine arm,
-  built on the otherwise-clean `_b1` fixture rather than on `c6run`, whose caps tree is red by
-  design. The arm asserts that the clean run exits 0 and that the branch run's only offending check
-  is 28. NOT OBSERVED by a criterion here: the suite is the close's to run, and its red on a staged
-  break is observed there (§7).
+  built on the otherwise-clean `_b1` shape rather than on `c6run`, whose caps tree is red by
+  design, and copy-installed the way `TOOL-aGraftedHelix-14`'s check-27 arm is (§4). The arm
+  asserts that the clean run exits 0 and that the branch run's only offending check is 28, read
+  from `--offenders` as that sibling reads it. NOT OBSERVED by a criterion here: the suite is the
+  close's to run, and its red on a staged break is observed there (§7).
 - **S4** — The memory-tree kit version moves once after this unit's last move if its shipped bytes
   moved, in every carrier `tools/check-kit-versions.sh` pairs. Observed by AC3.
 - **S5** — A gotcha record of the presence-probe class joins `memory/gotchas/`: a `grep -n` for a
@@ -78,17 +79,28 @@ re-renders the index the same way, so the branch's only offence is the duplicate
 keys held by a record added since the mainline merge-base, so the copy is graded and the original is
 not, and the finding names both stems. The clean case is the same tree on `main` alone.
 
-Both engine runs execute the worktree's engine by its path with the working directory at the
-fixture root, as `c6run` does, and under `GOV_DEFAULT_BRANCH=main`, so the merge-base derivation
-reads the fixture's own `main` whatever the shell exports. The staged break is made in a scratch
-copy of the whole kit directory, `tools/memory-tree/*.sh` and `*.py` copied the way the suite's
-`kit21` arm copies them, and the copy's engine is run. The tracked engine is never edited.
+The fixture is COPY-INSTALLED, the shape `TOOL-aGraftedHelix-14`'s check-27 arm uses: the
+worktree's `tools/memory-tree/*.sh` and `*.py` are copied to the fixture's own kit path, which its
+`.gitignore` excludes, and the index and catalogue renders run from that copy. Both engine runs
+execute the copy's engine by its path, with the working directory at the fixture root and under
+`GOV_DEFAULT_BRANCH=main`, so the merge-base derivation reads the fixture's own `main` whatever the
+shell exports. The staged break is made in that copy, which is a scratch copy of the whole kit
+directory, and the tracked engine is never edited. The recall kit is not copied: check 28 reads no
+sibling kit, and check 27 is NOT ARMED here because the fixture declares no `NEAR_MATCH_GATE`.
+
+Why not the worktree's engine run over a fixture beside it (rev-2's design), measured at the build
+pass: a copy of the kit OUTSIDE the fixture renders the build index and the gotcha catalogue
+differently from the worktree's kit, so the staged-break run redded checks 9 and 17-19 as well and
+could not exit 0; and the worktree's engine resolves check 26's `.memory-tree.conf` above ITSELF,
+so its run over the fixture walked the host repository's 417 merges rather than the fixture's.
+Either way a check other than 28 could hold the exit, which is the risk §5 names.
 
 ### Files touched (estimate)
 
 - `tools/memory-tree/check-memory-hygiene.test.sh`
-- `tools/memory-tree/check-memory-hygiene.sh`, only where S2 repairs the block
-- `memory/guides/SESSION-KICKOFF.md`, only where S2 moves the engine
+- `tools/memory-tree/check-memory-hygiene.sh`, its version line under S4, and the block only where
+  S2 repairs it
+- `memory/guides/SESSION-KICKOFF.md`, its `last-audit` stamp wherever the engine moves
 - `memory/gotchas/INDEX.md`, and one new record under `memory/gotchas/` (S5)
 - every other carrier of the memory-tree version marker, which `tools/check-kit-versions.sh`
   enumerates
@@ -108,11 +120,12 @@ copy of the whole kit directory, `tools/memory-tree/*.sh` and `*.py` copied the 
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the worktree's `tools/memory-tree/check-memory-hygiene.sh` runs by its path, with
-  the working directory at the root of the fixture's branch and `GOV_DEFAULT_BRANCH=main`, it exits
-  non-zero, prints a line opening `check 28:` naming both gotcha stems, and prints no other line
-  opening `check <n>:`. With the block's `status=1` deleted in a scratch copy of the kit directory,
-  the copy's engine run the same way exits 0; that red is observed once.
+- **AC1** — When the fixture's copy of `tools/memory-tree/check-memory-hygiene.sh`, installed at the
+  fixture's own kit path from the worktree's kit directory, runs by its path, with the working
+  directory at the root of the fixture's branch and `GOV_DEFAULT_BRANCH=main`, it exits non-zero,
+  prints a line opening `check 28:` naming both gotcha stems, and prints no other line opening
+  `check <n>:`. With the block's `status=1` deleted in that copy, the same run exits 0; that red is
+  observed once.
   Red when: the block swallows the mode's exit, so the engine exits 0 over the duplicate, or another
   check holds the exit.
 - **AC2** — When the same command runs on the fixture's `main`, it exits 0 and prints a line
@@ -131,7 +144,7 @@ copy of the whole kit directory, `tools/memory-tree/*.sh` and `*.py` copied the 
 
 `memory hygiene` · `memory-hygiene self-test` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/memory-tree/check-memory-hygiene.test.sh · the engine over an otherwise-clean branch adding a duplicated gotcha, asserting 28 is its only offending check, and over its clean main; stage the dispatch block's status=1 deleted, then its green-run print deleted, each in a scratch copy of the kit directory · the suite's floor rises by its new arm count
+New arm: tools/memory-tree/check-memory-hygiene.test.sh · the engine over an otherwise-clean branch adding a duplicated gotcha, asserting 28 is its only offending check, and over its clean main; stage the dispatch block's status=1 deleted, then its green-run print deleted, then its offender-key line deleted, each in the fixture's copy of the kit directory · the suite's floor rises by its new arm count
 
 The close runs the legs and the suite; a pass runs the two engine commands above as its check.
 
@@ -150,6 +163,14 @@ none
   block as a second signature, the decline is parked in the build README, and S5 adds the
   presence-probe gotcha as the documented check, AC4). The fixture also pins `GOV_DEFAULT_BRANCH`,
   as finding 28 asked of this unit's fixture.
+- rev-3 · 2026-10-05 · S3 · §4 The fixture, Files touched · AC1 · §7 · §10 · the build pass,
+  before any code: the fixture is copy-installed as `TOOL-aGraftedHelix-14`'s check-27 arm is, and
+  the engine run is the fixture's copy rather than the worktree's. Measured at the pass, rev-2's
+  scratch copy outside the fixture redded checks 9 and 17-19 under the staged break, so AC1's red
+  half could not exit 0, and the worktree's engine read check 26 against the host repository. The
+  arm reads the branch's only offending check from `--offenders`, as unit 14's does, and §7 adds a
+  third staged break, the offender-key line, which that read is the one observer of. Files touched
+  now name the version line and the stamp, which S4 owes whether or not S2 repairs the block.
 
 ## 10. Reuse audit
 
@@ -162,5 +183,8 @@ silence. The recall probe returned `TOOL-cSpliceWarden-6`, the ruling that check
 The round-1 audit of units 10 to 15 added `TOOL-aDeferredBar-8`, the open ask for a second
 `check-arms.py` discovery signature, which §3 now engages. The fixture's seam moved from `c6run` to
 `_b1` in the same suite, the one fixture there asserted otherwise clean before it reads a check.
+Rev-3 moved its install shape to the copy-install fixture of `TOOL-aGraftedHelix-14`'s check-27
+arm in that suite, the sibling this unit mirrors, after the `kit21` scratch-copy shape rev-2 named
+was measured redding three other checks under the staged break.
 
 Recall terms used: hygiene engine dispatch delegated row_grammar check-rotation status offender green-run summary arm staged break
