@@ -229,6 +229,12 @@ After a clean `--close` or `--abort`, the driver writes that call's END line its
 the run record through the runlog kit, re-renders the index and stages both (`TOOL-aMendedFleet-63`);
 under `in-place` the close commits them. A miss is one line, and no exit moves.
 
+The close is decided at `VERIFYING`, so the move into that phase, and a resume that finds the record
+there, prints what the close should carry, report-only: the open asks whose pointer names a file the
+range from the pinned base to HEAD touched, read through `ASKS_CMD --json --path <paths> --limit 0`,
+the asks companion's fourth call shape (`TOOL-aMendedFleet-66`), and then whether that range owes the
+flagged bar. Each list is a disposition worklist; neither refuses and no exit moves.
+
 ## The bar's bound — wall, queue and margin
 
 `TOOL-dDerivedDocket-27`, under owner ruling D12-i7. The unattended bar has ONE declared number,

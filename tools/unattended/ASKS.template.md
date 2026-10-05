@@ -183,6 +183,9 @@ by `ask`, then an `examined` line — reading its stdout alone:
    verb examines.
 3. A filing home's live asks, printed verbatim beside the recipe and never parsed:
    `<ASKS_CMD> --build <home> --at <merge-base of the anchor and HEAD>`.
+4. The open asks targeting the run's range, at the move into `VERIFYING` and at a resume there,
+   read as the generator's JSON projection by key and never parsed by position:
+   `<ASKS_CMD> --json --path <every path the pinned base..HEAD touched> --limit 0`.
 
 A later caller may read the working tree in shape 1's projection with no `--at`. Every call runs
 under the driver's declared bound, and a breach reads as never answered, which is not a red.

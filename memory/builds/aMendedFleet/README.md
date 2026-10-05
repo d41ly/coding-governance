@@ -242,7 +242,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-63 — `--close` and `--abort` render the run record themselves, after their own END line](spec/2026-10-04-spec-TOOL-aMendedFleet-63.md) | 63 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-64 — `govkit selfcheck --fix` writes every kit-version carrier from its `version_from` constant](spec/2026-10-04-spec-TOOL-aMendedFleet-64.md) | 64 | 2 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aMendedFleet-65 — the lander mints kit versions, so a branch owes no bump](spec/2026-10-04-spec-TOOL-aMendedFleet-65.md) | 65 | 2 | CLOSED | rev-3 | 2026-10-05 |
-| [TOOL-aMendedFleet-66 — the unattended close sequence lists the open asks that target files the run touched](spec/2026-10-04-spec-TOOL-aMendedFleet-66.md) | 66 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-66 — the unattended close sequence lists the open asks that target files the run touched](spec/2026-10-04-spec-TOOL-aMendedFleet-66.md) | 66 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-67 — review and drift harnesses can spawn their judges as a read-only agent type that omits the charter](spec/2026-10-04-spec-TOOL-aMendedFleet-67.md) | 67 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-68 — the unattended Skill becomes a router of at most 10 KiB](spec/2026-10-04-spec-TOOL-aMendedFleet-68.md) | 68 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-69 — the agent-instructions kit announces a canonical file past 32 KiB and states both tool facts as verified](spec/2026-10-04-spec-TOOL-aMendedFleet-69.md) | 69 | 1 | SPECCED | rev-2 | 2026-10-04 |

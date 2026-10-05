@@ -9320,6 +9320,26 @@ cp "$ip_out/keep.conf" "$ip_dir/.unattended.conf"
 sed -i '/^base: /d' "$ip_dir/memory/builds/tRun/RUN.md"
 out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
 hit  "$out" "unattended: the record pins no base, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed"
+# ---- TOOL-aMendedFleet-66: the move into VERIFYING lists the open asks that target a file the run's
+# ---- range touched, through the declared ASKS_CMD's --path shape. The stub answers its fixture ask
+# ---- only when the touched path is among the --path words, so a listed ask proves the range was read.
+ipreset
+iprun --preflight tRun --keepalive-id k1 >/dev/null
+ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+cat > "$ip_out/asks66.sh" <<'IPA'
+#!/usr/bin/env bash
+case " $* " in
+  *" --json --path "*" kitsurface/thing.txt "*" --limit 0 "*)
+    printf '{"asks":[{"id":"ARCH-tRun-9","status":"OPEN","sev":"low","summary":"the fixture ask on thing.txt","pointer":"kitsurface/thing.txt"}]}\n' ;;
+  *) printf '{"asks":[]}\n' ;;
+esac
+IPA
+printf 'ASKS_CMD="bash %s"\n' "$ip_out/asks66.sh" >> "$ip_dir/.unattended.conf"
+date +%s%N > "$ip_dir/kitsurface/thing.txt"
+ipgit add -A >/dev/null && ipgit commit -q -m touch --no-verify
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "unattended: open asks targeting files this run's range touched (report only, for disposition): 1"
+hit  "$out" "  ARCH-tRun-9 · OPEN · low · the fixture ask on thing.txt"
 # ---- closing review L1: a range whose ONLY touch on a declared prefix is a rename OUT of it still
 # ---- owes the flagged bar. A porcelain diff detects renames by default and names one by its
 # ---- destination alone, so the read carries --no-renames and names the source too.

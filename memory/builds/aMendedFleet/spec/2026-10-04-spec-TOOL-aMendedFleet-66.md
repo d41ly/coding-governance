@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-66 — the unattended close sequence lists the open asks that target files the run touched
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 66
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 66
 
 <!-- gen:spec-records -->
 

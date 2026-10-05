@@ -4405,6 +4405,7 @@ verb_phase() { # slug · phase · witness
   # TOOL-dAlignedCarrier-6 S2 - THE MOVE INTO VERIFYING IS WHERE THE OWED FLAGGED BAR IS ANNOUNCED,
   # under every LANDER_MODE, because it is the phase in which the main loop decides what its one
   # `--close` exports. No other target announces.
+  [ "$want" = VERIFYING ] && print_touched_asks "$rel"
   [ "$want" = VERIFYING ] && print_selftests_owed "$rel"
   return 0
 }
@@ -6537,6 +6538,7 @@ print_resume_orientation() { # run-state file · phase
   echo "unattended: the directives and their waivers — the table in the unattended Skill; your waivers are parked in this file"
   # TOOL-dAlignedCarrier-6 S3 - a session resuming or taking over a run at VERIFYING, after a
   # compaction or a process death, reads the owed-bar notice again: it never saw the move's.
+  [ "$2" = VERIFYING ] && print_touched_asks "$1"
   [ "$2" = VERIFYING ] && print_selftests_owed "$1"
   return 0
 }
@@ -7757,6 +7759,74 @@ check_inplace_preconditions() { # slug -> 0 when the bar may run over a prepared
   esac
   [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
   return 1
+}
+
+# TOOL-aMendedFleet-66 - THE OPEN ASKS THAT TARGET A FILE THE RUN'S RANGE TOUCHED, REPORT-ONLY, READ
+# AT VERIFYING. An open ask about a file reached no stage that was editing that file, so the move
+# into VERIFYING, where the run decides what its one --close carries, lists them for disposition.
+# The range is print_selftests_owed's read: the pinned base fact to HEAD, NUL-delimited and
+# rename-free. Matching and ranking are the generator's own `--path` (call shape 4 of the asks
+# companion), read as JSON by key and never by position. Every state says which on one line, and
+# this returns 0 on every path: the list never refuses and never moves an exit.
+print_touched_asks() { # run-state file -> lists the open asks whose pointer names a file the range touched
+  local _b _p _py _rc _list _first
+  local -a _paths=()
+  if [ -z "${ASKS_CMD:-}" ]; then
+    echo "unattended: open asks targeting this run's range not asked — this project declares no ASKS_CMD, so the ask contract is NOT ADOPTED here and no list is printed"
+    return 0
+  fi
+  _b=$(fact "$1" base)
+  if [ -z "$_b" ]; then
+    echo "unattended: the record pins no base, so the range whose touched files the open asks are matched against cannot be read, and no list is printed; whether any ask targets it is unanswerable here, not no"
+    return 0
+  fi
+  if ! GIT rev-parse -q --verify "$_b^{commit}" >/dev/null 2>&1; then
+    echo "unattended: the record's base ${_b:0:8} does not resolve in this clone, so the range whose touched files the open asks are matched against cannot be read, and no list is printed; whether any ask targets it is unanswerable here, not no"
+    return 0
+  fi
+  # ponytail: one path per line out of the NUL read, so a path holding a newline splits and matches nothing.
+  _list=$(set -o pipefail
+    GIT diff --no-renames --name-only -z "$_b" HEAD 2>/dev/null |
+      while IFS= read -r -d '' _p; do printf '%s\n' "$_p"; done) || {
+    echo "unattended: the run's range ${_b:0:8}..HEAD could not be diffed, so which open asks target it is unanswerable here, not none"
+    return 0
+  }
+  while IFS= read -r _p; do [ -n "$_p" ] && _paths+=("$_p"); done < <(printf '%s\n' "$_list")
+  if [ "${#_paths[@]}" -eq 0 ]; then
+    echo "unattended: open asks targeting files this run's range touched (report only, for disposition): 0"
+    return 0
+  fi
+  run_bounded $ASKS_CMD --json --path "${_paths[@]}" --limit 0; _rc=$?
+  if [ "$_rc" -eq 2 ]; then
+    _first=$(printf '%s\n' "$RB_ERR" | head -n 1)
+    echo "unattended: open asks targeting this run's range not asked — the declared ASKS_CMD refused the --path call shape with exit 2, which is how a generator that predates it answers: ${_first:-(no stderr)}"
+    return 0
+  fi
+  if [ "$_rc" -ne 0 ]; then
+    echo "unattended: open asks targeting this run's range: DEAD PROBE — the declared ASKS_CMD exited $_rc or outran its bound, so which open asks target the range is unanswerable here, not none"
+    return 0
+  fi
+  if ! _py=$(resolve_python 2>/dev/null) || [ -z "$_py" ]; then
+    echo "unattended: open asks targeting this run's range: DEAD PROBE — no python launcher resolves, so the generator's answer could not be read"
+    return 0
+  fi
+  printf '%s' "$RB_STDOUT" | "$_py" -c '
+import json, sys
+try:
+    sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+except Exception:
+    pass
+try:
+    rows = json.loads(sys.stdin.buffer.read().decode("utf-8"))["asks"]
+    lines = ["  %s · %s · %s · %s" % (r["id"], r["status"], r["sev"], r["summary"]) for r in rows]
+except Exception:
+    print("unattended: open asks targeting this run'"'"'s range: DEAD PROBE — the declared ASKS_CMD printed text that does not read as its --json projection, so which open asks target the range is unanswerable here, not none")
+    sys.exit(0)
+print("unattended: open asks targeting files this run'"'"'s range touched (report only, for disposition): %d" % len(lines))
+for line in lines:
+    print(line)
+' || echo "unattended: open asks targeting this run's range: DEAD PROBE — the inline reader of the generator's answer did not run"
+  return 0
 }
 
 # S3 - THE SELF-TEST TERM IS DERIVED, AND WHAT THE DERIVATION PRODUCES IS AN ANNOUNCEMENT, READ AT
