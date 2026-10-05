@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-14 — check 19 walks a terminal record's exclusions when EITHER owner-held scan hits, so an owner's round raise never reds an archived record
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7
+**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7
 
 <!-- gen:spec-records -->
 

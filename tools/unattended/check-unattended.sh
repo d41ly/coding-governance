@@ -2442,6 +2442,12 @@ while IFS= read -r f; do
     # ---- with no walk at all - the ordinary case, since no build README in this tree has ever carried
     # ---- the key. Measured before this was added: the walk over every terminal record here cost some
     # ---- twenty seconds a bar to reach the same empty answer the one superset scan reaches.
+    # ---- THE WALK'S TRIGGER IS SHARED BY EVERY SCAN THAT SHARES THE WALK (TOOL-aEvidencedLens-14):
+    # ---- it fires when the grant scan OR the round scan hits the superset, and both re-scan the one
+    # ---- walked list. A scan that grades the superset without the walk reds the default branch's own
+    # ---- commits - an owner's REVIEW_ROUNDS raise merged into the run would red an archived,
+    # ---- append-only record on every later bar. The walk keeps a merge commit itself and drops only
+    # ---- its non-run parent's side, so an evil merge raising the bound is still a run write.
     mayend=""; mayex=""; maywhy=""; maywalk=0
     case " $PHASES_TERMINAL " in
       *" $ph "*)
@@ -2474,14 +2480,14 @@ while IFS= read -r f; do
     else
       maywr=$(printf '%s\n' "$maycs" | scan_grant_writes)
       mayrw=$(printf '%s\n' "$maycs" | scan_round_writes)
-      if [ -n "$maywr" ] && [ "$maywalk" = 1 ]; then
+      if [ -n "$maywr$mayrw" ] && [ "$maywalk" = 1 ]; then
         mayex=$(read_run_exclusions "$mayend" "$rb" "$M/builds/$bslug/RUN.md" 2>/dev/null)
         [ $? = 0 ] || report "check 19 read the terminal exclusions of $f only in part - the walk or a reachability probe could not answer, so its range keeps commits an exclusion would have removed, which is the fail-closed direction"
         if maycs=$(read_run_commits "$mayend" "$rb" $mayex); then
           maywr=$(printf '%s\n' "$maycs" | scan_grant_writes)
           mayrw=$(printf '%s\n' "$maycs" | scan_round_writes)
         else
-          report "check 19 graded the WHOLE base..witness range of $f - its own commits could not be enumerated past the exclusions the walk read, and the superset is the fail-closed reading"
+          report "check 19 graded the WHOLE base..witness range of $f for both the grant scan and the round scan - its own commits could not be enumerated past the exclusions the walk read, and the superset is the fail-closed reading"
         fi
       fi
       # AN EMPTY RANGE IS SAID OUT LOUD. It is honest for a run that has committed nothing past its
@@ -2507,8 +2513,8 @@ while IFS= read -r f; do
       # ---- `REVIEW_ROUNDS=` assignment line, a second file the conf sources, a change in the driver's
       # ---- own REVIEW_ROUNDS_DEFAULT, or an uncommitted working-copy edit the driver sources for the
       # ---- current run, which raises that run's bound and leaves no commit to read. The terminal walk
-      # ---- fires on a GRANT hit only, so a round write in the unwalked superset is graded there
-      # ---- (TOOL-aEvidencedLens-14 owns that trigger).
+      # ---- fires on a hit by EITHER scan (TOOL-aEvidencedLens-14), so a round write is graded over
+      # ---- the walked list, never the unwalked superset.
       while read -r maysha mayold maynew; do
         [ -n "$maysha" ] || continue
         fail 19 "a commit among a run's own commits changes the effective REVIEW_ROUNDS bound in .unattended.conf, and the round bound is the owner's, set by an owner commit outside any run (run mandate memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-0-run-mandate.md, decision 4) - commit and bound follow: $maysha $mayold -> $maynew, run $f"

@@ -5418,7 +5418,7 @@ ma_grant() { # dir · slug · value -> a `may:` line added to that build's READM
 # THE BUILDER. BASE is `second` on main; the run branch `unit` opens with the record's first commit
 # (its facts), then the RUN'S grant to tOther2, then ordinary work; main then takes the OWNER'S grant
 # to tOther and is pushed. What each group does after that is the thing it tests.
-ma_init() { # name -> $ma_root/<name>, built to the shape above
+ma_init() { # name · [bare] -> $ma_root/<name>, built to the shape above; `bare` commits neither grant
   local d="$ma_root/$1"
   mkdir -p "$d/$KIT_REL" "$d/memory/guides"
   cp "$TMP/$KIT_REL/check-unattended.sh" "$TMP/$KIT_REL/unattended.sh" "$TMP/$KIT_REL/lib-unattended.sh" \
@@ -5440,10 +5440,10 @@ ma_init() { # name -> $ma_root/<name>, built to the shape above
     git remote add origin "$d.git" && git push -q origin main
     git checkout -q -b unit ) >/dev/null 2>&1
   ma_facts "$d" tRun RUNNING main "$(ma_base "$d")"; ma_commit "$d" facts
-  ma_grant "$d" tOther2 bin/run-granted.sh; ma_commit "$d" "run grants"
+  [ "${2:-}" = bare ] || { ma_grant "$d" tOther2 bin/run-granted.sh; ma_commit "$d" "run grants"; }
   ( cd "$d" && git commit -q --allow-empty -m "unit work" --no-verify )
   ( cd "$d" && git checkout -q main ) >/dev/null 2>&1
-  ma_grant "$d" tOther bin/owner-granted.sh; ma_commit "$d" "owner grants"
+  [ "${2:-}" = bare ] || { ma_grant "$d" tOther bin/owner-granted.sh; ma_commit "$d" "owner grants"; }
   ( cd "$d" && git push -q origin main && git checkout -q unit ) >/dev/null 2>&1
 }
 MA_RUN_RD="in memory/builds/tOther2/README.md, run memory/builds/tRun/RUN.md"
@@ -5660,6 +5660,55 @@ ma_rounds "$mar" 2; ma_commit "$mar" "run raises rounds"; MA_RR=$(ma_sha "$mar" 
 ma_facts "$mar" tRun LANDED HEAD "$(ma_base "$mar")"
 printf 'landed-anchor: remote\n' >> "$mar/memory/builds/tRun/RUN.md"; ma_commit "$mar" "landed record"
 hit "$(ma_leg "$mar")" "$MA_ROUNDS $MA_RR 1 -> 2, run memory/builds/tRun/RUN.md"
+
+# ==== TOOL-aEvidencedLens-14: THE WALK FIRES ON EITHER SCAN'S HIT =================================
+# A BARE graph carries no grant, so the grant scan never hits and only the round scan can trigger the
+# terminal walk. The owner raises the bound on main; the run branch reconciles main (plainly, or by an
+# evil merge), optionally raises it itself, and lands by a --no-ff merge named as the witness. Against
+# the grant-only trigger the unwalked superset names the owner's commit.
+ma_round_walk() { # name · run raise or "" · evil merge value or "" -> $mar, a landed terminal record
+  ma_init "$1" bare; mar="$ma_root/$1"
+  ( cd "$mar" && git checkout -q main ) >/dev/null 2>&1; ma_rounds "$mar" 2; ma_commit "$mar" "owner raises rounds"
+  ( cd "$mar" && git push -q origin main && git checkout -q unit ) >/dev/null 2>&1
+  if [ -n "$3" ]; then
+    ( cd "$mar" && git merge -q --no-ff --no-commit main ) >/dev/null 2>&1
+    ma_rounds "$mar" "$3"; ma_commit "$mar" "evil reconcile"
+  else
+    ( cd "$mar" && git merge -q --no-edit main ) >/dev/null 2>&1
+  fi
+  [ -z "$2" ] || { ma_rounds "$mar" "$2"; ma_commit "$mar" "run raises rounds"; }
+  ( cd "$mar" && git checkout -q main && git merge -q --no-ff --no-edit -m "land tRun" unit ) >/dev/null 2>&1
+  ma_facts "$mar" tRun LANDED HEAD "$(ma_base "$mar")"
+  printf 'landed-anchor: remote\n' >> "$mar/memory/builds/tRun/RUN.md"; ma_commit "$mar" "landed record"
+  MA_OWNR=$(git -C "$mar" log --format=%H --grep='^owner raises rounds$' -1)
+}
+ma_round_count() { printf '%s\n' "$1" | grep -cF -- "$MA_ROUNDS"; }
+# ---- round walk: AC1 - an owner raise merged into a terminal record's run names no round write
+ma_round_walk grw1 "" ""
+same "round walk: fixture, the owner raise and the run's reconcile of it are in base..witness" \
+  "$(git -C "$mar" log --format=%s -1 "$MA_OWNR")|$(git -C "$mar" log --format=%s -1 'HEAD~1^2')" "owner raises rounds|Merge branch 'main' into unit"
+out=$(ma_leg "$mar")
+miss "$out" "$MA_ROUNDS $MA_OWNR"
+miss "$out" "changes the effective REVIEW_ROUNDS bound"
+# ---- round walk: AC2 - the same record with a run raise beside it: named once, the owner's dropped.
+# ---- Also the liveness of AC1's `miss`: the same leg on the same graph does name a round write.
+ma_round_walk grw2 3 ""
+MA_RR=$(git -C "$mar" log --format=%H --grep='^run raises rounds$' -1)
+out=$(ma_leg "$mar")
+hit  "$out" "$MA_ROUNDS $MA_RR 2 -> 3, run memory/builds/tRun/RUN.md"
+miss "$out" "$MA_ROUNDS $MA_OWNR"
+same "round walk: a run raise beside an owner raise fails check 19 once" "$(ma_round_count "$out")" 1
+# ---- round walk: AC3 - an EVIL run merge whose resolution sets 3 over parents 1 (run) and 2 (owner)
+# ---- is a run write the walk keeps. Its red is a staged break: a walk that drops merge commits
+# ---- themselves, the superset read untouched, names nothing on the same graph.
+ma_round_walk grw3 "" 3
+MA_EM=$(git -C "$mar" log --format=%H --grep='^evil reconcile$' -1)
+out=$(ma_leg "$mar")
+hit  "$out" "$MA_ROUNDS $MA_EM 1 -> 3, run memory/builds/tRun/RUN.md"
+miss "$out" "$MA_ROUNDS $MA_OWNR"
+same "round walk: an evil run merge fails check 19 once" "$(ma_round_count "$out")" 1
+mutate "$mar/$KIT_REL/lib-unattended.sh" 's/GIT rev-list "\$_rrc_end" "^\$_rrc_base" \$_rrc_ex 2>/GIT rev-list "$_rrc_end" "^$_rrc_base" $_rrc_ex ${_rrc_ex:+--no-merges} 2>/'
+same "round walk: a walk that drops the merge itself names nothing" "$(ma_round_count "$(ma_leg "$mar")")" 0
 rm -rf "$ma_root"
 
 
