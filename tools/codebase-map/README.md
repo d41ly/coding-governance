@@ -33,6 +33,15 @@ project specifics live in exactly two files the adopting repo owns.
   customise its gate — and it states that it cannot tell a deliberate omission from a stale one.
 - `gen_map.py` — CLI: `--scaffold · --write · --check · --seed-baseline · --seed-affordance-baseline
   · --seed-affordances --top N`.
+
+  It writes `generated/inventories.json`, `generated/MAP.md`, `generated/CARDS.md` and, where the
+  SYMBOL tier is declared, `generated/symbols.json`. `CARDS.md` holds one card of at most
+  `FEATURE_CARD_CAP_BYTES` (1024) per feature dossier, rendered by `render_cards_md` from the toml
+  fence alone: title, status, streams, path, then decisions, claims and globs, each with its full
+  count, and a `cut <n> item(s)` line naming what did not fit. A prose edit never stales it.
+  An adopter upgrading past this kit's first `CARDS.md` adds one line to its gate's `fresh`
+  mapping, `gen_dir / "CARDS.md": m.render_cards_md(tree, INVENTORY_IDS),`, which is the line
+  `check_gate_coverage.py` reds naming until it is there.
 - `map_diff.py` — the range digest (`<base>..<head>`), plus `--drop-affordance-exempt` (S4a
   touch-drop).
 

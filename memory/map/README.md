@@ -11,7 +11,8 @@ inventories: `codebase-map/map_extractors.py`; gate: see `.codebase-map.conf` GA
   (seeded at adoption; a new dossier is never graced, a touch drops entries).
 - `features/<feature>.md` — one dossier per feature: first ```toml fence = machine claims,
   then `## Constraints & why` · `## Shared seams` · `## Gaps` · `## Reuse affordance` prose.
-- `generated/` — `inventories.json` (keys-only) + `MAP.md` (claimant-annotated) + `symbols.json`
+- `generated/` — `inventories.json` (keys-only) + `MAP.md` (claimant-annotated) + `CARDS.md`
+  (one card of at most 1 KB per feature, from its toml fence alone) + `symbols.json`
   (reuse-recall index — only when the SYMBOL tier is declared in map_extractors.py); regenerate
   with `python codebase-map/gen_map.py --write`, never hand-edit.
 
