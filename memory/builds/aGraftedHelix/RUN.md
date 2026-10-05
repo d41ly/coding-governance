@@ -9,9 +9,13 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+halt-code: repo-state-out-of-mandate
+refreshed-at: c3ef67429fef8327a8854a17a77d14e19b39b7fd · abort · 0 touching
+parked-surfaced: yes, 1 surfaced
+keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: de19f5ee3bf40a618b72fbccbc221b63ded46ed2
-phase: VERIFYING
+witness: 58560d5f853d8ecf9331484cc9f71ce0ae7582eb
+phase: ABORTED
 branch-sha: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 branch-ref: refs/heads/branch/helixir-review-gov-adoption-ce32e1
 spec-audit: 2026-10-04
@@ -223,3 +227,5 @@ base: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 2026-10-05T16:37:57Z rescope · item add TOOL-aGraftedHelix-31 · reason H3 (closing review round 1, id 21): the merged-in --settle never writes the run claim, so a settled hand-off stays held on the remote for good
 
 2026-10-05T16:38:05Z rescope · item add TOOL-aGraftedHelix-32 · reason the closing review round 1's 13 MEDIUM and 8 LOW findings (M1-M9, L1-L4), batched into one unit by the owner's promote-every-finding ruling
+
+2026-10-05T16:43:24Z abort · item aGraftedHelix · reason rotation, not abandonment: the merged-in check 89 (TOOL-aWardedAudit-4, TOOL-aEvidencedLens-22) refuses this record's own spec-audit opt-in at --close with no override, and the pinned BASE blob cannot change; the key is removed and the same slug re-preflights onto a BASE without it, carrying every built unit and the four units closing review round 1 promoted. Nothing is discarded.
