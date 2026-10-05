@@ -80,13 +80,13 @@ ids TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dT
 | [TOOL-dThriftyLanding-8 — the runner's docs mode sees a doc path touched on a merged side branch](spec/2026-10-05-spec-TOOL-dThriftyLanding-8.md) | 8 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-dThriftyLanding-9 — the hook's doc-only classification sees code touched on a merged side branch](spec/2026-10-05-spec-TOOL-dThriftyLanding-9.md) | 9 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-dThriftyLanding-10 — govkit's policy-key scan sees a quoted multi-path value](spec/2026-10-05-spec-TOOL-dThriftyLanding-10.md) | 10 | 2 | CLOSED | rev-1 | 2026-10-05 |
-| [TOOL-dThriftyLanding-11 — the policy selftest grades every spelling of a doc class](spec/2026-10-05-spec-TOOL-dThriftyLanding-11.md) | 11 | 2 | OPEN | rev-1 | 2026-10-05 |
+| [TOOL-dThriftyLanding-11 — the policy selftest grades every spelling of a doc class](spec/2026-10-05-spec-TOOL-dThriftyLanding-11.md) | 11 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-dThriftyLanding-12 — the closing review's batched minors, round 1](spec/2026-10-05-spec-TOOL-dThriftyLanding-12.md) | 12 | 2 | OPEN | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 20 bound to this build, across 4 record folder(s).
+Records: 22 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dThriftyLanding-11 TOOL-dThriftyLanding-12.
+Ids no record names: TOOL-dThriftyLanding-12.
 
 Ids no `spec-audit` record has ever named: TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-10 TOOL-dThriftyLanding-11 TOOL-dThriftyLanding-12 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6 TOOL-dThriftyLanding-8 TOOL-dThriftyLanding-9.
 <!-- /gen:build-index -->

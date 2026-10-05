@@ -1,10 +1,13 @@
 # TOOL-dThriftyLanding-11 — the policy selftest grades every spelling of a doc class
 
-**Status:** OPEN · rev-1 · 2026-10-05 · node d · Tier-2 · base f765eb8e · streams tooling · order 11
+**Status:** CLOSED · rev-1 · 2026-10-05 · node d · Tier-2 · base f765eb8e · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-05-build-TOOL-dThriftyLanding-11-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-dThriftyLanding-11-1-acceptance-ledger.md) | journal | — |
+| [2026-10-05-prompt-TOOL-dThriftyLanding-11-1-build-brief.md](../prompts/2026-10-05-prompt-TOOL-dThriftyLanding-11-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

@@ -5009,20 +5009,30 @@ user_skills = "/tmp/gk-fake-skills"
         # restated, so this arm grades the alternation the engine compiles and not a copy of it.
         sys.path.insert(0, str(HERE))
         import govkit as _gk_mod  # noqa: E402
-        _pk = "|".join(_re.escape(k) for k in _gk_mod.POLICY_KEYS)
-        _pol_re = _re.compile(
-            r"^[ \t]*(?::[ \t]+)?(?:export[ \t]+)?"
-            r"(?:(" + _pk + r")=\S*|\$\{(" + _pk + r"):?=[^}]*\})"
-            r"[ \t]*(?:#.*)?$")
+        # THE ENGINE'S OWN OBJECT (TOOL-dThriftyLanding-11). This arm compiled a hand copy of the
+        # pattern, so a defect in the engine's could pass here; it now grades `build_policy_re()`.
+        _pol_re = _gk_mod.build_policy_re()
         _gk_src = (HERE / "govkit.py").read_text(encoding="utf-8")
-        check("M5: the predicate this arm grades is the one govkit.py actually compiles",
-              '"|".join(re.escape(k) for k in POLICY_KEYS)' in _gk_src, "")
+        check("M5: the predicate this arm grades is the one check 7h3 actually calls",
+              "policy_re = build_policy_re()" in _gk_src, "")
         check("M5: POLICY_KEYS names the self-test switch, both inherited-red keys and the doc class",
               set(_gk_mod.POLICY_KEYS) == {"GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE",
                                            "GATE_DOC_PATHS"},
               repr(_gk_mod.POLICY_KEYS))
         check("M5: a doc-class line is caught as policy — 'GATE_DOC_PATHS=\"memory/\"'",
               bool(_pol_re.match('GATE_DOC_PATHS="memory/"')), "")
+        # The doc class is a space-separated LIST, so its every real spelling holds a blank. A pattern
+        # that stops at the first blank certified it absent in the only form it has.
+        for _s in ('GATE_DOC_PATHS="memory/ README.md AGENTS.md"', "GATE_DOC_PATHS='a/ b/'",
+                   'export GATE_DOC_PATHS="docs/ README.md"  # this repo only'):
+            check(f"M5: a multi-path doc class is caught — {_s!r}", bool(_pol_re.match(_s)), _s)
+        _gov_env = HERE.parent.parent / ".githooks" / "gate-env.sh"
+        _gov_line = next((l.rstrip("\n") for l in _gov_env.read_text(encoding="utf-8").splitlines()
+                          if l.startswith("GATE_DOC_PATHS=")), "") if _gov_env.is_file() else ""
+        if _gov_line:
+            check("M5: gov's own GATE_DOC_PATHS line is caught", bool(_pol_re.match(_gov_line)), _gov_line)
+        check("M5 control: a quoted doc class followed by a command is an invocation, not a policy",
+              not _pol_re.match('GATE_DOC_PATHS="a b" bash x'), "")
         for _s in ("export GATE_SELFTESTS=1", "GATE_SELFTESTS=1",
                    "export GATE_SELFTESTS=1  # gov only", ": ${GATE_SELFTESTS:=1}",
                    "INHERITED_RED=land", "export INHERITED_RED_MAX_AGE=10  # gov only",
