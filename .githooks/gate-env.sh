@@ -66,6 +66,11 @@
 #   GOV_BRANCH_GATE_CMD=<cmd> a bar for a push that does NOT touch the default branch, vetted by the
 #                             same rule at HEAD and fed git's pre-push ref lines on stdin. Unset, such
 #                             a push is ungated. It can only add a refusal, never remove one.
+#   GATE_DOC_PATHS="<paths>"  the doc class: space-separated repo paths, each a file or a directory
+#                             ending in `/`, no glob, no leading `:` or `/`, no `..`. A push that changes
+#                             nothing outside it is doc-only, and its bar skips each leg that DECLARES
+#                             `doc_reads` and none of whose paths moved. PARSED at the remote's tip, never
+#                             read from the sourced value; empty or absent is no doc class.
 #   INHERITED_RED=park|land   whether a push may land over a red its default branch already carries.
 #                             PARSED at the remote's tip by the hook and the unattended driver, never
 #                             read from the sourced value; see the policy block below.
@@ -93,3 +98,7 @@ GOV_KITROOT=tools
 # gated push has landed the edit. The source above still sets them as variables; nothing reads those.
 INHERITED_RED=land
 INHERITED_RED_MAX_AGE=10
+# THE DOC CLASS (TOOL-dThriftyLanding-5): the paths gov calls non-code. A push to the default branch
+# that changes nothing outside them is doc-only, and its bar skips each leg that DECLARES `doc_reads`
+# and none of whose paths moved. Read by .githooks/pre-push AT R, never from the tree being pushed.
+GATE_DOC_PATHS="memory/ README.md AGENTS.md CLAUDE.md WIRE-INTO-PROJECT.md coding-governance-agents.template.md"

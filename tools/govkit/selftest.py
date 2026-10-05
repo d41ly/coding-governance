@@ -4594,6 +4594,28 @@ user_skills = "/tmp/gk-fake-skills"
         bad_g = run_in(scratch_gov("true", "docs/nowhere/"))
         check("a guard in no declared class reds",
               bad_g.returncode == 1 and "declared classes" in bad_g.stdout, bad_g.stdout)
+
+        # ---- D3 (TOOL-dThriftyLanding-4): 7h holds a descriptor's doc_reads and the manifest's equal
+        _d3 = scratch_gov("true", f"{PFX}demo/", tag="d3")
+        _d3k = _d3 / PFX / "demo" / "kit.toml"
+        _d3l = _d3 / PFX / "gate-legs.json"
+        _d3rows = json.loads(_d3l.read_text(encoding="utf-8"))
+        _d3rows[0]["doc_reads"] = ["memory/builds/"]
+        _d3l.write_text(json.dumps(_d3rows, indent=2) + "\n", encoding="utf-8", newline="\n")
+        _r3 = run_in(_d3)
+        check("D3: a manifest doc_reads the descriptor does not declare REDS",
+              _r3.returncode == 1 and "disagree about which doc paths" in _r3.stdout, _r3.stdout)
+        _d3k.write_text(_d3k.read_text(encoding="utf-8").replace(
+            'subject = "repo"\n', 'subject = "repo"\ndoc_reads = ["{memory_root}/builds/"]\n', 1),
+            encoding="utf-8", newline="\n")
+        _r3 = run_in(_d3)
+        check("D3 control: the same paths, spelled through {memory_root}, agree",
+              "disagree about which doc paths" not in _r3.stdout, _r3.stdout)
+        _d3k.write_text(_d3k.read_text(encoding="utf-8").replace(
+            '{memory_root}/builds/', '{memory_root}/gotchas/'), encoding="utf-8", newline="\n")
+        _r3 = run_in(_d3)
+        check("D3: a descriptor naming OTHER doc paths REDS",
+              _r3.returncode == 1 and "disagree about which doc paths" in _r3.stdout, _r3.stdout)
         check("that message says the taxonomy must partition its own input",
               "does not partition its own input" in bad_g.stdout, bad_g.stdout)
 
@@ -4987,17 +5009,30 @@ user_skills = "/tmp/gk-fake-skills"
         # restated, so this arm grades the alternation the engine compiles and not a copy of it.
         sys.path.insert(0, str(HERE))
         import govkit as _gk_mod  # noqa: E402
-        _pk = "|".join(_re.escape(k) for k in _gk_mod.POLICY_KEYS)
-        _pol_re = _re.compile(
-            r"^[ \t]*(?::[ \t]+)?(?:export[ \t]+)?"
-            r"(?:(" + _pk + r")=\S*|\$\{(" + _pk + r"):?=[^}]*\})"
-            r"[ \t]*(?:#.*)?$")
+        # THE ENGINE'S OWN OBJECT (TOOL-dThriftyLanding-11). This arm compiled a hand copy of the
+        # pattern, so a defect in the engine's could pass here; it now grades `build_policy_re()`.
+        _pol_re = _gk_mod.build_policy_re()
         _gk_src = (HERE / "govkit.py").read_text(encoding="utf-8")
-        check("M5: the predicate this arm grades is the one govkit.py actually compiles",
-              '"|".join(re.escape(k) for k in POLICY_KEYS)' in _gk_src, "")
-        check("M5: POLICY_KEYS names the self-test switch and both inherited-red keys",
-              set(_gk_mod.POLICY_KEYS) == {"GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE"},
+        check("M5: the predicate this arm grades is the one check 7h3 actually calls",
+              "policy_re = build_policy_re()" in _gk_src, "")
+        check("M5: POLICY_KEYS names the self-test switch, both inherited-red keys and the doc class",
+              set(_gk_mod.POLICY_KEYS) == {"GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE",
+                                           "GATE_DOC_PATHS"},
               repr(_gk_mod.POLICY_KEYS))
+        check("M5: a doc-class line is caught as policy — 'GATE_DOC_PATHS=\"memory/\"'",
+              bool(_pol_re.match('GATE_DOC_PATHS="memory/"')), "")
+        # The doc class is a space-separated LIST, so its every real spelling holds a blank. A pattern
+        # that stops at the first blank certified it absent in the only form it has.
+        for _s in ('GATE_DOC_PATHS="memory/ README.md AGENTS.md"', "GATE_DOC_PATHS='a/ b/'",
+                   'export GATE_DOC_PATHS="docs/ README.md"  # this repo only'):
+            check(f"M5: a multi-path doc class is caught — {_s!r}", bool(_pol_re.match(_s)), _s)
+        _gov_env = HERE.parent.parent / ".githooks" / "gate-env.sh"
+        _gov_line = next((l.rstrip("\n") for l in _gov_env.read_text(encoding="utf-8").splitlines()
+                          if l.startswith("GATE_DOC_PATHS=")), "") if _gov_env.is_file() else ""
+        if _gov_line:
+            check("M5: gov's own GATE_DOC_PATHS line is caught", bool(_pol_re.match(_gov_line)), _gov_line)
+        check("M5 control: a quoted doc class followed by a command is an invocation, not a policy",
+              not _pol_re.match('GATE_DOC_PATHS="a b" bash x'), "")
         for _s in ("export GATE_SELFTESTS=1", "GATE_SELFTESTS=1",
                    "export GATE_SELFTESTS=1  # gov only", ": ${GATE_SELFTESTS:=1}",
                    "INHERITED_RED=land", "export INHERITED_RED_MAX_AGE=10  # gov only",
@@ -5037,6 +5072,94 @@ user_skills = "/tmp/gk-fake-skills"
             check("M6: the floor is the version the canary's key set moved in",
                   govkit.SUBJECT_FLOOR_RUN_GATES == (1, 1),
                   str(govkit.SUBJECT_FLOOR_RUN_GATES))
+            # D1 (TOOL-dThriftyLanding-4): `doc_reads` rides the same reader at its own floor, the
+            # runner version whose canary admits the key. 1.24 is the last one that refuses it.
+            _rgs.write_text("#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION=1.24\n",
+                            encoding="utf-8", newline="\n")
+            check("D1: a target at run-gates 1.24 does not get doc_reads",
+                  not govkit.check_target_reads_subject(_vp, {"prefix": PFX[:-1]},
+                                                        floor=govkit.DOC_READS_FLOOR_RUN_GATES),
+                  "1.24 accepted")
+            check("D1 control: the same 1.24 target still gets subject",
+                  govkit.check_target_reads_subject(_vp, {"prefix": PFX[:-1]}), "1.24 refused")
+            _rgs.write_text("#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION=1.25\n",
+                            encoding="utf-8", newline="\n")
+            check("D1: a target at run-gates 1.25 does",
+                  govkit.check_target_reads_subject(_vp, {"prefix": PFX[:-1]},
+                                                    floor=govkit.DOC_READS_FLOOR_RUN_GATES),
+                  "1.25 refused")
+            check("D1: the doc_reads floor is the runner version that reads the key",
+                  govkit.DOC_READS_FLOOR_RUN_GATES == (1, 25), str(govkit.DOC_READS_FLOOR_RUN_GATES))
+
+        # ---- D2 (TOOL-dThriftyLanding-4): derive_doc_reads is ALL OR NOTHING ---------------------
+        # A guard that loses an element runs less often; a doc_reads list that loses one SKIPS on the
+        # doc push touching the lost path. So one bad element omits the key, and the leg runs.
+        _have = {"memory/builds/x/README.md", "memory/gotchas/a.md", "tools/k/k.sh"}
+        _ctx = {"memory_root": "memory", "kit": "tools/k"}
+        _got, _why = govkit.derive_doc_reads({"doc_reads": ["{memory_root}/builds/"]}, _ctx, _have)
+        check("D2: a resolvable, tracked element is carried resolved",
+              _got == ["memory/builds/"] and _why == "", f"{_got!r} {_why!r}")
+        _got, _why = govkit.derive_doc_reads({"doc_reads": []}, _ctx, _have)
+        check("D2: a declared EMPTY list is carried as []", _got == [] and _why == "", repr(_got))
+        _got, _why = govkit.derive_doc_reads({}, _ctx, _have)
+        check("D2: no declaration carries nothing and says nothing", _got is None and _why == "",
+              repr(_got))
+        _got, _why = govkit.derive_doc_reads(
+            {"doc_reads": ["{memory_root}/builds/", "{memory_root}/nowhere/"]}, _ctx, _have)
+        check("D2: one untracked element omits the WHOLE key, never a narrowed list",
+              _got is None and "matches no tracked path" in _why, f"{_got!r} {_why!r}")
+        _got, _why = govkit.derive_doc_reads({"doc_reads": ["{map_root}/x/"]}, _ctx, _have)
+        check("D2: an unresolved token omits the key and names the token",
+              _got is None and "map_root" in _why, f"{_got!r} {_why!r}")
+        _gk_src_d = (HERE / "govkit.py").read_text(encoding="utf-8")
+        check("D2: the manifest writer routes doc_reads through derive_doc_reads at the floor",
+              "derive_doc_reads(leg, ctx, have)" in _gk_src_d
+              and "floor=DOC_READS_FLOOR_RUN_GATES" in _gk_src_d, "")
+
+        # ---- D4 (TOOL-dThriftyLanding-12, closing review M6 and M3): the writer, INSTALLED ---------
+        # D2 reads the helper and the source; this applies a real entry whose leg declares
+        # `doc_reads = []` into a fixture target and reads the row it wrote. Then it hand-edits that
+        # row's doc_reads and applies again: the edit is the adopter's coverage, so it must be reported
+        # as drift and kept, never overwritten. The below-floor half stays D1's: a target holding a
+        # run-gates install needs a receipt claiming it, which a fixture cannot plant without tripping
+        # the converge refusal the deployer is right to raise.
+        _d4 = tmp / "doc-reads-install"
+        (_d4 / PFX).mkdir(parents=True, exist_ok=True)
+        (_d4 / ".governance").mkdir(exist_ok=True)
+        (_d4 / PFX / "legs.json").write_text(
+            json.dumps([{"name": "control", "argv": ["true"]}], indent=2) + "\n",
+            encoding="utf-8", newline="\n")
+        (_d4 / PFX / "runner.sh").write_text('echo "GATE ok    control"\n', encoding="utf-8", newline="\n")
+        (_d4 / ".governance" / "deploy.toml").write_text(
+            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["check-kit-versions"]\n\n'
+            '[answers]\nmemory_root = "memory"\n\n'
+            f'[gate_runner]\nkind = "manifest"\nfile = "{PFX}legs.json"\n'
+            'grammar = "json-array"\ndedupe_key = "name"\n'
+            f'command = ["bash", "{PFX}runner.sh"]\n'
+            'run_all_env = { GATE_FULL = "1" }\n'
+            'observed_ran = ["GATE ok    {name}"]\n'
+            'observed_failed = ["GATE FAIL  {name}"]\n',
+            encoding="utf-8", newline="\n")
+        git(_d4, "init", "-q", "-b", "main"); git(_d4, "config", "user.email", "t@e")
+        git(_d4, "config", "user.name", "t"); git(_d4, "add", "-A"); git(_d4, "commit", "-qm", "b")
+        _p4 = run("apply", "--target", str(_d4), "--kits", "check-kit-versions")
+        _rows4 = json.loads((_d4 / PFX / "legs.json").read_text(encoding="utf-8"))
+        _kv = next((r for r in _rows4 if r.get("name") == "kit version markers"), None)
+        check("D4: an applied entry's leg carries the doc_reads its descriptor declares",
+              _kv is not None and _kv.get("doc_reads") == [], str(_rows4) + _p4.stdout[-600:])
+        for _r in _rows4:
+            if _r.get("name") == "kit version markers":
+                _r["doc_reads"] = ["memory/"]
+        (_d4 / PFX / "legs.json").write_text(json.dumps(_rows4, indent=2) + "\n",
+                                              encoding="utf-8", newline="\n")
+        _p4b = run("apply", "--target", str(_d4), "--kits", "check-kit-versions")
+        _rows4b = json.loads((_d4 / PFX / "legs.json").read_text(encoding="utf-8"))
+        _kvb = next((r for r in _rows4b if r.get("name") == "kit version markers"), {})
+        check("D4: a hand-edited doc_reads on an owned row is reported as drift",
+              "differs from what the receipt recorded" in (_p4b.stdout + _p4b.stderr),
+              _p4b.stdout[-600:] + _p4b.stderr[-300:])
+        check("D4: and the adopter's doc_reads is kept, not overwritten",
+              _kvb.get("doc_reads") == ["memory/"], str(_kvb))
 
         # AC5 — the header says what the check does NOT decide, in the generated file itself, where
         # a reader who found the pin will actually be looking.

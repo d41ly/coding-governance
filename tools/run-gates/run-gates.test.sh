@@ -121,7 +121,12 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=278
+FLOOR_ASSERTIONS=293
+# RAISED 289 -> 293 by TOOL-dThriftyLanding-12: 3i2's env-reader and stamp controls and the two
+# component-boundary assertions.
+# RAISED 288 -> 289 by TOOL-dThriftyLanding-8: section 3i2's merged-side-branch assertion.
+# RAISED 278 -> 288 by TOOL-dThriftyLanding-1: arm 1a's `doc_reads` control and section 3i2's nine
+# docs-mode assertions.
 # RAISED 273 -> 278 by TOOL-dUnstuckLanding-16: section 7's five new assertions (AC1's attr line and
 # stamp, AC2's unbounded stamp, its OWN attr line and absent stamp), while the flipped AC17
 # and F1 assertions keep their count. None is host-conditional.
@@ -204,7 +209,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling", "signature"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling", "signature", "doc_reads"}
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -366,7 +371,7 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling", "signature"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling", "signature", "doc_reads"}
 legs = json.load(open(sys.argv[1]))
 sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
 ' "$1"; }
@@ -383,6 +388,15 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"],"signatur":["bash","y.sh"]}]' >
 if keyset_probe "$ctl/sig.json" && ! keyset_probe "$ctl/sigtypo.json"; then :
 else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`signature\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
+# ...and `doc_reads`, the ninth (TOOL-dThriftyLanding-1), by the same two halves.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"doc_reads":[]}]' > "$ctl/dr.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"doc_read":[]}]' > "$ctl/drtypo.json"
+if keyset_probe "$ctl/dr.json" && ! keyset_probe "$ctl/drtypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`doc_reads\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
 rm -rf "$ctl"
@@ -412,13 +426,20 @@ def resolve_prefix_token(spelled, troot):
 # <<< resolve_prefix_token
 tracked = subprocess.run(["git","ls-files"],capture_output=True,text=True).stdout.split()
 bad = []
+# `doc_reads` is graded by the same rule and for a sharper reason (TOOL-dThriftyLanding-1): an element
+# naming nothing makes its leg SKIP on every doc-only push that touches the path it meant, so a typo
+# there is a skip that looks like a declaration.
 for l in json.load(open(sys.argv[1])):
-    for g in l.get("guard", []):
-        g = resolve_prefix_token(g, sys.argv[2])
-        if not any(t == g or t.startswith(g) for t in tracked):
-            bad.append("%s -> %s" % (l["name"], g))
+    for key in ("guard", "doc_reads"):
+        for g in (l.get(key) or []):
+            g = resolve_prefix_token(g, sys.argv[2])
+            # AT A PATH COMPONENT BOUNDARY, as the runner pathspecs and the deployer match: a
+            # character prefix let `memory/build` pass beside a tracked `memory/builds/...`.
+            b = g.rstrip("/")
+            if not any(t == b or t.startswith(b + "/") for t in tracked):
+                bad.append("%s -> %s %s" % (l["name"], key, g))
 if bad:
-    print("canary: guard pathspec matches no tracked path (the leg would skip forever): " + "; ".join(bad))
+    print("canary: guard or doc_reads pathspec matches no tracked path (the leg would skip forever): " + "; ".join(bad))
     sys.exit(1)
 ' "$LEGS_FILE" "$TROOT" || fail=1
 
@@ -1100,6 +1121,101 @@ n=$((n+1))
   printf '%s\n' "$o" | grep -q '^GATE skip' \
     && { echo "canary: GATE_FULL=1 at width $w still skipped a guarded leg"; fail=1; }
 done
+
+# 3i2. THE DOCS MODE. TOOL-dThriftyLanding-1. Under `GATE_DOCS_BASE` a leg that DECLARES `doc_reads`
+#     runs only when a declared path moved since that base, in the net diff OR in any commit of the
+#     range; a declared EMPTY list skips; a leg that declares nothing is untouched; GATE_FULL wins;
+#     and a docs run never stamps a full green, because each docs skip counts as a skip. Every one of
+#     those five is a different way to be wrong, so each has its own assertion, and the undeclared
+#     and GATE_FULL rows are the controls proving the fixture can still RUN a leg.
+D="$SCRATCH/docsmode"
+mkdir -p "$D/${PFX}${KIT}" "$D/fx" "$D/notes"
+cp "$SCRATCH/${PFX}${KIT}/run-gates.sh" "$D/${PFX}${KIT}/run-gates.sh"
+cp "$KITDIR/gate-fingerprint.sh" "$D/${PFX}${KIT}/" 2>/dev/null || true
+cp "$SCRATCH/fx/instant.sh" "$D/fx/a.sh"
+# A leg that RECORDS what it inherited (closing review L3): the runner must withhold GATE_DOCS_BASE.
+printf '#!/usr/bin/env bash\nprintf "%%s\\n" "${GATE_DOCS_BASE-unset}" > "$(git rev-parse --git-dir)/docs-env"\n' > "$D/fx/env.sh"
+printf 'a\n' > "$D/notes/a.md"; printf 'b\n' > "$D/notes/b.md"
+cat > "$D/${PFX}gate-legs.json" <<'JSON'
+[
+  {"name": "env reader",   "argv": ["bash", "fx/env.sh"], "doc_reads": ["notes/"]},
+  {"name": "reads b only", "argv": ["bash", "fx/a.sh"], "doc_reads": ["notes/b.md"]},
+  {"name": "reads notes",  "argv": ["bash", "fx/a.sh"], "doc_reads": ["notes/"]},
+  {"name": "reads none",   "argv": ["bash", "fx/a.sh"], "doc_reads": []},
+  {"name": "undeclared",   "argv": ["bash", "fx/a.sh"]}
+]
+JSON
+( cd "$D" && git init -q -b main . && git config user.email t@e && git config user.name t \
+  && git add -A && git commit -qm fx && printf 'a2\n' > notes/a.md && git commit -qam a ) >/dev/null 2>&1
+_db=$( cd "$D" && git rev-parse HEAD~1 )
+o=$( cd "$D" && GATE_FULL= GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=$_db GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE skip  reads b only  (docs-only: no path it reads moved)$' \
+  || { echo "canary: a leg whose declared doc path did not move was not skipped in the docs mode"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    reads notes$' \
+  || { echo "canary: a leg whose declared doc path moved did not run in the docs mode"; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE skip  reads none  (docs-only' \
+  || { echo "canary: a declared EMPTY doc_reads list did not skip, so it reads the same as no declaration"; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    undeclared$' \
+  || { echo "canary: a leg declaring no doc_reads was narrowed by the docs mode"; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed (2 skipped)$' \
+  || { echo "canary: the docs-mode skips were not tallied"; fail=1; }
+n=$((n+1))
+[ "$(cat "$D/.git/docs-env" 2>/dev/null)" = unset ] \
+  || { echo "canary: a leg inherited GATE_DOCS_BASE, which the runner must withhold: [$(cat "$D/.git/docs-env" 2>/dev/null)]"; fail=1; }
+n=$((n+1))
+[ -f "$D/.git/gate-full-green" ] \
+  && { echo "canary: a docs-mode run stamped a full green it did not earn"; fail=1; }
+o=$( cd "$D" && GATE_FULL=1 GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=$_db GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates GREEN — 5/5 legs passed$' \
+  || { echo "canary: GATE_FULL beside GATE_DOCS_BASE did not run every leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+# L3 (21): the POSITIVE control for the stamp-absence arm above — the same fixture, run whole, stamps.
+n=$((n+1))
+[ -f "$D/.git/gate-full-green" ] \
+  || { echo "canary: the full run over the docs fixture stamped nothing, so the docs run's absence of a stamp proves nothing"; fail=1; }
+# The reverted touch: b changes in one commit and is restored in the next, so its NET diff is empty.
+( cd "$D" && printf 'b2\n' > notes/b.md && git commit -qam b2 && printf 'b\n' > notes/b.md && git commit -qam b ) >/dev/null 2>&1
+o=$( cd "$D" && GATE_FULL= GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=$_db GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    reads b only$' \
+  || { echo "canary: a doc path touched and restored inside the range read as unmoved"; fail=1; }
+# ...and the same touch on a SIDE branch merged with --no-ff (TOOL-dThriftyLanding-8). Git's default
+# history simplification drops a side branch that nets to nothing on the path, and every landing here
+# is a --no-ff merge, so the linear arm above cannot see this one.
+_db2=$( cd "$D" && git rev-parse HEAD )
+( cd "$D" && git checkout -q -b side && printf 'b3\n' > notes/b.md && git commit -qam b3 \
+  && printf 'b\n' > notes/b.md && git commit -qam b && git checkout -q main \
+  && printf 'a3\n' > notes/a.md && git commit -qam a3 && git merge -q --no-ff -m land side ) >/dev/null 2>&1
+o=$( cd "$D" && GATE_FULL= GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=$_db2 GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    reads b only$' \
+  || { echo "canary: a doc path touched and restored on a merged side branch read as unmoved"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+o=$( cd "$D" && GATE_FULL= GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=no-such-rev GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q 'docs mode is OFF' \
+  && printf '%s\n' "$o" | grep -q '^gates GREEN — 5/5 legs passed$' \
+  || { echo "canary: an unresolvable GATE_DOCS_BASE did not turn the mode off ALOUD"; fail=1; }
+# M4 (closing review): arm 1b's tracked-path rule at a PATH COMPONENT BOUNDARY, over a fixture. A
+# string prefix of a tracked file (notes/a against notes/a.md) must fail; the directory must pass.
+_tp=$( cd "$D" && "$PYBIN" -c '
+import subprocess, sys
+tracked = subprocess.run(["git", "ls-files"], capture_output=True, text=True).stdout.split()
+for g in sys.argv[1:]:
+    b = g.rstrip("/")
+    print(g, "ok" if any(t == b or t.startswith(b + "/") for t in tracked) else "bad")
+' notes/a notes/ notes/a.md | tr -d '\r' )
+n=$((n+1))
+[ "$_tp" = "notes/a bad
+notes/ ok
+notes/a.md ok" ] || { echo "canary: the component-boundary rule misgraded a fixture: $_tp"; fail=1; }
+_rule=$(grep -c 't.startswith(b + "/") for t in tracked' "$0")
+n=$((n+1))
+[ "${_rule:-0}" -ge 2 ] || { echo "canary: arm 1b no longer uses the component-boundary rule this fixture grades"; fail=1; }
 
 # 3j MOVED to run-gates.gov.test.sh (G3). It asserted that GOV's `.githooks/pre-push` forces the
 #    full bar — a fact about gov's tree, sitting in the half whose whole contract is that every

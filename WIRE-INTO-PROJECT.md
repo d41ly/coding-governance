@@ -765,6 +765,10 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   remote race at `GOV_PUSH_MAIN_MAX_RETRIES` (default 3). The `pre-push` hook refuses a raw default-branch
   push that bypasses it (a local marker; `--no-verify` bypasses). Add `bash <prefix>/push-main.test.sh` as a
   gate-runner leg (the lander self-test).
+- **Optional, to stop a doc push paying the whole bar**: declare `GATE_DOC_PATHS` in
+  `.githooks/gate-env.sh` — your non-code paths, e.g. your memory tree and root markdown. A push that
+  changes only those runs just the legs whose `doc_reads` moved; kit legs arrive declared, and a leg of
+  your own runs every time until you give it a `doc_reads` list in your manifest.
 
 **Also copy, if you want the gates this repo runs on itself** (each is a leg, none is wired for you):
 

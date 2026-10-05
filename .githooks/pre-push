@@ -1077,18 +1077,46 @@ read_policy_at() { # sha -> PP_POLICY (park|land), PP_MAX_AGE (the positive boun
 
 gd=$(git rev-parse --git-dir 2>/dev/null)
 kitfp=""; [ -n "$GATE_RUNNER" ] && kitfp="$top/${GATE_RUNNER%/*}/gate-fingerprint.sh"
-rec="$gd/gate-full-green"
 force=""; lag=0
 rec_sha=""; rec_fp=""; rec_blob=""; rec_st=""
-if [ -f "$rec" ]; then
-  rec_sha=$(awk -F'\t' '$1=="sha"{print $2}' "$rec" 2>/dev/null)
-  rec_fp=$(awk -F'\t' '$1=="fingerprint"{print $2}' "$rec" 2>/dev/null)
-  rec_blob=$(awk -F'\t' '$1=="manifest_blob"{print $2}' "$rec" 2>/dev/null)
+read_green_file() { # path -> rec_sha rec_fp rec_blob rec_st, each empty when the file is absent
+  rec_sha=""; rec_fp=""; rec_blob=""; rec_st=""
+  [ -f "$1" ] || return 0
+  rec_sha=$(awk -F'\t' '$1=="sha"{print $2}' "$1" 2>/dev/null)
+  rec_fp=$(awk -F'\t' '$1=="fingerprint"{print $2}' "$1" 2>/dev/null)
+  rec_blob=$(awk -F'\t' '$1=="manifest_blob"{print $2}' "$1" 2>/dev/null)
   # WHAT THE RECORDED GREEN COVERED. Absent reads as OFF, and that default is the migration: every
   # stamp written before TOOL-dUnstalledConvoy-26 lacks this key, and defaulting the missing case to
   # "covered everything" would make each of them certify legs it never ran.
-  rec_st=$(awk -F'\t' '$1=="selftests"{print $2}' "$rec" 2>/dev/null)
+  rec_st=$(awk -F'\t' '$1=="selftests"{print $2}' "$1" 2>/dev/null)
+}
+
+# THE CANDIDATE STAMPS (TOOL-dThriftyLanding-2). `--git-dir` is per WORKTREE, so a full green earned in
+# a run's own worktree was invisible to the primary tree's push, which paid the whole bar again. The
+# stamp is self-validating — predicates 2 to 8 check that its sha is an ancestor of the pushed tip,
+# that its tree fingerprint reproduces AT that sha, and that the manifest it names is this one — so
+# WHERE it was written does not change what it proves. Three candidates, in this order, each path once:
+# this git dir's own stamp; the common dir's own, which is the primary tree's; and the common dir's
+# `gate-full-green.shared`, which the runner writes from a LINKED worktree and never into the primary's
+# file. The first that passes is adopted. ORDER is what keeps this strictly additive: a candidate is
+# read only when every one before it would have forced the full bar, so sharing can turn a FULL
+# decision scoped and can never turn a scoped one FULL.
+_gcd=$(git rev-parse --git-common-dir 2>/dev/null) || _gcd=""
+_gd_abs=$(cd "$gd" 2>/dev/null && pwd -P) || _gd_abs=""
+_gcd_abs=""; [ -n "$_gcd" ] && _gcd_abs=$(cd "$_gcd" 2>/dev/null && pwd -P)
+green_candidates=("$gd/gate-full-green")
+if [ -n "$_gcd_abs" ]; then
+  [ "$_gcd_abs" != "$_gd_abs" ] && green_candidates+=("$_gcd_abs/gate-full-green")
+  green_candidates+=("$_gcd_abs/gate-full-green.shared")
 fi
+green_label() { # candidate index -> how the decision line names it
+  case "$1" in
+    0) printf 'this git dir' ;;
+    *) case "${green_candidates[$1]}" in *.shared) printf "the common dir's gate-full-green.shared" ;;
+                                          *) printf "the common dir's gate-full-green" ;; esac ;;
+  esac
+}
+rec_from=""
 
 # PREDICATES 2 TO 8, ONE FUNCTION, TWO RECORDS (TOOL-dDerivedDocket-24). They were inline and read
 # the full green's fields; the inherited green below must pass exactly the same seven, so the seven
@@ -1126,8 +1154,12 @@ check_green_record() { # sha · fingerprint · manifest blob · selftests · lab
   #    whose recorded green was not earned on that exact second parent — not only on a retry. Kept at
   #    that width deliberately: a merge tip the record does not cover is precisely the case the record
   #    cannot speak for.
+  #    WAIVED ON A DOC-ONLY PUSH (TOOL-dThriftyLanding-3). What the record cannot speak for here is
+  #    the CODE the second parent brings in; on a doc-only push nothing outside the doc class moved,
+  #    and every leg reading a doc that did move still runs. Predicates 2 to 4 and 6 to 8, the lag
+  #    bound among them, still force.
   p2=$(git rev-parse -q --verify "$main_local^2" 2>/dev/null || true)
-  if [ -n "$p2" ] && ! git merge-base --is-ancestor "$p2" "$r_sha" 2>/dev/null; then
+  if [ -z "$DOCS_ONLY" ] && [ -n "$p2" ] && ! git merge-base --is-ancestor "$p2" "$r_sha" 2>/dev/null; then
     force="the pushed tip is a merge whose second parent ${p2:0:8} the recorded green does not cover"; return 0
   fi
   # 6. the diff touches the LEG MANIFEST, so the scoping decision itself has changed. A guard added,
@@ -1157,9 +1189,72 @@ check_green_record() { # sha · fingerprint · manifest blob · selftests · lab
   return 0
 }
 
-# 1. no record at all — nothing has ever proven this bar here.
-[ -n "$rec_sha" ] || force="no recorded full green"
-[ -z "$force" ] && check_green_record "$rec_sha" "$rec_fp" "$rec_blob" "$rec_st" "full green"
+# ---- THE DOC CLASS, READ AT R — TOOL-dThriftyLanding-3 -----------------------------------------
+# Whether this push changes only non-code paths. Which paths are non-code is a per-repository answer,
+# so it is DECLARED: `GATE_DOC_PATHS` in the gate-env file, a space-separated list of repo paths, each a
+# file or a directory ending in `/`. It is PARSED at R exactly as the inherited-red keys are, and never
+# read from the pushed tree, which could otherwise classify its own code as a doc. The push is doc-only
+# when R is an ancestor of the pushed tip, something differs between them, and no path outside the class
+# appears in their net diff OR in any commit between them: a code file added and removed again inside
+# the range is still code a leg should have seen. That read is `--full-history` (TOOL-dThriftyLanding-9):
+# git's default simplification drops a `--no-ff` merge's side branch that nets to nothing on the paths
+# asked about, and every landing here is such a merge. Every failure, and every element that is not a plain
+# repo path, reads as NOT doc-only, which is the decision this hook made before the class existed.
+DOCS_ONLY=""; DOCS_N=0; DOCS_WHY=""
+classify_docs() {
+  local blob spec all nd nl
+  local -a specs=() excl=()
+  [ -n "$main_remote" ] && [ -n "${main_remote//0/}" ] && [ -n "$main_local" ] || return 0
+  blob=$(git show "$main_remote:$_gate_env_rel" 2>/dev/null) || return 0
+  read -ra specs <<<"$(read_policy_key "$blob" GATE_DOC_PATHS)"
+  [ "${#specs[@]}" -gt 0 ] || return 0
+  for spec in "${specs[@]}"; do
+    case "$spec" in
+      :*|/*|*'*'*|*'?'*|*'['*|..|../*|*/..|*/../*|.|./*)
+        DOCS_WHY="GATE_DOC_PATHS at ${main_remote:0:8} holds '$spec', which is not a plain repo path, so no doc class applies"
+        return 0 ;;
+    esac
+    excl+=(":(exclude,literal)$spec")
+  done
+  git merge-base --is-ancestor "$main_remote" "$main_local" 2>/dev/null || return 0
+  all=$(git diff --no-renames --name-only "$main_remote" "$main_local" -- 2>/dev/null) || return 0
+  [ -n "$all" ] || return 0
+  nd=$(git diff --no-renames --name-only "$main_remote" "$main_local" -- . "${excl[@]}" 2>/dev/null) || return 0
+  nl=$(git log --full-history --no-renames --format= --name-only "$main_remote..$main_local" -- . "${excl[@]}" 2>/dev/null) || return 0
+  [ -z "$nd$nl" ] || return 0
+  # ONLY UNDER `land` AT R (TOOL-dThriftyLanding-12, closing review M2). The docs mode grades against
+  # R while the record it scopes from may sit below R, so a leg already red at an unproven R could be
+  # docskipped and a push land over it. Under `land` that red lands anyway, as INHERITED; under `park`
+  # it must not, so a park repository keeps today's decision for every push.
+  read_policy_at "$main_remote"
+  if [ "$PP_POLICY" != land ]; then
+    DOCS_WHY="the push changes only GATE_DOC_PATHS, but the inherited-red policy at ${main_remote:0:8} reads $PP_POLICY, so it is not scoped as doc-only"
+    return 0
+  fi
+  DOCS_ONLY=1; DOCS_N=$(printf '%s\n' "$all" | grep -c .)
+}
+classify_docs
+[ -n "$DOCS_WHY" ] && echo "pre-push: $DOCS_WHY" >&2
+
+# 1. no record at all — nothing has ever proven this bar here. Then predicates 2 to 8, per candidate
+#    (TOOL-dThriftyLanding-2). The FIRST candidate's refusal keeps its exact wording, so a clone with
+#    one git dir prints every message it printed before; a later candidate that EXISTS and is refused
+#    appends its own, so no refusal is silent. A later candidate that is absent adds nothing.
+_green_why=""
+for _gi in "${!green_candidates[@]}"; do
+  _gf=${green_candidates[$_gi]}
+  [ "$_gi" -gt 0 ] && [ ! -f "$_gf" ] && continue
+  read_green_file "$_gf"
+  force=""
+  [ -n "$rec_sha" ] || force="no recorded full green"
+  [ -z "$force" ] && check_green_record "$rec_sha" "$rec_fp" "$rec_blob" "$rec_st" "full green"
+  if [ -z "$force" ]; then
+    [ "$_gi" -gt 0 ] && rec_from=$(green_label "$_gi")
+    break
+  fi
+  if [ "$_gi" = 0 ]; then _green_why=$force; else _green_why="$_green_why; $(green_label "$_gi"): $force"; fi
+done
+[ -n "$force" ] && force=$_green_why
 
 # THE POLICY AT R, announced on every gated push whatever it reads, because the difference between
 # the two answers is whether an inherited red lands.
@@ -1277,6 +1372,11 @@ if [ "$bar_class" != stub ]; then
     [ -f "$top/$_legs" ] && check_reviewed_file "$_legs" "$main_local" "is the leg manifest the bar's runner reads"
   fi
 fi
+# THE DOCS KNOB IS THIS HOOK'S ALONE, for every bar a STUB included (TOOL-dThriftyLanding-3): it can
+# only narrow a run, and the STUB exemption above exists for fixture manifests, which it has no part in.
+# It is set again below, on a doc-only decision and nowhere else.
+[ -n "${GATE_DOCS_BASE+x}" ] && ENV_CLEARED+=" GATE_DOCS_BASE"
+unset GATE_DOCS_BASE
 [ -n "$ENV_CLEARED" ] \
   && echo "pre-push: not honoured from the environment by this bar:$ENV_CLEARED" >&2
 
@@ -1292,16 +1392,20 @@ fi
 # THE DECISION AND ITS REASON, on one line, always. A boundary that silently chooses the cheap path
 # is indistinguishable from one that is broken, and this line is the only place the choice is
 # visible to the person whose push it is.
+_docs_clause=""
+[ -n "$DOCS_ONLY" ] && _docs_clause=" docs-only: $DOCS_N path(s) in GATE_DOC_PATHS at ${main_remote:0:8};"
 if [ -n "$inh_sha" ]; then
-  echo "pre-push: scoped gate on $def push (${main_local:0:8}) — inherited green ${inh_sha:0:8} at base ${main_remote:0:8} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG; the full green was not usable: $full_force — bar: $bar_label"
+  [ -n "$DOCS_ONLY" ] && export GATE_DOCS_BASE="$main_remote"
+  echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause inherited green ${inh_sha:0:8} at base ${main_remote:0:8} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG; the full green was not usable: $full_force — bar: $bar_label"
   export GATE_BASE="$inh_sha"
   RUNLOG_DECISION=scoped
 elif [ -n "$force" ]; then
-  echo "pre-push: FULL gate on $def push (${main_local:0:8}) — $force${inh_why:+; $inh_why} — bar: $bar_label"
+  echo "pre-push: FULL gate on $def push (${main_local:0:8}) — ${DOCS_ONLY:+doc-only, but }$force${inh_why:+; $inh_why} — bar: $bar_label"
   export GATE_FULL=1
   RUNLOG_DECISION=full
 else
-  echo "pre-push: scoped gate on $def push (${main_local:0:8}) — full green ${rec_sha:0:8} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG — bar: $bar_label"
+  [ -n "$DOCS_ONLY" ] && export GATE_DOCS_BASE="$main_remote"
+  echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause full green ${rec_sha:0:8}${rec_from:+ from $rec_from} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG — bar: $bar_label"
   export GATE_BASE="$rec_sha"
   RUNLOG_DECISION=scoped
 fi

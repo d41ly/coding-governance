@@ -42,3 +42,4 @@ name = "kit version markers"
 subject = "repo"
 argv = ["bash", "{prefix}/check-kit-versions.sh"]
 guard = []
+doc_reads = []
