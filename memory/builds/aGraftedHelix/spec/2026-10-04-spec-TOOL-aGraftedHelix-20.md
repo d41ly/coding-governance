@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-aGraftedHelix-20-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aGraftedHelix-20-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-review-TOOL-aGraftedHelix-20-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-20-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 |
 
 <!-- /gen:spec-records -->
