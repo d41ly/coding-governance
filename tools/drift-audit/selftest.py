@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 284
+CHECK_FLOOR = 289
+# 284 -> 289, TOOL-aMendedFleet-21: the five checks of `test_cutoff_keys_armed`.
 # 277 -> 284, TOOL-aMendedFleet-8: the seven checks of `test_remote_ci_red_streak`.
 # 261 -> 267, TOOL-dDerivedDocket-26: the six checks of `test_legs_retried_after_timeout`.
 # 267 -> 277, TOOL-dDerivedDocket-34: the five checks of the retired dGV-13 signal leave, one
@@ -2591,6 +2592,45 @@ def test_legs_retried_after_timeout(tmp: pathlib.Path) -> None:
           dead["live"] is False, f"live={dead['live']} value={dead['value']}")
 
 
+def test_cutoff_keys_armed(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-21: armed `_CUTOFF` keys in TRACKED root confs, pinned only where declared.
+
+    Two root confs carry an armed, a blank, an exported and a commented cutoff line, and an untracked
+    conf carries one more; only the armed and exported ones in tracked confs are `value`.
+    """
+    print("armed cutoff keys across the tracked root confs")
+    name = "cutoff_keys_armed"
+    r = make_repo(tmp, name="cutoffs")
+    NL = chr(10)
+    dead = report(r).get(name, {})
+    check("cutoffs: no _CUTOFF assignment anywhere reads DEAD, not 0",
+          dead.get("live") is False, f"row {dead}")
+    (r / ".memory-tree.conf").write_text(
+        "MEMORY_ROOT=memory" + NL + 'A_CUTOFF="2026-01-01"' + NL + 'B_CUTOFF=""' + NL
+        + '# C_CUTOFF="2026-01-01"' + NL, encoding="utf-8", newline=NL)
+    (r / ".other.conf").write_text(
+        "export D_CUTOFF=2026-02-02" + NL + "E_CUTOFF=   # blank on purpose" + NL,
+        encoding="utf-8", newline=NL)
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: two root confs with cutoff keys", "--no-verify"], r)
+    (r / ".untracked.conf").write_text('F_CUTOFF="2026-03-03"' + NL, encoding="utf-8", newline=NL)
+    got = report(r).get(name, {})
+    check("cutoffs: armed and exported count, blank, commented and untracked do not",
+          (got.get("value"), got.get("of"), got.get("live")) == (2, 4, True), f"row {got}")
+    check("cutoffs: with no PINS entry the row is report-only and says no budget is declared",
+          got.get("gateable") is False and "no budget" in str((got.get("detail") or [{}])[0]),
+          f"row {got}")
+    proj = r / KIT_NAME / "drift_signals.py"
+    proj.write_text(proj.read_text(encoding="utf-8").replace(
+        "PINS = {}", "PINS = {'" + name + "': 2}"), encoding="utf-8", newline=NL)
+    check("cutoffs: a PINS entry makes it gateable", report(r).get(name, {}).get("gateable") is True)
+    with (r / ".other.conf").open("a", encoding="utf-8", newline=NL) as fh:
+        fh.write('G_CUTOFF="2026-04-04"' + NL)
+    out = run([sys.executable, REPORT_REL, "--check"], r)
+    check("cutoffs: arming a third key over a pin of 2 reds --check naming the signal",
+          out.returncode == 1 and f"{name} = 3 (pin 2)" in out.stderr, out.stderr.strip()[-300:])
+
+
 def _build_ci_rows(*conclusions) -> list:
     """Completed `push` runs, newest first, one per conclusion, as `gh run list --json` returns them."""
     return [{"databaseId": i, "status": "completed", "conclusion": c, "event": "push"}
@@ -2989,6 +3029,7 @@ def main() -> int:
         test_asks_disposed_overrides(tmp)
         test_legs_retried_after_timeout(tmp)
         test_remote_ci_red_streak(tmp)
+        test_cutoff_keys_armed(tmp)
         test_backlog_stragglers(tmp)
         test_readme_mechanism_drift(tmp)
         test_declared_empty(tmp)

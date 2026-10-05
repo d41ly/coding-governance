@@ -129,6 +129,9 @@ PINS: dict[str, int] = {
     #   Left at 0 every non-empty count reads "out of tolerance", which is how a reader learns
     #   to skip the line. The kit cannot ship a number for it: the value is your corpus’s, and a
     #   guessed pin is the one thing this block forbids.
+    # "cutoff_keys_armed": 0,   # armed `_CUTOFF` keys in your tracked root confs. Seed it from your
+    #   first report's value; with no entry it reports and never gates, because the shipped example
+    #   confs arm a key and a default of 0 would red your first `--check`.
 }
 
 # --------------------------------------------------------------------------------------------
@@ -187,4 +190,5 @@ DECLARED_EMPTY: set[str] = {
 
 RATCHETS: list[dict] = [
     # {"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"},
+    # {"file": "<path of this file>", "key": "cutoff_keys_armed", "weakens": "up"},
 ]

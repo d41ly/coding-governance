@@ -128,6 +128,18 @@ Tier 2 needs the two workflow scripts from `<prefix>/workflows/drift-audit-{code
 | `run_records_nonterminal_but_merged` | does a run record still read live after its work reached the default branch? | no |
 | `legs_retried_after_timeout` | how many legs did the merge bar retry, once and alone, after their own ceiling fired, over the run records this git dir still holds? | no |
 | `remote_ci_red_streak` | how many consecutive completed runs of the declared remote CI workflow on the default branch failed, newest first? Read through `gh`; DEAD PROBE when `gh` cannot answer, not asked under `--check` or with no workflow declared. | no |
+| `cutoff_keys_armed` | how many `_CUTOFF` keys carry a non-blank value across the tracked root-level `.<name>.conf` files? `of` counts every such assignment. | only where `PINS` declares it |
+
+### Armed cutoff keys are a budget
+
+Every armed `_CUTOFF` key makes a record's required shape depend on a filename date, so
+`cutoff_keys_armed` is pinned: a change that arms a new key reds `--check` unless an old one stops
+counting in the same change. A key stops counting in one of three ways. Its rule becomes
+unconditional, and the key goes with its readers' date guards. Two keys merge into one. Or the key
+is blanked or unassigned, which disarms its rule. The signal cannot tell the third from the first
+two; the diff shows which one happened. With no `PINS` entry the signal reports and never gates,
+because the shipped example confs arm a key. When no tracked root conf assigns any `_CUTOFF` key
+the signal reads DEAD PROBE, never 0.
 
 **Every signal carries a `live` field.** A signal whose population is empty prints `DEAD PROBE`
 instead of a clean `0`. This is the kit's central rule and it is not decoration: the upstream repo's

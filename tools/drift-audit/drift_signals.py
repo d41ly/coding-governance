@@ -329,6 +329,11 @@ PINS: dict[str, int] = {
     # branch, or as a terminal ask a REOPEN revives. Report-only, like its sibling above; the
     # RATCHETS row below is what makes a raise cost a written `<old> -> <new>` reason.
     "backlog_asks_unlabelled": 447,
+    # MEASURED at TOOL-aMendedFleet-21, which added the signal: every armed `_CUTOFF` key across the
+    # tracked root confs. GATEABLE, so a change that arms a new key reds `drift-audit records` unless
+    # another key stops being armed in the same change. Raising it instead is the RATCHETS row below,
+    # which needs the old and new values written here. The keys are not named: read the detail.
+    "cutoff_keys_armed": 29,
 }
 
 # --------------------------------------------------------------------------------------------
@@ -387,6 +392,7 @@ RATCHETS: list[dict] = [
     {"file": _THIS_FILE,
      "key": "source_cited_ids_resolving_to_no_record", "weakens": "up"},
     {"file": _THIS_FILE, "key": "backlog_asks_unlabelled", "weakens": "up"},
+    {"file": _THIS_FILE, "key": "cutoff_keys_armed", "weakens": "up"},
     # A pin in ANOTHER kit's conf. The ratchet does not care which file a scalar lives in, and
     # codebase-map has no shrink-only mechanism of its own - so an adopter without drift-audit
     # gets a declared pin and no enforcement, which the conf example states rather than hides.

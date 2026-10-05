@@ -136,8 +136,17 @@ def load_conf(root: pathlib.Path) -> dict[str, str]:
             f"{CONF_NAME} not found at {root}. It is owned by the memory-tree kit; adopt that first.\n"
             "Minimum stub:\n  MEMORY_ROOT=memory\n  DISCIPLINES=\"...\"\n"
         )
+    return parse_conf_text(p.read_text(encoding="utf-8", errors="replace"))
+
+
+def parse_conf_text(text: str) -> dict[str, str]:
+    """`load_conf`'s grammar over a conf's TEXT, so every root conf this kit reads parses one way.
+
+    TOOL-aMendedFleet-21 S2: lifted out of `load_conf` unchanged, for `build_cutoff_keys_armed`.
+    The bash-sourcing comparison in selftest.py reaches it through `load_conf`.
+    """
     conf: dict[str, str] = {}
-    for raw in p.read_text(encoding="utf-8", errors="replace").splitlines():
+    for raw in text.splitlines():
         line = raw.strip().lstrip("﻿")
         if not line or line.startswith("#") or "=" not in line:
             continue
@@ -1867,6 +1876,46 @@ def build_backlog_asks_unlabelled(ctx) -> dict:
             "live": len(judged) > 0, "detail": [{"id": i} for i in hits[:20]]}
 
 
+# --------------------------------------------------------------------------------------------
+# Signal — armed `*_CUTOFF` keys across the tracked root confs (TOOL-aMendedFleet-21)
+#
+# Every armed dated cutoff makes the required shape of a record depend on a filename date, and
+# nothing priced adding one. This counts them: the population is every `_CUTOFF` assignment in a
+# TRACKED root-level `.<name>.conf`, the value is the NON-BLANK ones. A blank key shapes nothing, so
+# it is in `of` and not in `value`. Spellings in tool source are NOT counted: a comment edit must not
+# move a budget.
+#
+# GATEABLE ONLY WHERE PINS DECLARES IT. The shipped example confs arm a key, so a default tolerance
+# of 0 would red every adopter's first `--check`; a guessed shipped pin is what PINS forbids.
+#
+# What it cannot see: a key BLANKED to meet the pin disarms its rule exactly as making the rule
+# unconditional does, and both read as one fewer. The README says so; the diff shows which.
+# --------------------------------------------------------------------------------------------
+
+
+def build_cutoff_keys_armed(ctx) -> dict:
+    name = "cutoff_keys_armed"
+    tracked = ctx.git.run("ls-files").stdout.splitlines()
+    confs = sorted(f for f in tracked if re.fullmatch(r"\.[^/]+\.conf", f))
+    armed, skipped, of = [], [], 0
+    for f in confs:
+        try:
+            conf = parse_conf_text((ctx.root / f).read_text(encoding="utf-8", errors="replace"))
+        except OSError as exc:
+            skipped.append({"file": f, "note": f"unreadable, skipped: {exc.__class__.__name__}"})
+            continue
+        for k, v in conf.items():
+            if k.endswith("_CUTOFF"):
+                of += 1
+                if v.strip():
+                    armed.append({"file": f, "key": k, "value": v})
+    gateable = name in ctx.pins
+    note = [] if gateable else [{"note": "no budget declared: add a PINS entry"}]
+    return {"signal": name, "value": len(armed), "of": of,
+            "tolerance": ctx.pins.get(name, 0), "gateable": gateable,
+            "live": of > 0, "detail": note + armed + skipped}
+
+
 
 # --------------------------------------------------------------------------------------------
 # Signal — a unit id cited by tracked SOURCE that no record defines
@@ -2479,6 +2528,7 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            build_readme_mechanism_drift,
            build_backlog_asks_contested, build_backlog_evidence_sha,
            build_backlog_asks_unlabelled,
+           build_cutoff_keys_armed,
            build_source_cited_ids_with_no_record,
            build_backlog_stragglers,
            build_nonterminal_merged_runs,
