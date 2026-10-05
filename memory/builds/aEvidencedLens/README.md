@@ -110,7 +110,7 @@ ids TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16 TOOL-aE
 | [TOOL-aEvidencedLens-21 — the closing diff review's batched minors, round 1](spec/2026-10-05-spec-TOOL-aEvidencedLens-21.md) | 12 | 2 | CLOSED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 34 bound to this build, across 4 record folder(s).
+Records: 43 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
