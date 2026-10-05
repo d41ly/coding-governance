@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-05-build-TOOL-aWardedAudit-1-runlog-030cb510.md](../build/2026-10-05-build-TOOL-aWardedAudit-1-runlog-030cb510.md) | journal | TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3 TOOL-aWardedAudit-5 |
 | [2026-10-05-prompt-TOOL-aWardedAudit-6-1-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aWardedAudit-6-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
