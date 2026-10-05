@@ -90,7 +90,8 @@ Then, in order:
    one's; widen it if your repo writes long justifications above a pin. This tree has two pins
    three lines apart at the same value, which is the case that makes the first half real.
 4. **Seed `PINS` at the values you just measured, not at zero.** A pin above the measured value hides
-   a live regression on day one; a pin below it reds the bar on work nobody did.
+   a live regression on day one; a pin below it reds the bar on work nobody did. Where a gateable
+   signal's rows each carry an `id`, seed `BASELINES` with the measured ids instead of a pin for it.
 4. Wire `--check` into your gate manifest.
 
 ## Layout
@@ -99,7 +100,7 @@ Then, in order:
 |---|---|---|
 | `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check`, `--delta`, `--escape-ratio` |
 | `drift_signals.template.py` | kit | the project layer's starting point |
-| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK`, `REMOTE_CI_WORKFLOW`, `AUTO_MEMORY_DIR` |
+| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `BASELINES`, `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK`, `REMOTE_CI_WORKFLOW`, `AUTO_MEMORY_DIR` |
 | `SKILL.template.md` | kit | rendered to `.claude/skills/drift-audit/SKILL.md` by the adopt script |
 | `adopt-drift-audit.sh` | kit | adopt + the `--check` sync arm for the merge bar |
 | `selftest.py` | kit | the kit's own falsifiability test |
@@ -114,7 +115,8 @@ A report-only signal with no pin by design prints `report only, no pin` in the s
 word nobody acts on. Its `--json` record carries `null` for both `tolerance` and `pin`. A project
 that wants a threshold for one declares it in its `PINS`, and the column then compares against it.
 Which signals are pinless is the status column's to say, not this paragraph's; a gateable signal
-never is.
+never is. A gateable signal whose rows each name their offender by `id` may take an id set in
+`BASELINES` instead of a `PINS` count; its status then reads `ok (baseline <n>)` or `OVER BASELINE`.
 
 | Signal | Asks | Gateable |
 |---|---|---|
@@ -277,6 +279,16 @@ cited as a **forward** reference ("TODO: see FOO-1") reads identically to one ci
 Chasing a perfect oracle is the expensive way to be wrong. A shrink-only pin drains the population
 without needing one, and it is the idiom these repos already use for exactly this. Lower a pin as its
 population drops; raising one needs the same justification as any other ratchet raise.
+
+**A pin bounds a count, not the offenders it counts.** When one pinned offender drains and a new one
+arrives in the same change, the value does not move and `--check` stays green over a regression. So
+a gateable signal whose detail rows each carry an `id` takes an id set in `BASELINES` instead: a row
+whose `id` the set does not list reds as `new`, a listed id no row carries reds as `stale` until its
+line is deleted, and the set may never gain an id against the base, nor be first seeded above the
+pin the base held. There is no escape for an addition: each such signal has a remedy that is not
+one. A signal named in both `PINS` and `BASELINES`, or a `BASELINES` key naming no gateable signal,
+is refused with exit 2. Signals that never gate keep their pins, because a set would change nothing
+`--check` does. The project layer is never evidence for signal 2, so listing an id does not cite it.
 
 ## Oracles are tightened against FIELD false positives, never speculatively
 

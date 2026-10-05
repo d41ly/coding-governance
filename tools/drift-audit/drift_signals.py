@@ -240,24 +240,6 @@ PINS: dict[str, int] = {
     # self-pruned its three landed rows and lowered the pin 4 -> 1, leaving node `b`'s single row.
     # That drain is subsumed — the shards are now frozen under `archive/ledger/` and the signal is
     # declared empty, so there is no population left for a pin of 1 to ratchet against.
-    # 2 — and THE IDS ARE DELIBERATELY NOT SPELLED HERE. This comment used to name both of them,
-    # which put this file inside the population it describes: measured, `drift_signals.py` was
-    # returned in the citation set for BOTH pinned ids, so the pin could not be drained by removing
-    # the annotations it was describing. The pin documented itself into permanence. Run
-    # this kit's report with `--json` and read the signal's own `detail`, which
-    # derives the two rows and cannot go stale the way this comment did.
-    #
-    # WHAT THE RESIDUAL IS, which is the part worth keeping: both are INPROGRESS with their ids in
-    # tracked kit source, and INPROGRESS means "approved, build underway" — arguably TRUE of a
-    # built-but-unmerged unit. So this is the oracle's known ambiguity rather than proven rot.
-    # Pinned rather than gated to zero for exactly that reason; read the detail before lowering it.
-    #
-    # RE-MEASURED at the unit that took the shipped id grammar and narrowed this signal's globs off
-    # test files. The value did not move, and that is the expected result rather than a failed
-    # change: both ids keep non-test product citations that neither the grammar swap nor the
-    # narrowing touches. What DID move is the judgeable population, upward, because the shipped
-    # grammar matches correction-form ids that the old hand-typed one silently declined to judge.
-    "non_terminal_specs_cited_by_product_source": 2,
     # 19 — MEASURED, and re-measured after round 7 corrected the instrument. The first seed was 31
     # through a skewed one: the blame side read `author-time` as UTC while the spec side is a
     # hand-typed LOCAL date, so 11 rows were pure +0300 artifacts, and one line naming a token twice
@@ -284,15 +266,6 @@ PINS: dict[str, int] = {
     # and the pin now holds the README signal table's names to the names the engine reports, which
     # agreed on the arming commit. The figures above describe the retired charter row.
     "handkept_inventories_disagreeing_with_source": 0,
-    # 1 — TOOL-aMooredAnchor-1, the oracle's known residual. Its build commits are 59b4710 and its
-    # siblings, whose subjects name neither its id nor its slug: it closed on 2026-08-11, hours after
-    # the convention it is judged by landed the same day. Read it before lowering this pin.
-    #
-    # SEEDED AT 1, NOT 0, and the difference is the whole reason the pin is trustworthy. Counting
-    # merge commits this signal reads 0 — but the only commits naming aMooredAnchor are two reconcile
-    # merges whose subjects name the branch merged INTO, carrying another build's work. A 0 measured
-    # that way is a number, not a measurement.
-    "closed_specs_with_no_product_commit": 1,
     # `backlog_rows_outliving_closed_specs` and its pin RETIRED together at the backlog switch-over
     # (TOOL-dDerivedDocket-34 S10): no backlog status is authored once BACKLOG_MODE is builds, so a
     # row token compared with its spec's status has nothing left to read. The stance it counted is
@@ -358,6 +331,51 @@ PINS: dict[str, int] = {
 }
 
 # --------------------------------------------------------------------------------------------
+# BASELINES — the gateable signals bounded by WHICH offenders they hold rather than how many
+# (TOOL-aMendedFleet-56). A pin bounds a count, so a drained offender and a new one at an equal count
+# read as no change; here a new id reds, a listed id that no longer offends reds until its line is
+# deleted, and the set may never gain an id against the base. There is no escape: each signal below
+# has a remedy that is not an addition. Delete an id the moment `--check` names it stale.
+#
+# Seeded with the offenders the BASE measured, never with ones that arrived on a branch: those red
+# as `new`, naming their id, until their cause is removed.
+# --------------------------------------------------------------------------------------------
+
+BASELINES: dict[str, list[str]] = {
+    # THE IDS ARE SPELLED HERE NOW, and that needed an engine change rather than a comment. This
+    # file sits inside EVIDENCE_GLOBS, so spelling an id here used to make it cite itself: measured,
+    # this file was returned in the citation set for both pinned ids, and the old pin could not be
+    # drained by removing the annotations describing it. The engine now excludes the project layer
+    # from signal 2's evidence, so a listed id drains when its real citations do.
+    #
+    # WHAT THE RESIDUAL IS, which is the part worth keeping: both are INPROGRESS with their ids in
+    # tracked kit source, and INPROGRESS means "approved, build underway" — arguably TRUE of a
+    # built-but-unmerged unit. So this is the oracle's known ambiguity rather than proven rot.
+    # Listed rather than gated to zero for exactly that reason; read the detail before deleting one.
+    #
+    # RE-MEASURED at the unit that took the shipped id grammar and narrowed this signal's globs off
+    # test files. The value did not move, and that is the expected result rather than a failed
+    # change: both ids keep non-test product citations that neither the grammar swap nor the
+    # narrowing touches. What DID move is the judgeable population, upward, because the shipped
+    # grammar matches correction-form ids that the old hand-typed one silently declined to judge.
+    "non_terminal_specs_cited_by_product_source": [
+        "TOOL-aBatchedLintel-1",
+        "TOOL-dNarrowedAnchor-1",
+    ],
+    # The oracle's known residual. Its build commits are 59b4710 and its siblings, whose subjects
+    # name neither its id nor its slug: it closed on 2026-08-11, hours after the convention it is
+    # judged by landed the same day. Read it before deleting it.
+    #
+    # LISTED, NOT ZERO, and the difference is the whole reason the bound is trustworthy. Counting
+    # merge commits this signal reads 0 — but the only commits naming its slug are two reconcile
+    # merges whose subjects name the branch merged INTO, carrying another build's work. A 0 measured
+    # that way is a number, not a measurement.
+    "closed_specs_with_no_product_commit": [
+        "TOOL-aMooredAnchor-1",
+    ],
+}
+
+# --------------------------------------------------------------------------------------------
 # RATCHETS — the shrink-only NUMBERS whose weakening direction must be justified in place.
 #
 # TOOL-aNumeralWarden-3: every gate that owns one of these compares only `value > pin`, so RAISING
@@ -401,8 +419,6 @@ RATCHETS: list[dict] = [
     {"file": ".memory-tree.conf", "key": "DEAD_PATH_PIN", "weakens": "up"},
     {"file": ".memory-tree.conf", "key": "UNIVERSAL_BUDGET", "weakens": "up"},
     {"file": ".memory-tree.conf", "key": "ROW_DUPLICATE_PIN", "weakens": "up"},
-    {"file": _THIS_FILE,
-     "key": "non_terminal_specs_cited_by_product_source", "weakens": "up"},
     {"file": _THIS_FILE,
      "key": "handkept_inventories_disagreeing_with_source", "weakens": "up"},
     # The signal is report-only, so crossing this pin never blocks a merge. What the row buys is

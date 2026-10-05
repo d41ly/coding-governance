@@ -1193,6 +1193,11 @@
       "file": ".githooks/pre-push.runlog.test.sh"
     },
     {
+      "id": "build_baseline_findings",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_big_model",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -5431,6 +5436,11 @@
       "id": "derive_root_confs",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_row_identity",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "derive_row_stems",
@@ -15786,6 +15796,11 @@
       "id": "test_baseline_never_gains_a_key",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
+    },
+    {
+      "id": "test_baselines",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_blank_roots_refuses",

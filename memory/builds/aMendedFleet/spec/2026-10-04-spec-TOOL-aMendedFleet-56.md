@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-56 — gateable stable-key drift signals are bounded by a shrink-only set of offender ids instead of a count
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 56 · advances TOOL-aNumeralWarden-3
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 56 · advances TOOL-aNumeralWarden-3
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-56-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-56-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -26,7 +28,10 @@ member against the base reds, so the bound is on identities and the raise-or-dra
   of offender ids, read with `getattr` and an empty default so an older adopter's layer keeps
   importing. This repo's `tools/drift-audit/drift_signals.py` seeds it for
   `non_terminal_specs_cited_by_product_source` and `closed_specs_with_no_product_commit` with exactly
-  the ids those records list at the build commit, and the two `PINS` entries and the one `RATCHETS`
+  the ids those records list at the BASE that still offend at the build commit; an offender that
+  arrived on this branch after the base is not seeded, because seeding it is the top-up S6 refuses
+  and S6's seed rule would red it against the base pin anyway. It reds as `new` instead, naming its
+  id. The two `PINS` entries and the one `RATCHETS`
   row naming the first are deleted in the same commit. The measured-residual comments beside the old
   pins move above the new entries. `tools/drift-audit/drift_signals.template.py` declares an empty
   `BASELINES` with a comment saying when to use it. Observed by AC1, AC6.
@@ -76,6 +81,12 @@ member against the base reds, so the bound is on identities and the raise-or-dra
 - **S9** — `memory/map/generated/symbols.json` is regenerated for the new definitions. NOT OBSERVED
   by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its check, and
   §7 names the legs that read it.
+- **S10** — THE LAYER IS NOT EVIDENCE. Signal 2 greps `EVIDENCE_GLOBS` for each id, and the project
+  layer sits inside them in this repo, so a `BASELINES` list spelling an id would itself cite it: the
+  listed id could never drain, and S3's stale half could never fire. The old `PINS` comment recorded
+  the same self-citation and answered it by not spelling the ids. `Ctx` derives the layer's
+  repo-relative path once, as `layer_path`, and `signal_spec_status` excludes it from its citation
+  grep, so a declaration about the signal is never evidence for it. Observed by AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -131,7 +142,7 @@ A baselined record gains `baseline` (an integer), `new` and `stale` (sorted list
 |---|---|---|
 | `BASELINES` | project-layer attribute | none; attributes are not graded |
 | `derive_row_identity` | function: a detail row in, an identity string out | `py.function`, verb `derive` |
-| `build_baseline_findings` | function: git, root and layer path in, findings out | `py.function`, verb `build` |
+| `build_baseline_findings` | function: git, the layer's path and the working `BASELINES` in, findings out | `py.function`, verb `build` |
 
 Both function names were answered OK by `python tools/lexicon/lexicon.py --suggest <name> --as py.function`.
 
@@ -190,22 +201,25 @@ and 52 edit `PINS` and are ordered before this unit; dispatch is sequential.
 
 - **AC1** — When `python tools/drift-audit/drift_report.py --json` runs on this repo, the
   `non_terminal_specs_cited_by_product_source` and `closed_specs_with_no_product_commit` records each
-  carry a `baseline` equal to their `value` and empty `new` and `stale` lists, and
-  `python tools/drift-audit/drift_report.py --offenders` prints no line opening with either name.
+  carry a `baseline` equal to the size of its `BASELINES` list, an empty `stale` list, and a `new`
+  list holding only offenders that arrived after the base measurement, and
+  `python tools/drift-audit/drift_report.py --offenders` prints no line naming a listed id.
   Red when: a record lacks the fields, or a listed offender is still reported as an offender.
-  figure: DERIVED at observation time; 2 and 1 at writing.
+  figure: DERIVED at observation time; baselines 2 and 1 at writing, and on the build commit the
+  first record's `new` holds the two ids earlier units of this build brought in (S1).
 - **AC2** — When every occurrence of `TOOL-aBatchedLintel-1` is deleted from
   `tools/memory-tree/check-memory-hygiene.sh` and a comment naming one SPECCED spec id the record
   does not list is appended to `tools/drift-audit/drift_report.py`, both in the working tree, and
-  `python tools/drift-audit/drift_report.py --check` runs, the first record's `value` equals its
-  `baseline`, the run exits 1, and `--offenders` prints one line for that signal naming the new id
-  and one naming `TOOL-aBatchedLintel-1` as stale; reverting both edits restores AC1.
+  `python tools/drift-audit/drift_report.py --check` runs, the first record's `value` is the value
+  AC1 read, the run exits 1, and `--offenders` prints, among its lines for that signal, one naming
+  the new id and one naming `TOOL-aBatchedLintel-1` as stale; reverting both edits restores AC1.
   Red when: a drain and a new offender at an equal count pass, which is the defect this unit closes.
   fixture: `TOOL-aBatchedLintel-1` is listed and cited from that file today.
 - **AC3** — When only the deletion of AC2 is made and `python tools/drift-audit/drift_report.py --check`
   runs, it exits 1 and stderr names `TOOL-aBatchedLintel-1` as stale; when its id is also deleted
-  from `BASELINES` in `tools/drift-audit/drift_signals.py`, `--offenders` prints no line for that
-  signal.
+  from `BASELINES` in `tools/drift-audit/drift_signals.py`, `--offenders` prints no line naming
+  it, though the layer now spells it in that run's other edits: S10 keeps the layer out of the
+  evidence.
   Red when: a listed id that no longer offends passes, leaving a latent waiver for its return.
 - **AC4** — When an id is appended to the `non_terminal_specs_cited_by_product_source` list of
   `BASELINES` in `tools/drift-audit/drift_signals.py` in the working tree and
@@ -263,6 +277,14 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with a baselined signal: a
   `extract_unlocated` so the key keeps one spelling, and S4 did not say whether a refused run reaches
   that unit's history write; both now name it, with a consumes-from edge. The new definitions owe
   `symbols.json`, which units 57, 59 and 90 regenerate for theirs and this spec omitted.
+- rev-3 · 2026-10-05 · S1 · S10 · AC1 · AC2 · AC3 · §4 Inventory · build pass: re-measured at the
+  build commit, signal 2 read 4 against its pin of 2, the two extras brought in by earlier units of
+  this build (a forward citation of unit 65 and the spec high-water registry unit 25 wrote), so S1
+  now seeds only what the base measured and AC1 to AC3 name ids rather than equate counts. Spelling
+  the ids in the layer made the layer cite them and no listed id could ever go stale, the
+  self-citation the old pin comment recorded; S10 excludes the layer from signal 2's evidence.
+  `build_baseline_findings` takes the working `BASELINES` from the imported layer rather than
+  re-parsing the working file, so the two sides of `main` read one value.
 
 ## 10. Reuse audit
 

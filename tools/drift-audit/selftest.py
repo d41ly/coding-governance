@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 357
+CHECK_FLOOR = 365
+# 357 -> 365, TOOL-aMendedFleet-56: the eight checks of `test_baselines`.
 # 352 -> 357, TOOL-aMendedFleet-55: the five `open_asks_cited_by_product_source` checks.
 # 345 -> 352, TOOL-aMendedFleet-54: the seven checks of `test_live_builds_without_activity`.
 # 330 -> 339, TOOL-aMendedFleet-52: the nine checks of `test_handkept_name_sets`.
@@ -1884,6 +1885,94 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
 
 
 
+def test_baselines(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-56 — a gateable signal bounded by WHICH offenders it holds, not how many.
+
+    One fixture, signal 2 baselined at one listed id. Each arm moves one thing from the committed
+    state and demands red, and the clean state and the equal-seed arm demand green, so a guard that
+    refused every edit fails here as surely as one that refused none.
+    """
+    print("BASELINES (an equal-count swap, a drain and a growth each red)")
+    r = make_repo(tmp, name="baselines")
+    sig = r / KIT_NAME / "drift_signals.py"
+    app = r / "src" / "app.py"
+    name = "non_terminal_specs_cited_by_product_source"
+    # A second SPECCED spec, so the swap has an id to swap in at an equal count.
+    (r / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aOther-1.md").write_text(
+        "# TOOL-aOther-1 — another thing\n\n"
+        "**Status:** SPECCED · rev-1 · 2026-01-01 · node a · Tier-2 · base 0000000\n",
+        encoding="utf-8", newline="\n")
+    app.write_text("# implements TOOL-aThing-1\n", encoding="utf-8", newline="\n")
+    # The layer sits INSIDE the evidence globs, as it does in this repo, so the drain arm also proves
+    # that a list spelling an id is not a citation of it (S10).
+    layer = sig.read_text(encoding="utf-8").replace(
+        "EVIDENCE_GLOBS = ['src', ", "EVIDENCE_GLOBS = ['src', '" + KIT_NAME + "', ")
+    seeded = layer + "BASELINES = {'" + name + "': ['TOOL-aThing-1']}\n"
+    sig.write_text(seeded, encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "seed the baseline", "--no-verify"], r)
+
+    def run_check() -> subprocess.CompletedProcess:
+        return run([sys.executable, REPORT_REL, "--check"], r)
+
+    clean = run_check()
+    rec = report(r)[name]
+    check("baselines: the seeded fixture is green, with the fields and nothing new or stale",
+          clean.returncode == 0 and rec.get("baseline") == 1 and rec.get("new") == []
+          and rec.get("stale") == [], f"rc={clean.returncode} {clean.stderr.strip()[-300:]} rec={rec}")
+
+    # --- an equal-count SWAP: the defect a count could not see ----------------------------------
+    app.write_text("# implements TOOL-aOther-1\n", encoding="utf-8", newline="\n")
+    swap = run_check()
+    offs = run([sys.executable, REPORT_REL, "--offenders"], r).stdout.splitlines()
+    check("baselines: the swap leaves the count at the listed size", report(r)[name]["value"] == 1)
+    check("baselines: an equal-count swap reds, keying the new row and the stale id",
+          swap.returncode == 1 and any("TOOL-aOther-1" in ln for ln in offs)
+          and f'{name}\t{{"stale": "TOOL-aThing-1"}}' in offs, f"rc={swap.returncode} {offs}")
+
+    # --- a DRAIN: a listed id no row carries reds until its line goes --------------------------
+    app.write_text("# nothing cited here\n", encoding="utf-8", newline="\n")
+    drain = run_check()
+    check("baselines: a drained listed id reds as stale though the layer still spells it",
+          drain.returncode == 1 and "stale TOOL-aThing-1" in drain.stderr,
+          f"rc={drain.returncode} {drain.stderr.strip()[-300:]}")
+
+    # --- GROWTH against a committed base that lists the signal ---------------------------------
+    app.write_text("# implements TOOL-aThing-1 and TOOL-aOther-1\n", encoding="utf-8", newline="\n")
+    sig.write_text(seeded.replace("['TOOL-aThing-1']", "['TOOL-aThing-1', 'TOOL-aOther-1']"),
+                   encoding="utf-8", newline="\n")
+    grown = run_check()
+    check("baselines: a set gaining an id against its base reds as a weakened ratchet",
+          grown.returncode == 1 and "RATCHET WEAKENED" in grown.stderr
+          and "gained TOOL-aOther-1" in grown.stderr, f"rc={grown.returncode} {grown.stderr.strip()[-300:]}")
+
+    # --- the FIRST seed is bounded by the pin the base held ------------------------------------
+    pinned = layer.replace("PINS = {}", "PINS = {'" + name + "': 1}")
+    sig.write_text(pinned, encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "a pin at the base", "--no-verify"], r)
+    sig.write_text(layer + "BASELINES = {'" + name + "': ['TOOL-aThing-1', 'TOOL-aOther-1']}\n",
+                   encoding="utf-8", newline="\n")
+    over = run_check()
+    check("baselines: a first seed above the base's pin reds",
+          over.returncode == 1 and "seeded with 2 ids where the base pins it at 1" in over.stderr,
+          f"rc={over.returncode} {over.stderr.strip()[-300:]}")
+    app.write_text("# implements TOOL-aThing-1\n", encoding="utf-8", newline="\n")
+    sig.write_text(seeded, encoding="utf-8", newline="\n")
+    equal = run_check()
+    check("baselines: a first seed at the base's pin is green", equal.returncode == 0,
+          f"rc={equal.returncode} {equal.stderr.strip()[-300:]}")
+
+    # --- ONE bound per signal -------------------------------------------------------------------
+    sig.write_text(seeded.replace("PINS = {}", "PINS = {'" + name + "': 1}"),
+                   encoding="utf-8", newline="\n")
+    both = run([sys.executable, REPORT_REL, "--check"], r)
+    check("baselines: a signal in both PINS and BASELINES is refused with exit 2 before any line",
+          both.returncode == 2 and not both.stdout.strip() and "PINS and BASELINES" in both.stderr,
+          f"rc={both.returncode} out={both.stdout[:120]!r} {both.stderr.strip()[-200:]}")
+    sig.write_text(seeded, encoding="utf-8", newline="\n")
+
+
 def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
     """The comparison base is the REMOTE-TRACKING ref — TOOL-dDerivedDocket-21 S1 and S2, AC1 and AC2.
 
@@ -3485,6 +3574,7 @@ def main() -> int:
         test_declared_empty(tmp)
         test_handkept_name_sets(tmp)
         test_ratchet_guard(tmp)
+        test_baselines(tmp)
         test_base_is_remote_tracking(tmp)
         test_ratchet_lookback(tmp)
         test_ratchet_message_states_its_window(tmp)

@@ -38,6 +38,7 @@ ponytail: stdlib + git only, no deps, no cache. It runs in seconds; there is not
 from __future__ import annotations
 
 import argparse
+import ast
 import datetime
 import hashlib
 import json
@@ -386,6 +387,61 @@ def build_lang_mode_findings(git: "Git", root: pathlib.Path, path: str = ".lexic
     return out
 
 
+
+# --------------------------------------------------------------------------------------------
+# TOOL-aMendedFleet-56 S6 — BASELINES is shrink-only, read at the base like the two guards above.
+#
+# A pin bounds a COUNT, so a drained offender and a new one at an equal count read as no change; an
+# id set bounds the offenders themselves. This guard keeps the set from growing: an id the base's
+# set did not carry is a finding, and a FIRST seed may not exceed the pin the base held for that
+# signal. There is no escape: each signal has a remedy that is not an addition.
+# ponytail: the base layer is read with `ast.literal_eval`, so a non-literal BASELINES or PINS at the
+# base is a finding rather than an evaluation; executing the base's code would be the upgrade.
+def build_baseline_findings(git: "Git", path: str, baselines: dict) -> list:
+    """Findings for every signal whose working `BASELINES` set is WEAKER than the base allows."""
+    if not baselines:
+        return []
+    base = git.run("show", f"{git.base_ref}:{path}")
+    if base.returncode != 0:
+        return []                          # the layer is new on this branch; nothing to compare
+    try:
+        tree = ast.parse(base.stdout)
+    except SyntaxError as exc:
+        return [f"{path}: the project layer at {git.base_ref} does not parse ({exc.msg}, line "
+                f"{exc.lineno}), so BASELINES cannot be compared against the base"]
+    nodes = {}
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            names = [t.id for t in node.targets if isinstance(t, ast.Name)]
+        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name) and node.value:
+            names = [node.target.id]
+        else:
+            continue
+        for n in names:
+            if n in ("BASELINES", "PINS"):
+                nodes[n] = node.value      # the last assignment wins, as it does on import
+    was = {}
+    for n, v in nodes.items():
+        try:
+            was[n] = ast.literal_eval(v)
+        except ValueError:
+            return [f"{path}: {n} at {git.base_ref} is not a literal, so BASELINES cannot be "
+                    f"compared against the base"]
+    old_sets, old_pins = was.get("BASELINES") or {}, was.get("PINS") or {}
+    out = []
+    for sig, ids in sorted(baselines.items()):
+        if sig in old_sets:
+            for i in sorted(set(ids) - set(old_sets[sig])):
+                out.append(f"{path}: BASELINES[{sig!r}] gained {i} against {git.base_ref}, which "
+                           f"WEAKENS it. The set is shrink-only and has no escape: remove the cause "
+                           f"that makes {i} an offender instead of listing it.")
+        elif len(set(ids)) > old_pins.get(sig, 0):
+            out.append(f"{path}: BASELINES[{sig!r}] is seeded with {len(set(ids))} ids where the "
+                       f"base pins it at {old_pins.get(sig, 0)} in PINS, which WEAKENS it. Seed only "
+                       f"the offenders the base's pin already bounds.")
+    return out
+
+
 class Git:
     def __init__(self, root: pathlib.Path, base_ref: str):
         self.root, self.base_ref = root, base_ref
@@ -664,7 +720,10 @@ def signal_spec_status(ctx) -> dict:
         # `-1` was reported with three citations, all of them `-11`'s, on a build whose ids ran
         # past 10. The over-count GROWS with the build: a 30-unit build mis-attributes ids 1, 2
         # and 3 to twenty siblings, each reading as a stale status header nobody can find.
-        hit = ctx.git.run("grep", "-l", "-w", "-F", own.group(1), "--", *ctx.evidence_globs)
+        # THE LAYER IS NOT EVIDENCE (TOOL-aMendedFleet-56 S10): a `BASELINES` list spelling this id
+        # would otherwise cite it, and a listed id could then never drain.
+        hit = ctx.git.run("grep", "-l", "-w", "-F", own.group(1), "--", *ctx.evidence_globs,
+                          *([f":(exclude){ctx.layer_path}"] if ctx.layer_path else []))
         if hit.returncode == 0 and hit.stdout.strip():
             suspect.append({
                 "file": str(p.relative_to(ctx.root)).replace("\\", "/"),
@@ -2855,6 +2914,13 @@ class Ctx:
         # The project layer itself, so a signal can ask for a declaration the kit does
         # not know about — e.g. DECLARED_EMPTY, which an older adopter will not have.
         self.proj = proj
+        # The layer's repo-relative path, or None outside the tree: signal 2 excludes it from its
+        # evidence and the BASELINES guard reads it at the base (TOOL-aMendedFleet-56).
+        try:
+            self.layer_path = pathlib.Path(proj.__file__).resolve().relative_to(
+                root.resolve()).as_posix()
+        except (AttributeError, TypeError, ValueError):
+            self.layer_path = None
         self.charter = getattr(proj, "CHARTER", None) or self._find_charter()
         # TOOL-aMendedFleet-53. The auto-memory directory signal 5 audits; BLANK or undeclared is
         # NOT ASKED, so an older adopter's project layer keeps importing.
@@ -2943,6 +3009,14 @@ def extract_unlocated(v):
     if isinstance(v, dict):
         return {k: extract_unlocated(x) for k, x in v.items() if k not in ("line", "lines")}
     return v
+
+
+def derive_row_identity(row) -> str:
+    """A detail row's identity for `BASELINES` (TOOL-aMendedFleet-56 S2): its `id` when that is a
+    string, else its unlocated `--offenders` key, so a row with no id is never silently matched."""
+    if isinstance(row, dict) and isinstance(row.get("id"), str):
+        return row["id"]
+    return json.dumps(extract_unlocated(row), sort_keys=True, ensure_ascii=False)
 
 
 # TOOL-aMendedFleet-48. Every `--check` appends one row per signal here, in the git COMMON dir so
@@ -3122,8 +3196,13 @@ def render_drift_offenders(over: list, dead: list, ratchets: list) -> list[str]:
     """
     rows = []
     for s in over:
+        # A BASELINED record keys only what MOVED: each new row and each stale id (TOOL-aMendedFleet-56 S5).
+        fresh = set(s["new"]) if "baseline" in s else None
         for d in s["detail"]:
-            rows.append((s["signal"], json.dumps(extract_unlocated(d), sort_keys=True, ensure_ascii=False)))
+            if fresh is None or derive_row_identity(d) in fresh:
+                rows.append((s["signal"], json.dumps(extract_unlocated(d), sort_keys=True, ensure_ascii=False)))
+        for i in (s["stale"] if fresh is not None else ()):
+            rows.append((s["signal"], json.dumps({"stale": i}, ensure_ascii=False)))
     for s in dead:
         rows.append((s["signal"], "DEAD — gateable, and its judgeable population is empty"))
     for r in ratchets:
@@ -3386,6 +3465,18 @@ def main(argv: list[str] | None = None) -> int:
         # line that keeps it. It also means the key is validated on EVERY run, not only under
         # --check, which is the run an adopter is told to make first.
         lookback = _read_lookback(proj)
+        # TOOL-aMendedFleet-56 S1 and S4: an optional id set per gateable signal, refused before any
+        # signal runs when its shape is wrong or a PINS entry bounds the same signal.
+        baselines = getattr(proj, "BASELINES", None) or {}
+        if not isinstance(baselines, dict) or not all(
+                isinstance(v, (list, tuple)) and all(isinstance(i, str) for i in v)
+                for v in baselines.values()):
+            raise DriftError("drift_signals.py declares BASELINES that is not a dict from a signal "
+                             "name to a list of offender id strings")
+        both = sorted(set(baselines) & set(proj.PINS))
+        if both:
+            raise DriftError(f"{', '.join(both)} is declared in both PINS and BASELINES; a signal "
+                             f"takes ONE bound, a count or an id set, so delete one of the two")
     except DriftError as exc:
         print(f"drift-report: {exc}", file=sys.stderr)
         return 2
@@ -3428,6 +3519,22 @@ def main(argv: list[str] | None = None) -> int:
         # gateable record never carries one, because `--check` compares its value against the pin.
         assert not (s["gateable"] and s["tolerance"] is None), f"{s['signal']}: gateable with no tolerance"
         s["pin"] = ctx.pins.get(s["signal"], s["tolerance"])
+    # TOOL-aMendedFleet-56 S4 and S3. A key naming no gateable record bounds nothing, so it is
+    # refused here, before the table, the JSON, the offender keys and the history write. A baselined
+    # record is then judged on its MEMBERS: `new` rows the set does not carry, `stale` ids no row
+    # carries. A record that is not live judges nothing, so both stay empty and DEAD reports it.
+    stray = sorted(set(baselines) - {s["signal"] for s in out if s["gateable"]})
+    if stray:
+        print(f"drift-report: BASELINES names {', '.join(stray)}, which this report does not "
+              f"produce as a gateable signal; an id set bounds only a gateable one, so delete the "
+              f"entry", file=sys.stderr)
+        return 2
+    for s in out:
+        if s["signal"] in baselines:
+            listed = set(baselines[s["signal"]])
+            have = {derive_row_identity(d) for d in s["detail"]} if s["live"] else listed
+            s["baseline"] = s["pin"] = len(listed)
+            s["new"], s["stale"] = sorted(have - listed), sorted(listed - have)
 
     # THE THREE POPULATIONS `--check` reds on, computed ONCE for both modes that read them, so
     # `--offenders` cannot disagree with `--check` about what is red. Neither function prints, so
@@ -3446,7 +3553,10 @@ def main(argv: list[str] | None = None) -> int:
         declared = set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
         ratchets = ratchet_findings(ctx.git, root, getattr(ctx.proj, "RATCHETS", ()), lookback)
         ratchets += build_lang_mode_findings(ctx.git, root, lookback=lookback)
-        over = [s for s in out if s["gateable"] and s["live"] and s["value"] > s["pin"]]
+        if ctx.layer_path:
+            ratchets += build_baseline_findings(ctx.git, ctx.layer_path, baselines)
+        over = [s for s in out if s["gateable"] and s["live"] and (
+            bool(s["new"] or s["stale"]) if "baseline" in s else s["value"] > s["pin"])]
         dead = [s for s in out if s["gateable"] and not s["live"] and s["signal"] not in declared]
 
     if args.offenders:
@@ -3477,6 +3587,9 @@ def main(argv: list[str] | None = None) -> int:
                           else "DEAD PROBE — signal cannot move, ignore its value")
             elif s["value"] < 0:
                 status = "n/a"
+            elif "baseline" in s:
+                status = ("OVER BASELINE — gateable" if s["new"] or s["stale"]
+                          else f"ok (baseline {s['baseline']})")
             elif s["pin"] is None:
                 # NOT `over pin 0`: a signal with no pin by design has nothing to be over, and a
                 # red-looking word nobody acts on trains the reader to skip the whole column.
@@ -3513,6 +3626,17 @@ def main(argv: list[str] | None = None) -> int:
         for r in ratchets:
             print(f"\ndrift-report: RATCHET WEAKENED — {r}", file=sys.stderr)
         for s in over:
+            if "baseline" in s:
+                print(f"\ndrift-report: {s['signal']} = {s['value']} against BASELINES "
+                      f"({s['baseline']} listed in {ctx.layer_path}) — this set is shrink-only",
+                      file=sys.stderr)
+                for i in s["new"]:
+                    print(f"  new   {i} — an offender the set does not list: remove its cause, "
+                          f"never list it", file=sys.stderr)
+                for i in s["stale"]:
+                    print(f"  stale {i} — listed but no longer an offender: delete its line from "
+                          f"BASELINES['{s['signal']}']", file=sys.stderr)
+                continue
             print(f"\ndrift-report: {s['signal']} = {s['value']} (pin {s['pin']}) — this list is shrink-only",
                   file=sys.stderr)
             for d in s["detail"][:10]:

@@ -135,6 +135,18 @@ PINS: dict[str, int] = {
 }
 
 # --------------------------------------------------------------------------------------------
+# BASELINES — optional. For a GATEABLE signal whose detail rows each name their offender by `id`
+# (`non_terminal_specs_cited_by_product_source`, `closed_specs_with_no_product_commit`), list the
+# offender ids instead of pinning a count: a pin cannot tell a drained offender from a new one at an
+# equal count, and a set can. `--check` reds on an id the list does not carry, on a listed id that
+# no longer offends (delete its line), and on a list that gains an id against the base, or is first
+# seeded above the base's pin. Seed it with the ids your first report measured, and drop that
+# signal's PINS entry in the same change: a signal takes one bound, and declaring both is refused.
+# --------------------------------------------------------------------------------------------
+
+BASELINES: dict[str, list[str]] = {}
+
+# --------------------------------------------------------------------------------------------
 # CHARTER — optional. The governing doc a HANDKEPT probe reads as `ctx.charter`, as the example
 # probe above does. Defaults to AGENTS.md then CLAUDE.md when unset.
 # --------------------------------------------------------------------------------------------

@@ -151,7 +151,7 @@ Cite ids, never line numbers.
 | [TOOL-aMeteredTurnstile-6](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | the bar did not get slower, PROCESS CREATION did: measured 2026-08-20… |
 | [TOOL-aNamedGesture-2](../builds/aNamedGesture/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | the kickoff manifest's last-audit stamp read 2026-08-26T10:10:00+03:00… |
 | [TOOL-aNumeralWarden-2](../builds/aNumeralWarden/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | agent-cap's enclosing-opener walk is defeated by two nested wrappers or… |
-| [TOOL-aNumeralWarden-3](../builds/aNumeralWarden/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-56 | 2026-08-10 | a drift-audit pin RAISE is indistinguishable from a population drain to… |
+| [TOOL-aNumeralWarden-3](../builds/aNumeralWarden/BACKLOG.md) | OPEN | — | — | 2026-08-10 | a drift-audit pin RAISE is indistinguishable from a population drain to… |
 | [TOOL-aPacedTurnstile-9](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | prove each leg guard COMPLETE, the sound fix TOOL-aPacedTurnstile-7… |
 | [TOOL-aPacedTurnstile-11](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | govkit's selfcheck cannot see that an entry SPELLING another entry's… |
 | [TOOL-aPacedTurnstile-12](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | govkit's selfcheck joins a descriptor's [[gate_leg]] rows to the repo's… |
