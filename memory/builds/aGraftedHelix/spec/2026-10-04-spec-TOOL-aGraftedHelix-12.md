@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-12 — every cell of the claim write table, and every write `--beat` declines, is observed
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -32,8 +32,11 @@ findings 2 and 3 (HIGH) of the round-1 spec audit.
 - **S3** — A table-driven arm in `tools/unattended/unattended.test.sh` holds one row per cell of
   the table `check_claim_writable` implements: the claim-read row, the mode, the reacher that drives
   that mode, and the outcome. The outcome is the exit, the check number, whether the claim ref's
-  sha moved and whether the run-state file changed, or `unreached` with the reason no path reaches
-  the cell. The arm seeds each claim state with real `gov-claim` messages over a bare remote. It
+  sha moved, whether the run-state file changed and the line the call printed (`taken` for `claim
+  taken over`, `announced` for `claim not written`), or `unreached` with the reason no path reaches
+  the cell. The line field is what tells a `take, announced` cell from a `take` one and an
+  `announce` cell from a refusal that wrote nothing. The arm seeds each claim state with real
+  `gov-claim` messages over a bare remote. It
   asserts that its own table holds rows × columns cells before it drives one, so a missing row reds
   rather than shrinking the arm. That count reads only the arm's own rows; deriving the cell set from
   the driver, so a class or mode added later reds too, is `TOOL-aGraftedHelix-19`'s. NOT OBSERVED by a criterion here: the suite is the main loop's to
@@ -66,14 +69,19 @@ findings 2 and 3 (HIGH) of the round-1 spec audit.
 
 | mode | reacher |
 |---|---|
-| preflight | `--preflight <slug>` from a fresh clone under a new session and keepalive |
+| preflight | `--preflight tFresh` under a new session and keepalive, in the suite's armed fixture, where the slug has no run-state file |
 | take-over | a different session's `--resume` reaching `run_takeover` on a presumed-stopped record |
 | holder | `--resume <slug> --keepalive-id <recorded id>`, and `--beat <slug>` for S2 |
 | status write | `--hold <slug>`, on a fixture reset per cell |
 
 Each cell starts from a fresh fixture state, so no cell's write is the next cell's input. The ref's
 sha is read with `git ls-remote <bare> refs/gov/runs/<slug>` before and after, and the run-state
-file is compared byte for byte.
+file is compared byte for byte. The preflight reacher needs no clone: each cell resets the tree to
+its mode's committed base and clears every claim, so the tree holds no run-state file for the slug,
+which is all a fresh clone bought. The `mine` row's claim is aged a third of `RESUME_STALE_BOUND`, so
+the holder cell `renew when due` is observed through its due half; the not-due half is unit 1's AC7
+and AC18 arms and this unit's AC2. All thirty-two cells are reached, so the arm carries no
+`unreached` row today; the form stays, so a cell a later change makes unreachable announces itself.
 
 ### Files touched (estimate)
 
@@ -97,18 +105,18 @@ file is compared byte for byte.
 
 ## 6. Acceptance criteria
 
-The fixture is unit 1's: a `git clone --local` of this repository under `%TEMP%`, its one remote
-re-pointed at a bare repository, claims seeded with `git commit-tree` over the empty tree.
+The fixture is the driver suite's claim fixture, unit 1's: a scratch repository under `%TEMP%`, its
+one remote a bare repository, claims seeded with `git commit-tree` over the empty tree.
 
 - **AC1** — When `bash tools/unattended/unattended.sh --preflight <slug> --keepalive-id k2` runs
   from a new session over a foreign `held` claim, and again over an `unknown` claim, each exits with
-  `UNATTENDED check 89 FAILED` and the clone holds no run-state file for the slug. When a different
+  `UNATTENDED check 89 FAILED` and the tree holds no run-state file for the slug. When a different
   session's `--resume` reaches `run_takeover` over a foreign `landed` claim, and again over an
   `unknown` claim, each exits with check 89 and the run-state file is byte-unchanged.
   Red when: any of the four cells takes the claim.
-- **AC2** — When `bash tools/unattended/unattended.sh --beat <slug>` runs over unit 1's tick
-  fixture, whose run `--liveness` reads `LIVE` on this host, with the claim rewritten to another
-  session `live`, it prints `unattended: beat — <slug> · skipped:` naming a claim not this run's,
+- **AC2** — When `bash tools/unattended/unattended.sh --beat <slug>` runs over the claim fixture,
+  whose run `--liveness` reads `LIVE` on this host as unit 1's `--beat` arm relies on, with the
+  claim rewritten to another session `live`, it prints `unattended: beat — <slug> · skipped:` naming a claim not this run's,
   and `git ls-remote <bare> refs/gov/runs/<slug>` prints the same sha before and after. With this
   run's own claim at a beat younger than a quarter of `RESUME_STALE_BOUND`, it prints the skipped
   line naming a beat not yet due, and the sha is unchanged.
@@ -137,6 +145,12 @@ none
 - rev-2 · 2026-10-04 · §2 §3 · S3 · the round-1 spec audit of units 10 to 15 promoted its finding
   31 on this unit to `TOOL-aGraftedHelix-19`. S3 and §3 stop calling the arm the class gate on its
   own row count, and §3 gains the hands-off to that unit.
+- rev-3 · 2026-10-05 · §2 §4 §6 · S3 AC1 AC2 · the build pass's divergences, before the code. S3's
+  outcome gains the printed line, which alone tells `take, announced` from `take` and `announce`
+  from a refusal. The preflight reacher runs in the suite's armed fixture rather than a fresh clone,
+  since a per-cell reset leaves the slug no run-state file, and AC1 says "tree" for "clone". The
+  `mine` seed is aged so the holder cell is observed due. AC2 runs in the driver suite's claim
+  fixture, the file §4 names, rather than the tick suite's.
 
 ## 10. Reuse audit
 
