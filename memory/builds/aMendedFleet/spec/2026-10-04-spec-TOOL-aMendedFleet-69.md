@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-69 — the agent-instructions kit announces a canonical file past 32 KiB and states both tool facts as verified
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 69
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 69
 
 <!-- gen:spec-records -->
 
@@ -144,8 +144,8 @@ fact is now visible where the wiring is graded.
   exits 0; when `AGENTS.md` is then truncated to exactly 32768 bytes with `head -c` and the check
   re-runs, it prints no announce and exits 0.
   Red when: the boundary is off by one, or the note changes the check's verdict.
-- **AC3** — When `bash tools/agent-instructions/adopt-agent-instructions.sh --check` runs at the repo
-  root, it prints the announce naming the byte count `wc -c < AGENTS.md` prints, and exits 0.
+- **AC3** — When `bash tools/agent-instructions/adopt-agent-instructions.sh --check --aliases claude`,
+  the `agent-instructions wiring` leg's own argv, runs at the repo root, it prints the announce naming the byte count `wc -c < AGENTS.md` prints, and exits 0.
   Red when: the repo's own oversized charter goes unannounced.
   figure: the byte count is DERIVED at observation time.
 - **AC4** — When `grep -c "nothing extra" tools/agent-instructions/README.md` runs it prints 0, and
@@ -199,6 +199,8 @@ New arm: `tools/agent-instructions/adopt-agent-instructions.test.sh` · a canoni
   and changelog, and the Codex source, all read 2026-10-04.
 - rev-2 · 2026-10-04 · §3 · M2 cross-read: the §8 F2 split was named only as a unit the run adds;
   it is `PLAY-aMendedFleet-3`, so the non-goal and the hands-off edge now name it.
+- rev-3 · 2026-10-05 · §6 AC3 · build pass: a bare `--check` at the root exits 1 on base and after, since
+  this repo wires only the `claude` alias; AC3 now runs the wiring leg's argv, `--aliases claude`.
 
 ## 10. Reuse audit
 

@@ -66,5 +66,15 @@ run --source src.md --aliases cursor --mode copy >/dev/null 2>&1
 git -C "$R" add -A >/dev/null 2>&1
 (cd "$R" && bash "$TOOL" --check --aliases cursor) >/dev/null 2>&1 && ok "9 eol-attr copy not false-drift (cmp -s)" || bad "9" "check false-flagged an identical copy under eol=lf"
 
+# 12 — a canonical over Codex's 32 KiB default is announced on install and --check; exactly 32768 is not; exit unchanged
+mkrepo t12; head -c 32769 /dev/zero | tr '\0' 'x' > "$R/src.md"
+out=$(run --source src.md 2>&1); rc=$?
+{ [ "$rc" = 0 ] && echo "$out" | grep -A1 '^canonical:' | grep -q 'over 32768'; } && ok "12 32769 B announced on install, exit 0" || bad "12" "rc=$rc out=$out"
+out=$(run --check 2>&1); rc=$?
+{ [ "$rc" = 0 ] && echo "$out" | grep -q 'over 32768'; } && ok "12 32769 B announced on --check, exit 0" || bad "12" "rc=$rc out=$out"
+head -c 32768 "$R/AGENTS.md" > "$R/a.tmp" && mv "$R/a.tmp" "$R/AGENTS.md"; rm -f "$R/.github/copilot-instructions.md"; run >/dev/null 2>&1
+out=$(run --check 2>&1); rc=$?
+{ [ "$rc" = 0 ] && ! echo "$out" | grep -q 'over 32768'; } && ok "12 32768 B not announced, exit 0" || bad "12" "rc=$rc out=$out"
+
 echo "==== $pass passed, $fail failed ===="
 [ "$fail" = 0 ]

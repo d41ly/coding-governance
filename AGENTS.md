@@ -10,8 +10,8 @@ land, so neither is spelled here: count `memory/map/features/` and the rows of
 `memory/map/baseline.toml`. No command reports the pair — this line used to claim
 `reuse_lookup.py` did, and it needs a query and prints the whole inventory, not the remainder.
 
-*(Read by every AI tool: `AGENTS.md` is canonical; `CLAUDE.md` is a `@AGENTS.md` import — Claude Code
-doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
+*(Read by every AI tool: `AGENTS.md` is canonical; `CLAUDE.md` is a `@AGENTS.md` import. Wired by
+`tools/agent-instructions/`; see its `README.md`.)*
 
 ## What ships here (the product)
 

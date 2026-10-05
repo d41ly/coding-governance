@@ -514,3 +514,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T20:12:25Z brief · item TOOL-aMendedFleet-69 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
 
 2026-10-05T20:23:02Z dispatch · item 4df000da TOOL-aMendedFleet-68 · reason tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md
+
+2026-10-05T20:30:13Z dispatch · item d42d74fe TOOL-aMendedFleet-69 · reason tools/agent-instructions/adopt-agent-instructions.sh tools/agent-instructions/README.md tools/agent-instructions/adopt-agent-instructions.test.sh AGENTS.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-69.md memory/builds/aMendedFleet/README.md memory/backlog/TOOL.md

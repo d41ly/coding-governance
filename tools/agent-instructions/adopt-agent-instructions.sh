@@ -4,8 +4,10 @@
 #
 # Canonical = AGENTS.md (the Linux-Foundation cross-tool standard: read natively by Codex/Copilot/
 # Cursor/Windsurf/Amp/Devin/Zed/Aider/Jules and Gemini CLI via .gemini config). Claude Code reads
-# ONLY CLAUDE.md — it does NOT read AGENTS.md natively (open request anthropics/claude-code#6235) —
-# so CLAUDE.md is wired with a `@AGENTS.md` import (or symlink/copy).
+# CLAUDE.md; from 2.1.277 it also reads AGENTS.md, but only in a project with no CLAUDE.md
+# (anthropics/claude-code#6235, closed) — so CLAUDE.md stays a `@AGENTS.md` import (or symlink/copy),
+# which serves a CLI older than 2.1.277 and a project whose CLAUDE.md exists for another reason.
+# A canonical over CODEX_MAX bytes is announced (Codex reads only that much by default); exit unchanged.
 #
 #   adopt-agent-instructions.sh [--source <file>] [--aliases "claude gemini copilot cursor windsurf"]
 #       [--mode symlink|pointer|copy] [--check] [--force]
@@ -26,6 +28,7 @@ ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || ROOT=$PWD
 cd "$ROOT" || { echo "AGENT-INSTR env ERROR — cannot enter repo root"; exit 2; }
 
 CANON="AGENTS.md"
+CODEX_MAX=32768   # Codex's default project_doc_max_bytes (32 KiB); a file of exactly this size is read whole
 SOURCE=""; ALIASES="claude gemini copilot"; MODE="pointer"; CHECK=0; FORCE=0
 need_val() { [ "$1" -ge 2 ] || { echo "AGENT-INSTR env ERROR — $2 needs a value"; exit 2; }; }
 while [ $# -gt 0 ]; do
@@ -57,10 +60,17 @@ alias_path() {
 rel_to_canon() { local p=$1 depth pref=""; depth=$(printf '%s' "$p" | tr -cd '/' | wc -c); while [ "$depth" -gt 0 ]; do pref="../$pref"; depth=$((depth-1)); done; printf '%s%s' "$pref" "$CANON"; }
 gemini_configured() { [ -f .gemini/settings.json ] && grep -Eq '"fileName"[[:space:]]*:[[:space:]]*(\[[[:space:]]*)?"'"$CANON"'"' .gemini/settings.json; }
 is_import() { grep -qE "^@\.*/?([^/]*/)*$CANON[[:space:]]*$" "$1" 2>/dev/null; }
+# announce, never refuse: the size is the adopter's choice, and Codex can be configured past it.
+print_size_note() {
+  local n; n=$(wc -c < "$CANON"); n=$((n))
+  [ "$n" -gt "$CODEX_MAX" ] && echo "  ! $CANON is $n bytes, over $CODEX_MAX: Codex reads at most 32 KiB of project instructions by default (project_doc_max_bytes) - trim it, or raise that key in the Codex config"
+  return 0
+}
 
 # ---- --check: verify only ----------------------------------------------
 if [ "$CHECK" = 1 ]; then
   [ -f "$CANON" ] || { echo "AGENT-INSTR CHECK FAILED — no canonical $CANON"; exit 1; }
+  print_size_note
   for a in $ALIASES; do
     p=$(alias_path "$a"); [ -n "$p" ] || { fail CHECK "unknown alias '$a'"; continue; }
     if [ "$a" = gemini ] && [ ! -e "$p" ] && [ ! -L "$p" ]; then
@@ -136,5 +146,6 @@ _wire_pointer_or_copy() {
 }
 
 echo "canonical: $CANON ($(wc -c < "$CANON") bytes) · mode: $MODE · aliases: $ALIASES"
+print_size_note
 for a in $ALIASES; do wire "$a"; done
 exit "$status"
