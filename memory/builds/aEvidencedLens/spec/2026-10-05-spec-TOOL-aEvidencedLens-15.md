@@ -1,11 +1,12 @@
 # TOOL-aEvidencedLens-15 — the diff-kind resume probe is observed from BASE with every REVIEW_SHAPE-derived value masked, its review key and its input print
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 9
+**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-05-build-TOOL-aEvidencedLens-15-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-aEvidencedLens-15-1-acceptance-ledger.md) | journal | — |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-15-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-15-2-build-brief.md) | journal | — |
 | [2026-10-05-review-TOOL-aEvidencedLens-15-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-15-spec-audit-round1.md) | spec-audit | — |
 
