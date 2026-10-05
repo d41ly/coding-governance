@@ -939,6 +939,51 @@ const allFindings = finderResults
     ({ ...f, lens: LENSES[i].key, ref: `${f.file}:${isSpec ? f.where : f.line}` }))))
   .map((f, i) => ({ ...f, id: i + 1 }))
 
+// TOOL-aEvidencedLens-6 - THE PER-LENS YIELD, one row per lens that RAN, in dispatch order. `rows` is
+// the ledger (or [] before the verify stage); `items` the synthesis's item list, or null when none can
+// be trusted (no synthesis, a dead one, or a tally fault), which nulls `defects` and `unique` rather
+// than guessing a split the tally itself refused. Items are read with the tally's own rules: a
+// severity outside the closed four skips its item, and an id that is not confirmed is ignored.
+// `unique` counts ITEMS whose every confirmed id is this lens's, so two lenses confirming one defect
+// are one shared item and neither is credited. `precision` is null, never 0, where nothing was judged.
+function deriveLensYield(rows, items) {
+  const confirmedLens = new Map(rows.filter((e) => e.verdict === 'confirmed').map((e) => [e.id, e.lens]))
+  const defects = {}
+  const unique = {}
+  for (const it of Array.isArray(items) ? items : []) {
+    if (['BLOCKER', 'HIGH', 'MEDIUM', 'LOW'].indexOf(it ? String(it.severity).toUpperCase() : '') === -1) continue
+    const owners = new Set((Array.isArray(it.ids) ? it.ids : []).filter((id) => confirmedLens.has(id)).map((id) => confirmedLens.get(id)))
+    for (const k of owners) defects[k] = (defects[k] || 0) + 1
+    if (owners.size === 1) for (const k of owners) unique[k] = (unique[k] || 0) + 1
+  }
+  return runningLensKeys.map((k) => {
+    const mine = rows.filter((e) => e.lens === k)
+    const n = { confirmed: 0, refuted: 0, uncertain: 0, unverified: 0 }
+    for (const e of mine) n[e.verdict]++
+    return {
+      lens: k, returned: !!finderResults[LENS_KEYS.indexOf(k)], raw: mine.length, confirmed: n.confirmed, refuted: n.refuted,
+      uncertain: n.uncertain, unverified: mine.length - n.confirmed - n.refuted,
+      precision: n.confirmed + n.refuted ? n.confirmed / (n.confirmed + n.refuted) : null,
+      defects: items ? defects[k] || 0 : null, unique: items ? unique[k] || 0 : null,
+    }
+  })
+}
+// The counts known BEFORE the synthesis, as the verbatim block its prompt carries; `defects` and
+// `unique` need its items, so they are returned and logged and never in the report.
+function renderLensYield(rows) {
+  const cols = ['lens', 'returned', 'raw', 'confirmed', 'refuted', 'uncertain', 'unverified', 'precision']
+  return ['| ' + cols.join(' | ') + ' |', '|' + cols.map(() => '---').join('|') + '|']
+    .concat(rows.map((e) => '| ' + [e.lens, e.returned ? 'yes' : 'no', e.raw, e.confirmed, e.refuted, e.uncertain, e.unverified,
+      e.precision === null ? '-' : e.precision.toFixed(2)].join(' | ') + ' |'))
+    .join('\n')
+}
+function printLensYield(rows) {
+  for (const e of rows)
+    log(`lens yield: ${e.lens} returned ${e.returned ? 'yes' : 'no'} · raw ${e.raw} · confirmed ${e.confirmed} · refuted ${e.refuted} · ` +
+      `uncertain ${e.uncertain} · unverified ${e.unverified} · precision ${e.precision === null ? '-' : e.precision.toFixed(2)} · ` +
+      `defects ${e.defects === null ? '-' : e.defects} · unique ${e.unique === null ? '-' : e.unique}`)
+}
+
 // ---- TOOL-dDerivedDocket-29 S5 — THE `exit` FIELD, on every return. `complete` when every agent
 // ---- returned, `deferred-platform` when any lens, skeptic batch or the synthesis came back null. A
 // ---- deferred return always carries `blockers: null`, the key, and `pending`: the labels a re-run
@@ -947,6 +992,8 @@ const allFindings = finderResults
 // ---- cannot repair an adjudication, so that path keeps the refusal its callers already make.
 if (lensesDead === lensesRunning) {
   log(`UNVERIFIED — all ${lensesRunning} lenses failed to return. Nothing was reviewed. Deferred: re-run with identical args.`)
+  const lensYield = deriveLensYield([], null) // TOOL-aEvidencedLens-6 S5 - every row returned: false, zeros
+  printLensYield(lensYield)
   return {
     // TOOL-dTieredTribunal-1 S3 - null, never 0. No synthesis ran, so there is no adjudicated count.
     exit: 'deferred-platform', key: reviewKey, pending: deadLensLabels,
@@ -955,7 +1002,7 @@ if (lensesDead === lensesRunning) {
     note: `DEFERRED: no lens completed (${lensesDead}/${lensesRunning} died) — nothing was reviewed; re-run with identical args`,
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
     // TOOL-aSightedSkeptic-8 S5 - nothing was judged on this path.
-    ledger: [], confirmedFindings: [], appendix: '',
+    ledger: [], confirmedFindings: [], appendix: '', lensYield,
   }
 }
 if (allFindings.length === 0) {
@@ -966,12 +1013,14 @@ if (allFindings.length === 0) {
     ? `DEFERRED: ${lensesDead}/${lensesRunning} lenses died and the survivors found nothing — re-run with identical args to dispatch only ${deadLensLabels.join(', ')}`
     : 'clean: 0 findings'
   log(note)
+  const lensYield = deriveLensYield([], null) // TOOL-aEvidencedLens-6 S5
+  printLensYield(lensYield)
   // TOOL-dTieredTribunal-1 S3 - null, never 0: no synthesis ran on this path either.
   return {
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
     lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, skippedLenses,
-    ledger: [], confirmedFindings: [], appendix: '', // TOOL-aSightedSkeptic-8 S5 - no finding raised
+    ledger: [], confirmedFindings: [], appendix: '', lensYield, // TOOL-aSightedSkeptic-8 S5 - no finding raised
   }
 }
 log(`${allFindings.length} raw findings across ${lensesRunning} lenses — verifying in batches.`)
@@ -1247,6 +1296,8 @@ if (confirmed.length + unverified.length === 0) {
   // A REFUTATION OVER A PARTIAL FAN DEFERS. It used to return `… treat as partial` beside a null
   // count, which a caller had to parse prose to tell from the clean result on the line below it.
   const deferred = pendingLabels.length > 0
+  const lensYield = deriveLensYield(ledger, null) // TOOL-aEvidencedLens-6 S4 - no synthesis, no items
+  printLensYield(lensYield)
   return {
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: pendingLabels,
     // TOOL-dTieredTribunal-1 S3 - null, never 0. Every finding was refuted, which is a RESULT, but
@@ -1260,7 +1311,7 @@ if (confirmed.length + unverified.length === 0) {
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
     // TOOL-aSightedSkeptic-8 S5 - no report is written on this path (spec F3), so the return is the
     // only place this ledger and appendix exist; a caller may write them.
-    ledger, confirmedFindings, appendix,
+    ledger, confirmedFindings, appendix, lensYield,
   }
 }
 
@@ -1274,6 +1325,8 @@ if (pendingLabels.length) {
     `The ${confirmed.length} confirmed and ${unverified.length} unverified finding(s) so far:`)
   for (const f of confirmed) log(`  CONFIRMED [${deriveBindingSeverity(f)}] lens=${f.lens} ${f.ref} - ${f.claim}`)
   for (const f of unverified) log(`  UNVERIFIED [${f.severity}] lens=${f.lens} ${f.ref} - ${f.claim}`)
+  const lensYield = deriveLensYield(ledger, null) // TOOL-aEvidencedLens-6 S4/S5 - a dead lens's row reads returned: false
+  printLensYield(lensYield)
   return {
     exit: 'deferred-platform', key: reviewKey, pending: pendingLabels,
     root: repo, raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length,
@@ -1282,11 +1335,13 @@ if (pendingLabels.length) {
     report: null, summary: '', blockers: null, highs: null,
     note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`,
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
-    ledger, confirmedFindings, appendix, // TOOL-aSightedSkeptic-8 S5 - what was judged so far; `exit` says partial
+    ledger, confirmedFindings, appendix, lensYield, // TOOL-aSightedSkeptic-8 S5 - what was judged so far; `exit` says partial
   }
 }
 
 // --- Phase 3: SYNTHESIZE — one agent writes the report ------------------
+// TOOL-aEvidencedLens-6 S6 - the per-lens counts that exist before the synthesis, for its verbatim block.
+const preSynthYield = deriveLensYield(ledger, null)
 phase('Synthesize')
 const synth = await agent(
   `Write the Tier-2 review report for: ${context}\n\n` +
@@ -1325,6 +1380,10 @@ const synth = await agent(
     `designed. Where it is NOT JUDGED, present it as the finder's proposal only. ` +
     // TOOL-aSightedSkeptic-7 S6 - the intensity, in the review-shape sentence, on every run.
     `State the review shape near the top — intensity ${intensity}, raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, unverified ${unverified.length} (${uncertainFindings.length} uncertain), precision ${precision.toFixed(2)}. ` +
+    // TOOL-aEvidencedLens-6 S6 - copied, as the appendix is, and not verified; the return holds the rows.
+    `\n\nLENS YIELD - the table between the two marker lines below goes into the report directly after the review-shape ` +
+    `sentence, copied VERBATIM: unedited, no row added, dropped, reordered or reworded, and neither marker line copied.\n` +
+    `<<<LENS YIELD\n${renderLensYield(preSynthYield)}\nLENS YIELD>>>` +
     // TOOL-aWeldedTribunal-4 — RUN INTEGRITY. This harness computes every counter below and logged
     // them to stdout, which is not the record; the AGENT writes the record, so a run whose lenses
     // half died wrote a durable report that could not say so. The two drift-audit siblings were
@@ -1549,6 +1608,9 @@ if (!synth) {
   for (const f of unverified) log(`  UNVERIFIED [${f.severity}] lens=${f.lens} ${f.ref} - ${f.claim}`)
 }
 
+// TOOL-aEvidencedLens-6 S4 - defects and unique only over an item list the tally accepted.
+const lensYield = deriveLensYield(ledger, synth && !tallyFault ? synth.items || [] : null)
+printLensYield(lensYield)
 // H1: the SUCCESS return carries the same trust counts as the early ones. A caller that only ever
 // sees {confirmed, precision} cannot tell a full review from one where half the lenses died.
 // TOOL-dDerivedDocket-29 S5 - past the partial-fan return above, the synthesis is the only agent left
@@ -1613,4 +1675,6 @@ return {
   ledger,
   confirmedFindings,
   appendix,
+  // TOOL-aEvidencedLens-6 S5 - on every return; README "return fields" states the row shape.
+  lensYield,
 }

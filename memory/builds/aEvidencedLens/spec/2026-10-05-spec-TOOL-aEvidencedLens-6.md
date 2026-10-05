@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-6 — the review returns a per-lens yield over defect clusters, unique defects counted
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 5
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 5 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 

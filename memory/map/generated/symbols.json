@@ -2718,6 +2718,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "deriveLensYield",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveLensYield",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "deriveLiveness",
       "kind": "function",
       "file": "tools/workflows/drift-audit-code.js"
@@ -5033,6 +5043,16 @@
       "file": "tools/govkit/refusal_join.py"
     },
     {
+      "id": "printLensYield",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "printLensYield",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "print_canon_posture",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -6514,6 +6534,16 @@
     },
     {
       "id": "renderIntent",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderLensYield",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderLensYield",
       "kind": "function",
       "file": "tools/workflows/tier2-review.template.js"
     },

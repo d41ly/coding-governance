@@ -1368,6 +1368,96 @@ async function runLedgerArms() {
   const k1 = await deriveFoldKey('abc1230')
   const k2b = await deriveFoldKey('abc1231')
   ck(k1 !== 'threw' && k0 !== k1 && k1 !== k2b && k0 !== k2b, 'fold: the review key moves with prevBlob')
+  await runLensYieldArms()
+}
+
+// ==== TOOL-aEvidencedLens-6 — `lensYield`, one row per running lens, unique defects counted by ITEM ====
+// Every arm is RED against the parent render, which returns no `lensYield` on any path, logs no
+// `lens yield:` line and puts no LENS YIELD block in the synthesis prompt.
+async function runLensYieldArms() {
+  const LORDER = ['security', 'correctness', 'seams', 'verification', 'intent']
+  const scanYield = (run, n) => !!run.result && Array.isArray(run.result.lensYield) && run.result.lensYield.length === n
+  const buildSynthOwn = (label, prompt) => ({ path: 'memory/reviews/r.md', summary: 's',
+    items: [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => ({ severity: 'HIGH', ids: [parseInt(x[1], 10)] })) })
+  const buildVerdictById = (pick) => (label, prompt) => {
+    const m = /ids ([0-9, ]+)\)/.exec(prompt)
+    const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
+    return { path: '/cd/v.json', verdicts: ids.map((id) => ({ id: id, verdict: pick(id), reason: 'r' })) }
+  }
+  // ---- AC1: each id in its own item credits every lens one unique defect; one item holding all five
+  // ---- credits none, which a raw-finding `unique` would credit five times.
+  let r = await runReview(DIFF, buildStubs({ synth: buildSynthOwn }))
+  if (checkNoThrow(r, 'lens yield own items')) {
+    ck(scanYield(r, 5) && r.result.lensYield.every((e, i) => e.lens === LORDER[i] && e.returned === true && e.raw === 1 && e.confirmed === 1 &&
+      e.precision === 1 && e.defects === 1 && e.unique === 1), 'lens yield: each id in its own item reads raw, confirmed, precision, defects and unique 1 per lens')
+  }
+  r = await runReview(DIFF, ALL_OK)
+  if (checkNoThrow(r, 'lens yield shared item')) {
+    ck(scanYield(r, 5) && r.result.lensYield.every((e) => e.defects === 1 && e.unique === 0), 'lens yield: one item holding all five ids reads defects 1 and unique 0 on every row')
+  }
+  // ---- AC2: a refuted lens reads precision 0; an uncertain one reads precision null, and unverified holds it.
+  r = await runReview(DIFF, buildStubs({ 'verify:': buildVerdictById((id) => (id === 1 ? 'refuted' : id === 2 ? 'uncertain' : 'confirmed')) }))
+  if (checkNoThrow(r, 'lens yield mixed verdicts')) {
+    const y = scanYield(r, 5) ? r.result.lensYield : []
+    ck(y.length === 5 && y[0].refuted === 1 && y[0].precision === 0 && y[0].defects === 0 &&
+      y[1].uncertain === 1 && y[1].unverified === 1 && y[1].precision === null && y[1].raw === 1,
+      'lens yield: a refuted lens reads precision 0 and defects 0, an uncertain one unverified 1 and precision null')
+  }
+  // ---- AC3: a tally fault nulls defects and unique on every row; confirmed stays an integer.
+  r = await runReview(DIFF, buildStubs({ synth: buildSynth(3) }))
+  if (checkNoThrow(r, 'lens yield tally fault')) {
+    ck(r.logs.some((l) => l.indexOf('WARNING: the synthesis item list') === 0) && scanYield(r, 5) &&
+      r.result.lensYield.every((e) => e.defects === null && e.unique === null && Number.isInteger(e.confirmed)),
+      'lens yield: a tally fault nulls defects and unique on every row rather than guessing a split')
+  }
+  // ---- AC4: a dead synthesis keeps the ledger counts and nulls the item figures; a dead lens keeps its row.
+  r = await runReview(DIFF, buildStubs({ synth: null }))
+  if (checkNoThrow(r, 'lens yield dead synth')) {
+    ck(scanYield(r, 5) && r.result.exit === 'deferred-platform' && r.result.lensYield.every((e) => e.confirmed === 1 && e.defects === null && e.unique === null),
+      'lens yield: a dead synthesis returns the ledger counts and null defects and unique')
+  }
+  r = await runReview(DIFF, buildStubs({ 'find:seams': null }))
+  if (checkNoThrow(r, 'lens yield dead lens')) {
+    ck(scanYield(r, 5) && r.result.exit === 'deferred-platform' && r.result.lensYield[2].lens === 'seams' && r.result.lensYield[2].returned === false &&
+      r.result.lensYield[2].raw === 0 && r.result.lensYield[0].returned === true, 'lens yield: a dead lens keeps its row, returned false, on the deferred return')
+  }
+  // ---- AC5: the no-finding, every-refuted and every-lens-dead exits each carry one row per running lens.
+  r = await runReview(DIFF, buildStubs({ 'find:': buildEmptyLens }))
+  if (checkNoThrow(r, 'lens yield no finding')) {
+    ck(scanYield(r, 5) && r.result.note === 'clean: 0 findings' && r.result.lensYield.every((e) => e.returned && e.raw === 0 && e.defects === null),
+      'lens yield: the no-finding exit carries a row per lens')
+  }
+  r = await runReview(DIFF, buildStubs({ 'verify:': buildVerdicts('refuted') }))
+  if (checkNoThrow(r, 'lens yield every refuted')) {
+    ck(scanYield(r, 5) && r.result.note === 'all findings adjudicated and refuted' && r.result.lensYield.every((e) => e.refuted === 1 && e.precision === 0 && e.defects === null),
+      'lens yield: the every-refuted exit carries a row per lens')
+  }
+  r = await runReview(DIFF, buildStubs({ 'find:': null }))
+  if (checkNoThrow(r, 'lens yield every lens dead')) {
+    ck(scanYield(r, 5) && r.result.lensYield.every((e) => e.returned === false && e.raw === 0 && e.confirmed === 0 && e.precision === null),
+      'lens yield: the every-lens-dead exit carries a returned-false row of zeros per lens')
+  }
+  // ---- AC6: the spec synthesis prompt carries the block after the review-shape sentence, and the log a line per lens.
+  r = await runReview(SPEC, ALL_OK)
+  if (checkNoThrow(r, 'lens yield spec block')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const at = sp ? sp.prompt.indexOf('<<<LENS YIELD\n') : -1
+    const end = at === -1 ? -1 : sp.prompt.indexOf('\nLENS YIELD>>>', at)
+    const block = end === -1 ? '' : sp.prompt.slice(at, end)
+    const keys = scanYield(r, 5) ? r.result.lensYield.map((e) => e.lens) : []
+    ck(keys.length === 5 && block !== '' && sp.prompt.indexOf('precision 1.00. \n\nLENS YIELD') !== -1 &&
+      keys.every((k) => block.indexOf('| ' + k + ' | yes | 1 | 1 | 0 | 0 | 0 | 1.00 |') !== -1),
+      'lens yield: the spec synthesis prompt carries the marked block, a row per running lens with its precision')
+    const yl = r.logs.filter((l) => l.indexOf('lens yield: ') === 0)
+    ck(yl.length === 5 && keys.every((k) => yl.some((l) => l.indexOf('lens yield: ' + k + ' returned yes') === 0 && l.indexOf('defects 1') !== -1 && l.indexOf('unique 0') !== -1)),
+      'lens yield: one log line per lens names defects and unique')
+  }
+  // ---- AC9: a light run has no row for a skipped lens.
+  r = await runReview(Object.assign({}, DIFF, { intensity: 'light' }), ALL_OK)
+  if (checkNoThrow(r, 'lens yield light')) {
+    ck(scanYield(r, 3) && r.result.skippedLenses.length === 2 && r.result.lensYield.every((e) => r.result.skippedLenses.indexOf(e.lens) === -1),
+      'lens yield: a light run carries a row per running lens and none for a skipped one')
+  }
 }
 
 runWholeScriptArms().then(() => {
@@ -1434,7 +1524,10 @@ printf '%s\n' "$out"
 # prevBlob arms (4), the three FOLD DIFF shapes and their WARNING and count (2), the DEGRADED round (1),
 # the moved and unusable blobs and the probe's hash-object ask (2), a null probe (1), a probe with no
 # blobs key (1) and the key over prevBlob (1).
-FLOOR_ASSERTIONS=217
+# RAISED 217 -> 229 by TOOL-aEvidencedLens-6: 12 assertions, counted off the block — own and shared items (2),
+# mixed verdicts (1), a tally fault (1), a dead synthesis and a dead lens (2), the no-finding, every-refuted
+# and every-lens-dead exits (3), the spec synthesis block and its log lines (2) and a light run (1).
+FLOOR_ASSERTIONS=229
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

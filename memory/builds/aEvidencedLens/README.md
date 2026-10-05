@@ -81,7 +81,7 @@ ids TOOL-aEvidencedLens-14
 | [TOOL-aEvidencedLens-2 — spec lenses probe read-only, and every spec finding carries its evidence](spec/2026-10-05-spec-TOOL-aEvidencedLens-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-3 — the spec skeptic confirms by the rubric, re-runs the evidence, and refutes duplicates and by-design](spec/2026-10-05-spec-TOOL-aEvidencedLens-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-4 — a spec fold round reads its diff, and a moved subject is graded, not fixed at BLOCKER](spec/2026-10-05-spec-TOOL-aEvidencedLens-4.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-05 |
-| [TOOL-aEvidencedLens-6 — the review returns a per-lens yield over defect clusters, unique defects counted](spec/2026-10-05-spec-TOOL-aEvidencedLens-6.md) | 5 | 2 | SPECCED | rev-3 | 2026-10-05 |
+| [TOOL-aEvidencedLens-6 — the review returns a per-lens yield over defect clusters, unique defects counted](spec/2026-10-05-spec-TOOL-aEvidencedLens-6.md) | 5 | 2 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aEvidencedLens-10 — `review_replay.py` scores a spec-audit report against a past one by file and section](spec/2026-10-05-spec-TOOL-aEvidencedLens-10.md) | 6 | 1 | SPECCED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-13 — no diff-kind probe, lens or skeptic prompt moved from BASE through unit 6, observed once with the review key masked](spec/2026-10-05-spec-TOOL-aEvidencedLens-13.md) | 6 | 2 | SPECCED | rev-1 | 2026-10-05 |
 | [TOOL-aEvidencedLens-5 — the build harness hands the audit its context, sibling specs, checklist and prior findings](spec/2026-10-05-spec-TOOL-aEvidencedLens-5.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-05 |

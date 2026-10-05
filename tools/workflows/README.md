@@ -207,7 +207,7 @@ trust boundary is not one to review light: the `security` lens is one of the two
 
 Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
 echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names
-it as `lens=<key>`. Every return carries three fields beside the counts:
+it as `lens=<key>`. Every return carries four fields beside the counts:
 
 - `ledger` — one entry per finding in id order: `id`, `lens`, `ref`, `severity` (the finder's),
   `skepticSeverity`, `verdict` (`confirmed`, `refuted`, `uncertain`, or `unverified` when no verdict
@@ -218,6 +218,16 @@ it as `lens=<key>`. Every return carries three fields beside the counts:
 - `appendix` — the ledger as a markdown table under `## Appendix — every finding`, with the eight
   columns `id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict`. A cell is `-`
   when its value is absent, a `|` is escaped, and line breaks fold to a space.
+- `lensYield` — per lens, `defects` and `unique` are `null` when no item list can be trusted (see below).
+  One row per lens that RAN, in dispatch order, none for a lens a light run skipped:
+  `lens`, `returned` (false for a lens that died), `raw`, `confirmed`, `refuted`, `uncertain`,
+  `unverified` (every finding neither confirmed nor refuted, the uncertain ones included), `precision`
+  (`confirmed / (confirmed + refuted)`, `null` when both are 0), `defects` (synthesis items holding a
+  confirmed id from this lens) and `unique` (items whose every confirmed id is this lens's). The item
+  list is untrusted, and both are `null` on every row, when no synthesis ran, it died,
+  or the tally fault fired. Each row is logged as a `lens yield:` line, and the counts known before
+  the synthesis reach its prompt as a verbatim block the report copies; the return is the source of
+  record, because that copy is not checked.
 
 The two exits before any skeptic runs, every lens dead and no finding raised, return `[]`, `[]` and
 `''`; a deferred return carries what was judged so far. The harness renders the appendix and tells the
