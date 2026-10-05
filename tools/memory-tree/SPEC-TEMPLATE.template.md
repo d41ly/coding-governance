@@ -225,11 +225,15 @@ adopter receives this paragraph and the blank key in the example conf.
 **Where a new arm lives.** When a unit adds or moves a gate arm, §7 carries one line per arm:
 
 ```
-New arm: <suite path> · <what stages its failing case> · <assertion floor to move, or none>
+New arm: <suite path> · covers <AC ids|none> · <what stages its failing case> · <floor to move, or none>
 ```
 
-It is prose, it is not machine-graded, and it never satisfies the rule above — the `New arm:` prefix
-is exactly what keeps it out of the leg join. A §7 carrying only an arm-home line still names no leg.
+The `covers` field is the one part of the line a checker reads. It lists the criteria of THIS spec
+the arm re-observes, space-separated, or `none` for an arm that observes only scope items no
+criterion names; every id must be a label this spec's §6 defines, and `none` stands alone, never
+beside an id. A line without the field is legal and ungraded. The rest of the line is prose, it is
+not machine-graded, and it never satisfies the rule above — the `New arm:` prefix is exactly what
+keeps it out of the leg join. A §7 carrying only an arm-home line still names no leg.
 
 ## §10 Reuse audit — the two facts, and what satisfies each
 
@@ -441,7 +445,7 @@ The named gate legs this unit must keep green, plus any new gate it adds. Put th
 line of their own carrying nothing but backticked names and separators — that line is what the
 leg join reads, and from `SPEC_LEGLINE_CUTOFF` onward a spec with this heading must have one.
 From `SPEC_GUARD_LEGS_CUTOFF` onward that line must also name every leg whose manifest `guard`
-a path under §4 `### Files touched (estimate)` trips. Add `New arm: <suite path> · <what stages its failing case> · <floor to move, or none>` per arm
+a path under §4 `### Files touched (estimate)` trips. Add `New arm: <suite path> · covers <AC ids|none> · <what stages its failing case> · <floor to move, or none>` per arm
 this unit adds or moves. The rules are the §7 section above this skeleton.
 
 ## 8. Open questions

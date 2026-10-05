@@ -251,6 +251,10 @@ BROAD_LEG_FLOOR = 5
 # The acceptance section by HEADING TEXT, the shape GATES_HEAD already has and for the same reason:
 # a light-profile spec drops `## 5.` and the ordinal read grades whatever sits sixth.
 AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
+# A criterion LABEL in any of the three forms the spec template admits (`- **AC1** — `, `- AC1. `,
+# `**AC1** `): the label regex of the hygiene gate's acceptance-witness check, ported, so the covers
+# join and that check agree on which criteria a spec defines (TOOL-aMendedFleet-75).
+AC_LABEL = re.compile(r"^(?:[ \t]*[-*][ \t]*)?(?:\*\*)?(AC[0-9]+[a-z]?)(?:\*\*)?(?:[^A-Za-z0-9]|$)", re.M)
 # A merge-bar or suite INVOCATION: the runner or a suite at command position — the token's start
 # or a chain separator, past optional VAR=value prefixes, `timeout` with its options and duration,
 # and a bash/sh/python/py launcher with one option — a short one, `py`'s version selector
@@ -880,6 +884,51 @@ def scan_spec_sizes(root, specs, files, ceiling, highwater, hw_rel):
     return hits, stale, held, largest
 
 
+def scan_arm_covers(f, text):
+    """THE COVERS JOIN (TOOL-aMendedFleet-75): every id a `New arm:` line's `covers` field names must
+    be a criterion label this spec's acceptance section defines.
+
+    An arm line opens `New arm:` at column 0 inside the Gates section and runs on through every
+    following indented non-blank line. Its fields split on ` · `; a field opening `covers ` yields its
+    whitespace-separated tokens. `none` passes standing alone in its field and is a hit beside an id.
+    A line with no such field is legal and ungraded, and an id in the line's other fields is prose,
+    never read: a line citing another record's criterion in prose is innocent (§8 F2 measured one).
+    Returns `(hits, arm_lines, carriers, tokens_graded)`; the counts feed the join's liveness line.
+    The hit token carries the spec path, so a waiver row reaches this spec's id and no other's.
+    """
+    gates = extract_gates(text)
+    if gates is None:
+        return [], 0, 0, 0
+    arms, cur = [], None
+    for line in gates.splitlines():
+        if line.startswith("New arm:"):
+            cur = [line.strip()]
+            arms.append(cur)
+        elif cur is not None and line[:1] in (" ", "\t") and line.strip():
+            cur.append(line.strip())
+        else:
+            cur = None
+    labels = set(AC_LABEL.findall(extract_acceptance(text) or ""))
+    hits, carriers, graded = [], 0, 0
+    for arm in arms:
+        fields = [fl.strip().split()[1:] for fl in " ".join(arm).split(" · ")
+                  if fl.strip().startswith("covers ")]
+        carriers += 1 if fields else 0
+        for toks in fields:
+            for tok in toks:
+                graded += 1
+                if tok == "none" and len(toks) == 1:
+                    continue
+                if tok == "none":
+                    why = "`none` stands alone in a covers field, never beside an id"
+                elif tok in labels:
+                    continue
+                else:
+                    why = "not a criterion label this spec's Acceptance section defines"
+                hits.append((f, "covers", f"covers <- {f} {tok}", why))
+    return hits, len(arms), carriers, graded
+
+
 def main(argv):
     listing = "--list" in argv
     root = pathlib.Path(run("git", "rev-parse", "--show-toplevel").strip())
@@ -969,6 +1018,7 @@ def main(argv):
     bar_examined, bar_specs, bar_carriers, near = 0, 0, 0, []
     g_examined, g_specs, g_carriers, g_nosubhead, g_nogates = 0, 0, 0, 0, 0
     c_runs, c_specs, c_cleared = 0, 0, 0
+    cv_lines, cv_specs, cv_carriers, cv_graded = 0, 0, 0, 0
     for f in specs:
         text = (root / f).read_bytes().decode("utf-8", "replace")
         m = SPEC_DATE.search("/" + f)
@@ -1113,6 +1163,12 @@ def main(argv):
                   + CLAIMS_WHY.format(cls=cls, cite=cite)) for line, obj, cls, arms, cite in c_hits]
         near += [(f, "claims", f"claims <- {obj}", f"line {line}, arm(s) {'+'.join(arms)} — {why}")
                  for line, obj, arms, why in c_clears]
+        cv_hits, n, c, k = scan_arm_covers(f, text)
+        hits += cv_hits
+        cv_lines += n
+        cv_specs += 1 if n else 0
+        cv_carriers += c
+        cv_graded += k
 
     # The seventh join, over a population the six above never build: one uid map over the live specs,
     # then one read per graded target. It is folded into `hits` before the waiver pass, so a handoff
@@ -1180,6 +1236,10 @@ def main(argv):
     # state, so this line is what keeps that zero from reading as coverage.
     print(f"spec-tokens: claims join · {c_runs} dossier-claim sentence(s) examined · {c_specs} live "
           f"spec(s) carry one · {c_cleared} object(s) cleared · canary held over {len(CLAIM_ARMS)} arm(s)")
+    # The covers join's line, on every run: the field is optional, so a zero carrier count is its
+    # normal state and only the arm-line count tells a join that read nothing from a clean one.
+    print(f"spec-tokens: covers join · {cv_lines} New arm line(s) in {cv_specs} live spec(s) · "
+          f"{cv_carriers} carry a covers field · {cv_graded} token(s) graded")
     # THE UNGRADED POPULATION, which the report used to leave out entirely. A leg join that reads N
     # specs and grades a leg name in far fewer of them looks identical to one that graded them all
     # and found nothing wrong. These two numbers are what separate the cases, and they are kept

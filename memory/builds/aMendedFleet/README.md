@@ -252,7 +252,7 @@ ids TOOL-aMendedFleet-109
 | [TOOL-aMendedFleet-72 — the gate runner reaps the dead `gate-timings.tsv` it no longer reads](spec/2026-10-04-spec-TOOL-aMendedFleet-72.md) | 72 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-73 — the vague-brief trial arm: a full spec against a short plan, on a three-sentence brief](spec/2026-10-04-spec-TOOL-aMendedFleet-73.md) | 73 | 2 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-74 — a unit can be handed the bug-class checklist for its write set before it writes code](spec/2026-10-04-spec-TOOL-aMendedFleet-74.md) | 74 | 2 | CLOSED | rev-2 | 2026-10-04 |
-| [TOOL-aMendedFleet-75 — a `New arm:` line declares the acceptance criteria its arm keeps observed](spec/2026-10-04-spec-TOOL-aMendedFleet-75.md) | 75 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-75 — a `New arm:` line declares the acceptance criteria its arm keeps observed](spec/2026-10-04-spec-TOOL-aMendedFleet-75.md) | 75 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [KICK-aMendedFleet-1 — the orientation card shows the last drift reading from the node's history](spec/2026-10-04-spec-KICK-aMendedFleet-1.md) | 76 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [KICK-aMendedFleet-2 — the orientation card shows which unmerged remote refs share paths with this tree's branch](spec/2026-10-04-spec-KICK-aMendedFleet-2.md) | 77 | 1 | SPECCED | rev-3 | 2026-10-04 |
 | [KICK-aMendedFleet-3 — kickoff Step 4 points at the two context commands the build method spells once](spec/2026-10-04-spec-KICK-aMendedFleet-3.md) | 78 | 1 | SPECCED | rev-1 | 2026-10-04 |
@@ -273,7 +273,7 @@ ids TOOL-aMendedFleet-109
 | [TOOL-aMendedFleet-93 — one tier2 review run with and without the charter, and the review default follows the reading](spec/2026-10-04-spec-TOOL-aMendedFleet-93.md) | 93 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [PLAY-aMendedFleet-3 — the charter's wiring rule stops stating which file Claude Code reads](spec/2026-10-04-spec-PLAY-aMendedFleet-3.md) | 94 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-94 — the wrapper's product-only prose loads from a path-scoped rule when a session opens a product file](spec/2026-10-04-spec-TOOL-aMendedFleet-94.md) | 95 | 2 | SPECCED | rev-2 | 2026-10-04 |
-| [KICK-aMendedFleet-4 — the orientation card notes a PATH CLI older than the running session](spec/2026-10-04-spec-KICK-aMendedFleet-4.md) | 96 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [KICK-aMendedFleet-4 — the orientation card notes a PATH CLI older than the running session](spec/2026-10-04-spec-KICK-aMendedFleet-4.md) | 96 | 1 | SPECCED | rev-3 | 2026-10-04 |
 | [PLAY-aMendedFleet-4 — the `AGENTS.md` wrapper carries one node registry](spec/2026-10-04-spec-PLAY-aMendedFleet-4.md) | 97 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-97 — held-red C1: the kits' Python stdio is UTF-8 on a host whose code page is cp1252](spec/2026-10-05-spec-TOOL-aMendedFleet-97.md) | 98 | 1 | SPECCED | rev-1 | 2026-10-05 |
 | [TOOL-aMendedFleet-98 — held-red C2: a Python suite's `bash` resolves to Git-Bash, never the System32 WSL launcher](spec/2026-10-05-spec-TOOL-aMendedFleet-98.md) | 99 | 1 | SPECCED | rev-1 | 2026-10-05 |

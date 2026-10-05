@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-75 — a `New arm:` line declares the acceptance criteria its arm keeps observed
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 75
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 75
 
 <!-- gen:spec-records -->
 
@@ -35,7 +35,12 @@ grammar and grades it: every id the field names must be a criterion the same spe
   when it is `none` standing alone in the field, or a label the spec's Acceptance section defines
   through `extract_acceptance`, in any of the three label forms the template admits. Every other
   token is a hit of kind `covers`: an id the section does not define, a malformed id, or `none`
-  beside an id. Hits print and waive exactly as every other kind does. Observed by AC1 and AC2.
+  beside an id. Hits print and waive exactly as every other kind does; the hit token is the
+  composite `covers <- <spec path> <token>`, as the size and claims joins compose theirs, so a
+  waiver row reaches one spec's id and never every spec's. Observed by AC1 and AC2.
+- **S7** — The one live spec whose field the join refuses on the day it lands, unit 4 of the
+  kickoff family in this build, spelled a range, `covers AC1 to AC4`; its line is written out as
+  the four ids, as its own rev bump. Observed by AC3, which requires the run add no `[covers]` hit.
 - **S3** — Liveness. Every run prints one line,
   `spec-tokens: covers join · <n> New arm line(s) in <m> live spec(s) · <c> carry a covers field · <k> token(s) graded`,
   so a join that matched nothing is distinguishable from a clean one. Observed by AC3.
@@ -109,6 +114,7 @@ New arm: `tools/check-spec-tokens.test.sh` · covers AC1 AC2 · a dangling id st
 - `memory/TEMPLATE-SPEC.md`
 - `memory/map/features/spec-tokens.md`
 - `memory/map/generated/symbols.json`
+- `memory/builds/aMendedFleet/spec/2026-10-04-spec-KICK-aMendedFleet-4.md`
 
 ### Alternatives rejected
 
@@ -197,6 +203,10 @@ New arm: `tools/check-spec-tokens.test.sh` · covers AC1 AC2 · a fixture spec w
 - rev-2 · 2026-10-04 · S6 · §4 · M2 cross-read: `scan_arm_covers` moves
   `memory/map/generated/symbols.json`, which units 18, 70 and 82 regenerate and declare for their
   own definitions; this spec named the freshness leg but omitted the write and its Files touched row.
+- rev-3 · 2026-10-06 · S2 · S7 · §4 · built: the join, run over the tree, refused one live line,
+  `covers AC1 to AC4` in a sibling spec written after this one, so AC3 could not hold without S7;
+  and S2 now names the composite hit token, which a bare `AC9` waiver row would otherwise share
+  across every spec.
 
 ## 10. Reuse audit
 

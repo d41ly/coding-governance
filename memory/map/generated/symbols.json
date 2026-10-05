@@ -14843,6 +14843,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "scan_arm_covers",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "scan_artifacts",
       "kind": "function",
       "file": "tools/codebase-map/check_gate_coverage.py"

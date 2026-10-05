@@ -1,6 +1,6 @@
 # KICK-aMendedFleet-4 — the orientation card notes a PATH CLI older than the running session
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff · ratified 2026-10-04 · order 96
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff · ratified 2026-10-04 · order 96
 
 <!-- gen:spec-records -->
 
@@ -171,7 +171,7 @@ No new refusal or gate clause is added, so nothing here is observed RED on a sta
 
 `manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `shell hygiene (a loop fed by a command substitution)` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
 
-New arm: `skills/session-kickoff/manifest-check.test.sh` · covers AC1 to AC4 · a stub `claude` on PATH under four `AI_AGENT` values and an unset one, no `claude` on PATH, and a stub that outlives a one-second bound, staged red by swapping the integer comparison for a string one · none
+New arm: `skills/session-kickoff/manifest-check.test.sh` · covers AC1 AC2 AC3 AC4 · a stub `claude` on PATH under four `AI_AGENT` values and an unset one, no `claude` on PATH, and a stub that outlives a one-second bound, staged red by swapping the integer comparison for a string one · none
 
 ## 8. Open questions
 
@@ -192,6 +192,9 @@ New arm: `skills/session-kickoff/manifest-check.test.sh` · covers AC1 to AC4 ·
 - rev-2 · 2026-10-04 · §4 · Files touched named `memory/map/generated/symbols.json`, which
   enumerates Python and JavaScript definitions only; `derive_cli_line` is shell, and
   `KICK-aMendedFleet-1`, adding a shell function to the same engine, declares no such write.
+- rev-3 · 2026-10-06 · §7 · the `New arm:` line's `covers` field spelled a range, `AC1 to AC4`; the
+  covers join of `TOOL-aMendedFleet-75` reads the field as space-separated criterion ids and graded
+  `to` as a hit, so the range is written out as the four ids it meant.
 
 ## 10. Reuse audit
 

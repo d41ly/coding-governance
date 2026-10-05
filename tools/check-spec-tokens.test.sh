@@ -33,7 +33,10 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=119
+FLOOR_ASSERTIONS=126
+# RAISED 119 -> 126 at TOOL-aMendedFleet-75, by its seven covers-join `arm` calls: the dangling id,
+# the count line, the defined id, `none` alone, `none` beside an id, the prose-only id and the field
+# on a continuation line.
 # RAISED 112 -> 119 at TOOL-aMendedFleet-25, by its seven size-join `arm` calls: the held spec and
 # its count, the padded spec, the grown held spec, the terminal spec's stale row, the arm-off line
 # and the non-number refusal.
@@ -1235,6 +1238,32 @@ arm "no class row turns the size join off, announced" 0 "$d" "no class row in ${
 printf 'memory/builds/*/spec/\tlots\n' > "$d/${PFX}template-size-limits.txt"
 arm "a class row that is not a number REFUSES" 1 "$d" "REFUSING — the size join's row for memory/builds/*/spec/"
 git -C "$d" reset -q --hard "$sized"
+
+# ---- TOOL-aMendedFleet-75: the covers join. The scratch spec defines only AC1; each edit appends
+#      one `New arm:` line to its section 7 and the checker re-runs. Staged red by deleting the
+#      scan_arm_covers call.
+d=$base/covers; scratch "$d"
+cs=memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md
+cvbase=$(git -C "$d" rev-parse HEAD)
+printf '\nNew arm: `x.test.sh` · covers AC1 AC9 · a dangling id · none\n' >> "$d/$cs"
+arm "a covers field naming an id section 6 does not define REDS as [covers]" 1 "$d" "[covers] \`covers <- $cs AC9\`" "\`covers <- $cs AC1\`"
+arm "the covers line counts the arm line, the carrier and both tokens" 1 "$d" "covers join · 1 New arm line(s) in 1 live spec(s) · 1 carry a covers field · 2 token(s) graded"
+git -C "$d" reset -q --hard "$cvbase"
+printf '\nNew arm: `x.test.sh` · covers AC1 · a defined id · none\n' >> "$d/$cs"
+arm "a covers field naming a defined id is clean" 0 "$d" "1 carry a covers field" "[covers]"
+git -C "$d" reset -q --hard "$cvbase"
+printf '\nNew arm: `x.test.sh` · covers none · no criterion · none\n' >> "$d/$cs"
+arm "covers none standing alone is clean" 0 "$d" "1 token(s) graded" "[covers]"
+git -C "$d" reset -q --hard "$cvbase"
+printf '\nNew arm: `x.test.sh` · covers none AC1 · none beside an id · none\n' >> "$d/$cs"
+arm "covers none beside an id REDS naming none" 1 "$d" "[covers] \`covers <- $cs none\`"
+git -C "$d" reset -q --hard "$cvbase"
+printf '\nNew arm: `x.test.sh` · AC9 named in prose only · none\n' >> "$d/$cs"
+arm "an id in the line's prose with no covers field is not graded" 0 "$d" "0 carry a covers field" "[covers]"
+git -C "$d" reset -q --hard "$cvbase"
+printf '\nNew arm: `x.test.sh` · a field on the next line\n  · covers AC9 · none\n' >> "$d/$cs"
+arm "a covers field on an indented continuation line is graded" 1 "$d" "[covers] \`covers <- $cs AC9\`"
+git -C "$d" reset -q --hard "$cvbase"
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then

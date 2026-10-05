@@ -66,7 +66,11 @@ in `.unattended.conf`, over the live tree before admitting a pass, because that 
 unit spec in its build commit and no bar ever grades one. The research record under
 `memory/builds/aDeferredBar/build/` traced one unit's 68-minute stall to exactly such a token in its
 AC8; the substitute the refusal names is the direct check — the checker on a staged break, a
-`--selftest` flag, a fixture — with the suite declared under `New arm:`. The test runs FIRST in each
+`--selftest` flag, a fixture — with the suite declared under `New arm:`. The `covers` join
+(TOOL-aMendedFleet-75) grades the one field of that line a checker reads: each id a `covers` field
+names must be a criterion label the same spec's acceptance section defines, `none` passes only
+alone, a line without the field is ungraded, and every run prints the arm lines, carriers and tokens
+it read. The test runs FIRST in each
 loop on the raw token, because `NOT_A_TOKEN` and `NOT_A_LEG` would drop the motivating
 `GATE_SELFTESTS=1 bash …` token unread. The cutoff is a RELATION, not a constant: the day after the
 later of the newest spec filename date on any ref and the setting commit's own date, and the checker
