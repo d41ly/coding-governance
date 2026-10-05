@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-6 — a decision row or gotcha whose normalized text another record already holds reds
 
-**Status:** SPECCED · rev-4 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 6 · ratified 2026-10-04
+**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 6 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 

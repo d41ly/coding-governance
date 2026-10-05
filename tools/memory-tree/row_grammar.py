@@ -30,7 +30,8 @@ cost every hygiene fixture and every freshly scaffolded adopter a red bar.
 
 CLI: --check (gate), --report (human), --emit-pin (the current counts, for re-pinning), --ages (row
 age DERIVED from git rather than stored), --check-rotation (check 24), --check-relations [<base>]
-(check 27), --measure-relations [<floor> [<base>]] (check 27's replay instrument), --selftest.
+(check 27), --measure-relations [<floor> [<base>]] (check 27's replay instrument), --check-content
+[<base>] (check 28), --selftest.
 
 CHECK 27 (TOOL-aGraftedHelix-9) — every decision row and gotcha ADDED since the mainline merge-base
 is ranked against the records that existed there, with the memory-recall kit's own index builder,
@@ -49,6 +50,18 @@ everybody who did not write it:
     already at the base is not graded; the decision index is append-only, which is check 20's and
     the merge driver's business.
 Nor a record compared with another added in the same range, nor any record kind but those two.
+
+CHECK 28 (TOOL-aGraftedHelix-6) — check 27's exact half. Every decision row and gotcha gets one
+normalized content key (`derive_content_key`), and a key held by two or more distinct identities
+reds when at least one holder was ADDED since the mainline merge-base. What check 28 does NOT check:
+  - a PARAPHRASE. The key folds case, whitespace, dates, link targets and emphasis, nothing else, so
+    a restatement in other words is check 27's to rank, never this one's.
+  - an ID HELD TWICE. One identity holding one key twice, in one document or across a rotation, is
+    checks 20 and 24's question, and a `snapshot` carry-forward holds it by design.
+  - a RECORD OUTSIDE THE TWO KINDS. Backlog asks, specs and every other record are not enumerated.
+  - FRONT MATTER. A gotcha is keyed on its body, so two with one body and two descriptions red.
+  - a duplicate whose EVERY HOLDER HAD LANDED at the base. It is counted and never reported, because
+    nobody may edit or remove a landed append-only record.
 
 PROVENANCE. The backlog-row grammar, the two shard pins and `--ages` were written in adopter nc's
 fork of this file and taken upstream by TOOL-aRepatriatedFork-9, with two grammar corrections that
@@ -1042,7 +1055,8 @@ def scan_records(root, conf):
     record names it by: the id | the stem and the front-matter `name`) · `where` (`<path>:<line>` |
     `<path>`) · `path` · `summary` (what similarity is measured on: the line after the keyed prefix |
     the front-matter `description`) · `full` (what satisfaction reads: the whole line | the whole
-    file) · `slug` (the id's middle segment | None).
+    file) · `slug` (the id's middle segment | None) · `body`, a gotcha's only (what check 28 keys:
+    the text after the front-matter block, or the whole file when it has none).
     """
     m = conf["MEMORY_ROOT"]
     rowre = re.compile(r"^\s*[-*]\s+[`*]*(" + id_pattern(conf).pattern + r")\b")
@@ -1084,24 +1098,25 @@ def scan_records(root, conf):
         stem = os.path.basename(p)[:-3]
         out.append({"kind": "gotcha", "ident": stem, "names": [stem, fm.get("name", "")],
                     "where": p, "path": p, "summary": fm.get("description", ""), "full": text,
-                    "slug": None})
+                    "slug": None, "body": text[hm.end():] if hm else text})
     return out
 
 
-def derive_relation_base(root, base=None):
+def derive_relation_base(root, base=None, check=None):
     """-> the commit check 27 measures from: `base` resolved, or the mainline merge-base.
 
     `check-verdict-epoch.sh`'s derivation: the merge-base of `origin/<branch>` and HEAD, then of
     `<branch>` and HEAD, with `<branch>` from GOV_DEFAULT_BRANCH or `main`. The remote first, so a
     stale local `main` cannot widen the range. No base while armed is a RED naming it, because the
-    bar judges a leg by its exit code and a zero-status skip would read as a pass.
+    bar judges a leg by its exit code and a zero-status skip would read as a pass. `check` names the
+    caller in an unresolvable explicit base's refusal; check 28 reads the same base.
     """
     if base:
         p = subprocess.run(["git", "rev-parse", "--verify", "--quiet", base + "^{commit}"], cwd=root,
                            capture_output=True, text=True, encoding="utf-8")
         if p.returncode != 0 or not p.stdout.strip():
-            raise Problem(f"row-grammar: check {RELATION_CHECK} was given the base '{base}', which "
-                          f"does not resolve to a commit here")
+            raise Problem(f"row-grammar: check {check or RELATION_CHECK} was given the base '{base}', "
+                          f"which does not resolve to a commit here")
         return p.stdout.strip()
     branch = os.environ.get("GOV_DEFAULT_BRANCH", "").strip() or "main"
     for ref in (f"origin/{branch}", branch):
@@ -1340,6 +1355,77 @@ def cmd_measure_relations(root, conf, floor=None, base=None):
         print(f"  {jac:.3f}  {r['ident']} > {h['ident']}  shared "
               + ", ".join(f"`{x}`" for x in shared[:3]))
     return 0
+
+
+# ============================== CHECK 28 — a record whose normalized text another record holds
+# TOOL-aGraftedHelix-6. Check 20 reds an id held twice and nothing redded one TEXT held under two
+# identities, so one decision recorded by two nodes, or one gotcha under two file names, passed every
+# leg. The key is pinned by the unit's spec §4 "The key", in its order; what the check does NOT
+# check is stated in the module docstring.
+CONTENT_CHECK = 28
+CONTENT_LINK_RE = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+CONTENT_DATE_RE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
+# Two row shapes live in one decision index, `- <id> · <text>` and `- **<id>** — **<text>**`, so the
+# emphasis marks and this leading separator run are what a re-mint in the other shape differs by.
+CONTENT_LEAD = "·—:- "
+
+
+def derive_content_key(text):
+    """-> `text` with links reduced to their text, ISO dates and `*`, `_`, backtick dropped, case and
+    whitespace runs folded, and a leading separator run stripped. Ids cited inside stay in the key."""
+    t = CONTENT_DATE_RE.sub("", CONTENT_LINK_RE.sub(r"\1", text))
+    return " ".join(re.sub(r"[*_`]", "", t).lower().split()).lstrip(CONTENT_LEAD)
+
+
+def check_content(root, conf, base):
+    """-> `(findings, stats)`: one finding per key two or more identities hold, one of them added.
+
+    Identity is `(kind, ident)`, so one id carried into a rotated archive, or held twice in one
+    document, is ONE identity and is checks 20 and 24's question. A key every holder of which is
+    present at `base` is LANDED: counted, never reported. `base` None grades every key as added.
+    """
+    recs = scan_records(root, conf)
+    added = {id(r) for r in (scan_added_records(root, conf, base, recs)[0] if base else recs)}
+    nrows = sum(1 for r in recs if r["kind"] == "row")
+    stats = {"graded": len(recs), "rows": nrows, "gotchas": len(recs) - nrows, "empty": 0,
+             "dupes": 0, "landed": 0}
+    held = {}
+    for r in recs:
+        key = derive_content_key(r["summary"] if r["kind"] == "row" else r["body"])
+        if key:
+            held.setdefault(key, []).append(r)
+        else:
+            stats["empty"] += 1
+    findings = []
+    for key, rs in held.items():
+        if len({(r["kind"], r["ident"]) for r in rs}) < 2:
+            continue
+        if not any(id(r) in added for r in rs):
+            stats["landed"] += 1
+            continue
+        stats["dupes"] += 1
+        findings.append(f"check {CONTENT_CHECK}: {len(rs)} records hold one content key — "
+                        + ", ".join(f"{r['where']} ({r['ident']})" for r in rs)
+                        + f" — key \"{key[:50]}{'…' if len(key) > 50 else ''}\"")
+    return findings, stats
+
+
+def cmd_check_content(root, conf, base=None):
+    if base:
+        sha = derive_relation_base(root, base, CONTENT_CHECK)
+    else:
+        try:
+            sha = derive_relation_base(root)
+        except Problem:
+            sha = None   # its one refusal with no base given: no mainline shares history with HEAD
+    findings, st = check_content(root, conf, sha)
+    for f in findings:
+        print(f)
+    scope = f"in {sha[:8]}..HEAD" if sha else "with no mainline base, every key graded"
+    print(f"row-grammar: check {CONTENT_CHECK} graded {st['graded']} record(s) {scope} — "
+          f"{st['rows']} row(s), {st['gotchas']} gotcha(s), {st['empty']} with an empty key, "
+          f"{st['dupes']} key(s) held twice, {st['landed']} landed key(s) held twice and not reported")
+    return 1 if findings else 0
 
 
 def cmd_report(root, conf):
@@ -2536,6 +2622,102 @@ def cmd_selftest():
                 "could not import the memory-recall kit's bench.py",
                 lambda: run_fixture(f2, "--check-relations", b2))
 
+        # ------------------------------------------------- CHECK 28 (TOOL-aGraftedHelix-6)
+        # In-process: the check reads no sibling kit, so no copy-install fixture is owed. Each
+        # fixture commits a base, then ADDS what the arm grades, and passes that base explicitly.
+        def build_content(name, decisions, files):
+            t = os.path.join(base, name); os.makedirs(t)
+            c = _tree(t, decisions)
+            b = run("git", "rev-parse", "HEAD", cwd=t).strip()
+            if files:
+                _write_commit(t, "2026-02-01", files)
+            return t, c, b
+
+        def run_content(t, c, b):
+            return cap(t, c, lambda r, cc: cmd_check_content(r, cc, b))
+
+        def build_body(stem, body):
+            return f"---\nname: {stem}\ndescription: the {stem} record\n---\n\n{body}"
+
+        # AC1 — two bodies apart only by case, whitespace runs, a date, a link target and emphasis.
+        t28, c28, b28 = build_content("content5", "", {
+            "memory/gotchas/crlf-a.md": build_body("crlf-a", "A CRLF  breaks the [shebang](a.md) "
+                                                   "line, seen 2026-01-01, **always**.\n"),
+            "memory/gotchas/crlf-b.md": build_body("crlf-b", "a crlf breaks the\n[shebang](b.md) "
+                                                   "line, seen 2026-03-09, always.\n")})
+        arm("check 28: two gotcha bodies apart only by case, whitespace, a date, a link target and "
+            "emphasis red, naming both paths",
+            "rc=1 check 28: 2 records hold one content key — memory/gotchas/crlf-a.md (crlf-a), "
+            "memory/gotchas/crlf-b.md (crlf-b) — key \"a crlf breaks the shebang line, seen , always.\"",
+            lambda: run_content(t28, c28, b28))
+        arm("check 28: ...in exactly one finding line", "findings=1",
+            lambda: f"findings={run_content(t28, c28, b28).count('check 28:')}")
+        # AC2 — a row re-minted in the decision index's other shape.
+        t28, c28, b28 = build_content("contentshape", "- ARCH-tA-1 · a row the other shape re-mints\n", {
+            "memory/DECISIONS.md": "- ARCH-tA-1 · a row the other shape re-mints\n"
+                                   "- **ARCH-tB-1** — **a row the other shape re-mints**\n"})
+        arm("check 28: a row re-minted in the bold-and-dash shape reds naming both locations",
+            "rc=1 check 28: 2 records hold one content key — memory/DECISIONS.md:1 (ARCH-tA-1), "
+            "memory/DECISIONS.md:2 (ARCH-tB-1)", lambda: run_content(t28, c28, b28))
+        # AC3 — one identity across a snapshot rotation, and two distinct bodies: neither is graded.
+        snap = "- ARCH-tSnap-1 · a row a snapshot rotation carries forward\n"
+        t28, c28, b28 = build_content("contentsnap", "", {
+            "memory/DECISIONS.md": snap, "memory/archive/DECISIONS.2026-01-01.md": snap,
+            "memory/gotchas/one.md": build_body("one", "One body.\n"),
+            "memory/gotchas/two.md": build_body("two", "Another body.\n")})
+        c28 = dict(c28); c28["ROTATION_MODE"] = "snapshot"
+        arm("check 28: one id across a snapshot rotation and two distinct bodies print no finding",
+            f"rc=0 row-grammar: check 28 graded 4 record(s) in {b28[:8]}..HEAD — 2 row(s), "
+            f"2 gotcha(s), 0 with an empty key, 0 key(s) held twice", lambda: run_content(t28, c28, b28))
+        # AC4 — no decision index and no gotcha: the summary still prints, counting 0.
+        t28, c28, b28 = build_content("contentempty", "", {"memory/DECISIONS.md": None})
+        arm("check 28: an empty population exits 0 and prints its summary with a graded count of 0",
+            f"rc=0 row-grammar: check 28 graded 0 record(s) in {b28[:8]}..HEAD — 0 row(s), 0 gotcha(s)",
+            lambda: run_content(t28, c28, b28))
+        # AC10 — a pair landed at the base is counted, never reported; an added restatement reds.
+        landed = "- ARCH-tL-{} · a text two ids already hold at the base\n"
+        t28, c28, b28 = build_content("contentlanded", landed.format(1) + landed.format(2), {})
+        arm("check 28: a duplicate landed at the base is counted and not reported",
+            "rc=0 row-grammar: check 28 graded 2 record(s) in " + b28[:8] + "..HEAD — 2 row(s), "
+            "0 gotcha(s), 0 with an empty key, 0 key(s) held twice, 1 landed key(s) held twice and "
+            "not reported", lambda: run_content(t28, c28, b28))
+        _write_commit(t28, "2026-02-01", {"memory/DECISIONS.md": "".join(landed.format(n) for n in (1, 2, 3))})
+        arm("check 28: an added restatement of a landed pair reds naming all three holders",
+            "rc=1 check 28: 3 records hold one content key — memory/DECISIONS.md:1 (ARCH-tL-1), "
+            "memory/DECISIONS.md:2 (ARCH-tL-2), memory/DECISIONS.md:3 (ARCH-tL-3)",
+            lambda: run_content(t28, c28, b28))
+        # AC11 — two empty keys are counted and never compared; three holders across two kinds.
+        t28, c28, b28 = build_content("contentblank", "", {
+            "memory/DECISIONS.md": "- ARCH-tE-1 · 2026-01-01\n- ARCH-tE-2 · **2026-02-02**\n"})
+        arm("check 28: two records whose keys are empty do not red each other, and are counted",
+            "rc=0 row-grammar: check 28 graded 2 record(s) in " + b28[:8] + "..HEAD — 2 row(s), "
+            "0 gotcha(s), 2 with an empty key, 0 key(s) held twice", lambda: run_content(t28, c28, b28))
+        t28, c28, b28 = build_content("contentthree", "", {
+            "memory/DECISIONS.md": "- ARCH-tT-1 · three records hold this text\n"
+                                   "- ARCH-tT-2 · **three  records hold this text**\n",
+            "memory/gotchas/three.md": build_body("three", "Three records hold this text\n")})
+        arm("check 28: three holders across a row and a gotcha are all named",
+            "rc=1 check 28: 3 records hold one content key — memory/DECISIONS.md:1 (ARCH-tT-1), "
+            "memory/DECISIONS.md:2 (ARCH-tT-2), memory/gotchas/three.md (three)",
+            lambda: run_content(t28, c28, b28))
+        # No mainline base: every key is graded as added, and the summary says so.
+        run("git", "branch", "-m", "no-mainline", cwd=t28)
+
+        def run_nobase():
+            saved = os.environ.pop("GOV_DEFAULT_BRANCH", None)
+            try:
+                return cap(t28, c28, cmd_check_content)
+            finally:
+                if saved is not None:
+                    os.environ["GOV_DEFAULT_BRANCH"] = saved
+        arm("check 28: with no mainline base every key is graded and the summary says so",
+            "graded 3 record(s) with no mainline base, every key graded — 2 row(s), 1 gotcha(s)",
+            run_nobase)
+        arm("check 28: ...and a duplicate there reds", "rc=1 check 28: 3 records hold", run_nobase)
+        arm("check 28: an explicit base that resolves to no commit is refused as check 28's",
+            "row-grammar: check 28 was given the base 'nosuchref'",
+            lambda: run_content(t28, c28, "nosuchref"))
+
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
         return 1
@@ -2568,8 +2750,11 @@ def main(argv):
     if mode == "--measure-relations":
         return cmd_measure_relations(root, conf, argv[2] if len(argv) > 2 else None,
                                      argv[3] if len(argv) > 3 else None)
+    if mode == "--check-content":
+        return cmd_check_content(root, conf, argv[2] if len(argv) > 2 else None)
     print(f"row-grammar: unknown argument '{mode}'; the modes are --check, --check-rotation, "
-          f"--check-relations, --measure-relations, --report, --emit-pin, --ages and --selftest")
+          f"--check-relations, --measure-relations, --check-content, --report, --emit-pin, --ages "
+          f"and --selftest")
     return 2
 
 

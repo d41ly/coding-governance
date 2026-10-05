@@ -110,6 +110,17 @@ while armed is a named refusal. The superseded-by map is derived only when a nea
 unsatisfied, from `TOOL-aGraftedHelix-4`'s two functions and never from the query cache, which a
 hygiene leg must not write.
 
+### Check 28 — one text, one record
+
+`--check-content [<base>]` is hygiene check 28, `TOOL-aGraftedHelix-6`, check 27's exact half over
+the same `scan_records` population and the same base. `derive_content_key` folds a row's text after
+its id, or a gotcha's `body` after its front matter, into one key: links to their text, ISO dates and
+emphasis dropped, case and whitespace folded, a leading separator run stripped, so a decision
+re-minted in the index's other row shape keys the same. A key two identities hold reds when one
+holder was added since the base; one identity held twice is checks 20 and 24's. A duplicate whose
+every holder had landed is counted and never reported, so a kit update cannot red a corpus nobody may
+edit, and with no mainline base every key is graded. It is always on: no conf key and no pin.
+
 ### The marker contract
 
 Four live readers parse the generated-region markers: `apply_region` in the index generator

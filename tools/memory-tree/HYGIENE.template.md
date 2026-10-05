@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.124 -->
+<!-- gov:kit memory-tree@2.125 -->
 # {{MEMORY_ROOT}}/ retention & hygiene
 
 `{{MEMORY_ROOT}}/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -497,6 +497,20 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     NOT GRADED, and said out loud: a near match below the TOP hit; a paraphrase under the floor; a
     bare relation token that names no record; a row edited in place, since the added set is decided
     by identity alone; and two records added in the same range.
+
+28. **one TEXT is held by one record** — every decision row and every gotcha gets one normalized
+    content key: a row's text after its id, a gotcha's body after its front matter, with links
+    reduced to their text, ISO dates and `*`, `_` and backtick dropped, case and whitespace runs
+    folded, and a leading separator run stripped. A key held by two or more distinct identities
+    REDS when at least one holder is absent at the mainline merge-base, one finding per key naming
+    every holder. It is check 27's exact half. A key whose every holder had landed at the base is
+    counted and not reported, because nobody may edit or remove a landed append-only record; with
+    no mainline base every key is graded and the summary says so. Delegated to `row_grammar.py
+    --check-content`; full runs only. Every run prints one summary line, red or green. The remedy
+    is to reword or drop the record that has not landed.
+    NOT GRADED, and said out loud: a paraphrase, which is check 27's; an id held twice, which is
+    20's and 24's, so a `snapshot` carry-forward is one identity; any record kind but those two;
+    front matter; and a duplicate whose every holder had landed at the base.
 
 ## Record bindings — how a record names its spec
 

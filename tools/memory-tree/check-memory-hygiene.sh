@@ -30,7 +30,7 @@ set -u
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.124   # gov:kit memory-tree@2.124 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.125   # gov:kit memory-tree@2.125 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -2499,6 +2499,19 @@ if [ "$STAGED" = 0 ]; then
   else
     printf '%s\n' "$relm"; status=1
     [ "$OFFENDERS" = 0 ] || add_offender_keys 27 $'\n'"$relm"
+  fi
+fi
+
+# 28 — a decision row or gotcha whose NORMALIZED text a record of another identity holds, one of the
+# holders added since the mainline merge-base: check 27's exact half (TOOL-aGraftedHelix-6).
+# Delegated to row_grammar.py for the reason 27 is, and full runs only for the same reason. The
+# capture is printed on a GREEN run too: its summary line is the only evidence anything was graded.
+if [ "$STAGED" = 0 ]; then
+  if contm=$("$_PY" "$HERE/row_grammar.py" --check-content 2>&1); then
+    [ -z "$contm" ] || printf '%s\n' "$contm"
+  else
+    printf '%s\n' "$contm"; status=1
+    [ "$OFFENDERS" = 0 ] || add_offender_keys 28 $'\n'"$contm"
   fi
 fi
 

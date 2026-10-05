@@ -1623,6 +1623,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "check_content",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "check_contract_registry",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2318,6 +2323,11 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "cmd_check_content",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "cmd_check_format",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2871,6 +2881,11 @@
       "id": "derive_conf_rel",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "derive_content_key",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "derive_count",
