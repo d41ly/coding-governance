@@ -133,7 +133,6 @@ case "$LAST_OUT" in *"there is no waiver"*) good "AC5 the refusal says there is 
   printf '%s\n' 'run("plan", "--kits", "qdemo")'
   printf '%s\n' 'x = ["bin", "qdemo"]'
   printf '%s\n' "ci = root / '.github' / 'qdemo'"
-  printf '%s\n' 'side = gd.resolve() / "qdemo" / "log.jsonl"'
   printf '%s\n' '# its Skill lands at .claude/skills/qdemo/SKILL.md'
   printf '%s\n' 'The `qdemo/` kit is described in prose.'
 } > "$S/${PFX}qdemo/spellings.py"
@@ -142,8 +141,7 @@ run_arm "AC5 ...and the drained forms and homonyms in the same file are clean" "
 
 # The homonym shapes above are CENSUS shapes: each must still exist in THIS tree, or the rule guards a
 # spelling nobody writes.
-for _site in 'gd.resolve() / "codebase-map" / "reinvention-backlog.md"' 'common / "codebase-map" / "lookups.jsonl"' \
-             "root / '.github' / 'workflows'" 'sdir / "workflows"'; do
+for _site in 'common / "codebase-map" / "lookups.jsonl"' "root / '.github' / 'workflows'" 'sdir / "workflows"'; do
   if git -C "$ROOT" grep -qF -- "$_site"; then good "census homonym still present: $_site"
   else bad "census homonym GONE, so its arm matches nothing: $_site"; fi
 done

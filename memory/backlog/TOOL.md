@@ -229,7 +229,6 @@ Cite ids, never line numbers.
 | [TOOL-aScannedThrottle-11](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-21 | LEFT-SHIFT, three classes both review rounds named UNGATEABLE, for the… |
 | [TOOL-aScouredKit-10](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | THE LEG-HOLD PREDICATE IS NOW WRITTEN TWICE AND NOTHING ASSERTS THE… |
 | [TOOL-aScouredKit-16](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | THE SEAM RANKING IS 63% NOISE AND TWO SHIPPED CONSUMERS ACT ON IT.… |
-| [TOOL-aScouredKit-17](../builds/aScouredKit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-38 | 2026-08-30 | dead_exports: 412 in tools/codebase-map/map_diff.py is 100% false… |
 | [TOOL-aScouredKit-18](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | tools/govkit/govkit.py's read_descriptors is load_toml and nothing else… |
 | [TOOL-aScouredKit-19](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | FIVE PYTHON READERS RE-PARSE .memory-tree.conf WITH A NAIVE… |
 | [TOOL-aScouredKit-21](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | tools/check-testsuite-counts.sh hardcodes MANIFEST=tools/gate-legs.json… |

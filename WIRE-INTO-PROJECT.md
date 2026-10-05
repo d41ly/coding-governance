@@ -502,15 +502,7 @@ pointer stub or self-prune rule from your kickoff manifest (§4) and your instan
    so the lookup flags the gap instead of a falsely-confident "no seam fits".
    **DoD (at review):** run `python <kit>/map_diff.py <base>..<head> --drop-affordance-exempt`
    — touching a graced feature's files drops its `affordance-exempt.toml` grace mechanically, so the
-   gate then demands its `## Reuse affordance` block (no human remembering). Also run
-   `python <kit>/map_diff.py <base>..<head> --converge` (the closing loop) — it WARNs on each
-   NEW export that resembles an existing high-fan-in seam of the same kind it did not wire through
-   (shipped reinvention, over ALL new code) and routes each to
-   `<git-common-dir>/codebase-map/reinvention-backlog.md` (deduped) — OUTSIDE your worktree, so a
-   `--converge` run never leaves untracked clutter in a gated directory; it falls back into
-   `<MAP_ROOT>/` only where git cannot answer at all. A run that finds a pre-2026-09-06 file at the
-   old location NAMES it and deletes nothing. It is a report + WARN, never a merge gate (a
-   token-stem collision has false positives).
+   gate then demands its `## Reuse affordance` block (no human remembering).
    To converge the active surface up front, `python <kit>/gen_map.py --seed-affordances --top
    <N>` lists the N highest-fan-in seams no dossier yet declares as the backfill worklist.
    Both CLIs read only committed artifacts, so nothing fails closed for them: each exits **2** with

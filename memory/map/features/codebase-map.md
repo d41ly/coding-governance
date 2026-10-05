@@ -86,6 +86,11 @@ repo-wide python-launcher seam rather than anything this feature owns.
   `FOUNDATION.md` is not measured. Its one `git log` restates every default a config key could
   change (`--no-show-signature`, `--no-color`, `--no-renames`), because the parse reads that
   stdout as data and `log.showSignature` alone would print gpg text into it.
+- **No closing loop catches reinvention that already shipped.** `map_diff.py --converge` was that
+  loop; no gate leg, hook or workflow ran it, every token-stem collision it had appended on node a
+  was a false positive, and it was deleted with its sink, its `CLONE_COUNT_FILE` key and the
+  documents prescribing it (TOOL-aMendedFleet-38). The lookup, read BEFORE building, is the reuse
+  check that stays, and the freshness signal above is what a close reads.
 - **Shell is in the symbol layer.** It carries the product here — the gates, adopters and hooks —
   and the project-owned `kit-sh` layer reads every `*.sh` under the tool root, `.githooks/` and
   `skills/` through the lexicon kit's tokenizer, failing closed. `RECALL_DARK_LAYERS` is empty, so

@@ -160,8 +160,8 @@ def require_adopted_root() -> Path:
     Resolution answers WHERE the root is; this answers WHETHER anything was adopted there. They are
     deliberately separate: the library layer stays fail-open (a thin corpus is a thin shortlist, by
     design), while a CLI refuses. Without this, a mis-rooted lookup prints `corpus: 0 symbols` and
-    `no seam fits`, and a mis-rooted `--converge` prints `collision_flags: 0` — both exit 0, and
-    both read as real answers derived from a real population. That is the green-by-absence class
+    `no seam fits` at exit 0, and a mis-rooted range digest reports every file UNMAPPED — both
+    read as real answers derived from a real population. That is the green-by-absence class
     the whole kit exists to prevent, so the kit must not ship it."""
     root = repo_root()
     if (root / CONF_NAME).is_file():
@@ -574,12 +574,12 @@ def enumerate_exports(
 
 
 # ======================================================================================
-# Reuse-convergence shared primitives (tokens · stems · fan-in)
+# Reuse-lookup shared primitives (tokens · stems · fan-in)
 # ======================================================================================
 #
-# The recall/collision math, written ONCE and shared by reuse_lookup.py (S3, behaviour->seam
-# lookup) and map_diff --converge (S5, shipped-reinvention detector). If these lived in either
-# CLI the other would reinvent them — the exact drift this whole tool exists to kill. Pure,
+# The recall math, written ONCE in the library and read by reuse_lookup.py (S3, behaviour->seam
+# lookup), its rank harness and gen_map's --seed-affordances. A copy inside any one CLI is the
+# exact drift this whole tool exists to kill. Pure,
 # stdlib, deterministic. NONE of this is committed to an artifact: fan-in restales a file on
 # nearly every commit (that is why symbols.json is {id,kind,file}-only), so it is computed on
 # demand OUTSIDE the freshness gate.
@@ -588,7 +588,7 @@ def enumerate_exports(
 #: many distinct files). Override per repo as SEAM_FANIN_THRESHOLD in .codebase-map.conf.
 SEAM_FANIN_THRESHOLD_DEFAULT = 3
 
-#: english glue dropped from a stem set so it never drives a match/collision.
+#: english glue dropped from a stem set so it never drives a match.
 _STOPWORDS = frozenset(
     {"a", "an", "the", "to", "of", "in", "on", "for", "and", "or", "is", "be", "as",
      "at", "by", "from", "into", "with", "it", "this", "that"}
@@ -615,8 +615,8 @@ _SUBTOKEN_RE = re.compile(r"[A-Z]+(?![a-z])|[A-Z][a-z]*|[a-z]+|[0-9]+")
 
 def subtokens(text: str) -> list[str]:
     """Lowercase word pieces of an identifier, key, or free-text phrase, split on camelCase,
-    snake_case, kebab, path (`/` `.`), and digit boundaries. The single tokenizer behind both
-    the recall corpus (S3) and the collision stem-compare (S5)."""
+    snake_case, kebab, path (`/` `.`), and digit boundaries. The single tokenizer behind the
+    recall corpus (S3) and the query stems compared against it."""
     return [t.lower() for t in _SUBTOKEN_RE.findall(text)]
 
 
@@ -629,8 +629,8 @@ def _stem(word: str) -> str:
 
 def stems(text: str) -> frozenset[str]:
     """Stem set of any identifier, key, or behaviour query. Two strings SHARE A TOKEN STEM iff
-    their stem sets intersect — the one definition of "lexically related" used by the lookup
-    shortlist AND the --converge collision check, so a match means the same thing in both.
+    their stem sets intersect — the one definition of "lexically related" the lookup shortlist
+    applies to names and prose alike, so a match means the same thing in both.
     Stopwords + 1-char tokens dropped; each subtoken crudely stemmed (see _STEM_SUFFIXES)."""
     return frozenset(
         _stem(t) for t in subtokens(text) if t not in _STOPWORDS and len(t) >= 2
@@ -703,7 +703,7 @@ def _identifier_tokens(source: str, suffix: str = "") -> set[str]:
     truncated a line of floor division, and a ``#`` truncated a line of TypeScript.
 
     An UNDECLARED suffix strips NOTHING and returns every token. Over-counting is this scan's
-    documented fail-open direction — it feeds a RANKING and a WARN, never a gate — and guessing a
+    documented fail-open direction — it feeds a RANKING, never a gate — and guessing a
     comment syntax is exactly how the old chain got here.
 
     A multi-line construct left UNTERMINATED at EOF is ABANDONED, the pass resuming just after the
@@ -860,7 +860,7 @@ def build_reference_index(
     """token -> {POSIX files mentioning it as an identifier}, scanned over the covered-layer
     source: the top-level dirs of ``files`` (a symbols.json file list), filtered to their
     extension set. This is the on-demand scan behind fan_in — NEVER committed. Fail-open by
-    design on an unreadable file (skipped): this feeds a RANKING/WARN, not a gate, so a binary
+    design on an unreadable file (skipped): this feeds a RANKING, not a gate, so a binary
     blob must not abort the lookup (the opposite of the extractor law, and deliberately so).
 
     ``stats``, when given, is FILLED with what this scan could and could not see — `files_scanned`,
@@ -915,7 +915,7 @@ def fan_in(index: dict[str, set[str]], symbol_id: str, def_files) -> int:
     """Distinct files referencing ``symbol_id`` as an identifier, minus EVERY file that defines it.
     An import/identifier-scoped HEURISTIC, not a resolved call graph (§3 non-goal): over-counts a
     common id (`get`), under-counts registry/dynamic dispatch — a documented recall FLOOR used for
-    ranking + a review WARN, never gated.
+    ranking, never gated.
 
     ``def_files`` IS A SET OF PATHS, not one path, and that is `TOOL-dTracedLattice-1` S1. A symbol
     defined in several files had one arbitrary definer subtracted and the others counted as
@@ -935,37 +935,9 @@ def fan_in(index: dict[str, set[str]], symbol_id: str, def_files) -> int:
     return len(index.get(symbol_id, set()) - set(def_files))
 
 
-def reference_index_for(
-    files: list[str], *, root: Path | None = None, extensions: frozenset[str] | None = None
-) -> dict[str, set[str]]:
-    """Reference index (token -> {POSIX files}) over an EXACT file list, NOT their whole dirs.
-    When ``extensions`` is given, only files with those suffixes are scanned (the covered code
-    layers) — so a non-code file in the range (a .md that merely names a symbol) cannot register a
-    spurious edge, mirroring build_reference_index's extension filter.
-    build_reference_index walks a whole layer for corpus-wide fan-in; this indexes only the
-    files given — the range-scoped scan behind --converge's "did the range wire through this
-    seam?" test (fan_in over THIS index > 0 = an edge was added by the range). Same fail-open
-    law: an unreadable/absent file (a deletion in the range) is skipped, never a crash — it
-    feeds a WARN, not a gate."""
-    root = root or repo_root()
-    index: dict[str, set[str]] = {}
-    for raw in files:
-        rel = raw.replace("\\", "/")
-        if extensions is not None and Path(rel).suffix not in extensions:
-            continue
-        try:
-            text = (root / rel).read_text(encoding="utf-8")
-        except (UnicodeDecodeError, OSError):
-            continue
-        for tok in _identifier_tokens(text, Path(rel).suffix):
-            index.setdefault(tok, set()).add(rel)
-    return index
-
-
 def seam_fanin_threshold(root: Path | None = None) -> int:
     """The configured seam fan-in threshold (SEAM_FANIN_THRESHOLD in .codebase-map.conf),
-    default SEAM_FANIN_THRESHOLD_DEFAULT. Shared by the lookup (hot-seam ranking) and --converge
-    (collision detection) so the two agree on what "a seam" is."""
+    default SEAM_FANIN_THRESHOLD_DEFAULT: what the lookup's hot-seam ranking counts as "a seam"."""
     raw = load_conf(root).get("SEAM_FANIN_THRESHOLD")
     if not raw:
         return SEAM_FANIN_THRESHOLD_DEFAULT
@@ -1148,8 +1120,7 @@ def load_map_tree(
 def load_dossier_texts(map_dir: Path) -> dict[str, str]:
     """{feature -> raw dossier markdown} for FOUNDATION.md + every features/*.md — the prose half,
     read WITHOUT parsing the toml claims (so it needs no inventory_ids and survives a claim-shape
-    error). The shared reader for the recall corpus (reuse_lookup S3) and the closing loop's
-    affordance cross-check + coverage hint (map_diff --converge S5) — one loader, not two."""
+    error). The reader behind the recall corpus (reuse_lookup S3)."""
     texts: dict[str, str] = {}
     foundation = map_dir / "FOUNDATION.md"
     if foundation.is_file():
@@ -1168,7 +1139,7 @@ def load_dossier_texts(map_dir: Path) -> dict[str, str]:
 # Every non-exempt dossier must carry a `## Reuse affordance` section that forces the reuse
 # decision: list the seams this feature is reused THROUGH, or state `none — <why>`. PRESENCE is
 # gated here; content QUALITY (does the id resolve? is the reason sound?) is the un-gatable
-# ceiling — reported later as affordance_coverage_% (S5), never a merge blocker. The delimiter
+# ceiling, never a merge blocker. The delimiter
 # (-/–/—) and every clause after the id are free: only the `seam:` prefix + first id token are
 # load-bearing, so a graced dossier can't be gamed by a formatting nit yet a bare heading with no
 # block still fails (a decision was dodged).
@@ -1286,153 +1257,6 @@ def drop_touched_exemptions(exempt, touched) -> frozenset[str]:
 
 
 # ======================================================================================
-# Closing loop — shipped-reinvention detector + backlog routing (S5, pure)
-# ======================================================================================
-#
-# The other half of convergence: S1–S4 help new work FIND a seam; this catches reinvention that
-# shipped anyway. A collision = a NEW exported symbol whose id shares a token stem with an
-# EXISTING high-fan-in seam of the SAME kind that the range did NOT wire through (no reference
-# edge added to it) — a machine proxy for "built new instead of reusing", computed over ALL new
-# code so skipping the S3 lookup can't hide it. A soft force: a review WARN routed to the
-# reinvention backlog, NEVER a hard gate (a token-stem collision has real false positives — a
-# legitimately-new same-named symbol — and a hard gate on it trains --no-verify, §3).
-
-
-@dataclass(frozen=True)
-class CollisionFlag:
-    new: str          # the new symbol id (S) — the shipped reinvention
-    resembles: str    # the existing seam id (E) it collides with and did not wire through
-    file: str         # S's def file — where the parallel implementation landed
-    fanin: int        # E's fan-in — how reused the seam S ignored is
-    kind: str         # the shared symbol kind (the F8b structural signal: same kind required)
-    confidence: str   # "high" if E DECLARES a ## Reuse affordance seam (F8c), else "medium"
-
-
-def detect_collisions(
-    new_symbols: list[dict[str, str]],
-    base_symbols: list[dict[str, str]],
-    ref_index: dict[str, set[str]],
-    range_index: dict[str, set[str]],
-    *,
-    threshold: int,
-    definers: dict[str, frozenset[str]],
-    affordance_seams: frozenset[str] = frozenset(),
-) -> list[CollisionFlag]:
-    """S5 closing loop (pure, deterministic). For each NEW symbol S, flag it iff it collides with
-    some EXISTING seam E where: E is the SAME kind (F8b structural signal); stem(S) & stem(E) is
-    non-empty (the one "shares a token stem" definition, shared with the S3 lookup); E's corpus
-    fan-in >= threshold (E is a real seam — ``ref_index`` is the whole-corpus scan); and the range
-    added NO reference edge to E (``fan_in(range_index, E) == 0`` — ``range_index`` is the
-    range-scoped scan, so a range that DID wire through E is not a collision). One flag per new
-    symbol, pointing at its strongest resemblance (highest fan-in; an affordance-declaring seam
-    breaks ties and raises confidence). Sorted fan-in desc, then new/resembles id.
-
-    ``base_symbols`` (present at range base) is the seam POOL: a seam must have existed to be
-    reinvented. ``new_symbols`` = head rows absent from base (all public — the extractors already
-    drop private names, so every kind here is an export). A malformed/empty stem yields no flag.
-
-    ``definers`` maps a symbol id to EVERY file defining it at head, and is REQUIRED because this
-    function cannot derive it: it sees the base pool and the new rows, never the head symbol table,
-    so a seam co-defined in a file outside both would keep scoring fan-in for its own definition.
-    The caller owns that table and hands it over. No default, deliberately — a defaulted empty map
-    would silently restore the old, wrong subtraction at the one call site that matters."""
-    seams_by_kind: dict[str, list[dict[str, str]]] = {}
-    for e in base_symbols:
-        seams_by_kind.setdefault(e["kind"], []).append(e)
-
-    flags: list[CollisionFlag] = []
-    for s in new_symbols:
-        s_stems = stems(s["id"])
-        if not s_stems:
-            continue
-        best: tuple[int, bool, dict[str, str]] | None = None
-        for e in seams_by_kind.get(s["kind"], ()):
-            if e["id"] == s["id"] and e["file"] == s["file"]:
-                continue  # an identical row is not "new vs existing"
-            if not (s_stems & stems(e["id"])):
-                continue
-            fe = fan_in(ref_index, e["id"], definers.get(e["id"], (e["file"],)))
-            if fe < threshold:
-                continue  # E is not a seam — below the reuse threshold
-            # "Wired through" = the NEW symbol's OWN file references E — scoped to s["file"], not
-            # the whole range (an unrelated changed file's edge to E must not mask S's reinvention),
-            # and ONLY when the ids differ: a same-id row's occurrence in its own file is its
-            # definition, never an edge to the same-named seam (else a verbatim same-name duplicate,
-            # the most blatant reinvention, is silently not flagged).
-            if s["id"] != e["id"] and s["file"] in range_index.get(e["id"], ()):
-                continue  # S's file genuinely references E -> extension/wrap, not reinvention
-            declared = e["id"] in affordance_seams
-            if best is None or (fe, declared) > (best[0], best[1]):
-                best = (fe, declared, e)
-        if best is not None:
-            fe, declared, e = best
-            flags.append(
-                CollisionFlag(
-                    new=s["id"], resembles=e["id"], file=s["file"], fanin=fe,
-                    kind=s["kind"], confidence="high" if declared else "medium",
-                )
-            )
-    flags.sort(key=lambda f: (-f.fanin, f.new, f.resembles))
-    return flags
-
-
-_BACKLOG_PREAMBLE = (
-    "# Reinvention backlog — codebase-map --converge (codebase-map kit)\n"
-    "\n"
-    "Shipped-reinvention WARNs from `map_diff --converge`: a NEW exported symbol whose id shares a\n"
-    "token stem with an existing high-fan-in seam of the same kind that it did NOT wire through.\n"
-    "Each row is a consolidation CANDIDATE, not a verdict — a token-stem collision has false\n"
-    "positives (a legitimately-new same-named symbol). Burn down: fold `new` into `resembles`, or\n"
-    "delete the row if the two are genuinely distinct. Append-only + deduped by (new, resembles);\n"
-    "never a merge gate.\n"
-    "\n"
-    "| new | resembles | file | seam fan-in | kind | confidence |\n"
-    "|---|---|---|---|---|---|\n"
-)
-
-
-def backlog_keys(text: str) -> set[tuple[str, str]]:
-    """The (new, resembles) pairs already recorded in a reinvention-backlog file — its table rows,
-    for append-time dedup. Tolerant of the header/separator/prose: a data row is a `| a | b | ...`
-    line whose first cell is a real id (not `new`, not a `---` separator)."""
-    keys: set[tuple[str, str]] = set()
-    for line in text.splitlines():
-        if not line.lstrip().startswith("|"):
-            continue
-        cells = [c.strip() for c in line.split("|")][1:-1]  # drop the outer-pipe empties
-        if len(cells) < 2 or not cells[0] or cells[0] == "new" or set(cells[0]) == {"-"}:
-            continue
-        keys.add((cells[0], cells[1]))
-    return keys
-
-
-def append_backlog(text: str, flags: list[CollisionFlag]) -> tuple[str, list[CollisionFlag]]:
-    """F7: append each collision flag to the reinvention-backlog text, deduped by (new, resembles)
-    — a durable, reviewable worklist. APPEND-ONLY: an existing row is never rewritten or removed
-    (humans burn it down); a re-run of --converge on the same range adds nothing. Returns the new
-    text and the flags actually appended (empty -> caller writes nothing). Seeds the header +
-    table when the file is empty/new."""
-    seen = backlog_keys(text)
-    added: list[CollisionFlag] = []
-    for f in flags:
-        key = (f.new, f.resembles)
-        if key in seen:
-            continue
-        seen.add(key)
-        added.append(f)
-    if not added:
-        return text, []
-    body = text if text.strip() else _BACKLOG_PREAMBLE
-    if not body.endswith("\n"):
-        body += "\n"
-    rows = "".join(
-        f"| {f.new} | {f.resembles} | {f.file} | {f.fanin} | {f.kind} | {f.confidence} |\n"
-        for f in added
-    )
-    return body + rows, added
-
-
-# ======================================================================================
 # Coverage (pure)
 # ======================================================================================
 
@@ -1515,8 +1339,8 @@ def render_symbols_json(symbols: list[dict[str, str]]) -> str:
     """The SYMBOL recall index: {id, kind, file} rows, ids sorted, POSIX paths, LF — so it is
     byte-deterministic across a Windows and a Linux run, exactly like inventories.json, and the
     freshness gate can byte-compare two renders. id/kind/file ONLY: NO fan-in (that would
-    restale the artifact on nearly every commit — fan-in is computed on demand in the lookup /
-    --converge). Fail-closed: a wrong-shape row, an unknown kind, or a backslash path RAISES —
+    restale the artifact on nearly every commit — fan-in is computed on demand in the lookup).
+    Fail-closed: a wrong-shape row, an unknown kind, or a backslash path RAISES —
     the byte-compare gate runs the SAME renderer twice so it cannot catch a fail-open producer;
     the shape is validated HERE."""
     rows: list[dict[str, str]] = []

@@ -119,6 +119,11 @@ class `TOOL-aRepatriatedFork-30` owns.
 The two exemptions this section used to describe — a `<path>:<line>` waiver registry frozen at its
 rows and a per-line fixture marker — were deleted with the ban list by `TOOL-aRepatriatedFork-30`.
 
+The homonym shapes the test proves clean are a CENSUS, not a wish list: each must still occur in
+this tree, or its arm guards a spelling nobody writes. A shape leaves the census, with its fixture
+line, when its last tree site goes — the `gd.resolve()` join did with the codebase-map closing
+loop's sink path (TOOL-aMendedFleet-38).
+
 ## The other half of the class — a path dead because it was DELETED
 
 `check-install-prefix.sh` holds a path that resolves nowhere because it is spelled at the wrong

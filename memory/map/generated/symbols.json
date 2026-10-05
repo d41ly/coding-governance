@@ -28,11 +28,6 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
-      "id": "CollisionFlag",
-      "kind": "class",
-      "file": "tools/codebase-map/map_lib.py"
-    },
-    {
       "id": "Conf",
       "kind": "class",
       "file": "tools/memory-recall/recall_conf.py"
@@ -538,11 +533,6 @@
       "file": "tools/hooks/agent-cap.test.sh"
     },
     {
-      "id": "append_backlog",
-      "kind": "function",
-      "file": "tools/codebase-map/map_lib.py"
-    },
-    {
       "id": "append_only_re",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -816,11 +806,6 @@
       "id": "backlog_blob_of",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
-    },
-    {
-      "id": "backlog_keys",
-      "kind": "function",
-      "file": "tools/codebase-map/map_lib.py"
     },
     {
       "id": "backlog_text_of",
@@ -4818,11 +4803,6 @@
       "file": "tools/runlog/model.py"
     },
     {
-      "id": "derive_backlog_path",
-      "kind": "function",
-      "file": "tools/codebase-map/map_diff.py"
-    },
-    {
       "id": "derive_ban_files",
       "kind": "function",
       "file": "tools/check-install-prefix.sh"
@@ -5851,11 +5831,6 @@
       "id": "det_ram_capped",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
-    },
-    {
-      "id": "detect_collisions",
-      "kind": "function",
-      "file": "tools/codebase-map/map_lib.py"
     },
     {
       "id": "digest",
@@ -11118,11 +11093,6 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
-      "id": "reference_index_for",
-      "kind": "function",
-      "file": "tools/codebase-map/map_lib.py"
-    },
-    {
       "id": "refusal",
       "kind": "function",
       "file": "tools/memory-recall/recall_conf.py"
@@ -11721,11 +11691,6 @@
       "id": "render_layer_refusal",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
-    },
-    {
-      "id": "render_legacy_note",
-      "kind": "function",
-      "file": "tools/codebase-map/map_diff.py"
     },
     {
       "id": "render_line",
@@ -15648,16 +15613,6 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
-      "id": "test_backlog_path_follows_the_common_dir_not_the_git_dir",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "test_backlog_path_is_outside_the_worktree",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
       "id": "test_backlog_stragglers",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -15861,11 +15816,6 @@
       "id": "test_declared_sources_reach_the_corpus",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "test_detect_collisions_and_backlog",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_digest_covers_kit_version",
@@ -16273,17 +16223,7 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
-      "id": "test_legacy_backlog_is_named_and_never_deleted",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
       "id": "test_legacy_language_name_refuses_and_names_the_extension",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "test_legacy_note_is_silent_when_it_would_name_its_own_destination",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },
@@ -16543,11 +16483,6 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
-      "id": "test_new_clones_reader",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
       "id": "test_no_backend_refuses",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -16581,11 +16516,6 @@
       "id": "test_no_signal_hardcodes_live",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
-    },
-    {
-      "id": "test_no_tracked_carrier_still_names_the_old_backlog_destination",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_node_tag_class_is_declared",
@@ -17234,11 +17164,6 @@
     },
     {
       "id": "test_symbol_extractors_fail_closed",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "test_symbols_at_ref_absent_is_not_empty",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },

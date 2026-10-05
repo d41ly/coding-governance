@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-38 — `map_diff --converge`, its sink and its prescriptions are deleted
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 38 · closes TOOL-aScouredKit-17
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 38 · closes TOOL-aScouredKit-17
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-38-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-38-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

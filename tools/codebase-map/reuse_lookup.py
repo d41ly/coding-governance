@@ -370,7 +370,7 @@ def seed_affordances(corpus: Corpus, ref_index: dict[str, set[str]], top: int) -
     line has BOTH 'symbol' and 'affordance-seam' in its merged sources and is DONE (excluded);
     a symbol below the threshold is not a seam and is not worklist-worthy. Pure + deterministic:
     ranked by fan-in desc then id. Fan-in is on demand (never committed) — same math as the lookup
-    and --converge so 'a seam' means one thing everywhere."""
+    so 'a seam' means one thing everywhere."""
     scored: list[tuple[Candidate, int]] = []
     for cand in corpus.candidates.values():
         if "symbol" not in cand.sources or not cand.files:
