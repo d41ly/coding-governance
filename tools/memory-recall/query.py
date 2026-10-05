@@ -326,7 +326,8 @@ def _docs(repo: pathlib.Path, files: list[str], declared: list[str]) -> tuple[li
             continue
         chunks.extend(E.extract_declarations(path, text))
     # The SECOND call site of the alias join, and the one the merge bar cannot see
-    # (ARCH-aGrittedFlagstone-3). `check_recall.py` grades a SUBPROCESS of `extract.py`; this CLI
+    # (ARCH-aGrittedFlagstone-3). Under a `records:` pin `check_recall.py` grades a SUBPROCESS of
+    # `extract.py` (the `served:` pin builds through `build_cache` and does reach it); this CLI
     # never runs that entry point and never reads its output dir -- it re-extracts here and indexes
     # the result. A join written only there ships a query index with an empty alias column while
     # every recall floor stays green, which is the dead-plumbing class arriving through the door

@@ -2478,7 +2478,8 @@ def test_alias_join_lands_on_the_named_record_and_only_it():
 def test_alias_join_reaches_the_query_index():
     """End to end through the CLI's OWN index — the half a recall floor cannot see.
 
-    `check-recall.py` grades a SUBPROCESS of `extract.py`. `query.py` never runs that entry point
+    Under a `records:` pin `check-recall.py` grades a SUBPROCESS of `extract.py` (the `served:` pin
+    builds through `query.build_cache` and does reach the join). `query.py` never runs that entry point
     and never reads its output dir: it re-extracts in process and indexes that. So every recall
     floor stays green with the query-side join deleted, and the shipped product indexes an empty
     alias column. The search expression is built ONLY from alias vocabulary that appears nowhere in
