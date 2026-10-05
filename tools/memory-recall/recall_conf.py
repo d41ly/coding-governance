@@ -27,7 +27,9 @@ Four OPTIONAL `RECALL_*` keys carry facts that belong to the adopter's corpus an
                             log under the common git dir
 
 A malformed value is a ConfError naming the key, never a silent fallback. Only the first two change
-which strings are ids, so only they enter `digest()`.
+which strings are ids, so only they enter `digest()`. `RECALL_EXCLUDE` (TOOL-aMendedFleet-27) is not
+one of the four: like `RECALL_EXTRA_SOURCES` it changes which documents exist, so it enters
+`digest()` too.
 
 The conf PARSER below is a copy of the twenty lines in codebase-map's map_lib.load_conf, not an
 import of it: kits are copied into adopters independently, and importing across kit directories
