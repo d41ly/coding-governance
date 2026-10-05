@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-24 — the `prior-session` add runs before `write_lease` moves the record's session, and the criteria that certify the set's readers start from the state and the session they need
 
-**Status:** SPECCED · rev-5 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 6
+**Status:** SPECCED · rev-6 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -19,8 +19,8 @@ status-write and restart site. The round-1 spec audit of unit 23 confirmed three
 - Finding 11: unit 23 S2 places the add only "before its `stage_or_fail`", so under unit 20 §4
   "The order" it follows `write_lease`. `write_lease` writes `session` and then four more facts,
   each ending `|| return 1`. A failure or kill between its `session` line and the add leaves the
-  record at `s2`, the claim at `s1` and no `s1` in the set. The next call answers check 90, or check
-  89 at the restart row, and the live run is forced to `--abort --code claim-lost`.
+  record at `s2`, the claim at `s1` and no `s1` in the set. The next call answers check 108, or check
+  107 at the restart row, and the live run is forced to `--abort --code claim-lost`.
 - Finding 6: unit 23 AC5 runs its restart after sequence d's closing call. That call empties the
   set and leaves the claim at `s3`, so the restart is unit 1's plain same-session row and S5's
   membership test is never reached.
@@ -64,14 +64,19 @@ of the round-1 spec audit of unit 23.
   already does. Neither runs under `s1`: unit 1 §4's columns test `mine` before `same session`, so
   under `s1` a `--dispatch` or a `--hold` whose widening is absent reaches the `same session` row,
   which takes or writes, and neither call could red. This supersedes unit 23 AC1, AC4 and AC5's
-  sequence-c leg for those calls, wherever they run. Observed by AC2 and AC3.
+  sequence-c leg for those calls, wherever they run. Unit 23's build wrote its arms under this rule
+  (its acceptance ledger, AC1 and AC4), so the arms as built are this rule's. Observed by AC2 and
+  AC3.
 - **S3** — Unit 23 AC5's sequence-d leg starts from sequence d up to, but not including, its
   closing call. It asserts that the set reads `s1 s2` and the claim names `session: s1` immediately
   before the restart call. This supersedes unit 23 AC5's "When sequence d of §4 runs" and its §7
-  restart arm's "after sequence d". Observed by AC4.
-- **S4** — `tools/unattended/unattended.test.sh` gains the interruption arm, and the arms of unit 23
-  that S2 and S3 name are rewritten, as §7 lists. NOT OBSERVED by a criterion here: the suite is the
-  main loop's to run at VERIFYING, and each arm's red on a staged break is observed there (§7).
+  restart arm's "after sequence d". Unit 23's rev-6 took this correction before its code, and its
+  arm as built stops short of d's closing call, asserts the line `prior-session: s1 s2` and the
+  claim at `s1`, then restarts. Observed by AC4.
+- **S4** — `tools/unattended/unattended.test.sh` gains the interruption arm, as §7 lists. The arms
+  of unit 23 that S2 and S3 name already carry both as unit 23's build wrote them, and are kept
+  unchanged. NOT OBSERVED by a criterion here: the suite is the main loop's to run at VERIFYING,
+  and each arm's red on a staged break is observed there (§7).
 - **S5** — The unattended kit version moves once after this unit's last move, in every carrier
   `tools/check-kit-versions.sh` pairs. Observed by AC5.
 
@@ -119,6 +124,8 @@ of the round-1 spec audit of unit 23.
 
 ### Evidence
 
+Line numbers are at base `5266d22e`; the functions they name have since moved down the file.
+
 - `write_lease` (`tools/unattended/unattended.sh:5557`) writes `keepalive`, then `session` at
   `:5563`, then `pid`, `host`, `pid-image` and `lease-utc`, each by `set_fact` and each ending
   `|| return 1`.
@@ -139,7 +146,7 @@ of the round-1 spec audit of unit 23.
 
 | step | reads | writes |
 |---|---|---|
-| claim read, `mine` test, check 90 | the record's facts before the call, the set included | nothing |
+| claim read, `mine` test, check 108 | the record's facts before the call, the set included | nothing |
 | the stamp, when `write_lease` is due | the clock, once | nothing |
 | claim CAS, when due | the values `write_lease` is about to record, and the stamp | the claim |
 | the add, when `write_lease` is due and the CAS did not complete or the claim was unreadable | the CAS outcome, the claim read, the record's `session` before the call | `prior-session` |
@@ -218,28 +225,30 @@ push exit 124; "unreachable" is unit 23's, the bare repository renamed away for 
 "restored" renames it back. The claim is read with `git ls-remote <bare> refs/gov/runs/<slug>` and
 `git cat-file -p`, and the set with the driver's `fact` over the run-state file.
 
-- **AC1** — When an `s2` holder call runs with the claim push exiting 124 and a `mktemp` shim on
+- **AC1** — Each leg first sets the record's `lease-utc` ten minutes back and commits it, as unit
+  18's arm does, so a `write_lease` run inside the preflight's own second still moves the stamp.
+  When an `s2` holder call runs with the claim push exiting 124 and a `mktemp` shim on
   `PATH` that forwards to the real `mktemp` until the run-state file's `session:` line reads `s2`,
   then exits 1 once, the run-state file reads `session: s2` and `prior-session: s1`, with its
   `lease-utc` line still at its pre-call value. That unmoved stamp is
   the arm's witness that the shim stopped `write_lease` after its `session` line; a call that ran
   `write_lease` whole proves nothing about the order and reds this criterion. A second `s2` call
-  with no shim exits 0, prints no `UNATTENDED check 90 FAILED`, leaves a claim naming
+  with no shim exits 0, prints no `UNATTENDED check 108 FAILED`, leaves a claim naming
   `session: s2`, leaves `fact` printing nothing for `prior-session`, and leaves
   `git diff --name-only` naming no run-state file. Over a fresh copy of the fixture, an `s2` holder
   call with the remote unreachable and the same shim leaves `session: s2`, `prior-session: s1` and
   `lease-utc` unmoved, as above. A second `s2` call with the remote still
-  unreachable and no shim exits 0, prints no `UNATTENDED check 90 FAILED`, and leaves the set
+  unreachable and no shim exits 0, prints no `UNATTENDED check 108 FAILED`, and leaves the set
   reading `s1`. A third `s2` call with no shim and the remote restored makes the second call's
   assertions of the first leg. The exit status of the two interrupted calls is not asserted here:
   the dispatcher discards the verb's return, and `TOOL-aGraftedHelix-26` AC2 asserts it.
   Red when: the add runs after `write_lease` on either trigger, so the interrupted call leaves no
-  `s1` in the set and the next call that reads the claim answers check 90.
+  `s1` in the set and the next call that reads the claim answers check 108.
 - **AC2** — When unit 23's sequences a and c run with their `--beat` under `CLAUDE_CODE_SESSION_ID`
   unset, and sequence b with its `--dispatch` under `s2`, each `--beat` prints
   `unattended: beat — <slug> · renewed` and the `--dispatch` exits 0 with no
-  `UNATTENDED check 90 FAILED`. After either, the claim names `session: s2` and the set reads `s1`.
-  Red when: `--beat` prints a skipped line or `--dispatch` answers check 90, which a build reading
+  `UNATTENDED check 108 FAILED`. After either, the claim names `session: s2` and the set reads `s1`.
+  Red when: `--beat` prints a skipped line or `--dispatch` answers check 108, which a build reading
   the set only at the `--resume` row does once the call cannot take the same-session row.
 - **AC3** — When unit 23 AC4's second fixture copy runs its incomplete `s2` call and the commit and
   push of its setup, and its `--hold` then runs under `CLAUDE_CODE_SESSION_ID` `s2`, the `--hold`
@@ -248,9 +257,9 @@ push exit 124; "unreachable" is unit 23's, the bare repository renamed away for 
 - **AC4** — When unit 23's sequence d runs up to, but not including, its closing call, the set
   reads `s1 s2` and the claim names `session: s1`. The next call, under `s3` with `CLAUDE_PID`
   changed, a new `--keepalive-id` and the remote restored, takes the run over, prints no
-  `UNATTENDED check 89 FAILED`, and leaves a claim naming the new keepalive and `session: s3`.
+  `UNATTENDED check 107 FAILED`, and leaves a claim naming the new keepalive and `session: s3`.
   Red when: the restart widening compares the whole value of the set with the claim's session, so
-  the call answers check 89.
+  the call answers check 107.
 - **AC5** — When `bash tools/check-kit-versions.sh` runs at the pass's commit it exits 0, and
   `python tools/govkit/govkit.py epoch --base <the pass's parent sha>` names no unattended carrier
   left behind.
@@ -260,13 +269,13 @@ push exit 124; "unreachable" is unit 23's, the bare repository renamed away for 
 
 `unattended kit gate` · `unattended skill wiring` · `recall floor` · `recall floor arms` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `harness arms (fail branches armed or pinned)` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `line length` · `shell hygiene (a loop fed by a command substitution)` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/unattended/unattended.test.sh · an s2 holder call whose claim push exits 124 and whose write_lease a mktemp shim stops after its session line, then a second s2 call with no check 90; over a fresh copy, the same shim on an s2 call with the remote unreachable, a still-unreachable s2 call with no check 90, and a restored s2 call with no check 90; stage the add moved back after write_lease, and separately the unreadable-claim path's add alone moved back, observed red through the unreachable leg · the suite's floor rises by its new arm count
+New arm: tools/unattended/unattended.test.sh · an s2 holder call whose claim push exits 124 and whose write_lease a mktemp shim stops after its session line, then a second s2 call with no check 108; over a fresh copy, the same shim on an s2 call with the remote unreachable, a still-unreachable s2 call with no check 108, and a restored s2 call with no check 108; stage the add moved back after write_lease, and separately the unreadable-claim path's add alone moved back, observed red through the unreachable leg · the suite's floor rises by its new arm count
 
-New arm: tools/unattended/unattended.test.sh · unit 23's a/b/c arm and its sequence-c restart arm with every --beat under CLAUDE_CODE_SESSION_ID unset and --dispatch under s2; stage the set supplied to check_claim_writable from the --resume row only, observed red through the --beat and --dispatch calls · none, the arm is unit 23's and is rewritten
+New arm: tools/unattended/unattended.test.sh · unit 23's a/b/c arm and its sequence-c restart arm with every --beat under CLAUDE_CODE_SESSION_ID unset and --dispatch under s2; stage the set supplied to check_claim_writable from the --resume row only, observed red through the --beat and --dispatch calls · none, unit 23's build already wrote the arm so, and it is kept
 
-New arm: tools/unattended/unattended.test.sh · unit 23's --hold arm with --hold under s2; stage the set supplied to check_claim_writable in holder mode only, observed red through the --hold leg alone · none, the arm is unit 23's and is rewritten
+New arm: tools/unattended/unattended.test.sh · unit 23's --hold arm with --hold under s2; stage the set supplied to check_claim_writable in holder mode only, observed red through the --hold leg alone · none, unit 23's build already wrote the arm so, and it is kept
 
-New arm: tools/unattended/unattended.test.sh · unit 23's sequence-d restart arm started short of d's closing call, asserting the set reads s1 s2 and the claim s1 before the restart; stage the restart widening comparing the whole value · FLOOR_ASSERTIONS rises by the assertions the rewrite adds, and FLOOR_SHARD_2 with it where the arm sits in region two, counted off the block
+New arm: tools/unattended/unattended.test.sh · unit 23's sequence-d restart arm started short of d's closing call, asserting the set reads s1 s2 and the claim s1 before the restart; stage the restart widening comparing the whole value · none, unit 23's rev-6 already wrote the arm so, and it is kept
 
 The unattended suites are not on the bar (`tools/unattended/README.md`). A pass runs its criteria
 directly, and the main loop runs the suite once at VERIFYING.
@@ -308,6 +317,14 @@ none
   and S1 points at it. AC1's two interrupted calls no longer assert "exits non-zero": that audit's
   H1 found the holder row's `|| return 1` never reaches the process exit, so no build of this unit
   could pass it, and `TOOL-aGraftedHelix-26` AC2 asserts the exit as 1. The record assertions stay.
+- rev-6 · 2026-10-05 · §1 §2 §4 §6 §7 · S2 S3 S4 · AC1 AC2 AC4 · the build pass's divergences,
+  before the code. The claim refusals were renumbered before the reconciling merge at `909c5e0b`,
+  because main's own driver already uses 89 to 106: check 90 reads as check 108 and check 89 as
+  check 107 throughout. Unit 23's build already wrote S2's sessions and S3's starting point into its
+  arms (its rev-6 and its acceptance ledger), so S4 keeps those arms unchanged and the three §7
+  lines that rewrote them now add nothing. AC1 back-dates the record's `lease-utc` before each leg,
+  because a stamp written inside the preflight's own second would read unmoved under a whole
+  `write_lease` and the witness could not red. §4 Evidence states that its line numbers are at base.
 
 ## 10. Reuse audit
 
