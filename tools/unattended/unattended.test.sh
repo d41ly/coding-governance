@@ -13900,9 +13900,12 @@ check_prior_interrupted() { # label · 124|away
   git add -A >/dev/null && git commit -q -m gr-aged --no-verify
   GR_LU=$(read_run_fact lease-utc); rm -f "$GR_BIN/mktemp.fired"
   case "$2" in 124) cp "$GR_BIN/git.124" "$GR_BIN/git" ;; away) mv "$ORIGIN" "$ORIGIN.away" ;; esac
-  CLAUDE_CODE_SESSION_ID=s2 PATH="$GR_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 >/dev/null 2>&1
+  out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GR_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
   case "$2" in 124) rm -f "$GR_BIN/git" ;; away) mv "$ORIGIN.away" "$ORIGIN" ;; esac
   n=$((n+1)); [ -e "$GR_BIN/mktemp.fired" ] || { echo "FAIL $1 the mktemp shim never fired, so the call was not interrupted"; st=1; }
+  # TOOL-aGraftedHelix-26 AC2: the failed lease fact is check 17, and the call exits 1 on it.
+  same "$1 the interrupted call exits 1" "$rc" "1"
+  hit  "$out" "UNATTENDED check 17 FAILED — cannot record the lease: "
   same "$1 the interrupted call leaves session s2" "$(read_run_fact session)" "s2"
   same "$1 ...prior-session s1" "$(read_run_fact prior-session)" "s1"
   same "$1 ...and lease-utc at its pre-call value" "$(read_run_fact lease-utc)" "$GR_LU"
@@ -13959,13 +13962,59 @@ build_prior_base
 sed -i "s/^lease-utc: .*/lease-utc: $(derive_claim_ago 600)/" memory/builds/tRun/RUN.md
 git add -A >/dev/null && git commit -q -m gs-aged --no-verify
 GS_LU=$(read_run_fact lease-utc)
-out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GS_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1)
+out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GS_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
 rm -rf "$GS_BIN"
 hit  "$out" "unattended: claim not written — tRun · the push was killed by this kit's own"
+# TOOL-aGraftedHelix-26 AC1: the failed add is check 17, and the call exits 1 on it.
+same "GH26 AC1 the call whose add fails exits 1" "$rc" "1"
+hit  "$out" "UNATTENDED check 17 FAILED — cannot record a run fact: prior-session in "
 same "GH25 AC1 the failed add leaves session s1" "$(read_run_fact session)" "s1"
 same "GH25 AC1 ...an empty prior-session set" "$(read_run_fact prior-session)" ""
 same "GH25 AC1 ...and lease-utc at its pre-call value" "$(read_run_fact lease-utc)" "$GS_LU"
 check_prior_landed "GH25 AC1 second"
+remove_claim_refs; reset_tree
+
+# ==================================================================================================
+# TOOL-aGraftedHelix-26 — A FAILED `prior-session` ADD OR LEASE FACT IS CHECK 17 AND EXITS THE CALL 1,
+# AND A CLAIM THAT COULD NOT BE READ REACHES THE ONE GUARDED ADD AND PUSHES NOTHING. AC1 and AC2 are
+# the exit and the line asserted in the arms of units 25 and 24 above. AC3: over unit 25's aged base,
+# an s2 holder call with the bare origin away runs under a git shim that forwards every call, logs
+# each argument list and leaves a marker when the claim fetch exits non-zero, and unit 25's once-only
+# mktemp shim keyed on that marker, so the first temporary file after the failed read, the add's,
+# fails. It exits 1 with the add's check-17 line, leaves session s1, an empty set and lease-utc
+# unmoved, and the log names no push; a restored s2 call with no shim lands the claim under s2 with
+# no check 108. RED against driver copies routing the unread claim to a second add with no guard,
+# and into a CAS with an empty expected sha. Units 20's and 24's helpers.
+# ==================================================================================================
+GT_BIN=$(mktemp -d)
+cat > "$GT_BIN/git" <<EOF
+#!/usr/bin/env bash
+printf ' %s \n' "\$*" >> "$GT_BIN/git.log"
+case " \$* " in *" fetch "*"refs/gov/runs/"*) "$GH_GIT" "\$@"; rc=\$?; [ "\$rc" = 0 ] || : > "$GT_BIN/git.fired"; exit "\$rc" ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+cat > "$GT_BIN/mktemp" <<EOF
+#!/usr/bin/env bash
+if [ -e "$GT_BIN/git.fired" ] && [ ! -e "$GT_BIN/mktemp.fired" ]; then : > "$GT_BIN/mktemp.fired"; exit 1; fi
+exec "$GR_MKTEMP" "\$@"
+EOF
+chmod +x "$GT_BIN/git" "$GT_BIN/mktemp"
+build_prior_base
+sed -i "s/^lease-utc: .*/lease-utc: $(derive_claim_ago 600)/" memory/builds/tRun/RUN.md
+git add -A >/dev/null && git commit -q -m gt-aged --no-verify
+GT_LU=$(read_run_fact lease-utc)
+mv "$ORIGIN" "$ORIGIN.away"
+out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GT_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
+mv "$ORIGIN.away" "$ORIGIN"
+n=$((n+1)); [ -e "$GT_BIN/mktemp.fired" ] || { echo "FAIL GH26 AC3 the mktemp shim never fired after a failed claim fetch, so the add was not failed"; st=1; }
+same "GH26 AC3 the unreadable call whose add fails exits 1" "$rc" "1"
+hit  "$out" "UNATTENDED check 17 FAILED — cannot record a run fact: prior-session in "
+same "GH26 AC3 ...leaves session s1" "$(read_run_fact session)" "s1"
+same "GH26 AC3 ...an empty prior-session set" "$(read_run_fact prior-session)" ""
+same "GH26 AC3 ...lease-utc at its pre-call value" "$(read_run_fact lease-utc)" "$GT_LU"
+same "GH26 AC3 ...and the git shim's log names no push" "$(grep -c ' push ' "$GT_BIN/git.log")" "0"
+rm -rf "$GT_BIN"
+check_prior_landed "GH26 AC3 restored"
 remove_claim_refs; reset_tree
 
 fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
@@ -15172,7 +15221,14 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # claim block's gh_ helpers and the helpers of units 20 and 24 on node a, 2026-10-05, executed 30
 # against the prologue's own 20, green against the kit and red under a driver copy with the add's
 # `|| return 1` dropped; no suite ran.
-FLOOR_ASSERTIONS=2380
+# RAISED 2380 -> 2399 by TOOL-aGraftedHelix-26: 19 executed assertions in region two, the exit and the
+# check-17 line added to unit 24's two interrupted calls and unit 25's failed add (6), and the
+# unreadable-trigger arm's 13, its one `mutate` call included, MEASURED: those blocks run alone behind
+# this prologue, the claim block's gh_ helpers and unit 20's prior-session helpers on node a,
+# 2026-10-05, executed 75 against 56 before, green against the kit and red under the parent's driver,
+# driver copies dropping each `fail 17` with its return kept, routing the unread claim to a second
+# unguarded add, and routing it into a CAS with an empty expected sha; no suite ran.
+FLOOR_ASSERTIONS=2399
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -15312,7 +15368,8 @@ FLOOR_SHARD_1=209
 # RAISED 1987 -> 2147: the same 160 region-two prior-session set assertions, see FLOOR_ASSERTIONS.
 # RAISED 2147 -> 2173: the same 26 region-two interruption assertions, see FLOOR_ASSERTIONS.
 # RAISED 2173 -> 2183: the same 10 region-two failed-add assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=2183
+# RAISED 2183 -> 2202: the same 19 region-two check-17 assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=2202
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

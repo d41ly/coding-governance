@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-26 — a failed `prior-session` add or `write_lease` fact fails the call through check 17, and both of the add's triggers reach one guarded call site, each observed
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 8
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 8
 
 <!-- gen:spec-records -->
 

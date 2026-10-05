@@ -50,7 +50,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.73   # gov:kit unattended@1.73 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.74   # gov:kit unattended@1.74 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -6529,19 +6529,26 @@ set_fact() { # file · key · value
 # as "not recorded", which is the pid-only reading the record had before these existed.
 # The optional third argument is the `lease-utc` a take site already handed its claim write
 # (TOOL-aGraftedHelix-11 S6); without one the clock is read here.
+# ONE GUARDED WRITE (TOOL-aGraftedHelix-26 S2): a fact that cannot be recorded is check 17 naming
+# it, because every caller returns on this function with no `fail` of its own and only `fail` sets
+# the process exit; `set_fact`'s `mktemp` and `mv` branches return with none. The facts are written
+# in the order they always were, each value computed in its arm, the two probes after `pid`.
 write_lease() { # run-state file · keepalive-id · [lease stamp]
-  local rel="$1" kid="$2" lu="${3:-}" sid="${CLAUDE_CODE_SESSION_ID:-}" pid="${CLAUDE_PID:-}" gone="" host img
-  set_fact "$rel" keepalive "$kid" || return 1
+  local rel="$1" kid="$2" lu="${3:-}" sid="${CLAUDE_CODE_SESSION_ID:-}" pid="${CLAUDE_PID:-}" gone="" k v
   if [ -z "$sid" ] && [ -z "$pid" ]; then gone="session id or pid"
   elif [ -z "$sid" ]; then gone="session id"
   elif [ -z "$pid" ]; then gone="pid"; fi
-  set_fact "$rel" session "${sid:-absent}" || return 1
-  set_fact "$rel" pid "${pid:-absent}" || return 1
-  host=$(read_host_name) || host=""
-  img=$(read_pid_image "${pid:-absent}") || img=""
-  set_fact "$rel" host "${host:-absent}" || return 1
-  set_fact "$rel" pid-image "${img:-absent}" || return 1
-  set_fact "$rel" lease-utc "${lu:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}" || return 1
+  for k in keepalive session pid host pid-image lease-utc; do
+    case "$k" in
+      keepalive) v=$kid ;;
+      session)   v=${sid:-absent} ;;
+      pid)       v=${pid:-absent} ;;
+      host)      v=$(read_host_name) || v=""; v=${v:-absent} ;;
+      pid-image) v=$(read_pid_image "${pid:-absent}") || v=""; v=${v:-absent} ;;
+      lease-utc) v=${lu:-$(date -u +%Y-%m-%dT%H:%M:%SZ)} ;;
+    esac
+    set_fact "$rel" "$k" "$v" || { fail 17 "cannot record the lease: $k in $rel"; return 1; }
+  done
   [ -z "$gone" ] || printf 'unattended: NOTE - this harness exposes no %s, so no out-of-session resumer can find this run; the lease records absent and the hooks and the tick report it UNBOUND rather than guess.\n' "$gone" >&2
   return 0
 }
@@ -7829,6 +7836,9 @@ verb_resume() { # slug
     # a failure between them, leaving the record at the new session, the claim at the old one and no
     # member naming it: the next call reads its own claim foreign. An interrupted clear leaves only
     # members this keepalive's claim no longer carries, and the next landed claim write empties them.
+    # TOOL-aGraftedHelix-26 - BOTH TRIGGERS REACH THE ONE GUARDED ADD: a claim that could not be read
+    # leaves `cw` empty, so no CAS runs and `cas` stays empty. A failed add is check 17, because the
+    # row's return alone exits the call 0: only `fail` sets the process exit.
     cw=""; cas=""
     if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
       check_claim_writable "$slug" holder "$ka" "${ls_sid:-absent}" "$ka" "$rel"; cw=$?
@@ -7843,7 +7853,8 @@ verb_resume() { # slug
         for pv in "$ls_sid" ${cw:+"$CW_SESS"}; do
           [ -z "$pv" ] || [[ " $ps " == *" $pv "* ]] || ps="${ps:+$ps }$pv"
         done
-        [ -z "$ps" ] || set_fact "$rel" prior-session "$ps" || return 1
+        [ -z "$ps" ] || set_fact "$rel" prior-session "$ps" \
+          || { fail 17 "cannot record a run fact: prior-session in $rel"; return 1; }
       fi
       write_lease "$rel" "$KID" "$lu" || return 1
       if [ "$cas" = 0 ] && [ -n "$(fact "$rel" prior-session)" ]; then
