@@ -5,8 +5,7 @@ opened: 2026-10-04
 streams: tooling+kickoff
 roster: TOOL
 authorized-by: prompt
-spec-audit: 2026-10-04
-ids: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-26 TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28
+ids: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-26 TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32
 ---
 
 # aGraftedHelix — six helixir mechanisms, grafted onto the kits that own their surface
@@ -43,9 +42,9 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
   the recall index, hygiene checks, `check-wiring.sh`, the orientation card.
 - Every new arm is observed RED on a staged break before it lands, and its header says what it does
   not check.
-- Spec audit: declared by the run, not the owner. Owner ruling 2026-10-05: the chain stops after
-  round 7; unit 26 is built un-audited, `specs-audited` closes under an override citing this
-  ruling, and every further finding is the closing review's.
+- No spec audit is owed. The run declared one itself (rounds 1-7, stopped by the owner on
+  2026-10-05); TOOL-aWardedAudit-4 makes that opt-in the owner's alone, so the key is gone and
+  the run re-preflighted onto a BASE without it (closing review round 1, H2).
 - Discoveries are adopted into this build, never filed as asks (prompt record).
 - Passes run sequentially: one worktree, one git index, and the harness dispatches in order.
 
@@ -92,6 +91,10 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
 | 26 | `TOOL-aGraftedHelix-26` | 2 | PROMOTED: a failed `prior-session` add or `write_lease` fact fails the call through check 17, and both of the add's triggers reach one guarded call site, each observed |
 | 27 | `TOOL-aGraftedHelix-27` | 2 | ADOPTED: the driver resolves generated indexes the same inside a git hook as outside one, so a pass commits the index its generator rewrote |
 | 28 | `TOOL-aGraftedHelix-28` | 1 | ADOPTED: a parity gate holds the by-design header the catalogue prints equal to the one the review harness parses |
+| 29 | `TOOL-aGraftedHelix-29` | 2 | PROMOTED: the by-design block is rendered from the tree at the review's base, so a diff cannot write its own exemption |
+| 30 | `TOOL-aGraftedHelix-30` | 2 | PROMOTED: a verb evaluates the authorization-reachable item against a merged driver, run at every reconciling merge |
+| 31 | `TOOL-aGraftedHelix-31` | 2 | PROMOTED: `--settle` writes the run claim, and a terminal-phase writer that writes no claim reds |
+| 32 | `TOOL-aGraftedHelix-32` | 2 | PROMOTED: the closing review's 21 MEDIUM and LOW findings, batched |
 
 <!-- /roster:units -->
 
@@ -99,7 +102,7 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
 **Build status:** CLOSED · 28 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
 ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13
 ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-26
-ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28
+ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -134,7 +137,7 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28
 | [TOOL-aGraftedHelix-28 — a parity gate holds the by-design head the catalogue renders equal to the pattern the review harness parses](spec/2026-10-05-spec-TOOL-aGraftedHelix-28.md) | 12 | 1 | CLOSED | rev-2 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 40 bound to this build, across 4 record folder(s).
+Records: 41 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

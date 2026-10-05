@@ -213,3 +213,13 @@ base: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 2026-10-05T15:18:30Z brief · item TOOL-aGraftedHelix-28 · reason a2e60ebbeb07 memory/builds/aGraftedHelix/prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md
 
 2026-10-05T15:34:19Z dispatch · item f52ee82b TOOL-aGraftedHelix-28 · reason memory/builds/aGraftedHelix/spec/2026-10-05-spec-TOOL-aGraftedHelix-28.md tools/workflows/check_by_design_parity.py tools/workflows/check-protocol-parity.test.sh tools/workflows/unattended-build.test.sh tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/README.md memory/map/features/review-harnesses.md memory/map/generated memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md memory/backlog/TOOL.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-05T16:37:33Z review · item aGraftedHelix · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 3 · minors 21 · disposition promote
+
+2026-10-05T16:37:43Z rescope · item add TOOL-aGraftedHelix-29 · reason H1 (closing review round 1, id 1): the by-design block is rendered from the tree under review, so a diff that adds an invariant writes its own review exemption
+
+2026-10-05T16:37:50Z rescope · item add TOOL-aGraftedHelix-30 · reason H2 (closing review round 1, id 20): a reconciling merge brought in check 89, which refuses this run's own spec-audit opt-in at --close with no override; left-shift: re-run the authorization-reachable item against a merged driver at the merge, not at the close
+
+2026-10-05T16:37:57Z rescope · item add TOOL-aGraftedHelix-31 · reason H3 (closing review round 1, id 21): the merged-in --settle never writes the run claim, so a settled hand-off stays held on the remote for good
+
+2026-10-05T16:38:05Z rescope · item add TOOL-aGraftedHelix-32 · reason the closing review round 1's 13 MEDIUM and 8 LOW findings (M1-M9, L1-L4), batched into one unit by the owner's promote-every-finding ruling
