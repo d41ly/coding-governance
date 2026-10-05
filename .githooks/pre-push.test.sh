@@ -1404,6 +1404,19 @@ case "$_o" in
   *"gate on main push"*) ok "DOCS AC3 a code touch inside the range keeps the push out of the doc class" ;;
   *) bad "DOCS AC3 no decision line: $_o" ;;
 esac
+# TOOL-dThriftyLanding-9: the same code touch on a SIDE branch merged with --no-ff. Git's default
+# history simplification drops a side branch that nets to nothing, so the linear arm above cannot see it.
+_r=$(read_docs_tip); set_docs_stamp
+git checkout -q -b side9; printf 'z\n' > src/z.sh; git add src/z.sh; git commit -qm "side code"
+git rm -q src/z.sh; printf 'b9\n' > notes/b.md; git commit -qam "side: remove it, edit a doc"
+git checkout -q main; printf 'a9\n' > notes/a.md; git commit -qam "main doc"
+git merge -q --no-ff -m "land side9" side9 >/dev/null 2>&1
+_o=$(run_docs_push)
+case "$_o" in
+  *"docs-only"*) bad "DOCS U9 a code touch on a merged side branch read as doc-only: $_o" ;;
+  *"gate on main push"*) ok "DOCS U9 a code touch on a merged side branch keeps the push out of the doc class" ;;
+  *) bad "DOCS U9 no decision line: $_o" ;;
+esac
 # AC4: a doc-only MERGE whose second parent the record does not cover. Predicate 5 forces it at base.
 _r=$(read_docs_tip); set_docs_stamp
 git checkout -q -b side; printf 'b2\n' > notes/b.md; git commit -qam "side doc"

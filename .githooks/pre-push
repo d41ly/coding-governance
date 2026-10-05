@@ -1196,7 +1196,9 @@ check_green_record() { # sha · fingerprint · manifest blob · selftests · lab
 # read from the pushed tree, which could otherwise classify its own code as a doc. The push is doc-only
 # when R is an ancestor of the pushed tip, something differs between them, and no path outside the class
 # appears in their net diff OR in any commit between them: a code file added and removed again inside
-# the range is still code a leg should have seen. Every failure, and every element that is not a plain
+# the range is still code a leg should have seen. That read is `--full-history` (TOOL-dThriftyLanding-9):
+# git's default simplification drops a `--no-ff` merge's side branch that nets to nothing on the paths
+# asked about, and every landing here is such a merge. Every failure, and every element that is not a plain
 # repo path, reads as NOT doc-only, which is the decision this hook made before the class existed.
 DOCS_ONLY=""; DOCS_N=0; DOCS_WHY=""
 classify_docs() {
@@ -1218,7 +1220,7 @@ classify_docs() {
   all=$(git diff --no-renames --name-only "$main_remote" "$main_local" -- 2>/dev/null) || return 0
   [ -n "$all" ] || return 0
   nd=$(git diff --no-renames --name-only "$main_remote" "$main_local" -- . "${excl[@]}" 2>/dev/null) || return 0
-  nl=$(git log --no-renames --format= --name-only "$main_remote..$main_local" -- . "${excl[@]}" 2>/dev/null) || return 0
+  nl=$(git log --full-history --no-renames --format= --name-only "$main_remote..$main_local" -- . "${excl[@]}" 2>/dev/null) || return 0
   [ -z "$nd$nl" ] || return 0
   DOCS_ONLY=1; DOCS_N=$(printf '%s\n' "$all" | grep -c .)
 }
