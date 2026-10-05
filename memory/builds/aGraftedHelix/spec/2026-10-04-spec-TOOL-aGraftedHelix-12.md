@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-12 — every cell of the claim write table, and every write `--beat` declines, is observed
 
-**Status:** SPECCED · rev-4 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 2
+**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 2
 
 <!-- gen:spec-records -->
 

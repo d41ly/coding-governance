@@ -12441,6 +12441,147 @@ fi   # ---- region two continues below: one compound block past about 3000 comma
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
 if in_shard 2; then
 
+# ==================================================================================================
+# TOOL-aGraftedHelix-12 — EVERY CELL OF THE CLAIM WRITE TABLE, and every write `--beat` declines.
+# GC_CELLS holds one line per cell of the table `check_claim_writable` implements, the stops guide's
+# section 7: the claim-read row, the mode, then the outcome its reacher must produce - the exit, the
+# check number (`-` for none), whether the claim ref's sha `moved` or stayed the `same`, whether the
+# run-state file `changed` or stayed the `same`, and the line the call printed: `taken` for `claim
+# taken over`, `announced` for the announce row's `claim not written`, `lost` for a write the push
+# lost, `-` for none of them. A cell no path reaches is written
+# `unreached` and its reason, and prints a SKIP naming both rather than passing. Before driving one,
+# the arm asserts its table holds every pair of GC_ROWS and GC_MODES exactly once, so a deleted cell
+# reds rather than shrinking the arm. WHAT THIS DOES NOT CHECK: that those two lists are the driver's.
+# A row or mode the driver gains reds nothing here; deriving them from it is TOOL-aGraftedHelix-19's.
+# Each cell starts from its mode's committed base with every claim cleared, then seeds its row as a
+# real gov-claim commit, so no cell's write is the next one's input. The reachers: --preflight of
+# tFresh under a new session and keepalive; a new session's --resume of a presumed-stopped tRun,
+# which reaches run_takeover; the holder's own --resume; and --hold, the status write. A failing cell
+# names its row and mode. It reuses the claim block's gh_ helpers.
+# ==================================================================================================
+GC_ROWS="none mine same live held stale terminal unknown"
+GC_MODES="preflight take-over holder status"
+GC_CELLS='none     preflight 0 -  moved changed -
+mine     preflight 0 -  moved changed -
+same     preflight 0 -  moved changed -
+live     preflight 1 89 same  same    -
+held     preflight 1 89 same  same    -
+stale    preflight 0 -  moved changed taken
+terminal preflight 0 -  moved changed -
+unknown  preflight 1 89 same  same    -
+none     take-over 0 -  moved changed -
+mine     take-over 0 -  moved changed -
+same     take-over 0 -  moved changed -
+live     take-over 1 89 same  same    -
+held     take-over 0 -  moved changed -
+stale    take-over 0 -  moved changed taken
+terminal take-over 1 89 same  same    -
+unknown  take-over 1 89 same  same    -
+none     holder    0 -  moved same    -
+mine     holder    0 -  moved same    -
+same     holder    0 -  moved same    -
+live     holder    1 90 same  same    -
+held     holder    1 90 same  same    -
+stale    holder    1 90 same  same    -
+terminal holder    1 90 same  same    -
+unknown  holder    1 90 same  same    -
+none     status    0 -  moved changed -
+mine     status    0 -  moved changed -
+same     status    0 -  moved changed -
+live     status    0 -  same  changed announced
+held     status    0 -  same  changed announced
+stale    status    0 -  moved changed -
+terminal status    0 -  moved changed -
+unknown  status    0 -  same  changed announced'
+# A row's claim, seeded against the reacher's own lease: `mine` carries its keepalive and session,
+# aged a third of the bound so the holder's renewal is due; `same` carries only its session.
+seed_claim_row() { # row · slug · the reacher's session · its keepalive
+  case "$1" in
+    none) ;;
+    mine) seed_claim "$2" "$3" "$4" live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)" ;;
+    same) seed_claim "$2" "$3" k-other live "$(derive_claim_now)" ;;
+    live) seed_claim "$2" s-other k-other live "$(derive_claim_now)" ;;
+    held) seed_claim "$2" s-other k-other held "$(derive_claim_now)" ;;
+    stale) seed_claim "$2" s-other k-other live "$(derive_claim_ago $((GH_BOUND + 600)))" ;;
+    terminal) seed_claim "$2" s-other k-other landed "$(derive_claim_now)" ;;
+    unknown) seed_claim "$2" s-other k-other live "" ;;
+    *) echo "FAIL GH12 the cell table names a row no seed builds: $1"; st=1; return 1 ;;
+  esac
+}
+# One cell, driven in THIS shell so its verdict survives: GC_GOT is the outcome in the table's order.
+run_claim_cell() { # row · mode -> GC_GOT
+  local row="$1" mode="$2" base slug me ka r0 r1 h0 h1 out rc ck=- ref=same rec=same line=-
+  case "$mode" in
+    preflight) base=$GC_FRESH; slug=tFresh; me=s-new; ka=k2 ;;
+    take-over) base=$GC_AGED; slug=tRun; me=s-new; ka=k2 ;;
+    holder|status) base=$GC_HELD; slug=tRun; me=fixture-session; ka=k1 ;;
+    *) GC_GOT="no reacher drives mode $mode"; return 1 ;;
+  esac
+  git checkout -q -f unit; git reset -q --hard "$base"; git clean -qfd; remove_claim_refs
+  seed_claim_row "$row" "$slug" "$me" "$ka" || { GC_GOT="no seed for row $row"; return 1; }
+  r0=$(git ls-remote "$ORIGIN" "refs/gov/runs/$slug" | cut -f1)
+  h0=$(git hash-object "memory/builds/$slug/RUN.md" 2>/dev/null) || h0=absent
+  case "$mode" in
+    preflight) out=$(CLAUDE_CODE_SESSION_ID=$me run --preflight "$slug" --keepalive-id "$ka"); rc=$? ;;
+    take-over) out=$(CLAUDE_CODE_SESSION_ID=$me run --resume "$slug" --keepalive-id "$ka"); rc=$? ;;
+    holder) out=$(run --resume "$slug" --keepalive-id "$ka"); rc=$? ;;
+    status) out=$(run --hold "$slug" --code platform-limit --until owner --reason "the cell table" --reaped "$ka"); rc=$? ;;
+  esac
+  r1=$(git ls-remote "$ORIGIN" "refs/gov/runs/$slug" | cut -f1)
+  h1=$(git hash-object "memory/builds/$slug/RUN.md" 2>/dev/null) || h1=absent
+  case "$out" in *"UNATTENDED check "*" FAILED"*) ck=${out#*UNATTENDED check }; ck=${ck%% *} ;; esac
+  [ "$r1" = "$r0" ] || ref=moved
+  [ -n "$r1" ] || [ -z "$r0" ] || ref=gone
+  [ "$h1" = "$h0" ] || rec=changed
+  # A WRITE THAT LOST is `lost`, never the refusal or the announcement it can coincide with: a row
+  # misread as `none` pushes against an empty lease, loses, and exits as check 90 or a `claim not
+  # written` line too - only the sentence tells the table's decision from a race the push lost.
+  case "$out" in
+    *"the claim moved on the remote between"*|*"unattended: claim not written — $slug · "*) line=lost ;;
+    *"unattended: claim taken over — "*) line=taken ;;
+    *"unattended: claim not written — $slug is held "*) line=announced ;;
+  esac
+  GC_GOT="$rc $ck $ref $rec $line"
+  [ "$GC_GOT" = "$3" ] || GC_GOT="$GC_GOT · output: $(printf '%s' "$out" | head -c 300)"
+}
+arm_claim_fixture; GC_FRESH=$(git rev-parse HEAD)
+build_claim_held; GC_HELD=$(git rev-parse HEAD)
+GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -q --allow-empty -m gc-aged --no-verify
+GC_AGED=$(git rev-parse HEAD)
+mapfile -t gc_lines <<<"$GC_CELLS"
+gc_want=""; for r in $GC_ROWS; do for m in $GC_MODES; do gc_want="$gc_want$r/$m"$'\n'; done; done
+gc_have=""
+for l in "${gc_lines[@]}"; do
+  read -r r m _ <<<"$l"; gc_have="$gc_have$r/$m"$'\n'
+done
+same "GH12 the cell table holds every row and mode pair exactly once" \
+  "$(printf '%s' "$gc_have" | sort | tr '\n' ' ')" "$(printf '%s' "$gc_want" | sort | tr '\n' ' ')"
+for l in "${gc_lines[@]}"; do
+  read -r r m want <<<"$l"
+  case "$want" in unreached*) echo "SKIP GH12 cell $r/$m is unreached: ${want#unreached }"; continue ;; esac
+  read -r gc_e gc_c gc_f gc_d gc_x <<<"$want"; want="$gc_e $gc_c $gc_f $gc_d $gc_x"
+  run_claim_cell "$r" "$m" "$want"
+  same "GH12 cell $r/$m (exit check ref record line)" "$GC_GOT" "$want"
+done
+# ---- AC2: --beat declines its own beat not yet due and another session's live claim, naming the
+# ---- claim test and never the verdict, and moves no ref. Red when --beat skips its `mine` test.
+build_claim_held
+gc_sha=$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)
+out=$(run --beat tRun)
+hit  "$out" "unattended: beat — tRun · skipped: the beat is not yet due"
+same "GH12 AC2 --beat over this run's young beat moves no ref" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gc_sha"
+seed_claim tRun s-other k-other live "$(derive_claim_now)"
+gc_sha=$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)
+out=$(run --beat tRun)
+hit  "$out" "unattended: beat — tRun · skipped: the claim is not this run's: tRun · node other · session s-other"
+miss "$out" "skipped: verdict"
+same "GH12 AC2 --beat over another session's live claim moves no ref" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gc_sha"
+remove_claim_refs; reset_tree
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
 # ---- AC6: `--hold` refuses, numbered and before any record write, while a recorded bar is alive under
 # ---- a LIVE driver — this suite's own shell stands in for it — and proceeds once the bar has exited.
 init_pl_fixture
@@ -12895,7 +13036,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # and the claim block's gh_ helpers on node a, 2026-10-05, executed 32 against the prologue's own 20,
 # green against the kit and red under two staged driver breaks and under the parent's driver; no
 # suite ran.
-FLOOR_ASSERTIONS=2045
+# RAISED 2045 -> 2086 by TOOL-aGraftedHelix-12: the claim-cell block's 41 executed assertions in
+# region two, its three `mutate` calls included, MEASURED: that block run alone behind this prologue
+# and the claim block's gh_ helpers on node a, 2026-10-05, executed 61 against the prologue's own 20,
+# green against the kit and red under two staged driver copies, one per cell set; no suite ran.
+FLOOR_ASSERTIONS=2086
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -13026,7 +13171,8 @@ FLOOR_SHARD_1=209
 # RAISED 1680 -> 1810: the same 130 region-two run-claim assertions, see FLOOR_ASSERTIONS.
 # RAISED 1810 -> 1836: the same 26 region-two hooked claim assertions, see FLOOR_ASSERTIONS.
 # RAISED 1836 -> 1848: the same 12 region-two lease-identity assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1848
+# RAISED 1848 -> 1889: the same 41 region-two claim-cell assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1889
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.
