@@ -880,7 +880,9 @@ async function runWholeScriptArms() {
   // uncertain verdict is held as neither confirmed, refuted nor unverified, and no `regraded` returns.
   const RUBRIC_END = 'how alarming the defect looks.'
   const scanRubric = (p) => {
-    const i = p.indexOf('SEVERITY RUBRIC')
+    // Anchored on the rubric's own opening: TOOL-aEvidencedLens-4's spec acquire sentence names the
+    // rubric ("graded by the SEVERITY RUBRIC below"), and a bare-name search took that line instead.
+    const i = p.indexOf('SEVERITY RUBRIC - grade')
     const j = i === -1 ? -1 : p.indexOf(RUBRIC_END, i)
     return j === -1 ? null : p.slice(i, j + RUBRIC_END.length)
   }
