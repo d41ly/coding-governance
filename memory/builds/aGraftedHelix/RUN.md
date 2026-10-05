@@ -65,3 +65,9 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-05T21:09:48Z dispatch · item 0bc5f0f8 TOOL-aGraftedHelix-33 · reason tools/workflows memory/map/generated memory/map/features/review-harnesses.md memory/guides/SESSION-KICKOFF.md memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-33.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md
 
 2026-10-05T21:40:52Z rescope · item add TOOL-aGraftedHelix-34 · reason discovery at VERIFYING: the owed unattended suites ran pooled on a frozen clone at 90a6f6fae and came back red (driver 12 arms, cross-component 1, gate shard 1 one, shard 8 killed after a fixture no-op, resume-tick 2); the Definition of Done cannot be met with them red, so the fixes join the build
+
+2026-10-05T23:14:44Z brief · item TOOL-aGraftedHelix-34 · reason a2e60ebbeb07 memory/builds/aGraftedHelix/prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md
+
+2026-10-05T23:15:20Z dispatch · item bd1f7d6b TOOL-aGraftedHelix-34 · reason tools/unattended tools/gate-legs.json memory/guides .claude/skills/unattended/SKILL.md memory/map memory/gotchas memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-34.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md
+
+2026-10-05T23:44:10Z dispatch · item bd1f7d6b TOOL-aGraftedHelix-34 · reason tools/unattended tools/gate-legs.json memory/guides .claude/skills/unattended/SKILL.md memory/map memory/gotchas memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-34.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md tools/run-gates/selftest-budgets.txt memory/LIVE.md memory/ledger/2026-10.md

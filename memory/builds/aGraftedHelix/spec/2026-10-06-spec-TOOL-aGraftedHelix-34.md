@@ -1,6 +1,6 @@
-# TOOL-aGraftedHelix-34 — every red arm of the owed unattended suites is fixed, proved inherited, or proved a pool-contention race, and each one not fixed here is filed
+# TOOL-aGraftedHelix-34 — every red arm of the owed unattended suites is fixed, the two pool races are closed, and gate shard 8 is re-cut
 
-**Status:** SPECCED · rev-1 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 18 · ratified 2026-10-06
+**Status:** SPECCED · rev-2 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 18 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 
@@ -13,123 +13,204 @@
 ## 1. Goal
 
 The unattended suites the close owes ran once, pooled eight-wide, on a frozen clone at `90a6f6fae`,
-and came back red. This unit classifies every real red arm of that sweep by a slice observed on
-frozen clones at this branch's HEAD `b5d40c61` and at origin/main `290d0d2d`. It fixes the one cause
-this build introduced, and files the rest as asks, so the close's attributed Definition of Done can
-name a record for each suite that stays red.
+and came back red. rev-1 attributed every real red arm by slices on frozen clones at this branch's
+HEAD `b5d40c61` and at origin/main `290d0d2d`, and filed the inherited ones. The run's standing
+mandate supersedes that filing: whatever this unit finds is fixed here. So this unit fixes the one
+red this build caused, every inherited stale fixture, both pool-contention races, and the cost
+growth that let gate shard 8 outrun its bound, so the close's sweep can be green without an ask.
 
 ## 2. Scope (IN)
 
-- **S1** — The AC3 arm of the driver suite's GH-1 block stages its unanswering remote on BOTH URLs of
-  `origin`. It reads `remote.origin.pushurl` into a local before the staging, sets the fetch URL and
-  the push URL to the missing path, runs `--claims`, then sets the fetch URL back to `$ORIGIN` and
-  the push URL back to the value it read, or unsets it when it read none. No assertion is added or
-  moved, so the suite's floors stay as they are. Observed by AC1 and AC2.
-- **S2** — Six asks are filed in this build's own backlog file, one per cause group in §4's ask
-  table, each in `tools/memory-tree/backlog.py`'s ask grammar with a `seen` clause at `290d0d2d` and an
-  `accept` clause. Each ask gets a SEV row at the severity the table gives and a KEEP row in the same
-  commit. The ids are the ones the main loop names in this unit's build brief (§3 Edges). Observed by
-  AC3.
-- **S3** — The pass re-observes the inherited classification: each inherited slice §4 names prints,
-  at `290d0d2d`, the FAIL lines §4's disposition table quotes for it. Observed by AC4.
-- **S4** — The pass re-observes the contention classification: the ledger slice and the resume-tick
-  slice print no FAIL line alone at the pass's commit, and the start-token probe moves a fresh
-  sleep's token under fork load. Observed by AC5.
-- **S5** — The unattended kit's version moves one minor step in every carrier
+- **S1** — OURS. The AC3 arm of the driver suite's GH-1 block stages its unanswering remote on BOTH
+  URLs of `origin`: it reads `remote.origin.pushurl` into a local, points the fetch URL and the push
+  URL at the missing path, runs `--claims`, then sets the fetch URL back to `$ORIGIN` and the push
+  URL back to the value it read, or unsets it when it read none. Observed by AC1 and AC2.
+- **S2** — the driver suite's inherited stale fixtures, fixed in the fixture because each arm shows
+  the product is right:
+  - (a) the phase-writer population pins EIGHT, and `--settle` is driven against the finished record
+    beside the other six refusers: it must print its check 95 refusal and write nothing;
+  - (b) S4 rule 1's red fixture strips every `stage_or_fail` inside `verb_close`, anchored on the
+    function's own header rather than on its LANDING line, and asserts the rule names exactly
+    `verb_close()`;
+  - (c) closing-review arm 5 runs `--close` with no override, because an unresolvable base reads
+    `handoff` and a hand-off node refuses every override at check 104, which is correct; arms 4 and
+    5 each also assert the length guard's own sentence, so neither passes on the range join alone;
+  - (d) the conf-dies spec-audit arm runs `--close` with no override, for the same reason.
+  Observed by AC3.
+- **S3** — the gate suite's inherited stale fixtures:
+  - (a) the verb-surface denylist gains `--highs` and `--minors`, the two `--review` arguments that
+    reached the driver's argv loop as case arms;
+  - (b) check 39's arm two anchors its `mutate` on the token `is_terminal "$DP_PHASE"` inside the
+    `verb_preflight` function range, never on a whole line;
+  - (c) the G0 fixture spells its grant once, `MA0_GRANT`, and every sed, grep and expected
+    sentence in the block reads that one variable.
+  Observed by AC4.
+- **S4** — cross-component arm 3b: both suites' `remove_announcements` strip the `check 23 fleet — `
+  announcement, which the leg prints on every run that grades a pass and which never fails it; arm
+  3b then asserts that line reads zero undeclared writes over a non-zero graded population. Observed
+  by AC5.
+- **S5** — the ledger race, in the product and in the arms. `run_bounded`'s wrapper writes a marker
+  file as its first act after the exec, and `run_bounded` waits for it, bounded at 100 polls of
+  0.05 s and ending early when the wrapper exits, before `write_proc_record` reads the start token.
+  The ledger AC6 and AC12 arms read their sleep's token through a new suite helper,
+  `read_pl_exec_token`, which waits, bounded, for the pid's stat line to name `(sleep)` and asserts
+  the token it returns is not `-`. Observed by AC6.
+- **S6** — the resume-tick race. The AC4 and AC13 hung-launcher arms read the killed pid through a
+  new suite helper, `read_task_gone`, which polls `tasklist` until the pid is unlisted or a bound of
+  25 polls of 0.2 s passes. Observed by AC7.
+- **S7** — gate shard 8 is RE-CUT. Six self-contained sections of region 8 are relabelled to the
+  five lightest regions by closing the region at a top-level seam and opening `if in_shard <k>`,
+  with text order unchanged. Every section after a new seam opens with `cd "$TMP" || exit 2;
+  anchor_restore`, so it starts from the prologue's tree, refs and remote in every mode. The 31
+  helpers still defined inside region 8 move, byte-identical, into the prologue's hoist set, which
+  its own comment says holds every region helper. The per-shard floors move by each section's
+  measured count, and the five receiving shards' budget rows are re-declared from the sections'
+  measured slice seconds. Observed by AC8.
+- **S8** — the unattended kit's version moves one minor step in every carrier
   `tools/check-kit-versions.sh` pairs, once, after the pass's last move, and the rendered guides and
-  the Skill are re-adopted from their templates in the same commit. Observed by AC6.
+  the Skill are re-adopted from their templates. Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
-- **Fixing an arm or a product path this build did not cause.** The brief's rule 3 binds: an
-  inherited red is proved and recorded, never fixed here. S2 files each one instead, and adopting any
-  of those asks as a unit is the main loop's decision under protocol §11.
-- **Calibration.** The count-only MISMATCH rows (adopter e2e, gate shards 2 to 5, stall-recorder,
-  stop-guard) and gate shard 8's pooled bound are the close's `--calibrate`, per the brief.
-- **Arms added after `90a6f6fae`.** Units 29 to 33 added arms, check 51's in gate shard 8 among
-  them, and each unit observed its own by a slice. The close's sweep is their first whole run.
-- **Which URL `read_claims` fetches.** Claims live on the remote the landing push goes to, which is
-  the shared brief's I1, so reading the push URL is the design. The arm was wrong, not the reader.
-- **Running any suite whole, or the merge bar.** Every observation here is a slice.
+- **Filing anything.** rev-1's six asks are withdrawn, not written: no backlog row, no SEV or KEEP
+  row, no change to `tools/memory-tree/backlog.py` or to `gen_build_index.py` for this purpose.
+- **Changing which URL `read_claims` fetches.** Claims live on the remote the landing push goes to,
+  the shared brief's I1, so reading the push URL is the design and the arm was wrong.
+- **Changing the shard arity.** The owner ruled eight; the re-cut moves sections between the eight
+  regions and adds none.
+- **Deleting or weakening an arm.** Every arm keeps its assertions; S2 and S4 add assertions.
+- **Calibration and the whole-suite proofs.** The count-only MISMATCH rows, every re-cut shard's
+  pooled reading, the eight-shard identity and each shard's green verdict are the close's, below.
+- **Running any suite whole, or the merge bar.** Every observation here is a slice or a probe.
 
 ### Edges
 
-- **consumes-from** external — the main loop mints six ask ids under this run's slug in the TOOL
-  family and names them in this unit's build brief. Charter §2 bars a fan-out child from minting, so
-  without them the pass files nothing and AC3 stays red.
-- **hands-off** external — the close: the pooled `--calibrate` over the count-only rows and over
-  gate shard 8, and the attributed verdict, where an arm §4 calls a pool-contention race may red at
-  L and not at R. The close re-runs that arm's slice alone before it reads the red as new.
+- **hands-off** external — the close: `--pooled --calibrate`, which re-reads the five receiving
+  shards, shard 8 and every count-only row with no per-row bound; the eight-shard identity, that the
+  executed counts of `--shard 1/8` through `--shard 8/8` sum to the unsharded count; and the
+  attributed verdict over every suite this unit edits.
 
 ## 4. Design
 
 ### Evidence
 
-Every reading below is PINNED: measured on node `a` on 2026-10-06, each slice run once on a
-`git clone --local` frozen at the named sha under a short `%TEMP%` root, with `TMPDIR` pointing
-there. No suite was run whole. The sweep's own logs are the frozen clone's
-`.git/gate-logs/selftests/*.out` at `90a6f6fae`; the FAIL lines quoted come from there and from the
-slices.
+Every reading in this subsection is PINNED, measured on node `a` on 2026-10-06 for rev-1, each
+slice run once on a `git clone --local` frozen at the named sha under a short `%TEMP%` root with
+`TMPDIR` pointing there. The sweep's logs are the frozen clone's `.git/gate-logs/selftests/*.out`
+at `90a6f6fae`.
 
-The slices were built by one recipe: a suite's prologue, then the named blocks, with the shard gate
-lines (`if in_shard N; then` and the region-closing `fi`) left out and a trailer appended that
-prints the executed count and exits with the suite's status. Each slice sits inside its clone's kit
-directory, because every prologue resolves the driver from its own directory. The block bounds are
-anchor texts, so the recipe survives line moves:
+The slices are built by one recipe: a suite's prologue, then the named blocks, with the shard gate
+lines left out and a trailer appended that prints the executed count and exits with the suite's
+status, written inside the clone's kit directory. Block bounds are anchor texts:
 
 | Slice | Suite | Blocks after the prologue |
 |---|---|---|
 | `cr` | driver | `crbc='--override build-complete` through the line before `# ---- TOOL-cBriefedPilot-4: --preflight REFUSES` |
 | `sa` | driver | the line `bcsetup; bcrestore`, then the block headed `TOOL-aGradedMandate-1` through `git checkout -qf unit; BCP=$_sa_bcp0; bcreset` |
-| `s4pw` | driver | `# Rule 1 - a function that writes the phase must also stage` through the S4 rule 1 FAIL line, then the `writers=` line and the one after it |
+| `s4pw` | driver | `# Rule 1 - a function that writes the phase must also stage` through the S4 rule 1 FAIL line, then the phase-writer population block through the line before `# ===... rotation: the fifth phase writer` |
 | `gh1` | driver | the block headed `TOOL-aGraftedHelix-1 — THE RUN CLAIM ON THE REMOTE`, to its closing `fi` |
 | `trgh1` | driver | the `scope()` line, the arm from `echo "MARK ac1-refused" >&2` through its two restoring `set-url` lines, then `gh1`'s block |
 | `pl` | driver | `slice_fn()`, the block headed `TOOL-dDerivedDocket-28: the run-owned process ledger` to its region `fi`, then the region block from `# ---- AC6:` through the line before `TOOL-dDerivedDocket-27` |
-| `cc` | cross-component | lines 1 through arm 3b's two `same` lines |
+| `cc` | cross-component | lines 1 through arm 3b's assertions |
 | `s1` | gate | `# ---- EVERY DISPATCHED VERB IS DOCUMENTED` through the dispatched-verb FAIL line |
 | `c39` | gate | the block headed `TOOL-dDerivedDocket-4: the phase-read routing` through the control's `a phase reader holds no read` line |
-| `g0` | gate | `reset_tree`, then `ma_root=$(mktemp -d)` through the AC5 hit naming `ruling D12-j` |
+| `g0` | gate | the G0 block, `reset_tree` and `ma_root=$(mktemp -d)` through the AC5 hit naming `ruling D12-j` |
 | `rt` | resume-tick | the AC4 block to the line before `# ---- U12`, then the AC13 HUNG block to the line before the AC13 IMAGE block |
 
-### The dispositions
+rev-1's attribution, kept as the evidence each fix answers. No arm was already fixed at HEAD:
 
-No arm is already fixed at HEAD: every red the sweep printed reds, or races, identically at `b5d40c61`
-and at `290d0d2d`. The brief's guess that shard 8's G0 failure follows from its fixture no-op is
-wrong: `g0` carries no check-39 block and reds alone.
-
-| Red (suite · arm) | Disposition | Evidence |
+| Red (suite · arm) | Cause | Evidence |
 |---|---|---|
-| driver · closing-review arm 5, `base: abc`, `missing: closing-review-recorded` | inherited, `a52f744e` | `cr` reds at both trees, 38 assertions each, with the same `check 104` refusal: the arm passes `--override build-complete` to a close that LANDING_NODES hands off, which is refused before the DoD prints |
-| driver · `S4 rule 1 does NOT fire` | inherited, `a52f744e` | `s4pw` reds at both. `verb_close` carries two `stage_or_fail` calls since the hand-off branch, so stripping the one after the LANDING write leaves the other and the rule stays silent |
-| driver · `the driver has 8 phase writer(s)` | inherited, `e63806aa` | `s4pw` reds at both. `--settle`'s LANDED write is the eighth `set_fact "$rel" phase`, and the arm pins 7 |
-| driver · conf-dies arm, `could not be evaluated to the end` and `specs-audited — not gradable` | inherited, `a52f744e` | `sa` reds at both, 91 assertions each. The landing-node read of the dying conf hands off at the advertised tip before either sentence prints |
-| driver · GH-1 `AC3 an unanswering remote exits 2` and its check-109 sentence | OURS, unit 1's arm | `gh1` alone is green, 150 assertions. `trgh1` reds with exactly the sweep's two lines, 152 assertions, `GOT: gA other live - unknown`. The refused-endpoint arm restores with `git remote set-url --push origin "$ORIGIN"`, which leaves a push URL set; `resolve_claim_remote` reads `get-url --push`, so AC3's fetch-URL staging never reaches the reader. S1 fixes it |
-| driver · ledger AC6, its no-write check and its second hold; ledger AC12's KEPT line and its ledger check | pool contention, code inherited from `1acce23d` | `pl` is green alone at both trees, 79 assertions each, 256 s and 263 s. The same slice with this build's blocks between the fixture and AC6 is green, 636 assertions, 1757 s; three calls to `write_aged_commit`, a helper defined outside that slice, failed there as unknown commands. `run_bounded`, `write_proc_record` and `derive_proc_state` are byte-identical at both trees, and so are the arms |
-| cross-component · `arm 3b: the leg is silent` | inherited, `d99cd032` | `cc` reds at both, 15 assertions each: check 23 prints its `check 23 fleet` line on every run that grades a pass, and `remove_announcements` does not strip it |
-| gate shard 1/8 · dispatched verb absent, `--highs` and `--minors` | inherited, `131537ae` | `s1` reds at both, 34 assertions each: `_denied` lacks the two `--review` arguments that commit added |
-| gate shard 8/8 · `fixture no-op` on check 39's arm two | inherited, `9dbc09be` | `c39` reds at both, 11 assertions each. That commit rewrote the `verb_preflight` line the sed anchors on |
-| gate shard 8/8 · the G0 fixture and three `may:`-grant arms | inherited, `d6d51fa0` | `g0` reds at both with the same five FAIL lines, 9 assertions. That landing merge respelled the greps to `bin/lander-granted.sh` and left the three seds writing `tools/` |
-| gate shard 8/8 · killed at its 6260 s bound | inherited cost growth | the region grew from 57 leg-run sites at its 2026-09-24 pooled reading (`b7377232`) to 174 at `290d0d2d` and 179 here. A sed-site count, re-derivable over the region's lines. The no-op costs nothing: `c39` took 203 s stale and 202 s with the anchor respelled, green. A fixed fixture cannot bring the shard inside its bound |
-| resume-tick · `AC4 the sleep is gone from tasklist`, `AC13 the hung launched pid is gone from tasklist` | pool contention, arms inherited from `1df36af3` and `9808fe1d` | `rt` is green alone at both trees, 6 passed each. The suite from its prologue through AC13, in order, is green, 70 passed. Three `rt` runs at each tree under twelve fork loops are green |
+| driver · closing-review arm 5, `missing: closing-review-recorded` | inherited, `a52f744e` | `cr` reds at both trees with the same check 104 refusal: an unresolvable base reads `handoff`, and the arm passes `--override build-complete` |
+| driver · `S4 rule 1 does NOT fire` | inherited, `a52f744e` | `s4pw` reds at both: `verb_close` carries two `stage_or_fail` calls since the hand-off branch, and the fixture strips one |
+| driver · `the driver has 8 phase writer(s)` | inherited, `e63806aa` | `s4pw` reds at both: `--settle`'s LANDED write is the eighth writer and the arm pins 7 |
+| driver · conf-dies arm, two sentences missing | inherited, `a52f744e` | `sa` reds at both: the dying conf at the tip reads `handoff`, and `$bcov`'s override is refused at check 104 before the DoD prints |
+| driver · GH-1 AC3 and its check-109 sentence | OURS, unit 1's arm | `gh1` alone is green, 150 assertions; `trgh1` reds with the sweep's two lines, 152 assertions: the refused-endpoint arm restores with `git remote set-url --push origin "$ORIGIN"`, and `resolve_claim_remote` reads `get-url --push` |
+| driver · ledger AC6 and AC12 | pool race, code from `1acce23d` | `pl` is green alone at both trees, 79 assertions; the mechanism is below |
+| cross-component · `arm 3b: the leg is silent` | inherited, `d99cd032` | `cc` reds at both, 15 assertions: check 23 prints its fleet line on every run that grades a pass |
+| gate shard 1/8 · dispatched verb absent, `--highs`, `--minors` | inherited, `131537ae` | `s1` reds at both, 34 assertions: the denylist lacks the two `--review` arguments |
+| gate shard 8/8 · `fixture no-op` on check 39's arm two | inherited, `9dbc09be` | `c39` reds at both, 11 assertions: that commit rewrote the `verb_preflight` line the sed anchors on |
+| gate shard 8/8 · the G0 fixture and three `may:`-grant arms | inherited, `d6d51fa0` | `g0` reds at both, five FAIL lines: the merge respelled the greps to `bin/lander-granted.sh` and left three seds writing `tools/` |
+| gate shard 8/8 · killed at its 6260 s bound | inherited cost growth | below |
+| resume-tick · AC4 and AC13 tasklist arms | pool race, arms from `1df36af3` and `9808fe1d` | `rt` is green alone at both trees and in order; below |
 
-### The contention mechanisms
+### The ledger race (S5)
 
-The ledger's is MEASURED. A fresh `sleep 30 &` has its start token, field 22 of its procfs stat
-line, read at once by the suite's own `read_pl_token` and again 0.5 s later. Idle, 0 of 30 trials
-moved. Under twelve fork loops, 3 of 30 moved, by 75 to 130 ticks. The token read before the exec
-is the forked shell's. The ledger arms read it at that moment, and so does the driver: `run_bounded`
-calls `write_proc_record` on `$!` as soon as `&` returns, and the job it forks execs `bash`. Under
-load `derive_proc_state` then reads the arm's live sleep as `reused`, and the sweep printed exactly
-that: `NOT reaped 9193 — exited, pid reused`. The driver's own bar takes the same code path, so the
-same misread can reach it; that half is inferred from the code and was not observed on a real bar.
-So this is a race in origin/main's recorder, and the arms surface it.
+MEASURED for rev-1: a fresh `sleep 30 &` read by the suite's own `read_pl_token` at once and again
+0.5 s later moved 0 of 30 tokens idle and 3 of 30 under twelve fork loops, by 75 to 130 ticks. On
+this platform an exec replaces the Windows process behind a pid, and the procfs start token moves
+with it, so a token read between the fork and the exec is the forked shell's. The ledger arms read
+at that moment; so does `run_bounded`, which calls `write_proc_record` on `$!` as soon as `&`
+returns, and the job it forks execs `bash`. Under load `derive_proc_state` then reads a live
+recorded process as `reused`. The driver's own bar takes that path, so `--hold`'s live-process
+refusal and `--abort`'s KEPT ledger can misread the driver's own work in flight.
 
-The resume-tick one is UNVERIFIED. The arms read `tasklist` the moment the tick's
-`taskkill //PID … //T //F` returns, and termination may still be in flight under load. Fork load did
-not reproduce it, so the disposition rests on elimination: green alone, green in order, and the arms
-and the kill path are identical at origin/main.
+The fix waits on the OBSERVED condition, never a fixed sleep. The wrapper, which is already a real
+parent through `; exit $?`, first runs `: >"$RB_UP"` and unsets the variable before running the
+command; only the post-exec image runs that line, so the marker's existence proves the exec. The
+wait is bounded and ends early when `kill -0` says the wrapper has gone, so a wrapper that cannot
+write its marker costs at most the bound and records exactly what it records today. The bound is a
+literal inside `run_bounded`, because the suite's two extraction arms source that function alone
+under `set -u`. The arms get the same discipline through `read_pl_exec_token`, which waits on the
+process image rather than on a marker, since `sleep` writes nothing.
 
-### The fix (S1)
+### The resume-tick race (S6)
+
+UNVERIFIED as a mechanism: `taskkill //F` returns while the process may still be terminating, and
+the arms read `tasklist` at once. Fork load did not reproduce the red. The fix asserts the property
+the arms name, that the pid becomes unlisted, within a bound: a tick that never kills still reds,
+after the bound, so the arm keeps discriminating.
+
+### The re-cut (S7)
+
+Region 8 grew from 86 leg invocations at the 2026-09-24 pooled reading (`b7377232`) to 326 at the
+2026-09-29 serial reading (`8331469c`) and 477 at `b5d40c61`, against 44 to 101 in each other
+region. A leg invocation is one call of `run`, `run_skip_leg`, `lmrun`, `run_ak_leg`, `ma_leg` or
+`run_lg_leg`, or one direct `bash "$SCRIPT"` or `check-unattended.sh ` call, on a line that is not a
+comment or a function header. The count is re-derivable with that predicate over each region's
+lines, and pooled cost per region tracks it: the 2026-09-24 readings run 31 to 57 s per invocation.
+
+The cut, at top-level seams whose sections build their own state. The six moved sections and the
+three that stay each open with the normalization line. Per-region invocation counts after the cut,
+from 70 · 92 · 64 · 101 · 52 · 55 · 44 · 477:
+
+| Section (opening anchor) | Invocations | Region |
+|---|---|---|
+| `# ---- 28c. The WRAPPER's own pin first` through the brief arms' last `wrote $BRIEF` hit | 87 | 8, unchanged, no normalization |
+| `# ---- EACH RUN AGAINST ITS OWN BUDGET` through the `--emit-ceiling` arms | 44 | 3 |
+| `# ============== TOOL-dDerivedDocket-4: the phase-read routing` | 17 | 8 |
+| `# ---- TOOL-dDerivedDocket-3 — checks 44 and 45` | 21 | 1 |
+| `# ==== TOOL-dDerivedDocket-52: resolve_introducing_commit` | 7 | 8 |
+| `# ---- TOOL-dDerivedDocket-18: THE ASK-MANDATE SECOND OPINIONS` through `rm -rf "$ak_root"` | 70 | 5 |
+| `# ==== TOOL-dDerivedDocket-54: check_touching_commit_reachable` | 3 | 8 |
+| `# ==== TOOL-dDerivedDocket-19: THE GRANT, SECOND-OPINIONED` through `rm -rf "$ma_root"` | 82 | 6 |
+| `# ================== TOOL-dDerivedDocket-22 — the derived terminal` | 32 | 1 |
+| `# ==== TOOL-dDerivedDocket-30: the conf hoist` to the end of region 8 | 86 | 7 |
+
+After: 123 · 92 · 108 · 101 · 122 · 137 · 130 · 114, so the largest region is 1.15 times the mean,
+where it was 4.0. The seams were chosen from a call map and a variable scan: `BRIEF` is set in the
+first section and read up to its last hit, the `ak` repository is built in the ask-mandate section
+and used by the freeze arms that end it, and the `ma_` helpers and `ma_root` span the grant section
+through the rounds arms, so each of those pairs stays in one section. `run_skip_leg` is defined in
+region 8's first section and called from the conf-hoist section, which is why the hoist is owed.
+
+A moved section runs after its new region's code in a shard run and at its old place in the
+unsharded run. The normalization line makes both predecessors irrelevant to the git fixture:
+`anchor_restore` resets the fixture tree, `main`, `unit`, every leaked ref and the bare origin's
+`main` to the prologue's `ANCHOR0` and `PRISTINE`. So the slice that grades a section is the
+prologue, that line and the section, and it reproduces both modes' state for the fixture. What it
+does not reproduce is shell state a region leaves behind; the variable scan found none crossing a
+seam, and the close's shard runs are the proof.
+
+Floors: each region's floor moves by the executed count its slice measures; FLOOR_SHARD_8 drops by
+the six moved counts and each receiving floor rises by its counts, and the unsharded floor does not
+move for the cut. Budgets: shard 8's row stays, because the region it measured was larger than what
+remains; each receiving row becomes its recorded reading plus its sections' slice seconds, less the
+prologue's measured seconds per slice, times 1.5, with that sum written beside it.
+
+### The fixes, as code
+
+S1, in the GH-1 block:
 
 ```bash
 gh_pu=$(git config --get remote.origin.pushurl || true)
@@ -140,141 +221,155 @@ git remote set-url origin "$ORIGIN"
 if [ -n "$gh_pu" ]; then git remote set-url --push origin "$gh_pu"; else git config --unset remote.origin.pushurl; fi
 ```
 
-The assertions under it are unchanged. The block's own exit line, which sets the fetch URL back to
-`$ORIGIN`, stays as it is.
+S5, in `run_bounded`:
 
-### The asks (S2)
-
-`<A1>` to `<A6>` stand for the ids the build brief names; `<date>` is the pass's date. Each row
-is followed in the Dispositions section by `- SEV · <id> · <severity> · <why>` and by
-`- KEEP · <id> · filed by an unattended run for the owning build; outside this build's goal`.
-
-| Ask | SEV | why | Covers |
-|---|---|---|---|
-| `<A1>` | MED | a held self-test suite reds on three stale fixtures; no product defect | the driver's inherited rows |
-| `<A2>` | HIGH | under load the driver can read its own live process as exited, then hold or abort over it | the ledger arms |
-| `<A3>` | MED | a held self-test suite reds on a stale denylist; no product defect | gate shard 1/8 |
-| `<A4>` | MED | a held self-test suite reds on two stale fixtures; no product defect | gate shard 8/8's arms |
-| `<A5>` | MED | a held self-test suite reds on a stale silence assertion; no product defect | cross-component |
-| `<A6>` | LOW | an arm asserts a forced kill finished the moment it was issued; the tick's behaviour is unaffected | resume-tick |
-
-```text
-- <A1> · filed <date> · inherited red: leg unattended driver selftest red at 290d0d2d, three stale arms: the phase-writer population pins 7 where --settle made the driver's writers 8 (e63806aa); S4 rule 1's red fixture strips one of verb_close's two stage calls (a52f744e); closing-review arm 5 and the conf-dies spec-audit arm pass an override to a close LANDING_NODES hands off, refused at check 104 before the DoD prints (a52f744e) · seen `tools/unattended/unattended.test.sh`@290d0d2d run `bash tools/unattended/unattended.test.sh` · accept the four arms are green at the default branch's tip
-- <A2> · filed <date> · inherited red under load: leg unattended driver selftest at 290d0d2d, the ledger arms AC6 and AC12 red in an eight-wide pool and are green alone; run_bounded's recorder reads a process's start token the moment its job is forked, before the exec moves it, so derive_proc_state can read the driver's own live bar as exited, pid reused, and --hold and --abort then proceed over work in flight (1acce23d) · seen `tools/unattended/unattended.sh`@290d0d2d run `bash tools/unattended/unattended.test.sh` · accept a recorded process keeps the token its ledger line carries across its own exec under load, and the ledger arms are green in an eight-wide pool
-- <A3> · filed <date> · inherited red: leg unattended gate selftest shard 1/8 red at 290d0d2d, the verb-surface arm counts --highs and --minors, arguments of --review, as verbs because its flag denylist lacks them (131537ae) · seen `tools/unattended/check-unattended.test.sh`@290d0d2d run `bash tools/unattended/check-unattended.test.sh --shard 1/8` · accept the verb-surface arm is green at the default branch's tip
-- <A4> · filed <date> · inherited red: leg unattended gate selftest shard 8/8 red at 290d0d2d, two stale fixtures: check 39's arm two seds a verb_preflight line 9dbc09be rewrote, so it edits nothing; the G0 fixture writes its may: grant as tools/lander-granted.sh while its greps read bin/lander-granted.sh (d6d51fa0), so G0 and the three grant arms red · seen `tools/unattended/check-unattended.test.sh`@290d0d2d run `bash tools/unattended/check-unattended.test.sh --shard 8/8` · accept check 39's arm two and the G0 arms are green at the default branch's tip
-- <A5> · filed <date> · inherited red: leg unattended cross-component red at 290d0d2d, arm 3b asserts the leg silent while check 23 prints its fleet line on every run that grades a pass (d99cd032), and remove_announcements does not strip it · seen `tools/unattended/cross-component.test.sh`@290d0d2d run `bash tools/unattended/cross-component.test.sh` · accept arm 3b is green at the default branch's tip
-- <A6> · filed <date> · inherited red under load: leg unattended resume-tick selftest at 290d0d2d, AC4 and AC13 read tasklist the moment the tick's forced taskkill returns, and red in an eight-wide pool while green alone and in order (1df36af3, 9808fe1d) · seen `tools/unattended/resume-tick.test.sh`@290d0d2d run `bash tools/unattended/resume-tick.test.sh` · accept AC4 and AC13 are green in an eight-wide pool
+```bash
+RB_UP="$_d/up" "${BASH:-bash}" -c ': >"$RB_UP"; unset RB_UP; "$@"; exit $?' "$ROOT" ... &
+_p=$!; _i=0
+while [ ! -e "$_d/up" ] && [ "$_i" -lt 100 ] && kill -0 "$_p" 2>/dev/null; do sleep 0.05; _i=$((_i + 1)); done
+write_proc_record "$_p" "$@"
 ```
 
-A concurrent build on another branch, aMendedFleet, specs the G0 half of `<A4>` as its unit 101.
-Its census predates every other introducer named here. The ask paraphrases that unit rather than
-citing its id, because the id resolves nowhere in this tree.
+### Left-shift, by class
+
+- **A fixture greps a line a later commit rewrites.** Three of the eight inherited reds are this
+  class: S4 rule 1's strip, check 39's arm two and the G0 seds. Each fix anchors on a STABLE TOKEN —
+  a function's own header, a call token inside a function range, one variable holding a path —
+  rather than on a whole line, so the next rewrite of the surrounding line does not strand it, and
+  the `mutate` helper's no-op FAIL still catches an anchor that matches nothing.
+- **A fixture reads a value at a moment the platform has not settled.** Both races are this class:
+  each read now waits, bounded, on the condition it depends on.
+- **A region outgrows its siblings.** The cut is re-derivable with the invocation predicate above,
+  and the floors and budgets move with it.
 
 ### Inventory
 
-Nothing is minted: no function, file of code, leg, conf key or naming cell. The backlog file is a
-record, and the six ask ids are the main loop's.
+Two suite helpers, `read_pl_exec_token` and `read_task_gone`, each a `read_` verb. No product
+function, file, leg, conf key or naming cell is minted.
 
 ### Rollout
 
-Edit the arm, file the asks, bump the kit, re-adopt the rendered guides and the Skill, and
-re-render the generated views with `python tools/memory-tree/gen_build_index.py --write`. One commit.
+The rev-2 spec commit first. Then one build commit: the arms, the driver's `run_bounded`, the re-cut,
+the floors and budgets, the kit bump and the re-adopted renders, the status flip. The acceptance
+ledger follows in a records commit.
 
 ### Files touched (estimate)
 
-- `tools/unattended/unattended.test.sh`, the GH-1 AC3 arm
-- `tools/unattended/unattended.sh`, the version line only
+- `tools/unattended/unattended.test.sh`, the GH-1 arm, S2's four fixtures, the ledger arms, floors
+- `tools/unattended/unattended.sh`, `run_bounded` and the version line
+- `tools/unattended/check-unattended.test.sh`, S3, the re-cut, the hoist, floors
+- `tools/unattended/cross-component.test.sh`, arm 3b and its filter
+- `tools/unattended/resume-tick.test.sh`, AC4 and AC13
+- `tools/run-gates/selftest-budgets.txt`, the five receiving shard rows and shard 8's note
 - `tools/unattended/`, every other version carrier
 - `memory/guides/`, the rendered unattended guides, re-adopted
 - `.claude/skills/unattended/SKILL.md`, re-adopted
-- `memory/builds/aGraftedHelix/`, its new backlog file
-- `memory/backlog/TOOL.md` and `memory/LIVE.md`, by the index generator
 
 ### Alternatives rejected
 
 Each with the test that rejected it, per BUILD-METHOD M12.
 
-- **Fixing the leftover at its source**, so the refused-endpoint arms unset the push URL rather
-  than setting it to `$ORIGIN`. Those arms are origin/main's, which §3's first non-goal keeps out,
-  and the GH-1 arm would still depend on whatever a later arm leaves. `trgh1` against `gh1` is the
-  test: the arm's verdict moved with an earlier arm's leftover.
-- **Staging the push URL alone.** Under the staged break where the reader fetches the fetch URL,
-  that arm reds for a reason its name does not state, so it would pin a second property. Staging
-  both keeps it on its subject, an unanswering remote.
-- **Moving the reader to the fetch URL.** It changes product behaviour to suit a fixture, against
-  the shared brief's I1.
-- **One ask per arm, or one per suite.** Per arm would ask the main loop for fifteen ids for six
-  causes. Per suite would join the driver's stale fixtures with its product race, whose severities
-  differ.
+- **Fixing the leftover push URL at its source**, so the refused-endpoint arms unset it rather than
+  set it to `$ORIGIN`. Five later arms stage only the fetch URL and pass today with the leftover in
+  place; unsetting it changes what each of them observes, and no slice can show that without running
+  them all. The GH-1 arm staging both URLs is independent of any earlier arm, which `trgh1` against
+  `gh1` tests.
+- **Staging the push URL alone.** Under the staged break where the reader fetches the fetch URL, that
+  arm reds for a reason its name does not state.
+- **Moving the reader to the fetch URL.** It changes product behaviour to suit a fixture, against I1.
+- **Restoring the closing-review and conf-dies arms' overrides by making the fixture a lander
+  node.** It moves the arms off their subject, a refused review join and a not-gradable grader, onto
+  the landing-node machinery, and the hand-off refusal they now meet is the product being right.
+- **Re-declaring shard 8's budget alone.** It accepts a shard four times its siblings, so every
+  pooled sweep's wall clock stays floored at shard 8; no reading of the grown region exists to
+  declare from, since the sweep killed it, so the figure would be a guess.
+- **Raising the arity.** The owner ruled eight.
+- **A fixed sleep before the token read, in the driver or the arms.** It is the shape the mandate
+  forbids, and it is wrong both ways: too short under load, a tax on every bounded call when idle.
 
 ## 5. Production-readiness checklist
 
-- security — N/A: a test fixture and records; no write path, no new surface.
-- perf / scale — two git config calls added to one arm; nothing else runs.
-- error / empty / loading states — a slice whose fixture fails prints its FAIL and exits non-zero,
-  as the suite does. An origin/main slice printing none of its quoted lines stops the pass before
-  any ask is filed (AC4).
-- observability — every ask carries a runnable `seen` and an `accept`, so each inherited red is
-  reproducible from the record alone.
-- risks — the contention arms may red again in the close's pooled run, and under the attributed
-  verdict a race red at L and green at R reads as NEW; the hand-off in §3 covers it. The ledger
-  mechanism is measured on node `a` only, and the resume-tick one is UNVERIFIED.
-- testing — AC1 and AC2 observe the fix red then green; AC4 and AC5 re-observe the classification.
-- migration — none.
-- user docs — N/A: suites and records internal to the kit.
+- security — N/A for S1 to S4, S6 and S7: fixtures and records. S5 adds one environment variable to
+  the wrapper's own environment and unsets it before the command runs, so the command's environment
+  is unchanged.
+- perf / scale — S5 costs at most one poll per bounded call when idle, since the marker is usually
+  there on the first test, and at most 100 polls of 0.05 s when it never appears. S7 brings the
+  largest region from 477 invocations to 137.
+- error / empty / loading states — a wrapper that cannot write its marker records what it records
+  today, after the bound; a `read_pl_exec_token` that never sees the exec returns `-` and the arm's
+  own assertion names it; `read_task_gone` reports the pid listed after its bound.
+- observability — every moved section keeps its own assertions and messages; the floors print per
+  shard on every run.
+- risks — a moved section could depend on shell state its new region leaves behind, which only the
+  close's shard runs can show; the normalization line removes the git-state half of that risk.
+- testing — §6.
+- migration — none. Reverting the cut is relabelling the seams.
+- user docs — N/A: suites, records and one internal helper.
 
 ## 6. Acceptance criteria
 
-Every criterion runs on a `git clone --local` frozen at the named sha under a short `%TEMP%` root,
-with each slice built by §4's recipe inside the clone's kit directory and deleted after. A staged
-break is made in the clone's own copy and nowhere else.
+Every criterion runs on a `git clone --local` under a short `%TEMP%` root, at the pass's tree unless
+it names another, with each slice built by §4's recipe inside the clone's kit directory and deleted
+after. A staged break is made in the clone's own copy and nowhere else.
 
-- **AC1** — When the `trgh1` slice runs on a clone at the pass's commit, it prints no `FAIL` line and
-  its trailer reads `(152 assertions executed)`.
+- **AC1** — When the `trgh1` slice runs, it prints no `FAIL` line and `(152 assertions executed)`.
   Red when: the arm stages its remote on the fetch URL alone while a push URL is set, as at
-  `b5d40c61`, where the same slice printed `FAIL AC3 an unanswering remote exits 2: expected [2], got [0]`
-  beside the missing check-109 sentence. Staged twice in the clone: the S1 edit reverted, and,
-  separately, the case arm of `read_claims` that sets `CL_WHY` on a failed fetch emptied in the
-  clone's driver, so a failed fetch reads as a read. Each prints the AC3 FAIL line.
+  `b5d40c61`; staged twice, the S1 edit reverted and, separately, the case arm of `read_claims` that
+  sets `CL_WHY` on a failed fetch emptied, each printing
+  `FAIL AC3 an unanswering remote exits 2: expected [2], got [0]`.
   cost: about seven minutes on node `a`.
   figure: 152 is PINNED, measured at `b5d40c61`; S1 adds no assertion.
-- **AC2** — When the `gh1` slice runs on a clone at the pass's commit, with the line
-  `git config --get remote.origin.pushurl || echo NONE` appended before its trailer, it prints no
-  `FAIL` line, `(150 assertions executed)`, and `NONE`.
-  Red when: the arm's restore leaves a push URL set in a tree that had none, which every later arm
-  reading the push remote inherits. Staged: the restore written as
-  `git remote set-url --push origin "$ORIGIN"`, which prints the origin path in place of `NONE`.
+- **AC2** — When the `gh1` slice runs with `git config --get remote.origin.pushurl || echo NONE`
+  appended before its trailer, it prints no `FAIL` line, `(150 assertions executed)`, and `NONE`.
+  Red when: the restore is written `git remote set-url --push origin "$ORIGIN"`, which prints the
+  origin path in place of `NONE`.
   cost: about eight minutes on node `a`.
-  figure: 150 is PINNED, measured at `b5d40c61`.
-- **AC3** — When `python tools/memory-tree/gen_build_index.py --asks --build aGraftedHelix --all` runs
-  at the pass's commit, it lists the six asks the build brief names, each OPEN with a `seen` clause
-  at `290d0d2d` and an `accept` clause, and the build's backlog file carries one SEV row at §4's
-  severity and one KEEP row for each.
-  Red when: a cause §4 groups is left with no filed record, so the attributed Definition of Done the
-  kit README states cannot name one for that suite. Staged: in a clone at the pass's commit, one
-  ask's three rows taken out, which lists five.
-  figure: six is PINNED, the cause groups of §4's ask table.
-- **AC4** — When the slices `cr`, `sa`, `s4pw`, `cc`, `s1`, `c39` and `g0` run on a clone at
-  `290d0d2d`, each prints the FAIL lines §4's disposition table quotes for it, and none prints a
-  FAIL line the table does not name.
-  Red when: a slice prints none of its quoted lines at `290d0d2d`, so that arm is not inherited and
-  this spec misclassified it; the pass stops there, before any ask is filed, and the spec is amended.
-  cost: about nine minutes on node `a` with the seven run concurrently.
-- **AC5** — When the `pl` and `rt` slices run alone on a clone at the pass's commit, neither prints
-  a `FAIL` line; and when the start-token probe, the suite's own `read_pl_token` read on a fresh
-  `sleep 30 &` at once and again 0.5 s later, runs 30 trials idle and 30 under twelve fork loops, the
-  idle trials move no token and the loaded ones move at least one.
-  Red when: a slice reds alone, which makes that arm a defect rather than a race and moves it to S1's
-  kind; or the loaded probe moves no token, which leaves `<A2>`'s mechanism unproved and its text
-  false, so the ask is not filed as written.
-  cost: about five minutes on node `a`.
-  figure: 0 of 30 idle and 3 of 30 loaded are PINNED, node `a` 2026-10-06. The loaded count is a
-  sample, and any count above zero passes.
-- **AC6** — When `python tools/govkit/govkit.py epoch --base <the pass's parent sha>` runs at the
-  pass's commit, it names no unattended carrier, and `bash tools/check-kit-versions.sh` exits 0.
-  `KIT_UNATTENDED_VERSION` in `tools/unattended/unattended.sh` reads one minor step above its value at
-  the pass's parent.
+- **AC3** — When the `cr`, `sa` and `s4pw` slices run, none prints a `FAIL` line, and each printed
+  one at the pass's parent.
+  Red when: staged one at a time, the closing-review checker's length guard in the clone's
+  `unattended.sh` widened to `-lt 0`, which `cr` reds on `records no usable pinned base`;
+  `AUTH_SPEC_AUDIT_DERIVED=1` set on fail 55's branch, the round-1 defect, which `sa` reds on; a
+  ninth `set_fact "$rel" phase` writer added, which `s4pw` reds on the population pin; the
+  `LANDING|LANDED` refusal arm of `run_settle` removed, which `s4pw` reds on the settle drive.
+- **AC4** — When the `s1`, `c39` and `g0` slices run, none prints a `FAIL` line and `c39` prints no
+  `fixture no-op`, and each printed its rev-1 FAIL lines at the pass's parent.
+  Red when: a `--frobnicate)` case arm is added to the clone driver's argv loop, which `s1` reds on
+  naming `--frobnicate`; check 39's direct-read predicate in the clone's `check-unattended.sh`
+  exempts `verb_preflight`, which `c39` reds on arm two's hit; `MA0_GRANT` is respelled in the G0
+  fixture's README seed alone, which `g0` reds on the fixture's own liveness assertion.
+- **AC5** — When the `cc` slice runs, it prints no `FAIL` line, and the cross-component suite's
+  arm 3b asserts a `check 23 fleet — 0 undeclared write(s)` line over a graded population above zero.
+  Red when: arm 3b's build commit also writes a file outside its declared lane, which the fleet line
+  counts and the arm reds on.
+- **AC6** — When the token probe runs 30 trials under twelve fork loops, `read_pl_token` read at once
+  after `sleep 30 &` and again 0.5 s later moves at least one token, and `read_pl_exec_token` read the
+  same way moves none; and when `run_bounded` extracted from the pass's `unattended.sh`, beside the
+  real `write_proc_record` and `read_proc_token`, records 30 `sleep 3` wrappers under the same load,
+  every recorded token equals the wrapper's token read 1 s later, while the parent's `run_bounded`
+  moves at least one. Then the `pl` slice prints no `FAIL` line.
+  Red when: the marker wait is removed from `run_bounded`, which is the parent's behaviour.
+  cost: about ten minutes on node `a`.
+  figure: the moved counts are a sample, PINNED only as "at least one" and "none".
+- **AC7** — When the `rt` slice runs, it prints no `FAIL` line; and when 30 trials of
+  `taskkill //PID <w> //T //F` on a fresh `sleep 300` under twelve fork loops each read `tasklist` at
+  once and through `read_task_gone`, `read_task_gone` reports every pid gone.
+  Red when: `run_kill_tree` is emptied in the slice's tick copy, which reds AC4 and AC13 after the
+  bound and not before it.
+- **AC8** — When the invocation predicate of §4 runs over the gate suite's regions, the
+  largest is at most 140 and at most 1.2 times the mean; each of the nine sections after a new seam,
+  sliced as the prologue, the normalization line and the section, prints no `FAIL` line, and its
+  executed count is the figure its floor moved by; `bash tools/unattended/check-arms-groups.sh`
+  prints no rule red it did not print at the parent; no `name() {` definition remains between the
+  first `in_shard` line and the floor line; and the sorted lines of the file differ from the parent's
+  sorted lines only by the seam and normalization lines and S3's own edits.
+  Red when: a section is cut from state it reads, which its slice reds on, as the `BRIEF` and `ak`
+  seams would.
+  cost: about twenty-five minutes on node `a` with the nine slices run four at a time.
+  figure: the counts and seconds are DERIVED at observation time.
+- **AC9** — When `python tools/govkit/govkit.py epoch --base 290d0d2d` runs at the pass's commit, it
+  names no unattended carrier; `bash tools/check-kit-versions.sh` exits 0; `KIT_UNATTENDED_VERSION`
+  in `tools/unattended/unattended.sh` reads one minor step above the parent's; and
+  `bash tools/unattended/adopt-unattended.sh --check` reports the renders in sync.
   Red when: the kit's shipped bytes moved without its version.
   figure: both versions are DERIVED from the pass's parent at observation time.
 
@@ -282,49 +377,62 @@ break is made in the clone's own copy and nowhere else.
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `unattended skill wiring` · `unattended protocol size` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `lexicon naming predicates`
 
-New arm: tools/unattended/unattended.test.sh · GH-1 AC3 now stages the push URL beside the fetch URL and restores what it found; stage the S1 edit reverted behind the refused-endpoint arm, and the fetch-failure case of read_claims emptied · none, no assertion is added
+New arm: tools/unattended/unattended.test.sh · GH-1 AC3 stages both URLs and restores what it found; staged by reverting S1 behind the refused-endpoint arm · none
+New arm: tools/unattended/unattended.test.sh · the settle drive against a finished record, and the population pin at eight; staged by removing run_settle's LANDING|LANDED refusal · FLOOR_SHARD_2 and FLOOR_ASSERTIONS by the arms' count
+New arm: tools/unattended/unattended.test.sh · closing-review arms 4 and 5 assert the length guard's sentence; staged by widening the guard · FLOOR_SHARD_1 and FLOOR_ASSERTIONS by two
+New arm: tools/unattended/unattended.test.sh · the ledger AC6 and AC12 token liveness; staged by an exec that never comes · FLOOR_SHARD_2 and FLOOR_ASSERTIONS by two
+New arm: tools/unattended/cross-component.test.sh · arm 3b's fleet line; staged by a write outside the declared lane · FLOOR_ASSERTIONS by two
+New arm: tools/unattended/check-unattended.test.sh · the six moved sections and two denylist entries; staged per AC4 and AC8 · every per-shard floor the cut moves
 
-The close runs the legs and the suites. A pass runs the slices of §6 and the commands of AC3 and
-AC6 as its check.
+The close runs the legs and the suites. A pass runs the slices and probes of §6 and the commands of
+AC8 and AC9 as its check.
 
 ## 8. Open questions
 
 - **F1 — Is a red that reds only in the eight-wide pool fixed here, adopted as its own unit, or
   filed?**
   Option A fixes both races in this unit: the recorder reads a process's token only after its exec,
-  and the resume-tick arms poll `tasklist` within a bound. Option B has the main loop adopt each as a
-  new unit now. Option C files each as an ask carrying its evidence, `<A2>` and `<A6>`, and leaves
-  adoption to the main loop.
-  A is the most feature-rich, and it violates §3's first non-goal, which the brief's rule 3 states:
-  neither race is this build's, since the code and the arms are byte-identical at origin/main. It is
-  also a second mechanism in a product function this build never touched, which BUILD-METHOD M2
-  makes a unit of its own. B is not a spec writer's act: an adoption is the main loop's, under
-  protocol §11, and it needs an ask or a finding to adopt from. C is that precondition.
-  RESOLVED (agent, 2026-10-06, delegated): C. Both races are filed with their evidence, `<A2>` at
-  HIGH because the recorder's misread can reach `--hold` and `--abort`; adoption stays open to the
-  main loop. Veto 1 removes A, and B is outside this unit's authority.
+  and the resume-tick arms wait for `tasklist` within a bound. Option B has the main loop adopt each
+  as a new unit. Option C files each as an ask carrying its evidence.
+  rev-1 took C on the brief's rule 3. The run's standing mandate, quoted in this pass's dispatch,
+  replaces that rule: every improvement found is integrated into the build and none is backlogged,
+  which removes C and makes B a detour through the same build.
+  RESOLVED (agent, 2026-10-06, delegated): A. Both races are fixed here, the recorder's in the
+  product because the driver's own bar takes the same path.
+- **F2 — Shard 8's cost growth: re-cut, or re-declare its budget?**
+  Option A re-cuts region 8 across the eight regions. Option B raises shard 8's budget row.
+  B has no measured figure to declare, since the sweep killed the shard, and it leaves every pooled
+  sweep floored at one shard four times its siblings. A is the remedy the shard's own budget row
+  already names, and its risk, a section reading state its new region does not leave, is reduced by
+  the normalization line and measured by each section's slice.
+  RESOLVED (agent, 2026-10-06, delegated): A, re-cut with every section sliced.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-06 · initial draft, adopted mid-run after the owed suites ran red on a frozen
   clone at `90a6f6fae`. Every red arm was sliced on frozen clones at `b5d40c61` and `290d0d2d`, and
   a start-token probe measured the ledger race on node `a`.
+- rev-2 · 2026-10-06 · §1 §2 §3 §4 §5 §6 §7 §8 §10 · S2 to S8 · AC3 to AC9 · the run's standing
+  mandate replaces filing with fixing: rev-1's six asks are withdrawn; every inherited fixture is
+  fixed, both pool races are closed, the ledger's in the driver, and region 8 is re-cut. rev-1's
+  attribution table stays as the evidence; F1 is re-resolved to A and F2 added.
 
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "attribute a red self-test arm to the branch or to
 origin/main by slicing the suite"` ranked name-stem neighbours, `armed`, `attribute_paths` and the
-`check-arms.py` branches among them. It printed `unscanned layers: .sh`, so it cannot see the five
-suites, which are all shell; no existing seam fits a classifier of held-suite reds, and the
-classification here is a record, not code. The seams this unit extends are the suites' own:
-their prologues and blocks, sliced rather than re-run, and the GH-1 arm itself. S2 reuses the ask
-grammar in `tools/memory-tree/backlog.py` and the inherited-red row shape `write_inherited_asks`
-in `tools/unattended/unattended.sh` writes at the close. That function files only bar legs from the
-close's own attribution file, so it cannot be called for a held self-test suite, and S2 writes its
-row shape by hand. The recall probe returned the asks other builds filed for held-suite reds,
-among them `TOOL-aHonedRuleset-16` (a stale sed target in the gate suite) and
-`TOOL-aSightedSkeptic-12` (an inherited red filed by ask), plus the brief itself; no record covers
-any red §4 names.
+`check-arms.py` branches among them. It printed `unscanned layers: .sh`, so it cannot see the four
+suites, which are all shell, and a "no seam fits" resting on it alone would be unfounded. The seams
+were found by reading the suites, and each fix extends one: the gate suite's `mutate` helper, whose
+no-op FAIL keeps an anchor that matches nothing loud; its `anchor_restore` and `reset_tree`, which
+the normalization line reuses; its hoist set, whose comment already states the rule S7 restores;
+the driver suite's `read_pl_token`, which `read_pl_exec_token` wraps; the resume-tick suite's
+`derive_winpid`, whose bounded poll `read_task_gone` follows; `run_bounded`'s own wrapper, which
+already keeps a real parent through `; exit $?`; and the budget rows' reading-times-1.5 rule in
+`tools/run-gates/selftest-budgets.txt`. The recall probe returned the asks other builds filed for
+held-suite reds, among them a stale sed target in the gate suite and an inherited red filed by ask,
+plus the brief itself; no record covers any red §4 names, and the earlier gate-suite re-cut's spec
+supplied the hoist and boundary-scan method S7 follows.
 
 Recall terms used: inherited red attribute selftest suite fixture no-op mutate stale fixture backlog origin/main slice arm
 
