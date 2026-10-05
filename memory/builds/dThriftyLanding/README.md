@@ -66,7 +66,7 @@ ids TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dT
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dThriftyLanding-1 — the runner skips a leg whose declared doc reads did not move](spec/2026-10-05-spec-TOOL-dThriftyLanding-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-05 |
+| [TOOL-dThriftyLanding-1 — the runner skips a leg whose declared doc reads did not move](spec/2026-10-05-spec-TOOL-dThriftyLanding-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-dThriftyLanding-2 — a full green earned in any worktree serves every worktree's push](spec/2026-10-05-spec-TOOL-dThriftyLanding-2.md) | 2 | 2 | OPEN | rev-1 | 2026-10-05 |
 | [TOOL-dThriftyLanding-3 — the push boundary recognises a doc-only push and scopes its bar to it](spec/2026-10-05-spec-TOOL-dThriftyLanding-3.md) | 3 | 2 | OPEN | rev-1 | 2026-10-05 |
 | [TOOL-dThriftyLanding-4 — the deployer carries a leg's doc reads to an adopter's manifest](spec/2026-10-05-spec-TOOL-dThriftyLanding-4.md) | 4 | 2 | OPEN | rev-1 | 2026-10-05 |
@@ -74,7 +74,7 @@ ids TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dT
 | [TOOL-dThriftyLanding-6 — the carriers state how a doc-only push is scoped](spec/2026-10-05-spec-TOOL-dThriftyLanding-6.md) | 6 | 1 | OPEN | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
 Ids no record names: TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6.
 

@@ -1,12 +1,14 @@
 # TOOL-dThriftyLanding-1 — the runner skips a leg whose declared doc reads did not move
 
-**Status:** OPEN · rev-1 · 2026-10-05 · node d · Tier-2 · base c3ef6742 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-10-05 · node d · Tier-2 · base c3ef6742 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-05-build-TOOL-dThriftyLanding-1-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-dThriftyLanding-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-05-prompt-TOOL-dThriftyLanding-1-0-run-mandate.md](../prompts/2026-10-05-prompt-TOOL-dThriftyLanding-1-0-run-mandate.md) | journal | — |
+| [2026-10-05-prompt-TOOL-dThriftyLanding-1-1-build-brief.md](../prompts/2026-10-05-prompt-TOOL-dThriftyLanding-1-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
