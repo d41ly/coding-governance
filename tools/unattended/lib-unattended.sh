@@ -24,8 +24,9 @@
 # the driver and the pass-order leg share; `read_host_name`, `read_pid_image` and `check_pid_alive`, the one reading
 # of "which node, which process" the lease writer and both pid probes share; `parse_gate_profile` and
 # `check_gate_wall`, the one reading of the gate runner's profile the driver and the leg both ask; the
-# anchored id tests; path containment; and "has this pass committed yet". The same rule admits the
-# resume tick as a third sourcer.
+# anchored id tests; path containment; the kit's own place in its repository, `derive_self_rel`, which
+# the generated-output resolver and the commit-time remedy both read; and "has this pass committed
+# yet". The same rule admits the resume tick as a third sourcer.
 
 # --------------------------------------------------------------------------------- git, once
 # Replace refs and graft advice are both OFF: a leg that reads history must see the history that is
@@ -526,6 +527,25 @@ resolve_shared_records() { # declared value · memory root -> the effective set
     printf '%s' "$1"
   fi
 }
+# WHERE THIS KIT SITS IN ITS REPOSITORY, by the logical walk and never by asking git
+# (TOOL-aGraftedHelix-27). In a linked worktree git exports an absolute GIT_DIR into its hooks, and
+# with no GIT_WORK_TREE beside it git takes the current directory for the work tree's top, so a
+# prefix asked of a kit directory came back empty inside `commit-msg` alone. The walk reads no
+# environment, and through a junction it keeps the ADOPTING repository where git answers the target:
+# memory/gotchas/inherited-git-dir-pins-the-work-tree-to-the-cwd.md. Carried inline, byte-identical,
+# because a copy-installed kit cannot source gov's lib dir; the resolve-python self-test grades it.
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
 # THE GENERATED OUTPUTS, DECLARED BY THE KITS THAT GENERATE THEM - TOOL-aWindowedPass-4. Every reader
 # of `GENERATED_INDEXES` (check 23, check 38, `--dispatch`'s condition 3, and the build-commit pick in
 # the pass-order and brief-recorded legs) calls this at conf load, as they call
@@ -549,8 +569,13 @@ resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memor
   local _rg_root=$1 _rg_decl=$2 _rg_mem=$3 _rg_here _rg_kitrel _rg_tool _rg_map _rg_d _rg_krel _rg_rows
   local _rg_out="" _rg_p _rg_g _rg_w _rg_kv _rg_seen=" "
   _rg_here=$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd) || _rg_here=""
-  _rg_kitrel=$(git -C "${_rg_here:-.}" rev-parse --show-prefix 2>/dev/null) || _rg_kitrel=""
-  _rg_kitrel=${_rg_kitrel%/}
+  # The walk above, not git: a hook's inherited GIT_DIR emptied git's answer (TOOL-aGraftedHelix-27).
+  # No .git above this library is the one state with no tool root to cut, so it is SAID, then read as
+  # the root install it would be; under `--check-commit` an unresolved output is refused anyway.
+  _rg_kitrel=$(derive_self_rel "${_rg_here:-.}") || {
+    _rg_kitrel=""
+    printf 'lib-unattended: resolve_generated_indexes found no .git at or above %s, so only the repository-root kits and the conf pairs were read\n' "${_rg_here:-.}" >&2
+  }
   case "$_rg_kitrel" in */*) _rg_tool=${_rg_kitrel%/*} ;; *) _rg_tool="" ;; esac
   # ABSENT takes the kit default; present and BLANK is kept, as `map_lib.load_conf` keeps it, and then
   # `{map_root}/` resolves to nothing rather than to an absolute `/` (closing review r2, L5).

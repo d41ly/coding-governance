@@ -14,7 +14,7 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["concurrent-runs-are-announced-not-refused.md"]
+gotcha-classes = ["concurrent-runs-are-announced-not-refused.md", "inherited-git-dir-pins-the-work-tree-to-the-cwd.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -33,6 +33,9 @@ Split out of `unattended` when that dossier reached its size cap, so every key i
 there but one: the invariant `concurrent-runs-are-announced-not-refused.md`, a preflight ruling that
 arrived with `unattended` two bytes under its cap (TOOL-aGraftedHelix-3). The split follows a real
 seam. That dossier is how a run proceeds; this one is what lets it start and what it was asked to do.
+The class `inherited-git-dir-pins-the-work-tree-to-the-cwd.md` is claimed here for the same
+reason (TOOL-aGraftedHelix-27): its instance is the library's kit-dir derivation, which the commit-time
+check reads under a linked worktree's hook, and that dossier was 2 bytes under its cap.
 
 ## Constraints & why
 

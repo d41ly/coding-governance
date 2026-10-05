@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-27 — the driver resolves generated indexes the same inside a git hook as outside one, so a pass commits the index its generator rewrote
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 4 · ratified 2026-10-05
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 4 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 

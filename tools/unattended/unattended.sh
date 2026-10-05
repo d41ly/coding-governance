@@ -48,7 +48,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.66   # gov:kit unattended@1.66 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.67   # gov:kit unattended@1.67 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -10232,9 +10232,11 @@ check_commit_message() { # commit message file
   # ...and NOT C-QUOTED: by default a non-ASCII path prints as `"docs/caf\303\251.md"`, which no
   # declaration covers and no printed repair can name (closing review r2, M4).
   st=$(git -c core.quotePath=false diff --cached --no-renames --name-only -z 2>/dev/null | tr '\0' '\n')
-  # Repo-relative from git itself: KIT_DIR is the shell's spelling and ROOT is git's, and on MSYS the
-  # two differ by drive form, so stripping one from the other leaves an absolute path in the command.
-  kd=$(git -C "$KIT_DIR" rev-parse --show-prefix 2>/dev/null); kd=${kd%/}; [ -n "$kd" ] || kd=$KIT_DIR
+  # Repo-relative by the library's logical walk: KIT_DIR is the shell's spelling and ROOT is git's, and
+  # on MSYS the two differ by drive form, so stripping one from the other leaves an absolute path in
+  # the command. Not git either: under this hook a linked worktree's GIT_DIR empties git's answer
+  # (TOOL-aGraftedHelix-27).
+  kd=$(derive_self_rel "$KIT_DIR") || kd=""; [ -n "$kd" ] || kd=$KIT_DIR
   for u in $trl; do
     decl=$(printf '%s\n' "$rows" | awk -v u="$u" '$2 == u { $1 = ""; $2 = ""; print }' | tr '\n' ' ')
     if [ -z "${decl// /}" ]; then

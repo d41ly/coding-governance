@@ -5938,6 +5938,99 @@ fi
 git reset -q --hard
 rm -f "$CCM"
 
+# ---- TOOL-aGraftedHelix-27: the generated outputs resolve the same INSIDE a git hook as outside one.
+# ---- In a linked worktree git exports an absolute GIT_DIR into `commit-msg`, and with no GIT_WORK_TREE
+# ---- beside it git takes the current directory for the work tree's top. The library asked git where
+# ---- its own kit sat, got an empty prefix, resolved no kit's [[generated]] row, and a pass that
+# ---- regenerated an index could not commit it. A REAL commit through a REAL hook, because only git
+# ---- sets the variable this is about; the fixture hook records whether it saw one.
+build_check_commit_fixture
+HK_KIT="${PFX}hkgen"
+mkdir -p "$HK_KIT"
+printf '[[generated]]\npath = "{memory_root}/HKGEN.md"\ngenerator = "gen.sh"\n' > "$HK_KIT/kit.toml"
+printf 'echo one\n' > "$HK_KIT/gen.sh"
+git add -A >/dev/null && git commit -q -m "fixture: a kit declaring one generated output" --no-verify
+run --dispatch tRun --pass ARCH-tRun-2 --writes "$HK_KIT/gen.sh" >/dev/null
+git add -A >/dev/null && git commit -q -m "records: declare ARCH-tRun-2" --no-verify
+HK_D=$(mktemp -d); HK_WT="$HK_D/w"
+mkdir -p "$HK_D/hooks"
+printf '#!/usr/bin/env bash\necho "${GIT_DIR:+set}" > %q\nbash %q --check-commit "$1"\n' "$HK_D/saw" "$SCRIPT" > "$HK_D/hooks/commit-msg"
+chmod +x "$HK_D/hooks/commit-msg"
+# the primary tree leaves the run's branch, so the linked worktree can hold it
+git checkout -q --detach
+git worktree add -q "$HK_WT" unit
+git config core.hooksPath "$HK_D/hooks"
+[ -n "$PFX" ] || echo "  (TOOL-aGraftedHelix-27 hook arm: a root install, where the kit's prefix has no slash and the resolver's glob is the same with and without the hook's GIT_DIR, so this arm's red half is unexercisable here)"
+printf 'echo two\n' > "$HK_WT/$HK_KIT/gen.sh"
+printf 'rendered\n' > "$HK_WT/memory/HKGEN.md"
+git -C "$HK_WT" add -A >/dev/null
+out=$(cd "$HK_WT" && git commit -q -m "ARCH-tRun-2 regenerates its index" -m "Pass: ARCH-tRun-2" 2>&1); rc=$?
+same "a pass commits the output its declared generator rewrote, through a commit-msg hook in a linked worktree, exit code" "$rc" "0"
+hk_files=$(git -C "$HK_WT" show --name-only --format= HEAD)
+hit  "$hk_files" "memory/HKGEN.md"
+hit  "$hk_files" "$HK_KIT/gen.sh"
+same "the fixture's commit-msg hook ran" "$([ -f "$HK_D/saw" ] && echo ran)" "ran"
+[ "$(cat "$HK_D/saw" 2>/dev/null)" = set ] \
+  || echo "  (TOOL-aGraftedHelix-27 hook arm: PRECONDITION UNMET - git exported no GIT_DIR into the linked worktree's commit-msg hook, so the commit above did not exercise the environment this arm is about)"
+# ...and the printed remedy names the driver as a shell prints it, never by an absolute path
+printf 'b\n' > "$HK_WT/${PFX}stray.sh"; git -C "$HK_WT" add -A >/dev/null
+out=$(cd "$HK_WT" && git commit -q -m "ARCH-tRun-1 builds its lane" -m "Pass: ARCH-tRun-1" 2>&1); rc=$?
+same "a commit staging an undeclared path through the hook is refused" "$([ "$rc" != 0 ] && echo refused)" "refused"
+hit  "$out" "widen it, then commit again: bash ${KIT_REL}/unattended.sh --dispatch tRun --pass ARCH-tRun-1"
+git config --unset core.hooksPath
+git worktree remove --force "$HK_WT"; git worktree prune
+git checkout -q unit
+rm -rf "$HK_D"
+
+# ...the resolver's answer does not depend on the hook, and a LINKED kit anchors to the ADOPTING
+# repository. Git answers a junction's or a symlink's target; the logical walk keeps the path walked.
+# ONE call shape for the three: "$1" is the library's directory and "$2" the repository root.
+JR_CALL='. "$1/lib-unattended.sh"; resolve_generated_indexes "$2" "" memory'
+JR=$(mktemp -d)
+mkdir -p "$JR/one/kits/unattended" "$JR/one/kits/onegen"
+cp "$HERE/lib-unattended.sh" "$JR/one/kits/unattended/"
+printf '[[generated]]\npath = "{memory_root}/ONE.md"\ngenerator = "g.sh"\n' > "$JR/one/kits/onegen/kit.toml"
+( cd "$JR/one" && git init -q . && git config user.email t@t.test && git config user.name t \
+  && git add -A && git commit -q -m one --no-verify && git worktree add -q -b w1 "$JR/w1" ) >/dev/null 2>&1
+JR_GD=$(git -C "$JR/w1" rev-parse --absolute-git-dir)
+jr_plain=$(cd "$JR/w1" && bash -c "$JR_CALL" _ "$JR/w1/kits/unattended" "$JR/w1" 2>/dev/null)
+jr_hook=$(cd "$JR/w1" && GIT_DIR="$JR_GD" bash -c "$JR_CALL" _ "$JR/w1/kits/unattended" "$JR/w1" 2>/dev/null)
+same "the resolver in a linked worktree prints the fixture kit's row" "$jr_plain" "memory/ONE.md:kits/onegen/g.sh"
+same "the resolver with the worktree's GIT_DIR exported prints the same bytes" "$jr_hook" "$jr_plain"
+mkdir -p "$JR/two/other/twogen"
+printf '[[generated]]\npath = "{memory_root}/TWO.md"\ngenerator = "g2.sh"\n' > "$JR/two/other/twogen/kit.toml"
+( cd "$JR/two" && git init -q . && git config user.email t@t.test && git config user.name t \
+  && git add -A && git commit -q -m two --no-verify ) >/dev/null 2>&1
+# A POSIX symlink first; on Windows a directory JUNCTION, as the codebase-map adopter's suite makes one.
+jr_link=0
+if ln -s "$JR/one/kits/unattended" "$JR/two/other/unattended" 2>/dev/null && [ -L "$JR/two/other/unattended" ]; then
+  jr_link=1
+elif command -v cygpath >/dev/null 2>&1 && command -v cmd >/dev/null 2>&1; then
+  rm -rf "$JR/two/other/unattended"
+  cmd //c mklink //J "$(cygpath -w "$JR/two/other/unattended")" "$(cygpath -w "$JR/one/kits/unattended")" >/dev/null 2>&1 || true
+  [ -f "$JR/two/other/unattended/lib-unattended.sh" ] && jr_link=2
+fi
+if [ "$jr_link" != 0 ]; then
+  same "the resolver reached through a directory link reads the adopting repository's kits" \
+    "$(cd "$JR/two" && bash -c "$JR_CALL" _ "$JR/two/other/unattended" "$JR/two" 2>/dev/null)" "memory/TWO.md:other/twogen/g2.sh"
+else
+  echo "  (TOOL-aGraftedHelix-27 link arm: this host made neither a symlink nor a junction, so the linked-kit half is unexercised)"
+fi
+rm -rf "$JR"
+
+# ...and a library no repository contains SAYS that it read only the root kits and the conf pairs
+NR=$(mktemp -d); mkdir -p "$NR/kit"; cp "$HERE/lib-unattended.sh" "$NR/kit/"
+if derive_self_rel "$NR/kit" >/dev/null; then
+  echo "  (TOOL-aGraftedHelix-27 announcement arm: a .git sits above the system temp directory on this host, so no directory there is outside every repository and the arm is unexercised)"
+else
+  nr_out=$(bash -c '. "$1/lib-unattended.sh"; resolve_generated_indexes "$2" "a/X.md:a/g.sh" memory' _ "$NR/kit" "$NR" 2>"$NR/err"); rc=$?
+  same "the resolver outside any repository, exit code" "$rc" "0"
+  same "the resolver outside any repository prints the conf pairs it was given" "$nr_out" "a/X.md:a/g.sh"
+  hit  "$(cat "$NR/err")" "lib-unattended: resolve_generated_indexes found no .git at or above $NR/kit, so only the repository-root kits and the conf pairs were read"
+  same "the resolver outside any repository announces on one stderr line" "$(grep -c '' "$NR/err")" "1"
+fi
+rm -rf "$NR"
+
 # ---- CONDITION 3, FLAT HALF: the records the method names outright, plus the derived run-state file.
 build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/DECISIONS.md)" "--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
@@ -13125,7 +13218,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # a, 2026-10-05, executed 74 against the prologue's own 20 before the refused-`--beat` pair landed,
 # and the mode-refusal arm alone executed 27 against the same 20, green against the kit and red under
 # staged driver copies; no suite ran.
-FLOOR_ASSERTIONS=2114
+# RAISED 2114 -> 2127 by TOOL-aGraftedHelix-27: the hook, linked-kit and announcement arms' 13
+# executed assertions in region two, MEASURED: that block run alone behind this prologue and
+# `build_check_commit_fixture` on node a, 2026-10-05, executed 33 against the prologue's own 20,
+# green against the kit and red under the parent's lib and driver, a lib whose kit-dir derivation
+# asked git again, and a lib without the announcement line; no suite ran.
+FLOOR_ASSERTIONS=2127
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -13259,7 +13357,8 @@ FLOOR_SHARD_1=209
 # RAISED 1848 -> 1889: the same 41 region-two claim-cell assertions, see FLOOR_ASSERTIONS.
 # RAISED 1889 -> 1902: the same 13 region-two holder-order assertions, see FLOOR_ASSERTIONS.
 # RAISED 1902 -> 1917: the same 15 region-two claim-cell and mode-refusal assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1917
+# RAISED 1917 -> 1930: the same 13 region-two hook, linked-kit and announcement assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1930
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.
