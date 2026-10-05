@@ -1,10 +1,13 @@
 # TOOL-dThriftyLanding-5 — gov declares its doc class and what its bar legs read of it
 
-**Status:** OPEN · rev-1 · 2026-10-05 · node d · Tier-2 · base c3ef6742 · streams tooling · order 5
+**Status:** CLOSED · rev-1 · 2026-10-05 · node d · Tier-2 · base c3ef6742 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-05-build-TOOL-dThriftyLanding-5-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-dThriftyLanding-5-1-acceptance-ledger.md) | journal | — |
+| [2026-10-05-prompt-TOOL-dThriftyLanding-5-1-build-brief.md](../prompts/2026-10-05-prompt-TOOL-dThriftyLanding-5-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

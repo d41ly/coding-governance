@@ -298,7 +298,7 @@ unset GATE_DOCS_BASE
 # restored in a later one has no net diff, and a leg that grades COMMITS (a pass-order or brief rule)
 # still has something to grade. Every failure reads as MOVED, so the leg runs: the one direction this
 # predicate may err in is doing more work.
-touched() {
+check_doc_moved() {
   local hit
   [ -n "$DOCS_BASE" ] || return 0
   ! git diff --quiet "$DOCS_BASE" -- "$@" 2>/dev/null && return 0
@@ -1828,7 +1828,7 @@ for ((i=0; i<total; i++)); do
     _dr=${docreads[$i]#=}
     if [ -z "$_dr" ]; then printf 'docskip' > "$WORK/$i.rc"; continue; fi
     IFS=, read -ra gp <<<"$_dr"
-    touched "${gp[@]}" || printf 'docskip' > "$WORK/$i.rc"
+    check_doc_moved "${gp[@]}" || printf 'docskip' > "$WORK/$i.rc"
     continue
   fi
   [ -z "${guards[$i]}" ] && continue

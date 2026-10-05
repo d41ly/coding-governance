@@ -93,3 +93,7 @@ GOV_KITROOT=tools
 # gated push has landed the edit. The source above still sets them as variables; nothing reads those.
 INHERITED_RED=land
 INHERITED_RED_MAX_AGE=10
+# THE DOC CLASS (TOOL-dThriftyLanding-5): the paths gov calls non-code. A push to the default branch
+# that changes nothing outside them is doc-only, and its bar runs only the legs whose declared
+# `doc_reads` moved. Read by .githooks/pre-push AT R, never from the tree being pushed.
+GATE_DOC_PATHS="memory/ README.md AGENTS.md CLAUDE.md WIRE-INTO-PROJECT.md coding-governance-agents.template.md"
