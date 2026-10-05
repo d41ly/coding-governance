@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-18 — `tier2-review.js` prints one machine shape line with severity counts and output tokens
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 18
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 18
 
 <!-- gen:spec-records -->
 
@@ -28,8 +28,12 @@ a grep. Report `[B#23]`, brief unit 18.
   ```
 
   A count the run has not produced at that stage is `-`, never `0`. The four severities count raw
-  confirmed findings by their binding grade, `deriveBindingSeverity`. `agents` is the value the
-  return's own `agents` field carries at that stage. Observed by AC1.
+  confirmed findings by their binding grade, `deriveBindingSeverity`; a grade outside the closed
+  four is counted in none. `agents` follows the final return's own `agents` formula, finders plus
+  batched skeptics plus the synthesis, through the stage reached: `lensesRunning` at `find`, plus the
+  batch count at `verify`, plus 1 at `synth`. Only the final return carries an `agents` field, so the
+  earlier stages take the formula, not a field. On the every-lens-dead exit `raw` is `-`: no lens
+  returned, so the zero there was never produced. Observed by AC1.
 - **S2** — A top-level function `readOutputTokens()` returns `budget.spent()` when the runtime's
   `budget` global exists and its `spent` is a function, and `null` otherwise. The script reads it once
   before its first agent call and again where it renders the line; `out-tokens` is the difference, or
@@ -91,12 +95,16 @@ cannot reach the record, and two lines, one per side, would disagree on `out-tok
 - `renderShapeLine` and `readOutputTokens`, top-level so a `node` slice can evaluate each alone;
   `render` and `read` are the declared verbs. A name the lexicon leg refuses is replaced with its
   `--suggest` answer at build time, and this list is amended with a rev bump.
+- `renderStageShape(at, counts, agents)`, the one caller of both: it fills the run's kind, round,
+  intensity and token delta around a stage's counts, so the five exits do not each restate them.
+  Not pure, so no criterion slices it; AC3 and the suite arm observe it through the exits.
 
 ### Files touched (estimate)
 
 - `tools/workflows/tier2-review.template.js`
 - `tools/workflows/tier2-review.js`
 - `tools/workflows/README.md`
+- `tools/workflows/tier2-review.test.sh` — the §7 arm, written in the pass and run at the close
 - `memory/map/generated/symbols.json`
 
 ### Rollout
@@ -173,6 +181,12 @@ New arm: tools/workflows/tier2-review.test.sh · each stubbed exit path asserts 
 - rev-2 · 2026-10-04 · §2 S6 · §4 · §7 · M2 cross-read: the definitions this unit adds
   move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
   code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
+- rev-3 · 2026-10-05 · §2 S1 · §4 Inventory · build-time: S1 said `agents` is the value the return's
+  own field carries at each stage, and four of the five exits carry no `agents` field, so S1 now
+  names the formula per stage; it also fixes `raw=-` on the every-lens-dead exit and leaves an
+  off-vocabulary grade uncounted. The inventory adds the `renderStageShape` helper the five exits
+  share; the lexicon's `--suggest` answered OK for all three names. Files touched gains the suite,
+  which §7's new arm writes and the estimate omitted.
 
 ## 10. Reuse audit
 
