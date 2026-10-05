@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-20 — the holder row's claim CAS runs before its `write_lease` under one stamp, and a CAS that does not land leaves a `prior-session` fact the `mine` test accepts
 
-**Status:** SPECCED · rev-6 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 4
+**Status:** SPECCED · rev-7 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -252,10 +252,12 @@ with `CLAUDE_CODE_SESSION_ID` set to `s2`.
 - **AC3** — When the call runs with no shim but a `date` shim on `PATH`, and the push lands, the
   claim's `lease-utc` equals the record's `lease-utc` byte for byte, and the record carries no
   `prior-session` line. The shim forwards every invocation to the real
-  `date` unchanged, except one asking for the `+%Y-%m-%dT%H:%M:%SZ` format, which it answers with
-  the real UTC time advanced by one more second for each such request so far, counted in a file
-  under the fixture. With the run-state file then committed in the fixture and the claim re-seeded
-  at a `beat-utc` older than a quarter of `RESUME_STALE_BOUND`, a second `s2` call with no shim,
+  `date` unchanged, except a clock read in the `+%Y-%m-%dT%H:%M:%SZ` format, `date -u` with that
+  format and no other argument, which it answers with the real UTC time advanced by one more second
+  for each such request so far, counted in a file under the fixture; the count is asserted to reach
+  two, so the arm shows the shim answered the reads it grades. With the run-state file then
+  committed in the fixture and the claim re-seeded at a `beat-utc` older than a quarter of
+  `RESUME_STALE_BOUND`, a second `s2` call with no shim,
   whose `write_lease` is not due and whose claim renewal is, moves the claim ref and leaves
   `git status --porcelain` empty.
   Red when: the claim and the record carry stamps read from two clocks, which the shim makes differ
@@ -273,9 +275,11 @@ with `CLAUDE_CODE_SESSION_ID` set to `s2`.
   `s2` with `CLAUDE_PID` changed and `--keepalive-id` naming a new keepalive, that call takes the run
   over, prints no `UNATTENDED check 89 FAILED`, and leaves a claim naming the new keepalive and
   `session: s2`. Over a second copy of the same record and claim, a call under `s3` and a new
-  keepalive that reaches `run_takeover` through the presumed-stopped row, with the fixture's
-  `RESUME_STALE_BOUND` lowered so the lease and the claim's beat both read stale, prints unit 1's
-  `claim taken over` line naming session `s1`.
+  keepalive that reaches `run_takeover` through the presumed-stopped row prints unit 1's
+  `claim taken over` line naming session `s1`. The lease and the claim's beat both read stale
+  through dates rather than through elapsed time: the record is committed under a date older than
+  `RESUME_STALE_BOUND`, as unit 12's take-over cells age theirs, and the claim is re-seeded with the
+  same `node`, `host`, `session` and `keepalive` at a beat older than the bound.
   Red when: the restart reads the claim as foreign and answers check 89, or the `s3` take-over reads
   the claim as `same session` and takes it without that line.
 
@@ -331,6 +335,12 @@ none
 - rev-6 · 2026-10-04 · §2 §3 · S1 · §3 gains the hands-off to `TOOL-aGraftedHelix-26`, promoted from
   finding 6 (HIGH) of the round-1 spec audit of `TOOL-aGraftedHelix-25`, and S1 points at it for the
   CAS on a claim read that did not answer, which no unit stated.
+- rev-7 · 2026-10-05 · §6 · AC3 AC6 · reconciled with the fixture before any code. AC6's `s3` leg
+  lowered `RESUME_STALE_BOUND` to make a seconds-old lease and beat read stale, which holds only
+  when the calls before it take longer than the lowered bound, a race against the host's speed; the
+  leg now ages both by date, as unit 12's take-over cells do. AC3's shim answered every request for
+  the stamp format, conversions of a given instant included; it now answers the clock read alone,
+  and asserts it answered at least two, so a build reading the clock once cannot pass it unread.
 
 ## 10. Reuse audit
 
