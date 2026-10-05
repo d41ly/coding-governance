@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-5 — each leg reading is stamped faithful or contended by a foreign-load census, and only faithful readings argue a ceiling
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 7 · advances TOOL-aSurfacedLexicon-22 · ratified 2026-10-04
+**Status:** SPECCED · rev-4 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 7 · advances TOOL-aSurfacedLexicon-22 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -38,7 +38,11 @@ rules, and is declared as the one uncensused path.
   a detached sampler shaped like `ts_tick_start`, which appends one sample every `CENSUS_EVERY`
   seconds until the runner is gone or the run stops it. `CENSUS_EVERY` is 60, and
   `GATE_CENSUS_EVERY` overrides it with a positive integer; any other override value prints one
-  `run-gates: NOTE` line and keeps 60. Observed by AC3, AC4, AC5 and AC11.
+  `run-gates: NOTE` line and keeps 60. `cleanup` stops the sampler, and it stops the turnstile
+  heartbeat ticker before it releases the beacon, the order the claim-time handlers it supersedes
+  already kept: a finished bar's ticker otherwise sleeps on for up to a sixth of the turnstile TTL,
+  reparented to pid 1 with the runner's argv, and every later bar's census on the host counts it as
+  foreign gate work. Observed by AC3, AC4, AC5, AC11 and AC14.
 - **S3** — `runleg` writes the eighth field of every `.leg` and `.retry.leg` row from
   `derive_foreign`: over the samples stamped inside `[start − 3 × CENSUS_EVERY, end]`, the largest
   positive count; else `unknown` when any sample there reads `unknown` or none exists; else `0`.
@@ -331,6 +335,11 @@ named below by its basename.
   Red when: the manual route is refused, reversing a ratified ruling, or no document says it is
   uncensused.
 
+- **AC14** — When a fixture bar run with the turnstile on and `GATE_CENSUS_EVERY=60` has exited,
+  `ps -ef` lists no process whose command line names that fixture's runner path.
+  Red when: the bar's turnstile ticker or census sampler outlives it, so the next bar's census on
+  the host counts a sleeping orphan as foreign gate work.
+
 ## 7. Gates
 
 `run-gates canary` · `run-gates evidence` · `run-gates turnstile` · `run-gates gov canary` · `run-gates run-log line` · `run-gates adopter e2e` · `profile-bar selftest` · `foreign-prefix parity (every self-test at three prefixes)` · `leg ceilings clear their evidenced maximum` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `kickoff-manifest ratchet` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `shell hygiene (a loop fed by a command substitution)` · `codebase-map coverage + freshness` · `harness arms (fail branches armed or pinned)` · `testsuite counts (every bar self-test prints one)` · `install-prefix (shipped surface)` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
@@ -342,6 +351,7 @@ self-tests, so the close owes each a run of its own, bounded, rather than inside
 New arm: tools/run-gates/run-gates.evidence.test.sh · AC1 to AC6 as fixture bars; stage the ancestor walk deleted, the window reach set to zero, the sampler left undisowned, and the ledger read's trailing field deleted · FLOOR_ASSERTIONS rises by the arms added
 New arm: tools/run-gates/run-gates.evidence.test.sh · AC7 and AC8 over fixture rows; stage the census filter deleted and the DEAD PROBE test moved after it · FLOOR_ASSERTIONS rises by the arms added
 New arm: tools/run-gates/run-gates.evidence.test.sh · AC3's two blind-census stubs, AC11's sub-second first wave, AC12's retry row and mixed window, and AC13's manual route; stage the observer test deleted, the first sample moved into the detached loop, the retry row's eighth field dropped, the positive-over-unknown order reversed and the exception sentence deleted · FLOOR_ASSERTIONS rises by the arms added
+New arm: tools/run-gates/run-gates.evidence.test.sh · AC14's lingering ticker and sampler; stage the ticker stop deleted from `cleanup` · FLOOR_ASSERTIONS rises by the arms added
 
 ## 8. Open questions
 
@@ -391,6 +401,13 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · AC3's two blind-census st
   asserts a line after the first. AC5 started its outside run 4 s after a runner whose startup on
   node `a` takes 5 to 17 s, so the first sample could already see it and the staged break would stay
   green; the arm now waits for the leg's start marker, and asserts the pid on a line after the first.
+- rev-4 · 2026-10-05 · §2 §6 §7 · S2 · AC14 · building found what speccing could not: two fixture
+  bars run a minute apart on node `a`, the second's census named the first bar's runner as a
+  foreign root, pid 1907364 with parent 1 and a `sleep 300` child. It was the first bar's turnstile
+  ticker. `cleanup` superseded the claim-time handlers, which each stop the ticker first, and kept
+  only their release, so every bar left its ticker sleeping up to a sixth of the TTL, and the next
+  bar's census read it as foreign load. S2 now has `cleanup` stop the ticker and the sampler, and
+  AC14 observes that no process naming a finished fixture bar's runner path remains.
 
 ## 10. Reuse audit
 
