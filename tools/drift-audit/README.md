@@ -97,7 +97,7 @@ Then, in order:
 
 | File | Owner | What |
 |---|---|---|
-| `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check`, `--delta` |
+| `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check`, `--delta`, `--escape-ratio` |
 | `drift_signals.template.py` | kit | the project layer's starting point |
 | `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK`, `REMOTE_CI_WORKFLOW` |
 | `SKILL.template.md` | kit | rendered to `.claude/skills/drift-audit/SKILL.md` by the adopt script |
@@ -216,6 +216,24 @@ report-only block. It compares the last group read at BASE or an ancestor of it 
 inside BASE..HEAD, printing one line per signal whose value, state or `key_hash` moved, and every case
 that cannot produce a delta prints one `skipped` line at exit 0; only an argument that is not a commit
 exits 2.
+
+## The escape ratio — `--escape-ratio <YYYY-MM>`, on demand only
+
+Every signal above reads a RECORD; this mode reads an OUTCOME. `drift_report.py --escape-ratio 2026-09`
+takes the month's product fixes — non-merge commits whose subject's first word is `fix`, with an
+optional scope, touching `PRODUCT_GLOBS` — and calls one ESCAPED when any line its diff takes out,
+blamed in its parent, landed on the base before the fix did. A landing is the first-parent commit that
+first made a commit reachable, and the month's landings are the first-parent commits dated in it, UTC.
+Version and audit stamps are dropped before blame, and a fix left with no line is unclassified and
+outside n. It prints n, escaped, the ratio with its 95% Wilson interval, the DIRECT share — fixes made
+on the first-parent line itself, escaped by construction, so that share measures workflow rather than
+defects — and `--json` lists every fix with its class so any figure can be re-derived by hand.
+
+It costs one blame per fix and file, minutes on a Windows host, which is why it is a mode and never a
+signal, refuses `--check`, `--offenders` and `--delta`, and is on no bar and no card. Two biases are
+known: a fix not called `fix` is missed, and blame credits moved code to its mover. The caveat line it
+always prints is the rule: a difference between two months of one repository is not evidence of an
+effect, so it prints no comparison.
 
 ## What "landed" is measured against — the base ladder
 

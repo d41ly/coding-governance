@@ -1588,6 +1588,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "build_landing_index",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_lang_mode_findings",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -3728,6 +3733,11 @@
       "file": ".githooks/straggler-guard.sh"
     },
     {
+      "id": "check_stamp_line",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "check_status_one_line",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -5813,6 +5823,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "derive_wilson_interval",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "derive_window",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -7836,6 +7851,11 @@
       "id": "measure_dossier_staleness",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "measure_escape_ratio",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "measure_execs",
@@ -10383,6 +10403,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "read_month_fixes",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "read_named_hold",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -11721,6 +11746,11 @@
       "id": "render_empty_spine_diagnosis",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "render_escape_ratio",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "render_fact",
@@ -16021,6 +16051,11 @@
       "id": "test_ensemble_arg_grammar",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_escape_ratio",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_every_advertised_gen_map_mode_runs",

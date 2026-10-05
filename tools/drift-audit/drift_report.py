@@ -6,6 +6,7 @@ gov:kit drift-audit@1.22
     python <prefix>/drift-audit/drift_report.py            # human table, always exits 0
     python <prefix>/drift-audit/drift_report.py --json     # machine-readable, always exits 0
     python <prefix>/drift-audit/drift_report.py --check    # exit 1 if a GATEABLE signal is over its pin
+    python <prefix>/drift-audit/drift_report.py --escape-ratio 2026-09   # on demand, minutes, never the bar
 
 WHY THIS KIT EXISTS. A governance repo gates its CODE contracts hard and its RECORD contracts not at
 all: a memory-hygiene gate checks that a spec Status token is spelled legally, never that it is TRUE.
@@ -40,6 +41,7 @@ import argparse
 import datetime
 import hashlib
 import json
+import math
 import os
 import pathlib
 import re
@@ -2980,6 +2982,199 @@ def render_drift_offenders(over: list, dead: list, ratchets: list) -> list[str]:
     return out
 
 
+# --------------------------------------------------------------------------------------------
+# --escape-ratio <month> — an OUTCOME reading, on demand only (TOOL-aMendedFleet-50)
+# --------------------------------------------------------------------------------------------
+# Of one month's product fixes, the share that repaired code which had already reached the base.
+# NOT a signal: it costs a blame per fix and file, so it is never on the bar, never on the card,
+# and it prints no comparison between months — one repository's before and after is not evidence.
+
+# A parent-side line matching one of these is a version or audit stamp, not code a fix repaired.
+ESCAPE_STAMP_PATTERNS = (
+    re.compile(r"gov:kit [A-Za-z0-9_.-]+@"),
+    re.compile(r"\bKIT_[A-Z0-9_]+_VERSION\s*="),
+    re.compile(r'^\s*version\s*=\s*"'),
+    re.compile(r"\blast-(?:audit|body-change):"),
+)
+_FIX_SUBJECT = re.compile(r"fix(?:\([^)]*\))?!?(?:[:\s]|$)")
+_FIX_GREP = r"^fix(\([^)]*\))?!?([:[:space:]]|$)"
+_HUNK = re.compile(r"^@@ -(\d+)(?:,(\d+))? ")
+_BLAME_HEAD = re.compile(r"^([0-9a-f]{40}) \d+ \d+")
+_WILSON_Z = 1.959963984540054
+_ESCAPE_CAVEAT = ("caveat: a difference between two months of one repository is not evidence of "
+                 "an effect")
+
+
+def build_landing_index(git: Git, tip: str) -> tuple[list, dict, dict]:
+    """(first-parent chain oldest first, commit -> landing commit, commit -> committer epoch), from
+    ONE `rev-list --timestamp --parents`. Walking the chain oldest first, every commit newly reachable
+    from a first-parent commit lands with it, so the landings partition the history and a commit's
+    landing's chain index orders when it reached the base."""
+    walk = git.run("rev-list", "--timestamp", "--parents", tip, "--")
+    if walk.returncode != 0 or not walk.stdout.strip():
+        raise DriftError(f"`git rev-list {tip}` returned nothing, so no landing can be placed")
+    parents, stamp = {}, {}
+    for line in walk.stdout.split("\n"):
+        f = line.split()
+        if len(f) >= 2:
+            stamp[f[1]], parents[f[1]] = int(f[0]), f[2:]
+    chain, at = [], tip
+    while at in parents:
+        chain.append(at)
+        at = parents[at][0] if parents[at] else None
+    chain.reverse()
+    landing: dict = {}
+    for f in chain:
+        stack = [f]
+        while stack:
+            c = stack.pop()
+            if c not in landing:
+                landing[c] = f
+                stack.extend(p for p in parents.get(c, ()) if p not in landing)
+    return chain, landing, stamp
+
+
+def read_month_fixes(git: Git, revs: list, globs: list) -> list[dict]:
+    """Every non-merge `fix` commit in `revs` touching `globs`, with its PARENT-SIDE lines — the
+    lines its diff takes out, numbered as they read in its parent — from ONE `git log -U0 -p`.
+    `--full-history`, because default simplification drops a side branch whose merge is TREESAME to
+    main for these paths, and that branch's fixes landed all the same."""
+    log = git.run("-c", "core.quotePath=false", "log", "--no-merges", "--no-renames", "--full-history",
+                  "--no-color", "--no-ext-diff", "--src-prefix=a/", "--dst-prefix=b/", "-U0", "-p",
+                  "-E", f"--grep={_FIX_GREP}", "--format=%x01%H%x02%s", *revs, "--", *globs)
+    if log.returncode != 0:
+        raise DriftError(f"`git log` over the month's landings failed: {log.stderr.strip()[:200]}")
+    fixes, cur, path, left, at = [], None, None, 0, 0
+    for line in log.stdout.split("\n"):
+        if line.startswith("\x01"):
+            sha, _, subject = line[1:].partition("\x02")
+            cur = {"sha": sha, "subject": subject, "lines": {}}
+            path, left = None, 0
+            if _FIX_SUBJECT.match(subject):  # `--grep` reads the body too; the subject decides
+                fixes.append(cur)
+            continue
+        if cur is None:
+            continue
+        if line.startswith("diff --git "):
+            path, left = None, 0
+        elif left == 0 and line.startswith("--- "):
+            p = line[4:].strip('"')
+            path = p[2:] if p.startswith("a/") else None
+        elif m := _HUNK.match(line):
+            at, left = int(m.group(1)), int(m.group(2) or 1)
+        elif left and line.startswith("-") and path:
+            cur["lines"].setdefault(path, []).append((at, line[1:]))
+            at, left = at + 1, left - 1
+    return fixes
+
+
+def check_stamp_line(text: str) -> bool:
+    """True when a parent-side line is a version or audit stamp (`ESCAPE_STAMP_PATTERNS`)."""
+    return any(p.search(text) for p in ESCAPE_STAMP_PATTERNS)
+
+
+def derive_wilson_interval(k: int, n: int) -> tuple[float, float] | None:
+    """The 95% Wilson score interval for k of n; None at n 0. Unlike the normal approximation it
+    stays inside [0, 1] at k 0 and at small n."""
+    if n <= 0:
+        return None
+    p, z2 = k / n, _WILSON_Z * _WILSON_Z
+    mid = (p + z2 / (2 * n)) / (1 + z2 / n)
+    half = _WILSON_Z * math.sqrt(p * (1 - p) / n + z2 / (4 * n * n)) / (1 + z2 / n)
+    return max(0.0, mid - half), min(1.0, mid + half)
+
+
+def measure_escape_ratio(git: Git, base_ref: str, base_sha: str, month: str, globs: list) -> dict:
+    """The `--escape-ratio` result for one `YYYY-MM` month, as the `--json` object.
+
+    A fix is ESCAPED when any parent-side line, stamps filtered out, blames to a commit whose landing
+    is earlier than the fix's own; a boundary or unplaced commit counts as earlier. DIRECT is a fix
+    that is its own landing, made on the first-parent line, and escaped by construction once it blames
+    anything — printed beside the ratio as the share that measures workflow rather than defects.
+    ponytail: one blame per fix and file, about 300 spawns a month; never a signal for that reason."""
+    chain, landing, stamp = build_landing_index(git, base_sha)
+    index = {f: i for i, f in enumerate(chain)}
+    picked = [i for i, f in enumerate(chain) if datetime.datetime.fromtimestamp(
+        stamp[f], datetime.timezone.utc).strftime("%Y-%m") == month]
+    res = {"month": month, "base_ref": base_ref, "base_sha": base_sha, "n": 0, "escaped": 0, "ratio": None, "interval": None, "direct": 0,
+           "unclassified": {}, "fixes": []}
+    if not picked:
+        return res
+    lo, hi = min(picked), max(picked)
+    revs = [chain[hi]] + ([f"^{chain[lo - 1]}"] if lo else [])
+    month_landings = {chain[i] for i in picked}
+    for fx in reversed(read_month_fixes(git, revs, globs)):
+        sha = fx["sha"]
+        own = landing.get(sha)
+        if own not in month_landings:
+            continue
+        row = {"sha": sha, "landing": own, "direct": own == sha, "class": "", "blamed_landings": []}
+        res["fixes"].append(row)
+        kept = {p: [n for n, t in ls if not check_stamp_line(t)] for p, ls in fx["lines"].items()}
+        if not globs:
+            row["class"] = "no-product-globs"
+        elif not fx["lines"]:
+            row["class"] = "addition-only"
+        elif not any(kept.values()):
+            row["class"] = "stamp-only"
+        if row["class"]:
+            res["unclassified"][row["class"]] = res["unclassified"].get(row["class"], 0) + 1
+            continue
+        blamed, bounds = set(), set()
+        for path, nums in kept.items():
+            spans = []
+            for n in sorted(set(nums)):
+                if spans and n == spans[-1][1] + 1:
+                    spans[-1][1] = n
+                else:
+                    spans.append([n, n])
+            args = [a for s, e in spans for a in ("-L", f"{s},{e}")]
+            out = git.run("blame", "--porcelain", *args, f"{sha}^", "--", path)
+            if out.returncode != 0:
+                raise DriftError(f"`git blame` of {path} in {sha[:8]}^ failed: {out.stderr.strip()[:200]}")
+            cur = None
+            for ln in out.stdout.split("\n"):
+                if m := _BLAME_HEAD.match(ln):
+                    cur = m.group(1)
+                    blamed.add(cur)
+                elif ln == "boundary" and cur:
+                    bounds.add(cur)
+        mine = index[own]
+        lands = {landing.get(b, b) for b in blamed}
+        row["blamed_landings"] = sorted(lands, key=lambda f: index.get(f, -1))
+        early = any(b in bounds or index.get(landing.get(b), -1) < mine for b in blamed)
+        row["class"] = "escaped" if early else "contained"
+        res["n"] += 1
+        res["escaped"] += early
+        res["direct"] += row["direct"]
+    if res["n"]:
+        res["ratio"] = res["escaped"] / res["n"]
+        res["interval"] = list(derive_wilson_interval(res["escaped"], res["n"]))
+    return res
+
+
+def render_escape_ratio(res: dict) -> list[str]:
+    """The human form of `measure_escape_ratio`: n, escaped, the ratio and its interval, the DIRECT
+    share, the unclassified counts, then the caveat line, which is printed on every outcome."""
+    out = [f"# escape-ratio {res['month']} (base {res['base_ref']} @ {res['base_sha'][:8]})"]
+    if not res["fixes"]:
+        out.append("n          0 — the month is empty: no product fix landed on the base in it")
+    else:
+        out.append(f"n          {res['n']} product fixes classified")
+        out.append(f"escaped    {res['escaped']}")
+        if res["n"]:
+            lo, hi = res["interval"]
+            out.append(f"ratio      {res['ratio']:.3f} (95% Wilson interval {lo:.3f} to {hi:.3f})")
+            out.append(f"direct     {res['direct']} of {res['n']} ({res['direct'] / res['n']:.3f}) — "
+                       "landed on the first-parent line, escaped by construction once it blames anything")
+        else:
+            out.append("ratio      none — no fix was classified, so there is nothing to divide")
+        un = res["unclassified"]
+        out.append("unclassified " + (", ".join(f"{k} {v}" for k, v in sorted(un.items())) or "0"))
+    out.append(_ESCAPE_CAVEAT)
+    return out
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Report whether this repo's records still match reality.")
     ap.add_argument("--json", action="store_true")
@@ -2995,7 +3190,24 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--delta", nargs=2, metavar=("BASE", "HEAD"),
                     help="print what moved between the history readings at BASE and inside "
                          "BASE..HEAD; report only, exit 0 unless an argument is not a commit")
+    ap.add_argument("--escape-ratio", metavar="YYYY-MM", default=None,
+                    help="on demand, minutes: the share of that month's product fixes that repaired "
+                         "code already on the base; never part of the report or the bar")
     args = ap.parse_args(argv)
+
+    if args.escape_ratio is not None:
+        # TOOL-aMendedFleet-50 S1: a mode of its own. Beside `--check` it would put a blame per fix
+        # on the bar, and beside `--offenders` or `--delta` neither output would mean what it says.
+        clash = [f for f, on in (("--check", args.check), ("--offenders", args.offenders),
+                                 ("--delta", args.delta)) if on]
+        if clash:
+            print(f"drift-report: --escape-ratio is an on-demand mode and does not combine with "
+                  f"{', '.join(clash)}", file=sys.stderr)
+            return 2
+        if not re.fullmatch(r"\d{4}-(?:0[1-9]|1[0-2])", args.escape_ratio):
+            print(f"drift-report: --escape-ratio wants a month as YYYY-MM (four-digit year, hyphen, "
+                  f"two-digit month), got '{args.escape_ratio}'", file=sys.stderr)
+            return 2
 
     if args.delta:
         # Reads the history only: no conf, no signals, no base ladder (TOOL-aMendedFleet-49).
@@ -3038,6 +3250,15 @@ def main(argv: list[str] | None = None) -> int:
               f"cannot judge ancestry against it.", file=sys.stderr)
         return 2
     base_at = base_sha.stdout.strip()[:8]
+    if args.escape_ratio is not None:
+        try:
+            res = measure_escape_ratio(Git(root, base_ref), base_ref, base_sha.stdout.strip(),
+                                       args.escape_ratio, list(proj.PRODUCT_GLOBS))
+        except DriftError as exc:
+            print(f"drift-report: {exc}", file=sys.stderr)
+            return 2
+        print(json.dumps(res, indent=1) if args.json else "\n".join(render_escape_ratio(res)))
+        return 0
     ctx = Ctx(root, conf, proj, base_ref)
     ctx.offline = bool(args.check or args.offenders)
     out = [s(ctx) for s in SIGNALS]

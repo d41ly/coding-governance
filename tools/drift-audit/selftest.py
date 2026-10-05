@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 318
+CHECK_FLOOR = 327
+# 318 -> 327, TOOL-aMendedFleet-50: the nine checks of `test_escape_ratio`.
 # 309 -> 318, TOOL-aMendedFleet-49: the nine checks of `test_drift_delta`.
 # 302 -> 309, TOOL-aMendedFleet-48: the seven checks of `test_drift_history`.
 # 295 -> 302, TOOL-aMendedFleet-47: the run-records arm's derived-LANDED checks — three derived
@@ -3159,6 +3160,74 @@ def test_drift_delta(tmp: pathlib.Path) -> None:
     check("delta: an argument that is not a commit exits 2", out.returncode == 2, f"{out.returncode}")
 
 
+def test_escape_ratio(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-50 S9: `--escape-ratio` over a fixture month holding a merge-landed contained
+    fix, a merge-landed escaped fix, a direct fix, a stamp-only fix and a fix touching no product path."""
+    print("escape ratio (landings by first parent, blame in the parent, stamps out, DIRECT named)")
+    import json
+
+    r = make_repo(tmp, name="escape")
+    # Every commit of the arm is dated into one month; make_repo's own commits are dated now, so the
+    # month's landings are exactly the ones made here.
+    when = {"GIT_AUTHOR_DATE": "2026-03-15T12:00:00Z", "GIT_COMMITTER_DATE": "2026-03-15T12:00:00Z"}
+
+    def build_commit(subject: str, files: dict) -> str:
+        for rel, text in files.items():
+            (r / rel).write_text(text, encoding="utf-8", newline="\n")
+        run(["git", "add", "-A"], r)
+        run(["git", "commit", "-qm", subject, "--no-verify"], r, env=when)
+        return run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+
+    build_commit("feat: the library", {"src/lib.py": "one\ntwo\nthree\n", "conf/kit.toml": 'version = "1.0"\n'})
+    run(["git", "checkout", "-q", "-b", "topic"], r)
+    build_commit("feat: branch-local code", {"src/branch.py": "x\ny\n"})
+    contained = build_commit("fix(topic): repair branch-local code", {"src/branch.py": "x\nY\n"})
+    escaped = build_commit("fix(topic): repair code main already had", {"src/lib.py": "ONE\ntwo\nthree\n"})
+    run(["git", "checkout", "-q", "main"], r)
+    run(["git", "merge", "-q", "--no-ff", "--no-verify", "-m", "merge topic", "topic"], r, env=when)
+    merge = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+    direct = build_commit("fix: repair on the first-parent line", {"src/lib.py": "ONE\ntwo\nTHREE\n"})
+    stamp = build_commit("fix: bump the stamp", {"conf/kit.toml": 'version = "1.1"\n'})
+    other = build_commit("fix: a file outside the product", {"notes.txt": "n\n"})
+
+    out = run([sys.executable, REPORT_REL, "--escape-ratio", "2026-03", "--json"], r)
+    res = json.loads(out.stdout) if out.returncode == 0 and out.stdout.strip() else {}
+    by = {f["sha"]: f for f in res.get("fixes", [])}
+    check("escape: n counts the contained, the escaped and the direct fix, two of them escaped",
+          res.get("n") == 3 and res.get("escaped") == 2, f"rc {out.returncode} {out.stderr[-300:]} {res}")
+    got = by.get(contained, {})
+    check("escape: a merge-landed fix blaming only its own branch is contained",
+          got.get("class") == "contained" and got.get("landing") == merge
+          and got.get("blamed_landings") == [merge] and got.get("direct") is False, str(got))
+    got = by.get(escaped, {})
+    check("escape: a merge-landed fix blaming code already on main is escaped",
+          got.get("class") == "escaped" and got.get("landing") == merge and merge not in got.get("blamed_landings", [merge]),
+          str(got))
+    got = by.get(direct, {})
+    check("escape: a direct fix is its own landing, named DIRECT, and escaped",
+          got.get("class") == "escaped" and got.get("landing") == direct and got.get("direct") is True
+          and res.get("direct") == 1, str(got))
+    check("escape: a stamp-only fix is unclassified and outside n",
+          by.get(stamp, {}).get("class") == "stamp-only" and res.get("unclassified") == {"stamp-only": 1},
+          str(res.get("unclassified")))
+    check("escape: a fix touching no product path is never read", other not in by and len(by) == 4,
+          str(sorted(f["class"] for f in by.values())))
+    text = run([sys.executable, REPORT_REL, "--escape-ratio", "2026-03"], r)
+    check("escape: the text form prints the ratio with its interval and the caveat line",
+          "Wilson interval" in text.stdout and text.stdout.rstrip().endswith("not evidence of an effect"),
+          text.stdout[-400:])
+    empty = run([sys.executable, REPORT_REL, "--escape-ratio", "2020-01"], r)
+    lines = empty.stdout.splitlines()
+    check("escape: an empty month prints n 0, says it is empty, and prints no ratio",
+          empty.returncode == 0 and any(ln.startswith("n ") and "empty" in ln for ln in lines)
+          and not any(ln.startswith("ratio") for ln in lines), empty.stdout)
+    bad = run([sys.executable, REPORT_REL, "--escape-ratio", "2026-3"], r)
+    clash = run([sys.executable, REPORT_REL, "--escape-ratio", "2026-03", "--check"], r)
+    check("escape: a malformed month and a --check beside the mode each exit 2",
+          bad.returncode == 2 and clash.returncode == 2 and "YYYY-MM" in bad.stderr and "--check" in clash.stderr,
+          f"{bad.returncode} {clash.returncode}")
+
+
 def test_version_carriers_agree(tmp: pathlib.Path) -> None:
     """TOOL-dLoggedFlight-13 S6: every carrier of this kit's version agrees with the engine's constant.
 
@@ -3226,6 +3295,7 @@ def main() -> int:
         test_park_sets_match_the_driver(tmp)
         test_drift_history(tmp)
         test_drift_delta(tmp)
+        test_escape_ratio(tmp)
         test_version_carriers_agree(tmp)
     print()
     if SKIPS:
