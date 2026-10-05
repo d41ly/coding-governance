@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.64 -->
+<!-- gov:kit unattended@1.67 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -102,12 +102,11 @@ to the build folder trades these properties:
 
 All were put to the owner and accepted.
 
-**A unit AWAITING SCOPE APPROVAL has three dispositions and they are not interchangeable.** Reachable
-at the pinned BASE: cost 5 already approved it, proceed. Authored by the run itself: the method's
-authoring rule governs, nothing is awaited. Present at BASE under a status naming an EXTERNAL
+**A unit AWAITING SCOPE APPROVAL has three dispositions, not interchangeable.** Reachable
+at the pinned BASE: cost 5 already approved it, proceed. Authored by the run: the method's
+authoring rule governs. Present at BASE under a status naming an EXTERNAL
 PREREQUISITE: halt with the external-prerequisite code, NOT the scope-approval one — different owner
-turns, and conflating them tells a returning owner to approve a scope when the blocker is outside the
-repository.
+turns: conflating them asks the owner to approve a scope when the blocker is outside the repo.
 
 A may: grant is honoured only from an owner-committed `slug` README at the default-branch anchor,
 and lifts the build method's veto 2 only; an ask-row or `SCOPE`-row `may` clause honours nothing.
@@ -115,7 +114,8 @@ Preflight pins it as `may:`, absent reading `none`, and refuses it under any oth
 a run commit writing one into any build README.
 
 The spec-audit opt-in is the OWNER's on the same reading (`TOOL-aWardedAudit-4`): a `spec-audit:`
-line counts only from a `slug` README, and preflight refuses one elsewhere (check 89);
+line counts only from a `slug` README or a `prompt` one whose BASE prompt record asks for it, and
+preflight refuses it elsewhere (check 89);
 `SPEC_AUDIT_DEFAULT` is read at the default-branch side of BASE; the bar reds a run commit writing
 either. The fan-out hook admits an audit in a live run only on the pinned `spec-audit` fact.
 

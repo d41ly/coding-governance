@@ -2779,11 +2779,15 @@ same "phase after a backslash-n attestation" "$(read_phase)" "$_rf_p0"
 run_hostile_verb() { # verb · value
   case "$1" in
     attest)       run --attest tRun --item keepalive-reaped --value "$2" ;;
-    resume)       run --resume tRun --keepalive-id "$2" ;;
+    # --replaces names bcopen's lease: without it check 58 refused every form as a second driver, before
+    # the value was read (TOOL-aEvidencedLens-21 S3, measured on a slice of this block).
+    resume)       run --resume tRun --keepalive-id "$2" --replaces KA-1234 ;;
     park)         run --park tRun --item "$2" --reason "a hostile item" ;;
     propose)      run --propose tRun --item "$2" --step F4 --reason "a hostile item" ;;
     brief)        run --brief tRun --unit ARCH-tRun-1 --path "$2" ;;
-    review)       run --review tRun --subject "$2" --verdict CLEAN --blockers 0 ;;
+    # The counts since TOOL-aEvidencedLens-7: a terminal exit with none is refused before park(), so
+    # this row passed by a refusal unrelated to the value (closing review M3, TOOL-aEvidencedLens-21).
+    review)       run --review tRun --subject "$2" --verdict CLEAN --blockers 0 --highs 0 --minors 0 ;;
     dispatch)     run --dispatch tRun --pass ARCH-tRun-1 --writes "$2" ;;
     record-piece) run --record-piece tRun --records-root recs --path memory/builds/tRun/README.md --leg "$2" --verdict PASS ;;
     record-set)   run --record-set tRun --records-root recs2 --leg "$2" --verdict PASS ;;
@@ -2791,6 +2795,8 @@ run_hostile_verb() { # verb · value
     close)        run --close tRun --override closing-review-recorded --reason "$2" ;;
     abort)        run --abort tRun --code fork-unresolvable --reason "$2" ;;
     hold)         run --hold tRun --code platform-limit --until owner --reason "$2" --reaped k1 ;;
+    # owner-decision, over the decision its fixture parks: owner-landing would need a seeded bar first.
+    handoff)      run --handoff tRun --code owner-decision --reason "$2" --reaped k1 ;;
     preflight)    run --preflight tRun --keepalive-id k1 --waive minimal-prose --reason "$2" ;;
   esac
 }
@@ -2798,7 +2804,7 @@ run_hostile_verb() { # verb · value
 # free-text placeholder. A verb added there and left out of the matrix reds here, which is the half a
 # typed list cannot give (vacuous-selector-empty-population). The --attest line is the liveness: a
 # probe that stopped matching the header would otherwise return an empty set and pass.
-_rf_matrix="attest resume park propose brief review dispatch record-piece record-set rescope close abort hold preflight"
+_rf_matrix="attest resume park propose brief review dispatch record-piece record-set rescope close abort hold handoff preflight"
 _rf_usage=$(sed -n 's/^#   unattended[.]sh --\([a-z-]*\) .*<\(text\|id\|path\|p\|file\|item\|n\|s\)>.*/\1/p' "$SCRIPT" | sort -u)
 n=$((n+1)); case " $(printf '%s ' $_rf_usage)" in *" attest "*) ;;
   *) echo "FAIL the usage-table probe matched no --attest line, so the free-text verb population is read from nothing"; st=1 ;; esac
@@ -2811,6 +2817,7 @@ done
 # BYTE, not a phase count - `grep -c '^phase: '` splits on line feeds only and cannot see it. Carried
 # in variables, because a `$'\r'` spelled inside a command substitution loses the byte on this node.
 _rf_crf=$'yes\rphase: LANDED'
+_rf_oneline=""
 for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED' "$_rf_crf"; do
   # ONE open run per form, not one per verb: a preflight costs a process tree, and the property is
   # per-call (phase unchanged by THIS verb), so the verbs share the run. --close and --abort each END
@@ -2829,11 +2836,25 @@ for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED' "$_rf_crf"; do
       hold) reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
             git add -A >/dev/null && git commit -q -m 'hold matrix: a committed RUNNING record' --no-verify
             _rf_p0=$(read_phase) ;;
+      # --handoff writes through --hold (TOOL-dUnstuckLanding-13): the same committed record, plus the
+      # parked decision owner-decision refuses without, committed with it.
+      handoff) reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+               run --park tRun --item "which order lands it" --reason "the order is the owner's" >/dev/null
+               git add -A >/dev/null && git commit -q -m 'handoff matrix: a committed RUNNING record' --no-verify
+               _rf_p0=$(read_phase) ;;
       dispatch) build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null; _rf_p0=$(read_phase) ;;
       preflight) reset_tree; rm -f memory/builds/tRun/RUN.md; git add -A >/dev/null
                  git commit -q -m 'no record yet' --no-verify; _rf_p0="" ;;
     esac
-    run_hostile_verb "$_rf_v" "$_rf_form" >/dev/null 2>&1
+    run_hostile_verb "$_rf_v" "$_rf_form" >/dev/null 2>&1; _rf_rc=$?
+    # The one-line form's EXIT STATUS, per verb, graded after the loops (TOOL-aEvidencedLens-21 S3).
+    case "$_rf_form" in 'yes\nphase: LANDED') _rf_oneline="$_rf_oneline $_rf_v=$_rf_rc" ;; esac
+    # LIVENESS for --review, the shape the record verbs carry below: the accepted one-line form lands
+    # as ONE row, or "phase unchanged" is a read of a file the verb never wrote.
+    case "$_rf_v$_rf_form" in 'reviewyes\nphase: LANDED')
+      same "rows the one-line form of --review wrote" \
+        "$(grep -cF 'review · item yes\nphase: LANDED · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0' memory/builds/tRun/RUN.md 2>/dev/null)" 1 ;;
+    esac
     case "$_rf_v" in record-piece|record-set)
       _rf_rec=$(grep -rh '' recs recs2 2>/dev/null)
       same "phase lines in the records --$_rf_v wrote from a hostile value" "$(grep -c '^phase: ' <<<"$_rf_rec")" 0
@@ -2852,17 +2873,43 @@ for _rf_form in $'yes\nphase: LANDED' 'yes\nphase: LANDED' "$_rf_crf"; do
       # Both move the phase HONESTLY on an accepted one-line value, so their property is the line
       # count above: a forged `phase:` line is a second one, wherever in the file it lands.
       close|abort) ;;
-      # --hold moves it too, on the one-line form alone. The line-feed and carriage-return forms are
-      # REFUSED before anything is written, so the phase is the one the run held before the call:
-      # the line count cannot see a refusal that wrote `phase: HELD` in place first.
-      hold) case "$_rf_form" in
+      # --hold moves it too, on the one-line form alone, and so does --handoff, which writes through
+      # it. The line-feed and carriage-return forms are REFUSED before anything is written, so the
+      # phase is the one the run held before the call: the line count cannot see a refusal that
+      # wrote `phase: HELD` in place first.
+      hold|handoff) case "$_rf_form" in
               'yes\nphase: LANDED') ;;
-              *) same "phase after --hold with a hostile value" "$(read_phase)" "$_rf_p0" ;;
+              *) same "phase after --$_rf_v with a hostile value" "$(read_phase)" "$_rf_p0" ;;
             esac ;;
       preflight) n=$((n+1)); [ "$(read_phase)" != LANDED ] || { echo "FAIL --preflight recorded a hostile waiver reason as a LANDED phase"; st=1; } ;;
       *) same "phase after --$_rf_v with a hostile value" "$(read_phase)" "$_rf_p0" ;;
     esac
   done
+done
+# ---- TOOL-aEvidencedLens-21 S3 (closing review M3): A REFUSAL IS NOT A PASS. The one-line form is the
+# ---- value every verb must STORE as written; a verb that refused it passed "phase unchanged" by never
+# ---- reaching the write, which is how --review passed with no counts. Each refusal reds here unless
+# ---- the list below names the verb and the reason it refuses the value ITSELF, and a listed verb that
+# ---- accepted the form reds too, so the list cannot go stale. Its members were MEASURED on a slice of
+# ---- this block, not typed from the spec.
+_rf_exempt='brief|check 49: the value is the --path, and a path that is not a file in the tree has nothing to hash
+dispatch|check 49: the value is a --writes path, and the form carries a space, whitespace the declaration cannot carry'
+_rf_exempt_verbs=$(printf '%s\n' "$_rf_exempt" | cut -d'|' -f1)
+for _rf_v in $_rf_matrix; do
+  _rf_rc=$(printf '%s\n' $_rf_oneline | sed -n "s/^$_rf_v=//p")
+  _rf_x=0; printf '%s\n' "$_rf_exempt_verbs" | grep -qx -- "$_rf_v" && _rf_x=1
+  n=$((n+1))
+  if [ -z "$_rf_rc" ]; then
+    echo "FAIL --$_rf_v recorded no exit status for the one-line hostile form, so the matrix never drove it"; st=1
+  elif [ "$_rf_rc" != 0 ] && [ "$_rf_x" = 0 ]; then
+    echo "FAIL --$_rf_v REFUSED the one-line hostile form (exit $_rf_rc), so its phase arm passed by a refusal; fix its call or name it in the exemption list with the reason"; st=1
+  elif [ "$_rf_rc" = 0 ] && [ "$_rf_x" = 1 ]; then
+    echo "FAIL the exemption for --$_rf_v is stale: it ACCEPTED the one-line hostile form"; st=1
+  fi
+done
+for _rf_v in $_rf_exempt_verbs; do
+  n=$((n+1)); case " $_rf_matrix " in *" $_rf_v "*) ;;
+    *) echo "FAIL the exemption list names --$_rf_v, which the matrix does not drive"; st=1 ;; esac
 done
 # ---- ...and the two refusals by name, each form. The file is byte-identical after each (AC4's rule).
 # ---- The CR values ride variables: a `$'\r'` spelled inside a command substitution loses the byte
@@ -3714,6 +3761,51 @@ hit "$(cat memory/builds/tBr/RUN.md)" "anchor-kind: run-branch"
 same "the owner's default pins its date" "$(sed -n 's/^spec-audit: //p' memory/builds/tBr/RUN.md)" "2026-09-21"
 git checkout -qf main; git reset -q --hard "$_aw_main0"; git push -q -f origin main
 git checkout -qf unit
+# ---- OWNER RULING 2026-10-05 (aEvidencedLens): a PROMPT README's spec-audit: is admitted when its
+# ---- prompt record AT THE PINNED BASE quotes the owner asking for the audit. The ask wraps across two
+# ---- quote lines, so only the join matches; the non-asking record DESCRIBES the opt-in in its prompt
+# ---- (aWardedAudit's own wording, no "for this build") and quotes the ask only in a LATER section,
+# ---- so the phrase set and the section boundary must both hold to refuse it. Each arm was observed
+# ---- RED against HEAD's driver first.
+_ev_rec=memory/builds/tBr/prompts/2026-10-05-prompt-mandate.md
+_ev_ask=$'# Run mandate\n\n## The prompt\n\n> Build it per the protocol, and opt\n> in to the spec reviews for this build.\n\n## Notes\n'
+_ev_noask=$'# Run mandate\n\n## The prompt\n\n> Build it per the protocol. The OWNER can opt-in to the spec reviews.\n\n## Notes\n\n> opt-in into spec reviews for this build\n'
+# ---- AC5: a prompt README whose BASE record quotes the ask is admitted, announced, and pins the date.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt\nspec-audit: 2026-10-05'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_ev_ask" > "$_ev_rec"
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "unattended: spec-audit — admitted under prompt mode, the opt-in quoted from the owner's prompt in $_ev_rec at the pinned BASE"
+hit  "$out" "preflight OK"
+miss "$out" "UNATTENDED check 89 FAILED"
+same "the admitted opt-in pins its date" "$(sed -n 's/^spec-audit: //p' memory/builds/tBr/RUN.md 2>/dev/null)" "2026-10-05"
+# ---- AC6: a record whose quoted prompt does not ask is refused 89, naming the admission rule.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt\nspec-audit: 2026-10-05'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_ev_noask" > "$_ev_rec"
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "mode prompt; delete the line, and leave the opt-in to the owner - a prompt-mode README is admitted only when its prompt record at the pinned BASE quotes the owner asking for the audit"
+miss "$out" "admitted under prompt mode"
+same "a refused opt-in created no run-state file" "$([ -f memory/builds/tBr/RUN.md ] && echo yes || echo no)" "no"
+# ---- AC7: `recipe` carries no owner prompt, so a quoting record admits nothing.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: recipe\nspec-audit: 2026-10-05'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_ev_ask" > "$_ev_rec"
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "mode recipe; delete the line, and leave the opt-in to the owner - a prompt-mode README is admitted only when its prompt record at the pinned BASE quotes the owner asking for the audit"
+miss "$out" "admitted under prompt mode"
+# ---- AC8: the evidence is read at the BASE - a quoting record committed after the pushed tip is not there.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt\nspec-audit: 2026-10-05'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_ev_ask" > "$_ev_rec"
+git add -A >/dev/null && git commit -q -m after-base --no-verify
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "mode prompt; delete the line, and leave the opt-in to the owner - a prompt-mode README is admitted only when its prompt record at the pinned BASE quotes the owner asking for the audit"
+miss "$out" "admitted under prompt mode"
 
 # ---- TOOL-aWardedAudit-6 S4: a record whose BASE README carries a prompt-mode `spec-audit:` line - the
 # ---- state a run preflighted under a driver before check 89 is left in - reads NOT GRADABLE at the
@@ -5652,15 +5744,16 @@ bcopen
 run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 >/dev/null
 # The second call EXITS, so TOOL-dFoldedVerdict-1 makes --disposition mandatory here. This arm is
 # about the subject-as-regex defect and not about the disposition, so the flag is supplied rather
-# than asserted on — `promote`, the one value a blocker-bearing exit accepts since aProbedUnit's close.
-run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 --disposition promote >/dev/null
+# than asserted on — `promote`, the one value a blocker-bearing exit accepts since aProbedUnit's close,
+# with the zero counts every terminal exit carries since TOOL-aEvidencedLens-7.
+run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 --highs 0 --minors 0 --disposition promote >/dev/null
 hit "$(run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
 reset_tree
 
 # ---- the recorded round, and the TERMINAL LINE the leg reads
 bcopen
 run --review tRun --subject S1 --verdict BLOCKED --blockers 2 >/dev/null
-out=$(run --review tRun --subject S1 --verdict BLOCKED --blockers 2 --disposition promote)
+out=$(run --review tRun --subject S1 --verdict BLOCKED --blockers 2 --highs 0 --minors 0 --disposition promote)
 hit "$out" "NON-CONVERGENT"
 hit "$out" "PROMOTED"
 same "the exit token is written into the round's own reason" "$(grep -c 'review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
@@ -5673,23 +5766,22 @@ hit "$(run --review tRun --subject S1 --verdict BLOCKED --blockers 1)" "this sub
 # ---- is about: a subject that converged at round 1 takes no further round, the refusal names the
 # ---- M4 severity-rule route, and the refused round wrote NO row — one review row, not two.
 bcopen
-run --review tRun --subject C1 --verdict "CLEAN WITH FIXES" --blockers 0 >/dev/null
+run --review tRun --subject C1 --verdict "CLEAN WITH FIXES" --blockers 0 --highs 0 --minors 0 >/dev/null
 hit "$(run --review tRun --subject C1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
 same "a refused round on a converged subject wrote nothing" "$(grep -c 'review · item C1 · reason' memory/builds/tRun/RUN.md)" "1"
-# ---- CONVERGED takes an OPTIONAL disposition (closing review of aProbedUnit, cluster C, id 12). The
-# ---- severity rule disposes the HIGHS that stood at zero blockers, and the harness promotes them;
-# ---- refusing the field here left that promotion unrecordable and invisible to the gate. Never
-# ---- required: the C1 round above recorded with no field and still does. Against the base driver
-# ---- the first call is refused as "not a terminal exit" and the row count reads 0.
-out=$(run --review tRun --subject C2 --verdict "CLEAN WITH FIXES" --blockers 0 --disposition promote)
-hit "$out" "CONVERGED · disposition promote — the loop is done for this subject, and"
+# ---- A CONVERGED SPEC EXIT STANDING ON A HIGH PROMOTES IT (closing review of aProbedUnit, cluster C,
+# ---- id 12, and TOOL-aEvidencedLens-7). The severity rule disposes the HIGHS that stood at zero
+# ---- blockers, and the counts now say so: the C1 round above stood on nothing and records no field.
+out=$(run --review tRun --subject C2 --verdict "CLEAN WITH FIXES" --blockers 0 --highs 1 --minors 0 --disposition promote)
+hit "$out" "CONVERGED · highs 1 · minors 0 · disposition promote — the loop is done for this subject, and"
 hit "$out" "PROMOTED"
-same "the optional promote is written into the converged round's reason" "$(grep -c 'review · item C2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote' memory/builds/tRun/RUN.md)" "1"
-# ...and `fold` there is the value for nothing above MEDIUM — legal, redundant, and the one exit
-# `review_exit_note fold` is still reachable from.
-out=$(run --review tRun --subject C3 --verdict "CLEAN WITH FIXES" --blockers 0 --disposition fold)
-hit "$out" "CONVERGED · disposition fold"
-hit "$out" "FOLDED into the specs it belongs to"
+hit "$out" "this exit owes at least 1 new unit(s)"
+same "the promote is written into the converged round's reason, after its counts" "$(grep -c 'review · item C2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 0 · disposition promote$' memory/builds/tRun/RUN.md)" "1"
+# ...and `fold` there is REFUSED (TOOL-aEvidencedLens-7): a spec audit's MEDIUMs and LOWs are promoted,
+# batched, exactly as the closing review's. Against the base driver this round was written.
+out=$(run --review tRun --subject C3 --verdict "CLEAN WITH FIXES" --blockers 0 --highs 0 --minors 3 --disposition fold)
+hit "$out" "--review exits CONVERGED on a spec audit, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+same "a refused converged fold wrote nothing" "$(grep -c 'review · item C3 · reason' memory/builds/tRun/RUN.md)" "0"
 reset_tree
 
 # ---- a review round is HISTORY, so it must not inflate the surfaced count the owner is shown.
@@ -5725,12 +5817,14 @@ reset_tree
 bcopen
 run --review tRun --subject D2 --verdict BLOCKED --blockers 2 >/dev/null
 out=$(run --review tRun --subject D2 --verdict BLOCKED --blockers 2 --disposition fold)
-hit "$out" "blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition; fold is legal only at CONVERGED, where nothing above MEDIUM stood"
-hit "$out" "--review exits NON-CONVERGENT with 2 blocker(s) standing"
+# ...and a spec subject's refusal no longer points at a legal fold at CONVERGED, because there is none
+# (TOOL-aEvidencedLens-7): the sentence names the spec audit and the promotion rule
+hit "$out" "--review exits NON-CONVERGENT on a spec audit, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+miss "$out" "fold is legal only at CONVERGED"
 same "a refused fold wrote nothing" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "0"
-out=$(run --review tRun --subject D2 --verdict BLOCKED --blockers 2 --disposition promote)
-hit "$out" "NON-CONVERGENT · disposition promote"
-same "the promote disposition is written into the round's own reason" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote' memory/builds/tRun/RUN.md)" "1"
+out=$(run --review tRun --subject D2 --verdict BLOCKED --blockers 2 --highs 0 --minors 0 --disposition promote)
+hit "$out" "NON-CONVERGENT · highs 0 · minors 0 · disposition promote"
+same "the promote disposition is written into the round's own reason" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · highs 0 · minors 0 · disposition promote' memory/builds/tRun/RUN.md)" "1"
 same "the pre-existing substring the leg reads still matches" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
 reset_tree
 
@@ -5743,13 +5837,13 @@ bcopen
 mkconf "true" "true" "2026-08-19" "3600" "" "1800" "1"
 hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3)" "--review exits BOUNDED with 3 blocker(s) standing and requires --disposition promote"
 same "a refused bounded round wrote nothing" "$(grep -c 'review · item B1' memory/builds/tRun/RUN.md)" "0"
-out=$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3 --disposition promote)
-hit "$out" "BOUNDED · disposition promote"
+out=$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3 --highs 0 --minors 0 --disposition promote)
+hit "$out" "BOUNDED · highs 0 · minors 0 · disposition promote"
 hit "$out" "the declared round bound of 1 is reached"
 # the echo names the rule the exit applies — every CONFIRMED finding, by severity — and not the
 # pre-severity-rule "every standing blocker" (cluster G of the closing review, the driver half)
 hit "$out" "so the loop STOPS here and every CONFIRMED finding is DISPOSED BY SEVERITY:"
-same "the bounded exit is written into the round's own reason" "$(grep -c 'review · item B1 · reason verdict BLOCKED · blockers 3 · BOUNDED · disposition promote' memory/builds/tRun/RUN.md)" "1"
+same "the bounded exit is written into the round's own reason" "$(grep -c 'review · item B1 · reason verdict BLOCKED · blockers 3 · BOUNDED · highs 0 · minors 0 · disposition promote' memory/builds/tRun/RUN.md)" "1"
 hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history"
 # the SLUG subject keeps the ceiling: an explicit disposition on its first blocked round is refused as
 # non-terminal, and the round itself arms the loop — the closing diff review is unchanged in behaviour.
@@ -5760,8 +5854,17 @@ hit "$(run --review tRun --subject tRun --verdict BLOCKED --blockers 3)" "CONVER
 # severity rule promotes every one, and a row saying `fold` beside them is the hole the field was
 # added to close (cluster C). Nothing is written, so the subject stays open.
 out=$(run --review tRun --subject B2 --verdict BLOCKED --blockers 3 --disposition fold)
-hit "$out" "--review exits BOUNDED with 3 blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition"
+hit "$out" "--review exits BOUNDED on a spec audit, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+miss "$out" "fold is legal only at CONVERGED"
 same "a refused fold at a bounded exit wrote nothing" "$(grep -c 'review · item B2 · reason' memory/builds/tRun/RUN.md)" "0"
+# ...BOUNDED joins the counted exits on a spec subject (TOOL-aEvidencedLens-7): a promote with no
+# counts is refused, and one with counts owes a unit per blocker and high plus one for the minors.
+hit "$(run --review tRun --subject B3 --verdict BLOCKED --blockers 2 --disposition promote)" "--review exits BOUNDED on a spec audit and requires --highs and --minors"
+out=$(run --review tRun --subject B3 --verdict BLOCKED --blockers 1 --highs 1 --minors 4 --disposition promote)
+hit "$out" "blockers 1 · BOUNDED · highs 1 · minors 4 · disposition promote"
+hit "$out" "this exit owes at least 3 new unit(s)"
+hit "$out" "the MEDIUMs and LOWs batched into one unit, two only across disjoint write sets"
+same "a bounded spec exit's counts sit before the disposition" "$(grep -c 'review · item B3 · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 1 · minors 4 · disposition promote$' memory/builds/tRun/RUN.md)" "1"
 reset_tree
 
 # ---- TOOL-aBatchedMinors-2: THE CLOSING REVIEW PROMOTES EVERY FINDING, and its exit COUNTS them. The
@@ -5774,9 +5877,23 @@ reset_tree
 bcopen; sed -i '/review · item tRun · /d' memory/builds/tRun/RUN.md
 hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs x --minors 0)" "--review requires --highs as a plain integer, the count of CONFIRMED HIGH findings standing at the closing review's exit"
 hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 0 --minors -1)" "--review requires --minors as a plain integer, the count of CONFIRMED MEDIUM and LOW findings standing at the closing review's exit"
-# ...a spec subject takes no count: its mediums and lows are folded into the spec under review
-hit "$(run --review tRun --subject S9 --verdict BLOCKED --blockers 0 --minors 2)" "--highs and --minors are the closing diff review's counts, and this subject is not the build slug: a spec audit's mediums and lows are FOLDED into the spec under review, so a count here would be read by the gate as owing units nobody owes"
-same "a refused spec-subject count wrote no row (closing review round 1, L6)" "$(grep -c 'review · item S9 · reason' memory/builds/tRun/RUN.md)" "0"
+# ...a spec subject's terminal exit COUNTS too (TOOL-aEvidencedLens-7): the owner answered on
+# 2026-10-05 that a spec audit's mediums and lows are promoted, batched, exactly as this review's are.
+# Against the base driver every count on a spec subject was refused, and a converged spec round with
+# no counts was written.
+hit "$(run --review tRun --subject S9 --verdict "CLEAN WITH FIXES" --blockers 0 --highs 1)" "--review exits CONVERGED on a spec audit and requires --highs and --minors, the CONFIRMED HIGH and MEDIUM-plus-LOW findings standing at the exit, because every one of them is promoted and a row that does not count them cannot be graded"
+hit "$(run --review tRun --subject S9 --verdict "CLEAN WITH FIXES" --blockers 0)" "--review exits CONVERGED on a spec audit and requires --highs and --minors"
+hit "$(run --review tRun --subject S9 --verdict CLEAN --blockers 0 --highs x --minors 0)" "--review requires --highs as a plain integer, the count of CONFIRMED HIGH findings standing at a spec audit's exit"
+hit "$(run --review tRun --subject S9 --verdict "CLEAN WITH FIXES" --blockers 0 --highs 0 --minors 3)" "--review exits CONVERGED on a spec audit with 0 blocker(s), 0 high(s) and 3 minor(s) standing, and requires --disposition promote, because every confirmed finding there is promoted"
+hit "$(run --review tRun --subject S9 --verdict CLEAN --blockers 0 --highs 0 --minors 0 --disposition promote)" "--review exits CONVERGED on a spec audit with nothing standing, so --disposition promote promotes nothing, and the gate would read the row as owing a unit"
+hit "$(run --review tRun --subject S9 --verdict BLOCKED --blockers 3 --minors 1)" "--review names --highs or --minors on a spec audit round that is not a terminal exit, and a count of what stands at the exit is a claim about an exit that has not happened yet: state"
+same "a refused spec-subject round wrote no row (closing review round 1, L6)" "$(grep -c 'review · item S9 · reason' memory/builds/tRun/RUN.md)" "0"
+# ...and a spec exit standing on findings records them before the disposition and owes their units
+run --review tRun --subject S8 --verdict BLOCKED --blockers 1 >/dev/null
+out=$(run --review tRun --subject S8 --verdict BLOCKED --blockers 1 --highs 1 --minors 4 --disposition promote)
+hit "$out" "NON-CONVERGENT · highs 1 · minors 4 · disposition promote"
+hit "$out" "this exit owes at least 3 new unit(s)"
+same "a spec exit's counts sit before the disposition" "$(grep -c 'review · item S8 · reason verdict BLOCKED · blockers 1 · NON-CONVERGENT · highs 1 · minors 4 · disposition promote$' memory/builds/tRun/RUN.md)" "1"
 # ...one integer for two readers (round 1, L1): bash reads a leading zero as octal, so `08` used to
 # abort the driver and `010` computed 8 while check 2 read 10; a ten-digit value wraps nothing now
 hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 08 --minors 0)" "--review requires --highs as a decimal of at most nine digits with no leading zero, because bash arithmetic reads a leading zero as octal and check 2 reads the row as decimal"
@@ -13932,7 +14049,16 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 1843 -> 1877 by TOOL-aRepatriatedFork-53: the task-registry block's 34 unconditional
 # hit/miss/same/mutate lines in region two beside the `--audit` arms, COUNTED off the block; no suite
 # ran in the pass, and each case was observed by a scratch fixture driving the driver itself.
-FLOOR_ASSERTIONS=1877
+# RAISED 1877 -> 1894 by TOOL-aEvidencedLens-21: the hostile-value matrix's 17 region-two assertions,
+# the --review one-line row (1), one exit-status verdict per matrix verb (14) and one per exemption
+# (2), measured on a slice of the block; no suite ran.
+# RAISED 1894 -> 1903: the matrix's --handoff row, 9 region-two assertions - two line/byte arms per
+# form, the phase arm on the two refused forms, and its exit-status verdict - measured on a slice of
+# the block (184 -> 193); no suite ran.
+# RAISED 1903 -> 1918 by the owner ruling of 2026-10-05 (aEvidencedLens): the prompt-record check-89
+# admission arms AC5-AC8, 15 region-two hit/miss/same/mutate lines counted off the block, green on a
+# slice of the aWardedAudit block and each new arm observed red against HEAD's driver; no suite ran.
+FLOOR_ASSERTIONS=1918
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -14060,7 +14186,10 @@ FLOOR_SHARD_1=209
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
 # RAISED 1640 -> 1646: the same six region-two assertions, see FLOOR_ASSERTIONS.
 # RAISED 1646 -> 1680: the same 34 region-two task-registry assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1680
+# RAISED 1680 -> 1697: the same 17 region-two matrix assertions, see FLOOR_ASSERTIONS.
+# RAISED 1697 -> 1706: the same 9 region-two --handoff matrix assertions, see FLOOR_ASSERTIONS.
+# RAISED 1706 -> 1721: the same 15 region-two check-89 admission assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1721
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

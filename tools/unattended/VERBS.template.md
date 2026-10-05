@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.64 -->
+<!-- gov:kit unattended@1.67 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -217,28 +217,25 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   smaller than the round before — and a subject that is NOT the build slug, a spec audit, takes at
   most the declared `REVIEW_ROUNDS` rounds (kit default 1) before it exits `BOUNDED`; the build slug
   is the closing diff review and its bound is the runaway ceiling, so it converges or backstops as it
-  always did. At a TERMINAL exit — `NON-CONVERGENT`, `CEILING` or `BOUNDED` — the round RECORDS its
-  disposition, and `promote` is the ONLY value a terminal exit can record: every such exit carries at
-  least one BLOCKER by construction, since a zero count is `CONVERGED`, and the severity rule the
-  Skill's exit bullet states promotes every blocker, so `--disposition promote` is REQUIRED there and
-  `fold` beside a standing blocker is REFUSED rather than written. `fold` survives as the reading of
-  a record that exited with nothing above MEDIUM, which the driver reaches only at `CONVERGED` with
-  no high, and that row needs no field. On a SPEC subject's `CONVERGED` an optional
-  `--disposition promote` is ACCEPTED, never required, for the round whose highs stood: it is the value that demands new unit
-  ids, and a mixed exit takes the value that demands something, so the gate counts the unit a high
-  became instead of reading the promotion as nothing. A record naming no value where one is owed
-  leaves the gate inferring one from ids. It refuses a verdict or a disposition outside its closed
-  set, a missing subject or count, a terminal exit carrying no disposition, `fold` at a terminal
-  exit, a disposition on a `CONVERGING` round, and a round on a subject whose loop has already ended.
-  **The closing diff review — the build-slug subject — counts what stood.** Owner ruling of
-  2026-10-04: every finding it confirms is promoted, one unit per BLOCKER and HIGH and the MEDIUMs
-  and LOWs batched into one unit, two only across disjoint write sets. Its terminal round therefore
-  REQUIRES `--highs <n>` and `--minors <n>`, the confirmed HIGH and MEDIUM-plus-LOW findings standing
-  at the exit, and writes them before the disposition: `blockers <b> · <EXIT> · highs <h> · minors
-  <m>[ · disposition promote]`. It requires `promote` when anything stood, refuses `fold` outright,
-  refuses `promote` when nothing stood, and refuses either count on a spec subject or a non-terminal
-  round. Check 2 reads a row carrying both counts as owing `blockers + highs`, plus one for the
-  minors when any stood, new non-WONTDO unit ids; every other row keeps the floor of one.
+  always did. At a TERMINAL exit — `CONVERGED`, `NON-CONVERGENT`, `CEILING` or `BOUNDED` — on EVERY
+  subject, spec subjects included, the round REQUIRES `--highs <n>` and `--minors <n>`, the confirmed
+  HIGH and MEDIUM-plus-LOW findings standing at the exit, and writes them before the disposition:
+  `blockers <b> · <EXIT> · highs <h> · minors <m>[ · disposition promote]`. Owner rulings of
+  2026-10-04 for the closing diff review, the build-slug subject, and of 2026-10-05 for a spec
+  subject: every finding a terminal exit confirms is promoted, one unit per BLOCKER and HIGH and the
+  MEDIUMs and LOWs batched into one unit, two only across disjoint write sets. So `promote` is the
+  ONLY value a terminal exit can record. It is REQUIRED whenever anything stood, "because every
+  confirmed finding there is promoted", and refused when nothing did, since it "promotes nothing, and
+  the gate would read the row as owing a unit". `fold` is refused at every terminal exit of every
+  subject, which "folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched
+  into one unit or two". `fold` survives only as the reading of a row written before spec subjects
+  counted their exits, which carries no counts. A record naming no value where one is owed leaves the
+  gate inferring one from ids. It refuses a verdict or a disposition outside its closed set, a
+  missing subject or count, a terminal exit missing either count or a disposition it owes, `fold` at
+  a terminal exit, a disposition or either count on a round that is not a terminal exit, and a round
+  on a subject whose loop has already ended. Check 2 reads a row carrying both counts as owing
+  `blockers + highs`, plus one for the minors when any stood, new non-WONTDO unit ids; every other
+  row keeps the floor of one.
 - `--check-commit` — `--check-commit <message file>`, run by the `commit-msg` hook on EVERY commit.
   It binds the run whose branch this worktree has checked out and is silent when there is none. A
   `Pass: <unit-id>` trailer must name an open dispatched pass, and the staged paths, less the

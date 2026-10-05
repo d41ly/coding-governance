@@ -133,8 +133,11 @@ acceptance criterion, so diagnostics that would change them live behind the flag
 A diff review fans out over five finder lenses, in this order: `security`, `correctness`, `seams`,
 `verification` and `intent`. Since 1.17 `verification` asks whether every changed behaviour has a
 check that can fail, and `intent` whether the diff does what its commit messages and specs say; the
-old `regressions` lens is retired. A spec audit keeps its four lenses. Five is also the most the
-agent-cap hook admits on that receiver, so the set cannot grow a sixth.
+old `regressions` lens is retired. A spec audit runs five lenses of its own, in this order:
+`coherence`, `grounding`, `reuse`, `blast-radius` and `failure-envelope` (TOOL-aEvidencedLens-1).
+`SPEC_LENSES` in the harness is that catalogue's one source; the method and the memory-tree README
+point at it. Five is also the most the agent-cap hook admits on that receiver, so neither set can
+grow a sixth.
 
 `lensNotes` appends a project addendum to one lens's brief, and to no other prompt:
 
@@ -204,7 +207,7 @@ trust boundary is not one to review light: the `security` lens is one of the two
 
 Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
 echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names
-it as `lens=<key>`. Every return carries three fields beside the counts:
+it as `lens=<key>`. Every return carries four fields beside the counts:
 
 - `ledger` — one entry per finding in id order: `id`, `lens`, `ref`, `severity` (the finder's),
   `skepticSeverity`, `verdict` (`confirmed`, `refuted`, `uncertain`, or `unverified` when no verdict
@@ -215,6 +218,16 @@ it as `lens=<key>`. Every return carries three fields beside the counts:
 - `appendix` — the ledger as a markdown table under `## Appendix — every finding`, with the eight
   columns `id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict`. A cell is `-`
   when its value is absent, a `|` is escaped, and line breaks fold to a space.
+- `lensYield` — per lens, `defects` and `unique` are `null` when no item list can be trusted (see below).
+  One row per lens that RAN, in dispatch order, none for a lens a light run skipped:
+  `lens`, `returned` (false for a lens that died), `raw`, `confirmed`, `refuted`, `uncertain`,
+  `unverified` (every finding neither confirmed nor refuted, the uncertain ones included), `precision`
+  (`confirmed / (confirmed + refuted)`, `null` when both are 0), `defects` (synthesis items holding a
+  confirmed id from this lens) and `unique` (items whose every confirmed id is this lens's). The item
+  list is untrusted, and both are `null` on every row, when no synthesis ran, it died,
+  or the tally fault fired. Each row is logged as a `lens yield:` line, and the counts known before
+  the synthesis reach its prompt as a verbatim block the report copies; the return is the source of
+  record, because that copy is not checked.
 
 The two exits before any skeptic runs, every lens dead and no finding raised, return `[]`, `[]` and
 `''`; a deferred return carries what was judged so far. The harness renders the appendix and tells the
@@ -229,7 +242,8 @@ Stdlib Python, run under the repo's python launcher. It answers one question not
 does a lens set or a prompt change find MORE of what a previous review proved real? Three modes:
 
 - `python3 {kit}/review_replay.py --known <record> --candidate <report> [--window N]` — the score.
-  The known set is the past diff-review record's confirmed findings in one of two UNITS, and the
+  The known set is a past diff-review or spec-audit record's confirmed findings; for a diff-review
+  record it is in one of two UNITS, and the
   `replay: known` line prints which. From its `## Appendix — every finding`, when it has one, the
   unit is `raw-finding`: one entry per confirmed appendix row, so a defect two lenses confirmed
   counts twice. Otherwise it is `adjudicated-item`, read from the legacy item table (a row whose
@@ -239,7 +253,20 @@ does a lens set or a prompt change find MORE of what a previous review proved re
   are found by header name. A known item is MATCHED when a candidate sits in the same file within
   `--window` lines (default 10); a drive-lettered ref such as `C:/repo/a.sh:12` keeps its path after
   the drive, so it matches a repo-relative one. It prints MATCHED, MISSED, UNSCORABLE and
-  CANDIDATE-ONLY lines, a per-lens line, and `replay: recall k/m`, and exits 0 at any recall.
+  CANDIDATE-ONLY lines, a per-lens line, and `replay: recall k/m`, and exits 0 at any recall. When
+  the known set came from an appendix, a `per-lens known:` line follows, giving each known-side lens
+  its confirmed count and how many a candidate matched.
+  **Spec mode** is chosen when the known record's first non-blank line is the `**Serves:** spec-audit`
+  binding. The known set is read from its appendix ONLY: with none it is refused `no-appendix`, never
+  scored as zero and never read through the legacy table. A spec ref is `<file>:<where>`, and the
+  section rule reads the first `§<n>` or `section <n>` in the address, else the first `S<n>`, `AC<n>`
+  or `F<n>` as §2, §6 or §8; an address naming none (`status header`) is UNSCORABLE. A match is the
+  same file and the same SECTION: the window is forced to 0, `--window` is ignored, and the
+  candidate line prints `address section`. The `replay: known` line carries `kind spec-audit` and the
+  subject pins written after the binding line, or `subjects none-stated`; no range is required. A
+  candidate opening with the other kind's `**Serves:**` binding is refused `kind-mismatch`, naming
+  both kinds, in either direction; an unbound candidate is read in the known record's mode. Spec
+  records are not listed by `--corpus`: name the known record directly.
 - `python3 {kit}/review_replay.py --corpus <dir> [<dir> ...] [--repo <clone>]` — which past records
   are replayable: each record whose first line is the `**Serves:** diff-review` binding, that passes
   the liveness check below and whose range resolves in this clone, with its round, range and scorable
