@@ -1354,6 +1354,82 @@ o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path
 has    "WS15 a resolved subject with no tree THROWS naming the field" "$o" "40-hex tree"
 hasnt_ "WS15 ...and not as a dirty tree" "$o" "Commit the fold"
 
+# ---- TOOL-aEvidencedLens-5: the audit is handed its context, sibling specs, bug-class checklist and
+# ---- scratch, and on a fold re-invoke the previous round's pins and confirmed set. Each input it could
+# ---- not produce is announced, never passed empty. Read RED first against the render at 5baf3465,
+# ---- whose audit call carried none of them, ignored `prevSubjects` and accepted a scratch under repo.
+o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+has    "EL5-AC1 the callee is handed scratch" "$w" '"scratch":"/tmp/s"'
+has    "EL5-AC1 ...a context naming the build README" "$w" 'memory/builds/tB/README.md'
+has    "EL5-AC1 ...and the run mandate's directory" "$w" 'memory/builds/tB/prompts/'
+has    "EL5-AC1 ...and specs: the format, then the siblings not under audit" "$w" '"specs":["memory/TEMPLATE-SPEC.md","s3"]'
+hasnt_ "EL5-AC3 a caller-pinned subject set passes no checklist key" "$w" '"checklist"'
+has    "EL5-AC3 ...and announces that no resolver ran" "$o" 'log:WARNING: no `checklist` for the audit: a caller-pinned `subjects` skipped the resolver, so no resolver ran'
+EL5_NOSUBJ=$(printf '%s' "$UNITS" | sed 's#"subjects":\[[^]]*\],##')
+el5_res() { printf '{"spec:":%s,"audit:subjects":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$1" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK"; }
+o=$(run_wf "$EL5_NOSUBJ" "$(el5_res '{"subjects":[{"path":"s1","blob":"'"$B40"'","tree":"'"$B40"'"}],"checklist":"# h\n- [ ] a\n- [ ] b\n","checklistPaths":["x"]}')")
+has    "EL5-AC2 the resolver's checklist reaches the callee verbatim" "$(printf '%s\n' "$o" | grep '^wargs:')" '"checklist":"# h\n- [ ] a\n- [ ] b\n"'
+p=$(printf '%s\n' "$o" | grep '^prompt:audit:subjects:')
+has    "EL5-AC2 the resolver is told to run gotchas.py --for-paths" "$p" 'gotchas.py --for-paths'
+has    "EL5-AC2 ...over the subjects' Files touched (estimate) paths" "$p" 'Files touched (estimate)'
+o=$(run_wf "$EL5_NOSUBJ" "$(el5_res '{"subjects":[{"path":"s1","blob":"'"$B40"'","tree":"'"$B40"'"}],"checklistError":"no path declared"}')")
+has    "EL5-AC3 a checklistError is announced by its reason" "$o" 'log:WARNING: no `checklist` for the audit: no path declared'
+hasnt_ "EL5-AC3 ...and no checklist key reaches the callee" "$(printf '%s\n' "$o" | grep '^wargs:')" '"checklist"'
+o=$(run_wf "$EL5_NOSUBJ" "$(el5_res '{"subjects":[{"path":"s1","blob":"'"$B40"'","tree":"'"$B40"'"}],"checklist":"# one\n# two\n"}')")
+has    "EL5-AC3 a header-only checklist is announced as no bug class selected" "$o" 'log:WARNING: no `checklist` for the audit: no bug class selected'
+hasnt_ "EL5-AC3 ...and never reaches the callee, whose parseChecklist refuses it" "$(printf '%s\n' "$o" | grep '^wargs:')" '"checklist"'
+EL5_FOLD='"slug":"tB","round":3,"subjectRound":2,'
+o=$(run_wf "$(printf '%s' "$UNITS" | sed "s#\"slug\":\"tB\",#${EL5_FOLD}\"prevSubjects\":[{\"path\":\"s1\",\"blob\":\"1234abc\"}],\"priorFindings\":[{\"ref\":\"r1\",\"claim\":\"c\"}],#")" "$(returns CONVERGED 0)")
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+has    "EL5-AC4 a fold re-invoke hands the previous pin to its subject" "$w" '{"path":"s1","blob":"abc1234","prevBlob":"1234abc"}'
+has    "EL5-AC4 ...and none to a subject the previous round did not pin" "$w" '{"path":"s2","blob":"def5678"}'
+has    "EL5-AC4 ...and passes priorFindings through" "$w" '"priorFindings":[{"ref":"r1","claim":"c"}]'
+o=$(run_wf "$(printf '%s' "$UNITS" | sed "s#\"slug\":\"tB\",#${EL5_FOLD}#")" "$(returns CONVERGED 0)")
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+hasnt_ "EL5-AC5 a fold re-invoke with neither fold arg does not throw" "$o" 'THROW'
+has    "EL5-AC5 ...and announces a degraded fold review" "$o" 'log:WARNING: a degraded fold review'
+hasnt_ "EL5-AC5 ...passing no prevBlob" "$w" 'prevBlob'
+hasnt_ "EL5-AC5 ...and no priorFindings" "$w" 'priorFindings'
+o=$(run_wf "$(printf '%s' "$UNITS" | sed "s#\"slug\":\"tB\",#${EL5_FOLD}\"prevSubjects\":[{\"path\":\"s1\",\"blob\":\"1234abc\"}],#")" "$(returns CONVERGED 0)")
+has    "EL5-AC5 prevSubjects alone announces the missing priorFindings" "$o" 'with no `priorFindings`'
+hasnt_ "EL5-AC5 ...and not as a degraded fold review" "$o" 'degraded fold review'
+o=$(run_wf "$(printf '%s' "$UNITS" | sed "s#\"slug\":\"tB\",#${EL5_FOLD}\"priorFindings\":[{\"ref\":\"r1\"}],#")" "$(returns CONVERGED 0)")
+has    "EL5-AC5 priorFindings alone announces prevSubjects and a whole-file review" "$o" 'no `prevSubjects` matching a subject, so the callee runs a whole-file review of each subject'
+hasnt_ "EL5-AC5 ...and not as a degraded fold review" "$o" 'degraded fold review'
+for el5 in \
+  "${EL5_FOLD}\"prevSubjects\":[{\"path\":\"s1\",\"blob\":\"xyz\"}],|\`prevSubjects\` must be an array of {path, blob} with a 7 to 40 hex blob" \
+  "${EL5_FOLD}\"priorFindings\":\"x\",|\`priorFindings\` must be an array of finding objects" \
+  "\"slug\":\"tB\",\"prevSubjects\":[{\"path\":\"s1\",\"blob\":\"1234abc\"}],|\`prevSubjects\` is present at callee round 1, a fresh generation" \
+  "\"slug\":\"tB\",\"priorFindings\":[{}],|\`priorFindings\` is present at callee round 1, a fresh generation"; do
+  o=$(run_wf "$(printf '%s' "$UNITS" | sed "s#\"slug\":\"tB\",#${el5%%|*}#")" "$(returns CONVERGED 0)")
+  has    "EL5-AC6 refused by name: ${el5#*|}" "$o" "THROW unattended-build: ${el5#*|}"
+  same   "EL5-AC6 ...before the sub-workflow: ${el5#*|}" "$(printf '%s\n' "$o" | grep -c '^workflow:')" "0"
+  hasnt_ "EL5-AC6 ...and before any agent: ${el5#*|}" "$o" 'agent:'
+done
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"blockers":3,"confirmed":3,"highs":0,"unverified":0,"report":"r.md","precision":1,"note":"n","confirmedFindings":[{"ref":"f1","claim":"c"}]},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(rec CONVERGING)" "$DISPOSE_OK")")
+has    "EL5-AC7 the CONVERGING return hands back the pinned {path, blob} set" "$o" '"prevSubjects":[{"path":"s1","blob":"abc1234"},{"path":"s2","blob":"def5678"}]'
+has    "EL5-AC7 ...and the callee's confirmedFindings as priorFindings" "$o" '"priorFindings":[{"ref":"f1","claim":"c"}]'
+has    "EL5-AC7 ...and nextAction names both as the args to copy back" "$o" "copy this return's prevSubjects and priorFindings as those args"
+o=$(run_wf "$UNITS" "$(returns CONVERGING 3)")
+has    "EL5-AC7 a callee return with no confirmedFindings is announced" "$o" 'log:WARNING: the review returned no `confirmedFindings` array'
+hasnt_ "EL5-AC7 ...and priorFindings is omitted, never handed back as []" "$(printf '%s\n' "$o" | grep '^RESULT ')" '"priorFindings":'
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"specPath":"s3"#"specPath":""#; s#}]}$#},{"id":"A-tB-4","order":3,"briefPath":"b4"}]}#')" "$(returns CONVERGED 0)")
+has    "EL5-AC9 an empty or absent specPath never reaches specs" "$(printf '%s\n' "$o" | grep '^wargs:')" '"specs":["memory/TEMPLATE-SPEC.md"]'
+hasnt_ "EL5-AC9 ...and the audit proceeds" "$o" 'THROW'
+for el5 in 's#"scratch":"/tmp/s"#"scratch":"/tmp/s\\nX"#' 's#"scratch":"/tmp/s"#"scratch":"/tmp/r/sub"#' \
+           's#"repo":"/tmp/r"#"repo":"c:/r"#; s#"scratch":"/tmp/s"#"scratch":"C:\\\\R\\\\x"#'; do
+  o=$(run_wf "$(printf '%s' "$UNITS" | sed "$el5")" "$(returns CONVERGED 0)")
+  has    "EL5-AC10 the prelude refuses a scratch the callee would ($el5)" "$o" 'THROW unattended-build: `scratch` must carry no control character and must not be equal to or under `repo`'
+  same   "EL5-AC10 ...before the sub-workflow ($el5)" "$(printf '%s\n' "$o" | grep -c '^workflow:')" "0"
+  hasnt_ "EL5-AC10 ...and before any spec-stage agent ($el5)" "$o" 'agent:'
+done
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"scratch":"/tmp/s"#"scratch":"/tmp/rs"#')" "$(returns CONVERGED 0)")
+same   "EL5-AC10 a sibling of repo sharing its prefix proceeds" "$(printf '%s\n' "$o" | grep -c '^workflow:')" "1"
+hdr=$(sed -n '/^\/\/ --- inputs (via Workflow `args`)/,/^\/\/ }$/p' "$F")
+has    "EL5-AC8 the args header documents prevSubjects" "$hdr" '//   prevSubjects:'
+has    "EL5-AC8 the args header documents priorFindings" "$hdr" '//   priorFindings:'
+
 # ---- F (id 16): an UNVERIFIED finding the stage judges not a defect has a route. `refuted` is
 # ---- optional, bounded by `unverified`, in the sum, and the severity floors stand.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
@@ -1792,7 +1868,7 @@ fi
 # `n=$((n+1))` sites — the PV-AC12 branch's among them, the one region that can SKIP — are not in
 # the static count, so it is a LOWER bound on what a green run executes. Lower it in a reviewed
 # diff or not at all.
-FLOOR_ASSERTIONS=293
+FLOOR_ASSERTIONS=348
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

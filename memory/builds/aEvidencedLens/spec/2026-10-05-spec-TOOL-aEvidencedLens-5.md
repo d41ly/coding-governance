@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-5 — the build harness hands the audit its context, sibling specs, checklist and prior findings
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6
+**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 

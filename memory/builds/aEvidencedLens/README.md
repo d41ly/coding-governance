@@ -84,7 +84,7 @@ ids TOOL-aEvidencedLens-14
 | [TOOL-aEvidencedLens-6 — the review returns a per-lens yield over defect clusters, unique defects counted](spec/2026-10-05-spec-TOOL-aEvidencedLens-6.md) | 5 | 2 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aEvidencedLens-10 — `review_replay.py` scores a spec-audit report against a past one by file and section](spec/2026-10-05-spec-TOOL-aEvidencedLens-10.md) | 6 | 1 | SPECCED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-13 — no diff-kind probe, lens or skeptic prompt moved from BASE through unit 6, observed once with the review key masked](spec/2026-10-05-spec-TOOL-aEvidencedLens-13.md) | 6 | 2 | SPECCED | rev-1 | 2026-10-05 |
-| [TOOL-aEvidencedLens-5 — the build harness hands the audit its context, sibling specs, checklist and prior findings](spec/2026-10-05-spec-TOOL-aEvidencedLens-5.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-05 |
+| [TOOL-aEvidencedLens-5 — the build harness hands the audit its context, sibling specs, checklist and prior findings](spec/2026-10-05-spec-TOOL-aEvidencedLens-5.md) | 6 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-7 — `--review` takes highs and minors on a spec subject's exit and requires `promote` when any stood](spec/2026-10-05-spec-TOOL-aEvidencedLens-7.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-9 — the bar refuses a run commit that changes `REVIEW_ROUNDS`](spec/2026-10-05-spec-TOOL-aEvidencedLens-9.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-12 — the spec skeptic line carries a finding's evidence through a line-break-only fold, so a pipe survives](spec/2026-10-05-spec-TOOL-aEvidencedLens-12.md) | 7 | 2 | SPECCED | rev-2 | 2026-10-05 |

@@ -5,7 +5,7 @@ export const meta = {
     'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal. AUDIT is opt-in: with no `specAudit` arg the stage announces itself OFF by declaration and the roster follows SPEC completion.',
   phases: [
     { title: 'Spec', detail: 'author every missing spec, in the declared order, no code' },
-    { title: 'Audit', detail: 'delegate to tier2-review.js as a spec-audit; record the round, after the disposal at zero blockers so the disposition field is what was promoted. Only when `specAudit` is declared: absent, the stage logs OFF by declaration and delegates nothing' },
+    { title: 'Audit', detail: 'delegate to tier2-review.js as a spec-audit, passing `context` (the build README and run mandate), `specs` (the spec format and every sibling spec), `checklist` (the resolver\'s gotchas.py --for-paths output) and `scratch`, plus `priorFindings` and a per-subject `prevBlob` on a fold re-invoke; record the round, after the disposal at zero blockers so the disposition field is what was promoted. Only when `specAudit` is declared: absent, the stage logs OFF by declaration and delegates nothing' },
     { title: 'Disposal', detail: 'dispose every confirmed and unverified finding by severity over the whole spec set, then hand out the roster, withheld on a clean round until its spec-audit record exists' },
   ],
 }
@@ -163,7 +163,14 @@ function chunk(a, n) {
 //   subjectRound: <integer>                         // ON A FOLD RE-INVOKE: the round the current subject
 //                                                   //   set was first audited at, copied from the CONVERGING
 //                                                   //   return; keeps the driver's sequence on ONE subject
+//   prevSubjects: [{ path, blob }],                 // ON A FOLD RE-INVOKE (callee round > 1): the pinned set
+//                                                   //   the CONVERGING return handed back; each matching
+//                                                   //   subject carries its blob to the callee as `prevBlob`
+//   priorFindings: [{ ... }]                        // ON A FOLD RE-INVOKE: the CONVERGING return's
+//                                                   //   `priorFindings`, the previous round's confirmed set
 // }
+// TOOL-aEvidencedLens-5 - the two fold args are REFUSED at a callee round of 1 (a fresh generation has
+// no previous round) and refused by name when malformed, before any agent spawns.
 //
 // THE REVIEW SUBJECT IS KEYED PER SPEC-SET GENERATION (closing review round 1, cluster B). It was the
 // literal `<slug>-spec-set`, so a unit the DISPOSAL stage promoted had no audit route: the subject
@@ -220,6 +227,20 @@ if (typeof cfg.scratch !== 'string' || !/^(\/|[A-Za-z]:[\\/])/.test(cfg.scratch)
     'unattended-build: args must carry an explicit `scratch`, an ABSOLUTE path to the session ' +
       'scratchpad — the one the caller\'s own system prompt names. Got ' + JSON.stringify(cfg.scratch) +
       '. Refusing to default it: a defaulted scratch root is the floating temp dir this argument exists to end.',
+  )
+}
+// TOOL-aEvidencedLens-5 S4 - the callee's two extra refusals, applied HERE so a scratch `tier2-review.js`
+// would refuse dies at this prelude and not after the spec stage and the resolver have spent their work:
+// a control character, and a value equal to or under an absolute `repo` after the same fold (slashes,
+// case, trailing slash) that harness applies.
+const scratchFold = cfg.scratch.replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '')
+const repoFold = String(cfg.repo).replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '')
+if (/[\x00-\x1f]/.test(cfg.scratch) || (/^(\/|[A-Za-z]:[\\/])/.test(String(cfg.repo)) &&
+    (scratchFold === repoFold || scratchFold.indexOf(repoFold + '/') === 0))) {
+  throw new Error(
+    'unattended-build: `scratch` must carry no control character and must not be equal to or under `repo`. Got ' +
+      JSON.stringify(cfg.scratch) + ' beside `repo` ' + JSON.stringify(cfg.repo) + '; the review harness refuses ' +
+      'both, so this refuses before any stage spends work.',
   )
 }
 const scratch = cfg.scratch.replace(/\\/g, '/')
@@ -289,7 +310,7 @@ const auditIds = a.auditIds === undefined ? [] : a.auditIds
 // fourth such argument (closing review of units 2–5, F6): the only paths that tell a caller to pass
 // it are audit re-invokes, so beside no declaration it names a round that never happened.
 const specAudit = a.specAudit !== undefined
-const auditShaped = ['subjects', 'auditIds', 'subjectRound'].filter(function (k) { return a[k] !== undefined })
+const auditShaped = ['subjects', 'auditIds', 'subjectRound', 'prevSubjects', 'priorFindings'].filter(function (k) { return a[k] !== undefined })
 if (a.round !== undefined && a.round > 1) auditShaped.push('round')
 if (!specAudit && auditShaped.length) {
   throw new Error(
@@ -305,6 +326,27 @@ if (subjectRound > roundNo) {
       'set cannot have been first audited at a round that has not happened; copy the value the ' +
       'CONVERGING return handed back rather than composing one.',
   )
+}
+// TOOL-aEvidencedLens-5 S5/S6 - the fold inputs, refused by name before any agent spawns.
+const calleeRound = roundNo - subjectRound + 1
+const FOLD_ARGS = [
+  ['prevSubjects', Array.isArray(a.prevSubjects) && a.prevSubjects.every(function (s) {
+    return !!s && typeof s === 'object' && typeof s.path === 'string' && !!s.path && /^[0-9a-f]{7,40}$/.test(String(s.blob))
+  }), 'an array of {path, blob} with a 7 to 40 hex blob'],
+  ['priorFindings', Array.isArray(a.priorFindings) && a.priorFindings.every(function (f) {
+    return !!f && typeof f === 'object' && !Array.isArray(f)
+  }), 'an array of finding objects'],
+]
+for (const t of FOLD_ARGS) {
+  if (a[t[0]] === undefined) continue
+  if (!t[1]) {
+    throw new Error('unattended-build: `' + t[0] + '` must be ' + t[2] + ', got ' + JSON.stringify(a[t[0]]) +
+      '. Copy the value the CONVERGING return handed back rather than composing one.')
+  }
+  if (calleeRound === 1) {
+    throw new Error('unattended-build: `' + t[0] + '` is present at callee round 1, a fresh generation with no ' +
+      'previous round to carry it from. Drop it; it belongs only on a fold re-invoke (round above subjectRound).')
+  }
 }
 const strayAudit = auditIds.filter(function (id) {
   return !units.some(function (u) { return u.id === id })
@@ -359,6 +401,9 @@ const DRIVER = 'bash tools/unattended/unattended.sh'
 // this unit deletes, and the child cannot carry it: a shipped kit file names nothing outside itself
 // by literal, so it lives in the parent, whose install paths are filled in when it is rendered.
 const CHECKLIST = 'python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD'
+// TOOL-aEvidencedLens-5 S3 - the spec audit's checklist. A spec precedes its code, so there is no diff:
+// the resolver runs this over the paths the subjects' `Files touched (estimate)` sections declare.
+const AUDIT_CHECKLIST = 'python tools/memory-tree/gotchas.py --for-paths'
 const ordered = units.slice().sort(function (x, y) {
   const ox = Number.isInteger(x.order) ? x.order : 1e9
   const oy = Number.isInteger(y.order) ? y.order : 1e9
@@ -451,6 +496,11 @@ const SUBJECTS_SCHEMA = {
         required: ['path', 'blob', 'tree'],
       },
     },
+    // TOOL-aEvidencedLens-5 S3 - OPTIONAL: the `--for-paths` stdout and the paths it ran over, or why
+    // none was produced. Never required, so a resolver that cannot produce one still pins the subjects.
+    checklist: { type: 'string' },
+    checklistPaths: { type: 'array', items: { type: 'string' } },
+    checklistError: { type: 'string' },
   },
   required: ['subjects'],
 }
@@ -764,6 +814,8 @@ if (!specAudit) {
 // and cannot watch the file between the check and the read. A caller-supplied set never enters
 // the branch and carries no `tree`, so the compare cannot read it; `badSubject` below grades both.
 let subjects = Array.isArray(a.subjects) ? a.subjects : null
+let checklist = null
+let checklistWhy = 'a caller-pinned `subjects` skipped the resolver, so no resolver ran to produce one'
 // SCOPED AFTER A DISPOSAL. With `auditIds` the resolver sees only the promoted units, so the audit
 // reads the specs no spec-audit record names yet and not the whole set a terminal round already
 // closed; the subject key above is what lets the driver accept that round at all.
@@ -783,10 +835,22 @@ if (specAudit && !subjects) {
       '`git hash-object <specPath>` in ' + repo + ' and return both as the full 40-character object ' +
       'names — `blob` and `tree` respectively, one entry per spec. Return ONLY units whose spec ' +
       'exists and whose blob resolves; an unspecced unit is omitted rather than given an invented ' +
-      'hash. Paths are repo-relative and forward-slashed.',
+      'hash. Paths are repo-relative and forward-slashed.\n\n' +
+      'Then the bug-class checklist: read each resolved spec\'s `### Files touched (estimate)` section, ' +
+      'collect its backticked paths, union them, and run `' + AUDIT_CHECKLIST + ' <paths>` in ' + repo +
+      ' with a 120-second timeout. Return its stdout verbatim as `checklist` and the paths as ' +
+      '`checklistPaths`. Return NO `checklist` and a `checklistError` naming why instead when no path ' +
+      'was declared, the command exits non-zero (name the code), it times out, or its stdout carries no ' +
+      'line starting `- ` (write `no bug class selected`).',
     { label: 'audit:subjects:r' + roundNo, phase: 'Audit', schema: SUBJECTS_SCHEMA },
   )
   subjects = (res && Array.isArray(res.subjects)) ? res.subjects : []
+  // S3/S8 - a checklist reaches the callee only when it carries a `- ` item, which is what its
+  // `parseChecklist` refuses otherwise; every other outcome is announced, never passed as ''.
+  if (res && typeof res.checklist === 'string' && /^- /m.test(res.checklist)) checklist = res.checklist
+  else checklistWhy = res && typeof res.checklist === 'string' && res.checklist.trim()
+    ? 'no bug class selected'
+    : (res && typeof res.checklistError === 'string' && res.checklistError) || 'the resolver returned neither `checklist` nor `checklistError`'
   // THE PRE-FLIGHT, INSIDE THE BRANCH so a supplied `{path, blob}` set never reads as dirty. The
   // field refusal comes first and is distinct from the dirty verdict: the suite's runner evaluates
   // no schema, so a resolver that omits `tree` or abbreviates a side is refused NAMING THE FIELD,
@@ -834,6 +898,44 @@ if (badSubject !== -1) {
   )
 }
 
+// TOOL-aEvidencedLens-5 - what the audit's lenses are primed with. Each input this stage could not
+// produce is ANNOUNCED and left out, never passed empty (S8).
+const subjectPaths = specAudit ? subjects.map(function (s) { return s.path }) : []
+// S5 - a fold re-invoke hands each subject the blob the previous round pinned; one already carrying a
+// `prevBlob` keeps it.
+const prevSubjects = Array.isArray(a.prevSubjects) ? a.prevSubjects : []
+if (specAudit) {
+  subjects = subjects.map(function (s) {
+    if (s.prevBlob !== undefined) return s
+    const prev = prevSubjects.find(function (p) { return p.path === s.path })
+    return prev ? Object.assign({}, s, { prevBlob: prev.blob }) : s
+  })
+}
+const priorFindings = Array.isArray(a.priorFindings) ? a.priorFindings : null
+if (specAudit && calleeRound > 1) {
+  const anyPrev = subjects.some(function (s) { return s.prevBlob !== undefined })
+  if (!anyPrev && !priorFindings) {
+    log('WARNING: a degraded fold review at callee round ' + calleeRound + ': no `prevSubjects` and no `priorFindings`, ' +
+      'so nothing names the text the previous round\'s fixes introduced and every subject is reviewed whole')
+  } else if (!anyPrev) {
+    log('WARNING: fold re-invoke with no `prevSubjects` matching a subject, so the callee runs a whole-file review of each subject')
+  } else if (!priorFindings) {
+    log('WARNING: fold re-invoke with no `priorFindings`, so the callee runs with no prior findings to check the fixes against')
+  }
+}
+// S1 - the two documents to read first; the mandate directory is `briefDir`, never re-spelled.
+const auditContext = 'Build ' + slug + ': read memory/builds/' + slug + '/README.md and the run mandate under ' + briefDir +
+  '/ (the file whose name carries run-mandate; under a run with no prompt the README is the mandate) FIRST - ' +
+  'they state what the build is for.'
+// S2 - the spec format first, then every non-empty sibling spec path not under audit this round, once,
+// in roster order. Non-empty BEFORE the subject exclusion: a spec the spec stage just authored carries ''.
+const auditSpecs = ['memory/TEMPLATE-SPEC.md']
+for (const u of ordered) {
+  if (typeof u.specPath === 'string' && u.specPath && subjectPaths.indexOf(u.specPath) === -1 &&
+      auditSpecs.indexOf(u.specPath) === -1) auditSpecs.push(u.specPath)
+}
+if (specAudit && checklist === null) log('WARNING: no `checklist` for the audit: ' + checklistWhy)
+
 // `null` WITH THE AUDIT OFF, and null is the right word: the adapter below reads `auRaw` as the callee's
 // return, and the callee was never called. Every check it runs is guarded on `specAudit`, so a null
 // here is never mistaken for the dead sub-workflow the first guard refuses.
@@ -847,9 +949,14 @@ const auRaw = !specAudit ? null : await workflow(
     // with it, and under the kit default every promoted-spec audit lands at an invocation round of 2
     // or more — over a spec nobody has reviewed. 1 for a fresh generation, N for its Nth fold;
     // `roundNo` stays the harness's own label.
-    round: roundNo - subjectRound + 1,
+    round: calleeRound,
     reviewDir: reviewDir,
+    scratch: scratch,
     subjects: subjects,
+    context: auditContext,
+    specs: auditSpecs,
+    ...(checklist !== null ? { checklist: checklist } : {}),
+    ...(priorFindings ? { priorFindings: priorFindings } : {}),
   },
 )
 
@@ -1121,6 +1228,12 @@ const audit = { ran: specAudit, verdict: verdict, blockers: au.blockers, highs: 
 // revision of this comment claimed the promotion happened and no line of the program did it.
 if (verdict === 'CONVERGING') {
   log('audit is still CONVERGING — no roster this invocation; fold, then re-invoke at round ' + (roundNo + 1))
+  // TOOL-aEvidencedLens-5 S7 - the fold inputs travel back for the caller to copy, as `subjectRound`
+  // does. A callee return with no `confirmedFindings` array OMITS `priorFindings` rather than carrying
+  // `[]`, so the next invoke is announced as lacking it instead of handed an empty set.
+  const handPrev = subjects.map(function (s) { return { path: s.path, blob: s.blob } })
+  const handPrior = Array.isArray(auRaw.confirmedFindings) ? auRaw.confirmedFindings : null
+  if (!handPrior) log('WARNING: the review returned no `confirmedFindings` array, so no `priorFindings` is handed back for the fold re-invoke')
   return {
     slug: slug,
     // THE MODE TRAVELS ON THIS RETURN TOO. It is the path an attended run takes on every
@@ -1142,6 +1255,8 @@ if (verdict === 'CONVERGING') {
     // sequence keeps its predecessor to shrink against; `auditIds` rides with it for the same reason.
     subjectRound: subjectRound,
     auditIds: auditIds,
+    prevSubjects: handPrev,
+    ...(handPrior ? { priorFindings: handPrior } : {}),
     // EVERY NON-THROWING EXIT CARRIES `roster`, so `roster.length === 0` is the caller's whole stop
     // condition. This return carried no such key at all, while the Skill bullet told the run that an
     // empty roster is the refusal — a caller reading `roster.length` read a property of `undefined`
@@ -1150,7 +1265,8 @@ if (verdict === 'CONVERGING') {
     nextAction:
       'FOLD the confirmed findings in ' + lastReport + ' as rev-N bumps with their section 9 lines, ' +
       'then re-invoke this harness with round: ' + (roundNo + 1) + ', subjectRound: ' + subjectRound +
-      (auditIds.length ? ', auditIds: ' + JSON.stringify(auditIds) : '') + '. Do not build.',
+      (auditIds.length ? ', auditIds: ' + JSON.stringify(auditIds) : '') +
+      ', and copy this return\'s prevSubjects' + (handPrior ? ' and priorFindings' : '') + ' as those args. Do not build.',
     note: 'HELD AT AUDIT — the review loop has not ended, so no unit was built' +
       (attended ? ' · ATTENDED, so no driver-side check ran' : ''),
   }
