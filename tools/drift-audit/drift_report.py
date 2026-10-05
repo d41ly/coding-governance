@@ -2844,6 +2844,110 @@ def write_drift_history(path: pathlib.Path | None, rows: list[str]) -> None:
     print(f"drift-report: {len(rows)} history rows appended to {path}")
 
 
+# TOOL-aMendedFleet-49. `--delta <base> <head>`: the history's one reader, beside its writer so the two
+# share HISTORY_COLUMNS. Every case that cannot produce a delta is ONE `skipped` line and exit 0 —
+# never a zero delta, which would read as "nothing moved" when nothing was measured.
+def read_history_groups(path: pathlib.Path | None) -> tuple[list[dict], str]:
+    """The history's groups in append order, each `{utc, sha, rows: {signal: row}, order}`; or no
+    groups and the skip reason. A group is the CONSECUTIVE rows of one write, keyed by utc and sha:
+    the writer appends one group in one binary write, so its rows are never split."""
+    if path is None or not path.is_file():
+        return [], f"no drift history in this clone ({path or 'git named no common dir'})"
+    lines = path.read_bytes().decode("utf-8", errors="replace").splitlines()
+    head = lines[0].split("\t") if lines else []
+    if not set(HISTORY_COLUMNS) <= set(head):
+        return [], f"{path.name} opens with a header this engine does not write"
+    col = {name: head.index(name) for name in HISTORY_COLUMNS}
+    groups: list[dict] = []
+    for ln in lines[1:]:
+        f = ln.split("\t")
+        if len(f) < len(head):
+            continue
+        row = {name: f[i] for name, i in col.items()}
+        key = (row["#utc"], row["sha"])
+        if not groups or groups[-1]["key"] != key:
+            groups.append({"key": key, "sha": row["sha"], "rows": {}, "order": []})
+        if row["signal"] not in groups[-1]["rows"]:
+            groups[-1]["order"].append(row["signal"])
+        groups[-1]["rows"][row["signal"]] = row
+    return groups, ""
+
+
+def derive_drift_delta(root: pathlib.Path, base: str, head: str) -> tuple[int, list[str]]:
+    """(exit, lines) for `--delta`. Exit 2 only when an argument is not a commit; every other miss is
+    one `skipped` line at exit 0. Ancestry comes from ONE `rev-list --parents` over both ends."""
+    shas = []
+    for arg in (base, head):
+        r = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet", arg + "^{commit}"],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if r.returncode != 0 or not r.stdout.strip():
+            return 2, [f"drift-report: --delta: '{arg}' does not resolve to a commit"]
+        shas.append(r.stdout.strip())
+    base_sha, head_sha = shas
+    groups, why = read_history_groups(resolve_history_path(root))
+    if why:
+        return 0, [f"drift-delta: skipped — {why}"]
+    graph = subprocess.run(["git", "-C", str(root), "rev-list", "--parents", head_sha, base_sha],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace")
+    parents = {}
+    for ln in graph.stdout.splitlines():
+        f = ln.split()
+        if f:
+            parents[f[0]] = f[1:]
+
+    def derive_ancestors(start: str) -> set:
+        seen, todo = set(), [start]
+        while todo:
+            c = todo.pop()
+            if c not in seen:
+                seen.add(c)
+                todo.extend(parents.get(c, ()))
+        return seen
+
+    at_base, at_head = derive_ancestors(base_sha), derive_ancestors(head_sha)
+    b = next((g for g in reversed(groups) if g["sha"] in at_base), None)
+    if b is None:
+        return 0, [f"drift-delta: skipped — no reading at or before BASE {base_sha[:8]}"]
+    h = next((g for g in reversed(groups) if g["sha"] in at_head and g["sha"] not in at_base), None)
+    if h is None:
+        return 0, [f"drift-delta: skipped — no reading inside BASE..HEAD "
+                   f"({base_sha[:8]}..{head_sha[:8]})"]
+    return 0, render_drift_delta(b, h, base_sha, head_sha)
+
+
+def render_drift_delta(b: dict, h: dict, base_sha: str, head_sha: str) -> list[str]:
+    """The two readings, then one line per signal that moved, in the HEAD group's order and then any
+    signal only BASE carries. A non-live side prints its state; equal live values with a moved
+    key_hash are `members changed`; a signal one group lacks is `absent`."""
+    def render_side(row):
+        if row is None:
+            return "absent"
+        return row["value"] if row["state"] == "live" else row["state"]
+
+    def render_at(end, g):
+        return f"{end[:8]} read at {g['sha'][:8]} ({'equal' if g['sha'] == end else 'an ancestor'})"
+
+    out = [f"drift-delta: BASE {render_at(base_sha, b)} · HEAD {render_at(head_sha, h)}"]
+    for sig in h["order"] + [s for s in b["order"] if s not in h["rows"]]:
+        x, y = b["rows"].get(sig), h["rows"].get(sig)
+        if x is not None and y is not None and x["state"] == y["state"]:
+            if x["state"] != "live" or (x["value"] == y["value"] and x["key_hash"] == y["key_hash"]):
+                continue
+            tail = " (members changed)" if x["value"] == y["value"] else ""
+            out.append(f"drift-delta:   {sig} {x['value']} -> {y['value']}{tail}")
+            continue
+        lhs, rhs = render_side(x), render_side(y)
+        # A live side beside a non-live or absent one names its state too: `dead -> live 0`.
+        if x is not None and x["state"] == "live":
+            lhs = f"live {lhs}"
+        if y is not None and y["state"] == "live":
+            rhs = f"live {rhs}"
+        out.append(f"drift-delta:   {sig} {lhs} -> {rhs}")
+    if len(out) == 1:
+        out.append("drift-delta:   no signal moved between the two readings")
+    return out
+
+
 def render_drift_offenders(over: list, dead: list, ratchets: list) -> list[str]:
     """`--offenders`: one `<signal>\t<detail key>` line per thing `--check` would red on.
 
@@ -2888,7 +2992,21 @@ def main(argv: list[str] | None = None) -> int:
                     help="ref that 'landed' means, verbatim (default: refs/remotes/origin/<the "
                          "default branch>; a clone with no origin remote uses the local branch, "
                          "announced)")
+    ap.add_argument("--delta", nargs=2, metavar=("BASE", "HEAD"),
+                    help="print what moved between the history readings at BASE and inside "
+                         "BASE..HEAD; report only, exit 0 unless an argument is not a commit")
     args = ap.parse_args(argv)
+
+    if args.delta:
+        # Reads the history only: no conf, no signals, no base ladder (TOOL-aMendedFleet-49).
+        try:
+            rc, lines = derive_drift_delta(repo_root(), *args.delta)
+        except DriftError as exc:
+            print(f"drift-report: {exc}", file=sys.stderr)
+            return 2
+        for ln in lines:
+            print(ln, file=sys.stderr if rc else sys.stdout)
+        return rc
 
     try:
         root = repo_root()

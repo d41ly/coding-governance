@@ -1039,6 +1039,25 @@ print_reap_targets() { # run-state file · slug
     printf 'unattended: the reap list this attestation is made over — keepalive %s · no durable schedule: no hold of this run owed one\n' "${ka:-none}"
   fi
 }
+# TOOL-aMendedFleet-49 - THE DRIFT DELTA the close's bar left behind, BASE..HEAD, read by the drift
+# kit's own `--delta` from the history its `--check` appends. REPORT ONLY: it never writes, never
+# calls `fail`, and returns 0 whatever it finds, so a close never fails on what drift did. The kit is
+# reached through the library's `resolve_kit_dir` from this kit's own dir, never a spelled sibling path.
+print_drift_delta() { # run-state file
+  local base py d
+  base=$(fact "$1" base)
+  echo "unattended: drift delta, report only — from the bar readings in this clone's drift history"
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ]; then
+    echo "drift-delta: skipped — no python launcher resolves, so the drift kit's reader cannot run"
+    return 0
+  fi
+  if ! d=$(resolve_kit_dir "$py" drift-audit drift_report.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    echo "drift-delta: skipped — no drift-audit kit holding drift_report.py resolves beside this kit"
+    return 0
+  fi
+  "$py" "$d/drift_report.py" --delta "$base" HEAD || true
+  return 0
+}
 checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
 
 # ------------------------------------------------------------------------------ the region grammar
@@ -7809,6 +7828,9 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
       DOD_OUT=""
     fi
   done
+  # TOOL-aMendedFleet-49 S6 - after the set is evaluated, so the bar's own reading is in the history,
+  # and BEFORE the unmet return, so a refused close shows the delta too.
+  print_drift_delta "$rel"
   [ "$unmet" = 0 ] || return 1
   # TOOL-dDerivedDocket-3 S4 - AFTER the Definition of Done evaluates and BEFORE any write. The
   # override parks below are writes, so a carry refusal placed after them would leave a record

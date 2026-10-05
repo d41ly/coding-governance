@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-49 — the unattended close prints the BASE..HEAD drift delta
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 49
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 49
 
 <!-- gen:spec-records -->
 

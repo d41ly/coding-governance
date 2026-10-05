@@ -4943,6 +4943,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "derive_drift_delta",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "derive_entries",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -9033,6 +9038,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "print_drift_delta",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "print_entries",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -10076,6 +10086,11 @@
       "id": "read_held_reds",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_history_groups",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "read_hold_codes",
@@ -11681,6 +11696,11 @@
       "id": "render_doc",
       "kind": "function",
       "file": "tools/memory-tree/kit-dogfood-parity.test.sh"
+    },
+    {
+      "id": "render_drift_delta",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "render_drift_offenders",
@@ -15936,6 +15956,11 @@
       "id": "test_dossier_staleness_from_git",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_drift_delta",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_drift_history",

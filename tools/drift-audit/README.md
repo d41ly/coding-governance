@@ -97,7 +97,7 @@ Then, in order:
 
 | File | Owner | What |
 |---|---|---|
-| `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check` |
+| `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check`, `--delta` |
 | `drift_signals.template.py` | kit | the project layer's starting point |
 | `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK`, `REMOTE_CI_WORKFLOW` |
 | `SKILL.template.md` | kit | rendered to `.claude/skills/drift-audit/SKILL.md` by the adopt script |
@@ -210,6 +210,12 @@ members change at an equal count and not when a line number moves, and is `-` fo
 `live`. One group per bar, one row per entry of `SIGNALS`, and no rotation. A write that fails prints one
 `history NOT written` line on stderr and never changes the exit status; a write that succeeds prints
 one stdout line naming the row count and the path.
+
+`--delta <base> <head>` is the history's one reader, and the unattended close prints its output as a
+report-only block. It compares the last group read at BASE or an ancestor of it with the last group read
+inside BASE..HEAD, printing one line per signal whose value, state or `key_hash` moved, and every case
+that cannot produce a delta prints one `skipped` line at exit 0; only an argument that is not a commit
+exits 2.
 
 ## What "landed" is measured against — the base ladder
 

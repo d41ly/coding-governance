@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 309
+CHECK_FLOOR = 318
+# 309 -> 318, TOOL-aMendedFleet-49: the nine checks of `test_drift_delta`.
 # 302 -> 309, TOOL-aMendedFleet-48: the seven checks of `test_drift_history`.
 # 295 -> 302, TOOL-aMendedFleet-47: the run-records arm's derived-LANDED checks — three derived
 # fixtures left unlisted, their count, the summary line, and the LANDING call-count size's two.
@@ -3110,6 +3111,54 @@ def test_drift_history(tmp: pathlib.Path) -> None:
           "history NOT written to" in squat.stderr and dr.HISTORY_FILE in squat.stderr, squat.stderr[-300:])
 
 
+def test_drift_delta(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-49: `--delta` prints a moved, a hash-only and no unchanged signal between a
+    reading at BASE and one at HEAD, and each of the four no-delta cases is one `skipped` line at 0."""
+    print("drift delta (--delta reads the history; every miss is one skipped line, never a zero delta)")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    r = make_repo(tmp, name="delta")
+    for i in range(3):
+        run(["git", "commit", "-q", "--allow-empty", "-m", f"delta {i}", "--no-verify"], r)
+    base = run(["git", "rev-parse", "HEAD~3"], r).stdout.strip()
+    head = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+    hist = r / ".git" / dr.HISTORY_FILE
+    header = "\t".join(dr.HISTORY_COLUMNS) + "\n"
+
+    def build_group(utc, sha, moved, hashed):
+        return "".join("\t".join((utc, sha, "b", "bs", sig, "live", val, "9", kh)) + "\n" for sig, val, kh in
+                       (("moved", moved, "aa"), ("hashed", "4", hashed), ("same", "5", "cc")))
+
+    at_base, at_head = build_group("t1", base, "7", "bb"), build_group("t2", head, "2", "dd")
+
+    def measure_delta(text, *args):
+        if text is None:
+            hist.unlink(missing_ok=True)
+        else:
+            hist.write_text(text, encoding="utf-8", newline="\n")
+        return run([sys.executable, REPORT_REL, "--delta", *(args or ("HEAD~3", "HEAD"))], r)
+
+    out = measure_delta(header + at_base + at_head)
+    lines = out.stdout.splitlines()
+    check("delta: both readings are named equal to their ends",
+          bool(lines) and lines[0].count("(equal)") == 2, out.stdout + out.stderr)
+    check("delta: a moved value prints one line", any(ln.endswith("moved 7 -> 2") for ln in lines), out.stdout)
+    check("delta: a hash-only move prints `members changed`",
+          any(ln.endswith("hashed 4 -> 4 (members changed)") for ln in lines), out.stdout)
+    check("delta: an unchanged signal prints nothing", not any(" same " in ln for ln in lines), out.stdout)
+    for label, text, why in (("no history file", None, "no drift history"),
+                             ("a foreign header", "utc\tsha\n" + at_base + at_head, "header"),
+                             ("no reading at BASE", header + at_head, "at or before BASE"),
+                             ("no reading inside BASE..HEAD", header + at_base, "inside BASE..HEAD")):
+        out = measure_delta(text)
+        check(f"delta: {label} is one skipped line at exit 0",
+              out.returncode == 0 and out.stdout.splitlines() == [out.stdout.strip()]
+              and "skipped" in out.stdout and why in out.stdout, f"{out.returncode} {out.stdout!r}")
+    out = measure_delta(header + at_base + at_head, "0000000", "HEAD")
+    check("delta: an argument that is not a commit exits 2", out.returncode == 2, f"{out.returncode}")
+
+
 def test_version_carriers_agree(tmp: pathlib.Path) -> None:
     """TOOL-dLoggedFlight-13 S6: every carrier of this kit's version agrees with the engine's constant.
 
@@ -3176,6 +3225,7 @@ def main() -> int:
         test_nonterminal_merged_runs(tmp)
         test_park_sets_match_the_driver(tmp)
         test_drift_history(tmp)
+        test_drift_delta(tmp)
         test_version_carriers_agree(tmp)
     print()
     if SKIPS:

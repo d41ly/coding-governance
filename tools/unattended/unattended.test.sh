@@ -9576,6 +9576,30 @@ out=$(run --close tRun)
 hit "$out" "the reap list this attestation is made over — keepalive k1 · no durable schedule: no hold of this run owed one"
 reset_tree
 
+# ---- TOOL-aMendedFleet-49 S8: --close prints the BASE..HEAD drift delta, report only, from a
+# ---- hand-written history in the fixture's common git dir. The driver runs from a COPY inside the
+# ---- fixture, beside a copy of the drift reader: the reader resolves beside the driver's own kit dir
+# ---- and reads the history of the repository it sits in, so the real kit would read the real repo.
+_da_rel=$(resolve_kit_dir "$_rkd_py" drift-audit drift_report.py "$HERE" 2>/dev/null) || _da_rel=""
+if [ -z "$_da_rel" ]; then
+  echo "  SKIP the drift-delta close arm: no drift-audit kit resolves beside this one, so nothing prints the delta"
+else
+  build_hold_fixture
+  mkdir -p dk/u dk/drift-audit
+  cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "$HERE/check-playbook.sh" dk/u/
+  cp "$(git -C "$HERE" rev-parse --show-toplevel)/$_da_rel/drift_report.py" dk/drift-audit/
+  git add -A >/dev/null && git commit -q -m dk --no-verify
+  _dh="$(git rev-parse --git-common-dir)/drift-history.tsv"
+  { printf '#utc\tsha\tbase_ref\tbase_sha\tsignal\tstate\tvalue\tof\tkey_hash\n'
+    printf 't1\t%s\tb\tbs\tmoved\tlive\t7\t9\taa\n' "$(git rev-parse "$(sed -n 's/^base: //p' memory/builds/tRun/RUN.md)")"
+    printf 't2\t%s\tb\tbs\tmoved\tlive\t2\t9\tbb\n' "$(git rev-parse HEAD)"; } > "$_dh"
+  out=$(bash dk/u/unattended.sh --close tRun 2>&1)
+  hit "$out" "unattended: drift delta, report only"
+  hit "$out" "drift-delta:   moved 7 -> 2"
+  rm -f "$_dh"
+  reset_tree
+fi
+
 # ---- AC15: the kit.toml carrier-pair probe, RESOLVED from the descriptor rather than retyped. Since
 # ---- DEPL-aHalvedInstall-2 it is a PRESENCE test that SOURCES the conf: each of the pair must hold a
 # ---- real value unless RESUME_SCHEDULE is off, read as the adopter reads it. Every spelling below

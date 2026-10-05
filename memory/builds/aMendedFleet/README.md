@@ -225,7 +225,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-46 — the replay harness measures which shortlist quantity predicts a reuse miss, before any miss signal ships](spec/2026-10-04-spec-TOOL-aMendedFleet-46.md) | 46 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-47 — `run_records_nonterminal_but_merged` honours derived LANDED, and the unused-verb pin drops to 0](spec/2026-10-04-spec-TOOL-aMendedFleet-47.md) | 47 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-48 — drift readings append to a node-local history file](spec/2026-10-04-spec-TOOL-aMendedFleet-48.md) | 48 | 2 | CLOSED | rev-3 | 2026-10-04 |
-| [TOOL-aMendedFleet-49 — the unattended close prints the BASE..HEAD drift delta](spec/2026-10-04-spec-TOOL-aMendedFleet-49.md) | 49 | 1 | SPECCED | rev-3 | 2026-10-04 |
+| [TOOL-aMendedFleet-49 — the unattended close prints the BASE..HEAD drift delta](spec/2026-10-04-spec-TOOL-aMendedFleet-49.md) | 49 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-50 — a monthly escape-ratio report, outside the seconds tier](spec/2026-10-04-spec-TOOL-aMendedFleet-50.md) | 50 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-51 — report-only drift signals over a pin nobody drains print pinless, and `readme_mechanism_drift` reads live builds only](spec/2026-10-04-spec-TOOL-aMendedFleet-51.md) | 51 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-52 — the hand-kept signal compares the drift README's signal names against the names the engine reports](spec/2026-10-04-spec-TOOL-aMendedFleet-52.md) | 52 | 1 | SPECCED | rev-2 | 2026-10-04 |
