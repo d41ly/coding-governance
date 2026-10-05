@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-8 — every automatic self-heal appends one line to a health log the orientation card counts
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling+kickoff · order 9 · ratified 2026-10-04
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling+kickoff · order 9 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -120,8 +120,10 @@ Both languages, one contract:
   write that fails prints ONE line on stderr starting `health: NOTE -` naming the path and the
   reason, writes nothing, and returns 0 (Python: returns `None`, never raises). A degraded write is
   announced, never silent (`memory/gotchas/degradation-known-but-unreported.md`).
-- `resolve_health_log` is the only spawn. The bash copy caches its answer per repo argument in the
-  calling shell, and the Python copy per process, so a writer pays at most one `git` per run.
+- `resolve_health_log` is the only spawn. A bash writer calls it at most once per run and keeps the
+  path it printed in its own variable, because a cache held inside the block would die with the
+  command substitution that reads it; the Python copy caches per process. Either way a writer pays
+  at most one `git` per run.
 - The canonical header states what the block does NOT do: it does not serialize concurrent writers
   (an append of one short line is not torn in practice, and a trim racing an append can lose the
   appended line — `ponytail:` one rename, a lock file if a lost line is ever observed); it does not
@@ -385,6 +387,11 @@ New arm: skills/session-kickoff/manifest-check.test.sh · AC7's seeded log and A
   arm, AC5 says it proves presence only and names each site's placement arm, and §7 gains the
   merge, ticket, wait and scratch arms); and 26 (AC2's 499-line fixture, the side of the
   threshold a 500-line fixture cannot see).
+- rev-3 · 2026-10-05 · §4 · the shared block · the bash copy keeps no cache: every bash writer reads
+  `resolve_health_log` through a command substitution, a subshell whose variables die with it, so a
+  cache inside the block could never hit; each bash writer holds the path in its own variable
+  instead, which keeps the one-`git`-per-run bound. Read at the run branch's tip, after units 1, 2
+  and 7 were built.
 
 ## 10. Reuse audit
 
