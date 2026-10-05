@@ -129,6 +129,7 @@ Tier 2 needs the two workflow scripts from `<prefix>/workflows/drift-audit-{code
 | `legs_retried_after_timeout` | how many legs did the merge bar retry, once and alone, after their own ceiling fired, over the run records this git dir still holds? | no |
 | `remote_ci_red_streak` | how many consecutive completed runs of the declared remote CI workflow on the default branch failed, newest first? Read through `gh`; DEAD PROBE when `gh` cannot answer, not asked under `--check` or with no workflow declared. | no |
 | `cutoff_keys_armed` | how many `_CUTOFF` keys carry a non-blank value across the tracked root-level `.<name>.conf` files? `of` counts every such assignment. | only where `PINS` declares it |
+| `dossiers_older_than_their_paths` | how many codebase-map feature dossiers are older than their paths — a commit touching a path the dossier claims is not an ancestor of the dossier's own last commit? Read from the map kit's own `map_diff.py --stale-dossiers --json`, so the attribution is spelled once; map-root paths are never a claim, and a merge commit carries no paths, so a change made only in a conflict resolution is not seen. The detail is the refresh worklist, most-behind first. Not asked where the map kit is absent or unadopted; DEAD PROBE on a shallow clone or when nothing touched a claimed path. | no |
 
 ### Armed cutoff keys are a budget
 

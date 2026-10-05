@@ -2520,6 +2520,65 @@ def build_remote_ci_red_streak(ctx) -> dict:
             "gateable": False, "live": live, "detail": [summary, *m["passed_over"]]}
 
 
+# --------------------------------------------------------------------------------------------
+# Signal - codebase-map dossiers older than their paths (TOOL-aMendedFleet-37)
+#
+# REPORT-ONLY, and IT DECIDES NOTHING. The rule — a commit touching a path a dossier claims is not
+# an ancestor of the dossier's own last commit — is the codebase-map kit's, computed by its
+# `map_diff.py --stale-dossiers --json` over its own glob attribution. Spelling the attribution a
+# second time here would be two answers to "which feature owns this path", and they would drift.
+# Three states: NOT ASKED where the map kit does not resolve or the root has not adopted it, DEAD
+# PROBE where the history is shallow, nothing touched a claimed path, or the reader failed, and a
+# count otherwise. The detail is the refresh worklist, most-behind first.
+# --------------------------------------------------------------------------------------------
+
+
+def read_stale_dossiers(ctx):
+    """`(returncode, stdout, stderr)` of `map_diff.py --stale-dossiers --json` at this report's root,
+    or None when the codebase-map kit does not resolve beside this one. `CODEBASE_MAP_ROOT` is
+    pinned to the root this report grades, so the map answers about the same tree."""
+    try:
+        kit = resolve_kit_dir("codebase-map", "map_diff.py", pathlib.Path(__file__).resolve().parent)
+    except LookupError:
+        return None
+    env = dict(os.environ, CODEBASE_MAP_ROOT=str(ctx.root))
+    try:
+        out = subprocess.run([sys.executable, str(kit / "map_diff.py"), "--stale-dossiers", "--json"],
+                             cwd=str(ctx.root), env=env, capture_output=True, text=True,
+                             encoding="utf-8", errors="replace", timeout=600)
+    except (OSError, subprocess.SubprocessError) as exc:
+        return (None, "", f"map_diff.py did not run: {exc}")
+    return (out.returncode, out.stdout, out.stderr)
+
+
+def build_stale_dossiers(ctx) -> dict:
+    name = "dossiers_older_than_their_paths"
+    got = read_stale_dossiers(ctx)
+    if got is None:
+        return _build_not_asked(name, "the codebase-map kit is not installed beside this one")
+    rc, stdout, stderr = got
+    said = ((stderr or "").strip().splitlines() or [f"exit {rc}"])[0][:240]
+    if rc == 2:
+        # map_diff's refusal: the root carries no .codebase-map.conf, so there is no map to grade.
+        return _build_not_asked(name, f"no codebase map is adopted at this root ({said})")
+    try:
+        doc = json.loads(stdout) if rc == 0 else None
+    except ValueError:
+        doc = None
+    if not isinstance(doc, dict) or not isinstance(doc.get("dossiers"), list):
+        live, detail = False, [{"note": f"DEAD PROBE — map_diff.py --stale-dossiers gave no answer: {said}"}]
+    else:
+        live = doc.get("live") is True
+        detail = ([{"note": f"DEAD PROBE — {doc.get('note')}"}] if not live else
+                  ([{"note": doc["note"]}] if doc.get("note") else [])
+                  + [r for r in doc["dossiers"] if isinstance(r, dict) and r.get("stale")])
+    return {"signal": name,
+            "value": int(doc.get("stale") or 0) if live else 0,
+            "of": int(doc.get("of") or 0) if live else 0,
+            "tolerance": ctx.pins.get(name, 0), "gateable": False, "live": live,
+            "unjudgeable": 0, "detail": detail}
+
+
 SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
@@ -2533,7 +2592,8 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            build_backlog_stragglers,
            build_nonterminal_merged_runs,
            measure_legs_retried_after_timeout,
-           build_remote_ci_red_streak]
+           build_remote_ci_red_streak,
+           build_stale_dossiers]
 
 
 # --------------------------------------------------------------------------------------------

@@ -2088,6 +2088,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "build_stale_dossiers",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_status_sheet",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -7808,6 +7813,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "measure_dossier_staleness",
+      "kind": "function",
+      "file": "tools/codebase-map/map_lib.py"
+    },
+    {
       "id": "measure_execs",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -9698,6 +9708,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_commit_paths",
+      "kind": "function",
+      "file": "tools/codebase-map/map_diff.py"
+    },
+    {
       "id": "read_conf",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -10711,6 +10726,11 @@
       "id": "read_spec_words",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_stale_dossiers",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "read_stale_header_waiver",
@@ -11941,6 +11961,11 @@
       "id": "render_staged",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "render_stale_dossiers",
+      "kind": "function",
+      "file": "tools/codebase-map/map_diff.py"
     },
     {
       "id": "render_status_row",
@@ -15868,6 +15893,11 @@
       "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
+      "id": "test_dossier_staleness_from_git",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_dry_run_walks_the_same_set_and_kills_nothing",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -17176,6 +17206,11 @@
       "id": "test_stale_declaration_is_reported_not_honoured",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_stale_dossiers",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_substrate_dispatch_is_total",

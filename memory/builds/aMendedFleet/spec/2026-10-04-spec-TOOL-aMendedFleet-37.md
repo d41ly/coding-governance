@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-37 — dossier freshness is derived from git, and drift-audit reports the dossiers older than their paths
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 37
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 37
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-37-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-37-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -31,9 +33,12 @@ with a shrink-only pin.
   left out of the claimed side, because the map's own records are not the code a dossier describes,
   and refreshing one dossier must never stale another. Observed by AC1 and AC2.
 - **S2** — A reader in `tools/codebase-map/map_diff.py`, `read_commit_paths`, runs ONE `git log` in
-  topological order printing each commit's sha, its parents and its touched paths, over either the
-  whole history at HEAD or one `<base>..<head>` range, and computes ancestry in process from the
-  parents it printed. It asks `git rev-parse --is-shallow-repository` first and reports a shallow
+  topological order printing each commit's sha, its parents and its touched paths, over the history
+  reachable from its tips — HEAD alone, or both ends of one `<base>..<head>` range — and computes
+  ancestry in process from the parents it printed. In range scope the commits in `<base>..<head>`
+  are those reachable from head and not from base, derived from the same parents, so a dossier last
+  committed before the range still carries its true `refreshed` sha. It asks `git rev-parse
+  --is-shallow-repository` first, in the same call that resolves the tips, and reports a shallow
   clone as unmeasurable rather than measuring an amputated history. Observed by AC2 and AC5.
 - **S3** — `map_diff.py --stale-dossiers` prints the result, and `--json` prints it as one object.
   The range positional becomes optional in this mode only: with none the scope is every commit
@@ -268,6 +273,10 @@ New arm: `tools/drift-audit/selftest.py` · canned `map_diff.py` output for a va
 - rev-2 · 2026-10-04 · §3 §8 · the M2 cross-read: the close-time list's hand-off named `external`
   and "a unit the run adds" while `TOOL-aMendedFleet-83` exists in this build and consumes S3's range
   mode; the Non-goal, the Edges bullet and F1 now name that unit.
+- rev-3 · 2026-10-05 · §2 S2 · at build: a log over the range alone cannot name `refreshed` for a
+  dossier last committed before the range, which §4's data model defines as the last commit at
+  head. The one log now covers the history reachable from both tips, and the range is the set
+  reachable from head and not from base, computed from the printed parents.
 
 ## 10. Reuse audit
 

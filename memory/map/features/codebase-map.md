@@ -74,10 +74,16 @@ repo-wide python-launcher seam rather than anything this feature owns.
 
 ## Gaps
 
-- **Two feature dossiers so far.** 69 inventory keys still sit in `baseline.toml`, so coverage is
-  ratcheted but not yet described. The map enforces "nothing new goes unclaimed"; it does not yet
-  answer "what is this repo made of". Read the live counts from `reuse_lookup.py`'s corpus header,
-  never from this line — it is prose and this gap is exactly where prose rots.
+- **Not every key is claimed yet.** The keys no dossier claims sit in `baseline.toml`, so coverage
+  is ratcheted but not fully described. The map enforces "nothing new goes unclaimed"; it does not
+  yet answer "what is this repo made of". Count `features/` and the baseline's rows for the live
+  figures, never this line — no command reports the pair, and prose is where that figure rots.
+- **Dossier prose is MEASURED for freshness, never gated.** `map_diff.py --stale-dossiers` derives,
+  from git ancestry and no stamp, which feature dossiers are older than the paths they claim, and
+  drift-audit reports the count as `dossiers_older_than_their_paths` against a shrink-only pin
+  (TOOL-aMendedFleet-37). It says a dossier was not re-read after its code moved, never that its
+  prose is false. Map-root paths are not claims, a merge commit carries no paths, and
+  `FOUNDATION.md` is not measured.
 - **Shell is in the symbol layer.** It carries the product here — the gates, adopters and hooks —
   and the project-owned `kit-sh` layer reads every `*.sh` under the tool root, `.githooks/` and
   `skills/` through the lexicon kit's tokenizer, failing closed. `RECALL_DARK_LAYERS` is empty, so
@@ -137,7 +143,8 @@ repo-wide python-launcher seam rather than anything this feature owns.
 
 ## Reuse affordance
 
-seam: map_lib — reuse for dossier/baseline parsing, deterministic rendering, coverage asserts and
-fan-in ranking; extend via a new helper in `map_lib.py` plus its case in `selftest.py`.
+seam: map_lib — reuse for dossier/baseline parsing, path attribution, dossier freshness
+(`measure_dossier_staleness`), deterministic rendering, coverage asserts and fan-in ranking; extend
+via a new helper in `map_lib.py` plus its case in `selftest.py`.
 seam: map_extractors.EXTRACTORS — reuse for declaring a new enumerable surface of this repo; extend
 via a new key whose callable fails closed, then claim its keys in a dossier.

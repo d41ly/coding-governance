@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 289
+CHECK_FLOOR = 295
+# 289 -> 295, TOOL-aMendedFleet-37: the six checks of `test_stale_dossiers`.
 # 284 -> 289, TOOL-aMendedFleet-21: the five checks of `test_cutoff_keys_armed`.
 # 277 -> 284, TOOL-aMendedFleet-8: the seven checks of `test_remote_ci_red_streak`.
 # 261 -> 267, TOOL-dDerivedDocket-26: the six checks of `test_legs_retried_after_timeout`.
@@ -2680,6 +2681,55 @@ def test_remote_ci_red_streak(tmp: pathlib.Path) -> None:
           and got["detail"][0]["note"].startswith("DEAD PROBE"), f"got {got}")
 
 
+def test_stale_dossiers(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-37: the three states of `dossiers_older_than_their_paths` over canned
+    `map_diff.py --stale-dossiers --json` output — the rule is the map kit's, so the arm grades only
+    how this report reads its answer. The reader is swapped on the module and always restored."""
+    import json
+    import types
+    print("dossiers older than their paths (canned map_diff output; not asked, dead, value)")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    name = "dossiers_older_than_their_paths"
+    ctx = types.SimpleNamespace(root=tmp, pins={name: 2})
+    rows = [{"feature": "b", "stale": True, "behind": 3}, {"feature": "a", "stale": True, "behind": 1},
+            {"feature": "c", "stale": False, "behind": 0}]
+    canned = {
+        "value": (0, json.dumps({"of": 3, "stale": 2, "live": True, "note": "", "dossiers": rows}), ""),
+        "dead": (0, json.dumps({"of": 0, "stale": 0, "live": False, "note": "the clone is shallow",
+                                "dossiers": []}), ""),
+        "garbled": (0, "{ not json", ""),
+        "refused": (2, "", "map-diff refused: no .codebase-map.conf at the resolved repo root\nmore"),
+        "absent": None,
+    }
+    real, got = dr.read_stale_dossiers, {}
+    try:
+        for state, answer in canned.items():
+            dr.read_stale_dossiers = lambda _ctx, answer=answer: answer
+            got[state] = dr.build_stale_dossiers(ctx)
+    finally:
+        dr.read_stale_dossiers = real
+    v = got["value"]
+    check("stale dossiers: a live answer reads the map's count, report-only, against its pin",
+          (v["value"], v["of"], v["live"], v["gateable"], v["tolerance"]) == (2, 3, True, False, 2), f"got {v}")
+    check("stale dossiers: the detail is the stale rows only, most-behind first as the map orders them",
+          [r["feature"] for r in v["detail"]] == ["b", "a"], f"got {v['detail']}")
+    d = got["dead"]
+    check("stale dossiers: live false is DEAD PROBE quoting the map's note, never a calm 0",
+          d["live"] is False and not d.get("not_asked")
+          and d["detail"][0]["note"] == "DEAD PROBE — the clone is shallow", f"got {d}")
+    g = got["garbled"]
+    check("stale dossiers: unparseable output is DEAD PROBE",
+          g["live"] is False and not g.get("not_asked") and g["detail"][0]["note"].startswith("DEAD PROBE"),
+          f"got {g}")
+    r = got["refused"]
+    check("stale dossiers: an unadopted map (exit 2) is NOT ASKED, quoting the refusal",
+          r.get("not_asked") is True and "no .codebase-map.conf" in r["detail"][0]["note"], f"got {r}")
+    check("stale dossiers: no map kit beside this one is NOT ASKED",
+          got["absent"].get("not_asked") is True, f"got {got['absent']}")
+
+
 # ---------------------------------------------------------------------------------------------
 # TOOL-dLoggedFlight-13 — run records left non-terminal after their build merged
 # ---------------------------------------------------------------------------------------------
@@ -3030,6 +3080,7 @@ def main() -> int:
         test_legs_retried_after_timeout(tmp)
         test_remote_ci_red_streak(tmp)
         test_cutoff_keys_armed(tmp)
+        test_stale_dossiers(tmp)
         test_backlog_stragglers(tmp)
         test_readme_mechanism_drift(tmp)
         test_declared_empty(tmp)

@@ -334,6 +334,12 @@ PINS: dict[str, int] = {
     # another key stops being armed in the same change. Raising it instead is the RATCHETS row below,
     # which needs the old and new values written here. The keys are not named: read the detail.
     "cutoff_keys_armed": 29,
+    # 26 - MEASURED at TOOL-aMendedFleet-37, which added the signal, at its own commit: 26 of 27
+    # feature dossiers older than their paths, every one but the codebase-map dossier that unit
+    # refreshed. Report-only; the pin is a declared DRAIN, one dossier re-read at a time, and the
+    # RATCHETS row below makes a raise cost a written `<old> -> <new>` reason. The dossiers are not
+    # named here: read the signal's own detail, which derives them most-behind first.
+    "dossiers_older_than_their_paths": 26,
 }
 
 # --------------------------------------------------------------------------------------------
@@ -393,6 +399,7 @@ RATCHETS: list[dict] = [
      "key": "source_cited_ids_resolving_to_no_record", "weakens": "up"},
     {"file": _THIS_FILE, "key": "backlog_asks_unlabelled", "weakens": "up"},
     {"file": _THIS_FILE, "key": "cutoff_keys_armed", "weakens": "up"},
+    {"file": _THIS_FILE, "key": "dossiers_older_than_their_paths", "weakens": "up"},
     # A pin in ANOTHER kit's conf. The ratchet does not care which file a scalar lives in, and
     # codebase-map has no shrink-only mechanism of its own - so an adopter without drift-audit
     # gets a declared pin and no enforcement, which the conf example states rather than hides.

@@ -287,6 +287,15 @@ def test_clis_refuse_an_unadopted_root(tmp: Path):
         assert rc == 2, f"map_diff exited {rc}, not a refusal"
         assert "refused" in err.getvalue(), err.getvalue()
         assert "collision_flags" not in out.getvalue(), out.getvalue()
+
+        # TOOL-aMendedFleet-37: an unadopted root would otherwise read every dossier fresh.
+        _sys.argv = ["map_diff.py", "--stale-dossiers"]
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            rc = md.main()
+        assert rc == 2, f"map_diff --stale-dossiers exited {rc}, not a refusal"
+        assert "refused" in err.getvalue(), err.getvalue()
+        assert out.getvalue() == "", f"an answer was printed anyway: {out.getvalue()!r}"
     finally:
         _sys.argv = saved_argv
         del os.environ["CODEBASE_MAP_ROOT"]
@@ -1533,6 +1542,80 @@ def test_symbols_at_ref_absent_is_not_empty(tmp: Path):
     assert md._symbols_at_ref(tmp, bad, rel) is None, "malformed JSON must not read as an empty baseline"
 
 
+def test_dossier_staleness_from_git(tmp: Path):
+    """TOOL-aMendedFleet-37 S1-S3: a dossier is stale when a commit touching a claimed path is not
+    an ancestor of the dossier's own last commit, read whole and by range, over a REAL git fixture —
+    ancestry exists only in an object store. A map-root-only commit never stales it, and a dossier
+    no commit carries is named in the note and left out of `of`."""
+    import json
+    import os
+    import subprocess
+
+    import map_diff as md
+
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull,
+               GIT_CONFIG_NOSYSTEM="1")
+
+    def run_git(*a):
+        r = subprocess.run(["git", "-C", str(tmp), *a], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        assert r.returncode == 0, f"git {' '.join(a)} failed: {r.stderr.strip()[:200]}"
+        return r.stdout.strip()
+
+    def write_commit(rel, text, msg):
+        (tmp / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tmp / rel).write_text(text, encoding="utf-8")
+        run_git("add", "-A")
+        run_git("commit", "-qm", msg)
+        return run_git("rev-parse", "HEAD")
+
+    run_git("init", "--template=", "-q")
+    run_git("config", "user.email", "t@t")
+    run_git("config", "user.name", "t")
+    run_git("config", "commit.gpgsign", "false")
+    write_commit("src/x/a.ts", "1\n", "seed code")
+    refresh = write_commit("map/features/x.md", "x\n", "refresh the dossier")
+    code = write_commit("src/x/a.ts", "2\n", "code moves after the refresh")
+    write_commit("map/generated/s.json", "{}\n", "map-root only")
+
+    # x claims the map root as the real codebase-map dossier does, so the exclusion is what holds.
+    d = m.parse_dossier(DOSSIER.replace('"src/x/**"', '"src/x/**", "map/*"'), IDS, source="t")
+    y = m.parse_dossier(DOSSIER.replace('feature = "x"', 'feature = "y"'), IDS, source="t")
+    f = m.parse_dossier(DOSSIER.replace('feature = "x"', 'feature = "foundation"').replace("src/x/**", "lib/**"),
+                        IDS, source="f")
+    tree = m.MapTree(foundation=f, dossiers=(d, y), baseline=EMPTY_BASE)
+
+    def measure(base, head="HEAD"):
+        commits, scope = md.read_commit_paths(tmp, base, head)
+        return {r["feature"]: r for r in m.measure_dossier_staleness(commits, tree, "map", scope=scope)}
+
+    at_refresh = measure(None, refresh)["x"]
+    assert at_refresh["refreshed"] == refresh and not at_refresh["stale"], at_refresh
+    whole = measure(None)
+    x = whole["x"]
+    assert x["stale"] and x["behind"] == 1 and x["newest"] == code, f"a code commit after the refresh: {x}"
+    assert whole["y"]["refreshed"] is None, "y has no commit of its own"
+    doc = json.loads(md.render_stale_dossiers("HEAD", list(whole.values()), as_json=True))
+    assert (doc["of"], doc["stale"], doc["live"]) == (1, 1, True), doc
+    assert doc["note"].endswith("carries them yet: y") and [r["feature"] for r in doc["dossiers"]] == ["x"], doc
+
+    in_range = measure(refresh)  # refresh..HEAD holds the code commit and no dossier commit
+    assert in_range["x"]["stale"] and in_range["x"]["refreshed"] == refresh, in_range["x"]
+    text = md.render_stale_dossiers(f"{refresh}..HEAD", list(in_range.values()), as_json=False)
+    assert "- x · map/features/x.md · 1 behind" in text, text
+
+    again = write_commit("map/features/x.md", "x again\n", "refresh after the code")
+    fixed = measure(refresh)["x"]
+    assert fixed["refreshed"] == again and not fixed["stale"] and fixed["touched"] == 1, fixed
+    assert "- x ·" not in md.render_stale_dossiers("r", list(measure(refresh).values()), as_json=False)
+
+    shallow = json.loads(md.render_stale_dossiers("HEAD", None, as_json=True))
+    assert shallow["live"] is False and "shallow" in shallow["note"] and shallow["of"] == 0, shallow
+    untouched = m.measure_dossier_staleness([("a", (), ("map/x.md",))], tree, "map")
+    assert json.loads(md.render_stale_dossiers("HEAD", untouched, as_json=True))["live"] is False, \
+        "a whole history touching no claimed path is not a clean all-fresh answer"
+
+
 def test_identifier_tokens_per_language():
     """TOOL-aLexedStripper-1 §4 + -6: one arm per over-strip class, each asserting an identifier the
     LANGUAGE-BLIND chain deleted. Every fixture below was observed RED against the three-regex
@@ -1883,6 +1966,11 @@ def main() -> int:
         failures += check(
             "symbols-at-ref: absent is not empty (ABL-bCandidLoupe-2)",
             lambda: test_symbols_at_ref_absent_is_not_empty(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "stale dossiers: ancestry, whole and by range, map-root excluded (aMendedFleet-37)",
+            lambda: test_dossier_staleness_from_git(Path(td)),
         )
     failures += check("identifier tokens: one arm per over-strip class", test_identifier_tokens_per_language)
     failures += check("map_imports: the rescued resolver's case table", test_map_imports_resolution)

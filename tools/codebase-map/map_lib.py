@@ -1649,6 +1649,57 @@ def attribute_paths(
     return result
 
 
+def measure_dossier_staleness(
+    commits: list[tuple[str, tuple[str, ...], tuple[str, ...]]],
+    tree: MapTree,
+    map_rel: str,
+    *,
+    keyed_attributors: tuple[tuple[re.Pattern[str], str], ...] = (),
+    scope: frozenset[str] | None = None,
+) -> list[dict]:
+    """One record per FEATURE dossier: is its prose older than the code it claims?
+
+    ``commits`` is ``(sha, parents, touched paths)`` in TOPOLOGICAL order, newest first — every
+    child before its parents, which is what lets ancestry be one forward pass with no graph walk.
+    ``scope`` is the set of shas a range covers; ``None`` is the whole list.
+
+    A dossier is STALE when a commit in scope touching a path it claims is not an ancestor of the
+    dossier's own last commit (``refreshed``). Ancestry, never dates: a dossier refreshed on a
+    parallel branch did not see code that landed beside it. Claims are ``attribute_paths``'s, so
+    the map keeps ONE answer to which feature owns a path. Every path under ``map_rel`` is left
+    out of the claimed side: the map's own records are not the code a dossier describes, and
+    refreshing one dossier must never stale another. A merge commit carries no paths here (the
+    log prints none for it), so a change made only in a conflict resolution is not seen.
+
+    ``refreshed`` is None for a dossier no commit carries yet; the caller leaves it out rather
+    than reading it as stale or fresh. FOUNDATION.md is not measured: its globs name shared
+    substrate rather than one feature."""
+    prefix = map_rel.strip("/") + "/"
+    paths = sorted({p for _, _, ps in commits for p in ps if not p.startswith(prefix)})
+    owners: dict[str, set[str]] = {}
+    for feature, claimed in attribute_paths(paths, tree, keyed_attributors=keyed_attributors).items():
+        for p in claimed:
+            owners.setdefault(p, set()).add(feature)
+    touched_by = {sha: set().union(*(owners.get(p, ()) for p in ps)) for sha, _, ps in commits
+                  if scope is None or sha in scope}
+    rows: list[dict] = []
+    for d in tree.dossiers:
+        dossier = f"{prefix}features/{d.feature}.md"
+        refreshed = next((sha for sha, _, ps in commits if dossier in ps), None)
+        # Topological order puts every descendant first, so a commit is an ancestor of
+        # `refreshed` exactly when some commit already known to be one names it as a parent.
+        seen = {refreshed} if refreshed else set()
+        for sha, parents, _ in commits:
+            if sha in seen:
+                seen.update(parents)
+        touches = [sha for sha, _, _ in commits if d.feature in touched_by.get(sha, ())]
+        behind = [sha for sha in touches if sha not in seen]
+        rows.append({"feature": d.feature, "dossier": dossier, "refreshed": refreshed,
+                     "stale": bool(behind), "behind": len(behind),
+                     "newest": behind[0] if behind else None, "touched": len(touches)})
+    return rows
+
+
 def lf(text: str) -> str:
     """LF-normalize before byte-comparing a committed artifact (CRLF-checkout defense)."""
     return text.replace("\r\n", "\n")

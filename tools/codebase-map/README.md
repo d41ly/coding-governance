@@ -39,6 +39,14 @@ project specifics live in exactly two files the adopting repo owns.
   and routes each to `<git-common-dir>/codebase-map/reinvention-backlog.md` (deduped by
   `{new, resembles}`), alongside `new_clones` and the demoted hygiene hints.
 
+  `--stale-dossiers [--json]` lists the feature dossiers OLDER THAN THEIR PATHS: a commit touching
+  a path a dossier claims is not an ancestor of the dossier's own last commit. Derived from git
+  ancestry, never a stamp or a date. With no range it reads the whole history at HEAD; with
+  `<base>..<head>` it lists the dossiers that range touched and did not refresh. Paths under
+  `MAP_ROOT` are never a claim, a merge commit carries no paths (a conflict-resolution-only change
+  is not seen), `FOUNDATION.md` is not measured, and a shallow clone prints `live` false rather
+  than a count. Report only; drift-audit reads it as `dossiers_older_than_their_paths`.
+
   **The record lives OUTSIDE the worktree**, under the git COMMON dir beside the recall query
   log — never `--git-dir`, which in a linked worktree is `.git/worktrees/<name>` and is deleted
   outright by `git worktree remove`. It was written into `<MAP_ROOT>/` until 2026-09-06, where
