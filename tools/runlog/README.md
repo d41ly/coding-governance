@@ -359,8 +359,9 @@ two bounds' difference. A model carrying no `record_window` renders both facts `
 alone. `closed-by` is one of three. `terminal-write`, where a record commit already carries a terminal
 phase: the bound is that commit's time and it is final. `last-activity`, where the run has not closed
 at all: the bound is its last record commit. And `terminal-pending`, where the run-state file is
-terminal but the commit carrying that write has not landed — which is EVERY record the Skill renders
-after `--landed` or `--abort`, because each render rides the commit that carries the run-state write
+terminal but the commit carrying that write has not landed — which is EVERY record rendered at a
+terminal verb: the one `--close` and `--abort` render themselves, and the one the Skill renders
+after `--landed`, because each render rides the commit that carries the run-state write
 the verb just staged. Such a record's closing bound is the last committed record commit, and the
 closer says so, instead of reading `last-activity` beside `terminal: yes`, which describes a run that
 stopped by going quiet. A re-render once that commit has landed reads `terminal-write` with the
