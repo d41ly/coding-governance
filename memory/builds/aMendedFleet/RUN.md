@@ -248,3 +248,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T03:17:18Z dispatch · item fe3aa324 TOOL-aMendedFleet-26 · reason tools/memory-tree/tree_lib.py tools/memory-tree/corpus_ids.py tools/memory-tree/gen_build_index.py tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-26.md
 
 2026-10-05T03:26:37Z dispatch · item fe3aa324 TOOL-aMendedFleet-26 · reason tools/memory-tree/tree_lib.py tools/memory-tree/corpus_ids.py tools/memory-tree/gen_build_index.py tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-26.md memory/builds/aMendedFleet/README.md
+
+2026-10-05T03:33:37Z dispatch · item b717013a TOOL-aMendedFleet-26 · reason memory/gotchas/record-citing-a-foreign-id-defines-or-orphans-it.md memory/gotchas/INDEX.md
