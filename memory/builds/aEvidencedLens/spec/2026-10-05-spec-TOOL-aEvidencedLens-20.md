@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-05-prompt-TOOL-aEvidencedLens-20-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-20-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
