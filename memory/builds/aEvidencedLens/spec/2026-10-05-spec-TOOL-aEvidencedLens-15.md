@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-05-prompt-TOOL-aEvidencedLens-15-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-15-2-build-brief.md) | journal | — |
 | [2026-10-05-review-TOOL-aEvidencedLens-15-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-15-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->

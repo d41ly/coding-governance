@@ -97,9 +97,9 @@ ids TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16 TOOL-aE
 | [TOOL-aEvidencedLens-18 — unit 15's observation is completed: the HEAD bytes tied to their blob, a break on the masked line, all four prints, both edges, and the closing pass's write set](spec/2026-10-05-spec-TOOL-aEvidencedLens-18.md) | 10 | 2 | SPECCED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 21 bound to this build, across 4 record folder(s).
+Records: 23 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aEvidencedLens-18.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aEvidencedLens-18.
 <!-- /gen:build-index -->

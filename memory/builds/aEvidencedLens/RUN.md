@@ -138,3 +138,7 @@ base: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 2026-10-05T03:20:30Z rescope · item add TOOL-aEvidencedLens-18 · reason spec-audit round 1 (reviews/2026-10-05-review-TOOL-aEvidencedLens-15-spec-audit-round1.md) ids 4 and 5 MEDIUM, ids 1, 2, 3 and 6 LOW, batched: unit 15's staged break never touches the masked step-3 line, its HEAD bytes are read from the working copy not the recorded blob, its Edges omit units 1 and 12, its ledger counts two prints of four and AC2 one HEAD print of two, and the build's closing pass omits the two generated indexes it rewrites; repairs TOOL-aEvidencedLens-15
 
 2026-10-05T03:27:29Z review · item aEvidencedLens-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 6 · disposition promote
+
+2026-10-05T03:31:37Z dispatch · item db35bca7 TOOL-aEvidencedLens-15 · reason memory/builds/aEvidencedLens/build/2026-10-05-build-TOOL-aEvidencedLens-15-1-acceptance-ledger.md memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-15.md memory/builds/aEvidencedLens/README.md
+
+2026-10-05T03:31:41Z brief · item TOOL-aEvidencedLens-15 · reason 3b6c208f6a98 memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-15-2-build-brief.md
