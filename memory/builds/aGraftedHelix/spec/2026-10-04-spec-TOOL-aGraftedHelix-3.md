@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-3 — invariant records in the bug-class catalogue become the review's by-design list
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 3 · ratified 2026-10-04
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 3 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -249,14 +249,20 @@ Rejected at writing, with the test that rejected each:
 | `load_defined_ids` | `gotchas.py` | `py.function` |
 | `load_leg_names` | `gotchas.py` | `py.function` |
 | `BY_DESIGN_HEAD` | `gotchas.py` | constant |
+| `INVARIANT_SECTIONS`, `GUARD_TOKEN_RE` | `gotchas.py` | constant |
+| `build_invariant`, `build_tree` | `gotchas.py`, nested in `cmd_selftest` | `py.function` |
 | `extractByDesign` | `tier2-review.template.js` | `js.function` |
 | `LEG_MANIFEST` | `.memory-tree.conf` and the shipped example | conf (dark) |
 | `checklist`, `checklistPaths` | `SUBJECTS_SCHEMA` fields | n/a |
 
 Each function name above was asked of `python tools/lexicon/lexicon.py --suggest <name> --as <cell>`
-on 2026-10-04 and answered OK. The new map keys are the seeds' basenames, claimed under
-`gotcha-classes`. The two `tools/run-gates/` seeds go to the run-gates dossier and the
-`tools/unattended/` seed goes to the unattended dossier.
+on 2026-10-04 and answered OK; the two self-test helpers were asked on 2026-10-05 and answered OK.
+The new map keys are the seeds' basenames, claimed under `gotcha-classes`. The two
+`tools/run-gates/` seeds go to the run-gates dossier. The `tools/unattended/` seed goes to the
+unattended-mandate dossier, whose globs also own `tools/unattended/unattended.sh`: the unattended
+dossier measured 20478 bytes against its 20480-byte `DOSSIER_CAP_BYTES` at the build pass's base,
+so one more claim there reds check 6, and the ruling is a preflight rule, which is that dossier's
+seam.
 
 ### Files touched (estimate)
 
@@ -283,7 +289,7 @@ on 2026-10-04 and answered OK. The new map keys are the seeds' basenames, claime
 - `memory/guides/SESSION-KICKOFF.md`
 - `memory/gotchas/INDEX.md`
 - `memory/map/features/run-gates.md`
-- `memory/map/features/unattended.md`
+- `memory/map/features/unattended-mandate.md`
 - `memory/map/features/review-harnesses.md`
 - `memory/map/generated/`
 - `.memory-tree.conf`
@@ -474,6 +480,11 @@ New arm: tools/workflows/unattended-build.test.sh · a caller checklist beside t
   observes the rendered resolver prompt and the caller-checklist precedence); 14 (AC2's inert-only
   invariant arm); and 15 (AC2's missing-manifest and absent-grammar arms, and AC11's example-conf
   grep).
+- rev-3 · 2026-10-05 · §4 · the build pass's divergences, before the code. The `tools/unattended/`
+  seed is claimed by the unattended-mandate dossier rather than the unattended one, which sat two
+  bytes under its 20480-byte dossier cap, and Files touched names that dossier in place of the
+  unattended one. The Inventory gains the two constants the grading reads (`INVARIANT_SECTIONS`,
+  `GUARD_TOKEN_RE`) and the two nested self-test helpers.
 
 ## 10. Reuse audit
 
