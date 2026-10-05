@@ -171,14 +171,23 @@ python check-recall.py --data-dir DIR   # grade an already-extracted dir (what t
 ```
 
 **The pin names a CELL, as one token**, because `bench.py` emits a matrix that spans 0.17 to 0.83 in
-a single run and a bare scalar names none of it:
+a single run and a bare scalar names none of it. The default head is `served`:
 
 ```
-RECALL_FLOOR="records:fts5:r@5>=0.81"
+RECALL_FLOOR="served:r@5>=0.86"
 ```
 
-`fts5` because `query.py` ranks with `bm25(d, 1.0, 1.0, ALIAS_WEIGHT)` and bench's `fts5` is that
-same unweighted expression — the reason is the source, not a score.
+**Why `served` is the default.** It ranks every question through this CLI's own `query_expr` and
+`run_fusion` — the records arm and the rolled-up chunk arm, fused by `rrf` — over sets
+`query.build_cache` builds, so a change to the expression, the rollup or the fusion moves the floor.
+The older single-pair head, `records:fts5:r@5>=0.81`, still parses: it ranks the bare question over
+one set through `bench.rank_with`, a configuration no session is served, because the CLI refuses a
+question without `--terms`. Under `served` every fixture question carries two term lists: `terms`,
+the strong rewrite written after reading the answering record, and `naive_terms`, written from the
+question alone. A graded row is one (question, slice) pair, and the leg prints `h` and `R` per slice
+because strong terms SATURATE — every question hits with them — and a slice that cannot fall buys
+no headroom. A `served` run still grades less than a session sees: tracked files only, the ranked
+list rather than the `--budget`-cut text, and the pin's `k` rather than the CLI's default 20.
 
 **WHICH SUBSTRATES ARE SEED-STABLE**, because a floor pinned to one that is not is a gate whose
 verdict moves on an unchanged tree, and that is a thing to know when CHOOSING rather than to
@@ -192,16 +201,18 @@ has measured them, and this sentence says so rather than implying they were. The
 CEILING-NORMALISED figure, which reduces exactly to `h/R`: `h` questions that hit, `R` whose targets
 resolve at all.
 
-**0.81 is DERIVED, not observed.** Measured `h=10`, `R=12`, normalised 0.8333. The one-retirement
-worst case is `(h-1)/(R-1) = 0.8182`, so the pin sits just below it and the property it buys is that
-retiring one hitting record costs nothing. Retiring a NON-hitting one raises the score. A regression
-with no retirement (`9/12 = 0.75`) reds. Re-measure with `--audit-fixture`, which prints `h`, `R` and
-`(h-1)/(R-1)` beside the declared value. It reds in ONE direction — when the pin has become LOOSER
-than the worst case, i.e. unsafe. A pin left merely conservative is caught by the arms, which assert
-the literal `h=10 R=12`.
+**The value is DERIVED, not observed.** It is the floor below the one-retirement worst case
+`(h-1)/(R-1)` over every row, so retiring one hitting record costs nothing; the measured `h` and
+`R` per slice, and the arithmetic, sit in the comment above the key in `.memory-tree.conf`, which is
+the one place they are written. Retiring a NON-hitting record raises the score. Re-measure with
+`--audit-fixture`, which prints `h` and `R` per slice and `(h-1)/(R-1)` beside the declared value.
+It reds in ONE direction — when the pin has become LOOSER than the worst case, i.e. unsafe. The arms
+assert the measured `h` and `R` are not below the conf's recorded figures; a pin left merely
+conservative after the fixture grew is caught by neither.
 
 **Two predicates, and each can red ALONE** — two checks that only ever fail together are one check
-wearing two names. `test_recall_floor.py` proves both directions on this corpus:
+wearing two names. `test_recall_floor.py` proves both directions on this corpus, under the
+single-pair head over a filtered extract, which is what keeps that grammar exercised:
 
 | degradation | per-id | floor |
 |---|---|---|

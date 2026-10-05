@@ -129,6 +129,12 @@ def build_filtered(drop=None) -> pathlib.Path:
     return dst
 
 
+# The single-pair head. The repo's own pin is `served`, which builds its own sets and ignores a
+# filtered extract dir, so every arm that grades a `--data-dir` names this head explicitly -- which
+# is also what keeps the older grammar exercised now that no conf in this repo carries it.
+SINGLE = 'RECALL_FLOOR="records:fts5:r@5>=0.81"'
+
+
 def run_check(*args, conf_floor: str | None = None, fixture: pathlib.Path | None = None):
     """Drive the shipped program. `conf_floor` swaps the pin by pointing --repo at a stub repo."""
     argv = [sys.executable, str(CHECK), *args]
@@ -160,7 +166,7 @@ def read_lines(proc) -> str:
 @check("baseline is green and prints both verdicts")
 def test_baseline_green():
     d = build_filtered()
-    p = run_check("--data-dir", str(d))
+    p = run_check("--data-dir", str(d), conf_floor=SINGLE)
     out = read_lines(p)
     assert p.returncode == 0, f"expected 0, got {p.returncode}\n{out}"
     assert "per-id ok" in out, out
@@ -182,7 +188,7 @@ def test_floor_reds_alone():
     # resolvable through the archive and build-README rows while the question falls out of the top 5.
     d = build_filtered(lambda r: r.get("id") == "TOOL-aWrittenMethod-4"
                        and r["path"] == "memory/DECISIONS.md")
-    p = run_check("--data-dir", str(d))
+    p = run_check("--data-dir", str(d), conf_floor=SINGLE)
     out = read_lines(p)
     assert p.returncode != 0, f"expected a red\n{out}"
     assert "per-id ok" in out, f"per-id should stay GREEN\n{out}"
@@ -196,7 +202,7 @@ def test_per_id_reds_alone():
     # TOOL-aMouldedFolio-1 is single-homed and does NOT hit today, so retiring it drops R without
     # dropping h: the normalised score goes UP while the id stops resolving.
     d = build_filtered(lambda r: r.get("id") == "TOOL-aMouldedFolio-1")
-    p = run_check("--data-dir", str(d))
+    p = run_check("--data-dir", str(d), conf_floor=SINGLE)
     out = read_lines(p)
     assert p.returncode != 0, f"expected a red\n{out}"
     assert "per-id RED" in out and "TOOL-aMouldedFolio-1" in out, f"per-id should name the id\n{out}"
@@ -208,7 +214,7 @@ def test_per_id_reds_alone():
 @check("one retirement of a HITTING target is free by construction")
 def test_one_retirement_is_free():
     d = build_filtered(lambda r: r.get("id") == "TOOL-aStandingWrit-2")
-    p = run_check("--data-dir", str(d))
+    p = run_check("--data-dir", str(d), conf_floor=SINGLE)
     out = read_lines(p)
     assert "RECALL_FLOOR ok" in out, f"the derived pin must absorb one retirement\n{out}"
     assert "0.8182" in out, f"expected the (h-1)/(R-1) worst case 0.8182\n{out}"
@@ -219,7 +225,7 @@ def test_one_retirement_is_free():
 @check("dropping the whole record file reds BOTH (the plumbing arm)")
 def test_both_red_on_wholesale_drop():
     d = build_filtered(lambda r: r["path"] == "memory/DECISIONS.md")
-    p = run_check("--data-dir", str(d))
+    p = run_check("--data-dir", str(d), conf_floor=SINGLE)
     out = read_lines(p)
     assert p.returncode != 0, out
     assert "per-id RED" in out and "RECALL_FLOOR RED" in out, f"both should red\n{out}"
@@ -242,7 +248,8 @@ def test_both_red_on_wholesale_drop():
 @check("an ABSENT fixture reds by name and does not skip")
 def test_absent_fixture_reds():
     missing = pathlib.Path(tempfile.gettempdir()) / "no-such-recall-fixture.json"
-    p = run_check("--data-dir", str(build_filtered()), fixture=missing)
+    p = run_check("--data-dir", str(build_filtered()), fixture=missing,
+                  conf_floor=SINGLE)
     out = read_lines(p)
     assert p.returncode == 2, f"expected refusal 2, got {p.returncode}\n{out}"
     assert "fixture absent" in out and missing.name in out, out
@@ -255,7 +262,7 @@ def test_empty_fixture_reds():
     fx = tmp / "empty.json"
     fx.write_text('{"queries": []}', encoding="utf-8", newline="\n")
     try:
-        p = run_check("--data-dir", str(build_filtered()), fixture=fx)
+        p = run_check("--data-dir", str(build_filtered()), fixture=fx, conf_floor=SINGLE)
         out = read_lines(p)
         assert p.returncode == 2, f"expected 2, got {p.returncode}\n{out}"
         assert "carries no queries" in out, out
@@ -272,7 +279,7 @@ def test_all_miss_fixture():
         {"query": "what colour is the boojum", "expected_ids": ["TOOL-zNoSuchThing-9"]},
     ]}), encoding="utf-8", newline="\n")
     try:
-        p = run_check("--data-dir", str(build_filtered()), fixture=fx)
+        p = run_check("--data-dir", str(build_filtered()), fixture=fx, conf_floor=SINGLE)
         out = read_lines(p)
         assert p.returncode == 1, f"expected 1, got {p.returncode}\n{out}"
         assert "per-id RED" in out, out
@@ -330,14 +337,29 @@ def test_out_of_vocabulary_pin_reds():
 # ------------------------------------------------------------------ the anti-tautology arms
 
 
-@check("--audit-fixture is green on the committed set and prints the derivation")
+@check("--audit-fixture is green on the served pin, h and R not below the conf's record")
 def test_audit_green():
-    p = run_check("--audit-fixture", "--data-dir", str(build_filtered()))
+    """The served audit over the real conf, measured h and R not below what the conf comment records.
+
+    It replaced an arm asserting a literal `h` and `R`. What a not-below arm STOPS seeing is a pin
+    left merely conservative after a fixture edit that RAISED h and R: the worst case rose, the pin
+    did not follow, and nothing reds. A drop below the recorded figures still reds here, and a pin
+    above the worst case reds in the audit itself.
+    """
+    conf = (ROOT / ".memory-tree.conf").read_text(encoding="utf-8")
+    rec = re.search(r"all rows h=(\d+) R=(\d+)", conf)
+    assert rec, "the conf comment above RECALL_FLOOR records no `all rows h=<n> R=<n>`"
+    p = run_check("--audit-fixture")
     out = read_lines(p)
     assert p.returncode == 0, f"expected 0\n{out}"
-    assert "h=10 R=12" in out, out
-    assert "0.8182" in out, f"the pin's own derivation must print\n{out}"
-    return "h=10 R=12, (h-1)/(R-1) = 0.8182 against the declared 0.81"
+    for name in ("terms", "naive_terms"):
+        assert f"slice {name}: h=" in out, f"the audit must print slice {name}\n{out}"
+    got = re.search(r"derivation: h=(\d+) R=(\d+)", out)
+    assert got, f"the pin's own derivation must print\n{out}"
+    h, R = int(got[1]), int(got[2])
+    assert h >= int(rec[1]) and R >= int(rec[2]), (
+        f"measured h={h} R={R} is below the conf's recorded h={rec[1]} R={rec[2]}\n{out}")
+    return f"h={h} R={R}, not below the recorded h={rec[1]} R={rec[2]}"
 
 
 @check("a TAUTOLOGICAL fixture reds the overlap audit")
@@ -359,7 +381,8 @@ def test_tautological_fixture_reds():
         for i in picks
     ]}), encoding="utf-8", newline="\n")
     try:
-        p = run_check("--audit-fixture", "--data-dir", str(build_filtered()), fixture=fx)
+        p = run_check("--audit-fixture", "--data-dir", str(build_filtered()), fixture=fx,
+                      conf_floor=SINGLE)
         out = read_lines(p)
         assert p.returncode == 1, f"expected the audit to RED, got {p.returncode}\n{out}"
         assert "AUDIT RED" in out and "OVERLAP_MAX" in out, out
@@ -371,21 +394,46 @@ def test_tautological_fixture_reds():
 @check("a fixture whose declared `hits` disagrees with the measurement reds")
 def test_hits_disagreement_reds():
     blob = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    flipped = False
     for q in blob["queries"]:
-        if q.get("hits") is False:
-            q["hits"] = True          # claim a miss is a hit
+        if q.get("hits", {}).get("naive_terms") is False:
+            q["hits"]["naive_terms"] = True          # claim a miss is a hit
+            flipped = True
             break
+    assert flipped, "the fixture declares no naive_terms miss, so there is nothing to lie about"
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="recallfx-"))
     fx = tmp / "lying-hits.json"
     fx.write_text(json.dumps(blob), encoding="utf-8", newline="\n")
     try:
-        p = run_check("--audit-fixture", "--data-dir", str(build_filtered()), fixture=fx)
+        p = run_check("--audit-fixture", fixture=fx)
         out = read_lines(p)
         assert p.returncode == 1, f"expected a red\n{out}"
-        assert "declares hits=True and measures False" in out, out
-        return "the hand-kept column is documentation a gate keeps honest"
+        assert "declares hits=True and measures False in slice naive_terms" in out, out
+        return "the hand-kept column is documentation a gate keeps honest, per slice"
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+
+@check("a served fixture missing a term list, or one outside TERM_BAND, REFUSES naming the question")
+def test_served_term_lists_refuse():
+    import query  # noqa: PLC0415
+
+    lo = query.TERM_BAND[0]
+    seen = []
+    for label, edit in (("no naive_terms", lambda q: q.pop("naive_terms")),
+                        ("short terms", lambda q: q.__setitem__("terms", q["terms"][:lo - 1]))):
+        blob = json.loads(FIXTURE.read_text(encoding="utf-8"))
+        edit(blob["queries"][3])
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="recallfx-"))
+        _SCRATCH.append(tmp)
+        fx = tmp / "terms.json"
+        fx.write_text(json.dumps(blob), encoding="utf-8", newline="\n")
+        p = run_check(fixture=fx)
+        out = read_lines(p)
+        assert p.returncode == 2, f"{label}: expected refusal 2, got {p.returncode}\n{out}"
+        assert "REFUSED" in out and "question 4" in out, f"{label}: must name the question\n{out}"
+        seen.append(label)
+    return "REFUSED, naming question 4: " + ", ".join(seen)
 
 
 @check("the kit payload WITHHOLDS all three gov-only files")
@@ -428,7 +476,7 @@ def test_audit_reds_on_unresolved_target():
     the one that would have caught it.
     """
     d = build_filtered(lambda r: r.get("id") == "TOOL-aMouldedFolio-1")
-    p = run_check("--audit-fixture", "--data-dir", str(d))
+    p = run_check("--audit-fixture", "--data-dir", str(d), conf_floor=SINGLE)
     out = read_lines(p)
     assert p.returncode == 1, f"expected a red\n{out}"
     assert "NOT MEAS" in out, f"the row must report NOT MEASURED\n{out}"
@@ -481,7 +529,7 @@ def test_malformed_question_refuses():
         {"expected_ids": ["TOOL-aStandingWrit-2"]},
     ]}), encoding="utf-8", newline="\n")
     try:
-        p = run_check("--data-dir", str(build_filtered()), fixture=fx)
+        p = run_check("--data-dir", str(build_filtered()), fixture=fx, conf_floor=SINGLE)
         out = read_lines(p)
         assert p.returncode == 2, f"expected 2, got {p.returncode}\n{out}"
         assert "question 2 carries no" in out, out

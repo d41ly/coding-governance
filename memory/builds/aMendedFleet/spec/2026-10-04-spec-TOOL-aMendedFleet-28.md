@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-28 — the recall floor grades the served path, terms plus fusion
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · advances TOOL-aProbedToolkit-10 · ratified 2026-10-04 · order 28
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · advances TOOL-aProbedToolkit-10 · ratified 2026-10-04 · order 28
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-28-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-28-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

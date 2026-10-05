@@ -1148,6 +1148,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_served_dir",
+      "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
+    },
+    {
       "id": "build_session_events",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -4649,6 +4654,11 @@
     },
     {
       "id": "measure_run",
+      "kind": "function",
+      "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "measure_served",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
     },
@@ -10341,6 +10351,11 @@
       "id": "test_self_chain_target_is_refused_by_run_kill",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_served_term_lists_refuse",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
       "id": "test_shell_constructs",

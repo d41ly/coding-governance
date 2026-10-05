@@ -14,83 +14,100 @@
     "`check-recall.py --audit-fixture` measures that mechanically as content-term overlap against the",
     "target's own text and reds above OVERLAP_MAX. See memory/gotchas/fixture-passes-by-finding-nothing.md.",
     "",
-    "`hits` records whether the question is answered at the pinned cell TODAY. It is not an input to",
-    "the SCORE -- nothing in the grading path reads it -- but `--audit-fixture` compares it against the",
-    "measurement and reds on a disagreement, so it is documentation a gate keeps honest. The two",
-    "misses are in the set precisely because they fail."
+    "`terms` and the second list are the rewrite words a session hands the CLI's `--terms`, one word per",
+    "element, each list's length inside query.TERM_BAND. `terms` is the STRONG rewrite, written after",
+    "reading the record that answers the question, and it saturates: every question hits with it.",
+    "Provenance of naive_terms: written from the question text ALONE, before the answering record was opened, by the agent building the served-floor unit of the aMendedFleet build (2026-10-05); the strong lists were written by that same agent after reading each memory/DECISIONS.md row. That order is a claim, not a check.",
+    "",
+    "`hits` records, per slice, whether the question is answered at the pinned cell TODAY. It is not an",
+    "input to the SCORE -- nothing in the grading path reads it -- but `--audit-fixture` compares it",
+    "against the measurement and reds on a disagreement, so it is documentation a gate keeps honest.",
+    "The weak slice's misses are the headroom: a slice where every row hits cannot fall."
   ],
   "queries": [
     {
       "query": "why can a mandate check not fall back to the current commit when the merge base will not resolve",
       "expected_ids": ["TOOL-aUnmannedHelm-5"],
       "from": "memory/builds/aWrittenMethod/spec/2026-08-11-spec-aWrittenMethod-2.md SS10 recall probe, answered by the memory/DECISIONS.md row",
-      "hits": true
+      "terms": ["merge-base", "refusal", "fallback", "HEAD", "mandate", "comparison", "resolve", "unresolved", "construction", "hole", "gate"],
+      "naive_terms": ["mandate", "check", "fallback", "current", "commit", "HEAD", "merge", "base", "unresolved", "missing", "error"], "hits": {"terms": true, "naive_terms": true}
     },
     {
       "query": "why is the floor on the phase set a number instead of a list of required names",
       "expected_ids": ["TOOL-aUnmannedHelm-6"],
       "from": "memory/builds/aWrittenMethod/spec/2026-08-11-spec-aWrittenMethod-2.md SS10 recall probe, answered by the memory/DECISIONS.md row",
-      "hits": true
+      "terms": ["core-set", "floor", "shrink-only", "count", "membership", "list", "vacuous", "subset", "assertion", "declared", "independently"],
+      "naive_terms": ["phase", "floor", "minimum", "count", "number", "list", "required", "names", "set", "validation"], "hits": {"terms": true, "naive_terms": true}
     },
     {
       "query": "is a remote tracking ref safe to trust as evidence of what the server says",
       "expected_ids": ["TOOL-aStandingWrit-2"],
       "from": "memory/DECISIONS.md -- 'an anchor is only as trustworthy as the cheapest way to move it'",
-      "hits": true
+      "terms": ["anchor", "trustworthy", "cheapest", "move", "refs/remotes", "origin", "local", "write", "observation", "remote", "push"],
+      "naive_terms": ["remote", "tracking", "ref", "origin", "trust", "evidence", "server", "state", "fetch", "stale"], "hits": {"terms": true, "naive_terms": true}
     },
     {
       "query": "what goes wrong when the name of the default branch comes from an environment variable",
       "expected_ids": ["TOOL-aStandingWrit-4"],
       "from": "memory/DECISIONS.md -- 'a classifier that takes the NAME of the thing it classifies from the environment is a fail-OPEN'",
-      "hits": true
+      "terms": ["classifier", "name", "environment", "fail-open", "override", "GOV_DEFAULT_BRANCH", "pre-push", "unmatched", "exit", "gate"],
+      "naive_terms": ["default", "branch", "name", "environment", "variable", "main", "override", "config", "problem", "wrong"], "hits": {"terms": true, "naive_terms": true}
     },
     {
       "query": "why did a timing based check block pushes on a tree it had already passed",
       "expected_ids": ["TOOL-cSteadyMetronome-1"],
       "from": "memory/DECISIONS.md -- 'a gate asserts what the SUBJECT does, never what the NODE does'",
-      "hits": true
+      "terms": ["gate", "subject", "node", "canary", "elapsed-time", "ratio", "machine", "blocked", "pushes", "rendezvous", "load"],
+      "naive_terms": ["timing", "check", "timeout", "push", "blocked", "tree", "passed", "already", "slow", "flaky"], "hits": {"terms": true, "naive_terms": true}
     },
     {
       "query": "should a long prose document and a table of rows get the same size budget",
       "expected_ids": ["TOOL-aWidenedGuide-1"],
       "from": "memory/DECISIONS.md -- 'the index cap splits by CLASS'",
-      "hits": true
+      "terms": ["index", "cap", "class", "guide", "prose", "rows", "sweep", "budget", "lines", "bytes", "READ_PATH_CEILING"],
+      "naive_terms": ["size", "budget", "limit", "prose", "document", "table", "rows", "length", "cap", "same"], "hits": {"terms": true, "naive_terms": true}
     },
     {
       "query": "why does assigning a command substitution to a variable hide the command failure",
       "expected_ids": ["TOOL-aWrittenMethod-4"],
       "from": "memory/DECISIONS.md -- 'a substitution reports the LAST command's status'",
-      "hits": true
+      "terms": ["substitution", "last", "command", "status", "return", "unreachable", "branch", "exit", "assignment", "fire"],
+      "naive_terms": ["command", "substitution", "variable", "assignment", "exit", "status", "failure", "hidden", "bash", "error"], "hits": {"terms": true, "naive_terms": true}
     },
     {
       "query": "what breaks when a shell replacement string contains an ampersand",
       "expected_ids": ["TOOL-aWrittenMethod-6"],
       "from": "memory/DECISIONS.md -- 'bash 5.1 gave pattern-substitution's REPLACEMENT a sed-like ampersand'",
-      "hits": true
+      "terms": ["bash", "5.1", "pattern-substitution", "replacement", "ampersand", "sed", "quoting", "unescaped", "corrupts"],
+      "naive_terms": ["shell", "replacement", "string", "ampersand", "substitution", "escape", "bash", "sed", "breaks", "special"], "hits": {"terms": true, "naive_terms": true}
     },
     {
       "query": "which files does the wiring checker actually watch for line ending damage",
       "expected_ids": ["TOOL-aUnmannedHelm-10"],
       "from": "memory/DECISIONS.md -- 'CRLF reaches past everything that watches for it'",
-      "hits": false
+      "terms": ["CRLF", "check-wiring.sh", "consumer", "launcher", "sourced", "conf", "hook", "byte-comparing", "whole"],
+      "naive_terms": ["wiring", "checker", "line", "endings", "CRLF", "files", "watched", "damage", "check", "script"], "hits": {"terms": true, "naive_terms": false}
     },
     {
       "query": "are documents split by whether they came from a template or by section",
       "expected_ids": ["TOOL-aMouldedFolio-1"],
       "from": "memory/DECISIONS.md -- 'the doc corpus's axis is AUTHORED-vs-DERIVED per SECTION'",
-      "hits": false
+      "terms": ["doc", "corpus", "axis", "authored", "derived", "section", "templated", "untemplated", "parity", "freshness", "truth-blind"],
+      "naive_terms": ["documents", "split", "template", "section", "corpus", "chunking", "source", "type", "origin"], "hits": {"terms": true, "naive_terms": false}
     },
     {
       "query": "why must an adopter script refuse before it reads any configuration",
       "expected_ids": ["TOOL-aUnmannedHelm-9"],
       "from": "memory/DECISIONS.md -- 'an adopter's refusals are ordered before it READS anything'",
-      "hits": true
+      "terms": ["adopter", "refusals", "ordered", "before", "reads", "conf", "foreign", "repo", "remedy", "operator"],
+      "naive_terms": ["adopter", "script", "refuse", "refusal", "configuration", "read", "order", "before", "install", "check"], "hits": {"terms": true, "naive_terms": false}
     },
     {
       "query": "can a plain phase move put a run into its final state",
       "expected_ids": ["TOOL-cFinalBerth-1"],
       "from": "memory/DECISIONS.md -- 'a terminal phase is written by a verb that EVALUATES what it claims'",
-      "hits": true
+      "terms": ["terminal", "phase", "verb", "evaluates", "move", "LANDING", "close-only", "landed", "precondition", "hole"],
+      "naive_terms": ["phase", "move", "transition", "run", "final", "state", "terminal", "done", "finish", "status"], "hits": {"terms": true, "naive_terms": true}
     }
   ]
 }

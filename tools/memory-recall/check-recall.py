@@ -25,6 +25,18 @@ red at per-id, so a short-circuiting program could never show the floor verdict 
 `not evaluated` is an explicit rule, not a side effect of stopping early: with a `ceiling` of 0
 there is nothing to divide, and printing that beats a 0/0 or a silent skip.
 
+TWO PIN HEADS. `<set>:<substrate>:<metric>@<k>` ranks the bare question over one extracted set
+through `bench.rank_with` -- a configuration no session is served. `served:<metric>@<k>` ranks
+through the CLI's own `query.query_expr` and `query.run_fusion` over sets `query.build_cache`
+builds, so a change to the expression, the rollup or the fusion moves the floor. Under it every
+question owes two term lists, and a graded ROW is one (question, slice) pair: `h`, `R` and the
+ceiling count rows, and each slice's `h` and `R` print so a saturated slice is visible.
+
+WHAT A `served` RUN STILL DOES NOT CHECK. Untracked files: the CLI indexes untracked-not-ignored
+notes and this builds over tracked files only. The `--budget` byte cut `emit` applies to the fused
+list: this grades the ranked list, not the emitted text. And the `k`: the CLI's default is 20,
+the pin's is whatever it names, so a pin at `@5` grades a shallower read than a default query.
+
 PRECONDITION 3 REPLACED A CHECK THAT COULD NOT FAIL. The spec's rev-3 had it as a predicate asking
 whether the pinned `<metric>@<k>` appeared in the report. Measured while building: `score()` emits
 `r@k` and `f@k` for whatever `k` it is handed, and the pin grammar admits only those two metrics, so
@@ -48,6 +60,7 @@ import json
 import pathlib
 import re
 import shutil
+import sqlite3
 import subprocess
 import sys
 import tempfile
@@ -61,6 +74,7 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 import bench  # noqa: E402
+import extract  # noqa: E402
 import query  # noqa: E402
 import recall_conf  # noqa: E402
 
@@ -81,6 +95,13 @@ PIN_KEY = "RECALL_FLOOR"
 PIN_RE = re.compile(
     r"^(?P<set>[a-z0-9]+):(?P<sub>[a-z0-9]+):(?P<metric>[a-z]+)@(?P<k>\d+)>=(?P<value>\d*\.?\d+)$"
 )
+# The `served` head: no set and no substrate, because the CLI's fused ranking is neither one set nor
+# one `bench` substrate. Under it the floor ranks through `query.query_expr` and `query.run_fusion`.
+SERVED_RE = re.compile(r"^served:(?P<metric>[a-z]+)@(?P<k>\d+)>=(?P<value>\d*\.?\d+)$")
+# The two term lists a question carries under a `served` pin, each one graded ROW: `terms` is the
+# rewrite a session writes after reading the corpus, `naive_terms` one written from the question
+# alone. The naive slice is where the headroom lives; strong terms saturate.
+SLICES = ("terms", "naive_terms")
 
 # The anti-tautology threshold. A question written by reading what the index returns scores ~1.0
 # here; the committed fixture measures min 0.125, mean 0.362, max 0.500, with none at or above 0.60.
@@ -95,12 +116,16 @@ class CheckRefused(Exception):
     """A precondition failed. The message is the whole report -- it names what was missing."""
 
 
-def read_fixture(path: pathlib.Path) -> list[dict]:
+def read_fixture(path: pathlib.Path, slices: tuple = ()) -> list[dict]:
     """Precondition 1. An empty question list is refused HERE rather than downstream.
 
     A fixture with no questions makes the per-id predicate vacuously green and leaves `substrates`
     empty, so the failure would surface as a missing cell three branches later and name the wrong
     thing. That is the `fixture-passes-by-finding-nothing` class arriving through its own gate.
+
+    `slices` names the term lists every question owes -- `SLICES` under a `served` pin, none under a
+    single-pair one. Each list's length must sit inside `query.TERM_BAND`, the band the CLI itself
+    holds a session to, so a list the CLI would refuse is never graded here.
     """
     if not path.is_file():
         raise CheckRefused(f"fixture absent: {path.as_posix()}")
@@ -122,31 +147,50 @@ def read_fixture(path: pathlib.Path) -> list[dict]:
         if not isinstance(ids, list) or any(not isinstance(x, str) for x in ids):
             raise CheckRefused(
                 f"fixture question {i} has a non-string `expected_ids`: {path.as_posix()}")
+        lo, hi = query.TERM_BAND
+        for name in slices:
+            words = q.get(name)
+            if not isinstance(words, list) or any(not isinstance(w, str) or not w.strip()
+                                                  for w in words):
+                raise CheckRefused(
+                    f"fixture question {i} carries no `{name}` word list: {q['query']!r}")
+            if not lo <= len(words) <= hi:
+                raise CheckRefused(
+                    f"fixture question {i} has {len(words)} `{name}`, outside TERM_BAND "
+                    f"{lo}-{hi}: {q['query']!r}")
     return queries
 
 
 def parse_pin(raw: str | None) -> dict:
-    """Precondition 2. `<set>:<sub>:<metric>@<k>>=<float>`, every field in its vocabulary."""
+    """Precondition 2. `served:<metric>@<k>>=<float>` or `<set>:<sub>:<metric>@<k>>=<float>`.
+
+    Both heads parse, so a conf still carrying the single-pair shape grades as it always did.
+    """
     if raw is None:
         raise CheckRefused(f"{PIN_KEY} is not declared in {recall_conf.CONF_NAME}")
     raw = raw.strip().strip('"').strip("'")
     if not raw:
         raise CheckRefused(f"{PIN_KEY} is empty in {recall_conf.CONF_NAME} -- there is no default")
-    m = PIN_RE.match(raw)
+    m = SERVED_RE.match(raw) or PIN_RE.match(raw)
     if not m:
         raise CheckRefused(
-            f"{PIN_KEY} does not parse: {raw!r}; want <set>:<substrate>:<metric>@<k>>=<float>"
+            f"{PIN_KEY} does not parse: {raw!r}; want served:<metric>@<k>>=<float> "
+            f"or <set>:<substrate>:<metric>@<k>>=<float>"
         )
-    if m["set"] not in SETS:
-        raise CheckRefused(f"{PIN_KEY} names set {m['set']!r}; known: {' '.join(SETS)}")
-    if m["sub"] not in SUBS:
-        raise CheckRefused(f"{PIN_KEY} names substrate {m['sub']!r}; known: {' '.join(SUBS)}")
+    served = m.re is SERVED_RE
+    if not served:
+        if m["set"] not in SETS:
+            raise CheckRefused(f"{PIN_KEY} names set {m['set']!r}; known: {' '.join(SETS)}")
+        if m["sub"] not in SUBS:
+            raise CheckRefused(f"{PIN_KEY} names substrate {m['sub']!r}; known: {' '.join(SUBS)}")
     if m["metric"] not in METRICS:
         raise CheckRefused(f"{PIN_KEY} names metric {m['metric']!r}; known: {' '.join(METRICS)}")
+    head = "served" if served else f"{m['set']}:{m['sub']}"
     return {
-        "set": m["set"], "sub": m["sub"], "metric": m["metric"],
+        "served": served, "set": "served" if served else m["set"],
+        "sub": None if served else m["sub"], "metric": m["metric"],
         "k": int(m["k"]), "value": float(m["value"]),
-        "cell": f"{m['set']}:{m['sub']}:{m['metric']}@{m['k']}", "raw": raw,
+        "cell": f"{head}:{m['metric']}@{m['k']}", "raw": raw,
     }
 
 
@@ -214,6 +258,78 @@ def measure_run(data: pathlib.Path, queries: list[dict], pin: dict) -> dict:
     }
 
 
+def build_served_dir(root: pathlib.Path) -> pathlib.Path:
+    """Build the CLI's own two sqlite sets in a throwaway dir, with the CLI's own builder.
+
+    `query.build_cache` over `extract.corpus_inputs` of the root -- tracked files only, where the
+    CLI also takes untracked ones. Nothing about extraction or indexing is restated here.
+    """
+    out = pathlib.Path(tempfile.mkdtemp(prefix="check-recall-served-"))
+    try:
+        files, declared = extract.corpus_inputs(root)
+        query.build_cache(root, out, files, declared)
+    except (OSError, ValueError, sqlite3.Error, subprocess.SubprocessError, SystemExit) as exc:
+        shutil.rmtree(out, ignore_errors=True)
+        raise CheckRefused(f"building the served sets under {root.as_posix()} failed: {exc}") from exc
+    return out
+
+
+def measure_served(dirp: pathlib.Path, queries: list[dict], pin: dict) -> dict:
+    """One graded ROW per (question, slice), ranked by the CLI's own `query_expr` and `run_fusion`.
+
+    A fused hit satisfies an expected id by `bench.expected_by_target`'s two rules. The anchor map
+    is the served `records.db` `meta` table, and a hit whose `id` column is EMPTY -- how `_write_set`
+    stores a chunk with no parent record -- loses that key before it is judged, so the anchor rule
+    judges it rather than an empty-string comparison.
+    """
+    try:
+        db = sqlite3.connect(f"file:{(dirp / 'records.db').as_posix()}?mode=ro", uri=True)
+        try:
+            rows = db.execute("SELECT m.id, m.path, d.body FROM d JOIN meta m ON m.rowid = d.rowid "
+                              "WHERE m.id != ''").fetchall()
+        finally:
+            db.close()
+    except sqlite3.Error as exc:
+        raise CheckRefused(f"served set unreadable under {dirp.as_posix()}: {exc}") from exc
+    if not rows:
+        raise CheckRefused(
+            f"served set 'records' is EMPTY under {dirp.as_posix()} -- nothing to grade, and a "
+            f"floor over an empty set is satisfied by any corpus"
+        )
+    docs = [{"id": i, "path": p, "text": t} for i, p, t in rows]
+    anchors: dict[str, list[str]] = {}
+    for d in docs:
+        anchors.setdefault(d["id"], []).append(d["path"])
+    key = f"{pin['metric']}@{pin['k']}"
+    per, unresolved = [], []
+    slices = {s: {"h": 0, "R": 0} for s in SLICES}
+    for q in queries:
+        # Predicate 4 and the overlap audit read the RECORD-level resolution, once per question.
+        targets = bench.expected_by_target(docs, q, anchors)
+        declared = [i.strip() for i in q.get("expected_ids", []) if i.strip()]
+        unresolved.extend(i for i in declared if i not in targets)
+        for s in SLICES:
+            expr = query.query_expr(q["query"], q[s])
+            fused = query.run_fusion(dirp, expr, pin["k"]) if expr else []
+            judged = [{k: v for k, v in h.items() if k != "id" or v} for h in fused]
+            want = bench.expected_by_target(judged, q, anchors)
+            # `and targets`: a row that cannot resolve is outside R, so it may not count toward h.
+            hit = bool(targets) and bench.score(
+                judged, list(range(len(judged))), want, [pin["k"]])[key] == 1.0
+            per.append({"q": q, "slice": s, "targets": targets, "hit": hit,
+                        "resolves": bool(targets)})
+            slices[s]["R"] += bool(targets)
+            slices[s]["h"] += hit
+    n = len(per)
+    resolved = sum(1 for p in per if p["resolves"])
+    hits = sum(1 for p in per if p["hit"])
+    return {
+        "docs": docs, "per": per, "n": n, "slices": slices,
+        "unresolved": unresolved, "R": resolved, "h": hits,
+        "ceiling": resolved / n, "cell_value": hits / n,
+    }
+
+
 def measure_overlap(run: dict) -> list[dict]:
     """Per question: how much of its vocabulary it shares with the records that answer it.
 
@@ -239,9 +355,14 @@ def measure_overlap(run: dict) -> list[dict]:
             target_terms |= set(bench.terms(run["docs"][i]["text"]))
         qt = list(dict.fromkeys(bench.terms(q["query"])))
         overlap = (len([x for x in qt if x in target_terms]) / max(1, len(qt))) if idx else None
+        # Under a `served` pin `hits` is keyed by slice; under a single-pair pin a keyed `hits`
+        # declares nothing about that cell, so it is not compared.
+        declared = q.get("hits")
+        if isinstance(declared, dict):
+            declared = declared.get(p["slice"]) if p.get("slice") else None
         rows.append({"ids": [i.strip() for i in q.get("expected_ids", []) if i.strip()],
-                     "homes": len(idx), "overlap": overlap,
-                     "hit": p["hit"], "declared_hit": q.get("hits")})
+                     "slice": p.get("slice") or "-", "homes": len(idx), "overlap": overlap,
+                     "hit": p["hit"], "declared_hit": declared})
     return rows
 
 
@@ -254,11 +375,12 @@ def check_audit(run: dict, pin: dict) -> list[str]:
     """
     rows = measure_overlap(run)
     failures = []
-    print(f"{'#':>3}  {'expected id':<28} {'homes':>5} {'hits':>5} {'overlap':>8}")
+    print(f"{'#':>3}  {'expected id':<28} {'slice':<11} {'homes':>5} {'hits':>5} {'overlap':>8}")
     for i, row in enumerate(rows, 1):
         tag = "yes" if row["hit"] else "no"
         shown = "NOT MEAS" if row["overlap"] is None else f"{row['overlap']:.3f}"
-        print(f"{i:>3}  {(row['ids'] or ['-'])[0]:<28} {row['homes']:>5} {tag:>5} {shown:>8}")
+        print(f"{i:>3}  {(row['ids'] or ['-'])[0]:<28} {row['slice']:<11} {row['homes']:>5} "
+              f"{tag:>5} {shown:>8}")
         if row["overlap"] is None:
             failures.append(
                 f"question {i} resolves no target in {pin['set']!r} -- overlap is NOT MEASURED, "
@@ -272,7 +394,10 @@ def check_audit(run: dict, pin: dict) -> list[str]:
         if row["declared_hit"] is not None and bool(row["declared_hit"]) != row["hit"]:
             failures.append(
                 f"question {i} declares hits={row['declared_hit']} and measures {row['hit']}"
+                + (f" in slice {row['slice']}" if row["slice"] != "-" else "")
             )
+    for name, s in run.get("slices", {}).items():
+        print(f"slice {name}: h={s['h']} R={s['R']}")
     h, R = run["h"], run["R"]
     headroom = (h - 1) / (R - 1) if R > 1 else float("nan")
     # Only MEASURED rows enter the summary. Averaging an unmeasured row in as 0.000 is what made the
@@ -308,8 +433,9 @@ def main() -> int:
 
     scratch = None
     try:
-        queries = read_fixture(fixture_path)
+        # The pin is read FIRST because it decides which term lists a question owes.
         pin = parse_pin(recall_conf.load_conf(root).get(PIN_KEY))
+        queries = read_fixture(fixture_path, SLICES if pin["served"] else ())
     except CheckRefused as exc:
         print(f"check-recall: REFUSED -- {exc}", file=sys.stderr)
         return 2
@@ -318,9 +444,11 @@ def main() -> int:
         try:
             if args.data_dir:
                 data = pathlib.Path(args.data_dir)
+            elif pin["served"]:
+                data = scratch = build_served_dir(root)
             else:
                 data = scratch = build_data_dir(root)
-            run = measure_run(data, queries, pin)
+            run = (measure_served if pin["served"] else measure_run)(data, queries, pin)
         except CheckRefused as exc:
             # ONE handler over BOTH preconditions. Splitting them left `build_data_dir`'s refusal
             # escaping as a traceback and exit 1, and it is the only branch the leg's own argv
@@ -344,11 +472,13 @@ def main() -> int:
                   f"{', '.join(sorted(set(run['unresolved'])))}")
         else:
             print(f"check-recall: per-id ok -- every expected id resolves in {pin['set']} "
-                  f"({run['R']}/{run['n']} questions)")
+                  f"({run['R']}/{run['n']} {'rows' if pin['served'] else 'questions'})")
 
         # -- predicate 5: the floor. `not evaluated` is a REPORTED state, never a silent skip.
         print(f"check-recall: cell {pin['cell']}  raw {run['cell_value']:.4f}  "
               f"ceiling {run['ceiling']:.4f}")
+        for name, s in run.get("slices", {}).items():
+            print(f"check-recall: slice {name} h={s['h']} R={s['R']}")
         if run["ceiling"] == 0:
             print(f"check-recall: {PIN_KEY} not evaluated -- ceiling is 0, nothing to divide")
         else:

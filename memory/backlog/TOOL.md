@@ -168,7 +168,7 @@ Cite ids, never line numbers.
 | [TOOL-aProbedToolkit-7](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | AN EMPTIED SYMBOL TIER IS INVISIBLE ON EVERY codebase-map LEG. Both the… |
 | [TOOL-aProbedToolkit-8](../builds/aProbedToolkit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-40 | 2026-09-03 | THE MAP'S COVERAGE NUMBER MEASURES THE WRONG POPULATION AND THE… |
 | [TOOL-aProbedToolkit-9](../builds/aProbedToolkit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-36 | 2026-09-03 | reuse_lookup.py HAS NO OUTPUT BUDGET. One query in incms returns 35334… |
-| [TOOL-aProbedToolkit-10](../builds/aProbedToolkit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-28 | 2026-09-03 | THE RECALL FLOOR GRADES A CONFIGURATION THE CLI DOES NOT SHIP.… |
+| [TOOL-aProbedToolkit-10](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE RECALL FLOOR GRADES A CONFIGURATION THE CLI DOES NOT SHIP.… |
 | [TOOL-aProbedToolkit-11](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | TWO RECALL DIAGNOSTICS ARE ZERO-PREDICATES, SO EACH IS SILENT IN THE… |
 | [TOOL-aProbedToolkit-12](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | A memory-tree VERSION BUMP IS A CORPUS MIGRATION NOBODY HAS COSTED, AND… |
 | [TOOL-aProbedToolkit-13](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | TWO OF THE FOUR KITS SHIP NO WIRING --check, AND THEY ARE THE TWO WHOSE… |
