@@ -562,3 +562,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T23:36:47Z dispatch · item 3b8238dd KICK-aMendedFleet-1 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/map/features/session-kickoff.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-KICK-aMendedFleet-1.md memory/guides/SESSION-KICKOFF.md memory/LIVE.md
 
 2026-10-05T23:42:55Z dispatch · item 3b8238dd KICK-aMendedFleet-1 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/map/features/session-kickoff.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-KICK-aMendedFleet-1.md memory/guides/SESSION-KICKOFF.md memory/builds/aMendedFleet/README.md
+
+2026-10-05T23:47:23Z brief · item KICK-aMendedFleet-2 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
