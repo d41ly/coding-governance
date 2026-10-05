@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-27 — recall excludes archived versioned snapshots by a declared pattern, and an arm proves a live line answers instead
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 27
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 27
 
 <!-- gen:spec-records -->
 

@@ -9283,6 +9283,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_exclude_leaves_a_live_line_answering",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_exotic_line_terminators_cannot_forge_a_row",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"

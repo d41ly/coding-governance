@@ -127,7 +127,7 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 75
+SELFTEST_ARMS = 76
 # 34 -> 58 on 2026-08-24 (adopter ic's recall contrib branch): twenty-four arms — twenty-three ported from
 #   adopter ic's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
@@ -157,6 +157,9 @@ SELFTEST_ARMS = 75
 #   its states, three of which no run in a repo with a readable log produces. Both this line and
 #   the one above it were written as `71 -> 73` on two branches that did not know about each
 #   other; the merge renumbered this one, which is the whole reason the chain is checked.
+# 75 -> 76 on 2026-10-05 (TOOL-aMendedFleet-27): ONE arm, the gold arm of `RECALL_EXCLUDE` - a live
+#   guide and two archived versioned copies of its rule; declared, the live line answers and no copy
+#   does; blank, the copies return.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -1703,6 +1706,43 @@ def test_undeclared_file_stays_out():
 
 
 
+@check("RECALL_EXCLUDE: a live line answers, its archived versioned copies do not, blank returns them")
+def test_exclude_leaves_a_live_line_answering():
+    """TOOL-aMendedFleet-27 S5. Archived versioned snapshots restate a live rule in superseded text,
+    and a charter question returned them at alternate ranks. The property is two-sided: declared,
+    the live line is IN the hits and no copy is; blank, the copies come back - so the exclusion is
+    the declaration's doing and not some other filter's, and the live hit proves the query matched.
+    """
+    root, kitdir = make_repo()
+    conf = root / ".memory-tree.conf"
+    rule = "Every frumious bandersnatch is muzzled before the vorpal audit begins.\n"
+    files = {"memory/guides/live.md": "# Live guide\n\n" + rule,
+             "memory/archive/guide-v-1-0.md": "# Guide v1.0\n\n" + rule,
+             "memory/archive/guide-v-1-1.md": "# Guide v1.1\n\n" + rule}
+    for rel, body in files.items():
+        (root / rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / rel).write_text(body, encoding="utf-8", newline="\n")
+    subprocess.run(["git", "-C", str(root), "add", "-A"], check=True, capture_output=True)
+    q = ("what must happen to the bandersnatch before the audit", "--terms",
+         "frumious bandersnatch muzzled vorpal audit")
+    copies = ("memory/archive/guide-v-1-0.md", "memory/archive/guide-v-1-1.md")
+    try:
+        conf.write_text(CONF + 'RECALL_EXCLUDE="memory/archive/*-v-[0-9]*-[0-9]*.md"\n',
+                        encoding="utf-8", newline="\n")
+        on = run(root, kitdir, *q)
+        assert "memory/guides/live.md" in on.stdout, f"the live line did not answer:\n{on.stdout}"
+        leaked = [c for c in copies if c in on.stdout]
+        assert not leaked, f"declared, the copies still answered: {leaked}"
+        assert "matches no corpus path" not in on.stderr, on.stderr
+        conf.write_text(CONF + 'RECALL_EXCLUDE=""\n', encoding="utf-8", newline="\n")
+        off = run(root, kitdir, *q)
+        back = [c for c in copies if c in off.stdout]
+        assert back == list(copies), f"blank, the copies did not return: {back}\n{off.stdout}"
+        return "declared: live only; blank: live + both copies"
+    finally:
+        cleanup(root)
+
+
 @check("the ONE walk still serves two callers: untracked visible to query, absent at a rev")
 def test_one_walk_two_callers():
     """S5. The two enumerators existed because the query path must see a note written this session
@@ -3058,6 +3098,7 @@ def main() -> int:
         test_version_marker, test_verbatim_files, test_adopter_layout,
         test_declared_sources_reach_the_corpus, test_declared_source_absent_is_skipped,
         test_undeclared_file_stays_out, test_one_walk_two_callers,
+        test_exclude_leaves_a_live_line_answering,
         # ported from adopter ic scripts/recall/selftest.py — the two verbatim files, the unforked half
         # of query.py, and the alias join
         test_chunk_matching, test_scoring, test_full_at_k_counts_targets_not_documents,

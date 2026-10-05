@@ -252,3 +252,7 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T03:33:37Z dispatch · item b717013a TOOL-aMendedFleet-26 · reason memory/gotchas/record-citing-a-foreign-id-defines-or-orphans-it.md memory/gotchas/INDEX.md
 
 2026-10-05T03:35:26Z brief · item TOOL-aMendedFleet-27 · reason 37e2c28ec58f memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
+
+2026-10-05T03:39:17Z dispatch · item 902e8408 TOOL-aMendedFleet-27 · reason tools/memory-recall/recall_conf.py tools/memory-recall/extract.py tools/memory-recall/selftest.py tools/memory-recall/README.md .memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-27.md memory/LIVE.md
+
+2026-10-05T03:44:35Z dispatch · item 902e8408 TOOL-aMendedFleet-27 · reason tools/memory-recall/recall_conf.py tools/memory-recall/extract.py tools/memory-recall/selftest.py tools/memory-recall/README.md .memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-27.md memory/LIVE.md memory/builds/aMendedFleet/README.md memory/map/generated/symbols.json

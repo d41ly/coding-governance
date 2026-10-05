@@ -205,13 +205,14 @@ class Conf:
     """The RESOLVED values every other module in the kit reads."""
 
     __slots__ = ("root", "path", "memory_root", "families", "node_tag_class", "cache_budget_mb",
-                 "extra_sources", "cited_families", "build_qid_cutoff", "export_dir")
+                 "extra_sources", "cited_families", "build_qid_cutoff", "export_dir", "exclude")
 
     def __init__(self, root: pathlib.Path, memory_root: str, families: tuple[str, ...],
                  cache_budget_mb: float | None = DEFAULT_CACHE_BUDGET_MB,
                  extra_sources: tuple[str, ...] = (), node_tag_class: str = NODE_TAG_CLASS,
                  cited_families: tuple[str, ...] = (),
-                 build_qid_cutoff: dict[str, int] | None = None, export_dir: str | None = None):
+                 build_qid_cutoff: dict[str, int] | None = None, export_dir: str | None = None,
+                 exclude: tuple[str, ...] = ()):
         self.root = root
         self.path = root / CONF_NAME
         self.memory_root = memory_root
@@ -230,6 +231,10 @@ class Conf:
         # DECLARED extra corpus sources, repo-relative. Empty is the pre-widening corpus
         # exactly, which is what an adopter whose conf has no such key must keep getting.
         self.extra_sources = extra_sources
+        # `RECALL_EXCLUDE`: repo-relative glob patterns the ONE corpus walk leaves out
+        # (TOOL-aMendedFleet-27). Globbed where the sources above are declared, because an exclusion
+        # only takes answers away and a glob is what keeps a new archived snapshot from being missed.
+        self.exclude = exclude
 
     def digest(self) -> str:
         """A hash of the RESOLVED values, not of the conf file's bytes.
@@ -256,9 +261,10 @@ class Conf:
         # Measured: without it, editing the declaration left the index warm and the corpus stale,
         # so both arms proving the widening is opt-in were answered by a cached number.
         # `cited_families` is in the blob beside `node_tag_class`: both change which strings are ids.
+        # `exclude` is in it for the `extra_sources` reason: it changes WHICH documents exist.
         blob = "\0".join((self.memory_root, ",".join(sorted(self.families)), self.node_tag_class,
                           " ".join(self.extra_sources), KIT_MEMORY_RECALL_VERSION,
-                          ",".join(sorted(self.cited_families))))
+                          ",".join(sorted(self.cited_families)), " ".join(self.exclude)))
         return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
 
 
@@ -329,7 +335,7 @@ def resolve(root: pathlib.Path | None = None) -> Conf:
                                            "a repo-relative directory inside the root"))
     out = Conf(base, memory_root, families, _budget(conf.get("RECALL_CACHE_BUDGET_MB")),
                tuple(conf.get("RECALL_EXTRA_SOURCES", "").split()), tag_class, cited, cutoff,
-               export_dir)
+               export_dir, tuple(conf.get("RECALL_EXCLUDE", "").split()))
     if root is None:
         _cached = out
     return out
@@ -363,6 +369,7 @@ def main() -> int:
     print(f"CITED_FAMILIES={' '.join(c.cited_families)}")
     print(f"BUILD_QID_CUTOFF={' '.join(f'{k}:{v}' for k, v in sorted(c.build_qid_cutoff.items()))}")
     print(f"EXPORT_DIR={c.export_dir or ''}")
+    print(f"RECALL_EXCLUDE={' '.join(c.exclude)}")
     print(f"CONF_DIGEST={c.digest()}")
     print(f"KIT_VERSION={KIT_MEMORY_RECALL_VERSION}")
     return 0

@@ -41,7 +41,7 @@ file of its own. Two keys are required:
 | `MEMORY_ROOT` | the corpus root passed to `git ls-files`, and folded into the durable-home regex |
 | `FAMILIES` | the `discipline:FAMILY` pairs; the uppercase FAMILY tokens are the id allowlist |
 
-Four more keys are optional and recall-scoped. Each one is a fact about YOUR corpus, and absent,
+The keys below are optional and recall-scoped. Each one is a fact about YOUR corpus, and absent,
 each keeps the kit's default exactly. A malformed value is refused with exit 2, naming the key; it
 never falls back silently. Running this kit's `recall_conf.py` prints what each resolved to.
 
@@ -51,9 +51,11 @@ never falls back silently. Running this kit's `recall_conf.py` prints what each 
 | `RECALL_CITED_FAMILIES` | none | families your corpus CITES and never homes: they become ids, and gain no durable home. A token `FAMILIES` already declares is refused |
 | `RECALL_BUILD_QID_CUTOFF` | no boundary | `<tag>:<qid>` pairs; each node's build-era boundary in its own query log, which `--export` labels |
 | `RECALL_EXPORT_DIR` | the common git dir | a repo-relative directory for `--export`'s aggregate; one that resolves outside the root is refused |
+| `RECALL_EXCLUDE` | nothing excluded | space-separated, repo-relative glob patterns the corpus walk leaves out (`*` spans a slash), for superseded copies such as versioned snapshots under an archive. Blank is the same as absent; a pattern matching no corpus path is announced with one line on stderr |
 
 `RECALL_NODE_TAG_CLASS` and `RECALL_CITED_FAMILIES` change which strings are ids, so they are in
-`Conf.digest()` and editing one rebuilds the cache. The other two do not, and are not.
+`Conf.digest()` and editing one rebuilds the cache. `RECALL_EXCLUDE` is in it too, because it
+changes which documents exist. The export and cutoff keys change neither, and are not.
 
 ## Use
 
