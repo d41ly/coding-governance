@@ -705,9 +705,9 @@ has    "V2 zero confirmed: the hand-out carries promoted 0 and folded 0 out loud
 # ---- rule, spells the promotion verb with --reason, and hands out the roster with both counts.
 # TOOL-aEvidencedLens-8 - every confirmed finding is PROMOTED: the high to its own unit, the three
 # minors batched into one, so this double is the accepted shape over `review_out 0 4 1`.
-# `dispose_units <promoted> <units> [folded]` - an otherwise-accepted disposal of <promoted> findings
+# `build_dispose_units <promoted> <units> [folded]` - an otherwise-accepted disposal of <promoted> findings
 # into <units> units A-tB-4.., each placed past the roster end, which `repairs: none` admits.
-dispose_units() { local i ids='' pl=''
+build_dispose_units() { local i ids='' pl=''
   for i in $(seq 4 $(( $2 + 3 ))); do ids="$ids${ids:+,}\"A-tB-$i\""; pl="$pl${pl:+,}{\"unit\":\"A-tB-$i\",\"repairs\":\"none\",\"order\":3}"; done
   printf '{"disposed":true,"standing":[],"promoted":%s,"folded":%s,"promotedIds":[%s],"edges":[],"placements":[%s],"summary":"d"}' "$1" "${3:-0}" "$ids" "$pl"; }
 DISPOSE_HIGH_BATCH='{"disposed":true,"standing":[],"promoted":4,"folded":0,"promotedIds":["A-tB-4","A-tB-5"],"edges":[],"placements":[{"unit":"A-tB-4","repairs":"A-tB-3","order":3},{"unit":"A-tB-5","repairs":"none","order":3}],"summary":"d"}'
@@ -1137,7 +1137,7 @@ has    "C a clean zero-blocker record carries --highs 0 --minors 0" "$(printf '%
 # At a POSITIVE count the first command carries NO counts, which a CONVERGING round would refuse, and
 # the retry names all three flags as its trigger and appends every one of them.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 2 5 1)" "$(rec BOUNDED)" "$(dispose_units 5 4)")")
+    "$SPEC_OK" "$(review_out 2 5 1)" "$(rec BOUNDED)" "$(build_dispose_units 5 4)")")
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:record:r1:')
 has    "C two blockers: the first command ends at --blockers 2" "$p" "--blockers 2  Return"
 has    "C ...and the retry appends --highs, --minors and --disposition" "$p" "run the SAME command once more with --highs 1 --minors 2 --disposition promote appended"
@@ -1148,29 +1148,29 @@ has    "C ...triggered by a refusal naming any of the three" "$p" "REFUSES namin
 # TOOL-aEvidencedLens-8 S3: the split is now on UNITS, one per blocker and high, and the counts all
 # promote. Five findings promoted into ONE unit over 2 blockers + 3 highs is refused at the floor.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 2 5 3)" "$(rec BOUNDED)" "$(dispose_units 5 1)")")
+    "$SPEC_OK" "$(review_out 2 5 3)" "$(rec BOUNDED)" "$(build_dispose_units 5 1)")")
 has    "D one unit beside 2 blockers + 3 highs: the roster is EMPTY" "$o" '"roster":[]'
 has    "D ...and the note names the floor" "$o" "1 unit(s) for 2 blocker(s), 3 high(s) and 0 minor(s), below the floor of 5"
 has    "D ...and the disposal is NOT done" "$o" "disposal: NOT done"
 # ---- TOOL-aEvidencedLens-8 S2: a non-zero `folded` is refused BY NAME, even where the sum reconciles.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 3 1)" "$(rec CONVERGED)" "$(dispose_units 2 2 1)")")
+    "$SPEC_OK" "$(review_out 0 3 1)" "$(rec CONVERGED)" "$(build_dispose_units 2 2 1)")")
 has    "D8 folded 1 over a reconciling sum: REFUSED by name" "$o" "folded 1 — a spec audit's MEDIUM and LOW are PROMOTED, batched, never folded"
 has    "D8 ...with an empty roster" "$o" '"roster":[]'
 # ---- S3's floor: one unit for one high and two minors is refused; two are accepted.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 3 1)" "$(rec CONVERGED)" "$(dispose_units 3 1)")")
+    "$SPEC_OK" "$(review_out 0 3 1)" "$(rec CONVERGED)" "$(build_dispose_units 3 1)")")
 has    "D8 one unit for one high and two minors: REFUSED at the floor" "$o" "1 unit(s) for 0 blocker(s), 1 high(s) and 2 minor(s), below the floor of 2"
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 3 1)" "$(rec CONVERGED)" "$(dispose_units 3 2)")")
+    "$SPEC_OK" "$(review_out 0 3 1)" "$(rec CONVERGED)" "$(build_dispose_units 3 2)")")
 has    "D8 ...two units are ACCEPTED" "$o" "disposal: done — promoted 3 · folded 0"
 has    "D8 ...and the roster is handed out" "$o" '"roster":[{'
 # ---- S3's ceiling: five minors promoted into five units is the measured shape it exists to refuse.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 5 0)" "$(rec CONVERGED)" "$(dispose_units 5 5)")")
+    "$SPEC_OK" "$(review_out 0 5 0)" "$(rec CONVERGED)" "$(build_dispose_units 5 5)")")
 has    "D8 five units for five minors: REFUSED at the ceiling" "$o" "5 unit(s) where at most 2 fit — the minors are batched into one unit or two, never one per minor"
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 5 0)" "$(rec CONVERGED)" "$(dispose_units 5 2)")")
+    "$SPEC_OK" "$(review_out 0 5 0)" "$(rec CONVERGED)" "$(build_dispose_units 5 2)")")
 has    "D8 ...two disjoint batches are ACCEPTED" "$o" "disposal: done — promoted 5 · folded 0"
 # ---- S1: the disposal prompt PROMOTES the minors, batched, and carries its four pinned sentences.
 p=$(printf '%s\n' "$o" | grep '^prompt:dispose:tB:')
@@ -1194,13 +1194,13 @@ has    "D ...with an empty roster" "$o" '"roster":[]'
 # ---- TOOL-aEvidencedLens-21 AC3 (closing review M2): two raw HIGH ids the report merged into one item.
 # The prompt and the floor agree on RAW ids, and no count changes basis.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 2 2)" "$(rec CONVERGED)" "$(dispose_units 2 1)")")
+    "$SPEC_OK" "$(review_out 0 2 2)" "$(rec CONVERGED)" "$(build_dispose_units 2 1)")")
 has    "D21 the disposal prompt makes each merged raw id its own unit" "$(printf '%s\n' "$o" | grep '^prompt:dispose:tB:')" "even where the report merged several ids into one item"
 has    "D21 one unit for two raw HIGH ids in one item: REFUSED at the floor" "$o" "1 unit(s) for 0 blocker(s), 2 high(s) and 0 minor(s), below the floor of 2"
 has    "D21 ...naming raw ids, merged items included" "$o" "one unit per RAW blocker and high id, merged items included"
 has    "D21 ...with an empty roster" "$o" '"roster":[]'
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 2 2)" "$(rec CONVERGED)" "$(dispose_units 2 2)")")
+    "$SPEC_OK" "$(review_out 0 2 2)" "$(rec CONVERGED)" "$(build_dispose_units 2 2)")")
 has    "D21 ...two units are ACCEPTED" "$o" "disposal: done — promoted 2 · folded 0"
 has    "D21 ...and the record counts stay raw" "$(printf '%s\n' "$o" | grep '^prompt:audit:record')" "--highs 2 --minors 0"
 
@@ -1348,14 +1348,14 @@ o=$(run_wf "$A_UNITS" "$(printf '{"spec":{"authored":[],"alreadyPresent":["A-tB-
 has    "DP attended: deferred too, and told to stop rather than hold" "$o" "an attended run has no driver to hold"
 # id 14: unverified findings are OUTSTANDING and run the stage.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 0 0 2)" "$(rec CONVERGED)" "$(dispose_units 2 1)")")
+    "$SPEC_OK" "$(review_out 0 0 0 2)" "$(rec CONVERGED)" "$(build_dispose_units 2 1)")")
 has    "F 0 confirmed + 2 unverified: the disposal agent RUNS" "$o" "agent:dispose:tB"
 has    "F ...and the prompt hands it the unverified population" "$o" "and 2 unverified. Open the report"
 has    "F ...and says an unverified finding is OUTSTANDING, not cleared" "$o" "OUTSTANDING, not cleared"
 has    "F ...and the hand-out carries unverified 2" "$o" '"unverified":2'
 has    "F ...and the roster is handed out" "$o" '"roster":[{'
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-    "$SPEC_OK" "$(review_out 0 1 1 1)" "$(rec CONVERGED)" "$(dispose_units 2 2)")")
+    "$SPEC_OK" "$(review_out 0 1 1 1)" "$(rec CONVERGED)" "$(build_dispose_units 2 2)")")
 has    "F confirmed 1 + unverified 1: reconciles against their sum" "$o" '"roster":[{'
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
     "$SPEC_OK" "$(review_out 0 1 1 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":0,"promotedIds":["A-tB-4"],"summary":"d"}')")
@@ -1457,16 +1457,16 @@ has    "EL5-AC1 ...and specs: the format, then the siblings not under audit" "$w
 hasnt_ "EL5-AC3 a caller-pinned subject set passes no checklist key" "$w" '"checklist"'
 has    "EL5-AC3 ...and announces that no resolver ran" "$o" 'log:WARNING: no `checklist` for the audit: a caller-pinned `subjects` skipped the resolver, so no resolver ran'
 EL5_NOSUBJ=$(printf '%s' "$UNITS" | sed 's#"subjects":\[[^]]*\],##')
-el5_res() { printf '{"spec:":%s,"audit:subjects":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$1" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK"; }
-o=$(run_wf "$EL5_NOSUBJ" "$(el5_res '{"subjects":[{"path":"s1","blob":"'"$B40"'","tree":"'"$B40"'"}],"checklist":"# h\n- [ ] a\n- [ ] b\n","checklistPaths":["x"]}')")
+build_el5_res() { printf '{"spec:":%s,"audit:subjects":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$1" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK"; }
+o=$(run_wf "$EL5_NOSUBJ" "$(build_el5_res '{"subjects":[{"path":"s1","blob":"'"$B40"'","tree":"'"$B40"'"}],"checklist":"# h\n- [ ] a\n- [ ] b\n","checklistPaths":["x"]}')")
 has    "EL5-AC2 the resolver's checklist reaches the callee verbatim" "$(printf '%s\n' "$o" | grep '^wargs:')" '"checklist":"# h\n- [ ] a\n- [ ] b\n"'
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:subjects:')
 has    "EL5-AC2 the resolver is told to run gotchas.py --for-paths" "$p" 'gotchas.py --for-paths'
 has    "EL5-AC2 ...over the subjects' Files touched (estimate) paths" "$p" 'Files touched (estimate)'
-o=$(run_wf "$EL5_NOSUBJ" "$(el5_res '{"subjects":[{"path":"s1","blob":"'"$B40"'","tree":"'"$B40"'"}],"checklistError":"no path declared"}')")
+o=$(run_wf "$EL5_NOSUBJ" "$(build_el5_res '{"subjects":[{"path":"s1","blob":"'"$B40"'","tree":"'"$B40"'"}],"checklistError":"no path declared"}')")
 has    "EL5-AC3 a checklistError is announced by its reason" "$o" 'log:WARNING: no `checklist` for the audit: no path declared'
 hasnt_ "EL5-AC3 ...and no checklist key reaches the callee" "$(printf '%s\n' "$o" | grep '^wargs:')" '"checklist"'
-o=$(run_wf "$EL5_NOSUBJ" "$(el5_res '{"subjects":[{"path":"s1","blob":"'"$B40"'","tree":"'"$B40"'"}],"checklist":"# one\n# two\n"}')")
+o=$(run_wf "$EL5_NOSUBJ" "$(build_el5_res '{"subjects":[{"path":"s1","blob":"'"$B40"'","tree":"'"$B40"'"}],"checklist":"# one\n# two\n"}')")
 has    "EL5-AC3 a header-only checklist is announced as no bug class selected" "$o" 'log:WARNING: no `checklist` for the audit: no bug class selected'
 hasnt_ "EL5-AC3 ...and never reaches the callee, whose parseChecklist refuses it" "$(printf '%s\n' "$o" | grep '^wargs:')" '"checklist"'
 EL5_FOLD='"slug":"tB","round":3,"subjectRound":2,'
