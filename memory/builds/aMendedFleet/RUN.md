@@ -550,3 +550,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T22:47:18Z brief · item TOOL-aMendedFleet-74 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
 
 2026-10-05T22:55:31Z dispatch · item 70d880ee TOOL-aMendedFleet-74 · reason tools/workflows/unattended-unit.js tools/workflows/unattended-build.test.sh memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-74.md memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-74-1-acceptance-ledger.md memory/builds/aMendedFleet/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-05T23:02:31Z brief · item TOOL-aMendedFleet-75 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
