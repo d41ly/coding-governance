@@ -259,6 +259,31 @@ absent takes the kit default and says so on stderr; non-numeric or zero is a ref
 this is its reason:
 because the ceiling would fire first and the declared bound could never be reached.
 
+## The overlap probe at `--preflight`
+
+`--preflight` announces every unmerged remote ref that touches what this run touches, beside its
+count of concurrent run-state files. That count sees only the records this clone tracks, and a
+slug-keyed claim sees one slug; neither sees two builds on one subject, which would otherwise be
+learned when the second one merges. The summary line always prints, opening
+`unattended: overlap probe — `, so a clean result reads differently from a probe that did not run.
+
+- **What it reads.** Every ref under the single remote's `refs/remotes/<remote>/` reachable from
+  neither the observed default-branch tip nor `HEAD`, the remote's `HEAD` symref skipped. For each,
+  the paths its diff from the observed tip changes, and the backticked paths under
+  `### Files touched` of every spec that diff changes whose status is not `CLOSED` or `WONTDO`. It
+  joins them with this run's own diff from that tip and its build's live specs: two paths are shared
+  when equal or when one is a directory holding the other. Each shared path is tagged `diff` or
+  `declared`, because a declared path is a spec's estimate rather than an edit.
+- **It never fetches.** It reads the refs as of this clone's last fetch, and its summary line says so.
+- **What it excludes.** A ref whose tip is older than the driver's `OVERLAP_AGE_DAYS`, counted on the summary line as aged
+  out. A path under a `SHARED_RECORDS` entry or a `GENERATED_INDEXES` index: those reconcile
+  additively or re-render, and are never contested. A diff path whose every added and removed line
+  carries a kit version marker, unless a spec on the ref also declares it.
+- **It refuses nothing.** A remote-tracking ref is a local write any process can move, so the
+  overlap probe can add or remove an announcement and never a refusal; preflight's outcome is the
+  same with or without it. With no observed tip it prints `overlap probe UNAVAILABLE` and the reason,
+  and a ref whose diff cannot be read is counted as unreadable, never as clean.
+
 ## Running the kit's own checks
 
 ```

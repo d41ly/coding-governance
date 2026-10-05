@@ -2282,6 +2282,151 @@ check_single_live() {
   return 0
 }
 
+# THE CROSS-RUN OVERLAP PROBE, preflight's second announcement and the only one that reads REMOTE
+# refs. TOOL-aMendedFleet-60. The run-state count above sees the records this clone tracks; a remote
+# claim keyed by slug sees one slug. Neither sees two builds on one SUBJECT, which until this probe
+# was learned at the second one's merge. It joins the paths every unmerged remote-tracking ref
+# changed or declares against the paths this run changed or declares, and ANNOUNCES each ref sharing
+# one.
+#
+# WHAT IT DOES NOT CLAIM. It refuses nothing and writes nothing: a remote-tracking ref is a LOCAL
+# write any process can move (TOOL-aStandingWrit-2), so it can add or remove a line and never a
+# refusal. It never fetches, so it reads the refs as of this clone's last fetch, and says so. A
+# declared path is a spec's ESTIMATE, not an edit; the tag on each path says which kind it is. A
+# path under a shared record or a generated index is never shared, because those reconcile
+# additively or re-render. A diff touching only kit version markers is not an overlap unless a spec
+# on the ref also declares the path. The age bound is a constant until an adopter asks for another.
+OVERLAP_AGE_DAYS=14
+# `read_files_touched <rev> <file>` - the backticked path tokens under `### Files touched` of every
+# spec the file lists, read at <rev> with ONE `git show`, terminal specs skipped. The blobs arrive
+# concatenated, so each spec's status header is what opens its record. A token is a path when it is
+# one word of path characters holding a `/` or ending in an extension: prose spans in the section
+# such as a function name or an id are not paths. Its status is git's, so an unreadable ref is
+# counted as unreadable rather than as clean.
+read_files_touched() { # rev · file of spec paths -> one declared path per line
+  local _rf_ps=() _rf_p
+  while IFS= read -r _rf_p; do
+    _rf_p=${_rf_p%$'\r'}
+    case "$_rf_p" in *.md) _rf_ps+=("$1:$_rf_p") ;; esac
+  done < "$2"
+  [ "${#_rf_ps[@]}" -gt 0 ] || return 0
+  GIT show "${_rf_ps[@]}" 2>/dev/null | awk '
+    { sub(/\r$/, "") }
+    /^\*\*Status:\*\* / { term = ($2 == "CLOSED" || $2 == "WONTDO"); ft = 0; next }
+    /^#/ { ft = ($0 ~ /^### Files touched/); next }
+    ft && !term {
+      s = $0
+      while (match(s, /`[^`]+`/)) {
+        t = substr(s, RSTART + 1, RLENGTH - 2); s = substr(s, RSTART + RLENGTH)
+        if (t ~ /^[A-Za-z0-9._\/-]+$/ && (t ~ /\// || t ~ /\.[A-Za-z0-9]+$/)) print t
+      }
+    }'
+  return "${PIPESTATUS[0]}"
+}
+check_cross_run_overlap() { # slug - always returns 0
+  local slug="$1" anc="${ASHA:-}" rem d now ref sha ct age secs n=0 a=0 u=0 s=0 _co_q _co_g _co_ps=()
+  if [ -z "$anc" ] || ! GIT rev-parse --verify --quiet "$anc^{commit}" >/dev/null 2>&1; then
+    echo "unattended: overlap probe UNAVAILABLE — no observed default-branch tip names a commit in this clone, so no remote ref can be read as unmerged against it"
+    return 0
+  fi
+  d=$(mktemp -d) || { echo "unattended: overlap probe UNAVAILABLE — cannot create a scratch directory"; return 0; }
+  rem=$(GIT remote | head -1)
+  # OUR PATHS: what this run changed since the anchor, and what its live specs declare.
+  if ! GIT -c core.quotepath=off diff --name-only "$anc...HEAD" > "$d/ours" 2>/dev/null; then
+    echo "unattended: overlap probe UNAVAILABLE — this run's own changes since the observed tip ${anc:0:8} cannot be listed"
+    rm -rf "$d"; return 0
+  fi
+  if [ -n "$slug" ]; then
+    GIT ls-tree -r --name-only HEAD -- "$M/builds/$slug/spec/" > "$d/ourspecs" 2>/dev/null || : > "$d/ourspecs"
+    read_files_touched HEAD "$d/ourspecs" >> "$d/ours" || :
+  fi
+  # NEVER CONTESTED: every shared record, and the index half of every generated pair.
+  : > "$d/excl"
+  for _co_q in ${SHARED_RECORDS:-}; do printf '%s\n' "$_co_q" >> "$d/excl"; done
+  for _co_q in ${GENERATED_INDEXES:-}; do printf '%s\n' "${_co_q%%:*}" >> "$d/excl"; done
+  # THE REFS: reachable from neither the anchor nor HEAD, so this run's own pushed branch drops out
+  # while it is behind HEAD and reappears when another session pushed past it.
+  if ! GIT for-each-ref --no-merged="$anc" --no-merged=HEAD \
+       --format='%(refname)%09%(objectname)%09%(committerdate:unix)' "refs/remotes/$rem/" > "$d/refs" 2>/dev/null; then
+    echo "unattended: overlap probe UNAVAILABLE — the remote-tracking refs of $rem cannot be listed"
+    rm -rf "$d"; return 0
+  fi
+  now=$(date +%s); : > "$d/lines"
+  while IFS=$'\t' read -r ref sha ct <&3; do
+    ref=${ref%$'\r'}; ct=${ct%$'\r'}
+    [ -n "$ref" ] && [ "$ref" != "refs/remotes/$rem/HEAD" ] || continue
+    n=$((n + 1))
+    secs=$((now - ${ct:-0})); age=$((secs / 86400))
+    if [ "$secs" -gt $((OVERLAP_AGE_DAYS * 86400)) ]; then a=$((a + 1)); continue; fi
+    # THEIR PATHS: the ref's diff names, and the Files touched of the specs it changed and kept.
+    if ! GIT -c core.quotepath=off diff --no-renames --name-status "$anc...$sha" > "$d/ns" 2>/dev/null; then
+      u=$((u + 1)); continue
+    fi
+    awk -F'\t' -v m="$M/builds/" -v df="$d/tdiff" -v sf="$d/tspecs" '
+      { sub(/\r$/, ""); if ($2 == "") next; print $2 > df
+        if ($1 !~ /^D/ && index($2, m) == 1 && $2 ~ /\/spec\/.*\.md$/) print $2 > sf }
+      END { printf "" > df; printf "" > sf }' "$d/ns"
+    if ! read_files_touched "$sha" "$d/tspecs" > "$d/tdecl"; then u=$((u + 1)); continue; fi
+    # THE JOIN, one process: equal, or one a directory the other sits under, after the same
+    # normalisation `normpath` applies. Prints `path<TAB>diff|declared|diff+declared`.
+    awk -F'\t' -v xf="$d/excl" -v of="$d/ours" -v tf="$d/tdiff" -v cf="$d/tdecl" '
+      function norm(p) {
+        sub(/\r$/, "", p); gsub(/\/\/+/, "/", p)
+        while (p ~ /^\.\//) p = substr(p, 3)
+        while (p ~ /\/\.\//) sub(/\/\.\//, "/", p)
+        while (p ~ /.\/\.$/) sub(/\/\.$/, "", p)
+        while (p ~ /.\/$/) sub(/\/$/, "", p)
+        return p }
+      function under(a, b) { return a == b || index(b, a "/") == 1 }
+      function kept(p,   i) { if (p == "") return 0; for (i = 1; i <= nx; i++) if (under(x[i], p)) return 0; return 1 }
+      FILENAME == xf { p = norm($0); if (p != "") x[++nx] = p; next }
+      FILENAME == of { p = norm($0); if (kept(p) && !(p in ov)) { ov[p] = 1; o[++no] = p }; next }
+      { p = norm($0); if (!kept(p)) next
+        if (!(p in tag)) { order[++nt] = p; tag[p] = "" }
+        if (FILENAME == tf) td[p] = 1; else tc[p] = 1 }
+      END { for (k = 1; k <= nt; k++) { p = order[k]
+              for (i = 1; i <= no; i++) if (under(p, o[i]) || under(o[i], p)) {
+                print p "\t" (td[p] ? (tc[p] ? "diff+declared" : "diff") : "declared"); break } } }
+    ' "$d/excl" "$d/ours" "$d/tdiff" "$d/tdecl" > "$d/shared"
+    [ -s "$d/shared" ] || continue
+    # THE MARKER FILTER: a path the ref's DIFF names loses that tag when every line it adds or
+    # removes carries a kit version marker. A declared tag stays whatever the diff holds. A path
+    # both sources name prints `diff`, since an edit outranks an estimate, and `declared` once its
+    # diff half is dropped.
+    _co_ps=()
+    while IFS=$'\t' read -r _co_q _co_g; do
+      case "$_co_g" in diff*) _co_ps+=("$_co_q") ;; esac
+    done < "$d/shared"
+    : > "$d/u0"
+    if [ "${#_co_ps[@]}" -gt 0 ]; then
+      GIT -c core.quotepath=off diff --no-renames -U0 "$anc...$sha" -- "${_co_ps[@]}" > "$d/u0" 2>/dev/null || : > "$d/u0"
+    fi
+    awk -F'\t' -v uf="$d/u0" -v r="${ref#refs/remotes/}" -v t="${sha:0:8}" -v age="$age" '
+      FILENAME == uf {
+        if ($0 ~ /^diff --git /) { h = 1; f = ""; next }
+        if (h && $0 ~ /^\+\+\+ b\//) { f = substr($0, 7); next }
+        if (h && $0 ~ /^--- a\// && f == "") { f = substr($0, 7); next }
+        if ($0 ~ /^@@/) { h = 0; next }
+        if (!h && f != "" && $0 ~ /^[-+]/) { ch[f]++; if ($0 !~ /gov:kit [A-Za-z0-9_.-]+@[0-9][0-9A-Za-z.]*/) nm[f]++ }
+        next }
+      { p = $1; g = $2
+        if (g ~ /^diff/ && ch[p] > 0 && nm[p] == 0) { if (g == "diff") next; g = "declared" }
+        if (g == "diff+declared") g = "diff"
+        out[++k] = p " (" g ")" }
+      END { if (k == 0) exit
+            line = "  " r " · " t " · " age "d old · " k " shared: "
+            for (i = 1; i <= k && i <= 5; i++) line = line (i > 1 ? ", " : "") out[i]
+            if (k > 5) line = line " and " (k - 5) " more"
+            print line }' "$d/u0" "$d/shared" >> "$d/lines.new"
+    if [ -s "$d/lines.new" ]; then s=$((s + 1)); cat "$d/lines.new" >> "$d/lines"; fi
+    rm -f "$d/lines.new"
+  done 3< "$d/refs"
+  printf "unattended: overlap probe — %d unmerged remote ref(s) read as of this clone's last fetch, %d aged out past %d days, %d unreadable, " "$n" "$a" "$OVERLAP_AGE_DAYS" "$u"
+  if [ "$s" -eq 0 ]; then echo "no shared path"; else echo "$s sharing a path; this run is NOT blocked"; cat "$d/lines"; fi
+  rm -rf "$d"
+  return 0
+}
+
 # ONE comparison enforces BOTH provenance properties. At a pinned merge-base, "was it reachable from
 # the BASE" and "did the run author it" are the same question, so there is one answer and one place
 # for it to be wrong.
@@ -5195,6 +5340,7 @@ verb_preflight() { # slug · keepalive-id
   check_method || true
   check_waivers "$rel" || true
   check_single_live || true
+  check_cross_run_overlap "$slug" || true
   # S2 - the declared lander is PROBED, not believed, and only where the declaration says it will be
   # used. It joins the other preconditions through `status` rather than returning, so an operator
   # reads every unmet precondition in one pass.

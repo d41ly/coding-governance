@@ -725,6 +725,63 @@ git add -A && git commit -q -m selfrec --no-verify
 out=$(run --preflight tRun --keepalive-id k1)
 miss "$out" "concurrent unattended run(s)"
 
+# ---- TOOL-aMendedFleet-60: THE CROSS-RUN OVERLAP PROBE announces an unmerged remote ref sharing a
+# ---- path with this run, and refuses nothing. The ref is built by PLUMBING off `main` and pushed as
+# ---- `side`, so the working tree and the conf every arm reads are never touched; this run's own half
+# ---- of each join is a commit on the unit branch, which `reset_tree` drops. `side` is deleted after
+# ---- the last arm so no later preflight reads it. Staged red by deleting the probe's one call.
+build_overlap_ref() { # path · content · committer-epoch-or-empty — one commit off main writing <path>, force-pushed as origin/side
+  local _ov_b _ov_t _ov_c _ov_ix
+  _ov_ix=$(mktemp); rm -f "$_ov_ix"
+  _ov_b=$(printf '%s\n' "$2" | git hash-object -w --stdin)
+  GIT_INDEX_FILE=$_ov_ix git read-tree main
+  GIT_INDEX_FILE=$_ov_ix git update-index --add --cacheinfo "100644,$_ov_b,$1"
+  _ov_t=$(GIT_INDEX_FILE=$_ov_ix git write-tree); rm -f "$_ov_ix"
+  if [ -n "$3" ]; then _ov_c=$(GIT_COMMITTER_DATE="$3 +0000" git commit-tree "$_ov_t" -p main -m side)
+  else _ov_c=$(git commit-tree "$_ov_t" -p main -m side); fi
+  git push -qf origin "$_ov_c:refs/heads/side" && git fetch -q origin
+}
+add_overlap_commit() { mkdir -p "$(dirname "$1")"; printf '%s\n' "$2" > "$1"; git add -- "$1"; git commit -q -m ours --no-verify; }
+reset_tree
+out=$(bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1); ov_rc0=$?
+hit "$out" "unattended: overlap probe — 0 unmerged remote ref(s) read as of this clone's last fetch, 0 aged out past 14 days, 0 unreadable, no shared path"
+# AC1: an overlapping diff is announced, tagged `diff`, and the verb's outcome does not move.
+reset_tree; add_overlap_commit src/ov.sh ours; build_overlap_ref src/ov.sh theirs ""
+out=$(bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1); ov_rc=$?
+hit "$out" "1 sharing a path; this run is NOT blocked"
+hit "$out" "  origin/side · "
+hit "$out" "1 shared: src/ov.sh (diff)"
+same "an announced overlap leaves the preflight's exit status alone" "$ov_rc" "$ov_rc0"
+# AC2: a diff whose every line carries a kit version marker is not an overlap.
+reset_tree; add_overlap_commit src/kit.sh ours; build_overlap_ref src/kit.sh "V=2   # gov:kit tkit@1.2" ""
+out=$(run --preflight tRun --keepalive-id k1)
+miss "$out" "src/kit.sh (diff)"
+hit "$out" "1 unmerged remote ref(s) read as of this clone's last fetch, 0 aged out past 14 days, 0 unreadable, no shared path"
+# AC3: a ref whose tip is past the age bound is counted, never read.
+reset_tree; add_overlap_commit src/ov.sh ours; build_overlap_ref src/ov.sh theirs "$(( $(date +%s) - 30 * 86400 ))"
+out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "1 aged out past 14 days"
+miss "$out" "  origin/side · "
+# AC4: a live spec on the ref declares the path with no product edit; WONTDO withdraws it.
+print_overlap_spec() { printf '# X-tSide-1 — side\n\n**Status:** %s · rev-1 · 2026-10-04 · node z · Tier-1\n\n### Files touched (estimate)\n\n- `src/ov.sh`\n\n## 5. next\n' "$1"; }
+reset_tree; add_overlap_commit src/ov.sh ours; build_overlap_ref memory/builds/tSide/spec/2026-10-04-spec-X-tSide-1.md "$(print_overlap_spec SPECCED)" ""
+out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "1 shared: src/ov.sh (declared)"
+reset_tree; add_overlap_commit src/ov.sh ours; build_overlap_ref memory/builds/tSide/spec/2026-10-04-spec-X-tSide-1.md "$(print_overlap_spec WONTDO)" ""
+out=$(run --preflight tRun --keepalive-id k1)
+miss "$out" "src/ov.sh (declared)"
+# AC5: a shared record is never contested, and a probe with no anchor says it did not run.
+reset_tree; add_overlap_commit memory/DECISIONS.md ours; build_overlap_ref memory/DECISIONS.md theirs ""
+out=$(run --preflight tRun --keepalive-id k1)
+miss "$out" "memory/DECISIONS.md (diff)"
+hit "$out" "1 unmerged remote ref(s) read as of this clone's last fetch, 0 aged out past 14 days, 0 unreadable, no shared path"
+reset_tree; git remote set-url origin "$ORIGIN_DIR/absent.git"
+out=$(run --preflight tRun --keepalive-id k1)
+git remote set-url origin "$ORIGIN"
+hit "$out" "unattended: overlap probe UNAVAILABLE — "
+git push -q origin --delete side 2>/dev/null; git update-ref -d refs/remotes/origin/side 2>/dev/null
+reset_tree
+
 # ---- check 6: the build folder exists on the unit branch but NOT at the pinned BASE. The
 # ---- self-authored case in its purest form - the run invented the build that authorizes it.
 reset_tree
@@ -12551,7 +12608,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 1843 -> 1877 by TOOL-aRepatriatedFork-53: the task-registry block's 34 unconditional
 # hit/miss/same/mutate lines in region two beside the `--audit` arms, COUNTED off the block; no suite
 # ran in the pass, and each case was observed by a scratch fixture driving the driver itself.
-FLOOR_ASSERTIONS=1877
+# RAISED 1877 -> 1891 by TOOL-aMendedFleet-60: the overlap probe's 14 hit/miss/same lines in region
+# one beside the concurrent-run arms, COUNTED off the block; no suite ran in the pass, and the block
+# was observed green in a prologue slice and red with the probe's call deleted.
+FLOOR_ASSERTIONS=1891
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -12673,7 +12733,8 @@ FLOOR_ASSERTIONS=1877
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
 PROLOGUE_ARMS=18
 # RAISED 208 -> 209: region one's in_shard block-length arm, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=209
+# RAISED 209 -> 223: the overlap probe's 14 region-one assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=223
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
