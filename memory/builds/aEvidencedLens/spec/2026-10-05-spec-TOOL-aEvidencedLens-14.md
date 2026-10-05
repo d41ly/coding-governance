@@ -1,12 +1,13 @@
 # TOOL-aEvidencedLens-14 — check 19 walks a terminal record's exclusions when EITHER owner-held scan hits, so an owner's round raise never reds an archived record
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-05-prompt-TOOL-aEvidencedLens-14-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-14-2-build-brief.md) | journal | — |
+| [2026-10-05-review-TOOL-aEvidencedLens-12-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-12-spec-audit-round1.md) | spec-audit | TOOL-aEvidencedLens-12 TOOL-aEvidencedLens-13 |
 
 <!-- /gen:spec-records -->
 
@@ -34,7 +35,10 @@ of the round-1 spec audit.
   `read_run_exclusions` read, so the walk is still read once and still serves both. The fail-closed
   branch, which grades the whole superset when the walked list cannot be enumerated, keeps both
   scans' superset results and says so on the report channel, as it does for the grant scan today.
-  Observed by AC2 and AC3.
+  The walk excludes only commits reachable from a merge's non-run parent: `read_run_exclusions`
+  prints that PARENT and walks on, and `read_run_commits` keeps the merge commit itself. So a merge
+  commit's own write, settled against every parent as unit 9's round scan settles it, is a run write
+  the walk keeps, and an evil merge raising the bound still fails check 19. Observed by AC2 and AC3.
 - **S3** — The superset-first order stays: a record whose superset hits neither scan is settled with
   no walk, so the ordinary bar pays nothing more. The header comment above the walk says the walk
   TRIGGER is shared by every scan that shares the walk, and why: a scan that grades the superset
@@ -110,7 +114,10 @@ fail 19 per grant hit;  fail 19 per rounds hit
 - observability — every fail line names the commit and the record, as before.
 - risks — an owner raise and a run raise in one record's range: the walk keeps the run's own and
   drops the owner's, so the run raise still reds. AC2 holds both.
-- testing — the arms of S4, observed RED against the leg as `TOOL-aEvidencedLens-9` built it.
+- testing — the arms of S4. The first two are observed RED against the leg as
+  `TOOL-aEvidencedLens-9` built it; the evil-merge arm is green there too, since the unwalked leg
+  also names a kept merge, so its red is a staged break, a walk that excludes the merge commit
+  itself.
 - migration — none.
 - user docs — the clause header (S3).
 
@@ -118,8 +125,9 @@ fail 19 per grant hit;  fail 19 per rounds hit
 
 Each criterion runs `bash tools/unattended/check-unattended.sh` over a scratch fixture repository,
 `git init` under a short directory beneath `%TEMP%`, its records built as the check suite's
-grant-write fixture builds them. Each red is first observed against the leg at the pass-start HEAD,
-read with `git show` into the scratchpad.
+grant-write fixture builds them. Each red of AC1 and AC2 is first observed against the leg at the
+pass-start HEAD, read with `git show` into the scratchpad; AC3's is observed on the staged break it
+names, because the pass-start leg names a kept merge too.
 
 - **AC1** — When the fixture holds a TERMINAL run-state file whose `base..witness` range contains an
   owner commit on the default branch raising `REVIEW_ROUNDS="1"` to `"2"`, merged into the run branch
@@ -129,9 +137,14 @@ read with `git show` into the scratchpad.
 - **AC2** — When the same fixture also holds a run commit raising the bound to `"3"`, check 19 fails
   once, naming that run commit and `2 -> 3`, and does not name the owner commit.
   Red when: the walk drops the run's own write, or the owner commit is named.
-- **AC3** — When the run commit raising the bound is one `read_run_exclusions` removes, a merge of the
-  default branch into the run whose exclusion the walk reads, check 19 names no round write.
-  Red when: an excluded commit is graded as the run's own.
+- **AC3** — When AC1's fixture's merge of the default branch into the run is an EVIL merge, its
+  resolution setting `REVIEW_ROUNDS="3"` where the default-branch parent holds `"2"` and the run
+  parent `"1"`, check 19 fails once, naming that merge commit and not the owner commit; and a scratch
+  copy of the leg whose walk also excludes the merge commit itself names nothing on the same fixture.
+  Red when: the walk drops a merge commit's own write, so a run hides a raise in its own merge, or
+  the staged break still names the merge, so the arm cannot tell a kept merge from a dropped one.
+  fixture: a merge settled against every parent writes only when its value differs from each, as
+  `TOOL-aEvidencedLens-9`'s round scan settles it.
 - **AC4** — When `grep -n 'maywr\$' tools/unattended/check-unattended.sh` runs it prints the walk
   condition carrying both scans' results, and the comment above it names the shared trigger.
   Red when: the walk still fires on the grant scan alone.
@@ -147,7 +160,7 @@ read with `git show` into the scratchpad.
 
 New arm: tools/unattended/check-unattended.test.sh · `round walk:` a terminal record whose superset holds an owner raise merged into the run, which the grant-only trigger reds · none
 New arm: tools/unattended/check-unattended.test.sh · `round walk:` the same record with a run raise beside it, which a walk dropping too much would pass · none
-New arm: tools/unattended/check-unattended.test.sh · `round walk:` a run raise in an excluded merge commit, which an unwalked scan grades · none
+New arm: tools/unattended/check-unattended.test.sh · `round walk:` an evil run merge whose resolution raises the bound, which the walk must keep and name; its red is a staged walk that excludes the merge commit itself · none
 
 ## 8. Open questions
 
@@ -157,6 +170,15 @@ none
 
 - rev-1 · 2026-10-05 · initial draft, promoted from the round-1 spec audit's finding 37 (HIGH),
   repairing `TOOL-aEvidencedLens-9`.
+- rev-2 · 2026-10-05 · §5 §6 §7 S2 AC3 · fold of the spec audit of units 12 to 14
+  (`reviews/2026-10-05-review-TOOL-aEvidencedLens-12-spec-audit-round1.md`). Ids 3, 8 and 16
+  (MEDIUM): AC3 and the third `round walk:` arm described a run commit in an "excluded merge", which
+  the walk cannot produce, since it removes a merge's non-run parent side and keeps the merge commit.
+  The finder's fix for id 3 was judged unsound, so the skeptic's correction is taken: AC3 becomes the
+  keep case of ids 8 and 16, an evil run merge that must still fail check 19 after the walk, with its
+  red on a staged walk that excludes the merge itself; S2 states that a merge's own write is a run
+  write the walk keeps; and the §6 preamble and §5 testing line exempt that arm from the pass-start
+  red, because the unwalked leg names a kept merge too. AC5's count stays at 3.
 
 ## 10. Reuse audit
 

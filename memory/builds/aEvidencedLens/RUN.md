@@ -84,3 +84,5 @@ base: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 2026-10-05T00:33:24Z dispatch · item 2704dbf0 TOOL-aEvidencedLens-5 · reason tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh tools/workflows/README.md memory/map/generated/symbols.json memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-5.md memory/builds/aEvidencedLens/README.md
 
 2026-10-05T00:33:28Z brief · item TOOL-aEvidencedLens-5 · reason f050c40d95ce memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-5-2-build-brief.md
+
+2026-10-05T01:00:35Z rescope · item add TOOL-aEvidencedLens-15 · reason spec-audit round 1 (reviews/2026-10-05-review-TOOL-aEvidencedLens-12-spec-audit-round1.md) ids 1, 5 and 14 HIGH: unit 13 masks only result.key in its BASE comparison, but the diff-kind resume:probe spells the key as a template carrying inputPrint, which the REVIEW_SHAPE move changes, so its AC1 and AC2 are red on a correct build and invite reverting that move; repairs TOOL-aEvidencedLens-13
