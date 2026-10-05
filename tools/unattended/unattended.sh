@@ -51,7 +51,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.77   # gov:kit unattended@1.77 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.78   # gov:kit unattended@1.78 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -5916,7 +5916,7 @@ run_handoff() { # slug · code · reason · reaped · unreachable
 # so it rides the next landing from this tree or a batched owner pass, and every deriving reader
 # reads the record correctly before then. A live record only: an archive is immutable.
 run_settle() { # slug
-  local slug="$1" rel ph br hc cut first wla t8 st_lease
+  local slug="$1" rel ph br hc cut first wla t8 st_lease _sk st_claim
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to settle: $rel"; return 1; }
@@ -6019,6 +6019,16 @@ run_settle() { # slug
       set_fact "$rel" abandoned "$(read_utc_now)" || return 1 ;;
   esac
   stage_or_fail "$rel" || return 1
+  # TOOL-aGraftedHelix-31 - THE STATUS WRITE, after the record is staged, as the other terminal verbs
+  # write it: a landed hand-off's `held` claim reads `landed`, and a dead lease's `live` one `aborted`.
+  # Handed the record's own keepalive and session, the claim `run_hold` or the dead holder wrote reads
+  # `mine` whoever settles. The legacy branch writes none: `--abort` wrote that claim when it ended the
+  # run, and the settle adds no phase (spec F1). Announced and never failing the verb.
+  case "$br" in handed) st_claim=landed ;; lease-dead) st_claim=aborted ;; *) st_claim="" ;; esac
+  if [ -n "$st_claim" ] && [ "$RUN_CLAIMS" = on ] && read_claims soft; then
+    _sk=$(fact "$rel" keepalive)
+    check_claim_writable "$slug" status "$_sk" "$(fact "$rel" session)" "$_sk" "$rel" && write_claim "$slug" "$st_claim" "$_sk" soft "$rel"
+  fi
   case "$br" in
     handed) echo "unattended: settled $rel as a landed hand-off - phase LANDED · landed-by attended · landed-derived ${DP_LANDING:0:8} ${DP_TIP:0:8}" ;;
     legacy) echo "unattended: settled $rel as ABORTED with its work landed - work-landed-at $(fact "$rel" work-landed-at)" ;;

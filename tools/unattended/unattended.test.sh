@@ -8977,6 +8977,13 @@ init_su_fixture() {
   run_su_git reset -q --hard "$su_unit"; run_su_git clean -qfd
   run_su_git remote set-url origin "$su_origin"
   run_su_git update-ref refs/heads/main "$su_base"; run_su_git push -q -f origin "$su_base":main; run_su_git fetch -q origin main
+  # TOOL-aGraftedHelix-31: SU_CLAIMS=on turns the run claim on in a conf commit of its own, over an
+  # origin holding no claim. Unset, the conf declares no RUN_CLAIMS and nothing below is spent.
+  if [ -n "${SU_CLAIMS:-}" ]; then
+    git --git-dir="$su_origin" for-each-ref --format='delete %(refname)' refs/gov | git --git-dir="$su_origin" update-ref --stdin
+    printf 'RUN_CLAIMS="on"\n' >> "$su_dir/.unattended.conf"
+    run_su_git commit -qam "conf: the run claim on" --no-verify
+  fi
 }
 # A PREFLIGHTED, COMMITTED record handed off under <code> over a GREEN bar, the hand-off itself
 # committed as the run's last act on its branch: SU_C is the commit carrying the HELD record.
@@ -9031,6 +9038,15 @@ write_su_aborted() {
   run_su_git push -q -f origin HEAD:main
   SU_REC=$(run_su_git rev-parse HEAD)
 }
+# A claim SEEDED into this block's own origin as a real gov-claim commit over the empty tree, the shape
+# the run-claim block's seed_claim writes into the suite's origin, which this block does not use.
+seed_su_claim() { # slug · session · keepalive · status · beat-utc
+  local t c
+  t=$(git --git-dir="$su_origin" mktree </dev/null)
+  c=$(git --git-dir="$su_origin" commit-tree "$t" -m "$(printf 'gov-claim %s\n\nslug: %s\nnode: other\nhost: otherhost\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s' "$1" "$1" "$2" "$3" "$4" "$5" "$5")")
+  git --git-dir="$su_origin" update-ref "refs/gov/runs/$1" "$c"
+}
+read_su_claim() { git --git-dir="$su_origin" log -1 --format=%B "refs/gov/runs/$1" 2>/dev/null | sed -n "s/^$2: //p"; }
 
 # ---- AC1: a hand-off its owner merged reads `LANDED (attended)` to --status and `terminal` to
 # ---- --liveness; --settle writes the terminal, stages it and leaves HEAD where it was; the leg counts
@@ -9305,6 +9321,60 @@ hit  "$out" "a record claims work-landed-at and the content predicate does not u
 same "AC7 the settled bytes of the kept record red nothing" \
   "$(printf '%s\n' "$out" | grep -F 'a record claims work-landed-at' | grep -c 'memory/builds/tAkept/' || true)" "0"
 hit  "$out" "a record carries abandoned with no work-landed-at, and --settle writes the two together"
+
+# ---- TOOL-aGraftedHelix-31, the closing review's H3: --settle writes the run claim. AC5 FIRST, while
+# ---- no arm has written a claim: with RUN_CLAIMS undeclared, as this block's conf ships it, the handed
+# ---- settle creates none. RED against a status write run outside its RUN_CLAIMS guard.
+write_su_handoff owner-landing
+run_su_git push -q origin HEAD:main
+out=$(run_su --settle tRun)
+hit  "$out" "unattended: settled memory/builds/tRun/RUN.md as a landed hand-off"
+same "GH31 AC5 the switched-off settle created no claim" "$(git --git-dir="$su_origin" for-each-ref refs/gov)" ""
+# ---- AC1: the handed settle writes the hand-off's `held` claim `landed`, under the run's identity
+# ---- and never the settler's, and --claims reads it terminal. RED against the parent's driver: `held`.
+SU_CLAIMS=on write_su_handoff owner-landing
+same "GH31 AC1 the hand-off left the claim held" "$(read_su_claim tRun status)" "held"
+run_su_git push -q origin HEAD:main
+out=$(CLAUDE_CODE_SESSION_ID=owner-session run_su --settle tRun); su_rc=$?
+same "GH31 AC1 the settle exits 0" "$su_rc" "0"
+same "GH31 AC1 the settle wrote LANDED" "$(read_su_fact "$SU_R" phase)" "LANDED"
+same "GH31 AC1 the settle staged the record" "$(run_su_git diff --cached --name-only)" "$SU_R"
+same "GH31 AC1 the claim reads landed" "$(read_su_claim tRun status)" "landed"
+same "GH31 AC1 the claim keeps the record's keepalive" "$(read_su_claim tRun keepalive)" "$(read_su_fact "$SU_R" keepalive)"
+same "GH31 AC1 the claim keeps the record's session, never the settler's" "$(read_su_claim tRun session)" "$(read_su_fact "$SU_R" session)"
+same "GH31 AC1 --claims reads it terminal" "$(run_su --claims | awk -F'\t' '$1 == "tRun" { print $3, $5 }')" "landed terminal"
+# ---- AC2: the lease-dead settle writes the dead holder's `live` claim `aborted`. RED against the
+# ---- parent's driver: it stays `live`, to age to stale and be announced at every other preflight.
+SU_CLAIMS=on write_su_aborted
+add_facts "$su_dir/memory/builds/tAwork/RUN.md" "$(printf 'keepalive: k1\nsession: absent\npid: absent\nlease-utc: 2000-01-01T00:00:00Z')"
+GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" \
+  run_su_git commit -qam "records(tAwork): an old lease with no session" --no-verify
+su_gd=$(run_su_git rev-parse --absolute-git-dir); rm -rf "$su_gd/gate-logs" "$su_gd/gate-queue-heartbeat"
+seed_su_claim tAwork absent k1 live 2000-01-01T00:00:00Z
+out=$(run_su --settle tAwork)
+hit  "$out" "unattended: settled memory/builds/tAwork/RUN.md as abandoned at phase BUILDING with its work landed"
+same "GH31 AC2 the dead holder's claim reads aborted" "$(read_su_claim tAwork status)" "aborted"
+# ---- AC3: the legacy settle writes no claim (spec F1). A claim this harness's session holds for the
+# ---- ABORTED record would be written through the status column's `same session` row, so it is the
+# ---- claim a write there would move; it stays at the sha it had.
+SU_CLAIMS=on write_su_aborted
+seed_su_claim tAkept fixture-session k1 aborted "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+su_cr=$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tAkept)
+out=$(run_su --settle tAkept)
+hit  "$out" "unattended: settled memory/builds/tAkept/RUN.md as ABORTED with its work landed - work-landed-at $SU_W_tAkept $SU_REC"
+same "GH31 AC3 the legacy settle left the claim unmoved" "$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tAkept)" "$su_cr"
+# ---- AC4: a fresh `live` claim another session holds is announced and left, and the settle still
+# ---- exits 0 with its record staged.
+SU_CLAIMS=on write_su_handoff owner-landing
+run_su_git push -q origin HEAD:main
+seed_su_claim tRun other-session k9 live "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+su_cr=$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)
+out=$(CLAUDE_CODE_SESSION_ID=owner-session run_su --settle tRun); su_rc=$?
+same "GH31 AC4 the settle exits 0 over a foreign claim" "$su_rc" "0"
+same "GH31 AC4 the settle wrote LANDED" "$(read_su_fact "$SU_R" phase)" "LANDED"
+same "GH31 AC4 the settle staged the record" "$(run_su_git diff --cached --name-only)" "$SU_R"
+hit  "$out" "unattended: claim not written — tRun is held live by session other-session"
+same "GH31 AC4 the foreign claim is unmoved" "$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)" "$su_cr"
 rm -rf "$su_dir" "$su_oroot" "$su_out"
 
 fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
@@ -15410,7 +15480,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # record block behind this prologue on node a, 2026-10-05: 48 executed, green against the kit, every
 # arm red under the parent's driver (check 14), and each staged break - a fact write in the met
 # branch, the not-evaluated branch deleted, the chain inlined - red on its own arms alone; no suite ran.
-FLOOR_ASSERTIONS=2463
+# RAISED 2463 -> 2482 by TOOL-aGraftedHelix-31: the --settle claim arms' 19 region-two assertions,
+# switched off (2), handed (8), lease-dead (2), legacy (2) and a foreign live claim (5), MEASURED on a
+# slice of the --settle block behind this prologue on node a, 2026-10-05: n 20 -> 39, and the handed,
+# lease-dead and foreign-claim arms red under the parent's driver; no suite ran.
+FLOOR_ASSERTIONS=2482
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -15556,7 +15630,8 @@ FLOOR_SHARD_1=209
 # RAISED 1706 -> 1721: the same 15 region-two check-89 admission assertions, see FLOOR_ASSERTIONS.
 # MERGED at the second reconcile with origin/main: this side 2202 plus main's 41 over 1680 = 2243.
 # RAISED 2243 -> 2266: the same 23 region-two --authorization assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=2266
+# RAISED 2266 -> 2285: the same 19 region-two --settle claim assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=2285
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

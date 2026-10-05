@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.77 -->
+<!-- gov:kit unattended@1.78 -->
 # The unattended stop contract — HELD, the hold codes and the lease
 
 *Installed beside `UNATTENDED-PROTOCOL.md` from the unattended kit and byte-compared against the
@@ -232,8 +232,10 @@ call and the read claim's session, each once. That row is the set's one writer: 
 write of that row that lands empties it, writing the empty value only when the set is non-empty, and
 a landed `--beat`, `--dispatch` or status write leaves it as it is. A holder refused at check 108
 ends with `--abort <slug> --code claim-lost`. The status
-writes are `--hold` (`held`), `--landed` (`landed`), `--abort` (`aborted`) and the landing re-bind
-(`live`, its new keepalive), each after its own staging and never failing its verb. The resume tick
+writes are `--hold` (`held`), `--landed` (`landed`), `--abort` (`aborted`), `--settle` (`landed`
+over a landed hand-off, `aborted` over an abandoned working record, and none over a legacy
+`ABORTED` one) and the landing re-bind (`live`, its new keepalive), each after its own staging
+and never failing its verb. The resume tick
 renews a `LIVE` run's claim through `--beat`, which writes only the none and `mine` rows.
 
 ## 8. The resume matrix

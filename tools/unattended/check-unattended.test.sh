@@ -6377,6 +6377,40 @@ git add .githooks/pre-push
 mutate $KIT_REL/unattended.sh 's|hook="\.githooks/gate-env\.sh"|hook=".githooks/moved-env.sh"|'
 hit  "$(run)" "a red the driver lands is one the hook refuses to push: hook .githooks/gate-env.sh, driver .githooks/moved-env.sh"
 reset_tree
+
+# ==== TOOL-aGraftedHelix-31: CHECK 51, a function that writes a terminal phase and never the run claim
+# ---- (closing review H3). The staged function is appended to the fixture's tracked lib by sed's `r`,
+# ---- as check 48's arms stage theirs, and its write is spelled from fragments so this suite's own
+# ---- bytes carry nothing the real-tree leg could read as a writer. RED, the three red arms, against
+# ---- the leg with the check's block deleted.
+_c51_sw="set""_fact"
+printf 'c51probe() {\n  %s "$rel" phase ABORTED || return 1\n}\n' "$_c51_sw" > "$TMPBIN_PARENT/c51.fn"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c51.fn"
+out=$(run)
+hit  "$out" "a function in a shipped shell file of this kit writes a terminal phase and no run claim, so the run it ends leaves its claim on the remote reading live or held, a held claim never ages, and the slug's next --preflight is refused at check 107 by a claim nobody releases; write the claim with write_claim after the record is staged, or name the function on TERMINAL_CLAIM_EXEMPT_FNS with its reason"
+hit  "$(printf '%s\n' "$out" | grep -F 'c51probe()')" "$KIT_REL/lib-unattended.sh:"
+# ...the same function named on the list is silent, so the arm above is not a ban on the write.
+reset_tree
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c51.fn"
+mutate $KIT_REL/check-unattended.sh 's|^TERMINAL_CLAIM_EXEMPT_FNS=.*|TERMINAL_CLAIM_EXEMPT_FNS="c51probe"|'
+miss "$(run)" "writes a terminal phase and no run claim"
+# ...a STALE entry reds by name: one naming no function the predicate would hit widens the set.
+reset_tree
+mutate $KIT_REL/check-unattended.sh 's|^TERMINAL_CLAIM_EXEMPT_FNS=.*|TERMINAL_CLAIM_EXEMPT_FNS="ghostfn"|'
+hit  "$(run)" "TERMINAL_CLAIM_EXEMPT_FNS names ghostfn(), which is no function writing a terminal phase without a claim write"
+# ...LIVENESS: every terminal write respelled with a quoted key, the same write to bash and one the
+# predicate does not match, so the scan finds no writer and must refuse rather than pass.
+reset_tree
+mutate $KIT_REL/unattended.sh 's/\(set_fact "\$[A-Za-z_]*" \)phase \(LANDED\|ABORTED\)/\1"phase" \2/g'
+hit  "$(run)" "the scan found no function writing a terminal phase in this kit's shell files, so its predicate no longer matches how the driver spells that write and the claim pairing would be graded over no writer at all, passing by finding nothing"
+# ...the CONTROL: the shipped driver and the shipped, empty list print neither failure, and the
+# report counts the writers it graded.
+reset_tree
+out=$(GOV_UNATTENDED_REPORT=1 run)
+miss "$out" "writes a terminal phase and no run claim"
+miss "$out" "the scan found no function writing a terminal phase"
+hit  "$out" "writing a terminal phase, 0 exempt"
+reset_tree
 fi   # ---- end REGION 8------------------------------------------------------------------------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
@@ -6522,7 +6556,12 @@ fi   # ---- end REGION 8--------------------------------------------------------
 # ---- exemption loop; region 4 +2, check 36's scope liveness arm respelling all three fixture files
 # ---- and reading the report's count; region 8 +2, check 39's liveness arm staging its break with a
 # ---- `mutate` and the check-39 control's new `miss`. FLOOR_SHARD_1, _4 and _8 carry the same.
-FLOOR_ASSERTIONS=938
+# ---- RAISED 938 -> 951 by exactly the arm, TOOL-aGraftedHelix-31: check 51's thirteen assertions
+# ---- (five `mutate`, five `hit`, three `miss`), all at the END of region 8, so FLOOR_SHARD_8 carries
+# ---- the same +13 and the other seven are untouched. MEASURED by running the block alone behind a
+# ---- replica of this prologue on node a, 2026-10-05, n 0 -> 13 and green, and the three red arms red
+# ---- with the check's block deleted from the fixture's leg; this pass runs no suite.
+FLOOR_ASSERTIONS=951
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
@@ -6534,7 +6573,7 @@ FLOOR_SHARD_4=100
 FLOOR_SHARD_5=67
 FLOOR_SHARD_6=75
 FLOOR_SHARD_7=92
-FLOOR_SHARD_8=389
+FLOOR_SHARD_8=402
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;

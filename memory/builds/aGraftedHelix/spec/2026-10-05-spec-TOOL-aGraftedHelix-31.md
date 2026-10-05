@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-31 — `--settle` writes the run claim, and a terminal-phase writer that writes no claim reds
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 018b5675 · streams tooling · order 15 · ratified 2026-10-05
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-2 · base 018b5675 · streams tooling · order 15 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
