@@ -7507,7 +7507,7 @@ print("held reader: run %s at %s · %d held job(s) read · %d red" % (rid, sha[:
 }
 
 write_held_asks() { # slug · R · bar run dir -> one line per red held suite: filed, reused or refused; never a verdict
-  local slug=$1 r=$2 d=$3 r8=${2:0:8} conf wf out line suite sha run concl sha8 bl f home cand reused fam seq id
+  local slug=$1 r=$2 d=$3 r8=${2:0:8} conf wf line suite sha run concl sha8 bl f home cand reused fam seq id
   local argv file tok seen a s k today filed=0
   local -a rows=()
   if [ -z "$r" ]; then
@@ -7524,13 +7524,12 @@ write_held_asks() { # slug · R · bar run dir -> one line per red held suite: f
     echo "gates-green: held reader refused — HELD_CI_WORKFLOW at $r8 is outside [A-Za-z0-9._-]+ ending .yml or .yaml, so no URL is built from it: $(printf '%q' "$wf")"
     return 0
   fi
-  out=$(read_held_reds "${AURL:-}" "$wf")
   while IFS= read -r line; do
     case "$line" in
       held$'\t'*) rows+=("$line") ;;
       ?*) echo "gates-green: $line" ;;
     esac
-  done <<< "$out"
+  done < <(read_held_reds "${AURL:-}" "$wf")
   bl="$M/builds/$slug/BACKLOG.md"
   today=$(date -u +%Y-%m-%d)
   for line in "${rows[@]}"; do
