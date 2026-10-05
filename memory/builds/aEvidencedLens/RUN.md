@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+landed-by: attended
+landed-derived: 930cceed7f3b773ae2ec629852879fe82060b42e e5d9c4cd859381012452365011f3a930731654e4
 asks-at-landing: TOOL-aEvidencedLens-16=OPEN
 units-at-landing: TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-12 TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-11 TOOL-aEvidencedLens-13 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-18 TOOL-aEvidencedLens-19 TOOL-aEvidencedLens-20 TOOL-aEvidencedLens-21
 hold-run: 
@@ -24,8 +26,8 @@ parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 refreshed-at: cfa2cc455cacd4b5782970cb96f25c25bb07965d · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 4902e40c6a972a59396d37e4a925419952c24b9d
-phase: HELD
+witness: 930cceed7f3b773ae2ec629852879fe82060b42e
+phase: LANDED
 branch-sha: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 branch-ref: refs/heads/branch/spec-review-improvements-f59dad
 spec-audit: 2026-10-05
