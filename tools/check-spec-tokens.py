@@ -32,7 +32,8 @@ THE JOINS KEEP THEIR POPULATIONS APART, the correction rev-2 folded from round 3
 population plus one of its own, the declared write set; the sixth, `claims`, reads none of them,
 being a grammar over the spec's own prose outside its fenced blocks; and the seventh, `handoff`,
 reads none of them either and mints a fifth population of its own, the backticked payloads of a
-spec's hands-off bullets, joined to the text of the sibling each one names.
+spec's hands-off bullets, joined to the text of the sibling each one names. The eighth, `size`,
+reads the live specs' own bytes and the two size sidecars, and no token at all.
 
   legs   backticked tokens on a `## 7. Gates` LINE THAT IS THE LIST -> a `name` in the manifest.
          A section 7 line carrying prose is not graded: measured, that predicate produced 270
@@ -128,6 +129,16 @@ spec's hands-off bullets, joined to the text of the sibling each one names.
          CLOSED or WONTDO. A hit's token is `claims <- <object>`, the guards join's composite
          spelling, so a `[path]` waiver row keyed on the same bare string neither swallows a
          claims refusal nor is kept from reading stale by one; waive a claim by that token.
+  size   every LIVE spec's bytes, carriage returns stripped as check-template-size.sh strips them
+         -> the CLASS row `memory/builds/*/spec/` of `template-size-limits.txt` beside the leg
+         manifest (TOOL-aMendedFleet-25). The eighth population is the live specs themselves. A
+         spec over the ceiling is a hit whose token is `size <- <path>`, unless a row keyed by its
+         exact path in `template-size-highwater.txt` HOLDS it: held, it may shrink and may not grow,
+         and past its row it is a hit naming both figures. A high-water row under `memory/builds/`
+         naming anything but a live spec over the ceiling is STALE and reds, untracked, terminal or
+         back under. No class row turns the arm off, announced; a non-number class or high-water
+         row refuses. What it does NOT check: a line count, a terminal spec, and growth below the
+         ceiling.
 
 REFUSALS, not passes. An empty spec population refuses: a lint that graded nothing reports the same
 zero as a clean tree. An unreadable manifest refuses. A waiver row naming a path no spec cites, or
@@ -172,6 +183,12 @@ LEGS_NAME = "gate-legs.json"
 #: directory; `LEGS` is the repo-relative spelling `main` derives, for its messages.
 LEGS = LEGS_NAME
 HERE = pathlib.Path(__file__).resolve().parent
+# TOOL-aMendedFleet-25: the size join's two sidecars, read from the directory holding the leg
+# manifest, and the CLASS key its ceiling row carries. The key is a label no measured file's key
+# equals, so check-template-size.sh never reads it; class membership is this checker's LIVE test.
+SIZE_LIMITS_NAME = "template-size-limits.txt"
+SIZE_HIGHWATER_NAME = "template-size-highwater.txt"
+SIZE_CLASS_KEY = "memory/builds/*/spec/"
 
 
 def derive_legs_path(root):
@@ -788,6 +805,80 @@ def read_waivers(root):
     return rows
 
 
+def read_size_ceilings(tooldir):
+    """The size join's inputs from the two sidecars beside the leg manifest (TOOL-aMendedFleet-25):
+    `(ceiling, highwater)`, where `ceiling` is the CLASS row's bytes or None when the row is absent
+    (the arm is off) and `highwater` maps each recorded path to its bytes. Parsed the way
+    check-template-size.sh parses them: tab-separated, comment and blank lines skipped, the value
+    stripped of whitespace. A class row or a high-water row whose value is not a number REFUSES:
+    returns None after printing the refusal, never zero and never off."""
+    found = {}
+    for name in (SIZE_LIMITS_NAME, SIZE_HIGHWATER_NAME):
+        p = tooldir / name
+        rows = {}
+        if p.exists():
+            for line in p.read_bytes().decode("utf-8", "replace").splitlines():
+                if not line.strip() or line.lstrip().startswith("#"):
+                    continue
+                key, _, val = line.partition("\t")
+                rows[key] = "".join(val.split())
+        found[name] = rows
+    limits, highwater = found[SIZE_LIMITS_NAME], found[SIZE_HIGHWATER_NAME]
+    bad = [(SIZE_LIMITS_NAME, SIZE_CLASS_KEY, limits[SIZE_CLASS_KEY])] \
+        if SIZE_CLASS_KEY in limits and not limits[SIZE_CLASS_KEY].isdigit() else []
+    bad += [(SIZE_HIGHWATER_NAME, k, v) for k, v in highwater.items() if not v.isdigit()]
+    if bad:
+        name, key, val = bad[0]
+        print(f"spec-tokens: REFUSING — the size join's row for {key} in {name} is not a number: "
+              f"'{val}'; it would read as zero or as off")
+        return None
+    ceiling = int(limits[SIZE_CLASS_KEY]) if SIZE_CLASS_KEY in limits else None
+    return ceiling, {k: int(v) for k, v in highwater.items()}
+
+
+def scan_spec_sizes(root, specs, files, ceiling, highwater, hw_rel):
+    """The size join (TOOL-aMendedFleet-25) over the LIVE specs: each measured in bytes with carriage
+    returns stripped, as check-template-size.sh measures. Returns `(hits, stale, held, largest)`.
+
+    A spec over `ceiling` with no high-water row is a hit; one with a row is HELD while it does not
+    exceed the row, and a hit naming both figures once it does. A row keyed under `memory/builds/`
+    that names anything but a live spec over the ceiling is STALE — untracked, terminal or back under
+    it — the rule a waiver row nothing produces already meets. `largest` is the largest unheld spec
+    as `(bytes, path)`, or None. It does not price growth under the ceiling, and it reads no line
+    count: the template gate prices bytes only, and so does this."""
+    hits, stale, held, largest, size = [], [], 0, None, {}
+    for f in specs:
+        n = len((root / f).read_bytes().replace(b"\r", b""))
+        size[f] = n
+        rec = highwater.get(f)
+        if n > ceiling and rec is not None:
+            if n > rec:
+                hits.append((f, "size", f"size <- {f}",
+                             f"held at its recorded high-water {rec} in {hw_rel} and now {n} bytes "
+                             f"(+{n - rec}); a held spec may shrink and may not grow"))
+            else:
+                held += 1
+            continue
+        if largest is None or n > largest[0]:
+            largest = (n, f)
+        if n > ceiling:
+            hits.append((f, "size", f"size <- {f}",
+                         f"{n} bytes, {n - ceiling} over the spec ceiling {ceiling}; split the spec "
+                         "or move history out of it"))
+    for key in sorted(highwater):
+        if not key.startswith("memory/builds/"):
+            continue
+        if key not in files:
+            stale.append(("HIGH-WATER", key, f"in {hw_rel} — untracked"))
+        elif key not in size:
+            what = "terminal" if re.match(r"memory/builds/[^/]+/spec/.*\.md$", key) else "not a spec"
+            stale.append(("HIGH-WATER", key, f"in {hw_rel} — {what}"))
+        elif size[key] <= ceiling:
+            stale.append(("HIGH-WATER", key, f"in {hw_rel} — back under the ceiling "
+                                             f"({size[key]} <= {ceiling})"))
+    return hits, stale, held, largest
+
+
 def main(argv):
     listing = "--list" in argv
     root = pathlib.Path(run("git", "rev-parse", "--show-toplevel").strip())
@@ -834,6 +925,13 @@ def main(argv):
     if not legs:
         print(f"spec-tokens: REFUSING — {LEGS} declares no leg")
         return 1
+
+    sizes = read_size_ceilings(legs_path.parent)
+    if sizes is None:
+        return 1
+    tool_rel = legs_path.parent.relative_to(root.resolve()).as_posix()
+    limits_rel = (f"{tool_rel}/" if tool_rel != "." else "") + SIZE_LIMITS_NAME
+    hw_rel = (f"{tool_rel}/" if tool_rel != "." else "") + SIZE_HIGHWATER_NAME
 
     waivers = read_waivers(root)
     if waivers is None:
@@ -1022,6 +1120,15 @@ def main(argv):
     ho_hits, ho_bullets, ho_tokens, ho_silent = scan_handoffs(root, specs, ho_uids, handoff_cut)
     hits += ho_hits
 
+    # The eighth join (TOOL-aMendedFleet-25): its hits take the waiver pass below like any other, and
+    # its stale high-water rows join the stale list, so one exit decision covers both.
+    ceiling, highwater = sizes
+    sz_stale, sz_held, sz_largest = [], 0, None
+    if ceiling is not None:
+        sz_hits, sz_stale, sz_held, sz_largest = scan_spec_sizes(root, specs, files, ceiling,
+                                                                 highwater, hw_rel)
+        hits += sz_hits
+
     live = [h for h in hits if h[2] not in waivers]
     for h in hits:
         if h[2] in waivers:
@@ -1030,9 +1137,10 @@ def main(argv):
     stale = []
     for tok, why in waivers.items():
         if not why:
-            stale.append((tok, "carries no reason"))
+            stale.append(("WAIVER", tok, "carries no reason"))
         elif tok not in seen_waived:
-            stale.append((tok, "no spec produces this hit any more"))
+            stale.append(("WAIVER", tok, "no spec produces this hit any more"))
+    stale += sz_stale
 
     if listing:
         for f, kind, tok, why in hits:
@@ -1089,15 +1197,23 @@ def main(argv):
           f"{ho_tokens} payload token(s) · {ho_silent} silent (no live target in the build, or no "
           f"source uid) · {HANDOFF_KEY} "
           + (handoff_cut if handoff_cut else "blank (arm off)"))
+    # The size join's line, on every run and carrying `live spec(s) ·` for the hands-off line's
+    # reason: `--dispatch` filters its refusal diagnosis on that text.
+    if ceiling is None:
+        print(f"spec-tokens: size join · {len(specs)} live spec(s) · no class row in {limits_rel} (arm off)")
+    else:
+        big = f"{sz_largest[0]} B {sz_largest[1]}" if sz_largest else "none"
+        print(f"spec-tokens: size join · {len(specs)} live spec(s) · ceiling {ceiling} from {limits_rel} · "
+              f"largest unheld {big} · {sz_held} held at a recorded high-water")
 
     if listing:
         return 0
     for f, kind, tok, why in live:
         print(f"spec-tokens: {f} [{kind}] `{tok}` — {why}")
-    for tok, why in stale:
-        print(f"spec-tokens: STALE WAIVER `{tok}` — {why}")
+    for label, tok, why in stale:
+        print(f"spec-tokens: STALE {label} `{tok}` — {why}")
     if live or stale:
-        print(f"spec-tokens: {len(live)} unwaived hit(s), {len(stale)} stale waiver(s)")
+        print(f"spec-tokens: {len(live)} unwaived hit(s), {len(stale)} stale row(s)")
         return 1
     return 0
 

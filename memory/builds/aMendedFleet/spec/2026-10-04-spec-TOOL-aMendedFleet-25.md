@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-25 — live specs carry a declared byte ceiling, and a spec already over it is held at its recorded high-water
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 25
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 25
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-25-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-25-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -118,7 +120,7 @@ own population test.
 
 ```
 spec-tokens: size join · 68 live spec(s) · ceiling 49152 from tools/template-size-limits.txt · largest unheld 48652 B <path> · 5 held at a recorded high-water
-spec-tokens: size join · no class row in tools/template-size-limits.txt (arm off) · 68 live spec(s)
+spec-tokens: size join · 68 live spec(s) · no class row in tools/template-size-limits.txt (arm off)
 ```
 
 ### Inventory
@@ -235,6 +237,9 @@ New arm: tools/check-spec-tokens.test.sh · a fixture tree with a class row, a p
   `tools/check-spec-tokens.py` move `memory/map/generated/symbols.json`, which units 18, 70 and 82
   regenerate and declare for their own definitions; this spec omitted the write, its Files touched
   row and the legs it owes.
+- rev-3 · 2026-10-04 · §4 · built: the arm-off line in §4 Mechanism ended `live spec(s)` with no
+  ` ·` after it, so it did not carry the text S5 requires and `--dispatch` would not filter it;
+  the count moves ahead of the arm-off clause, as in the armed line.
 
 ## 10. Reuse audit
 

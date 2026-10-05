@@ -33,7 +33,10 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=112
+FLOOR_ASSERTIONS=119
+# RAISED 112 -> 119 at TOOL-aMendedFleet-25, by its seven size-join `arm` calls: the held spec and
+# its count, the padded spec, the grown held spec, the terminal spec's stale row, the arm-off line
+# and the non-number refusal.
 # RAISED 109 -> 112 at TOOL-aRepatriatedFork-54, by its three root-install `arm` calls: the untracked
 # bare name, the basename citation and the dotted non-file word.
 # RAISED 32 -> 38 at the closing review's F2, F4, F9 and F10, by the static count of the arms they
@@ -1205,6 +1208,33 @@ else
   printf '%s\n' "$out" | grep -E 'claims|STALE' | head -3; fail=$((fail+1))
 fi
 git -C "$d" reset -q --hard "$clean"
+
+# ---- TOOL-aMendedFleet-25: the size join. One fixture tree with a class row at a small ceiling, a
+#      second live spec over it HELD by a high-water row, and the first spec padded past it.
+d=$base/size; scratch "$d"
+sp=memory/builds/tOne/spec
+cp "$d/$sp/2026-09-02-spec-TOOL-tOne-1.md" "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md"
+printf '%0700d\n' 0 >> "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md"
+held=$(tr -d '\r' < "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md" | wc -c | tr -d '[:space:]')
+printf '# limits\nmemory/builds/*/spec/\t600\n' > "$d/${PFX}template-size-limits.txt"
+printf '%s\t%s\n' "$sp/2026-09-02-spec-TOOL-tOne-2.md" "$held" > "$d/${PFX}template-size-highwater.txt"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm size --no-verify; sized=$(git -C "$d" rev-parse HEAD)
+arm "a spec over the class ceiling with a high-water row is HELD and the line counts it" 0 "$d" "size join · 2 live spec(s) · ceiling 600 from ${PFX}template-size-limits.txt · largest unheld"
+arm "the held count rides the size line" 0 "$d" "1 held at a recorded high-water"
+printf '%0700d\n' 0 >> "$d/$sp/2026-09-02-spec-TOOL-tOne-1.md"
+arm "a live spec padded past the ceiling with no row REDS as [size]" 1 "$d" "[size] \`size <- $sp/2026-09-02-spec-TOOL-tOne-1.md\`"
+git -C "$d" reset -q --hard "$sized"
+printf 'one more line\n' >> "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md"
+arm "a held spec grown by one line REDS naming its recorded high-water" 1 "$d" "held at its recorded high-water $held"
+git -C "$d" reset -q --hard "$sized"
+sed -i 's/^\*\*Status:\*\* OPEN/**Status:** CLOSED/' "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md"
+arm "a high-water row for a terminal spec REDS as stale" 1 "$d" "STALE HIGH-WATER \`$sp/2026-09-02-spec-TOOL-tOne-2.md\` — in ${PFX}template-size-highwater.txt — terminal"
+git -C "$d" reset -q --hard "$sized"
+printf '# limits, no class row\n' > "$d/${PFX}template-size-limits.txt"
+arm "no class row turns the size join off, announced" 0 "$d" "no class row in ${PFX}template-size-limits.txt (arm off)"
+printf 'memory/builds/*/spec/\tlots\n' > "$d/${PFX}template-size-limits.txt"
+arm "a class row that is not a number REFUSES" 1 "$d" "REFUSING — the size join's row for memory/builds/*/spec/"
+git -C "$d" reset -q --hard "$sized"
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then

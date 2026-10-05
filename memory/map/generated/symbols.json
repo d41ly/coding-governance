@@ -6123,6 +6123,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_size_ceilings",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "read_skill_front",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -8446,6 +8451,11 @@
       "id": "scan_spec_marks",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "scan_spec_sizes",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "scan_substituted",

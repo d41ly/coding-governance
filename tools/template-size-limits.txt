@@ -17,6 +17,12 @@
 # row below, whose insulation from the environment is a property a landed unit built and verified.
 #
 # A subject with no row here falls through to the environment and then the default, unchanged.
+#
+# CLASS ROWS. A key that ends in `/` and carries a `*` is a CLASS label, not a measured file: no
+# subject's repo-relative key can equal it, so check-template-size.sh never reads one. Its reader is
+# named in its own comment block. The one class row today is the live-spec ceiling, read by
+# <prefix>/check-spec-tokens.py's size join, which holds a spec already over it at its row in the
+# high-water record — written by this gate's own `--bump`, so there is still one writer of that file.
 
 # --- the governance playbook template ---------------------------------------------------------
 # 49152 = 48 KiB. RAISED from 32768 on owner order, 2026-08-16 (memory/DECISIONS.md,
@@ -107,3 +113,18 @@ memory/guides/BUILD-METHOD.md	30720
 # instead is the adopter's own announcement, which compares the render against its GUIDE_CAP_BYTES.
 # WHAT THIS DOES NOT COVER: the file's line count, which only the adopter's GUIDE_CAP_LINES reads.
 memory/guides/UNATTENDED-PROTOCOL.md	65692
+
+# --- every LIVE spec, a CLASS row (TOOL-aMendedFleet-25) --------------------------------------
+# 49152 bytes = 48 KiB, CR-stripped, the charter template's own ceiling, so no spec costs more to
+# re-read than the ruleset does. A unit builder re-reads its current spec whole at every pass
+# boundary (the build method's M7, step 4), so a spec's bytes are a read cost paid once per pass.
+# Measured at 580dc980 over every tracked spec: median 17,121 bytes, 90th percentile 46,302,
+# largest 156,459 (terminal). Of 68 live specs, 11 exceeded 32768 and 5 exceeded 49152; 32768 was
+# rejected because it held eleven, and the largest live spec was rejected because it bounds nothing.
+#
+# THIS KEY IS A CLASS LABEL that no measured file's key equals, so check-template-size.sh never
+# reads it. Its reader is <prefix>/check-spec-tokens.py's size join, whose population is that
+# checker's LIVE specs: a terminal spec is never measured. The five live specs over the ceiling at
+# landing are HELD at their rows in <prefix>/template-size-highwater.txt, written by `--bump` with an
+# explicit limit; a held spec may shrink and may not grow, and its row reds as stale once it closes.
+memory/builds/*/spec/	49152
