@@ -248,6 +248,17 @@ here would be a kit path the `install-prefix` ban reds on, with no waiver to tak
    reports `ok`, because a driver that cannot start never writes `%A`: git prints `CONFLICT` and
    leaves the path holding OURS-ONLY content with zero conflict markers. `--fix` sets the config for
    you and refuses to declare a driver wired when it cannot run.
+   The wholly GENERATED views take one side instead of merging, and the freshness checks then red
+   the stale render until `--write` re-renders it. Add the attributes, and the one per-node config
+   line `ours` needs because git ships it as a strategy, not a driver (`--fix` sets it too):
+   ```
+   memory/LIVE.md merge=ours
+   memory/ledger/*.md merge=ours
+   memory/gotchas/INDEX.md merge=ours
+   ```
+   ```bash
+   git config merge.ours.driver true
+   ```
 
 ### 3a-asks — Per-build asks and a generated backlog view (opt-in; memory-tree kit ≥ 2.100)
 

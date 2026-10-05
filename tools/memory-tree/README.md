@@ -157,6 +157,21 @@ section honest rather than merely correct today: `check-wiring.sh` RUNS the conf
 scratch three-way before it reports `ok`, and `check-wiring.test.sh` DERIVES both spellings above by
 running `--fix` in a fixture of each layout, so a stray third spelling in this file reds the bar.
 
+**The wholly GENERATED views take one side instead.** A merge touching them on both sides is never
+reconciled by hand: it keeps the current side, and check 9 or check 17 reds the stale result until
+`gen_build_index.py --write` or `gotchas.py --write` re-renders it:
+
+```gitattributes
+memory/LIVE.md merge=ours
+memory/ledger/*.md merge=ours
+memory/gotchas/INDEX.md merge=ours
+```
+
+git ships `ours` as a merge STRATEGY, not a driver, so the attribute needs one per-node config line,
+`git config merge.ours.driver true`. Unset, git silently falls back to the text merge and conflicts.
+`check-wiring.sh` reports the unset driver `UNWIRED`, sets it under `--fix` and `--session`, and never
+overwrites a value already set.
+
 ## Backlog modes — authored shards and per-build asks
 
 Where an ask lives, and who decides its status, is one conf key. This section is the author-facing

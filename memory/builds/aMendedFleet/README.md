@@ -198,7 +198,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-19 — `gen_build_index.py --doctor <slug>` prints every failing build-folder rule in one pass](spec/2026-10-04-spec-TOOL-aMendedFleet-19.md) | 19 | 2 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aMendedFleet-20 — `--new-spec` writes a skeleton that already carries every shape a cutoff demands](spec/2026-10-04-spec-TOOL-aMendedFleet-20.md) | 20 | 1 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aMendedFleet-21 — a cutoff budget: armed `*_CUTOFF` keys are a pinned drift signal, so a new one must displace an old one](spec/2026-10-04-spec-TOOL-aMendedFleet-21.md) | 21 | 2 | CLOSED | rev-2 | 2026-10-04 |
-| [TOOL-aMendedFleet-22 — the generated views merge by taking one side](spec/2026-10-04-spec-TOOL-aMendedFleet-22.md) | 22 | 1 | SPECCED | rev-3 | 2026-10-04 |
+| [TOOL-aMendedFleet-22 — the generated views merge by taking one side](spec/2026-10-04-spec-TOOL-aMendedFleet-22.md) | 22 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-23 — check 19 reports the gotcha anchors that select no tracked path](spec/2026-10-04-spec-TOOL-aMendedFleet-23.md) | 23 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-24 — dead repo paths in live build READMEs are reported, and the decision log's dead pointer is repaired](spec/2026-10-04-spec-TOOL-aMendedFleet-24.md) | 24 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-25 — live specs carry a declared byte ceiling, and a spec already over it is held at its recorded high-water](spec/2026-10-04-spec-TOOL-aMendedFleet-25.md) | 25 | 2 | SPECCED | rev-2 | 2026-10-04 |

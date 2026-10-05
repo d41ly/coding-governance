@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-22 — the generated views merge by taking one side
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 22
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 22
 
 <!-- gen:spec-records -->
 
