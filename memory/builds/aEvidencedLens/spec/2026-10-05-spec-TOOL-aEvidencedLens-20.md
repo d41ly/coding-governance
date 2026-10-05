@@ -1,11 +1,12 @@
 # TOOL-aEvidencedLens-20 — the minors batch of unit 18's audit: each of its criteria observed live, unit 15's prints and break reused by name, the revs it expects, its false prose corrected, and a closing write set derived rather than asserted
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 11
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-05-build-TOOL-aEvidencedLens-20-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-aEvidencedLens-20-1-acceptance-ledger.md) | journal | — |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-20-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-20-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

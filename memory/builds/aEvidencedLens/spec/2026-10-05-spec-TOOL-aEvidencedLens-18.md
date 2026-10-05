@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-18 — unit 15's observation is completed: the HEAD bytes tied to their blob, a break on the masked line, all four prints, both edges, and the closing pass's write set
 
-**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 10
+**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -30,8 +30,10 @@ ONE unit, and this is that unit. It repairs `TOOL-aEvidencedLens-15` and closes:
 - **id 3 (LOW)** — unit 15, as the build's last open unit, would rewrite `memory/LIVE.md` and
   `memory/ledger/2026-10.md` without declaring them. Closed by S5.
 
-Unit 15 builds first, as written. This unit then re-runs its observation with the four missing
-pieces of evidence, writes them to its own ledger, and repairs the two record defects.
+Unit 15 builds first, as written. Unit 15's ledger already carried the four prints and the
+per-arg-set key-mask reds; what it lacked was S1's tie of the HEAD bytes to their blob and S2's
+break on the masked step-3 line. This unit re-runs the observation with those two pieces, writes
+them to its own ledger, and repairs the two record defects.
 
 ## 2. Scope (IN)
 
@@ -107,8 +109,10 @@ Read at `a1a77460f` on 2026-10-05.
   `:720`, step 3 of the diff-kind probe, which spells
   `<the first 12 hex of the base sha>-<the first 12 hex of the head sha>-${inputPrint}`. The S2 break
   edits that line and no other.
-- The inputs to `inputPrint` include `priorFindings` and `round`, so the round-1 and round-2 arg sets
-  carry distinct prints. Unit 13's ledger recorded four distinct values for the same arg sets.
+- `inputPrint` is built at `tools/workflows/tier2-review.js:696-697` from the checklist, the specs,
+  `priorFindings` and the other context fields, and the two arg sets differ in those, so they carry
+  distinct prints. `round` is not among its inputs: it enters only `deriveReviewKey`, at `:702`.
+  Unit 13's ledger recorded four distinct values for the same arg sets.
 - `gen_build_index.py` derives a build's status from the first precedence token any unit holds. With
   this unit at SPECCED, unit 15's flip to CLOSED leaves the build at SPECCED, so its `memory/LIVE.md`
   row and its `memory/ledger/2026-10.md` row do not change in unit 15's pass.
@@ -239,6 +243,13 @@ none
   until units 19 and 20 were promoted after it. With them open the build stays SPECCED, so the pass
   writes neither generated index; S5 and AC5 now make each write conditional on the generator moving
   its row. `TOOL-aEvidencedLens-20` S2 carries the fuller correction; nothing else moves.
+- rev-4 · 2026-10-05 · §1 §4 §9 · written by `TOOL-aEvidencedLens-20` (S1, S2, S9, S11 and S14 of
+  the minors batch of this unit's spec audit); §2 and §6 stand as built. The S1, §4 and AC1 equality
+  ran plain `git hash-object`, with filters on, so it ties no line-ending bytes; the filter-off tie
+  is `TOOL-aEvidencedLens-19`'s. S5 and §4's last files-touched bullet held only if no promotion
+  followed this unit, and two did, units 19 and 20. `broken1.js` in S2, §4 and AC2 is unit 15's
+  `broken.js`, the name its ledger recorded. §1 now says unit 15's ledger already held the four
+  prints and the per-arg-set reds, and §4's second Evidence bullet names `round` as a key input only.
 
 ## 10. Reuse audit
 
