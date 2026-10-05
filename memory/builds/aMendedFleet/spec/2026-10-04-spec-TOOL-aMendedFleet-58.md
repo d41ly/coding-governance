@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-58 — gate yield per leg is reported from the gates journal
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 58
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 58
 
 <!-- gen:spec-records -->
 
@@ -27,8 +27,9 @@ never went red in the window and whether it runs on every bar. It reports; it re
 - **S2** — THE WINDOW. `bars` is the number of journal lines whose `verdict` is `GREEN` or `RED`; a
   line reading `NONE` ran no leg and is counted on stderr apart. `red` is the number of those lines
   naming the leg in a `fail.<n>` field, and `last_red` is the `started` of the newest. stderr carries
-  one line naming the window's first and last `started`, the bar count, the red-bar count and the
-  NONE count. Observed by AC1.
+  one line naming the window's first and last `started`, the bar count, the red-bar count, the
+  NONE count and an `other` count of lines whose verdict is none of the three, which are never read
+  as bars. A window of zero bars prints no rows. Observed by AC1.
 - **S3** — THE CAP AND THE LIVENESS. The writer caps named failures at twenty and counts the rest
   into `fail_more`; the mode sums `fail_more` into an `unattributed` count on stderr. A line whose
   `failed` differs from its named failures plus `fail_more` is counted as `mismatched` on stderr and
@@ -37,7 +38,8 @@ never went red in the window and whether it runs on every bar. It reports; it re
 - **S4** — THE POPULATION. `--legs <manifest>` names a gate-leg manifest by path, read as JSON.
   Every leg it names prints, `red` 0 included; a leg named in the journal and absent from it prints
   with `in_manifest` false. `always_run` is true for a leg with no guard whose `subject` is not `kit`
-  and whose `chunk` is not `selftests`, the runner's own held rule, and null without `--legs`.
+  and whose `chunk` is not `selftests`, the runner's own held rule, and null without `--legs`, as
+  `in_manifest` is; `--legs` without `--by-leg` exits 2.
   Without `--legs` only legs that went red print, and stderr says never-red legs are not listed
   because no population was given. Observed by AC1 and AC2.
 - **S5** — `build_leg_yield` in `tools/runlog/runlog.py` holds S2 to S4 over parsed lines and an
@@ -175,6 +177,9 @@ New arm: `tools/runlog/selftest.py` · a fixture journal with a capped line, a m
   a's gates journal against the manifest at base.
 - rev-2 · 2026-10-04 · §3 · M2 cross-read: §3 called the per-run `<i>.leg` rows unit 59's
   population, but `TOOL-aMendedFleet-59` S2 reads only the verdicts and the `<i>.retry.leg` rows.
+- rev-3 · 2026-10-05 · S2, S4 · built: S2 gains the `other` verdict count and the zero-bar
+  window's empty row set, S4 the null `in_manifest` without `--legs` and the refusal of `--legs`
+  alone, each a case the rev-2 text left unstated.
 
 ## 10. Reuse audit
 

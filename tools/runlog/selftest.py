@@ -312,7 +312,13 @@ from collections import Counter  # noqa: E402
 # not-local one commits `anomalies 0`. Its decoy checks move it by 3, and the one helper it arrives
 # with carries none. The Skill-copy arm gains 1 for the renamed-kind staging.
 # 6 + 1 + 3 = 10
-ASSERTION_FLOOR = 1543
+# RAISED 1543 -> 1554 by TOOL-aMendedFleet-58, gate yield per leg: ONE new arm with 8 checks — the
+# fixture journal read whole; each manifest leg's red count, window, newest red and held-rule
+# reading; the row count and order; the capped line unattributed and only the mismatched line
+# mismatched; the window skipping the NONE line; without --legs only red legs and the never-red
+# line; and another producer refused. Its decoy checks move it by 3.
+# 8 + 3 = 11
+ASSERTION_FLOOR = 1554
 
 PASS = []
 FAIL = []
@@ -608,6 +614,56 @@ def test_ac5_ac7_ac9_journal_and_root():
           "not inside a git work tree" in refused, True)
     check("...and the CLI exits 2 saying so",
           (r.returncode, "not inside a git work tree" in r.stderr), (2, True))
+
+
+def test_by_leg_yield():
+    """TOOL-aMendedFleet-58: `journal --producer gates --by-leg` over a fixture journal holding a
+    capped line, a mismatched line, a NONE line and a GREEN one, and a manifest naming legs the journal
+    never names. Every expected figure below is counted by hand from the fixture, not by the kit."""
+    _base, primary, _linked, _made = build_scratch_clone()
+    root = rl.resolve_journal_root(primary)
+    root.mkdir(parents=True, exist_ok=True)
+    bar = {"v": "1", "t": "1.000000", "p": "gates", "ev": "once", "run": "r", "verdict": "RED"}
+    capped = dict(bar, started="2026-10-01T00:00:01Z", failed="22", fail_more="2",
+                  **{"fail.1": "alpha"}, **{f"fail.{n}": f"cap {n:02d}" for n in range(2, 21)})
+    mismatched = dict(bar, t="2.000000", started="2026-10-01T00:00:02Z", failed="3", **{"fail.1": "alpha"})
+    none = dict(bar, t="3.000000", started="", verdict="NONE", failed="")
+    green = dict(bar, t="4.000000", started="2026-10-01T00:00:04Z", verdict="GREEN", failed="0")
+    (root / "gates.log").write_bytes("".join(rl.render_line(f) + "\n"
+                                             for f in (capped, mismatched, none, green)).encode("utf-8"))
+    manifest = primary / "legs.json"
+    manifest.write_text(json.dumps([
+        {"name": "alpha", "subject": "repo", "chunk": "records"},
+        {"name": "never", "subject": "repo", "chunk": "records"},
+        {"name": "guarded", "guard": ["x"], "subject": "repo", "chunk": "records"},
+        {"name": "kitleg", "subject": "kit", "chunk": "records"}]), encoding="utf-8")
+    r = run_cli(["journal", "--producer", "gates", "--by-leg", "--legs", str(manifest)], primary)
+    rows = [json.loads(ln) for ln in r.stdout.splitlines() if ln.strip()]
+    check("by-leg: the fixture journal was read whole, so every figure below is a reading",
+          (r.returncode, "lines=4 bad=0" in r.stderr), (0, True))
+    by = {row["leg"]: (row["red"], row["bars"], row["last_red"], row["in_manifest"], row["always_run"])
+          for row in rows}
+    check("by-leg: each manifest leg's red count, window, newest red and held-rule reading",
+          {k: by.get(k) for k in ("alpha", "never", "guarded", "kitleg", "cap 20")},
+          {"alpha": (2, 3, "2026-10-01T00:00:02Z", True, True), "never": (0, 3, None, True, True),
+           "guarded": (0, 3, None, True, False), "kitleg": (0, 3, None, True, False),
+           "cap 20": (1, 3, "2026-10-01T00:00:01Z", False, None)})
+    check("by-leg: every manifest leg plus every journal-only leg prints once, most reds first",
+          (len(rows), len(by), rows[0]["leg"] if rows else None), (23, 23, "alpha"))
+    check("by-leg: the capped line is unattributed and only the mismatched line is mismatched",
+          "by-leg unattributed=2 mismatched=1" in r.stderr, True)
+    check("by-leg: the window skips the NONE line's empty start and counts it apart",
+          "window 2026-10-01T00:00:01Z .. 2026-10-01T00:00:04Z bars=3 red_bars=2 none=1" in r.stderr,
+          True)
+    r = run_cli(["journal", "--producer", "gates", "--by-leg"], primary)
+    rows = [json.loads(ln) for ln in r.stdout.splitlines() if ln.strip()]
+    check("by-leg without --legs: only legs that went red print, with no population fields",
+          (len(rows), [x for x in rows if x["red"] == 0 or x["in_manifest"] is not None]), (20, []))
+    check("by-leg without --legs: stderr says never-red legs are not listed",
+          "never-red legs are not listed" in r.stderr, True)
+    r = run_cli(["journal", "--producer", "driver", "--by-leg"], primary)
+    check("by-leg: another producer exits 2 naming --producer gates",
+          (r.returncode, "--producer gates" in r.stderr, r.stdout), (2, True, ""))
 
 
 def test_read_journal_states():

@@ -1608,6 +1608,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "build_leg_yield",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
+    },
+    {
       "id": "build_lexicon_marginal_offense_rate",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -9123,6 +9128,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "print_leg_window",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
+    },
+    {
       "id": "print_liveness",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -15891,6 +15901,11 @@
       "id": "test_build_qid_cutoff_is_read_from_conf",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_by_leg_yield",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_ceiling_decides_before_any_label",

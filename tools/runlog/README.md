@@ -73,6 +73,21 @@ bad count is always printed for a file that exists, so a writer emitting garbage
 file prints `runlog: <path> absent` and exits 0: no producer has written yet, which is a state and not
 an error. Exit 2 means no journal root resolved or the file could not be read.
 
+```bash
+python <this kit>/runlog.py journal --producer gates --by-leg --legs <gate-leg manifest>
+```
+
+`--by-leg` reports gate yield: which legs ever catch anything. stdout carries one JSON row per leg,
+`{"leg", "red", "bars", "last_red", "in_manifest", "always_run"}`, most reds first. A bar is a line
+whose `verdict` is GREEN or RED; `red` counts the bars naming the leg in a `fail.<n>` field. With
+`--legs` every leg the manifest names prints, never-red ones included, and `always_run` is true for a
+leg with no guard whose subject is not `kit` and whose chunk is not `selftests`; without it only legs
+that went red print, and stderr says so. stderr names the window, its bar, red-bar and NONE counts,
+`unattributed` (the `fail_more` the writer's cap left unnamed) and `mismatched` (lines whose `failed`
+disagrees with their named failures plus `fail_more`). The journal names failures, never the legs a
+bar ran, so `bars` is an upper bound for a guarded or held leg. Any producer but `gates` exits 2, and
+so does an unreadable manifest. It reports and removes nothing.
+
 ## The library
 
 | name | what it does |
