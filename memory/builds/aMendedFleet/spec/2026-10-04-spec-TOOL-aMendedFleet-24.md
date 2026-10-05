@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-24 — dead repo paths in live build READMEs are reported, and the decision log's dead pointer is repaired
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 24
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 24
 
 <!-- gen:spec-records -->
 
@@ -42,7 +42,8 @@ directory this repo does not have.
   with no tracked README asserts the empty-population note. Observed by AC4.
 - **S6** — `memory/DECISIONS.md` line 5's sentence pointing at the `decisions/` directory is rewritten
   to point at the build folder that minted the id, `builds/<slug>/`, and no other line of the file
-  changes. Observed by AC5.
+  changes. DELIVERED by the main loop's records commit `37ed0d324`, because the file is a SHARED_RECORDS
+  path check 49 refuses in any pass write set; this unit's pass does not write it. Observed by AC5.
 - **S7** — check 15's catalogue entry in `tools/memory-tree/HYGIENE.template.md` gains one sentence
   naming the advisory population, and `memory/HYGIENE.md` is re-rendered from it. Observed by AC6.
 - **S8** — `memory/map/generated/symbols.json` is regenerated for the new
@@ -163,7 +164,7 @@ runs beside another that writes it. The re-render in S7 is the parity script's `
 - **AC4** — When `python tools/memory-tree/corpus_ids.py --selftest` runs, S5's arm passes; with the
   sink choice reversed as a staged break, so admitted files feed `dead`, the arm reds.
   Red when: the arm's fixture links no build, so the advisory population is empty and cannot fail.
-- **AC5** — When `git diff -U0 HEAD~1 -- memory/DECISIONS.md` runs on the pass's commit, it shows one
+- **AC5** — When `git diff -U0 37ed0d324~1 37ed0d324 -- memory/DECISIONS.md` runs, it shows one
   removed and one added line, both at line 5, and `sed -n 5p memory/DECISIONS.md` no longer names the
   decisions directory.
   Red when: any decision row changes, or the sentence still names that directory.
@@ -192,6 +193,7 @@ New arm: tools/memory-tree/corpus_ids.py --selftest · S5's live-README arm, sta
 - rev-2 · 2026-10-04 · §2 S8 · §4 · §7 · M2 cross-read: the definitions this unit adds
   move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
   code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
+- rev-3 · 2026-10-04 · §2 S6 and §6 AC5 point at the main loop's records commit 37ed0d324: check 49 refuses memory/DECISIONS.md, a SHARED_RECORDS path, in any pass write set.
 
 ## 10. Reuse audit
 
