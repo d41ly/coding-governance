@@ -28,7 +28,7 @@
 # rewriting settings.json, the file the SessionStart hook lives in. Each auto-fix that sets a value
 # appends one `hookspath-set` or `merge-driver-set` line to the health log under the git common dir,
 # which the orientation card counts; the format is the `health_log_sh` block's header below.
-KIT_CHECK_WIRING_VERSION=1.24   # gov:kit check-wiring@1.24 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.24   # gov:kit check-wiring@1.25 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -1229,6 +1229,25 @@ check_skill_install() {
     [ "$a" = "$b" ] || bad="$bad $f"
   done
 
+  # A LINKED WORKTREE WHOSE OWN BRANCH EDITS THE ENGINE IS NOT A WIRING FAULT. The install follows the
+  # primary checkout, and the remedy above names that checkout, so when the install matches it byte
+  # for byte the only difference is this branch's unlanded edit, which reaches the install when the
+  # branch lands. Reporting it UNWIRED made `--check` fail in exactly that worktree, and the unattended
+  # driver's preflight delegates to `--check`, so a build editing the engine could never re-preflight
+  # (aGraftedHelix, 2026-10-05). The install drifting from the primary as well still reds below.
+  # WHAT THIS DOES NOT CHECK: that the primary checkout is on the default branch, or current.
+  if [ -n "$bad" ] && ! [ "$primary" -ef "$ROOT" ] && [ -d "$primary/$rel" ]; then
+    local pbad=""
+    for f in SKILL.md MANIFEST-TEMPLATE.md manifest-check.sh; do
+      a=$(LC_ALL=C tr -d '\r' < "$inst/$f" | cksum)
+      b=$(LC_ALL=C tr -d '\r' < "$primary/$rel/$f" 2>/dev/null | cksum)
+      [ "$a" = "$b" ] || pbad="$pbad $f"
+    done
+    if [ -z "$pbad" ]; then
+      echo "note     skill     — this worktree's branch edits the engine in:${bad}; the install matches the primary checkout's, so the edit reaches it when the branch lands"
+      return
+    fi
+  fi
   if [ -n "$bad" ]; then
     echo "UNWIRED  skill     — the installed engine differs from tracked in:${bad}; this session is running a different engine than this repo ships. Fix: $fix"
     unwired=$((unwired+1))

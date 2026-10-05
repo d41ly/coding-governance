@@ -1090,6 +1090,25 @@ out=$(skill_run)
 case "$out" in "UNWIRED  skill"*"missing manifest-check.sh"*) r=1 ;; *) r=0 ;; esac
 ck "a shipped file absent from the install -> UNWIRED naming it" "$r"; rm -rf "$FAKEHOME"; cleanup
 
+# A LINKED worktree whose own branch edits the engine, while the install matches the primary
+# checkout: a note, never UNWIRED, or a build editing the engine can never re-preflight. And the same
+# worktree with the install drifting from the primary too: still UNWIRED.
+newrepo; skill_fixture 1; install_engine 'engine
+'
+SKWT=$(mktemp -d); rmdir "$SKWT"; git worktree add -q -b skbr "$SKWT" >/dev/null 2>&1
+( cd "$SKWT" && printf 'edited\n' > skills/session-kickoff/SKILL.md && git commit -q -am edit )
+out=$(cd "$SKWT" && skill_run)
+case "$out" in "note     skill"*"branch edits the engine in: SKILL.md"*) r=1 ;; *) r=0 ;; esac
+ck "a linked worktree's own engine edit, install matching the primary -> note" "$r"
+case "$out" in *UNWIRED*) r=0 ;; *) r=1 ;; esac
+ck "...and never UNWIRED" "$r"
+install_engine 'DIFFERENT
+'
+out=$(cd "$SKWT" && skill_run)
+case "$out" in "UNWIRED  skill"*"differs from tracked in: SKILL.md"*) r=1 ;; *) r=0 ;; esac
+ck "the same worktree with the install drifting from the primary too -> UNWIRED" "$r"
+git worktree remove --force "$SKWT" >/dev/null 2>&1; rm -rf "$SKWT" "$FAKEHOME"; cleanup
+
 # AC7 — the adopter shape: the install exists, the repo tracks no kit source. Without this state the
 # check is a permanent false alarm in every adopting repo.
 newrepo; skill_fixture 0; install_engine 'engine
