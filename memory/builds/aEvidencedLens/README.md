@@ -81,7 +81,7 @@ ids TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16 TOOL-aE
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aEvidencedLens-1 — the spec-audit lens catalogue: five lenses aimed at the measured classes, the harness its one source](spec/2026-10-05-spec-TOOL-aEvidencedLens-1.md) | 1 | 2 | CLOSED | rev-3 | 2026-10-05 |
+| [TOOL-aEvidencedLens-1 — the spec-audit lens catalogue: five lenses aimed at the measured classes, the harness its one source](spec/2026-10-05-spec-TOOL-aEvidencedLens-1.md) | 1 | 2 | CLOSED | rev-4 | 2026-10-05 |
 | [TOOL-aEvidencedLens-2 — spec lenses probe read-only, and every spec finding carries its evidence](spec/2026-10-05-spec-TOOL-aEvidencedLens-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-3 — the spec skeptic confirms by the rubric, re-runs the evidence, and refutes duplicates and by-design](spec/2026-10-05-spec-TOOL-aEvidencedLens-3.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aEvidencedLens-4 — a spec fold round reads its diff, and a moved subject is graded, not fixed at BLOCKER](spec/2026-10-05-spec-TOOL-aEvidencedLens-4.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-05 |
@@ -90,18 +90,18 @@ ids TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16 TOOL-aE
 | [TOOL-aEvidencedLens-5 — the build harness hands the audit its context, sibling specs, checklist and prior findings](spec/2026-10-05-spec-TOOL-aEvidencedLens-5.md) | 6 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-7 — `--review` takes highs and minors on a spec subject's exit and requires `promote` when any stood](spec/2026-10-05-spec-TOOL-aEvidencedLens-7.md) | 6 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-9 — the bar refuses a run commit that changes `REVIEW_ROUNDS`](spec/2026-10-05-spec-TOOL-aEvidencedLens-9.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-05 |
-| [TOOL-aEvidencedLens-12 — the spec skeptic line carries a finding's evidence through a line-break-only fold, so a pipe survives](spec/2026-10-05-spec-TOOL-aEvidencedLens-12.md) | 7 | 2 | CLOSED | rev-4 | 2026-10-05 |
+| [TOOL-aEvidencedLens-12 — the spec skeptic line carries a finding's evidence through a line-break-only fold, so a pipe survives](spec/2026-10-05-spec-TOOL-aEvidencedLens-12.md) | 7 | 2 | CLOSED | rev-5 | 2026-10-05 |
 | [TOOL-aEvidencedLens-14 — check 19 walks a terminal record's exclusions when EITHER owner-held scan hits, so an owner's round raise never reds an archived record](spec/2026-10-05-spec-TOOL-aEvidencedLens-14.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-8 — the build harness promotes spec-audit minors, batched, and records the counts](spec/2026-10-05-spec-TOOL-aEvidencedLens-8.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-11 — the method, the memory-tree README, the Skill, the verbs entry and a decision record state what units 1 to 9 built](spec/2026-10-05-spec-TOOL-aEvidencedLens-11.md) | 8 | 1 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aEvidencedLens-13 — no diff-kind lens or skeptic prompt moved from BASE through unit 12, observed once with the review key masked](spec/2026-10-05-spec-TOOL-aEvidencedLens-13.md) | 8 | 2 | CLOSED | rev-2 | 2026-10-05 |
-| [TOOL-aEvidencedLens-15 — the diff-kind resume probe is observed from BASE with every REVIEW_SHAPE-derived value masked, its review key and its input print](spec/2026-10-05-spec-TOOL-aEvidencedLens-15.md) | 9 | 2 | CLOSED | rev-2 | 2026-10-05 |
-| [TOOL-aEvidencedLens-18 — unit 15's observation is completed: the HEAD bytes tied to their blob, a break on the masked line, all four prints, both edges, and the closing pass's write set](spec/2026-10-05-spec-TOOL-aEvidencedLens-18.md) | 10 | 2 | SPECCED | rev-3 | 2026-10-05 |
+| [TOOL-aEvidencedLens-15 — the diff-kind resume probe is observed from BASE with every REVIEW_SHAPE-derived value masked, its review key and its input print](spec/2026-10-05-spec-TOOL-aEvidencedLens-15.md) | 9 | 2 | CLOSED | rev-3 | 2026-10-05 |
+| [TOOL-aEvidencedLens-18 — unit 15's observation is completed: the HEAD bytes tied to their blob, a break on the masked line, all four prints, both edges, and the closing pass's write set](spec/2026-10-05-spec-TOOL-aEvidencedLens-18.md) | 10 | 2 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aEvidencedLens-19 — unit 18's byte tie is observed with filters off: each saved harness file equals its blob byte for byte, and a CRLF copy and a one-byte append each red it](spec/2026-10-05-spec-TOOL-aEvidencedLens-19.md) | 11 | 2 | SPECCED | rev-1 | 2026-10-05 |
 | [TOOL-aEvidencedLens-20 — the minors batch of unit 18's audit: each of its criteria observed live, unit 15's prints and break reused by name, the revs it expects, its false prose corrected, and a closing write set derived rather than asserted](spec/2026-10-05-spec-TOOL-aEvidencedLens-20.md) | 11 | 2 | SPECCED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 27 bound to this build, across 4 record folder(s).
+Records: 28 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-15 — the diff-kind resume probe is observed from BASE with every REVIEW_SHAPE-derived value masked, its review key and its input print
 
-**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 9
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -67,6 +67,10 @@ pass by masking nothing. It closes ids 1, 5 and 14 (HIGH) of that audit.
 - **consumes-from** `TOOL-aEvidencedLens-13` — the BASE-comparison rule, the two diff-kind arg sets
   and the stub driver shape this unit extends with the class mask; that unit hands this one the
   `resume:probe` label its key mask cannot reach.
+- **consumes-from** `TOOL-aEvidencedLens-12` — the review harness as this build ships it; unit 12 is
+  the last unit that edits it, so S2 and AC1 observe the probe after it lands.
+- **consumes-from** `TOOL-aEvidencedLens-1` — the `REVIEW_SHAPE` move of its S3, which makes the
+  BASE and HEAD prints differ; AC2's key-mask red rests on it.
 - **hands-off** `TOOL-aEvidencedLens-18` — the completion of this unit's observation: the HEAD
   render read from the object database, a staged break on step 3's masked line, every print per arg
   set, and the edges and closing write set the spec audit of this unit found missing. That unit
@@ -181,6 +185,9 @@ none
   spec audit of this unit (`reviews/2026-10-05-review-TOOL-aEvidencedLens-15-spec-audit-round1.md`)
   promoted for ids 4 and 5 (MEDIUM) and 1, 2, 3 and 6 (LOW). Nothing else moves; this unit builds as
   written.
+- rev-3 · 2026-10-05 · §3 · gains the consumes-from edges to `TOOL-aEvidencedLens-12` and
+  `TOOL-aEvidencedLens-1`, which S2, AC1 and AC2 rest on; written by `TOOL-aEvidencedLens-18` S4
+  (id 1 of this unit's spec audit). Nothing else moves.
 
 ## 10. Reuse audit
 

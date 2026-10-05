@@ -1,11 +1,12 @@
 # TOOL-aEvidencedLens-18 — unit 15's observation is completed: the HEAD bytes tied to their blob, a break on the masked line, all four prints, both edges, and the closing pass's write set
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 10
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-05-build-TOOL-aEvidencedLens-18-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-aEvidencedLens-18-1-acceptance-ledger.md) | journal | — |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-18-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-18-2-build-brief.md) | journal | — |
 | [2026-10-05-review-TOOL-aEvidencedLens-18-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-18-spec-audit-round1.md) | spec-audit | — |
 

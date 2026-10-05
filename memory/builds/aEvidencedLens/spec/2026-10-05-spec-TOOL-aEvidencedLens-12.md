@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-12 — the spec skeptic line carries a finding's evidence through a line-break-only fold, so a pipe survives
 
-**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7
+**Status:** CLOSED · rev-5 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -73,6 +73,8 @@ skeptic reads the command byte for byte, and proves it with a pipe-bearing case.
   after this unit lands and covers its edit.
 - **hands-off** `TOOL-aEvidencedLens-18` — the review harness as this build ships it, which that
   unit reads from the object database at HEAD to complete unit 15's observation.
+- **hands-off** `TOOL-aEvidencedLens-15` — the review harness as this build ships it; this is the
+  last unit that edits it, so that unit's BASE observation of the diff-kind probe covers its edit.
 
 ## 4. Design
 
@@ -226,6 +228,8 @@ none
   that unit's rev-2 now consumes from.
 - rev-4 · 2026-10-05 · §3 · gains the hands-off to `TOOL-aEvidencedLens-18`, the minors batch promoted
   from the spec audit of unit 15, which consumes from this unit.
+- rev-5 · 2026-10-05 · §3 · gains the hands-off to `TOOL-aEvidencedLens-15`, the reciprocal of that
+  unit's consumes-from edge; written by `TOOL-aEvidencedLens-18` S4 (id 1 of unit 15's spec audit).
 
 ## 10. Reuse audit
 
