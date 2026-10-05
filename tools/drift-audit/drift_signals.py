@@ -279,6 +279,10 @@ PINS: dict[str, int] = {
     #
     # DRAINED to 0: all seven were SELF-TESTS whose parent gate was cited but whose own script
     # path was not; the charter now names them in one bullet, so every leg on the bar is spelled there.
+    #
+    # RE-ARMED at 0 over a different population (TOOL-aMendedFleet-52): the charter row is retired,
+    # and the pin now holds the README signal table's names to the names the engine reports, which
+    # agreed on the arming commit. The figures above describe the retired charter row.
     "handkept_inventories_disagreeing_with_source": 0,
     # 1 — TOOL-aMooredAnchor-1, the oracle's known residual. Its build commits are 59b4710 and its
     # siblings, whose subjects name neither its id nor its slug: it closed on 2026-08-11, hours after
