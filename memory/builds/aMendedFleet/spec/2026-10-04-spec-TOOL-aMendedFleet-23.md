@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-23 — check 19 reports the gotcha anchors that select no tracked path
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 23
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 23
 
 <!-- gen:spec-records -->
 

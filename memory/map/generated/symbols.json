@@ -8233,6 +8233,11 @@
       "file": "tools/workflows/review_replay.py"
     },
     {
+      "id": "scan_dead_anchors",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "scan_decisions",
       "kind": "function",
       "file": "tools/runlog/model.py"

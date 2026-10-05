@@ -348,6 +348,8 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     `universal`, and a record whose anchors reach ONLY the append-only tree is reported as INERT:
     reachable on paper, dead in practice. The `universal` set is budgeted (`UNIVERSAL_BUDGET`)
     because every universal record is emitted on EVERY reviewer's checklist.
+    An anchor that selects no tracked path is reported by one NON-GATING `HYGIENE advisory check 19:`
+    line naming the counts, never the exit status; `gotchas.py --report` lists each one.
 
 20. **one id, one row per document** — within a single row document (the decision index, a backlog
     shard, and the rotated archive of either) an id appears at most once. An archive is recognised by

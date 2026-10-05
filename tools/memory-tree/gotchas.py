@@ -233,6 +233,18 @@ def inert_only(rec: dict, paths, m: str, append_only: re.Pattern) -> bool:
     return bool(hits) and all(append_only.match(p) for p in hits)
 
 
+def scan_dead_anchors(recs: list, paths, m: str) -> list:
+    """Every `(record path, anchor)` of a non-universal class record that `selectable` maps to NO
+    tracked path. ADVISORY, never gating: a dead anchor beside a live one leaves the record firing,
+    and the standing population holds glob and example tokens an author meant as illustration.
+
+    Universal records are skipped because selection never reads their anchors. Resolution is
+    `selectable`'s, never a second matcher.
+    """
+    return [(r["path"], a) for r in recs if r["kind"] == "class" and not r["universal"]
+            for a in r["anchors"] if not selectable(a, paths, m)]
+
+
 # ---------------------------------------------------------------------------------------- rendering
 def render(recs: list, m: str) -> str:
     head = [
@@ -282,6 +294,7 @@ def cmd_check(root: str, conf: dict) -> int:
     m = conf["MEMORY_ROOT"]
     recs = records(root, m)
     bad = []
+    advisory = ""
     # 17 — INDEX freshness.
     idx = os.path.join(root, m, "gotchas", "INDEX.md")
     want = render(recs, m)
@@ -313,8 +326,17 @@ def cmd_check(root: str, conf: dict) -> int:
             if n > int(budget):
                 bad.append(f"check 19: {n} universal record(s) against a budget of {budget} — every one "
                            f"is emitted on EVERY checklist, so raise the budget in a commit that says why")
+        # 19 — the DEAD-ANCHOR advisory. One line, never the exit status (TOOL-aMendedFleet-23).
+        dead = scan_dead_anchors(recs, paths, m)
+        if dead:
+            graded = sum(len(r["anchors"]) for r in recs if r["kind"] == "class" and not r["universal"])
+            advisory = (f"HYGIENE advisory check 19: {len(dead)} of {graded} anchor(s) in "
+                        f"{len({p for p, _ in dead})} class record(s) select no tracked path — "
+                        f"gotchas.py --report lists them")
     for line in bad:
         print("HYGIENE " + line)
+    if advisory:
+        print(advisory)
     return 1 if bad else 0
 
 
@@ -341,6 +363,16 @@ def cmd_report(root: str, conf: dict) -> int:
     print(f"unanchored       : {sum(1 for r in classes if not r['anchors'] and not r['universal'])}")
     for r in recs:
         print(f"    {r['kind']:<10} {len(r['anchors']):>2} anchor(s)  {r['name']}")
+    paths = [p for p in run("git", "ls-files", cwd=root).split("\n") if p] if recs else []
+    dead = scan_dead_anchors(recs, paths, m)
+    graded = sum(len(r["anchors"]) for r in classes if not r["universal"])
+    print(f"dead anchors     : {len(dead)} of {graded} in {len({p for p, _ in dead})} class record(s)")
+    last = None
+    for p, a in dead:
+        if p != last:
+            print(f"    {p}")
+            last = p
+        print(f"        {a}")
     return 0
 
 
@@ -555,6 +587,18 @@ def cmd_selftest() -> int:
         c5 = _scratch(t5, {"u.md": _rec("u", "d", "Applies everywhere. No machine gate.\n", universal=True)})
         cmd_write(t5, c5); run("git", "add", "-A", cwd=t5); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t5)
         arm("a universal record needs no anchor", None, lambda: cmd_check(t5, c5))
+
+        # 19 — the dead-anchor ADVISORY (TOOL-aMendedFleet-23): one live anchor, one dead, exit 0.
+        td = os.path.join(base, "dead"); os.makedirs(td)
+        cd = _scratch(td, {"d.md": _rec("d", "d", f"Fires on `{PFX}some-gate.sh` and `no/such/thing.sh`. "
+                                                  "Gated by the hygiene gate.\n")})
+        cmd_write(td, cd); run("git", "add", "-A", cwd=td); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=td)
+        arm("check 19 advises on a dead anchor and keeps exit 0",
+            "HYGIENE advisory check 19: 1 of 2 anchor(s) in 1 class record(s) select no tracked path — "
+            "gotchas.py --report lists them\n[rc=0]", lambda: cmd_check(td, cd))
+        arm("--report lists the dead anchor under its record",
+            "dead anchors     : 1 of 2 in 1 class record(s)\n    memory/gotchas/d.md\n        no/such/thing.sh\n",
+            lambda: cmd_report(td, cd))
 
         # the universal BUDGET.
         t6 = os.path.join(base, "budget"); os.makedirs(t6)

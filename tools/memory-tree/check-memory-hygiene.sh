@@ -17,7 +17,8 @@
 # already false of 13-19 — one rule returning two verdicts, the
 # `amendment-leaves-its-other-half-standing` class this repo catalogues.
 #
-# Exit 0 + no output = clean. Anything printed is a hygiene regression.
+# Exit 0 = clean. Two channels print at exit 0 and are NOT regressions: the corpus classifier's
+# check-16 notices, and any line opening `HYGIENE advisory `. Anything else printed is a regression.
 set -u
 # --offenders: THE SIGNATURE THE MERGE BAR GRADES THIS LEG WITH (TOOL-dDerivedDocket-23 S3). The full
 # check runs exactly as it does with no flag and exits as it does; what changes is stdout, which
@@ -348,12 +349,13 @@ fail() { if [ "$OFFENDERS" = 1 ]; then add_offender_keys "$1" "$2"; else echo "H
 # add_offender_keys <check> <message> — one key per offender line the message LISTS. A message's first
 # line is its header and is dropped when a list follows it; a one-line message is its own key. Lines
 # ending in a colon are sub-headers, and a `… and N more` line is a count rather than an offender.
+# A line opening `HYGIENE advisory ` is NON-GATING and never a key (TOOL-aMendedFleet-23).
 add_offender_keys() {
   local _body=$2 _k
   case "$_body" in *$'\n'*) _body=${_body#*$'\n'} ;; esac
   _k=$(printf '%s\n' "$_body" \
     | sed -E 's/\r$//; s/\t/ /g; s/^[[:space:]]+//; s/[[:space:]]+$//; s/([^[:space:]:]):[0-9]+(:[0-9]+)*(:|[[:space:]]|$)/\1\3/g' \
-    | awk -v c="check $1" 'NF && $0 !~ /:$/ && $0 !~ /^(…|\.\.\.) *and / { print c "\t" $0 }')
+    | awk -v c="check $1" 'NF && $0 !~ /:$/ && $0 !~ /^(…|\.\.\.) *and / && $0 !~ /^HYGIENE advisory / { print c "\t" $0 }')
   [ -z "$_k" ] || OFFENDER_KEYS="$OFFENDER_KEYS$_k"$'\n'
 }
 
@@ -2458,12 +2460,14 @@ fi
 # 17-19 — the bug-class catalogue (delegates to the sibling module). The catalogue's INDEX is
 # generated, every class record declares a gate or says it has none, and a record whose anchors reach
 # only the append-only tree is reachable on paper and dead in practice.
+# PRINT WHATEVER IT SAID, then decide from the exit code, as the corpus_ids block above does: check
+# 19's dead-anchor advisory prints at exit 0, and the old `if ! got=$(...)` form discarded it.
 if [ "$STAGED" = 0 ]; then
-  if ! got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); then
-    printf '%s
-' "$got"; status=1
-    [ "$OFFENDERS" = 0 ] || add_offender_keys 17-19 $'\n'"$got"
-  fi
+  got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); _gotrc=$?
+  [ -n "$got" ] && printf '%s
+' "$got"
+  [ "$_gotrc" -ne 0 ] && status=1
+  [ "$_gotrc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 17-19 $'\n'"$got"
 fi
 
 # 20 — the row documents' grammar, and id collisions INSIDE one file. Delegated for the same reason
