@@ -615,7 +615,7 @@ def build_spec_root(section_10: str) -> pathlib.Path:
 def test_spec_probes_dead_harvest():
     root = build_spec_root("No recall probe was run here.")
     p = subprocess.run([sys.executable, str(CHECK), "--spec-probes", "--repo", str(root)],
-                       capture_output=True, text=True, cwd=str(ROOT))
+                       capture_output=True, text=True, encoding="utf-8", cwd=str(ROOT))
     out = read_lines(p)
     assert p.returncode == 1, f"exit {p.returncode}, want 1\n{out}"
     assert "DEAD PROBE" in out and "harvest" in out, f"no DEAD PROBE naming the harvest:\n{out}"
