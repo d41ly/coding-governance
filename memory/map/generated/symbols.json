@@ -5973,6 +5973,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_pauses",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
       "id": "read_pointer",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"

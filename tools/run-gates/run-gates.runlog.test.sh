@@ -44,7 +44,9 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 # 192 -> 197, TOOL-dDerivedDocket-25: AC2's moved-tree bar, five checks.
 # 197 -> 210, TOOL-dDerivedDocket-26: AC2's HOST bar and its two new refusals, four checks each, and
 # AC5's check that both bars printed the acquire line its stdout comparison filters.
-FLOOR_ASSERTIONS=210
+# 210 -> 211, TOOL-aGraftedHelix-7: AC5's check that both bars printed the `memory: ` line its stdout
+# comparison now filters too.
+FLOOR_ASSERTIONS=211
 # Where the scratch clone installs the runner: a FIXTURE-INTERNAL path, bound once, never gov's prefix.
 KR=kit/run-gates
 n=0; st=0
@@ -589,8 +591,13 @@ check_ac5_write_failure() {
   # share, so it is filtered from the comparison and its presence checked on both sides instead.
   check "AC5 both bars print one acquire line" \
     "$(printf '%s\n' "$OUT" | grep -c '^gate queue: acquired ')|$(printf '%s\n' "$out_off" | grep -c '^gate queue: acquired ')" "1|1"
+  # THE MEMORY LINE names the peak used memory each bar's dispatch decisions read (TOOL-aGraftedHelix-7),
+  # a property of the host at that instant, so it is filtered too and its presence checked on both sides.
+  check "AC5 both bars print one memory line" \
+    "$(printf '%s\n' "$OUT" | grep -c '^memory: ')|$(printf '%s\n' "$out_off" | grep -c '^memory: ')" "1|1"
   check "AC5 a failed append leaves stdout alone" \
-    "$(printf '%s\n' "$OUT" | grep -v '^gate queue: acquired ')" "$(printf '%s\n' "$out_off" | grep -v '^gate queue: acquired ')"
+    "$(printf '%s\n' "$OUT" | grep -v '^gate queue: acquired ' | grep -v '^memory: ')" \
+    "$(printf '%s\n' "$out_off" | grep -v '^gate queue: acquired ' | grep -v '^memory: ')"
   check "AC5 stderr carries ONE run-log line" "$(printf '%s\n' "$ERR" | grep -c '^run-gates: run log')" 1
   check "AC5 that line names the file it could not write" "$(printf '%s\n' "$ERR" | grep '^run-gates: run log' | grep -c 'runlog/gates.log')" 1
   check "AC5 and nothing else new on stderr" "$(printf '%s\n' "$ERR" | grep -v '^run-gates: run log')" "$err_off"

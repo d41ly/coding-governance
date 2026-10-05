@@ -185,8 +185,9 @@ ATTR_BASE=fb07ca25
 # closing-fix ledger carries both counts.
 # MERGED with TOOL-dDerivedDocket-1/-23's floor: base 43, +26 from that build (69), +69 from
 # TOOL-aBatchedArm (112), so 43 + 26 + 69.
-SELFTEST_FLOOR=139
+SELFTEST_FLOOR=141
 # RAISED 138 -> 139 by the dDerivedDocket closing diff review's F5: the signalled --attribute arm.
+# RAISED 139 -> 141 by TOOL-aGraftedHelix-7: the sweep's memory pause at 95 % and at 10 % used.
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -343,6 +344,31 @@ build_repo() {
   # The subject file the dirty suite appends to has to be TRACKED, or --untracked-files=no
   # cannot see it and the arm passes by finding nothing.
   printf 'a tracked subject\n' > subject.md
+  # ---- TOOL-aGraftedHelix-7's driver: the sweep's memory pause. It puts the bar's runner beside this
+  # ---- one, so `--print-profile` answers the threshold, turns both rows' suite into a 2 s sleeper that
+  # ---- stamps its start and end OUTSIDE the tree, and runs the pooled sweep at outer width 2 with the
+  # ---- pause at 90 % over a fixture meminfo reading <pct> used. It prints whether the second suite
+  # ---- started no earlier than the first ended, and the sweep's `memory:` line. Whole seconds, so a
+  # ---- `date` with no %N still answers.
+  cat > ${PFX}mempause.sh <<'SH'
+#!/usr/bin/env bash
+# mempause.sh <pct used> <the bar's runner> <its kit dir here> <the rows' suite> <the self-test runner>
+set -u
+pct=$1; bar=$2; kd=$3; suite=$4; runner=$5
+D=$(cd .. && pwd)/mempause.$$
+mkdir -p "$D/cg" || exit 1
+cp "$bar" "$kd/run-gates.sh" || exit 1
+printf 'MemTotal: 1000 kB\nMemAvailable: %s kB\n' "$(( (100 - pct) * 10 ))" > "$D/mi"
+printf '#!/usr/bin/env bash\ns=$(date +%%s); sleep 2\necho "$s $(date +%%s)" >> %s/stamps\necho "PASS (1 assertions)"\n' \
+  "$D" > "$suite"
+out=$(GATE_JOBS=2 GATE_MEMPAUSE=90 GATE_MEMINFO="$D/mi" GATE_CGROUP_ROOT="$D/cg" bash "$runner" --pooled --calibrate 2>&1); rc=$?
+set -- $(sort -n "$D/stamps" 2>/dev/null | tr '\n' ' ')
+if [ "$#" != 4 ]; then how="unstamped ($# stamps)"
+elif [ "$3" -ge "$2" ]; then how=held
+else how=overlapped; fi
+echo "AC9 $how | $(printf '%s\n' "$out" | grep '^memory:')"
+exit "$rc"
+SH
 
   # ---------------------------------------------------------------- the attribution fixture
   # TOOL-dDerivedDocket-1. TWO COMMITS, and that is the whole shape: commit one is R, the baseline
@@ -1473,5 +1499,14 @@ arm "a matched red-by-design row still counts as a WITHHELD cost verdict" 0 \
     "2 cost verdict(s) WITHHELD under pooled@2x1" \
     "bash ${PFX}seed.sh 'free one' pooled@2x1 1 1 3 81 && sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-shard.sh|' $B" \
     "$R --pooled"
+
+# ---- THE SWEEP'S MEMORY PAUSE. TOOL-aGraftedHelix-7 AC9. The sweep makes the bar's decision before
+# ---- each suite it dispatches, with its own count of suites running, and prints the same `memory:`
+# ---- line. Red when: the pooled sweep starts its second suite under pressure while the first runs.
+MP_DRIVE="bash ${PFX}mempause.sh %s \"$(dirname -- "$RUNNER")/run-gates.sh\" \"$(dirname -- "$RUNNER_REL")\" ${PFX}suite-ok.sh ${RUNNER_REL}"
+arm "AC9 at 95 % used the pooled sweep holds its second suite until the first ends, and says so" 0 \
+    "AC9 held | memory: 1 pause(s)" '' "$(printf "$MP_DRIVE" 95)"
+arm "AC9 at 10 % used both suites start together and the line reads no pause" 0 \
+    "AC9 overlapped | memory: no pause" '' "$(printf "$MP_DRIVE" 10)"
 
 run_arms run-selftests.test.sh

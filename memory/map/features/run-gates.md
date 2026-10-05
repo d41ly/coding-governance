@@ -159,12 +159,6 @@ resolves to — and mount points are not symlinks, so a prefix strip across the 
 sitting INSIDE the target as being outside it. Measured: that refusal fired against a scratch target
 the kit's own e2e had just built around it.
 
-**The report tail is a two-space contract.** `<verb>  <leg name>  <tail>` on every verb, so a reader
-splits the remainder on a double space and recovers the bare leg name. A single space returned a
-truncated name for any leg whose name contains one, which is most of them, and the deployer reads a
-target's verdicts exactly that way. The gov-only canary forbids a double space inside a leg NAME,
-which is what makes the split unambiguous rather than usually right.
-
 **The pool's knobs are DECLARED, and no knob may make the bar check less.** `gate-profiles.txt`
 maps detected cores and RAM to a named row; the FIRST row satisfying both thresholds wins and the
 last row is a zero-threshold catch-all, so unknown hardware is matched rather than special-cased.
@@ -213,6 +207,8 @@ world moved past is indistinguishable from one nobody measured. `TOOL-dDerivedDo
 **`--print-profile` carries a backstop's two terms.** `queue` is `TS_MAXWAIT`, derived above the verb's exit so it never reads 0, and `ceiling_max` the manifest's largest positive ceiling by the parse's own predicate: `-` for none, absent for a manifest that will not parse. The unattended driver sizes its bar's backstop from them. `TOOL-dDerivedDocket-27`.
 
 **Only a census-clean reading argues a ceiling.** A `.leg` row's eighth field, `foreign`, is the most foreign gate-work trees the run's `census` saw, or `unknown`; it misses other load and Windows processes no MSYS shell spawned. `derive-ceilings.py` sets the rest aside as `contended` or `uncensused`; `--observed` stays admitted, uncensused. `cleanup` stops the turnstile ticker later censuses counted. `TOOL-aGraftedHelix-5`.
+
+**A dispatch waits out memory pressure, and every wait ends.** `mempause=90` holds the next leg while used memory sits above it and a leg runs; the `mempause_sh` block both dispatchers carry, parity-graded, releases a hold `fell`, `drained`, `unread`, `bound` or `wall`, so a pause narrows a pool and never deadlocks it. Each episode is a `pauses` row, and `derive-ceilings.py` sets its legs' readings aside as `paused`. `TOOL-aGraftedHelix-7`.
 
 **A waiting bar beats.** On every tick it waits, the turnstile rewrites `gate-queue-heartbeat` under its own worktree's git dir, beside `gate-logs/`, and never removes it, so an out-of-process liveness reader sees a queued bar move before its first leg lands; the unattended driver's clock reads its mtime. `TOOL-dDerivedDocket-64`.
 

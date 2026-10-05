@@ -29,7 +29,11 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.25   # gov:kit run-gates@1.25
+KIT_RUN_GATES_VERSION=1.26   # gov:kit run-gates@1.26
+# 1.25 -> 1.26: the profile knob `mempause`, every shipped row at 90: dispatch HOLDS while used memory
+# is above it and a leg runs (TOOL-aGraftedHelix-7). The run record gains `pauses`, the verdict
+# `paused` and `paused_s`, the header and `--print-profile` `mempause`, the profile line a field, and
+# stdout one `memory:` line; a table carrying the knob is refused by a runner older than this one.
 # 1.24 -> 1.25: every `.leg` row gains an eighth field, `foreign`, from a census of foreign gate work
 # taken while the legs run, and the header gains `census_every` (TOOL-aGraftedHelix-5). A reader that
 # splits a row by position keeps working; one that reads the seventh field with a trailing catch-all
@@ -301,7 +305,7 @@ TIMINGS="$LEDGER"
 # slower, and it may turn an unbounded hang into a bounded RED. It may never make the bar check less.
 # KNOWN_KNOBS is the whole implemented set; the canary PINS the same set separately, which is what
 # stops a coverage knob being added without an author reading this paragraph.
-KNOWN_KNOBS="width timeout wall"
+KNOWN_KNOBS="width timeout wall mempause"
 PROFILES="${GATE_PROFILES:-$KITREL/gate-profiles.txt}"
 prof_die() { echo "run-gates: $*" >&2; exit 2; }
 
@@ -386,7 +390,114 @@ det_ram_capped() {
   return 0
 }
 
-PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_WALL=0; PROF_TAG=""; PROF_WHERE=""
+# >>> mempause_sh — canonical copy: run-gates.sh in this kit's dir (byte-identical; gated)
+# THE MEMORY PAUSE (TOOL-aGraftedHelix-7). The width is chosen ONCE, from RAM, at start; nothing
+# watched memory while the work ran. A dispatcher calls `check_dispatch_pause <running>` before each
+# dispatch and HOLDS that dispatch while used memory sits above `MEMPAUSE` percent and something is
+# still running. Both runners carry this block byte-identical, so it reads only what its caller set:
+# `MEMPAUSE` (the threshold, 0 = off), `MEMPAUSE_INERT` (1 when the host gave no reading at start)
+# and `MEMPAUSE_ROWS` (the run record's `pauses` file, empty for none). Builtins only, and the
+# decision reads `MEMPAUSE_READ` rather than a command substitution, so a decision forks nothing.
+# A HOLD ALWAYS ENDS: nothing polls, so each decision happens at a completion, and a hold is released
+# when the reading falls (`fell`), when nothing runs (`drained`), when the reading vanishes
+# (`unread`), or at the first completion after `MEMPAUSE_HOLD` seconds (`bound`); the caller closes
+# one the wall's break left open as `wall`. The knob narrows a pool and never turns a leg into
+# anything: under pressure that never falls the pool drains toward width 1 and keeps moving.
+MEMPAUSE_HOLD=300
+case "${GATE_MEMPAUSE_HOLD:-}" in ''|*[!0-9]*|???????*) ;; *) MEMPAUSE_HOLD=$((10#$GATE_MEMPAUSE_HOLD)) ;; esac
+MEMPAUSE_N=0; MEMPAUSE_HELD_S=0; MEMPAUSE_READ=""; MEMPAUSE_PEAK=""; MEMPAUSE_OPEN=""; MEMPAUSE_OPEN_PEAK=0
+MEMPAUSE_FELL=0; MEMPAUSE_BOUND=0; MEMPAUSE_DRAINED=0; MEMPAUSE_UNREAD=0; MEMPAUSE_WALL=0
+# read_mem_used — used memory as a whole percent, on stdout and in MEMPAUSE_READ; rc 1 and nothing
+# when no source reads. The host half is `MemTotal` against `MemAvailable`, or `MemFree` where the
+# file has none (on MSYS that IS Windows' available figure); the cgroup half is its usage over its
+# limit, v2 then v1, with `max` and v1's 19-digit sentinel rejected as `cgroup_ram_mb` rejects them.
+# The HIGHER wins: a wrong source can only make the bar slower, the direction `det_ram_capped` takes.
+read_mem_used() {
+  local f="${GATE_MEMINFO:-/proc/meminfo}" cg="${GATE_CGROUP_ROOT:-/sys/fs/cgroup}" k v _
+  local tot="" av="" fr="" host="" grp="" lim="" use=""
+  MEMPAUSE_READ=""
+  if [ -r "$f" ]; then
+    while read -r k v _; do
+      case "$k" in MemTotal:) tot=$v ;; MemAvailable:) av=$v ;; MemFree:) fr=$v ;; esac
+    done < "$f"
+  fi
+  [ -n "$av" ] || av=$fr
+  case "$tot" in ''|*[!0-9]*|????????????????*) tot="" ;; esac
+  case "$av" in ''|*[!0-9]*|????????????????*) av="" ;; esac
+  if [ -n "$tot" ] && [ -n "$av" ] && [ "$((10#$tot))" -gt 0 ]; then
+    tot=$((10#$tot)); av=$((10#$av)); [ "$av" -le "$tot" ] || av=$tot
+    host=$(( (tot - av) * 100 / tot ))
+  fi
+  for k in memory.max:memory.current memory/memory.limit_in_bytes:memory/memory.usage_in_bytes; do
+    lim=""; use=""
+    { read -r lim < "$cg/${k%%:*}"; read -r use < "$cg/${k#*:}"; } 2>/dev/null
+    case "$lim" in ''|*[!0-9]*|????????????????*) continue ;; esac
+    case "$use" in ''|*[!0-9]*|????????????????*) continue ;; esac
+    [ "$((10#$lim))" -gt 0 ] || continue
+    grp=$(( 10#$use * 100 / 10#$lim )); [ "$grp" -le 100 ] || grp=100
+    break
+  done
+  [ -n "$host$grp" ] || return 1
+  v=${host:-$grp}; [ -n "$grp" ] && [ "$grp" -gt "$v" ] && v=$grp
+  MEMPAUSE_READ=$v
+  printf '%s\n' "$v"
+}
+# check_dispatch_pause <running> — rc 0 HOLDS the next dispatch, rc 1 lets it go. First match:
+# off or INERT; no reading (`unread`); at or under the threshold (`fell`); nothing running
+# (`drained`), so a hold never outlives the last job; an episode held MEMPAUSE_HOLD seconds or more
+# (`bound`), tested only here, so it is released at the first decision after the bound; else hold,
+# opening an episode when none is open.
+check_dispatch_pause() {
+  { [ "${MEMPAUSE:-0}" -gt 0 ] && [ "${MEMPAUSE_INERT:-0}" = 0 ]; } || return 1
+  if ! read_mem_used >/dev/null; then write_pause_row unread; return 1; fi
+  { [ -z "$MEMPAUSE_PEAK" ] || [ "$MEMPAUSE_READ" -gt "$MEMPAUSE_PEAK" ]; } && MEMPAUSE_PEAK=$MEMPAUSE_READ
+  [ -n "$MEMPAUSE_OPEN" ] && [ "$MEMPAUSE_READ" -gt "$MEMPAUSE_OPEN_PEAK" ] && MEMPAUSE_OPEN_PEAK=$MEMPAUSE_READ
+  if [ "$MEMPAUSE_READ" -le "$MEMPAUSE" ]; then write_pause_row fell; return 1; fi
+  if [ "${1:-0}" -le 0 ]; then write_pause_row drained; return 1; fi
+  if [ -n "$MEMPAUSE_OPEN" ] && [ $(( EPOCHSECONDS - MEMPAUSE_OPEN )) -ge "$MEMPAUSE_HOLD" ]; then
+    write_pause_row bound; return 1
+  fi
+  [ -n "$MEMPAUSE_OPEN" ] || { MEMPAUSE_OPEN=$EPOCHSECONDS; MEMPAUSE_OPEN_PEAK=$MEMPAUSE_READ; }
+  return 0
+}
+# write_pause_row <ended-by> — closes the open episode, a no-op when none is open: one `pauses` row,
+# `<started-s> TAB <ended-s> TAB <held-s> TAB <peak-pct> TAB <threshold> TAB <ended-by>`, when the
+# caller set MEMPAUSE_ROWS, and the counters the summary prints either way.
+write_pause_row() {
+  [ -n "$MEMPAUSE_OPEN" ] || return 0
+  local now=$EPOCHSECONDS held
+  held=$(( now - MEMPAUSE_OPEN ))
+  MEMPAUSE_N=$(( MEMPAUSE_N + 1 )); MEMPAUSE_HELD_S=$(( MEMPAUSE_HELD_S + held ))
+  case "$1" in
+    fell) MEMPAUSE_FELL=$(( MEMPAUSE_FELL + 1 )) ;;
+    bound) MEMPAUSE_BOUND=$(( MEMPAUSE_BOUND + 1 )) ;;
+    drained) MEMPAUSE_DRAINED=$(( MEMPAUSE_DRAINED + 1 )) ;;
+    unread) MEMPAUSE_UNREAD=$(( MEMPAUSE_UNREAD + 1 )) ;;
+    *) MEMPAUSE_WALL=$(( MEMPAUSE_WALL + 1 )) ;;
+  esac
+  if [ -n "${MEMPAUSE_ROWS:-}" ]; then
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$MEMPAUSE_OPEN" "$now" "$held" "$MEMPAUSE_OPEN_PEAK" \
+      "${MEMPAUSE:-0}" "$1" >> "$MEMPAUSE_ROWS" 2>/dev/null || true
+  fi
+  MEMPAUSE_OPEN=""; MEMPAUSE_OPEN_PEAK=0
+}
+# render_pause_summary — the ONE `memory:` line a run prints after its pool drains, on every run.
+render_pause_summary() {
+  if [ "${MEMPAUSE:-0}" -le 0 ]; then
+    printf 'memory: pause off\n'
+  elif [ "${MEMPAUSE_INERT:-0}" = 1 ]; then
+    printf 'memory: no reading on this host, so the %s%% pause was INERT\n' "$MEMPAUSE"
+  elif [ "$MEMPAUSE_N" = 0 ]; then
+    printf 'memory: no pause  (peak %s%% used, threshold %s%%)\n' "${MEMPAUSE_PEAK:-?}" "$MEMPAUSE"
+  else
+    printf 'memory: %s pause(s), %ss held  (peak %s%% used, threshold %s%%; fell %s, bound %s, drained %s, unread %s, wall %s)\n' \
+      "$MEMPAUSE_N" "$MEMPAUSE_HELD_S" "${MEMPAUSE_PEAK:-?}" "$MEMPAUSE" \
+      "$MEMPAUSE_FELL" "$MEMPAUSE_BOUND" "$MEMPAUSE_DRAINED" "$MEMPAUSE_UNREAD" "$MEMPAUSE_WALL"
+  fi
+}
+# <<< mempause_sh
+
+PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_WALL=0; PROF_MEMPAUSE=0; PROF_TAG=""; PROF_WHERE=""
 if [ -f "$PROFILES" ]; then
   # GATE_PROFILE names a row and SKIPS detection; otherwise the first row both thresholds satisfy.
   if [ -n "${GATE_PROFILE:-}" ]; then PROF_WHERE="detection skipped"
@@ -423,6 +534,10 @@ if [ -f "$PROFILES" ]; then
       # was silently dropped AND the INERT warning that would have said so was disabled by the same
       # failing test. The visibility line then reported `timeout off` beside a table declaring one.
       case "${k#*=}" in ????????????????*) prof_die "$PROFILES:$ln: knob '${k%%=*}' value too long to compare (max 15 digits): '${k#*=}'" ;; esac
+      # A PERCENT, so a value above 100 is a threshold no reading can cross: the knob would read as on
+      # and could never hold. Refused like any malformed knob rather than clamped (TOOL-aGraftedHelix-7).
+      [ "${k%%=*}" = mempause ] && [ "$((10#${k#*=}))" -gt 100 ] \
+        && prof_die "$PROFILES:$ln: knob 'mempause' is a percent of used memory, 0 to 100: '${k#*=}'"
     done
     declared="$declared $pname"
     [ -n "$sel" ] && continue
@@ -443,7 +558,7 @@ if [ -f "$PROFILES" ]; then
   IFS=, read -ra kv <<<"$selknobs"
   for k in "${kv[@]}"; do
     case "${k%%=*}" in width) PROF_WIDTH=${k#*=} ;; timeout) PROF_TIMEOUT=${k#*=} ;;
-                        wall) PROF_WALL=${k#*=} ;; esac
+                        wall) PROF_WALL=${k#*=} ;; mempause) PROF_MEMPAUSE=$((10#${k#*=})) ;; esac
   done
   [ -n "$PROF_WIDTH" ] || prof_die "$PROFILES: row '$sel' declares no width knob"
   PROF_TAG="detected"
@@ -666,7 +781,31 @@ prof_w=off; [ "$WALL" -gt 0 ] && prof_w="${WALL}s"
 if [ "$CEILINGS_LIVE" != 1 ]; then
   echo "run-gates: NOTE - this host has no runnable 'timeout -k', so EVERY leg's declared ceiling is INERT and every leg runs unbounded this run" >&2
 fi
-PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c, wall $prof_w; $PROF_TAG)"
+# ---- THE MEMORY PAUSE'S THRESHOLD, resolved beside the wall it shares the profile line with. The row
+# ---- supplies it and `GATE_MEMPAUSE` overrides it alone, as `GATE_WALL` does the wall; an override
+# ---- that is not a percent is announced and leaves the pause OFF, because a knob that silently took
+# ---- some other value is a knob the operator believes they set. A threshold over a host that gives
+# ---- no reading is INERT and says so here, once, instead of reading 0 % used on every decision.
+MEMPAUSE=$PROF_MEMPAUSE
+if [ -n "${GATE_MEMPAUSE:-}" ]; then
+  case "$GATE_MEMPAUSE" in
+    *[!0-9]*|????*) MEMPAUSE=101 ;;
+    *) MEMPAUSE=$((10#$GATE_MEMPAUSE)) ;;
+  esac
+  if [ "$MEMPAUSE" -gt 100 ]; then
+    echo "run-gates: NOTE - GATE_MEMPAUSE='$GATE_MEMPAUSE' is not a percent from 0 to 100, so the memory pause is OFF this run" >&2
+    MEMPAUSE=0
+  fi
+fi
+MEMPAUSE_INERT=0; MEMPAUSE_ROWS=""
+if [ "$MEMPAUSE" -gt 0 ] && ! read_mem_used >/dev/null; then
+  MEMPAUSE_INERT=1
+  echo "run-gates: NOTE - profile '$PROF_NAME' asks to hold dispatch above ${MEMPAUSE}% used memory, but this host gives no reading (${GATE_MEMINFO:-/proc/meminfo}, nor a cgroup pair under ${GATE_CGROUP_ROOT:-/sys/fs/cgroup}), so the memory pause is INERT this run" >&2
+fi
+prof_m=off; prof_mrec=off
+[ "$MEMPAUSE" -gt 0 ] && { prof_m="${MEMPAUSE}%"; prof_mrec=$MEMPAUSE; }
+[ "$MEMPAUSE_INERT" = 1 ] && { prof_m=INERT; prof_mrec=inert; }
+PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c, wall $prof_w, mempause $prof_m; $PROF_TAG)"
 
 # HOISTED ABOVE `--print-profile`, TOOL-dDerivedDocket-27 S3. That verb reports the queue bound,
 # and a queue printed before the TTL is resolved reads 0, which is a bound on nothing. Deriving it
@@ -742,6 +881,9 @@ sys.stdout.write(str(max(c)) if c else "-")
   printf 'queue\t%s\n'     "$TS_MAXWAIT"
   [ -n "$PROF_CEILING_MAX" ] && printf 'ceiling_max\t%s\n' "$PROF_CEILING_MAX"
   printf 'ceilings\t%s\n'  "$CEILINGS_LIVE"
+  # The EFFECTIVE threshold, 0 for off. INERT is a fact about the host and rides `line`; a second
+  # reader decides it with a read of its own (TOOL-aGraftedHelix-7).
+  printf 'mempause\t%s\n'  "$MEMPAUSE"
   printf 'line\t%s\n'      "$PROF_LINE"
   exit 0
 fi
@@ -1612,6 +1754,10 @@ if [ -n "$gd" ]; then
     chmod 700 "$RUNDIR" 2>/dev/null || true
     RC="$RUNDIR"
     printf '%s' "$RUNID" > "$RUNROOT/current.tmp" 2>/dev/null && mv -f "$RUNROOT/current.tmp" "$RUNROOT/current" 2>/dev/null || true
+    # The memory pause's episodes, one row each, beside the `.leg` rows they explain. Emptied when a
+    # pinned id reuses the directory, so a row here is always this run's (TOOL-aGraftedHelix-7).
+    MEMPAUSE_ROWS="$RUNDIR/pauses"
+    [ -e "$MEMPAUSE_ROWS" ] && : > "$MEMPAUSE_ROWS"
   else
     # Creating the run directory fails the run the way the `mktemp -d` it sits beside already does.
     echo "run-gates: cannot create the run record at $RUNDIR" >&2; exit 2
@@ -1936,6 +2082,9 @@ if [ -n "$RUNDIR" ]; then
     # leg's window reaches three periods before its start. Outside the run-envelope block for the
     # reason the queue keys above give.
     printf 'census_every\t%s\n' "$CENSUS_EVERY"
+    # The memory pause's threshold this run held dispatch above, `off`, or `inert` where the host gave
+    # no reading (TOOL-aGraftedHelix-7). Outside the run-envelope block for the reason above.
+    printf 'mempause\t%s\n' "$prof_mrec"
     # The RESOLVED dispatch order, recorded here because this is the point at which it is in
     # scope. The chunking unit's ordering criteria read it from the record rather than
     # re-deriving it, which is what keeps the record's key set single-sourced.
@@ -3232,9 +3381,15 @@ while [ "$wi" -lt "$nwalk" ]; do
   # one — every leg of it has printed, because the reader never advances past a leg with no result.
   if [ "${chunks[$next]}" != "$cur_chunk" ]; then chunk_close; cur_chunk=${chunks[$next]}; fi
   di_before=$di
-  while [ "$di" -lt "$ndisp" ] && [ "$(live)" -lt "$JOBS" ]; do
+  # THE RUNNING COUNT IS CAPTURED from the test that already takes it, so the memory pause's decision
+  # below asks nothing again and adds no spawn (TOOL-aGraftedHelix-7).
+  while [ "$di" -lt "$ndisp" ] && { nlive=$(live); [ "$nlive" -lt "$JOBS" ]; }; do
     k=${disp[$di]}; di=$((di+1))
     { [ -z "${names[$k]}" ] || [ -f "$WORK/$k.rc" ]; } && continue   # sentinel, or already decided by the guard pass
+    # A HOLD steps the index back and leaves the pass: the reader below then blocks on `wait -n` as it
+    # does with a full pool, and a hold only happens while a leg runs, so that wait returns. The next
+    # completion re-decides for this same leg.
+    if check_dispatch_pause "$nlive"; then di=$((di-1)); break; fi
     arm_wall
     arm_census
     runleg "$k" &
@@ -3257,7 +3412,10 @@ while [ "$wi" -lt "$nwalk" ]; do
     # because the first run is the one with no cache.
     if [ "$di" -eq "$di_before" ]; then
       k=${disp[$di]}; di=$((di+1))
-      if [ -n "${names[$k]}" ] && [ ! -f "$WORK/$k.rc" ]; then runleg "$k" & fi
+      # THE SECOND DISPATCH SITE decides too, with nothing running: a held leg reaches this branch when
+      # its runners finished between the pass's count and the liveness test, and its episode must close
+      # `drained` here, or it would outlive the loop and close as `wall` with no wall fired.
+      if [ -n "${names[$k]}" ] && [ ! -f "$WORK/$k.rc" ]; then check_dispatch_pause 0; runleg "$k" & fi
     fi
     continue
   fi
@@ -3265,8 +3423,12 @@ while [ "$wi" -lt "$nwalk" ]; do
   [ -f "$WORK/$next.rc" ] && continue
   report_one "$next"; wi=$((wi+1))         # genuinely no result: report it, never hang
 done
+write_pause_row wall                       # an episode open now is one the wall's break left; a no-op otherwise
 wait
 chunk_close                                # the last chunk has no successor to close it
+# THE MEMORY PAUSE'S ONE LINE, after the pool drains and before the serial retry, so a run the wall
+# stopped prints it too. Its peak varies with the host, so a whole-output reader filters it by name.
+render_pause_summary
 # THE SERIAL RETRY, after the pool drains and INSIDE the wall (TOOL-dDerivedDocket-26 S1), and before
 # the attribution below, which reads the red set the retry decides and each red leg's FIRST attempt.
 run_leg_retry
@@ -3401,6 +3563,8 @@ if [ -f "$WORK/wall.breach" ]; then
       printf 'held\t%s\n' "${ondemands:-0}"
       printf 'reused\t%s\n' "$reuses"
       printf 'retried\t%s\n' "${RETRIED:-0}"
+      printf 'paused\t%s\n' "$MEMPAUSE_N"
+      printf 'paused_s\t%s\n' "$MEMPAUSE_HELD_S"
       printf 'wall_breach\t%s\n' "$WALL"
     } > "$RUNDIR/verdict.tmp" 2>/dev/null && mv -f "$RUNDIR/verdict.tmp" "$RUNDIR/verdict" 2>/dev/null || true
     chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
@@ -3427,6 +3591,8 @@ if [ "$fails" = 0 ] && [ "$ran" -le 0 ] && [ "${ondemands:-0}" -gt 0 ] \
       printf 'held\t%s\n' "${ondemands:-0}"
       printf 'reused\t0\n'
       printf 'retried\t0\n'
+      printf 'paused\t%s\n' "$MEMPAUSE_N"
+      printf 'paused_s\t%s\n' "$MEMPAUSE_HELD_S"
     } > "$RUNDIR/verdict.tmp" 2>/dev/null && mv -f "$RUNDIR/verdict.tmp" "$RUNDIR/verdict" 2>/dev/null || true
     chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
   fi
@@ -3488,6 +3654,9 @@ if [ -n "$RUNDIR" ]; then
     # How many deferred legs ran again, pass or fail (TOOL-dDerivedDocket-26 S2). The drift report
     # sums it across the records it can read.
     printf 'retried\t%s\n' "${RETRIED:-0}"
+    # The memory pause's episodes and the seconds they held, summed (TOOL-aGraftedHelix-7).
+    printf 'paused\t%s\n' "$MEMPAUSE_N"
+    printf 'paused_s\t%s\n' "$MEMPAUSE_HELD_S"
   } > "$_vtmp" 2>/dev/null && mv -f "$_vtmp" "$RUNDIR/verdict" 2>/dev/null || true
   chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
 fi

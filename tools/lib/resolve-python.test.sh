@@ -151,6 +151,7 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 UNATTENDED_DIR=$(resolve_kit_dir "$REALPY" unattended check-unattended.sh "$HERE") || exit 2
+RUNGATES_DIR=$(resolve_kit_dir "$REALPY" run-gates run-gates.sh "$HERE") || exit 2
 # ---- 2. PARITY ----------------------------------------------------------------------------------
 # A TABLE of (marker, canonical source, exclude-prefix), not one hardcoded predicate. It held exactly
 # one row for a long time and read as a population; it was not one — the marker was hardcoded in both
@@ -169,6 +170,7 @@ derive_self_rel|$ROOT/$KIT_REL/kit-rel.sh|$KIT_REL/kit-rel
 derive_kit_paths|$ROOT/$KIT_REL/render-doc.sh|$KIT_REL/render-doc
 resolve_prefix_token|$ROOT/$KIT_REL/resolve_prefix_token.py|$KIT_REL/resolve_prefix_token
 resolve_prefix_sh|$ROOT/$KIT_REL/kit-rel.sh|$KIT_REL/kit-rel
+mempause_sh|$ROOT/$RUNGATES_DIR/run-gates.sh|$RUNGATES_DIR/run-gates.sh
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -180,7 +182,9 @@ resolve_prefix_sh|$ROOT/$KIT_REL/kit-rel.sh|$KIT_REL/kit-rel
 # derive_kit_paths (TOOL-aRepatriatedFork-10, closing review round 1 L4) is the receipt read the two
 # memory-tree renderers each used to spell as their own grep, with nothing comparing the two.
 # resolve_prefix_token and resolve_prefix_sh (TOOL-aRepatriatedFork-47) are the `{prefix}` token's
-# two canonicals, one per language; §2b below holds them to one answer. The runbook's embedded
+# two canonicals, one per language; §2b below holds them to one answer. mempause_sh
+# (TOOL-aGraftedHelix-7) is the memory pause both of the run-gates kit's dispatchers carry inline; like
+# kickoff_region its canonical is a kit file, the bar's runner, and the self-test runner holds the copy. The runbook's embedded
 # migration program carries the Python one, so the population grep reads that one Markdown file too.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the

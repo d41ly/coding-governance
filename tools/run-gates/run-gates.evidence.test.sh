@@ -142,7 +142,8 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=110
+FLOOR_ASSERTIONS=112
+# RAISED 110 -> 112 by TOOL-aGraftedHelix-7: AC10's two assertions over a reading taken during a memory pause.
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -1430,6 +1431,29 @@ cn_w=$( cd "$CN_T" && "$DC_PY" "$CN_SCRIPT" --write 2>&1 ); cn_rc=$?
   && ok "AC8 control: a record holding no reading still exits 2 with DEAD PROBE" \
   || nope "AC8 control: an empty record no longer reports DEAD PROBE (rc=$cn_rc)"
 rm -rf "$CN_T"
+
+# --- A READING TAKEN DURING A MEMORY PAUSE ARGUES NO CEILING (TOOL-aGraftedHelix-7 AC10) -----------
+# One run, one `pauses` episode from epoch 1000 to 1010, and three `ok` readings of L at foreign 0:
+# 10 s from 995 to 1005 (inside the episode), 20 s from 1020 to 1040 (after it), 30 s from 970 to 1000
+# (it TOUCHES the episode's start, which is the instant a held leg dispatched). Every count PINNED.
+PZ_T=$(mktemp -d)
+mkdir -p "$PZ_T/${PFX}${KIT}" "$PZ_T/.git/gate-run/r1"
+cp "$ROOT/${PFX}${KIT}/derive-ceilings.py" "$ROOT/${PFX}${KIT}/ceiling-margin.txt" "$PZ_T/${PFX}${KIT}/" \
+  || { echo "evidence-test: cannot copy the ceiling kit for the pause arms"; exit 2; }
+( cd "$PZ_T" && git init -q -b main . ) >/dev/null 2>&1
+printf '%s\n' '[' '  {"name": "L", "argv": ["true"], "ceiling": 300}' ']' > "$PZ_T/${PFX}gate-legs.json"
+printf '1000\t1010\t10\t95\t90\tfell\n' > "$PZ_T/.git/gate-run/r1/pauses"
+{ printf 'L\tok\t0\t10.0\t995000000000\t1005000000000\t-\t0\n'
+  printf 'L\tok\t0\t20.0\t1020000000000\t1040000000000\t-\t0\n'
+  printf 'L\tok\t0\t30.0\t970000000000\t1000000000000\t-\t0\n'; } > "$PZ_T/.git/gate-run/r1/1.leg"
+pz_rep=$( cd "$PZ_T" && "$DC_PY" "$PZ_T/${PFX}${KIT}/derive-ceilings.py" --report 2>&1 )
+printf '%s\n' "$pz_rep" | awk -F'\t' '$1 == "L" && $2 == "30.0" && $3 == "2" && $NF == "1" { f = 1 } END { exit !f }' \
+  && ok "AC10 L reads a max of 30.0 from 2 readings with 1 set aside: the overlapping one, not the one touching the edge" \
+  || { nope "AC10 L's row admits the reading taken during the pause, or sets aside the one touching its start"; printf '%s\n' "$pz_rep" | sed 's/^/      /'; }
+printf '%s\n' "$pz_rep" | grep '^# set aside:' | grep -q '[^0-9]1 paused' \
+  && ok "AC10 the set-aside line names 1 paused" \
+  || { nope "AC10 the set-aside line does not name 1 paused"; printf '%s\n' "$pz_rep" | sed 's/^/      /'; }
+rm -rf "$PZ_T"
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "run-gates evidence: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }

@@ -24,7 +24,8 @@ holds a floor under its ceiling for good. The runner therefore stamps each row's
 `foreign`, from a census of the process table taken while the leg ran: `0` when it found none, a
 positive count when it found some, `unknown` when it could not see. `read_runs` admits a row only
 when that field reads `0`, and sets every other one aside under the first reason in `ASIDE_REASONS`
-that fits it: a positive count is `contended`, and anything else, a seven-field row written before
+that fits it: a positive count is `contended`, a leg that ran while its run's memory pause held a
+dispatch is `paused` (TOOL-aGraftedHelix-7), and anything else, a seven-field row written before
 the census existed included, is `uncensused`. `--report` and `--write` say how many they set aside,
 because a reading withheld silently is a probe that reads zero. WHAT THE CENSUS CANNOT SEE: load not
 shaped like this repository's gate work, and on Windows any process no MSYS shell spawned, so a `0`
@@ -113,10 +114,12 @@ CEILING_WINDOW_S = 5 + 30
 RUNNER_SOURCE = "runner"
 
 # WHY A READING THE ADMISSION RULE ADMITTED STILL ARGUES NO CEILING, in first-match order: a `foreign`
-# field holding a positive count is `contended`, and anything but `0` after that is `uncensused`. A
+# field holding a positive count is `contended`; a leg that ran while one of its own run's memory
+# pause episodes was open is `paused` (TOOL-aGraftedHelix-7), because used memory sat above the
+# threshold and the reading ran contended; and anything but `0` after that is `uncensused`. A
 # later reason is inserted where its precedence puts it, and every reader prints the counts by
 # walking this tuple, so a new reason reaches every report without a second list to keep in step.
-ASIDE_REASONS = ("contended", "uncensused")
+ASIDE_REASONS = ("contended", "paused", "uncensused")
 
 
 def resolve_repo_root() -> pathlib.Path:
@@ -169,6 +172,25 @@ def read_margin() -> tuple[int, float, str]:
                 continue
     sys.exit(f"derive-ceilings: {MARGIN_FILE.name} declares no "
              f"<floor seconds>, tab, <fraction> row")
+
+
+def read_pauses(run_dir: str) -> list[tuple[int, int]]:
+    """One run's memory pause episodes, `(started, ended)` in epoch seconds, from its `pauses` file.
+
+    A row is `<started> TAB <ended> TAB <held> TAB <peak> TAB <threshold> TAB <ended-by>`, written by
+    the runner's `write_pause_row`; a row that is not six fields with numeric stamps is skipped, and
+    a run with no file had no episode. TOOL-aGraftedHelix-7.
+    """
+    try:
+        txt = pathlib.Path(run_dir, "pauses").read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return []
+    out = []
+    for line in txt.splitlines():
+        p = line.split("\t")
+        if len(p) == 6 and p[0].isascii() and p[0].isdigit() and p[1].isascii() and p[1].isdigit():
+            out.append((int(p[0]), int(p[1])))
+    return out
 
 
 def read_runs(gd: pathlib.Path, legs: dict, reset) -> tuple[dict, dict]:
@@ -238,6 +260,7 @@ def read_runs(gd: pathlib.Path, legs: dict, reset) -> tuple[dict, dict]:
     per: dict[str, list[float]] = {}
     aside: dict[str, dict[str, int]] = {}
     reset = set(reset or ())
+    pauses: dict[str, list[tuple[int, int]]] = {}
     for f in glob.glob(str(gd / "gate-run" / "*" / "*.leg")):
         try:
             txt = pathlib.Path(f).read_text(encoding="utf-8", errors="replace")
@@ -264,9 +287,20 @@ def read_runs(gd: pathlib.Path, legs: dict, reset) -> tuple[dict, dict]:
             # foreign gate work beside the leg, and `unknown`, junk or a seven-field row is a
             # reading nobody graded, which is not known faithful.
             foreign = p[7].strip() if len(p) >= 8 else ""
-            if foreign != "0":
+            # THE MEMORY PAUSE, second in first-match order: the leg's own start and end, divided
+            # down from nanoseconds, STRICTLY overlap an episode of its own run. Touching an edge is
+            # not paused: an episode ends at the instant its waiting leg dispatched.
+            run_dir = os.path.dirname(f)
+            if run_dir not in pauses:
+                pauses[run_dir] = read_pauses(run_dir)
+            paused = False
+            if pauses[run_dir] and len(p) >= 6 and p[4].isascii() and p[4].isdigit() \
+                    and p[5].isascii() and p[5].isdigit():
+                s, e = int(p[4]) / 1e9, int(p[5]) / 1e9
+                paused = any(s < b and e > a for a, b in pauses[run_dir])
+            if foreign != "0" or paused:
                 why = ("contended" if foreign.isascii() and foreign.isdigit() and int(foreign) > 0
-                       else "uncensused")
+                       else "paused" if paused else "uncensused")
                 counts = aside.setdefault(p[0], dict.fromkeys(ASIDE_REASONS, 0))
                 counts[why] += 1
                 continue

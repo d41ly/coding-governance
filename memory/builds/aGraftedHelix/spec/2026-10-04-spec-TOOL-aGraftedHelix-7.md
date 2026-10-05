@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-7 — the gate runner stops dispatching legs above a declared memory fraction and records the pause
 
-**Status:** SPECCED · rev-4 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 8 · ratified 2026-10-04
+**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 8 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
