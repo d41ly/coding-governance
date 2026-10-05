@@ -3678,6 +3678,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "extract_section_ref",
+      "kind": "function",
+      "file": "tools/workflows/review_replay.py"
+    },
+    {
       "id": "extract_segments",
       "kind": "function",
       "file": "tools/runlog/extract.py"
@@ -3689,6 +3694,11 @@
     },
     {
       "id": "extract_stated_count",
+      "kind": "function",
+      "file": "tools/workflows/review_replay.py"
+    },
+    {
+      "id": "extract_subject_pins",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
     },
@@ -4589,6 +4599,11 @@
     },
     {
       "id": "measure_recall",
+      "kind": "function",
+      "file": "tools/workflows/review_replay.py"
+    },
+    {
+      "id": "measure_replay",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
     },
@@ -5936,6 +5951,11 @@
       "id": "read_record_copies",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_record_kind",
+      "kind": "function",
+      "file": "tools/workflows/review_replay.py"
     },
     {
       "id": "read_records",

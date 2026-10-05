@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-10 — `review_replay.py` scores a spec-audit report against a past one by file and section
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 028b5cac · streams tooling · order 6
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 028b5cac · streams tooling · order 6 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
