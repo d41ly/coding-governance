@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aGraftedHelix-26-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aGraftedHelix-26-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
