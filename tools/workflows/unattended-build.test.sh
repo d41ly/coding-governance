@@ -1429,6 +1429,13 @@ same   "EL5-AC10 a sibling of repo sharing its prefix proceeds" "$(printf '%s\n'
 hdr=$(sed -n '/^\/\/ --- inputs (via Workflow `args`)/,/^\/\/ }$/p' "$F")
 has    "EL5-AC8 the args header documents prevSubjects" "$hdr" '//   prevSubjects:'
 has    "EL5-AC8 the args header documents priorFindings" "$hdr" '//   priorFindings:'
+ad=$(grep -m1 "title: 'Audit'" "$F")
+for el5 in '`context`' '`specs`' '`checklist`' '`scratch`'; do
+  has  "EL5-AC8 the meta Audit phase detail names $el5" "$ad" "$el5"
+done
+cl=$(grep '^const AUDIT_CHECKLIST = ' "$F")
+has    "EL5-AC8 the render spells the --for-paths command" "$cl" 'gotchas.py --for-paths'
+hasnt_ "EL5-AC8 ...with no render token left on its line" "$cl" '{{'
 
 # ---- F (id 16): an UNVERIFIED finding the stage judges not a defect has a route. `refuted` is
 # ---- optional, bounded by `unverified`, in the sum, and the severity floors stand.
@@ -1868,7 +1875,7 @@ fi
 # `n=$((n+1))` sites — the PV-AC12 branch's among them, the one region that can SKIP — are not in
 # the static count, so it is a LOWER bound on what a green run executes. Lower it in a reviewed
 # diff or not at all.
-FLOOR_ASSERTIONS=348
+FLOOR_ASSERTIONS=354
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The
