@@ -53,6 +53,10 @@ owner's four answers.
   an edit to one, do NOT stop: build everything else, leave the spec SPECCED, and return the exact edit
   (file, old line, new line) as a need. The main loop applies it in a records commit and closes you.
 - **New ids are the main loop's.** A pass never mints an id. If your spec needs one, return the need.
+- **Every text-mode IO call you add names its encoding** (`encoding="utf-8"` on `open`, and on any
+  `subprocess` call with `text=True`). `tools/gate-lint/encoding_posture.py` grades it and its registry
+  may only fall; run `python tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills`
+  before committing. Edit tracked files in BYTES or with the Edit tool: working copies here are CRLF.
 - **Scratch** is the session scratchpad your grounding sentence names; a clone or fixture repository
   goes under `%TEMP%/<short-name>`.
 - **Windows host.** Author files with the Write/Edit tools; bash heredocs and python text mode corrupt
