@@ -12,8 +12,10 @@
 ## What the close owes
 
 The `tier2-review self-test` leg was not run in this pass. Its appendix header pin moved to nine
-columns, a new arm asserts the `classes` field and cells, and its assertion floor rose 180 to 181;
-only `node --check` over the extracted runner was run, which proves it parses and nothing more. The
+columns, a new arm asserts the `classes` field and cells, and its assertion floor rose 180 to 181.
+The extracted runner was only PARSED, through the `AsyncFunction` constructor rather than
+`node --check` (the node-check gotcha), and that parse was observed red on a staged break inside the
+new arm. A clean parse proves nothing about the arm's assertions. The
 `workflow script syntax`, `review-protocol parity (kit vs dogfood)`, `review-replay selftest`,
 `lexicon naming predicates` and `codebase-map coverage + freshness` legs are the close's too. S6 is
 observed only by this build's closing diff review, the first live run to write a record.
