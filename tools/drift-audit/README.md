@@ -140,6 +140,7 @@ never is.
 | `cutoff_keys_armed` | how many `_CUTOFF` keys carry a non-blank value across the tracked root-level `.<name>.conf` files? `of` counts every such assignment. | only where `PINS` declares it |
 | `source_cited_ids_resolving_to_no_record` | does every id cited in tracked source resolve to a record, an anchor line under the memory root or a spec's own H1? | no |
 | `dossiers_older_than_their_paths` | how many codebase-map feature dossiers are older than their paths — a commit touching a path the dossier claims is not an ancestor of the dossier's own last commit? Read from the map kit's own `map_diff.py --stale-dossiers --json`, so the attribution is spelled once; map-root paths are never a claim, and a merge commit carries no paths, so a change made only in a conflict resolution is not seen. The detail is the refresh worklist, most-behind first. Not asked where the map kit is absent or unadopted; DEAD PROBE on a shallow clone or when nothing touched a claimed path. | no |
+| `live_builds_without_activity` | how many live builds are dormant? Counts the `dormant` cells of the `Activity` column the memory-tree generator renders into `LIVE.md` against its `LIVE_DORMANT_DAYS`, found by header name, and defines no dormancy rule of its own; `of` counts the `active` and `dormant` rows, any other cell is unjudgeable, and the detail names each dormant build with its `Last record`. Not asked where `LIVE.md` or its `Activity` column is absent. | no |
 
 ### Armed cutoff keys are a budget
 

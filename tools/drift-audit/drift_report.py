@@ -2694,6 +2694,58 @@ def build_stale_dossiers(ctx) -> dict:
             "unjudgeable": 0, "detail": detail}
 
 
+# --------------------------------------------------------------------------------------------
+# TOOL-aMendedFleet-54 — live builds nobody is working, read from the index generator's own render
+#
+# The dormancy RULE is the memory-tree generator's (`LIVE_DORMANT_DAYS`, its `Activity` column), and
+# this signal defines none of its own: it counts the cells that render wrote, exactly as the backlog
+# signals count the generator's ask projection. The column is found BY HEADER NAME, so a column
+# appended after it moves nothing. REPORT-ONLY and pinless: a dormant build is a state to read, and a
+# ceiling on a count that moves with the calendar would red a tree nobody touched.
+# --------------------------------------------------------------------------------------------
+
+def build_live_builds_without_activity(ctx) -> dict:
+    """Dormant rows of `<memory root>/LIVE.md`'s table; a cell neither `active` nor `dormant` is
+    UNJUDGEABLE, never active. No file, or a table with no `Activity` header, is NOT ASKED."""
+    name = "live_builds_without_activity"
+    rel = f"{ctx.memory_root}/LIVE.md"
+    try:
+        lines = (ctx.root / rel).read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return _build_not_asked(name, f"no {rel}; the memory-tree index is not rendered here")
+    start = next((i for i in range(len(lines) - 1) if lines[i].lstrip().startswith("|")
+                  and re.fullmatch(r"\|?[\s:|-]+\|?", lines[i + 1].strip() or "x")), None)
+    header = ([c.strip() for c in lines[start].strip().strip("|").split("|")]
+              if start is not None else [])
+    if "Activity" not in header:
+        return _build_not_asked(name, f"{rel} carries no table with an Activity column; "
+                                      "a blank LIVE_DORMANT_DAYS renders none, so dormancy is not asked")
+    col, last = header.index("Activity"), (header.index("Last record") if "Last record" in header else None)
+    dormant, active, unjudgeable, detail = 0, 0, 0, []
+    for line in lines[start + 2:]:
+        if not line.lstrip().startswith("|"):
+            break
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        state = cells[col] if col < len(cells) else ""
+        if state == "active":
+            active += 1
+        elif state == "dormant":
+            dormant += 1
+            link = re.search(r"\[([^\]]+)\]", cells[0])
+            row = {"build": link.group(1) if link else cells[0]}
+            if last is not None and last < len(cells):
+                row["last_record"] = cells[last]
+            detail.append(row)
+        else:
+            unjudgeable += 1
+            detail.append({"note": f"unjudgeable Activity cell {state!r}: {line.strip()[:160]}"})
+    return {"signal": name, "value": dormant, "of": dormant + active, "tolerance": None,
+            "gateable": False,
+            # A table with the column and no judgeable row cannot move this count.
+            "live": dormant + active > 0,
+            "unjudgeable": unjudgeable, "detail": detail}
+
+
 SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
@@ -2708,7 +2760,8 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            build_nonterminal_merged_runs,
            measure_legs_retried_after_timeout,
            build_remote_ci_red_streak,
-           build_stale_dossiers]
+           build_stale_dossiers,
+           build_live_builds_without_activity]
 
 
 # --------------------------------------------------------------------------------------------

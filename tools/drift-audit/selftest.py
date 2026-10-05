@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 345
+CHECK_FLOOR = 352
+# 345 -> 352, TOOL-aMendedFleet-54: the seven checks of `test_live_builds_without_activity`.
 # 330 -> 339, TOOL-aMendedFleet-52: the nine checks of `test_handkept_name_sets`.
 # 339 -> 345, TOOL-aMendedFleet-53: the six checks of `test_auto_memory_pointers`.
 # 327 -> 330, TOOL-aMendedFleet-51: the readme-drift all-CLOSED arm and the two pinless checks.
@@ -2857,6 +2858,54 @@ def test_stale_dossiers(tmp: pathlib.Path) -> None:
           got["absent"].get("not_asked") is True, f"got {got['absent']}")
 
 
+def test_live_builds_without_activity(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-54: `live_builds_without_activity` counts the `dormant` cells of the
+    rendered LIVE.md table by header name, and its not-asked and dead states."""
+    import types
+    print("live builds without activity (fixture LIVE.md tables)")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    r = tmp / "live-activity"
+    (r / "mem").mkdir(parents=True)
+    ctx = types.SimpleNamespace(root=r, memory_root="mem")
+
+    def read(*rows, head="| Build | Status | Last record | Activity |"):
+        body = "\n".join([head, "|" + "---|" * (head.count("|") - 1)] + list(rows))
+        (r / "mem" / "LIVE.md").write_text(f"# LIVE\n\nprose\n\n{body}\n\ntrailer\n",
+                                           encoding="utf-8", newline="\n")
+        return dr.build_live_builds_without_activity(ctx)
+
+    three = ("| [bOne](builds/bOne/README.md) | SPECCED | 2026-08-01 | dormant |",
+             "| [bTwo](builds/bTwo/README.md) | INPROGRESS | 2026-10-01 | active |",
+             "| [bSix](builds/bSix/README.md) | SPECCED | 2026-07-02 | dormant |")
+    got = read(*three)
+    check("live activity: two dormant rows of three read 2 of 3, live, report-only and pinless",
+          (got["value"], got["of"], got["live"], got["gateable"], got["tolerance"], got["unjudgeable"])
+          == (2, 3, True, False, None, 0), f"got {got}")
+    check("live activity: the detail names each dormant build and its last record",
+          got["detail"] == [{"build": "bOne", "last_record": "2026-08-01"},
+                            {"build": "bSix", "last_record": "2026-07-02"}], f"got {got['detail']}")
+    later = read(*(row + " 4 |" for row in three),
+                 head="| Build | Status | Last record | Activity | Landed-unclosed |")
+    check("live activity: a column placed after Activity moves nothing",
+          (later["value"], later["of"], later["detail"]) == (got["value"], got["of"], got["detail"]),
+          f"got {later}")
+    odd = read(three[0], three[1], three[2].replace("| dormant |", "| sleepy |"))
+    check("live activity: an unknown cell is unjudgeable, never active",
+          (odd["value"], odd["of"], odd["unjudgeable"]) == (1, 2, 1), f"got {odd}")
+    bare = read(*(row.rsplit("|", 2)[0] + "|" for row in three),
+                head="| Build | Status | Last record |")
+    check("live activity: a table without the Activity header is NOT ASKED naming the column",
+          bare.get("not_asked") is True and "Activity" in bare["detail"][0]["note"], f"got {bare}")
+    empty = read()
+    check("live activity: the column with no row is DEAD, not asked is not claimed",
+          empty["live"] is False and not empty.get("not_asked") and empty["value"] == 0, f"got {empty}")
+    (r / "mem" / "LIVE.md").unlink()
+    check("live activity: no LIVE.md is NOT ASKED",
+          dr.build_live_builds_without_activity(ctx).get("not_asked") is True)
+
+
 # ---------------------------------------------------------------------------------------------
 # TOOL-dLoggedFlight-13 — run records left non-terminal after their build merged
 # ---------------------------------------------------------------------------------------------
@@ -3401,6 +3450,7 @@ def main() -> int:
         test_auto_memory_pointers(tmp)
         test_cutoff_keys_armed(tmp)
         test_stale_dossiers(tmp)
+        test_live_builds_without_activity(tmp)
         test_backlog_stragglers(tmp)
         test_readme_mechanism_drift(tmp)
         test_declared_empty(tmp)

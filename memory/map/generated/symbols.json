@@ -1618,6 +1618,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "build_live_builds_without_activity",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_live_fixture",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -16419,6 +16424,11 @@
     },
     {
       "id": "test_live_backlog_rows",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_live_builds_without_activity",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
     },

@@ -230,7 +230,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-51 — report-only drift signals over a pin nobody drains print pinless, and `readme_mechanism_drift` reads live builds only](spec/2026-10-04-spec-TOOL-aMendedFleet-51.md) | 51 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-52 — the hand-kept signal compares the drift README's signal names against the names the engine reports](spec/2026-10-04-spec-TOOL-aMendedFleet-52.md) | 52 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-53 — the dangling-pointer signal reads the declared auto-memory directory and checks its backticked paths against the tracked tree](spec/2026-10-04-spec-TOOL-aMendedFleet-53.md) | 53 | 1 | CLOSED | rev-2 | 2026-10-04 |
-| [TOOL-aMendedFleet-54 — drift reports `live_builds_without_activity` from the dormant rows LIVE.md renders](spec/2026-10-04-spec-TOOL-aMendedFleet-54.md) | 54 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-54 — drift reports `live_builds_without_activity` from the dormant rows LIVE.md renders](spec/2026-10-04-spec-TOOL-aMendedFleet-54.md) | 54 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-55 — drift reports `open_asks_cited_by_product_source`, report-only](spec/2026-10-04-spec-TOOL-aMendedFleet-55.md) | 55 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-56 — gateable stable-key drift signals are bounded by a shrink-only set of offender ids instead of a count](spec/2026-10-04-spec-TOOL-aMendedFleet-56.md) | 56 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-57 — shrink-only lists are graded against their low-water mark](spec/2026-10-04-spec-TOOL-aMendedFleet-57.md) | 57 | 1 | SPECCED | rev-2 | 2026-10-04 |

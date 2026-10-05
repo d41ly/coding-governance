@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-54 — drift reports `live_builds_without_activity` from the dormant rows LIVE.md renders
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 54
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 54
 
 <!-- gen:spec-records -->
 
