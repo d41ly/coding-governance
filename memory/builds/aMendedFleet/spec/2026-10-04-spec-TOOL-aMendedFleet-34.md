@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-34 — recall measures offline whether an answer was used, from the query log and the worktree's next commit
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes TOOL-aWeighedCompass-11 · order 34
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes TOOL-aWeighedCompass-11 · order 34
 
 <!-- gen:spec-records -->
 
@@ -26,8 +26,9 @@ supersedes the ask to widen the opened hook, as the review's plan says.
   admin directory under the common git dir's `worktrees/` whose `gitdir` file names that worktree,
   or the common dir's own `logs/HEAD` when the row names the primary tree. The NEXT commit is the
   first reflog entry whose message opens `commit` and whose timestamp is at or after the row's
-  `at`. A row with no reflog to read is UNATTRIBUTED and counted in a bucket of its own. Observed
-  by AC1, AC2.
+  `at`. A row with no reflog to read is UNATTRIBUTED and counted in a bucket of its own, and so is a
+  row older than its reflog's FIRST entry: that reflog belongs to a later tree at the same path, or
+  was expired past the row, so its next commit is not this row's. Observed by AC1, AC2.
 - **S3** — CITATION. The distinct next commits are read in ONE `git log --no-walk` call carrying
   their message and zero-context patch; a commit's cited set is every id the kit's own id grammar
   finds in the message and in its added lines. Observed by AC1.
@@ -190,6 +191,11 @@ New arm: tools/memory-recall/selftest.py · the AC1 fixture, staged red by remov
   code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
   §3 Edges also names `TOOL-aMendedFleet-82` for the `head` field, which it called
   `external`, and the §7 arm line moves `SELFTEST_ARMS`, as `TOOL-aMendedFleet-27` S5 does.
+- rev-3 · 2026-10-05 · §2 S2 · the build's bug-class checklist named a location join that
+  outlives its subject: a worktree path is reused, and a reflog's old entries expire, so S2's
+  first-commit-after rule alone credited a row with a later tree's commit. A row older than its
+  reflog's first entry is unattributed. S4's "spell" is read as a whole id or slug token, not a
+  substring, so an id is not held by a row spelling a longer id that begins with it.
 
 ## 10. Reuse audit
 

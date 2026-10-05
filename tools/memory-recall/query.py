@@ -1296,23 +1296,26 @@ def measure_answer_used(repo: pathlib.Path) -> int:
         except (KeyError, TypeError, ValueError):
             at = None
         if wt and wt not in reflogs:
-            entries = []
             path = resolve_worktree_reflog(common, wt)
+            entries = None
             if path is not None:
+                # (timestamp, new sha, is a commit) per line; the FIRST line dates the tree itself.
+                entries = []
                 for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
                     head, _, msg = line.partition("\t")
                     parts = head.split(" ")
-                    if msg.startswith("commit") and len(parts) >= 4:
-                        try:
-                            entries.append((int(parts[-2]), parts[1]))
-                        except ValueError:
-                            continue
-            reflogs[wt] = entries if path is not None else None
+                    try:
+                        entries.append((int(parts[-2]), parts[1], msg.startswith("commit")))
+                    except (IndexError, ValueError):
+                        continue
+            reflogs[wt] = entries
         entries = reflogs.get(wt) if wt else None
-        if entries is None or at is None:
+        # A row older than the reflog's first entry ran in an earlier tree at this path, or its
+        # entries expired: the join key outlived its subject, so the row is not attributed.
+        if not entries or at is None or entries[0][0] > at:
             unattributed += 1
             continue
-        nxt = next((sha for ts, sha in entries if ts >= at), None)
+        nxt = next((sha for ts, sha, is_commit in entries if is_commit and ts >= at), None)
         if nxt is None:
             no_commit += 1
             continue
@@ -1330,12 +1333,15 @@ def measure_answer_used(repo: pathlib.Path) -> int:
     for row, ranked, sha in pending:
         subject, ids = cited.get(sha, ("", set()))
         # The caller already held an id its own question or terms spell, or one from the build its
-        # commit's subject names, so citing it says nothing about the answer.
-        held = " ".join([str(row.get("query") or ""), *map(str, row.get("terms") or [])])
+        # commit's subject names, so citing it says nothing about the answer. WHOLE tokens, never
+        # substrings: `TOOL-aFoo-1` is not held by a row spelling `TOOL-aFoo-12`.
+        held = set(E.ID_RE.findall(" ".join([str(row.get("query") or ""),
+                                              *map(str, row.get("terms") or [])])))
+        words = set("".join(c if c.isalpha() else " " for c in subject).split())
         for rank, rid in enumerate(ranked, 1):
-            parts = rid.split("-")
-            slug = parts[1] if len(parts) == 3 and parts[1].isalpha() else None
-            if rid in ids and rid not in held and not (slug and slug in subject):
+            seg = rid.split("-")
+            slug = seg[1] if len(seg) == 3 and seg[1].isalpha() else None
+            if rid in ids and rid not in held and slug not in words:
                 used += 1
                 hist[rank] += 1
                 break

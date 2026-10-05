@@ -167,8 +167,9 @@ SELFTEST_ARMS = 81
 #   last-query order inverts their built_at order, a husk worktree with no .git, and the query-log
 #   reader with its empty-map fallback to built_at order.
 # 80 -> 81 on 2026-10-05 (TOOL-aMendedFleet-34): ONE arm, `--used` over a linked-worktree fixture -
-#   a rank-2 citation counts, an id the row's own terms spell does not, a reflog-less row is
-#   unattributed, an absent log and an all-unattributed log both exit 2, and the log is unchanged.
+#   a rank-2 citation counts, an id the row's own terms spell does not (a longer id containing it
+#   does not hold it), a reflog-less row and a row older than its reflog are unattributed, an absent
+#   log and an all-unattributed log both exit 2, and the log is unchanged.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -3216,7 +3217,9 @@ def test_spec_h1_record_outranks_a_citation():
 def test_used_joins_answers_to_the_next_commit():
     """TOOL-aMendedFleet-34 AC1, AC3, AC4. Row 1's rank-2 id is cited by the linked worktree's next
     commit; row 2's only cited id is in its own terms, so the caller already held it; row 3 names a
-    worktree with no reflog. Observed RED as `2 of 2` with the terms exclusion removed."""
+    worktree with no reflog, and row 4 predates the linked worktree's reflog. Observed RED as `2 of 2`
+    with the terms exclusion removed, as `0 of 2` with it tested as a substring, and as `2 of 3` with
+    the first-entry guard removed."""
     root, kitdir = make_repo()
     wt = root.parent / (root.name + "-wt")
     try:
@@ -3229,15 +3232,19 @@ def test_used_joins_answers_to_the_next_commit():
         subprocess.run([*git, "worktree", "add", "-q", "-b", "wt", str(wt)], check=True, capture_output=True)
         log.parent.mkdir(parents=True, exist_ok=True)
         gone = root.parent / (root.name + "-gone")
-        # (worktree, terms, result ids in rank order) per row.
-        rows = [(gone, [], ["TOOL-aFoo-2"]),
-                (wt, ["x"], ["TOOL-aFoo-1", "TOOL-aFoo-2"]),
-                (wt, ["TOOL-aBar-3"], ["TOOL-aBar-3"]),
-                (gone, [], ["TOOL-aFoo-2"])]
-        lines = [json.dumps({"qid": n, "at": "2000-01-01T00:00:00+00:00", "type": "query",
+        now = datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds")
+        old = "2000-01-01T00:00:00+00:00"  # older than wt's reflog: an earlier tree at that path
+        # (worktree, at, terms, result ids in rank order) per row. Row 1's terms hold `TOOL-aFoo-23`,
+        # which CONTAINS `TOOL-aFoo-2` as a substring and is not that id.
+        rows = [(gone, now, [], ["TOOL-aFoo-2"]),
+                (wt, now, ["TOOL-aFoo-23"], ["TOOL-aFoo-1", "TOOL-aFoo-2"]),
+                (wt, now, ["TOOL-aBar-3"], ["TOOL-aBar-3"]),
+                (gone, now, [], ["TOOL-aFoo-2"]),
+                (wt, old, [], ["TOOL-aFoo-2"])]
+        lines = [json.dumps({"qid": n, "at": at, "type": "query",
                              "query": "q", "terms": terms, "worktree": str(w),
                              "results": [{"set": "records", "id": i} for i in ids]}) + "\n"
-                 for n, (w, terms, ids) in enumerate(rows, 1)]
+                 for n, (w, at, terms, ids) in enumerate(rows, 1)]
         log.write_text(lines[0], encoding="utf-8", newline="\n")
         p = run(root, kitdir, "--used")
         assert p.returncode == 2 and "not measured" in p.stderr, (
@@ -3251,7 +3258,7 @@ def test_used_joins_answers_to_the_next_commit():
         p = run(root, kitdir, "--used")
         out = p.stdout
         assert p.returncode == 0 and "answer-used: 1 of 2" in out, f"wrong figure: {out}{p.stderr}"
-        assert "of 3 query rows: 1 unattributed" in out and " 2:1 " in out, f"wrong buckets: {out}"
+        assert "of 4 query rows: 2 unattributed" in out and " 2:1 " in out, f"wrong buckets: {out}"
         assert hashlib.sha256(log.read_bytes()).hexdigest() == before, "--used wrote to the log"
         for t in (root, wt):
             st = subprocess.run(["git", "-C", str(t), "status", "--porcelain"],
