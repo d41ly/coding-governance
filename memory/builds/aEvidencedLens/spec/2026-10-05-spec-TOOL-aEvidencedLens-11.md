@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-11 — the method, the memory-tree README, the Skill, the verbs entry and a decision record state what units 1 to 9 built
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-1 · base 028b5cac · streams tooling · order 8
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 028b5cac · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -203,7 +203,9 @@ Under 300 bytes, the cap every row of the file meets. The id is the main loop's 
   `2026-10-05` and is at most 300 bytes.
   Red when: the ratified row is edited, or the ruling lives only in this build's prompt record.
 - **AC6** — When `git grep -nIiE 'MEDIUM or LOW is FOLDED|FOLDED into the spec|four lenses|ACCEPTED there, never|is ACCEPTED, never required'`
-  runs with the exclusions of §4's grep, it prints nothing.
+  runs with the exclusions of §4's grep plus `':!memory/gotchas'`, it prints no line in a file this
+  unit owns, and every line it prints in a file another unit owns is listed in this unit's
+  acceptance ledger as returned to the main loop.
   Red when: any carrier still states the fold for a spec subject or the four-lens count. A hit in a
   file another unit owns is returned to the main loop, not fixed in this pass.
 
@@ -225,6 +227,10 @@ none
   term adds every UNVERIFIED finding the disposal promoted, as unit 8 counts it. Id 45 (MEDIUM, its
   unit-11 half): S1 keeps M4's chain sentence unchanged, consistent with unit 8 §8 F3 parking the
   generation bound.
+- rev-3 · 2026-10-05 · AC6 · build pass. AC6 as written could not pass on a correct build: its grep
+  hits the two gotchas §4 says describe history and stay, and S6 routes a hit in another unit's file
+  to the ledger rather than to an empty output. AC6 now excludes `memory/gotchas` and reads S6's
+  ledger route.
 
 ## 10. Reuse audit
 
