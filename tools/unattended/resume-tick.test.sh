@@ -797,6 +797,36 @@ check_miss "$OUT" "skip · verdict LIVE" "GH1 AC12 ...and never falls to the gen
 n12=$(git --git-dir="$G12" log -1 --format=%B refs/gov/runs/tRun | sed -n 's/^beat-utc: //p')
 check_same "GH1 AC12 the claim's beat moved off the seeded one" "$([ -n "$n12" ] && [ "$n12" != "$(git --git-dir="$G12" log -1 --format=%B "$G12_C" | sed -n 's/^beat-utc: //p')" ] && echo moved || echo unmoved)" "moved"
 rm -rf "$G12"
+
+# ---- TOOL-aGraftedHelix-11 AC1: the tick runs `--beat` with NO session id, as the OS scheduler
+# ---- launches it, and the claim it renews, then the one it creates over an empty remote, carries the
+# ---- LEASE's identity: the record's session, keepalive, host and lease-utc. Between the two, the
+# ---- holder's own --resume under the lease's session and pid reads that claim as its own. The record
+# ---- carries every lease fact, so each comparison has a value to miss. RED against a driver whose
+# ---- claim write reads the session back from the environment: `absent`, then check 90.
+CONF_EXTRA="$(printf 'RESUME_STALE_BOUND="1800"\nRUN_CLAIMS="on"')" build_fixture 999999999
+G11="$GITTMP/rt-origin11.git"; rm -rf "$G11"; git init -q --bare "$G11"
+G11_HOST=$(read_host_name)
+( cd "$FX" && sed -i "s/^phase: BUILDING\$/phase: BUILDING\nkeepalive: kT\nhost: $G11_HOST\nlease-utc: $OLD_UTC/" memory/builds/tRun/RUN.md \
+    && git add -A && GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q --amend --no-edit && git remote add origin "$G11" )
+G11_C=$(GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t.test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t.test git --git-dir="$G11" commit-tree "$(git --git-dir="$G11" mktree </dev/null)" -m "$(printf 'gov-claim tRun\n\nslug: tRun\nnode: n\nhost: h\nsession: %s\nkeepalive: kT\nstatus: live\nlease-utc: %s\nbeat-utc: %s' "$SID" "$OLD_UTC" "$(date -u -d "@$(( $(date -u +%s) - 1000 ))" +%Y-%m-%dT%H:%M:%SZ)")")
+git --git-dir="$G11" update-ref refs/gov/runs/tRun "$G11_C"
+mkdir -p "$FX_GITDIR/gate-logs" && touch -d '+5 minutes' "$FX_GITDIR/gate-logs/leg.log"
+G11_SID=${CLAUDE_CODE_SESSION_ID-}; unset CLAUDE_CODE_SESSION_ID
+run_tick_over "$TICK"
+check_hit  "$OUT" "resume-tick: tRun · $FX · beat · unattended: beat — tRun · renewed " "GH11 AC1 the tick with no session id renews the run's claim"
+check_same "GH11 AC1 ...under the lease's session, never absent" "$(git --git-dir="$G11" log -1 --format=%B refs/gov/runs/tRun | sed -n 's/^session: //p')" "$SID"
+G11_OUT=$(cd "$FX" && CLAUDE_CODE_SESSION_ID="$SID" CLAUDE_PID=999999999 bash "$KIT/unattended.sh" --resume tRun --keepalive-id kT 2>&1); G11_RC=$?
+check_same "GH11 AC1 the holder's resume under the lease's session exits 0" "$G11_RC" "0"
+check_miss "$G11_OUT" "UNATTENDED check 90 FAILED" "GH11 AC1 ...and reads the claim the tick wrote as its own"
+git --git-dir="$G11" update-ref -d refs/gov/runs/tRun
+run_tick_over "$TICK"
+check_hit  "$OUT" "resume-tick: tRun · $FX · beat · unattended: beat — tRun · renewed " "GH11 AC1 the tick with no session id creates a claim over an empty remote"
+check_same "GH11 AC1 the created claim names the lease's session, keepalive, host and lease-utc" \
+  "$(git --git-dir="$G11" log -1 --format=%B refs/gov/runs/tRun | sed -n -e 's/^host: //p' -e 's/^session: //p' -e 's/^keepalive: //p' -e 's/^lease-utc: //p' | tr '\n' ' ')" \
+  "$G11_HOST $SID kT $OLD_UTC "
+[ -z "$G11_SID" ] || export CLAUDE_CODE_SESSION_ID="$G11_SID"
+rm -rf "$G11"
 rm -rf "$U65_CFG"
 
 # ---- AC12: the two announced skips of the walk. A driver whose --liveness exits non-zero is a dead
@@ -971,7 +1001,11 @@ n=$((pass+fail))
 # LIVE skip are retargeted to the beat row one for one. The pass that wrote it ran no suite; the
 # block was run alone over a replica of this prologue, against the kit and against a tick whose
 # LIVE row is the generic skip.
-FLOOR_ASSERTIONS=184
+# RAISED 184 -> 190 by TOOL-aGraftedHelix-11 AC1: the session-less beat block's 6 assertions after
+# the AC12 block, COUNTED off its own `check_*` lines, every one unconditional. The pass that wrote
+# it ran no suite; the block was run alone over a replica of this prologue, against the kit, against
+# a driver whose claim write reads the session from the environment, and against the parent's driver.
+FLOOR_ASSERTIONS=190
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 # THE TRAILER IS UNCONDITIONAL. `run-selftests.sh --pooled` reads a completed run by its trailer

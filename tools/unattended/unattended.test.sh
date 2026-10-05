@@ -12390,6 +12390,57 @@ git config --unset core.hooksPath; git remote set-head origin -d 2>/dev/null
 remove_claim_refs; rm -rf "$GK_HOOKS" "$GK_BIN"; rm -f "$GK_GD/pre-push-refusal"; reset_tree
 fi
 
+# ==================================================================================================
+# TOOL-aGraftedHelix-11 — A CLAIM WRITE COPIES ITS IDENTITY FROM THE LEASE RECORD. AC2: `--dispatch`
+# under another session id, as a Workflow child's is, pushes nothing while the beat is young and, with
+# the beat due, renews the claim under the LEASE's session. AC4: `--preflight` hands its claim write
+# and `write_lease` one stamp, so the claim's `lease-utc` is the record's byte for byte and the
+# holder's next `--resume` pushes nothing. A git shim holds the claim push past a second boundary, so
+# a take site whose `write_lease` reads its own clock differs every time rather than by chance. RED
+# against a driver whose claim write reads the session from the environment, and against one whose
+# `--preflight` hands `write_lease` no stamp. It reuses the claim block's gh_ helpers.
+# ==================================================================================================
+GI_BIN=$(mktemp -d); GI_GIT=$(command -v git)
+# ---- AC2
+build_claim_held
+mkdir -p memory/builds/tRun/spec
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add -A >/dev/null && git commit -q -m gi-spec --no-verify
+gi_sha=$(read_claim_ref tRun)
+out=$(CLAUDE_CODE_SESSION_ID=s-child run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh); rc=$?
+same "GH11 AC2 a child's dispatch under another session exits 0" "$rc" "0"
+hit  "$out" "dispatch declared"
+same "GH11 AC2 ...and with the beat young pushes nothing" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gi_sha"
+git add -A >/dev/null && git commit -q -m gi-dispatched --no-verify
+seed_claim tRun fixture-session k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+gi_sha=$(read_claim_ref tRun)
+out=$(CLAUDE_CODE_SESSION_ID=s-child run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh); rc=$?
+same "GH11 AC2 a child's dispatch with the beat due exits 0" "$rc" "0"
+n=$((n+1)); [ "$(read_claim_ref tRun)" != "$gi_sha" ] || { echo "FAIL GH11 AC2 a due beat was not renewed"; st=1; }
+same "GH11 AC2 ...under the lease's session, never the child's" "$(read_claim_field tRun session)" "$(sed -n 's/^session: //p' memory/builds/tRun/RUN.md)"
+# ---- AC4
+arm_claim_fixture
+cat > "$GI_BIN/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) "$GI_GIT" "\$@"; r=\$?; sleep 2; exit \$r ;; esac
+exec "$GI_GIT" "\$@"
+EOF
+chmod +x "$GI_BIN/git"
+out=$(PATH="$GI_BIN:$PATH" bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+rm -f "$GI_BIN/git"
+hit  "$out" "preflight OK"
+same "GH11 AC4 the claim's lease-utc is the record's byte for byte" "$(read_claim_field tRun lease-utc)" "$(sed -n 's/^lease-utc: //p' memory/builds/tRun/RUN.md)"
+git add -A >/dev/null && git commit -q -m gi-preflighted --no-verify
+gi_sha=$(read_claim_ref tRun)
+out=$(run --resume tRun --keepalive-id k1); rc=$?
+same "GH11 AC4 the holder's next resume exits 0" "$rc" "0"
+same "GH11 AC4 ...and pushes nothing while the beat is young" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gi_sha"
+rm -rf "$GI_BIN"; remove_claim_refs; reset_tree
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
 # ---- AC6: `--hold` refuses, numbered and before any record write, while a recorded bar is alive under
 # ---- a LIVE driver — this suite's own shell stands in for it — and proceeds once the bar has exited.
 init_pl_fixture
@@ -12839,7 +12890,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # region two, its three `mutate` calls included, MEASURED: that block run alone behind this prologue
 # and the claim block's gh_ helpers on node a, 2026-10-05, executed 46 against the prologue's own 20,
 # green against the kit and red under three staged driver breaks and one fixture break; no suite ran.
-FLOOR_ASSERTIONS=2033
+# RAISED 2033 -> 2045 by TOOL-aGraftedHelix-11: the lease-identity block's 12 executed assertions in
+# region two, its two `mutate` calls included, MEASURED: that block run alone behind this prologue
+# and the claim block's gh_ helpers on node a, 2026-10-05, executed 32 against the prologue's own 20,
+# green against the kit and red under two staged driver breaks and under the parent's driver; no
+# suite ran.
+FLOOR_ASSERTIONS=2045
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -12969,7 +13025,8 @@ FLOOR_SHARD_1=209
 # RAISED 1646 -> 1680: the same 34 region-two task-registry assertions, see FLOOR_ASSERTIONS.
 # RAISED 1680 -> 1810: the same 130 region-two run-claim assertions, see FLOOR_ASSERTIONS.
 # RAISED 1810 -> 1836: the same 26 region-two hooked claim assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1836
+# RAISED 1836 -> 1848: the same 12 region-two lease-identity assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1848
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

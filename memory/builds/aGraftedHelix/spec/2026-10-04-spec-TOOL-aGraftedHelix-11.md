@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-11 — a claim write copies its identity from the run's lease record, never from the writer's environment
 
-**Status:** SPECCED · rev-4 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 2 · ratified 2026-10-04
+**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 2 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
