@@ -5987,14 +5987,14 @@ rm -rf "$HK_D"
 # ONE call shape for the three: "$1" is the library's directory and "$2" the repository root.
 JR_CALL='. "$1/lib-unattended.sh"; resolve_generated_indexes "$2" "" memory'
 JR=$(mktemp -d)
-mkdir -p "$JR/one/kits/unattended" "$JR/one/kits/onegen"
-cp "$HERE/lib-unattended.sh" "$JR/one/kits/unattended/"
+mkdir -p "$JR/one/kits/drvkit" "$JR/one/kits/onegen"
+cp "$HERE/lib-unattended.sh" "$JR/one/kits/drvkit/"
 printf '[[generated]]\npath = "{memory_root}/ONE.md"\ngenerator = "g.sh"\n' > "$JR/one/kits/onegen/kit.toml"
 ( cd "$JR/one" && git init -q . && git config user.email t@t.test && git config user.name t \
   && git add -A && git commit -q -m one --no-verify && git worktree add -q -b w1 "$JR/w1" ) >/dev/null 2>&1
 JR_GD=$(git -C "$JR/w1" rev-parse --absolute-git-dir)
-jr_plain=$(cd "$JR/w1" && bash -c "$JR_CALL" _ "$JR/w1/kits/unattended" "$JR/w1" 2>/dev/null)
-jr_hook=$(cd "$JR/w1" && GIT_DIR="$JR_GD" bash -c "$JR_CALL" _ "$JR/w1/kits/unattended" "$JR/w1" 2>/dev/null)
+jr_plain=$(cd "$JR/w1" && bash -c "$JR_CALL" _ "$JR/w1/kits/drvkit" "$JR/w1" 2>/dev/null)
+jr_hook=$(cd "$JR/w1" && GIT_DIR="$JR_GD" bash -c "$JR_CALL" _ "$JR/w1/kits/drvkit" "$JR/w1" 2>/dev/null)
 same "the resolver in a linked worktree prints the fixture kit's row" "$jr_plain" "memory/ONE.md:kits/onegen/g.sh"
 same "the resolver with the worktree's GIT_DIR exported prints the same bytes" "$jr_hook" "$jr_plain"
 mkdir -p "$JR/two/other/twogen"
@@ -6003,16 +6003,16 @@ printf '[[generated]]\npath = "{memory_root}/TWO.md"\ngenerator = "g2.sh"\n' > "
   && git add -A && git commit -q -m two --no-verify ) >/dev/null 2>&1
 # A POSIX symlink first; on Windows a directory JUNCTION, as the codebase-map adopter's suite makes one.
 jr_link=0
-if ln -s "$JR/one/kits/unattended" "$JR/two/other/unattended" 2>/dev/null && [ -L "$JR/two/other/unattended" ]; then
+if ln -s "$JR/one/kits/drvkit" "$JR/two/other/drvkit" 2>/dev/null && [ -L "$JR/two/other/drvkit" ]; then
   jr_link=1
 elif command -v cygpath >/dev/null 2>&1 && command -v cmd >/dev/null 2>&1; then
-  rm -rf "$JR/two/other/unattended"
-  cmd //c mklink //J "$(cygpath -w "$JR/two/other/unattended")" "$(cygpath -w "$JR/one/kits/unattended")" >/dev/null 2>&1 || true
-  [ -f "$JR/two/other/unattended/lib-unattended.sh" ] && jr_link=2
+  rm -rf "$JR/two/other/drvkit"
+  cmd //c mklink //J "$(cygpath -w "$JR/two/other/drvkit")" "$(cygpath -w "$JR/one/kits/drvkit")" >/dev/null 2>&1 || true
+  [ -f "$JR/two/other/drvkit/lib-unattended.sh" ] && jr_link=2
 fi
 if [ "$jr_link" != 0 ]; then
   same "the resolver reached through a directory link reads the adopting repository's kits" \
-    "$(cd "$JR/two" && bash -c "$JR_CALL" _ "$JR/two/other/unattended" "$JR/two" 2>/dev/null)" "memory/TWO.md:other/twogen/g2.sh"
+    "$(cd "$JR/two" && bash -c "$JR_CALL" _ "$JR/two/other/drvkit" "$JR/two" 2>/dev/null)" "memory/TWO.md:other/twogen/g2.sh"
 else
   echo "  (TOOL-aGraftedHelix-27 link arm: this host made neither a symlink nor a junction, so the linked-kit half is unexercised)"
 fi
