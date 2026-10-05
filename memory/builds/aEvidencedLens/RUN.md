@@ -126,3 +126,5 @@ base: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 2026-10-05T02:44:34Z dispatch · item 877ebb69 TOOL-aEvidencedLens-13 · reason memory/builds/aEvidencedLens/build/2026-10-05-build-TOOL-aEvidencedLens-13-1-acceptance-ledger.md memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-13.md memory/builds/aEvidencedLens/README.md
 
 2026-10-05T02:46:31Z dispatch · item 5bb57077 TOOL-aEvidencedLens-13 · reason memory/builds/aEvidencedLens/build/2026-10-05-build-TOOL-aEvidencedLens-13-1-acceptance-ledger.md memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-13.md memory/builds/aEvidencedLens/README.md
+
+2026-10-05T02:51:57Z brief · item TOOL-aEvidencedLens-11 · reason db974413c41a memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-11-2-build-brief.md
