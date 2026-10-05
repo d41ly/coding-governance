@@ -320,7 +320,7 @@ PINS: dict[str, int] = {
     # `over pin` once it rises. The records are not named here, for the reason the non-terminal-specs
     # pin above gives: read the signal's own `detail`.
     "run_records_nonterminal_but_merged": 5,
-    # 447 — MEASURED at TOOL-aMendedFleet-15, after the prior unit's five dispositions. It stands in
+    # MEASURED at TOOL-aMendedFleet-15, after the prior unit's five dispositions. It stands in
     # for check 20's `SEVERITY_UNLABELLED_PIN`, which the backlog switch-over blanked because the
     # shard census reads a generated view as zero rows; this signal shipped with no pin, so it read
     # `over pin 0` on every run and a rise moved no number anybody was held to.
@@ -365,7 +365,7 @@ RATCHET_LOOKBACK = 14
 # module used to carry the literal again, so adding a row RAISED the carried-literal count and
 # tripped the ban on a kit file spelling paths. The rows need a repo-relative path because the
 # reader resolves it against the repo root, so this is the narrowest honest form: one name, used
-# four times, and adding a fifth row now costs nothing.
+# by every row that names this module, and adding another row costs nothing.
 #
 # DERIVED from this file's own location (TOOL-aRepatriatedFork-29 S6); see `_TOOLS` at the top.
 _THIS_FILE = _HERE.relative_to(_CHECKOUT).as_posix()
