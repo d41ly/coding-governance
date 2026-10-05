@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-46 — the replay harness measures which shortlist quantity predicts a reuse miss, before any miss signal ships
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 46
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 46
 
 <!-- gen:spec-records -->
 
@@ -107,6 +107,16 @@ Read at base `7af5f564`, whose bytes for every file below equal HEAD's at `fee9f
   the reachable population holds 274 phrases and only 11 misses, so its high readings rest on too
   few misses to qualify under S3. The verdict read `none qualifies`.
 
+- **AC4 evidence — the verdict at this unit's pass.** MEASURED 2026-10-05 on node a, with units 35,
+  36 and 41 landed, by `replay-phrases.py --predictors` on parent `d0e673fd2` plus this unit's diff
+  (the commit that closes this unit carries exactly that tree): 439 graded phrases, 372 hits, 67
+  misses, 31 with unreachable truth; the reachable population holds 408 phrases and 36 misses, so
+  it now clears S3's label floor and is refused on its AUCs instead. Readings, all then reachable:
+  `seed_coverage` 0.561 / 0.621, `best_overlap` 0.591 / 0.689, `union_coverage` 0.561 / 0.575,
+  `n_seeds` and `n_ranked` 0.602 / 0.663, `idf_coverage` 0.559 / 0.615, `best_idf` 0.550 / 0.636,
+  `q_len` 0.568 / 0.621; shuffle bands 0.397-0.603 and 0.323-0.636 over 50 trials, seed 0. The
+  verdict read `none qualifies`, so no runtime miss line is owed. Run took 26.6 s of its 60 s ceiling.
+
 ### Inventory
 
 | Identifier | Kind | Cell |
@@ -115,6 +125,8 @@ Read at base `7af5f564`, whose bytes for every file below equal HEAD's at `fee9f
 | `derive_auc` | function, `replay-phrases.py` | `py.function`, verb `derive`; `--suggest` answered OK |
 | `measure_shuffle_band` | function, `replay-phrases.py` | `py.function`, verb `measure`; `--suggest` answered OK |
 | `derive_predictor_verdict` | function, `replay-phrases.py` | `py.function`, verb `derive`; `--suggest` answered OK |
+| `measure_population` | function, `replay-phrases.py` | `py.function`, verb `measure`; `--suggest` answered OK |
+| `check_truth_reachable` | function, `replay-phrases.py` | `py.function`, verb `check`; `--suggest` answered OK |
 | `--predictors` | CLI flag | none |
 
 ### Rollout
@@ -213,6 +225,11 @@ New arm: `tools/codebase-map/selftest.py` · canned rows with a separable and an
   `codebase-map` dossier, while `TOOL-aMendedFleet-89` adds the map rule that when, where and on
   which node a figure was measured live in the record and the dossier cites its id; the date and sha
   now sit in this unit's AC4 evidence, and the dossier line cites this unit.
+- rev-3 · 2026-10-05 · §4 Inventory, §4 Evidence · the build pass records AC4's verdict under §4
+  Evidence, and `measure_population` grades one population
+  (label split, eight AUCs, its own band) so S3 and S4 read one table, and `check_truth_reachable`
+  is the one reachability predicate S1's row and `main`'s unreachable count both read, rather than
+  a second hand-copy of it.
 
 ## 10. Reuse audit
 

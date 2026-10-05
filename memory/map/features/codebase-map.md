@@ -120,6 +120,13 @@ repo-wide python-launcher seam rather than anything this feature owns.
 - **`*.template.py` is excluded from the symbol layer** because a template and its instantiated twin
   define the same names in two files, and `fan_in()` counts the twin as a reference. Measured: with
   the templates indexed, two `test_*` functions outranked `walk_dir_keys` in the reuse shortlist.
+- miss predictor: none qualifies (TOOL-aMendedFleet-46, whose record says when and where it was
+  measured), so the lookup prints no miss line and answers a miss with the confidence of a hit.
+  `replay-phrases.py --predictors` grades eight shortlist quantities by AUC against the hit label,
+  over every graded phrase and over the phrases whose truth is reachable, beside a shuffled-label
+  band; a predictor needs an AUC at or beyond 0.70 / 0.30, outside the band, on a population with
+  enough hits AND misses. Re-run it after any ranker or corpus change: a verdict that names a
+  predictor is what earns the runtime line, as a unit of its own.
 
 ## How the neighbour cap selects
 

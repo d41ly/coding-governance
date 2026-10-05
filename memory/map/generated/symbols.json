@@ -3793,6 +3793,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "check_truth_reachable",
+      "kind": "function",
+      "file": "tools/codebase-map/replay-phrases.py"
+    },
+    {
       "id": "check_ts_arrow",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -4803,6 +4808,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_auc",
+      "kind": "function",
+      "file": "tools/codebase-map/replay-phrases.py"
+    },
+    {
       "id": "derive_ban_files",
       "kind": "function",
       "file": "tools/check-install-prefix.sh"
@@ -5296,6 +5306,11 @@
       "id": "derive_phase",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_predictor_verdict",
+      "kind": "function",
+      "file": "tools/codebase-map/replay-phrases.py"
     },
     {
       "id": "derive_present_layers",
@@ -7918,6 +7933,16 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "measure_population",
+      "kind": "function",
+      "file": "tools/codebase-map/replay-phrases.py"
+    },
+    {
+      "id": "measure_predictors",
+      "kind": "function",
+      "file": "tools/codebase-map/replay-phrases.py"
+    },
+    {
       "id": "measure_ranks",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
@@ -7961,6 +7986,11 @@
       "id": "measure_served",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "measure_shuffle_band",
+      "kind": "function",
+      "file": "tools/codebase-map/replay-phrases.py"
     },
     {
       "id": "measure_slot_sizes",
@@ -16351,6 +16381,11 @@
       "id": "test_member_outside_the_scope_set_is_dropped",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_miss_predictor_verdict_needs_enough_misses",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_mixed_namespace_tree_dies_completely",

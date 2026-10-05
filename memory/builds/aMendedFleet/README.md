@@ -222,7 +222,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-43 — the map renders a card of at most 1 KB per feature from its dossier's toml fence](spec/2026-10-04-spec-TOOL-aMendedFleet-43.md) | 43 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-44 — the map gate refuses a present-tense count of an inventory population in dossier prose](spec/2026-10-04-spec-TOOL-aMendedFleet-44.md) | 44 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-45 — reviewers' by-design list comes from one source, the invariant records](spec/2026-10-04-spec-TOOL-aMendedFleet-45.md) | 45 | 1 | WONTDO | rev-2 | 2026-10-04 |
-| [TOOL-aMendedFleet-46 — the replay harness measures which shortlist quantity predicts a reuse miss, before any miss signal ships](spec/2026-10-04-spec-TOOL-aMendedFleet-46.md) | 46 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-46 — the replay harness measures which shortlist quantity predicts a reuse miss, before any miss signal ships](spec/2026-10-04-spec-TOOL-aMendedFleet-46.md) | 46 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-47 — `run_records_nonterminal_but_merged` honours derived LANDED, and the unused-verb pin drops to 0](spec/2026-10-04-spec-TOOL-aMendedFleet-47.md) | 47 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-48 — drift readings append to a node-local history file](spec/2026-10-04-spec-TOOL-aMendedFleet-48.md) | 48 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-49 — the unattended close prints the BASE..HEAD drift delta](spec/2026-10-04-spec-TOOL-aMendedFleet-49.md) | 49 | 1 | SPECCED | rev-3 | 2026-10-04 |

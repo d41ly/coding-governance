@@ -1882,6 +1882,8 @@ def main() -> int:
     failures += check("fan-in subtracts every definer (S1)", test_fan_in_subtracts_every_definer)
     failures += check("rank_harness: control and measurement share a denominator (review F5)",
                       test_the_control_and_the_measurement_share_a_denominator)
+    failures += check("replay-phrases: a miss predictor needs a separable AUC AND enough misses",
+                      test_miss_predictor_verdict_needs_enough_misses)
     failures += check("gen_map: every advertised read-only mode runs (review F1)",
                       test_every_advertised_gen_map_mode_runs)
     with tempfile.TemporaryDirectory() as td:
@@ -2648,6 +2650,35 @@ def test_the_control_and_the_measurement_share_a_denominator():
     assert f"{want:.3f}" in text, (
         "the constant control was scored over a different population than `measure_recall` "
         f"divides by:\n{text}")
+
+
+def test_miss_predictor_verdict_needs_enough_misses():
+    """TOOL-aMendedFleet-46 S7. Canned rows, no corpus: a separable predictor and an inseparable
+    one through `derive_auc`, then `derive_predictor_verdict` over a population that clears the
+    floor and one ONE miss short of it. The second is the arm's point: an AUC read off too few
+    misses must never name a predictor, however far it sits from chance.
+    """
+    import importlib.util
+    kit = Path(os.path.abspath(__file__)).parent
+    spec = importlib.util.spec_from_file_location("_replay_phrases", kit / "replay-phrases.py")
+    rp = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rp)
+    floor = rp.PREDICTOR_MIN_LABELS
+    vals = {p: 0 for p in rp.PREDICTORS}
+    # n_seeds separates the labels perfectly; q_len is one value on both sides
+    rows = ([dict(vals, hit=True, n_seeds=5, q_len=3) for _ in range(floor + 10)]
+            + [dict(vals, hit=False, n_seeds=1, q_len=3) for _ in range(floor + 10)])
+    assert rp.derive_auc([3, 4, 5], [0, 1, 2]) == 1.0
+    assert rp.derive_auc([1, 1, 1], [1, 1, 1]) == 0.5
+    assert rp.derive_auc([1], []) is None, "an empty side has no AUC, never a chance reading"
+    pop = rp.measure_population("all", rows)
+    assert pop["aucs"]["n_seeds"] == 1.0 and pop["aucs"]["q_len"] == 0.5, pop["aucs"]
+    assert pop["band"] and pop["band"][1] < 1.0, f"the shuffled band must sit below 1.0: {pop}"
+    verdict = rp.derive_predictor_verdict([pop])
+    assert verdict.startswith("n_seeds ("), verdict
+    short = dict(pop, misses=floor - 1)
+    verdict = rp.derive_predictor_verdict([short])
+    assert verdict.startswith("none qualifies") and "too few misses" in verdict, verdict
 
 
 if __name__ == "__main__":
