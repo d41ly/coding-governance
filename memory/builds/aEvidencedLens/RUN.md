@@ -9,13 +9,23 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-aEvidencedLens-16=OPEN
+units-at-landing: TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-12 TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-11 TOOL-aEvidencedLens-13 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-18 TOOL-aEvidencedLens-19 TOOL-aEvidencedLens-20 TOOL-aEvidencedLens-21
+hold-run: 
+hold-streak: 1 · at 4902e40c
+resume-owed: none · owner
+held-at: 2026-10-05T08:10:50Z
+hold-reason: Every unit is CLOSED and the branch is pushed. Landing is refused only because this run wrote its own spec-audit opt-in on the owner's prompt before TOOL-aWardedAudit-4 made the opt-in owner-only (check 89, no override). The parked decision names the options.
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
 gates-run: unattended-17911867649313475711-1400943 d6bf3cbe
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
-refreshed-at: cfa2cc455cacd4b5782970cb96f25c25bb07965d · park · 0 touching
+refreshed-at: cfa2cc455cacd4b5782970cb96f25c25bb07965d · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 94d99c6cad84d7ccc78e01f8a5b64f7826397b45
-phase: VERIFYING
+witness: 4902e40c6a972a59396d37e4a925419952c24b9d
+phase: HELD
 branch-sha: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 branch-ref: refs/heads/branch/spec-review-improvements-f59dad
 spec-audit: 2026-10-05
@@ -185,3 +195,7 @@ base: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 2026-10-05T07:46:07Z brief · item TOOL-aEvidencedLens-12 · reason 28c1f9da20ea memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-12-2-build-brief.md
 
 2026-10-05T08:08:11Z decision · item Land aEvidencedLens although its spec-audit opt-in was written by this run? The owner's prompt said to opt in, so the run wrote spec-audit: 2026-10-05 into its own prompt-mode README at BASE 3640cf58. TOOL-aWardedAudit-4 then landed on main mid-run and made the opt-in owner-only: check 89 refuses authorization-reachable, which takes no override, and check 19 reds the unattended kit gate by reading 3640cf58 as an own commit of the two other live runs, aClosedDocket and aUnblockedFleet. · reason Options: (a) the owner lands the branch with the lander, taking the prompt as the owner's opt-in; check 19's red on the other runs clears once 3640cf58 is on main, and check 89 only grades this run's close. (b) The owner amends check 89 to admit an opt-in quoted from an owner prompt record. (c) Discard. Refused because each option overrides or changes an authorization check, which no run may do. Every unit is CLOSED; the close's other reds, kit epoch and both lexicon legs, are fixed in f1545cdd6 and b52dbdaad, but the bar was not re-run after those fixes.
+
+2026-10-05T08:10:54Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aEvidencedLens && bash tools/push-main.sh --land --slug aEvidencedLens && bash tools/unattended/unattended.sh --settle aEvidencedLens
+
+2026-10-05T08:10:54Z hold · item owner-decision · reason until owner · reaped 15cbf130 · resume none(owner)

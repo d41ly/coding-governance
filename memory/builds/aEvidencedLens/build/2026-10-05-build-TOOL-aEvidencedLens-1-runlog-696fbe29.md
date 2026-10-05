@@ -9,30 +9,30 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 - run-state: memory/builds/aEvidencedLens/RUN.md
 - run: 1 of 1
 - start: 696fbe2956b5364cc43ba79666c9f6521c414864
-- phase: VERIFYING
+- phase: HELD
 - terminal: no
-- window: 2026-10-04T22:24:41Z to 2026-10-05T06:02:10Z
+- window: 2026-10-04T22:24:41Z to 2026-10-05T08:09:34Z
 - window opened by: git
 - window closed by: last-activity
-- duration: 27449s
+- duration: 35093s
 - own commits: 35
 - last own commit: 029b0522adf8521cbf33a2f89a9f511571764f2e
 - merged: no
 - units served: 19
 - sources present: 7 of 7
 - owner turns: launch 1 · pre-run 1 · in-window 1 · post-close 0
-- usage main: requests 270 · in 606 · out 164112 · cache-read 133118175 · cache-write 1038525
+- usage main: requests 307 · in 682 · out 187340 · cache-read 159520570 · cache-write 1086760
 - usage agent: requests 191 · in 382 · out 161406 · cache-read 36148114 · cache-write 990891
 - usage workflow: requests 3065 · in 6132 · out 2685727 · cache-read 533581710 · cache-write 16939669
-- attributed calls: 3331 of 3959
+- attributed calls: 3348 of 3996
 - values withheld: 0
-- commitment: sha256 eff76e185532ea1fdd2b35e62655212b64378408bd872dc88db3030d01b89b09 · lines 504
+- commitment: sha256 3597f3dbcc9c9b66f9a81c2a2831afc10c1b56df7406ead10b2a349b0a1231c1 · lines 529
 
 ## Timeline
 
-- events: 103 · shown 60 · elided 43
-- elided: 43 events from 2026-10-05T00:30:58Z to 2026-10-05T03:01:33Z
-- withheld rows: verb 211 · push 41 · push-refused 0 · gate 0 · compact 0 · limit 0 · idle 0 · workflow 26
+- events: 106 · shown 60 · elided 46
+- elided: 46 events from 2026-10-05T00:30:58Z to 2026-10-05T03:08:05Z
+- withheld rows: verb 219 · push 45 · push-refused 0 · gate 1 · compact 0 · limit 0 · idle 0 · workflow 26
 
 | UTC | source | event | value | phase | rc | more |
 |---|---|---|---|---|---|---|
@@ -69,9 +69,6 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 | UTC | source | event | value | phase | rc | more |
 |---|---|---|---|---|---|---|
-| 2026-10-05T03:04:35Z | run-state | dispatch | TOOL-aEvidencedLens-11 | - | - | - |
-| 2026-10-05T03:05:09Z | git | commit | 4babe902d2ce | - | - | TOOL-aEvidencedLens-11 |
-| 2026-10-05T03:08:05Z | run-state | phase | 4babe902d2ce | REVIEWING | - | - |
 | 2026-10-05T03:25:06Z | git | commit | e4dd6c85be33 | - | - | TOOL-aEvidencedLens-18 |
 | 2026-10-05T03:29:23Z | run-state | phase | 7f4c20279db5 | BUILDING | - | - |
 | 2026-10-05T03:31:37Z | run-state | dispatch | TOOL-aEvidencedLens-15 | - | - | - |
@@ -99,6 +96,9 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | 2026-10-05T05:20:42Z | run-state | brief | TOOL-aEvidencedLens-21 | - | - | - |
 | 2026-10-05T05:46:55Z | git | commit | 029b0522adf8 | - | - | TOOL-aEvidencedLens-21 |
 | 2026-10-05T06:02:10Z | run-state | phase | 94d99c6cad84 | VERIFYING | - | - |
+| 2026-10-05T07:46:07Z | run-state | brief | TOOL-aEvidencedLens-12 | - | - | - |
+| 2026-10-05T07:48:58Z | git | merge | ea4dd8193b8b | - | - | - |
+| 2026-10-05T07:52:17Z | git | merge | d6bf3cbe24ea | - | - | - |
 
 ## Units
 
@@ -116,7 +116,7 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | 6 | TOOL-aEvidencedLens-9 | CLOSED | 2 | 1 | 1 | 2577d81d925b |
 | 6 | TOOL-aEvidencedLens-10 | CLOSED | 3 | 1 | 1 | da5d530bddd3 |
 | 7 | TOOL-aEvidencedLens-8 | CLOSED | 3 | 2 | 1 | efad66acf068 |
-| 7 | TOOL-aEvidencedLens-12 | CLOSED | 4 | 2 | 1 | e9028d73d256 |
+| 7 | TOOL-aEvidencedLens-12 | CLOSED | 4 | 2 | 2 | e9028d73d256 |
 | 7 | TOOL-aEvidencedLens-14 | CLOSED | 4 | 2 | 1 | 091f81b0f2a8 |
 | 8 | TOOL-aEvidencedLens-11 | CLOSED | 3 | 3 | 1 | 4babe902d2ce |
 | 8 | TOOL-aEvidencedLens-13 | CLOSED | 4 | 2 | 2 | - |
@@ -128,20 +128,20 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 ## Decisions
 
-- entries: 71 · shown 0 · aggregated yes
+- entries: 73 · shown 0 · aggregated yes
 - trailer near-misses: 29
 - decision-log rows the owner's: 0
 - spec marks: owner-before 0 · owner-inside 0 · agent-before 0 · agent-inside 20
-- excluded rows: proposal 0 · rescope 8 · dispatch 38 · review 5 · brief 20 · hold 0 · resume 0
+- excluded rows: proposal 0 · rescope 8 · dispatch 38 · review 5 · brief 21 · hold 1 · resume 0
 - review rounds: 5 · shown 5 · aggregated no
 
 | # | source | entries |
 |---|---|---|
-| 1 | decision | 2 |
+| 1 | decision | 3 |
 | 2 | abort | 0 |
 | 3 | override | 0 |
 | 4 | waiver | 0 |
-| 5 | handoff | 0 |
+| 5 | handoff | 1 |
 | 6 | rescope-retire | 0 |
 | 7 | rescope-supersede | 0 |
 | 8 | rescope-defer | 0 |
@@ -186,17 +186,19 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 ## Anomalies
 
-- anomalies: 7 · shown 7 · aggregated no
+- anomalies: 9 · shown 9 · aggregated no
 
 | # | kind | subclass |
 |---|---|---|
 | 1 | out-of-band-edit | - |
 | 2 | out-of-band-edit | - |
-| 3 | refusal-loop | - |
-| 4 | refusal-loop | - |
-| 5 | destructive-git | - |
-| 6 | destructive-git | - |
+| 3 | out-of-band-edit | - |
+| 4 | out-of-band-edit | - |
+| 5 | refusal-loop | - |
+| 6 | refusal-loop | - |
 | 7 | destructive-git | - |
+| 8 | destructive-git | - |
+| 9 | destructive-git | - |
 
 ## Coverage
 
@@ -209,9 +211,9 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | # | source | state | lines | bad |
 |---|---|---|---|---|
 | 1 | run-state | present | - | - |
-| 2 | driver | present | 422 | 0 |
-| 3 | gates | present | 0 | 0 |
-| 4 | pushes | present | 41 | 0 |
+| 2 | driver | present | 438 | 0 |
+| 3 | gates | present | 1 | 0 |
+| 4 | pushes | present | 45 | 0 |
 | 5 | git | present | - | - |
 | 6 | transcripts | present | - | - |
 | 7 | build-folder | present | - | - |
@@ -220,8 +222,8 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 ```json
 {"schema":1,"sections":{
-"Summary":{"facts":{"run-state":"memory/builds/aEvidencedLens/RUN.md","run":"1 of 1","start":"696fbe2956b5364cc43ba79666c9f6521c414864","phase":"VERIFYING","terminal":"no","window":"2026-10-04T22:24:41Z to 2026-10-05T06:02:10Z","window opened by":"git","window closed by":"last-activity","duration":"27449s","own commits":"35","last own commit":"029b0522adf8521cbf33a2f89a9f511571764f2e","merged":"no","units served":"19","sources present":"7 of 7","owner turns":"launch 1 · pre-run 1 · in-window 1 · post-close 0","usage main":"requests 270 · in 606 · out 164112 · cache-read 133118175 · cache-write 1038525","usage agent":"requests 191 · in 382 · out 161406 · cache-read 36148114 · cache-write 990891","usage workflow":"requests 3065 · in 6132 · out 2685727 · cache-read 533581710 · cache-write 16939669","attributed calls":"3331 of 3959","values withheld":"0","commitment":"sha256 eff76e185532ea1fdd2b35e62655212b64378408bd872dc88db3030d01b89b09 · lines 504"},"tables":[]},
-"Timeline":{"facts":{"events":"103 · shown 60 · elided 43","elided":"43 events from 2026-10-05T00:30:58Z to 2026-10-05T03:01:33Z","withheld rows":"verb 211 · push 41 · push-refused 0 · gate 0 · compact 0 · limit 0 · idle 0 · workflow 26"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
+"Summary":{"facts":{"run-state":"memory/builds/aEvidencedLens/RUN.md","run":"1 of 1","start":"696fbe2956b5364cc43ba79666c9f6521c414864","phase":"HELD","terminal":"no","window":"2026-10-04T22:24:41Z to 2026-10-05T08:09:34Z","window opened by":"git","window closed by":"last-activity","duration":"35093s","own commits":"35","last own commit":"029b0522adf8521cbf33a2f89a9f511571764f2e","merged":"no","units served":"19","sources present":"7 of 7","owner turns":"launch 1 · pre-run 1 · in-window 1 · post-close 0","usage main":"requests 307 · in 682 · out 187340 · cache-read 159520570 · cache-write 1086760","usage agent":"requests 191 · in 382 · out 161406 · cache-read 36148114 · cache-write 990891","usage workflow":"requests 3065 · in 6132 · out 2685727 · cache-read 533581710 · cache-write 16939669","attributed calls":"3348 of 3996","values withheld":"0","commitment":"sha256 3597f3dbcc9c9b66f9a81c2a2831afc10c1b56df7406ead10b2a349b0a1231c1 · lines 529"},"tables":[]},
+"Timeline":{"facts":{"events":"106 · shown 60 · elided 46","elided":"46 events from 2026-10-05T00:30:58Z to 2026-10-05T03:08:05Z","withheld rows":"verb 219 · push 45 · push-refused 0 · gate 1 · compact 0 · limit 0 · idle 0 · workflow 26"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
 ["2026-10-04T22:24:41Z","run-state","phase","3640cf580d9d","RUNNING","-","-"],
 ["2026-10-04T22:29:48Z","run-state","phase","0159896b86b3","SPECCING","-","-"],
 ["2026-10-04T22:52:30Z","run-state","phase","4d0d64688285","REVIEWING","-","-"],
@@ -253,9 +255,6 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["2026-10-05T00:24:00Z","git","commit","62a1cf2a2fa3","-","-","TOOL-aEvidencedLens-6"],
 ["2026-10-05T00:30:18Z","run-state","dispatch","TOOL-aEvidencedLens-6","-","-","-"]]},
 {"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
-["2026-10-05T03:04:35Z","run-state","dispatch","TOOL-aEvidencedLens-11","-","-","-"],
-["2026-10-05T03:05:09Z","git","commit","4babe902d2ce","-","-","TOOL-aEvidencedLens-11"],
-["2026-10-05T03:08:05Z","run-state","phase","4babe902d2ce","REVIEWING","-","-"],
 ["2026-10-05T03:25:06Z","git","commit","e4dd6c85be33","-","-","TOOL-aEvidencedLens-18"],
 ["2026-10-05T03:29:23Z","run-state","phase","7f4c20279db5","BUILDING","-","-"],
 ["2026-10-05T03:31:37Z","run-state","dispatch","TOOL-aEvidencedLens-15","-","-","-"],
@@ -282,7 +281,10 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["2026-10-05T05:20:39Z","run-state","dispatch","TOOL-aEvidencedLens-21","-","-","-"],
 ["2026-10-05T05:20:42Z","run-state","brief","TOOL-aEvidencedLens-21","-","-","-"],
 ["2026-10-05T05:46:55Z","git","commit","029b0522adf8","-","-","TOOL-aEvidencedLens-21"],
-["2026-10-05T06:02:10Z","run-state","phase","94d99c6cad84","VERIFYING","-","-"]]}]},
+["2026-10-05T06:02:10Z","run-state","phase","94d99c6cad84","VERIFYING","-","-"],
+["2026-10-05T07:46:07Z","run-state","brief","TOOL-aEvidencedLens-12","-","-","-"],
+["2026-10-05T07:48:58Z","git","merge","ea4dd8193b8b","-","-","-"],
+["2026-10-05T07:52:17Z","git","merge","d6bf3cbe24ea","-","-","-"]]}]},
 "Units":{"facts":{"units":"19 · shown 19 · aggregated no"},"tables":[{"name":"units","header":["order","unit","status","commits","dispatched","briefed","built"],"rows":[
 ["1","TOOL-aEvidencedLens-1","CLOSED","2","3","1","c49655e6ac27"],
 ["2","TOOL-aEvidencedLens-2","CLOSED","2","3","1","bcd020ac20ee"],
@@ -294,7 +296,7 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["6","TOOL-aEvidencedLens-9","CLOSED","2","1","1","2577d81d925b"],
 ["6","TOOL-aEvidencedLens-10","CLOSED","3","1","1","da5d530bddd3"],
 ["7","TOOL-aEvidencedLens-8","CLOSED","3","2","1","efad66acf068"],
-["7","TOOL-aEvidencedLens-12","CLOSED","4","2","1","e9028d73d256"],
+["7","TOOL-aEvidencedLens-12","CLOSED","4","2","2","e9028d73d256"],
 ["7","TOOL-aEvidencedLens-14","CLOSED","4","2","1","091f81b0f2a8"],
 ["8","TOOL-aEvidencedLens-11","CLOSED","3","3","1","4babe902d2ce"],
 ["8","TOOL-aEvidencedLens-13","CLOSED","4","2","2","-"],
@@ -303,12 +305,12 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["11","TOOL-aEvidencedLens-19","CLOSED","2","2","1","-"],
 ["11","TOOL-aEvidencedLens-20","CLOSED","2","2","1","-"],
 ["12","TOOL-aEvidencedLens-21","CLOSED","2","1","1","029b0522adf8"]]}]},
-"Decisions":{"facts":{"entries":"71 · shown 0 · aggregated yes","trailer near-misses":"29","decision-log rows the owner's":"0","spec marks":"owner-before 0 · owner-inside 0 · agent-before 0 · agent-inside 20","excluded rows":"proposal 0 · rescope 8 · dispatch 38 · review 5 · brief 20 · hold 0 · resume 0","review rounds":"5 · shown 5 · aggregated no"},"tables":[{"name":"by-source","header":["#","source","entries"],"rows":[
-["1","decision","2"],
+"Decisions":{"facts":{"entries":"73 · shown 0 · aggregated yes","trailer near-misses":"29","decision-log rows the owner's":"0","spec marks":"owner-before 0 · owner-inside 0 · agent-before 0 · agent-inside 20","excluded rows":"proposal 0 · rescope 8 · dispatch 38 · review 5 · brief 21 · hold 1 · resume 0","review rounds":"5 · shown 5 · aggregated no"},"tables":[{"name":"by-source","header":["#","source","entries"],"rows":[
+["1","decision","3"],
 ["2","abort","0"],
 ["3","override","0"],
 ["4","waiver","0"],
-["5","handoff","0"],
+["5","handoff","1"],
 ["6","rescope-retire","0"],
 ["7","rescope-supersede","0"],
 ["8","rescope-defer","0"],
@@ -342,19 +344,21 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["16","green-at-close","-","UNJUDGEABLE"],
 ["17","keepalive-reaped","-","MET"],
 ["18","review-exited","-","MET"]]}]},
-"Anomalies":{"facts":{"anomalies":"7 · shown 7 · aggregated no"},"tables":[{"name":"anomalies","header":["#","kind","subclass"],"rows":[
+"Anomalies":{"facts":{"anomalies":"9 · shown 9 · aggregated no"},"tables":[{"name":"anomalies","header":["#","kind","subclass"],"rows":[
 ["1","out-of-band-edit","-"],
 ["2","out-of-band-edit","-"],
-["3","refusal-loop","-"],
-["4","refusal-loop","-"],
-["5","destructive-git","-"],
-["6","destructive-git","-"],
-["7","destructive-git","-"]]}]},
+["3","out-of-band-edit","-"],
+["4","out-of-band-edit","-"],
+["5","refusal-loop","-"],
+["6","refusal-loop","-"],
+["7","destructive-git","-"],
+["8","destructive-git","-"],
+["9","destructive-git","-"]]}]},
 "Coverage":{"facts":{"journal starts":"1 joined of 1 record-creating","unjoined starts":"0","sessions":"1 named · 1 extracted","idle gaps":"judged yes · near an owner turn 1","anomaly kinds":"judged 12 of 12"},"tables":[{"name":"sources","header":["#","source","state","lines","bad"],"rows":[
 ["1","run-state","present","-","-"],
-["2","driver","present","422","0"],
-["3","gates","present","0","0"],
-["4","pushes","present","41","0"],
+["2","driver","present","438","0"],
+["3","gates","present","1","0"],
+["4","pushes","present","45","0"],
 ["5","git","present","-","-"],
 ["6","transcripts","present","-","-"],
 ["7","build-folder","present","-","-"]]}]}}}
