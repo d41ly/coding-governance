@@ -525,13 +525,7 @@ only mitigation; there is no detector.
 
 ### M4 — the spec-audit lens catalogue
 
-Three to five, primed with the mandate, the build overview and the spec format:
-
-- **underspecification** — which §2 item has no §6 criterion, and which §6 criterion names no observation.
-- **contradiction** — §2 against §3; a sub-spec against the main spec on M2's four axes; §4 Design against §7 Gates.
-- **unstated assumption** — what must be true of existing code for §4 to work that §4 never says and §10 never
-  checked.
-- **prior art** — has a record already decided this? That is the recall probe, M5.
+The one source of the catalogue is `SPEC_LENSES` in `<prefix>/workflows/tier2-review.js`; each lens's brief is there.
 
 ## Running this engine verbatim — the four adopter routes
 

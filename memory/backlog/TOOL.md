@@ -68,6 +68,7 @@ Cite ids, never line numbers.
 | [TOOL-aDeferredBar-20](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE TWO READERS' LAUNCHER GRAMMARS ARE ASSERTED ALIKE ONLY BY HAND:… |
 | [TOOL-aDeferredBar-21](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | A SUITE WHOSE SUBJECT READS A GOV_ VARIABLE INHERITS THE MACHINE'S… |
 | [TOOL-aDeferredBar-22](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | FOUR brief: ARMS OF tools/unattended/unattended.test.sh HAVE BEEN RED… |
+| [TOOL-aEvidencedLens-16](../builds/aEvidencedLens/BACKLOG.md) | OPEN | MED | — | 2026-10-05 | the build harness's Disposal stage reads a §3 edge as one-ended when… |
 | [TOOL-aFlaggedScaffold-3](../builds/aFlaggedScaffold/BACKLOG.md) | OPEN | — | — | 2026-08-29 | govkit update CANNOT LAND A SOURCE GOV STARTED SHIPPING. Its… |
 | [TOOL-aFlaggedScaffold-5](../builds/aFlaggedScaffold/BACKLOG.md) | OPEN | — | — | 2026-08-29 | govkit check CALLS A KIT ADOPTED ON THE EXIT CODE ALONE and never runs… |
 | [TOOL-aGradedDialect-6](../builds/aGradedDialect/BACKLOG.md) | OPEN | — | — | 2026-09-10 | a FIFTH copy of the lexicon armedness predicate lives outside the kit… |

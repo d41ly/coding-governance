@@ -1,11 +1,11 @@
 export const meta = {
   name: 'unattended-build',
-  version: '1.6', // gov:kit unattended-build@1.6 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
+  version: '1.7', // gov:kit unattended-build@1.7 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
     'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal. The SPEC stage ends in ONE commit of the specs its writers authored, so the audit pins them at HEAD in the same call. AUDIT is opt-in: with no `specAudit` arg the stage announces itself OFF by declaration and the roster follows SPEC completion.',
   phases: [
     { title: 'Spec', detail: 'author every missing spec, in the declared order, no code; then ONE agent commits the authored specs' },
-    { title: 'Audit', detail: 'delegate to tier2-review.js as a spec-audit; record the round, after the disposal at zero blockers so the disposition field is what was promoted. Only when `specAudit` is declared: absent, the stage logs OFF by declaration and delegates nothing' },
+    { title: 'Audit', detail: 'delegate to tier2-review.js as a spec-audit, passing `context` (the build README and run mandate), `specs` (the spec format and every sibling spec), `checklist` (a caller\'s, else the resolver\'s gotchas.py --for-paths output, merged with the spec commit\'s --for-diff output) and `scratch`, plus `priorFindings` and a per-subject `prevBlob` on a fold re-invoke; record the round, after the disposal at zero blockers so the disposition field is what was promoted. Only when `specAudit` is declared: absent, the stage logs OFF by declaration and delegates nothing' },
     { title: 'Disposal', detail: 'dispose every confirmed and unverified finding by severity over the whole spec set, then hand out the roster, withheld on a clean round until its spec-audit record exists' },
   ],
 }
@@ -182,10 +182,17 @@ function chunk(a, n) {
 //   subjectRound: <integer>                         // ON A FOLD RE-INVOKE: the round the current subject
 //                                                   //   set was first audited at, copied from the CONVERGING
 //                                                   //   return; keeps the driver's sequence on ONE subject
-//   checklist: "<the checker's stdout>"             // optional: the spec audit's checklist; ABSENT = the
-//                                                   //   resolver's `--for-paths` run over the specs'
-//                                                   //   Files-touched paths, and a WARNING when it has none
+//   prevSubjects: [{ path, blob }],                 // ON A FOLD RE-INVOKE (callee round > 1): the pinned set
+//                                                   //   the CONVERGING return handed back; each matching
+//                                                   //   subject carries its blob to the callee as `prevBlob`
+//   priorFindings: [{ ... }],                       // ON A FOLD RE-INVOKE: the CONVERGING return's
+//                                                   //   `priorFindings`, the previous round's confirmed set
+//   checklist: "<the checker's stdout>"             // optional: the spec audit's checklist, winning over
+//                                                   //   the resolver's `--for-paths` run; used only when
+//                                                   //   it carries a `- ` item, and announced otherwise
 // }
+// TOOL-aEvidencedLens-5 - the two fold args are REFUSED at a callee round of 1 (a fresh generation has
+// no previous round) and refused by name when malformed, before any agent spawns.
 //
 // THE REVIEW SUBJECT IS KEYED PER SPEC-SET GENERATION (closing review round 1, cluster B). It was the
 // literal `<slug>-spec-set`, so a unit the DISPOSAL stage promoted had no audit route: the subject
@@ -242,6 +249,28 @@ if (typeof cfg.scratch !== 'string' || !/^(\/|[A-Za-z]:[\\/])/.test(cfg.scratch)
     'unattended-build: args must carry an explicit `scratch`, an ABSOLUTE path to the session ' +
       'scratchpad — the one the caller\'s own system prompt names. Got ' + JSON.stringify(cfg.scratch) +
       '. Refusing to default it: a defaulted scratch root is the floating temp dir this argument exists to end.',
+  )
+}
+// TOOL-aEvidencedLens-5 S4 - the callee's two extra refusals, applied HERE so a scratch `tier2-review.js`
+// would refuse dies at this prelude and not after the spec stage and the resolver have spent their work:
+// a control character, and a value equal to or under `repo` after the same fold (slashes, case, trailing
+// slash, an MSYS `/<letter>/` to `<letter>:/`) that harness applies. TOOL-aEvidencedLens-21 S1 copies its
+// other two, so both scripts keep one answer: a relative `repo` and a `..` segment in either value are
+// refused, because the comparison is textual. An 8.3 short name or a link aliasing `repo` is not seen.
+if (!/^(\/|[A-Za-z]:[\\/])/.test(String(cfg.repo)) || /(^|[\\/])\.\.([\\/]|$)/.test(cfg.scratch + '\n' + String(cfg.repo))) {
+  throw new Error(
+    'unattended-build: `repo` must be ABSOLUTE and neither `repo` nor `scratch` may carry a .. segment. Got `repo` ' +
+      JSON.stringify(cfg.repo) + ' beside `scratch` ' + JSON.stringify(cfg.scratch) + '; the review harness refuses ' +
+      'both on a spec audit, because its under-`repo` test is textual, so this refuses before any stage spends work.',
+  )
+}
+const scratchFold = cfg.scratch.replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '').replace(/^\/([a-z])(?=\/|$)/, '$1:')
+const repoFold = String(cfg.repo).replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '').replace(/^\/([a-z])(?=\/|$)/, '$1:')
+if (/[\x00-\x1f]/.test(cfg.scratch) || scratchFold === repoFold || scratchFold.indexOf(repoFold + '/') === 0) {
+  throw new Error(
+    'unattended-build: `scratch` must carry no control character and must not be equal to or under `repo`. Got ' +
+      JSON.stringify(cfg.scratch) + ' beside `repo` ' + JSON.stringify(cfg.repo) + '; the review harness refuses ' +
+      'both, so this refuses before any stage spends work.',
   )
 }
 const scratch = cfg.scratch.replace(/\\/g, '/')
@@ -311,7 +340,7 @@ const auditIds = a.auditIds === undefined ? [] : a.auditIds
 // fourth such argument (closing review of units 2–5, F6): the only paths that tell a caller to pass
 // it are audit re-invokes, so beside no declaration it names a round that never happened.
 const specAudit = a.specAudit !== undefined
-const auditShaped = ['subjects', 'auditIds', 'subjectRound'].filter(function (k) { return a[k] !== undefined })
+const auditShaped = ['subjects', 'auditIds', 'subjectRound', 'prevSubjects', 'priorFindings'].filter(function (k) { return a[k] !== undefined })
 if (a.round !== undefined && a.round > 1) auditShaped.push('round')
 if (!specAudit && auditShaped.length) {
   throw new Error(
@@ -327,6 +356,27 @@ if (subjectRound > roundNo) {
       'set cannot have been first audited at a round that has not happened; copy the value the ' +
       'CONVERGING return handed back rather than composing one.',
   )
+}
+// TOOL-aEvidencedLens-5 S5/S6 - the fold inputs, refused by name before any agent spawns.
+const calleeRound = roundNo - subjectRound + 1
+const FOLD_ARGS = [
+  ['prevSubjects', Array.isArray(a.prevSubjects) && a.prevSubjects.every(function (s) {
+    return !!s && typeof s === 'object' && typeof s.path === 'string' && !!s.path && /^[0-9a-f]{7,40}$/.test(String(s.blob))
+  }), 'an array of {path, blob} with a 7 to 40 hex blob'],
+  ['priorFindings', Array.isArray(a.priorFindings) && a.priorFindings.every(function (f) {
+    return !!f && typeof f === 'object' && !Array.isArray(f)
+  }), 'an array of finding objects'],
+]
+for (const t of FOLD_ARGS) {
+  if (a[t[0]] === undefined) continue
+  if (!t[1]) {
+    throw new Error('unattended-build: `' + t[0] + '` must be ' + t[2] + ', got ' + JSON.stringify(a[t[0]]) +
+      '. Copy the value the CONVERGING return handed back rather than composing one.')
+  }
+  if (calleeRound === 1) {
+    throw new Error('unattended-build: `' + t[0] + '` is present at callee round 1, a fresh generation with no ' +
+      'previous round to carry it from. Drop it; it belongs only on a fold re-invoke (round above subjectRound).')
+  }
 }
 const strayAudit = auditIds.filter(function (id) {
   return !units.some(function (u) { return u.id === id })
@@ -401,6 +451,9 @@ const resumeRemedy =
         '`git ls-tree HEAD -- <spec path>`.') +
   ' A resume replays every agent call whose prompt is unchanged, so its cached answer returns this same ' +
   'refusal however the tree has moved since.'
+// TOOL-aEvidencedLens-5 S3 - the spec audit's checklist. A spec precedes its code, so there is no diff:
+// the resolver runs this over the paths the subjects' `Files touched (estimate)` sections declare.
+const AUDIT_CHECKLIST = 'python {{MEMORY_TREE_DIR}}/gotchas.py --for-paths'
 const ordered = units.slice().sort(function (x, y) {
   const ox = Number.isInteger(x.order) ? x.order : 1e9
   const oy = Number.isInteger(y.order) ? y.order : 1e9
@@ -525,10 +578,11 @@ const SUBJECTS_SCHEMA = {
         required: ['path', 'blob', 'tree'],
       },
     },
-    // TOOL-aGraftedHelix-3 S9 - OPTIONAL, so a caller-supplied subject set and every stub that predates
-    // them keep working: the checker's stdout over the specs' Files-touched paths, and those paths.
+    // TOOL-aEvidencedLens-5 S3 - OPTIONAL: the `--for-paths` stdout and the paths it ran over, or why
+    // none was produced. Never required, so a resolver that cannot produce one still pins the subjects.
     checklist: { type: 'string' },
     checklistPaths: { type: 'array', items: { type: 'string' } },
+    checklistError: { type: 'string' },
     // TOOL-aGraftedHelix-15 S4 - OPTIONAL for the same reason: each spec that exists in the working
     // tree and has no blob at `HEAD`. An entry refuses the call, naming the paths; never an empty set.
     notAtHead: {
@@ -1017,15 +1071,22 @@ if (!specAudit) {
 // and cannot watch the file between the check and the read. A caller-supplied set never enters
 // the branch and carries no `tree`, so the compare cannot read it; `badSubject` below grades both.
 let subjects = Array.isArray(a.subjects) ? a.subjects : null
-// TOOL-aGraftedHelix-3 S9 - THE SPEC AUDIT GETS A CHECKLIST. The resolver already runs git per spec, so
-// it also runs the bug-class checker over the paths the specs' `### Files touched` sub-heads name, and
-// the stage forwards its stdout as the audit's `checklist`: the classes, and the by-design block the
-// review harness cuts out of it. The Files-touched paths and never a tool root, because `--for-paths`
-// over a whole kit selects most of the catalogue (TOOL-aWeighedCompass-14). A caller's `checklist`
-// wins, as a caller's `subjects` does. WHAT THIS DOES NOT CHECK: that the agent ran the command it was
-// told to or returned its stdout unaltered; the harness's head-count refusal catches a truncated block.
-let auditChecklist = typeof a.checklist === 'string' ? a.checklist : null
-let auditChecklistFrom = auditChecklist === null ? null : 'the caller\'s checklist argument'
+// THE SPEC AUDIT GETS A CHECKLIST (TOOL-aEvidencedLens-5 S3, which TOOL-aGraftedHelix-3 S9 built in
+// parallel and merged into this one mechanism). The resolver already runs git per spec, so it also
+// runs the bug-class checker over the paths the specs' `### Files touched` sub-heads name, and the
+// stage forwards its stdout as the audit's `checklist`: the classes, and the by-design block the review
+// harness cuts out of it. The Files-touched paths and never a tool root, because `--for-paths` over a
+// whole kit selects most of the catalogue (TOOL-aWeighedCompass-14). A caller's `checklist` wins, as a
+// caller's `subjects` does (aGraftedHelix-3 S9), under the same `- ` item rule as the resolver's.
+// WHAT THIS DOES NOT CHECK: that the agent ran the command it was told to or returned its stdout
+// unaltered; the harness's head-count refusal catches a truncated block.
+let checklist = null
+let checklistFrom = null
+let checklistWhy = 'a caller-pinned `subjects` skipped the resolver, so no resolver ran to produce one'
+if (typeof a.checklist === 'string') {
+  if (/^- /m.test(a.checklist)) { checklist = a.checklist; checklistFrom = 'the caller\'s checklist argument' }
+  else checklistWhy = 'the caller\'s `checklist` carries no line starting `- `, so no bug class selected'
+}
 // SCOPED AFTER A DISPOSAL. With `auditIds` the resolver sees only the promoted units, so the audit
 // reads the specs no spec-audit record names yet and not the whole set a terminal round already
 // closed; the subject key above is what lets the driver accept that round at all.
@@ -1071,18 +1132,27 @@ if (specAudit && !subjects) {
       'exists and whose blob resolves; an unspecced unit is omitted rather than given an invented ' +
       'hash. Paths are repo-relative and forward-slashed.\n' +
       'A spec path that EXISTS in the working tree and does NOT resolve at HEAD goes in `notAtHead` as ' +
-      '`{path}`, and never in `subjects`: it is a spec nothing has committed, so no blob can pin it.\n' +
-      'Then collect every backticked path token under each of those specs\' `### Files touched` sub-head, ' +
-      'spelled with or without ` (estimate)`, and run ONCE over all of them, in ' + repo + ': ' +
-      '`python {{MEMORY_TREE_DIR}}/gotchas.py --for-paths <those paths>`. Return its stdout VERBATIM as ' +
-      '`checklist` and the paths you passed as `checklistPaths`. A spec with no such sub-head adds no path; ' +
-      'with no path at all, omit both fields rather than run the command over nothing.',
+      '`{path}`, and never in `subjects`: it is a spec nothing has committed, so no blob can pin it.\n\n' +
+      'Then the bug-class checklist: read each resolved spec\'s `### Files touched (estimate)` section, ' +
+      'the sub-head spelled with or without ` (estimate)`, ' +
+      'collect its backticked paths, union them, and run `' + AUDIT_CHECKLIST + ' <paths>` in ' + repo +
+      ' with a 120-second timeout. Return its stdout verbatim as `checklist` and the paths as ' +
+      '`checklistPaths`. Return NO `checklist` and a `checklistError` naming why instead when no path ' +
+      'was declared, the command exits non-zero (name the code), it times out, or its stdout carries no ' +
+      'line starting `- ` (write `no bug class selected`).',
     { label: 'audit:subjects:r' + roundNo, phase: 'Audit', schema: SUBJECTS_SCHEMA },
   )
   subjects = (res && Array.isArray(res.subjects)) ? res.subjects : []
-  if (auditChecklist === null && res && typeof res.checklist === 'string' && res.checklist.trim()) {
-    auditChecklist = res.checklist
-    auditChecklistFrom = '--for-paths over ' + (Array.isArray(res.checklistPaths) ? res.checklistPaths.length : 0) + ' path(s)'
+  // S3/S8 - a checklist reaches the callee only when it carries a `- ` item, which is what its
+  // `parseChecklist` refuses otherwise; every other outcome is announced, never passed as ''. A
+  // caller's usable `checklist` already won above, so the resolver's is read only in its absence.
+  if (checklist === null) {
+    if (res && typeof res.checklist === 'string' && /^- /m.test(res.checklist)) {
+      checklist = res.checklist
+      checklistFrom = '--for-paths over ' + (Array.isArray(res.checklistPaths) ? res.checklistPaths.length : 0) + ' path(s)'
+    } else checklistWhy = res && typeof res.checklist === 'string' && res.checklist.trim()
+      ? 'no bug class selected'
+      : (res && typeof res.checklistError === 'string' && res.checklistError) || 'the resolver returned neither `checklist` nor `checklistError`'
   }
   // THE PRE-FLIGHT, INSIDE THE BRANCH so a supplied `{path, blob}` set never reads as dirty. The
   // field refusal comes first and is distinct from the dirty verdict: the suite's runner evaluates
@@ -1152,29 +1222,70 @@ if (badSubject !== -1) {
   )
 }
 
+// TOOL-aEvidencedLens-5 - what the audit's lenses are primed with. Each input this stage could not
+// produce is ANNOUNCED and left out, never passed empty (S8).
+const subjectPaths = specAudit ? subjects.map(function (s) { return s.path }) : []
+// S5 - a fold re-invoke hands each subject the blob the previous round pinned; one already carrying a
+// `prevBlob` keeps it.
+const prevSubjects = Array.isArray(a.prevSubjects) ? a.prevSubjects : []
+if (specAudit) {
+  subjects = subjects.map(function (s) {
+    if (s.prevBlob !== undefined) return s
+    const prev = prevSubjects.find(function (p) { return p.path === s.path })
+    return prev ? Object.assign({}, s, { prevBlob: prev.blob }) : s
+  })
+}
+const priorFindings = Array.isArray(a.priorFindings) ? a.priorFindings : null
+if (specAudit && calleeRound > 1) {
+  const anyPrev = subjects.some(function (s) { return s.prevBlob !== undefined })
+  if (!anyPrev && !priorFindings) {
+    log('WARNING: a degraded fold review at callee round ' + calleeRound + ': no `prevSubjects` and no `priorFindings`, ' +
+      'so nothing names the text the previous round\'s fixes introduced and every subject is reviewed whole')
+  } else if (!anyPrev) {
+    log('WARNING: fold re-invoke with no `prevSubjects` matching a subject, so the callee runs a whole-file review of each subject')
+  } else if (!priorFindings) {
+    log('WARNING: fold re-invoke with no `priorFindings`, so the callee runs with no prior findings to check the fixes against')
+  }
+}
+// S1 - the two documents to read first; the mandate directory is `briefDir`, never re-spelled.
+const auditContext = 'Build ' + slug + ': read memory/builds/' + slug + '/README.md and the run mandate under ' + briefDir +
+  '/ (the file whose name carries run-mandate; under a run with no prompt the README is the mandate) FIRST - ' +
+  'they state what the build is for.'
+// S2 - the spec format first, then every non-empty sibling spec path not under audit this round, once,
+// in roster order. Non-empty BEFORE the subject exclusion: a spec the spec stage just authored carries ''
+// wherever the commit stage did not run to fill its path.
+const auditSpecs = ['memory/TEMPLATE-SPEC.md']
+for (const u of ordered) {
+  if (typeof u.specPath === 'string' && u.specPath && subjectPaths.indexOf(u.specPath) === -1 &&
+      auditSpecs.indexOf(u.specPath) === -1) auditSpecs.push(u.specPath)
+}
 // TOOL-aGraftedHelix-15 S10 — THE SPEC COMMIT'S CHECKLIST REACHES THE AUDIT. BUILD-METHOD M6 owes the
 // checklist over every pass's commit, acted on before the next pass, and the next pass here is this
-// audit. Merged after the caller's or the resolver's, never appended (`renderChecklistUnion` says why).
+// audit. Merged after the caller's or the resolver's, never appended (`renderChecklistUnion` says why),
+// and held to the same `- ` item rule: a union with no item is not passed, and the absence says so.
 // Off the audit route the hand-out carries it instead, as `specCommit`.
 if (specAudit && specCommit && specCommit.checklist) {
-  auditChecklist = renderChecklistUnion(auditChecklist || '',
+  const commitFrom = 'the spec commit ' + specCommit.sha.slice(0, 12) + '\'s --for-diff'
+  const merged = renderChecklistUnion(checklist || '',
     'the spec commit ' + specCommit.sha + ' — ' + CHECKLIST, specCommit.checklist)
-  auditChecklistFrom = (auditChecklistFrom ? auditChecklistFrom + ', merged with ' : '') +
-    'the spec commit ' + specCommit.sha.slice(0, 12) + '\'s --for-diff'
+  if (/^- /m.test(merged)) {
+    checklistFrom = (checklist !== null ? checklistFrom + ', merged with ' : '') + commitFrom
+    checklist = merged
+  } else checklistWhy += '; ' + commitFrom + ' selected no bug class either'
 }
 // The checklist line is said ONCE per audited round, either way: a missing checklist is a lens set
 // sweeping none of the project's recurring classes, which must never read like one that swept them.
 if (specAudit) {
-  if (auditChecklist !== null) log('audit round ' + roundNo + ': checklist from ' + auditChecklistFrom)
-  else log('WARNING: audit round ' + roundNo + ': no checklist reached the spec audit — the resolver returned none ' +
-    'and the caller passed none, so no lens sweeps the project\'s recurring bug classes or reads its by-design list')
+  if (checklist !== null) log('audit round ' + roundNo + ': checklist from ' + checklistFrom)
+  else log('WARNING: no `checklist` for the audit: ' + checklistWhy)
 }
+
 // `null` WITH THE AUDIT OFF, and null is the right word: the adapter below reads `auRaw` as the callee's
 // return, and the callee was never called. Every check it runs is guarded on `specAudit`, so a null
 // here is never mistaken for the dead sub-workflow the first guard refuses.
 const auRaw = !specAudit ? null : await workflow(
   { scriptPath: '{{KIT_DIR}}/tier2-review.js' },
-  Object.assign({
+  {
     kind: 'spec-audit',
     repo: repo,
     // THE CALLEE'S ROUND IS THE SUBJECT'S, NOT THE INVOCATION'S (closing review round 2, cluster E).
@@ -1182,10 +1293,15 @@ const auRaw = !specAudit ? null : await workflow(
     // with it, and under the kit default every promoted-spec audit lands at an invocation round of 2
     // or more — over a spec nobody has reviewed. 1 for a fresh generation, N for its Nth fold;
     // `roundNo` stays the harness's own label.
-    round: roundNo - subjectRound + 1,
+    round: calleeRound,
     reviewDir: reviewDir,
+    scratch: scratch,
     subjects: subjects,
-  }, auditChecklist === null ? {} : { checklist: auditChecklist }),
+    context: auditContext,
+    specs: auditSpecs,
+    ...(checklist !== null ? { checklist: checklist } : {}),
+    ...(priorFindings ? { priorFindings: priorFindings } : {}),
+  },
 )
 
 // ===================== THE ADAPTER, REBUILT AGAINST THE CALLEE'S ACTUAL CONTRACT =============
@@ -1358,9 +1474,19 @@ const auUnverified = !specAudit ? null : cleanRound ? 0 : auRaw.unverified
 // knows that exit before the driver names it: at zero blockers with something to dispose, the
 // DISPOSAL stage runs FIRST and the record carries `promote` iff `promotedIds` is non-empty. At a
 // positive count the driver's token decides whether the loop even ended, so the record comes first
-// there, and every such terminal exit records `promote` on the driver's own refusal-and-retry.
-// The record is therefore a function, called at one of two points.
-async function writeRound(disposition) {
+// there, and every such terminal exit records its counts and `promote` on the driver's own
+// refusal-and-retry. The record is therefore a function, called at one of two points.
+//
+// TOOL-aEvidencedLens-8 S4/S5 - A TERMINAL SPEC EXIT CARRIES `--highs` AND `--minors`, which the
+// driver requires there and refuses on a `CONVERGING` round. At zero blockers the exit is CONVERGED,
+// so the counts ride from the start; at a positive count only the driver knows, so the first command
+// carries none and the retry adds them. `<m>` is the review's confirmed MEDIUM and LOW, plus the
+// UNVERIFIED findings the disposal promoted (`adjudicated`) on the record that follows a disposal;
+// a record before the disposal cannot know those and omits them, which understates check 2's floor
+// and never overstates it.
+async function writeRound(disposition, adjudicated) {
+  const minorsCount = au.confirmed - au.blockers - au.highs + (adjudicated || 0)
+  const counts = ' --highs ' + au.highs + ' --minors ' + minorsCount
   const rv = attended
     ? { token: au.blockers === 0 ? 'CONVERGED' : 'CONVERGING', exitCode: 0 }
     : await agent(
@@ -1368,13 +1494,16 @@ async function writeRound(disposition) {
       'Record AUDIT round ' + roundNo + ' with the driver and return its convergence token.\n\n' +
       'Run exactly:\n  ' + DRIVER + ' --review ' + slug + ' --subject ' + subject +
       ' --verdict ' + (au.blockers > 0 ? '"BLOCKED"' : '"CLEAN"') +
-      ' --blockers ' + au.blockers + disposition + '\n\n' +
+      ' --blockers ' + au.blockers + (au.blockers === 0 ? counts : '') + disposition + '\n\n' +
       'Return the CONVERGENCE token it prints — one of CONVERGING, CONVERGED, NON-CONVERGENT, ' +
       'CEILING, BOUNDED — verbatim, and the command\'s exit code. Do not infer the token from the ' +
       'blocker count: it is a property of the SEQUENCE of rounds, which only the driver can see. ' +
-      'If the command REFUSES naming --disposition, this round is a terminal exit: run the SAME ' +
-      'command once more with --disposition promote appended, and return THAT run\'s token and ' +
-      'exit code. If the command REFUSES saying the subject already carries a terminal review ' +
+      (au.blockers === 0
+        ? ''
+        : 'If the command REFUSES naming --disposition, --highs or --minors, this round is a terminal ' +
+          'exit: run the SAME command once more with' + counts + ' --disposition promote appended, ' +
+          'and return THAT run\'s token and exit code. ') +
+      'If the command REFUSES saying the subject already carries a terminal review ' +
       'round, return terminalSubject: true with its stderr and no token — do not retry under another ' +
       'subject. If the command fails for any other reason, return its stderr rather than a token.',
     { label: 'audit:record:r' + roundNo, phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
@@ -1456,6 +1585,12 @@ const audit = { ran: specAudit, verdict: verdict, blockers: au.blockers, highs: 
 // revision of this comment claimed the promotion happened and no line of the program did it.
 if (verdict === 'CONVERGING') {
   log('audit is still CONVERGING — no roster this invocation; fold, then re-invoke at round ' + (roundNo + 1))
+  // TOOL-aEvidencedLens-5 S7 - the fold inputs travel back for the caller to copy, as `subjectRound`
+  // does. A callee return with no `confirmedFindings` array OMITS `priorFindings` rather than carrying
+  // `[]`, so the next invoke is announced as lacking it instead of handed an empty set.
+  const handPrev = subjects.map(function (s) { return { path: s.path, blob: s.blob } })
+  const handPrior = Array.isArray(auRaw.confirmedFindings) ? auRaw.confirmedFindings : null
+  if (!handPrior) log('WARNING: the review returned no `confirmedFindings` array, so no `priorFindings` is handed back for the fold re-invoke')
   return {
     slug: slug,
     // THE MODE TRAVELS ON THIS RETURN TOO. It is the path an attended run takes on every
@@ -1477,6 +1612,8 @@ if (verdict === 'CONVERGING') {
     // sequence keeps its predecessor to shrink against; `auditIds` rides with it for the same reason.
     subjectRound: subjectRound,
     auditIds: auditIds,
+    prevSubjects: handPrev,
+    ...(handPrior ? { priorFindings: handPrior } : {}),
     // EVERY NON-THROWING EXIT CARRIES `roster`, so `roster.length === 0` is the caller's whole stop
     // condition. This return carried no such key at all, while the Skill bullet told the run that an
     // empty roster is the refusal — a caller reading `roster.length` read a property of `undefined`
@@ -1485,7 +1622,11 @@ if (verdict === 'CONVERGING') {
     nextAction:
       'FOLD the confirmed findings in ' + lastReport + ' as rev-N bumps with their section 9 lines, ' +
       'then re-invoke this harness with round: ' + (roundNo + 1) + ', subjectRound: ' + subjectRound +
-      (auditIds.length ? ', auditIds: ' + JSON.stringify(auditIds) : '') + '. Do not build.',
+      (auditIds.length ? ', auditIds: ' + JSON.stringify(auditIds) : '') +
+      ', and copy this return\'s prevSubjects' + (handPrior ? ' and priorFindings' : '') + ' as those args. Do not build. ' +
+      // TOOL-aEvidencedLens-8 S7 - the boundary, stated where the fold is ordered.
+      'This in-loop fold is the review loop\'s own fix step and not the exit\'s disposition: only a ' +
+      'terminal exit disposes, and it PROMOTES whatever stands.',
     note: 'HELD AT AUDIT — the review loop has not ended, so no unit was built' +
       (attended ? ' · ATTENDED, so no driver-side check ran' : ''),
   }
@@ -1508,7 +1649,8 @@ if (verdict === 'CONVERGING') {
 // over fifteen confirmed findings.
 //
 // THE STAGE RUNS ON ANY OUTSTANDING FINDING AND DISPOSES BY SEVERITY (TOOL-aProbedUnit-7): a BLOCKER
-// or HIGH is PROMOTED to a unit, a MEDIUM or LOW is FOLDED into its spec. OUTSTANDING is the
+// or HIGH is PROMOTED to a unit of its own, and since TOOL-aEvidencedLens-8 (owner, 2026-10-05) the
+// MEDIUMs and LOWs are PROMOTED too, batched into one unit or two disjoint ones. OUTSTANDING is the
 // callee's word and it covers two populations: the CONFIRMED findings and the UNVERIFIED ones, which
 // came back with no usable skeptic verdict and are not cleared — a verify stage degraded by dead
 // skeptic batches used to read as clean here, because only `confirmed` was counted (closing review
@@ -1546,7 +1688,10 @@ if (!specAudit) {
       ' unverified. Open the report and take each confirmed finding at the severity the report ' +
       'gives it. Every count above is of RAW findings by report id and never of the items a report ' +
       'may merge them into, so a finding merged into an item takes that item\'s severity and still ' +
-      'counts once, by its own id. An UNVERIFIED finding came back with no usable skeptic verdict and is OUTSTANDING, ' +
+      'counts once, by its own id. Each BLOCKER or HIGH id is its own unit even where the report merged ' +
+      'several ids into one item, because the unit floor, the driver\'s owed count and check 2 all count ' +
+      'raw ids: ids sharing an item each take a unit, and each unit\'s spec names its id and the item it ' +
+      'shares. An UNVERIFIED finding came back with no usable skeptic verdict and is OUTSTANDING, ' +
       'not cleared — read the code yourself and take it at the severity you adjudicate. ' +
       'BUILD-METHOD M4 disposes BY SEVERITY and admits no third ' +
       'route. PROMOTE every BLOCKER and every HIGH: ' +
@@ -1565,9 +1710,15 @@ if (!specAudit) {
       'IS RENUMBERED. A promotion that repairs no unit in particular takes an order ABOVE EVERY ' +
       'unit in this build — the honest append-past-the-end default, and the only case in which a ' +
       'promotion may land there. Never guess a position for one. ' +
-      'FOLD every MEDIUM and every ' +
-      'LOW into the spec it belongs to, as a rev-N bump with its ' +
-      'section 9 line. ' +
+      'PROMOTE every MEDIUM and every LOW too, BATCHED: all of them go into ONE unit whose spec ' +
+      'names every finding by report id in its §1 and gives each its own §2 item. Use TWO units ' +
+      'only when the minors split into two disjoint write sets by BUILD-METHOD M6\'s clauses, so ' +
+      'the halves build concurrently — never one unit per minor. Add each batch unit by the same ' +
+      (attended ? 'README roster row' : '`--rescope --act add`') + ' a promoted blocker takes, its ' +
+      'reason naming every report id it closes. A finding is not an ask, so it is named in scope ' +
+      'and never through the `closes` verb, which joins a spec to a `BACKLOG.md` ask. In ' +
+      '`placements`, `repairs` names the one unit every minor in the batch lands on, or `none` ' +
+      'when they land on several. Nothing is folded: return `folded` as 0. ' +
       'EVERY §3 EDGE YOU WRITE GETS BOTH OF ITS ENDS, in the same pass: a **consumes-from** `X` in ' +
       'one spec is a **hands-off** back in X\'s own §3, amended there as a rev-N bump with its ' +
       'section 9 line. A bullet written at one end only reds the hygiene gate\'s §3 edge join and ' +
@@ -1601,15 +1752,18 @@ if (!specAudit) {
   // audit gate, and this guard simply did not get the pattern.
   //
   // AND THE COUNTS MUST RECONCILE, IN SUM AND IN SPLIT. Every outstanding finding is promoted,
-  // folded or named standing — the prompt says so — so a return whose three numbers do not add to
-  // confirmed + unverified is the same self-contradiction with the contradiction moved into two
-  // integers. The sum alone was `containment-tested-one-way` (closing review round 1, cluster D):
-  // `promoted 0, folded 10` reconciled against confirmed 10 with two blockers and three highs in
-  // it, and the roster went out over two blockers folded into prose. The severity rule implies the
-  // split: every BLOCKER and HIGH is promoted, so `promoted` is AT LEAST `blockers + highs` and
-  // `folded` AT LEAST the confirmed rest — equalities when nothing is unverified, floors when an
-  // unverified finding was adjudicated into either. The reason is chosen in the order the existing
-  // arms read it; the refusal keeps their shape, an empty roster and a note.
+  // refuted or named standing — the prompt says so — so a return whose numbers do not add to
+  // confirmed + unverified is the same self-contradiction with the contradiction moved into the
+  // integers. `folded` stays in the sum so the reconciliation keeps its shape, and it must be 0. The
+  // sum alone was `containment-tested-one-way` (closing review round 1, cluster D): `promoted 0,
+  // folded 10` reconciled against confirmed 10 with two blockers and three highs in it, and the
+  // roster went out over two blockers folded into prose. TOOL-aEvidencedLens-8 S2/S3 - the
+  // promotion rule implies the split: every confirmed finding is promoted, so `promoted` is at least
+  // `confirmed`, and the UNITS are bounded both ways — one per blocker and high plus one for the
+  // minors at the floor, and at the ceiling two for the confirmed minors plus one per UNVERIFIED
+  // finding the stage promoted, whose severity is unknown and may owe a unit of its own. The ceiling
+  // refuses the shape it exists for, five minors promoted into five units. The reason is chosen in
+  // the order the existing arms read it; the refusal keeps their shape, an empty roster and a note.
   //
   // AND A PROMOTION NAMES ITS UNIT. `promoted` above zero beside an empty `promotedIds` is a
   // promotion the caller cannot route to an audit; a named unit beside `promoted` 0 is a unit no
@@ -1618,8 +1772,8 @@ if (!specAudit) {
   // AND `refuted` IS BOUNDED BY THE UNVERIFIED COUNT (closing review round 2, cluster F). It is the
   // one verdict a dead skeptic batch left unsupplied, so it may cover the UNVERIFIED population and
   // nothing else; a `refuted` above `unverified` has refuted a CONFIRMED finding, which is the
-  // re-review M4 forbids. It joins the sum and leaves the severity floors alone: a confirmed
-  // BLOCKER or HIGH is still promoted, and a confirmed MEDIUM or LOW still folded.
+  // re-review M4 forbids. It joins the sum and leaves the promotion floors alone: every confirmed
+  // finding is still promoted.
   stood = Array.isArray(d && d.standing) ? d.standing : []
   const counted = Number.isInteger(d && d.promoted) && Number.isInteger(d && d.folded)
   promoted = counted ? d.promoted : null
@@ -1672,17 +1826,27 @@ if (!specAudit) {
       ' repairing ' + JSON.stringify(p && p.repairs)
   })
   // ONE UNIT ON BOTH SIDES OF THE SUBTRACTION (TOOL-dMergedTally-1). `confirmed` counts RAW findings,
-  // so `blockers` and `highs` must too, or `mustFold` is raw minus items and demands more folds than
-  // the MEDIUM and LOW findings exist to fill. The synthesis used to type both integers and counted
+  // so `blockers` and `highs` must too, or `confirmedMinors` is raw minus items and miscounts the
+  // MEDIUM and LOW findings the batch closes. The synthesis used to type both integers and counted
   // the ITEMS it merged raw findings into: 13 confirmed in 10 items read blockers 1, highs 5 against a
   // raw 3 and 6, and no honest disposal passed. `tier2-review.js` now derives both from the raw ids
   // each item lists, and returns null when an id is placed in no item or in two.
-  const mustPromote = au.blockers + au.highs
-  const mustFold = au.confirmed - mustPromote
+  const confirmedMinors = au.confirmed - au.blockers - au.highs
+  const adjudicated = counted ? Math.max(d.promoted - au.confirmed, 0) : 0  // UNVERIFIED findings promoted
+  const minors = confirmedMinors + adjudicated
+  const unitFloor = au.blockers + au.highs + (minors > 0 ? 1 : 0)
+  const unitCeiling = au.blockers + au.highs + adjudicated + (confirmedMinors > 0 ? 2 : 0)
   const refutedOk = Number.isInteger(refuted) && refuted >= 0 && refuted <= au.unverified
+  // TWO ARMS BELOW ARE UNREACHABLE TODAY, kept on purpose and said so (guard-above-a-fold class).
+  // `d.promoted < au.confirmed` is settled by the sum, `folded` 0 and `refuted <= unverified`, which
+  // leave `promoted = confirmed + unverified - refuted`. The `promoted`/`promotedIds` pairing is
+  // settled by the unit bounds: a positive `promoted` has a floor of one, a zero one a ceiling of
+  // zero. Each stays as its own NAMED refusal should the arm above it ever loosen; neither is a
+  // redundant guard to delete, and the bounds and sum above them are not either.
   if (!d || d.disposed !== true || stood.length || !counted || !refutedOk ||
       d.promoted + d.folded + refuted + stood.length !== outstanding ||
-      d.promoted < mustPromote || d.folded < mustFold ||
+      d.folded !== 0 || d.promoted < au.confirmed ||
+      promotedIds.length < unitFloor || promotedIds.length > unitCeiling ||
       (d.promoted > 0) !== (promotedIds.length > 0) ||
       edges === null || oneWay.length || unplaced.length || misplaced.length) {
     const why = !d ? 'the disposal stage returned nothing at all'
@@ -1696,10 +1860,19 @@ if (!specAudit) {
         ? 'the counts do not reconcile — promoted ' + d.promoted + ' + folded ' + d.folded +
           ' + refuted ' + refuted + ' + standing ' + stood.length + ' is not confirmed ' + au.confirmed +
           ' + unverified ' + au.unverified
-      : d.promoted < mustPromote || d.folded < mustFold
-        ? 'the counts do not split by severity — promoted ' + d.promoted + ' is below blockers ' +
-          au.blockers + ' + highs ' + au.highs + ', or folded ' + d.folded + ' is below the ' +
-          mustFold + ' confirmed at MEDIUM or LOW'
+      : d.folded !== 0
+        ? 'folded ' + d.folded + ' — a spec audit\'s MEDIUM and LOW are PROMOTED, batched, never ' +
+          'folded (owner, 2026-10-05)'
+      : d.promoted < au.confirmed
+        ? 'promoted ' + d.promoted + ' is below the ' + au.confirmed + ' confirmed — every confirmed ' +
+          'finding is promoted'
+      : promotedIds.length < unitFloor
+        ? promotedIds.length + ' unit(s) for ' + au.blockers + ' blocker(s), ' + au.highs +
+          ' high(s) and ' + minors + ' minor(s), below the floor of ' + unitFloor + ' — one unit per ' +
+          'RAW blocker and high id, merged items included, plus one for the minors'
+      : promotedIds.length > unitCeiling
+        ? promotedIds.length + ' unit(s) where at most ' + unitCeiling + ' fit — the minors are ' +
+          'batched into one unit or two, never one per minor'
       : (d.promoted > 0) !== (promotedIds.length > 0)
         ? 'promoted ' + d.promoted + ' beside promotedIds ' + JSON.stringify(promotedIds) +
           ' — a promotion names the unit it became, and a unit names the finding that made it'
@@ -1742,8 +1915,10 @@ if (!specAudit) {
           ? ' The round was NOT recorded: at zero blockers the driver\'s row follows the disposal so its ' +
             'disposition field is what was promoted. Dispose the findings by hand under BUILD-METHOD M4, ' +
             'then record it yourself — `' + DRIVER + ' --review ' + slug + ' --subject ' + subject +
-            ' --verdict "CLEAN" --blockers 0`, with ` --disposition promote` appended iff any finding ' +
-            'became a unit — and dispatch from `' + DRIVER + ' --plan ' + slug + ' --paths`, the resume route.'
+            ' --verdict "CLEAN" --blockers 0 --highs ' + au.highs + ' --minors ' + confirmedMinors +
+            '`, adding to `--minors` every promoted UNVERIFIED finding, with ` --disposition promote` ' +
+            'appended iff any finding became a unit — and dispatch from `' + DRIVER + ' --plan ' + slug +
+            ' --paths`, the resume route.'
           : ''),
     }
   }
@@ -1757,7 +1932,7 @@ if (!specAudit) {
 }
 // THE RECORD FOLLOWS THE DISPOSAL AT ZERO BLOCKERS (cluster B, above): the field is derived from what
 // was actually promoted, so a unit the stage made out of an UNVERIFIED finding reaches check 2.
-if (disposeFirst) await writeRound(promotedIds.length ? ' --disposition promote' : '')
+if (disposeFirst) await writeRound(promotedIds.length ? ' --disposition promote' : '', Math.max(promoted - au.confirmed, 0))
 // ==================================================== THE HAND-OUT, and what is graded before it
 // S4/S4b - THE PER-UNIT REFUSAL, and in attended mode it happens HERE rather than at `--dispatch`.
 // IT DID NOT LEAVE WITH THE BUILD AGENT (TOOL-aHoistedPass-6): it grades which units may be

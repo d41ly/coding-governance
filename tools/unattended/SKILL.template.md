@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.75 -->
+<!-- gov:kit unattended@1.76 -->
 
 # Unattended runs
 
@@ -250,7 +250,8 @@ It schedules no idle-wake, and the section above does not bind it: there is an o
    project default at the default-branch side of it, so a working-copy edit opts nothing in or out, and a value that is not a date is a refusal.
    **The opt-in is the OWNER's, never yours** (`TOOL-aWardedAudit-4`). Do not write `spec-audit:`
    into a README you author: preflight refuses it under `authorized-by: prompt` or `recipe`
-   (check 89), and reads a project default only from the default branch. The `not owed` line names
+   (check 89). The one exception is a `prompt` README whose prompt record at BASE quotes the
+   owner asking for the audit (owner, 2026-10-05); write the key only then. Preflight reads a project default only from the default branch. The `not owed` line names
    the owner's cue, two or more units or a FORKED spec: carry it to the wrap-up and decide nothing.
    Keep the line: the harness call needs it.
    After a compaction, `--status` carries the same fact as `· spec-audit <date>`.
@@ -812,35 +813,33 @@ confirmed-blocker count for THIS round, as a plain integer.
 It answers with one of five states, and the state is what you act on:
 
 - **CONVERGING** — this round's count is strictly smaller than the round before. Fold and go again.
-  On the closing diff review the fold fixes its BLOCKERS only; the highs, mediums and lows carry to
-  the exit, where they are counted and promoted (the build method's M8).
+  On a SPEC subject the fold fixes what that round confirmed, and only the exit promotes. On the
+  closing diff review the fold fixes its BLOCKERS only; the highs, mediums and lows carry to the
+  exit, where they are counted and promoted (the build method's M8).
 - **CONVERGED** — zero blockers. The loop is done for that subject, and its confirmed highs,
-  mediums and lows are still disposed, by the severity rule the next bullet states. Where a HIGH
-  stood on a SPEC subject, record `--disposition promote` on that round — ACCEPTED there, never
-  required — so the merge bar demands the unit the high became instead of reading the promotion as
-  nothing; with nothing above MEDIUM the row needs no field. The closing diff review's converged
-  round is different, and the paragraph after this list states how.
+  mediums and lows are still disposed, by the severity rule the next bullet states. The round
+  records `--highs` and `--minors` on every subject, and `--disposition promote` whenever anything
+  stood, so the merge bar demands the units the findings became instead of reading the promotion as
+  nothing; the paragraph after this list states the counts.
 - **NON-CONVERGENT** — the count did not shrink. **The loop STOPS**, and every CONFIRMED finding is
   DISPOSED BY SEVERITY — and that holds at `CONVERGED` too. A BLOCKER or HIGH is PROMOTED: it
   becomes a UNIT whose mechanism CLOSES the finding, specced at its tier, audited as a SPEC, built,
-  closed. On a SPEC subject a MEDIUM or LOW is FOLDED into the spec it belongs to, as a `rev-N`
-  bump with its §9 line; the closing diff review promotes those too, as the paragraph after this
-  list states. Never parked, never waived, never RETIRED, and never re-reviewed. Both terminate.
+  closed. A MEDIUM or LOW is PROMOTED too, on every subject, batched as the paragraph after this
+  list states. Never folded, never parked, never waived, never RETIRED, and never re-reviewed.
   **`never RETIRED` is in that list because it is the cheapest exit and the one the enumeration used
   to leave open**: a promoted unit flipped to `WONTDO` satisfies the leg's promotion count, which
   reads new ids, and `build-complete`, which reads only that no row is non-terminal. **Nor is it
   ever DEFERRED to be carried forward**: that would meet the promotion count and `build-complete` at
   once, so `build-complete` carries only a unit the roster held when the run started, and a promoted
   unit flipped to `DEFERRED` stays unfinished.
-  **Record it**, with `--disposition promote` on the round that exits: `promote` is the ONLY value a
-  terminal exit can record, because every exit that is not `CONVERGED` carries at least one BLOCKER
-  and the rule promotes every one of them, so `fold` at an exit with blockers is REFUSED rather than
-  written. The merge bar reads that field and demands the new unit ids it implies; a promotion with
+  **Record it**, with `--highs`, `--minors` and `--disposition promote` on the round that exits:
+  `promote` is the ONLY value a terminal exit can record, so `fold` is REFUSED at every exit of
+  every subject rather than written. The merge bar reads that field and demands the new unit ids it implies; a promotion with
   nothing recorded is indistinguishable from one that never happened.
 - **BOUNDED** — the declared round bound, `REVIEW_ROUNDS` (kit default 1), is reached on a subject
   that is not the build slug. **The loop STOPS**, and every CONFIRMED finding is DISPOSED BY
-  SEVERITY, exactly as at `NON-CONVERGENT`; the round records `--disposition promote`, the only
-  value a terminal exit can carry. The owner ruled on 2026-09-14 that a SPEC subject takes one round
+  SEVERITY, exactly as at `NON-CONVERGENT`; the round records `--highs`, `--minors` and
+  `--disposition promote`, the only value a terminal exit can carry. The owner ruled on 2026-09-14 that a SPEC subject takes one round
   by default; the closing diff review keeps its convergence loop, because its subject is the build
   slug, whose bound is the runaway ceiling. **A promotion at this exit is NOT audited by the round
   that produced it**: after `--rescope --act add` and the new spec, re-invoke the harness at round
@@ -858,21 +857,25 @@ It answers with one of five states, and the state is what you act on:
   That is a defect in the predicate, not a routine outcome. The run promotes and lands anyway, and you
   record it in the build README, because a fact that lives only in a transcript is a fact nobody reads.
 
-**The closing diff review promotes EVERY confirmed finding, and its exit COUNTS them.** Owner
-ruling of 2026-10-04: a BLOCKER or HIGH becomes a unit of its own, and the MEDIUMs and LOWs are
-batched into ONE unit whose spec names every one of them — TWO only when they split into two
+**Every terminal exit promotes EVERY confirmed finding, and COUNTS them.** Owner rulings of
+2026-10-04 for the closing diff review and 2026-10-05 for a spec subject: a BLOCKER or HIGH becomes
+a unit of its own, and the MEDIUMs and LOWs are batched into ONE unit whose spec names every one of them — TWO only when they split into two
 disjoint write sets by the build method's M6 clauses, so the halves build concurrently. Never one
 unit per minor, and never a fold. Each unit is a `--rescope --act add`, specced, built and closed
-like any promotion. The terminal round on the build slug therefore carries two counts, REQUIRED
-there and refused on any other round or subject:
+like any promotion. The terminal round on every subject therefore carries two counts, REQUIRED at
+every terminal exit, spec subjects included, and refused on a round that is not one:
 
 ```bash
-bash {{KIT_DIR}}/unattended.sh --review <slug> --subject <slug> --verdict <verdict> --blockers <N> --highs <H> --minors <M> --disposition promote
+bash {{KIT_DIR}}/unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N> --highs <H> --minors <M> --disposition promote
 ```
 
-Derive both from the harness returns, never by reading the report: per round, `<H>` adds that
-round's `highs` and `<M>` adds `confirmed - blockers - highs`, summed over every round of the loop,
-because a closing fold fixes blockers only, per the CONVERGING bullet above. The verb then requires `promote`
+On a spec subject the build harness records them itself. Otherwise derive both from the harness
+returns, never by reading the report. On the closing diff review, per round, `<H>` adds that round's
+`highs` and `<M>` adds `confirmed - blockers - highs`, summed over every round of the loop, because
+a closing fold fixes blockers only, per the CONVERGING bullet above. On a spec subject, recorded by
+hand, they are that exit round's `highs`, and its `confirmed - blockers - highs` plus every
+UNVERIFIED finding the disposal promoted, with no summing across rounds, because a spec round's fold
+fixes everything that round confirmed. The verb then requires `promote`
 whenever anything stood and refuses it when nothing did, and the merge bar demands one new unit per
 standing blocker and high plus one for the minors.
 
