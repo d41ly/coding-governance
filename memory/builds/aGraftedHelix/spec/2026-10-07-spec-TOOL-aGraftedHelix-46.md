@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-46 — govkit reads a quoted conf value followed by a comment the way the shell that sources it does
 
-**Status:** SPECCED · rev-1 · 2026-10-07 · node a · Tier-1 · base e1f4d8c0 · streams tooling · order 27
+**Status:** SPECCED · rev-2 · 2026-10-07 · node a · Tier-1 · base e1f4d8c0 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
@@ -187,7 +187,7 @@ Option (b) of F1 is weighed there, with the fixture observation that costs it.
   `python -c "import sys,pathlib,tempfile as t; sys.path.insert(0,'tools/govkit'); import selftest as s; s.check_conf_reader_parity(pathlib.Path(t.mkdtemp(prefix='g46-'))); print('FAILURES', s.FAILURES)"`
   Red when: any row's `parse_conf_assignment` or `parse_conf_line` value differs from bash's, or
   fewer rows are graded than the table holds.
-  cost: about 45 s, most of it the import of `tools/govkit/selftest.py` (UNVERIFIED for this arm).
+  cost: about 45 s, most of it the import of the govkit selftest module (UNVERIFIED for this arm).
   fixture: the temp root is a fixture directory under `%TEMP%`, never the scratchpad, whose path
   length false-reds other govkit arms.
   figure: the row count is DERIVED from the table's length at run time.
@@ -251,6 +251,7 @@ New arm: `tools/govkit/selftest.py` · covers AC1 AC2 AC3 AC4 · `check_conf_rea
 ## 9. Revision log
 
 - rev-1 · 2026-10-07 · initial draft, from the owner's adoption of 2026-10-07 and the unit's brief.
+- rev-2 · 2026-10-07 · AC1's cost line no longer backticks the selftest file, which the spec-token bar join read as a suite cited as the observation; the slice itself is unchanged.
 
 ## 10. Reuse audit
 
