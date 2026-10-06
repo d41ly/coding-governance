@@ -71,3 +71,9 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-05T23:15:20Z dispatch · item bd1f7d6b TOOL-aGraftedHelix-34 · reason tools/unattended tools/gate-legs.json memory/guides .claude/skills/unattended/SKILL.md memory/map memory/gotchas memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-34.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md
 
 2026-10-05T23:44:10Z dispatch · item bd1f7d6b TOOL-aGraftedHelix-34 · reason tools/unattended tools/gate-legs.json memory/guides .claude/skills/unattended/SKILL.md memory/map memory/gotchas memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-34.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md tools/run-gates/selftest-budgets.txt memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-06T01:52:42Z review · item aGraftedHelix · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 14 · disposition promote
+
+2026-10-06T01:52:45Z rescope · item add TOOL-aGraftedHelix-35 · reason H1 (rotated run's closing review round 1, ids 1 and 18): the spec-audit route still merges a by-design block read at the spec commit's parent, inside the build, so a build-added invariant can exempt the specs it audits
+
+2026-10-06T01:52:47Z rescope · item add TOOL-aGraftedHelix-36 · reason the rotated run's closing review round 1's MEDIUM and LOW findings M2-M7 and L1-L3, batched into one unit by the owner's promote-every-finding ruling; M1 is the HIGH's own defect and closes with it

@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-04-build-TOOL-aGraftedHelix-34-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aGraftedHelix-34-1-acceptance-ledger.md) | journal | — |
 | [2026-10-06-prompt-TOOL-aGraftedHelix-34-1-spec-brief.md](../prompts/2026-10-06-prompt-TOOL-aGraftedHelix-34-1-spec-brief.md) | journal | — |
+| [2026-10-06-review-TOOL-aGraftedHelix-29-closing-diff-round1.md](../reviews/2026-10-06-review-TOOL-aGraftedHelix-29-closing-diff-round1.md) | diff-review | TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33 |
 
 <!-- /gen:spec-records -->
 
