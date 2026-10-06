@@ -962,6 +962,57 @@ export CARD_OVERLAP_BOUND=1
 run_card "overlaps cell: a driver past the bound is unknown, not none" "$R" 0 "overlaps — skipped: --overlaps did not answer within 1s" --card --write --session "$NONCE-t77d"
 unset CARD_OVERLAP_BOUND
 
+# KICK-aMendedFleet-4 — the `cli —` cell over a stub `claude` first on PATH, under four AI_AGENT
+# values and an unset one, then a stub printing no number, no `claude` on PATH at all, and a stub
+# that outlives a one-second bound. Staged red by swapping the integer comparison for a string one,
+# which orders 2.1.99 after 2.1.178. AI_AGENT and PATH are restored after the block.
+mkrepo clicell; CL="$R"; CLI_BIN="$TMP/clibin"; mkdir -p "$CLI_BIN"
+cli_aa_set=${AI_AGENT+1}; cli_aa=${AI_AGENT-}; cli_path=$PATH
+printf '#!/usr/bin/env bash\necho "2.1.178 (Claude Code)"\n' > "$CLI_BIN/claude"; chmod +x "$CLI_BIN/claude"
+export PATH="$CLI_BIN:$cli_path"
+cli_card() {   # $1=session suffix $2=AI_AGENT value, or - for unset; run in THIS shell so it counts
+  if [ "$2" = - ]; then unset AI_AGENT; else export AI_AGENT="$2"; fi
+  run_card "cli cell: --card --write under AI_AGENT=$2" "$CL" 0 - --card --write --session "$NONCE-$1"
+}
+cli_cell() { grep -m1 '^cli — ' "$CL/.git/orientation/$NONCE-$1.md"; }
+cli_card t4a claude-code_2-1-286_agent
+check_eq "cli cell: a PATH claude older than the session is a NOTE" \
+  "cli — NOTE: PATH claude 2.1.178 is older than this session's 2.1.286, so a session started from PATH runs the older CLI" \
+  "$(cli_cell t4a)"
+check_eq "cli cell: sits directly after node —" "cli" \
+  "$(grep -A1 '^node — ' "$CL/.git/orientation/$NONCE-t4a.md" | sed -n 2p | cut -d' ' -f1)"
+cli_card t4b claude-code_2-1-99_harness
+check_eq "cli cell: fields compare as integers, so 2.1.178 is newer than 2.1.99" \
+  "cli — PATH claude 2.1.178 is newer than this session's 2.1.99" "$(cli_cell t4b)"
+cli_card t4c claude-code_2-1-178_agent
+check_eq "cli cell: equal versions match" "cli — 2.1.178 · PATH claude matches this session" "$(cli_cell t4c)"
+cli_card t4d claude-code_2-1-290_harness
+check_eq "cli cell: 2.1.290 makes PATH older" \
+  "cli — NOTE: PATH claude 2.1.178 is older than this session's 2.1.290, so a session started from PATH runs the older CLI" \
+  "$(cli_cell t4d)"
+cli_card t4e -
+check_eq "cli cell: an unset AI_AGENT is no session version" "cli — skipped: AI_AGENT names no Claude Code version" "$(cli_cell t4e)"
+cli_card t4f claude-code_x_agent
+check_eq "cli cell: a non-numeric field is no session version" "cli — skipped: AI_AGENT names no Claude Code version" "$(cli_cell t4f)"
+printf '#!/usr/bin/env bash\necho "Claude Code"\n' > "$CLI_BIN/claude"
+cli_card t4g claude-code_2-1-286_agent
+check_eq "cli cell: a PATH claude printing no number is skipped" "cli — skipped: claude --version printed no version" "$(cli_cell t4g)"
+printf '#!/usr/bin/env bash\nsleep 10\necho "2.1.178 (Claude Code)"\n' > "$CLI_BIN/claude"
+export CARD_CLI_BOUND=1
+cli_card t4h claude-code_2-1-286_agent
+check_eq "cli cell: a PATH claude past the bound is skipped" "cli — skipped: claude --version did not answer within 1s" "$(cli_cell t4h)"
+unset CARD_CLI_BOUND
+cli_noc=""; IFS=: read -r -a cli_dirs <<< "$cli_path"
+for d in "${cli_dirs[@]}"; do
+  [ -n "$d" ] || continue
+  [ -e "$d/claude" ] || [ -e "$d/claude.exe" ] || [ -e "$d/claude.cmd" ] || cli_noc="${cli_noc:+$cli_noc:}$d"
+done
+export PATH="$cli_noc"
+cli_card t4i claude-code_2-1-286_agent
+check_eq "cli cell: no claude on PATH is skipped" "cli — skipped: no claude on PATH" "$(cli_cell t4i)"
+export PATH="$cli_path"
+if [ -n "$cli_aa_set" ]; then export AI_AGENT="$cli_aa"; else unset AI_AGENT; fi
+
 # ---- KICK-aReplayedCard-2: --card --append and --card --check ------------------------------------
 # Every arm runs in the clone's linked worktrees, whose common dir holds the cards. The reader the
 # append spawns is the clone's copy of the memory-tree id reader, which the fixture commit above
@@ -1322,7 +1373,8 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +2: C12's pair, the CR-byte check's green and red cases (round 3 M1's left-shift).
 # +2: L3's pair, the junction-copy setup and its graded-ids arm (aRepatriatedFork round 1 L3).
 # +8: the `overlaps —` cell's arms (KICK-aMendedFleet-2), counted off the block; no suite ran in the pass.
-FLOOR_ASSERTIONS=188
+# +19: the `cli —` cell's nine card writes and ten cell checks (KICK-aMendedFleet-4), counted the same way.
+FLOOR_ASSERTIONS=207
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

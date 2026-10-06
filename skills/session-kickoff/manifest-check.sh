@@ -131,6 +131,9 @@ CARD_CAP_BYTES=${CARD_CAP_BYTES:-8192}
 # does; neither is an adopter knob.
 CARD_OVERLAP_BOUND=${CARD_OVERLAP_BOUND:-10}
 CARD_OVERLAP_ROWS=5
+# The `cli —` cell's bound on `claude --version`, in seconds (KICK-aMendedFleet-4); the env override
+# exists for the self-test's slow-stub arm and is not an adopter knob.
+CARD_CLI_BOUND=${CARD_CLI_BOUND:-5}
 
 # The session id, in PRECEDENCE order: `--session` answers FIRST and SUPPRESSES the stdin read;
 # only a caller that passed none falls through to the `{"session_id": …}` JSON the SessionStart hook
@@ -236,6 +239,42 @@ derive_node_tag() {
   esac
 }
 
+# The `cli —` cell (KICK-aMendedFleet-4): PATH's `claude --version` against the running session's
+# version. The session's is read from `AI_AGENT` by the unattended driver's rule, spelled again here
+# because this kit names no file of another: a `claude-code_` prefix, the field before the next `_`,
+# dashes as dots, two to four integers. The PATH read is bounded and lands in a scratch file under
+# the card dir, never a `$( )` capture a grandchild could hold open. Fields compare as integers, a
+# missing one as 0; every failure is its own `skipped:` line, and none moves the card's exit.
+derive_cli_line() {
+  local s="" p="" t sf rc c=0 i
+  local -a toks a b
+  case "${AI_AGENT:-}" in claude-code_*) s=${AI_AGENT#claude-code_}; s=${s%%_*}; s=${s//-/.} ;; esac
+  [[ $s =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] || { printf 'cli — skipped: AI_AGENT names no Claude Code version\n'; return 0; }
+  command -v claude >/dev/null 2>&1 || { printf 'cli — skipped: no claude on PATH\n'; return 0; }
+  sf="$CARD_DIR/.cli.$$"
+  mkdir -p "$CARD_DIR" 2>/dev/null
+  timeout -k 2 "$CARD_CLI_BOUND" claude --version </dev/null >"$sf" 2>/dev/null; rc=$?
+  [ -f "$sf" ] && read -r -a toks < "$sf"
+  rm -f "$sf" 2>/dev/null
+  case "$rc" in 124|137) printf 'cli — skipped: claude --version did not answer within %ss\n' "$CARD_CLI_BOUND"; return 0 ;; esac
+  for t in ${toks[@]+"${toks[@]}"}; do
+    t=${t%$'\r'}
+    [[ $t =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] && { p=$t; break; }
+  done
+  [ -n "$p" ] || { printf 'cli — skipped: claude --version printed no version\n'; return 0; }
+  a=(${p//./ }); b=(${s//./ })
+  for i in 0 1 2 3; do
+    (( 10#${a[i]:-0} == 10#${b[i]:-0} )) && continue
+    if (( 10#${a[i]:-0} < 10#${b[i]:-0} )); then c=-1; else c=1; fi
+    break
+  done
+  case "$c" in
+    0) printf 'cli — %s · PATH claude matches this session\n' "$s" ;;
+    -1) printf "cli — NOTE: PATH claude %s is older than this session's %s, so a session started from PATH runs the older CLI\n" "$p" "$s" ;;
+    *) printf "cli — PATH claude %s is newer than this session's %s\n" "$p" "$s" ;;
+  esac
+}
+
 # The `drift —` cell (KICK-aMendedFleet-1): the LAST group of `drift-history.tsv` in the git common
 # dir, the file every bar's `drift-audit records` leg appends to (TOOL-aMendedFleet-48). It READS that
 # file and never runs the report: one `head` and one `tail -n 400` into one C-locale awk, so the
@@ -283,7 +322,9 @@ derive_drift_line() {
 # `$1` names the writer verb the header carries; a card the replay wrote fresh says `--card --replay`,
 # which is the one byte-level fact that tells a session started before the writer was wired from one
 # whose startup ran it. The `live —` cell reads the memory-tree conf when there is one and reports
-# `skipped:` otherwise, because this kit requires no other kit. The `drift —` cell, between
+# `skipped:` otherwise, because this kit requires no other kit. The `cli —` cell, directly after
+# `node —`, is `derive_cli_line`: PATH's `claude --version` against the session's own version from
+# `AI_AGENT`, a NOTE when PATH is older, one line always. The `drift —` cell, between
 # `worktrees —` and `live —`, is `derive_drift_line`: the last group of `drift-history.tsv` in the
 # git common dir, read from that file and never from a report run. The `overlaps —` cell, after any
 # `drift —` cell and before `live —`, is `derive_overlaps_line`: the unattended driver's
@@ -314,6 +355,7 @@ render_card() {
   fi
   printf 'orientation — %s · written %s · by %s --card --%s\n' "$CARD_SID" "$(date +%Y-%m-%dT%H:%M:%S%z)" "${0##*/}" "$verb"
   derive_node_tag "$registry"
+  derive_cli_line
   render_tree_cell
   printf 'worktrees — %s\n' "$(git worktree list 2>/dev/null | wc -l | tr -d '[:space:]')"
   derive_drift_line

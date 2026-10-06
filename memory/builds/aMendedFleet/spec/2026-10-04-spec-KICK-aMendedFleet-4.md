@@ -1,6 +1,6 @@
 # KICK-aMendedFleet-4 — the orientation card notes a PATH CLI older than the running session
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff · ratified 2026-10-04 · order 96
+**Status:** CLOSED · rev-4 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff · ratified 2026-10-04 · order 96
 
 <!-- gen:spec-records -->
 
@@ -104,6 +104,7 @@ Read at base `7af5f564`; `skills/session-kickoff/` is byte-identical at the work
 - `skills/session-kickoff/manifest-check.sh`
 - `skills/session-kickoff/manifest-check.test.sh`
 - `memory/map/features/session-kickoff.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -195,6 +196,9 @@ New arm: `skills/session-kickoff/manifest-check.test.sh` · covers AC1 AC2 AC3 A
 - rev-3 · 2026-10-06 · §7 · the `New arm:` line's `covers` field spelled a range, `AC1 to AC4`; the
   covers join of `TOOL-aMendedFleet-75` reads the field as space-separated criterion ids and graded
   `to` as a hit, so the range is written out as the four ids it meant.
+- rev-4 · 2026-10-06 · §4 · Files touched names `memory/map/generated/symbols.json` again: rev-2's
+  reason was wrong, since `gen_map.py --check` read STALE after the build and `--write` added
+  `derive_cli_line` and the self-test's two shell helpers, so the generator enumerates shell too.
 
 ## 10. Reuse audit
 

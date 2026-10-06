@@ -66,6 +66,9 @@ file every bar's drift-audit records leg appends to, by reading that file and ne
 The `overlaps —` cell (`KICK-aMendedFleet-2`) prints the unattended driver's `--overlaps` answer, the
 unmerged remote-tracking refs sharing a path with this tree's branch, read once under a bounded
 `timeout` and found through `resolve_kit_file`, so the kit spells no path of the unattended kit.
+The `cli —` cell (`KICK-aMendedFleet-4`), directly after `node —`, compares PATH's `claude --version`,
+read once under a bounded `timeout`, with the running session's version from `AI_AGENT`, and prints a
+NOTE when PATH is the older, since every session started from PATH runs that CLI.
 
 The engine's kickoff lands on the card through `--card --append` (`KICK-aReplayedCard-2`), which
 checks every cited path, line range and record id for EXISTENCE in two spawns — one

@@ -4133,6 +4133,16 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "cli_card",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "cli_cell",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
       "id": "cmd_adopt",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -4961,6 +4971,11 @@
       "id": "derive_clauses",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "derive_cli_line",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "derive_comparator",
