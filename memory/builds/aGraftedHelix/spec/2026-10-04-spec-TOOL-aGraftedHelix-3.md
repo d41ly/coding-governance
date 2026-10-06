@@ -91,7 +91,8 @@ needed. The unit also routes the checklist into the spec audit, which has never 
 
 ### Edges
 
-none
+- **hands-off** `TOOL-aGraftedHelix-29` — the `invariant` kind, `render_by_design` and the
+  by-design block, which that unit reads at the subject's base instead of the working tree.
 
 ## 4. Design
 
