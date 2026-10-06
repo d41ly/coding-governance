@@ -151,7 +151,7 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraf
 | [TOOL-aGraftedHelix-37 — breaking a stale claim-push lock is a step one writer wins](spec/2026-10-06-spec-TOOL-aGraftedHelix-37.md) | 21 | 2 | CLOSED | rev-3 | 2026-10-06 |
 <!-- /gen:build-units -->
 
-Records: 55 bound to this build, across 4 record folder(s).
+Records: 56 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
