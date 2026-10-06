@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.82 -->
+<!-- gov:kit unattended@1.83 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -196,7 +196,9 @@ on stderr when absent.
 
 A relaunch appends one `run-resumed` line, and a launch that failed one `resume-failed` line, to the
 health log under the git common dir that the orientation card counts; the driver appends
-`claim-taken-over` when it takes over a stale claim (`TOOL-aGraftedHelix-8`). The line format is the
+`claim-taken-over` when it takes over a stale claim (`TOOL-aGraftedHelix-8`), and
+`claim-push-lock-broken` when it breaks a stale `claim-push.lock` under that lock's guard, or
+`claim-push-guard-cleared` when it removes a guard a crashed writer left (`TOOL-aGraftedHelix-37`). The line format is the
 header of the `health_log_sh` block in `lib-unattended.sh`.
 
 ## The sidecar

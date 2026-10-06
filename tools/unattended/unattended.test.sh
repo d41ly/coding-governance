@@ -14417,6 +14417,146 @@ same "GH36 AC14 an expired lock is cleared and the claim renewed" "$([ "$(git ls
 same "GH36 AC14 ...and no lock directory remains" "$([ -e "$gu_gd/claim-push.lock" ] && echo left || echo none)" "none"
 rm -rf "$gu_gd/claim-push.lock"
 remove_claim_refs; reset_tree
+# ---- TOOL-aGraftedHelix-37: breaking a stale `claim-push.lock` is a step ONE writer wins. The three
+# ---- lock functions are EXTRACTED from the shipped driver and driven over plain directories, never a
+# ---- copy typed here, and an empty extraction fails naming the function. The race runs two writers
+# ---- over a stale lock, the second's `date` waiting (bounded 10 s) for the first's verdict and the
+# ---- first starting once the second waits: the order that let both in on unit 36's inline break.
+# ---- A writer's `date`, `find` and `rm` are SHIMS first on its own PATH, never shell functions: a
+# ---- function named for a command is a lexicon verb offender, and assigning PATH clears the hash.
+# ---- Every arm's staged break is a `mutate` of the extracted copy, sourced only inside a `$( )`, so
+# ---- the suite's own shell keeps the clean functions; the block unsets them and re-sources the
+# ---- library its health stubs shadow on the way out. No fixture repository and no remote.
+gh_d=$(mktemp -d); gh_fn="$gh_d/fn.sh"; gh_cp="$gh_d/cp.sh"
+for gh_f in check_claim_push_lock_stale write_claim_push_lock remove_claim_push_lock; do
+  gh_x=$(sed -n "/^$gh_f() {/,/^}\$/p" "$SCRIPT")
+  [ -n "$gh_x" ] || { echo "FAIL could not extract $gh_f from $SCRIPT — the GH37 arms would grade nothing"; st=1; }
+  printf '%s\n' "$gh_x" >> "$gh_fn"
+done
+REMOTE_BOUND=60
+ROOT="$TMP"
+resolve_health_log() { echo "$gh_d/health"; }
+add_health_event() { echo "$3" >> "$1"; }
+# shellcheck disable=SC1090
+. "$gh_fn"
+GH37_DATE=$(command -v date); GH37_FIND=$(command -v find); GH37_RM=$(command -v rm)
+export GH37_DATE GH37_FIND GH37_RM
+mkdir -p "$gh_d/bin-race2" "$gh_d/bin-inter1" "$gh_d/bin-inter2"
+# The race's second writer: its `date` marks `in2`, then waits for the first writer's verdict.
+cat > "$gh_d/bin-race2/date" <<'GH37'
+#!/usr/bin/env bash
+: > "$GH37_X/in2"; i=0; while [ ! -e "$GH37_X/v1" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
+exec "$GH37_DATE" "$@"
+GH37
+# The interleaving's first writer: its SECOND `date`, the re-read under a guard it holds, marks `in1`
+# and waits for writer 2's verdict.
+cat > "$gh_d/bin-inter1/date" <<'GH37'
+#!/usr/bin/env bash
+if [ -e "$GH37_X/d1" ]; then
+  : > "$GH37_X/in1"; i=0
+  while [ ! -e "$GH37_X/v2" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
+else
+  : > "$GH37_X/d1"
+fi
+exec "$GH37_DATE" "$@"
+GH37
+# ...and its second writer: `find` marks the guard's age read, `rm` waits for writer 1 to act first.
+cat > "$gh_d/bin-inter2/find" <<'GH37'
+#!/usr/bin/env bash
+"$GH37_FIND" "$@"; r=$?; : > "$GH37_X/read2"; exit "$r"
+GH37
+cat > "$gh_d/bin-inter2/rm" <<'GH37'
+#!/usr/bin/env bash
+i=0; while [ ! -e "$GH37_X/in1" ] && [ ! -e "$GH37_X/v1" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
+exec "$GH37_RM" "$@"
+GH37
+chmod +x "$gh_d/bin-race2/date" "$gh_d/bin-inter1/date" "$gh_d/bin-inter2/find" "$gh_d/bin-inter2/rm"
+measure_gh37_race() { # functions file -> `<trials two writers took the lock> <trials exactly one did>`, of five
+  local t x lk p i two=0 one=0
+  . "$1"
+  for t in 1 2 3 4 5; do
+    x="$gh_d/trial$t"; mkdir -p "$x"; lk="$x/claim-push.lock"
+    mkdir "$lk"; echo "$(( $(date +%s) - 5 ))" > "$lk/until"
+    ( export GH37_X="$x"; PATH="$gh_d/bin-race2:$PATH"
+      write_claim_push_lock "$lk" w2; echo $? > "$x/v2" ) &
+    i=0; while [ ! -e "$x/in2" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
+    ( write_claim_push_lock "$lk" w1; echo $? > "$x/v1" ) &
+    wait
+    p=$(cat "$x/v1" "$x/v2" 2>/dev/null | grep -c '^0$')
+    [ "$p" != 2 ] || two=$((two+1)); [ "$p" != 1 ] || one=$((one+1))
+    rm -rf "$x"
+  done
+  echo "$two $one"
+}
+# The interleaving, in a FIXED order over a stale lock and a guard aged two minutes: writer 2 reads the
+# guard's age while it is old, writer 1 then removes it (and, in the staged break, takes it and waits
+# inside its re-read for writer 2's verdict), and only then does writer 2 act on its old reading.
+measure_gh37_interleave() { # functions file -> how many of the two writers took the lock
+  local x="$gh_d/inter" lk i
+  . "$1"
+  mkdir -p "$x"; lk="$x/claim-push.lock"
+  mkdir "$lk" "$lk.break"; echo "$(( $(date +%s) - 5 ))" > "$lk/until"; touch -d "@$(( $(date +%s) - 120 ))" "$lk.break"
+  ( export GH37_X="$x"; PATH="$gh_d/bin-inter2:$PATH"
+    write_claim_push_lock "$lk" w2; echo $? > "$x/v2" ) &
+  i=0; while [ ! -e "$x/read2" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
+  ( export GH37_X="$x"; PATH="$gh_d/bin-inter1:$PATH"
+    write_claim_push_lock "$lk" w1; echo $? > "$x/v1" ) &
+  wait
+  cat "$x/v1" "$x/v2" 2>/dev/null | grep -c '^0$'
+  rm -rf "$x"
+}
+# ---- AC1: the race. RED with the re-read under the guard cut: the lagging writer breaks the fresh lock.
+gh_r=$(measure_gh37_race "$gh_fn")
+same "GH37 AC1 no race trial lets two writers take a stale lock" "${gh_r% *}" "0"
+same "GH37 AC1 ...and every trial lets exactly one take it" "${gh_r#* }" "5"
+cp "$gh_fn" "$gh_cp"
+mutate "$gh_cp" '/^    if ! check_claim_push_lock_stale "\$lk"; then rmdir/d'
+gh_r=$(measure_gh37_race "$gh_cp")
+same "GH37 AC1 a copy with the re-read under the guard cut lets two writers in" "$([ "${gh_r% *}" -ge 1 ] && echo yes || echo "no: $gh_r")" "yes"
+# ---- AC3: the bound. A fresh guard stays; an aged one is removed and logged, the call busy; the call
+# ---- after it breaks the lock. RED when an aged guard is never removed: every later call stays busy.
+gh_lk="$gh_d/bound/claim-push.lock"; mkdir -p "$gh_lk" "$gh_lk.break"; : > "$gh_d/health"
+echo "$(( $(date +%s) - 5 ))" > "$gh_lk/until"
+write_claim_push_lock "$gh_lk" w-me; gh_rc=$?
+same "GH37 AC3 a stale lock under a fresh guard leaves the call busy" "$gh_rc" "1"
+same "GH37 AC3 ...and the guard in place" "$([ -d "$gh_lk.break" ] && echo kept || echo gone)" "kept"
+touch -d "@$(( $(date +%s) - 120 ))" "$gh_lk.break"
+write_claim_push_lock "$gh_lk" w-me; gh_rc=$?
+same "GH37 AC3 a guard aged two minutes leaves the call busy" "$gh_rc" "1"
+same "GH37 AC3 ...and removes the guard" "$([ -d "$gh_lk.break" ] && echo kept || echo gone)" "gone"
+hit  "$(cat "$gh_d/health")" "claim-push-guard-cleared"
+write_claim_push_lock "$gh_lk" w-me; gh_rc=$?
+same "GH37 AC3 the next call breaks and takes the stale lock" "$gh_rc" "0"
+same "GH37 AC3 ...its until is a deadline in the future" "$(u=""; read -r u <"$gh_lk/until"; case "$u" in ''|*[!0-9]*) echo none ;; *) [ "$u" -gt "$(date +%s)" ] && echo future || echo past ;; esac)" "future"
+same "GH37 AC3 ...its owner is the token passed" "$(cat "$gh_lk/owner" 2>/dev/null)" "w-me"
+same "GH37 AC3 ...no guard is left" "$([ -e "$gh_lk.break" ] && echo left || echo none)" "none"
+hit  "$(cat "$gh_d/health")" "claim-push-lock-broken"
+cp "$gh_fn" "$gh_cp"
+mutate "$gh_cp" '/^        rm -rf "\$g"$/d'
+same "GH37 AC3 a copy that never removes an aged guard leaves the call after it busy" "$( . "$gh_cp"; l="$gh_d/bound2/claim-push.lock"
+  mkdir -p "$l" "$l.break"; echo "$(( $(date +%s) - 5 ))" > "$l/until"; touch -d "@$(( $(date +%s) - 120 ))" "$l.break"
+  write_claim_push_lock "$l" w-me; write_claim_push_lock "$l" w-me; echo $? )" "1"
+# ---- AC4: the interleaved abandoned guard. RED when the remover takes the guard in the same call.
+gh_r=$(measure_gh37_interleave "$gh_fn")
+same "GH37 AC4 two writers acting on one aged guard reading never both take the lock" "$([ "$gh_r" -lt 2 ] && echo under-two || echo "$gh_r")" "under-two"
+cp "$gh_fn" "$gh_cp"
+mutate "$gh_cp" 's/^      return 1$/      mkdir "$g" 2>\/dev\/null || return 1/'
+same "GH37 AC4 a copy whose remover takes the guard lets both writers in" "$(measure_gh37_interleave "$gh_cp")" "2"
+# ---- AC5: the owner. RED with the owner comparison cut: a foreign release removes the lock.
+gh_lk="$gh_d/own/claim-push.lock"; mkdir -p "$gh_lk"; echo w-other > "$gh_lk/owner"
+remove_claim_push_lock "$gh_lk" w-me
+same "GH37 AC5 a release under another token leaves the lock" "$([ -d "$gh_lk" ] && echo kept || echo gone)" "kept"
+remove_claim_push_lock "$gh_lk" w-other
+same "GH37 AC5 ...and the owner's own token removes it" "$([ -d "$gh_lk" ] && echo kept || echo gone)" "gone"
+cp "$gh_fn" "$gh_cp"
+mutate "$gh_cp" 's/\[ "\$o" = "\$2" \] && //'
+same "GH37 AC5 a copy with the owner comparison cut removes another writer's lock" "$( . "$gh_cp"; mkdir -p "$gh_lk"; echo w-other > "$gh_lk/owner"
+  remove_claim_push_lock "$gh_lk" w-me; [ -d "$gh_lk" ] && echo kept || echo gone )" "gone"
+unset -f check_claim_push_lock_stale write_claim_push_lock remove_claim_push_lock measure_gh37_race measure_gh37_interleave
+unset REMOTE_BOUND GH37_DATE GH37_FIND GH37_RM
+# shellcheck source=lib-unattended.sh
+. "$HERE/lib-unattended.sh"
+rm -rf "$gh_d"
 # ---- AC7: a finished record over a README missing its build-index close refuses at check 9 before the
 # ---- rotation; a live record missing its generated close refuses before the claim write.
 build_aborted_run() { run --preflight tRun --keepalive-id k1 >/dev/null; sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md; fixture; }
@@ -15746,7 +15886,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # (1, S9), the settle's claim retry (14, S4) and the claim-push lock (8, S10), counted off the block's
 # own `hit`/`miss`/`same` lines and each observed red under its staged break on a slice behind this
 # prologue on node a, 2026-10-06; no suite ran.
-FLOOR_ASSERTIONS=2511
+# RAISED 2511 -> 2534 by TOOL-aGraftedHelix-37: the GH37 claim-push lock block's 23 region-two
+# assertions, the race (4), the abandoned-guard bound (12), the interleaving (3) and the owner (4),
+# each arm's own `mutate` included, counted off the block's `hit`/`same`/`mutate` lines and run as a
+# slice behind this prologue on node a, 2026-10-06 (n 2 -> 25), each arm red under its staged break
+# in a scratch copy of the driver; no suite ran.
+FLOOR_ASSERTIONS=2534
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -15896,7 +16041,8 @@ FLOOR_SHARD_1=211
 # RAISED 2266 -> 2285: the same 19 region-two --settle claim assertions, see FLOOR_ASSERTIONS.
 # RAISED 2285 -> 2289: the settle drive and the two ledger token-liveness arms, see FLOOR_ASSERTIONS.
 # RAISED 2289 -> 2312: the same 23 region-two exec-marker, settle-retry and lock assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=2312
+# RAISED 2312 -> 2335 by TOOL-aGraftedHelix-37: the same 23 region-two GH37 lock assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=2335
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

@@ -61,7 +61,9 @@ record is never restaged for it (`TOOL-aGraftedHelix-1`). Where `RUN_CLAIMS` is 
 same git dir, and a `--preflight` refused after its claim write restores the record and writes a claim
 it created `aborted` (`TOOL-aGraftedHelix-32`). The claim push takes `claim-push.lock` in that git dir
 before it tests the marker, and push-main touches its marker before it waits on the lock, so the two
-pushes serialise; a `--settle` re-run over a settled record retries the claim's status write through
+pushes serialise. A stale lock is broken only under its guard directory `claim-push.lock.break`, by
+the one writer that takes it and re-reads the deadline there, and released only by its `owner`
+(`TOOL-aGraftedHelix-37`); a `--settle` re-run over a settled record retries the claim's status write through
 `write_settle_claim`, over a `held` or `live` claim of the record's own lease alone
 (`TOOL-aGraftedHelix-36`). The class `orchestrator-hand-off-owed-a-disposition.md`
 is claimed here because its remedy is a stop: a discovery handed to the orchestrator resolves to a

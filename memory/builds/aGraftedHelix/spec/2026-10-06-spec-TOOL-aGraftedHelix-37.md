@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-37 — breaking a stale claim-push lock is a step one writer wins
 
-**Status:** SPECCED · rev-3 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 21 · ratified 2026-10-06
+**Status:** CLOSED · rev-3 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 21 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 

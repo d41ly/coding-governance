@@ -68,6 +68,17 @@ it tests the marker, records its deadline in it, and releases it on every path; 
 its marker, then waits for no live lock, then clears its verdict files and pushes, and clears the
 marker only after it has read them. Whichever side moves second sees the other.
 
+## The third instance: a stale lock broken on a stale read
+
+`TOOL-aGraftedHelix-37`, a discovery of unit 36's builder. That lock's own break was the class again:
+a writer finding `claim-push.lock` stale removed it and made it afresh, acting on a staleness it had
+read before the removal. Two writers reading one stale deadline both broke it, the lagging one
+removing the fresh lock the first had just made, and both pushed. Measured on node `a`: every trial
+in which the second writer lagged the first by about one process spawn let both in. The decision to
+break is now taken under a guard directory only one writer can make, and the guard's holder re-reads
+the deadline before it removes anything, so the act follows a reading taken where no other breaker
+can move it. A release removes the lock only while its `owner` file holds the releaser's token.
+
 ## Its gate
 
 The verdict-file instance is **gated by** the driver suite's GH32 AC6 arm, which plants
@@ -75,7 +86,11 @@ The verdict-file instance is **gated by** the driver suite's GH32 AC6 arm, which
 the claim ref unmoved; it read RED against a driver copy without the guard. The lock is gated by
 the driver suite's GH36 AC14 arms, a live lock skipping the beat and an expired one cleared and
 released, and by `tools/push-main.test.sh` cases 2d and 2e, the lander waiting on a live lock and
-passing an expired one; each read RED with its half of the lock cut.
+passing an expired one; each read RED with its half of the lock cut. The stale-read break is gated
+by the driver suite's GH37 arms over the lock functions extracted from the driver: two writers
+racing over one stale lock, the abandoned-guard bound, two writers interleaved on one aged guard,
+and the owner check; each reads RED on a `mutate` of its own extracted copy, the race with the
+re-read under the guard cut.
 
 No class-wide machine gate: a predicate that found two processes reading one name would red on every
 sanctioned shared setting. The instance is gated by `tools/push-main.test.sh` arms H1 and H1b, which

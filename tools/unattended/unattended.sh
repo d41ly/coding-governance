@@ -51,7 +51,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.82   # gov:kit unattended@1.82 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.83   # gov:kit unattended@1.83 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -2034,6 +2034,62 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
   return 0
 }
 
+# THE CLAIM-PUSH LOCK (TOOL-aGraftedHelix-37). `write_claim_push_lock` takes `claim-push.lock` with
+# `mkdir` and writes its deadline into `until` and the caller's token into `owner`. A lock it cannot
+# make is broken only when `check_claim_push_lock_stale` reads it stale - a deadline already passed,
+# or none and a directory older than two minutes - and only by the writer that takes the guard
+# `<lock>.break` with `mkdir`. Holding the guard it re-reads the rule, breaks a lock still stale,
+# makes it again and writes both files before it releases the guard; a re-read finding the lock live,
+# or a re-make losing to a plain `mkdir`, releases the guard and reports busy. So no breaker removes
+# a lock another breaker made. A guard older than one minute was left by a crash: the writer finding
+# it removes it and reports busy, never taking it in the same call, and the next call breaks the
+# lock. Each self-heal appends a health event once the guard is released. `remove_claim_push_lock`
+# clears the lock only while its `owner` reads the caller's token, the turnstile's nonce pattern, so
+# a release never removes the fresh lock of a writer that broke it. `until` stays a bare epoch, the
+# one field the lander's wait reads.
+# WHAT THIS DOES NOT CHECK: removing an abandoned guard is itself unguarded, so two writers removing
+# one at once while a third takes a fresh guard between them can admit two breakers; that needs a
+# writer to die or stall for a minute inside the break, then four writers in one git dir in one
+# window. An owner that outlives its recorded deadline (no runnable `timeout -k`) is breakable while
+# it pushes, and its own release can land between a breaker's re-read and its removal. Both the
+# deadline and the age are wall-clock reads, so a clock stepped forward breaks a live lock.
+# A writer in another git dir takes another lock.
+check_claim_push_lock_stale() { # lock dir -> 0 when its deadline passed, or it has none and is older than two minutes
+  local lu=""; { read -r lu <"$1/until"; } 2>/dev/null || :
+  case "$lu" in *[!0-9]*) lu="" ;; esac
+  if [ -n "$lu" ]; then [ "$lu" -lt "$(date +%s)" ]; return; fi
+  [ -n "$(find "$1" -maxdepth 0 -mmin +2 2>/dev/null)" ]
+}
+write_claim_push_lock() { # lock dir · owner token -> 0 taken, 1 busy
+  local lk="$1" g="$1.break" broke=""
+  if ! mkdir "$lk" 2>/dev/null; then
+    check_claim_push_lock_stale "$lk" || return 1
+    if ! mkdir "$g" 2>/dev/null; then
+      if [ -n "$(find "$g" -maxdepth 0 -mmin +1 2>/dev/null)" ]; then
+        rm -rf "$g"
+        add_health_event "$(resolve_health_log "$ROOT")" unattended claim-push-guard-cleared "$g"
+      fi
+      return 1
+    fi
+    if ! check_claim_push_lock_stale "$lk"; then rmdir "$g" 2>/dev/null; return 1; fi
+    rm -rf "$lk"
+    mkdir "$lk" 2>/dev/null || { rmdir "$g" 2>/dev/null; return 1; }
+    broke=1
+  fi
+  printf '%s\n' "$(( $(date +%s) + REMOTE_BOUND + 10 ))" >"$lk/until" 2>/dev/null || :
+  printf '%s\n' "$2" >"$lk/owner" 2>/dev/null || :
+  if [ -n "$broke" ]; then
+    rmdir "$g" 2>/dev/null
+    add_health_event "$(resolve_health_log "$ROOT")" unattended claim-push-lock-broken "$lk"
+  fi
+  return 0
+}
+remove_claim_push_lock() { # lock dir · owner token -> removes it only while its owner file reads that token
+  local o=""; { read -r o <"$1/owner"; } 2>/dev/null || :
+  [ -n "$2" ] && [ "$o" = "$2" ] && rm -rf "$1"
+  return 0
+}
+
 # ONE CLAIM WRITE, by compare-and-swap on the sha `check_claim_writable` read: `git push --porcelain
 # --force-with-lease=<ref>:<that sha>`, EMPTY for a create. The porcelain status line decides the
 # outcome, never the exit alone: `!` with `(stale info)` or `(fetch first)` is LOST, the ref moved
@@ -2058,8 +2114,9 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # `claim-push.lock` in the same git dir BEFORE it tests the marker, writes its deadline into the
 # lock's `until`, and releases it on every path out; push-main touches its marker, then waits for no
 # live lock, then clears and pushes. Whichever side moves second sees the other, so the marker test
-# can no longer pass a moment before the lander clears its verdict files. A lock whose deadline has
-# passed, or that carries none and is older than two minutes, is cleared and taken once.
+# can no longer pass a moment before the lander clears its verdict files. The take, the break of a
+# stale lock and the release are `write_claim_push_lock` and `remove_claim_push_lock`, whose header
+# states their limits (TOOL-aGraftedHelix-37).
 # WHAT THIS DOES NOT CHECK: on a host with no runnable `timeout -k` the push is unbounded, so a push
 # can outlive the deadline it recorded, and a lander past that deadline then pushes beside it.
 # THE IDENTITY IS THE LEASE RECORD'S (TOOL-aGraftedHelix-11), so a writer the OS scheduler launched
@@ -2069,24 +2126,13 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # harness's session and host with the one lease stamp the caller also hands `write_lease`. `node` is
 # the claim's own on the `mine` row, this user's elsewhere.
 write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [run-state file] · [lease stamp] -> 0 written, 1 lost, 2 not completed; WC_WHY
-  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" d t c rc l line flag node host sid msg rf="" tok="" lk="" lu busy=""
+  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" d t c rc l line flag node host sid msg rf="" tok="" lk="" own="" busy=""
   WC_WHY=""; WC_BEAT=$(read_utc_now)
   [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
   [ -z "$RUNLOG_GITDIR" ] || rf="$RUNLOG_GITDIR/pre-push-refusal"
   if [ -n "$RUNLOG_GITDIR" ]; then
-    lk="$RUNLOG_GITDIR/claim-push.lock"
-    if ! mkdir "$lk" 2>/dev/null; then
-      lu=""; { read -r lu <"$lk/until"; } 2>/dev/null || :
-      case "$lu" in *[!0-9]*) lu="" ;; esac
-      if { [ -n "$lu" ] && [ "$lu" -lt "$(date +%s)" ]; } \
-         || { [ -z "$lu" ] && [ -n "$(find "$lk" -maxdepth 0 -mmin +2 2>/dev/null)" ]; }; then
-        rm -rf "$lk"; mkdir "$lk" 2>/dev/null || busy=1
-      else
-        busy=1
-      fi
-    fi
-    if [ -n "$busy" ]; then lk=""
-    else printf '%s\n' "$(( $(date +%s) + REMOTE_BOUND + 10 ))" >"$lk/until" 2>/dev/null || :; fi
+    lk="$RUNLOG_GITDIR/claim-push.lock"; own="$BASHPID.$RANDOM"
+    write_claim_push_lock "$lk" "$own" || { lk=""; busy=1; }
   fi
   if [ -n "$rel" ]; then
     sid=$(fact "$rel" session) || :; host=$(fact "$rel" host) || :; lease=$(fact "$rel" lease-utc) || :; lease="${lease:-absent}"
@@ -2127,7 +2173,7 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
       [ "$tok" != default-branch ] || WC_WHY="$WC_WHY · fix once: git remote set-head $CR_NAME -a"
     fi
   fi
-  [ -z "$lk" ] || rm -rf "$lk"
+  [ -z "$lk" ] || remove_claim_push_lock "$lk" "$own"
   [ -z "${d:-}" ] || rm -f "$d"
   if [ "$rc" = 0 ]; then
     # A TAKE-OVER OF A STALE CLAIM IS A SELF-HEAL, logged once per write that landed (I3,
