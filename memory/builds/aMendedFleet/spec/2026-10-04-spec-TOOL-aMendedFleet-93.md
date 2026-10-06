@@ -1,10 +1,13 @@
 # TOOL-aMendedFleet-93 — one tier2 review run with and without the charter, and the review default follows the reading
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 93
+**Status:** INPROGRESS · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 93
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-06-build-TOOL-aMendedFleet-93-ab.py](../build/2026-10-06-build-TOOL-aMendedFleet-93-ab.py) | journal | — |
+| [2026-10-06-build-TOOL-aMendedFleet-93-run-brief.md](../build/2026-10-06-build-TOOL-aMendedFleet-93-run-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -114,8 +117,8 @@ Read at the worktree HEAD `8312d315`, whose bytes under `tools/` equal base `7af
 ### The subject
 
 aWindowedPass's round-1 closing range, `886b089dfd9c4bf98dc2024e21d7d9607f9b5cc0` to
-`e252bafb3fe306e0118c2771ef627b865528e895`: 83 files, 2691 insertions and 299 deletions, PINNED by
-`git diff --shortstat` on 2026-10-04. Its round-1 record states raw 29, confirmed 26, refuted 3 and
+`e252bafb3fe306e0118c2771ef627b865528e895`: 74 files, 1596 insertions and 279 deletions, PINNED by
+`git diff --shortstat` on 2026-10-06, two-dot and three-dot alike, since the base is the merge base. Its round-1 record states raw 29, confirmed 26, refuted 3 and
 precision 0.90 under the harness of that day, which the reading reports beside both arms and never
 compares. A landed, reviewed range keeps both arms off this build's own diff, which its closing
 review reads.
@@ -158,7 +161,7 @@ The last six move only on `DEFAULT-PLAN`.
 
 ### Cost
 
-Two full-intensity reviews of a 2691-line diff, about eleven agents each, sequential, never more
+Two full-intensity reviews of a 1875-line diff, about eleven agents each, sequential, never more
 than five at once. The token figure is UNVERIFIED and is what the reading records.
 
 ### Alternatives rejected
@@ -257,6 +260,14 @@ New arm: `tools/workflows/tier2-review.test.sh` · only on `DEFAULT-PLAN`: stub 
   key, a workflow agent's transcript and meta file on node a, and the aWindowedPass round-1 record.
 - rev-2 · 2026-10-04 · §3 · M2 cross-read: the edge on unit 67 was written `external` for a sibling
   of this build; it now names `TOOL-aMendedFleet-67`, which declares the reciprocal hands-off.
+- rev-3 · 2026-10-06 · §4 The subject, §4 Cost · the first build pass re-ran the pin: `git diff
+  --shortstat` over the range reads 74 files, 1596 insertions and 279 deletions, not rev-2's 83,
+  2691 and 299, which no diff form reproduces; the cost line follows. S3's key handling is spelled
+  in the run brief as every `review-lenses/` directory whose name begins
+  `diff-review-r1-886b089dfd9c-e252bafb3fe3-`, because the input-print suffix of today's key is
+  known only once the probe runs. The brief also fixes how the instrument reads "classifies every
+  agent": a judge with no `usage` event reads NOT VALID by name, never a zero, as §5 already says of
+  an unclassified agent. The spec reads INPROGRESS after this pass, per S3.
 
 ## 10. Reuse audit
 
