@@ -33,7 +33,8 @@ or file an ask and declare it. It stays report-only.
   `tools/drift-audit/drift_signals.template.py` carries both with a comment, and this repo's
   `tools/drift-audit/drift_signals.py` declares neither, taking the defaults. A declared value of the
   wrong shape, a limit that is not a positive int or a `DEAD_FILED` that is not a str-to-str dict, is
-  refused with exit 2 before any signal runs, as `RATCHET_LOOKBACK` and `BASELINES` are. Observed by AC2.
+  refused with exit 2 before any signal runs, as `RATCHET_LOOKBACK` and `BASELINES` are. The defaults
+  are observed by AC2; the refusal by the build's direct check, which no criterion here names.
 - **S3** — THE STATUS. In the human table, a report-only record that reads DEAD PROBE in this run and
   whose streak is at least the limit prints `DEAD PROBE for <k> readings — take it out of SIGNALS, or
   file an ask and declare it in DEAD_FILED`, or, when `DEAD_FILED` names it, `DEAD PROBE for <k> readings —
@@ -47,7 +48,8 @@ or file an ask and declare it. It stays report-only.
 - **S5** — A `DEAD_FILED` entry naming a signal that is not in `SIGNALS`, or one live in this run,
   prints one header line naming the entry and asking that it be taken out, so a filing cannot
   outlive the death it filed. Observed by AC4.
-- **S6** — No exit status moves in any mode. Observed by AC3.
+- **S6** — The rule moves no exit status in any mode; S2's refusal of a malformed declaration is a
+  configuration error, not the rule. Observed by AC3.
 - **S7** — The drift-audit README gains a paragraph beside the signal table naming the rule, the two
   keys and the history it reads, and stating that it is report-only because the history is node-local.
   Its layout table's `drift_signals.py` row lists both keys among the project-layer names, as units
@@ -206,7 +208,7 @@ New arm: `tools/drift-audit/selftest.py` · fixture histories with a streak at, 
 - rev-2 · 2026-10-04 · S7 · M2 cross-read: units 8, 53 and 56 add their new project-layer keys to
   the README layout table's `drift_signals.py` row, and S7 left `DEAD_READINGS_LIMIT` and
   `DEAD_FILED` out of it, so that row would stop listing every key the layer may carry.
-- rev-3 · 2026-10-06 · S2 · build: a malformed declaration of either key is refused with exit 2,
+- rev-3 · 2026-10-06 · S2, S6 · build: a malformed declaration of either key is refused with exit 2,
   as the sibling optional keys are, rather than failing mid-table with a traceback; S6 binds the
   rule, which still moves no exit status, and a config refusal is not the rule.
 
