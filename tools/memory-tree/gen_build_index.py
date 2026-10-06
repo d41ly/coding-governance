@@ -1646,14 +1646,15 @@ def render_shards(builds: list, m: str) -> dict:
             "",
             "Frozen once the month passes: its inputs stop changing, so no rotation rule is needed.",
             "",
-            "| Build | Status | Node | Streams | Ids (n) |",
-            "|---|---|---|---|---|",
+            # TOOL-aMendedFleet-81: only what a build cannot change after its month, so the sentence
+            # above is true. Status, streams and the id count moved a month late; LIVE.md carries them.
+            "| Build | Node | Opened |",
+            "|---|---|---|",
         ]
         for b in sorted(rows, key=lambda x: x["slug"]):
             fm = b["fm"]
             body.append(
-                f"| [{b['slug']}](../builds/{b['slug']}/README.md) | {b['status']} | {fm['node']} | "
-                f"{fm['streams']} | {len(b['roster'])} |"
+                f"| [{b['slug']}](../builds/{b['slug']}/README.md) | {fm['node']} | {fm['opened']} |"
             )
         out[f"{m}/ledger/{month}.md"] = "\n".join(body) + "\n"
     return out
@@ -3725,8 +3726,27 @@ def cmd_selftest() -> int:
         conf2 = _fixture(t2, spec_status="CLOSED")
         arm("terminal build leaves LIVE.md", "*No live build.*",
             lambda: plan(t2, conf2)[0]["memory/LIVE.md"])
-        arm("terminal build still appears in its month shard", "| [tOne](../builds/tOne/README.md) | CLOSED",
+        arm("terminal build still appears in its month shard", "| [tOne](../builds/tOne/README.md) | a | 2026-08-01 |",
             lambda: plan(t2, conf2)[0]["memory/ledger/2026-08.md"])
+
+        # TOOL-aMendedFleet-81 AC2 — the month shard is FROZEN: a status flip and an added unit move
+        # LIVE.md and leave the shard's bytes alone. Both units end CLOSED so the BUILD's status moves
+        # too (SPECCED to CLOSED), or a restored Status column would pass this arm. The LIVE.md half is the arm's liveness: a
+        # mutation that never took effect would also leave the shard identical.
+        tf = os.path.join(base, "frozen"); os.makedirs(tf)
+        conff = _fixture(tf, spec_status="SPECCED")
+        before = plan(tf, conff)[0]
+        sd = os.path.join(tf, "memory", "builds", "tOne", "spec")
+        write_text(os.path.join(sd, "2026-08-01-spec-tOne-1.md"),
+                   "# ARCH-tOne-1 — a unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-2 · base 0123abcd\n")
+        write_text(os.path.join(sd, "2026-08-02-spec-tOne-2.md"),
+                   "# ARCH-tOne-2 — a unit\n\n**Status:** CLOSED · rev-1 · 2026-08-02 · node a · Tier-2 · base 0123abcd\n")
+        run("git", "add", "-A", cwd=tf)
+        run("git", "commit", "-q", "-m", "flip and add", "--no-verify", cwd=tf)
+        after = plan(tf, load_conf(tf))[0]
+        arm("a status flip and an added unit leave the month shard byte-identical", "True",
+            lambda: str(before["memory/ledger/2026-08.md"] == after["memory/ledger/2026-08.md"]
+                        and before["memory/LIVE.md"] != after["memory/LIVE.md"]))
 
         # AC2 — an unpaired marker is a NAMED error, not a silent departure.
         # TOOL-dFramedEntrypoint-5 S4 class (c) — THE SENTENCE-REMOVAL ARMS ARE RETIRED, all of them,
