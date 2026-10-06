@@ -674,3 +674,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T08:58:58Z brief · item TOOL-aMendedFleet-94 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
 
 2026-10-06T09:09:10Z dispatch · item bc6906b6 TOOL-aMendedFleet-94 · reason .claude/rules/product.md AGENTS.md tools/template-size-highwater.txt memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-94.md memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-94-1-acceptance-ledger.md memory/builds/aMendedFleet/README.md memory/LIVE.md
+
+2026-10-06T09:22:56Z brief · item KICK-aMendedFleet-4 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
