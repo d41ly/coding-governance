@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-41 — the driver suite runs in the pooled sweep as eight shards cut by its own region costs
 
-**Status:** SPECCED · rev-1 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 25 · ratified 2026-10-06
+**Status:** SPECCED · rev-2 · 2026-10-07 · node a · Tier-2 · base 290d0d2d · streams tooling · order 25 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 
@@ -23,32 +23,38 @@ sweep's floor alone.
 
 - **S1** — `SHARD_ARITY` in `tools/unattended/unattended.test.sh` moves from 2 to 8, and the fifteen
   top-level blocks of today's region two are relabelled, in text order and contiguously, into regions
-  2 to 8 by the §4 cut rule. Region one does not move. No block is split, no arm is reordered or
-  reindented, and every new region boundary reuses an existing seam line, which is respelled
-  `fi   # ---- end REGION <k>`; a seam inside a region is respelled `fi   # ---- region <k> continues`.
-  The suite's header and region comments read the count from `SHARD_ARITY` rather than typing it.
-  Observed by AC1 and AC2.
-- **S2** — every region from 2 to 8 opens with an entry line guarded by `[ "$SH_I" = <k> ]`, which
-  runs `bcsetup; bcrestore` exactly as region two's entry does today, then re-executes whatever the
-  region reads that only another region assigns or builds. Every helper a region calls whose
-  definition sits in another region moves, byte-identical, into the prologue beside `bcrestore`. The
-  unsharded run therefore executes the same commands in the same order as at the parent. Observed by
-  AC2, AC3 and AC4.
+  2 to 8 by the §4 cut rule. Region one does not move. No arm is reordered or reindented, and every
+  new region boundary reuses an existing seam line, which is respelled `fi   # ---- end REGION <k>`,
+  except ONE: the seam between today's blocks 3 and 4 moves below the spec-token arm group that opens
+  block 4, because that group runs over the dispatch fixture the arms above it leave (§4, "The moved
+  seam"). A seam inside a region is respelled `fi   # ---- region <k> continues`. The suite's header
+  and region comments read the count from `SHARD_ARITY` rather than typing it. Observed by AC1 and AC2.
+- **S2** — every region from 2 to 8 opens with an entry guarded by `[ "$SH_I" = <k> ]`, which runs
+  `bcsetup; bcrestore` exactly as region two's entry does today, then rebuilds whatever the region
+  reads that only another region assigns or builds, on the terms §4 "Region entry and the hoist"
+  states. Every helper a region calls whose definition sits in another region moves, byte-identical,
+  into the prologue beside `bcrestore`; the one top-level fixture span a later region reads, the ask
+  stub, is wrapped byte-identical as the prologue builder `build_ask_stub`, which its original site
+  calls. The unsharded run therefore executes the same commands in the same order as at the parent.
+  Observed by AC2, AC3 and AC4.
 - **S3** — the first block of each region from 2 to 8 carries the two-line `FOREIGN_PREFIX_PROBE`
   site after its first arm, copied from region one's. Observed by AC4.
 - **S4** — the floor is selected by `FLOOR_SHARD_$SH_I` indirection, as the gate suite selects it,
   with `FLOOR_SHARD_2` to `FLOOR_SHARD_8` declared by the §4 split rule. `FLOOR_SHARD_1` and
   `FLOOR_ASSERTIONS` keep their values, `PROLOGUE_ARMS` is re-read, and its comment states the
-  identity for `SHARD_ARITY` regions. The shard trailer names the other `SHARD_ARITY - 1` regions as
-  not exercised. Observed by AC5.
+  identity for `SHARD_ARITY` regions, less the `mutate` sites region 8's entry pays through the two
+  fixture builders it calls. The shard trailer names the other `SHARD_ARITY - 1` regions as not
+  exercised. Observed by AC5.
 - **S5** — the block-length arm in region one reads every `if in_shard <k>; then` label rather than
   `[12]`, and closes a block only at a seam line, never at the inner
   `fi   # ---- end the run_bounded host gate`. Observed by AC6.
 - **S6** — in `tools/run-gates/selftest-budgets.txt` the `unattended driver selftest` row is replaced
   by eight rows `unattended driver selftest shard <k>/8`, argv
   `bash {prefix}/unattended/unattended.test.sh --shard <k>/8`, each budget DERIVED by the §4 rule
-  and its reading field saying so. The row's line in `tools/run-gates/selftest-pooled-evidence.txt`
-  is deleted with it, or the declaration gate reads it as an orphan. Observed by AC7.
+  and its reading field saying so as an ESTIMATE that names how it was sized and that the owner's
+  manual run is to confirm it (owner ruling 2026-10-06: no whole kit suite runs in this session). The
+  row's line in `tools/run-gates/selftest-pooled-evidence.txt` is deleted with it, or the declaration
+  gate reads it as an orphan. Observed by AC7.
   - **Readers:** by name: `tools/run-gates/selftest-budgets.txt` and
     `tools/run-gates/selftest-pooled-evidence.txt` spell the row name, one line each, and this item
     rewrites both. by value: `tools/run-gates/run-selftests.sh` reads the rows as its population, its
@@ -70,9 +76,10 @@ sweep's floor alone.
 
 - **Choosing an arity other than eight.** The owner ruled eight for both unattended suites (§8 F1);
   the census in §4 measures that eight meets the target and is where the target stops improving.
-- **Splitting a block.** The largest block, the one that opens with the declared spec-token
-  checker's dispatch arms, holds a fifth of the driver's calls and is the floor no cut at existing
-  seams goes below. A new seam inside a block is a state analysis this unit does not do.
+- **Splitting a block, or adding a seam.** The largest block, block 4, holds near a fifth of the
+  driver's calls and is the floor no cut at existing seams goes below. A new seam inside a block is a
+  state analysis this unit does not do. The one seam S1 moves is not new: it is block 3's own,
+  set below an arm group that the one-arm probe showed cannot open a region.
 - **Changing the pooled runner.** Its dispatch is declaration order, which puts the eight driver rows
   ahead of the gate shards. Longest-first dispatch would be a run-gates mechanism of its own.
 - **Porting the canary's reverse shard-join half** into `tools/run-gates/run-selftests.sh`. S7
@@ -82,14 +89,16 @@ sweep's floor alone.
   `check_helpers_hoisted`. A cross-region call fails its shard loudly at the next sweep, and the arm
   would be a mechanism and an inventory key of its own.
 - **Running any shard whole.** Every per-shard reading, the comparison against the gate shards and
-  the identity are the close's, below. No suite, whole shard or bar runs in the pass; §6 runs only
-  one-arm probes and a prologue-only staged break.
+  the identity are the owner's manual run's, below. No suite, whole shard or bar runs in the pass;
+  §6 runs one-arm probes, a prologue-only staged break, and each region behind the prologue as a
+  SLICE bounded at 540 s, which the owner's ruling of 2026-10-06 admits for sizing and which never
+  stands in for a shard's verdict.
 - **Re-declaring any row but the driver's**, and filing anything.
 
 ### Edges
 
 - **consumes-from** external — the recorded sweep readings this unit sizes against: the longest gate shard at 7391 s and the driver row walled at 19871 s in the b04ab0da0 sweep, and the driver row's completed 17142 s in the 90a6f6fae sweep, both in this build's prompt records; and the owner's arity ruling of 2026-08-29 in TOOL-aGradedDoorway-7.
-- **hands-off** external — the close: the pooled calibrate over the unattended kit, which writes the eight rows' first readings into the evidence file; each driver shard running to its own end with no FAIL line and an executed count at or above its floor; the longest driver shard reading compared with the longest gate shard reading in that same calibrate; and the identity, that the eight executed counts less seven times PROLOGUE_ARMS equal the unsharded count.
+- **hands-off** external — the owner's manual run of the merged tree, which replaces the close's by the owner's ruling of 2026-10-06: the pooled calibrate over the unattended kit, which writes the eight rows' first readings into the evidence file; each driver shard running to its own end with no FAIL line and an executed count at or above its floor; the longest driver shard reading compared with the longest gate shard reading in that same calibrate; and the identity, that the eight executed counts less seven times PROLOGUE_ARMS, less the `mutate` sites region 8's entry pays, equal the unsharded count.
 
 ## 4. Design
 
@@ -97,7 +106,9 @@ sweep's floor alone.
 
 Every figure in this subsection is PINNED, measured on node `a` on 2026-10-06 at `1b4f7720e`, the
 branch HEAD this spec was written against. The pass re-derives every one over its own parent before
-any code, and a moved figure is a rev bump of this spec committed before the code commit.
+any code, and a moved figure is a rev bump of this spec committed before the code commit. rev-2 is
+that re-derivation, over the pass's parent `62dc8a6c5`, where the suite is byte-identical to
+`1b4f7720e`: `git diff 1b4f7720e 62dc8a6c5 -- tools/unattended/unattended.test.sh` prints nothing.
 
 - The sweep at `b04ab0da0`, from this unit's brief: the driver row started at +0 and was killed by
   the run wall at 19871 s; the gate shards ran 4724 to 7391 s each and finished by +10210 s; every
@@ -116,27 +127,29 @@ The cost unit is the driver call site, the analogue of unit 34's leg invocation.
 is a block line, comments dropped and single-quoted spans blanked, that holds `bash "$SCRIPT"` or
 calls at command position `run` or any helper whose body holds a driver call site, closed
 transitively. A block runs from an `if in_shard <k>; then` line at column 0 to the seam line that
-closes it. A block's share is its call sites over the file's. At `1b4f7720e` the closure holds 37
-driver-reaching helpers and the file holds 1835 call sites:
+closes it. A block's share is its call sites over the file's. rev-2 re-implemented the predicate as
+written, a call site being a LINE and a command substitution inside double quotes being code; at the
+parent the closure holds 47 driver-reaching helpers and the file holds 1975 call sites. rev-1's 37
+and 1835 came from a scan that counted occurrences and read no double-quoted substitution:
 
-| Block | Lines at `1b4f7720e` | Share | Static assertion sites |
+| Block | Lines at the parent | Share | Static assertion sites |
 |---|---|---|---|
-| 1 | 630–1889 | 6.8 % | 226 |
-| 2 | 1898–3537 | 9.9 % | 304 |
-| 3 | 3539–5230 | 13.0 % | 344 |
-| 4 | 5232–7321 | 20.1 % | 566 |
-| 5 | 7323–8852 | 11.4 % | 371 |
-| 6 | 8854–8998 | 1.3 % | 44 |
-| 7 | 9000–9527 | 2.8 % | 124 |
-| 8 | 9529–11246 | 12.5 % | 404 |
-| 9 | 11248–11382 | 0.8 % | 34 |
-| 10 | 11384–13282 | 8.9 % | 354 |
-| 11 | 13284–13617 | 3.0 % | 110 |
-| 12 | 13619–13744 | 0.2 % | 33 |
-| 13 | 13746–14268 | 2.1 % | 166 |
+| 1 | 630–1889 | 7.5 % | 224 |
+| 2 | 1898–3537 | 8.9 % | 298 |
+| 3 | 3539–5230 | 11.6 % | 339 |
+| 4 | 5232–7321 | 18.5 % | 552 |
+| 5 | 7323–8852 | 12.7 % | 369 |
+| 6 | 8854–8998 | 1.7 % | 42 |
+| 7 | 9000–9527 | 2.7 % | 119 |
+| 8 | 9529–11246 | 11.1 % | 397 |
+| 9 | 11248–11382 | 0.7 % | 34 |
+| 10 | 11384–13282 | 10.5 % | 351 |
+| 11 | 13284–13617 | 2.8 % | 110 |
+| 12 | 13619–13744 | 0.4 % | 33 |
+| 13 | 13746–14268 | 1.9 % | 119 |
 | 14 | 14270–14423 | 0.3 % | 29 |
-| 15 | 14425–14725 | 1.0 % | 73 |
-| 16 | 14727–15754 | 6.0 % | 225 |
+| 15 | 14425–14725 | 1.2 % | 73 |
+| 16 | 14727–15754 | 7.5 % | 225 |
 
 A static assertion site is a command-position `hit`, `miss`, `same` or `mutate` call, or a bare
 `n=$((n+1))`, on the same lines. The first census pass counted only direct calls and undercounted
@@ -150,43 +163,55 @@ it ran with lanes idle and faster than a shard would under a full pool. The targ
 D as 1.5 times the walled reading, this repo's measured-plus-headroom habit: 7391 / 29807, a share
 of 24.8 %. figure: G and D PINNED from the sweep at `b04ab0da0`; the share DERIVED from them.
 
-**What the census says about the arity.** With region one fixed, the smallest arity whose best
-contiguous cut puts every region at or under 24.8 % is six, at 22.9 %; five reaches only 28.0 %. At
-eight the best achievable largest region is block 4 alone, 20.1 %, and no higher arity lowers it
-without splitting a block. Eight is the owner's ruling (§8 F1), and the census measures it at the
-knee. Its predicted longest shard is 21.5 % of D: 4272 s at the walled reading and 6408 s at the
-target's D, both under G.
+**What the census says about the arity.** With region one fixed and the moved seam in place, the
+smallest arity whose best contiguous cut puts every region at or under 24.8 % is six, at 22.4 %; five
+reaches only 28.1 %. At eight the best achievable largest region is block 4 alone, 18.3 %, and no
+higher arity lowers it without splitting a block. Eight is the owner's ruling (§8 F1), and the census
+measures it at the knee. The cut the rule takes is not that one, because state couples blocks 8 to
+16 (below): its predicted longest shard is region 8 at 24.6 % of D, about 4890 s at the walled
+reading and about 7340 s at the target's D, both under G, the second with under one percent to spare.
 
-### The cut rule, and the cut it gives at 1b4f7720e
+### The cut rule, and the cut it gives at the parent
 
 Among the contiguous partitions of region two's fifteen blocks into seven regions whose shares are
-each at most the target, take the one with the fewest crossings, then the smallest largest region.
-A crossing is a helper or a variable whose resolution leaves its region. A call resolves to the
-nearest column-0 definition above it in text order, and an `unset -f` of the name ends that
-definition's reach. A read of `$v` resolves to the nearest assignment above it, where `v=`, the
-`local`, `export` and `declare` forms, `for v in` and `read` all assign. Of 222 partitions within
-the target at `1b4f7720e`, the rule takes this one:
+each at most the target, take the one with the fewest crossings, then the smallest largest region,
+and a tie on both keeps rev-1's cut. A crossing is a helper or a variable whose resolution leaves its
+region. A call resolves to the nearest column-0 definition above it in text order, and an `unset -f`
+of the name ends that definition's reach. A read of `$v` resolves to the nearest assignment above
+it, where `v=`, the `local`, `export` and `declare` forms, `for v in` and `read` all assign, an
+escaped `\$v` is no read, and a call carries the reads and assignments of the helper bodies it
+reaches. Globals read by driver functions the suite slices in at run time count too, by a second
+scan over the sliced bodies. Of 218 partitions within the target at the parent, rev-1's cut has the
+fewest crossings, 33, tied on crossings and largest region with one other, and the rule takes it.
+Under rev-1's entry terms none of the 218 survives (below), so the amended terms are what admit it:
 
-| Region | Blocks | Lines at `1b4f7720e` | Share | Static assertion sites |
+| Region | Blocks | Lines at the parent | Share at the build | Static assertion sites |
 |---|---|---|---|---|
-| 1 | 1 | 630–1889 | 6.8 % | 226 |
-| 2 | 2 | 1898–3537 | 9.9 % | 304 |
-| 3 | 3 | 3539–5230 | 13.0 % | 344 |
-| 4 | 4 | 5232–7321 | 20.1 % | 566 |
-| 5 | 5 | 7323–8852 | 11.4 % | 371 |
-| 6 | 6–7 | 8854–9527 | 4.1 % | 168 |
-| 7 | 8–9 | 9529–11382 | 13.3 % | 438 |
-| 8 | 10–16 | 11384–15754 | 21.5 % | 990 |
+| 1 | 1 | 630–1889 | 7.6 % | 224 |
+| 2 | 2 | 1898–3537 | 8.9 % | 298 |
+| 3 | 3, to the moved seam | 3539–5287 | 11.8 % | 346 |
+| 4 | 4, from the moved seam | 5288–7321 | 18.3 % | 545 |
+| 5 | 5 | 7323–8852 | 12.6 % | 369 |
+| 6 | 6–7 | 8854–9527 | 4.4 % | 161 |
+| 7 | 8–9 | 9529–11382 | 11.8 % | 431 |
+| 8 | 10–16 | 11384–15754 | 24.6 % | 940 |
 
-Keeping blocks 10 to 16 together is the rule at work: the minimum-largest cut splits them and
-carries the process-ledger fixture across a region boundary, at 45 crossings against this cut's 32.
-The predicate's hits for this cut at `1b4f7720e`, with its near-misses, which the pass re-reads rather
-than trusts:
+Keeping blocks 10 to 16 together is the rule at work: block 16 opens on the process-ledger fixture
+block 10 builds in top-level code. The predicate's hits for this cut at the parent, with its
+near-misses, which the pass re-read rather than trusted:
 
 | Kind | Hits | Near-misses, and why |
 |---|---|---|
-| helpers to hoist | `askmode` `askrows` `build_dd_landing` `build_hold_fixture` `dispbacklog` `dispreset` `dispspec` `drop_lease_facts` `read_hole_probe` `read_lease_hash` `restore_dd_origin` `scope` `set_lease_fact` `slice_fn` `write_aged_commit` `write_published_conf` | `mktemp`, a shadow defined and unset on the next two lines |
-| variables to rebuild | `ASKSTUB` `DD_C` `DD_CD` `DD_LOG` `DD_PID` `DSTUB` `LEASE` `OWN_PID` `STOP7` | `PATH`, the environment; `body` `s` `t` `want` `x`, loop, `read` or quoted forms the first scan did not model |
+| helpers to hoist | `askconf` `askmode` `askrows` `build_dd_landing` `build_hold_fixture` `dispbacklog` `dispreset` `dispspec` `drop_lease_facts` `read_hole_probe` `read_lease_hash` `restore_dd_origin` `scope` `set_lease_fact` `slice_fn` `write_aged_commit` `write_published_conf`, and the two builders region 8's entry calls, `asksetup` and `dispsetup` | `mktemp`, a shadow defined and unset on the next two lines |
+| variables to rebuild | `ASKSTUB` `ASKSTUB_DIR` `DD_CD` `DD_LOG` `DD_PID` `DISPMAIN` `DISPP` `LEASE` `OWN_PID` `STOP7`, and from the sliced driver bodies `GATE_BOUND_LIVE` `GATE_BOUND` `ROOT` | `BCP`, which every entry's `bcsetup` assigns; `RB_TOOK`, which the sliced `run_bounded` assigns before its caller reads it; `k` `s`, escaped reads inside a heredoc and a `sed` script; rev-1's `DD_C` and `DSTUB`, each assigned in its own region before the read |
+
+### The moved seam
+
+The one-arm probe of AC4 found region 4 red at its first arm, eight `FAIL` lines: the spec-token arm
+group that opened block 4 begins by renaming the spec the dispatch arms at the foot of block 3 leave
+staged, so in a shard run it renamed nothing and every dispatch it graded refused at check 49. The
+group ends by restoring that fixture, and the brief arms after it say they are self-contained, so the
+seam moves below the group: block 3 gains about fifty lines and stays far under the 2500-line bound.
 
 ### Region entry and the hoist
 
@@ -199,14 +224,28 @@ A **variable** that crosses is never hoisted, because an assignment hoisted into
 earlier in the unsharded run than it does today. It is rebuilt by the reading region's entry line,
 inside the `SH_I` guard, so only a shard run executes it: the assignment re-executed verbatim when
 its right-hand side reads only the prologue's fixture and the entry's own state, or the hoisted
-fixture builder called when the read needs state that builder makes. An entry never executes an
-assertion, and it never calls a helper whose body holds an assertion site; that keeps the identity
-below exact. When a read cannot be rebuilt on those terms, the seam is wrong and the cut takes the
-rule's next partition.
+fixture builder called when the read needs state that builder makes. rev-1 added that an entry
+never calls a helper whose body holds an assertion site, and that a read no entry can rebuild moves
+the cut to the rule's next partition. Under those terms no partition within the target survives:
+blocks 8 to 16 chain through the ask stub, written by top-level code in block 8, and through the
+commits `asksetup` and `dispsetup` push to the default branch, which the dispatch arms of block 10
+read, and both builders hold `mutate` sites. rev-2 amends two terms instead of the target:
+
+- a top-level fixture span a later region reads, which no assignment re-executes, is WRAPPED
+  byte-identical as a prologue builder its original site calls, so the unsharded run is unchanged;
+  the ask stub is the one such span, `build_ask_stub`;
+- an entry MAY call a fixture builder holding assertion sites when the state its region reads is
+  that builder's commits. Region 8's entry calls `asksetup` and `dispsetup`, and the identity below
+  subtracts their `mutate` sites. The need for `asksetup` was found by running, not by the scan: a
+  bounded slice of region 8 refused every `tDisp` preflight until its filing home was on the branch.
+
+Region 7's ask witness runs the driver's own `run_bounded`, sliced in at run time, which reads
+`GATE_BOUND_LIVE` and `ROOT` bare, so region 7's entry re-executes the assignments region 5 last left
+them at. Each rebuilt line is byte-identical to the line it re-executes:
 
 ```bash
-if in_shard 3; then
-if [ "$SH_I" = 3 ]; then bcsetup; bcrestore; fi   # plus this region's rebuilds, if the scan names any
+if in_shard 8; then
+if [ "$SH_I" = 8 ]; then bcsetup; bcrestore; build_ask_stub; asksetup; dispsetup; fi
 ```
 
 ### Floors, PROLOGUE_ARMS and the identity
@@ -217,18 +256,21 @@ stages. Each new floor is that count plus a share of the parent's region-two flo
 ```text
 FLOOR_SHARD_k = PROLOGUE_ARMS + floor(0.9 × R × a_k / A)     k = 2 .. 8
 R   = the parent's FLOOR_SHARD_2 less the parent's PROLOGUE_ARMS
-a_k = region k's static assertion sites;  A = the sum over regions 2 to 8
+a_k = region k's static assertion sites at the parent, cut as the file cuts it;  A = their sum, 2 to 8
 ```
 
 The 0.9 is this derivation's own discount. Static sites stand in for executed counts, and a region
 whose arms execute less than its sites suggest would otherwise red a healthy shard at the close.
-At `1b4f7720e`, with `PROLOGUE_ARMS` at 18, the rule gives 218, 244, 391, 262, 128, 306 and 671 for
-regions 2 to 8. figure: DERIVED at the pass over its parent; the next measured executed count of a
-shard re-declares its floor at the suite's usual headroom.
+a_k is read at the parent rather than at the build because the hoist moves `asksetup`'s and
+`dispsetup`'s `mutate` sites into the prologue while region 7 still calls them. AC5 re-read
+`PROLOGUE_ARMS` as 20 where the parent declared 18, and with it the rule gives 222, 255, 390, 270,
+129, 312 and 658 for regions 2 to 8. figure: DERIVED at the pass over its parent; the next measured
+executed count of a shard re-declares its floor at the suite's usual headroom.
 
-Since neither the entry's helpers nor the probe sites execute an assertion in a run that is not a
-probe, the eight shards' executed counts less seven `PROLOGUE_ARMS` equal the unsharded count. The
-comment beside `PROLOGUE_ARMS` states that identity for `SHARD_ARITY` regions, and the close
+Since neither the probe sites nor any entry but region 8's executes an assertion in a run that is
+not a probe, the eight shards' executed counts less seven `PROLOGUE_ARMS`, less the `mutate` sites
+region 8's entry pays through `asksetup` and `dispsetup`, equal the unsharded count. The comment
+beside `PROLOGUE_ARMS` states that identity for `SHARD_ARITY` regions, and the owner's manual run
 observes it.
 
 ### The declaration
@@ -237,14 +279,17 @@ Each row's budget is `ceil(1.5 × (p_k + s_k × 17142))`, where `s_k` is region 
 `p_k` is the seconds AC4 measures for that shard's probe run, which is the prologue, the entry and
 one arm. 17142 s is the latest COMPLETED whole reading of the driver suite, pooled, so these
 budgets are loose ceilings as a serial cost verdict. Each row's reading field says that in the
-file's grammar: derived, the date, node `a`, the share, the whole reading and its sha, the probe
-seconds, x1.5. Before the probe seconds, the shares give 1749, 2546, 3343, 5169, 2932, 1055, 3420 and
-5529 s for regions 1 to 8. `run-selftests.sh --rank` already lists derived and pooled readings as
-unbacked, so these rows join an existing population there rather than starting one.
+file's grammar, opening on the word ESTIMATE: how it was sized, the date, node `a`, the share, the
+whole reading and its sha, the probe seconds, x1.5, and that the owner's manual run of the merged
+tree is to confirm or re-declare it. The field never spells the `--rank` verb's `measured` or
+`worst of` shapes, because a derived figure ranked as a measured one is the inverse of the intent.
+Over the build's census and AC4's seconds the rule gives 1978, 2357, 3074, 4797, 3320, 1224, 3139
+and 6444 s for regions 1 to 8. `run-selftests.sh --rank` already lists derived and pooled readings
+as unbacked, so these rows join an existing population there rather than starting one.
 
-The old evidence row is deleted, and the eight new rows carry none until the close calibrates. That
-is the evidence file's own announced-unarmed state: `--pooled` refuses an uncalibrated row by name
-and runs nothing.
+The old evidence row is deleted, and the eight new rows carry none until the owner's run
+calibrates. That is the evidence file's own announced-unarmed state: `--pooled` refuses an
+uncalibrated row by name and runs nothing.
 
 ### Who runs the suite whole
 
@@ -255,21 +300,24 @@ reads the row and runs nothing. After this unit every one of those routes runs t
 and nothing runs the suite whole.
 
 Two things read a whole run. `FLOOR_ASSERTIONS` is graded only unsharded and stays, binding a
-developer's hand-run whole suite. The identity's unsharded term is the other, and the close takes it
-from one unsharded run or from the recorded `3978` plus the floor raises of the units after
+developer's hand-run whole suite. The identity's unsharded term is the other, and the owner's run
+takes it from one unsharded run or from the recorded `3978` plus the floor raises of the units after
 `eb96ea8b2`. Nothing automated depends on a whole run, so no route is kept whole. A cross-region
 state dependency, the hazard the region-two comment names as ungated, now reds in its own shard,
 which is the safer direction.
 
 ### Inventory
 
-No function, file, leg, conf key or naming cell is minted. Eight budget rows and seven floor
-constants are declared, and helpers move within one file under their own names.
+No file, leg, conf key or naming cell is minted. One function is: `build_ask_stub`, inside the suite.
+The codebase map inventories kits, hooks, legs, lexicon verbs and Python and JavaScript symbols, so a
+shell function in a suite is no key of it, and `lexicon.py --suggest build_ask_stub --as sh.function`
+reads OK. Eight budget rows and seven floor constants are declared, and helpers move within one file
+under their own names.
 
 ### Rollout
 
 The pass first re-derives the census, the cut and the crossing scan over its parent, and commits a
-rev bump of this spec if any figure moved. Then one build commit: the suite, the declaration and
+rev bump of this spec if any figure moved; rev-2 is that commit. Then one build commit: the suite, the declaration and
 the evidence, the prose of S7, both kits' versions, the re-adopted renders, the manifest re-stamp
 and the status flip. The acceptance ledger follows in a records commit.
 
@@ -291,33 +339,45 @@ and the status flip. The acceptance ledger follows in a records commit.
 Each with the test that rejected it, per BUILD-METHOD M12.
 
 - **Six regions, the census's smallest arity.** The owner ruled eight for both suites, and the
-  census shows six meets the target only at 22.9 % against eight's 21.5 %.
-- **The minimum-largest cut at eight**, 20.1 % largest. It cuts the process-ledger fixture across
-  regions 7 and 8 and costs 45 crossings against 32; both cuts are under the target.
+  census shows six meets the target only at 22.4 %.
+- **The minimum-largest cut at eight**, 18.3 % largest. It cuts the process-ledger fixture across
+  regions, which block 10 builds in top-level code and block 16 reads; the rule's crossing count
+  ranks it below the cut taken.
+- **rev-1's entry terms unchanged.** The search over the parent's 218 partitions within the target
+  rejected them: none survives, because blocks 8 to 16 chain through the ask stub, the two
+  ask-and-dispatch builders and the process-ledger fixture, and only one partition, blocks 8 to 16
+  as one region at 36.4 %, keeps every link inside a region.
+- **Replaying block 3's last dispatch arms inside region 4's entry.** The state the spec-token group
+  reads is those arms' own sequence, not a builder's, and an entry replaying them executes region 3's
+  assertions; moving the seam costs one boundary and no arm.
 - **Hoisting crossing assignments into the prologue.** It moves when the unsharded run executes
   them, and `STOP7`'s line also runs `mkdir -p` under the fixture's git dir, a side effect that
   would then precede every arm between the prologue and its block.
 - **A sizing proxy of direct driver calls only.** It read block 7 at zero calls and block 16 at
   16, where the closure through fixture helpers counts 51 and 110.
-- **Measuring each region by running it.** That is a suite run inside a pass, refused by §8 F2.
+- **Measuring each region by running it.** That is a suite run inside a pass, refused by §8 F2. The
+  bounded slices of §6 AC10 run each region for 540 s as evidence of cross-region state and are no
+  reading: none finished inside its bound with seven running at once.
 
 ## 5. Production-readiness checklist
 
 - security — N/A: a test suite's region labels, a declaration, an evidence row and comments.
 - perf / scale — the sweep's driver floor moves from at least 19871 s to a predicted longest shard of
-  21.5 % of the driver's cost. Seven more prologue runs join every sweep, and the foreign-prefix leg
+  24.6 % of the driver's cost. Seven more prologue runs join every sweep, and the foreign-prefix leg
   gains seven probe rows at each of its three prefixes.
 - error / empty / loading states — an index outside 1 to 8 is refused before the scratch dir exists;
   an empty region reds its floor and still prints its trailer; a missing `FLOOR_SHARD_k` dies under
   `set -u` with no trailer, which the pool reads as untrailed.
 - observability — every shard prints its floor-graded count and names the seven regions it did not
-  exercise; the close's calibrate writes a reading per shard.
+  exercise; the owner's calibrate writes a reading per shard.
 - risks — a block may read shell or git state a predecessor in another region leaves behind, which
-  only the close's shard runs can show. The crossing scan covers helpers and variables, and each
-  entry rebuilds the region-two epoch; other state an earlier region leaves under the git dir is
-  absent in a shard run, so the arm that needed it reds rather than passes. The derived floors may
-  sit above a region's true count, which the 0.9 discount guards against.
-- testing — §6, and the close's calibrate in §3.
+  only whole shard runs can show, and those are the owner's. The crossing scans cover helpers,
+  variables and the globals sliced driver bodies read, each entry rebuilds the region-two epoch, and
+  the probes and bounded slices of §6 found the two state links no scan saw; other state an earlier
+  region leaves under the git dir is absent in a shard run, so the arm that needed it reds rather
+  than passes. The derived floors may sit above a region's true count, which the 0.9 discount guards
+  against.
+- testing — §6, and the owner's manual run in §3.
 - migration — none. Reverting is relabelling the regions and restoring one row.
 - user docs — N/A: suites, declarations and one help sentence.
 
@@ -337,17 +397,19 @@ a name that is not a suite's, so the copy resolves the clone's driver exactly as
 - **AC2** — When the sorted lines of the file are compared with its parent's,
   `sort tools/unattended/unattended.test.sh | diff <(git show <parent>:tools/unattended/unattended.test.sh | sort) -`,
   every differing line is an `in_shard` label, a seam line, a region entry, a probe site, the
-  block-length arm, a floor or its selection, the trailer, `SHARD_ARITY`, or a comment; and
+  block-length arm, a floor or its selection, the trailer, `SHARD_ARITY`, `PROLOGUE_ARMS`, the ask-stub
+  builder's head, close or call, or a comment; and
   `bash -n tools/unattended/unattended.test.sh` exits 0.
   Red when: a hoisted helper is edited in transit in a scratch copy, which the diff prints as a body
   line, or an `if in_shard` line loses its `fi`, which the syntax check reports.
 - **AC3** — When the §4 crossing predicate runs over the file, no helper call resolves to a
   definition outside the prologue and its own region, every variable read that resolves into another
-  region is assigned in its own region's `SH_I`-guarded entry, and no entry calls a helper whose body
-  holds an assertion site; the near-misses print beside the result.
+  region is assigned in its own region's `SH_I`-guarded entry, no global a sliced driver body reads
+  resolves into another region, and no entry calls a helper whose body holds an assertion site but
+  region 8's `asksetup` and `dispsetup`; the near-misses print beside the result.
   Red when: a scratch copy moves `build_hold_fixture` back into block 5, which the predicate names as
   called from regions 6 and 7.
-  figure: the hits at `1b4f7720e` are PINNED in §4; the result is DERIVED at observation.
+  figure: the hits at the parent are PINNED in §4; the result is DERIVED at observation.
 - **AC4** — When a copy of the suite runs in a clone with `FOREIGN_PREFIX_PROBE=1` at each of
   `--shard 1/8` to `--shard 8/8`, eight at once, each prints `foreign-prefix-probe: stopped after 1 arm`
   and a `PASS (` line and exits 0, and each run's seconds are recorded as that shard's `p_k`.
@@ -390,6 +452,12 @@ a name that is not a suite's, so the copy resolves the clone's driver exactly as
   Red when: either kit's shipped bytes moved without its version, or the runner moved without the
   manifest's `last-audit` re-stamp.
   figure: both versions are DERIVED from the pass's parent at observation.
+- **AC10** — When a copy in a clone runs `--shard 2/8` to `--shard 8/8` at once behind the prologue,
+  each as a SLICE bounded at 540 s, no run prints a `FAIL` line before its bound stops it.
+  Red when: region 8's entry calls `dispsetup` without `asksetup`, which reds the `tDisp` preflights
+  inside the bound for want of the filing home `asksetup` commits.
+  cost: nine minutes on node `a`. A bound that stops a region early is evidence about that region's
+  head and never its verdict; the verdict is the owner's whole shard run.
 
 ## 7. Gates
 
@@ -398,18 +466,19 @@ a name that is not a suite's, so the copy resolves the clone's driver exactly as
 New arm: tools/unattended/unattended.test.sh · the floor selected per shard for eight regions; staged by relabelling region 8's blocks as 7, so shard 8 executes the prologue alone · FLOOR_SHARD_2 to FLOOR_SHARD_8 by the split rule
 New arm: tools/unattended/unattended.test.sh · the block-length arm over every region label, closed only at seam lines; staged by a scratch copy whose region-7 block passes 2500 lines · none
 
-The close runs the legs, the pooled calibrate that takes the eight rows' first readings, and the
-identity. A pass runs the probes, copies and predicates of §6 as its check.
+The main loop runs the legs. The pooled calibrate that takes the eight rows' first readings and the
+identity are the owner's manual run of the merged tree, by the owner's ruling of 2026-10-06. A pass
+runs the probes, copies, slices and predicates of §6 as its check.
 
 ## 8. Open questions
 
 - **F1 — What arity does the driver suite take?**
   Option A takes the census's smallest arity that meets the target, six, at a largest region of
-  22.9 %. Option B takes eight, the owner's ruling of 2026-08-29 for both unattended suites, whose
-  gate half TOOL-aBatchedArm-3 carried and whose driver half it left standing. Option C keeps two,
-  which leaves region two at 93.2 % of the driver's calls and fails the target outright.
-  The census measures eight at the knee: from eight on, the largest region cannot fall below one
-  block's 20.1 % without splitting a block.
+  22.4 % (rev-1 read 22.9 %). Option B takes eight, the owner's ruling of 2026-08-29 for both
+  unattended suites, whose gate half TOOL-aBatchedArm-3 carried and whose driver half it left
+  standing. Option C keeps two, which leaves region two at about 92 % of the driver's calls and fails
+  the target outright. The census measures eight at the knee: from eight on, the largest region
+  cannot fall below one block's 18.3 % without splitting a block.
   RESOLVED (owner, 2026-08-29): B, eight — TOOL-aGradedDoorway-7 §8, "pick 8 and fix what breaks",
   for both suites. This spec carries that ruling's driver half and measures that eight meets the
   target.
@@ -423,13 +492,24 @@ identity. A pass runs the probes, copies and predicates of §6 as its check.
   suite held well under half of today's assertions, and that row was already measured overrun.
   RESOLVED (agent, 2026-10-06, delegated): B. Each budget's reading field says DERIVED and names its
   base, the probe seconds are fresh node-`a` measurements, and the close's calibrate is the first
-  reading of each shard.
+  reading of each shard. The owner's ruling of 2026-10-06 moved that first reading from the close to
+  the owner's manual run of the merged tree, and each reading field says ESTIMATE accordingly.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-06 · initial draft, adopted at VERIFYING after the pooled sweep at `b04ab0da0`
   walled the unsharded driver row. The census, the cut and the crossing scan were run read-only over
   the suite at `1b4f7720e`; no suite or shard was run.
+- rev-2 · 2026-10-07 · the pass's re-derivation over its parent `62dc8a6c5`, where the suite is
+  unchanged since `1b4f7720e`. Moved figures: the census (47 helpers and 1975 call sites against 37
+  and 1835, region 8 at 24.6 % against 21.5 %), the crossing hits (`askconf`, `ASKSTUB_DIR`, `DISPP`,
+  `DISPMAIN` and three sliced-body globals in; `DD_C` and `DSTUB` out), `PROLOGUE_ARMS` re-read as 20,
+  and the floors and budgets that follow. Amended: an entry may call a fixture builder holding
+  assertion sites, a top-level fixture span is wrapped as a builder, and the identity subtracts
+  region 8's entry `mutate` sites, because under rev-1's terms no partition survived; one seam moves,
+  found by AC4's probe; AC10 added, the bounded slices that found `asksetup`'s need; the close's
+  readings move to the owner's manual run by the owner's ruling of 2026-10-06, and the budget rows
+  say ESTIMATE.
 
 ## 10. Reuse audit
 
