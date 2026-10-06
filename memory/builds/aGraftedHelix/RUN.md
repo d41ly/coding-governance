@@ -9,9 +9,9 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-parked-surfaced: yes, 2 surfaced
+parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
-refreshed-at: 290d0d2d5ae893a2d723a2247ad788035d3bffdf · park · 0 touching
+refreshed-at: cacd8d307477c5aca09d2cfe851fe4e5f425b932 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 071c32bce76b2a3fe2d384504739235e574b0dd1
 phase: VERIFYING
@@ -129,3 +129,5 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-06T20:30:05Z dispatch · item 62dc8a6c TOOL-aGraftedHelix-41 · reason tools/unattended tools/run-gates memory/guides .claude/skills/unattended/SKILL.md memory/map memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-41.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md
 
 2026-10-06T21:37:23Z dispatch · item 183047ec TOOL-aGraftedHelix-41 · reason tools/unattended tools/run-gates memory/guides .claude/skills/unattended/SKILL.md memory/map memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-41.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-06T22:32:15Z decision · item landing-target · reason question: land this run to origin through the lander, or let it ride the owner's merged local main; options: lander push now, or local main only with the owner pushing after the manual self-test run; recommendation: local main only, since the owner is assembling local main from every current session (another session reconciled it with origin/main at cacd8d30, 223 commits ahead and unpushed) and ruled that the kit self-tests run by hand from that merged tree; this run merged local main a30f45893 and will fast-forward local main to its tip, pushing nothing
