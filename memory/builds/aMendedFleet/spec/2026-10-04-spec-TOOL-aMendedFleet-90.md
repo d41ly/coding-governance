@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-90 — a report-only drift signal DEAD for N recorded readings is named for retirement or a filed ask
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 90
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 90
 
 <!-- gen:spec-records -->
 
@@ -31,7 +31,9 @@ or file an ask and declare it. It stays report-only.
   optional keys use: `DEAD_READINGS_LIMIT`, an int, the engine default 10 when undeclared; and
   `DEAD_FILED`, a dict from signal name to the id of the ask filed for it, empty when undeclared.
   `tools/drift-audit/drift_signals.template.py` carries both with a comment, and this repo's
-  `tools/drift-audit/drift_signals.py` declares neither, taking the defaults. Observed by AC2.
+  `tools/drift-audit/drift_signals.py` declares neither, taking the defaults. A declared value of the
+  wrong shape, a limit that is not a positive int or a `DEAD_FILED` that is not a str-to-str dict, is
+  refused with exit 2 before any signal runs, as `RATCHET_LOOKBACK` and `BASELINES` are. Observed by AC2.
 - **S3** — THE STATUS. In the human table, a report-only record that reads DEAD PROBE in this run and
   whose streak is at least the limit prints `DEAD PROBE for <k> readings — take it out of SIGNALS, or
   file an ask and declare it in DEAD_FILED`, or, when `DEAD_FILED` names it, `DEAD PROBE for <k> readings —
@@ -204,6 +206,9 @@ New arm: `tools/drift-audit/selftest.py` · fixture histories with a streak at, 
 - rev-2 · 2026-10-04 · S7 · M2 cross-read: units 8, 53 and 56 add their new project-layer keys to
   the README layout table's `drift_signals.py` row, and S7 left `DEAD_READINGS_LIMIT` and
   `DEAD_FILED` out of it, so that row would stop listing every key the layer may carry.
+- rev-3 · 2026-10-06 · S2 · build: a malformed declaration of either key is refused with exit 2,
+  as the sibling optional keys are, rather than failing mid-table with a traceback; S6 binds the
+  rule, which still moves no exit status, and a config refusal is not the rule.
 
 ## 10. Reuse audit
 

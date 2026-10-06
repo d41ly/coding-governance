@@ -3194,6 +3194,56 @@ def read_history_groups(path: pathlib.Path | None) -> tuple[list[dict], str]:
     return groups, ""
 
 
+# TOOL-aMendedFleet-90. A report-only probe DEAD for this many recorded readings in a row stops
+# printing "ignore its value" and names the two ways out. Report only: the history is node-local, so
+# a verdict built on it would not reproduce at a sha.
+DEFAULT_DEAD_READINGS_LIMIT = 10
+
+
+def _read_dead_keys(proj) -> tuple[int, dict]:
+    """(DEAD_READINGS_LIMIT, DEAD_FILED) from the project layer, each absent taking its default; a
+    present-but-malformed one is a named refusal rather than a comparison failing mid-table."""
+    limit = getattr(proj, "DEAD_READINGS_LIMIT", None)
+    limit = DEFAULT_DEAD_READINGS_LIMIT if limit is None else limit
+    if not isinstance(limit, int) or isinstance(limit, bool) or limit < 1:
+        raise DriftError(f"drift_signals.py declares DEAD_READINGS_LIMIT = {limit!r}; it must be a "
+                         f"positive integer, or absent to take the shipped {DEFAULT_DEAD_READINGS_LIMIT}")
+    filed = getattr(proj, "DEAD_FILED", None) or {}
+    if not isinstance(filed, dict) or not all(isinstance(k, str) and isinstance(v, str)
+                                              for k, v in filed.items()):
+        raise DriftError("drift_signals.py declares DEAD_FILED that is not a dict from a signal name "
+                         "to the id of the ask filed for it")
+    return limit, filed
+
+
+def derive_dead_streaks(path: pathlib.Path | None) -> tuple[dict, int] | None:
+    """({signal: trailing readings whose state is `dead`}, readings), or None when the history is
+    missing, unreadable or headerless. A READING is the last group in a run of consecutive groups at
+    one sha, so a bar re-run at one commit does not age a signal; absence ends a streak."""
+    try:
+        groups, why = read_history_groups(path)
+    except OSError:
+        return None
+    if why:
+        return None
+    readings: list[dict] = []
+    for g in groups:
+        if readings and readings[-1]["sha"] == g["sha"]:
+            readings[-1] = g
+        else:
+            readings.append(g)
+    streaks = {}
+    for sig in {s for g in readings for s in g["rows"]}:
+        k = 0
+        for g in reversed(readings):
+            row = g["rows"].get(sig)
+            if row is None or row["state"] != "dead":
+                break
+            k += 1
+        streaks[sig] = k
+    return streaks, len(readings)
+
+
 def derive_drift_delta(root: pathlib.Path, base: str, head: str) -> tuple[int, list[str]]:
     """(exit, lines) for `--delta`. Exit 2 only when an argument is not a commit; every other miss is
     one `skipped` line at exit 0. Ancestry comes from ONE `rev-list --parents` over both ends."""
@@ -3568,6 +3618,7 @@ def main(argv: list[str] | None = None) -> int:
         if both:
             raise DriftError(f"{', '.join(both)} is declared in both PINS and BASELINES; a signal "
                              f"takes ONE bound, a count or an id set, so delete one of the two")
+        dead_limit, dead_filed = _read_dead_keys(proj)
     except DriftError as exc:
         print(f"drift-report: {exc}", file=sys.stderr)
         return 2
@@ -3656,6 +3707,12 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.buffer.write("".join(k + "\n" for k in keys).encode("utf-8"))
         return 1 if (over or dead or ratchets) else 0
 
+    # TOOL-aMendedFleet-90: the history is read ONCE, here, before `--check` appends this run to it.
+    history_path = resolve_history_path(root)
+    streaks = derive_dead_streaks(history_path)
+    for s in out:
+        s["dead_readings"] = None if streaks is None else streaks[0].get(s["signal"], 0)
+
     if args.json:
         print(json.dumps(out, indent=1))
     else:
@@ -3665,6 +3722,16 @@ def main(argv: list[str] | None = None) -> int:
         # THE BASE IS A HEADER FACT, ref AND sha. Two nodes comparing reports can then see at once
         # whether they graded the same commit, which a bare branch name never told them.
         print(f"# drift-report at {head} (base {base_ref} @ {base_at}) · kit {KIT_DRIFT_AUDIT_VERSION}")
+        # The reader's liveness line: a history it could not read says so, never the old status alone.
+        where = history_path or "no git common dir"
+        print(f"# dead-for-N: {streaks[1]} readings recorded at {where} · limit {dead_limit}"
+              if streaks is not None else f"# dead-for-N: no history at {where}, nothing judged")
+        # A filing must not outlive the death it filed.
+        live_now = {s["signal"]: s["live"] and not s.get("not_asked") for s in out}
+        for sig in sorted(dead_filed):
+            if sig not in live_now or live_now[sig]:
+                why = "is not a signal of this report" if sig not in live_now else "is live in this run"
+                print(f"# dead-for-N: DEAD_FILED names {sig}, which {why}; take the entry out")
         print(f"# {'signal':<48} {'value':>7} {'of':>6}  status")
         for s in out:
             if s.get("not_asked"):
@@ -3673,9 +3740,17 @@ def main(argv: list[str] | None = None) -> int:
                 note = next((d.get("note") for d in s["detail"][:1] if isinstance(d, dict)), None)
                 status = f"not asked — {note or 'this repo does not adopt what the signal reads'}"
             elif not s["live"]:
-                status = ("empty by declaration — nothing to measure here yet"
-                          if s["signal"] in set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
-                          else "DEAD PROBE — signal cannot move, ignore its value")
+                k = s["dead_readings"]
+                if s["signal"] in set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ()):
+                    status = "empty by declaration — nothing to measure here yet"
+                elif not s["gateable"] and k is not None and k >= dead_limit:
+                    # TOOL-aMendedFleet-90 S3. A gateable dead record keeps its status: `--check` reds it.
+                    status = (f"DEAD PROBE for {k} readings — filed {dead_filed[s['signal']]}"
+                              if s["signal"] in dead_filed else
+                              f"DEAD PROBE for {k} readings — take it out of SIGNALS, or file an ask "
+                              f"and declare it in DEAD_FILED")
+                else:
+                    status = "DEAD PROBE — signal cannot move, ignore its value"
             elif s["value"] < 0:
                 status = "n/a"
             elif "baseline" in s:

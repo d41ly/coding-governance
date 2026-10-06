@@ -173,6 +173,19 @@ AUTO_MEMORY_DIR: str = ""
 REMOTE_CI_WORKFLOW: str = ""
 
 # --------------------------------------------------------------------------------------------
+# DEAD_READINGS_LIMIT and DEAD_FILED — optional. A report-only signal that reads DEAD PROBE for
+# DEAD_READINGS_LIMIT recorded readings in a row (the shipped 10 when absent) stops printing
+# "ignore its value" and asks you to take it out of SIGNALS, or to file an ask and name it here.
+# DEAD_FILED maps a signal to that ask's id, and the status then prints `filed <id>`; an entry for a
+# signal that is not in the report, or is live, is named in the header until you take it out. The
+# readings come from `--check`'s node-local history, so this never moves an exit status.
+# --------------------------------------------------------------------------------------------
+
+# DEAD_READINGS_LIMIT = 10
+
+DEAD_FILED: dict[str, str] = {}
+
+# --------------------------------------------------------------------------------------------
 # DECLARED_EMPTY — signals whose population is empty ON PURPOSE. `--check` reds a gateable signal
 # that has gone DEAD, because a blind instrument reporting 0 is the failure this kit exists to
 # refuse; a signal you have deliberately not populated yet is not blind, and belongs here.

@@ -267,7 +267,7 @@ ids TOOL-aMendedFleet-108 TOOL-aMendedFleet-109
 | [TOOL-aMendedFleet-87 — a query joins changed paths to the gate legs that guard them](spec/2026-10-04-spec-TOOL-aMendedFleet-87.md) | 87 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-88 — `map_imports.py` is deleted, having no consumer](spec/2026-10-04-spec-TOOL-aMendedFleet-88.md) | 88 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-89 — measured history leaves the dossiers near the byte cap for the records that measured it](spec/2026-10-04-spec-TOOL-aMendedFleet-89.md) | 89 | 1 | CLOSED | rev-2 | 2026-10-04 |
-| [TOOL-aMendedFleet-90 — a report-only drift signal DEAD for N recorded readings is named for retirement or a filed ask](spec/2026-10-04-spec-TOOL-aMendedFleet-90.md) | 90 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-90 — a report-only drift signal DEAD for N recorded readings is named for retirement or a filed ask](spec/2026-10-04-spec-TOOL-aMendedFleet-90.md) | 90 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-91 — a spec's status header declares a records-only deliverable, and the product-commit signal reads it](spec/2026-10-04-spec-TOOL-aMendedFleet-91.md) | 91 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-92 — check 23 prints a fleet line, and drift-audit reads it from the newest bar run](spec/2026-10-04-spec-TOOL-aMendedFleet-92.md) | 92 | 2 | SPECCED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-93 — one tier2 review run with and without the charter, and the review default follows the reading](spec/2026-10-04-spec-TOOL-aMendedFleet-93.md) | 93 | 2 | SPECCED | rev-2 | 2026-10-04 |

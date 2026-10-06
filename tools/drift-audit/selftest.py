@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 383
+CHECK_FLOOR = 397
+# 383 -> 397, TOOL-aMendedFleet-90: the fourteen checks of `test_dead_streaks`.
 # 377 -> 383, TOOL-aMendedFleet-59: the six every-git-dir checks in `test_legs_retried_after_timeout`.
 # 365 -> 377, TOOL-aMendedFleet-57: the twelve checks of `test_shrink_low_water`.
 # 357 -> 365, TOOL-aMendedFleet-56: the eight checks of `test_baselines`.
@@ -3513,6 +3514,93 @@ def test_drift_delta(tmp: pathlib.Path) -> None:
     check("delta: an argument that is not a commit exits 2", out.returncode == 2, f"{out.returncode}")
 
 
+def test_dead_streaks(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-90 S8: `derive_dead_streaks` counts READINGS, not groups, by header, with
+    absence ending a streak; the report names a report-only probe dead past the limit, and a stale
+    `DEAD_FILED` entry, and neither moves `--check`'s exit."""
+    print("dead streaks (readings by sha, columns by header, the limit names retirement, report only)")
+    import json
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    cols = list(dr.HISTORY_COLUMNS)
+
+    def write_hist(path, readings, order=cols):
+        # `readings` is a list of (sha, {signal: state}); one group per entry, utc unique per entry.
+        text = "\t".join(order) + "\n"
+        for i, (sha, states) in enumerate(readings):
+            for sig, state in states.items():
+                row = {"#utc": f"t{i}", "sha": sha, "base_ref": "b", "base_sha": "bs", "signal": sig,
+                       "state": state, "value": "0", "of": "0", "key_hash": "-"}
+                text += "\t".join(row[c] for c in order) + "\n"
+        path.write_text(text, encoding="utf-8", newline="\n")
+
+    hist = tmp / "streaks.tsv"
+    seq = [("s0", {"d3": "live", "back": "dead", "gone": "dead"})] + [
+        (f"s{i}", {"d3": "dead", "back": "dead", "gone": "dead"}) for i in (1, 2)] + [
+        ("s3", {"d3": "dead", "back": "live"})]
+    write_hist(hist, seq)
+    got = dr.derive_dead_streaks(hist)
+    check("streaks: dead in the last three readings counts 3; live or absent newest counts 0",
+          got is not None and got[0] == {"d3": 3, "back": 0, "gone": 0} and got[1] == 4, f"{got}")
+    write_hist(hist, seq[:3] + [("s2", {"d3": "dead", "back": "dead", "gone": "dead"})] + seq[3:])
+    again = dr.derive_dead_streaks(hist)
+    check("streaks: a repeated-sha group is one reading, so it ages nothing",
+          again == got, f"{again} vs {got}")
+    write_hist(hist, seq, order=list(reversed(cols)))
+    check("streaks: a reordered header reads the same", dr.derive_dead_streaks(hist) == got,
+          f"{dr.derive_dead_streaks(hist)}")
+    write_hist(hist, [(f"s{i}", {"d": "dead"}) for i in range(10)])
+    check("streaks: ten dead readings count 10, the limit's default",
+          dr.derive_dead_streaks(hist) == ({"d": 10}, 10) and dr.DEFAULT_DEAD_READINGS_LIMIT == 10,
+          f"{dr.derive_dead_streaks(hist)}")
+    check("streaks: a missing file is None, never zero streaks",
+          dr.derive_dead_streaks(tmp / "no-such.tsv") is None)
+    hist.write_text("utc\tsha\n", encoding="utf-8", newline="\n")
+    check("streaks: a foreign header is None", dr.derive_dead_streaks(hist) is None)
+
+    r = make_repo(tmp, name="streaks")
+    recs = json.loads(run([sys.executable, REPORT_REL, "--json"], r).stdout)
+    check("streaks: with no history every record's dead_readings is null",
+          bool(recs) and all(s.get("dead_readings", "x") is None for s in recs), "")
+    human = run([sys.executable, REPORT_REL], r).stdout
+    check("streaks: no history prints the no-history liveness line",
+          "# dead-for-N: no history at" in human, human[:400])
+    rc_absent = run([sys.executable, REPORT_REL, "--check"], r).returncode
+    (r / ".git" / dr.HISTORY_FILE).unlink(missing_ok=True)
+    dead = [s["signal"] for s in recs if not s["live"] and not s["gateable"] and not s.get("not_asked")
+            and s["signal"] != "handkept_inventories_disagreeing_with_source"]
+    if not dead:
+        skip("streaks: the limit's status line", "the fixture reads no report-only signal DEAD")
+    else:
+        sig = dead[0]
+        write_hist(r / ".git" / dr.HISTORY_FILE, [(f"{i:040x}", {sig: "dead"}) for i in range(10)])
+        human = run([sys.executable, REPORT_REL], r).stdout
+        row = next((ln for ln in human.splitlines() if ln.strip().startswith(sig)), "")
+        check("streaks: a report-only probe dead for the limit names SIGNALS and DEAD_FILED",
+              "DEAD PROBE for 10 readings" in row and "DEAD_FILED" in row, row)
+        check("streaks: the liveness line counts the readings it found",
+              "# dead-for-N: 10 readings recorded at" in human, human[:400])
+        check("streaks: --json carries dead_readings 10 for it",
+              next(s for s in json.loads(run([sys.executable, REPORT_REL, "--json"], r).stdout)
+                   if s["signal"] == sig)["dead_readings"] == 10, "")
+        rc_present = run([sys.executable, REPORT_REL, "--check"], r).returncode
+        check("streaks: --check exits the same with the history present and absent",
+              rc_present == rc_absent, f"{rc_absent} -> {rc_present}")
+        write_hist(r / ".git" / dr.HISTORY_FILE, [(f"{i:040x}", {sig: "dead"}) for i in range(10)])
+    layer = r / KIT_NAME / "drift_signals.py"
+    filed = {"no_such_signal": "X-1", **({dead[0]: "X-2"} if dead else {})}
+    layer.write_text(layer.read_text(encoding="utf-8") + f"DEAD_FILED = {filed!r}\n",
+                     encoding="utf-8", newline="\n")
+    human = run([sys.executable, REPORT_REL], r).stdout
+    check("streaks: a DEAD_FILED entry for a signal not in the report is named in the header",
+          any(ln.startswith("# dead-for-N: DEAD_FILED names no_such_signal") and "take the entry out" in ln
+              for ln in human.splitlines()), human[:600])
+    if dead:
+        row = next((ln for ln in human.splitlines() if ln.strip().startswith(dead[0])), "")
+        check("streaks: a filed dead probe prints the filed id", "filed X-2" in row, row)
+
+
 def test_escape_ratio(tmp: pathlib.Path) -> None:
     """TOOL-aMendedFleet-50 S9: `--escape-ratio` over a fixture month holding a merge-landed contained
     fix, a merge-landed escaped fix, a direct fix, a stamp-only fix and a fix touching no product path."""
@@ -3653,6 +3741,7 @@ def main() -> int:
         test_park_sets_match_the_driver(tmp)
         test_drift_history(tmp)
         test_drift_delta(tmp)
+        test_dead_streaks(tmp)
         test_escape_ratio(tmp)
         test_version_carriers_agree(tmp)
     print()

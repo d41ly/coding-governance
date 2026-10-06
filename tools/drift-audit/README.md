@@ -100,7 +100,7 @@ Then, in order:
 |---|---|---|
 | `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check`, `--delta`, `--escape-ratio` |
 | `drift_signals.template.py` | kit | the project layer's starting point |
-| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `BASELINES`, `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK`, `REMOTE_CI_WORKFLOW`, `AUTO_MEMORY_DIR` |
+| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `BASELINES`, `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK`, `REMOTE_CI_WORKFLOW`, `AUTO_MEMORY_DIR`, `DEAD_READINGS_LIMIT`, `DEAD_FILED` |
 | `SKILL.template.md` | kit | rendered to `.claude/skills/drift-audit/SKILL.md` by the adopt script |
 | `adopt-drift-audit.sh` | kit | adopt + the `--check` sync arm for the merge bar |
 | `selftest.py` | kit | the kit's own falsifiability test |
@@ -161,6 +161,18 @@ instead of a clean `0`. This is the kit's central rule and it is not decoration:
 convergence tool shipped a `collision_flags` signal structurally incapable of being non-zero, and
 every reader took the 0 as "converged" for thirteen days. A metric that cannot move is worse than no
 metric, because it is read as good news.
+
+**A report-only probe dead for N readings is named for retirement.** "Ignore its value" is honest
+once and is how a dead probe survives for months. The report reads `--check`'s history,
+`<git-common-dir>/drift-history.tsv`, once per run and before it appends; a READING is the last group
+of a run of consecutive groups at one sha, so a bar re-run at one commit ages nothing. A report-only
+signal dead for at least `DEAD_READINGS_LIMIT` readings in a row (10 when undeclared) prints
+`DEAD PROBE for <k> readings` and asks you to take it out of `SIGNALS`, or to file an ask and map the
+signal to its id in `DEAD_FILED`, after which it prints `filed <id>`. The header carries one `# dead-for-N:`
+line naming the readings it found, or that it found no history; a `DEAD_FILED` entry naming a signal
+that is absent or live is named there too. It is REPORT-ONLY because the history is node-local and
+never pushed: a verdict built on it would pass on a fresh clone and fail on an old one at one sha.
+The `--json` record carries `dead_readings`, `null` when no history was read.
 
 The kit holds itself to that rule — `selftest.py` exercises each gateable signal **twice**, once on a
 fixture where it must be silent and once on a minimal violating fixture where it must fire. An arm
