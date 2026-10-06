@@ -107,6 +107,10 @@ EVIDENCE_GLOBS: list[str] = PRODUCT_GLOBS + [
     # a collapse that generalises three cases and silently loses a fourth. Both lines together are
     # 175 files; the predicate alone was 176. Measured at the commit that restored this.
     ":(exclude)*.test-template.*",
+    # THE SIZE REGISTRIES. The template-size gate keys its ceiling and high-water rows by FILE PATH,
+    # and a live spec is one of the subjects it measures, so a row names the spec's path without
+    # claiming any of its work shipped. Admitted, a size row is a citation of every spec it holds.
+    ":(exclude)*template-size-*.txt",
 ]
 
 # --------------------------------------------------------------------------------------------
