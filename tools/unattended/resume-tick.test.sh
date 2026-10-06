@@ -230,6 +230,20 @@ derive_winpid() {
   esac
   printf '%s' "$w"
 }
+# read_task_gone <winpid> — the count of `No tasks are running` lines `tasklist` prints for that pid,
+# polled until it reads 1 or 25 polls of 0.2 s pass (TOOL-aGraftedHelix-34 S6). `taskkill //F`
+# returns while the process may still be terminating, and an eight-wide pool widens that window: the
+# AC4 and AC13 arms read `tasklist` at once and redded there while green alone and in order. A tick
+# that never killed still reads 0, after the bound, so the arms keep their failing case.
+read_task_gone() {
+  local c=0 i=0
+  while [ "$i" -lt 25 ]; do
+    c=$(tasklist //FI "PID eq $1" 2>/dev/null | grep -c 'No tasks are running')
+    [ "$c" = 1 ] && break
+    sleep 0.2; i=$((i + 1))
+  done
+  printf '%s' "$c"
+}
 NOW_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 OLD_UTC=$(date -u -d "@$(( $(date -u +%s) - 7200 ))" +%Y-%m-%dT%H:%M:%SZ)
 UTC_RE='^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z '
@@ -375,7 +389,7 @@ if [ -n "$WPID" ]; then
   check_same "AC4 the stub was invoked" "$(read_stub_log | grep -c 'argv -p')" "1"
   check_hit "$(cat "$SIDECAR/resume.tRun.log")" " pid $WPID pid-alive yes out " "AC4 the sidecar line records pid-alive yes"
   case "$(uname -s)" in
-    MINGW*|MSYS*|CYGWIN*) check_same "AC4 the sleep is gone from tasklist" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'No tasks are running')" "1" ;;
+    MINGW*|MSYS*|CYGWIN*) check_same "AC4 the sleep is gone from tasklist" "$(read_task_gone "$WPID")" "1" ;;
     *) check_same "AC4 the sleep is gone" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "gone" ;;
   esac
 else
@@ -419,7 +433,7 @@ if [ -n "$WPID" ]; then
   run_tick_over "$TICK"
   check_hit "$OUT" "· resumed · attempt 2 · out " "AC13 a hung launched session is relaunched"
   case "$(uname -s)" in
-    MINGW*|MSYS*|CYGWIN*) check_same "AC13 the hung launched pid is gone from tasklist" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'No tasks are running')" "1" ;;
+    MINGW*|MSYS*|CYGWIN*) check_same "AC13 the hung launched pid is gone from tasklist" "$(read_task_gone "$WPID")" "1" ;;
     *) check_same "AC13 the hung launched pid is gone" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "gone" ;;
   esac
 else
@@ -491,7 +505,7 @@ if [ -n "$WPID" ]; then
   run_tick_over "$TICK"
   check_hit "$OUT" "· resumed · attempt 2 · out " "AC13 a launched line past the bound is hung and relaunched"
   case "$(uname -s)" in
-    MINGW*|MSYS*|CYGWIN*) check_same "AC13 the launcher hung past the bound is gone from tasklist" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'No tasks are running')" "1" ;;
+    MINGW*|MSYS*|CYGWIN*) check_same "AC13 the launcher hung past the bound is gone from tasklist" "$(read_task_gone "$WPID")" "1" ;;
     *) check_same "AC13 the launcher hung past the bound is gone" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "gone" ;;
   esac
 else

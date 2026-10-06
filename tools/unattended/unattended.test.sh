@@ -1621,17 +1621,26 @@ printf '**Serves:** diff-review ARCH-tRun-1
 # closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
 git add -A >/dev/null
 sed -i '/^base: /d' memory/builds/tRun/RUN.md
-hit "$(run --close tRun $crbc)" "closing-review-recorded"
+out=$(run --close tRun $crbc)
+hit "$out" "closing-review-recorded"
+# ...and the GUARD's own sentence, so the arm cannot pass on the range join refusing an empty base
+# by a route of its own (TOOL-aGraftedHelix-34 S2).
+hit "$out" "the run-state file records no usable pinned base"
 
 # arm 5 — a base TRUNCATED below eight characters is refused for the same reason, and separately,
 # because "absent" and "too short to be a needle" reach the guard by different routes.
+# NO OVERRIDE (TOOL-aGraftedHelix-34 S2). A base that does not resolve makes this node read
+# `handoff`, and a hand-off node refuses every override at check 104 before the Definition of Done
+# prints, which is the product being right; `build-complete` simply prints unmet beside this item.
 cropen; rb=$(crbase)
 printf '**Serves:** diff-review ARCH-tRun-1
 
 # closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
 git add -A >/dev/null
 sed -i 's/^base: .*/base: abc/' memory/builds/tRun/RUN.md
-hit "$(run --close tRun $crbc)" "closing-review-recorded"
+out=$(run --close tRun)
+hit "$out" "closing-review-recorded"
+hit "$out" "the run-state file records no usable pinned base"
 reset_tree
 
 # ---- TOOL-cBriefedPilot-4: --preflight REFUSES a tree with no build-method carrier. Every
@@ -3003,9 +3012,14 @@ n=$((n+1)); [ -z "$badstage" ] || { echo "FAIL a function writes the phase and n
 
 # Rule 1's RED FIXTURE, without which the rule is silent whether it works or not: strip verb_close's
 # stage and prove the rule names verb_close.
+# ANCHORED ON THE FUNCTION, not on the LANDING line (TOOL-aGraftedHelix-34 S2): the hand-off branch
+# gave verb_close a second `stage_or_fail`, and a strip keyed on the line after the LANDING write left
+# that one standing, so the rule stayed silent on a copy that still staged. Every stage call inside
+# the function goes, and the rule must name exactly that function.
 u4="$TMP/s4-unstaged.sh"
-awk '/set_fact "\$rel" phase LANDING/ { print; skip = 1; next }
-     skip && /stage_or_fail/ { skip = 0; next }
+awk '/^verb_close\(\)/ { inv = 1 }
+     inv && /^}/      { inv = 0 }
+     inv && /stage_or_fail/ { next }
      { print }' "$SCRIPT" > "$u4"
 ru=$(awk '
   /^[a-z_]+\(\)/ { fn = $1; ph[fn] = 0; sg[fn] = 0 }
@@ -3013,7 +3027,7 @@ ru=$(awk '
   fn && /stage_or_fail/          { sg[fn] = 1 }
   END { for (f in ph) if (ph[f] && !sg[f]) print f }
 ' "$u4")
-n=$((n+1)); [ -n "$ru" ] || { echo "FAIL S4 rule 1 does NOT fire on a copy with verb_close's stage removed, so it would not notice a regression"; st=1; }
+n=$((n+1)); [ "$ru" = "verb_close()" ] || { echo "FAIL S4 rule 1 does NOT name exactly verb_close() on a copy with verb_close's stage calls removed (it named [$ru]), so it would not notice a regression"; st=1; }
 
 # Rule 2 - a function that parks must also carry the bypass-flag guard. Same scoping, same reason.
 #
@@ -3562,8 +3576,11 @@ hit "$(cat memory/builds/tRun/RUN.md)" "override · item records-current · reas
 # SEVEN since TOOL-dDerivedDocket-4 S9, which placed its two here: `--hold` writes HELD and the
 # take-over (`--resume --keepalive-id`) writes the held-from phase back, each behind its own
 # terminal refusal. Six refuse here and the rotation arm drives the seventh.
+# EIGHT since `--settle` (TOOL-dUnstuckLanding-14), placed here by TOOL-aGraftedHelix-34 S2: its
+# LANDED write sits behind a refusal of its own, check 95, which never prints the shared sentence,
+# so it is driven after the loop rather than inside it.
 writers=$(grep -c 'set_fact "$rel" phase' "$SCRIPT")
-n=$((n+1)); [ "$writers" = 7 ]   || { echo "FAIL the driver has $writers phase writer(s); this arm drives 6 of them and the rotation arm below drives the seventh — place the new verb in one of the two, or the terminal guard is unproven for it"; st=1; }
+n=$((n+1)); [ "$writers" = 8 ]   || { echo "FAIL the driver has $writers phase writer(s); this arm drives 7 of them and the rotation arm below drives the eighth — place the new verb in one of the two, or the terminal guard is unproven for it"; st=1; }
 
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
@@ -3575,6 +3592,11 @@ for v in "--phase tRun BUILDING --witness abc" "--close tRun" "--abort tRun --re
   hit "$out" "the run is already finished and a finished record is not something to move, re-open or re-pin"
   same "the finished record survived $v" "$(sum)" "$before"
 done
+# ...and the eighth writer, `--settle`, over the same committed LANDED record: its own refusal, and
+# nothing written.
+out=$(run --settle tRun)
+hit "$out" "--settle does not write over a recorded LANDED"
+same "the finished record survived --settle tRun" "$(sum)" "$before"
 
 # ============================================================ rotation: the fifth phase writer
 # `--preflight` over a terminal record RETIRES it and starts a fresh run. The refusal above is right
@@ -7948,7 +7970,9 @@ init_sa_run; crfix; git add -A >/dev/null; git commit -q -m sa-run-pinned --no-v
 git checkout -qf main; printf 'return 0\n' >> .unattended.conf
 git add -A >/dev/null; git commit -q -m sa-base-dies-after-preflight --no-verify; git push -q -f origin main
 git checkout -qf unit; git merge -q --no-edit main >/dev/null 2>&1
-out=$(run --close tRun $bcov)
+# NO OVERRIDE (TOOL-aGraftedHelix-34 S2): the dying conf at the advertised tip makes this node read
+# `handoff`, which refuses every override at check 104 before either sentence below prints.
+out=$(run --close tRun)
 hit "$out" "the project conf at the default-branch side of the pinned BASE could not be evaluated to the end"
 hit "$out" "specs-audited — not gradable: the spec-audit source at BASE was not derived in this shell (authorization-reachable is unmet above: an unreachable anchor, a missing README, or a refused spec-audit:/SPEC_AUDIT_DEFAULT read)"
 miss "$out" "at BASE: (none)"
@@ -12985,6 +13009,20 @@ read_pl_token() { # pid -> its procfs start token, or `-`
   { IFS= read -r l < "/proc/$1/stat"; } 2>/dev/null || { printf -- '-'; return 0; }
   r=${l##*) }; read -r -a f <<<"$r"; printf '%s' "${f[19]:--}"
 }
+# THE TOKEN ONCE THE EXEC HAS HAPPENED (TOOL-aGraftedHelix-34 S5). On this platform an exec replaces
+# the Windows process behind a pid and the procfs start token moves with it, so a token read the
+# moment `&` returns is the forked shell's whenever the box is loaded: measured 3 of 30 under twelve
+# fork loops, 0 of 30 idle. Waits on the OBSERVED image, `(<comm>)` in the stat line, bounded at 100
+# polls of 0.1 s; `-` past the bound, which the caller asserts against.
+read_pl_exec_token() { # pid · comm -> its start token once it runs <comm>, or `-`
+  local l i=0
+  while [ "$i" -lt 100 ]; do
+    { IFS= read -r l < "/proc/$1/stat"; } 2>/dev/null || break
+    case "$l" in *"($2)"*) read_pl_token "$1"; return 0 ;; esac
+    sleep 0.1; i=$((i + 1))
+  done
+  printf -- '-'
+}
 read_pl_kids() { # pid -> every descendant's pid, one per line
   local d l r k
   local -a f
@@ -13181,9 +13219,15 @@ seed_claim gB s-b k-b live "$(derive_claim_now)"
 out=$(bash "$SCRIPT" --claims 2>/dev/null)
 same "AC16 an invalid stamp reads every claim of the date call unknown, aged -" "$(printf '%s\n' "$out" | cut -f1,4,5 | tr '\t\n' ':;')" "gA:-:unknown;gB:-:unknown;"
 # ---- AC3: a remote that does not answer is exit 2 and check 109, never `claims: none`.
+# ---- BOTH URLs are staged and the push URL is put back as it was found (TOOL-aGraftedHelix-34 S1):
+# ---- `resolve_claim_remote` reads `get-url --push`, and the refused-endpoint arms above leave a
+# ---- push URL set, so a fetch-URL-only staging never reached the reader and the arm read gA.
+gh_pu=$(git config --get remote.origin.pushurl || true)
 git remote set-url origin "$ORIGIN_DIR/no-such-remote.git"
+git remote set-url --push origin "$ORIGIN_DIR/no-such-remote.git"
 out=$(bash "$SCRIPT" --claims 2>&1); rc=$?
 git remote set-url origin "$ORIGIN"
+if [ -n "$gh_pu" ]; then git remote set-url --push origin "$gh_pu"; else git config --unset remote.origin.pushurl; fi
 same "AC3 an unanswering remote exits 2" "$rc" "2"
 hit  "$out" "the claims on the remote could not be read, so whether another session drives this slug is unknown rather than no, and nothing was written"
 miss "$out" "claims: none"
@@ -14402,7 +14446,8 @@ if in_shard 2; then
 # ---- a LIVE driver — this suite's own shell stands in for it — and proceeds once the bar has exited.
 init_pl_fixture
 sleep 63 & pl_bar=$!
-pl_tok=$(read_pl_token "$pl_bar")
+pl_tok=$(read_pl_exec_token "$pl_bar" sleep)
+n=$((n+1)); [ "$pl_tok" != - ] || { echo "FAIL AC6 fixture: the sleep $pl_bar never showed its exec'd image, so the record would carry no token and the hold arm grades an untokened record"; st=1; }
 mkdir -p "${PL_LEDGER%/*}"
 printf '%s %s %s - k1 2026-09-22T00:00:00Z sleep 63\n' "$pl_bar" "$pl_tok" "$$" > "$PL_LEDGER"
 pl_rb=$(run_pl_git hash-object memory/builds/tRun/RUN.md)
@@ -14471,7 +14516,8 @@ hit  "$out" "phase ABORTED"
 n=$((n+1)); [ ! -f "$PL_LEDGER" ] || { echo "FAIL AC12 --abort left the ledger of a finished run behind"; st=1; }
 init_pl_fixture
 sleep 67 & pl_bar=$!
-pl_tok=$(read_pl_token "$pl_bar")
+pl_tok=$(read_pl_exec_token "$pl_bar" sleep)
+n=$((n+1)); [ "$pl_tok" != - ] || { echo "FAIL AC12 fixture: the sleep $pl_bar never showed its exec'd image, so the record would carry no token and the KEPT arm grades an untokened record"; st=1; }
 mkdir -p "${PL_LEDGER%/*}"
 printf '%s %s %s - k1 2026-09-22T00:00:00Z sleep 67\n' "$pl_bar" "$pl_tok" "$$" > "$PL_LEDGER"
 n=$((n+1)); [ -f "$PL_LEDGER" ] || { echo "FAIL AC12 the fixture carries no ledger, so its survival proves nothing"; st=1; }
@@ -15625,7 +15671,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # switched off (2), handed (8), lease-dead (2), legacy (2) and a foreign live claim (5), MEASURED on a
 # slice of the --settle block behind this prologue on node a, 2026-10-05: n 20 -> 39, and the handed,
 # lease-dead and foreign-claim arms red under the parent's driver; no suite ran.
-FLOOR_ASSERTIONS=2482
+# RAISED 2482 -> 2488 by TOOL-aGraftedHelix-34 S2 and S5: closing-review arms 4 and 5 each assert the
+# length guard's sentence (2, region one), `--settle` driven against the finished record (2) and the
+# ledger AC6 and AC12 token-liveness arms (2, region two). MEASURED on slices behind this prologue on
+# node a, 2026-10-06: `cr` 38 -> 40, `s4pw` 35 -> 37, `pl` 79 -> 81, each red under its staged break;
+# no suite ran.
+FLOOR_ASSERTIONS=2488
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -15747,7 +15798,8 @@ FLOOR_ASSERTIONS=2482
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
 PROLOGUE_ARMS=18
 # RAISED 208 -> 209: region one's in_shard block-length arm, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=209
+# RAISED 209 -> 211: the two closing-review guard-sentence arms, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=211
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
@@ -15772,7 +15824,8 @@ FLOOR_SHARD_1=209
 # MERGED at the second reconcile with origin/main: this side 2202 plus main's 41 over 1680 = 2243.
 # RAISED 2243 -> 2266: the same 23 region-two --authorization assertions, see FLOOR_ASSERTIONS.
 # RAISED 2266 -> 2285: the same 19 region-two --settle claim assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=2285
+# RAISED 2285 -> 2289: the settle drive and the two ledger token-liveness arms, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=2289
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

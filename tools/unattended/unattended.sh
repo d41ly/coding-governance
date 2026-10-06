@@ -51,7 +51,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.80   # gov:kit unattended@1.80 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.81   # gov:kit unattended@1.81 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -231,7 +231,7 @@ RB_BOUND=""
 # On the UNBOUNDED path, a host with no runnable `timeout`, the command now ignores INT, so a Ctrl-C
 # ends the driver alone and leaves the command running — as a recorded orphan the next reap finds.
 run_bounded() { # argv...
-  local _s _e _rc _d _p _b=${RB_BOUND:-${GATE_BOUND:-0}}
+  local _s _e _rc _d _p _i _b=${RB_BOUND:-${GATE_BOUND:-0}}
   # THE REFUSAL BRANCH KEEPS RB_OUT'S SENTENCE and empties only the two NEW values. That sentence
   # is this branch's ONLY diagnostic -- it is SET here and the function returns before RB_TOOK is
   # computed below, so it is the freshest thing a caller gets -- and check_wiring, the gates-green
@@ -245,12 +245,22 @@ run_bounded() { # argv...
   # GATE_BOUND_LIVE is REMOTE_BOUND_LIVE's sibling and is probed the same way: by RUNNING timeout,
   # never by testing for the binary. With no runnable timeout the command still RUNS, unbounded --
   # a bound may cost speed and may turn a hang into a verdict; it may never turn a check into a skip.
+  # THE RECORD WAITS FOR THE EXEC (TOOL-aGraftedHelix-34 S5). On this platform an exec replaces the
+  # Windows process behind a pid and the procfs start token moves with it, so a token read the moment
+  # `&` returns is the forked shell's whenever the box is loaded - measured 3 of 30 under twelve fork
+  # loops - and `derive_proc_state` then reads this driver's own live command as `reused`. The
+  # wrapper's first act, `: >"$RB_UP"`, runs only in the post-exec image, so the marker proves the
+  # exec; the wait is on that observed condition, bounded at 100 polls of 0.05 s and ended early when
+  # the wrapper is gone, and the variable is unset before the command so its environment is as it
+  # was. A LITERAL bound, because the suite sources this function alone under `set -u`.
   if [ "$GATE_BOUND_LIVE" = 1 ] && [ "$_b" -gt 0 ]; then
-    "${BASH:-bash}" -c '"$@"; exit $?' "$ROOT" timeout -k 5s "$_b" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
+    RB_UP="$_d/up" "${BASH:-bash}" -c ': >"$RB_UP"; unset RB_UP; "$@"; exit $?' "$ROOT" timeout -k 5s "$_b" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
   else
-    "${BASH:-bash}" -c '"$@"; exit $?' "$ROOT" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
+    RB_UP="$_d/up" "${BASH:-bash}" -c ': >"$RB_UP"; unset RB_UP; "$@"; exit $?' "$ROOT" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
   fi
   _p=$!
+  _i=0
+  while [ ! -e "$_d/up" ] && [ "$_i" -lt 100 ] && kill -0 "$_p" 2>/dev/null; do sleep 0.05; _i=$((_i + 1)); done
   write_proc_record "$_p" "$@"
   wait "$_p"; _rc=$?
   _e=$(date +%s); RB_TOOK=$(( _e - _s ))
