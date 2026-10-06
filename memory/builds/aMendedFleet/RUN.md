@@ -720,3 +720,7 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T11:51:08Z dispatch · item 6d30d15a TOOL-aMendedFleet-101 · reason tools/unattended/check-unattended.test.sh memory/builds/aMendedFleet/spec/2026-10-05-spec-TOOL-aMendedFleet-101.md memory/builds/aMendedFleet/README.md
 
 2026-10-06T11:56:40Z brief · item TOOL-aMendedFleet-102 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
+
+2026-10-06T12:05:29Z dispatch · item 7f51b8d6 TOOL-aMendedFleet-102 · reason tools/memory-tree/backlog.py tools/memory-tree/transition_audit.py memory/builds/aMendedFleet/spec/2026-10-05-spec-TOOL-aMendedFleet-102.md memory/LIVE.md
+
+2026-10-06T12:09:30Z dispatch · item 7f51b8d6 TOOL-aMendedFleet-102 · reason tools/memory-tree/backlog.py tools/memory-tree/transition_audit.py memory/builds/aMendedFleet/spec/2026-10-05-spec-TOOL-aMendedFleet-102.md memory/builds/aMendedFleet/README.md

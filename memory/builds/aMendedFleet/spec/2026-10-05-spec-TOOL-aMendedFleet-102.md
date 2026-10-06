@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-102 — the two drifted inline `resolve_kit_dir` copies match their canonical source
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · order 103
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · order 103
 
 <!-- gen:spec-records -->
 
