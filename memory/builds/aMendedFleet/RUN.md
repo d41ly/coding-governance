@@ -590,3 +590,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T02:00:57Z dispatch · item af9df15b TOOL-aMendedFleet-81 · reason tools/memory-tree/gen_build_index.py
 
 2026-10-06T02:10:44Z dispatch · item ee94eb6e TOOL-aMendedFleet-81 · reason memory/ledger/2026-07.md memory/ledger/2026-08.md memory/ledger/2026-09.md memory/ledger/2026-10.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-81.md memory/builds/aMendedFleet/README.md memory/LIVE.md
+
+2026-10-06T02:15:06Z brief · item TOOL-aMendedFleet-82 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
