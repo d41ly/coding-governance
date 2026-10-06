@@ -1,10 +1,12 @@
 # PLAY-aMendedFleet-1 — the AGENTS.md wrapper's merge-bar section moves to a guide, without its repeated catalog or dated history
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams playbook · ratified 2026-10-04 · order 79
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams playbook · ratified 2026-10-04 · order 79
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-PLAY-aMendedFleet-1-1-acceptance-ledger.md](../build/2026-10-04-build-PLAY-aMendedFleet-1-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

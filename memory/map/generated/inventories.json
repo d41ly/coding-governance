@@ -289,6 +289,7 @@
     "guides": [
       "ANNOTATION-STYLE.md",
       "BUILD-METHOD.md",
+      "MERGE-BAR.md",
       "PLAYBOOK-TEMPLATE.md",
       "REVIEW-PROTOCOL.md",
       "SESSION-KICKOFF.md",

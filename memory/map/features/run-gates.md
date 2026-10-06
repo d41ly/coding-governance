@@ -32,7 +32,7 @@ gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md",
   "signal-trap-runs-the-exit-handler-twice.md",
   "async-job-starts-with-sigint-ignored.md",
   "decision-re-derived-by-a-second-process.md"]
-guides = []
+guides = ["MERGE-BAR.md"]
 backlog-shards = []
 lexicon-verbs = []
 [paths]
