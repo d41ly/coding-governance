@@ -145,7 +145,7 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraf
 | [TOOL-aGraftedHelix-34 — every red arm of the owed unattended suites is fixed, the two pool races are closed, and gate shard 8 is re-cut](spec/2026-10-06-spec-TOOL-aGraftedHelix-34.md) | 18 | 2 | CLOSED | rev-3 | 2026-10-06 |
 <!-- /gen:build-units -->
 
-Records: 49 bound to this build, across 4 record folder(s).
+Records: 50 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
