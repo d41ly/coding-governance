@@ -28,7 +28,7 @@
 # rewriting settings.json, the file the SessionStart hook lives in. Each auto-fix that sets a value
 # appends one `hookspath-set` or `merge-driver-set` line to the health log under the git common dir,
 # which the orientation card counts; the format is the `health_log_sh` block's header below.
-KIT_CHECK_WIRING_VERSION=1.24   # gov:kit check-wiring@1.25 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.25   # gov:kit check-wiring@1.25 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
