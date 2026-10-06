@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-38 — three checks that went blind when units 32 to 36 moved code into helpers
 
-**Status:** SPECCED · rev-1 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 22 · ratified 2026-10-06
+**Status:** SPECCED · rev-2 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 22 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 
@@ -53,12 +53,15 @@ each class, so the next helper extraction reds with a remedy instead of reaching
   function carries the bypass token, or the arm fails naming the caller. The suite's floors rise by
   exactly the assertions added. Observed by AC4 and AC9.
 - **S5** — The arms-groups linter, `tools/unattended/check-arms-groups.sh`, frames a function's span
-  without counting braces inside a single-quoted string that spans lines. Per line, after the
-  strings and expansions the shipped `strip` already clears, an odd count of remaining single quotes
-  toggles an open-quote state carried to the next line. While the state is open a line contributes
-  no brace until its closing quote, and the comment tail is cut only outside the quote. A span closes
-  when its depth reaches zero with no quote open. The idiom `'\''` is cleared before the count. The
-  helper doing this is awk-local and named `extract_counted`. Observed by AC6 and AC7.
+  without counting braces inside a single-quoted string that spans lines. Per line, single-quoted
+  pairs are cleared FIRST, then the strings and expansions the shipped `strip` already clears, and a
+  single quote left over opens a string whose state is carried to the next line. The order matters:
+  `strip` clears `"…"` pairs before `'…'` pairs, and a `"…"` pair can straddle a single-quoted
+  string's closing quote, which leaves a quote that opens nothing (§4). While the state is open a
+  line contributes no brace until its closing quote, and the comment tail is cut only outside the
+  quote. A span closes when its depth reaches zero with no quote open. The idiom `'\''` is cleared
+  before the count. The helper doing this is awk-local and named `extract_counted`. Observed by AC6
+  and AC7.
 - **S6** — The same linter REFUSES, exit 2, a function span that reaches the end of the file
   unclosed or holds, after its first line, a column-0 function definition or a column-0
   `if in_shard` seam. The refusal names the function, the line it opened on and the first line it
@@ -202,7 +205,7 @@ cuts 0 groups and 0 arms and REFUSES. Unit 34's region re-cut and unit 36's nine
 did not move the anchor: the suite at `910b8608`, unit 36's parent, frames 76 functions with none
 running off, and the shipped linter over it prints RED with 25 findings. That answers §8 F5.
 
-Candidates, each run over all twelve `*.test.sh` files of the kit and over the suite at `910b8608`,
+Candidates, each run over all thirteen `*.test.sh` files of the kit and over the suite at `910b8608`,
 comparing every function's span with the shipped framing:
 
 | Candidate | `check_helpers_hoisted` | other spans moved | lost on |
@@ -210,7 +213,7 @@ comparing every function's span with the shipped framing:
 | P2, a span ends at the first column-0 `}` | closes | 14 functions merged into neighbours | `_bm_sections` swallows four, `pedit` six |
 | P3, escaped braces stripped before the count | closes | `scan_exit_sites` in `runlog-writer.test.sh` ends at 379, one line early | the `(\{\|then\|else\|do)` regex at its line 369, which the shipped count balances |
 | P4, the suite rewrites its regex outside the count | closes | none | the next author's multi-line program |
-| P5, no brace counts inside a single-quoted string spanning lines | closes | none in eleven files; in the driver suite, `dodarm` stops running off | — |
+| P5, no brace counts inside a single-quoted string spanning lines | closes | none in twelve files; in the driver suite, `dodarm` stops running off | — |
 
 P5 agrees with the shipped framing on every function the shipped framing frames correctly, and
 corrects the two that run off: `check_helpers_hoisted` here and `dodarm` in
@@ -220,8 +223,17 @@ arms 920 · batched 14 · sentinels 0` and RED with 25 findings, rule A 0, rule 
 pre-unit-36 figures. Over a synthetic file holding the defect's shape, the shipped linter REFUSES and
 the P5 copy reads GREEN.
 
+P5 as rev-1 first worded it, the odd count read AFTER `strip`, moves one span the shipped framing
+frames correctly: `seed` in `tools/unattended/adopt-unattended.test.sh`, 146 to 224 under the shipped
+framing and 146 to 214 under it. Its line 187 reads `sed -n 's/^…"event":…"\([^"]*\)".*/\1/p' "$_fr"`;
+`strip` pairs the double quote after `\)` with the one opening `"$_fr"`, which swallows the closing
+single quote between them, so one quote is left over and reads as opening a string the line closes.
+That is the `a-pair-exists-and-it-is-the-wrong-one` class again. Clearing single-quoted pairs first
+moves no correct span: measured at rev-2 over the thirteen suites and the suite at `910b8608`, the
+only spans that move are the two run-offs.
+
 S6's refusal is the left-shift. Under the shipped framing it fires on the tracked suite, naming the
-17 seams that `check_helpers_hoisted` swallowed. Under P5 it fires on none of the twelve suites and
+17 seams that `check_helpers_hoisted` swallowed. Under P5 it fires on none of the thirteen suites and
 on none at `910b8608`, so it reds nothing that frames correctly today. It turns the framing's
 remaining blind spot into a named refusal rather than the anonymous `parsed 0 group(s)` this defect
 produced.
@@ -436,6 +448,12 @@ leg's script, the linter and slices, and the main loop runs the owed suites once
 - rev-1 · 2026-10-06 · initial draft, from the unit 38 spec brief, grounded at `65a8f167`, which
   carries the kit bytes of `eb96ea8b2`, with the calibrate's 20 outputs read whole and the check 51,
   rule 2 and framing probes run on node `a`.
+- rev-2 · 2026-10-06 · node a · at the build, before the code commit: S5 clears single-quoted pairs
+  BEFORE the strings `strip` clears, because rev-1's wording, the odd count read after `strip`,
+  disagreed with §4's own measurement: built as worded, it moved `seed` in
+  `tools/unattended/adopt-unattended.test.sh`, a span the shipped framing frames correctly, through a
+  `"…"` pair straddling a single quote. §4 records the measurement, and the kit holds thirteen
+  `*.test.sh` files, not twelve.
 
 ## 10. Reuse audit
 
