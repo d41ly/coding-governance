@@ -610,3 +610,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T03:21:27Z dispatch · item a14a7ca1 TOOL-aMendedFleet-85 · reason coding-governance-agents.template.md AGENTS.md WIRE-INTO-PROJECT.md tools/template-size-highwater.txt memory/guides/SESSION-KICKOFF.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-85.md
 
 2026-10-06T03:25:18Z dispatch · item a14a7ca1 TOOL-aMendedFleet-85 · reason coding-governance-agents.template.md AGENTS.md WIRE-INTO-PROJECT.md tools/template-size-highwater.txt memory/guides/SESSION-KICKOFF.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-85.md memory/builds/aMendedFleet/README.md memory/backlog/TOOL.md
+
+2026-10-06T03:29:45Z brief · item TOOL-aMendedFleet-86 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
