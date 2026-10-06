@@ -23,20 +23,20 @@ parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 refreshed-at: cacd8d307477c5aca09d2cfe851fe4e5f425b932 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: fff8b6422bdb4d986a27f973e06635e69b5e9646
-phase: HELD
+witness: e1f4d8c0c6abc835e8fbd41fd3878e4452b8c922
+phase: VERIFYING
 branch-sha: 018b5675727d4c3f316e5b6c53b11c688f03a472
 branch-ref: refs/heads/branch/helixir-review-gov-adoption-ce32e1
 may: none
 mode: prompt
 run-branch: refs/heads/branch/helixir-review-gov-adoption-ce32e1
 anchor-kind: run-branch
-lease-utc: 2026-10-05T17:04:11Z
+lease-utc: 2026-10-06T22:39:32Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 3932
 session: 1b37a234-acee-4cd7-8267-704d25af99be
-keepalive: 199408b7
+keepalive: 3b95b0bd
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 290d0d2d5ae893a2d723a2247ad788035d3bffdf
 anchor-ref: refs/heads/main
@@ -145,3 +145,11 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-06T22:34:35Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aGraftedHelix && bash tools/push-main.sh --land --slug aGraftedHelix && bash tools/unattended/unattended.sh --settle aGraftedHelix
 
 2026-10-06T22:34:35Z hold · item owner-decision · reason until owner · reaped 199408b7 · resume none(owner)
+
+2026-10-06T22:39:40Z resume · item aGraftedHelix · reason held · keepalive 3b95b0bd · manual
+
+2026-10-06T22:41:10Z rescope · item add TOOL-aGraftedHelix-45 · reason owner decision of 2026-10-07 on the run's parked and open items: adopt as a unit now
+
+2026-10-06T22:41:18Z rescope · item add TOOL-aGraftedHelix-46 · reason owner decision of 2026-10-07 on the run's parked and open items: adopt as a unit now
+
+2026-10-06T22:41:23Z rescope · item add TOOL-aGraftedHelix-47 · reason owner decision of 2026-10-07 on the run's parked and open items: adopt as a unit now
