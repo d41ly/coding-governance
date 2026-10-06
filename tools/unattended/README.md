@@ -233,7 +233,10 @@ The close is decided at `VERIFYING`, so the move into that phase, and a resume t
 there, prints what the close should carry, report-only: the open asks whose pointer names a file the
 range from the pinned base to HEAD touched, read through `ASKS_CMD --json --path <paths> --limit 0`,
 the asks companion's fourth call shape (`TOOL-aMendedFleet-66`), and then whether that range owes the
-flagged bar. Each list is a disposition worklist; neither refuses and no exit moves.
+flagged bar, and then the stale-dossier list: the dossiers that range touched and did not refresh,
+read through `map_diff.py <base>..HEAD --stale-dossiers --json` from the directory of the declared
+`MAP_CLI`'s kit (`TOOL-aMendedFleet-83`). Each list is a disposition worklist; none refuses and no
+exit moves.
 
 ## The bar's bound — wall, queue and margin
 

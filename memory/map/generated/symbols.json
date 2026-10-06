@@ -9358,6 +9358,11 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
+      "id": "print_stale_dossiers",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "print_summary",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"

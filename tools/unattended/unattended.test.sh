@@ -9366,6 +9366,31 @@ ipgit add -A >/dev/null && ipgit commit -q -m touch --no-verify
 out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
 hit  "$out" "unattended: open asks targeting files this run's range touched (report only, for disposition): 1"
 hit  "$out" "  ARCH-tRun-9 · OPEN · low · the fixture ask on thing.txt"
+# ---- TOOL-aMendedFleet-83: the move into VERIFYING lists the dossiers the run's range touched and did
+# ---- not refresh, through the map_diff.py beside the declared MAP_CLI. The stub answers from the range
+# ---- it is handed: its one dossier is stale only when the range touched the claimed path and not the
+# ---- dossier, so a listed dossier proves the range was read. Staged red by deleting the verb_phase call.
+ipreset
+iprun --preflight tRun --keepalive-id k1 >/dev/null
+ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+mkdir -p "$ip_dir/mapkit"
+: > "$ip_dir/mapkit/reuse_lookup.py"
+cat > "$ip_dir/mapkit/map_diff.py" <<'IPM'
+import json, subprocess, sys
+rng = sys.argv[1]
+names = subprocess.run(["git", "diff", "--name-only", rng.split("..")[0], "HEAD"],
+                       capture_output=True, text=True, encoding="utf-8").stdout.split()
+stale = "kitsurface/thing.txt" in names and "dossiers/thing.md" not in names
+print(json.dumps({"scope": rng, "of": 1, "stale": int(stale), "live": True, "note": "",
+                  "dossiers": [{"feature": "thing", "dossier": "dossiers/thing.md", "refreshed": "0" * 40,
+                                "stale": stale, "behind": 1, "newest": "ab" * 20}]}))
+IPM
+printf 'MAP_CLI="mapkit/reuse_lookup.py"\n' >> "$ip_dir/.unattended.conf"
+date +%s%N > "$ip_dir/kitsurface/thing.txt"
+ipgit add -A >/dev/null && ipgit commit -q -m touch --no-verify
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "unattended: dossiers this run's range touched and did not refresh (report only): 1 of 1"
+hit  "$out" "  thing · dossiers/thing.md · 1 behind · newest abababab"
 # ---- closing review L1: a range whose ONLY touch on a declared prefix is a rename OUT of it still
 # ---- owes the flagged bar. A porcelain diff detects renames by default and names one by its
 # ---- destination alone, so the read carries --no-renames and names the source too.

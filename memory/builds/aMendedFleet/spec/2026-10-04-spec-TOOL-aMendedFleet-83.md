@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-83 — the unattended close sequence lists the dossiers its range touched and did not refresh
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 83
+**Status:** CLOSED · rev-3 · 2026-10-06 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 83
 
 <!-- gen:spec-records -->
 
@@ -135,8 +135,8 @@ same driver and are ordered first too; this unit rebases onto them.
 
 - **AC1** — When, in a scratch clone of the unit's tip under a short `%TEMP%` path, one commit
   appends a comment line to `tools/codebase-map/rank_harness.py` and
-  `bash tools/unattended/unattended.sh --phase aMendedFleet VERIFYING <that commit's sha>` runs, its
-  stdout carries the header line with a count of at least 1 and an indented line naming
+  `bash tools/unattended/unattended.sh --phase aMendedFleet VERIFYING --witness <that commit's sha>`
+  runs, its stdout carries the header line with a count of at least 1 and an indented line naming
   `codebase-map`, after the `phase VERIFYING` line.
   Red when: the move prints no list, or the list omits the dossier the commit left behind.
   cost: seconds; the clone is the only thing written.
@@ -187,6 +187,8 @@ New arm: `tools/unattended/unattended.test.sh` · a fixture run moved into `VERI
 - rev-1 · 2026-10-04 · initial draft, split from unit 37 at its F1, from a read of `verb_phase`,
   `print_selftests_owed`, `verb_close` and the conf's CLI keys at base.
 - rev-2 · 2026-10-04 · §4 Files touched and §7 add symbols.json and its coverage leg: the new public shell function is indexed after TOOL-aMendedFleet-35 S1.
+- rev-3 · 2026-10-06 · AC1 spells the witness as `--witness <sha>`: the verb refuses a bare positional
+  sha with check 11, so the criterion as written could not run.
 
 ## 10. Reuse audit
 

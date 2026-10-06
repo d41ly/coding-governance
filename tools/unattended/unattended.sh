@@ -4437,6 +4437,7 @@ verb_phase() { # slug · phase · witness
   # `--close` exports. No other target announces.
   [ "$want" = VERIFYING ] && print_touched_asks "$rel"
   [ "$want" = VERIFYING ] && print_selftests_owed "$rel"
+  [ "$want" = VERIFYING ] && print_stale_dossiers "$rel"
   return 0
 }
 
@@ -6570,6 +6571,7 @@ print_resume_orientation() { # run-state file · phase
   # compaction or a process death, reads the owed-bar notice again: it never saw the move's.
   [ "$2" = VERIFYING ] && print_touched_asks "$1"
   [ "$2" = VERIFYING ] && print_selftests_owed "$1"
+  [ "$2" = VERIFYING ] && print_stale_dossiers "$1"
   return 0
 }
 
@@ -7856,6 +7858,63 @@ print("unattended: open asks targeting files this run'"'"'s range touched (repor
 for line in lines:
     print(line)
 ' || echo "unattended: open asks targeting this run's range: DEAD PROBE — the inline reader of the generator's answer did not run"
+  return 0
+}
+
+# TOOL-aMendedFleet-83 - THE DOSSIERS THE RUN'S RANGE TOUCHED AND DID NOT REFRESH, REPORT-ONLY, READ
+# AT VERIFYING beside the owed-bar notice, where the run can still refresh one. The rule is the map
+# kit's own range reader, `--stale-dossiers --json`, read by key; this prints it and computes nothing.
+# The reader is DERIVED as the file beside the declared MAP_CLI, never spelled, so a map kit installed
+# at another prefix is found where it is. The base is the pinned fact and is NOT resolved here first:
+# a shallow clone names a sha it never fetched, and the reader's own shallow note is the honest answer
+# there. Every state says which on one line, and this returns 0 on every path.
+print_stale_dossiers() { # run-state file -> lists the dossiers the range touched and did not refresh
+  local _b _kd _py _rc _first
+  _kd=$(dirname -- "${MAP_CLI:-.}")
+  if [ -z "${MAP_CLI:-}" ] || [ ! -f "$ROOT/$MAP_CLI" ] || [ ! -f "$ROOT/$_kd/map_diff.py" ]; then
+    echo "unattended: stale dossiers in this run's range not asked — MAP_CLI is blank, names no file, or has no map_diff.py beside it, so the map's range reader is not adopted here and no list is printed (MAP_CLI: ${MAP_CLI:-blank})"
+    return 0
+  fi
+  _b=$(fact "$1" base)
+  if [ -z "$_b" ]; then
+    echo "unattended: the record pins no base, so the range whose stale dossiers are listed cannot be read, and no list is printed; whether any dossier is stale is unanswerable here, not no"
+    return 0
+  fi
+  if ! _py=$(resolve_python 2>/dev/null) || [ -z "$_py" ]; then
+    echo "unattended: stale dossiers in this run's range: DEAD PROBE — no python launcher resolves, so the map's range reader could not run"
+    return 0
+  fi
+  run_bounded "$_py" "$_kd/map_diff.py" "$_b..HEAD" --stale-dossiers --json; _rc=$?
+  if [ "$_rc" -eq 2 ]; then
+    _first=$(printf '%s\n' "$RB_ERR" | head -n 1)
+    echo "unattended: stale dossiers in this run's range not asked — the map's range reader refused with exit 2, which is how an unadopted map answers: ${_first:-(no stderr)}"
+    return 0
+  fi
+  if [ "$_rc" -ne 0 ]; then
+    echo "unattended: stale dossiers in this run's range: DEAD PROBE — the map's range reader exited $_rc or outran its bound, so which dossiers the range left stale is unanswerable here, not none"
+    return 0
+  fi
+  printf '%s' "$RB_STDOUT" | "$_py" -c '
+import json, sys
+try:
+    sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+except Exception:
+    pass
+try:
+    doc = json.loads(sys.stdin.buffer.read().decode("utf-8"))
+    live, note, of = doc["live"], doc["note"], doc["of"]
+    lines = ["  %s · %s · %s behind · newest %s" % (r["feature"], r["dossier"], r["behind"], r["newest"][:8])
+             for r in doc["dossiers"] if r["stale"]]
+except Exception:
+    print("unattended: stale dossiers in this run'"'"'s range: DEAD PROBE — the map'"'"'s range reader printed text that does not read as its --json answer, so which dossiers the range left stale is unanswerable here, not none")
+    sys.exit(0)
+if not live:
+    print("unattended: stale dossiers in this run'"'"'s range: DEAD PROBE — %s" % note)
+    sys.exit(0)
+print("unattended: dossiers this run'"'"'s range touched and did not refresh (report only): %d of %d" % (len(lines), of))
+for line in lines:
+    print(line)
+' || echo "unattended: stale dossiers in this run's range: DEAD PROBE — the inline reader of the map's answer did not run"
   return 0
 }
 
