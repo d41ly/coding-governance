@@ -746,3 +746,11 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T14:08:07Z dispatch · item 18c889d5 TOOL-aMendedFleet-25 · reason tools/drift-audit/drift_signals.py memory/LIVE.md
 
 2026-10-06T14:36:38Z dispatch · item 26c67ceb TOOL-aMendedFleet-53 · reason .lexicon.conf
+
+2026-10-06T15:21:29Z review · item aMendedFleet · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 16 · disposition promote
+
+2026-10-06T15:21:43Z rescope · item add TOOL-aMendedFleet-110 · reason closing review r1 HIGH (finding 1): a branch can move a BASELINES-ed drift signal into PINS and escape the shrink-only guard
+
+2026-10-06T15:21:51Z rescope · item add TOOL-aMendedFleet-111 · reason closing review r1 minors, code write set (findings 3 4 5 6 7 9 10 18 19)
+
+2026-10-06T15:21:58Z rescope · item add TOOL-aMendedFleet-112 · reason closing review r1 minors, suite-floor and record write set (findings 12 14 15 16 17 20 21)
