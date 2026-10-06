@@ -427,7 +427,7 @@ Cite ids, never line numbers.
 | [TOOL-dTieredTribunal-23](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the protocol gate arm TOOL-dTieredTribunal-13's F1 resolved to record… |
 | [TOOL-dTieredTribunal-24](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | two mechanical arms for the amendment-leaves-its-other-half-standing… |
 | [TOOL-dUnstalledConvoy-14](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | hygiene check 12 asserts the HEADER rev appears in section 9 and says… |
-| [TOOL-dUnstalledConvoy-15](../builds/dUnstalledConvoy/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-98 | 2026-08-20 | the bare-interpreter class survives outside govkit:… |
+| [TOOL-dUnstalledConvoy-15](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-20 | the bare-interpreter class survives outside govkit:… |
 | [TOOL-dUnstalledConvoy-16](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | a correction to a claim held by SEVERAL carriers lands in one of them… |
 | [TOOL-dUnstalledConvoy-18](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-21 | a PYTHON rewrite of a shell source silently eats a LONE CR.… |
 | [TOOL-dUnstalledConvoy-19](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-21 | APPENDING to a test suite strands the arms, and every static signal… |

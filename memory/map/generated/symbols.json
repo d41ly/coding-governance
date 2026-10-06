@@ -12555,6 +12555,11 @@
     {
       "id": "resolve_bash",
       "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "resolve_bash",
+      "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {

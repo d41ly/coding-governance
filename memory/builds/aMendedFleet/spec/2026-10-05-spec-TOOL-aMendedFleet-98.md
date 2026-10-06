@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-98 — held-red C2: a Python suite's `bash` resolves to Git-Bash, never the System32 WSL launcher
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · advances TOOL-dUnstalledConvoy-15 · order 99
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · advances TOOL-dUnstalledConvoy-15 · order 99
 
 <!-- gen:spec-records -->
 
