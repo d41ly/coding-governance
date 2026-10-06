@@ -9,12 +9,22 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-aGraftedHelix-42=OPEN TOOL-aGraftedHelix-43=OPEN TOOL-aGraftedHelix-44=OPEN
+units-at-landing: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-26 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33 TOOL-aGraftedHelix-34 TOOL-aGraftedHelix-35 TOOL-aGraftedHelix-36 TOOL-aGraftedHelix-37 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39 TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41
+hold-run: 
+hold-streak: 1 · at fff8b642
+resume-owed: none · owner
+held-at: 2026-10-06T22:34:26Z
+hold-reason: the run is complete (41 units CLOSED) and merged with local main's reconcile; whether it lands through the lander or rides the owner's merged local main is the owner's call, given the 2026-10-06 rulings that local main gather every session and that the kit self-tests run by hand from that tree
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
-refreshed-at: cacd8d307477c5aca09d2cfe851fe4e5f425b932 · park · 0 touching
+refreshed-at: cacd8d307477c5aca09d2cfe851fe4e5f425b932 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 071c32bce76b2a3fe2d384504739235e574b0dd1
-phase: VERIFYING
+witness: fff8b6422bdb4d986a27f973e06635e69b5e9646
+phase: HELD
 branch-sha: 018b5675727d4c3f316e5b6c53b11c688f03a472
 branch-ref: refs/heads/branch/helixir-review-gov-adoption-ce32e1
 may: none
@@ -131,3 +141,7 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-06T21:37:23Z dispatch · item 183047ec TOOL-aGraftedHelix-41 · reason tools/unattended tools/run-gates memory/guides .claude/skills/unattended/SKILL.md memory/map memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-41.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md memory/LIVE.md memory/ledger/2026-10.md
 
 2026-10-06T22:32:15Z decision · item landing-target · reason question: land this run to origin through the lander, or let it ride the owner's merged local main; options: lander push now, or local main only with the owner pushing after the manual self-test run; recommendation: local main only, since the owner is assembling local main from every current session (another session reconciled it with origin/main at cacd8d30, 223 commits ahead and unpushed) and ruled that the kit self-tests run by hand from that merged tree; this run merged local main a30f45893 and will fast-forward local main to its tip, pushing nothing
+
+2026-10-06T22:34:35Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aGraftedHelix && bash tools/push-main.sh --land --slug aGraftedHelix && bash tools/unattended/unattended.sh --settle aGraftedHelix
+
+2026-10-06T22:34:35Z hold · item owner-decision · reason until owner · reaped 199408b7 · resume none(owner)
