@@ -684,3 +684,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T09:50:26Z brief · item PLAY-aMendedFleet-4 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
 
 2026-10-06T09:59:57Z dispatch · item f9b2bb5c PLAY-aMendedFleet-4 · reason coding-governance-agents.template.md tools/govkit/entries/playbook.kit.toml .governance/deploy.toml AGENTS.md tools/template-size-highwater.txt memory/guides/SESSION-KICKOFF.md memory/builds/aMendedFleet/spec/2026-10-04-spec-PLAY-aMendedFleet-4.md memory/builds/aMendedFleet/README.md
+
+2026-10-06T10:12:48Z brief · item TOOL-aMendedFleet-97 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
