@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-36 — the rotated run's closing review MEDIUM and LOW findings, fixed as one batch
 
-**Status:** SPECCED · rev-1 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 20 · ratified 2026-10-06
+**Status:** SPECCED · rev-2 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 20 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 
@@ -100,6 +100,15 @@ Every item names the review section it answers. The review record is
   harness and the skill are re-rendered, the unattended guides re-adopted, `gotchas.py --write`
   re-renders the catalogue index, the two dossiers whose prose names a moved mechanism are
   refreshed, and the kickoff manifest is re-stamped. Observed by AC20 and AC21.
+- **S14** — Adopted from unit 35's discovery. Two carriers say `gotchas.py --for-diff` always exits
+  0, false since unit 29, which made it exit 1 with a `HYGIENE gotchas:` line on a refused range, as
+  the memory-tree README states: the build method's M6 sentence in
+  `tools/memory-tree/BUILD-METHOD.template.md`, and the per-pass checklist paragraph of
+  `tools/unattended/SKILL.template.md`. Each sentence says instead that it exits 0 whenever it
+  prints a checklist and 1 with a `HYGIENE gotchas:` line on a refusal. The build method is a
+  governance carrier shared invariant 10 closes; this edit takes that invariant's one exception,
+  because the shipped contract would otherwise state false behaviour, and it changes the claim about
+  an exit status and no rule. Both are re-rendered. Observed by AC22.
 
 ## 3. Non-goals (OUT)
 
@@ -122,7 +131,8 @@ Every item names the review section it answers. The review record is
 - **No class gate for orchestrator hand-offs.** The class record measured why no predicate separates
   them; S5 runs the documented check instead.
 - **The roster-row class stays a documented check.** BUILD-METHOD M8 already owes a re-read of the
-  build README against the code at the close, and no unit of this build edits the method.
+  build README against the code at the close. This unit edits the method at M6's exit-status
+  sentence alone (S14), under shared invariant 10's false-behaviour exception, and adds no rule.
 
 ### Edges
 
@@ -400,6 +410,16 @@ failure. The prologue now executes one assertion, so `FLOOR_ASSERTIONS` and each
 `ADOPTED: every red arm of the owed unattended suites is fixed, the two pool races are closed, and gate shard 8 is re-cut`,
 the title spec 34 carries at rev-3, in a records commit.
 
+### S14 — two carriers stop saying the checklist always exits 0
+
+The build method's M6 line becomes: it takes a COMMITTED range and exits 0 whenever it prints a
+checklist, and 1 with a `HYGIENE gotchas:` line when it refuses the range. The skill's sentence
+"Its stdout IS the checklist and it always exits 0" becomes "Its stdout IS the checklist and it
+exits 0 whenever it prints one, and 1 with a `HYGIENE gotchas:` line when it refuses the range".
+The README row already states this, so both point at behaviour one carrier owns. The method stays
+under its 30720-byte budget. The method's live copy is re-rendered by the kit's parity render, the
+skill by `adopt-unattended.sh`.
+
 ### Inventory
 
 | identifier | where | cell |
@@ -436,6 +456,7 @@ JavaScript symbol is added, so the map's symbol index does not move.
 - `memory/map/features/unattended-stops.md`, `memory/map/features/review-harnesses.md`
 - `memory/builds/aGraftedHelix/README.md`, `memory/builds/aGraftedHelix/RUN.md` through `--park`
 - `memory/guides/SESSION-KICKOFF.md`, the re-stamp
+- `tools/memory-tree/BUILD-METHOD.template.md`, `memory/guides/BUILD-METHOD.md` by the render (S14)
 - every version carrier `tools/check-kit-versions.sh` pairs for the four kits
 
 ### Rollout
@@ -448,7 +469,8 @@ One pass, in these steps, each verified by its own criteria before the next:
 4. `tools/check-wiring.sh` and its suite: S6.
 5. `tools/workflows/`: S3, then S7 and S8. The render, then the fixture `base` edit across the
    suite, re-reading unit 35's arms.
-6. The skill, verbs and stops templates, re-adopted: S3's sentence and S4's two.
+6. The skill, verbs and stops templates, re-adopted: S3's sentence, S4's two and S14's skill
+   sentence; then S14's build-method sentence and its render.
 7. `tools/unattended/check-unattended.test.sh`: S11.
 8. Records: S12, S5's park, the gotcha sections, `gotchas.py --write`, the two dossiers.
 9. S13: each kit's version once, the harness engine identity and its suite pin, renders, the
@@ -635,10 +657,16 @@ or in the working tree, and is restored before the next criterion, which
   every line of the second reads `ok`. `bash skills/session-kickoff/manifest-check.sh` exits 0 over
   the re-stamped manifest.
   Red when: the catalogue index, the map or the manifest's audit stamp is stale.
+- **AC22** — When `grep -n "always exits 0" memory/guides/BUILD-METHOD.md .claude/skills/unattended/SKILL.md`
+  runs at the pass's commit, it prints nothing, and `grep -c "HYGIENE gotchas:"` counts at least one
+  line in each. `bash tools/check-template-size.sh memory/guides/BUILD-METHOD.md` exits 0, and
+  `bash tools/unattended/adopt-unattended.sh --check` exits 0.
+  Red when: either carrier still claims the checker cannot exit non-zero, or a render differs from
+  its template.
 
 ## 7. Gates
 
-`gotchas selftest` · `memory hygiene` · `unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `workflow script syntax` · `review-protocol parity (kit vs dogfood)` · `unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `check-wiring self-test` · `transition-audit arms` · `straggler-guard arms` · `push-main self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `kit epoch (shipped bytes move, the version moves)` · `codebase-map coverage + freshness` · `kickoff-manifest ratchet` · `install-prefix (shipped surface)` · `encoding posture (text IO names its encoding)` · `shell hygiene (a loop fed by a command substitution)` · `line length` · `govkit selfcheck` · `testsuite counts (every bar self-test prints one)` · `spec tokens (a spec's own names resolve)`
+`gotchas selftest` · `memory hygiene` · `unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `workflow script syntax` · `review-protocol parity (kit vs dogfood)` · `unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `check-wiring self-test` · `transition-audit arms` · `straggler-guard arms` · `push-main self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `kit epoch (shipped bytes move, the version moves)` · `codebase-map coverage + freshness` · `kickoff-manifest ratchet` · `install-prefix (shipped surface)` · `encoding posture (text IO names its encoding)` · `shell hygiene (a loop fed by a command substitution)` · `line length` · `govkit selfcheck` · `testsuite counts (every bar self-test prints one)` · `spec tokens (a spec's own names resolve)` · `kit/dogfood doc parity` · `build-method size`
 
 New arm: gotchas.py --selftest · a range renaming an anchored invariant; stage the touched-set read reverted to --name-only alone · none
 New arm: tools/workflows/unattended-build.test.sh · GH29 refusals and the audit fixtures' base; stage the refusal cut from a render copy · FLOOR_ASSERTIONS, by the assertions added
@@ -702,6 +730,10 @@ a criterion lives in a suite, and the main loop runs those suites once at VERIFY
 - rev-1 · 2026-10-06 · initial draft, from the unit 35-36 spec brief and the rotated run's closing
   review round 1, M2 to M7 and L1 to L3, grounded at `45ce8c76` against unit 35's spec as authored,
   with the sweeps, the wiring measurement and the two predicate probes run on node `a`.
+- rev-2 · 2026-10-06 · S14 and AC22 added, adopted from unit 35's discovery: the build method and the
+  unattended skill both say `--for-diff` always exits 0. §3's method non-goal now names the one
+  sentence this unit edits under shared invariant 10's false-behaviour exception, and §7 names the
+  method's parity and size legs.
 
 ## 10. Reuse audit
 
