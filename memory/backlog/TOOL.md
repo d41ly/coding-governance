@@ -151,6 +151,8 @@ Cite ids, never line numbers.
 | [TOOL-aMendedFleet-113](../builds/aMendedFleet/BACKLOG.md) | OPEN | MED | — | 2026-10-06 | the aMendedFleet closing review (findings 12 to 17) found four suites… |
 | [TOOL-aMendedFleet-114](../builds/aMendedFleet/BACKLOG.md) | OPEN | LOW | — | 2026-10-06 | the aMendedFleet closing review (finding 21) found kickoff units graded… |
 | [TOOL-aMendedFleet-115](../builds/aMendedFleet/BACKLOG.md) | OPEN | MED | — | 2026-10-06 | print_touched_asks (unit TOOL-aMendedFleet-66) hands every path the… |
+| [TOOL-aMendedFleet-117](../builds/aMendedFleet/BACKLOG.md) | OPEN | MED | — | 2026-10-07 | TOOL-aMendedFleet-116 reverses D11-c: an unattended landing may be… |
+| [TOOL-aMendedFleet-118](../builds/aMendedFleet/BACKLOG.md) | OPEN | LOW | — | 2026-10-07 | the owner approved the /goal spike parked at this run's start: test… |
 | [TOOL-aMeteredTurnstile-2](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | the bar LEAKS scratch git repos into TMPDIR and never sweeps them: 786… |
 | [TOOL-aMeteredTurnstile-3](../builds/aMeteredTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-20 | gate-timings.tsv evicts on the RUN, never on the manifest: the… |
 | [TOOL-aMeteredTurnstile-5](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | longest-first dispatch pessimises time-to-first-signal by construction:… |

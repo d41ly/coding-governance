@@ -12,6 +12,8 @@
 - TOOL-aMendedFleet-113 · filed 2026-10-06 · the aMendedFleet closing review (findings 12 to 17) found four suites whose assertion floors rose by less than the arms their units added, so a stranded block no longer reds; nothing compares a floor's move with the arms added beside it · accept a check over the floored suites that counts the assertion calls a diff adds in each suite's own spelling and reds when the floor moved by less without a recorded reason → `tools/check-testsuite-counts.sh`
 - TOOL-aMendedFleet-114 · filed 2026-10-06 · the aMendedFleet closing review (finding 21) found kickoff units graded Tier-1 whose commits changed two kits or added a CLI flag, so check 23's Tier-2 acceptance-ledger join never ran on them · accept a hygiene check that reds a Tier-1 spec whose unit commits touch two kit directories or add a usage line, unless the spec records a tier waiver → `tools/memory-tree/check-memory-hygiene.sh`
 - TOOL-aMendedFleet-115 · filed 2026-10-06 · `print_touched_asks` (unit TOOL-aMendedFleet-66) hands every path the run's range changed to ASKS_CMD as argv words; at aMendedFleet's own VERIFYING move that was 605 paths and 37490 bytes, past Windows' 32 KiB command line, so python never started (exit 126, `Argument list too long`) and the list read DEAD PROBE on exactly the large build it exists for · accept the touched-asks read passes its paths on stdin or in batches, and a 600-path range lists its asks on node a → `tools/unattended/unattended.sh`
+- TOOL-aMendedFleet-117 · filed 2026-10-07 · TOOL-aMendedFleet-116 reverses D11-c: an unattended landing may be bound by a remote ruleset instead of a direct push, and runs move to --permission-mode auto, which needs CLI 2.1.281 where node a's PATH carries 2.1.178 · accept the default branch carries a ruleset with a required check an unattended landing passes, the protocol and charter landing text say so, and runs launch in auto mode on every node whose CLI supports it → `memory/guides/UNATTENDED-PROTOCOL.md`
+- TOOL-aMendedFleet-118 · filed 2026-10-07 · the owner approved the /goal spike parked at this run's start: test /goal in an interactive session as the keepalive for an unattended run · accept a recorded interactive /goal run that either replaces the idle-wake tick, which then retires, or a record of why it cannot → `tools/unattended/README.md`
 
 ## Dispositions
 
@@ -19,7 +21,9 @@
 - SEV · TOOL-aMendedFleet-96 · LOW · two readers of one definition set, no wrong answer today
 - SEV · TOOL-aMendedFleet-106 · LOW · a release act over many asks, no defect of its own
 - KEEP · TOOL-aMendedFleet-106 · advanced by TOOL-aMendedFleet-14, which defers the aged asks on it; the owner's triage is what closes it
-- KEEP · PLAY-aMendedFleet-5 · advanced by PLAY-aMendedFleet-2; the reading is unit TOOL-aMendedFleet-73's and the ruling is the owner's, so this build closes nothing
+- WONTDO · PLAY-aMendedFleet-5 · the owner ruled the design pass keeps the full Tier-2 spec (PLAY-aMendedFleet-6, 2026-10-07), so nothing changes; the rerun stays TOOL-aMendedFleet-109
+- KEEP · TOOL-aMendedFleet-117 · the owner's ruling TOOL-aMendedFleet-116 is recorded; its build is a follow-up
+- KEEP · TOOL-aMendedFleet-118 · owner-approved; it runs in an interactive session
 - KEEP · TOOL-aMendedFleet-95 · filed at the M2 cross-read for a runbook sentence no unit of this build re-verifies; it stays live for a later build
 - KEEP · TOOL-aMendedFleet-96 · unit TOOL-aMendedFleet-3's hands-off edge; no unit of this build owns the drift report's reader, so it stays live
 - KEEP · TOOL-aMendedFleet-107 · a change to the dispatch disjointness rule that no unit of this build owns; it stays live
@@ -338,3 +342,5 @@
 - SEV · TOOL-aMendedFleet-113 · MED · a floor raised by less than its arms lets a stranded block pass silently
 - SEV · TOOL-aMendedFleet-114 · LOW · a mis-tiered unit skips the Tier-2 ledger join
 - SEV · TOOL-aMendedFleet-115 · MED · the touched-asks list dies on a large range, the case it serves
+- SEV · TOOL-aMendedFleet-117 · MED · the owner's D11-c reversal has no build yet
+- SEV · TOOL-aMendedFleet-118 · LOW · the approved /goal spike is unrun
