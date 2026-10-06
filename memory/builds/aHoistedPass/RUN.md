@@ -9,6 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+work-landed-at: 8eebfbc640a00cdf46f2f654bb50e83daee919de 028b5cac6504b37b99d83180b65bf211deb972b6
 halt-code: repo-state-out-of-mandate
 keepalive-reaped: yes — CronDelete cancelled job e540bdc0 and CronList then reported no scheduled jobs; one job, created and reaped by this run, no resume in between
 parked-surfaced: yes, 12 surfaced — the twelfth is the gates-green override --close itself wrote, which the Definition of Done could not count because it is evaluated before overrides land

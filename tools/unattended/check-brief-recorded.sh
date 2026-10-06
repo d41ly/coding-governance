@@ -110,7 +110,7 @@
 # post-run subset joined it rather than moving the increment, which would change what the sibling's
 # identically named count means.
 set -u
-KIT_UNATTENDED_VERSION=1.61   # gov:kit unattended@1.61 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.68   # gov:kit unattended@1.68 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and
@@ -475,7 +475,12 @@ brief-recorded: GRADED ANYWAY — $id was BUILT at $(GIT rev-parse --short "$bui
       # commit behind the base, so a later repair naming it is the earliest in-range match. Asked
       # through pass-order's own pre-anchor probe, newest first and capped; TRUNCATED answers
       # nothing, and the unit is graded.
-      _pre=$(build_commit "$base $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "")
+      # NO `$HR_EXCL` HERE, in either mode (TOOL-dUnstuckLanding-27 S1). This probe EXEMPTS, it does
+      # not detect: it looks BEHIND the base, and everything behind the base is on the advertised tip
+      # by construction, so `^<tip>` emptied it in RANGE mode and redded every repair of a unit an
+      # earlier landed run built. Narrowing an exemption widens what fails. The in-range walk above
+      # keeps the token; pass-order's pre-anchor probe keeps it too, because that one detects.
+      _pre=$(build_commit "$base" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "")
       if [ -n "$_pre" ] && [ "$_pre" != TRUNCATED ]; then
         prebuilt=$((prebuilt+1))
         announced="$announced

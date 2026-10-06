@@ -1,6 +1,6 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.22` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.23` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `<prefix>/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
 
@@ -138,8 +138,10 @@ never is. A gateable signal whose rows each name their offender by `id` may take
 | `backlog_stragglers` | does a ref still carry backlog row changes unaccounted against the default branch? | no |
 | `asks_disposed_overrides` | how often did a run buy the `asks-disposed` Definition-of-Done item with an override? | no |
 | `run_records_nonterminal_but_merged` | does a run record still read live after its work reached the default branch? | no |
+| `aborted_work_landed` | does a live ABORTED record dated before `HANDOFF_CUTOFF` have work the content predicate reads landed, with no upheld `work-landed-at`? Cleared by the unattended kit's `--settle`; an archive is listed and not counted. | no |
+| `discarded_work_landed` | did the work of an ABORTED record dated on or after `HANDOFF_CUTOFF`, when ABORTED means discard, land anyway? No verb clears it. Not asked while the key is blank. | no |
 | `legs_retried_after_timeout` | how many legs did the merge bar retry, once and alone, after their own ceiling fired, over the run records every git dir of the clone still holds — the common dir and each linked worktree's — and which legs, how often each failed on its retry? A removed worktree takes its records with it. | no |
-| `fleet_over_budget` | which live runs hold undeclared writes counted against check 23's per-run zero, read from the `check 23 fleet` line of the newest bar run any git dir of the clone holds? Not asked without `.unattended.conf`. | no |
+| `fleet_over_budget` | which builds hold more undeclared writes than the unattended kit's per-build `UNDECLARED_WRITE_BUDGET`, read from the `check 23 fleet` line of the newest bar run any git dir of the clone holds? A line reading `over unjudged` is DEAD PROBE, never 0. Not asked without `.unattended.conf`. | no |
 | `remote_ci_red_streak` | how many consecutive completed runs of the declared remote CI workflow on the default branch failed, newest first? Read through `gh`; DEAD PROBE when `gh` cannot answer, not asked under `--check` or with no workflow declared. | no |
 | `cutoff_keys_armed` | how many `_CUTOFF` keys carry a non-blank value across the tracked root-level `.<name>.conf` files? `of` counts every such assignment. | only where `PINS` declares it |
 | `source_cited_ids_resolving_to_no_record` | does every id cited in tracked source resolve to a record, an anchor line under the memory root or a spec's own H1? | no |

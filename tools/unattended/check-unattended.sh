@@ -24,10 +24,10 @@
 # contract line above is written to admit them; so do check 23's `check 23 EXCLUDED` and
 # `check 23 exclusion UNAVAILABLE`, which share check 7's predicate (TOOL-aSightedSkeptic-13), and
 # check 23's `check 23 SOLO` line with its run's graded-and-overlapped count, an undeclared write the
-# check found and did not count because its pass overlapped no sibling (TOOL-aWindowedPass-1), and its
-# `check 23 OTHER RUN` line, counted writes of a run this tree does not drive (TOOL-aWindowedPass-5), and
-# its `check 23 fleet` line, every graded record's counted writes totalled, which never fails the leg
-# (TOOL-aMendedFleet-92). They are not skips. An exclusion is a positive
+# check found and did not count because its pass overlapped no sibling (TOOL-aWindowedPass-1), its
+# `check 23 OTHER RUN` and `check 23 UNBOUND` lines, counted writes of a run this tree does not drive
+# (TOOL-aWindowedPass-5), and its `check 23 fleet` line, which reports the whole fleet's
+# undeclared-write count and never fails the leg (TOOL-dUnstuckLanding-17, TOOL-aMendedFleet-92). They are not skips. An exclusion is a positive
 # finding that CHANGED THE VERDICT — a record the check stopped counting — and the reader of a green
 # run is entitled to know which one and on what evidence. Routing them through REPORT was the first
 # implementation and it made the exclusion invisible on every bar run, which is the check-quietly-
@@ -50,7 +50,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.61   # gov:kit unattended@1.61 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.68   # gov:kit unattended@1.68 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -143,7 +143,7 @@ case "${1:-}" in
   "")            ;;
   --only)        [ "${2:-}" = 28 ] || { echo "check-unattended: --only takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=only28 ;;
   --skip)        [ "${2:-}" = 28 ] || { echo "check-unattended: --skip takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=skip28 ;;
-  --emit-ceiling) echo "check-unattended: --emit-ceiling is retired with UNDECLARED_WRITE_CEILING (TOOL-aWindowedPass-5): check 23 grades the run this branch drives against zero, so there is no pin left to measure"; exit 2 ;;
+  --emit-ceiling) echo "check-unattended: --emit-ceiling is retired with UNDECLARED_WRITE_CEILING (TOOL-aWindowedPass-5) and refused (TOOL-dUnstuckLanding-17): check 23 grades the run this branch drives against a declared per-build budget, which is a policy and not a measurement, so there is no pin left to measure, and the fleet's count now appears on the 'check 23 fleet' line every run prints"; exit 2 ;;
   *)             echo "check-unattended: unknown argument '${1}'; this leg takes [--only 28] or [--skip 28]"; exit 2 ;;
 esac
 # gov:argv-end
@@ -192,8 +192,14 @@ KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FL
 DISPOSITION_CUTOFF=""
 # TOOL-dDerivedDocket-22 S10 - the date from which the landed fact-set arm grades a record.
 LANDED_FACTS_CUTOFF=""
+# TOOL-dUnstuckLanding-13 S8 - the date from which ABORTED means DISCARD. Initialised and admitted
+# here so a project's declared value reaches the readers that split ABORTED records on it.
+HANDOFF_CUTOFF=""
+# TOOL-dUnstuckLanding-20 S6 - which nodes may land, graded by check 49 through the library function
+# the driver resolves a node with, so the two readers cannot disagree about which token is a pair.
+LANDING_NODES=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
-HALT_CODES_EXTRA=""; HALT_FLOOR=""
+HALT_CODES_EXTRA=""; HALT_FLOOR=""; UNDECLARED_WRITE_BUDGET=""
 HOLD_CODES_EXTRA=""; HOLD_FLOOR=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""
 RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
@@ -276,12 +282,12 @@ while IFS= read -r -d '' _ck; do
     # as a whole line, and a region it cannot read is a refusal, not an empty set.
     # gov:conf-allow-begin
     MEMORY_ROOT|LANDER|LANDER_MODE|SELFTESTS_OWED_PATHS|BYPASS_BAN|GATE_CMD|WIRING_CHECK|KEEPALIVE_CREATE|KEEPALIVE_DELETE|\
-    PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|LANDED_FACTS_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
+    PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|LANDED_FACTS_CUTOFF|HANDOFF_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
     KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
-    HALT_FLOOR|HOLD_CODES_EXTRA|HOLD_FLOOR|\
+    HALT_FLOOR|UNDECLARED_WRITE_BUDGET|HOLD_CODES_EXTRA|HOLD_FLOOR|\
     RESUME_SCHEDULE|RESUME_SCHEDULE_CREATE|RESUME_SCHEDULE_DELETE|RESUME_SCHEDULE_DELAY|RESUME_SCHEDULE_LIMIT|\
     RECALL_CLI|ASKS_CMD|SHARED_RECORDS|GENERATED_INDEXES|GATE_BOUND|GATE_WALL|GATE_PROFILE_CMD|\
-    UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
+    UNITS_REGION_CUTOFF|LANDING_NODES) eval "$_ck=\$_cv" ;;
     # gov:conf-allow-end
   esac
 done < <( . "$CONF" >/dev/null 2>&1 || exit 9
@@ -434,12 +440,19 @@ check_adv_reaches() {  # rev -> 0 an ancestor of the advertised HEAD · 1 not
 # and the reach set `check_adv_reaches` warms, so every record would re-walk the advertised history.
 # MODE-INDEPENDENT, as check 7 and the driver's `read_derived_phase` are: ruling D12-i2 derives
 # LANDED from the remote, not from LANDER_MODE. Fails closed: 2 when no advertised tip resolves.
+# TOOL-dUnstuckLanding-14 S3 - A HELD RECORD UNDER A HAND-OFF CODE is admitted too, through the
+# library's hand-off argument and the driver's own code list, so check 7's exclusion and check 23's
+# share the driver's attended reading. A HELD record under any other code never derives.
 DERIVED_LANDING_COMMIT=""
 check_derived_landed() { # run-state file -> 0 derived LANDED (sets DERIVED_LANDING_COMMIT) · 1 not · 2 UNAVAILABLE
   DERIVED_LANDING_COMMIT=""
-  local _dl_c
-  [ "$(phase_of "$1")" = LANDING ] || return 1
-  _dl_c=$(read_landing_commit "$1" 2>/dev/null) || return 1
+  local _dl_c _dl_hl=""
+  case "$(phase_of "$1")" in
+    LANDING) ;;
+    HELD) case " $HOLD_CODES_HANDOFF " in *" $(fact_of "$1" hold-code) "*) _dl_hl="$HOLD_CODES_HANDOFF" ;; *) return 1 ;; esac ;;
+    *) return 1 ;;
+  esac
+  _dl_c=$(read_landing_commit "$1" "$_dl_hl" 2>/dev/null) || return 1
   [ "${ADV_HEAD_OK:-0}" = 1 ] || return 2
   check_adv_reaches "$_dl_c" || return 1
   DERIVED_LANDING_COMMIT=$_dl_c
@@ -520,6 +533,10 @@ REVIEW_DISPOSITIONS=$(core_of REVIEW_DISPOSITIONS)
 # accepted them. Unreadable is named inside check 2 rather than at a `fail` site of its own, because
 # the three pinned check-2 ordinals in memory/project/unarmed-branches.txt sit below this line.
 FOLD_CUTOFF=$(core_of FOLD_CUTOFF)
+# TOOL-aEvidencedLens-9 S7 - the day a spec subject's terminal row began to carry `highs` and
+# `minors` and stopped folding (TOOL-aEvidencedLens-7 declares it). Read and named exactly as
+# FOLD_CUTOFF is, for the same reason: a ratchet grading history needs one cutoff per rule it grades.
+SPEC_COUNTS_CUTOFF=$(core_of SPEC_COUNTS_CUTOFF)
 # The halt vocabulary, read the same way. The leg holds NO member token of its own: a prefix
 # alternation could not tell a member from an unrelated identifier, and a sibling unit lands a
 # constant whose name such an alternation would have matched.
@@ -527,6 +544,9 @@ HALT_CODES_CORE=$(core_of HALT_CODES_CORE)
 # The HOLD vocabulary, read for the reason the halt one is: a set the driver validates against and
 # nothing grades is a vocabulary with a floor nobody enforces.
 HOLD_CODES_CORE=$(core_of HOLD_CODES_CORE)
+# TOOL-dUnstuckLanding-14 S1 - the two hand-off codes, read from the driver for the same reason, so
+# the leg's derived-LANDED predicate admits exactly the HELD records the driver's does.
+HOLD_CODES_HANDOFF=$(core_of HOLD_CODES_HANDOFF)
 HALT_CODES="$HALT_CODES_CORE $HALT_CODES_EXTRA"
 
 # ---- TOOL-dDerivedDocket-18 — the driver's UNQUOTED numeric constants. `core_of` above matches
@@ -622,6 +642,12 @@ else
     *) rv_bad="$rv_bad
   (the driver declares no readable ISO-date FOLD_CUTOFF, so the fold-beside-blockers clause cannot tell a record written under the old contract from one graded by the severity rule and would red every record or none: '$FOLD_CUTOFF')" ;;
   esac
+  rv_speccut=$SPEC_COUNTS_CUTOFF
+  case "$SPEC_COUNTS_CUTOFF" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) rv_speccut=""; rv_bad="$rv_bad
+  (the driver declares no readable ISO-date SPEC_COUNTS_CUTOFF, so the counted-spec-row clause cannot tell a record written when a spec subject's terminal row carried no counts and could fold from one written after, and would red every record or none: '$SPEC_COUNTS_CUTOFF')" ;;
+  esac
   for rvf in $(GIT ls-files ":(glob)$M/builds/*/RUN*.md" 2>/dev/null); do
     [ -f "$rvf" ] || continue
     grep -q '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rvf" 2>/dev/null || continue
@@ -678,14 +704,15 @@ else
     # GRADED ON THE RECORD'S OWN FIRST-COMMIT DATE, the idiom LANDED_ANCHOR_CUTOFF already uses. A
     # record whose first commit is at or after the cutoff is read for its dispositions; one before it
     # keeps the id-delta proxy verbatim, messages included.
+    # --follow OR THE ROTATION RE-DATES THE RECORD. `--preflight` moves a terminal RUN.md to
+    # RUN.<phase>.<blob8>.md, a NEW path whose first `A` is the rotation commit, so a record
+    # created before the cutoff becomes GRADED the moment any later run rotates it — and its rows
+    # predate the flag, so it reds forever on an append-only archive. Measured on
+    # RUN.ABORTED.fc79c21d.md: 2026-08-20 without, 2026-08-19 with.
+    rv_fc=$(GIT log --follow --diff-filter=A --format=%cs -- "$rvf" 2>/dev/null | tail -1)
+    rv_slug=${rvf%/RUN*.md}; rv_slug=${rv_slug##*/}
     rv_graded=0
     if [ -n "$DISPOSITION_CUTOFF" ]; then
-      # --follow OR THE ROTATION RE-DATES THE RECORD. `--preflight` moves a terminal RUN.md to
-      # RUN.<phase>.<blob8>.md, a NEW path whose first `A` is the rotation commit, so a record
-      # created before the cutoff becomes GRADED the moment any later run rotates it — and its rows
-      # predate the flag, so it reds forever on an append-only archive. Measured on
-      # RUN.ABORTED.fc79c21d.md: 2026-08-20 without, 2026-08-19 with.
-      rv_fc=$(GIT log --follow --diff-filter=A --format=%cs -- "$rvf" 2>/dev/null | tail -1)
       # AN EMPTY DATE GRADES. The record is staged and uncommitted, which is the IN-FLIGHT run — the
       # one case that can still record a disposition, and so the last one to hand the id proxy to.
       # The sibling cutoff this was copied from grandfathers an empty date; the spec said to invert
@@ -698,7 +725,7 @@ else
     # grades here too, for the reason the sibling gives: it is the in-flight run.
     rv_foldgraded=0
     if [ "$rv_graded" = 1 ] && { [ -z "$rv_fc" ] || printf '%s\n%s\n' "$FOLD_CUTOFF" "$rv_fc" | sort -C; }; then rv_foldgraded=1; fi
-    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" -v foldgraded="$rv_foldgraded" -v disps="|$REVIEW_DISPOSITIONS|" '
+    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" -v foldgraded="$rv_foldgraded" -v fc="$rv_fc" -v speccut="$rv_speccut" -v slug="$rv_slug" -v disps="|$REVIEW_DISPOSITIONS|" '
       /^[0-9][0-9-]*T[0-9:]*Z review · item / {
         line = $0; sub(/\r$/, "", line)
         i = index(line, " · item "); if (i == 0) next
@@ -708,11 +735,11 @@ else
         n[it]++
         b = -1
         if (match(rs, /blockers [0-9]+/)) b = substr(rs, RSTART + 9, RLENGTH - 9) + 0
-        # THE CLOSING REVIEW COUNTS (TOOL-aBatchedMinors-3). `--review` writes `highs <n> · minors <n>`
-        # on the build-slug subject terminal round only, and BOTH or neither: a row carrying both
-        # is a closing-review exit whose every confirmed finding is promoted, and it owes one unit per
-        # blocker and high plus one for the minors batch. A row carrying neither - every spec-audit
-        # row, every closing row written before the counts existed - keeps the floor of one.
+        # THE TERMINAL-ROUND COUNTS (TOOL-aBatchedMinors-3, every subject since TOOL-aEvidencedLens-7).
+        # `--review` writes `highs <n> · minors <n>` on a subject terminal round, BOTH or neither: a
+        # row carrying both, on any subject, is a counted exit whose every confirmed finding is
+        # promoted, and it owes one unit per blocker and high plus one for the minors batch. A row
+        # carrying neither - one written before its subject was counted - keeps the floor of one.
         # NOT CHECKED: that the minors went into at most two units, or that a promoted unit
         # mechanism closes its finding - the region records ids, never which finding an id closes.
         hi = -1; mi = -1
@@ -723,6 +750,12 @@ else
         last[it] = b
         if (rs ~ /CONVERGED|NON-CONVERGENT|CEILING|BOUNDED/) term[it] = 1
         nf = split(rs, fld, " · ")
+        # A COUNTED SPEC ROW (TOOL-aEvidencedLens-9 S7). In a record first-committed on or after
+        # SPEC_COUNTS_CUTOFF (an empty date is the in-flight run and grades), a terminal row on a
+        # subject other than the build slug owes both counts and never folds; before it the driver
+        # refused the counts there and accepted fold at CONVERGED, so the old reading stands.
+        if (speccut != "" && (fc == "" || fc >= speccut) && it != slug && rs ~ /CONVERGED|NON-CONVERGENT|CEILING|BOUNDED/ \
+            && (!cnt || (nf > 0 && fld[nf] == "disposition fold"))) specbad[it] = 1
         if (rs ~ /NON-CONVERGENT|CEILING|BOUNDED/) {
           needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi
           disp[it] = (nf > 0 && fld[nf] ~ /^disposition /) ? substr(fld[nf], length("disposition ") + 1) : ""
@@ -769,20 +802,23 @@ else
             # when it was written: nothing
           }
         }
+        specs = ""; for (it in specbad) specs = specs " " it
+        if (specs != "")
+          printf "\n  %s (spec subject(s)%s record a terminal row with no highs and minors counts or with disposition fold in a record first-committed on or after SPEC_COUNTS_CUTOFF, after which the driver requires both counts at every terminal exit of every subject and refuses fold at all of them, so every confirmed finding is promoted)", f, specs
         if (graded == 1) {
           if (nomiss != "")
             printf "\n  %s (exited subject(s)%s record NO disposition while this record is graded against DISPOSITION_CUTOFF, so which of fold or promote the run took cannot be read - and with nothing to read this clause would demand nothing and pass by finding nothing)", f, nomiss
           if (illegal != "")
             printf "\n  %s (exited subject(s)%s carry a disposition outside the closed set %s - the driver validates the flag at write time, so an illegal value reached this record by HAND, and reading it as absent would name the wrong cause)", f, illegal, substr(disps, 2, length(disps) - 2)
           if (closefold != "")
-            printf "\n  %s (closing-review subject(s)%s record disposition fold on a row carrying highs and minors, and the closing diff review folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two)", f, closefold
+            printf "\n  %s (subject(s)%s record disposition fold on a row carrying highs and minors, and a counted exit folds nothing on any subject: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two)", f, closefold
           if (foldbad != "")
             printf "\n  %s (exited subject(s)%s record disposition fold beside a NON-ZERO blocker count in a record first-committed on or after FOLD_CUTOFF, after which the driver refuses this at write time, and the severity rule promotes every blocker, so a fold there is a blocker left standing under a field that says nothing was)", f, foldbad
           if (nneed > 0) {
             if (readable != 1)
               printf "\n  %s (%d subject(s) EXITED recording disposition promote and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nsubj
             else if (newids + 0 < nneed)
-              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, against a floor of %d - one per subject, or on a closing-review row carrying counts one per blocker and high plus one for its minors - so at least one promoted finding has no unit. A subject recording disposition fold beside zero blockers demands nothing here)", f, nsubj, newids + 0, nneed
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, against a floor of %d - one per subject, or on a row carrying highs and minors counts, on any subject, one per blocker and high plus one for its minors - so at least one promoted finding has no unit. A subject recording disposition fold beside zero blockers demands nothing here)", f, nsubj, newids + 0, nneed
           }
         }
         else {
@@ -917,7 +953,9 @@ if [ -n "$PARK_KINDS_OWED" ]; then
   # to what it was, the split's whole purpose reverts, and every gate and every criterion stays green.
   # A typo like `supercede` is exactly that, and is what this arm exists to catch.
   if [ -n "$PARK_ACTS_OWED" ]; then
-    pa_case=$(grep -oE '^[[:space:]]*retire\|supersede\|add\)' "$DRIVER" | head -1)
+    # The FOUR-act alternation since TOOL-dUnstuckLanding-18 added `defer`: a probe still spelling the
+    # three-act one matches nothing in the driver and refuses below, which is how this line was found.
+    pa_case=$(grep -oE '^[[:space:]]*retire\|supersede\|add\|defer\)' "$DRIVER" | head -1)
     if [ -z "$pa_case" ]; then
       fail 2 "the driver declares owed rescope ACTS but this leg cannot find the closed act alternation --rescope validates against, so the act axis would be graded against nothing: $DRIVER"
     else
@@ -932,6 +970,21 @@ if [ -n "$PARK_KINDS_OWED" ]; then
   fi
 else
   fail 2 "the driver declares no PARK_KINDS_OWED taxonomy, so the surfaced count and the parked-decisions Definition-of-Done item both range over a set this leg cannot read: $DRIVER"
+fi
+# ---- THE HAND-OFF CODES, guarded as the hold codes are (TOOL-dUnstuckLanding-14 S1; closing review
+# ---- round 1, L5). `core_of` reads a renamed or missing constant as empty, and an empty set made
+# ---- check_derived_landed refuse every HELD record while the driver, reading its own constant, still
+# ---- derived LANDED for each: two readers of one phase disagreeing with nothing red. A member outside
+# ---- HOLD_CODES_CORE is a hand-off the hold vocabulary itself would refuse. Placed BELOW the pinned
+# ---- check-2 ordinals in the central unarmed-branches file, so none of them moves.
+if [ -z "$HOLD_CODES_HANDOFF" ]; then
+  fail 2 "the driver declares no readable HOLD_CODES_HANDOFF, so this leg would derive LANDED for no handed record while the driver derives it for each: $DRIVER"
+else
+  ho_bad=""
+  for ho in $HOLD_CODES_HANDOFF; do
+    case " $HOLD_CODES_CORE " in *" $ho "*) ;; *) ho_bad="$ho_bad $ho" ;; esac
+  done
+  [ -z "$ho_bad" ] || fail 2 "a hand-off code is not a member of the driver's HOLD_CODES_CORE, so a record could carry a hand-off the hold vocabulary refuses:$ho_bad"
 fi
 
 # ---------------------------------------------------------------------- 2 + 3: the core-set floors
@@ -1251,6 +1304,10 @@ fi
 # per record, 36 times, always about the same sha.
 ADV_HEAD_OK=0
 if [ -n "$ADV_HEAD" ] && GIT cat-file -e "$ADV_HEAD^{commit}" 2>/dev/null; then ADV_HEAD_OK=1; fi
+# THE RUN THIS TREE DRIVES (TOOL-aWindowedPass-5): the record whose run branch is the branch checked
+# out here. A detached HEAD binds none. Read once, here, because check 19's live own-commit arms and
+# check 23 below both compare every record against it.
+DS_HEAD_REF=$(GIT symbolic-ref -q HEAD 2>/dev/null || true)
 
 declare -A _PUB_REACH
 _PUB_WARMED=0
@@ -1572,10 +1629,42 @@ read_asks_of() { # README blob text -> the asks: value, or nothing
 # ---- an absent key means `none` and an empty one is a malformed grant, and a bare empty string
 # ---- cannot tell them apart.
 read_may_of() { # README blob text -> `may=<value>` when the front matter carries the key, or nothing
-  printf '%s\n' "$1" | awk '
+  read_fm_key_of may "$1"
+}
+# ---- TOOL-aWardedAudit-5 - the same read for any front-matter KEY, so the spec-audit opt-in is read
+# ---- exactly as the grant is: front matter only, first line of the key, PRESENCE tagged. The key
+# ---- is compared as a literal prefix, never spliced into a regex.
+read_fm_key_of() { # key · README blob text -> `<key>=<value>` when the front matter carries the key, or nothing
+  printf '%s\n' "$2" | awk -v k="$1" '
     NR == 1 { if ($0 !~ /^---[[:space:]]*\r?$/) exit; next }
     /^---[[:space:]]*\r?$/ { exit }
-    /^may:/ { v = $0; sub(/^may:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "may=" v; exit }'
+    index($0, k ":") == 1 { v = substr($0, length(k) + 2); sub(/^[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print k "=" v; exit }'
+}
+# ---- TOOL-aWardedAudit-5 - the project-wide opt-in out of a conf blob: the LAST `SPEC_AUDIT_DEFAULT=`
+# ---- assignment's raw value, a trailing ` # comment` and one layer of matching quotes stripped.
+# ---- WHAT IT DOES NOT DO: evaluate the conf. The driver reads the key by evaluating the blob, so a
+# ---- value assembled from a variable, or an assignment a `return` never reaches, reads differently
+# ---- here; this is the bar's raw second opinion on what a commit WROTE, not on what the driver reads.
+read_conf_default_of() { # conf blob text -> the raw value, or nothing
+  printf '%s\n' "$1" | awk -v q="'" '
+    /^[[:space:]]*(export[[:space:]]+)?SPEC_AUDIT_DEFAULT=/ {
+      v = $0; sub(/^[[:space:]]*(export[[:space:]]+)?SPEC_AUDIT_DEFAULT=/, "", v)
+      sub(/[[:space:]]+#.*$/, "", v); sub(/[[:space:]]*\r?$/, "", v)
+      if (length(v) >= 2 && ((substr(v, 1, 1) == "\"" && substr(v, length(v), 1) == "\"") || (substr(v, 1, 1) == q && substr(v, length(v), 1) == q)))
+        v = substr(v, 2, length(v) - 2)
+      last = v }
+    END { printf "%s", last }'
+}
+# ---- The value a grant-write KEY carries at one revision of one file, tagged, or nothing: a README
+# ---- front-matter key by presence, the conf default only when NON-BLANK, because a blank default is
+# ---- the shipped state and opts nothing in.
+read_grant_key_at() { # key · rev · path
+  local _gk_b _gk_v
+  _gk_b=$(GIT show "$2:$3" 2>/dev/null)
+  case "$1" in
+    SPEC_AUDIT_DEFAULT) _gk_v=$(read_conf_default_of "$_gk_b"); [ -z "$_gk_v" ] || printf 'SPEC_AUDIT_DEFAULT=%s' "$_gk_v" ;;
+    *) read_fm_key_of "$1" "$_gk_b" ;;
+  esac
 }
 
 # ---- TOOL-dDerivedDocket-19 S4, the cross-run arm's reader. Given a run's OWN commits on stdin, one
@@ -1598,10 +1687,16 @@ read_may_of() { # README blob text -> `may=<value>` when the front matter carrie
 # ----
 # ---- WHAT IT DOES NOT SEE: a README under a path other than `<MEMORY_ROOT>/builds/<slug>/README.md`,
 # ---- and a grant a run carries in some other file. Neither is a place the driver reads a grant from.
-scan_grant_writes() { # stdin: commit ids -> `<commit> <README>` per commit that writes a may: line into one
-  local _sg_c _sg_p _sg_new _sg_par _sg_hit
+# ----
+# ---- THREE KEYS, ONE WALK (TOOL-aWardedAudit-5). The spec-audit opt-in is the owner's on the same
+# ---- reading as the grant, so a run that LANDS one - a `spec-audit:` line in any build README, or a
+# ---- non-blank `SPEC_AUDIT_DEFAULT` in the project conf - opts the next run in with no owner turn,
+# ---- exactly as a landed `may:` grants it. The same diff serves all three, and each line it prints
+# ---- names its key so the caller can say which.
+scan_grant_writes() { # stdin: commit ids -> `<commit> <file> <key>` per commit that writes a grant or an opt-in
+  local _sg_c _sg_p _sg_k _sg_new _sg_par _sg_hit
   GIT diff-tree --stdin -r -p --cc --no-renames --no-ext-diff --no-textconv --format='commit %H %P' \
-      -- ":(glob)$M/builds/*/README.md" 2>/dev/null \
+      -- ":(glob)$M/builds/*/README.md" ".unattended.conf" 2>/dev/null \
     | awk -v pre="$M/builds/" '
         /^commit [0-9a-f]+/ { c = $2; np = NF - 2; f = ""; inh = 0; next }
         /^diff --git / { f = $NF; sub(/^b\//, "", f); inh = 0; next }
@@ -1610,18 +1705,74 @@ scan_grant_writes() { # stdin: commit ids -> `<commit> <README>` per commit that
         inh == 1 {
           w = (np > 1) ? np : 1
           lead = substr($0, 1, w); body = substr($0, w + 1)
-          if (body ~ /^may:/ && lead !~ /[^+]/ && index(f, pre) == 1 \
-              && substr(f, length(pre) + 1) ~ /^[^\/]+\/README\.md$/) print c " " f
+          if (lead ~ /[^+]/) next
+          if (f == ".unattended.conf") {
+            if (body ~ /^[[:space:]]*(export[[:space:]]+)?SPEC_AUDIT_DEFAULT=/) print c " " f " SPEC_AUDIT_DEFAULT"
+          } else if (index(f, pre) == 1 && substr(f, length(pre) + 1) ~ /^[^\/]+\/README\.md$/) {
+            if (body ~ /^may:/) print c " " f " may"
+            else if (body ~ /^spec-audit:/) print c " " f " spec-audit"
+          }
         }' | sort -u \
-    | while read -r _sg_c _sg_p; do
-        [ -n "$_sg_p" ] || continue
-        _sg_new=$(read_may_of "$(GIT show "$_sg_c:$_sg_p" 2>/dev/null)")
+    | while read -r _sg_c _sg_p _sg_k; do
+        [ -n "$_sg_k" ] || continue
+        _sg_new=$(read_grant_key_at "$_sg_k" "$_sg_c" "$_sg_p")
         [ -n "$_sg_new" ] || continue
         _sg_hit=1
         for _sg_par in $(GIT rev-list --parents -n 1 "$_sg_c" 2>/dev/null | cut -d' ' -f2-); do
-          [ "$(read_may_of "$(GIT show "$_sg_par:$_sg_p" 2>/dev/null)")" = "$_sg_new" ] && _sg_hit=0
+          [ "$(read_grant_key_at "$_sg_k" "$_sg_par" "$_sg_p")" = "$_sg_new" ] && _sg_hit=0
         done
-        [ "$_sg_hit" = 1 ] && printf '%s %s\n' "$_sg_c" "$_sg_p"
+        [ "$_sg_hit" = 1 ] && printf '%s %s %s\n' "$_sg_c" "$_sg_p" "$_sg_k"
+      done
+}
+
+# ---- TOOL-aEvidencedLens-9 S1 - THE ROUND BOUND a `.unattended.conf` blob gives the driver, which
+# ---- SOURCES the conf, so the LAST `REVIEW_ROUNDS=` assignment line wins and an empty or absent one
+# ---- falls to `REVIEW_ROUNDS_DEFAULT`, read from `$DRIVER` because that line is unquoted and
+# ---- `core_of` reads only `KEY="…"`. A comment spelling the key is no assignment. Quotes, a trailing
+# ---- `# comment`, trailing whitespace and a CR are stripped, so `1` and `"1"` are one bound.
+# ---- TOOL-aEvidencedLens-21 S6 (closing review L1): leading zeros of an all-digit value are stripped
+# ---- too, an all-zero value reading `0`, so `01` and `1` are one bound and `00` never reads as
+# ---- absent. MORE THAN ONE assignment line prints `rounds=multi:<v1>,<v2>…`, every value in file
+# ---- order: which one the driver sources is not decidable without running the blob, so the string
+# ---- differs from any single-line parent's and the scan names the commit, fail-closed.
+read_rounds_of() { # conf blob text -> `rounds=<effective bound>`
+  printf '%s\n' "$1" | DRV="${DRIVER:-}" awk '
+    function clean(v) {
+      sub(/\r$/, "", v); sub(/[[:space:]]+#.*$/, "", v); sub(/[[:space:]]+$/, "", v)
+      if (v ~ /^".*"$/ || v ~ /^\047.*\047$/) v = substr(v, 2, length(v) - 2)
+      if (v ~ /^[0-9]+$/) { sub(/^0+/, "", v); if (v == "") v = "0" }
+      return v
+    }
+    /^[[:space:]]*REVIEW_ROUNDS=/ { v = $0; sub(/^[[:space:]]*REVIEW_ROUNDS=/, "", v); r = clean(v); all = all (n++ ? "," : "") r }
+    END {
+      if (n > 1) { print "rounds=multi:" all; exit }
+      if (r == "" && ENVIRON["DRV"] != "")
+        while ((getline l < ENVIRON["DRV"]) > 0)
+          if (l ~ /^REVIEW_ROUNDS_DEFAULT=/) { sub(/^REVIEW_ROUNDS_DEFAULT=/, "", l); r = clean(l); break }
+      print "rounds=" r
+    }'
+}
+
+# ---- TOOL-aEvidencedLens-9 S2 - given commit ids on stdin, every commit whose EFFECTIVE round bound
+# ---- differs from the bound at EVERY one of its parents, printed `<commit> <old> <new>` (old read
+# ---- at the first parent). `scan_grant_writes`' two stages: one `diff-tree --stdin` restricted to
+# ---- the conf names the candidates - `-c` lists a merge only where its blob differs from every
+# ---- parent's - and each is settled by `read_rounds_of` at the commit and each parent, so a merge
+# ---- taking one side's value wrote nothing. A blob unreadable at a parent reads as the default.
+scan_round_writes() { # stdin: commit ids -> `<commit> <old> <new>` per commit that changes the round bound
+  local _sr_c _sr_new _sr_old _sr_o _sr_par _sr_hit
+  GIT diff-tree --stdin -r -c --name-only --no-renames --format='commit %H' -- .unattended.conf 2>/dev/null \
+    | awk '/^commit [0-9a-f]+/ { c = $2; next } $0 == ".unattended.conf" && c != "" { print c }' | sort -u \
+    | while read -r _sr_c; do
+        [ -n "$_sr_c" ] || continue
+        _sr_new=$(read_rounds_of "$(GIT show "$_sr_c:.unattended.conf" 2>/dev/null)")
+        _sr_hit=1; _sr_old=""
+        for _sr_par in $(GIT rev-list --parents -n 1 "$_sr_c" 2>/dev/null | cut -d' ' -f2-); do
+          _sr_o=$(read_rounds_of "$(GIT show "$_sr_par:.unattended.conf" 2>/dev/null)")
+          [ "$_sr_o" = "$_sr_new" ] && _sr_hit=0
+          [ -n "$_sr_old" ] || _sr_old=$_sr_o
+        done
+        [ "$_sr_hit" = 1 ] && printf '%s %s %s\n' "$_sr_c" "${_sr_old#rounds=}" "${_sr_new#rounds=}"
       done
 }
 
@@ -1797,7 +1948,7 @@ scan_foreign_anchors() { # build folder · slug -> 0 and ASK_ANCHORS, or 1 and A
 # ---- string compared against a date grades every record or none and nobody can tell which. A BLANK
 # ---- one turns the arm off and says so on the report channel, where this leg announces every case
 # ---- it could not reach, so a disabled arm never reads as one that found nothing.
-LFC_ON=0; LFC_MODE=${LANDER_MODE:-primary}; lfc_n_landed=0; lfc_n_derived=0; lfc_n_landing=0
+LFC_ON=0; LFC_MODE=${LANDER_MODE:-primary}; lfc_n_landed=0; lfc_n_derived=0; lfc_n_landing=0; lfc_n_attended=0
 if [ -n "$LANDED_FACTS_CUTOFF" ]; then
   case "$LANDED_FACTS_CUTOFF" in
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) LFC_ON=1 ;;
@@ -1893,7 +2044,10 @@ while IFS= read -r f; do
   if [ "$LFC_ON" = 1 ]; then
     lfc_pop=""
     case "$ph" in
-      LANDED) if { extract_run_facts < "$f"; } 2>/dev/null | grep -q '^landed-derived:'; then lfc_pop=derived; else lfc_pop=landed; fi ;;
+      # TOOL-dUnstuckLanding-14 S8 - a landed hand-off, settled or rotated, carries `landed-by:
+      # attended` and is graded as its own population, which owes that fact too.
+      LANDED) if [ "$(fact_of "$f" landed-by)" = attended ]; then lfc_pop=attended
+              elif { extract_run_facts < "$f"; } 2>/dev/null | grep -q '^landed-derived:'; then lfc_pop=derived; else lfc_pop=landed; fi ;;
       LANDING)
         if lfc_c=$(read_landing_commit "$f"); then
           if [ "$LFC_MODE" = in-place ]; then
@@ -1909,11 +2063,58 @@ while IFS= read -r f; do
         landed) lfc_n_landed=$((lfc_n_landed + 1)) ;;
         derived) lfc_n_derived=$((lfc_n_derived + 1)) ;;
         landing) lfc_n_landing=$((lfc_n_landing + 1)) ;;
+        attended) lfc_n_attended=$((lfc_n_attended + 1)) ;;
       esac
       lfc_miss=$(read_missing_landed_facts "$f" "$lfc_pop")
       [ -z "$lfc_miss" ] \
         || fail 15 "a landed record first committed on or after LANDED_FACTS_CUTOFF is missing a fact its landing verb writes, so what that landing covered cannot be read from the record it left, and no verb adds a fact to a record once it is terminal or pushed - population $lfc_pop, missing [$lfc_miss] in $f"
     fi
+  fi
+
+  # ---- 15, WORK-LANDED-AT IS UPHELD, NOT MERELY PRESENT - TOOL-dUnstuckLanding-14 S8. `--settle`
+  # ---- writes it only where the library's content predicate reads the run's work landed on the
+  # ---- advertised tip, and this asks the SAME predicate again, so a hand-written fact - planted to
+  # ---- silence a later signal - reds. It also reds the fact on an ABORTED record first committed on
+  # ---- or after HANDOFF_CUTOFF, which meant discard, and an `abandoned` marker standing without it.
+  # ----
+  # ---- GRADED AT THE TIP THE FACT RECORDS (implementation review round 1, M9), through the library's
+  # ---- `check_work_landed_fact`, which the drift kit's parity arm runs too (L6): the fact must name
+  # ---- the record's witness, its tip must be on the advertised tip, and the work must read landed
+  # ---- THERE. A revert landing after a correct settle is a report line, never a red no verb clears.
+  # ----
+  # ---- WHAT IT DOES NOT CHECK: that the run's work was RIGHT, only that it landed where the fact says;
+  # ---- that it STAYED, which is reported and never graded; that `base` and `witness` are the values
+  # ---- the run's own verbs wrote, since both are the record's own facts and a hand edit of all three
+  # ---- moves together; nor a record this clone cannot judge: no advertised tip is REPORTED as a
+  # ---- skip, never a red.
+  wla=$(fact_of "$f" work-landed-at)
+  if [ -n "$wla" ]; then
+    if [ "${ADV_HEAD_OK:-0}" != 1 ]; then
+      report "check 15 did not grade work-landed-at in $f - no advertised default-branch tip resolves in this clone, so the content predicate has no tip to read"
+    else
+      check_work_landed_fact "$f" "$ADV_HEAD"; wla_rc=$?
+      if [ "$wla_rc" != 0 ]; then
+        fail 15 "a record claims work-landed-at and the content predicate does not uphold it at the tip the fact records, so the fact is not one --settle could have written: $WL_WHY in $f"
+      elif [ -n "$WLF_NOW" ]; then
+        wla_t=${wla#* }
+        report "check 15 upheld work-landed-at in $f at the tip it records, ${wla_t:0:8}, and the content predicate no longer reads that work landed on the advertised tip ${ADV_HEAD:0:8}, so a later change on the default branch undid it; reported and never a red, because no verb rewrites the record: $WLF_NOW"
+      elif [ -n "$WLF_UNDECIDED" ]; then
+        wla_t=${wla#* }
+        report "check 15 upheld work-landed-at in $f at the tip it records, ${wla_t:0:8}, and it was not re-judged at the advertised tip ${ADV_HEAD:0:8}: $WLF_UNDECIDED"
+      fi
+    fi
+    if [ "$ph" = ABORTED ]; then
+      case "$HANDOFF_CUTOFF" in
+        [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9])
+          wla_d=$(read_first_commit_date "$f")
+          if [ -z "$wla_d" ] || ! [[ "$wla_d" < "$HANDOFF_CUTOFF" ]]; then
+            fail 15 "an ABORTED record first committed on or after HANDOFF_CUTOFF claims work-landed-at, and from that date ABORTED means discard, so no verb writes that its work landed: ${wla_d:-never} against $HANDOFF_CUTOFF in $f"
+          fi ;;
+        *) fail 15 "an ABORTED record claims work-landed-at and HANDOFF_CUTOFF is not a date, so whether it predates the day ABORTED came to mean discard cannot be read, and --settle refuses every such record: ${HANDOFF_CUTOFF:-blank} in $f" ;;
+      esac
+    fi
+  elif [ -n "$(fact_of "$f" abandoned)" ]; then
+    fail 15 "a record carries abandoned with no work-landed-at, and --settle writes the two together, so the marker that takes it out of the live-run count stands on no proof that its work landed: $f"
   fi
 
   # ---- 8: the generated region holds NO COPY of the unit list. It is DERIVED from the build README
@@ -2285,8 +2486,21 @@ while IFS= read -r f; do
     # ---- rotated archive will have. Read as live instead, its range would be whatever this tree has
     # ---- not pushed, which after a landing is nothing at all.
     # ----
+    # ---- A LIVE RECORD IS GRADED ONLY IN A TREE ON ITS OWN RUN BRANCH. Its range is HEAD past the
+    # ---- advertised tip, so in a tree on ANOTHER branch that range is the other branch's unlanded
+    # ---- commits, and a run whose record rides the default branch was charged with them (the close
+    # ---- bar of aEvidencedLens named aClosedDocket and aUnblockedFleet). The run branch is read the
+    # ---- way check 23 reads it - `run-branch:`, else `branch-ref:` - and compared against
+    # ---- `symbolic-ref HEAD`; on a mismatch all three own-commit arms skip, announced. A detached
+    # ---- HEAD, or a record naming no run branch, is graded as before, the fail-closed direction.
+    # ---- This clause does NOT check a live run's commits from any other tree: a bar run elsewhere
+    # ---- does not see them, and they are graded by the run's own close and its lander's bar, which
+    # ---- run on its branch. Terminal and derived-landed records walk from a commit, not HEAD, and
+    # ---- are unaffected.
+    # ----
     # ---- A SKIP ANNOUNCES ITSELF. A terminal record with no witness, a witness this clone cannot
-    # ---- resolve, or a live one with no tip to exclude is named on the report channel, never passed.
+    # ---- resolve, a live one on another branch, or a live one with no tip to exclude is named on
+    # ---- the report channel, never passed.
     # ----
     # ---- WHAT IT TRUSTS, because its inputs are the graded record's own. The witness and the BASE
     # ---- bound the range and the run writes both, so a forged pair moves the range: check 9 grades
@@ -2296,6 +2510,12 @@ while IFS= read -r f; do
     # ---- with no walk at all - the ordinary case, since no build README in this tree has ever carried
     # ---- the key. Measured before this was added: the walk over every terminal record here cost some
     # ---- twenty seconds a bar to reach the same empty answer the one superset scan reaches.
+    # ---- THE WALK'S TRIGGER IS SHARED BY EVERY SCAN THAT SHARES THE WALK (TOOL-aEvidencedLens-14):
+    # ---- it fires when the grant scan OR the round scan hits the superset, and both re-scan the one
+    # ---- walked list. A scan that grades the superset without the walk reds the default branch's own
+    # ---- commits - an owner's REVIEW_ROUNDS raise merged into the run would red an archived,
+    # ---- append-only record on every later bar. The walk keeps a merge commit itself and drops only
+    # ---- its non-run parent's side, so an evil merge raising the bound is still a run write.
     mayend=""; mayex=""; maywhy=""; maywalk=0
     case " $PHASES_TERMINAL " in
       *" $ph "*)
@@ -2310,41 +2530,76 @@ while IFS= read -r f; do
         mayend=HEAD
         maylc=""
         [ "$ph" = LANDING ] && maylc=$(read_landing_commit "$f" 2>/dev/null)
+        mayrbr=$(fact_of "$f" run-branch); [ -n "$mayrbr" ] || mayrbr=$(fact_of "$f" branch-ref)
         if [ -n "$maylc" ] && check_adv_reaches "$maylc"; then
           mayend=$maylc; maywalk=1
+        elif [ -n "$DS_HEAD_REF" ] && [ -n "$mayrbr" ] && [ "$mayrbr" != "$DS_HEAD_REF" ]; then
+          maywhy="it is live on its run branch $mayrbr and this tree has $DS_HEAD_REF checked out, so the commits HEAD holds past the advertised tip are this branch's, not that run's; its own close and its lander's bar grade them on its branch"
         elif [ "$ADV_HEAD_OK" = 1 ]; then
           mayex=$ADV_HEAD
         elif [ -n "$ADV_NAME" ] && GIT rev-parse --verify --quiet "refs/heads/$ADV_NAME^{commit}" >/dev/null 2>&1; then
           mayex="refs/heads/$ADV_NAME"
-          report "check 19 excludes the LOCAL ref $ADV_NAME from the own commits of $f - the advertised default-branch tip is not in this clone, and a local ref is the weaker reading: a run that merged into it hides its own commits from the grant-write arm"
+          report "check 19 excludes the LOCAL ref $ADV_NAME from the own commits of $f - the advertised default-branch tip is not in this clone, and a local ref is the weaker reading: a run that merged into it hides its own commits from the grant-write and round-bound arms"
         else
           maywhy="it is live and neither the advertised default-branch tip nor a local ref of the advertised name can be read, so its own commits cannot be told from the default branch's"
         fi ;;
     esac
     if [ -n "$maywhy" ]; then
-      report "check 19 SKIPPED the grant-write arm for $f - $maywhy"
+      report "check 19 SKIPPED the grant-write and round-bound arms for $f - $maywhy"
     elif ! maycs=$(read_run_commits "$mayend" "$rb" $mayex); then
-      report "check 19 SKIPPED the grant-write arm for $f - its own commits could not be enumerated from $mayend over base $rb, and an empty list here would read as a run that wrote nothing"
+      report "check 19 SKIPPED the grant-write and round-bound arms for $f - its own commits could not be enumerated from $mayend over base $rb, and an empty list here would read as a run that wrote nothing"
     else
       maywr=$(printf '%s\n' "$maycs" | scan_grant_writes)
-      if [ -n "$maywr" ] && [ "$maywalk" = 1 ]; then
+      mayrw=$(printf '%s\n' "$maycs" | scan_round_writes)
+      if [ -n "$maywr$mayrw" ] && [ "$maywalk" = 1 ]; then
         mayex=$(read_run_exclusions "$mayend" "$rb" "$M/builds/$bslug/RUN.md" 2>/dev/null)
         [ $? = 0 ] || report "check 19 read the terminal exclusions of $f only in part - the walk or a reachability probe could not answer, so its range keeps commits an exclusion would have removed, which is the fail-closed direction"
         if maycs=$(read_run_commits "$mayend" "$rb" $mayex); then
           maywr=$(printf '%s\n' "$maycs" | scan_grant_writes)
+          mayrw=$(printf '%s\n' "$maycs" | scan_round_writes)
         else
-          report "check 19 graded the WHOLE base..witness range of $f - its own commits could not be enumerated past the exclusions the walk read, and the superset is the fail-closed reading"
+          report "check 19 graded the WHOLE base..witness range of $f for both the grant scan and the round scan - its own commits could not be enumerated past the exclusions the walk read, and the superset is the fail-closed reading"
         fi
       fi
       # AN EMPTY RANGE IS SAID OUT LOUD. It is honest for a run that has committed nothing past its
       # BASE, and it is what a live record reads as once everything it wrote is on the advertised
       # tip without a committed LANDING to walk from - a skip that looks like a pass otherwise.
-      [ -n "$maycs" ] || report "check 19's grant-write arm examined NO own commit of $f - the range from $mayend over base $rb past its exclusions is empty"
-      while read -r maysha mayrd; do
+      [ -n "$maycs" ] || report "check 19's grant-write and round-bound arms examined NO own commit of $f - the range from $mayend over base $rb past its exclusions is empty"
+      while read -r maysha mayrd mayky; do
         [ -n "$maysha" ] || continue
-        fail 19 "a commit among a run's own commits writes a may: line into a build README, so a run could land the grant the next run would be authorized by - commit and README follow: $maysha in $mayrd, run $f"
+        case "$mayky" in
+          spec-audit)
+            fail 19 "a commit among a run's own commits writes a spec-audit: line into a build README, so a run could land the opt-in the next run's pre-code audit would rest on, and only the owner opts a build in - commit and README follow: $maysha in $mayrd, run $f" ;;
+          SPEC_AUDIT_DEFAULT)
+            fail 19 "a commit among a run's own commits writes a non-blank SPEC_AUDIT_DEFAULT into the project conf, so a run could land the project-wide opt-in every later run's pre-code audit would rest on, and only the owner opts a build in - commit and conf follow: $maysha in $mayrd, run $f" ;;
+          *)
+            fail 19 "a commit among a run's own commits writes a may: line into a build README, so a run could land the grant the next run would be authorized by - commit and README follow: $maysha in $mayrd, run $f" ;;
+        esac
       done < <(printf '%s
 ' "$maywr")
+      # ---- 19: NO RUN COMMIT CHANGES THE ROUND BOUND - TOOL-aEvidencedLens-9 S3. The owner ruled on
+      # ---- 2026-10-05 that the spec-audit round bound is the owner's and an agent never decides it
+      # ---- (run mandate memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-0-run-mandate.md,
+      # ---- decision 4). Same own-commit list as the grant arm above, same walk, no second definition.
+      # ---- EFFECTIVE, NOT RAW: a commit counts only where the bound the driver would apply moved, so
+      # ---- `c117d0007` (TOOL-aProbedUnit-6), which ADDED `REVIEW_ROUNDS="1"` inside aProbedUnit's
+      # ---- landed range when the default was already 1, changed nothing and needs no cutoff; a
+      # ---- respelling such as `1` to `"1"` changes nothing; a run commit setting the default's value
+      # ---- passes by design.
+      # ---- This clause does NOT check: an edit committed outside any run, a preflight `--waive`,
+      # ---- a value set by a shell construct other than a
+      # ---- `REVIEW_ROUNDS=` assignment line, a second file the conf sources, a change in the driver's
+      # ---- own REVIEW_ROUNDS_DEFAULT, or an uncommitted working-copy edit the driver sources for the
+      # ---- current run, which raises that run's bound and leaves no commit to read. An assignment
+      # ---- masked by a later one inside a dead block, a function body or a heredoc is not resolved:
+      # ---- a blob with more than one assignment line reads FAIL-CLOSED as `multi:` (TOOL-aEvidencedLens-21
+      # ---- S6), so the commit writing it is named even where the bound the driver sources held. The terminal walk
+      # ---- fires on a hit by EITHER scan (TOOL-aEvidencedLens-14), so a round write is graded over
+      # ---- the walked list, never the unwalked superset.
+      while read -r maysha mayold maynew; do
+        [ -n "$maysha" ] || continue
+        fail 19 "a commit among a run's own commits changes the effective REVIEW_ROUNDS bound in .unattended.conf, and the round bound is the owner's, set by an owner commit outside any run (run mandate memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-0-run-mandate.md, decision 4) - commit and bound follow: $maysha $mayold -> $maynew, run $f"
+      done < <(printf '%s\n' "$mayrw")
     fi
   fi
 
@@ -2640,10 +2895,10 @@ EOF
 # ---- says so: in gov's own in-place mode no record says LANDED until a rotation, so an arm grading
 # ---- recorded LANDED alone would pass on nothing, and the count is what shows which one it graded.
 if [ "$LFC_ON" = 1 ]; then
-  lfc_tot=$((lfc_n_landed + lfc_n_derived + lfc_n_landing))
+  lfc_tot=$((lfc_n_landed + lfc_n_derived + lfc_n_landing + lfc_n_attended))
   lfc_zero=""
   [ "$lfc_tot" = 0 ] && lfc_zero=" - a count of 0, so this arm graded nothing on this tree and its green is coverage of an empty population"
-  report "the landed fact-set arm of check 15 graded, at LANDED_FACTS_CUTOFF $LANDED_FACTS_CUTOFF under LANDER_MODE $LFC_MODE: recorded LANDED $lfc_n_landed · rotated derived LANDED $lfc_n_derived · committed LANDING $lfc_n_landing$lfc_zero"
+  report "the landed fact-set arm of check 15 graded, at LANDED_FACTS_CUTOFF $LANDED_FACTS_CUTOFF under LANDER_MODE $LFC_MODE: recorded LANDED $lfc_n_landed · rotated derived LANDED $lfc_n_derived · committed LANDING $lfc_n_landing · attended LANDED $lfc_n_attended$lfc_zero"
 fi
 if [ "$asks_n" = 0 ]; then
   report "the ask-mandate second opinions (checks 19, 15 and 37) are VACUOUS on this tree: 0 run-state records pin an asks: fact, so every arm examined nothing and a green verdict here is coverage of an empty population"
@@ -2714,6 +2969,12 @@ for c7f in $live; do
   if check_derived_landed "$c7f"; then
     c7drop="$c7drop $c7f"
     printf 'unattended: check 7 EXCLUDED %s — derived LANDED: its landing commit %s is an ancestor of the advertised default-branch tip %s, so the record the push carried is on the remote and it is a finished run rather than a second live one\n' "$c7f" "$DERIVED_LANDING_COMMIT" "$ADV_HEAD"
+  elif [ -n "$(fact_of "$c7f" abandoned)" ]; then
+    # TOOL-dUnstuckLanding-14 S7 - `--settle` wrote `abandoned` over a dead lease whose work landed,
+    # and `--preflight`'s announcement excludes the same marker, so the two count one population.
+    # Whether the marker is UPHELD is check 15's question, not this report's.
+    c7drop="$c7drop $c7f"
+    printf 'unattended: check 7 EXCLUDED %s — abandoned at %s: --settle found its lease dead and its work landed at %s, so no session drives it\n' "$c7f" "$(fact_of "$c7f" abandoned)" "$(fact_of "$c7f" work-landed-at)"
   else
     c7keep="$c7keep $c7f"; c7n=$((c7n+1))
   fi
@@ -2867,7 +3128,7 @@ elif [ -f "$LIVEDOC" ]; then
     proj_extra=$(comm -23 <(grep -oE '^[A-Z_]+=' "$ROOT/.unattended.conf" | tr -d '=' | remove_retired_keys | sort -u) <(printf '%s\n' "$doc_keys") | tr '\n' ' ')
     for _rk in $RETIRED_CONF_KEYS; do
       grep -q "^$_rk=" "$ROOT/.unattended.conf" \
-        && report "check 22 - $_rk is RETIRED (TOOL-aWindowedPass-5): this leg ignores it, and the line may be deleted from .unattended.conf"
+        && report "check 22 - $_rk is RETIRED (TOOL-aWindowedPass-5): this join ignores it, and check 23 refuses it by name until the line is deleted from .unattended.conf, naming UNDECLARED_WRITE_BUDGET, which replaced it (TOOL-dUnstuckLanding-17)"
     done
   else
     proj_extra=""
@@ -3636,8 +3897,12 @@ done
 # ---- NOTHING: `brief-recorded` grades CLOSED units only, at the BUILD commit and not the pass
 # ---- commit, reads the LAST row per unit where this check takes the union, and proves only that the
 # ---- row's hash still names the blob at that path. Nothing asserts the path was a brief.
-# THE COUNTS ARE PER RUN since TOOL-aWindowedPass-5 retired the repo-global ceiling: each run's are
-# reset at the top of its loop, so only the exclusion notice's once-flag is declared here.
+# THE FLEET'S ACCUMULATORS (TOOL-cMendedVintage-14, per build since TOOL-dUnstuckLanding-17), declared
+# where `set -u` can see them before the loop that fills them. The VERDICT's counts are PER RUN since
+# TOOL-aWindowedPass-5 retired the repo-global ceiling: each run's are reset at the top of its loop.
+# `ds_graded` is the LIVENESS half and counts rows that REACHED the subset test, not rows that failed
+# it: a hit count of zero is a clean tree, a GRADED count of zero under a non-zero budget is a probe
+# that died.
 # ---- ABSORB (TOOL-dDerivedDocket-24 S9, owner ruling D12-i5). A run may FIX a red it inherited,
 # ---- beyond its declared write set, in a commit of its own whose subject is exactly
 # ---- `absorb(<slug>): <leg> inherited at <R8>` and names NO unit id. Such a commit is classified
@@ -3670,13 +3935,44 @@ check_generated_render() { # commit · path -> 0, printing what generated it, wh
   check_gen_region_only "$1^:$2" "$1:$2" || return 1
   printf 'a change inside its gen regions only'
 }
-ds_unavail=0
-# THE RUN THIS TREE DRIVES (TOOL-aWindowedPass-5): the record whose run branch is the branch checked
-# out here. A detached HEAD binds none. Read once; every record below is compared against it.
-DS_HEAD_REF=$(GIT symbolic-ref -q HEAD 2>/dev/null || true)
-# THE FLEET TOTALS (TOOL-aMendedFleet-92): counted writes, graded passes, graded records and one
-# `<slug>=<n>` pair per record holding a counted write, summed across every record graded below.
-ds_fleet_n=0; ds_fleet_g=0; ds_fleet_r=0; ds_fleet_over=""
+ds_fleet_n=0; ds_graded=0; ds_unavail=0; ds_records=0; ds_fleet_over=""
+# DS_HEAD_REF, the run this tree drives, is read once beside ADV_HEAD_OK above.
+# ---- THE BUDGET IS READ BEFORE THE LOOP (TOOL-dUnstuckLanding-17 S7/S8), because the run this tree
+# ---- drives is judged against it as the loop leaves that record. MANDATORY, in the shape its sibling
+# ---- pins take: undeclared or not a single integer is a refusal, never a defaulted value. The RETIRED
+# ---- key is refused BY NAME off the leg's own text scan of declared names, so it is never imported and
+# ---- an adopter who upgrades without moving it is told which key replaced it. Check 22 tolerates the
+# ---- same key as retired (TOOL-aWindowedPass-5), so the key-table join does not red on it as well.
+ds_budget_ok=0
+_c23_retired=UNDECLARED_WRITE_CEILING
+if printf '%s\n' "$_conf_names" | grep -qx -- "$_c23_retired"; then
+  fail 23 "$_c23_retired is retired: check 23 grades each run record against a per-build budget now, so declare UNDECLARED_WRITE_BUDGET in .unattended.conf and delete the old key, which nothing reads any more: $CONF"
+fi
+if [ -z "$UNDECLARED_WRITE_BUDGET" ]; then
+  fail 23 "UNDECLARED_WRITE_BUDGET is undeclared in .unattended.conf, and with no budget a pass that wrote outside its declared set is reported and never graded - which is the state this check exists to end"
+elif ! printf '%s' "$UNDECLARED_WRITE_BUDGET" | grep -qE '^[0-9]+$'; then
+  fail 23 "UNDECLARED_WRITE_BUDGET is not a single integer, so the per-build comparison below would be a string test wearing a numeric name: $UNDECLARED_WRITE_BUDGET"
+else
+  ds_budget_ok=1
+fi
+# ---- THE RANGE (TOOL-dUnstuckLanding-17 S5). When the advertised tip resolves and HEAD carries commits
+# ---- it lacks, a counted pass whose pass commit is already on that tip is still COUNTED on the fleet
+# ---- line and is NOT graded against its run's budget: it was graded when it landed, and re-grading
+# ---- landed history reds every later closing run on work it did not do. This leg's own observation of
+# ---- the remote, `ADV_HEAD`, is what decides it; it does not call the history legs' library reader.
+# ---- Otherwise WHOLE mode grades every counted pass, as the leg always did, and the fleet line says why.
+ds_range=whole; ds_head=$(GIT rev-parse HEAD 2>/dev/null)
+if [ "${ADV_HEAD_OK:-0}" != 1 ]; then
+  ds_field="range whole (the tip did not resolve: no advertised default-branch tip is in this clone)"
+else
+  ds_ahead=$(GIT rev-list --count "$ADV_HEAD..HEAD" 2>/dev/null)
+  case "$ds_ahead" in ''|*[!0-9]*) ds_ahead=0 ;; esac
+  if [ "$ds_ahead" -gt 0 ]; then
+    ds_range=range; ds_field="range ${ADV_HEAD:0:8}..${ds_head:0:8}"
+  else
+    ds_field="range whole (HEAD carries nothing the tip ${ADV_HEAD:0:8} lacks)"
+  fi
+fi
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
@@ -3707,20 +4003,22 @@ for f in $RUNS; do
   fi
   # ---- DERIVED LANDED IS NOT GRADED (TOOL-aSightedSkeptic-13). An in-place landing leaves its record
   # ---- at LANDING forever, so the recorded-phase skip above never fires for it and its landed,
-  # ---- append-only dispatch history counted against every later run's ceiling. Check 7's predicate,
+  # ---- append-only dispatch history counted against every later run's verdict. Check 7's predicate,
   # ---- asked here AFTER both skips: a record that was never graded stays silent, and under
   # ---- LANDER_MODE=primary a landed record reads LANDED and never reaches it. Default channel, for
   # ---- header exception TWO's reason: an exclusion changes the verdict.
   check_derived_landed "$f"; ds_dl=$?
   if [ "$ds_dl" = 0 ]; then
-    printf 'unattended: check 23 EXCLUDED %s — derived LANDED: its landing commit %s is an ancestor of the advertised default-branch tip %s, so its dispatch history is landed and append-only and is not graded against the ceiling\n' "$f" "$DERIVED_LANDING_COMMIT" "$ADV_HEAD"
+    printf 'unattended: check 23 EXCLUDED %s — derived LANDED: its landing commit %s is an ancestor of the advertised default-branch tip %s, so its dispatch history is landed and append-only and is not graded against the budget\n' "$f" "$DERIVED_LANDING_COMMIT" "$ADV_HEAD"
     continue
   fi
   if [ "$ds_dl" = 2 ] && [ "$ds_unavail" = 0 ]; then
     ds_unavail=1
     printf 'unattended: check 23 exclusion UNAVAILABLE — no advertised default-branch tip resolves in this clone, so a LANDING record already on the remote cannot be told from a live one; every LANDING record with dispatch rows is graded\n'
   fi
-  ds_fleet_r=$((ds_fleet_r + 1))
+  # THIS RECORD'S TWO COUNTS: every over-declared pass, for the fleet line, and the ones the budget
+  # grades, which in RANGE mode leaves out a pass whose pass commit is on the advertised tip.
+  ds_records=$((ds_records + 1)); ds_rec_all=0; ds_rec_n=0; ds_rec_lines=""
   while IFS= read -r dsrow; do
     [ -n "$dsrow" ] || continue
     dsitem=${dsrow#* dispatch · item }; dsitem=${dsitem%% · reason *}
@@ -3833,7 +4131,7 @@ DSSIBS
     dsnl=$'\n'; dsbrief="$dsnl$(read_brief_paths "$dshit" "$dsunit" "$f")$dsnl"
     # THE SUBSET TEST. Declaring MORE than you use is conservative and fine; writing outside the
     # declaration is the defect.
-    ds_run_graded=$((ds_run_graded + 1))
+    ds_run_graded=$((ds_run_graded + 1)); ds_graded=$((ds_graded + 1))
     dsout=""
     # NOT C-QUOTED, as `--check-commit` lists the same paths (closing review r2, M4): a quoted non-ASCII
     # path is covered by no declaration, so the two readers would disagree about it.
@@ -3863,7 +4161,6 @@ DSSIBS
   done <<DSROWS
 $dsrows
 DSROWS
-  ds_fleet_g=$((ds_fleet_g + ds_run_graded))
   [ -n "$ds_pend" ] || continue
   # ---- OVERLAP (TOOL-aWindowedPass-1 S1/S2). A declaration is the disjointness proof for passes that
   # ---- ran AT THE SAME TIME, so only a pass whose window overlapped a sibling unit's is counted: one
@@ -3912,12 +4209,20 @@ DSWIN
     [ -n "$dpout" ] || continue
     ds_line="$dpu at $dpe wrote $dpout in $f"
     if [ "$dsov" = 1 ]; then
-      # THE FINDING NO LONGER PRINTS ITSELF ON STDOUT. It is COUNTED, and the ratchet below decides
+      # THE FINDING NO LONGER PRINTS ITSELF ON STDOUT. It is COUNTED, and the budget below decides
       # the verdict; the per-instance detail goes to the report channel.
-      ds_over_n=$((ds_over_n + 1))
+      ds_over_n=$((ds_over_n + 1)); ds_rec_all=$((ds_rec_all + 1)); ds_fleet_n=$((ds_fleet_n + 1))
       ds_over="$ds_over
   $ds_line"
       report "check 23 — a dispatched pass committed a path outside the set it declared before dispatch: $ds_line"
+      # A PLAIN COMMAND, never `$(...)`: the reach set `check_adv_reaches` warms dies with a subshell.
+      if [ "$ds_range" = range ] && check_adv_reaches "$dpe"; then
+        :
+      else
+        ds_rec_n=$((ds_rec_n + 1))
+        ds_rec_lines="$ds_rec_lines
+  $ds_line"
+      fi
     else
       # DEFAULT CHANNEL, under the header's exception TWO: an uncounted write changed the verdict.
       ds_run_solo=1
@@ -3929,36 +4234,72 @@ DSPEND
   # S3: a run where every pass was solo says so, rather than reading as coverage.
   ds_run_line="check 23 $f — graded $ds_run_graded pass(es), $ds_run_over overlapped a sibling"
   if [ "$ds_run_solo" = 1 ]; then printf 'unattended: %s\n' "$ds_run_line"; else report "$ds_run_line"; fi
-  # ---- EACH RUN AGAINST ZERO, ON ITS OWN (TOOL-aWindowedPass-5). A repo-global shrink-only ceiling let
-  # ---- one run's committed, unrepairable history hold or abort another run's landing. Only the run
-  # ---- this tree drives can fail here, and its close is where that binds; any other live run's
-  # ---- counted writes are printed, because they changed the verdict a ceiling once gave.
+  # THE FLEET LINE'S `over` FIELD (TOOL-dUnstuckLanding-17 S6): every counted write, on the tip or not.
+  [ "$ds_rec_all" -gt 0 ] && [ "$ds_budget_ok" = 1 ] && [ "$ds_rec_all" -gt "$UNDECLARED_WRITE_BUDGET" ] \
+    && ds_fleet_over="$ds_fleet_over $dsslug=$ds_rec_all"
+  # ---- EACH RUN AGAINST ITS OWN BUDGET (TOOL-aWindowedPass-5, TOOL-dUnstuckLanding-17). A repo-global
+  # ---- shrink-only ceiling let one run's committed, unrepairable history hold or abort another run's
+  # ---- landing. Only the run this tree drives can fail here, and its close is where that binds: it
+  # ---- fails when its counted writes NOT already on the advertised tip exceed `UNDECLARED_WRITE_BUDGET`,
+  # ---- which is 0 unless a project declares otherwise. Any other live run's counted writes are
+  # ---- printed, because they changed the verdict a ceiling once gave.
   # ---- WHAT THIS DOES NOT CHECK: a run nobody drives from a checkout is never failed by this check,
   # ---- on the bar or anywhere else, until a tree on its branch runs the leg.
   [ "$ds_over_n" -gt 0 ] || continue
-  ds_fleet_n=$((ds_fleet_n + ds_over_n)); ds_fleet_over="$ds_fleet_over $dsslug=$ds_over_n"
   dsrb=$(fact_of "$f" run-branch); [ -n "$dsrb" ] || dsrb=$(fact_of "$f" branch-ref)
   if [ -z "$dsrb" ]; then
     # A RECORD NAMING NO RUN BRANCH (a detached preflight) matches no checkout, its own close included,
     # so "graded at its own close" would be false for it (closing review r1, M6). Said distinctly.
     printf 'unattended: check 23 UNBOUND %s: %s counted - the record names no run branch, so no checkout binds it and no leg can fail it\n' "$f" "$ds_over_n"
   elif [ -n "$DS_HEAD_REF" ] && [ "$dsrb" = "$DS_HEAD_REF" ]; then
-    fail 23 "a pass of the run this branch drives committed outside the set it declared before dispatch while its window overlapped a sibling pass, and that declaration is the disjointness proof two concurrent passes rest on: $ds_over_n in $f$ds_over"
+    if [ "$ds_budget_ok" = 1 ] && [ "$ds_rec_n" -gt "$UNDECLARED_WRITE_BUDGET" ]; then
+      fail 23 "a pass of the run this branch drives committed outside the set it declared before dispatch while its window overlapped a sibling pass, and that declaration is the disjointness proof two concurrent passes rest on: $ds_rec_n in $f against a per-build budget of $UNDECLARED_WRITE_BUDGET$ds_rec_lines"
+    else
+      report "check 23 $f - $ds_over_n counted, $ds_rec_n graded against a per-build budget of ${UNDECLARED_WRITE_BUDGET:-undeclared}: the run this branch drives is within it, or its counted passes are already on the advertised tip"
+    fi
   else
     printf 'unattended: check 23 OTHER RUN %s: %s counted, graded at its own close - this tree drives %s\n' "$f" "$ds_over_n" "${DS_HEAD_REF:-a detached HEAD, which binds no run}"
   fi
 done
-# ---- THE FLEET LINE (TOOL-aMendedFleet-92), on the default channel under header exception TWO,
-# ---- whenever a record reached grading. It totals the per-run counts above and never fails the leg:
-# ---- each run is still graded against zero, at its own close. One contract between two kits, its
-# ---- head and first field in node d's words: the drift report's `measure_fleet_over_budget` anchors
-# ---- on the head and reads the `over` and `at` fields by their leading word.
-# ---- WHAT THIS DOES NOT CHECK: a record skipped or excluded above is in no total, and the line binds
-# ---- nowhere - it is the one place a run nobody drives from a checkout is seen at all.
-if [ "$ds_fleet_r" -gt 0 ]; then
-  ds_fleet_over=${ds_fleet_over# }; ds_fleet_at=$(GIT rev-parse HEAD 2>/dev/null)
-  printf 'unattended: check 23 fleet — %s undeclared write(s) over %s graded pass(es) in %s record(s) · budget 0 per run · over %s · at %s\n' \
-    "$ds_fleet_n" "$ds_fleet_g" "$ds_fleet_r" "${ds_fleet_over:-none}" "${ds_fleet_at:0:8}"
+
+# ---- 23's BUDGET (TOOL-cMendedVintage-14, made per build by TOOL-dUnstuckLanding-17, and per DRIVEN RUN
+# ---- by TOOL-aWindowedPass-5). The subset test above used to print one line per offending pass and
+# ---- leave the exit status alone, which is a REPORT wearing a gate's number. The declaration was
+# ---- therefore enforced in one direction only: declaring too much wedges the run, declaring too
+# ---- little was a line nobody had to read.
+# ----
+# ---- A PER-BUILD BUDGET, NOT A FLEET CEILING. The count used to be summed over every live record and
+# ---- compared against one shrink-only pin, so another build's rows could fill the ceiling and red a
+# ---- closing run that wrote nothing outside its declaration; in the adopters that class stopped more
+# ---- closes than any other. The run this tree drives is judged against `UNDECLARED_WRITE_BUDGET` as
+# ---- the loop leaves it, above, and the fleet total is REPORTED on the line below and never fails the
+# ---- leg. A budget is a policy and not a measurement, so it has no shrink-only comparison and no
+# ---- "lower the pin" report: an adopter's budget is 0 and means what it says.
+# ----
+# ---- WHAT THIS DOES NOT CHECK, because a gate's own header owes its gaps:
+# ----   - THE FLEET TOTAL BINDS NOWHERE. This leg prints it and the drift report's `fleet_over_budget`
+# ----     signal lists the builds over budget, report-only; no bar, CI job or hook fails on it.
+# ----   - A PUSHED PASS IN RANGE MODE IS NOT RE-GRADED. Its pass commit is on the advertised tip, so it
+# ----     was graded when it landed. WHOLE mode grades it, and fails it only for the run the checkout
+# ----     drives; remote CI on the default branch drives none, so there it is printed, never failed.
+# ----   - NOTHING HERE MAKES THE DECLARATION HONEST. Both artifacts are the run's, so a run may still
+# ----     declare the wider set up front, as this check's own header states.
+# ----   - THE OTHER TWO check-23 FINDINGS ARE STILL BARE PRINTS. The dodged-join and ambiguous-
+# ----     attribution branches keep the shape the ruling took off the subset test, deliberately.
+# THE LIVENESS HALF: a budget above zero over a fleet that graded no pass at all is a probe that died.
+if [ "$ds_budget_ok" = 1 ] && [ "$UNDECLARED_WRITE_BUDGET" -gt 0 ] && [ "$ds_graded" = 0 ]; then
+  fail 23 "the declared budget on undeclared writes is above zero while NO dispatched pass was graded at all, so every per-build comparison above would report a reassuring zero for a probe that died rather than for a tree that is clean: $UNDECLARED_WRITE_BUDGET against a graded population of $ds_graded"
+fi
+# THE FLEET LINE (S6), on the default channel under header exception TWO, whenever the walked population
+# holds a record with dispatch rows. One contract between two kits: the drift report's
+# `measure_fleet_over_budget` anchors on its head and reads its `over` and `at` fields by their word.
+# It counts only COUNTED writes: a SOLO write (TOOL-aWindowedPass-1) is reported and never counted.
+if [ "$ds_records" -gt 0 ]; then
+  if [ "$ds_budget_ok" = 1 ]; then ds_bfield="budget $UNDECLARED_WRITE_BUDGET per build"; ds_ofield="over ${ds_fleet_over# }"
+  else ds_bfield="budget ${UNDECLARED_WRITE_BUDGET:-undeclared} per build"; ds_ofield="over unjudged"; fi
+  [ "$ds_ofield" = "over " ] && ds_ofield="over none"
+  printf 'unattended: check 23 fleet — %s undeclared write(s) over %s graded pass(es) in %s record(s) · %s · %s · %s · at %s\n' \
+    "$ds_fleet_n" "$ds_graded" "$ds_records" "$ds_bfield" "$ds_ofield" "$ds_field" "${ds_head:0:8}"
 fi
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): every tracked build README carries EXACTLY ONE well-formed
@@ -4402,6 +4743,7 @@ unattended.sh	asks:	the build README's front matter, a scan its `---` close boun
 unattended.sh	may:	the build README's front matter, a scan its `---` close bounds
 check-unattended.sh	asks:	the build README's front matter, a scan its `---` close bounds
 check-unattended.sh	may:	the build README's front matter or a commit's diff of it, never a run-state file
+check-unattended.sh	spec-audit:	the build README's front matter or a commit's diff of it, never a run-state file (TOOL-aWardedAudit-5)
 lib-unattended.sh	(keepalive|	check_lease_only_diff grades git diff -U0 hunk lines, which carry no section to scope to
 resume-tick.sh	pid: 	the driver's --liveness stdout, not a run-state file
 stop-guard.js	' + key	parseLiveness reads the driver's --liveness stdout, not a run-state file
@@ -5395,7 +5737,7 @@ _lc_hits=${_lc_hits%$'\n'}
 # print_liveness arrived with origin/main (aWokenSentinel); it reads the RECORDED phase because it
 # takes no network.
 # check_commit_message (TOOL-aWindowedPass-3) runs on every commit, and a hook takes no network either.
-PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness check_commit_message"
+PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness run_settle check_commit_message"
 # ---- LIVENESS: the classifier must RECOGNISE the readers' own reads. The two readers are the one
 # ---- place a read of the fact is certain to exist, so each must hold a line the read predicate
 # ---- matches, or the driver reads the fact in a spelling this check no longer sees and the routing
@@ -5763,6 +6105,47 @@ else
     report "check 48 graded ${_c48_n%% *} function(s) in ${#_c48_files[@]} shell file(s) of this kit, ${_c48_n#* } of them staging a run-state file"
   fi
   [ -z "$_c48_hits" ] || fail 48 "a function in a shipped shell file of this kit writes a run-state fact after its last staging of that same file, so the index holds the file as it was before that write and the write stays unstaged: a commit of what the verb staged records half of it and leaves the tree dirty; stage after the last write. matches: $_c48_hits"
+fi
+
+# ---- check 49 - EVERY LANDING_NODES TOKEN IS A PAIR, AND NO TAG OR NODE IS DECLARED TWICE.
+# ---- TOOL-dUnstuckLanding-20 S6 (F4). The driver resolves the node holding a run against this key at
+# ---- the pinned BASE, and a malformed token never matches, so a typo makes that node hand off on every
+# ---- run with nothing red. Graded through `scan_landing_nodes`, the library function the driver's own
+# ---- reason line calls, so the leg and the driver read one grammar.
+# ----
+# ---- What this does NOT check: that a pair names a REAL node, or the node the owner meant, or that the
+# ---- tags agree with the charter's node registry. It reads the conf at HEAD, which is the BASE of the
+# ---- next run and not of any run already pinned.
+if [ -z "${LANDING_NODES//[[:space:]]/}" ]; then
+  report "check 49 did not grade LANDING_NODES - the project conf declares none, so every node may land"
+else
+  _c49_bad=$(scan_landing_nodes "$LANDING_NODES" | tr '\n' ' ' | sed 's/ $//')
+  if [ -n "$_c49_bad" ]; then
+    fail 49 "LANDING_NODES declares a token that is not a <tag>=<machine>/<user> pair, or a tag or machine/user declared twice, and a malformed token never matches, so that node hands off on every run with nothing else red: $_c49_bad"
+  else
+    report "check 49 graded LANDING_NODES: $(set -f; set -- $LANDING_NODES; echo $#) pair(s), each well-formed and none declared twice"
+  fi
+fi
+
+# ---- check 50 - THE DRIVER READS THE POLICY FILE THE PRE-PUSH HOOK READS. Implementation review
+# ---- round 2, hunt item 3, on TOOL-dUnstuckLanding-16's fold: a conf naming no policy file makes the
+# ---- driver read the hook's own file at R, and the driver spells that path beside the hook's
+# ---- `_gate_env="$top/..."` derivation - two spellings of one fact, equal today and free to drift.
+# ---- Compared here, so a hook that moves its file reds the bar rather than the next landing.
+# ----
+# ---- What this does NOT check: that either path names the right file, nor a conf that NAMES a
+# ---- policy file, which the driver reads and the hook never does, a divergence older than this check.
+_c50_hook=.githooks/pre-push
+if ! git ls-files --error-unmatch -- "$_c50_hook" >/dev/null 2>&1; then
+  report "check 50 did not compare the inherited-red policy path - this tree tracks no $_c50_hook, so no hook reads one beside the driver"
+else
+  _c50_h=$(sed -n 's|^_gate_env="$top/\(.*\)"$|\1|p' "$_c50_hook" | head -1)
+  _c50_d=$(sed -n 's/^.* hook="\([^"]*\)".*$/\1/p' "$DRIVER" | head -1)
+  if [ -z "$_c50_h" ] || [ "$_c50_h" != "$_c50_d" ]; then
+    fail 50 "the driver's inherited-red policy path is not the pre-push hook's, so on a conf naming no policy file the two readers of one policy read two files, and a red the driver lands is one the hook refuses to push: hook ${_c50_h:-unread}, driver ${_c50_d:-unread}"
+  else
+    report "check 50 compared the inherited-red policy path the driver and the pre-push hook read: $_c50_d"
+  fi
 fi
 
 fi   # ---- end of the checks `--only 28` skips

@@ -66,10 +66,16 @@
 #   GOV_BRANCH_GATE_CMD=<cmd> a bar for a push that does NOT touch the default branch, vetted by the
 #                             same rule at HEAD and fed git's pre-push ref lines on stdin. Unset, such
 #                             a push is ungated. It can only add a refusal, never remove one.
+#   GATE_DOC_PATHS="<paths>"  the doc class: space-separated repo paths, each a file or a directory
+#                             ending in `/`, no glob, no leading `:` or `/`, no `..`. A push that changes
+#                             nothing outside it is doc-only, and its bar skips each leg that DECLARES
+#                             `doc_reads` and none of whose paths moved. PARSED at the remote's tip, never
+#                             read from the sourced value; empty or absent is no doc class.
 #   INHERITED_RED=park|land   whether a push may land over a red its default branch already carries.
 #                             PARSED at the remote's tip by the hook and the unattended driver, never
 #                             read from the sourced value; see the policy block below.
-#   INHERITED_RED_MAX_AGE=<n> the age bound, in first-parent landings, that `land` needs beside it.
+#   INHERITED_RED_MAX_AGE=<n> the age bound, in first-parent landings, past which an inherited
+#                             red's ask is escalated BLOCKER. It decides no landing.
 #                             PARSED at the remote's tip by the hook and the unattended driver, never
 #                             read from the sourced value; see the policy block below.
 # THIS FILE IS VETTED BEFORE IT IS SOURCED (TOOL-aRepatriatedFork-5, closing review round 1 H1): the
@@ -81,9 +87,10 @@ GOV_KITROOT=tools
 
 # ---- THE INHERITED-RED POLICY, by owner ruling D12-i4 (2026-09-13). TOOL-dDerivedDocket-24 -------
 # Gov LANDS over a red its default branch already carries, when every red leg reads INHERITED against
-# the remote's own tip and arrived within the last ten first-parent landings; a red older than that,
-# or one the run worsened, still blocks. The kit default is `park`, and no kit ships this path, so the
-# choice stays gov's for the reason the paragraphs above give for GATE_SELFTESTS.
+# the remote's own tip, at any age; one the run worsened still blocks. A red older than ten
+# first-parent landings lands with its ask escalated to BLOCKER (ruling TOOL-dUnstuckLanding-22,
+# superseding that part of D12-i4). The kit default is `land` since that ruling, and gov declares both
+# lines anyway, so the bound it escalates at is written here and not inherited from a default.
 #
 # THESE TWO LINES ARE DATA, NOT SHELL, to both of their readers. `.githooks/pre-push` and the
 # unattended driver each PARSE them out of this file as committed at the remote's tip - never out of
@@ -91,3 +98,7 @@ GOV_KITROOT=tools
 # gated push has landed the edit. The source above still sets them as variables; nothing reads those.
 INHERITED_RED=land
 INHERITED_RED_MAX_AGE=10
+# THE DOC CLASS (TOOL-dThriftyLanding-5): the paths gov calls non-code. A push to the default branch
+# that changes nothing outside them is doc-only, and its bar skips each leg that DECLARES `doc_reads`
+# and none of whose paths moved. Read by .githooks/pre-push AT R, never from the tree being pushed.
+GATE_DOC_PATHS="memory/ README.md AGENTS.md CLAUDE.md WIRE-INTO-PROJECT.md coding-governance-agents.template.md"

@@ -1574,6 +1574,39 @@ def derive_landed_counts(record: dict, builds: list, m: str) -> dict:
     return counts
 
 
+LIVE_BLOCKER_HEADING = "## Open BLOCKER asks"
+
+
+def render_live_blockers(reading: dict) -> list:
+    """The `## Open BLOCKER asks` section's lines, or nothing when no OPEN ask carries SEV BLOCKER.
+
+    TOOL-dUnstuckLanding-16 S5. Read from the ask FOLD this generator already computes and never from
+    any one writer's ask grammar: a BLOCKER belongs in front of the owner whatever filed it, and the
+    alternative — parsing the unattended driver's inherited-red text — would be a contract spelled in
+    two kits with no parity gate. One line per ask, linking its home build's BACKLOG and carrying the
+    view's excerpt of its text, which is far inside check 7's per-line entry cap. An escalated
+    inherited-red ask's text opens on the leg, so the excerpt names it.
+
+    WHAT IT DOES NOT CHECK: why an ask is BLOCKER, or whether it still should be. It lists the fold's
+    verdict and nothing more. EMPTY renders NOTHING, not an empty heading, so a tree with no BLOCKER
+    ask renders LIVE.md byte-identical to the render before this section existed.
+    """
+    corpus, fold = reading.get("corpus"), reading.get("fold")
+    if corpus is None or fold is None:
+        return []
+    excerpt = reading.get("excerpt", backlog.EXCERPT_DEFAULT)
+    asks = [a for parsed in corpus.files for a in parsed.asks
+            if fold.statuses.get(a.id) == "OPEN" and fold.severities.get(a.id) == "BLOCKER"]
+    if not asks:
+        return []
+    asks.sort(key=backlog.build_ask_sort_key)
+    out = ["", LIVE_BLOCKER_HEADING, ""]
+    for a in asks:
+        out.append(f"- [{a.id}](builds/{a.slug}/BACKLOG.md) · {a.slug} · "
+                   f"{backlog.render_summary_cell(a.text, excerpt)}")
+    return out
+
+
 def render_live(builds: list, m: str, conf: dict | None = None, reading: dict | None = None,
                 landed: dict | None = None) -> str:
     # LIVE_DORMANT_DAYS (TOOL-aMendedFleet-12): blank or absent renders the file this function always
@@ -1631,6 +1664,7 @@ def render_live(builds: list, m: str, conf: dict | None = None, reading: dict | 
             )
     else:
         out.append("*No live build.*")
+    out += render_live_blockers(reading or {})
     return "\n".join(out) + "\n"
 
 
@@ -5292,6 +5326,37 @@ def cmd_selftest() -> int:
                 [a for a, m in _dec.items()
                  if (min(m) if m else "") != _dec_fold.decided.get(a, "")],
                 len(_dec), len([a for a, m in _dec.items() if len(m) > 1])))
+
+        # TOOL-dUnstuckLanding-16 AC7 — LIVE.md's `## Open BLOCKER asks`, from the fold alone. One
+        # OPEN BLOCKER ask renders the heading and a line naming its id, its home and its leg; a tree
+        # whose OPEN asks are all HIGH, beside a CLOSED ask carrying BLOCKER, renders no heading — so
+        # the status filter and the SEV filter are each exercised by a population that could fail it.
+        _bl_rows = _ac7_rows + [backlog.render_sev_row("EXMP-aFoo-30", "HIGH", "graded")]
+        _bl_ask = backlog.render_ask_row(
+            "EXMP-aFoo-34", "2026-09-03",
+            "inherited red: leg x leg red at abc12345, older than the 2-landing age bound",
+            clauses=(_SEEN_HERE, _ACCEPT))
+        _blc = _build_backlog_fixture(et, {**_ac7, "memory/builds/aFoo/BACKLOG.md": _render_backlog_file(
+            "aFoo", _ac7_asks + [_bl_ask],
+            _bl_rows + [backlog.render_sev_row("EXMP-aFoo-34", "BLOCKER", "aged past the bound")])},
+            cutoff=_cut)
+        with contextlib.redirect_stdout(io.StringIO()):
+            _bl_live = plan(et, _blc)[0]["memory/LIVE.md"]
+        arm("an OPEN BLOCKER ask renders `## Open BLOCKER asks` in LIVE.md, naming its id, home and leg",
+            "heading=True line=True",
+            lambda: f"heading={(chr(10) + LIVE_BLOCKER_HEADING + chr(10)) in _bl_live} "
+                    f"line={'- [EXMP-aFoo-34](builds/aFoo/BACKLOG.md) · aFoo · inherited red: leg x leg' in _bl_live}")
+        _hic = _build_backlog_fixture(et, {**_ac7, "memory/builds/aFoo/BACKLOG.md": _render_backlog_file(
+            "aFoo", _ac7_asks,
+            _bl_rows + [backlog.render_sev_row("EXMP-aFoo-31", "BLOCKER", "closed, so not live")])},
+            cutoff=_cut)
+        with contextlib.redirect_stdout(io.StringIO()):
+            _hi_live = plan(et, _hic)[0]["memory/LIVE.md"]
+        arm("a tree whose OPEN asks are all HIGH renders no BLOCKER heading, a CLOSED BLOCKER included",
+            "heading=False",
+            lambda: f"heading={LIVE_BLOCKER_HEADING in _hi_live}")
+        # THE _ac7 TREE PUT BACK, because the AC8 arm below commits whatever is on disk as its pin.
+        _build_backlog_fixture(et, _ac7, cutoff=_cut)
 
         # AC8 — the pinned read, and the tree it must leave alone. THE CONTROL RUNS FIRST and the
         # porcelain is sampled AFTER it, because the control rebuilds the fixture and a sample

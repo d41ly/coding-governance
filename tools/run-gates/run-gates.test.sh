@@ -121,7 +121,16 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=273
+FLOOR_ASSERTIONS=293
+# RAISED 289 -> 293 by TOOL-dThriftyLanding-12: 3i2's env-reader and stamp controls and the two
+# component-boundary assertions.
+# RAISED 288 -> 289 by TOOL-dThriftyLanding-8: section 3i2's merged-side-branch assertion.
+# RAISED 278 -> 288 by TOOL-dThriftyLanding-1: arm 1a's `doc_reads` control and section 3i2's nine
+# docs-mode assertions.
+# RAISED 273 -> 278 by TOOL-dUnstuckLanding-16: section 7's five new assertions (AC1's attr line and
+# stamp, AC2's unbounded stamp, its OWN attr line and absent stamp), while the flipped AC17
+# and F1 assertions keep their count. None is host-conditional.
+# COUNTED off the section's own calls; this pass runs no suite.
 # RAISED 272 -> 273 by the reconcile of origin/main into aRepatriatedFork: that build's one
 # `{prefix}` assertion (TOOL-aRepatriatedFork-29, bf7c4ab7, 149 -> 150 on its side) joins the
 # dDerivedDocket arms counted below.
@@ -200,7 +209,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling", "signature"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling", "signature", "doc_reads"}
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -362,7 +371,7 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling", "signature"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling", "signature", "doc_reads"}
 legs = json.load(open(sys.argv[1]))
 sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
 ' "$1"; }
@@ -379,6 +388,15 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"],"signatur":["bash","y.sh"]}]' >
 if keyset_probe "$ctl/sig.json" && ! keyset_probe "$ctl/sigtypo.json"; then :
 else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`signature\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
+# ...and `doc_reads`, the ninth (TOOL-dThriftyLanding-1), by the same two halves.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"doc_reads":[]}]' > "$ctl/dr.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"doc_read":[]}]' > "$ctl/drtypo.json"
+if keyset_probe "$ctl/dr.json" && ! keyset_probe "$ctl/drtypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`doc_reads\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
 rm -rf "$ctl"
@@ -408,13 +426,20 @@ def resolve_prefix_token(spelled, troot):
 # <<< resolve_prefix_token
 tracked = subprocess.run(["git","ls-files"],capture_output=True,text=True).stdout.split()
 bad = []
+# `doc_reads` is graded by the same rule and for a sharper reason (TOOL-dThriftyLanding-1): an element
+# naming nothing makes its leg SKIP on every doc-only push that touches the path it meant, so a typo
+# there is a skip that looks like a declaration.
 for l in json.load(open(sys.argv[1])):
-    for g in l.get("guard", []):
-        g = resolve_prefix_token(g, sys.argv[2])
-        if not any(t == g or t.startswith(g) for t in tracked):
-            bad.append("%s -> %s" % (l["name"], g))
+    for key in ("guard", "doc_reads"):
+        for g in (l.get(key) or []):
+            g = resolve_prefix_token(g, sys.argv[2])
+            # AT A PATH COMPONENT BOUNDARY, as the runner pathspecs and the deployer match: a
+            # character prefix let `memory/build` pass beside a tracked `memory/builds/...`.
+            b = g.rstrip("/")
+            if not any(t == b or t.startswith(b + "/") for t in tracked):
+                bad.append("%s -> %s %s" % (l["name"], key, g))
 if bad:
-    print("canary: guard pathspec matches no tracked path (the leg would skip forever): " + "; ".join(bad))
+    print("canary: guard or doc_reads pathspec matches no tracked path (the leg would skip forever): " + "; ".join(bad))
     sys.exit(1)
 ' "$LEGS_FILE" "$TROOT" || fail=1
 
@@ -1096,6 +1121,101 @@ n=$((n+1))
   printf '%s\n' "$o" | grep -q '^GATE skip' \
     && { echo "canary: GATE_FULL=1 at width $w still skipped a guarded leg"; fail=1; }
 done
+
+# 3i2. THE DOCS MODE. TOOL-dThriftyLanding-1. Under `GATE_DOCS_BASE` a leg that DECLARES `doc_reads`
+#     runs only when a declared path moved since that base, in the net diff OR in any commit of the
+#     range; a declared EMPTY list skips; a leg that declares nothing is untouched; GATE_FULL wins;
+#     and a docs run never stamps a full green, because each docs skip counts as a skip. Every one of
+#     those five is a different way to be wrong, so each has its own assertion, and the undeclared
+#     and GATE_FULL rows are the controls proving the fixture can still RUN a leg.
+D="$SCRATCH/docsmode"
+mkdir -p "$D/${PFX}${KIT}" "$D/fx" "$D/notes"
+cp "$SCRATCH/${PFX}${KIT}/run-gates.sh" "$D/${PFX}${KIT}/run-gates.sh"
+cp "$KITDIR/gate-fingerprint.sh" "$D/${PFX}${KIT}/" 2>/dev/null || true
+cp "$SCRATCH/fx/instant.sh" "$D/fx/a.sh"
+# A leg that RECORDS what it inherited (closing review L3): the runner must withhold GATE_DOCS_BASE.
+printf '#!/usr/bin/env bash\nprintf "%%s\\n" "${GATE_DOCS_BASE-unset}" > "$(git rev-parse --git-dir)/docs-env"\n' > "$D/fx/env.sh"
+printf 'a\n' > "$D/notes/a.md"; printf 'b\n' > "$D/notes/b.md"
+cat > "$D/${PFX}gate-legs.json" <<'JSON'
+[
+  {"name": "env reader",   "argv": ["bash", "fx/env.sh"], "doc_reads": ["notes/"]},
+  {"name": "reads b only", "argv": ["bash", "fx/a.sh"], "doc_reads": ["notes/b.md"]},
+  {"name": "reads notes",  "argv": ["bash", "fx/a.sh"], "doc_reads": ["notes/"]},
+  {"name": "reads none",   "argv": ["bash", "fx/a.sh"], "doc_reads": []},
+  {"name": "undeclared",   "argv": ["bash", "fx/a.sh"]}
+]
+JSON
+( cd "$D" && git init -q -b main . && git config user.email t@e && git config user.name t \
+  && git add -A && git commit -qm fx && printf 'a2\n' > notes/a.md && git commit -qam a ) >/dev/null 2>&1
+_db=$( cd "$D" && git rev-parse HEAD~1 )
+o=$( cd "$D" && GATE_FULL= GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=$_db GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE skip  reads b only  (docs-only: no path it reads moved)$' \
+  || { echo "canary: a leg whose declared doc path did not move was not skipped in the docs mode"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    reads notes$' \
+  || { echo "canary: a leg whose declared doc path moved did not run in the docs mode"; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE skip  reads none  (docs-only' \
+  || { echo "canary: a declared EMPTY doc_reads list did not skip, so it reads the same as no declaration"; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    undeclared$' \
+  || { echo "canary: a leg declaring no doc_reads was narrowed by the docs mode"; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed (2 skipped)$' \
+  || { echo "canary: the docs-mode skips were not tallied"; fail=1; }
+n=$((n+1))
+[ "$(cat "$D/.git/docs-env" 2>/dev/null)" = unset ] \
+  || { echo "canary: a leg inherited GATE_DOCS_BASE, which the runner must withhold: [$(cat "$D/.git/docs-env" 2>/dev/null)]"; fail=1; }
+n=$((n+1))
+[ -f "$D/.git/gate-full-green" ] \
+  && { echo "canary: a docs-mode run stamped a full green it did not earn"; fail=1; }
+o=$( cd "$D" && GATE_FULL=1 GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=$_db GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates GREEN — 5/5 legs passed$' \
+  || { echo "canary: GATE_FULL beside GATE_DOCS_BASE did not run every leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+# L3 (21): the POSITIVE control for the stamp-absence arm above — the same fixture, run whole, stamps.
+n=$((n+1))
+[ -f "$D/.git/gate-full-green" ] \
+  || { echo "canary: the full run over the docs fixture stamped nothing, so the docs run's absence of a stamp proves nothing"; fail=1; }
+# The reverted touch: b changes in one commit and is restored in the next, so its NET diff is empty.
+( cd "$D" && printf 'b2\n' > notes/b.md && git commit -qam b2 && printf 'b\n' > notes/b.md && git commit -qam b ) >/dev/null 2>&1
+o=$( cd "$D" && GATE_FULL= GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=$_db GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    reads b only$' \
+  || { echo "canary: a doc path touched and restored inside the range read as unmoved"; fail=1; }
+# ...and the same touch on a SIDE branch merged with --no-ff (TOOL-dThriftyLanding-8). Git's default
+# history simplification drops a side branch that nets to nothing on the path, and every landing here
+# is a --no-ff merge, so the linear arm above cannot see this one.
+_db2=$( cd "$D" && git rev-parse HEAD )
+( cd "$D" && git checkout -q -b side && printf 'b3\n' > notes/b.md && git commit -qam b3 \
+  && printf 'b\n' > notes/b.md && git commit -qam b && git checkout -q main \
+  && printf 'a3\n' > notes/a.md && git commit -qam a3 && git merge -q --no-ff -m land side ) >/dev/null 2>&1
+o=$( cd "$D" && GATE_FULL= GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=$_db2 GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    reads b only$' \
+  || { echo "canary: a doc path touched and restored on a merged side branch read as unmoved"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+o=$( cd "$D" && GATE_FULL= GATE_BASE= GATE_SELFTESTS= GATE_DOCS_BASE=no-such-rev GATE_JOBS=2 bash $KIT_REL/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q 'docs mode is OFF' \
+  && printf '%s\n' "$o" | grep -q '^gates GREEN — 5/5 legs passed$' \
+  || { echo "canary: an unresolvable GATE_DOCS_BASE did not turn the mode off ALOUD"; fail=1; }
+# M4 (closing review): arm 1b's tracked-path rule at a PATH COMPONENT BOUNDARY, over a fixture. A
+# string prefix of a tracked file (notes/a against notes/a.md) must fail; the directory must pass.
+_tp=$( cd "$D" && "$PYBIN" -c '
+import subprocess, sys
+tracked = subprocess.run(["git", "ls-files"], capture_output=True, text=True).stdout.split()
+for g in sys.argv[1:]:
+    b = g.rstrip("/")
+    print(g, "ok" if any(t == b or t.startswith(b + "/") for t in tracked) else "bad")
+' notes/a notes/ notes/a.md | tr -d '\r' )
+n=$((n+1))
+[ "$_tp" = "notes/a bad
+notes/ ok
+notes/a.md ok" ] || { echo "canary: the component-boundary rule misgraded a fixture: $_tp"; fail=1; }
+_rule=$(grep -c 't.startswith(b + "/") for t in tracked' "$0")
+n=$((n+1))
+[ "${_rule:-0}" -ge 2 ] || { echo "canary: arm 1b no longer uses the component-boundary rule this fixture grades"; fail=1; }
 
 # 3j MOVED to run-gates.gov.test.sh (G3). It asserted that GOV's `.githooks/pre-push` forces the
 #    full bar — a fact about gov's tree, sitting in the half whose whole contract is that every
@@ -2156,16 +2276,23 @@ n=$((n+1))
 # `GATE_INHERITED_RED_MAX_AGE=10` a red that arrived inside the window reads INHERITED with its age and
 # the landing that introduced it, the record's row carries the three age columns before the reason,
 # and under `land` the inherited-green stamp names R, the bound and the leg while no full green is
-# written. The same leg red already at R~10 reads `aged`, and no inherited-green stamp is written.
-build_age_fixture() { # dir · the landing (1..12) the red arrives in -> sets AGE_R
-  local d=$1 at=$2 i
+# written. The same leg red already at R~10 reads `aged`, and since TOOL-dUnstuckLanding-16 it is
+# STAMPED too: the age escalates the ask and no longer decides the landing (ruling
+# TOOL-dUnstuckLanding-22). A third argument adds a second leg, green at R and red at L — OWN.
+build_age_fixture() { # dir · the landing (1..12) the red arrives in · [own] -> sets AGE_R
+  local d=$1 at=$2 own=${3:-} i
   mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
   cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
   ( cd "$d" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
       && git config core.autocrlf false ) >/dev/null 2>&1
   printf '#!/usr/bin/env bash\nif [ -s data/red.txt ]; then cat data/red.txt; exit 1; fi\nexit 0\n' > "$d/fx/r.sh"
-  printf '[\n  {"name": "aged leg", "argv": ["bash", "fx/r.sh"]}\n]\n' > "$d/$ATL"
+  if [ -n "$own" ]; then
+    printf '#!/usr/bin/env bash\nif [ -s data/own.txt ]; then cat data/own.txt; exit 1; fi\nexit 0\n' > "$d/fx/o.sh"
+    printf '[\n  {"name": "aged leg", "argv": ["bash", "fx/r.sh"]},\n  {"name": "own leg", "argv": ["bash", "fx/o.sh"]}\n]\n' > "$d/$ATL"
+  else
+    printf '[\n  {"name": "aged leg", "argv": ["bash", "fx/r.sh"]}\n]\n' > "$d/$ATL"
+  fi
   : > "$d/data/red.txt"
   ( cd "$d" && git add -A && git commit -qm "landing 0" ) >/dev/null 2>&1
   for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
@@ -2175,6 +2302,7 @@ build_age_fixture() { # dir · the landing (1..12) the red arrives in -> sets AG
   done
   AGE_R=$(git -C "$d" rev-parse HEAD)
   printf 'L\n' > "$d/data/l.txt"
+  [ -n "$own" ] && printf 'FAIL mine\n' > "$d/data/own.txt"
   ( cd "$d" && git add -A && git commit -qm "L, past R" ) >/dev/null 2>&1
 }
 AG="$AT/ag"; build_age_fixture "$AG" 4
@@ -2201,9 +2329,40 @@ AH="$AT/ah"; build_age_fixture "$AH" 1
 ahout=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=10)
 check_attr_line "$ahout" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · aged at R~10" \
   "AC3 a red already present at R~10 reads aged"
+# FLIPPED by TOOL-dUnstuckLanding-16 from TOOL-dDerivedDocket-24's AC17, which asserted NO stamp: an
+# aged INHERITED leg now lands, so the stamp is written and names the leg and the bound.
 n=$((n+1))
-[ ! -f "$AH/.git/gate-inherited-green" ] \
-  || { echo "canary: attribution — AC17 an aged leg still wrote gate-inherited-green, so a red past the bound would land"; fail=1; }
+{ [ -f "$AH/.git/gate-inherited-green" ] \
+    && [ "$(awk -F'\t' '$1=="max_age"{print $2}' "$AH/.git/gate-inherited-green")" = 10 ] \
+    && [ "$(awk -F'\t' '$1=="legs"{print $2}' "$AH/.git/gate-inherited-green")" = "aged leg" ]; } \
+  || { echo "canary: attribution — TOOL-dUnstuckLanding-16 an aged INHERITED leg under land wrote no gate-inherited-green naming the leg and the bound"; fail=1; }
+# TOOL-dUnstuckLanding-16 AC1 — red at R and at R~2 with the same offender, under a bound of 2: the
+# row reads `aged`, and the stamp is written naming that leg with `max_age` 2.
+rm -f "$AH/.git/gate-inherited-green"
+ah2out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=2)
+check_attr_line "$ah2out" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · aged at R~2" \
+  "TOOL-dUnstuckLanding-16 AC1 a red already present at R~2 reads aged"
+n=$((n+1))
+{ [ -f "$AH/.git/gate-inherited-green" ] \
+    && [ "$(awk -F'\t' '$1=="base"{print $2}' "$AH/.git/gate-inherited-green")" = "$AGE_R" ] \
+    && [ "$(awk -F'\t' '$1=="max_age"{print $2}' "$AH/.git/gate-inherited-green")" = 2 ] \
+    && [ "$(awk -F'\t' '$1=="legs"{print $2}' "$AH/.git/gate-inherited-green")" = "aged leg" ]; } \
+  || { echo "canary: attribution — TOOL-dUnstuckLanding-16 AC1 an aged leg under a bound of 2 wrote no gate-inherited-green naming R, max_age 2 and the leg"; fail=1; }
+# AC2's first clause — no bound handed: the stamp is still written, with an EMPTY `max_age`.
+rm -f "$AH/.git/gate-inherited-green"
+ah3out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land)
+n=$((n+1))
+{ [ -f "$AH/.git/gate-inherited-green" ] \
+    && [ "$(awk -F'\t' '$1=="max_age"{print "<" $2 ">"}' "$AH/.git/gate-inherited-green")" = "<>" ] \
+    && [ "$(awk -F'\t' '$1=="legs"{print $2}' "$AH/.git/gate-inherited-green")" = "aged leg" ]; } \
+  || { echo "canary: attribution — TOOL-dUnstuckLanding-16 AC2 an INHERITED red with no age bound wrote no gate-inherited-green with an empty max_age"; printf '%s\n' "$ah3out" | grep -E '^(GATE attr|run-gates: inherited)' | sed 's/^/    /'; fail=1; }
+# AC2's last clause — a second leg reads OWN: nothing is stamped, at any age.
+AO="$AT/ao"; build_age_fixture "$AO" 1 own
+aoout=$(run_attr_bar "$AO" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=2)
+check_attr_line "$aoout" "own leg" "OWN" "TOOL-dUnstuckLanding-16 AC2 a leg green at R and red at L reads OWN"
+n=$((n+1))
+[ ! -f "$AO/.git/gate-inherited-green" ] \
+  || { echo "canary: attribution — TOOL-dUnstuckLanding-16 AC2 a bar with an OWN leg wrote gate-inherited-green, so a red of the run's own would land"; fail=1; }
 # THE CLOSING DIFF REVIEW'S F1 — NO-SIGNATURE LEGS WHOSE TEXT MOVED INSIDE THE WINDOW. The age probe
 # used to answer rc 1, the green code, for any probe red with output not byte-identical to L's, so
 # the bisection walked toward R and named the landing that CHANGED the text as the owner: an old red
@@ -2254,9 +2413,12 @@ _amrec=$(ls -1d "$AM"/.git/gate-run/*/ 2>/dev/null | tail -1)
 awk -F'\t' '$1 == "moved count" { seen = 1; if ($6 != "-" || $9 !~ /declares no signature/) bad = 1 }
     END { exit (bad || !seen) }' "${_amrec}attribution" 2>/dev/null \
   || { echo "canary: attribution — F1 the row for a moved count line carries an age, or a reason not naming the missing signature"; grep '^moved count' "${_amrec}attribution" 2>/dev/null | sed 's/^/    /'; fail=1; }
+# FLIPPED by TOOL-dUnstuckLanding-16 (AC2's middle clause): every leg here reads INHERITED — one
+# aged, one unproven, one numeric — so the stamp is written and names all three. Before ruling
+# TOOL-dUnstuckLanding-22 an aged or unproven leg blocked it.
 n=$((n+1))
-[ ! -f "$AM/.git/gate-inherited-green" ] \
-  || { echo "canary: attribution — F1 a bar whose moved-text legs cannot all be aged wrote gate-inherited-green, so an old red would land"; fail=1; }
+[ "$(awk -F'\t' '$1=="legs"{print $2}' "$AM/.git/gate-inherited-green" 2>/dev/null)" = "moved superset,moved count,moved inside" ] \
+  || { echo "canary: attribution — TOOL-dUnstuckLanding-16 AC2 a bar whose legs all read INHERITED, an unproven one among them, wrote no gate-inherited-green naming the three"; fail=1; }
 # THE SAME REVIEW'S F5, THIS RUNNER'S INSTANCE OF ITS CLASS. A signal arm runs `cleanup` and exits,
 # and that exit runs `cleanup` again from the EXIT trap: the worktree the first entry removed failed
 # to remove on the second, and the bar printed an orphan line naming a path already gone. The leg's

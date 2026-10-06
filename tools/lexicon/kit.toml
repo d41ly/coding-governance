@@ -160,12 +160,14 @@ name = "lexicon naming predicates"
 subject = "repo"
 argv = ["python", "{kit}/lexicon.py"]
 guard = ["{prefix}/", "skills/session-kickoff/", ".githooks/", ".claude/", ".lexicon.conf"]
+doc_reads = ["{memory_root}/builds/"]
 
 [[gate_leg]]
 name = "lexicon wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
 guard = []
+doc_reads = ["{memory_root}/builds/"]
 
 [[hole]]
 id = "lexicon-ratified"

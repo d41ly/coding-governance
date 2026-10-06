@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # adopt-process-monitor.test.sh — the adopter's refusals, each staged and observed RED.
 #
-# gov:kit process-monitor@0.12
+# gov:kit process-monitor@0.14
 #
 # Every arm here stages a break into a SCRATCH copy of the conf and asserts the adopter refuses.
 # Nothing is asserted about the shipped tree except by the two arms that say so, because a suite
@@ -207,19 +207,31 @@ fi
 HOOK="$KIT_DIR/procmon-hook.js"
 GD=$(git -C "$ROOT" rev-parse --git-common-dir 2>/dev/null)
 run_hook() { printf '%s' "$1" | CLAUDE_PROJECT_DIR="$ROOT" PROCMON_PYTHON="${2:-$TESTPY}" node "$HOOK" 2>&1; }
+# THE CLEAN ARM RUNS AGAINST A FIXTURE ROOT, never the real one (TOOL-dUnstuckLanding, the close's
+# bar). Over the real root the census reads the HOST: a Claude Code session running in this repo for
+# longer than the shipped 4h ceiling is a live process carrying the repo path, so "clean is silent"
+# was red on any node with a long session open, the session running the bar included. The fixture's
+# conf scopes the census to an empty directory, so silence there is a property of the code and not
+# of what else the machine is running. The census is still the real one beside the real hook.
+_cleandir="$WORK/cleanroot"; mkdir -p "$_cleandir"
+git -C "$_cleandir" init -q 2>/dev/null
+_clean_w=$( cd "$_cleandir" && { pwd -W 2>/dev/null || pwd; } )
+sed "s|^PROCMON_ROOTS=.*|PROCMON_ROOTS=\"$_clean_w $_cleandir\"|" "$ROOT/.process-monitor.conf" > "$_cleandir/.process-monitor.conf"
+CLEAN_GD=$(git -C "$_cleandir" rev-parse --absolute-git-dir 2>/dev/null)
+run_clean_hook() { printf '%s' "$1" | CLAUDE_PROJECT_DIR="$_cleandir" PROCMON_PYTHON="${2:-$TESTPY}" node "$HOOK" 2>&1; }
 
 if [ -f "$HOOK" ] && command -v node >/dev/null 2>&1; then
-  rm -f "$GD/procmon-stamp" 2>/dev/null
-  _out=$(run_hook '{"hook_event_name":"PostToolUse"}')
+  rm -f "$CLEAN_GD/procmon-stamp" 2>/dev/null
+  _out=$(run_clean_hook '{"hook_event_name":"PostToolUse"}')
   if [ -z "$_out" ]; then add_pass "test_clean_is_silent"; else add_fail "test_clean_is_silent (got: $_out)"; fi
 
   # The stamp is written AFTER the work: a hook that stamps first throttles itself out of ever
   # running again the moment it crashes, and that silence reads exactly like a clean tree.
-  if [ -f "$GD/procmon-stamp" ]; then add_pass "test_stamp_is_written_after_the_run"; else add_fail "test_stamp_is_written_after_the_run"; fi
+  if [ -f "$CLEAN_GD/procmon-stamp" ]; then add_pass "test_stamp_is_written_after_the_run"; else add_fail "test_stamp_is_written_after_the_run"; fi
 
   # The throttled path must spawn NOTHING. Shimming python to a name that cannot exist proves it:
   # had the early exit run a census, this would report the failure instead of staying silent.
-  _out=$(run_hook '{"hook_event_name":"PostToolUse"}' nonesuch-python-shim)
+  _out=$(run_clean_hook '{"hook_event_name":"PostToolUse"}' nonesuch-python-shim)
   if [ -z "$_out" ]; then add_pass "test_throttled_path_spawns_nothing"; else add_fail "test_throttled_path_spawns_nothing (got: $_out)"; fi
 
   # SessionStart ignores the window: a fresh session inherits another session's stamp, and that is

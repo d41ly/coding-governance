@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-06T13:02:13+03:00 @ f9b2bb5cf2d3967c0091a0750957186294261da2
+last-audit: 2026-10-06T21:39:55+03:00 @ e3c6570b65dc3883e879702dc8f5c3c33deb5459
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: f9b2bb5cf2d3967c0091a0750957186294261da2
+last-body-change: e3c6570b65dc3883e879702dc8f5c3c33deb5459
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -51,9 +51,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   BUILD-METHOD's, both changed under `TOOL-dUnstalledConvoy`, and both invert what a session would
   otherwise assume: M2/M3 give a run delegated authority to retire, supersede or add units inside the
   build's stated goal rather than stalling on a spec that turned out wrong, and M6's parallel default
-  now binds delegated passes only. Conditions and bounds are M3's and M6's. What
-  is NOT in force is the VERIFICATION: `--dispatch` records a pass's declared write set and the
-  comparison only REPORTS (`TOOL-dUnstalledConvoy-23`). Declare them anyway; green is not a proof.
+  now binds delegated passes only. Conditions and bounds are M3's and M6's. Check 23 counts only a
+  pass that overlapped a sibling and fails only the branch's own run, over `UNDECLARED_WRITE_BUDGET`;
+  `--check-commit` refuses an undeclared staged path (`TOOL-aWindowedPass-1`, `-3`, `-5`).
 
 - **Every session start writes an ORIENTATION CARD** at `<git-common-dir>/orientation/<session_id>.md`
   (`manifest-check.sh --card --write`, wired as a SessionStart hook; `--card --replay` re-injects it
@@ -126,9 +126,10 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   floor is excluded and printed with its count, a one-segment root such as `tools/` under the sub-head
   declares nothing, and a spec with no Gates heading is not joined. `TOOL-aBlindedTrial-8`.
 
-- **The pre-code spec audit is owed where the build README's `spec-audit: <date>` OR `.unattended.conf`'s
-  `SPEC_AUDIT_DEFAULT` (read at BASE, the README winning) declares it; under neither, nothing is owed
-  and the kickoff engine asks the owner once at READY.** `TOOL-aBlindedTrial-6`, `-7`, `KICK-aBlindedTrial-1`.
+- **The pre-code spec audit is owed where the OWNER declares it: a `slug` README's `spec-audit: <date>`
+  OR `.unattended.conf`'s `SPEC_AUDIT_DEFAULT` on the default branch; a run never declares either.
+  Under neither, none is owed; kickoff asks at READY.**
+  `TOOL-aBlindedTrial-6`, `-7`, `TOOL-aWardedAudit-4`, `KICK-aBlindedTrial-1`.
 
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
   `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one second. Hit twice:
@@ -176,7 +177,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY, at the width tools/run-gates/gate-profiles.txt declares for the detected hardware; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
 # Legs report in CHUNKS, each closing with a verdict line, so a red is readable before the run ends. A chunk whose every leg skipped reports skipped, never green.
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
-GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD. .githooks/pre-push no longer sets this unconditionally: it decides, and prints which it chose and why
+GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD and the docs mode (GATE_DOCS_BASE). .githooks/pre-push decides, and prints which it chose and why
 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
 # Every leg declares a `ceiling` in tools/gate-legs.json; one outliving it gets ONE serial retry (a pass is green); all-HOST exits 4. TOOL-aBoundedCeiling-1
 # The whole RUN has a wall, per profile row; GATE_WALL overrides. A breach kills the legs. TOOL-aQuenchedHarness-1

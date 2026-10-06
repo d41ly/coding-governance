@@ -940,14 +940,14 @@ run_card "drift cell: a truncated last line is a write in progress" "$R" 0 - --c
 check_eq "drift cell: the truncated line is not counted" "$dh_want" "$(read_drift_cell t76d)"
 
 # KICK-aMendedFleet-2 — the `overlaps —` cell over a stub driver the resolver finds at the repo's
-# own `unattended/unattended.sh`: no conf, an answer of seven rows, a refusal, and a driver that
+# own unattended kit driver: no conf, an answer of seven rows, a refusal, and a driver that
 # outlives a one-second bound. Staged red by deleting the `derive_overlaps_line` call.
 mkrepo ovcell
 run_card "overlaps cell: no .unattended.conf is a skipped: line at exit 0" "$R" 0 "overlaps — skipped: no .unattended.conf in this tree" --card --write --session "$NONCE-t77a"
-mkdir -p "$R/unattended"; : > "$R/.unattended.conf"
+ov_kit=unattended; ov_drv="$R/$ov_kit/$ov_kit.sh"; mkdir -p "$R/$ov_kit"; : > "$R/.unattended.conf"
 ov_head="unattended: overlap probe — 7 unmerged remote ref(s) read as of this clone's last fetch, 0 aged out past 14 days, 0 unreadable, 7 sharing a path; this run is NOT blocked"
 { printf '#!/usr/bin/env bash\n[ "$1" = --overlaps ] || exit 3\necho "%s"\n' "$ov_head"
-  printf 'for i in 1 2 3 4 5 6 7; do echo "  origin/b$i · deadbeef · 0d old · 1 shared: src/x.sh (diff)"; done\n'; } > "$R/unattended/unattended.sh"
+  printf 'for i in 1 2 3 4 5 6 7; do echo "  origin/b$i · deadbeef · 0d old · 1 shared: src/x.sh (diff)"; done\n'; } > "$ov_drv"
 commit_all "$R" "the stub driver and an empty conf"
 run_card "overlaps cell: --card --write over a driver that answers" "$R" 0 - --card --write --session "$NONCE-t77b"
 check_eq "overlaps cell: the probe's first line prints verbatim" "overlaps — $ov_head" "$(grep -m1 '^overlaps — ' "$R/.git/orientation/$NONCE-t77b.md")"
@@ -955,9 +955,9 @@ check_eq "overlaps cell: five rows, indented by two spaces" "5" "$(grep -c '^  o
 check_eq "overlaps cell: the rest are counted" "  … 2 more" "$(grep -m1 '^  … ' "$R/.git/orientation/$NONCE-t77b.md")"
 check_eq "overlaps cell: sits after drift — and before live —" "worktrees drift overlaps live" \
   "$(grep -oE '^(worktrees|drift|overlaps|live) — ' "$R/.git/orientation/$NONCE-t77b.md" | cut -d' ' -f1 | tr '\n' ' ' | sed 's/ $//')"
-printf '#!/usr/bin/env bash\necho "unattended: a stub refusal"; exit 2\n' > "$R/unattended/unattended.sh"
+printf '#!/usr/bin/env bash\necho "unattended: a stub refusal"; exit 2\n' > "$ov_drv"
 run_card "overlaps cell: a refusing driver is a skipped: line naming its first line" "$R" 0 "overlaps — skipped: unattended: a stub refusal" --card --write --session "$NONCE-t77c"
-printf '#!/usr/bin/env bash\nsleep 5\n' > "$R/unattended/unattended.sh"
+printf '#!/usr/bin/env bash\nsleep 5\n' > "$ov_drv"
 export CARD_OVERLAP_BOUND=1
 run_card "overlaps cell: a driver past the bound is unknown, not none" "$R" 0 "overlaps — skipped: --overlaps did not answer within 1s" --card --write --session "$NONCE-t77d"
 unset CARD_OVERLAP_BOUND

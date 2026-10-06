@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.61 -->
+<!-- gov:kit unattended@1.68 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -20,7 +20,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   config, and the run's first act must not be the mode whose past over-firing this protocol cites.
   Where the project declares `GATE_PROFILE_CMD` it pins the bar's backstop, the runner's wall plus
   its queue bound plus a margin, as the `gate-backstop` fact, and it refuses a wall below the
-  largest leg ceiling that profile reports.
+  largest leg ceiling that profile reports. It resolves this node against `LANDING_NODES` at BASE
+  and at the advertised tip, lander only where both list it and undeclared only where neither
+  declares the key, prints `landing — lander`, `handoff` or `undeclared`, and records the first two
+  as `landing`. A record `--settle` marked `abandoned` it retires like a finished one.
 - `--phase` — writes a phase and its witness. Without it the vocabulary is decorative: only
   `--preflight` and `--close` ever wrote one, so every member between them entered the file only by
   hand-editing an artifact this kit calls generated.
@@ -31,7 +34,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   what a gate reads. The run then carries on with the units that do not depend on that fork. Only
   when EVERY remaining unit depends on it does the run halt, with the fork-unresolvable code — a run
   that can still make progress on something else is not stuck, and stopping early spends an owner
-  turn that was not needed.
+  turn that was not needed. A park that is not a no-op REFRESHES first: it lists the commits on the
+  advertised tip in neither BASE nor HEAD that touch the build's README or a declared write, and
+  records `refreshed-at` — the tip and the count, `unlisted` for a tip this clone lacks, or
+  `unobserved` — never refusing and never fetching.
 - `--brief` — records WHAT a build pass was handed: the unit, and the hash of a TRACKED brief file,
   through `park()` as a `history` kind. `--status` reads it, grading each unit's LATEST row.
 - `--propose` — writes a PROPOSAL: an amendment a run would make to the playbook it is following,
@@ -86,10 +92,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   NOTHING. Without the flag the one-slug form stays byte-identical to what it has always been.
 - `--status` — ONE line, opened by `unattended: <slug>`, with every field after it joined by ` · `
   in the order this entry names them. The phase, the witness and the next unit print on every line:
-  `phase <phase>`, where a derived LANDED reads `LANDED (derived: <sha8> on <ref> at <tip8>)` and a
-  LANDING the derivation explains reads `LANDING (not on the remote: <reason>)`; `witness <sha>`,
-  the sha reading `NONE` on a record that names none, which the verb then refuses; and
-  `next <unit>`, the link label of the first non-terminal row in the generated units region, or
+  `phase <phase>`, where a LANDED an owner's hand-off made, derived or settled, reads
+  `LANDED (attended)`, any other derived LANDED reads `LANDED (derived: <sha8> on <ref> at <tip8>)`,
+  and a LANDING the derivation explains reads `LANDING (not on the remote: <reason>)`;
+  `witness <sha>`, the sha reading `NONE` on a record that names none, which the verb then refuses;
+  and `next <unit>`, the link label of the first non-terminal row in the generated units region, or
   `(no non-terminal unit)`. Every other field is OPTIONAL and prints only under the condition named
   beside it, so a record none of them applies to prints only the fields above. Between the witness
   and `next`: `halt-code <code>` when the record carries one, then `spec-audit <date>` when it pins
@@ -141,7 +148,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
 - `--resume` — re-enters the run from the run-state file; must agree with `--status`. With
   `--keepalive-id <id>` it applies the resume matrix: the holder's own id writes nothing, while a
   take-over, `--replaces`, the holder's restarted process and a pushed landing not yet observed
-  re-record keepalive, session and pid and stage the record; refused on a recorded terminal.
+  re-record keepalive, session and pid and stage the record; refused on a recorded terminal, and on
+  a record `--settle` marked `abandoned`, whose next run `--preflight` starts.
   `--scheduled <held-at>` marks it as the restart a DURABLE schedule issued. It refuses, numbered
   and before any write, unless the exact hold that schedule was filed for is still the record's
   state, and on success the take-over runs unchanged, still requires the session's own
@@ -151,7 +159,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one. Its bar is
   bounded by the pinned backstop, and `gates-green` names each other way a bar ends as what it is: a
   TREE MOVED exit is run once more, and a HOST exit or a kill before the bar acquired the repository
-  prints a `hold ·` line rather than reading as a red leg.
+  prints a `hold ·` line rather than reading as a red leg. Under `primary` it prints `--park`'s
+  refresh before the DoD and records `refreshed-at` only with a met DoD's writes. It resolves its own
+  node again, at BASE before the anchor round-trip and at the advertised tip after it, and on a
+  `landing` hand-off node it refuses any override and, with the DoD
+  met, writes the bar's facts and refuses, naming `--handoff <slug> --code owner-landing`.
 - `--landed` — an OBSERVATION rather than a claim, guarded on the RECORDED phase. It accepts a record
   only at `LANDING` and re-observes the anchor. Under `primary` it is the one writer of `LANDED` and
   refuses unless HEAD is an ancestor of the tip the remote advertises; where `LANDER_MARKER` is
@@ -170,9 +182,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   id prints `keepalive-reaped: checked`; no sidecar, or no recorded id, prints `unchecked` with the
   reason and lands. It parses nothing beyond a substring test for the id, and it does not check that
   the id was ever this run's job.
-- `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add`, the unit
-  as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the three
-  acts; this verb is the record. It RECORDS rather than acts: a row derived from the change it just
+- `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add|defer`, the
+  unit as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the
+  first three acts; this verb is the record. `defer` sets a roster unit aside against an open ask so
+  `build-complete` can carry it forward (`UNATTENDED-STOPS.md` §15); it refuses `--successor`, and like
+  `retire` and `supersede` it is owed to the owner at the wrap-up. It RECORDS rather than acts: a row derived from the change it just
   made is a summary, and a check comparing the two confirms the driver instead of
   checking it. Nothing forces the call to precede the edit, so the row is a declaration in shape
   rather than in enforced ordering: the pair catches an amendment made with NO record, never a
@@ -203,28 +217,25 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   smaller than the round before — and a subject that is NOT the build slug, a spec audit, takes at
   most the declared `REVIEW_ROUNDS` rounds (kit default 1) before it exits `BOUNDED`; the build slug
   is the closing diff review and its bound is the runaway ceiling, so it converges or backstops as it
-  always did. At a TERMINAL exit — `NON-CONVERGENT`, `CEILING` or `BOUNDED` — the round RECORDS its
-  disposition, and `promote` is the ONLY value a terminal exit can record: every such exit carries at
-  least one BLOCKER by construction, since a zero count is `CONVERGED`, and the severity rule the
-  Skill's exit bullet states promotes every blocker, so `--disposition promote` is REQUIRED there and
-  `fold` beside a standing blocker is REFUSED rather than written. `fold` survives as the reading of
-  a record that exited with nothing above MEDIUM, which the driver reaches only at `CONVERGED` with
-  no high, and that row needs no field. On a SPEC subject's `CONVERGED` an optional
-  `--disposition promote` is ACCEPTED, never required, for the round whose highs stood: it is the value that demands new unit
-  ids, and a mixed exit takes the value that demands something, so the gate counts the unit a high
-  became instead of reading the promotion as nothing. A record naming no value where one is owed
-  leaves the gate inferring one from ids. It refuses a verdict or a disposition outside its closed
-  set, a missing subject or count, a terminal exit carrying no disposition, `fold` at a terminal
-  exit, a disposition on a `CONVERGING` round, and a round on a subject whose loop has already ended.
-  **The closing diff review — the build-slug subject — counts what stood.** Owner ruling of
-  2026-10-04: every finding it confirms is promoted, one unit per BLOCKER and HIGH and the MEDIUMs
-  and LOWs batched into one unit, two only across disjoint write sets. Its terminal round therefore
-  REQUIRES `--highs <n>` and `--minors <n>`, the confirmed HIGH and MEDIUM-plus-LOW findings standing
-  at the exit, and writes them before the disposition: `blockers <b> · <EXIT> · highs <h> · minors
-  <m>[ · disposition promote]`. It requires `promote` when anything stood, refuses `fold` outright,
-  refuses `promote` when nothing stood, and refuses either count on a spec subject or a non-terminal
-  round. Check 2 reads a row carrying both counts as owing `blockers + highs`, plus one for the
-  minors when any stood, new non-WONTDO unit ids; every other row keeps the floor of one.
+  always did. At a TERMINAL exit — `CONVERGED`, `NON-CONVERGENT`, `CEILING` or `BOUNDED` — on EVERY
+  subject, spec subjects included, the round REQUIRES `--highs <n>` and `--minors <n>`, the confirmed
+  HIGH and MEDIUM-plus-LOW findings standing at the exit, and writes them before the disposition:
+  `blockers <b> · <EXIT> · highs <h> · minors <m>[ · disposition promote]`. Owner rulings of
+  2026-10-04 for the closing diff review, the build-slug subject, and of 2026-10-05 for a spec
+  subject: every finding a terminal exit confirms is promoted, one unit per BLOCKER and HIGH and the
+  MEDIUMs and LOWs batched into one unit, two only across disjoint write sets. So `promote` is the
+  ONLY value a terminal exit can record. It is REQUIRED whenever anything stood, "because every
+  confirmed finding there is promoted", and refused when nothing did, since it "promotes nothing, and
+  the gate would read the row as owing a unit". `fold` is refused at every terminal exit of every
+  subject, which "folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched
+  into one unit or two". `fold` survives only as the reading of a row written before spec subjects
+  counted their exits, which carries no counts. A record naming no value where one is owed leaves the
+  gate inferring one from ids. It refuses a verdict or a disposition outside its closed set, a
+  missing subject or count, a terminal exit missing either count or a disposition it owes, `fold` at
+  a terminal exit, a disposition or either count on a round that is not a terminal exit, and a round
+  on a subject whose loop has already ended. Check 2 reads a row carrying both counts as owing
+  `blockers + highs`, plus one for the minors when any stood, new non-WONTDO unit ids; every other
+  row keeps the floor of one.
 - `--check-commit` — `--check-commit <message file>`, run by the `commit-msg` hook on EVERY commit.
   It binds the run whose branch this worktree has checked out and is silent when there is none. A
   `Pass: <unit-id>` trailer must name an open dispatched pass, and the staged paths, less the
@@ -258,12 +269,34 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   recorded as `hold-run`, rewritten EMPTY by a hold without it, printed on the HELD checkpoint and
   named by a take-over's relaunch line, and a value outside 1 to 64 letters, digits, `_` and `-` is
   refused with the rest. The contract is `UNATTENDED-STOPS.md`.
+- `--handoff` — the exit for a run whose work is sound and which an owner must land, or decide
+  first. `--handoff <slug> --code owner-landing|owner-decision --reason <text>` plus exactly one of
+  `--reaped <id>` and `--keepalive-unreachable <node>`. It is `--hold` with the condition fixed at
+  `owner`, so every refusal a hold makes applies and no durable restart is owed, and it is the only
+  producer of the two hand-off codes, which `--hold` refuses. It adds the landing recipe as a
+  `handoff` row the owner is shown, and `units-at-landing` and `asks-at-landing` as `--close` writes
+  them. `owner-landing` is refused over a bar that is not GREEN unless every red leg reads INHERITED;
+  `owner-decision` requires a parked decision row. The contract is `UNATTENDED-STOPS.md` §2 and §4.
+  The recipe's last command is `--settle`, through this kit's own repo-relative path. After its
+  last refusal it makes `--park`'s refresh and records `refreshed-at` with its writes.
+- `--settle` — writes what git proves onto a slug's live record. `--settle <slug>`. A hand-off its
+  owner landed, which every deriving reader already reads `LANDED (attended)`, becomes `phase:
+  LANDED` with `landed-by: attended` and `landed-derived`. An `ABORTED` record first committed before
+  `HANDOFF_CUTOFF`, and a working record whose `--liveness` verdict is `STALE` or `UNBOUND`, gain
+  `work-landed-at: <witness> <tip>` when the content predicate reads the run's own commits on the
+  advertised tip and none reverted; the working one gains `abandoned` too and keeps its phase. It
+  refuses, numbered and before any write, everything else, an unanswered remote and an undecidable
+  predicate; a settled record is said so, with nothing written. It STAGES and never commits. The
+  contract is `UNATTENDED-STOPS.md` §12.
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
   effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
   nothing, so the machine items assert obligations it does not have, while the idle-wake is still
   orphaned and the parked decisions still unseen. The code is validated before it is recorded and the
   refusal names the legal set; it is the twelfth authored fact, and it exists because one terminal
-  phase said a run stopped and never said why.
+  phase said a run stopped and never said why. From `HANDOFF_CUTOFF` an `ABORTED` record means
+  DISCARD, and an abort naming a hand-off-shaped halt code, on a record first
+  committed on or after it prints a notice naming `--handoff`, then aborts as asked; it never refuses.
+  With both attested items met it makes `--park`'s refresh and records `refreshed-at` beside the phase.
 
 ## The paths, in order
 
@@ -347,7 +380,8 @@ one are two acts with two authorizations.
    and its recorded reason at `--close`, and where the project sets a reuse-evidence cutoff the memory
    gate refuses a spec whose §10 lacks EITHER the recall terms or a probe result; a waived run's spec
    §10 still NAMES the waiver, which the gate accepts as a finding. **`land-once-done`**: the
-   Definition-of-Done item that observes completeness stays, and still owes an override at close.
+   Definition-of-Done item that observes completeness stays, and still owes an override at close
+   unless every unfinished unit is carried forward (`UNATTENDED-STOPS.md` §15).
    Neither `recipe` row states its rule, deliberately: following a declared procedure to the letter
    IS the pass loop and its regrounding rule (M7), and recording what was produced IS the wrap-up
    derivation (M9).
@@ -383,10 +417,14 @@ one are two acts with two authorizations.
    `unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: <date>` when the README
    declares no key (`TOOL-aBlindedTrial-7`; the README key wins whatever it says); or
    `unattended: spec-audit — not owed (opt-in)`. The audit is OPT-IN per build (owner ruling of
-   2026-09-20, `TOOL-aBlindedTrial-6`); both keys are read at BASE, so a working-copy edit opts
-   nothing in or out, and a value that is not a date is a refusal. `not owed` carries a
-   recommendation when the build has two or more units or a spec grades FORKED. Keep the line: the
-   harness call needs it, and after a compaction `--status` carries it as `· spec-audit <date>`.
+   2026-09-20, `TOOL-aBlindedTrial-6`); the README key is read at BASE and the project default at
+   the default-branch side of it, so a working-copy edit opts nothing in or out, and a value that is
+   not a date is a refusal. **The opt-in is the OWNER's, never yours** (`TOOL-aWardedAudit-4`): do
+   not write `spec-audit:` into a README you author, which preflight refuses under `authorized-by:
+   prompt` or `recipe` (check 89), except a `prompt` README whose prompt record at BASE quotes the
+   owner asking for the audit (owner, 2026-10-05). `not owed` names the owner's cue, two or more
+   units or a FORKED spec: carry it to the wrap-up and decide nothing. Keep the line: the harness
+   call needs it, and after a compaction `--status` carries it as `· spec-audit <date>`.
 4. **`/session-kickoff`, if the project ships it — after preflight, never before.** Its unattended
    hand-back fires only when a non-terminal run-state file exists, which only `--preflight` creates;
    invoked first it halts at its READY card for a confirmation nobody is present to give. It buys the
@@ -458,7 +496,9 @@ the run, which makes "the owner was asked at the start" a property of the commit
 3. **Write the build folder**, `builds/<slug>/README.md` under the memory root, with ALL SIX required
    front-matter keys — `slug`, `node`, `opened`, `streams`, `roster`, `ids` — plus
    `authorized-by: prompt`, and the generated-region marker pair `gen:build-index` with its close, or
-   preflight refuses at step 5 that *the build README's generated markers are malformed*.
+   preflight refuses at step 5 that *the build README's generated markers are malformed*. **No
+   `spec-audit:` key**: under this mode check 89 refuses it, because a run may not opt itself into
+   the audit.
    **The prompt goes to a RECORD, never into the README**: under `builds/<slug>/prompts/`, carrying
    its `**Serves:**` line and, where the value was a path, the path it came from — the bytes travel,
    because the authorization may not point at a file editable after the run starts. Not the README:
@@ -574,12 +614,13 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   once over the set, with `--verdict PASS`, `FAIL`, or `NA` for a leg whose declared coverage mode
   is dark. The verdict is validated for SPELLING alone — nothing compares the word to an outcome.
 - **When building uncovers what speccing could not, AMEND — do not stall** (M2, M3):
-  `--rescope <slug> --act retire|supersede|add --item <unit-id> [--successor <unit-id>] --reason
-  "<what building uncovered>"`. The README's GOAL statement may not be amended and a governance
-  carrier's stated constraints are out of reach. An id in the units region never LEAVES it: retiring
-  is a status flip to `WONTDO` with a successor or reason, because the authorization compares BASE
-  against HEAD as a subset. `retire` and `supersede` are surfaced-class rows your
-  `parked-decisions-surfaced` attestation must cover; `add` stays history.
+  `--rescope <slug> --act retire|supersede|add|defer --item <unit-id> [--successor <unit-id>]
+  --reason "<what building uncovered>"`; `defer` is the close's carry-forward act, below. The
+  README's GOAL statement may not be amended and a governance carrier's stated constraints are out
+  of reach. An id in the units region never LEAVES it: retiring is a status flip to `WONTDO` with a
+  successor or reason, because the authorization compares BASE against HEAD as a subset. `retire`,
+  `supersede` and `defer` are surfaced-class rows your `parked-decisions-surfaced` attestation must
+  cover; `add` stays history.
 - **Before dispatching a pass, DECLARE its write set** (M6): `--dispatch <slug> --pass <unit-id>
   --writes <path> --writes <path>`, one path per `--writes`. It refuses two passes claiming one file
   and a pass claiming a shared mutable record; a generated index alone is fine and only the index
@@ -592,7 +633,8 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   SPEC, then — only where the build or its project declares the audit — AUDIT and DISPOSAL, and hands
   back the ordered roster on a terminal `--review` verdict, or at SPEC completion when the audit is
   off. Pass `specAudit: <date>` when the preflight line read `opted in by README spec-audit: <date>`
-  or `opted in by project default SPEC_AUDIT_DEFAULT: <date>`, and omit it on `not owed (opt-in)`.
+  or `opted in by project default SPEC_AUDIT_DEFAULT: <date>`, and omit it on `not owed (opt-in)`;
+  the fan-out hook compares the value with the run's pinned `spec-audit` fact and refuses any other.
   The unit harness then builds ONE unit per call from its brief and its spec. Every call is made by
   `scriptPath`, never by `name`: the fan-out guard's read-window narrowing is conditional on
   `scriptPath`. Read the build method WHOLE before the first call. The child runs no gate, suite or
@@ -612,7 +654,8 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
     (`UNATTENDED-ASKS.md` §3); `next: none - every tracked spec is terminal` ends the loop;
     `next: none - no tracked spec grades as a unit` does NOT — halt and read the NOT A UNIT rows, the
     verb still exits 0. A child returning `committed:false` stops the loop. Nothing refuses the next
-    dispatch for you: the one refusal of an early stop is `build-complete` at `--close`.
+    dispatch for you: the one refusal of an early stop is `build-complete` at `--close`, and its
+    escapes are a unit carried forward against an open ask or a recorded `--override build-complete`.
 - **Run the bug-class checklist after every commit**, before the next pass: the memory-tree kit's
   `gotchas.py --for-diff HEAD~1..HEAD`. It takes a COMMITTED range, so before the commit it prints
   "touches no file", which reads like a clean checklist and is not one. Its stdout IS the checklist
@@ -630,31 +673,40 @@ Record EVERY round: `--review <slug> --subject <id-or-slug> --verdict <verdict> 
 is `CLEAN`, `CLEAN WITH FIXES` or `BLOCKED`; `--blockers` is THIS round's confirmed count. Act on the
 state it answers (the rule is M4 and M8; the verb entry above states the recording):
 
-- **CONVERGING** — strictly smaller than the round before. Fold and go again; on the closing diff
-  review the fold fixes BLOCKERS only, and the rest carries to the exit (M8).
+- **CONVERGING** — strictly smaller than the round before. Fold and go again: on a SPEC subject the
+  fold fixes what that round confirmed and only the exit promotes; on the closing diff review it
+  fixes BLOCKERS only, and the rest carries to the exit (M8).
 - **CONVERGED** — zero blockers; its confirmed highs, mediums and lows are still disposed by
-  severity. Where a HIGH stood on a SPEC subject, record `--disposition promote` on that round.
+  severity. The round records `--highs` and `--minors` on every subject, and `--disposition
+  promote` whenever anything stood.
 - **NON-CONVERGENT** — the count did not shrink. The loop STOPS and every CONFIRMED finding is
   DISPOSED BY SEVERITY: a BLOCKER or HIGH becomes a UNIT whose mechanism closes it, specced, audited
-  as a SPEC, built and closed; on a SPEC subject a MEDIUM or LOW is FOLDED as a `rev-N` bump with its
-  §9 line. Never parked, waived, RETIRED or re-reviewed — a promoted unit flipped to `WONTDO` would
-  satisfy both the promotion count and `build-complete`. Record `--disposition promote`; `fold` at an
-  exit with blockers is refused.
+  as a SPEC, built and closed; a MEDIUM or LOW is PROMOTED too, on every subject, batched as the
+  paragraph below states. Never folded, parked, waived, RETIRED or re-reviewed — a promoted unit
+  flipped to `WONTDO` would satisfy both the promotion count and `build-complete` — and never
+  DEFERRED to be carried forward, since `build-complete` carries only a unit the roster held when the
+  run started. Record `--highs`, `--minors` and `--disposition promote`; `fold` is refused at every
+  exit of every subject.
 - **BOUNDED** — `REVIEW_ROUNDS` (kit default 1) reached on a subject that is not the build slug.
-  Disposed exactly as `NON-CONVERGENT`, recorded `promote`. A promotion here is not audited by the
-  round that produced it: after `--rescope --act add` and the new spec, re-invoke the harness at round
-  N+1 — a post-disposal re-invoke passes `auditIds` and no `subjectRound`, a fold re-invoke copies the
-  `subjectRound` the CONVERGING return handed back, and `auditIds` and `subjects` are never passed
-  together. Skip it and `specs-audited` refuses at `--close` where an audit is declared.
+  Disposed exactly as `NON-CONVERGENT`, recorded with both counts and `promote`. A promotion here is
+  not audited by the round that produced it: after `--rescope --act add` and the new spec, re-invoke
+  the harness at round N+1 — a post-disposal re-invoke passes `auditIds` and no `subjectRound`, a
+  fold re-invoke copies the `subjectRound` the CONVERGING return handed back, and `auditIds` and
+  `subjects` are never passed together. Skip it and `specs-audited` refuses at `--close` where an audit is declared.
 - **CEILING** — the runaway backstop fired: a defect in the predicate. Promote, land anyway, and
   record it in the build README.
 
-**The closing diff review promotes EVERY confirmed finding** (owner ruling of 2026-10-04): a unit per
-BLOCKER and HIGH, the MEDIUMs and LOWs batched into ONE unit, TWO only across disjoint write sets by
-M6. Its terminal round carries `--highs <H> --minors <M> --disposition promote`, derived from the
-harness returns, never the report: per round, `<H>` adds that round's `highs` and `<M>` adds
-`confirmed - blockers - highs`, summed over every round. Strictly smaller, never merely different:
-2, 1, 2 changes forever. A subject whose loop ended takes no further round.
+**Every terminal exit promotes EVERY confirmed finding, and COUNTS them** (owner rulings of
+2026-10-04 for the closing diff review and 2026-10-05 for a spec subject): a unit per BLOCKER and
+HIGH, the MEDIUMs and LOWs batched into ONE unit, TWO only across disjoint write sets by M6. The
+terminal round on every subject carries `--highs <H> --minors <M> --disposition promote`, refused on
+a round that is not one. On a spec subject the build harness records them itself. Otherwise derive
+both from the harness returns, never the report: on the closing diff review, per round, `<H>` adds
+that round's `highs` and `<M>` adds `confirmed - blockers - highs`, summed over every round; on a
+spec subject recorded by hand they are that exit round's `highs`, and its `confirmed - blockers -
+highs` plus every UNVERIFIED finding the disposal promoted, with no summing, because a spec round's
+fold fixes everything that round confirmed. Strictly smaller, never merely different: 2, 1, 2
+changes forever. A subject whose loop ended takes no further round.
 
 ### Resume
 
@@ -719,15 +771,24 @@ Read the run-state file before anything else (`UNATTENDED-STOPS.md` §8 and §9 
    `--value "yes, <n> surfaced"`, a count `--close` checks against the record's surfaced lines,
    `history` rows and this close's own overrides excluded.
 6. **A bar exiting 3, TREE MOVED, is re-run once by the item**; a second is unmet and yours to find.
-7. **An INHERITED red is not yours to override.** Under `land`, an inherited-only red inside its age
-   bound is met; under `park` or past the bound the item prints the inherited-red hold, and the
-   Skill's hold routing applies. `--override gates-green` and `--abort --code gate-red-out-of-scope`
-   are refused unless every red leg reads INHERITED at HEAD. You may instead ABSORB the red on
+7. **An INHERITED red is not yours to override.** Under `land`, the kit default, an inherited-only
+   red is met at any age, and a leg older than the age bound has its ask filed BLOCKER; under a
+   declared `park` the item prints the inherited-red hold, and the Skill's hold routing applies.
+   `--override gates-green` and `--abort --code gate-red-out-of-scope` are refused unless every red
+   leg reads INHERITED at HEAD. You may instead ABSORB the red on
    `UNATTENDED-STOPS.md` §13's four conditions, in a commit of its own.
 8. **An override names its item and a reason, one pair per unmet item**:
    `--close <slug> --override <item> --reason "<why>"`, repeated. A `--override` without its own
    `--reason` is refused before anything is written; the override surfaces in the wrap-up as a
    parked entry.
+9. **A unit you cannot finish is carried forward, not overridden.** At the close a park is never an
+   abort: take the exit `UNATTENDED-STOPS.md` §15's close-decision table names, for a partial build
+   the carry-forward term. A unit of the roster the run started with, waiting on an open ask this
+   build filed, gets spec status `DEFERRED` with `closes` or `advances` naming that ask, and
+   `--rescope <slug> --act defer --item <unit-id> --reason "<why it waits>"`. `build-complete` then
+   meets and prints one `carried forward` line per unit. It stays unmet, naming the unit and the
+   condition, when the unit was added during the run, its ask is not open, or a CLOSED unit declares
+   `consumes-from` onto it; that build is a `--handoff` under `owner-decision`, never an override.
 
 ### Record the run
 
@@ -786,6 +847,27 @@ NAME, going on when no task has it, then (2) `RESUME_SCHEDULE_CREATE` under that
 instant, ONE-SHOT, with the three printed prompt lines copied VERBATIM, neither rewritten nor given
 the hold reason. The carrier must be DURABLE; the keepalive's scheduler is session-scoped, and the
 kit gate reds a conf that names it here.
+
+### Hand it off — done, but you may not land it
+
+`--handoff <slug> --code owner-landing|owner-decision --reason "<why an owner has to take it from
+here>" --reaped <the keepalive id you just deleted>`. Use it, not `--abort`, when the work is sound
+and the one step left is the owner's: the landing itself, from a node that may not land or onto an
+order only the owner sets, or a decision the mandate does not delegate. `ABORTED` means DISCARD, and
+a run whose work then lands anyway leaves a record that contradicts git for good. `owner-landing`
+means nothing to decide, and is refused unless the last bar the record names reads GREEN on this
+tree or every red leg reads INHERITED: an OWN red is yours to fix, or to hand off as a decision.
+`owner-decision` means one parked decision stands first: `--park` it before you hand off. It is a
+hold with the condition fixed at `owner`, so everything `--hold` asks applies — commit, push the
+branch, reap and name the keepalive — but no durable restart is owed and nothing is filed. It
+writes the landing recipe as a `handoff` row and prints it; that line is what the owner runs, so
+put nothing in the reason it already says. Commit the staged record, push the branch, then stop.
+
+The recipe ends with `--settle <slug>`, and you run it yourself when you find a landed hand-off
+still recorded HELD: every reader already reads it `LANDED (attended)`, and this writes it. It
+stages and never commits, so the settle commit rides the next landing from that tree; the same verb
+records where an older `ABORTED` run's work landed, marks a run whose lease died after its work
+landed `abandoned`, and refuses anything git does not prove.
 
 ### Abort — it cannot finish
 

@@ -1,6 +1,6 @@
 """drift_signals.py — THIS PROJECT's drift-signal declarations (the only project-owned code).
 
-gov:kit drift-audit@1.22
+gov:kit drift-audit@1.23
 
 Copied from <prefix>/drift-audit/drift_signals.template.py at adoption. Fill the four required names below,
 then run `python <prefix>/drift-audit/drift_report.py`.
@@ -134,6 +134,10 @@ PINS: dict[str, int] = {
     # "cutoff_keys_armed": 0,   # armed `_CUTOFF` keys in your tracked root confs. Seed it from your
     #   first report's value; with no entry it reports and never gates, because the shipped example
     #   confs arm a key and a default of 0 would red your first `--check`.
+    # "aborted_work_landed": 0,     # REPORT-ONLY: seed it at what your first report MEASURES; it
+    #   drains as `--settle` writes `work-landed-at` onto each listed record.
+    # "discarded_work_landed": 0,   # REPORT-ONLY: seed it at what your first report MEASURES; no
+    #   verb clears it, so a pin there records the value rather than a drain target.
 }
 
 # --------------------------------------------------------------------------------------------

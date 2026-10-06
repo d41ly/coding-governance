@@ -204,7 +204,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 660
+    "ceiling": 660,
+    "doc_reads": []
   },
   {
     "name": "verdict epoch (kit version dates the engine)",
@@ -614,7 +615,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "doc_reads": ["memory/guides/"]
   },
   {
     "name": "review-join ban (no ref-keyed join)",
@@ -859,7 +861,8 @@
     ],
     "chunk": "records",
     "subject": "repo",
-    "ceiling": 180
+    "ceiling": 180,
+    "doc_reads": []
   },
   {
     "name": "process-monitor census selftest",
@@ -949,7 +952,8 @@
     "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint \u2014 the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`.",
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 16040
+    "ceiling": 16040,
+    "doc_reads": ["memory/builds/", "memory/guides/", "memory/archive/"]
   },
   {
     "name": "pass-order history",
@@ -961,7 +965,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],
-    "ceiling": 5400
+    "ceiling": 5400,
+    "doc_reads": ["memory/builds/", "memory/project/"]
   },
   {
     "name": "brief-recorded",
@@ -973,7 +978,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],
-    "ceiling": 900
+    "ceiling": 900,
+    "doc_reads": ["memory/builds/", "memory/project/"]
   },
   {
     "name": "playbook validity gate",
@@ -1141,7 +1147,8 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 2940
+    "ceiling": 2940,
+    "doc_reads": []
   },
   {
     "name": "hook destinations self-test",
@@ -1270,7 +1277,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "doc_reads": ["memory/builds/"]
   },
   {
     "name": "lexicon selftest",
@@ -1295,7 +1303,8 @@
     "guard": [],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 330
+    "ceiling": 330,
+    "doc_reads": ["memory/builds/"]
   },
   {
     "name": "playbook placeholder catalogue",
@@ -1352,7 +1361,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 900
+    "ceiling": 900,
+    "doc_reads": []
   },
   {
     "name": "straggler-guard arms",
@@ -1371,7 +1381,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "doc_reads": []
   },
   {
     "name": "marker contracts",
@@ -1381,7 +1392,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 1840
+    "ceiling": 1840,
+    "doc_reads": []
   },
   {
     "name": "verifier fan-out",
@@ -1520,7 +1532,8 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 300
+    "ceiling": 300,
+    "doc_reads": ["AGENTS.md", "CLAUDE.md"]
   },
   {
     "name": "receipt sync (installed files match the receipt)",

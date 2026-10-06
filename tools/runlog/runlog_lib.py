@@ -24,7 +24,7 @@ import re
 import subprocess
 from dataclasses import dataclass, field
 
-KIT_RUNLOG_VERSION = "1.6"  # gov:kit runlog@1.6
+KIT_RUNLOG_VERSION = "1.7"  # gov:kit runlog@1.7
 
 # The grammar versions this reader knows. A set, so a v2 reader can keep reading v1 lines.
 GRAMMAR_VERSIONS = frozenset({"1"})

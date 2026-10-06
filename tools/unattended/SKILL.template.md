@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.61 -->
+<!-- gov:kit unattended@1.68 -->
 
 # Unattended runs
 
@@ -30,8 +30,6 @@ A value mixing a slug and ids is refused before any verb.
 | an existing PLAYBOOK and a number of pieces | Start a PLAYBOOK run | `recipe` |
 | a topic and no playbook, handed the same way | Author a PLAYBOOK | `prompt` |
 | ids, a prompt naming ids, or a FILING HOME's slug | Ids go through the scaffold | nothing: the OWNER lands the README |
-
-Producing pieces ATTENDED is not a run.
 
 ## Start a run
 
@@ -70,7 +68,7 @@ Producing pieces ATTENDED is not a run.
 
 ## Ids go through the scaffold
 
-`bash {{KIT_DIR}}/unattended.sh --preflight "<the value>" --keepalive-id <id>` refuses and prints the
+`unattended.sh --preflight "<the value>" --keepalive-id <id>` refuses and prints the
 scaffold recipe: relay it to the owner verbatim, reap the keepalive, and stop.
 
 ## Start a run from a PROMPT
@@ -112,7 +110,7 @@ unattended.sh --phase <slug> BUILDING --witness $(git rev-parse HEAD)
 unattended.sh --park <slug> --item "<the question>" --reason "<options, and why refused>"
 unattended.sh --propose <slug> --item "<amendment>" --step "<step>" --reason "<why>"
 unattended.sh --brief <slug> --unit <unit-id> --path <the brief file>
-unattended.sh --rescope <slug> --act retire|supersede|add --item <unit-id> --reason "<why>"
+unattended.sh --rescope <slug> --act retire|supersede|add|defer --item <unit-id> --reason "<why>"
 unattended.sh --dispatch <slug> --pass <unit-id> --writes <path> --writes <path>
 unattended.sh --plan <slug> --paths
 unattended.sh --status <slug>
@@ -177,9 +175,15 @@ unattended.sh --version   # which kit build
 `unattended.sh --hold <slug> --code <code> --until <cond> --reason "<why>" --reaped <id>`, then file
 the restart it prints: `{{RESUME_SCHEDULE_DELETE}}`, then `{{RESUME_SCHEDULE_CREATE}}`.
 
+## Hand it off
+
+Sound work the owner lands or decides:
+`unattended.sh --handoff <slug> --code owner-landing|owner-decision --reason "<why>" --reaped <id>`,
+never `--abort` (DISCARD). Once landed: `unattended.sh --settle <slug>`.
+
 ## If it cannot finish
 
-`bash {{KIT_DIR}}/unattended.sh --abort <slug> --code <halt-code> --reason "<what stopped it>"`
+`unattended.sh --abort <slug> --code <halt-code> --reason "<what stopped it>"`
 
 ## Reap
 

@@ -473,6 +473,34 @@ case "$line" in
   *) bad "29b the full arm reports a scope without naming the bar: ${line:-<no decision line>}" ;;
 esac
 
+# 30 — TOOL-dThriftyLanding-2: A GREEN FROM ANOTHER WORKTREE SERVES THIS PUSH. This fixture is a plain
+#      clone, so its git dir IS the common dir and its own stamp is the primary's; a linked worktree's
+#      runner writes `gate-full-green.shared` beside it. With no own stamp and a usable shared one, the
+#      decision is scoped and names where its record came from; with an unusable shared one it is FULL
+#      and names BOTH refusals, so neither is silent; and the own stamp still wins when it is usable.
+_gd30=$(git rev-parse --git-dir)
+rm -f "$_gd30/gate-full-green" "$_gd30/gate-full-green.shared"
+printf 'sha\t%s\nfingerprint\t\nmanifest_blob\t\nrun_id\ttest\n' "$(git rev-parse HEAD)" > "$_gd30/gate-full-green.shared"
+line=$(decide)
+case "$line" in
+  *"scoped gate"*"gate-full-green.shared"*) ok "30 a shared green from another worktree scopes the push and is named" ;;
+  *) bad "30 a usable shared green was not adopted: ${line:-<no decision line>}" ;;
+esac
+printf 'sha\t%s\nfingerprint\t\nmanifest_blob\t\nrun_id\ttest\n' 0000000000000000000000000000000000000000 > "$_gd30/gate-full-green.shared"
+line=$(decide)
+case "$line" in
+  *"FULL gate"*"no recorded full green"*"gate-full-green.shared"*"not an ancestor"*) ok "30b an unusable shared green forces FULL and both refusals are named" ;;
+  *) bad "30b expected FULL naming the own and the shared refusal: ${line:-<no decision line>}" ;;
+esac
+stamp "$(git rev-parse HEAD)"
+line=$(decide)
+case "$line" in
+  *"scoped gate"*" from "*) bad "30c a usable own stamp was passed over for a shared one: $line" ;;
+  *"scoped gate"*) ok "30c control — a usable own stamp is adopted first, worded as before" ;;
+  *) bad "30c control — a current own stamp did not scope: ${line:-<no decision line>}" ;;
+esac
+rm -f "$_gd30/gate-full-green" "$_gd30/gate-full-green.shared"
+
 # --- 16-18: TOOL-dScrubbedConduit-1 S2/S5. A LINKED WORKTREE, because that is the shape this
 # --- harness could not previously see. Every fixture above is `git init` plus `git init --bare`, and
 # --- neither exports GIT_DIR into a hook — which is exactly why this class went unobserved here
@@ -939,21 +967,75 @@ case "$_o" in
   *) bad "IR AC15 a moved tree must block, got: $_o" ;;
 esac
 
-# AC17: an aged row blocks under land; land beside a blank, zero or non-numeric bound reads park.
-_o=$(run_ir_push IR_AGE=aged)
-case "$_o" in
-  *"x reads INHERITED with age 'aged'"*"rc=1") ok "IR AC17 an aged inherited leg is blocked under land" ;;
-  *) bad "IR AC17 an aged leg must block, got: $_o" ;;
-esac
+# AC17, FLIPPED by TOOL-dUnstuckLanding-16 (ruling TOOL-dUnstuckLanding-22): an aged row, and an
+# age-unproven one, LAND under land — the age escalates the driver's ask and decides no landing. Land
+# beside a blank, zero or non-numeric bound reads land with NO bound, announced, and lands too; the
+# runner is handed no bound.
+for _a in aged -; do
+  _o=$(run_ir_push IR_AGE="$_a")
+  case "$_o" in
+    *"red on inherited legs only — landing under INHERITED_RED=land: x"*"rc=0") ok "IR AC17 an inherited leg with age '$_a' lands under land" ;;
+    *) bad "IR AC17 an inherited leg with age '$_a' must land under land, got: $_o" ;;
+  esac
+done
 for _b in "" 0 ten; do
   build_ir_fixture "ac17$_b" "INHERITED_RED=land\nINHERITED_RED_MAX_AGE=$_b\n" || bad "IR AC17 could not build its fixture"
   _o=$(run_ir_push)
   case "$_o" in
-    *"reads park — INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it, which reads park"*"rc=1")
-      ok "IR AC17 land with the bound '$_b' reads park, announced, and blocks" ;;
-    *) bad "IR AC17 land with the bound '$_b' must read park, got: $_o" ;;
+    *"reads land — declared, with no age bound, so no leg is aged"*"landing under INHERITED_RED=land: x"*"rc=0")
+      ok "IR AC17 land with the bound '$_b' reads land with no bound, announced, and lands" ;;
+    *) bad "IR AC17 land with the bound '$_b' must read land with no bound, got: $_o" ;;
+  esac
+  case "$(cat "$ir_env" 2>/dev/null)" in
+    "policy=land age= attr=${IR_R}") ok "IR AC17 land with the bound '$_b' hands the runner no bound" ;;
+    *) bad "IR AC17 land with the bound '$_b' handed the runner: $(cat "$ir_env" 2>/dev/null)" ;;
   esac
 done
+
+# TOOL-dUnstuckLanding-16 AC3: R's policy file declares ONLY a bound. The kit default is land, so the
+# policy line names it, and an aged inherited-only red lands. `park` declared beside the same bound
+# blocks it, and a malformed value reads park and blocks it — a typo must never land a red. The
+# branch's own copy says something else each time, so a reader of the pushed tree is graded too.
+build_ir_fixture ac3d 'INHERITED_RED_MAX_AGE=2\n' || bad "IR TOOL-dUnstuckLanding-16 AC3 could not build its fixture"
+printf 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=2\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
+git add -A >/dev/null 2>&1; git commit -q -m "the branch declares park in its own copy" >/dev/null 2>&1
+_o=$(run_ir_push IR_AGE=aged)
+case "$_o" in
+  *"inherited-red policy at ${IR_R:0:8} reads land — no INHERITED_RED is declared in .githooks/gate-env.sh there, so the kit default land applies"*"red on inherited legs only — landing under INHERITED_RED=land: x"*"rc=0")
+    ok "IR TOOL-dUnstuckLanding-16 AC3 an undeclared policy reads the kit default land and an aged inherited red lands" ;;
+  *) bad "IR TOOL-dUnstuckLanding-16 AC3 an undeclared policy must read the kit default land and land, got: $_o" ;;
+esac
+case "$(cat "$ir_env" 2>/dev/null)" in
+  "policy=land age=2 attr=${IR_R}") ok "IR TOOL-dUnstuckLanding-16 AC3 the kit default hands the runner land and the declared bound 2" ;;
+  *) bad "IR TOOL-dUnstuckLanding-16 AC3 the kit default handed the runner: $(cat "$ir_env" 2>/dev/null)" ;;
+esac
+for _p in park lnad; do
+  build_ir_fixture "ac3$_p" "INHERITED_RED=$_p\nINHERITED_RED_MAX_AGE=2\n" || bad "IR TOOL-dUnstuckLanding-16 AC3 could not build its fixture"
+  printf 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=2\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
+  git add -A >/dev/null 2>&1; git commit -q -m "the branch grants itself land" >/dev/null 2>&1
+  _o=$(run_ir_push IR_AGE=aged)
+  case "$_o" in
+    *"red on inherited legs only"*) bad "IR TOOL-dUnstuckLanding-16 AC3 INHERITED_RED=$_p at R landed an inherited red: $_o" ;;
+    *"inherited-red policy at ${IR_R:0:8} reads park"*"rc=1") ok "IR TOOL-dUnstuckLanding-16 AC3 INHERITED_RED=$_p at R reads park and blocks the red" ;;
+    *) bad "IR TOOL-dUnstuckLanding-16 AC3 INHERITED_RED=$_p at R must read park and block, got: $_o" ;;
+  esac
+done
+
+# Closing review round 1 M12 (id 18), the hook's flipped branch: R carries NO .githooks/gate-env.sh,
+# so the policy reads the kit default land, naming the absence, and an inherited-only red lands. The
+# branch restores its own copy, which the hook sources and never reads a policy from. RED against a
+# hook whose absent branch read park, staged in a scratch copy and restored.
+build_ir_fixture m12 'INHERITED_RED_MAX_AGE=2\n' || bad "IR M12 could not build its fixture"
+git rm -q .githooks/gate-env.sh >/dev/null 2>&1; git commit -q -m "R carries no gate-env" >/dev/null 2>&1
+git push -q --no-verify origin main >/dev/null 2>&1; IR_R=$(git rev-parse HEAD)
+mkdir -p .githooks; printf 'INHERITED_RED_MAX_AGE=2\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
+git add -A >/dev/null 2>&1; git commit -q -m "the branch restores its own copy" >/dev/null 2>&1
+_o=$(run_ir_push)
+case "$_o" in
+  *"inherited-red policy at ${IR_R:0:8} reads land — .githooks/gate-env.sh is absent at ${IR_R:0:8}, so the kit default land applies"*"red on inherited legs only — landing under INHERITED_RED=land: x"*"rc=0")
+    ok "IR M12 a gate-env absent at R reads the kit default land and an inherited red lands" ;;
+  *) bad "IR M12 a gate-env absent at R must read the kit default land and land, got: $_o" ;;
+esac
 
 # AC4: an inherited green whose base IS the remote sha selects the scoped gate and names itself; once
 # the remote moves past that base, the same stamp forces FULL.
@@ -1116,7 +1198,9 @@ cd "$pfx_home" || exit 2
 #   GATE_ATTRIBUTE GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE — the hook clears the policy pair
 #     and sets all three from R itself (TOOL-dDerivedDocket-23, -24), and attribution is report-only.
 #   GATE_AMBIENT_TMP GATE_HOST_RATIO — assigned in the runner, from TMPDIR and as a source constant.
-BAR_INERT_KNOBS="GATE_AMBIENT_TMP GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_HELD GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+#   GATE_DOCS_BASE — the hook clears it for every bar, a STUB included, and sets it only on a doc-only
+#     decision (TOOL-dThriftyLanding-3), as it sets GATE_BASE on the path where that matters.
+BAR_INERT_KNOBS="GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_HELD GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
 read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
 check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
   local knobs cleared scrubbed k n
@@ -1309,5 +1393,176 @@ superseded: fb -> fa"
 else
   bad "AMF3 the lexicon kit does not resolve beside this hook's kit root, so the merge-loss arms did not run"
 fi
+# ---- TOOL-dThriftyLanding-3: A DOC-ONLY PUSH, CLASSIFIED AGAINST THE DOC CLASS AT R ---------------
+# A scratch repo whose gate-env file at R declares `GATE_DOC_PATHS`, a stub bar that records the docs
+# base it was handed, and a record stamped at R so the decision is scoped unless a predicate forces.
+# Each arm grades the DECISION LINE and what reached the bar, against the declaration at R.
+docs_env="$tmp/docs-env.txt"
+docstub="$tmp/docstub.sh"
+printf '#!/usr/bin/env bash\nprintf "docs=%%s\\n" "${GATE_DOCS_BASE:-}" > "$DOCS_ENV"\nexit 0\n' > "$docstub"
+build_docs_fixture() { # tag · gate-env body (printf %b) -> a pushed main at R carrying that body
+  local d="$tmp/docs-$1"
+  mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
+  git init -q --bare "$d/remote.git"; git init -q "$d/work"
+  cd "$d/work" || return 1
+  git config user.email t@example.com; git config user.name t; git config core.autocrlf false
+  git config core.hooksPath "$d/hooks"
+  mkdir -p .githooks "$KIT_REL" notes src
+  printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
+  printf '%b' "$2" > .githooks/gate-env.sh
+  printf 'GOV_KITROOT=%s\n' "$KIT_REL" >> .githooks/gate-env.sh
+  printf 'a\n' > notes/a.md; printf 'b\n' > notes/b.md; printf 'x\n' > src/x.sh
+  git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+  git remote add origin "$d/remote.git"
+  touch "$(git rev-parse --git-dir)/push-main-active"
+  GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
+}
+set_docs_stamp() { # a full green naming the remote tip, which the arms then push past
+  printf 'sha\t%s\nfingerprint\t\nmanifest_blob\t\nrun_id\ttest\n' \
+    "$(git ls-remote origin refs/heads/main | cut -f1)" > "$(git rev-parse --git-dir)/gate-full-green"
+}
+run_docs_push() { # [env…] -> the push's merged output, then the docs base the bar received
+  rm -f "$docs_env"
+  local o; o=$( env GATE_SELFTESTS= DOCS_ENV="$docs_env" GOV_GATE_CMD="bash $docstub" "$@" git push origin main 2>&1 )
+  printf '%s\n%s\n' "$o" "$(cat "$docs_env" 2>/dev/null || echo 'docs=<bar did not run>')"
+}
+read_docs_tip() { git ls-remote origin refs/heads/main | cut -f1; }
+
+build_docs_fixture ac1 'GATE_DOC_PATHS="notes/"\n' || bad "DOCS AC1 could not build its fixture"
+_r=$(read_docs_tip); set_docs_stamp
+printf 'a2\n' > notes/a.md; git commit -qam "doc edit"
+_o=$(run_docs_push)
+case "$_o" in
+  *"scoped gate on main push"*"docs-only: 1 path(s) in GATE_DOC_PATHS at ${_r:0:8}"*"docs=$_r"*) ok "DOCS AC1 a doc-only push is named docs-only and the bar receives R as its docs base" ;;
+  *) bad "DOCS AC1 expected a docs-only scoped decision and docs=$_r, got: $_o" ;;
+esac
+_r=$(read_docs_tip); set_docs_stamp
+printf 'a3\n' > notes/a.md; printf 'x2\n' > src/x.sh; git commit -qam "mixed"
+_o=$(run_docs_push)
+case "$_o" in
+  *"docs-only"*) bad "DOCS AC2 a push changing src/x.sh was classified doc-only: $_o" ;;
+  *"scoped gate on main push"*"docs=") ok "DOCS AC2 a mixed push is not doc-only and receives no docs base" ;;
+  *) bad "DOCS AC2 expected a plain scoped decision with no docs base, got: $_o" ;;
+esac
+_r=$(read_docs_tip); set_docs_stamp
+printf 'y\n' > src/y.sh; git add src/y.sh; git commit -qm "add code"
+git rm -q src/y.sh; printf 'a4\n' > notes/a.md; git commit -qam "remove it again"
+_o=$(run_docs_push)
+case "$_o" in
+  *"docs-only"*) bad "DOCS AC3 a code file added and removed inside the range read as doc-only: $_o" ;;
+  *"gate on main push"*) ok "DOCS AC3 a code touch inside the range keeps the push out of the doc class" ;;
+  *) bad "DOCS AC3 no decision line: $_o" ;;
+esac
+# TOOL-dThriftyLanding-9: the same code touch on a SIDE branch merged with --no-ff. Git's default
+# history simplification drops a side branch that nets to nothing, so the linear arm above cannot see it.
+_r=$(read_docs_tip); set_docs_stamp
+git checkout -q -b side9; printf 'z\n' > src/z.sh; git add src/z.sh; git commit -qm "side code"
+git rm -q src/z.sh; printf 'b9\n' > notes/b.md; git commit -qam "side: remove it, edit a doc"
+git checkout -q main; printf 'a9\n' > notes/a.md; git commit -qam "main doc"
+git merge -q --no-ff -m "land side9" side9 >/dev/null 2>&1
+_o=$(run_docs_push)
+case "$_o" in
+  *"docs-only"*) bad "DOCS U9 a code touch on a merged side branch read as doc-only: $_o" ;;
+  *"gate on main push"*) ok "DOCS U9 a code touch on a merged side branch keeps the push out of the doc class" ;;
+  *) bad "DOCS U9 no decision line: $_o" ;;
+esac
+# AC4: a doc-only MERGE whose second parent the record does not cover. Predicate 5 forces it at base.
+_r=$(read_docs_tip); set_docs_stamp
+git checkout -q -b side; printf 'b2\n' > notes/b.md; git commit -qam "side doc"
+git checkout -q main; printf 'a5\n' > notes/a.md; git commit -qam "main doc"
+git merge -q --no-ff -m "land side" side >/dev/null 2>&1
+_o=$(run_docs_push)
+case "$_o" in
+  *"scoped gate on main push"*"docs-only"*) ok "DOCS AC4 a doc-only merge is not forced FULL by its second parent" ;;
+  *) bad "DOCS AC4 expected a docs-only scoped decision over the merge, got: $_o" ;;
+esac
+# AC7: the lag bound still forces a doc-only push.
+_r=$(read_docs_tip); set_docs_stamp
+_lag=$(grep -m1 -oE 'GATE_FULL_MAX_LAG=[0-9]+' "$SRC/.githooks/pre-push" | grep -oE '[0-9]+')
+for _i in $(seq 0 "${_lag:-10}"); do printf '%s\n' "$_i" > notes/a.md; git commit -qam "lag $_i"; done
+_o=$(run_docs_push)
+case "$_o" in
+  *"FULL gate on main push"*"doc-only, but"*"commits behind"*) ok "DOCS AC7 the lag bound still forces FULL on a doc-only push, and says so" ;;
+  *) bad "DOCS AC7 expected FULL with doc-only, but and the lag reason, got: $_o" ;;
+esac
+# AC8: an exported GATE_DOCS_BASE never reaches the bar of a push that is not doc-only.
+_r=$(read_docs_tip); set_docs_stamp
+printf 'x3\n' > src/x.sh; git commit -qam "code"
+_o=$(run_docs_push GATE_DOCS_BASE="$_r")
+case "$_o" in
+  *"not honoured from the environment"*"GATE_DOCS_BASE"*"docs=") ok "DOCS AC8 an exported docs base is cleared and named, and the bar receives none" ;;
+  *) bad "DOCS AC8 expected the knob cleared and named with no docs base at the bar, got: $_o" ;;
+esac
+# AC5: a class declared only in the pushed tree is not read.
+build_docs_fixture ac5 '' || bad "DOCS AC5 could not build its fixture"
+set_docs_stamp
+printf 'GATE_DOC_PATHS="notes/ .githooks/"\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
+printf 'a2\n' > notes/a.md; git commit -qam "the branch declares its own doc class"
+_o=$(run_docs_push)
+case "$_o" in
+  *"docs-only"*) bad "DOCS AC5 a doc class declared only in the pushed tree was honoured: $_o" ;;
+  *"scoped gate on main push"*) ok "DOCS AC5 the doc class is read at R, never from the pushed tree" ;;
+  *) bad "DOCS AC5 expected a plain scoped decision, got: $_o" ;;
+esac
+# AC6: a glob element invalidates the whole declaration, aloud.
+build_docs_fixture ac6 'GATE_DOC_PATHS="notes/*"\n' || bad "DOCS AC6 could not build its fixture"
+set_docs_stamp
+printf 'a2\n' > notes/a.md; git commit -qam "doc edit"
+_o=$(run_docs_push)
+case "$_o" in
+  *"docs-only"*) bad "DOCS AC6 a glob element was honoured: $_o" ;;
+  *"not a plain repo path"*"gate on main push"*) ok "DOCS AC6 a glob element voids the doc class and the hook says so" ;;
+  *) bad "DOCS AC6 expected the invalid-element notice, got: $_o" ;;
+esac
+# TOOL-dThriftyLanding-12, closing review M5: `.` excludes the whole tree, so it voids the class too.
+build_docs_fixture dot 'GATE_DOC_PATHS="."\n' || bad "DOCS M5 could not build its fixture"
+set_docs_stamp
+printf 'x2\n' > src/x.sh; git commit -qam "code"
+_o=$(run_docs_push)
+case "$_o" in
+  *"docs-only"*) bad "DOCS M5 a code push under GATE_DOC_PATHS=. was classified doc-only: $_o" ;;
+  *"not a plain repo path"*"gate on main push"*) ok "DOCS M5 a '.' element voids the doc class and the hook says so" ;;
+  *) bad "DOCS M5 expected the invalid-element notice, got: $_o" ;;
+esac
+# TOOL-dThriftyLanding-12, closing review M2: under INHERITED_RED=park at R a doc push is not scoped as
+# doc-only, because the docs base may sit above an unproven record; the hook names the policy.
+build_docs_fixture park 'GATE_DOC_PATHS="notes/"\nINHERITED_RED=park\n' || bad "DOCS M2 could not build its fixture"
+set_docs_stamp
+printf 'a2\n' > notes/a.md; git commit -qam "doc edit"
+_o=$(run_docs_push)
+case "$_o" in
+  *"docs-only"*) bad "DOCS M2 a doc push under park was scoped as doc-only: $_o" ;;
+  *"reads park, so it is not scoped as doc-only"*"gate on main push"*) ok "DOCS M2 under park a doc push keeps today's decision, and the hook names the policy" ;;
+  *) bad "DOCS M2 expected the park notice, got: $_o" ;;
+esac
+# TOOL-dThriftyLanding-12, closing review L3: the inherited-green branch exports the docs base too.
+build_docs_fixture inh 'GATE_DOC_PATHS="notes/"\n' || bad "DOCS L3a could not build its fixture"
+_r=$(read_docs_tip)
+rm -f "$(git rev-parse --git-dir)/gate-full-green"
+write_ir_stamp "$_r" "$_r" ""
+printf 'a2\n' > notes/a.md; git commit -qam "doc edit"
+_o=$(run_docs_push)
+case "$_o" in
+  *"scoped gate on main push"*"docs-only"*"inherited green"*"docs=$_r") ok "DOCS L3a an inherited-green doc push is docs-only and hands the bar R" ;;
+  *) bad "DOCS L3a expected an inherited-green docs-only decision and docs=$_r, got: $_o" ;;
+esac
+# ...and a LINKED worktree adopts the primary's own stamp, the common dir's gate-full-green.
+build_docs_fixture wt 'GATE_DOC_PATHS="notes/"\n' || bad "DOCS L3b could not build its fixture"
+_r=$(read_docs_tip); set_docs_stamp
+_wt="$tmp/docs-wt-linked"
+git worktree add -q "$_wt" -b wtb >/dev/null 2>&1
+(
+  cd "$_wt" || exit 1
+  touch "$(git rev-parse --git-dir)/push-main-active"
+  rm -f "$(git rev-parse --git-dir)/gate-full-green"
+  printf 'a3\n' > notes/a.md; git commit -qam "doc edit from a linked worktree"
+  rm -f "$docs_env"
+  env GATE_SELFTESTS= DOCS_ENV="$docs_env" GOV_GATE_CMD="bash $docstub" git push origin HEAD:main 2>&1
+) > "$tmp/docs-wt.out"
+case "$(cat "$tmp/docs-wt.out")" in
+  *"scoped gate on main push"*"from the common dir's gate-full-green "*) ok "DOCS L3b a linked worktree adopts the primary's stamp and names it" ;;
+  *) bad "DOCS L3b expected the common dir's own stamp adopted, got: $(cat "$tmp/docs-wt.out")" ;;
+esac
+cd "$pfx_home" || exit 2
 
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

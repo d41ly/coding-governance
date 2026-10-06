@@ -110,8 +110,8 @@ the preamble every agent it spawns reads — and hands it to every child in `dis
 `repo`, `slug`, `mode`, `driver`, `ground` and `checklist`. `unattended-unit.js` refuses without it
 and refuses a `ground` that does not name it, so a hand-composed dispatch cannot hand a child a
 different root from the one its grounding sentence tells the agent to use (`TOOL-aProbedUnit-4`).
-`tier2-review.js` and the drift-audit siblings still tell their agents nothing about temporary
-files.
+The drift-audit siblings, and `tier2-review.js` on a diff review, still tell their agents nothing
+about temporary files; a spec audit hands its lenses `scratch` (`TOOL-aEvidencedLens-2`).
 
 **`review_replay.py` scores a review for RECALL against a past round** (`TOOL-aSightedSkeptic-9`):
 `--known` reads a past diff-review record's confirmed findings, one per RAW finding from its finding

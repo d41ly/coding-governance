@@ -1,6 +1,6 @@
 """drift_signals.py — coding-governance's own drift-signal declarations (dogfooding the kit).
 
-gov:kit drift-audit@1.22
+gov:kit drift-audit@1.23
 
 Copied from drift_signals.template.py and filled for THIS repo. The corpus root and disciplines are
 NOT restated here — they come from `.memory-tree.conf`, which the memory-tree kit owns.
@@ -317,6 +317,14 @@ PINS: dict[str, int] = {
     # record whose landing commit is on the base ref (owner ruling D12-i2, derived LANDED). What
     # remains is non-`LANDING` records only; the detail's summary line counts the derived ones.
     "run_records_nonterminal_but_merged": 2,
+    # MEASURED at the unit that added the signal, TOOL-dUnstuckLanding-15, against origin/main: live
+    # LEGACY ABORTED records whose work the content predicate reads landed and which carry no upheld
+    # `work-landed-at`. Report-only with no RATCHETS row, for the reason the pin above gives; it drains
+    # by `--settle` on each listed slug and a commit of what that staged, and is lowered as it does.
+    # Its sibling `discarded_work_landed` carries no pin: no ABORTED record here is dated on or after
+    # HANDOFF_CUTOFF yet, so it reads DEAD, and a pin over a population that does not exist is a guess.
+    # Drained 8 -> 0 by `--settle` on all eight slugs (aec85436), 2026-10-05.
+    "aborted_work_landed": 0,
     # MEASURED at TOOL-aMendedFleet-15, after the prior unit's five dispositions. It stands in
     # for check 20's `SEVERITY_UNLABELLED_PIN`, which the backlog switch-over blanked because the
     # shard census reads a generated view as zero rows; this signal shipped with no pin, so it read
@@ -330,7 +338,9 @@ PINS: dict[str, int] = {
     # tracked root confs. GATEABLE, so a change that arms a new key reds `drift-audit records` unless
     # another key stops being armed in the same change. Raising it instead is the RATCHETS row below,
     # which needs the old and new values written here. The keys are not named: read the detail.
-    "cutoff_keys_armed": 29,
+    # 29 -> 30 at the reconcile of aMendedFleet with origin/main, 2026-10-06: main's dThriftyLanding
+    # handoff verb arrived with its own armed cutoff in .unattended.conf, and no key stopped being armed.
+    "cutoff_keys_armed": 30,
     # 26 - MEASURED at TOOL-aMendedFleet-37, which added the signal, at its own commit: 26 of 27
     # feature dossiers older than their paths, every one but the codebase-map dossier that unit
     # refreshed. Report-only; the pin is a declared DRAIN, one dossier re-read at a time, and the

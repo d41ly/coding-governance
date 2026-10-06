@@ -68,6 +68,7 @@ Cite ids, never line numbers.
 | [TOOL-aDeferredBar-20](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE TWO READERS' LAUNCHER GRAMMARS ARE ASSERTED ALIKE ONLY BY HAND:… |
 | [TOOL-aDeferredBar-21](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | A SUITE WHOSE SUBJECT READS A GOV_ VARIABLE INHERITS THE MACHINE'S… |
 | [TOOL-aDeferredBar-22](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | FOUR brief: ARMS OF tools/unattended/unattended.test.sh HAVE BEEN RED… |
+| [TOOL-aEvidencedLens-16](../builds/aEvidencedLens/BACKLOG.md) | OPEN | MED | — | 2026-10-05 | the build harness's Disposal stage reads a §3 edge as one-ended when… |
 | [TOOL-aFlaggedScaffold-3](../builds/aFlaggedScaffold/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-29 | govkit update CANNOT LAND A SOURCE GOV STARTED SHIPPING. Its… |
 | [TOOL-aFlaggedScaffold-5](../builds/aFlaggedScaffold/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-29 | govkit check CALLS A KIT ADOPTED ON THE EXIT CODE ALONE and never runs… |
 | [TOOL-aGradedDialect-6](../builds/aGradedDialect/BACKLOG.md) | OPEN | — | — | 2026-09-10 | a FIFTH copy of the lexicon armedness predicate lives outside the kit… |
@@ -420,6 +421,7 @@ Cite ids, never line numbers.
 | [TOOL-dSpentCeiling-6](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | two waiver registries pin LINE NUMBERS into files that get edited, so… |
 | [TOOL-dSpentCeiling-7](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | FLIP READ_PATH_RULES_GATE to True in tools/memory-tree/corpus_ids.py,… |
 | [TOOL-dSpentCeiling-8](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | THE FULL BAR IS NONDETERMINISTIC UNDER ITS OWN CONCURRENCY, on at least… |
+| [TOOL-dThriftyLanding-7](../builds/dThriftyLanding/BACKLOG.md) | OPEN | MED | — | 2026-10-05 | unattended kit gate costs 222 s standalone on node d and reads every… |
 | [TOOL-dTieredTribunal-4](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | the args-must-be-an-object guard is not ported into the two drift-audit… |
 | [TOOL-dTieredTribunal-6](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | The RECLASSIFICATION that created this row was ratified 2026-08-26… |
 | [TOOL-dTieredTribunal-16](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | tools/workflows/tier2-review.js computes every liveness counter it… |
@@ -439,3 +441,5 @@ Cite ids, never line numbers.
 | [TOOL-dUnstalledConvoy-35](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-24 | signal_lexicon_ratified_stale compares the ratification stamp against… |
 | [TOOL-dUnstalledConvoy-36](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-24 | refusal_join.py's JOIN half has never executed. Its docstring promises… |
 | [TOOL-dUnstalledConvoy-37](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-24 | core.hooksPath is repo-global and absolute, so in this multi-worktree… |
+| [TOOL-dUnstuckLanding-11](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | carry the kit that ships asks 3 to 10 into inCMS and NicoCares through… |
+| [TOOL-dUnstuckLanding-26](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | a gate for a merge whose resolution drops one side's hunks: for each… |

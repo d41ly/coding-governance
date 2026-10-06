@@ -44,7 +44,7 @@ import sys
 import tempfile
 import time
 
-KIT_GOVKIT_VERSION = "1.12"  # gov:kit govkit@1.12 — kit identity; set HERE, never from a conf
+KIT_GOVKIT_VERSION = "1.14"  # gov:kit govkit@1.14 — kit identity; set HERE, never from a conf
 
 RECEIPT_SCHEMA = 3  # bumped by any unit that adds a per-role row field; readers accept 1, 2 and 3
 
@@ -53,7 +53,27 @@ RECEIPT_SCHEMA = 3  # bumped by any unit that adds a per-role row field; readers
 # `INHERITED_RED_MAX_AGE` are the inherited-red policy, whose gov value is `land` — a choice no
 # adopter may inherit by a kit copying the file that makes it. A key typed into the pattern instead
 # would be a second list of what a policy is, and the one a new key forgets.
-POLICY_KEYS = ("GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE")
+# `GATE_DOC_PATHS` joined with TOOL-dThriftyLanding-3: which paths a repository calls non-code decides
+# which legs its doc-only pushes skip, so it is that repository's answer and no kit may carry gov's.
+POLICY_KEYS = ("GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE", "GATE_DOC_PATHS")
+
+
+def build_policy_re() -> "re.Pattern[str]":
+    """The line predicate check 7h3 grades every shipped line with: an ASSIGNMENT of a POLICY_KEYS key.
+
+    One compiled object, built here and nowhere else, so the selftest grades the engine's own pattern
+    rather than a copy of it. The value arm takes a double- or single-quoted value holding blanks
+    beside a bare one (TOOL-dThriftyLanding-10): `GATE_DOC_PATHS` is a space-separated list, and the
+    old bare non-blank run stopped at its first blank, so the doc class was invisible in the only
+    spelling it has. The
+    tail is unchanged — blanks, an optional comment, end of line — so `KEY="a b" bash x` is still an
+    invocation and not a policy.
+    """
+    pk = "|".join(re.escape(k) for k in POLICY_KEYS)
+    return re.compile(
+        r"^[ \t]*(?::[ \t]+)?(?:export[ \t]+)?"
+        r"(?:(" + pk + r")=(?:\"[^\"]*\"|'[^']*'|\S*)|\$\{(" + pk + r"):?=[^}]*\})"
+        r"[ \t]*(?:#.*)?$")
 
 # The hard order's step ids, RESERVED here in one ordered tuple — including the steps this engine
 # does not perform yet. A step id is data, not a print: the ordering criterion is an assertion about
@@ -2592,6 +2612,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         # legs — both run-gates canaries among them, which the runner itself calls the bar's own
         # liveness assertion — held off every bar while this file reported them running.
         manifest_chunk = {leg.get("name"): leg.get("chunk") for leg in _legs_json}
+        manifest_doc_reads = {leg.get("name"): leg.get("doc_reads") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             for leg in d.get("gate_leg", []):
@@ -2645,6 +2666,20 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                         r.fail(f"entry '{eid}' declares gate leg '{nm}' as subject '{d_sub}' while "
                                f"<prefix>/gate-legs.json says '{m_sub}' — the descriptor and the "
                                f"manifest disagree about whether this leg runs by default")
+                    # AND ABOUT DOC READS (TOOL-dThriftyLanding-4), presence included: a descriptor
+                    # that declares none ships a leg that runs on every adopter's doc push while gov
+                    # skips it, and the reverse ships a skip gov never exercised. Both sides are
+                    # resolved through gov's own ctx, so `{memory_root}/builds/` equals `memory/builds/`.
+                    _dctx = canonical_ctx(eid)
+                    d_dr = leg.get("doc_reads")
+                    m_dr = manifest_doc_reads.get(nm)
+                    _d = None if d_dr is None else [resolve_tokens(str(x), _dctx)[0] for x in d_dr]
+                    _m = None if m_dr is None else [resolve_tokens(str(x), _dctx)[0] for x in m_dr]
+                    if _d != _m:
+                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with doc_reads {_d!r} while "
+                               f"<prefix>/gate-legs.json says {_m!r} — the descriptor and the "
+                               f"manifest disagree about which doc paths this leg reads, so a doc-only "
+                               f"push skips it in one tree and runs it in the other")
                 # AC1b: a name that travels. A digit inside a parenthetical is a COUNT, and a count
                 # in a leg name goes stale exactly where nobody is reading — in somebody else's repo.
                 if re.search(r"\([^)]*\d[^)]*\)", nm):
@@ -2824,11 +2859,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     # inherited-red pair is caught in every spelling `GATE_SELFTESTS` is. Re-run over the tracked tree
     # after widening: one policy file, `.githooks/gate-env.sh`, now assigning two of the three keys,
     # and still no invocation matched. The first capture that matched names the key in the refusal.
-    _pk = "|".join(re.escape(k) for k in POLICY_KEYS)
-    policy_re = re.compile(
-        r"^[ \t]*(?::[ \t]+)?(?:export[ \t]+)?"
-        r"(?:(" + _pk + r")=\S*|\$\{(" + _pk + r"):?=[^}]*\})"
-        r"[ \t]*(?:#.*)?$")
+    policy_re = build_policy_re()
     # THE SHIPPED SET, resolved the way `apply` resolves it. `claims` covers only 13 of 58 file
     # rules in this tree, so deriving from that key alone would have quantified over a third of the
     # payload and reported a confident zero over the rest — the could-not-fail shape, arriving as an
@@ -3925,6 +3956,16 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     row["subject"] = leg.get("subject") or "repo"
                 if guards:
                     row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
+                # DOC READS TRAVEL, all or nothing, and only into a runner that reads them: below
+                # DOC_READS_FLOOR_RUN_GATES the target's canary pins a key set without it, and a
+                # routine install would red their bar. TOOL-dThriftyLanding-4.
+                _dr, _dr_why = derive_doc_reads(leg, ctx, have)
+                if _dr is not None and check_target_reads_subject(
+                        target, deploy, descs, floor=DOC_READS_FLOOR_RUN_GATES):
+                    row["doc_reads"] = _dr
+                elif _dr_why:
+                    print(f"govkit {verb} — gate leg '{nm}': doc_reads omitted ({_dr_why}), so it "
+                          f"runs on every doc-only push")
                 if nm in by_name:
                     prev = next((e for e in owned and prior if e["name"] == nm), None)
                     # DEPL-cMendedVintage-22. THE SUBJECT OF THIS COMPARISON IS THE TARGET, and for
@@ -3952,7 +3993,10 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     # this defect one level up rather than a stricter version of the fix.
                     tgt = existing[by_name[nm]]
                     if prev and (tgt.get("argv") != prev.get("argv")
-                                 or tgt.get("guard", []) != prev.get("guard", [])):
+                                 or tgt.get("guard", []) != prev.get("guard", [])
+                                 # a hand-widened doc_reads is the adopter's coverage; overwriting it
+                                 # with gov's narrower list skips their leg (TOOL-dThriftyLanding-12)
+                                 or tgt.get("doc_reads") != prev.get("doc_reads")):
                         r.fail(f"leg '{nm}' in the target differs from what the receipt recorded — "
                                f"reporting drift rather than replacing it; ownership of the NAME is "
                                f"not ownership of the ROW")
@@ -3975,6 +4019,7 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                                 # runs a full apply on a below-floor fixture. Found by the spec
                                 # audit of a unit that was about to copy this seam verbatim.
                                 "subject": row.get("subject"),
+                                "doc_reads": row.get("doc_reads"),
                                 "guard_dropped": [{"spec": a, "why": b} for a, b in dropped],
                                 "history_depth": leg.get("history_depth")})
                 if dropped and not guards:
@@ -5394,6 +5439,34 @@ def validate_gate_runner(deploy: dict, r: Report) -> dict:
 # The run-gates version at which `subject` entered the manifest's pinned key set. Below it, the
 # target's own canary refuses the key. TOOL-dUnstalledConvoy-26.
 SUBJECT_FLOOR_RUN_GATES = (1, 1)
+# The run-gates version at which `doc_reads` entered that key set, and the runner learned to read it.
+# TOOL-dThriftyLanding-4, against the runner TOOL-dThriftyLanding-1 shipped as 1.25.
+DOC_READS_FLOOR_RUN_GATES = (1, 25)
+
+
+def derive_doc_reads(leg: dict, ctx: dict[str, str], have: set[str]) -> tuple[list[str] | None, str]:
+    """The `doc_reads` list a target's manifest row carries for <leg>, or None, and why it is None.
+
+    ALL OR NOTHING, which is the opposite of the guard rule beside it and for a reason. A guard that
+    loses an element runs LESS often only when the rest also miss; a `doc_reads` list that loses one
+    SKIPS on exactly the doc push that touches the lost path. So any element that does not resolve,
+    or names nothing the target tracks, omits the key, and an omitted key runs the leg on every doc
+    push. A declared EMPTY list is carried as `[]`: it says the leg reads no doc path.
+    """
+    spec = leg.get("doc_reads")
+    if spec is None:
+        return None, ""
+    if not isinstance(spec, list):
+        return None, "doc_reads is not a list"
+    out: list[str] = []
+    for g in spec:
+        v, missing = resolve_tokens(str(g), ctx)
+        if missing:
+            return None, f"'{g}' carries an unresolved token '{missing[0]}'"
+        if not any(t == v.rstrip("/") or t.startswith(v.rstrip("/") + "/") for t in have if t):
+            return None, f"'{v}' matches no tracked path in the target"
+        out.append(v)
+    return out, ""
 
 
 def derive_target_runner(target: pathlib.Path, deploy: dict,
@@ -5415,7 +5488,8 @@ def derive_target_runner(target: pathlib.Path, deploy: dict,
 
 
 def check_target_reads_subject(target: pathlib.Path, deploy: dict,
-                               descs: dict[str, tuple[dict, str]] | None = None) -> bool:
+                               descs: dict[str, tuple[dict, str]] | None = None,
+                               floor: tuple[int, ...] = SUBJECT_FLOOR_RUN_GATES) -> bool:
     """Can this target's installed run-gates parse a `subject` key without redding its own canary?
 
     Read from the TARGET, never assumed and never taken from gov's own tree: the question is what
@@ -5438,7 +5512,7 @@ def check_target_reads_subject(target: pathlib.Path, deploy: dict,
         got = tuple(int(x) for x in m.group(1).split("."))
     except ValueError:
         return False
-    return got >= SUBJECT_FLOOR_RUN_GATES
+    return got >= floor
 
 
 def read_inert_kits(deploy: dict) -> set[str]:

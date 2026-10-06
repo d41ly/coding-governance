@@ -130,6 +130,7 @@ argv = ["bash", "{kit}/check-protocol-parity.test.sh"]
 # sibling-kit guard token exists to name it (TOOL-aCollapsedScan-11), so a guard scoped to this kit
 # let a memory-tree move skip this leg inside the pre-push window. It costs about a second.
 guard = []
+doc_reads = ["{memory_root}/guides/"]
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a

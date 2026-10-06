@@ -22,7 +22,9 @@
 # root the driver and the resume tick both read; `read_bound_key`, the one reader of a bound conf
 # key both of them call; `read_fork_cutoff`, the one TEXT read of the memory kit's FORK_ITEM_CUTOFF
 # the driver and the pass-order leg share; `read_host_name`, `read_pid_image` and `check_pid_alive`, the one reading
-# of "which node, which process" the lease writer and both pid probes share; `parse_gate_profile` and
+# of "which node, which process" the lease writer and both pid probes share; `read_user_name`,
+# `resolve_landing_tag` and `scan_landing_nodes`, the one reading of which node may land, the driver
+# and the gate leg both ask; `parse_gate_profile` and
 # `check_gate_wall`, the one reading of the gate runner's profile the driver and the leg both ask; the
 # anchored id tests; path containment; "has this pass committed yet"; and `read_advertised_head` with
 # `read_history_range`, the one observation of the remote's tip and the one range rule the two history
@@ -253,6 +255,35 @@ read_fork_cutoff() { # conf file -> the cutoff on stdout, blank when off; rc 2 w
     }' "$1"
 }
 
+# ------------------------------------------------------------- a spec's consumes-from edges, as TEXT
+# TOOL-dUnstuckLanding-18 S3. `build-complete`'s carry-forward term asks whether a CLOSED unit
+# declares a `consumes-from` edge onto a unit that is not landing, and the edge grammar is the memory
+# kit's (TEMPLATE-SPEC §3 `### Edges`), parsed there by the hygiene engine. This kit installs without
+# that checker, so this is a deliberate RE-PARSE of the same lines, read as text the way
+# `read_fork_cutoff` above reads that kit's conf: the bullet head `**consumes-from**` inside a
+# `### Edges` block under the `## <n>. Non-goals` section, and its FIRST backticked token when that
+# token is id-shaped. The `external` form names no unit and is skipped by construction, because it
+# carries no backticked id in the payload slot.
+#
+# WHAT IT DOES NOT CHECK: that the id is a unit of the same build, or that the block is well-formed.
+# Both are the hygiene engine's findings; a malformed block that engine reds reads here as fewer edges,
+# which is the direction that blocks nothing — so the engine is the guard and this is the reader.
+read_consumes_from() { # spec file -> the unit ids its §3 Edges block consumes from, one per line
+  [ -r "$1" ] || return 0
+  awk '
+    { sub(/\r$/, "") }
+    /^## / { in3 = ($0 ~ /^## [0-9]+[.] Non-goals/); ined = 0; next }
+    !in3 { next }
+    /^### / { ined = ($0 ~ /^### Edges[ \t]*$/); next }
+    !ined { next }
+    /^(-|\*)[ \t]*\*\*consumes-from\*\*[ \t]/ {
+      t = $0; sub(/^[^*]*\*\*[^*]*\*\*[ \t]*/, "", t)
+      if (t !~ /^`/) next
+      sub(/^`/, "", t); sub(/`.*$/, "", t)
+      if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print t
+    }' "$1"
+}
+
 # ------------------------------------------------------------------------ the gate profile, once
 # TOOL-dDerivedDocket-27 S2, S3 and S6. The runner prints its resolved profile as TAB-separated
 # key/value lines, and two readers need three of those keys: the driver bounds its bar by `wall`
@@ -345,6 +376,66 @@ read_host_name() { # -> the node's name, lowercased, or nothing
   [ -n "$h" ] || h=$(hostname 2>/dev/null) || h=""
   [ -n "$h" ] || return 1
   printf '%s\n' "$h" | tr '[:upper:]' '[:lower:]'
+}
+
+# THE USER, in `read_host_name`'s shape (TOOL-dUnstuckLanding-20 S1): `USERNAME` where Windows sets
+# it, else `id -un`, else `USER`, LOWERCASED, because a landing pair compares the machine and the user
+# together and the two sources disagree on case for one account. Empty when none answers.
+read_user_name() { # -> the user's name, lowercased, or nothing
+  local u="${USERNAME:-}"
+  [ -n "$u" ] || u=$(id -un 2>/dev/null) || u=""
+  [ -n "$u" ] || u="${USER:-}"
+  [ -n "$u" ] || return 1
+  printf '%s\n' "$u" | tr '[:upper:]' '[:lower:]'
+}
+
+# THE LANDING-NODE GRAMMAR, ONE SPELLING (TOOL-dUnstuckLanding-20 S2). `LANDING_NODES` is a list of
+# `<tag>=<machine>/<user>` pairs, the tag one lowercase letter and neither half empty or carrying a
+# `/`. The driver resolves the node holding a run through the first function and the gate leg grades
+# the declaration through the second, so the two readers cannot disagree about which token is a pair.
+# Every field compares LOWERCASED, for `read_host_name`'s reason. A node is a machine AND a user,
+# never a path: the charter's node registry forbids a path, because roots can be identical.
+#
+# `%20` SPELLS A SPACE (closing review round 1, L2). The value is word-split, so `a=desk/john smith`
+# was two tokens, and a Windows account named `john smith` could never be declared. The pair is decoded
+# before it is compared. `scan_landing_nodes` compares the RAW tokens: a token can hold no literal
+# space, so two raw spellings decode alike exactly when they are equal, and its duplicate test stays
+# exact without decoding into the space its own seen-list splits on.
+resolve_landing_tag() { # nodes · machine · user -> the one matching pair's tag; 1 on none, an empty input, or two tags
+  local - nodes m u tok tag mu hit="" esc='%20'
+  set -f
+  nodes=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
+  m=$(printf '%s' "$2" | tr '[:upper:]' '[:lower:]'); u=$(printf '%s' "$3" | tr '[:upper:]' '[:lower:]')
+  [ -n "$m" ] && [ -n "$u" ] || return 1
+  for tok in $nodes; do
+    case "$tok" in [a-z]=?*/?*) ;; *) continue ;; esac
+    tag=${tok%%=*}; mu=${tok#*=}
+    case "$mu" in */*/*) continue ;; esac
+    mu=${mu//"$esc"/ }
+    [ "$mu" = "$m/$u" ] || continue
+    if [ -n "$hit" ] && [ "$hit" != "$tag" ]; then return 1; fi
+    hit=$tag
+  done
+  [ -n "$hit" ] || return 1
+  printf '%s\n' "$hit"
+}
+scan_landing_nodes() { # nodes -> each malformed token, then each tag or machine/user declared twice; nothing when well-formed or blank
+  # A malformed token whose tag is still readable claims that tag, so `d=compeeto d=m/u` names `d` as
+  # declared twice as well as `d=compeeto` as malformed: either fix leaves one pair per tag.
+  local - tok mu seen_t=" " seen_p=" "
+  set -f
+  for tok in $(printf '%s' "$1" | tr '[:upper:]' '[:lower:]'); do
+    case "$tok" in
+      [a-z]=*) case "$seen_t" in *" ${tok%%=*} "*) printf '%s\n' "${tok%%=*}" ;; *) seen_t="$seen_t${tok%%=*} " ;; esac ;;
+    esac
+    mu=${tok#*=}
+    case "$tok" in
+      [a-z]=?*/?*) case "$mu" in */*/*) printf '%s\n' "$tok"; continue ;; esac ;;
+      *) printf '%s\n' "$tok"; continue ;;
+    esac
+    case "$seen_p" in *" $mu "*) printf '%s\n' "$mu" ;; *) seen_p="$seen_p$mu " ;; esac
+  done
+  return 0
 }
 
 # THE IMAGE HOLDING A PID. Prints the image name and returns 0 when a process holds the pid; 1 when
@@ -979,9 +1070,10 @@ read_run_commits() {  # endpoint · base · exclusion-tip…
 # ------------------------------------------------- the advertised tip, for the two history legs
 # TOOL-dUnstuckLanding-17 S1. `pass-order history` and `brief-recorded` grade only the commits the
 # closing run adds on top of the tip the REMOTE advertises, and this is the one place either learns
-# that tip. ONE bounded `ls-remote --symref --exit-code <remote> HEAD`, and nothing else is read: never
-# a local ref, never `refs/remotes/<remote>/HEAD`, never an environment variable. Every one of those is
-# a value the graded run controls, and a range the run names is a range the run can empty.
+# that tip. ONE bounded `ls-remote --symref --exit-code <remote> HEAD`, and nothing else names the tip:
+# never a local ref, never `refs/remotes/<remote>/HEAD`, never an environment variable. Every one of
+# those is a value the graded run controls, and a range the run names is a range the run can empty.
+# The one variable read, GATE_PUSH_BASE, can only refuse the tip, never supply one (M6 below).
 #
 # THE BOUNDS ARE THE DRIVER'S, READ AS DATA. `REMOTE_BOUND`, `REMOTE_CONNECT_BOUND` and
 # `REMOTE_LOWSPEED_BYTES` are file constants in the driver; this reads their quoted values out of the
@@ -991,15 +1083,25 @@ read_run_commits() {  # endpoint · base · exclusion-tip…
 #
 # EVERY FAILURE IS A RETURN OF 1 WITH THE REASON IN `ADVH_WHY`, and the caller widens to grading the
 # WHOLE history, never to an empty range. An unanswered observation that narrowed the range would be a
-# probe reading zero. The six refusals: no remote or more than one, a constant that does not read, no
-# working `timeout -k` (the bound would be inert), the bound firing, a remote advertising no HEAD, and
-# an advertised object this clone does not hold.
+# probe reading zero. The refusals: no remote or more than one, a constant that does not read, a fetch
+# URL that is not the push URL, no working `timeout -k` (the bound would be inert), the bound firing, a
+# remote advertising no HEAD, a tip the push's own ref line contradicts, and an advertised object this
+# clone does not hold.
+#
+# THE FETCH URL MUST BE THE PUSH URL, and in pre-push the tip must be GATE_PUSH_BASE (closing review
+# round 1, M6). `ls-remote` follows `remote.<name>.url` and `insteadOf`, so a run pointing the fetch URL
+# at a seeded copy advertising an older tip narrowed both legs while its push went to the real remote.
+# The driver's anchor observation refuses that split at fail 25; this reader now widens on it. The
+# pre-push hook writes GATE_PUSH_BASE from git's own ref line, the push connection's answer, so a tip
+# disagreeing with it is refused. Both tests can only WIDEN: an equal pair narrows nothing it did not.
 #
 # WHAT THIS DOES NOT DO: share the kit gate's observation or the driver's `read_advertised_tip`. Three
-# bounded observations of one advertisement is a known residual, stated in the unit's spec.
+# bounded observations of one advertisement is a known residual, stated in the unit's spec. Nor does it
+# defeat a run that points BOTH URLs at one seeded relay, outside pre-push, where nothing ties the tip
+# to the push: both are config the run writes, protocol section 9's limit for a check under its uid.
 ADVH_SHA=""; ADVH_WHY=""
 read_advertised_head() { # driver path -> 0 with ADVH_SHA set · 1 with ADVH_WHY set
-  local _ah_drv=${1:-} _ah_k _ah_l _ah_v _ah_b="" _ah_cb="" _ah_lb="" _ah_rems _ah_n _ah_rem _ah_f _ah_rc _ah_sha
+  local _ah_drv=${1:-} _ah_k _ah_l _ah_v _ah_b="" _ah_cb="" _ah_lb="" _ah_rems _ah_n _ah_rem _ah_fu _ah_pu _ah_f _ah_rc _ah_sha
   ADVH_SHA=""; ADVH_WHY=""
   if [ -z "$_ah_drv" ] || [ ! -f "$_ah_drv" ]; then
     ADVH_WHY="the driver that holds the remote bounds is not readable: ${_ah_drv:-<none given>}"; return 1
@@ -1031,6 +1133,10 @@ read_advertised_head() { # driver path -> 0 with ADVH_SHA set · 1 with ADVH_WHY
     1) _ah_rem=$_ah_rems ;;
     *) ADVH_WHY="this clone declares $_ah_n remotes, and which one the landing reaches is not this reader's to guess"; return 1 ;;
   esac
+  _ah_fu=$(GIT ls-remote --get-url "$_ah_rem" 2>/dev/null); _ah_pu=$(GIT remote get-url --push "$_ah_rem" 2>/dev/null)
+  if [ -z "$_ah_fu" ] || [ "$_ah_fu" != "$_ah_pu" ]; then
+    ADVH_WHY="the remote $_ah_rem is read from ${_ah_fu:-nothing} and pushed to ${_ah_pu:-nothing}, so a tip read from the first is not the one a push lands on"; return 1
+  fi
   if ! timeout -k 1s 10 true >/dev/null 2>&1; then
     ADVH_WHY="this node has no working 'timeout -k', so the remote observation cannot be bounded"; return 1
   fi
@@ -1056,6 +1162,9 @@ read_advertised_head() { # driver path -> 0 with ADVH_SHA set · 1 with ADVH_WHY
   esac
   if [ -z "$_ah_sha" ]; then
     ADVH_WHY="the remote $_ah_rem answered and advertised no HEAD, so it names no default-branch tip"; return 1
+  fi
+  if [ -n "${GATE_PUSH_BASE:-}" ] && [ "$_ah_sha" != "$GATE_PUSH_BASE" ]; then
+    ADVH_WHY="the remote advertises ${_ah_sha:0:8} and the push's own ref line names ${GATE_PUSH_BASE:0:8} as the default branch it moves, so the two observations disagree"; return 1
   fi
   if ! GIT rev-parse --verify --quiet "$_ah_sha^{commit}" >/dev/null 2>&1; then
     ADVH_WHY="the remote $_ah_rem advertises ${_ah_sha:0:8}, a tip this clone does not hold; fetch and read again"; return 1
@@ -1319,11 +1428,21 @@ check_lease_only_diff() { # run-state file -> 0 when it differs from HEAD in lea
 # the six lease-fact lines of a record the push already carried. Committing it would move HEAD off
 # the pushed tip, so it stays a working-copy difference, and a difference confined to those six lines
 # is read as none. Every other byte, the phase line among them, must still match.
-read_landing_commit() { # run-state file -> the commit that carries it at LANDING, or status 1
-  local _lc_f="${1:-}" _lc_ph _lc_c
+#
+# TOOL-dUnstuckLanding-14 S1 - THE OPTIONAL SECOND ARGUMENT is the hand-off code list, and with it
+# HEAD's copy may also read `phase: HELD` under a `hold-code` in that list: the hand-off commit is
+# the run's last act on its own branch, so a landing that carries it carries the work it hands off.
+# Both callers pass the driver's own constant, so the list is spelled once. Without the argument
+# nothing changes: a HELD copy is no landing.
+read_landing_commit() { # run-state file · [hand-off codes] -> the commit that carries it, or status 1
+  local _lc_f="${1:-}" _lc_ph _lc_c _lc_hc
   [ -n "$_lc_f" ] || return 1
   check_lease_only_diff "$_lc_f" || return 1
   _lc_ph=$(GIT show "HEAD:$_lc_f" 2>/dev/null | extract_run_facts | sed -n 's/^phase: *//p' | head -1 | tr -d '\r')
+  if [ "$_lc_ph" = HELD ] && [ -n "${2:-}" ]; then
+    _lc_hc=$(GIT show "HEAD:$_lc_f" 2>/dev/null | extract_run_facts | sed -n 's/^hold-code: *//p' | head -1 | tr -d '\r')
+    case " $2 " in *" $_lc_hc "*) [ -n "$_lc_hc" ] && _lc_ph=LANDING ;; esac
+  fi
   [ "$_lc_ph" = LANDING ] || return 1
   _lc_c=$(GIT log -1 --format=%H HEAD -- "$_lc_f" 2>/dev/null)
   [ -n "$_lc_c" ] || return 1
@@ -1402,22 +1521,161 @@ check_landed_facts_due() { # record path · cutoff -> 0 graded · 1 grandfathere
 #   derived  a recorded LANDED carrying `landed-derived`, which only the rotation writes - the roster
 #            the close froze, and the derivation itself
 #   landing  a committed LANDING under in-place landing - the roster `--close` froze beside the phase
+#   attended a recorded LANDED carrying `landed-by: attended` - a hand-off an owner landed, written by
+#            `--settle` or the rotation: the hand-off's roster, the derivation, and who landed it
+#            (TOOL-dUnstuckLanding-14 S8)
 #
 # `asks-at-landing` is not here: the freeze-presence arm grades it, and one fact graded by two arms
 # is two answers to one question. PRESENCE of the key line is the test; a value is a record's own.
 # Prints the missing keys, space-separated, and nothing when the set is complete.
-read_missing_landed_facts() { # record file · landed|derived|landing -> the missing keys
+read_missing_landed_facts() { # record file · landed|derived|landing|attended -> the missing keys
   local _mf_f="${1:-}" _mf_k _mf_want _mf_out=""
   case "${2:-}" in
     landed)  _mf_want="landed-anchor units-at-landing unpushed-at-landing" ;;
     derived) _mf_want="units-at-landing landed-derived" ;;
     landing) _mf_want="units-at-landing" ;;
+    attended) _mf_want="units-at-landing landed-derived landed-by" ;;
     *) return 2 ;;
   esac
   for _mf_k in $_mf_want; do
     { extract_run_facts < "$_mf_f"; } 2>/dev/null | grep -q "^$_mf_k:" || _mf_out="$_mf_out${_mf_out:+ }$_mf_k"
   done
   printf '%s' "$_mf_out"
+}
+
+# TOOL-dUnstuckLanding-14 S4 - DID THIS RUN'S WORK LAND, decided by CONTENT and never by witness
+# ancestry. `--abort` writes `witness` = HEAD and commits the record on top of it, so every record
+# read from the tip has its witness on the tip by construction, and a witness equal to `base`, or
+# taken from another tree's commit, is on every later tip too (review item H1). Landed is all three:
+#
+#   (i)   the witness is not an ancestor of `base`, and `base..witness` holds at least one commit
+#         ATTRIBUTABLE to the run: its subject names the slug as a word, or it touches the build folder;
+#   (ii)  every attributable commit is an ancestor of the tip;
+#   (iii) no commit on the tip's first-parent line since the witness carries a `This reverts commit
+#         <sha>` line naming one of them, or naming a merge that brought one of them onto the tip.
+#
+# 0 landed · 1 not landed · 2 UNDECIDABLE, the reason in WL_WHY either way. A missing `base`, a
+# `base`, `witness` or tip this clone cannot resolve, or a range git will not walk is undecidable,
+# never a guess. Two callers, `--settle` and the leg's check 15, so the writer and the grader cannot
+# disagree about one record. The slug and folder come from the record's path, `<builds>/<slug>/RUN*.md`.
+# CALLED AS A PLAIN COMMAND: WL_WHY is a global, and a substitution would discard it.
+WL_WHY=""
+check_work_landed() { # record file · advertised tip -> 0 landed · 1 not · 2 undecidable; WL_WHY
+  local _wl_f="${1:-}" _wl_t="${2:-}" _wl_b _wl_w _wl_d _wl_s _wl_all _wl_own _wl_c _wl_x="" _wl_n=0 _wl_log _wl_rv
+  local _wl_p1 _wl_p2 _wl_a
+  WL_WHY=""
+  _wl_b=$({ extract_run_facts < "$_wl_f"; } 2>/dev/null | sed -n 's/^base: *//p' | head -1 | tr -d '\r')
+  _wl_w=$({ extract_run_facts < "$_wl_f"; } 2>/dev/null | sed -n 's/^witness: *//p' | head -1 | tr -d '\r')
+  [ -n "$_wl_b" ] || { WL_WHY="the record carries no base fact, so the run's own range cannot be opened"; return 2; }
+  GIT rev-parse --verify --quiet "$_wl_b^{commit}" >/dev/null 2>&1 \
+    || { WL_WHY="its base $_wl_b does not resolve in this clone"; return 2; }
+  GIT rev-parse --verify --quiet "${_wl_w:-none}^{commit}" >/dev/null 2>&1 \
+    || { WL_WHY="its witness ${_wl_w:-none} does not resolve in this clone"; return 2; }
+  GIT rev-parse --verify --quiet "${_wl_t:-none}^{commit}" >/dev/null 2>&1 \
+    || { WL_WHY="the tip ${_wl_t:-none} does not resolve in this clone"; return 2; }
+  if GIT merge-base --is-ancestor "$_wl_w" "$_wl_b" 2>/dev/null; then
+    WL_WHY="its witness ${_wl_w:0:8} is its base ${_wl_b:0:8} or an ancestor of it, so the run committed nothing of its own"
+    return 1
+  fi
+  _wl_d=${_wl_f%/*}; _wl_s=${_wl_d##*/}
+  _wl_all=$(GIT log --format='%H %s' "$_wl_b..$_wl_w" 2>/dev/null) \
+    || { WL_WHY="the range ${_wl_b:0:8}..${_wl_w:0:8} cannot be read"; return 2; }
+  _wl_own=$(GIT log --format=%H "$_wl_b..$_wl_w" -- "$_wl_d/" 2>/dev/null) \
+    || { WL_WHY="the range ${_wl_b:0:8}..${_wl_w:0:8} cannot be read"; return 2; }
+  # The rows are split into an array, and NOT read by a loop fed by a here-string: the shell-hygiene
+  # leg refuses a loop whose redirect holds a substitution's output (`_wl_all` above).
+  local -a _wl_rows=()
+  mapfile -t _wl_rows <<< "$_wl_all"
+  for _wl_c in "${_wl_rows[@]}"; do
+    [ -n "$_wl_c" ] || continue
+    case "$_wl_own" in
+      *"${_wl_c%% *}"*) ;;
+      *) [[ " ${_wl_c#* } " =~ [^A-Za-z0-9]"$_wl_s"[^A-Za-z0-9] ]] || continue ;;
+    esac
+    _wl_x="$_wl_x ${_wl_c%% *}"; _wl_n=$((_wl_n + 1))
+  done
+  if [ "$_wl_n" = 0 ]; then
+    WL_WHY="no commit in ${_wl_b:0:8}..${_wl_w:0:8} names $_wl_s in its subject or touches $_wl_d/, so its witness is not this run's work"
+    return 1
+  fi
+  for _wl_c in $_wl_x; do
+    GIT merge-base --is-ancestor "$_wl_c" "$_wl_t" 2>/dev/null \
+      || { WL_WHY="its commit ${_wl_c:0:8} is not on the tip ${_wl_t:0:8}"; return 1; }
+  done
+  _wl_log=$(GIT log --first-parent --format=%B "$_wl_t" "^$_wl_w" 2>/dev/null) \
+    || { WL_WHY="the tip's first-parent line since ${_wl_w:0:8} cannot be read"; return 2; }
+  _wl_rv=$(printf '%s\n' "$_wl_log" | sed -n 's/.*This reverts commit \([0-9a-f]\{7,40\}\).*/\1/p')
+  for _wl_c in $_wl_rv; do
+    case "$_wl_x" in *" $_wl_c"*)
+      WL_WHY="a commit on the tip's first-parent line reverts its commit ${_wl_c:0:8}"; return 1 ;;
+    esac
+    # A LANDING IS A --no-ff MERGE, and its usual back-out is `git revert -m 1 <merge>`, whose line
+    # names the MERGE and none of the run's own commits (implementation review round 1, M4). A named
+    # merge reverts the run when it brought an attributable commit in: on its second parent's side
+    # and not already on its first.
+    _wl_p1=$(GIT rev-parse --verify --quiet "$_wl_c^1^{commit}" 2>/dev/null) || continue
+    _wl_p2=$(GIT rev-parse --verify --quiet "$_wl_c^2^{commit}" 2>/dev/null) || continue
+    for _wl_a in $_wl_x; do
+      if GIT merge-base --is-ancestor "$_wl_a" "$_wl_p2" 2>/dev/null \
+         && ! GIT merge-base --is-ancestor "$_wl_a" "$_wl_p1" 2>/dev/null; then
+        WL_WHY="a commit on the tip's first-parent line reverts the merge ${_wl_c:0:8}, which brought its commit ${_wl_a:0:8} onto the tip"
+        return 1
+      fi
+    done
+  done
+  WL_WHY="$_wl_n commit(s) of its own in ${_wl_b:0:8}..${_wl_w:0:8}, every one on the tip ${_wl_t:0:8} and none reverted"
+  return 0
+}
+
+# IS A RECORD'S `work-landed-at: <witness> <tip>` UPHELD - the leg's check 15, and the drift kit's
+# parity arm holding its own `upheld` reading to this one (implementation review round 1, L6). The
+# fact is graded AT THE TIP IT RECORDS, never at today's (M9): `--settle` wrote it after reading the
+# work landed there, and a revert landing later is a fact about the default branch, not about that
+# write, which no verb could clear. Upheld is all three: its first field is the record's witness; its
+# tip resolves and is an ancestor of <advertised tip>, so it names a landing the default branch
+# carries; and `check_work_landed` reads the work landed at that tip.
+#
+# 0 upheld · 1 not upheld · 2 undecidable, the reason in WL_WHY. On 0, WLF_NOW is EMPTY, or the
+# reason the predicate no longer reads the work landed at <advertised tip> - the report line a later
+# revert becomes - and WLF_UNDECIDED is EMPTY, or the reason it could not re-judge that at all
+# (implementation review round 2, L8): a probe that cannot read the tip's first-parent line is not a
+# revert anybody observed. CALLED AS A PLAIN COMMAND, for WL_WHY's reason.
+#
+# WHAT IT DOES NOT CHECK: the record's phase or its date against HANDOFF_CUTOFF, which check 15
+# grades beside it; nor that the recorded tip was the one advertised when `--settle` ran.
+WLF_NOW=""; WLF_UNDECIDED=""
+check_work_landed_fact() { # record file · advertised tip -> 0 upheld · 1 not · 2 undecidable; WL_WHY, WLF_NOW, WLF_UNDECIDED
+  local _wf_f="${1:-}" _wf_adv="${2:-}" _wf_v _wf_n _wf_t="" _wf_wit _wf_full _wf_rc
+  WLF_NOW=""; WLF_UNDECIDED=""; WL_WHY=""
+  _wf_v=$({ extract_run_facts < "$_wf_f"; } 2>/dev/null | sed -n 's/^work-landed-at: *//p' | head -1 | tr -d '\r')
+  _wf_wit=$({ extract_run_facts < "$_wf_f"; } 2>/dev/null | sed -n 's/^witness: *//p' | head -1 | tr -d '\r')
+  _wf_n=${_wf_v%% *}
+  case "$_wf_v" in *" "*) _wf_t=${_wf_v#* }; _wf_t=${_wf_t%% *} ;; esac
+  if [ -z "$_wf_n" ] || [ "$_wf_n" != "$_wf_wit" ]; then
+    _wf_full=$(GIT rev-parse --verify --quiet "${_wf_wit:-none}^{commit}" 2>/dev/null)
+    if [ -z "$_wf_n" ] || [ "$_wf_n" != "$_wf_full" ]; then
+      WL_WHY="its work-landed-at names ${_wf_n:0:8} and its witness is ${_wf_wit:0:8}, so the fact is not about this run's own work"
+      [ -n "$_wf_n" ] || WL_WHY="its work-landed-at names no commit, so the fact is not about this run's own work"
+      return 1
+    fi
+  fi
+  GIT rev-parse --verify --quiet "${_wf_adv:-none}^{commit}" >/dev/null 2>&1 \
+    || { WL_WHY="the advertised tip ${_wf_adv:-none} does not resolve in this clone"; return 2; }
+  if ! GIT rev-parse --verify --quiet "${_wf_t:-none}^{commit}" >/dev/null 2>&1 \
+     || ! GIT merge-base --is-ancestor "$_wf_t" "$_wf_adv" 2>/dev/null; then
+    WL_WHY="the tip its work-landed-at records, ${_wf_t:0:8}, is not on the advertised tip ${_wf_adv:0:8}, so it names no landing the default branch carries"
+    [ -n "$_wf_t" ] || WL_WHY="its work-landed-at records no tip, so it names no landing the default branch carries"
+    return 1
+  fi
+  check_work_landed "$_wf_f" "$_wf_t"; _wf_rc=$?
+  [ "$_wf_rc" = 0 ] || return "$_wf_rc"
+  check_work_landed "$_wf_f" "$_wf_adv"; _wf_rc=$?
+  case "$_wf_rc" in
+    1) WLF_NOW="$WL_WHY" ;;
+    2) WLF_UNDECIDED="$WL_WHY" ;;
+  esac
+  WL_WHY="its witness ${_wf_n:0:8} reads landed at the tip the fact records, ${_wf_t:0:8}"
+  return 0
 }
 
 # THE NEXT ANCHOR for a unit after <anchor>, or empty when this is the unit's last row. Chosen by

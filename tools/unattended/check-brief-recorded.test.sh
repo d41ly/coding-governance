@@ -713,8 +713,8 @@ write_br_build() { # unit number · row|norow -> one build commit for that unit,
   printf 'product %s\n' "$1" > ${PFX}p$1.sh
   git add -A >/dev/null; git commit -q -m "ARCH-tBR-$1: build the thing" --no-verify
 }
-seed_brange_fixture() { # -> prints the fixture root; the clone is <root>/work, its origin <root>/origin.git
-  local T
+seed_brange_fixture() { # [row|norow] -> prints the fixture root; the clone is <root>/work, its origin <root>/origin.git
+  local T U1="${1:-norow}"
   T=$(mktemp -d) || exit 2
   ( cd "$T" || exit 2
     git init -q --bare origin.git
@@ -732,7 +732,7 @@ seed_brange_fixture() { # -> prints the fixture root; the clone is <root>/work, 
     git add -A >/dev/null; git commit -q -m "fixture base" --no-verify
     printf '# tBR — run state\n<!-- run:generated -->\n<!-- /run:generated -->\n## Run facts\nbase: %s\n## Parked\n' "$(git rev-parse HEAD)" > memory/builds/tBR/RUN.md
     git add -A >/dev/null; git commit -q -m "run state" --no-verify
-    write_br_build 1 norow
+    write_br_build 1 "$U1"
     git remote add origin ../origin.git; git push -q origin main
     write_br_build 2 row
   ) >/dev/null 2>&1
@@ -766,6 +766,22 @@ T=$(seed_brange_fixture)
 o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
 same  "range waiver: a row naming a pushed unit is not judged stale, exit code" "$rc" "0"
 has   "range waiver: the row is counted as not judged" "$o" "1 waivers not judged"
+rm -rf "$T"
+# ...a unit an EARLIER run built and landed, repaired by THIS run with no brief row, is built before its
+# run in RANGE mode exactly as it is in WHOLE mode (TOOL-dUnstuckLanding-27 S1, AC1). The exemption probe
+# looks BEHIND the base, and everything behind the base is on the tip by construction, so the `^<tip>`
+# the in-range walk carries would empty this probe and red the repair. Run 2's base is the tip itself.
+T=$(seed_brange_fixture row)
+( cd "$T/work" && git reset -q --hard origin/main \
+  && printf '# tBR — run state\n<!-- run:generated -->\n<!-- /run:generated -->\n## Run facts\nbase: %s\n## Parked\n' "$(git rev-parse HEAD)" > memory/builds/tBR/RUN.md \
+  && git add -A >/dev/null && git commit -q -m "run 2 state" --no-verify \
+  && printf 'product 1, repaired\n' > ${PFX}p1.sh && git add -A >/dev/null \
+  && git commit -q -m "fix(tBR): ARCH-tBR-1 — repair the thing" --no-verify ) >/dev/null 2>&1
+o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
+same  "range prebuilt: a pre-base build repaired in range is not a violation, exit code" "$rc" "0"
+has   "range prebuilt: the leg ran in RANGE mode" "$o" "range "
+has   "range prebuilt: the unit is named built before its run" "$o" "ARCH-tBR-1 was built before its run"
+hasnt "range prebuilt: the repair is not reported as a briefless build" "$o" "ARCH-tBR-1 — BUILT at"
 rm -rf "$T"
 
 echo "--- $n arms, exit $st"
