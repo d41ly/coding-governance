@@ -1323,7 +1323,11 @@ printf '%s\n' "$out"
 # RAISED 183 -> 188 by TOOL-aMendedFleet-111: 5 assertions, counted off the block — `durable` and the
 # deferred note under an absent and a `none` workerType, for dead lenses (2) and a dead synthesis (2),
 # and the synthesis-died log under the absent type (1).
-FLOOR_ASSERTIONS=188
+# RAISED 188 -> 200 by TOOL-aMendedFleet-67: 12 assertions, counted off the block — the `workerType`
+# arms whose absent-type half TOOL-aMendedFleet-93 rewrote: the default run's judges (1), the absent
+# run (1), the explicit Plan run (7) and the refusal loop's one call over three values (3). Landed
+# unpriced; TOOL-aMendedFleet-112 priced it, and no suite ran in that pass.
+FLOOR_ASSERTIONS=200
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

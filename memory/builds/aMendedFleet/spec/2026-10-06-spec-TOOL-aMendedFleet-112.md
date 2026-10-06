@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-112 — four suites' assertion floors cover the arms this build added, unit 75's AC1 names the plain-run form, and the kickoff units are graded Tier-2
 
-**Status:** SPECCED · rev-1 · 2026-10-06 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-06 · order 109
+**Status:** CLOSED · rev-2 · 2026-10-06 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-06 · order 109
 
 <!-- gen:spec-records -->
 
@@ -36,15 +36,18 @@ concurrently. Every finding was re-verified at `e83b29b6`, the reviewed tip, and
 - **S2** — FINDING 14, THE KICK-2 MISCOUNT. The `KICK-aMendedFleet-2` block executes 9 assertions,
   not the 10 both floor comments state. The `RAISED 1892 -> 1902` line under `FLOOR_ASSERTIONS`
   becomes `RAISED 1892 -> 1901` naming 9 lines, and the `RAISED 224 -> 234` line under
-  `FLOOR_SHARD_1` becomes `RAISED 224 -> 233` naming 9 assertions. S1's raises chain from the
-  corrected figures. Observed by AC2.
+  `FLOOR_SHARD_1` becomes `RAISED 224 -> 233` naming 9 assertions. The `TOOL-aMendedFleet-111`
+  lines that chain from the old figures move by the same one: `RAISED 1901 -> 1909` and
+  `RAISED 233 -> 235`, their counts unchanged. S1's raises chain from the corrected figures.
+  Observed by AC2.
   **Readers:** by name: no code reads a `RAISED` comment in this suite; the comment is read by the
   next author who raises the floor. by value: the suite's `[ "$n" -ge "$FLOOR" ]` comparison,
   through the constants the corrected chain sets.
 - **S3** — FINDING 15, THE TIER2-REVIEW FLOOR. `FLOOR_ASSERTIONS` in
-  `tools/workflows/tier2-review.test.sh` rises from 183 to 195, with one `RAISED 183 -> 195 by
-  TOOL-aMendedFleet-67:` comment naming the 12 `ck()` calls of the `workerType` block, whose
-  absent-type half `TOOL-aMendedFleet-93` rewrote. Observed by AC3.
+  `tools/workflows/tier2-review.test.sh` rises from 188, where `TOOL-aMendedFleet-111` left it, to
+  200, with one `RAISED 188 -> 200 by TOOL-aMendedFleet-67:` comment, the newest in the block,
+  naming the 12 `ck()` calls of the `workerType` block, whose absent-type half
+  `TOOL-aMendedFleet-93` rewrote. Observed by AC3.
   **Readers:** by name: the suite's own floor compare after the runner's summary line, and
   `tools/check-testsuite-counts.sh` for the pin's presence. by value: the
   `[ "$executed" -lt "$FLOOR_ASSERTIONS" ]` compare, which reds when the executed count falls below
@@ -143,23 +146,28 @@ Read at `e83b29b6`, the reviewed tip and this worktree's HEAD, on 2026-10-06.
 ### Inventory — the unattended suite's blocks
 
 Executed assertions per block, counted off each block's own lines with its loop and branches
-expanded. PINNED at `e83b29b6` on 2026-10-06; the build re-derives them by the same count.
+expanded. PINNED at `106c527e` on 2026-10-06, re-counted after `TOOL-aMendedFleet-111` landed: each
+block's count is unchanged from `e83b29b6`, its line moved by that unit's inserted arms.
 
 | Unit | Block line | Region | Executed | Floor today |
 |---|---|---|---|---|
 | `TOOL-aMendedFleet-60` | 728 | one | 15 | priced |
 | `KICK-aMendedFleet-2` | 783 | one | 9 | priced as 10, S2 |
-| `TOOL-aMendedFleet-61` | 1308 | one | 19 | unpriced |
-| `TOOL-aMendedFleet-63` | 1595 | one | 11, a loop of 7 with the runlog kit present and 4 without | unpriced |
-| `TOOL-aMendedFleet-66` | 9349 | two | 2 | unpriced |
-| `TOOL-aMendedFleet-83` | 9369 | two | 2 | unpriced |
-| `TOOL-aMendedFleet-49` S8 | 9783 | two | 2, behind a SKIP that S1 makes count 2 | unpriced |
-| `TOOL-aMendedFleet-9` | 11719 | two | 16 | unpriced |
+| `TOOL-aMendedFleet-111` AC1 | 794 | one | 2 | priced |
+| `TOOL-aMendedFleet-61` | 1316 | one | 19 | unpriced |
+| `TOOL-aMendedFleet-63` | 1603 | one | 11, a loop of 7 with the runlog kit present and 4 without | unpriced |
+| `TOOL-aMendedFleet-66` | 9357 | two | 2 | unpriced |
+| `TOOL-aMendedFleet-83` | 9377 | two | 2 | unpriced |
+| `TOOL-aMendedFleet-49` S8 | 9791 | two | 2, behind a SKIP that S1 makes count 2 | unpriced |
+| `TOOL-aMendedFleet-9` | 11727 | two | 16 | unpriced |
+| `TOOL-aMendedFleet-111` AC5 | 12099 | two | 6 | priced |
 
-The resulting pins, from base: `FLOOR_SHARD_1` 209 + 15 + 9 + 19 + 11 = 263; `FLOOR_SHARD_2`
-1680 + 2 + 2 + 2 + 16 = 1702; `FLOOR_ASSERTIONS` 1877 + 54 + 22 = 1953. The raise chain under
-`FLOOR_ASSERTIONS` reads 1892 -> 1901 for KICK-2, then 1901 -> 1920, 1931, 1933, 1935, 1937 and
-1953 for units 61, 63, 66, 83, 49 and 9 in suite order. The other three pins: 195, 1561, 216.
+The resulting pins, from base: `FLOOR_SHARD_1` 209 + 15 + 9 + 2 + 19 + 11 = 265; `FLOOR_SHARD_2`
+1680 + 6 + 2 + 2 + 2 + 16 = 1708; `FLOOR_ASSERTIONS` 1877 + 56 + 28 = 1961. The raise chain under
+`FLOOR_ASSERTIONS` reads 1892 -> 1901 for KICK-2, 1901 -> 1909 for unit 111, then 1909 -> 1928,
+1939, 1941, 1943, 1945 and 1961 for units 61, 63, 66, 83, 49 and 9 in suite order. Under
+`FLOOR_SHARD_1`: 224 -> 233, 233 -> 235, 235 -> 254, 254 -> 265; under `FLOOR_SHARD_2`, after unit
+111's 1680 -> 1686: 1688, 1690, 1692, 1708. The other three pins: 200, 1561, 216.
 
 No identifier is minted. The three ledger records are new files.
 
@@ -186,7 +194,7 @@ generator sees tracked files only.
 - `memory/builds/aMendedFleet/spec/2026-10-04-spec-KICK-aMendedFleet-1.md`
 - `memory/builds/aMendedFleet/spec/2026-10-04-spec-KICK-aMendedFleet-2.md`
 - `memory/builds/aMendedFleet/spec/2026-10-04-spec-KICK-aMendedFleet-4.md`
-- three new ledger records, `2026-10-06-build-KICK-aMendedFleet-<n>-1-acceptance-ledger.md` for
+- three new ledger records, `2026-10-04-build-KICK-aMendedFleet-<n>-1-acceptance-ledger.md` for
   n of 1, 2 and 4, under the build's own build folder
 - `memory/builds/aMendedFleet/README.md`, re-rendered
 
@@ -227,18 +235,19 @@ generator sees tracked files only.
   under each constant its region moves, and the S8 SKIP branch carries `n=$((n+2))`.
   Red when: a block in §4's table can be deleted and the executed count still meets the floor its
   region reads, which is the case whenever a pin is below base plus the table's sum.
-  figure: DERIVED from the per-block count at observation time; 263, 1702 and 1953 at writing.
+  figure: DERIVED from the per-block count at observation time; 265, 1708 and 1961 at rev-2.
 - **AC2** — When `grep -n "KICK-aMendedFleet-2" tools/unattended/unattended.test.sh` runs, both
-  floor comments read 9 and the raises read `1892 -> 1901` and `224 -> 233`, and the block's own
-  `hit`, `miss` and `same` lines number 9.
+  floor comments read 9 and the raises read `1892 -> 1901` and `224 -> 233`, the
+  `TOOL-aMendedFleet-111` raises after them chain from those figures, and the block's own `hit`,
+  `miss` and `same` lines, the 111 arm inside it set aside, number 9.
   Red when: a comment still prices the block at 10, so one pinned assertion exists nowhere.
 - **AC3** — When `grep -n "FLOOR_ASSERTIONS=" tools/workflows/tier2-review.test.sh` runs, it prints
-  195, and the `RAISED 183 -> 195` line above it names `TOOL-aMendedFleet-67` and 12 assertions;
+  200, and the `RAISED 188 -> 200` line above it names `TOOL-aMendedFleet-67` and 12 assertions;
   and the `ck(` calls between the `TOOL-aMendedFleet-67` S5 header and the next block, with the
   refusal loop's one call counted three times, number 12.
-  Red when: the pin is below 195, so the `workerType` block can be stranded behind an early exit
+  Red when: the pin is below 200, so the `workerType` block can be stranded behind an early exit
   with the suite still at its floor.
-  figure: PINNED, 12 counted at `e83b29b6`.
+  figure: PINNED, 12 counted at `e83b29b6` and again at `106c527e`.
 - **AC4** — When `grep -n "^ASSERTION_FLOOR = " tools/runlog/selftest.py` runs, it prints 1561, and
   the last `RAISED` line in the file reads `RAISED 1554 -> 1561 by TOOL-aMendedFleet-70:` with
   `4 + 3 = 7` as the last arithmetic line of its block.
@@ -273,9 +282,9 @@ staged break AC7 names is check 23's existing branch observed over the new recor
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `testsuite counts (every bar self-test prints one)` · `manifest-check self-test` · `scratch-guard self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `line length` · `kit epoch (shipped bytes move, the version moves)`
 
-New arm: `tools/unattended/unattended.test.sh` · covers AC1 AC2 · the existing floor compare, red when a §4 block is deleted or stranded past an exit · `FLOOR_SHARD_1` 263, `FLOOR_SHARD_2` 1702, `FLOOR_ASSERTIONS` 1953
+New arm: `tools/unattended/unattended.test.sh` · covers AC1 AC2 · the existing floor compare, red when a §4 block is deleted or stranded past an exit · `FLOOR_SHARD_1` 265, `FLOOR_SHARD_2` 1708, `FLOOR_ASSERTIONS` 1961
 
-New arm: `tools/workflows/tier2-review.test.sh` · covers AC3 · the existing floor compare, red when the `workerType` block is stranded behind a `die()` · `FLOOR_ASSERTIONS` 195
+New arm: `tools/workflows/tier2-review.test.sh` · covers AC3 · the existing floor compare, red when the `workerType` block is stranded behind a `die()` · `FLOOR_ASSERTIONS` 200
 
 New arm: `tools/runlog/selftest.py` · covers AC4 · the existing floor compare and the record AC2 arm, red when `test_extract_ready` leaves `test_` discovery or the raise block's arithmetic misses the move · `ASSERTION_FLOOR` 1561
 
@@ -292,7 +301,7 @@ New arm: `skills/session-kickoff/manifest-check.test.sh` · covers AC5 · the ex
   base-ref and per-suite spelling questions, a second mechanism under M2, while this unit is records
   and constants. `tools/check-testsuite-counts.sh` is the seam it would extend, since it already
   reads every floored suite without running one.
-  RESOLVED (main loop, 2026-10-06): split and filed — the floor-delta check is the ask
+  RESOLVED (agent, 2026-10-06, delegated): split and filed — the floor-delta check is the ask
   TOOL-aMendedFleet-113, extending `tools/check-testsuite-counts.sh`. M4 batches the closing
   review's minors into this one unit, so a second mechanism is filed rather than added to the run.
 - **F2** — Does this unit build the gate the review proposes for finding 21, a hygiene check that
@@ -300,7 +309,7 @@ New arm: `skills/session-kickoff/manifest-check.test.sh` · covers AC5 · the ex
   spec records a tier waiver?
   Options: build it here; split it out. It reads commit history from a spec, adds a waiver grammar
   to the status header, and is a new hygiene check, a mechanism of its own.
-  RESOLVED (main loop, 2026-10-06): split and filed — the Tier-1 cross-kit check is the ask
+  RESOLVED (agent, 2026-10-06, delegated): split and filed — the Tier-1 cross-kit check is the ask
   TOOL-aMendedFleet-114, filed beside TOOL-aMendedFleet-113 for the same reason.
 - **F3** — Finding 20's left-shift: the review asks for a checklist line, "an AC quoting a
   checker's output names the flags that produce it". The class
@@ -314,6 +323,15 @@ New arm: `skills/session-kickoff/manifest-check.test.sh` · covers AC5 · the ex
 - rev-1 · 2026-10-06 · initial draft, from the closing diff review's findings 12, 14, 15, 16, 17,
   20 and 21, a static count of every block this build added to the four suites at `e83b29b6`, and a
   scratch-clone hygiene run with the three KICK headers flipped to Tier-2.
+- rev-2 · 2026-10-06 · S2 · S3 · §4 · AC1 · AC2 · AC3 · §7 · the floors recounted at `106c527e`
+  after `TOOL-aMendedFleet-111` landed and raised them by its own arms: every block of §4's table
+  re-counted off its lines at HEAD, unchanged; the unattended pins become 265, 1708 and 1961 over
+  111's 236, 1686 and 1910, the KICK-2 correction re-chains 111's two region-one raises, and the
+  tier2-review pin becomes 200 over 111's 188. The ledger filenames take the brief's
+  `2026-10-04-build-` prefix, the build's convention. §8 F1 and F2 name their resolver in the
+  template's grammar, the run's agent under the mandate, where they read `main loop`: check 12
+  grades the mark once the status is terminal. Closing this, the last open unit, derives the
+  build CLOSED, so the two asks those forks filed carry KEEP rows in the build's backlog.
 
 ## 10. Reuse audit
 

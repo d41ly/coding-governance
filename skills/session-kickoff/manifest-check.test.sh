@@ -1374,7 +1374,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +2: L3's pair, the junction-copy setup and its graded-ids arm (aRepatriatedFork round 1 L3).
 # +8: the `overlaps —` cell's arms (KICK-aMendedFleet-2), counted off the block; no suite ran in the pass.
 # +19: the `cli —` cell's nine card writes and ten cell checks (KICK-aMendedFleet-4), counted the same way.
-FLOOR_ASSERTIONS=207
+# +9: the `drift —` cell's five run_card and four check_eq calls (KICK-aMendedFleet-1), landed unpriced
+# and counted off the block by TOOL-aMendedFleet-112; no suite ran in that pass.
+FLOOR_ASSERTIONS=216
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

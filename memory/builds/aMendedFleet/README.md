@@ -167,7 +167,7 @@ and every red leg fixed. The prompt, the owner's four answers and the report are
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 109 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff+playbook
+**Build status:** CLOSED · 109 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff+playbook
 ids KICK-aMendedFleet-1 KICK-aMendedFleet-2 KICK-aMendedFleet-3 KICK-aMendedFleet-4 PLAY-aMendedFleet-1 PLAY-aMendedFleet-2 PLAY-aMendedFleet-3 PLAY-aMendedFleet-4 PLAY-aMendedFleet-5 TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5
 ids TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19
 ids TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33
@@ -255,9 +255,9 @@ ids TOOL-aMendedFleet-108 TOOL-aMendedFleet-109 TOOL-aMendedFleet-110 TOOL-aMend
 | [TOOL-aMendedFleet-72 — the gate runner reaps the dead `gate-timings.tsv` it no longer reads](spec/2026-10-04-spec-TOOL-aMendedFleet-72.md) | 72 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-73 — the vague-brief trial arm: a full spec against a short plan, on a three-sentence brief](spec/2026-10-04-spec-TOOL-aMendedFleet-73.md) | 73 | 2 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-74 — a unit can be handed the bug-class checklist for its write set before it writes code](spec/2026-10-04-spec-TOOL-aMendedFleet-74.md) | 74 | 2 | CLOSED | rev-2 | 2026-10-04 |
-| [TOOL-aMendedFleet-75 — a `New arm:` line declares the acceptance criteria its arm keeps observed](spec/2026-10-04-spec-TOOL-aMendedFleet-75.md) | 75 | 1 | CLOSED | rev-3 | 2026-10-04 |
-| [KICK-aMendedFleet-1 — the orientation card shows the last drift reading from the node's history](spec/2026-10-04-spec-KICK-aMendedFleet-1.md) | 76 | 1 | CLOSED | rev-2 | 2026-10-04 |
-| [KICK-aMendedFleet-2 — the orientation card shows which unmerged remote refs share paths with this tree's branch](spec/2026-10-04-spec-KICK-aMendedFleet-2.md) | 77 | 1 | CLOSED | rev-3 | 2026-10-04 |
+| [TOOL-aMendedFleet-75 — a `New arm:` line declares the acceptance criteria its arm keeps observed](spec/2026-10-04-spec-TOOL-aMendedFleet-75.md) | 75 | 1 | CLOSED | rev-4 | 2026-10-06 |
+| [KICK-aMendedFleet-1 — the orientation card shows the last drift reading from the node's history](spec/2026-10-04-spec-KICK-aMendedFleet-1.md) | 76 | 2 | CLOSED | rev-3 | 2026-10-06 |
+| [KICK-aMendedFleet-2 — the orientation card shows which unmerged remote refs share paths with this tree's branch](spec/2026-10-04-spec-KICK-aMendedFleet-2.md) | 77 | 2 | CLOSED | rev-4 | 2026-10-06 |
 | [KICK-aMendedFleet-3 — kickoff Step 4 points at the two context commands the build method spells once](spec/2026-10-04-spec-KICK-aMendedFleet-3.md) | 78 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [PLAY-aMendedFleet-1 — the AGENTS.md wrapper's merge-bar section moves to a guide, without its repeated catalog or dated history](spec/2026-10-04-spec-PLAY-aMendedFleet-1.md) | 79 | 2 | CLOSED | rev-2 | 2026-10-04 |
 | [PLAY-aMendedFleet-2 — an experiment's instruments and result rows are committed beside its record, and the vague-brief arm gates §1 as a HIGH ask](spec/2026-10-04-spec-PLAY-aMendedFleet-2.md) | 80 | 1 | CLOSED | rev-3 | 2026-10-04 |
@@ -276,7 +276,7 @@ ids TOOL-aMendedFleet-108 TOOL-aMendedFleet-109 TOOL-aMendedFleet-110 TOOL-aMend
 | [TOOL-aMendedFleet-93 — one tier2 review run with and without the charter, and the review default follows the reading](spec/2026-10-04-spec-TOOL-aMendedFleet-93.md) | 93 | 2 | CLOSED | rev-4 | 2026-10-06 |
 | [PLAY-aMendedFleet-3 — the charter's wiring rule stops stating which file Claude Code reads](spec/2026-10-04-spec-PLAY-aMendedFleet-3.md) | 94 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-94 — the wrapper's product-only prose loads from a path-scoped rule when a session opens a product file](spec/2026-10-04-spec-TOOL-aMendedFleet-94.md) | 95 | 2 | CLOSED | rev-3 | 2026-10-06 |
-| [KICK-aMendedFleet-4 — the orientation card notes a PATH CLI older than the running session](spec/2026-10-04-spec-KICK-aMendedFleet-4.md) | 96 | 1 | CLOSED | rev-4 | 2026-10-04 |
+| [KICK-aMendedFleet-4 — the orientation card notes a PATH CLI older than the running session](spec/2026-10-04-spec-KICK-aMendedFleet-4.md) | 96 | 2 | CLOSED | rev-5 | 2026-10-06 |
 | [PLAY-aMendedFleet-4 — the `AGENTS.md` wrapper carries one node registry](spec/2026-10-04-spec-PLAY-aMendedFleet-4.md) | 97 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-97 — held-red C1: the kits' Python stdio is UTF-8 on a host whose code page is cp1252](spec/2026-10-05-spec-TOOL-aMendedFleet-97.md) | 98 | 1 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aMendedFleet-98 — held-red C2: a Python suite's `bash` resolves to Git-Bash, never the System32 WSL launcher](spec/2026-10-05-spec-TOOL-aMendedFleet-98.md) | 99 | 1 | CLOSED | rev-1 | 2026-10-05 |
@@ -289,10 +289,10 @@ ids TOOL-aMendedFleet-108 TOOL-aMendedFleet-109 TOOL-aMendedFleet-110 TOOL-aMend
 | [TOOL-aMendedFleet-105 — the reaper's verification settles, so a member dying as it is signalled is not a survivor](spec/2026-10-05-spec-TOOL-aMendedFleet-105.md) | 106 | 1 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aMendedFleet-110 — a drift signal moved from BASELINES into PINS is graded against the base's BASELINES](spec/2026-10-06-spec-TOOL-aMendedFleet-110.md) | 107 | 2 | CLOSED | rev-1 | 2026-10-06 |
 | [TOOL-aMendedFleet-111 — closing review round 1 minors, code: a rename-safe overlap diff, the lander's kit paths, an all-zero push base, LIVE's dirty inputs, a merge-aware pickaxe, true resume texts under the Plan default, a dead install-prefix exemption](spec/2026-10-06-spec-TOOL-aMendedFleet-111.md) | 108 | 2 | CLOSED | rev-2 | 2026-10-06 |
-| [TOOL-aMendedFleet-112 — four suites' assertion floors cover the arms this build added, unit 75's AC1 names the plain-run form, and the kickoff units are graded Tier-2](spec/2026-10-06-spec-TOOL-aMendedFleet-112.md) | 109 | 1 | SPECCED | rev-1 | 2026-10-06 |
+| [TOOL-aMendedFleet-112 — four suites' assertion floors cover the arms this build added, unit 75's AC1 names the plain-run form, and the kickoff units are graded Tier-2](spec/2026-10-06-spec-TOOL-aMendedFleet-112.md) | 109 | 1 | CLOSED | rev-2 | 2026-10-06 |
 <!-- /gen:build-units -->
 
-Records: 66 bound to this build, across 4 record folder(s).
+Records: 69 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-aMendedFleet-112.
 

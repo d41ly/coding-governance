@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-75 — a `New arm:` line declares the acceptance criteria its arm keeps observed
 
-**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 75
+**Status:** CLOSED · rev-4 · 2026-10-06 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 75
 
 <!-- gen:spec-records -->
 
@@ -147,8 +147,9 @@ New arm: `tools/check-spec-tokens.test.sh` · covers AC1 AC2 · a dangling id st
 - **AC1** — When a scratch clone made by `git clone --local` under a short `%TEMP%` directory gains
   one tracked fixture spec under a fixture build's `spec/` folder, `SPECCED`, whose §6 defines only
   `AC1` and whose §7 carries `New arm:` with the field `covers AC1 AC9`, and
-  `python tools/check-spec-tokens.py` runs in that clone, stdout carries one `HIT` line of kind
-  `[covers]` naming the fixture and `AC9`, and none naming `AC1`.
+  `python tools/check-spec-tokens.py` runs in that clone without `--list`, stdout carries one line
+  carrying `[covers]` and the composite token `covers <- <fixture spec> AC9`, and none whose token
+  names `AC1`; the `HIT` prefix is `--list`'s and a plain run never prints it.
   Red when: the `scan_arm_covers` call is staged out of `main` and the `AC9` line is absent.
   cost: seconds, plus the clone.
 - **AC2** — When the fixture's field is changed in turn to `covers AC1`, to `covers none`, and to
@@ -209,6 +210,10 @@ New arm: `tools/check-spec-tokens.test.sh` · covers AC1 AC2 · a fixture spec w
   `covers AC1 to AC4` in a sibling spec written after this one, so AC3 could not hold without S7;
   and S2 now names the composite hit token, which a bare `AC9` waiver row would otherwise share
   across every spec.
+- rev-4 · 2026-10-06 · AC1 · the closing review's finding 20: AC1 asked a plain run for a `HIT`
+  line, which only `--list` prints; it now asks for the plain form, `[covers]` and the composite
+  token, the form the covers arm of `tools/check-spec-tokens.test.sh` asserts. Built by
+  TOOL-aMendedFleet-112; no code moved.
 
 ## 10. Reuse audit
 

@@ -318,7 +318,12 @@ from collections import Counter  # noqa: E402
 # mismatched; the window skipping the NONE line; without --legs only red legs and the never-red
 # line; and another producer refused. Its decoy checks move it by 3.
 # 8 + 3 = 11
-ASSERTION_FLOOR = 1554
+# RAISED 1554 -> 1561 by TOOL-aMendedFleet-70: the READY extractor, ONE new arm with 4 checks —
+# `test_extract_ready`'s card append as the READY point, the summed requests before it, the text
+# line as witness when no card is appended, and the liveness that the placeholder alone reads 0.
+# Its decoy checks move it by 3. Landed unpriced; TOOL-aMendedFleet-112 priced it, no suite run.
+# 4 + 3 = 7
+ASSERTION_FLOOR = 1561
 
 PASS = []
 FAIL = []

@@ -9796,7 +9796,8 @@ reset_tree
 _da_home=drift-audit
 _da_rel=$(resolve_kit_dir "$_rkd_py" "$_da_home" drift_report.py "$HERE" 2>/dev/null) || _da_rel=""
 if [ -z "$_da_rel" ]; then
-  echo "  SKIP the drift-delta close arm: no drift-audit kit resolves beside this one, so nothing prints the delta"
+  n=$((n+2))   # COUNTED EITHER WAY, so the floor grades this suite and not which kits sit beside it
+  echo "  SKIP the drift-delta close arm: no drift-audit kit resolves beside this one, so nothing prints the delta; its 2 assertions are counted, not run"
 else
   build_hold_fixture
   mkdir -p dk/u "dk/$_da_home"
@@ -12806,12 +12807,21 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 1877 -> 1892 by TOOL-aMendedFleet-60: the overlap probe's 15 hit/miss/same lines in region
 # one beside the concurrent-run arms, COUNTED off the block; no suite ran in the pass, and the block
 # was observed green in a prologue slice and red with the probe's call deleted.
-# RAISED 1892 -> 1902 by KICK-aMendedFleet-2: the --overlaps verb's 10 hit/miss/same lines in region
-# one, inside the overlap probe's block, COUNTED off the block; no suite ran in the pass.
-# RAISED 1902 -> 1910 by TOOL-aMendedFleet-111: the rename-overlap arm's 2 hit/miss lines in region
+# RAISED 1892 -> 1901 by KICK-aMendedFleet-2: the --overlaps verb's 9 hit/miss/same lines in region
+# one, inside the overlap probe's block, COUNTED off the block; no suite ran in the pass. Written
+# 1902 and 10 when it landed; TOOL-aMendedFleet-112 re-counted the block at 9 and re-chained below.
+# RAISED 1901 -> 1909 by TOOL-aMendedFleet-111: the rename-overlap arm's 2 hit/miss lines in region
 # one (AC1) and the LIVE_LANDED_UNCLOSED render-input arm's 6 in region two (AC5), COUNTED off the
 # blocks; no suite ran in the pass, and each block was observed green and red in a prologue slice.
-FLOOR_ASSERTIONS=1910
+# The raises below are TOOL-aMendedFleet-112's, pricing arms earlier units of this build added
+# unpriced, each COUNTED off its block with loops and branches expanded; no suite ran in the pass.
+# RAISED 1909 -> 1928 by TOOL-aMendedFleet-61: the CLI-version pin and tick-probe arms' 19 lines, region one.
+# RAISED 1928 -> 1939 by TOOL-aMendedFleet-63: the --abort run-record loop, 7 with the runlog kit and 4 without, region one.
+# RAISED 1939 -> 1941 by TOOL-aMendedFleet-66: the VERIFYING open-asks arm's 2 lines, region two.
+# RAISED 1941 -> 1943 by TOOL-aMendedFleet-83: the VERIFYING stale-dossier arm's 2 lines, region two.
+# RAISED 1943 -> 1945 by TOOL-aMendedFleet-49: S8's drift-delta close arm, 2, COUNTED EITHER WAY, region two.
+# RAISED 1945 -> 1961 by TOOL-aMendedFleet-9: the held-job writer arms' 16 lines, region two.
+FLOOR_ASSERTIONS=1961
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -12934,16 +12944,22 @@ FLOOR_ASSERTIONS=1910
 PROLOGUE_ARMS=18
 # RAISED 208 -> 209: region one's in_shard block-length arm, see FLOOR_ASSERTIONS.
 # RAISED 209 -> 224: the overlap probe's 15 region-one assertions, see FLOOR_ASSERTIONS.
-# RAISED 224 -> 234: the --overlaps verb's 10 region-one assertions, see FLOOR_ASSERTIONS.
-# RAISED 234 -> 236: the rename-overlap arm's 2 region-one assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=236
+# RAISED 224 -> 233: the --overlaps verb's 9 region-one assertions (KICK-aMendedFleet-2), see FLOOR_ASSERTIONS.
+# RAISED 233 -> 235: the rename-overlap arm's 2 region-one assertions, see FLOOR_ASSERTIONS.
+# RAISED 235 -> 254: TOOL-aMendedFleet-61's 19 region-one assertions, see FLOOR_ASSERTIONS.
+# RAISED 254 -> 265: TOOL-aMendedFleet-63's 11 region-one assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=265
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
 # RAISED 1640 -> 1646: the same six region-two assertions, see FLOOR_ASSERTIONS.
 # RAISED 1646 -> 1680: the same 34 region-two task-registry assertions, see FLOOR_ASSERTIONS.
 # RAISED 1680 -> 1686: the render-input arm's 6 region-two assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1686
+# RAISED 1686 -> 1688: TOOL-aMendedFleet-66's 2 region-two assertions, see FLOOR_ASSERTIONS.
+# RAISED 1688 -> 1690: TOOL-aMendedFleet-83's 2 region-two assertions, see FLOOR_ASSERTIONS.
+# RAISED 1690 -> 1692: TOOL-aMendedFleet-49 S8's 2 region-two assertions, see FLOOR_ASSERTIONS.
+# RAISED 1692 -> 1708: TOOL-aMendedFleet-9's 16 region-two assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1708
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

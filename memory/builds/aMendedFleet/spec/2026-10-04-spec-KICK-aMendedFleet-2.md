@@ -1,11 +1,12 @@
 # KICK-aMendedFleet-2 — the orientation card shows which unmerged remote refs share paths with this tree's branch
 
-**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff+tooling · ratified 2026-10-04 · order 77
+**Status:** CLOSED · rev-4 · 2026-10-06 · node a · Tier-2 · base 7af5f564 · streams kickoff+tooling · ratified 2026-10-04 · order 77
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-KICK-aMendedFleet-2-1-acceptance-ledger.md](../build/2026-10-04-build-KICK-aMendedFleet-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-06-review-TOOL-aMendedFleet-1-closing-diff-round1.md](../reviews/2026-10-06-review-TOOL-aMendedFleet-1-closing-diff-round1.md) | diff-review | KICK-aMendedFleet-1 KICK-aMendedFleet-3 KICK-aMendedFleet-4 PLAY-aMendedFleet-1 PLAY-aMendedFleet-2 PLAY-aMendedFleet-3 PLAY-aMendedFleet-4 TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33 TOOL-aMendedFleet-34 TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-39 TOOL-aMendedFleet-40 TOOL-aMendedFleet-41 TOOL-aMendedFleet-42 TOOL-aMendedFleet-43 TOOL-aMendedFleet-44 TOOL-aMendedFleet-45 TOOL-aMendedFleet-46 TOOL-aMendedFleet-47 TOOL-aMendedFleet-48 TOOL-aMendedFleet-49 TOOL-aMendedFleet-50 TOOL-aMendedFleet-51 TOOL-aMendedFleet-52 TOOL-aMendedFleet-53 TOOL-aMendedFleet-54 TOOL-aMendedFleet-55 TOOL-aMendedFleet-56 TOOL-aMendedFleet-57 TOOL-aMendedFleet-58 TOOL-aMendedFleet-59 TOOL-aMendedFleet-60 TOOL-aMendedFleet-61 TOOL-aMendedFleet-62 TOOL-aMendedFleet-63 TOOL-aMendedFleet-64 TOOL-aMendedFleet-65 TOOL-aMendedFleet-66 TOOL-aMendedFleet-67 TOOL-aMendedFleet-68 TOOL-aMendedFleet-69 TOOL-aMendedFleet-70 TOOL-aMendedFleet-71 TOOL-aMendedFleet-72 TOOL-aMendedFleet-73 TOOL-aMendedFleet-74 TOOL-aMendedFleet-75 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83 TOOL-aMendedFleet-84 TOOL-aMendedFleet-85 TOOL-aMendedFleet-86 TOOL-aMendedFleet-87 TOOL-aMendedFleet-88 TOOL-aMendedFleet-89 TOOL-aMendedFleet-90 TOOL-aMendedFleet-91 TOOL-aMendedFleet-92 TOOL-aMendedFleet-93 TOOL-aMendedFleet-94 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedFleet-99 TOOL-aMendedFleet-100 TOOL-aMendedFleet-101 TOOL-aMendedFleet-102 TOOL-aMendedFleet-103 TOOL-aMendedFleet-104 TOOL-aMendedFleet-105 |
 
 <!-- /gen:spec-records -->
@@ -114,6 +115,9 @@ Read at the worktree HEAD `efc4b0c9`, whose bytes under `skills/session-kickoff/
   this cell sits above `live —` so that build's adjacency criterion survives.
 - `resolve_id_reader` resolves the memory-tree id reader through `resolve_kit_dir` from the
   script's directory, then the repo root, then the one tracked copy `git ls-files` names.
+- Tier-2 by the tier rule's clause "a cross-kit change" in `memory/guides/SESSION-KICKOFF.md`: the
+  unit adds the `--overlaps` flag to the unattended driver and the card cell that calls it, two
+  kits, in one commit. Re-graded from Tier-1 at rev-4.
 
 ### Inventory
 
@@ -243,6 +247,10 @@ New arm: `tools/unattended/unattended.test.sh` · covers AC2 AC3 · `--overlaps`
   enumerates Python and JavaScript definitions only; this unit's three functions are shell, and
   `KICK-aMendedFleet-1`, adding a shell function to the same engine, declares no such write.
 - rev-3 · 2026-10-04 · §4 Files touched restores symbols.json: TOOL-aMendedFleet-35 S1 indexes public shell functions from order 35 on.
+- rev-4 · 2026-10-06 · §4 · the closing review's finding 21: the tier rule's "a cross-kit
+  change" clause grades this unit Tier-2, so the header's tier moves and §4 names the clause; the
+  acceptance ledger the CLOSED Tier-2 unit owes is TOOL-aMendedFleet-112's, from the observations
+  its build commit records. No criterion or design moved.
 
 ## 10. Reuse audit
 
