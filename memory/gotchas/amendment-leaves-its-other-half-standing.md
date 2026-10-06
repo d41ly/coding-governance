@@ -58,6 +58,13 @@ Two mechanical arms are worth more than the discipline, because they cannot forg
 Neither catches the blocker above. What catches that one is reading the whole sentence after editing
 its first half — and the reason to write this down is that the author had, and did not.
 
+**Checklist line: a change to a durability default re-reads every resume promise.** Build aMendedFleet
+moved the review harness's judge type to a default under which no judge writes its result file, and
+left standing every note, relaunch line and protocol step that promised a re-run reuses those files.
+The default is the amended half; the promises are the other half, spread across the harness, the
+build harness, the driver and two rendered guides. The harness template,
+`tools/workflows/tier2-review.template.js`, is anchored so the next edit to it selects this class.
+
 There is **no machine gate** for this class today, and the two arms above are filed as
 `TOOL-dTieredTribunal-24` rather than built here. Saying so plainly matters more than usual for this
 particular record: a class whose whole subject is a half-finished edit would be a poor place to leave
@@ -65,8 +72,8 @@ particular record: a class whose whole subject is a half-finished edit would be 
 
 ## The anchors
 
-The taken set is `memory/builds/` — where specs, their criteria and their revision logs live, which
-is the only surface on which this class has been observed. It is deliberately NOT `memory/`, which
+The taken set is `memory/builds/` — where specs, their criteria and their revision logs live — and
+the review harness template named above, the one code surface where this class has been observed. It is deliberately NOT `memory/`, which
 would select on every note and index in the tree, and not the two spec paths that produced it, which
 would make the record a citation of one build rather than a class. The record that found it is
 memory/builds/dTieredTribunal/reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-post-acceptance-round1.md,

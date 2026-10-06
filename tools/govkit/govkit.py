@@ -12367,7 +12367,9 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
             sys.stderr.write(f"govkit: {p}\n")
         return 2
     boundary = base is not None
-    if base is None and os.environ.get("GATE_PUSH_BASE"):
+    # An ALL-ZERO value reads as UNSET (TOOL-aMendedFleet-111 S3): the hook exports the remote's old
+    # sha, forty zeros on a push that CREATES the default branch, and no commit carries that name.
+    if base is None and os.environ.get("GATE_PUSH_BASE", "").strip("0"):
         base, boundary = os.environ["GATE_PUSH_BASE"], True
     if base is None:
         # The default base is `check-verdict-epoch.sh`'s: the merge-base with the default branch,

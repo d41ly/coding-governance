@@ -537,7 +537,9 @@ check_merge_losses() {  # R · T -> 1 when a merge in R..T loses a definition; 0
     echo "push-main: the merge-loss check did NOT run — no usable python launcher; the pre-push hook grades the landing again." >&2
     return 0
   fi
-  if ! dir=$(resolve_kit_dir "$py" lexicon lexicon.py "$self_dir" 2>/dev/null); then
+  # The FILE test (TOOL-aMendedFleet-111 S2): the resolver answers relative to THIS script's tree,
+  # and `$top` is the cwd's, so a tree without the kit made python exit 2 and read as a DEAD PROBE.
+  if ! dir=$(resolve_kit_dir "$py" lexicon lexicon.py "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/lexicon.py" ]; then
     echo "push-main: the merge-loss check did NOT run — no lexicon kit beside this lander; the pre-push hook grades the landing again." >&2
     return 0
   fi
@@ -564,7 +566,8 @@ run_minter() {  # base · [head] -> 0 minted, clean or announced-skipped · 1 th
     echo "push-main: kit versions were NOT minted — no usable python launcher; the push bar's epoch legs grade the landing."
     return 0
   fi
-  if ! dir=$(resolve_kit_dir "$py" govkit govkit.py "$self_dir" 2>/dev/null); then
+  # The FILE test, for check_merge_losses's reason: a missing deployer is a skip, never a refusal.
+  if ! dir=$(resolve_kit_dir "$py" govkit govkit.py "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/govkit.py" ]; then
     echo "push-main: kit versions were NOT minted — no govkit deployer beside this lander; the push bar's epoch legs grade the landing."
     return 0
   fi

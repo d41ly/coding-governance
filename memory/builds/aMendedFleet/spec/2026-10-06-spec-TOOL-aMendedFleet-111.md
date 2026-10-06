@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-111 — closing review round 1 minors, code: a rename-safe overlap diff, the lander's kit paths, an all-zero push base, LIVE's dirty inputs, a merge-aware pickaxe, true resume texts under the Plan default, a dead install-prefix exemption
 
-**Status:** SPECCED · rev-1 · 2026-10-06 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-06 · order 108
+**Status:** CLOSED · rev-2 · 2026-10-06 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-06 · order 108
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-111-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-111-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -253,8 +255,8 @@ refreshed on touch.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When, in a scratch clone where this run's commit renames one tracked shell file and an
-  unmerged remote ref edits that file under its old name, `bash tools/unattended/unattended.sh
+- **AC1** — When, in a scratch clone where this run's commit renames one tracked file the anchor
+  carries and an unmerged remote ref edits that file under its old name, `bash tools/unattended/unattended.sh
   --overlaps` runs, its `overlaps —` output names the old path as shared with that ref.
   Red when: `--no-renames` is removed from the `ours` read and the probe prints `no shared path`.
   fixture: the unattended suite's `--overlaps` block builds a remote and refs; the tree has none.
@@ -272,7 +274,7 @@ refreshed on touch.
   epoch` runs at the worktree root, its output equals that of the same command with the variable unset.
   Red when: it prints `FAILED · no base to compare against` and exits 1.
 - **AC5** — When, in a scratch clone whose `.memory-tree.conf` keeps `LIVE_LANDED_UNCLOSED="1"`, an
-  unstaged edit to a tracked file under `tools/` adds a citation of a non-terminal id and
+  unstaged edit to a tracked product file outside the memory root adds a citation of a non-terminal id and
   `write_ask_views` then `write_run_record` run, each prints its `not re-rendered` refusal naming that
   file, and `memory/LIVE.md` stays unstaged.
   Red when: the helper stages a `memory/LIVE.md` whose Landed-unclosed count reflects the unstaged edit.
@@ -300,8 +302,9 @@ refreshed on touch.
   `amendment-leaves-its-other-half-standing`.
   Red when: either document still promises reuse with no condition, or the class is not selected.
 - **AC10** — When `bash tools/check-install-prefix.sh` runs at the worktree root, it reports the same
-  spelling count it reports at HEAD; and when `\bgd\b` is staged back into `NONKIT`, or `session` is
-  staged out of it, the new liveness arm reds naming that alternative.
+  spelling count it reports at HEAD; and when `\bgd\b` is staged back into `NONKIT` the new liveness
+  arm reds naming that alternative, and when `session` is staged out of it the clean-homonym arm reds
+  on the fixture line that spells it.
   Red when: the drop raises the tree's count, or an alternative no fixture line matches passes.
   figure: DERIVED at observation time; §4 measured 4 at HEAD.
 
@@ -326,6 +329,15 @@ none
 
 - rev-1 · 2026-10-06 · initial draft, from findings 3, 4, 5, 6, 7, 9, 10, 18 and 19 of the closing
   review's round 1, each re-verified at HEAD `e83b29b6`.
+- rev-2 · 2026-10-06 · built and CLOSED. Four corrections from building it. AC1 names a tracked file
+  the anchor carries rather than a shell file, because the unattended fixture's main holds no shell
+  file and a rename needs a source at the anchor. AC5 names a product file outside the memory root
+  rather than one under `tools/`, because a fixture line spelling that prefix is a kit-path spelling
+  the install-prefix leg bans. AC10's `session` direction reds the clean-homonym arm, not the
+  liveness arm, which grades only the alternatives the checker still carries. And S6's "every
+  deferred note" takes the every-lens-dead note too, which the §4 evidence list had not named. The
+  push-main suite and the govkit selftest carry no assertion floor, so §7's "floor moves" is moot for
+  those two arms.
 
 ## 10. Reuse audit
 

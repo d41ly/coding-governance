@@ -425,6 +425,31 @@ async function runWholeScriptArms() {
     ck(r.result.exit === 'complete' && r.result.blockers === null, 'AC7 a synthesis leaving one confirmed id out: complete beside blockers null')
   }
 
+  // ---- TOOL-aMendedFleet-111 AC7: every deferred note and `durable` follow `workerType`. Under the
+  // ---- absent default, Plan, no judge wrote a file, so the note says a re-run dispatches every judge
+  // ---- again and `durable` is false; under `none` the note keeps "dispatch only" and `durable` is
+  // ---- true. Staged red by restoring the unconditional "dispatch only" wording.
+  const ABS111 = Object.assign({}, DIFF); delete ABS111.workerType
+  r = await runReview(ABS111, buildStubs({ 'find:': null }))
+  if (checkNoThrow(r, 'aMF-111 AC7 absent, lenses dead'))
+    ck(r.result.durable === false && r.result.note.indexOf('dispatches every finder and skeptic again') !== -1 && r.result.note.indexOf('dispatch only') === -1,
+      'aMF-111 AC7 workerType absent, every lens dead: durable false, the note re-dispatches every judge')
+  r = await runReview(DIFF, buildStubs({ 'find:': null }))
+  if (checkNoThrow(r, 'aMF-111 AC7 none, lenses dead'))
+    ck(r.result.durable === true && r.result.note.indexOf('dispatch only find:') !== -1,
+      'aMF-111 AC7 workerType none, every lens dead: durable true, the note dispatches only the dead')
+  r = await runReview(ABS111, buildStubs({ synth: null }))
+  if (checkNoThrow(r, 'aMF-111 AC7 absent, synthesis dead')) {
+    ck(r.result.durable === false && r.result.note.indexOf('every finder and skeptic again, plus the synthesis') !== -1,
+      'aMF-111 AC7 workerType absent, the synthesis dead: durable false, the note re-dispatches every judge and the synthesis')
+    ck(r.logs.some((l) => l.indexOf('the synthesis agent DIED') !== -1 && l.indexOf('plus the synthesis') !== -1 && l.indexOf('dispatches only the synthesis') === -1),
+      'aMF-111 AC7 ...and the synthesis-died log says the same')
+  }
+  r = await runReview(DIFF, buildStubs({ synth: null }))
+  if (checkNoThrow(r, 'aMF-111 AC7 none, synthesis dead'))
+    ck(r.result.durable === true && r.result.note.indexOf('dispatch only the synthesis') !== -1,
+      'aMF-111 AC7 workerType none, the synthesis dead: durable true, the note dispatches only the synthesis')
+
   // ==== TOOL-aSightedSkeptic-5 — five diff lenses, `lensNotes`, and the review-shape bump ===========
   // ---- AC1: the lens set and its ORDER, read off what a complete run actually spawns.
   r = await runReview(DIFF, ALL_OK)
@@ -1295,7 +1320,10 @@ printf '%s\n' "$out"
 # ninth column over labelled, out-of-range and unlabelled claims (1).
 # RAISED 181 -> 183 by TOOL-aMendedFleet-18: 2 assertions, counted off the block — every exit's
 # review-shape line at its stage (1) and the synthesis prompt carrying the complete return's line (1).
-FLOOR_ASSERTIONS=183
+# RAISED 183 -> 188 by TOOL-aMendedFleet-111: 5 assertions, counted off the block — `durable` and the
+# deferred note under an absent and a `none` workerType, for dead lenses (2) and a dead synthesis (2),
+# and the synthesis-died log under the absent type (1).
+FLOOR_ASSERTIONS=188
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

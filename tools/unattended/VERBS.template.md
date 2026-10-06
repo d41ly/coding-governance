@@ -601,7 +601,8 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   session scratchpad, absolute>` and refuses without it; the child refuses too, without the key or
   with a `ground` that does not name it.
   - **A review the platform killed DEFERS**: on `exit: 'deferred-platform'` nothing was recorded or
-    built and every returned agent's result is on disk. Re-run the harness ONCE with identical args;
+    built and every returned agent's result is on disk, because the build harness runs its audit under
+    `workerType: 'none'`. Re-run the harness ONCE with identical args;
     on a second `deferred-platform`, hold — `--code platform-limit --until "after <reset UTC>"` when
     the Workflow result names a usage or session limit, `--code platform-unavailable --until "probe
     api"` otherwise — each with `--pending-run <runId>`.

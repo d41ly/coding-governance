@@ -211,7 +211,10 @@ lease is taken, so a refused take-over writes nothing at all:
 7. the history row is written;
 8. a HELD record returns to its `held-from` phase, and one carrying `hold-run` prints the relaunch of
    that deferred review FIRST: re-run it with identical args, which reuses every lens and skeptic
-   file it wrote and dispatches only what did not return.
+   file it wrote and dispatches only what did not return. The files exist only where the review ran
+   under `workerType: 'none'`, as the build harness's spec audit does; a review under a named type,
+   the default of a direct call, wrote none and its re-run dispatches every judge again. A hold can
+   name any deferred review, the closing diff review included.
 
 **The reap ordering, which used to live in the protocol's keepalive section.** A resumed session did
 not schedule the job the run-state file names and cannot assume it died with the process that did.

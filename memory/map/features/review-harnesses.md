@@ -62,9 +62,12 @@ marker comment, and a trailing semicolon on a bound constant declaration defeats
 that runs its own lenses. That capability is absent rather than policed, which is why the fan-out
 decision has to be made in the orchestrator.
 
-**`tier2-review.js` survives a dead fan (`TOOL-dDerivedDocket-29`).** Every lens and skeptic batch
-writes its result under `<git-common-dir>/review-lenses/<key>/` before it returns, and `path` is
-required on all three agent schemas. The key is the kind, the round, the pinned subject (the
+**`tier2-review.js` survives a dead fan (`TOOL-dDerivedDocket-29`).** Under `workerType: 'none'`
+every lens and skeptic batch writes its result under `<git-common-dir>/review-lenses/<key>/` before
+it returns, and `path` is required on all three agent schemas. A judge writes its file ONLY under
+`none`: the absent default, Plan, holds no Write tool, so a deferred return under it carries
+`durable: false` and a re-run dispatches every judge again (`TOOL-aMendedFleet-111`). The build
+harness's spec audit passes `none` for that reason. The key is the kind, the round, the pinned subject (the
 RESOLVED base and head for a diff review) and a print of `context`, `byDesign` and `priorFindings`.
 One probe agent reads the directory first, because the script has no filesystem, and a file is
 reused only when its own `key` field matches; a verify file also needs its batch's claim print. Any

@@ -104,7 +104,8 @@ function readOutputTokens() {
 //   checklist: "<preamble>\n- <item>\n  <continuation>" | ["<item>", ...], // the project's recurring
 //                                         // bug classes, each item swept by exactly one lens; absent -> a WARNING
 //   workerType: "<agent type>" | "none" } // the type every finder and skeptic spawns as; absent -> Plan,
-//                                         // "none" -> the platform default. Under a type no judge writes a lens file
+//                                         // "none" -> the platform default. Under a type no judge writes a lens file,
+//                                         // so a deferred return's `durable` is false and a re-run re-dispatches every judge
 // D9 - `kind` and `subjects` were added without extending this block, and BUILD-METHOD M4 sends a
 // reader HERE for the spec-audit spelling. An absent `kind` does not refuse - it defaults - so a
 // header missing the field buys exactly the failure M4 exists to prevent: a code-shaped review of a
@@ -183,6 +184,15 @@ const workerType = a.workerType === undefined ? 'Plan' : a.workerType === 'none'
 if (a.workerType !== undefined && (typeof a.workerType !== 'string' || !/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(a.workerType)))
   throw new Error('tier2-review: `workerType` must be an agent type name matching ^[A-Za-z][A-Za-z0-9_-]{0,63}$. Got ' + JSON.stringify(a.workerType) + '.')
 const judgeOpts = workerType ? { agentType: workerType } : {}
+// TOOL-aMendedFleet-111 S6 - whether the judges' results outlive this run. Under a named type no judge
+// writes its file, so every deferred note says a re-run dispatches every finder and skeptic again, and
+// every return carrying `pending` carries `durable` too, so a caller reads the fact, not the prose.
+const durable = !workerType
+function renderRerunTail(only, synthToo) {
+  return durable
+    ? `re-run with identical args to dispatch only ${only}`
+    : `this run wrote no result file, so a re-run with identical args dispatches every finder and skeptic again${synthToo ? ', plus the synthesis' : ''}`
+}
 if (workerType)
   log(`worker type ${workerType} — every finder and skeptic spawns as it and writes no find-*.json or verify-*.json, so this run's lens and batch results are NOT durable and a resume re-dispatches them`)
 // S7 - the context default is per-kind, and each is wrong if the other kind inherits it.
@@ -627,7 +637,9 @@ else log('WARNING: `checklist` was supplied with no item — no lens sweeps the 
 // `priorFindings`, `lensNotes`, `specs`, `checklist`, `intensity` and the REVIEW_SHAPE literal - every input a lens prompt interpolates,
 // and the prompts' own shape, except `repo`, which is left out on
 // purpose: the common dir is shared by every worktree on the node, and a take-over from another
-// worktree of the same commits is exactly the re-run this exists for. A spec audit's subject is every
+// worktree of the same commits is exactly the re-run this exists for. The reuse holds only for a
+// `workerType: 'none'` run: under a named type no judge wrote a file, so the key directory is empty
+// and a re-run dispatches every judge again (TOOL-aMendedFleet-111 S6). A spec audit's subject is every
 // `path@blob` in the order given; a diff review's is the RESOLVED base and head (F5), so a review
 // commissioned against `origin/main` is pinned to the sha that ref named, and a moved ref is a
 // different key rather than a stale answer.
@@ -860,7 +872,8 @@ const allFindings = finderResults
 // ---- TOOL-dDerivedDocket-29 S5 — THE `exit` FIELD, on every return. `complete` when every agent
 // ---- returned, `deferred-platform` when any lens, skeptic batch or the synthesis came back null. A
 // ---- deferred return always carries `blockers: null`, the key, and `pending`: the labels a re-run
-// ---- with identical args will dispatch, everything else being reused from the key directory. The
+// ---- with identical args will dispatch, everything else being reused from the key directory when
+// ---- `durable` is true, the `workerType: 'none'` case; when it is false a re-run dispatches all. The
 // ---- one null `blockers` that is NOT a death, the tally fault below, stays `complete`: a re-run
 // ---- cannot repair an adjudication, so that path keeps the refusal its callers already make.
 if (lensesDead === lensesRunning) {
@@ -871,10 +884,10 @@ if (lensesDead === lensesRunning) {
   return {
     shape: shapeLine,
     // TOOL-dTieredTribunal-1 S3 - null, never 0. No synthesis ran, so there is no adjudicated count.
-    exit: 'deferred-platform', key: reviewKey, pending: deadLensLabels,
+    exit: 'deferred-platform', key: reviewKey, pending: deadLensLabels, durable,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: 0, lensesDead,
     lensesReused: reusedLens.size,
-    note: `DEFERRED: no lens completed (${lensesDead}/${lensesRunning} died) — nothing was reviewed; re-run with identical args`,
+    note: `DEFERRED: no lens completed (${lensesDead}/${lensesRunning} died) — nothing was reviewed; ${renderRerunTail(deadLensLabels.join(', '), false)}`,
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
     // TOOL-aSightedSkeptic-8 S5 - nothing was judged on this path.
     ledger: [], confirmedFindings: [], appendix: '',
@@ -885,7 +898,7 @@ if (allFindings.length === 0) {
   // nothing`, which the build harness's clean-round test cannot tell from a result; it defers now.
   const deferred = lensesDead > 0
   const note = deferred
-    ? `DEFERRED: ${lensesDead}/${lensesRunning} lenses died and the survivors found nothing — re-run with identical args to dispatch only ${deadLensLabels.join(', ')}`
+    ? `DEFERRED: ${lensesDead}/${lensesRunning} lenses died and the survivors found nothing — ${renderRerunTail(deadLensLabels.join(', '), false)}`
     : 'clean: 0 findings'
   log(note)
   const shapeLine = renderStageShape('find', { raw: 0 }, lensesRunning)
@@ -893,7 +906,7 @@ if (allFindings.length === 0) {
   // TOOL-dTieredTribunal-1 S3 - null, never 0: no synthesis ran on this path either.
   return {
     shape: shapeLine,
-    exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels,
+    exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels, durable,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
     lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, skippedLenses,
     ledger: [], confirmedFindings: [], appendix: '', // TOOL-aSightedSkeptic-8 S5 - no finding raised
@@ -1171,14 +1184,14 @@ if (confirmed.length + unverified.length === 0) {
   log(shapeLine)
   return {
     shape: shapeLine,
-    exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: pendingLabels,
+    exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: pendingLabels, durable,
     // TOOL-dTieredTribunal-1 S3 - null, never 0. Every finding was refuted, which is a RESULT, but
     // no synthesis pass ran to adjudicate a blocker count, so there is none to report.
     confirmed: [], report: null, precision, root: repo, blockers: null, highs: null,
     lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: 0, uncertain: 0,
     conflicts: conflicts.size, duplicates, spurious, lensesReused: reusedLens.size, batchesReused,
     note: deferred
-      ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${lensesRunning} lenses died — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`
+      ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${lensesRunning} lenses died — ${renderRerunTail(pendingLabels.join(', '), false)}`
       : 'all findings adjudicated and refuted',
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
     // TOOL-aSightedSkeptic-8 S5 - no report is written on this path (spec F3), so the return is the
@@ -1191,7 +1204,8 @@ if (confirmed.length + unverified.length === 0) {
 // set that is incomplete, and a dead skeptic batch means findings nobody judged; either way the report
 // would be rewritten by the re-run, and a report over a half-judged set is the one document that must
 // not call the run finished. The BASE `PARTIAL` path returned an INTEGER `blockers` over exactly that
-// set. Every result that did come back is on disk under the key, so the re-run pays only for the dead.
+// set. Under `workerType: 'none'` every result that did come back is on disk under the key, so the
+// re-run pays only for the dead; under a named type nothing is, and it pays for every judge again.
 if (pendingLabels.length) {
   log(`WARNING: ${pendingLabels.length} agent(s) did not return (${pendingLabels.join(', ')}) — DEFERRED, and no synthesis runs over a partial set. ` +
     `The ${confirmed.length} confirmed and ${unverified.length} unverified finding(s) so far:`)
@@ -1201,12 +1215,12 @@ if (pendingLabels.length) {
   log(shapeLine)
   return {
     shape: shapeLine,
-    exit: 'deferred-platform', key: reviewKey, pending: pendingLabels,
+    exit: 'deferred-platform', key: reviewKey, pending: pendingLabels, durable,
     root: repo, raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length,
     unverified: unverified.length, uncertain: uncertainFindings.length, conflicts: conflicts.size, duplicates, spurious, precision,
     lensesRun: liveResults.length, lensesDead, skepticsDead, lensesReused: reusedLens.size, batchesReused,
     report: null, summary: '', blockers: null, highs: null,
-    note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`,
+    note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — ${renderRerunTail(pendingLabels.join(', '), false)}`,
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
     ledger, confirmedFindings, appendix, // TOOL-aSightedSkeptic-8 S5 - what was judged so far; `exit` says partial
   }
@@ -1462,9 +1476,10 @@ if (synth) {
 // `complete` and every confirmed finding was lost with nothing logged. The findings exist here in
 // memory - the only thing missing was saying so before the return threw them away.
 // TOOL-dDerivedDocket-29 - and the findings are ALSO on disk now: every lens and batch that returned
-// wrote its file under the key, so a re-run reuses all of them and dispatches the synthesis alone.
+// wrote its file under the key, so a re-run reuses all of them and dispatches the synthesis alone -
+// under `workerType: 'none'` only; under a named type none wrote one (TOOL-aMendedFleet-111 S6).
 if (!synth) {
-  log(`WARNING: the synthesis agent DIED. No report was written, and the ${confirmed.length} confirmed finding(s) below are in this log and in ${keyDir}; a re-run with identical args dispatches only the synthesis:`)
+  log(`WARNING: the synthesis agent DIED. No report was written, and the ${confirmed.length} confirmed finding(s) below are in this log${durable ? ` and in ${keyDir}` : ''}; ${durable ? 'a re-run with identical args dispatches only the synthesis' : renderRerunTail('', true)}:`)
   for (const f of confirmed)
     log(`  CONFIRMED [${deriveBindingSeverity(f)}] lens=${f.lens} ${f.ref} - ${f.claim} | ${renderFixLine(f)}`)
   for (const f of unverified) log(`  UNVERIFIED [${f.severity}] lens=${f.lens} ${f.ref} - ${f.claim}`)
@@ -1479,6 +1494,7 @@ return {
   exit: synth ? 'complete' : 'deferred-platform',
   key: reviewKey,
   pending: synth ? [] : ['synth'],
+  durable,
   lensesReused: reusedLens.size,
   batchesReused,
   root: repo,
@@ -1513,7 +1529,7 @@ return {
     // Lens and skeptic deaths never reach this return (TOOL-dDerivedDocket-29), so the last two arms
     // speak of UNUSABLE verdicts: a batch that returned with an id missing, spurious or contradicted.
     !synth
-      ? `DEFERRED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log and on disk — re-run with identical args to dispatch only the synthesis`
+      ? `DEFERRED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log${durable ? ' and on disk' : ''} — ${durable ? 're-run with identical args to dispatch only the synthesis' : renderRerunTail('', true)}`
       : tallyFault
         ? `UNVERIFIED: the report was written, but its item list does not place every confirmed finding exactly once (${tallyFault}), so blockers and highs are null`
         // TOOL-aSightedSkeptic-6 S8 - the uncertain count apart from the no-verdict count, so a run whose

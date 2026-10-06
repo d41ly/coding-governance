@@ -11783,6 +11783,16 @@
       "file": "tools/workflows/orient-counterfactual.js"
     },
     {
+      "id": "renderRerunTail",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderRerunTail",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "renderRoster",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
@@ -12758,6 +12768,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "resolve_index_generator",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "resolve_ingest_sides",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -13046,6 +13061,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "resolve_kit_dir",
@@ -14198,6 +14218,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "run_bounded",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_card",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
@@ -14576,6 +14601,11 @@
       "id": "run_reaper",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "run_render_helper",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "run_rm3",

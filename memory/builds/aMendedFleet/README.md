@@ -288,13 +288,13 @@ ids TOOL-aMendedFleet-108 TOOL-aMendedFleet-109 TOOL-aMendedFleet-110 TOOL-aMend
 | [TOOL-aMendedFleet-104 — the foreign-prefix leg declares `review-replay selftest` a whole run](spec/2026-10-05-spec-TOOL-aMendedFleet-104.md) | 105 | 1 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aMendedFleet-105 — the reaper's verification settles, so a member dying as it is signalled is not a survivor](spec/2026-10-05-spec-TOOL-aMendedFleet-105.md) | 106 | 1 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aMendedFleet-110 — a drift signal moved from BASELINES into PINS is graded against the base's BASELINES](spec/2026-10-06-spec-TOOL-aMendedFleet-110.md) | 107 | 2 | CLOSED | rev-1 | 2026-10-06 |
-| [TOOL-aMendedFleet-111 — closing review round 1 minors, code: a rename-safe overlap diff, the lander's kit paths, an all-zero push base, LIVE's dirty inputs, a merge-aware pickaxe, true resume texts under the Plan default, a dead install-prefix exemption](spec/2026-10-06-spec-TOOL-aMendedFleet-111.md) | 108 | 2 | SPECCED | rev-1 | 2026-10-06 |
+| [TOOL-aMendedFleet-111 — closing review round 1 minors, code: a rename-safe overlap diff, the lander's kit paths, an all-zero push base, LIVE's dirty inputs, a merge-aware pickaxe, true resume texts under the Plan default, a dead install-prefix exemption](spec/2026-10-06-spec-TOOL-aMendedFleet-111.md) | 108 | 2 | CLOSED | rev-2 | 2026-10-06 |
 | [TOOL-aMendedFleet-112 — four suites' assertion floors cover the arms this build added, unit 75's AC1 names the plain-run form, and the kickoff units are graded Tier-2](spec/2026-10-06-spec-TOOL-aMendedFleet-112.md) | 109 | 1 | SPECCED | rev-1 | 2026-10-06 |
 <!-- /gen:build-units -->
 
-Records: 65 bound to this build, across 4 record folder(s).
+Records: 66 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aMendedFleet-111 TOOL-aMendedFleet-112.
+Ids no record names: TOOL-aMendedFleet-112.
 
 Ids no `spec-audit` record has ever named: KICK-aMendedFleet-1 KICK-aMendedFleet-2 KICK-aMendedFleet-3 KICK-aMendedFleet-4 PLAY-aMendedFleet-1 PLAY-aMendedFleet-2 PLAY-aMendedFleet-3 PLAY-aMendedFleet-4 TOOL-aMendedFleet-1 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12
 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-2 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25

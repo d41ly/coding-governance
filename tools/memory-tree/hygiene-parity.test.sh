@@ -64,7 +64,10 @@ BEFORE_REV=${1:-}
 # commit in which the constant reached its CURRENT value.
 KITV=$(sed -n 's/^KIT_MEMORY_TREE_VERSION=\([0-9.]*\).*/\1/p' $KIT_REL/check-memory-hygiene.sh | head -1)
 [ -n "$KITV" ] || { echo "FAIL cannot read KIT_MEMORY_TREE_VERSION — the baseline floor is derived from it"; exit 2; }
-FLOOR=$(git log --format=%H -S"KIT_MEMORY_TREE_VERSION=$KITV" -- $KIT_REL/check-memory-hygiene.sh | tail -1)
+# `--diff-merges=first-parent` so a value a PREPARED merge minted is found, and `--no-patch` because
+# that option alone prints the merge's patch, whose last line `tail -1` would read as the floor
+# (TOOL-aMendedFleet-111 S5, measured on git 2.54).
+FLOOR=$(git log --format=%H --no-patch --diff-merges=first-parent -S"KIT_MEMORY_TREE_VERSION=$KITV" -- $KIT_REL/check-memory-hygiene.sh | tail -1)
 if [ -z "$FLOOR" ]; then
   # THE EMPTY CASE IS DEFINED, because "no floor found" is not "any baseline is fine". A shallow
   # clone or a squashed import has no commit introducing the constant, and silently skipping the

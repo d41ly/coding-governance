@@ -1001,6 +1001,12 @@ def check_mint_verb(tmp: pathlib.Path) -> None:
     p = run_gk("epoch", push_base=base)
     check("[aMF-65 S6] ...and with GATE_PUSH_BASE set the same move is FAILED, exit 1",
           p.returncode == 1 and "epoch: vk · FAILED · moved in" in p.stdout, p.stdout + p.stderr)
+    # TOOL-aMendedFleet-111 AC4: forty zeros, the hook's export on a push creating the default
+    # branch, reads as UNSET. Observed RED against the base govkit: FAILED, no base, exit 1.
+    p = run_gk("epoch", push_base="0" * 40)
+    check("[aMF-111 S3] ...and an all-zero GATE_PUSH_BASE reads as unset: owed at the lander, exit 0",
+          p.returncode == 0 and "epoch: vk · owed at the lander · moved in" in p.stdout
+          and "FAILED" not in p.stdout, p.stdout + p.stderr)
     p = run_gk("mint", "--base", base)
     vk = (fx / PFX / "vk" / "vk.sh").read_text(encoding="utf-8")
     check("[aMF-65 S1] `mint` writes the next value on the constant and its marker, naming it",

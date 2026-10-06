@@ -850,6 +850,10 @@ const auRaw = !specAudit ? null : await workflow(
     round: roundNo - subjectRound + 1,
     reviewDir: reviewDir,
     subjects: subjects,
+    // TOOL-aMendedFleet-111 S7 - `none`, so every judge writes its lens or verify file and the
+    // deferred `next` below, which promises the re-run reuses them, is true. The callee's absent
+    // default is Plan, under which no judge writes one and a re-run dispatches every judge again.
+    workerType: 'none',
   },
 )
 
@@ -885,7 +889,8 @@ if (specAudit && (!auRaw || typeof auRaw !== 'object' ||
 // synthesis came back null, with `blockers: null` and the `pending` labels a re-run will dispatch.
 // Tested HERE, ahead of the clean-round test and the non-integer refusal below: that refusal read
 // the same null as DEGRADED and THREW, so a session limit killed the run and the re-run paid for
-// every lens again. Every result that did come back is on disk under the callee's review key, so the
+// every lens again. Every result that did come back is on disk under the callee's review key, because
+// this harness runs its audit under `workerType: 'none'` (TOOL-aMendedFleet-111 S8), so the
 // remedy is cheap and it is not this script's to take - a workflow script has no clock and cannot
 // wait out a limit. The caller re-runs this workflow ONCE with identical args, and holds on a second
 // deferral. No review round is recorded: nothing was adjudicated. `roster: []`, as on every other

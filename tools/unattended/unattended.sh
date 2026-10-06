@@ -2333,7 +2333,7 @@ check_cross_run_overlap() { # slug - always returns 0
   d=$(mktemp -d) || { echo "unattended: overlap probe UNAVAILABLE — cannot create a scratch directory"; return 0; }
   rem=$(GIT remote | head -1)
   # OUR PATHS: what this run changed since the anchor, and what its live specs declare.
-  if ! GIT -c core.quotepath=off diff --name-only "$anc...HEAD" > "$d/ours" 2>/dev/null; then
+  if ! GIT -c core.quotepath=off diff --no-renames --name-only "$anc...HEAD" > "$d/ours" 2>/dev/null; then
     echo "unattended: overlap probe UNAVAILABLE — this run's own changes since the observed tip ${anc:0:8} cannot be listed"
     rm -rf "$d"; return 0
   fi
@@ -6640,10 +6640,12 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
     echo "unattended: taken over — phase $hf · keepalive $kid · the hold is released and this session holds the lease"
     # TOOL-dDerivedDocket-29 S7 - THE RELAUNCH. A hold taken on a second deferred review names the
     # Workflow run it was waiting on, and a recorded runId nothing reads is a fact written for nobody.
-    # The lens and skeptic files that run wrote are reused either way; the runId is the bonus path.
+    # The lens and skeptic files that run wrote are reused either way, where it wrote any: a review run
+    # under `workerType: 'none'` writes them, one under a named type, a direct call's default, writes
+    # none and dispatches every judge again (TOOL-aMendedFleet-111 S7). The runId is the bonus path.
     prun=$(fact "$rel" hold-run)
     if [ -n "$prun" ]; then
-      echo "unattended: relaunch the deferred review FIRST — pending run $prun: re-run that Workflow with identical args, resuming from run $prun where the platform offers it; the review reuses every lens and skeptic file the run wrote and dispatches only what did not return"
+      echo "unattended: relaunch the deferred review FIRST — pending run $prun: re-run that Workflow with identical args, resuming from run $prun where the platform offers it; the review reuses every lens and skeptic file the run wrote and dispatches only what did not return, where it ran under workerType 'none' as the build harness's audit does; a review under a named type, the default of a direct call, wrote none and dispatches every judge again"
     fi
     print_resume_orientation "$rel" "$hf"
   else
@@ -7296,7 +7298,7 @@ write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP r
 # stage that git itself refuses, a held index lock say, is named on a line of its own and returns 1
 # too, because the success line would otherwise claim paths the index does not hold.
 write_ask_views() { # count of asks this call filed -> 0 rendered and staged, 1 on a named miss; one line each
-  local n=$1 gen="" py="" rc=0 why="" fix="" p h line paths="" left="" staged=1 dirty="" gd=""
+  local n=$1 gen="" py="" rc=0 why="" fix="" p h line paths="" left="" staged=1 dirty="" gd="" luc=""
   local -a post=() stage=()
   local -A h0=()
   # ONE test for both halves of "resolves": the library resolver runs the inline `resolve_python`
@@ -7313,9 +7315,15 @@ write_ask_views() { # count of asks this call filed -> 0 rendered and staged, 1 
     # tracked and untracked, so no path arrives twice. `--no-renames`, so a path the render moves
     # away is listed by its own name and staged as the deletion it is, never folded into a
     # destination (memory/gotchas/porcelain-diff-names-a-rename-by-its-destination.md).
+    # UNDER `LIVE_LANDED_UNCLOSED=1` EVERY unstaged tracked path is an input (TOOL-aMendedFleet-111
+    # S4): the render then reads product source through drift-audit's `git grep` over the working
+    # tree, so a citation edit anywhere moves LIVE's Landed-unclosed count. A superset of the evidence
+    # globs, priced in the spec: at worst a refusal naming a path the render did not read.
+    luc=$(read_conf_value .memory-tree.conf LIVE_LANDED_UNCLOSED) || luc=""
     while IFS= read -r -d '' p; do
       h0[$p]=$(GIT hash-object -- "$p" 2>/dev/null) || h0[$p]=-
-      case "$p" in "$M"/*|.memory-tree.conf) dirty="$dirty${dirty:+ }$p" ;; esac
+      case "$p" in "$M"/*|.memory-tree.conf) dirty="$dirty${dirty:+ }$p" ;;
+        *) [ "${luc//[[:space:]]/}" != 1 ] || dirty="$dirty${dirty:+ }$p" ;; esac
     done < <(GIT diff --no-renames --name-only -z 2>/dev/null)
     while IFS= read -r -d '' p; do
       h0[$p]=$(GIT hash-object -- "$p" 2>/dev/null) || h0[$p]=-
@@ -11221,9 +11229,13 @@ write_run_record() { # slug -> 0 always; one line per miss
   fi
   # The inputs: tracked paths under the memory root, the conf tracked or not, and the generator's
   # own modules (a generator at the root names its top-level modules only), as write_ask_views reads them.
+  # Under `LIVE_LANDED_UNCLOSED=1` no pathspec: every unstaged tracked path, as write_ask_views reads it.
   d=$(dirname -- "$gen"); [ "$d" != . ] || d=':(glob)*.py'
+  local -a ps=("$M" .memory-tree.conf "$d"); local luc
+  luc=$(read_conf_value .memory-tree.conf LIVE_LANDED_UNCLOSED) || luc=""
+  [ "${luc//[[:space:]]/}" != 1 ] || ps=()
   while IFS= read -r p; do dirty="$dirty${dirty:+ }$p"; done \
-    < <(GIT diff --no-renames --name-only -- "$M" .memory-tree.conf "$d" 2>/dev/null)
+    < <(GIT diff --no-renames --name-only -- "${ps[@]}" 2>/dev/null)
   [ -z "$(GIT ls-files --others --exclude-standard -- .memory-tree.conf 2>/dev/null)" ] || dirty="$dirty${dirty:+ }.memory-tree.conf"
   if [ -n "$dirty" ]; then
     echo "unattended: run record staged, but the index was not re-rendered: its inputs carry changes the index does not hold: $dirty — repair: stage or discard them, then run $(derive_index_repair)"

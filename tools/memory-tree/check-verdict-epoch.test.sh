@@ -190,10 +190,30 @@ BASE_G=$(cd "$G" && git rev-parse HEAD)
 commit_engine "$G" 1.5 "echo an unbumped behaviour line" "move, no bump"
 arm 'off the push boundary an undated move is owed at the lander, exit 0' 0 'owed at the lander' "$G"
 ARM_GPB=$BASE_G arm '...and with GATE_PUSH_BASE set the same move FAILS' 1 'changes KIT_MEMORY_TREE_VERSION (still 1.5)' "$G"
+# TOOL-aMendedFleet-111 AC3: an ALL-ZERO GATE_PUSH_BASE, which the hook exports on a push creating the
+# default branch, reads as UNSET: the merge-base fallback, so the same move is owed at the lander.
+# Observed RED against the base gate, which exited 2 naming the all-zero commit.
+ARM_GPB=0000000000000000000000000000000000000000 arm '...and an all-zero GATE_PUSH_BASE reads as unset, owed at the lander' 0 'owed at the lander' "$G"
 ( cd "$G" && git checkout -q --detach "$BASE_G" && git merge -q --no-ff --no-commit feat ) >/dev/null 2>&1
 engine "$G" 1.6 "echo an unbumped behaviour line"
 ( cd "$G" && git add -A && git commit -qm "merge: minted" --no-verify ) >/dev/null
 ARM_GPB=$BASE_G arm '...and a bump minted INTO the merge onto the base dates it' 0 'the version moved 1.5 -> 1.6' "$G"
+
+# ---- 5c. EVERY KIT-VERSION PICKAXE READS MERGES AND PRINTS NO PATCH (TOOL-aMendedFleet-111 AC6). A
+# minted version is introduced by a MERGE, which a pickaxe skips without `--diff-merges=first-parent`;
+# that option alone prints the merge's patch, which a `tail -1` or a sha loop then reads as a commit.
+# Over the tracked scripts of the repository this suite runs in. LIVE: zero hits is a dead probe,
+# since this kit's own gate carries one. Staged red by deleting `--no-patch` from the gate's search.
+pk=$(cd "$(git -C "$HERE" rev-parse --show-toplevel)" && git grep -nE 'log.* -[SG].*KIT_[A-Z_]*_VERSION' -- '*.sh' '*.py' '*.js' 2>/dev/null)
+pk_bad=$(printf '%s\n' "$pk" | grep -v -e '^$' | grep -v -e '--no-patch.*--diff-merges=first-parent' -e '--diff-merges=first-parent.*--no-patch')
+if [ -z "$pk" ]; then
+  fails=$((fails+1)); printf 'arm FAIL  %s\n' 'the kit-version pickaxe scan matched nothing, so it graded nothing (DEAD PROBE)'
+elif [ -n "$pk_bad" ]; then
+  fails=$((fails+1)); printf 'arm FAIL  %s\n' 'a kit-version pickaxe lacks --no-patch or --diff-merges=first-parent:'
+  printf '%s\n' "$pk_bad" | sed 's/^/      /'
+else
+  printf 'arm ok    %s\n' "every kit-version pickaxe reads merges and prints no patch ($(printf '%s\n' "$pk" | grep -c .) site(s))"
+fi
 
 # ---- 6. this repo, right now --------------------------------------------------------------------
 # The live tree must be clean, and it must be clean because the constant MOVED — not because nothing

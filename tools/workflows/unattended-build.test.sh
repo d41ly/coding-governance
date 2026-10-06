@@ -339,6 +339,9 @@ done
 o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
 has "S1 the AUDIT stage invokes tier2-review as a SUB-WORKFLOW from the script" "$o" \
     "workflow:${PFX}${KIT}/tier2-review.js"
+# TOOL-aMendedFleet-111 AC8: the spec-audit call passes `workerType: 'none'`, so every judge writes its
+# file and the deferred `next`'s promise that a re-run reuses them holds. Staged red by deleting it.
+has "aMF-111 AC8 the spec-audit call passes workerType none" "$(printf '%s\n' "$o" | grep '^wargs:')" '"workerType":"none"'
 
 # S3 — CONVERGING paired with 0 blockers is REFUSED BY NAME. A loop with nothing left to
 # converge on has converged, so the pairing is this repo's signature for a record no verb
@@ -1813,7 +1816,8 @@ fi
 # `n=$((n+1))` sites — the PV-AC12 branch's among them, the one region that can SKIP — are not in
 # the static count, so it is a LOWER bound on what a green run executes. Lower it in a reviewed
 # diff or not at all.
-FLOOR_ASSERTIONS=293
+# RAISED 293 -> 294 by TOOL-aMendedFleet-111: the spec-audit call's `workerType` arm (1).
+FLOOR_ASSERTIONS=294
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

@@ -184,6 +184,9 @@ for _d in $DELEGATES; do [ -f "$_d" ] && SCAN="$SCAN $_d"; done
 
 BASE="${1:-}"
 BOUNDARY=1
+# An ALL-ZERO GATE_PUSH_BASE reads as UNSET (TOOL-aMendedFleet-111 S3): the hook exports the remote's
+# old sha, all zeros on a push that CREATES the default branch, and no commit carries that name.
+case "${GATE_PUSH_BASE:-}" in ""|*[!0]*) ;; *) GATE_PUSH_BASE="" ;; esac
 [ -z "$BASE" ] && [ -n "${GATE_PUSH_BASE:-}" ] && BASE=$GATE_PUSH_BASE
 if [ -z "$BASE" ]; then
   BOUNDARY=0
@@ -268,7 +271,7 @@ while IFS= read -r cand; do
   prev=$(verat "$cand^")
   if [ -n "$cur" ] && [ "$cur" != "$prev" ]; then S="$cand"; break; fi
 done <<EOF
-$(git log --format=%H --diff-merges=first-parent -G'^KIT_MEMORY_TREE_VERSION=' "$BASE"..HEAD -- "$ENGINE" 2>/dev/null)
+$(git log --format=%H --no-patch --diff-merges=first-parent -G'^KIT_MEMORY_TREE_VERSION=' "$BASE"..HEAD -- "$ENGINE" 2>/dev/null)
 EOF
 
 # OFF THE PUSH BOUNDARY a move the constant does not date is the lander's to mint, not a failure.

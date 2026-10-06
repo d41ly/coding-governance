@@ -643,4 +643,33 @@ else
   echo "  skip — 24 no govkit deployer or runlog kit beside this lander, so the mint arm did not run"
 fi
 
+# 25 — TOOL-aMendedFleet-111 AC2: THIS lander run in a tree that lacks the lexicon and govkit files
+#      SKIPS both checks by name. The kits resolve beside the lander, but the files are read under the
+#      cwd's toplevel, so before the file test python's exit 2 for a missing script read as a DEAD
+#      PROBE and a REFUSED mint. Staged red by removing the two file tests.
+if [ -n "$_mt_gk" ] && [ -n "$_ml_lex" ]; then
+  git clone -q --bare "$SRC" "$tmp/remote5.git"
+  git clone -q "$tmp/remote5.git" "$tmp/work5"
+  out25=$(
+    cd "$tmp/work5" || exit 1
+    git config user.email t@e; git config user.name t; git config core.autocrlf false
+    git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
+    git rm -q -- "${KIT_REL}$_ml_lex/lexicon.py" "${KIT_REL}$_mt_gk/govkit.py"
+    git commit -q --no-verify -m "drop the lexicon and govkit files"
+    git push -q -f --no-verify origin main
+    git -C "$tmp/remote5.git" symbolic-ref HEAD refs/heads/main
+    git checkout -q -b feat
+    echo u25 > src-u25.txt; git add src-u25.txt 2>/dev/null; git commit -q --no-verify -m "TOOL-tFix-25: unit"
+    unset GATE_PUSH_BASE; bash "$HERE/push-main.sh" --prepare --slug tSkip 2>&1
+  )
+  case "$out25" in *"no lexicon kit beside this lander"*) l25=1 ;; *) l25=0 ;; esac
+  case "$out25" in *"no govkit deployer beside this lander"*) g25=1 ;; *) g25=0 ;; esac
+  case "$out25" in *"DEAD PROBE"*|*"REFUSED"*) x25=1 ;; *) x25=0 ;; esac
+  [ "$l25$g25$x25" = 110 ] \
+    && ok "25 a tree without the lexicon and govkit files skips both checks by name, with no DEAD PROBE or REFUSED" \
+    || bad "25 lexicon-skip=$l25 govkit-skip=$g25 dead-or-refused=$x25 $out25"
+else
+  echo "  skip — 25 no govkit deployer or lexicon kit beside this lander, so the missing-file arm did not run"
+fi
+
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

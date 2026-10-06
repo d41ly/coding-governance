@@ -791,6 +791,14 @@ git remote set-url origin "$ORIGIN"
 same "--overlaps answers with exit 0 while the remote URL names nothing" "$ov_rc" "0"
 hit "$out" "1 sharing a path; this run is NOT blocked"
 hit "$out" "1 shared: src/ov.sh (diff)"
+# ---- TOOL-aMendedFleet-111 AC1: a path this run RENAMED is still its path under the OLD name, so a
+# ---- ref editing that old name overlaps. A tracked file on main, because a rename needs a source at
+# ---- the anchor. Staged red by dropping `--no-renames` from the `ours` read: `no shared path`.
+reset_tree; git mv content/pb-noout.md content/pb-moved.md; git commit -q -m ours-mv --no-verify
+build_overlap_ref content/pb-noout.md theirs ""
+out=$(run --overlaps)
+hit "$out" "1 shared: content/pb-noout.md (diff)"
+miss "$out" "no shared path"
 # AC2: no slug, so its own declared paths are the live specs its diff changed; WONTDO withdraws them.
 print_own_spec() { printf '# X-tOwn-1 — own\n\n**Status:** %s · rev-1 · 2026-10-04 · node z · Tier-1\n\n### Files touched (estimate)\n\n- `src/ov.sh`\n\n## 5. next\n' "$1"; }
 reset_tree; add_overlap_commit memory/builds/tOwn/spec/2026-10-04-spec-X-tOwn-1.md "$(print_own_spec SPECCED)"; build_overlap_ref src/ov.sh theirs ""
@@ -12088,6 +12096,46 @@ RVC
   unset -f run_rv run_rv_git build_rv_fixture check_rv_commit
 fi
 
+# ---- TOOL-aMendedFleet-111 AC5: under `LIVE_LANDED_UNCLOSED=1` the render reads product source, so
+# ---- an unstaged citation edit to product source is an INPUT of both render helpers: each names it and
+# ---- stages no view. Both helpers are SLICED from the shipped driver and called in a subshell whose
+# ---- stubs stand in for the resolvers and the bounded runner; the stub render appends to LIVE, so a
+# ---- helper that rendered anyway stages it. The blank-key controls render, which keeps the two
+# ---- refusals from passing vacuously. Staged red by restoring the memory-root-only inventory.
+run_render_helper() { # conf key value · helper -> the helper's output, then the staged paths, from a fresh tree
+  reset_tree
+  mkdir -p src memory/builds/tRun/build; printf '#!/bin/sh\n' > src/lu.sh; printf 'live\n' > memory/LIVE.md
+  printf 'LIVE_LANDED_UNCLOSED="%s"\n' "$1" >> .memory-tree.conf
+  fixture; printf '# cites ARCH-tRun-1\n' >> src/lu.sh
+  (
+    slice_fn "$2" >/dev/null && slice_fn scan_dirty_paths >/dev/null || exit 1
+    lu_g=$(git rev-parse --absolute-git-dir); mkdir -p "$lu_g/lurl"; : > "$lu_g/lu-gen.py"; : > "$lu_g/lurl/runlog.py"
+    resolve_python() { echo pystub; }
+    resolve_index_generator() { echo "$lu_g/lu-gen.py"; }
+    resolve_kit_dir() { echo "$lu_g/lurl"; }
+    run_bounded() {
+      case "$*" in
+        *runlog.py*) printf 'rec\n' > memory/builds/tRun/build/lu-record.md
+                     RB_STDOUT="runlog: record written memory/builds/tRun/build/lu-record.md (4 bytes)" ;;
+        *) printf 'stale\n' >> memory/LIVE.md; RB_STDOUT="" ;;
+      esac
+      RB_OUT=""; RB_TOOK=0; return 0
+    }
+    M=memory RUNLOG_SWITCH=0 VERB=--abort LANDER_MODE=primary KIT_DIR=.
+    if [ "$2" = write_ask_views ]; then write_ask_views 1; else write_run_record tRun; fi
+    echo "STAGED: $(git diff --cached --name-only | tr '\n' ' ')"
+  ) 2>&1
+}
+out=$(run_render_helper 1 write_ask_views)
+hit  "$out" "were not re-rendered: the views' inputs carry changes the index does not hold, and a render would stage views derived from them: src/lu.sh"
+miss "$(printf '%s\n' "$out" | grep '^STAGED:')" "memory/LIVE.md"
+out=$(run_render_helper 1 write_run_record)
+hit  "$out" "the index was not re-rendered: its inputs carry changes the index does not hold: src/lu.sh"
+miss "$(printf '%s\n' "$out" | grep '^STAGED:')" "memory/LIVE.md"
+hit  "$(run_render_helper "" write_ask_views)" "gates-green: re-rendered the generated views for 1 filed ask(s) and staged 1 path(s): memory/LIVE.md"
+hit  "$(run_render_helper "" write_run_record | grep '^STAGED:')" "memory/LIVE.md"
+reset_tree; unset -f run_render_helper
+
 # ================ TOOL-dDerivedDocket-28: the run-owned process ledger =============================
 # ---- SELF-CONTAINED, for the in-place block's reason and one more: these arms KILL drivers, and a
 # ---- ledger another block appends to would make every count here a count of that block's history.
@@ -12760,7 +12808,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # was observed green in a prologue slice and red with the probe's call deleted.
 # RAISED 1892 -> 1902 by KICK-aMendedFleet-2: the --overlaps verb's 10 hit/miss/same lines in region
 # one, inside the overlap probe's block, COUNTED off the block; no suite ran in the pass.
-FLOOR_ASSERTIONS=1902
+# RAISED 1902 -> 1910 by TOOL-aMendedFleet-111: the rename-overlap arm's 2 hit/miss lines in region
+# one (AC1) and the LIVE_LANDED_UNCLOSED render-input arm's 6 in region two (AC5), COUNTED off the
+# blocks; no suite ran in the pass, and each block was observed green and red in a prologue slice.
+FLOOR_ASSERTIONS=1910
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -12884,13 +12935,15 @@ PROLOGUE_ARMS=18
 # RAISED 208 -> 209: region one's in_shard block-length arm, see FLOOR_ASSERTIONS.
 # RAISED 209 -> 224: the overlap probe's 15 region-one assertions, see FLOOR_ASSERTIONS.
 # RAISED 224 -> 234: the --overlaps verb's 10 region-one assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=234
+# RAISED 234 -> 236: the rename-overlap arm's 2 region-one assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=236
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
 # RAISED 1640 -> 1646: the same six region-two assertions, see FLOOR_ASSERTIONS.
 # RAISED 1646 -> 1680: the same 34 region-two task-registry assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1680
+# RAISED 1680 -> 1686: the render-input arm's 6 region-two assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1686
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.
