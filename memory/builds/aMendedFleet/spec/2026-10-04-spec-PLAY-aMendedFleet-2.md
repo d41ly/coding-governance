@@ -1,6 +1,6 @@
 # PLAY-aMendedFleet-2 — an experiment's instruments and result rows are committed beside its record, and the vague-brief arm gates §1 as a HIGH ask
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams playbook · ratified 2026-10-04 · order 80
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams playbook · advances PLAY-aMendedFleet-5 · ratified 2026-10-04 · order 80
 
 <!-- gen:spec-records -->
 
@@ -202,6 +202,9 @@ the close.
 - rev-2 · 2026-10-04 · S5 · AC6 · §4 · §7 · M2 cross-read: the template is a watched path, which
   units 78 and 94 re-stamp the kickoff manifest for and this spec did not; S5 re-stamps it in the
   same commit and AC6 observes it.
+- rev-3 · 2026-10-06 · S4 · the main loop minted PLAY-aMendedFleet-5, filed it with its HIGH severity and KEEP
+  row, and added `advances` to the status header; the ask notes that unit TOOL-aMendedFleet-73's run
+  stopped at its pilot without a reading, so the gate it describes still has nothing behind it.
 
 ## 10. Reuse audit
 

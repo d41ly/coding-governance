@@ -8,6 +8,7 @@
 - TOOL-aMendedFleet-107 · filed 2026-10-05 · `--dispatch` check 49 refuses a pass declaring a generator together with the index it renders (clause 3 of the method's disjointness rule) even when the build dispatches strictly sequentially, so a unit that changes a generator and must commit its re-render splits into land-dark-then-arm or multi-dispatch commits: units TOOL-aMendedFleet-12, -13, -42 and -43 of this build each did · accept a sequential pass may declare a generator and its index in one declaration, or the refusal names the sequential route
 - TOOL-aMendedFleet-108 · filed 2026-10-05 · the lander now mints kit versions into the landing merge (unit TOOL-aMendedFleet-65), and a minted carrier on the kickoff manifest's `watch:` line (the memory-tree hygiene gate, the build method) moves a watched path, so the manifest check's C5 reds at the push bar on every landing that mints memory-tree, and the lander cannot re-verify §B to re-stamp · accept a diff on a watched path that changes only version-marker lines owes no re-audit, or the lander names the owed re-stamp before the bar runs
 - TOOL-aMendedFleet-109 · filed 2026-10-06 · the vague-brief trial (unit TOOL-aMendedFleet-73) stopped at its pilot: a build with no design document scored intent 10 of 10, so the hidden intent suite cannot separate a spec from a plan on a three-sentence brief either, and the P against S question the charter's design-pass rule rests on is still open · accept a rerun, in a session of its own, whose primary measure is the blind-probed decision-met rate over the committed decision list, with a pilot headroom check on that measure before the arms
+- PLAY-aMendedFleet-5 · filed 2026-10-06 · the charter's §1 design pass keeps the full Tier-2 spec until a recorded reading of the vague-brief arm decides otherwise; the first trial measured only explicit briefs (the plan at 1.1 times the cost of building directly, the full spec route at 12.3 times, and every tool passing its hidden suite), and unit TOOL-aMendedFleet-73's run stopped at its pilot without a reading · accept an owner ruling on §1's design-pass shape that cites unit TOOL-aMendedFleet-73's trial report or its rerun → `coding-governance-agents.template.md`
 
 ## Dispositions
 
@@ -15,6 +16,7 @@
 - SEV · TOOL-aMendedFleet-96 · LOW · two readers of one definition set, no wrong answer today
 - SEV · TOOL-aMendedFleet-106 · LOW · a release act over many asks, no defect of its own
 - KEEP · TOOL-aMendedFleet-106 · advanced by TOOL-aMendedFleet-14, which defers the aged asks on it; the owner's triage is what closes it
+- KEEP · PLAY-aMendedFleet-5 · advanced by PLAY-aMendedFleet-2; the reading is unit TOOL-aMendedFleet-73's and the ruling is the owner's, so this build closes nothing
 - WONTDO · TOOL-aReplayedCard-9 · the eight-arm matrix needs a session started with an agent definition already installed, which no unattended pass can take, and aMendedFleet's context-diet units measure orientation cost on the live path instead; a REOPEN row naming aMendedFleet restores it
 - CLOSED · TOOL-aUnblockedFleet-7 · by TOOL-aWokenSentinel-16 · check 34 of `--landed` reads containment, so a second landing that overwrites the shared lander marker still contains the first run's witness (6bb7ac756)
 - CLOSED · TOOL-aUnblockedFleet-8 · by TOOL-dDerivedDocket-27 · its S4 makes the bar's bound wall plus queue plus GATE_BACKSTOP_MARGIN for a repository declaring GATE_PROFILE_CMD, which `.unattended.conf` does, so queue wait is no longer charged against a bound that excludes it
@@ -321,3 +323,4 @@
 - SEV · TOOL-aMendedFleet-107 · MED · a refusal written for concurrency taxes every sequential generator change
 - SEV · TOOL-aMendedFleet-108 · MED · the lander's own mint reds the push bar it hands the landing to
 - SEV · TOOL-aMendedFleet-109 · LOW · the design-pass question the trial was built for is still unmeasured
+- SEV · PLAY-aMendedFleet-5 · HIGH · §1's design pass is the rule every Tier-2 unit pays, and no reading of the vague-brief arm stands behind it

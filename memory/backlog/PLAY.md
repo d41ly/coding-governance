@@ -14,4 +14,6 @@ Cite ids, never line numbers.
 > Already landed without this? Any node:  python tools/memory-tree/migrate_backlog.py --repair <merge-sha>
 > A branch nobody will revisit? From the default branch:  python tools/memory-tree/migrate_backlog.py --ingest <ref>
 
-*No live ask.*
+| Ask | Status | Sev | Decided by | Filed | Summary |
+|---|---|---|---|---|---|
+| [PLAY-aMendedFleet-5](../builds/aMendedFleet/BACKLOG.md) | OPEN | HIGH | — | 2026-10-06 | the charter's §1 design pass keeps the full Tier-2 spec until a… |

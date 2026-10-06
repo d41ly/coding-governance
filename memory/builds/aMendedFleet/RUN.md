@@ -582,3 +582,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T01:12:22Z brief · item PLAY-aMendedFleet-2 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
 
 2026-10-06T01:20:09Z dispatch · item 8bc32c6e PLAY-aMendedFleet-2 · reason coding-governance-agents.template.md AGENTS.md tools/template-size-highwater.txt memory/guides/SESSION-KICKOFF.md
+
+2026-10-06T01:39:47Z dispatch · item 28759635 PLAY-aMendedFleet-2 · reason memory/LIVE.md memory/backlog/PLAY.md memory/builds/aMendedFleet/BACKLOG.md memory/builds/aMendedFleet/README.md memory/builds/aMendedFleet/spec/2026-10-04-spec-PLAY-aMendedFleet-2.md memory/ledger/2026-10.md
