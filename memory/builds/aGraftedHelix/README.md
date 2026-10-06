@@ -153,7 +153,7 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraf
 | [TOOL-aGraftedHelix-38 — three checks that went blind when units 32 to 36 moved code into helpers](spec/2026-10-06-spec-TOOL-aGraftedHelix-38.md) | 22 | 2 | CLOSED | rev-2 | 2026-10-06 |
 <!-- /gen:build-units -->
 
-Records: 57 bound to this build, across 4 record folder(s).
+Records: 58 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
