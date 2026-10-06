@@ -395,12 +395,15 @@ def build_lang_mode_findings(git: "Git", root: pathlib.Path, path: str = ".lexic
 # id set bounds the offenders themselves. This guard keeps the set from growing: an id the base's
 # set did not carry is a finding, and a FIRST seed may not exceed the pin the base held for that
 # signal. There is no escape: each signal has a remedy that is not an addition.
+#
+# TOOL-aMendedFleet-110: nor is MOVING a signal out of the set. Every signal the base's BASELINES
+# held is graded, listed in the working set or not, so a signal leaving BASELINES for PINS may be
+# pinned no higher than the size of the set the base held. Deleting the set and pinning it at any
+# count used to pass, because only the working dict was walked and an empty one returned early.
 # ponytail: the base layer is read with `ast.literal_eval`, so a non-literal BASELINES or PINS at the
 # base is a finding rather than an evaluation; executing the base's code would be the upgrade.
-def build_baseline_findings(git: "Git", path: str, baselines: dict) -> list:
+def build_baseline_findings(git: "Git", path: str, baselines: dict, pins: dict) -> list:
     """Findings for every signal whose working `BASELINES` set is WEAKER than the base allows."""
-    if not baselines:
-        return []
     base = git.run("show", f"{git.base_ref}:{path}")
     if base.returncode != 0:
         return []                          # the layer is new on this branch; nothing to compare
@@ -439,6 +442,12 @@ def build_baseline_findings(git: "Git", path: str, baselines: dict) -> list:
             out.append(f"{path}: BASELINES[{sig!r}] is seeded with {len(set(ids))} ids where the "
                        f"base pins it at {old_pins.get(sig, 0)} in PINS, which WEAKENS it. Seed only "
                        f"the offenders the base's pin already bounds.")
+    for sig in sorted(set(old_sets) - set(baselines)):
+        size = len(set(old_sets[sig]))
+        if sig in pins and pins[sig] > size:
+            out.append(f"{path}: {sig!r} moved from BASELINES to PINS at {pins[sig]} where the "
+                       f"base's set held {size} ids at {git.base_ref}, which WEAKENS it. Pin it no "
+                       f"higher than {size}, the set's size, and drain from there.")
     return out
 
 
@@ -3820,7 +3829,7 @@ def main(argv: list[str] | None = None) -> int:
         ratchets = ratchet_findings(ctx.git, root, getattr(ctx.proj, "RATCHETS", ()), lookback)
         ratchets += build_lang_mode_findings(ctx.git, root, lookback=lookback)
         if ctx.layer_path:
-            ratchets += build_baseline_findings(ctx.git, ctx.layer_path, baselines)
+            ratchets += build_baseline_findings(ctx.git, ctx.layer_path, baselines, proj.PINS)
         over = [s for s in out if s["gateable"] and s["live"] and (
             bool(s["new"] or s["stale"]) if "baseline" in s else s["value"] > s["pin"])]
         dead = [s for s in out if s["gateable"] and not s["live"] and s["signal"] not in declared]

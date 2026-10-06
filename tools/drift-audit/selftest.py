@@ -93,7 +93,9 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 411
+CHECK_FLOOR = 414
+# 411 -> 414, TOOL-aMendedFleet-110: the MOVE, EMPTY and CONTROL checks in `test_baselines`, COUNTED
+# off the arms rather than measured, because the unit pass runs no suite.
 # 402 -> 411, TOOL-aMendedFleet-92: the nine checks of `test_fleet_over_budget`, COUNTED off the arm
 # rather than measured, because the unit pass runs no suite; the close's run re-reads it.
 # 397 -> 402, TOOL-aMendedFleet-91: the five records-only checks of signal 6.
@@ -2010,6 +2012,31 @@ def test_baselines(tmp: pathlib.Path) -> None:
     check("baselines: a signal in both PINS and BASELINES is refused with exit 2 before any line",
           both.returncode == 2 and not both.stdout.strip() and "PINS and BASELINES" in both.stderr,
           f"rc={both.returncode} out={both.stdout[:120]!r} {both.stderr.strip()[-200:]}")
+    sig.write_text(seeded, encoding="utf-8", newline="\n")
+
+    # --- TOOL-aMendedFleet-110: a MOVE out of BASELINES into PINS is graded against the base ----
+    # The seeded set becomes the base first: the arms above end on a base that pins the signal.
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "the seeded set is the base", "--no-verify"], r)
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+    moved = dr.build_baseline_findings(
+        dr.Git(r, "HEAD"), f"{ROOT_PFX}{KIT_NAME}/drift_signals.py",
+        {"closed_specs_with_no_product_commit": []}, {name: 2})
+    check("baselines: a set moved to PINS above the base's size is one finding naming it",
+          len(moved) == 1 and f"{name!r} moved" in moved[0] and "WEAKENS" in moved[0], repr(moved))
+    sig.write_text(layer.replace("PINS = {}", "PINS = {'" + name + "': 2}"),
+                   encoding="utf-8", newline="\n")
+    emptied = run_check()
+    check("baselines: no BASELINES and the signal pinned above the base's size reds",
+          emptied.returncode == 1 and "RATCHET WEAKENED" in emptied.stderr
+          and f"{name!r} moved" in emptied.stderr,
+          f"rc={emptied.returncode} {emptied.stderr.strip()[-300:]}")
+    sig.write_text(layer.replace("PINS = {}", "PINS = {'" + name + "': 1}"),
+                   encoding="utf-8", newline="\n")
+    at_size = run_check()
+    check("baselines: a move pinned at the base set's size is green", at_size.returncode == 0,
+          f"rc={at_size.returncode} {at_size.stderr.strip()[-300:]}")
     sig.write_text(seeded, encoding="utf-8", newline="\n")
 
 

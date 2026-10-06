@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-110 — a drift signal moved from BASELINES into PINS is graded against the base's BASELINES
 
-**Status:** SPECCED · rev-1 · 2026-10-06 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-06 · order 107
+**Status:** CLOSED · rev-1 · 2026-10-06 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-06 · order 107
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-110-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-110-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

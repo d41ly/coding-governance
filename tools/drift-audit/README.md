@@ -299,7 +299,9 @@ a gateable signal whose detail rows each carry an `id` takes an id set in `BASEL
 whose `id` the set does not list reds as `new`, a listed id no row carries reds as `stale` until its
 line is deleted, and the set may never gain an id against the base, nor be first seeded above the
 pin the base held. There is no escape for an addition: each such signal has a remedy that is not
-one. A signal named in both `PINS` and `BASELINES`, or a `BASELINES` key naming no gateable signal,
+one. Nor is moving a signal out of the set an escape: a signal leaving `BASELINES` for `PINS` is
+pinned no higher than the size of the set the base held, or `--check` reds it as a weakened ratchet.
+A signal named in both `PINS` and `BASELINES`, or a `BASELINES` key naming no gateable signal,
 is refused with exit 2. Signals that never gate keep their pins, because a set would change nothing
 `--check` does. The project layer is never evidence for signal 2, so listing an id does not cite it.
 

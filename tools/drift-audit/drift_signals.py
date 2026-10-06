@@ -345,6 +345,8 @@ PINS: dict[str, int] = {
 # read as no change; here a new id reds, a listed id that no longer offends reds until its line is
 # deleted, and the set may never gain an id against the base. There is no escape: each signal below
 # has a remedy that is not an addition. Delete an id the moment `--check` names it stale.
+# Moving a signal out of this dict into PINS is graded too (TOOL-aMendedFleet-110): it may be pinned
+# no higher than the size of the set the base held, so a move cannot buy headroom.
 #
 # Seeded with the offenders the BASE measured, never with ones that arrived on a branch: those red
 # as `new`, naming their id, until their cause is removed.
