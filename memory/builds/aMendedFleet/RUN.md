@@ -702,3 +702,7 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T10:53:43Z dispatch · item ef01d5a6 TOOL-aMendedFleet-98 · reason tools/lexicon/selftest.py memory/builds/aMendedFleet/spec/2026-10-05-spec-TOOL-aMendedFleet-98.md memory/builds/aMendedFleet/README.md memory/backlog/TOOL.md memory/map/generated/symbols.json
 
 2026-10-06T10:58:41Z brief · item TOOL-aMendedFleet-99 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
+
+2026-10-06T11:07:24Z dispatch · item 3cb3e7b7 TOOL-aMendedFleet-99 · reason .github/workflows/remote-ci.yml memory/gotchas/fixture-inherits-ambient-machine-state.md memory/gotchas/INDEX.md memory/builds/aMendedFleet/spec/2026-10-05-spec-TOOL-aMendedFleet-99.md
+
+2026-10-06T11:11:30Z dispatch · item 3cb3e7b7 TOOL-aMendedFleet-99 · reason .github/workflows/remote-ci.yml memory/gotchas/fixture-inherits-ambient-machine-state.md memory/gotchas/INDEX.md memory/builds/aMendedFleet/spec/2026-10-05-spec-TOOL-aMendedFleet-99.md memory/builds/aMendedFleet/README.md

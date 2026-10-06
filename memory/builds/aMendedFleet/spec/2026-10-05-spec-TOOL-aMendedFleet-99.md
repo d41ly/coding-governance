@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-99 — the held job runs its suites from the tree path the bar job uses
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · order 100
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · order 100
 
 <!-- gen:spec-records -->
 
