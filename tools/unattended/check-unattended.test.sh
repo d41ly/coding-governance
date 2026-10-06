@@ -3868,10 +3868,10 @@ miss "$out" "check 23 ABSORB"
 hit  "$out" "a pass of the run this branch drives committed outside the set it declared before dispatch while its window overlapped a sibling pass, and that declaration is the disjointness proof two concurrent passes rest on"
 
 # ---- THE WIDENING REPAIR, AND THE POST-HOC REWRITE THAT WEARS ITS CLOTHES (closing review F3/F4).
-# ---- `--dispatch`'s widening supersedes an OPEN pass's row and parks the replacement AT THE SAME
-# ---- ANCHOR, so a widened declaration is two rows under one key and the later binds. A widening
-# ---- asked for AFTER the pass committed cannot reuse that anchor — the driver no longer finds the
-# ---- row to supersede — so it lands under a new key and the original narrow row is still graded.
+# ---- A widening `--dispatch` made while the pass is OPEN parks a second row AT THE SAME ANCHOR, so a
+# ---- widened declaration is two rows under one key and the pass may write their union (arm F,
+# ---- TOOL-aGraftedHelix-39). A widening asked for AFTER the pass committed cannot reuse that anchor,
+# ---- because HEAD has moved, so it lands under a new key and the original narrow row is still graded.
 # ---- That is the ordering constraint, obtained by construction instead of by comparing timestamps.
 
 # A: the sanctioned repair. Widened at its own anchor, commits inside the widened set.
@@ -3926,7 +3926,20 @@ printf 'b\n' > work/build.txt && printf 'x\n' > work/STRAY.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
 hit "$(run)" "a pass of the run this branch drives committed outside the set it declared before dispatch while its window overlapped a sibling pass, and that declaration is the disjointness proof two concurrent passes rest on"
 
-# F: BOTH IDS IN ONE DISPATCH GROUP, which is the whole of this arm and is what the first two
+# F: TWO SAME-ANCHOR ROWS WITH DISJOINT PATHS are one pass that may write their UNION
+# (TOOL-aGraftedHelix-39): the second row ADDS a path and replaces nothing. Built as arm A is, with its
+# sibling row. Graded against the last row alone, the commit's write to work/one.txt is undeclared.
+reset_tree
+write_run_branch
+drows ARCH-tRun-1 "work/one.txt" "work/two.txt"
+drow ARCH-tRun-9 "work/nine.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/two.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+out=$(run)
+hit  "$out" "unattended: check 23 fleet — 0 undeclared write(s) over 1 graded pass(es)"
+miss "$out" "check 23 FAILED"
+
+# G: BOTH IDS IN ONE DISPATCH GROUP, which is the whole of this arm and is what the first two
 # versions of it missed. The ambiguity loop only pairs siblings sharing an anchor, so a fixture that
 # parks its two ids at different anchors never reaches the comparison it claims to pin — and reverting
 # the anchoring left the whole suite green. `ARCH-tRun-1` is a prefix of `ARCH-tRun-10`, so under an
@@ -6671,7 +6684,12 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- (six `mutate`, four `hit`, one `miss`), at the END of check 51's block in region 7, so
 # ---- FLOOR_SHARD_7 carries the same +11 and the other seven are untouched. MEASURED on a slice of
 # ---- the prologue and check 51's block on node a, 2026-10-06; this pass runs no suite.
-FLOOR_ASSERTIONS=965
+# ---- RAISED 965 -> 967 by exactly the arm, TOOL-aGraftedHelix-39 S8: check 23's arm F, two same-
+# ---- anchor rows with disjoint paths graded as their union (one `hit`, one `miss`), in the
+# ---- widening-repair block of region 8, so FLOOR_SHARD_8 carries the same +2 and the other seven
+# ---- are untouched. The block's old arm F, both ids in one group, is relabelled G. MEASURED on a
+# ---- slice of the prologue and arms A to G on node a, 2026-10-06; this pass runs no suite.
+FLOOR_ASSERTIONS=967
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
@@ -6683,7 +6701,7 @@ FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133
 FLOOR_SHARD_6=150
 FLOOR_SHARD_7=226
-FLOOR_SHARD_8=206
+FLOOR_SHARD_8=208
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;

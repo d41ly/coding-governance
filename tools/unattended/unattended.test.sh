@@ -6267,6 +6267,58 @@ fi
 git reset -q --hard
 rm -f "$CCM"
 
+# ---- TOOL-aGraftedHelix-39: ONE DERIVATION OF THE PATHS A DISPATCHED PASS MAY WRITE. Every row at one
+# ---- anchor stands and the pass may write their union; a row at a later anchor is a new pass. The
+# ---- kit library's `read_pass_declarations` answers it for `--dispatch`, `--check-commit`, `--audit`
+# ---- and check 23 alike. Against the parent: (a) exits 1 naming a.sh, (b) prints no effective line,
+# ---- (c) accepts the sibling while the pass is open, and (d) exits 0.
+GH39M=$(mktemp)
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+[ -z "$PFX" ] || mkdir -p "$PFX"
+# (a) and (b): a second declaration at the SAME anchor names only the path it adds
+run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh --writes ${PFX}b.sh >/dev/null
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}c.sh)
+GH39G=$(git rev-parse --short=8 HEAD)
+same "GH39 both declarations sit at one anchor" "$(grep -c " dispatch · item $GH39G ARCH-tRun-1 · reason " memory/builds/tRun/RUN.md)" "2"
+hit  "$out" "unattended: dispatch effective — $GH39G ARCH-tRun-1 · ${PFX}a.sh ${PFX}b.sh ${PFX}c.sh"
+printf 'a\n' > ${PFX}a.sh; printf 'b\n' > ${PFX}b.sh; printf 'c\n' > ${PFX}c.sh
+git add ${PFX}a.sh ${PFX}b.sh ${PFX}c.sh
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$GH39M"
+out=$(run --check-commit "$GH39M"); rc=$?
+same "GH39 (a) --check-commit admits the union of the same-anchor rows, exit code" "$rc" "0"
+miss "$out" "stages paths outside the set it declared before dispatch"
+# (c): the earlier same-anchor paths stay reserved against a sibling while the pass is open...
+hit  "$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}a.sh)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: ${PFX}a.sh also in $GH39G ARCH-tRun-1"
+# ...and are released once the pass commits inside the union, here a write to c.sh alone
+git reset -q; git add ${PFX}c.sh memory/builds/tRun/RUN.md
+git commit -q -m "ARCH-tRun-1 builds its lane" -m "Pass: ARCH-tRun-1" --no-verify
+hit  "$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}a.sh)" "dispatch declared"
+# (d): a row at a LATER anchor is a new pass, graded alone, and the committed pass's paths do not carry
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+[ -z "$PFX" ] || mkdir -p "$PFX"
+run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh --writes ${PFX}b.sh >/dev/null
+printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
+git commit -q -m "ARCH-tRun-1 builds its lane" -m "Pass: ARCH-tRun-1" --no-verify
+run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}c.sh >/dev/null
+GH39G=$(git rev-parse --short=8 HEAD)
+printf 'b\n' > ${PFX}b.sh; git add ${PFX}b.sh
+out=$(run --check-commit "$GH39M"); rc=$?
+same "GH39 (d) --check-commit grades a later anchor's row alone, exit code" "$rc" "1"
+hit  "$out" "stages paths outside the set it declared before dispatch, and the declaration can still be widened because the pass has not committed: ${PFX}b.sh; graded against the pass at $GH39G, which declares: ${PFX}c.sh — widen it"
+git reset -q --hard; rm -f "$GH39M"
+# (e): ONE derivation, in the shared library, called by every reader and defined by none of them
+same "read_pass_declarations is defined exactly once, in the shared library" \
+  "$(grep -c '^read_pass_declarations()' "$HERE/lib-unattended.sh")" "1"
+same "the driver's five readers call it rather than parsing the rows their own way" \
+  "$(grep -v '^[[:space:]]*#' "$HERE/unattended.sh" | grep -c 'read_pass_declarations ')" "5"
+same "and so does check 23" \
+  "$(grep -v '^[[:space:]]*#' "$HERE/check-unattended.sh" | grep -c 'read_pass_declarations ')" "1"
+same "and neither defines its own" \
+  "$(grep -c '^read_pass_declarations()' "$HERE/unattended.sh" "$HERE/check-unattended.sh" | grep -c ':0$')" "2"
+same "the per-row supersession test is gone from the openness predicate" \
+  "$(grep -c 'THE LAST ROW CARRYING THIS SET' "$HERE/unattended.sh")" "0"
+reset_tree
+
 # ---- TOOL-aGraftedHelix-27: the generated outputs resolve the same INSIDE a git hook as outside one.
 # ---- In a linked worktree git exports an absolute GIT_DIR into `commit-msg`, and with no GIT_WORK_TREE
 # ---- beside it git takes the current directory for the work tree's top. The library asked git where
@@ -15920,7 +15972,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 2534 -> 2536 by TOOL-aGraftedHelix-38 S4: rule 2's declared-pair arms in region two, the
 # stale-entry arm (a) and the call-structure arm (b), two inline assertions, run as a slice of the
 # prologue and rule 2's block on node a, 2026-10-06, each red under its staged break; no suite ran.
-FLOOR_ASSERTIONS=2536
+# RAISED 2536 -> 2549 by TOOL-aGraftedHelix-39 S7: the one-derivation block beside the
+# `--check-commit` arms in region two, thirteen assertions (arms (a) to (d) eight, arm (e) five),
+# run as a slice of the prologue and that block on node a, 2026-10-06 (n 20 -> 33), green, and each
+# arm red under its staged break in a scratch copy of the kit; no suite ran.
+FLOOR_ASSERTIONS=2549
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -16072,7 +16128,8 @@ FLOOR_SHARD_1=211
 # RAISED 2289 -> 2312: the same 23 region-two exec-marker, settle-retry and lock assertions, see FLOOR_ASSERTIONS.
 # RAISED 2312 -> 2335 by TOOL-aGraftedHelix-37: the same 23 region-two GH37 lock assertions, see FLOOR_ASSERTIONS.
 # RAISED 2335 -> 2337 by TOOL-aGraftedHelix-38: the same 2 region-two rule-2 pair assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=2337
+# RAISED 2337 -> 2350 by TOOL-aGraftedHelix-39: the same 13 region-two one-derivation assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=2350
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

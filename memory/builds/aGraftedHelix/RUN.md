@@ -105,3 +105,9 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-06T11:30:24Z dispatch · item 333160ad TOOL-aGraftedHelix-38 · reason tools/unattended memory/gotchas/a-pair-exists-and-it-is-the-wrong-one.md memory/gotchas/a-helper-extraction-blinds-a-per-function-rule.md memory/gotchas/INDEX.md memory/guides .claude/skills/unattended/SKILL.md memory/map memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-38.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md
 
 2026-10-06T11:46:31Z rescope · item add TOOL-aGraftedHelix-39 · reason discovery by unit 38's builder: a second --dispatch naming only new paths left the earlier-declared paths outside the set its next commit was graded against, silently, where the verbs contract says declarations are append-only and both rows stand; reproduce, then fix the readers or the message
+
+2026-10-06T12:13:45Z brief · item TOOL-aGraftedHelix-39 · reason a2e60ebbeb07 memory/builds/aGraftedHelix/prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md
+
+2026-10-06T12:14:27Z dispatch · item b32773b5 TOOL-aGraftedHelix-39 · reason tools/unattended memory/gotchas/two-guards-one-question-two-answers.md memory/guides .claude/skills/unattended/SKILL.md memory/map memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-39.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md
+
+2026-10-06T12:20:34Z dispatch · item b32773b5 TOOL-aGraftedHelix-39 · reason tools/unattended memory/gotchas/two-guards-one-question-two-answers.md memory/guides .claude/skills/unattended/SKILL.md memory/map memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-39.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md memory/project/substitution-fed-loops.txt

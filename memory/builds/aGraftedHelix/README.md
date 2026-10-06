@@ -106,7 +106,7 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 39 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
+**Build status:** CLOSED · 39 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
 ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13
 ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-26
 ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33 TOOL-aGraftedHelix-34 TOOL-aGraftedHelix-35 TOOL-aGraftedHelix-36 TOOL-aGraftedHelix-37 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39
@@ -152,7 +152,7 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraf
 | [TOOL-aGraftedHelix-36 — the rotated run's closing review MEDIUM and LOW findings, fixed as one batch](spec/2026-10-06-spec-TOOL-aGraftedHelix-36.md) | 20 | 2 | CLOSED | rev-2 | 2026-10-06 |
 | [TOOL-aGraftedHelix-37 — breaking a stale claim-push lock is a step one writer wins](spec/2026-10-06-spec-TOOL-aGraftedHelix-37.md) | 21 | 2 | CLOSED | rev-3 | 2026-10-06 |
 | [TOOL-aGraftedHelix-38 — three checks that went blind when units 32 to 36 moved code into helpers](spec/2026-10-06-spec-TOOL-aGraftedHelix-38.md) | 22 | 2 | CLOSED | rev-2 | 2026-10-06 |
-| [TOOL-aGraftedHelix-39 — one derivation of the paths a dispatched pass may write](spec/2026-10-06-spec-TOOL-aGraftedHelix-39.md) | 23 | 2 | SPECCED | rev-1 | 2026-10-06 |
+| [TOOL-aGraftedHelix-39 — one derivation of the paths a dispatched pass may write](spec/2026-10-06-spec-TOOL-aGraftedHelix-39.md) | 23 | 2 | CLOSED | rev-1 | 2026-10-06 |
 <!-- /gen:build-units -->
 
 Records: 59 bound to this build, across 4 record folder(s).

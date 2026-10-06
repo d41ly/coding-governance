@@ -50,7 +50,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.84   # gov:kit unattended@1.84 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.85   # gov:kit unattended@1.85 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -3981,20 +3981,10 @@ for f in $RUNS; do
   # with different windows. What changes is same-anchor rows: `row[k] = $0` overwrote, so a run that
   # took the driver's own published repair ("a pass that needs more paths declares again") had its
   # first declaration silently discarded and was reported against the second alone.
-  dsrows=$(grep -F -- ' dispatch · item ' "$f" 2>/dev/null | awk '
-      { k = $0; sub(/^.* dispatch · item /, "", k); sub(/ · reason .*$/, "", k)
-        pth = $0; sub(/^.* · reason /, "", pth)
-        pre = $0; sub(/ dispatch · item .*$/, "", pre)
-        if (!(k in seen)) { seen[k] = 1; ord[++n] = k; head[k] = pre; paths[k] = pth }
-        else {
-          split(paths[k], have, " "); dup = 0
-          split(pth, add, " ")
-          for (a in add) { dup = 0
-            for (h in have) if (have[h] == add[a]) dup = 1
-            if (!dup) paths[k] = paths[k] " " add[a] }
-        } }
-      END { for (i = 1; i <= n; i++) { k = ord[i]
-              print head[k] " dispatch · item " k " · reason " paths[k] } }' || true)
+  # THE KIT LIBRARY DERIVES IT (TOOL-aGraftedHelix-39), the same function the driver's `--dispatch`,
+  # `--check-commit` and `--audit` ask, so the four readers cannot answer "which paths may this pass
+  # write" four ways again. A key's paths come in first-appearance order, each once.
+  dsrows=$(read_pass_declarations "$f")
   if [ -z "$dsrows" ]; then
     report "check 23 skipped for $f — this run declared no concurrent dispatch, so there is no declaration to compare and a green verdict here would be coverage of nothing"
     continue

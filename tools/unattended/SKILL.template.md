@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.84 -->
+<!-- gov:kit unattended@1.85 -->
 
 # Unattended runs
 
@@ -687,8 +687,10 @@ definition, so the absence is a decision and not an oversight.
   a shared mutable record. A generated index ALONE is fine — every pass changes a spec header it is
   rendered from — and only the index together with its GENERATOR is refused. The third clause, whether
   a file is a contract the sibling reads, is a judgement no verb can make, and it says so rather than
-  pretending. If a pass discovers it needs another file, re-declare with the WIDER set BEFORE the
-  commit; narrowing is refused, because narrowing after the fact is how a write gets hidden.
+  pretending. If a pass discovers it needs another file, declare again BEFORE the commit, naming only
+  the paths it adds: every row at one anchor stands and the pass may write their union, which
+  `--dispatch` prints as `dispatch effective`. A narrower row is accepted and frees nothing, and a
+  row at a LATER anchor is a new pass, graded on its own.
   **End the pass commit's message with a `Pass: <unit-id>` trailer**, and give a commit that names a
   unit but is no pass `Pass: none`: the gate attributes a commit by its trailer and never by its
   subject once one is present, which is what stops a records commit from being graded as a pass.

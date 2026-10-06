@@ -51,7 +51,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.84   # gov:kit unattended@1.84 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.85   # gov:kit unattended@1.85 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -1341,8 +1341,9 @@ derive_refreshed_at() { # run-state file · slug · verb -> prints the listing, 
     RF_FACT="$_rf_tip · $_rf_verb · unlisted"; return 0
   fi
   # NOT A LOOP FED BY A REDIRECT HOLDING A SUBSTITUTION (the shell-hygiene leg): `mapfile` over a
-  # process substitution reads to its writer's end, and `awk` drops empty lines and repeats.
-  mapfile -t _rf_paths < <( { readme_of "$_rf_slug"; echo; grep -F ' dispatch · item ' "$_rf_f" 2>/dev/null | sed 's/.* · reason //' | tr ' ' '\n'; } | awk 'NF && !s[$0]++')
+  # process substitution reads to its writer's end, and `awk` drops empty lines and repeats. The
+  # declared paths are the library's keys' unions over every key, which is every row's paths.
+  mapfile -t _rf_paths < <( { readme_of "$_rf_slug"; echo; read_pass_declarations "$_rf_f" | sed 's/.* · reason //' | tr ' ' '\n'; } | awk 'NF && !s[$0]++')
   _rf_m=$(GIT rev-list --count "$_rf_tip" --not "$_rf_base" HEAD 2>/dev/null) || _rf_m="?"
   _rf_n=$(GIT --literal-pathspecs rev-list --count "$_rf_tip" --not "$_rf_base" HEAD -- "${_rf_paths[@]}" 2>/dev/null) || _rf_n="?"
   _rf_rows=$(GIT --literal-pathspecs log -n 10 --format='%h %s' "$_rf_tip" --not "$_rf_base" HEAD -- "${_rf_paths[@]}" 2>/dev/null)
@@ -7255,10 +7256,10 @@ print_audit() { # slug
   # `--liveness`. The verdict arithmetic below reads them exactly as it read its own locals.
   read_tree_clocks
   now=$TC_NOW; lastc=$TC_LASTC; lastw=$TC_LASTW; dead=$TC_DEAD
-  # THE LATEST PASS PER UNIT, by the awk shape `verb_status` uses for brief rows: split on the
-  # separator, keep rows whose first field ends ` dispatch`, take the ISO from that field, the group
-  # and unit from `item`, the declared set from `reason`. One awk pass and no back-reference, for the
-  # reason that function's comment records.
+  # THE LATEST PASS PER UNIT, from the kit library's `read_pass_declarations` in `current` mode:
+  # one line per unit, the key holding its last row, with that key's FIRST row's ISO and the union of
+  # its rows' paths (TOOL-aGraftedHelix-39 moved the derivation there; this verb's answer is unchanged).
+  # The awk below only splits that line into the fields the loop reads.
   #
   # SAME-ANCHOR ROWS ARE ONE PASS AND THEIR SETS ARE UNIONED; a NEW anchor replaces. This is check
   # 23's key, `(anchor, unit)`, and not the LAST row per unit this first read: `--writes` is
@@ -7266,11 +7267,9 @@ print_audit() { # slug
   # and this repo's own harness produced twelve one-path rows for one unit — so the last row alone
   # asked whether the pass wrote its LAST path, reported a CLOSED unit open for hours, and handed
   # the keepalive a kill order for it (closing review of aProbedUnit, cluster A).
-  rows=$(awk -F' · ' '$1 ~ /^[0-9][0-9-]*T[0-9:]*Z dispatch$/ && $2 ~ /^item / && $3 ~ /^reason / {
+  rows=$(read_pass_declarations "$rel" current | awk -F' · ' '{
        iso = $1; sub(/ dispatch$/, "", iso); it = substr($2, 6); g = it; sub(/ .*/, "", g); u = it; sub(/^[^ ]* /, "", u)
-       if (u in ga && ga[u] == g) dc[u] = dc[u] " " substr($3, 8)
-       else { ga[u] = g; ts[u] = iso; dc[u] = substr($3, 8) }
-     } END { for (u in ga) print u "\t" ts[u] "\t" ga[u] "\t" dc[u] }' "$rel" 2>/dev/null | sort)
+       print u "\t" iso "\t" g "\t" substr($3, 8) }' | sort)
   # A UNIT WHOSE SPEC IS TERMINAL IS NOT OPEN, whatever its rows say. The openness test is a
   # disjointness proof and answers conservatively — a pass that legitimately declared a path it never
   # wrote stays open under it forever — which is the right answer for `--dispatch` and the wrong one
@@ -11657,31 +11656,17 @@ RESCOPED
 # definitions of "open" is the two-answers class, and the first version of this test was wrong once
 # already (it counted the declaration commit). Openness comes from `pass_commit` in the kit library,
 # which the gate leg calls too.
+#
+# A PASS IS ITS KEY, an anchor and a unit, AND ITS DECLARED SET IS THE KEY'S UNION — the set the
+# library's `read_pass_declarations` prints, which every caller passes here. No row of a key closes
+# another (TOOL-aGraftedHelix-39). The rule this replaces closed an earlier same-anchor row whenever
+# a later one carried a different set (TOOL-cMendedVintage-10), so a re-declaration naming only the
+# paths it ADDED read as one that REPLACED them. That rule existed for a pass that NARROWED and kept
+# its abandoned paths reserved forever, and the union keeps its fix: the pass closes when its commit
+# writes inside ANY path a row named, which releases every one of them. What a narrowing pass now
+# holds is the window before its commit, the conservative direction a disjointness proof wants.
 check_pass_open() { # grp · unit · run-state file · declared set (space-separated)
-  local _g="$1" _u="$2" _rel="$3" _decl="$4" _pcommit _wrote _hit _dp _wp _rows _r _n _at
-  # A SUPERSEDED ROW IS NOT AN OPEN PASS (TOOL-cMendedVintage-10). `--writes` is repeatable and the
-  # record is append-only, so a unit that re-declares — NARROWING, because it discovered it needs
-  # fewer files — leaves earlier rows naming paths no commit of its will ever write. Deciding on the
-  # commit alone reserves those paths forever and refuses every later unit declaring one, which
-  # rewards a pass for writing everything it declared and punishes one for finding it needs less.
-  # The live instance wedged this build: one unit's first row named an engine file it correctly never
-  # touched, and the next unit's declaration of that file was refused against a pass long finished.
-  #
-  # THE LAST ROW CARRYING THIS SET, not the first: a unit may re-declare an IDENTICAL set and those
-  # two rows supersede nothing. A set matching NO row is `--audit`'s union of a unit's same-anchor
-  # rows, which already spans through the last of them and is superseded by nothing — so an unmatched
-  # set falls through to the commit test unchanged. That is what keeps the stall clock reading the
-  # union it built rather than grading every re-declaring unit closed and never reporting it STALLED.
-  _rows=$(grep -F -- " dispatch · item $_g $_u · reason " "$_rel" 2>/dev/null || true)
-  _n=0; _at=0
-  while IFS= read -r _r; do
-    [ -n "$_r" ] || continue
-    _n=$((_n + 1))
-    [ "${_r#* · reason }" = "$_decl" ] && _at=$_n
-  done <<CPOROWS
-$_rows
-CPOROWS
-  [ "$_at" -gt 0 ] && [ "$_at" -lt "$_n" ] && return 1
+  local _g="$1" _u="$2" _rel="$3" _decl="$4" _pcommit _wrote _hit _dp _wp
   # An anchor this clone cannot resolve leaves the pass OPEN — `pass_commit` returns 1 for it.
   # Conservative by choice: the failure of a disjointness proof must be a refusal, never a pass.
   _pcommit=$(pass_commit "$_g" "$_u" "$_rel" || true)
@@ -11714,7 +11699,7 @@ CPOROWS
 # WHAT IT DOES NOT CHECK: a `--no-verify` commit never reaches it, and `Pass: none` is taken at its
 # word. Check 23 still grades both at the close.
 check_commit_message() { # commit message file
-  local msg="$1" f rel="" ref slug trl subj rows r d o u decl st p q ok uncov uncovl briefs cmd kd head
+  local msg="$1" f rel="" ref slug trl subj rows r d o u decl graded st p q ok uncov uncovl briefs cmd kd head
   [ -f "$msg" ] || { fail 49 "--check-commit was given no readable commit message file: ${msg:-(none)}"; return 1; }
   # It runs on EVERY commit, so the candidates are narrowed by one grep for this branch's ref before
   # the holder predicate, which reads the record's facts, confirms each.
@@ -11735,19 +11720,22 @@ check_commit_message() { # commit message file
   # `\r`, which is not blank to awk, so the paragraph never ended (closing review r2, M5). One awk and no
   # `grep` stage: MSYS grep strips CR on its own, which hid this on one node and not on another.
   subj=$(awk '{ sub(/\r$/, "") } /^#/ { next } NF { p = 1 } p && !NF { exit } p { printf "%s ", $0 }' "$msg")
-  # ONE LINE PER OPEN ROW, `<unit> <declared paths>`, through the predicate `--dispatch` and `--audit`
-  # already share, so this verb cannot call a pass open that they call closed. A row it calls closed
-  # BECAUSE ITS PASS COMMIT IS HEAD is kept apart (`O` rows): that is `git commit --amend` on the pass
-  # commit, whose HEAD is the commit being replaced (closing review r1, M4). Only a trailer naming the
-  # unit reopens it, so a records commit after a pass is never asked for a trailer it does not owe.
+  # ONE LINE PER UNIT, `<o|O> <unit> <anchor> <declared paths>`, from the key holding the unit's LAST
+  # row (the library's `current`), which is the window check 23 grades a commit made now in: a row at
+  # a later anchor is a new pass, graded alone, and an earlier pass's paths do not carry into it
+  # (TOOL-aGraftedHelix-39). Openness is the predicate `--dispatch` and `--audit` already share, asked
+  # over the key's union, so this verb cannot call a pass open that they call closed. A key it calls
+  # closed BECAUSE ITS PASS COMMIT IS HEAD is kept apart (`O`): that is `git commit --amend` on the
+  # pass commit, whose HEAD is the commit being replaced (closing review r1, M4). Only a trailer naming
+  # the unit reopens it, so a records commit after a pass is never asked for a trailer it does not owe.
   head=$(GIT rev-parse -q --verify HEAD 2>/dev/null)
-  rows=$(grep -F -- " dispatch · item " "$rel" 2>/dev/null | while IFS= read -r r; do
+  rows=$(read_pass_declarations "$rel" current | while IFS= read -r r; do
       [ -n "$r" ] || continue
       d=${r#* dispatch · item }; d=${d%% · reason *}
       if check_pass_open "${d%% *}" "${d#* }" "$rel" "${r#* · reason }"; then
-        printf 'o %s %s\n' "${d#* }" "${r#* · reason }"
+        printf 'o %s %s %s\n' "${d#* }" "${d%% *}" "${r#* · reason }"
       elif [ -n "$head" ] && [ "$(pass_commit "${d%% *}" "${d#* }" "$rel" || true)" = "$head" ]; then
-        printf 'O %s %s\n' "${d#* }" "${r#* · reason }"
+        printf 'O %s %s %s\n' "${d#* }" "${d%% *}" "${r#* · reason }"
       fi
     done)
   case " $trl " in *" none "*) return 0 ;; esac
@@ -11755,7 +11743,7 @@ check_commit_message() { # commit message file
   # reads until EOF, and the shell-hygiene leg bans it. The dispatch arm creates and removes the file.
   if [ -z "${trl// /}" ]; then
     printf '%s\n' "$rows" > "$CC_TMP"
-    while read -r o u decl; do
+    while read -r o u d decl; do
       [ "$o" = o ] || continue
       id_in "$subj" "$u" || continue
       fail 49 "--check-commit: this commit's subject names $u, an open dispatched pass of $slug, and the message carries no Pass: trailer, so check 23 would take it for that pass's commit; end the message with 'Pass: $u' when it is the pass, or 'Pass: none' when it is not"
@@ -11774,7 +11762,10 @@ check_commit_message() { # commit message file
   # (TOOL-aGraftedHelix-27).
   kd=$(derive_self_rel "$KIT_DIR") || kd=""; [ -n "$kd" ] || kd=$KIT_DIR
   for u in $trl; do
-    decl=$(printf '%s\n' "$rows" | awk -v u="$u" '$2 == u { $1 = ""; $2 = ""; print }' | tr '\n' ' ')
+    decl=$(printf '%s\n' "$rows" | awk -v u="$u" '$2 == u { $1 = ""; $2 = ""; $3 = ""; print }' | tr '\n' ' ')
+    # THE PASS THIS COMMIT IS GRADED AGAINST, named in both path refusals below so a refusal says
+    # which declaration it read and not only what fell outside it.
+    graded=$(printf '%s\n' "$rows" | awk -v u="$u" '$2 == u { g = $3; $1 = ""; $2 = ""; $3 = ""; sub(/^ +/, ""); print "graded against the pass at " g ", which declares: " $0; exit }')
     if [ -z "${decl// /}" ]; then
       fail 49 "--check-commit: the Pass: trailer names $u, which has no open dispatched pass in $slug, so nothing declared what this commit may write; declare it first: bash $kd/unattended.sh --dispatch $slug --pass $u --writes <path>"
       return 1
@@ -11797,7 +11788,7 @@ check_commit_message() { # commit message file
     # of it (TOOL-aWindowedPass-6). A widening `--dispatch` would anchor at the commit the amend
     # replaces, a row check 23 never grades, so no widening is offered - only the repairs it honours.
     if [ -n "$uncov" ] && [ -z "$(printf '%s\n' "$rows" | awk -v u="$u" '$1 == "o" && $2 == u { print "y"; exit }')" ]; then
-      fail 49 "--check-commit: pass $u has committed - HEAD is its pass commit, so this is an amend - and it stages paths outside the set it declared before dispatch:$uncov. An amend cannot widen a committed pass: unstage those paths, or commit them as a new commit after a fresh --dispatch for them"
+      fail 49 "--check-commit: pass $u has committed - HEAD is its pass commit, so this is an amend - and it stages paths outside the set it declared before dispatch:$uncov; $graded. An amend cannot widen a committed pass: unstage those paths, or commit them as a new commit after a fresh --dispatch for them"
       return 1
     fi
     if [ -n "$uncov" ]; then
@@ -11809,7 +11800,7 @@ check_commit_message() { # commit message file
       while IFS= read -r q; do
         [ -n "$q" ] && printf -v cmd '%s --writes %q' "$cmd" "$q"
       done < "$CC_TMP"
-      fail 49 "--check-commit: pass $u stages paths outside the set it declared before dispatch, and the declaration can still be widened because the pass has not committed:$uncov — widen it, then commit again: $cmd"
+      fail 49 "--check-commit: pass $u stages paths outside the set it declared before dispatch, and the declaration can still be widened because the pass has not committed:$uncov; $graded — widen it, then commit again: $cmd"
       return 1
     fi
   done
@@ -12021,12 +12012,12 @@ verb_dispatch() { # slug · unit · writes...
   # carries a pass's OWN declaration, so every pass closed the instant it was declared and this whole
   # proof ran over an empty set. A closing review reproduced that with two controls. The comment is
   # now a function call, which cannot be wrong about what the leg does — `check_pass_open`, shared
-  # with `--audit`. The two verbs ask it over DIFFERENT row sets, on purpose: this loop asks per
-  # ROW, so a row whose set the pass never wrote keeps its paths reserved against a sibling (the
-  # conservative answer a disjointness proof wants); `--audit` asks over the UNION of a unit's
-  # same-anchor rows, because a pass that wrote inside ANY of them is not idle (the true answer a
-  # stall clock wants). One predicate, two populations — stated so nobody "fixes" either to match.
-  sibrows=$(grep -F -- " dispatch · item " "$rel" 2>/dev/null | while IFS= read -r _r; do
+  # with `--audit`. ONE POPULATION, the library's keys (TOOL-aGraftedHelix-39): this loop asks about
+  # EVERY key and `--audit` about each unit's current one, and both ask over the key's union. So a
+  # pass's earlier same-anchor paths stay reserved against a sibling until it commits inside the
+  # union, and are released then. The per-ROW reading this replaced let a re-declaration naming only
+  # its added paths free the earlier ones while the pass was still open.
+  sibrows=$(read_pass_declarations "$rel" | while IFS= read -r _r; do
       [ -n "$_r" ] || continue
       _i=${_r#* dispatch · item }; _i=${_i%% · reason *}
       _g=${_i%% *}; _u=${_i#* }
@@ -12143,6 +12134,12 @@ SIBS
   park "$rel" dispatch "$grp $unit" "$want" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: dispatch declared — $grp $unit · $want"
+  # THE SET NOW IN FORCE, which is the key's union and not the row just parked: a declaration naming
+  # only the paths it adds leaves every earlier same-anchor path standing, and this says so.
+  local _eff
+  _eff=$(read_pass_declarations "$rel" current | grep -F -- " $unit · reason ")
+  _eff=${_eff#* dispatch · item }
+  echo "unattended: dispatch effective — ${_eff%% · reason *} · ${_eff#* · reason }"
   return 0
 }
 

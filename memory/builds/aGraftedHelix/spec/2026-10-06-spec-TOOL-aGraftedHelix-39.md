@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-39 — one derivation of the paths a dispatched pass may write
 
-**Status:** SPECCED · rev-1 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 23 · ratified 2026-10-06
+**Status:** CLOSED · rev-1 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 23 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 

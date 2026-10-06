@@ -30,6 +30,16 @@ The driver's own source carried a comment saying it had removed "the wedge shape
 to remove" — for the *idempotent* case, where a byte-identical row already exists. The general case
 was still wedged, one branch below the comment claiming otherwise.
 
+`TOOL-aGraftedHelix-39`, the same kit, a second question: *which paths may this dispatched pass
+write*. Four readers answered it three ways. Check 23 and `--audit` unioned every row at one anchor,
+as the verbs contract says; the driver's openness test closed an earlier same-anchor row whenever a
+later one carried a different set, so `--dispatch` and `--check-commit` read a re-declaration naming
+only its ADDED paths as one that REPLACED them, and a builder's next commit was refused for the
+paths it had declared first. `--check-commit` also unioned a pass committed at HEAD with a later
+open row, so a path the earlier pass declared was admitted into a later pass that check 23 grades
+alone. Not a wedge this time, a disagreement in both directions: the commit-time check refused what
+the close would pass, and passed what the close would count.
+
 ## Why it survives review
 
 Each guard reads correctly on its own, and a reviewer reading one is not reading the other. Nothing
@@ -75,4 +85,8 @@ derivations are different code, one of them is wrong even when both are green to
 Where this bit, the derivation now lives once in `tools/unattended/lib-unattended.sh` and is called
 by `tools/unattended/unattended.sh` and `tools/unattended/check-unattended.sh`, with an arm asserting
 neither defines its own — that arm is the closest thing to a gate this class has, and it is specific
-to the one pair rather than to the class.
+to the one pair rather than to the class. `TOOL-aGraftedHelix-39` added the second such arm, in the
+driver suite beside the `--check-commit` arms: `read_pass_declarations` is defined once in the
+library, called by five readers in the driver and one in the gate leg, defined by neither, and the
+per-row supersession test is gone. It counts names, so a reader that parses the rows without the
+function name is still invisible to it.

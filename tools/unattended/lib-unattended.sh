@@ -955,6 +955,40 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
   return 1
 }
 
+# ------------------------------------------------- which paths may a dispatched pass write, once
+# Prints one line per KEY, where a key is an anchor and a unit, in the shape of a raw dispatch row:
+#   <utc of the key's first row> dispatch · item <anchor> <unit> · reason <paths>
+# `<paths>` is every path of every row under that key, in first-appearance order, each once, and
+# keys print in the order they first appear. With a second argument `current`, each unit keeps only
+# the key holding its LAST row: the window a commit made NOW is graded in. A file holding no
+# dispatch row prints nothing. TOOL-aGraftedHelix-39.
+#
+# EVERY ROW UNDER ONE KEY STANDS AND THE PASS MAY WRITE THEIR UNION. That is the rule the verbs
+# contract states ("A DECLARATION IS APPEND-ONLY", "both rows stand", TOOL-cMendedVintage-15), and
+# check 23 and `--audit` already graded it. Four readers answered "which paths may this pass write"
+# three different ways before this: the driver's openness test closed an earlier same-anchor row
+# whenever a later one carried a different set, so a re-declaration naming only the paths it ADDED
+# read as one that REPLACED them, and `--check-commit` refused the earlier paths; and that verb also
+# unioned a pass committed at HEAD with a later open row, so a path the earlier pass declared leaked
+# into the later one, which check 23 grades alone. Every reader asks this function now.
+#
+# ONE AWK PROCESS, a file and no pipe: the walk cannot wait on a grandchild's write end. The key is
+# cut with the same expansions every reader of a row already uses, so a grammar change moves them all.
+read_pass_declarations() {  # run-state file · [current]
+  awk -v cur="${2:-}" '
+    index($0, " dispatch · item ") && index($0, " · reason ") {
+      k = $0; sub(/^.* dispatch · item /, "", k); sub(/ · reason .*$/, "", k)
+      p = $0; sub(/^.* · reason /, "", p)
+      if (!(k in at)) { at[k] = $0; sub(/ dispatch · item .*$/, "", at[k]); ord[++n] = k; ps[k] = "" }
+      m = split(p, a, " ")
+      for (i = 1; i <= m; i++) if (!((k, a[i]) in seen)) { seen[k, a[i]] = 1; ps[k] = ps[k] (ps[k] == "" ? "" : " ") a[i] }
+      u = k; sub(/^[^ ]* /, "", u); last[u] = k
+    }
+    END { for (i = 1; i <= n; i++) { k = ord[i]; u = k; sub(/^[^ ]* /, "", u)
+            if (cur == "current" && last[u] != k) continue
+            print at[k] " dispatch · item " k " · reason " ps[k] } }' "$1" 2>/dev/null || :
+}
+
 # ONE ANSWER TO "did this change touch only gen regions" (TOOL-aWindowedPass-3). Check 23 asks it of a
 # commit against its parent, `--check-commit` of the index against HEAD; two copies of the strip would
 # let the close forgive what the commit-time step refused. Regions NEST, the build README's unit table
