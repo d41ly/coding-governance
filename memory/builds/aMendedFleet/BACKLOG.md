@@ -11,6 +11,7 @@
 - PLAY-aMendedFleet-5 · filed 2026-10-06 · the charter's §1 design pass keeps the full Tier-2 spec until a recorded reading of the vague-brief arm decides otherwise; the first trial measured only explicit briefs (the plan at 1.1 times the cost of building directly, the full spec route at 12.3 times, and every tool passing its hidden suite), and unit TOOL-aMendedFleet-73's run stopped at its pilot without a reading · accept an owner ruling on §1's design-pass shape that cites unit TOOL-aMendedFleet-73's trial report or its rerun → `coding-governance-agents.template.md`
 - TOOL-aMendedFleet-113 · filed 2026-10-06 · the aMendedFleet closing review (findings 12 to 17) found four suites whose assertion floors rose by less than the arms their units added, so a stranded block no longer reds; nothing compares a floor's move with the arms added beside it · accept a check over the floored suites that counts the assertion calls a diff adds in each suite's own spelling and reds when the floor moved by less without a recorded reason → `tools/check-testsuite-counts.sh`
 - TOOL-aMendedFleet-114 · filed 2026-10-06 · the aMendedFleet closing review (finding 21) found kickoff units graded Tier-1 whose commits changed two kits or added a CLI flag, so check 23's Tier-2 acceptance-ledger join never ran on them · accept a hygiene check that reds a Tier-1 spec whose unit commits touch two kit directories or add a usage line, unless the spec records a tier waiver → `tools/memory-tree/check-memory-hygiene.sh`
+- TOOL-aMendedFleet-115 · filed 2026-10-06 · `print_touched_asks` (unit TOOL-aMendedFleet-66) hands every path the run's range changed to ASKS_CMD as argv words; at aMendedFleet's own VERIFYING move that was 605 paths and 37490 bytes, past Windows' 32 KiB command line, so python never started (exit 126, `Argument list too long`) and the list read DEAD PROBE on exactly the large build it exists for · accept the touched-asks read passes its paths on stdin or in batches, and a 600-path range lists its asks on node a → `tools/unattended/unattended.sh`
 
 ## Dispositions
 
@@ -26,6 +27,7 @@
 - KEEP · TOOL-aMendedFleet-109 · its accept clause asks for a rerun in a session of its own, which no unit of this build is; it stays live
 - KEEP · TOOL-aMendedFleet-113 · split out of TOOL-aMendedFleet-112's §8 F1 as a second mechanism the closing review's minors batch may not carry; no unit of this build builds the check, so it stays live
 - KEEP · TOOL-aMendedFleet-114 · split out of TOOL-aMendedFleet-112's §8 F2 for the same reason; no unit of this build builds the hygiene check, so it stays live
+- KEEP · TOOL-aMendedFleet-115 · a follow-up no unit of this build owns; found at the build's own VERIFYING move
 - WONTDO · TOOL-aReplayedCard-9 · the eight-arm matrix needs a session started with an agent definition already installed, which no unattended pass can take, and aMendedFleet's context-diet units measure orientation cost on the live path instead; a REOPEN row naming aMendedFleet restores it
 - CLOSED · TOOL-aUnblockedFleet-7 · by TOOL-aWokenSentinel-16 · check 34 of `--landed` reads containment, so a second landing that overwrites the shared lander marker still contains the first run's witness (6bb7ac756)
 - CLOSED · TOOL-aUnblockedFleet-8 · by TOOL-dDerivedDocket-27 · its S4 makes the bar's bound wall plus queue plus GATE_BACKSTOP_MARGIN for a repository declaring GATE_PROFILE_CMD, which `.unattended.conf` does, so queue wait is no longer charged against a bound that excludes it
@@ -335,3 +337,4 @@
 - SEV · PLAY-aMendedFleet-5 · HIGH · §1's design pass is the rule every Tier-2 unit pays, and no reading of the vague-brief arm stands behind it
 - SEV · TOOL-aMendedFleet-113 · MED · a floor raised by less than its arms lets a stranded block pass silently
 - SEV · TOOL-aMendedFleet-114 · LOW · a mis-tiered unit skips the Tier-2 ledger join
+- SEV · TOOL-aMendedFleet-115 · MED · the touched-asks list dies on a large range, the case it serves
