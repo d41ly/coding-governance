@@ -156,7 +156,7 @@ ids TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 TOOL-aGraftedHelix-42 TOOL-aGraf
 | [TOOL-aGraftedHelix-37 — breaking a stale claim-push lock is a step one writer wins](spec/2026-10-06-spec-TOOL-aGraftedHelix-37.md) | 21 | 2 | CLOSED | rev-3 | 2026-10-06 |
 | [TOOL-aGraftedHelix-38 — three checks that went blind when units 32 to 36 moved code into helpers](spec/2026-10-06-spec-TOOL-aGraftedHelix-38.md) | 22 | 2 | CLOSED | rev-2 | 2026-10-06 |
 | [TOOL-aGraftedHelix-39 — one derivation of the paths a dispatched pass may write](spec/2026-10-06-spec-TOOL-aGraftedHelix-39.md) | 23 | 2 | CLOSED | rev-1 | 2026-10-06 |
-| [TOOL-aGraftedHelix-40 — the playbook arm prints its leg's evidence on a miss, and the resume-tick arms grade detachment by a child that outlives the tick](spec/2026-10-06-spec-TOOL-aGraftedHelix-40.md) | 24 | 2 | SPECCED | rev-1 | 2026-10-06 |
+| [TOOL-aGraftedHelix-40 — the playbook arm prints its leg's evidence on a miss, and the resume-tick arms grade detachment by a child that outlives the tick](spec/2026-10-06-spec-TOOL-aGraftedHelix-40.md) | 24 | 2 | CLOSED | rev-1 | 2026-10-06 |
 | [TOOL-aGraftedHelix-41 — the driver suite runs in the pooled sweep as eight shards cut by its own region costs](spec/2026-10-06-spec-TOOL-aGraftedHelix-41.md) | 25 | 2 | SPECCED | rev-1 | 2026-10-06 |
 <!-- /gen:build-units -->
 

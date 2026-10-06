@@ -32,6 +32,12 @@ afterwards too: "the child is still running" is a verdict that does not depend o
 `tools/unattended/unattended.sh` inside its gate command. That arm's first draft slept a fixed time
 before the signal, and round 2 of the spec audit replaced the sleep with the ready file.
 
+`tools/unattended/resume-tick.test.sh`, its AC1 detachment arm and its AC2 orphan arm. Both graded
+a detached child by the tick's whole wall clock against 20 s, so under a pooled sweep they redded
+at 21 s, 49 s and 68 s while the child was still running: the clock placed a verdict at a moment
+of time, the same guess one level up. TOOL-aGraftedHelix-40 replaced each with the ordering the
+detachment produces, a child held for `STUB_HOLD_S` and read ALIVE after the tick returned.
+
 ## Gate
 
 No machine gate for the class. A sleep before a `kill` has no signature that separates it from a

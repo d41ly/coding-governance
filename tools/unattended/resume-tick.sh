@@ -150,7 +150,8 @@ print_decision() { # slug · worktree · act
 # `timeout 1 true` fails under load); a bound may never turn the check into a skip. THE ANSWER GOES
 # TO A FILE, never through `$( )`: a substitution reads until the LAST write end closes, so a
 # child the CLI leaves behind would hold the tick past the bound with the verdict already in —
-# `memory/gotchas/bounded-through-a-pipe-is-unbounded`, and the suite measures the wall.
+# `memory/gotchas/bounded-through-a-pipe-is-unbounded`, and the suite asserts the CLI's orphan
+# outlives the tick.
 check_login() { # scratch-file -> 0 when the CLI answers logged in
   if timeout -k 1s 10 true >/dev/null 2>&1; then timeout -k 5s 60 claude auth status </dev/null >"$1" 2>&1
   else claude auth status </dev/null >"$1" 2>&1; fi

@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-40 — the playbook arm prints its leg's evidence on a miss, and the resume-tick arms grade detachment by a child that outlives the tick
 
-**Status:** SPECCED · rev-1 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 24 · ratified 2026-10-06
+**Status:** CLOSED · rev-1 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 24 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 

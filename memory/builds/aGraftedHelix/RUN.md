@@ -115,3 +115,9 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-06T18:56:34Z rescope · item add TOOL-aGraftedHelix-40 · reason discovery at VERIFYING: the pooled sweep at b04ab0da0 reds the playbook selftest on a commented BYPASS_BAN spelling (green at eb96ea8b2) and the resume-tick selftest on a detachment arm graded by elapsed time
 
 2026-10-06T18:56:38Z rescope · item add TOOL-aGraftedHelix-41 · reason discovery at VERIFYING: the unsharded driver suite ran 19871 s and was walled with no verdict while every other row finished by +10210 s, so one row sets the sweep's floor; it already shards at arity 2 and the sweep registers it whole
+
+2026-10-06T20:00:45Z brief · item TOOL-aGraftedHelix-40 · reason a2e60ebbeb07 memory/builds/aGraftedHelix/prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md
+
+2026-10-06T20:02:11Z dispatch · item d3f0aa37 TOOL-aGraftedHelix-40 · reason tools/unattended memory/guides .claude/skills/unattended/SKILL.md memory/map memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-40.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md
+
+2026-10-06T20:05:15Z dispatch · item d3f0aa37 TOOL-aGraftedHelix-40 · reason tools/unattended memory/gotchas/fixed-sleep-does-not-place-a-signal.md memory/gotchas/INDEX.md memory/guides .claude/skills/unattended/SKILL.md memory/map memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-40.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md

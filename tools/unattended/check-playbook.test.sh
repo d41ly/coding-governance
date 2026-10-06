@@ -561,13 +561,20 @@ cp "$KEEP" "$F"
 # spellings that a `sed | tr -d '"' | head -1` reader resolves differently, each with a record
 # carrying the flag, each required to red. Without the fix the leg exits 0 AND prints that it read
 # the corpus, which is the worst of the two possible wrong answers.
+# A MISS PRINTS THE LEG'S EVIDENCE AND ASSERTS NO CAUSE (TOOL-aGraftedHelix-40 S1). The pooled sweep
+# at b04ab0da redded this loop once with a cause it named and could not show, and a fail-open exit 0
+# and a fail-closed refusal under another check are both misses here; the exit and every leg line
+# tell them apart. One assertion per spelling, so the miss sets `st` itself rather than via `bad`.
 for _sp in "BYPASS_BAN='--no-verify'" 'BYPASS_BAN="--no-verify"   # the flag the lander bans'; do
   cp "$KEEP" "$F"
   printf '\nlanded with --no-verify\n' >> "$W/$PREC"
   ( cd "$W" && printf 'PLAYBOOK_GLOB="'"${PFX}${KIT_NAME}/"'*.md"\n%s\n' "$_sp" > .unattended.conf )
+  out=$(run); r=$?
   n=$((n+1))
-  grep -qF -- "a tracked EVIDENCE RECORD names the declared bypass flag" <<<"$(run)" \
-    || bad "a legal shell spelling of BYPASS_BAN resolves to something no record can contain, and the leg says nothing: $_sp"
+  grep -qF -- "a tracked EVIDENCE RECORD names the declared bypass flag" <<<"$out" || {
+    st=1; echo "FAIL the leg did not name the record carrying the flag under the spelling $_sp, leg exit $r; its lines follow"
+    [ -z "$out" ] || printf '%s\n' "$out" | sed 's/^/    leg: /'
+  }
   ( cd "$W" && git checkout -q -- "$PREC" )
 done
   ( cd "$W" && printf 'PLAYBOOK_GLOB="'"${PFX}${KIT_NAME}/"'*.md"\nBYPASS_BAN="--no-verify"\n' > .unattended.conf )

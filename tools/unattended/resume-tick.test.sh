@@ -15,7 +15,9 @@
 # session, or honours the CONTINUE payload is measured nowhere here (spec §4 records the CLI
 # measurement). It does not prove the tick is REGISTERED on any node (the adopter's --check INFO
 # line reports that), and the POSIX arms of the kill and the detach are UNVERIFIED: no registered
-# node is POSIX, and this suite runs where it runs.
+# node is POSIX, and this suite runs where it runs. No arm grades the tick's own wall clock, because
+# under a pool that clock measures the node: detachment is graded by a child alive after its parent
+# returned (TOOL-aGraftedHelix-40).
 #
 # EVERY ARM DRIVES ITS OWN TREE. The tick keys on a worktree list, a conf, a run-state record and
 # the tree's clocks, so every fixture is a scratch `git init` under a SHORT path — the scratchpad's
@@ -83,11 +85,17 @@ SID="11111111-2222-3333-4444-555555555555"
 mkdir -p "$TMP/cfg-empty"; export CLAUDE_CONFIG_DIR="$TMP/cfg-empty"
 
 # THE STUB `claude`, first on PATH: writes its argv and its own pid to STUB_LOG, answers
-# `auth status` with `{"loggedIn": true}` or `false` from STUB_LOGGED_IN, and on `-p` sleeps 15 s
-# then writes `done`. The log path is BAKED into the stub, because the launcher carries PATH and
-# nothing else the arm exported. `(( $$ ))` is the stub's own pid: the arms that must wait for a
-# launched stub to end kill it by that, so a green run leaves no sleeper behind.
+# `auth status` with `{"loggedIn": true}` or `false` from STUB_LOGGED_IN, and on `-p` starts a
+# `sleep` for STUB_HOLD_S in the background, logs `sleeper <pid>`, waits on it, then writes `done`.
+# The log path is BAKED into the stub, because the launcher carries PATH and nothing else the arm
+# exported. `(( $$ ))` is the stub's own pid: the arms that must wait for a launched stub to end kill
+# it and its sleeper by the pids it logged, so a green run leaves no sleeper behind.
 STUB_LOG="$TMP/stub.log"
+# STUB_HOLD_S — the hold of every child a stub leaves running, PINNED at 300 s on node a 2026-10-06:
+# over four times the worst whole-tick wall measured under load, 68 s. The child is the detachment
+# signal and must not end before the arm reads it. It bounds only the failing path, where a tick
+# that waits on its child returns after it; on the passing path the stubs are killed.
+STUB_HOLD_S=300
 build_stub() {
   mkdir -p "$TMP/stub"
   {
@@ -95,7 +103,7 @@ build_stub() {
     printf 'printf "pid %%s argv %%s\\n" "$$" "$*" >> %q\n' "$STUB_LOG"
     printf 'case "$1" in\n'
     printf '  auth) if [ "${STUB_LOGGED_IN:-true}" = false ]; then printf "{\\n  \\"loggedIn\\": false\\n}\\n"; else printf "{\\n  \\"loggedIn\\": true\\n}\\n"; fi ;;\n'
-    printf '  -p) sleep 60; printf "done\\n" >> %q ;;\n' "$STUB_LOG"
+    printf '  -p) sleep %s & s=$!; printf "sleeper %%s\\n" "$s" >> %q; wait "$s"; printf "done\\n" >> %q ;;\n' "$STUB_HOLD_S" "$STUB_LOG" "$STUB_LOG"
     printf 'esac\nexit 0\n'
   } > "$TMP/stub/claude"
   chmod +x "$TMP/stub/claude"
@@ -109,12 +117,13 @@ case "$(command -v claude)" in
   *) echo "resume-tick.test: REFUSED — claude resolves to $(command -v claude), not the stub under $TMP/stub, so an arm could reach the real CLI"; exit 2 ;;
 esac
 
-# remove_stubs — every stub `-p` still sleeping, by the pid it logged, then the log. Called by every
-# fixture build, not only at exit: a stub launched by one arm writes `done` fifteen seconds later,
-# into the log a later arm is asserting empty.
+# remove_stubs — every stub `-p` still sleeping and every sleeper it started, by the pids it logged,
+# then the log. Called by every fixture build, not only at exit: a stub launched by one arm writes
+# `done` STUB_HOLD_S later, into the log a later arm is asserting empty. The sleeper is killed by its
+# own pid, because killing the stub shell leaves its `sleep` running with parent 1.
 remove_stubs() {
   local p
-  [ -f "$STUB_LOG" ] && for p in $(sed -n 's/^pid \([0-9]*\) argv -p .*/\1/p' "$STUB_LOG"); do kill "$p" 2>/dev/null; done
+  [ -f "$STUB_LOG" ] && for p in $(sed -n -e 's/^pid \([0-9]*\) argv -p .*/\1/p' -e 's/^sleeper \([0-9]*\)$/\1/p' "$STUB_LOG"); do kill "$p" 2>/dev/null; done
   rm -f "$STUB_LOG"
   return 0
 }
@@ -181,16 +190,17 @@ add_sibling_worktree() {
   ( cd "$FX" && git worktree add -q -b "${1:-wave}" "$SIB" ) >/dev/null 2>&1 || { print_bad "fixture: git worktree add failed under $SIB"; return 1; }
   SIB=$( cd "$SIB" && git rev-parse --show-toplevel )
 }
-# run_tick_over <tick> [args] — OUT, ERR, RC and SECS are what the tick did; SECS is the wall it took.
+# run_tick_over <tick> [args] — OUT, ERR and RC are what the tick did.
 run_tick_over() {
-  local t="$1" t0; shift; t0=$(date +%s)
-  OUT=$(bash "$t" --repo "$FX" "$@" 2>"$TMP/err"); RC=$?; ERR=$(cat "$TMP/err"); SECS=$(( $(date +%s) - t0 ))
+  local t="$1"; shift
+  OUT=$(bash "$t" --repo "$FX" "$@" 2>"$TMP/err"); RC=$?; ERR=$(cat "$TMP/err")
 }
-# read_stub_log — the log once the launched stub has started, polled up to ten seconds because
-# the launch is detached and the child starts after the tick returned; empty when it never came.
+# read_stub_log — the log once the launched stub has started its sleeper, polled up to ten seconds
+# because the launch is detached and the child starts after the tick returned; the `sleeper` line
+# is written after the `argv` line, so both are in. Empty when it never came.
 read_stub_log() {
   local i; for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
-    [ -s "$STUB_LOG" ] && grep -q 'argv -p' "$STUB_LOG" && break; sleep 0.5
+    [ -s "$STUB_LOG" ] && grep -q '^sleeper ' "$STUB_LOG" && break; sleep 0.5
   done
   cat "$STUB_LOG" 2>/dev/null || true
 }
@@ -303,18 +313,27 @@ check_hit "$OUT" "resume-tick: tRun · $FX · beat · unattended: beat — tRun 
 check_same "AC2 a LIVE record consults neither login nor the stub" "$([ -f "$STUB_LOG" ] && echo invoked || echo nothing)" "nothing"
 # ...and the login probe's bound is a bound on the CLOCK, not on the verdict
 # (`memory/gotchas/bounded-through-a-pipe-is-unbounded`): a stub whose `auth status` leaves a
-# sleeper behind holding its stdout answers logged-out, and the tick is back within a few seconds
-# rather than when the sleeper ends. The arm MEASURES the wall, because the message half of this
-# class is always right. RED against a tick reading the answer through `$( )`.
+# sleeper behind holding its stdout answers logged-out, and the tick returns while the sleeper still
+# runs rather than when it ends. The arm asserts the orphan is ALIVE once the tick has returned,
+# because the message half of this class is always right and a clock under a pool measures the node.
+# The orphan sleeps STUB_HOLD_S and writes its pid beside the stub; the arm kills it by that pid.
+# RED against a tick reading the answer through `$( )`: the tick returns after the orphan ended.
 mkdir -p "$TMP/stub2"
-printf '#!/bin/sh\nsleep 60 &\nprintf "{\\n  \\"loggedIn\\": false\\n}\\n"\nexit 0\n' > "$TMP/stub2/claude"; chmod +x "$TMP/stub2/claude"
+printf '#!/bin/sh\nsleep %s &\nprintf "%%s\\n" "$!" > %q\nprintf "{\\n  \\"loggedIn\\": false\\n}\\n"\nexit 0\n' "$STUB_HOLD_S" "$TMP/stub2/orphan.pid" > "$TMP/stub2/claude"; chmod +x "$TMP/stub2/claude"
 build_fixture 999999999
 PATH="$TMP/stub2:$PATH" run_tick_over "$TICK"
 check_hit "$OUT" "SKIP — the CLI is not logged in on this node" "AC2 a sleeper behind the CLI still yields the logged-out skip"
-check_same "AC2 the tick did not wait for the CLI's 60 s orphan" "$([ "$SECS" -le 20 ] && echo yes || echo "no: ${SECS}s")" "yes"
+ORPHAN=$(cat "$TMP/stub2/orphan.pid" 2>/dev/null); ORPHAN_W=""
+[ -z "$ORPHAN" ] || ORPHAN_W=$(derive_winpid "$ORPHAN")
+if [ -n "$ORPHAN_W" ]; then
+  check_same "AC2 the CLI's orphan is still running when the tick has returned, so the tick did not wait on it" "$(check_pid_alive "$ORPHAN_W")" "yes"
+else
+  print_bad "AC2 fixture: no pid derives from the orphan's pid file [$ORPHAN], which the process table no longer lists or the stub never wrote, so the arm would probe an empty value and prove nothing"
+fi
+[ -z "$ORPHAN" ] || kill "$ORPHAN" 2>/dev/null
 
 # ---- AC1: the STALE fixture with a dead recorded pid is RESUMED: one line ending in the .out path,
-# ---- the tick back within 5 s while the stub still sleeps (the launch is DETACHED), the argv
+# ---- the stub's sleeper alive once the tick has returned (the launch is DETACHED), the argv
 # ---- carrying the session, the flag, the turns and the payload's first instruction, the sidecar
 # ---- line stamped and counted, the launcher beside it. The bound is 1800 s here, not the suite's
 # ---- 1: the hour-old commit still reads STALE, and the in-flight read-back below needs the launch
@@ -324,8 +343,16 @@ run_tick_over "$TICK"
 check_same "AC1 exits 0" "$RC" "0"
 check_same "AC1 one decision line" "$(printf '%s\n' "$OUT" | grep -c '')" "1"
 check_hit "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1 · out $SIDECAR/resume.tRun." "AC1 the resumed decision line"
-check_same "AC1 the tick returned well inside the 60 s launch, so it is detached" "$([ "$SECS" -le 20 ] && echo yes || echo "no: ${SECS}s")" "yes"
 LOG=$(read_stub_log)
+# The sleeper is the detachment signal: a tick that waited on its launch returns after the hold, when
+# the sleeper has ended. Read by its Windows pid under MSYS, the probe pair the U12 and AC13 arms use.
+SLEEPER=$(printf '%s\n' "$LOG" | sed -n 's/^sleeper \([0-9][0-9]*\)$/\1/p' | head -n 1); SLEEPER_W=""
+[ -z "$SLEEPER" ] || SLEEPER_W=$(derive_winpid "$SLEEPER")
+if [ -n "$SLEEPER_W" ]; then
+  check_same "AC1 the stub's sleeper is alive when the tick has returned, so the launch is detached" "$(check_pid_alive "$SLEEPER_W")" "yes"
+else
+  print_bad "AC1 fixture: no pid derives from the stub log's sleeper line [$SLEEPER], which the process table no longer lists or the log never carried, so the detachment arm would probe an empty value and prove nothing"
+fi
 check_hit "$LOG" "argv -p --resume $SID --dangerously-skip-permissions --max-turns 40 " "AC1 the stub was launched with the session, the flag and the turns"
 check_miss "$LOG" "done" "AC1 the stub is still running when the tick has returned"
 check_hit "$LOG" "--keepalive-id" "AC1 the payload carries its first instruction"
