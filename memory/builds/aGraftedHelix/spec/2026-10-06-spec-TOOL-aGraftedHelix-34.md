@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-34 — every red arm of the owed unattended suites is fixed, the two pool races are closed, and gate shard 8 is re-cut
 
-**Status:** SPECCED · rev-2 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 18 · ratified 2026-10-06
+**Status:** SPECCED · rev-3 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 18 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 
@@ -55,9 +55,11 @@ growth that let gate shard 8 outrun its bound, so the close's sweep can be green
   The ledger AC6 and AC12 arms read their sleep's token through a new suite helper,
   `read_pl_exec_token`, which waits, bounded, for the pid's stat line to name `(sleep)` and asserts
   the token it returns is not `-`. Observed by AC6.
-- **S6** — the resume-tick race. The AC4 and AC13 hung-launcher arms read the killed pid through a
-  new suite helper, `read_task_gone`, which polls `tasklist` until the pid is unlisted or a bound of
-  25 polls of 0.2 s passes. Observed by AC7.
+- **S6** — the resume-tick race. Every arm that reads `tasklist` for a pid the tick has just killed,
+  AC4's and the two AC13 hung-launcher arms, reads it through a new suite helper, `read_task_gone`,
+  which polls until the pid is unlisted or a bound of 25 polls of 0.2 s passes. The third arm, the
+  launcher hung past the in-flight bound, did not red in the sweep and has the same shape, so it is
+  the same class and moves with the two that did. Observed by AC7.
 - **S7** — gate shard 8 is RE-CUT. Six self-contained sections of region 8 are relabelled to the
   five lightest regions by closing the region at a top-level seam and opening `if in_shard <k>`,
   with text order unchanged. Every section after a new seam opens with `cd "$TMP" || exit 2;
@@ -143,7 +145,10 @@ with it, so a token read between the fork and the exec is the forked shell's. Th
 at that moment; so does `run_bounded`, which calls `write_proc_record` on `$!` as soon as `&`
 returns, and the job it forks execs `bash`. Under load `derive_proc_state` then reads a live
 recorded process as `reused`. The driver's own bar takes that path, so `--hold`'s live-process
-refusal and `--abort`'s KEPT ledger can misread the driver's own work in flight.
+refusal and `--abort`'s KEPT ledger can misread the driver's own work in flight. Measured in this
+pass, the driver's half is NARROWER than the arms': the parent's recorder moved no token in 130
+trials under load, because it forks `mkdir -p` and resolves the ledger path before reading, and
+that delay let the exec finish first every time. Narrowed by an incidental delay is not closed.
 
 The fix waits on the OBSERVED condition, never a fixed sleep. The wrapper, which is already a real
 parent through `; exit $?`, first runs `: >"$RB_UP"` and unsets the variable before running the
@@ -156,23 +161,27 @@ process image rather than on a marker, since `sleep` writes nothing.
 
 ### The resume-tick race (S6)
 
-UNVERIFIED as a mechanism: `taskkill //F` returns while the process may still be terminating, and
-the arms read `tasklist` at once. Fork load did not reproduce the red. The fix asserts the property
-the arms name, that the pid becomes unlisted, within a bound: a tick that never kills still reds,
-after the bound, so the arm keeps discriminating.
+MEASURED in this pass, where rev-1 could only reason to it: `taskkill //F` returns while the process
+may still be terminating. Thirty kills of a fresh `sleep 300` under twelve fork loops, each followed
+at once by `tasklist`, left the pid listed once; the same thirty read through `read_task_gone` left
+none. The arm suite's own fork-loop runs had not reproduced it because they read one arm at a time.
+The fix asserts the property the arms name, that the pid becomes unlisted, within a bound: a tick
+that never kills still reds, after the bound, so the arm keeps discriminating.
 
 ### The re-cut (S7)
 
-Region 8 grew from 86 leg invocations at the 2026-09-24 pooled reading (`b7377232`) to 326 at the
-2026-09-29 serial reading (`8331469c`) and 477 at `b5d40c61`, against 44 to 101 in each other
-region. A leg invocation is one call of `run`, `run_skip_leg`, `lmrun`, `run_ak_leg`, `ma_leg` or
-`run_lg_leg`, or one direct `bash "$SCRIPT"` or `check-unattended.sh ` call, on a line that is not a
-comment or a function header. The count is re-derivable with that predicate over each region's
+Region 8 grew from 84 leg invocations at the 2026-09-24 pooled reading (`b7377232`) to 308 at the
+2026-09-29 serial reading (`8331469c`) and 449 at the pass's parent, against 44 to 101 in each
+other region. A leg invocation is one call of `run`, `run_skip_leg`, `lmrun`, `run_ak_leg`, `ma_leg`
+or `run_lg_leg`, or one direct `bash "$SCRIPT"` or `check-unattended.sh ` call, on a line that is
+not a comment or a function header, inside a block that opens `if in_shard <k>; then` and closes at
+the next `fi   #` seam line. The count is re-derivable with that predicate over each region's
 lines, and pooled cost per region tracks it: the 2026-09-24 readings run 31 to 57 s per invocation.
 
 The cut, at top-level seams whose sections build their own state. The six moved sections and the
 three that stay each open with the normalization line. Per-region invocation counts after the cut,
-from 70 · 92 · 64 · 101 · 52 · 55 · 44 · 477:
+from 70 · 91 · 63 · 101 · 52 · 55 · 44 · 449, read off the cut file with the hoisted definitions
+outside every region:
 
 | Section (opening anchor) | Invocations | Region |
 |---|---|---|
@@ -183,12 +192,12 @@ from 70 · 92 · 64 · 101 · 52 · 55 · 44 · 477:
 | `# ==== TOOL-dDerivedDocket-52: resolve_introducing_commit` | 7 | 8 |
 | `# ---- TOOL-dDerivedDocket-18: THE ASK-MANDATE SECOND OPINIONS` through `rm -rf "$ak_root"` | 70 | 5 |
 | `# ==== TOOL-dDerivedDocket-54: check_touching_commit_reachable` | 3 | 8 |
-| `# ==== TOOL-dDerivedDocket-19: THE GRANT, SECOND-OPINIONED` through `rm -rf "$ma_root"` | 82 | 6 |
+| `# ==== TOOL-dDerivedDocket-19: THE GRANT, SECOND-OPINIONED` through `rm -rf "$ma_root"` | 77 | 6 |
 | `# ================== TOOL-dDerivedDocket-22 — the derived terminal` | 32 | 1 |
 | `# ==== TOOL-dDerivedDocket-30: the conf hoist` to the end of region 8 | 86 | 7 |
 
-After: 123 · 92 · 108 · 101 · 122 · 137 · 130 · 114, so the largest region is 1.15 times the mean,
-where it was 4.0. The seams were chosen from a call map and a variable scan: `BRIEF` is set in the
+After: 123 · 91 · 107 · 101 · 122 · 132 · 130 · 114, so the largest region is 1.15 times the mean,
+where it was 3.88. The seams were chosen from a call map and a variable scan: `BRIEF` is set in the
 first section and read up to its last hit, the `ak` repository is built in the ask-mandate section
 and used by the freeze arms that end it, and the `ma_` helpers and `ma_root` span the grant section
 through the rounds arms, so each of those pairs stays in one section. `run_skip_leg` is defined in
@@ -294,7 +303,7 @@ Each with the test that rejected it, per BUILD-METHOD M12.
   is unchanged.
 - perf / scale — S5 costs at most one poll per bounded call when idle, since the marker is usually
   there on the first test, and at most 100 polls of 0.05 s when it never appears. S7 brings the
-  largest region from 477 invocations to 137.
+  largest region from 449 invocations to 132.
 - error / empty / loading states — a wrapper that cannot write its marker records what it records
   today, after the bound; a `read_pl_exec_token` that never sees the exec returns `-` and the arm's
   own assertion names it; `read_task_gone` reports the pid listed after its bound.
@@ -339,15 +348,22 @@ after. A staged break is made in the clone's own copy and nowhere else.
   fixture's README seed alone, which `g0` reds on the fixture's own liveness assertion.
 - **AC5** — When the `cc` slice runs, it prints no `FAIL` line, and the cross-component suite's
   arm 3b asserts a `check 23 fleet — 0 undeclared write(s)` line over a graded population above zero.
-  Red when: arm 3b's build commit also writes a file outside its declared lane, which the fleet line
-  counts and the arm reds on.
+  Red when: the fleet line's count is staged to a non-zero value in the clone's
+  `check-unattended.sh`, which the new hit reds on; and, separately, arm 3b's build commit also
+  writes a file outside its declared lane, which the leg reports as a SOLO write the fleet does not
+  count, so the arm's silence assertion reds and the fleet pair stays green.
 - **AC6** — When the token probe runs 30 trials under twelve fork loops, `read_pl_token` read at once
   after `sleep 30 &` and again 0.5 s later moves at least one token, and `read_pl_exec_token` read the
   same way moves none; and when `run_bounded` extracted from the pass's `unattended.sh`, beside the
   real `write_proc_record` and `read_proc_token`, records 30 `sleep 3` wrappers under the same load,
-  every recorded token equals the wrapper's token read 1 s later, while the parent's `run_bounded`
-  moves at least one. Then the `pl` slice prints no `FAIL` line.
-  Red when: the marker wait is removed from `run_bounded`, which is the parent's behaviour.
+  every recorded token equals the wrapper's token read 1 s later. Then the `pl` slice prints no
+  `FAIL` line.
+  Red when: the arms read the token the moment `&` returns, the parent's arms, which the at-once half
+  of the token probe reproduces. The PRODUCT half has no observed red: the parent's `run_bounded`
+  moved no token in 130 trials, 30 under twelve fork loops and 100 under twenty-four, because
+  `write_proc_record` forks `mkdir -p` and resolves the ledger path before its token read, and that
+  delay let the exec finish first in every trial measured. The marker closes by construction a
+  window that incidental delay only narrows, and the observation says so rather than claiming a red.
   cost: about ten minutes on node `a`.
   figure: the moved counts are a sample, PINNED only as "at least one" and "none".
 - **AC7** — When the `rt` slice runs, it prints no `FAIL` line; and when 30 trials of
@@ -358,12 +374,15 @@ after. A staged break is made in the clone's own copy and nowhere else.
 - **AC8** — When the invocation predicate of §4 runs over the gate suite's regions, the
   largest is at most 140 and at most 1.2 times the mean; each of the nine sections after a new seam,
   sliced as the prologue, the normalization line and the section, prints no `FAIL` line, and its
-  executed count is the figure its floor moved by; `bash tools/unattended/check-arms-groups.sh`
+  executed count is the figure its floor moved by. One arm is the exception and is observed another
+  way: the check-23 section's H1 self-scan reads `$0`, which in a slice is the slice and holds none of
+  the region it scans, so it reds there by construction; its own awk run over the whole cut file must
+  print `graded=26` and no line number, as over the parent's file. `bash tools/unattended/check-arms-groups.sh`
   prints no rule red it did not print at the parent; no `name() {` definition remains between the
   first `in_shard` line and the floor line; and the sorted lines of the file differ from the parent's
   sorted lines only by the seam and normalization lines and S3's own edits.
-  Red when: a section is cut from state it reads, which its slice reds on, as the `BRIEF` and `ak`
-  seams would.
+  Red when: a section is cut from state it reads, which its slice reds on; staged by slicing the
+  brief arms G to J alone, away from the section that sets `BRIEF`.
   cost: about twenty-five minutes on node `a` with the nine slices run four at a time.
   figure: the counts and seconds are DERIVED at observation time.
 - **AC9** — When `python tools/govkit/govkit.py epoch --base 290d0d2d` runs at the pass's commit, it
@@ -416,6 +435,13 @@ AC8 and AC9 as its check.
   mandate replaces filing with fixing: rev-1's six asks are withdrawn; every inherited fixture is
   fixed, both pool races are closed, the ledger's in the driver, and region 8 is re-cut. rev-1's
   attribution table stays as the evidence; F1 is re-resolved to A and F2 added.
+- rev-3 · 2026-10-06 · §4 · S6 · AC5 AC6 AC8 · what the build's slices and probes measured, written
+  before the code commit: the invocation counts restated under the predicate's stated bounds, 449
+  at the parent and 132 at most after the cut; S6 names the third tasklist arm of the same shape; the
+  resume-tick mechanism is measured, 1 of 30 kills listed at once; AC5's red is the fleet count
+  staged, since a stray write is a SOLO write the fleet never counts; AC6 records that the parent's
+  recorder moved no token in 130 trials, so its product half has no observed red; AC8 names the one
+  self-scanning arm a slice cannot grade and the mis-cut it stages.
 
 ## 10. Reuse audit
 
