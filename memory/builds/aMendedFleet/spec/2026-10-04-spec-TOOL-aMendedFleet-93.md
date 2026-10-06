@@ -9,7 +9,10 @@
 | [2026-10-04-build-TOOL-aMendedFleet-93-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-93-1-acceptance-ledger.md) | journal | — |
 | [2026-10-06-build-TOOL-aMendedFleet-93-ab.py](../build/2026-10-06-build-TOOL-aMendedFleet-93-ab.py) | journal | — |
 | [2026-10-06-build-TOOL-aMendedFleet-93-arm-a-report.md](../build/2026-10-06-build-TOOL-aMendedFleet-93-arm-a-report.md) | journal | — |
+| [2026-10-06-build-TOOL-aMendedFleet-93-arm-a.json](../build/2026-10-06-build-TOOL-aMendedFleet-93-arm-a.json) | journal | — |
 | [2026-10-06-build-TOOL-aMendedFleet-93-arm-b-report.md](../build/2026-10-06-build-TOOL-aMendedFleet-93-arm-b-report.md) | journal | — |
+| [2026-10-06-build-TOOL-aMendedFleet-93-arm-b.json](../build/2026-10-06-build-TOOL-aMendedFleet-93-arm-b.json) | journal | — |
+| [2026-10-06-build-TOOL-aMendedFleet-93-judges.tsv](../build/2026-10-06-build-TOOL-aMendedFleet-93-judges.tsv) | journal | — |
 | [2026-10-06-build-TOOL-aMendedFleet-93-reading.md](../build/2026-10-06-build-TOOL-aMendedFleet-93-reading.md) | journal | — |
 | [2026-10-06-build-TOOL-aMendedFleet-93-run-brief.md](../build/2026-10-06-build-TOOL-aMendedFleet-93-run-brief.md) | journal | — |
 

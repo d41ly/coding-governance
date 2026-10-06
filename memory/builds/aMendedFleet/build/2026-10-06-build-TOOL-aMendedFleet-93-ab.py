@@ -33,6 +33,9 @@ REPO = HERE.parents[3]
 STEM = "2026-10-06-build-TOOL-aMendedFleet-93-"
 ARM_FILES = {"A": HERE / (STEM + "arm-a.json"), "B": HERE / (STEM + "arm-b.json")}
 JUDGES = HERE / (STEM + "judges.tsv")
+# Every committed record carries hygiene check 21's binding as its first line, in the comment form
+# its file type allows; the readers drop that one line before parsing.
+SERVES = "**Serves:** journal TOOL-aMendedFleet-93"
 SUBJECT_RECORD = (REPO / "memory" / "builds" / "aWindowedPass" / "reviews"
                   / "2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round1.md")
 COLUMNS = ("arm", "agent", "label", "role", "agent_type", "first_turn", "out")
@@ -97,12 +100,14 @@ def scan_agents(projects_root, sid, runs):
 
 
 def write_rows(path, rows):
-    lines = ["\t".join(COLUMNS)] + ["\t".join(r[c] for c in COLUMNS) for r in rows]
+    lines = ["# " + SERVES, "\t".join(COLUMNS)] + ["\t".join(r[c] for c in COLUMNS) for r in rows]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
 def read_rows(path):
     lines = path.read_text(encoding="utf-8").splitlines()
+    while lines and lines[0].startswith("#"):
+        lines = lines[1:]
     if not lines or tuple(lines[0].split("\t")) != COLUMNS:
         raise SystemExit(f"t93: {path.name} does not open with the header {' '.join(COLUMNS)}")
     return [dict(zip(COLUMNS, line.split("\t"))) for line in lines[1:] if line]
@@ -111,7 +116,10 @@ def read_rows(path):
 def read_arm(path):
     if not path.exists():
         raise SystemExit(f"t93: {path.name} is not committed; the arms have not run")
-    obj = json.loads(path.read_text(encoding="utf-8"))
+    text = path.read_text(encoding="utf-8")
+    if text.startswith("//"):
+        text = text.split("\n", 1)[1] if "\n" in text else ""
+    obj = json.loads(text)
     if not isinstance(obj, dict):
         raise SystemExit(f"t93: {path.name} is not a JSON object")
     return obj
