@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""runlog.py — the runlog kit's command line. gov:kit runlog@1.7
+"""runlog.py — the runlog kit's command line. gov:kit runlog@1.8
 
     python <this kit>/runlog.py journal --producer driver|gates|pushes
+    python <this kit>/runlog.py journal --producer gates --by-leg [--legs <gate-leg manifest>]
     python <this kit>/runlog.py extract --slug <slug> | --session <sid> | --discover [--slug <slug>]
                                         [--transcripts <projects dir>]
     python <this kit>/runlog.py extract --measure <projects dir>
+    python <this kit>/runlog.py extract --ready <projects dir>
     python <this kit>/runlog.py narration --session <sid> --from <t> --to <t> [--transcripts <dir>]
     python <this kit>/runlog.py model <slug> [--run <n>] [--json] [--journals <dir>] [--transcripts <dir>]
     python <this kit>/runlog.py record <slug> [--run <n>] [--write] [--journals <dir>] [--transcripts <dir>]
@@ -24,7 +26,7 @@ recomputes a record's journal commitment on this machine: exit 0 when it matches
 `none`, 1 when the journal changed after the render, 2 when the record or its journals cannot be read.
 
 `extract` writes one structural extract per session to the user-profile store and prints one JSON
-object per session on stdout; `--measure` writes nothing and prints a report. `narration` prints a
+object per session on stdout; `--measure` and `--ready` write nothing and print a report. `narration` prints a
 window of redacted text framed as data and writes nothing. The extractor's rules are the kit README's.
 `model` joins one run's sources into the run model and prints it, the whole JSON with `--json`, and
 writes a local copy beside the extracts; it exits 2 when the build has no committed run-state file or
@@ -39,7 +41,9 @@ and a session with no transcript on this machine is the state `absent`, not a fa
 exactly the line's keys, and puts everything a human reads on stderr: the resolved path, the line
 count and the bad-line count, which is ALWAYS printed for a file that exists, so a writer emitting
 garbage is loud rather than filtered out. The journal root is the git common dir of the clone the
-command runs IN, so every worktree of one clone reads the same file.
+command runs IN, so every worktree of one clone reads the same file. `--by-leg`, legal only with
+`--producer gates`, prints one row per leg instead of the lines, and the window it counted on stderr;
+`build_leg_yield` states what it counts and what it cannot know.
 
 Exit 0 = the file was read, or is absent (a named state: no producer has written yet) · 2 = no
 journal root resolves, or the file exists and cannot be read. A file holding bad lines still exits 0
@@ -52,6 +56,7 @@ import json
 import os
 import pathlib
 import re
+import statistics
 import sys
 import time
 
@@ -76,9 +81,82 @@ NARRATION_GUTTER = "  | "
 # two Unicode line separators. A raw CR returns a terminal to column 0 and an ESC starts a control
 # sequence, so either could draw the closing marker over the gutter; each prints as its escape.
 CONTROL_RE = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f\u2028\u2029]")
+# A gates line's named failure, `fail.1` .. `fail.<cap>`; the rest are counted into `fail_more`.
+FAIL_KEY_RE = re.compile(r"fail\.[0-9]+")
+
+
+def build_leg_yield(lines, legs=None) -> tuple:
+    """`(rows, window)` for `journal --producer gates --by-leg`, over parsed gates lines (field dicts)
+    and an optional gate-leg manifest list. A bar is a line whose `verdict` is GREEN or RED; a NONE
+    line ran no leg and any other verdict is counted apart, never read as a bar. A leg's `red` counts
+    the bars naming it in a `fail.<n>` field. `unattributed` sums `fail_more`, the failures the
+    writer's cap left unnamed, and `mismatched` counts bars whose `failed` is not their named failures
+    plus `fail_more`: the writer disagreeing with itself, still read. With `legs`, every leg it names
+    is a row, `red` 0 included, and `always_run` is the runner's held rule inverted: no guard, subject
+    not `kit`, chunk not `selftests`. Without it only legs that went red are rows, and both
+    `in_manifest` and `always_run` are null. A window of zero bars has NO rows: a never-red list over
+    nothing would be a clean report that measured nothing.
+
+    What it does NOT know: which legs a bar RAN. The journal names failures only, so `bars` is an
+    upper bound on how often a guarded or held leg ran."""
+    window = {"first": "", "last": "", "bars": 0, "red_bars": 0, "none": 0, "other": 0,
+              "unattributed": 0, "mismatched": 0}
+    red, last_red = {}, {}
+    started = sorted(f["started"] for f in lines if f.get("started"))
+    if started:
+        window["first"], window["last"] = started[0], started[-1]
+    for f in lines:
+        verdict = f.get("verdict", "")
+        if verdict == "NONE":
+            window["none"] += 1
+            continue
+        if verdict not in ("GREEN", "RED"):
+            window["other"] += 1
+            continue
+        window["bars"] += 1
+        window["red_bars"] += verdict == "RED"
+        named = [v for k, v in f.items() if FAIL_KEY_RE.fullmatch(k)]
+        more = f.get("fail_more", "")
+        more = int(more) if more.isdigit() else 0
+        window["unattributed"] += more
+        window["mismatched"] += f.get("failed") != str(len(named) + more)
+        for leg in set(named):
+            red[leg] = red.get(leg, 0) + 1
+            last_red[leg] = f.get("started", "")
+    held = {} if legs is None else {
+        leg["name"]: not leg.get("guard") and leg.get("subject") != "kit" and leg.get("chunk") != "selftests"
+        for leg in legs}
+    names = (set(red) | set(held)) if window["bars"] else set()
+    rows = [{"leg": n, "red": red.get(n, 0), "bars": window["bars"], "last_red": last_red.get(n),
+             "in_manifest": None if legs is None else n in held,
+             "always_run": None if legs is None else held.get(n)} for n in names]
+    rows.sort(key=lambda r: (-r["red"], r["leg"]))
+    return rows, window
+
+
+def print_leg_window(window, has_legs) -> None:
+    w = window
+    print(f"runlog: by-leg window {w['first'] or '-'} .. {w['last'] or '-'} bars={w['bars']} "
+          f"red_bars={w['red_bars']} none={w['none']} other={w['other']}", file=sys.stderr)
+    print(f"runlog: by-leg unattributed={w['unattributed']} mismatched={w['mismatched']}", file=sys.stderr)
+    print("runlog: by-leg bars is an upper bound on how often a guarded or held leg ran: the journal "
+          "names failures, never the legs a bar ran", file=sys.stderr)
+    if not has_legs:
+        print("runlog: by-leg never-red legs are not listed, because no population was given "
+              "(--legs <manifest>)", file=sys.stderr)
 
 
 def cmd_journal(args) -> int:
+    legs = None
+    if args.legs:
+        try:
+            legs = json.loads(pathlib.Path(args.legs).read_bytes())
+            for leg in legs:
+                if not isinstance(leg["name"], str):
+                    raise TypeError("a leg's name is not a string")
+        except (OSError, ValueError, TypeError, KeyError) as exc:
+            print(f"runlog: --legs {args.legs} unreadable — {type(exc).__name__}: {exc}", file=sys.stderr)
+            return 2
     try:
         root = rl.resolve_journal_root()
     except ValueError as exc:
@@ -93,8 +171,14 @@ def cmd_journal(args) -> int:
     if journal.state == "unreadable":
         print(f"runlog: {shown} unreadable — {journal.note}", file=sys.stderr)
         return 2
-    for line in journal.lines:
-        sys.stdout.write(json.dumps(line.fields) + "\n")
+    window = None
+    if args.by_leg:
+        rows, window = build_leg_yield([line.fields for line in journal.lines], legs)
+        for row in rows:
+            sys.stdout.write(json.dumps(row) + "\n")
+    else:
+        for line in journal.lines:
+            sys.stdout.write(json.dumps(line.fields) + "\n")
     sys.stdout.flush()
     empty = " empty" if journal.state == "empty" else ""
     print(f"runlog: {shown}{empty} lines={len(journal.lines)} bad={journal.bad}", file=sys.stderr)
@@ -102,6 +186,8 @@ def cmd_journal(args) -> int:
         print(f"runlog: {shown}:{lineno} refused — {why}", file=sys.stderr)
     if journal.bad > REFUSALS_SHOWN:
         print(f"runlog: {journal.bad - REFUSALS_SHOWN} more refusal(s) not listed", file=sys.stderr)
+    if window is not None:
+        print_leg_window(window, legs is not None)
     return 0
 
 
@@ -119,9 +205,37 @@ def print_measure(root) -> int:
     return 0
 
 
+def _derive_quartiles(values) -> str:
+    if not values:
+        return "q1=n/a median=n/a q3=n/a"
+    qs = [values[0]] * 3 if len(values) == 1 else statistics.quantiles(values, n=4, method="inclusive")
+    return " ".join(f"{k}={round(q, 2)}" for k, q in zip(("q1", "median", "q3"), qs))
+
+
+def print_ready(root) -> int:
+    report = ex.measure_ready_tree(root)
+    if report["sessions"] == 0:
+        print(f"runlog: ready DEAD PROBE \u2014 no session under {root}")
+        return 2
+    print("runlog: ready (report-only, grades nothing) " + " ".join(
+        f"{k}={report[k]}" for k in ("sessions", "ready", "card", "text")))
+    rows = report["rows"]
+    for label, values in (
+            ("spent_tokens", [r["in"] + r["out"] + r["cache_read"] + r["cache_write"] for r in rows]),
+            ("context_growth", [r["context_ready"] - r["context_first"] for r in rows
+                                if r["context_first"] is not None]),
+            ("minutes", [r["minutes"] for r in rows])):
+        print(f"runlog: ready quartiles {label} {_derive_quartiles(values)}")
+    for r in rows:
+        print("runlog: ready row " + " ".join(f"{k}={'n/a' if v is None else v}" for k, v in r.items()))
+    return 0
+
+
 def cmd_extract(args) -> int:
     if args.measure:
         return print_measure(args.measure)
+    if args.ready:
+        return print_ready(args.ready)
     # The store resolves FIRST: a machine with no store refuses before a single transcript is read.
     # One named session that cannot be read is the whole request, so it exits 2; among several, a
     # session refused for its shape or its location is counted and the rest are still extracted.
@@ -355,6 +469,10 @@ def main(argv=None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     pj = sub.add_parser("journal", help="print one producer file's lines as JSON, counts on stderr")
     pj.add_argument("--producer", required=True, choices=sorted(rl.PRODUCER_FILES))
+    pj.add_argument("--by-leg", action="store_true", help="with --producer gates: one row per leg, "
+                    "how many bars it reddened; the window on stderr")
+    pj.add_argument("--legs", metavar="MANIFEST", help="with --by-leg: the gate-leg manifest whose "
+                    "every leg prints, never-red ones included")
     pe = sub.add_parser("extract", help="write structural session extracts to the user-profile store")
     pe.add_argument("--slug", help="alone: the sessions the driver journal names for this run; with "
                     "--discover: a filter")
@@ -363,6 +481,8 @@ def main(argv=None) -> int:
                     help="find sessions by a preflight call, attributed heuristically")
     pe.add_argument("--measure", metavar="DIR", help="report rate and peak memory over a projects "
                     "dir; writes nothing")
+    pe.add_argument("--ready", metavar="DIR", help="report what each session under a projects dir "
+                    "spent before READY; writes nothing")
     pe.add_argument("--transcripts", help="the projects dir to read instead of Claude Code's own")
     pn = sub.add_parser("narration", help="print a window of redacted narration; writes nothing")
     pn.add_argument("--session", required=True)
@@ -396,15 +516,20 @@ def main(argv=None) -> int:
     if args.cmd == "verify":
         return cmd_verify(args)
     if args.cmd == "extract":
-        modes = sum((bool(args.session), args.discover, bool(args.measure)))
-        if modes > 1 or (args.slug and (args.session or args.measure)):
-            ap.error("extract takes ONE of --slug, --session, --discover and --measure; only "
-                     "--discover combines with --slug")
+        modes = sum((bool(args.session), args.discover, bool(args.measure), bool(args.ready)))
+        if modes > 1 or (args.slug and (args.session or args.measure or args.ready)):
+            ap.error("extract takes ONE of --slug, --session, --discover, --measure and --ready; "
+                     "only --discover combines with --slug")
         if modes == 0 and not args.slug:
-            ap.error("extract needs --slug, --session, --discover or --measure")
+            ap.error("extract needs --slug, --session, --discover, --measure or --ready")
         return cmd_extract(args)
     if args.cmd == "narration":
         return cmd_narration(args)
+    if args.legs and not args.by_leg:
+        ap.error("journal --legs is read only by --by-leg")
+    if args.by_leg and args.producer != "gates":
+        ap.error("journal --by-leg reads --producer gates only: no other producer's lines are gate "
+                 "verdicts")
     return cmd_journal(args)
 
 

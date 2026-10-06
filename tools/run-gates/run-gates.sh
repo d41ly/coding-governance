@@ -29,7 +29,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.27   # gov:kit run-gates@1.27
+KIT_RUN_GATES_VERSION=1.28   # gov:kit run-gates@1.28
 # 1.24 -> 1.25: the manifest's NINTH field, `doc_reads`, and the docs mode `GATE_DOCS_BASE` that reads
 # it (TOOL-dThriftyLanding-1); a full green is also shared through the common git dir
 # (TOOL-dThriftyLanding-2). The canary's key-set pin admits the new key, which is the floor the
@@ -52,7 +52,7 @@ KIT_RUN_GATES_VERSION=1.27   # gov:kit run-gates@1.27
 # some. A 1.5 runner reading a 1.4 table is fine, because an absent knob defaults. The two
 # files ship in one kit and one `include = "**"` rule, so an ordinary apply moves them
 # together; what is NOT covered is a partial update or a hand copy of one file, and unlike the
-# 1.1 case above no govkit floor withholds the table today. TOOL-aQuenchedHarness-1.
+# 1.1 case above no govkit floor was written to withhold the table. TOOL-aQuenchedHarness-1.
 # THIS SCRIPT'S OWN DIRECTORY, RESOLVED BEFORE THE `cd`. A relative `$0` is relative to the caller's
 # cwd, so deriving it after `cd "$ROOT"` resolves it against the repo root instead: invoked as
 # `bash ../<prefix>/run-gates/run-gates.sh` from a subdirectory the kit dir collapsed to the root, the
@@ -3217,6 +3217,12 @@ if [ -n "$LEDGER" ]; then
   # ATOMIC rather than a copy in place. A reader that opens the ledger while the bar is mid-write
   # got a truncated file before; a rename is the only way this file is ever replaced now.
   mv -f "$merged" "$LEDGER" 2>/dev/null || cp "$merged" "$LEDGER" 2>/dev/null || true
+  # THE RETIRED CACHE IS DELETED HERE. Nothing reads `gate-timings.tsv` since the ledger replaced it,
+  # yet every node that ran an older runner still holds a copy: a stale second store of one fact that
+  # build records had to warn readers not to cite. The runner is the one program every node runs, so it
+  # clears its own git dir and the common dir (the turnstile's `TS_COMMON`, empty when that is off).
+  # That one filename and nothing else; a failed delete never moves the verdict (TOOL-aMendedFleet-72).
+  rm -f "$gd/gate-timings.tsv" ${TS_COMMON:+"$TS_COMMON/gate-timings.tsv"} 2>/dev/null || true
 fi
 
 echo "----"

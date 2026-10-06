@@ -681,7 +681,9 @@ run "C11 does not police bullets outside the traps section" "$R" 0 -
 # TREE's `corpus_ids.py`, so the reader the append spawns is the one under test like the checker
 # is, and a spec whose H1 defines `TOOL-zCardFixture-10` while its prose cites
 # `TOOL-zCardFixture-11` — the id a mention-grep would pass. Two linked worktrees: the sibling-tree
-# arms append from the second.
+# arms append from the second. The commit also drops `.unattended.conf`, so every card these arms
+# write skips the `overlaps —` read rather than starting the real driver per card; that cell's own
+# arms run over a stub (KICK-aMendedFleet-2).
 NONCE="mfc$$"
 GOVROOT=$(git -C "$(dirname "$CHECK")" rev-parse --show-toplevel)
 # THE READER IS FOUND THE WAY THE CHECKER FINDS IT (TOOL-aRepatriatedFork-18 S3): the checker's own
@@ -690,6 +692,7 @@ GOVROOT=$(git -C "$(dirname "$CHECK")" rev-parse --show-toplevel)
 # spelled kit path resolved at gov's prefix only. An empty answer is the checker's own "id
 # citations unchecked" state, and the fixture below then fails naming the clone step.
 eval "$(awk '/^resolve_kit_dir\(\) \{$/,/^}$/' "$CHECK")"
+eval "$(awk '/^resolve_kit_file\(\) \{$/,/^}$/' "$CHECK")"   # the id reader's body since KICK-aMendedFleet-2 S3
 eval "$(awk '/^resolve_id_reader\(\) \{$/,/^}$/' "$CHECK")"
 MC_PY=$(resolve_python 2>/dev/null) || MC_PY=""
 READER=$(ROOT="$GOVROOT" MC_DIR="$(dirname "$CHECK")" resolve_id_reader)
@@ -702,6 +705,7 @@ git clone -q --local "$GOVROOT" "$CCLONE" \
   && mkdir -p "$CCLONE/memory/builds/zCardFixture/spec" \
   && printf '# TOOL-zCardFixture-10 — a fixture unit, defined by this H1 alone\n\n**Status:** SPECCED · rev-1 · 2026-09-14 · node z · Tier-1\n\nThis prose CITES TOOL-zCardFixture-11 and nothing defines it.\n' \
        > "$CCLONE/memory/builds/zCardFixture/spec/2026-09-14-spec-TOOL-zCardFixture-10.md" \
+  && rm -f "$CCLONE/.unattended.conf" \
   && git -C "$CCLONE" add -A && git -C "$CCLONE" commit -q --no-verify -m "fixture: the reader under test and TOOL-zCardFixture-10" \
   && git -C "$CCLONE" worktree add -q "$CWT" -b card-wt && git -C "$CCLONE" worktree add -q "$CWT2" -b card-wt2 \
   || { echo "FAIL card fixture: cannot clone $GOVROOT, commit the fixture and add two worktrees under $TMP"; fail=$((fail+1)); }
@@ -909,6 +913,105 @@ check_eq "AC9 a primary tree's card says primary" "tree — $(git -C "$TMP/ahead
 # AC10 — no .memory-tree.conf: exit 0 and a skipped: live cell, never a refusal.
 mkrepo noconf; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 run_card "AC10 --card --write with no .memory-tree.conf exits 0" "$R" 0 "live — skipped: no .memory-tree.conf in this tree" --card --write --session "$NONCE-t10"
+
+# KICK-aMendedFleet-1 — the `drift —` cell over a hand-written history in the common dir: two
+# groups (the cell names the SECOND), then a replay after a third group, an absent file, a header
+# missing `signal`, and a truncated last line. Staged red by deleting the `derive_drift_line` call.
+mkrepo drifthist; DH="$R/.git/drift-history.tsv"; dh_head=$(head_sha "$R")
+{ printf '#utc\tsha\tbase_ref\tbase_sha\tsignal\tstate\tvalue\tof\tkey_hash\n'
+  printf '2026-10-01T00:00:00Z\taaaaaaaabbbbbbbb\torigin/main\tx\tsigOld\tlive\t9\t9\th\n'
+  for r in 'sigLive\tlive\t2\t76' 'sigZero\tlive\t0\t10' 'sigDead\tdead\t0\t0'; do
+    printf "2026-10-02T00:00:00Z\t%s\torigin/main\tx\t$r\t-\n" "$dh_head"; done; } > "$DH"
+dh_want="drift — last bar 2026-10-02T00:00:00Z at ${dh_head:0:8} · HEAD · 3 signals · 1 nonzero · 1 dead · sigDead DEAD, sigLive=2/76"
+read_drift_cell() { grep -m1 '^drift — ' "$R/.git/orientation/$NONCE-$1.md"; }
+run_card "drift cell: --card --write over a two-group history" "$R" 0 - --card --write --session "$NONCE-t76a"
+check_eq "drift cell: the LAST group's utc, sha, counts and names, dead first" "$dh_want" "$(read_drift_cell t76a)"
+check_eq "drift cell: sits after worktrees — and before live —" "worktrees drift live" \
+  "$(grep -oE '^(worktrees|drift|live) — ' "$R/.git/orientation/$NONCE-t76a.md" | cut -d' ' -f1 | tr '\n' ' ' | sed 's/ $//')"
+printf '2026-10-03T00:00:00Z\t%s\to\tx\tsigNew\tdead\t0\t0\t-\n' "$dh_head" >> "$DH"
+run_card "drift cell: --card --replay after a third group" "$R" 0 - --card --replay --session "$NONCE-t76a"
+check_eq "drift cell: the replay prints the stored cell, not the new group" "$dh_want" "$(grep -m1 '^drift — ' "$CARD_OUT")"
+head -n 5 "$DH" > "$TMP/dh.keep"; rm -f "$DH"
+run_card "drift cell: an absent history is a skipped: line at exit 0" "$R" 0 "drift — skipped: no drift-history.tsv in the git common dir" --card --write --session "$NONCE-t76b"
+sed '1s/\tsignal\t/\tsignalX\t/' "$TMP/dh.keep" > "$DH"
+run_card "drift cell: a header lacking signal is UNKNOWN naming it" "$R" 0 "drift — UNKNOWN: drift-history.tsv header lacks signal" --card --write --session "$NONCE-t76c"
+{ cat "$TMP/dh.keep"; printf '2026-10-04T00:00:00Z\tdeadbeef\to'; } > "$DH"
+run_card "drift cell: a truncated last line is a write in progress" "$R" 0 - --card --write --session "$NONCE-t76d"
+check_eq "drift cell: the truncated line is not counted" "$dh_want" "$(read_drift_cell t76d)"
+
+# KICK-aMendedFleet-2 — the `overlaps —` cell over a stub driver the resolver finds at the repo's
+# own unattended kit driver: no conf, an answer of seven rows, a refusal, and a driver that
+# outlives a one-second bound. Staged red by deleting the `derive_overlaps_line` call.
+mkrepo ovcell
+run_card "overlaps cell: no .unattended.conf is a skipped: line at exit 0" "$R" 0 "overlaps — skipped: no .unattended.conf in this tree" --card --write --session "$NONCE-t77a"
+ov_kit=unattended; ov_drv="$R/$ov_kit/$ov_kit.sh"; mkdir -p "$R/$ov_kit"; : > "$R/.unattended.conf"
+ov_head="unattended: overlap probe — 7 unmerged remote ref(s) read as of this clone's last fetch, 0 aged out past 14 days, 0 unreadable, 7 sharing a path; this run is NOT blocked"
+{ printf '#!/usr/bin/env bash\n[ "$1" = --overlaps ] || exit 3\necho "%s"\n' "$ov_head"
+  printf 'for i in 1 2 3 4 5 6 7; do echo "  origin/b$i · deadbeef · 0d old · 1 shared: src/x.sh (diff)"; done\n'; } > "$ov_drv"
+commit_all "$R" "the stub driver and an empty conf"
+run_card "overlaps cell: --card --write over a driver that answers" "$R" 0 - --card --write --session "$NONCE-t77b"
+check_eq "overlaps cell: the probe's first line prints verbatim" "overlaps — $ov_head" "$(grep -m1 '^overlaps — ' "$R/.git/orientation/$NONCE-t77b.md")"
+check_eq "overlaps cell: five rows, indented by two spaces" "5" "$(grep -c '^  origin/b' "$R/.git/orientation/$NONCE-t77b.md")"
+check_eq "overlaps cell: the rest are counted" "  … 2 more" "$(grep -m1 '^  … ' "$R/.git/orientation/$NONCE-t77b.md")"
+check_eq "overlaps cell: sits after drift — and before live —" "worktrees drift overlaps live" \
+  "$(grep -oE '^(worktrees|drift|overlaps|live) — ' "$R/.git/orientation/$NONCE-t77b.md" | cut -d' ' -f1 | tr '\n' ' ' | sed 's/ $//')"
+printf '#!/usr/bin/env bash\necho "unattended: a stub refusal"; exit 2\n' > "$ov_drv"
+run_card "overlaps cell: a refusing driver is a skipped: line naming its first line" "$R" 0 "overlaps — skipped: unattended: a stub refusal" --card --write --session "$NONCE-t77c"
+printf '#!/usr/bin/env bash\nsleep 5\n' > "$ov_drv"
+export CARD_OVERLAP_BOUND=1
+run_card "overlaps cell: a driver past the bound is unknown, not none" "$R" 0 "overlaps — skipped: --overlaps did not answer within 1s" --card --write --session "$NONCE-t77d"
+unset CARD_OVERLAP_BOUND
+
+# KICK-aMendedFleet-4 — the `cli —` cell over a stub `claude` first on PATH, under four AI_AGENT
+# values and an unset one, then a stub printing no number, no `claude` on PATH at all, and a stub
+# that outlives a one-second bound. Staged red by swapping the integer comparison for a string one,
+# which orders 2.1.99 after 2.1.178. AI_AGENT and PATH are restored after the block.
+mkrepo clicell; CL="$R"; CLI_BIN="$TMP/clibin"; mkdir -p "$CLI_BIN"
+cli_aa_set=${AI_AGENT+1}; cli_aa=${AI_AGENT-}; cli_path=$PATH
+printf '#!/usr/bin/env bash\necho "2.1.178 (Claude Code)"\n' > "$CLI_BIN/claude"; chmod +x "$CLI_BIN/claude"
+export PATH="$CLI_BIN:$cli_path"
+cli_card() {   # $1=session suffix $2=AI_AGENT value, or - for unset; run in THIS shell so it counts
+  if [ "$2" = - ]; then unset AI_AGENT; else export AI_AGENT="$2"; fi
+  run_card "cli cell: --card --write under AI_AGENT=$2" "$CL" 0 - --card --write --session "$NONCE-$1"
+}
+cli_cell() { grep -m1 '^cli — ' "$CL/.git/orientation/$NONCE-$1.md"; }
+cli_card t4a claude-code_2-1-286_agent
+check_eq "cli cell: a PATH claude older than the session is a NOTE" \
+  "cli — NOTE: PATH claude 2.1.178 is older than this session's 2.1.286, so a session started from PATH runs the older CLI" \
+  "$(cli_cell t4a)"
+check_eq "cli cell: sits directly after node —" "cli" \
+  "$(grep -A1 '^node — ' "$CL/.git/orientation/$NONCE-t4a.md" | sed -n 2p | cut -d' ' -f1)"
+cli_card t4b claude-code_2-1-99_harness
+check_eq "cli cell: fields compare as integers, so 2.1.178 is newer than 2.1.99" \
+  "cli — PATH claude 2.1.178 is newer than this session's 2.1.99" "$(cli_cell t4b)"
+cli_card t4c claude-code_2-1-178_agent
+check_eq "cli cell: equal versions match" "cli — 2.1.178 · PATH claude matches this session" "$(cli_cell t4c)"
+cli_card t4d claude-code_2-1-290_harness
+check_eq "cli cell: 2.1.290 makes PATH older" \
+  "cli — NOTE: PATH claude 2.1.178 is older than this session's 2.1.290, so a session started from PATH runs the older CLI" \
+  "$(cli_cell t4d)"
+cli_card t4e -
+check_eq "cli cell: an unset AI_AGENT is no session version" "cli — skipped: AI_AGENT names no Claude Code version" "$(cli_cell t4e)"
+cli_card t4f claude-code_x_agent
+check_eq "cli cell: a non-numeric field is no session version" "cli — skipped: AI_AGENT names no Claude Code version" "$(cli_cell t4f)"
+printf '#!/usr/bin/env bash\necho "Claude Code"\n' > "$CLI_BIN/claude"
+cli_card t4g claude-code_2-1-286_agent
+check_eq "cli cell: a PATH claude printing no number is skipped" "cli — skipped: claude --version printed no version" "$(cli_cell t4g)"
+printf '#!/usr/bin/env bash\nsleep 10\necho "2.1.178 (Claude Code)"\n' > "$CLI_BIN/claude"
+export CARD_CLI_BOUND=1
+cli_card t4h claude-code_2-1-286_agent
+check_eq "cli cell: a PATH claude past the bound is skipped" "cli — skipped: claude --version did not answer within 1s" "$(cli_cell t4h)"
+unset CARD_CLI_BOUND
+cli_noc=""; IFS=: read -r -a cli_dirs <<< "$cli_path"
+for d in "${cli_dirs[@]}"; do
+  [ -n "$d" ] || continue
+  [ -e "$d/claude" ] || [ -e "$d/claude.exe" ] || [ -e "$d/claude.cmd" ] || cli_noc="${cli_noc:+$cli_noc:}$d"
+done
+export PATH="$cli_noc"
+cli_card t4i claude-code_2-1-286_agent
+check_eq "cli cell: no claude on PATH is skipped" "cli — skipped: no claude on PATH" "$(cli_cell t4i)"
+export PATH="$cli_path"
+if [ -n "$cli_aa_set" ]; then export AI_AGENT="$cli_aa"; else unset AI_AGENT; fi
 
 # ---- KICK-aReplayedCard-2: --card --append and --card --check ------------------------------------
 # Every arm runs in the clone's linked worktrees, whose common dir holds the cards. The reader the
@@ -1269,7 +1372,11 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # unraised floor is the one thing that lets a later edit delete the arms and red nothing.
 # +2: C12's pair, the CR-byte check's green and red cases (round 3 M1's left-shift).
 # +2: L3's pair, the junction-copy setup and its graded-ids arm (aRepatriatedFork round 1 L3).
-FLOOR_ASSERTIONS=180
+# +8: the `overlaps —` cell's arms (KICK-aMendedFleet-2), counted off the block; no suite ran in the pass.
+# +19: the `cli —` cell's nine card writes and ten cell checks (KICK-aMendedFleet-4), counted the same way.
+# +9: the `drift —` cell's five run_card and four check_eq calls (KICK-aMendedFleet-1), landed unpriced
+# and counted off the block by TOOL-aMendedFleet-112; no suite ran in that pass.
+FLOOR_ASSERTIONS=216
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

@@ -725,6 +725,98 @@ git add -A && git commit -q -m selfrec --no-verify
 out=$(run --preflight tRun --keepalive-id k1)
 miss "$out" "concurrent unattended run(s)"
 
+# ---- TOOL-aMendedFleet-60: THE CROSS-RUN OVERLAP PROBE announces an unmerged remote ref sharing a
+# ---- path with this run, and refuses nothing. The ref is built by PLUMBING off `main` and pushed as
+# ---- `side`, so the working tree and the conf every arm reads are never touched; this run's own half
+# ---- of each join is a commit on the unit branch, which `reset_tree` drops. `side` is deleted after
+# ---- the last arm so no later preflight reads it. Staged red by deleting the probe's one call.
+build_overlap_ref() { # path · content · committer-epoch-or-empty — one commit off main writing <path>, force-pushed as origin/side
+  local _ov_b _ov_t _ov_c _ov_ix
+  _ov_ix=$(mktemp); rm -f "$_ov_ix"
+  _ov_b=$(printf '%s\n' "$2" | git hash-object -w --stdin)
+  GIT_INDEX_FILE=$_ov_ix git read-tree main
+  GIT_INDEX_FILE=$_ov_ix git update-index --add --cacheinfo "100644,$_ov_b,$1"
+  _ov_t=$(GIT_INDEX_FILE=$_ov_ix git write-tree); rm -f "$_ov_ix"
+  if [ -n "$3" ]; then _ov_c=$(GIT_COMMITTER_DATE="$3 +0000" git commit-tree "$_ov_t" -p main -m side)
+  else _ov_c=$(git commit-tree "$_ov_t" -p main -m side); fi
+  git push -qf origin "$_ov_c:refs/heads/side" && git fetch -q origin
+}
+add_overlap_commit() { mkdir -p "$(dirname "$1")"; printf '%s\n' "$2" > "$1"; git add -- "$1"; git commit -q -m ours --no-verify; }
+reset_tree
+out=$(bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1); ov_rc0=$?
+hit "$out" "unattended: overlap probe — 0 unmerged remote ref(s) read as of this clone's last fetch, 0 aged out past 14 days, 0 unreadable, no shared path"
+# AC1: an overlapping diff is announced, tagged `diff`, and the verb's outcome does not move.
+reset_tree; add_overlap_commit src/ov.sh ours; build_overlap_ref src/ov.sh theirs ""
+out=$(bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1); ov_rc=$?
+hit "$out" "1 sharing a path; this run is NOT blocked"
+hit "$out" "  origin/side · "
+hit "$out" "1 shared: src/ov.sh (diff)"
+same "an announced overlap leaves the preflight's exit status alone" "$ov_rc" "$ov_rc0"
+# AC2: a diff whose every line carries a kit version marker is not an overlap.
+reset_tree; add_overlap_commit src/kit.sh ours; build_overlap_ref src/kit.sh "V=2   # gov:kit tkit@1.2" ""
+out=$(run --preflight tRun --keepalive-id k1)
+miss "$out" "src/kit.sh (diff)"
+hit "$out" "1 unmerged remote ref(s) read as of this clone's last fetch, 0 aged out past 14 days, 0 unreadable, no shared path"
+# AC3: a ref whose tip is past the age bound is counted, never read.
+reset_tree; add_overlap_commit src/ov.sh ours; build_overlap_ref src/ov.sh theirs "$(( $(date +%s) - 30 * 86400 ))"
+out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "1 aged out past 14 days"
+miss "$out" "  origin/side · "
+# AC4: a live spec on the ref declares the path with no product edit; WONTDO withdraws it.
+print_overlap_spec() { printf '# X-tSide-1 — side\n\n**Status:** %s · rev-1 · 2026-10-04 · node z · Tier-1\n\n### Files touched (estimate)\n\n- `src/ov.sh`\n\n## 5. next\n' "$1"; }
+reset_tree; add_overlap_commit src/ov.sh ours; build_overlap_ref memory/builds/tSide/spec/2026-10-04-spec-X-tSide-1.md "$(print_overlap_spec SPECCED)" ""
+out=$(run --preflight tRun --keepalive-id k1)
+hit "$out" "1 shared: src/ov.sh (declared)"
+reset_tree; add_overlap_commit src/ov.sh ours; build_overlap_ref memory/builds/tSide/spec/2026-10-04-spec-X-tSide-1.md "$(print_overlap_spec WONTDO)" ""
+out=$(run --preflight tRun --keepalive-id k1)
+miss "$out" "src/ov.sh (declared)"
+hit "$out" "1 unmerged remote ref(s) read as of this clone's last fetch, 0 aged out past 14 days, 0 unreadable, no shared path"
+# AC5: a shared record is never contested, and a probe with no anchor says it did not run.
+reset_tree; add_overlap_commit memory/DECISIONS.md ours; build_overlap_ref memory/DECISIONS.md theirs ""
+out=$(run --preflight tRun --keepalive-id k1)
+miss "$out" "memory/DECISIONS.md (diff)"
+hit "$out" "1 unmerged remote ref(s) read as of this clone's last fetch, 0 aged out past 14 days, 0 unreadable, no shared path"
+reset_tree; git remote set-url origin "$ORIGIN_DIR/absent.git"
+out=$(run --preflight tRun --keepalive-id k1)
+git remote set-url origin "$ORIGIN"
+hit "$out" "unattended: overlap probe UNAVAILABLE — "
+# ---- KICK-aMendedFleet-2: `--overlaps` runs the same probe for a session that never preflights,
+# ---- anchored on the LOCAL refs/remotes/origin/HEAD and never on observe_anchor, so it answers
+# ---- while the remote URL names nothing. Staged red by making print_overlaps call observe_anchor.
+git remote set-head origin main
+reset_tree; add_overlap_commit src/ov.sh ours; build_overlap_ref src/ov.sh theirs ""
+git remote set-url origin "$ORIGIN_DIR/absent.git"
+out=$(bash "$SCRIPT" --overlaps 2>&1); ov_rc=$?
+git remote set-url origin "$ORIGIN"
+same "--overlaps answers with exit 0 while the remote URL names nothing" "$ov_rc" "0"
+hit "$out" "1 sharing a path; this run is NOT blocked"
+hit "$out" "1 shared: src/ov.sh (diff)"
+# ---- TOOL-aMendedFleet-111 AC1: a path this run RENAMED is still its path under the OLD name, so a
+# ---- ref editing that old name overlaps. A tracked file on main, because a rename needs a source at
+# ---- the anchor. Staged red by dropping `--no-renames` from the `ours` read: `no shared path`.
+reset_tree; git mv content/pb-noout.md content/pb-moved.md; git commit -q -m ours-mv --no-verify
+build_overlap_ref content/pb-noout.md theirs ""
+out=$(run --overlaps)
+hit "$out" "1 shared: content/pb-noout.md (diff)"
+miss "$out" "no shared path"
+# AC2: no slug, so its own declared paths are the live specs its diff changed; WONTDO withdraws them.
+print_own_spec() { printf '# X-tOwn-1 — own\n\n**Status:** %s · rev-1 · 2026-10-04 · node z · Tier-1\n\n### Files touched (estimate)\n\n- `src/ov.sh`\n\n## 5. next\n' "$1"; }
+reset_tree; add_overlap_commit memory/builds/tOwn/spec/2026-10-04-spec-X-tOwn-1.md "$(print_own_spec SPECCED)"; build_overlap_ref src/ov.sh theirs ""
+out=$(run --overlaps)
+hit "$out" "1 shared: src/ov.sh (diff)"
+reset_tree; add_overlap_commit memory/builds/tOwn/spec/2026-10-04-spec-X-tOwn-1.md "$(print_own_spec WONTDO)"; build_overlap_ref src/ov.sh theirs ""
+out=$(run --overlaps)
+miss "$out" "src/ov.sh (diff)"
+hit "$out" "1 unmerged remote ref(s) read as of this clone's last fetch, 0 aged out past 14 days, 0 unreadable, no shared path"
+# AC3: an unset remote HEAD is one UNAVAILABLE line at exit 0, never a clean answer.
+git remote set-head origin -d
+out=$(bash "$SCRIPT" --overlaps 2>&1); ov_rc=$?
+same "--overlaps exits 0 with no remote HEAD" "$ov_rc" "0"
+hit "$out" "unattended: overlap probe UNAVAILABLE — refs/remotes/origin/HEAD is unset"
+miss "$out" "no shared path"
+git push -q origin --delete side 2>/dev/null; git update-ref -d refs/remotes/origin/side 2>/dev/null
+reset_tree
+
 # ---- check 6: the build folder exists on the unit branch but NOT at the pinned BASE. The
 # ---- self-authored case in its purest form - the run invented the build that authorizes it.
 reset_tree
@@ -1221,6 +1313,49 @@ hit "$sout" "phase RUNNING"
 hit "$rout" "resume at phase RUNNING"
 hit "$sout" "next ARCH-tRun-1"
 
+# ---- TOOL-aMendedFleet-61: --preflight pins the LAUNCHING CLI from AI_AGENT, every resume that
+# ---- proceeds compares against it as INTEGERS, and the tick's registration is a loud preflight
+# ---- line through the library's one probe. Staged red by deleting the `print_cli_version_drift`
+# ---- call in `print_resume_orientation`. The stubs stand in for `schtasks` AND `crontab`, so the
+# ---- arm reads the same on either probe; each prints the task name only when it answers yes.
+reset_tree
+_cv() { sed -n 's/^cli-version: //p' memory/builds/tRun/RUN.md | tr -d '\r'; }
+mkdir -p "$ORIGIN_DIR/tick-yes" "$ORIGIN_DIR/tick-no" "$ORIGIN_DIR/tick-none"
+for _tk in schtasks crontab; do
+  printf '#!/bin/sh\necho gov-resume-tick\nexit 0\n' > "$ORIGIN_DIR/tick-yes/$_tk"
+  printf '#!/bin/sh\nexit 1\n' > "$ORIGIN_DIR/tick-no/$_tk"
+done
+printf '#!/bin/sh\nexec %s "$@"\n' "$(command -v uname)" > "$ORIGIN_DIR/tick-none/uname"
+chmod +x "$ORIGIN_DIR"/tick-*/*
+out=$(PATH="$ORIGIN_DIR/tick-no:$PATH" AI_AGENT=claude-code_2-1-286_harness run --preflight tRun --keepalive-id KA-1234); rc=$?
+hit "$out" "the launching CLI pinned as cli-version: 2.1.286"
+hit "$out" "WARNING — no scheduled task named gov-resume-tick exists on this node"
+same "an unregistered tick does not move preflight's exit" "$rc" "0"
+same "preflight pins the launching CLI, dotted" "$(_cv)" "2.1.286"
+out=$(AI_AGENT=claude-code_2-1-178_harness run --resume tRun --keepalive-id KA-1234); rc=$?
+hit "$out" "WARNING — this session's CLI 2.1.178 is OLDER than the 2.1.286 that launched this run"
+same "an older CLI does not move the resume's exit" "$rc" "0"
+same "a resume never rewrites the pinned CLI" "$(_cv)" "2.1.286"
+out=$(env -u AI_AGENT bash "$SCRIPT" --resume tRun --keepalive-id KA-1234 2>&1); _rc2=$?
+hit "$out" "CLI version UNKNOWN — this session's side is missing"
+same "an unknown CLI does not move the resume's exit" "$_rc2" "$rc"
+out=$(AI_AGENT=other-agent_2-1-286_harness run --resume tRun --keepalive-id KA-1234)
+hit "$out" "CLI version UNKNOWN — this session's side is missing"
+out=$(AI_AGENT=claude-code_2-1-286_harness run --resume tRun --keepalive-id KA-1234)
+hit "$out" "CLI version 2.1.286 — the same as the one that launched this run"
+miss "$out" "is OLDER than the"; miss "$out" "is newer than the"
+out=$(AI_AGENT=claude-code_2-1-290_harness run --resume tRun --keepalive-id KA-1234)
+hit "$out" "NOTE — this session's CLI 2.1.290 is newer than the 2.1.286 that launched this run"
+# The string-comparison trap: 2.1.99 sorts AFTER 2.1.286 as text and is the OLDER of the two.
+out=$(AI_AGENT=claude-code_2-1-99_harness run --resume tRun --keepalive-id KA-1234)
+hit "$out" "WARNING — this session's CLI 2.1.99 is OLDER than the 2.1.286 that launched this run"
+# The probe itself, three answers: registered, not registered, and could not ask.
+_tr() { (PATH="$1"; read_tick_registration; printf '%s %s' "$?" "$TR_WHY"); }
+same "a probe answering yes reads registered" "$(_tr "$ORIGIN_DIR/tick-yes:$PATH")" "0 "
+same "a probe answering no reads unregistered" "$(_tr "$ORIGIN_DIR/tick-no:$PATH")" "1 "
+hit "$(_tr "$ORIGIN_DIR/tick-none")" "is not on PATH"
+same "a missing probe command reads UNKNOWN, not no" "$(_tr "$ORIGIN_DIR/tick-none" | cut -c1)" "2"
+
 # ---- check 10, all three branches: no file for --status, no phase, no file for --close.
 reset_tree; readme tNoRun; fixture
 out=$(run --status tNoRun);  hit "$out" "no run-state file, so there is no run to report on"
@@ -1465,6 +1600,38 @@ hit "$out" "write the RECORD KEY, which is not always the item name: parked-surf
 # ---- likeliest and was unguessable: the join reads --cached, so a record on disk and never staged
 # ---- is invisible here and reads exactly like having written no review at all.
 
+# ---- TOOL-aMendedFleet-63: --abort renders the run record itself, after its own END line, where
+# ---- the runlog kit resolves in the tree being aborted, and says `not asked` where it does not;
+# ---- neither moves the exit. One unit is dispatched first. Staged red by deleting the
+# ---- post-dispatch `write_run_record` call: the present arm loses its indented renderer lines and
+# ---- the absent arm its `not asked` line.
+# The kit is reached through the resolver, REPO-RELATIVE, never a spelled sibling path, and laid
+# into the fixture at that same relative path, which is where the driver's file test looks.
+_rl_rel=$(resolve_kit_dir "$_rkd_py" runlog runlog.py "$HERE") || exit 2
+_rl_src="$(git -C "$HERE" rev-parse --show-toplevel)/$_rl_rel"
+for _rk in present absent; do
+  bcopen
+  # A READY spec, because bcopen's is THIN and `--dispatch` refuses a THIN unit (check 49).
+  printf '# ARCH-tRun-1 — the unit\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-1 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n' > memory/builds/tRun/spec/one.md
+  fixture
+  hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes src/rr.sh)" "dispatch declared"
+  if [ "$_rk" = present ]; then
+    mkdir -p "$_rl_rel" && cp "$_rl_src"/*.py "$_rl_src"/redaction.tsv "$_rl_rel"/
+  fi
+  out=$(run --abort tRun --code fork-unresolvable --reason "the run-record arm, kit $_rk"); rc=$?
+  hit "$out" "phase ABORTED"
+  same "the run-record render does not move the abort's exit, kit $_rk" "$rc" "0"
+  if [ "$_rk" = present ]; then
+    hit "$out" "    runlog: record written memory/builds/tRun/build/"
+    hit "$(git diff --cached --name-only)" "memory/builds/tRun/build/"
+    # This fixture holds no memory-tree generator, so the index half is the named miss.
+    hit "$out" "unattended: run record staged, but no memory-tree generator resolves here"
+    miss "$out" "run record not asked"
+  else
+    hit "$out" "unattended: run record not asked — no runlog kit holding runlog.py resolves beside this kit"
+  fi
+  rm -rf "$_rl_rel"
+done
 
 bcrestore   # HOISTED: restore main to the shared BASE for the arms below.
 
@@ -9936,6 +10103,51 @@ cp "$ip_out/keep.conf" "$ip_dir/.unattended.conf"
 sed -i '/^base: /d' "$ip_dir/memory/builds/tRun/RUN.md"
 out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
 hit  "$out" "unattended: the record pins no base, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed"
+# ---- TOOL-aMendedFleet-66: the move into VERIFYING lists the open asks that target a file the run's
+# ---- range touched, through the declared ASKS_CMD's --path shape. The stub answers its fixture ask
+# ---- only when the touched path is among the --path words, so a listed ask proves the range was read.
+ipreset
+iprun --preflight tRun --keepalive-id k1 >/dev/null
+ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+cat > "$ip_out/asks66.sh" <<'IPA'
+#!/usr/bin/env bash
+case " $* " in
+  *" --json --path "*" kitsurface/thing.txt "*" --limit 0 "*)
+    printf '{"asks":[{"id":"ARCH-tRun-9","status":"OPEN","sev":"low","summary":"the fixture ask on thing.txt","pointer":"kitsurface/thing.txt"}]}\n' ;;
+  *) printf '{"asks":[]}\n' ;;
+esac
+IPA
+printf 'ASKS_CMD="bash %s"\n' "$ip_out/asks66.sh" >> "$ip_dir/.unattended.conf"
+date +%s%N > "$ip_dir/kitsurface/thing.txt"
+ipgit add -A >/dev/null && ipgit commit -q -m touch --no-verify
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "unattended: open asks targeting files this run's range touched (report only, for disposition): 1"
+hit  "$out" "  ARCH-tRun-9 · OPEN · low · the fixture ask on thing.txt"
+# ---- TOOL-aMendedFleet-83: the move into VERIFYING lists the dossiers the run's range touched and did
+# ---- not refresh, through the map_diff.py beside the declared MAP_CLI. The stub answers from the range
+# ---- it is handed: its one dossier is stale only when the range touched the claimed path and not the
+# ---- dossier, so a listed dossier proves the range was read. Staged red by deleting the verb_phase call.
+ipreset
+iprun --preflight tRun --keepalive-id k1 >/dev/null
+ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+mkdir -p "$ip_dir/mapkit"
+: > "$ip_dir/mapkit/reuse_lookup.py"
+cat > "$ip_dir/mapkit/map_diff.py" <<'IPM'
+import json, subprocess, sys
+rng = sys.argv[1]
+names = subprocess.run(["git", "diff", "--name-only", rng.split("..")[0], "HEAD"],
+                       capture_output=True, text=True, encoding="utf-8").stdout.split()
+stale = "kitsurface/thing.txt" in names and "dossiers/thing.md" not in names
+print(json.dumps({"scope": rng, "of": 1, "stale": int(stale), "live": True, "note": "",
+                  "dossiers": [{"feature": "thing", "dossier": "dossiers/thing.md", "refreshed": "0" * 40,
+                                "stale": stale, "behind": 1, "newest": "ab" * 20}]}))
+IPM
+printf 'MAP_CLI="mapkit/reuse_lookup.py"\n' >> "$ip_dir/.unattended.conf"
+date +%s%N > "$ip_dir/kitsurface/thing.txt"
+ipgit add -A >/dev/null && ipgit commit -q -m touch --no-verify
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "unattended: dossiers this run's range touched and did not refresh (report only): 1 of 1"
+hit  "$out" "  thing · dossiers/thing.md · 1 behind · newest abababab"
 # ---- closing review L1: a range whose ONLY touch on a declared prefix is a rename OUT of it still
 # ---- owes the flagged bar. A porcelain diff detects renames by default and names one by its
 # ---- destination alone, so the read carries --no-renames and names the source too.
@@ -10324,6 +10536,33 @@ build_hold_fixture
 out=$(run --close tRun)
 hit "$out" "the reap list this attestation is made over — keepalive k1 · no durable schedule: no hold of this run owed one"
 reset_tree
+
+# ---- TOOL-aMendedFleet-49 S8: --close prints the BASE..HEAD drift delta, report only, from a
+# ---- hand-written history in the fixture's common git dir. The driver runs from a COPY inside the
+# ---- fixture, beside a copy of the drift reader: the reader resolves beside the driver's own kit dir
+# ---- and reads the history of the repository it sits in, so the real kit would read the real repo.
+# The copy sits at the <home> the driver's resolver asks for, held once so no line spells a kit path.
+_da_home=drift-audit
+_da_rel=$(resolve_kit_dir "$_rkd_py" "$_da_home" drift_report.py "$HERE" 2>/dev/null) || _da_rel=""
+if [ -z "$_da_rel" ]; then
+  n=$((n+2))   # COUNTED EITHER WAY, so the floor grades this suite and not which kits sit beside it
+  echo "  SKIP the drift-delta close arm: no drift-audit kit resolves beside this one, so nothing prints the delta; its 2 assertions are counted, not run"
+else
+  build_hold_fixture
+  mkdir -p dk/u "dk/$_da_home"
+  cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "$HERE/check-playbook.sh" dk/u/
+  cp "$(git -C "$HERE" rev-parse --show-toplevel)/$_da_rel/drift_report.py" "dk/$_da_home/"
+  git add -A >/dev/null && git commit -q -m dk --no-verify
+  _dh="$(git rev-parse --git-common-dir)/drift-history.tsv"
+  { printf '#utc\tsha\tbase_ref\tbase_sha\tsignal\tstate\tvalue\tof\tkey_hash\n'
+    printf 't1\t%s\tb\tbs\tmoved\tlive\t7\t9\taa\n' "$(git rev-parse "$(sed -n 's/^base: //p' memory/builds/tRun/RUN.md)")"
+    printf 't2\t%s\tb\tbs\tmoved\tlive\t2\t9\tbb\n' "$(git rev-parse HEAD)"; } > "$_dh"
+  out=$(bash dk/u/unattended.sh --close tRun 2>&1)
+  hit "$out" "unattended: drift delta, report only"
+  hit "$out" "drift-delta:   moved 7 -> 2"
+  rm -f "$_dh"
+  reset_tree
+fi
 
 # ---- AC15: the kit.toml carrier-pair probe, RESOLVED from the descriptor rather than retyped. Since
 # ---- DEPL-aHalvedInstall-2 it is a PRESENCE test that SOURCES the conf: each of the pair must hold a
@@ -12300,7 +12539,7 @@ printf '#!/usr/bin/env bash\ncase "${F4_CP_FAILS:-}" in\n  backup)  [ "$2" = "$F
   > "$TMP/f4-shim/cp"
 chmod +x "$TMP/f4-shim/cp"
 f4_shim=$(cd "$TMP/f4-shim" && pwd)
-slice_fn write_inherited_asks; slice_fn write_backlog_rows
+slice_fn write_inherited_asks; slice_fn write_backlog_rows; slice_fn write_ask_rows
 read_leg_argv() { printf 'bash x.sh'; }
 derive_ask_seq() { printf '2'; }
 read_ask_back() { AB_WHY="the double reads nothing back"; [ "${F4_READBACK:-no}" = yes ]; }
@@ -12354,8 +12593,57 @@ hit  "$out" "f4-views-double: 1 filed"
 same "F4 the views helper is called once per filing call" "$(printf '%s\n' "$out" | grep -c 'f4-views-double')" "1"
 hit  "$(cat "$f4_dir/memory/builds/tRun/BACKLOG.md")" "- KEEP · ARCH-tRun-1 · authored, and kept live on purpose"
 hit  "$(cat "$f4_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the default branch"
-unset -f write_inherited_asks write_backlog_rows read_leg_argv derive_ask_seq read_ask_back write_ask_views run_f4_filer seed_f4_tree
+unset -f write_inherited_asks write_backlog_rows write_ask_rows read_leg_argv derive_ask_seq read_ask_back write_ask_views run_f4_filer seed_f4_tree
 rm -rf "$f4_dir" "$TMP/f4-authored.md" "$TMP/f4-not-a-dir" "$TMP/f4-shim"
+
+# TOOL-aMendedFleet-9: THE DAILY HELD JOB'S REDS. SLICED, with the reader shadowed and ASKS_CMD blank,
+# so the writer only PRINTS what it would file. The key is read at R: blank is DARK and a bad shape is
+# refused, and neither reaches the reader. Over an armed key, a red row prints in the ask grammar, a
+# green row is skipped, and a backtick name and a sha R does not descend from are refused by name.
+h9_dir=$(mktemp -d)
+( cd "$h9_dir" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false && mkdir -p memory/builds/tRun \
+    && printf -- '---\nslug: tRun\nroster: ARCH\n---\n' > memory/builds/tRun/README.md \
+    && printf 'HELD_CI_WORKFLOW=""\n' > .unattended.conf && git add -A && git commit -q -m blank --no-verify ) >/dev/null 2>&1
+slice_fn write_held_asks; slice_fn read_policy_key; slice_fn read_roster_family
+readme_of() { printf '%s/builds/%s/README.md' "$M" "$1"; }
+read_leg_argv() { return 1; }
+derive_ask_seq() { printf '7'; }
+read_held_reds() { echo "$2" >> "$h9_dir/.git/h9-calls"; [ -z "$H9_ROWS" ] || printf '%s\n' "$H9_ROWS"; echo "held reader: run 9 at stub · 4 held job(s) read · 3 red"; }
+run_h9() { # R -> the sliced writer's output over the arm's repository, with ASKS_CMD blank
+  local M=memory ASKS_CMD="" CONF=.unattended.conf AURL=https://github.com/o/r.git
+  ( cd "$h9_dir" || exit 2; write_held_asks tRun "$1" ""; echo "h9-rc=$?" ) 2>&1
+}
+H9_ROWS=""
+h9_r=$(git -C "$h9_dir" rev-parse HEAD)
+out=$(run_h9 "$h9_r")
+hit  "$out" "gates-green: held reader DARK — HELD_CI_WORKFLOW is blank or absent in the conf at ${h9_r:0:8}, so no request is made"
+hit  "$out" "h9-rc=0"
+n=$((n+1)); [ ! -s "$h9_dir/.git/h9-calls" ] || { echo "FAIL held: a blank HELD_CI_WORKFLOW at R still called the reader"; st=1; }
+printf 'HELD_CI_WORKFLOW="../x.yml"\n' > "$h9_dir/.unattended.conf"; git -C "$h9_dir" commit -qam bad --no-verify
+h9_r=$(git -C "$h9_dir" rev-parse HEAD)
+out=$(run_h9 "$h9_r")
+hit  "$out" "gates-green: held reader refused — HELD_CI_WORKFLOW at ${h9_r:0:8} is outside [A-Za-z0-9._-]+ ending .yml or .yaml"
+hit  "$out" "h9-rc=0"
+n=$((n+1)); [ ! -s "$h9_dir/.git/h9-calls" ] || { echo "FAIL held: a refused HELD_CI_WORKFLOW reached the reader"; st=1; }
+printf 'HELD_CI_WORKFLOW="remote-ci.yml"\n' > "$h9_dir/.unattended.conf"; git -C "$h9_dir" commit -qam armed --no-verify
+h9_r=$(git -C "$h9_dir" rev-parse HEAD)
+h9_off=$(git -C "$h9_dir" commit-tree -p HEAD -m off "$(git -C "$h9_dir" rev-parse 'HEAD^{tree}')")
+H9_ROWS=$(printf 'held\tok suite\t%s\t9\tfailure\nheld\tgreen suite\t%s\t9\tsuccess\nheld\tbad`suite\t%s\t9\tfailure\nheld\toff suite\t%s\t9\ttimed_out' "$h9_r" "$h9_r" "$h9_r" "$h9_off")
+out=$(run_h9 "$h9_r")
+hit  "$out" "gates-green: held reader: run 9 at stub · 4 held job(s) read · 3 red"
+hit  "$out" "gates-green: ASKS_CMD is blank, so the held auto-file is DARK and writes nothing; it would have filed, in memory/builds/tRun/BACKLOG.md:"
+hit  "$out" " · held red: suite ok suite red at ${h9_r:0:8} on the daily held job, run 9 · seen \`.github/workflows/remote-ci.yml\`@${h9_r:0:8} · accept the suite is green on the daily held job at the default branch's tip"
+hit  "$out" "    - SEV · ARCH-tRun-7 · HIGH · a held self-test is red on the default branch's daily job"
+hit  "$out" "gates-green: held suite refused, no ask filed — its name carries a backtick"
+hit  "$out" "gates-green: no ask filed for held suite off suite — its head sha $h9_off is not an ancestor of R ${h9_r:0:8} here"
+hit  "$out" "h9-rc=0"
+miss "$out" "suite green suite"
+miss "$out" "suite bad"
+n=$((n+1)); [ ! -e "$h9_dir/memory/builds/tRun/BACKLOG.md" ] || { echo "FAIL held: the writer with ASKS_CMD blank wrote a BACKLOG.md"; st=1; }
+unset -f write_held_asks read_policy_key read_roster_family readme_of read_leg_argv derive_ask_seq read_held_reds run_h9
+unset H9_ROWS
+rm -rf "$h9_dir"
 
 # AC21 and AC23: under park with the witness set, the rows are staged beside the hold line; commit,
 # push, reap and hold as the line says, and the hold is accepted. Resumed and closed again over the
@@ -12679,6 +12967,46 @@ RVC
   rm -rf "$rv_dir" "$rv_oroot" "$rv_out"
   unset -f run_rv run_rv_git build_rv_fixture check_rv_commit
 fi
+
+# ---- TOOL-aMendedFleet-111 AC5: under `LIVE_LANDED_UNCLOSED=1` the render reads product source, so
+# ---- an unstaged citation edit to product source is an INPUT of both render helpers: each names it and
+# ---- stages no view. Both helpers are SLICED from the shipped driver and called in a subshell whose
+# ---- stubs stand in for the resolvers and the bounded runner; the stub render appends to LIVE, so a
+# ---- helper that rendered anyway stages it. The blank-key controls render, which keeps the two
+# ---- refusals from passing vacuously. Staged red by restoring the memory-root-only inventory.
+run_render_helper() { # conf key value · helper -> the helper's output, then the staged paths, from a fresh tree
+  reset_tree
+  mkdir -p src memory/builds/tRun/build; printf '#!/bin/sh\n' > src/lu.sh; printf 'live\n' > memory/LIVE.md
+  printf 'LIVE_LANDED_UNCLOSED="%s"\n' "$1" >> .memory-tree.conf
+  fixture; printf '# cites ARCH-tRun-1\n' >> src/lu.sh
+  (
+    slice_fn "$2" >/dev/null && slice_fn scan_dirty_paths >/dev/null || exit 1
+    lu_g=$(git rev-parse --absolute-git-dir); mkdir -p "$lu_g/lurl"; : > "$lu_g/lu-gen.py"; : > "$lu_g/lurl/runlog.py"
+    resolve_python() { echo pystub; }
+    resolve_index_generator() { echo "$lu_g/lu-gen.py"; }
+    resolve_kit_dir() { echo "$lu_g/lurl"; }
+    run_bounded() {
+      case "$*" in
+        *runlog.py*) printf 'rec\n' > memory/builds/tRun/build/lu-record.md
+                     RB_STDOUT="runlog: record written memory/builds/tRun/build/lu-record.md (4 bytes)" ;;
+        *) printf 'stale\n' >> memory/LIVE.md; RB_STDOUT="" ;;
+      esac
+      RB_OUT=""; RB_TOOK=0; return 0
+    }
+    M=memory RUNLOG_SWITCH=0 VERB=--abort LANDER_MODE=primary KIT_DIR=.
+    if [ "$2" = write_ask_views ]; then write_ask_views 1; else write_run_record tRun; fi
+    echo "STAGED: $(git diff --cached --name-only | tr '\n' ' ')"
+  ) 2>&1
+}
+out=$(run_render_helper 1 write_ask_views)
+hit  "$out" "were not re-rendered: the views' inputs carry changes the index does not hold, and a render would stage views derived from them: src/lu.sh"
+miss "$(printf '%s\n' "$out" | grep '^STAGED:')" "memory/LIVE.md"
+out=$(run_render_helper 1 write_run_record)
+hit  "$out" "the index was not re-rendered: its inputs carry changes the index does not hold: src/lu.sh"
+miss "$(printf '%s\n' "$out" | grep '^STAGED:')" "memory/LIVE.md"
+hit  "$(run_render_helper "" write_ask_views)" "gates-green: re-rendered the generated views for 1 filed ask(s) and staged 1 path(s): memory/LIVE.md"
+hit  "$(run_render_helper "" write_run_record | grep '^STAGED:')" "memory/LIVE.md"
+reset_tree; unset -f run_render_helper
 
 # ================ TOOL-dDerivedDocket-28: the run-owned process ledger =============================
 # ---- SELF-CONTAINED, for the in-place block's reason and one more: these arms KILL drivers, and a
@@ -14049,6 +14377,23 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 1843 -> 1877 by TOOL-aRepatriatedFork-53: the task-registry block's 34 unconditional
 # hit/miss/same/mutate lines in region two beside the `--audit` arms, COUNTED off the block; no suite
 # ran in the pass, and each case was observed by a scratch fixture driving the driver itself.
+# RAISED 1877 -> 1892 by TOOL-aMendedFleet-60: the overlap probe's 15 hit/miss/same lines in region
+# one beside the concurrent-run arms, COUNTED off the block; no suite ran in the pass, and the block
+# was observed green in a prologue slice and red with the probe's call deleted.
+# RAISED 1892 -> 1901 by KICK-aMendedFleet-2: the --overlaps verb's 9 hit/miss/same lines in region
+# one, inside the overlap probe's block, COUNTED off the block; no suite ran in the pass. Written
+# 1902 and 10 when it landed; TOOL-aMendedFleet-112 re-counted the block at 9 and re-chained below.
+# RAISED 1901 -> 1909 by TOOL-aMendedFleet-111: the rename-overlap arm's 2 hit/miss lines in region
+# one (AC1) and the LIVE_LANDED_UNCLOSED render-input arm's 6 in region two (AC5), COUNTED off the
+# blocks; no suite ran in the pass, and each block was observed green and red in a prologue slice.
+# The raises below are TOOL-aMendedFleet-112's, pricing arms earlier units of this build added
+# unpriced, each COUNTED off its block with loops and branches expanded; no suite ran in the pass.
+# RAISED 1909 -> 1928 by TOOL-aMendedFleet-61: the CLI-version pin and tick-probe arms' 19 lines, region one.
+# RAISED 1928 -> 1939 by TOOL-aMendedFleet-63: the --abort run-record loop, 7 with the runlog kit and 4 without, region one.
+# RAISED 1939 -> 1941 by TOOL-aMendedFleet-66: the VERIFYING open-asks arm's 2 lines, region two.
+# RAISED 1941 -> 1943 by TOOL-aMendedFleet-83: the VERIFYING stale-dossier arm's 2 lines, region two.
+# RAISED 1943 -> 1945 by TOOL-aMendedFleet-49: S8's drift-delta close arm, 2, COUNTED EITHER WAY, region two.
+# RAISED 1945 -> 1961 by TOOL-aMendedFleet-9: the held-job writer arms' 16 lines, region two.
 # RAISED 1877 -> 1894 by TOOL-aEvidencedLens-21: the hostile-value matrix's 17 region-two assertions,
 # the --review one-line row (1), one exit-status verdict per matrix verb (14) and one per exemption
 # (2), measured on a slice of the block; no suite ran.
@@ -14058,7 +14403,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 1903 -> 1918 by the owner ruling of 2026-10-05 (aEvidencedLens): the prompt-record check-89
 # admission arms AC5-AC8, 15 region-two hit/miss/same/mutate lines counted off the block, green on a
 # slice of the aWardedAudit block and each new arm observed red against HEAD's driver; no suite ran.
-FLOOR_ASSERTIONS=1918
+# MERGED at the reconcile of origin/main into aMendedFleet: both chains above start at 1877,
+# so the floor is base 1877 + aMendedFleet's 84 (1877 -> 1961) + origin/main's
+# 41 (1877 -> 1918) = 2002.
+FLOOR_ASSERTIONS=2002
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -14180,16 +14528,29 @@ FLOOR_ASSERTIONS=1918
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
 PROLOGUE_ARMS=18
 # RAISED 208 -> 209: region one's in_shard block-length arm, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=209
+# RAISED 209 -> 224: the overlap probe's 15 region-one assertions, see FLOOR_ASSERTIONS.
+# RAISED 224 -> 233: the --overlaps verb's 9 region-one assertions (KICK-aMendedFleet-2), see FLOOR_ASSERTIONS.
+# RAISED 233 -> 235: the rename-overlap arm's 2 region-one assertions, see FLOOR_ASSERTIONS.
+# RAISED 235 -> 254: TOOL-aMendedFleet-61's 19 region-one assertions, see FLOOR_ASSERTIONS.
+# RAISED 254 -> 265: TOOL-aMendedFleet-63's 11 region-one assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=265
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
 # RAISED 1640 -> 1646: the same six region-two assertions, see FLOOR_ASSERTIONS.
 # RAISED 1646 -> 1680: the same 34 region-two task-registry assertions, see FLOOR_ASSERTIONS.
+# RAISED 1680 -> 1686: the render-input arm's 6 region-two assertions, see FLOOR_ASSERTIONS.
+# RAISED 1686 -> 1688: TOOL-aMendedFleet-66's 2 region-two assertions, see FLOOR_ASSERTIONS.
+# RAISED 1688 -> 1690: TOOL-aMendedFleet-83's 2 region-two assertions, see FLOOR_ASSERTIONS.
+# RAISED 1690 -> 1692: TOOL-aMendedFleet-49 S8's 2 region-two assertions, see FLOOR_ASSERTIONS.
+# RAISED 1692 -> 1708: TOOL-aMendedFleet-9's 16 region-two assertions, see FLOOR_ASSERTIONS.
 # RAISED 1680 -> 1697: the same 17 region-two matrix assertions, see FLOOR_ASSERTIONS.
 # RAISED 1697 -> 1706: the same 9 region-two --handoff matrix assertions, see FLOOR_ASSERTIONS.
 # RAISED 1706 -> 1721: the same 15 region-two check-89 admission assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1721
+# MERGED at the reconcile of origin/main into aMendedFleet: both chains above start at 1680,
+# so the floor is base 1680 + aMendedFleet's 28 (1680 -> 1708) + origin/main's
+# 41 (1680 -> 1721) = 1749.
+FLOOR_SHARD_2=1749
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

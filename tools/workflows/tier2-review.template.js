@@ -1,6 +1,6 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.32', // gov:kit tier2-review@1.32 // gov:kit review-harness@1.32 — BOTH ids: the
+  version: '1.33', // gov:kit tier2-review@1.33 // gov:kit review-harness@1.33 — BOTH ids: the
   // second is this entry's REGISTRY id, and without it a deployer grepping the id the
   // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
@@ -28,9 +28,10 @@ function chunk(a, n) {
 }
 
 // --- TOOL-dDerivedDocket-29 — the review KEY, derived from the inputs and nothing else ----------
-// A lens or a skeptic batch writes its result to `<git-common-dir>/review-lenses/<key>/` BEFORE it
-// returns, so a fan that dies on a session limit keeps every result that came back, and a re-run with
-// the same inputs dispatches only what is missing. The key is what makes "the same inputs" a test and
+// Under `workerType: 'none'` a lens or a skeptic batch writes its result to
+// `<git-common-dir>/review-lenses/<key>/` BEFORE it returns, so a fan that dies on a session limit
+// keeps every result that came back, and a re-run with the same inputs dispatches only what is
+// missing; under a named type no judge writes one and a re-run dispatches every judge again. The key is what makes "the same inputs" a test and
 // not a hope: a file is reused only when its own `key` field equals the string computed here.
 // FNV-1a over UTF-16 code units, with `Math.imul` because the script runtime refuses the clock and
 // randomness and nothing else; the human-readable prefix means a collision needs the same kind,
@@ -70,6 +71,23 @@ function buildKeyedSchema(schema, extra) {
   }
 }
 
+// --- TOOL-aMendedFleet-18 — the REVIEW-SHAPE line, one byte-stable record line per exit ----------
+// Pure, so a `node` slice evaluates it alone. A count the run has not produced at that stage arrives
+// null or absent and prints `-`, never `0`: a zero is a result and an absence is not. `key=value`
+// fields and no head from the chat micro-format set, because this is a RECORD line.
+function renderShapeLine(fields) {
+  return `review-shape kind=${fields.kind} round=${fields.round} intensity=${fields.intensity} at=${fields.at} ` +
+    ['raw', 'confirmed', 'refuted', 'unverified', 'blocker', 'high', 'medium', 'low']
+      .map((k) => `${k}=${fields[k] === null || fields[k] === undefined ? '-' : fields[k]}`).join(' ') +
+    ` agents=${fields.agents} out-tokens=${fields.outTokens === null || fields.outTokens === undefined ? 'unknown' : fields.outTokens}`
+}
+// The runtime's `budget.spent()` is the OUTPUT tokens spent this turn across the main loop and every
+// workflow, a shared pool, so only a delta isolates a run. Read through a `typeof` guard: the harness's
+// own suite and a `node` slice have no `budget`, and an absent counter is `null`, never a number.
+function readOutputTokens() {
+  return typeof budget === 'object' && budget !== null && typeof budget.spent === 'function' ? budget.spent() : null
+}
+
 // --- inputs (via Workflow `args`) ---------------------------------------
 // { base: "<immutable SHA>", head: "HEAD", repo: "/path/to/worktree",
 //   context: "what this diff does + the security model + what's by-design",
@@ -92,8 +110,11 @@ function buildKeyedSchema(schema, extra) {
 //   lensNotes: { "<lens key>": "<note>" }, // project addendum per lens of THIS kind; absent -> {} and a WARNING
 //   intensity: "full" | "light",          // DEFAULTS to "full"; only the CALLER picks light, which runs
 //                                         // LIGHT_LENSES and names the lenses it skipped; a spec-audit refuses light
-//   checklist: "<preamble>\n- <item>\n  <continuation>" | ["<item>", ...] } // the project's recurring
+//   checklist: "<preamble>\n- <item>\n  <continuation>" | ["<item>", ...], // the project's recurring
 //                                         // bug classes, each item swept by exactly one lens; absent -> a WARNING
+//   workerType: "<agent type>" | "none" } // the type every finder and skeptic spawns as; absent -> Plan,
+//                                         // "none" -> the platform default. Under a type no judge writes a lens file,
+//                                         // so a deferred return's `durable` is false and a re-run re-dispatches every judge
 // D9 - `kind` and `subjects` were added without extending this block, and BUILD-METHOD M4 sends a
 // reader HERE for the spec-audit spelling. An absent `kind` does not refuse - it defaults - so a
 // header missing the field buys exactly the failure M4 exists to prevent: a code-shaped review of a
@@ -162,6 +183,27 @@ if (typeof intensity !== 'string' || ['full', 'light'].indexOf(intensity) === -1
   throw new Error('tier2-review: `intensity` must be one of full | light. Got ' + JSON.stringify(a.intensity) + '.')
 if (isSpec && intensity === 'light')
   throw new Error('tier2-review: a spec-audit has no light lens subset; `intensity` must be full or absent. Got "light".')
+// TOOL-aMendedFleet-67 S1/S2 - `workerType`, the agent type the JUDGES spawn as: every finder and every
+// skeptic, never the resume probe or the synthesis, which read and write the lens files and the report.
+// Shape-checked here, before any spawn. The built-in types that omit the charter hold no Write tool,
+// so under one the judges get no DURABILITY instruction and the run says its results are not durable.
+// TOOL-aMendedFleet-93 S4 - absent reads as `Plan`, the default the charter A/B's reading set; the
+// reserved literal `none` spawns as before the default, durability instructions and review key included.
+const workerType = a.workerType === undefined ? 'Plan' : a.workerType === 'none' ? '' : a.workerType
+if (a.workerType !== undefined && (typeof a.workerType !== 'string' || !/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(a.workerType)))
+  throw new Error('tier2-review: `workerType` must be an agent type name matching ^[A-Za-z][A-Za-z0-9_-]{0,63}$. Got ' + JSON.stringify(a.workerType) + '.')
+const judgeOpts = workerType ? { agentType: workerType } : {}
+// TOOL-aMendedFleet-111 S6 - whether the judges' results outlive this run. Under a named type no judge
+// writes its file, so every deferred note says a re-run dispatches every finder and skeptic again, and
+// every return carrying `pending` carries `durable` too, so a caller reads the fact, not the prose.
+const durable = !workerType
+function renderRerunTail(only, synthToo) {
+  return durable
+    ? `re-run with identical args to dispatch only ${only}`
+    : `this run wrote no result file, so a re-run with identical args dispatches every finder and skeptic again${synthToo ? ', plus the synthesis' : ''}`
+}
+if (workerType)
+  log(`worker type ${workerType} — every finder and skeptic spawns as it and writes no find-*.json or verify-*.json, so this run's lens and batch results are NOT durable and a resume re-dispatches them`)
 // S7 - the context default is per-kind, and each is wrong if the other kind inherits it.
 const context = a.context || (isSpec ? 'the spec set under audit' : 'the cumulative diff landing on main')
 const byDesign = a.byDesign || 'none supplied'
@@ -560,7 +602,7 @@ const SPEC_LENSES = [
   {
     key: 'reuse',
     brief:
-      'Reuse: functionality is reused and extended, never rebuilt. Report a design that builds what already exists, such as a function, a checker, a gate leg, a driver verb or a record shape, instead of extending it; a section-10 seam that is cited but is not the one section 4 extends, or that does not exist; and a question a decision record or an ask already decided, decided asks included. Probe before you claim: the codebase-map kit\'s reuse_lookup.py with a behaviour phrase, the memory-recall kit\'s query.py with a plain-English question and 8-14 --terms in this corpus\'s own jargon, and grep, because the lookup cannot see every layer and prints the ones it skipped. Locate each tool with git ls-files; where one is absent, say so in the finding and use grep. Read the asks through the memory-tree kit\'s gen_build_index.py --asks --json --all, falling back to the backlog shards when its mode field says shards. THE BAR: a reuse finding names the existing seam or record by path or id AND quotes the spec text that duplicates or contradicts it. That a related record exists is not a finding.',
+      'Reuse: functionality is reused and extended, never rebuilt. Report a design that builds what already exists, such as a function, a checker, a gate leg, a driver verb or a record shape, instead of extending it; a section-10 seam that is cited but is not the one section 4 extends, or that does not exist; and a question a decision record or an ask already decided, decided asks included. Probe before you claim: the codebase-map kit\'s reuse_lookup.py with a behaviour phrase, the memory-recall kit\'s query.py with a plain-English question and 8-14 --terms in this corpus\'s own jargon, and grep, because the lookup cannot see every layer and prints the ones it skipped. Locate each tool with git ls-files; where one is absent, say so in the finding and use grep. Read the asks through the memory-tree kit\'s gen_build_index.py --asks --json --all --path <every path the spec\'s Files touched estimate names>, falling back to the backlog shards when its mode field says shards. THE BAR: a reuse finding names the existing seam or record by path or id AND quotes the spec text that duplicates or contradicts it. That a related record exists is not a finding.',
   },
   {
     key: 'blast-radius',
@@ -689,7 +731,9 @@ else log('WARNING: `checklist` was supplied with no item — no lens sweeps the 
 // `priorFindings`, `lensNotes`, `specs`, `checklist`, `intensity` and the REVIEW_SHAPE literal - every input a lens prompt interpolates,
 // and the prompts' own shape, except `repo`, which is left out on
 // purpose: the common dir is shared by every worktree on the node, and a take-over from another
-// worktree of the same commits is exactly the re-run this exists for. A spec audit's subject is every
+// worktree of the same commits is exactly the re-run this exists for. The reuse holds only for a
+// `workerType: 'none'` run: under a named type no judge wrote a file, so the key directory is empty
+// and a re-run dispatches every judge again (TOOL-aMendedFleet-111 S6). A spec audit's subject is every
 // `path@blob` in the order given; a diff review's is the RESOLVED base and head (F5), so a review
 // commissioned against `origin/main` is pinned to the sha that ref named, and a moved ref is a
 // different key rather than a stale answer.
@@ -700,22 +744,35 @@ else log('WARNING: `checklist` was supplied with no item — no lens sweeps the 
 // lens set moves this literal again. It rides the print rather than the key's string, so the probe
 // prompt's hand-spelled directory follows without a second edit.
 // TOOL-aEvidencedLens-1 S3 - r2, ONE bump for the whole aEvidencedLens build (its shared invariant 5).
-const REVIEW_SHAPE = 'lenses5-r2'
+// r3 at the reconcile of aMendedFleet with origin/main: the merged reuse lens and the workerType-aware
+// re-run texts differ from both sides' prompts, so neither side's lens files may answer the merge.
+const REVIEW_SHAPE = 'lenses5-r3'
 // TOOL-aSightedSkeptic-3 S5 - `specs` is interpolated by renderIntent(), so it joins the print too.
 // TOOL-aSightedSkeptic-4 S7 - so does the PARSED checklist: a CRLF string and its LF twin are one key,
 // and a lens swept under one checklist is never reused under another.
 // TOOL-aSightedSkeptic-7 S8 - and so does `intensity`: a light run and a full run never share a lens file.
+// TOOL-aMendedFleet-67 S2 - and so does `workerType`, only when it names a type, so a `none` key equals
+// every pre-type key and a run under a type is never answered from a `none` run's lens files.
 // TOOL-aEvidencedLens-2 S5 - and, on the spec kind only, PROBE_RULES, spread so the diff print object is
 // unchanged. `scratch` is a location, not content, and stays out: a resumed run has a new scratchpad.
 // TOOL-aEvidencedLens-4 S7 - and `prevBlobs`, one per subject in order, null where absent, ONLY when some
 // subject carries one: a run carrying none, the diff kind included, keeps its print and so its key.
-const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}),
-  ...(prevBlobCount ? { prevBlobs: subjects.map((x) => (x && typeof x === 'object' && x.prevBlob !== undefined ? x.prevBlob : null)) } : {}) }))
+const inputPrint = deriveFnv1a(renderCanonical(Object.assign({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}),
+  ...(prevBlobCount ? { prevBlobs: subjects.map((x) => (x && typeof x === 'object' && x.prevBlob !== undefined ? x.prevBlob : null)) } : {}) }, workerType ? { workerType: workerType } : {})))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
 function deriveReviewKey(b, h) {
   return `${kind}-r${round}-${isSpec ? specSubject : deriveSubjectPair(b, h)}-${inputPrint}`
+}
+// TOOL-aMendedFleet-18 S2/S3 - the token counter is read ONCE before the first agent, and a stage's
+// line is the delta to its own read. `agents` follows the final return's formula through the stage
+// reached (spec rev-3): finders at find, plus skeptic batches at verify, plus the synthesis at synth.
+const tokensAtStart = readOutputTokens()
+function renderStageShape(at, counts, agents) {
+  const now = readOutputTokens()
+  return renderShapeLine(Object.assign({ kind: kind, round: round, intensity: intensity, at: at, agents: agents,
+    outTokens: tokensAtStart === null || now === null ? null : now - tokensAtStart }, counts))
 }
 phase('Resume')
 const probe = await agent(
@@ -924,11 +981,14 @@ const finderResults = await boundedParallel(
         SEVERITY_RUBRIC + `\n` +
         // TOOL-dDerivedDocket-29 S1 - WRITE BEFORE RETURN. A fan that dies on a session limit loses
         // every structured return with it; a file on disk survives, and the next run's probe reuses it.
-        `\nDURABILITY — BEFORE you return, whatever you found, Write the exact JSON object you are about to return, plus one more field "key":"${reviewKey}", to ${keyDir}/find-${L.key}.json, creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.\n` +
+        // TOOL-aMendedFleet-67 S2 - a judge under `workerType` holds no Write tool, so it is told none.
+        (workerType
+          ? `\nWrite no file. Set path to an empty string.\n`
+          : `\nDURABILITY — BEFORE you return, whatever you found, Write the exact JSON object you are about to return, plus one more field "key":"${reviewKey}", to ${keyDir}/find-${L.key}.json, creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.\n`) +
         (isSpec
           ? `Return JSON {lens:"${L.key}", path, findings:[{file,where,severity,claim,impact,fix,evidence}]}.`
           : `Return JSON {lens:"${L.key}", path, findings:[{file,line,severity,claim,impact,fix}]}.`),
-        { label: `find:${L.key}`, phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA },
+        Object.assign({ label: `find:${L.key}`, phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA }, judgeOpts),
       ),
   ),
 )
@@ -1003,19 +1063,24 @@ function printLensYield(rows) {
 // ---- TOOL-dDerivedDocket-29 S5 — THE `exit` FIELD, on every return. `complete` when every agent
 // ---- returned, `deferred-platform` when any lens, skeptic batch or the synthesis came back null. A
 // ---- deferred return always carries `blockers: null`, the key, and `pending`: the labels a re-run
-// ---- with identical args will dispatch, everything else being reused from the key directory. The
+// ---- with identical args will dispatch, everything else being reused from the key directory when
+// ---- `durable` is true, the `workerType: 'none'` case; when it is false a re-run dispatches all. The
 // ---- one null `blockers` that is NOT a death, the tally fault below, stays `complete`: a re-run
 // ---- cannot repair an adjudication, so that path keeps the refusal its callers already make.
 if (lensesDead === lensesRunning) {
   log(`UNVERIFIED — all ${lensesRunning} lenses failed to return. Nothing was reviewed. Deferred: re-run with identical args.`)
+  // TOOL-aMendedFleet-18 S3 - no lens returned, so even `raw` was never produced (spec rev-3).
+  const shapeLine = renderStageShape('find', {}, lensesRunning)
+  log(shapeLine)
   const lensYield = deriveLensYield([], null) // TOOL-aEvidencedLens-6 S5 - every row returned: false, zeros
   printLensYield(lensYield)
   return {
+    shape: shapeLine,
     // TOOL-dTieredTribunal-1 S3 - null, never 0. No synthesis ran, so there is no adjudicated count.
-    exit: 'deferred-platform', key: reviewKey, pending: deadLensLabels,
+    exit: 'deferred-platform', key: reviewKey, pending: deadLensLabels, durable,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: 0, lensesDead,
     lensesReused: reusedLens.size,
-    note: `DEFERRED: no lens completed (${lensesDead}/${lensesRunning} died) — nothing was reviewed; re-run with identical args`,
+    note: `DEFERRED: no lens completed (${lensesDead}/${lensesRunning} died) — nothing was reviewed; ${renderRerunTail(deadLensLabels.join(', '), false)}`,
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
     // TOOL-aSightedSkeptic-8 S5 - nothing was judged on this path.
     ledger: [], confirmedFindings: [], appendix: '', lensYield,
@@ -1026,14 +1091,17 @@ if (allFindings.length === 0) {
   // nothing`, which the build harness's clean-round test cannot tell from a result; it defers now.
   const deferred = lensesDead > 0
   const note = deferred
-    ? `DEFERRED: ${lensesDead}/${lensesRunning} lenses died and the survivors found nothing — re-run with identical args to dispatch only ${deadLensLabels.join(', ')}`
+    ? `DEFERRED: ${lensesDead}/${lensesRunning} lenses died and the survivors found nothing — ${renderRerunTail(deadLensLabels.join(', '), false)}`
     : 'clean: 0 findings'
   log(note)
+  const shapeLine = renderStageShape('find', { raw: 0 }, lensesRunning)
+  log(shapeLine)
   const lensYield = deriveLensYield([], null) // TOOL-aEvidencedLens-6 S5
   printLensYield(lensYield)
   // TOOL-dTieredTribunal-1 S3 - null, never 0: no synthesis ran on this path either.
   return {
-    exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels,
+    shape: shapeLine,
+    exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels, durable,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
     lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, skippedLenses,
     ledger: [], confirmedFindings: [], appendix: '', lensYield, // TOOL-aSightedSkeptic-8 S5 - no finding raised
@@ -1121,13 +1189,15 @@ const verdictResults = await boundedParallel(
         `"none" when no fix was proposed. For "unsound", \`fixNote\` holds ONLY the corrected fix, and is empty when you have none; ` +
         `say why the fix is unsound in \`reason\`, never in \`fixNote\`. ` +
         `The fix verdict NEVER changes the finding's verdict: judge the claim on its own, then the fix on its own.` +
-        `\n\nDURABILITY — BEFORE you return, Write the exact JSON object you are about to return, plus two more fields ` +
-        `"key":"${reviewKey}" and "batch":"${batchPrints[gi]}", to ${keyDir}/verify-${group[0].id}-${group[group.length - 1].id}.json, ` +
-        `creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.` +
+        (workerType
+          ? `\n\nWrite no file. Set path to an empty string.`
+          : `\n\nDURABILITY — BEFORE you return, Write the exact JSON object you are about to return, plus two more fields ` +
+            `"key":"${reviewKey}" and "batch":"${batchPrints[gi]}", to ${keyDir}/verify-${group[0].id}-${group[group.length - 1].id}.json, ` +
+            `creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.`) +
         `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted"|"uncertain", reason, severity:"blocker"|"high"|"medium"|"low" (on a confirmed verdict), fixVerdict:"sound"|"unsound"|"none", fixNote}]}. ` +
         `Emit EXACTLY one verdict per finding above (${group.length} verdicts, ids ${group.map((f) => f.id).join(', ')}). ` +
         `Copy the integer id — do NOT re-type the file path, and do not renumber.`,
-        { label: batchLabels[gi], phase: 'Verify', schema: VERDICT_SCHEMA },
+        Object.assign({ label: batchLabels[gi], phase: 'Verify', schema: VERDICT_SCHEMA }, judgeOpts),
       ),
   ),
 )
@@ -1258,6 +1328,25 @@ log(
       : precision < 0.5 ? ' (below 0.5 — tighten scope/priming next time, don\'t add agents)' : ''),
 )
 
+// TOOL-aMendedFleet-17 S1 - the class names a claim's HEAD labels denote. Only the leading run of
+// `C<n>`, `[C<n>]`, each optionally followed by `:` or `,`, is read, so a `C3` in the prose is not
+// a label. Label n names item n's first token after an optional `[ ]`/`[x]` box when that token is a
+// lowercase slug; otherwise, and for an n outside the items, the label itself, which no slug spells.
+function extractFindingClasses(claim, items) {
+  const names = []
+  let rest = String(claim || '')
+  let m
+  while ((m = /^\s*(?:\[C(\d+)\]|C(\d+))[:,]?(?=\s|$)/.exec(rest))) {
+    rest = rest.slice(m[0].length)
+    const n = m[1] || m[2]
+    const item = items[n - 1]
+    const slug = typeof item === 'string' ? /^(?:\[[ x]\]\s+)?([a-z][a-z0-9]*(?:-[a-z0-9]+)*)(?=\s|$)/.exec(item) : null
+    const name = slug ? slug[1] : 'C' + n
+    if (names.indexOf(name) === -1) names.push(name)
+  }
+  return names
+}
+
 // TOOL-aSightedSkeptic-8 S3 - THE LEDGER, every finding and its verdict in id order, refuted ones
 // included: the only place a refuted finding reaches a record. Read through verdictById by the
 // integer id, never by `ref` (two findings at one file:line would collapse into one row).
@@ -1273,6 +1362,8 @@ const ledger = allFindings.map((f) => {
     reason: conflicts.has(f.id) ? 'contradictory verdicts' : orphanDuplicates.has(f.id) ? 'duplicate of an unconfirmed id' : v ? String(v.reason || '') : '',
     fixVerdict: v && FIX_VERDICTS.indexOf(v.fixVerdict) !== -1 ? v.fixVerdict : null,
     claim: f.claim,
+    // TOOL-aMendedFleet-17 S2 - empty with no checklist, where no label can denote a class.
+    classes: CHECKLIST_ITEMS.length ? extractFindingClasses(f.claim, CHECKLIST_ITEMS) : [],
   }
 })
 // S4 - the confirmed set in the shape `priorFindings` reads, so round N+1 is handed it rather than a
@@ -1298,15 +1389,24 @@ function renderPromptLine(v) {
 function renderCell(v) {
   return renderPromptLine(v).replace(/\|/g, '\\|')
 }
-// The eight columns are the hand-off to TOOL-aSightedSkeptic-9; `claim` rides the ledger only (spec F4).
+// The first eight columns are the hand-off to TOOL-aSightedSkeptic-9; `claim` rides the ledger only
+// (spec F4). TOOL-aMendedFleet-17 S3 - `classes` is the ninth, its names joined by one space.
 function renderAppendix(rows) {
   if (!rows.length) return ''
-  const cols = ['id', 'lens', 'ref', 'severity', 'skepticSeverity', 'verdict', 'reason', 'fixVerdict']
+  const cols = ['id', 'lens', 'ref', 'severity', 'skepticSeverity', 'verdict', 'reason', 'fixVerdict', 'classes']
   return ['## Appendix — every finding', '', '| ' + cols.join(' | ') + ' |', '|' + cols.map(() => '---').join('|') + '|']
-    .concat(rows.map((e) => '| ' + cols.map((c) => renderCell(e[c])).join(' | ') + ' |'))
+    .concat(rows.map((e) => '| ' + cols.map((c) => renderCell(c === 'classes' ? (e.classes || []).join(' ') : e[c])).join(' | ') + ' |'))
     .join('\n')
 }
 const appendix = renderAppendix(ledger)
+// TOOL-aMendedFleet-18 S1 - every count the verify stage produced, the four severities over RAW
+// confirmed findings by binding grade; a grade outside the closed four is counted in none.
+const verifiedCounts = { raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length,
+  unverified: unverified.length, blocker: 0, high: 0, medium: 0, low: 0 }
+for (const f of confirmed) {
+  const g = deriveBindingSeverity(f)
+  if (SEVERITIES.indexOf(g) !== -1) verifiedCounts[g]++
+}
 
 // U6/S7: the run that most needs a written report is the one where findings were raised and nothing
 // came back to judge them. The old `judged === 0` early return returned WITHOUT a report in exactly
@@ -1320,17 +1420,20 @@ if (confirmed.length + unverified.length === 0) {
   // A REFUTATION OVER A PARTIAL FAN DEFERS. It used to return `… treat as partial` beside a null
   // count, which a caller had to parse prose to tell from the clean result on the line below it.
   const deferred = pendingLabels.length > 0
+  const shapeLine = renderStageShape('verify', verifiedCounts, lensesRunning + batches.length)
+  log(shapeLine)
   const lensYield = deriveLensYield(ledger, null) // TOOL-aEvidencedLens-6 S4 - no synthesis, no items
   printLensYield(lensYield)
   return {
-    exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: pendingLabels,
+    shape: shapeLine,
+    exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: pendingLabels, durable,
     // TOOL-dTieredTribunal-1 S3 - null, never 0. Every finding was refuted, which is a RESULT, but
     // no synthesis pass ran to adjudicate a blocker count, so there is none to report.
     confirmed: [], report: null, precision, root: repo, blockers: null, highs: null,
     lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: 0, uncertain: 0,
     conflicts: conflicts.size, duplicates, spurious, lensesReused: reusedLens.size, batchesReused,
     note: deferred
-      ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${lensesRunning} lenses died — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`
+      ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${lensesRunning} lenses died — ${renderRerunTail(pendingLabels.join(', '), false)}`
       : 'all findings adjudicated and refuted',
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
     // TOOL-aSightedSkeptic-8 S5 - no report is written on this path (spec F3), so the return is the
@@ -1343,27 +1446,36 @@ if (confirmed.length + unverified.length === 0) {
 // set that is incomplete, and a dead skeptic batch means findings nobody judged; either way the report
 // would be rewritten by the re-run, and a report over a half-judged set is the one document that must
 // not call the run finished. The BASE `PARTIAL` path returned an INTEGER `blockers` over exactly that
-// set. Every result that did come back is on disk under the key, so the re-run pays only for the dead.
+// set. Under `workerType: 'none'` every result that did come back is on disk under the key, so the
+// re-run pays only for the dead; under a named type nothing is, and it pays for every judge again.
 if (pendingLabels.length) {
   log(`WARNING: ${pendingLabels.length} agent(s) did not return (${pendingLabels.join(', ')}) — DEFERRED, and no synthesis runs over a partial set. ` +
     `The ${confirmed.length} confirmed and ${unverified.length} unverified finding(s) so far:`)
   for (const f of confirmed) log(`  CONFIRMED [${deriveBindingSeverity(f)}] lens=${f.lens} ${f.ref} - ${f.claim}`)
   for (const f of unverified) log(`  UNVERIFIED [${f.severity}] lens=${f.lens} ${f.ref} - ${f.claim}`)
+  const shapeLine = renderStageShape('verify', verifiedCounts, lensesRunning + batches.length)
+  log(shapeLine)
   const lensYield = deriveLensYield(ledger, null) // TOOL-aEvidencedLens-6 S4/S5 - a dead lens's row reads returned: false
   printLensYield(lensYield)
   return {
-    exit: 'deferred-platform', key: reviewKey, pending: pendingLabels,
+    shape: shapeLine,
+    exit: 'deferred-platform', key: reviewKey, pending: pendingLabels, durable,
     root: repo, raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length,
     unverified: unverified.length, uncertain: uncertainFindings.length, conflicts: conflicts.size, duplicates, spurious, precision,
     lensesRun: liveResults.length, lensesDead, skepticsDead, lensesReused: reusedLens.size, batchesReused,
     report: null, summary: '', blockers: null, highs: null,
-    note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`,
+    note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — ${renderRerunTail(pendingLabels.join(', '), false)}`,
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
     ledger, confirmedFindings, appendix, lensYield, // TOOL-aSightedSkeptic-8 S5 - what was judged so far; `exit` says partial
   }
 }
 
 // --- Phase 3: SYNTHESIZE — one agent writes the report ------------------
+// TOOL-aMendedFleet-18 S3/S4 - rendered BEFORE the synthesis, because that agent writes the record and
+// this script cannot: the line the record copies and the line the final return carries are one string.
+// Its `out-tokens` therefore excludes the synthesis agent's own spend (spec section 3).
+const synthShape = renderStageShape('synth', verifiedCounts, lensesRunning + batches.length + 1)
+log(synthShape)
 // TOOL-aEvidencedLens-6 S6 - the per-lens counts that exist before the synthesis, for its verbatim block.
 const preSynthYield = deriveLensYield(ledger, null)
 phase('Synthesize')
@@ -1530,6 +1642,9 @@ const synth = await agent(
     // TOOL-aSightedSkeptic-8 S7 - the harness renders the appendix and the agent only copies it: a
     // table composed from these lines would miss every refuted finding, which no line above shows.
     // The copy is NOT verified here (spec F2); the return's `appendix` holds the exact text.
+    // TOOL-aMendedFleet-18 S4 - the shape line rides the same copy instruction; the return's `shape` holds it.
+    `\n\nREVIEW-SHAPE LINE - copy the review-shape line between the two marker lines below VERBATIM, alone on its own line, immediately above the appendix heading, and neither marker line copied.\n` +
+    `<<<SHAPE\n${synthShape}\nSHAPE>>>` +
     (appendix
       ? `\n\nAPPENDIX - the report's LAST section, after everything else, is the text between the two marker lines ` +
         `below, copied VERBATIM: unedited, no row added, dropped, reordered or reworded, and neither marker line copied.\n` +
@@ -1624,9 +1739,10 @@ if (synth) {
 // `complete` and every confirmed finding was lost with nothing logged. The findings exist here in
 // memory - the only thing missing was saying so before the return threw them away.
 // TOOL-dDerivedDocket-29 - and the findings are ALSO on disk now: every lens and batch that returned
-// wrote its file under the key, so a re-run reuses all of them and dispatches the synthesis alone.
+// wrote its file under the key, so a re-run reuses all of them and dispatches the synthesis alone -
+// under `workerType: 'none'` only; under a named type none wrote one (TOOL-aMendedFleet-111 S6).
 if (!synth) {
-  log(`WARNING: the synthesis agent DIED. No report was written, and the ${confirmed.length} confirmed finding(s) below are in this log and in ${keyDir}; a re-run with identical args dispatches only the synthesis:`)
+  log(`WARNING: the synthesis agent DIED. No report was written, and the ${confirmed.length} confirmed finding(s) below are in this log${durable ? ` and in ${keyDir}` : ''}; ${durable ? 'a re-run with identical args dispatches only the synthesis' : renderRerunTail('', true)}:`)
   for (const f of confirmed)
     log(`  CONFIRMED [${deriveBindingSeverity(f)}] lens=${f.lens} ${f.ref} - ${f.claim} | ${renderFixLine(f)}`)
   for (const f of unverified) log(`  UNVERIFIED [${f.severity}] lens=${f.lens} ${f.ref} - ${f.claim}`)
@@ -1640,9 +1756,11 @@ printLensYield(lensYield)
 // TOOL-dDerivedDocket-29 S5 - past the partial-fan return above, the synthesis is the only agent left
 // that can have died, so it alone decides `exit` here. The tally fault stays `complete`.
 return {
+  shape: synthShape, // TOOL-aMendedFleet-18 S3 - the line handed to the synthesis, unchanged
   exit: synth ? 'complete' : 'deferred-platform',
   key: reviewKey,
   pending: synth ? [] : ['synth'],
+  durable,
   lensesReused: reusedLens.size,
   batchesReused,
   root: repo,
@@ -1677,7 +1795,7 @@ return {
     // Lens and skeptic deaths never reach this return (TOOL-dDerivedDocket-29), so the last two arms
     // speak of UNUSABLE verdicts: a batch that returned with an id missing, spurious or contradicted.
     !synth
-      ? `DEFERRED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log and on disk — re-run with identical args to dispatch only the synthesis`
+      ? `DEFERRED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log${durable ? ' and on disk' : ''} — ${durable ? 're-run with identical args to dispatch only the synthesis' : renderRerunTail('', true)}`
       : tallyFault
         ? `UNVERIFIED: the report was written, but its item list does not place every confirmed finding exactly once (${tallyFault}), so blockers and highs are null`
         // TOOL-aSightedSkeptic-6 S8 - the uncertain count apart from the no-verdict count, so a run whose

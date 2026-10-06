@@ -58,5 +58,4 @@ nothing exists. An empty shortlist plus recall-dark layers means "I could not se
 - Fan-in is an import/identifier heuristic, not a resolved call graph: it over-counts common names and
   under-counts registry/dynamic-dispatch seams (which look cold but are heavily reused). Treat fan-in
   as a ranking hint, not ground truth.
-- The lookup is **advisory** — it never fails a build. The closing loop that catches reinvention you
-  shipped anyway is `map_diff --converge` at review time.
+- The lookup is **advisory** — it never fails a build.

@@ -22,10 +22,11 @@ kits = [
   "settings-merge", "check-wiring", "push-main", "check-kit-versions", "check-install-prefix",
 ]
 
-# EMPTY, and that is a measurement rather than an oversight: both fenceable project-property blocks
-# apply here. This fleet is multi-OS (four nodes, Windows and POSIX shells), and the security
-# section's outbound surface exists.
-drop_blocks = []
+# `security-outbound` and `cross-os` apply here, so both stay: this fleet is multi-OS (four nodes,
+# Windows and POSIX shells), and the security section's outbound surface exists. `node-table` is
+# dropped (PLAY-aMendedFleet-4): the four-node registry is the wrapper's `## Node registry` table,
+# above the rendered region, and a one-row §2 table beside it was a second, incomplete registry.
+drop_blocks = ["node-table"]
 
 [answers]
 # STATED, not sniffed. A probe reading the environment baked node `a`'s identity into a charter on a

@@ -127,6 +127,7 @@ tier2-review self-test	kit	selftests
 transition-audit arms	repo	declarations
 unattended kit gate	repo	declarations
 unattended protocol size	repo	product
+unattended skill size	repo	product
 unattended skill wiring	repo	wiring
 unattended-build self-test	kit	selftests
 verdict epoch (kit version dates the engine)	repo	declarations

@@ -15,6 +15,13 @@
 # docs/map works fine.
 MAP_ROOT=memory/map
 
+# Repo-relative directories whose files are RECORDS rather than code -- a memory tree, a docs
+# archive -- space- or comma-separated, quoted if more than one: "memory docs/adr". map_diff.py
+# splits its coverage figure on them into a `# code:` line, the convergence metric, and a
+# `# records:` line. Blank, the digest prints an `undeclared` line instead and its one header
+# figure mixes code with records. An entry naming no tracked path prints DEAD PROBE, never a split.
+RECORD_ROOTS=
+
 # Where adopt-codebase-map.sh copies the gate template — a path INSIDE the directory your
 # project's existing test suite collects (pytest/vitest-adjacent/…). Zero CI changes by
 # design: the gate rides the suite that already gates your merge bar.
@@ -41,17 +48,11 @@ MAP_DIFF_CMD="python <prefix>/codebase-map/map_diff.py"   # the pre-stamp shape;
 # Leave empty when every present layer has an extractor. Quote it — it has spaces.
 RECALL_DARK_LAYERS=""
 
-# Fan-in at/above which a symbol counts as a reusable "seam": referenced from >= this many distinct
-# files (import/identifier positions). Used by reuse_lookup (hot-seam ranking) and map_diff
-# --converge (collision detection). Integer >= 1; default 3. Raise it in a big repo where 3 files
-# is common, lower it in a small one.
+# Fan-in + install sites at/above which a symbol counts as a reusable "seam": files referencing it
+# (import/identifier positions) plus files carrying an inlined canonical copy of it (a `# >>> <name>`
+# marker). Used by reuse_lookup and gen_map --seed-affordances alike. Integer >= 1;
+# default 3. Raise it in a big repo where 3 files is common, lower it in a small one.
 SEAM_FANIN_THRESHOLD=3
-
-# Optional: a file (relative to the repo root) holding a single integer — the verbatim-clone count
-# from an adopted clone-ratchet kit (e.g. jscpd baseline). map_diff --converge reports it as
-# `new_clones`; folding a duplicate drops the count. Leave unset when no clone kit is adopted
-# (--converge then reports `new_clones: null`). It is NOT a codebase-map artifact and is never gated here.
-CLONE_COUNT_FILE=""
 
 # How many feature dossiers may declare an EMPTY `decisions` list. SHRINK-ONLY: it is a debt
 # being drained, not a tolerance. SHIPS UNSET ON PURPOSE — a number measured on gov's corpus is

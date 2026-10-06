@@ -236,8 +236,9 @@ def row_docs(root, m, conf):
     archive holding them was written.
 
     NOT "every .md under archive/". That sweeps in the frozen charter snapshots and the retired
-    ledger shards, which are prose. They contribute no keyed rows today, so the naive widening looks
-    harmless — measured, it moves the row count by nothing and the `loose` count by seven — but a
+    ledger shards, which are prose. They contributed no keyed rows at 993b64c54 (2026-09-13), so the
+    naive widening looked harmless — measured then, it moved the row count by nothing and the
+    `loose` count by seven — but a
     quoted example row inside one would red the `unkeyed` branch on a file nobody is permitted to
     edit, and the only remedy would be to edit it.
 
@@ -516,7 +517,7 @@ class ParsedRow:
 
     `form` is 'dash' | 'legacy'; `keyed` is False when the id is a bare family with no slug and no
     sequence, which is a ROW without an id rather than a line that is not a row — the distinction
-    hygiene check 8 cannot make and the reason eleven BRAND rows go uncounted today.
+    hygiene check 8 cannot make and the reason BRAND rows of that shape go uncounted.
     """
 
     __slots__ = ("raw", "form", "id", "keyed", "status", "qualifiers", "closed_by",
@@ -1523,7 +1524,7 @@ def cmd_selftest():
             lambda: read_field("OPEN ARCH — a body", "keyed"))
         arm("a bare-family row still carries its status, so it COUNTS", "True",
             lambda: read_field("- ARCH · OPEN · a body", "live"))
-        # The two fields -61 and -65 build on. `opened` is empty on every real row today; its SLOT
+        # The two fields -61 and -65 build on. `opened` may be empty on every real row; its SLOT
         # is what this unit fixes, so the arm is what stops -65 from having to move severity.
         arm("severity is lifted off the head of the body", "'MED'",
             lambda: read_field("- ARCH-tOne-1 · OPEN · MED: a body", "severity"))
@@ -1839,6 +1840,8 @@ def main(argv):
 
 
 if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8", errors="backslashreplace")
     try:
         sys.exit(main(sys.argv))
     except Problem as exc:

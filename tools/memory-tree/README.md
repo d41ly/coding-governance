@@ -17,7 +17,7 @@ ARCH-bOrderlyAtlas-1.)
 | `.memory-tree.conf.example` | the per-repo config — `MEMORY_ROOT`, `DISCIPLINES`, discipline→`FAMILIES`, optional `TOMBSTONE_ROOTS`. Copy to your repo root as `.memory-tree.conf`. |
 | `check-memory-hygiene.sh` | the gate — 26 checks (1-12, 21, 22, 23 and 25 in the shell, 13-16 delegated to `corpus_ids.py`, 17-19 to `gotchas.py`, 20 and 24 to `row_grammar.py`, 26 to `transition_audit.py`; 21 owns its fail branches in the shell and delegates only the PARSE to `gen_build_index.py`, because `check-arms.py` discovers its population from tracked shell and cannot see a Python raise), grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
 | `row_grammar.py` | check 20 — one id, one row per row document. Pinned shrink-only by `ROW_DUPLICATE_PIN`; undeclared means 0, the strictest value. Arms live in its own `--selftest`, which is a gate leg, because the shell arm-scanner cannot reach a Python module. Also the backlog-row grammar other engines import (`parse_row`, `census`), the `SEVERITY_UNLABELLED_PIN` and `LIVE_ROW_PIN` shard ratchets (blank = unarmed, announced as NOT MEASURED), `--emit-pin` for all three pins, and `--ages`, row age DERIVED from git. |
-| `gen_build_index.py` | the generated build index (`--write` / `--check` / `--selftest`); check 9 calls it. Renders each build README's generated region, `LIVE.md`, and `ledger/<month>.md` shards from build front matter plus every spec's status header — a build's status is a pure function of its units', so nothing is authored and nothing rots. Under `BACKLOG_MODE=builds` it also renders the family views and owns the `--asks` print modes and the `--new-build` scaffold; its `--selftest` compares [Backlog modes](#backlog-modes--authored-shards-and-per-build-asks) against `backlog.py`'s declarations. |
+| `gen_build_index.py` | the generated build index (`--write` / `--check` / `--selftest`); check 9 calls it. Renders each build README's generated region, `LIVE.md`, and `ledger/<month>.md` shards from build front matter plus every spec's status header — a build's status is a pure function of its units', so nothing is authored and nothing rots. With `LIVE_DORMANT_DAYS` set, `LIVE.md` gains a `Last record` column, the newest date the build's own records carry, and an `Activity` column reading `active` or `dormant` against the newest record date in the tree, active rows first; blank renders the file unchanged. With `LIVE_LANDED_UNCLOSED` set to `1`, `LIVE.md` also gains a trailing `Landed-unclosed` column, each live build's non-terminal units whose id tracked product source cites, read by calling the drift-audit kit's own `non_terminal_specs_cited_by_product_source` signal in-process, so it is a candidate to close and never a verdict; the key declares that tree carries that kit, an empty evidence population refuses rather than rendering zeros, and blank never imports it. Under `BACKLOG_MODE=builds` it also renders the family views and owns the `--asks` print modes and the `--new-build` scaffold; its `--selftest` compares [Backlog modes](#backlog-modes--authored-shards-and-per-build-asks) against `backlog.py`'s declarations. |
 | `backlog.py` | the per-build ask model: the `BACKLOG.md` grammar, the spec-header verbs `closes` and `advances`, the order-free status fold, the verdicts as data (`VERDICT_CODES`), READY, and the family-view renderer with the one relocation recipe. A library that reads no tree; its arms run inside `gen_build_index.py --selftest`. |
 | `migrate_backlog.py` | the switch from shards to per-build asks: the planner (`--plan`), the switch-over writer (`--write`), the relocation engine (`--relocate` / `--ingest` / `--repair`), the straggler census (`--stragglers`) and the recipe (`--recipe`), plus `--selftest`. It calls `backlog.py`'s grammar and fold and `transition_audit.py`'s delta, and spells neither. |
 | `transition_audit.py` | hygiene check 26, the transition-merge audit: a merge joining a lineage that edits authored shards to one that renders them from build folders must account for every row change with one `RELOCATED` row. Dormant under `shards`; under `builds` it keys rows through the memory-recall kit's anchor grammar and refuses by name without it. |
@@ -37,7 +37,7 @@ ARCH-bOrderlyAtlas-1.)
 | `kit.toml` | this kit's descriptor for the deployer: file roles, the withheld self-tests, and the `requires_if` rows naming the memory-recall kit. |
 | `README.md` | this file. |
 | `corpus_ids.py` | the id + path classifier behind checks 13-16 (13-15 pinned, 16 structural) (`--report` / `--check` / `--measure` / `--print-defined-ids` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a four-rule registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from the memory-recall kit and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every pin is measured per corpus; checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none. `--print-defined-ids` prints the id grammar as a POSIX ERE on its first line, then every id the corpus DEFINES, for a caller that must join cited ids against the set without spelling the grammar — the kickoff checker's `--card --append` is that caller. |
-| `gotchas.py` | the bug-class catalogue behind checks 17-19 (`--check` / `--write` / `--report` / `--for-diff <range>` / `--for-paths <path>...` / `--declares` / `--selftest`). Anchors are DERIVED from each record's body, not authored; `--for-diff`'s stdout IS the reviewer's checklist for that diff. |
+| `gotchas.py` | the bug-class catalogue behind checks 17-19 (`--check` / `--write` / `--report` / `--for-diff <range>` / `--for-paths <path>...` / `--declares` / `--selftest`). Anchors are DERIVED from each record's body, not authored; `--for-diff`'s stdout IS the reviewer's checklist for that diff, ranked by anchor specificity (`path`, then `directory`, then `basename`, universals first and outside the ranking) and cut at a tier boundary: whole tiers print in full while they fit `CHECKLIST_FULL_BUDGET`, 12, and every class from the first tier that does not prints as one line. No class leaves it. |
 | `check-arms.py` | the harness meta-gate: every `fail` BRANCH is armed by a positive assertion naming its own failure text, or pinned in a shrink-only list. Keyed on the call site, pinned in both directions, and excluded from its own scan. Arms are read from the gate's `<stem>.test.sh` and an optional `<stem>.local.test.sh`; pins from `<MEMORY_ROOT>/project/unarmed-branches.txt` and a sidecar `unarmed-branches.txt` beside the gate, and `--report` names the file that armed or pinned each branch. Floored per gate by `ARMS_FLOORS`, which is REFUSED blank while any gate is discovered; `--emit-floors` prints the measured line. Its helpers come from `tree_lib.py`, the one module the kit's engines share, so no engine imports a sibling engine. |
 | `kit-dogfood-parity.test.sh` | the two docs this kit SHIPS must equal the two an adopting repo RUNS ON, modulo the tool-root install prefix (`--check` / `--render`). |
 | `adopt-memory-tree.sh` | `--scaffold` an empty tree that passes once its conf declares the keys the gate reads from the config (new projects). `--render` re-renders the four rendered documents in a tree that already carries the adoption marker, and writes nothing else — the mode `[[regenerate]]` names, and the only one that refreshes them after adoption. It REFUSES on a tree with no marker, and on a kit directory missing any of the four templates, rather than replacing your committed rule set with a placeholder. |
@@ -156,6 +156,21 @@ Measured — that is what the previously published mixed-prefix literal did. Two
 section honest rather than merely correct today: `check-wiring.sh` RUNS the configured command on a
 scratch three-way before it reports `ok`, and `check-wiring.test.sh` DERIVES both spellings above by
 running `--fix` in a fixture of each layout, so a stray third spelling in this file reds the bar.
+
+**The wholly GENERATED views take one side instead.** A merge touching them on both sides is never
+reconciled by hand: it keeps the current side, and check 9 or check 17 reds the stale result until
+`gen_build_index.py --write` or `gotchas.py --write` re-renders it:
+
+```gitattributes
+memory/LIVE.md merge=ours
+memory/ledger/*.md merge=ours
+memory/gotchas/INDEX.md merge=ours
+```
+
+git ships `ours` as a merge STRATEGY, not a driver, so the attribute needs one per-node config line,
+`git config merge.ours.driver true`. Unset, git silently falls back to the text merge and conflicts.
+`check-wiring.sh` reports the unset driver `UNWIRED`, sets it under `--fix` and `--session`, and never
+overwrites a value already set.
 
 ## Backlog modes — authored shards and per-build asks
 
@@ -298,12 +313,37 @@ probe: ask text is written by whoever filed it.
 `--asks <FAMILY>` narrows it to one family, and `--asks <ID>` prints one ask's detail, terminal or
 not. `--all` adds the terminal asks. `--json` prints one object, `mode`, `examined` and `asks`, for a
 program: under `shards` its `mode` reads `shards` and its asks are empty by design, so a reader
-falls back to the authored shards. `--tsv` prints the READY grades as TAB rows. `--status <token>`,
+falls back to the authored shards. Every JSON row carries the ask's `pointer` tail and a `summary`
+of its text, capped in UTF-8 bytes at `ASK_SUMMARY_BYTES`. `--path <path>…` keeps the asks whose
+pointer or merged `seen` locator is one of those paths or a directory on either side of one, ranks
+them by severity then newest filing, and caps them at `--limit <n>` (`ASK_PATH_LIMIT` when omitted,
+0 lifts it); the JSON object then adds `paths`, `matched` and `cut`, and `--path` refuses an id,
+`--probe`, `--tsv` and the READY options. `--tsv` prints the READY grades as TAB rows. `--status <token>`,
 `--build <slug>`, `--ready [IDLIST]`, `--target <slug>`, `--live-builds <slug>…`, `--at <rev>` and
 `--probe <id>` qualify `--asks` and never run alone; `--at` reads the records and the conf at that
 revision. `--new-build <slug> --asks <IDLIST>` scaffolds the build README an owner lands: it prints
 the readiness table first, refuses when an id is filed nowhere or every id grades `no`, and
 otherwise writes and stages that README and its contract row, then renders.
+
+`--new-spec <ID> --tier <1|2> [--order <n>] [--base <sha>]` writes one spec skeleton,
+`<MEMORY_ROOT>/builds/<slug>/spec/<today>-spec-<ID>.md`, and prints its path and its slot count. The
+header is filled: status `OPEN`, `rev-1`, today, the node from the slug, `--tier`, `base` from
+`--base` or `HEAD`, `streams` from the id's family, and `order` only when `--order` is given. The
+`##` headings are read from the skeleton fence of the installed `TEMPLATE-SPEC.md`, and the body
+already carries every shape a dated cutoff in the conf demands. Each part only an author can write
+is a slot opening with the fill marker `<fill:`, which hygiene check 12 refuses as an unfilled
+skeleton placeholder on both tiers. It refuses before writing on a bad tier, id, family, slug,
+duplicate id, existing file, `--base` or `--order`, and it stages nothing and renders nothing. After
+filling every slot, run `git add <the printed path>` and then `python <kit>/gen_build_index.py --write`.
+
+`--doctor <slug>` prints every failing rule one build folder owes, in one run, and writes nothing.
+`--doctor` runs two graders past their first failure: `hygiene`, the gate's full `--offenders` run
+filtered to keys naming the folder or an id of its slug, and `slot-contract`, the registry row,
+slots and slot budget of that folder's README. `--doctor` costs one full hygiene run, one to three
+minutes on node a. `--doctor` needs the folder tracked, since both graders read tracked files: an
+untracked file is counted with the `git add` remedy, and a folder with nothing tracked exits 2
+ungraded. It exits 1 on a failing rule and 2 when a grader cannot answer; the spec-token checker
+is not consulted.
 
 ### Stragglers
 
@@ -459,9 +499,9 @@ method.
 **Never read a probe's exit status as a verdict — these exit 0 on a miss.** A clean "nothing found" is an ANSWER:
 record it as the no-seam evidence, and do not re-run with softer words until it says something.
 
-**A partial-recall or blind-layer notice means the probe cannot see that layer at all.** In this repo **bash is
-recall-dark**, so the gates, adopters and hooks that ARE the product never surface as seams; `grep` that layer
-specifically and say so in §10.
+**A partial-recall or blind-layer notice means the probe cannot see that layer at all.** Its banner names
+every unscanned layer, derived from the tree; where it names one, `grep` that layer specifically and say so
+in §10.
 
 **A miss on one phrasing is not absence.** Try the behaviour, then the artifact noun, once.
 

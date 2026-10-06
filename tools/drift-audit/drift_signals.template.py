@@ -1,6 +1,6 @@
 """drift_signals.py — THIS PROJECT's drift-signal declarations (the only project-owned code).
 
-gov:kit drift-audit@1.23
+gov:kit drift-audit@1.24
 
 Copied from <prefix>/drift-audit/drift_signals.template.py at adoption. Fill the four required names below,
 then run `python <prefix>/drift-audit/drift_report.py`.
@@ -99,8 +99,10 @@ TRACE_CUTOFF: str = ""
 TRACE_GLOBS: list[str] = []
 
 # TRACE_WAIVER: where the signal's per-spec waiver registry lives, repo-relative. One row per waived
-# spec, `<spec path><TAB><reason>`, for a CLOSED unit no TRACE_GLOBS subject can ever name, such as a
-# records-only or tooling-only deliverable. BLANK keeps `<MEMORY_ROOT>/project/trace-waiver.txt`,
+# spec, `<spec path><TAB><reason>`, for a CLOSED unit no TRACE_GLOBS subject can ever name, such as
+# one whose product landed before your id-in-subject convention. A records-only deliverable takes NO
+# row: its spec declares `records-only` as a `·`-separated field of its status header, and the signal
+# sets it aside and lists it under `records_only`. BLANK keeps `<MEMORY_ROOT>/project/trace-waiver.txt`,
 # where an absent file is an empty waiver set. Declare it when your memory tree has no `project/`
 # directory. A DECLARED path that is absent or outside the tree is a finding of its own.
 TRACE_WAIVER: str = ""
@@ -129,6 +131,9 @@ PINS: dict[str, int] = {
     #   Left at 0 every non-empty count reads "out of tolerance", which is how a reader learns
     #   to skip the line. The kit cannot ship a number for it: the value is your corpus’s, and a
     #   guessed pin is the one thing this block forbids.
+    # "cutoff_keys_armed": 0,   # armed `_CUTOFF` keys in your tracked root confs. Seed it from your
+    #   first report's value; with no entry it reports and never gates, because the shipped example
+    #   confs arm a key and a default of 0 would red your first `--check`.
     # "aborted_work_landed": 0,     # REPORT-ONLY: seed it at what your first report MEASURES; it
     #   drains as `--settle` writes `work-landed-at` onto each listed record.
     # "discarded_work_landed": 0,   # REPORT-ONLY: seed it at what your first report MEASURES; no
@@ -136,11 +141,55 @@ PINS: dict[str, int] = {
 }
 
 # --------------------------------------------------------------------------------------------
-# CHARTER — optional. The file holding the node-registry table, used to resolve THIS node's tag for
-# the node-scoped dangling-pointer signal. Defaults to AGENTS.md then CLAUDE.md when unset.
+# BASELINES — optional. For a GATEABLE signal whose detail rows each name their offender by `id`
+# (`non_terminal_specs_cited_by_product_source`, `closed_specs_with_no_product_commit`), list the
+# offender ids instead of pinning a count: a pin cannot tell a drained offender from a new one at an
+# equal count, and a set can. `--check` reds on an id the list does not carry, on a listed id that
+# no longer offends (delete its line), and on a list that gains an id against the base, or is first
+# seeded above the base's pin. Seed it with the ids your first report measured, and drop that
+# signal's PINS entry in the same change: a signal takes one bound, and declaring both is refused.
+# --------------------------------------------------------------------------------------------
+
+BASELINES: dict[str, list[str]] = {}
+
+# --------------------------------------------------------------------------------------------
+# CHARTER — optional. The governing doc a HANDKEPT probe reads as `ctx.charter`, as the example
+# probe above does. Defaults to AGENTS.md then CLAUDE.md when unset.
 # --------------------------------------------------------------------------------------------
 
 # CHARTER = "AGENTS.md"
+
+# --------------------------------------------------------------------------------------------
+# AUTO_MEMORY_DIR — optional. The agent auto-memory directory `dangling_pointers_in_own_ledger`
+# audits: every backticked repo path in its `*.md` notes is checked against `git ls-files`. Two
+# expansions: `~` is the user's home, and `{checkout}` is the primary checkout's absolute path with
+# every character outside `[A-Za-z0-9-]` turned into `-`, which is how Claude Code keys a project.
+# For Claude Code: "~/.claude/projects/{checkout}/memory". BLANK is NOT ASKED; a declaration naming
+# no directory on this node reads DEAD PROBE. Report-only: the notes are one machine's.
+# --------------------------------------------------------------------------------------------
+
+AUTO_MEMORY_DIR: str = ""
+
+# --------------------------------------------------------------------------------------------
+# REMOTE_CI_WORKFLOW — optional. The workflow file (e.g. "ci.yml") whose runs on the default branch
+# `remote_ci_red_streak` reads through an authenticated `gh`. BLANK is NOT ASKED: a repo with no
+# remote CI reads neither a clean 0 nor a dead probe. Report-only, and never asked under --check.
+# --------------------------------------------------------------------------------------------
+
+REMOTE_CI_WORKFLOW: str = ""
+
+# --------------------------------------------------------------------------------------------
+# DEAD_READINGS_LIMIT and DEAD_FILED — optional. A report-only signal that reads DEAD PROBE for
+# DEAD_READINGS_LIMIT recorded readings in a row (the shipped 10 when absent) stops printing
+# "ignore its value" and asks you to take it out of SIGNALS, or to file an ask and name it here.
+# DEAD_FILED maps a signal to that ask's id, and the status then prints `filed <id>`; an entry for a
+# signal that is not in the report, or is live, is named in the header until you take it out. The
+# readings come from `--check`'s node-local history, so this never moves an exit status.
+# --------------------------------------------------------------------------------------------
+
+# DEAD_READINGS_LIMIT = 10
+
+DEAD_FILED: dict[str, str] = {}
 
 # --------------------------------------------------------------------------------------------
 # DECLARED_EMPTY — signals whose population is empty ON PURPOSE. `--check` reds a gateable signal
@@ -183,4 +232,5 @@ DECLARED_EMPTY: set[str] = {
 
 RATCHETS: list[dict] = [
     # {"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"},
+    # {"file": "<path of this file>", "key": "cutoff_keys_armed", "weakens": "up"},
 ]

@@ -1,6 +1,6 @@
 # memory-recall — ask your decision corpus a question, get the records that answer it
 
-<!-- gov:kit memory-recall@1.25 -->
+<!-- gov:kit memory-recall@1.26 -->
 
 A project-agnostic kit that turns a memory-tree corpus into two derived FTS5 indexes — one document
 per anchored record, one per heading-bounded chunk — fuses them with reciprocal rank fusion, and
@@ -28,7 +28,7 @@ Ported from adopter ic's `scripts/recall/` implementation at `5318064`.
 | `SKILL.template.md` | the agent-facing Skill, with the project values as placeholders. Rendered, never copied. |
 | `recall-opened.js` | **optional** PostToolUse hook that infers which hit was read. **Forked**. |
 | `recall-opened.fragment.json` | the settings block that wires that hook: event, matcher, dedup marker, hook path. |
-| `recall-opened.test.sh` | the hook's own check — 8 cases, including a non-`memory` corpus root and a sibling worktree. |
+| `recall-opened.test.sh` | the hook's own check, including a non-`memory` corpus root and a sibling worktree. Its closing `passed` line reports how many cases ran — no count is written here, for the reason the `selftest.py` row gives. |
 | `verbatim.json` | LF-normalised digests of the two verbatim files, so a silent edit to one reds the selftest. |
 
 ## Configure
@@ -41,7 +41,7 @@ file of its own. Two keys are required:
 | `MEMORY_ROOT` | the corpus root passed to `git ls-files`, and folded into the durable-home regex |
 | `FAMILIES` | the `discipline:FAMILY` pairs; the uppercase FAMILY tokens are the id allowlist |
 
-Four more keys are optional and recall-scoped. Each one is a fact about YOUR corpus, and absent,
+The keys below are optional and recall-scoped. Each one is a fact about YOUR corpus, and absent,
 each keeps the kit's default exactly. A malformed value is refused with exit 2, naming the key; it
 never falls back silently. Running this kit's `recall_conf.py` prints what each resolved to.
 
@@ -51,9 +51,11 @@ never falls back silently. Running this kit's `recall_conf.py` prints what each 
 | `RECALL_CITED_FAMILIES` | none | families your corpus CITES and never homes: they become ids, and gain no durable home. A token `FAMILIES` already declares is refused |
 | `RECALL_BUILD_QID_CUTOFF` | no boundary | `<tag>:<qid>` pairs; each node's build-era boundary in its own query log, which `--export` labels |
 | `RECALL_EXPORT_DIR` | the common git dir | a repo-relative directory for `--export`'s aggregate; one that resolves outside the root is refused |
+| `RECALL_EXCLUDE` | nothing excluded | space-separated, repo-relative glob patterns the corpus walk leaves out (`*` spans a slash), for superseded copies such as versioned snapshots under an archive. Blank is the same as absent; a pattern matching no corpus path is announced with one line on stderr |
 
 `RECALL_NODE_TAG_CLASS` and `RECALL_CITED_FAMILIES` change which strings are ids, so they are in
-`Conf.digest()` and editing one rebuilds the cache. The other two do not, and are not.
+`Conf.digest()` and editing one rebuilds the cache. `RECALL_EXCLUDE` is in it too, because it
+changes which documents exist. The export and cutoff keys change neither, and are not.
 
 ## Use
 
@@ -63,17 +65,32 @@ python3 <prefix>/memory-recall/query.py "why did the gate start refusing my push
 python3 <prefix>/memory-recall/query.py --opened <rank> --qid <N>  # record which hit answered it
 python3 <prefix>/memory-recall/query.py "<question>" --rebuild     # force a cache rebuild
 python3 <prefix>/memory-recall/query.py --export --tag a           # aggregate the log, outside the tree
+python3 <prefix>/memory-recall/query.py --used                     # was each answer cited? writes nothing
 ```
+
+`--used` joins each logged query's result ids to the ids its worktree's next commit cites, in the
+message or the added lines, through the worktree's live reflog. When that reflog is gone, a row's
+logged `head` sha stands in: the ONE commit any ref reaches whose parents include it, committed at
+or after the query, is its next commit, and two such commits count the row as `ambiguous head`.
+A removed worktree's rows with no `head` are counted unattributed rather than guessed at.
 
 `--terms` is **required**. Rewriting is the measured half of the retrieval gain upstream (records
 recall@20 0.71 → 0.84 on its hard slice) and the CLI cannot produce the terms itself — it is offline
 and stdlib-only. The caller is a model, so supplying them costs nothing. `--no-terms` runs the
 un-rewritten baseline deliberately and is logged as such.
 
+The answer keeps every hit the byte budget reaches, in two tiers. The head prints snippets while
+they stay within the `SNIPPET_SHARE` of `--budget` that `query.py` declares; every later hit
+prints as a one-line pointer, `[n] id · path:line`, and is opened by its path. A closing line names the split, and the
+query log's `n_snippets` counts the head while `n_shown` and `shown_paths` count both tiers. A hard
+top-N cut was rejected: logged opens sit beyond rank 20.
+
 ## What it writes — nothing inside your worktree
 
 The cache (`records.db`, `chunks.db`, `manifest.json`) and the append-only query log
 (`queries.jsonl`) live under `<common-git-dir>/recall/`, keyed by a digest of the worktree path.
+Each query row carries its `worktree` path and `head`, the sha HEAD named at query time (`null` on
+an unborn HEAD), so the row stays attributable after `git worktree remove` takes the reflog.
 `--export`'s aggregate is written beside the log, not into the tree, so no free-text question ever
 reaches a tracked file. The one exception is one you declare: `RECALL_EXPORT_DIR` puts it in the
 tree, and the file carries counts only.
@@ -90,24 +107,28 @@ age. Two passes run after a successful build, never before (a cache is replaceab
 replacement exists):
 
 1. **dead-worktree eviction**, unconditional and free: a sibling whose recorded `worktree` no longer
-   exists goes. A cache with **no readable manifest** is never evicted — that is the shape of a
-   sibling mid-first-build.
+   exists, or exists as an empty husk holding no `.git` entry (what `git worktree remove` leaves on
+   Windows while a process holds the directory), goes. A cache with **no readable manifest** is
+   never evicted — that is the shape of a sibling mid-first-build. A directory that cannot be
+   removed is reported `could NOT evict` and keeps its manifest for a later pass.
 2. **the byte budget**, `RECALL_CACHE_BUDGET_MB` in `.memory-tree.conf`. **Absent** = the kit's
+   default, 512 MB; **blank** = uncapped. Eviction is least-recently-queried first: a cache's age is
+   the newer of its worktree's last `query` row in `queries.jsonl` and its `built_at`, ties broken by
+   `built_at`, so a sibling queried all day from a warm cache outlives one rebuilt once and
+   abandoned. It stops the moment the tree is under budget. Three directories are never candidates: the current
+   worktree's cache (evicting it makes the budget a rebuild loop), one that is **mid-build** — a
+   database newer than its manifest, which is true during a *re*build too, when the previous manifest
+   is still readable — and one whose manifest has no `built_at`. When the budget cannot be met
+   without reaching past them, the shortfall is reported and **nothing** is deleted.
+
+Every eviction prints one line naming the worktree, its last query (`never` when no row names it) and
+its `built_at`. A cache that vanishes silently is indistinguishable from one that was never built.
 
 `RECALL_EXTRA_SOURCES` — space-separated, repo-RELATIVE files whose `KEY=value` declarations join
 the corpus as chunks, each carrying the comment block above it. Blank or absent is the pre-widening
 corpus exactly; a declared file that does not exist is skipped with one line. **Declared, never
 globbed** — corpus membership is a decision about what counts as an answer. Note for adopters: a
 file you name here is INDEXED, so do not name one holding secrets.
-   default, 512 MB; **blank** = uncapped. Eviction is least-recently-built first by `built_at`, and
-   it stops the moment the tree is under budget. Three directories are never candidates: the current
-   worktree's cache (evicting it makes the budget a rebuild loop), one that is **mid-build** — a
-   database newer than its manifest, which is true during a *re*build too, when the previous manifest
-   is still readable — and one whose manifest has no `built_at`. When the budget cannot be met
-   without reaching past them, the shortfall is reported and **nothing** is deleted.
-
-Every eviction prints one line naming the worktree and its `built_at`. A cache that vanishes silently
-is indistinguishable from one that was never built.
 
 ## Adopt (per project)
 
@@ -165,18 +186,37 @@ program imports its scoring functions and edits nothing.
 ```bash
 python check-recall.py                  # the merge-bar leg
 python check-recall.py --audit-fixture  # per-question homes, hits and overlap, plus the derivation
-python check-recall.py --data-dir DIR   # grade an already-extracted dir (what the arms use)
+python check-recall.py --data-dir DIR   # grade an already-built dir: extract.py's under a single-pair pin, build_cache's under served
+python check-recall.py --spec-probes    # a REPORT, no floor: hit@10 over the probes every spec's section 10 records
 ```
+
+**`--spec-probes` is a second, larger question set, and it pins nothing.** It harvests the
+`query.py` question and `--terms` each tracked spec's section 10 records, labels each with the
+foreign ids the same spec cites OUTSIDE section 10 (an id section 10 also cites is dropped, since
+that is where the author wrote what the probe returned), and prints hit@10 of the served path with
+`n` beside it and every set-aside counted by reason. No person has checked those labels. It cannot
+see a probe return the author never wrote into section 10, it grades today's corpus including records
+written after the probe, and only ids in the declared families are labels. An empty harvest, or
+nothing left after de-contamination, prints `DEAD PROBE` naming the stage and exits 1.
 
 **The pin names a CELL, as one token**, because `bench.py` emits a matrix that spans 0.17 to 0.83 in
-a single run and a bare scalar names none of it:
+a single run and a bare scalar names none of it. The default head is `served`:
 
 ```
-RECALL_FLOOR="records:fts5:r@5>=0.81"
+RECALL_FLOOR="served:r@5>=0.86"
 ```
 
-`fts5` because `query.py` ranks with `bm25(d, 1.0, 1.0, ALIAS_WEIGHT)` and bench's `fts5` is that
-same unweighted expression — the reason is the source, not a score.
+**Why `served` is the default.** It ranks every question through this CLI's own `query_expr` and
+`run_fusion` — the records arm and the rolled-up chunk arm, fused by `rrf` — over sets
+`query.build_cache` builds, so a change to the expression, the rollup or the fusion moves the floor.
+The older single-pair head, `records:fts5:r@5>=0.81`, still parses: it ranks the bare question over
+one set through `bench.rank_with`, a configuration no session is served, because the CLI refuses a
+question without `--terms`. Under `served` every fixture question carries two term lists: `terms`,
+the strong rewrite written after reading the answering record, and `naive_terms`, written from the
+question alone. A graded row is one (question, slice) pair, and the leg prints `h` and `R` per slice
+because strong terms SATURATE — every question hits with them — and a slice that cannot fall buys
+no headroom. A `served` run still grades less than a session sees: tracked files only, the ranked
+list rather than the `--budget`-cut text, and the pin's `k` rather than the CLI's default 20.
 
 **WHICH SUBSTRATES ARE SEED-STABLE**, because a floor pinned to one that is not is a gate whose
 verdict moves on an unchanged tree, and that is a thing to know when CHOOSING rather than to
@@ -190,16 +230,18 @@ has measured them, and this sentence says so rather than implying they were. The
 CEILING-NORMALISED figure, which reduces exactly to `h/R`: `h` questions that hit, `R` whose targets
 resolve at all.
 
-**0.81 is DERIVED, not observed.** Measured `h=10`, `R=12`, normalised 0.8333. The one-retirement
-worst case is `(h-1)/(R-1) = 0.8182`, so the pin sits just below it and the property it buys is that
-retiring one hitting record costs nothing. Retiring a NON-hitting one raises the score. A regression
-with no retirement (`9/12 = 0.75`) reds. Re-measure with `--audit-fixture`, which prints `h`, `R` and
-`(h-1)/(R-1)` beside the declared value. It reds in ONE direction — when the pin has become LOOSER
-than the worst case, i.e. unsafe. A pin left merely conservative is caught by the arms, which assert
-the literal `h=10 R=12`.
+**The value is DERIVED, not observed.** It is the floor below the one-retirement worst case
+`(h-1)/(R-1)` over every row, so retiring one hitting record costs nothing; the measured `h` and
+`R` per slice, and the arithmetic, sit in the comment above the key in `.memory-tree.conf`, which is
+the one place they are written. Retiring a NON-hitting record raises the score. Re-measure with
+`--audit-fixture`, which prints `h` and `R` per slice and `(h-1)/(R-1)` beside the declared value.
+It reds in ONE direction — when the pin has become LOOSER than the worst case, i.e. unsafe. The arms
+assert the measured `h` and `R` are not below the conf's recorded figures; a pin left merely
+conservative after the fixture grew is caught by neither.
 
 **Two predicates, and each can red ALONE** — two checks that only ever fail together are one check
-wearing two names. `test_recall_floor.py` proves both directions on this corpus:
+wearing two names. `test_recall_floor.py` proves both directions on this corpus, under the
+single-pair head over a filtered extract, which is what keeps that grammar exercised:
 
 | degradation | per-id | floor |
 |---|---|---|
@@ -252,10 +294,10 @@ measures their own value.
   corpus it does not describe and the un-forked upstream prints `index 0 records + N chunks` and
   exits 0. This kit prints a `ZERO RECORDS` diagnosis naming the resolved families, the conf path and
   `--rebuild`, on the query path and on `extract.py`'s own.
-- **On a small corpus, retrieval buys precision, not speed.** Measured on this repo — 66 tracked
-  corpus files, 496,153 bytes, 9 anchored records, 1,033 chunks — a full-corpus
-  `grep -rIl "adopt" memory/` takes 0.077 s / 0.092 s / 0.447 s across three warm runs and returns
-  31 of 66 files. The kit's index build is 0.18 s and a warm query is 1.58–2.27 s wall, dominated by
-  interpreter start-up and `git` calls, so it is **slower** than the grep at this size. What it
-  returns is a ranked handful instead of half the tree. Adopt it for the ranking, not the clock;
-  upstream's 40 MB corpus is where the 6 s cold build starts paying for itself.
+- **Retrieval buys precision, not speed.** A warm query is not faster than a full-corpus
+  `grep -rIl` over the memory root: its wall clock is dominated by interpreter start-up and `git`
+  calls, and the grep lists every file that spells the word. What a query returns instead is a
+  ranked list. Adopt it for the ranking, not the clock. The corpus is not sized here, because a
+  size typed beside the thing it measures is stale on the next edit: every query prints an
+  `index <records> records + <chunks> chunks` line, and `--stats` given beside a question prints
+  the whole cache manifest, file count included. Alone, `--stats` exits 2 with no question given.

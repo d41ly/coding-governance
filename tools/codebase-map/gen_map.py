@@ -27,7 +27,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 
 try:  # a non-UTF-8 stdout (stripped CI locale) must degrade a non-ASCII print, not crash it
-    sys.stdout.reconfigure(errors="replace")
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except (AttributeError, ValueError):
     pass
 
@@ -102,7 +102,8 @@ inventories: `{kit}/map_extractors.py`; gate: see `.codebase-map.conf` GATE_FILE
   (seeded at adoption; a new dossier is never graced, a touch drops entries).
 - `features/<feature>.md` — one dossier per feature: first ```toml fence = machine claims,
   then `## Constraints & why` · `## Shared seams` · `## Gaps` · `## Reuse affordance` prose.
-- `generated/` — `inventories.json` (keys-only) + `MAP.md` (claimant-annotated) + `symbols.json`
+- `generated/` — `inventories.json` (keys-only) + `MAP.md` (claimant-annotated) + `CARDS.md`
+  (one byte-capped card per feature, from its toml fence alone) + `symbols.json`
   (reuse-recall index — only when the SYMBOL tier is declared in map_extractors.py); regenerate
   with `{regen}`, never hand-edit.
 
@@ -124,6 +125,12 @@ inventories: `{kit}/map_extractors.py`; gate: see `.codebase-map.conf` GATE_FILE
   or `none — <why feature-specific>` (presence gated, content not). BEFORE building, run
   `python {kit}/reuse_lookup.py "<behaviour>"` to find an existing seam to wire through
   instead of reinventing it (see `{kit}/reuse-lookup.agent.md`).
+- Dossier prose carries no present-tense typed count of an inventory population (gate-enforced,
+  digits only). Remedy, one of: freeze it as a past-tense reading that cites the record which
+  measured it; point at the file that owns it; or rewrite the sentence without it.
+- Measured history lives in the record that measured it. A dossier states each constraint and its
+  reason in the present tense and cites that record's id; when, where and on which node a figure was
+  measured, and the incident behind a rule, stay in the record, never copied into the dossier.
 """
 
 
@@ -135,6 +142,7 @@ def _artifacts() -> dict[Path, str]:
     arts = {
         gen_dir / "inventories.json": m.render_inventories_json(inventories, IDS),
         gen_dir / "MAP.md": m.render_map_md(inventories, IDS, owners, tree.baseline),
+        gen_dir / "CARDS.md": m.render_cards_md(tree, IDS),
     }
     # SYMBOL recall tier (optional): render symbols.json only when the project declares symbol
     # extractors and they yield symbols — an opted-out repo gets no artifact and no gate demand.
@@ -189,13 +197,13 @@ def _seed_affordances(top: int) -> None:
         return
     ref_index = m.build_reference_index(corpus.symbol_files) if corpus.symbol_files else {}
     worklist = rl.seed_affordances(corpus, ref_index, top)
-    print(f"# seed-affordances: top {top} undeclared seams (fan-in >= {corpus.threshold})")
+    print(f"# seed-affordances: top {top} undeclared seams (fan-in + installs >= {corpus.threshold})")
     if not worklist:
         print("(none — every seam at/above the threshold already declares a ## Reuse affordance)")
         return
-    for cand, fanin in worklist:
+    for cand, fanin, installs in worklist:
         print(
-            f"- {cand.name}  [fan-in {fanin} | {cand.kind} | {', '.join(cand.files)}]  "
+            f"- {cand.name}  [fan-in {fanin} | installs {installs} | {cand.kind} | {', '.join(cand.files)}]  "
             f"-> add `seam: {cand.name} - reuse for <need>; extend via <point>` to its dossier"
         )
 

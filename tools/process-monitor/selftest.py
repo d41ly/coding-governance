@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the process-monitor engine's arms.
 
-gov:kit process-monitor@0.14
+gov:kit process-monitor@0.15
 
 Two kinds of arm and the split is deliberate. PARSING arms run over captured fixtures, so they grade
 column contracts without a live table. LIVENESS arms run over a live read, because a property like
@@ -691,6 +691,42 @@ def test_survivor_is_derived_from_a_re_read():
           (rep["survivors"], sorted(rep["killed"])), ([3], [1, 2, 4]))
 
 
+def run_settled_with_stub(listed_reads, deadline_s=None):
+    """`check_settled_survivors` over a stub census listing member 2, with a refused signal on it,
+    for the first `listed_reads` reads only. Restores the real census whatever happens."""
+    rep = reap.run_kill(1, build_tree_rows(), build_scope(1, 2, 3, 4), dry_run=True)
+    rep["errors"] = [(2, 1, "kill: 1197: Permission denied")]
+    reads = []
+
+    def scan_stub_census(forced_backend="", timeout=None):
+        reads.append(1)
+        return ([build_row(2, 1, "bash -c ./rel.sh")] if len(reads) <= listed_reads else []), {}
+    saved = census.scan_processes
+    census.scan_processes = scan_stub_census
+    try:
+        return reap.check_settled_survivors(rep, "", deadline_s)
+    finally:
+        census.scan_processes = saved
+
+
+def test_a_member_gone_at_the_settled_reread_is_not_a_signal_error():
+    """The cascade race (TOOL-aMendedFleet-105): listed by the first read, gone at the second. Its
+    refused signal was to a process already exiting. Red when `SETTLE_S` is 0 in reap.py."""
+    rep = run_settled_with_stub(1)
+    check("test_a_member_gone_at_the_settled_reread_is_not_a_signal_error",
+          (rep["survivors"], rep["errors"], 2 in rep["already_gone"], rep["rereads"]),
+          ([], [], True, 2))
+
+
+def test_a_member_present_past_the_deadline_stays_a_survivor():
+    """The settle only WAITS: a member every read still lists keeps its survivor row AND its
+    error. Red when the reclassification moves an error without reading the final census."""
+    rep = run_settled_with_stub(10 ** 6, deadline_s=1)
+    check("test_a_member_present_past_the_deadline_stays_a_survivor",
+          (rep["survivors"], len(rep["errors"]), 2 in rep["already_gone"], rep["rereads"] >= 2),
+          ([2], 1, False, True))
+
+
 def test_unaddressable_row_is_reported_not_claimed():
     saved_res, saved_chk = reap.resolve_signal_binaries, reap.check_msys_addressable
     reap.resolve_signal_binaries = lambda: {"msys": None, "native": None}
@@ -1027,8 +1063,7 @@ def test_live_tree_dies_completely():
                   "fence, not the reaper, is what this arm then measured)", file=sys.stderr)
             return
         rep = reap.run_kill(target, rows, sc)
-        fresh, _c2 = census.scan_processes()
-        rep = reap.check_survivors(rep, fresh)
+        rep = reap.check_settled_survivors(rep, "")
         by_win = {r["winpid"]: (r.get("command") or "") for r in rows}
         walked_cmds = [by_win.get(w, "") for w in rep["walked"]]
         staged = [
@@ -1042,8 +1077,11 @@ def test_live_tree_dies_completely():
         ]
         found = [name for name, hit in staged if any(hit(c) for c in walked_cmds)]
         missing = [name for name, hit in staged if not any(hit(c) for c in walked_cmds)]
-        print("  walked %d through %s · members seen: %s"
-              % (len(rep["walked"]), launcher, ", ".join(found) or "none"))
+        print("  walked %d through %s · census reads %d · members seen: %s"
+              % (len(rep["walked"]), launcher, rep["rereads"], ", ".join(found) or "none"))
+        # A future red names its member: every leftover's command, from the pre-kill census.
+        for w in sorted(set(rep["survivors"]) | {e[0] for e in rep["errors"]}):
+            print("  left %d: %s" % (w, by_win.get(w, "")[:160]))
         check("test_live_tree_dies_completely",
               (missing, rep["survivors"], rep["errors"]),
               ([], [], []))

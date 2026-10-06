@@ -223,6 +223,14 @@ GATE_POLICY_FILE=""
 # grade. A repo with no `asks:` key anywhere takes today's path unchanged and is told so on stdout.
 ASKS_CMD=""
 
+# OPTIONAL. The file name, under `.github/workflows/`, of the workflow whose SCHEDULED `held` job
+# runs the self-test suites the merge bar does not. `gates-green` reads its latest completed scheduled
+# run after the bar, anonymously through the public GitHub API, and files one HIGH ask per red held
+# suite through `ASKS_CMD`. Read AS COMMITTED AT the tip the remote advertises, parsed and never
+# sourced; a value outside `[A-Za-z0-9._-]+` ending `.yml` or `.yaml` is refused by name. BLANK is the
+# kit default and means the route is DARK: announced, and no request is made.
+HELD_CI_WORKFLOW=""
+
 # OPTIONAL. The REAPER a run's own orphaned processes go through: every command the driver starts is
 # recorded by identity in a per-slug ledger, and a recorded process whose driver is gone is killed
 # by calling `<this> --kill-msys <pid>`, one at a time. The process-monitor kit's `reap.py` is the

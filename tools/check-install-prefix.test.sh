@@ -44,6 +44,7 @@ GK_SRC=$(git ls-files -- "${PFX}*/govkit.py" | head -1)
 GK=${GK_SRC%/*}; GK=${GK##*/}
 TL=tool   # gov's own prefix is "${TL}s", assembled so that this file does not spell it
 T=$(printf '\t')
+# RAISED 39 -> 40 by TOOL-aMendedFleet-111: the NONKIT liveness arm (1).
 FLOOR_ASSERTIONS=40
 fails=0; passed=0; GRADED=0
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
@@ -133,20 +134,39 @@ case "$LAST_OUT" in *"there is no waiver"*) good "AC5 the refusal says there is 
   printf '%s\n' 'run("plan", "--kits", "qdemo")'
   printf '%s\n' 'x = ["bin", "qdemo"]'
   printf '%s\n' "ci = root / '.github' / 'qdemo'"
-  printf '%s\n' 'side = gd.resolve() / "qdemo" / "log.jsonl"'
   printf '%s\n' '# its Skill lands at .claude/skills/qdemo/SKILL.md'
   printf '%s\n' 'The `qdemo/` kit is described in prose.'
+  printf '%s\n' 'hook = git_dir() / "qdemo"'
+  printf '%s\n' 'log = session_root / "qdemo"'
+  printf '%s\n' 'tx = transcript_dir / "qdemo"'
 } > "$S/${PFX}qdemo/spellings.py"
 git -C "$S" add -A >/dev/null 2>&1
 run_arm "AC5 ...and the drained forms and homonyms in the same file are clean" "install-prefix: clean — " 0 "$S"
+HOMONYM_LINES=$(cat "$S/${PFX}qdemo/spellings.py")
 
 # The homonym shapes above are CENSUS shapes: each must still exist in THIS tree, or the rule guards a
 # spelling nobody writes.
-for _site in 'gd.resolve() / "codebase-map" / "reinvention-backlog.md"' 'common / "codebase-map" / "lookups.jsonl"' \
-             "root / '.github' / 'workflows'" 'sdir / "workflows"'; do
+CENSUS_SITES=('common / "codebase-map" / "lookups.jsonl"' "root / '.github' / 'workflows'" 'sdir / "workflows"')
+for _site in "${CENSUS_SITES[@]}"; do
   if git -C "$ROOT" grep -qF -- "$_site"; then good "census homonym still present: $_site"
   else bad "census homonym GONE, so its arm matches nothing: $_site"; fi
 done
+# TOOL-aMendedFleet-111 AC10: EVERY `NONKIT` alternative is exercised by a clean homonym fixture line
+# or a census site, so an exemption whose spelling nobody writes reds here naming itself. The
+# alternatives are read off the checker, never retyped. Staged red by re-adding `\bgd\b`; staging
+# `session` out of it reds the clean-homonym arm above, on the fixture line that spells it.
+_nk=$(sed -n 's/^NONKIT = re\.compile(r"(?i)\(.*\)")$/\1/p' "$GATE")
+_nkpy=""; for _c in python3 python py; do "$_c" -c "import sys" >/dev/null 2>&1 && { _nkpy=$_c; break; }; done
+if [ -z "$_nk" ] || [ -z "$_nkpy" ]; then
+  bad "the NONKIT liveness arm could not read the checker's alternatives (or run python), so it graded nothing"
+else
+  _nkdead=$(printf '%s\n' "$HOMONYM_LINES" "${CENSUS_SITES[@]}" | "$_nkpy" -c 'import re, sys
+alts = sys.argv[1].split("|")
+lines = sys.stdin.read().splitlines()
+print(" ".join(a for a in alts if not any(re.search("(?i)" + a, l) for l in lines)))' "$_nk")
+  if [ -z "$_nkdead" ]; then good "every NONKIT alternative is exercised by a homonym fixture line or a census site: $_nk"
+  else bad "NONKIT alternative(s) no homonym fixture line or census site exercises, so they guard a spelling nobody writes: $_nkdead"; fi
+fi
 
 # ==================== the POPULATION is every tracked file, shipped or not =====================
 P1="$TMP/population"; build_source_fixture "$P1" 'A qdemo kit.'

@@ -207,17 +207,35 @@ trust boundary is not one to review light: the `security` lens is one of the two
 
 Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
 echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names
-it as `lens=<key>`. Every return carries four fields beside the counts:
+it as `lens=<key>`. Every return carries five fields beside the counts:
+
+- `shape` — one record line, also logged, in this fixed grammar:
+  `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown>`.
+  `at` is the stage the exit reached; a count that stage has not produced is `-`, never `0`, and the
+  every-lens-dead exit prints `raw=-`. The four severities count RAW confirmed findings by binding
+  grade, not the synthesis's adjudicated items, which stay in `blockers` and `highs`. `agents` is the
+  final return's formula through the stage reached. `out-tokens` is a `budget.spent()` DELTA from just
+  before the first agent: the counter is a pool shared by the main loop and every workflow in the
+  turn, so spend elsewhere during the run inflates it, and `unknown` means no `budget` was readable.
+  The `at=synth` line is rendered before the synthesis agent runs, so its out-tokens EXCLUDE the
+  synthesis agent's own spend. The synthesis is told to copy it verbatim, alone on its line,
+  immediately above the appendix heading, and the final return carries the same string, so the
+  record's copy can be compared to it.
 
 - `ledger` — one entry per finding in id order: `id`, `lens`, `ref`, `severity` (the finder's),
   `skepticSeverity`, `verdict` (`confirmed`, `refuted`, `uncertain`, or `unverified` when no verdict
-  stands), `reason`, `fixVerdict` and `claim`. An absent optional value is `null`.
+  stands), `reason`, `fixVerdict`, `claim` and `classes`. An absent optional value is `null`.
+  `classes` lists the checklist classes the claim's leading `C<n>` labels denote, by each item's
+  slug, in order and without duplicates; a label with no slug to resolve, its item absent or not
+  slug-led, is kept as `C<n>`. It is `[]` when the claim opens with no label or the run had no
+  checklist.
 - `confirmedFindings` — one entry per confirmed finding: `id`, `lens`, `ref`, `claim`, `severity` (the
   binding grade), `fix` and `fixVerdict`. A fix the skeptic judged unsound is replaced by its note
   when it gave one. Pass this array as the next round's `priorFindings` rather than re-typing it.
-- `appendix` — the ledger as a markdown table under `## Appendix — every finding`, with the eight
-  columns `id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict`. A cell is `-`
-  when its value is absent, a `|` is escaped, and line breaks fold to a space.
+- `appendix` — the ledger as a markdown table under `## Appendix — every finding`, with the nine
+  columns `id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes`. The
+  ninth joins the `classes` names with one space, so a class's hits can be counted across records. A
+  cell is `-` when its value is absent or empty, a `|` is escaped, and line breaks fold to a space.
 - `lensYield` — per lens, `defects` and `unique` are `null` when no item list can be trusted (see below).
   One row per lens that RAN, in dispatch order, none for a lens a light run skipped:
   `lens`, `returned` (false for a lens that died), `raw`, `confirmed`, `refuted`, `uncertain`,
@@ -230,11 +248,55 @@ it as `lens=<key>`. Every return carries four fields beside the counts:
   record, because that copy is not checked.
 
 The two exits before any skeptic runs, every lens dead and no finding raised, return `[]`, `[]` and
-`''`; a deferred return carries what was judged so far. The harness renders the appendix and tells the
+`''` as the ledger, the confirmed set and the appendix; a deferred return carries what was judged so far. The harness renders the appendix and tells the
 synthesis to copy it verbatim as the report's last section. That copy is the only way a REFUTED finding
 reaches a record, and the harness cannot check it was made: compare the report against the returned
 `appendix`. A run whose every finding is refuted writes no report, so there the appendix exists in the
 return alone, and the caller writes it down if it wants one.
+
+## `workerType` — judges spawned as a named agent type, in all three harnesses
+
+Every agent a harness spawns loads the charter through `CLAUDE.md` before its task. A judge reads a
+brief the harness wrote and lands nothing, so `workerType` lets a caller spawn the JUDGES as a named
+agent type instead. In `tier2-review.js` an absent `workerType` reads as `Plan`, the default one
+measured A/B pair set (TOOL-aMendedFleet-93's reading): its read-only judges matched the charter-loaded
+arm's precision at about half the first-turn context. The reserved literal `none` spawns every judge as
+before that default, durability instructions and review key included. In the two drift harnesses an
+absent `workerType` still spawns every agent as the platform default, because no pair measured them.
+
+```js
+// tier2-review.js: every finder and every skeptic batch spawns as the type
+args: { repo, base, head, reviewDir, workerType: 'Plan' }
+// drift-audit-code.js and drift-audit-state.js: the skeptic batches only
+args: { repo, base, outDir, workerType: 'Plan' }
+```
+
+The value must match `^[A-Za-z][A-Za-z0-9_-]{0,63}$`, or the harness refuses before any agent spawns
+with a message naming `workerType`. A well-formed name the platform does not know comes back as its
+named `not found` refusal, which each harness already counts as a dead agent. The orchestrating
+agents never take the type: the tier2 resume probe reads the lens files and the synthesis writes the
+report.
+
+Under a type, a tier2 judge is told to write no `find-*.json` or `verify-*.json` and to return `path`
+empty, because the read-only types hold no Write tool. One log line names the type and says the run's
+lens and batch results are NOT durable, so a resume re-dispatches them; pass `workerType: 'none'` when
+a run must resume. `workerType` joins the review key only when it names a type, so a `none` run keys as
+every run before the default did, and a run under a type is never answered from a `none` run's lens files.
+
+The drift FINDERS keep the default type. Each writes its prose writeup under `outDir`, `wave1-<lens>.md`
+from the code harness and `wave2-<lens>.md` from the state harness, as it works, and that file is both its deliverable and the harness's durability control, after a
+two-hour finder once died with nothing on disk; a type with no Write tool can hold neither.
+
+Which types omit the charter — verified 2026-10-04, node a, Claude Code 2.1.178, by a read-only
+`grep -a -o` over the installed binary for `omitClaudeMd`:
+
+- Only the built-in `Explore` (model `haiku`) and `Plan` (model `inherit`) set it. Both disallow the
+  file-editing tools and carry a read-only prompt. `Explore` also changes the model, so an A/B over
+  it measures two effects at once; `Plan` changes only the context.
+- A project agent definition cannot ask for it: the CLI's list of known definition front-matter keys
+  does not carry the field, so a custom type buys a tool restriction and none of the saving.
+- UNVERIFIED: whether a custom definition added mid-session is spawnable without restarting the
+  session. Name a built-in type unless that has been measured.
 
 ## `review_replay.py` — a review scored for recall against a past round
 

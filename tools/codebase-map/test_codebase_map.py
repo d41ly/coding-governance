@@ -10,7 +10,8 @@ Remedies when this gate fails on your change:
 - claim the new key in the owning `<MAP_ROOT>/features/<feature>.md` (create it from any
   existing dossier — headings are pinned, prose is free), or
 - claim it in `<MAP_ROOT>/FOUNDATION.md` if it is shared substrate;
-- `baseline.toml` additions are reserved for the initial backfill — do not add new keys;
+- `baseline.toml` never gains a key: the gate refuses one the baseline at the branch's base did not
+  carry (the merge-base with the remote default branch) — claim it in a dossier instead;
 - claim edits: regen artifacts with the command the failure prints (`map_lib.regen_cmd()`).
 
 WHAT THIS GATE DOES NOT CHECK, stated here because a structural check reads as a semantic one to
@@ -148,6 +149,31 @@ def test_every_inventory_key_is_claimed_or_baselined() -> None:
     )
 
 
+def test_baseline_never_gains_a_key() -> None:
+    """The baseline is SHRINK-ONLY, graded against its own earlier self: a key the baseline at the
+    branch's base did not carry is a refusal. The four coverage asserts above cannot see it, since
+    moving a claim from a dossier into the baseline keeps every one of them clean.
+
+    UNGRADED, AND SAYS SO, when there is no base to read — no fetched `origin` default branch, or
+    no baseline at the base. The compared sha and both sides' key counts print on every graded run,
+    so a comparison of the committed file against itself (CI on the landed tip) is visible."""
+    root = m.repo_root()
+    base, why = m.resolve_compare_base(root)
+    if base is None:
+        print(f"     UNGRADED: {why}")
+        return
+    added, note = m.derive_baseline_additions(root, base)
+    if added is None:
+        print(f"     UNGRADED: {note} ({why})")
+        return
+    print(f"     compared against {base[:12]} ({why}): {note}")
+    assert not added, (
+        "baseline.toml GAINED keys its base did not carry — claim each in a feature dossier, or "
+        "FOUNDATION.md for shared substrate, and delete it from the baseline:\n"
+        + "\n".join(f"  {inv}: {key}" for inv, keys in added.items() for key in keys)
+    )
+
+
 def test_dossier_prose_headings_pinned() -> None:
     tree = m.load_map_tree(INVENTORY_IDS, decision_id_re=ID_RE)
     features_dir = m.map_root() / "features"
@@ -218,6 +244,32 @@ def test_dossier_decisions_are_declining() -> None:
     )
 
 
+def test_dossier_prose_carries_no_typed_count() -> None:
+    """No present-tense digit count of an inventory population in dossier prose.
+
+    The map derives every inventory's size into MAP.md, so "the 86 legs" in a dossier is a second
+    answer that goes stale on the next leg (charter §7). A sentence reading as a past measurement
+    is frozen and passes. NOT checked: counts spelled as words, counts inside fences (the toml
+    title included) or code spans, and nouns outside the map's inventories.
+    """
+    texts = m.load_dossier_texts(m.map_root())
+    hits: list[str] = []
+    candidates = frozen = 0
+    for name, text in texts.items():
+        found, n_frozen = m.measure_typed_counts(text, INVENTORY_IDS)
+        candidates += len(found) + n_frozen
+        frozen += n_frozen
+        source = "FOUNDATION.md" if name == "foundation" else f"{name}.md"
+        hits.extend(f"{source}:{line}: {match}" for line, match in found)
+    print(f"     typed-count lint: {candidates} candidate(s) read in {len(texts)} dossier(s), {frozen} frozen")
+    assert not hits, (
+        "a present-tense count of an inventory population in dossier prose:\n  "
+        + "\n  ".join(hits)
+        + "\nRemedy, one of: freeze it as a past-tense reading that cites the record which measured "
+        "it; point at the file that owns it; or rewrite the sentence without it."
+    )
+
+
 def test_path_derived_keys_are_posix() -> None:
     for inv_id, keys in ext.all_inventories().items():
         offenders = [k for k in keys if "\\" in k]
@@ -245,6 +297,7 @@ def test_generated_artifacts_are_fresh() -> None:
     fresh = {
         gen_dir / "inventories.json": m.render_inventories_json(inventories, INVENTORY_IDS),
         gen_dir / "MAP.md": m.render_map_md(inventories, INVENTORY_IDS, owners, tree.baseline),
+        gen_dir / "CARDS.md": m.render_cards_md(tree, INVENTORY_IDS),
     }
     # CONDITIONAL tiers, one record each. A tier that does not run is REPORTED, never omitted: an
     # `if population:` with no `else` compares nothing and passes, which reads exactly like a tier
@@ -289,9 +342,11 @@ if __name__ == "__main__":
     failures = 0
     for fn in (
         test_every_inventory_key_is_claimed_or_baselined,
+        test_baseline_never_gains_a_key,
         test_dossier_prose_headings_pinned,
         test_dossier_affordance_present_or_graced,
         test_dossier_decisions_are_declining,
+        test_dossier_prose_carries_no_typed_count,
         test_path_derived_keys_are_posix,
         test_generated_artifacts_are_fresh,
     ):

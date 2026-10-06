@@ -29,6 +29,7 @@
 #   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--run <id>] [--set <hashes>]]
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
 #   unattended.sh --version                                        # the kit version, then exit
+#   unattended.sh --overlaps                                       # the overlap probe against the LOCAL default-branch tracking ref, no network
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
 #
@@ -48,7 +49,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.68   # gov:kit unattended@1.68 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.69   # gov:kit unattended@1.69 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -479,7 +480,7 @@ CONF="$ROOT/.unattended.conf"
 MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="$SHARED_RECORDS_UNDECLARED"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
-ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
+ASKS_CMD=""; HELD_CI_WORKFLOW=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
 GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
 DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
@@ -499,6 +500,9 @@ DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; RUNLOG_SESSION_V
 #   * ASKS_CMD (TOOL-dDerivedDocket-16) - the ASK GENERATOR, in RECALL_CLI's register: optional,
 #     blank is "not adopted" and is ANNOUNCED. A build README carrying an `asks:` key while this is
 #     blank REFUSES at preflight rather than pinning a mandate nothing in the project can grade.
+#   * HELD_CI_WORKFLOW (TOOL-aMendedFleet-9) - the workflow file whose daily scheduled held job
+#     `gates-green` reads after its bar. The value THIS source binds decides nothing:
+#     `write_held_asks` re-reads the key from the conf at R. Blank is DARK, announced.
 #   * HOLD_CODES_EXTRA and HOLD_FLOOR - the HOLD vocabulary's project half, and its shrink-only
 #     floor. Spelled beside the halt keys and never merged with them: a halt code ENDS a run and a
 #     hold code PAUSES one, and one list would let a pause be recorded as an ending.
@@ -1075,6 +1079,25 @@ print_reap_targets() { # run-state file · slug
   else
     printf 'unattended: the reap list this attestation is made over — keepalive %s · no durable schedule: no hold of this run owed one\n' "${ka:-none}"
   fi
+}
+# TOOL-aMendedFleet-49 - THE DRIFT DELTA the close's bar left behind, BASE..HEAD, read by the drift
+# kit's own `--delta` from the history its `--check` appends. REPORT ONLY: it never writes, never
+# calls `fail`, and returns 0 whatever it finds, so a close never fails on what drift did. The kit is
+# reached through the library's `resolve_kit_dir` from this kit's own dir, never a spelled sibling path.
+print_drift_delta() { # run-state file
+  local base py d
+  base=$(fact "$1" base)
+  echo "unattended: drift delta, report only — from the bar readings in this clone's drift history"
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ]; then
+    echo "drift-delta: skipped — no python launcher resolves, so the drift kit's reader cannot run"
+    return 0
+  fi
+  if ! d=$(resolve_kit_dir "$py" drift-audit drift_report.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    echo "drift-delta: skipped — no drift-audit kit holding drift_report.py resolves beside this kit"
+    return 0
+  fi
+  "$py" "$d/drift_report.py" --delta "$base" HEAD || true
+  return 0
 }
 checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
 
@@ -1925,7 +1948,7 @@ GG_HARD=""
 # still writes nothing; `verb_close` clears both on entry.
 GG_RUN_FACT=""; GG_INH_FACT=""
 # TOOL-dUnstuckLanding-27 S3 - THE PATHS THE BAR'S OWN CLOSE STEP STAGED beside the run-state file:
-# the build's BACKLOG.md `write_inherited_asks` filed into and the views `write_ask_views` reported
+# the build's BACKLOG.md `write_inherited_asks` or `write_held_asks` filed into and the views `write_ask_views` reported
 # staging. Written by `write_gates_staged` as `path@blob` lines into THE BAR'S OWN RUN RECORD,
 # `staged` beside its attribution, never into the run-state file (implementation review round 2, M2
 # and L1), and read by `check_bar_tied`'s record-only mode.
@@ -2383,6 +2406,179 @@ check_single_live() {
   return 0
 }
 
+# THE CROSS-RUN OVERLAP PROBE, preflight's second announcement and the only one that reads REMOTE
+# refs. TOOL-aMendedFleet-60. The run-state count above sees the records this clone tracks; a remote
+# claim keyed by slug sees one slug. Neither sees two builds on one SUBJECT, which until this probe
+# was learned at the second one's merge. It joins the paths every unmerged remote-tracking ref
+# changed or declares against the paths this run changed or declares, and ANNOUNCES each ref sharing
+# one.
+#
+# WHAT IT DOES NOT CLAIM. It refuses nothing and writes nothing: a remote-tracking ref is a LOCAL
+# write any process can move (TOOL-aStandingWrit-2), so it can add or remove a line and never a
+# refusal. It never fetches, so it reads the refs as of this clone's last fetch, and says so. A
+# declared path is a spec's ESTIMATE, not an edit; the tag on each path says which kind it is. A
+# path under a shared record or a generated index is never shared, because those reconcile
+# additively or re-render. A diff touching only kit version markers is not an overlap unless a spec
+# on the ref also declares the path. The age bound is a constant until an adopter asks for another.
+OVERLAP_AGE_DAYS=14
+# `read_files_touched <rev> <file>` - the backticked path tokens under `### Files touched` of every
+# spec the file lists, read at <rev> with ONE `git show`, terminal specs skipped. The blobs arrive
+# concatenated, so each spec's status header is what opens its record. A token is a path when it is
+# one word of path characters holding a `/` or ending in an extension: prose spans in the section
+# such as a function name or an id are not paths. Its status is git's, so an unreadable ref is
+# counted as unreadable rather than as clean.
+read_files_touched() { # rev · file of spec paths -> one declared path per line
+  local _rf_ps=() _rf_p
+  while IFS= read -r _rf_p; do
+    _rf_p=${_rf_p%$'\r'}
+    case "$_rf_p" in *.md) _rf_ps+=("$1:$_rf_p") ;; esac
+  done < "$2"
+  [ "${#_rf_ps[@]}" -gt 0 ] || return 0
+  GIT show "${_rf_ps[@]}" 2>/dev/null | awk '
+    { sub(/\r$/, "") }
+    /^\*\*Status:\*\* / { term = ($2 == "CLOSED" || $2 == "WONTDO"); ft = 0; next }
+    /^#/ { ft = ($0 ~ /^### Files touched/); next }
+    ft && !term {
+      s = $0
+      while (match(s, /`[^`]+`/)) {
+        t = substr(s, RSTART + 1, RLENGTH - 2); s = substr(s, RSTART + RLENGTH)
+        if (t ~ /^[A-Za-z0-9._\/-]+$/ && (t ~ /\// || t ~ /\.[A-Za-z0-9]+$/)) print t
+      }
+    }'
+  return "${PIPESTATUS[0]}"
+}
+check_cross_run_overlap() { # slug - always returns 0
+  local slug="$1" anc="${ASHA:-}" rem d now ref sha ct age secs n=0 a=0 u=0 s=0 _co_q _co_g _co_ps=()
+  if [ -z "$anc" ] || ! GIT rev-parse --verify --quiet "$anc^{commit}" >/dev/null 2>&1; then
+    echo "unattended: overlap probe UNAVAILABLE — no observed default-branch tip names a commit in this clone, so no remote ref can be read as unmerged against it"
+    return 0
+  fi
+  d=$(mktemp -d) || { echo "unattended: overlap probe UNAVAILABLE — cannot create a scratch directory"; return 0; }
+  rem=$(GIT remote | head -1)
+  # OUR PATHS: what this run changed since the anchor, and what its live specs declare.
+  if ! GIT -c core.quotepath=off diff --no-renames --name-only "$anc...HEAD" > "$d/ours" 2>/dev/null; then
+    echo "unattended: overlap probe UNAVAILABLE — this run's own changes since the observed tip ${anc:0:8} cannot be listed"
+    rm -rf "$d"; return 0
+  fi
+  # A SLUG names this run's build, whose live specs declare. NO SLUG is the attended `--overlaps`
+  # caller (KICK-aMendedFleet-2 S2): its declared paths are those of the live specs its own
+  # `<anchor>...HEAD` diff changed and kept, the rule the loop below applies to a ref.
+  if [ -n "$slug" ]; then
+    GIT ls-tree -r --name-only HEAD -- "$M/builds/$slug/spec/" > "$d/ourspecs" 2>/dev/null || : > "$d/ourspecs"
+  else
+    GIT -c core.quotepath=off diff --no-renames --name-status "$anc...HEAD" 2>/dev/null | awk -F'\t' -v m="$M/builds/" '
+      { sub(/\r$/, "") } $1 !~ /^D/ && index($2, m) == 1 && $2 ~ /\/spec\/.*\.md$/ { print $2 }' > "$d/ourspecs"
+  fi
+  read_files_touched HEAD "$d/ourspecs" >> "$d/ours" || :
+  # NEVER CONTESTED: every shared record, and the index half of every generated pair.
+  : > "$d/excl"
+  for _co_q in ${SHARED_RECORDS:-}; do printf '%s\n' "$_co_q" >> "$d/excl"; done
+  for _co_q in ${GENERATED_INDEXES:-}; do printf '%s\n' "${_co_q%%:*}" >> "$d/excl"; done
+  # THE REFS: reachable from neither the anchor nor HEAD, so this run's own pushed branch drops out
+  # while it is behind HEAD and reappears when another session pushed past it.
+  if ! GIT for-each-ref --no-merged="$anc" --no-merged=HEAD \
+       --format='%(refname)%09%(objectname)%09%(committerdate:unix)' "refs/remotes/$rem/" > "$d/refs" 2>/dev/null; then
+    echo "unattended: overlap probe UNAVAILABLE — the remote-tracking refs of $rem cannot be listed"
+    rm -rf "$d"; return 0
+  fi
+  now=$(date +%s); : > "$d/lines"
+  while IFS=$'\t' read -r ref sha ct <&3; do
+    ref=${ref%$'\r'}; ct=${ct%$'\r'}
+    [ -n "$ref" ] && [ "$ref" != "refs/remotes/$rem/HEAD" ] || continue
+    n=$((n + 1))
+    secs=$((now - ${ct:-0})); age=$((secs / 86400))
+    if [ "$secs" -gt $((OVERLAP_AGE_DAYS * 86400)) ]; then a=$((a + 1)); continue; fi
+    # THEIR PATHS: the ref's diff names, and the Files touched of the specs it changed and kept.
+    if ! GIT -c core.quotepath=off diff --no-renames --name-status "$anc...$sha" > "$d/ns" 2>/dev/null; then
+      u=$((u + 1)); continue
+    fi
+    awk -F'\t' -v m="$M/builds/" -v df="$d/tdiff" -v sf="$d/tspecs" '
+      { sub(/\r$/, ""); if ($2 == "") next; print $2 > df
+        if ($1 !~ /^D/ && index($2, m) == 1 && $2 ~ /\/spec\/.*\.md$/) print $2 > sf }
+      END { printf "" > df; printf "" > sf }' "$d/ns"
+    if ! read_files_touched "$sha" "$d/tspecs" > "$d/tdecl"; then u=$((u + 1)); continue; fi
+    # THE JOIN, one process: equal, or one a directory the other sits under, after the same
+    # normalisation `normpath` applies. Prints `path<TAB>diff|declared|diff+declared`.
+    awk -F'\t' -v xf="$d/excl" -v of="$d/ours" -v tf="$d/tdiff" -v cf="$d/tdecl" '
+      function norm(p) {
+        sub(/\r$/, "", p); gsub(/\/\/+/, "/", p)
+        while (p ~ /^\.\//) p = substr(p, 3)
+        while (p ~ /\/\.\//) sub(/\/\.\//, "/", p)
+        while (p ~ /.\/\.$/) sub(/\/\.$/, "", p)
+        while (p ~ /.\/$/) sub(/\/$/, "", p)
+        return p }
+      function under(a, b) { return a == b || index(b, a "/") == 1 }
+      function kept(p,   i) { if (p == "") return 0; for (i = 1; i <= nx; i++) if (under(x[i], p)) return 0; return 1 }
+      FILENAME == xf { p = norm($0); if (p != "") x[++nx] = p; next }
+      FILENAME == of { p = norm($0); if (kept(p) && !(p in ov)) { ov[p] = 1; o[++no] = p }; next }
+      { p = norm($0); if (!kept(p)) next
+        if (!(p in tag)) { order[++nt] = p; tag[p] = "" }
+        if (FILENAME == tf) td[p] = 1; else tc[p] = 1 }
+      END { for (k = 1; k <= nt; k++) { p = order[k]
+              for (i = 1; i <= no; i++) if (under(p, o[i]) || under(o[i], p)) {
+                print p "\t" (td[p] ? (tc[p] ? "diff+declared" : "diff") : "declared"); break } } }
+    ' "$d/excl" "$d/ours" "$d/tdiff" "$d/tdecl" > "$d/shared"
+    [ -s "$d/shared" ] || continue
+    # THE MARKER FILTER: a path the ref's DIFF names loses that tag when every line it adds or
+    # removes carries a kit version marker. A declared tag stays whatever the diff holds. A path
+    # both sources name prints `diff`, since an edit outranks an estimate, and `declared` once its
+    # diff half is dropped.
+    _co_ps=()
+    while IFS=$'\t' read -r _co_q _co_g; do
+      case "$_co_g" in diff*) _co_ps+=("$_co_q") ;; esac
+    done < "$d/shared"
+    : > "$d/u0"
+    if [ "${#_co_ps[@]}" -gt 0 ]; then
+      GIT -c core.quotepath=off diff --no-renames -U0 "$anc...$sha" -- "${_co_ps[@]}" > "$d/u0" 2>/dev/null || : > "$d/u0"
+    fi
+    awk -F'\t' -v uf="$d/u0" -v r="${ref#refs/remotes/}" -v t="${sha:0:8}" -v age="$age" '
+      FILENAME == uf {
+        if ($0 ~ /^diff --git /) { h = 1; f = ""; next }
+        if (h && $0 ~ /^\+\+\+ b\//) { f = substr($0, 7); next }
+        if (h && $0 ~ /^--- a\// && f == "") { f = substr($0, 7); next }
+        if ($0 ~ /^@@/) { h = 0; next }
+        if (!h && f != "" && $0 ~ /^[-+]/) { ch[f]++; if ($0 !~ /gov:kit [A-Za-z0-9_.-]+@[0-9][0-9A-Za-z.]*/) nm[f]++ }
+        next }
+      { p = $1; g = $2
+        if (g ~ /^diff/ && ch[p] > 0 && nm[p] == 0) { if (g == "diff") next; g = "declared" }
+        if (g == "diff+declared") g = "diff"
+        out[++k] = p " (" g ")" }
+      END { if (k == 0) exit
+            line = "  " r " · " t " · " age "d old · " k " shared: "
+            for (i = 1; i <= k && i <= 5; i++) line = line (i > 1 ? ", " : "") out[i]
+            if (k > 5) line = line " and " (k - 5) " more"
+            print line }' "$d/u0" "$d/shared" >> "$d/lines.new"
+    if [ -s "$d/lines.new" ]; then s=$((s + 1)); cat "$d/lines.new" >> "$d/lines"; fi
+    rm -f "$d/lines.new"
+  done 3< "$d/refs"
+  printf "unattended: overlap probe — %d unmerged remote ref(s) read as of this clone's last fetch, %d aged out past %d days, %d unreadable, " "$n" "$a" "$OVERLAP_AGE_DAYS" "$u"
+  if [ "$s" -eq 0 ]; then echo "no shared path"; else echo "$s sharing a path; this run is NOT blocked"; cat "$d/lines"; fi
+  rm -rf "$d"
+  return 0
+}
+# `--overlaps`: the probe above for a session that never preflights - the orientation card calls it
+# (KICK-aMendedFleet-2). The anchor is the LOCAL `refs/remotes/<remote>/HEAD` target, never
+# `observe_anchor`, so no ls-remote, no fetch and no network: the refs the probe joins are as of
+# the last fetch either way. No slug, so its own declared paths come from the specs its diff
+# changed. Other than one remote, or no symref, is one UNAVAILABLE line. Always returns 0.
+print_overlaps() {
+  local nrem rem ref
+  nrem=$(GIT remote | grep -c . || true)
+  if [ "$nrem" != 1 ]; then
+    echo "unattended: overlap probe UNAVAILABLE — this clone declares $nrem remotes, and the probe reads the tracking refs of exactly one"
+    return 0
+  fi
+  rem=$(GIT remote | head -1)
+  ref=$(GIT symbolic-ref -q "refs/remotes/$rem/HEAD" 2>/dev/null) || ref=""
+  if [ -z "$ref" ]; then
+    echo "unattended: overlap probe UNAVAILABLE — refs/remotes/$rem/HEAD is unset in this clone, so no local default-branch tip anchors the probe"
+    return 0
+  fi
+  ASHA=$(GIT rev-parse --verify --quiet "$ref^{commit}" 2>/dev/null) || ASHA=""
+  check_cross_run_overlap ""
+  return 0
+}
+
 # The CLOSED set of owner phrasings that ask for the pre-code spec audit (owner ruling 2026-10-05,
 # build aEvidencedLens): the literal key `spec-audit:`, or "opt in" / "opt-in" / "optin" followed by
 # in|into|to, an optional "the", "spec review(s)" / "spec audit(s)", and "for this build". The last
@@ -2554,8 +2750,8 @@ check_authorization() { # slug · base
   AUTH_MAY=$(printf '%s\n' "$_fm" | sed -n 's/^may=//p' | head -1)
   AUTH_MAY_SET=0
   case $'\n'"$_fm" in *$'\n'may=*) AUTH_MAY_SET=1 ;; esac
-  # ABSENT is `slug` - every build README in every adopter's tree today declares nothing, and that
-  # is the ordinary case, not a defect. A value OUTSIDE the closed set is a refusal rather than a
+  # ABSENT is `slug` - a build README that declares nothing is the ordinary case, not a defect.
+  # A value OUTSIDE the closed set is a refusal rather than a
   # default: defaulting an unrecognised mode to either member lets a typo select a discipline
   # nobody declared, which is the failure shape ANCHOR_SCOPE's own value guard exists to avoid.
   [ -n "$AUTH_MODE" ] || AUTH_MODE=slug
@@ -4317,14 +4513,15 @@ verb_plan() { # slug
   load_spec_facts $specs
   # S6 - THE TWO `NOT A UNIT` DIAGNOSTICS, reported FIRST and from the spec files, because the region
   # cannot carry them: `render_region` emits rows only for specs whose status header parsed, so a file
-  # with none has no row to appear in. Five tracked specs produce the first row today and ZERO produce
-  # the second, which the driver's own comment below already states - so the second is armed by
-  # fixture or not at all.
+  # with none has no row to appear in. At c80d92333 (2026-08-25) five tracked specs produced the
+  # first row and ZERO produced the second, which the driver's own comment below already states -
+  # so the second is armed by fixture or not at all.
   # R3-M4 — the renderable count comes from `spec_ids`, which is this driver's OWN answer to "does
   # this spec parse as a unit" and whose comment says it exists so two callers cannot disagree. The
   # inline count that stood here was a third spelling of that predicate, looser than the generator's,
   # so the stale-region refusal could name an inert repair. Latent — zero of 277 tracked specs
-  # disagree today — and removed rather than left to be discovered by the first one that does.
+  # disagreed at 1ce89563a (2026-08-25) — and removed rather than left to be discovered by the
+  # first one that does.
   # TOOL-aCollapsedScan-1 - both readers below are map lookups now, and the count comes off those
   # maps rather than being priced with a sort and a grep. `basename` went too: it is an exec and
   # the expansion is not.
@@ -4541,7 +4738,9 @@ verb_phase() { # slug · phase · witness
   # TOOL-dAlignedCarrier-6 S2 - THE MOVE INTO VERIFYING IS WHERE THE OWED FLAGGED BAR IS ANNOUNCED,
   # under every LANDER_MODE, because it is the phase in which the main loop decides what its one
   # `--close` exports. No other target announces.
+  [ "$want" = VERIFYING ] && print_touched_asks "$rel"
   [ "$want" = VERIFYING ] && print_selftests_owed "$rel"
+  [ "$want" = VERIFYING ] && print_stale_dossiers "$rel"
   return 0
 }
 
@@ -5628,7 +5827,7 @@ check_settled_abandoned() { # run-state file -> 0 when it carries both
 }
 
 verb_preflight() { # slug · keepalive-id
-  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix _pf_gbt="" _pf_ab=""
+  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix _pf_gbt="" _pf_cv _pf_tr _pf_ab=""
   # TOOL-dDerivedDocket-16 S6 - THE IDS TEST RUNS FIRST, before `check_slug` and before any anchor
   # work, because it needs no tree. `check_slug`'s own grammar ADMITS an id - letters, digits and
   # dashes, opening on a letter - so an id reached the folder lookup and was refused with a message
@@ -5757,6 +5956,7 @@ verb_preflight() { # slug · keepalive-id
   check_method || true
   check_waivers "$rel" || true
   check_single_live || true
+  check_cross_run_overlap "$slug" || true
   # S2 - the declared lander is PROBED, not believed, and only where the declaration says it will be
   # used. It joins the other preconditions through `status` rather than returning, so an operator
   # reads every unmet precondition in one pass.
@@ -5907,6 +6107,25 @@ verb_preflight() { # slug · keepalive-id
   # the session, pid, host, image and lease-utc beside it are the lease's own and are taken afresh.
   _pf_ka=$(fact "$rel" keepalive); [ -n "$_pf_ka" ] || _pf_ka="$kid"
   write_lease "$rel" "$_pf_ka" || return 1
+  # TOOL-aMendedFleet-61 S2 - THE LAUNCHING CLI, PINNED ONCE like the base, and BESIDE the lease,
+  # never inside it: `check_lease_only_diff` admits a lease-only difference on a closed set of six
+  # fact lines, and a resume rewriting this would record the resuming CLI over the launching one.
+  if [ -n "$(fact "$rel" cli-version)" ]; then
+    _pf_cv="pinned by an earlier preflight"
+  else
+    _pf_cv="read from AI_AGENT"
+    set_fact "$rel" cli-version "$(read_cli_version || echo absent)" || return 1
+  fi
+  echo "unattended: preflight — the launching CLI pinned as cli-version: $(fact "$rel" cli-version) ($_pf_cv)"
+  # S5 - THE RESUME TICK, announced and never graded: preflight's exit does not move on any answer.
+  read_tick_registration; _pf_tr=$?
+  if [ "$_pf_tr" = 0 ]; then
+    echo "unattended: preflight — the resume tick is registered as gov-resume-tick"
+  elif [ "$_pf_tr" = 1 ]; then
+    echo "unattended: WARNING — no scheduled task named gov-resume-tick exists on this node, so a run that stalls here waits for a human to start a session; the kit README has the line that registers it"
+  else
+    echo "unattended: WARNING — whether gov-resume-tick is registered on this node is UNKNOWN: $TR_WHY"
+  fi
   # TOOL-dUnstuckLanding-20 S4 - THE LANDING NODE, written afresh like the lease because it describes
   # the node holding the run. A hand-off node starts normally and says so from its first record; no
   # preflight refuses on it. Undeclared writes no fact. Read at BASE and at the tip the anchor
@@ -5941,8 +6160,8 @@ verb_preflight() { # slug · keepalive-id
   [ -n "$(fact "$rel" mode)" ] || set_fact "$rel" mode "${AUTH_MODE:-slug}" || return 1
   # TOOL-dDerivedDocket-19 S1 - THE GRANT, PINNED ONCE for the reason the mode is. Only a `slug` README
   # can reach here carrying one, because the check above refuses the key under every other mode, so
-  # every other run pins `none` - and so does a `slug` README that declares nothing, which is every
-  # README in this tree today. Printed, because the leg re-reads it and a reader should not have to.
+  # every other run pins `none` - and so does a `slug` README that declares nothing, the ordinary
+  # case. Printed, because the leg re-reads it and a reader should not have to.
   [ -n "$(fact "$rel" may)" ] || set_fact "$rel" may "${AUTH_MAY:-none}" || return 1
   echo "unattended: preflight — grant pinned as may: $(fact "$rel" may)"
   # TOOL-dDerivedDocket-16 S3 - THE THREE ASK FACTS, pinned ONCE for the reason `base` and the anchor
@@ -7091,16 +7310,66 @@ derive_liveness() { # slug · run-state file · recorded phase -> 0 with LV_*, 1
   return 0
 }
 
+# THE RUNNING SESSION'S CLI VERSION (TOOL-aMendedFleet-61 S1), from `AI_AGENT`, which the Claude Code
+# CLI sets to `claude-code_<major>-<minor>-<patch>_<kind>` from its OWN version, overwriting an
+# inherited one. Not `claude --version`: that answers for the PATH binary, which on node a is older
+# than the session running this. Only the underscore shape is read; an unset variable, another
+# agent's value or anything not two to four dot-separated integers after the turn returns 1.
+read_cli_version() { # -> the version, dotted, on stdout · 1 and nothing when unreadable
+  local v="${AI_AGENT:-}"
+  case "$v" in claude-code_*) ;; *) return 1 ;; esac
+  v=${v#claude-code_}; v=${v%%_*}; v=${v//-/.}
+  [[ $v =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] || return 1
+  printf '%s\n' "$v"
+}
+
+# S3 - THIS SESSION'S CLI AGAINST THE ONE THAT LAUNCHED THE RUN, pinned as `cli-version` by
+# --preflight. Compared field by field as INTEGERS: a string comparison orders 2.1.99 after 2.1.286.
+# Exactly one line on every path, returns 0 on every path, and writes nothing: a version difference
+# is a fact for the run to report, never a reason to stop it. The pinned value is validated before
+# any arithmetic sees it, because the record is a file a hand can edit.
+print_cli_version_drift() { # run-state file
+  local now pin i x y cmp=0 a b
+  now=$(read_cli_version) || now=""
+  pin=$(fact "$1" cli-version) || pin=""
+  [[ $pin =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] || pin=""
+  if [ -z "$now" ] || [ -z "$pin" ]; then
+    if [ -z "$now" ] && [ -z "$pin" ]; then
+      echo "unattended: CLI version UNKNOWN — both sides are missing: AI_AGENT carries no Claude Code version, and the record pins no readable cli-version"
+    elif [ -z "$now" ]; then
+      echo "unattended: CLI version UNKNOWN — this session's side is missing: AI_AGENT carries no Claude Code version; the run was launched by $pin"
+    else
+      echo "unattended: CLI version UNKNOWN — the launching side is missing: the record pins no readable cli-version; this session runs $now"
+    fi
+    return 0
+  fi
+  IFS=. read -r -a a <<< "$now"; IFS=. read -r -a b <<< "$pin"
+  for i in 0 1 2 3; do
+    x=$((10#${a[i]:-0})); y=$((10#${b[i]:-0}))
+    if [ "$x" -lt "$y" ]; then cmp=-1; break; fi
+    if [ "$x" -gt "$y" ]; then cmp=1; break; fi
+  done
+  case "$cmp" in
+    0) echo "unattended: CLI version $now — the same as the one that launched this run" ;;
+    -1) echo "unattended: WARNING — this session's CLI $now is OLDER than the $pin that launched this run; a resume through an older CLI may lack what the run relied on" ;;
+    1) echo "unattended: NOTE — this session's CLI $now is newer than the $pin that launched this run" ;;
+  esac
+  return 0
+}
+
 # The orientation half of --resume, unchanged in substance and extracted because the take-over half
 # ends in it too. The method path is DERIVED from MEMORY_ROOT, never recorded as a run fact: the
 # authored region carries its facts and never restates a derivable one (protocol section 2).
 print_resume_orientation() { # run-state file · phase
+  print_cli_version_drift "$1"
   echo "unattended: resume at phase $2 — read $1, then continue the first non-terminal unit above"
   [ -f "$M/guides/BUILD-METHOD.md" ] && echo "unattended: re-read the build method at $M/guides/BUILD-METHOD.md"
   echo "unattended: the directives and their waivers — the table in the unattended Skill; your waivers are parked in this file"
   # TOOL-dAlignedCarrier-6 S3 - a session resuming or taking over a run at VERIFYING, after a
   # compaction or a process death, reads the owed-bar notice again: it never saw the move's.
+  [ "$2" = VERIFYING ] && print_touched_asks "$1"
   [ "$2" = VERIFYING ] && print_selftests_owed "$1"
+  [ "$2" = VERIFYING ] && print_stale_dossiers "$1"
   return 0
 }
 
@@ -7169,10 +7438,12 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
     echo "unattended: taken over — phase $hf · keepalive $kid · the hold is released and this session holds the lease"
     # TOOL-dDerivedDocket-29 S7 - THE RELAUNCH. A hold taken on a second deferred review names the
     # Workflow run it was waiting on, and a recorded runId nothing reads is a fact written for nobody.
-    # The lens and skeptic files that run wrote are reused either way; the runId is the bonus path.
+    # The lens and skeptic files that run wrote are reused either way, where it wrote any: a review run
+    # under `workerType: 'none'` writes them, one under a named type, a direct call's default, writes
+    # none and dispatches every judge again (TOOL-aMendedFleet-111 S7). The runId is the bonus path.
     prun=$(fact "$rel" hold-run)
     if [ -n "$prun" ]; then
-      echo "unattended: relaunch the deferred review FIRST — pending run $prun: re-run that Workflow with identical args, resuming from run $prun where the platform offers it; the review reuses every lens and skeptic file the run wrote and dispatches only what did not return"
+      echo "unattended: relaunch the deferred review FIRST — pending run $prun: re-run that Workflow with identical args, resuming from run $prun where the platform offers it; the review reuses every lens and skeptic file the run wrote and dispatches only what did not return, where it ran under workerType 'none' as the build harness's audit does; a review under a named type, the default of a direct call, wrote none and dispatches every judge again"
     fi
     print_resume_orientation "$rel" "$hf"
   else
@@ -7874,7 +8145,7 @@ write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP r
 # stage that git itself refuses, a held index lock say, is named on a line of its own and returns 1
 # too, because the success line would otherwise claim paths the index does not hold.
 write_ask_views() { # count of asks this call filed -> 0 rendered and staged, 1 on a named miss; one line each
-  local n=$1 gen="" py="" rc=0 why="" fix="" p h line paths="" left="" staged=1 dirty="" gd=""
+  local n=$1 gen="" py="" rc=0 why="" fix="" p h line paths="" left="" staged=1 dirty="" gd="" luc=""
   local -a post=() stage=()
   local -A h0=()
   AV_STAGED=""
@@ -7892,9 +8163,15 @@ write_ask_views() { # count of asks this call filed -> 0 rendered and staged, 1 
     # tracked and untracked, so no path arrives twice. `--no-renames`, so a path the render moves
     # away is listed by its own name and staged as the deletion it is, never folded into a
     # destination (memory/gotchas/porcelain-diff-names-a-rename-by-its-destination.md).
+    # UNDER `LIVE_LANDED_UNCLOSED=1` EVERY unstaged tracked path is an input (TOOL-aMendedFleet-111
+    # S4): the render then reads product source through drift-audit's `git grep` over the working
+    # tree, so a citation edit anywhere moves LIVE's Landed-unclosed count. A superset of the evidence
+    # globs, priced in the spec: at worst a refusal naming a path the render did not read.
+    luc=$(read_conf_value .memory-tree.conf LIVE_LANDED_UNCLOSED) || luc=""
     while IFS= read -r -d '' p; do
       h0[$p]=$(GIT hash-object -- "$p" 2>/dev/null) || h0[$p]=-
-      case "$p" in "$M"/*|.memory-tree.conf) dirty="$dirty${dirty:+ }$p" ;; esac
+      case "$p" in "$M"/*|.memory-tree.conf) dirty="$dirty${dirty:+ }$p" ;;
+        *) [ "${luc//[[:space:]]/}" != 1 ] || dirty="$dirty${dirty:+ }$p" ;; esac
     done < <(GIT diff --no-renames --name-only -z 2>/dev/null)
     while IFS= read -r -d '' p; do
       h0[$p]=$(GIT hash-object -- "$p" 2>/dev/null) || h0[$p]=-
@@ -7979,10 +8256,62 @@ read_ask_back() { # ask id · slug · SEV -> 0 when ASKS_CMD reads it back as ON
   return 1
 }
 
+read_roster_family() { # slug -> the first family of the build README's front-matter roster; nothing when none
+  awk 'NR == 1 { next } /^---/ { exit } /^roster:/ { v = $0; sub(/^roster:[[:space:]]*/, "", v); print v; exit }' \
+    "$(readme_of "$1")" 2>/dev/null | tr '+, ' '\n\n\n' | grep -m1 -E '^[A-Z]+$'
+}
+
+# THE BACKUP, THE WRITE, THE READ-BACK AND THE ROLLBACK, one copy for every auto-filer of this
+# section. It prints exactly one line naming the subject (`leg <name>`, `suite <name>`) and returns 0
+# only when the ask was filed and read back.
+#
+# THE BACKUP IS THE ROLLBACK'S PRECONDITION, so it is PROVEN before the file is touched, and a
+# file that cannot be backed up is not written at all (closing diff review of dDerivedDocket,
+# F4). This used to set `had=1` before the backup existed and never look again: under a temp store
+# that failed after the bar ran, `mktemp` left `prior` empty, the restore guard read false, and
+# the rollback's other arm DELETED a BACKLOG.md that existed before the write and staged the
+# deletion into the close's records commit. A `cp` that failed or stopped short left a backup the
+# restore then copied over the file. `cmp` is the proof: a backup that is not byte for byte the
+# file is not a backup.
+write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 · ask row · SEV row · KEEP row · [SEV, HIGH] -> 0 filed
+  local bl=$1 slug=$2 id=$3 what=$4 at8=$5 sev=${9:-HIGH} prior="" had=0 restored rc=0
+  if [ -f "$bl" ]; then
+    had=1
+    if ! prior=$(mktemp) || ! cp -- "$bl" "$prior" || ! cmp -s "$bl" "$prior"; then
+      [ -z "$prior" ] || rm -f -- "$prior"
+      echo "gates-green: no ask filed for $what — $bl could not be backed up before the write, so a rollback could not put it back, and it is left exactly as it was"
+      return 1
+    fi
+  fi
+  mkdir -p "${bl%/*}" && write_backlog_rows "$bl" "$slug" "$6" "$7" "$8" && GIT add -- "$bl" 2>/dev/null
+  if read_ask_back "$id" "$slug" "$sev"; then
+    echo "gates-green: filed ask $id for $what red at $at8, $sev, staged in $bl"
+    case " $WI_STAGED " in *" $bl "*) ;; *) WI_STAGED="$WI_STAGED${WI_STAGED:+ }$bl" ;; esac
+  else
+    rc=1
+    # REMOVED, and the file put back exactly as it was: a row the parser cannot read back is a row
+    # every later reader would read differently from this writer. A path that EXISTED before the
+    # write is only ever restored from its proven backup and never removed; a restore that fails
+    # KEEPS the backup and names it, because deleting the one good copy is the step to refuse.
+    restored=1
+    if [ "$had" = 1 ]; then
+      if cp -- "$prior" "$bl"; then GIT add -- "$bl" 2>/dev/null; else restored=0; fi
+    else GIT rm -q --cached -f -- "$bl" >/dev/null 2>&1; rm -f -- "$bl"; fi
+    if [ "$restored" = 1 ]; then
+      echo "gates-green: the rows for $what were REMOVED — the declared ask generator did not read $id back as one OPEN $sev ask homed at $slug: $AB_WHY"
+    else
+      echo "gates-green: the rows for $what could NOT be removed — $bl was not put back from its backup, which is KEPT at $prior; restore it by hand before committing. The declared ask generator did not read $id back as one OPEN $sev ask homed at $slug: $AB_WHY"
+      prior=""
+    fi
+    [ -z "${RB_OUT:-}" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+  fi
+  [ -z "$prior" ] || rm -f -- "$prior"
+  return "$rc"
+}
+
 write_inherited_asks() { # slug · R · run dir
-  local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k prior had restored
+  local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k
   local r8=${2:0:8} today sev filed=0
-  WI_STAGED=""
   bl="$M/builds/$slug/BACKLOG.md"
   today=$(date -u +%Y-%m-%d)
   [ -f "$d/attribution" ] || return 0
@@ -8006,10 +8335,7 @@ write_inherited_asks() { # slug · R · run dir
     # the first family of the build README's roster.
     fam=""
     case "$ownid" in [A-Z]*-*) fam=${ownid%%-*} ;; esac
-    if [ -z "$fam" ]; then
-      fam=$(awk 'NR == 1 { next } /^---/ { exit } /^roster:/ { v = $0; sub(/^roster:[[:space:]]*/, "", v); print v; exit }' \
-              "$(readme_of "$slug")" 2>/dev/null | tr '+, ' '\n\n\n' | grep -m1 -E '^[A-Z]+$')
-    fi
+    [ -n "$fam" ] || fam=$(read_roster_family "$slug")
     if [ -z "$fam" ]; then
       echo "gates-green: no ask filed for leg $leg — the build README names no roster family and the age probe named no owner id, so there is no family to mint the id in"
       continue
@@ -8041,51 +8367,202 @@ write_inherited_asks() { # slug · R · run dir
       printf '    %s\n' "$a" "$s" "$k"
       continue
     fi
-    # THE BACKUP IS THE ROLLBACK'S PRECONDITION, so it is PROVEN before the file is touched, and a
-    # file that cannot be backed up is not written at all (closing diff review of dDerivedDocket,
-    # F4). This used to set `had=1` before the backup existed and never look again: under a temp store
-    # that failed after the bar ran, `mktemp` left `prior` empty, the restore guard read false, and
-    # the rollback's other arm DELETED a BACKLOG.md that existed before the write and staged the
-    # deletion into the close's records commit. A `cp` that failed or stopped short left a backup the
-    # restore then copied over the file. `cmp` is the proof: a backup that is not byte for byte the
-    # file is not a backup.
-    had=0; prior=""
-    if [ -f "$bl" ]; then
-      had=1
-      if ! prior=$(mktemp) || ! cp -- "$bl" "$prior" || ! cmp -s "$bl" "$prior"; then
-        [ -z "$prior" ] || rm -f -- "$prior"
-        echo "gates-green: no ask filed for leg $leg — $bl could not be backed up before the write, so a rollback could not put it back, and it is left exactly as it was"
-        continue
-      fi
-    fi
-    mkdir -p "${bl%/*}" && write_backlog_rows "$bl" "$slug" "$a" "$s" "$k" && GIT add -- "$bl" 2>/dev/null
-    if read_ask_back "$id" "$slug" "$sev"; then
-      echo "gates-green: filed ask $id for leg $leg red at $r8, $sev, staged in $bl"
-      filed=$((filed + 1))
-      case " $WI_STAGED " in *" $bl "*) ;; *) WI_STAGED="$WI_STAGED${WI_STAGED:+ }$bl" ;; esac
-    else
-      # REMOVED, and the file put back exactly as it was: a row the parser cannot read back is a row
-      # every later reader would read differently from this writer. A path that EXISTED before the
-      # write is only ever restored from its proven backup and never removed; a restore that fails
-      # KEEPS the backup and names it, because deleting the one good copy is the step to refuse.
-      restored=1
-      if [ "$had" = 1 ]; then
-        if cp -- "$prior" "$bl"; then GIT add -- "$bl" 2>/dev/null; else restored=0; fi
-      else GIT rm -q --cached -f -- "$bl" >/dev/null 2>&1; rm -f -- "$bl"; fi
-      if [ "$restored" = 1 ]; then
-        echo "gates-green: the rows for leg $leg were REMOVED — the declared ask generator did not read $id back as one OPEN $sev ask homed at $slug: $AB_WHY"
-      else
-        echo "gates-green: the rows for leg $leg could NOT be removed — $bl was not put back from its backup, which is KEPT at $prior; restore it by hand before committing. The declared ask generator did not read $id back as one OPEN $sev ask homed at $slug: $AB_WHY"
-        prior=""
-      fi
-      [ -z "${RB_OUT:-}" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
-    fi
-    [ -z "$prior" ] || rm -f -- "$prior"
+    write_ask_rows "$bl" "$slug" "$id" "leg $leg" "$r8" "$a" "$s" "$k" "$sev" && filed=$((filed + 1))
   done < "$d/attribution"
   # TOOL-dMendedRecall-2 S1 - THE VIEWS, once per call and only when this call FILED: a reused ask,
   # the dark path, a leg it could not file and rows it rolled back move no view, so a call that
   # files nothing prints exactly what it printed before the views were its job. A miss is named
   # by the helper and changes nothing here: the item's verdict is the caller's, as it was.
+  [ "$filed" -gt 0 ] || return 0
+  write_ask_views "$filed" || :
+  [ -z "$AV_STAGED" ] || WI_STAGED="$WI_STAGED $AV_STAGED"
+  return 0
+}
+
+# ---- THE DAILY HELD JOB'S REDS, routed into the same auto-file. TOOL-aMendedFleet-9.
+# The remote CI workflow's scheduled `held` job runs the self-test suites the merge bar does not, and
+# its reds had no owner on any record. `gates-green` reads the latest COMPLETED scheduled run of the
+# workflow `HELD_CI_WORKFLOW` names, after its bar and on every return code, and files one OPEN HIGH
+# ask per red held suite through the helpers above.
+#
+# THE KEY IS READ AT R AND NEVER FROM THE TREE, by `read_policy_key`, parse-only, as the gate policy
+# is. Blank or absent is DARK and makes no request; a value outside `[A-Za-z0-9._-]+` ending `.yml`
+# or `.yaml` is refused by name before any URL is built from it.
+#
+# THE READ: one anonymous HTTPS GET of the runs listing and one per page of that run's jobs, at the
+# literal host `api.github.com`, for the owner and repository parsed out of the anchor URL only when
+# its host is `github.com`. No redirect is followed, no credential is sent or read, every request is
+# bounded at 30 seconds and every response at 4 MiB. Every way the read can fail to see the job is a
+# DEAD PROBE line that files nothing: a non-GitHub anchor, a non-200 answer, no completed scheduled
+# run, no job named `held <suite>`, or fewer jobs read than the API declares. A green day prints a
+# zero red count beside a non-zero job count, so a broken probe cannot read as a clean one.
+#
+# REUSED BEFORE IT IS FILED, over EVERY build's `BACKLOG.md`, not only this one's: a red the daily
+# job carries for a week would otherwise collect one HIGH ask per closing build. A job name is
+# untrusted text bound for a tracked file, so one carrying a backtick, a control character, the
+# ` · ` separator or the ` → ` arrow is refused and named, and so is a head sha R does not descend
+# from. Nothing here changes the caller's verdict.
+read_held_reds() { # anchor URL · workflow file name -> one TAB row per held job and ONE liveness line, or ONE DEAD PROBE line
+  local py
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ]; then
+    echo "held reader: DEAD PROBE — no python launcher resolves, so nothing was read"; return 0
+  fi
+  RHR_URL="$1" RHR_WF="$2" "$py" -c '
+import json, os, re, sys, urllib.error, urllib.request
+try:
+    sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+except Exception:
+    pass
+def dead(why):
+    print("held reader: DEAD PROBE — " + why)
+    sys.exit(0)
+url, wf = os.environ["RHR_URL"].strip(), os.environ["RHR_WF"]
+if not re.fullmatch(r"[A-Za-z0-9._-]+\.ya?ml", wf):
+    dead("the workflow file name is outside [A-Za-z0-9._-]+ ending .yml or .yaml: " + repr(wf))
+m = re.fullmatch(r"(?:https://github\.com/|ssh://git@github\.com/|git@github\.com:)([A-Za-z0-9._-]+)/([A-Za-z0-9._-]+?)(?:\.git)?/?", url)
+if not m:
+    dead("the anchor URL is not a github.com repository, so there is no public job listing to read: " + (url or "(none)"))
+class Refuse(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *args, **kwargs):
+        return None
+opener, cap = urllib.request.build_opener(Refuse), 4 << 20
+def get(path):
+    req = urllib.request.Request("https://api.github.com" + path, headers={
+        "Accept": "application/vnd.github+json", "User-Agent": "unattended-held-reader"})
+    try:
+        with opener.open(req, timeout=30) as r:
+            status, body = r.status, r.read(cap + 1)
+    except urllib.error.HTTPError as e:
+        dead("GET " + path + " answered HTTP " + str(e.code))
+    except Exception as e:
+        dead("GET " + path + " did not answer: " + type(e).__name__)
+    if status != 200:
+        dead("GET " + path + " answered HTTP " + str(status))
+    if len(body) > cap:
+        dead("GET " + path + " answered more than the 4 MiB cap")
+    try:
+        return json.loads(body)
+    except ValueError:
+        dead("GET " + path + " answered something that is not JSON")
+base = "/repos/%s/%s/actions" % (m.group(1), m.group(2))
+runs = get(base + "/workflows/" + wf + "/runs?event=schedule&status=completed&per_page=1").get("workflow_runs") or []
+if not runs:
+    dead("no completed scheduled run of " + wf + " exists at " + m.group(1) + "/" + m.group(2))
+rid, sha = runs[0].get("id"), str(runs[0].get("head_sha") or "")
+# EVERY FIELD BEFORE THE LAST IS NON-EMPTY: the writer splits on TAB, which bash collapses, so an
+# empty sha would shift the conclusion out of its field and a red would read as no verdict at all.
+if not re.fullmatch(r"[0-9a-f]{40}", sha) or not isinstance(rid, int):
+    dead("the latest completed scheduled run carries no 40-hex head sha or integer id: %r %r" % (sha, rid))
+jobs, total, page = [], None, 1
+while True:
+    got = get(base + "/runs/%s/jobs?per_page=100&page=%d" % (rid, page))
+    total, batch = got.get("total_count"), got.get("jobs") or []
+    jobs += batch
+    if not batch or not isinstance(total, int) or len(jobs) >= total or page >= 50:
+        break
+    page += 1
+if not isinstance(total, int) or len(jobs) != total:
+    dead("run %s declares %s job(s) and %d were read" % (rid, total, len(jobs)))
+held = [j for j in jobs if str(j.get("name") or "").startswith("held ") and str(j.get("name"))[5:].strip()]
+if not held:
+    dead("run %s at %s carries %d job(s) and none is named held <suite>" % (rid, sha[:8], len(jobs)))
+red = 0
+for j in held:
+    c = str(j.get("conclusion") or "")
+    red += c in ("failure", "timed_out")
+    # A TAB, a newline, a CR or a NUL in a name would split the row; each becomes U+001F, a control
+    # character the writer refuses by name, so the row grammar holds and the refusal stays visible.
+    print("held\t%s\t%s\t%s\t%s" % (str(j["name"])[5:].translate({0: 31, 9: 31, 10: 31, 13: 31}), sha, rid, c))
+print("held reader: run %s at %s · %d held job(s) read · %d red" % (rid, sha[:8], len(held), red))
+' || echo "held reader: DEAD PROBE — the reader exited $? without a verdict"
+}
+
+write_held_asks() { # slug · R · bar run dir -> one line per red held suite: filed, reused or refused; never a verdict
+  local slug=$1 r=$2 d=$3 r8=${2:0:8} conf wf line suite sha run concl sha8 bl f home cand reused fam seq id
+  local argv file tok seen a s k today filed=0
+  local -a rows=()
+  if [ -z "$r" ]; then
+    echo "gates-green: held reader — no advertised tip was observed, so there is no R to read HELD_CI_WORKFLOW at, and nothing is read"
+    return 0
+  fi
+  conf=$(GIT show "$r:${CONF##*/}" 2>/dev/null) || conf=""
+  wf=$(read_policy_key "$conf" HELD_CI_WORKFLOW)
+  if [ -z "$wf" ]; then
+    echo "gates-green: held reader DARK — HELD_CI_WORKFLOW is blank or absent in the conf at $r8, so no request is made"
+    return 0
+  fi
+  if [[ ! $wf =~ ^[A-Za-z0-9._-]+\.ya?ml$ ]]; then
+    echo "gates-green: held reader refused — HELD_CI_WORKFLOW at $r8 is outside [A-Za-z0-9._-]+ ending .yml or .yaml, so no URL is built from it: $(printf '%q' "$wf")"
+    return 0
+  fi
+  while IFS= read -r line; do
+    case "$line" in
+      held$'\t'*) rows+=("$line") ;;
+      ?*) echo "gates-green: $line" ;;
+    esac
+  done < <(read_held_reds "${AURL:-}" "$wf")
+  bl="$M/builds/$slug/BACKLOG.md"
+  today=$(date -u +%Y-%m-%d)
+  for line in "${rows[@]}"; do
+    IFS=$'\t' read -r _ suite sha run concl <<< "$line"
+    case "$concl" in failure|timed_out) ;; *) continue ;; esac
+    case "$suite" in
+      *'`'*|*[[:cntrl:]]*|*' · '*|*' → '*)
+        echo "gates-green: held suite refused, no ask filed — its name carries a backtick, a control character, the ' · ' separator or the ' → ' arrow, any of which breaks the ask grammar: $(printf '%q' "$suite")"
+        continue ;;
+    esac
+    if [[ ! $sha =~ ^[0-9a-f]{40}$ ]] || [[ ! $run =~ ^[0-9]+$ ]]; then
+      echo "gates-green: no ask filed for held suite $suite — the reader's row carries a head sha or run id that is not one: $sha $run"
+      continue
+    fi
+    sha8=${sha:0:8}
+    if ! GIT merge-base --is-ancestor "$sha" "$r" 2>/dev/null; then
+      echo "gates-green: no ask filed for held suite $suite — its head sha $sha is not an ancestor of R $r8 here, so the red is not proven on the default branch"
+      continue
+    fi
+    reused=""
+    if [ -n "${ASKS_CMD:-}" ]; then
+      for f in "$M"/builds/*/BACKLOG.md; do
+        [ -f "$f" ] || continue
+        home=${f%/BACKLOG.md}; home=${home##*/}
+        while IFS= read -r cand; do
+          [ -n "$cand" ] || continue
+          if read_ask_back "$cand" "$home" HIGH; then
+            echo "gates-green: ask $cand already OPEN HIGH for held suite $suite in $f · reused"; reused=1; break
+          fi
+        done < <(grep -F -- "held red: suite $suite red at " "$f" 2>/dev/null \
+                   | awk '/^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed / { v = $2; print v }')
+        [ -z "$reused" ] || break
+      done
+    fi
+    [ -z "$reused" ] || continue
+    fam=$(read_roster_family "$slug")
+    if [ -z "$fam" ]; then
+      echo "gates-green: no ask filed for held suite $suite — the build README names no roster family, so there is no family to mint the id in"
+      continue
+    fi
+    # THE LOCATOR: the suite's own script at that sha when the leg manifest the bar's header names
+    # resolves it there, else the workflow file at that sha, which is where the suite's job is defined.
+    if argv=$(read_leg_argv "$d" "$sha" "$suite") && [ -n "$argv" ]; then
+      file=""
+      for tok in ${argv#* }; do case "$tok" in -*) ;; *) file=$tok; break ;; esac; done
+      [ -n "$file" ] || file=${argv%% *}
+      seen="seen \`$file\`@$sha8 run \`$argv\`"
+    else
+      seen="seen \`.github/workflows/$wf\`@$sha8"
+    fi
+    seq=$(derive_ask_seq "$fam" "$slug")
+    id="$fam-$slug-$seq"
+    a="- $id · filed $today · held red: suite $suite red at $sha8 on the daily held job, run $run · $seen · accept the suite is green on the daily held job at the default branch's tip"
+    s="- SEV · $id · HIGH · a held self-test is red on the default branch's daily job"
+    k="- KEEP · $id · filed by an unattended run for the owning build; outside this build's goal"
+    if [ -z "${ASKS_CMD:-}" ]; then
+      echo "gates-green: ASKS_CMD is blank, so the held auto-file is DARK and writes nothing; it would have filed, in $bl:"
+      printf '    %s\n' "$a" "$s" "$k"
+      continue
+    fi
+    write_ask_rows "$bl" "$slug" "$id" "held suite $suite" "$sha8" "$a" "$s" "$k" && filed=$((filed + 1))
+  done
   [ "$filed" -gt 0 ] || return 0
   write_ask_views "$filed" || :
   [ -z "$AV_STAGED" ] || WI_STAGED="$WI_STAGED $AV_STAGED"
@@ -8290,6 +8767,131 @@ check_inplace_preconditions() { # slug -> 0 when the bar may run over a prepared
   esac
   [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
   return 1
+}
+
+# TOOL-aMendedFleet-66 - THE OPEN ASKS THAT TARGET A FILE THE RUN'S RANGE TOUCHED, REPORT-ONLY, READ
+# AT VERIFYING. An open ask about a file reached no stage that was editing that file, so the move
+# into VERIFYING, where the run decides what its one --close carries, lists them for disposition.
+# The range is print_selftests_owed's read: the pinned base fact to HEAD, NUL-delimited and
+# rename-free. Matching and ranking are the generator's own `--path` (call shape 4 of the asks
+# companion), read as JSON by key and never by position. Every state says which on one line, and
+# this returns 0 on every path: the list never refuses and never moves an exit.
+print_touched_asks() { # run-state file -> lists the open asks whose pointer names a file the range touched
+  local _b _p _py _rc _list _first
+  local -a _paths=()
+  if [ -z "${ASKS_CMD:-}" ]; then
+    echo "unattended: open asks targeting this run's range not asked — this project declares no ASKS_CMD, so the ask contract is NOT ADOPTED here and no list is printed"
+    return 0
+  fi
+  _b=$(fact "$1" base)
+  if [ -z "$_b" ]; then
+    echo "unattended: the record pins no base, so the range whose touched files the open asks are matched against cannot be read, and no list is printed; whether any ask targets it is unanswerable here, not no"
+    return 0
+  fi
+  if ! GIT rev-parse -q --verify "$_b^{commit}" >/dev/null 2>&1; then
+    echo "unattended: the record's base ${_b:0:8} does not resolve in this clone, so the range whose touched files the open asks are matched against cannot be read, and no list is printed; whether any ask targets it is unanswerable here, not no"
+    return 0
+  fi
+  # ponytail: one path per line out of the NUL read, so a path holding a newline splits and matches nothing.
+  _list=$(set -o pipefail
+    GIT diff --no-renames --name-only -z "$_b" HEAD 2>/dev/null |
+      while IFS= read -r -d '' _p; do printf '%s\n' "$_p"; done) || {
+    echo "unattended: the run's range ${_b:0:8}..HEAD could not be diffed, so which open asks target it is unanswerable here, not none"
+    return 0
+  }
+  while IFS= read -r _p; do [ -n "$_p" ] && _paths+=("$_p"); done < <(printf '%s\n' "$_list")
+  if [ "${#_paths[@]}" -eq 0 ]; then
+    echo "unattended: open asks targeting files this run's range touched (report only, for disposition): 0"
+    return 0
+  fi
+  run_bounded $ASKS_CMD --json --path "${_paths[@]}" --limit 0; _rc=$?
+  if [ "$_rc" -eq 2 ]; then
+    _first=$(printf '%s\n' "$RB_ERR" | head -n 1)
+    echo "unattended: open asks targeting this run's range not asked — the declared ASKS_CMD refused the --path call shape with exit 2, which is how a generator that predates it answers: ${_first:-(no stderr)}"
+    return 0
+  fi
+  if [ "$_rc" -ne 0 ]; then
+    echo "unattended: open asks targeting this run's range: DEAD PROBE — the declared ASKS_CMD exited $_rc or outran its bound, so which open asks target the range is unanswerable here, not none"
+    return 0
+  fi
+  if ! _py=$(resolve_python 2>/dev/null) || [ -z "$_py" ]; then
+    echo "unattended: open asks targeting this run's range: DEAD PROBE — no python launcher resolves, so the generator's answer could not be read"
+    return 0
+  fi
+  printf '%s' "$RB_STDOUT" | "$_py" -c '
+import json, sys
+try:
+    sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+except Exception:
+    pass
+try:
+    rows = json.loads(sys.stdin.buffer.read().decode("utf-8"))["asks"]
+    lines = ["  %s · %s · %s · %s" % (r["id"], r["status"], r["sev"], r["summary"]) for r in rows]
+except Exception:
+    print("unattended: open asks targeting this run'"'"'s range: DEAD PROBE — the declared ASKS_CMD printed text that does not read as its --json projection, so which open asks target the range is unanswerable here, not none")
+    sys.exit(0)
+print("unattended: open asks targeting files this run'"'"'s range touched (report only, for disposition): %d" % len(lines))
+for line in lines:
+    print(line)
+' || echo "unattended: open asks targeting this run's range: DEAD PROBE — the inline reader of the generator's answer did not run"
+  return 0
+}
+
+# TOOL-aMendedFleet-83 - THE DOSSIERS THE RUN'S RANGE TOUCHED AND DID NOT REFRESH, REPORT-ONLY, READ
+# AT VERIFYING beside the owed-bar notice, where the run can still refresh one. The rule is the map
+# kit's own range reader, `--stale-dossiers --json`, read by key; this prints it and computes nothing.
+# The reader is DERIVED as the file beside the declared MAP_CLI, never spelled, so a map kit installed
+# at another prefix is found where it is. The base is the pinned fact and is NOT resolved here first:
+# a shallow clone names a sha it never fetched, and the reader's own shallow note is the honest answer
+# there. Every state says which on one line, and this returns 0 on every path.
+print_stale_dossiers() { # run-state file -> lists the dossiers the range touched and did not refresh
+  local _b _kd _py _rc _first
+  _kd=$(dirname -- "${MAP_CLI:-.}")
+  if [ -z "${MAP_CLI:-}" ] || [ ! -f "$ROOT/$MAP_CLI" ] || [ ! -f "$ROOT/$_kd/map_diff.py" ]; then
+    echo "unattended: stale dossiers in this run's range not asked — MAP_CLI is blank, names no file, or has no map_diff.py beside it, so the map's range reader is not adopted here and no list is printed (MAP_CLI: ${MAP_CLI:-blank})"
+    return 0
+  fi
+  _b=$(fact "$1" base)
+  if [ -z "$_b" ]; then
+    echo "unattended: the record pins no base, so the range whose stale dossiers are listed cannot be read, and no list is printed; whether any dossier is stale is unanswerable here, not no"
+    return 0
+  fi
+  if ! _py=$(resolve_python 2>/dev/null) || [ -z "$_py" ]; then
+    echo "unattended: stale dossiers in this run's range: DEAD PROBE — no python launcher resolves, so the map's range reader could not run"
+    return 0
+  fi
+  run_bounded "$_py" "$_kd/map_diff.py" "$_b..HEAD" --stale-dossiers --json; _rc=$?
+  if [ "$_rc" -eq 2 ]; then
+    _first=$(printf '%s\n' "$RB_ERR" | head -n 1)
+    echo "unattended: stale dossiers in this run's range not asked — the map's range reader refused with exit 2, which is how an unadopted map answers: ${_first:-(no stderr)}"
+    return 0
+  fi
+  if [ "$_rc" -ne 0 ]; then
+    echo "unattended: stale dossiers in this run's range: DEAD PROBE — the map's range reader exited $_rc or outran its bound, so which dossiers the range left stale is unanswerable here, not none"
+    return 0
+  fi
+  printf '%s' "$RB_STDOUT" | "$_py" -c '
+import json, sys
+try:
+    sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+except Exception:
+    pass
+try:
+    doc = json.loads(sys.stdin.buffer.read().decode("utf-8"))
+    live, note, of = doc["live"], doc["note"], doc["of"]
+    lines = ["  %s · %s · %s behind · newest %s" % (r["feature"], r["dossier"], r["behind"], r["newest"][:8])
+             for r in doc["dossiers"] if r["stale"]]
+except Exception:
+    print("unattended: stale dossiers in this run'"'"'s range: DEAD PROBE — the map'"'"'s range reader printed text that does not read as its --json answer, so which dossiers the range left stale is unanswerable here, not none")
+    sys.exit(0)
+if not live:
+    print("unattended: stale dossiers in this run'"'"'s range: DEAD PROBE — %s" % note)
+    sys.exit(0)
+print("unattended: dossiers this run'"'"'s range touched and did not refresh (report only): %d of %d" % (len(lines), of))
+for line in lines:
+    print(line)
+' || echo "unattended: stale dossiers in this run's range: DEAD PROBE — the inline reader of the map's answer did not run"
+  return 0
 }
 
 # S3 - THE SELF-TEST TERM IS DERIVED, AND WHAT THE DERIVATION PRODUCES IS AN ANNOUNCEMENT, READ AT
@@ -8613,6 +9215,9 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
       DOD_OUT=""
     fi
   done
+  # TOOL-aMendedFleet-49 S6 - after the set is evaluated, so the bar's own reading is in the history,
+  # and BEFORE the unmet return, so a refused close shows the delta too.
+  print_drift_delta "$rel"
   [ "$unmet" = 0 ] || return 1
   # TOOL-dUnstuckLanding-20 S5 - A MET DoD ON A HAND-OFF NODE WRITES THE BAR'S FACTS AND REFUSES (F2).
   # The facts first, because `--handoff --code owner-landing` reads `gates-run` through the
@@ -8722,7 +9327,7 @@ dod_met() { # slug · run-state file · item · checker
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
       local _grc _gr _gid _ggd _gh _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
-      local -a _genv
+      local -a _genv _grb
       # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
       # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
       # ref: a run's own commit on local main carrying `land` and its own red would sit at R, read
@@ -8798,6 +9403,14 @@ dod_met() { # slug · run-state file · item · checker
         { [ "$_grc" = 3 ] && [ "$_gtry" = 1 ]; } || break
         echo "unattended: gates-green — the bar exited 3, TREE MOVED: the tree changed while it ran, so no verdict describes it; running it once more"
       done
+      # TOOL-aMendedFleet-9 S7 - THE DAILY HELD JOB'S REDS reach the auto-file after the bar has
+      # returned, on EVERY return code: held suites are not bar legs, so the red-bar branch alone
+      # would never see the common case, a green bar over red held suites. A BARE STATEMENT, and the
+      # bar's own capture is put back after it because the read-back inside reuses `run_bounded`, so
+      # the writer's outcome reaches neither DOD_OUT nor this item's return.
+      _grb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR"); WI_STAGED=""
+      write_held_asks "$slug" "$_gr" "$_gdir"
+      RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
       # THE `gates-run` FACT, naming this bar's id and the HEAD it graded - the record S7's two
       # refusals consult. On a MET bar it is written with the close's other writes, after the carry
       # check, so a refusal there still writes nothing; on an UNMET one it is written HERE, because
@@ -9195,8 +9808,9 @@ $_bcopen"
       # ---- The grade is a single token by design.
       # ----
       # ---- DATE-GRANDFATHERED on the spec's FILENAME date against SPEC_THIN_CUTOFF, the same idiom
-      # ---- UNITS_REGION_CUTOFF uses. Two of 307 tracked CLOSED specs grade THIN today, both from a
-      # ---- pre-kit July build, and a term that reds a landed spec no run may rewrite is unlandable.
+      # ---- UNITS_REGION_CUTOFF uses. Two of 307 tracked CLOSED specs graded THIN at 788908bcb
+      # ---- (2026-08-31), both from a pre-kit July build, and a term that reds a landed spec no
+      # ---- run may rewrite is unlandable.
       # ---- BLANK or absent turns the term off entirely, which is announced rather than silent.
       local _bcthin="" _bcid _bcsp _bcdate
       if [ -z "${SPEC_THIN_CUTOFF:-}" ]; then
@@ -11584,7 +12198,8 @@ write_runlog_start() { # the caller's first argument · its second -> the START 
   write_runlog_line "${f[@]}"
 }
 
-# Called by the EXIT trap and nothing else. EVERY read is defaulted: `set -u` holds inside a trap, and
+# Called by the EXIT trap, and once by the run-record writer below, which clears that trap at once so
+# no call writes two END lines. EVERY read is defaulted: `set -u` holds inside a trap, and
 # a trap that aborts on an unset name writes nothing for exactly the call it exists to record.
 write_runlog_end() { # the status the EXIT trap saw -> the END line, then the out-of-band stamp
   local rc="${1:-}" ex=unclean t d dur="" chk="" c u="" ub="" pt="" p1 p2 p3
@@ -11626,6 +12241,88 @@ write_runlog_end() { # the status the EXIT trap saw -> the END line, then the ou
       printf 'unattended: run log — cannot write the out-of-band stamp %s, so the next call cannot tell an outside edit from none; the verb, its output and its exit code are unaffected\n' "$RUNLOG_GITDIR/runlog-stamp-$RUNLOG_SLUG" >&2
     fi
   fi
+  return 0
+}
+
+# TOOL-aMendedFleet-63 - THE RUN RECORD, rendered by the two terminal verbs themselves. The Skill told
+# every run to render it at `--abort` and `--close` and most runs did not, so a run no other node could
+# read was the common case. Called ONCE, from the block after the verb dispatch, and only after a
+# `--close` or `--abort` that returned clean onto a LANDING or ABORTED record.
+#
+# THE END LINE FIRST (S2). The runlog model reads a START with no END as a `killed-verb` anomaly, so a
+# record rendered while this call's END is unwritten would report the very call that rendered it as
+# killed. The END is written here, the EXIT trap is cleared, and the final exit writes no second one.
+#
+# NOTHING HERE CHANGES AN EXIT (S6). Every miss is one line and a return 0: an absent kit (no record is
+# owed), a renderer or generator that refused, a dirty input, a refused stage or commit.
+#
+# THE INDEX follows `write_ask_views`'s two rules (S4): the record is staged FIRST, because the
+# generator lists its inputs with `git ls-files`; nothing renders over an unstaged input under the
+# memory root or `.memory-tree.conf`; and only paths the render newly dirtied are staged.
+write_run_record() { # slug -> 0 always; one line per miss
+  local slug=$1 py="" d="" gen="" rec="" p dirty="" rc
+  local -a stage=()
+  local -A pre=()
+  if [ "${RUNLOG_SWITCH:-}" != 0 ]; then
+    RUNLOG_CLEAN=1; write_runlog_end 0; builtin trap - EXIT
+  fi
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" runlog runlog.py "$KIT_DIR" 2>/dev/null) || [ ! -f "$d/runlog.py" ]; then
+    # The resolver answers REPO-RELATIVE to the kit's own repository, so the file test is what holds
+    # a driver run from another tree to the kit in the tree being closed, as the generator's is.
+    echo "unattended: run record not asked — no runlog kit holding runlog.py resolves beside this kit, so there is nothing to render from and no record is owed"
+    return 0
+  fi
+  run_bounded "$py" -B "$d/runlog.py" record "$slug" --write; rc=$?
+  [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+  if [ "$rc" != 0 ]; then
+    echo "unattended: run record not written — the renderer exited $rc after ${RB_TOOK}s; this verb's exit is unchanged"
+    return 0
+  fi
+  rec=$(printf '%s\n' "$RB_STDOUT" | sed -n 's/^runlog: record written \(.*\) ([0-9]* bytes.*/\1/p' | head -1)
+  [ -n "$rec" ] || return 0   # the renderer's own no-record line, printed above, is the answer
+  GIT add -- "$rec" >/dev/null 2>&1 \
+    || { echo "unattended: run record written but git could not stage it, so no index was rendered: $rec"; return 0; }
+  if ! gen=$(resolve_index_generator) || [ ! -f "$gen" ]; then
+    echo "unattended: run record staged, but no memory-tree generator resolves here, so the index was not re-rendered — repair: $(derive_index_repair)"
+    return 0
+  fi
+  # The inputs: tracked paths under the memory root, the conf tracked or not, and the generator's
+  # own modules (a generator at the root names its top-level modules only), as write_ask_views reads them.
+  # Under `LIVE_LANDED_UNCLOSED=1` no pathspec: every unstaged tracked path, as write_ask_views reads it.
+  d=$(dirname -- "$gen"); [ "$d" != . ] || d=':(glob)*.py'
+  local -a ps=("$M" .memory-tree.conf "$d"); local luc
+  luc=$(read_conf_value .memory-tree.conf LIVE_LANDED_UNCLOSED) || luc=""
+  [ "${luc//[[:space:]]/}" != 1 ] || ps=()
+  while IFS= read -r p; do dirty="$dirty${dirty:+ }$p"; done \
+    < <(GIT diff --no-renames --name-only -- "${ps[@]}" 2>/dev/null)
+  [ -z "$(GIT ls-files --others --exclude-standard -- .memory-tree.conf 2>/dev/null)" ] || dirty="$dirty${dirty:+ }.memory-tree.conf"
+  if [ -n "$dirty" ]; then
+    echo "unattended: run record staged, but the index was not re-rendered: its inputs carry changes the index does not hold: $dirty — repair: stage or discard them, then run $(derive_index_repair)"
+    return 0
+  fi
+  while IFS= read -r p; do pre[$p]=1; done < <(scan_dirty_paths)
+  run_bounded "$py" -B "$gen" --write; rc=$?
+  while IFS= read -r p; do [ -n "${pre[$p]+x}" ] || stage+=("$p"); done < <(scan_dirty_paths | sort -u)
+  if [ "$rc" != 0 ]; then
+    echo "unattended: run record staged, but the index generator exited $rc after ${RB_TOOK}s — repair: $(derive_index_repair)"
+    [ -z "${RB_OUT:-}" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+  fi
+  if [ "${#stage[@]}" != 0 ] && ! GIT add -A -- "${stage[@]}" >/dev/null 2>&1; then
+    echo "unattended: run record staged, but git could not stage what the index render moved: ${stage[*]}"
+    return 0
+  fi
+  # S5 - THE COMMIT, only where the close already commits: `in-place`, after `--close`.
+  if [ "$VERB" = --close ] && [ "$LANDER_MODE" = in-place ]; then
+    if run_bounded git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" commit -q -m "records($slug): the run record"; then
+      echo "unattended: run record committed at $(GIT rev-parse --short HEAD 2>/dev/null) on top of the close record"
+    else
+      echo "unattended: run record staged, but its commit failed — the commit's own output follows"
+      [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+    fi
+    return 0
+  fi
+  echo "unattended: run record staged, with the ${#stage[@]} path(s) its index render moved: $rec — commit them with the run-state file"
   return 0
 }
 
@@ -11789,6 +12486,7 @@ while [ $# -gt 0 ]; do
                     CC_TMP=$(mktemp) || { echo "unattended: --check-commit cannot create a scratch file, so it graded nothing"; RUNLOG_CLEAN=1; exit 2; }
                     check_commit_message "${1:-}"; _rl_rc=$?; rm -f "$CC_TMP"; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; RUNLOG_CLEAN=1; exit 0 ;;
+    --overlaps)     print_overlaps; RUNLOG_CLEAN=1; exit 0 ;;
     # THE SET IS THE DISPATCH. A slug-taking verb is recognised by membership in VERBS_SLUG rather
     # than by an alternation typed here, so the declaration is load-bearing: a verb absent from it
     # falls through to refusal 14 and does not run at all. The arm sits LAST because every flag above
@@ -11833,5 +12531,12 @@ case "$VERB" in
   --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$VERDICT" ;;
   --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" ;;
   --dispatch)  verb_dispatch "$SLUG" "$PK_ITEM" "${DP_WRITES[@]}" ;;
+esac
+# TOOL-aMendedFleet-63 - the two terminal verbs render the run record, after their own END line.
+case "$VERB" in
+  --close|--abort)
+    if [ "$status" = 0 ]; then
+      case "$(fact "$(runmd_of "$SLUG")" phase 2>/dev/null)" in LANDING|ABORTED) write_run_record "$SLUG" ;; esac
+    fi ;;
 esac
 RUNLOG_CLEAN=1; exit "$status"

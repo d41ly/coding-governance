@@ -26,7 +26,7 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in.
-KIT_CHECK_WIRING_VERSION=1.23   # gov:kit check-wiring@1.23 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.24   # gov:kit check-wiring@1.24 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -1104,6 +1104,38 @@ check_merge_rows() {
   fi
 }
 
+# --- the merge=ours arm: generated views take one side ---------------------------------------------
+# `.gitattributes` routes the wholly generated views through `merge=ours`, so a merge keeps this side
+# and the freshness checks red the stale render. But git ships `ours` as a merge STRATEGY, not a
+# DRIVER: with `merge.ours.driver` unset the attribute falls back to the text merge and conflicts,
+# printing no warning (probed, git 2.54). The driver is the shell's `true`, which leaves %A — this
+# side — as written. The config tail is check_merge_rows' own: set when unset under --fix/--session,
+# a foreign value reported and never overwritten. (aMendedFleet unit 22)
+check_merge_ours() {
+  local cur
+  # One `check-attr --stdin` over the tracked paths, the same read check_merge_rows makes.
+  if ! git ls-files 2>/dev/null | git check-attr --stdin merge 2>/dev/null | grep -q ': merge: ours$'; then
+    echo "skip     merge     — merge=ours is declared on no tracked path"
+    return
+  fi
+  cur=$(git config merge.ours.driver 2>/dev/null || true)
+  if [ -z "$cur" ]; then
+    if [ "$DO_FIX" = 1 ]; then
+      git config merge.ours.driver true && echo "FIXED    merge     — set merge.ours.driver"
+    else
+      echo "UNWIRED  merge     — paths declare merge=ours but merge.ours.driver is unset; git has no built-in ours driver, so it falls back to a text merge that conflicts on a generated view. Fix: git config merge.ours.driver true"
+      unwired=$((unwired+1))
+    fi
+    return
+  fi
+  if [ "$cur" = true ]; then
+    echo "ok       merge     — merge.ours.driver wired"
+  else
+    echo "UNWIRED  merge     — merge.ours.driver='$cur', not 'true'; NOT overwriting (deliberate?)"
+    unwired=$((unwired+1))
+  fi
+}
+
 # --- Check S: the machine-global /session-kickoff install matches the tracked engine ---------------
 # CONTENT, not link-ness. The obvious check — is the install a junction or a symlink — cannot be
 # written portably here: under MSYS an NTFS junction is not reported by `test -L`, it presents as an
@@ -1289,6 +1321,7 @@ check_scratch_guard
 check_recall_opened
 check_card
 check_merge_rows
+check_merge_ours
 check_eol
 check_skill_install
 check_backlog_stragglers

@@ -11,6 +11,7 @@ decisions = []
 gate-legs = ["spec tokens (a spec's own names resolve)", "spec-tokens self-test"]
 kits = []
 git-hooks = []
+harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -65,7 +66,11 @@ in `.unattended.conf`, over the live tree before admitting a pass, because that 
 unit spec in its build commit and no bar ever grades one. The research record under
 `memory/builds/aDeferredBar/build/` traced one unit's 68-minute stall to exactly such a token in its
 AC8; the substitute the refusal names is the direct check — the checker on a staged break, a
-`--selftest` flag, a fixture — with the suite declared under `New arm:`. The test runs FIRST in each
+`--selftest` flag, a fixture — with the suite declared under `New arm:`. The `covers` join
+(TOOL-aMendedFleet-75) grades the one field of that line a checker reads: each id a `covers` field
+names must be a criterion label the same spec's acceptance section defines, `none` passes only
+alone, a line without the field is ungraded, and every run prints the arm lines, carriers and tokens
+it read. The test runs FIRST in each
 loop on the raw token, because `NOT_A_TOKEN` and `NOT_A_LEG` would drop the motivating
 `GATE_SELFTESTS=1 bash …` token unread. The cutoff is a RELATION, not a constant: the day after the
 later of the newest spec filename date on any ref and the setting commit's own date, and the checker
@@ -158,6 +163,10 @@ shape, never a waiver row, because a shape generalises to specs nobody has writt
 - `python tools/check-spec-tokens.py` — the leg. Silent plus exit 0 is compliance.
 - `python tools/check-spec-tokens.py --list` — every hit AND near-miss, exit 0. The authoring aid,
   and the pre-wiring instrument section 7 of the charter requires before a predicate is wired.
+- `python tools/check-spec-tokens.py --legs-for <path>...` (or `-` for stdin) — a query, not a join:
+  the legs whose guard each path trips by the guards join's own rule, broad ones marked, glob guards
+  printed UNEVALUATED, and the unguarded count as a footer. Grades no spec; exit 2 when every path
+  is untracked (TOOL-aMendedFleet-87).
 - `memory/project/spec-token-waivers.txt` — the shrink-only exception registry.
 
 ## The section-7 contract (TOOL-aJoinedCanon-7)

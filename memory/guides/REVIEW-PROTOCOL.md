@@ -185,9 +185,10 @@ which is the defeatable class this rule exists to stay out of.
 
 Dimension finders (security / correctness / data-integrity / dead-code / integration-seams) emit
 `file:line` findings **scoped to an immutable base SHA**, then skeptics try to REFUTE each before it
-is recorded. Feed the finders the security model, the open backlog — the asks
-`gen_build_index.py --asks --json` prints, or the backlog shards when its `mode` field says
-`shards` — and what is by-design, so they hunt NEW issues instead of re-reporting known ones.
+is recorded. Feed the finders the security model, the open asks on the files under review — the
+rows `gen_build_index.py --asks --json --path <every path the diff touches>` prints, ranked by
+severity and capped, with `--limit 0` lifting the cap, or the backlog shards when its `mode` field
+says `shards` — and what is by-design, so they hunt NEW issues instead of re-reporting known ones.
 
 Default configuration: **3–6 primed finder lenses → batched default-refute skeptics within the
 hook's declared bound → one
@@ -196,7 +197,10 @@ synthesis pass**; three phases, find → verify → synthesize. The ready-made h
 takes a structured `args` object and REFUSES a prose string, because defaulting the review root to
 the process cwd twice made it audit a repository nobody had briefed it on.
 
-**Results are durable.** Every lens and skeptic batch Writes its result to
+**Results are durable only on request.** By default every finder and skeptic batch spawns as the
+read-only `Plan` type, which holds no Write tool, so it writes no result file and a resume reuses
+nothing: a re-run dispatches every judge again (TOOL-aMendedFleet-93). A run that passes
+`workerType: 'none'` spawns its judges with the charter loaded, and each Writes its result to
 `<git-common-dir>/review-lenses/<key>/find-<lens>.json` or `verify-<first id>-<last id>.json`
 BEFORE it returns, and all three schemas require its `path`. The key is the kind, the round, the
 pinned subject and a print of the inputs, so a re-run with identical args reuses every file that

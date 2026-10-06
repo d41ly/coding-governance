@@ -11,6 +11,7 @@ decisions = []
 gate-legs = ["codebase-map coverage + freshness", "codebase-map gate coverage", "codebase-map kit selftest", "codebase-map adopter e2e"]
 kits = ["codebase-map"]
 git-hooks = []
+harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -42,9 +43,23 @@ in `map_extractors.py` is gone and must not be reintroduced — the kit's selfte
 with `map_lib.kit_dir()` about the prefix stamped into byte-compared artifacts.
 
 `baseline.toml` holds the shrink-only backfill of the keys no dossier claims yet: a new key must be claimed
-in a dossier, never appended to the baseline. The gate proved this on its own first run — adding the
+in a dossier, never appended to the baseline, and `test_baseline_never_gains_a_key` refuses an appended key by
+comparing the working file with the baseline at the branch's base (`map_lib.resolve_compare_base`, the merge
+bar's merge-base rule; `UNGRADED` when no `origin` default branch or no baseline at the base). The gate proved this on its own first run — adding the
 `codebase-map coverage + freshness` leg failed the coverage assert until this dossier claimed it, and
 again when `codebase-map adopter e2e` arrived from main.
+
+A change to the reuse probe's ranking, its candidate lines or the fan-in it reads runs
+`python tools/codebase-map/replay-phrases.py --floor` before it lands, and records the line it printed.
+That grades a population FROZEN by record date against floors recorded in the script, exits 1 on a
+breach and 2 when the population moved. It is on no leg, by the 2026-08-23 owner ruling.
+
+`generated/CARDS.md` gives each feature a card of at most `FEATURE_CARD_CAP_BYTES` bytes, rendered
+by `map_lib.render_cards_md` from the toml fence ALONE, so a reader learns a dossier's title, status
+and claims without paying for its prose (TOOL-aMendedFleet-43). It reads no prose by design: a prose
+edit never stales it, and a fence edit stales it exactly when it stales `MAP.md`. A card past the
+cap drops items one at a time and its `cut <n> item(s)` line counts them; every list line keeps its
+full count. `FOUNDATION.md` gets no card.
 
 ## Shared seams
 
@@ -59,31 +74,53 @@ artifact then reaches an adopter whose gate has no tier for it. It compares the 
 each side names — never bytes, because a project is entitled to customise its gate — and it says
 plainly that it cannot tell a deliberate omission from a stale one.
 
-`map_imports.py` is this tree's ONE AST import resolver, rescued out of the lexicon kit's P3
-predicate by `TOOL-dTracedLattice-6` ahead of that predicate's deletion. It is a seam, not private
-code: it returns CANDIDATE repo paths for an import target, branched on the importer's extension,
-and it resolves import statements only — no call sites, no attribute receivers, no counting. Its own
-module header states its provenance and the ONE way it differs from the original it was copied from;
-read it there rather than here, because a dossier sentence restating that claim is a second copy
-that can disagree with the source and did. Until `TOOL-aSurfacedLexicon-2` lands the original still
-exists and a selftest arm compares the two BEHAVIOURALLY on every run; after it lands, that arm
-skips with a named reason rather than passing on an absent comparison.
-
 `tools/lib/resolve-python.sh` is inlined byte-identically into `adopt-codebase-map.sh`, which is the
 repo-wide python-launcher seam rather than anything this feature owns.
 
 ## Gaps
 
-- **Two feature dossiers so far.** 69 inventory keys still sit in `baseline.toml`, so coverage is
-  ratcheted but not yet described. The map enforces "nothing new goes unclaimed"; it does not yet
-  answer "what is this repo made of". Read the live counts from `reuse_lookup.py`'s corpus header,
-  never from this line — it is prose and this gap is exactly where prose rots.
-- **bash is recall-dark.** It carries the product here — the gates, adopters and hooks — and
-  `map_lib` ships no shell symbol extractor. Declared in `.codebase-map.conf` `RECALL_DARK_LAYERS`
-  so `reuse_lookup.py` prints a partial-recall notice rather than a falsely confident miss.
+- **Not every key is claimed yet.** The keys no dossier claims sit in `baseline.toml`, so coverage
+  is ratcheted but not fully described. The map enforces "nothing new goes unclaimed"; it does not
+  yet answer "what is this repo made of". Count `features/` and the baseline's rows for the live
+  figures, never this line — no command reports the pair, and prose is where that figure rots.
+- **The digest's convergence figure is its `# code:` line, not its header.** `map_diff.py` splits
+  the population by the conf's `RECORD_ROOTS` (TOOL-aMendedFleet-86): the header mixes code with
+  memory-tree records, which the map does not claim to describe, so it measured how much of a
+  range was record writing. `map_diff.py --tree` prints the same split over every tracked file.
+- **Dossier prose is MEASURED for freshness, never gated.** `map_diff.py --stale-dossiers` derives,
+  from git ancestry and no stamp, which feature dossiers are older than the paths they claim, and
+  drift-audit reports the count as `dossiers_older_than_their_paths` against a shrink-only pin
+  (TOOL-aMendedFleet-37). It says a dossier was not re-read after its code moved, never that its
+  prose is false. Map-root paths are not claims, a merge commit carries no paths, and
+  `FOUNDATION.md` is not measured. Its one `git log` restates every default a config key could
+  change (`--no-show-signature`, `--no-color`, `--no-renames`), because the parse reads that
+  stdout as data and `log.showSignature` alone would print gpg text into it.
+- **One shape of dossier prose IS gated: a present-tense typed count of an inventory population.**
+  The map derives every inventory's size into `MAP.md`, so a digit count of legs or keys in a
+  dossier is a second answer that goes stale (TOOL-aMendedFleet-44). `measure_typed_counts` in
+  `map_lib.py` reads prose only — fences and code spans blanked — and passes a sentence that reads
+  as a past measurement; `test_dossier_prose_carries_no_typed_count` asserts no unfrozen hit and
+  prints its candidate and frozen counts every run, so "read nothing" never looks like "clean".
+  Digits only: a spelled count and a count in the toml `title` are not read.
+- **No closing loop catches reinvention that already shipped.** `map_diff.py --converge` was that
+  loop; no gate leg, hook or workflow ran it, every token-stem collision it had appended on node a
+  was a false positive, and it was deleted with its sink, its `CLONE_COUNT_FILE` key and the
+  documents prescribing it (TOOL-aMendedFleet-38). The lookup, read BEFORE building, is the reuse
+  check that stays, and the freshness signal above is what a close reads.
+- **Shell is in the symbol layer.** It carries the product here — the gates, adopters and hooks —
+  and the project-owned `kit-sh` layer reads every `*.sh` under the tool root, `.githooks/` and
+  `skills/` through the lexicon kit's tokenizer, failing closed. `RECALL_DARK_LAYERS` is empty, so
+  no layer is dark; a shell file with no `.sh` suffix, such as the `pre-push` hook, is not indexed.
 - **`*.template.py` is excluded from the symbol layer** because a template and its instantiated twin
   define the same names in two files, and `fan_in()` counts the twin as a reference. Measured: with
   the templates indexed, two `test_*` functions outranked `walk_dir_keys` in the reuse shortlist.
+- miss predictor: none qualifies (TOOL-aMendedFleet-46, whose record says when and where it was
+  measured), so the lookup prints no miss line and answers a miss with the confidence of a hit.
+  `replay-phrases.py --predictors` grades the shortlist quantities its `PREDICTORS` names by AUC
+  against the hit label, over every graded phrase and over the phrases whose truth is reachable,
+  beside a shuffled-label band; the qualifying rule is its `PREDICTOR_*` constants, read there.
+  Re-run it after any ranker or corpus change: a verdict that names a predictor is what earns the
+  runtime line, as a unit of its own.
 
 ## How the neighbour cap selects
 
@@ -100,7 +137,16 @@ repo-wide python-launcher seam rather than anything this feature owns.
   So the change is correct at source and its effect on the ranks a reader actually looks at is
   nil on this corpus. The instrument is `replay-phrases.py`, which is `project-owned` and on no leg.
 - **The printed header discloses what the ranking does not mean.** Fan-in counts name tokens and
-  resolves no symbols, so a high rank means "this name appears a lot", never "this is your seam".
+  resolves no symbols, so a high rank means "this name appears a lot", not "this is your seam"; the
+  header line says the first half only, its restatement spent on `+ installs` in the seam line.
+- **Fan-in is not the only count: install sites sit beside it.** `fan_in` subtracts every definer,
+  and an inlined copy of a helper defines it, so the most-installed helper read as barely used.
+  `_scan_install_sites` counts each tracked file carrying a `# >>> <name>` canonical-copy marker,
+  the source the marker names left out, and a candidate is a seam when fan-in plus installs reaches
+  the threshold, in the lookup and the affordance worklist alike. Installs are printed and make a
+  seam; they never enter the ordering key, which the replay floor grades. The install-site totals
+  print in the FOOTER: the header is charged against the byte budget, and a header line there
+  pushed a recorded hit past the cut at the floor's zero slack.
 - **The same-kind arm is DIRECTORY-SCOPED, and the axis is the defining file's own directory.** Kind
   alone admitted 619 of 648 kinded candidates — 95% — so no cap over it selected by anything.
   Scoped to the seed's directory the same pool falls to 134 / 133 / 101 / 81 across the four
@@ -120,6 +166,9 @@ repo-wide python-launcher seam rather than anything this feature owns.
   liveness.** `shown_paths` is the deduped, file-backed, repo-relative source set the answer
   pointed a reader at, in shortlist order; `n_sources` is that count BEFORE `SOURCE_PATHS_CAP`, so
   a truncated list is visible AS truncated rather than as a short one.
+- **The byte budget cuts the log the way it cuts the answer** (TOOL-aMendedFleet-36). `shown_paths`
+  and `n_sources` are derived from the candidates `derive_budget_cut()` SHOWED, and `n_cut` counts
+  the ranked candidates the budget dropped. A row older than that key lacks it: unknown, not zero.
 - **`n_shown` was NOT redefined.** It still counts RANKED CANDIDATES, which is a different number
   from the path count. Measured on one live row BEFORE the dossier branch landed, 39 ranked against
   10 sources; the same shape holds after it, at a larger source count. An analysis joining
@@ -133,7 +182,8 @@ repo-wide python-launcher seam rather than anything this feature owns.
 
 ## Reuse affordance
 
-seam: map_lib — reuse for dossier/baseline parsing, deterministic rendering, coverage asserts and
-fan-in ranking; extend via a new helper in `map_lib.py` plus its case in `selftest.py`.
+seam: map_lib — reuse for dossier/baseline parsing, path attribution, dossier freshness
+(`measure_dossier_staleness`), deterministic rendering, coverage asserts and fan-in ranking; extend
+via a new helper in `map_lib.py` plus its case in `selftest.py`.
 seam: map_extractors.EXTRACTORS — reuse for declaring a new enumerable surface of this repo; extend
 via a new key whose callable fails closed, then claim its keys in a dossier.

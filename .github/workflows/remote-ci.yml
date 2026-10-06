@@ -19,7 +19,10 @@
 # WHY WINDOWS UNDER GIT-BASH: every recorded green was earned there, so a Linux runner's first reds
 # would measure the host rather than the tree. WHY THE BAR CLONES TO THE PRIMARY-TREE PATH instead of
 # running in the checkout workspace: the charter renders that path from wherever the clone sits, so a
-# bar run anywhere else reads its own charter as drifted on every push.
+# bar run anywhere else reads its own charter as drifted on every push. THE HELD JOB CLONES THERE TOO,
+# for two reasons the workspace on D: cannot meet: the tracked `.process-monitor.conf` declares that
+# path as its roots, and the manifest-check suite clones the tree with `--local` into a temp root on
+# C:, which fails from another volume with `Improper link`. One workflow-level PRIMARY_TREE names it.
 #
 # Every action is GitHub-owned and pinned by a full commit sha, its tag in the comment beside it.
 name: remote-ci
@@ -33,6 +36,10 @@ on:
 
 permissions:
   contents: read
+
+env:
+  # The path every recorded green was earned at, and the one the rendered charter records.
+  PRIMARY_TREE: C:/projects/coding-governance
 
 jobs:
   history-audit:
@@ -83,9 +90,6 @@ jobs:
     defaults:
       run:
         shell: bash
-    env:
-      # The path every recorded green was earned at, and the one the rendered charter records.
-      PRIMARY_TREE: C:/projects/coding-governance
     steps:
       - name: core.autocrlf off at GLOBAL scope, before the clone
         run: git config --global core.autocrlf false
@@ -279,22 +283,18 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: core.autocrlf off at GLOBAL scope, before any checkout
+      - name: core.autocrlf off at GLOBAL scope, before the clone
         run: git config --global core.autocrlf false
-      - name: checkout, full history, no token left behind
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
-        with:
-          path: tree
-          fetch-depth: 0
-          persist-credentials: false
-      - name: point origin/HEAD at main, which the checkout leaves unset
-        working-directory: tree
-        run: git remote set-head origin main
+      - name: anonymous clone to the primary-tree path, which also sets origin/HEAD
+        run: git clone "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$PRIMARY_TREE"
+      - name: pin the run's sha
+        working-directory: ${{ env.PRIMARY_TREE }}
+        run: git checkout -B main "$GITHUB_SHA"
       - name: origin/HEAD resolves before any bar command runs
-        working-directory: tree
+        working-directory: ${{ env.PRIMARY_TREE }}
         run: git symbolic-ref refs/remotes/origin/HEAD
       - name: run the suite as the sweep runs one, its output written as it runs
-        working-directory: tree
+        working-directory: ${{ env.PRIMARY_TREE }}
         # `timeout` bounds the suite and not the pipe: `tee` reads until its LAST writer closes, so a
         # grandchild that escapes the kill would hold this step open to the job limit. The step
         # timeout, derived by the plan from the same run bound, ends it with the upload still inside.
@@ -303,7 +303,8 @@ jobs:
           HELD_NAME: ${{ matrix.name }}
           HELD_ARGV: ${{ matrix.argv }}
           HELD_BOUND: ${{ matrix.run_bound }}
-          HELD_OUT: ../held-${{ matrix.safe }}.log
+          # Anchored at the workspace, where the upload step resolves it; the tree is outside it.
+          HELD_OUT: ${{ github.workspace }}/held-${{ matrix.safe }}.log
         # Exit 124 or 137 is a kill at the bound, named below. A platform-bounded suite runs under
         # the cap the plan derived, ten minutes inside the job limit, so its upload still runs.
         run: |
@@ -317,7 +318,7 @@ jobs:
           scratch=$(mktemp -d)
           echo "held: $HELD_NAME, bound ${HELD_BOUND}s: $argv"
           rc=0
-          TMPDIR="$scratch" timeout -k 5 "$HELD_BOUND" bash -c "$argv" < /dev/null 2>&1 | tee "$HELD_OUT" || rc=$?
+          TMPDIR="$scratch" timeout -k 5 "$HELD_BOUND" bash -c "$argv" < /dev/null 2>&1 | tee "$(cygpath -u "$HELD_OUT")" || rc=$?
           case "$rc" in
             0) echo "held: $HELD_NAME PASS" ;;
             124|137) echo "held: $HELD_NAME KILLED at its ${HELD_BOUND}s bound, exit $rc" >&2 ;;

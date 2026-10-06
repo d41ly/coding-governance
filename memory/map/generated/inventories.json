@@ -120,6 +120,7 @@
       "transition-audit arms",
       "unattended kit gate",
       "unattended protocol size",
+      "unattended skill size",
       "unattended skill wiring",
       "unattended-build self-test",
       "verdict epoch (kit version dates the engine)",
@@ -149,12 +150,21 @@
     ],
     "git-hooks": [
       "commit-msg",
-      "gate-env.sh",
       "pre-commit",
       "pre-push",
-      "pre-rebase",
-      "pre_push_bar_selftest.py",
-      "straggler-guard.sh"
+      "pre-rebase"
+    ],
+    "harness-hooks": [
+      "PostToolUse tools/memory-recall/recall-opened.js",
+      "PostToolUse tools/process-monitor/procmon-hook.js",
+      "PreToolUse tools/hooks/agent-cap.js",
+      "PreToolUse tools/hooks/scratch-guard.js",
+      "PreToolUse tools/unattended/gate-guard.js",
+      "SessionStart skills/session-kickoff/manifest-check.sh",
+      "SessionStart tools/check-wiring.sh",
+      "SessionStart tools/process-monitor/procmon-hook.js",
+      "Stop tools/unattended/stop-guard.js",
+      "StopFailure tools/unattended/stall-recorder.js"
     ],
     "workflow-scripts": [
       "check-workflow-syntax.js",
@@ -280,6 +290,7 @@
     "guides": [
       "ANNOTATION-STYLE.md",
       "BUILD-METHOD.md",
+      "MERGE-BAR.md",
       "PLAYBOOK-TEMPLATE.md",
       "REVIEW-PROTOCOL.md",
       "SESSION-KICKOFF.md",

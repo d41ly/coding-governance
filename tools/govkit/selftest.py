@@ -224,7 +224,7 @@ def run(*args: str, cwd: pathlib.Path | None = None) -> subprocess.CompletedProc
         _argv += ["--to", GOV_PIN]
     _p = subprocess.run(
         [sys.executable, str(GOVKIT), *_argv],
-        capture_output=True, text=True, cwd=str(cwd) if cwd else None,
+        capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(cwd) if cwd else None,
     )
     if _argv and _argv[0] == "apply" and _p.returncode == 0:
         write_receipt_pin(_argv)
@@ -633,7 +633,7 @@ def write_vintage_receipt(govroot: pathlib.Path, target: pathlib.Path,
     through the engine's own helpers, so the fixture and the thing it grades cannot disagree about
     what a blob is named. `version` and `oid` stay as `apply` wrote them at HEAD, so any comparison
     of either against a vintage reads as if the target were at HEAD, whichever `--to` a run names.
-    No arm grades either field over these fixtures today; one that does must rewind them first.
+    An arm that grades either field over these fixtures must rewind them first.
 
     A row with no `source` is left as `apply` wrote it. `apply` emits one -- the synthesized
     `attributes` row -- when its selection or a kit the receipt already records declares an `lf_pin`,
@@ -942,6 +942,154 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
     p = run_epoch("--all")
     check("[aRF-15 S1] `epoch` refuses an argument other than --base",
           p.returncode == 2 and "epoch takes no arguments except --base" in p.stderr, p.stderr)
+
+
+def check_mint_verb(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-65 S1, S6 — `mint` over a fixture registry with one moved kit.
+
+    `vk` moves a shipped byte with no bump; `nk` declares no version. Off the push boundary `epoch`
+    reports `vk` owed at the lander and exits 0; with GATE_PUSH_BASE it FAILS. `mint` then writes
+    1.1 on the constant AND its same-line marker, after which `epoch` grades the tree clean and a
+    second `mint` writes nothing. Observed RED against the base govkit, which has no `mint` verb and
+    printed FAILED with exit 1 off the boundary.
+    """
+    fx = tmp / "mint-fx"
+    for d in (f"{PFX}{KIT_NAMES['govkit']}/entries", f"{PFX}vk", f"{PFX}nk"):
+        (fx / d).mkdir(parents=True, exist_ok=True)
+    gk = fx / PFX / KIT_NAMES["govkit"] / "govkit.py"
+    shutil.copy(GOVKIT, gk)
+    shutil.copy2(GOVKIT.parent / "adopters.toml", gk.parent / "adopters.toml")
+    files = {
+        f"{PFX}{KIT_NAMES['govkit']}/registry.toml":
+            '[[entry]]\nid = "vk"\ndescriptor = "{prefix}/govkit/entries/vk.kit.toml"\n\n'
+            '[[entry]]\nid = "nk"\ndescriptor = "{prefix}/govkit/entries/nk.kit.toml"\n',
+        f"{PFX}{KIT_NAMES['govkit']}/entries/vk.kit.toml":
+            'id = "vk"\nhome = "vk"\n'
+            'version_from = { file = "vk.sh", pattern = "^KIT_VK_VERSION=" }\n\n'
+            '[[files]]\ninclude = ["vk.sh", "lib.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n',
+        f"{PFX}{KIT_NAMES['govkit']}/entries/nk.kit.toml":
+            'id = "nk"\nhome = "nk"\nversion_from = { none = "a fixture kit" }\n\n'
+            '[[files]]\ninclude = ["nk.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n',
+        f"{PFX}vk/vk.sh": "KIT_VK_VERSION=1.0   # gov:kit vk@1.0\n",
+        f"{PFX}vk/lib.sh": "echo one\n",
+        f"{PFX}nk/nk.sh": "echo nk\n",
+    }
+    for rel, text in files.items():
+        (fx / rel).write_text(text, encoding="utf-8", newline="\n")
+    git(fx, "init", "-q")
+    git(fx, "config", "user.email", "fixture@example.invalid")
+    git(fx, "config", "user.name", "fixture")
+    settle(fx, "base")
+    base = subprocess.run(["git", "-C", str(fx), "rev-parse", "HEAD"],
+                          capture_output=True, text=True, encoding="utf-8").stdout.strip()
+    git(fx, "branch", "landed", base)
+    env = {k: v for k, v in os.environ.items() if k != "GATE_PUSH_BASE"}
+    env["GOV_DEFAULT_BRANCH"] = "landed"
+
+    def run_gk(*args: str, push_base: str = "") -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, str(gk), *args], capture_output=True, text=True,
+                              encoding="utf-8",
+                              env={**env, "GATE_PUSH_BASE": push_base} if push_base else env)
+
+    (fx / PFX / "vk" / "lib.sh").write_text("echo two\n", encoding="utf-8", newline="\n")
+    (fx / PFX / "nk" / "nk.sh").write_text("echo nk2\n", encoding="utf-8", newline="\n")
+    settle(fx, "move, no bump")
+    p = run_gk("epoch")
+    check("[aMF-65 S6] off the push boundary an undated move is `owed at the lander`, exit 0",
+          p.returncode == 0 and "epoch: vk · owed at the lander · moved in" in p.stdout
+          and "FAILED" not in p.stdout, p.stdout + p.stderr)
+    p = run_gk("epoch", push_base=base)
+    check("[aMF-65 S6] ...and with GATE_PUSH_BASE set the same move is FAILED, exit 1",
+          p.returncode == 1 and "epoch: vk · FAILED · moved in" in p.stdout, p.stdout + p.stderr)
+    # TOOL-aMendedFleet-111 AC4: forty zeros, the hook's export on a push creating the default
+    # branch, reads as UNSET. Observed RED against the base govkit: FAILED, no base, exit 1.
+    p = run_gk("epoch", push_base="0" * 40)
+    check("[aMF-111 S3] ...and an all-zero GATE_PUSH_BASE reads as unset: owed at the lander, exit 0",
+          p.returncode == 0 and "epoch: vk · owed at the lander · moved in" in p.stdout
+          and "FAILED" not in p.stdout, p.stdout + p.stderr)
+    p = run_gk("mint", "--base", base)
+    vk = (fx / PFX / "vk" / "vk.sh").read_text(encoding="utf-8")
+    check("[aMF-65 S1] `mint` writes the next value on the constant and its marker, naming it",
+          p.returncode == 0 and "mint: vk · 1.0 -> 1.1" in p.stdout
+          and "mint: nk · skip · no declared version" in p.stdout
+          and vk == "KIT_VK_VERSION=1.1   # gov:kit vk@1.1\n", p.stdout + p.stderr + vk)
+    settle(fx, "minted")
+    p = run_gk("epoch", push_base=base)
+    check("[aMF-65 S2] ...and the leg that grades reads the minted tree as clean",
+          p.returncode == 0 and "epoch: vk · clean · 1.1" in p.stdout, p.stdout + p.stderr)
+    p = run_gk("mint", "--base", base)
+    check("[aMF-65 S1] a second `mint` over the bumped range writes nothing",
+          p.returncode == 0 and "mint: vk · clean" in p.stdout
+          and (fx / PFX / "vk" / "vk.sh").read_text(encoding="utf-8") == vk, p.stdout + p.stderr)
+    p = run_gk("mint")
+    check("[aMF-65 S1] `mint` without --base is an argument refusal, exit 2",
+          p.returncode == 2 and "mint needs --base" in p.stderr, p.stderr)
+    p = run_gk("mint", "--base", "no-such-rev")
+    check("[aMF-65 S1] an unresolvable base is a FAILED exit 1",
+          p.returncode == 1 and "mint: FAILED · no base" in p.stdout, p.stdout + p.stderr)
+
+
+def check_fix_carriers(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-64 S7 — `write_version_carriers` over a two-entry fixture, then again.
+
+    `vk`'s constant is bumped alone to 1.1. Its same-line copy, a `version:` field matching the OTHER
+    entry's pattern in a file carrying `vk`'s marker, its CRLF README marker and the alias on its own
+    constant line must all move; `wk`'s own field and a decoy carrying no registry marker must not,
+    and a file that does not decode is skipped. A second run rewrites nothing. Skipping the same-line
+    clause leaves `copy.sh` at 1.0 and reds the first assertion.
+    """
+    gk = govkit_module()
+    fx = tmp / "fix-fx"
+    files = {
+        "vk/vk.sh": b"KIT_VK_VERSION=1.1   # gov:kit vk@1.0 // gov:kit vk-alias@1.0\n",
+        "vk/copy.sh": b"KIT_VK_VERSION=1.0   # gov:kit vk@1.0\n",
+        "vk/harness.js": b"  version: '1.0',\n// gov:kit vk@1.0\n",
+        "vk/README.md": b"<!-- gov:kit vk@1.0 -->\r\nprose naming 1.0\r\n",
+        "vk/blob.dat": b"\xff\xfe gov:kit vk@1.0\n",
+        "wk/wk.js": b"  version: '2.0', // gov:kit wk@2.0\n",
+        "wk/decoy.js": b"  version: '9.9', // gov:kit other@9.9\n",
+    }
+    for rel, data in files.items():
+        (fx / rel).parent.mkdir(parents=True, exist_ok=True)
+        (fx / rel).write_bytes(data)
+    git(fx, "init", "-q")
+    # `-f`: a machine-global excludes file may ignore `*.dat`, and the basis reads tracked paths only.
+    git(fx, "add", "-A", "-f")
+    descs = {
+        "vk": ({"id": "vk", "home": "vk",
+                "version_from": {"file": "vk.sh", "pattern": "^KIT_VK_VERSION="}}, "vk/kit.toml"),
+        "wk": ({"id": "wk", "home": "wk",
+                "version_from": {"file": "wk.js", "pattern": "version: "}}, "wk/kit.toml"),
+    }
+    with contextlib.redirect_stdout(io.StringIO()) as said:
+        first = gk.write_version_carriers(fx, descs, gk.derive_marker_basis(fx, descs))
+
+    def read_fx(rel: str) -> bytes:
+        return (fx / rel).read_bytes()
+    check("[aMF-64 S2] a same-line constant copy moves with the constant",
+          read_fx("vk/copy.sh") == b"KIT_VK_VERSION=1.1   # gov:kit vk@1.1\n", repr(read_fx("vk/copy.sh")))
+    check("[aMF-64 S2] another entry's pattern moves in a file carrying only this entry's marker",
+          read_fx("vk/harness.js") == b"  version: '1.1',\n// gov:kit vk@1.1\n", repr(read_fx("vk/harness.js")))
+    check("[aMF-64 S2] the alias on the constant's own line moves, the constant does not",
+          read_fx("vk/vk.sh") == b"KIT_VK_VERSION=1.1   # gov:kit vk@1.1 // gov:kit vk-alias@1.1\n",
+          repr(read_fx("vk/vk.sh")))
+    check("[aMF-64 S3] a CRLF carrier keeps its line endings, and prose naming the old value stays",
+          read_fx("vk/README.md") == b"<!-- gov:kit vk@1.1 -->\r\nprose naming 1.0\r\n",
+          repr(read_fx("vk/README.md")))
+    check("[aMF-64 S2] the ownership clause leaves the other entry's field and a foreign-marked decoy",
+          read_fx("wk/wk.js") == files["wk/wk.js"] and read_fx("wk/decoy.js") == files["wk/decoy.js"],
+          repr(read_fx("wk/decoy.js")))
+    check("[aMF-64 S3] a file that does not decode is named and left untouched",
+          read_fx("vk/blob.dat") == files["vk/blob.dat"] and "vk/blob.dat" in said.getvalue(),
+          said.getvalue())
+    check("[aMF-64 S2] the rewrites are returned one per carrier", len(first) == 7, repr(first))
+    with contextlib.redirect_stdout(io.StringIO()):
+        second = gk.write_version_carriers(fx, descs, gk.derive_marker_basis(fx, descs))
+    check("[aMF-64 S5] a second run over a fixed tree rewrites nothing", second == [], repr(second))
+    p = subprocess.run([sys.executable, str(GOVKIT), "selfcheck", "--bogus"],
+                       capture_output=True, text=True, encoding="utf-8")
+    check("[aMF-64 S4] selfcheck refuses an unknown flag naming --write and --fix",
+          p.returncode == 2 and "--write" in p.stderr and "--fix" in p.stderr, p.stderr)
 
 
 OWN_KIT = """id = "demo"
@@ -2029,6 +2177,8 @@ def main() -> int:
         check_answers_parity(tmp / "ap")
         check_shipped_verb(tmp)
         check_epoch_verb(tmp)
+        check_mint_verb(tmp)
+        check_fix_carriers(tmp)
         check_adopter_owned(tmp / "own")
         check_apply_owned(tmp / "ao")
         check_pytest_ini_probe(tmp / "pi")
@@ -2169,8 +2319,8 @@ def main() -> int:
               any(u["dest"] == dest and u["role"] == "project-owned"
                   for u in with_co["unlanded"]), "")
 
-        # AC2 — the precedence note reports BOTH figures. Zero carve-outs-that-change is the true
-        # state of gov today and must NOT red; hiding it behind a single number is what let the first
+        # AC2 — the precedence note reports BOTH figures. Zero carve-outs-that-change is a true
+        # state gov has been in and must NOT red; hiding it behind a single number is what let the first
         # fold claim a byte-level effect the resolver does not have.
         ps = run("selfcheck")
         check("selfcheck's precedence note reports carve-outs declared AND how many change a write",
@@ -2599,7 +2749,7 @@ def main() -> int:
             git(g, "commit", "-qm", "s")
             return subprocess.run(
                 [sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), "selfcheck"],
-                capture_output=True, text=True)
+                capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         scratch_gov.n = 0
 
@@ -2858,7 +3008,7 @@ user_skills = "/tmp/gk-fake-skills"
         def _run_selfcheck(root):
             return subprocess.run(
                 [sys.executable, str(root / PFX / KIT_NAMES["govkit"] / "govkit.py"), "selfcheck"],
-                capture_output=True, text=True)
+                capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         base = _run_selfcheck(gcopy)
         check("the gov copy is green before either arm is provoked", base.returncode == 0,
@@ -4527,11 +4677,11 @@ user_skills = "/tmp/gk-fake-skills"
 
         def run_in(g: pathlib.Path) -> subprocess.CompletedProcess:
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"),
-                                   "selfcheck"], capture_output=True, text=True)
+                                   "selfcheck"], capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         def run_in_gov(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
-                                  capture_output=True, text=True)
+                                  capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         def build_scratch_gov_kit(tag: str, kit_toml: str) -> pathlib.Path:
             """A scratch gov tree carrying ONE `demo` entry whose descriptor the caller writes.
@@ -5784,7 +5934,7 @@ user_skills = "/tmp/gk-fake-skills"
                 # unreachable by S1's own mechanism.
                 [sys.executable, str(GOVKIT), "update", "--target", str(cc), "--write",
                  "--to", GOV_PIN],
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8", errors="replace")
             _deadline = time.time() + 30
             while time.time() < _deadline and not _lk.exists() and _first.poll() is None:
                 time.sleep(0.002)
@@ -5840,7 +5990,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         def gov_run(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
-                                  capture_output=True, text=True)
+                                  capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         gv = vintage_gov()
         VA = gout(gv, "rev-parse", "HEAD").strip()
@@ -6645,7 +6795,7 @@ user_skills = "/tmp/gk-fake-skills"
         def gov_update(g: pathlib.Path, t: pathlib.Path, *extra: str):
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"),
                                    "update", "--target", str(t), *extra],
-                                  capture_output=True, text=True)
+                                  capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         def poison(t: pathlib.Path, path: str, drop: tuple[str, ...] = (),
                    **set_to) -> dict:
@@ -7376,7 +7526,7 @@ user_skills = "/tmp/gk-fake-skills"
         def carry_update(g: pathlib.Path, t: pathlib.Path, *extra):
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"),
                                    "update", "--target", str(t), *extra],
-                                  capture_output=True, text=True)
+                                  capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         g9 = carry_gov("c9")
         A9 = gout(g9, "rev-parse", "HEAD").strip()
@@ -9054,7 +9204,7 @@ user_skills = "/tmp/gk-fake-skills"
               and GK11.blob_at(_gc11, _Bc11, f"{PFX}demo/pathy2.txt") == _C11_B.encode(), "")
         _wc11 = subprocess.run([sys.executable, str(_gc11 / PFX / KIT_NAMES["govkit"] / "govkit.py"),
                                 "update", "--target", str(_tc11), "--write"],
-                               capture_output=True, text=True)
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
         check("[-11] S11 the carried rename RECONCILES rather than conflicting",
               _wc11.returncode == 0, _wc11.stdout[-1500:] + _wc11.stderr[-900:])
         check("[-11] S11 ...the file is at its new destination, in the TARGET's own prefix",
@@ -9766,7 +9916,7 @@ user_skills = "/tmp/gk-fake-skills"
         # claim about nothing. `0` is the operator's own revert, spelled here for the same reason.
         _wdr = subprocess.run(
             [sys.executable, str(_gdr / PFX / KIT_NAMES["govkit"] / "govkit.py"),
-             "update", "--target", str(_tdr), "--write"], capture_output=True, text=True,
+             "update", "--target", str(_tdr), "--write"], capture_output=True, text=True, encoding="utf-8", errors="replace",
             env=dict(os.environ, GOVKIT_RERENDER="0"))
         _obdr = _tdr / ".governance" / "outbox"
 
@@ -12833,7 +12983,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         def run_pv_govkit(g: pathlib.Path, *args: str, env: dict | None = None) -> subprocess.CompletedProcess:
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
-                                  capture_output=True, text=True, env=env)
+                                  capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
 
         # THE REAL RENDERER AND THE ARGV THE REAL DESCRIPTOR DECLARES FOR IT. Read, never restated: a
         # fixture argv typed here would keep passing after `kit.toml` stopped declaring it.
@@ -13923,7 +14073,7 @@ user_skills = "/tmp/gk-fake-skills"
 
     def run_govkit(*args: str) -> subprocess.CompletedProcess:
         return subprocess.run([sys.executable, str(_gov / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
-                              capture_output=True, text=True)
+                              capture_output=True, text=True, encoding="utf-8", errors="replace")
 
     # ---- THE OBSERVED-STATE TABLE IS THE ONE SPELLING OF IT ---------------------------------
     # Three copies existed and they disagreed: the reader's state tuple, the validator's
@@ -14332,7 +14482,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         def run_gov13(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"),
-                                   *args], capture_output=True, text=True)
+                                   *args], capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         def read_legs13(t: pathlib.Path) -> list[str]:
             f = t / "scripts" / "gate-legs.json"

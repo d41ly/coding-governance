@@ -202,6 +202,7 @@ printf '# t1\n\n**Status:** OPEN · rev-1 · 2026-08-01 · node a · Tier-1 · b
 - rev-1 · first\n' \
   > "$D/spec/2026-08-01-spec-tFixture-5.md"                                      # Tier-1 light profile -> silent
 good | sed 's/^A goal\.$/Ship on YYYY-MM-DD./' > "$D/spec/2026-08-01-spec-tFixture-6.md"                # placeholder -> red
+good | sed 's/^A goal\.$/<fill: the goal>/' > "$D/spec/2026-08-01-spec-tFixture-222.md"             # --new-spec fill slot -> red
 good | sed '/^The design\.$/d' > "$D/spec/2026-08-01-spec-tFixture-7.md"          # empty section body -> red
 good | sed 's/rev-1 · 2026-08-01 · node/rev-2 · 2026-08-01 · node/' > "$D/spec/2026-08-01-spec-tFixture-8.md"  # header rev not in §9 -> red
 good | sed 's/^\*\*Status:\*\* SPECCED/**Status:** WONTDO/' > "$D/spec/2026-08-01-spec-tFixture-9.md"   # bare WONTDO tail -> red
@@ -1051,6 +1052,7 @@ hit  'tFixture-3.md (missing/invalid'
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 hit  'tFixture-4.md (## sections differ'
 hit  'tFixture-6.md (unfilled skeleton placeholder'
+hit  'tFixture-222.md (unfilled skeleton placeholder'
 hit  'tFixture-7.md (section with an empty body'
 hit  'tFixture-8.md (header rev-2 not logged'
 hit  'tFixture-9.md (WONTDO needs'
@@ -2310,6 +2312,13 @@ c6run() {  # $1 = extra conf lines (%b, so \n works); leaves $out set and assert
   # (d) a BUILD README with more lines than the row-document tier allows and well under its OWN byte
   #     cap. Its silence is the proof that a zero LINE cap means NO line cap rather than a cap of zero.
   { fm tLong; i=1; while [ "$i" -le 400 ]; do printf -- '- row %d\n' "$i"; i=$((i+1)); done; } > memory/builds/tLong/README.md
+  # (g) THE AUTHORED PRICE (TOOL-aMendedFleet-84). tGen's generated regions alone pass the cap and
+  #     it is silent; tGenA is the same file with authored rows past the cap and is named as authored;
+  #     tGenU drops one close marker, so its pairs do not balance and it is priced whole.
+  mkdir -p memory/builds/tGen memory/builds/tGenA memory/builds/tGenU
+  { fm tGen; printf '<!-- gen:build-index -->\n<!-- gen:build-units -->\n'; rows 80; printf '<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n\n<!-- gen:build-order -->\n'; rows 40; printf '<!-- /gen:build-order -->\n'; } > memory/builds/tGen/README.md
+  { fm tGenA; rows 110; printf '<!-- gen:build-index -->\n'; rows 120; printf '<!-- /gen:build-index -->\n'; } > memory/builds/tGenA/README.md
+  { fm tGenU; printf '<!-- gen:build-index -->\n'; rows 80; printf '<!-- /gen:build-index -->\n\n<!-- gen:build-order -->\n'; rows 40; } > memory/builds/tGenU/README.md
   # (e) and (f) — check 7's ENTRY budget, one fixture per class at a width BETWEEN the two shipped
   #     tiers. 320 characters is over the row-document 300 and under the build-README 350, so with
   #     nothing declared the row is named and the README is silent: one width, both defaults, and
@@ -2336,8 +2345,20 @@ n=$((n+1))
 cblock "$out" 6 | grep -qE 'memory/backlog/ARCH\.md \([0-9]+B [0-9]+L > 20480B/250L\)' \
   || { echo "FAIL check 6 named the row document but not against the SHIPPED 20480B/250L default"; st=1; }
 n=$((n+1))
-cblock "$out" 6 | grep -qE 'memory/builds/tBig/README\.md \([0-9]+B > 25600B; no line cap for this class\)' \
+cblock "$out" 6 | grep -qE 'memory/builds/tBig/README\.md \([0-9]+B authored > 25600B; generated regions not priced; no line cap for this class\)' \
   || { echo "FAIL check 6 named the build README but not against the SHIPPED 25600B default, or printed a line cap for a class that has none"; st=1; }
+# --- (g) the authored price: generated regions alone never bill the cap, authored growth past it
+# --- does, and an unbalanced pair is priced whole. Staged red by deleting the subtraction in check 6.
+cnot 6 'memory/builds/tGen/README.md'
+chit 6 'memory/builds/tGenA/README.md'
+chit 6 'memory/builds/tGenU/README.md'
+n=$((n+1))
+cblock "$out" 6 | grep -qE 'memory/builds/tGenA/README\.md \([0-9]+B authored > 25600B; generated regions not priced; no line cap for this class\)' \
+  || { echo "FAIL check 6 named a README grown past the cap by authored rows without the authored-bytes message"; st=1; }
+n=$((n+1))
+_w=$(wc -c < "$C6/memory/builds/tGenU/README.md" | tr -d ' ')
+cblock "$out" 6 | grep -qF "memory/builds/tGenU/README.md (${_w}B > 25600B; generated region markers unbalanced" \
+  || { echo "FAIL check 6 did not price a README with an unbalanced region pair at its whole wc -c figure (${_w}B)"; st=1; }
 # --- CHECK 7's entry budget at the SHIPPED defaults. One 320-char fixture line in each class: the
 # --- row document is over 300 and named, the build README is under 350 and silent. A single arm
 # --- would pass under one merged tier; the pair is what observes the split.

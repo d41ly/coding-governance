@@ -5,6 +5,8 @@
     python <prefix>/memory-tree/gen_build_index.py --write         # (re)render every artifact
     python <prefix>/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
     python <prefix>/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
+    python <prefix>/memory-tree/gen_build_index.py --doctor <slug> # every failing rule for one build folder
+    python <prefix>/memory-tree/gen_build_index.py --new-spec <ID> --tier <1|2>  # a spec skeleton
     python <prefix>/memory-tree/gen_build_index.py --selftest      # fixtures, in a temp dir
 
 WHAT --check-format DOES NOT CHECK. It grades POSITION for every tracked build README and SHAPE — the
@@ -18,15 +20,21 @@ It replaces the retired directory-listing generator. A listing carried paths, wh
 prints better; this carries STATUS, which git does not — and a build's status is a PURE FUNCTION of
 its units' statuses, so nothing here is authored and nothing rots.
 
-FOUR SOURCES, NOTHING ELSE
+FIVE SOURCES, NOTHING ELSE
   * each build's README front matter (slug node opened streams roster [status])
   * every `**Status:**` header under that build's spec/, at any depth
-  * for the ROSTER only, every tracked file under the memory root EXCEPT this field's own outputs —
-    the build's own README and the generated index and shards. `ids` is therefore an OUTPUT, not a
-    source: `--write` overwrites whatever was authored there.
+  * for the ROSTER, and for the date of a build's last record, every tracked file under the memory
+    root EXCEPT this field's own outputs — the build's own README and the generated index and shards.
+    `ids` is therefore an OUTPUT, not a source: `--write` overwrites whatever was authored there. The
+    last-record date reads only the leading date of each record FILENAME, never a file's mtime, and
+    LIVE.md renders it only under a set LIVE_DORMANT_DAYS (TOOL-aMendedFleet-12).
   * under `BACKLOG_MODE=builds` ONLY, every tracked `builds/<slug>/BACKLOG.md`, read through
     `backlog.py`'s grammar and folded into the family views. Under `shards` that source does not
     exist and not one branch below it is reached, which is what keeps this change dark.
+  * under `LIVE_LANDED_UNCLOSED=1` ONLY, the drift-audit kit's `non_terminal_specs_cited_by_product_source`
+    join, called in-process through that kit's own signal and restated nowhere here, which greps
+    tracked product source; LIVE.md renders its rows as a per-build `Landed-unclosed` count
+    (TOOL-aMendedFleet-13). Blank or absent, the drift kit is never imported.
 No git history and no mtimes. A source the renderer does not read cannot make the render drift; a
 source the renderer WRITES must not also be read, or a wrong value defends itself forever.
 
@@ -148,7 +156,7 @@ SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import (  # noqa: E402  the kit's shared helpers
     STATUS_TOKENS, TERMINAL, build_spec_path_re, kit_rel, parse_conf, parse_spec_h1,
-    unfenced_lines,
+    scan_missing_citations, unfenced_lines,
 )
 
 
@@ -791,6 +799,8 @@ def rosters(root: str, tracked: list, m: str, families: set,
             # A roster is built from ids in PROSE, so a file that is not text cannot contribute one
             # and skipping it changes no output. Verified by artifact equality, not by assertion.
             continue
+        # A `missing:` id declares that it has no record (TOOL-aMendedFleet-26), so it joins no roster.
+        _marked, text = scan_missing_citations(text, id_re)
         for mm in id_re.finditer(text):
             slug = mm.group(1)
             if p == f"{m}/builds/{slug}/README.md":
@@ -1488,6 +1498,82 @@ def apply_region(readme_text: str, region: str, readme: str,
     return "\n".join(lines[: opens[0]] + region.split("\n") + lines[closes[0] + 1 :])
 
 
+def derive_last_record(build: dict, asks) -> str:
+    """TOOL-aMendedFleet-12 S1 — the newest date this build's own tracked records carry.
+
+    Four sources, every one already in hand: the front matter's `opened`, each unit's status-header
+    date, the leading date of each tracked record filename, and the `filed` date of each ask homed in
+    the build's `BACKLOG.md`. No git history and no clock, so the module docstring's no-history
+    contract still holds. A date that is not a real calendar date is a named refusal, not a traceback.
+    """
+    dates = [build["fm"]["opened"]] + [u["date"] for u in build["units"]]
+    dates += [mo.group(0) for mo in (re.match(r"\d{4}-\d{2}-\d{2}", os.path.basename(p))
+                                     for p in build["docs"]) if mo]
+    dates += [a.filed for a in asks]
+    for d in dates:
+        try:
+            datetime.date.fromisoformat(d)
+        except ValueError:
+            raise Problem(f"{build['readme']}: '{d}' is a record date of this build and not a real "
+                          f"calendar date, so LIVE_DORMANT_DAYS cannot measure from it") from None
+    return max(dates)
+
+
+def read_landed_unclosed(root: str, conf: dict, resolve=None) -> dict | None:
+    """TOOL-aMendedFleet-13 S1, S4, S5 — drift-audit's own spec-status signal record, or None.
+
+    Blank or absent returns None and never resolves, let alone imports, the drift kit (S6). Set to
+    `1`, it calls `signal_spec_status` through the kit's own `Ctx`, `load_conf` and
+    `load_project_layer`, base ref `HEAD` because the signal never reads it, so the join is the drift
+    kit's and is restated nowhere here. Every failure is a named Problem before anything is written:
+    an illegal value, an unresolvable kit, a drift-kit refusal carried with its own text, and an
+    EMPTY evidence population, whose every zero would be a reassuring one.
+    """
+    raw = (conf.get("LIVE_LANDED_UNCLOSED") or "").strip()
+    if raw not in ("", "1"):
+        raise Problem(f"LIVE_LANDED_UNCLOSED='{raw}' is not one of its two legal values, "
+                      f"blank (off) or 1 (on)")
+    if not raw:
+        return None
+    try:
+        kit = (resolve or backlog.resolve_kit_dir)("drift-audit", "drift_report.py",
+                                                   os.path.dirname(os.path.abspath(__file__)))
+    except LookupError as exc:
+        raise Problem(f"LIVE_LANDED_UNCLOSED=1 needs the drift-audit kit, which does not "
+                      f"resolve: {exc}") from None
+    sys.path.insert(0, str(kit))
+    import drift_report  # noqa: PLC0415 — deferred: only a set key may import the sibling kit
+    rootp = pathlib.Path(root)
+    try:
+        ctx = drift_report.Ctx(rootp, drift_report.load_conf(rootp),
+                               drift_report.load_project_layer(rootp), "HEAD")
+        record = drift_report.signal_spec_status(ctx)
+    except drift_report.DriftError as exc:
+        raise Problem(f"LIVE_LANDED_UNCLOSED=1: the drift-audit kit refused: {exc}") from None
+    if not record.get("evidence_files"):
+        raise Problem(f"LIVE_LANDED_UNCLOSED=1: drift-audit's {record.get('signal')} join read an EMPTY "
+                      f"evidence population (EVIDENCE_GLOBS resolves to no tracked file), so every "
+                      f"Landed-unclosed count would be a reassuring zero")
+    return record
+
+
+def derive_landed_counts(record: dict, builds: list, m: str) -> dict:
+    """TOOL-aMendedFleet-13 S2 — the signal's detail rows counted per build, every build keyed.
+
+    A row counts for a non-terminal build only when its (file, id) pair is one of that build's units
+    in this generator's TRACKED reading: the signal globs the filesystem, so an untracked spec reaches
+    it, and the pair keeps the render a function of the tracked tree. Terminal builds count zero.
+    """
+    counts = {}
+    rows = {(r["file"], r["id"]) for r in record.get("detail") or ()}
+    for b in builds:
+        marker = "/builds/" + b["slug"] + "/"
+        own = {(f"{m}{marker}{u['path'].replace(os.sep, '/').split(marker, 1)[1]}", u["id"])
+               for u in b["units"]}
+        counts[b["slug"]] = 0 if b["status"] in TERMINAL else len(own & rows)
+    return counts
+
+
 LIVE_BLOCKER_HEADING = "## Open BLOCKER asks"
 
 
@@ -1521,7 +1607,14 @@ def render_live_blockers(reading: dict) -> list:
     return out
 
 
-def render_live(builds: list, m: str, reading: dict = None) -> str:
+def render_live(builds: list, m: str, conf: dict | None = None, reading: dict | None = None,
+                landed: dict | None = None) -> str:
+    # LIVE_DORMANT_DAYS (TOOL-aMendedFleet-12): blank or absent renders the file this function always
+    # rendered, byte for byte; anything else must be a positive whole number of days or it refuses.
+    raw = ((conf or {}).get("LIVE_DORMANT_DAYS") or "").strip()
+    if raw and (not re.fullmatch(r"[0-9]+", raw) or int(raw) == 0):
+        raise Problem(f"LIVE_DORMANT_DAYS='{raw}' is not a positive whole number of days; LIVE.md "
+                      f"marks a build dormant by it, so an unusable value must name itself")
     live = [b for b in builds if b["status"] not in TERMINAL]
     out = [
         GEN_HEADER,
@@ -1531,16 +1624,43 @@ def render_live(builds: list, m: str, reading: dict = None) -> str:
         "terminal status. Nothing here is edited by hand.",
         "",
     ]
+    head, rule, extra = "| Build | Status | Node | Opened | Streams | Ids (n) |", "|---|---|---|---|---|---|", {}
+    if live and raw:
+        # The ANCHOR is the newest last-record date across EVERY build, terminal ones included, and
+        # never the clock: a clock anchor would stale this file with no commit. ONE table, active rows
+        # first, because the kickoff card counts rows under one header (S3).
+        corpus = (reading or {}).get("corpus")
+        homes = {f.path: f.asks for f in corpus.files} if corpus else {}
+        last = {b["slug"]: derive_last_record(b, homes.get(f"{m}/builds/{b['slug']}/BACKLOG.md", ()))
+                for b in builds}
+        anchor = max(last.values())
+        who = min(s for s, d in last.items() if d == anchor)
+        day = datetime.date.fromisoformat(anchor)
+        for b in live:
+            gap = (day - datetime.date.fromisoformat(last[b["slug"]])).days
+            extra[b["slug"]] = (last[b["slug"]], "dormant" if gap > int(raw) else "active")
+        live = sorted(live, key=lambda b: extra[b["slug"]][1] == "dormant")   # stable: slug order kept
+        out += [f"Dormant: no record dated within {raw} days of {anchor}, the newest record date in "
+                f"this tree ({who}).", ""]
+        head, rule = head + " Last record | Activity |", rule + "---|---|"
+    if live and landed is not None:
+        # TOOL-aMendedFleet-13 S3: after TOOL-aMendedFleet-12's column pair and its sentence.
+        out += ["Landed-unclosed: the build's non-terminal units whose id tracked product source cites, "
+                "by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to "
+                "close, not a verdict.", ""]
+        head, rule = head + " Landed-unclosed |", rule + "---|"
     if live:
         # A COUNT, not the list. This file is in check 7's entry-budget population and the build
         # README's region is not, so the full roster renders there and a bounded number renders here:
         # a ten-id row measured 316 chars against a 300-char cap, on a file with no slack.
-        out += ["| Build | Status | Node | Opened | Streams | Ids (n) |", "|---|---|---|---|---|---|"]
+        out += [head, rule]
         for b in live:
             fm = b["fm"]
+            tail = " {} | {} |".format(*extra[b["slug"]]) if extra else ""
+            tail += f" {landed.get(b['slug'], 0)} |" if landed is not None else ""
             out.append(
                 f"| [{b['slug']}](builds/{b['slug']}/README.md) | {b['status']} | {fm['node']} | "
-                f"{fm['opened']} | {fm['streams']} | {len(b['roster'])} |"
+                f"{fm['opened']} | {fm['streams']} | {len(b['roster'])} |{tail}"
             )
     else:
         out.append("*No live build.*")
@@ -1560,14 +1680,15 @@ def render_shards(builds: list, m: str) -> dict:
             "",
             "Frozen once the month passes: its inputs stop changing, so no rotation rule is needed.",
             "",
-            "| Build | Status | Node | Streams | Ids (n) |",
-            "|---|---|---|---|---|",
+            # TOOL-aMendedFleet-81: only what a build cannot change after its month, so the sentence
+            # above is true. Status, streams and the id count moved a month late; LIVE.md carries them.
+            "| Build | Node | Opened |",
+            "|---|---|---|",
         ]
         for b in sorted(rows, key=lambda x: x["slug"]):
             fm = b["fm"]
             body.append(
-                f"| [{b['slug']}](../builds/{b['slug']}/README.md) | {b['status']} | {fm['node']} | "
-                f"{fm['streams']} | {len(b['roster'])} |"
+                f"| [{b['slug']}](../builds/{b['slug']}/README.md) | {fm['node']} | {fm['opened']} |"
             )
         out[f"{m}/ledger/{month}.md"] = "\n".join(body) + "\n"
     return out
@@ -1871,8 +1992,8 @@ def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
     if not spans:
         # TOOL-dFramedEntrypoint-1 S4 — the TOTAL-EXEMPTION hole. This returned [] unconditionally,
         # so a README carrying no generated pair passed every trigger however much prose it held:
-        # measured on a 45,185-byte fixture with two invented sections, which reported clean. No file
-        # in the live corpus reaches it today, which is exactly why it went unnoticed.
+        # measured on a 45,185-byte fixture with two invented sections, which reported clean. It went
+        # unnoticed because no file in the live corpus reached it.
         return [(1, "no generated region pair, so every slot trigger would pass vacuously — "
                     "run --write to create the pairs")]
     first_open = min(o for o, _c in spans)
@@ -2043,7 +2164,7 @@ def remove_dead_regions(readme_text: str) -> str:
     return readme_text
 
 
-def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
+def plan(root: str, conf: dict, create_missing: bool = False, resolve=None) -> tuple:
     """Return (artifacts, orphans, unmanaged) — the whole render, computed without touching disk.
 
     `create_missing` is the ONE asymmetry between the two verbs (S7). `--write` passes true and adds
@@ -2139,7 +2260,9 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
             artifacts[rel] = apply_region(
                 stext, render_spec_records(u["id"], inverted.get(u["id"], []), rel), rel,
                 SPEC_RECORDS_OPEN, SPEC_RECORDS_CLOSE)
-    artifacts[f"{m}/LIVE.md"] = render_live(builds, m, reading)
+    record = read_landed_unclosed(root, conf, resolve)
+    artifacts[f"{m}/LIVE.md"] = render_live(
+        builds, m, conf, reading, None if record is None else derive_landed_counts(record, builds, m))
     artifacts.update(render_shards(builds, m))
     # Orphans: a tracked file under ledger/ that this render does not produce. The DELETABLE set is
     # bounded to the month-shard NAME; anything else is reported and left alone.
@@ -2366,14 +2489,49 @@ ASK_STATUS_TOKENS = STATUS_TOKENS + (backlog.UNRESOLVED,)
 ASK_ID_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+$")
 ASK_USAGE = ("usage: gen_build_index.py --asks [FAMILY|ID] [--all] [--status <token>] "
              "[--build <slug>] [--json|--tsv] [--ready [IDLIST]] [--target <slug>] "
-             "[--live-builds <slug>…] [--at <rev>] [--probe <id>]")
+             "[--live-builds <slug>…] [--at <rev>] [--probe <id>] "
+             "[--path <path>… [--limit <n>]]")
 #: The options that take a LIST of bare words rather than one value. Their list ends at the next
 #: `--option` or at the end of argv, and NOT at the first token starting with `-`: an IDLIST
 #: continuation is spelled `-4`, so a one-dash stop would silently truncate every mandate that
 #: used the continuation form — the fix-F2 narrowing, reintroduced by the argument parser.
-ASK_LIST_OPTIONS = {"--ready": "ready", "--live-builds": "live_builds"}
+ASK_LIST_OPTIONS = {"--ready": "ready", "--live-builds": "live_builds", "--path": "path"}
 ASK_VALUE_OPTIONS = {"--status": "status", "--build": "build", "--target": "target",
-                     "--at": "at", "--probe": "probe"}
+                     "--at": "at", "--probe": "probe", "--limit": "limit"}
+#: The `summary` field's cap, in encoded UTF-8 bytes with the ellipsis inside it.
+ASK_SUMMARY_BYTES = 160
+#: How many rows `--path` keeps when no `--limit` is given. `--limit 0` lifts the cap.
+ASK_PATH_LIMIT = 20
+#: The options `--path` refuses beside it (S5): each reads a population `--path` would silently
+#: shrink — `--tsv` and its READY options grade a mandate, and an id or a probe names one ask.
+ASK_PATH_CONFLICTS = ("tsv", "ready", "target", "live_builds", "probe")
+_ASK_PATH_LINE_RE = re.compile(r":\d+$")
+
+
+def resolve_ask_path(value: str) -> str:
+    """One locator or `--path` value in the form both sides are compared in: a backslash folded to
+    a slash, a trailing `:<line>`, a leading `./` and a trailing `/` dropped."""
+    out = _ASK_PATH_LINE_RE.sub("", value.strip().replace("\\", "/"))
+    while out.startswith("./"):
+        out = out[2:]
+    return out.rstrip("/")
+
+
+def check_ask_path(locators, paths, memory_root: str) -> bool:
+    """True when one locator is one of `paths`, or a whole-segment directory of one, or under one.
+
+    A locator relative to the memory root matches as if prefixed by it, because the records write
+    `builds/<slug>/…` as often as `memory/builds/<slug>/…`. Strings only: nothing is opened.
+    """
+    for raw in locators:
+        loc = resolve_ask_path(raw)
+        if not loc:
+            continue
+        for cand in (loc, f"{memory_root}/{loc}"):
+            for path in paths:
+                if cand == path or cand.startswith(path + "/") or path.startswith(cand + "/"):
+                    return True
+    return False
 
 
 def read_asks_args(argv: list) -> dict:
@@ -2384,7 +2542,8 @@ def read_asks_args(argv: list) -> dict:
     how a filter silently becomes a grading input.
     """
     out = {"pick": "", "all": False, "status": "", "build": "", "json": False, "tsv": False,
-           "ready": None, "target": "", "live_builds": None, "at": "", "probe": ""}
+           "ready": None, "target": "", "live_builds": None, "at": "", "probe": "",
+           "path": None, "limit": ""}
     rest = list(argv)
     while rest:
         token = rest.pop(0)
@@ -2414,6 +2573,30 @@ def read_asks_args(argv: list) -> dict:
         raise Problem("--asks: --json and --tsv are two projections of one answer, and a run that "
                       "printed both would put a JSON object in a consumer's TAB stream. "
                       f"{ASK_USAGE}")
+    if out["path"] is None:
+        if out["limit"]:
+            raise Problem(f"--asks: --limit caps what --path matched, and no --path was given. "
+                          f"{ASK_USAGE}")
+        return out
+    for key in ASK_PATH_CONFLICTS:
+        if out[key] not in ("", None, False):
+            raise Problem(f"--asks: --path and --{key.replace('_', '-')} cannot be combined: "
+                          f"--path ranks and caps the rows, which would shrink what that option "
+                          f"reads. {ASK_USAGE}")
+    if ASK_ID_RE.match(out["pick"]):
+        raise Problem(f"--asks: --path and an id pick `{out['pick']}` cannot be combined: an id "
+                      f"names one ask already. {ASK_USAGE}")
+    if out["limit"] and not out["limit"].isdigit():
+        raise Problem(f"--asks: --limit takes a non-negative integer, and was given "
+                      f"`{out['limit']}`. {ASK_USAGE}")
+    paths = []
+    for value in out["path"]:
+        folded = value.replace("\\", "/")
+        if folded.startswith("/") or re.match(r"^[A-Za-z]:", folded) or ".." in folded.split("/"):
+            raise Problem(f"--asks: --path `{value}` is absolute or climbs out with `..`; give a "
+                          f"repo-relative path. {ASK_USAGE}")
+        paths.append(resolve_ask_path(value))
+    out["path"] = paths
     return out
 
 
@@ -2423,8 +2606,13 @@ def build_ask_row(ask, fold, evidence: dict) -> dict:
     The switch-over's drift signals read `closing`, `declining`, `live_specs` and `sev` by name, and
     the agent carriers read the rest. Renaming one is a breaking change to a consumer this file
     cannot see, which is why they are listed in the spec and asserted by an arm.
+
+    `pointer` and `summary` were ADDED by TOOL-aMendedFleet-10, so a reader of one row no longer
+    has to open the BACKLOG.md it names; every consumer reads by name, so the addition moves none.
     """
     return {
+        "pointer": ask.pointer,
+        "summary": backlog.render_summary_cell(ask.text, ASK_SUMMARY_BYTES, by_bytes=True),
         "id": ask.id,
         "home": ask.slug,
         "file": ask.path,
@@ -2890,8 +3078,8 @@ def cmd_probe(root: str, conf: dict, corpus, ask_id: str) -> int:
 def cmd_asks(root: str, conf: dict, args: dict) -> int:
     """The print modes. They write no file, and stdout carries the mode's VALUE and nothing else.
 
-    THE REDIRECT IS AROUND THE WHOLE READ, not around the two notices this file happens to print
-    today. `collect()` prints a tolerated-header line and a liveness line on every run, and a JSON
+    THE REDIRECT IS AROUND THE WHOLE READ, not around whichever notices this file happens to
+    print. `collect()` prints a tolerated-header line and a liveness line on every run, and a JSON
     consumer handed either of them ahead of the object gets a decode error — the class the hygiene
     engine's own ON STDERR note records. Redirecting the read wholesale means a notice added to any
     callee later is on stderr by construction rather than by somebody remembering this rule. Under
@@ -2960,10 +3148,27 @@ def cmd_asks(root: str, conf: dict, args: dict) -> int:
         if args["status"] and row["status"] != args["status"]:
             continue
         picked.append((ask, row))
+    envelope: dict = {}
+    if args["path"] is not None:
+        # RANKED AND CAPPED ONLY HERE (§8 F1): the unfiltered modes keep the view's order. Two
+        # stable sorts over the id order: newest filing first, then severity on top of that.
+        merged = backlog.derive_clauses(corpus)
+        picked = [(ask, row) for ask, row in picked
+                  if check_ask_path(backlog.derive_ask_locators(ask, merged.get(ask.id, {}))[0],
+                                    args["path"], conf["MEMORY_ROOT"])]
+        picked.sort(key=lambda pair: pair[1]["filed"], reverse=True)
+        ranks = backlog.SEVERITIES + (backlog.UNLABELLED,)
+        picked.sort(key=lambda pair: ranks.index(pair[1]["sev"]) if pair[1]["sev"] in ranks
+                    else len(ranks))
+        limit = int(args["limit"]) if args["limit"] else ASK_PATH_LIMIT
+        matched = len(picked)
+        if limit:
+            picked = picked[:limit]
+        envelope = {"paths": args["path"], "matched": matched, "cut": matched - len(picked)}
     if args["json"]:
-        print(json.dumps({"mode": reading.get("mode", ""),
-                          "examined": len(corpus.files),
-                          "asks": [row for _ask, row in picked]}, indent=2, sort_keys=True))
+        print(json.dumps(dict(envelope, mode=reading.get("mode", ""),
+                              examined=len(corpus.files),
+                              asks=[row for _ask, row in picked]), indent=2, sort_keys=True))
         return 0
     # THE READY MODES. Asked for by `--tsv` or by any of the three options that only READY reads;
     # asked for by none of them, this mode is byte-identical to what the view unit shipped.
@@ -2977,6 +3182,9 @@ def cmd_asks(root: str, conf: dict, args: dict) -> int:
         print(render_ask_detail(*picked[0], backlog.derive_clauses(corpus).get(pick, {})))
         return 0
     print(render_asks_table(picked, reading.get("excerpt", backlog.EXCERPT_DEFAULT)))
+    if envelope:
+        print(f"{envelope['cut']} of {envelope['matched']} matched cut by the limit; "
+              f"rerun with --limit 0 to see every one")
     return 0
 
 
@@ -3552,8 +3760,27 @@ def cmd_selftest() -> int:
         conf2 = _fixture(t2, spec_status="CLOSED")
         arm("terminal build leaves LIVE.md", "*No live build.*",
             lambda: plan(t2, conf2)[0]["memory/LIVE.md"])
-        arm("terminal build still appears in its month shard", "| [tOne](../builds/tOne/README.md) | CLOSED",
+        arm("terminal build still appears in its month shard", "| [tOne](../builds/tOne/README.md) | a | 2026-08-01 |",
             lambda: plan(t2, conf2)[0]["memory/ledger/2026-08.md"])
+
+        # TOOL-aMendedFleet-81 AC2 — the month shard is FROZEN: a status flip and an added unit move
+        # LIVE.md and leave the shard's bytes alone. Both units end CLOSED so the BUILD's status moves
+        # too (SPECCED to CLOSED), or a restored Status column would pass this arm. The LIVE.md half is the arm's liveness: a
+        # mutation that never took effect would also leave the shard identical.
+        tf = os.path.join(base, "frozen"); os.makedirs(tf)
+        conff = _fixture(tf, spec_status="SPECCED")
+        before = plan(tf, conff)[0]
+        sd = os.path.join(tf, "memory", "builds", "tOne", "spec")
+        write_text(os.path.join(sd, "2026-08-01-spec-tOne-1.md"),
+                   "# ARCH-tOne-1 — a unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-2 · base 0123abcd\n")
+        write_text(os.path.join(sd, "2026-08-02-spec-tOne-2.md"),
+                   "# ARCH-tOne-2 — a unit\n\n**Status:** CLOSED · rev-1 · 2026-08-02 · node a · Tier-2 · base 0123abcd\n")
+        run("git", "add", "-A", cwd=tf)
+        run("git", "commit", "-q", "-m", "flip and add", "--no-verify", cwd=tf)
+        after = plan(tf, load_conf(tf))[0]
+        arm("a status flip and an added unit leave the month shard byte-identical", "True",
+            lambda: str(before["memory/ledger/2026-08.md"] == after["memory/ledger/2026-08.md"]
+                        and before["memory/LIVE.md"] != after["memory/LIVE.md"]))
 
         # AC2 — an unpaired marker is a NAMED error, not a silent departure.
         # TOOL-dFramedEntrypoint-5 S4 class (c) — THE SENTENCE-REMOVAL ARMS ARE RETIRED, all of them,
@@ -4612,6 +4839,14 @@ def cmd_selftest() -> int:
         arm("the shards-mode roster scan still reads it — the control", "True",
             lambda: str(any("EXMP-aBar-99" in v for v in
                             rosters(bt, _tracked9, "memory", set(BL_FAMILIES)).values())))
+        # TOOL-aMendedFleet-26 — a `missing:` id joins no roster; the plain citation beside it is the
+        # control that the scan read the file at all.
+        tm = os.path.join(base, "missing-form")
+        os.makedirs(os.path.join(tm, "memory/builds/aFoo/spec"))
+        with open(os.path.join(tm, "memory/builds/aFoo/spec/s.md"), "w", encoding="utf-8") as fh:
+            fh.write("# EXMP-aFoo-1 — a unit\n\nCites EXMP-aBar-7 and missing:EXMP-aBar-8.\n")
+        arm("a `missing:` id joins no roster, a plain citation still does", "['EXMP-aBar-7']",
+            lambda: rosters(tm, ["memory/builds/aFoo/spec/s.md"], "memory", {"EXMP"}).get("aBar"))
         _ids_b = plan(bt, _build_backlog_fixture(bt, NOHOME))[0]
         _ids_s = plan(bt, _build_backlog_fixture(bt, NOHOME, mode="shards"))[0]
         arm("every build README's ids: renders identically in both modes", "True",
@@ -4767,6 +5002,51 @@ def cmd_selftest() -> int:
                     _render_backlog_spec("EXMP-aBar-80", tail=bar_tail),
                 "memory/builds/aBar/BACKLOG.md": _render_backlog_file("aBar", bar_asks, bar_rows),
             }
+
+        # TOOL-aMendedFleet-10 AC4 and AC2 — `--path` over five asks, and the byte-measured
+        # summary. Three reach `tools/x/run.sh` (a DIRECTORY pointer, a pinned `seen`, a `matching`
+        # `seen`); the fourth points relative to the memory root; the fifth is the near-miss whose
+        # `tools/xx/` would match a character prefix and must not match a whole-segment one.
+        _pf_long = "a" * 155 + "—" * 81 + "bb"
+        _pf_files = _build_env_tree(
+            foo_asks=[
+                backlog.render_ask_row("EXMP-aFoo-1", "2026-09-01", "dir pointer", pointer="`tools/x/`"),
+                backlog.render_ask_row("EXMP-aFoo-2", "2026-09-02", "pinned seen",
+                                       clauses=(("seen", "`tools/x/run.sh`@abc1234:7"),)),
+                backlog.render_ask_row("EXMP-aFoo-3", "2026-09-03", _pf_long,
+                                       clauses=(("seen", "`tools/x/run.sh` matching `foo`"),)),
+                backlog.render_ask_row("EXMP-aFoo-4", "2026-09-04", "rooted pointer",
+                                       pointer="builds/aFoo/README.md"),
+                backlog.render_ask_row("EXMP-aFoo-5", "2026-09-05", "the near miss",
+                                       pointer="tools/y/other.sh",
+                                       clauses=(("seen", "`tools/xx/run.sh`@abc1234"),))],
+            foo_rows=[backlog.render_sev_row("EXMP-aFoo-1", "MED", "m"),
+                      backlog.render_sev_row("EXMP-aFoo-2", "HIGH", "h"),
+                      backlog.render_sev_row("EXMP-aFoo-4", "BLOCKER", "b"),
+                      backlog.render_sev_row("EXMP-aFoo-5", "HIGH", "h")])
+        _cpf = _build_backlog_fixture(et, _pf_files)
+        _rc, _sopf, _se = _read_asks_run(et, _cpf, ["--json", "--path", "tools\\x\\run.sh:12"])
+        arm("--path returns exactly the three reaching asks, HIGH then MED then unlabelled",
+            "rc=0 ids=['EXMP-aFoo-2', 'EXMP-aFoo-1', 'EXMP-aFoo-3'] paths=['tools/x/run.sh'] "
+            "matched=3 cut=0",
+            lambda: f"rc={_rc} ids={[r['id'] for r in json.loads(_sopf)['asks']]} "
+                    f"paths={json.loads(_sopf)['paths']} matched={json.loads(_sopf)['matched']} "
+                    f"cut={json.loads(_sopf)['cut']}")
+        _rc, _sopf4, _se = _read_asks_run(et, _cpf, ["--json", "--path", "memory/builds/aFoo/README.md"])
+        arm("a pointer relative to the memory root is matched by its rooted path",
+            "ids=['EXMP-aFoo-4']", lambda: f"ids={[r['id'] for r in json.loads(_sopf4)['asks']]}")
+        _rc, _sopfl, _se = _read_asks_run(et, _cpf, ["--json", "--path", "tools/x", "--limit", "1"])
+        arm("--limit caps the ranked rows and `cut` counts what it removed",
+            "ids=['EXMP-aFoo-2'] matched=3 cut=2",
+            lambda: f"ids={[r['id'] for r in json.loads(_sopfl)['asks']]} "
+                    f"matched={json.loads(_sopfl)['matched']} cut={json.loads(_sopfl)['cut']}")
+        _pf_sum = [r for r in json.loads(_sopf)["asks"] if r["id"] == "EXMP-aFoo-3"][0]["summary"]
+        arm("a 400-byte text's summary is cut in BYTES, on a whole character, ellipsis inside 160",
+            "bytes=158 ends=True text=400",
+            lambda: f"bytes={len(_pf_sum.encode('utf-8'))} ends={_pf_sum == 'a' * 155 + '…'} "
+                    f"text={len(_pf_long.encode('utf-8'))}")
+        arm("every row carries its pointer", "`tools/x/`",
+            lambda: [r for r in json.loads(_sopf)["asks"] if r["id"] == "EXMP-aFoo-1"][0]["pointer"])
 
         # AC1's second half — the misread `out` value REACHES `--check` as V13, on the real tree.
         _c1 = _build_backlog_fixture(et, _build_env_tree(foo_asks=[_ac1_collide]))
@@ -5676,6 +5956,167 @@ def cmd_selftest() -> int:
         lambda: scan_modes_doc_drift(_d_source, _d_readme.replace(MODES_HEADING, "## Elsewhere"),
                                      GUARD_CODES)[0])
 
+    # TOOL-aMendedFleet-12 — LIVE.md's `Last record` and `Activity` columns, three arms (S7).
+    _l_spec = "memory/builds/{0}/spec/2026-09-01-spec-{0}-1.md"
+    _l_none = ("---\nslug: aNone\nnode: a\nopened: 2026-08-01\nstreams: tool\nroster: EXMP\n"
+               "ids: EXMP-aNone-1\nstatus: OPEN\n---\n\n# aNone\n\n" + MARK_OPEN + "\n" + MARK_CLOSE + "\n")
+    _l_files = {
+        # aSpec's newest date is a status-header date, and it is the anchor.
+        "memory/builds/aSpec/README.md": _render_backlog_readme("aSpec"),
+        _l_spec.format("aSpec"): _render_backlog_spec("EXMP-aSpec-1").replace("2026-09-01 ·", "2026-09-30 ·"),
+        # aFile's is a record FILENAME, exactly 21 days before the anchor: active.
+        "memory/builds/aFile/README.md": _render_backlog_readme("aFile"),
+        _l_spec.format("aFile"): _render_backlog_spec("EXMP-aFile-1"),
+        "memory/builds/aFile/build/2026-09-09-build-EXMP-aFile-1-1-note.md": "# a note\n",
+        # aAsk's is an ask's `filed` date, 22 days before the anchor: dormant.
+        "memory/builds/aAsk/README.md": _render_backlog_readme("aAsk"),
+        _l_spec.format("aAsk"): _render_backlog_spec("EXMP-aAsk-1"),
+        "memory/builds/aAsk/BACKLOG.md": _render_backlog_file(
+            "aAsk", [backlog.render_ask_row("EXMP-aAsk-2", "2026-09-08", "an ask")]),
+        # aNone carries no dated record at all: its cell is its `opened`.
+        "memory/builds/aNone/README.md": _l_none,
+        "memory/builds/aNone/spec/legacy-note.md": "# no header here\n",
+    }
+    with tempfile.TemporaryDirectory() as _l_base:
+        _l_t = os.path.join(_l_base, "dormant"); os.makedirs(_l_t)
+        _l_conf = dict(_build_backlog_fixture(_l_t, _l_files), LIVE_DORMANT_DAYS="21")
+        _l_live = plan(_l_t, _l_conf)[0]["memory/LIVE.md"]
+        arm("AC3 — every date source reaches its row, the 21-day boundary is active and 22 is dormant",
+            "| [aFile](builds/aFile/README.md) | SPECCED | a | 2026-09-01 | tool | 1 | 2026-09-09 | active |\n"
+            "| [aSpec](builds/aSpec/README.md) | SPECCED | a | 2026-09-01 | tool | 1 | 2026-09-30 | active |\n"
+            "| [aAsk](builds/aAsk/README.md) | SPECCED | a | 2026-09-01 | tool | 2 | 2026-09-08 | dormant |\n"
+            "| [aNone](builds/aNone/README.md) | OPEN | a | 2026-08-01 | tool | 1 | 2026-08-01 | dormant |\n",
+            lambda: _l_live)
+        arm("AC3 — the anchor sentence names the threshold, the newest date and the build that set it",
+            "Dormant: no record dated within 21 days of 2026-09-30, the newest record date in this "
+            "tree (aSpec).", lambda: _l_live)
+        arm("AC3 — a zero LIVE_DORMANT_DAYS refuses by name",
+            "LIVE_DORMANT_DAYS='0' is not a positive whole number",
+            lambda: plan(_l_t, dict(_l_conf, LIVE_DORMANT_DAYS="0")))
+        # AC4 — blank renders the pre-unit file. The oracle is that render, frozen here as it shipped.
+        _l_blank = dict(_l_conf, LIVE_DORMANT_DAYS="")
+        _l_rows = [f"| [{b['slug']}](builds/{b['slug']}/README.md) | {b['status']} | {b['fm']['node']} | "
+                   f"{b['fm']['opened']} | {b['fm']['streams']} | {len(b['roster'])} |"
+                   for b in collect(_l_t, _l_blank) if b["status"] not in TERMINAL]
+        _l_old = "\n".join([
+            GEN_HEADER, "# memory/LIVE.md — builds with at least one non-terminal unit", "",
+            "Derived, never authored: a build leaves this file when every one of its units reaches a",
+            "terminal status. Nothing here is edited by hand.", "",
+            "| Build | Status | Node | Opened | Streams | Ids (n) |", "|---|---|---|---|---|---|"]
+            + _l_rows) + "\n"
+        arm("AC4 — a blank LIVE_DORMANT_DAYS renders the pre-unit LIVE.md byte for byte", "True",
+            lambda: str(len(_l_rows) == 4 and plan(_l_t, _l_blank)[0]["memory/LIVE.md"] == _l_old))
+        # TOOL-aMendedFleet-13 — LIVE.md's `Landed-unclosed` column. The resolvers are dict lookups
+        # that raise KeyError, a LookupError, so the AC5 one is exactly what resolve_kit_dir raises.
+        arm("TOOL-aMendedFleet-13 AC6 — a blank LIVE_LANDED_UNCLOSED never resolves the drift kit and "
+            "moves no byte, with and without the dormancy pair", "True True",
+            lambda: "{} {}".format(
+                plan(_l_t, dict(_l_blank, LIVE_LANDED_UNCLOSED=""),
+                     resolve=lambda *_a: {}["a blank key resolved the drift kit"])[0]["memory/LIVE.md"]
+                == _l_old,
+                plan(_l_t, dict(_l_conf, LIVE_LANDED_UNCLOSED=" "),
+                     resolve=lambda *_a: {}["a blank key resolved the drift kit"])[0]["memory/LIVE.md"]
+                == _l_live))
+        arm("TOOL-aMendedFleet-13 AC5 — a set key whose drift kit does not resolve refuses by name",
+            "LIVE_LANDED_UNCLOSED=1 needs the drift-audit kit, which does not resolve",
+            lambda: plan(_l_t, dict(_l_conf, LIVE_LANDED_UNCLOSED="1"),
+                         resolve=lambda *_a: {}["no drift-audit kit in this fixture"]))
+        arm("TOOL-aMendedFleet-13 S5 — a value other than blank or 1 refuses by name",
+            "LIVE_LANDED_UNCLOSED='yes' is not one of its two legal values",
+            lambda: plan(_l_t, dict(_l_conf, LIVE_LANDED_UNCLOSED="yes")))
+        _k_read: dict = {}
+        _k_live = render_live(collect(_l_t, _l_conf, backlog_out=_k_read), "memory", _l_conf, _k_read,
+                              {"aSpec": 2})
+        arm("TOOL-aMendedFleet-13 S3 — the sentence follows the dormancy sentence",
+            "tree (aSpec).\n\nLanded-unclosed: the build's non-terminal units", lambda: _k_live)
+        arm("TOOL-aMendedFleet-13 S3 — the column trails the dormancy pair, zero included",
+            "| Last record | Activity | Landed-unclosed |\n|---|---|---|---|---|---|---|---|---|\n"
+            "| [aFile](builds/aFile/README.md) | SPECCED | a | 2026-09-01 | tool | 1 | 2026-09-09 | active | 0 |\n"
+            "| [aSpec](builds/aSpec/README.md) | SPECCED | a | 2026-09-01 | tool | 1 | 2026-09-30 | active | 2 |\n",
+            lambda: _k_live)
+        # AC2 — the pure mapping over a live build and a terminal one. The third row carries the live
+        # unit's OWN id at a path the fixture never tracked, so only the (file, id) pair rejects it.
+        _k_t = os.path.join(_l_base, "landed"); os.makedirs(_k_t)
+        _k_conf = _build_backlog_fixture(_k_t, {
+            "memory/builds/aLive/README.md": _render_backlog_readme("aLive"),
+            _l_spec.format("aLive"): _render_backlog_spec("EXMP-aLive-1"),
+            "memory/builds/aDone/README.md": _render_backlog_readme("aDone"),
+            _l_spec.format("aDone"): _render_backlog_spec("EXMP-aDone-1", "CLOSED"),
+        })
+        _k_rows = [{"file": _l_spec.format("aLive"), "id": "EXMP-aLive-1"},
+                   {"file": _l_spec.format("aDone"), "id": "EXMP-aDone-1"},
+                   {"file": "memory/builds/aLive/spec/2026-09-02-spec-aLive-1-copy.md", "id": "EXMP-aLive-1"}]
+        arm("TOOL-aMendedFleet-13 AC2 — a terminal or untracked row counts nowhere, the live one once",
+            "[('aDone', 0), ('aLive', 1)]",
+            lambda: str(sorted(derive_landed_counts({"detail": _k_rows}, collect(_k_t, _k_conf),
+                                                    "memory").items())))
+        # AC2 — the same tracked bytes committed a year apart render one LIVE.md. The commit dates are
+        # asserted apart first, so an arm whose fixtures collapsed to one date cannot pass vacuously.
+        _l_renders, _l_dates = [], []
+        for _l_n, _l_when in (("y1", "2025-01-15T12:00:00"), ("y2", "2026-01-15T12:00:00")):
+            _l_r = os.path.join(_l_base, _l_n); os.makedirs(_l_r)
+            _l_c = dict(_build_backlog_fixture(_l_r, _l_files), LIVE_DORMANT_DAYS="21")
+            subprocess.run(("git", "commit", "-q", "--no-verify", "-m", "f"), cwd=_l_r, check=True,
+                           capture_output=True,
+                           env=dict(_build_git_env(), GIT_AUTHOR_DATE=_l_when, GIT_COMMITTER_DATE=_l_when))
+            _l_dates.append(run("git", "log", "-1", "--format=%ad %cd", "--date=short", cwd=_l_r).strip())
+            _l_renders.append(plan(_l_r, _l_c)[0]["memory/LIVE.md"])
+        arm("AC2 — two trees a year apart in commit dates render one LIVE.md", "apart=True same=True",
+            lambda: f"apart={_l_dates[0] != _l_dates[1]} same={_l_renders[0] == _l_renders[1]}")
+
+    # TOOL-aMendedFleet-19 AC6 — the attribution delimits the slug on both sides, so `zA` never claims
+    # `zAB`'s README or ids. A substring match would attribute all four and count none elsewhere.
+    _d_keys = ["check 9\tmemory/builds/zA/README.md", "check 21\tTOOL-zA-3 cited by nothing",
+               "check 9\tmemory/builds/zAB/README.md", "check 21\tTOOL-zAB-2 cited by nothing", ""]
+    arm("TOOL-aMendedFleet-19 AC6 — zA takes its README and id, zAB's two count elsewhere",
+        "['memory/builds/zA/README.md', 'TOOL-zA-3 cited by nothing'] 2",
+        lambda: "%s %d" % ([k for _r, k in scan_doctor_offenders(_d_keys, "zA", "memory")[0]],
+                           scan_doctor_offenders(_d_keys, "zA", "memory")[1]))
+    # AC5 — a hygiene child exiting 2, or exiting 1 naming no key, is unanswered: exit 2, naming the
+    # grader, and the slot-contract finding beside it still prints. The third arm holds the answered
+    # case at 1, so a verdict returning 2 unconditionally cannot pass the pair.
+    _d_slot = {"grader": "slot-contract", "answered": True, "why": "", "mine": [("registry", "no row")],
+               "elsewhere": 0}
+    for _d_code in (2, 1):
+        _d_hyg = {"grader": "hygiene", "answered": True, "why": "", "code": _d_code, "mine": [],
+                  "elsewhere": 0}
+        arm(f"TOOL-aMendedFleet-19 AC5 — hygiene exit {_d_code} with no key reads exit 2, slot finding kept",
+            "2 True True", lambda h=_d_hyg: "%d %s %s" % (
+                derive_doctor_verdict("zA", [h, _d_slot])[0],
+                "doctor zA: hygiene did not answer" in "\n".join(derive_doctor_verdict("zA", [h, _d_slot])[1]),
+                "doctor zA: slot-contract registry — no row" in "\n".join(derive_doctor_verdict("zA", [h, _d_slot])[1])))
+    arm("TOOL-aMendedFleet-19 S4 — an answered hygiene run with a key elsewhere and a slot finding reads 1",
+        "1", lambda: str(derive_doctor_verdict("zA", [
+            {"grader": "hygiene", "answered": True, "why": "", "code": 1, "mine": [], "elsewhere": 3},
+            _d_slot])[0]))
+
+    # TOOL-aMendedFleet-20 AC5 — the skeleton follows a FIXTURE template's fence, renamed heading and
+    # all, writes one §5 bullet per fixture row, and carries `order` only when given. The heading list
+    # is compared whole and in order, so a render that drops or reorders one cannot pass.
+    _n_tpl = ("# T\n\n## 1. Prose outside the fence\n\n```markdown\n# <FAMILY-slug-seq> — <title>\n\n"
+              "## 1. Aim\n\n## 2. Scope (IN)\n\n## 5. Production-readiness checklist\n\n"
+              "```markdown\n- AC1 example\n```\n\n## 6. Acceptance criteria\n\n## 11. Extra\n```\n")
+    _n_args = ("memory/TEMPLATE-SPEC.md", "ARCH-aFix-3", "2", "0123abcd", "2026-10-04", "arch")
+    _n_out = render_spec_skeleton(_n_tpl, *_n_args, "", ["alpha", "beta / gamma"])
+    _n_ord = render_spec_skeleton(_n_tpl, *_n_args, "7", ["alpha"])
+    arm("TOOL-aMendedFleet-20 AC5 — the fixture fence's headings, in order, and nothing else",
+        "['## 1. Aim', '## 2. Scope (IN)', '## 5. Production-readiness checklist', "
+        "'## 6. Acceptance criteria', '## 11. Extra']",
+        lambda: str([ln for ln in _n_out.split("\n") if ln.startswith("## ")]))
+    arm("TOOL-aMendedFleet-20 AC5 — one §5 bullet per fixture READINESS_ROWS row",
+        "['- alpha — ', '- beta / gamma — ']",
+        lambda: str([ln[:ln.index("— ") + 2] for ln in _n_out.split("## 5.")[1].split("## 6.")[0]
+                     .split("\n") if ln.startswith("- ")]))
+    arm("TOOL-aMendedFleet-20 AC5 — the header parses, and carries order only when passed",
+        "True True False True",
+        lambda: "%s %s %s %s" % (bool(HDR_RE.match(_n_out.split("\n")[2])),
+                                 bool(HDR_RE.match(_n_ord.split("\n")[2])),
+                                 "order" in _n_out.split("\n")[2],
+                                 _n_ord.split("\n")[2].endswith("· streams arch · order 7")))
+    arm("TOOL-aMendedFleet-20 S3 — a template with no skeleton fence is refused, never guessed",
+        "carries no skeleton fence",
+        lambda: render_spec_skeleton("# T\n\n## 1. Goal\n", *_n_args, "", []))
+
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it
     # would be one more row in the manifest for a file this one already imports. Its arms print
@@ -5689,15 +6130,302 @@ def cmd_selftest() -> int:
     return 0
 
 
+# ------------------------------------------------------------------ --doctor (TOOL-aMendedFleet-19)
+# A new build folder owes several things graded by different checkers, two of which stop at their
+# first failure, so a hand-written folder used to surface its rules one bar cycle at a time. The
+# doctor runs both graders that own those rules, keeps going past every failure, and prints the ones
+# attributed to ONE folder. It reads and prints; it fixes nothing.
+#
+# WHAT IT DOES NOT CHECK. The spec-token checker sits outside this kit and is never consulted, and a
+# hygiene key naming neither the folder's path nor an id of its slug is counted elsewhere rather than
+# attributed — the summary's elsewhere count is what keeps such a key visible.
+DOCTOR_USAGE = "usage: gen_build_index.py --doctor <slug>"
+
+
+def read_doctor_args(argv: list) -> str:
+    """`--doctor`'s own parse: exactly one slug, never a path (F4). Every refusal names the usage."""
+    if len(argv) != 1 or argv[0].startswith("--"):
+        raise Problem(f"--doctor takes exactly one build slug. {DOCTOR_USAGE}")
+    slug = argv[0]
+    if "/" in slug or "\\" in slug:
+        raise Problem(f"--doctor takes a slug, not a path: `{slug}`. {DOCTOR_USAGE}")
+    if not backlog.SLUG_RE.match(slug):
+        raise Problem(f"`{slug}` is not a build slug. {DOCTOR_USAGE}")
+    return slug
+
+
+def scan_doctor_offenders(keys: list, slug: str, memory_root: str) -> tuple:
+    """`(mine, elsewhere)` from `check <n><TAB><key>` lines. S2's attribution, delimited both sides.
+
+    A key is this folder's when it carries the folder's path or an id `<FAMILY>-<slug>-<seq>`. The
+    slug is delimited on BOTH sides, so slug `zA` never claims `zAB`'s README or its ids.
+    """
+    path_re = re.compile(re.escape(f"{memory_root.rstrip('/')}/builds/{slug}") + r"(?![A-Za-z0-9])")
+    id_re = re.compile(r"(?<![A-Za-z0-9])[A-Z]+-" + re.escape(slug) + r"-[0-9]+")
+    mine, elsewhere = [], 0
+    for line in keys:
+        if not line.strip():
+            continue
+        rule, _tab, key = line.partition("\t")
+        if not _tab:
+            rule, key = "check ?", line
+        # A Windows child can join a path with `\`, as check 9's message does at the repo root.
+        if path_re.search(key.replace("\\", "/")) or id_re.search(key):
+            mine.append((rule.strip(), key.strip()))
+        else:
+            elsewhere += 1
+    return mine, elsewhere
+
+
+def run_hygiene_offenders(root: str, slug: str, memory_root: str) -> dict:
+    """Grader one: the hygiene gate's `--offenders` run as a child, its keys attributed (S2, S5)."""
+    out = {"grader": "hygiene", "answered": False, "why": "", "mine": [], "elsewhere": 0}
+    script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "check-memory-hygiene.sh")
+    try:
+        # Deferred: only this mode needs a bash, and corpus_ids already owns the Windows rule that a
+        # bash on PATH may be a launcher for a different filesystem.
+        import corpus_ids  # noqa: PLC0415
+        sh = corpus_ids.resolve_bash()
+    except Exception as exc:  # noqa: BLE001 — no usable bash is an unanswered grader, never clean
+        out["why"] = f"no usable bash: {exc}"
+        return out
+    try:
+        p = subprocess.run([sh, script.replace(os.sep, "/"), "--offenders"], cwd=root,
+                           capture_output=True, text=True, encoding="utf-8", env=_build_git_env())
+    except OSError as exc:
+        out["why"] = f"cannot run {sh}: {exc}"
+        return out
+    out["answered"], out["code"] = True, p.returncode
+    out["mine"], out["elsewhere"] = scan_doctor_offenders(p.stdout.split("\n"), slug, memory_root)
+    return out
+
+
+def check_folder_slots(root: str, conf: dict, slug: str) -> dict:
+    """Grader two: the slot contract for this folder's README only (S3), past its first failure."""
+    out = {"grader": "slot-contract", "answered": True, "why": "", "mine": [], "elsewhere": 0}
+    m = conf["MEMORY_ROOT"]
+    rel = f"{m}/builds/{slug}/README.md"
+    tracked = extract_build_readmes(run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n"), m)
+    bound = set()
+    try:
+        bound, exempt, _pin = read_contract_rows(root, conf)
+        if rel not in bound and rel not in exempt:
+            out["mine"].append(("registry", f"{m}/{CONTRACT_REGISTRY} names neither a bound nor an "
+                                            f"exempt row for `{rel}`"))
+        check_contract_registry(root, conf, tracked)
+    except Problem as exc:
+        # The registry check raises on its FIRST failure: one naming this README is ours, any other
+        # is counted elsewhere, and the slot walk below runs either way.
+        if rel not in str(exc):
+            out["elsewhere"] += 1
+        elif not out["mine"]:
+            out["mine"].append(("registry", str(exc)))
+    if rel not in tracked:
+        out["mine"].append(("slot", f"{rel} is not a tracked build README, so no slot rule can grade it"))
+        return out
+    for line, why in slot_violations(read_text(os.path.join(root, rel)), rel, canon=rel in bound):
+        out["mine"].append(("slot", f"{rel}:{line} — {why}"))
+    if rel in bound:
+        try:
+            hard, _adv = scan_slot_budget(root, conf, rel)
+        except Problem as exc:
+            out["answered"], out["why"] = False, str(exc)
+            return out
+        out["mine"] += [("budget", h.strip()) for h in hard]
+    return out
+
+
+def derive_doctor_verdict(slug: str, outcomes: list) -> tuple:
+    """`(exit, lines)` from both graders' outcomes. A grader that cannot answer is never clean (S5).
+
+    The hygiene child exiting anything but 0 or 1, or exiting 1 naming no key, did not answer — even
+    when a caller marked it answered. Every other grader's findings still print beside it.
+    """
+    lines, unanswered, failing, elsewhere = [], [], 0, 0
+    for o in outcomes:
+        code = o.get("code")
+        if (not o["answered"] or code not in (None, 0, 1)
+                or (code == 1 and not o["mine"] and not o["elsewhere"])):
+            why = o["why"] or (f"its child exited {code} naming no offender" if code in (0, 1)
+                               else f"its child exited {code}")
+            unanswered.append(o["grader"])
+            lines.append(f"doctor {slug}: {o['grader']} did not answer — {why}")
+        for rule, detail in o["mine"]:
+            lines.append(f"doctor {slug}: {o['grader']} {rule} — {detail}")
+            failing += 1
+        elsewhere += o["elsewhere"]
+    graders = " and ".join(o["grader"] for o in outcomes)
+    lines.append(f"doctor {slug}: {failing} failing rule(s) from graders {graders}; {elsewhere} "
+                 f"offender(s) the graders named outside this folder; the spec-token checker outside "
+                 f"this kit was not consulted"
+                 + (f"; NOT ANSWERED: {', '.join(unanswered)}" if unanswered else ""))
+    return (2 if unanswered else 1 if failing else 0), lines
+
+
+def cmd_doctor(root: str, conf: dict, slug: str) -> int:
+    """Every failing build-folder rule for one slug, in one pass (TOOL-aMendedFleet-19)."""
+    m = conf["MEMORY_ROOT"]
+    folder = f"{m}/builds/{slug}"
+    if not os.path.isdir(os.path.join(root, folder)):
+        raise Problem(f"--doctor {slug}: no folder {folder}/ on disk. {DOCTOR_USAGE}")
+    # S6 — both graders read TRACKED files, so an untracked file is invisible to them. Say so first.
+    tracked = [p for p in run("git", "ls-files", "--", f"{folder}/", cwd=root).split("\n") if p]
+    untracked = [p for p in run("git", "ls-files", "--others", "--exclude-standard", "--", f"{folder}/",
+                                cwd=root).split("\n") if p]
+    remedy = f"`git add {folder}` first, because both graders read tracked files only"
+    if not tracked:
+        print(f"doctor {slug}: {len(untracked)} untracked file(s) and none tracked under {folder}/; "
+              f"run {remedy}. Nothing graded.")
+        return 2
+    if untracked:
+        print(f"doctor {slug}: {len(untracked)} untracked file(s) under {folder}/ are invisible to "
+              f"both graders; run {remedy}.")
+    code, lines = derive_doctor_verdict(slug, [run_hygiene_offenders(root, slug, m),
+                                               check_folder_slots(root, conf, slug)])
+    for line in lines:
+        print(line)
+    return code
+
+
+# ---------------------------------------------------------------- --new-spec (TOOL-aMendedFleet-20)
+# Every dated cutoff in the conf adds a shape a new spec must carry, and a copied template skeleton
+# learns the missing ones from a red leg, one bar cycle each. This writes a spec that already carries
+# every one of those shapes, with each part only an author can write left as a FILL_MARKER slot that
+# check 12 refuses until it is filled. It writes one file; it stages nothing and renders nothing,
+# because a render rewrites shared generated files that concurrent spec writers contend on (F3).
+#
+# WHAT IT DOES NOT CHECK. The §7 leg line is a slot, never derived from the paths an author will
+# touch: that guard join lives outside this kit and the paths do not exist yet. Nothing here asks
+# whether a filled slot says anything true; check 12 grades the shapes and the marker, no more.
+NEW_SPEC_USAGE = "usage: gen_build_index.py --new-spec <ID> --tier <1|2> [--order <n>] [--base <sha>]"
+#: The slot opener. Check 12's placeholder pattern carries it as its third alternative, both tiers.
+FILL_MARKER = "<fill:"
+
+
+def read_new_spec_args(argv: list) -> dict:
+    """`--new-spec`'s own parse: one positional id, `--tier`, and optional `--order` and `--base`."""
+    out = {"id": "", "tier": "", "order": "", "base": "HEAD"}
+    rest = list(argv)
+    if rest and not rest[0].startswith("--"):
+        out["id"] = rest.pop(0)
+    while rest:
+        token = rest.pop(0)
+        if token not in ("--tier", "--order", "--base") or not rest:
+            raise Problem(f"--new-spec: unknown option or missing value at {token}. {NEW_SPEC_USAGE}")
+        out[token[2:]] = rest.pop(0)
+    if not out["id"]:
+        raise Problem(f"--new-spec takes a unit id. {NEW_SPEC_USAGE}")
+    if out["tier"] not in ("1", "2"):
+        raise Problem(f"--new-spec takes --tier 1 or --tier 2, got `{out['tier']}`. {NEW_SPEC_USAGE}")
+    if out["order"] and not re.fullmatch(r"[1-9][0-9]*", out["order"]):
+        raise Problem(f"--new-spec: --order takes a positive integer, got `{out['order']}`. "
+                      f"{NEW_SPEC_USAGE}")
+    return out
+
+
+def render_spec_skeleton(template: str, template_rel: str, spec_id: str, tier: str, base: str,
+                         today: str, streams: str, order: str, rows: list) -> str:
+    """The new spec's bytes: a filled header, the template's `##` headings, a slot per authored part.
+
+    The headings are READ from the skeleton fence of the installed template (F2), so the section
+    canon keeps one spelling; a section's body is chosen by its NUMBER, so a renamed heading is
+    followed. A template with no skeleton fence is a refusal, never a guess.
+    """
+    lines = template.split("\n")
+    start = next((i for i in range(len(lines) - 1) if lines[i].startswith("```")
+                  and lines[i + 1].startswith("# <FAMILY-slug-seq>")), None)
+    end = max((i for i, line in enumerate(lines) if line.startswith("```")), default=-1)
+    headings = [line.rstrip() for line in lines[start + 1:end]
+                if line.startswith("## ")] if start is not None else []
+    if not headings:
+        raise Problem(f"--new-spec: {template_rel} carries no skeleton fence opening on "
+                      f"`# <FAMILY-slug-seq>` with `##` headings under it; nothing was written")
+    fill = FILL_MARKER + " {}>"
+    bodies = {
+        1: [fill.format("the change and why it is worth building, in one or two sentences")],
+        2: [f"- **S1** — {fill.format('what this unit builds, verifiable at done')}. Observed by AC1."],
+        3: [f"- {fill.format('what an eager builder might include but must not')}", "",
+            "### Edges", "", "none"],
+        4: [fill.format("the mechanism: data shapes, contracts, flows"), "",
+            "### Files touched (estimate)", "",
+            f"- {fill.format('each path this unit writes, backticked')}"],
+        5: [f"- {r} — {fill.format('what is needed, or N/A and why')}" for r in rows]
+           or [f"- {fill.format('one line per cross-cutting concern')}"],
+        6: [f"- **AC1** — When `{fill.format('the command or file that observes it')}` runs, "
+            f"{fill.format('the observable result')}.",
+            f"  Red when: {fill.format('the break that turns it red')}."],
+        7: [f"`{fill.format('leg')}`"],
+        8: ["none"],
+        9: [f"- rev-1 · {today} · initial draft."],
+        10: [fill.format("the seam this unit extends by path and the probe that named it, or no "
+                         "existing seam fits with the evidence"), "",
+             f"Recall terms used: {fill.format('the query and its 8-14 terms, verbatim')}"],
+    }
+    header = (f"**Status:** OPEN · rev-1 · {today} · node {spec_id.split('-')[1][0]} · Tier-{tier} "
+              f"· base {base} · streams {streams}" + (f" · order {order}" if order else ""))
+    out = [f"# {spec_id} — {fill.format('title')}", "", header]
+    for h in headings:
+        num = re.match(r"## (\d+)\.", h)
+        out += ["", h, ""] + bodies.get(int(num.group(1)) if num else 0,
+                                        [fill.format("this section")])
+    return "\n".join(out) + "\n"
+
+
+def cmd_new_spec(root: str, conf: dict, args: dict) -> int:
+    """Write one spec skeleton under its build's `spec/` folder; refuse before writing on any conflict."""
+    m = conf["MEMORY_ROOT"]
+    spec_id = args["id"]
+    parts = re.fullmatch(r"([A-Z]+)-([a-z][A-Za-z0-9]*)-([1-9][0-9]*)", spec_id)
+    if not parts or not backlog.SLUG_RE.match(parts.group(2)):
+        raise Problem(f"--new-spec: `{spec_id}` is not a unit id, FAMILY-<slug>-<seq> with a node-led "
+                      f"CamelCase slug. {NEW_SPEC_USAGE}")
+    family, slug = parts.group(1), parts.group(2)
+    disciplines = read_discipline_map(conf)
+    if family not in disciplines:
+        raise Problem(f"--new-spec: family {family} is not declared in FAMILIES "
+                      f"(`{conf.get('FAMILIES', '')}`)")
+    folder = f"{m}/builds/{slug}"
+    if not run("git", "ls-files", "--", f"{folder}/README.md", cwd=root).strip():
+        raise Problem(f"--new-spec: {folder}/README.md is not tracked, so {slug} is not a build")
+    for rel in run("git", "ls-files", "--", f"{folder}/spec/", cwd=root).split("\n"):
+        text, _why = read_text_or_none(os.path.join(root, rel)) if rel else (None, "")
+        hit = parse_spec_h1(rel, text, m, list(disciplines)) if text else None
+        if hit and hit[1] == spec_id:
+            raise Problem(f"--new-spec: {rel} already carries {spec_id} in its H1")
+    today = datetime.date.today().isoformat()
+    rel = f"{folder}/spec/{today}-spec-{spec_id}.md"
+    if os.path.exists(os.path.join(root, rel)):
+        raise Problem(f"--new-spec: {rel} already exists")
+    try:
+        base = run("git", "rev-parse", "--verify", "--quiet", f"{args['base']}^{{commit}}",
+                   cwd=root).strip()[:8]
+    except subprocess.CalledProcessError:
+        base = ""
+    if not base:
+        raise Problem(f"--new-spec: --base `{args['base']}` does not resolve to a commit")
+    template_rel = f"{m}/TEMPLATE-SPEC.md"
+    template, why = read_text_or_none(os.path.join(root, template_rel))
+    if template is None:
+        raise Problem(f"--new-spec: {template_rel} {why}")
+    rows = [r for r in conf.get("READINESS_ROWS", "").split("|") if r]
+    text = render_spec_skeleton(template, template_rel, spec_id, args["tier"], base, today,
+                                disciplines[family], args["order"], rows)
+    write_text(os.path.join(root, rel), text)
+    print(f"build-index: wrote {rel} carrying {text.count(FILL_MARKER)} fill slot(s); check 12 "
+          f"refuses it until every `{FILL_MARKER} …>` is filled. Then: git add {rel} && "
+          f"python {kit_rel()}/gen_build_index.py --write")
+    return 0
+
+
 def main(argv: list) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
         return cmd_selftest()
     if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey",
-                    "--report", "--bump", "--asks", "--new-build"):
+                    "--report", "--bump", "--asks", "--new-build", "--new-spec", "--doctor"):
         print("usage: gen_build_index.py "
               "[--check|--write|--check-format|--survey|--report|--bump|"
-              "--print-bindings|--asks|--new-build|--selftest]")
+              "--print-bindings|--asks|--new-build|--new-spec|--doctor|--selftest]")
         return 2
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
@@ -5718,9 +6446,19 @@ def main(argv: list) -> int:
             print(f"build-index: {exc}", file=sys.stderr)
             return 2
         return cmd_asks(root, conf, args)
+    # `--doctor` refuses with 2, not the handler's 1: a refusal there is a usage error, and 1 is the
+    # mode's own "a rule fails" verdict.
+    if mode == "--doctor":
+        try:
+            return cmd_doctor(root, conf, read_doctor_args(argv[2:]))
+        except Problem as exc:
+            print(f"build-index: {exc}")
+            return 2
     try:
         if mode == "--new-build":
             return cmd_new_build(root, conf, read_new_build_args(argv[2:]))
+        if mode == "--new-spec":
+            return cmd_new_spec(root, conf, read_new_spec_args(argv[2:]))
         if mode == "--check-format":
             return cmd_check_format(root, conf)
         if mode == "--survey":

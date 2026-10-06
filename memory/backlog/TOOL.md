@@ -16,39 +16,39 @@ Cite ids, never line numbers.
 
 | Ask | Status | Sev | Decided by | Filed | Summary |
 |---|---|---|---|---|---|
-| [TOOL-aBoundedCeiling-8](../builds/aBoundedCeiling/BACKLOG.md) | OPEN | — | — | 2026-08-27 | tools/run-gates/run-gates.turnstile.test.sh arm 4c (AC4c) CANNOT FAIL.… |
-| [TOOL-aBoundedCeiling-9](../builds/aBoundedCeiling/BACKLOG.md) | OPEN | — | — | 2026-08-27 | the unattended kit gate leg is RED ON MAIN and has been since… |
-| [TOOL-aBoundedCeiling-10](../builds/aBoundedCeiling/BACKLOG.md) | OPEN | — | — | 2026-08-27 | A HELD LEG CANNOT NOTICE ITS OWN DRIFT, and two independent instances… |
-| [TOOL-aBoundedCeiling-11](../builds/aBoundedCeiling/BACKLOG.md) | OPEN | — | — | 2026-08-27 | A RUN CAN REACH A TERMINAL PHASE BY HAND, SKIPPING EVERY FACT THE VERB… |
-| [TOOL-aBoundedCeiling-12](../builds/aBoundedCeiling/BACKLOG.md) | OPEN | — | — | 2026-08-28 | THE TURNSTILE REAPS A DEAD HOLDER AND NEVER A DEAD WAITER, so one… |
-| [TOOL-aBoundedCeiling-13](../builds/aBoundedCeiling/BACKLOG.md) | OPEN | — | — | 2026-08-27 | CARRY-FORWARD from TOOL-aBoundedCeiling-5, retired WONTDO at the… |
-| [TOOL-aBoundedVerdict-6](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-17 | the run-state authored region's 8 KB spill rule becomes load-bearing… |
-| [TOOL-aBoundedVerdict-7](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-17 | nothing records inter-unit dependencies; a build README's authored… |
-| [TOOL-aBoundedVerdict-8](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-17 | no leg asserts a review subject AT the cap with a non-clean verdict was… |
-| [TOOL-aBoundedVerdict-10](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-17 | unattended driver selftest HANGS on node a inside its first --preflight… |
-| [TOOL-aBoundedVerdict-20](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-19 | the aBoundedVerdict spec audit's UNFOLDED residue: 6 high clusters… |
-| [TOOL-aBoundedVerdict-22](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-19 | the resolver ban in unattended.test.sh greps (python3?/py) , which… |
-| [TOOL-aBoundedVerdict-23](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-19 | --status/--resume pick the next unit as the first non-terminal row in… |
-| [TOOL-aBoundedVerdict-25](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-19 | check-unattended.sh carries three RAW CR bytes inside CR-stripping awk… |
-| [TOOL-aBoundedVerdict-26](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-19 | run-gates.sh / tail -N returns TAIL's exit status, so the idiom that… |
-| [TOOL-aBoundedVerdict-27](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-19 | unattended.test.sh's 344 assertions share ONE mutable fixture tree with… |
-| [TOOL-aBoundedVerdict-28](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-19 | BUILD-METHOD.md is at 249 lines against its own ≤250 self-declared cap… |
+| [TOOL-aBoundedCeiling-8](../builds/aBoundedCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | tools/run-gates/run-gates.turnstile.test.sh arm 4c (AC4c) CANNOT FAIL.… |
+| [TOOL-aBoundedCeiling-9](../builds/aBoundedCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the unattended kit gate leg is RED ON MAIN and has been since… |
+| [TOOL-aBoundedCeiling-10](../builds/aBoundedCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | A HELD LEG CANNOT NOTICE ITS OWN DRIFT, and two independent instances… |
+| [TOOL-aBoundedCeiling-11](../builds/aBoundedCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | A RUN CAN REACH A TERMINAL PHASE BY HAND, SKIPPING EVERY FACT THE VERB… |
+| [TOOL-aBoundedCeiling-12](../builds/aBoundedCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | THE TURNSTILE REAPS A DEAD HOLDER AND NEVER A DEAD WAITER, so one… |
+| [TOOL-aBoundedCeiling-13](../builds/aBoundedCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | CARRY-FORWARD from TOOL-aBoundedCeiling-5, retired WONTDO at the… |
+| [TOOL-aBoundedVerdict-6](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | the run-state authored region's 8 KB spill rule becomes load-bearing… |
+| [TOOL-aBoundedVerdict-7](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | nothing records inter-unit dependencies; a build README's authored… |
+| [TOOL-aBoundedVerdict-8](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | no leg asserts a review subject AT the cap with a non-clean verdict was… |
+| [TOOL-aBoundedVerdict-10](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | unattended driver selftest HANGS on node a inside its first --preflight… |
+| [TOOL-aBoundedVerdict-20](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | the aBoundedVerdict spec audit's UNFOLDED residue: 6 high clusters… |
+| [TOOL-aBoundedVerdict-22](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | the resolver ban in unattended.test.sh greps (python3?/py) , which… |
+| [TOOL-aBoundedVerdict-23](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | --status/--resume pick the next unit as the first non-terminal row in… |
+| [TOOL-aBoundedVerdict-25](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | check-unattended.sh carries three RAW CR bytes inside CR-stripping awk… |
+| [TOOL-aBoundedVerdict-26](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | run-gates.sh / tail -N returns TAIL's exit status, so the idiom that… |
+| [TOOL-aBoundedVerdict-27](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | unattended.test.sh's 344 assertions share ONE mutable fixture tree with… |
+| [TOOL-aBoundedVerdict-28](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | BUILD-METHOD.md is at 249 lines against its own ≤250 self-declared cap… |
 | [TOOL-aBoundedVerdict-29](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-19 | check-verdict-epoch.sh's remedy names THREE files to bump; the kit has… |
-| [TOOL-aBoundedVerdict-31](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-20 | every TemporaryDirectory() in the kits can red the bar on WINDOWS for a… |
-| [TOOL-aBoundedVerdict-32](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-20 | TOOL-cBriefedPilot-18 AC9 was CLAIMED at a close it was not met at. It… |
-| [TOOL-aBranchedMandate-5](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | adopt-drift-audit.sh diffs its render with no [ -s ] test, so… |
-| [TOOL-aBranchedMandate-8](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | --preflight OVERWRITES a live non-terminal run-state file, losing the… |
-| [TOOL-aBranchedMandate-9](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | --preflight's rotation and scaffold run BEFORE checks that can return… |
-| [TOOL-aBranchedMandate-10](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | map_extractors.template.py unions the two JS scans with a bare +,… |
-| [TOOL-aBranchedMandate-11](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | govkit.py's blocked skip reason is unreachable behind cmd_apply's early… |
-| [TOOL-aCandidStub-1](../builds/aCandidStub/BACKLOG.md) | OPEN | — | — | 2026-08-10 | tools/hooks/agent-cap.js blesses an identifier bound from an EMPTY… |
-| [TOOL-aCandidStub-2](../builds/aCandidStub/BACKLOG.md) | OPEN | — | — | 2026-08-10 | tools/memory-tree/adopt-memory-tree.sh scaffolds no gotchas/, and… |
-| [TOOL-aCollapsedScan-5](../builds/aCollapsedScan/BACKLOG.md) | OPEN | — | — | 2026-08-26 | THE ORIGINAL FACT IS NOW FALSE and the ASK SURVIVES. Re-measured… |
-| [TOOL-aCollapsedScan-8](../builds/aCollapsedScan/BACKLOG.md) | OPEN | — | — | 2026-08-26 | tools/drift-audit/drift_report.py at line 65 carries the SAME… |
-| [TOOL-aCollapsedScan-9](../builds/aCollapsedScan/BACKLOG.md) | OPEN | — | — | 2026-08-26 | a BUDGET_* ceiling is a single integer over a cost that is both… |
-| [TOOL-aCollapsedScan-11](../builds/aCollapsedScan/BACKLOG.md) | OPEN | — | — | 2026-08-26 | a kit.toml gate-leg descriptor cannot express a guard on a SIBLING kit,… |
-| [TOOL-aCollapsedScan-12](../builds/aCollapsedScan/BACKLOG.md) | OPEN | — | — | 2026-08-26 | tools/govkit/govkit.py's repo_root() walks its ancestors for… |
-| [TOOL-aDeclaredBound-6](../builds/aDeclaredBound/BACKLOG.md) | OPEN | — | — | 2026-08-18 | tools/workflows/tier2-review.js describes its own find phase twice and… |
+| [TOOL-aBoundedVerdict-31](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | every TemporaryDirectory() in the kits can red the bar on WINDOWS for a… |
+| [TOOL-aBoundedVerdict-32](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | TOOL-cBriefedPilot-18 AC9 was CLAIMED at a close it was not met at. It… |
+| [TOOL-aBranchedMandate-5](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | adopt-drift-audit.sh diffs its render with no [ -s ] test, so… |
+| [TOOL-aBranchedMandate-8](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | --preflight OVERWRITES a live non-terminal run-state file, losing the… |
+| [TOOL-aBranchedMandate-9](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | --preflight's rotation and scaffold run BEFORE checks that can return… |
+| [TOOL-aBranchedMandate-10](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | map_extractors.template.py unions the two JS scans with a bare +,… |
+| [TOOL-aBranchedMandate-11](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | govkit.py's blocked skip reason is unreachable behind cmd_apply's early… |
+| [TOOL-aCandidStub-1](../builds/aCandidStub/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | tools/hooks/agent-cap.js blesses an identifier bound from an EMPTY… |
+| [TOOL-aCandidStub-2](../builds/aCandidStub/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | tools/memory-tree/adopt-memory-tree.sh scaffolds no gotchas/, and… |
+| [TOOL-aCollapsedScan-5](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | THE ORIGINAL FACT IS NOW FALSE and the ASK SURVIVES. Re-measured… |
+| [TOOL-aCollapsedScan-8](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | tools/drift-audit/drift_report.py at line 65 carries the SAME… |
+| [TOOL-aCollapsedScan-9](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | a BUDGET_* ceiling is a single integer over a cost that is both… |
+| [TOOL-aCollapsedScan-11](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | a kit.toml gate-leg descriptor cannot express a guard on a SIBLING kit,… |
+| [TOOL-aCollapsedScan-12](../builds/aCollapsedScan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | tools/govkit/govkit.py's repo_root() walks its ancestors for… |
+| [TOOL-aDeclaredBound-6](../builds/aDeclaredBound/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | tools/workflows/tier2-review.js describes its own find phase twice and… |
 | [TOOL-aDeferredBar-4](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | A *.test.sh UNDER A KIT DIRECTORY WITH A BUDGET ROW AND NO… |
 | [TOOL-aDeferredBar-5](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | HYGIENE CHECK 12'S ACCEPTANCE-WITNESS ARM ACCEPTS A *.test.sh-SHAPED… |
 | [TOOL-aDeferredBar-6](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE SPEC-STAGE WRITER IS NOT TOLD TO RUN THE SPEC-TOKEN CHECKER BEFORE… |
@@ -69,57 +69,56 @@ Cite ids, never line numbers.
 | [TOOL-aDeferredBar-21](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | A SUITE WHOSE SUBJECT READS A GOV_ VARIABLE INHERITS THE MACHINE'S… |
 | [TOOL-aDeferredBar-22](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | FOUR brief: ARMS OF tools/unattended/unattended.test.sh HAVE BEEN RED… |
 | [TOOL-aEvidencedLens-16](../builds/aEvidencedLens/BACKLOG.md) | OPEN | MED | — | 2026-10-05 | the build harness's Disposal stage reads a §3 edge as one-ended when… |
-| [TOOL-aFlaggedScaffold-3](../builds/aFlaggedScaffold/BACKLOG.md) | OPEN | — | — | 2026-08-29 | govkit update CANNOT LAND A SOURCE GOV STARTED SHIPPING. Its… |
-| [TOOL-aFlaggedScaffold-5](../builds/aFlaggedScaffold/BACKLOG.md) | OPEN | — | — | 2026-08-29 | govkit check CALLS A KIT ADOPTED ON THE EXIT CODE ALONE and never runs… |
+| [TOOL-aFlaggedScaffold-3](../builds/aFlaggedScaffold/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-29 | govkit update CANNOT LAND A SOURCE GOV STARTED SHIPPING. Its… |
+| [TOOL-aFlaggedScaffold-5](../builds/aFlaggedScaffold/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-29 | govkit check CALLS A KIT ADOPTED ON THE EXIT CODE ALONE and never runs… |
 | [TOOL-aGradedDialect-6](../builds/aGradedDialect/BACKLOG.md) | OPEN | — | — | 2026-09-10 | a FIFTH copy of the lexicon armedness predicate lives outside the kit… |
 | [TOOL-aGradedDialect-7](../builds/aGradedDialect/BACKLOG.md) | OPEN | — | — | 2026-09-10 | two UNGUARDED load_conf calls in tools/lexicon/selftest.py, in the… |
 | [TOOL-aGradedDialect-9](../builds/aGradedDialect/BACKLOG.md) | OPEN | — | — | 2026-09-10 | NOTHING GATES A parser DECLARATION AGAINST A WHOLE FILE, and that gap… |
 | [TOOL-aGradedDialect-11](../builds/aGradedDialect/BACKLOG.md) | OPEN | — | — | 2026-09-11 | a DECLARATOR LIST yields only its first binding: const a = () => 1, b =… |
-| [TOOL-aGradedDoorway-2](../builds/aGradedDoorway/BACKLOG.md) | OPEN | — | — | 2026-08-28 | tools/unattended/adopt-unattended.test.sh and check-unattended.test.sh… |
-| [TOOL-aGradedDoorway-4](../builds/aGradedDoorway/BACKLOG.md) | OPEN | — | — | 2026-08-28 | check 21's build-README population uses a * pathspec, and git's *… |
-| [TOOL-aGradedDoorway-5](../builds/aGradedDoorway/BACKLOG.md) | OPEN | — | — | 2026-08-28 | check 30 spawns a --plan subprocess per build, which costs a… |
-| [TOOL-aGradedDoorway-6](../builds/aGradedDoorway/BACKLOG.md) | OPEN | — | — | 2026-08-28 | check-wiring.sh carries prefix and launcher resolution for a non-tools… |
+| [TOOL-aGradedDoorway-2](../builds/aGradedDoorway/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | tools/unattended/adopt-unattended.test.sh and check-unattended.test.sh… |
+| [TOOL-aGradedDoorway-4](../builds/aGradedDoorway/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | check 21's build-README population uses a * pathspec, and git's *… |
+| [TOOL-aGradedDoorway-5](../builds/aGradedDoorway/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | check 30 spawns a --plan subprocess per build, which costs a… |
+| [TOOL-aGradedDoorway-6](../builds/aGradedDoorway/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | check-wiring.sh carries prefix and launcher resolution for a non-tools… |
 | [TOOL-aGradedDoorway-7](../builds/aGradedDoorway/BACKLOG.md) | INPROGRESS | — | TOOL-aGradedDoorway-7 | 2026-08-29 | Five legs cost 6.1 h of a 6.7 h --editor bar and one costs 4 h 14 m… |
-| [TOOL-aGradedDoorway-8](../builds/aGradedDoorway/BACKLOG.md) | OPEN | — | — | 2026-08-29 | The shard-join predicate ships only with the GOV-ONLY canary… |
-| [TOOL-aGradedDoorway-9](../builds/aGradedDoorway/BACKLOG.md) | OPEN | — | — | 2026-08-29 | A run that HOLDS a leg and a run that PASSES it are indistinguishable… |
-| [TOOL-aGradedDoorway-10](../builds/aGradedDoorway/BACKLOG.md) | OPEN | — | — | 2026-08-29 | S3's spawn measurement is a fact about the NODE, not the kit, and no… |
-| [TOOL-aGradedMandate-12](../builds/aGradedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-31 | THE UNATTENDED KIT'S OWN BUDGET CEILINGS ARE MEASURED ON AN IDLE NODE… |
-| [TOOL-aGradedMandate-13](../builds/aGradedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-31 | THE EMPTY-ROSTER VACUITY IS CLOSED IN THE LEG AND STILL OPEN IN THE… |
-| [TOOL-aGradedMandate-14](../builds/aGradedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-31 | TWO SKIP ANNOUNCEMENTS EACH CERTIFY THAT THE OTHER ARM RAN, AND NEITHER… |
-| [TOOL-aGradedMandate-15](../builds/aGradedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-31 | CHECK 24 JOINS UNIT IDS BY MENTION RATHER THAN BY OWNERSHIP, which is… |
-| [TOOL-aHoistedPass-11](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | the child's prompt between dispatches is UNGUARDED: agent-cap.js's… |
-| [TOOL-aHoistedPass-12](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | the read-window narrowing is CONDITIONAL on scriptPath, not name: or an… |
-| [TOOL-aHoistedPass-13](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | export const meta has NO enforcer. Both readers SELECT by it, so… |
-| [TOOL-aHoistedPass-14](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | three of the child's five constraints have NO enforcer: a function… |
-| [TOOL-aHoistedPass-15](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | nothing re-checks that the child does not NEST. A nested workflow call… |
-| [TOOL-aHoistedPass-17](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | LOOP COMPLETENESS RESTS ON ONE OVERRIDABLE CHECK: build-complete term 5… |
-| [TOOL-aHoistedPass-18](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | the order gate runs only when BOTH units carry an order verb — 38 of 61… |
-| [TOOL-aHoistedPass-19](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | --dispatch refuses neither a FORKED unit, nor a re-dispatch, nor a unit… |
-| [TOOL-aHoistedPass-20](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | a reader can mistake next: none - no tracked spec grades as a unit for… |
-| [TOOL-aHoistedPass-21](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | the premise that a Workflow call is authorized where a direct spawn is… |
-| [TOOL-aHoistedPass-22](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | N returns to the main loop is N stall points, and the cost is… |
-| [TOOL-aHoistedPass-23](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | M6 names a concurrent dispatch path this build does not construct. The… |
-| [TOOL-aHoistedPass-24](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | two loop spellings stay open until the ban widens, across six predicate… |
-| [TOOL-aHoistedPass-25](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | UNDER-DENIAL HAS NO STANDING READER. The widening's DENY arms live on… |
-| [TOOL-aHoistedPass-26](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | a resume inside the SPEC/AUDIT prologue still records a second review… |
-| [TOOL-aHoistedPass-27](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | the per-run agent TOTAL stays unbounded and unreadable: guardAgentSpawn… |
-| [TOOL-aHoistedPass-28](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE BUILD-METHOD BUDGET'S LINE AXIS STAYS UNGATED. build-method size… |
-| [TOOL-aHoistedPass-29](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | a later raise of the byte cap is caught by NOTHING: the drift-audit… |
-| [TOOL-aHoistedPass-30](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE MAP BASELINE'S SHRINK-ONLY RULE IS A CONVENTION, NOT A CONSTRAINT —… |
-| [TOOL-aHoistedPass-31](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | A FORGOTTEN KIT-VERSION BUMP REDS NOTHING, and under ruling D1 that… |
-| [TOOL-aHoistedPass-32](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | FIVE tools/ CARRIERS STATE THE SUPERSEDED parallelism route: none, none… |
-| [TOOL-aHoistedPass-33](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE gov:kit unattended-build@1.0 MARKER ON LINE 3 OF THAT HARNESS'S OWN… |
-| [TOOL-aHoistedPass-34](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | meta.description AND meta.phases IN A WORKFLOW SCRIPT ARE GRADED BY… |
-| [TOOL-aHoistedPass-35](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE HANDED-OUT ROSTER CARRIES AN EMPTY specPath FOR EVERY… |
-| [TOOL-aHoistedPass-36](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | tools/unattended/unattended.test.sh HAS NEVER BEEN RUN TO COMPLETION… |
-| [TOOL-aHoistedPass-37](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | check-unattended.sh --only 28 DIES AT CHECK 30 AND HAS SINCE CHECK 30… |
-| [TOOL-aHoistedPass-38](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | tools/unattended/check-unattended.test.sh IS RED IN BOTH SHARDS FOR… |
-| [TOOL-aHoistedPass-39](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | memory hygiene CHECK 23 IS RED ON TOOL-aHoistedPass-6's ACCEPTANCE… |
+| [TOOL-aGradedDoorway-8](../builds/aGradedDoorway/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-29 | The shard-join predicate ships only with the GOV-ONLY canary… |
+| [TOOL-aGradedDoorway-9](../builds/aGradedDoorway/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-29 | A run that HOLDS a leg and a run that PASSES it are indistinguishable… |
+| [TOOL-aGradedDoorway-10](../builds/aGradedDoorway/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-29 | S3's spawn measurement is a fact about the NODE, not the kit, and no… |
+| [TOOL-aGradedMandate-12](../builds/aGradedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-31 | THE UNATTENDED KIT'S OWN BUDGET CEILINGS ARE MEASURED ON AN IDLE NODE… |
+| [TOOL-aGradedMandate-13](../builds/aGradedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-31 | THE EMPTY-ROSTER VACUITY IS CLOSED IN THE LEG AND STILL OPEN IN THE… |
+| [TOOL-aGradedMandate-14](../builds/aGradedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-31 | TWO SKIP ANNOUNCEMENTS EACH CERTIFY THAT THE OTHER ARM RAN, AND NEITHER… |
+| [TOOL-aGradedMandate-15](../builds/aGradedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-31 | CHECK 24 JOINS UNIT IDS BY MENTION RATHER THAN BY OWNERSHIP, which is… |
+| [TOOL-aHoistedPass-11](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | the child's prompt between dispatches is UNGUARDED: agent-cap.js's… |
+| [TOOL-aHoistedPass-12](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | the read-window narrowing is CONDITIONAL on scriptPath, not name: or an… |
+| [TOOL-aHoistedPass-13](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | export const meta has NO enforcer. Both readers SELECT by it, so… |
+| [TOOL-aHoistedPass-14](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | three of the child's five constraints have NO enforcer: a function… |
+| [TOOL-aHoistedPass-15](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | nothing re-checks that the child does not NEST. A nested workflow call… |
+| [TOOL-aHoistedPass-17](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | LOOP COMPLETENESS RESTS ON ONE OVERRIDABLE CHECK: build-complete term 5… |
+| [TOOL-aHoistedPass-18](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | the order gate runs only when BOTH units carry an order verb — 38 of 61… |
+| [TOOL-aHoistedPass-19](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | --dispatch refuses neither a FORKED unit, nor a re-dispatch, nor a unit… |
+| [TOOL-aHoistedPass-20](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | a reader can mistake next: none - no tracked spec grades as a unit for… |
+| [TOOL-aHoistedPass-21](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | the premise that a Workflow call is authorized where a direct spawn is… |
+| [TOOL-aHoistedPass-22](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | N returns to the main loop is N stall points, and the cost is… |
+| [TOOL-aHoistedPass-23](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | M6 names a concurrent dispatch path this build does not construct. The… |
+| [TOOL-aHoistedPass-24](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | two loop spellings stay open until the ban widens, across six predicate… |
+| [TOOL-aHoistedPass-25](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | UNDER-DENIAL HAS NO STANDING READER. The widening's DENY arms live on… |
+| [TOOL-aHoistedPass-26](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | a resume inside the SPEC/AUDIT prologue still records a second review… |
+| [TOOL-aHoistedPass-27](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | the per-run agent TOTAL stays unbounded and unreadable: guardAgentSpawn… |
+| [TOOL-aHoistedPass-28](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | THE BUILD-METHOD BUDGET'S LINE AXIS STAYS UNGATED. build-method size… |
+| [TOOL-aHoistedPass-29](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | a later raise of the byte cap is caught by NOTHING: the drift-audit… |
+| [TOOL-aHoistedPass-31](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | A FORGOTTEN KIT-VERSION BUMP REDS NOTHING, and under ruling D1 that… |
+| [TOOL-aHoistedPass-32](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | FIVE tools/ CARRIERS STATE THE SUPERSEDED parallelism route: none, none… |
+| [TOOL-aHoistedPass-33](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | THE gov:kit unattended-build@1.0 MARKER ON LINE 3 OF THAT HARNESS'S OWN… |
+| [TOOL-aHoistedPass-34](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | meta.description AND meta.phases IN A WORKFLOW SCRIPT ARE GRADED BY… |
+| [TOOL-aHoistedPass-35](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | THE HANDED-OUT ROSTER CARRIES AN EMPTY specPath FOR EVERY… |
+| [TOOL-aHoistedPass-36](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | tools/unattended/unattended.test.sh HAS NEVER BEEN RUN TO COMPLETION… |
+| [TOOL-aHoistedPass-37](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | check-unattended.sh --only 28 DIES AT CHECK 30 AND HAS SINCE CHECK 30… |
+| [TOOL-aHoistedPass-38](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | tools/unattended/check-unattended.test.sh IS RED IN BOTH SHARDS FOR… |
+| [TOOL-aHoistedPass-39](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | memory hygiene CHECK 23 IS RED ON TOOL-aHoistedPass-6's ACCEPTANCE… |
 | [TOOL-aHoistedPass-40](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-06 | THE KIT GATE'S IMPORT ALLOW-LIST IS A FOURTH HAND-TYPED SPELLING OF ITS… |
 | [TOOL-aHoistedPass-41](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-06 | THE ONE NAMEABLE VERB DEBT THIS BUILD ADDED IS DEFERRED, NOT TAKEN. Of… |
 | [TOOL-aHoistedPass-42](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-06 | TWO FILES THIS BUILD LANDED HAVE NO RUNNER ANYWHERE, which is… |
-| [TOOL-aHonedRuleset-7](../builds/aHonedRuleset/BACKLOG.md) | OPEN | — | — | 2026-09-05 | tools/memory-tree/HYGIENE.template.md STATES ITS WHOLE CAP TABLE TWICE,… |
-| [TOOL-aHonedRuleset-9](../builds/aHonedRuleset/BACKLOG.md) | OPEN | — | — | 2026-09-05 | tools/govkit/check_runbook_parity.py IS ON NO BAR — **AND THIS IS THE… |
+| [TOOL-aHonedRuleset-7](../builds/aHonedRuleset/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | tools/memory-tree/HYGIENE.template.md STATES ITS WHOLE CAP TABLE TWICE,… |
+| [TOOL-aHonedRuleset-9](../builds/aHonedRuleset/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | tools/govkit/check_runbook_parity.py IS ON NO BAR — **AND THIS IS THE… |
 | [TOOL-aHonedRuleset-11](../builds/aHonedRuleset/BACKLOG.md) | OPEN | — | — | 2026-09-06 | tools/check-playbook-parity.sh HAS NO WAY TO EXERCISE A CANDIDATE ROW… |
 | [TOOL-aHonedRuleset-12](../builds/aHonedRuleset/BACKLOG.md) | OPEN | — | — | 2026-09-06 | AN ACCEPTANCE CRITERION CAN NAME A FILE ITS OWN PATTERN CANNOT MATCH,… |
 | [TOOL-aHonedRuleset-13](../builds/aHonedRuleset/BACKLOG.md) | OPEN | — | — | 2026-09-06 | CHECK 9's WATCHED-COMMIT COUNTER IS INVISIBLE UNTIL IT FAILS AT THE… |
@@ -129,62 +128,67 @@ Cite ids, never line numbers.
 | [TOOL-aJoinedCanon-12](../builds/aJoinedCanon/BACKLOG.md) | OPEN | — | — | 2026-09-07 | tools/**/*.md IS NOT PINNED TO LF AND NOTHING ON THE BAR REDS FOR CRLF… |
 | [TOOL-aJoinedCanon-13](../builds/aJoinedCanon/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE EXAMPLE-CONF PARITY ARM DERIVES ITS KEY SET FROM ONE ENGINE, SO A… |
 | [TOOL-aJoinedCanon-14](../builds/aJoinedCanon/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE tFixture ALLOCATION STRIDE IS TEN WIDE AND OPEN-ENDED, WHICH CANNOT… |
-| [TOOL-aKeyedAnnotation-5](../builds/aKeyedAnnotation/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE gov: MARKER VOCABULARY IS UNCLOSED, so a misspelled marker is… |
-| [TOOL-aKeyedAnnotation-6](../builds/aKeyedAnnotation/BACKLOG.md) | OPEN | — | — | 2026-09-05 | A DECLARED RECALL SOURCE CAN YIELD ZERO CHUNKS SILENTLY, and one does… |
-| [TOOL-aKeyedAnnotation-7](../builds/aKeyedAnnotation/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THREE CONSECUTIVE UNIT IDS OF THE UNATTENDED KIT'S dUnstalledConvoy… |
-| [TOOL-aKeyedAnnotation-9](../builds/aKeyedAnnotation/BACKLOG.md) | OPEN | — | — | 2026-09-05 | tools/check-spec-tokens.py's PATHS ARM CANNOT TELL A BROKEN CITATION… |
-| [TOOL-aKeyedAnnotation-10](../builds/aKeyedAnnotation/BACKLOG.md) | OPEN | — | — | 2026-09-05 | KIT/DOGFOOD PARITY IS A HAND-KEPT LITERAL, and three findings of one… |
-| [TOOL-aKeyedAnnotation-11](../builds/aKeyedAnnotation/BACKLOG.md) | OPEN | — | — | 2026-09-05 | A LIVE SPEC OF THE aMendedLedger BUILD CITES THE CODEBASE-MAP CONF BY… |
-| [TOOL-aKeyedAnnotation-12](../builds/aKeyedAnnotation/BACKLOG.md) | OPEN | — | — | 2026-09-05 | NO ARM ASSERTS THE LIVENESS OF A SIGNAL WHOSE DECLARATION IS A GLOB… |
-| [TOOL-aKeyedAnnotation-13](../builds/aKeyedAnnotation/BACKLOG.md) | OPEN | — | — | 2026-09-05 | NOTHING STOPS A SECOND MODULE BINDING THE RECALL EXTRACTOR'S… |
+| [TOOL-aKeyedAnnotation-5](../builds/aKeyedAnnotation/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | THE gov: MARKER VOCABULARY IS UNCLOSED, so a misspelled marker is… |
+| [TOOL-aKeyedAnnotation-6](../builds/aKeyedAnnotation/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | A DECLARED RECALL SOURCE CAN YIELD ZERO CHUNKS SILENTLY, and one does… |
+| [TOOL-aKeyedAnnotation-7](../builds/aKeyedAnnotation/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | THREE CONSECUTIVE UNIT IDS OF THE UNATTENDED KIT'S dUnstalledConvoy… |
+| [TOOL-aKeyedAnnotation-9](../builds/aKeyedAnnotation/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | tools/check-spec-tokens.py's PATHS ARM CANNOT TELL A BROKEN CITATION… |
+| [TOOL-aKeyedAnnotation-10](../builds/aKeyedAnnotation/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | KIT/DOGFOOD PARITY IS A HAND-KEPT LITERAL, and three findings of one… |
+| [TOOL-aKeyedAnnotation-11](../builds/aKeyedAnnotation/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | A LIVE SPEC OF THE aMendedLedger BUILD CITES THE CODEBASE-MAP CONF BY… |
+| [TOOL-aKeyedAnnotation-12](../builds/aKeyedAnnotation/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | NO ARM ASSERTS THE LIVENESS OF A SIGNAL WHOSE DECLARATION IS A GLOB… |
+| [TOOL-aKeyedAnnotation-13](../builds/aKeyedAnnotation/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | NOTHING STOPS A SECOND MODULE BINDING THE RECALL EXTRACTOR'S… |
 | [TOOL-aLeakedHandle-4](../builds/aLeakedHandle/BACKLOG.md) | OPEN | — | — | 2026-09-10 | THE CARRIED SITES IN memory/project/substitution-fed-loops.txt ARE A… |
 | [TOOL-aLeakedHandle-5](../builds/aLeakedHandle/BACKLOG.md) | OPEN | — | — | 2026-09-10 | A LEG KILLED WITH **NO DECLARED CEILING** STILL NAMES ONLY AN EXIT… |
-| [TOOL-aLexedStripper-3](../builds/aLexedStripper/BACKLOG.md) | OPEN | — | — | 2026-08-30 | STILL OPEN after TOOL-dMispairedQuote-1, which deliberately left this… |
-| [TOOL-aLexedStripper-4](../builds/aLexedStripper/BACKLOG.md) | OPEN | — | — | 2026-08-30 | STILL OPEN after TOOL-dMispairedQuote-1, which changed that function's… |
-| [TOOL-aLexedStripper-7](../builds/aLexedStripper/BACKLOG.md) | OPEN | — | — | 2026-08-30 | scan_js_definitions in tools/codebase-map/map_lib.py strips BLOCK… |
-| [TOOL-aLexedStripper-8](../builds/aLexedStripper/BACKLOG.md) | OPEN | — | — | 2026-08-30 | the codebase-map 1.3 and agent-cap 1.9 fixes land upstream, but an… |
-| [TOOL-aMeteredTurnstile-2](../builds/aMeteredTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-20 | the bar LEAKS scratch git repos into TMPDIR and never sweeps them: 786… |
+| [TOOL-aLexedStripper-3](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | STILL OPEN after TOOL-dMispairedQuote-1, which deliberately left this… |
+| [TOOL-aLexedStripper-4](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | STILL OPEN after TOOL-dMispairedQuote-1, which changed that function's… |
+| [TOOL-aLexedStripper-7](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | scan_js_definitions in tools/codebase-map/map_lib.py strips BLOCK… |
+| [TOOL-aLexedStripper-8](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | the codebase-map 1.3 and agent-cap 1.9 fixes land upstream, but an… |
+| [TOOL-aMendedFleet-95](../builds/aMendedFleet/BACKLOG.md) | OPEN | LOW | — | 2026-10-04 | WIRE-INTO-PROJECT.md tells an adopter that the charter's node registry… |
+| [TOOL-aMendedFleet-96](../builds/aMendedFleet/BACKLOG.md) | OPEN | LOW | — | 2026-10-05 | tools/drift-audit/drift_report.py keeps its own _read_defs_at_sha, a… |
+| [TOOL-aMendedFleet-106](../builds/aMendedFleet/BACKLOG.md) | OPEN | LOW | — | 2026-10-05 | OWNER TRIAGE OF THE AGED UNLABELLED ASKS. TOOL-aMendedFleet-14 deferred… |
+| [TOOL-aMendedFleet-107](../builds/aMendedFleet/BACKLOG.md) | OPEN | MED | — | 2026-10-05 | --dispatch check 49 refuses a pass declaring a generator together with… |
+| [TOOL-aMendedFleet-108](../builds/aMendedFleet/BACKLOG.md) | OPEN | MED | — | 2026-10-05 | the lander now mints kit versions into the landing merge (unit… |
+| [TOOL-aMendedFleet-109](../builds/aMendedFleet/BACKLOG.md) | OPEN | LOW | — | 2026-10-06 | the vague-brief trial (unit TOOL-aMendedFleet-73) stopped at its pilot:… |
+| [TOOL-aMendedFleet-113](../builds/aMendedFleet/BACKLOG.md) | OPEN | MED | — | 2026-10-06 | the aMendedFleet closing review (findings 12 to 17) found four suites… |
+| [TOOL-aMendedFleet-114](../builds/aMendedFleet/BACKLOG.md) | OPEN | LOW | — | 2026-10-06 | the aMendedFleet closing review (finding 21) found kickoff units graded… |
+| [TOOL-aMendedFleet-115](../builds/aMendedFleet/BACKLOG.md) | OPEN | MED | — | 2026-10-06 | print_touched_asks (unit TOOL-aMendedFleet-66) hands every path the… |
+| [TOOL-aMeteredTurnstile-2](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | the bar LEAKS scratch git repos into TMPDIR and never sweeps them: 786… |
 | [TOOL-aMeteredTurnstile-3](../builds/aMeteredTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-20 | gate-timings.tsv evicts on the RUN, never on the manifest: the… |
-| [TOOL-aMeteredTurnstile-5](../builds/aMeteredTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-20 | longest-first dispatch pessimises time-to-first-signal by construction:… |
-| [TOOL-aMeteredTurnstile-6](../builds/aMeteredTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-20 | the bar did not get slower, PROCESS CREATION did: measured 2026-08-20… |
-| [TOOL-aNamedGesture-2](../builds/aNamedGesture/BACKLOG.md) | OPEN | — | — | 2026-08-25 | the kickoff manifest's last-audit stamp read 2026-08-26T10:10:00+03:00… |
-| [TOOL-aNumeralWarden-2](../builds/aNumeralWarden/BACKLOG.md) | OPEN | — | — | 2026-08-10 | agent-cap's enclosing-opener walk is defeated by two nested wrappers or… |
+| [TOOL-aMeteredTurnstile-5](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | longest-first dispatch pessimises time-to-first-signal by construction:… |
+| [TOOL-aMeteredTurnstile-6](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | the bar did not get slower, PROCESS CREATION did: measured 2026-08-20… |
+| [TOOL-aNamedGesture-2](../builds/aNamedGesture/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | the kickoff manifest's last-audit stamp read 2026-08-26T10:10:00+03:00… |
+| [TOOL-aNumeralWarden-2](../builds/aNumeralWarden/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | agent-cap's enclosing-opener walk is defeated by two nested wrappers or… |
 | [TOOL-aNumeralWarden-3](../builds/aNumeralWarden/BACKLOG.md) | OPEN | — | — | 2026-08-10 | a drift-audit pin RAISE is indistinguishable from a population drain to… |
-| [TOOL-aPacedTurnstile-9](../builds/aPacedTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-18 | prove each leg guard COMPLETE, the sound fix TOOL-aPacedTurnstile-7… |
-| [TOOL-aPacedTurnstile-11](../builds/aPacedTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-18 | govkit's selfcheck cannot see that an entry SPELLING another entry's… |
-| [TOOL-aPacedTurnstile-12](../builds/aPacedTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-18 | govkit's selfcheck joins a descriptor's [[gate_leg]] rows to the repo's… |
-| [TOOL-aPacedTurnstile-13](../builds/aPacedTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-18 | the fingerprint helper TOOL-aPacedTurnstile-5 S5 specifies is… |
-| [TOOL-aPacedTurnstile-15](../builds/aPacedTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-18 | the unattended kit has no check that the PRIMARY tree is landable, and… |
+| [TOOL-aPacedTurnstile-9](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | prove each leg guard COMPLETE, the sound fix TOOL-aPacedTurnstile-7… |
+| [TOOL-aPacedTurnstile-11](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | govkit's selfcheck cannot see that an entry SPELLING another entry's… |
+| [TOOL-aPacedTurnstile-12](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | govkit's selfcheck joins a descriptor's [[gate_leg]] rows to the repo's… |
+| [TOOL-aPacedTurnstile-13](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | the fingerprint helper TOOL-aPacedTurnstile-5 S5 specifies is… |
+| [TOOL-aPacedTurnstile-15](../builds/aPacedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | the unattended kit has no check that the PRIMARY tree is landable, and… |
 | [TOOL-aPooledSweep-4](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THREE HELD SUITES ARE RED AT HEAD AND THIS BUILD DID NOT CAUSE ANY OF… |
 | [TOOL-aPooledSweep-5](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE WHOLE-POPULATION SWEEP IS UNMEASURED, and the 4.0x figure this… |
 | [TOOL-aPooledSweep-6](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE PEAK-CONCURRENCY ARM DOES NOT DISCRIMINATE THE COMPARISON IT EXISTS… |
 | [TOOL-aPooledSweep-7](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE PORT PROGRAMME TOOL-aQuenchedHarness-6 OPENED IS SUPERSEDED FOR… |
-| [TOOL-aProbedToolkit-2](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | A SKIP READS AS A PASS IN EVERY ADOPTER. check() at… |
-| [TOOL-aProbedToolkit-4](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE LEXICON RATCHET CAN ONLY LOOSEN, AND ITS REMEDY ANSWERS 1.5% OF… |
-| [TOOL-aProbedToolkit-5](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE LEXICON PREDICATE GRADES A POPULATION THE TABLE WAS NEVER WRITTEN… |
-| [TOOL-aProbedToolkit-6](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE LEXICON GATE CAN BE LEGALLY GREEN AT 5.2% COVERAGE, AND THE ONE… |
-| [TOOL-aProbedToolkit-7](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | AN EMPTIED SYMBOL TIER IS INVISIBLE ON EVERY codebase-map LEG. Both the… |
-| [TOOL-aProbedToolkit-8](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE MAP'S COVERAGE NUMBER MEASURES THE WRONG POPULATION AND THE… |
-| [TOOL-aProbedToolkit-9](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | reuse_lookup.py HAS NO OUTPUT BUDGET. One query in incms returns 35334… |
+| [TOOL-aProbedToolkit-2](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | A SKIP READS AS A PASS IN EVERY ADOPTER. check() at… |
+| [TOOL-aProbedToolkit-4](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE LEXICON RATCHET CAN ONLY LOOSEN, AND ITS REMEDY ANSWERS 1.5% OF… |
+| [TOOL-aProbedToolkit-5](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE LEXICON PREDICATE GRADES A POPULATION THE TABLE WAS NEVER WRITTEN… |
+| [TOOL-aProbedToolkit-6](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE LEXICON GATE CAN BE LEGALLY GREEN AT 5.2% COVERAGE, AND THE ONE… |
+| [TOOL-aProbedToolkit-7](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | AN EMPTIED SYMBOL TIER IS INVISIBLE ON EVERY codebase-map LEG. Both the… |
 | [TOOL-aProbedToolkit-10](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE RECALL FLOOR GRADES A CONFIGURATION THE CLI DOES NOT SHIP.… |
-| [TOOL-aProbedToolkit-11](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | TWO RECALL DIAGNOSTICS ARE ZERO-PREDICATES, SO EACH IS SILENT IN THE… |
-| [TOOL-aProbedToolkit-12](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | A memory-tree VERSION BUMP IS A CORPUS MIGRATION NOBODY HAS COSTED, AND… |
-| [TOOL-aProbedToolkit-13](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | TWO OF THE FOUR KITS SHIP NO WIRING --check, AND THEY ARE THE TWO WHOSE… |
-| [TOOL-aProbedToolkit-14](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | TWO KIT READMEs STATE A DERIVED NUMBER THAT HAS DRIFTED.… |
-| [TOOL-aProbedToolkit-15](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE CHARTER OVERSELLS WHAT THE MAP GUARANTEES, AND THE OVERCLAIM SHIPS.… |
-| [TOOL-aProbedToolkit-16](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | memory-recall's HEADLINE CLAIM IS UNPROVEN BY THE ONLY PARTY THAT… |
-| [TOOL-aProbedToolkit-17](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE CHARTER MANDATES file:line AND THE HYGIENE GATE REFUSES IT, SO THE… |
-| [TOOL-aProbedToolkit-18](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | closed_specs_with_no_product_commit CANNOT EXPRESS A UNIT WHOSE… |
+| [TOOL-aProbedToolkit-11](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | TWO RECALL DIAGNOSTICS ARE ZERO-PREDICATES, SO EACH IS SILENT IN THE… |
+| [TOOL-aProbedToolkit-12](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | A memory-tree VERSION BUMP IS A CORPUS MIGRATION NOBODY HAS COSTED, AND… |
+| [TOOL-aProbedToolkit-13](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | TWO OF THE FOUR KITS SHIP NO WIRING --check, AND THEY ARE THE TWO WHOSE… |
+| [TOOL-aProbedToolkit-14](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | TWO KIT READMEs STATE A DERIVED NUMBER THAT HAS DRIFTED.… |
+| [TOOL-aProbedToolkit-16](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | memory-recall's HEADLINE CLAIM IS UNPROVEN BY THE ONLY PARTY THAT… |
+| [TOOL-aProbedToolkit-17](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE CHARTER MANDATES file:line AND THE HYGIENE GATE REFUSES IT, SO THE… |
 | [TOOL-aProbedUnit-12](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | a CLEAN spec-audit round writes NO spec-audit record (tier2-review.js… |
 | [TOOL-aProbedUnit-13](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | --dispatch refuses a later unit's memory/LIVE.md declaration: a prior… |
 | [TOOL-aProbedUnit-14](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | unattended.test.sh is red at base: four brief: arms expect the newline,… |
 | [TOOL-aProbedUnit-15](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | unattended adopter e2e ran 137 s against its declared 60 s and the… |
 | [TOOL-aProbedUnit-16](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tier2-review.js and the two drift-audit workflows hand their agents no… |
 | [TOOL-aProbedUnit-17](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | the closing review's round-3 mediums and lows stand unfolded: clusters… |
-| [TOOL-aPromptedMandate-7](../builds/aPromptedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-18 | the leg's SOURCE-level no-write arm (check-unattended.test.sh) greps… |
-| [TOOL-aPromptedMandate-9](../builds/aPromptedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-18 | nothing in the driver's precondition chain has a timeout and the… |
-| [TOOL-aPromptedMandate-14](../builds/aPromptedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-19 | marker-contract.test.sh gates the four readers of the generated… |
-| [TOOL-aProvenReuse-6](../builds/aProvenReuse/BACKLOG.md) | OPEN | — | — | 2026-08-31 | THE BOUNDED-OBSERVATION ARMS ARE WALL-CLOCK ASSERTIONS AND FLAKE UNDER… |
+| [TOOL-aPromptedMandate-7](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | the leg's SOURCE-level no-write arm (check-unattended.test.sh) greps… |
+| [TOOL-aPromptedMandate-9](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | nothing in the driver's precondition chain has a timeout and the… |
+| [TOOL-aPromptedMandate-14](../builds/aPromptedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | marker-contract.test.sh gates the four readers of the generated… |
+| [TOOL-aProvenReuse-6](../builds/aProvenReuse/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-31 | THE BOUNDED-OBSERVATION ARMS ARE WALL-CLOCK ASSERTIONS AND FLAKE UNDER… |
 | [TOOL-aQuenchedHarness-9](../builds/aQuenchedHarness/BACKLOG.md) | OPEN | — | — | 2026-09-07 | govkit selftest HAS TWO ARMS RED AT 274aa39b AND NOBODY KNEW, which is… |
 | [TOOL-aQuenchedHarness-12](../builds/aQuenchedHarness/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE REUSE PROBE CANNOT SEE SIBLING WORKTREES, so it cannot answer the… |
 | [TOOL-aReapedSpinner-11](../builds/aReapedSpinner/BACKLOG.md) | OPEN | — | — | 2026-09-08 | run-selftests.sh:37 CARRIES THE BANNED PYTHON-LAUNCHER IDIOM, AND THE… |
@@ -193,9 +197,9 @@ Cite ids, never line numbers.
 | [TOOL-aReapedSpinner-14](../builds/aReapedSpinner/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE GATE RUNNER'S OWN TREE FALLS INTO THE ONE BLIND SPOT THIS KIT… |
 | [TOOL-aReapedSpinner-18](../builds/aReapedSpinner/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE govkit selftest LEG CARRIES FOUR STALE ASSERTIONS AND REDS ON MAIN.… |
 | [TOOL-aReapedSpinner-19](../builds/aReapedSpinner/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THREE LEGS RED ON MAIN OVER THE SAME TWO STALE EXPECTATIONS, AND THIS… |
-| [TOOL-aReapedTicket-4](../builds/aReapedTicket/BACKLOG.md) | OPEN | — | — | 2026-08-27 | ts_try_reap in tools/run-gates/run-gates.sh reaps the holder beacon… |
-| [TOOL-aReapedTicket-5](../builds/aReapedTicket/BACKLOG.md) | OPEN | — | — | 2026-08-27 | NARROWED by aUnblockedFleet (2026-08-31) to the STALENESS BOUND alone.… |
-| [TOOL-aRelaxedShard-2](../builds/aRelaxedShard/BACKLOG.md) | OPEN | — | — | 2026-08-17 | check 6's build-README class (25,600 B, cl=0) has NO byte-axis arm:… |
+| [TOOL-aReapedTicket-4](../builds/aReapedTicket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | ts_try_reap in tools/run-gates/run-gates.sh reaps the holder beacon… |
+| [TOOL-aReapedTicket-5](../builds/aReapedTicket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | NARROWED by aUnblockedFleet (2026-08-31) to the STALENESS BOUND alone.… |
+| [TOOL-aRelaxedShard-2](../builds/aRelaxedShard/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | check 6's build-README class (25,600 B, cl=0) has NO byte-axis arm:… |
 | [TOOL-aRepatriatedFork-20](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-23 | DRAIN THE CARRIED ENCODING SITES:… |
 | [TOOL-aRepatriatedFork-22](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-24 | check_waivers in tools/unattended/unattended.sh tests *"$BYPASS_BAN"*,… |
 | [TOOL-aRepatriatedFork-33](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-25 | candidate gov check from inCMS's retired check 27: every minted id owns… |
@@ -206,7 +210,6 @@ Cite ids, never line numbers.
 | [TOOL-aReplayedCard-6](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | drift-audit's closed_specs_with_no_product_commit signal joins by build… |
 | [TOOL-aReplayedCard-7](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | manifest-check.sh --card --write spawns about ten git processes for its… |
 | [TOOL-aReplayedCard-8](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | WIRE-INTO-PROJECT.md §4 spells the kickoff-manifest format version… |
-| [TOOL-aReplayedCard-9](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | run the eight-arm stage-2 matrix with… |
 | [TOOL-aReplayedCard-10](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | corpus_ids.py --print-defined-ids is a corpus walk plus the shell… |
 | [TOOL-aReplayedCard-11](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | --card --append accepts a real READY body that carries no ## task… |
 | [TOOL-aReplayedCard-12](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | scratch-guard.test.sh's meta-arm re-runs the whole orientation section,… |
@@ -216,131 +219,125 @@ Cite ids, never line numbers.
 | [TOOL-aReplayedCard-16](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/process-monitor/adopt-process-monitor.test.sh's flagged-row arm… |
 | [TOOL-aReplayedCard-17](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | the kickoff-manifest kit gained two shipped files (the card fragments)… |
 | [TOOL-aReplayedCard-18](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | TOOL-aReplayedCard-2's AC9 — one forced compaction in a session started… |
-| [TOOL-aResumedRelay-1](../builds/aResumedRelay/BACKLOG.md) | OPEN | — | — | 2026-08-26 | the lexicon VERB table needs a CURATION PASS over the deployer's… |
-| [TOOL-aRootedPrefix-3](../builds/aRootedPrefix/BACKLOG.md) | OPEN | — | — | 2026-08-09 | hygiene checks 6/7 measure RAW working-tree bytes, so an adopter… |
-| [TOOL-aScannedThrottle-3](../builds/aScannedThrottle/BACKLOG.md) | OPEN | — | — | 2026-08-20 | ZERO Defender exclusions are confirmed on node a (Get-MpPreference… |
-| [TOOL-aScannedThrottle-4](../builds/aScannedThrottle/BACKLOG.md) | OPEN | — | — | 2026-08-20 | HVCI/VBS is ON and ENFORCING on node a (Win32_DeviceGuard… |
-| [TOOL-aScannedThrottle-5](../builds/aScannedThrottle/BACKLOG.md) | OPEN | — | — | 2026-08-20 | run-gates canary (466-587s in-bar, 317s standalone, 10-11% of… |
-| [TOOL-aScannedThrottle-6](../builds/aScannedThrottle/BACKLOG.md) | OPEN | — | — | 2026-08-20 | legs DILATE 1.5-1.85x inside the pool: run-gates canary costs 317s… |
-| [TOOL-aScannedThrottle-7](../builds/aScannedThrottle/BACKLOG.md) | OPEN | — | — | 2026-08-20 | run-gates evidence reds under load on a 5-SECOND bound:… |
-| [TOOL-aScannedThrottle-8](../builds/aScannedThrottle/BACKLOG.md) | OPEN | — | — | 2026-08-21 | RE-MINTED from -1 2026-08-21: that seq is the build UNIT's, and one id… |
-| [TOOL-aScannedThrottle-9](../builds/aScannedThrottle/BACKLOG.md) | OPEN | — | — | 2026-08-21 | LEFT-SHIFT from TOOL-aScannedThrottle-1's closing review: eight of… |
-| [TOOL-aScannedThrottle-10](../builds/aScannedThrottle/BACKLOG.md) | OPEN | — | — | 2026-08-21 | LEFT-SHIFT, four gates that review proposed, none built and none seen… |
-| [TOOL-aScannedThrottle-11](../builds/aScannedThrottle/BACKLOG.md) | OPEN | — | — | 2026-08-21 | LEFT-SHIFT, three classes both review rounds named UNGATEABLE, for the… |
-| [TOOL-aScouredKit-10](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | THE LEG-HOLD PREDICATE IS NOW WRITTEN TWICE AND NOTHING ASSERTS THE… |
-| [TOOL-aScouredKit-16](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | THE SEAM RANKING IS 63% NOISE AND TWO SHIPPED CONSUMERS ACT ON IT.… |
-| [TOOL-aScouredKit-17](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | dead_exports: 412 in tools/codebase-map/map_diff.py is 100% false… |
-| [TOOL-aScouredKit-18](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | tools/govkit/govkit.py's read_descriptors is load_toml and nothing else… |
-| [TOOL-aScouredKit-19](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | FIVE PYTHON READERS RE-PARSE .memory-tree.conf WITH A NAIVE… |
-| [TOOL-aScouredKit-21](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | tools/check-testsuite-counts.sh hardcodes MANIFEST=tools/gate-legs.json… |
-| [TOOL-aScouredKit-22](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | memory/HYGIENE.md's numbered catalog — the file whose own line 115… |
+| [TOOL-aResumedRelay-1](../builds/aResumedRelay/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | the lexicon VERB table needs a CURATION PASS over the deployer's… |
+| [TOOL-aRootedPrefix-3](../builds/aRootedPrefix/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-09 | hygiene checks 6/7 measure RAW working-tree bytes, so an adopter… |
+| [TOOL-aScannedThrottle-3](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | ZERO Defender exclusions are confirmed on node a (Get-MpPreference… |
+| [TOOL-aScannedThrottle-4](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | HVCI/VBS is ON and ENFORCING on node a (Win32_DeviceGuard… |
+| [TOOL-aScannedThrottle-5](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | run-gates canary (466-587s in-bar, 317s standalone, 10-11% of… |
+| [TOOL-aScannedThrottle-6](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | legs DILATE 1.5-1.85x inside the pool: run-gates canary costs 317s… |
+| [TOOL-aScannedThrottle-7](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | run-gates evidence reds under load on a 5-SECOND bound:… |
+| [TOOL-aScannedThrottle-8](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-21 | RE-MINTED from -1 2026-08-21: that seq is the build UNIT's, and one id… |
+| [TOOL-aScannedThrottle-9](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-21 | LEFT-SHIFT from TOOL-aScannedThrottle-1's closing review: eight of… |
+| [TOOL-aScannedThrottle-10](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-21 | LEFT-SHIFT, four gates that review proposed, none built and none seen… |
+| [TOOL-aScannedThrottle-11](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-21 | LEFT-SHIFT, three classes both review rounds named UNGATEABLE, for the… |
+| [TOOL-aScouredKit-10](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | THE LEG-HOLD PREDICATE IS NOW WRITTEN TWICE AND NOTHING ASSERTS THE… |
+| [TOOL-aScouredKit-16](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | THE SEAM RANKING IS 63% NOISE AND TWO SHIPPED CONSUMERS ACT ON IT.… |
+| [TOOL-aScouredKit-18](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | tools/govkit/govkit.py's read_descriptors is load_toml and nothing else… |
+| [TOOL-aScouredKit-19](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | FIVE PYTHON READERS RE-PARSE .memory-tree.conf WITH A NAIVE… |
+| [TOOL-aScouredKit-21](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | tools/check-testsuite-counts.sh hardcodes MANIFEST=tools/gate-legs.json… |
+| [TOOL-aScouredKit-22](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | memory/HYGIENE.md's numbered catalog — the file whose own line 115… |
 | [TOOL-aScouredKit-23](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | WIRE-INTO-PROJECT.md (59833 B / 816 lines) and… |
-| [TOOL-aScouredKit-24](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | ELEVEN OF 25 REGISTRY ENTRIES ARE NEVER PASSED TO apply BY ANY GATE,… |
-| [TOOL-aScouredKit-26](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | A CROSS-ENTRY DESTINATION TOKEN DOES NOT EXIST, and TOOL-aScouredKit-15… |
-| [TOOL-aScouredKit-27](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | chunk DECIDES WHETHER A LEG RUNS AND DOES NOT TRAVEL TO ADOPTERS.… |
-| [TOOL-aScouredKit-28](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | A QUOTED CONF VALUE WITH A TRAILING COMMENT DIVERGES FROM BASH IN BOTH… |
-| [TOOL-aScouredKit-29](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | tools/govkit/selftest.py's memory-recall leak arm is a SUBSTRING TEST… |
-| [TOOL-aScouredKit-33](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | THE WAIVER PRODUCER STILL WORD-SPLITS while its consumers no longer do.… |
-| [TOOL-aScouredKit-34](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | A MALFORMED DIRECTIVE SCOPE IS REPORTED AS THE RUN'S FAULT.… |
-| [TOOL-aSealedCaravan-2](../builds/aSealedCaravan/BACKLOG.md) | OPEN | — | — | 2026-08-11 | check-arms.py scans tracked *.sh only, so no Python write path is armed… |
-| [TOOL-aSealedCaravan-4](../builds/aSealedCaravan/BACKLOG.md) | OPEN | — | — | 2026-08-11 | the memory-tree renders are install-prefix-correct but NOT… |
-| [TOOL-aSiftedFork-1](../builds/aSiftedFork/BACKLOG.md) | OPEN | — | — | 2026-08-28 | THE AWK CHECK-23 COMMENT IS WRONG BY OMISSION about the change it is… |
-| [TOOL-aSiftedFork-2](../builds/aSiftedFork/BACKLOG.md) | OPEN | — | — | 2026-08-28 | CHECK 23's AWK STREAM SWALLOWS THE DIAGNOSTIC ITS PREDECESSOR PRINTED,… |
-| [TOOL-aSiftedFork-3](../builds/aSiftedFork/BACKLOG.md) | OPEN | — | — | 2026-08-28 | NOTHING VALIDATES FAMILIES, so a declared family code reaches check… |
-| [TOOL-aSiftedFork-4](../builds/aSiftedFork/BACKLOG.md) | OPEN | — | — | 2026-08-28 | THE EQUIVALENCE HARNESS CANNOT SEE THE CLASS IT EXISTS TO CATCH, which… |
-| [TOOL-aSiftedFork-5](../builds/aSiftedFork/BACKLOG.md) | OPEN | — | — | 2026-08-28 | THE VERDICT-EPOCH REMEDY NAMES THREE CARRIERS AND THE VERSION CHECKER… |
-| [TOOL-aSiftedFork-6](../builds/aSiftedFork/BACKLOG.md) | OPEN | — | — | 2026-08-28 | THE CANARY'S CLAMP ARMS USE timeout UNGUARDED, so a host that has none… |
-| [TOOL-aSiftedFork-7](../builds/aSiftedFork/BACKLOG.md) | OPEN | — | — | 2026-08-28 | THE RUN-GATES CANARY IS NON-DETERMINISTIC ON THIS HOST AND NAMES A… |
+| [TOOL-aScouredKit-24](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | ELEVEN OF 25 REGISTRY ENTRIES ARE NEVER PASSED TO apply BY ANY GATE,… |
+| [TOOL-aScouredKit-26](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | A CROSS-ENTRY DESTINATION TOKEN DOES NOT EXIST, and TOOL-aScouredKit-15… |
+| [TOOL-aScouredKit-27](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | chunk DECIDES WHETHER A LEG RUNS AND DOES NOT TRAVEL TO ADOPTERS.… |
+| [TOOL-aScouredKit-28](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | A QUOTED CONF VALUE WITH A TRAILING COMMENT DIVERGES FROM BASH IN BOTH… |
+| [TOOL-aScouredKit-29](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | tools/govkit/selftest.py's memory-recall leak arm is a SUBSTRING TEST… |
+| [TOOL-aScouredKit-33](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | THE WAIVER PRODUCER STILL WORD-SPLITS while its consumers no longer do.… |
+| [TOOL-aScouredKit-34](../builds/aScouredKit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | A MALFORMED DIRECTIVE SCOPE IS REPORTED AS THE RUN'S FAULT.… |
+| [TOOL-aSealedCaravan-2](../builds/aSealedCaravan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | check-arms.py scans tracked *.sh only, so no Python write path is armed… |
+| [TOOL-aSealedCaravan-4](../builds/aSealedCaravan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | the memory-tree renders are install-prefix-correct but NOT… |
+| [TOOL-aSiftedFork-1](../builds/aSiftedFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | THE AWK CHECK-23 COMMENT IS WRONG BY OMISSION about the change it is… |
+| [TOOL-aSiftedFork-2](../builds/aSiftedFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | CHECK 23's AWK STREAM SWALLOWS THE DIAGNOSTIC ITS PREDECESSOR PRINTED,… |
+| [TOOL-aSiftedFork-3](../builds/aSiftedFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | NOTHING VALIDATES FAMILIES, so a declared family code reaches check… |
+| [TOOL-aSiftedFork-4](../builds/aSiftedFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | THE EQUIVALENCE HARNESS CANNOT SEE THE CLASS IT EXISTS TO CATCH, which… |
+| [TOOL-aSiftedFork-5](../builds/aSiftedFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | THE VERDICT-EPOCH REMEDY NAMES THREE CARRIERS AND THE VERSION CHECKER… |
+| [TOOL-aSiftedFork-6](../builds/aSiftedFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | THE CANARY'S CLAMP ARMS USE timeout UNGUARDED, so a host that has none… |
+| [TOOL-aSiftedFork-7](../builds/aSiftedFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | THE RUN-GATES CANARY IS NON-DETERMINISTIC ON THIS HOST AND NAMES A… |
 | [TOOL-aSightedSkeptic-11](../builds/aSightedSkeptic/BACKLOG.md) | OPEN | HIGH | — | 2026-10-01 | inherited red: leg row-keyed merge driver replay red at ef1dcdb6,… |
-| [TOOL-aStagedLane-5](../builds/aStagedLane/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE INDEX-VERSUS-COMMIT SHAPE SURVIVES ONE FILE OVER.… |
-| [TOOL-aStandingWrit-2](../builds/aStandingWrit/BACKLOG.md) | OPEN | — | — | 2026-08-11 | SECURITY in landed code: the pinned BASE anchors on a remote-tracking… |
-| [TOOL-aStandingWrit-5](../builds/aStandingWrit/BACKLOG.md) | OPEN | — | — | 2026-08-11 | .githooks/pre-commit's branch guard fails CLOSED on a bogus… |
-| [TOOL-aStandingWrit-6](../builds/aStandingWrit/BACKLOG.md) | OPEN | — | — | 2026-08-11 | the leg's BASE path now OBSERVES the remote (TOOL-aBranchedMandate-3),… |
-| [TOOL-aStandingWrit-7](../builds/aStandingWrit/BACKLOG.md) | OPEN | — | — | 2026-08-11 | nothing binds the EXECUTING kit code to code an owner approved: a run… |
-| [TOOL-aStandingWrit-9](../builds/aStandingWrit/BACKLOG.md) | OPEN | — | — | 2026-08-11 | --plan's FORKED axis reads only §8's first non-blank line, so a spec… |
-| [TOOL-aSurfacedLexicon-15](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE Q3 RENAME UNIT, named by three specs and filed nowhere until now.… |
-| [TOOL-aSurfacedLexicon-16](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-04 | REVIEW FINDING D25, raised by the rebuild research pass and filed… |
-| [TOOL-aSurfacedLexicon-17](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE GENERATED BUILD-ORDER TABLE'S Parallel COLUMN IS DERIVED FROM THE… |
-| [TOOL-aSurfacedLexicon-21](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE UNARMED-BRANCH META-GATE CANNOT SEE PYTHON, and that is why unarmed… |
+| [TOOL-aStagedLane-5](../builds/aStagedLane/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | THE INDEX-VERSUS-COMMIT SHAPE SURVIVES ONE FILE OVER.… |
+| [TOOL-aStandingWrit-2](../builds/aStandingWrit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | SECURITY in landed code: the pinned BASE anchors on a remote-tracking… |
+| [TOOL-aStandingWrit-5](../builds/aStandingWrit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | .githooks/pre-commit's branch guard fails CLOSED on a bogus… |
+| [TOOL-aStandingWrit-6](../builds/aStandingWrit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | the leg's BASE path now OBSERVES the remote (TOOL-aBranchedMandate-3),… |
+| [TOOL-aStandingWrit-7](../builds/aStandingWrit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | nothing binds the EXECUTING kit code to code an owner approved: a run… |
+| [TOOL-aStandingWrit-9](../builds/aStandingWrit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | --plan's FORKED axis reads only §8's first non-blank line, so a spec… |
+| [TOOL-aSurfacedLexicon-15](../builds/aSurfacedLexicon/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE Q3 RENAME UNIT, named by three specs and filed nowhere until now.… |
+| [TOOL-aSurfacedLexicon-16](../builds/aSurfacedLexicon/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | REVIEW FINDING D25, raised by the rebuild research pass and filed… |
+| [TOOL-aSurfacedLexicon-17](../builds/aSurfacedLexicon/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | THE GENERATED BUILD-ORDER TABLE'S Parallel COLUMN IS DERIVED FROM THE… |
+| [TOOL-aSurfacedLexicon-21](../builds/aSurfacedLexicon/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | THE UNARMED-BRANCH META-GATE CANNOT SEE PYTHON, and that is why unarmed… |
 | [TOOL-aSurfacedLexicon-22](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | THE WALK IS FIXED AND THE CEILING NOW MEASURES CONTENTION INSTEAD.… |
 | [TOOL-aSurfacedLexicon-23](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | A CELL CANNOT SAY "PRODUCT CODE, NOT RECORDS", so two surfaces ship… |
 | [TOOL-aSurfacedLexicon-24](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | A SKIP CLAIM WRITTEN AS check(<label>, True) IS A COMMENT WEARING A… |
 | [TOOL-aSurfacedLexicon-25](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | A PUSH TO THE DEFAULT BRANCH PROCEEDED WITH NO BAR RUN, and the hook… |
-| [TOOL-aTetheredConvoy-1](../builds/aTetheredConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-17 | the playbook template reached origin/main carrying UNRESOLVED conflict… |
-| [TOOL-aTetheredScratch-3](../builds/aTetheredScratch/BACKLOG.md) | OPEN | — | — | 2026-08-20 | tools/memory-recall/selftest.py leaves 2 EMPTY tmp.* dirs per run that… |
-| [TOOL-aTetheredScratch-4](../builds/aTetheredScratch/BACKLOG.md) | OPEN | — | — | 2026-08-20 | A TEST FIXTURE COMMITTED INTO THE LIVE REPO. Two commits authored t… |
-| [TOOL-aTimedTurnstile-2](../builds/aTimedTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-11 | 29 of 47 legs are SELF-TESTS holding 96.7% of wall (368.7s); the 18… |
-| [TOOL-aTimedTurnstile-3](../builds/aTimedTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-11 | with legs concurrent the floor is the longest leg UNDER LOAD (~76s,… |
-| [TOOL-aTimedTurnstile-4](../builds/aTimedTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-11 | cold/warm is 1.59x (607.3s vs 382.1s) and every fresh worktree pays it… |
-| [TOOL-aTimedTurnstile-6](../builds/aTimedTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-11 | two classes want memory/gotchas/ records: a poll tick is a PROCESS here… |
-| [TOOL-aTimedTurnstile-7](../builds/aTimedTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-11 | review aTimedTurnstile-1 gate A2: check-arms.py forbids absence-only… |
-| [TOOL-aTimedTurnstile-8](../builds/aTimedTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-11 | review aTimedTurnstile-1 gates A3/B2, one grep leg each: no *.test.sh… |
+| [TOOL-aTetheredConvoy-1](../builds/aTetheredConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | the playbook template reached origin/main carrying UNRESOLVED conflict… |
+| [TOOL-aTetheredScratch-3](../builds/aTetheredScratch/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | tools/memory-recall/selftest.py leaves 2 EMPTY tmp.* dirs per run that… |
+| [TOOL-aTetheredScratch-4](../builds/aTetheredScratch/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | A TEST FIXTURE COMMITTED INTO THE LIVE REPO. Two commits authored t… |
+| [TOOL-aTimedTurnstile-2](../builds/aTimedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | 29 of 47 legs are SELF-TESTS holding 96.7% of wall (368.7s); the 18… |
+| [TOOL-aTimedTurnstile-3](../builds/aTimedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | with legs concurrent the floor is the longest leg UNDER LOAD (~76s,… |
+| [TOOL-aTimedTurnstile-4](../builds/aTimedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | cold/warm is 1.59x (607.3s vs 382.1s) and every fresh worktree pays it… |
+| [TOOL-aTimedTurnstile-6](../builds/aTimedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | two classes want memory/gotchas/ records: a poll tick is a PROCESS here… |
+| [TOOL-aTimedTurnstile-7](../builds/aTimedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | review aTimedTurnstile-1 gate A2: check-arms.py forbids absence-only… |
+| [TOOL-aTimedTurnstile-8](../builds/aTimedTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | review aTimedTurnstile-1 gates A3/B2, one grep leg each: no *.test.sh… |
 | [TOOL-aTracedSpawn-1](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | tools/unattended/unattended.test.sh CANNOT BE RUN UNSHARDED AND DIES AT… |
 | [TOOL-aTracedSpawn-2](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE REMAINING 320 SPAWNS IN check-unattended.sh's FIXTURE FRAME, after… |
 | [TOOL-aTracedSpawn-3](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE SHARD-2 FAILURE COUNT AFTER THE FIXTURE-HEADING FIX IS UNMEASURED,… |
-| [TOOL-aUnblockedFleet-7](../builds/aUnblockedFleet/BACKLOG.md) | OPEN | — | — | 2026-08-31 | THE LANDER MARKER IS SHARED BY EVERY WORKTREE OF ONE CLONE, so two… |
-| [TOOL-aUnblockedFleet-8](../builds/aUnblockedFleet/BACKLOG.md) | OPEN | — | — | 2026-08-31 | TWO CONCURRENT UNATTENDED CLOSES IN ONE CLONE CONTEND ON THE MERGE… |
-| [TOOL-aUnblockedFleet-9](../builds/aUnblockedFleet/BACKLOG.md) | OPEN | — | — | 2026-08-31 | FIVE ACCEPTANCE CRITERIA OF TOOL-aUnblockedFleet-2 ARE WRITTEN,… |
+| [TOOL-aUnblockedFleet-9](../builds/aUnblockedFleet/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-31 | FIVE ACCEPTANCE CRITERIA OF TOOL-aUnblockedFleet-2 ARE WRITTEN,… |
 | [TOOL-aUnmannedHelm-2](../builds/aUnmannedHelm/BACKLOG.md) | OPEN | — | — | 2026-08-10 | the ledger_dir in tools/drift-audit/drift_report.py points at an… |
-| [TOOL-aUnmannedHelm-10](../builds/aUnmannedHelm/BACKLOG.md) | OPEN | — | — | 2026-08-10 | three root docs (AGENTS.md, WIRE-INTO-PROJECT.md, .gitattributes) come… |
+| [TOOL-aUnmannedHelm-10](../builds/aUnmannedHelm/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | three root docs (AGENTS.md, WIRE-INTO-PROJECT.md, .gitattributes) come… |
 | [TOOL-aWalkedCorpus-2](../builds/aWalkedCorpus/BACKLOG.md) | DEFERRED | — | TOOL-aWalkedCorpus-2 | 2026-08-17 | a recall quality floor. Measured NOT buildable against bench.py as it… |
-| [TOOL-aWalkedCorpus-4](../builds/aWalkedCorpus/BACKLOG.md) | OPEN | — | — | 2026-08-17 | memory-recall selftest.py mints its two synthetic corpus ids in a LIVE… |
-| [TOOL-aWalkedCorpus-5](../builds/aWalkedCorpus/BACKLOG.md) | OPEN | — | — | 2026-08-17 | govkit selfcheck partitions gate-leg guard pathspecs into four PREFIX… |
-| [TOOL-aWalkedCorpus-6](../builds/aWalkedCorpus/BACKLOG.md) | OPEN | — | — | 2026-08-17 | govkit has no rule kind meaning 'in the kit dir, deliberately NOT in… |
-| [TOOL-aWalkedCorpus-10](../builds/aWalkedCorpus/BACKLOG.md) | OPEN | — | — | 2026-08-18 | codebase-map's seeded-extractors-or-crashed outcome stays unmarked… |
-| [TOOL-aWeighedCompass-4](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE RECALL FIXTURE CARRIES NO TERMS, SO EVERY PUBLISHED CHUNK NUMBER… |
-| [TOOL-aWeighedCompass-7](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE REUSE PROBE RANKS ON NAME STEMS, AT PRECISION 0.056. Graded against… |
-| [TOOL-aWeighedCompass-8](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | SHELL IS DARK TO THE SYMBOL INDEX AND SHELL IS MOST OF THE GATE… |
-| [TOOL-aWeighedCompass-9](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | 211 OF 889 CITED IDS (23.7%) HAVE NO RECORD OF THEIR OWN. From… |
-| [TOOL-aWeighedCompass-11](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE opened SIGNAL IS TOO THIN TO GRADE RETRIEVAL WITH. recall-opened.js… |
-| [TOOL-aWeighedCompass-13](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE SYMBOL INDEX EXCLUDES EVERY PRIVATE HELPER.… |
-| [TOOL-aWeighedCompass-16](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE RECALL FLOOR GRADES A CONFIGURATION NO SESSION INVOKES.… |
-| [TOOL-aWeighedCompass-18](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE FIXTURE SATURATES, SO IT CANNOT PRICE THE CHUNK HALF AT ALL.… |
-| [TOOL-aWeighedCompass-19](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | union.py IS THE ONLY SCORER THAT GRADES THE SHAPE THE CLI SERVES, AND… |
-| [TOOL-aWeldedTribunal-9](../builds/aWeldedTribunal/BACKLOG.md) | OPEN | — | — | 2026-09-05 | pass-order history BREACHES ITS 900 s CEILING ONLY UNDER THE FULL… |
-| [TOOL-aWeldedTribunal-10](../builds/aWeldedTribunal/BACKLOG.md) | OPEN | — | — | 2026-09-05 | .githooks/pre-push SHOULD REFUSE A PUSH WHOSE HOOK CAME FROM ANOTHER… |
-| [TOOL-aWeldedTribunal-11](../builds/aWeldedTribunal/BACKLOG.md) | OPEN | — | — | 2026-09-05 | TWO MORE ROWS NAME THE ALREADY-FIXED --landed ORDERING DEFECT and are… |
-| [TOOL-aWeldedTribunal-12](../builds/aWeldedTribunal/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE LEXICON VERB PIN IS BREACHED ON main AND THE PUSH BOUNDARY REFUSES… |
-| [TOOL-aWiredReckoning-1](../builds/aWiredReckoning/BACKLOG.md) | OPEN | — | — | 2026-08-18 | govkit's 45 new defs skip the verb table; VERB_OFFENDER_PIN raised… |
+| [TOOL-aWalkedCorpus-4](../builds/aWalkedCorpus/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | memory-recall selftest.py mints its two synthetic corpus ids in a LIVE… |
+| [TOOL-aWalkedCorpus-5](../builds/aWalkedCorpus/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | govkit selfcheck partitions gate-leg guard pathspecs into four PREFIX… |
+| [TOOL-aWalkedCorpus-6](../builds/aWalkedCorpus/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | govkit has no rule kind meaning 'in the kit dir, deliberately NOT in… |
+| [TOOL-aWalkedCorpus-10](../builds/aWalkedCorpus/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | codebase-map's seeded-extractors-or-crashed outcome stays unmarked… |
+| [TOOL-aWeighedCompass-4](../builds/aWeighedCompass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE RECALL FIXTURE CARRIES NO TERMS, SO EVERY PUBLISHED CHUNK NUMBER… |
+| [TOOL-aWeighedCompass-7](../builds/aWeighedCompass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE REUSE PROBE RANKS ON NAME STEMS, AT PRECISION 0.056. Graded against… |
+| [TOOL-aWeighedCompass-9](../builds/aWeighedCompass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | 211 OF 889 CITED IDS (23.7%) HAVE NO RECORD OF THEIR OWN. From… |
+| [TOOL-aWeighedCompass-13](../builds/aWeighedCompass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE SYMBOL INDEX EXCLUDES EVERY PRIVATE HELPER.… |
+| [TOOL-aWeighedCompass-18](../builds/aWeighedCompass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE FIXTURE SATURATES, SO IT CANNOT PRICE THE CHUNK HALF AT ALL.… |
+| [TOOL-aWeighedCompass-19](../builds/aWeighedCompass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | union.py IS THE ONLY SCORER THAT GRADES THE SHAPE THE CLI SERVES, AND… |
+| [TOOL-aWeldedTribunal-9](../builds/aWeldedTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | pass-order history BREACHES ITS 900 s CEILING ONLY UNDER THE FULL… |
+| [TOOL-aWeldedTribunal-10](../builds/aWeldedTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | .githooks/pre-push SHOULD REFUSE A PUSH WHOSE HOOK CAME FROM ANOTHER… |
+| [TOOL-aWeldedTribunal-11](../builds/aWeldedTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | TWO MORE ROWS NAME THE ALREADY-FIXED --landed ORDERING DEFECT and are… |
+| [TOOL-aWeldedTribunal-12](../builds/aWeldedTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | THE LEXICON VERB PIN IS BREACHED ON main AND THE PUSH BOUNDARY REFUSES… |
+| [TOOL-aWiredReckoning-1](../builds/aWiredReckoning/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-18 | govkit's 45 new defs skip the verb table; VERB_OFFENDER_PIN raised… |
 | [TOOL-aWokenSentinel-30](../builds/aWokenSentinel/BACKLOG.md) | OPEN | — | — | 2026-09-20 | THE SPEC-AUDIT PROMOTION CASCADE HAS NO GENERATION BOUND: REVIEW_ROUNDS… |
 | [TOOL-aWokenSentinel-31](../builds/aWokenSentinel/BACKLOG.md) | OPEN | — | — | 2026-09-21 | THE UNATTENDED KIT'S SELF-TESTS ARE RED ON MAIN, and the reds are… |
-| [TOOL-cBriefedPilot-7](../builds/cBriefedPilot/BACKLOG.md) | OPEN | — | — | 2026-08-14 | the build-complete DoD item: --close blocks while a roster unit is… |
-| [TOOL-cBriefedPilot-8](../builds/cBriefedPilot/BACKLOG.md) | OPEN | — | — | 2026-08-14 | the closing-review-recorded DoD item: a tracked review under this build… |
-| [TOOL-cBriefedPilot-13](../builds/cBriefedPilot/BACKLOG.md) | OPEN | — | — | 2026-08-14 | leg check 17 grades every parked waiver line for a declared handle and… |
-| [TOOL-cBriefedPilot-14](../builds/cBriefedPilot/BACKLOG.md) | OPEN | — | — | 2026-08-14 | leg check 18 asserts the Skill names kickoff AFTER preflight — order,… |
-| [TOOL-cBriefedPilot-22](../builds/cBriefedPilot/BACKLOG.md) | OPEN | — | — | 2026-08-14 | check 16 arm A's join extended to the protocol's own §3 phase list and… |
-| [TOOL-cBriefedPilot-23](../builds/cBriefedPilot/BACKLOG.md) | OPEN | — | — | 2026-08-15 | a newline in an --override or --abort reason forges a second parked… |
-| [TOOL-cBriefedPilot-24](../builds/cBriefedPilot/BACKLOG.md) | OPEN | — | — | 2026-08-15 | --plan cannot see a unit BUILT on the run's branch but not landed:… |
-| [TOOL-cBriefedPilot-25](../builds/cBriefedPilot/BACKLOG.md) | OPEN | — | — | 2026-08-15 | only --preflight re-splices RUN.md's generated region and it refuses a… |
-| [TOOL-cBriefedPilot-26](../builds/cBriefedPilot/BACKLOG.md) | OPEN | — | — | 2026-08-15 | the driver's remote observation is environment-sensitive: the anchor… |
-| [TOOL-cBriefedPilot-27](../builds/cBriefedPilot/BACKLOG.md) | OPEN | — | — | 2026-08-15 | check-arms certifies an assertion EXISTS in a test file; the suite… |
-| [TOOL-cBriefedPilot-28](../builds/cBriefedPilot/BACKLOG.md) | OPEN | — | — | 2026-08-15 | the parallelism routes are re-openable on evidence: R2+R5 was re-opened… |
-| [TOOL-cBriefedPilot-29](../builds/cBriefedPilot/BACKLOG.md) | OPEN | — | — | 2026-08-15 | M7 re-reads BUILD-METHOD.md WHOLE at every pass boundary and nothing… |
-| [TOOL-cFinalBerth-4](../builds/cFinalBerth/BACKLOG.md) | OPEN | — | — | 2026-08-13 | the three named refusals aMooredAnchor S4 scoped for check 9's silent… |
-| [TOOL-cFinalBerth-5](../builds/cFinalBerth/BACKLOG.md) | OPEN | — | — | 2026-08-13 | the run-gates canary's par*2 < ser ratio FLIPS run to run on one tree:… |
+| [TOOL-cBriefedPilot-7](../builds/cBriefedPilot/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-14 | the build-complete DoD item: --close blocks while a roster unit is… |
+| [TOOL-cBriefedPilot-8](../builds/cBriefedPilot/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-14 | the closing-review-recorded DoD item: a tracked review under this build… |
+| [TOOL-cBriefedPilot-13](../builds/cBriefedPilot/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-14 | leg check 17 grades every parked waiver line for a declared handle and… |
+| [TOOL-cBriefedPilot-14](../builds/cBriefedPilot/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-14 | leg check 18 asserts the Skill names kickoff AFTER preflight — order,… |
+| [TOOL-cBriefedPilot-22](../builds/cBriefedPilot/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-14 | check 16 arm A's join extended to the protocol's own §3 phase list and… |
+| [TOOL-cBriefedPilot-23](../builds/cBriefedPilot/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | a newline in an --override or --abort reason forges a second parked… |
+| [TOOL-cBriefedPilot-24](../builds/cBriefedPilot/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | --plan cannot see a unit BUILT on the run's branch but not landed:… |
+| [TOOL-cBriefedPilot-25](../builds/cBriefedPilot/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | only --preflight re-splices RUN.md's generated region and it refuses a… |
+| [TOOL-cBriefedPilot-26](../builds/cBriefedPilot/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | the driver's remote observation is environment-sensitive: the anchor… |
+| [TOOL-cBriefedPilot-27](../builds/cBriefedPilot/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | check-arms certifies an assertion EXISTS in a test file; the suite… |
+| [TOOL-cBriefedPilot-28](../builds/cBriefedPilot/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | the parallelism routes are re-openable on evidence: R2+R5 was re-opened… |
+| [TOOL-cBriefedPilot-29](../builds/cBriefedPilot/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | M7 re-reads BUILD-METHOD.md WHOLE at every pass boundary and nothing… |
+| [TOOL-cFinalBerth-4](../builds/cFinalBerth/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-13 | the three named refusals aMooredAnchor S4 scoped for check 9's silent… |
+| [TOOL-cFinalBerth-5](../builds/cFinalBerth/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-13 | the run-gates canary's par*2 < ser ratio FLIPS run to run on one tree:… |
 | [TOOL-cGradedDebt-3](../builds/cGradedDebt/BACKLOG.md) | OPEN | — | — | 2026-09-13 | ARMS_FLOORS FOR THE HYGIENE GATE TRAILS ITS POPULATION BY FOUR.… |
 | [TOOL-cMendedVintage-20](../builds/cMendedVintage/BACKLOG.md) | OPEN | — | — | 2026-09-20 | the unattended driver gains a rotation the verbs understand, so a long… |
-| [TOOL-cSettledDocket-7](../builds/cSettledDocket/BACKLOG.md) | OPEN | — | — | 2026-08-17 | tools/memory-recall/recall-opened.test.sh is tracked and NO gate leg… |
-| [TOOL-cSettledDocket-8](../builds/cSettledDocket/BACKLOG.md) | OPEN | — | — | 2026-08-17 | DIRECTIVES_EXTRA_TABLE has one reader, check 16. Unit 2's 'shown to the… |
-| [TOOL-cSettledDocket-9](../builds/cSettledDocket/BACKLOG.md) | OPEN | — | — | 2026-08-17 | a terminal spec whose Open-questions section is present but EMPTY stays… |
-| [TOOL-cSettledDocket-10](../builds/cSettledDocket/BACKLOG.md) | OPEN | — | — | 2026-08-17 | check-testsuite-counts says 'every bar self-test' and grades only… |
-| [TOOL-cSettledDocket-11](../builds/cSettledDocket/BACKLOG.md) | OPEN | — | — | 2026-08-17 | check 8 exempts a TERMINAL record by clearing rd, skipping the… |
-| [TOOL-cSettledDocket-12](../builds/cSettledDocket/BACKLOG.md) | OPEN | — | — | 2026-08-17 | tools/lexicon/selftest.py failed the bar on a shutil.rmtree traceback… |
-| [TOOL-cSettledDocket-13](../builds/cSettledDocket/BACKLOG.md) | OPEN | — | — | 2026-08-17 | unattended.test.sh loops the verb set across three carriers, all inside… |
-| [TOOL-cSettledDocket-14](../builds/cSettledDocket/BACKLOG.md) | OPEN | — | — | 2026-08-17 | the same gate on the conf axis: every key the engine READS must appear… |
-| [TOOL-cSettledDocket-15](../builds/cSettledDocket/BACKLOG.md) | OPEN | — | — | 2026-08-17 | citing a non-terminal spec id from product source has red the bar three… |
-| [TOOL-cTracedPromise-2](../builds/cTracedPromise/BACKLOG.md) | OPEN | — | — | 2026-08-14 | the §6 acceptance-witness rule, deferred from cTracedPromise on cost:… |
-| [TOOL-cTracedPromise-3](../builds/cTracedPromise/BACKLOG.md) | OPEN | — | — | 2026-08-14 | tighten closed_specs_with_no_product_commit to an id-only key, the… |
-| [TOOL-cTracedPromise-4](../builds/cTracedPromise/BACKLOG.md) | OPEN | — | — | 2026-08-15 | check-memory-hygiene.test.sh printed an AUTHORED assertion count, stuck… |
-| [TOOL-cTracedPromise-5](../builds/cTracedPromise/BACKLOG.md) | OPEN | — | — | 2026-08-15 | an adopter who fills TRACE_CUTOFF before closing any spec after it reds… |
-| [TOOL-cTracedPromise-7](../builds/cTracedPromise/BACKLOG.md) | OPEN | — | — | 2026-08-15 | the unset-TRACE_CUTOFF row prints DEAD PROBE though --check ignores it:… |
-| [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | OPEN | — | — | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
-| [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | OPEN | — | — | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
-| [TOOL-dCarriedReceipt-1](../builds/dCarriedReceipt/BACKLOG.md) | OPEN | — | — | 2026-08-25 | --review's convergence predicate is scoped to ONE run's run-state file… |
-| [TOOL-dCarriedReceipt-2](../builds/dCarriedReceipt/BACKLOG.md) | OPEN | — | — | 2026-08-25 | --review makes CONVERGED terminal for a subject (unattended.sh:3135,… |
-| [TOOL-dCarriedReceipt-3](../builds/dCarriedReceipt/BACKLOG.md) | OPEN | — | — | 2026-08-25 | a FOLD pass legitimately spans many units, and the dispatch machinery… |
-| [TOOL-dCarriedReceipt-4](../builds/dCarriedReceipt/BACKLOG.md) | OPEN | — | — | 2026-08-25 | a spec that is DELIBERATELY never closed cannot be cited from tracked… |
-| [TOOL-dClosedLexicon-14](../builds/dClosedLexicon/BACKLOG.md) | OPEN | — | — | 2026-08-17 | govkit check printed playbook: landed-but-inert and exited 0 over a… |
+| [TOOL-cSettledDocket-7](../builds/cSettledDocket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | tools/memory-recall/recall-opened.test.sh is tracked and NO gate leg… |
+| [TOOL-cSettledDocket-8](../builds/cSettledDocket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | DIRECTIVES_EXTRA_TABLE has one reader, check 16. Unit 2's 'shown to the… |
+| [TOOL-cSettledDocket-9](../builds/cSettledDocket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | a terminal spec whose Open-questions section is present but EMPTY stays… |
+| [TOOL-cSettledDocket-10](../builds/cSettledDocket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | check-testsuite-counts says 'every bar self-test' and grades only… |
+| [TOOL-cSettledDocket-11](../builds/cSettledDocket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | check 8 exempts a TERMINAL record by clearing rd, skipping the… |
+| [TOOL-cSettledDocket-12](../builds/cSettledDocket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | tools/lexicon/selftest.py failed the bar on a shutil.rmtree traceback… |
+| [TOOL-cSettledDocket-13](../builds/cSettledDocket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | unattended.test.sh loops the verb set across three carriers, all inside… |
+| [TOOL-cSettledDocket-14](../builds/cSettledDocket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | the same gate on the conf axis: every key the engine READS must appear… |
+| [TOOL-cSettledDocket-15](../builds/cSettledDocket/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | citing a non-terminal spec id from product source has red the bar three… |
+| [TOOL-cTracedPromise-2](../builds/cTracedPromise/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-14 | the §6 acceptance-witness rule, deferred from cTracedPromise on cost:… |
+| [TOOL-cTracedPromise-3](../builds/cTracedPromise/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-14 | tighten closed_specs_with_no_product_commit to an id-only key, the… |
+| [TOOL-cTracedPromise-4](../builds/cTracedPromise/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | check-memory-hygiene.test.sh printed an AUTHORED assertion count, stuck… |
+| [TOOL-cTracedPromise-5](../builds/cTracedPromise/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | an adopter who fills TRACE_CUTOFF before closing any spec after it reds… |
+| [TOOL-cTracedPromise-7](../builds/cTracedPromise/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | the unset-TRACE_CUTOFF row prints DEAD PROBE though --check ignores it:… |
+| [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
+| [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
+| [TOOL-dCarriedReceipt-1](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review's convergence predicate is scoped to ONE run's run-state file… |
+| [TOOL-dCarriedReceipt-2](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review makes CONVERGED terminal for a subject (unattended.sh:3135,… |
+| [TOOL-dCarriedReceipt-3](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | a FOLD pass legitimately spans many units, and the dispatch machinery… |
+| [TOOL-dCarriedReceipt-4](../builds/dCarriedReceipt/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | a spec that is DELIBERATELY never closed cannot be cited from tracked… |
+| [TOOL-dClosedLexicon-14](../builds/dClosedLexicon/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | govkit check printed playbook: landed-but-inert and exited 0 over a… |
 | [TOOL-dDerivedDocket-38](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/run-gates/run-selftests.sh SELECTS SUITES ONLY BY A --kit <dir>… |
 | [TOOL-dDerivedDocket-39](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | govkit's requires_if SELECTS NO KIT AT APPLY. Its one reader is… |
 | [TOOL-dDerivedDocket-40](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NO LEASE-MATRIX ROW NAMES WHO REACHES IT, AND NOTHING COUNTS ROWS… |
@@ -363,8 +360,8 @@ Cite ids, never line numbers.
 | [TOOL-dDerivedDocket-69](../builds/dDerivedDocket/BACKLOG.md) | OPEN | MED | — | 2026-09-29 | A SUITE THAT CRASHES AFTER ITS FIRST FAIL LINE READS AS FAILING, NEVER… |
 | [TOOL-dDerivedDocket-75](../builds/dDerivedDocket/BACKLOG.md) | OPEN | LOW | — | 2026-09-30 | NODE d RUNS AN ABSOLUTE core.hooksPath FROM A WRITER NOBODY KNOWS. The… |
 | [TOOL-dDerivedDocket-76](../builds/dDerivedDocket/BACKLOG.md) | OPEN | MED | — | 2026-09-30 | THE UNATTENDED KIT'S COMPENSATING CHECK IS UNPAID FOR THIS LANDING.… |
-| [TOOL-dFoldedVerdict-7](../builds/dFoldedVerdict/BACKLOG.md) | OPEN | — | — | 2026-09-01 | THREE CARRIERS WERE FOUND SITTING EXACTLY ON THEIR DECLARED CEILING IN… |
-| [TOOL-dFoldedVerdict-9](../builds/dFoldedVerdict/BACKLOG.md) | OPEN | — | — | 2026-09-02 | RETIRING ANOTHER BUILD'S UNIT LEFT TWO CONSEQUENCES ON THAT BUILD'S OWN… |
+| [TOOL-dFoldedVerdict-7](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THREE CARRIERS WERE FOUND SITTING EXACTLY ON THEIR DECLARED CEILING IN… |
+| [TOOL-dFoldedVerdict-9](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-02 | RETIRING ANOTHER BUILD'S UNIT LEFT TWO CONSEQUENCES ON THAT BUILD'S OWN… |
 | [TOOL-dGatedProse-6](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | the join count in memory/map/features/spec-tokens.md is typed prose… |
 | [TOOL-dGatedProse-7](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | tools/template-size-limits.txt lines 69-70 misstate the build method's… |
 | [TOOL-dGatedProse-8](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | every existing memory-tree adopter keeps the retired guide cap after… |
@@ -372,17 +369,17 @@ Cite ids, never line numbers.
 | [TOOL-dGatedProse-10](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | memory/map/features/memory-tree-hygiene.md line 54 names… |
 | [TOOL-dGatedProse-11](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | tools/check-spec-tokens.py grades a LIVE spec by a whitelist, OPEN,… |
 | [TOOL-dGatedProse-12](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | FIVE KIT SELF-TESTS ARE RED ON MAIN and no row records them: measured… |
-| [TOOL-dHonouredPark-5](../builds/dHonouredPark/BACKLOG.md) | OPEN | — | — | 2026-08-25 | A bespoke review fan-out must assign finding ids in the ORCHESTRATOR,… |
-| [TOOL-dHonouredPark-6](../builds/dHonouredPark/BACKLOG.md) | OPEN | — | — | 2026-08-25 | The engine tolerates a build folder whose specs carry another build's… |
-| [TOOL-dHonouredPark-7](../builds/dHonouredPark/BACKLOG.md) | OPEN | — | — | 2026-08-25 | plan_state cannot tell a spec that DISCUSSES a resolution mark from one… |
-| [TOOL-dHonouredPark-8](../builds/dHonouredPark/BACKLOG.md) | OPEN | — | — | 2026-08-25 | --review keys its convergence loop on --subject alone, so a build's… |
-| [TOOL-dHonouredPark-9](../builds/dHonouredPark/BACKLOG.md) | OPEN | — | — | 2026-08-25 | The verdict-epoch bump is only ever discovered AFTER a red bar.… |
-| [TOOL-dHonouredPark-10](../builds/dHonouredPark/BACKLOG.md) | OPEN | — | — | 2026-08-25 | check 29 has no terminal-run exemption, so an ABORTED run that used the… |
-| [TOOL-dMispairedQuote-4](../builds/dMispairedQuote/BACKLOG.md) | OPEN | — | — | 2026-09-01 | agent-cap.js models no regex literal, which is the ROOT of every… |
-| [TOOL-dMispairedQuote-5](../builds/dMispairedQuote/BACKLOG.md) | OPEN | — | — | 2026-09-01 | checkLiteralOpen's keyword clause admits a quote after any of eleven JS… |
-| [TOOL-dMispairedQuote-6](../builds/dMispairedQuote/BACKLOG.md) | OPEN | — | — | 2026-09-01 | resolveLiteralEnd opener-tests only the OPENING quote, so a mispairing… |
-| [TOOL-dMispairedQuote-8](../builds/dMispairedQuote/BACKLOG.md) | OPEN | — | — | 2026-09-01 | checkLiteralOpen admits a quote after an OPERATOR or punctuation, which… |
-| [TOOL-dNarrowedAnchor-3](../builds/dNarrowedAnchor/BACKLOG.md) | OPEN | — | — | 2026-08-25 | BUDGET_gate_selftest was DERIVED, never observed, and the derivation… |
+| [TOOL-dHonouredPark-5](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | A bespoke review fan-out must assign finding ids in the ORCHESTRATOR,… |
+| [TOOL-dHonouredPark-6](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | The engine tolerates a build folder whose specs carry another build's… |
+| [TOOL-dHonouredPark-7](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | plan_state cannot tell a spec that DISCUSSES a resolution mark from one… |
+| [TOOL-dHonouredPark-8](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review keys its convergence loop on --subject alone, so a build's… |
+| [TOOL-dHonouredPark-9](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | The verdict-epoch bump is only ever discovered AFTER a red bar.… |
+| [TOOL-dHonouredPark-10](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | check 29 has no terminal-run exemption, so an ABORTED run that used the… |
+| [TOOL-dMispairedQuote-4](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | agent-cap.js models no regex literal, which is the ROOT of every… |
+| [TOOL-dMispairedQuote-5](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | checkLiteralOpen's keyword clause admits a quote after any of eleven JS… |
+| [TOOL-dMispairedQuote-6](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | resolveLiteralEnd opener-tests only the OPENING quote, so a mispairing… |
+| [TOOL-dMispairedQuote-8](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | checkLiteralOpen admits a quote after an OPERATOR or punctuation, which… |
+| [TOOL-dNarrowedAnchor-3](../builds/dNarrowedAnchor/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | BUDGET_gate_selftest was DERIVED, never observed, and the derivation… |
 | [TOOL-dPolishedVitrine-3](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/memory-recall/adopt-memory-recall.sh probes for the settings… |
 | [TOOL-dPolishedVitrine-4](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | derive_gate_runner in tools/playbook/render_playbook.py tries four… |
 | [TOOL-dPolishedVitrine-7](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/check-kit-placeholders.py EXEMPTS the review-harness kit because… |
@@ -392,59 +389,58 @@ Cite ids, never line numbers.
 | [TOOL-dPolishedVitrine-11](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | THE UNATTENDED ADOPTER DELETES FIXTURE RECORDS GOVKIT SHIPS AS ENGINE… |
 | [TOOL-dPolishedVitrine-15](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-13 | A FINISHED CLAIM THAT STANDS AT HEAD IS TRUSTED, AND THE KIT GATE WOULD… |
 | [TOOL-dPolishedVitrine-16](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE TWO CONSUMERS HOLD AN unattended@1.20 THAT GOV NUMBERS TWICE. inCMS… |
-| [TOOL-dRetiredFork-22](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-02 | THE BUILD HARNESS'S AUDIT STAGE CANNOT EVER COMPLETE, so BUILD is… |
-| [TOOL-dRetiredFork-23](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE GIT-ENV LEAK LIST NOW EXISTS IN THREE COPIES AND NOTHING COMPARES… |
-| [TOOL-dRetiredFork-25](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | check-memory-hygiene.test.sh fails two arms on a freshly scaffolded… |
-| [TOOL-dRetiredFork-26](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | Both Python selftests are unswept by the KIT_REL sweep:… |
-| [TOOL-dRetiredFork-27](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | govkit apply leaves a DUPLICATE row in a manifest whose dedupe_key is… |
-| [TOOL-dRetiredFork-28](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | tools/govkit/check_runbook_parity.py exits 1 with 18 problems and is… |
-| [TOOL-dRetiredFork-31](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | FOUR HAND-BUILT FIXTURES IN check-memory-hygiene.test.sh REPLICATE… |
-| [TOOL-dRetiredFork-32](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
-| [TOOL-dRetiredFork-33](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
-| [TOOL-dRetiredFork-34](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
-| [TOOL-dRetiredFork-35](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
-| [TOOL-dRetiredFork-36](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
-| [TOOL-dRetiredFork-37](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
-| [TOOL-dRetiredFork-38](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
-| [TOOL-dRetiredFork-39](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
-| [TOOL-dRetiredFork-40](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | NINE LEG CEILINGS ARE AUTHORED IN MILLISECONDS AGAINST A FIELD THE… |
+| [TOOL-dRetiredFork-22](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-02 | THE BUILD HARNESS'S AUDIT STAGE CANNOT EVER COMPLETE, so BUILD is… |
+| [TOOL-dRetiredFork-23](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE GIT-ENV LEAK LIST NOW EXISTS IN THREE COPIES AND NOTHING COMPARES… |
+| [TOOL-dRetiredFork-25](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | check-memory-hygiene.test.sh fails two arms on a freshly scaffolded… |
+| [TOOL-dRetiredFork-26](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | Both Python selftests are unswept by the KIT_REL sweep:… |
+| [TOOL-dRetiredFork-27](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | govkit apply leaves a DUPLICATE row in a manifest whose dedupe_key is… |
+| [TOOL-dRetiredFork-28](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | tools/govkit/check_runbook_parity.py exits 1 with 18 problems and is… |
+| [TOOL-dRetiredFork-31](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | FOUR HAND-BUILT FIXTURES IN check-memory-hygiene.test.sh REPLICATE… |
+| [TOOL-dRetiredFork-32](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
+| [TOOL-dRetiredFork-33](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
+| [TOOL-dRetiredFork-34](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
+| [TOOL-dRetiredFork-35](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
+| [TOOL-dRetiredFork-36](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
+| [TOOL-dRetiredFork-37](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
+| [TOOL-dRetiredFork-38](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
+| [TOOL-dRetiredFork-39](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
+| [TOOL-dRetiredFork-40](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | NINE LEG CEILINGS ARE AUTHORED IN MILLISECONDS AGAINST A FIELD THE… |
 | [TOOL-dScaffoldedMirror-4](../builds/dScaffoldedMirror/BACKLOG.md) | OPEN | — | — | 2026-08-24 | PHASE 0, and a hard prerequisite for -9. Waiver hardening: re-key all… |
 | [TOOL-dScaffoldedMirror-9](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-dDerivedDocket-66 | 2026-08-24 | PHASE 4, blocked on -4 and -11. The grandfather set with a provenance… |
 | [TOOL-dScaffoldedMirror-11](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-dDerivedDocket-66 | 2026-08-24 | PHASE 3, blocked on a kit-owned ^visit_[A-Z]/generic_visit exemption… |
 | [TOOL-dScaffoldedMirror-12](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-dDerivedDocket-66 | 2026-08-24 | PHASE 5, RESEARCH, only on the owner's word. The consistency… |
 | [TOOL-dScaffoldedMirror-15](../builds/dScaffoldedMirror/BACKLOG.md) | OPEN | — | — | 2026-08-24 | nothing tells an adopter this kit exists, and it is upstream of the… |
-| [TOOL-dScaffoldedMirror-20](../builds/dScaffoldedMirror/BACKLOG.md) | OPEN | — | — | 2026-08-25 | nothing checks this repo's own .gitattributes against the [[lf_pin]]s… |
-| [TOOL-dScaffoldedMirror-21](../builds/dScaffoldedMirror/BACKLOG.md) | OPEN | — | — | 2026-08-25 | check-unattended.sh check 29 has no grandfathering, so any run already… |
-| [TOOL-dScrubbedConduit-3](../builds/dScrubbedConduit/BACKLOG.md) | OPEN | — | — | 2026-08-23 | [[hole]] discharge probes are run by nothing on the bar.… |
-| [TOOL-dSealedTally-2](../builds/dSealedTally/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE UNATTENDED --checks RUNNER REDS EVERY RUN HERE: all four checks… |
-| [TOOL-dSettledRoster-1](../builds/dSettledRoster/BACKLOG.md) | OPEN | — | — | 2026-08-20 | AGENTS.md, the one file every session is pointed at, is reachable by no… |
-| [TOOL-dSettledRoster-4](../builds/dSettledRoster/BACKLOG.md) | OPEN | — | — | 2026-08-20 | check-verdict-epoch.sh's remediation message names THREE carriers to… |
-| [TOOL-dSettledRoster-6](../builds/dSettledRoster/BACKLOG.md) | OPEN | — | — | 2026-08-20 | THREE resolve_bash copies exist and two of them probe a weaker property… |
-| [TOOL-dSpentCeiling-4](../builds/dSpentCeiling/BACKLOG.md) | OPEN | — | — | 2026-08-25 | a kit's RELEASE can spend another kit's read budget, and no gate… |
-| [TOOL-dSpentCeiling-5](../builds/dSpentCeiling/BACKLOG.md) | OPEN | — | — | 2026-08-25 | the hygiene check COUNT is hand-typed in at least three places and they… |
-| [TOOL-dSpentCeiling-6](../builds/dSpentCeiling/BACKLOG.md) | OPEN | — | — | 2026-08-25 | two waiver registries pin LINE NUMBERS into files that get edited, so… |
-| [TOOL-dSpentCeiling-7](../builds/dSpentCeiling/BACKLOG.md) | OPEN | — | — | 2026-08-25 | FLIP READ_PATH_RULES_GATE to True in tools/memory-tree/corpus_ids.py,… |
-| [TOOL-dSpentCeiling-8](../builds/dSpentCeiling/BACKLOG.md) | OPEN | — | — | 2026-08-25 | THE FULL BAR IS NONDETERMINISTIC UNDER ITS OWN CONCURRENCY, on at least… |
+| [TOOL-dScaffoldedMirror-20](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | nothing checks this repo's own .gitattributes against the [[lf_pin]]s… |
+| [TOOL-dScaffoldedMirror-21](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | check-unattended.sh check 29 has no grandfathering, so any run already… |
+| [TOOL-dScrubbedConduit-3](../builds/dScrubbedConduit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-23 | [[hole]] discharge probes are run by nothing on the bar.… |
+| [TOOL-dSealedTally-2](../builds/dSealedTally/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE UNATTENDED --checks RUNNER REDS EVERY RUN HERE: all four checks… |
+| [TOOL-dSettledRoster-1](../builds/dSettledRoster/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | AGENTS.md, the one file every session is pointed at, is reachable by no… |
+| [TOOL-dSettledRoster-4](../builds/dSettledRoster/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | check-verdict-epoch.sh's remediation message names THREE carriers to… |
+| [TOOL-dSettledRoster-6](../builds/dSettledRoster/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | THREE resolve_bash copies exist and two of them probe a weaker property… |
+| [TOOL-dSpentCeiling-4](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | a kit's RELEASE can spend another kit's read budget, and no gate… |
+| [TOOL-dSpentCeiling-5](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | the hygiene check COUNT is hand-typed in at least three places and they… |
+| [TOOL-dSpentCeiling-6](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | two waiver registries pin LINE NUMBERS into files that get edited, so… |
+| [TOOL-dSpentCeiling-7](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | FLIP READ_PATH_RULES_GATE to True in tools/memory-tree/corpus_ids.py,… |
+| [TOOL-dSpentCeiling-8](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | THE FULL BAR IS NONDETERMINISTIC UNDER ITS OWN CONCURRENCY, on at least… |
 | [TOOL-dThriftyLanding-7](../builds/dThriftyLanding/BACKLOG.md) | OPEN | MED | — | 2026-10-05 | unattended kit gate costs 222 s standalone on node d and reads every… |
-| [TOOL-dTieredTribunal-4](../builds/dTieredTribunal/BACKLOG.md) | OPEN | — | — | 2026-08-26 | the args-must-be-an-object guard is not ported into the two drift-audit… |
-| [TOOL-dTieredTribunal-6](../builds/dTieredTribunal/BACKLOG.md) | OPEN | — | — | 2026-08-26 | The RECLASSIFICATION that created this row was ratified 2026-08-26… |
-| [TOOL-dTieredTribunal-16](../builds/dTieredTribunal/BACKLOG.md) | OPEN | — | — | 2026-08-26 | tools/workflows/tier2-review.js computes every liveness counter it… |
-| [TOOL-dTieredTribunal-17](../builds/dTieredTribunal/BACKLOG.md) | OPEN | — | — | 2026-08-26 | plan_state in tools/unattended/unattended.sh maps a spec's sections by… |
-| [TOOL-dTieredTribunal-21](../builds/dTieredTribunal/BACKLOG.md) | OPEN | — | — | 2026-08-26 | tools/govkit/selftest.py writes a fixture named x.json into the PROCESS… |
-| [TOOL-dTieredTribunal-22](../builds/dTieredTribunal/BACKLOG.md) | OPEN | — | — | 2026-08-27 | the uncounted filter(Boolean) predicate, the follow-up… |
-| [TOOL-dTieredTribunal-23](../builds/dTieredTribunal/BACKLOG.md) | OPEN | — | — | 2026-08-27 | the protocol gate arm TOOL-dTieredTribunal-13's F1 resolved to record… |
-| [TOOL-dTieredTribunal-24](../builds/dTieredTribunal/BACKLOG.md) | OPEN | — | — | 2026-08-27 | two mechanical arms for the amendment-leaves-its-other-half-standing… |
-| [TOOL-dUnstalledConvoy-14](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-20 | hygiene check 12 asserts the HEADER rev appears in section 9 and says… |
+| [TOOL-dTieredTribunal-4](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | the args-must-be-an-object guard is not ported into the two drift-audit… |
+| [TOOL-dTieredTribunal-6](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | The RECLASSIFICATION that created this row was ratified 2026-08-26… |
+| [TOOL-dTieredTribunal-16](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | tools/workflows/tier2-review.js computes every liveness counter it… |
+| [TOOL-dTieredTribunal-17](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | plan_state in tools/unattended/unattended.sh maps a spec's sections by… |
+| [TOOL-dTieredTribunal-21](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | tools/govkit/selftest.py writes a fixture named x.json into the PROCESS… |
+| [TOOL-dTieredTribunal-22](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the uncounted filter(Boolean) predicate, the follow-up… |
+| [TOOL-dTieredTribunal-23](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | the protocol gate arm TOOL-dTieredTribunal-13's F1 resolved to record… |
+| [TOOL-dTieredTribunal-24](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-27 | two mechanical arms for the amendment-leaves-its-other-half-standing… |
+| [TOOL-dUnstalledConvoy-14](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | hygiene check 12 asserts the HEADER rev appears in section 9 and says… |
 | [TOOL-dUnstalledConvoy-15](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-20 | the bare-interpreter class survives outside govkit:… |
-| [TOOL-dUnstalledConvoy-16](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-20 | a correction to a claim held by SEVERAL carriers lands in one of them… |
-| [TOOL-dUnstalledConvoy-18](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-21 | a PYTHON rewrite of a shell source silently eats a LONE CR.… |
-| [TOOL-dUnstalledConvoy-19](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-21 | APPENDING to a test suite strands the arms, and every static signal… |
-| [TOOL-dUnstalledConvoy-23](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-21 | redesign the dispatch write-set grading, which ships DARK behind… |
-| [TOOL-dUnstalledConvoy-24](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-21 | --close STAGES the LANDING phase and nothing commits it, so a run that… |
-| [TOOL-dUnstalledConvoy-34](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-24 | three driver refusal messages have no arm asserting them, all in the… |
-| [TOOL-dUnstalledConvoy-35](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-24 | signal_lexicon_ratified_stale compares the ratification stamp against… |
-| [TOOL-dUnstalledConvoy-36](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-24 | refusal_join.py's JOIN half has never executed. Its docstring promises… |
-| [TOOL-dUnstalledConvoy-37](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-24 | core.hooksPath is repo-global and absolute, so in this multi-worktree… |
-| [TOOL-dUnstalledConvoy-38](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-24 | --landed's check 34 compares the lander marker against the run's own… |
+| [TOOL-dUnstalledConvoy-16](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | a correction to a claim held by SEVERAL carriers lands in one of them… |
+| [TOOL-dUnstalledConvoy-18](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-21 | a PYTHON rewrite of a shell source silently eats a LONE CR.… |
+| [TOOL-dUnstalledConvoy-19](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-21 | APPENDING to a test suite strands the arms, and every static signal… |
+| [TOOL-dUnstalledConvoy-23](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-21 | redesign the dispatch write-set grading, which ships DARK behind… |
+| [TOOL-dUnstalledConvoy-24](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-21 | --close STAGES the LANDING phase and nothing commits it, so a run that… |
+| [TOOL-dUnstalledConvoy-34](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-24 | three driver refusal messages have no arm asserting them, all in the… |
+| [TOOL-dUnstalledConvoy-35](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-24 | signal_lexicon_ratified_stale compares the ratification stamp against… |
+| [TOOL-dUnstalledConvoy-36](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-24 | refusal_join.py's JOIN half has never executed. Its docstring promises… |
+| [TOOL-dUnstalledConvoy-37](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-24 | core.hooksPath is repo-global and absolute, so in this multi-worktree… |
 | [TOOL-dUnstuckLanding-11](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | carry the kit that ships asks 3 to 10 into inCMS and NicoCares through… |
 | [TOOL-dUnstuckLanding-26](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | a gate for a merge whose resolution drops one side's hunks: for each… |

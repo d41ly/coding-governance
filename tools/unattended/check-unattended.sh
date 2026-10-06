@@ -27,7 +27,7 @@
 # check found and did not count because its pass overlapped no sibling (TOOL-aWindowedPass-1), its
 # `check 23 OTHER RUN` and `check 23 UNBOUND` lines, counted writes of a run this tree does not drive
 # (TOOL-aWindowedPass-5), and its `check 23 fleet` line, which reports the whole fleet's
-# undeclared-write count and never fails the leg (TOOL-dUnstuckLanding-17). They are not skips. An exclusion is a positive
+# undeclared-write count and never fails the leg (TOOL-dUnstuckLanding-17, TOOL-aMendedFleet-92). They are not skips. An exclusion is a positive
 # finding that CHANGED THE VERDICT — a record the check stopped counting — and the reader of a green
 # run is entitled to know which one and on what evidence. Routing them through REPORT was the first
 # implementation and it made the exclusion invisible on every bar run, which is the check-quietly-
@@ -50,7 +50,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.68   # gov:kit unattended@1.68 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.69   # gov:kit unattended@1.69 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -1429,8 +1429,9 @@ is_published() { # commit -> 0 published · 1 not published · 2 CANNOT TELL, a 
 # The drift-audit kit's `drift_report.py` reproduced the same class for the same flag, at 806-818.
 #
 # THE TENANCY FLOOR IS THE MECHANISM, not a refinement. Two runs share one path, and their records
-# share whole lines - `memory/builds/aBoundedVerdict/RUN.md` and its ABORTED sibling carry thirteen
-# identical non-blank lines today. Unfloored, a search for one of them answers the FIRST run's
+# share whole lines - `memory/builds/aBoundedVerdict/RUN.md` and its ABORTED sibling carried
+# thirteen identical non-blank lines at 14d5c6a41 (2026-09-21).
+# Unfloored, a search for one of them answers the FIRST run's
 # preflight (`e8be30e9`, 40 commits walked) instead of the queried record's own (`9ea808cf`, 24).
 # The verification below cannot catch that and is not asked to: `e8be30e9`'s first parent carries no
 # record at all, so "the parent does not have the line" is true of a commit made the day before the
@@ -2653,7 +2654,7 @@ WAIVERS
   # ---- THE ASK MANDATE, SECOND-OPINIONED — TOOL-dDerivedDocket-18. The helpers and the honest
   # ---- limits are at the head of this file; what follows is the six arms, keyed on the ONE fact
   # ---- that makes a record mandated. Every one of them is VACUOUS on a record with no `asks:`
-  # ---- fact, which is every record in this tree today, so the count is announced after the loop:
+  # ---- fact, which can be every record in a tree, so the count is announced after the loop:
   # ---- a skip that looks like a pass is indistinguishable from coverage.
   recasks=$(fact_of "$f" asks)
   if [ -n "$recasks" ]; then
@@ -3391,7 +3392,7 @@ else
   #
   # A declared path that does not EXIST is a named refusal, never an empty union: silent, every
   # project-declared directive would land back on the "declared and absent from the table" branch
-  # with nothing saying why. Undeclared is the empty set, which is every adopter today.
+  # with nothing saying why. Undeclared is the empty set, the ordinary case for an adopter.
   if [ -n "$DIRECTIVES_EXTRA_TABLE" ]; then
     if [ ! -f "$ROOT/$DIRECTIVES_EXTRA_TABLE" ]; then
       fail 16 "DIRECTIVES_EXTRA_TABLE names a file that does not exist, so every project-declared directive would read as absent from the table it is supposed to be in: $DIRECTIVES_EXTRA_TABLE"
@@ -3640,7 +3641,8 @@ if [ -f "$proto" ]; then
       [ -z "$kd2" ] || fail 16 "the protocol lists a phase as a build-method pass kind that the driver does not publish as one, so the contract claims the method names a position it does not: $kd2"
     fi
   fi
-  # Item NAMES only. The checker column is deliberately not joined: measured today three cells read
+  # Item NAMES only. The checker column is deliberately not joined: measured at 5e5d97837
+  # (2026-08-16), three cells read
   # `machine, PRE-LANDING` or `agent-attested` against the constant's `machine`/`agent`, and those
   # spellings say something true the constant has no room for. Joining them would need a
   # normalisation table, which is a third spelling of a two-value fact.

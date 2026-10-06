@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-code',
-  version: '1.23',
+  version: '1.24',
   description:
     'Drift audit Tier 2, wave 1: dead / inefficient / unwired / duplicated code + instrument integrity. Project-agnostic; all repo facts arrive via args.',
   whenToUse:
@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.23
+// gov:kit drift-audit@1.24
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // The cap is on CONCURRENCY *and*, for the verify stage, on TOTAL agents. Concurrency is not a
 // budget: N findings fanned one-skeptic-each still spawn N agents, five at a time.
@@ -81,10 +81,17 @@ function chunk(a, n) {
 //   frameworkExports: "which exports a framework references by convention, not by import",
 //   measured: "the Tier-0 numbers already established — agents must interrogate, not re-derive",
 //   byDesign: "recorded/backlogged issues reviewers must NOT re-report as new",
+//   workerType: "<agent type>",            // the type every SKEPTIC batch spawns as; absent -> the default
 // }
 const a = args || {}
 const REPO = a.repo || '.'
 const BASE = a.base || 'HEAD'
+// TOOL-aMendedFleet-67 S3 - `workerType` routes the SKEPTIC batches only. A finder writes its
+// writeup to outDir as it works, which is its deliverable and its durability control, and a
+// read-only type holds no Write tool. Shape-checked before any spawn.
+if (a.workerType !== undefined && (typeof a.workerType !== 'string' || !/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(a.workerType)))
+  throw new Error('drift-audit-code: `workerType` must be an agent type name matching ^[A-Za-z][A-Za-z0-9_-]{0,63}$. Got ' + JSON.stringify(a.workerType) + '.')
+const skepticOpts = a.workerType ? { agentType: a.workerType } : {}
 const OUT = a.outDir || `${REPO}/memory`
 const MAX_VERIFIERS = {{FANOUT_CAP}}
 
@@ -365,7 +372,7 @@ ${a.byDesign || '(none supplied)'}
 
 FINDINGS BATCH ${bi + 1}:
 ${JSON.stringify(b, null, 1)}`,
-      { label: `verify:batch${bi + 1}`, phase: 'Verify', schema: VERDICT_SCHEMA }
+      Object.assign({ label: `verify:batch${bi + 1}`, phase: 'Verify', schema: VERDICT_SCHEMA }, skepticOpts)
     )
   ),
   CAP

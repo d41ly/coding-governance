@@ -47,12 +47,15 @@ zero committed bytes; that figure is the source project's and has not been re-de
 
 ## Reading the answer
 
-Open the records it names, not the streams they live in. Output is sized by a byte budget
-(default 20 000 B) and prints snippets, so a hit is a pointer, not the document.
+Open the records it names, not the streams they live in. Output is sized by `--budget`: the
+head of the ranked list prints snippets, every later hit prints as a one-line pointer
+(`[n] id · path:line`), and a closing line says where snippets stop. A pointer is opened by its
+path; it is a hit like any other, not a weaker one. Raise `--budget` for more snippets.
 
-**A miss is ordinary.** On a small corpus retrieval buys precision, not speed — a full-corpus
-`grep` is faster and returns half the tree. So when the hits are thin or wrong, fall straight
-back to `Grep` over `memory/`. That is not a failure mode, it is the other tool.
+**A miss is ordinary, and it is usually a vocabulary miss.** When the hits are thin or wrong,
+re-query ONCE with terms in the vocabulary the missing record would use: an id family, a flag
+or conf key, a file name. Only then fall back to `Grep` over `memory/`. That is not a
+failure mode, it is the other tool.
 
 ## Record which hit you opened — one flag, and it is the point
 

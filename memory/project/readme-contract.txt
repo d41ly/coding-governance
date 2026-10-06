@@ -166,6 +166,7 @@ memory/builds/dUnstuckLanding/README.md
 memory/builds/aHalvedInstall/README.md
 memory/builds/aWindowedPass/README.md
 memory/builds/aBatchedMinors/README.md
+memory/builds/aMendedFleet/README.md
 memory/builds/aEvidencedLens/README.md
 memory/builds/aWardedAudit/README.md
 memory/builds/dThriftyLanding/README.md

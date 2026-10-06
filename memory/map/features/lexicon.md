@@ -17,6 +17,7 @@ gate-legs = [
 ]
 kits = ["lexicon"]
 git-hooks = []
+harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = ["lexicon"]
@@ -63,18 +64,13 @@ globs = [
 **The verb table is a SCOPING instrument, not a spelling one.** "Which verb is this?" is answerable
 only when a function does one thing, so a name that will not fit is reporting an unclear
 responsibility or a seam in the wrong place. That is the whole value. The kit is OPT-IN — the engine
-reports `NOT ADOPTED` and exits 0 with no `.lexicon.conf` present — but NOT because the value is
-unmeasurable: `TOOL-dScaffoldedMirror-17` superseded that premise and `drift-audit`'s
-`lexicon_marginal_offense_rate` measures it. This file carried the dead claim TWICE and `-7`
-superseded only the copy in Gaps, which is this repo's own "a fix naming more than one carrier lands
-in only one" class, inside the fix for it.
+reports `NOT ADOPTED` and exits 0 with no `.lexicon.conf` present — and the value is measurable:
+`drift-audit`'s `lexicon_marginal_offense_rate` measures it (`TOOL-dScaffoldedMirror-17`).
 
-**TWO QUESTIONS, TWO DECIDERS — and this paragraph used to hold the answer to only one.** Companion
-§12 bans a gate whose vocabulary is a hand-kept mirror of the codebase's own identifiers, and until
-`TOOL-dScaffoldedMirror-8` the scaffold was exactly that: it ranked the corpus's leading tokens and
-adopted the top rows, so a repo that already called everything `get` was certified as calling it
-`get`. What the corpus now decides is MEMBERSHIP — does any spelling of this concept have a live
-definition site. What it is CALLED comes from `canon.py`, twenty frozen clusters whose element 0 is
+**TWO QUESTIONS, TWO DECIDERS.** Companion §12 bans a gate whose vocabulary is a hand-kept mirror
+of the codebase's own identifiers, so the scaffold never ranks the corpus's leading tokens
+(`TOOL-dScaffoldedMirror-8`). The corpus decides MEMBERSHIP — does any spelling of this concept have
+a live definition site. What it is CALLED comes from `canon.py`, frozen clusters whose element 0 is
 the representative unconditionally. The corpus cannot promote a spelling and cannot nominate a verb
 the canon does not hold, so the seed is prescriptive at the moment it is written.
 
@@ -90,31 +86,20 @@ step. What the door buys is visibility and attribution, never proof: no machine 
 considered overlay from one filled from the corpus's commonest spellings, and the kit says so in
 both `.lexicon.conf` and its README rather than leaving a reader to find it.
 
-The `ratified` arm survives and is no longer the RESOLUTION, only the second half: a canon-sourced
-seed is a starting vocabulary and not a curated one, so it ships `PROPOSED` with `ratified` empty and
-reds until a human stamps it. This paragraph and the one above it were the SAME claim in two
-carriers, and the round-1 fix rewrote the other; that is this file confessing to the class it
-confesses to two paragraphs down, twice.
+The `ratified` arm is the second half: a canon-sourced seed is a starting vocabulary and not a
+curated one, so it ships `PROPOSED` with `ratified` empty and reds until a human stamps it.
 
 **Vacuity is pushed back on three ways.** The corpus-side arm is `DEAD PROBE`: a `parser` or
 `probe` language whose definition population is empty against a corpus containing that extension is a
 refusal. That arm is itself defeated by an empty corpus, so the kit-side arm is a frozen SENTINEL
 fixture per shipped pattern set in `selftest.py`. The third is `check_self_containment`'s own
 `DEAD PROBE`: a self-containment walk that judges NO imports reds rather than reporting the clean
-zero a broken probe prints. The third USED to be `UNSELECTIVE LAYERS RULE`, over a declared rule
-whose globs selected nothing; it went with the predicate that read it.
+zero a broken probe prints.
 
-**P3 IS DELETED, and its failed reachability proof is the record worth keeping.** The predicate,
-its `LAYERS` declaration, its glob dialect and its import resolver were removed by
-`TOOL-aSurfacedLexicon-2`; nothing below describes live code. The kit's first real declaration named
-a hyphenated directory no import could resolve into, so P3's offender pin read a confident 0 that no
-edit could move. The first fix ADDED a construction-based reachability proof, and a review measured
-it a tautology: every synthetic derived from a target's PATH round-tripped through the resolver's own
-path-mirroring reading, so restoring the pre-fix blind resolver still certified the rule REACHABLE.
-It was removed rather than patched. What P3's correctness rested on was `resolve_import`, an OBSERVED
-failing case, and fixtures in the PRODUCTION shape — a hyphenated directory reached by a bare-stem
-import, which is precisely the shape a path-shaped fixture cannot represent. The transferable half
-outlived the predicate: no construction-based proof can establish that a declared rule can fire. See
+**No construction-based proof can establish that a declared rule can fire.** A synthetic derived
+from a target's PATH round-trips through the resolver's own reading, so it certifies a blind
+resolver REACHABLE; correctness rests on an OBSERVED failing case and fixtures in the PRODUCTION
+shape. The layers predicate that taught this was deleted by `TOOL-aSurfacedLexicon-2`. See
 `armed-but-unreachable-rule`.
 
 **Coverage is DECLARED per extension, and an undeclared one is a named refusal.**
@@ -125,8 +110,6 @@ carry no definitions at all, and declaring them is what makes the undeclared-ext
 meaningful rather than noisy.
 
 **A predicate that is satisfied and one that was never asked must not produce the same exit code.**
-The written form of that used to be `P3 NOT ARMED`, over an empty `LAYERS` block nothing could
-derive a proposal for. With the declaration gone the same rule binds the refusal that replaced it:
 `check_self_containment` derives its own population and REDS as `DEAD PROBE` when that population is
 empty, because zero offenders over zero imports is exactly the clean green a broken walk prints. Its
 walk root is a PARAMETER so that arm can be staged; a predicate that can only read its own installed
@@ -137,14 +120,12 @@ and with parameters — Go's `context` is the standing example — so an importe
 `widget_manager` parameter are both green while a `class ThingManager` definition reds.
 
 **Waivers key on the matched TEXT, never `<path>:<line>`.** Position keying means any edit ABOVE a
-waived line unpins it, reddening a merge that touched nothing the waiver guards; that was hit on
-the install-prefix waiver registry's first real merge, and is tracked as `TOOL-aSealedCaravan-1`,
-which closed when `TOOL-aRepatriatedFork-30` deleted that registry. A waiver
+waived line unpins it, reddening a merge that touched nothing the waiver guards
+(`TOOL-aSealedCaravan-1`). A waiver
 whose text is gone reds as STALE, so a registry cannot quietly outlive what it excuses.
 
-**`.lexicon.conf` is in the corpus leg's guard, and `lexicon wiring` still grades it unguarded.** A
-conf-only commit used to skip `lexicon naming predicates`, because govkit's guard partition had no
-class for a root file. Its `root-conf` class now takes every descriptor's `[config] file`, and govkit
+**`.lexicon.conf` is in the corpus leg's guard, and `lexicon wiring` still grades it unguarded.**
+govkit's guard partition has a `root-conf` class taking every descriptor's `[config] file`, and govkit
 selfcheck reds a guarded bar leg whose argv names one its guard lacks. TOOL-dDerivedDocket-21.
 
 **`check-placeholders.sh` asserts what is true of a SOURCE, not of a render.** In this repo the
@@ -155,39 +136,32 @@ predicate lives in `--check <a> <b>` and runs only over fixtures. The render-sid
 already exists and stays where it is: `tools/govkit/entries/playbook.kit.toml`'s
 `playbook-placeholders` hole.
 
-**ONE file carries the `governance-template` marker as of v3.0, and the marker LOCKSTEP died with the
-second carrier.** It is not weakened, it is gone: a comparison over a population of one is not a
-comparison. The count has been miscounted in both directions — a spec once reached "three" through a
-review fold, when the deploy-time catalogue's only `vN.N` was prose and a gate built to three would
-have compared a literal against a real version and redded forever. Both miscounts were caught only by
-measuring, which is why the gate derives the count instead of asserting one.
+**ONE file carries the `governance-template` marker, so there is no marker LOCKSTEP**: a comparison
+over a population of one is not a comparison. The gate derives the carrier count instead of
+asserting one.
 
 **`--offenders` is a key per offender, for the bar's red attribution.** No `path:line`, no count, no
 cut, a repeat carrying `#<k>`; its exit is `--check`'s. `TOOL-dDerivedDocket-23`.
 
 ## Shared seams
 
-`tools/lexicon/lexicon_conf.py` is the ONE reader of `.lexicon.conf`. FOUR consumers now need the
+`tools/lexicon/lexicon_conf.py` is the ONE reader of `.lexicon.conf`. Every consumer of the
 file — the engine, the bash adopter, `map_extractors.py`'s `lexicon-verbs` inventory, and the two
 `drift-audit` signals — and every one of them reaches it through this reader: the bash side calls
 `--print-verbs`, and both Python consumers `sys.path`-insert the kit rather than growing a parser. The grammar is the sibling
 `KEY=VALUE` form PLUS indented block keys, because a closed verb table with prose meanings cannot fit
 a line-based conf and `map_lib.load_conf()` has no multi-line support.
 
-That reader now also decides WHICH LANGUAGES ARE ARMED, which moved a seam. `PATTERN_SETS` in
-`lexicon.py` used to be the whole answer, and it sits in an `engine`-role file an upgrade
-overwrites — so an adopter with Go or C# has no shipped extractor to reach for, and TypeScript was
-in that list until `TOOL-aGradedDialect-3` shipped `ts-tokens` and `tsx-tokens` as declared
-extensions of their own.
-A `PATTERNS:` block in the declaration now carries `<pattern-set-id>.<part>` rows, and
+That reader also decides WHICH LANGUAGES ARE ARMED. `PATTERN_SETS` in `lexicon.py` sits in an
+`engine`-role file an upgrade overwrites, so an adopter with a language it lacks has no shipped
+extractor to reach for. A `PATTERNS:` block in the declaration carries `<pattern-set-id>.<part>` rows, and
 `resolve_pattern_sets` merges them over the shipped constant PER KEY into a new mapping that every
 reader takes: the engine's one corpus walk, the coverage fraction, the scaffold's measured pins, and
 `drift-audit`'s two lexicon signals. The shipped constant is never mutated — `selftest.py` compares
 its frozen sentinels against it to prove every SHIPPED set has a fixture, so shipped and resolved
-have to stay two names. The two out-of-kit read sites are the reason this is a seam and not a
-detail: both tested membership against the shipped constant and skipped, so a declared language was
-passed over file by file while each signal reported a clean number with `live` still true.
-TOOL-aSurfacedLexicon-9.
+have to stay two names. The two out-of-kit read sites are why this is a seam: testing membership
+against the shipped constant passes a declared language over while each signal reports a clean
+number with `live` still true. TOOL-aSurfacedLexicon-9.
 
 `tools/lexicon/subtokens.py` is a PORT of `map_lib.subtokens()`, not an import, and the direction of
 truth is deliberate: the lexicon owns its copy so the kit ships self-contained and an adopter taking
@@ -234,43 +208,19 @@ cost on the adopter corpus, is `parse_ts_source`'s header; a third accessor take
   code that justified it: expansion is one-way, and there is no contraction verb. Wiring
   the table into the `codebase-map` ratchet and the `drift-audit` signal set is `TOOL-dClosedLexicon-2`,
   which is CLOSED and whose wiring is LIVE: `memory/map/generated/inventories.json` carries the
-  `lexicon-verbs` inventory and `tools/drift-audit/drift_report.py` carries the signals. This line
-  said BLOCKED on a parked scope fork until `TOOL-aSurfacedLexicon-12` read the three carriers of
-  that unit's status against each other and against the tree.
+  `lexicon-verbs` inventory and `tools/drift-audit/drift_report.py` carries the signals.
 - **No `memory/gotchas/` class for naming violations.** Companion §7 requires a failing case OBSERVED
   before a gate lands, and a class authored ahead of its first instance is the gate-discipline error
   this repo names. The first confirmed P1 or P2 finding becomes one.
-- **P3 RESOLVED an import to candidate PATHS and was never a full module resolver — history, not a
-  live gap.** It tried the dotted-namespace-as-path reading, the last segment as a module stem
-  against the tracked corpus, and relative specifiers normalised against the importer's directory. It
-  did NOT follow build-tool path aliases, `package.json` `exports` maps, or re-export barrels, so an
-  aliased import into a forbidden layer was never caught. The version before that compared the raw
-  namespace against a path glob and was structurally incapable: the first real rule declared — naming
-  a HYPHENATED directory no module name can contain — could never match, and P3 reported an
-  unfalsifiable 0. `check_self_containment` inherits none of this, because it resolves nothing: it
-  reads an import's top-level name and asks whether a `.py` file of that name sits beside the engine.
-  What it inherits instead is a narrower reach — it judges the KIT's own directory and no other
-  population, which is the whole of what the deleted rule was ever relied on for.
-- **P3 TOOK three adversarial rounds and four blockers to get right, all in two helper functions,
-  and that is the finding this kit paid for.** Every one lived in `_glob_match` or `resolve_import`,
-  and none was visible to an end-to-end fixture — reverting the `_glob_match` rewrite verbatim left
-  all 48 fixture arms green while the live gate stayed at exit 0. The last two were a `<dir>/*` glob
-  whose earlier wildcard was escaped literally, so nesting stopped below depth 1, and importer-local
-  precedence applied to fully-qualified dotted imports where the language grants none. Both were
-  fixed, each pinned by a CASE TABLE row keyed to its defect, and all of it was deleted with the
-  predicate by `TOOL-aSurfacedLexicon-2` — 164 engine lines and 29 arms for one declared rule whose
-  pin never left `"0"`. The transferable finding survives the code: a predicate's correctness
-  concentrates in its helpers and fixtures do not reach them, so a predicate that NEEDS helpers is
-  buying a maintenance surface. The replacement refusal has none, which is the argument for its
-  shape. P1, P2 and the placeholder gate were never implicated.
-- **Both halves of this bullet are SUPERSEDED, and it is rewritten rather than trimmed because it
-  carried two dead premises in one sentence.** It read "the benefit is unmeasurable by construction,
-  which is why the kit is opt-in and why the retirement condition is written down: retire P1 if it
-  goes unused across two adopters." `TOOL-dScaffoldedMirror-17` kills the first — `drift-audit`'s
-  `lexicon_marginal_offense_rate` measures offenders-added per definition-added between the
-  declaration's adoption commit and HEAD, both operands derived by this kit's own extractor.
-  `TOOL-dScaffoldedMirror-16` kills the second: F4 is superseded, P1 stays and is strengthened, and
-  no later session may close it on that condition. Opt-in survives; the REASON for it does not.
+- **`check_self_containment` resolves nothing, so its reach is narrow.** It reads an import's
+  top-level name and asks whether a `.py` file of that name sits beside the engine: it judges the
+  KIT's own directory and no other population, and follows no path alias, `exports` map or barrel.
+- **A predicate's correctness concentrates in its helpers, and end-to-end fixtures do not reach
+  them** — the finding `TOOL-aSurfacedLexicon-2` recorded when it deleted the layers predicate. A
+  predicate that NEEDS helpers buys a maintenance surface; the replacement refusal has none.
+- **Opt-in has no retirement condition.** `lexicon_marginal_offense_rate` measures offenders-added
+  per definition-added between the declaration's adoption commit and HEAD, both operands derived by
+  this kit's own extractor (`TOOL-dScaffoldedMirror-17`), and P1 stays (`TOOL-dScaffoldedMirror-16`).
 
 ## Reuse affordance
 

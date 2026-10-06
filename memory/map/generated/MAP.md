@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 124 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 95 · guides: 9 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 125 · kits: 17 · git-hooks: 4 · harness-hooks: 10 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 95 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -127,6 +127,7 @@ Inventories: gate-legs: 124 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 
 | `transition-audit arms` | memory-tree-hygiene |
 | `unattended kit gate` | unattended |
 | `unattended protocol size` | unattended |
+| `unattended skill size` | unattended |
 | `unattended skill wiring` | unattended |
 | `unattended-build self-test` | review-harnesses |
 | `verdict epoch (kit version dates the engine)` | memory-tree-hygiene |
@@ -162,12 +163,24 @@ Inventories: gate-legs: 124 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 
 | key | claimant |
 |---|---|
 | `commit-msg` | memory-tree-hygiene |
-| `gate-env.sh` | foundation |
 | `pre-commit` | baseline |
 | `pre-push` | baseline |
 | `pre-rebase` | memory-tree-hygiene |
-| `pre_push_bar_selftest.py` | run-gates |
-| `straggler-guard.sh` | memory-tree-hygiene |
+
+## harness-hooks
+
+| key | claimant |
+|---|---|
+| `PostToolUse tools/memory-recall/recall-opened.js` | memory-recall |
+| `PostToolUse tools/process-monitor/procmon-hook.js` | process-monitor |
+| `PreToolUse tools/hooks/agent-cap.js` | agent-cap |
+| `PreToolUse tools/hooks/scratch-guard.js` | agent-cap |
+| `PreToolUse tools/unattended/gate-guard.js` | unattended |
+| `SessionStart skills/session-kickoff/manifest-check.sh` | session-kickoff |
+| `SessionStart tools/check-wiring.sh` | foundation |
+| `SessionStart tools/process-monitor/procmon-hook.js` | process-monitor |
+| `Stop tools/unattended/stop-guard.js` | unattended |
+| `StopFailure tools/unattended/stall-recorder.js` | unattended |
 
 ## workflow-scripts
 
@@ -308,6 +321,7 @@ Inventories: gate-legs: 124 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 
 |---|---|
 | `ANNOTATION-STYLE.md` | annotation-style |
 | `BUILD-METHOD.md` | build-method |
+| `MERGE-BAR.md` | run-gates |
 | `PLAYBOOK-TEMPLATE.md` | playbook-mode |
 | `REVIEW-PROTOCOL.md` | agent-cap |
 | `SESSION-KICKOFF.md` | session-kickoff |

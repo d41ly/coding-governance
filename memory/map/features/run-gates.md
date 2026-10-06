@@ -15,7 +15,8 @@ gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring"
   "leg ceilings clear their evidenced maximum", "run-gates run-log line",
   "receipt sync (installed files match the receipt)", "pre-push bar self-test"]
 kits = ["run-gates"]
-git-hooks = ["pre_push_bar_selftest.py"]
+git-hooks = []
+harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -31,11 +32,12 @@ gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md",
   "signal-trap-runs-the-exit-handler-twice.md",
   "async-job-starts-with-sigint-ignored.md",
   "decision-re-derived-by-a-second-process.md"]
-guides = []
+guides = ["MERGE-BAR.md"]
 backlog-shards = []
 lexicon-verbs = []
 [paths]
 globs = [
+  ".githooks/pre_push_bar_selftest.py",
   "tools/run-gates/run-gates.sh",
   "tools/run-gates/run-selftests.sh",
   "tools/run-gates/lib-attribute.sh",
@@ -65,12 +67,10 @@ globs = [
 `<git-dir>/gate-run/<run-id>/` — a header before dispatch, one TSV row and one redacted output copy
 per leg, a verdict last — and the verdict's ABSENCE is the crash signal. The `.rc` completion file
 deliberately stays in the `mktemp -d` scratch. It is the DISPATCH SUPPRESSOR: the loop skips any leg
-that already has one, so a leftover makes the runner skip a leg and print it green. The unit's spec
-asked for it to move into the record and its own reasoning argued the other way; the arm found the
-disagreement. A scratch name nothing outside the process can predict cannot be planted, while a run
-directory has a nameable path and the runner accepts a pinned id through `GATE_RUN_ID`. Measured:
-with the suppressor in the record, a planted `<i>.rc` suppressed its leg and the run reported the
-plant's verdict as the leg's own. A pin names ONE run: the runner drops `GATE_RUN_ID` from its
+that already has one, so a leftover makes the runner skip a leg and print it green. A scratch name
+nothing outside the process can predict cannot be planted, while a run directory has a nameable path
+and the runner accepts a pinned id through `GATE_RUN_ID`: in the record, a planted `<i>.rc` would
+suppress its leg and the run would report the plant's verdict as the leg's own. A pin names ONE run: the runner drops `GATE_RUN_ID` from its
 environment once read, because the pre-push hook exports one and every leg would otherwise inherit
 it, and a nested runner a leg starts would reuse one directory for every bar (TOOL-dLoggedFlight-4).
 
@@ -83,20 +83,16 @@ is one stderr line that moves neither the exit code nor stdout, and `GOV_RUNLOG=
 suite launches the INT bar through `timeout`, because an `&` job starts with SIGINT ignored and bash
 cannot trap it, the class `async-job-starts-with-sigint-ignored`. `TOOL-dLoggedFlight-3`.
 
-**One store, because the second reader was the one that would have broken.** `gate-ledger.tsv`
-REPLACED `gate-timings.tsv` rather than sitting beside it, and field 2 is still the duration so the
-runner's dispatch parser needed no edit. The reason it could not simply be added is `profile_bar.py`,
-which snapshots the store's mtime before and after a run and REFUSES when it did not move: a runner
-that silently stopped writing the old path would not have degraded the profiler, it would have made
-it refuse on every invocation, turning `profile-bar selftest` into a leg whose subject can no longer
-run.
+**One store, because a second would break its other reader.** `gate-ledger.tsv` is the only timing
+store, and its field 2 is the duration the runner's dispatch parser reads. `profile_bar.py` snapshots
+the store's mtime around a run and REFUSES when it did not move, so a runner that wrote a second path
+instead would make `profile-bar selftest` refuse on every invocation.
 
-**CLEAN means porcelain EMPTY, untracked included.** The full-green stamp's five preconditions are
-what make its name true, and this is the one a reader gets wrong: `git diff --quiet` is blind to an
-untracked file, so an implementation using it stamps a green over a tree with a `??` line — and the
-recorded digest then has a non-empty porcelain component that the at-a-rev fingerprint form cannot
-reproduce at any sha, which forces the full bar forever while printing that the record describes a
-different tree. Safe, permanent, and it reads as caution.
+**CLEAN means porcelain EMPTY, untracked included.** Of the full-green stamp's five preconditions
+this is the one a reader gets wrong: `git diff --quiet` is blind to an untracked file, so a stamp over
+a tree with a `??` line records a porcelain component no at-a-rev fingerprint reproduces, forcing the
+full bar forever while claiming the record describes a different tree. Safe, permanent, and it reads
+as caution.
 
 **The runner owns its scratch, and a moved tree is its own exit.** `WORK` is a named `gate-work.*`
 dir under the ambient `TMPDIR` with an `owner` record (pid, common dir, epoch), and every leg's
@@ -104,8 +100,8 @@ dir under the ambient `TMPDIR` with an `owner` record (pid, common dir, epoch), 
 only this repository's, and never a dir whose owner it cannot read. `TMPDIR entries <n>` prints the
 ambient count once per bar. A relatively started runner re-execs through its absolute path so the
 process-monitor fence can attribute it. A bar over a tree that moved exits 3, `TREE MOVED`, unless a
-leg failed, which stays RED and names the move. Two readers compare whole outputs, the canary's width
-arm and the run-log suite's failed-append arm, so both keep the new count line stable.
+leg failed, which stays RED and names the move. The canary's width arm and the run-log suite's
+failed-append arm compare whole outputs, so both keep the count line stable.
 `TOOL-dDerivedDocket-25`.
 
 **A fired ceiling is deferred, not failed, and exit 0 needs a written verdict.** `check_ceiling_fired`,
@@ -119,25 +115,21 @@ empty manifest and an unwritten verdict file are REFUSED, and the pre-push hook 
 after every exit 0. Two whole-output readers filter the timestamped `gate queue: acquired` line.
 `TOOL-dDerivedDocket-26`.
 
-**Exactly one leg is impure, and it is the gate rather than a self-test.** Seven of the 86 legs name
-a network verb in their own script; six build their origin under `mktemp -d`. The seventh,
-`unattended kit gate`, runs `ls-remote` against the real remote and fails closed, so its verdict is a
-function of the remote as well as of the tree. That is the population the `impure` key declares —
-measured 2026-08-20, and both the "all four unattended legs" guess and the "none of them" reading
-were wrong.
+**Exactly one leg is impure, and it is the gate rather than a self-test.** `unattended kit gate`
+runs `ls-remote` against the real remote and fails closed, so its verdict is a function of the remote
+as well as of the tree; every other leg naming a network verb builds its origin under `mktemp -d`.
+That is the population the `impure` key declares, as `TOOL-aPacedTurnstile-5` measured.
 
 
 **The leg manifest is the kit dir's SIBLING, derived and never spelled.** `<prefix>/gate-legs.json`,
 computed from the runner's own location. A hardcoded `tools/gate-legs.json` resolves to nothing at any
-other install prefix, and this is a kit whose whole point is that it installs somewhere else.
-`GATE_LEGS` outranks the derivation, and that seam is what both harnesses drive so a nested run never
-re-enters the real bar.
+other install prefix, which is where this kit installs. `GATE_LEGS` outranks the derivation, so a
+harness's nested run never re-enters the real bar.
 
 **One leg here grades the DEPLOYER's work rather than the runner's.** `receipt sync` reads
 `.governance/install.json` and reds when an engine row's file is missing or no longer hashes to its
-recorded sha256. It lives in this kit because that is the kit every adopter installs, and it exists
-because the reader that already answers this question needs a gov checkout beside the target and so
-can never run on an adopter's own bar. It is the INTEGRITY arm alone — no `source`, `commit` or
+recorded sha256. It lives here because every adopter installs this kit; the reader that already
+answers the question needs a gov checkout beside the target, so it never runs on an adopter's bar. It is the INTEGRITY arm alone — no `source`, `commit` or
 `gov_oid`, which resolve only against gov's blobs, and no `seed`, `merged`, `attributes` or `forked`
 row. In THIS repository it always takes its announced-skip path, because there is no receipt here, so
 its four built-in fixture arms are the only part of it any gov bar grades. TOOL-cMendedVintage-6.
@@ -146,44 +138,41 @@ its four built-in fixture arms are the only part of it any gov bar grades. TOOL-
 emitted from the selected kits' `[[gate_leg]]` blocks; seeding an adopter with gov's leg names is
 `memory/gotchas/pin-copied-from-another-corpus.md`. So `run-gates.test.sh` SHIPS and asserts only what
 is true in any tree, while `run-gates.gov.test.sh` takes every arm keyed on this repo's corpus and is
-withheld from the payload by a `project-owned` rule — the same mechanism, and the same stated reason,
-as the memory-recall kit's recall-floor split. The gov-only file is a leg on gov's bar and an
+withheld from the payload by a `project-owned` rule, as the memory-recall kit's recall-floor split
+is. The gov-only file is a leg on gov's bar and an
 `[[exempt_leg]]` row in the registry; it is deliberately NOT a `[[gate_leg]]` in `kit.toml`, because a
 descriptor row naming a leg a target's manifest cannot carry is exactly what reds the deployer's
 selfcheck.
 
 **The gov-only harness REFUSES rather than passing on a foreign corpus.** It asserts a witness leg
-name and exits 2 when the manifest is not gov's. A gov-only harness that quietly succeeds elsewhere is
-the split failing open: every arm inside it would pass by finding nothing, and the next unit to add one
-would inherit a green that means nothing.
+name and exits 2 when the manifest is not gov's. Passing quietly elsewhere is the split failing
+open: every arm inside would pass by finding nothing.
 
 **Membership is decided by GIT IDENTITY, never by comparing path strings.** The adopter asks git for
 the toplevel from inside the kit dir and from inside the target, and compares those two answers.
 Under MSYS one directory has two spellings — a `/tmp/...` mount and the `/c/Users/.../Temp/...` it
 resolves to — and mount points are not symlinks, so a prefix strip across the two reports a kit
-sitting INSIDE the target as being outside it. Measured: that refusal fired against a scratch target
-the kit's own e2e had just built around it.
+sitting INSIDE the target as being outside it.
 
 **The report tail is a two-space contract.** `<verb>  <leg name>  <tail>` on every verb, so a reader
-splits the remainder on a double space and recovers the bare leg name. A single space returned a
-truncated name for any leg whose name contains one, which is most of them, and the deployer reads a
-target's verdicts exactly that way. The gov-only canary forbids a double space inside a leg NAME,
+splits the remainder on a double space and recovers the bare leg name. A single space truncates any
+leg name containing one, and the deployer reads a target's verdicts exactly that way. The gov-only canary forbids a double space inside a leg NAME,
 which is what makes the split unambiguous rather than usually right.
 
 **The pool's knobs are DECLARED, and no knob may make the bar check less.** `gate-profiles.txt`
 maps detected cores and RAM to a named row; the FIRST row satisfying both thresholds wins and the
 last row is a zero-threshold catch-all, so unknown hardware is matched rather than special-cased.
-Cores alone were the wrong question — each heavy leg builds its own scratch repo, so a 16-core / 8 GB
-box used to select width 8 and thrash. The invariant is that a knob may cost SPEED or convert a hang
-into a bounded RED, never turn a leg into a pass or a skip — and the BOUND is on the clock as well as
-on the verdict, which cost a blocker to learn: a leg captured through a command substitution keeps
+Cores alone are the wrong question: each heavy leg builds its own scratch repo, so a many-core box
+with little RAM thrashes at full width. A knob may cost SPEED or convert a hang into a bounded RED,
+never turn a leg into a pass or a skip — and the BOUND is on the clock as well as on the verdict: a
+leg captured through a command substitution keeps
 the worker blocked until the last inherited write end closes, so an orphan defeats the timeout while
 `timeout` still reports 124. Capture through a file, and grade the elapsed time against an untimed
 control rather than against the message; the runner declares the implemented set
 and the shipped canary PINS the same set separately, so a new knob reds until an author edits the pin
 and reads the rule. An ABSENT table falls back to the built-in formula and is the documented
 rollback; a MALFORMED one refuses, because a silently ignored knob is a knob the operator believes
-they set. Matching NOTHING is a refusal too, and deliberately not the same state as absent.
+they set. Matching NOTHING refuses too, a state distinct from absent.
 
 **`--check` is the join nothing else asserts.** A target's `[gate_runner]` declaration names the line
 heads the deployer matches to read verdicts; those heads are strings in the runner's own `printf`
@@ -192,10 +181,9 @@ ran nothing — silently, because "no lines matched" and "no legs ran" are one o
 
 **A held suite's verdict is ATTRIBUTED, not absolute.** `run-selftests.sh --attribute <R>` runs each
 selected suite at the working tree AND at R's own copy of it, in a detached worktree under the git
-common dir, and reports NEW, INHERITED and FIXED sets of normalised FAIL lines. It exists because
-several suites in the declared population are red at any base for causes filed against other units,
-so the bare GREEN the compensating-check wording used to demand named a state nobody could reach,
-and the red it produced instead was not about the change being graded. Exit 1 is a NEW FAIL, a DEAD
+common dir, and reports NEW, INHERITED and FIXED sets of normalised FAIL lines, because a suite can
+be red at any base for causes filed against other units, so a bare GREEN names a state nobody can
+reach. Exit 1 is a NEW FAIL, a DEAD
 PROBE at L or an L-side OVER BUDGET, and never an inherited one; consumers read the `verdict clean`
 token on the summary line and never the NEW count alone. SETS AND NOT COUNTS, because a failure this
 tree fixed plus one it introduced nets to zero. A dead side has no members, so everything at L over
@@ -224,16 +212,14 @@ world moved past is indistinguishable from one nobody measured. `TOOL-dDerivedDo
 **The inlined `resolve_python` block.** Between the `>>> resolve_python` / `<<< resolve_python`
 markers in the runner and in both shipped harnesses, byte-identical to
 `tools/lib/resolve-python.sh`. The parity gate derives its copy population by GREPPING for that
-opening marker, so pasting the block enrols a new copy automatically — no table row, no gate edit.
+opening marker, so pasting the block enrols a new copy with no table row or gate edit.
 
-**The `GATE_LEGS` seam.** The one override that lets any harness drive the real runner against a
-fixture manifest. Without it the only way to exercise the runner is to invoke it against the repo,
-which re-runs the whole bar recursively and clobbers the live summary mid-run.
+**The `GATE_LEGS` seam.** Without it the only way to exercise the runner is against the repo, which
+re-runs the whole bar recursively and clobbers the live summary mid-run.
 
 **The manifest derivation.** Four lines carried identically by the runner and both harnesses, and the
-gov-only canary asserts that identity as SOURCE PARITY rather than by recomputing it — an earlier
-draft of that arm recomputed and compared two answers, which is `two-answers-to-one-question` inside
-the arm written to prevent it, and it duly disagreed with itself.
+gov-only canary asserts that identity as SOURCE PARITY rather than by recomputing it, which would be
+`two-answers-to-one-question` inside the arm written to prevent it.
 
 **The `[gate_runner_seed]` table in `kit.toml`.** The seed `govkit intake` emits a target's own
 `[gate_runner]` declaration from, resolving path tokens ONLY: the runner's `{name}` placeholder passes
@@ -251,10 +237,6 @@ time; extend by adding keys the deployer resolves, leaving runner-side placehold
 
 ## Affordances
 
-- **Run the bar** — `bash tools/run-gates/run-gates.sh`; `GATE_JOBS=1` for the serial path through the
-  same code, `GATE_FULL=1` to ignore every leg guard.
-- **Drive it against a fixture** — `GATE_LEGS=<file> bash tools/run-gates/run-gates.sh`, which is how
-  every harness exercises the runner without re-entering the real bar.
 - **Check a target's declaration** — `bash tools/run-gates/adopt-run-gates.sh --check`, which reports
   NOT ADOPTED and exits 0 where no target declares one.
 
@@ -263,9 +245,8 @@ time; extend by adding keys the deployer resolves, leaving runner-side placehold
 - The shipped canary's selection arms drive a FIXTURE table they write, not `gate-profiles.txt`,
   because that file is data an adopter is expected to tune and an arm keyed on its figures would red
   on their tree while saying nothing about it. Exactly one arm reads the shipped table — the pinned
-  knob set, whose subject is that file's own content. The cost is that nothing observes a gov
-  threshold drifting away from gov's hardware; the benefit is that a malformed shipped table reds one
-  arm instead of cascading into twelve that have nothing to do with it.
+  knob set, whose subject is that file's own content. So nothing observes a gov threshold
+  drifting from gov's hardware, but a malformed shipped table reds one arm instead of cascading.
 
 - `adopt-run-gates.sh` has no WRITE path today: the `[gate_runner]` declaration is emitted by
   `govkit intake` from this kit's `[gate_runner_seed]`, because a declaration written at configure

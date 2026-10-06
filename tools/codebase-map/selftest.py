@@ -31,44 +31,8 @@ def derive_install_prefix() -> str:
 
 
 PFX = derive_install_prefix()
-# TOOL-aRepatriatedFork-46: this kit's own directory is named by the NAME it has in this install, and a
-# SIBLING kit is reached through the resolver, which reads the install receipt first.
+# TOOL-aRepatriatedFork-46: this kit's own directory is named by the NAME it has in this install.
 KIT_NAME = Path(os.path.abspath(__file__)).parent.name
-# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
-def resolve_kit_dir(home, anchor, here):
-    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
-
-    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
-       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
-       a memory-recall kit an adopter homed at `scripts/recall/`.
-    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
-    3. refuse — LookupError naming the three places looked; never a guessed prefix.
-    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
-    """
-    import json
-    import pathlib
-    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
-    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
-    receipt = root / ".governance" / "install.json"
-    try:
-        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
-    except (OSError, ValueError, AttributeError):
-        rows = []
-    for row in rows:
-        if not isinstance(row, dict) or not row.get("path"):
-            continue
-        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
-            continue
-        hit = (root / str(row["path"])).absolute()
-        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
-            return hit.parent
-    probes = (here / home, here.parent / home)
-    for cand in probes:
-        if (cand / anchor).is_file():
-            return cand
-    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
-        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
-# <<< resolve_kit_dir
 
 
 # `abspath`, NOT `resolve()`: this insert decides which path string `map_lib.__file__` carries,
@@ -80,7 +44,6 @@ sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 
 import map_lib as m  # noqa: E402
 import reuse_lookup as rl  # noqa: E402
-import map_imports as mi  # noqa: E402
 import map_diff as md  # noqa: E402
 import check_gate_coverage as cg  # noqa: E402
 
@@ -260,7 +223,7 @@ def test_clis_refuse_an_unadopted_root(tmp: Path):
     """AC2: BOTH CLIs refuse through their OWN main(). The helper being correct is not the same
     claim as the CLIs calling it — that gap is the whole defect, since neither imports the project
     layer that would otherwise fail closed for them. Each must exit 2 AND print no result: a
-    `no seam fits` or a `collision_flags: 0` on stdout is the confident-empty-answer this closes."""
+    `no seam fits` or an all-UNMAPPED digest on stdout is the confident-empty-answer this closes."""
     import contextlib
     import io
     import os
@@ -280,13 +243,22 @@ def test_clis_refuse_an_unadopted_root(tmp: Path):
         assert "refused" in err.getvalue(), err.getvalue()
         assert out.getvalue() == "", f"a shortlist was printed anyway: {out.getvalue()!r}"
 
-        _sys.argv = ["map_diff.py", "HEAD~1..HEAD", "--converge"]
+        _sys.argv = ["map_diff.py", "HEAD~1..HEAD"]
         out, err = io.StringIO(), io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
             rc = md.main()
         assert rc == 2, f"map_diff exited {rc}, not a refusal"
         assert "refused" in err.getvalue(), err.getvalue()
-        assert "collision_flags" not in out.getvalue(), out.getvalue()
+        assert out.getvalue() == "", f"a digest was printed anyway: {out.getvalue()!r}"
+
+        # TOOL-aMendedFleet-37: an unadopted root would otherwise read every dossier fresh.
+        _sys.argv = ["map_diff.py", "--stale-dossiers"]
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            rc = md.main()
+        assert rc == 2, f"map_diff --stale-dossiers exited {rc}, not a refusal"
+        assert "refused" in err.getvalue(), err.getvalue()
+        assert out.getvalue() == "", f"an answer was printed anyway: {out.getvalue()!r}"
     finally:
         _sys.argv = saved_argv
         del os.environ["CODEBASE_MAP_ROOT"]
@@ -623,6 +595,82 @@ def test_renders_round_trip_and_determinism():
     # the version marker rides both generated artifacts so the deployer can grep the installed version
     marker = "codebase-map@" + m.KIT_CODEBASE_MAP_VERSION
     assert marker in one and marker in j
+
+
+def _test_feature_cards():
+    """TOOL-aMendedFleet-43: CARDS.md renders from the fences alone, one card per dossier, each
+    within FEATURE_CARD_CAP_BYTES, and an overflowing card counts exactly what it dropped."""
+    f = m.parse_dossier(DOSSIER.replace('"x"', '"foundation"', 1), IDS, source="f")
+    plain = m.parse_dossier(DOSSIER, IDS, source="t")
+    big = m.Dossier(
+        feature="big", title="é" * 300, status="building", streams=("core",),
+        decisions=(), claims=claims(flags=("a_flag",)),
+        globs=tuple(f"src/very/long/path/number/{i:03d}/**" for i in range(60)),
+    )
+    empty = m.render_cards_md(m.MapTree(foundation=f, dossiers=(), baseline=EMPTY_BASE), IDS, "docs/map")
+    assert "# Feature cards" in empty and "\n## " not in empty, "an empty tree renders a heading only"
+    tree = m.MapTree(foundation=f, dossiers=(plain, big), baseline=EMPTY_BASE)
+    text = m.render_cards_md(tree, IDS, "docs/map")
+    permuted = m.MapTree(foundation=f, dossiers=(big, plain), baseline=EMPTY_BASE)
+    assert text == m.render_cards_md(permuted, IDS, "docs/map"), "cards must not depend on input order"
+    cards = re.split(r"(?m)^(?=## )", text)[1:]
+    assert [c.split("\n", 1)[0] for c in cards] == ["## big", "## x"], "one card per dossier, sorted, no foundation"
+    for c in cards:
+        assert len(c.encode("utf-8")) <= m.FEATURE_CARD_CAP_BYTES, f"card over the cap: {len(c.encode('utf-8'))}"
+    x = cards[1]
+    assert "dossier `docs/map/features/x.md`" in x and "- decisions 1: `REC-someSlug-1`" in x
+    assert "- flags 1: `a_flag`" in x and "routes" not in x and "- cut" not in x
+    lines = cards[0].rstrip("\n").split("\n")
+    assert lines[2].endswith("...") and len(lines[2].encode("utf-8")) <= 160, lines[2]
+    globs = next(ln for ln in lines if ln.startswith("- globs "))
+    assert globs.startswith("- globs 60: "), globs
+    shown = globs.count("`") // 2 + 1  # plus the one flags item
+    cut = re.fullmatch(r"- cut (\d+) item\(s\) to fit 1024 bytes; the dossier's toml fence lists them all", lines[-1])
+    assert cut and int(cut.group(1)) == 61 - shown, (lines[-1], shown)
+
+
+def _test_typed_counts():
+    """TOOL-aMendedFleet-44: measure_typed_counts raises a present-tense digit count of an
+    inventory noun in prose, and nothing else — every S2 clause, positive and negative."""
+    ids = ("gate-legs", "rendered-skills", "gotcha-classes")
+
+    def read_hits(text):
+        return [mt for _, mt in m.measure_typed_counts(text, ids)[0]]
+
+    positives = {
+        "Seven of the 86 legs name a network verb.": ["86 legs"],
+        "The bar runs 124 gate legs.": ["124 gate legs"],
+        "It holds 1 leg.": ["1 leg"],
+        "There are 9 classes and 3 inventory keys.": ["9 classes", "3 inventory keys"],
+        "Three of the 27 dossiers remain.": ["27 dossiers"],
+        "It ships 4 rendered skills.": ["4 rendered skills"],
+        "one\n\nThe bar runs 12\ngate legs; it ran 5 legs on 2026-01-01.": ["12 gate legs"],
+    }
+    for text, want in positives.items():
+        assert read_hits(text) == want, (text, read_hits(text))
+    negatives = (
+        "see the §7 leg line",
+        "Check 42 grades the wall, 43 the Skill's hold routing.",
+        "a code span holding `86 legs` here.",
+        "before\n\n```\n86 legs\n```\n\nafter",
+        "~~~\n86 legs\n~~~",
+        "issue #12 legs, path a/12 legs, v1.12 legs, x-12 legs, a12 legs",
+        "86 of those legs",
+        "two legs and 123456 legs",
+        "The bar runs 124 legs, measured at base.",
+        "It ran 124 legs at `abc1234`.",
+        "node a counts 124 legs.",
+        "124 legs, PINNED.",
+        "124 legs at review.",
+        "124 legs on the day.",
+        "There were 124 legs.",
+    )
+    for text in negatives:
+        assert read_hits(text) == [], (text, read_hits(text))
+    found, frozen = m.measure_typed_counts("A 3 legs read. B 4 legs.", ids)
+    assert [h[1] for h in found] == ["4 legs"] and frozen == 1, (found, frozen)
+    assert m.measure_typed_counts("line\n\nnext\n9 legs", ids)[0] == [(4, "9 legs")]
+    assert m.measure_typed_counts("", ids) == ([], 0)
 
 
 def test_conf_grammar(tmp: Path):
@@ -984,17 +1032,56 @@ def test_seed_affordances(tmp: Path):
         worklist = rl.seed_affordances(corpus, ref, 10)
         # slugify EXCLUDED (already declares a seam) despite fan-in 5; Cache EXCLUDED (fan-in 1 < 3);
         # ranked by fan-in desc.
-        assert [c.name for c, _ in worklist] == ["titlecase", "truncate"], worklist
-        assert [fi for _, fi in worklist] == [4, 3]
-        assert all(c.name != "slugify" for c, _ in worklist)  # nothing already declared
+        assert [c.name for c, _, _ in worklist] == ["titlecase", "truncate"], worklist
+        assert [fi for _, fi, _ in worklist] == [4, 3]
+        assert all(c.name != "slugify" for c, _, _ in worklist)  # nothing already declared
         # --top cap: only the single highest-fan-in undeclared seam
-        assert [c.name for c, _ in rl.seed_affordances(corpus, ref, 1)] == ["titlecase"]
+        assert [c.name for c, _, _ in rl.seed_affordances(corpus, ref, 1)] == ["titlecase"]
+        # TOOL-aMendedFleet-42 S3: installs lift a below-threshold symbol onto the worklist, by the
+        # same fan-in + installs test the lookup applies.
+        corpus.installs = {"Cache": {"x/one.sh", "x/two.sh"}}
+        lifted = {c.name: (fi, n) for c, fi, n in rl.seed_affordances(corpus, ref, 10)}
+        assert lifted.get("Cache") == (1, 2), lifted
     finally:
         del os.environ["CODEBASE_MAP_ROOT"]
 
 
+def _test_install_sites(tmp: Path):
+    """TOOL-aMendedFleet-42 S1/S2: two carriers of one canonical-copy marker are two installs, and
+    the file the marker names as its canonical copy is the SOURCE and is left out. Staged red by
+    counting the source: the count is then three. A candidate at fan-in 1 with two installs is a
+    SEAM at threshold 3, and its line prints `installs 2`."""
+    import subprocess
+    marker = "# >>> helper -- canonical copy: helper.py in the src dir (byte-identical; gated)\n"
+    (tmp / "src").mkdir()
+    (tmp / "src" / "helper.py").write_text(marker + "def helper():\n    pass\n", encoding="utf-8")
+    (tmp / "a.sh").write_text("cat <<'EOF'\n" + marker + "EOF\n", encoding="utf-8")
+    (tmp / "b.js").write_text("  // >>> helper -- canonical copy: helper.py\n", encoding="utf-8")
+    (tmp / "untracked.sh").write_text(marker, encoding="utf-8")
+    subprocess.run(["git", "-c", "init.defaultBranch=main", "init", "-q", str(tmp)],
+                   check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(tmp), "add", "src/helper.py", "a.sh", "b.js"],
+                   check=True, capture_output=True)
+    sites, why = m._scan_install_sites(tmp)
+    assert why == "", why
+    assert sites == {"helper": {"a.sh", "b.js"}}, sites  # source and untracked file left out
+
+    corpus = rl.Corpus(candidates={}, shared_seams={}, symbol_files=[], threshold=3,
+                       installs=sites)
+    pool = {"helper": rl.Candidate("helper", ("symbol",), "function", ("src/helper.py",))}
+    r = rl._rank(pool, corpus, {"helper": {"src/helper.py", "c.py"}}, "helper", True, "name stem")
+    assert (r.fanin, r.installs, r.is_seam) == (1, 2, True), r
+    assert "fan-in 1 | installs 2 | SEAM" in rl._line(r, corpus), rl._line(r, corpus)
+
+    # an empty scan carries its reason, never a silent zero
+    (tmp / "a.sh").write_text("nothing\n", encoding="utf-8")
+    (tmp / "b.js").write_text("nothing\n", encoding="utf-8")
+    sites, why = m._scan_install_sites(tmp)
+    assert sites == {} and why, (sites, why)
+
+
 def test_reuse_shared_primitives(tmp: Path):
-    # --- tokenizer + crude stemmer: the one "shares a token stem" definition (S3 recall / S5 collision)
+    # --- tokenizer + crude stemmer: the one "shares a token stem" definition (S3 recall)
     assert m.subtokens("getUserID") == ["get", "user", "id"]
     assert m.subtokens("api/x/route.ts") == ["api", "x", "route", "ts"]
     assert m.subtokens("a_flag") == ["a", "flag"]
@@ -1100,7 +1187,7 @@ def test_lookup_row_carries_sources(tmp: Path):
         assert labelled <= set(paths), f"showed a source the log dropped: {labelled - set(paths)}"
         # (b) the row carries both fields, and n_shown keeps its OLD meaning -- the ranked count,
         #     which is a different number from the path count.
-        rl.write_lookup(m.repo_root(), "q", len(sl.ranked), paths)
+        rl.write_lookup(m.repo_root(), "q", len(sl.ranked), paths, 0)
         log = rl._resolve_git_dir(m.repo_root()) / "codebase-map" / "lookups.jsonl"
         row = json.loads(log.read_text(encoding="utf-8").strip().splitlines()[-1])
         assert row["n_shown"] == len(sl.ranked), row
@@ -1110,7 +1197,7 @@ def test_lookup_row_carries_sources(tmp: Path):
         # (c) THE CAP, exercised rather than assumed: n_sources records the pre-cap count, so a
         #     truncated list is visible AS truncated. Without this the cap is a constant nothing reads.
         many = [f"src/f{i}.py" for i in range(rl.SOURCE_PATHS_CAP + 7)]
-        rl.write_lookup(m.repo_root(), "q2", 999, many)
+        rl.write_lookup(m.repo_root(), "q2", 999, many, 0)
         row = json.loads(log.read_text(encoding="utf-8").strip().splitlines()[-1])
         assert len(row["shown_paths"]) == rl.SOURCE_PATHS_CAP, len(row["shown_paths"])
         assert row["n_sources"] == len(many), row["n_sources"]
@@ -1132,7 +1219,7 @@ def test_lookup_row_carries_sources(tmp: Path):
         #     pointed at a tree with no git dir at all, which is the real resolution failure.
         nogit = tmp / "nogit"
         nogit.mkdir()
-        rl.write_lookup(nogit, "q3", 1, ["src/text.py"])  # must not raise
+        rl.write_lookup(nogit, "q3", 1, ["src/text.py"], 0)  # must not raise
         assert not list(nogit.rglob("lookups.jsonl")), "wrote a row with no git dir to write into"
     finally:
         os.environ.pop("CODEBASE_MAP_ROOT", None)
@@ -1360,144 +1447,29 @@ def test_reuse_lookup(tmp: Path):
         del os.environ["CODEBASE_MAP_ROOT"]
 
 
-def test_detect_collisions_and_backlog(tmp: Path):
-    """AC4: on a range that adds `slugify2` (stem-colliding with the high-fan-in `slugify` seam,
-    no new edge to it) the closing loop emits ONE collision_flag; a symbol that WIRES THROUGH its
-    seam, one whose seam is below threshold, one of a different kind, and one unrelated do NOT
-    flag; the backlog dedupes by (new, resembles); and new_clones is a clone-ratchet count, NOT
-    dead_exports/affordance_coverage_%. Pure core — the git-range extraction is thin glue tested
-    by the scratchpad fixture in the build report."""
-    # base seams (present at range base). Constructed reference index -> exact fan-in per seam
-    # (the fan_in math itself is proven in test_reuse_shared_primitives; this pins collision logic).
-    base = [
-        {"id": "slugify", "kind": "function", "file": "src/text.py"},        # reinvented (fan-in 3)
-        {"id": "fetchGateway", "kind": "function", "file": "src/gw.py"},     # wired-through (fan-in 3)
-        {"id": "parseThing", "kind": "function", "file": "src/parse.py"},    # below threshold (fan-in 1)
-        {"id": "Money", "kind": "class", "file": "src/money.py"},            # a class (kind mismatch)
-    ]
-    ref = {
-        "slugify": {"src/a.py", "src/b.py", "src/c.py", "src/text.py"},      # fan-in 3
-        "fetchGateway": {"src/d.py", "src/e.py", "src/f.py", "src/gw.py"},   # fan-in 3
-        "parseThing": {"src/g.py", "src/parse.py"},                          # fan-in 1 < threshold
-        "Money": {"src/money.py"},                                           # fan-in 0
-    }
-    new = [
-        {"id": "slugify2", "kind": "function", "file": "src/new1.py"},       # collides slugify, NOT wired -> FLAG
-        {"id": "retryGateway", "kind": "function", "file": "src/new2.py"},   # collides fetchGateway, WIRES through
-        {"id": "parseWidget", "kind": "function", "file": "src/new3.py"},    # collides parseThing, but it's < threshold
-        {"id": "moneyBag", "kind": "function", "file": "src/new4.py"},       # stem 'money' but Money is a CLASS
-        {"id": "helper", "kind": "function", "file": "src/new5.py"},         # unrelated -> no shared stem
-    ]
-    # the range wires through fetchGateway (new2 references it) — an edge added -> not reinvention;
-    # slugify has NO edge added in the range -> slugify2 is reinvention.
-    range_index = {"fetchGateway": {"src/new2.py"}}
-    # S1 — the definer map `detect_collisions` no longer derives. Built from base + new the way
-    # `map_diff` builds it from head rows; `slugify` is deliberately CO-DEFINED so the arm below
-    # exercises the multi-definer subtraction rather than the one-path case.
-    definers = {r["id"]: frozenset({r["file"]}) for r in base + new}
-    flags = m.detect_collisions(new, base, ref, range_index, threshold=3, definers=definers)
-    assert [f.new for f in flags] == ["slugify2"], flags               # exactly one collision
-    only = flags[0]
-    assert only.resembles == "slugify" and only.file == "src/new1.py" and only.fanin == 3
-    assert only.kind == "function" and only.confidence == "medium"     # no affordance declared -> medium
-    # F8c: when the seam DECLARES an affordance, confidence rises to high.
-    hi = m.detect_collisions(new, base, ref, range_index, threshold=3, definers=definers, affordance_seams=frozenset({"slugify"}))
-    assert hi[0].confidence == "high"
-    # retryGateway stays clean ONLY because the range wired through fetchGateway — drop that edge and
-    # it flags, proving the reference-edge check is load-bearing (not dead code). parseWidget/moneyBag
-    # stay clean regardless (below-threshold seam / kind mismatch).
-    flagged_names = {f.new for f in m.detect_collisions(new, base, ref, {}, threshold=3, definers=definers)}
-    assert flagged_names == {"slugify2", "retryGateway"}, flagged_names
-    # KEYSTONE regression: a SAME-NAME reinvention (new `slugify` in another file) whose only
-    # occurrence of the id in the range is its OWN definition must FLAG — a same-id row's
-    # self-mention is never a wire-through edge to the same-named seam (else the most blatant
-    # duplicate passes clean).
-    dup = m.detect_collisions(
-        [{"id": "slugify", "kind": "function", "file": "src/dup.py"}],
-        base, ref, {"slugify": {"src/dup.py"}}, threshold=3, definers=definers,
-    )
-    assert [f.new for f in dup] == ["slugify"], dup
-    # control: a RENAMED symbol whose own file genuinely references the seam is a wire-through -> clean.
-    wired = m.detect_collisions(
-        [{"id": "slugify2", "kind": "function", "file": "src/new1.py"}],
-        base, ref, {"slugify": {"src/new1.py"}}, threshold=3, definers=definers,
-    )
-    assert wired == [], wired
-    # control: the SAME rename with an edge from an UNRELATED file (not new1.py) still FLAGS —
-    # the wire-through is scoped to the new symbol's own file, not the whole range.
-    masked = m.detect_collisions(
-        [{"id": "slugify2", "kind": "function", "file": "src/new1.py"}],
-        base, ref, {"slugify": {"src/z.py"}}, threshold=3, definers=definers,
-    )
-    assert [f.new for f in masked] == ["slugify2"], masked
-
-    # --- backlog: seeded header, append, dedup by (new, resembles) --------------------------------
-    text0, added0 = m.append_backlog("", flags)
-    assert added0 and "| slugify2 | slugify |" in text0 and text0.startswith("# Reinvention backlog")
-    assert m.backlog_keys(text0) == {("slugify2", "slugify")}
-    text1, added1 = m.append_backlog(text0, flags)          # re-run same range -> nothing new
-    assert added1 == [] and text1 == text0
-    more = [m.CollisionFlag("slugify3", "slugify", "src/t3.py", 3, "function", "medium")]
-    text2, added2 = m.append_backlog(text0, more)           # a different `new` -> a new row
-    assert [a.new for a in added2] == ["slugify3"]
-    assert m.backlog_keys(text2) == {("slugify2", "slugify"), ("slugify3", "slugify")}
-
-
-def test_new_clones_reader(tmp: Path):
-    """new_clones is the adopted clone-ratchet's count (int), null when no clone kit is wired, and
-    folding a duplicate drops it — NEVER dead_exports/affordance_coverage_% (the demoted hints)."""
-    import map_diff as md
-
-    assert md._new_clones(tmp, {}) is None                                  # no CLONE_COUNT_FILE -> null
-    conf = {"CLONE_COUNT_FILE": "clones.txt"}
-    assert md._new_clones(tmp, conf) is None                                # configured but absent -> null
-    (tmp / "clones.txt").write_text("7\n", encoding="utf-8")
-    assert md._new_clones(tmp, conf) == 7
-    (tmp / "clones.txt").write_text("4\n", encoding="utf-8")                # a fold drops the count
-    assert md._new_clones(tmp, conf) == 4
-    (tmp / "clones.txt").write_text("not-a-number\n", encoding="utf-8")     # garbage -> null, never a crash
-    assert md._new_clones(tmp, conf) is None
-
-
-def test_symbols_at_ref_absent_is_not_empty(tmp: Path):
-    """ABL-bCandidLoupe-2: `_symbols_at_ref` distinguishes THREE states, and `--converge` prints no
-    `collision_flags` NUMBER for the third.
-
-    The defect this pins: the reader failed open to `[]` for an absent file, which is
-    indistinguishable from a present-but-empty one. With no baseline no seam reaches the fan-in
-    threshold, so every range whose base predates the SYMBOL tier printed `collision_flags: 0` — a
-    confident empty answer over nothing measured, while a base AFTER the tier over the same repo
-    reported 538. Gating the CLASS, not the instance: the assertion is about the three-state
-    contract, so a future fail-open at either call site reds here rather than in a number nobody
-    re-reads.
-
-    THE ONLY REAL `git init` FIXTURE IN THIS SUITE, and it is isolated on purpose. `_symbols_at_ref`
-    shells out to `git show <ref>:<path>`, so the three states cannot be faked by an empty `.git`
-    directory the way this file's other arms do — the difference between "no such path at this ref"
-    and "this path holds []" only exists in a real object store. The environment is pinned
-    (`GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM` to the null device, `--template=` empty) so a node with
-    an opinionated global config, a commit template or a hook directory cannot change the result,
-    and every git failure is re-raised as an AssertionError because `check` above catches only that
-    and `Skipped`."""
+def test_dossier_staleness_from_git(tmp: Path):
+    """TOOL-aMendedFleet-37 S1-S3: a dossier is stale when a commit touching a claimed path is not
+    an ancestor of the dossier's own last commit, read whole and by range, over a REAL git fixture —
+    ancestry exists only in an object store. A map-root-only commit never stales it, and a dossier
+    no commit carries is named in the note and left out of `of`."""
+    import json
     import os
     import subprocess
 
     import map_diff as md
 
-    env = dict(os.environ)
-    env["GIT_CONFIG_GLOBAL"] = os.devnull
-    env["GIT_CONFIG_SYSTEM"] = os.devnull
-    env["GIT_CONFIG_NOSYSTEM"] = "1"
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull,
+               GIT_CONFIG_NOSYSTEM="1")
 
     def run_git(*a):
-        r = subprocess.run(
-            ["git", "-C", str(tmp), *a], capture_output=True, text=True,
-            encoding="utf-8", errors="replace", env=env,
-        )
+        r = subprocess.run(["git", "-C", str(tmp), *a], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
         assert r.returncode == 0, f"git {' '.join(a)} failed: {r.stderr.strip()[:200]}"
         return r.stdout.strip()
 
-    def seed_commit(msg):
+    def write_commit(rel, text, msg):
+        (tmp / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tmp / rel).write_text(text, encoding="utf-8")
         run_git("add", "-A")
         run_git("commit", "-qm", msg)
         return run_git("rev-parse", "HEAD")
@@ -1506,31 +1478,122 @@ def test_symbols_at_ref_absent_is_not_empty(tmp: Path):
     run_git("config", "user.email", "t@t")
     run_git("config", "user.name", "t")
     run_git("config", "commit.gpgsign", "false")
-    rel = "gen/symbols.json"
-    (tmp / "gen").mkdir()
-    (tmp / "seed.txt").write_text("x\n", encoding="utf-8")
-    before = seed_commit("no symbols yet")
+    write_commit("src/x/a.ts", "1\n", "seed code")
+    refresh = write_commit("map/features/x.md", "x\n", "refresh the dossier")
+    code = write_commit("src/x/a.ts", "2\n", "code moves after the refresh")
+    write_commit("map/generated/s.json", "{}\n", "map-root only")
 
-    (tmp / rel).write_text('{"symbols": []}\n', encoding="utf-8")
-    empty = seed_commit("empty symbols")
+    # x claims the map root as the real codebase-map dossier does, so the exclusion is what holds.
+    d = m.parse_dossier(DOSSIER.replace('"src/x/**"', '"src/x/**", "map/*"'), IDS, source="t")
+    y = m.parse_dossier(DOSSIER.replace('feature = "x"', 'feature = "y"'), IDS, source="t")
+    f = m.parse_dossier(DOSSIER.replace('feature = "x"', 'feature = "foundation"').replace("src/x/**", "lib/**"),
+                        IDS, source="f")
+    tree = m.MapTree(foundation=f, dossiers=(d, y), baseline=EMPTY_BASE)
 
-    (tmp / rel).write_text(
-        '{"symbols": [{"id": "slugify", "kind": "function", "file": "src/text.py"}]}\n',
-        encoding="utf-8",
-    )
-    full = seed_commit("one symbol")
+    def measure(base, head="HEAD"):
+        commits, scope = md.read_commit_paths(tmp, base, head)
+        return {r["feature"]: r for r in m.measure_dossier_staleness(commits, tree, "map", scope=scope)}
 
-    # STATE 3 — the ref carries no such file. Not measurable, and NOT an empty measurement.
-    assert md._symbols_at_ref(tmp, before, rel) is None, "an ABSENT symbols.json must not read as empty"
-    # STATE 2 — present and holding nothing. A real measurement of zero.
-    assert md._symbols_at_ref(tmp, empty, rel) == [], "a present-but-empty file must read as []"
-    # STATE 1 — present with rows.
-    rows = md._symbols_at_ref(tmp, full, rel)
-    assert rows is not None and len(rows) == 1 and rows[0]["id"] == "slugify", rows
-    # Malformed JSON is unmeasurable too — a parse failure is not evidence of an empty baseline.
-    (tmp / rel).write_text("{ not json\n", encoding="utf-8")
-    bad = seed_commit("malformed")
-    assert md._symbols_at_ref(tmp, bad, rel) is None, "malformed JSON must not read as an empty baseline"
+    at_refresh = measure(None, refresh)["x"]
+    assert at_refresh["refreshed"] == refresh and not at_refresh["stale"], at_refresh
+    whole = measure(None)
+    x = whole["x"]
+    assert x["stale"] and x["behind"] == 1 and x["newest"] == code, f"a code commit after the refresh: {x}"
+    assert whole["y"]["refreshed"] is None, "y has no commit of its own"
+    doc = json.loads(md.render_stale_dossiers("HEAD", list(whole.values()), as_json=True))
+    assert (doc["of"], doc["stale"], doc["live"]) == (1, 1, True), doc
+    assert doc["note"].endswith("carries them yet: y") and [r["feature"] for r in doc["dossiers"]] == ["x"], doc
+
+    in_range = measure(refresh)  # refresh..HEAD holds the code commit and no dossier commit
+    assert in_range["x"]["stale"] and in_range["x"]["refreshed"] == refresh, in_range["x"]
+    text = md.render_stale_dossiers(f"{refresh}..HEAD", list(in_range.values()), as_json=False)
+    assert "- x · map/features/x.md · 1 behind" in text, text
+
+    again = write_commit("map/features/x.md", "x again\n", "refresh after the code")
+    fixed = measure(refresh)["x"]
+    assert fixed["refreshed"] == again and not fixed["stale"] and fixed["touched"] == 1, fixed
+    assert "- x ·" not in md.render_stale_dossiers("r", list(measure(refresh).values()), as_json=False)
+
+    shallow = json.loads(md.render_stale_dossiers("HEAD", None, as_json=True))
+    assert shallow["live"] is False and "shallow" in shallow["note"] and shallow["of"] == 0, shallow
+    untouched = m.measure_dossier_staleness([("a", (), ("map/x.md",))], tree, "map")
+    assert json.loads(md.render_stale_dossiers("HEAD", untouched, as_json=True))["live"] is False, \
+        "a whole history touching no claimed path is not a clean all-fresh answer"
+
+
+def test_record_roots_split_code_from_records(tmp: Path):
+    """TOOL-aMendedFleet-86 S2-S4: RECORD_ROOTS partitions the digest's population, over a REAL git
+    fixture because a root is live only when `git ls-files` names a path under it. One code file and
+    one record file split one of each; blank is undeclared; an entry naming nothing tracked is DEAD.
+    Staged red by dropping the root from the conf: the split then claims no records."""
+    import os
+    import subprocess
+
+    import map_diff as md
+
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull,
+               GIT_CONFIG_NOSYSTEM="1")
+    for rel in ("src/a.py", "memory/r.md"):
+        (tmp / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tmp / rel).write_text("x\n", encoding="utf-8")
+    for a in (("init", "--template=", "-q"), ("add", "-A")):
+        r = subprocess.run(["git", "-C", str(tmp), *a], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        assert r.returncode == 0, f"git {' '.join(a)} failed: {r.stderr.strip()[:200]}"
+
+    roots, dead = md.derive_record_roots(tmp, {"RECORD_ROOTS": "memory/"})
+    assert (roots, dead) == (["memory"], None), (roots, dead)
+    files = ["src/a.py", "memory/r.md"]
+    records = [p for p in files if any(p == r or p.startswith(r + "/") for r in roots)]
+    assert records == ["memory/r.md"] and len(files) - len(records) == 1, records
+    assert md.derive_record_roots(tmp, {"RECORD_ROOTS": ""}) == ([], None)
+    assert md.derive_record_roots(tmp, {}) == ([], None)
+    assert md.derive_record_roots(tmp, {"RECORD_ROOTS": "memory,nosuchdir"}) == (["memory", "nosuchdir"],
+                                                                                "nosuchdir")
+    assert md.render_coverage_line("code", 1, 3) == "# code: mapped 1/3 (33%)"
+    assert md.render_coverage_line("records", 0, 0) == "# records: n/a (0 files)"
+
+
+def test_baseline_additions_from_git(tmp: Path):
+    """TOOL-aMendedFleet-40 S5: the baseline is graded against its own copy at a base sha, over a
+    REAL git fixture. An added key is named, an unchanged file gains nothing, and a base with no
+    baseline is NO comparison — never an empty one that would read every key as added."""
+    import os
+    import subprocess
+
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull,
+               GIT_CONFIG_NOSYSTEM="1")
+
+    def run_git(*a):
+        r = subprocess.run(["git", "-C", str(tmp), *a], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        assert r.returncode == 0, f"git {' '.join(a)} failed: {r.stderr.strip()[:200]}"
+        return r.stdout.strip()
+
+    run_git("init", "--template=", "-q")
+    run_git("config", "user.email", "t@t")
+    run_git("config", "user.name", "t")
+    run_git("config", "commit.gpgsign", "false")
+    (tmp / "README").write_text("x\n", encoding="utf-8")
+    run_git("add", "-A")
+    run_git("commit", "-qm", "no map yet")
+    bare = run_git("rev-parse", "HEAD")
+    baseline = tmp / "memory" / "map" / "baseline.toml"
+    baseline.parent.mkdir(parents=True)
+    baseline.write_text(m.render_baseline({"flags": ["a"]}, IDS), encoding="utf-8")
+    run_git("add", "-A")
+    run_git("commit", "-qm", "seed the baseline")
+    seeded = run_git("rev-parse", "HEAD")
+
+    same, note = m.derive_baseline_additions(tmp, seeded)
+    assert same == {} and "base carried 1 key(s), working carries 1" in note, (same, note)
+    baseline.write_text(m.render_baseline({"flags": ["a", "b"], "routes": ["r"]}, IDS), encoding="utf-8")
+    added, _ = m.derive_baseline_additions(tmp, seeded)
+    assert added == {"flags": ["b"], "routes": ["r"]}, f"an added key must be named: {added}"
+    none, why = m.derive_baseline_additions(tmp, bare)
+    assert none is None and "no memory/map/baseline.toml" in why, (none, why)
+    gone, reason = m.resolve_compare_base(tmp)
+    assert gone is None and "origin/main" in reason, (gone, reason)
 
 
 def test_identifier_tokens_per_language():
@@ -1769,6 +1832,8 @@ def main() -> int:
     failures += check(
         "symbols.json deterministic + fail-closed render", test_symbols_render_deterministic_and_fail_closed
     )
+    failures += check("feature cards: fence-only, capped, cut counted (TOOL-aMendedFleet-43)", _test_feature_cards)
+    failures += check("typed counts: prose digits of inventory nouns, frozen pass (TOOL-aMendedFleet-44)", _test_typed_counts)
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "extractor helpers fail closed", lambda: test_extractor_helpers_fail_closed(Path(td))
@@ -1786,6 +1851,9 @@ def main() -> int:
     failures += check("affordance exemption drop on touch (S4a / AC1)", test_affordance_exemption_drop)
     with tempfile.TemporaryDirectory() as td:
         failures += check("seed-affordances worklist (S4b / AC5)", lambda: test_seed_affordances(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("install sites: copies counted, the canonical source left out",
+                          lambda: _test_install_sites(Path(td)))
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "reuse-lookup shared primitives (stems + fan-in + threshold)", lambda: test_reuse_shared_primitives(Path(td))
@@ -1807,17 +1875,11 @@ def main() -> int:
             "the map log row records the sources it showed, capped and never fatal",
             lambda: test_lookup_row_carries_sources(Path(td)),
         )
-    with tempfile.TemporaryDirectory() as td:
-        failures += check(
-            "closing loop: collisions + backlog dedup (S5 / AC4)", lambda: test_detect_collisions_and_backlog(Path(td))
-        )
-    with tempfile.TemporaryDirectory() as td:
-        failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
     failures += check("fan-in subtracts every definer (S1)", test_fan_in_subtracts_every_definer)
     failures += check("rank_harness: control and measurement share a denominator (review F5)",
                       test_the_control_and_the_measurement_share_a_denominator)
-    failures += check("no carrier names the old backlog destination (review F7)",
-                      test_no_tracked_carrier_still_names_the_old_backlog_destination)
+    failures += check("replay-phrases: a miss predictor needs a separable AUC AND enough misses",
+                      test_miss_predictor_verdict_needs_enough_misses)
     failures += check("gen_map: every advertised read-only mode runs (review F1)",
                       test_every_advertised_gen_map_mode_runs)
     with tempfile.TemporaryDirectory() as td:
@@ -1828,9 +1890,6 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         failures += check("gate-coverage: a GATE_FILE naming nothing REFUSES (review F6)",
                           lambda: test_gate_coverage_refuses_a_gate_file_that_names_nothing(Path(td)))
-    with tempfile.TemporaryDirectory() as td:
-        failures += check("backlog: the legacy note never names its own destination (review F8)",
-                          lambda: test_legacy_note_is_silent_when_it_would_name_its_own_destination(Path(td)))
     failures += check("dark layers: an undeclared layer refuses with both remedies (AC1)",
                       test_undeclared_layer_refuses_with_both_remedies)
     failures += check("dark layers: the banner is derived, not declared (AC2/AC4)",
@@ -1841,6 +1900,9 @@ def main() -> int:
                       test_legacy_language_name_refuses_and_names_the_extension)
     failures += check_guarded("dark layers: every declared layer is present here (AC5)",
                               test_every_declared_layer_is_present_on_this_tree)
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("shell layer: public definitions only, untokenizable refuses (aMendedFleet-35)",
+                          lambda: test_shell_layer_indexes_public_definitions_only(Path(td)))
     with tempfile.TemporaryDirectory() as td:
         failures += check("gate-coverage: an uncompared artifact fails (AC1)",
                           lambda: test_gate_coverage_fails_on_an_uncompared_artifact(Path(td)))
@@ -1855,19 +1917,14 @@ def main() -> int:
                           lambda: test_gate_coverage_refuses_a_predicate_that_matches_nothing(Path(td)))
     failures += check("gate-coverage: green on this tree",
                       test_gate_coverage_is_green_on_this_tree)
-    failures += check("backlog: written outside the worktree (AC1)",
-                      test_backlog_path_is_outside_the_worktree)
-    failures += check_guarded("backlog: follows --git-common-dir (AC6)",
-                              test_backlog_path_follows_the_common_dir_not_the_git_dir)
-    with tempfile.TemporaryDirectory() as td:
-        failures += check("backlog: the legacy file is named, never deleted (AC7)",
-                          lambda: test_legacy_backlog_is_named_and_never_deleted(Path(td)))
     failures += check("freshness: an orphaned artifact is a refusal (AC2)",
                       test_conditional_tier_refuses_an_orphaned_artifact)
     failures += check("freshness: a NEW conditional tier reports itself (AC1/AC4)",
                       test_a_new_conditional_tier_reports_itself)
     failures += check("gate and template are byte-identical (AC5)",
                       test_the_gate_and_its_template_are_byte_identical)
+    failures += check("reuse-lookup: the byte budget keeps the first candidate (aMendedFleet-36)",
+                      test_budget_cut_shows_first_and_names_the_rest)
     failures += check("gov-only files withheld on both paths (AC13)",
                       test_gov_only_files_are_withheld_on_both_paths)
     failures += check("scan coverage line cannot go quiet (AC12)",
@@ -1876,14 +1933,20 @@ def main() -> int:
                               test_every_co_defined_symbol_reaches_every_definer)
     with tempfile.TemporaryDirectory() as td:
         failures += check(
-            "symbols-at-ref: absent is not empty (ABL-bCandidLoupe-2)",
-            lambda: test_symbols_at_ref_absent_is_not_empty(Path(td)),
+            "stale dossiers: ancestry, whole and by range, map-root excluded (aMendedFleet-37)",
+            lambda: test_dossier_staleness_from_git(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "record roots: code and records split, undeclared and dead named (aMendedFleet-86)",
+            lambda: test_record_roots_split_code_from_records(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "baseline additions: graded against the base, absent base is no comparison (aMendedFleet-40)",
+            lambda: test_baseline_additions_from_git(Path(td)),
         )
     failures += check("identifier tokens: one arm per over-strip class", test_identifier_tokens_per_language)
-    failures += check("map_imports: the rescued resolver's case table", test_map_imports_resolution)
-    failures += check("map_imports: no sibling-kit import (AC7)", test_map_imports_has_no_sibling_kit_import)
-    failures += check("map_imports: same candidates as the kit it was rescued from (AC1)",
-                      test_map_imports_matches_the_kit_it_was_rescued_from)
     failures += check_guarded("identifier tokens: corpus recall + precision floors", test_identifier_tokens_corpus_recall)
     # S2 — EXECUTED and SKIPPED reported separately, always. A single number cannot say which of
     # the two it is, and the whole defect this unit closes was a report that could not tell them
@@ -1900,117 +1963,6 @@ def main() -> int:
     print("PASS" if not failures else f"{failures} FAILURE(S)")
     return 1 if failures else 0
 
-
-
-# --- map_imports: the rescued AST import resolver (TOOL-dTracedLattice-6) -------------------------
-# The rows below are the lexicon kit's own `resolve_import` case table, carried with the code so the
-# arms that covered it there cover it here. They assert on the CANDIDATE SET directly rather than
-# through a glob matcher, because the candidate set is what this module returns and a glob is the
-# consumer's business. Every fixture path below exists so a row can FAIL: `debounce.js`,
-# `thingamajig/thing.js` and `outside/thing.js` were added upstream after three rows were found to
-# be passing on an empty corpus rather than on correct code.
-RI_FILES = [
-    "src/pkg/consumer/a.py",
-    "src/pkg/consumer/helper.py",
-    "src/pkg/shared_core/helper.py",
-    "src/pkg/shared_core/only_there.py",
-    "src/pkg/shared_core/notes.md",
-    "web/consumer/a.js",
-    "web/shared/thing.js",
-    "web/shared/debounce.js",
-    "web/shared/thingamajig/thing.js",
-    "outside/thing.js",
-]
-PY_IMPORTER = "src/pkg/consumer/a.py"
-JS_IMPORTER = "web/consumer/a.js"
-
-
-def test_map_imports_resolution():
-    idx = mi.build_module_index(RI_FILES)
-
-    def resolve_for(target, importer=PY_IMPORTER):
-        return mi.resolve_import(target, importer, idx)
-
-    # A FULLY-QUALIFIED dotted import reaches the far package even though a same-stem local sibling
-    # exists: the language grants the importer's directory no precedence there. The upstream B1
-    # false negative was exactly this crossing vanishing onto the sibling.
-    assert "src/pkg/shared_core/helper.py" in resolve_for("pkg.shared_core.helper"), resolve_for("pkg.shared_core.helper")
-    assert "src/pkg/consumer/helper.py" not in resolve_for("pkg.shared_core.helper")
-    # A BARE name prefers the importer-local sibling...
-    assert resolve_for("helper") == ["src/pkg/consumer/helper.py"], resolve_for("helper")
-    # ...and FALLS BACK across when there is no local sibling. Not directory-bound.
-    assert resolve_for("only_there") == ["src/pkg/shared_core/only_there.py"], resolve_for("only_there")
-    # Extension scoping: a same-stem file of another language is not a resolution.
-    assert resolve_for("notes") == [], resolve_for("notes")
-    # A dotted target whose PATH is inconsistent with the dots denotes nothing tracked. Both of
-    # these are real imports in this tree that touch nothing in it.
-    for target in ("concurrent.helper", "thirdparty.helper"):
-        assert all(not c.startswith("src/") for c in resolve_for(target)), (target, resolve_for(target))
-    # A relative JS specifier resolves against the importer's directory.
-    assert "web/shared/thing.js" in resolve_for("../shared/thing.js", JS_IMPORTER), resolve_for("../shared/thing.js", JS_IMPORTER)
-    # BOUNDARY, not prefix: `../shared/thing` must not land on `thingamajig/thing.js`.
-    assert "web/shared/thingamajig/thing.js" not in resolve_for("../shared/thing.js", JS_IMPORTER)
-    # Escaping the repo root is EXTERNAL, never clamped back in — clamping fabricates a candidate.
-    assert resolve_for("../../../outside/thing.js", JS_IMPORTER) == [], resolve_for("../../../outside/thing.js", JS_IMPORTER)
-    # THE LANGUAGE BRANCH. A JS package specifier carrying a dot is one name, not a namespace path.
-    assert resolve_for("lodash.debounce", JS_IMPORTER) == ["lodash.debounce"], resolve_for("lodash.debounce", JS_IMPORTER)
-    # And a Python leading dot is relative-to-package: `from . import helper` stays in the importer's
-    # own package and must not reach the same-stem file in the other one.
-    rel = resolve_for(".helper")
-    assert "src/pkg/consumer/helper.py" in rel, rel
-    assert "src/pkg/shared_core/helper.py" not in rel, rel
-    # An unresolvable external target denotes nothing in the corpus.
-    assert all(not c.startswith(("src/", "web/")) for c in resolve_for("json")), resolve_for("json")
-
-
-def test_map_imports_has_no_sibling_kit_import():
-    """AC7 — the rescued module reaches into no sibling kit.
-
-    Asserted over the module's own source rather than by a `LAYERS` rule: the lexicon rule that
-    would state this direction rides on predicate P3, which `TOOL-aSurfacedLexicon-2` deletes, so a
-    rule-based assertion would disappear with the thing it was written to outlive.
-    """
-    src = Path(os.path.abspath(__file__)).parent.joinpath("map_imports.py").read_text(encoding="utf-8")
-    for ln, line in enumerate(src.split("\n"), 1):
-        stripped = line.strip()
-        if stripped.startswith(("import ", "from ")):
-            assert "lexicon" not in stripped, f"map_imports.py:{ln} imports a sibling kit: {stripped}"
-
-
-def test_map_imports_matches_the_kit_it_was_rescued_from():
-    """AC1 — same candidates as the original, over the same fixtures.
-
-    SKIPS LOUDLY once the lexicon kit's copy is gone. That is the designed end state, not a hole:
-    `TOOL-aSurfacedLexicon-2` deletes the original, and after it lands this arm has nothing to
-    compare against and says so instead of reporting a green it did not earn.
-    """
-    try:
-        origin = resolve_kit_dir("lexicon", "lexicon.py", Path(os.path.abspath(__file__)).parent) / "lexicon.py"
-    except LookupError:
-        origin = None
-    if origin is None or not origin.exists():
-        raise Skipped("the lexicon kit is not installed here, so the original this module was "
-                      "rescued from cannot be compared against")
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("_lex_origin", origin)
-    lex = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(lex)
-    if not hasattr(lex, "resolve_import"):
-        raise Skipped("the lexicon kit no longer carries `resolve_import`, which is the deletion "
-                      "this module was rescued ahead of")
-    ours, theirs = mi.build_module_index(RI_FILES), lex.build_module_index(RI_FILES)
-    assert ours == theirs, "the module index diverged"
-    cases = [
-        ("pkg.shared_core.helper", PY_IMPORTER), ("helper", PY_IMPORTER),
-        ("only_there", PY_IMPORTER), ("notes", PY_IMPORTER), ("concurrent.helper", PY_IMPORTER),
-        ("thirdparty.helper", PY_IMPORTER), (".helper", PY_IMPORTER), ("json", PY_IMPORTER),
-        ("../shared/thing.js", JS_IMPORTER), ("../../../outside/thing.js", JS_IMPORTER),
-        ("lodash.debounce", JS_IMPORTER), ("thing", JS_IMPORTER),
-    ]
-    for target, importer in cases:
-        a = mi.resolve_import(target, importer, ours)
-        b = lex.resolve_import(target, importer, theirs)
-        assert a == b, f"{target!r} from {importer!r}: rescued {a} vs original {b}"
 
 
 # --- S1: fan-in subtracts EVERY definer (TOOL-dTracedLattice-1) -----------------------------------
@@ -2083,6 +2035,41 @@ def test_scan_coverage_line_cannot_go_quiet():
     # everything and found nothing".
     quiet = rl.render(rl.Shortlist("q", [], (), corpus.threshold, {}, {}), corpus)
     assert "scan coverage: not run" in quiet, quiet
+
+
+def test_budget_cut_shows_first_and_names_the_rest():
+    """TOOL-aMendedFleet-36 — the byte budget cuts the ranked tail, never the first candidate.
+
+    A synthetic shortlist, so the arm grades the cut rule rather than this corpus's sizes. Staged
+    red by deleting the first-candidate exception in `derive_budget_cut`: budget 1 then shows none.
+    """
+    corpus = rl.Corpus(candidates={}, shared_seams={}, symbol_files=[], threshold=3,
+                       has_symbols=True, decisions_by_feature={})
+    ranked = [rl.Ranked(rl.Candidate(f"cand{i}", ("symbol",), "function", (f"src/f{i}.py",)),
+                        True, 0, "stem match") for i in range(6)]
+    sl = rl.Shortlist("q", ranked, (), 3, {}, {})
+    shown, n_cut = rl.derive_budget_cut(sl, corpus, 1)
+    assert [r.candidate.name for r in shown] == ["cand0"] and n_cut == 5, (shown, n_cut)
+    text = rl.render(sl, corpus, 1)
+    assert sum(ln.startswith("- cand") for ln in text.splitlines()) == 1, text
+    assert ("cut 5 of 6 candidate(s) past the 1-byte budget - rerun with --budget 0 to see them all"
+            in text), text
+    assert text.rstrip("\n").splitlines()[-1].startswith("Decision:"), text
+    full = rl.render(sl, corpus, 0)
+    assert sum(ln.startswith("- cand") for ln in full.splitlines()) == 6, full
+    assert "\ncut " not in full, full
+    # Every budget: the printed head stays within it once more than one candidate is shown, and
+    # the shown count never falls as the budget grows. LIVENESS: some budget must cut mid-list.
+    prev, partial = 0, False
+    for budget in range(1, len(full.encode("utf-8")) + 64, 7):
+        shown, n_cut = rl.derive_budget_cut(sl, corpus, budget)
+        assert len(shown) >= prev and len(shown) + n_cut == 6, (budget, len(shown), prev)
+        head = rl.render(sl, corpus, budget).split("\ncut ")[0] + "\n"
+        if n_cut and len(shown) > 1:
+            assert len(head.encode("utf-8")) <= budget, (budget, len(head.encode("utf-8")))
+        partial |= 1 < len(shown) < 6
+        prev = len(shown)
+    assert partial, "no budget cut mid-list, so the bound above was never exercised"
 
 
 def test_gov_only_files_are_withheld_on_both_paths():
@@ -2184,8 +2171,9 @@ def test_conditional_tier_refuses_an_orphaned_artifact():
 def test_a_new_conditional_tier_reports_itself():
     """AC1 and AC4 in one arm, because they are one mechanism.
 
-    AC4 first: `symbols.json` is the ONLY conditional tier today, so a criterion that enumerated
-    the tiers would grade a population of one and could not fail. This introduces a SECOND tier in
+    AC4 first: `symbols.json` was the ONLY conditional tier when this was written (7ad94fbb2,
+    2026-09-06), so a criterion that enumerated the tiers would grade a population of one and could
+    not fail. This introduces a SECOND tier in
     a fixture and asserts it is reported with no reporting line written for it — the list IS the
     mechanism. AC1 rides on it: that tier's artifact does not exist, so its empty population is a
     NAMED skip and not a refusal, which is the legal state an adopter declaring no such extractor
@@ -2210,76 +2198,6 @@ def test_the_gate_and_its_template_are_byte_identical():
     b = (kit / "test_codebase_map.template.py").read_bytes()
     assert a == b, ("the installed gate and its template have diverged; "
                     f"{len(a)} vs {len(b)} bytes")
-
-
-# --- the reinvention backlog leaves the worktree (TOOL-dTracedLattice-3) --------------------------
-def test_backlog_path_is_outside_the_worktree():
-    """AC1 / S2 — `--converge` cannot leave untracked clutter inside a gated directory.
-
-    Asserted on the DESTINATION rather than by running a converge into a scratch repo: the property
-    the unit is about is where the write goes, and a fixture that ran the whole digest would grade
-    the digest.
-    """
-    import subprocess
-    root = m.repo_root()
-    path = md.derive_backlog_path(root)
-    assert path.name == "reinvention-backlog.md", path
-    # NOT `is_relative_to(root)`. In a PRIMARY checkout the git dir IS `<root>/.git`, so that test
-    # calls a correct destination wrong — measured, by running this suite from the primary tree
-    # during the landing merge. What the unit actually promises is that `--converge` leaves no
-    # untracked clutter in a GATED directory, so the two properties are asserted directly: the write
-    # lands under the git common dir, and nowhere under MAP_ROOT.
-    raw = subprocess.run(["git", "-C", str(root), "rev-parse", "--git-common-dir"],
-                         capture_output=True, text=True, check=True).stdout.strip()
-    common = Path(raw)
-    common = (common if common.is_absolute() else (root / raw)).resolve()
-    assert path.is_relative_to(common), f"the backlog is not under the git common dir: {path}"
-    assert not path.is_relative_to(m.map_root(root)), (
-        f"the backlog is inside the gated map tree, which is the defect this unit removed: {path}")
-
-
-def test_backlog_path_follows_the_common_dir_not_the_git_dir():
-    """AC6 — `--git-common-dir`, never `--git-dir`.
-
-    SKIPS LOUDLY where the two are the same path, which is every non-linked checkout: the arm would
-    then pass whichever the code resolved, and a row that cannot tell the two apart is worse than no
-    row. Gov's own bar runs this from a linked worktree, where they differ.
-    """
-    import subprocess
-    root = m.repo_root()
-
-    def read_dir(flag):
-        raw = subprocess.run(["git", "-C", str(root), "rev-parse", flag],
-                             capture_output=True, text=True, check=True).stdout.strip()
-        q = Path(raw)
-        return (q if q.is_absolute() else (root / raw)).resolve()
-
-    common, own = read_dir("--git-common-dir"), read_dir("--git-dir")
-    if common == own:
-        raise Skipped("this checkout is not a linked worktree, so --git-dir and --git-common-dir "
-                      "are the same path and the two cannot be told apart here")
-    path = md.derive_backlog_path(root)
-    assert path.is_relative_to(common), (path, common)
-    assert not path.is_relative_to(own), (
-        f"the backlog landed under --git-dir ({own}), which `git worktree remove` deletes outright")
-
-
-def test_legacy_backlog_is_named_and_never_deleted(tmp: Path):
-    """AC7 — the migration case, which a clean fixture never reaches.
-
-    It exists only because the destination moved, so AC1's clean-worktree criterion cannot grade it.
-    """
-    root = tmp
-    legacy = tmp / "map" / "reinvention-backlog.md"
-    current = tmp / "elsewhere" / "reinvention-backlog.md"
-    assert md.render_legacy_note(legacy, current, root) == "", "a note with no legacy file to name"
-    legacy.parent.mkdir(parents=True)
-    legacy.write_text("# rows nobody has read\n", encoding="utf-8")
-    note = md.render_legacy_note(legacy, current, root)
-    assert "LEGACY location" in note and "NO LONGER WRITTEN" in note, note
-    assert "map/reinvention-backlog.md" in note, note
-    assert current.as_posix() in note, note
-    assert legacy.is_file(), "the note must not delete the file it names"
 
 
 # --- the adopter's frozen gate is compared against the engine (TOOL-dTracedLattice-4) -------------
@@ -2443,6 +2361,30 @@ def test_every_declared_layer_is_present_on_this_tree():
         assert token in present, f"{token} is declared dark and is not present in the corpus"
 
 
+def test_shell_layer_indexes_public_definitions_only(tmp: Path):
+    """TOOL-aMendedFleet-35 S1/S2 — the project-owned `kit-sh` layer, over a fixture root.
+
+    A public definition is indexed; a `_`-private one and a function inside a heredoc body are not;
+    an untokenizable file raises MapError naming it rather than yielding a smaller index.
+    """
+    import map_extractors as mx
+    good, bad = tmp / "good", tmp / "bad"
+    good.mkdir()
+    bad.mkdir()
+    (good / "lib.sh").write_text(
+        "build_thing() {\n  echo hi\n}\n_private_helper() {\n  :\n}\n"
+        "cat <<'EOF'\nfunction embedded() { return 1; }\nEOF\n", encoding="utf-8")
+    (bad / "broken.sh").write_text('f() {\n  echo "oops\n}\n', encoding="utf-8")
+    rows = mx.scan_shell_layer("kit-sh", (good,), root=tmp)
+    assert rows == [{"id": "build_thing", "kind": "function", "file": "good/lib.sh"}], rows
+    try:
+        mx.scan_shell_layer("kit-sh", (bad,), root=tmp)
+    except m.MapError as exc:
+        assert "bad/broken.sh" in str(exc), exc
+    else:
+        raise AssertionError("an untokenizable shell file was indexed as nothing, not refused")
+
+
 # --- left-shifts from the closing diff review (dTracedLattice round 1) ----------------------------
 def test_every_advertised_gen_map_mode_runs():
     """F1's class, not F1's line. `--seed-affordances` shipped BROKEN through a data-model rename
@@ -2463,7 +2405,7 @@ def test_every_advertised_gen_map_mode_runs():
     # tree.
     for argv, prints in ((["--check"], False), (["--seed-affordances", "--top", "3"], True)):
         proc = subprocess.run([sys.executable, str(kit / "gen_map.py"), *argv],
-                              capture_output=True, text=True, cwd=str(m.repo_root()))
+                              capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(m.repo_root()))
         assert proc.returncode == 0, f"gen_map.py {' '.join(argv)} exited {proc.returncode}\n{proc.stderr}"
         assert "Traceback" not in proc.stderr, proc.stderr
         if prints:
@@ -2556,17 +2498,6 @@ def test_gate_coverage_refuses_a_gate_file_that_names_nothing(tmp: Path):
     assert "not the benign unset state" in err.getvalue(), err.getvalue()
 
 
-def test_legacy_note_is_silent_when_it_would_name_its_own_destination(tmp: Path):
-    """F8's class. On the fail-open path the destination falls back INTO the map tree, so the legacy
-    file and the current one are the same path — and the note then told the reader to delete the
-    file the run had just written to."""
-    same = tmp / "reinvention-backlog.md"
-    same.write_text("# rows\n", encoding="utf-8")
-    assert md.render_legacy_note(same, same, tmp) == "", "the note named the file it just wrote"
-    other = tmp / "elsewhere.md"
-    assert md.render_legacy_note(same, other, tmp) != "", "and it must still fire for a real legacy"
-
-
 def test_the_control_and_the_measurement_share_a_denominator():
     """F5's class. `measure_recall` divides by the LIVE scenarios; the constant control divided by
     ALL rows, so a dead probe shrank one rate and not the other and the comparison flattered the
@@ -2608,28 +2539,34 @@ def test_the_control_and_the_measurement_share_a_denominator():
         f"divides by:\n{text}")
 
 
-def test_no_tracked_carrier_still_names_the_old_backlog_destination():
-    """F7's class. The destination moved and four carriers restated it; a grep is the whole gate.
-
-    The ONE sanctioned mention is `derive_backlog_path`'s own fail-open branch, which really does
-    write there when git cannot answer.
+def test_miss_predictor_verdict_needs_enough_misses():
+    """TOOL-aMendedFleet-46 S7. Canned rows, no corpus: a separable predictor and an inseparable
+    one through `derive_auc`, then `derive_predictor_verdict` over a population that clears the
+    floor and one ONE miss short of it. The second is the arm's point: an AUC read off too few
+    misses must never name a predictor, however far it sits from chance.
     """
-    import subprocess
-    root = m.repo_root()
-    # The needle is BUILT rather than written, so this arm's own source does not contain it. A
-    # self-matching predicate reds forever and the obvious repair — excluding this file — would
-    # blind the arm to a real hit here.
-    needle = "MAP_ROOT>/" + "reinvention-backlog.md"
-    proc = subprocess.run(["git", "-C", str(root), "grep", "-n", "-F", needle,
-                           "--", ":!memory/builds/"], capture_output=True, text=True)
-    # `git grep` exits 1 on NO MATCH and 128 on a usage or repository error, and both print nothing
-    # — so discarding the code made a broken invocation indistinguishable from a clean tree.
-    assert proc.returncode in (0, 1), (
-        f"git grep failed (rc={proc.returncode}), so this arm measured nothing: {proc.stderr}")
-    hits = [ln for ln in proc.stdout.splitlines() if ln.strip()]
-    assert not hits, (
-        "a tracked carrier still names the pre-2026-09-06 backlog destination; the record lives "
-        "under the git common dir now:\n" + "\n".join(hits))
+    import importlib.util
+    kit = Path(os.path.abspath(__file__)).parent
+    spec = importlib.util.spec_from_file_location("_replay_phrases", kit / "replay-phrases.py")
+    rp = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rp)
+    floor = rp.PREDICTOR_MIN_LABELS
+    vals = {p: 0 for p in rp.PREDICTORS}
+    # n_seeds separates the labels perfectly; q_len is one value on both sides
+    rows = ([dict(vals, hit=True, n_seeds=5, q_len=3) for _ in range(floor + 10)]
+            + [dict(vals, hit=False, n_seeds=1, q_len=3) for _ in range(floor + 10)])
+    assert rp.derive_auc([3, 4, 5], [0, 1, 2]) == 1.0
+    assert rp.derive_auc([1, 1, 1], [1, 1, 1]) == 0.5
+    assert rp.derive_auc([1], []) is None, "an empty side has no AUC, never a chance reading"
+    pop = rp.measure_population("all", rows)
+    assert pop["aucs"]["n_seeds"] == 1.0 and pop["aucs"]["q_len"] == 0.5, pop["aucs"]
+    assert pop["band"] and pop["band"][1] < 1.0, f"the shuffled band must sit below 1.0: {pop}"
+    verdict = rp.derive_predictor_verdict([pop])
+    assert verdict.startswith("n_seeds ("), verdict
+    short = dict(pop, misses=floor - 1)
+    verdict = rp.derive_predictor_verdict([short])
+    assert verdict.startswith("none qualifies") and "too few misses" in verdict, verdict
+
 
 if __name__ == "__main__":
     sys.exit(main())

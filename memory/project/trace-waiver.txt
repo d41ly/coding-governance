@@ -17,6 +17,11 @@
 #
 # Fields: <spec-path>	ab<unit-id>	ab<reason>.
 #
+# A NEW records-only unit takes no row here: its spec declares `records-only` as a field of its own
+# status header (TOOL-aMendedFleet-91), and a row beside that declaration is reported stale. This
+# file keeps the other shape, a unit whose product landed before the id-in-subject convention. The
+# three RECORDS-ONLY rows below predate the verb and stay; their CLOSED headers are not rewritten.
+#
 # The SEED rows below are the same shape, and it is the residual the header-date key knowingly trades
 # in (§4 of that spec: "touching a grandfathered CLOSED spec's header advances its date and pulls it
 # into the population, where it will red for want of a convention it never had"). Each unit's product
