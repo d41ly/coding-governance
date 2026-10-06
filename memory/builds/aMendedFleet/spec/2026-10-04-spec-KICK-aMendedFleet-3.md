@@ -1,6 +1,6 @@
 # KICK-aMendedFleet-3 — kickoff Step 4 points at the two context commands the build method spells once
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff+tooling · ratified 2026-10-04 · order 78
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff+tooling · ratified 2026-10-04 · order 78
 
 <!-- gen:spec-records -->
 

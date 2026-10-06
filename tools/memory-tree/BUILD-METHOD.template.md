@@ -158,6 +158,14 @@ The recall CLI is offline and cannot coin terms — you write them, 8–14, or i
 spec's §10** the seam you will extend, cited by path, or an explicit "no existing seam fits" with the evidence —
 **and the recall terms you used**, because composing them is the expensive half and M7 re-runs the query.
 
+**The context for a path set** — kickoff's entrypoints, a spec's Files touched — is two more
+commands, and the kickoff engine points here rather than spelling them:
+
+```bash
+python {{KIT_DIR}}/gotchas.py --for-paths <paths>            # the bug classes those paths can hit
+python {{KIT_DIR}}/gen_build_index.py --asks --path <paths>  # the open asks targeting them, ranked and capped
+```
+
 Two rules you cannot afford to look up: **a probe exits 0 on a miss**, so "nothing found" is an ANSWER to record,
 never a failure to retry with softer words; and **a hit can be STALE**, so verify any claim about current code
 against source before building on it and say in §10 where the two disagreed. The rest of the probe-failure

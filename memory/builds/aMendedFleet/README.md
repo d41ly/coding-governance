@@ -255,7 +255,7 @@ ids TOOL-aMendedFleet-109
 | [TOOL-aMendedFleet-75 — a `New arm:` line declares the acceptance criteria its arm keeps observed](spec/2026-10-04-spec-TOOL-aMendedFleet-75.md) | 75 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [KICK-aMendedFleet-1 — the orientation card shows the last drift reading from the node's history](spec/2026-10-04-spec-KICK-aMendedFleet-1.md) | 76 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [KICK-aMendedFleet-2 — the orientation card shows which unmerged remote refs share paths with this tree's branch](spec/2026-10-04-spec-KICK-aMendedFleet-2.md) | 77 | 1 | CLOSED | rev-3 | 2026-10-04 |
-| [KICK-aMendedFleet-3 — kickoff Step 4 points at the two context commands the build method spells once](spec/2026-10-04-spec-KICK-aMendedFleet-3.md) | 78 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [KICK-aMendedFleet-3 — kickoff Step 4 points at the two context commands the build method spells once](spec/2026-10-04-spec-KICK-aMendedFleet-3.md) | 78 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [PLAY-aMendedFleet-1 — the AGENTS.md wrapper's merge-bar section moves to a guide, without its repeated catalog or dated history](spec/2026-10-04-spec-PLAY-aMendedFleet-1.md) | 79 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [PLAY-aMendedFleet-2 — an experiment's instruments and result rows are committed beside its record, and the vague-brief arm gates §1 as a HIGH ask](spec/2026-10-04-spec-PLAY-aMendedFleet-2.md) | 80 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-81 — the month shards carry only what never changes after their month](spec/2026-10-04-spec-TOOL-aMendedFleet-81.md) | 81 | 1 | SPECCED | rev-1 | 2026-10-04 |
