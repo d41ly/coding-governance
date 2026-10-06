@@ -86,6 +86,9 @@ Cite ids, never line numbers.
 | [TOOL-aGradedMandate-13](../builds/aGradedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-31 | THE EMPTY-ROSTER VACUITY IS CLOSED IN THE LEG AND STILL OPEN IN THE… |
 | [TOOL-aGradedMandate-14](../builds/aGradedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-31 | TWO SKIP ANNOUNCEMENTS EACH CERTIFY THAT THE OTHER ARM RAN, AND NEITHER… |
 | [TOOL-aGradedMandate-15](../builds/aGradedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-31 | CHECK 24 JOINS UNIT IDS BY MENTION RATHER THAN BY OWNERSHIP, which is… |
+| [TOOL-aGraftedHelix-42](../builds/aGraftedHelix/BACKLOG.md) | OPEN | MED | — | 2026-10-06 | the build harness's spec stage gives a writer no channel for evidence… |
+| [TOOL-aGraftedHelix-43](../builds/aGraftedHelix/BACKLOG.md) | OPEN | MED | — | 2026-10-06 | spec passes run reproduction work that belongs to a build pass: unit… |
+| [TOOL-aGraftedHelix-44](../builds/aGraftedHelix/BACKLOG.md) | OPEN | MED | — | 2026-10-06 | the spec template's per-criterion obligations (a Red-when clause and a… |
 | [TOOL-aHoistedPass-11](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | the child's prompt between dispatches is UNGUARDED: agent-cap.js's… |
 | [TOOL-aHoistedPass-12](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | the read-window narrowing is CONDITIONAL on scriptPath, not name: or an… |
 | [TOOL-aHoistedPass-13](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | export const meta has NO enforcer. Both readers SELECT by it, so… |
