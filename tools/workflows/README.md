@@ -228,8 +228,13 @@ the working tree.
 Its SPEC stage ends in ONE commit (TOOL-aGraftedHelix-15): when the writers authored a unit and the
 caller pinned no `subjects`, one agent commits the authored specs with `Pass: none` and the program
 writes each committed path onto its unit, so the audit pins them at `HEAD` in the same call. That
-commit's `--for-diff` checklist is merged into the audit's, under one by-design head; with the audit
-off it rides the hand-out as `specCommit`. Each writer's `authored` entry is resolved to its roster
+commit's checklist items are merged into the audit's with its by-design block left out
+(TOOL-aGraftedHelix-35), so the audit's block is the first input's alone, less any ruling either input
+itemises as a `NEW/CHANGED invariant`; with the audit off the checklist rides the hand-out whole as
+`specCommit`. With a 7-40 hex `base` the commit stage runs `gotchas.py --for-paths --base <sha>` over
+the paths its commit wrote, so that block is read at the run's pinned base; with none it runs
+`--for-diff HEAD~1..HEAD`, read at the spec commit's parent, and the audit-OFF route logs a `WARNING:`
+saying so. Each writer's `authored` entry is resolved to its roster
 unit before that commit, whether it is spelled as an id, a repo-relative path or an absolute one
 (TOOL-aGraftedHelix-33): an entry that names no roster unit by id and no unit's spec by path refuses
 the run, and a unit placed by path whose committed spec, found by its H1, is another file refuses

@@ -1529,8 +1529,10 @@ has    "GH29 ...and WARNS the same" "$o" "$GH29_WT"
 P_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","units":[{"id":"A-tB-1","order":1,"briefPath":"b1"}]}'
 P_OFF=$(printf '%s' "$P_UNITS" | sed 's#"specAudit":"2026-09-20",##')
 P_SPEC='{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"ok"}'
-P_SUBJ='"audit:subjects":{"subjects":[{"path":"'$CPATH'","blob":"'$B40'","tree":"'$B40'"}],"checklist":"# r-head\n- [ ] alpha (universal)\n      a\n- [ ] beta\n      b\n# by design — 1 invariant(s) this selection touches\n- inv-one — x → y (D-1)","checklistPaths":["a.sh"]}'
-P_CCL='# c-head\n- [ ] alpha (universal)\n      a\n- [ ] gamma\n      g\n# by design — 1 invariant(s) this selection touches\n- inv-two — x → y (D-2)'
+# Each checklist states its read point on the line after its first header, as the checker does since
+# TOOL-aGraftedHelix-29; TOOL-aGraftedHelix-35 keeps the first's and drops the second's.
+P_SUBJ='"audit:subjects":{"subjects":[{"path":"'$CPATH'","blob":"'$B40'","tree":"'$B40'"}],"checklist":"# r-head\n# invariants are read at r-point\n- [ ] alpha (universal)\n      a\n- [ ] beta\n      b\n# by design — 1 invariant(s) this selection touches\n- inv-one — x → y (D-1)","checklistPaths":["a.sh"]}'
+P_CCL='# c-head\n# invariants are read at c-point\n- [ ] alpha (universal)\n      a\n- [ ] gamma\n      g\n# by design — 1 invariant(s) this selection touches\n- inv-two — x → y (D-2)'
 P_COMMIT='{"committed":true,"sha":"'$CSHA'","why":"","specs":[{"id":"A-tB-1","path":"'$CPATH'"}],"summary":"ok","checklist":"'$P_CCL'"}'
 run_pathless() { # args · spec double · commit double · resolver map entry, or '' -> the run, audit and disposal doubled clean
   run_wf "$1" "$(printf '{"spec:":%s,"commit:":%s%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
@@ -1550,10 +1552,15 @@ has    "GH15 ...never stages a path listed before staging" "$p" "is FOREIGN, and
 has    "GH15 ...and runs the per-pass checklist over its commit" "$p" "python ${PFX}${MT_KIT}/gotchas.py --for-diff HEAD~1..HEAD"
 has    "GH15 the commit is logged with its sha" "$o" "log:spec stage: committed 1 spec(s) at $CSHA"
 w=$(printf '%s\n' "$o" | grep '^wargs:')
-has    "GH15 the audit's checklist opens with both heads and the label between them" "$w" '"checklist":"# r-head\n# the spec commit '"$CSHA"' — python '"${PFX}${MT_KIT}"'/gotchas.py --for-diff HEAD~1..HEAD\n# c-head\n- [ ] alpha'
+has    "GH15 the audit's checklist opens with both heads and the label between them" "$w" '"checklist":"# r-head\n# invariants are read at r-point\n# the spec commit '"$CSHA"' — python '"${PFX}${MT_KIT}"'/gotchas.py --for-diff HEAD~1..HEAD\n# c-head\n- [ ] alpha'
 has    "GH15 ...carries the commit's new item after the resolver's" "$w" '- [ ] beta\n      b\n- [ ] gamma'
 same   "GH15 ...and a repeated item once" "$(printf '%s' "$w" | grep -o 'alpha' | wc -l | tr -d ' ')" "1"
-has    "GH15 ...under ONE by-design head counting both blocks" "$w" '# by design — 2 invariant(s) this selection touches\n- inv-one — x → y (D-1)\n- inv-two'
+# TOOL-aGraftedHelix-35 S1 - the merged block is the FIRST input's alone and states one read point: the
+# spec commit's block and its read-point line are left out. RED on the parent render, which printed
+# `# by design — 2` over both entries and both read-point lines.
+has    "GH15 ...under ONE by-design head counting the first input's block alone" "$w" '# by design — 1 invariant(s) this selection touches\n- inv-one — x → y (D-1)"'
+hasnt_ "GH15 ...with the spec commit's entry nowhere" "$w" "inv-two"
+hasnt_ "GH15 ...nor its read-point line" "$w" "c-point"
 same   "GH15 ...and no second head" "$(printf '%s' "$w" | grep -o 'by design' | wc -l | tr -d ' ')" "1"
 # The head is a COPY of the review harness's, because workflow scripts cannot import, so the pair is
 # compared here: a head one of them re-spells would merge into a block the other no longer cuts out.
@@ -1836,7 +1843,7 @@ has    "BT3 attended, OFF, every unit terminal: the exit carries the audit objec
 has    "BT3 ...with an empty roster, by filtering" "$o" '"roster":[]'
 # ---- AC7: both carriers read 1.8 — the render is byte-compared to the template by the parity leg,
 # ---- so the marker moving in one file and not the other reds there; this arm reads the render.
-has    "BT3-AC7 the render carries the engine version 1.10" "$(sed -n '3p' "$F")" "version: '1.10', // gov:kit unattended-build@1.10"
+has    "BT3-AC7 the render carries the engine version 1.11" "$(sed -n '3p' "$F")" "version: '1.11', // gov:kit unattended-build@1.11"
 
 # ================================== TOOL-dPolishedVitrine-1 — THE HARNESS IS RENDERED AT INSTALL
 # The harness shipped as an ENGINE file, and apply writes those verbatim, so every install path it
@@ -2412,6 +2419,102 @@ has    "GH33 attended path entry: rostered despite entry-time MISSING" "$o" '"ro
 has    "GH33 ...and left to the caller to commit by its id" "$o" "so A-tB-1 is left to the caller to commit"
 same   "GH33 ...its writer asked for ids" "$(printf '%s\n' "$o" | grep '^prompt:spec:tB:' | grep -c 'by its unit id')" "1"
 
+# ---- TOOL-aGraftedHelix-35: NO BY-DESIGN ENTRY REACHES A SPEC AUDIT UNLESS IT STOOD AT THE RUN'S PINNED
+# ---- BASE, and the spec commit's checklist reads its invariants there. The real-checker arm runs the
+# ---- step-6 command and the resolver's command, each EXTRACTED from the harness's own prompts, in a
+# ---- three-commit repository holding the memory-tree kit at `$GKD`: a base commit with `inv-base`, a
+# ---- pass commit adding `inv-build`, both anchored on `memory/LIVE.md`, and a spec commit writing that
+# ---- file and the double's spec. Their stdout is the doubles' `checklist` on a second run, so the union
+# ---- grades the checker's real output and never a value typed here. Each arm read RED on a scratch copy
+# ---- of the render with one break staged: the parent render (the real-checker arm), the name filter
+# ---- cut (the omission arm), and the pinned branch cut, the warning deleted and the shape test dropped
+# ---- (the prompt and log arms).
+build_gh35_invariant() { # name · decision -> one invariant record anchored on memory/LIVE.md
+  printf -- '---\nname: %s\ndescription: a ruling\nkind: invariant\ndecision: %s\n---\n\nAnchored on `memory/LIVE.md`.\n\n## Looks wrong\n\nx\n\n## Actually\n\ny\n' "$1" "$2"
+}
+build_gh35_repo() { # dir -> the base, pass and spec commits
+  local d=$1
+  mkdir -p "$d/memory/gotchas" "$d/$GKD" "$d/${CPATH%/*}"
+  ( cd "$d" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
+      && git config core.autocrlf false && git config core.hooksPath .git/no-hooks )
+  printf 'MEMORY_ROOT=memory\n' > "$d/.memory-tree.conf"
+  printf '# live\n' > "$d/memory/LIVE.md"
+  printf 'echo one\n' > "$d/fixture.sh"
+  cp -r "$ROOT/$MT_KIT_DIR/." "$d/$GKD/" && rm -rf "$d/$GKD/__pycache__"
+  build_gh35_invariant inv-base D-1 > "$d/memory/gotchas/inv-base.md"
+  ( cd "$d" && git add -A && git commit -q -m base )
+  build_gh35_invariant inv-build D-2 > "$d/memory/gotchas/inv-build.md"
+  printf 'echo two\n' >> "$d/fixture.sh"
+  ( cd "$d" && git add -A && git commit -q -m pass )
+  printf 'regenerated\n' >> "$d/memory/LIVE.md"
+  printf '# A-tB-1 — the authored unit\n' > "$d/$CPATH"
+  ( cd "$d" && git add -A && git commit -q -m spec )
+}
+run_gh35_command() { # dir · command -> the command's stdout, `python` shadowed by the resolved launcher
+  # CR dropped: a Windows python writes CRLF to a pipe, which the union folds but a multi-line read does not.
+  ( cd "$1" && GH35_PY="$_rkd_py" bash -c 'python() { command "$GH35_PY" "$@"; }; eval "$1"' gh35 "$2" 2>"$LAY/gh35-err.txt" ) | tr -d '\r'
+}
+G35="$LAY/gh35"
+if [ -n "$GKD" ] && build_gh35_repo "$G35" && [ "$(git -C "$G35" rev-list --count HEAD)" = 3 ]; then
+  GH35_B=$(git -C "$G35" rev-parse HEAD~2)
+  GH35_ARGS=$(printf '%s' "$P_UNITS" | sed 's#"slug":"tB",#"slug":"tB","base":"'"$GH35_B"'",#')
+  o=$(run_pathless "$GH35_ARGS" "$P_SPEC" "$COMMIT_OK" "$P_SUBJ")
+  c6=$(node -e 'const m = /^6\. Run `([^`]+)`/m.exec(JSON.parse(process.argv[1])); if (m) process.stdout.write(m[1])' \
+    "$(printf '%s\n' "$o" | sed -n 's/^promptjson:commit:specs:tB://p')" 2>/dev/null)
+  cr=$(node -e 'const m = /run `([^`]*gotchas[.]py --for-paths[^`]*)`/.exec(JSON.parse(process.argv[1])); if (m) process.stdout.write(m[1])' \
+    "$(printf '%s\n' "$o" | sed -n 's/^promptjson:audit:subjects:r1://p')" 2>/dev/null)
+  o6=$(run_gh35_command "$G35" "$c6")
+  or=$(run_gh35_command "$G35" "${cr//"<paths>"/fixture.sh}")
+  has    "GH35 the step-6 output reads its invariants at the run's base" "$o6" "# invariants are read at ${GH35_B:0:12}"
+  has    "GH35 ...itemises the ruling the pass added" "$o6" "- [ ] NEW/CHANGED invariant inv-build"
+  has    "GH35 ...and holds the base's ruling alone by design" "$o6" "$(printf '# by design — 1 invariant(s) this selection touches\n- inv-base — ')"
+  hasnt_ "GH35 ...with the pass's ruling not by design there" "$o6" "- inv-build — "
+  has    "GH35 the resolver's output reads at the same base" "$or" "# invariants are read at ${GH35_B:0:12}"
+  GH35_COMMIT='{"committed":true,"sha":"'$CSHA'","why":"","specs":[{"id":"A-tB-1","path":"'$CPATH'"}],"summary":"ok","checklist":'"$(node -e 'process.stdout.write(JSON.stringify(process.argv[1]))' "$o6")"'}'
+  GH35_SUBJ='"audit:subjects":{"subjects":[{"path":"'$CPATH'","blob":"'$B40'","tree":"'$B40'"}],"checklist":'"$(node -e 'process.stdout.write(JSON.stringify(process.argv[1]))' "$or")"',"checklistPaths":["fixture.sh"]}'
+  o=$(run_pathless "$GH35_ARGS" "$P_SPEC" "$GH35_COMMIT" "$GH35_SUBJ")
+  w=$(printf '%s\n' "$o" | grep '^wargs:')
+  has    "GH35 the audit's merged checklist carries the moved ruling as an item" "$w" "NEW/CHANGED invariant inv-build"
+  has    "GH35 ...under a by-design head of 0" "$w" '# by design — 0 invariant(s) this selection touches"'
+  hasnt_ "GH35 ...with the pass's ruling never by design" "$w" "- inv-build — "
+  hasnt_ "GH35 ...nor the base's, which the spec commit's block alone carried" "$w" "- inv-base — "
+else
+  n=$((n+1)); echo "FAIL GH35 the real-checker arm could not start: kit dir '$GKD', fixture '$G35' -- every arm it holds went UNRUN"; st=1
+fi
+# The omission arm: the first input's block holds three rulings, the first input itemises one of them
+# and the second another, so the merged block is the third alone. RED with the name filter cut.
+GH35_OSUBJ='"audit:subjects":{"subjects":[{"path":"'$CPATH'","blob":"'$B40'","tree":"'$B40'"}],"checklist":"# r-head\n- [ ] NEW/CHANGED invariant inv-q — verify the ruling before treating it as by design\n      q\n# by design — 3 invariant(s) this selection touches\n- inv-keep — x → y (D-1)\n- inv-q — x → y (D-2)\n- inv-z — x → y (D-3)","checklistPaths":["a.sh"]}'
+GH35_OCOMMIT='{"committed":true,"sha":"'$CSHA'","why":"","specs":[{"id":"A-tB-1","path":"'$CPATH'"}],"summary":"ok","checklist":"# c-head\n- [ ] NEW/CHANGED invariant inv-z — verify the ruling before treating it as by design\n      z\n# by design — 0 invariant(s) this selection touches"}'
+o=$(run_pathless "$P_UNITS" "$P_SPEC" "$GH35_OCOMMIT" "$GH35_OSUBJ")
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+has    "GH35 a ruling either input itemises is omitted: the block is the third alone" "$w" '# by design — 1 invariant(s) this selection touches\n- inv-keep — x → y (D-1)"'
+hasnt_ "GH35 ...the first input's itemised ruling is not by design" "$w" "- inv-q — "
+hasnt_ "GH35 ...nor the second input's" "$w" "- inv-z — "
+has    "GH35 ...and both stay items" "$w" 'NEW/CHANGED invariant inv-q — verify the ruling before treating it as by design\n      q\n- [ ] NEW/CHANGED invariant inv-z'
+# The prompt and log arms: a 40-hex `base` pins the spec commit's checker and the union's label, and
+# the log names it; no `base`, or one of another shape, keeps `--for-diff` and, with the audit off,
+# WARNS that the hand-out's checklist reads at the spec commit's parent; a pinned base off the audit
+# route warns nothing. Every absence rides beside a positive read of the same run's prompt.
+GH35_P=fedcba9876543210fedcba9876543210fedcba98
+GH35_PIN="python ${PFX}${MT_KIT}/gotchas.py --for-paths --base $GH35_P \$(git diff --no-renames --name-only HEAD~1..HEAD)"
+GH35_UNPIN="python ${PFX}${MT_KIT}/gotchas.py --for-diff HEAD~1..HEAD"
+GH35_WARN="log:WARNING: the spec commit's checklist reads invariants at its parent"
+build_gh35_args() { # base · units args -> those args with that base
+  printf '%s' "$2" | sed 's#"slug":"tB",#"slug":"tB","base":"'"$1"'",#'
+}
+o=$(run_pathless "$(build_gh35_args "$GH35_P" "$P_UNITS")" "$P_SPEC" "$P_COMMIT" "$P_SUBJ")
+has    "GH35 a pinned base reaches the spec commit's checker" "$(printf '%s\n' "$o" | grep '^prompt:commit:specs:tB:')" "$GH35_PIN"
+has    "GH35 ...and the merged checklist's label line" "$(printf '%s\n' "$o" | grep '^wargs:')" "# the spec commit $CSHA — $GH35_PIN"'\n# c-head'
+has    "GH35 ...and the log names the read point" "$o" "merged with the spec commit ${CSHA:0:12}'s --for-paths at base ${GH35_P:0:12} (its by-design block left out)"
+for c in "none|$P_OFF" "origin/main|$(build_gh35_args origin/main "$P_OFF")"; do
+  o=$(run_pathless "${c#*|}" "$P_SPEC" "$P_COMMIT" '')
+  has    "GH35 audit off, base [${c%%|*}]: the spec commit keeps --for-diff" "$(printf '%s\n' "$o" | grep '^prompt:commit:specs:tB:')" "$GH35_UNPIN"
+  has    "GH35 audit off, base [${c%%|*}]: ...and WARNS the hand-out reads at its parent" "$o" "$GH35_WARN"
+done
+o=$(run_pathless "$(build_gh35_args "$GH35_P" "$P_OFF")" "$P_SPEC" "$P_COMMIT" '')
+has    "GH35 audit off, a pinned base: the spec commit's checker is pinned" "$(printf '%s\n' "$o" | grep '^prompt:commit:specs:tB:')" "$GH35_PIN"
+hasnt_ "GH35 ...and no WARNING prints" "$o" "$GH35_WARN"
+
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
 # over it, 326 at 1d8530e7 (TOOL-aWokenSentinel-21) — at ~10 % headroom, rounded down, because the
@@ -2455,7 +2558,11 @@ same   "GH33 ...its writer asked for ids" "$(printf '%s\n' "$o" | grep '^prompt:
 # the unit's parent and 656 after — four spellings to one commit (8), five more placed (2), the
 # unplaceable loop (3, run seven times, so it executes 21), the H1 disagreement (4), the absolute pair
 # folding equal (3) and the attended path entry (3). All of them sit on the path a green run takes.
-FLOOR_ASSERTIONS=532
+# RAISED 532 -> 554 by TOOL-aGraftedHelix-35: its 22 static sites, counted with the grep above as 656 at
+# the unit's parent and 678 after — the GH15 merged-head arm rewritten into three (+2), the real-checker
+# arm (9), the omission arm (4), and the prompt and log arms (7, two of them in a loop run twice, so it
+# executes 9). All of them sit on the path a green run takes.
+FLOOR_ASSERTIONS=554
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

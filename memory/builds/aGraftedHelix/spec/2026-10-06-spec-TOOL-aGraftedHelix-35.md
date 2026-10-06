@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-35 — no by-design entry reaches a spec audit unless it stood at the run's pinned base, and the spec commit's checklist reads its invariants there
 
-**Status:** SPECCED · rev-1 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 19 · ratified 2026-10-06
+**Status:** CLOSED · rev-1 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 19 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 

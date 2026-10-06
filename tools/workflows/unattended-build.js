@@ -1,11 +1,11 @@
 export const meta = {
   name: 'unattended-build',
-  version: '1.10', // gov:kit unattended-build@1.10 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
+  version: '1.11', // gov:kit unattended-build@1.11 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
     'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal. The SPEC stage ends in ONE commit of the specs its writers authored, so the audit pins them at HEAD in the same call. AUDIT is opt-in: with no `specAudit` arg the stage announces itself OFF by declaration and the roster follows SPEC completion.',
   phases: [
     { title: 'Spec', detail: 'author every missing spec, in the declared order, no code; then ONE agent commits the authored specs' },
-    { title: 'Audit', detail: 'delegate to tier2-review.js as a spec-audit, passing `context` (the build README and run mandate), `specs` (the spec format and every sibling spec), `checklist` (a caller\'s, else the resolver\'s gotchas.py --for-paths output, merged with the spec commit\'s --for-diff output) and `scratch`, plus `priorFindings` and a per-subject `prevBlob` on a fold re-invoke; record the round, after the disposal at zero blockers so the disposition field is what was promoted. Only when `specAudit` is declared: absent, the stage logs OFF by declaration and delegates nothing' },
+    { title: 'Audit', detail: 'delegate to tier2-review.js as a spec-audit, passing `context` (the build README and run mandate), `specs` (the spec format and every sibling spec), `checklist` (a caller\'s, else the resolver\'s gotchas.py --for-paths output, merged with the spec commit\'s checklist items, its by-design block left out; that checklist reads its invariants at the pinned `base` when one is passed, else at the spec commit\'s parent, which is the block the audit-OFF hand-out carries) and `scratch`, plus `priorFindings` and a per-subject `prevBlob` on a fold re-invoke; record the round, after the disposal at zero blockers so the disposition field is what was promoted. Only when `specAudit` is declared: absent, the stage logs OFF by declaration and delegates nothing' },
     { title: 'Disposal', detail: 'dispose every confirmed and unverified finding by severity over the whole spec set, then hand out the roster, withheld on a clean round until its spec-audit record exists' },
   ],
 }
@@ -457,7 +457,21 @@ const AUDIT_CHECKLIST = 'python tools/memory-tree/gotchas.py --for-paths'
 // TOOL-aGraftedHelix-29 S9 - the checker reads the audit's by-design block AT THE RUN'S PINNED BASE, so
 // an invariant this build added or edited is an item on its own audit and never an exemption. Only a
 // `base` of the shape `badSubject` tests is forwarded; any other value pins nothing and is warned of.
+// TOOL-aGraftedHelix-35 - the audit's block is the RESOLVER'S alone: the spec commit's checklist joins
+// it for its items, and `renderChecklistUnion` leaves that checklist's by-design block out. The spec
+// commit's own checker reads at this same base too, through `SPEC_COMMIT_CHECKLIST` below, because the
+// audit-OFF hand-out carries that checklist whole as `specCommit.checklist`.
 const auditBase = /^[0-9a-f]{7,40}$/.test(base) ? base : ''
+// TOOL-aGraftedHelix-35 S3 - THE SPEC COMMIT'S CHECKLIST, ONE constant read by the commit stage's step 6,
+// the union's label and the `checklist from` line. With `auditBase` set it is the resolver's verb pinned
+// at that base over the paths the spec commit wrote, so an invariant an earlier pass of this build added
+// is an item, never by design; with none it is `CHECKLIST`, whose block is read at the spec commit's
+// parent, inside the build, and the audit-OFF route warns where `specCommit` is stored. `--no-renames`
+// lists a renamed path's source too. The command substitution splits on whitespace, so a path carrying
+// a space is split, which the commit block's own `for f in $changed` loop already assumes away.
+const SPEC_COMMIT_CHECKLIST = auditBase
+  ? AUDIT_CHECKLIST + ' --base ' + auditBase + ' $(git diff --no-renames --name-only HEAD~1..HEAD)'
+  : CHECKLIST
 const ordered = units.slice().sort(function (x, y) {
   const ox = Number.isInteger(x.order) ? x.order : 1e9
   const oy = Number.isInteger(y.order) ? y.order : 1e9
@@ -500,28 +514,52 @@ function renderCloses(list) {
 // one figure with a stated source and a gate.
 // A block whose own head disagrees with its entries carries that difference into the merged head as
 // `gap`, so the review harness's head-count refusal still fires on a truncated block.
-// WHAT IT DOES NOT CHECK: that either input is the checker's stdout.
+// TOOL-aGraftedHelix-35 S1/S2 - THE MERGED BLOCK IS THE FIRST INPUT'S ALONE. The second input is the
+// spec commit's checklist, whose block is read at that commit's parent when no `base` is pinned, inside
+// the build, so a ruling an earlier pass added could exempt the specs being audited. Its head, its
+// entries and its `INVARIANTS_READ_PREFIX` header line are left out whatever command produced it, so the
+// merged checklist states one read point; its class and NEW/CHANGED items still merge. Then a kept entry
+// whose invariant name is a whitespace-separated token on the first line of any item, from either input,
+// is omitted, so a ruling one input itemises as moved never stands as by design beside it. The head
+// counts the entries that remain plus `gap`.
+// WHAT IT DOES NOT CHECK: that either input is the checker's stdout. A checker header reworded away from
+// `INVARIANTS_READ_PREFIX` passes into the merged preamble, though no entry rides with it, because the
+// block is cut by the parity-gated `BY_DESIGN_HEAD`. An entry not of the `- <name> — ` shape is never
+// matched by name, so it is kept.
 const BY_DESIGN_HEAD = /^# by design — (\d+) invariant\(s\) this selection touches$/
 const BY_DESIGN_FORMAT = '# by design — {n} invariant(s) this selection touches'
+const INVARIANTS_READ_PREFIX = '# invariants are read '
 function renderChecklistUnion(first, label, second) {
   const head = [], items = [], design = []
   let gap = 0
-  for (const text of [first, '# ' + label, second]) {
+  const texts = [first, '# ' + label, second]
+  for (let t = 0; t < texts.length; t++) {
+    const theirs = t === texts.length - 1
     let inDesign = false, cur = -1
-    for (const raw of String(text).replace(/\r\n/g, '\n').split('\n')) {
+    for (const raw of String(texts[t]).replace(/\r\n/g, '\n').split('\n')) {
       const line = raw.replace(/\s+$/, '')
       if (!line) continue
       const m = BY_DESIGN_HEAD.exec(line)
-      if (m) { inDesign = true; gap += Number(m[1]); continue }
-      if (inDesign && line.indexOf('- ') === 0) { gap--; if (design.indexOf(line) === -1) design.push(line); continue }
+      if (m) { inDesign = true; if (!theirs) gap += Number(m[1]); continue }
+      if (inDesign && line.indexOf('- ') === 0) {
+        if (!theirs) { gap--; if (design.indexOf(line) === -1) design.push(line) }
+        continue
+      }
       inDesign = false
       if (line.indexOf('- ') === 0) {
         cur = items.some(function (i) { return i.split('\n')[0] === line }) ? -2 : items.push(line) - 1
-      } else if (cur === -1) head.push(line)
-      else if (cur >= 0) items[cur] += '\n' + line
+      } else if (cur === -1) {
+        if (!(theirs && line.indexOf(INVARIANTS_READ_PREFIX) === 0)) head.push(line)
+      } else if (cur >= 0) items[cur] += '\n' + line
     }
   }
-  return head.concat(items, [BY_DESIGN_FORMAT.replace('{n}', String(design.length + gap))], design).join('\n')
+  const named = {}
+  for (const i of items) for (const tok of i.split('\n')[0].split(/\s+/)) named[tok] = true
+  const kept = design.filter(function (e) {
+    const m = /^- (\S+) — /.exec(e)
+    return !(m && named[m[1]] === true)
+  })
+  return head.concat(items, [BY_DESIGN_FORMAT.replace('{n}', String(kept.length + gap))], kept).join('\n')
 }
 
 // --- the stage return schemas -----------------------------------------------------------------
@@ -1038,8 +1076,8 @@ if (!authoredIds.length) {
       '4. When the block\'s last line prints anything, a spec is left dirty after the commit: return ' +
       '`committed: false` and quote those porcelain lines in `why`.\n' +
       '5. Return `sha` as the full 40-hex `git rev-parse HEAD`.\n' +
-      '6. Run `' + CHECKLIST + '` over the commit just made and return its stdout VERBATIM as `checklist`. ' +
-      'It always exits 0; an empty selection returns an empty string.',
+      '6. Run `' + SPEC_COMMIT_CHECKLIST + '` over the commit just made and return its stdout VERBATIM as ' +
+      '`checklist`, whatever its exit status; an empty selection returns an empty string.',
     { label: 'commit:specs:' + slug, phase: 'Spec', schema: SPEC_COMMIT_SCHEMA },
   )
   // S3 — FIVE REFUSALS, in the order the spec's table states, each before the resolver can spawn and
@@ -1090,6 +1128,12 @@ if (!authoredIds.length) {
   }
   specCommit = { sha: sc.sha, checklist: typeof sc.checklist === 'string' && sc.checklist.trim() ? sc.checklist : '' }
   log('spec stage: committed ' + committedSpecs.length + ' spec(s) at ' + sc.sha)
+  // TOOL-aGraftedHelix-35 S4 - the audit-OFF hand-out carries this checklist whole, so an unpinned one is
+  // said out loud; on the audit route the union leaves its block out and the resolver warns instead.
+  if (!specAudit && SPEC_COMMIT_CHECKLIST === CHECKLIST) {
+    log('WARNING: the spec commit\'s checklist reads invariants at its parent — no pinned `base` was passed, ' +
+      'so an invariant this build added in an earlier pass can stand as by design in `specCommit.checklist`')
+  }
   // S2 — THE PATH FILL. `--plan <slug> --paths` prints an empty path for a spec nothing has committed,
   // so a unit the writers just authored arrives with none; the committed path is written onto it here,
   // and `auditUnits` and `buildUnits` both filter `ordered` after this line, so the resolver's roster
@@ -1373,11 +1417,15 @@ for (const u of ordered) {
 // checklist over every pass's commit, acted on before the next pass, and the next pass here is this
 // audit. Merged after the caller's or the resolver's, never appended (`renderChecklistUnion` says why),
 // and held to the same `- ` item rule: a union with no item is not passed, and the absence says so.
-// Off the audit route the hand-out carries it instead, as `specCommit`.
+// TOOL-aGraftedHelix-35 - its ITEMS join the audit and its by-design block is left out, so the audit's
+// block is the first input's alone; the `checklist from` line says so and names where it was read.
+// Off the audit route the hand-out carries it instead, as `specCommit`, block and all.
 if (specAudit && specCommit && specCommit.checklist) {
-  const commitFrom = 'the spec commit ' + specCommit.sha.slice(0, 12) + '\'s --for-diff'
+  const commitFrom = 'the spec commit ' + specCommit.sha.slice(0, 12) +
+    (SPEC_COMMIT_CHECKLIST === CHECKLIST ? '\'s --for-diff' : '\'s --for-paths at base ' + auditBase.slice(0, 12)) +
+    ' (its by-design block left out)'
   const merged = renderChecklistUnion(checklist || '',
-    'the spec commit ' + specCommit.sha + ' — ' + CHECKLIST, specCommit.checklist)
+    'the spec commit ' + specCommit.sha + ' — ' + SPEC_COMMIT_CHECKLIST, specCommit.checklist)
   if (/^- /m.test(merged)) {
     checklistFrom = (checklist !== null ? checklistFrom + ', merged with ' : '') + commitFrom
     checklist = merged
@@ -2156,8 +2204,8 @@ if (attended && !buildUnits.length) {
 // so it stays empty only on a call whose commit stage did not run — caller `subjects`, or nothing
 // authored — for a unit the caller passed without a path. `resolvePathsWith` names the command that
 // resolves those. A run that dispatches straight off this array hands such a child an empty spec path.
-// `specCommit` rides the audit-OFF hand-out only: on the audit route the spec commit's checklist went
-// to the audit, which is the pass M6 says acts on it.
+// `specCommit` rides the audit-OFF hand-out only: on the audit route the spec commit's checklist items
+// went to the audit, which is the pass M6 says acts on them, and its by-design block was left out.
 const handOut = {
   slug: slug,
   mode: mode,

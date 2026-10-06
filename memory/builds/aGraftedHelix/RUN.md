@@ -77,3 +77,7 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-06T01:52:45Z rescope · item add TOOL-aGraftedHelix-35 · reason H1 (rotated run's closing review round 1, ids 1 and 18): the spec-audit route still merges a by-design block read at the spec commit's parent, inside the build, so a build-added invariant can exempt the specs it audits
 
 2026-10-06T01:52:47Z rescope · item add TOOL-aGraftedHelix-36 · reason the rotated run's closing review round 1's MEDIUM and LOW findings M2-M7 and L1-L3, batched into one unit by the owner's promote-every-finding ruling; M1 is the HIGH's own defect and closes with it
+
+2026-10-06T02:23:22Z brief · item TOOL-aGraftedHelix-35 · reason a2e60ebbeb07 memory/builds/aGraftedHelix/prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md
+
+2026-10-06T02:24:29Z dispatch · item 7a8b2173 TOOL-aGraftedHelix-35 · reason tools/workflows tools/memory-tree memory/guides memory/map memory/HYGIENE.md memory/TEMPLATE-SPEC.md memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-35.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md
