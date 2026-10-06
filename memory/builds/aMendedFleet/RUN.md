@@ -666,3 +666,7 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T08:25:02Z brief · item PLAY-aMendedFleet-3 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
 
 2026-10-06T08:37:30Z dispatch · item ee812e3f TOOL-aMendedFleet-93 · reason memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-93-ab.py memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-93-arm-a.json memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-93-arm-b.json memory/builds/aMendedFleet/build/2026-10-06-build-TOOL-aMendedFleet-93-judges.tsv memory/builds/aMendedFleet/README.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-93.md
+
+2026-10-06T08:45:17Z dispatch · item da4f548b PLAY-aMendedFleet-3 · reason coding-governance-agents.template.md AGENTS.md memory/guides/SESSION-KICKOFF.md memory/builds/aMendedFleet/spec/2026-10-04-spec-PLAY-aMendedFleet-3.md
+
+2026-10-06T08:49:18Z dispatch · item da4f548b PLAY-aMendedFleet-3 · reason coding-governance-agents.template.md AGENTS.md memory/guides/SESSION-KICKOFF.md memory/builds/aMendedFleet/spec/2026-10-04-spec-PLAY-aMendedFleet-3.md memory/builds/aMendedFleet/README.md

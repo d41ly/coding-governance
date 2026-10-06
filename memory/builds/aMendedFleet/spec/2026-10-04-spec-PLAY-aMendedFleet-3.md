@@ -1,6 +1,6 @@
 # PLAY-aMendedFleet-3 — the charter's wiring rule stops stating which file Claude Code reads
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams playbook · ratified 2026-10-04 · order 94
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams playbook · ratified 2026-10-04 · order 94
 
 <!-- gen:spec-records -->
 

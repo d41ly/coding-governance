@@ -144,8 +144,8 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 ## §6 — Decisions, backlogs & the governing doc
 
 - **Wire the governing doc so every tool actually reads it.** Agents do not all read the same
-  filename: writing the filled charter to `AGENTS.md` alone ships a repo Claude Code cannot read,
-  because it does not read that name natively. Make ONE file canonical and the others thin imports of
+  filename, and which names a tool reads moves with its version, so one name alone can ship a
+  repo some agent never reads. Make ONE file canonical and the others thin imports of
   it, so there is one text and no copy to drift, and verify the wiring with a check rather than by
   eye — an unwired pair fails silently and looks fine.
 - Two record types per stream: the decision log is append-only (never rewrite a ratified record — supersede with a new id + note); the backlog keeps stable ids (gaps fine), and how an ask's status is kept is the memory tree's rule (§5).

@@ -271,7 +271,7 @@ ids TOOL-aMendedFleet-108 TOOL-aMendedFleet-109
 | [TOOL-aMendedFleet-91 — a spec's status header declares a records-only deliverable, and the product-commit signal reads it](spec/2026-10-04-spec-TOOL-aMendedFleet-91.md) | 91 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-92 — check 23 prints a fleet line, and drift-audit reads it from the newest bar run](spec/2026-10-04-spec-TOOL-aMendedFleet-92.md) | 92 | 2 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-93 — one tier2 review run with and without the charter, and the review default follows the reading](spec/2026-10-04-spec-TOOL-aMendedFleet-93.md) | 93 | 2 | CLOSED | rev-4 | 2026-10-06 |
-| [PLAY-aMendedFleet-3 — the charter's wiring rule stops stating which file Claude Code reads](spec/2026-10-04-spec-PLAY-aMendedFleet-3.md) | 94 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [PLAY-aMendedFleet-3 — the charter's wiring rule stops stating which file Claude Code reads](spec/2026-10-04-spec-PLAY-aMendedFleet-3.md) | 94 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-94 — the wrapper's product-only prose loads from a path-scoped rule when a session opens a product file](spec/2026-10-04-spec-TOOL-aMendedFleet-94.md) | 95 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [KICK-aMendedFleet-4 — the orientation card notes a PATH CLI older than the running session](spec/2026-10-04-spec-KICK-aMendedFleet-4.md) | 96 | 1 | SPECCED | rev-3 | 2026-10-04 |
 | [PLAY-aMendedFleet-4 — the `AGENTS.md` wrapper carries one node registry](spec/2026-10-04-spec-PLAY-aMendedFleet-4.md) | 97 | 1 | SPECCED | rev-2 | 2026-10-04 |
