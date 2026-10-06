@@ -572,3 +572,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T00:32:34Z dispatch · item 5564aeb6 KICK-aMendedFleet-3 · reason tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md skills/session-kickoff/SKILL.md tools/template-size-highwater.txt memory/project/method-carriers.txt memory/guides/SESSION-KICKOFF.md memory/builds/aMendedFleet/spec/2026-10-04-spec-KICK-aMendedFleet-3.md
 
 2026-10-06T00:39:32Z dispatch · item 5564aeb6 KICK-aMendedFleet-3 · reason tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md skills/session-kickoff/SKILL.md tools/template-size-highwater.txt memory/project/method-carriers.txt memory/guides/SESSION-KICKOFF.md memory/builds/aMendedFleet/spec/2026-10-04-spec-KICK-aMendedFleet-3.md memory/builds/aMendedFleet/README.md
+
+2026-10-06T00:51:01Z brief · item PLAY-aMendedFleet-1 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
