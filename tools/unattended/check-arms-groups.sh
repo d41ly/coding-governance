@@ -4,7 +4,9 @@
 #   bash <kit>/check-arms-groups.sh [<test file>]   # default: check-unattended.test.sh beside this script
 #
 #   exit 0 = every group clean · 1 = a rule red · 2 = REFUSED (unreadable file, an empty delimiter
-#   set, zero groups or zero arms parsed — a linter that parsed nothing never prints a clean verdict)
+#   set, zero groups or zero arms parsed — a linter that parsed nothing never prints a clean verdict —
+#   or a function span that runs unclosed to the end of the file or swallows a column-0 definition
+#   or `if in_shard` seam, named with the line it opened on and the first line it swallowed)
 #
 # WHAT IT GRADES. One pass over ONE text file, no subprocess per group, no suite executed. The file
 # is cut into GROUPS at every tree reset, and three rules are read off each group's LINKAGE:
@@ -34,6 +36,10 @@
 #   - INLINE ARMS. Assertions spelled as `n=$((n+1)); … || { echo "FAIL …"; st=1; }` carry no helper
 #     name and are not arms to this linter; only `hit`, `miss` and `same` calls are.
 #   - FUNCTION BODIES and comments. A call inside a helper's definition is a definition, not a group.
+#   - A MULTI-LINE DOUBLE-QUOTED STRING OR HEREDOC BODY carrying an unbalanced brace. Spans are framed
+#     by brace balance with single-quoted strings that span lines skipped (TOOL-aGraftedHelix-38 S5),
+#     and no other multi-line quoting is tracked: such a brace mis-frames its function, and is REFUSED
+#     only when the span then swallows a definition or a seam or runs off the file.
 #   - EXISTING VIOLATIONS are reported, never waived: the count over the tracked suite is the unit's
 #     starting figure and lives in its acceptance ledger, not in a registry here.
 set -u
@@ -50,6 +56,19 @@ awk '
 function strip(s) {                       # quoted strings and `${…}` out, then the comment tail
   gsub(/"[^"]*"/, "", s); gsub(/\047[^\047]*\047/, "", s); gsub(/\$\{[^}]*\}/, "", s)
   sub(/(^|[ \t])#.*$/, "", s); return s
+}
+function extract_counted(s,   p) {        # the part of one line whose braces frame a span (TOOL-aGraftedHelix-38 S5)
+  gsub(/\047\\\047\047/, "", s)           # close, escaped quote, reopen: no quote boundary
+  if (inq) {                              # inside a single-quoted string opened on an earlier line
+    p = index(s, "\047"); if (p == 0) return ""
+    s = substr(s, p + 1); inq = 0
+  }
+  # single-quoted pairs BEFORE double-quoted ones, unlike `strip`: a "…" pair matched first can
+  # straddle the closing quote of a sed program holding double quotes, followed by "$f", and leave
+  # one quote behind that opens nothing (no quote is spelled in this comment: it sits inside one)
+  gsub(/\047[^\047]*\047/, "", s); s = strip(s)
+  p = index(s, "\047"); if (p > 0) { inq = 1; s = substr(s, 1, p - 1) }   # an unpartnered quote opens a string
+  return s
 }
 function first_word(s,   w) {             # the command word of one `;`-separated segment
   sub(/^[ \t({!]+/, "", s)
@@ -70,22 +89,34 @@ function calls_member(s,   k, m, parts, w) {     # any word of a stripped body l
 { n++; L[n] = $0 }
 END {
   if (n == 0) { print "check-arms-groups: REFUSED — the file is empty, so it graded nothing"; exit 2 }
-  # ---- pass 1: function spans, brace-balanced over stripped lines; every line of a body is skipped
+  # ---- pass 1: function spans, brace-balanced over stripped lines; every line of a body is skipped.
+  # ---- No brace inside a single-quoted string that spans lines is counted, so a multi-line awk
+  # ---- program carrying `\{` in a regex closes where its function does (S5).
   nf = 0
   for (i = 1; i <= n; i++) {
     if (L[i] ~ /^[A-Za-z_][A-Za-z0-9_]*\(\)[ \t]*\{/) {
       name = L[i]; sub(/\(\).*$/, "", name)
-      depth = 0; j = i
+      depth = 0; j = i; inq = 0
       while (j <= n) {
-        s = strip(L[j]); depth += gsub(/\{/, "{", s) - gsub(/\}/, "}", s)
-        if (depth <= 0) break
+        s = extract_counted(L[j]); depth += gsub(/\{/, "{", s) - gsub(/\}/, "}", s)
+        if (depth <= 0 && !inq) break
         j++
       }
-      if (j > n) j = n
-      nf++; FN[nf] = name; FA[nf] = i; FZ[nf] = j
+      runoff = (j > n); if (j > n) j = n
+      nf++; FN[nf] = name; FA[nf] = i; FZ[nf] = j; FO[nf] = runoff
       for (k = i; k <= j; k++) INFN[k] = 1
       i = j
     }
+  }
+  # ---- a span that runs off the file, or swallows a column-0 definition or seam, is mis-framed: no
+  # ---- verdict is printed over a population cut wrong (S6)
+  for (f = 1; f <= nf; f++) {
+    for (k = FA[f] + 1; k <= FZ[f]; k++) if (L[k] ~ /^[A-Za-z_][A-Za-z0-9_]*\(\)[ \t]*\{/ || L[k] ~ /^if[ \t]+in_shard[ \t]/) break
+    if (k <= FZ[f]) why = "swallows line " k ": " L[k]
+    else if (FO[f]) why = "runs unclosed to the end of the file at line " n
+    else continue
+    print "check-arms-groups: REFUSED — function " FN[f] "() opened at line " FA[f] " " why " — its braces do not balance where it ends, so every group after it is mis-cut and no verdict is printed"
+    exit 2
   }
   # ---- the delimiter set: roots perform a hard reset; the closure is over callers, to a fixpoint
   ndel = 0

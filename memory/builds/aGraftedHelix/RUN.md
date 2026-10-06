@@ -101,3 +101,5 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-06T10:59:44Z dispatch · item 7db5d7a8 TOOL-aGraftedHelix-38 · reason tools/unattended memory/gotchas/a-pair-exists-and-it-is-the-wrong-one.md memory/gotchas/INDEX.md memory/guides .claude/skills/unattended/SKILL.md memory/map memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-38.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md
 
 2026-10-06T11:06:45Z dispatch · item 7db5d7a8 TOOL-aGraftedHelix-38 · reason memory/gotchas/a-helper-extraction-blinds-a-per-function-rule.md
+
+2026-10-06T11:30:24Z dispatch · item 333160ad TOOL-aGraftedHelix-38 · reason tools/unattended memory/gotchas/a-pair-exists-and-it-is-the-wrong-one.md memory/gotchas/a-helper-extraction-blinds-a-per-function-rule.md memory/gotchas/INDEX.md memory/guides .claude/skills/unattended/SKILL.md memory/map memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-38.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md

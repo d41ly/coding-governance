@@ -121,9 +121,26 @@ check_has  "DELIM a planted hard-reset helper joins the resolved set" "$o" " myr
 check_has  "DELIM a helper that calls it joins the set transitively" "$o" " mywrap"
 check_same "DELIM the wrapper's call opens a new group, so the control after it is not rule A" "$(measure_rule A "$o")" "$bA"
 
+# ---- FRAME · function spans (TOOL-aGraftedHelix-38 S5-S7). A brace inside a single-quoted program
+# ---- spanning lines frames nothing; a span that still mis-frames is a named refusal, never a verdict.
+printf 'reset_tree() { git reset -q --hard "$P"; }\nread_defs() {\n  awk \047\n    /\\(\\) *\\{/ { print FILENAME ":" FNR }\n  \047 "$1"\n}\nif in_shard 1; then\nreset_tree\nout=$(run)\nhit "$out" "a"\nfi\n' > "$T/frame_a.sh"
+o=$(bash "$LINT" "$T/frame_a.sh"); rc=$?
+check_same "FRAME a multi-line single-quoted program with an escaped brace closes its function" "$rc" "0"
+check_has  "FRAME the program's function closes, so the arm after it is graded GREEN" "$o" "GREEN — 0 findings over 2 groups and 1 arms"
+check_has  "FRAME the seam after that function is counted" "$o" "(1 seams)"
+printf 'reset_tree() { git reset -q --hard "$P"; }\nprint_brace() {\n  echo "a {\nb"\n}\nif in_shard 1; then\nreset_tree\nout=$(run)\nhit "$out" "a"\nfi\n' > "$T/frame_b.sh"
+o=$(bash "$LINT" "$T/frame_b.sh"); rc=$?
+check_same "FRAME a span that swallows a seam exits 2" "$rc" "2"
+check_has  "FRAME the refusal names the mis-framed function and its first line" "$o" "REFUSED — function print_brace() opened at line 2 "
+check_has  "FRAME the refusal names the seam it swallowed" "$o" "swallows line 6: if in_shard 1; then"
+printf 'reset_tree() { git reset -q --hard "$P"; }\nif in_shard 1; then\nreset_tree\nout=$(run)\nhit "$out" "a"\nfi\nread_tail() {\n  echo x\n' > "$T/frame_c.sh"
+o=$(bash "$LINT" "$T/frame_c.sh"); rc=$?
+check_same "FRAME a function never closed exits 2" "$rc" "2"
+check_has  "FRAME the refusal names the unclosed function" "$o" "function read_tail() opened at line 7 runs unclosed to the end of the file"
+
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, measured when this suite was written:
 # every arm above ran, and a block stranded past an exit would lower it.
-FLOOR_ASSERTIONS=35
+FLOOR_ASSERTIONS=43
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # THE TRAILER IS UNCONDITIONAL: a red-but-complete run must still carry one, or the pooled runner
 # reads it as untrailed and writes no reading (aBatchedArm closing D4).

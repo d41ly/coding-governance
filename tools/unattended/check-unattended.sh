@@ -50,7 +50,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.83   # gov:kit unattended@1.83 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.84   # gov:kit unattended@1.84 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -6157,12 +6157,17 @@ fi
 # ---- PREDICATE, per function: a terminal write is a `set_fact` call whose first argument is a plain
 # ---- shell variable, whose second word is `phase` and whose third is a literal member of the
 # ---- driver's PHASES_TERMINAL, read above through `core_of`; a claim write is a `write_claim` call on
-# ---- a non-comment line of the same function. A function holding a terminal write and no claim
+# ---- a non-comment line of the same function, OR a call there to a function TERMINAL_CLAIM_HELPER_FNS
+# ---- declares (TOOL-aGraftedHelix-38 S1), ONE declared level: a helper of a helper does not count. A
+# ---- function holding a terminal write and no claim
 # ---- write is a hit unless the list names it, and a list entry naming anything the predicate would
-# ---- not hit reds too, because a stale row widens the very set it was written to narrow. Measured
+# ---- not hit reds too, because a stale row widens the very set it was written to narrow. The helper
+# ---- list is graded both ways too: an entry that is no function of the population, or whose own
+# ---- body holds no direct `write_claim` call, is a hit naming that entry. Measured
 # ---- before it was wired, over the ten shell files at 9024901c: four terminal writers, one hit,
 # ---- `run_settle`; near-misses `run_hold` (HELD), `verb_close` (LANDING), `verb_phase` and
-# ---- `run_takeover`, whose phase is a variable.
+# ---- `run_takeover`, whose phase is a variable. Unit 36 then moved `run_settle`'s claim write into
+# ---- `write_settle_claim`, and this predicate, which did not follow the call, named it again.
 # ----
 # ---- What this does NOT check: a PATH - it grades a function, so a claim write on one branch passes
 # ---- a terminal write on another; HELD, which is not terminal, nor the `abandoned` fact; a phase
@@ -6170,27 +6175,35 @@ fi
 # ---- producers it may not reach); that the claim's status matches the phase, that the write sits
 # ---- under the RUN_CLAIMS guard, or that it follows the stage. `verb_preflight` writes LANDED to a
 # ---- scratch copy of the record it retires and passes because it writes the new run's claim. A
-# ---- trailing comment on a code line is read as code, as check 48 reads it.
+# ---- trailing comment on a code line is read as code, as check 48 reads it. Through a helper on
+# ---- TERMINAL_CLAIM_HELPER_FNS it does not check that the helper's `write_claim` sits on a path its
+# ---- caller reaches, nor the status the helper writes; and a call to any function the list does not
+# ---- name passes nothing, however that function writes a claim - `run_hold` writes one, and a
+# ---- terminal writer that calls it is still a hit, which is the H3 shape this check exists for.
 # ----
 # ---- DECLARED, so a fixture can move it, as PHASE_RECORDED_FNS is beside check 39. Ships EMPTY; an
 # ---- entry carries its reason on a comment line above this one.
 TERMINAL_CLAIM_EXEMPT_FNS=""
+# TERMINAL_CLAIM_HELPER_FNS — write_settle_claim: unit 36 moved the settle's claim write into it so the
+# `first` and `retry` paths share one implementation; it calls write_claim itself, which the list grades.
+TERMINAL_CLAIM_HELPER_FNS="write_settle_claim"
 _c51_files=()
 for _c51_p in "${_c48_files[@]}"; do
   case "$_c51_p" in *.test.sh) ;; *) _c51_files+=("$_c51_p") ;; esac
 done
 _c51_out=""
 if [ "${#_c51_files[@]}" -gt 0 ]; then
-  _c51_out=$(TERMS="$PHASES_TERMINAL" EXEMPT="$TERMINAL_CLAIM_EXEMPT_FNS" awk '
+  _c51_out=$(TERMS="$PHASES_TERMINAL" EXEMPT="$TERMINAL_CLAIM_EXEMPT_FNS" HELPERS="$TERMINAL_CLAIM_HELPER_FNS" awk '
       function flush() {
         if (fn != "") {
-          nfn++
-          if (tw != "") { nt++; if (!cw) { cand[fn] = 1; if (!(fn in ex)) hits = hits "\n  " tw " " fn "() writes a terminal phase and never calls write_claim" } }
+          nfn++; seen[fn] = 1; if (dw) direct[fn] = 1
+          if (tw != "") { nt++; if (cw && !dw) nh++; if (!cw) { cand[fn] = 1; if (!(fn in ex)) hits = hits "\n  " tw " " fn "() writes a terminal phase and never calls write_claim" } }
         }
-        fn = ""; tw = ""; cw = 0
+        fn = ""; tw = ""; cw = 0; dw = 0
       }
-      function scan(s,   t, w) {
-        if (s ~ /(^|[^A-Za-z0-9_])write_claim[ \t]/) cw = 1
+      function scan(s,   t, w, h) {
+        if (s ~ /(^|[^A-Za-z0-9_])write_claim[ \t]/) { cw = 1; dw = 1 }
+        for (h in helper) if (match(s, "(^|[^A-Za-z0-9_])" h "[ \t]")) cw = 1
         while (match(s, /(^|[^A-Za-z0-9_])set_fact[ \t]+"?\$[A-Za-z_][A-Za-z0-9_]*"?[ \t]+phase[ \t]+"?[A-Za-z_]+/)) {
           t = substr(s, RSTART, RLENGTH); s = substr(s, RSTART + RLENGTH)
           w = t; sub(/^.*[ \t]"?/, "", w)
@@ -6198,7 +6211,8 @@ if [ "${#_c51_files[@]}" -gt 0 ]; then
         }
       }
       BEGIN { k = split(ENVIRON["TERMS"], a, /[ \t]+/); for (i = 1; i <= k; i++) if (a[i] != "") term[a[i]] = 1
-              k = split(ENVIRON["EXEMPT"], a, /[ \t]+/); for (i = 1; i <= k; i++) if (a[i] != "") ex[a[i]] = 1 }
+              k = split(ENVIRON["EXEMPT"], a, /[ \t]+/); for (i = 1; i <= k; i++) if (a[i] != "") ex[a[i]] = 1
+              k = split(ENVIRON["HELPERS"], a, /[ \t]+/); for (i = 1; i <= k; i++) if (a[i] != "") helper[a[i]] = 1 }
       FNR == 1 { flush() }
       { ln = $0; gsub(/\r/, "", ln) }
       ln ~ /^[A-Za-z_][A-Za-z0-9_]*\(\)[ \t]*\{/ {
@@ -6211,17 +6225,21 @@ if [ "${#_c51_files[@]}" -gt 0 ]; then
       { c = ln; sub(/^[ \t]+/, "", c); if (c ~ /^#/) next; scan(c) }
       END { flush()
             for (e in ex) { if (e in cand) ne++; else hits = hits "\n  TERMINAL_CLAIM_EXEMPT_FNS names " e "(), which is no function writing a terminal phase without a claim write" }
-            printf "%d %d %d\t%s", nfn, nt, ne, hits }' "${_c51_files[@]}")
+            for (h in helper) {
+              if (!(h in seen)) hits = hits "\n  TERMINAL_CLAIM_HELPER_FNS names " h "(), which is no function of the shell files this check reads"
+              else if (!(h in direct)) hits = hits "\n  TERMINAL_CLAIM_HELPER_FNS names " h "(), whose own body holds no write_claim call"
+            }
+            printf "%d %d %d %d\t%s", nfn, nt, ne, nh, hits }' "${_c51_files[@]}")
 fi
 _c51_hits=${_c51_out#*$'\t'}; _c51_n=${_c51_out%%$'\t'*}
 # NO COUNTS IS NOT NO HITS, and NO WRITER IS NOT CLEAN: the driver certainly holds --abort's terminal
 # write, so a scan that finds none no longer matches how the driver spells one, and would pass by
 # finding nothing.
-read -r _c51_f _c51_t _c51_e <<<"$_c51_n"
+read -r _c51_f _c51_t _c51_e _c51_h <<<"$_c51_n"
 if [ "$_c51_hits" = "$_c51_out" ] || [ "${_c51_t:-0}" = 0 ]; then
   fail 51 "the scan found no function writing a terminal phase in this kit's shell files, so its predicate no longer matches how the driver spells that write and the claim pairing would be graded over no writer at all, passing by finding nothing"
 else
-  report "check 51 graded $_c51_f function(s) in ${#_c51_files[@]} shell file(s) of this kit, $_c51_t writing a terminal phase, $_c51_e exempt"
+  report "check 51 graded $_c51_f function(s) in ${#_c51_files[@]} shell file(s) of this kit, $_c51_t writing a terminal phase, $_c51_e exempt, $_c51_h through a declared helper"
   [ -z "${_c51_hits//[[:space:]]/}" ] \
     || fail 51 "a function in a shipped shell file of this kit writes a terminal phase and no run claim, so the run it ends leaves its claim on the remote reading live or held, a held claim never ages, and the slug's next --preflight is refused at check 107 by a claim nobody releases; write the claim with write_claim after the record is staged, or name the function on TERMINAL_CLAIM_EXEMPT_FNS with its reason:$_c51_hits"
 fi

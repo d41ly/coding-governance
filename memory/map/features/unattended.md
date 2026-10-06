@@ -25,7 +25,7 @@ gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mod
   "fallback-fabricates-the-passing-value.md", "two-readers-of-one-config-one-re-derived.md",
   "destructive-step-before-its-precondition.md", "line-count-reads-empty-capture-as-one.md",
   "guard-fed-the-value-it-supersedes.md", "witness-graded-against-a-fact-written-after-it.md",
-  "porcelain-diff-names-a-rename-by-its-destination.md"]
+  "porcelain-diff-names-a-rename-by-its-destination.md", "a-helper-extraction-blinds-a-per-function-rule.md"]
 guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md", "UNATTENDED-STOPS.md", "UNATTENDED-ASKS.md"]
 backlog-shards = []
 lexicon-verbs = []
@@ -239,23 +239,23 @@ core sets are not editable from the project layer.
 *Re-derived 2026-08-20 against the tree, not carried forward. Dossier prose is ungated and rots
 silently; re-derive this section whenever the feature is touched.*
 
-- **The junction arm of the adopter e2e is SKIPPED on node `a`**, which lacks the privilege to
-  create a symlink. It reports the skip loudly rather than passing, but the shape this fleet
-  actually installs with is therefore unexercised here and needs a run on a node that can link.
+- **The junction arm of the adopter e2e is SKIPPED on node `a`**, which cannot create a symlink. It
+  reports the skip loudly, but the shape this fleet installs with is unexercised here and needs a
+  node that can link.
 - **A bug class this build DISCOVERED is now catalogued but only gated in one place.**
   `assertion-between-two-derived-values` was found here, in this kit's own leg, and the arm that
   proves it is this kit's. The class is general — any checker that composes both sides of a
   comparison has it — and nothing sweeps for it repo-wide.
-- **The DIRECTIVE LAYER is gated on both halves.** The registry is joined to the Skill's table in
-  both directions by check 16, every cited method section resolves, and the protocol's own §3 phase
-  list, §4 DoD table and the count sentence above it are joined to the driver's constants by arms D
-  and E. Check 17 grades the parked waiver record: a declared handle, a non-empty reason, and the
-  whole line present in the run-state file's FIRST committed blob. Its green control's waiver is
-  written by `--preflight --waive` rather than by hand, which is the cross-component arm
-  `TOOL-aStandingWrit-8` asked for. Two exemptions are deliberate and each carries its reason in
-  source: the handle-membership test is skipped on a TERMINAL record, because a frozen waiver graded
-  against a moving directive set is a red wedge no verb can repair, and the git join is silent when
-  the record has no committed blob.
+- **The DIRECTIVE LAYER is gated on both halves.** Check 16 joins the registry to the Skill's table
+  both ways and resolves every cited method section; arms D and E join the protocol's §3 phases, §4
+  DoD table and count sentence to the driver. Check 17 grades the parked waiver: a declared handle, a
+  reason, and the line in the run-state file's FIRST committed blob, its control written by
+  `--preflight --waive` (`TOOL-aStandingWrit-8`). Two exemptions carry their reasons in source: a
+  TERMINAL record skips the handle test, and a record with no committed blob skips the git join.
+- **A per-function source rule goes blind when a helper is extracted**
+  (`a-helper-extraction-blinds-a-per-function-rule`). Check 51 and the driver suite's rule 2 declare
+  and grade their indirection; rule 1 and checks 39 and 48 read a function the same way and are a
+  documented check, not a gate.
 - **The DoD core is `CORE_FLOOR` in `.unattended.conf`, never a count typed here** — this row
   once said `10:8` and rotted. `closing-review-recorded` joins the pinned BASE to a tracked review
   record; the base needle is SEVEN characters (git abbreviates to seven here; the eight-char form

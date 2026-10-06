@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.83 -->
+<!-- gov:kit unattended@1.84 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two

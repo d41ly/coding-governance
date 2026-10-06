@@ -3031,27 +3031,53 @@ n=$((n+1)); [ "$ru" = "verb_close()" ] || { echo "FAIL S4 rule 1 does NOT name e
 
 # Rule 2 - a function that parks must also carry the bypass-flag guard. Same scoping, same reason.
 #
-# ONE DECLARED EXEMPTION, and the rule's limit stated with it: `verb_preflight` parks a waiver, and its
-# guard lives in `check_waivers`, which it CALLS. This rule reads text and cannot follow a call, so a
-# cross-function guard is declared here rather than pretended away. That is the whole cost of the
-# scoping choice, and it is the second false positive this rule produced before being narrowed -- the
-# first was a proximity window, this one a call boundary. A NEW name appearing in this exemption list
-# deserves the scrutiny the rule exists to apply, not an edit to the list.
-badguard=$(awk '
+# ONE DECLARED EXEMPTION, and the rule's limit stated with it: the preflight's waiver is parked by
+# `write_preflight_record`, and its guard lives in `check_waivers`, which that function's ONLY caller,
+# `verb_preflight`, calls on an EARLIER line - before the status gate that ends the verb on any refused
+# precondition. The guard sits BESIDE the park, in the caller's earlier callee, so following the
+# parking function's own calls never reaches it. This rule reads text and cannot follow a call, so a
+# cross-function guard is declared here rather than pretended away, as a PAIR: the parking function
+# and the guard function. That is the whole cost of the scoping choice, and it is the second false
+# positive this rule produced before being narrowed -- the first was a proximity window, this one a
+# call boundary. A NEW name appearing in this exemption deserves the scrutiny the rule exists to apply,
+# not an edit to it. The pair is GRADED (TOOL-aGraftedHelix-38 S4): it named `verb_preflight()` by
+# literal until unit 32 moved the park out of it, and nothing said the entry had gone stale.
+park_exempt_fn="write_preflight_record()"
+park_exempt_guard="check_waivers"
+badguard=$(awk -v ex="$park_exempt_fn" '
   /^[a-z_]+\(\)/ { fn = $1; pk[fn] = 0; gd[fn] = 0 }
   fn && /^ *park "\$rel"/ { pk[fn] = 1 }
   fn && /BYPASS_BAN/       { gd[fn] = 1 }
-  END { for (f in pk) if (pk[f] && !gd[f] && f != "verb_preflight()") print f }
+  END { for (f in pk) if (pk[f] && !gd[f] && f != ex) print f }
 ' "$SCRIPT")
 n=$((n+1)); [ -z "$badguard" ] || { echo "FAIL a function parks an entry with no bypass-flag guard anywhere in it: $badguard"; st=1; }
+# ...(a) the exempted function parks under the rule's own framing, or the exemption is stale.
+pkall=$(awk '
+  /^[a-z_]+\(\)/ { fn = $1; pk[fn] = 0 }
+  fn && /^ *park "\$rel"/ { pk[fn] = 1 }
+  END { for (f in pk) if (pk[f]) print f }
+' "$SCRIPT")
+n=$((n+1)); printf '%s\n' "$pkall" | grep -qxF -- "$park_exempt_fn" \
+  || { echo "FAIL rule 2's exemption names $park_exempt_fn, which parks nothing under the rule's framing, so the exemption is stale and whatever parks now is unguarded in the rule's eyes"; st=1; }
+# ...(b) the call structure the pair rests on: the exempted function has a caller, every caller calls
+# the guard function on an earlier non-comment line, and the guard function carries the bypass token.
+pgc=$(awk -v x="${park_exempt_fn%()}" -v g="$park_exempt_guard" '
+  /^[a-z_]+\(\)/ { fn = $1; gs = 0; isg = (fn == g "()"); next }
+  !fn || /^[ \t]*#/ { next }
+  isg && /BYPASS_BAN/ { tok = 1 }
+  $0 ~ ("(^|[^A-Za-z0-9_])" g "([ \t;]|$)") { gs = 1 }
+  fn != x "()" && $0 ~ ("(^|[^A-Za-z0-9_])" x "([ \t;]|$)") { nc++; if (!gs) print "caller " fn " calls " x " with no earlier " g " call" }
+  END { if (!nc) print "no function calls " x; if (!tok) print g " carries no BYPASS_BAN token" }
+' "$SCRIPT")
+n=$((n+1)); [ -z "$pgc" ] || { echo "FAIL rule 2's exemption rests on a call structure the driver no longer has: $pgc"; st=1; }
 
 # Rule 2's RED FIXTURE. Rule 1 had one and rule 2 did not, which I said out loud rather than shipping
 # the asymmetry: a source rule with no negative control is the class this build keeps filing.
-rg=$(awk '
+rg=$(awk -v ex="$park_exempt_fn" '
   /^[a-z_]+\(\)/ { fn = $1; pk[fn] = 0; gd[fn] = 0 }
   fn && /^ *park "\$rel"/ { pk[fn] = 1 }
   fn && /BYPASS_BAN/       { gd[fn] = 1 }
-  END { for (f in pk) if (pk[f] && !gd[f] && f != "verb_preflight()") print f }
+  END { for (f in pk) if (pk[f] && !gd[f] && f != ex) print f }
 ' <(sed '/BYPASS_BAN/d' "$SCRIPT"))
 n=$((n+1)); [ -n "$rg" ] || { echo "FAIL S4 rule 2 does NOT fire on a copy with every bypass guard deleted, so it would not notice a regression"; st=1; }
 
@@ -15891,7 +15917,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # each arm's own `mutate` included, counted off the block's `hit`/`same`/`mutate` lines and run as a
 # slice behind this prologue on node a, 2026-10-06 (n 2 -> 25), each arm red under its staged break
 # in a scratch copy of the driver; no suite ran.
-FLOOR_ASSERTIONS=2534
+# RAISED 2534 -> 2536 by TOOL-aGraftedHelix-38 S4: rule 2's declared-pair arms in region two, the
+# stale-entry arm (a) and the call-structure arm (b), two inline assertions, run as a slice of the
+# prologue and rule 2's block on node a, 2026-10-06, each red under its staged break; no suite ran.
+FLOOR_ASSERTIONS=2536
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -16042,7 +16071,8 @@ FLOOR_SHARD_1=211
 # RAISED 2285 -> 2289: the settle drive and the two ledger token-liveness arms, see FLOOR_ASSERTIONS.
 # RAISED 2289 -> 2312: the same 23 region-two exec-marker, settle-retry and lock assertions, see FLOOR_ASSERTIONS.
 # RAISED 2312 -> 2335 by TOOL-aGraftedHelix-37: the same 23 region-two GH37 lock assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=2335
+# RAISED 2335 -> 2337 by TOOL-aGraftedHelix-38: the same 2 region-two rule-2 pair assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=2337
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

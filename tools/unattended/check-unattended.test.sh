@@ -6477,6 +6477,31 @@ miss "$out" "writes a terminal phase and no run claim"
 miss "$out" "the scan found no function writing a terminal phase"
 hit  "$out" "writing a terminal phase, 0 exempt"
 reset_tree
+# ---- TOOL-aGraftedHelix-38 S3: a claim write through a DECLARED helper, TERMINAL_CLAIM_HELPER_FNS, one
+# ---- level deep. Staged as the arms above are. (a) a writer calling an UNLISTED helper that writes no
+# ---- claim is a hit, so following any call is not the rule; (b) that helper on the list is a hit on
+# ---- the list entry, whose own body holds no write_claim; (c) a writer whose only claim write is
+# ---- run_hold's `held`, unlisted, is a hit, the H3 shape, so following any CLAIM-WRITING call is not
+# ---- the rule either; (d) a writer through the shipped helper is silent; (e) a stale entry reds.
+printf 'c51nohelper() {\n  %s "$rel" phase ABORTED || return 1\n  c51quiet "$rel"\n}\nc51quiet() {\n  echo "$1"\n}\n' "$_c51_sw" > "$TMPBIN_PARENT/c51a.fn"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c51a.fn"
+hit  "$(run)" "c51nohelper() writes a terminal phase and never calls write_claim"
+reset_tree
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c51a.fn"
+mutate $KIT_REL/check-unattended.sh 's|^TERMINAL_CLAIM_HELPER_FNS=.*|TERMINAL_CLAIM_HELPER_FNS="write_settle_claim c51quiet"|'
+hit  "$(run)" "TERMINAL_CLAIM_HELPER_FNS names c51quiet(), whose own body holds no write_claim call"
+reset_tree
+printf 'c51hold() {\n  %s "$rel" phase ABORTED || return 1\n  run_hold "$slug" x x x x x x\n}\n' "$_c51_sw" > "$TMPBIN_PARENT/c51c.fn"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c51c.fn"
+hit  "$(run)" "c51hold() writes a terminal phase and never calls write_claim"
+reset_tree
+printf 'c51settle() {\n  %s "$rel" phase ABORTED || return 1\n  write_settle_claim "$slug" "$rel" x first\n}\n' "$_c51_sw" > "$TMPBIN_PARENT/c51d.fn"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c51d.fn"
+miss "$(run)" "c51settle() writes a terminal phase"
+reset_tree
+mutate $KIT_REL/check-unattended.sh 's|^TERMINAL_CLAIM_HELPER_FNS=.*|TERMINAL_CLAIM_HELPER_FNS="write_settle_claim ghosthelper"|'
+hit  "$(run)" "TERMINAL_CLAIM_HELPER_FNS names ghosthelper(), which is no function of the shell files this check reads"
+reset_tree
 fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aGraftedHelix-34 S7 ---------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
@@ -6642,7 +6667,11 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- which every shard executes too, so each FLOOR_SHARD_k below rises by the same 1. MEASURED on a
 # ---- slice of the prologue on node a, 2026-10-06, n 0 -> 1, green, and red with a column-0 helper
 # ---- planted inside region 8 of a scratch copy; this pass runs no suite.
-FLOOR_ASSERTIONS=954
+# ---- RAISED 954 -> 965 by exactly the arms, TOOL-aGraftedHelix-38 S3: check 51's helper-list arms
+# ---- (six `mutate`, four `hit`, one `miss`), at the END of check 51's block in region 7, so
+# ---- FLOOR_SHARD_7 carries the same +11 and the other seven are untouched. MEASURED on a slice of
+# ---- the prologue and check 51's block on node a, 2026-10-06; this pass runs no suite.
+FLOOR_ASSERTIONS=965
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
@@ -6653,7 +6682,7 @@ FLOOR_SHARD_3=128
 FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133
 FLOOR_SHARD_6=150
-FLOOR_SHARD_7=215
+FLOOR_SHARD_7=226
 FLOOR_SHARD_8=206
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;

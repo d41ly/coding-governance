@@ -16,10 +16,11 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 |---|---|---:|---|---|
 | [a-folded-field-leaves-its-row-shape-docs-behind](a-folded-field-leaves-its-row-shape-docs-behind.md) | class | 4 |  | a review fold adds a key to a declared row shape in the code and its gate, and the spec body and the README that describe that shape keep the old key set |
 | [a-grep-for-a-word-is-a-presence-probe](a-grep-for-a-word-is-a-presence-probe.md) | class | 3 |  | a grep for a word over a source file proves the word is there, not that the code around it runs, so a comment or a dead block satisfies the criterion it was written to observe |
+| [a-helper-extraction-blinds-a-per-function-rule](a-helper-extraction-blinds-a-per-function-rule.md) | class | 3 |  | a source rule that pairs two facts on lines of ONE function goes blind when a refactor moves one half into a new helper, naming a correct function or exempting one that no longer holds the half |
 | [a-merged-in-check-can-refuse-a-pinned-record](a-merged-in-check-can-refuse-a-pinned-record.md) | class | 4 |  | a merge of the remote's default branch into a run branch brings in a check, or narrows one, that the running record cannot satisfy because the bytes it grades are pinned at BASE; nothing grades it again until the verb that owns it, and for a non-overridable item the only exits left are rotation and hand-off |
 | [a-new-leg-trips-a-growing-set-of-meta-gates](a-new-leg-trips-a-growing-set-of-meta-gates.md) | class | 6 |  | adding one gate leg trips a set of meta-gates that grows as new ones land, and a check inside an existing gate is far cheaper — but not free |
 | [a-new-local-collides-in-a-long-function](a-new-local-collides-in-a-long-function.md) | class | 2 |  | a local added to a function thousands of lines long can share its name with one a distant block already binds, and the later binding silently replaces the new value only on the inputs that reach that block |
-| [a-pair-exists-and-it-is-the-wrong-one](a-pair-exists-and-it-is-the-wrong-one.md) | class | 2 |  | a scanner that pairs a delimiter with the next one of its kind finds a pair for a delimiter that opens nothing, and the span it then blanks is where the defect hides |
+| [a-pair-exists-and-it-is-the-wrong-one](a-pair-exists-and-it-is-the-wrong-one.md) | class | 6 |  | a scanner that pairs a delimiter with the next one of its kind finds a pair for a delimiter that opens nothing, and the span it then blanks is where the defect hides |
 | [a-spelling-change-strands-its-readers](a-spelling-change-strands-its-readers.md) | class | 11 |  | a shared file changes how it SPELLS its values, the readers someone migrated resolve the new spelling, and every reader nobody listed compares the raw one and matches nothing |
 | [a-view-fix-trades-one-blindness-for-another](a-view-fix-trades-one-blindness-for-another.md) | class | 3 |  | a scanner that grades source through a rendered view has a blind spot, and building a better view moves it rather than closing it, each move a new fail-open or false-deny |
 | [ab-arm-never-did-the-work](ab-arm-never-did-the-work.md) | class | 3 |  | a timing A/B whose arms are not each asserted to have DONE the work measures a refusal against a run, and the fast arm looks like the good one |
@@ -117,6 +118,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-102 record(s): 99 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+103 record(s): 100 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

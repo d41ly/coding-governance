@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-38 — three checks that went blind when units 32 to 36 moved code into helpers
 
-**Status:** SPECCED · rev-2 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 22 · ratified 2026-10-06
+**Status:** CLOSED · rev-2 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 22 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 
