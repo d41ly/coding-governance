@@ -155,7 +155,7 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraf
 | [TOOL-aGraftedHelix-39 — one derivation of the paths a dispatched pass may write](spec/2026-10-06-spec-TOOL-aGraftedHelix-39.md) | 23 | 2 | CLOSED | rev-1 | 2026-10-06 |
 <!-- /gen:build-units -->
 
-Records: 59 bound to this build, across 4 record folder(s).
+Records: 60 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
