@@ -52,7 +52,7 @@ Cite ids, never line numbers.
 | [TOOL-aDeferredBar-5](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | HYGIENE CHECK 12'S ACCEPTANCE-WITNESS ARM ACCEPTS A *.test.sh-SHAPED… |
 | [TOOL-aDeferredBar-6](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE SPEC-STAGE WRITER IS NOT TOLD TO RUN THE SPEC-TOKEN CHECKER BEFORE… |
 | [TOOL-aDeferredBar-7](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/check-wiring.sh HAS NO ARM FOR… |
-| [TOOL-aDeferredBar-8](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/memory-tree/check-arms.py DISCOVERS GATES BY A fail() { HELPER,… |
+| [TOOL-aDeferredBar-8](../builds/aDeferredBar/BACKLOG.md) | SPECCED | — | TOOL-aGraftedHelix-47 | 2026-09-14 | tools/memory-tree/check-arms.py DISCOVERS GATES BY A fail() { HELPER,… |
 | [TOOL-aDeferredBar-9](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/unattended/adopt-unattended.test.sh CARRIES NO ASSERTION FLOOR… |
 | [TOOL-aDeferredBar-10](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | AN ACCEPTANCE-LEDGER LINE CAN ASSERT A LEG'S EXIT FOR A TREE THAT MOVED… |
 | [TOOL-aDeferredBar-11](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/memory-recall/test_recall_floor.py IS THE ONE chunk = selftests… |
