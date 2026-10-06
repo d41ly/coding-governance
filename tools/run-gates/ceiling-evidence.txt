@@ -17,6 +17,14 @@
 # at its ceiling can produce no in-band reading above that ceiling, which is why the
 # out-of-band path exists — and why it is never allowed to look like the in-band one.
 #
+# THE CENSUS. A run record's reading argues a row only when its `.leg` row's eighth field,
+# `foreign`, reads 0: the runner's census of foreign gate work found none while the leg ran.
+# A positive count is set aside as contended, and `unknown` or a row with no such field as
+# uncensused; `--report` and `--write` print how many. The census sees only processes shaped
+# like this repository's gate work, so a 0 says no foreign gate work, never a quiet host. An
+# `--observed` reading is admitted uncensused: no run record reaches it, and its `--how` text
+# is the only record of the load it was taken under (TOOL-cMendedVintage-17).
+#
 # <leg>	<max seconds>	<readings>	<node>	<date>	<source>
 agent-cap restatement	27.0	1	a	2026-09-06	runner
 agent-cap restatement self-test	115.4	2	a	2026-09-24	runner

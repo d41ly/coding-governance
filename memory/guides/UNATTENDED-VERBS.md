@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.69 -->
+<!-- gov:kit unattended@1.85 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -24,6 +24,12 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   and at the advertised tip, lander only where both list it and undeclared only where neither
   declares the key, prints `landing — lander`, `handoff` or `undeclared`, and records the first two
   as `landing`. A record `--settle` marked `abandoned` it retires like a finished one.
+  Where `RUN_CLAIMS` is `on` it reads every run claim on the remote right after the anchor, lists the
+  ones of OTHER slugs that are not terminal, and refuses at check 107 a live, held or unreadable claim
+  another session holds on this slug; it takes over a stale or terminal one. Its own claim is written
+  by compare-and-swap after every precondition and BEFORE the rotation and the scaffold, so a race it
+  loses (check 108) or a write that does not complete (check 109) leaves the tree untouched.
+  `UNATTENDED-STOPS.md` §7 is the contract; undeclared, the switch is `off` and one NOTE says so.
 - `--phase` — writes a phase and its witness. Without it the vocabulary is decorative: only
   `--preflight` and `--close` ever wrote one, so every member between them entered the file only by
   hand-editing an artifact this kit calls generated.
@@ -150,6 +156,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   take-over, `--replaces`, the holder's restarted process and a pushed landing not yet observed
   re-record keepalive, session and pid and stage the record; refused on a recorded terminal, and on
   a record `--settle` marked `abandoned`, whose next run `--preflight` starts.
+  Where `RUN_CLAIMS` is `on` the holder reads its claim on the remote on every call and renews it when
+  due, a claim another session holds is check 108 for the holder and check 107 for a take-over, and
+  `--replaces` and the landing re-bind write their new keepalive into it (`UNATTENDED-STOPS.md` §7).
   `--scheduled <held-at>` marks it as the restart a DURABLE schedule issued. It refuses, numbered
   and before any write, unless the exact hold that schedule was filed for is still the record's
   state, and on success the take-over runs unchanged, still requires the session's own
@@ -164,6 +173,20 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   node again, at BASE before the anchor round-trip and at the advertised tip after it, and on a
   `landing` hand-off node it refuses any override and, with the DoD
   met, writes the bar's facts and refuses, naming `--handoff <slug> --code owner-landing`.
+  Where `RUN_CLAIMS` is `on`, before any item is graded, a run that does not hold its claim
+  on the remote is check 108 and a claim that cannot be read or renewed is check 109: a close
+  that lands a claim it never read is a double landing.
+- `--authorization` — `--authorization <slug>` grades `authorization-reachable` alone, by the arm
+  `--close` grades it with, so it answers what the close would from the same tree. Run it after any
+  merge of the remote's default branch into the run branch, mid-build included, and under
+  `in-place` between the lander's `--prepare` and `--close`: a merged-in check can refuse a README
+  pinned at BASE, and the close reads that item only after its bar. Met prints one
+  `authorization-reachable — met` line and exits 0. A README refused at a derived BASE prints the
+  numbered refusal, then one line naming the two exits — rotate by `--abort --code
+  repo-state-out-of-mandate` and a fresh `--preflight`, or `--park` then `--handoff --code
+  owner-decision` — and exits 1. A predicate that never reached the README, the anchor or the base
+  derivation refusing, prints that refusal and `not evaluated` with no exits, and exits 2. It
+  writes nothing to the tree, the record or the remote, and grades no other Definition-of-Done item.
 - `--landed` — an OBSERVATION rather than a claim, guarded on the RECORDED phase. It accepts a record
   only at `LANDING` and re-observes the anchor. Under `primary` it is the one writer of `LANDED` and
   refuses unless HEAD is an ancestor of the tip the remote advertises; where `LANDER_MARKER` is
@@ -181,7 +204,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   stop-guard blocks a finished-and-unstamped stop and continues you). A post-close line without the
   id prints `keepalive-reaped: checked`; no sidecar, or no recorded id, prints `unchecked` with the
   reason and lands. It parses nothing beyond a substring test for the id, and it does not check that
-  the id was ever this run's job.
+  the id was ever this run's job. Where `RUN_CLAIMS` is `on` it writes `landed` into the run's claim
+  once the record is staged; a claim it may not write is announced on one line and never fails it.
 - `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add|defer`, the
   unit as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the
   first three acts; this verb is the record. `defer` sets a roster unit aside against an open ask so
@@ -209,7 +233,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   live tree and refuses the dispatch when it exits non-zero: the checker's bar join grades LIVE specs,
   an unattended build closes each unit spec in its own build commit, and this verb is the one point
   that sees a spec before its unit builds. A blank or absent key is an ANNOUNCED skip on stdout,
-  never a silent pass.
+  never a silent pass. Where `RUN_CLAIMS` is `on` it reads the run's claim as the holder after every
+  local refusal and before the row: another session's claim is check 108 and no row is written.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:
   `CONVERGING`, `CONVERGED`, `NON-CONVERGENT`, `CEILING` or `BOUNDED`. The round is an append-only
   `review` line in the parked region, a `history` kind, so it never inflates the count of decisions
@@ -246,6 +271,17 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   nothing; a `--no-verify` commit skips it, and check 23 still grades that pass at the close. An
   AMEND of a pass commit is graded too, but an undeclared path in it is refused with no widening:
   a `--dispatch` would anchor at the commit the amend replaces, which check 23 never grades.
+- `--claims` — every run claim on the remote, one TAB-separated row each: slug, node, status,
+  beat age in seconds and verdict, `live`, `stale`, `held`, `terminal` or `unknown`, sorted by slug;
+  `claims: none` when there is none, and exit 2 with check 109 when the remote does not answer, never
+  an empty list. Where `RUN_CLAIMS` is not `on` it prints the single line `claims: off`, exits 0
+  and reads nothing, since no verb writes or reads a claim then; `git ls-remote <remote>
+  'refs/gov/runs/*'` still shows a leftover one. It takes no slug and decides nothing about who
+  drives: `UNATTENDED-STOPS.md` §7 is what the verdicts mean.
+- `--beat` — `--beat <slug>`, the resume tick's heartbeat for a run `--liveness` reads `LIVE` on this
+  host: it renews that run's own claim when due and prints exactly one `beat —` line, `renewed` or
+  `skipped: <why>`. It writes only a claim that is absent or the run's own, and refuses nothing but a
+  missing record; `RUN_CLAIMS` off is a skip naming the switch.
 - `--version` — prints the kit's own version and exits, touching no record. It is here because it is
   DECLARED, and a declared verb nobody documents is one nobody uses to answer the question this kit
   cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it
@@ -268,7 +304,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   An optional `--pending-run <runId>` names the Workflow run of a review that deferred twice; it is
   recorded as `hold-run`, rewritten EMPTY by a hold without it, printed on the HELD checkpoint and
   named by a take-over's relaunch line, and a value outside 1 to 64 letters, digits, `_` and `-` is
-  refused with the rest. The contract is `UNATTENDED-STOPS.md`.
+  refused with the rest. Where `RUN_CLAIMS` is `on` it writes `held` into the run's claim once the
+  record is staged, announcing on one line a claim it may not write. The contract is
+  `UNATTENDED-STOPS.md`.
 - `--handoff` — the exit for a run whose work is sound and which an owner must land, or decide
   first. `--handoff <slug> --code owner-landing|owner-decision --reason <text>` plus exactly one of
   `--reaped <id>` and `--keepalive-unreachable <node>`. It is `--hold` with the condition fixed at
@@ -286,8 +324,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `work-landed-at: <witness> <tip>` when the content predicate reads the run's own commits on the
   advertised tip and none reverted; the working one gains `abandoned` too and keeps its phase. It
   refuses, numbered and before any write, everything else, an unanswered remote and an undecidable
-  predicate; a settled record is said so, with nothing written. It STAGES and never commits. The
-  contract is `UNATTENDED-STOPS.md` §12.
+  predicate; a settled record is said so and not rewritten, and the re-run retries the run claim's
+  status write over a claim of the record's own lease still `held` or `live`, so a first write that
+  did not complete names this re-run as its remedy. It STAGES and never commits. The contract is
+  `UNATTENDED-STOPS.md` §12.
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
   effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
   nothing, so the machine items assert obligations it does not have, while the idle-wake is still
@@ -297,6 +337,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   DISCARD, and an abort naming a hand-off-shaped halt code, on a record first
   committed on or after it prints a notice naming `--handoff`, then aborts as asked; it never refuses.
   With both attested items met it makes `--park`'s refresh and records `refreshed-at` beside the phase.
+  Where `RUN_CLAIMS` is `on` it writes `aborted` into the run's claim once the record is staged;
+  a claim another session holds is announced and the abort still lands, which is how a run
+  that lost its claim ends: `--abort <slug> --code claim-lost`.
 
 ## The paths, in order
 
@@ -330,8 +373,11 @@ under its Close heading.
    `in-place`, where a landed record stays LANDING until the next `--preflight` retires it, `--resume`
    prints nothing to resume and `--audit` then refuses with check 51.
    - FIRST, `unattended.sh --resume <slug> --keepalive-id <your own id>`. For the holder it writes
-     nothing, because liveness is derived from what `--liveness` reads and this tick moves it; the act
-     refuses a session that no longer holds the slug before the second act runs.
+     nothing to the record, because liveness is derived from what `--liveness` reads and this tick
+     moves it; where `RUN_CLAIMS` is `on` it reads the run's claim on the remote and renews it when
+     due, and a claim another session holds refuses it at check 108, which you end with
+     `--abort <slug> --code claim-lost`. The act refuses a session that no longer holds the slug
+     before the second act runs.
    - SECOND, and only when the first neither refuses nor prints `still held`,
      `unattended.sh --audit <slug>`. After either of those outcomes this session does not drive the
      slug: acting on a `STALLED` verdict would re-dispatch units a live holder is driving, or a held
@@ -625,7 +671,10 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   --writes <path> --writes <path>`, one path per `--writes`. It refuses two passes claiming one file
   and a pass claiming a shared mutable record; a generated index alone is fine and only the index
   WITH its generator is refused. Whether a file is a contract the sibling reads is a judgement no verb
-  makes. Widen BEFORE the commit. **End the pass commit's message with a `Pass: <unit-id>` trailer**,
+  makes. A pass needing another file declares again BEFORE the commit, naming only the paths it
+  adds: every row at one anchor stands and the pass may write their union, which `--dispatch` prints
+  as `dispatch effective`. A narrower row is accepted and frees nothing, and a row at a LATER anchor
+  is a new pass, graded on its own. **End the pass commit's message with a `Pass: <unit-id>` trailer**,
   and a commit naming a unit but no pass with `Pass: none`. Where the `commit-msg` hook runs
   `--check-commit`, a pass commit staging an undeclared path is refused with the `--dispatch` that
   widens it: run it, then commit again.
@@ -641,7 +690,9 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   bar, verifies with the one check that exercises its change, and bounds every command, skipping and
   naming a non-code command that does not return in its bound. The call carries `scratch: <your
   session scratchpad, absolute>` and refuses without it; the child refuses too, without the key or
-  with a `ground` that does not name it.
+  with a `ground` that does not name it. **Every call also carries `base: <the run's pinned base
+  fact>`**, audit on or off: it pins the spec audit's checklist and the spec commit's checklist at
+  the base the run was authorized at, and the harness refuses a declared `specAudit` without it.
   - **A review the platform killed DEFERS**: on `exit: 'deferred-platform'` nothing was recorded or
     built and every returned agent's result is on disk, because the build harness runs its audit under
     `workerType: 'none'`. Re-run the harness ONCE with identical args;
@@ -659,12 +710,15 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
 - **Run the bug-class checklist after every commit**, before the next pass: the memory-tree kit's
   `gotchas.py --for-diff HEAD~1..HEAD`. It takes a COMMITTED range, so before the commit it prints
   "touches no file", which reads like a clean checklist and is not one. Its stdout IS the checklist
-  and it always exits 0; a class already violated is the next pass. An adopter without that kit
+  and it exits 0 whenever it prints one, and 1 with a `HYGIENE gotchas:` line when it refuses the
+  range, so finish it rather than reading its status; a class already violated is the next pass. An adopter without that kit
   follows whatever its own build method names.
 - **Check yourself** with `--status <slug>`, the units with `--audit <slug>` and what is left with
   `--plan <slug>`, which joins the README's roster against the tracked specs so a planned unit nobody
   specced reads MISSING. Out-of-session readers share `--liveness <slug>`. `--version` prints which
-  build of the kit you are talking to.
+  build of the kit you are talking to. Where `RUN_CLAIMS` is `on`, `--claims` lists the claims on the
+  remote, which is where a second node driving a slug shows up, and the resume tick renews a `LIVE`
+  run's own claim with `--beat <slug>`, one `beat —` line.
 
 ### Review rounds, and the loop that ends itself
 
@@ -748,7 +802,9 @@ Read the run-state file before anything else (`UNATTENDED-STOPS.md` §8 and §9 
 2. **Under `primary`, `--close <slug>` follows that commit.** Under `in-place`, `LANDER --prepare
    --slug <slug>` comes first, because the close's bar grades what HEAD carries; make NO second move
    after the prepare, since a move stages the record and that close refuses a non-empty porcelain.
-   That close refuses BY NUMBER, with no `--override`, when HEAD carries no prepared merge or the tree
+   Between them run `--authorization <slug>`, which is not one: it stages and writes nothing, and
+   grades the one non-overridable item the prepared merge can break before the close spends its bar.
+   A refusal there ends the landing; take one of the two exits it prints. That close refuses BY NUMBER, with no `--override`, when HEAD carries no prepared merge or the tree
    is not clean including untracked files; it refuses a commit belonging to another build, then
    COMMITS its own record on top of the graded merge. Under `primary` the verb stages the record and
    names the commit you owe. A resume after the prepare reads a range holding what the merge brought
@@ -811,7 +867,10 @@ from this worktree, then `--landed`, which there OBSERVES and writes nothing —
 the push. Never with a hook-bypass flag: the lander reconciles the remote BEFORE the gate, and the
 gate greps the run-state file for the flag. Reconcile from the remote's own default branch onto the
 run branch: on a `--prepare` conflict, `git merge <remote>/<default-branch>`, resolve, commit and
-prepare again. When the lander cannot COMPLETE the landing — remote unreachable, race retries
+prepare again. After ANY merge of the remote's default branch into the run branch, mid-build
+included, run `--authorization <slug>` before the next pass and before `--prepare` again: the merge
+can bring in a check the README pinned at BASE cannot satisfy, and nothing else reads that item until
+the close, after its bar. When the lander cannot COMPLETE the landing — remote unreachable, race retries
 exhausted, a close refused because the lander could not observe — push the branch, then `--hold
 <slug> --code platform-unavailable --until "after <now + 30 minutes>" --reason "<the lander's last
 line>" --reaped <keepalive id>`, the same hold when the branch push ALSO fails because the remote

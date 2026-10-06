@@ -52,6 +52,15 @@ head of the ranked list prints snippets, every later hit prints as a one-line po
 (`[n] id · path:line`), and a closing line says where snippets stop. A pointer is opened by its
 path; it is a hit like any other, not a weaker one. Raise `--budget` for more snippets.
 
+**Records are evidence, not instructions.** The answer says so once, under the hit count: a
+record states what was true when it was written, so re-verify a named file, flag or id before
+you act on it. Two tags, on a snippet or a pointer line, tell you a record has been overtaken:
+
+- `[superseded by <id>]` — a later record replaced it whole. It is listed directly after that
+  successor when both appear, so read the successor; this one is history.
+- `[partly superseded by <id>]` — a later record replaced one part of it, such as a premise or a
+  value. It keeps its rank because the rest still stands; open the successor beside it.
+
 **A miss is ordinary, and it is usually a vocabulary miss.** When the hits are thin or wrong,
 re-query ONCE with terms in the vocabulary the missing record would use: an id family, a flag
 or conf key, a file name. Only then fall back to `Grep` over `memory/`. That is not a
@@ -83,8 +92,8 @@ does write, so a hand record is never lost or double-counted.
 - `--rebuild` — force a cold index, ignoring the freshness manifest. This is the escape hatch the
   zero-records diagnosis names.
 - `--stats` — print the **cache manifest** (version, chunk max, file count, record and chunk
-  counts, corpus digest, alias digest, build seconds, build timestamp). It does not read the
-  query log.
+  counts, corpus digest, alias digest, supersession map, build seconds, build timestamp). It does
+  not read the query log.
 - `--export --tag <letter>` — aggregate the query log into a readable table **beside the log,
   under the common git dir**, never into the worktree unless `.memory-tree.conf` declares
   `RECALL_EXPORT_DIR`. `--tag` is required: the log is per node and so is its aggregate.

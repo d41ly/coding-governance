@@ -41,6 +41,16 @@ overclaimed: a committed file under the declared prefix whose name held a tab pr
 string under `quotepath=off` and matched no prefix. The read is now `GIT diff --no-renames --name-only -z`, split NUL-delimited and
 matched inside a `pipefail` pipeline.
 
+`cmd_for_diff` in `tools/memory-tree/gotchas.py`, the touched set behind the review checklist's
+by-design block, built by TOOL-aGraftedHelix-29. Its rotated closing review, round 1, M2: a range
+renaming an anchored invariant with a small edit left the source path out of `changed`, so the base's
+copy of the ruling stood in the by-design block and exempted the range that moved it. The read is now
+`git diff --no-renames --name-only -z`, split on NUL (TOOL-aGraftedHelix-36 S1). That unit's sweep
+over every `diff --name-only` line the build added found no other prefix-matched read without the
+flag: the spec commit's pinned checklist already passes `--no-renames`, the spec commit block's
+`changed=$(git diff --name-only -- ...)` only asks whether anything changed, `row_grammar.py`'s
+gotcha replay walks with `--no-renames`, and the rest are suite assertions comparing a whole listing.
+
 ## The fix
 
 A touched-set read that is PREFIX-MATCHED passes `--no-renames` (so both sides of a rename are named)
@@ -56,8 +66,9 @@ line scan, because whether the output is prefix-matched is decided lines or func
 review's own sweep of the kit found the defect and one benign near-miss (`resolve_hold_streak`), plus
 four plumbing `diff-tree` sites that are correct as written. A regex over the call site alone would
 red the near-miss or pass the defect. It is a documented check instead: a reviewer of a diff that
-adds a `diff --name-only` feeding a `case` or prefix match asks the rename question. The one live
-instance is held by a suite arm, the rename-out arm in `tools/unattended/unattended.test.sh`.
+adds a `diff --name-only` feeding a `case` or prefix match asks the rename question. Each live
+instance is held by an arm: the rename-out arm in `tools/unattended/unattended.test.sh`, and the
+rename arm of `gotchas.py --selftest`.
 
 ## What this does NOT say
 

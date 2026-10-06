@@ -246,6 +246,16 @@ cleanup
 newrepo
 chk --session >/dev/null; rc=$?; got=$(git config core.hooksPath)
 { [ "$rc" = 0 ] && [ "$got" = ".githooks" ]; } && ck "AC6 --session wires + exit 0" 1 || ck "AC6 --session wires + exit 0" 0
+# TOOL-aGraftedHelix-8 AC4 — the auto-wire is a self-heal, so it appends ONE I3 line to the health log
+# under the common dir, and only on the branch that ran `git config`: a second SessionStart over the
+# wired tree prints `ok` and appends nothing, or the card would count a heal on every session start.
+# WHAT THIS DOES NOT CHECK: the line's stamp or fold, which the resolver suite's §2c owns.
+hl="$(git rev-parse --path-format=absolute --git-common-dir)/health.log"
+ck "U8 AC4 --session's hooks auto-wire appends one check-wiring hookspath-set line" \
+   "$([ "$(awk -F'\t' '$2 == "check-wiring" && $3 == "hookspath-set" && $4 ~ /mode session$/' "$hl" 2>/dev/null | wc -l | tr -d ' ')" = 1 ] && [ "$(grep -c . "$hl")" = 1 ] && echo 1 || echo 0)"
+nb=$(grep -c . "$hl" 2>/dev/null); out=$(chk --session)
+ck "U8 AC4 ...and a second --session over the wired tree prints ok and appends none" \
+   "$(printf '%s\n' "$out" | grep -q '^ok       hooks' && [ "$(grep -c . "$hl" 2>/dev/null)" = "$nb" ] && echo 1 || echo 0)"
 cleanup
 
 # AC7 — agent-cap adopted but unwired -> --check UNWIRED (exit 1); --session still exits 0
@@ -911,10 +921,20 @@ before=$(git config merge.rows.driver); chk --fix >/dev/null; after=$(git config
 # state 7 — --session wires the unset case too. Setting a repo-local config is exactly the class of
 # act --session exists for; the eol arm's session exemption is not copied because that one rewrites
 # file bytes.
+hl="$(git rev-parse --path-format=absolute --git-common-dir)/health.log"
+n0=$(awk -F'\t' '$3 == "merge-driver-set"' "$hl" 2>/dev/null | wc -l | tr -d ' ')
 git config --unset merge.rows.driver
 chk --session >/dev/null; rc=$?; got=$(git config merge.rows.driver)
 { [ "$rc" = 0 ] && [ "$got" = "$WANT" ]; } \
   && ck "AC10 --session wires the driver + exit 0" 1 || ck "AC10 --session wires the driver + exit 0" 0
+# TOOL-aGraftedHelix-8 AC4, the merge arm: one merge-driver-set line naming the session mode, and a
+# second --session over the wired driver appends none.
+n1=$(awk -F'\t' '$3 == "merge-driver-set"' "$hl" 2>/dev/null | wc -l | tr -d ' ')
+last=$(awk -F'\t' '$3 == "merge-driver-set" { d = $4 } END { print d }' "$hl" 2>/dev/null)
+chk --session >/dev/null
+n2=$(awk -F'\t' '$3 == "merge-driver-set"' "$hl" 2>/dev/null | wc -l | tr -d ' ')
+ck "U8 AC4 --session's merge auto-wire appends one merge-driver-set line, and a second run none" \
+   "$([ "$n1" = "$((n0 + 1))" ] && [ "$n2" = "$n1" ] && [ "$last" = "merge.rows.driver · mode session" ] && echo 1 || echo 0)"
 cleanup
 
 # AC11 — the `merge=rows` ATTRIBUTE, asserted against THIS repo's REAL tree.
@@ -1069,6 +1089,49 @@ rm -f "$FAKEHOME/.claude/skills/session-kickoff/manifest-check.sh"
 out=$(skill_run)
 case "$out" in "UNWIRED  skill"*"missing manifest-check.sh"*) r=1 ;; *) r=0 ;; esac
 ck "a shipped file absent from the install -> UNWIRED naming it" "$r"; rm -rf "$FAKEHOME"; cleanup
+
+# A LINKED worktree whose own branch edits the engine, while the install matches the primary
+# checkout: a note, never UNWIRED, or a build editing the engine can never re-preflight. And the same
+# worktree with the install drifting from the primary too: still UNWIRED.
+newrepo; skill_fixture 1; install_engine 'engine
+'
+# A bare origin with its HEAD set, so the note's merge base resolves (TOOL-aGraftedHelix-36 S6).
+SKOR=$(mktemp -d); git init -q --bare "$SKOR"; git -C "$SKOR" symbolic-ref HEAD refs/heads/main
+git remote add origin "$SKOR"; git push -q origin main >/dev/null 2>&1
+git fetch -q origin >/dev/null 2>&1; git remote set-head origin main >/dev/null 2>&1
+SKWT=$(mktemp -d); rmdir "$SKWT"; git worktree add -q -b skbr "$SKWT" >/dev/null 2>&1
+( cd "$SKWT" && printf 'edited\n' > skills/session-kickoff/SKILL.md && git commit -q -am edit )
+out=$(cd "$SKWT" && skill_run)
+case "$out" in "note     skill"*"branch edits the engine in: SKILL.md"*) r=1 ;; *) r=0 ;; esac
+ck "a linked worktree's own engine edit, install matching the primary -> note" "$r"
+case "$out" in *UNWIRED*) r=0 ;; *) r=1 ;; esac
+ck "...and never UNWIRED" "$r"
+install_engine 'DIFFERENT
+'
+out=$(cd "$SKWT" && skill_run)
+case "$out" in "UNWIRED  skill"*"differs from tracked in: SKILL.md"*) r=1 ;; *) r=0 ;; esac
+ck "the same worktree with the install drifting from the primary too -> UNWIRED" "$r"
+# ...with no remote HEAD to take a merge base from, the editing worktree cannot earn its note.
+install_engine 'engine
+'
+git remote set-head origin -d >/dev/null 2>&1
+out=$(cd "$SKWT" && skill_run)
+case "$out" in "UNWIRED  skill"*"no single remote's HEAD resolves"*) r=1 ;; *) r=0 ;; esac
+ck "an engine-editing worktree with no remote HEAD -> UNWIRED" "$r"
+git remote set-head origin main >/dev/null 2>&1
+# ...and a worktree branched from an origin/main whose engine edit the primary never took, with no
+# engine edit of its own, while the install matches the lagging primary: UNWIRED, naming the
+# fast-forward. RED with the branch-change condition cut: the lagging worktree read the note.
+SKCL=$(mktemp -d); rmdir "$SKCL"; git clone -q "$SKOR" "$SKCL" >/dev/null 2>&1
+( cd "$SKCL" && git config user.email t@e && git config user.name t \
+    && printf 'upstream\n' > skills/session-kickoff/SKILL.md && git commit -q -am upstream && git push -q origin main ) >/dev/null 2>&1
+git fetch -q origin >/dev/null 2>&1
+SKLG=$(mktemp -d); rmdir "$SKLG"; git worktree add -q -b sklag "$SKLG" origin/main >/dev/null 2>&1
+out=$(cd "$SKLG" && skill_run)
+case "$out" in "UNWIRED  skill"*"in: SKILL.md"*"pull --ff-only"*) r=1 ;; *) r=0 ;; esac
+ck "a worktree off an origin/main the primary lags, no engine edit of its own -> UNWIRED, fast-forward the primary" "$r"
+git worktree remove --force "$SKLG" >/dev/null 2>&1
+git worktree remove --force "$SKWT" >/dev/null 2>&1; rm -rf "$SKWT" "$SKLG" "$SKCL" "$SKOR" "$FAKEHOME"; cleanup
 
 # AC7 — the adopter shape: the install exists, the repo tracks no kit source. Without this state the
 # check is a permanent false alarm in every adopting repo.

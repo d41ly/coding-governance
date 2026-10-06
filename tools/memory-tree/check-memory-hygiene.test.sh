@@ -1936,6 +1936,28 @@ n=$((n+1))
 n=$((n+1))
 grep -qF 'row-grammar: NOT MEASURED — memory/backlog/ARCH.md has no LIVE_ROW_PIN entry' <<<"$outy" \
   || { echo "FAIL a green check 20 run swallowed its NOT MEASURED line, so an unarmed live-row pin is silent again"; st=1; }
+# TOOL-aGraftedHelix-3 S7: checks 17-19's capture reaches the operator on a GREEN run too. A young tree
+# holding one invariant whose decision resolves and whose guard is a leg name, with LEG_MANIFEST
+# undeclared: gotchas.py announces the guard NOT resolved at exit 0, and an engine that printed the
+# capture only on failure turned that announcement back into silence. WHAT THIS DOES NOT CHECK: the
+# announcement's wording, which gotchas.py's own self-test owns; only that the green run shows it.
+YI=$TMP/young-invariant
+mkdir -p "$YI/memory/project" "$YI/memory/backlog" "$YI/memory/gotchas" "$YI/bin"
+( cd "$YI" && git init -q . && git config user.email t@t.test && git config user.name t
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
+  printf '# r\n' > memory/README.md
+  printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
+  printf '# d\n\n- ARCH-tYoung-1 · a ruling the invariant cites\n' > memory/DECISIONS.md
+  printf '#!/usr/bin/env bash\n' > bin/young-gate.sh
+  printf -- '---\nname: young-invariant\ndescription: a fixture invariant\nkind: invariant\ndecision: ARCH-tYoung-1\n---\n\n## Looks wrong\nIt looks wrong in `bin/young-gate.sh`.\n\n## Actually\nIt is the ruling.\n\n## Do\nKeep it.\n\n## Do not\nChange it.\n\n## Guarded by\n`young leg`\n' \
+    > memory/gotchas/young-invariant.md
+  git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null && "$_PY" "$HERE/gotchas.py" --write >/dev/null && git add -A
+  git commit -q -m young-invariant --no-verify )
+outyi=$(cd "$YI" && bash "$SCRIPT" 2>/dev/null); rcyi=$?
+n=$((n+1))
+[ "$rcyi" = 0 ] && grep -qF 'gotchas: memory/gotchas/young-invariant.md guard `young leg` NOT resolved — LEG_MANIFEST is blank' <<<"$outyi" \
+  || { echo "FAIL a green checks 17-19 run swallowed gotchas.py's NOT resolved line (rc=$rcyi), so an unresolvable invariant guard is silent again"; st=1; }
 
 # ---- (c) A tree carrying a .codebase-map.conf. This is the ONLY place check 7's MAP_SUB branch is
 # ----     reachable: every tree above writes no such conf, so `MAP_SUB` is empty throughout and the
@@ -3444,6 +3466,144 @@ out_fi=$(cd "$FI" && bash "$SCRIPT" --staged 2>/dev/null)
 n=$((n+1))
 grep -qF 'is not F-item shaped' <<<"$out_fi" && { echo "FAIL the F-item shape arm fired with FORK_ITEM_CUTOFF BLANK, the declared off state every adopter ships with"; st=1; }
 
+# ---- TOOL-aGraftedHelix-14 — CHECK 27's DISPATCH BLOCK, observed THROUGH THE ENGINE. The block
+# ---- delegates to `row_grammar.py --check-relations`, whose own selftest arms the predicate; none of
+# ---- those arms runs this script, so none sees whether the block sets status=1 on the module's
+# ---- exit or prints its summary on a green run, and the one grep that observed it is satisfied by
+# ---- a comment. A block that swallowed the exit would leave the leg green over every near match.
+# ---- A COPY-INSTALL fixture, the shape that module's check-27 arms use: this kit's scripts and the
+# ---- recall kit's modules sit where THIS install has them, so the index builder resolves and
+# ---- extract.py binds its id grammar to the fixture rather than to the host
+# ---- (`grammar-bound-to-the-wrong-root`). Otherwise clean on the _b1 shape, so 27 is the branch's
+# ---- only offence. The branch row PARAPHRASES the base row: a verbatim restatement is also an exact
+# ---- duplicate, which is TOOL-aGraftedHelix-6's check 28 and not this arm's subject. Every run pins
+# ---- GOV_DEFAULT_BRANCH=main, because the relation base is derived from it.
+R27_KIT=$(resolve_kit_dir "$_PY" memory-recall bench.py "$HERE" 2>/dev/null) || R27_KIT=""
+if [ -z "$R27_KIT" ]; then
+  echo "skip check 27 through the engine: no memory-recall kit beside this one, so its five arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+5))
+else
+  R27=$TMP/rel27
+  _r27host=${HERE%/"$KIT_REL"}
+  mkdir -p "$R27/$KIT_REL" "$R27/$R27_KIT"
+  cp "$HERE"/*.sh "$HERE"/*.py "$R27/$KIT_REL"/
+  cp "$_r27host/$R27_KIT"/*.py "$R27/$R27_KIT"/
+  # The receipt rides along when there is one: it is how a re-homed recall kit resolves.
+  if [ -f "$_r27host/.governance/install.json" ]; then
+    mkdir -p "$R27/.governance" && cp "$_r27host/.governance/install.json" "$R27/.governance/"
+  fi
+  (
+    cd "$R27" || exit 1
+    git init -q . && git symbolic-ref HEAD refs/heads/main
+    git config user.email t@t.test; git config user.name t; git config core.autocrlf false
+    mkdir -p memory/builds/tOne/spec memory/project
+    printf '/%s/\n/%s/\n/.governance/\n__pycache__/\n' "${KIT_REL%%/*}" "${R27_KIT%%/*}" > .gitignore
+    printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\nNEAR_MATCH_GATE="red:0.125"\n' > .memory-tree.conf
+    printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
+    printf '# r\n' > memory/README.md
+    printf '# d\n\n- ARCH-tOne-1 - rotation archives keep terminal rows only, and a live row never moves into one\n' > memory/DECISIONS.md
+    printf '# stale-header-waiver.txt -- EMPTY is expected; the file must exist.\n' > memory/project/stale-header-waiver.txt
+    printf -- '---\nslug: tOne\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\nids: ARCH-tOne-1\nstatus: OPEN\n---\n\n# tOne\n\n<!-- gen:build-index -->\n\n<!-- /gen:build-index -->\n' > memory/builds/tOne/README.md
+    printf '# ARCH-tOne-1 - a unit\n\nbody\n' > memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md
+    git add -A && git -c commit.gpgsign=false commit -q -m base --no-verify
+    "$_PY" "$KIT_REL/gen_build_index.py" --write
+    git add -A && git -c commit.gpgsign=false commit -q -m gen --no-verify
+    git checkout -q -b arm
+    printf -- '- ARCH-tTwo-1 - a live row is never moved into a rotation archive, which holds only terminal rows\n' >> memory/DECISIONS.md
+    git add -A && git -c commit.gpgsign=false commit -q -m paraphrase --no-verify
+  ) >/dev/null 2>&1
+  run_rel27_gate() { local _b=$1; shift; ( cd "$R27" && git checkout -q "$_b" && GOV_DEFAULT_BRANCH=main bash "$R27/$KIT_REL/check-memory-hygiene.sh" "$@" 2>&1 ); }
+  o27=$(run_rel27_gate arm); r27rc=$?
+  n=$((n+1))
+  if [ "$r27rc" != 0 ] && grep -qE '^check 27: ARCH-tTwo-1 \(memory/DECISIONS\.md:[0-9]+\) near-matches ARCH-tOne-1 at ' <<<"$o27"; then
+    echo "ok   check 27 through the engine: a paraphrased decision row reds the leg, naming itself and the base row"
+  else
+    echo "FAIL check 27 through the engine: the branch adding a paraphrased row exited $r27rc without a check 27 line naming ARCH-tTwo-1 and ARCH-tOne-1 - the block swallowed the module's exit, or never ran it:"; printf '%s\n' "$o27" | sed 's/^/      /'; st=1
+  fi
+  # TOOL-aGraftedHelix-17: the paraphrase is all that keeps check 28 off this branch. A branch row
+  # whose body restates the base row's is a content duplicate, check 28 reds the same run, and the
+  # exit is no longer 27's to claim. The --offenders arm below reds then too, but its message is
+  # about the offending check; this one names the fixture's row as the cause.
+  n=$((n+1))
+  if grep -qE '^check 28:' <<<"$o27"; then
+    echo "FAIL check 27 through the engine: the branch run printed a check 28 line - the fixture's branch row ARCH-tTwo-1 is a content duplicate of its base row ARCH-tOne-1, so the exit belongs to check 28 and not to 27; paraphrase the row again:"; grep -E '^check 28:' <<<"$o27" | sed 's/^/      /'; st=1
+  else
+    echo "ok   check 27 through the engine: the branch run prints no check 28 line, so its row is no content duplicate of the base row"
+  fi
+  # --offenders, not a grep of the prose: it keys EVERY check's offence the same way, a delegated
+  # module's and corpus_ids' refusal included, and it is the only reader of the block's own key line.
+  _r27k=$(run_rel27_gate arm --offenders | cut -f1 | sort -u)
+  n=$((n+1))
+  [ "$_r27k" = "check 27" ] || { echo "FAIL check 27 through the engine: --offenders keyed the branch as [$(printf '%s' "$_r27k" | tr '\n' ',')] rather than check 27 alone - another check offends, so the exit is not 27's to claim, or the block keys nothing under 27"; st=1; }
+  o27=$(run_rel27_gate main); r27rc=$?
+  n=$((n+1))
+  case "$r27rc:$o27" in
+    0:*"row-grammar: check 27 graded 0 added record(s)"*) echo "ok   check 27 through the engine: the clean main exits 0 and prints the module's graded summary" ;;
+    *) echo "FAIL check 27 through the engine: the clean main exited $r27rc, or the green run did not print the 'row-grammar: check 27 graded 0' summary - the block drops its capture on exit 0:"; printf '%s\n' "$o27" | sed 's/^/      /'; st=1 ;;
+  esac
+  o27=$(GOV_DEFAULT_BRANCH=no-such-branch run_rel27_gate main); r27rc=$?
+  n=$((n+1))
+  [ "$r27rc" = 0 ] || { echo "FAIL check 27 through the engine: an exported GOV_DEFAULT_BRANCH naming no branch reached the pinned run (rc=$r27rc), so these arms grade the shell rather than the block:"; printf '%s\n' "$o27" | sed 's/^/      /'; st=1; }
+fi
+
+# ---- TOOL-aGraftedHelix-13 — CHECK 28's DISPATCH BLOCK, observed THROUGH THE ENGINE, for the reason
+# ---- the check-27 arms above exist: `row_grammar.py --selftest` arms the predicate and never runs
+# ---- this script, and the one grep that observed the block (`check-content`) is satisfied by a
+# ---- comment or a dead block. A block that swallowed the module's exit would leave the leg green
+# ---- over a duplicated record. COPY-INSTALLED as the check-27 fixture is, because the build index
+# ---- and the gotcha catalogue render against the generator's own path: a kit copy outside the
+# ---- tree reds checks 9 and 17-19, and this kit's own engine resolves check 26's conf above
+# ---- itself, so either would let a check other than 28 hold the exit. No recall kit: check 28
+# ---- reads none, and 27 is NOT ARMED with NEAR_MATCH_GATE blank. Otherwise clean on the _b1
+# ---- shape; the branch adds a gotcha whose body is main's, so 28 is its only offence. Every run
+# ---- pins GOV_DEFAULT_BRANCH=main, because the content base is derived from it.
+C28=$TMP/cont28
+mkdir -p "$C28/$KIT_REL"
+cp "$HERE"/*.sh "$HERE"/*.py "$C28/$KIT_REL"/
+(
+  cd "$C28" || exit 1
+  git init -q . && git symbolic-ref HEAD refs/heads/main
+  git config user.email t@t.test; git config user.name t; git config core.autocrlf false
+  mkdir -p memory/builds/tOne/spec memory/project memory/gotchas
+  printf '/%s/\n__pycache__/\n' "${KIT_REL%%/*}" > .gitignore
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n' > .memory-tree.conf
+  printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
+  printf '# r\n' > memory/README.md
+  printf '# d\n\n- ARCH-tOne-1 - a decision\n' > memory/DECISIONS.md
+  printf '# stale-header-waiver.txt -- EMPTY is expected; the file must exist.\n' > memory/project/stale-header-waiver.txt
+  printf -- '---\nslug: tOne\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\nids: ARCH-tOne-1\nstatus: OPEN\n---\n\n# tOne\n\n<!-- gen:build-index -->\n\n<!-- /gen:build-index -->\n' > memory/builds/tOne/README.md
+  printf '# ARCH-tOne-1 - a unit\n\nbody\n' > memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md
+  printf -- '---\nname: held-once\ndescription: a fixture class\nkind: class\nuniversal: true\n---\n\n# A class\n\nA fixture body naming its resolution. No machine gate.\n' > memory/gotchas/held-once.md
+  git add -A && git -c commit.gpgsign=false commit -q -m base --no-verify
+  "$_PY" "$KIT_REL/gen_build_index.py" --write && "$_PY" "$KIT_REL/gotchas.py" --write
+  git add -A && git -c commit.gpgsign=false commit -q -m gen --no-verify
+  git checkout -q -b arm
+  printf -- '---\nname: held-twice\ndescription: a fixture class\nkind: class\nuniversal: true\n---\n\n# A class\n\nA fixture body naming its resolution. No machine gate.\n' > memory/gotchas/held-twice.md
+  "$_PY" "$KIT_REL/gotchas.py" --write
+  git add -A && git -c commit.gpgsign=false commit -q -m copy --no-verify
+) >/dev/null 2>&1
+run_cont28_gate() { local _b=$1; shift; ( cd "$C28" && git checkout -q "$_b" && GOV_DEFAULT_BRANCH=main bash "$C28/$KIT_REL/check-memory-hygiene.sh" "$@" 2>&1 ); }
+o28=$(run_cont28_gate arm); r28rc=$?
+_c28l=$(grep -E '^check 28: ' <<<"$o28")
+_c28x=$(grep -E '^check [0-9]+:' <<<"$o28" | grep -vE '^check 28: ')
+n=$((n+1))
+if [ "$r28rc" != 0 ] && grep -qF 'memory/gotchas/held-once.md (held-once)' <<<"$_c28l" \
+   && grep -qF 'memory/gotchas/held-twice.md (held-twice)' <<<"$_c28l" && [ -z "$_c28x" ]; then
+  echo "ok   check 28 through the engine: a branch adding a gotcha whose body main holds reds the leg, naming both, and no other check"
+else
+  echo "FAIL check 28 through the engine: the branch adding a duplicated gotcha exited $r28rc without one check 28 line naming held-once and held-twice and no other check line - the block swallowed the module's exit, never ran it, or another check holds the exit:"; printf '%s\n' "$o28" | sed 's/^/      /'; st=1
+fi
+# --offenders, as the check-27 arm reads it: it keys every check's offence the same way, and it is
+# the only reader of the block's own add_offender_keys line.
+_c28k=$(run_cont28_gate arm --offenders | cut -f1 | sort -u)
+n=$((n+1))
+[ "$_c28k" = "check 28" ] || { echo "FAIL check 28 through the engine: --offenders keyed the branch as [$(printf '%s' "$_c28k" | tr '\n' ',')] rather than check 28 alone - another check offends, so the exit is not 28's to claim, or the block keys nothing under 28"; st=1; }
+o28=$(run_cont28_gate main); r28rc=$?
+n=$((n+1))
+case "$r28rc:$o28" in
+  0:*"row-grammar: check 28 graded 2 record(s)"*) echo "ok   check 28 through the engine: the clean main exits 0 and prints the module's graded summary" ;;
+  *) echo "FAIL check 28 through the engine: the clean main exited $r28rc, or the green run did not print the 'row-grammar: check 28 graded 2' summary - the block drops its capture on exit 0:"; printf '%s\n' "$o28" | sed 's/^/      /'; st=1 ;;
+esac
+
 # THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
 # 235; the merged suite measures 251, so 235 is satisfied and 224 would be a silent LOWERING of a
 # shrink-only pin. A discount from the new measurement would give ~202, which is lower still - the
@@ -3482,7 +3642,13 @@ grep -qF 'is not F-item shaped' <<<"$out_fi" && { echo "FAIL the F-item shape ar
 # MERGED at the landing reconcile with d6e1749c: the fork 456 + ours' 60 (374 -> 434 above) +
 # theirs' 15 (456 -> 471 above) = 531, keeping theirs' skip-aware predicate, which counts the
 # arms skipped aloud when no playbook-render engine sits beside the kit.
-FLOOR_ASSERTIONS=531
+# RAISED 531 -> 535 by TOOL-aGraftedHelix-14: its four check-27 engine arms, each top-level and
+# skipped aloud with n_skip carrying the four when no memory-recall kit sits beside this one.
+# RAISED 535 -> 538 by TOOL-aGraftedHelix-13: its three check-28 engine arms, each top-level and
+# never skipped, because that fixture needs no sibling kit.
+# RAISED 538 -> 539 by TOOL-aGraftedHelix-17: its no-check-28 arm on the check-27 branch run,
+# top-level and skipped aloud with that block's other four.
+FLOOR_ASSERTIONS=539
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

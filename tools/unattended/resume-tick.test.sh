@@ -230,6 +230,20 @@ derive_winpid() {
   esac
   printf '%s' "$w"
 }
+# read_task_gone <winpid> — the count of `No tasks are running` lines `tasklist` prints for that pid,
+# polled until it reads 1 or 25 polls of 0.2 s pass (TOOL-aGraftedHelix-34 S6). `taskkill //F`
+# returns while the process may still be terminating, and an eight-wide pool widens that window: the
+# AC4 and AC13 arms read `tasklist` at once and redded there while green alone and in order. A tick
+# that never killed still reads 0, after the bound, so the arms keep their failing case.
+read_task_gone() {
+  local c=0 i=0
+  while [ "$i" -lt 25 ]; do
+    c=$(tasklist //FI "PID eq $1" 2>/dev/null | grep -c 'No tasks are running')
+    [ "$c" = 1 ] && break
+    sleep 0.2; i=$((i + 1))
+  done
+  printf '%s' "$c"
+}
 NOW_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 OLD_UTC=$(date -u -d "@$(( $(date -u +%s) - 7200 ))" +%Y-%m-%dT%H:%M:%SZ)
 UTC_RE='^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z '
@@ -285,7 +299,7 @@ check_same "AC2 no sidecar line" "$([ -s "$SIDECAR/resume.tRun.log" ] && echo wr
 mkdir -p "$FX_GITDIR/gate-logs" && touch -d '+5 minutes' "$FX_GITDIR/gate-logs/leg.log"; rm -f "$STUB_LOG"
 run_tick_over "$TICK"
 check_same "AC2 a LIVE record exits 0" "$RC" "0"
-check_hit "$OUT" "resume-tick: tRun · $FX · skip · verdict LIVE" "AC2 a LIVE record is skipped by verdict"
+check_hit "$OUT" "resume-tick: tRun · $FX · beat · unattended: beat — tRun · skipped: RUN_CLAIMS is off" "AC2 a LIVE record takes the beat row, which names the switch it is off by"
 check_same "AC2 a LIVE record consults neither login nor the stub" "$([ -f "$STUB_LOG" ] && echo invoked || echo nothing)" "nothing"
 # ...and the login probe's bound is a bound on the CLOCK, not on the verdict
 # (`memory/gotchas/bounded-through-a-pipe-is-unbounded`): a stub whose `auth status` leaves a
@@ -322,6 +336,11 @@ check_same "AC1 the sidecar line starts with a UTC stamp" "$(grep -cE "$UTC_RE" 
 check_hit "$(cat "$SIDECAR/resume.tRun.log")" " attempt 1 session $SID pid 999999999 pid-alive no out $SIDECAR/resume.tRun." "AC1 the sidecar line's fields"
 check_same "AC1 the launcher exists beside the log" "$(ls "$SIDECAR"/resume.tRun.*.sh 2>/dev/null | grep -c '')" "1"
 check_same "AC1 the launcher records the argv" "$(grep -c -- '--dangerously-skip-permissions --max-turns 40' "$SIDECAR"/resume.tRun.*.sh)" "1"
+# TOOL-aGraftedHelix-8: the relaunch IS the self-heal, so the fixture's health log (I3, under its git
+# common dir) holds ONE run-resumed line naming the slug, the attempt, the session and the kill —
+# `none`, because the recorded pid is dead and nothing was killed.
+check_same "AGH8 the relaunch appended one run-resumed line" \
+  "$(awk -F'\t' '$2 == "resume-tick" && $3 == "run-resumed" { print $4 }' "$FX_GITDIR/health.log" 2>/dev/null)" "tRun attempt 1 session $SID killed none"
 OUT_PATH=$(sed -n 's/.* out //p' "$SIDECAR/resume.tRun.log" | head -n 1); OUT_PATH=${OUT_PATH%% launched *}
 check_same "AC1 the .out the line names is the one the launcher writes" "$(grep -c -- ">$OUT_PATH" "$SIDECAR"/resume.tRun.*.sh)" "1"
 # ...AC13, the LAUNCHED PID (closing review id 3): the line ends `launched <pid> <utc> <image>` —
@@ -340,6 +359,7 @@ check_same "AC13 a second STALE tick exits 0" "$RC" "0"
 check_hit "$OUT" "resume-tick: tRun · $FX · skip · IN-FLIGHT · launched $LAUNCHED alive since " "AC13 the second tick reads the launch as in flight"
 check_same "AC13 the second tick launched nothing" "$(grep -c 'argv -p' "$STUB_LOG")" "1"
 check_same "AC13 the second tick wrote no attempt line" "$(grep -c '' "$SIDECAR/resume.tRun.log")" "1"
+check_same "AGH8 the in-flight skip appended no health line" "$(grep -c '' "$FX_GITDIR/health.log" 2>/dev/null)" "1"
 
 # ---- AC3: the cap is CONSECUTIVE, not lifetime. Six lines newer than the last move (the hour-old
 # ---- commit) exhaust it and invoke nothing; six lines OLDER than it launch attempt 7, because a
@@ -369,7 +389,7 @@ if [ -n "$WPID" ]; then
   check_same "AC4 the stub was invoked" "$(read_stub_log | grep -c 'argv -p')" "1"
   check_hit "$(cat "$SIDECAR/resume.tRun.log")" " pid $WPID pid-alive yes out " "AC4 the sidecar line records pid-alive yes"
   case "$(uname -s)" in
-    MINGW*|MSYS*|CYGWIN*) check_same "AC4 the sleep is gone from tasklist" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'No tasks are running')" "1" ;;
+    MINGW*|MSYS*|CYGWIN*) check_same "AC4 the sleep is gone from tasklist" "$(read_task_gone "$WPID")" "1" ;;
     *) check_same "AC4 the sleep is gone" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "gone" ;;
   esac
 else
@@ -413,7 +433,7 @@ if [ -n "$WPID" ]; then
   run_tick_over "$TICK"
   check_hit "$OUT" "· resumed · attempt 2 · out " "AC13 a hung launched session is relaunched"
   case "$(uname -s)" in
-    MINGW*|MSYS*|CYGWIN*) check_same "AC13 the hung launched pid is gone from tasklist" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'No tasks are running')" "1" ;;
+    MINGW*|MSYS*|CYGWIN*) check_same "AC13 the hung launched pid is gone from tasklist" "$(read_task_gone "$WPID")" "1" ;;
     *) check_same "AC13 the hung launched pid is gone" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "gone" ;;
   esac
 else
@@ -485,7 +505,7 @@ if [ -n "$WPID" ]; then
   run_tick_over "$TICK"
   check_hit "$OUT" "· resumed · attempt 2 · out " "AC13 a launched line past the bound is hung and relaunched"
   case "$(uname -s)" in
-    MINGW*|MSYS*|CYGWIN*) check_same "AC13 the launcher hung past the bound is gone from tasklist" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'No tasks are running')" "1" ;;
+    MINGW*|MSYS*|CYGWIN*) check_same "AC13 the launcher hung past the bound is gone from tasklist" "$(read_task_gone "$WPID")" "1" ;;
     *) check_same "AC13 the launcher hung past the bound is gone" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "gone" ;;
   esac
 else
@@ -510,6 +530,9 @@ case "$(uname -s)" in
     check_same "AC17 the attempt line carries no launched token" "$(grep -c ' launched ' "$SIDECAR/resume.tRun.log")" "0"
     check_same "AC17 the attempt line still counts" "$(grep -c ' attempt 1 session ' "$SIDECAR/resume.tRun.log")" "1"
     check_same "AC17 the stub was not launched" "$(grep -c 'argv -p' "$STUB_LOG")" "0"
+    # TOOL-aGraftedHelix-8: a relaunch that failed is ONE resume-failed line, never a run-resumed one.
+    check_same "AGH8 the failed launch appended one resume-failed line and no run-resumed one" \
+      "$(awk -F'\t' '$2 == "resume-tick" { print $3 "|" substr($4, 1, 15) }' "$FX_GITDIR/health.log" 2>/dev/null | tr '\n' ';')" "resume-failed|tRun attempt 1 ;"
     rm -rf "$TMP/stubcp" ;;
   *) echo "skip AC17 · the POSIX detach records \$! and cannot fail the way Start-Process does; the arm runs under MSYS only" ;;
 esac
@@ -675,7 +698,7 @@ check_hit  "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1" "U61 withou
 build_fixture 999999999; add_sibling_worktree
 mkdir -p "$FX_GITDIR/gate-logs" && touch -d '+5 minutes' "$FX_GITDIR/gate-logs/leg.log"
 run_tick_over "$TICK" --dry-run
-check_hit  "$OUT" "resume-tick: tRun · $FX · skip · verdict LIVE (dry-run)" "U62 the run's own worktree reads LIVE"
+check_hit  "$OUT" "resume-tick: tRun · $FX · beat · --beat tRun would run (dry-run)" "U62 the run's own worktree reads LIVE"
 check_hit  "$OUT" "resume-tick: tRun · $SIB · skip · ELSEWHERE · the run's branch is refs/heads/main, and this worktree is not on it, so nothing is killed or launched from this copy (dry-run)" "U62 the sibling copy is skipped ELSEWHERE, naming the run's branch"
 check_miss "$OUT" "resumed ·" "U62 no copy of a live run is resumed"
 rm -f "$FX_GITDIR/gate-logs/leg.log"
@@ -749,7 +772,7 @@ check_hit  "$OUT" "resume-tick: tRun · $SIB · skip · ELSEWHERE" "U62 ...and n
 build_fixture 999999999
 printf 'waited\t4\n' > "$FX_GITDIR/gate-queue-heartbeat"; touch -d '+5 minutes' "$FX_GITDIR/gate-queue-heartbeat"
 run_tick_over "$TICK" --dry-run
-check_hit  "$OUT" "resume-tick: tRun · $FX · skip · verdict LIVE" "U64 a record whose only fresh signal is the queue heartbeat is skipped LIVE"
+check_hit  "$OUT" "resume-tick: tRun · $FX · beat · --beat tRun would run (dry-run)" "U64 a record whose only fresh signal is the queue heartbeat is skipped LIVE"
 check_miss "$OUT" "resumed ·" "U64 ...and is never resumed"
 touch -d '2000-01-01T00:00:00Z' "$FX_GITDIR/gate-queue-heartbeat"
 run_tick_over "$TICK" --dry-run
@@ -768,11 +791,65 @@ U65_CFG="$TMP/cfg-u65"; U65_P="$U65_CFG/projects/$(printf '%s' "$FX" | tr ':\\/.
 mkdir -p "$U65_P/$SID/subagents/workflows/wf_x" && touch -d '2000-01-01T00:00:00Z' "$U65_P/$SID.jsonl"
 touch "$U65_P/$SID/subagents/workflows/wf_x/agent-a1.jsonl"
 CLAUDE_CONFIG_DIR="$U65_CFG" run_tick_over "$TICK" --dry-run
-check_hit  "$OUT" "resume-tick: tRun · $FX · skip · verdict LIVE" "U65 a record whose only fresh signal is a sub-agent transcript is skipped LIVE"
+check_hit  "$OUT" "resume-tick: tRun · $FX · beat · --beat tRun would run (dry-run)" "U65 a record whose only fresh signal is a sub-agent transcript is skipped LIVE"
 check_miss "$OUT" "resumed ·" "U65 ...and is never resumed"
 touch -d '2000-01-01T00:00:00Z' "$U65_P/$SID/subagents/workflows/wf_x/agent-a1.jsonl"
 CLAUDE_CONFIG_DIR="$U65_CFG" run_tick_over "$TICK" --dry-run
 check_hit  "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1" "U65 the same sub-agent transcript dated past the bound is resumed"
+
+# ---- TOOL-aGraftedHelix-1 AC12: a LIVE run takes the beat row, which runs the driver's `--beat` in
+# ---- the worktree and quotes its one line, and the run's own claim on the remote is renewed; with
+# ---- `--dry-run` the row is named and nothing is pushed. The fixture gains a bare remote, the switch
+# ---- on, a bound the hour-old commit is past, a keepalive the claim is keyed on, and a gate log
+# ---- dated ahead so the run reads LIVE; the claim is seeded as this run's own, its beat past the
+# ---- quarter-bound the holder renews at. RED against a tick whose LIVE row is the generic skip.
+CONF_EXTRA="$(printf 'RESUME_STALE_BOUND="1800"\nRUN_CLAIMS="on"')" build_fixture 999999999
+G12="$GITTMP/rt-origin.git"; rm -rf "$G12"; git init -q --bare "$G12"
+( cd "$FX" && sed -i 's/^phase: BUILDING$/phase: BUILDING\nkeepalive: kT/' memory/builds/tRun/RUN.md && git add -A \
+    && GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q --amend --no-edit && git remote add origin "$G12" )
+G12_T=$(git --git-dir="$G12" mktree </dev/null)
+G12_C=$(GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t.test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t.test git --git-dir="$G12" commit-tree "$G12_T" -m "$(printf 'gov-claim tRun\n\nslug: tRun\nnode: n\nhost: h\nsession: %s\nkeepalive: kT\nstatus: live\nlease-utc: %s\nbeat-utc: %s' "$SID" "$OLD_UTC" "$(date -u -d "@$(( $(date -u +%s) - 1000 ))" +%Y-%m-%dT%H:%M:%SZ)")")
+git --git-dir="$G12" update-ref refs/gov/runs/tRun "$G12_C"
+mkdir -p "$FX_GITDIR/gate-logs" && touch -d '+5 minutes' "$FX_GITDIR/gate-logs/leg.log"
+run_tick_over "$TICK" --dry-run
+check_hit  "$OUT" "resume-tick: tRun · $FX · beat · --beat tRun would run (dry-run)" "GH1 AC12 a dry run names the beat row"
+check_same "GH1 AC12 ...and pushes nothing" "$(git --git-dir="$G12" rev-parse refs/gov/runs/tRun)" "$G12_C"
+run_tick_over "$TICK"
+check_hit  "$OUT" "resume-tick: tRun · $FX · beat · unattended: beat — tRun · renewed " "GH1 AC12 a LIVE run's tick renews its claim through --beat"
+check_miss "$OUT" "skip · verdict LIVE" "GH1 AC12 ...and never falls to the generic skip"
+n12=$(git --git-dir="$G12" log -1 --format=%B refs/gov/runs/tRun | sed -n 's/^beat-utc: //p')
+check_same "GH1 AC12 the claim's beat moved off the seeded one" "$([ -n "$n12" ] && [ "$n12" != "$(git --git-dir="$G12" log -1 --format=%B "$G12_C" | sed -n 's/^beat-utc: //p')" ] && echo moved || echo unmoved)" "moved"
+rm -rf "$G12"
+
+# ---- TOOL-aGraftedHelix-11 AC1: the tick runs `--beat` with NO session id, as the OS scheduler
+# ---- launches it, and the claim it renews, then the one it creates over an empty remote, carries the
+# ---- LEASE's identity: the record's session, keepalive, host and lease-utc. Between the two, the
+# ---- holder's own --resume under the lease's session and pid reads that claim as its own. The record
+# ---- carries every lease fact, so each comparison has a value to miss. RED against a driver whose
+# ---- claim write reads the session back from the environment: `absent`, then check 108.
+CONF_EXTRA="$(printf 'RESUME_STALE_BOUND="1800"\nRUN_CLAIMS="on"')" build_fixture 999999999
+G11="$GITTMP/rt-origin11.git"; rm -rf "$G11"; git init -q --bare "$G11"
+G11_HOST=$(read_host_name)
+( cd "$FX" && sed -i "s/^phase: BUILDING\$/phase: BUILDING\nkeepalive: kT\nhost: $G11_HOST\nlease-utc: $OLD_UTC/" memory/builds/tRun/RUN.md \
+    && git add -A && GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q --amend --no-edit && git remote add origin "$G11" )
+G11_C=$(GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t.test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t.test git --git-dir="$G11" commit-tree "$(git --git-dir="$G11" mktree </dev/null)" -m "$(printf 'gov-claim tRun\n\nslug: tRun\nnode: n\nhost: h\nsession: %s\nkeepalive: kT\nstatus: live\nlease-utc: %s\nbeat-utc: %s' "$SID" "$OLD_UTC" "$(date -u -d "@$(( $(date -u +%s) - 1000 ))" +%Y-%m-%dT%H:%M:%SZ)")")
+git --git-dir="$G11" update-ref refs/gov/runs/tRun "$G11_C"
+mkdir -p "$FX_GITDIR/gate-logs" && touch -d '+5 minutes' "$FX_GITDIR/gate-logs/leg.log"
+G11_SID=${CLAUDE_CODE_SESSION_ID-}; unset CLAUDE_CODE_SESSION_ID
+run_tick_over "$TICK"
+check_hit  "$OUT" "resume-tick: tRun · $FX · beat · unattended: beat — tRun · renewed " "GH11 AC1 the tick with no session id renews the run's claim"
+check_same "GH11 AC1 ...under the lease's session, never absent" "$(git --git-dir="$G11" log -1 --format=%B refs/gov/runs/tRun | sed -n 's/^session: //p')" "$SID"
+G11_OUT=$(cd "$FX" && CLAUDE_CODE_SESSION_ID="$SID" CLAUDE_PID=999999999 bash "$KIT/unattended.sh" --resume tRun --keepalive-id kT 2>&1); G11_RC=$?
+check_same "GH11 AC1 the holder's resume under the lease's session exits 0" "$G11_RC" "0"
+check_miss "$G11_OUT" "UNATTENDED check 108 FAILED" "GH11 AC1 ...and reads the claim the tick wrote as its own"
+git --git-dir="$G11" update-ref -d refs/gov/runs/tRun
+run_tick_over "$TICK"
+check_hit  "$OUT" "resume-tick: tRun · $FX · beat · unattended: beat — tRun · renewed " "GH11 AC1 the tick with no session id creates a claim over an empty remote"
+check_same "GH11 AC1 the created claim names the lease's session, keepalive, host and lease-utc" \
+  "$(git --git-dir="$G11" log -1 --format=%B refs/gov/runs/tRun | sed -n -e 's/^host: //p' -e 's/^session: //p' -e 's/^keepalive: //p' -e 's/^lease-utc: //p' | tr '\n' ' ')" \
+  "$G11_HOST $SID kT $OLD_UTC "
+[ -z "$G11_SID" ] || export CLAUDE_CODE_SESSION_ID="$G11_SID"
+rm -rf "$G11"
 rm -rf "$U65_CFG"
 
 # ---- AC12: the two announced skips of the walk. A driver whose --liveness exits non-zero is a dead
@@ -942,7 +1019,21 @@ n=$((pass+fail))
 # the U64 block, COUNTED off its own `check_*` lines, every one unconditional. The pass that wrote
 # it ran no suite; the arm was run alone over a replica of this prologue, against the kit and
 # against a driver copy without the sub-agent term.
-FLOOR_ASSERTIONS=179
+# RAISED 179 -> 184 by TOOL-aGraftedHelix-1 AC12: the LIVE beat row's 5 assertions after the U65
+# block, COUNTED off its own `check_*` lines, every one unconditional; the four arms that read the
+# LIVE skip are retargeted to the beat row one for one. The pass that wrote it ran no suite; the
+# block was run alone over a replica of this prologue, against the kit and against a tick whose
+# LIVE row is the generic skip.
+# RAISED 184 -> 190 by TOOL-aGraftedHelix-11 AC1: the session-less beat block's 6 assertions after
+# the AC12 block, COUNTED off its own `check_*` lines, every one unconditional. The pass that wrote
+# it ran no suite; the block was run alone over a replica of this prologue, against the kit, against
+# a driver whose claim write reads the session from the environment, and against the parent's driver.
+# RAISED 190 -> 192 by TOOL-aGraftedHelix-8: the health-log lines of AC1 and AC13, COUNTED off their
+# own `check_*` lines and unconditional; AC17's third is MSYS-only and stays out of the floor, as
+# AC17's own arms do. The pass that wrote them ran no suite; the AC1, AC13 and AC17 blocks were run
+# alone over a replica of this prologue, against the kit and against a tick whose call sat above
+# the pid check.
+FLOOR_ASSERTIONS=192
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 # THE TRAILER IS UNCONDITIONAL. `run-selftests.sh --pooled` reads a completed run by its trailer

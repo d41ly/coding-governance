@@ -36,6 +36,22 @@
 #                parent reparents its children out from under the walk. `GATE_WALL=<s>` overrides
 #                the row's value alone.
 #
+#   mempause=<pct>  hold the NEXT dispatch while used memory sits above this percent and a leg is
+#                still running; 0 = off, which is what a row that omits it gets, and above 100 is
+#                refused. The width is still chosen once, from RAM, at start; this watches what the
+#                legs actually do to it. A hold ends when the reading falls to the threshold, when
+#                nothing is left running, when the reading vanishes, when the wall fires, or at the
+#                first leg completion after the runner's `MEMPAUSE_HOLD` seconds, which
+#                `GATE_MEMPAUSE_HOLD` overrides, so it only ever narrows the pool and can never
+#                deadlock it: the knob costs speed, never a leg. Every row below declares 90: node
+#                `a` read 62 % used at rest on 2026-10-05, so 90 leaves a bar's own legs room and
+#                catches the thrash a second bar or a pooled suite run beside it causes. Each bar's
+#                `memory:` line prints the peak its decisions read, the figure to move it by.
+#                The reading is `/proc/meminfo` (`MemAvailable`, or `MemFree` where there is none,
+#                which on MSYS is Windows' own available figure) and the cgroup's usage over its
+#                limit, the HIGHER of the two; a host with neither reads INERT and says so.
+#                `GATE_MEMPAUSE=<pct>` overrides the row's value alone. TOOL-aGraftedHelix-7.
+#
 # OVERRIDES: `GATE_PROFILE=<name>` selects a row by name and skips detection. `GATE_PROFILES=<path>`
 # points at a different table; a path that does not exist falls back to the built-in formula, which
 # is the documented rollback for this whole mechanism. `GATE_JOBS=<n>` overrides the WIDTH alone and
@@ -71,7 +87,7 @@
 # `minimal` row below already declares, and it clears the largest ceiling with the pool term to
 # spare. The wedged-bar bound this buys is six hours rather than three; that is the price of a
 # verdict that means something.
-capable	8	24000	width=8,timeout=0,wall=21600
+capable	8	24000	width=8,timeout=0,wall=21600,mempause=90
 
 # --- the 4-core class ------------------------------------------------------------------------------
 # Deliberately BEHAVIOUR-NEUTRAL: the built-in formula already yields width 4 there. Moving the
@@ -79,11 +95,11 @@ capable	8	24000	width=8,timeout=0,wall=21600
 # matters, and a knob whose first landing is also its first behaviour change has no control. This
 # row's PURPOSE is its RAM threshold of zero paired with the row above: it is what a high-core,
 # low-RAM box falls to.
-modest	4	0	width=4,timeout=0,wall=21600
+modest	4	0	width=4,timeout=0,wall=21600,mempause=90
 
 # --- the catch-all, and the detection-failure row --------------------------------------------------
 # Zero thresholds, so it can never fail to match. Width 2 rather than 1 because unknown hardware is
 # slow, not serial-only. Removing this row is an operator error and the runner refuses rather than
 # silently falling through to the built-in formula: absent and unmatchable are different states and
 # only one of them is a mistake.
-minimal	0	0	width=2,timeout=0,wall=21600
+minimal	0	0	width=2,timeout=0,wall=21600,mempause=90

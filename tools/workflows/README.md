@@ -6,7 +6,7 @@ Three gates in this directory read the tree and delegate their verdict to the ag
 |---|---|
 | `check-review-join.sh` | no ref-keyed verdict join, and every agent wave a source scan can see is counted |
 | `check-verifier-fanout.sh` | the committed harnesses obey the verify-stage cap |
-| `check-workflow-syntax.js` | every workflow script parses |
+| `check-workflow-syntax.js` | every workflow script parses, and a second pass reds a pathless `git commit` on any code line, `git -C` included, printing how many lines it graded; a zero beside the build harness render is a dead probe |
 
 `tier2-review.js` is the ready-made harness they exist to protect. It carries this directory's
 version under **two** kit ids, and both are paired — see its line 3 and `check-kit-versions.sh`.
@@ -34,8 +34,9 @@ an install from before that migrates them the way the build harness migrated at 
 `*.template.js` is a render source, not a harness: the verifier fan-out and syntax gates judge its
 render and skip the template.
 
-**Edit the template, never the render.** The build harness names four install paths: the driver,
-the bug-class checklist, the review sub-workflow it awaits and the child it hands the caller. A
+**Edit the template, never the render.** The build harness names install paths: the driver,
+the bug-class checklist, the build-index generator `gen_build_index.py` its spec commit runs, the
+review sub-workflow it awaits and the child it hands the caller. A
 workflow script has no filesystem when it runs, so it cannot find its siblings, and apply would
 write a shipped copy verbatim, naming this repo's `tools/` layout in every adopter. So the kit
 renders it instead, and `kit.toml`'s `[[regenerate]]` block re-runs the render on every update run
@@ -187,7 +188,58 @@ non-empty strings. The items are split ROUND-ROBIN over the lenses of the run's 
 lens `(n - 1) % K` in lens order, so each class is swept by exactly one finder, labelled `C<n>`, and
 a finder begins a hit's claim with that label. A lens with no share is told so; skeptics get none. The
 split is logged, and RUN INTEGRITY states it. An absent or itemless checklist logs a `WARNING:` and
-RUN INTEGRITY says no class was swept. The parsed checklist joins the review key.
+RUN INTEGRITY says no class was swept; a string of `# ` header lines alone is itemless, not a refusal.
+The parsed checklist joins the review key.
+
+The string form may end with the checker's by-design block, `# by design — <n> invariant(s) this
+selection touches` and one `- ` line per invariant the change touches. It is CUT OUT before the items
+are parsed, so no lens sweeps intended behaviour as a bug class, and it becomes `byDesign` under the
+label `Intended behaviour — invariants this change touches:`, after a caller's own `byDesign` under
+`Known and tracked — do not re-report:`. Neither replaces the other. A head whose count disagrees with
+its entry lines refuses before any agent spawns. Each source is logged as a `by-design:` line, and
+RUN INTEGRITY's `By design:` clause names the same sources. The array form carries no block. The
+checker reads that block at the range's base, so an invariant the diff adds, edits or takes out never
+reaches `byDesign`: it arrives as an ordinary `- [ ] NEW/CHANGED invariant <name>` item, swept by one
+lens like any class, and the checker's header line naming the base is preamble. This suite's
+by-design range arm runs the real checker over a fixture range and holds that end to end.
+
+The memory-tree kit's `gotchas.py` prints that head, and every template the checker's
+`EVALUATED_TEMPLATES` names spells it: this harness's `BY_DESIGN_HEAD` pattern finds it, and the build
+harness carries a second pattern and the `BY_DESIGN_FORMAT` its merged checklist is emitted from.
+`check_by_design_parity.py` holds them all. It renders the head through the catalogue's own
+`render_by_design`, runs each template's pattern over it in `node`, renders the format at the same
+counts, and reds when a pattern stops matching, stops capturing the count, or matches the head behind
+a leading space, or when the format renders any other head. It does not trust that list: it scans
+its own directory and the memory-tree kit for every file carrying the head's fixed tail and reds on
+one outside the evaluated set, so the population is derived rather than stated. The parity leg runs
+it in check mode over the memory-tree kit it resolved, so a head reworded in one place reds the bar
+rather than leaving a harness logging `none supplied`. A catalogue that predates the block skips out
+loud, and `--selftest` covers every outcome.
+
+`unattended-build.js` hands its spec audit a checklist the same way: the subject resolver runs
+`gotchas.py --for-paths` over the paths the specs' `### Files touched` sub-heads name and returns its
+stdout, which the stage forwards as `checklist`; a caller's `checklist` argument wins, and none at
+all logs a `WARNING:`. A `base` of 7-40 hex is forwarded as `--for-paths --base <sha>`, so the
+checker reads the by-design block at the run's pinned base and lists every invariant this build
+moved as a `NEW/CHANGED invariant` item; the `checklist from` line names that base. With no such
+`base`, the stage that takes the resolver's checklist logs a `WARNING:` that the block was read from
+the working tree.
+
+Its SPEC stage ends in ONE commit (TOOL-aGraftedHelix-15): when the writers authored a unit and the
+caller pinned no `subjects`, one agent commits the authored specs with `Pass: none` and the program
+writes each committed path onto its unit, so the audit pins them at `HEAD` in the same call. That
+commit's checklist items are merged into the audit's with its by-design block left out
+(TOOL-aGraftedHelix-35), so the audit's block is the first input's alone, less any ruling either input
+itemises as a `NEW/CHANGED invariant`; with the audit off the checklist rides the hand-out whole as
+`specCommit`. With a 7-40 hex `base` the commit stage runs `gotchas.py --for-paths --base <sha>` over
+the paths its commit wrote, so that block is read at the run's pinned base; with none it runs
+`--for-diff HEAD~1..HEAD`, read at the spec commit's parent, and the audit-OFF route logs a `WARNING:`
+saying so. Each writer's `authored` entry is resolved to its roster
+unit before that commit, whether it is spelled as an id, a repo-relative path or an absolute one
+(TOOL-aGraftedHelix-33): an entry that names no roster unit by id and no unit's spec by path refuses
+the run, and a unit placed by path whose committed spec, found by its H1, is another file refuses
+after the commit. Every refusal that asks for a commit names a fresh
+re-invoke, never a `resumeFromRunId` resume, because a resume replays the cached answer that refused.
 
 `intensity` is `'full'` or `'light'`, and absent it is `'full'`. Only the caller picks it; the harness
 never chooses light for itself, whatever the diff's size or history:

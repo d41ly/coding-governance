@@ -15,7 +15,8 @@ harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["suite-edited-while-bash-executes-it.md", "ledger-token-wrapped-across-a-line-joins-nothing.md", "inline-fence-swallows-the-rest-of-the-file.md",
+gotcha-classes = ["a-grep-for-a-word-is-a-presence-probe.md",
+  "suite-edited-while-bash-executes-it.md", "ledger-token-wrapped-across-a-line-joins-nothing.md", "inline-fence-swallows-the-rest-of-the-file.md",
   "record-citing-a-foreign-id-defines-or-orphans-it.md", "swallowed-delegate-reads-as-clean.md",
   "waiver-row-that-hides-nothing-reds.md", "pin-gated-checks-arm-nothing-without-a-pin.md",
   "record-without-serves-or-with-a-round-counter.md", "sourced-conf-blank-overrides-the-default.md"]
@@ -44,6 +45,9 @@ verdicts datable. How many numbered checks it carries is derivable from the engi
 written here. Several of them delegate to sibling
 Python modules (`gen_build_index.py`, `corpus_ids.py`, `gotchas.py`, `row_grammar.py`, `transition_audit.py`);
 this dossier owns the engine, its self-test, the epoch and the transition audit, not the other modules.
+Of those, `gotchas.py` is the one a review reads: it reads the by-design block at the subject's base
+(`TOOL-aGraftedHelix-29`), so an invariant a change moves reaches that change's review as a checklist
+item and never as an exemption.
 
 **One leg here belongs to a module this dossier does NOT own**, deliberately. `backlog migration selftest` runs `migrate_backlog.py --selftest`, the
 suite of the shards-to-builds migration PLANNER and of the relocation ENGINE that lives beside it in

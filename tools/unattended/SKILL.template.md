@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.69 -->
+<!-- gov:kit unattended@1.85 -->
 
 # Unattended runs
 
@@ -114,6 +114,8 @@ unattended.sh --rescope <slug> --act retire|supersede|add|defer --item <unit-id>
 unattended.sh --dispatch <slug> --pass <unit-id> --writes <path> --writes <path>
 unattended.sh --plan <slug> --paths
 unattended.sh --status <slug>
+unattended.sh --claims  # RUN_CLAIMS on
+unattended.sh --beat <slug>
 unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>
 python {{MEMORY_TREE_DIR}}/gotchas.py --for-diff HEAD~1..HEAD
 ```
@@ -129,15 +131,14 @@ reaps with `{{KEEPALIVE_DELETE}}` before scheduling, and runs `{{RESUME_SCHEDULE
 ## Close
 
 `unattended.sh --phase <slug> VERIFYING --witness <sha>`, commit, then `unattended.sh --close <slug>`,
-under `in-place` after `{{LANDER}} --prepare --slug <slug>`. Attest with
-`unattended.sh --attest <slug> --item keepalive-reaped|parked-decisions-surfaced`.
+under `in-place` after `{{LANDER}} --prepare --slug <slug>` and
+`unattended.sh --authorization <slug>`. Attest with `unattended.sh --attest <slug> --item keepalive-reaped|parked-decisions-surfaced`.
 
 **TWO items have NO override, and this is where you will meet them: `authorization-reachable` and
-`pieces-complete`.** Neither can be overridden, waived or attested around. An override on the
+`pieces-complete`.** An override on the
 authorization check IS the authorization check, so the verb refuses the pair rather than recording
 it; and `pieces-complete` is the item saying a recipe-mode run produced what the owner asked for over
 content nothing else on the bar can grade, so an override on it is the run certifying its own output.
-A recipe run is the one most likely to meet the second.
 
 **A `hold ·` line from `gates-green` is your next step, whatever its code.** The item prints one
 when the bar ended for a reason that is not this run's to fix: `host-degraded` until `probe gate`

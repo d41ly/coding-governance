@@ -414,7 +414,11 @@ if [ -n "$obs" ] && [ -n "$env_def" ] && [ "$obs" != "$env_def" ]; then
 fi
 def=${obs:-$env_def}
 if [ -z "$def" ]; then
-  why="pre-push: can't determine the default branch (${push_remote:+$push_remote/HEAD unset}${push_remote:-the push names a URL, so no remote HEAD is observable} and GOV_DEFAULT_BRANCH unset)."
+  # ONE of the two clauses, never both: `${x:-text}` expands to $x itself when x is set, so pairing it
+  # with `${x:+…}` printed "origin/HEAD unsetorigin". Chosen once, named once.
+  if [ -n "$push_remote" ]; then head_clause="$push_remote/HEAD unset"
+  else head_clause="the push names a URL, so no remote HEAD is observable"; fi
+  why="pre-push: can't determine the default branch ($head_clause and GOV_DEFAULT_BRANCH unset)."
   echo "$why" >&2
   echo "  Refusing to guess — silently assuming 'main' would BYPASS this gate on a non-main default." >&2
   echo "  Fix once: git remote set-head ${push_remote:-<remote>} -a   — or export GOV_DEFAULT_BRANCH=<branch>." >&2

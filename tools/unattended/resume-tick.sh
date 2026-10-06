@@ -23,6 +23,8 @@
 #   host: names another node              -> skip · leased on <host>, not this node <me>
 #   verdict HELD                          -> skip · HELD · its restart is the durable schedule --hold printed, never this tick
 #   verdict ELSEWHERE                     -> skip · ELSEWHERE · the run's branch is <ref>, and this worktree is not on it ...
+#   verdict LIVE                          -> beat · <the driver's `--beat` line>, run in the worktree; a run
+#     waiting on one long Workflow gets no idle-wake, so this is what keeps its remote claim fresh
 #   verdict not STALE, and not            -> skip · verdict <V>
 #     FINISHED-UNSTAMPED with stale: yes
 #   holder-ref absent                     -> skip · NO RUN BRANCH · the record names neither run-branch nor branch-ref ...
@@ -262,7 +264,7 @@ read_liveness() { # worktree · slug
 # with cwd in the worktree so it answers THAT tree's git dir, made absolute because the main
 # worktree's answer is the relative `.git`.
 run_tick() { # worktree · slug · session · host
-  local wt="$1" slug="$2" sid="$3" host="$4" me sidecar log utc stamp launcher out n payload kitrel lastutc lastout boundcut lalive limg lutc
+  local wt="$1" slug="$2" sid="$3" host="$4" me sidecar log utc stamp launcher out n payload kitrel lastutc lastout boundcut lalive limg lutc killed=""
   # THE NODE FIRST: a record leased on another node is not this tick's to probe, kill or launch —
   # its pid is a number in another process table (closing review id 2). A lease with no host
   # recorded (`absent`, or written before the fact existed) is judged as it always was.
@@ -286,6 +288,15 @@ run_tick() { # worktree · slug · session · host
   # one slug from two worktrees while the run's own copy is graded in its own.
   if [ "$RL_VERDICT" = ELSEWHERE ]; then
     print_decision "$slug" "$wt" "skip · ELSEWHERE · the run's branch is $RL_HOLDER, and this worktree is not on it, so nothing is killed or launched from this copy"; return 0
+  fi
+  # LIVE RENEWS THE RUN'S CLAIM (TOOL-aGraftedHelix-1 S11): the driver's `--beat`, run in the run's
+  # worktree, decides whether the claim is this run's and due and prints its one `beat —` line, which
+  # is quoted whole; this tick re-derives nothing. `--dry-run` names the row and runs nothing.
+  if [ "$RL_VERDICT" = LIVE ]; then
+    if [ "$DRY_RUN" = 1 ]; then print_decision "$slug" "$wt" "beat · --beat $slug would run"; return 0; fi
+    out=$(cd "$wt" && bash "$DRIVER" --beat "$slug" 2>/dev/null </dev/null)
+    out=$(printf '%s\n' "$out" | grep -m 1 '^unattended: beat — ')
+    print_decision "$slug" "$wt" "beat · ${out:-the driver printed no beat line}"; return 0
   fi
   case "$RL_VERDICT:$RL_STALE" in STALE:*|FINISHED-UNSTAMPED:yes) ;; *) print_decision "$slug" "$wt" "skip · verdict $RL_VERDICT"; return 0 ;; esac
   # A VERDICT THAT WOULD ACT, ON A RECORD NAMING NO BRANCH: no one worktree can be shown to hold it,
@@ -326,8 +337,8 @@ run_tick() { # worktree · slug · session · host
   if ! check_login "$sidecar/resume.$slug.$stamp.auth"; then
     echo "resume-tick: $slug · $wt · SKIP — the CLI is not logged in on this node; nothing can resume $slug"; return 0
   fi
-  [ "$RL_ALIVE" = yes ] && run_kill_tree "$RL_PID"
-  [ "$lalive" = yes ] && run_kill_tree "$RT_LAUNCHED"
+  [ "$RL_ALIVE" = yes ] && { run_kill_tree "$RL_PID"; killed="$RL_PID"; }
+  [ "$lalive" = yes ] && { run_kill_tree "$RT_LAUNCHED"; killed="${killed:+$killed }$RT_LAUNCHED"; }
   # THE CONTINUE PAYLOAD, one string. The kit's repo-relative path is derived, never spelled; a kit
   # outside the root keeps its absolute path, which still runs.
   kitrel=${KIT_DIR#"$ROOT"/}
@@ -348,7 +359,13 @@ run_tick() { # worktree · slug · session · host
   run_detached "$launcher" "$sidecar/resume.$slug.$stamp.pid"
   # A launch that reported no pid is announced as a failure, never as `resumed`; its line stays and
   # counts, because the cap is what ends a launch that fails every time (round 2, defect C).
-  if [ -z "$RD_PID" ]; then print_decision "$slug" "$wt" "launch failed: $RD_FIRST"; return 0; fi
+  # BOTH OUTCOMES ARE LOGGED (I3, TOOL-aGraftedHelix-8), each beside the line it already prints:
+  # a relaunch is the self-heal, and a relaunch that failed is the heal the card must not miss.
+  TICK_HEALTH_LOG=${TICK_HEALTH_LOG:-$(resolve_health_log "$ROOT")}
+  if [ -z "$RD_PID" ]; then
+    add_health_event "$TICK_HEALTH_LOG" resume-tick resume-failed "$slug attempt $n $RD_FIRST"
+    print_decision "$slug" "$wt" "launch failed: $RD_FIRST"; return 0
+  fi
   # THE LAUNCHED FIELD: the pid, the stamp taken now that the launch has returned — the process
   # existed before it, so a holder that started after it is not the launch — and the image holding
   # the pid, LAST because `System Idle Process` has spaces. `absent` where a probe answered nothing.
@@ -357,6 +374,7 @@ run_tick() { # worktree · slug · session · host
   lutc=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   limg=$(read_pid_image "$RD_PID") || limg=absent
   sed -i "\$ s|\$| launched $RD_PID $lutc ${limg:-absent}|" "$log"
+  add_health_event "$TICK_HEALTH_LOG" resume-tick run-resumed "$slug attempt $n session $sid killed ${killed:-none}"
   print_decision "$slug" "$wt" "resumed · attempt $n · out $out"
   return 0
 }

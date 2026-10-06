@@ -402,6 +402,20 @@ done <<EOF
 $_secs
 EOF
 [ "$_p_bad" = 0 ] || exit 1
+
+# THE BY-DESIGN HEAD PAIR (TOOL-aGraftedHelix-28). The memory-tree kit's `gotchas.py` PRINTS the head
+# of its by-design block and `tier2-review.template.js` FINDS it with `BY_DESIGN_HEAD`, two spellings
+# in two kits. A head reworded in either makes the harness log `none supplied`, which reads as "no
+# invariant touched". `check_by_design_parity.py` runs the renderer and the pattern against each other
+# and its exit is this leg's. It reaches the catalogue through the `MTD` resolved above, so the
+# memory-tree kit stays a derived path, and it skips out loud exactly where that resolution did.
+if [ -n "$MTD_SKIP" ]; then
+  echo "protocol-parity: the by-design arm did NOT run — $MTD_SKIP"
+else
+  [ -f "$HERE/check_by_design_parity.py" ] || { echo "protocol-parity: missing shipped copy $KITREL/check_by_design_parity.py"; exit 1; }
+  _bd_py=$(resolve_python) || exit 2
+  "$_bd_py" "$HERE/check_by_design_parity.py" "$MTD" || exit $?
+fi
 if [ "$nskip" -gt 0 ]; then
   echo "protocol-parity: in parity — $((i-nskip)) rendered pair(s) match their templates for '$KITREL'; $nskip pair(s) SKIPPED, each named above"
 else

@@ -968,6 +968,78 @@ def test_non_msys_row_is_signalled_by_taskkill():
           (True, True, True, False, False))
 
 
+# ================================================================ the health log (TOOL-aGraftedHelix-8)
+
+
+def test_health_appender_failures_return_none_with_one_note():
+    """The reaper's copy of the I3 appender NEVER raises into its caller: a completed kill must not
+    turn into a traceback because its log line could not be written. An empty path, a refused event
+    token and a log inside a missing directory each return None and print exactly one
+    `health: NOTE -` line on stderr. WHAT THIS DOES NOT CHECK: the line format, which the resolver
+    suite's behaviour arm holds both canonicals to."""
+    import contextlib
+    import io
+    tmp = tempfile.mkdtemp()
+    got = []
+    for args in (("", "reap", "tree-killed", "x"),
+                 (os.path.join(tmp, "health.log"), "reap", "Bad", "x"),
+                 (os.path.join(tmp, "missing", "dir", "health.log"), "reap", "tree-killed", "x")):
+        err = io.StringIO()
+        try:
+            with contextlib.redirect_stderr(err):
+                ret = reap.add_health_event(*args)
+        except Exception as exc:  # the defect this arm exists for
+            ret = "raised %s" % type(exc).__name__
+        got.append((ret, err.getvalue().count("health: NOTE -")))
+    shutil.rmtree(tmp, ignore_errors=True)
+    check("test_health_appender_failures_return_none_with_one_note", got, [(None, 1)] * 3)
+
+
+def test_sweep_logs_one_tree_killed_per_target_and_none_dry():
+    """S4: a real sweep appends ONE `tree-killed` line per kill target, AFTER `check_survivors` has
+    read the census back, to the health log under the sweep root's git common dir; a dry run
+    appends none. Every stage is stubbed, `run_kill` included, so nothing is signalled: the census
+    answers the tree first and an empty table on the read-back, so the line's count is the
+    read-back's. WHAT THIS DOES NOT CHECK: the `--kill` path in `main`, which carries the same call
+    and is named by the presence grep of AC5, nor a real kill, which the live-tree arm owns."""
+    import classify as classify_mod
+    import scope as scope_mod
+    root = tempfile.mkdtemp()
+    subprocess.run(["git", "init", "-q", root], capture_output=True, timeout=60)
+    with open(os.path.join(root, ".process-monitor.conf"), "w", encoding="utf-8") as fh:
+        fh.write('PROCMON_ROOTS="/c/projects/gov"\n')
+    log = reap.resolve_health_log(root)
+    rows = build_tree_rows()
+    answers = [rows, rows, []]  # the dry sweep's census, the real sweep's, then its read-back
+    saved = (census.scan_processes, scope_mod.build_self_chain, scope_mod.derive_scope,
+             classify_mod.scan_verdicts, reap.run_kill)
+    census.scan_processes = lambda backend="": (answers.pop(0), {})
+    scope_mod.build_self_chain = lambda rows_, pid: set()
+    scope_mod.derive_scope = lambda rows_, roots, chain: (build_scope(1, 2, 3, 4),
+                                                          {"unattributable": 0})
+    classify_mod.scan_verdicts = lambda rows_, sc, ceiling, rate: (
+        [(r, "ORPHAN") for r in rows_ if r["winpid"] == 1], {})
+    reap.run_kill = lambda target, rows_, sc, dry_run=False: {
+        "target": target, "walked": [4, 3, 2, 1], "kill_set": [4, 3, 2, 1], "dropped": [],
+        "withheld": [], "signalled": [] if dry_run else [4, 3, 2, 1], "unsignalable": [],
+        "errors": [], "already_gone": [], "dry_run": dry_run}
+    try:
+        reap.run_sweep(root, "reap-orphans", True)
+        dry = os.path.exists(log)
+        reap.run_sweep(root, "reap-orphans", False)
+        with open(log, encoding="utf-8") as fh:
+            lines = [l.rstrip("\n").split("\t") for l in fh]
+    except Exception as exc:  # a stub that no longer fits the chain is a FAIL, never a crash
+        dry, lines = "raised %s: %s" % (type(exc).__name__, exc), []
+    finally:
+        (census.scan_processes, scope_mod.build_self_chain, scope_mod.derive_scope,
+         classify_mod.scan_verdicts, reap.run_kill) = saved
+        shutil.rmtree(root, ignore_errors=True)
+    check("test_sweep_logs_one_tree_killed_per_target_and_none_dry",
+          (bool(log), dry, [l[1:] for l in lines]),
+          (True, False, [["reap", "tree-killed", "target 1 killed 4 survivors 0 unsignalable 0"]]))
+
+
 def resolve_launcher():
     """The POSIX shell whose processes the census can enumerate, plus every candidate RUN.
 

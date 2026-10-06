@@ -169,4 +169,5 @@ memory/builds/aBatchedMinors/README.md
 memory/builds/aMendedFleet/README.md
 memory/builds/aEvidencedLens/README.md
 memory/builds/aWardedAudit/README.md
+memory/builds/aGraftedHelix/README.md
 memory/builds/dThriftyLanding/README.md

@@ -29,7 +29,24 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.28   # gov:kit run-gates@1.28
+KIT_RUN_GATES_VERSION=1.29   # gov:kit run-gates@1.29
+# 1.28 + 1.27 -> 1.29: the reconcile with origin/main 290d0d2d5. Both lines moved the kit from 1.24, so
+# each spelled its own 1.25 onward: this branch's notes are first, then main's, each under its own numbers.
+# 1.27 -> 1.28: every repair the runner makes on its own appends one line to the health log under the
+# git common dir (TOOL-aGraftedHelix-8): the `health_log_sh` block, inlined byte-identical, and seven sites.
+# 1.26 -> 1.27: the same unit's follow-up moved the kit's bytes after 1.26 was cut — its suites' bars
+# run with the pause off and its prose stops restating the table's figures; no behaviour moved.
+# 1.25 -> 1.26: the profile knob `mempause`, on every shipped row: dispatch HOLDS while used memory
+# is above it and a leg runs (TOOL-aGraftedHelix-7). The run record gains `pauses`, the verdict
+# `paused` and `paused_s`, the header and `--print-profile` `mempause`, the profile line a field, and
+# stdout one `memory:` line; a table carrying the knob is refused by a runner older than this one.
+# 1.24 -> 1.25: every `.leg` row gains an eighth field, `foreign`, from a census of foreign gate work
+# taken while the legs run, and the header gains `census_every` (TOOL-aGraftedHelix-5). A reader that
+# splits a row by position keeps working; one that reads the seventh field with a trailing catch-all
+# variable folds the eighth into it, which is why the ledger block's read gained one.
+# --- origin/main's line from 1.24, numbered as it landed there:
+# 1.27 -> 1.28: the runner deletes the retired `gate-timings.tsv` from its git dir and the common dir
+# (TOOL-aMendedFleet-72); no verdict moves.
 # 1.24 -> 1.25: the manifest's NINTH field, `doc_reads`, and the docs mode `GATE_DOCS_BASE` that reads
 # it (TOOL-dThriftyLanding-1); a full green is also shared through the common git dir
 # (TOOL-dThriftyLanding-2). The canary's key-set pin admits the new key, which is the floor the
@@ -332,7 +349,7 @@ TIMINGS="$LEDGER"
 # slower, and it may turn an unbounded hang into a bounded RED. It may never make the bar check less.
 # KNOWN_KNOBS is the whole implemented set; the canary PINS the same set separately, which is what
 # stops a coverage knob being added without an author reading this paragraph.
-KNOWN_KNOBS="width timeout wall"
+KNOWN_KNOBS="width timeout wall mempause"
 PROFILES="${GATE_PROFILES:-$KITREL/gate-profiles.txt}"
 prof_die() { echo "run-gates: $*" >&2; exit 2; }
 
@@ -417,7 +434,163 @@ det_ram_capped() {
   return 0
 }
 
-PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_WALL=0; PROF_TAG=""; PROF_WHERE=""
+# >>> mempause_sh — canonical copy: run-gates.sh in this kit's dir (byte-identical; gated)
+# THE MEMORY PAUSE (TOOL-aGraftedHelix-7). The width is chosen ONCE, from RAM, at start; nothing
+# watched memory while the work ran. A dispatcher calls `check_dispatch_pause <running>` before each
+# dispatch and HOLDS that dispatch while used memory sits above `MEMPAUSE` percent and something is
+# still running. Both runners carry this block byte-identical, so it reads only what its caller set:
+# `MEMPAUSE` (the threshold, 0 = off), `MEMPAUSE_INERT` (1 when the host gave no reading at start)
+# and `MEMPAUSE_ROWS` (the run record's `pauses` file, empty for none). Builtins only, and the
+# decision reads `MEMPAUSE_READ` rather than a command substitution, so a decision forks nothing.
+# A HOLD ALWAYS ENDS: nothing polls, so each decision happens at a completion, and a hold is released
+# when the reading falls (`fell`), when nothing runs (`drained`), when the reading vanishes
+# (`unread`), or at the first completion after `MEMPAUSE_HOLD` seconds (`bound`); the caller closes
+# one the wall's break left open as `wall`. The knob narrows a pool and never turns a leg into
+# anything: under pressure that never falls the pool drains toward width 1 and keeps moving.
+MEMPAUSE_HOLD=300
+case "${GATE_MEMPAUSE_HOLD:-}" in ''|*[!0-9]*|???????*) ;; *) MEMPAUSE_HOLD=$((10#$GATE_MEMPAUSE_HOLD)) ;; esac
+MEMPAUSE_N=0; MEMPAUSE_HELD_S=0; MEMPAUSE_READ=""; MEMPAUSE_PEAK=""; MEMPAUSE_OPEN=""; MEMPAUSE_OPEN_PEAK=0
+MEMPAUSE_FELL=0; MEMPAUSE_BOUND=0; MEMPAUSE_DRAINED=0; MEMPAUSE_UNREAD=0; MEMPAUSE_WALL=0
+# read_mem_used — used memory as a whole percent, on stdout and in MEMPAUSE_READ; rc 1 and nothing
+# when no source reads. The host half is `MemTotal` against `MemAvailable`, or `MemFree` where the
+# file has none (on MSYS that IS Windows' available figure); the cgroup half is its usage over its
+# limit, v2 then v1, with `max` and v1's 19-digit sentinel rejected as `cgroup_ram_mb` rejects them.
+# The HIGHER wins: a wrong source can only make the bar slower, the direction `det_ram_capped` takes.
+read_mem_used() {
+  local f="${GATE_MEMINFO:-/proc/meminfo}" cg="${GATE_CGROUP_ROOT:-/sys/fs/cgroup}" k v _
+  local tot="" av="" fr="" host="" grp="" lim="" use=""
+  MEMPAUSE_READ=""
+  if [ -r "$f" ]; then
+    while read -r k v _; do
+      case "$k" in MemTotal:) tot=$v ;; MemAvailable:) av=$v ;; MemFree:) fr=$v ;; esac
+    done < "$f"
+  fi
+  [ -n "$av" ] || av=$fr
+  case "$tot" in ''|*[!0-9]*|????????????????*) tot="" ;; esac
+  case "$av" in ''|*[!0-9]*|????????????????*) av="" ;; esac
+  if [ -n "$tot" ] && [ -n "$av" ] && [ "$((10#$tot))" -gt 0 ]; then
+    tot=$((10#$tot)); av=$((10#$av)); [ "$av" -le "$tot" ] || av=$tot
+    host=$(( (tot - av) * 100 / tot ))
+  fi
+  for k in memory.max:memory.current memory/memory.limit_in_bytes:memory/memory.usage_in_bytes; do
+    lim=""; use=""
+    { read -r lim < "$cg/${k%%:*}"; read -r use < "$cg/${k#*:}"; } 2>/dev/null
+    case "$lim" in ''|*[!0-9]*|????????????????*) continue ;; esac
+    case "$use" in ''|*[!0-9]*|????????????????*) continue ;; esac
+    [ "$((10#$lim))" -gt 0 ] || continue
+    grp=$(( 10#$use * 100 / 10#$lim )); [ "$grp" -le 100 ] || grp=100
+    break
+  done
+  [ -n "$host$grp" ] || return 1
+  v=${host:-$grp}; [ -n "$grp" ] && [ "$grp" -gt "$v" ] && v=$grp
+  MEMPAUSE_READ=$v
+  printf '%s\n' "$v"
+}
+# check_dispatch_pause <running> — rc 0 HOLDS the next dispatch, rc 1 lets it go. First match:
+# off or INERT; no reading (`unread`); at or under the threshold (`fell`); nothing running
+# (`drained`), so a hold never outlives the last job; an episode held MEMPAUSE_HOLD seconds or more
+# (`bound`), tested only here, so it is released at the first decision after the bound; else hold,
+# opening an episode when none is open.
+check_dispatch_pause() {
+  { [ "${MEMPAUSE:-0}" -gt 0 ] && [ "${MEMPAUSE_INERT:-0}" = 0 ]; } || return 1
+  if ! read_mem_used >/dev/null; then write_pause_row unread; return 1; fi
+  { [ -z "$MEMPAUSE_PEAK" ] || [ "$MEMPAUSE_READ" -gt "$MEMPAUSE_PEAK" ]; } && MEMPAUSE_PEAK=$MEMPAUSE_READ
+  [ -n "$MEMPAUSE_OPEN" ] && [ "$MEMPAUSE_READ" -gt "$MEMPAUSE_OPEN_PEAK" ] && MEMPAUSE_OPEN_PEAK=$MEMPAUSE_READ
+  if [ "$MEMPAUSE_READ" -le "$MEMPAUSE" ]; then write_pause_row fell; return 1; fi
+  if [ "${1:-0}" -le 0 ]; then write_pause_row drained; return 1; fi
+  if [ -n "$MEMPAUSE_OPEN" ] && [ $(( EPOCHSECONDS - MEMPAUSE_OPEN )) -ge "$MEMPAUSE_HOLD" ]; then
+    write_pause_row bound; return 1
+  fi
+  [ -n "$MEMPAUSE_OPEN" ] || { MEMPAUSE_OPEN=$EPOCHSECONDS; MEMPAUSE_OPEN_PEAK=$MEMPAUSE_READ; }
+  return 0
+}
+# write_pause_row <ended-by> — closes the open episode, a no-op when none is open: one `pauses` row,
+# `<started-s> TAB <ended-s> TAB <held-s> TAB <peak-pct> TAB <threshold> TAB <ended-by>`, when the
+# caller set MEMPAUSE_ROWS, and the counters the summary prints either way.
+write_pause_row() {
+  [ -n "$MEMPAUSE_OPEN" ] || return 0
+  local now=$EPOCHSECONDS held
+  held=$(( now - MEMPAUSE_OPEN ))
+  MEMPAUSE_N=$(( MEMPAUSE_N + 1 )); MEMPAUSE_HELD_S=$(( MEMPAUSE_HELD_S + held ))
+  case "$1" in
+    fell) MEMPAUSE_FELL=$(( MEMPAUSE_FELL + 1 )) ;;
+    bound) MEMPAUSE_BOUND=$(( MEMPAUSE_BOUND + 1 )) ;;
+    drained) MEMPAUSE_DRAINED=$(( MEMPAUSE_DRAINED + 1 )) ;;
+    unread) MEMPAUSE_UNREAD=$(( MEMPAUSE_UNREAD + 1 )) ;;
+    *) MEMPAUSE_WALL=$(( MEMPAUSE_WALL + 1 )) ;;
+  esac
+  if [ -n "${MEMPAUSE_ROWS:-}" ]; then
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$MEMPAUSE_OPEN" "$now" "$held" "$MEMPAUSE_OPEN_PEAK" \
+      "${MEMPAUSE:-0}" "$1" >> "$MEMPAUSE_ROWS" 2>/dev/null || true
+  fi
+  MEMPAUSE_OPEN=""; MEMPAUSE_OPEN_PEAK=0
+}
+# render_pause_summary — the ONE `memory:` line a run prints after its pool drains, on every run.
+render_pause_summary() {
+  if [ "${MEMPAUSE:-0}" -le 0 ]; then
+    printf 'memory: pause off\n'
+  elif [ "${MEMPAUSE_INERT:-0}" = 1 ]; then
+    printf 'memory: no reading on this host, so the %s%% pause was INERT\n' "$MEMPAUSE"
+  elif [ "$MEMPAUSE_N" = 0 ]; then
+    printf 'memory: no pause  (peak %s%% used, threshold %s%%)\n' "${MEMPAUSE_PEAK:-?}" "$MEMPAUSE"
+  else
+    printf 'memory: %s pause(s), %ss held  (peak %s%% used, threshold %s%%; fell %s, bound %s, drained %s, unread %s, wall %s)\n' \
+      "$MEMPAUSE_N" "$MEMPAUSE_HELD_S" "${MEMPAUSE_PEAK:-?}" "$MEMPAUSE" \
+      "$MEMPAUSE_FELL" "$MEMPAUSE_BOUND" "$MEMPAUSE_DRAINED" "$MEMPAUSE_UNREAD" "$MEMPAUSE_WALL"
+  fi
+}
+# <<< mempause_sh
+
+# >>> health_log_sh — canonical copy: health-log.sh in gov's lib dir (byte-identical; gated)
+# I3, THE HEALTH LOG (TOOL-aGraftedHelix-8): `<git-common-dir>/health.log`, one LF-terminated UTF-8
+# line per automatic self-heal, four TAB-separated fields: utc (`YYYY-MM-DDTHH:MM:SS+00:00`), source
+# and event (each `^[a-z][a-z0-9-]*$`), and a detail whose TAB, CR and LF are each folded to one space
+# and which is cut to 240 characters. At HEALTH_LOG_CAP_LINES lines the appender first keeps the
+# newest half, through a temp file and a rename, then appends. `derive_health_log <common-dir>` prints
+# the path and spawns nothing; `resolve_health_log <repo-dir>` asks git once and prints it, or fails
+# printing nothing; `add_health_event <log> <source> <event> <detail>` is the only writer. A refused
+# token, an empty path or a failed write prints ONE `health: NOTE -` line on stderr and returns 0: it
+# never fails its caller. WHAT IT DOES NOT DO: serialize concurrent writers (a trim racing an append
+# can lose that line; ponytail: one rename, a lock file if a lost line is ever observed); validate
+# what a detail means; or tell a repository with no writer installed from one where nothing healed.
+HEALTH_LOG_CAP_LINES=500
+derive_health_log() { printf '%s/health.log\n' "$1"; }
+resolve_health_log() {
+  local _hl_c
+  _hl_c=$(git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
+  _hl_c=${_hl_c%$'\r'}
+  [ -n "$_hl_c" ] || return 1
+  derive_health_log "$_hl_c"
+}
+add_health_event() {
+  local _hl_log=${1:-} _hl_src=${2:-} _hl_ev=${3:-} _hl_d=${4:-} _hl_why="" _hl_n=0 _hl_t
+  local _hl_a=abcdefghijklmnopqrstuvwxyz
+  case "$_hl_src" in ''|[!$_hl_a]*|*[!$_hl_a'0123456789-']*) _hl_why="source '$_hl_src' is not a lowercase token" ;; esac
+  case "$_hl_ev" in ''|[!$_hl_a]*|*[!$_hl_a'0123456789-']*) _hl_why="event '$_hl_ev' is not a lowercase token" ;; esac
+  [ -n "$_hl_log" ] || _hl_why="no log path resolved"
+  if [ -z "$_hl_why" ]; then
+    _hl_d=${_hl_d//$'\t'/ }; _hl_d=${_hl_d//$'\r'/ }; _hl_d=${_hl_d//$'\n'/ }; _hl_d=${_hl_d:0:240}
+    _hl_t=$(date -u +%Y-%m-%dT%H:%M:%S+00:00 2>/dev/null) || _hl_t=""
+    [ -n "$_hl_t" ] || _hl_why="date printed no UTC stamp"
+  fi
+  if [ -z "$_hl_why" ] && [ -f "$_hl_log" ]; then
+    _hl_n=$(wc -l < "$_hl_log" 2>/dev/null) || _hl_n=0
+    _hl_n=${_hl_n//[!0-9]/}
+    if [ "${_hl_n:-0}" -ge "$HEALTH_LOG_CAP_LINES" ]; then
+      { tail -n $((HEALTH_LOG_CAP_LINES / 2)) "$_hl_log" > "$_hl_log.trim.$$" && mv -f "$_hl_log.trim.$$" "$_hl_log"; } 2>/dev/null \
+        || { rm -f "$_hl_log.trim.$$" 2>/dev/null; _hl_why="the trim to the newest $((HEALTH_LOG_CAP_LINES / 2)) lines failed"; }
+    fi
+  fi
+  if [ -z "$_hl_why" ]; then
+    { printf '%s\t%s\t%s\t%s\n' "$_hl_t" "$_hl_src" "$_hl_ev" "$_hl_d" >> "$_hl_log"; } 2>/dev/null && return 0
+    _hl_why="the append failed"
+  fi
+  printf 'health: NOTE - %s: %s; nothing written\n' "${_hl_log:-(no path)}" "$_hl_why" >&2
+  return 0
+}
+# <<< health_log_sh
+
+PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_WALL=0; PROF_MEMPAUSE=0; PROF_TAG=""; PROF_WHERE=""
 if [ -f "$PROFILES" ]; then
   # GATE_PROFILE names a row and SKIPS detection; otherwise the first row both thresholds satisfy.
   if [ -n "${GATE_PROFILE:-}" ]; then PROF_WHERE="detection skipped"
@@ -454,6 +627,10 @@ if [ -f "$PROFILES" ]; then
       # was silently dropped AND the INERT warning that would have said so was disabled by the same
       # failing test. The visibility line then reported `timeout off` beside a table declaring one.
       case "${k#*=}" in ????????????????*) prof_die "$PROFILES:$ln: knob '${k%%=*}' value too long to compare (max 15 digits): '${k#*=}'" ;; esac
+      # A PERCENT, so a value above 100 is a threshold no reading can cross: the knob would read as on
+      # and could never hold. Refused like any malformed knob rather than clamped (TOOL-aGraftedHelix-7).
+      [ "${k%%=*}" = mempause ] && [ "$((10#${k#*=}))" -gt 100 ] \
+        && prof_die "$PROFILES:$ln: knob 'mempause' is a percent of used memory, 0 to 100: '${k#*=}'"
     done
     declared="$declared $pname"
     [ -n "$sel" ] && continue
@@ -474,7 +651,7 @@ if [ -f "$PROFILES" ]; then
   IFS=, read -ra kv <<<"$selknobs"
   for k in "${kv[@]}"; do
     case "${k%%=*}" in width) PROF_WIDTH=${k#*=} ;; timeout) PROF_TIMEOUT=${k#*=} ;;
-                        wall) PROF_WALL=${k#*=} ;; esac
+                        wall) PROF_WALL=${k#*=} ;; mempause) PROF_MEMPAUSE=$((10#${k#*=})) ;; esac
   done
   [ -n "$PROF_WIDTH" ] || prof_die "$PROFILES: row '$sel' declares no width knob"
   PROF_TAG="detected"
@@ -697,7 +874,31 @@ prof_w=off; [ "$WALL" -gt 0 ] && prof_w="${WALL}s"
 if [ "$CEILINGS_LIVE" != 1 ]; then
   echo "run-gates: NOTE - this host has no runnable 'timeout -k', so EVERY leg's declared ceiling is INERT and every leg runs unbounded this run" >&2
 fi
-PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c, wall $prof_w; $PROF_TAG)"
+# ---- THE MEMORY PAUSE'S THRESHOLD, resolved beside the wall it shares the profile line with. The row
+# ---- supplies it and `GATE_MEMPAUSE` overrides it alone, as `GATE_WALL` does the wall; an override
+# ---- that is not a percent is announced and leaves the pause OFF, because a knob that silently took
+# ---- some other value is a knob the operator believes they set. A threshold over a host that gives
+# ---- no reading is INERT and says so here, once, instead of reading 0 % used on every decision.
+MEMPAUSE=$PROF_MEMPAUSE
+if [ -n "${GATE_MEMPAUSE:-}" ]; then
+  case "$GATE_MEMPAUSE" in
+    *[!0-9]*|????*) MEMPAUSE=101 ;;
+    *) MEMPAUSE=$((10#$GATE_MEMPAUSE)) ;;
+  esac
+  if [ "$MEMPAUSE" -gt 100 ]; then
+    echo "run-gates: NOTE - GATE_MEMPAUSE='$GATE_MEMPAUSE' is not a percent from 0 to 100, so the memory pause is OFF this run" >&2
+    MEMPAUSE=0
+  fi
+fi
+MEMPAUSE_INERT=0; MEMPAUSE_ROWS=""
+if [ "$MEMPAUSE" -gt 0 ] && ! read_mem_used >/dev/null; then
+  MEMPAUSE_INERT=1
+  echo "run-gates: NOTE - profile '$PROF_NAME' asks to hold dispatch above ${MEMPAUSE}% used memory, but this host gives no reading (${GATE_MEMINFO:-/proc/meminfo}, nor a cgroup pair under ${GATE_CGROUP_ROOT:-/sys/fs/cgroup}), so the memory pause is INERT this run" >&2
+fi
+prof_m=off; prof_mrec=off
+[ "$MEMPAUSE" -gt 0 ] && { prof_m="${MEMPAUSE}%"; prof_mrec=$MEMPAUSE; }
+[ "$MEMPAUSE_INERT" = 1 ] && { prof_m=INERT; prof_mrec=inert; }
+PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c, wall $prof_w, mempause $prof_m; $PROF_TAG)"
 
 # HOISTED ABOVE `--print-profile`, TOOL-dDerivedDocket-27 S3. That verb reports the queue bound,
 # and a queue printed before the TTL is resolved reads 0, which is a bound on nothing. Deriving it
@@ -773,6 +974,9 @@ sys.stdout.write(str(max(c)) if c else "-")
   printf 'queue\t%s\n'     "$TS_MAXWAIT"
   [ -n "$PROF_CEILING_MAX" ] && printf 'ceiling_max\t%s\n' "$PROF_CEILING_MAX"
   printf 'ceilings\t%s\n'  "$CEILINGS_LIVE"
+  # The EFFECTIVE threshold, 0 for off. INERT is a fact about the host and rides `line`; a second
+  # reader decides it with a read of its own (TOOL-aGraftedHelix-7).
+  printf 'mempause\t%s\n'  "$MEMPAUSE"
   printf 'line\t%s\n'      "$PROF_LINE"
   exit 0
 fi
@@ -836,6 +1040,10 @@ if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
   TS_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || TS_COMMON=""
   [ -n "$TS_COMMON" ] && TS_COMMON=$(cd "$TS_COMMON" 2>/dev/null && pwd) || TS_COMMON=""
 fi
+# THE HEALTH LOG (I3, TOOL-aGraftedHelix-8), derived from the common dir this runner already holds,
+# so no self-heal site below spawns git: the turnstile's here, WORK_COMMON's once it is resolved.
+RG_HEALTH_LOG=""
+[ -z "$TS_COMMON" ] || RG_HEALTH_LOG=$(derive_health_log "$TS_COMMON")
 
 TS_TICK=${GATE_TURNSTILE_TICK:-2}
 # The heartbeat cadence is DERIVED from the TTL and declared nowhere else, so the pair cannot drift —
@@ -928,13 +1136,15 @@ ts_try_reap() {
   hb=$(cat "$TS_DIR_C/heartbeat" 2>/dev/null)
   if [ -n "$hpid" ] && ! ts_alive "$hpid"; then
     printf 'run-gates: reaping the beacon of a dead holder (pid %s)\n' "$hpid" >&2
-    rm -rf "$TS_DIR_C" 2>/dev/null; return 0
+    rm -rf "$TS_DIR_C" 2>/dev/null
+    add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "dead holder pid $hpid"; return 0
   fi
   case "$hb" in ''|*[!0-9]*) hb=0 ;; esac
   age=$(( $(ts_now) - hb ))
   if [ "$hb" != 0 ] && [ "$age" -gt "$TS_TTL" ]; then
     printf 'run-gates: reaping the beacon of a stalled holder (heartbeat %ss old, ttl %ss)\n' "$age" "$TS_TTL" >&2
-    rm -rf "$TS_DIR_C" 2>/dev/null; return 0
+    rm -rf "$TS_DIR_C" 2>/dev/null
+    add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "stalled holder heartbeat ${age}s ttl ${TS_TTL}s"; return 0
   fi
   return 1
 }
@@ -993,12 +1203,12 @@ ts_sweep_queue() {
     case "$pid" in ''|*[!0-9]*) pid="" ;; esac
     if [ -n "$pid" ] && ! ts_alive "$pid"; then
       printf 'run-gates: sweeping the queue ticket of a dead waiter (pid %s)\n' "$pid" >&2
-      rm -f "$t" 2>/dev/null && swept=1
+      rm -f "$t" 2>/dev/null && { swept=1; add_health_event "$RG_HEALTH_LOG" run-gates ticket-swept "dead waiter pid $pid"; }
       continue
     fi
     if [ -n "$cutoff" ] && [ "$stamp" \< "$cutoff" ]; then
       printf 'run-gates: sweeping a queue ticket past the bounded wait (stamp %s, cutoff %s)\n' "$stamp" "$cutoff" >&2
-      rm -f "$t" 2>/dev/null && swept=1
+      rm -f "$t" 2>/dev/null && { swept=1; add_health_event "$RG_HEALTH_LOG" run-gates ticket-swept "stamp $stamp past $cutoff"; }
     fi
   done
   [ "$swept" = 1 ]
@@ -1149,6 +1359,7 @@ if [ -n "$TS_COMMON" ]; then
       # its ticket and proceeds unqueued rather than becoming the outage. It contributes nothing to
       # the exit code, ever.
       echo "run-gates: turnstile WAIT EXPIRED after ${TS_WAITED}s (bound ${TS_MAXWAIT}s) — running UNQUEUED alongside whatever holds the beacon" >&2
+      add_health_event "$RG_HEALTH_LOG" run-gates turnstile-expired "waited ${TS_WAITED}s bound ${TS_MAXWAIT}s"
       ts_drop_ticket
       break
     fi
@@ -1269,6 +1480,7 @@ if [ -z "$WORK_COMMON" ]; then
   WORK_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || WORK_COMMON=""
   [ -n "$WORK_COMMON" ] && WORK_COMMON=$(cd "$WORK_COMMON" 2>/dev/null && pwd) || WORK_COMMON=""
 fi
+[ -n "$RG_HEALTH_LOG" ] || [ -z "$WORK_COMMON" ] || RG_HEALTH_LOG=$(derive_health_log "$WORK_COMMON")
 
 write_work_owner() { # -> $WORK/owner, one line: pid TAB common dir TAB start epoch; rc 1 when unwritten
   printf '%s\t%s\t%s\n' "$$" "$WORK_COMMON" "${EPOCHSECONDS:-$(date +%s)}" > "$WORK/owner.tmp" 2>/dev/null \
@@ -1301,7 +1513,7 @@ scan_dead_work() { # -> removes each gate-work dir under the ambient TMPDIR that
       doomed+=("$f")
     done
     if { [ "${#doomed[@]}" = 0 ] || rm -rf "${doomed[@]}" 2>/dev/null; } && rm -rf "$d" 2>/dev/null; then
-      :
+      add_health_event "$RG_HEALTH_LOG" run-gates scratch-swept "dead bar pid $pid"
     else
       printf 'run-gates: NOTE - the scratch of dead bar %s was not removed whole; its owner record stays, so the next bar retries: %s\n' "$pid" "$d" >&2
     fi
@@ -1588,7 +1800,11 @@ write_runlog_verdict() { # the status the EXIT trap saw -> one ev=once line appe
 # an orphan line naming a path that no longer exists (the dDerivedDocket closing diff review's F5,
 # the sibling runner's instance of the same class).
 ATTR_WT=""
-cleanup() { write_runlog_verdict "$?"; run_outstanding_reap; if [ -n "${ATTR_WT:-}" ]; then if remove_scratch_worktree "$ATTR_WT"; then ATTR_WT=""; else echo "run-gates: the R worktree at $ATTR_WT could not be removed — remove it by hand" >&2; fi; fi; rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
+# THE TICKER AND THE CENSUS SAMPLER STOP HERE TOO (TOOL-aGraftedHelix-5). The claim-time handlers this
+# trap supersedes each run `ts_tick_stop` before the release, and this one kept only the release, so
+# every bar left its ticker sleeping for up to TS_TICK_EVERY, reparented to pid 1 with this runner's
+# argv, and the next bar's foreign-load census on the host counted it as somebody else's gate work.
+cleanup() { write_runlog_verdict "$?"; run_outstanding_reap; remove_census_watcher; if [ -n "${ATTR_WT:-}" ]; then if remove_scratch_worktree "$ATTR_WT"; then ATTR_WT=""; else echo "run-gates: the R worktree at $ATTR_WT could not be removed — remove it by hand" >&2; fi; fi; rm -rf "$WORK" 2>/dev/null || true; ts_tick_stop; ts_release; ts_drop_ticket; }
 trap cleanup EXIT
 trap 'RUNLOG_RC=130; cleanup; exit 130' INT
 trap 'RUNLOG_RC=143; cleanup; exit 143' TERM
@@ -1639,6 +1855,10 @@ if [ -n "$gd" ]; then
     chmod 700 "$RUNDIR" 2>/dev/null || true
     RC="$RUNDIR"
     printf '%s' "$RUNID" > "$RUNROOT/current.tmp" 2>/dev/null && mv -f "$RUNROOT/current.tmp" "$RUNROOT/current" 2>/dev/null || true
+    # The memory pause's episodes, one row each, beside the `.leg` rows they explain. Emptied when a
+    # pinned id reuses the directory, so a row here is always this run's (TOOL-aGraftedHelix-7).
+    MEMPAUSE_ROWS="$RUNDIR/pauses"
+    [ -e "$MEMPAUSE_ROWS" ] && : > "$MEMPAUSE_ROWS"
   else
     # Creating the run directory fails the run the way the `mktemp -d` it sits beside already does.
     echo "run-gates: cannot create the run record at $RUNDIR" >&2; exit 2
@@ -1784,6 +2004,48 @@ while IFS= read -r line; do
   subjects+=("${sj:-repo}"); ceilings+=("${ce:-}"); signatures+=("${sg:-}"); docreads+=("${dr:-}")
 done <<<"$legs"
 total=${#names[@]}
+
+# ---- THE FOREIGN-LOAD CENSUS. TOOL-aGraftedHelix-5 ------------------------------------------------
+# `derive-ceilings.py` argues every ceiling from the `.leg` readings this runner records, and a reading
+# taken while ANOTHER session's suite or another clone's bar loaded the host reads exactly like a slow
+# leg. So the run takes a census of foreign gate work while its legs run, and each `.leg` row carries
+# what it found as its eighth field, `foreign`: the largest count of foreign trees a sample inside the
+# leg's window saw, `unknown` when the census could not see, `0` when it saw none. The evidence tool
+# argues a ceiling only from `0` rows.
+#
+# WHAT COUNTS. A process-table row is gate work when its WHOLE line names a script some manifest leg
+# runs, this runner or its sibling self-test runner, or carries a word ending `.test.sh` or
+# `selftest.py`. The tokens are derived HERE, once, from the parsed argvs: every word carrying a `/`
+# and ending `.sh`, `.py` or `.js`. This runner's own ancestors and descendants are never foreign, and
+# the ancestors are not decoration: an agent session's `bash -c` wrapper carries its whole command
+# text, so the wrapper of the session that started THIS bar names the runner's path. A tree counts
+# once, at its topmost matching process.
+#
+# WHAT IT CANNOT SEE, said here because a `0` reads as "quiet host": load not shaped like this
+# repository's gate work — another repository's build under other script names, an on-access scanner,
+# an agent's own CPU — and on Windows any process no MSYS shell spawned. Contention from this bar's
+# OWN neighbours is not foreign either; `measure_neighbours` and the serial retry own that. It can
+# over-count, which only sets a reading aside: a bar queued on the turnstile, a short command whose
+# text names a gate script, and on Windows an orphan of this bar's own legs whose parent reads 1.
+#
+# THE PERIOD IS A CONSTANT, and `GATE_CENSUS_EVERY` overrides it for the fixtures: no host has asked
+# for another, and a profile knob would cost the canary's pinned set.
+CENSUS_EVERY=60
+if [ -n "${GATE_CENSUS_EVERY:-}" ]; then
+  if num_ok "$GATE_CENSUS_EVERY"; then CENSUS_EVERY=$((10#$GATE_CENSUS_EVERY))
+  else echo "run-gates: NOTE - GATE_CENSUS_EVERY='$GATE_CENSUS_EVERY' is not a positive integer, so the foreign-load census samples every ${CENSUS_EVERY}s" >&2; fi
+fi
+CENSUS_TOKENS="$WORK/census.tokens"
+{
+  printf '%s\n' "$KITREL/run-gates.sh" "$KITREL/run-selftests.sh"
+  for ((i=0; i<total; i++)); do
+    IFS=$'\x1f' read -ra _ct_av <<<"${argvs[$i]}"
+    for _ct_w in ${_ct_av[@]+"${_ct_av[@]}"}; do
+      case "$_ct_w" in *[[:space:]]*) ;; */*.sh|*/*.py|*/*.js) printf '%s\n' "$_ct_w" ;; esac
+    done
+  done
+} > "$CENSUS_TOKENS" 2>/dev/null || CENSUS_TOKENS=""
+unset _ct_av _ct_w
 
 # UNBOUNDED LEGS ARE REPORTED, NEVER REFUSED. TOOL-aBoundedCeiling-1 S6. The runner cannot know
 # whether a row with no ceiling is a gov leg somebody forgot or an adopter leg the deployer has no
@@ -1936,6 +2198,13 @@ if [ -n "$RUNDIR" ]; then
     # The ambient TMPDIR count the bar printed, measured once after its sweep (TOOL-dDerivedDocket-25
     # S3). Outside the run-envelope block for the reason the queue keys above give.
     printf 'tmpdir_entries\t%s\n' "$TMPDIR_ENTRIES"
+    # The census period every `.leg` row's `foreign` field was derived under (TOOL-aGraftedHelix-5): a
+    # leg's window reaches three periods before its start. Outside the run-envelope block for the
+    # reason the queue keys above give.
+    printf 'census_every\t%s\n' "$CENSUS_EVERY"
+    # The memory pause's threshold this run held dispatch above, `off`, or `inert` where the host gave
+    # no reading (TOOL-aGraftedHelix-7). Outside the run-envelope block for the reason above.
+    printf 'mempause\t%s\n' "$prof_mrec"
     # The RESOLVED dispatch order, recorded here because this is the point at which it is in
     # scope. The chunking unit's ordering criteria read it from the record rather than
     # re-deriving it, which is what keeps the record's key set single-sourced.
@@ -2086,7 +2355,7 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
   # The suffix is empty on a leg's first attempt and `.retry` on its serial retry (TOOL-dDerivedDocket-26
   # S2), so every file a retry writes sits BESIDE the first attempt's and the red attribution still
   # reads that first attempt exactly as it was written.
-  local i=$1 sfx=${2:-} s e out rc tpid=""
+  local i=$1 sfx=${2:-} s e out rc tpid="" FOREIGN=unknown
   # THE WALL'S HANDLE ON THIS LEG. `$BASHPID`, never `$$`: inside a backgrounded function `$$` is
   # still the RUNNER's pid, and a wall that killed that would kill the shell that has to print the
   # verdict. Written before anything else so a leg that wedges on its first line is still reachable.
@@ -2172,9 +2441,11 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
     [ "$fired" = 1 ] && st=timeout
     # TAB-SEPARATED and NEWLINE-FREE by construction: every field is a leg name, a token, a
     # number or a digest. The leg name is the only one an author controls, and the canary
-    # already forbids a tab inside one.
-    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-      "${names[$i]}" "$st" "$rc" "$secs" "$s" "$e" "$(input_key "$i")" \
+    # already forbids a tab inside one. The EIGHTH field is `foreign`, the census's verdict on this
+    # attempt's window (TOOL-aGraftedHelix-5), appended so no positional reader moves.
+    derive_foreign "$s" "$e"
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+      "${names[$i]}" "$st" "$rc" "$secs" "$s" "$e" "$(input_key "$i")" "$FOREIGN" \
       > "$RUNDIR/$i$sfx.leg.tmp" 2>/dev/null \
       && mv -f "$RUNDIR/$i$sfx.leg.tmp" "$RUNDIR/$i$sfx.leg" 2>/dev/null || true
   fi
@@ -2428,6 +2699,107 @@ remove_wall_watcher() {
   WALL_PID=""; WALL_ARMED=0
 }
 
+# ---- THE CENSUS'S FOUR FUNCTIONS. TOOL-aGraftedHelix-5; what the census counts is stated where its
+# ---- tokens are derived, above the run header.
+#
+# measure_foreign — ONE census line on stdout, in ONE write: the epoch second, TAB, the count of
+# foreign gate-work trees or `unknown`, TAB, each tree's root as <pid>:<token>, space-separated. A root
+# is written as its pid and the token that matched it, NEVER its command line, which can carry a
+# credential. `unknown` when `ps` fails, when its header names no PID or PPID column, or when the
+# snapshot holds no row for this runner: a snapshot that cannot see its observer is not a census of
+# the observer's host. The columns are found by the header's own names, so procps and MSYS `ps -ef`
+# both parse, and the WHOLE row is matched, because a start time printed with a space shifts every
+# later column. `$$` is the RUNNER's pid in the detached sampler too, which is the point. Two spawns.
+measure_foreign() {
+  local snap ts=${EPOCHSECONDS:-0}
+  if [ -z "${CENSUS_TOKENS:-}" ] || ! snap=$(ps -ef 2>/dev/null); then
+    printf '%s\tunknown\t\n' "$ts"; return 0
+  fi
+  awk -v me="$$" -v ts="$ts" '
+    FILENAME == ARGV[1] { if ($0 != "") tok[++nt] = $0; next }
+    !hdr { hdr = 1; for (k = 1; k <= NF; k++) { if ($k == "PID") pc = k; if ($k == "PPID") qc = k }; next }
+    # A PID or PPID that is not a number continues a multi-line argv, the guard scan_descendants wears.
+    !pc || !qc || $pc !~ /^[0-9]+$/ || $qc !~ /^[0-9]+$/ { next }
+    { p = $pc; par[p] = $qc
+      for (i = 1; i <= nt; i++) if (index($0, tok[i])) { hit[p] = tok[i]; next }
+      for (k = 1; k <= NF; k++) if ($k ~ /\.test\.sh$/ || $k ~ /selftest\.py$/) { hit[p] = $k; next } }
+    END {
+      if (!pc || !qc || !(me in par)) { printf "%s\tunknown\t\n", ts; exit }
+      for (a = me; (a in par) && !(a in ex); a = par[a]) ex[a] = 1      # the ancestors, this runner included
+      for (p in hit) {
+        if (p in ex) continue
+        d = 0; b = p
+        while ((b in par) && b != me && d < 256) { b = par[b]; d++ }
+        if (b != me) cand[p] = 1                                           # a descendant reaches this runner
+      }
+      for (p in cand) if (!(par[p] in cand)) { n++; r = r (r == "" ? "" : " ") p ":" hit[p] }
+      printf "%s\t%d\t%s\n", ts, n, r
+    }' "$CENSUS_TOKENS" - <<<"$snap"
+}
+
+# arm_census — the first sample is the RUNNER's, taken in this shell before the first leg dispatches,
+# so every first-wave leg has a sample inside its window however short it is, and its `unknown` is
+# announced from here: a backgrounded subshell gives no ordering against its parent and has no stderr.
+# Truncating at arm means a run id reused through GATE_RUN_ID never reads a stale sample. Only the
+# periodic loop is detached, and it copies `ts_tick_start` property by property: stdio to /dev/null,
+# disowned so `live()` never counts it, and two exits, the runner gone or the run's disarm marker. A
+# `kill -9` on the runner leaves it to exit at its next tick, holding no descriptor of the caller's.
+CENSUS_ARMED=0; CENSUS_PID=""
+arm_census() {
+  [ "$CENSUS_ARMED" = 0 ] || return 0
+  CENSUS_ARMED=1
+  [ -n "$RUNDIR" ] || return 0
+  local _f="$RUNDIR/census" _c="" _me=$$ _every=$CENSUS_EVERY _work=$WORK
+  measure_foreign > "$_f" 2>/dev/null
+  chmod 600 "$_f" 2>/dev/null || true
+  { IFS=$'\t' read -r _ _c _ < "$_f"; } 2>/dev/null
+  case "$_c" in
+    ''|*[!0-9]*) echo "run-gates: NOTE - the foreign-load census's first sample reads unknown (ps -ef failed, named no PID or PPID column, or did not list this runner), so a leg's foreign field reads unknown and derive-ceilings sets its reading aside" >&2 ;;
+  esac
+  (
+    while :; do
+      sleep "$_every"
+      kill -0 "$_me" 2>/dev/null || exit 0
+      [ -f "$_work/census.disarm" ] && exit 0
+      measure_foreign >> "$_f" 2>/dev/null || exit 0
+    done
+  ) >/dev/null 2>&1 &
+  CENSUS_PID=$!
+  disown "$CENSUS_PID" 2>/dev/null || true
+}
+
+remove_census_watcher() {
+  [ -n "${CENSUS_PID:-}" ] || return 0
+  : > "$WORK/census.disarm" 2>/dev/null || true
+  kill "$CENSUS_PID" 2>/dev/null
+  CENSUS_PID=""
+}
+
+# derive_foreign <started-ns> <ended-ns> — FOREIGN, one leg attempt's `foreign` field, from the census
+# samples stamped inside [start − 3 × CENSUS_EVERY, end]: their largest positive count; else `unknown`
+# when one of them reads unknown or none exists; else 0. The reach is three periods because `sleep`
+# on node `a` delivered 1.65 to 1.93 times its nominal seconds under load (the wall's measurement
+# above), and one period would leave a short leg with no sample at all. SET, never printed, and
+# builtins only: the worker would read a printed value through a subshell, which is a spawn per leg.
+# An unterminated last line is a sample still being appended, and `read` skips it.
+derive_foreign() {
+  local lo hi ts c max=0 unk=0 any=0
+  FOREIGN=unknown
+  case "${1:-}${2:-}" in ''|*[!0-9]*) return 0 ;; esac
+  [ -n "$RUNDIR" ] && [ -f "$RUNDIR/census" ] || return 0
+  lo=$(( $1 / 1000000000 - 3 * CENSUS_EVERY )); hi=$(( $2 / 1000000000 ))
+  while IFS=$'\t' read -r ts c _; do
+    case "$ts" in ''|*[!0-9]*) continue ;; esac
+    [ "$ts" -ge "$lo" ] && [ "$ts" -le "$hi" ] || continue
+    any=1
+    case "$c" in ''|*[!0-9]*) unk=1; continue ;; esac
+    [ "$c" -gt "$max" ] && max=$c
+  done < "$RUNDIR/census" 2>/dev/null
+  if [ "$max" -gt 0 ]; then FOREIGN=$max
+  elif [ "$any" = 1 ] && [ "$unk" = 0 ]; then FOREIGN=0; fi
+  return 0
+}
+
 # ---- RED ATTRIBUTION, REPORT-ONLY. TOOL-dDerivedDocket-23 ----------------------------------------
 # A red bar names WHICH legs failed and never WHOSE failure each one is. Five recorded stops were a
 # run deciding, with nobody to ask, that a red "was not mine", and at least two of those claims were
@@ -2621,7 +2993,11 @@ run_leg_retry() {
       continue
     fi
     rc=$(cat "$WORK/$i.retry.rc")
-    if [ "$rc" = 0 ]; then printf 'GATE ok    %s  (retried after timeout)\n' "${names[$i]}"; continue; fi
+    if [ "$rc" = 0 ]; then
+      printf 'GATE ok    %s  (retried after timeout)\n' "${names[$i]}"
+      add_health_event "$RG_HEALTH_LOG" run-gates retry-passed "${names[$i]} after a $(cat "$WORK/$i.bound" 2>/dev/null || printf '?')s timeout"
+      continue
+    fi
     fails=$((fails + 1)); RETRY_FAILS=$((RETRY_FAILS + 1)); RED_LEGS="$RED_LEGS $i"
     fired=$(cat "$WORK/$i.retry.bound" 2>/dev/null) || fired=0
     secs=$(cat "$WORK/$i.retry.sec" 2>/dev/null) || secs=""
@@ -3134,10 +3510,17 @@ while [ "$wi" -lt "$nwalk" ]; do
   # one — every leg of it has printed, because the reader never advances past a leg with no result.
   if [ "${chunks[$next]}" != "$cur_chunk" ]; then chunk_close; cur_chunk=${chunks[$next]}; fi
   di_before=$di
-  while [ "$di" -lt "$ndisp" ] && [ "$(live)" -lt "$JOBS" ]; do
+  # THE RUNNING COUNT IS CAPTURED from the test that already takes it, so the memory pause's decision
+  # below asks nothing again and adds no spawn (TOOL-aGraftedHelix-7).
+  while [ "$di" -lt "$ndisp" ] && { nlive=$(live); [ "$nlive" -lt "$JOBS" ]; }; do
     k=${disp[$di]}; di=$((di+1))
     { [ -z "${names[$k]}" ] || [ -f "$WORK/$k.rc" ]; } && continue   # sentinel, or already decided by the guard pass
+    # A HOLD steps the index back and leaves the pass: the reader below then blocks on `wait -n` as it
+    # does with a full pool, and a hold only happens while a leg runs, so that wait returns. The next
+    # completion re-decides for this same leg.
+    if check_dispatch_pause "$nlive"; then di=$((di-1)); break; fi
     arm_wall
+    arm_census
     runleg "$k" &
   done
   if [ -f "$WORK/$next.rc" ]; then report_one "$next"; wi=$((wi+1)); continue; fi
@@ -3158,7 +3541,10 @@ while [ "$wi" -lt "$nwalk" ]; do
     # because the first run is the one with no cache.
     if [ "$di" -eq "$di_before" ]; then
       k=${disp[$di]}; di=$((di+1))
-      if [ -n "${names[$k]}" ] && [ ! -f "$WORK/$k.rc" ]; then runleg "$k" & fi
+      # THE SECOND DISPATCH SITE decides too, with nothing running: a held leg reaches this branch when
+      # its runners finished between the pass's count and the liveness test, and its episode must close
+      # `drained` here, or it would outlive the loop and close as `wall` with no wall fired.
+      if [ -n "${names[$k]}" ] && [ ! -f "$WORK/$k.rc" ]; then check_dispatch_pause 0; runleg "$k" & fi
     fi
     continue
   fi
@@ -3166,8 +3552,15 @@ while [ "$wi" -lt "$nwalk" ]; do
   [ -f "$WORK/$next.rc" ] && continue
   report_one "$next"; wi=$((wi+1))         # genuinely no result: report it, never hang
 done
+write_pause_row wall                       # an episode open now is one the wall's break left; a no-op otherwise
 wait
 chunk_close                                # the last chunk has no successor to close it
+# THE MEMORY PAUSE'S ONE LINE, after the pool drains and before the serial retry, so a run the wall
+# stopped prints it too. Its peak varies with the host, so a whole-output reader filters it by name.
+render_pause_summary
+# ONE I3 LINE PER BAR THAT PAUSED, never one per episode (TOOL-aGraftedHelix-8): the summary's counts.
+[ "$MEMPAUSE_N" = 0 ] || add_health_event "$RG_HEALTH_LOG" run-gates dispatch-paused \
+  "$MEMPAUSE_N pause(s) ${MEMPAUSE_HELD_S}s held peak ${MEMPAUSE_PEAK:-?}% threshold ${MEMPAUSE:-0}% fell $MEMPAUSE_FELL bound $MEMPAUSE_BOUND drained $MEMPAUSE_DRAINED unread $MEMPAUSE_UNREAD wall $MEMPAUSE_WALL"
 # THE SERIAL RETRY, after the pool drains and INSIDE the wall (TOOL-dDerivedDocket-26 S1), and before
 # the attribution below, which reads the red set the retry decides and each red leg's FIRST attempt.
 run_leg_retry
@@ -3175,6 +3568,7 @@ run_leg_retry
 # the bar and its attribution together (TOOL-dDerivedDocket-23 F6). A no-op unless asked and red.
 run_attribution
 remove_wall_watcher
+remove_census_watcher
 
 # THE LEDGER. It replaces the old `gate-timings.tsv` rather than sitting beside it: two stores of
 # one fact, with the older one read by the only tool that grades the newer, is exactly the shape
@@ -3190,7 +3584,9 @@ if [ -n "$LEDGER" ]; then
     [ -f "$WORK/$i.sec" ] || continue
     lst=ok; lkey=-; lend=""; lsec="$WORK/$i.sec"
     if [ -n "$RUNDIR" ] && [ -f "$RUNDIR/$i.leg" ]; then
-      IFS=$'\t' read -r _ lst _ _ _ lend lkey < "$RUNDIR/$i.leg" 2>/dev/null || { lst=ok; lkey=-; }
+      # THE TRAILING `_` takes field 8, `foreign` (TOOL-aGraftedHelix-5): without it the key read
+      # absorbed `<key>TAB<foreign>`, and a TAB inside the key breaks the ledger's five-field grammar.
+      IFS=$'\t' read -r _ lst _ _ _ lend lkey _ < "$RUNDIR/$i.leg" 2>/dev/null || { lst=ok; lkey=-; }
     fi
     # A RETRIED LEG takes its retry's seconds and the status `retried`, whatever the retry did
     # (TOOL-dDerivedDocket-26 S2). The seconds are the leg's cost ALONE, which is the better dispatch
@@ -3305,6 +3701,8 @@ if [ -f "$WORK/wall.breach" ]; then
       printf 'held\t%s\n' "${ondemands:-0}"
       printf 'reused\t%s\n' "$reuses"
       printf 'retried\t%s\n' "${RETRIED:-0}"
+      printf 'paused\t%s\n' "$MEMPAUSE_N"
+      printf 'paused_s\t%s\n' "$MEMPAUSE_HELD_S"
       printf 'wall_breach\t%s\n' "$WALL"
     } > "$RUNDIR/verdict.tmp" 2>/dev/null && mv -f "$RUNDIR/verdict.tmp" "$RUNDIR/verdict" 2>/dev/null || true
     chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
@@ -3331,6 +3729,8 @@ if [ "$fails" = 0 ] && [ "$ran" -le 0 ] && [ "${ondemands:-0}" -gt 0 ] \
       printf 'held\t%s\n' "${ondemands:-0}"
       printf 'reused\t0\n'
       printf 'retried\t0\n'
+      printf 'paused\t%s\n' "$MEMPAUSE_N"
+      printf 'paused_s\t%s\n' "$MEMPAUSE_HELD_S"
     } > "$RUNDIR/verdict.tmp" 2>/dev/null && mv -f "$RUNDIR/verdict.tmp" "$RUNDIR/verdict" 2>/dev/null || true
     chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
   fi
@@ -3392,6 +3792,9 @@ if [ -n "$RUNDIR" ]; then
     # How many deferred legs ran again, pass or fail (TOOL-dDerivedDocket-26 S2). The drift report
     # sums it across the records it can read.
     printf 'retried\t%s\n' "${RETRIED:-0}"
+    # The memory pause's episodes and the seconds they held, summed (TOOL-aGraftedHelix-7).
+    printf 'paused\t%s\n' "$MEMPAUSE_N"
+    printf 'paused_s\t%s\n' "$MEMPAUSE_HELD_S"
   } > "$_vtmp" 2>/dev/null && mv -f "$_vtmp" "$RUNDIR/verdict" 2>/dev/null || true
   chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
 fi

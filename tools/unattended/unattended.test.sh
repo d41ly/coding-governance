@@ -244,6 +244,9 @@ RESUME_SCHEDULE_CREATE="TheScheduleCreate"
 RESUME_SCHEDULE_DELETE="TheScheduleDelete"
 RESUME_SCHEDULE_DELAY="${10-1800}"
 RESUME_SCHEDULE_LIMIT="${11-6}"
+# DECLARED off, for LANDER_MODE's reason above: an undeclared switch NOTEs on stderr at every
+# preflight. The run-claim arms turn it on in a commit of their own (TOOL-aGraftedHelix-1).
+RUN_CLAIMS="off"
 PHASES_EXTRA=""
 DOD_EXTRA=""
 EOF
@@ -1785,17 +1788,26 @@ printf '**Serves:** diff-review ARCH-tRun-1
 # closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
 git add -A >/dev/null
 sed -i '/^base: /d' memory/builds/tRun/RUN.md
-hit "$(run --close tRun $crbc)" "closing-review-recorded"
+out=$(run --close tRun $crbc)
+hit "$out" "closing-review-recorded"
+# ...and the GUARD's own sentence, so the arm cannot pass on the range join refusing an empty base
+# by a route of its own (TOOL-aGraftedHelix-34 S2).
+hit "$out" "the run-state file records no usable pinned base"
 
 # arm 5 — a base TRUNCATED below eight characters is refused for the same reason, and separately,
 # because "absent" and "too short to be a needle" reach the guard by different routes.
+# NO OVERRIDE (TOOL-aGraftedHelix-34 S2). A base that does not resolve makes this node read
+# `handoff`, and a hand-off node refuses every override at check 104 before the Definition of Done
+# prints, which is the product being right; `build-complete` simply prints unmet beside this item.
 cropen; rb=$(crbase)
 printf '**Serves:** diff-review ARCH-tRun-1
 
 # closing review\n\nrange %s...HEAD\n' "$(git rev-parse --short "$rb")" > memory/builds/tRun/reviews/r1.md
 git add -A >/dev/null
 sed -i 's/^base: .*/base: abc/' memory/builds/tRun/RUN.md
-hit "$(run --close tRun $crbc)" "closing-review-recorded"
+out=$(run --close tRun)
+hit "$out" "closing-review-recorded"
+hit "$out" "the run-state file records no usable pinned base"
 reset_tree
 
 # ---- TOOL-cBriefedPilot-4: --preflight REFUSES a tree with no build-method carrier. Every
@@ -3167,9 +3179,14 @@ n=$((n+1)); [ -z "$badstage" ] || { echo "FAIL a function writes the phase and n
 
 # Rule 1's RED FIXTURE, without which the rule is silent whether it works or not: strip verb_close's
 # stage and prove the rule names verb_close.
+# ANCHORED ON THE FUNCTION, not on the LANDING line (TOOL-aGraftedHelix-34 S2): the hand-off branch
+# gave verb_close a second `stage_or_fail`, and a strip keyed on the line after the LANDING write left
+# that one standing, so the rule stayed silent on a copy that still staged. Every stage call inside
+# the function goes, and the rule must name exactly that function.
 u4="$TMP/s4-unstaged.sh"
-awk '/set_fact "\$rel" phase LANDING/ { print; skip = 1; next }
-     skip && /stage_or_fail/ { skip = 0; next }
+awk '/^verb_close\(\)/ { inv = 1 }
+     inv && /^}/      { inv = 0 }
+     inv && /stage_or_fail/ { next }
      { print }' "$SCRIPT" > "$u4"
 ru=$(awk '
   /^[a-z_]+\(\)/ { fn = $1; ph[fn] = 0; sg[fn] = 0 }
@@ -3177,31 +3194,57 @@ ru=$(awk '
   fn && /stage_or_fail/          { sg[fn] = 1 }
   END { for (f in ph) if (ph[f] && !sg[f]) print f }
 ' "$u4")
-n=$((n+1)); [ -n "$ru" ] || { echo "FAIL S4 rule 1 does NOT fire on a copy with verb_close's stage removed, so it would not notice a regression"; st=1; }
+n=$((n+1)); [ "$ru" = "verb_close()" ] || { echo "FAIL S4 rule 1 does NOT name exactly verb_close() on a copy with verb_close's stage calls removed (it named [$ru]), so it would not notice a regression"; st=1; }
 
 # Rule 2 - a function that parks must also carry the bypass-flag guard. Same scoping, same reason.
 #
-# ONE DECLARED EXEMPTION, and the rule's limit stated with it: `verb_preflight` parks a waiver, and its
-# guard lives in `check_waivers`, which it CALLS. This rule reads text and cannot follow a call, so a
-# cross-function guard is declared here rather than pretended away. That is the whole cost of the
-# scoping choice, and it is the second false positive this rule produced before being narrowed -- the
-# first was a proximity window, this one a call boundary. A NEW name appearing in this exemption list
-# deserves the scrutiny the rule exists to apply, not an edit to the list.
-badguard=$(awk '
+# ONE DECLARED EXEMPTION, and the rule's limit stated with it: the preflight's waiver is parked by
+# `write_preflight_record`, and its guard lives in `check_waivers`, which that function's ONLY caller,
+# `verb_preflight`, calls on an EARLIER line - before the status gate that ends the verb on any refused
+# precondition. The guard sits BESIDE the park, in the caller's earlier callee, so following the
+# parking function's own calls never reaches it. This rule reads text and cannot follow a call, so a
+# cross-function guard is declared here rather than pretended away, as a PAIR: the parking function
+# and the guard function. That is the whole cost of the scoping choice, and it is the second false
+# positive this rule produced before being narrowed -- the first was a proximity window, this one a
+# call boundary. A NEW name appearing in this exemption deserves the scrutiny the rule exists to apply,
+# not an edit to it. The pair is GRADED (TOOL-aGraftedHelix-38 S4): it named `verb_preflight()` by
+# literal until unit 32 moved the park out of it, and nothing said the entry had gone stale.
+park_exempt_fn="write_preflight_record()"
+park_exempt_guard="check_waivers"
+badguard=$(awk -v ex="$park_exempt_fn" '
   /^[a-z_]+\(\)/ { fn = $1; pk[fn] = 0; gd[fn] = 0 }
   fn && /^ *park "\$rel"/ { pk[fn] = 1 }
   fn && /BYPASS_BAN/       { gd[fn] = 1 }
-  END { for (f in pk) if (pk[f] && !gd[f] && f != "verb_preflight()") print f }
+  END { for (f in pk) if (pk[f] && !gd[f] && f != ex) print f }
 ' "$SCRIPT")
 n=$((n+1)); [ -z "$badguard" ] || { echo "FAIL a function parks an entry with no bypass-flag guard anywhere in it: $badguard"; st=1; }
+# ...(a) the exempted function parks under the rule's own framing, or the exemption is stale.
+pkall=$(awk '
+  /^[a-z_]+\(\)/ { fn = $1; pk[fn] = 0 }
+  fn && /^ *park "\$rel"/ { pk[fn] = 1 }
+  END { for (f in pk) if (pk[f]) print f }
+' "$SCRIPT")
+n=$((n+1)); printf '%s\n' "$pkall" | grep -qxF -- "$park_exempt_fn" \
+  || { echo "FAIL rule 2's exemption names $park_exempt_fn, which parks nothing under the rule's framing, so the exemption is stale and whatever parks now is unguarded in the rule's eyes"; st=1; }
+# ...(b) the call structure the pair rests on: the exempted function has a caller, every caller calls
+# the guard function on an earlier non-comment line, and the guard function carries the bypass token.
+pgc=$(awk -v x="${park_exempt_fn%()}" -v g="$park_exempt_guard" '
+  /^[a-z_]+\(\)/ { fn = $1; gs = 0; isg = (fn == g "()"); next }
+  !fn || /^[ \t]*#/ { next }
+  isg && /BYPASS_BAN/ { tok = 1 }
+  $0 ~ ("(^|[^A-Za-z0-9_])" g "([ \t;]|$)") { gs = 1 }
+  fn != x "()" && $0 ~ ("(^|[^A-Za-z0-9_])" x "([ \t;]|$)") { nc++; if (!gs) print "caller " fn " calls " x " with no earlier " g " call" }
+  END { if (!nc) print "no function calls " x; if (!tok) print g " carries no BYPASS_BAN token" }
+' "$SCRIPT")
+n=$((n+1)); [ -z "$pgc" ] || { echo "FAIL rule 2's exemption rests on a call structure the driver no longer has: $pgc"; st=1; }
 
 # Rule 2's RED FIXTURE. Rule 1 had one and rule 2 did not, which I said out loud rather than shipping
 # the asymmetry: a source rule with no negative control is the class this build keeps filing.
-rg=$(awk '
+rg=$(awk -v ex="$park_exempt_fn" '
   /^[a-z_]+\(\)/ { fn = $1; pk[fn] = 0; gd[fn] = 0 }
   fn && /^ *park "\$rel"/ { pk[fn] = 1 }
   fn && /BYPASS_BAN/       { gd[fn] = 1 }
-  END { for (f in pk) if (pk[f] && !gd[f] && f != "verb_preflight()") print f }
+  END { for (f in pk) if (pk[f] && !gd[f] && f != ex) print f }
 ' <(sed '/BYPASS_BAN/d' "$SCRIPT"))
 n=$((n+1)); [ -n "$rg" ] || { echo "FAIL S4 rule 2 does NOT fire on a copy with every bypass guard deleted, so it would not notice a regression"; st=1; }
 
@@ -3726,8 +3769,11 @@ hit "$(cat memory/builds/tRun/RUN.md)" "override · item records-current · reas
 # SEVEN since TOOL-dDerivedDocket-4 S9, which placed its two here: `--hold` writes HELD and the
 # take-over (`--resume --keepalive-id`) writes the held-from phase back, each behind its own
 # terminal refusal. Six refuse here and the rotation arm drives the seventh.
+# EIGHT since `--settle` (TOOL-dUnstuckLanding-14), placed here by TOOL-aGraftedHelix-34 S2: its
+# LANDED write sits behind a refusal of its own, check 95, which never prints the shared sentence,
+# so it is driven after the loop rather than inside it.
 writers=$(grep -c 'set_fact "$rel" phase' "$SCRIPT")
-n=$((n+1)); [ "$writers" = 7 ]   || { echo "FAIL the driver has $writers phase writer(s); this arm drives 6 of them and the rotation arm below drives the seventh — place the new verb in one of the two, or the terminal guard is unproven for it"; st=1; }
+n=$((n+1)); [ "$writers" = 8 ]   || { echo "FAIL the driver has $writers phase writer(s); this arm drives 7 of them and the rotation arm below drives the eighth — place the new verb in one of the two, or the terminal guard is unproven for it"; st=1; }
 
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
@@ -3739,6 +3785,11 @@ for v in "--phase tRun BUILDING --witness abc" "--close tRun" "--abort tRun --re
   hit "$out" "the run is already finished and a finished record is not something to move, re-open or re-pin"
   same "the finished record survived $v" "$(sum)" "$before"
 done
+# ...and the eighth writer, `--settle`, over the same committed LANDED record: its own refusal, and
+# nothing written.
+out=$(run --settle tRun)
+hit "$out" "--settle does not write over a recorded LANDED"
+same "the finished record survived --settle tRun" "$(sum)" "$before"
 
 # ============================================================ rotation: the fifth phase writer
 # `--preflight` over a terminal record RETIRES it and starts a fresh run. The refusal above is right
@@ -3985,10 +4036,59 @@ git push -q -f origin unit 2>/dev/null
 run --preflight tBr2 --keepalive-id k1 >/dev/null
 sed 's/tBr2/tBr/g' memory/builds/tBr2/RUN.md > memory/builds/tBr/RUN.md
 git add -A >/dev/null && git commit -q -m "a record borrowed from a pre-89 preflight" --no-verify
+# ---- TOOL-aGraftedHelix-30: `--authorization` grades `authorization-reachable` ALONE, by the arm
+# ---- --close grades it with, so a reconciling merge learns at the merge what the close would say.
+# ---- AC1: the sibling's BASE README carries no key, so the item is met, and the verb moves nothing:
+# ---- the tree, the record and the remote read the same after it as before.
+read_authorization_witness() { # slug -> the three reads the verb may not move
+  git status --porcelain; git hash-object "memory/builds/$1/RUN.md"; git ls-remote origin
+}
+_az_tip=$(git rev-parse HEAD~1)
+_az_w0=$(read_authorization_witness tBr2)
+out=$(run --authorization tBr2); _az_rc=$?
+hit  "$out" "unattended: authorization-reachable — met · base $_az_tip · anchor refs/heads/main at "
+same "GH30 AC1 a met record exits 0" "$_az_rc" "0"
+same "GH30 AC1 a met record moved nothing" "$(read_authorization_witness tBr2)" "$_az_w0"
+out=$(run --authorization tAbsent); _az_rc=$?
+hit  "$out" "no run-state file, so there is no run whose authorization can be graded"
+same "GH30 AC1 an absent record exits 1" "$_az_rc" "1"
+# ---- AC2: the borrowed record is check 89's, and ONE line then names both exits and not owner-landing.
+_az_w0=$(read_authorization_witness tBr)
+_az_ref=$(run --authorization tBr); _az_rc=$?
+hit  "$_az_ref" "mode prompt; delete the line"
+miss "$_az_ref" "owner-landing"
+same "GH30 AC2 one line names both exits" "$(printf '%s\n' "$_az_ref" | grep -F -- '--abort tBr --code repo-state-out-of-mandate' | grep -cF -- '--handoff tBr --code owner-decision')" "1"
+same "GH30 AC2 a refused record exits 1" "$_az_rc" "1"
+same "GH30 AC2 a refused record moved nothing" "$(read_authorization_witness tBr)" "$_az_w0"
+# ---- AC4: a predicate that never reached the README is NOT EVALUATED - exit 2 and no exits - when the
+# ---- remote does not answer and when the run branch is unpublished; pushed again, the answer returns.
+git remote set-url origin "$ORIGIN_DIR/nope.git"
+out=$(run --authorization tBr2); _az_rc=$?
+hit  "$out" "the remote did not answer, and the anchor is an observation of it"
+hit  "$out" "unattended: authorization-reachable — not evaluated"
+miss "$out" "--handoff"
+same "GH30 AC4 an unanswered remote exits 2" "$_az_rc" "2"
+git remote set-url origin "$ORIGIN"
+git push -q origin --delete unit 2>/dev/null
+out=$(run --authorization tBr2); _az_rc=$?
+hit  "$out" "the remote advertises no tip for the branch this run is on"
+hit  "$out" "unattended: authorization-reachable — not evaluated"
+miss "$out" "--handoff"
+same "GH30 AC4 an unpublished run branch exits 2" "$_az_rc" "2"
+git push -q -f origin "$_az_tip:refs/heads/unit" 2>/dev/null
+out=$(run --authorization tBr2); _az_rc=$?
+hit  "$out" "unattended: authorization-reachable — met · base $_az_tip"
+same "GH30 AC4 the branch pushed again reads met" "$_az_rc" "0"
 out=$(run --close tBr)
 hit  "$out" "the build README declares spec-audit: under an authorization mode that resolves at the second anchor"
 hit  "$out" "specs-audited — not gradable"
 miss "$out" "specs-audited — not owed"
+# ---- GH30 AC3: the close and the verb print ONE check 89 line, byte for byte, because the verb's
+# ---- body grades through a single `dod_met` call and carries no copy of the chain it would refuse on.
+same "GH30 AC3 --close and --authorization print one check 89 line" "$(printf '%s\n' "$out" | grep -F 'check 89 FAILED')" "$(printf '%s\n' "$_az_ref" | grep -F 'check 89 FAILED')"
+_az_body=$(sed -n '/^print_authorization() {/,/^}/p' "$SCRIPT" | grep -v '^[[:space:]]*#')
+same "GH30 AC3 the verb grades through one dod_met call" "$(printf '%s\n' "$_az_body" | grep -c 'dod_met "$slug" "$rel" authorization-reachable')" "1"
+same "GH30 AC3 the verb carries no copy of the chain" "$(printf '%s\n' "$_az_body" | grep -cE 'check_authorization|trusted_base')" "0"
 
 # ---- 50: THE SECOND ANCHOR IS ADMISSIBLE PER MODE. Four arms, because a refusal needs a companion
 # ---- saying it refused the right thing and a companion saying it did not refuse everything.
@@ -6334,6 +6434,151 @@ fi
 git reset -q --hard
 rm -f "$CCM"
 
+# ---- TOOL-aGraftedHelix-39: ONE DERIVATION OF THE PATHS A DISPATCHED PASS MAY WRITE. Every row at one
+# ---- anchor stands and the pass may write their union; a row at a later anchor is a new pass. The
+# ---- kit library's `read_pass_declarations` answers it for `--dispatch`, `--check-commit`, `--audit`
+# ---- and check 23 alike. Against the parent: (a) exits 1 naming a.sh, (b) prints no effective line,
+# ---- (c) accepts the sibling while the pass is open, and (d) exits 0.
+GH39M=$(mktemp)
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+[ -z "$PFX" ] || mkdir -p "$PFX"
+# (a) and (b): a second declaration at the SAME anchor names only the path it adds
+run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh --writes ${PFX}b.sh >/dev/null
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}c.sh)
+GH39G=$(git rev-parse --short=8 HEAD)
+same "GH39 both declarations sit at one anchor" "$(grep -c " dispatch · item $GH39G ARCH-tRun-1 · reason " memory/builds/tRun/RUN.md)" "2"
+hit  "$out" "unattended: dispatch effective — $GH39G ARCH-tRun-1 · ${PFX}a.sh ${PFX}b.sh ${PFX}c.sh"
+printf 'a\n' > ${PFX}a.sh; printf 'b\n' > ${PFX}b.sh; printf 'c\n' > ${PFX}c.sh
+git add ${PFX}a.sh ${PFX}b.sh ${PFX}c.sh
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$GH39M"
+out=$(run --check-commit "$GH39M"); rc=$?
+same "GH39 (a) --check-commit admits the union of the same-anchor rows, exit code" "$rc" "0"
+miss "$out" "stages paths outside the set it declared before dispatch"
+# (c): the earlier same-anchor paths stay reserved against a sibling while the pass is open...
+hit  "$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}a.sh)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: ${PFX}a.sh also in $GH39G ARCH-tRun-1"
+# ...and are released once the pass commits inside the union, here a write to c.sh alone
+git reset -q; git add ${PFX}c.sh memory/builds/tRun/RUN.md
+git commit -q -m "ARCH-tRun-1 builds its lane" -m "Pass: ARCH-tRun-1" --no-verify
+hit  "$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}a.sh)" "dispatch declared"
+# (d): a row at a LATER anchor is a new pass, graded alone, and the committed pass's paths do not carry
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+[ -z "$PFX" ] || mkdir -p "$PFX"
+run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh --writes ${PFX}b.sh >/dev/null
+printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
+git commit -q -m "ARCH-tRun-1 builds its lane" -m "Pass: ARCH-tRun-1" --no-verify
+run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}c.sh >/dev/null
+GH39G=$(git rev-parse --short=8 HEAD)
+printf 'b\n' > ${PFX}b.sh; git add ${PFX}b.sh
+out=$(run --check-commit "$GH39M"); rc=$?
+same "GH39 (d) --check-commit grades a later anchor's row alone, exit code" "$rc" "1"
+hit  "$out" "stages paths outside the set it declared before dispatch, and the declaration can still be widened because the pass has not committed: ${PFX}b.sh; graded against the pass at $GH39G, which declares: ${PFX}c.sh — widen it"
+git reset -q --hard; rm -f "$GH39M"
+# (e): ONE derivation, in the shared library, called by every reader and defined by none of them
+same "read_pass_declarations is defined exactly once, in the shared library" \
+  "$(grep -c '^read_pass_declarations()' "$HERE/lib-unattended.sh")" "1"
+same "the driver's five readers call it rather than parsing the rows their own way" \
+  "$(grep -v '^[[:space:]]*#' "$HERE/unattended.sh" | grep -c 'read_pass_declarations ')" "5"
+same "and so does check 23" \
+  "$(grep -v '^[[:space:]]*#' "$HERE/check-unattended.sh" | grep -c 'read_pass_declarations ')" "1"
+same "and neither defines its own" \
+  "$(grep -c '^read_pass_declarations()' "$HERE/unattended.sh" "$HERE/check-unattended.sh" | grep -c ':0$')" "2"
+same "the per-row supersession test is gone from the openness predicate" \
+  "$(grep -c 'THE LAST ROW CARRYING THIS SET' "$HERE/unattended.sh")" "0"
+reset_tree
+
+# ---- TOOL-aGraftedHelix-27: the generated outputs resolve the same INSIDE a git hook as outside one.
+# ---- In a linked worktree git exports an absolute GIT_DIR into `commit-msg`, and with no GIT_WORK_TREE
+# ---- beside it git takes the current directory for the work tree's top. The library asked git where
+# ---- its own kit sat, got an empty prefix, resolved no kit's [[generated]] row, and a pass that
+# ---- regenerated an index could not commit it. A REAL commit through a REAL hook, because only git
+# ---- sets the variable this is about; the fixture hook records whether it saw one.
+build_check_commit_fixture
+HK_KIT="${PFX}hkgen"
+mkdir -p "$HK_KIT"
+printf '[[generated]]\npath = "{memory_root}/HKGEN.md"\ngenerator = "gen.sh"\n' > "$HK_KIT/kit.toml"
+printf 'echo one\n' > "$HK_KIT/gen.sh"
+git add -A >/dev/null && git commit -q -m "fixture: a kit declaring one generated output" --no-verify
+run --dispatch tRun --pass ARCH-tRun-2 --writes "$HK_KIT/gen.sh" >/dev/null
+git add -A >/dev/null && git commit -q -m "records: declare ARCH-tRun-2" --no-verify
+HK_D=$(mktemp -d); HK_WT="$HK_D/w"
+mkdir -p "$HK_D/hooks"
+printf '#!/usr/bin/env bash\necho "${GIT_DIR:+set}" > %q\nbash %q --check-commit "$1"\n' "$HK_D/saw" "$SCRIPT" > "$HK_D/hooks/commit-msg"
+chmod +x "$HK_D/hooks/commit-msg"
+# the primary tree leaves the run's branch, so the linked worktree can hold it
+git checkout -q --detach
+git worktree add -q "$HK_WT" unit
+git config core.hooksPath "$HK_D/hooks"
+[ -n "$PFX" ] || echo "  (TOOL-aGraftedHelix-27 hook arm: a root install, where the kit's prefix has no slash and the resolver's glob is the same with and without the hook's GIT_DIR, so this arm's red half is unexercisable here)"
+printf 'echo two\n' > "$HK_WT/$HK_KIT/gen.sh"
+printf 'rendered\n' > "$HK_WT/memory/HKGEN.md"
+git -C "$HK_WT" add -A >/dev/null
+out=$(cd "$HK_WT" && git commit -q -m "ARCH-tRun-2 regenerates its index" -m "Pass: ARCH-tRun-2" 2>&1); rc=$?
+same "a pass commits the output its declared generator rewrote, through a commit-msg hook in a linked worktree, exit code" "$rc" "0"
+hk_files=$(git -C "$HK_WT" show --name-only --format= HEAD)
+hit  "$hk_files" "memory/HKGEN.md"
+hit  "$hk_files" "$HK_KIT/gen.sh"
+same "the fixture's commit-msg hook ran" "$([ -f "$HK_D/saw" ] && echo ran)" "ran"
+[ "$(cat "$HK_D/saw" 2>/dev/null)" = set ] \
+  || echo "  (TOOL-aGraftedHelix-27 hook arm: PRECONDITION UNMET - git exported no GIT_DIR into the linked worktree's commit-msg hook, so the commit above did not exercise the environment this arm is about)"
+# ...and the printed remedy names the driver as a shell prints it, never by an absolute path
+printf 'b\n' > "$HK_WT/${PFX}stray.sh"; git -C "$HK_WT" add -A >/dev/null
+out=$(cd "$HK_WT" && git commit -q -m "ARCH-tRun-1 builds its lane" -m "Pass: ARCH-tRun-1" 2>&1); rc=$?
+same "a commit staging an undeclared path through the hook is refused" "$([ "$rc" != 0 ] && echo refused)" "refused"
+hit  "$out" "widen it, then commit again: bash ${KIT_REL}/unattended.sh --dispatch tRun --pass ARCH-tRun-1"
+git config --unset core.hooksPath
+git worktree remove --force "$HK_WT"; git worktree prune
+git checkout -q unit
+rm -rf "$HK_D"
+
+# ...the resolver's answer does not depend on the hook, and a LINKED kit anchors to the ADOPTING
+# repository. Git answers a junction's or a symlink's target; the logical walk keeps the path walked.
+# ONE call shape for the three: "$1" is the library's directory and "$2" the repository root.
+JR_CALL='. "$1/lib-unattended.sh"; resolve_generated_indexes "$2" "" memory'
+JR=$(mktemp -d)
+mkdir -p "$JR/one/kits/drvkit" "$JR/one/kits/onegen"
+cp "$HERE/lib-unattended.sh" "$JR/one/kits/drvkit/"
+printf '[[generated]]\npath = "{memory_root}/ONE.md"\ngenerator = "g.sh"\n' > "$JR/one/kits/onegen/kit.toml"
+( cd "$JR/one" && git init -q . && git config user.email t@t.test && git config user.name t \
+  && git add -A && git commit -q -m one --no-verify && git worktree add -q -b w1 "$JR/w1" ) >/dev/null 2>&1
+JR_GD=$(git -C "$JR/w1" rev-parse --absolute-git-dir)
+jr_plain=$(cd "$JR/w1" && bash -c "$JR_CALL" _ "$JR/w1/kits/drvkit" "$JR/w1" 2>/dev/null)
+jr_hook=$(cd "$JR/w1" && GIT_DIR="$JR_GD" bash -c "$JR_CALL" _ "$JR/w1/kits/drvkit" "$JR/w1" 2>/dev/null)
+same "the resolver in a linked worktree prints the fixture kit's row" "$jr_plain" "memory/ONE.md:kits/onegen/g.sh"
+same "the resolver with the worktree's GIT_DIR exported prints the same bytes" "$jr_hook" "$jr_plain"
+mkdir -p "$JR/two/other/twogen"
+printf '[[generated]]\npath = "{memory_root}/TWO.md"\ngenerator = "g2.sh"\n' > "$JR/two/other/twogen/kit.toml"
+( cd "$JR/two" && git init -q . && git config user.email t@t.test && git config user.name t \
+  && git add -A && git commit -q -m two --no-verify ) >/dev/null 2>&1
+# A POSIX symlink first; on Windows a directory JUNCTION, as the codebase-map adopter's suite makes one.
+jr_link=0
+if ln -s "$JR/one/kits/drvkit" "$JR/two/other/drvkit" 2>/dev/null && [ -L "$JR/two/other/drvkit" ]; then
+  jr_link=1
+elif command -v cygpath >/dev/null 2>&1 && command -v cmd >/dev/null 2>&1; then
+  rm -rf "$JR/two/other/drvkit"
+  cmd //c mklink //J "$(cygpath -w "$JR/two/other/drvkit")" "$(cygpath -w "$JR/one/kits/drvkit")" >/dev/null 2>&1 || true
+  [ -f "$JR/two/other/drvkit/lib-unattended.sh" ] && jr_link=2
+fi
+if [ "$jr_link" != 0 ]; then
+  same "the resolver reached through a directory link reads the adopting repository's kits" \
+    "$(cd "$JR/two" && bash -c "$JR_CALL" _ "$JR/two/other/drvkit" "$JR/two" 2>/dev/null)" "memory/TWO.md:other/twogen/g2.sh"
+else
+  echo "  (TOOL-aGraftedHelix-27 link arm: this host made neither a symlink nor a junction, so the linked-kit half is unexercised)"
+fi
+rm -rf "$JR"
+
+# ...and a library no repository contains SAYS that it read only the root kits and the conf pairs
+NR=$(mktemp -d); mkdir -p "$NR/kit"; cp "$HERE/lib-unattended.sh" "$NR/kit/"
+if derive_self_rel "$NR/kit" >/dev/null; then
+  echo "  (TOOL-aGraftedHelix-27 announcement arm: a .git sits above the system temp directory on this host, so no directory there is outside every repository and the arm is unexercised)"
+else
+  nr_out=$(bash -c '. "$1/lib-unattended.sh"; resolve_generated_indexes "$2" "a/X.md:a/g.sh" memory' _ "$NR/kit" "$NR" 2>"$NR/err"); rc=$?
+  same "the resolver outside any repository, exit code" "$rc" "0"
+  same "the resolver outside any repository prints the conf pairs it was given" "$nr_out" "a/X.md:a/g.sh"
+  hit  "$(cat "$NR/err")" "lib-unattended: resolve_generated_indexes found no .git at or above $NR/kit, so only the repository-root kits and the conf pairs were read"
+  same "the resolver outside any repository announces on one stderr line" "$(grep -c '' "$NR/err")" "1"
+fi
+rm -rf "$NR"
+
 # ---- CONDITION 3, FLAT HALF: the records the method names outright, plus the derived run-state file.
 build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/DECISIONS.md)" "--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
@@ -7432,6 +7677,15 @@ n=$((n+1))
 [ "$_rc" = 0 ] || { echo "FAIL run_bounded returned $_rc for a command that finished inside its bound"; st=1; }
 hit "$RB_OUT" "alive"
 
+# ...and the process record WAITS FOR THE EXEC (TOOL-aGraftedHelix-36 S9): a recorder stub that
+# reads whether the wrapper's marker existed when it ran. RED with the wait loop deleted from a copy
+# of the driver: the record then runs the moment `&` returns, before the child shell has started.
+rm -f "$TMP/rb-up.log"
+write_proc_record() { [ -e "$_d/up" ] && echo up || echo early; } >>"$TMP/rb-up.log"
+run_bounded bash -c 'exit 0'
+same "GH36 the process record waits for the exec marker" "$(cat "$TMP/rb-up.log" 2>/dev/null)" "up"
+write_proc_record() { :; }
+
 # ...and with the bound INERT the command still RUNS, exit status intact. A bound may cost speed and
 # may turn a hang into a verdict; it may never turn a check into a skip.
 GATE_BOUND_LIVE=0
@@ -7970,7 +8224,9 @@ init_sa_run; crfix; git add -A >/dev/null; git commit -q -m sa-run-pinned --no-v
 git checkout -qf main; printf 'return 0\n' >> .unattended.conf
 git add -A >/dev/null; git commit -q -m sa-base-dies-after-preflight --no-verify; git push -q -f origin main
 git checkout -qf unit; git merge -q --no-edit main >/dev/null 2>&1
-out=$(run --close tRun $bcov)
+# NO OVERRIDE (TOOL-aGraftedHelix-34 S2): the dying conf at the advertised tip makes this node read
+# `handoff`, which refuses every override at check 104 before either sentence below prints.
+out=$(run --close tRun)
 hit "$out" "the project conf at the default-branch side of the pinned BASE could not be evaluated to the end"
 hit "$out" "specs-audited — not gradable: the spec-audit source at BASE was not derived in this shell (authorization-reachable is unmet above: an unreachable anchor, a missing README, or a refused spec-audit:/SPEC_AUDIT_DEFAULT read)"
 miss "$out" "at BASE: (none)"
@@ -8999,6 +9255,13 @@ init_su_fixture() {
   run_su_git reset -q --hard "$su_unit"; run_su_git clean -qfd
   run_su_git remote set-url origin "$su_origin"
   run_su_git update-ref refs/heads/main "$su_base"; run_su_git push -q -f origin "$su_base":main; run_su_git fetch -q origin main
+  # TOOL-aGraftedHelix-31: SU_CLAIMS=on turns the run claim on in a conf commit of its own, over an
+  # origin holding no claim. Unset, the conf declares no RUN_CLAIMS and nothing below is spent.
+  if [ -n "${SU_CLAIMS:-}" ]; then
+    git --git-dir="$su_origin" for-each-ref --format='delete %(refname)' refs/gov | git --git-dir="$su_origin" update-ref --stdin
+    printf 'RUN_CLAIMS="on"\n' >> "$su_dir/.unattended.conf"
+    run_su_git commit -qam "conf: the run claim on" --no-verify
+  fi
 }
 # A PREFLIGHTED, COMMITTED record handed off under <code> over a GREEN bar, the hand-off itself
 # committed as the run's last act on its branch: SU_C is the commit carrying the HELD record.
@@ -9053,6 +9316,15 @@ write_su_aborted() {
   run_su_git push -q -f origin HEAD:main
   SU_REC=$(run_su_git rev-parse HEAD)
 }
+# A claim SEEDED into this block's own origin as a real gov-claim commit over the empty tree, the shape
+# the run-claim block's seed_claim writes into the suite's origin, which this block does not use.
+seed_su_claim() { # slug · session · keepalive · status · beat-utc
+  local t c
+  t=$(git --git-dir="$su_origin" mktree </dev/null)
+  c=$(git --git-dir="$su_origin" commit-tree "$t" -m "$(printf 'gov-claim %s\n\nslug: %s\nnode: other\nhost: otherhost\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s' "$1" "$1" "$2" "$3" "$4" "$5" "$5")")
+  git --git-dir="$su_origin" update-ref "refs/gov/runs/$1" "$c"
+}
+read_su_claim() { git --git-dir="$su_origin" log -1 --format=%B "refs/gov/runs/$1" 2>/dev/null | sed -n "s/^$2: //p"; }
 
 # ---- AC1: a hand-off its owner merged reads `LANDED (attended)` to --status and `terminal` to
 # ---- --liveness; --settle writes the terminal, stages it and leaves HEAD where it was; the leg counts
@@ -9078,7 +9350,7 @@ hit "$out" "attended LANDED 1"
 same "AC1 the leg reds no check 15 on the settled record" \
   "$(printf '%s\n' "$out" | grep -F "$SU_R" | grep -c 'UNATTENDED check 15 FAILED' || true)" "0"
 su_b=$(read_su_sum)
-hit "$(run_su --settle tRun)" "unattended: already settled - memory/builds/tRun/RUN.md reads LANDED; nothing was written"
+hit "$(run_su --settle tRun)" "unattended: already settled - memory/builds/tRun/RUN.md reads LANDED; the record was not rewritten"
 same "AC1 a second settle wrote nothing" "$(read_su_sum)" "$su_b"
 
 # ---- AC9: --resume over the landed hand-off, before it is settled, has nothing to resume, names
@@ -9327,6 +9599,96 @@ hit  "$out" "a record claims work-landed-at and the content predicate does not u
 same "AC7 the settled bytes of the kept record red nothing" \
   "$(printf '%s\n' "$out" | grep -F 'a record claims work-landed-at' | grep -c 'memory/builds/tAkept/' || true)" "0"
 hit  "$out" "a record carries abandoned with no work-landed-at, and --settle writes the two together"
+
+# ---- TOOL-aGraftedHelix-31, the closing review's H3: --settle writes the run claim. AC5 FIRST, while
+# ---- no arm has written a claim: with RUN_CLAIMS undeclared, as this block's conf ships it, the handed
+# ---- settle creates none. RED against a status write run outside its RUN_CLAIMS guard.
+write_su_handoff owner-landing
+run_su_git push -q origin HEAD:main
+out=$(run_su --settle tRun)
+hit  "$out" "unattended: settled memory/builds/tRun/RUN.md as a landed hand-off"
+same "GH31 AC5 the switched-off settle created no claim" "$(git --git-dir="$su_origin" for-each-ref refs/gov)" ""
+# ---- AC1: the handed settle writes the hand-off's `held` claim `landed`, under the run's identity
+# ---- and never the settler's, and --claims reads it terminal. RED against the parent's driver: `held`.
+SU_CLAIMS=on write_su_handoff owner-landing
+same "GH31 AC1 the hand-off left the claim held" "$(read_su_claim tRun status)" "held"
+run_su_git push -q origin HEAD:main
+out=$(CLAUDE_CODE_SESSION_ID=owner-session run_su --settle tRun); su_rc=$?
+same "GH31 AC1 the settle exits 0" "$su_rc" "0"
+same "GH31 AC1 the settle wrote LANDED" "$(read_su_fact "$SU_R" phase)" "LANDED"
+same "GH31 AC1 the settle staged the record" "$(run_su_git diff --cached --name-only)" "$SU_R"
+same "GH31 AC1 the claim reads landed" "$(read_su_claim tRun status)" "landed"
+same "GH31 AC1 the claim keeps the record's keepalive" "$(read_su_claim tRun keepalive)" "$(read_su_fact "$SU_R" keepalive)"
+same "GH31 AC1 the claim keeps the record's session, never the settler's" "$(read_su_claim tRun session)" "$(read_su_fact "$SU_R" session)"
+same "GH31 AC1 --claims reads it terminal" "$(run_su --claims | awk -F'\t' '$1 == "tRun" { print $3, $5 }')" "landed terminal"
+# ---- AC2: the lease-dead settle writes the dead holder's `live` claim `aborted`. RED against the
+# ---- parent's driver: it stays `live`, to age to stale and be announced at every other preflight.
+SU_CLAIMS=on write_su_aborted
+add_facts "$su_dir/memory/builds/tAwork/RUN.md" "$(printf 'keepalive: k1\nsession: absent\npid: absent\nlease-utc: 2000-01-01T00:00:00Z')"
+GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" \
+  run_su_git commit -qam "records(tAwork): an old lease with no session" --no-verify
+su_gd=$(run_su_git rev-parse --absolute-git-dir); rm -rf "$su_gd/gate-logs" "$su_gd/gate-queue-heartbeat"
+seed_su_claim tAwork absent k1 live 2000-01-01T00:00:00Z
+out=$(run_su --settle tAwork)
+hit  "$out" "unattended: settled memory/builds/tAwork/RUN.md as abandoned at phase BUILDING with its work landed"
+same "GH31 AC2 the dead holder's claim reads aborted" "$(read_su_claim tAwork status)" "aborted"
+# ---- AC3: the legacy settle writes no claim (spec F1). A claim this harness's session holds for the
+# ---- ABORTED record would be written through the status column's `same session` row, so it is the
+# ---- claim a write there would move; it stays at the sha it had.
+SU_CLAIMS=on write_su_aborted
+seed_su_claim tAkept fixture-session k1 aborted "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+su_cr=$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tAkept)
+out=$(run_su --settle tAkept)
+hit  "$out" "unattended: settled memory/builds/tAkept/RUN.md as ABORTED with its work landed - work-landed-at $SU_W_tAkept $SU_REC"
+same "GH31 AC3 the legacy settle left the claim unmoved" "$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tAkept)" "$su_cr"
+# ---- AC4: a fresh `live` claim another session holds is announced and left, and the settle still
+# ---- exits 0 with its record staged.
+SU_CLAIMS=on write_su_handoff owner-landing
+run_su_git push -q origin HEAD:main
+seed_su_claim tRun other-session k9 live "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+su_cr=$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)
+out=$(CLAUDE_CODE_SESSION_ID=owner-session run_su --settle tRun); su_rc=$?
+same "GH31 AC4 the settle exits 0 over a foreign claim" "$su_rc" "0"
+same "GH31 AC4 the settle wrote LANDED" "$(read_su_fact "$SU_R" phase)" "LANDED"
+same "GH31 AC4 the settle staged the record" "$(run_su_git diff --cached --name-only)" "$SU_R"
+hit  "$out" "unattended: claim not written — tRun is held live by session other-session"
+same "GH31 AC4 the foreign claim is unmoved" "$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)" "$su_cr"
+# ---- TOOL-aGraftedHelix-36 S4: a re-run of --settle retries the claim write. AC5: a first write
+# ---- that does not complete, push-main holding its marker in this git dir, names the re-run; the
+# ---- re-run over the settled record writes the claim `landed`; a third re-run pushes nothing. RED
+# ---- against the parent's driver, whose already-settled exit wrote nothing, so the claim stayed held.
+SU_CLAIMS=on write_su_handoff owner-landing
+run_su_git push -q origin HEAD:main
+su_gd=$(run_su_git rev-parse --absolute-git-dir); : > "$su_gd/push-main-active"
+out=$(CLAUDE_CODE_SESSION_ID=owner-session run_su --settle tRun); su_rc=$?
+same "GH36 AC5 the settle exits 0 with its claim write refused" "$su_rc" "0"
+same "GH36 AC5 ...and wrote LANDED" "$(read_su_fact "$SU_R" phase)" "LANDED"
+hit  "$out" "unattended: the settle's claim write did not complete; re-run --settle tRun to retry it"
+same "GH36 AC5 ...and --claims reads the claim held" "$(run_su --claims | awk -F'\t' '$1 == "tRun" { print $3 }')" "held"
+rm -f "$su_gd/push-main-active"
+out=$(CLAUDE_CODE_SESSION_ID=owner-session run_su --settle tRun)
+hit  "$out" "unattended: already settled - memory/builds/tRun/RUN.md reads LANDED; the record was not rewritten"
+hit  "$out" "unattended: claim retried — tRun now reads landed on the remote"
+same "GH36 AC5 the re-run's claim reads landed terminal" "$(run_su --claims | awk -F'\t' '$1 == "tRun" { print $3, $5 }')" "landed terminal"
+su_cr=$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)
+out=$(CLAUDE_CODE_SESSION_ID=owner-session run_su --settle tRun)
+hit  "$out" "unattended: already settled - memory/builds/tRun/RUN.md reads LANDED; the record was not rewritten"
+miss "$out" "claim retried"
+same "GH36 AC5 a third re-run leaves the claim ref unmoved" "$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)" "$su_cr"
+# ---- AC6: a fresh `live` claim another session holds over the settled record is announced and left.
+seed_su_claim tRun other-session k9 live "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+su_cr=$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)
+out=$(CLAUDE_CODE_SESSION_ID=owner-session run_su --settle tRun)
+hit  "$out" "unattended: claim not written — tRun is held live by session other-session"
+same "GH36 AC6 the re-run leaves another session's claim unmoved" "$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)" "$su_cr"
+# ---- ...and a STALE one, which the status column would write: the retry writes only a `mine` claim.
+seed_su_claim tRun other-session k9 live 2000-01-01T00:00:00Z
+su_cr=$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)
+# ---- Each unmoved ref rides beside a positive read of the same run, so a verb that refused before
+# ---- the retry could not pass these arms by writing nothing (fixture-passes-by-finding-nothing).
+out=$(CLAUDE_CODE_SESSION_ID=owner-session run_su --settle tRun)
+hit  "$out" "unattended: already settled - memory/builds/tRun/RUN.md reads LANDED; the record was not rewritten"
+same "GH36 AC6 the re-run leaves another session's stale claim unmoved" "$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)" "$su_cr"
 rm -rf "$su_dir" "$su_oroot" "$su_out"
 
 fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
@@ -13098,6 +13460,20 @@ read_pl_token() { # pid -> its procfs start token, or `-`
   { IFS= read -r l < "/proc/$1/stat"; } 2>/dev/null || { printf -- '-'; return 0; }
   r=${l##*) }; read -r -a f <<<"$r"; printf '%s' "${f[19]:--}"
 }
+# THE TOKEN ONCE THE EXEC HAS HAPPENED (TOOL-aGraftedHelix-34 S5). On this platform an exec replaces
+# the Windows process behind a pid and the procfs start token moves with it, so a token read the
+# moment `&` returns is the forked shell's whenever the box is loaded: measured 3 of 30 under twelve
+# fork loops, 0 of 30 idle. Waits on the OBSERVED image, `(<comm>)` in the stat line, bounded at 100
+# polls of 0.1 s; `-` past the bound, which the caller asserts against.
+read_pl_exec_token() { # pid · comm -> its start token once it runs <comm>, or `-`
+  local l i=0
+  while [ "$i" -lt 100 ]; do
+    { IFS= read -r l < "/proc/$1/stat"; } 2>/dev/null || break
+    case "$l" in *"($2)"*) read_pl_token "$1"; return 0 ;; esac
+    sleep 0.1; i=$((i + 1))
+  done
+  printf -- '-'
+}
 read_pl_kids() { # pid -> every descendant's pid, one per line
   local d l r k
   local -a f
@@ -13235,11 +13611,1455 @@ fi   # ---- region two continues below: one compound block past about 3000 comma
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
 if in_shard 2; then
 
+# ==================================================================================================
+# TOOL-aGraftedHelix-1 — THE RUN CLAIM ON THE REMOTE. Every arm is the driver over this suite's
+# fixture with RUN_CLAIMS turned on in a commit of its own, the remote being the suite's bare origin.
+# Claims are SEEDED as real gov-claim commits over the empty tree, written straight into the bare
+# repo, never a simplified shape; the lost race and the refused push are staged by a git shim on
+# PATH that moves the ref or answers for the push, never by a sleep. WHAT THIS BLOCK DOES NOT DRIVE:
+# every cell of the write table; the cells no criterion names are TOOL-aGraftedHelix-12's arm.
+# The block clears the origin's claims, its shims and the landing it pushes on the way out, because
+# the bare origin and the git dir outlive reset_tree.
+# ==================================================================================================
+GH_BIN=$(mktemp -d); GH_GIT=$(command -v git)
+GH_BOUND=5400   # mkconf's RESUME_STALE_BOUND, read back below so the stale split is DERIVED from the conf
+derive_claim_now() { date -u +%Y-%m-%dT%H:%M:%SZ; }
+derive_claim_ago() { date -u -d "@$(( $(date -u +%s) - $1 ))" +%Y-%m-%dT%H:%M:%SZ; }
+remove_claim_refs() { git --git-dir="$ORIGIN" for-each-ref --format='delete %(refname)' refs/gov | git --git-dir="$ORIGIN" update-ref --stdin; }
+seed_claim() { # slug · session · keepalive · status · beat-utc (empty omits the line) · [node] · [host]
+  local t c m
+  m=$(printf 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s' \
+    "$1" "$1" "${6:-other}" "${7:-otherhost}" "$2" "$3" "$4" "$(derive_claim_now)")
+  [ -z "$5" ] || m=$(printf '%s\nbeat-utc: %s' "$m" "$5")
+  t=$(git --git-dir="$ORIGIN" mktree </dev/null); c=$(git --git-dir="$ORIGIN" commit-tree "$t" -m "$m")
+  git --git-dir="$ORIGIN" update-ref "refs/gov/runs/$1" "$c"
+}
+read_claim_ref() { git --git-dir="$ORIGIN" rev-parse -q --verify "refs/gov/runs/$1" 2>/dev/null; }
+read_claim_field() { git --git-dir="$ORIGIN" log -1 --format=%B "refs/gov/runs/$1" 2>/dev/null | sed -n "s/^$2: //p"; }
+arm_claim_fixture() { reset_tree; mutate .unattended.conf 's/^RUN_CLAIMS="off"$/RUN_CLAIMS="on"/'; fixture; remove_claim_refs; rm -f "$GH_BIN/git"; }
+build_claim_held() { arm_claim_fixture; run --preflight tRun --keepalive-id k1 >/dev/null; git add -A >/dev/null && git commit -q -m build_claim_held --no-verify; }
+GH_STOP="$(git rev-parse --git-dir)/unattended/stop.tRun.log"
+GH_LOG="$(cd "$(git rev-parse --git-common-dir)" && pwd)/unattended/landed.tRun.log"
+build_claim_landing() { arm_claim_fixture; rm -f "$GH_STOP" "$GH_LOG"; run --preflight tRun --keepalive-id k1 >/dev/null
+               sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md; fixture; git push -q -f origin HEAD:main; }
+remove_claim_landing() { git checkout -q -f unit 2>/dev/null; git branch -f main "$BASE"; git push -q -f origin "$BASE":main; rm -f "$GH_STOP" "$GH_LOG"; }
+
+# ---- AC1: no claim on the remote prints the single line `claims: none` and exits 0.
+arm_claim_fixture
+GH_BOUND=$(sed -n 's/^RESUME_STALE_BOUND="\(.*\)"$/\1/p' .unattended.conf)
+out=$(bash "$SCRIPT" --claims 2>/dev/null); rc=$?
+same "AC1 --claims over an empty namespace prints exactly claims: none" "$out" "claims: none"
+same "AC1 ...and exits 0" "$rc" "0"
+# ---- AC2: five claims, one per verdict, five TAB-separated fields each, sorted by slug, the stale
+# ---- split on the conf's own bound and the unparsed claim's age `-`.
+seed_claim gA s-a k-a live "$(derive_claim_now)"
+seed_claim gB s-b k-b live "$(derive_claim_ago $((GH_BOUND + 600)))"
+seed_claim gC s-c k-c held "$(derive_claim_ago $((GH_BOUND * 3)))"
+seed_claim gD s-d k-d landed "$(derive_claim_now)"
+seed_claim gE s-e k-e live ""
+out=$(bash "$SCRIPT" --claims 2>/dev/null)
+same "AC2 --claims prints five rows" "$(printf '%s\n' "$out" | grep -c '')" "5"
+same "AC2 ...of five TAB-separated fields each" "$(printf '%s\n' "$out" | awk -F'\t' 'NF != 5' | grep -c '')" "0"
+same "AC2 ...with one verdict per claim, in slug order" "$(printf '%s\n' "$out" | cut -f1,5 | tr '\t\n' ': ')" "gA:live gB:stale gC:held gD:terminal gE:unknown "
+same "AC2 ...and the unparsed claim's age is -" "$(printf '%s\n' "$out" | awk -F'\t' '$1 == "gE" { print $4 }')" "-"
+# ---- AC16: a stamp-shaped but invalid beat sorting first turns every claim of that one date call
+# ---- unknown, never an age shifted onto its neighbour.
+remove_claim_refs
+seed_claim gA s-a k-a live "2026-02-30T00:00:00Z"
+seed_claim gB s-b k-b live "$(derive_claim_now)"
+out=$(bash "$SCRIPT" --claims 2>/dev/null)
+same "AC16 an invalid stamp reads every claim of the date call unknown, aged -" "$(printf '%s\n' "$out" | cut -f1,4,5 | tr '\t\n' ':;')" "gA:-:unknown;gB:-:unknown;"
+# ---- AC3: a remote that does not answer is exit 2 and check 109, never `claims: none`.
+# ---- BOTH URLs are staged and the push URL is put back as it was found (TOOL-aGraftedHelix-34 S1):
+# ---- `resolve_claim_remote` reads `get-url --push`, and the refused-endpoint arms above leave a
+# ---- push URL set, so a fetch-URL-only staging never reached the reader and the arm read gA.
+gh_pu=$(git config --get remote.origin.pushurl || true)
+git remote set-url origin "$ORIGIN_DIR/no-such-remote.git"
+git remote set-url --push origin "$ORIGIN_DIR/no-such-remote.git"
+out=$(bash "$SCRIPT" --claims 2>&1); rc=$?
+git remote set-url origin "$ORIGIN"
+if [ -n "$gh_pu" ]; then git remote set-url --push origin "$gh_pu"; else git config --unset remote.origin.pushurl; fi
+same "AC3 an unanswering remote exits 2" "$rc" "2"
+hit  "$out" "the claims on the remote could not be read, so whether another session drives this slug is unknown rather than no, and nothing was written"
+miss "$out" "claims: none"
+
+# ---- AC4: --preflight claims the slug on the remote, and a second clone under another session and
+# ---- keepalive is refused at check 107 naming the holder, with no run-state file written.
+arm_claim_fixture
+out=$(run --preflight tFresh --keepalive-id k1)
+hit  "$out" "preflight OK"
+same "AC4 the claim names the preflighting session" "$(read_claim_field tFresh session)" "fixture-session"
+same "AC4 ...live" "$(read_claim_field tFresh status)" "live"
+GH_C2=$(mktemp -d); git clone -q "$TMP" "$GH_C2/c" 2>/dev/null
+( cd "$GH_C2/c" && git config core.autocrlf false && git remote set-url origin "$ORIGIN" )
+out=$(cd "$GH_C2/c" && CLAUDE_CODE_SESSION_ID=other-session bash "$SCRIPT" --preflight tFresh --keepalive-id k2 2>&1); rc=$?
+n=$((n+1)); [ "$rc" != 0 ] || { echo "FAIL AC4 a second preflight of a live-claimed slug exited 0"; st=1; }
+hit  "$out" "another session holds this slug's claim on the remote, so a second driver would start beside it; nothing was written, and the claim names its holder"
+hit  "$out" "tFresh · node "
+hit  "$out" "· session fixture-session · beat "
+n=$((n+1)); [ ! -e "$GH_C2/c/memory/builds/tFresh/RUN.md" ] || { echo "FAIL AC4 the refused clone wrote its run-state file"; st=1; }
+rm -rf "$GH_C2"
+# ---- AC5: a STALE claim and a LANDED one are both taken over by a new session's --preflight, and only
+# ---- the stale take-over is announced.
+arm_claim_fixture
+seed_claim tFresh s-old k-old live "$(derive_claim_ago $((GH_BOUND + 600)))"
+out=$(run --preflight tFresh --keepalive-id k1)
+hit  "$out" "preflight OK"
+hit  "$out" "unattended: claim taken over — tFresh · node other · session s-old · beat "
+same "AC5 the stale claim now names this session" "$(read_claim_field tFresh session)" "fixture-session"
+same "AC5 ...live" "$(read_claim_field tFresh status)" "live"
+arm_claim_fixture
+seed_claim tFresh s-old k-old landed "$(derive_claim_now)"
+out=$(run --preflight tFresh --keepalive-id k1)
+hit  "$out" "preflight OK"
+miss "$out" "claim taken over"
+same "AC5 the landed claim now names this session" "$(read_claim_field tFresh session)" "fixture-session"
+# ---- AC11: the claims of OTHER slugs are announced, live, stale, held and unknown, never terminal,
+# ---- and nothing is printed when there are none.
+arm_claim_fixture
+seed_claim gL s-l k-l live "$(derive_claim_now)"
+seed_claim gS s-s k-s live "$(derive_claim_ago $((GH_BOUND + 600)))"
+seed_claim gH s-h k-h held "$(derive_claim_now)"
+seed_claim gU s-u k-u live ""
+seed_claim gT s-t k-t aborted "$(derive_claim_now)"
+out=$(run --preflight tFresh --keepalive-id k1)
+hit  "$out" "unattended: 4 claim(s) on the remote for other slugs — this run is NOT blocked by them:"
+hit  "$out" "  gL · node other · status live · beat "
+hit  "$out" "  gS · node other · status live · beat "
+hit  "$out" "  gH · node other · status held · beat "
+hit  "$out" "  gU · node other · status live · beat unknown · verdict unknown"
+miss "$out" "  gT · "
+arm_claim_fixture
+out=$(run --preflight tFresh --keepalive-id k1)
+miss "$out" "claim(s) on the remote"
+
+# ---- AC6: a race lost between the read and the push is check 108, and nothing is written: no record,
+# ---- and on a slug whose prior run left a terminal record, no rotation.
+arm_claim_fixture
+GH_RACER=$(git --git-dir="$ORIGIN" commit-tree "$(git --git-dir="$ORIGIN" mktree </dev/null)" -m "gov-claim racer")
+cat > "$GH_BIN/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) "$GH_GIT" --git-dir="$ORIGIN" update-ref refs/gov/runs/tFresh $GH_RACER; "$GH_GIT" --git-dir="$ORIGIN" update-ref refs/gov/runs/tRun $GH_RACER ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+chmod +x "$GH_BIN/git"
+out=$(PATH="$GH_BIN:$PATH" bash "$SCRIPT" --preflight tFresh --keepalive-id k1 2>&1)
+hit  "$out" "the claim moved on the remote between this call's read and its write, so another session took the slug first and this run must not drive it; nothing was written, and a run that has a record ends with --abort <slug> --code claim-lost"
+n=$((n+1)); [ ! -e memory/builds/tFresh/RUN.md ] || { echo "FAIL AC6 a lost race wrote the run-state file"; st=1; }
+same "AC6 the racer's claim stands" "$(read_claim_ref tFresh)" "$GH_RACER"
+mv "$GH_BIN/git" "$GH_BIN/git.racer"; arm_claim_fixture; mv "$GH_BIN/git.racer" "$GH_BIN/git"
+run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
+add_facts memory/builds/tRun/RUN.md "halt-code: fork-unresolvable"; fixture; before=$(sum)
+out=$(PATH="$GH_BIN:$PATH" bash "$SCRIPT" --preflight tRun --keepalive-id k2 2>&1)
+hit  "$out" "UNATTENDED check 108 FAILED"
+miss "$out" "retired the finished record"
+same "AC6 the terminal record is byte-unchanged after the lost race" "$(sum)" "$before"
+same "AC6 ...and unmoved: no archive beside it" "$(git ls-files 'memory/builds/tRun/RUN.*.md' | grep -c .)" "0"
+# ---- AC17: a push refused for any reason but a race, and a push the bound killed, are check 109,
+# ---- never check 108, and leave no run-state file.
+arm_claim_fixture
+cat > "$GH_BIN/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) printf 'To x\n!\tdeadbeef:refs/gov/runs/tFresh\t[remote rejected] (pre-receive hook declined)\nDone\n'; exit 1 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+chmod +x "$GH_BIN/git"
+out=$(PATH="$GH_BIN:$PATH" bash "$SCRIPT" --preflight tFresh --keepalive-id k1 2>&1)
+hit  "$out" "the claim write did not complete, so whether this run holds its slug on the remote is unknown rather than lost, and nothing was written"
+hit  "$out" "[remote rejected] (pre-receive hook declined)"
+miss "$out" "UNATTENDED check 108 FAILED"
+n=$((n+1)); [ ! -e memory/builds/tFresh/RUN.md ] || { echo "FAIL AC17 a refused push wrote the run-state file"; st=1; }
+cat > "$GH_BIN/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) exit 124 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+out=$(PATH="$GH_BIN:$PATH" bash "$SCRIPT" --preflight tFresh --keepalive-id k1 2>&1)
+hit  "$out" "UNATTENDED check 109 FAILED"
+miss "$out" "UNATTENDED check 108 FAILED"
+n=$((n+1)); [ ! -e memory/builds/tFresh/RUN.md ] || { echo "FAIL AC17 a killed push wrote the run-state file"; st=1; }
+rm -f "$GH_BIN/git"
+
+# ---- AC7: the holder renews only when due, refuses another session's live claim at check 108 naming
+# ---- claim-lost, and that code ends the run; the kit's example declares the raised floor.
+build_claim_held
+gh_sha=$(read_claim_ref tRun)
+out=$(run --resume tRun --keepalive-id k1); rc=$?
+same "AC7 the holder's resume exits 0" "$rc" "0"
+same "AC7 ...and a young beat is not pushed" "$(read_claim_ref tRun)" "$gh_sha"
+seed_claim tRun fixture-session k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+gh_old=$(read_claim_field tRun beat-utc)
+run --resume tRun --keepalive-id k1 >/dev/null
+n=$((n+1)); [ "$(read_claim_field tRun beat-utc)" != "$gh_old" ] || { echo "FAIL AC7 a beat older than a quarter of the bound was not renewed"; st=1; }
+seed_claim tRun s-other k-other live "$(derive_claim_now)"
+before=$(sum)
+out=$(run --resume tRun --keepalive-id k1); rc=$?
+n=$((n+1)); [ "$rc" != 0 ] || { echo "FAIL AC7 the holder resumed over another session's live claim"; st=1; }
+hit  "$out" "this run does not hold its claim on the remote, because another session's claim is there, so it must not drive the slug and nothing was written; end the run with --abort <slug> --code claim-lost, the halt code for a lost claim"
+same "AC7 the refused holder wrote nothing" "$(sum)" "$before"
+run --attest tRun --item keepalive-reaped >/dev/null; run --attest tRun --item parked-decisions-surfaced >/dev/null
+out=$(run --abort tRun --code claim-lost --reason "another session holds this run's claim"); rc=$?
+hit  "$out" "phase ABORTED · witness"
+hit  "$out" "unattended: claim not written — tRun is held live by session s-other on other, beat "
+same "AC9 an abort under another session's live claim still exits 0" "$rc" "0"
+same "AC7 the kit's example raises HALT_FLOOR to the new core size" "$(grep -c '^HALT_FLOOR="8"$' "$HERE/.unattended.conf.example")" "1"
+# ---- AC8: a take-over refuses another session's LIVE claim at check 107 with the record unchanged, and
+# ---- takes a STALE one, the claim then naming the new session.
+build_claim_held; GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -q --allow-empty -m gh-aged --no-verify
+seed_claim tRun s-third k-third live "$(derive_claim_now)"
+before=$(sum)
+out=$(CLAUDE_CODE_SESSION_ID=s-new run --resume tRun --keepalive-id kB)
+hit  "$out" "UNATTENDED check 107 FAILED"
+same "AC8 the refused take-over left the record byte-unchanged" "$(sum)" "$before"
+seed_claim tRun s-third k-third live "$(derive_claim_ago $((GH_BOUND + 600)))"
+out=$(CLAUDE_CODE_SESSION_ID=s-new run --resume tRun --keepalive-id kB)
+hit  "$out" "taken over — phase RUNNING · keepalive kB"
+hit  "$out" "unattended: claim taken over — tRun · node other · session s-third"
+same "AC8 the stale claim now names the new session" "$(read_claim_field tRun session)" "s-new"
+# ---- AC9: --hold writes held, the released --resume live, --abort aborted, and the ref stays.
+build_claim_held
+out=$(run --hold tRun --code platform-limit --until owner --reason x --reaped k1)
+hit  "$out" "phase HELD"
+same "AC9 --hold writes held" "$(read_claim_field tRun status)" "held"
+git add -A >/dev/null && git commit -q -m gh-held --no-verify
+out=$(run --resume tRun --keepalive-id k2)
+hit  "$out" "the hold is released"
+same "AC9 the released resume writes live" "$(read_claim_field tRun status)" "live"
+same "AC9 ...under its keepalive" "$(read_claim_field tRun keepalive)" "k2"
+git add -A >/dev/null && git commit -q -m gh-resumed --no-verify
+run --attest tRun --item keepalive-reaped >/dev/null; run --attest tRun --item parked-decisions-surfaced >/dev/null
+out=$(run --abort tRun --code fork-unresolvable --reason "the claim arm ends its run")
+hit  "$out" "phase ABORTED"
+same "AC9 --abort writes aborted" "$(read_claim_field tRun status)" "aborted"
+same "AC9 ...and the terminal claim stays on the remote" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | grep -c .)" "1"
+# ---- AC10: --close refuses at check 108, before any Definition-of-Done line, a run whose claim another
+# ---- session holds live, and writes no LANDING.
+build_claim_held
+seed_claim tRun s-other k-other live "$(derive_claim_now)"
+out=$(run --close tRun)
+hit  "$out" "UNATTENDED check 108 FAILED"
+miss "$out" "UNATTENDED check 13 FAILED"
+same "AC10 the refused close wrote no LANDING" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "RUNNING"
+
+# ---- AC19: a claim read that fails while the anchor answers is check 109 at --close; another session's
+# ---- live claim is check 108 at --dispatch with no row; a STALE foreign one refuses both, ref unmoved.
+build_claim_held
+cat > "$GH_BIN/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" fetch "*"refs/gov/runs/"*) exit 128 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+chmod +x "$GH_BIN/git"
+out=$(PATH="$GH_BIN:$PATH" bash "$SCRIPT" --close tRun 2>&1)
+hit  "$out" "UNATTENDED check 109 FAILED"
+miss "$out" "UNATTENDED check 13 FAILED"
+rm -f "$GH_BIN/git"
+mkdir -p memory/builds/tRun/spec
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add -A >/dev/null && git commit -q -m gh-spec --no-verify
+seed_claim tRun s-other k-other live "$(derive_claim_now)"
+before=$(sum)
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
+hit  "$out" "UNATTENDED check 108 FAILED"
+miss "$out" "dispatch declared"
+same "AC19 the refused dispatch left the record byte-unchanged" "$(sum)" "$before"
+seed_claim tRun s-other k-other live "$(derive_claim_ago $((GH_BOUND + 600)))"
+gh_sha=$(read_claim_ref tRun)
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
+hit  "$out" "--code claim-lost"
+out=$(run --close tRun)
+hit  "$out" "this run does not hold its claim on the remote, because another session's claim is there"
+same "AC19 a holder never takes a successor's stale claim" "$(read_claim_ref tRun)" "$gh_sha"
+
+# ---- AC18: --replaces writes the new keepalive into the claim with the session UNSET, and the next
+# ---- holder resume pushes nothing while the beat is not due; the LANDING re-bind writes over the
+# ---- prior session's stale claim and announces over a fresh foreign one; the same-session row takes.
+build_claim_held
+out=$(env -u CLAUDE_CODE_SESSION_ID bash "$SCRIPT" --resume tRun --keepalive-id k2 --replaces k1 2>&1)
+hit  "$out" "keepalive replaced"
+same "AC18 --replaces writes the new keepalive into the claim" "$(read_claim_field tRun keepalive)" "k2"
+gh_sha=$(read_claim_ref tRun)
+out=$(env -u CLAUDE_CODE_SESSION_ID bash "$SCRIPT" --resume tRun --keepalive-id k2 2>&1); rc=$?
+same "AC18 the replaced holder's next resume exits 0" "$rc" "0"
+same "AC18 ...and pushes nothing while the beat is not due" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gh_sha"
+build_claim_landing
+seed_claim tRun fixture-session k1 live "$(derive_claim_ago $((GH_BOUND + 600)))"
+out=$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id k2)
+hit  "$out" "landing re-bound · keepalive k1 -> k2"
+same "AC18 the re-bind writes its keepalive over the prior session's stale claim" "$(read_claim_field tRun keepalive)" "k2"
+remove_claim_landing; build_claim_landing
+seed_claim tRun s-other k-other live "$(derive_claim_now)"
+out=$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id k2); rc=$?
+hit  "$out" "unattended: claim not written — tRun is held live by session s-other"
+same "AC18 a fresh foreign claim leaves the re-bind exit 0" "$rc" "0"
+remove_claim_landing
+build_claim_held
+seed_claim tRun fixture-session k-older live "$(derive_claim_now)"
+out=$(run --resume tRun --keepalive-id k1); rc=$?
+same "AC18 the same-session row exits 0" "$rc" "0"
+same "AC18 ...and rewrites the claim under the holder's keepalive" "$(read_claim_field tRun keepalive)" "k1"
+# ---- AC20: --landed writes landed over the run's own live claim, and --claims reads it terminal.
+build_claim_landing
+out=$(run --landed tRun)
+hit  "$out" "phase LANDED · witness"
+same "AC20 --landed writes landed" "$(read_claim_field tRun status)" "landed"
+same "AC20 ...which --claims reads terminal" "$(bash "$SCRIPT" --claims 2>/dev/null | awk -F'\t' '$1 == "tRun" { print $5 }')" "terminal"
+remove_claim_landing
+# ...and under LANDER_MODE=in-place, where --landed stages nothing and only observes (spec rev-7).
+arm_claim_fixture; mutate .unattended.conf 's/^LANDER_MODE="primary"$/LANDER_MODE="in-place"/'; fixture
+rm -f "$GH_STOP" "$GH_LOG"; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md; fixture; git push -q -f origin HEAD:main
+out=$(run --landed tRun)
+hit  "$out" "phase LANDED (derived: "
+same "AC20 the in-place --landed writes landed too" "$(read_claim_field tRun status)" "landed"
+remove_claim_landing
+
+# ---- --beat: a missing record is its one refusal; off, it names the switch; on a LIVE run it skips a
+# ---- beat not yet due and renews one that is, one `beat —` line each.
+reset_tree
+hit  "$(run --beat tFresh)" "no run-state file, so there is no run whose claim a beat could renew"
+run --preflight tRun --keepalive-id k1 >/dev/null
+hit  "$(run --beat tRun)" "unattended: beat — tRun · skipped: RUN_CLAIMS is off"
+build_claim_held
+out=$(run --beat tRun)
+hit  "$out" "unattended: beat — tRun · skipped: the beat is not yet due"
+same "--beat prints exactly one beat line" "$(printf '%s\n' "$out" | grep -c '^unattended: beat — ')" "1"
+seed_claim tRun fixture-session k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+hit  "$(run --beat tRun)" "unattended: beat — tRun · renewed "
+
+# ---- AC21: undeclared, the switch is off - one NOTE at --preflight and no claim written; a value
+# ---- outside the set refuses naming the key; the kit's example ships it off.
+reset_tree; mutate .unattended.conf '/^RUN_CLAIMS=/d'; fixture; remove_claim_refs
+out=$(run --preflight tFresh --keepalive-id k1); rc=$?
+same "AC21 an undeclared switch still preflights" "$rc" "0"
+same "AC21 ...with one NOTE naming RUN_CLAIMS" "$(printf '%s\n' "$out" | grep -c 'unattended: NOTE - this project declares no RUN_CLAIMS')" "1"
+same "AC21 ...and no claim on the remote" "$(git ls-remote "$ORIGIN" 'refs/gov/*' | grep -c .)" "0"
+reset_tree; mutate .unattended.conf 's/^RUN_CLAIMS="off"$/RUN_CLAIMS="maybe"/'
+out=$(run --status tRun); rc=$?
+same "AC21 a value outside the set exits 2" "$rc" "2"
+hit  "$out" "unattended: REFUSING - RUN_CLAIMS is declared as 'maybe', which is outside the closed set 'on off'"
+same "AC21 the kit's example ships the switch off" "$(grep -c '^RUN_CLAIMS="off"$' "$HERE/.unattended.conf.example")" "1"
+remove_claim_refs; rm -rf "$GH_BIN"; git remote set-url origin "$ORIGIN"; reset_tree
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
+# ==================================================================================================
+# TOOL-aGraftedHelix-10 — THE CLAIM PUSH THROUGH THE TRACKED PRE-PUSH HOOK. Every other arm here runs
+# hookless with GOV_DEFAULT_BRANCH=main exported, which is how a claim pushed to the URL passed this
+# suite and was refused on node a, where the variable is unset
+# (memory/gotchas/fixture-lacks-a-gate-the-consumer-has.md). This block alone unsets it and points
+# core.hooksPath at a COPY of this repository's tracked hook, OUTSIDE the work tree: `reset_tree`
+# cleans an untracked copy inside it, and one left there dirties the tree --preflight refuses.
+# `git remote add` records no origin/HEAD, so the block records it, and deletes it again on the way
+# out. It reuses the claim block's gh_ helpers. WHAT THIS DOES NOT DRIVE: the hook's gate-env.sh,
+# straggler guard and branch bar, which this fixture does not carry; the unit's acceptance ledger
+# records the same push measured once against a clone of this repository, which carries all three.
+# ==================================================================================================
+GK_SRC="${HERE%/"$KIT_REL"}/.githooks/pre-push"
+if [ ! -f "$GK_SRC" ]; then
+  echo "SKIP TOOL-aGraftedHelix-10 hooked claim arms: no tracked pre-push hook at $GK_SRC, so no claim push in this tree meets one"
+else
+GK_HOOKS=$(mktemp -d); GK_BIN=$(mktemp -d); GK_GIT=$(command -v git)
+GK_GD=$(git rev-parse --absolute-git-dir)
+GK_JOURNAL="$(cd "$(git rev-parse --git-common-dir)" && pwd)/runlog/pushes.log"
+cp "$GK_SRC" "$GK_HOOKS/pre-push"; chmod +x "$GK_HOOKS/pre-push"
+run_hooked() { env -u GOV_DEFAULT_BRANCH -u GOV_RUNLOG -u GOV_BRANCH_GATE_CMD bash "$SCRIPT" "$@" 2>&1; }
+build_hooked_fixture() { arm_claim_fixture; git config core.hooksPath "$GK_HOOKS"; git remote set-head origin -a >/dev/null 2>&1
+          rm -f "$GK_BIN/git" "$GK_GD/pre-push-refusal" "$GK_JOURNAL"; }
+read_hooked_journal() { tail -n 1 "$GK_JOURNAL" 2>/dev/null; }
+# ---- AC1: by the remote's NAME the hook observes origin/HEAD, takes `skip-nondefault`, and the claim
+# ---- lands with no refusal file - with GOV_DEFAULT_BRANCH unset. A URL push is refused right here.
+build_hooked_fixture
+same "AC1 the fixture records origin/HEAD" "$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null)" "origin/main"
+out=$(run_hooked --preflight tFresh --keepalive-id k1); rc=$?
+same "AC1 a hooked preflight exits 0" "$rc" "0"
+hit  "$out" "preflight OK"
+same "AC1 ...and the claim is on the remote" "$(git ls-remote "$ORIGIN" refs/gov/runs/tFresh | grep -c .)" "1"
+n=$((n+1)); [ ! -e "$GK_GD/pre-push-refusal" ] || { echo "FAIL AC1 a landed claim push left a refusal file: $(cat "$GK_GD/pre-push-refusal")"; st=1; }
+hit  "$(read_hooked_journal)" "decision=skip-nondefault"
+# ---- AC2: the holder's due beat moves through the hooked compare-and-swap.
+git add -A >/dev/null && git commit -q -m gk_hold --no-verify
+seed_claim tFresh fixture-session k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+gk_old=$(read_claim_field tFresh beat-utc)
+rm -f "$GK_JOURNAL"   # so the journal arm below reads THIS push's line, never AC1's
+out=$(run_hooked --resume tFresh --keepalive-id k1); rc=$?
+same "AC2 the hooked holder resume exits 0" "$rc" "0"
+n=$((n+1)); [ "$(read_claim_field tFresh beat-utc)" != "$gk_old" ] || { echo "FAIL AC2 a due beat did not move through the hooked push: $out"; st=1; }
+n=$((n+1)); [ ! -e "$GK_GD/pre-push-refusal" ] || { echo "FAIL AC2 the hooked update left a refusal file"; st=1; }
+hit  "$(read_hooked_journal)" "decision=skip-nondefault"
+# ---- AC3: no recorded origin/HEAD is the hook's `default-branch` refusal - check 109, never 90, the
+# ---- remedy composed from the remote's name, no record - and the driver supplies no default.
+build_hooked_fixture; git remote set-head origin -d
+out=$(run_hooked --preflight tFresh --keepalive-id k1); rc=$?
+n=$((n+1)); [ "$rc" != 0 ] || { echo "FAIL AC3 a hook-refused claim push preflighted"; st=1; }
+hit  "$out" "UNATTENDED check 109 FAILED"
+miss "$out" "UNATTENDED check 108 FAILED"
+hit  "$out" "the pre-push hook refused it: default-branch"
+hit  "$out" "git remote set-head origin -a"
+same "AC3 ...and nothing reached the remote" "$(git ls-remote "$ORIGIN" refs/gov/runs/tFresh | grep -c .)" "0"
+n=$((n+1)); [ ! -e memory/builds/tFresh/RUN.md ] || { echo "FAIL AC3 a hook-refused claim push wrote the run-state file"; st=1; }
+# ---- AC5: a refusal file an EARLIER push left is removed before the claim push, so a push that
+# ---- never reached the hook is check 109 with git's exit and no token.
+build_hooked_fixture
+printf 'gate-red\tpre-push: merge bar RED - push blocked\n' > "$GK_GD/pre-push-refusal"
+cat > "$GK_BIN/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) exit 128 ;; esac
+exec "$GK_GIT" "\$@"
+EOF
+chmod +x "$GK_BIN/git"
+out=$(PATH="$GK_BIN:$PATH" run_hooked --preflight tFresh --keepalive-id k1); rc=$?
+hit  "$out" "UNATTENDED check 109 FAILED"
+hit  "$out" "git push exited 128"
+miss "$out" "gate-red"
+miss "$out" "set-head"
+n=$((n+1)); [ ! -e "$GK_GD/pre-push-refusal" ] || { echo "FAIL AC5 the stale refusal file survived the claim push"; st=1; }
+n=$((n+1)); [ ! -e memory/builds/tFresh/RUN.md ] || { echo "FAIL AC5 a push that never ran wrote the run-state file"; st=1; }
+git config --unset core.hooksPath; git remote set-head origin -d 2>/dev/null
+remove_claim_refs; rm -rf "$GK_HOOKS" "$GK_BIN"; rm -f "$GK_GD/pre-push-refusal"; reset_tree
+fi
+
+# ==================================================================================================
+# TOOL-aGraftedHelix-11 — A CLAIM WRITE COPIES ITS IDENTITY FROM THE LEASE RECORD. AC2: `--dispatch`
+# under another session id, as a Workflow child's is, pushes nothing while the beat is young and, with
+# the beat due, renews the claim under the LEASE's session. AC4: `--preflight` hands its claim write
+# and `write_lease` one stamp, so the claim's `lease-utc` is the record's byte for byte and the
+# holder's next `--resume` pushes nothing. A git shim holds the claim push past a second boundary, so
+# a take site whose `write_lease` reads its own clock differs every time rather than by chance. RED
+# against a driver whose claim write reads the session from the environment, and against one whose
+# `--preflight` hands `write_lease` no stamp. It reuses the claim block's gh_ helpers.
+# ==================================================================================================
+GI_BIN=$(mktemp -d); GI_GIT=$(command -v git)
+# ---- AC2
+build_claim_held
+mkdir -p memory/builds/tRun/spec
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add -A >/dev/null && git commit -q -m gi-spec --no-verify
+gi_sha=$(read_claim_ref tRun)
+out=$(CLAUDE_CODE_SESSION_ID=s-child run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh); rc=$?
+same "GH11 AC2 a child's dispatch under another session exits 0" "$rc" "0"
+hit  "$out" "dispatch declared"
+same "GH11 AC2 ...and with the beat young pushes nothing" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gi_sha"
+git add -A >/dev/null && git commit -q -m gi-dispatched --no-verify
+seed_claim tRun fixture-session k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+gi_sha=$(read_claim_ref tRun)
+out=$(CLAUDE_CODE_SESSION_ID=s-child run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh); rc=$?
+same "GH11 AC2 a child's dispatch with the beat due exits 0" "$rc" "0"
+n=$((n+1)); [ "$(read_claim_ref tRun)" != "$gi_sha" ] || { echo "FAIL GH11 AC2 a due beat was not renewed"; st=1; }
+same "GH11 AC2 ...under the lease's session, never the child's" "$(read_claim_field tRun session)" "$(sed -n 's/^session: //p' memory/builds/tRun/RUN.md)"
+# ---- AC4
+arm_claim_fixture
+cat > "$GI_BIN/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) "$GI_GIT" "\$@"; r=\$?; sleep 2; exit \$r ;; esac
+exec "$GI_GIT" "\$@"
+EOF
+chmod +x "$GI_BIN/git"
+out=$(PATH="$GI_BIN:$PATH" bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
+rm -f "$GI_BIN/git"
+hit  "$out" "preflight OK"
+same "GH11 AC4 the claim's lease-utc is the record's byte for byte" "$(read_claim_field tRun lease-utc)" "$(sed -n 's/^lease-utc: //p' memory/builds/tRun/RUN.md)"
+git add -A >/dev/null && git commit -q -m gi-preflighted --no-verify
+gi_sha=$(read_claim_ref tRun)
+out=$(run --resume tRun --keepalive-id k1); rc=$?
+same "GH11 AC4 the holder's next resume exits 0" "$rc" "0"
+same "GH11 AC4 ...and pushes nothing while the beat is young" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gi_sha"
+rm -rf "$GI_BIN"; remove_claim_refs; reset_tree
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
+# ==================================================================================================
+# TOOL-aGraftedHelix-12 — EVERY CELL OF THE CLAIM WRITE TABLE, and every write `--beat` declines.
+# GC_CELLS holds one line per cell of the table `check_claim_writable` implements, the stops guide's
+# section 7: the claim-read row, the mode, then the outcome its reacher must produce - the exit, the
+# check number (`-` for none), whether the claim ref's sha `moved` or stayed the `same`, whether the
+# run-state file `changed` or stayed the `same`, and the line the call printed: `taken` for `claim
+# taken over`, `announced` for the announce row's `claim not written`, `lost` for a write the push
+# lost, `renewed` and `declined` for the two `beat —` lines, `-` for none of them. A cell no path
+# reaches is written `unreached` and its reason, and prints a SKIP naming both rather than passing.
+# THE CELLS ARE DERIVED, not typed twice (TOOL-aGraftedHelix-19): the rows and modes are the
+# driver's own CLAIM_READS and CLAIM_MODES lines, read the way the verb arms read VERBS_SLUG, and
+# before any cell is driven the arm asserts its table types exactly their product, naming every cell
+# on one side only. A class or mode the driver gains without a typed cell reds here, and so does a
+# deleted cell. Each cell starts from its mode's committed base with every claim cleared, then seeds
+# its row as a real gov-claim commit, so no cell's write is the next one's input. The reachers:
+# --preflight of tFresh under a new session and keepalive; a new session's --resume of a
+# presumed-stopped tRun, which reaches run_takeover; the holder's own --resume; --hold, the status
+# write; and --beat. A failing cell names its row and mode. It reuses the claim block's gh_ helpers.
+# ==================================================================================================
+GC_CELLS='none             preflight 0 -  moved changed -
+mine             preflight 0 -  moved changed -
+same             preflight 0 -  moved changed -
+foreign-live     preflight 1 107 same  same    -
+foreign-held     preflight 1 107 same  same    -
+foreign-stale    preflight 0 -  moved changed taken
+foreign-terminal preflight 0 -  moved changed -
+foreign-unknown  preflight 1 107 same  same    -
+none             take-over 0 -  moved changed -
+mine             take-over 0 -  moved changed -
+same             take-over 0 -  moved changed -
+foreign-live     take-over 1 107 same  same    -
+foreign-held     take-over 0 -  moved changed -
+foreign-stale    take-over 0 -  moved changed taken
+foreign-terminal take-over 1 107 same  same    -
+foreign-unknown  take-over 1 107 same  same    -
+none             holder    0 -  moved same    -
+mine             holder    0 -  moved same    -
+same             holder    0 -  moved same    -
+foreign-live     holder    1 108 same  same    -
+foreign-held     holder    1 108 same  same    -
+foreign-stale    holder    1 108 same  same    -
+foreign-terminal holder    1 108 same  same    -
+foreign-unknown  holder    1 108 same  same    -
+none             status    0 -  moved changed -
+mine             status    0 -  moved changed -
+same             status    0 -  moved changed -
+foreign-live     status    0 -  same  changed announced
+foreign-held     status    0 -  same  changed announced
+foreign-stale    status    0 -  moved changed -
+foreign-terminal status    0 -  moved changed -
+foreign-unknown  status    0 -  same  changed announced
+none             beat      0 -  moved same    renewed
+mine             beat      0 -  moved same    renewed
+same             beat      0 -  same  same    declined
+foreign-live     beat      0 -  same  same    declined
+foreign-held     beat      0 -  same  same    declined
+foreign-stale    beat      0 -  same  same    declined
+foreign-terminal beat      0 -  same  same    declined
+foreign-unknown  beat      0 -  same  same    declined'
+mapfile -t gc_lines <<<"$GC_CELLS"
+gc_rows=$(sed -n 's/^CLAIM_READS="\(.*\)"$/\1/p' "$SCRIPT")
+gc_modes=$(sed -n 's/^CLAIM_MODES="\(.*\)"$/\1/p' "$SCRIPT")
+gc_want=""
+for r in $gc_rows; do for m in $gc_modes; do gc_want="$gc_want$r/$m"$'\n'; done; done
+gc_have=""
+for l in "${gc_lines[@]}"; do
+  read -r r m _ <<<"$l"; gc_have="$gc_have$r/$m"$'\n'
+done
+gc_odd=$(comm -3 <(printf '%s' "$gc_want" | sort) <(printf '%s' "$gc_have" | sort) \
+  | awk -F'\t' '{ if ($1 != "") print $1 " has no typed outcome;"; else print $2 " is typed beyond the driver cells;" }' | tr '\n' ' ')
+same "GH19 the cell table types exactly the driver's CLAIM_READS by CLAIM_MODES, once each" "$gc_odd" ""
+# A row's claim, seeded against the reacher's own lease: `mine` carries its keepalive and session,
+# aged a third of the bound so the holder's renewal is due; `same` carries only its session.
+seed_claim_row() { # row · slug · the reacher's session · its keepalive
+  case "$1" in
+    none) ;;
+    mine) seed_claim "$2" "$3" "$4" live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)" ;;
+    same) seed_claim "$2" "$3" k-other live "$(derive_claim_now)" ;;
+    foreign-live) seed_claim "$2" s-other k-other live "$(derive_claim_now)" ;;
+    foreign-held) seed_claim "$2" s-other k-other held "$(derive_claim_now)" ;;
+    foreign-stale) seed_claim "$2" s-other k-other live "$(derive_claim_ago $((GH_BOUND + 600)))" ;;
+    foreign-terminal) seed_claim "$2" s-other k-other landed "$(derive_claim_now)" ;;
+    foreign-unknown) seed_claim "$2" s-other k-other live "" ;;
+    *) echo "FAIL GH12 the cell table names a row no seed builds: $1"; st=1; return 1 ;;
+  esac
+}
+# One cell, driven in THIS shell so its verdict survives: GC_GOT is the outcome in the table's order.
+run_claim_cell() { # row · mode -> GC_GOT
+  local row="$1" mode="$2" base slug me ka r0 r1 h0 h1 out rc ck=- ref=same rec=same line=-
+  case "$mode" in
+    preflight) base=$GC_FRESH; slug=tFresh; me=s-new; ka=k2 ;;
+    take-over) base=$GC_AGED; slug=tRun; me=s-new; ka=k2 ;;
+    holder|status|beat) base=$GC_HELD; slug=tRun; me=fixture-session; ka=k1 ;;
+    *) GC_GOT="no reacher drives mode $mode"; return 1 ;;
+  esac
+  git checkout -q -f unit; git reset -q --hard "$base"; git clean -qfd; remove_claim_refs
+  seed_claim_row "$row" "$slug" "$me" "$ka" || { GC_GOT="no seed for row $row"; return 1; }
+  r0=$(git ls-remote "$ORIGIN" "refs/gov/runs/$slug" | cut -f1)
+  h0=$(git hash-object "memory/builds/$slug/RUN.md" 2>/dev/null) || h0=absent
+  case "$mode" in
+    preflight) out=$(CLAUDE_CODE_SESSION_ID=$me run --preflight "$slug" --keepalive-id "$ka"); rc=$? ;;
+    take-over) out=$(CLAUDE_CODE_SESSION_ID=$me run --resume "$slug" --keepalive-id "$ka"); rc=$? ;;
+    holder) out=$(run --resume "$slug" --keepalive-id "$ka"); rc=$? ;;
+    status) out=$(run --hold "$slug" --code platform-limit --until owner --reason "the cell table" --reaped "$ka"); rc=$? ;;
+    beat) out=$(run --beat "$slug"); rc=$? ;;
+  esac
+  r1=$(git ls-remote "$ORIGIN" "refs/gov/runs/$slug" | cut -f1)
+  h1=$(git hash-object "memory/builds/$slug/RUN.md" 2>/dev/null) || h1=absent
+  case "$out" in *"UNATTENDED check "*" FAILED"*) ck=${out#*UNATTENDED check }; ck=${ck%% *} ;; esac
+  [ "$r1" = "$r0" ] || ref=moved
+  [ -n "$r1" ] || [ -z "$r0" ] || ref=gone
+  [ "$h1" = "$h0" ] || rec=changed
+  # A WRITE THAT LOST is `lost`, never the refusal or the announcement it can coincide with: a row
+  # misread as `none` pushes against an empty lease, loses, and exits as check 108 or a `claim not
+  # written` line too - only the sentence tells the table's decision from a race the push lost.
+  case "$out" in
+    *"the claim moved on the remote between"*|*"unattended: claim not written — $slug · "*) line=lost ;;
+    *"unattended: beat — $slug · skipped: the claim moved, so the run's own next verb decides it"*) line=lost ;;
+    *"unattended: claim taken over — "*) line=taken ;;
+    *"unattended: claim not written — $slug is held "*) line=announced ;;
+    *"unattended: beat — $slug · renewed "*) line=renewed ;;
+    *"unattended: beat — $slug · skipped: the claim is not this run's: "*) line=declined ;;
+  esac
+  GC_GOT="$rc $ck $ref $rec $line"
+  [ "$GC_GOT" = "$3" ] || GC_GOT="$GC_GOT · output: $(printf '%s' "$out" | head -c 300)"
+}
+arm_claim_fixture; GC_FRESH=$(git rev-parse HEAD)
+build_claim_held; GC_HELD=$(git rev-parse HEAD)
+GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -q --allow-empty -m gc-aged --no-verify
+GC_AGED=$(git rev-parse HEAD)
+for l in "${gc_lines[@]}"; do
+  read -r r m want <<<"$l"
+  case "$want" in unreached*) echo "SKIP GH12 cell $r/$m is unreached: ${want#unreached }"; continue ;; esac
+  read -r gc_e gc_c gc_f gc_d gc_x <<<"$want"; want="$gc_e $gc_c $gc_f $gc_d $gc_x"
+  run_claim_cell "$r" "$m" "$want"
+  same "GH12 cell $r/$m (exit check ref record line)" "$GC_GOT" "$want"
+done
+# ---- AC2: --beat declines its own beat not yet due and another session's live claim, naming the
+# ---- claim test and never the verdict, and moves no ref. Red when --beat skips its `mine` test.
+build_claim_held
+gc_sha=$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)
+out=$(run --beat tRun)
+hit  "$out" "unattended: beat — tRun · skipped: the beat is not yet due"
+same "GH12 AC2 --beat over this run's young beat moves no ref" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gc_sha"
+seed_claim tRun s-other k-other live "$(derive_claim_now)"
+gc_sha=$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)
+out=$(run --beat tRun)
+hit  "$out" "unattended: beat — tRun · skipped: the claim is not this run's: tRun · node other · session s-other"
+miss "$out" "skipped: verdict"
+same "GH12 AC2 --beat over another session's live claim moves no ref" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gc_sha"
+# ---- TOOL-aGraftedHelix-19 S5: a mode outside CLAIM_MODES is refused before any claim write. The
+# ---- scratch driver REMOVES the existing member `status`, so the value keeps its case branch and
+# ---- only the membership test stands between `--hold` and the write: red when that test is gone.
+build_claim_held
+gc_drv=$(mktemp -d)
+sed 's/^\(CLAIM_MODES=".*\) status\(.*"\)$/\1\2/' "$SCRIPT" >"$gc_drv/unattended.sh"
+cp "$HERE/lib-unattended.sh" "$gc_drv/lib-unattended.sh"
+gc_m0=$(sed -n 's/^CLAIM_MODES="\(.*\)"$/\1/p' "$SCRIPT")
+gc_m1=$(sed -n 's/^CLAIM_MODES="\(.*\)"$/\1/p' "$gc_drv/unattended.sh")
+hit  " $gc_m0 " " status "
+same "GH19 S5 the scratch driver's CLAIM_MODES is the kit's less status" " $gc_m1 " "$(printf ' %s ' "$gc_m0" | sed 's/ status / /')"
+gc_sha=$(read_claim_ref tRun)
+# ---- ...and `--beat`'s site, which never met a refusal before S2, maps it to one skip line and
+# ---- writes nothing: over NO claim, where a fall-through would create one. Red when that line goes.
+sed 's/^\(CLAIM_MODES=".*\) beat"$/\1"/' "$SCRIPT" >"$gc_drv/nobeat.sh"
+remove_claim_refs
+out=$(bash "$gc_drv/nobeat.sh" --beat tRun 2>&1)
+hit  "$out" "unattended: beat — tRun · skipped: the claim write table refused the call"
+same "GH19 S2 a refused --beat creates no claim" "$(read_claim_ref tRun)" ""
+git --git-dir="$ORIGIN" update-ref refs/gov/runs/tRun "$gc_sha"
+out=$(bash "$gc_drv/unattended.sh" --hold tRun --code platform-limit --until owner --reason "the mode axis" --reaped k1 2>&1)
+hit  "$out" "UNATTENDED check 110 FAILED — this call passed a claim mode the driver does not declare, so the claim write table has no column for it and nothing was written; declare the mode in CLAIM_MODES beside its case branch, or pass a declared one: mode status · CLAIM_MODES $gc_m1"
+same "GH19 S5 the refused status write moves no claim ref" "$(read_claim_ref tRun)" "$gc_sha"
+rm -rf "$gc_drv"
+remove_claim_refs; reset_tree
+# ---- TOOL-aGraftedHelix-22 S2: a claim-read class the decision derives outside CLAIM_READS is
+# ---- refused before any claim write. The scratch driver REMOVES the existing member `foreign-stale`,
+# ---- so the class keeps its case branch and only the read-axis membership test stands between a
+# ---- foreign stale claim and `--preflight`'s take, announced write: red when that test is gone.
+arm_claim_fixture
+gc_drv=$(mktemp -d)
+sed 's/^\(CLAIM_READS=".*\) foreign-stale\(.*"\)$/\1\2/' "$SCRIPT" >"$gc_drv/unattended.sh"
+cp "$HERE/lib-unattended.sh" "$gc_drv/lib-unattended.sh"
+gc_r0=$(sed -n 's/^CLAIM_READS="\(.*\)"$/\1/p' "$SCRIPT")
+gc_r1=$(sed -n 's/^CLAIM_READS="\(.*\)"$/\1/p' "$gc_drv/unattended.sh")
+hit  " $gc_r0 " " foreign-stale "
+same "GH22 S2 the scratch driver's CLAIM_READS is the kit's less foreign-stale" " $gc_r1 " "$(printf ' %s ' "$gc_r0" | sed 's/ foreign-stale / /')"
+seed_claim_row foreign-stale tFresh s-new k2
+gc_sha=$(read_claim_ref tFresh)
+out=$(CLAUDE_CODE_SESSION_ID=s-new bash "$gc_drv/unattended.sh" --preflight tFresh --keepalive-id k2 2>&1)
+hit  "$out" "UNATTENDED check 111 FAILED — this call derived a claim-read class the driver does not declare, so the claim write table has no row for it and nothing was written; declare the class in CLAIM_READS beside its case branch: class foreign-stale · CLAIM_READS $gc_r1"
+same "GH22 S2 the refused preflight moves no claim ref" "$(read_claim_ref tFresh)" "$gc_sha"
+same "GH22 S2 ...and writes no run-state file" "$([ -e memory/builds/tFresh/RUN.md ] && echo present || echo absent)" "absent"
+rm -rf "$gc_drv"
+remove_claim_refs; reset_tree
+
+# ==================================================================================================
+# TOOL-aGraftedHelix-18 — THE HOLDER ROW DECIDES `mine` BEFORE ITS write_lease AND COPIES THE CLAIM'S
+# IDENTITY AFTER IT. AC1: a record and claim preflighted under s1, the holder's --resume under s2
+# moves the claim to s2, and a second call under s2 reads it `mine`, never check 108. AC2: a changed
+# pid alone moves `lease-utc`, the claim then carries the record's stamp byte for byte, and the next
+# call under that pid pushes nothing. The record's stamp is first set ten minutes back, so a
+# write_lease inside the preflight's own second still moves it. RED against a driver whose claim
+# write reads the lease facts before write_lease, and against one whose due test reads them there.
+# WHAT THIS DOES NOT DRIVE: a claim push that does not complete after write_lease (TOOL-aGraftedHelix-20).
+# ==================================================================================================
+# ---- AC1
+arm_claim_fixture
+CLAUDE_CODE_SESSION_ID=s1 run --preflight tRun --keepalive-id k1 >/dev/null
+git add -A >/dev/null && git commit -q -m go-s1 --no-verify
+same "GH18 AC1 the claim names s1 before the resume" "$(read_claim_field tRun session)" "s1"
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+same "GH18 AC1 the holder's resume under s2 exits 0" "$rc" "0"
+hit  "$out" "unattended: lease recorded · keepalive k1 · session s1 -> s2"
+same "GH18 AC1 ...and the claim follows the record to s2" "$(read_claim_field tRun session)" "s2"
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+same "GH18 AC1 the second call under s2 exits 0" "$rc" "0"
+miss "$out" "UNATTENDED check 108 FAILED"
+# ---- AC2
+build_claim_held
+sed -i "s/^lease-utc: .*/lease-utc: $(derive_claim_ago 600)/" memory/builds/tRun/RUN.md
+git add -A >/dev/null && git commit -q -m go-aged --no-verify
+out=$(CLAUDE_PID=4242 run --resume tRun --keepalive-id k1); rc=$?
+same "GH18 AC2 the holder's resume under a changed pid exits 0" "$rc" "0"
+hit  "$out" "· pid 999999999 -> 4242 ·"
+same "GH18 AC2 the claim's lease-utc is the record's byte for byte" "$(read_claim_field tRun lease-utc)" "$(sed -n 's/^lease-utc: //p' memory/builds/tRun/RUN.md)"
+go_sha=$(read_claim_ref tRun)
+out=$(CLAUDE_PID=4242 run --resume tRun --keepalive-id k1); rc=$?
+same "GH18 AC2 the next call under that pid exits 0" "$rc" "0"
+same "GH18 AC2 ...and pushes nothing" "$(read_claim_ref tRun)" "$go_sha"
+remove_claim_refs; reset_tree
+
+# ==================================================================================================
+# TOOL-aGraftedHelix-20 — THE HOLDER ROW PUSHES ITS CLAIM BEFORE ITS write_lease, UNDER ONE STAMP, AND
+# A PUSH THAT DOES NOT LAND LEAVES `prior-session`. Every arm starts from a record and claim
+# preflighted under s1 and calls the holder's --resume under s2, so its write_lease is due. AC2: a
+# claim push made to exit 124, and a remote renamed away, each leave the record at s2 with
+# `prior-session: s1` and the claim at s1, staged; a second s2 call reads that claim `mine`, lands it
+# under s2 and empties the set. AC1: a lost race is check 108 with the record and the index
+# untouched. AC3: under a date shim advancing every clock read, the claim and the record carry one
+# stamp, and a renewal over a record without the fact writes nothing. AC6: the session's restart under
+# a new keepalive takes the run over through `same session`, and an s3 take-over through the
+# presumed-stopped row still announces the claim taken over from s1. RED against driver copies with
+# S3's widening removed, `prior-session` left unwritten, the CAS moved back after write_lease, the
+# claim reading its own clock, S8's widening removed, and S8 handed the record off the restart row.
+# The lost race is unit 1's git shim; nothing here sleeps. It reuses the claim block's gh_ helpers.
+# ==================================================================================================
+GP_BIN=$(mktemp -d); GP_DATE=$(command -v date)
+read_run_fact() { sed -n "s/^$1: //p" memory/builds/tRun/RUN.md; }
+build_prior_base() { arm_claim_fixture; CLAUDE_CODE_SESSION_ID=s1 run --preflight tRun --keepalive-id k1 >/dev/null; git add -A >/dev/null && git commit -q -m gp-s1 --no-verify; }
+cat > "$GP_BIN/git.124" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) exit 124 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+chmod +x "$GP_BIN/git.124"
+# ---- AC2, the 124 arm: the s2 call whose claim push exits 124, then a second s2 call with no shim.
+build_prior_base
+cp "$GP_BIN/git.124" "$GP_BIN/git"
+out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GP_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
+rm -f "$GP_BIN/git"
+same "GH20 AC2 the s2 call whose claim push exits 124 exits 0" "$rc" "0"
+hit  "$out" "unattended: claim not written — tRun · the push was killed by this kit's own"
+same "GH20 AC2 ...the record reads session s2" "$(read_run_fact session)" "s2"
+same "GH20 AC2 ...and prior-session s1" "$(read_run_fact prior-session)" "s1"
+same "GH20 AC2 ...while the claim still names s1" "$(read_claim_field tRun session)" "s1"
+same "GH20 AC2 ...and the record is staged" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+same "GH20 AC2 the second s2 call exits 0" "$rc" "0"
+miss "$out" "UNATTENDED check 108 FAILED"
+same "GH20 AC2 ...lands the claim under s2" "$(read_claim_field tRun session)" "s2"
+same "GH20 AC2 ...empties the prior-session set (TOOL-aGraftedHelix-23 S7)" "$(read_run_fact prior-session)" ""
+same "GH20 AC2 ...and stages the record it cleared" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
+# ---- AC2, the unreachable arm: the bare origin renamed away for the first s2 call, restored for the
+# ---- second. Red when prior-session is left unwritten: the second call then reads s1 as foreign.
+build_prior_base
+mv "$ORIGIN" "$ORIGIN.away"
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+mv "$ORIGIN.away" "$ORIGIN"
+same "GH20 AC2 the s2 call with the remote unreachable exits 0" "$rc" "0"
+hit  "$out" "unattended: claims not read — "
+same "GH20 AC2 ...the record reads session s2" "$(read_run_fact session)" "s2"
+same "GH20 AC2 ...and prior-session s1" "$(read_run_fact prior-session)" "s1"
+same "GH20 AC2 ...while the claim still names s1" "$(read_claim_field tRun session)" "s1"
+same "GH20 AC2 ...and the record is staged" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+same "GH20 AC2 the second s2 call with the remote restored exits 0" "$rc" "0"
+miss "$out" "UNATTENDED check 108 FAILED"
+same "GH20 AC2 ...lands the claim under s2" "$(read_claim_field tRun session)" "s2"
+same "GH20 AC2 ...empties the prior-session set (TOOL-aGraftedHelix-23 S7)" "$(read_run_fact prior-session)" ""
+same "GH20 AC2 ...and stages the record it cleared" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
+# ---- AC1: the s2 call that loses the race is check 108, and the run-state file and the index are
+# ---- untouched. Red when the CAS runs after write_lease: the record moved on a call that lost.
+build_prior_base
+GP_RACER=$(git --git-dir="$ORIGIN" commit-tree "$(git --git-dir="$ORIGIN" mktree </dev/null)" -m "gov-claim racer")
+cat > "$GP_BIN/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) "$GH_GIT" --git-dir="$ORIGIN" update-ref refs/gov/runs/tRun $GP_RACER ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+chmod +x "$GP_BIN/git"
+before=$(sum)
+out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GP_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
+rm -f "$GP_BIN/git"
+n=$((n+1)); [ "$rc" != 0 ] || { echo "FAIL GH20 AC1 the s2 call that lost its race exited 0"; st=1; }
+hit  "$out" "UNATTENDED check 108 FAILED"
+same "GH20 AC1 the record's session still reads s1" "$(read_run_fact session)" "s1"
+same "GH20 AC1 ...the record is byte-unchanged" "$(sum)" "$before"
+same "GH20 AC1 ...the working copy names no run-state file" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
+same "GH20 AC1 ...nor does the index" "$(git diff --cached --name-only -- memory/builds/tRun/RUN.md)" ""
+same "GH20 AC1 the racer's claim stands" "$(read_claim_ref tRun)" "$GP_RACER"
+# ---- AC3: the landing s2 call under a date shim that advances each clock read by one more second, so
+# ---- two reads always differ: the claim's lease-utc is the record's, and no prior-session line is
+# ---- written. Then a renewal whose write_lease is not due moves the ref and writes nothing local.
+build_prior_base
+cat > "$GP_BIN/date" <<EOF
+#!/usr/bin/env bash
+if [ "\$*" = "-u +%Y-%m-%dT%H:%M:%SZ" ]; then
+  k=\$(( \$(cat "$GP_BIN/date.count" 2>/dev/null || echo 0) + 1 )); echo "\$k" > "$GP_BIN/date.count"
+  exec "$GP_DATE" -u -d "@\$(( \$("$GP_DATE" -u +%s) + k ))" +%Y-%m-%dT%H:%M:%SZ
+fi
+exec "$GP_DATE" "\$@"
+EOF
+chmod +x "$GP_BIN/date"; rm -f "$GP_BIN/date.count"
+out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GP_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
+rm -f "$GP_BIN/date"
+same "GH20 AC3 the landing s2 call under the date shim exits 0" "$rc" "0"
+n=$((n+1)); [ "$(cat "$GP_BIN/date.count" 2>/dev/null || echo 0)" -ge 2 ] || { echo "FAIL GH20 AC3 the date shim answered fewer than two clock reads, so this arm graded no stamp it shimmed"; st=1; }
+same "GH20 AC3 the claim's lease-utc is the record's byte for byte" "$(read_claim_field tRun lease-utc)" "$(read_run_fact lease-utc)"
+same "GH20 AC3 ...and the record carries no prior-session line" "$(grep -c '^prior-session:' memory/builds/tRun/RUN.md)" "0"
+git add -A >/dev/null && git commit -q -m gp-landed --no-verify
+seed_claim tRun s2 k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+gp_sha=$(read_claim_ref tRun)
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+same "GH20 AC3 the renewing s2 call exits 0" "$rc" "0"
+n=$((n+1)); [ "$(read_claim_ref tRun)" != "$gp_sha" ] || { echo "FAIL GH20 AC3 the due renewal did not move the claim ref"; st=1; }
+same "GH20 AC3 ...and over a record without the fact writes nothing local" "$(git status --porcelain)" ""
+# ---- AC6: after an incomplete s2 push, the s2 restart under a new keepalive and pid takes the run over
+# ---- with no check 107. Then, over the same record and claim aged by date, an s3 take-over through the
+# ---- presumed-stopped row announces the claim taken over from s1.
+build_prior_base
+cp "$GP_BIN/git.124" "$GP_BIN/git"
+CLAUDE_CODE_SESSION_ID=s2 PATH="$GP_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 >/dev/null 2>&1
+rm -f "$GP_BIN/git"
+same "GH20 AC6 the incomplete push left prior-session s1" "$(read_run_fact prior-session)" "s1"
+GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -q -m gp-aged --no-verify
+gp_aged=$(git rev-parse HEAD)
+out=$(CLAUDE_CODE_SESSION_ID=s2 CLAUDE_PID=4242 run --resume tRun --keepalive-id k2); rc=$?
+same "GH20 AC6 the s2 restart under a new keepalive exits 0" "$rc" "0"
+hit  "$out" "this resume TAKES THE RUN OVER in its place"
+miss "$out" "UNATTENDED check 107 FAILED"
+same "GH20 AC6 ...and leaves the claim under the new keepalive" "$(read_claim_field tRun keepalive)" "k2"
+same "GH20 AC6 ...and session s2" "$(read_claim_field tRun session)" "s2"
+git reset -q --hard "$gp_aged"; git clean -qfd
+seed_claim tRun s1 k1 live "$(derive_claim_ago $((GH_BOUND + 600)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+out=$(CLAUDE_CODE_SESSION_ID=s3 run --resume tRun --keepalive-id k3); rc=$?
+same "GH20 AC6 the s3 take-over exits 0" "$rc" "0"
+hit  "$out" "unattended: presumed-stopped — "
+hit  "$out" "unattended: claim taken over — tRun · node "
+hit  "$out" " · session s1 · beat "
+rm -rf "$GP_BIN"; remove_claim_refs; reset_tree
+
+# ==================================================================================================
+# TOOL-aGraftedHelix-23 — `prior-session` IS A SET THE `--resume` HOLDER ROW ALONE GROWS AND EMPTIES,
+# AND EVERY READER TESTS MEMBERSHIP. Every arm starts from unit 20's base, record and claim
+# preflighted under s1. "124" is unit 20's git shim making the claim push exit 124; "away" renames the
+# bare origin away for that one call. AC1: sequences a to d of the spec's section 4 leave the line
+# `prior-session: s1 s2` before a closing s3 call that lands with no check 108 and empties the set; the
+# landed `--beat` of a and c and `--dispatch` of b move the claim to s2 and leave the set at s1. AC2:
+# sequences e and f, two incomplete calls in a row, keep s1; a landed renewal over a record without
+# the fact, and an incomplete one whose write_lease is not due, each leave the tree clean. AC3: a set
+# holding `absent` is a member. AC4: `--dispatch` (sequence b) and `--hold` read the set themselves.
+# AC5: the restart row tests membership, every position and an `absent` member. `--beat` runs with no
+# session, as the OS-scheduled tick does; `--dispatch` and `--hold` run under s2, so neither can reach
+# the `same session` row. RED against driver copies with unit 20's absent-only write, `--beat` and
+# `--dispatch` emptying the set, the set written as the read claim's session alone, the pre-call
+# session written unconditionally, `absent` read as no fact, the clear written while empty, the add
+# unscoped from write_lease due, the set read at the `--resume` row only, and the restart widening
+# comparing the whole value, the first member alone, or skipping `absent`. Unit 20's helpers reused.
+# ==================================================================================================
+GQ_BIN=$(mktemp -d)
+cat > "$GQ_BIN/git.124" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) exit 124 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+chmod +x "$GQ_BIN/git.124"
+# One holder `--resume`: no shim, the claim push exiting 124, or the bare origin away for this call
+# alone. Every call exits 0 and leaves no unstaged run-state file, the spec's fixture rule.
+run_prior_resume() { # label · session · none|124|away · [keepalive] · [pid] -> GQ_OUT
+  local p="$PATH" rc
+  case "$3" in 124) cp "$GQ_BIN/git.124" "$GQ_BIN/git"; p="$GQ_BIN:$PATH" ;; away) mv "$ORIGIN" "$ORIGIN.away" ;; esac
+  GQ_OUT=$(CLAUDE_CODE_SESSION_ID="$2" CLAUDE_PID="${5:-$CLAUDE_PID}" PATH="$p" bash "$SCRIPT" --resume tRun --keepalive-id "${4:-k1}" 2>&1); rc=$?
+  case "$3" in 124) rm -f "$GQ_BIN/git" ;; away) mv "$ORIGIN.away" "$ORIGIN" ;; esac
+  same "$1 the $2 call ($3) exits 0" "$rc" "0"
+  same "$1 ...and leaves no unstaged run-state file" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
+}
+# The closing call of a sequence: no shim, under its last session and pid, lands and empties the set.
+check_prior_close() { # label · session · [pid]
+  run_prior_resume "$1" "$2" none k1 "${3:-$CLAUDE_PID}"
+  miss "$GQ_OUT" "UNATTENDED check 108 FAILED"
+  same "$1 ...leaves the claim naming $2" "$(read_claim_field tRun session)" "$2"
+  same "$1 ...and the prior-session set empty" "$(read_run_fact prior-session)" ""
+}
+# The calls of one sequence of the spec's section 4 before its closing one, over a fresh base.
+build_prior_seq() { # a|b|c|d|e|f
+  build_prior_base
+  if [ "$1" = b ]; then
+    mkdir -p memory/builds/tRun/spec
+    printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+    git add -A >/dev/null && git commit -q -m gq-spec --no-verify
+  fi
+  case "$1" in d) run_prior_resume "GH23 $1" s2 away ;; *) run_prior_resume "GH23 $1" s2 124 ;; esac
+  same "GH23 $1 the first incomplete call leaves the set s1" "$(read_run_fact prior-session)" "s1"
+  case "$1" in
+    a|c) out=$(env -u CLAUDE_CODE_SESSION_ID bash "$SCRIPT" --beat tRun 2>&1)
+         hit  "$out" "unattended: beat — tRun · renewed " ;;
+    b)   out=$(CLAUDE_CODE_SESSION_ID=s2 run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh); rc=$?
+         same "GH23 AC1 b and AC4 the --dispatch under s2 exits 0" "$rc" "0"
+         miss "$out" "UNATTENDED check 108 FAILED"
+         same "GH23 AC4 ...and leaves no unstaged run-state file" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" "" ;;
+  esac
+  case "$1" in
+    a|b|c) same "GH23 $1 ...the landed write moves the claim to s2" "$(read_claim_field tRun session)" "s2"
+           same "GH23 $1 ...and leaves the set s1" "$(read_run_fact prior-session)" "s1" ;;
+  esac
+  case "$1" in
+    a|b|f) run_prior_resume "GH23 $1" s3 124 ;;
+    c|d)   run_prior_resume "GH23 $1" s3 away ;;
+    e)     run_prior_resume "GH23 $1" s2 124 k1 4243 ;;
+  esac
+  same "GH23 $1 the record carries prior-session: s1 s2 byte for byte" "$(grep '^prior-session:' memory/builds/tRun/RUN.md)" "prior-session: s1 s2"
+}
+# A record and claim leased with no session, so both name `absent`.
+build_prior_absent() { arm_claim_fixture; env -u CLAUDE_CODE_SESSION_ID bash "$SCRIPT" --preflight tRun --keepalive-id k1 >/dev/null 2>&1; git add -A >/dev/null && git commit -q -m gq-absent --no-verify; }
+# ---- AC1: sequences a to d, each ending in a closing s3 call that answers no check 108.
+for gq_s in a b c d; do
+  build_prior_seq "$gq_s"
+  case "$gq_s" in d) gq_c=s1 ;; *) gq_c=s2 ;; esac
+  same "GH23 AC1 $gq_s the claim before the closing call names $gq_c" "$(read_claim_field tRun session)" "$gq_c"
+  check_prior_close "GH23 AC1 $gq_s closing" s3
+done
+# ---- AC2: sequences e and f, two incomplete calls in a row, keep s1 in the set; e closes under s2 at
+# ---- the pid of its second call, f under s3.
+build_prior_seq e
+same "GH23 AC2 e the claim before the closing call names s1" "$(read_claim_field tRun session)" "s1"
+check_prior_close "GH23 AC2 e closing" s2 4243
+build_prior_seq f
+same "GH23 AC2 f the claim before the closing call names s1" "$(read_claim_field tRun session)" "s1"
+check_prior_close "GH23 AC2 f closing" s3
+# ---- AC2, the renewal legs: over the committed base, which carries no prior-session line, with its
+# ---- claim re-seeded at an aged beat. A landed renewal writes nothing local; an incomplete one whose
+# ---- write_lease is not due announces its push and adds nothing.
+build_prior_base
+seed_claim tRun s1 k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+gq_sha=$(read_claim_ref tRun)
+run_prior_resume "GH23 AC2 renewal" s1 none
+n=$((n+1)); [ "$(read_claim_ref tRun)" != "$gq_sha" ] || { echo "FAIL GH23 AC2 the landed renewal did not move the claim ref"; st=1; }
+same "GH23 AC2 ...and over a record without the fact writes nothing local" "$(git status --porcelain)" ""
+build_prior_base
+seed_claim tRun s1 k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+run_prior_resume "GH23 AC2 incomplete renewal" s1 124
+hit  "$GQ_OUT" "unattended: claim not written — tRun · the push was killed by this kit's own"
+same "GH23 AC2 ...writes nothing local" "$(git status --porcelain)" ""
+same "GH23 AC2 ...and no prior-session line" "$(grep -c '^prior-session:' memory/builds/tRun/RUN.md)" "0"
+# ---- AC3: an `absent` lease, then an s2 call whose push exits 124, leaves the set `absent`, which
+# ---- the closing s2 call reads as a member.
+build_prior_absent
+same "GH23 AC3 the record names session absent" "$(read_run_fact session)" "absent"
+same "GH23 AC3 ...and so does the claim" "$(read_claim_field tRun session)" "absent"
+run_prior_resume "GH23 AC3" s2 124
+same "GH23 AC3 ...the incomplete call leaves the set absent" "$(read_run_fact prior-session)" "absent"
+check_prior_close "GH23 AC3 closing" s2
+# ---- AC4: `--hold` under s2 after one incomplete s2 call. The staged record is committed and the run
+# ---- branch pushed first, build_hold_fixture's shape, for --hold's clean-tree and published-tip
+# ---- refusals; that push moves no claim ref. The --dispatch leg is sequence b's, in AC1.
+build_prior_base
+gq_unit=$(git --git-dir="$ORIGIN" rev-parse -q --verify refs/heads/unit) || gq_unit=""
+git push -q -f origin HEAD:refs/heads/unit
+run_prior_resume "GH23 AC4" s2 124
+same "GH23 AC4 ...the incomplete call stages the record" "$(git diff --cached --name-only -- memory/builds/tRun/RUN.md)" "memory/builds/tRun/RUN.md"
+git commit -q -m gq-hold --no-verify; git push -q -f origin HEAD:refs/heads/unit
+same "GH23 AC4 the branch push leaves the claim at s1" "$(read_claim_field tRun session)" "s1"
+same "GH23 AC4 ...and the set s1" "$(read_run_fact prior-session)" "s1"
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --hold tRun --code platform-limit --until owner --reason "the status-write widening" --reaped k1)
+miss "$out" "UNATTENDED check 2 FAILED"
+miss "$out" "unattended: claim not written"
+same "GH23 AC4 --hold under s2 writes held" "$(read_claim_field tRun status)" "held"
+same "GH23 AC4 ...and leaves the set s1" "$(read_run_fact prior-session)" "s1"
+# The bare origin outlives reset_tree, so the run branch this arm pushed is put back as it found it.
+if [ -n "$gq_unit" ]; then git --git-dir="$ORIGIN" update-ref refs/heads/unit "$gq_unit"; else git --git-dir="$ORIGIN" update-ref -d refs/heads/unit; fi
+# ---- AC5: the restart row's take-over tests membership. Each leg commits its record under a 2000 date,
+# ---- as unit 20's AC6 does, then restarts under a new pid and keepalive with the remote restored.
+# ---- d stops short of its closing call, so the claim is s1, the set's first member; c's claim is s2,
+# ---- its second; the absent lease's is `absent`.
+build_prior_seq d
+same "GH23 AC5 d the claim before the restart names s1" "$(read_claim_field tRun session)" "s1"
+write_aged_commit
+run_prior_resume "GH23 AC5 d restart" s3 none k3 4244
+miss "$GQ_OUT" "UNATTENDED check 107 FAILED"
+hit  "$GQ_OUT" "this resume TAKES THE RUN OVER in its place"
+same "GH23 AC5 d ...leaves the claim under the new keepalive" "$(read_claim_field tRun keepalive)" "k3"
+same "GH23 AC5 d ...and session s3" "$(read_claim_field tRun session)" "s3"
+build_prior_seq c
+same "GH23 AC5 c the claim before the restart names s2" "$(read_claim_field tRun session)" "s2"
+write_aged_commit
+run_prior_resume "GH23 AC5 c restart" s3 none k3 4244
+miss "$GQ_OUT" "UNATTENDED check 107 FAILED"
+same "GH23 AC5 c ...leaves the claim under the new keepalive" "$(read_claim_field tRun keepalive)" "k3"
+same "GH23 AC5 c ...and session s3" "$(read_claim_field tRun session)" "s3"
+build_prior_absent
+run_prior_resume "GH23 AC5 absent" s2 124
+same "GH23 AC5 absent ...leaves the set absent" "$(read_run_fact prior-session)" "absent"
+write_aged_commit
+run_prior_resume "GH23 AC5 absent restart" s2 none k2 4244
+miss "$GQ_OUT" "UNATTENDED check 107 FAILED"
+same "GH23 AC5 absent ...leaves the claim under the new keepalive" "$(read_claim_field tRun keepalive)" "k2"
+same "GH23 AC5 absent ...and session s2" "$(read_claim_field tRun session)" "s2"
+rm -rf "$GQ_BIN"; remove_claim_refs; reset_tree
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
+# ==================================================================================================
+# TOOL-aGraftedHelix-24 — THE `prior-session` ADD RUNS BEFORE write_lease. A mktemp shim on PATH
+# forwards to the real mktemp until the run-state file's `session:` line reads s2, then exits 1 once,
+# so an s2 holder call's write_lease stops after its session line at the same place every time, with
+# no sleep. Each leg first sets the record's lease-utc ten minutes back and commits it, so the
+# unmoved stamp is a witness that can red: a write_lease run whole moves it. AC1: the call whose
+# claim push exits 124, and over a fresh base the call with the remote away, each leave session s2,
+# prior-session s1 and lease-utc unmoved; the next s2 calls read the claim `mine` through the set
+# with no check 108, a still-unreachable one writing nothing. RED against driver copies with the add
+# moved back after write_lease, and with the unreadable-claim path's add alone moved back. Unit 20's
+# helpers reused.
+# ==================================================================================================
+GR_BIN=$(mktemp -d); GR_MKTEMP=$(command -v mktemp)
+cat > "$GR_BIN/git.124" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) exit 124 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+cat > "$GR_BIN/mktemp" <<EOF
+#!/usr/bin/env bash
+if [ ! -e "$GR_BIN/mktemp.fired" ] && grep -qx 'session: s2' "$TMP/memory/builds/tRun/RUN.md" 2>/dev/null; then
+  : > "$GR_BIN/mktemp.fired"; exit 1
+fi
+exec "$GR_MKTEMP" "\$@"
+EOF
+chmod +x "$GR_BIN/git.124" "$GR_BIN/mktemp"
+# Unit 20's base with its lease stamp aged and committed, then one s2 holder call under the mktemp
+# shim, with the claim push exiting 124 or the bare origin away for that call alone.
+check_prior_interrupted() { # label · 124|away
+  build_prior_base
+  sed -i "s/^lease-utc: .*/lease-utc: $(derive_claim_ago 600)/" memory/builds/tRun/RUN.md
+  git add -A >/dev/null && git commit -q -m gr-aged --no-verify
+  GR_LU=$(read_run_fact lease-utc); rm -f "$GR_BIN/mktemp.fired"
+  case "$2" in 124) cp "$GR_BIN/git.124" "$GR_BIN/git" ;; away) mv "$ORIGIN" "$ORIGIN.away" ;; esac
+  out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GR_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
+  case "$2" in 124) rm -f "$GR_BIN/git" ;; away) mv "$ORIGIN.away" "$ORIGIN" ;; esac
+  n=$((n+1)); [ -e "$GR_BIN/mktemp.fired" ] || { echo "FAIL $1 the mktemp shim never fired, so the call was not interrupted"; st=1; }
+  # TOOL-aGraftedHelix-26 AC2: the failed lease fact is check 17, and the call exits 1 on it.
+  same "$1 the interrupted call exits 1" "$rc" "1"
+  hit  "$out" "UNATTENDED check 17 FAILED — cannot record the lease: "
+  same "$1 the interrupted call leaves session s2" "$(read_run_fact session)" "s2"
+  same "$1 ...prior-session s1" "$(read_run_fact prior-session)" "s1"
+  same "$1 ...and lease-utc at its pre-call value" "$(read_run_fact lease-utc)" "$GR_LU"
+  same "$1 ...while the claim still names s1" "$(read_claim_field tRun session)" "s1"
+}
+# A later s2 call with no shim, the remote reachable: it reads the claim `mine` and lands it.
+check_prior_landed() { # label
+  out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+  same "$1 the s2 call exits 0" "$rc" "0"
+  miss "$out" "UNATTENDED check 108 FAILED"
+  same "$1 ...leaves the claim naming s2" "$(read_claim_field tRun session)" "s2"
+  same "$1 ...empties the prior-session set" "$(read_run_fact prior-session)" ""
+  same "$1 ...and leaves no unstaged run-state file" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
+}
+# ---- AC1, the 124 leg: the interrupted call, then a second s2 call with no shim.
+check_prior_interrupted "GH24 AC1 124" 124
+check_prior_landed "GH24 AC1 124 second"
+# ---- AC1, the unreachable leg: the interrupted call, a second s2 call still unreachable, which reads
+# ---- no claim and writes nothing, then a third with the remote restored.
+check_prior_interrupted "GH24 AC1 away" away
+mv "$ORIGIN" "$ORIGIN.away"
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+mv "$ORIGIN.away" "$ORIGIN"
+same "GH24 AC1 away the still-unreachable s2 call exits 0" "$rc" "0"
+miss "$out" "UNATTENDED check 108 FAILED"
+same "GH24 AC1 away ...and leaves the set s1" "$(read_run_fact prior-session)" "s1"
+same "GH24 AC1 away ...and the claim at s1" "$(read_claim_field tRun session)" "s1"
+check_prior_landed "GH24 AC1 away restored"
+rm -rf "$GR_BIN"; remove_claim_refs; reset_tree
+
+# ==================================================================================================
+# TOOL-aGraftedHelix-25 — THE `prior-session` ADD'S OWN FAILURE RETURNS THE HOLDER ROW BEFORE
+# write_lease. The git shim makes the claim push exit 124 and leaves a marker; a mktemp shim forwards
+# until that marker exists, then exits 1 once, so the first temporary file taken after the CAS's
+# outcome, the add's set_fact, fails, with no sleep and no count. AC1: over unit 24's aged base the s2
+# call prints the announce line and leaves session s1, an empty set and lease-utc unmoved; the next
+# s2 call with no shim reads the claim `mine`, lands it under s2 with no check 108 and leaves the set
+# empty. RED against a driver copy with the add's `|| return 1` dropped: write_lease moves the record
+# to s2 with no s1 in the set, and the second call answers check 108. Units 20's and 24's helpers.
+# ==================================================================================================
+GS_BIN=$(mktemp -d)
+cat > "$GS_BIN/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" push "*"refs/gov/runs/"*) : > "$GS_BIN/git.fired"; exit 124 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+cat > "$GS_BIN/mktemp" <<EOF
+#!/usr/bin/env bash
+if [ -e "$GS_BIN/git.fired" ] && [ ! -e "$GS_BIN/mktemp.fired" ]; then : > "$GS_BIN/mktemp.fired"; exit 1; fi
+exec "$GR_MKTEMP" "\$@"
+EOF
+chmod +x "$GS_BIN/git" "$GS_BIN/mktemp"
+build_prior_base
+sed -i "s/^lease-utc: .*/lease-utc: $(derive_claim_ago 600)/" memory/builds/tRun/RUN.md
+git add -A >/dev/null && git commit -q -m gs-aged --no-verify
+GS_LU=$(read_run_fact lease-utc)
+out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GS_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
+rm -rf "$GS_BIN"
+hit  "$out" "unattended: claim not written — tRun · the push was killed by this kit's own"
+# TOOL-aGraftedHelix-26 AC1: the failed add is check 17, and the call exits 1 on it.
+same "GH26 AC1 the call whose add fails exits 1" "$rc" "1"
+hit  "$out" "UNATTENDED check 17 FAILED — cannot record a run fact: prior-session in "
+same "GH25 AC1 the failed add leaves session s1" "$(read_run_fact session)" "s1"
+same "GH25 AC1 ...an empty prior-session set" "$(read_run_fact prior-session)" ""
+same "GH25 AC1 ...and lease-utc at its pre-call value" "$(read_run_fact lease-utc)" "$GS_LU"
+check_prior_landed "GH25 AC1 second"
+remove_claim_refs; reset_tree
+
+# ==================================================================================================
+# TOOL-aGraftedHelix-26 — A FAILED `prior-session` ADD OR LEASE FACT IS CHECK 17 AND EXITS THE CALL 1,
+# AND A CLAIM THAT COULD NOT BE READ REACHES THE ONE GUARDED ADD AND PUSHES NOTHING. AC1 and AC2 are
+# the exit and the line asserted in the arms of units 25 and 24 above. AC3: over unit 25's aged base,
+# an s2 holder call with the bare origin away runs under a git shim that forwards every call, logs
+# each argument list and leaves a marker when the claim fetch exits non-zero, and unit 25's once-only
+# mktemp shim keyed on that marker, so the first temporary file after the failed read, the add's,
+# fails. It exits 1 with the add's check-17 line, leaves session s1, an empty set and lease-utc
+# unmoved, and the log names no push; a restored s2 call with no shim lands the claim under s2 with
+# no check 108. RED against driver copies routing the unread claim to a second add with no guard,
+# and into a CAS with an empty expected sha. Units 20's and 24's helpers.
+# ==================================================================================================
+GT_BIN=$(mktemp -d)
+cat > "$GT_BIN/git" <<EOF
+#!/usr/bin/env bash
+printf ' %s \n' "\$*" >> "$GT_BIN/git.log"
+case " \$* " in *" fetch "*"refs/gov/runs/"*) "$GH_GIT" "\$@"; rc=\$?; [ "\$rc" = 0 ] || : > "$GT_BIN/git.fired"; exit "\$rc" ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+cat > "$GT_BIN/mktemp" <<EOF
+#!/usr/bin/env bash
+if [ -e "$GT_BIN/git.fired" ] && [ ! -e "$GT_BIN/mktemp.fired" ]; then : > "$GT_BIN/mktemp.fired"; exit 1; fi
+exec "$GR_MKTEMP" "\$@"
+EOF
+chmod +x "$GT_BIN/git" "$GT_BIN/mktemp"
+build_prior_base
+sed -i "s/^lease-utc: .*/lease-utc: $(derive_claim_ago 600)/" memory/builds/tRun/RUN.md
+git add -A >/dev/null && git commit -q -m gt-aged --no-verify
+GT_LU=$(read_run_fact lease-utc)
+mv "$ORIGIN" "$ORIGIN.away"
+out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GT_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
+mv "$ORIGIN.away" "$ORIGIN"
+n=$((n+1)); [ -e "$GT_BIN/mktemp.fired" ] || { echo "FAIL GH26 AC3 the mktemp shim never fired after a failed claim fetch, so the add was not failed"; st=1; }
+same "GH26 AC3 the unreadable call whose add fails exits 1" "$rc" "1"
+hit  "$out" "UNATTENDED check 17 FAILED — cannot record a run fact: prior-session in "
+same "GH26 AC3 ...leaves session s1" "$(read_run_fact session)" "s1"
+same "GH26 AC3 ...an empty prior-session set" "$(read_run_fact prior-session)" ""
+same "GH26 AC3 ...lease-utc at its pre-call value" "$(read_run_fact lease-utc)" "$GT_LU"
+same "GH26 AC3 ...and the git shim's log names no push" "$(grep -c ' push ' "$GT_BIN/git.log")" "0"
+rm -rf "$GT_BIN"
+check_prior_landed "GH26 AC3 restored"
+remove_claim_refs; reset_tree
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
+# ==================================================================================================
+# TOOL-aGraftedHelix-32 — THE CLOSING REVIEW'S MINORS IN THE DRIVER. AC18 (M8, L1): the GH26 AC3
+# no-push witness gets a leg of its own, the bare origin in place, no mktemp shim, and a git shim that
+# fails only the claim fetch and logs every argument list, so nothing absorbs a push before the log
+# sees it. RED against a driver copy routing the unread claim into a CAS with an empty expected sha.
+# AC6 (M3): a claim push waits while push-main holds `push-main-active` in this git dir, so a beat
+# landing mid-bar cannot clear the verdict files the lander trusts. AC7 to AC11 (M4,
+# TOOL-aBranchedMandate-9): a --preflight refusal after its claim write leaves the tree as it found it
+# and writes a claim it CREATED `aborted`, one it renewed left with a line. AC12: the post-claim
+# `return 1` sits in that one restoring branch. AC15 (M6): a soft claim read meets check 24 as one
+# announced line and the verb exits 0. Units 20's and 24's helpers, and the claim block's.
+# ==================================================================================================
+GU_BIN=$(mktemp -d)
+cat > "$GU_BIN/git" <<EOF
+#!/usr/bin/env bash
+printf ' %s \n' "\$*" >> "$GU_BIN/git.log"
+case " \$* " in *" fetch "*"refs/gov/runs/"*) exit 1 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+cat > "$GU_BIN/git.add" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" add -- memory/builds/tRun/RUN.md "*) exit 1 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+chmod +x "$GU_BIN/git" "$GU_BIN/git.add"
+mkdir -p "$GU_BIN/add"; cp "$GU_BIN/git.add" "$GU_BIN/add/git"
+# ---- AC18: over unit 25's aged base, an s2 holder call whose claim fetch fails pushes nothing.
+build_prior_base
+sed -i "s/^lease-utc: .*/lease-utc: $(derive_claim_ago 600)/" memory/builds/tRun/RUN.md
+git add -A >/dev/null && git commit -q -m gu-aged --no-verify
+gu_sha=$(read_claim_ref tRun)
+out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GU_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
+hit  "$out" "unattended: claims not read — the remote did not answer, git fetch exited 1"
+same "GH32 AC18 the unread holder call's git log names no push" "$(grep -c ' push ' "$GU_BIN/git.log")" "0"
+same "GH32 AC18 ...the claim ref is unmoved" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gu_sha"
+same "GH32 AC18 ...and the call exits 0, the read announced and the lease recorded" "$rc" "0"
+remove_claim_refs; reset_tree
+# ---- AC6: a due beat over a live run waits while push-main holds its marker in this git dir.
+build_claim_held
+seed_claim tRun fixture-session k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+gu_gd=$(git rev-parse --absolute-git-dir); gu_sha=$(read_claim_ref tRun)
+: > "$gu_gd/push-main-active"; printf 'gate-red\tthe bar went red\n' > "$gu_gd/pre-push-refusal"
+gu_rf=$(git hash-object "$gu_gd/pre-push-refusal")
+out=$(run --beat tRun)
+hit  "$out" "unattended: beat — tRun · skipped: the write did not complete: push-main is landing from this git dir, so a claim push now would clear its verdict files: "
+same "GH32 AC6 the beat prints one beat line" "$(printf '%s\n' "$out" | grep -c '^unattended: beat — ')" "1"
+same "GH32 AC6 ...leaves pre-push-refusal byte-identical" "$(git hash-object "$gu_gd/pre-push-refusal" 2>/dev/null)" "$gu_rf"
+same "GH32 AC6 ...and the claim ref unmoved" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gu_sha"
+same "GH36 AC14 a write the marker refused leaves no claim-push lock" "$([ -e "$gu_gd/claim-push.lock" ] && echo left || echo none)" "none"
+rm -f "$gu_gd/push-main-active" "$gu_gd/pre-push-refusal"
+remove_claim_refs; reset_tree
+# ---- TOOL-aGraftedHelix-36 AC14 (L1): a claim push takes `claim-push.lock` in its git dir before it
+# ---- tests push-main's marker, so a live lock another writer holds skips the beat, naming the lock,
+# ---- and a lock whose deadline passed is cleared, taken and released. RED against the parent's driver,
+# ---- which tested the marker alone and pushed beside a held lock.
+build_claim_held
+seed_claim tRun fixture-session k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+gu_gd=$(git rev-parse --absolute-git-dir); gu_sha=$(read_claim_ref tRun)
+mkdir -p "$gu_gd/claim-push.lock"; echo "$(( $(date +%s) + 60 ))" > "$gu_gd/claim-push.lock/until"
+out=$(run --beat tRun)
+hit  "$out" "unattended: beat — tRun · skipped: the write did not complete: a claim push from this git dir is in flight; retry once it ends: "
+hit  "$out" "claim-push.lock"
+same "GH36 AC14 a live lock leaves one beat line" "$(printf '%s\n' "$out" | grep -c '^unattended: beat — ')" "1"
+same "GH36 AC14 ...and the claim ref unmoved" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gu_sha"
+echo "$(( $(date +%s) - 5 ))" > "$gu_gd/claim-push.lock/until"
+out=$(run --beat tRun)
+hit  "$out" "unattended: beat — tRun · renewed "
+same "GH36 AC14 an expired lock is cleared and the claim renewed" "$([ "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" = "$gu_sha" ] && echo unmoved || echo moved)" "moved"
+same "GH36 AC14 ...and no lock directory remains" "$([ -e "$gu_gd/claim-push.lock" ] && echo left || echo none)" "none"
+rm -rf "$gu_gd/claim-push.lock"
+remove_claim_refs; reset_tree
+# ---- TOOL-aGraftedHelix-37: breaking a stale `claim-push.lock` is a step ONE writer wins. The three
+# ---- lock functions are EXTRACTED from the shipped driver and driven over plain directories, never a
+# ---- copy typed here, and an empty extraction fails naming the function. The race runs two writers
+# ---- over a stale lock, the second's `date` waiting (bounded 10 s) for the first's verdict and the
+# ---- first starting once the second waits: the order that let both in on unit 36's inline break.
+# ---- A writer's `date`, `find` and `rm` are SHIMS first on its own PATH, never shell functions: a
+# ---- function named for a command is a lexicon verb offender, and assigning PATH clears the hash.
+# ---- Every arm's staged break is a `mutate` of the extracted copy, sourced only inside a `$( )`, so
+# ---- the suite's own shell keeps the clean functions; the block unsets them and re-sources the
+# ---- library its health stubs shadow on the way out. No fixture repository and no remote.
+gh_d=$(mktemp -d); gh_fn="$gh_d/fn.sh"; gh_cp="$gh_d/cp.sh"
+for gh_f in check_claim_push_lock_stale write_claim_push_lock remove_claim_push_lock; do
+  gh_x=$(sed -n "/^$gh_f() {/,/^}\$/p" "$SCRIPT")
+  [ -n "$gh_x" ] || { echo "FAIL could not extract $gh_f from $SCRIPT — the GH37 arms would grade nothing"; st=1; }
+  printf '%s\n' "$gh_x" >> "$gh_fn"
+done
+REMOTE_BOUND=60
+ROOT="$TMP"
+resolve_health_log() { echo "$gh_d/health"; }
+add_health_event() { echo "$3" >> "$1"; }
+# shellcheck disable=SC1090
+. "$gh_fn"
+GH37_DATE=$(command -v date); GH37_FIND=$(command -v find); GH37_RM=$(command -v rm)
+export GH37_DATE GH37_FIND GH37_RM
+mkdir -p "$gh_d/bin-race2" "$gh_d/bin-inter1" "$gh_d/bin-inter2"
+# The race's second writer: its `date` marks `in2`, then waits for the first writer's verdict.
+cat > "$gh_d/bin-race2/date" <<'GH37'
+#!/usr/bin/env bash
+: > "$GH37_X/in2"; i=0; while [ ! -e "$GH37_X/v1" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
+exec "$GH37_DATE" "$@"
+GH37
+# The interleaving's first writer: its SECOND `date`, the re-read under a guard it holds, marks `in1`
+# and waits for writer 2's verdict.
+cat > "$gh_d/bin-inter1/date" <<'GH37'
+#!/usr/bin/env bash
+if [ -e "$GH37_X/d1" ]; then
+  : > "$GH37_X/in1"; i=0
+  while [ ! -e "$GH37_X/v2" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
+else
+  : > "$GH37_X/d1"
+fi
+exec "$GH37_DATE" "$@"
+GH37
+# ...and its second writer: `find` marks the guard's age read, `rm` waits for writer 1 to act first.
+cat > "$gh_d/bin-inter2/find" <<'GH37'
+#!/usr/bin/env bash
+"$GH37_FIND" "$@"; r=$?; : > "$GH37_X/read2"; exit "$r"
+GH37
+cat > "$gh_d/bin-inter2/rm" <<'GH37'
+#!/usr/bin/env bash
+i=0; while [ ! -e "$GH37_X/in1" ] && [ ! -e "$GH37_X/v1" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
+exec "$GH37_RM" "$@"
+GH37
+chmod +x "$gh_d/bin-race2/date" "$gh_d/bin-inter1/date" "$gh_d/bin-inter2/find" "$gh_d/bin-inter2/rm"
+measure_gh37_race() { # functions file -> `<trials two writers took the lock> <trials exactly one did>`, of five
+  local t x lk p i two=0 one=0
+  . "$1"
+  for t in 1 2 3 4 5; do
+    x="$gh_d/trial$t"; mkdir -p "$x"; lk="$x/claim-push.lock"
+    mkdir "$lk"; echo "$(( $(date +%s) - 5 ))" > "$lk/until"
+    ( export GH37_X="$x"; PATH="$gh_d/bin-race2:$PATH"
+      write_claim_push_lock "$lk" w2; echo $? > "$x/v2" ) &
+    i=0; while [ ! -e "$x/in2" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
+    ( write_claim_push_lock "$lk" w1; echo $? > "$x/v1" ) &
+    wait
+    p=$(cat "$x/v1" "$x/v2" 2>/dev/null | grep -c '^0$')
+    [ "$p" != 2 ] || two=$((two+1)); [ "$p" != 1 ] || one=$((one+1))
+    rm -rf "$x"
+  done
+  echo "$two $one"
+}
+# The interleaving, in a FIXED order over a stale lock and a guard aged two minutes: writer 2 reads the
+# guard's age while it is old, writer 1 then removes it (and, in the staged break, takes it and waits
+# inside its re-read for writer 2's verdict), and only then does writer 2 act on its old reading.
+measure_gh37_interleave() { # functions file -> how many of the two writers took the lock
+  local x="$gh_d/inter" lk i
+  . "$1"
+  mkdir -p "$x"; lk="$x/claim-push.lock"
+  mkdir "$lk" "$lk.break"; echo "$(( $(date +%s) - 5 ))" > "$lk/until"; touch -d "@$(( $(date +%s) - 120 ))" "$lk.break"
+  ( export GH37_X="$x"; PATH="$gh_d/bin-inter2:$PATH"
+    write_claim_push_lock "$lk" w2; echo $? > "$x/v2" ) &
+  i=0; while [ ! -e "$x/read2" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
+  ( export GH37_X="$x"; PATH="$gh_d/bin-inter1:$PATH"
+    write_claim_push_lock "$lk" w1; echo $? > "$x/v1" ) &
+  wait
+  cat "$x/v1" "$x/v2" 2>/dev/null | grep -c '^0$'
+  rm -rf "$x"
+}
+# ---- AC1: the race. RED with the re-read under the guard cut: the lagging writer breaks the fresh lock.
+gh_r=$(measure_gh37_race "$gh_fn")
+same "GH37 AC1 no race trial lets two writers take a stale lock" "${gh_r% *}" "0"
+same "GH37 AC1 ...and every trial lets exactly one take it" "${gh_r#* }" "5"
+cp "$gh_fn" "$gh_cp"
+mutate "$gh_cp" '/^    if ! check_claim_push_lock_stale "\$lk"; then rmdir/d'
+gh_r=$(measure_gh37_race "$gh_cp")
+same "GH37 AC1 a copy with the re-read under the guard cut lets two writers in" "$([ "${gh_r% *}" -ge 1 ] && echo yes || echo "no: $gh_r")" "yes"
+# ---- AC3: the bound. A fresh guard stays; an aged one is removed and logged, the call busy; the call
+# ---- after it breaks the lock. RED when an aged guard is never removed: every later call stays busy.
+gh_lk="$gh_d/bound/claim-push.lock"; mkdir -p "$gh_lk" "$gh_lk.break"; : > "$gh_d/health"
+echo "$(( $(date +%s) - 5 ))" > "$gh_lk/until"
+write_claim_push_lock "$gh_lk" w-me; gh_rc=$?
+same "GH37 AC3 a stale lock under a fresh guard leaves the call busy" "$gh_rc" "1"
+same "GH37 AC3 ...and the guard in place" "$([ -d "$gh_lk.break" ] && echo kept || echo gone)" "kept"
+touch -d "@$(( $(date +%s) - 120 ))" "$gh_lk.break"
+write_claim_push_lock "$gh_lk" w-me; gh_rc=$?
+same "GH37 AC3 a guard aged two minutes leaves the call busy" "$gh_rc" "1"
+same "GH37 AC3 ...and removes the guard" "$([ -d "$gh_lk.break" ] && echo kept || echo gone)" "gone"
+hit  "$(cat "$gh_d/health")" "claim-push-guard-cleared"
+write_claim_push_lock "$gh_lk" w-me; gh_rc=$?
+same "GH37 AC3 the next call breaks and takes the stale lock" "$gh_rc" "0"
+same "GH37 AC3 ...its until is a deadline in the future" "$(u=""; read -r u <"$gh_lk/until"; case "$u" in ''|*[!0-9]*) echo none ;; *) [ "$u" -gt "$(date +%s)" ] && echo future || echo past ;; esac)" "future"
+same "GH37 AC3 ...its owner is the token passed" "$(cat "$gh_lk/owner" 2>/dev/null)" "w-me"
+same "GH37 AC3 ...no guard is left" "$([ -e "$gh_lk.break" ] && echo left || echo none)" "none"
+hit  "$(cat "$gh_d/health")" "claim-push-lock-broken"
+cp "$gh_fn" "$gh_cp"
+mutate "$gh_cp" '/^        rm -rf "\$g"$/d'
+same "GH37 AC3 a copy that never removes an aged guard leaves the call after it busy" "$( . "$gh_cp"; l="$gh_d/bound2/claim-push.lock"
+  mkdir -p "$l" "$l.break"; echo "$(( $(date +%s) - 5 ))" > "$l/until"; touch -d "@$(( $(date +%s) - 120 ))" "$l.break"
+  write_claim_push_lock "$l" w-me; write_claim_push_lock "$l" w-me; echo $? )" "1"
+# ---- AC4: the interleaved abandoned guard. RED when the remover takes the guard in the same call.
+gh_r=$(measure_gh37_interleave "$gh_fn")
+same "GH37 AC4 two writers acting on one aged guard reading never both take the lock" "$([ "$gh_r" -lt 2 ] && echo under-two || echo "$gh_r")" "under-two"
+cp "$gh_fn" "$gh_cp"
+mutate "$gh_cp" 's/^      return 1$/      mkdir "$g" 2>\/dev\/null || return 1/'
+same "GH37 AC4 a copy whose remover takes the guard lets both writers in" "$(measure_gh37_interleave "$gh_cp")" "2"
+# ---- AC5: the owner. RED with the owner comparison cut: a foreign release removes the lock.
+gh_lk="$gh_d/own/claim-push.lock"; mkdir -p "$gh_lk"; echo w-other > "$gh_lk/owner"
+remove_claim_push_lock "$gh_lk" w-me
+same "GH37 AC5 a release under another token leaves the lock" "$([ -d "$gh_lk" ] && echo kept || echo gone)" "kept"
+remove_claim_push_lock "$gh_lk" w-other
+same "GH37 AC5 ...and the owner's own token removes it" "$([ -d "$gh_lk" ] && echo kept || echo gone)" "gone"
+cp "$gh_fn" "$gh_cp"
+mutate "$gh_cp" 's/\[ "\$o" = "\$2" \] && //'
+same "GH37 AC5 a copy with the owner comparison cut removes another writer's lock" "$( . "$gh_cp"; mkdir -p "$gh_lk"; echo w-other > "$gh_lk/owner"
+  remove_claim_push_lock "$gh_lk" w-me; [ -d "$gh_lk" ] && echo kept || echo gone )" "gone"
+unset -f check_claim_push_lock_stale write_claim_push_lock remove_claim_push_lock measure_gh37_race measure_gh37_interleave
+unset REMOTE_BOUND GH37_DATE GH37_FIND GH37_RM
+# shellcheck source=lib-unattended.sh
+. "$HERE/lib-unattended.sh"
+rm -rf "$gh_d"
+# ---- AC7: a finished record over a README missing its build-index close refuses at check 9 before the
+# ---- rotation; a live record missing its generated close refuses before the claim write.
+build_aborted_run() { run --preflight tRun --keepalive-id k1 >/dev/null; sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md; fixture; }
+reset_tree; build_aborted_run
+mutate memory/builds/tRun/README.md '/^<!-- \/gen:build-index -->$/d'; fixture
+out=$(run --preflight tRun --keepalive-id k2); rc=$?
+same "GH32 AC7 a malformed README under a finished record exits 1" "$rc" "1"
+hit  "$out" "the build README's generated markers are malformed, and the unit list is DERIVED from there, so an unpaired marker is not something to guess around"
+miss "$out" "retired the finished record"
+same "GH32 AC7 ...and leaves the tree clean" "$(git status --porcelain)" ""
+build_claim_held
+mutate memory/builds/tRun/RUN.md '/^<!-- \/run:generated -->$/d'; fixture
+gu_sha=$(read_claim_ref tRun)
+out=$(run --preflight tRun --keepalive-id k1); rc=$?
+same "GH32 AC7 a live record missing its generated close exits 1" "$rc" "1"
+hit  "$out" "the run-state file's generated markers are malformed — exactly one open and one close, close after open"
+same "GH32 AC7 ...with its claim at the pre-call sha" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gu_sha"
+remove_claim_refs
+# ---- AC8: a session id carrying a carriage return refuses at write_lease, after the rotation; the
+# ---- refusal puts the finished record back, and the next clean call archives it.
+reset_tree; build_aborted_run
+gu_blob=$(git rev-parse HEAD:memory/builds/tRun/RUN.md)
+# REDIRECTED, never captured: on node a a carriage return in an environment value does not reach a
+# child started inside `$(...)`, so a captured call ran under `s1` and preflighted green. MEASURED.
+CLAUDE_CODE_SESSION_ID=$'s\r1' bash "$SCRIPT" --preflight tRun --keepalive-id k2 >"$GU_BIN/ac8.out" 2>&1; rc=$?
+out=$(cat "$GU_BIN/ac8.out")
+same "GH32 AC8 a refusal after the rotation exits 1" "$rc" "1"
+hit  "$out" "UNATTENDED check 17 FAILED"
+hit  "$out" "unattended: --preflight refused; the run-state file is unchanged"
+same "GH32 AC8 ...leaves the tree clean" "$(git status --porcelain)" ""
+same "GH32 AC8 ...the record at its HEAD blob" "$(git hash-object memory/builds/tRun/RUN.md)" "$gu_blob"
+same "GH32 AC8 ...and no archive" "$(ls memory/builds/tRun | grep -c '^RUN\.ABORTED\.')" "0"
+out=$(run --preflight tRun --keepalive-id k2)
+hit  "$out" "preflight OK"
+hit  "$out" "unattended: retired the finished record — memory/builds/tRun/RUN.md -> "
+# ---- AC9: the stage itself refused - a git shim failing only the run-state file's add.
+reset_tree; build_aborted_run
+out=$(PATH="$GU_BIN/add:$PATH" bash "$SCRIPT" --preflight tRun --keepalive-id k2 2>&1); rc=$?
+same "GH32 AC9 a refused stage exits 1" "$rc" "1"
+hit  "$out" "cannot stage the run-state file, and the gate leg's whole per-run population is the index, so an unstaged run is invisible to every check it has"
+hit  "$out" "unattended: --preflight refused; the run-state file is unchanged"
+same "GH32 AC9 ...leaves the tree clean" "$(git status --porcelain)" ""
+same "GH32 AC9 ...and no archive" "$(ls memory/builds/tRun | grep -c '^RUN\.ABORTED\.')" "0"
+# ---- AC10: the same refusal over a claim this call CREATED writes it aborted.
+arm_claim_fixture; build_aborted_run; remove_claim_refs
+out=$(PATH="$GU_BIN/add:$PATH" bash "$SCRIPT" --preflight tRun --keepalive-id k2 2>&1); rc=$?
+same "GH32 AC10 a refused stage under a created claim exits 1" "$rc" "1"
+same "GH32 AC10 ...prints one claim marked aborted line" "$(printf '%s\n' "$out" | grep -c '^unattended: claim marked aborted — tRun, created by this refused call$')" "1"
+same "GH32 AC10 ...and --claims reads it aborted, terminal" "$(bash "$SCRIPT" --claims 2>/dev/null | awk -F'\t' '$1 == "tRun" { print $3, $5 }')" "aborted terminal"
+remove_claim_refs
+# ---- AC11: over a claim this call RENEWED, the claim is left live and the record put back.
+build_claim_held
+gu_blob=$(git rev-parse HEAD:memory/builds/tRun/RUN.md)
+out=$(PATH="$GU_BIN/add:$PATH" bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1); rc=$?
+same "GH32 AC11 a refused re-preflight exits 1" "$rc" "1"
+same "GH32 AC11 ...prints one claim left line naming renew" "$(printf '%s\n' "$out" | grep -c '^unattended: claim left — tRun · renew · this call refused after it$')" "1"
+same "GH32 AC11 ...--claims reads it live" "$(bash "$SCRIPT" --claims 2>/dev/null | awk -F'\t' '$1 == "tRun" { print $3 }')" "live"
+same "GH32 AC11 ...and the record is at its HEAD blob" "$(git hash-object memory/builds/tRun/RUN.md)" "$gu_blob"
+remove_claim_refs; reset_tree
+# ---- AC12: after its claim write, verb_preflight returns 1 only inside the branch taken when
+# ---- write_preflight_record fails, so no refusal there skips the restore and the claim disposition.
+read_post_claim_returns() { # driver -> `<inside>:<outside>` counts of `return 1` after the claim write
+  sed -n '/^verb_preflight()/,/^}/p' "$1" | awk '
+    /! write_claim "\$slug" live / { cw = 1 }
+    cw && !past && /^  fi$/ { past = 1; next }
+    !past { next }
+    /^  if ! write_preflight_record; then$/ { inb = 1 }
+    /return 1/ { if (inb) good++; else bad++ }
+    inb && /^  fi$/ { inb = 0 }
+    END { print good + 0 ":" bad + 0 }'
+}
+same "GH32 AC12 verb_preflight's one post-claim return 1 is the restoring branch's" "$(read_post_claim_returns "$SCRIPT")" "1:0"
+# ---- AC15: a second remote added after preflight is check 24 to the soft claim read: one announced
+# ---- line, no check-24 failure, exit 0 and exactly one dispatch row.
+build_claim_held
+mkdir -p memory/builds/tRun/spec
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add -A >/dev/null && git commit -q -m gu-spec --no-verify
+git remote add gu-second "$ORIGIN"
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh); rc=$?
+git remote remove gu-second
+same "GH32 AC15 a dispatch reading claims under two remotes exits 0" "$rc" "0"
+same "GH32 AC15 ...prints one claims-not-read line naming check 24" "$(printf '%s\n' "$out" | grep -c '^unattended: claims not read — the clone does not declare exactly one remote, check 24$')" "1"
+miss "$out" "UNATTENDED check 24 FAILED"
+same "GH32 AC15 ...and writes exactly one dispatch row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md)" "1"
+rm -rf "$GU_BIN"; remove_claim_refs; reset_tree
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
 # ---- AC6: `--hold` refuses, numbered and before any record write, while a recorded bar is alive under
 # ---- a LIVE driver — this suite's own shell stands in for it — and proceeds once the bar has exited.
 init_pl_fixture
 sleep 63 & pl_bar=$!
-pl_tok=$(read_pl_token "$pl_bar")
+pl_tok=$(read_pl_exec_token "$pl_bar" sleep)
+n=$((n+1)); [ "$pl_tok" != - ] || { echo "FAIL AC6 fixture: the sleep $pl_bar never showed its exec'd image, so the record would carry no token and the hold arm grades an untokened record"; st=1; }
 mkdir -p "${PL_LEDGER%/*}"
 printf '%s %s %s - k1 2026-09-22T00:00:00Z sleep 63\n' "$pl_bar" "$pl_tok" "$$" > "$PL_LEDGER"
 pl_rb=$(run_pl_git hash-object memory/builds/tRun/RUN.md)
@@ -13308,7 +15128,8 @@ hit  "$out" "phase ABORTED"
 n=$((n+1)); [ ! -f "$PL_LEDGER" ] || { echo "FAIL AC12 --abort left the ledger of a finished run behind"; st=1; }
 init_pl_fixture
 sleep 67 & pl_bar=$!
-pl_tok=$(read_pl_token "$pl_bar")
+pl_tok=$(read_pl_exec_token "$pl_bar" sleep)
+n=$((n+1)); [ "$pl_tok" != - ] || { echo "FAIL AC12 fixture: the sleep $pl_bar never showed its exec'd image, so the record would carry no token and the KEPT arm grades an untokened record"; st=1; }
 mkdir -p "${PL_LEDGER%/*}"
 printf '%s %s %s - k1 2026-09-22T00:00:00Z sleep 67\n' "$pl_bar" "$pl_tok" "$$" > "$PL_LEDGER"
 n=$((n+1)); [ -f "$PL_LEDGER" ] || { echo "FAIL AC12 the fixture carries no ledger, so its survival proves nothing"; st=1; }
@@ -14394,6 +16215,71 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 1941 -> 1943 by TOOL-aMendedFleet-83: the VERIFYING stale-dossier arm's 2 lines, region two.
 # RAISED 1943 -> 1945 by TOOL-aMendedFleet-49: S8's drift-delta close arm, 2, COUNTED EITHER WAY, region two.
 # RAISED 1945 -> 1961 by TOOL-aMendedFleet-9: the held-job writer arms' 16 lines, region two.
+# RAISED 1877 -> 2007 by TOOL-aGraftedHelix-1: the run-claim block's 130 executed assertions in region
+# two, before its last block, MEASURED rather than counted: that block run alone behind this prologue
+# on node a, 2026-10-05, executed 146 against the prologue's own 20, plus the in-place landed arm's 4
+# run alone the same way, green against the kit and red
+# arm by arm against two driver copies carrying nineteen staged breaks; no suite ran in the pass.
+# RAISED 2007 -> 2033 by TOOL-aGraftedHelix-10: the hooked claim block's 26 executed assertions in
+# region two, its three `mutate` calls included, MEASURED: that block run alone behind this prologue
+# and the claim block's gh_ helpers on node a, 2026-10-05, executed 46 against the prologue's own 20,
+# green against the kit and red under three staged driver breaks and one fixture break; no suite ran.
+# RAISED 2033 -> 2045 by TOOL-aGraftedHelix-11: the lease-identity block's 12 executed assertions in
+# region two, its two `mutate` calls included, MEASURED: that block run alone behind this prologue
+# and the claim block's gh_ helpers on node a, 2026-10-05, executed 32 against the prologue's own 20,
+# green against the kit and red under two staged driver breaks and under the parent's driver; no
+# suite ran.
+# RAISED 2045 -> 2086 by TOOL-aGraftedHelix-12: the claim-cell block's 41 executed assertions in
+# region two, its three `mutate` calls included, MEASURED: that block run alone behind this prologue
+# and the claim block's gh_ helpers on node a, 2026-10-05, executed 61 against the prologue's own 20,
+# green against the kit and red under two staged driver copies, one per cell set; no suite ran.
+# RAISED 2086 -> 2099 by TOOL-aGraftedHelix-18: the holder-order arm's 13 executed assertions in
+# region two, its two `mutate` calls included, MEASURED: that block run alone behind this prologue
+# and the claim block's gh_ helpers on node a, 2026-10-05, executed 33 against the prologue's own 20,
+# green against the kit and red under the parent's driver and one staged driver copy; no suite ran.
+# RAISED 2099 -> 2114 by TOOL-aGraftedHelix-19: the claim-cell block's 8 new `beat` cells and the
+# mode-refusal arm's 7 executed assertions, its one `mutate` call included, all in region two,
+# MEASURED: the cell block run alone behind this prologue and the claim block's gh_ helpers on node
+# a, 2026-10-05, executed 74 against the prologue's own 20 before the refused-`--beat` pair landed,
+# and the mode-refusal arm alone executed 27 against the same 20, green against the kit and red under
+# staged driver copies; no suite ran.
+# RAISED 2114 -> 2127 by TOOL-aGraftedHelix-27: the hook, linked-kit and announcement arms' 13
+# executed assertions in region two, MEASURED: that block run alone behind this prologue and
+# `build_check_commit_fixture` on node a, 2026-10-05, executed 33 against the prologue's own 20,
+# green against the kit and red under the parent's lib and driver, a lib whose kit-dir derivation
+# asked git again, and a lib without the announcement line; no suite ran.
+# RAISED 2127 -> 2178 by TOOL-aGraftedHelix-20: the prior-session block's 51 executed assertions in
+# region two, its five `mutate` calls included, MEASURED: that block run alone behind this prologue
+# and the claim block's gh_ helpers on node a, 2026-10-05, executed 71 against the prologue's own 20,
+# green against the kit and red under six staged driver breaks, one per arm; no suite ran.
+# RAISED 2178 -> 2184 by TOOL-aGraftedHelix-22: the read-axis refusal arm's 6 executed assertions in
+# region two, its one `mutate` call included, MEASURED: that arm run alone behind this prologue and
+# the claim block's gh_ helpers on node a, 2026-10-05, executed 26 against the prologue's own 20,
+# green against the kit and red, three of them, with the read-axis membership test removed; no suite ran.
+# RAISED 2184 -> 2344 by TOOL-aGraftedHelix-23: the prior-session set block's 160 executed assertions
+# in region two, its thirteen `mutate` calls included, MEASURED: that block run alone behind this
+# prologue, the claim block's gh_ helpers and unit 20's prior-session helpers on node a, 2026-10-05,
+# executed 181 against the prologue's own 20 and the slice's one setup `mutate`, green against the
+# kit and red under staged driver copies, one break or one disjoint group of breaks per run; unit
+# 20's block, re-read for the set's empty cleared state, kept its 51; no suite ran.
+# RAISED 2344 -> 2370 by TOOL-aGraftedHelix-24: the interruption arm's 26 executed assertions in
+# region two, its two `mutate` calls included, MEASURED: that block run alone behind this prologue,
+# the claim block's gh_ helpers and unit 20's prior-session helpers on node a, 2026-10-05, executed
+# 46 against the prologue's own 20, green against the kit and red under the parent's driver, a
+# driver copy moving back the unreadable-claim path's add alone, and a shim that never fires; no
+# suite ran.
+# RAISED 2370 -> 2380 by TOOL-aGraftedHelix-25: the failed-add arm's 10 executed assertions in
+# region two, its one `mutate` call included, MEASURED: that arm run alone behind this prologue, the
+# claim block's gh_ helpers and the helpers of units 20 and 24 on node a, 2026-10-05, executed 30
+# against the prologue's own 20, green against the kit and red under a driver copy with the add's
+# `|| return 1` dropped; no suite ran.
+# RAISED 2380 -> 2399 by TOOL-aGraftedHelix-26: 19 executed assertions in region two, the exit and the
+# check-17 line added to unit 24's two interrupted calls and unit 25's failed add (6), and the
+# unreadable-trigger arm's 13, its one `mutate` call included, MEASURED: those blocks run alone behind
+# this prologue, the claim block's gh_ helpers and unit 20's prior-session helpers on node a,
+# 2026-10-05, executed 75 against 56 before, green against the kit and red under the parent's driver,
+# driver copies dropping each `fail 17` with its return kept, routing the unread claim to a second
+# unguarded add, and routing it into a CAS with an empty expected sha; no suite ran.
 # RAISED 1877 -> 1894 by TOOL-aEvidencedLens-21: the hostile-value matrix's 17 region-two assertions,
 # the --review one-line row (1), one exit-status verdict per matrix verb (14) and one per exemption
 # (2), measured on a slice of the block; no suite ran.
@@ -14406,7 +16292,42 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # MERGED at the reconcile of origin/main into aMendedFleet: both chains above start at 1877,
 # so the floor is base 1877 + aMendedFleet's 84 (1877 -> 1961) + origin/main's
 # 41 (1877 -> 1918) = 2002.
-FLOOR_ASSERTIONS=2002
+# MERGED at the second reconcile with origin/main: this side 2399 plus main's 41 over 1877 = 2440.
+# RAISED 2440 -> 2463 by TOOL-aGraftedHelix-30: the --authorization arms' 23 region-two assertions,
+# met and moving nothing (5), check 89 with one exits line (5), not evaluated twice and met again
+# (10), and the close's check 89 line plus the source arm (3), MEASURED on a slice of the borrowed-
+# record block behind this prologue on node a, 2026-10-05: 48 executed, green against the kit, every
+# arm red under the parent's driver (check 14), and each staged break - a fact write in the met
+# branch, the not-evaluated branch deleted, the chain inlined - red on its own arms alone; no suite ran.
+# RAISED 2463 -> 2482 by TOOL-aGraftedHelix-31: the --settle claim arms' 19 region-two assertions,
+# switched off (2), handed (8), lease-dead (2), legacy (2) and a foreign live claim (5), MEASURED on a
+# slice of the --settle block behind this prologue on node a, 2026-10-05: n 20 -> 39, and the handed,
+# lease-dead and foreign-claim arms red under the parent's driver; no suite ran.
+# RAISED 2482 -> 2488 by TOOL-aGraftedHelix-34 S2 and S5: closing-review arms 4 and 5 each assert the
+# length guard's sentence (2, region one), `--settle` driven against the finished record (2) and the
+# ledger AC6 and AC12 token-liveness arms (2, region two). MEASURED on slices behind this prologue on
+# node a, 2026-10-06: `cr` 38 -> 40, `s4pw` 35 -> 37, `pl` 79 -> 81, each red under its staged break;
+# no suite ran.
+# RAISED 2488 -> 2511 by TOOL-aGraftedHelix-36: 23 region-two assertions, the exec-marker record arm
+# (1, S9), the settle's claim retry (14, S4) and the claim-push lock (8, S10), counted off the block's
+# own `hit`/`miss`/`same` lines and each observed red under its staged break on a slice behind this
+# prologue on node a, 2026-10-06; no suite ran.
+# RAISED 2511 -> 2534 by TOOL-aGraftedHelix-37: the GH37 claim-push lock block's 23 region-two
+# assertions, the race (4), the abandoned-guard bound (12), the interleaving (3) and the owner (4),
+# each arm's own `mutate` included, counted off the block's `hit`/`same`/`mutate` lines and run as a
+# slice behind this prologue on node a, 2026-10-06 (n 2 -> 25), each arm red under its staged break
+# in a scratch copy of the driver; no suite ran.
+# RAISED 2534 -> 2536 by TOOL-aGraftedHelix-38 S4: rule 2's declared-pair arms in region two, the
+# stale-entry arm (a) and the call-structure arm (b), two inline assertions, run as a slice of the
+# prologue and rule 2's block on node a, 2026-10-06, each red under its staged break; no suite ran.
+# RAISED 2536 -> 2549 by TOOL-aGraftedHelix-39 S7: the one-derivation block beside the
+# `--check-commit` arms in region two, thirteen assertions (arms (a) to (d) eight, arm (e) five),
+# run as a slice of the prologue and that block on node a, 2026-10-06 (n 20 -> 33), green, and each
+# arm red under its staged break in a scratch copy of the kit; no suite ran.
+# MERGED at the reconcile of local main (aGraftedHelix) into origin/main (aMendedFleet): both chains
+# above start at the merge base's 1918, so the floor is base 1918 + aMendedFleet's 84 (1918 -> 2002)
+# + aGraftedHelix's 631 (1918 -> 2549) = 2633.
+FLOOR_ASSERTIONS=2633
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -14533,7 +16454,9 @@ PROLOGUE_ARMS=18
 # RAISED 233 -> 235: the rename-overlap arm's 2 region-one assertions, see FLOOR_ASSERTIONS.
 # RAISED 235 -> 254: TOOL-aMendedFleet-61's 19 region-one assertions, see FLOOR_ASSERTIONS.
 # RAISED 254 -> 265: TOOL-aMendedFleet-63's 11 region-one assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=265
+# RAISED 209 -> 211: the two closing-review guard-sentence arms, see FLOOR_ASSERTIONS.
+# MERGED at the reconcile of local main into origin/main: base 209 + aMendedFleet's 56 + aGraftedHelix's 2 = 267.
+FLOOR_SHARD_1=267
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
@@ -14544,13 +16467,36 @@ FLOOR_SHARD_1=265
 # RAISED 1688 -> 1690: TOOL-aMendedFleet-83's 2 region-two assertions, see FLOOR_ASSERTIONS.
 # RAISED 1690 -> 1692: TOOL-aMendedFleet-49 S8's 2 region-two assertions, see FLOOR_ASSERTIONS.
 # RAISED 1692 -> 1708: TOOL-aMendedFleet-9's 16 region-two assertions, see FLOOR_ASSERTIONS.
+# RAISED 1680 -> 1810: the same 130 region-two run-claim assertions, see FLOOR_ASSERTIONS.
+# RAISED 1810 -> 1836: the same 26 region-two hooked claim assertions, see FLOOR_ASSERTIONS.
+# RAISED 1836 -> 1848: the same 12 region-two lease-identity assertions, see FLOOR_ASSERTIONS.
+# RAISED 1848 -> 1889: the same 41 region-two claim-cell assertions, see FLOOR_ASSERTIONS.
+# RAISED 1889 -> 1902: the same 13 region-two holder-order assertions, see FLOOR_ASSERTIONS.
+# RAISED 1902 -> 1917: the same 15 region-two claim-cell and mode-refusal assertions, see FLOOR_ASSERTIONS.
+# RAISED 1917 -> 1930: the same 13 region-two hook, linked-kit and announcement assertions, see FLOOR_ASSERTIONS.
+# RAISED 1930 -> 1981: the same 51 region-two prior-session assertions, see FLOOR_ASSERTIONS.
+# RAISED 1981 -> 1987: the same 6 region-two read-axis refusal assertions, see FLOOR_ASSERTIONS.
+# RAISED 1987 -> 2147: the same 160 region-two prior-session set assertions, see FLOOR_ASSERTIONS.
+# RAISED 2147 -> 2173: the same 26 region-two interruption assertions, see FLOOR_ASSERTIONS.
+# RAISED 2173 -> 2183: the same 10 region-two failed-add assertions, see FLOOR_ASSERTIONS.
+# RAISED 2183 -> 2202: the same 19 region-two check-17 assertions, see FLOOR_ASSERTIONS.
 # RAISED 1680 -> 1697: the same 17 region-two matrix assertions, see FLOOR_ASSERTIONS.
 # RAISED 1697 -> 1706: the same 9 region-two --handoff matrix assertions, see FLOOR_ASSERTIONS.
 # RAISED 1706 -> 1721: the same 15 region-two check-89 admission assertions, see FLOOR_ASSERTIONS.
 # MERGED at the reconcile of origin/main into aMendedFleet: both chains above start at 1680,
 # so the floor is base 1680 + aMendedFleet's 28 (1680 -> 1708) + origin/main's
 # 41 (1680 -> 1721) = 1749.
-FLOOR_SHARD_2=1749
+# MERGED at the second reconcile with origin/main: this side 2202 plus main's 41 over 1680 = 2243.
+# RAISED 2243 -> 2266: the same 23 region-two --authorization assertions, see FLOOR_ASSERTIONS.
+# RAISED 2266 -> 2285: the same 19 region-two --settle claim assertions, see FLOOR_ASSERTIONS.
+# RAISED 2285 -> 2289: the settle drive and the two ledger token-liveness arms, see FLOOR_ASSERTIONS.
+# RAISED 2289 -> 2312: the same 23 region-two exec-marker, settle-retry and lock assertions, see FLOOR_ASSERTIONS.
+# RAISED 2312 -> 2335 by TOOL-aGraftedHelix-37: the same 23 region-two GH37 lock assertions, see FLOOR_ASSERTIONS.
+# RAISED 2335 -> 2337 by TOOL-aGraftedHelix-38: the same 2 region-two rule-2 pair assertions, see FLOOR_ASSERTIONS.
+# RAISED 2337 -> 2350 by TOOL-aGraftedHelix-39: the same 13 region-two one-derivation assertions, see FLOOR_ASSERTIONS.
+# MERGED at the reconcile of local main into origin/main: base 1721 + aMendedFleet's 28 (1721 -> 1749)
+# + aGraftedHelix's 629 (1721 -> 2350) = 2378.
+FLOOR_SHARD_2=2378
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

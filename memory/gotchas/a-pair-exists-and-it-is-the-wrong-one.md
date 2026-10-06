@@ -35,6 +35,19 @@ and wrote *"needs a matching PAIR before it blanks anything, and so does this no
 and was the sentence that kept the class open for another release. The regression arm those rounds
 left behind carries ONE apostrophe on its line, so it passes under the defect.
 
+The second instance is `tools/unattended/check-arms-groups.sh`, the structural group linter, at
+`TOOL-aGraftedHelix-38`. Its pass 1 frames a function by counting braces over lines with quoted
+pairs blanked, one LINE at a time, so a single quote opening a program that spans four lines had no
+partner on its line and blanked nothing. `check_helpers_hoisted` in
+`tools/unattended/check-unattended.test.sh` carries `\(\) *\{` in such a program; that brace was
+counted, the span never closed, every later line read as a function body, and the linter refused the
+suite as `parsed 0 group(s)`: 16 failing arm lines. The repair carries the open quote to the next
+line, and it met the class a second time on the way: blanking `"…"` pairs BEFORE `'…'` pairs, as the
+shared `strip` does, pairs a double quote inside `sed -n 's/"a"\("b"\)/\1/p' "$f"` with the one
+opening `"$f"`, swallowing the closing single quote between them, so the line read as opening a
+string it closes. Measured, that moved one correctly framed span in
+`tools/unattended/adopt-unattended.test.sh`; single-quoted pairs are now blanked first.
+
 ## The check
 
 **Ask what the delimiter OPENS, not whether it has a partner.** A quote opens a string literal only
@@ -59,3 +72,11 @@ each carrying TWO quotes on the fan-out line and each with a control that remove
 `mispaired quote: SAME LINE is the load-bearing part` is the one that names the placement, because
 the arm this class slipped past for a release put its single apostrophe on the line above. The
 un-hiding half is gated by the `no-regress: …` arms and by the property arm over the tracked corpus.
+
+The linter instance is gated by its own REFUSAL and its FRAME arms in
+`tools/unattended/check-arms-groups.test.sh`: a span that runs unclosed to the end of the file, or
+swallows a column-0 definition or `if in_shard` seam, exits 2 naming the function, the line it
+opened on and the first line it swallowed, so a mis-framing the quote tracking still misses — a
+multi-line double-quoted string or heredoc carrying a brace — is a named refusal rather than an
+anonymous empty parse. Un-hiding applied here too: the corrected framing returns the gate suite's
+own findings to the linter, which reports them.

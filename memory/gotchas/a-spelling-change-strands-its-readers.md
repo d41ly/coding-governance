@@ -50,6 +50,18 @@ and every program that is handed a value read from it, not only the ones that pa
 ask what it does with the value: resolve, compare, grep or open. Every compare, grep and open needs
 the resolution too.
 
+## A renumber is a spelling change
+
+`TOOL-aGraftedHelix-32` (the closing review of that build, L4). The run-claim refusals in
+`tools/unattended/unattended.sh` moved from checks 89 to 93 up to 107 to 111 before a merge brought
+in other checks at 89 and 90. The renumbering commit built its inventory from the driver, its
+suites, the confs and the templates, and exempted only the build records, so the codebase map's
+`memory/map/features/unattended-stops.md` went on sending a reader of the claim refusals to two
+unrelated live checks. A check number is a value other files spell, and a renumber strands every
+reader that spells it in prose. The documented check for a renumber: grep the whole tracked tree for
+each old number in that check's context, excluding only the build records, which are history,
+and list every hit in the commit message, fixed or left with a reason.
+
 ## Detection
 
 No machine gate. The candidate predicate, "a file naming the manifest carries the resolver block or

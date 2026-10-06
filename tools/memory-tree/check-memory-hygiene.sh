@@ -31,7 +31,7 @@ set -u
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.126   # gov:kit memory-tree@2.126 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.132   # gov:kit memory-tree@2.132 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -2495,8 +2495,10 @@ fi
 # 17-19 — the bug-class catalogue (delegates to the sibling module). The catalogue's INDEX is
 # generated, every class record declares a gate or says it has none, and a record whose anchors reach
 # only the append-only tree is reachable on paper and dead in practice.
-# PRINT WHATEVER IT SAID, then decide from the exit code, as the corpus_ids block above does: check
-# 19's dead-anchor advisory prints at exit 0, and the old `if ! got=$(...)` form discarded it.
+# PRINT WHATEVER IT SAID, then decide from the exit code, as the corpus_ids block above does. Two
+# lines print at exit 0 and a gate that swallowed them would turn each back into a silent skip: check
+# 19's dead-anchor advisory (TOOL-aMendedFleet-23), and an invariant guard or decision the module
+# could not resolve, ANNOUNCED inside its green output (TOOL-aGraftedHelix-3 S7), as check 20's is.
 if [ "$STAGED" = 0 ]; then
   got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); _gotrc=$?
   [ -n "$got" ] && printf '%s
@@ -2519,6 +2521,34 @@ if [ "$STAGED" = 0 ]; then
     printf '%s
 ' "$rowg"; status=1
     [ "$OFFENDERS" = 0 ] || add_offender_keys 20 $'\n'"$rowg"
+  fi
+fi
+
+# 27 — a decision row or gotcha ADDED since the mainline merge-base that ranks as a near match of an
+# older record must name it, or carry a relation token. Delegated to row_grammar.py, the row
+# grammar's owner, for the reason 20 and 24 are (TOOL-cSpliceWarden-6), and ranked with the
+# memory-recall kit's own index builder (TOOL-aGraftedHelix-9). Full runs only: it reads a commit
+# range, which a staged selection has no use for. The capture is printed on a GREEN run too, because
+# its summary line, or its NOT ARMED line, is the only evidence the check graded anything.
+if [ "$STAGED" = 0 ]; then
+  if relm=$("$_PY" "$HERE/row_grammar.py" --check-relations 2>&1); then
+    [ -z "$relm" ] || printf '%s\n' "$relm"
+  else
+    printf '%s\n' "$relm"; status=1
+    [ "$OFFENDERS" = 0 ] || add_offender_keys 27 $'\n'"$relm"
+  fi
+fi
+
+# 28 — a decision row or gotcha whose NORMALIZED text a record of another identity holds, one of the
+# holders added since the mainline merge-base: check 27's exact half (TOOL-aGraftedHelix-6).
+# Delegated to row_grammar.py for the reason 27 is, and full runs only for the same reason. The
+# capture is printed on a GREEN run too: its summary line is the only evidence anything was graded.
+if [ "$STAGED" = 0 ]; then
+  if contm=$("$_PY" "$HERE/row_grammar.py" --check-content 2>&1); then
+    [ -z "$contm" ] || printf '%s\n' "$contm"
+  else
+    printf '%s\n' "$contm"; status=1
+    [ "$OFFENDERS" = 0 ] || add_offender_keys 28 $'\n'"$contm"
   fi
 fi
 

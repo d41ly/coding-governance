@@ -1,0 +1,25 @@
+# Acceptance ledger — TOOL-aGraftedHelix-34
+
+**Serves:** journal TOOL-aGraftedHelix-34
+
+Node `a`, 2026-10-06. The build commit is `7dd6b08e`, over the pass's parent `bba0d484`, the spec's
+rev-3 commit; rev-2 (`70fc46a7`) withdrew rev-1's asks and rev-3 recorded what the slices below
+measured before the code landed. No merge bar and no self-test suite ran in this pass. Every slice
+was the suite's prologue plus the named blocks, written inside the kit directory of a
+`git clone --local` at `70fc46a7` under a short `%TEMP%` root carrying the build's suite and driver
+bytes, with `TMPDIR` there, run seven at a time. Those bytes equal the build commit's except the
+floor constants and their comments and the version markers, none of which a slice reads. Each staged
+break lived in a clone of its own with the build's bytes plus that one break, and a break that changed
+no byte refused itself. The suites themselves, the eight-shard identity and the pooled calibrate are
+the main loop's, at the close.
+
+**Evidences:** TOOL-aGraftedHelix-34
+- AC1 — `trgh1` — green, `(152 assertions executed)`, 786 s; with the parent's suite behind the build's driver it printed `FAIL AC3 an unanswering remote exits 2: expected [2], got [0]` and the missing check-109 sentence, and with `read_claims`' failed-fetch arm emptied so `CL_WHY` stays unset it printed the same AC3 line plus two more.
+- AC2 — `gh1` — green, `(150 assertions executed)` and `NONE` on its own line, 781 s; with the restore written `git remote set-url --push origin "$ORIGIN"` it printed the bare origin's path in place of `NONE`.
+- AC3 — `cr` — green at 40, `sa` green at 91 and `s4pw` green at 37, where the parent's slices printed rev-1's FAIL lines at 38, 91 and 35; the guard in the clone's `unattended.sh` widened to `-lt 0` redded `cr` twice on `records no usable pinned base`, `AUTH_SPEC_AUDIT_DERIVED=1` on fail 55's branch redded `sa` on the not-gradable sentence and `at BASE: (none)`, a ninth phase writer redded `s4pw` with `the driver has 9 phase writer(s)`, and `run_settle`'s refusal arm renamed away redded it on `--settle does not write over a recorded LANDED`.
+- AC4 — `s1` — green at 36, `c39` green at 11 with no `fixture no-op`, `g0` green at 9, each red at the parent per rev-1; a `--frobnicate)` arm in the driver's argv loop redded `s1` naming `--frobnicate(skill) --frobnicate(usage) --frobnicate(refusal)`, `verb_preflight` exempted in the clone's `check-unattended.sh` redded `c39` on `reads the phase fact directly inside verb_preflight()`, and `MA0_GRANT` respelled in the tTick README seed alone redded `g0` on the fixture's liveness line and the control's miss.
+- AC5 — `cc` — green at 17; the fleet line's count staged to `1` in the clone's `check-unattended.sh` redded the new hit on `check 23 fleet — 0 undeclared write(s) over`, and a stray write beside arm 3b's lane redded the silence assertion on a `check 23 SOLO` line while the fleet pair stayed green, as rev-3 states.
+- AC6 — `read_pl_exec_token` — under twelve fork loops, `read_pl_token` read at once after `sleep 30 &` moved 2 of 30 tokens and `read_pl_exec_token` moved 0 of 30; the build's `run_bounded` beside the real `write_proc_record` and `read_proc_token` moved 0 of 28 recorded wrappers, and the parent's moved 0 of 30 at that load and 0 of 98 recorded over 100 trials under twenty-four, the unobserved product red rev-3 records; the `pl` slice was green at 81, 485 s.
+- AC7 — `read_task_gone` — 30 kills of a fresh `sleep 300` by `taskkill //PID <w> //T //F` under twelve fork loops left the pid listed once when `tasklist` was read at once and none through `read_task_gone`; the `rt` slice was green, `10 passed, 0 failed`, 57 s; with `run_kill_tree` emptied in the tick copy it printed `7 passed, 3 failed`, AC4 and both AC13 kill arms, in 180 s, each after its bound.
+- AC8 — `bash tools/unattended/check-arms-groups.sh` — printed 25 findings at the parent and 25 at the build, identical once line numbers are dropped except the one G0 text S3 respelled; the invocation predicate read 70 · 91 · 63 · 101 · 52 · 55 · 44 · 449 at the parent and 123 · 91 · 107 · 101 · 122 · 132 · 130 · 114 at the build, max over mean 3.88 then 1.15; the sections after the new seams executed 72 (green but for the one self-scan), 34, 21, 38, 68, 32, 77, 50 and 126, the first region-8 section 108 and the prologue alone 0; the self-scan's awk over the whole cut file printed `graded=26` and no line, as over the parent's; no `name() {` definition is left between the first `in_shard` line and the floor line; the sorted-lines diff against the pre-cut file shows only the seam, normalization and hoist-comment lines; and the brief arms sliced away from `BRIEF` died on `BRIEF: unbound variable`.
+- AC9 — `python tools/govkit/govkit.py epoch --base 290d0d2d` — printed `epoch: unattended · clean · 1.81` at `7dd6b08e`; `bash tools/check-kit-versions.sh` printed `kit-versions: clean — 16 declared carrier(s) under tools/`; `KIT_UNATTENDED_VERSION` reads 1.81 against the parent's 1.80; `bash tools/unattended/adopt-unattended.sh --check` printed `in sync`.

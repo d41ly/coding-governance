@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.126 -->
+<!-- gov:kit memory-tree@2.132 -->
 # {{MEMORY_ROOT}}/ retention & hygiene
 
 `{{MEMORY_ROOT}}/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -355,13 +355,19 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
 17. **catalogue index freshness** — `gotchas/INDEX.md` byte-matches a fresh render.
 18. **a class declares its resolution** — every `kind: class` record names a gate or says in as many
     words that it has none. Silence is not acceptable: "no gate named" and "gate not yet written" are
-    indistinguishable from outside, and the second one quietly never happens.
+    indistinguishable from outside, and the second one quietly never happens. Every `kind: invariant`
+    record names a `decision:` this corpus DEFINES, carries all five sections non-empty, and opens its
+    `## Guarded by` with `no machine gate` or with backticked tokens alone, each a tracked path or a
+    leg name in the manifest `LEG_MANIFEST` names. A blank key, or an absent id-grammar kit, turns its
+    arm into a `NOT resolved` line printed at exit 0 — announced, never a red and never silent.
 19. **the record can actually fire** — a class record derives at least one anchor or is marked
     `universal`, and a record whose anchors reach ONLY the append-only tree is reported as INERT:
     reachable on paper, dead in practice. The `universal` set is budgeted (`UNIVERSAL_BUDGET`)
-    because every universal record is emitted on EVERY reviewer's checklist.
-    An anchor that selects no tracked path is reported by one NON-GATING `HYGIENE advisory check 19:`
-    line naming the counts, never the exit status; `gotchas.py --report` lists each one.
+    because every universal record is emitted on EVERY reviewer's checklist. An invariant is graded
+    the same way with no universal escape: unanchored or marked `universal` is a finding.
+    A class anchor that selects no tracked path is reported by one NON-GATING
+    `HYGIENE advisory check 19:` line naming the counts, never the exit status; `gotchas.py --report`
+    lists each one.
 
 20. **one id, one row per document** — within a single row document (the decision index, a backlog
     shard, and the rotated archive of either) an id appears at most once. An archive is recognised by
@@ -488,6 +494,38 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     cannot list its own sha. A tree that wants the same refusal at the moment a merge is CONCLUDED
     wires the module as a `commit-msg` hook, which is the one hook a clean `git merge` and a
     conflicted one both reach.
+
+27. **a new record that RESTATES an older one names it** — every decision row and every gotcha whose
+    identity is absent at the mainline merge-base is ranked against the records present there, with
+    the memory-recall kit's own index builder over each record's summary (a row's text after its id,
+    a gotcha's `description`). A top hit that reaches `NEAR_MATCH_GATE`'s floor in Jaccard similarity
+    AND shares a term of four or more characters is a NEAR MATCH, and the new record must name the
+    hit, name a successor the recall kit's superseded-by map holds for it, or carry `supersedes`,
+    `coexists-with` or `disputes`. It obliges a relation and never judges one. A hit that is a row of
+    the new row's own session slug is counted and not graded. Delegated to `row_grammar.py`, which
+    owns the row grammar; full runs only, because it reads a commit range. `red:<floor>` fails the
+    leg, `warn:<floor>` prints `WARN` lines and passes, BLANK is NOT ARMED and says so on every run,
+    and the kit ships it blank: a floor measured on another corpus is not a floor for yours, so
+    measure your own with `row_grammar.py --measure-relations <floor>` before arming it. An armed
+    run with no mainline base, or with no memory-recall kit installed, is a named refusal. Every
+    armed run prints one summary line with its counts, red or green.
+    NOT GRADED, and said out loud: a near match below the TOP hit; a paraphrase under the floor; a
+    bare relation token that names no record; a row edited in place, since the added set is decided
+    by identity alone; and two records added in the same range.
+
+28. **one TEXT is held by one record** — every decision row and every gotcha gets one normalized
+    content key: a row's text after its id, a gotcha's body after its front matter, with links
+    reduced to their text, ISO dates and `*`, `_` and backtick dropped, case and whitespace runs
+    folded, and a leading separator run stripped. A key held by two or more distinct identities
+    REDS when at least one holder is absent at the mainline merge-base, one finding per key naming
+    every holder. It is check 27's exact half. A key whose every holder had landed at the base is
+    counted and not reported, because nobody may edit or remove a landed append-only record; with
+    no mainline base every key is graded and the summary says so. Delegated to `row_grammar.py
+    --check-content`; full runs only. Every run prints one summary line, red or green. The remedy
+    is to reword or drop the record that has not landed.
+    NOT GRADED, and said out loud: a paraphrase, which is check 27's; an id held twice, which is
+    20's and 24's, so a `snapshot` carry-forward is one identity; any record kind but those two;
+    front matter; and a duplicate whose every holder had landed at the base.
 
 ## Record bindings — how a record names its spec
 
@@ -617,6 +655,31 @@ python {{KIT_DIR}}/gotchas.py --for-diff <base>..<head>
 ```
 
 Its stdout IS the checklist. A checklist nobody can finish is not a checklist.
+
+A record is a `kind: class` (the default), a `note`, a `superseded` class, or a `kind: invariant`: a
+ruling a reviewer keeps mistaking for a bug. An invariant carries a `decision:` key naming the ruling
+and five sections, `## Looks wrong`, `## Actually`, `## Do`, `## Do not` and `## Guarded by`; its
+anchors select it exactly as a class's do. The checklist ends with the by-design block, printed on
+every non-empty selection, `0` included:
+
+```text
+# by design — 1 invariant(s) this selection touches
+- <name> — <looks wrong> → <actually> (<decision id>)
+```
+
+The review harness cuts that block out of `checklist` and hands it to every lens and skeptic as
+intended behaviour, so a reviewer refutes a finding the ruling covers instead of re-reporting it.
+
+The block is read at the subject's BASE, so a change cannot write its own exemption: `--for-diff`
+reads it at the commit its range diffs from, and `--for-paths --base <rev>` at that revision. An
+invariant the subject adds, edits or takes out prints as a checklist item instead, and a header line
+names the base and how many there were:
+
+```text
+- [ ] NEW/CHANGED invariant <name> — verify the ruling before treating it as by design
+```
+
+`--for-paths` with no base reads the working tree, and its header line says so.
 
 ## Codebase-map interop
 

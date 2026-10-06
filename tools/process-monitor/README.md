@@ -27,6 +27,10 @@ Attribution is a property of the TREE, not of a row: a process is yours because 
 at a path you declared, which is what makes a `sleep 900` with a bare argv reapable and an unrelated
 editor invisible.
 
+Every kill is logged: `reap.py` appends one `tree-killed` line per kill target, after the read-back,
+to the health log under the git common dir that the orientation card counts (`TOOL-aGraftedHelix-8`).
+The line format is the header of the `health_log_py` block in `reap.py`.
+
 ## Adopting it
 
 ```bash

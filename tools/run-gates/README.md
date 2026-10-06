@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.28` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.29` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -199,6 +199,12 @@ It FAILS OPEN. The wait is bounded at a declared multiple of the TTL; on expiry 
 loudly, drops its ticket and proceeds unqueued. `GATE_TURNSTILE=0` disables it entirely. It never
 contributes to the exit code — a turnstile that can wedge a bar is worse than two bars.
 
+Every repair the runner makes on its own also appends one line to the health log under the git
+common dir, which the orientation card counts (`TOOL-aGraftedHelix-8`): `beacon-reaped`,
+`ticket-swept`, `scratch-swept`, `turnstile-expired`, `retry-passed` for a serial retry that passed,
+and one `dispatch-paused` per bar the memory pause held; the line format is the header of the
+`health_log_sh` block in `run-gates.sh`.
+
 ## `--print-profile` — the resolved profile, for a second reader
 
 `run-gates.sh --print-profile` prints what this run WOULD use and exits before the turnstile: no
@@ -212,11 +218,44 @@ it knows:
 | `queue` | the turnstile's bounded wait in seconds, the declared multiple of the TTL, derived before the verb exits |
 | `ceiling_max` | the largest positive leg `ceiling` in the resolved manifest, or `-` when no leg declares one; ABSENT when the manifest does not parse |
 | `ceilings` · `line` | whether per-leg ceilings are live here, and the profile line a bar prints |
+| `mempause` | the memory pause's effective threshold, `GATE_MEMPAUSE` over the row's own; 0 is off. A host that gives no reading shows as `mempause INERT` on `line` |
 
 The unattended kit's driver reads `wall`, `queue` and `ceiling_max` to size the backstop of its
 own bar (`TOOL-dDerivedDocket-27`): the wall is armed only after the queue, so the longest a
 healthy bar takes is the two together, and a wall below `ceiling_max` fires on a healthy bar that
 dispatches that leg.
+
+## The memory pause — `mempause=<pct>`
+
+The width is chosen once, from RAM, at start; the `mempause` knob watches what the legs then do to
+memory. Before every dispatch the runner reads used memory and HOLDS that dispatch while the reading
+sits above the threshold and a leg is still running. Every shipped row declares one, and the table
+argues its figure; a row that omits it, or `GATE_MEMPAUSE=0`, is off. `GATE_MEMPAUSE=<pct>` overrides
+the row alone, any other override prints one `run-gates: NOTE` and leaves the pause off, and a table
+value above 100 refuses.
+
+**A hold always ends**, so the knob costs speed and never a leg. Nothing polls: each decision happens
+when a leg completes, and a hold is released when the reading falls to the threshold (`fell`), when
+no leg is left running (`drained`), when the reading vanishes (`unread`), at the first completion
+after the block's `MEMPAUSE_HOLD` seconds, which `GATE_MEMPAUSE_HOLD` overrides (`bound`), or by the
+wall (`wall`). Under pressure that never falls the pool drains toward width 1 and keeps moving; the
+serial retry is never held.
+
+**The reading** is `/proc/meminfo`'s `MemTotal` against `MemAvailable`, or `MemFree` where the file
+has none, which on MSYS is Windows' own available figure; and the cgroup's usage over its limit under
+`GATE_CGROUP_ROOT`. The higher wins, read with shell builtins, so a decision spawns nothing.
+`GATE_MEMINFO=<path>` replaces the file. A host with neither, macOS among them, reads INERT: one
+`run-gates: NOTE` at start, `mempause INERT` on the profile line.
+
+**What it records.** Each episode is one row of the run record's `pauses` file, `<started-s> ·
+<ended-s> · <held-s> · <peak-pct> · <threshold> · <ended-by>`, TAB-separated; the verdict file gains
+`paused` and `paused_s`, the header `mempause`, and every bar prints one line after its pool drains:
+`memory: pause off`, `memory: no reading on this host, …`, `memory: no pause  (peak <p>% used, …)` or
+`memory: <k> pause(s), <s>s held  (…; fell <a>, bound <b>, drained <c>, unread <d>, wall <e>)`. Its
+peak varies with the host, so a reader comparing two bars' whole output filters it by name.
+`derive-ceilings.py` sets aside, as `paused`, any reading whose leg ran while one of its own run's
+episodes was open. `run-selftests.sh --pooled` carries the same block, byte-identical and
+parity-graded, holds its next suite the same way, and prints the same line; it keeps no `pauses` row.
 
 ## The scratch directory — owned, redirected and swept
 
@@ -257,6 +296,29 @@ run itself — can find it. The `header` is written before the first leg dispatc
 row and one redacted `<i>.out` copy land per leg; the `verdict` is written last, and ITS ABSENCE is
 the crash signal. `GATE_RUN_KEEP` run directories are kept, swept after the verdict and never before
 dispatch, so a crashed run's record survives the next few ordinary runs.
+
+A `<i>.leg` row, and a `<i>.retry.leg` row beside it for a leg retried alone, holds eight TAB-separated
+fields: `name · status · rc · seconds · started · ended · key · foreign`. `started` and `ended` are
+epoch nanoseconds. `foreign` is the run's census of foreign gate work over that attempt: the largest
+count of foreign process trees any sample saw from three census periods before the leg started until
+it ended, `0` when every sample saw none, `unknown` when the census could not see. The samples land in
+the record's `census` file, one line each: epoch second, count or `unknown`, and each tree's root as
+`<pid>:<token>`, never its command line, which can carry a credential. The first sample is taken
+before the first leg dispatches, then one every 60 s, which `GATE_CENSUS_EVERY` overrides with a
+positive integer; the header records the period as `census_every`. A first sample reading `unknown`
+prints one `run-gates: NOTE` line on stderr.
+
+**What the census counts, and what it cannot see.** One `ps -ef` snapshot per sample: a row is gate
+work when its whole line names a script some manifest leg runs, this runner or `run-selftests.sh`,
+or carries a word ending `.test.sh` or `selftest.py`. This bar's own ancestors and descendants never
+count, and a tree counts once, at its topmost matching process. It cannot see load shaped otherwise —
+another repository's build, an on-access scanner, an agent's own CPU — nor, on Windows, any process
+no MSYS shell spawned, so `0` means no foreign gate work and never a quiet host. Contention from this
+bar's own neighbours is the serial retry's to answer. It over-counts in the safe direction: a bar
+queued on the turnstile or a short command whose text names a gate script reads as foreign, which
+only sets a reading aside. `ps` failing, a header naming no PID or PPID column, or a snapshot holding
+no row for this runner reads `unknown`, never `0`. The bar's exit stops the sampler and the turnstile
+ticker, so neither outlives it to be counted by the next bar.
 
 A caller may pin the run id with `GATE_RUN_ID`, and the pre-push hook does, so its push line joins
 this run's line exactly. The runner reads the pin and then REMOVES it from its environment before any
@@ -337,6 +399,21 @@ It refuses a reading with no stated conditions, one for a leg the manifest does 
 node would have to be defaulted, and one that raises nothing. The row lands in the evidence file
 carrying its source, so a number somebody measured by hand never reads as one the runner watched,
 and `--check` names those legs apart from the rest.
+
+**Only a reading the census found free of foreign gate work argues a ceiling.** `derive-ceilings.py`
+admits a run-record reading only when its `foreign` field reads `0`, and sets the rest aside under
+one reason each, first match: a positive count is `contended`, and anything else, `unknown` or a
+seven-field row written before the census existed, is `uncensused`. `--report` prints a
+`# set aside:` line with the count per reason and an `aside` column per leg, and names a leg whose
+every reading was set aside on its own line rather than as UNBACKED; `--write` names the same counts
+on its summary line and, when everything was set aside, holds every evidence row rather than
+reporting DEAD PROBE, which stays for a record holding no reading at all. The census never lowers a
+ceiling: the evidence file stays monotone, and `--check` reads tracked files only.
+
+**`--observed` is the one uncensused route, and it stays admitted.** A reading taken outside the
+runner is admissible and uncensused, as TOOL-cMendedVintage-17 rules: it never passes through a run
+record, so no census reaches it and nothing filters it, and its `--how` text is the only record of
+the load it was taken under. Say in that text what else was running.
 
 **On a host with no runnable `timeout -k`, every ceiling is INERT** and the runner says so on
 stderr. Legs still run. A bound may cost you speed and may turn a hang into a verdict; it may never

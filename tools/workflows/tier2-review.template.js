@@ -1,6 +1,6 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.33', // gov:kit tier2-review@1.33 // gov:kit review-harness@1.33 — BOTH ids: the
+  version: '1.42', // gov:kit tier2-review@1.42 // gov:kit review-harness@1.42 — BOTH ids: the
   // second is this entry's REGISTRY id, and without it a deployer grepping the id the
   // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
@@ -111,7 +111,11 @@ function readOutputTokens() {
 //   intensity: "full" | "light",          // DEFAULTS to "full"; only the CALLER picks light, which runs
 //                                         // LIGHT_LENSES and names the lenses it skipped; a spec-audit refuses light
 //   checklist: "<preamble>\n- <item>\n  <continuation>" | ["<item>", ...], // the project's recurring
-//                                         // bug classes, each item swept by exactly one lens; absent -> a WARNING
+//                                         // bug classes, each item swept by exactly one lens; absent -> a WARNING.
+//                                         // The STRING form may carry the by-design block the checker prints
+//                                         // after its items (`# by design — <n> invariant(s) this selection
+//                                         // touches`, then `- ` lines): it is cut out before the items are
+//                                         // parsed and joins `byDesign`. The array form carries no block.
 //   workerType: "<agent type>" | "none" } // the type every finder and skeptic spawns as; absent -> Plan,
 //                                         // "none" -> the platform default. Under a type no judge writes a lens file,
 //                                         // so a deferred return's `durable` is false and a re-run re-dispatches every judge
@@ -206,13 +210,13 @@ if (workerType)
   log(`worker type ${workerType} — every finder and skeptic spawns as it and writes no find-*.json or verify-*.json, so this run's lens and batch results are NOT durable and a resume re-dispatches them`)
 // S7 - the context default is per-kind, and each is wrong if the other kind inherits it.
 const context = a.context || (isSpec ? 'the spec set under audit' : 'the cumulative diff landing on main')
-const byDesign = a.byDesign || 'none supplied'
+// `byDesign` is RESOLVED below, after the checklist's by-design block is cut out (TOOL-aGraftedHelix-3).
 // TOOL-aBoundedVerdict-14 S1/S2 - the fold-scoping inputs. `priorFindings` is deliberately NOT merged
 // into `byDesign`: they are different instructions. byDesign says "this is intended, do not report
 // it"; a prior finding says "this was reported and FIXED - check the fix, and do not re-raise the
-// original". Collapsing them loses the second half, which is the half this unit exists for. Measured
-// before building: byDesign is supplied by no caller anywhere in the tree, so smuggling load-bearing
-// content through it would put it in a field with a zero-use history.
+// original". Collapsing them loses the second half, which is the half this unit exists for. When
+// that unit measured, no caller filled `byDesign`; the checklist's by-design block now does, and it is
+// intended behaviour, never a fixed defect, so the two stay apart.
 const priorFindings = Array.isArray(a.priorFindings) ? a.priorFindings : []
 // F1 resolved: accept an explicit integer AND infer 2 when prior findings arrive without one, so a
 // caller cannot silently get a round-1 brief while handing over a previous round's confirmed set.
@@ -365,7 +369,10 @@ function parseChecklist(v) {
       else if (items.length) items[items.length - 1] += '\n' + line
       else pre.push(line)
     }
-    if (!items.length && v.trim())
+    // A remainder of `# ` header lines alone is ZERO items, not prose (TOOL-aGraftedHelix-3 S8): it is
+    // what the checker prints when it selects no class, once its by-design block is cut out, and it
+    // is announced below as supplied with no item. Prose with no item still refuses.
+    if (!items.length && pre.some((l) => l.indexOf('# ') !== 0))
       throw new Error('tier2-review: `checklist` must be ' + rule + '. Got a string with no line starting "- ": ' +
         JSON.stringify(v.slice(0, 80)) + '. Pass the items as an array instead.')
     return { preamble: pre.join('\n'), items: items }
@@ -377,8 +384,54 @@ function parseChecklist(v) {
     throw new Error('tier2-review: `checklist` must be ' + rule + '. Member ' + bad + ' is ' + JSON.stringify(v[bad]) + '.')
   return { preamble: '', items: v.slice() }
 }
-const checklist = parseChecklist(a.checklist)
+// TOOL-aGraftedHelix-3 S8 - the BY-DESIGN BLOCK (I4) the checker prints after its items: the head
+// `# by design — <n> invariant(s) this selection touches`, then one `- ` line per invariant the
+// selection touches, blank lines skipped, ending at the first other line. CUT OUT before the items are
+// parsed, because `parseChecklist` would sweep every entry as a bug class and every lens would hunt
+// intended behaviour. A head whose count disagrees with its entries REFUSES before any agent spawns:
+// a truncated block hands the lenses a partial list that reads as a whole one. String form only.
+const BY_DESIGN_HEAD = /^# by design — (\d+) invariant\(s\) this selection touches$/
+function extractByDesign(v) {
+  if (typeof v !== 'string') return { remainder: v, entries: null }
+  const lines = v.replace(/\r\n/g, '\n').split('\n')
+  const at = lines.findIndex((l) => BY_DESIGN_HEAD.test(l.replace(/\s+$/, '')))
+  if (at === -1) return { remainder: v, entries: null }
+  const claimed = Number(BY_DESIGN_HEAD.exec(lines[at].replace(/\s+$/, ''))[1])
+  const entries = []
+  let end = at + 1
+  for (; end < lines.length; end++) {
+    const line = lines[end].replace(/\s+$/, '')
+    if (!line) continue
+    if (line.indexOf('- ') !== 0) break
+    entries.push(line.slice(2))
+  }
+  if (entries.length !== claimed)
+    throw new Error('tier2-review: the checklist\'s by-design block claims ' + claimed + ' invariant(s) and carries ' +
+      entries.length + ' entry line(s). A truncated block would hand every lens a partial by-design list that reads ' +
+      'as a whole one; pass the checker\'s stdout whole.')
+  return { remainder: lines.slice(0, at).concat(lines.slice(end)).join('\n'), entries: entries }
+}
+const byDesignBlock = extractByDesign(a.checklist)
+const checklist = parseChecklist(byDesignBlock.remainder)
 const CHECKLIST_ITEMS = checklist.items
+// `byDesign` is the caller's KNOWN AND TRACKED issues THEN the block's INTENDED BEHAVIOUR, each under its
+// own label, so neither displaces the other: a caller's tracked list never erases the invariants, and a
+// block can never override what a caller said. `byDesignSources` is what the log and RUN INTEGRITY say.
+const BY_DESIGN_ENTRIES = byDesignBlock.entries || []
+const byDesignParts = []
+const byDesignSources = []
+if (a.byDesign) {
+  byDesignParts.push('Known and tracked — do not re-report:\n' + a.byDesign)
+  byDesignSources.push('the caller\'s byDesign')
+}
+if (BY_DESIGN_ENTRIES.length) {
+  byDesignParts.push('Intended behaviour — invariants this change touches:\n' + BY_DESIGN_ENTRIES.join('\n'))
+  byDesignSources.push(BY_DESIGN_ENTRIES.length + ' invariant(s) from the checklist\'s by-design block')
+}
+const byDesign = byDesignParts.length ? byDesignParts.join('\n') : 'none supplied'
+if (!byDesignSources.length)
+  byDesignSources.push('none supplied — no caller byDesign and ' + (byDesignBlock.entries ? 'a block of 0' : 'no block'))
+for (const s of byDesignSources) log('by-design: ' + s)
 const baseLooksPinned = isSpec || PINNED_SHA.test(String(base))
 if (!baseLooksPinned) {
   const why =
@@ -1568,6 +1621,8 @@ const synth = await agent(
         runningLensKeys.map((k) => `${k} ${checklistShares[k].length}`).join(', ') + `.\n`
       : `Checklist: NONE swept — ${a.checklist === undefined ? 'absent' : 'supplied with no item'}; a zero count is not ` +
         `evidence the project's recurring bug classes are absent.\n`) +
+    // TOOL-aGraftedHelix-3 S8 - where the by-design list came from, in the words the log used.
+    `By design: ${byDesignSources.join('; ')}.\n` +
     // TOOL-aEvidencedLens-4 S6 - spec kind only: the move check, and at round > 1 how the fold text was named.
     (isSpec
       ? `move check: ` + (!probeLive

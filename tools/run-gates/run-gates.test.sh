@@ -121,7 +121,12 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=293
+FLOOR_ASSERTIONS=324
+# MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
+# NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
+# `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
+# RAISED 278 -> 309 by TOOL-aGraftedHelix-7: arm 3a's `memory: ` presence check and section 11's
+# thirty memory-pause assertions, the FIFO half of 11g counted on a host with no mkfifo as well.
 # RAISED 289 -> 293 by TOOL-dThriftyLanding-12: 3i2's env-reader and stamp controls and the two
 # component-boundary assertions.
 # RAISED 288 -> 289 by TOOL-dThriftyLanding-8: section 3i2's merged-side-branch assertion.
@@ -169,6 +174,11 @@ LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
 # arms reading those bars red on a runner that was fine. LEGS_FILE keeps the inherited manifest for
 # the arms that grade it; no scratch bar reads it, and one that needs a manifest names its own.
 unset GATE_LEGS
+# THE MEMORY PAUSE IS OFF for every scratch bar here unless an arm sets it (TOOL-aGraftedHelix-7). The
+# shipped table turns it on, and it reads the HOST's memory: on a box above the threshold it narrows
+# the pool, and the arms that count concurrent legs through a rendezvous would red for the box rather
+# than the runner. Section 11 drives it over fixture readings, setting the knob per bar.
+export GATE_MEMPAUSE=0
 
 # 1. manifest well-formed: non-empty list; every leg has a non-empty name, an argv with a launcher
 #    AND a script (len >= 2), and argv[0] in the allowed set. An empty name is the runner's
@@ -560,8 +570,14 @@ s4=$(run_scratch 4); peaks4=$(peaks_now); n4=$(npeaks_now)
 # about it. The presence check right below is what keeps this filter from hiding its disappearance.
 # THE ACQUIRE LINE IS FILTERED TOO (TOOL-dDerivedDocket-26): it names the instant the bar acquired,
 # which two runs never share. The second presence check below keeps the filter from hiding it.
-f1=$(printf '%s\n' "$s1" | grep -v '^gate profile: ' | grep -v '^TMPDIR entries ' | grep -v '^gate queue: acquired ')
-f4=$(printf '%s\n' "$s4" | grep -v '^gate profile: ' | grep -v '^TMPDIR entries ' | grep -v '^gate queue: acquired ')
+# THE MEMORY LINE IS FILTERED TOO (TOOL-aGraftedHelix-7): `memory: ` names the peak used memory the
+# dispatch decisions read, a property of the host at that instant. The third presence check below
+# keeps the filter from hiding its absence.
+f1=$(printf '%s\n' "$s1" | grep -v '^gate profile: ' | grep -v '^TMPDIR entries ' | grep -v '^gate queue: acquired ' | grep -v '^memory: ')
+f4=$(printf '%s\n' "$s4" | grep -v '^gate profile: ' | grep -v '^TMPDIR entries ' | grep -v '^gate queue: acquired ' | grep -v '^memory: ')
+n=$((n+1))
+{ [ "$(printf '%s\n' "$s1" | grep -c '^memory: ')" = 1 ] && [ "$(printf '%s\n' "$s4" | grep -c '^memory: ')" = 1 ]; } \
+  || { echo "canary: a bar did not print exactly one 'memory: ' line, so arm 3a's filter is hiding its absence rather than its peak"; fail=1; }
 n=$((n+1))
 { [ "$(printf '%s\n' "$s1" | grep -c '^TMPDIR entries [0-9][0-9]*$')" = 1 ] \
   && [ "$(printf '%s\n' "$s4" | grep -c '^TMPDIR entries [0-9][0-9]*$')" = 1 ]; } \
@@ -1328,7 +1344,9 @@ printf '%s\n' "$o" | grep -q 'big' \
 #     deliberately two separate statements — a knob added to the table reds here until an author
 #     edits this line, which is the moment they read the invariant. Collapsing the two would remove
 #     the only forcing function a coverage knob would ever meet.
-PINNED_KNOBS="timeout wall width"
+# `mempause` joined at TOOL-aGraftedHelix-7: it holds a dispatch while used memory is high and every
+# hold ends, so it costs speed and never a leg — read against the invariant before it was pinned.
+PINNED_KNOBS="mempause timeout wall width"
 PTBL="$KITREL/gate-profiles.txt"
 n=$((n+1))
 if [ ! -f "$PTBL" ]; then
@@ -2879,14 +2897,21 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   check_hv_line "AC2 the retry line carries the final verdict" '^---- retry: green  \(1 retried, 0 failed\)$'
   check_hv_value "S2 its ledger row reads retried, which reuse never accepts" \
     "$(awk -F'\t' '$1 == "contended" { print $3 }' "$H1/.git/gate-ledger.tsv" 2>/dev/null)" retried
+  # TOOL-aGraftedHelix-8: a serial retry that PASSES healed a contended timeout, so it appends ONE I3
+  # line naming the leg and its first attempt's ceiling; the lone hang below FAILS its retry and adds none.
+  check_hv_value "AGH8 the passing retry appends one retry-passed line naming the leg and its first timeout" \
+    "$(awk -F'\t' '$2 == "run-gates" && $3 == "retry-passed" { print $4 }' "$H1/.git/health.log" 2>/dev/null)" "contended after a 2s timeout"
   unset HV_FLAG
   # ...and a leg that hangs ALONE, with no floor for this clone: zero neighbours, FAIL on its retry.
   printf '[{"name": "lone", "argv": ["bash", "fx/hang.sh"], "ceiling": 1}]\n' > "$HV/lone.json"
   rm -f "$HV/nofloor"
+  hv_rp0=$(awk -F'\t' '$3 == "retry-passed"' "$H1/.git/health.log" 2>/dev/null | wc -l | tr -d ' ')
   run_hv_bar "$H1" "$HV/lone.json" GATE_SPAWN_FLOOR="$HV/nofloor"
   check_hv_value "AC1 the lone hang exits 1" "$HV_RC" 1
   check_hv_line "AC1 its first timeout names ZERO neighbours" '^GATE retry  lone  \(timed out after 1s beside 0 neighbours; '
   check_hv_line "AC4 its second timeout is FAIL naming the missing calibration" '^GATE FAIL  lone  \(timed out after 1s, again on its serial retry; no spawn floor is recorded for this clone, so HOST was not measured\)$'
+  check_hv_value "AGH8 a retry that FAILS appends no retry-passed line" \
+    "$(awk -F'\t' '$3 == "retry-passed"' "$H1/.git/health.log" 2>/dev/null | wc -l | tr -d ' ')" "$hv_rp0"
 
   # 9g. AC4 — HOST. A planted 1 ms floor and a spawn seamed to cost 50 ms: a leg that times out twice
   #     is HOST and the bar exits 4.
@@ -2999,6 +3024,191 @@ check_pp_value "S3 a manifest that does not parse prints no ceiling_max line" \
   "$( ( cd "$PP/r" && env GATE_WALL= GATE_JOBS= GATE_PROFILES= GATE_PROFILE=minimal GATE_LEGS="$PP/broken.json" \
         bash $KIT_REL/run-gates.sh --print-profile 2>/dev/null ) | grep -c '^ceiling_max' )" 0
 rm -rf "$PP" 2>/dev/null || true
+
+# ================================================================================================
+# 11. THE MEMORY PAUSE. TOOL-aGraftedHelix-7. `mempause=<pct>` holds the NEXT dispatch while used
+#     memory sits above the threshold and a leg still runs, and every hold ends: `fell`, `bound`,
+#     `drained`, `unread`, or `wall` for one the wall's break left open. Every bar reads a FIXTURE
+#     meminfo through `GATE_MEMINFO`, written OUTSIDE the scratch repository so the tree never moves,
+#     and points `GATE_CGROUP_ROOT` at an empty directory so the host's cgroup files cannot vote. The
+#     table is this section's own, wall 0, so no capture waits on the wall watcher's poll. Each arm's
+#     legs carry names of their own: the ledger orders dispatch longest-first BY NAME, and a name one
+#     arm timed would reorder the next arm's dispatch away from the trace it states.
+MP=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the memory-pause arms"; exit 2; }
+mkdir -p "$MP/x" "$MP/cg"
+build_hv_repo "$MP/r"
+printf 't\t0\t0\twidth=3,timeout=0,wall=0\n' > "$MP/r/$KIT_REL/gate-profiles.txt"
+cat > "$MP/r/fx/mp.sh" <<'SH'
+#!/usr/bin/env bash
+# mp.sh <secs> [pre] [write <file> <pct> | rm <file>] — sleep, and act on a fixture meminfo before
+# (`pre`) or after the sleep.
+secs=$1; shift; pre=""
+[ "${1:-}" = pre ] && { pre=1; shift; }
+act=${1:-}; f=${2:-}; pct=${3:-}
+doit() {
+  case "$act" in
+    write) printf 'MemTotal: 1000 kB\nMemAvailable: %s kB\n' "$(( (100 - pct) * 10 ))" > "$f" ;;
+    rm) rm -f "$f" ;;
+  esac
+}
+[ -n "$pre" ] && doit
+sleep "$secs"
+[ -z "$pre" ] && doit
+exit 0
+SH
+( cd "$MP/r" && git add -A && git commit -qm mempause ) >/dev/null 2>&1
+write_mp_meminfo() { printf 'MemTotal: 1000 kB\nMemAvailable: %s kB\n' "$(( (100 - $2) * 10 ))" > "$1"; }
+run_mp_bar() { # run id · manifest · VAR=value… -> MP_OUT (stdout), MP_ERR (stderr) and MP_RC
+  ( cd "$MP/r" && env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_WALL= GATE_SELFTESTS= GATE_ATTRIBUTE= \
+      GATE_PROFILES= GATE_PROFILE= GATE_JOBS= GATE_MEMPAUSE= GATE_MEMPAUSE_HOLD= GATE_MEMINFO= \
+      GATE_TURNSTILE=0 GATE_CGROUP_ROOT="$MP/cg" GATE_RUN_ID="$1" GATE_LEGS="$2" "${@:3}" \
+      bash $KIT_REL/run-gates.sh >"$MP/x/out" 2>"$MP/x/err" ); MP_RC=$?
+  MP_OUT=$(cat "$MP/x/out"); MP_ERR=$(cat "$MP/x/err")
+}
+resolve_mp_record() { printf '%s' "$MP/r/.git/gate-run/$1"; }
+read_mp_leg() { awk -F'\t' -v k="$3" '{ print $k }' "$(resolve_mp_record "$1")/$2.leg" 2>/dev/null; }
+read_mp_ends() { cut -f6 "$(resolve_mp_record "$1")/pauses" 2>/dev/null | tr '\n' ' '; }
+check_mp_value() { # label · got · want -> one counted assertion
+  n=$((n+1))
+  [ "$2" = "$3" ] || { echo "canary: memory pause — $1: got [$2], wanted [$3]"; printf '%s\n' "$MP_OUT" | sed 's/^/    /'; fail=1; }
+}
+read_mp_key() { # VAR=value… -> the `mempause` key and the profile line --print-profile prints, TAB-joined
+  ( cd "$MP/r" && env GATE_PROFILES= GATE_PROFILE= GATE_JOBS= GATE_MEMPAUSE= GATE_MEMINFO= \
+      GATE_CGROUP_ROOT="$MP/cg" "$@" bash $KIT_REL/run-gates.sh --print-profile 2>/dev/null ) \
+    | awk -F'\t' '$1 == "mempause" { k = $2 } $1 == "line" { l = $2 } END { printf "%s\t%s", k, l }'
+}
+write_mp_meminfo "$MP/x/low" 10
+
+# 11a. AC1 — the knob, its override and its refusal, through --print-profile over this section's table.
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,mempause=80\n' > "$MP/x/t80.txt"
+_mpk=$(read_mp_key GATE_PROFILES="$MP/x/t80.txt" GATE_MEMINFO="$MP/x/low")
+check_mp_value "AC1 the key prints the row's 80" "${_mpk%%$'\t'*}" 80
+check_mp_value "AC1 the profile line carries mempause 80%" "$(case "${_mpk#*$'\t'}" in *'mempause 80%;'*) echo yes ;; esac)" yes
+_mpk=$(read_mp_key GATE_PROFILES="$MP/x/t80.txt" GATE_MEMINFO="$MP/x/low" GATE_MEMPAUSE=0)
+check_mp_value "AC1 GATE_MEMPAUSE=0 reaches the line as off" "$(case "${_mpk#*$'\t'}" in *'mempause off;'*) echo yes ;; esac)" yes
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,mempause=101\n' > "$MP/x/t101.txt"
+_mpo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/t101.txt" GATE_PROFILE= GATE_MEMPAUSE= bash $KIT_REL/run-gates.sh --print-profile 2>&1 ); _mprc=$?
+check_mp_value "AC1 a row carrying mempause=101 exits 2" "$_mprc" 2
+check_mp_value "AC1 and its refusal names the knob" "$(printf '%s\n' "$_mpo" | grep -c "knob 'mempause'")" 1
+_mpo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/t80.txt" GATE_PROFILE= GATE_MEMPAUSE=x GATE_MEMINFO="$MP/x/low" \
+          GATE_CGROUP_ROOT="$MP/cg" bash $KIT_REL/run-gates.sh --print-profile 2>&1 )
+check_mp_value "AC1 GATE_MEMPAUSE=x prints one NOTE" "$(printf '%s\n' "$_mpo" | grep -c '^run-gates: NOTE - GATE_MEMPAUSE=')" 1
+check_mp_value "AC1 and leaves the pause off" "$(printf '%s\n' "$_mpo" | awk -F'\t' '$1 == "line" && /mempause off;/ { c++ } END { print c + 0 }')" 1
+
+# 11b. AC5 — a held dispatch waits for the reading to FALL. A rewrites the meminfo to 10 % after 3 s.
+write_mp_meminfo "$MP/x/m5" 95
+printf '[{"name": "A5", "argv": ["bash", "fx/mp.sh", "3", "write", "%s", "10"]},\n {"name": "B5", "argv": ["bash", "fx/ok.sh"]},\n {"name": "C5", "argv": ["bash", "fx/ok.sh"]}]\n' \
+  "$MP/x/m5" > "$MP/x/ac5.json"
+run_mp_bar ac5 "$MP/x/ac5.json" GATE_MEMPAUSE=90 GATE_MEMINFO="$MP/x/m5"
+check_mp_value "AC5 the bar is green" "$MP_RC" 0
+check_mp_value "AC5 one episode, ending fell" "$(read_mp_ends ac5)" "fell "
+check_mp_value "AC5 it held 2 s or more" "$([ "$(cut -f3 "$(resolve_mp_record ac5)/pauses" 2>/dev/null)" -ge 2 ] 2>/dev/null && echo yes)" yes
+_mpae=$(read_mp_leg ac5 0 6)
+check_mp_value "AC5 B and C start no earlier than A ends" \
+  "$([ -n "$_mpae" ] && [ "$(read_mp_leg ac5 1 5)" -ge "$_mpae" ] && [ "$(read_mp_leg ac5 2 5)" -ge "$_mpae" ] && echo yes)" yes
+check_mp_value "AC5 the verdict file reads paused 1" "$(awk -F'\t' '$1 == "paused" { print $2 }' "$(resolve_mp_record ac5)/verdict")" 1
+check_mp_value "AC5 stdout carries one memory: 1 pause(s) line" "$(printf '%s\n' "$MP_OUT" | grep -c '^memory: 1 pause(s)')" 1
+
+# 11c. AC6 — a hold is BOUNDED per episode, and a hold with nothing running is DRAINED. B turns the
+#      pressure on as it ends at 1 s and D is held; C ends at 4 s, past D's 2 s bound, so D is
+#      released `bound`; E is held from then until A ends at 8 s and closes `drained`. B writes at its
+#      END, never its start: a start-of-leg write races C's own dispatch decision, and C held there
+#      turns every later episode into `drained` — observed twice in five runs before the move.
+write_mp_meminfo "$MP/x/m6" 10
+printf '[{"name": "A6", "argv": ["bash", "fx/mp.sh", "8"]},\n {"name": "B6", "argv": ["bash", "fx/mp.sh", "1", "write", "%s", "95"]},\n {"name": "C6", "argv": ["bash", "fx/mp.sh", "4"]},\n {"name": "D6", "argv": ["bash", "fx/ok.sh"]},\n {"name": "E6", "argv": ["bash", "fx/ok.sh"]}]\n' \
+  "$MP/x/m6" > "$MP/x/ac6.json"
+_mpt0=$(date +%s)
+run_mp_bar ac6 "$MP/x/ac6.json" GATE_MEMPAUSE=90 GATE_MEMPAUSE_HOLD=2 GATE_MEMINFO="$MP/x/m6"; _mprc6=$MP_RC
+_mpt1=$(date +%s)
+check_mp_value "AC6 one episode ends bound and one drained" "$(read_mp_ends ac6)" "bound drained "
+check_mp_value "AC6 every leg reports" "$(printf '%s\n' "$MP_OUT" | grep -c '^GATE ok ')" 5
+check_mp_value "AC6 the bar finishes inside 60 s" "$([ $(( _mpt1 - _mpt0 )) -lt 60 ] && echo yes)" yes
+write_mp_meminfo "$MP/x/m6" 10
+run_mp_bar ac6off "$MP/x/ac6.json" GATE_MEMPAUSE=0 GATE_MEMINFO="$MP/x/m6"
+check_mp_value "AC6 its exit equals the same fixture's with the pause off" "$_mprc6" "$MP_RC"
+
+# 11d. AC7 — no reading is INERT, announced once, and never 0 % used.
+printf '[{"name": "A7", "argv": ["bash", "fx/ok.sh"]}]\n' > "$MP/x/one.json"
+run_mp_bar ac7 "$MP/x/one.json" GATE_MEMPAUSE=90 GATE_MEMINFO="$MP/x/no-such-meminfo"
+check_mp_value "AC7 one NOTE names the pause INERT" "$(printf '%s\n' "$MP_ERR" | grep -c '^run-gates: NOTE .*memory pause is INERT')" 1
+check_mp_value "AC7 the profile line carries mempause INERT" "$(printf '%s\n' "$MP_OUT" | grep -c '^gate profile: .*mempause INERT;')" 1
+check_mp_value "AC7 no pauses row is written" "$(cat "$(resolve_mp_record ac7)/pauses" 2>/dev/null | wc -l | tr -d ' ')" 0
+check_mp_value "AC7 the summary line opens memory: no reading" "$(printf '%s\n' "$MP_OUT" | grep -c '^memory: no reading')" 1
+
+# 11e. AC12 — a reading that VANISHES mid-hold releases it as `unread`, at once.
+write_mp_meminfo "$MP/x/m12" 95
+printf '[{"name": "A12", "argv": ["bash", "fx/mp.sh", "3", "rm", "%s"]},\n {"name": "B12", "argv": ["bash", "fx/ok.sh"]},\n {"name": "C12", "argv": ["bash", "fx/ok.sh"]}]\n' \
+  "$MP/x/m12" > "$MP/x/ac12.json"
+run_mp_bar ac12 "$MP/x/ac12.json" GATE_MEMPAUSE=90 GATE_MEMINFO="$MP/x/m12"
+check_mp_value "AC12 one episode, ending unread" "$(read_mp_ends ac12)" "unread "
+_mpae=$(read_mp_leg ac12 0 6)
+check_mp_value "AC12 B and C dispatch at A's end" \
+  "$([ -n "$_mpae" ] && [ "$(read_mp_leg ac12 1 5)" -ge "$_mpae" ] && [ "$(read_mp_leg ac12 2 5)" -ge "$_mpae" ] && echo yes)" yes
+
+# 11f. AC13 — the wall fires during a hold: its episode closes `wall`, the verdict carries both keys.
+write_mp_meminfo "$MP/x/m13" 95
+printf '[{"name": "A13", "argv": ["bash", "fx/mp.sh", "10"]},\n {"name": "B13", "argv": ["bash", "fx/ok.sh"]}]\n' > "$MP/x/ac13.json"
+run_mp_bar ac13 "$MP/x/ac13.json" GATE_JOBS=2 GATE_WALL=3 GATE_MEMPAUSE=90 GATE_MEMINFO="$MP/x/m13"
+check_mp_value "AC13 the walled run is red" "$MP_RC" 1
+check_mp_value "AC13 its open episode closes wall" "$(read_mp_ends ac13)" "wall "
+check_mp_value "AC13 the verdict file carries paused and paused_s" \
+  "$(awk -F'\t' '$1 == "paused" || $1 == "paused_s" { c++ } END { print c + 0 }' "$(resolve_mp_record ac13)/verdict")" 2
+check_mp_value "AC13 stdout carries one memory: line" "$(printf '%s\n' "$MP_OUT" | grep -c '^memory:')" 1
+# S5's THIRD verdict writer, the refusal of a manifest whose every leg is held, carries both keys too:
+# AC5 reads the ordinary writer and AC13 the wall's, and a key dropped from this one read green.
+printf '[{"name": "K5", "argv": ["bash", "fx/ok.sh"], "subject": "kit"}]\n' > "$MP/x/held.json"
+run_mp_bar held "$MP/x/held.json"
+check_mp_value "S5 the held-only refusal's verdict file reads REFUSED and carries paused and paused_s" \
+  "$(awk -F'\t' '$1 == "verdict" { v = $2 } $1 == "paused" || $1 == "paused_s" { c++ } END { print v "|" c + 0 }' "$(resolve_mp_record held)/verdict" 2>/dev/null)" "REFUSED|2"
+
+# 11g. AC14 — the FORCED-PROGRESS branch decides too. First the block alone: an episode open, the
+#      reading above the threshold, `check_dispatch_pause 0` dispatches and closes it `drained`.
+_mpb=$( awk '/^# >>> mempause_sh/,/^# <<< mempause_sh/' "$KITDIR/run-gates.sh" | tr -d '\r' )
+write_mp_meminfo "$MP/x/m14" 95
+_mpo=$( GATE_MEMINFO="$MP/x/m14" GATE_CGROUP_ROOT="$MP/cg" bash -c "$_mpb"'
+  MEMPAUSE=90; MEMPAUSE_INERT=0; MEMPAUSE_ROWS="$1"
+  check_dispatch_pause 2; a=$?; check_dispatch_pause 0; b=$?
+  printf "%s %s %s" "$a" "$b" "$(cut -f6 "$1")"' _ "$MP/x/rows14" )
+check_mp_value "AC14 the block holds with a leg running, then check_dispatch_pause 0 dispatches as drained" "$_mpo" "0 1 drained"
+#      Then the branch itself, which only a race reaches, made deterministic: the walk is [C, A, Y] and
+#      the dispatch [A, Y, C] from the ledger a seed bar writes, so Y's completion starts a pass whose
+#      FIRST candidate is C. That decision reads a FIFO whose writer answers only once A's `.leg` row
+#      exists and a second more has passed, so C is held with NOTHING left running, and the next
+#      dispatch is the forced branch's. Without its decision the episode outlives the loop as `wall`.
+printf '[{"name": "C14", "argv": ["bash", "fx/ok.sh"]},\n {"name": "A14", "argv": ["bash", "fx/mp.sh", "3"]},\n {"name": "Y14", "argv": ["bash", "fx/mp.sh", "0.5"]}]\n' \
+  > "$MP/x/ac14.json"
+cat > "$MP/x/serve.sh" <<'SH'
+#!/usr/bin/env bash
+# serve.sh <fifo> <file to await> — reads 1 to 3 (the INERT probe and the first two dispatches) answer
+# 10 %; read 4 answers 95 % once <file to await> exists and one more second has passed; later reads 95 %.
+f=$1; await=$2; c=0
+while :; do
+  exec 3>"$f" || exit 0
+  c=$((c + 1)); pct=95
+  if [ "$c" -le 3 ]; then pct=10
+  elif [ "$c" -eq 4 ]; then
+    for _ in $(seq 1 200); do [ -f "$await" ] && break; sleep 0.1; done
+    sleep 1
+  fi
+  printf 'MemTotal: 1000 kB\nMemAvailable: %s kB\n' "$(( (100 - pct) * 10 ))" >&3
+  exec 3>&-
+done
+SH
+n=$((n+1))
+if ! mkfifo "$MP/x/fifo" 2>/dev/null; then
+  echo "canary: SKIP arm 11g's forced-branch half — this host has no mkfifo, so the FIFO that holds a decision until the last leg is gone cannot be built"
+else
+  run_mp_bar ac14seed "$MP/x/ac14.json" GATE_JOBS=2 GATE_MEMPAUSE=0
+  bash "$MP/x/serve.sh" "$MP/x/fifo" "$(resolve_mp_record ac14)/1.leg" >/dev/null 2>&1 & _mpsv=$!
+  run_mp_bar ac14 "$MP/x/ac14.json" GATE_JOBS=2 GATE_MEMPAUSE=90 GATE_MEMINFO="$MP/x/fifo"
+  # A writer blocked opening the FIFO is released by a read-write open, which never blocks itself.
+  kill "$_mpsv" 2>/dev/null; exec 4<>"$MP/x/fifo"; exec 4>&-; wait "$_mpsv" 2>/dev/null
+  if [ "$MP_RC" = 0 ] && [ "$(read_mp_ends ac14)" = "drained " ]; then :; else
+    echo "canary: memory pause — AC14 the forced branch's held leg closed [$(read_mp_ends ac14)] with exit $MP_RC, wanted [drained ] and 0"
+    printf '%s\n' "$MP_OUT" | sed 's/^/    /'; fail=1
+  fi
+fi
+rm -rf "$MP" 2>/dev/null || true
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

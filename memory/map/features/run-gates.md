@@ -31,7 +31,8 @@ gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md",
   "a-new-leg-trips-a-growing-set-of-meta-gates.md",
   "signal-trap-runs-the-exit-handler-twice.md",
   "async-job-starts-with-sigint-ignored.md",
-  "decision-re-derived-by-a-second-process.md"]
+  "decision-re-derived-by-a-second-process.md",
+  "canary-waits-on-a-rendezvous-not-a-clock.md", "sweep-issues-no-cost-verdict.md"]
 guides = ["MERGE-BAR.md"]
 backlog-shards = []
 lexicon-verbs = []
@@ -121,11 +122,6 @@ as well as of the tree; every other leg naming a network verb builds its origin 
 That is the population the `impure` key declares, as `TOOL-aPacedTurnstile-5` measured.
 
 
-**The leg manifest is the kit dir's SIBLING, derived and never spelled.** `<prefix>/gate-legs.json`,
-computed from the runner's own location. A hardcoded `tools/gate-legs.json` resolves to nothing at any
-other install prefix, which is where this kit installs. `GATE_LEGS` outranks the derivation, so a
-harness's nested run never re-enters the real bar.
-
 **One leg here grades the DEPLOYER's work rather than the runner's.** `receipt sync` reads
 `.governance/install.json` and reds when an engine row's file is missing or no longer hashes to its
 recorded sha256. It lives here because every adopter installs this kit; the reader that already
@@ -153,11 +149,6 @@ the toplevel from inside the kit dir and from inside the target, and compares th
 Under MSYS one directory has two spellings — a `/tmp/...` mount and the `/c/Users/.../Temp/...` it
 resolves to — and mount points are not symlinks, so a prefix strip across the two reports a kit
 sitting INSIDE the target as being outside it.
-
-**The report tail is a two-space contract.** `<verb>  <leg name>  <tail>` on every verb, so a reader
-splits the remainder on a double space and recovers the bare leg name. A single space truncates any
-leg name containing one, and the deployer reads a target's verdicts exactly that way. The gov-only canary forbids a double space inside a leg NAME,
-which is what makes the split unambiguous rather than usually right.
 
 **The pool's knobs are DECLARED, and no knob may make the bar check less.** `gate-profiles.txt`
 maps detected cores and RAM to a named row; the FIRST row satisfying both thresholds wins and the
@@ -204,6 +195,10 @@ world moved past is indistinguishable from one nobody measured. `TOOL-dDerivedDo
 **An INHERITED leg is aged and owned, and a landable red is stamped apart.** Under `GATE_INHERITED_RED_MAX_AGE=<n>` each INHERITED leg runs once more at R~n and, when not red there, a first-parent bisection names the landing that introduced it; a probe that cannot answer, a no-`signature` leg red there without every non-blank line of L's output included, reads `age unproven`; the three columns go before the reason. The age decides no landing (`TOOL-dUnstuckLanding-16`): under an exported `land` with every red leg INHERITED, at any age and with or without a bound, `gate-inherited-green` records R and `max_age`, empty when none was handed, and never touches `gate-full-green`. The pre-push hook reads the policy at the remote sha, trusts that stamp only at the same R and bound, and lands an inherited-only red on an unmoved tree. `TOOL-dDerivedDocket-24`.
 
 **`--print-profile` carries a backstop's two terms.** `queue` is `TS_MAXWAIT`, derived above the verb's exit so it never reads 0, and `ceiling_max` the manifest's largest positive ceiling by the parse's own predicate: `-` for none, absent for a manifest that will not parse. The unattended driver sizes its bar's backstop from them. `TOOL-dDerivedDocket-27`.
+
+**Only a census-clean reading argues a ceiling.** A `.leg` row's eighth field, `foreign`, is the most foreign gate-work trees the run's `census` saw, or `unknown`; it misses other load and Windows processes no MSYS shell spawned. `derive-ceilings.py` sets the rest aside as `contended` or `uncensused`; `--observed` stays admitted, uncensused. `cleanup` stops the turnstile ticker later censuses counted. `TOOL-aGraftedHelix-5`.
+
+**A dispatch waits out memory pressure, and every wait ends.** `mempause` holds the next leg while used memory is above its row's threshold and a leg runs; the `mempause_sh` block both dispatchers carry releases it `fell`, `drained`, `unread`, `bound` or `wall`, so a pool narrows and never deadlocks. Each episode is a `pauses` row, and `derive-ceilings.py` sets its legs' readings aside as `paused`. `TOOL-aGraftedHelix-7`.
 
 **A waiting bar beats.** On every tick it waits, the turnstile rewrites `gate-queue-heartbeat` under its own worktree's git dir, beside `gate-logs/`, and never removes it, so an out-of-process liveness reader sees a queued bar move before its first leg lands; the unattended driver's clock reads its mtime. `TOOL-dDerivedDocket-64`.
 

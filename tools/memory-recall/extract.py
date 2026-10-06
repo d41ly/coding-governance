@@ -2,7 +2,7 @@
 """Build the retrieval document sets from the tracked corpus under ``$MEMORY_ROOT``.
 
 Ported from adopter ic ``scripts/recall/extract.py`` at 5318064 (file last changed 958bd35c3; fd6274d
-is that revision's tip and never touched this file). The fork is SIX constructs wide, so a future
+is that revision's tip and never touched this file). The fork is SEVEN constructs wide, so a future
 re-pull is a three-way merge rather than archaeology: (1) ``FAMILIES``; (2) BOTH halves of the
 session era inside ``ERAS`` -- the node-tag class, and the trailing ``[a-z]*`` that keys this
 corpus's ratified correction-id form (``TOOL-aDrainedSluice-<n>b``), which upstream never mints and
@@ -13,8 +13,10 @@ sixth: two of its three lines are load-bearing (without ``CONF``, ``FAMILIES = C
 NameError, so a re-pull that drops them fails loudly), but ``dont_write_bytecode`` is the whole of
 the kit's "writes nothing inside your worktree" property on this file and a re-pull can drop it in
 silence -- the .pyc lands next to the source, inside the adopter's tree, and ``git status`` is
-clean anyway because ``__pycache__/`` is a near-universal ignore rule. Everything else is
-upstream's, byte for byte.
+clean anyway because ``__pycache__/`` is a near-universal ignore rule; (7) the supersession
+derivation, ``extract_supersessions`` and ``derive_supersession_map`` beside ``extract_records``
+and the ``superseded`` report line (TOOL-aGraftedHelix-4). Everything else is upstream's, byte for
+byte.
 
 Rebuilt instrument for the upstream recall measurement. The original harness lived in a session
 scratchpad and was lost with the session, which made every number it produced unfalsifiable. This
@@ -652,6 +654,76 @@ def extract_records(path: str, text: str) -> list[dict]:
     return docs
 
 
+# --- supersession (TOOL-aGraftedHelix-4) ----------------------------------------------------------
+# Three spellings, pinned by the unit's spec §4 and measured over this corpus there. P1 and P2 read a
+# record's TEXT; P3 reads a spec's STATUS LINE, which no record's text holds because a spec's H1
+# record is its title row only (TOOL-aRepatriatedFork-40). An edge is PARTIAL when the id is followed
+# at once by a possessive or by `for` -- "SUPERSEDES <id>'s PREMISE" retires a clause, not a record.
+_SUP_W = r"[`*\[]*"  # optional wrapping before an id
+SUPERSEDE_P1 = re.compile(r"\bsupersed(?:e|es|ing)\s+" + _SUP_W + "(" + ID + r")\b", re.I)
+SUPERSEDE_P2 = re.compile(r"\bsuperseded\s+by\s+" + _SUP_W + "(" + ID + r")\b", re.I)
+SUPERSEDE_P3 = re.compile(
+    r"\bsuperseded[ -]by\s+((?:" + _SUP_W + ID + r"\b[`*\]]*[\s,]*)+)", re.I)
+SUPERSEDE_PARTIAL = re.compile(r"^[`*\]]*(?:['’]s\b|\s+for\b)", re.I)
+
+
+def extract_supersessions(path: str, text: str, records: list[dict]) -> list[tuple[str, str, str, str]]:
+    """Candidate edges ``(old, new, kind, pattern)`` from one file; ``kind`` is whole or partial.
+
+    ``records`` is what ``extract_records`` returned for this file. P1 (``supersedes <id>``) makes
+    the cited id old and the record new; P2 (``superseded by <id>``) the reverse; P3 is a
+    ``superseded by``/``superseded-by`` list on the ``**Status:** `` line in a spec's first five
+    lines, old being the id its H1 defines. A self-edge is skipped. Nothing here checks that an id
+    exists: ``derive_supersession_map`` does, over the whole walk.
+    """
+    edges: list[tuple[str, str, str, str]] = []
+
+    def add(old: str, new: str, after: str, pattern: str) -> None:
+        if old != new:
+            kind = "partial" if SUPERSEDE_PARTIAL.match(after) else "whole"
+            edges.append((old, new, kind, pattern))
+
+    for r in records:
+        t = r["text"]
+        for m in SUPERSEDE_P1.finditer(t):
+            add(m.group(1), r["id"], t[m.end(1):], "P1")
+        for m in SUPERSEDE_P2.finditer(t):
+            add(r["id"], m.group(1), t[m.end(1):], "P2")
+    h1 = load_parse_spec_h1()(path, text, CONF.memory_root, CONF.families)
+    if h1:
+        for line in text.split("\n")[:5]:
+            if not line.startswith("**Status:** "):
+                continue
+            for m in SUPERSEDE_P3.finditer(line):
+                for i in ID_RE.finditer(m.group(1)):
+                    add(h1[1], i.group(0), line[m.start(1) + i.end():], "P3")
+    return edges
+
+
+def derive_supersession_map(edges, defined) -> tuple[dict, dict]:
+    """``({old: [[new, kind], …]}, counts)`` over the edges whose two ends ``defined`` holds.
+
+    An edge naming an id no record anchors is dropped and its id counted UNRESOLVED -- never kept,
+    never minted. ``counts`` carries the map size, how many ids hold a whole edge and how many only
+    partial ones, the kept edges per pattern and kind, and the unresolved ids.
+    """
+    smap: dict[str, set] = {}
+    per = {p: {"whole": 0, "partial": 0} for p in ("P1", "P2", "P3")}
+    unresolved: set[str] = set()
+    for old, new, kind, pattern in edges:
+        missing = {i for i in (old, new) if i not in defined}
+        if missing:
+            unresolved |= missing
+            continue
+        if (new, kind) not in smap.setdefault(old, set()):
+            smap[old].add((new, kind))
+            per[pattern][kind] += 1
+    out = {old: [list(e) for e in sorted(smap[old])] for old in sorted(smap)}
+    whole = sum(1 for v in out.values() if any(k == "whole" for _, k in v))
+    return out, {"ids": len(out), "whole": whole, "partial": len(out) - whole,
+                 "patterns": per, "unresolved": sorted(unresolved)}
+
+
 def extract_chunks(
     path: str, text: str, chunk_max: int = CHUNK_MAX, overlap: float = 0.0
 ) -> list[dict]:
@@ -756,15 +828,18 @@ def main() -> int:
     records, chunks = [], []
     anchors: dict[str, list[str]] = defaultdict(list)
     cited: set[str] = set()
+    sup_edges: list[tuple[str, str, str, str]] = []
 
     for path in files:
         text = read(repo, path, rev)
         if not text:
             continue
         cited.update(ID_RE.findall(text))
-        for d in extract_records(path, text):
+        recs = extract_records(path, text)
+        for d in recs:
             records.append(d)
             anchors[d["id"]].append(path)
+        sup_edges += extract_supersessions(path, text, recs)
         chunks.extend(extract_chunks(path, text, chunk_max, overlap))
 
     # The DECLARED extra sources. Chunks only, and separate from the loop above because these are
@@ -821,6 +896,13 @@ def main() -> int:
     # are REPORTED here and pinned in `check_recall.py`: both move with corpus growth.
     print(f"aliases     {n_aliased:>7} records aliased  (ids {len(by_id)}, unresolved "
           f"{len(unresolved)}, digest {alias_digest or '-'}, source {alias_src})")
+    # Always printed, a zero included: a map that derived nothing reads as zero out loud.
+    _, sc = derive_supersession_map(sup_edges, set(anchors))
+    pp = " ".join(f"{p} {v['whole'] + v['partial']} ({v['whole']} whole, {v['partial']} partial)"
+                  for p, v in sc["patterns"].items())
+    print(f"superseded  {sc['ids']:>7} ids  ({sc['whole']} whole, {sc['partial']} partial only; "
+          f"edges {pp}; unresolved {len(sc['unresolved'])}"
+          + (": " + " ".join(sc["unresolved"]) if sc["unresolved"] else "") + ")")
     return 0
 
 

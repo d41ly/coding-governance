@@ -15,7 +15,7 @@ harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = []
+gotcha-classes = ["a-merged-in-check-can-refuse-a-pinned-record.md", "concurrent-runs-are-announced-not-refused.md", "inherited-git-dir-pins-the-work-tree-to-the-cwd.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -30,9 +30,16 @@ globs = [
 ]
 ```
 
-Split out of `unattended` when that dossier reached its size cap, so it claims no keys: every key it
-touches is claimed there. The split follows a real seam. That dossier is how a run proceeds; this one
-is what lets it start and what it was asked to do.
+Split out of `unattended` when that dossier reached its size cap, so every key it touches is claimed
+there but one: the invariant `concurrent-runs-are-announced-not-refused.md`, a preflight ruling that
+arrived with `unattended` two bytes under its cap (TOOL-aGraftedHelix-3). The split follows a real
+seam. That dossier is how a run proceeds; this one is what lets it start and what it was asked to do.
+The class `inherited-git-dir-pins-the-work-tree-to-the-cwd.md` is claimed here for the same
+reason (TOOL-aGraftedHelix-27): its instance is the library's kit-dir derivation, which the commit-time
+check reads under a linked worktree's hook, and that dossier was 2 bytes under its cap.
+The class `a-merged-in-check-can-refuse-a-pinned-record.md` is claimed here on its own merits
+(TOOL-aGraftedHelix-30): it is about what authorizes a run, a README pinned at BASE that a merged-in
+check refuses, and its answer is `--authorization`, which grades that one item alone.
 
 ## Constraints & why
 

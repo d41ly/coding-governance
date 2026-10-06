@@ -144,9 +144,9 @@ check-memory-hygiene.sh: the memory tree's structural gate, its per-class size c
 - gate-legs 9: `memory hygiene`, `memory-hygiene self-test`, `verdict epoch (kit version dates the engine)`, `verdict-epoch self-test`, `kit version markers`, `kit/dogfood doc parity`, `transition-audit arms`, `backlog migration selftest`, `straggler-guard arms`
 - kits 1: `memory-tree`
 - git-hooks 2: `commit-msg`, `pre-rebase`
-- gotcha-classes 9: `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`, `inline-fence-swallows-the-rest-of-the-file.md`, `record-citing-a-foreign-id-defines-or-orphans-it.md`, `swallowed-delegate-reads-as-clean.md`
+- gotcha-classes 10: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`, `inline-fence-swallows-the-rest-of-the-file.md`, `record-citing-a-foreign-id-defines-or-orphans-it.md`
 - globs 10
-- cut 14 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 15 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## memory-tree-merge-driver
 
@@ -218,10 +218,10 @@ The gate runner, its harnesses, and the adopter that keeps a target's verdict re
 - decisions 9: `TOOL-aPacedTurnstile-1`, `TOOL-aPacedTurnstile-2`, `TOOL-aPacedTurnstile-4`, `TOOL-aPacedTurnstile-5`, `TOOL-aPacedTurnstile-6`, `TOOL-aPacedTurnstile-3`, `TOOL-aPacedTurnstile-7`, `TOOL-aPacedTurnstile-16`, `TOOL-dLoggedFlight-3`
 - gate-legs 13: `run-gates gov canary`, `run-gates adopter e2e`, `run-gates wiring`, `profile-bar selftest`, `run-gates turnstile`, `every held leg is budgeted, every budget row resolves`, `run-selftests self-test`, `selftest harness self-test`, `extract-arms self-test`, `leg ceilings clear their evidenced maximum`, `run-gates run-log line`, `receipt sync (installed files match the receipt)`, `pre-push bar self-test`
 - kits 1: `run-gates`
-- gotcha-classes 12
+- gotcha-classes 14
 - guides 1: `MERGE-BAR.md`
 - globs 21
-- cut 33 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 35 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## runlog
 
@@ -279,10 +279,10 @@ Unattended runs — a mandate on disk, not a block of chat
 - workflow-scripts 2: `unattended-build.js`, `unattended-unit.js`
 - skill-engines 1: `session-kickoff`
 - rendered-skills 1: `unattended`
-- gotcha-classes 24: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`, `second-implementation-is-not-a-second-opinion.md`, `inputs-inside-the-subjects-reach.md`
+- gotcha-classes 25: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`, `second-implementation-is-not-a-second-opinion.md`, `inputs-inside-the-subjects-reach.md`
 - guides 4
 - globs 3
-- cut 26 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 27 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## unattended-mandate
 
@@ -290,6 +290,7 @@ The unattended run's authorization: the observed anchor and the ask mandate
 
 - status `building` · streams `tooling` · dossier `memory/map/features/unattended-mandate.md`
 - decisions 3: `TOOL-aStandingWrit-2`, `TOOL-dNarrowedAnchor-1`, `TOOL-dDerivedDocket-19`
+- gotcha-classes 3: `a-merged-in-check-can-refuse-a-pinned-record.md`, `concurrent-runs-are-announced-not-refused.md`, `inherited-git-dir-pins-the-work-tree-to-the-cwd.md`
 - globs 6: `tools/unattended/unattended.sh`, `tools/unattended/check-unattended.sh`, `tools/unattended/lib-unattended.sh`, `memory/guides/UNATTENDED-PROTOCOL.md`, `memory/guides/UNATTENDED-ASKS.md`, `.unattended.conf`
 
 ## unattended-stops
@@ -298,5 +299,5 @@ The unattended run's stops: HELD, the lease and the process ledger
 
 - status `building` · streams `tooling` · dossier `memory/map/features/unattended-stops.md`
 - decisions 2: `TOOL-dDerivedDocket-4`, `TOOL-dDerivedDocket-28`
-- gotcha-classes 1: `liveness-negative-from-another-population.md`
+- gotcha-classes 2: `liveness-negative-from-another-population.md`, `orchestrator-hand-off-owed-a-disposition.md`
 - globs 4: `tools/unattended/unattended.sh`, `tools/unattended/STOPS.template.md`, `memory/guides/UNATTENDED-STOPS.md`, `.unattended.conf`
