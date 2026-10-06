@@ -76,7 +76,7 @@ because a monitor that seems to cover more than it does is worse than one that c
 
 ## Why it is not simpler than it looks
 
-Three things were measured on Windows and each one killed an obvious design:
+Each of these was measured on Windows, and each one killed an obvious design:
 
 - `kill -9 <top>` leaves the descendants alive. `taskkill /T` prints `SUCCESS` and killed one
   process of four, because it walks the WINDOWS process tree and MSYS parent edges are a different
@@ -86,6 +86,13 @@ Three things were measured on Windows and each one killed an obvious design:
   an MSYS child", which is every orphan worth reaping.
 - Every descendant of a test tree shared the CALLER's own process group, so a group kill reaps the
   session running the sweep.
+- One census re-read after the kill is not verification. Leaves-first still cascades, so a shell
+  whose foreground child just died is exiting on its own when the walk reaches it; MSYS answers
+  `Permission denied` to a signal for an exiting process, and an immediate re-read still lists it.
+  That reported a survivor and a signal error for a member that died, in two of three scheduled
+  remote runs and one of six on node a, at unchanged bytes. Verification therefore re-reads until
+  the kill set is gone or `SETTLE_S` passes, and a refused signal on a member the final read shows
+  gone counts as already gone. A member still listed at the deadline stays a survivor and an error.
 
 The kit therefore keys on the Windows pid, carries both parent graphs, and chooses its signal per
 row. None of that is defensive programming; each replaced something that measured false.

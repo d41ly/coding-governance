@@ -3708,6 +3708,11 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "check_settled_survivors",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
+    },
+    {
       "id": "check_shape_run",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -14633,6 +14638,11 @@
       "file": "tools/workflows/review_replay.py"
     },
     {
+      "id": "run_settled_with_stub",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "run_shuffle_control",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
@@ -15841,6 +15851,16 @@
       "id": "terms",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "test_a_member_gone_at_the_settled_reread_is_not_a_signal_error",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_a_member_present_past_the_deadline_stays_a_survivor",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_a_new_conditional_tier_reports_itself",

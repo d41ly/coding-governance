@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-105 — the reaper's verification settles, so a member dying as it is signalled is not a survivor
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-1 · base 34a99ad1 · streams tooling · ratified 2026-10-05 · order 106
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-1 · base 34a99ad1 · streams tooling · ratified 2026-10-05 · order 106
 
 <!-- gen:spec-records -->
 

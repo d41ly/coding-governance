@@ -734,3 +734,9 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T12:40:40Z dispatch · item 0185b9ae TOOL-aMendedFleet-104 · reason tools/run-gates/foreign-prefix.gov.test.sh memory/builds/aMendedFleet/spec/2026-10-05-spec-TOOL-aMendedFleet-104.md memory/builds/aMendedFleet/README.md
 
 2026-10-06T12:48:34Z brief · item TOOL-aMendedFleet-105 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
+
+2026-10-06T13:03:18Z dispatch · item 9f254cfb TOOL-aMendedFleet-105 · reason tools/process-monitor/reap.py tools/process-monitor/selftest.py tools/process-monitor/README.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-05-spec-TOOL-aMendedFleet-105.md memory/builds/aMendedFleet/README.md
+
+2026-10-06T13:17:24Z dispatch · item 9f254cfb TOOL-aMendedFleet-105 · reason tools/process-monitor/reap.py tools/process-monitor/selftest.py tools/process-monitor/README.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-05-spec-TOOL-aMendedFleet-105.md memory/builds/aMendedFleet/README.md memory/LIVE.md
+
+2026-10-06T13:28:59Z dispatch · item 9f254cfb TOOL-aMendedFleet-105 · reason tools/process-monitor/reap.py tools/process-monitor/selftest.py tools/process-monitor/README.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-05-spec-TOOL-aMendedFleet-105.md memory/builds/aMendedFleet/README.md memory/LIVE.md memory/builds/aMendedFleet/BACKLOG.md

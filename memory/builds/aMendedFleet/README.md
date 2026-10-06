@@ -164,7 +164,7 @@ and every red leg fixed. The prompt, the owner's four answers and the report are
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 106 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff+playbook
+**Build status:** CLOSED · 106 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff+playbook
 ids KICK-aMendedFleet-1 KICK-aMendedFleet-2 KICK-aMendedFleet-3 KICK-aMendedFleet-4 PLAY-aMendedFleet-1 PLAY-aMendedFleet-2 PLAY-aMendedFleet-3 PLAY-aMendedFleet-4 PLAY-aMendedFleet-5 TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5
 ids TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19
 ids TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33
@@ -283,7 +283,7 @@ ids TOOL-aMendedFleet-108 TOOL-aMendedFleet-109
 | [TOOL-aMendedFleet-102 — the two drifted inline `resolve_kit_dir` copies match their canonical source](spec/2026-10-05-spec-TOOL-aMendedFleet-102.md) | 103 | 1 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aMendedFleet-103 — the hygiene suite's python-parity arm exempts `GRAMMAR_WHERE` beside `GRAMMAR_DIR`](spec/2026-10-05-spec-TOOL-aMendedFleet-103.md) | 104 | 1 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aMendedFleet-104 — the foreign-prefix leg declares `review-replay selftest` a whole run](spec/2026-10-05-spec-TOOL-aMendedFleet-104.md) | 105 | 1 | CLOSED | rev-1 | 2026-10-05 |
-| [TOOL-aMendedFleet-105 — the reaper's verification settles, so a member dying as it is signalled is not a survivor](spec/2026-10-05-spec-TOOL-aMendedFleet-105.md) | 106 | 1 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aMendedFleet-105 — the reaper's verification settles, so a member dying as it is signalled is not a survivor](spec/2026-10-05-spec-TOOL-aMendedFleet-105.md) | 106 | 1 | CLOSED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
 Records: 63 bound to this build, across 3 record folder(s).

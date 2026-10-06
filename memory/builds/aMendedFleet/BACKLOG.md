@@ -17,6 +17,11 @@
 - SEV · TOOL-aMendedFleet-106 · LOW · a release act over many asks, no defect of its own
 - KEEP · TOOL-aMendedFleet-106 · advanced by TOOL-aMendedFleet-14, which defers the aged asks on it; the owner's triage is what closes it
 - KEEP · PLAY-aMendedFleet-5 · advanced by PLAY-aMendedFleet-2; the reading is unit TOOL-aMendedFleet-73's and the ruling is the owner's, so this build closes nothing
+- KEEP · TOOL-aMendedFleet-95 · filed at the M2 cross-read for a runbook sentence no unit of this build re-verifies; it stays live for a later build
+- KEEP · TOOL-aMendedFleet-96 · unit TOOL-aMendedFleet-3's hands-off edge; no unit of this build owns the drift report's reader, so it stays live
+- KEEP · TOOL-aMendedFleet-107 · a change to the dispatch disjointness rule that no unit of this build owns; it stays live
+- KEEP · TOOL-aMendedFleet-108 · a lander and kickoff-manifest change that no unit of this build owns; it stays live
+- KEEP · TOOL-aMendedFleet-109 · its accept clause asks for a rerun in a session of its own, which no unit of this build is; it stays live
 - WONTDO · TOOL-aReplayedCard-9 · the eight-arm matrix needs a session started with an agent definition already installed, which no unattended pass can take, and aMendedFleet's context-diet units measure orientation cost on the live path instead; a REOPEN row naming aMendedFleet restores it
 - CLOSED · TOOL-aUnblockedFleet-7 · by TOOL-aWokenSentinel-16 · check 34 of `--landed` reads containment, so a second landing that overwrites the shared lander marker still contains the first run's witness (6bb7ac756)
 - CLOSED · TOOL-aUnblockedFleet-8 · by TOOL-dDerivedDocket-27 · its S4 makes the bar's bound wall plus queue plus GATE_BACKSTOP_MARGIN for a repository declaring GATE_PROFILE_CMD, which `.unattended.conf` does, so queue wait is no longer charged against a bound that excludes it
