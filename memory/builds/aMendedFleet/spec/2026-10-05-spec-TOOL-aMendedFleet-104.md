@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-104 — the foreign-prefix leg declares `review-replay selftest` a whole run
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · order 105
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · order 105
 
 <!-- gen:spec-records -->
 
