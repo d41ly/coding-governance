@@ -168,7 +168,6 @@ Cite ids, never line numbers.
 | [TOOL-aProbedToolkit-5](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE LEXICON PREDICATE GRADES A POPULATION THE TABLE WAS NEVER WRITTEN… |
 | [TOOL-aProbedToolkit-6](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE LEXICON GATE CAN BE LEGALLY GREEN AT 5.2% COVERAGE, AND THE ONE… |
 | [TOOL-aProbedToolkit-7](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | AN EMPTIED SYMBOL TIER IS INVISIBLE ON EVERY codebase-map LEG. Both the… |
-| [TOOL-aProbedToolkit-8](../builds/aProbedToolkit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-86 | 2026-09-03 | THE MAP'S COVERAGE NUMBER MEASURES THE WRONG POPULATION AND THE… |
 | [TOOL-aProbedToolkit-10](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE RECALL FLOOR GRADES A CONFIGURATION THE CLI DOES NOT SHIP.… |
 | [TOOL-aProbedToolkit-11](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | TWO RECALL DIAGNOSTICS ARE ZERO-PREDICATES, SO EACH IS SILENT IN THE… |
 | [TOOL-aProbedToolkit-12](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | A memory-tree VERSION BUMP IS A CORPUS MIGRATION NOBODY HAS COSTED, AND… |

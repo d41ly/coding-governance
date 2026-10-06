@@ -1558,6 +1558,39 @@ def test_dossier_staleness_from_git(tmp: Path):
         "a whole history touching no claimed path is not a clean all-fresh answer"
 
 
+def test_record_roots_split_code_from_records(tmp: Path):
+    """TOOL-aMendedFleet-86 S2-S4: RECORD_ROOTS partitions the digest's population, over a REAL git
+    fixture because a root is live only when `git ls-files` names a path under it. One code file and
+    one record file split one of each; blank is undeclared; an entry naming nothing tracked is DEAD.
+    Staged red by dropping the root from the conf: the split then claims no records."""
+    import os
+    import subprocess
+
+    import map_diff as md
+
+    env = dict(os.environ, GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull,
+               GIT_CONFIG_NOSYSTEM="1")
+    for rel in ("src/a.py", "memory/r.md"):
+        (tmp / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tmp / rel).write_text("x\n", encoding="utf-8")
+    for a in (("init", "--template=", "-q"), ("add", "-A")):
+        r = subprocess.run(["git", "-C", str(tmp), *a], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        assert r.returncode == 0, f"git {' '.join(a)} failed: {r.stderr.strip()[:200]}"
+
+    roots, dead = md.derive_record_roots(tmp, {"RECORD_ROOTS": "memory/"})
+    assert (roots, dead) == (["memory"], None), (roots, dead)
+    files = ["src/a.py", "memory/r.md"]
+    records = [p for p in files if any(p == r or p.startswith(r + "/") for r in roots)]
+    assert records == ["memory/r.md"] and len(files) - len(records) == 1, records
+    assert md.derive_record_roots(tmp, {"RECORD_ROOTS": ""}) == ([], None)
+    assert md.derive_record_roots(tmp, {}) == ([], None)
+    assert md.derive_record_roots(tmp, {"RECORD_ROOTS": "memory,nosuchdir"}) == (["memory", "nosuchdir"],
+                                                                                "nosuchdir")
+    assert md.render_coverage_line("code", 1, 3) == "# code: mapped 1/3 (33%)"
+    assert md.render_coverage_line("records", 0, 0) == "# records: n/a (0 files)"
+
+
 def test_baseline_additions_from_git(tmp: Path):
     """TOOL-aMendedFleet-40 S5: the baseline is graded against its own copy at a base sha, over a
     REAL git fixture. An added key is named, an unchanged file gains nothing, and a base with no
@@ -1939,6 +1972,11 @@ def main() -> int:
         failures += check(
             "stale dossiers: ancestry, whole and by range, map-root excluded (aMendedFleet-37)",
             lambda: test_dossier_staleness_from_git(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "record roots: code and records split, undeclared and dead named (aMendedFleet-86)",
+            lambda: test_record_roots_split_code_from_records(Path(td)),
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check(

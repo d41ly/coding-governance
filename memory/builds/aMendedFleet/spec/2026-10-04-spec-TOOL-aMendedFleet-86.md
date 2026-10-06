@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-86 — the map digest reports code coverage apart from record coverage
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 86 · closes TOOL-aProbedToolkit-8
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 86 · closes TOOL-aProbedToolkit-8
 
 <!-- gen:spec-records -->
 

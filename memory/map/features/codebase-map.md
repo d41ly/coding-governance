@@ -93,6 +93,10 @@ repo-wide python-launcher seam rather than anything this feature owns.
   is ratcheted but not fully described. The map enforces "nothing new goes unclaimed"; it does not
   yet answer "what is this repo made of". Count `features/` and the baseline's rows for the live
   figures, never this line — no command reports the pair, and prose is where that figure rots.
+- **The digest's convergence figure is its `# code:` line, not its header.** `map_diff.py` splits
+  the population by the conf's `RECORD_ROOTS` (TOOL-aMendedFleet-86): the header mixes code with
+  memory-tree records, which the map does not claim to describe, so it measured how much of a
+  range was record writing. `map_diff.py --tree` prints the same split over every tracked file.
 - **Dossier prose is MEASURED for freshness, never gated.** `map_diff.py --stale-dossiers` derives,
   from git ancestry and no stamp, which feature dossiers are older than the paths they claim, and
   drift-audit reports the count as `dossiers_older_than_their_paths` against a shrink-only pin

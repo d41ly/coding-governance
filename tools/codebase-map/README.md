@@ -54,6 +54,14 @@ project specifics live in exactly two files the adopting repo owns.
 - `map_diff.py` — the range digest (`<base>..<head>`), plus `--drop-affordance-exempt` (S4a
   touch-drop).
 
+  Beneath its mixed header figure it prints a `# code:` line and a `# records:` line, split by the
+  conf's `RECORD_ROOTS` (directories whose files are records, `memory` here). The CODE line is the
+  map's convergence figure; the header also counts record writing, which the map does not claim to
+  describe. `RECORD_ROOTS` blank prints an `undeclared` line, and an entry naming no tracked path a
+  `DEAD PROBE` line, never a split. `--tree` attributes every tracked file instead of a range and
+  prints the header and those lines only; it refuses a range, `--stale-dossiers` and
+  `--drop-affordance-exempt`.
+
   `--stale-dossiers [--json]` lists the feature dossiers OLDER THAN THEIR PATHS: a commit touching
   a path a dossier claims is not an ancestor of the dossier's own last commit. Derived from git
   ancestry, never a stamp or a date. With no range it reads the whole history at HEAD; with

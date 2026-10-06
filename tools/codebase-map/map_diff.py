@@ -3,11 +3,19 @@
     python <kit>/map_diff.py <base>..<head> [--verbose] [--drop-affordance-exempt]
     python <kit>/map_diff.py <base> <head>  [--verbose]
     python <kit>/map_diff.py [<base>..<head>] --stale-dossiers [--json]
+    python <kit>/map_diff.py --tree
 
 Attributes every changed file to its claiming feature(s) — keyed attributors first (from
 map_extractors.KEYED_ATTRIBUTORS), then dossier path globs, then foundation globs — and rolls
 up the rest as UNMAPPED (per-top-level-dir counts by default; full list behind --verbose).
-The coverage line is the map's convergence-visibility metric.
+Beneath the header's mixed figure, the population is split by the conf's RECORD_ROOTS into a
+`# code:` line and a `# records:` line. The CODE line is the map's convergence-visibility
+metric; the mixed header measures how much of a range was record writing. RECORD_ROOTS blank
+prints an `undeclared` line instead, and an entry naming no tracked path a DEAD PROBE line.
+
+--tree: attribute every tracked file instead of a range, and print the header and the code and
+record lines only, no per-feature list. Refused with a range, --stale-dossiers or
+--drop-affordance-exempt (a whole tree would clear every grace).
 
 --drop-affordance-exempt (S4a): after attribution, rewrite <MAP_ROOT>/affordance-exempt.toml,
 dropping every feature the range TOUCHED (shrink-only). Touching a graced feature's files
@@ -68,6 +76,32 @@ def _changed_files(base: str, head: str) -> list[str]:
         print(f"# map-diff: cannot resolve range {base}..{head} (bad ref / shallow clone?) - nothing to diff")
         return []
     return [line.strip() for line in out.stdout.splitlines() if line.strip()]
+
+
+def derive_record_roots(root: Path, conf: dict[str, str]) -> tuple[list[str], str | None]:
+    """``(roots, dead)`` from the conf's ``RECORD_ROOTS`` (space- or comma-separated, repo-relative
+    directories whose files are records rather than code). ``dead`` names the first entry that
+    matches no tracked path, so the split cannot be trusted; ``([], None)`` when undeclared.
+    ONE ``git ls-files`` call over every entry."""
+    roots = [r.strip("/") for r in conf.get("RECORD_ROOTS", "").replace(",", " ").split() if r.strip("/")]
+    if not roots:
+        return [], None
+    out = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "-z", "--", *roots],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    tracked = [p for p in out.stdout.split("\0") if p] if out.returncode == 0 else []
+    for r in roots:
+        if not any(p == r or p.startswith(r + "/") for p in tracked):
+            return roots, r
+    return roots, None
+
+
+def render_coverage_line(label: str, mapped: int, total: int) -> str:
+    """``# <label>: mapped <m>/<n> (<p>%)``, or ``n/a (0 files)`` over an empty population."""
+    if not total:
+        return f"# {label}: n/a (0 files)"
+    return f"# {label}: mapped {mapped}/{total} ({100 * mapped // total}%)"
 
 
 def _drop_affordance_exempt(touched: dict[str, list[str]]) -> None:
@@ -210,9 +244,19 @@ def main() -> int:
         "with <base>..<head>, the dossiers that range touched and did not refresh. Report only.",
     )
     parser.add_argument("--json", action="store_true", help="--stale-dossiers: one JSON object")
+    parser.add_argument(
+        "--tree",
+        action="store_true",
+        help="attribute every tracked file instead of a range; prints the header and the code and "
+        "record coverage lines only. Takes no range, --stale-dossiers or --drop-affordance-exempt.",
+    )
     args = parser.parse_args()
 
-    if len(args.range) == 1 and ".." in args.range[0]:
+    if args.tree:
+        if args.range or args.stale_dossiers or args.drop_affordance_exempt:
+            parser.error("--tree takes no range, --stale-dossiers or --drop-affordance-exempt")
+        base = head = None
+    elif len(args.range) == 1 and ".." in args.range[0]:
         base, head = args.range[0].split("..", 1)
     elif len(args.range) == 2:
         base, head = args.range
@@ -253,10 +297,23 @@ def main() -> int:
         print(render_stale_dossiers(scope, rows, as_json=args.json))
         return 0
 
-    files = _changed_files(base, head)
+    root = m.repo_root()
+    if args.tree:
+        listing = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "-z"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+        )
+        if listing.returncode != 0:
+            print("map-diff --tree: git ls-files failed", file=sys.stderr)
+            return 1
+        files = [p for p in listing.stdout.split("\0") if p]
+        scope = "--tree"
+    else:
+        files = _changed_files(base, head)
+        scope = f"{base}..{head}"
 
     if not files:
-        print(f"map-diff {base}..{head}: no changes")
+        print(f"map-diff {scope}: no changes")
         return 0
 
     import map_extractors as ext  # project layer — only the attribution digest needs it
@@ -271,9 +328,24 @@ def main() -> int:
 
     mapped_count = len(files) - len(unmapped)
     print(
-        f"# map-diff {base}..{head} — {len(files)} files, mapped {mapped_count}/{len(files)} "
+        f"# map-diff {scope} — {len(files)} files, mapped {mapped_count}/{len(files)} "
         f"({100 * mapped_count // len(files)}%)"
     )
+    roots, dead = derive_record_roots(root, m.load_conf(root))
+    if dead is not None:
+        print(f"# code/records: DEAD PROBE - RECORD_ROOTS entry {dead} names no tracked path")
+    elif not roots:
+        print("# code/records: undeclared - set RECORD_ROOTS in .codebase-map.conf")
+    else:
+        unmapped_set = set(unmapped)
+        records = [p for p in files if any(p == r or p.startswith(r + "/") for r in roots)]
+        record_set = set(records)
+        code = [p for p in files if p not in record_set]
+        print(render_coverage_line("code", sum(p not in unmapped_set for p in code), len(code)))
+        print(render_coverage_line("records", sum(p not in unmapped_set for p in records), len(records))
+              + f" under RECORD_ROOTS {' '.join(roots)}")
+    if args.tree:
+        return 0
     for owner in sorted(attributed):
         paths = attributed[owner]
         d = by_feature.get(owner)

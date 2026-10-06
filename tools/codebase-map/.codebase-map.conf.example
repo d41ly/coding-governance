@@ -15,6 +15,13 @@
 # docs/map works fine.
 MAP_ROOT=memory/map
 
+# Repo-relative directories whose files are RECORDS rather than code -- a memory tree, a docs
+# archive -- space- or comma-separated, quoted if more than one: "memory docs/adr". map_diff.py
+# splits its coverage figure on them into a `# code:` line, the convergence metric, and a
+# `# records:` line. Blank, the digest prints an `undeclared` line instead and its one header
+# figure mixes code with records. An entry naming no tracked path prints DEAD PROBE, never a split.
+RECORD_ROOTS=
+
 # Where adopt-codebase-map.sh copies the gate template — a path INSIDE the directory your
 # project's existing test suite collects (pytest/vitest-adjacent/…). Zero CI changes by
 # design: the gate rides the suite that already gates your merge bar.

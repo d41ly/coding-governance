@@ -5478,6 +5478,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_record_roots",
+      "kind": "function",
+      "file": "tools/codebase-map/map_diff.py"
+    },
+    {
       "id": "derive_regenerate_argvs",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -11908,6 +11913,11 @@
       "file": "tools/lexicon/subtokens.py"
     },
     {
+      "id": "render_coverage_line",
+      "kind": "function",
+      "file": "tools/codebase-map/map_diff.py"
+    },
+    {
       "id": "render_doc",
       "kind": "function",
       "file": "tools/lib/render-doc.sh"
@@ -17206,6 +17216,11 @@
       "id": "test_record_placement_windows",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_roots_split_code_from_records",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_record_template_pairs",
