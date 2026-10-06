@@ -93,3 +93,5 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-06T04:34:33Z brief · item TOOL-aGraftedHelix-37 · reason a2e60ebbeb07 memory/builds/aGraftedHelix/prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md
 
 2026-10-06T04:35:10Z dispatch · item 83afdc95 TOOL-aGraftedHelix-37 · reason tools/unattended tools/push-main.sh tools/push-main.test.sh memory/gotchas/decision-re-derived-by-a-second-process.md memory/guides .claude/skills/unattended/SKILL.md memory/map memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-37.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md
+
+2026-10-06T10:08:38Z rescope · item add TOOL-aGraftedHelix-38 · reason discovery at VERIFYING: the pooled calibrate at eb96ea8b2 reds 11 of 20 rows; check 51 reds the real tree over run_settle, whose claim write unit 36 moved into write_settle_claim; write_preflight_record parks with no bypass guard; the arms-groups parser refuses the re-cut gate suite
