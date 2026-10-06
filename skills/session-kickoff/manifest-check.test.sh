@@ -681,7 +681,9 @@ run "C11 does not police bullets outside the traps section" "$R" 0 -
 # TREE's `corpus_ids.py`, so the reader the append spawns is the one under test like the checker
 # is, and a spec whose H1 defines `TOOL-zCardFixture-10` while its prose cites
 # `TOOL-zCardFixture-11` — the id a mention-grep would pass. Two linked worktrees: the sibling-tree
-# arms append from the second.
+# arms append from the second. The commit also drops `.unattended.conf`, so every card these arms
+# write skips the `overlaps —` read rather than starting the real driver per card; that cell's own
+# arms run over a stub (KICK-aMendedFleet-2).
 NONCE="mfc$$"
 GOVROOT=$(git -C "$(dirname "$CHECK")" rev-parse --show-toplevel)
 # THE READER IS FOUND THE WAY THE CHECKER FINDS IT (TOOL-aRepatriatedFork-18 S3): the checker's own
@@ -703,6 +705,7 @@ git clone -q --local "$GOVROOT" "$CCLONE" \
   && mkdir -p "$CCLONE/memory/builds/zCardFixture/spec" \
   && printf '# TOOL-zCardFixture-10 — a fixture unit, defined by this H1 alone\n\n**Status:** SPECCED · rev-1 · 2026-09-14 · node z · Tier-1\n\nThis prose CITES TOOL-zCardFixture-11 and nothing defines it.\n' \
        > "$CCLONE/memory/builds/zCardFixture/spec/2026-09-14-spec-TOOL-zCardFixture-10.md" \
+  && rm -f "$CCLONE/.unattended.conf" \
   && git -C "$CCLONE" add -A && git -C "$CCLONE" commit -q --no-verify -m "fixture: the reader under test and TOOL-zCardFixture-10" \
   && git -C "$CCLONE" worktree add -q "$CWT" -b card-wt && git -C "$CCLONE" worktree add -q "$CWT2" -b card-wt2 \
   || { echo "FAIL card fixture: cannot clone $GOVROOT, commit the fixture and add two worktrees under $TMP"; fail=$((fail+1)); }
