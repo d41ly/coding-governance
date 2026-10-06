@@ -1,14 +1,16 @@
 # TOOL-aMendedFleet-93 — one tier2 review run with and without the charter, and the review default follows the reading
 
-**Status:** INPROGRESS · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 93
+**Status:** CLOSED · rev-4 · 2026-10-06 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 93
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-93-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-93-1-acceptance-ledger.md) | journal | — |
 | [2026-10-06-build-TOOL-aMendedFleet-93-ab.py](../build/2026-10-06-build-TOOL-aMendedFleet-93-ab.py) | journal | — |
 | [2026-10-06-build-TOOL-aMendedFleet-93-arm-a-report.md](../build/2026-10-06-build-TOOL-aMendedFleet-93-arm-a-report.md) | journal | — |
 | [2026-10-06-build-TOOL-aMendedFleet-93-arm-b-report.md](../build/2026-10-06-build-TOOL-aMendedFleet-93-arm-b-report.md) | journal | — |
+| [2026-10-06-build-TOOL-aMendedFleet-93-reading.md](../build/2026-10-06-build-TOOL-aMendedFleet-93-reading.md) | journal | — |
 | [2026-10-06-build-TOOL-aMendedFleet-93-run-brief.md](../build/2026-10-06-build-TOOL-aMendedFleet-93-run-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -225,7 +227,7 @@ than five at once. The token figure is UNVERIFIED and is what the reading record
   hits the durability paragraph, and `diff` of `tools/workflows/REVIEW-PROTOCOL.template.md` against
   `memory/guides/REVIEW-PROTOCOL.md` shows only the lines it showed at base.
   Red when: the protocol still promises durable judge results by default, or the render diverged.
-- **AC8** — When `git grep -n "diff-review TOOL-aWindowedPass" -- memory/builds/aMendedFleet/` runs
+- **AC8** — When `git grep -n "diff-review TOOL-aWindowedPass" -- memory/builds/aMendedFleet/build/` runs
   at the unit's tip it prints nothing, and `git grep -c "journal TOOL-aMendedFleet-93" -- memory/builds/aMendedFleet/`
   counts at least the two arm reports.
   Red when: an arm report still binds the subject build's closed units.
@@ -270,6 +272,10 @@ New arm: `tools/workflows/tier2-review.test.sh` · only on `DEFAULT-PLAN`: stub 
   known only once the probe runs. The brief also fixes how the instrument reads "classifies every
   agent": a judge with no `usage` event reads NOT VALID by name, never a zero, as §5 already says of
   an unclassified agent. The spec reads INPROGRESS after this pass, per S3.
+- rev-4 · 2026-10-06 · §6 AC8 · the second build pass ran AC8's first grep over the whole build folder
+  and it printed one line: this spec's own AC8 sentence, which quotes the pattern, so the criterion
+  could never read empty. Its first grep is scoped to `build/`, where the arm reports live; the
+  second grep and the red case are unchanged.
 
 ## 10. Reuse audit
 

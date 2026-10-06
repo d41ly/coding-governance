@@ -103,8 +103,8 @@ function readOutputTokens() {
 //                                         // LIGHT_LENSES and names the lenses it skipped; a spec-audit refuses light
 //   checklist: "<preamble>\n- <item>\n  <continuation>" | ["<item>", ...], // the project's recurring
 //                                         // bug classes, each item swept by exactly one lens; absent -> a WARNING
-//   workerType: "<agent type>" }          // the type every finder and skeptic spawns as; absent -> the
-//                                         // default type. Under one the judges write no lens file
+//   workerType: "<agent type>" | "none" } // the type every finder and skeptic spawns as; absent -> Plan,
+//                                         // "none" -> the platform default. Under a type no judge writes a lens file
 // D9 - `kind` and `subjects` were added without extending this block, and BUILD-METHOD M4 sends a
 // reader HERE for the spec-audit spelling. An absent `kind` does not refuse - it defaults - so a
 // header missing the field buys exactly the failure M4 exists to prevent: a code-shaped review of a
@@ -177,7 +177,9 @@ if (isSpec && intensity === 'light')
 // skeptic, never the resume probe or the synthesis, which read and write the lens files and the report.
 // Shape-checked here, before any spawn. The built-in types that omit the charter hold no Write tool,
 // so under one the judges get no DURABILITY instruction and the run says its results are not durable.
-const workerType = a.workerType === undefined ? '' : a.workerType
+// TOOL-aMendedFleet-93 S4 - absent reads as `Plan`, the default the charter A/B's reading set; the
+// reserved literal `none` spawns as before the default, durability instructions and review key included.
+const workerType = a.workerType === undefined ? 'Plan' : a.workerType === 'none' ? '' : a.workerType
 if (a.workerType !== undefined && (typeof a.workerType !== 'string' || !/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(a.workerType)))
   throw new Error('tier2-review: `workerType` must be an agent type name matching ^[A-Za-z][A-Za-z0-9_-]{0,63}$. Got ' + JSON.stringify(a.workerType) + '.')
 const judgeOpts = workerType ? { agentType: workerType } : {}
@@ -640,8 +642,8 @@ const REVIEW_SHAPE = 'lenses5-r1'
 // TOOL-aSightedSkeptic-4 S7 - so does the PARSED checklist: a CRLF string and its LF twin are one key,
 // and a lens swept under one checklist is never reused under another.
 // TOOL-aSightedSkeptic-7 S8 - and so does `intensity`: a light run and a full run never share a lens file.
-// TOOL-aMendedFleet-67 S2 - and so does `workerType`, only when given, so a default key never moves and
-// an A/B arm under a type is never answered from the default arm's lens files.
+// TOOL-aMendedFleet-67 S2 - and so does `workerType`, only when it names a type, so a `none` key equals
+// every pre-type key and a run under a type is never answered from a `none` run's lens files.
 const inputPrint = deriveFnv1a(renderCanonical(Object.assign({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity }, workerType ? { workerType: workerType } : {})))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))

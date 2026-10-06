@@ -245,7 +245,11 @@ return alone, and the caller writes it down if it wants one.
 
 Every agent a harness spawns loads the charter through `CLAUDE.md` before its task. A judge reads a
 brief the harness wrote and lands nothing, so `workerType` lets a caller spawn the JUDGES as a named
-agent type instead. Absent, every spawn is byte-identical to a run without it; no caller passes it yet.
+agent type instead. In `tier2-review.js` an absent `workerType` reads as `Plan`, the default one
+measured A/B pair set (TOOL-aMendedFleet-93's reading): its read-only judges matched the charter-loaded
+arm's precision at about half the first-turn context. The reserved literal `none` spawns every judge as
+before that default, durability instructions and review key included. In the two drift harnesses an
+absent `workerType` still spawns every agent as the platform default, because no pair measured them.
 
 ```js
 // tier2-review.js: every finder and every skeptic batch spawns as the type
@@ -262,8 +266,9 @@ report.
 
 Under a type, a tier2 judge is told to write no `find-*.json` or `verify-*.json` and to return `path`
 empty, because the read-only types hold no Write tool. One log line names the type and says the run's
-lens and batch results are NOT durable, so a resume re-dispatches them. `workerType` joins the review
-key only when given, so a run under a type is never answered from a default run's lens files.
+lens and batch results are NOT durable, so a resume re-dispatches them; pass `workerType: 'none'` when
+a run must resume. `workerType` joins the review key only when it names a type, so a `none` run keys as
+every run before the default did, and a run under a type is never answered from a `none` run's lens files.
 
 The drift FINDERS keep the default type. Each writes its prose writeup under `outDir`, `wave1-<lens>.md`
 from the code harness and `wave2-<lens>.md` from the state harness, as it works, and that file is both its deliverable and the harness's durability control, after a

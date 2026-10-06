@@ -216,8 +216,10 @@ async function runReview(args, stubs, source) {
 
 const B = 'b'.repeat(40)
 const H = 'c'.repeat(40)
-const DIFF = { repo: '/tmp/r', base: B, head: H, round: 1, context: 'ctx', reviewDir: 'memory/reviews' }
-const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 's.md', blob: 'abc1234' }] }
+// TOOL-aMendedFleet-93 S4 - absent `workerType` reads as Plan, so the durable-spawn arms below pin `none`,
+// which spawns exactly as an absent value did before the default.
+const DIFF = { repo: '/tmp/r', base: B, head: H, round: 1, context: 'ctx', reviewDir: 'memory/reviews', workerType: 'none' }
+const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 's.md', blob: 'abc1234' }], workerType: 'none' }
 const buildProbe = (finds, verifies, base, head) => ({ commonDir: '/cd', base: base || B, head: head || H, finds: finds || [], verifies: verifies || [] })
 // One finding per lens, so five lenses make five ids and five batches of one: verify:ids-1-1 .. 5-5.
 const buildLensReturn = (label) => {
@@ -293,9 +295,20 @@ async function runWholeScriptArms() {
 
   // ---- TOOL-aMendedFleet-67 S5 - `workerType` routes the JUDGES and only them, and they write nothing.
   // ---- The default half reads the first run's judges, so an arm that always sets the option reds here.
-  ck(finds.concat(verifies).every((t) => t.agentType === undefined), 'workerType: absent, no judge spawn carries an agentType')
-  r = await runReview(Object.assign({ workerType: 'Plan' }, DIFF), ALL_OK)
+  ck(finds.concat(verifies).every((t) => t.agentType === undefined), 'workerType: none, no judge spawn carries an agentType')
+  const ABSENT = Object.assign({}, DIFF)
+  delete ABSENT.workerType
+  const rd = await runReview(ABSENT, ALL_OK)
+  let KP = ''
+  if (checkNoThrow(rd, 'workerType absent run')) {
+    KP = rd.result.key
+    ck(rd.trace.filter((t) => /^(find|verify):/.test(t.label)).length === 10 &&
+      rd.trace.filter((t) => /^(find|verify):/.test(t.label)).every((t) => t.agentType === 'Plan'),
+      'workerType: absent, every finder and skeptic batch spawns as Plan (TOOL-aMendedFleet-93 S4)')
+  }
+  r = await runReview(Object.assign({}, DIFF, { workerType: 'Plan' }), ALL_OK)
   if (checkNoThrow(r, 'workerType run')) {
+    ck(r.result.key === KP, 'workerType: an explicit Plan run keys as an absent one')
     const judges = r.trace.filter((t) => /^(find|verify):/.test(t.label))
     const orch = r.trace.filter((t) => !/^(find|verify):/.test(t.label))
     ck(judges.length === 10 && judges.every((t) => t.agentType === 'Plan'), 'workerType: all five finders and five skeptic batches spawn as Plan')
@@ -306,7 +319,7 @@ async function runWholeScriptArms() {
     ck(r.result.key !== K, 'workerType: the key differs from the default run\'s, so no default lens file answers it')
   }
   for (const [lbl, v] of [['two words', 'two words'], ['a number', 7], ['65 characters', 'A'.repeat(65)]]) {
-    r = await runReview(Object.assign({ workerType: v }, DIFF), ALL_OK)
+    r = await runReview(Object.assign({}, DIFF, { workerType: v }), ALL_OK)
     ck(!!r.threw && r.threw.indexOf('workerType') !== -1 && r.trace.length === 0, 'workerType: ' + lbl + ' is refused before any spawn')
   }
 
