@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-45 — a leg bans a location probe asked from a moved directory unless it scrubs an inherited GIT_DIR or a registry row waives it
 
-**Status:** SPECCED · rev-1 · 2026-10-07 · node a · Tier-2 · base e1f4d8c0 · streams tooling+kickoff · order 26
+**Status:** SPECCED · rev-2 · 2026-10-07 · node a · Tier-2 · base e1f4d8c0 · streams tooling+kickoff · order 26 · ratified 2026-10-07
 
 <!-- gen:spec-records -->
 
@@ -56,8 +56,10 @@ predicate can decide it.
   `tools/check-kit-versions.sh` pairs. The unattended renders are re-adopted. The kickoff
   manifest is re-stamped, because the pass edits files its `watch:` line names. Observed by AC7.
 - **S9** — `tools/gate-lint/README.md` documents the mode, the class and the registry. Its
-  sentence that states how many legs the kit declares is reworded to name the legs without a count.
-  Observed by AC8.
+  sentence that states how many legs the kit declares is reworded to name the legs without a count,
+  and so are the two sentences in `tools/gate-lint/kit.toml` and the one in the gate-lint dossier
+  that count the kit's legs. The leg's subject is pinned in `tools/govkit/subject-pins.tsv` by
+  `govkit.py selfcheck --write`, which reds an unpinned leg. Observed by AC7 and AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -170,11 +172,16 @@ an unquoted run. `check_probe_scrubbed` reads the code before the match and requ
 purpose: the other order, a third variable, or an `unset` earlier on the line at top level grade
 bare. A false red names its remedy. A false pass would be silent.
 
-`build_probe_measured` returns `{(path, key): count}` over the bare sites. `read_registry` gains a
-key-shape parameter whose default is the existing `DELIMITER`, so the sibling's behaviour is
-byte-identical. The probe key shape is `-C <word> --show-<x>` or `cd <word> --show-<x>`, which a line
-number cannot match. `print_probe_populations` prints the counts in a fixed order, and
-`run_probe_scan` returns 0, 1 or 2 like `main`.
+`build_probe_measured` returns `{(path, key): count}` over the bare sites. `read_registry` and
+`resolve_declaration` gain a key-shape parameter, the pattern with the two phrases a malformed key
+is refused in, whose default is the existing `DELIMITER` and its phrases, so the sibling's behaviour
+is byte-identical. They also take an optional dict that `read_registry` fills with each row's
+reason, which is how a waived site's reason reaches the run. `check_registry` takes an optional map
+of undeclared-site text per key, so a bare probe is reported in the probe's own words with each
+site's line and remedy, and every other key keeps the loop text. The probe key shape is
+`-C <word> --show-<x>` or `cd <word> --show-<x>`, which a line number cannot match.
+`print_probe_populations` prints the counts in a fixed order, and `run_probe_scan` returns 0, 1 or 2
+like `main`.
 
 ### Fixture table for the selftest arms
 
@@ -233,6 +240,7 @@ siblings.
 - `tools/gate-lint/README.md`
 - `tools/gate-lint/kit.toml`
 - `tools/gate-legs.json`
+- `tools/govkit/subject-pins.tsv`
 - `.memory-tree.conf`
 - `memory/project/location-probe-waivers.txt`
 - `memory/map/features/gate-lint.md`
@@ -409,6 +417,8 @@ runs the bar once, and the kit suites stay the owner's manual run (owner ruling 
   Recommendation: (a). It is a check inside an existing gate script, which is the cheaper unit the
   new-leg gotcha prices, and it is the only option that adds one leg and renames none. Under (b) or
   (c), a rev bump re-cuts S5, AC2 and AC8.
+  RESOLVED (agent, 2026-10-07, delegated): (a). All three satisfy the same criteria; (a) adds one
+  leg, renames none and reuses the sibling's cutter and registry pair, which M3's tie-break prefers.
 - **F2 — Which spellings does the ban cover?**
   (a) The `-C` spelling only, with the operand read as a shell word: 23 bare sites in 16 files. The
   `cd` spelling is printed as a fourth near-miss count.
@@ -421,6 +431,8 @@ runs the bar once, and the kit suites stay the owner's manual run (owner ruling 
   gates a probe that answers correctly from inside its own repository, so most of its hits would be
   scrubbed for no defect. Under (a), a rev bump drops AC5 and moves the `cd` row of §4's fixture
   table to the near-miss column.
+  RESOLVED (agent, 2026-10-07, delegated): (b). It is the most feature-rich survivor, keeping AC5;
+  (c) is vetoed by §3's non-goal on probes that ask for the git dir or the common dir.
 - **F3 — Are the Python callers in this unit?** Measured at `03a0956c`, seven Python sites ask
   `git -C <dir> rev-parse --show-toplevel`, or run it with `cwd=` at a subdirectory. They are
   `tools/lexicon/lexicon.py` line 4347, `tools/drift-audit/drift_report.py` line 111,
@@ -435,6 +447,8 @@ runs the bar once, and the kit suites stay the owner's manual run (owner ruling 
   is a second parser with its own population and near-misses. M2 makes that a second mechanism, and
   this unit is already a large diff. Under (b), a rev bump adds a scope item, a criterion and a
   `closes` verb.
+  RESOLVED (agent, 2026-10-07, delegated): (a). Option (b) is a second mechanism in one spec, which
+  M2's one-mechanism rule refuses, so it is handed off as §3 states.
 
 ## 9. Revision log
 
@@ -442,6 +456,11 @@ runs the bar once, and the kit suites stay the owner's manual run (owner ruling 
   the run branch at `03a0956c`. The predicate, its widenings and the near-misses were run over the
   real tree, and the exported-`GIT_DIR` failures were measured on node `a`. The three forks are left
   open for the owner, at the owner's request.
+- rev-2 · 2026-10-07 · node a · the build pass resolved the three forks under the run's delegation,
+  F1 (a), F2 (b) and F3 (a), each by its own recommendation. §4 "The mode" now says what the
+  registry pair gains: the key shape with its refusal phrases, a reason map, and per-key
+  undeclared text for `check_registry`. S9 adds the kit descriptor's and the dossier's leg-count
+  sentences and the subject pin the new leg owes, which the pass found graded by `govkit selfcheck`.
 
 ## 10. Reuse audit
 
