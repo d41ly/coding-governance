@@ -1,10 +1,34 @@
 #!/usr/bin/env python3
-"""Shell source-hygiene scan — a loop reader fed by a command substitution, which can block forever.
+"""Shell source-hygiene scan — a loop reader fed by a command substitution, which can block forever,
+and, as a second mode, a location probe asked from a moved directory, which answers wrong in a hook.
 
 Project-agnostic. Run over any repo:
 
     python <this file> [registry-path] [root]     # scan; exit 0 clean, 1 on an undeclared site
-    python <this file> --selftest                 # prove the predicate in BOTH directions
+    python <this file> --location-probes [registry-path] [root] [pathspec ...]   # the second class
+    python <this file> --selftest                 # prove both predicates in BOTH directions
+
+THE SECOND CLASS, `--location-probes`. With `GIT_DIR` set and no `GIT_WORK_TREE`, git takes the
+CURRENT directory for the top of the work tree. So `git -C <dir> rev-parse --show-prefix`, and the
+`cd <dir> && git rev-parse --show-*` spelling of it, answer about `<dir>` as if it were the root.
+Git exports `GIT_DIR` into a linked worktree's hooks and merge drivers, so every such probe is
+right in a shell and silently wrong under one. Whether a hook can REACH a given probe is a question
+about callers, which no line predicate decides, so this is a BAN on the spelling: every probe opens
+its own substitution with `unset GIT_DIR GIT_WORK_TREE;`, or carries a registry row whose reason is
+printed on every run. The population is every tracked `*.sh` plus every tracked extensionless file
+whose first line is a shell shebang, narrowed by the pathspecs. The registry is the grammar below,
+keyed on the probe AS WRITTEN, `-C <word> --show-<x>` or `cd <word> --show-<x>`, never a line.
+Three near-miss counts are printed and not gated: a `-C` probe asking the git dir or the common dir,
+which an inherited `GIT_DIR` answers correctly from inside its own repository; `--show-*` asked
+with no move, which asks the caller's directory; and the gated spelling inside a comment.
+
+WHAT `--location-probes` DOES NOT CHECK, each a MISS and never a false red: reachability; a probe
+split across a line continuation; a probe built in a variable, through `eval`, or behind any wrapper
+but `GIT`; a `cd` carrying an option or a redirect before its `&&`; Python and JavaScript callers;
+other subcommands run with `-C` into a subdirectory, such as `ls-files`, whose answers move the
+same way; quoting carried across lines; and a scrub that unsets the variables for a whole function
+rather than inside the substitution, which grades BARE — one spelling is accepted on purpose, so the
+other order, a third variable and an earlier top-level `unset` all grade bare and name the remedy.
 
 THE CLASS. `while read … done <<TAG` with `$(cmd)` in the heredoc body, or `done <<< "$(cmd)"`.
 The substitution reads until EOF, and EOF arrives when the LAST inherited write end of its pipe
@@ -85,6 +109,9 @@ mis-spelled path grade silently against nothing while reading exactly like a fir
 """
 from __future__ import annotations
 
+import contextlib
+import io
+import os
 import pathlib
 import re
 import subprocess
@@ -127,11 +154,51 @@ CLASSES = [
 ]
 GATED = [key for key, _label, gated in CLASSES if gated]
 
+# ---- the LOCATION-PROBE class, `--location-probes` ----------------------------------------------
+# One level of `$( )` holding plain text and quoted strings. A probe's `-C` operand is often one,
+# `"$(dirname -- "$0")"`, and a `[^ ]+` operand reads that as two words and misses the probe.
+_PROBE_SUB = r"\$\((?:[^()\"']|\"[^\"]*\"|'[^']*')*\)"
+# A shell WORD: double-quoted, single-quoted and unquoted runs, concatenated.
+PROBE_WORD = (r"(?:\"(?:[^\"\\$]|\\.|" + _PROBE_SUB + r"|\$(?!\())*\"|'[^']*'|" + _PROBE_SUB
+              + r"|\\.|\$(?!\()|[^\s\"'`();&|$\\])+")
+_PROBE_GIT = r"(?<![\w$.-])(?:git|GIT)(?:[ \t]+-c[ \t]+" + PROBE_WORD + r")*"
+_PROBE_FLAG = r"[ \t]+--[A-Za-z][\w-]*(?:=" + PROBE_WORD + r")?"
+_PROBE_TAIL = r"[ \t]+rev-parse(?:" + _PROBE_FLAG + r")*[ \t]+--"
+_PROBE_ASKS = r"(show-(?:prefix|toplevel|cdup))(?![\w-])"
+_PROBE_MOVE = (_PROBE_GIT + r"[ \t]+-C[ \t]+(" + PROBE_WORD + r")(?:[ \t]+-c[ \t]+" + PROBE_WORD
+               + r"|" + _PROBE_FLAG + r")*" + _PROBE_TAIL)
+# The two gated forms. Group 1 is the moved-to word and group 2 the flag asked, in both.
+PROBE_C = re.compile(_PROBE_MOVE + _PROBE_ASKS)
+PROBE_CD = re.compile(r"(?<![\w$.-])cd[ \t]+(" + PROBE_WORD + r")[ \t]*(?:&&|;)[ \t]*" + _PROBE_GIT
+                      + _PROBE_TAIL + _PROBE_ASKS)
+# Two of the near misses: the git dir asked from a moved directory, and `--show-*` with no move.
+PROBE_IDENTITY = re.compile(_PROBE_MOVE + r"((?:absolute-)?git-dir|git-common-dir)(?![\w-])")
+PROBE_CWD = re.compile(_PROBE_GIT + _PROBE_TAIL + _PROBE_ASKS)
+# The one scrub accepted: the probe is the FIRST command of the substitution that opens with it.
+PROBE_SCRUB = "unset GIT_DIR GIT_WORK_TREE; "
+SCRUBBED = re.compile(r"\(unset GIT_DIR GIT_WORK_TREE;[ \t]+\Z")
+# A shell shebang on an extensionless file — sh, bash, dash, ksh or zsh, direct or through `env`.
+SHELL_SHEBANG = re.compile(rb"\A#![^\n]*?[/ \t](?:ba|da|k|z)?sh(?:[ \t\r]|\Z)")
+# A probe registry key. A line number matches neither form, which is AC3's malformed-key arm.
+PROBE_KEY = re.compile(r"\A(?:-C|cd) \S.* --show-(?:prefix|toplevel|cdup)\Z")
+# The registry key shapes: the pattern, what a malformed key is not, and what the key is.
+DELIMITER_SHAPE = (DELIMITER, "a heredoc tag or `<<<`", "DELIMITER")
+PROBE_KEY_SHAPE = (PROBE_KEY, "a probe as written, `-C <word> --show-<x>` or `cd <word> --show-<x>`",
+                   "PROBE as written")
+# The probe taxonomy, in report order: (key, mark, label).
+PROBE_CLASSES = [
+    ("bare", "GATED", "a location probe asked from a moved directory with no scrub"),
+    ("scrubbed", "scrubbed", "the same probe, first in a substitution opening `(unset GIT_DIR GIT_WORK_TREE;`"),
+    ("identity", "near miss", "`-C <dir> rev-parse` asking the git dir or the common dir"),
+    ("cwd", "near miss", "`rev-parse --show-*` with no `-C` and no `cd` — it asks the caller's directory"),
+    ("comment", "near miss", "a comment carrying the gated spelling — it never runs"),
+]
+
 #: The executed-assertion floor for `--selftest`, compared against the count it prints.
 #: A printed count nothing reads is the same nothing as no count: this repository has shipped
 #: nine arms stranded past an unconditional exit while the suite printed a total and every
 #: other gate held. Raise it with the arms; it may never be lowered to fit a regression.
-FLOOR_ASSERTIONS = 32
+FLOOR_ASSERTIONS = 55
 
 
 def check_substitution(text: str) -> bool:
@@ -302,8 +369,15 @@ def build_measured(findings: dict[str, list[tuple[str, int, str]]]) -> dict[tupl
     return measured
 
 
-def read_registry(path: pathlib.Path) -> tuple[dict[tuple[str, str], int], list[str]]:
-    """The declared sites, plus every malformed row. A row is `path TAB delim TAB count TAB reason`."""
+def read_registry(path: pathlib.Path, shape: tuple = DELIMITER_SHAPE,
+                  reasons: dict | None = None) -> tuple[dict[tuple[str, str], int], list[str]]:
+    """The declared sites, plus every malformed row. A row is `path TAB delim TAB count TAB reason`.
+
+    `shape` is the key's pattern with the two phrases a malformed key is refused in; its default is
+    the loop scan's, byte-identically. `reasons`, when given, is filled with each row's reason, which
+    the probe mode prints for every waived site.
+    """
+    pattern, label, keyname = shape
     declared: dict[tuple[str, str], int] = {}
     malformed: list[str] = []
     for number, raw in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
@@ -315,9 +389,9 @@ def read_registry(path: pathlib.Path) -> tuple[dict[tuple[str, str], int], list[
             malformed.append(f"line {number}: not <path> TAB <delimiter> TAB <count> TAB <reason>: {row}")
             continue
         rel, delim, count = fields[0].strip(), fields[1].strip(), fields[2].strip()
-        if not DELIMITER.match(delim):
+        if not pattern.match(delim):
             malformed.append(
-                f"line {number}: {delim!r} is not a heredoc tag or `<<<` — the key is the DELIMITER, "
+                f"line {number}: {delim!r} is not {label} — the key is the {keyname}, "
                 f"never a line number, because a line number moves on an unrelated edit: {row}")
             continue
         if not count.isdigit() or int(count) < 1:
@@ -327,10 +401,13 @@ def read_registry(path: pathlib.Path) -> tuple[dict[tuple[str, str], int], list[
             malformed.append(f"line {number}: ({rel}, {delim}) is declared twice: {row}")
             continue
         declared[(rel, delim)] = int(count)
+        if reasons is not None:
+            reasons[(rel, delim)] = "\t".join(fields[3:]).strip()
     return declared, malformed
 
 
-def resolve_declaration(arg: str | None) -> tuple[dict[tuple[str, str], int], list[str]]:
+def resolve_declaration(arg: str | None, shape: tuple = DELIMITER_SHAPE,
+                        reasons: dict | None = None) -> tuple[dict[tuple[str, str], int], list[str]]:
     """The declared sites for the OPTIONAL registry argument, or a refusal. Three states.
 
     ABSENT is the posture this scanner ships in, and it used to be the one state it refused. An
@@ -349,17 +426,24 @@ def resolve_declaration(arg: str | None) -> tuple[dict[tuple[str, str], int], li
         raise OSError(f"no registry at {path} — the argument was SUPPLIED and does not resolve to "
                       f"a file, which is a typo and not a posture; OMIT it to grade against an "
                       f"empty declaration")
-    return read_registry(path)
+    return read_registry(path, shape, reasons)
 
 
 def check_registry(measured: dict[tuple[str, str], int],
-                   declared: dict[tuple[str, str], int]) -> list[str]:
-    """Set equality in both directions, with the counts. Returns one line per violation."""
+                   declared: dict[tuple[str, str], int],
+                   explained: dict[tuple[str, str], str] | None = None) -> list[str]:
+    """Set equality in both directions, with the counts. Returns one line per violation.
+
+    `explained` carries the undeclared-site text for a key, where the caller's class needs its own
+    words; a key it does not carry gets the loop scan's.
+    """
     problems = []
     for key in sorted(set(measured) | set(declared)):
         rel, delim = key
         have, want = measured.get(key), declared.get(key)
-        if want is None:
+        if want is None and explained and key in explained:
+            problems.append(explained[key])
+        elif want is None:
             problems.append(
                 f"{rel}: a loop is fed by `{delim}` holding a command substitution, and no registry "
                 f"row declares it ({have} site(s)) — feed the loop from a scratch FILE instead")
@@ -383,17 +467,143 @@ def print_populations(findings: dict[str, list[tuple[str, int, str]]], scanned: 
         print(f"sh-hygiene:   [{mark}] {len(sites)} site(s) in {files} file(s) — {label}")
 
 
+def check_probe_scrubbed(code: str, start: int) -> bool:
+    """True when the probe at `start` is the first command of a `(` opening with the scrub."""
+    return bool(SCRUBBED.search(code[:start]))
+
+
+def scan_probe_file(text: str) -> dict[str, list[tuple[int, str, str]]]:
+    """Classify every location probe in one shell source: `{class-key: [(line, key, remedy), ...]}`.
+
+    Only the gated forms carry a key, and only a bare one a remedy: the line with the scrub put in,
+    after the `(` the probe opens, or around the probe in a subshell of its own where none does.
+    """
+    found: dict[str, list[tuple[int, str, str]]] = {key: [] for key, _m, _l in PROBE_CLASSES}
+    for number, raw in enumerate(text.split("\n"), 1):
+        line = raw.rstrip("\r")
+        code = extract_code(line)
+        if PROBE_C.search(line[len(code):]) or PROBE_CD.search(line[len(code):]):
+            found["comment"].append((number, "", ""))
+        moved: list[tuple[int, int]] = []
+        for pattern, form in ((PROBE_C, "-C"), (PROBE_CD, "cd")):
+            for match in pattern.finditer(code):
+                key = f"{form} {match.group(1)} --{match.group(2)}"
+                moved.append(match.span())
+                if check_probe_scrubbed(code, match.start()):
+                    found["scrubbed"].append((number, key, ""))
+                    continue
+                head = code[:match.start()].rstrip()
+                remedy = (head + PROBE_SCRUB + code[match.start():] if head.endswith("(") else
+                          head + " (" + PROBE_SCRUB + match.group(0) + ")" + code[match.end():])
+                found["bare"].append((number, key, remedy.strip()))
+        found["identity"].extend((number, "", "") for _m in PROBE_IDENTITY.finditer(code))
+        found["cwd"].extend((number, "", "") for match in PROBE_CWD.finditer(code)
+                            if not any(start <= match.start() < end for start, end in moved))
+    return found
+
+
+def scan_probe_tree(root: pathlib.Path, pathspecs: list[str]
+                    ) -> tuple[dict[str, list[tuple[str, int, str, str]]], int]:
+    """Every tracked shell source under `root` and the pathspecs, classified. Returns (found, files).
+
+    A shell source is a `*.sh`, or an extensionless file whose first line is a shell shebang — which
+    reaches a repository's git hooks without this kit naming where it keeps them.
+    """
+    listing = subprocess.run(
+        ["git", "ls-files", "-z", "--", *(pathspecs or ["."])],
+        cwd=str(root), capture_output=True, text=True, encoding="utf-8",
+    )
+    if listing.returncode != 0:
+        raise OSError("git ls-files failed, so the population could not be derived at all: "
+                      + (listing.stderr or "").strip())
+    total: dict[str, list[tuple[str, int, str, str]]] = {key: [] for key, _m, _l in PROBE_CLASSES}
+    scanned = 0
+    for rel in sorted(p for p in listing.stdout.split("\0") if p):
+        full = root / rel
+        name = rel.rsplit("/", 1)[-1]
+        if not full.is_file() or not (name.endswith(".sh") or "." not in name):
+            continue
+        data = full.read_bytes()
+        if not name.endswith(".sh") and not SHELL_SHEBANG.match(data.split(b"\n", 1)[0]):
+            continue
+        scanned += 1
+        for key, sites in scan_probe_file(data.decode("utf-8", "replace")).items():
+            total[key].extend((rel, line, probe, remedy) for line, probe, remedy in sites)
+    return total, scanned
+
+
+def build_probe_measured(found: dict[str, list[tuple[str, int, str, str]]]) -> dict[tuple[str, str], int]:
+    """The bare sites as `{(path, probe key): count}` — the registry's own key."""
+    measured: dict[tuple[str, str], int] = {}
+    for rel, _line, key, _remedy in found["bare"]:
+        measured[(rel, key)] = measured.get((rel, key), 0) + 1
+    return measured
+
+
+def print_probe_populations(found: dict[str, list[tuple[str, int, str, str]]], scanned: int) -> None:
+    print(f"sh-hygiene: location probes — {scanned} tracked shell source(s) scanned")
+    for key, mark, label in PROBE_CLASSES:
+        sites = found[key]
+        files = len({site[0] for site in sites})
+        print(f"sh-hygiene:   [{mark}] {len(sites)} site(s) in {files} file(s) — {label}")
+
+
+def run_probe_scan(args: list[str]) -> int:
+    """`--location-probes [registry] [root] [pathspec ...]`: 0 clean, 1 findings, 2 refusal."""
+    root = pathlib.Path(args[1] if len(args) > 1 else ".").resolve()
+    if not root.is_dir():
+        print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
+        return 2
+    reasons: dict[tuple[str, str], str] = {}
+    try:
+        declared, malformed = resolve_declaration(args[0] if args else None, PROBE_KEY_SHAPE, reasons)
+        found, scanned = scan_probe_tree(root, args[2:])
+    except OSError as exc:
+        print(f"sh-hygiene: {exc}", file=sys.stderr)
+        return 2
+    if scanned == 0:
+        print("sh-hygiene: no tracked shell source under the root and pathspecs, so this run graded "
+              "NOTHING — that is a refusal and not a pass", file=sys.stderr)
+        return 2
+    if not args:
+        print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
+    print_probe_populations(found, scanned)
+    measured = build_probe_measured(found)
+    # A WAIVED SITE SAYS WHY ON EVERY RUN, green included: a reason nobody reads is no reason.
+    for key in sorted(set(measured) & set(declared)):
+        print(f"sh-hygiene: waived — {key[0]}: `{key[1]}` × {declared[key]} — {reasons[key]}")
+    explained: dict[tuple[str, str], str] = {}
+    for rel, line, key, remedy in found["bare"]:
+        explained.setdefault((rel, key), f"{rel}: the location probe `{key}` is asked bare and no "
+                                         f"registry row declares it — scrub each site in place:")
+        explained[(rel, key)] += f"\n    {rel}:{line}: {remedy}"
+    problems = malformed + check_registry(measured, declared, explained)
+    if not problems:
+        print(f"sh-hygiene: OK — {sum(declared.values())} declared site(s) in {len(declared)} row(s), "
+              f"no undeclared location probe asked from a moved directory")
+        return 0
+    print(f"sh-hygiene: {len(problems)} finding(s). With GIT_DIR set and no GIT_WORK_TREE, which git "
+          f"exports into a linked worktree's hooks and merge drivers, git takes the current directory "
+          f"for the top of the work tree, so a probe asked from a moved directory answers about that "
+          f"directory as if it were the root.")
+    for problem in problems:
+        print(f"  {problem}")
+    return 1
+
+
 def run_selftest() -> int:
     """Stage the break, confirm RED. A gate whose failing case has never been observed is not one."""
     ok = True
     n = 0
 
-    def test(claim: str, got: object, want: object) -> None:
+    def test(claim: str, got: object, want: object, say: bool = False) -> None:
         nonlocal ok, n
         n += 1
         if got != want:
             print(f"SELFTEST FAIL: {claim} — got {got!r}, wanted {want!r}")
             ok = False
+        elif say:
+            print(f"sh-hygiene selftest: ok — {claim}")
 
     # THE FIXTURE IS THE WORK. It carries the failing form and its nearest innocent neighbour in one
     # file, so an arm that passes by grading nothing is not available: the same run must name one
@@ -556,6 +766,92 @@ def run_selftest() -> int:
         test("an argument that was supplied and does not resolve refuses, naming the path",
              refusal, "named")
 
+    # ---- the LOCATION-PROBE class: every row of the unit's fixture table, each with its verdict ----
+    # One line per case, and each case must land in EXACTLY one class, so an arm cannot pass by
+    # grading nothing: the gated forms, both scrubs, the three spellings the scrub check refuses on
+    # purpose, and one of each near miss share this one run.
+    probe_cases = [
+        ('x=$(git -C "$d" rev-parse --show-prefix)', "bare"),
+        ('x=$(GIT -C "$d" rev-parse --show-toplevel)', "bare"),
+        ('x=$(git -C "$(dirname -- "$0")" rev-parse --show-prefix)', "bare"),
+        ('x=$(git -c a.b=c -C "$d" rev-parse --path-format=absolute --show-toplevel)', "bare"),
+        ('x=$(cd "$d" && git rev-parse --show-prefix)', "bare"),
+        ('x=$(unset GIT_DIR GIT_WORK_TREE; git -C "$d" rev-parse --show-toplevel)', "scrubbed"),
+        ('x=$(unset GIT_DIR GIT_WORK_TREE; cd "$d" && git rev-parse --show-prefix)', "scrubbed"),
+        ('unset GIT_DIR GIT_WORK_TREE; x=$(git -C "$d" rev-parse --show-prefix)', "bare"),
+        ('x=$(unset GIT_WORK_TREE GIT_DIR; git -C "$d" rev-parse --show-prefix)', "bare"),
+        ('# x=$(git -C "$d" rev-parse --show-prefix)', "comment"),
+        ('x=$(git -C "$d" rev-parse --git-common-dir)', "identity"),
+        ("top=$(git rev-parse --show-toplevel)", "cwd"),
+    ]
+    for case, want in probe_cases:
+        verdict = [key for key, sites in scan_probe_file(case + "\n").items() if sites]
+        test(f"probe [{want}] {case}", verdict, [want], say=True)
+    quoted = scan_probe_file(probe_cases[2][0])["bare"]
+    test("the quoted-substitution operand is ONE word, so the key is the probe as written",
+         [key for _l, key, _r in quoted], ['-C "$(dirname -- "$0")" --show-prefix'], say=True)
+    test("the remedy a bare site prints is itself graded scrubbed, top-level unset included",
+         [[key for key, sites in scan_probe_file(remedy).items() if sites]
+          for case, _w in probe_cases[7:9] for _l, _k, remedy in scan_probe_file(case)["bare"]],
+         [["scrubbed"], ["scrubbed"]], say=True)
+
+    # ---- the population, the registry and the refusals, over a real repository ---------------------
+    # A git hook exports GIT_DIR, and this block runs git in a scratch repository, so the three
+    # variables are held out of the environment for its length and put back after.
+    held = {name: os.environ.pop(name) for name in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE")
+            if name in os.environ}
+    try:
+        with tempfile.TemporaryDirectory() as scratch:
+            tree = pathlib.Path(scratch)
+            probe = probe_cases[0][0] + "\n"
+            files = {"a.sh": probe, "hook": "#!/usr/bin/env bash\n" + probe,
+                     "tool": "#!/usr/bin/env python3\n" + probe, "b.test.sh": probe}
+            for rel, body in files.items():
+                (tree / rel).write_bytes(body.encode("utf-8"))
+            for argv in (["git", "init", "-q", "."], ["git", "add", "-A"]):
+                subprocess.run(argv, cwd=str(tree), capture_output=True, check=True)
+            found, scanned = scan_probe_tree(tree, [":!*.test.sh"])
+            test("a bash-shebang extensionless file is scanned, a python one and an excluded suite are not",
+                 sorted({site[0] for site in found["bare"]}), ["a.sh", "hook"], say=True)
+            found, scanned = scan_probe_tree(tree, [])
+            test("the CONTROL — without the exclusion the suite is scanned too",
+                 sorted({site[0] for site in found["bare"]}), ["a.sh", "b.test.sh", "hook"], say=True)
+            reg = tree / "reg.txt"
+            key = '-C "$d" --show-prefix'
+            outcomes = []
+            for rows in (f"a.sh\t{key}\t1\tread by no hook\nhook\t{key}\t1\tthe hook's own\n",
+                         f"a.sh\t{key}\t1\tread by no hook\nhook\t{key}\t1\tthe hook's own\n"
+                         f"gone.sh\t{key}\t1\ta drained site\n",
+                         f"a.sh\t{key}\t2\tread by no hook\nhook\t{key}\t1\tthe hook's own\n",
+                         f"a.sh\t153\t1\tkeyed on a line\nhook\t{key}\t1\tthe hook's own\n"):
+                reg.write_text(rows, encoding="utf-8")
+                said = io.StringIO()
+                with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
+                    code = run_probe_scan([str(reg), str(tree), ":!*.test.sh"])
+                outcomes.append((code, said.getvalue()))
+            test("a registry row for each bare site is green", outcomes[0][0], 0, say=True)
+            test("and a waived site prints its reason on that green run",
+                 "read by no hook" in outcomes[0][1], True, say=True)
+            test("a row whose site is gone is a finding", (outcomes[1][0], "no longer finds" in outcomes[1][1]),
+                 (1, True), say=True)
+            test("a count that disagrees is a finding", (outcomes[2][0], "the scan measures" in outcomes[2][1]),
+                 (1, True), say=True)
+            test("a line-number key is a finding", (outcomes[3][0], "never a line number" in outcomes[3][1]),
+                 (1, True), say=True)
+            refusals = []
+            for argv in ([str(reg), str(tree), "nosuch/"], [str(tree / "nosuch.txt"), str(tree)]):
+                with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                    refusals.append(run_probe_scan(argv))
+            test("an empty population and an unresolvable registry each refuse with 2", refusals, [2, 2],
+                 say=True)
+            (tree / ".git").rename(tree / "not-git")
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                refusals = [run_probe_scan([str(reg), str(tree)])]
+            test("a root that is no repository refuses with 2 rather than grading nothing", refusals, [2],
+                 say=True)
+    finally:
+        os.environ.update(held)
+
     if n < FLOOR_ASSERTIONS:
         print(f"SELFTEST FAIL: {n} assertion(s) executed, under the floor of {FLOOR_ASSERTIONS} — an arm is stranded past an early exit, which is the one defect a printed count can see and a per-arm check cannot")
         ok = False
@@ -566,6 +862,8 @@ def run_selftest() -> int:
 def main(argv: list[str]) -> int:
     if "--selftest" in argv:
         return run_selftest()
+    if "--location-probes" in argv:
+        return run_probe_scan([arg for arg in argv[1:] if arg != "--location-probes"])
     args = argv[1:]
     root = pathlib.Path(args[1] if len(args) > 1 else ".").resolve()
     if not root.is_dir():

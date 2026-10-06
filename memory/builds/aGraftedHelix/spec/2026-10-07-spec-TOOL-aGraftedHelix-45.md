@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-45 — a leg bans a location probe asked from a moved directory unless it scrubs an inherited GIT_DIR or a registry row waives it
 
-**Status:** SPECCED · rev-2 · 2026-10-07 · node a · Tier-2 · base e1f4d8c0 · streams tooling+kickoff · order 26 · ratified 2026-10-07
+**Status:** CLOSED · rev-2 · 2026-10-07 · node a · Tier-2 · base e1f4d8c0 · streams tooling+kickoff · order 26 · ratified 2026-10-07
 
 <!-- gen:spec-records -->
 

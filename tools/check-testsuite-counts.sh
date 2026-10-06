@@ -28,7 +28,7 @@ set -u
 _self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "testsuite-counts: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
-_self_pre=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || { echo "testsuite-counts: cannot derive this gate's own directory from '$_self_dir', so the manifest beside it cannot be found"; exit 2; }
+_self_pre=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || { echo "testsuite-counts: cannot derive this gate's own directory from '$_self_dir', so the manifest beside it cannot be found"; exit 2; }
 MANIFEST="${GATE_LEGS:-${_self_pre}gate-legs.json}"
 # The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test.

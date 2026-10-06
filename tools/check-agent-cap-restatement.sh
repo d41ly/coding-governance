@@ -53,7 +53,7 @@ ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "agent-cap-restateme
 cd "$ROOT" || exit 2
 
 # The registry defaults to the sidecar BESIDE this gate, derived (TOOL-aRepatriatedFork-2 S7).
-_self_pre=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || _self_pre=""
+_self_pre=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || _self_pre=""
 WAIVERS=${1:-${_self_pre}agent-cap-restatement-waivers.txt}
 
 # FROZEN trees, excluded by PATH PREFIX rather than by matched text. These are append-only records

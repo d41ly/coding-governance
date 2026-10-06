@@ -2,8 +2,9 @@
 
 Project-agnostic checks for classes that make a script misbehave **silently**.
 
-The kit declares **two** gate legs of its own, both in `kit.toml`: `shell hygiene (a loop fed by a
-command substitution)` and `shell-hygiene selftest`. It declared NONE until
+The kit declares its own gate legs in `kit.toml`: `shell hygiene (a loop fed by a command
+substitution)`, `shell hygiene (a location probe asked from a moved directory)` and
+`shell-hygiene selftest`. It declared NONE until
 `TOOL-aLeakedHandle-1`, and the PowerShell half below is still on no leg anywhere — see
 *What is still unwired*. Anything not declared there is the consuming project's to wire, and the
 two-line adoption step for that is documented here rather than left implicit.
@@ -79,6 +80,48 @@ with no carried sites needs no file at all, and an empty file says the same thin
 
 No count is written here or in the registry. The scanner derives the site and row totals and prints
 both on every run, green included; a number typed beside them would be wrong on the next commit.
+
+### `--location-probes` — a location probe asked from a moved directory
+
+```bash
+python3 <tool-root>/gate-lint/sh_hygiene.py --location-probes [registry-path] [root] [pathspec ...]
+```
+
+A second class, in the same scanner. With `GIT_DIR` set and no `GIT_WORK_TREE`, git takes the
+CURRENT directory for the top of the work tree, so `git -C <dir> rev-parse --show-prefix` — and
+`cd <dir> && git rev-parse --show-*`, its other spelling — answers about `<dir>` as if it were the
+root. Git exports `GIT_DIR` into a linked worktree's hooks and merge drivers, so such a probe is
+right in a shell and silently wrong under one: an empty prefix, or the probed directory named as the
+repository root, and every reader downstream treats that as a legal answer.
+
+Whether a hook can reach a given probe is a question about callers that no line predicate answers,
+so the mode BANS THE SPELLING. Every probe opens its own substitution with the scrub, or carries a
+registry row whose reason the scan prints on every run, green included:
+
+```bash
+top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$dir" rev-parse --show-toplevel)
+```
+
+One scrub spelling is accepted on purpose: the probe is the first command of the `(` that opens with
+exactly that `unset`. An `unset` earlier on the line, the other variable order, or a third variable
+grades bare, and the hit prints the scrubbed spelling as its remedy. Never unset the variables for
+the whole process instead: a check that reads `GIT_DIR` on purpose goes blind, and `GIT_INDEX_FILE`
+names a different index on a partial commit.
+
+The population is every tracked `*.sh` plus every tracked extensionless file whose first line is a
+shell shebang, narrowed by the pathspecs. The shebang rule reaches a repository's git hooks without
+the kit naming where it keeps them. The `-C` operand is read as a whole shell word, so a quoted
+`"$(dirname -- "$0")"` is one operand rather than two. Every run prints the scanned file count, the
+bare count, the scrubbed count and three near misses it reports and does not gate: a `-C` probe
+asking the git dir or the common dir, which an inherited `GIT_DIR` answers correctly from inside its
+own repository; `--show-*` asked with no move, which asks the caller's directory; and the gated
+spelling inside a comment. The scanner's header lists what the mode does NOT check.
+
+The registry has the loop registry's four fields and both-directions rule, keyed on the PROBE AS
+WRITTEN instead of a delimiter — `-C <word> --show-<x>` or `cd <word> --show-<x>`, the word exactly
+as the source spells it — and never on a line number. The argument is optional with the same three
+states: absent grades an empty declaration and says so, supplied-and-unresolvable refuses, and an
+empty population or a failed `git ls-files` refuses with exit 2.
 
 ## encoding_posture.py
 

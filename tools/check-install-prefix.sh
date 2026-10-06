@@ -81,7 +81,7 @@ cd "$ROOT" || exit 2
 # one tree differ as strings, so the strip no-ops and the result comes out ABSOLUTE. An EMPTY prefix
 # is the repo root, which is a legal install and not a failure — the two are told apart by git's
 # exit status, not by the emptiness of its answer.
-if ! SELF_REL=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
+if ! SELF_REL=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
   echo "install-prefix: cannot derive this gate's own directory from '$_self_dir', so its tool root"
   echo "install-prefix: and population cannot be resolved. REFUSING rather than falling back to a"
   echo "install-prefix: guessed prefix, which is the shape that makes a broken install look like a"

@@ -168,7 +168,7 @@ except LookupError as e:
 r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
-_kit=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || { echo "verdict-epoch: cannot derive this gate's own directory from '$_self_dir'"; exit 2; }
+_kit=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || { echo "verdict-epoch: cannot derive this gate's own directory from '$_self_dir'"; exit 2; }
 ENGINE="${_kit}check-memory-hygiene.sh"
 _recall=""
 if _ve_py=$(resolve_python 2>/dev/null); then

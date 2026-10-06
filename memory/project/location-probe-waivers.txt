@@ -1,0 +1,15 @@
+# location-probe-waivers.txt — the probes the `shell hygiene (a location probe asked from a moved
+# directory)` leg waives. TOOL-aGraftedHelix-45.
+#
+# A row is `<path> TAB <probe> TAB <count> TAB <reason>`. The key is the file and the PROBE AS
+# WRITTEN — `-C <word> --show-<x>` or `cd <word> --show-<x>`, the word exactly as the source spells
+# it — and NEVER a line number, because a line-keyed registry reds on an unrelated edit above the
+# waived line. The count is how many sites in that file carry that probe.
+#
+# SET EQUALITY IN BOTH DIRECTIONS, and the counts too: a bare site with no row fails, a row the scan
+# no longer finds fails, and a count that no longer matches fails. The leg prints every row's reason
+# on every run, green included.
+#
+# IT LANDS EMPTY. Every probe in the population was scrubbed in place when the leg was wired, and
+# none reads GIT_DIR on purpose. A row belongs here only for a probe that MUST see an inherited
+# GIT_DIR, with that reason written out; a probe that merely has not been scrubbed yet is not one.

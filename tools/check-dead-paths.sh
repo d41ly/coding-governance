@@ -78,7 +78,7 @@ cd "$ROOT" || exit 2
 # THIS GATE'S OWN DIRECTORY, DERIVED, and an underivable one REFUSES. Its waiver registry and its own
 # two files sit here, and every waiver row names its file through the `{prefix}` token the loop below
 # resolves against this answer, so gov runs at whatever kit root it was checked out under.
-if ! SELF_PRE=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
+if ! SELF_PRE=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
   echo "dead-paths: cannot derive this gate's own directory from '$_self_dir' — REFUSING"
   exit 2
 fi

@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.133 -->
+<!-- gov:kit memory-tree@2.134 -->
 # {{MEMORY_ROOT}}/ retention & hygiene
 
 `{{MEMORY_ROOT}}/` is the project's AI-first memory: version-controlled, travelling to every node on clone.

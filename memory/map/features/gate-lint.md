@@ -12,6 +12,7 @@ gate-legs = [
   "shell hygiene (a loop fed by a command substitution)",
   "shell-hygiene selftest",
   "encoding posture (text IO names its encoding)",
+  "shell hygiene (a location probe asked from a moved directory)",
 ]
 kits = ["gate-lint"]
 git-hooks = []
@@ -28,6 +29,7 @@ globs = [
   "tools/gate-lint/*",
   "memory/project/substitution-fed-loops.txt",
   "memory/project/encoding-posture-sites.txt",
+  "memory/project/location-probe-waivers.txt",
 ]
 ```
 
@@ -113,6 +115,17 @@ because a declared adopter leg reds at every adopter's next pull until they seed
 whether it replaces an adopter's own scanner is theirs to decide (that unit's §8 F2). The leg is
 therefore an `[[exempt_leg]]` row in the govkit registry, not a `[[gate_leg]]` in the descriptor.
 
+**The location-probe ban is a second MODE of the shell scanner, not a second scanner.**
+`TOOL-aGraftedHelix-45` gates `git -C <dir> rev-parse --show-*` and `cd <dir> && git rev-parse
+--show-*` in shipped shell: under an inherited `GIT_DIR` both answer about `<dir>` as if it were the
+root, and git exports one into a linked worktree's hooks. No line predicate can tell which probe a
+hook reaches, so the leg bans the SPELLING — a probe opens its own substitution with `unset GIT_DIR
+GIT_WORK_TREE;` or carries a waiver row whose reason prints on every run. It reuses the comment
+cutter and the registry pair, with the key shape passed in: the probe as written, never a line.
+Its population reaches extensionless files by their shell shebang, so the git hooks are graded
+without the kit naming where a repository keeps them. The class record is
+`memory/gotchas/inherited-git-dir-pins-the-work-tree-to-the-cwd.md`.
+
 ## Shared seams
 
 - `memory/project/*.txt` — the shrink-only registry convention, shared with
@@ -120,7 +133,7 @@ therefore an `[[exempt_leg]]` row in the govkit registry, not a `[[gate_leg]]` i
   directory, same both-directions rule. Membership is declared through `PROJECT_REGISTRY_EXTRA` in
   `.memory-tree.conf`, because hygiene check 3 keeps that directory a closed set.
 - `tools/gate-legs.json` — the leg manifest is the single source for what the bar runs. The kit
-  descriptor declares the same two rows through `{kit}` tokens, and `govkit` compares the two
+  descriptor declares the same rows through `{kit}` tokens, and `govkit` compares the two
   spellings in both directions on NAME, SUBJECT and CHUNK and never on argv — which is what lets
   this repository's own row carry a registry argument the shipped descriptor does not.
 - `git ls-files` as the population — the same derived-not-authored rule
@@ -151,6 +164,11 @@ that must land green over a non-compliant population without keying on a line nu
   drained; the leg reds if you delete one too early or too late.
 - `python tools/gate-lint/encoding_posture.py [registry] [root] [pathspec ...]` — the Python
   text-IO scan; `--selftest` proves both arms fire on an offending fixture and clear on its twin.
+- `python tools/gate-lint/sh_hygiene.py --location-probes [registry] [root] [pathspec ...]` — the
+  location-probe ban. It prints the bare, scrubbed and three near-miss counts, every waived row's
+  reason, and for each bare site its path, line and scrubbed spelling.
+- `memory/project/location-probe-waivers.txt` — gov's waivers for that ban, keyed on the probe as
+  written. It landed holding no row.
 - `memory/project/encoding-posture-sites.txt` — gov's gov-internal carried sites, one row per
   file and arm. Lower a count or delete a row in the commit that drains the site.
 

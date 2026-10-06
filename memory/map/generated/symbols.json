@@ -1973,6 +1973,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "build_probe_measured",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "build_projects",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -3786,6 +3791,11 @@
       "id": "check_probe_command",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "check_probe_scrubbed",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "check_proc_gone",
@@ -9928,6 +9938,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "print_probe_populations",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "print_ready",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
@@ -15703,6 +15718,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "run_probe_scan",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "run_push",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -16366,6 +16386,16 @@
       "id": "scan_preflights",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "scan_probe_file",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "scan_probe_tree",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "scan_processes",

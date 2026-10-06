@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-07T01:29:59+03:00 @ 7996de7afafef862ee26afea62893a1b90f5e65b
+last-audit: 2026-10-07T02:55:28+03:00 @ 764b6d8cece5533bf0ea3ea116a5e0b58698ab8e
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: cacd8d307477c5aca09d2cfe851fe4e5f425b932
+last-body-change: 764b6d8cece5533bf0ea3ea116a5e0b58698ab8e
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -249,7 +249,8 @@ does) · `process-creation-is-the-suite-cost.md` ·
 · `check-format-grades-two-populations.md` · `waiver-row-that-hides-nothing-reds.md` · `a-new-leg-trips-a-growing-set-of-meta-gates.md` · `conf-value-interpolated-into-a-regex.md`
 · `pin-gated-checks-arm-nothing-without-a-pin.md` · `record-without-serves-or-with-a-round-counter.md` · `sourced-conf-blank-overrides-the-default.md`
 · `shipped-checker-edit-is-an-adopter-contract-change.md` · `concurrency-is-not-a-budget.md` (also the file-constant bound) · `allowlist-narrower-than-the-root-it-guards.md` (also what a
-`scratch-guard` denial means). The 2026-09-14 eviction is `TOOL-aReplayedCard-4`; its acceptance ledger maps every bullet to the record it landed in.
+`scratch-guard` denial means) · `inherited-git-dir-pins-the-work-tree-to-the-cwd.md` (a `-C`
+probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `TOOL-aReplayedCard-4`; its acceptance ledger maps every bullet to the record it landed in.
 
 - A gate FIXTURE a node may not host: an IGNORED path is never staged, and a name differing only in
   CASE is the same file. Both give an arm that passes because its fixture was never there. `*.bak`
@@ -258,10 +259,6 @@ does) · `process-creation-is-the-suite-cost.md` ·
   recorded high-water. Raising the
   ceiling is an owner decision, not an edit. Read the current
   margin FROM `bash tools/check-template-size.sh`, never from prose.
-- `git -C <dir> rev-parse --show-toplevel` returns `<dir>` ITSELF when an absolute `GIT_DIR` is
-  inherited — what git exports to a merge driver in a LINKED WORKTREE. That made the row driver
-  conflict every merge there until `repo_root()` walked up for the conf (`TOOL-aCollapsedScan-7`).
-  Worktree merges are CLEAN now, re-verified 2026-09-04.
 - A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
   and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
   `TOOL-aPromptedMandate-4`.
