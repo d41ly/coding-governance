@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.87 -->
+<!-- gov:kit unattended@1.88 -->
 # The unattended stop contract — HELD, the hold codes and the lease
 
 *Installed beside `UNATTENDED-PROTOCOL.md` from the unattended kit and byte-compared against the
@@ -296,7 +296,10 @@ lease is taken, so a refused take-over writes nothing at all:
 7. the history row is written;
 8. a HELD record returns to its `held-from` phase, and one carrying `hold-run` prints the relaunch of
    that deferred review FIRST: re-run it with identical args, which reuses every lens and skeptic
-   file it wrote and dispatches only what did not return.
+   file it wrote and dispatches only what did not return. The files exist only where the review ran
+   under `workerType: 'none'`, as the build harness's spec audit does; a review under a named type,
+   the default of a direct call, wrote none and its re-run dispatches every judge again. A hold can
+   name any deferred review, the closing diff review included.
 
 **The reap ordering, which used to live in the protocol's keepalive section.** A resumed session did
 not schedule the job the run-state file names and cannot assume it died with the process that did.
@@ -595,6 +598,16 @@ does not read back as one OPEN ask of the SEV owed are removed and named. An OPE
 already filed for the same leg at the same R, read back at the SEV owed, is reused and named, so a
 repeated close files nothing twice. With `ASKS_CMD` blank the item prints the rows it would file and
 writes nothing.
+
+**The daily held job's reds get an owner too.** After the bar returns, on every return code and
+without touching the verdict, the item reads the latest completed scheduled run of the workflow
+`HELD_CI_WORKFLOW` names, read from the conf at R, through the public API with no credential, and
+files one ask per held suite whose job concluded `failure` or `timed_out`, in the same grammar and
+through the same read-back and rollback: SEV HIGH, a KEEP row, and an `accept` clause asking for the
+suite green on the daily held job. An OPEN HIGH ask for the same suite in ANY build's `BACKLOG.md`
+is reused and named. A name carrying a backtick, a control character, ` · ` or ` → `, and a head sha
+R does not descend from, are refused and named. Every way the read can fail is a `DEAD PROBE` line
+that files nothing, and blank `HELD_CI_WORKFLOW` is DARK, announced, with no request made.
 
 **The two escape routes are backed or refused.** `--close --override gates-green` and
 `--abort --code gate-red-out-of-scope` are refused, numbered, unless the record the `gates-run` fact

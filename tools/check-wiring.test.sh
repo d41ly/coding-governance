@@ -1547,5 +1547,36 @@ ck "U19 AC5 ...and a pinned .claude/ file outside both globs is not" \
    "$(printf '%s' "$out" | grep -q 'other.js' && echo 0 || echo 1)"
 cleanup
 
+# U22 AC3 — the merge=ours arm. git ships `ours` as a strategy, not a driver, so the attribute alone
+# falls back to a text merge; the arm names the unset driver, wires `true` under --fix and --session,
+# and never overwrites a value somebody else set. The baseline rc is 0 (hooks wired, no other kit
+# adopted), so each rc=1 below is this arm's own. Global and system config are cut off for the arm:
+# git reads `merge.ours.driver` from them too, so a node that set it globally would make "unset"
+# unreachable here and red the arm for the machine's reasons.
+export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
+newrepo; git config core.hooksPath .githooks
+mkdir -p memory; printf 'x\n' > memory/LIVE.md
+out=$(chk --check); rc=$?
+ck "U22 AC3 no path declares merge=ours -> skip, exit 0" \
+   "$([ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     merge     — merge=ours is declared on no tracked path' && echo 1 || echo 0)"
+printf 'memory/LIVE.md merge=ours\n' > .gitattributes
+git add -A; git commit -q -m ours
+out=$(chk --check); rc=$?
+ck "U22 AC3 merge=ours with the driver unset -> UNWIRED naming merge.ours.driver, exit 1" \
+   "$([ "$rc" = 1 ] && printf '%s' "$out" | grep -q '^UNWIRED  merge     — .*merge\.ours\.driver is unset' && echo 1 || echo 0)"
+chk --fix >/dev/null; got=$(git config merge.ours.driver 2>/dev/null || true); out=$(chk --check); rc=$?
+ck "U22 AC3 ...--fix sets it to true, and the re-check is ok, exit 0" \
+   "$([ "$got" = true ] && [ "$rc" = 0 ] && printf '%s' "$out" | grep -q '^ok       merge     — merge.ours.driver wired' && echo 1 || echo 0)"
+git config merge.ours.driver false
+chk --fix >/dev/null; got=$(git config merge.ours.driver 2>/dev/null || true); out=$(chk --check); rc=$?
+ck "U22 AC3 ...a value already set is never overwritten and stays UNWIRED" \
+   "$([ "$got" = false ] && [ "$rc" = 1 ] && printf '%s' "$out" | grep -q "merge.ours.driver='false', not 'true'; NOT overwriting" && echo 1 || echo 0)"
+git config --unset merge.ours.driver
+chk --session >/dev/null; rc=$?; got=$(git config merge.ours.driver 2>/dev/null || true)
+ck "U22 AC3 ...--session wires the unset driver, exit 0" \
+   "$([ "$rc" = 0 ] && [ "$got" = true ] && echo 1 || echo 0)"
+cleanup
+unset GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

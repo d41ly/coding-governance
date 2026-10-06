@@ -11,6 +11,7 @@ decisions = []
 gate-legs = ["kickoff engine size <=18KiB"]
 kits = []
 git-hooks = []
+harness-hooks = ["SessionStart skills/session-kickoff/manifest-check.sh"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -66,7 +67,15 @@ sibling resolver as the id reader, and lists the remote's run claims by the driv
 `stale` and `terminal` ones older than the checker's `CARD_CLAIMS_HIDE_S`; a replay reads no remote.
 Where the conf's `RUN_CLAIMS` is not `on` the driver answers `claims: off` without a read and the
 cell reads `skipped: RUN_CLAIMS is off`, so the shipped dark default pays no fetch per session start
-and the card never reads the switch itself (`TOOL-aGraftedHelix-32`).
+and the card never reads the switch itself (`TOOL-aGraftedHelix-32`). The `drift —` cell
+(`KICK-aMendedFleet-1`) summarises the last group of `drift-history.tsv` in the git common dir, the
+file every bar's drift-audit records leg appends to, by reading that file and never running the report.
+The `overlaps —` cell (`KICK-aMendedFleet-2`) prints the unattended driver's `--overlaps` answer, the
+unmerged remote-tracking refs sharing a path with this tree's branch, read once under a bounded
+`timeout` and found through `resolve_kit_file`, so the kit spells no path of the unattended kit.
+The `cli —` cell (`KICK-aMendedFleet-4`), directly after `node —`, compares PATH's `claude --version`,
+read once under a bounded `timeout`, with the running session's version from `AI_AGENT`, and prints a
+NOTE when PATH is the older, since every session started from PATH runs that CLI.
 
 The engine's kickoff lands on the card through `--card --append` (`KICK-aReplayedCard-2`), which
 checks every cited path, line range and record id for EXISTENCE in two spawns — one
@@ -101,6 +110,8 @@ preflight line states the posture.
   copy can differ with nothing to notice. `check-wiring.sh` now compares them by content and reports
   at SessionStart; it is deliberately not a merge-bar leg, because machine state travels with no
   commit and would red the bar for a reason no diff can fix.
+- **`manifest-check.sh` is wired at `SessionStart`** to write or replay the orientation card, two
+  matchers on one event and so one `harness-hooks` claim; no path glob here covers it.
 - **The `governance-template:` marker fallback is engine-only.** The checker does not implement it, so
   it is absent from `--locations` and is documented as engine behaviour instead. That is one fact in
   two documents, which is the shape this feature otherwise exists to remove; it survives because

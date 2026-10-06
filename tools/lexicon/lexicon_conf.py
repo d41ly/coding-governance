@@ -548,4 +548,9 @@ def _main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
+    # UTF-8 on every host, and only when run as a script: `adopt-lexicon.sh` reads the glosses
+    # through a pipe, and outside Python's UTF-8 mode a Windows pipe is the ANSI code page, so an
+    # em dash arrives as 0x97 and the rendered Skill drifts (TOOL-aMendedFleet-6). Importers keep
+    # their own stdout.
+    sys.stdout.reconfigure(encoding="utf-8")
     raise SystemExit(_main(sys.argv))

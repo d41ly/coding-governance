@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """reap.py — kill a tree and PROVE each member died.
 
-gov:kit process-monitor@0.15
+gov:kit process-monitor@0.16
 
 Contract: memory/builds/aReapedSpinner/spec/2026-09-08-spec-TOOL-aReapedSpinner-4.md
 
@@ -110,6 +110,9 @@ def add_health_event(log, source, event, detail):
 
 
 SIGNAL_TIMEOUT_S = 20
+# How long verification waits for a dying member to leave the census. PINNED as a bound, not a
+# measurement: the census suite's held bound is 160 s and its live arm already stages for 3.
+SETTLE_S = 10
 
 
 class ReapRefused(RuntimeError):
@@ -257,6 +260,38 @@ def check_survivors(report, rescan):
     return report
 
 
+def check_settled_survivors(report, backend="", deadline_s=None):
+    """`check_survivors` over REPEATED census reads, until the kill set is gone or the deadline.
+
+    Measured (TOOL-aMendedFleet-105): leaves-first still cascades, so a shell whose foreground
+    child just died is exiting on its own when the walk reaches it. MSYS refuses the signal to an
+    exiting process (`Permission denied`), and ONE immediate re-read still lists it — a survivor
+    and a signal error for a member that died. Red twice in three remote runs, once in six on node a.
+
+    It only WAITS: the verdict is still a census read, never a signal's exit status. After the last
+    read, a refused signal on a member that read shows gone is the cascade case and joins
+    `already_gone`; one still present stays an error AND a survivor. `deadline_s=None` reads
+    `SETTLE_S` at call time; 0 is the old single-read behaviour. `rereads` is the settle's liveness.
+    """
+    import time
+    import census
+    limit = time.monotonic() + (SETTLE_S if deadline_s is None else deadline_s)
+    reads = 0
+    while True:
+        rescan, _c = census.scan_processes(backend)
+        reads += 1
+        report = check_survivors(report, rescan)
+        if not report["survivors"] or time.monotonic() >= limit:
+            break
+        time.sleep(0.25)
+    report["rereads"] = reads
+    gone = set(report["killed"])
+    report["already_gone"] = list(report.get("already_gone", ())) + [
+        e[0] for e in report["errors"] if e[0] in gone]
+    report["errors"] = [e for e in report["errors"] if e[0] not in gone]
+    return report
+
+
 def render_kill(report):
     out = ["reap: %s target %d · walked %d · in scope %d · dropped %d · withheld %d"
            % ("DRY RUN" if report["dry_run"] else "kill", report["target"],
@@ -264,10 +299,10 @@ def render_kill(report):
               len(report.get("withheld", ())))]
     if "killed" in report:
         out.append("reap: killed %d · survivors %d · already gone %d · unsignalable %d "
-                   "· signal errors %d"
+                   "· signal errors %d · census reads %d"
                    % (len(report["killed"]), len(report["survivors"]),
                       len(report.get("already_gone", ())), len(report["unsignalable"]),
-                      len(report["errors"])))
+                      len(report["errors"]), report.get("rereads", 1)))
     for winpid, rc, msg in report["errors"]:
         out.append("reap:   signal error on %d (rc %d): %s" % (winpid, rc, msg))
     for winpid in report["unsignalable"]:
@@ -312,8 +347,7 @@ def run_sweep(root_dir, mode, dry_run, backend=""):
             reports.append({"target": winpid, "refused": str(exc)})
             continue
         if not dry_run:
-            fresh, _ = census.scan_processes(backend)
-            rep = check_survivors(rep, fresh)
+            rep = check_settled_survivors(rep, backend)
             # ONE I3 LINE PER KILL TARGET, after the read-back, so the count is the census's.
             add_health_event(resolve_health_log(root_dir), "reap", "tree-killed",
                              "target %d killed %d survivors %d unsignalable %d"
@@ -404,8 +438,7 @@ def main(argv):
             # The explicit path bypasses the MODE, never the FENCE.
             rep = run_kill(target, rows, scope, dry_run=dry_run)
             if not dry_run:
-                fresh, _ = census.scan_processes(backend)
-                rep = check_survivors(rep, fresh)
+                rep = check_settled_survivors(rep, backend)
                 add_health_event(resolve_health_log(root_dir), "reap", "tree-killed",
                                  "target %d killed %d survivors %d unsignalable %d"
                                  % (target, len(rep["killed"]), len(rep["survivors"]),

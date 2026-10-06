@@ -77,6 +77,14 @@ memory/backlog/*.md merge=rows
 # is never asked, and git's own text merge completes the merge with nothing refusing it.
 memory/builds/*/BACKLOG.md merge=rows
 
+# Wholly GENERATED views: a merge takes this side, and check 9 (gen_build_index.py --check) or
+# check 17 (gotchas.py --check) then reds the stale result until `--write` re-renders it.
+# git ships `ours` as a merge STRATEGY, not a driver: with no `merge.ours.driver` configured the
+# attribute silently falls back to the text merge. `bash tools/check-wiring.sh --fix` sets it to `true`.
+memory/LIVE.md merge=ours
+memory/ledger/*.md merge=ours
+memory/gotchas/INDEX.md merge=ours
+
 # The governance template is under a STRICT byte gate — pin it (+ companions) to LF so a CRLF
 # checkout can't inflate the count past the limit. (The gate also normalizes, belt-and-suspenders.)
 coding-governance-agents.template.md text eol=lf

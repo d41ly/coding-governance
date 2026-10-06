@@ -17,7 +17,8 @@
 # already false of 13-19 — one rule returning two verdicts, the
 # `amendment-leaves-its-other-half-standing` class this repo catalogues.
 #
-# Exit 0 + no output = clean. Anything printed is a hygiene regression.
+# Exit 0 = clean. Two channels print at exit 0 and are NOT regressions: the corpus classifier's
+# check-16 notices, and any line opening `HYGIENE advisory `. Anything else printed is a regression.
 set -u
 # --offenders: THE SIGNATURE THE MERGE BAR GRADES THIS LEG WITH (TOOL-dDerivedDocket-23 S3). The full
 # check runs exactly as it does with no flag and exits as it does; what changes is stdout, which
@@ -30,7 +31,7 @@ set -u
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.132   # gov:kit memory-tree@2.132 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.133   # gov:kit memory-tree@2.133 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -348,12 +349,13 @@ fail() { if [ "$OFFENDERS" = 1 ]; then add_offender_keys "$1" "$2"; else echo "H
 # add_offender_keys <check> <message> — one key per offender line the message LISTS. A message's first
 # line is its header and is dropped when a list follows it; a one-line message is its own key. Lines
 # ending in a colon are sub-headers, and a `… and N more` line is a count rather than an offender.
+# A line opening `HYGIENE advisory ` is NON-GATING and never a key (TOOL-aMendedFleet-23).
 add_offender_keys() {
   local _body=$2 _k
   case "$_body" in *$'\n'*) _body=${_body#*$'\n'} ;; esac
   _k=$(printf '%s\n' "$_body" \
     | sed -E 's/\r$//; s/\t/ /g; s/^[[:space:]]+//; s/[[:space:]]+$//; s/([^[:space:]:]):[0-9]+(:[0-9]+)*(:|[[:space:]]|$)/\1\3/g' \
-    | awk -v c="check $1" 'NF && $0 !~ /:$/ && $0 !~ /^(…|\.\.\.) *and / { print c "\t" $0 }')
+    | awk -v c="check $1" 'NF && $0 !~ /:$/ && $0 !~ /^(…|\.\.\.) *and / && $0 !~ /^HYGIENE advisory / { print c "\t" $0 }')
   [ -z "$_k" ] || OFFENDER_KEYS="$OFFENDER_KEYS$_k"$'\n'
 }
 
@@ -839,28 +841,63 @@ if [ -n "$sel6" ]; then
   #
   # The shipped ratio between the classes is stated as an allowance, not an arithmetic identity: a
   # project that moves one key and not another changes it.
+  #
+  # A BUILD README IS PRICED BY ITS AUTHORED BYTES (TOOL-aMendedFleet-84): its `wc -c` figure less
+  # every line from a `<!-- gen:build-index -->`, `<!-- gen:build-order -->` or
+  # `<!-- gen:build-edges -->` marker through its matching close, markers and newlines included, and
+  # less the front matter's one `ids:` line. Those bytes are rendered from the specs at about 308 per
+  # unit, so pricing them made the cap a bound on the roster rather than on what anyone wrote. A
+  # nested pair (`gen:build-units` inside the index region) is counted once; a marker is column-0
+  # equality after one trailing CR, the generator's own reading. A README whose pairs do not balance
+  # prints -1 here and is priced WHOLE, which fails safe. NOT CHECKED HERE: that a region's bytes
+  # really are generated. Check 9 re-renders the three registered regions and byte-compares them, so
+  # prose cannot hide inside one; a pair under any other name is priced as authored. LC_ALL=C makes
+  # `length` count bytes on every node.
+  gen6=$(printf '%s\n' "$sel6" | while IFS= read -r f; do case "$f" in "$M"/builds/*/README.md) printf '%s\n' "$f" ;; esac; done \
+    | LC_ALL=C xargs -r awk '
+    function flush() { if (f != "") { v = (bad || d != 0) ? -1 : s; print v, f } }
+    FNR==1 { flush(); f=FILENAME; d=0; s=0; fm=0; bad=0 }
+    { x=$0; sub(/\r$/, "", x) }
+    FNR==1 && x=="---" { fm=1; next }
+    fm==1 && x=="---" { fm=2; next }
+    fm==1 && x ~ /^ids:/ { s += length($0)+1; next }
+    x=="<!-- gen:build-index -->" || x=="<!-- gen:build-order -->" || x=="<!-- gen:build-edges -->" { d++ }
+    d>0 { s += length($0)+1 }
+    x=="<!-- /gen:build-index -->" || x=="<!-- /gen:build-order -->" || x=="<!-- /gen:build-edges -->" { d--; if (d<0) bad=1 }
+    END { flush() }')
   bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/"           -v icb="$INDEX_CAP_BYTES" -v icl="$INDEX_CAP_LINES"           -v gcb="$GUIDE_CAP_BYTES" -v gcl="$GUIDE_CAP_LINES"           -v rcb="$BUILD_README_CAP_BYTES" -v rcl="$BUILD_README_CAP_LINES"           -v dcb="$DOSSIER_CAP_BYTES" -v dcl="$DOSSIER_CAP_LINES"           -v dp="${MAP_SUB:+$M/$MAP_SUB/features/}" '
-    FNR==NR { if ($NF!="total") b[$NF]=$1; next }
+    # THREE streams, told apart by a file counter: `FNR==NR` names only the first. Each is a printf
+    # of a captured string, so none is ever zero lines and the counter cannot skip one.
+    FNR==1 { fi++ }
+    fi==1 { if ($NF!="total") b[$NF]=$1; next }
+    fi==3 { if (NF) g[$NF]=$1; next }
     $NF=="total" { next }
     { l[$NF]=$1; ord[++n]=$NF }
     END { for(i=1;i<=n;i++){ f=ord[i]
             # +0 on every binding: awk compares an unset or non-numeric -v as a STRING, which reds
             # nothing at all. The validation at conf load is what makes these numbers; this is belt.
-            cb = icb+0; cl = icl+0
+            cb = icb+0; cl = icl+0; rd = 0
             if (index(f, gp) == 1) { cb = gcb+0; cl = gcl+0 }
             # A build README: its own tier, and a 0 line cap means NO independent line cap. The line
             # count is whatever fits the byte budget at the per-line width, so there is no third
             # number to drift against the other two.
-            if (index(f, bp) == 1 && f ~ /\/README\.md$/) { cb = rcb+0; cl = rcl+0 }
+            if (index(f, bp) == 1 && f ~ /\/README\.md$/) { cb = rcb+0; cl = rcl+0; rd = 1 }
             # A codebase-map dossier, GUARDED on a non-empty prefix. `dp` is empty when no map is
             # adopted, and `index(f, "")` is 1 for EVERY string — an unguarded test would hand the
             # dossier bound to the whole tree and silently undo the index cap. The `ex7` selector in
             # check 7 adds its map alternatives under `[ -n "$MAP_SUB" ]` for the same reason.
-            if (dp != "" && index(f, dp) == 1) { cb = dcb+0; cl = dcl+0 }
-            if (b[f]+0>cb || (cl>0 && l[f]+0>cl)) {
-              if (cl>0) printf "%s (%dB %dL > %dB/%dL)\n", f, b[f]+0, l[f]+0, cb, cl
-              else      printf "%s (%dB > %dB; no line cap for this class)\n", f, b[f]+0, cb } } }
-  ' <(printf '%s\n' "$cbytes") <(printf '%s\n' "$clines"))
+            if (dp != "" && index(f, dp) == 1) { cb = dcb+0; cl = dcl+0; rd = 0 }
+            # rd 1: authored price; rd 2: a README whose region pairs do not balance, priced whole.
+            sz = b[f]+0
+            if (rd && (f in g)) { if (g[f]+0 < 0) rd = 2; else sz = b[f] - g[f] }
+            else rd = 0
+            if (sz>cb || (cl>0 && l[f]+0>cl)) {
+              if (rd == 1 && cl>0) printf "%s (%dB authored %dL > %dB/%dL; generated regions not priced in bytes)\n", f, sz, l[f]+0, cb, cl
+              else if (rd == 1)    printf "%s (%dB authored > %dB; generated regions not priced; no line cap for this class)\n", f, sz, cb
+              else if (rd == 2)    printf "%s (%dB > %dB; generated region markers unbalanced, so priced whole; no line cap for this class)\n", f, sz, cb
+              else if (cl>0) printf "%s (%dB %dL > %dB/%dL)\n", f, sz, l[f]+0, cb, cl
+              else      printf "%s (%dB > %dB; no line cap for this class)\n", f, sz, cb } } }
+  ' <(printf '%s\n' "$cbytes") <(printf '%s\n' "$clines") <(printf '%s\n' "$gen6"))
 fi
 derive_waived 6 "$bad6"; bad6="$_UNWAIVED"
 # TWO BRANCHES, because the two classes have DIFFERENT remedies and a message is the only thing a
@@ -943,8 +980,8 @@ if [ -n "$sel7" ]; then
         # build. It cannot be wrapped — parse_front_matter refuses an indented continuation and
         # check-unattended.sh check 13 parses the same block — so measuring it would cap a value no
         # author controls and no renderer may reflow. This is scoping WITHIN a file, which is what
-        # the fence handling below already does. Measured: no index-set member opens with front
-        # matter today, so this changes no current verdict.
+        # the fence handling below already does. Measured at 20f7f2a40 (2026-08-17): no index-set
+        # member opened with front matter when this was written, so it changed no verdict then.
         if (nl == 1 && line == "---") { fm = 1; continue }
         if (fm) { if (line == "---") fm = 0; continue }
         if (line ~ /^[[:space:]]*(```|~~~)/) {
@@ -1521,7 +1558,8 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       print f " (missing/invalid **Status:** header in lines 1-5)"
       next      # header unparseable — the per-field assertions below have no anchor
     }
-    for (i = 1; i <= n; i++) if (body[i] ~ /<FAMILY-slug-seq>|YYYY-MM-DD/) { print f " (unfilled skeleton placeholder)"; break }
+    # ---- `<fill:` is the slot opener `gen_build_index.py --new-spec` writes (TOOL-aMendedFleet-20).
+    for (i = 1; i <= n; i++) if (body[i] ~ /<FAMILY-slug-seq>|YYYY-MM-DD|<fill:/) { print f " (unfilled skeleton placeholder)"; break }
     if (hdr ~ /^\*\*Status:\*\* WONTDO/ && hdr !~ /base [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]* · ./)
       print f " (WONTDO needs a successor id or reason pointer in the header tail)"
     # ---- the FILENAME date, computed once. Not the first date in the PATH: a build folder used to
@@ -2457,17 +2495,16 @@ fi
 # 17-19 — the bug-class catalogue (delegates to the sibling module). The catalogue's INDEX is
 # generated, every class record declares a gate or says it has none, and a record whose anchors reach
 # only the append-only tree is reachable on paper and dead in practice.
-# The capture is printed on a GREEN run too (TOOL-aGraftedHelix-3 S7), as check 20's is: an invariant
-# guard that cannot be resolved is ANNOUNCED inside the module's green output, and a gate that swallowed
-# it would turn the announcement back into the silent skip it exists to replace.
+# PRINT WHATEVER IT SAID, then decide from the exit code, as the corpus_ids block above does. Two
+# lines print at exit 0 and a gate that swallowed them would turn each back into a silent skip: check
+# 19's dead-anchor advisory (TOOL-aMendedFleet-23), and an invariant guard or decision the module
+# could not resolve, ANNOUNCED inside its green output (TOOL-aGraftedHelix-3 S7), as check 20's is.
 if [ "$STAGED" = 0 ]; then
-  if got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); then
-    [ -z "$got" ] || printf '%s\n' "$got"
-  else
-    printf '%s
-' "$got"; status=1
-    [ "$OFFENDERS" = 0 ] || add_offender_keys 17-19 $'\n'"$got"
-  fi
+  got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); _gotrc=$?
+  [ -n "$got" ] && printf '%s
+' "$got"
+  [ "$_gotrc" -ne 0 ] && status=1
+  [ "$_gotrc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 17-19 $'\n'"$got"
 fi
 
 # 20 — the row documents' grammar, and id collisions INSIDE one file. Delegated for the same reason

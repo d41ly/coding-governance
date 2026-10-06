@@ -23,6 +23,14 @@
 #                                            belonging to another build.
 #   push-main.sh --prepared --slug <slug>    exit 0 when HEAD carries a prepared merge; read-only.
 #
+# KIT VERSIONS ARE MINTED HERE, NOT ON A BRANCH (TOOL-aMendedFleet-65). The minting `--prepare` runs
+# the deployer's `govkit.py mint` over the advertised tip..the branch tip and writes each kit version
+# the landing owes INTO the prepared merge; the attended landing mints over the fetched tip and
+# commits the result as `mint: kit versions onto <remote>/<branch> at <sha8>`. A branch therefore
+# owes no bump: the epoch legs grade one only at the push boundary. Where no deployer resolves beside
+# this lander, which is every adopter, both paths say so in one line and land as before. What a mint
+# does NOT do: re-stamp the kickoff manifest, so a minted carrier on its watch line still reds C5.
+#
 # WHY THE FLAGS EXIST — TOOL-dDerivedDocket-2. The attended path lands only from the primary tree
 # with the default branch checked out, and it pushes that branch, which every build on the node
 # shares. A run that is never on it therefore had to leave its own tree to land, and its landing
@@ -85,6 +93,9 @@ fi
 obs=2
 [ -n "$MODE" ] && obs=3
 
+# This script's own directory, read BEFORE the cd below: a relative $0 resolves from the caller's
+# directory and nowhere else. It is the tool root the lexicon kit is looked for in (TOOL-aMendedFleet-3).
+self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || self_dir=""
 top=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "push-main: not a git repo" >&2; exit "$obs"; }
 cd "$top" || exit "$obs"
 
@@ -452,13 +463,156 @@ check_carry_set() {  # R -> 1 when a member belongs to another build
   return 0
 }
 
+# ---- MERGE LOSS, before --prepare moves the branch — TOOL-aMendedFleet-3 ------------------------
+# The two resolvers below are the pre-push hook's, inlined byte-identically from the canonical copies
+# their marker lines name and gated by the resolve-python self-test's parity table. TOOL-aMendedFleet-65
+# reuses them for its version minter rather than adding a second resolver to this script.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+# `check_merge_losses R T` runs the lexicon kit's `--merge-losses` over `R..T`, the merges a prepared
+# landing would publish, so a merge that LOST a definition a parent carried is refused here, before
+# the branch moves, rather than after the bar at the push. Exit 1 of the mode returns 1 with its
+# lines; a DEAD PROBE, no python and no kit each print one line and return 0, because the pre-push
+# hook grades the same range again at the push and binds there. The kit is found from THIS script's
+# own directory, the tool root it was installed into, never from a typed prefix.
+check_merge_losses() {  # R · T -> 1 when a merge in R..T loses a definition; 0 otherwise, any skip printed
+  local py dir out rc
+  if ! py=$(resolve_python 2>/dev/null); then
+    echo "push-main: the merge-loss check did NOT run — no usable python launcher; the pre-push hook grades the landing again." >&2
+    return 0
+  fi
+  # The FILE test (TOOL-aMendedFleet-111 S2): the resolver answers relative to THIS script's tree,
+  # and `$top` is the cwd's, so a tree without the kit made python exit 2 and read as a DEAD PROBE.
+  if ! dir=$(resolve_kit_dir "$py" lexicon lexicon.py "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/lexicon.py" ]; then
+    echo "push-main: the merge-loss check did NOT run — no lexicon kit beside this lander; the pre-push hook grades the landing again." >&2
+    return 0
+  fi
+  out=$("$py" "$top/$dir/lexicon.py" --merge-losses "$1..$2" 2>&1); rc=$?
+  case "$rc" in
+    0) return 0 ;;
+    1) printf '%s\n' "$out" | sed 's/^/  /' >&2; return 1 ;;
+  esac
+  echo "push-main: DEAD PROBE — the merge-loss check could not answer, so this prepare continues; the pre-push hook binds the landing:" >&2
+  printf '%s\n' "$out" | sed 's/^/  /' >&2
+  return 0
+}
+
+# ---- KIT VERSIONS, minted at the landing — TOOL-aMendedFleet-65 ----------------------------------
+# `run_minter <base> [<head>]` runs the deployer's `mint` verb, which writes the next version of every
+# kit whose shipped bytes moved in <base>..<head> with no bump dating the move, into the WORKING TREE;
+# the caller commits what it wrote. Found the way the merge-loss check finds its kit, from this
+# script's own directory. No python or no deployer, which is every adopter because govkit stays in
+# gov, prints one line and returns 0: the landing proceeds exactly as it did before this existed.
+# The minter's lines go to stdout on success; on a refusal to stderr, and this returns 1.
+run_minter() {  # base · [head] -> 0 minted, clean or announced-skipped · 1 the minter refused
+  local py dir out rc
+  if ! py=$(resolve_python 2>/dev/null); then
+    echo "push-main: kit versions were NOT minted — no usable python launcher; the push bar's epoch legs grade the landing."
+    return 0
+  fi
+  # The FILE test, for check_merge_losses's reason: a missing deployer is a skip, never a refusal.
+  if ! dir=$(resolve_kit_dir "$py" govkit govkit.py "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/govkit.py" ]; then
+    echo "push-main: kit versions were NOT minted — no govkit deployer beside this lander; the push bar's epoch legs grade the landing."
+    return 0
+  fi
+  out=$("$py" "$top/$dir/govkit.py" mint --base "$1" ${2:+--head "$2"} 2>&1); rc=$?
+  if [ "$rc" -eq 0 ]; then
+    printf '%s\n' "$out" | grep -v -e ' · clean$' -e ' · skip · ' || true
+    return 0
+  fi
+  echo "push-main: the version minter REFUSED (exit $rc):" >&2
+  printf '%s\n' "$out" | sed 's/^/  /' >&2
+  return 1
+}
+
 # `--prepare`: merge THIS branch onto the advertised tip, in place, and move the branch to it.
 #
 # THE SUBJECT NAMES THE SLUG AND NO UNIT ID. `build_commit` in the unattended kit joins a commit to
 # a unit by the unit id as a whole token in its subject, so a unit id here would make the landing
 # merge that unit's build commit and move every verdict derived from it.
 cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing could be observed
-  local branch oldb R t dirt
+  local branch oldb R t dirt msg
   branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
   if [ -z "$branch" ]; then
     echo "push-main: HEAD is detached, and preparing a landing moves the branch it is made on — check the run's branch out first." >&2
@@ -493,7 +647,8 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     echo "push-main: could not check out the advertised tip ${R:0:8} to merge onto; nothing was changed." >&2
     return 1
   fi
-  if ! git merge --no-ff "$oldb" -m "merge: $SLUG — land onto $remote/$def at ${R:0:8}" >/dev/null 2>&1; then
+  msg="merge: $SLUG — land onto $remote/$def at ${R:0:8}"
+  if ! git merge --no-ff "$oldb" -m "$msg" >/dev/null 2>&1; then
     git merge --abort >/dev/null 2>&1 || true
     git checkout "$branch" >/dev/null 2>&1 || true
     echo "push-main: merging '$branch' onto $remote/$def at ${R:0:8} CONFLICTS. Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
@@ -506,6 +661,35 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     # tip. There is then no landing to prepare, and HEAD must not be left detached at the tip.
     git checkout "$branch" >/dev/null 2>&1 || true
     echo "push-main: '$branch' is already contained in $remote/$def at ${R:0:8} — there is nothing to land." >&2
+    return 1
+  fi
+  # MINT INTO THE MERGE (TOOL-aMendedFleet-65 S3): the versions this landing owes are written over
+  # the merged tree and the merge is REWRITTEN with them, same parents and subject, so the value
+  # enters through the prepared merge itself and the idempotency check above still sees one merge
+  # on the tip. `commit-tree`, not `--no-commit` and `git commit`: concluding a merge with
+  # `git commit` fires the pre-commit staged legs over the whole landing diff, which `git merge`
+  # never fires. A refusal takes the CONFLICT path's exit shape: the branch is left unmoved.
+  if ! run_minter "$R" "$oldb"; then
+    git reset -q --hard "$t" >/dev/null 2>&1 || true
+    git checkout "$branch" >/dev/null 2>&1 || true
+    echo "push-main: the kit versions this landing owes could not be minted (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+    return 1
+  fi
+  if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
+    git add -A
+    if ! t=$(git commit-tree "$(git write-tree)" -p "$R" -p "$oldb" -m "$msg") || ! git update-ref --no-deref HEAD "$t"; then
+      git reset -q --hard HEAD >/dev/null 2>&1 || true
+      git checkout "$branch" >/dev/null 2>&1 || true
+      echo "push-main: could not commit the minted versions into the merge. Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+      return 1
+    fi
+  fi
+  # MERGE LOSS (TOOL-aMendedFleet-3): the CONFLICT path's exit shape, so a refused landing leaves the
+  # branch exactly where it was. `R..t` holds this merge and every merge the branch carries past R.
+  if ! check_merge_losses "$R" "$t"; then
+    git checkout "$branch" >/dev/null 2>&1 || true
+    echo "push-main: landing '$branch' onto $remote/$def at ${R:0:8} would publish a merge that loses a definition one of its parents carried (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+    echo "  Restore it in a new commit on '$branch', or add 'superseded: <name> -> <successor>' to that merge's message, then run --prepare again." >&2
     return 1
   fi
   # COMPARE-AND-SWAP. `git branch -f` would not notice a sibling session moving the branch under
@@ -640,6 +824,24 @@ while [ "$attempt" -le "$max" ]; do
     if ! git merge --no-ff "$remote/$def" -m "Merge $remote/$def into $def (push-main reconcile)"; then
       git merge --abort
       echo "push-main: reconcile CONFLICT — resolve manually, commit, then re-run push-main. Aborted (no push)." >&2
+      exit 1
+    fi
+  fi
+
+  # MINT, on every attempt (TOOL-aMendedFleet-65 S4): this path has no prepared merge, so the versions
+  # this landing owes over the fetched tip are their own commit. Its subject names no unit id, for
+  # the reason --prepare's does. `--no-verify` for the reason --prepare uses `commit-tree`; the
+  # pre-push bar below grades the commit like every other one it pushes.
+  mt=$(git rev-parse --verify "refs/remotes/$remote/$def")
+  if ! run_minter "$mt"; then
+    git reset -q --hard HEAD >/dev/null 2>&1 || true
+    echo "push-main: the kit versions this landing owes could not be minted (named above). Aborted (no push)." >&2
+    exit 1
+  fi
+  if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
+    git add -A
+    if ! git commit -q --no-verify -m "mint: kit versions onto $remote/$def at ${mt:0:8}"; then
+      echo "push-main: could not commit the minted versions. Aborted (no push)." >&2
       exit 1
     fi
   fi

@@ -13,8 +13,8 @@
 # to everybody who did not write it: it never runs the real `claude` — the stub answers `auth status`
 # from STUB_LOGGED_IN and sleeps on `-p` — so whether the CLI accepts `--max-turns`, resumes the
 # session, or honours the CONTINUE payload is measured nowhere here (spec §4 records the CLI
-# measurement). It does not prove the tick is REGISTERED on any node (the adopter's --check INFO
-# line reports that), and the POSIX arms of the kill and the detach are UNVERIFIED: no registered
+# measurement). It does not prove the tick is REGISTERED on any node (the adopter's --check and
+# the driver's --preflight report that), and the POSIX arms of the kill and the detach are UNVERIFIED: no registered
 # node is POSIX, and this suite runs where it runs. No arm grades the tick's own wall clock, because
 # under a pool that clock measures the node: detachment is graded by a child alive after its parent
 # returned (TOOL-aGraftedHelix-40).

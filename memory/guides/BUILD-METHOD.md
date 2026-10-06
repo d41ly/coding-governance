@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.132 -->
+<!-- gov:kit memory-tree@2.133 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -159,6 +159,14 @@ python tools/memory-recall/query.py "<question in plain English>" --terms "<8-14
 The recall CLI is offline and cannot coin terms — you write them, 8–14, or it exits 2 saying so. **Write into the
 spec's §10** the seam you will extend, cited by path, or an explicit "no existing seam fits" with the evidence —
 **and the recall terms you used**, because composing them is the expensive half and M7 re-runs the query.
+
+**The context for a path set** — kickoff's entrypoints, a spec's Files touched — is two more
+commands, and the kickoff engine points here rather than spelling them:
+
+```bash
+python tools/memory-tree/gotchas.py --for-paths <paths>            # the bug classes those paths can hit
+python tools/memory-tree/gen_build_index.py --asks --path <paths>  # the open asks targeting them, ranked and capped
+```
 
 Two rules you cannot afford to look up: **a probe exits 0 on a miss**, so "nothing found" is an ANSWER to record,
 never a failure to retry with softer words; and **a hit can be STALE**, so verify any claim about current code

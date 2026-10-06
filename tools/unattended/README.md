@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.87 -->
+<!-- gov:kit unattended@1.88 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -12,7 +12,7 @@ Run `adopt-unattended.sh` from this directory; `--check` verifies without writin
 
 | artifact | how it is produced |
 |---|---|
-| the `unattended` Skill | **rendered** from `SKILL.template.md` + `.unattended.conf` |
+| the `unattended` Skill | **rendered** from `SKILL.template.md` + `.unattended.conf`: a ROUTER, size-gated, into the verb carrier's `The paths, in order` section |
 | the protocol | copied from `PROTOCOL.template.md` |
 | the verb carrier | copied from `VERBS.template.md` |
 | the playbook template | copied from `PLAYBOOK-TEMPLATE.template.md` |
@@ -173,8 +173,9 @@ still holds it and whose holder started before the lease, and treats the pid it 
 flight until the tree moves or the stale bound passes, after which it is killed as hung and the
 run is launched again. The kit never registers it — `schtasks /create` and
 `crontab` are the owner's acts, once per node, under the login whose CLI is authenticated — and
-until it is registered the tick is inert; the adopter's `--check` says which on an `INFO` line and
-reds on neither answer.
+until it is registered the tick is inert; `--preflight` and the adopter's `--check` both say which,
+through the library's one probe, `read_tick_registration`, with a `WARNING` line when it is not
+registered or cannot be asked, and neither refuses on any answer.
 
 Windows, from cmd or PowerShell (Git-Bash needs every `/` option doubled, `//create`, `//sc`, …):
 
@@ -193,6 +194,13 @@ POSIX, one crontab line (the trailing comment names it the way the Windows task 
 bound run and does nothing else — no kill, no launch, no attempt line, no login probe. The two knobs
 it reads, `RESUME_ATTEMPTS` and `RESUME_TURNS`, are the root `.unattended.conf`'s and are announced
 on stderr when absent.
+
+The tick launches its session from the PATH CLI, which may be older than the one that launched the
+run. So `--preflight` pins `cli-version` ONCE, read from `AI_AGENT` in its `claude-code_` shape
+(`absent` when it carries none), beside the lease and never inside it; every resume that proceeds
+compares the running session's version against it as integers and prints one line — the same, a
+`WARNING` when this CLI is older, a `NOTE` when it is newer, or `UNKNOWN` naming the missing side.
+It is a warning and never a refusal, and so is the tick line beside it.
 
 A relaunch appends one `run-resumed` line, and a launch that failed one `resume-failed` line, to the
 health log under the git common dir that the orientation card counts; the driver appends
@@ -217,11 +225,26 @@ remote advertises, and hands the bar the inherited-red policy it read at that ti
 bar's own run record: an inherited-only red is met under `land`, the kit default, at any age; it
 parks as the `inherited-red` hold under a declared `park`; and it files an ask for each inherited leg
 once `ASKS_CMD` is declared, at SEV BLOCKER for a leg older than the age bound
-(`TOOL-dUnstuckLanding-16`). The contract is `UNATTENDED-STOPS.md`. One residual moved here from the protocol's §3 when
+(`TOOL-dUnstuckLanding-16`). After the bar, on every return code, it also reads the daily scheduled
+held job of the workflow `HELD_CI_WORKFLOW` names and files one HIGH ask per red held suite the same
+way, reusing an OPEN one in any build. The contract is `UNATTENDED-STOPS.md`. One residual moved here from the protocol's §3 when
 that arm grew its decision table (`TOOL-dDerivedDocket-24`): two runs CLOSING together in one clone
 contend on the bar's turnstile. Where the project declares a profile, the queue wait has its own term
 in the bar's backstop and the second run waits it out; where it does not, the wait is charged
 against `GATE_BOUND`, so the second can fail `gates-green` for contention.
+
+After a clean `--close` or `--abort`, the driver writes that call's END line itself and then renders
+the run record through the runlog kit, re-renders the index and stages both (`TOOL-aMendedFleet-63`);
+under `in-place` the close commits them. A miss is one line, and no exit moves.
+
+The close is decided at `VERIFYING`, so the move into that phase, and a resume that finds the record
+there, prints what the close should carry, report-only: the open asks whose pointer names a file the
+range from the pinned base to HEAD touched, read through `ASKS_CMD --json --path <paths> --limit 0`,
+the asks companion's fourth call shape (`TOOL-aMendedFleet-66`), and then whether that range owes the
+flagged bar, and then the stale-dossier list: the dossiers that range touched and did not refresh,
+read through `map_diff.py <base>..HEAD --stale-dossiers --json` from the directory of the declared
+`MAP_CLI`'s kit (`TOOL-aMendedFleet-83`). Each list is a disposition worklist; none refuses and no
+exit moves.
 
 ## The bar's bound — wall, queue and margin
 
@@ -264,6 +287,38 @@ absent takes the kit default and says so on stderr; non-numeric or zero is a ref
 **Why `REVIEW_ROUNDS` refuses a value at or above the runaway ceiling.** The row keeps the refusal;
 this is its reason:
 because the ceiling would fire first and the declared bound could never be reached.
+
+## The overlap probe at `--preflight`
+
+`--preflight` announces every unmerged remote ref that touches what this run touches, beside its
+count of concurrent run-state files. That count sees only the records this clone tracks, and a
+slug-keyed claim sees one slug; neither sees two builds on one subject, which would otherwise be
+learned when the second one merges. The summary line always prints, opening
+`unattended: overlap probe — `, so a clean result reads differently from a probe that did not run.
+
+- **What it reads.** Every ref under the single remote's `refs/remotes/<remote>/` reachable from
+  neither the observed default-branch tip nor `HEAD`, the remote's `HEAD` symref skipped. For each,
+  the paths its diff from the observed tip changes, and the backticked paths under
+  `### Files touched` of every spec that diff changes whose status is not `CLOSED` or `WONTDO`. It
+  joins them with this run's own diff from that tip and its build's live specs: two paths are shared
+  when equal or when one is a directory holding the other. Each shared path is tagged `diff` or
+  `declared`, because a declared path is a spec's estimate rather than an edit.
+- **It never fetches.** It reads the refs as of this clone's last fetch, and its summary line says so.
+- **What it excludes.** A ref whose tip is older than the driver's `OVERLAP_AGE_DAYS`, counted on the summary line as aged
+  out. A path under a `SHARED_RECORDS` entry or a `GENERATED_INDEXES` index: those reconcile
+  additively or re-render, and are never contested. A diff path whose every added and removed line
+  carries a kit version marker, unless a spec on the ref also declares it.
+- **It refuses nothing.** A remote-tracking ref is a local write any process can move, so the
+  overlap probe can add or remove an announcement and never a refusal; preflight's outcome is the
+  same with or without it. With no observed tip it prints `overlap probe UNAVAILABLE` and the reason,
+  and a ref whose diff cannot be read is counted as unreadable, never as clean.
+- **An attended session reads it too.** `unattended.sh --overlaps` runs the same probe with no slug
+  and exits 0 on every path. Its anchor is the local default-branch tracking ref,
+  `refs/remotes/<remote>/HEAD`, never the remote's advertisement, so it reads no network; its own
+  declared paths are the live specs its diff from that tip changed. Other than one remote, or that
+  symref unset, prints `overlap probe UNAVAILABLE`. The session-kickoff kit's orientation card calls
+  it once per session start, bounded, and prints its answer as the `overlaps —` cell
+  (`KICK-aMendedFleet-2`).
 
 ## Running the kit's own checks
 

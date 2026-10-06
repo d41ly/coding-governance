@@ -14,8 +14,8 @@ diagnosed out loud, and the manifest carries the join counts the third one reads
 chunk arm is ROLLED UP through ``run_rollup`` and the two fusion call sites are collapsed into one
 ``run_fusion()``, so a rollup cannot be applied to the healthy path and not the cache-rebuild path;
 (8) supersession (TOOL-aGraftedHelix-4): the manifest carries the map ``extract`` derives,
-``derive_supersession_order`` runs inside ``run_fusion``, ``render`` and ``emit`` tag a superseded
-hit's header, and ``main`` prints ``EVIDENCE_BANNER`` once per answer.
+``derive_supersession_order`` runs inside ``run_fusion``, ``render``, ``render_pointer`` and
+``emit`` tag a superseded hit's header, and ``main`` prints ``EVIDENCE_BANNER`` once per answer.
 
 Standard library only. Two derived FTS5 indexes -- one per anchored record, one per 600-char
 heading-bounded chunk -- cached under the COMMON git directory and rebuilt when the corpus moves.
@@ -29,6 +29,7 @@ Usage:
   {cli} "<question>" --rebuild       # force a cache rebuild, ignoring the freshness manifest
   {cli} --opened <rank> [--qid N]    # record which hit you actually read
   {cli} --export --tag <letter>      # aggregate the log beside itself, outside the worktree
+  {cli} --used                       # was each answer cited by its worktree's next commit? writes nothing
 
 ``--terms`` is REQUIRED. Rewriting is the measured half of the retrieval gain (records recall@20
 0.71 -> 0.84, MRR 0.389 -> 0.530, for zero committed bytes) and the CLI cannot generate the terms
@@ -161,6 +162,10 @@ SNIPPET_TOKENS = 64  # FTS5's documented maximum; a larger value is silently cla
 # The default is the MEASURED cost of the shipped configuration: union.py reports 19 606 B for
 # records:fts5+chunks:fts5 at k=20 PER SOURCE, which is ~40 hits, not 20.
 DEFAULT_BUDGET = 20_000
+# The share of `--budget` the SNIPPET tier may spend; later hits print as one-line pointers. Not
+# tuned: the gold set (n=12 to 16) cannot price a share. Measured opens sit at median rank 6 and as
+# deep as 37, so a count cut drops answers and a share keeps `--budget` the one knob.
+SNIPPET_SHARE = 0.25
 TERM_BAND = (8, 14)  # the instruction the SEALED rewriters were given -- not a measured optimum
 # Printed ONCE per answer, under the hit count (TOOL-aGraftedHelix-4): a record is what someone
 # wrote when they wrote it, and a superseded one is still printed.
@@ -205,6 +210,7 @@ KNOWN_FLAGS = (
     "--no-terms",
     "--export",
     "--tag",
+    "--used",
 )
 
 REFUSAL = """refused: this CLI requires rewrite terms alongside the question.
@@ -249,6 +255,22 @@ def common_git_dir(repo: pathlib.Path) -> pathlib.Path:
     raw = git(repo, "rev-parse", "--git-common-dir").strip()
     p = pathlib.Path(raw)
     return p.resolve() if p.is_absolute() else (repo / raw).resolve()
+
+
+def read_worktree_head(repo: pathlib.Path) -> str | None:
+    """The sha HEAD names in this worktree, or None on an unborn HEAD or any git failure.
+
+    Logged on every query row so ``--used`` can find the next commit by ANCESTRY once
+    ``git worktree remove`` has taken the reflog (TOOL-aMendedFleet-82). Not ``git()``: that
+    helper raises, and an unborn HEAD must not cost the query its log row.
+    """
+    try:
+        p = subprocess.run(["git", "-C", str(repo), "rev-parse", "--verify", "--quiet", "HEAD"],
+                           capture_output=True, text=True, encoding="utf-8")
+    except OSError:
+        return None
+    sha = p.stdout.strip()
+    return sha if p.returncode == 0 and sha else None
 
 
 # The query path's corpus walk lived HERE as a second enumerator and is gone: `E.corpus_inputs`
@@ -340,7 +362,8 @@ def _docs(repo: pathlib.Path, files: list[str], declared: list[str]
             continue
         chunks.extend(E.extract_declarations(path, text))
     # The SECOND call site of the alias join, and the one the merge bar cannot see
-    # (ARCH-aGrittedFlagstone-3). `check_recall.py` grades a SUBPROCESS of `extract.py`; this CLI
+    # (ARCH-aGrittedFlagstone-3). Under a `records:` pin `check_recall.py` grades a SUBPROCESS of
+    # `extract.py` (the `served:` pin builds through `build_cache` and does reach it); this CLI
     # never runs that entry point and never reads its output dir -- it re-extracts here and indexes
     # the result. A join written only there ships a query index with an empty alias column while
     # every recall floor stays green, which is the dead-plumbing class arriving through the door
@@ -439,14 +462,28 @@ def _build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str],
     return man
 
 
+def check_dead_worktree(wt: str) -> bool:
+    """Is the recorded worktree gone? True when the path does not exist OR holds no ``.git`` entry.
+
+    A primary tree holds a ``.git`` directory and a linked worktree a ``.git`` file; the empty husk
+    `git worktree remove` leaves on Windows (a live process holding it as cwd) holds neither, and
+    under existence alone it kept its ~113 MB cache forever (TOOL-aMendedFleet-32, F2).
+    """
+    p = pathlib.Path(wt)
+    return not p.exists() or not (p / ".git").exists()
+
+
 def evict_dead_siblings(keep: pathlib.Path) -> list[str]:
-    """Delete sibling caches whose recorded ``worktree`` no longer exists. Returns what went.
+    """Delete sibling caches whose recorded ``worktree`` is dead (`check_dead_worktree`). Returns
+    what went; a directory that could not be removed is reported on stderr and is not in the list.
 
     ONE predicate, read in two directions: an unreadable manifest means REBUILD MINE, NEVER DELETE
     THEIRS. The builder writes both .db files BEFORE the manifest, deliberately and atomically, so
     a directory with no readable manifest is exactly the shape of a sibling mid-first-build --
     evicting it destroys a live cache while its builder is still writing. A pre-fork manifest with
     no ``worktree`` key is kept for the same reason: absence of evidence.
+
+    Deletes through `_remove_cache_dir`, manifest last, for the reason its docstring measures.
     """
     gone: list[str] = []
     parent = keep.parent
@@ -461,10 +498,13 @@ def evict_dead_siblings(keep: pathlib.Path) -> list[str]:
         if man is None:                      # never-evict: no readable manifest
             continue
         wt = man.get("worktree")
-        if not wt or pathlib.Path(wt).exists():
+        if not wt or not check_dead_worktree(wt):
             continue
-        shutil.rmtree(d, ignore_errors=True)
-        gone.append(wt)
+        if _remove_cache_dir(d):
+            gone.append(wt)
+        else:
+            print(f"could NOT evict the cache of dead worktree {wt} — something in it is still "
+                  "open; its manifest was left in place so a later pass can retry", file=sys.stderr)
     return gone
 
 
@@ -559,8 +599,40 @@ def _remove_cache_dir(d: pathlib.Path) -> bool:
     return not d.exists()
 
 
-def evict_over_budget(keep: pathlib.Path, budget_mb: float | None) -> list[str]:
-    """Bring `recall/cache/` under its byte budget by evicting LEAST-RECENTLY-BUILT first.
+def load_last_queries(log: pathlib.Path) -> dict[str, str]:
+    """``worktree`` -> the newest ``at`` of its ``query`` rows in the query log, read once.
+
+    A missing or unreadable log is an EMPTY map, never an error: eviction then falls back to
+    ``built_at`` order. Malformed lines and non-``query`` rows are skipped — an ``opened`` row
+    follows a ``query`` row of the same worktree, so it would move no order anyway.
+    """
+    last: dict[str, str] = {}
+    try:
+        with log.open(encoding="utf-8") as fh:
+            for line in fh:
+                try:
+                    row = json.loads(line)
+                except ValueError:
+                    continue
+                if not isinstance(row, dict) or row.get("type") != "query":
+                    continue
+                wt, at = row.get("worktree"), row.get("at")
+                # both sides are `isoformat(timespec="seconds")` in UTC, so text order is time order
+                if isinstance(wt, str) and isinstance(at, str) and at > last.get(wt, ""):
+                    last[wt] = at
+    except (OSError, UnicodeError):
+        return {}
+    return last
+
+
+def evict_over_budget(keep: pathlib.Path, budget_mb: float | None,
+                      last_queries: dict[str, str] | None = None) -> list[str]:
+    """Bring `recall/cache/` under its byte budget by evicting LEAST-RECENTLY-QUERIED first.
+
+    A cache's age is the newer of its last logged query (`last_queries`, from `load_last_queries`)
+    and its ``built_at``, ties broken by ``built_at``. Build time ALONE evicted a sibling queried all
+    day from a warm cache ahead of one rebuilt once and abandoned (TOOL-aMendedFleet-32). An empty
+    map is exactly the old least-recently-built order.
 
     THE WHOLE PLAN IS COMPUTED BEFORE ANYTHING IS DELETED. Greedy oldest-first eviction and "when
     the budget cannot be met, delete nothing" are incompatible otherwise: a greedy loop deletes until
@@ -587,6 +659,7 @@ def evict_over_budget(keep: pathlib.Path, budget_mb: float | None) -> list[str]:
     if total <= budget:
         return out
 
+    last_queries = last_queries or {}
     candidates = []
     for d in dirs:
         if d == keep or _mid_build(d):
@@ -594,14 +667,16 @@ def evict_over_budget(keep: pathlib.Path, budget_mb: float | None) -> list[str]:
         man = read_manifest(d)
         if man is None or not man.get("built_at"):
             continue
-        candidates.append((man["built_at"], d, man.get("worktree") or "?"))
-    candidates.sort(key=lambda t: t[0])       # oldest built_at first
+        wt = man.get("worktree") or "?"
+        candidates.append((man["built_at"], d, wt, last_queries.get(wt)))
+    # oldest of (last query, built_at) first; ties by built_at
+    candidates.sort(key=lambda t: (max(t[3] or "", t[0]), t[0]))
 
     plan, projected = [], total
-    for built_at, d, wt in candidates:
+    for built_at, d, wt, last in candidates:
         if projected <= budget:
             break
-        plan.append((built_at, d, wt))
+        plan.append((built_at, d, wt, last))
         projected -= sizes[d]
     if projected > budget:
         out.append(
@@ -611,7 +686,7 @@ def evict_over_budget(keep: pathlib.Path, budget_mb: float | None) -> list[str]:
             % ((total - budget) / 1048576, budget_mb)
         )
         return out
-    for built_at, d, wt in plan:
+    for built_at, d, wt, last in plan:
         # RE-CHECK AT THE MOMENT OF DELETION. The plan is a proposal made from a snapshot; a sibling
         # can start a build between the snapshot and this loop, and a plan is not a licence to delete
         # something that has become live since it was made.
@@ -619,8 +694,8 @@ def evict_over_budget(keep: pathlib.Path, budget_mb: float | None) -> list[str]:
             out.append("did NOT evict %s: a build started in it after the plan was made" % wt)
             continue
         if _remove_cache_dir(d):
-            out.append("evicted the least-recently-built cache: %s (built %s, %.1f MB)"
-                       % (wt, built_at, sizes[d] / 1048576))
+            out.append("evicted the least-recently-queried cache: %s (last query %s, built %s, %.1f MB)"
+                       % (wt, last or "never", built_at, sizes[d] / 1048576))
         else:
             out.append("could NOT evict %s (built %s) — something in it is still open; its manifest "
                        "was left in place so a later pass can retry" % (wt, built_at))
@@ -671,8 +746,9 @@ def ensure_cache(repo: pathlib.Path, force: bool = False) -> tuple[pathlib.Path,
     # second pass over whatever survives, and both run only AFTER a successful build: a cache is
     # replaceable only once its replacement exists.
     for wt in evict_dead_siblings(dirp):
-        print(f"evicted the cache of a worktree that no longer exists: {wt}", file=sys.stderr)
-    for line in evict_over_budget(dirp, CONF.cache_budget_mb):
+        print(f"evicted the cache of a worktree that no longer exists or holds no .git: {wt}",
+              file=sys.stderr)
+    for line in evict_over_budget(dirp, CONF.cache_budget_mb, load_last_queries(log_path(repo))):
         print(line, file=sys.stderr)
     return dirp, built, True
 
@@ -882,38 +958,61 @@ def render(hit: dict, question: str, extra_terms: list[str] | None = None) -> tu
     return f"{head}{hit['path']}:{hit['line']}{sup}{tag}\n    {body}", is_head
 
 
+def render_pointer(hit: dict, n: int) -> str:
+    """One hit as a single line, ``[n] id · path:line`` -- the header half of ``render``, so it
+    carries the supersession tag too: a deep superseded hit printed untagged reads as current."""
+    head = f"{hit['id']} · " if hit["id"] else ""
+    return f"[{n}] {head}{hit['path']}:{hit['line']}{render_supersession_tag(hit)}"
+
+
 def emit(
     hits: list[dict], question: str, budget: int, full: bool = False
-) -> tuple[str, int, int, int]:
-    """Render hits in rank order until the NEXT one would exceed ``budget``.
+) -> tuple[str, int, int, int, int]:
+    """Render hits in rank order, in two tiers, until the NEXT one would exceed ``budget``.
 
-    Returns ``(text, shown, bytes_spent, overflow)``. The one exception to the bound is a budget too
-    small for even the first hit: that hit is emitted alone and ``overflow`` says by how much,
-    rather than printing an empty list that reads as "no such record".
+    The SNIPPET tier renders whole hits while their bytes stay within ``SNIPPET_SHARE`` of the
+    budget, and the first hit is always in it. Every later hit is a POINTER, one line, so a deep
+    hit stays in the list at a fraction of a snippet's cost (TOOL-aMendedFleet-31).
+
+    Returns ``(text, shown, bytes_spent, overflow, snippets)``; ``shown`` counts both tiers. The one
+    exception to the bound is a budget too small for even the first hit: that hit is emitted alone
+    and ``overflow`` says by how much, rather than printing an empty list that reads as "no such
+    record". ``bytes_spent`` counts each hit's own bytes, not the newlines that separate them.
 
     ``full=True`` renders whole documents instead of snippets. It is not a CLI flag -- restoring
     whole-document output is the cost this item exists to remove -- it exists so the saving can be
     MEASURED against the same ranked pool rather than against a number written in a document.
     """
-    parts: list[str] = []
-    spent = shown = overflow = 0
+    snippet_parts: list[str] = []
+    pointer_parts: list[str] = []
+    spent = overflow = 0
     for n, h in enumerate(hits, 1):
-        if full:
-            text = (f"{h['id'] + ' · ' if h['id'] else ''}{h['path']}:{h['line']}"
-                    f"{render_supersession_tag(h)}\n    {h['text']}")
-        else:
-            text, _ = render(h, question)
-        chunk = f"[{n}] {text}\n"
+        if not pointer_parts:
+            if full:
+                text = (f"{h['id'] + ' · ' if h['id'] else ''}{h['path']}:{h['line']}"
+                        f"{render_supersession_tag(h)}\n    {h['text']}")
+            else:
+                text, _ = render(h, question)
+            chunk = f"[{n}] {text}\n"
+            cost = len(chunk.encode())
+            if not snippet_parts and cost > budget:
+                snippet_parts.append(chunk)
+                spent, overflow = cost, cost - budget
+                break
+            if not snippet_parts or spent + cost <= budget * SNIPPET_SHARE:
+                snippet_parts.append(chunk)
+                spent += cost
+                continue
+        chunk = render_pointer(h, n) + "\n"
         cost = len(chunk.encode())
         if spent + cost > budget:
-            if shown == 0:
-                parts.append(chunk)
-                shown, spent, overflow = 1, cost, cost - budget
             break
-        parts.append(chunk)
+        pointer_parts.append(chunk)
         spent += cost
-        shown += 1
-    return "\n".join(parts), shown, spent, overflow
+    text = "\n".join(snippet_parts)
+    if pointer_parts:
+        text += "\n" + "".join(pointer_parts)
+    return text, len(snippet_parts) + len(pointer_parts), spent, overflow, len(snippet_parts)
 
 
 # ---------------------------------------------------------------------------------- the log
@@ -1204,11 +1303,184 @@ def export(repo: pathlib.Path, tag: str) -> int:
     return 0
 
 
+# ------------------------------------------------------- answer used (TOOL-aMendedFleet-34)
+# `--opened` is recorded by hand almost never, so the outcome signal is thin. This joins each logged
+# query's result ids to the ids its worktree's NEXT commit cites. Offline and read-only: no index,
+# no log row, no file anywhere. A removed worktree's reflog is gone with it, so its rows are counted
+# UNATTRIBUTED rather than guessed at; a time window over `git log --all` would credit a query with
+# a concurrent session's citation. A row that logged its `head` is the exception (TOOL-aMendedFleet-82):
+# its next commit is the ONE child of that sha committed at or after the query, and two such
+# children are AMBIGUOUS, never a pick.
+
+
+def resolve_worktree_reflog(common: pathlib.Path, worktree: str) -> pathlib.Path | None:
+    """The HEAD reflog of the tree a query row names, or None when there is none to read.
+
+    A linked worktree's admin dir under ``<common>/worktrees/`` holds a ``gitdir`` file naming
+    ``<worktree>/.git``; the primary tree's reflog is the common dir's own. Both sides go through
+    ``normcase(abspath())`` because the log spells Windows paths with either separator.
+    """
+    want = os.path.normcase(os.path.abspath(worktree))
+    if want == os.path.normcase(os.path.abspath(common.parent)):
+        log = common / "logs" / "HEAD"
+        return log if log.is_file() else None
+    admin = common / "worktrees"
+    if not admin.is_dir():
+        return None
+    for d in admin.iterdir():
+        try:
+            named = (d / "gitdir").read_text(encoding="utf-8").strip()
+        except OSError:
+            continue
+        if os.path.normcase(os.path.abspath(os.path.dirname(named))) == want:
+            log = d / "logs" / "HEAD"
+            return log if log.is_file() else None
+    return None
+
+
+def read_cited_ids(repo: pathlib.Path, shas: list[str]) -> dict[str, tuple[str, set[str]]]:
+    """``sha -> (subject, ids cited in its message or added lines)``, from ONE ``git log`` spawn.
+
+    One call, not one per commit: a spawn costs most of a second on some nodes. A sha the object
+    store no longer holds is skipped by ``--ignore-missing`` and reads as citing nothing.
+    """
+    if not shas:
+        return {}
+    out = subprocess.run(
+        ["git", "-C", str(repo), "log", "--no-walk=unsorted", "--stdin", "--ignore-missing",
+         "-p", "-U0", "--no-color", "--format=%x1e%H%n%B"],
+        input="\n".join(shas) + "\n", capture_output=True, text=True, encoding="utf-8",
+        errors="replace", check=True,
+    ).stdout
+    cited: dict[str, tuple[str, set[str]]] = {}
+    for block in out.split("\x1e")[1:]:
+        sha, _, rest = block.partition("\n")
+        msg, sep, patch = rest.partition("\ndiff --git ")
+        ids = set(E.ID_RE.findall(msg))
+        if sep:
+            added = "\n".join(ln[1:] for ln in patch.splitlines()
+                              if ln.startswith("+") and not ln.startswith("+++"))
+            ids.update(E.ID_RE.findall(added))
+        cited[sha.strip()] = (msg.lstrip("\n").split("\n", 1)[0], ids)
+    return cited
+
+
+def measure_answer_used(repo: pathlib.Path) -> int:
+    """Print how many attributable query rows' answers the worktree's next commit cites."""
+    log = log_path(repo)
+    if not log.exists():
+        print(f"no query log at {log.as_posix()} — answer-used not measured", file=sys.stderr)
+        return 2
+    common = common_git_dir(repo)
+    rows = [r for r in read_log(repo) if r.get("type") == "query"]
+    reflogs: dict[str, list[tuple[int, str]] | None] = {}  # worktree -> commit entries, None = no reflog
+    no_id = unattributed = no_commit = by_head = ambiguous = 0
+    pending: list[tuple[dict, list[str], str]] = []  # (row, record ids in rank order, next sha)
+    orphans: list[tuple[dict, list[str], str, float]] = []  # reflog gone, `head` logged: ancestry
+    for row in rows:
+        ranked = [res.get("id") or "" for res in row.get("results") or []]
+        if not any(E.ID_RE.fullmatch(i) for i in ranked):
+            no_id += 1
+            continue
+        wt = str(row.get("worktree") or "")
+        try:
+            at = datetime.fromisoformat(row["at"]).timestamp()
+        except (KeyError, TypeError, ValueError):
+            at = None
+        if wt and wt not in reflogs:
+            path = resolve_worktree_reflog(common, wt)
+            entries = None
+            if path is not None:
+                # (timestamp, new sha, is a commit) per line; the FIRST line dates the tree itself.
+                entries = []
+                for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+                    head, _, msg = line.partition("\t")
+                    parts = head.split(" ")
+                    try:
+                        entries.append((int(parts[-2]), parts[1], msg.startswith("commit")))
+                    except (IndexError, ValueError):
+                        continue
+            reflogs[wt] = entries
+        entries = reflogs.get(wt) if wt else None
+        # A row older than the reflog's first entry ran in an earlier tree at this path, or its
+        # entries expired: the join key outlived its subject, so the row is not attributed.
+        if not entries or at is None or entries[0][0] > at:
+            # TOOL-aMendedFleet-82: the reflog is gone (or is a later tree's), but a row that
+            # logged its `head` still names the commit its next commit is a child of.
+            if at is not None and row.get("head"):
+                orphans.append((row, ranked, str(row["head"]), at))
+            else:
+                unattributed += 1
+            continue
+        nxt = next((sha for ts, sha, is_commit in entries if is_commit and ts >= at), None)
+        if nxt is None:
+            no_commit += 1
+            continue
+        pending.append((row, ranked, nxt))
+
+    if orphans:
+        # ONE spawn for the whole parent map, made only when a row needs it: sha, committer time,
+        # parents. A commit no ref reaches is not here, and reads as "no commit after the query".
+        children: dict[str, list[tuple[str, int]]] = collections.defaultdict(list)
+        out = subprocess.run(["git", "-C", str(repo), "log", "--all", "--format=%H %ct %P"],
+                             capture_output=True, text=True, encoding="utf-8", check=True).stdout
+        for line in out.splitlines():
+            sha, ct, *parents = line.split()
+            for par in parents:
+                children[par].append((sha, int(ct)))
+        for row, ranked, head, at in orphans:
+            kids = {sha for sha, ct in children.get(head, []) if ct >= at}
+            if len(kids) == 1:
+                by_head += 1
+                pending.append((row, ranked, kids.pop()))
+            elif kids:
+                # Two worktrees started from one tip would credit each other's citations.
+                ambiguous += 1
+                unattributed += 1
+            else:
+                no_commit += 1
+    head_line = f"  attributed by head ancestry: {by_head} · ambiguous head: {ambiguous}"
+
+    if not pending:
+        print(f"answer-used: not measured — none of {len(rows)} query row(s) is attributable "
+              f"({unattributed} unattributed, {no_commit} no commit after the query, "
+              f"{no_id} no record id in results); a removed worktree's reflog is gone",
+              file=sys.stderr)
+        print(head_line, file=sys.stderr)
+        return 2
+    cited = read_cited_ids(repo, sorted({sha for _, _, sha in pending}))
+    used = 0
+    hist = collections.Counter()
+    for row, ranked, sha in pending:
+        subject, ids = cited.get(sha, ("", set()))
+        # The caller already held an id its own question or terms spell, or one from the build its
+        # commit's subject names, so citing it says nothing about the answer. WHOLE tokens, never
+        # substrings: `TOOL-aFoo-1` is not held by a row spelling `TOOL-aFoo-12`.
+        held = set(E.ID_RE.findall(" ".join([str(row.get("query") or ""),
+                                              *map(str, row.get("terms") or [])])))
+        words = set("".join(c if c.isalpha() else " " for c in subject).split())
+        for rank, rid in enumerate(ranked, 1):
+            seg = rid.split("-")
+            slug = seg[1] if len(seg) == 3 and seg[1].isalpha() else None
+            if rid in ids and rid not in held and slug not in words:
+                used += 1
+                hist[rank] += 1
+                break
+    print(f"answer-used: {used} of {len(pending)} attributable query row(s) cite a shown record id "
+          "in the worktree's next commit")
+    print(f"  of {len(rows)} query rows: {unattributed} unattributed (reflog gone) · {no_commit} "
+          f"no commit after the query · {no_id} no record id in results")
+    print("  used at rank: " + " ".join(f"{r}:{hist[r]}" for r in range(1, RESULT_CAP + 1))
+          + " — a deeper rank is not logged")
+    print(head_line)
+    return 0
+
+
 # ---------------------------------------------------------------------------------- main
 
 
 VALUE_FLAGS = ("--k", "--budget", "--opened", "--qid", "--terms", "--tag")
-BARE_FLAGS = ("--stats", "--rebuild", "--help", "--no-terms", "--export")
+BARE_FLAGS = ("--stats", "--rebuild", "--help", "--no-terms", "--export", "--used")
 
 
 def parse(argv: list[str]) -> tuple[dict[str, str], list[str], str | None]:
@@ -1280,6 +1552,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"--tag takes one letter from the node registry, got {tag!r}", file=sys.stderr)
             return 2
         return export(repo, tag)
+
+    if "--used" in flags:
+        return measure_answer_used(repo)
 
     if "--opened" in flags:
         rank = num("--opened", 0)
@@ -1395,8 +1670,13 @@ def main(argv: list[str] | None = None) -> int:
         print(dead, file=sys.stderr)
     print(f"{len(hits)} hits for: {question}\n{EVIDENCE_BANNER}\n")
 
-    out, shown, spent, overflow = emit(hits, question + " " + " ".join(terms), budget)
+    out, shown, spent, overflow, snippets = emit(hits, question + " " + " ".join(terms), budget)
     print(out)
+    if shown > snippets:
+        print(
+            f"snippets for ranks 1-{snippets} · pointers for {snippets + 1}-{shown} "
+            f"of {len(hits)} hits · raise --budget for more snippets"
+        )
     if shown < len(hits):
         print(
             f"shown {shown} of {len(hits)} within {budget:,} B "
@@ -1415,8 +1695,10 @@ def main(argv: list[str] | None = None) -> int:
             "budget": budget,
             "bytes_emitted": spent,
             "worktree": str(repo),
+            "head": read_worktree_head(repo),  # survives the worktree; `--used` reads it
             "n_hits": len(hits),
-            "n_shown": shown,
+            "n_shown": shown,  # both tiers: a pointer line shows the path, so it maps to a rank
+            "n_snippets": snippets,
             # Top RESULT_CAP only. Embedding every fused hit cost 12 987 B per record (mean 131.8
             # results) -- a month of six-node traffic in hundreds of MB. `n_hits` above keeps the
             # TRUE total, so the cap shrinks the log without clamping the count. What is lost: the

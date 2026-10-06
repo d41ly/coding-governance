@@ -16,6 +16,7 @@ gate-legs = [
 ]
 kits = ["memory-recall"]
 git-hooks = []
+harness-hooks = ["PostToolUse tools/memory-recall/recall-opened.js"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = ["memory-recall"]
@@ -33,7 +34,8 @@ globs = [
 The kit answers "why is this repo the way it is" from its own records, offline and stdlib-only:
 `extract.py` walks the corpus once, `bench.py` scores retrieval substrates, `query.py` serves the
 CLI and the rendered Skill, and `check-recall.py` grades a committed question set against a declared
-floor on the merge bar.
+floor on the merge bar. `recall-opened.js`, the opt-in `PostToolUse` observer on `Read`, is this
+dossier's `harness-hooks` claim.
 
 ## Constraints & why
 
@@ -86,8 +88,9 @@ floor on the merge bar.
   at 600, so `check-recall.py` imports `query.CHUNK_MAX` rather than restating it — grading at the
   extractor's default would pin a substrate no session is served.
 - **The floor is DECLARED and DERIVED, never recomputed from the run it grades.** `RECALL_FLOOR` in
-  `.memory-tree.conf` names one CELL of the metric matrix as a single token, and its value is the
-  one-retirement worst case `(h-1)/(R-1)`, not the day's score. A gate that recomputes its own
+  `.memory-tree.conf` names one CELL as a single token -- the `served` head, the CLI's own fused
+  ranking over each question's two term lists -- and its value is the one-retirement worst case
+  `(h-1)/(R-1)` over every (question, slice) row, not the day's score. A gate that recomputes its own
   threshold can never fail.
 - **The floor is GOV-ONLY.** `kit.toml` withholds `recall-fixture.json`, `check-recall.py` and
   `test_recall_floor.py` through a `project-owned` rule claiming their destinations. An adopter's
@@ -114,18 +117,20 @@ floor on the merge bar.
 
 - **The fixture is twelve questions, not coverage.** The floor measures that these questions still
   find these records. A change that improves them while degrading a hundred others passes.
-- **Only `records` is graded.** `chunks:fts5:r@5` measures 0.1667 against `records` 0.8333 on this
-  fixture, because an id is a record-level target. Grading chunks needs a path- or passage-keyed
-  fixture, which is its own unit.
-- **The graded ensemble is not the served one.** `query.py` fuses records and chunks through RRF;
-  the floor grades one set with one substrate, because `union.py` reports no `ceiling` and one `k`.
+- **The served floor still grades ids, not passages.** The `served` pin ranks through `query.py`'s
+  own `query_expr` and `run_fusion`, so the chunk arm takes part, but a target is a record id, so a
+  chunk counts only through the anchor rule. A passage-keyed fixture is its own unit.
+- **A `served` run grades less than a session sees.** It builds over tracked files only, grades
+  the ranked list rather than the `--budget`-cut text, and at the pin's `k` rather than the CLI's
+  default 20; `check-recall.py`'s docstring names all three.
 - **No adopter gets a floor.** The parked half of that decision is recorded in
   `TOOL-aWalkedCorpus-3` §8: an adopter-facing version needs a seeding path and a measuring verb that
   differ in what gets BUILT, not merely in configuration.
 - **The pin's derivation is re-checked in ONE direction.** `--audit-fixture` prints `h`, `R` and
   `(h-1)/(R-1)` beside the declared value and reds only when the pin has become LOOSER than that
-  worst case. A pin left conservative by a fixture edit is caught instead by the arms, which assert
-  the literal counts. Nothing recomputes the pin, by design.
+  worst case. The arms assert the measured `h` and `R` are NOT BELOW the figures the conf comment
+  records, so a pin left conservative after a fixture GREW is caught by nothing. Nothing recomputes
+  the pin, by design.
 
 - **The suite's own guard was blind until 2026-09-28.** `selftest.py` brackets this repo's
   live query log because a gate that writes to the instrument it measures is how upstream's log

@@ -100,7 +100,8 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
   at §3 below.
 - **A self-verifying codebase map** (`codebase-map/` kit): per-feature dossiers claim EXACT KEYS from
   machine-enumerated inventories, and a ratchet fails on any unclaimed new key AND any claim naming a
-  dead key, so the map cannot rot into fiction. `map_diff` renders any git range as a feature-level
+  dead key, so its claimed keys cannot rot into fiction; path globs and dossier prose are not gated.
+  `map_diff` renders any git range as a feature-level
   changelog. Zero CI changes — the gate rides the existing suite. Keeping it selected keeps three
   `kit:codebase-map` blocks in the charter.
 - **A records-vs-reality audit** (`drift-audit/` kit): asks whether this repo's RECORD of its own
@@ -248,6 +249,17 @@ here would be a kit path the `install-prefix` ban reds on, with no waiver to tak
    reports `ok`, because a driver that cannot start never writes `%A`: git prints `CONFLICT` and
    leaves the path holding OURS-ONLY content with zero conflict markers. `--fix` sets the config for
    you and refuses to declare a driver wired when it cannot run.
+   The wholly GENERATED views take one side instead of merging, and the freshness checks then red
+   the stale render until `--write` re-renders it. Add the attributes, and the one per-node config
+   line `ours` needs because git ships it as a strategy, not a driver (`--fix` sets it too):
+   ```
+   memory/LIVE.md merge=ours
+   memory/ledger/*.md merge=ours
+   memory/gotchas/INDEX.md merge=ours
+   ```
+   ```bash
+   git config merge.ours.driver true
+   ```
 
 ### 3a-asks — Per-build asks and a generated backlog view (opt-in; memory-tree kit ≥ 2.100)
 
@@ -491,15 +503,7 @@ pointer stub or self-prune rule from your kickoff manifest (§4) and your instan
    so the lookup flags the gap instead of a falsely-confident "no seam fits".
    **DoD (at review):** run `python <kit>/map_diff.py <base>..<head> --drop-affordance-exempt`
    — touching a graced feature's files drops its `affordance-exempt.toml` grace mechanically, so the
-   gate then demands its `## Reuse affordance` block (no human remembering). Also run
-   `python <kit>/map_diff.py <base>..<head> --converge` (the closing loop) — it WARNs on each
-   NEW export that resembles an existing high-fan-in seam of the same kind it did not wire through
-   (shipped reinvention, over ALL new code) and routes each to
-   `<git-common-dir>/codebase-map/reinvention-backlog.md` (deduped) — OUTSIDE your worktree, so a
-   `--converge` run never leaves untracked clutter in a gated directory; it falls back into
-   `<MAP_ROOT>/` only where git cannot answer at all. A run that finds a pre-2026-09-06 file at the
-   old location NAMES it and deletes nothing. It is a report + WARN, never a merge gate (a
-   token-stem collision has false positives).
+   gate then demands its `## Reuse affordance` block (no human remembering).
    To converge the active surface up front, `python <kit>/gen_map.py --seed-affordances --top
    <N>` lists the N highest-fan-in seams no dossier yet declares as the backfill worklist.
    Both CLIs read only committed artifacts, so nothing fails closed for them: each exits **2** with

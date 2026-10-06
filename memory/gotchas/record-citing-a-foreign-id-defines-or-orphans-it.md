@@ -36,6 +36,10 @@ the violation it existed to catch, and a spec-audit round had to find it.
 
 Name the build and the seq range in prose. Do not spell the id, in the head or the body.
 
+Or, in a row's BODY, write the id in the `missing:<ID>` form (TOOL-aMendedFleet-26): the walk counts
+it apart from orphans and refuses it once a spec defines the id. It is no escape for the HEAD case,
+which still DEFINES whatever id it anchors.
+
 To CHECK that, do not reach for the orphan count: it observes the body case only. Enumerate the
 foreign build's ids across the memory root before and after and assert the set is byte-identical —
 that is what sees the head case. Use both, and say which clause catches which failure, because one

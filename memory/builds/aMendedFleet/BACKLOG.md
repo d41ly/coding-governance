@@ -1,0 +1,340 @@
+# aMendedFleet — asks
+
+## Asks
+
+- TOOL-aMendedFleet-95 · filed 2026-10-04 · `WIRE-INTO-PROJECT.md` tells an adopter that the charter's node registry serves as the kickoff manifest's `registry:` file; once PLAY-aMendedFleet-4 leaves one registry in the `AGENTS.md` wrapper, no unit of this build re-verifies that runbook sentence against it (found at the M2 cross-read) · accept the runbook's registry sentence names the one registry the `AGENTS.md` wrapper carries → `WIRE-INTO-PROJECT.md`
+- TOOL-aMendedFleet-96 · filed 2026-10-05 · `tools/drift-audit/drift_report.py` keeps its own `_read_defs_at_sha`, a whole-tree reader over the same extractor TOOL-aMendedFleet-3 put behind `read_defs_at_sha` in `tools/lexicon/lexicon.py`; two readers of one question (unit 3's §3 hands-off edge) · accept `drift_report.py` calls the lexicon reader and defines no reader of its own → `tools/drift-audit/drift_report.py`
+- TOOL-aMendedFleet-106 · filed 2026-10-05 · OWNER TRIAGE OF THE AGED UNLABELLED ASKS. TOOL-aMendedFleet-14 deferred every ask that sat OPEN with no severity, no hold and no linked spec for 30 days or more at 2026-10-05 on this one ask, so OPEN again separates the asks somebody will act on from the ones nobody has looked at. Triage each: a SEV row, a CLOSED or WONTDO row, or nothing. The release act is ONE CLOSED row on this ask, which returns every deferred ask still undisposed to OPEN · accept every ask deferred until this one carries a SEV row or a terminal status, or the owner releases the rest by closing this ask
+- TOOL-aMendedFleet-107 · filed 2026-10-05 · `--dispatch` check 49 refuses a pass declaring a generator together with the index it renders (clause 3 of the method's disjointness rule) even when the build dispatches strictly sequentially, so a unit that changes a generator and must commit its re-render splits into land-dark-then-arm or multi-dispatch commits: units TOOL-aMendedFleet-12, -13, -42 and -43 of this build each did · accept a sequential pass may declare a generator and its index in one declaration, or the refusal names the sequential route
+- TOOL-aMendedFleet-108 · filed 2026-10-05 · the lander now mints kit versions into the landing merge (unit TOOL-aMendedFleet-65), and a minted carrier on the kickoff manifest's `watch:` line (the memory-tree hygiene gate, the build method) moves a watched path, so the manifest check's C5 reds at the push bar on every landing that mints memory-tree, and the lander cannot re-verify §B to re-stamp · accept a diff on a watched path that changes only version-marker lines owes no re-audit, or the lander names the owed re-stamp before the bar runs
+- TOOL-aMendedFleet-109 · filed 2026-10-06 · the vague-brief trial (unit TOOL-aMendedFleet-73) stopped at its pilot: a build with no design document scored intent 10 of 10, so the hidden intent suite cannot separate a spec from a plan on a three-sentence brief either, and the P against S question the charter's design-pass rule rests on is still open · accept a rerun, in a session of its own, whose primary measure is the blind-probed decision-met rate over the committed decision list, with a pilot headroom check on that measure before the arms
+- PLAY-aMendedFleet-5 · filed 2026-10-06 · the charter's §1 design pass keeps the full Tier-2 spec until a recorded reading of the vague-brief arm decides otherwise; the first trial measured only explicit briefs (the plan at 1.1 times the cost of building directly, the full spec route at 12.3 times, and every tool passing its hidden suite), and unit TOOL-aMendedFleet-73's run stopped at its pilot without a reading · accept an owner ruling on §1's design-pass shape that cites unit TOOL-aMendedFleet-73's trial report or its rerun → `coding-governance-agents.template.md`
+- TOOL-aMendedFleet-113 · filed 2026-10-06 · the aMendedFleet closing review (findings 12 to 17) found four suites whose assertion floors rose by less than the arms their units added, so a stranded block no longer reds; nothing compares a floor's move with the arms added beside it · accept a check over the floored suites that counts the assertion calls a diff adds in each suite's own spelling and reds when the floor moved by less without a recorded reason → `tools/check-testsuite-counts.sh`
+- TOOL-aMendedFleet-114 · filed 2026-10-06 · the aMendedFleet closing review (finding 21) found kickoff units graded Tier-1 whose commits changed two kits or added a CLI flag, so check 23's Tier-2 acceptance-ledger join never ran on them · accept a hygiene check that reds a Tier-1 spec whose unit commits touch two kit directories or add a usage line, unless the spec records a tier waiver → `tools/memory-tree/check-memory-hygiene.sh`
+- TOOL-aMendedFleet-115 · filed 2026-10-06 · `print_touched_asks` (unit TOOL-aMendedFleet-66) hands every path the run's range changed to ASKS_CMD as argv words; at aMendedFleet's own VERIFYING move that was 605 paths and 37490 bytes, past Windows' 32 KiB command line, so python never started (exit 126, `Argument list too long`) and the list read DEAD PROBE on exactly the large build it exists for · accept the touched-asks read passes its paths on stdin or in batches, and a 600-path range lists its asks on node a → `tools/unattended/unattended.sh`
+
+## Dispositions
+
+- SEV · TOOL-aMendedFleet-95 · LOW · a runbook sentence no unit re-verifies after a registry edit
+- SEV · TOOL-aMendedFleet-96 · LOW · two readers of one definition set, no wrong answer today
+- SEV · TOOL-aMendedFleet-106 · LOW · a release act over many asks, no defect of its own
+- KEEP · TOOL-aMendedFleet-106 · advanced by TOOL-aMendedFleet-14, which defers the aged asks on it; the owner's triage is what closes it
+- KEEP · PLAY-aMendedFleet-5 · advanced by PLAY-aMendedFleet-2; the reading is unit TOOL-aMendedFleet-73's and the ruling is the owner's, so this build closes nothing
+- KEEP · TOOL-aMendedFleet-95 · filed at the M2 cross-read for a runbook sentence no unit of this build re-verifies; it stays live for a later build
+- KEEP · TOOL-aMendedFleet-96 · unit TOOL-aMendedFleet-3's hands-off edge; no unit of this build owns the drift report's reader, so it stays live
+- KEEP · TOOL-aMendedFleet-107 · a change to the dispatch disjointness rule that no unit of this build owns; it stays live
+- KEEP · TOOL-aMendedFleet-108 · a lander and kickoff-manifest change that no unit of this build owns; it stays live
+- KEEP · TOOL-aMendedFleet-109 · its accept clause asks for a rerun in a session of its own, which no unit of this build is; it stays live
+- KEEP · TOOL-aMendedFleet-113 · split out of TOOL-aMendedFleet-112's §8 F1 as a second mechanism the closing review's minors batch may not carry; no unit of this build builds the check, so it stays live
+- KEEP · TOOL-aMendedFleet-114 · split out of TOOL-aMendedFleet-112's §8 F2 for the same reason; no unit of this build builds the hygiene check, so it stays live
+- KEEP · TOOL-aMendedFleet-115 · a follow-up no unit of this build owns; found at the build's own VERIFYING move
+- WONTDO · TOOL-aReplayedCard-9 · the eight-arm matrix needs a session started with an agent definition already installed, which no unattended pass can take, and aMendedFleet's context-diet units measure orientation cost on the live path instead; a REOPEN row naming aMendedFleet restores it
+- CLOSED · TOOL-aUnblockedFleet-7 · by TOOL-aWokenSentinel-16 · check 34 of `--landed` reads containment, so a second landing that overwrites the shared lander marker still contains the first run's witness (6bb7ac756)
+- CLOSED · TOOL-aUnblockedFleet-8 · by TOOL-dDerivedDocket-27 · its S4 makes the bar's bound wall plus queue plus GATE_BACKSTOP_MARGIN for a repository declaring GATE_PROFILE_CMD, which `.unattended.conf` does, so queue wait is no longer charged against a bound that excludes it
+- WONTDO · TOOL-aWeighedCompass-16 · a duplicate of TOOL-aProbedToolkit-10, the recall floor grading a configuration the CLI does not ship; that ask stays live and carries the fix
+- CLOSED · TOOL-dUnstalledConvoy-38 · by TOOL-aWokenSentinel-16 · the predicate this ask asks for, marker contains the witness and sits on the remote default branch, is that unit's check 34, and its README row names this ask as the defect it fixed (6bb7ac756)
+- DEFERRED · DEPL-aFerriedDossier-2 · until TOOL-aMendedFleet-106 · filed 2026-08-16; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-aFerriedDossier-3 · until TOOL-aMendedFleet-106 · filed 2026-08-16; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-aHoistedPass-2 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-aHoistedPass-5 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-aHoistedPass-6 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-aHoistedPass-7 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-aHoistedPass-8 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-aHoistedPass-9 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-aSealedCaravan-3 · until TOOL-aMendedFleet-106 · filed 2026-08-11; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-aTetheredConvoy-9 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-dCarriedReceipt-16 · until TOOL-aMendedFleet-106 · filed 2026-08-24; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-dRatifiedSeam-2 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-dRatifiedSeam-3 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-dRatifiedSeam-4 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-dRatifiedSeam-5 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-dRatifiedSeam-6 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-dRetiredFork-11 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-dRetiredFork-12 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-dSealedTally-6 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-dSettledRoster-1 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · DEPL-dSettledRoster-2 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedCeiling-8 · until TOOL-aMendedFleet-106 · filed 2026-08-27; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedCeiling-9 · until TOOL-aMendedFleet-106 · filed 2026-08-27; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedCeiling-10 · until TOOL-aMendedFleet-106 · filed 2026-08-27; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedCeiling-11 · until TOOL-aMendedFleet-106 · filed 2026-08-27; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedCeiling-12 · until TOOL-aMendedFleet-106 · filed 2026-08-28; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedCeiling-13 · until TOOL-aMendedFleet-106 · filed 2026-08-27; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedVerdict-6 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedVerdict-7 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedVerdict-8 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedVerdict-10 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedVerdict-20 · until TOOL-aMendedFleet-106 · filed 2026-08-19; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedVerdict-22 · until TOOL-aMendedFleet-106 · filed 2026-08-19; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedVerdict-23 · until TOOL-aMendedFleet-106 · filed 2026-08-19; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedVerdict-25 · until TOOL-aMendedFleet-106 · filed 2026-08-19; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedVerdict-26 · until TOOL-aMendedFleet-106 · filed 2026-08-19; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedVerdict-27 · until TOOL-aMendedFleet-106 · filed 2026-08-19; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedVerdict-28 · until TOOL-aMendedFleet-106 · filed 2026-08-19; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedVerdict-31 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBoundedVerdict-32 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBranchedMandate-5 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBranchedMandate-8 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBranchedMandate-9 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBranchedMandate-10 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aBranchedMandate-11 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aCandidStub-1 · until TOOL-aMendedFleet-106 · filed 2026-08-10; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aCandidStub-2 · until TOOL-aMendedFleet-106 · filed 2026-08-10; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aCollapsedScan-5 · until TOOL-aMendedFleet-106 · filed 2026-08-26; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aCollapsedScan-8 · until TOOL-aMendedFleet-106 · filed 2026-08-26; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aCollapsedScan-9 · until TOOL-aMendedFleet-106 · filed 2026-08-26; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aCollapsedScan-11 · until TOOL-aMendedFleet-106 · filed 2026-08-26; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aCollapsedScan-12 · until TOOL-aMendedFleet-106 · filed 2026-08-26; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aDeclaredBound-6 · until TOOL-aMendedFleet-106 · filed 2026-08-18; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aFlaggedScaffold-3 · until TOOL-aMendedFleet-106 · filed 2026-08-29; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aFlaggedScaffold-5 · until TOOL-aMendedFleet-106 · filed 2026-08-29; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aGradedDoorway-2 · until TOOL-aMendedFleet-106 · filed 2026-08-28; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aGradedDoorway-4 · until TOOL-aMendedFleet-106 · filed 2026-08-28; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aGradedDoorway-5 · until TOOL-aMendedFleet-106 · filed 2026-08-28; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aGradedDoorway-6 · until TOOL-aMendedFleet-106 · filed 2026-08-28; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aGradedDoorway-8 · until TOOL-aMendedFleet-106 · filed 2026-08-29; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aGradedDoorway-9 · until TOOL-aMendedFleet-106 · filed 2026-08-29; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aGradedDoorway-10 · until TOOL-aMendedFleet-106 · filed 2026-08-29; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aGradedMandate-12 · until TOOL-aMendedFleet-106 · filed 2026-08-31; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aGradedMandate-13 · until TOOL-aMendedFleet-106 · filed 2026-08-31; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aGradedMandate-14 · until TOOL-aMendedFleet-106 · filed 2026-08-31; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aGradedMandate-15 · until TOOL-aMendedFleet-106 · filed 2026-08-31; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-11 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-12 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-13 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-14 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-15 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-17 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-18 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-19 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-20 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-21 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-22 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-23 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-24 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-25 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-26 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-27 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-28 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-29 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-31 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-32 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-33 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-34 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-35 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-36 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-37 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-38 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHoistedPass-39 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHonedRuleset-7 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aHonedRuleset-9 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aKeyedAnnotation-5 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aKeyedAnnotation-6 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aKeyedAnnotation-7 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aKeyedAnnotation-9 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aKeyedAnnotation-10 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aKeyedAnnotation-11 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aKeyedAnnotation-12 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aKeyedAnnotation-13 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aLexedStripper-3 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aLexedStripper-4 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aLexedStripper-7 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aLexedStripper-8 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aMeteredTurnstile-2 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aMeteredTurnstile-5 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aMeteredTurnstile-6 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aNamedGesture-2 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aNumeralWarden-2 · until TOOL-aMendedFleet-106 · filed 2026-08-10; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aPacedTurnstile-9 · until TOOL-aMendedFleet-106 · filed 2026-08-18; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aPacedTurnstile-11 · until TOOL-aMendedFleet-106 · filed 2026-08-18; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aPacedTurnstile-12 · until TOOL-aMendedFleet-106 · filed 2026-08-18; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aPacedTurnstile-13 · until TOOL-aMendedFleet-106 · filed 2026-08-18; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aPacedTurnstile-15 · until TOOL-aMendedFleet-106 · filed 2026-08-18; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aProbedToolkit-2 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aProbedToolkit-4 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aProbedToolkit-5 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aProbedToolkit-6 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aProbedToolkit-7 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aProbedToolkit-11 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aProbedToolkit-12 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aProbedToolkit-13 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aProbedToolkit-14 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aProbedToolkit-16 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aProbedToolkit-17 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aPromptedMandate-7 · until TOOL-aMendedFleet-106 · filed 2026-08-18; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aPromptedMandate-9 · until TOOL-aMendedFleet-106 · filed 2026-08-18; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aPromptedMandate-14 · until TOOL-aMendedFleet-106 · filed 2026-08-19; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aProvenReuse-6 · until TOOL-aMendedFleet-106 · filed 2026-08-31; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aReapedTicket-4 · until TOOL-aMendedFleet-106 · filed 2026-08-27; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aReapedTicket-5 · until TOOL-aMendedFleet-106 · filed 2026-08-27; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aRelaxedShard-2 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aResumedRelay-1 · until TOOL-aMendedFleet-106 · filed 2026-08-26; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aRootedPrefix-3 · until TOOL-aMendedFleet-106 · filed 2026-08-09; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScannedThrottle-3 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScannedThrottle-4 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScannedThrottle-5 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScannedThrottle-6 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScannedThrottle-7 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScannedThrottle-8 · until TOOL-aMendedFleet-106 · filed 2026-08-21; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScannedThrottle-9 · until TOOL-aMendedFleet-106 · filed 2026-08-21; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScannedThrottle-10 · until TOOL-aMendedFleet-106 · filed 2026-08-21; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScannedThrottle-11 · until TOOL-aMendedFleet-106 · filed 2026-08-21; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScouredKit-10 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScouredKit-16 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScouredKit-18 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScouredKit-19 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScouredKit-21 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScouredKit-22 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScouredKit-24 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScouredKit-26 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScouredKit-27 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScouredKit-28 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScouredKit-29 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScouredKit-33 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aScouredKit-34 · until TOOL-aMendedFleet-106 · filed 2026-08-30; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aSealedCaravan-2 · until TOOL-aMendedFleet-106 · filed 2026-08-11; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aSealedCaravan-4 · until TOOL-aMendedFleet-106 · filed 2026-08-11; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aSiftedFork-1 · until TOOL-aMendedFleet-106 · filed 2026-08-28; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aSiftedFork-2 · until TOOL-aMendedFleet-106 · filed 2026-08-28; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aSiftedFork-3 · until TOOL-aMendedFleet-106 · filed 2026-08-28; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aSiftedFork-4 · until TOOL-aMendedFleet-106 · filed 2026-08-28; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aSiftedFork-5 · until TOOL-aMendedFleet-106 · filed 2026-08-28; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aSiftedFork-6 · until TOOL-aMendedFleet-106 · filed 2026-08-28; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aSiftedFork-7 · until TOOL-aMendedFleet-106 · filed 2026-08-28; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aStagedLane-5 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aStandingWrit-2 · until TOOL-aMendedFleet-106 · filed 2026-08-11; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aStandingWrit-5 · until TOOL-aMendedFleet-106 · filed 2026-08-11; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aStandingWrit-6 · until TOOL-aMendedFleet-106 · filed 2026-08-11; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aStandingWrit-7 · until TOOL-aMendedFleet-106 · filed 2026-08-11; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aStandingWrit-9 · until TOOL-aMendedFleet-106 · filed 2026-08-11; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aSurfacedLexicon-15 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aSurfacedLexicon-16 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aSurfacedLexicon-17 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aSurfacedLexicon-21 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aTetheredConvoy-1 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aTetheredScratch-3 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aTetheredScratch-4 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aTimedTurnstile-2 · until TOOL-aMendedFleet-106 · filed 2026-08-11; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aTimedTurnstile-3 · until TOOL-aMendedFleet-106 · filed 2026-08-11; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aTimedTurnstile-4 · until TOOL-aMendedFleet-106 · filed 2026-08-11; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aTimedTurnstile-6 · until TOOL-aMendedFleet-106 · filed 2026-08-11; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aTimedTurnstile-7 · until TOOL-aMendedFleet-106 · filed 2026-08-11; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aTimedTurnstile-8 · until TOOL-aMendedFleet-106 · filed 2026-08-11; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aUnblockedFleet-9 · until TOOL-aMendedFleet-106 · filed 2026-08-31; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aUnmannedHelm-10 · until TOOL-aMendedFleet-106 · filed 2026-08-10; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWalkedCorpus-4 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWalkedCorpus-5 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWalkedCorpus-6 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWalkedCorpus-10 · until TOOL-aMendedFleet-106 · filed 2026-08-18; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWeighedCompass-4 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWeighedCompass-7 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWeighedCompass-9 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWeighedCompass-13 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWeighedCompass-18 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWeighedCompass-19 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWeldedTribunal-9 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWeldedTribunal-10 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWeldedTribunal-11 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWeldedTribunal-12 · until TOOL-aMendedFleet-106 · filed 2026-09-05; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-aWiredReckoning-1 · until TOOL-aMendedFleet-106 · filed 2026-08-18; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cBriefedPilot-7 · until TOOL-aMendedFleet-106 · filed 2026-08-14; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cBriefedPilot-8 · until TOOL-aMendedFleet-106 · filed 2026-08-14; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cBriefedPilot-13 · until TOOL-aMendedFleet-106 · filed 2026-08-14; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cBriefedPilot-14 · until TOOL-aMendedFleet-106 · filed 2026-08-14; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cBriefedPilot-22 · until TOOL-aMendedFleet-106 · filed 2026-08-14; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cBriefedPilot-23 · until TOOL-aMendedFleet-106 · filed 2026-08-15; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cBriefedPilot-24 · until TOOL-aMendedFleet-106 · filed 2026-08-15; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cBriefedPilot-25 · until TOOL-aMendedFleet-106 · filed 2026-08-15; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cBriefedPilot-26 · until TOOL-aMendedFleet-106 · filed 2026-08-15; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cBriefedPilot-27 · until TOOL-aMendedFleet-106 · filed 2026-08-15; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cBriefedPilot-28 · until TOOL-aMendedFleet-106 · filed 2026-08-15; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cBriefedPilot-29 · until TOOL-aMendedFleet-106 · filed 2026-08-15; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cFinalBerth-4 · until TOOL-aMendedFleet-106 · filed 2026-08-13; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cFinalBerth-5 · until TOOL-aMendedFleet-106 · filed 2026-08-13; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cSettledDocket-7 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cSettledDocket-8 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cSettledDocket-9 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cSettledDocket-10 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cSettledDocket-11 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cSettledDocket-12 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cSettledDocket-13 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cSettledDocket-14 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cSettledDocket-15 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cTracedPromise-2 · until TOOL-aMendedFleet-106 · filed 2026-08-14; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cTracedPromise-3 · until TOOL-aMendedFleet-106 · filed 2026-08-14; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cTracedPromise-4 · until TOOL-aMendedFleet-106 · filed 2026-08-15; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cTracedPromise-5 · until TOOL-aMendedFleet-106 · filed 2026-08-15; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-cTracedPromise-7 · until TOOL-aMendedFleet-106 · filed 2026-08-15; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dBriefedPass-6 · until TOOL-aMendedFleet-106 · filed 2026-09-01; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dBriefedPass-7 · until TOOL-aMendedFleet-106 · filed 2026-09-01; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dCarriedReceipt-1 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dCarriedReceipt-2 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dCarriedReceipt-3 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dCarriedReceipt-4 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dClosedLexicon-14 · until TOOL-aMendedFleet-106 · filed 2026-08-17; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dFoldedVerdict-7 · until TOOL-aMendedFleet-106 · filed 2026-09-01; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dFoldedVerdict-9 · until TOOL-aMendedFleet-106 · filed 2026-09-02; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dHonouredPark-5 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dHonouredPark-6 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dHonouredPark-7 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dHonouredPark-8 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dHonouredPark-9 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dHonouredPark-10 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dMispairedQuote-4 · until TOOL-aMendedFleet-106 · filed 2026-09-01; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dMispairedQuote-5 · until TOOL-aMendedFleet-106 · filed 2026-09-01; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dMispairedQuote-6 · until TOOL-aMendedFleet-106 · filed 2026-09-01; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dMispairedQuote-8 · until TOOL-aMendedFleet-106 · filed 2026-09-01; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dNarrowedAnchor-3 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-22 · until TOOL-aMendedFleet-106 · filed 2026-09-02; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-23 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-25 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-26 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-27 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-28 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-31 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-32 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-33 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-34 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-35 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-36 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-37 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-38 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-39 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dRetiredFork-40 · until TOOL-aMendedFleet-106 · filed 2026-09-03; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dScaffoldedMirror-20 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dScaffoldedMirror-21 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dScrubbedConduit-3 · until TOOL-aMendedFleet-106 · filed 2026-08-23; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dSealedTally-2 · until TOOL-aMendedFleet-106 · filed 2026-09-04; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dSettledRoster-1 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dSettledRoster-4 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dSettledRoster-6 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dSpentCeiling-4 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dSpentCeiling-5 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dSpentCeiling-6 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dSpentCeiling-7 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dSpentCeiling-8 · until TOOL-aMendedFleet-106 · filed 2026-08-25; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dTieredTribunal-4 · until TOOL-aMendedFleet-106 · filed 2026-08-26; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dTieredTribunal-6 · until TOOL-aMendedFleet-106 · filed 2026-08-26; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dTieredTribunal-16 · until TOOL-aMendedFleet-106 · filed 2026-08-26; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dTieredTribunal-17 · until TOOL-aMendedFleet-106 · filed 2026-08-26; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dTieredTribunal-21 · until TOOL-aMendedFleet-106 · filed 2026-08-26; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dTieredTribunal-22 · until TOOL-aMendedFleet-106 · filed 2026-08-27; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dTieredTribunal-23 · until TOOL-aMendedFleet-106 · filed 2026-08-27; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dTieredTribunal-24 · until TOOL-aMendedFleet-106 · filed 2026-08-27; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dUnstalledConvoy-14 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dUnstalledConvoy-16 · until TOOL-aMendedFleet-106 · filed 2026-08-20; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dUnstalledConvoy-18 · until TOOL-aMendedFleet-106 · filed 2026-08-21; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dUnstalledConvoy-19 · until TOOL-aMendedFleet-106 · filed 2026-08-21; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dUnstalledConvoy-23 · until TOOL-aMendedFleet-106 · filed 2026-08-21; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dUnstalledConvoy-24 · until TOOL-aMendedFleet-106 · filed 2026-08-21; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dUnstalledConvoy-34 · until TOOL-aMendedFleet-106 · filed 2026-08-24; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dUnstalledConvoy-35 · until TOOL-aMendedFleet-106 · filed 2026-08-24; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dUnstalledConvoy-36 · until TOOL-aMendedFleet-106 · filed 2026-08-24; no severity, no hold, no linked spec at 2026-10-05
+- DEFERRED · TOOL-dUnstalledConvoy-37 · until TOOL-aMendedFleet-106 · filed 2026-08-24; no severity, no hold, no linked spec at 2026-10-05
+- SEV · TOOL-aMendedFleet-107 · MED · a refusal written for concurrency taxes every sequential generator change
+- SEV · TOOL-aMendedFleet-108 · MED · the lander's own mint reds the push bar it hands the landing to
+- SEV · TOOL-aMendedFleet-109 · LOW · the design-pass question the trial was built for is still unmeasured
+- SEV · PLAY-aMendedFleet-5 · HIGH · §1's design pass is the rule every Tier-2 unit pays, and no reading of the vague-brief arm stands behind it
+- SEV · TOOL-aMendedFleet-113 · MED · a floor raised by less than its arms lets a stranded block pass silently
+- SEV · TOOL-aMendedFleet-114 · LOW · a mis-tiered unit skips the Tier-2 ledger join
+- SEV · TOOL-aMendedFleet-115 · MED · the touched-asks list dies on a large range, the case it serves

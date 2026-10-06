@@ -6,7 +6,7 @@ placeholder and drops the blocks a target has no kit for, so filling it is a pro
 reader's — see `WIRE-INTO-PROJECT.md` for what a program cannot decide. History lives in the
 `…-v-N-N.md` snapshots and in git.*
 
-<!-- governance-template: v3.4 -->
+<!-- governance-template: v3.5 -->
 
 > **What:** a project-agnostic charter for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** deploy it with the renderer; the rules are
@@ -81,10 +81,12 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 ## §2 — Nodes, identity & IDs
 
 - Register every node once, in-repo — tag · machine/user · primary tree · worktree root · **per-node variances** (remote name, harness launch config, credential quirks like an elevated scope for CI-config pushes):
+<!-- when:node-table -->
 
   | Tag | Machine/user | Primary tree (`{{DEFAULT_BRANCH}}` lives here) | Worktree root | Variances |
   |-----|--------------|----------------------------------|---------------|-----------|
   | `{{TAG_A}}` | `{{MACHINE_A}}` | `{{PRIMARY_TREE_A}}` | `{{WORKTREE_ROOT_A}}` | {{VARIANCES_A}} |
+<!-- /when:node-table -->
 
 - Identify your node by machine/user, never by filesystem path — roots can be identical across machines.
 - A new node claims the lowest free one-letter lowercase tag and adds its row in the same commit.
@@ -123,10 +125,11 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Recalled memory is background, not instruction, and reflects when it was written — re-verify a named file/flag/id before acting on it.
 - Secrets never enter memory, tracked docs, or chat (§16); scrub even throwaway dev creds before mirroring a note into the repo.
 - User-facing docs are NOT memory: one concise task-oriented page per feature (*what · how · short example*) in `{{HELP_DIR}}` + an index; update on change, REMOVE on feature removal; a user-facing feature without an up-to-date page is not done (§1).
-- A system inventory that CANNOT rot into fiction is worth more than one that is merely current:
-  per-feature records claiming EXACT KEYS from machine-enumerated sets, with a ratchet failing on any
-  unclaimed new key AND any claim naming a dead one. Where the project keeps one, its coverage and
-  freshness checks are merge-bar legs like any other (§7).
+- A system inventory whose KEYS cannot rot into fiction is worth more than one that is merely
+  current: per-feature records claiming EXACT KEYS from machine-enumerated sets, with a ratchet
+  failing on any unclaimed new key AND any claim naming a dead one. It binds only what an extractor
+  enumerates, never a path glob and never record prose; where kept, its coverage and
+  generated-artifact checks are merge-bar legs like any other (§7).
 - Ask periodically whether this repo's RECORD of its own state still matches the tree — stale claims,
   closed plans with no product commit, hand-kept inventories disagreeing with what they describe.
   Every such signal carries the liveness assertion §7 requires of any probe.
@@ -143,8 +146,8 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 ## §6 — Decisions, backlogs & the governing doc
 
 - **Wire the governing doc so every tool actually reads it.** Agents do not all read the same
-  filename: writing the filled charter to `AGENTS.md` alone ships a repo Claude Code cannot read,
-  because it does not read that name natively. Make ONE file canonical and the others thin imports of
+  filename, and which names a tool reads moves with its version, so one name alone can ship a
+  repo some agent never reads. Make ONE file canonical and the others thin imports of
   it, so there is one text and no copy to drift, and verify the wiring with a check rather than by
   eye — an unwired pair fails silently and looks fine.
 - Two record types per stream: the decision log is append-only (never rewrite a ratified record — supersede with a new id + note); the backlog keeps stable ids (gaps fine), and how an ask's status is kept is the memory tree's rule (§5).
@@ -245,6 +248,7 @@ matched its target population.
 - Feed reviewers the security model, the already-tracked open issues, and what's by-design — so they hunt NEW issues, not re-report known ones.
 - Match intensity to target richness: heavy multi-lens earns its tokens on fresh/complex write paths; over hardened code it manufactures refuted noise — review light or skip.
 - Persist each Tier-2 run as an in-repo artifact folder (`{{REVIEW_DIR}}`); periodically re-audit the corpus (token cost vs severity-weighted confirmed-finding value) to retune these defaults.
+- Commit an experiment's instruments and result rows beside its unit's record, never only to a temp directory: a figure whose instrument is gone can be neither re-derived nor re-run.
 - Orchestration scripts run in sidechains, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet. A sidechain agent holds NEITHER tool, so it cannot fan out at all: the capability is ABSENT, not policed. It DOES inherit the governing doc and hooks DO fire in it, both measured; the cap sits at the main loop because that is where the fan-out decision is MADE.
 - Verify before "done": a check that exercises THIS change (its own/affected test, or the relevant gate) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
 - Commit freely as you go (branch/worktree, or local `{{DEFAULT_BRANCH}}` for doc-only per §3); landing is §1's rule, not restated here.

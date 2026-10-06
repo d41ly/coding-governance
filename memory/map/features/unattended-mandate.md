@@ -11,6 +11,7 @@ decisions = ["TOOL-aStandingWrit-2", "TOOL-dNarrowedAnchor-1", "TOOL-dDerivedDoc
 gate-legs = []
 kits = []
 git-hooks = []
+harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []

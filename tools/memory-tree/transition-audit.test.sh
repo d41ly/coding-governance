@@ -42,9 +42,19 @@ KIT_LIB="$TOOL_ROOT/lib"
 # shellcheck source=/dev/null
 . "$KIT_LIB/resolve-python.sh"
 PY=$(resolve_python) || { echo "FAIL no usable python launcher"; exit 2; }
+# THE PYTHON STATE EVERY ARM RUNS UNDER IS DECLARED, never inherited. The hosted runner has neither
+# UTF-8 mode nor a bytecode opt-out; a node exporting either hid a red there. Without UTF-8 mode a
+# Windows stdout takes the ANSI code page, so the producer's codec is graded by AC11. Bytecode off,
+# because a `.pyc` written beside the fixture's kit aborts the F11 checkouts.
+export PYTHONUTF8=0 PYTHONDONTWRITEBYTECODE=1
+unset PYTHONIOENCODING
+case "$("$PY" -c 'import sys; print(sys.stdout.encoding)' | tr -d '\r')" in
+  utf-8|utf8|UTF-8) echo "transition-audit: this host's redirected stdout is UTF-8 anyway, so the codec dependency is UNGRADED here" ;;
+esac
 
 # RAISED 58 -> 62 with AC9b's four arms: the delta cache keyed by the declared inputs (review F10).
-FLOOR_ASSERTIONS=62
+# RAISED 62 -> 64 with F11's two checkout-landed assertions.
+FLOOR_ASSERTIONS=64
 
 TMP=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP"' EXIT
@@ -492,8 +502,7 @@ write_relocated "$F11" aFlip TOOL-aSeed-1 "$F11_STRAG"
 git -C "$F11" add -A >/dev/null 2>&1; git -C "$F11" commit -qm "account for the relocation"
 F11_OK=$(git -C "$F11" rev-parse HEAD)
 F11_BAD=$(git -C "$F11" rev-parse HEAD^1)
-acct() { # $1 = the tip to account against, with HEAD checked out at $2
-  git -C "$F11" checkout -q "$2"
+acct() { # $1 = the tip to account against, read with whatever HEAD the caller checked out
   ( cd "$F11" && "$PY" - "$F11" "$F11_STRAG" "$F11_FLIP" "$1" "$KIT_MT" <<'PYEOF'
 import sys
 sys.path.insert(0, sys.argv[5])
@@ -505,9 +514,17 @@ print("all" if entries and all(v == "ok" for v in verdicts.values()) else "not-a
 PYEOF
 )
 }
-[ "$(acct "$F11_OK" "$F11_BAD")" = all ] \
+# Each checkout is asserted HERE, outside `$(acct ...)`: a `bad` in that subshell sets a lost `st`,
+# and an aborted checkout leaves HEAD on the tip the arm passes, disarming the HEAD-vs-tip question.
+git -C "$F11" checkout -q "$F11_BAD"
+[ "$(git -C "$F11" rev-parse HEAD)" = "$F11_BAD" ] \
+  || bad "AC11: the checkout of $F11_BAD did not land, so the accounted() arm after it reads the wrong HEAD"; ok
+[ "$(acct "$F11_OK")" = all ] \
   || bad "AC11: accounted() over a tip carrying one RELOCATED row per entry did not account for them while HEAD lacked the rows"; ok
-[ "$(acct "$F11_BAD" "$F11_OK")" = not-all ] \
+git -C "$F11" checkout -q "$F11_OK"
+[ "$(git -C "$F11" rev-parse HEAD)" = "$F11_OK" ] \
+  || bad "AC11: the checkout of $F11_OK did not land, so the accounted() arm after it reads the wrong HEAD"; ok
+[ "$(acct "$F11_BAD")" = not-all ] \
   || bad "AC11: accounted() read HEAD's tree instead of the tip's — HEAD carried the rows and the tip did not"; ok
 git -C "$F11" checkout -q main
 

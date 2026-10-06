@@ -35,7 +35,7 @@ repo a fixture COMMITS in gets its own identity at creation, bare ones included 
 happens to be a worktree.
 
 Ambient state a fixture can inherit without saying so: git identity, `core.autocrlf`, `init.defaultBranch`,
-`$HOME`, locale, `TMPDIR`. A fixture that needs one declares it.
+`$HOME`, locale, `TMPDIR`, the checkout's path and the volume it shares with the temp root. A fixture that needs one declares it.
 
 No machine gate. The generalisable protection is that an empty capture is never fed onward — the
 `$ahead` above was empty and got passed straight to `update-ref`, which is what turned a clear
@@ -66,3 +66,26 @@ argv carries the first root, and finding THAT in scope. `tools/run-gates/run-gat
 AC9 compared two spellings of one directory as strings; node `a`'s `TEMP` is `DAILY-~1`, which
 `mktemp` keeps and git's absolute answer does not. `-ef`. Both were red on that node alone.
 The launch path and the shape of `TEMP` join the list above.
+
+## It bit again as the checkout's path and volume
+
+The daily `held` job in `.github/workflows/remote-ci.yml` took its tree from `actions/checkout`
+under the runner's workspace on `D:`, while every recorded green was earned at the primary-tree
+path on `C:`. Two suites red on every held run for that alone. `skills/session-kickoff/manifest-check.test.sh`
+clones the tree with `git clone --local` into a temp root on `C:`, and from `D:` that clone printed
+`Improper link`, leaving no fixture for the hundred arms after it. The arm in
+`tools/process-monitor/adopt-process-monitor.test.sh` that accepts the shipped
+`.process-monitor.conf` refused it, because the conf's roots name the primary-tree path and the
+runner had no such directory. Fixed host-side, as the `bar` job already was: the held job clones to
+the same `PRIMARY_TREE`. The checkout's path, and the volume it shares with the temp root, join the
+list above.
+
+## It bit again in the check suite's ghost-tip arm
+
+`tools/unattended/check-unattended.test.sh` built its bare origin with no identity, and its check-9
+ghost-tip arm runs `git --git-dir="$ORIGIN" commit-tree` inside it. On the hosted runner, which has
+no global identity, shard 2/8 of the held job printed `unable to auto-detect email address`, `$ghost`
+came back empty, and `update-ref` printed `not a valid SHA1`. Fixed with the driver suite's two
+`config user.` lines on the bare repo. The "Where it bit" paragraph above is no longer true of node
+`a`: it now carries a global identity, so only an emptied global config
+(`GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1`) reproduces the failure there.

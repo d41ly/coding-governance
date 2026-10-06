@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.23
+gov:kit drift-audit@1.24
 
     python <kit>/selftest.py
 
@@ -93,7 +93,33 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 346
+CHECK_FLOOR = 474
+# 414 + 346 -> 474, the merge of origin/main into aMendedFleet: base 277, plus 137 from this
+# branch (277 -> 414) and 69 from origin/main (277 -> 346), is 483, less the nine checks of
+# `test_fleet_over_budget` that both sides counted for ONE arm: TOOL-aMendedFleet-92 ported
+# TOOL-dUnstuckLanding-17's arm verbatim, and the merge keeps one copy, the one carrying M10.
+# 411 -> 414, TOOL-aMendedFleet-110: the MOVE, EMPTY and CONTROL checks in `test_baselines`, COUNTED
+# off the arms rather than measured, because the unit pass runs no suite.
+# 402 -> 411, TOOL-aMendedFleet-92: the nine checks of `test_fleet_over_budget`, COUNTED off the arm
+# rather than measured, because the unit pass runs no suite; the close's run re-reads it.
+# 397 -> 402, TOOL-aMendedFleet-91: the five records-only checks of signal 6.
+# 383 -> 397, TOOL-aMendedFleet-90: the fourteen checks of `test_dead_streaks`.
+# 377 -> 383, TOOL-aMendedFleet-59: the six every-git-dir checks in `test_legs_retried_after_timeout`.
+# 365 -> 377, TOOL-aMendedFleet-57: the twelve checks of `test_shrink_low_water`.
+# 357 -> 365, TOOL-aMendedFleet-56: the eight checks of `test_baselines`.
+# 352 -> 357, TOOL-aMendedFleet-55: the five `open_asks_cited_by_product_source` checks.
+# 345 -> 352, TOOL-aMendedFleet-54: the seven checks of `test_live_builds_without_activity`.
+# 330 -> 339, TOOL-aMendedFleet-52: the nine checks of `test_handkept_name_sets`.
+# 339 -> 345, TOOL-aMendedFleet-53: the six checks of `test_auto_memory_pointers`.
+# 327 -> 330, TOOL-aMendedFleet-51: the readme-drift all-CLOSED arm and the two pinless checks.
+# 318 -> 327, TOOL-aMendedFleet-50: the nine checks of `test_escape_ratio`.
+# 309 -> 318, TOOL-aMendedFleet-49: the nine checks of `test_drift_delta`.
+# 302 -> 309, TOOL-aMendedFleet-48: the seven checks of `test_drift_history`.
+# 295 -> 302, TOOL-aMendedFleet-47: the run-records arm's derived-LANDED checks — three derived
+# fixtures left unlisted, their count, the summary line, and the LANDING call-count size's two.
+# 289 -> 295, TOOL-aMendedFleet-37: the six checks of `test_stale_dossiers`.
+# 284 -> 289, TOOL-aMendedFleet-21: the five checks of `test_cutoff_keys_armed`.
+# 277 -> 284, TOOL-aMendedFleet-8: the seven checks of `test_remote_ci_red_streak`.
 # 261 -> 267, TOOL-dDerivedDocket-26: the six checks of `test_legs_retried_after_timeout`.
 # 267 -> 277, TOOL-dDerivedDocket-34: the five checks of the retired dGV-13 signal leave, one
 # retirement check and the fourteen of `test_backlog_ask_signals` arrive.
@@ -698,6 +724,40 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
           f"got {v6w2['detail']} -- a stale waiver is being swallowed")
     waiver.unlink()
 
+    # THE RECORDS-ONLY VERB (TOOL-aMendedFleet-91). One fixture, CLOSED and certified by nothing, so
+    # it FIRES bare: asserted first, or the exemption arm passes without the verb doing anything.
+    ro_rel = SPEC_DIR_FOR_FIXTURE + "/2026-02-02-spec-aRecords-1.md"
+    ro = r / ro_rel
+    ro_h1 = "# TOOL-aRecords-1 — a census, records and nothing else\n\n"
+    ro_status = "**Status:** CLOSED · rev-1 · 2026-02-02 · node a · Tier-1 · base 0000000"
+
+    # (status tail, body, waiver row, label, detail ids wanted, records_only wanted). The body arm
+    # spells the token between `·` separators, so a read of the whole text rather than the status
+    # line alone reds it.
+    for tail, body, row, why, want, listed in (
+        ("", "", "", "the records-only fixture fires BEFORE it declares the verb",
+         ["TOOL-aRecords-1"], []),
+        (" · records-only · order 7", "", "", "a CLOSED spec declaring records-only is silent and listed",
+         [], [ro_rel]),
+        (" · records-only", "", ro_rel + "\tTOOL-aRecords-1\tdeclared twice\n",
+         "the verb beside a waiver row reports the row stale, naming the declaration",
+         ["(stale waiver)"], [ro_rel]),
+        (" · records-only-ish", "", "", "a lookalike tail token exempts nothing",
+         ["TOOL-aRecords-1"], []),
+        ("", "\n## 1. Goal\n\nIts tail would read · records-only · were it declared.\n", "",
+         "records-only in body prose exempts nothing", ["TOOL-aRecords-1"], []),
+    ):
+        ro.write_text(ro_h1 + ro_status + tail + "\n" + body, encoding="utf-8", newline="\n")
+        if row:
+            waiver.write_text(row, encoding="utf-8", newline="\n")
+        got = report(r)["closed_specs_with_no_product_commit"]
+        if row:
+            waiver.unlink()
+        named = not row or bool(got["detail"]) and "records-only" in got["detail"][0].get("note", "")
+        check(why, [d["id"] for d in got["detail"]] == want and got["records_only"] == listed
+              and named, f"got {got['detail']} records_only={got.get('records_only')}")
+    ro.unlink()
+
     # --- 3 — --check honours the pin in BOTH directions -------------------------------------
     print("--check pin semantics")
     sig = r / KIT_NAME / "drift_signals.py"
@@ -1241,6 +1301,15 @@ def test_live_backlog_rows(tmp: pathlib.Path) -> None:
     check("counts LIVE rows, not entries: 3 of 5", got["value"] == 3, f"got {got['value']}")
     check("reports every shard, so a total cannot hide one", got["of"] == 2, f"got {got['of']}")
     check("probe is LIVE with shards present", got["live"] is True)
+    # --- PINLESS BY DESIGN (TOOL-aMendedFleet-51 S1, S3): a None tolerance serialises as null, the
+    # --- pin resolves to null with no PINS entry, and the table says so instead of `over pin 0`.
+    check("pinless: the record serialises a null tolerance and a null pin",
+          got["tolerance"] is None and got["pin"] is None,
+          f"tolerance={got['tolerance']!r} pin={got['pin']!r}")
+    _row = next((ln for ln in run([sys.executable, REPORT_REL], r).stdout.splitlines()
+                 if "live_backlog_rows_per_shard" in ln), "")
+    check("pinless: its printed row reads 'report only, no pin' and nothing about being over",
+          "report only, no pin" in _row and "over" not in _row, f"row={_row.strip()!r}")
     per = {d["shard"]: d for d in got["detail"]}
     check("the empty shard reports 0 rather than being skipped",
           per.get("memory/backlog/DES.md", {}).get("live") == 0,
@@ -1353,6 +1422,34 @@ def test_backlog_ask_signals(tmp: pathlib.Path) -> None:
         check(f"[dDD-34] a projection lacking `{field}` makes {name} a DEAD PROBE, not a 0",
               dead["live"] is False and not dead.get("not_asked"), f"{dead}")
 
+    # TOOL-aMendedFleet-55: live asks cited by product source, over the same stub projection. The
+    # fixture's EVIDENCE_GLOBS is `src` minus `*.test.sh`; `-4` appears only inside `-41`.
+    name = "open_asks_cited_by_product_source"
+    asks = [{"id": f"ARCH-aFoo-{n}", "status": "OPEN"} for n in (2, 3, 4)]
+    (r / "projection.json").write_text(json.dumps(asks), encoding="utf-8", newline="\n")
+    (r / "src").mkdir(exist_ok=True)
+    (r / "src" / "cites.py").write_text("# fixes ARCH-aFoo-2\n# and ARCH-aFoo-41, a longer sibling\n",
+                                        encoding="utf-8", newline="\n")
+    (r / "src" / "only.test.sh").write_text("# ARCH-aFoo-3\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "asks cited from source and from a test", "--no-verify"], r)
+    got = report(r)[name]
+    ids = [d["id"] for d in got.get("detail", [])]
+    check("[aMF-55] cited asks: 1 of 3 live, report-only and pinless",
+          (got["value"], got["of"], got["live"], got["gateable"], got["tolerance"])
+          == (1, 3, True, False, None), f"{got}")
+    check("[aMF-55] an ask cited from product source counts, with its status and path",
+          {"id": "ARCH-aFoo-2", "status": "OPEN", "cited_in": ["src/cites.py"]} in got["detail"],
+          f"{got['detail']}")
+    check("[aMF-55] an ask cited only from a *.test.sh file does not count",
+          "ARCH-aFoo-3" not in ids, f"{ids}")
+    check("[aMF-55] a sibling id one digit longer does not count for the shorter id",
+          "ARCH-aFoo-4" not in ids, f"{ids}")
+    (r / "projection.json").write_text("not json", encoding="utf-8", newline="\n")
+    dead = report(r)[name]
+    check("[aMF-55] an unreadable projection reads not live, never not asked",
+          dead["live"] is False and not dead.get("not_asked"), f"{dead}")
+
 
 NL_ = chr(10)
 
@@ -1398,7 +1495,7 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
     spec = [
         "# TOOL-aDrift-1 - a drifting thing",
         "",
-        "**Status:** CLOSED - rev-2 - 2026-01-05 - node a - Tier-2 - base 0000000",
+        "**Status:** INPROGRESS - rev-2 - 2026-01-05 - node a - Tier-2 - base 0000000",
         "",
         "## 9. Revision log",
         "",
@@ -1438,6 +1535,20 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
     # REPORT ONLY, for the reason F2 settled: `drift-audit records` is an unguarded merge-bar leg and
     # this predicate reports a POINTER, not a proven contradiction.
     check("the signal is not gateable", got["gateable"] is False)
+
+    # --- TOOL-aMendedFleet-51 S4: a build whose every spec is CLOSED is a frozen record and is not
+    # --- graded. EVERY spec of the build is flipped, `make_repo`'s SPECCED one included, because a
+    # --- single live spec keeps the whole build graded. The arm above read one row from this tree.
+    for _sp in sorted((r / SPEC_DIR_FOR_FIXTURE).glob("*.md")):
+        _txt = _sp.read_text(encoding="utf-8")
+        _sp.write_text(re.sub(r"^\*\*Status:\*\*\s*[A-Za-z]+", "**Status:** CLOSED", _txt, flags=re.M),
+                       encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "close every spec", "--no-verify"], r)
+    shut = report(r)["readme_mechanism_drift"]
+    check("S4: a build whose every spec is CLOSED is not graded, so it reads zero rows",
+          shut["value"] == 0 and shut["detail"] == [] and shut["of"] == 0,
+          f"got value={shut['value']} of={shut['of']} rows={shut['detail'][:1]}")
 
     # --- AC2: a README and spec set that AGREE are silent, and the probe stays live -----------
     r2 = make_repo(tmp, name="rmagree")
@@ -1547,6 +1658,9 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
         (_d / ("2026-01-01-spec-a" + _b + "-1.md")).write_text(
             NL_.join([
                 "# TOOL-a" + _b + "-1 - a thing",
+                "",
+                # LIVE, so the build is graded at all (TOOL-aMendedFleet-51 S4).
+                "**Status:** INPROGRESS - rev-2 - 2026-01-05 - node a - Tier-2 - base 0000000",
                 "",
                 "## 9. Revision log",
                 "",
@@ -1700,6 +1814,57 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
           f"stderr={fires.stderr.strip()[:200]}")
 
 
+def test_handkept_name_sets(tmp: pathlib.Path) -> None:
+    """A HANDKEPT probe returning two SETS scores their symmetric difference and names both halves
+    (TOOL-aMendedFleet-52). The fixture row's actual half is `ctx.signal_names`, so the arm also
+    proves `main` hands the hand-kept signal the names every other signal reported."""
+    import json
+
+    print("HANDKEPT name sets (equal reads 0 and live; a missing and a stale name each count one)")
+    r = make_repo(tmp, name="namesets")
+    names = sorted(report(r))
+    claims = r / "names.txt"
+    sig = r / KIT_NAME / "drift_signals.py"
+    text = sig.read_text(encoding="utf-8")
+    assert text.count("HANDKEPT = []\n") == 1, "fixture HANDKEPT literal moved; this arm would test nothing"
+    sig.write_text(text.replace("HANDKEPT = []\n", (
+        "def read_fixture_names(ctx):\n"
+        "    import pathlib\n"
+        "    got = (pathlib.Path(ctx.root) / 'names.txt').read_text(encoding='utf-8').split()\n"
+        "    return set(got), set(ctx.signal_names)\n"
+        "HANDKEPT = [{'record': 'names.txt', 'source': 'the engine', 'probe': read_fixture_names}]\n")),
+        encoding="utf-8", newline="\n")
+
+    def read_row(claimed: list[str]) -> tuple[dict, dict]:
+        claims.write_text("\n".join(claimed) + "\n", encoding="utf-8", newline="\n")
+        rec = report(r)["handkept_inventories_disagreeing_with_source"]
+        return rec, (rec["detail"][0] if rec["detail"] else {})
+
+    rec, row = read_row(names)
+    check("name sets: equal sets read 0 and live", rec["value"] == 0 and rec["live"] is True,
+          f"value={rec['value']} live={rec['live']} row={json.dumps(row)[:200]}")
+    check("name sets: the population is every reported name", rec["of"] == len(names),
+          f"of={rec['of']} names={len(names)}")
+    check("name sets: claims and actual are serialised as counts",
+          row.get("claims") == len(names) and row.get("actual") == len(names), json.dumps(row)[:200])
+
+    dropped = "closed_specs_with_no_product_commit"
+    assert dropped in names, f"{dropped} is not a reported signal; this arm would drop nothing"
+    rec, row = read_row([n for n in names if n != dropped])
+    check("name sets: a name missing from the claims counts one", rec["value"] == 1,
+          f"value={rec['value']}")
+    check("name sets: ...and is named under missing", row.get("missing") == [dropped],
+          json.dumps(row)[:200])
+    check("name sets: ...and nothing under extra", row.get("extra") == [], json.dumps(row)[:200])
+
+    rec, row = read_row(names + ["no_such_signal"])
+    check("name sets: a stale extra name counts one", rec["value"] == 1, f"value={rec['value']}")
+    check("name sets: ...and is named under extra", row.get("extra") == ["no_such_signal"],
+          json.dumps(row)[:200])
+    check("name sets: ...and the population is the union", rec["of"] == len(names) + 1,
+          f"of={rec['of']}")
+
+
 def test_ratchet_guard(tmp: pathlib.Path) -> None:
     """A pin RAISE and a population DRAIN look identical to `value > pin` — TOOL-aNumeralWarden-3.
 
@@ -1775,6 +1940,157 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
           out.returncode == 0 and "RATCHET WEAKENED" not in out.stderr,
           (out.stdout + out.stderr)[-400:])
 
+
+
+def test_baselines(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-56 — a gateable signal bounded by WHICH offenders it holds, not how many.
+
+    One fixture, signal 2 baselined at one listed id. Each arm moves one thing from the committed
+    state and demands red, and the clean state and the equal-seed arm demand green, so a guard that
+    refused every edit fails here as surely as one that refused none.
+    """
+    print("BASELINES (an equal-count swap, a drain and a growth each red)")
+    r = make_repo(tmp, name="baselines")
+    sig = r / KIT_NAME / "drift_signals.py"
+    app = r / "src" / "app.py"
+    name = "non_terminal_specs_cited_by_product_source"
+    # A second SPECCED spec, so the swap has an id to swap in at an equal count.
+    (r / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aOther-1.md").write_text(
+        "# TOOL-aOther-1 — another thing\n\n"
+        "**Status:** SPECCED · rev-1 · 2026-01-01 · node a · Tier-2 · base 0000000\n",
+        encoding="utf-8", newline="\n")
+    app.write_text("# implements TOOL-aThing-1\n", encoding="utf-8", newline="\n")
+    # The layer sits INSIDE the evidence globs, as it does in this repo, so the drain arm also proves
+    # that a list spelling an id is not a citation of it (S10).
+    layer = sig.read_text(encoding="utf-8").replace(
+        "EVIDENCE_GLOBS = ['src', ", "EVIDENCE_GLOBS = ['src', '" + KIT_NAME + "', ")
+    seeded = layer + "BASELINES = {'" + name + "': ['TOOL-aThing-1']}\n"
+    sig.write_text(seeded, encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "seed the baseline", "--no-verify"], r)
+
+    def run_check() -> subprocess.CompletedProcess:
+        return run([sys.executable, REPORT_REL, "--check"], r)
+
+    clean = run_check()
+    rec = report(r)[name]
+    check("baselines: the seeded fixture is green, with the fields and nothing new or stale",
+          clean.returncode == 0 and rec.get("baseline") == 1 and rec.get("new") == []
+          and rec.get("stale") == [], f"rc={clean.returncode} {clean.stderr.strip()[-300:]} rec={rec}")
+
+    # --- an equal-count SWAP: the defect a count could not see ----------------------------------
+    app.write_text("# implements TOOL-aOther-1\n", encoding="utf-8", newline="\n")
+    swap = run_check()
+    offs = run([sys.executable, REPORT_REL, "--offenders"], r).stdout.splitlines()
+    check("baselines: the swap leaves the count at the listed size", report(r)[name]["value"] == 1)
+    check("baselines: an equal-count swap reds, keying the new row and the stale id",
+          swap.returncode == 1 and any("TOOL-aOther-1" in ln for ln in offs)
+          and f'{name}\t{{"stale": "TOOL-aThing-1"}}' in offs, f"rc={swap.returncode} {offs}")
+
+    # --- a DRAIN: a listed id no row carries reds until its line goes --------------------------
+    app.write_text("# nothing cited here\n", encoding="utf-8", newline="\n")
+    drain = run_check()
+    check("baselines: a drained listed id reds as stale though the layer still spells it",
+          drain.returncode == 1 and "stale TOOL-aThing-1" in drain.stderr,
+          f"rc={drain.returncode} {drain.stderr.strip()[-300:]}")
+
+    # --- GROWTH against a committed base that lists the signal ---------------------------------
+    app.write_text("# implements TOOL-aThing-1 and TOOL-aOther-1\n", encoding="utf-8", newline="\n")
+    sig.write_text(seeded.replace("['TOOL-aThing-1']", "['TOOL-aThing-1', 'TOOL-aOther-1']"),
+                   encoding="utf-8", newline="\n")
+    grown = run_check()
+    check("baselines: a set gaining an id against its base reds as a weakened ratchet",
+          grown.returncode == 1 and "RATCHET WEAKENED" in grown.stderr
+          and "gained TOOL-aOther-1" in grown.stderr, f"rc={grown.returncode} {grown.stderr.strip()[-300:]}")
+
+    # --- the FIRST seed is bounded by the pin the base held ------------------------------------
+    pinned = layer.replace("PINS = {}", "PINS = {'" + name + "': 1}")
+    sig.write_text(pinned, encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "a pin at the base", "--no-verify"], r)
+    sig.write_text(layer + "BASELINES = {'" + name + "': ['TOOL-aThing-1', 'TOOL-aOther-1']}\n",
+                   encoding="utf-8", newline="\n")
+    over = run_check()
+    check("baselines: a first seed above the base's pin reds",
+          over.returncode == 1 and "seeded with 2 ids where the base pins it at 1" in over.stderr,
+          f"rc={over.returncode} {over.stderr.strip()[-300:]}")
+    app.write_text("# implements TOOL-aThing-1\n", encoding="utf-8", newline="\n")
+    sig.write_text(seeded, encoding="utf-8", newline="\n")
+    equal = run_check()
+    check("baselines: a first seed at the base's pin is green", equal.returncode == 0,
+          f"rc={equal.returncode} {equal.stderr.strip()[-300:]}")
+
+    # --- ONE bound per signal -------------------------------------------------------------------
+    sig.write_text(seeded.replace("PINS = {}", "PINS = {'" + name + "': 1}"),
+                   encoding="utf-8", newline="\n")
+    both = run([sys.executable, REPORT_REL, "--check"], r)
+    check("baselines: a signal in both PINS and BASELINES is refused with exit 2 before any line",
+          both.returncode == 2 and not both.stdout.strip() and "PINS and BASELINES" in both.stderr,
+          f"rc={both.returncode} out={both.stdout[:120]!r} {both.stderr.strip()[-200:]}")
+    sig.write_text(seeded, encoding="utf-8", newline="\n")
+
+    # --- TOOL-aMendedFleet-110: a MOVE out of BASELINES into PINS is graded against the base ----
+    # The seeded set becomes the base first: the arms above end on a base that pins the signal.
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "the seeded set is the base", "--no-verify"], r)
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+    moved = dr.build_baseline_findings(
+        dr.Git(r, "HEAD"), f"{ROOT_PFX}{KIT_NAME}/drift_signals.py",
+        {"closed_specs_with_no_product_commit": []}, {name: 2})
+    check("baselines: a set moved to PINS above the base's size is one finding naming it",
+          len(moved) == 1 and f"{name!r} moved" in moved[0] and "WEAKENS" in moved[0], repr(moved))
+    sig.write_text(layer.replace("PINS = {}", "PINS = {'" + name + "': 2}"),
+                   encoding="utf-8", newline="\n")
+    emptied = run_check()
+    check("baselines: no BASELINES and the signal pinned above the base's size reds",
+          emptied.returncode == 1 and "RATCHET WEAKENED" in emptied.stderr
+          and f"{name!r} moved" in emptied.stderr,
+          f"rc={emptied.returncode} {emptied.stderr.strip()[-300:]}")
+    sig.write_text(layer.replace("PINS = {}", "PINS = {'" + name + "': 1}"),
+                   encoding="utf-8", newline="\n")
+    at_size = run_check()
+    check("baselines: a move pinned at the base set's size is green", at_size.returncode == 0,
+          f"rc={at_size.returncode} {at_size.stderr.strip()[-300:]}")
+    sig.write_text(seeded, encoding="utf-8", newline="\n")
+
+
+def test_shrink_low_water(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-57: a shrink-only list is graded against the lowest count its first-parent
+    history reached, so one that drained and grew back is `regrown` while still under its seed."""
+    import types
+    print("shrink-only low-water (truth table + a list committed at 3, 1, 2)")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    # The truth table over the predicate: (seed, low_water, entries) -> reason.
+    for args, want in (((3, 1, 2), "regrown"), ((0, 0, 4), "regrown"), ((2, 2, 2), "never drained"),
+                       ((2, 1, 1), None), ((0, 0, 0), None), ((4, 0, 0), None), ((2, 2, -1), None)):
+        check(f"check_shrink_row{args} reads {want!r}", dr.check_shrink_row(*args) == want,
+              repr(dr.check_shrink_row(*args)))
+
+    r = tmp / "low-water"
+    r.mkdir()
+    run(["git", "init", "-q", "-b", "main"], r)
+    run(["git", "config", "user.email", "selftest@example.com"], r)
+    run(["git", "config", "user.name", "selftest"], r)
+    lst = r / "list.txt"
+    for n in (3, 1, 2):
+        lst.write_text("# header\n\n" + "".join(f"row-{i}\n" for i in range(n)),
+                       encoding="utf-8", newline="\n")
+        run(["git", "add", "-A"], r)
+        run(["git", "commit", "-q", "-m", f"list at {n}", "--no-verify"], r)
+    ctx = types.SimpleNamespace(root=r, git=dr.Git(r, "main"),
+                                shrink_only={"list.txt": "a list", "never.txt": "never committed"})
+    got = dr.derive_low_waters(ctx.git, list(ctx.shrink_only))
+    check("the replay reads the list's low-water as 1", got.get("list.txt") == 1, repr(got))
+    check("a path with no history has no low-water", got.get("never.txt") is None, repr(got))
+    sig = dr.signal_shrink_only(ctx)
+    row = next(x for x in sig["detail"] if x["file"] == "list.txt")
+    check("the seed reading calls the list shrinking (shrunk_by 1)", row["shrunk_by"] == 1, repr(row))
+    check("...and the low-water reading names it regrown", row["reason"] == "regrown", repr(row))
+    check("the regrown list is the one offender, the historyless one unjudgeable",
+          sig["value"] == 1 and sig["unjudgeable"] == 1, repr(sig))
 
 
 def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
@@ -2565,11 +2881,16 @@ def test_asks_disposed_overrides(tmp: pathlib.Path) -> None:
 # ---------------------------------------------------------------------------------------------
 
 
-def _write_gate_verdict(r: pathlib.Path, run: str, body: str) -> None:
-    """One run record's verdict file under the fixture's git dir, where the gate runner writes it."""
-    d = r / ".git" / "gate-run" / run
+def _write_gate_verdict(r: pathlib.Path, run: str, body: str, git_dir: str = ".git",
+                        retries: tuple = ()) -> None:
+    """One run record's verdict file under a fixture git dir, where the gate runner writes it, with
+    one `<i>.retry.leg` row per `(leg, status)` in `retries`."""
+    d = r / git_dir / "gate-run" / run
     d.mkdir(parents=True, exist_ok=True)
     (d / "verdict").write_text(body, encoding="utf-8", newline="\n")
+    for i, (leg, status) in enumerate(retries):
+        (d / f"{i}.retry.leg").write_text(f"{leg}\t{status}\t0\t3\t1\t2\tabc\n",
+                                          encoding="utf-8", newline="\n")
 
 
 def test_legs_retried_after_timeout(tmp: pathlib.Path) -> None:
@@ -2599,6 +2920,252 @@ def test_legs_retried_after_timeout(tmp: pathlib.Path) -> None:
     dead = report(make_repo(tmp, name="noruns"))["legs_retried_after_timeout"]
     check("a git dir with no run record reports DEAD rather than 0",
           dead["live"] is False, f"live={dead['live']} value={dead['value']}")
+    # --- TOOL-aMendedFleet-59: every git dir of the clone, grouped by leg ---------------------------
+    # Red against a reader of the current git dir alone: the linked worktree's record goes unread.
+    w = make_repo(tmp, name="retriedwt")
+    _write_gate_verdict(w, "r1", "verdict\tGREEN\nretried\t1\n", retries=(("leg a", "ok"),))
+    _write_gate_verdict(w, "r1", "verdict\tRED\nretried\t2\n", git_dir=".git/worktrees/w1",
+                        retries=(("leg a", "ok"), ("leg b", "fail")))
+    got = report(w)["legs_retried_after_timeout"]
+    check("a linked worktree's run record is summed beside the common dir's",
+          got["value"] == 3 and got["of"] == 2, f"value {got['value']} of {got['of']}")
+    check("`git_dirs` counts the git dirs holding a record", got["git_dirs"] == 2, f"got {got['git_dirs']}")
+    check("every counted retry names its leg", got["unattributed"] == 0, f"got {got['unattributed']}")
+    legs = {d["leg"]: d for d in got["detail"]}
+    check("a leg retried in two git dirs reads 2 retries over 2 git dirs",
+          legs.get("leg a", {}).get("retried") == 2 and legs["leg a"]["git_dirs"] == 2, f"got {legs}")
+    check("a leg that failed on its retry reads `failed_after_retry` 1",
+          legs.get("leg b", {}).get("failed_after_retry") == 1
+          and legs.get("leg a", {}).get("failed_after_retry") == 0, f"got {legs}")
+    check("the detail orders legs by retries descending",
+          [d["leg"] for d in got["detail"]] == ["leg a", "leg b"], f"got {got['detail']}")
+
+
+def test_cutoff_keys_armed(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-21: armed `_CUTOFF` keys in TRACKED root confs, pinned only where declared.
+
+    Two root confs carry an armed, a blank, an exported and a commented cutoff line, and an untracked
+    conf carries one more; only the armed and exported ones in tracked confs are `value`.
+    """
+    print("armed cutoff keys across the tracked root confs")
+    name = "cutoff_keys_armed"
+    r = make_repo(tmp, name="cutoffs")
+    NL = chr(10)
+    dead = report(r).get(name, {})
+    check("cutoffs: no _CUTOFF assignment anywhere reads DEAD, not 0",
+          dead.get("live") is False, f"row {dead}")
+    (r / ".memory-tree.conf").write_text(
+        "MEMORY_ROOT=memory" + NL + 'A_CUTOFF="2026-01-01"' + NL + 'B_CUTOFF=""' + NL
+        + '# C_CUTOFF="2026-01-01"' + NL, encoding="utf-8", newline=NL)
+    (r / ".other.conf").write_text(
+        "export D_CUTOFF=2026-02-02" + NL + "E_CUTOFF=   # blank on purpose" + NL,
+        encoding="utf-8", newline=NL)
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: two root confs with cutoff keys", "--no-verify"], r)
+    (r / ".untracked.conf").write_text('F_CUTOFF="2026-03-03"' + NL, encoding="utf-8", newline=NL)
+    got = report(r).get(name, {})
+    check("cutoffs: armed and exported count, blank, commented and untracked do not",
+          (got.get("value"), got.get("of"), got.get("live")) == (2, 4, True), f"row {got}")
+    check("cutoffs: with no PINS entry the row is report-only and says no budget is declared",
+          got.get("gateable") is False and "no budget" in str((got.get("detail") or [{}])[0]),
+          f"row {got}")
+    proj = r / KIT_NAME / "drift_signals.py"
+    proj.write_text(proj.read_text(encoding="utf-8").replace(
+        "PINS = {}", "PINS = {'" + name + "': 2}"), encoding="utf-8", newline=NL)
+    check("cutoffs: a PINS entry makes it gateable", report(r).get(name, {}).get("gateable") is True)
+    with (r / ".other.conf").open("a", encoding="utf-8", newline=NL) as fh:
+        fh.write('G_CUTOFF="2026-04-04"' + NL)
+    out = run([sys.executable, REPORT_REL, "--check"], r)
+    check("cutoffs: arming a third key over a pin of 2 reds --check naming the signal",
+          out.returncode == 1 and f"{name} = 3 (pin 2)" in out.stderr, out.stderr.strip()[-300:])
+
+
+def _build_ci_rows(*conclusions) -> list:
+    """Completed `push` runs, newest first, one per conclusion, as `gh run list --json` returns them."""
+    return [{"databaseId": i, "status": "completed", "conclusion": c, "event": "push"}
+            for i, c in enumerate(conclusions)]
+
+
+def test_remote_ci_red_streak(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-8: the streak rules over canned rows, and the three non-live states.
+
+    The reader is pointed at a host no remote matches, so `gh` refuses (or is absent): either way the
+    signal must say DEAD PROBE, never a calm 0. No network answer is asserted here."""
+    import types
+    print("remote CI red streak (streak rules over canned rows; not asked, dead)")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    m = dr.measure_red_streak(_build_ci_rows("failure", "cancelled", "failure", "success"))
+    check("a cancelled run neither ends nor extends the streak",
+          m["streak"] == 2 and len(m["passed_over"]) == 1, f"got {m['streak']}")
+    m = dr.measure_red_streak(_build_ci_rows("success", "failure"))
+    check("a newest green reads 0", m["streak"] == 0 and not m["capped"], f"got {m}")
+    m = dr.measure_red_streak(_build_ci_rows("failure", "timed_out", "startup_failure"))
+    check("an all-red window reports its length, capped", m["streak"] == 3 and m["capped"], f"got {m}")
+    m = dr.measure_red_streak(_build_ci_rows("cancelled", "skipped") + [{"databaseId": 9, "status": "in_progress"}])
+    check("no verdict-bearing run reports no streak", m["streak"] is None, f"got {m}")
+
+    r = make_repo(tmp, name="remoteci")
+    ctx = types.SimpleNamespace(root=r, git=dr.Git(r, "refs/remotes/origin/main"), pins={},
+                                remote_ci_workflow="", offline=False)
+    check("no declared workflow is NOT ASKED",
+          dr.build_remote_ci_red_streak(ctx).get("not_asked") is True)
+    ctx.remote_ci_workflow, ctx.offline = "ci.yml", True
+    check("--check / --offenders is NOT ASKED and spawns nothing",
+          dr.build_remote_ci_red_streak(ctx).get("not_asked") is True)
+    ctx.offline = False
+    old = os.environ.get("GH_HOST")
+    os.environ["GH_HOST"] = "nonexistent.invalid"
+    try:
+        got = dr.build_remote_ci_red_streak(ctx)
+    finally:
+        if old is None:
+            os.environ.pop("GH_HOST", None)
+        else:
+            os.environ["GH_HOST"] = old
+    check("an unreachable remote is DEAD PROBE, not a calm 0",
+          got["live"] is False and not got.get("not_asked")
+          and got["detail"][0]["note"].startswith("DEAD PROBE"), f"got {got}")
+
+
+def test_auto_memory_pointers(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-53: `dangling_pointers_in_own_ledger` judges the backticked repo paths in a
+    declared auto-memory directory against `git ls-files`, and its two non-live states."""
+    import types
+    print("auto-memory pointers (tracked vs untracked; not asked; dead)")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    r = tmp / "automem-repo"
+    (r / "src").mkdir(parents=True)
+    (r / "src" / "a.py").write_text("x = 1\n", encoding="utf-8", newline="\n")
+    run(["git", "init", "-q", "-b", "main"], r)
+    run(["git", "add", "-A"], r)
+    run(["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "seed",
+         "--no-verify"], r)
+    notes = tmp / "automem-notes"
+    notes.mkdir()
+    # One tracked path (with a line suffix), one untracked path under a tracked top-level directory,
+    # and spans the probe must not judge: an untracked top level, a placeholder and a bare word.
+    (notes / "n.md").write_text("See `src/a.py:3` and `src/gone.py`; not `elsewhere/x.py`, "
+                                "`src/<name>.py` or `word`.\n", encoding="utf-8", newline="\n")
+    ctx = types.SimpleNamespace(root=r, git=dr.Git(r, "main"), pins={}, auto_memory_dir=str(notes))
+    got = dr.signal_dangling_pointers(ctx)
+    check("auto-memory: one tracked and one untracked path read 1 of 2",
+          got["value"] == 1 and got["of"] == 2 and got["live"] is True, f"got {got}")
+    check("auto-memory: the detail row names the note and the untracked path",
+          got["detail"] == [{"note_file": "n.md", "path": "src/gone.py"}], f"got {got['detail']}")
+    check("auto-memory: report-only and pinless",
+          got["gateable"] is False and got["tolerance"] is None, f"got {got}")
+    ctx.auto_memory_dir = ""
+    check("auto-memory: a blank declaration is NOT ASKED",
+          dr.signal_dangling_pointers(ctx).get("not_asked") is True)
+    ctx.auto_memory_dir = str(tmp / "no-such-dir")
+    got = dr.signal_dangling_pointers(ctx)
+    check("auto-memory: a missing directory is DEAD PROBE naming the resolved path",
+          got["live"] is False and not got.get("not_asked")
+          and "no-such-dir" in got["detail"][0]["note"], f"got {got}")
+    key = dr.resolve_auto_memory_dir(r, "{checkout}").name
+    check("auto-memory: {checkout} expands to a [A-Za-z0-9-] key",
+          re.fullmatch(r"[A-Za-z0-9-]+", key) is not None, f"got {key}")
+
+
+def test_stale_dossiers(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-37: the three states of `dossiers_older_than_their_paths` over canned
+    `map_diff.py --stale-dossiers --json` output — the rule is the map kit's, so the arm grades only
+    how this report reads its answer. The reader is swapped on the module and always restored."""
+    import json
+    import types
+    print("dossiers older than their paths (canned map_diff output; not asked, dead, value)")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    name = "dossiers_older_than_their_paths"
+    ctx = types.SimpleNamespace(root=tmp, pins={name: 2})
+    rows = [{"feature": "b", "stale": True, "behind": 3}, {"feature": "a", "stale": True, "behind": 1},
+            {"feature": "c", "stale": False, "behind": 0}]
+    canned = {
+        "value": (0, json.dumps({"of": 3, "stale": 2, "live": True, "note": "", "dossiers": rows}), ""),
+        "dead": (0, json.dumps({"of": 0, "stale": 0, "live": False, "note": "the clone is shallow",
+                                "dossiers": []}), ""),
+        "garbled": (0, "{ not json", ""),
+        "refused": (2, "", "map-diff refused: no .codebase-map.conf at the resolved repo root\nmore"),
+        "absent": None,
+    }
+    real, got = dr.read_stale_dossiers, {}
+    try:
+        for state, answer in canned.items():
+            dr.read_stale_dossiers = lambda _ctx, answer=answer: answer
+            got[state] = dr.build_stale_dossiers(ctx)
+    finally:
+        dr.read_stale_dossiers = real
+    v = got["value"]
+    check("stale dossiers: a live answer reads the map's count, report-only, against its pin",
+          (v["value"], v["of"], v["live"], v["gateable"], v["tolerance"]) == (2, 3, True, False, 2), f"got {v}")
+    check("stale dossiers: the detail is the stale rows only, most-behind first as the map orders them",
+          [r["feature"] for r in v["detail"]] == ["b", "a"], f"got {v['detail']}")
+    d = got["dead"]
+    check("stale dossiers: live false is DEAD PROBE quoting the map's note, never a calm 0",
+          d["live"] is False and not d.get("not_asked")
+          and d["detail"][0]["note"] == "DEAD PROBE — the clone is shallow", f"got {d}")
+    g = got["garbled"]
+    check("stale dossiers: unparseable output is DEAD PROBE",
+          g["live"] is False and not g.get("not_asked") and g["detail"][0]["note"].startswith("DEAD PROBE"),
+          f"got {g}")
+    r = got["refused"]
+    check("stale dossiers: an unadopted map (exit 2) is NOT ASKED, quoting the refusal",
+          r.get("not_asked") is True and "no .codebase-map.conf" in r["detail"][0]["note"], f"got {r}")
+    check("stale dossiers: no map kit beside this one is NOT ASKED",
+          got["absent"].get("not_asked") is True, f"got {got['absent']}")
+
+
+def test_live_builds_without_activity(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-54: `live_builds_without_activity` counts the `dormant` cells of the
+    rendered LIVE.md table by header name, and its not-asked and dead states."""
+    import types
+    print("live builds without activity (fixture LIVE.md tables)")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    r = tmp / "live-activity"
+    (r / "mem").mkdir(parents=True)
+    ctx = types.SimpleNamespace(root=r, memory_root="mem")
+
+    def read(*rows, head="| Build | Status | Last record | Activity |"):
+        body = "\n".join([head, "|" + "---|" * (head.count("|") - 1)] + list(rows))
+        (r / "mem" / "LIVE.md").write_text(f"# LIVE\n\nprose\n\n{body}\n\ntrailer\n",
+                                           encoding="utf-8", newline="\n")
+        return dr.build_live_builds_without_activity(ctx)
+
+    three = ("| [bOne](builds/bOne/README.md) | SPECCED | 2026-08-01 | dormant |",
+             "| [bTwo](builds/bTwo/README.md) | INPROGRESS | 2026-10-01 | active |",
+             "| [bSix](builds/bSix/README.md) | SPECCED | 2026-07-02 | dormant |")
+    got = read(*three)
+    check("live activity: two dormant rows of three read 2 of 3, live, report-only and pinless",
+          (got["value"], got["of"], got["live"], got["gateable"], got["tolerance"], got["unjudgeable"])
+          == (2, 3, True, False, None, 0), f"got {got}")
+    check("live activity: the detail names each dormant build and its last record",
+          got["detail"] == [{"build": "bOne", "last_record": "2026-08-01"},
+                            {"build": "bSix", "last_record": "2026-07-02"}], f"got {got['detail']}")
+    later = read(*(row + " 4 |" for row in three),
+                 head="| Build | Status | Last record | Activity | Landed-unclosed |")
+    check("live activity: a column placed after Activity moves nothing",
+          (later["value"], later["of"], later["detail"]) == (got["value"], got["of"], got["detail"]),
+          f"got {later}")
+    odd = read(three[0], three[1], three[2].replace("| dormant |", "| sleepy |"))
+    check("live activity: an unknown cell is unjudgeable, never active",
+          (odd["value"], odd["of"], odd["unjudgeable"]) == (1, 2, 1), f"got {odd}")
+    bare = read(*(row.rsplit("|", 2)[0] + "|" for row in three),
+                head="| Build | Status | Last record |")
+    check("live activity: a table without the Activity header is NOT ASKED naming the column",
+          bare.get("not_asked") is True and "Activity" in bare["detail"][0]["note"], f"got {bare}")
+    empty = read()
+    check("live activity: the column with no row is DEAD, not asked is not claimed",
+          empty["live"] is False and not empty.get("not_asked") and empty["value"] == 0, f"got {empty}")
+    (r / "mem" / "LIVE.md").unlink()
+    check("live activity: no LIVE.md is NOT ASKED",
+          dr.build_live_builds_without_activity(ctx).get("not_asked") is True)
 
 
 _FLEET_SIG = "fleet_over_budget"
@@ -2800,17 +3367,27 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
     # A kind the driver does not declare is not a parked row, so it cannot be the last one.
     add_counted("tUndeclaredKind", "surfaced-park",
                 [P("decision", "asked"), P("heartbeat", "no driver writes this kind")])
-    add_counted("tLanding", "surfaced-park", [P("decision", "asked")], phase="LANDING")
+    # ---- TOOL-aMendedFleet-47, derived LANDED: a `LANDING` record whose landing commit is on `main`
+    # is neither counted nor unjudgeable, whatever its witness says. Without the derivation these
+    # three read as a counted row and as the two witness-at-or-behind-base rows below, which is what
+    # makes them discriminate.
+    derived = [
+        _write_run_record(r, f"{B}/tLanding/RUN.md", {"phase": "LANDING", "witness": tip, "base": early},
+                          [P("decision", "asked")]),
+        _write_run_record(r, f"{B}/tLandingAtBase/RUN.md", {"phase": "LANDING", "witness": tip, "base": tip}),
+        _write_run_record(r, f"{B}/tLandingBehind/RUN.md", {"phase": "LANDING", "witness": early, "base": tip}),
+    ]
 
     # ---- AC3, the unjudgeable half: counted apart with the reason, never scored clean, never counted.
+    # The two stale-witness rows are BUILDING, since a LANDING one on `main` now derives LANDED.
     stale: dict = {}
 
     def add_stale(slug: str, facts: dict, relation: str, why: str) -> None:
         stale[_write_run_record(r, f"{B}/{slug}/RUN.md", facts)] = (relation, why)
 
-    add_stale("tClosedAtBase", {"phase": "LANDING", "witness": tip, "base": tip},
+    add_stale("tClosedAtBase", {"phase": "BUILDING", "witness": tip, "base": tip},
               "equal", "witness not re-written since preflight")
-    add_stale("tBehindBase", {"phase": "LANDING", "witness": early, "base": tip},
+    add_stale("tBehindBase", {"phase": "BUILDING", "witness": early, "base": tip},
               "behind", "witness not re-written since preflight")
     add_stale("tNoPhase", {"witness": tip, "base": early}, "unknown", "no phase: fact")
     add_stale("tNoWitness", {"phase": "BUILDING", "base": early}, "unknown", "no witness: fact")
@@ -2839,6 +3416,13 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
     add_counted("tWorktreeDone", "no-rows")
     run_commit("chore: run records")
 
+    # ...and a LANDING record whose landing commit is NOT on `main`: committed on a branch HEAD now
+    # sits on, so the derivation must read the base ref and never HEAD. It stays counted.
+    run(["git", "checkout", "-q", "-b", "landing-ahead"], r)
+    add_counted("tLandingAhead", "surfaced-park", [P("decision", "asked")], phase="LANDING")
+    run(["git", "add", "--", f"{B}/tLandingAhead/RUN.md"], r)
+    run(["git", "commit", "-q", "-m", "chore: a landing not yet on main", "--no-verify"], r)
+
     # AFTER the commit the working tree contradicts HEAD for two records, and a third record exists in
     # the working tree alone. Every one of these is read at HEAD or not at all.
     _write_run_record(r, f"{B}/tWorktreeLive/RUN.md", {"phase": "BUILDING", "witness": tip, "base": early})
@@ -2848,7 +3432,7 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
 
     got = read_signal()
     rows = {d.split(" ", 1)[0]: d for d in got["detail"] if not d.startswith("note")}
-    tracked = len(counted) + len(stale) + len(quiet)
+    tracked = len(counted) + len(stale) + len(quiet) + len(derived)
     check("run records: the population is every TRACKED record, the archive in and the untracked out",
           got["of"] == tracked, f"of {got['of']}, wanted {tracked}")
     check("run records: live over a non-empty population", got["live"] is True, f"live={got['live']}")
@@ -2864,9 +3448,14 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
         row = rows.get(rel, "")
         check(f"run records: {rel.split('/')[2]} is unjudgeable, {relation}, with its reason",
               f" {relation} unjudgeable \u2014 {why}" in row, f"got {row!r}")
-    for rel in quiet + [untracked]:
+    for rel in quiet + derived + [untracked]:
         check(f"run records: {rel.split('/')[2]} is neither counted nor listed",
               rel not in rows, f"got {rows.get(rel)!r}")
+    check("run records: every LANDING record landed on main reads derived LANDED, and only those",
+          got.get("derived_landed") == len(derived), f"derived_landed {got.get('derived_landed')}")
+    want_sum = f"derived \u2014 {len(derived)} of {len(derived) + 1} LANDING records read LANDED"
+    check("run records: the derived summary line sits just before the closing note",
+          got["detail"][-2].startswith(want_sum), f"got {got['detail'][-2]!r}, wanted {want_sum!r}")
     check("run records: the refused-landing note closes the detail",
           got["detail"][-1].startswith("note \u2014 a refused landing"), f"last {got['detail'][-1]!r}")
 
@@ -2887,7 +3476,8 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
           blind["live"] is False and blind["value"] == 0 and "rev-list" in str(blind["detail"]),
           f"{blind}")
 
-    # ---- AC4, three git calls for five records and for fifty. A separate minimal repo, so the count
+    # ---- AC4, three git calls for five records and for fifty, four once LANDING records exist. A
+    # separate minimal repo, so the count
     # is over a population the arm sets rather than over whatever the fixture above accumulated.
     small = tmp / "runcalls"
     small.mkdir()
@@ -2900,19 +3490,25 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
         run(["git", "commit", "-q", "-m", name, "--no-verify"], small)
     wit = run(["git", "rev-parse", "HEAD"], small).stdout.strip()
     bas = run(["git", "rev-parse", "HEAD~1"], small).stdout.strip()
+    # TOOL-aMendedFleet-47: the third size adds FIVE `LANDING` records, each derived LANDED, so one
+    # batched `log` costs a fourth call where a per-record lookup would cost eight.
     per_size = {}
-    for lo, hi in ((0, 5), (5, 50)):
+    for lo, hi, phase in ((0, 5, "BUILDING"), (5, 50, "BUILDING"), (50, 55, "LANDING")):
         for i in range(lo, hi):
             _write_run_record(small, f"{B}/tCall{i}/RUN.md",
-                              {"phase": "BUILDING", "witness": wit, "base": bas}, [P("decision", "x")])
+                              {"phase": phase, "witness": wit, "base": bas}, [P("decision", "x")])
         run(["git", "add", "-A"], small)
         run(["git", "commit", "-q", "-m", f"{hi} records", "--no-verify"], small)
         seen = dr.build_nonterminal_merged_runs(_build_run_ctx(dr, small))
-        per_size[hi] = (_measure_git_calls(dr, small), seen["value"])
-    for size, (calls, value) in sorted(per_size.items()):
-        check(f"run records: {size} records are all read and counted (the premise)",
-              value == size, f"value {value}")
-        check(f"run records: {size} records cost three git calls", calls == 3, f"{calls} calls")
+        per_size[hi] = (_measure_git_calls(dr, small), seen["value"], seen.get("derived_landed"))
+    for size, (calls, value, got_derived) in sorted(per_size.items()):
+        landings = max(0, size - 50)
+        check(f"run records: {size} records are all read, {landings} derived LANDED (the premise)",
+              value == size - landings and got_derived == landings,
+              f"value {value} derived_landed {got_derived}")
+        want_calls = 4 if landings else 3
+        check(f"run records: {size} records cost {want_calls} git calls", calls == want_calls,
+              f"{calls} calls")
 
 
 def _extract_driver_set(text: str, name: str):
@@ -2961,6 +3557,256 @@ def test_park_sets_match_the_driver(tmp: pathlib.Path) -> None:
     grown = _extract_driver_set(doctored, "PARK_KINDS_OWED") or set()
     check("driver sets: control — a driver that gains an owed kind reads unequal",
           "heartbeat" in grown - set(dr._RUN_PARK_KINDS_OWED), f"extracted {sorted(grown)}")
+
+
+def test_drift_history(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-48 S7: `--check` appends one group per run to the common dir's history,
+    the other modes write nothing, the key hash sees a member swap, and a failed write is no verdict."""
+    print("drift history (--check appends a group; other modes never write; a failed write is no verdict)")
+    import json
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    r = make_repo(tmp, name="history")
+    hist = r / ".git" / dr.HISTORY_FILE
+    n = len(json.loads(run([sys.executable, REPORT_REL, "--json"], r).stdout))
+    first = run([sys.executable, REPORT_REL, "--check"], r)
+    run([sys.executable, REPORT_REL, "--check"], r)
+    lines = hist.read_text(encoding="utf-8").splitlines() if hist.is_file() else []
+    check("history: two --check runs write one header and two groups of one row per record",
+          len(lines) == 1 + 2 * n and lines[0] == "\t".join(dr.HISTORY_COLUMNS)
+          and sum(ln.startswith("#") for ln in lines) == 1, f"{len(lines)} lines for {n} records")
+    check("history: every row carries nine fields and a state in the four-state set",
+          all(len(ln.split("\t")) == 9 and ln.split("\t")[5] in ("live", "dead", "not-asked", "declared-empty")
+              for ln in lines[1:]) and bool(lines[1:]), lines[1] if len(lines) > 1 else "")
+    run([sys.executable, REPORT_REL, "--offenders"], r)
+    run([sys.executable, REPORT_REL, "--json"], r)
+    run([sys.executable, REPORT_REL, "--json", "--check"], r)
+    after = hist.read_text(encoding="utf-8").splitlines() if hist.is_file() else []
+    check("history: --offenders, --json and --json --check write nothing", after == lines,
+          f"{len(lines)} -> {len(after)} lines")
+
+    def measure_key_hash(detail):
+        rec = {"signal": "s", "value": len(detail), "of": 9, "live": True, "detail": detail}
+        return dr.build_history_rows([rec], set(), "t", "h", "b", "bs")[0].split("\t")[8]
+
+    one = measure_key_hash([{"path": "a.md"}, {"path": "b.md"}])
+    check("history: a member swap at an equal count moves key_hash",
+          one != measure_key_hash([{"path": "a.md"}, {"path": "c.md"}]), one)
+    check("history: a moved line locator does not move key_hash",
+          measure_key_hash([{"path": "a.md:3"}, {"path": "b.md", "line": 4}])
+          == measure_key_hash([{"path": "a.md:7"}, {"path": "b.md", "line": 9}]), one)
+
+    hist.unlink()
+    hist.mkdir()
+    squat = run([sys.executable, REPORT_REL, "--check"], r)
+    check("history: a directory on the file's name leaves the exit status unchanged",
+          squat.returncode == first.returncode, f"{first.returncode} -> {squat.returncode}")
+    check("history: ...and stderr names the path it could not write",
+          "history NOT written to" in squat.stderr and dr.HISTORY_FILE in squat.stderr, squat.stderr[-300:])
+
+
+def test_drift_delta(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-49: `--delta` prints a moved, a hash-only and no unchanged signal between a
+    reading at BASE and one at HEAD, and each of the four no-delta cases is one `skipped` line at 0."""
+    print("drift delta (--delta reads the history; every miss is one skipped line, never a zero delta)")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    r = make_repo(tmp, name="delta")
+    for i in range(3):
+        run(["git", "commit", "-q", "--allow-empty", "-m", f"delta {i}", "--no-verify"], r)
+    base = run(["git", "rev-parse", "HEAD~3"], r).stdout.strip()
+    head = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+    hist = r / ".git" / dr.HISTORY_FILE
+    header = "\t".join(dr.HISTORY_COLUMNS) + "\n"
+
+    def build_group(utc, sha, moved, hashed):
+        return "".join("\t".join((utc, sha, "b", "bs", sig, "live", val, "9", kh)) + "\n" for sig, val, kh in
+                       (("moved", moved, "aa"), ("hashed", "4", hashed), ("same", "5", "cc")))
+
+    at_base, at_head = build_group("t1", base, "7", "bb"), build_group("t2", head, "2", "dd")
+
+    def measure_delta(text, *args):
+        if text is None:
+            hist.unlink(missing_ok=True)
+        else:
+            hist.write_text(text, encoding="utf-8", newline="\n")
+        return run([sys.executable, REPORT_REL, "--delta", *(args or ("HEAD~3", "HEAD"))], r)
+
+    out = measure_delta(header + at_base + at_head)
+    lines = out.stdout.splitlines()
+    check("delta: both readings are named equal to their ends",
+          bool(lines) and lines[0].count("(equal)") == 2, out.stdout + out.stderr)
+    check("delta: a moved value prints one line", any(ln.endswith("moved 7 -> 2") for ln in lines), out.stdout)
+    check("delta: a hash-only move prints `members changed`",
+          any(ln.endswith("hashed 4 -> 4 (members changed)") for ln in lines), out.stdout)
+    check("delta: an unchanged signal prints nothing", not any(" same " in ln for ln in lines), out.stdout)
+    for label, text, why in (("no history file", None, "no drift history"),
+                             ("a foreign header", "utc\tsha\n" + at_base + at_head, "header"),
+                             ("no reading at BASE", header + at_head, "at or before BASE"),
+                             ("no reading inside BASE..HEAD", header + at_base, "inside BASE..HEAD")):
+        out = measure_delta(text)
+        check(f"delta: {label} is one skipped line at exit 0",
+              out.returncode == 0 and out.stdout.splitlines() == [out.stdout.strip()]
+              and "skipped" in out.stdout and why in out.stdout, f"{out.returncode} {out.stdout!r}")
+    out = measure_delta(header + at_base + at_head, "0000000", "HEAD")
+    check("delta: an argument that is not a commit exits 2", out.returncode == 2, f"{out.returncode}")
+
+
+def test_dead_streaks(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-90 S8: `derive_dead_streaks` counts READINGS, not groups, by header, with
+    absence ending a streak; the report names a report-only probe dead past the limit, and a stale
+    `DEAD_FILED` entry, and neither moves `--check`'s exit."""
+    print("dead streaks (readings by sha, columns by header, the limit names retirement, report only)")
+    import json
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    cols = list(dr.HISTORY_COLUMNS)
+
+    def write_hist(path, readings, order=cols):
+        # `readings` is a list of (sha, {signal: state}); one group per entry, utc unique per entry.
+        text = "\t".join(order) + "\n"
+        for i, (sha, states) in enumerate(readings):
+            for sig, state in states.items():
+                row = {"#utc": f"t{i}", "sha": sha, "base_ref": "b", "base_sha": "bs", "signal": sig,
+                       "state": state, "value": "0", "of": "0", "key_hash": "-"}
+                text += "\t".join(row[c] for c in order) + "\n"
+        path.write_text(text, encoding="utf-8", newline="\n")
+
+    hist = tmp / "streaks.tsv"
+    seq = [("s0", {"d3": "live", "back": "dead", "gone": "dead"})] + [
+        (f"s{i}", {"d3": "dead", "back": "dead", "gone": "dead"}) for i in (1, 2)] + [
+        ("s3", {"d3": "dead", "back": "live"})]
+    write_hist(hist, seq)
+    got = dr.derive_dead_streaks(hist)
+    check("streaks: dead in the last three readings counts 3; live or absent newest counts 0",
+          got is not None and got[0] == {"d3": 3, "back": 0, "gone": 0} and got[1] == 4, f"{got}")
+    write_hist(hist, seq[:3] + [("s2", {"d3": "dead", "back": "dead", "gone": "dead"})] + seq[3:])
+    again = dr.derive_dead_streaks(hist)
+    check("streaks: a repeated-sha group is one reading, so it ages nothing",
+          again == got, f"{again} vs {got}")
+    write_hist(hist, seq, order=list(reversed(cols)))
+    check("streaks: a reordered header reads the same", dr.derive_dead_streaks(hist) == got,
+          f"{dr.derive_dead_streaks(hist)}")
+    write_hist(hist, [(f"s{i}", {"d": "dead"}) for i in range(10)])
+    check("streaks: ten dead readings count 10, the limit's default",
+          dr.derive_dead_streaks(hist) == ({"d": 10}, 10) and dr.DEFAULT_DEAD_READINGS_LIMIT == 10,
+          f"{dr.derive_dead_streaks(hist)}")
+    check("streaks: a missing file is None, never zero streaks",
+          dr.derive_dead_streaks(tmp / "no-such.tsv") is None)
+    hist.write_text("utc\tsha\n", encoding="utf-8", newline="\n")
+    check("streaks: a foreign header is None", dr.derive_dead_streaks(hist) is None)
+
+    r = make_repo(tmp, name="streaks")
+    recs = json.loads(run([sys.executable, REPORT_REL, "--json"], r).stdout)
+    check("streaks: with no history every record's dead_readings is null",
+          bool(recs) and all(s.get("dead_readings", "x") is None for s in recs), "")
+    human = run([sys.executable, REPORT_REL], r).stdout
+    check("streaks: no history prints the no-history liveness line",
+          "# dead-for-N: no history at" in human, human[:400])
+    rc_absent = run([sys.executable, REPORT_REL, "--check"], r).returncode
+    (r / ".git" / dr.HISTORY_FILE).unlink(missing_ok=True)
+    dead = [s["signal"] for s in recs if not s["live"] and not s["gateable"] and not s.get("not_asked")
+            and s["signal"] != "handkept_inventories_disagreeing_with_source"]
+    if not dead:
+        skip("streaks: the limit's status line", "the fixture reads no report-only signal DEAD")
+    else:
+        sig = dead[0]
+        write_hist(r / ".git" / dr.HISTORY_FILE, [(f"{i:040x}", {sig: "dead"}) for i in range(10)])
+        human = run([sys.executable, REPORT_REL], r).stdout
+        row = next((ln for ln in human.splitlines() if ln.strip().startswith(sig)), "")
+        check("streaks: a report-only probe dead for the limit names SIGNALS and DEAD_FILED",
+              "DEAD PROBE for 10 readings" in row and "DEAD_FILED" in row, row)
+        check("streaks: the liveness line counts the readings it found",
+              "# dead-for-N: 10 readings recorded at" in human, human[:400])
+        check("streaks: --json carries dead_readings 10 for it",
+              next(s for s in json.loads(run([sys.executable, REPORT_REL, "--json"], r).stdout)
+                   if s["signal"] == sig)["dead_readings"] == 10, "")
+        rc_present = run([sys.executable, REPORT_REL, "--check"], r).returncode
+        check("streaks: --check exits the same with the history present and absent",
+              rc_present == rc_absent, f"{rc_absent} -> {rc_present}")
+        write_hist(r / ".git" / dr.HISTORY_FILE, [(f"{i:040x}", {sig: "dead"}) for i in range(10)])
+    layer = r / KIT_NAME / "drift_signals.py"
+    filed = {"no_such_signal": "X-1", **({dead[0]: "X-2"} if dead else {})}
+    layer.write_text(layer.read_text(encoding="utf-8") + f"DEAD_FILED = {filed!r}\n",
+                     encoding="utf-8", newline="\n")
+    human = run([sys.executable, REPORT_REL], r).stdout
+    check("streaks: a DEAD_FILED entry for a signal not in the report is named in the header",
+          any(ln.startswith("# dead-for-N: DEAD_FILED names no_such_signal") and "take the entry out" in ln
+              for ln in human.splitlines()), human[:600])
+    if dead:
+        row = next((ln for ln in human.splitlines() if ln.strip().startswith(dead[0])), "")
+        check("streaks: a filed dead probe prints the filed id", "filed X-2" in row, row)
+
+
+def test_escape_ratio(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-50 S9: `--escape-ratio` over a fixture month holding a merge-landed contained
+    fix, a merge-landed escaped fix, a direct fix, a stamp-only fix and a fix touching no product path."""
+    print("escape ratio (landings by first parent, blame in the parent, stamps out, DIRECT named)")
+    import json
+
+    r = make_repo(tmp, name="escape")
+    # Every commit of the arm is dated into one month; make_repo's own commits are dated now, so the
+    # month's landings are exactly the ones made here.
+    when = {"GIT_AUTHOR_DATE": "2026-03-15T12:00:00Z", "GIT_COMMITTER_DATE": "2026-03-15T12:00:00Z"}
+
+    def build_commit(subject: str, files: dict) -> str:
+        for rel, text in files.items():
+            (r / rel).write_text(text, encoding="utf-8", newline="\n")
+        run(["git", "add", "-A"], r)
+        run(["git", "commit", "-qm", subject, "--no-verify"], r, env=when)
+        return run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+
+    build_commit("feat: the library", {"src/lib.py": "one\ntwo\nthree\n", "conf/kit.toml": 'version = "1.0"\n'})
+    run(["git", "checkout", "-q", "-b", "topic"], r)
+    build_commit("feat: branch-local code", {"src/branch.py": "x\ny\n"})
+    contained = build_commit("fix(topic): repair branch-local code", {"src/branch.py": "x\nY\n"})
+    escaped = build_commit("fix(topic): repair code main already had", {"src/lib.py": "ONE\ntwo\nthree\n"})
+    run(["git", "checkout", "-q", "main"], r)
+    run(["git", "merge", "-q", "--no-ff", "--no-verify", "-m", "merge topic", "topic"], r, env=when)
+    merge = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+    direct = build_commit("fix: repair on the first-parent line", {"src/lib.py": "ONE\ntwo\nTHREE\n"})
+    stamp = build_commit("fix: bump the stamp", {"conf/kit.toml": 'version = "1.1"\n'})
+    other = build_commit("fix: a file outside the product", {"notes.txt": "n\n"})
+
+    out = run([sys.executable, REPORT_REL, "--escape-ratio", "2026-03", "--json"], r)
+    res = json.loads(out.stdout) if out.returncode == 0 and out.stdout.strip() else {}
+    by = {f["sha"]: f for f in res.get("fixes", [])}
+    check("escape: n counts the contained, the escaped and the direct fix, two of them escaped",
+          res.get("n") == 3 and res.get("escaped") == 2, f"rc {out.returncode} {out.stderr[-300:]} {res}")
+    got = by.get(contained, {})
+    check("escape: a merge-landed fix blaming only its own branch is contained",
+          got.get("class") == "contained" and got.get("landing") == merge
+          and got.get("blamed_landings") == [merge] and got.get("direct") is False, str(got))
+    got = by.get(escaped, {})
+    check("escape: a merge-landed fix blaming code already on main is escaped",
+          got.get("class") == "escaped" and got.get("landing") == merge and merge not in got.get("blamed_landings", [merge]),
+          str(got))
+    got = by.get(direct, {})
+    check("escape: a direct fix is its own landing, named DIRECT, and escaped",
+          got.get("class") == "escaped" and got.get("landing") == direct and got.get("direct") is True
+          and res.get("direct") == 1, str(got))
+    check("escape: a stamp-only fix is unclassified and outside n",
+          by.get(stamp, {}).get("class") == "stamp-only" and res.get("unclassified") == {"stamp-only": 1},
+          str(res.get("unclassified")))
+    check("escape: a fix touching no product path is never read", other not in by and len(by) == 4,
+          str(sorted(f["class"] for f in by.values())))
+    text = run([sys.executable, REPORT_REL, "--escape-ratio", "2026-03"], r)
+    check("escape: the text form prints the ratio with its interval and the caveat line",
+          "Wilson interval" in text.stdout and text.stdout.rstrip().endswith("not evidence of an effect"),
+          text.stdout[-400:])
+    empty = run([sys.executable, REPORT_REL, "--escape-ratio", "2020-01"], r)
+    lines = empty.stdout.splitlines()
+    check("escape: an empty month prints n 0, says it is empty, and prints no ratio",
+          empty.returncode == 0 and any(ln.startswith("n ") and "empty" in ln for ln in lines)
+          and not any(ln.startswith("ratio") for ln in lines), empty.stdout)
+    bad = run([sys.executable, REPORT_REL, "--escape-ratio", "2026-3"], r)
+    clash = run([sys.executable, REPORT_REL, "--escape-ratio", "2026-03", "--check"], r)
+    check("escape: a malformed month and a --check beside the mode each exit 2",
+          bad.returncode == 2 and clash.returncode == 2 and "YYYY-MM" in bad.stderr and "--check" in clash.stderr,
+          f"{bad.returncode} {clash.returncode}")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -3433,10 +4279,18 @@ def main() -> int:
         test_asks_disposed_overrides(tmp)
         test_legs_retried_after_timeout(tmp)
         test_fleet_over_budget(tmp)
+        test_remote_ci_red_streak(tmp)
+        test_auto_memory_pointers(tmp)
+        test_cutoff_keys_armed(tmp)
+        test_stale_dossiers(tmp)
+        test_live_builds_without_activity(tmp)
         test_backlog_stragglers(tmp)
         test_readme_mechanism_drift(tmp)
         test_declared_empty(tmp)
+        test_handkept_name_sets(tmp)
         test_ratchet_guard(tmp)
+        test_baselines(tmp)
+        test_shrink_low_water(tmp)
         test_base_is_remote_tracking(tmp)
         test_ratchet_lookback(tmp)
         test_ratchet_message_states_its_window(tmp)
@@ -3448,6 +4302,10 @@ def main() -> int:
         test_evidence_globs_exclude_test_templates(tmp)
         test_nonterminal_merged_runs(tmp)
         test_park_sets_match_the_driver(tmp)
+        test_drift_history(tmp)
+        test_drift_delta(tmp)
+        test_dead_streaks(tmp)
+        test_escape_ratio(tmp)
         test_aborted_work_landed(tmp)
         test_work_landed_matches_the_driver(tmp)
         test_version_carriers_agree(tmp)

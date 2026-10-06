@@ -130,7 +130,7 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 78
+SELFTEST_ARMS = 86
 # 34 -> 58 on 2026-08-24 (adopter ic's recall contrib branch): twenty-four arms — twenty-three ported from
 #   adopter ic's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
@@ -160,10 +160,28 @@ SELFTEST_ARMS = 78
 #   its states, three of which no run in a repo with a readable log produces. Both this line and
 #   the one above it were written as `71 -> 73` on two branches that did not know about each
 #   other; the merge renumbered this one, which is the whole reason the chain is checked.
-# 75 -> 78 on 2026-10-05 (TOOL-aGraftedHelix-4): THREE arms over supersession - the extracted
+# 75 -> 76 on 2026-10-05 (TOOL-aMendedFleet-27): ONE arm, the gold arm of `RECALL_EXCLUDE` - a live
+#   guide and two archived versioned copies of its rule; declared, the live line answers and no copy
+#   does; blank, the copies return.
+# 76 -> 77 on 2026-10-05 (TOOL-aMendedFleet-31): ONE arm, the two-tier emission - twenty equal hits
+#   at a budget whose snippet share holds three print three snippets and seventeen pointer lines,
+#   and a budget too small for every pointer still truncates.
+# 77 -> 80 on 2026-10-05 (TOOL-aMendedFleet-32): THREE arms over cache eviction - live siblings whose
+#   last-query order inverts their built_at order, a husk worktree with no .git, and the query-log
+#   reader with its empty-map fallback to built_at order.
+# 80 -> 81 on 2026-10-05 (TOOL-aMendedFleet-34): ONE arm, `--used` over a linked-worktree fixture -
+#   a rank-2 citation counts, an id the row's own terms spell does not (a longer id containing it
+#   does not hold it), a reflog-less row and a row older than its reflog are unattributed, an absent
+#   log and an all-unattributed log both exit 2, and the log is unchanged.
+# 81 -> 83 on 2026-10-06 (TOOL-aMendedFleet-82): TWO arms over `--used`'s head-ancestry arm - a
+#   removed worktree's row is attributed through the one child of its logged `head`, and a `head`
+#   with two children after the query counts the row ambiguous and credits neither.
+# 83 -> 86 on 2026-10-05 (TOOL-aGraftedHelix-4): THREE arms over supersession - the extracted
 #   edges and the map (each grammar rule, the self-edge skip and the unresolved drop), the order
 #   step (five placement cases), and the header tag in both renderers. Each case was observed red
-#   with its rule disabled in the working tree before the unit landed.
+#   with its rule disabled in the working tree before the unit landed. Written as `75 -> 78` on a
+#   branch that did not know about the five lines above; the reconcile merge renumbered it, and the
+#   tag arm now also asserts the pointer tier carries the tag.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -1018,7 +1036,7 @@ def _budget_conf(mb: str) -> str:
     return CONF + f'RECALL_CACHE_BUDGET_MB="{mb}"\n'
 
 
-@check("the cache budget evicts least-recently-built first and stops at the budget")
+@check("the cache budget evicts the oldest first and stops at the budget")
 def test_budget_lru():
     root, kitdir = make_repo(conf=_budget_conf("0.4"))
     try:
@@ -1031,7 +1049,7 @@ def test_budget_lru():
         assert not old.exists(), "the oldest cache survived an over-budget run"
         assert new.exists(), "eviction did not STOP once the tree was under budget"
         assert cache_of(root).exists(), "the CURRENT worktree's cache was evicted"
-        assert "evicted the least-recently-built cache" in proc.stderr, "the eviction was silent"
+        assert "evicted the least-recently-queried cache" in proc.stderr, "the eviction was silent"
         assert "2020-01-01" in proc.stderr, "the report does not name what went"
         return "oldest gone, newer kept, current kept, reported"
     finally:
@@ -1229,16 +1247,102 @@ def test_budget_blank():
         proc = run(root, kitdir, *Q, "--rebuild")
         assert proc.returncode == 0, proc.stderr
         assert old.exists(), "a blank budget still evicted by size"
-        assert "least-recently-built" not in proc.stderr, "the size pass ran with a blank budget"
+        assert "least-recently-queried" not in proc.stderr, "the size pass ran with a blank budget"
         # ...and the SAME tree under a real budget does evict it, so the arm above is not passing
         # because the fixture is under budget anyway.
         (root / ".memory-tree.conf").write_text(_budget_conf("0.4"), encoding="utf-8", newline="\n")
         proc2 = run(root, kitdir, *Q, "--rebuild")
         assert not old.exists(), "the same tree under a real budget did not evict — the blank arm is vacuous"
-        assert "least-recently-built" in proc2.stderr
+        assert "least-recently-queried" in proc2.stderr
         return "blank = uncapped, and the same tree evicts once a budget is set"
     finally:
         cleanup(root)
+
+
+# ------------------------------------------ last-query order and husk worktrees (TOOL-aMendedFleet-32)
+
+
+@check("the cache budget evicts least-recently-QUERIED first: an old build in use outlives an idle one")
+def test_budget_orders_by_last_query():
+    """Three LIVE siblings built A, B, C oldest first, last queried A newest. Build order alone
+    evicts A, the one in use; the last-query order evicts B and names its last query."""
+    root, kitdir = make_repo(conf=_budget_conf("0.4"))
+    try:
+        run(root, kitdir, *Q)
+        caches = cache_of(root).parent
+        # A live worktree is a directory holding a `.git` entry. Under the fixture's own .git, so
+        # cleanup(root) takes them and no corpus walk ever sees them.
+        trees = {}
+        for n in "ABC":
+            t = git_common_dir(root) / "wt" / n
+            t.mkdir(parents=True)
+            (t / ".git").write_text("gitdir: nowhere\n", encoding="utf-8")
+            trees[n] = str(t)
+        sib = {n: _sib(caches, n, kb=150, built_at=f"2020-0{i}-01T00:00:00+00:00", worktree=trees[n])
+               for i, n in enumerate("ABC", 1)}
+        rows = (("A", "2022-01-01T00:00:00+00:00"), ("B", "2020-06-01T00:00:00+00:00"),
+                ("C", "2021-01-01T00:00:00+00:00"), ("A", "2020-07-01T00:00:00+00:00"))
+        log = git_common_dir(root) / "recall" / "queries.jsonl"
+        with log.open("a", encoding="utf-8", newline="\n") as fh:
+            for n, at in rows:
+                fh.write(json.dumps({"type": "query", "at": at, "worktree": trees[n]}) + "\n")
+        proc = run(root, kitdir, *Q, "--rebuild")
+        assert proc.returncode == 0, proc.stderr
+        assert sib["A"].exists(), "A, built first and queried last, was evicted: build order still rules"
+        assert not sib["B"].exists(), "B, the least-recently-queried cache, survived an over-budget run"
+        assert sib["C"].exists(), "eviction did not STOP once the tree was under budget"
+        assert "last query 2020-06-01" in proc.stderr, "the line does not name B's last query"
+        return "A kept on its last query, B evicted and named by it, C kept"
+    finally:
+        cleanup(root)
+
+
+@check("cache eviction: a husk worktree (exists, no .git) goes with a vanished one; a live one stays")
+def test_eviction_husk():
+    root, kitdir = make_repo()
+    try:
+        run(root, kitdir, *Q)
+        caches = cache_of(root).parent
+        husk = git_common_dir(root) / "husk"
+        husk.mkdir()
+        gone = _sib(caches, "gone", kb=1, worktree=str(root / "no" / "such" / "tree"))
+        hsk = _sib(caches, "husk", kb=1, worktree=str(husk))
+        live = _sib(caches, "live", kb=1, worktree=str(root))
+        proc = run(root, kitdir, *Q, "--rebuild")
+        assert proc.returncode == 0, proc.stderr
+        assert not gone.exists(), "a cache for a vanished worktree survived"
+        assert not hsk.exists(), "a cache for an empty husk worktree survived"
+        assert live.exists(), "a cache for a LIVE worktree was evicted"
+        assert str(husk) in proc.stderr, "the husk eviction was silent"
+        return "vanished and husk evicted and reported, live kept"
+    finally:
+        cleanup(root)
+
+
+@check("load_last_queries keeps each worktree's newest query row; an empty map is built_at order")
+def test_last_queries_and_empty_log():
+    scratch = pathlib.Path(tempfile.mkdtemp(prefix="mrecall-lq-")).resolve()
+    try:
+        log = scratch / "queries.jsonl"
+        rows = ({"type": "query", "at": "2021-01-01T00:00:00+00:00", "worktree": "W"},
+                {"type": "opened", "at": "2023-01-01T00:00:00+00:00", "worktree": "W"},
+                {"type": "query", "at": "2020-01-01T00:00:00+00:00", "worktree": "W"})
+        log.write_text("{not json\n" + "".join(json.dumps(r) + "\n" for r in rows),
+                       encoding="utf-8", newline="\n")
+        got = query.load_last_queries(log)
+        assert got == {"W": "2021-01-01T00:00:00+00:00"}, f"wrong map: {got}"
+        assert query.load_last_queries(scratch / "absent.jsonl") == {}, "an absent log is not empty"
+        caches = scratch / "cache"
+        keep = caches / "keep"
+        keep.mkdir(parents=True)
+        old = _sib(caches, "old", kb=300, built_at="2020-01-01T00:00:00+00:00", worktree="X")
+        new = _sib(caches, "new", kb=100, built_at="2021-01-01T00:00:00+00:00", worktree="Y")
+        out = query.evict_over_budget(keep, 0.3, {})
+        assert not old.exists() and new.exists(), f"an empty map left built_at order: {out}"
+        assert any("last query never" in line for line in out), f"no `never` in {out}"
+        return "newest query row kept, opened and malformed skipped, absent log empty, empty map = built_at"
+    finally:
+        cleanup(scratch)
 
 
 def copy_extra(kitdir: pathlib.Path, *names: str) -> None:
@@ -1721,6 +1825,43 @@ def test_undeclared_file_stays_out():
 
 
 
+@check("RECALL_EXCLUDE: a live line answers, its archived versioned copies do not, blank returns them")
+def test_exclude_leaves_a_live_line_answering():
+    """TOOL-aMendedFleet-27 S5. Archived versioned snapshots restate a live rule in superseded text,
+    and a charter question returned them at alternate ranks. The property is two-sided: declared,
+    the live line is IN the hits and no copy is; blank, the copies come back - so the exclusion is
+    the declaration's doing and not some other filter's, and the live hit proves the query matched.
+    """
+    root, kitdir = make_repo()
+    conf = root / ".memory-tree.conf"
+    rule = "Every frumious bandersnatch is muzzled before the vorpal audit begins.\n"
+    files = {"memory/guides/live.md": "# Live guide\n\n" + rule,
+             "memory/archive/guide-v-1-0.md": "# Guide v1.0\n\n" + rule,
+             "memory/archive/guide-v-1-1.md": "# Guide v1.1\n\n" + rule}
+    for rel, body in files.items():
+        (root / rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / rel).write_text(body, encoding="utf-8", newline="\n")
+    subprocess.run(["git", "-C", str(root), "add", "-A"], check=True, capture_output=True)
+    q = ("what must happen to the bandersnatch before the audit", "--terms",
+         "frumious bandersnatch muzzled vorpal audit")
+    copies = ("memory/archive/guide-v-1-0.md", "memory/archive/guide-v-1-1.md")
+    try:
+        conf.write_text(CONF + 'RECALL_EXCLUDE="memory/archive/*-v-[0-9]*-[0-9]*.md"\n',
+                        encoding="utf-8", newline="\n")
+        on = run(root, kitdir, *q)
+        assert "memory/guides/live.md" in on.stdout, f"the live line did not answer:\n{on.stdout}"
+        leaked = [c for c in copies if c in on.stdout]
+        assert not leaked, f"declared, the copies still answered: {leaked}"
+        assert "matches no corpus path" not in on.stderr, on.stderr
+        conf.write_text(CONF + 'RECALL_EXCLUDE=""\n', encoding="utf-8", newline="\n")
+        off = run(root, kitdir, *q)
+        back = [c for c in copies if c in off.stdout]
+        assert back == list(copies), f"blank, the copies did not return: {back}\n{off.stdout}"
+        return "declared: live only; blank: live + both copies"
+    finally:
+        cleanup(root)
+
+
 @check("the ONE walk still serves two callers: untracked visible to query, absent at a rev")
 def test_one_walk_two_callers():
     """S5. The two enumerators existed because the query path must see a note written this session
@@ -2126,25 +2267,63 @@ def test_budget_bounds_emission_and_beats_full_documents():
     q = "latch guard stale write"
 
     for budget in (600, 2_000, 20_000):
-        text, shown, spent, overflow = QRY.emit(hits, q, budget)
-        assert spent == len(text.encode()) - max(0, shown - 1), "accounting must match the emission"
+        text, shown, spent, overflow, snippets = QRY.emit(hits, q, budget)
+        # Snippets are separated by a blank line, pointers by none, and one blank line splits them.
+        seps = max(0, snippets - 1) + (1 if shown > snippets else 0)
+        assert spent == len(text.encode()) - seps, "accounting must match the emission"
         if shown > 1:
             assert spent <= budget, f"emitted {spent} B over a {budget} B budget"
         assert shown >= 1, "a budget must never emit an empty list while hits exist"
 
     # A budget below one hit emits exactly that hit and reports the overflow.
-    _, shown, _, overflow = QRY.emit(hits, q, 10)
+    _, shown, _, overflow, _ = QRY.emit(hits, q, 10)
     assert shown == 1 and overflow > 0, "a lone oversized hit is emitted and its overflow named"
 
-    # Truncation is reachable, which a default-budget-only test would never show.
-    _, shown, _, _ = QRY.emit(hits, q, 2_000)
+    # Truncation is reachable, which a default-budget-only test would never show. Pointers are
+    # cheap, so the budget must be small enough that even they cannot reach hit 20.
+    _, shown, _, _, _ = QRY.emit(hits, q, 600)
     assert shown < len(hits), "the shown-N-of-M path must be exercised by some budget"
 
     # Snippets against whole documents, same pool, same budget ceiling raised out of the way.
-    _, _, snip_b, _ = QRY.emit(hits, q, 10_000_000)
-    _, _, full_b, _ = QRY.emit(hits, q, 10_000_000, full=True)
+    _, _, snip_b, _, _ = QRY.emit(hits, q, 10_000_000)
+    _, _, full_b, _, _ = QRY.emit(hits, q, 10_000_000, full=True)
     assert snip_b <= 0.4 * full_b, f"snippets cost {snip_b} B against {full_b} B for full documents"
     return f"snippets {snip_b} B against {full_b} B for the same 20 hits"
+
+
+@check("emit: snippets stop at SNIPPET_SHARE of the budget and every later hit is a pointer line")
+def test_snippet_share_bounds_the_head_and_pointers_keep_the_rest():
+    """TOOL-aMendedFleet-31. Twenty equal hits at a budget whose snippet share holds exactly three:
+    three snippets, seventeen pointers, a fifth return of 3, every snippet above every pointer. The
+    all-snippet emission this replaced prints twenty snippets and returns four values, so it reds
+    here. A budget too small for every pointer still truncates, so `shown N of M` stays reachable.
+    """
+    import query as QRY
+    hits = [
+        {
+            "set": "records",
+            "id": f"TOOL-{i:03d}",
+            "path": f"{resolve_memory_root()}/tooling/area{i:02d}.md",
+            "line": 10 + i,
+            "snippet": "…the latch closes on flush and the guard rejects a stale write…",
+            "text": "the latch closes on flush and the guard rejects a stale write.",
+        }
+        for i in range(1, 21)
+    ]
+    q = "latch guard stale write"
+    one = len(f"[1] {QRY.render(hits[0], q)[0]}\n".encode())
+    budget = int(3.5 * one / QRY.SNIPPET_SHARE)  # the share holds 3 snippets and not a 4th
+    text, shown, spent, _, snippets = QRY.emit(hits, q, budget)
+    assert (snippets, shown) == (3, 20), f"{snippets} snippets, {shown} shown at {budget} B"
+    ranks = [ln for ln in text.splitlines() if ln.startswith("[")]
+    assert len(ranks) == 20, f"{len(ranks)} hit lines for 20 hits"
+    bodies = [i for i, ln in enumerate(text.splitlines()) if ln.startswith("    ")]
+    assert len(bodies) == 3 and max(bodies) < text.splitlines().index(ranks[3]), "a snippet follows a pointer"
+    assert ranks[3] == QRY.render_pointer(hits[3], 4), f"pointer line is {ranks[3]!r}"
+    assert spent <= budget
+    _, small, _, _, _ = QRY.emit(hits, q, int(1.2 * one / QRY.SNIPPET_SHARE))
+    assert 1 <= small < 20, f"a budget too small for every pointer showed {small} of 20"
+    return f"3 snippets + 17 pointers in {spent} B of {budget} B; {small} of 20 at the small budget"
 
 
 @check("supplied --terms bypass terms() verbatim, and the refusal LEADS with --terms")
@@ -2459,7 +2638,8 @@ def test_alias_join_lands_on_the_named_record_and_only_it():
 def test_alias_join_reaches_the_query_index():
     """End to end through the CLI's OWN index — the half a recall floor cannot see.
 
-    `check-recall.py` grades a SUBPROCESS of `extract.py`. `query.py` never runs that entry point
+    Under a `records:` pin `check-recall.py` grades a SUBPROCESS of `extract.py` (the `served:` pin
+    builds through `query.build_cache` and does reach the join). `query.py` never runs that entry point
     and never reads its output dir: it re-extracts in process and indexes that. So every recall
     floor stays green with the query-side join deleted, and the shipped product indexes an empty
     alias column. The search expression is built ONLY from alias vocabulary that appears nowhere in
@@ -3059,6 +3239,117 @@ def test_spec_h1_record_outranks_a_citation():
     return f"{hits[0]}; the citation comes back as {cite.split(' ', 1)[0]}"
 
 
+@check("--used joins logged answers to the worktree's next commit, held ids excluded, read-only")
+def test_used_joins_answers_to_the_next_commit():
+    """TOOL-aMendedFleet-34 AC1, AC3, AC4. Row 1's rank-2 id is cited by the linked worktree's next
+    commit; row 2's only cited id is in its own terms, so the caller already held it; row 3 names a
+    worktree with no reflog, and row 4 predates the linked worktree's reflog. Observed RED as `2 of 2`
+    with the terms exclusion removed, as `0 of 2` with it tested as a substring, and as `2 of 3` with
+    the first-entry guard removed."""
+    root, kitdir = make_repo()
+    wt = root.parent / (root.name + "-wt")
+    try:
+        log = git_common_dir(root) / "recall" / "queries.jsonl"
+        p = run(root, kitdir, "--used")
+        assert p.returncode == 2 and log.as_posix() in p.stderr, (
+            f"an absent log did not exit 2 naming {log.as_posix()}: {p.returncode} {p.stderr}")
+        git = ["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t"]
+        subprocess.run([*git, "commit", "-qm", "seed"], check=True, capture_output=True)
+        subprocess.run([*git, "worktree", "add", "-q", "-b", "wt", str(wt)], check=True, capture_output=True)
+        log.parent.mkdir(parents=True, exist_ok=True)
+        gone = root.parent / (root.name + "-gone")
+        now = datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds")
+        old = "2000-01-01T00:00:00+00:00"  # older than wt's reflog: an earlier tree at that path
+        # (worktree, at, terms, result ids in rank order) per row. Row 1's terms hold `TOOL-aFoo-23`,
+        # which CONTAINS `TOOL-aFoo-2` as a substring and is not that id.
+        rows = [(gone, now, [], ["TOOL-aFoo-2"]),
+                (wt, now, ["TOOL-aFoo-23"], ["TOOL-aFoo-1", "TOOL-aFoo-2"]),
+                (wt, now, ["TOOL-aBar-3"], ["TOOL-aBar-3"]),
+                (gone, now, [], ["TOOL-aFoo-2"]),
+                (wt, old, [], ["TOOL-aFoo-2"])]
+        lines = [json.dumps({"qid": n, "at": at, "type": "query",
+                             "query": "q", "terms": terms, "worktree": str(w),
+                             "results": [{"set": "records", "id": i} for i in ids]}) + "\n"
+                 for n, (w, at, terms, ids) in enumerate(rows, 1)]
+        log.write_text(lines[0], encoding="utf-8", newline="\n")
+        p = run(root, kitdir, "--used")
+        assert p.returncode == 2 and "not measured" in p.stderr, (
+            f"nothing attributable did not exit 2 as not measured: {p.returncode} {p.stdout}{p.stderr}")
+        log.write_text("".join(lines[1:]), encoding="utf-8", newline="\n")
+        (wt / "notes.md").write_text("cites TOOL-aFoo-2 and TOOL-aBar-3\n", encoding="utf-8", newline="\n")
+        wgit = ["git", "-C", str(wt), "-c", "user.email=t@t", "-c", "user.name=t"]
+        subprocess.run([*wgit, "add", "notes.md"], check=True, capture_output=True)
+        subprocess.run([*wgit, "commit", "-qm", "add notes"], check=True, capture_output=True)
+        before = hashlib.sha256(log.read_bytes()).hexdigest()
+        p = run(root, kitdir, "--used")
+        out = p.stdout
+        assert p.returncode == 0 and "answer-used: 1 of 2" in out, f"wrong figure: {out}{p.stderr}"
+        assert "of 4 query rows: 2 unattributed" in out and " 2:1 " in out, f"wrong buckets: {out}"
+        assert hashlib.sha256(log.read_bytes()).hexdigest() == before, "--used wrote to the log"
+        for t in (root, wt):
+            st = subprocess.run(["git", "-C", str(t), "status", "--porcelain"],
+                                capture_output=True, text=True, encoding="utf-8", check=True).stdout
+            assert not st.strip(), f"--used left the tree dirty: {st}"
+        return out.splitlines()[0]
+    finally:
+        cleanup(wt)  # a SIBLING of root, so both go, as in test_repo_root_linked_worktree
+        cleanup(root)
+
+
+def run_used_after_worktree_removed(twin: bool):
+    """TOOL-aMendedFleet-82's fixture: a linked worktree logs one query row carrying its `head`,
+    commits a citation of the row's first result id, and is removed with `git worktree remove`.
+    `twin` adds a second child of `head` on another branch, made after the row's `at` too."""
+    root, kitdir = make_repo()
+    wt = root.parent / (root.name + "-wt")
+    try:
+        git = ["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t"]
+        subprocess.run([*git, "commit", "-qm", "seed"], check=True, capture_output=True)
+        subprocess.run([*git, "worktree", "add", "-q", "-b", "wt", str(wt)], check=True, capture_output=True)
+        head = query.read_worktree_head(wt)
+        log = git_common_dir(root) / "recall" / "queries.jsonl"
+        log.parent.mkdir(parents=True, exist_ok=True)
+        at = datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds")
+        log.write_text(json.dumps({"qid": 1, "at": at, "type": "query", "query": "q", "terms": [],
+                                   "worktree": str(wt), "head": head,
+                                   "results": [{"set": "records", "id": "TOOL-aFoo-2"}]}) + "\n",
+                       encoding="utf-8", newline="\n")
+        (wt / "notes.md").write_text("cites TOOL-aFoo-2\n", encoding="utf-8", newline="\n")
+        wgit = ["git", "-C", str(wt), "-c", "user.email=t@t", "-c", "user.name=t"]
+        subprocess.run([*wgit, "add", "notes.md"], check=True, capture_output=True)
+        subprocess.run([*wgit, "commit", "-qm", "add notes"], check=True, capture_output=True)
+        if twin:
+            tree_sha = subprocess.run([*git, "rev-parse", f"{head}^{{tree}}"], capture_output=True,
+                                      text=True, encoding="utf-8", check=True).stdout.strip()
+            kid = subprocess.run([*git, "commit-tree", tree_sha, "-p", head, "-m", "sibling"],
+                                 capture_output=True, text=True, encoding="utf-8", check=True).stdout.strip()
+            subprocess.run([*git, "branch", "twin", kid], check=True, capture_output=True)
+        subprocess.run([*git, "worktree", "remove", str(wt)], check=True, capture_output=True)
+        return head, run(root, kitdir, "--used")
+    finally:
+        cleanup(wt)
+        cleanup(root)
+
+
+@check("--used attributes a removed worktree's query row by its logged head's one child")
+def test_used_attributes_a_removed_worktree_by_head():
+    """TOOL-aMendedFleet-82 AC3. Observed RED as `not measured` with the row's `head` deleted."""
+    head, p = run_used_after_worktree_removed(twin=False)
+    assert head and re.fullmatch(r"[0-9a-f]{40,64}", head), f"no head read from the worktree: {head!r}"
+    assert p.returncode == 0 and "answer-used: 1 of 1" in p.stdout, f"wrong figure: {p.stdout}{p.stderr}"
+    assert "attributed by head ancestry: 1 · ambiguous head: 0" in p.stdout, f"wrong head line: {p.stdout}"
+    return p.stdout.splitlines()[0]
+
+
+@check("--used counts a head with two children after the query as ambiguous, crediting neither")
+def test_used_counts_two_head_children_ambiguous():
+    """TOOL-aMendedFleet-82 AC4. Observed RED as `answer-used: 1 of 1` with the earliest child
+    credited instead."""
+    _, p = run_used_after_worktree_removed(twin=True)
+    assert p.returncode == 2 and "answer-used: 1" not in p.stdout, f"a child was credited: {p.stdout}"
+    assert "(1 unattributed," in p.stderr, f"the ambiguous row is not unattributed: {p.stderr}"
+    assert "attributed by head ancestry: 0 · ambiguous head: 1" in p.stderr, f"wrong head line: {p.stderr}"
+    return p.stderr.strip().splitlines()[-1].strip()
 # --- TOOL-aGraftedHelix-4: supersession, extracted and mapped, ordered, and tagged ----------------
 SUP_SPEC_REL = "builds/bQuill/spec/2026-10-04-spec-TOOL-aQuill-7.md"
 SUP_ROWS = (
@@ -3158,10 +3449,16 @@ def test_supersession_tag_in_both_renderers():
             for rid in (a, b)]
     hits = QRY.derive_supersession_order(hits, {a: [[b, "whole"]]})
     want = f"{a} · {a}.md:1  [superseded by {b}]"
-    full, _, _, _ = QRY.emit(hits, "latch flush", 10_000_000, full=True)
-    snip, _, _, _ = QRY.emit(hits, "latch flush", 10_000_000)
+    full, _, _, _, _ = QRY.emit(hits, "latch flush", 10_000_000, full=True)
+    snip, _, _, _, _ = QRY.emit(hits, "latch flush", 10_000_000)
     assert want in full, f"the full branch dropped the tag:\n{full}"
     assert want in snip, f"the snippet branch dropped the tag:\n{snip}"
+    # The pointer tier (TOOL-aMendedFleet-31) is a third header: a budget whose snippet share holds
+    # only rank 1 prints the superseded hit as a pointer, and the pointer must carry the tag too.
+    one = len(f"[1] {QRY.render(hits[0], 'latch flush')[0]}\n".encode())
+    ptr, shown, _, _, n_snip = QRY.emit(hits, "latch flush", int(1.5 * one / QRY.SNIPPET_SHARE))
+    assert (n_snip, shown) == (1, 2), f"{n_snip} snippets, {shown} shown; the pointer arm never ran"
+    assert f"[2] {want}" in ptr.splitlines(), f"the pointer tier dropped the tag:\n{ptr}"
     old = next(h for h in hits if h["id"] == a)
     two = dict(old, superseded_by=[b, c], supersession="whole")
     head = QRY.render(two, "latch flush")[0].splitlines()[0]
@@ -3169,7 +3466,7 @@ def test_supersession_tag_in_both_renderers():
     part = dict(old, superseded_by=[b], supersession="partial")
     head = QRY.render(part, "latch flush")[0].splitlines()[0]
     assert head.endswith(f"[partly superseded by {b}]"), head
-    return "full and snippet headers tagged; two successors in one tag; partial says partly"
+    return "full, snippet and pointer headers tagged; two successors in one tag; partial says partly"
 
 
 def main() -> int:
@@ -3186,12 +3483,15 @@ def main() -> int:
         test_budget_lru, test_budget_protections, test_build_marker_lifecycle,
         test_budget_build_in_flight, test_budget_marker_ttl,
         test_budget_cannot_satisfy, test_budget_recheck_before_delete, test_budget_blank,
+        # TOOL-aMendedFleet-32: last-query order, husk worktrees, the log reader
+        test_budget_orders_by_last_query, test_eviction_husk, test_last_queries_and_empty_log,
         test_python3_only,
         test_scaffold_converges, test_skill_drift_reds, test_crlf_working_copy_is_not_drift,
         test_skill_description_invariants, test_hook_test,
         test_version_marker, test_verbatim_files, test_adopter_layout,
         test_declared_sources_reach_the_corpus, test_declared_source_absent_is_skipped,
         test_undeclared_file_stays_out, test_one_walk_two_callers,
+        test_exclude_leaves_a_live_line_answering,
         # ported from adopter ic scripts/recall/selftest.py — the two verbatim files, the unforked half
         # of query.py, and the alias join
         test_chunk_matching, test_scoring, test_full_at_k_counts_targets_not_documents,
@@ -3200,6 +3500,7 @@ def main() -> int:
         test_build_index_default_stays_in_memory, test_query_expr_refuses_empty_and_phrases_ids,
         test_rrf_is_rank_based_not_score_based, test_rrf_key_separates_two_windows_of_one_section,
         test_budget_bounds_emission_and_beats_full_documents,
+        test_snippet_share_bounds_the_head_and_pointers_keep_the_rest,
         test_rewrite_terms_are_required_and_survive_verbatim,
         test_argv_grammar_and_the_refusal_are_gated, test_result_cap_keeps_the_true_hit_count,
         test_shown_paths_make_every_rank_recoverable,
@@ -3219,6 +3520,10 @@ def main() -> int:
         # TOOL-dHashedPrelude-2: the guard that brackets this suite, gated
         test_the_live_log_baseline_is_taken_before_any_arm_runs,
         test_the_live_log_verdict_is_total_over_its_states,
+        # TOOL-aMendedFleet-34: the offline answer-used join
+        test_used_joins_answers_to_the_next_commit,
+        # TOOL-aMendedFleet-82: the head-ancestry arm of `--used`
+        test_used_attributes_a_removed_worktree_by_head, test_used_counts_two_head_children_ambiguous,
         # TOOL-aGraftedHelix-4: supersession
         test_supersession_edges_and_map, test_supersession_order_moves_only_past_a_successor,
         test_supersession_tag_in_both_renderers,

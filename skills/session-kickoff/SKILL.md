@@ -175,17 +175,9 @@ CI-verified, so trust them over prose notes; the generated map is the system inv
 high-risk unit touching an UNDOSSIERED feature creates/refreshes that dossier as part of its
 design pass (the map's convergence rule).
 
-**The bug classes this area can hit** (when the project ships the memory-tree kit): the checklist is
-reachable before a diff exists, over the pointer-map row's entrypoints. `<MEMORY_TREE_KIT>` is whichever
-of `memory-tree/` or `<prefix>/memory-tree/` holds `gotchas.py` — a DIFFERENT kit from the `<KIT>` the
-recall step below resolves, and the two are not interchangeable:
-
-```bash
-python <MEMORY_TREE_KIT>/gotchas.py --for-paths <the row's entrypoints>
-```
-
-Its stdout IS the list; report the class names on the READY card. This is what the manifest used to
-front-load as prose and no longer needs to.
+**The bug classes and open asks for this area** (when the project ships the build method,
+`<MEMORY_ROOT>/guides/BUILD-METHOD.md`): run the two context commands its M5 spells over the
+pointer-map row's entrypoints. Report the class names on `## classes` and the ask ids on `## records`.
 
 **Memory-recall for the prior records** (when the project has the kit — `<KIT>` is whichever of
 `memory-recall/` or `<prefix>/memory-recall/` holds `query.py`; both spellings ship, so resolve it

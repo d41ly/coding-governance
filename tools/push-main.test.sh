@@ -4,7 +4,7 @@
 #
 # Cases 1-8 are the ATTENDED landing, from a primary tree with the default branch checked out, and
 # so are the cases after them up to AC1 (TOOL-aRepatriatedFork-5, -8: the lander marker, the one
-# dirty definition, the refusal channel). Then cases 9-22 AGAIN, a separate block: the IN-PLACE
+# dirty definition, the refusal channel). Then cases 9-23 AGAIN, a separate block: the IN-PLACE
 # landing flags (TOOL-dDerivedDocket-2), over a second fixture that adds
 # what they need: a linked worktree on a run branch, and a local default branch carrying commits
 # nobody pushed. What this file does NOT check: anything about a real remote or a real bar — the
@@ -596,5 +596,102 @@ rema=$(git ls-remote "$tmp/remote2.git" refs/heads/main | awk '{print $1}')
 [ "$rc22b" = 3 ] && [ "$rc22c" = 3 ] && [ "$remb" = "$rema" ] \
   && ok "22b an unreachable remote exits 3 from both read-only flags, and pushes nothing" \
   || bad "22b rc-carry=$rc22b rc-prepared=$rc22c $out22b $out22c"
+
+# 23 — TOOL-aMendedFleet-3 AC8: --prepare over a branch carrying a merge that LOSES a definition one
+#      parent carried refuses BEFORE the branch moves, naming it. The fixture's sideB adds `fb`; the
+#      run branch merges sideB resolving the conflict to its own side, merge `01c22e155`'s shape. The
+#      lexicon kit is the directory beside this lander that holds its anchor, copied beside the
+#      fixture's lander under the same name, where the lander looks for it. Observed RED against the
+#      base lander, which moved the branch to the prepared merge and exited 0.
+_ml_lex=$(cd "$HERE" && for d in */; do [ -f "$d/lexicon.py" ] && { printf '%s' "${d%/}"; break; }; done)
+if [ -n "$_ml_lex" ]; then
+  git init -q --bare "$tmp/remote3.git"
+  setup_repo "$tmp/work3" origin "$tmp/remote3.git"
+  git config core.autocrlf false
+  cp -r "$HERE/$_ml_lex" "./$KIT_REL$_ml_lex"; rm -rf "./$KIT_REL$_ml_lex/__pycache__"
+  printf 'LANGS="sh:shell-tokens:parser"\n' > .lexicon.conf
+  printf '__pycache__/\n' > .gitignore
+  printf 'fa() { :; }\n' > a.sh
+  git add -A; git commit -q -m "lexicon and a.sh"
+  git push -q --no-verify origin main
+  git -C "$tmp/remote3.git" symbolic-ref HEAD refs/heads/main
+  git checkout -q -b sideB
+  printf 'fa() { echo B; }\nfb() { :; }\n' > a.sh; git commit -q -am "side B"
+  git checkout -q -b feat main
+  printf 'fa() { echo A; }\n' > a.sh; git commit -q -am "TOOL-tFix-5: side A"
+  git merge -q --no-ff --no-commit sideB >/dev/null 2>&1
+  printf 'fa() { echo A; }\n' > a.sh; git add a.sh; git commit -q -m "merge sideB, taking side A"
+  before23=$(git rev-parse refs/heads/feat)
+  out23=$(bash "$lander" --prepare --slug fx 2>&1); rc23=$?
+  [ "$rc23" = 1 ] && [ "$(git rev-parse refs/heads/feat)" = "$before23" ] \
+    && [ "$(git symbolic-ref --short HEAD 2>/dev/null)" = feat ] \
+    && case "$out23" in *"a.sh: fb"*) true ;; *) false ;; esac \
+    && ok "23 --prepare refuses a merge losing fb, naming it; the branch is unmoved and checked out" \
+    || bad "23 rc=$rc23 head=$(git symbolic-ref --short HEAD 2>/dev/null) $out23"
+else
+  bad "23 no directory beside this lander holds the lexicon kit, so the merge-loss arm did not run"
+fi
+
+# 24 — TOOL-aMendedFleet-65 AC1: --prepare MINTS the kit versions the landing owes INTO the prepared
+#      merge. A clone of this repository at its committed HEAD, pushed to a bare remote as main; a
+#      branch adds a comment line to the runlog kit's extract.py and is prepared. The merge's diff
+#      against its first parent moves KIT_RUNLOG_VERSION to the tip's value plus one, and the lander
+#      prints one `mint: runlog` line. Observed RED against the base lander, which merged the move
+#      under the old value. Needs gov's deployer beside the lander; an install without one says so.
+_mt_gk=$(cd "$HERE" && for d in */; do [ -f "$d/govkit.py" ] && [ -f "$d/registry.toml" ] && { printf '%s' "${d%/}"; break; }; done)
+_mt_rl=$(cd "$HERE" && for d in */; do [ -f "$d/runlog_lib.py" ] && { printf '%s' "${d%/}"; break; }; done)
+if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ]; then
+  git clone -q --bare "$SRC" "$tmp/remote4.git"
+  git clone -q "$tmp/remote4.git" "$tmp/work4"
+  (
+    cd "$tmp/work4" || exit 1
+    git config user.email t@e; git config user.name t; git config core.autocrlf false
+    git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
+    git push -q -f origin main
+    git -C "$tmp/remote4.git" symbolic-ref HEAD refs/heads/main
+    R4=$(git rev-parse HEAD)
+    v0=$(sed -n 's/^KIT_RUNLOG_VERSION = "\([0-9.]*\)".*/\1/p' "${KIT_REL}$_mt_rl/runlog_lib.py")
+    v1="${v0%.*}.$(( ${v0##*.} + 1 ))"
+    git checkout -q -b feat
+    printf '# a comment line, push-main.test case 24\n' >> "${KIT_REL}$_mt_rl/extract.py"
+    git commit -q -am "move runlog"
+    out24=$(unset GATE_PUSH_BASE; bash "$lander" --prepare --slug tMint 2>/dev/null); rc24=$?
+    moved=$(git diff HEAD^1 HEAD -- "${KIT_REL}$_mt_rl/runlog_lib.py" | grep -c "^+KIT_RUNLOG_VERSION = \"$v1\"")
+    [ "$rc24" = 0 ] && [ "$(git rev-parse HEAD^1)" = "$R4" ] && [ "$moved" = 1 ] \
+      && [ "$(printf '%s\n' "$out24" | grep -c '^mint: runlog')" = 1 ] && [ -z "$(git status --porcelain)" ]
+  ) && ok "24 --prepare mints runlog's next version into the prepared merge and says so once" \
+    || bad "24 the prepared merge does not carry the minted runlog version (or the tree was left dirty)"
+else
+  echo "  skip — 24 no govkit deployer or runlog kit beside this lander, so the mint arm did not run"
+fi
+
+# 25 — TOOL-aMendedFleet-111 AC2: THIS lander run in a tree that lacks the lexicon and govkit files
+#      SKIPS both checks by name. The kits resolve beside the lander, but the files are read under the
+#      cwd's toplevel, so before the file test python's exit 2 for a missing script read as a DEAD
+#      PROBE and a REFUSED mint. Staged red by removing the two file tests.
+if [ -n "$_mt_gk" ] && [ -n "$_ml_lex" ]; then
+  git clone -q --bare "$SRC" "$tmp/remote5.git"
+  git clone -q "$tmp/remote5.git" "$tmp/work5"
+  out25=$(
+    cd "$tmp/work5" || exit 1
+    git config user.email t@e; git config user.name t; git config core.autocrlf false
+    git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
+    git rm -q -- "${KIT_REL}$_ml_lex/lexicon.py" "${KIT_REL}$_mt_gk/govkit.py"
+    git commit -q --no-verify -m "drop the lexicon and govkit files"
+    git push -q -f --no-verify origin main
+    git -C "$tmp/remote5.git" symbolic-ref HEAD refs/heads/main
+    git checkout -q -b feat
+    echo u25 > src-u25.txt; git add src-u25.txt 2>/dev/null; git commit -q --no-verify -m "TOOL-tFix-25: unit"
+    unset GATE_PUSH_BASE; bash "$HERE/push-main.sh" --prepare --slug tSkip 2>&1
+  )
+  case "$out25" in *"no lexicon kit beside this lander"*) l25=1 ;; *) l25=0 ;; esac
+  case "$out25" in *"no govkit deployer beside this lander"*) g25=1 ;; *) g25=0 ;; esac
+  case "$out25" in *"DEAD PROBE"*|*"REFUSED"*) x25=1 ;; *) x25=0 ;; esac
+  [ "$l25$g25$x25" = 110 ] \
+    && ok "25 a tree without the lexicon and govkit files skips both checks by name, with no DEAD PROBE or REFUSED" \
+    || bad "25 lexicon-skip=$l25 govkit-skip=$g25 dead-or-refused=$x25 $out25"
+else
+  echo "  skip — 25 no govkit deployer or lexicon kit beside this lander, so the missing-file arm did not run"
+fi
 
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

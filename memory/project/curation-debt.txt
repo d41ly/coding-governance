@@ -22,6 +22,12 @@
 # unattended protocol guide, a merge-induced overflow standing at 64939 B, over the retired byte cap.
 # Under the raised pair it passes checks 6, 7 and 8 unwaived, and a row left behind would red as stale.
 #
+# TWO ROWS DRAINED AT TOOL-aMendedFleet-84, which prices a build README by its AUTHORED bytes:
+# check 6 subtracts the three generated regions and the front matter's `ids:` line before the cap.
+# Drained: cBriefedPilot (27895 B whole, about 21.4 KB authored) and aMendedFleet (renderer-shaped,
+# 39649 B whole, about 12.4 KB authored). Neither earns check 6, 7 or 8 under that price, and a row
+# left behind would red as stale.
+#
 # WHAT IS LEFT is authored prose over an authored cap, which is what this registry was always for.
 
 # memory/builds/aBoundedVerdict/README.md - 38261 B against a 25600 cap, and five AUTHORED lines over
@@ -29,9 +35,6 @@
 # it is that build's own curation, not this one's. It fell from 44872 B when the two regions went, so
 # the removal helped and did not finish the job.
 memory/builds/aBoundedVerdict/README.md
-# memory/builds/cBriefedPilot/README.md - 27895 B against the same cap, down from 32023 B. Authored
-# prose again; same disposition as the row above.
-memory/builds/cBriefedPilot/README.md
 # memory/builds/aUnmannedHelm/README.md - ONE authored line at 419 chars against the 350 tier. The
 # file is 12158 B and comfortably inside the byte cap, so this row buys exactly one line.
 # BLAST RADIUS: listing it silences checks 6 AND 7 on the whole file to waive that single line. That
