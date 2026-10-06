@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-103 — the hygiene suite's python-parity arm exempts `GRAMMAR_WHERE` beside `GRAMMAR_DIR`
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · order 104
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · order 104
 
 <!-- gen:spec-records -->
 
