@@ -28,9 +28,10 @@ function chunk(a, n) {
 }
 
 // --- TOOL-dDerivedDocket-29 — the review KEY, derived from the inputs and nothing else ----------
-// A lens or a skeptic batch writes its result to `<git-common-dir>/review-lenses/<key>/` BEFORE it
-// returns, so a fan that dies on a session limit keeps every result that came back, and a re-run with
-// the same inputs dispatches only what is missing. The key is what makes "the same inputs" a test and
+// Under `workerType: 'none'` a lens or a skeptic batch writes its result to
+// `<git-common-dir>/review-lenses/<key>/` BEFORE it returns, so a fan that dies on a session limit
+// keeps every result that came back, and a re-run with the same inputs dispatches only what is
+// missing; under a named type no judge writes one and a re-run dispatches every judge again. The key is what makes "the same inputs" a test and
 // not a hope: a file is reused only when its own `key` field equals the string computed here.
 // FNV-1a over UTF-16 code units, with `Math.imul` because the script runtime refuses the clock and
 // randomness and nothing else; the human-readable prefix means a collision needs the same kind,
