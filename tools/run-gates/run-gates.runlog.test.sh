@@ -34,8 +34,8 @@
 # a later unit. The turnstile and the wall watcher are OFF in every bar but the wall arm, so their
 # background ticks cannot outlive a bar holding this scratch open; the writer sits in `cleanup`, which
 # runs the same with either on. An `exit` inside a function DEFINED above the trap and called below it
-# is not enumerated, since the lexer keys on the line the `exit` sits on; the two such functions today,
-# `prof_die` and the turnstile ticker, run only above it. A SIGKILL, which runs no trap and leaves no
+# is not enumerated, since the lexer keys on the line the `exit` sits on; such a function must run
+# only above it, as `prof_die` and the turnstile ticker do. A SIGKILL, which runs no trap and leaves no
 # line. Wall time, except where the verdict is the wall firing. The lexer is a COPY of the one in the
 # unattended kit's run-log suite, because kits do not source each other's tests; each copy is graded
 # by its own staged arms.

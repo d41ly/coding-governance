@@ -172,6 +172,27 @@ def unfenced_lines(text: str):
         yield opened_at, None
 
 
+#: The declared-gap citation form (TOOL-aMendedFleet-26): this prefix written immediately before an
+#: id says "this id has no record", so check 14 does not count it as an orphan and the roster
+#: derivation does not file it on its slug's build. Spelled here and nowhere else.
+MISSING_PREFIX = "missing:"
+
+
+def scan_missing_citations(text: str, id_re) -> tuple[list, str]:
+    """`(ids, blanked)`: every id written in the `missing:` form, and `text` with each form and its
+    id overwritten by spaces of the same length, so offsets and line numbers still hold.
+
+    `id_re` is the CALLER's own compiled id regex, so the form needs no second id grammar: each
+    reader recognises a marked id by exactly the predicate it already uses for a cited one. A plain
+    regex cannot tell the two apart on its own, because the colon is a word boundary.
+    """
+    pat = re.compile(re.escape(MISSING_PREFIX) + "(?:" + id_re.pattern + ")", id_re.flags)
+    ids = [mm.group(0)[len(MISSING_PREFIX):] for mm in pat.finditer(text)]
+    if not ids:
+        return ids, text
+    return ids, pat.sub(lambda mm: " " * len(mm.group(0)), text)
+
+
 def build_spec_path_re(memory_root: str):
     """The path half of `parse_spec_h1`: a build's `spec/` folder, at any depth. Exposed so a caller
     walking a whole tree can skip reading a file the predicate would refuse on its path alone."""

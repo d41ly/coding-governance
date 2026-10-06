@@ -268,7 +268,7 @@ DOTDIR = re.compile(r"^\.[A-Za-z]")
 # ponytail: a NAME heuristic over the operand a join starts from. Its ceiling: a git directory or a
 # transcript held in a variable named otherwise counts as a kit path. The remedy is a name that says
 # what the variable holds.
-NONKIT = re.compile(r"(?i)git|\bgd\b|\bcommon\b|\bsdir\b|session|transcript")
+NONKIT = re.compile(r"(?i)git|\bcommon\b|\bsdir\b|session|transcript")
 # Rule 5: the ONLY spellings that drain a kit segment. Any other brace before a kit name is a derived
 # base the kit name was typed after, which is the class (`${PFX}<kit>/`).
 DRAINED = re.compile(r"(?:\{prefix\}/|\{kit\}/|\{\{TOOL_ROOT\}\}|<prefix>/|<tool-root>/)$")

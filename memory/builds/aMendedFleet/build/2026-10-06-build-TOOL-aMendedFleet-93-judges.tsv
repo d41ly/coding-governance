@@ -1,0 +1,26 @@
+# **Serves:** journal TOOL-aMendedFleet-93
+arm	agent	label	role	agent_type	first_turn	out
+A	agent-a857060e6fc44a834	find:correctness	finder	workflow-subagent	89995	38212
+A	agent-a01d83c8cc172279a	find:intent	finder	workflow-subagent	90015	27088
+A	agent-a5f113a6ccb613abc	find:seams	finder	workflow-subagent	89994	37947
+A	agent-af7f0c31165062466	find:security	finder	workflow-subagent	90020	25488
+A	agent-abe8afe69ac5c626a	find:verification	finder	workflow-subagent	90010	27293
+A	agent-a9e7cba5eefa5f957	resume:probe	orchestration	workflow-subagent	89934	595
+A	agent-a2799ec18d7548845	synth	orchestration	workflow-subagent	114318	19381
+A	agent-a5aeafb5d0210f9c7	verify:ids-1-6	skeptic	workflow-subagent	93556	21696
+A	agent-a183b3c2ac5c80e61	verify:ids-13-18	skeptic	workflow-subagent	92717	18754
+A	agent-a57086f694d558800	verify:ids-19-24	skeptic	workflow-subagent	92470	17116
+A	agent-a85446ae86ceda631	verify:ids-25-26	skeptic	workflow-subagent	91020	6051
+A	agent-a3b6fb3fa6282c60c	verify:ids-7-12	skeptic	workflow-subagent	93014	17287
+B	agent-ad281cd3cf9e29efd	find:correctness	finder	Plan	48112	29738
+B	agent-a55dd934942b54fb0	find:intent	finder	Plan	48133	18933
+B	agent-a318fd49d2f8407f0	find:seams	finder	Plan	48112	25165
+B	agent-a332ebc4fea19ce76	find:security	finder	Plan	48139	14278
+B	agent-ac75f5480ff464db0	find:verification	finder	Plan	48128	22396
+B	agent-a2c6af20e03dad37d	resume:probe	orchestration	workflow-subagent	89838	595
+B	agent-a9a173b1dfdb5b78c	synth	orchestration	workflow-subagent	117729	21517
+B	agent-ac747a6ca79639396	verify:ids-1-6	skeptic	Plan	51402	12708
+B	agent-a45d85a268262f74e	verify:ids-13-18	skeptic	Plan	50771	15216
+B	agent-abea1c0f202c3bb77	verify:ids-19-24	skeptic	Plan	50664	10742
+B	agent-af06d6ddff7eeb5b2	verify:ids-25-29	skeptic	Plan	50025	7452
+B	agent-a57091b907fb00422	verify:ids-7-12	skeptic	Plan	50871	9926

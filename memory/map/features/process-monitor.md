@@ -15,6 +15,7 @@ gate-legs = [
 ]
 kits = ["process-monitor"]
 git-hooks = []
+harness-hooks = ["SessionStart tools/process-monitor/procmon-hook.js", "PostToolUse tools/process-monitor/procmon-hook.js"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -41,6 +42,8 @@ alive 7.5 hours after it was stopped.
 **Four stages, four modules, one direction.** `census.py` reads the table; `scope.py` decides which
 rows are ours; `classify.py` decides which of ours are dead weight; `reap.py` kills and proves it.
 Each is usable alone, and the split is what lets the fence be gated separately from the kill.
+`procmon-hook.js` puts the verdict where a session reads it, at `SessionStart` and after every
+shell call; those two wirings are this dossier's `harness-hooks` claims.
 
 **The census is keyed on `winpid` and carries BOTH parent graphs.** MSYS rows measured 19 of 337 on
 this host, and the gate runner dispatches its legs as NATIVE processes, so a census keyed on the

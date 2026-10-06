@@ -15,6 +15,7 @@ would be judging the wrong file.
 """
 
 import contextlib
+import os
 import re
 import shutil
 import subprocess
@@ -38,6 +39,52 @@ def derive_install_prefix() -> str:
 
 
 PFX = derive_install_prefix()
+
+
+def resolve_bash() -> str:
+    """The bash that shares THIS filesystem, by absolute path — never the bare name `bash`.
+
+    On a Windows host the loader resolves a bare `bash` from System32 BEFORE PATH, and what sits
+    there is the WSL launcher: with no distribution behind it every arm reds on "no installed
+    distributions", and with one it runs a bash that sees `/mnt/c/` rather than this tree. So the
+    override `GOV_BASH` is taken when set, else PATH is walked with System32 and WindowsApps
+    skipped, and a candidate is accepted only when it can `test -f` this file by its absolute
+    forward-slashed path — starting is not evidence, since a WSL bash starts fine. Nothing accepted,
+    or an override that cannot see the tree, is exit 2 naming the remedy, never a fall-through to
+    the bare name, which is the defect itself made silent.
+    """
+    me = os.path.abspath(__file__).replace("\\", "/")
+    override = os.environ.get("GOV_BASH")
+    cands, tried = ([override] if override else []), []
+    for d in ([] if override else os.environ.get("PATH", "").split(os.pathsep)):
+        for name in ("bash.exe", "bash"):
+            cand = os.path.join(d, name)
+            if not os.path.isfile(cand):
+                continue
+            low = cand.replace("\\", "/").lower()
+            if "/system32/" in low or "/windowsapps/" in low:
+                tried.append(f"{cand} (a launcher, skipped)")
+            else:
+                cands.append(cand)
+    for cand in cands:
+        try:
+            sees = subprocess.run([cand, "-c", 'test -f "$1"', "_", me], capture_output=True).returncode == 0
+        except OSError:
+            sees = False
+        if sees:
+            return cand
+        tried.append(f"{cand} (cannot see {me})")
+    if override:
+        print(f"lexicon selftest: GOV_BASH is set to '{override}', an override that cannot see the tree "
+              f"(`test -f {me}` failed there); point GOV_BASH at a bash sharing this filesystem",
+              file=sys.stderr)
+    else:
+        print(f"lexicon selftest: no bash on PATH can see this tree, tried: {'; '.join(tried) or 'none found'}; "
+              "set GOV_BASH to a bash sharing this filesystem", file=sys.stderr)
+    raise SystemExit(2)
+
+
+BASH = resolve_bash()
 
 
 
@@ -944,7 +991,7 @@ with build_tempdir() as td:
     check("AC5: ...and it no longer calls the cell `dark`, which it is not",
           _tsx_i >= 0 and "dark" not in _tsx_note, _tsx_note[:400])
 
-    r = subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=root,
+    r = subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=root,
                        capture_output=True, text=True)
     out = r.stdout + r.stderr
     check("scaffold: --check REDS on the unratified seed", r.returncode != 0, out)
@@ -961,7 +1008,7 @@ with build_tempdir() as td:
 
     crlf = (root / ".lexicon.conf").read_bytes().replace(b"\n", b"\r\n")
     (root / ".lexicon.conf").write_bytes(crlf)
-    r = subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=root,
+    r = subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=root,
                        capture_output=True, text=True)
     out = r.stdout + r.stderr
     check("scaffold: --check STILL reds on an unratified seed in a CRLF conf (the reader strips CR)",
@@ -1005,10 +1052,10 @@ with build_tempdir() as td:
         # embedded quotes do not survive, which read every reference value as empty.
         (root / "ref.sh").write_text("set -a; . ./spell.conf; printf '%s|' \"$A\" \"$B\" \"$C\" \"$D\" \"$E\"\n",
                                      encoding="utf-8", newline="\n")
-        _ref = subprocess.run(["bash", "ref.sh"], cwd=root, capture_output=True, text=True,
+        _ref = subprocess.run([BASH, "ref.sh"], cwd=root, capture_output=True, text=True,
                               encoding="utf-8").stdout
         (root / "ref.sh").unlink()
-        _got = subprocess.run(["bash", "spell.sh"], cwd=root, capture_output=True, text=True,
+        _got = subprocess.run([BASH, "spell.sh"], cwd=root, capture_output=True, text=True,
                               encoding="utf-8").stdout
         check("read_conf_scalar reads single quotes, `K=#x` and a blank value as bash sourcing does",
               _got == _ref == "a # b|a|#x||q|", f"sh={_got!r} bash={_ref!r}")
@@ -1063,9 +1110,9 @@ with build_tempdir() as td:
                        .replace('ratified=""', 'ratified="2026-09-06 node a"'),
                        encoding="utf-8", newline="\n")
     subprocess.run(["git", "add", "--", ".lexicon.conf"], cwd=root, capture_output=True)
-    subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--render"], cwd=root,
+    subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--render"], cwd=root,
                    capture_output=True, text=True)
-    _r = subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=root,
+    _r = subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=root,
                         capture_output=True, text=True)
     _o = _r.stdout + _r.stderr
     check("B1 control: a ratified scaffolded seed passes --check, grade included",
@@ -1074,7 +1121,7 @@ with build_tempdir() as td:
     _conf_p.write_text(_conf_p.read_text(encoding="utf-8")
                        .replace('VERB_OFFENDER_PIN="', 'VERB_OFFENDER_PIN="9'),
                        encoding="utf-8", newline="\n")
-    _r = subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=root,
+    _r = subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=root,
                         capture_output=True, text=True)
     _o = _r.stdout + _r.stderr
     check("B1: a CONF-ONLY pin change reds --check, which is the leg no guard scopes off a bar",
@@ -1718,7 +1765,7 @@ with tempfile.TemporaryDirectory(dir=str(KIT.parent.parent)) as _td:
     # directory" to with exit 127, even though python can stat the file. Both are NON-ZERO, so the
     # refusal arm above would have passed on a bash error rather than on the version check -- the
     # sibling arm below caught exactly that, twice, which is the whole reason a refusal arm needs one.
-    _r = subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--render"],
+    _r = subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--render"],
                         capture_output=True, text=True, cwd=_td)
     check("a kit whose version constant cannot be read REFUSES to render",
           _r.returncode != 0, f"exit={_r.returncode} {(_r.stdout + _r.stderr)[:200]}")
@@ -3703,7 +3750,7 @@ for _label, _tail in (
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
         (_sroot / ".lexicon.conf").write_text(BASE_CONF + _tail, encoding="utf-8", newline="\n")
         subprocess.run(["git", "init", "-q"], cwd=_sroot, check=True)
-        _sr = subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=_sroot,
+        _sr = subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=_sroot,
                              capture_output=True, text=True)
         _STAMP[_label] = _sr.stdout + _sr.stderr
 _EMPTY_STAMP_MSG = "declares a CANON: overlay"
@@ -4361,7 +4408,7 @@ def read_expand_rows(out: str) -> list:
 
 def run_expand_wrapper(root, *args):
     """`adopt-lexicon.sh --expand` in a fixture repo — the SHELL surface, where the guard lives."""
-    r = subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--expand", *args],
+    r = subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--expand", *args],
                        cwd=root, capture_output=True, text=True)
     return r.returncode, r.stdout + r.stderr
 
@@ -4628,7 +4675,7 @@ with build_tempdir() as td:
     # review H1.
     _probe = _root / "crlf-probe.txt"
     _probe.write_bytes(b'expanded="x"\r\n')
-    _pr = subprocess.run(["bash", "-c", "grep -E '^expanded=' \"$1\"", "_", str(_probe)],
+    _pr = subprocess.run([BASH, "-c", "grep -E '^expanded=' \"$1\"", "_", str(_probe)],
                          capture_output=True)
     if b"\r" not in _pr.stdout:
         print("lexicon selftest SKIP — F6's CR-residue half: this platform's `grep` drops the CR "
@@ -5825,6 +5872,124 @@ check("AC6 green: ...and a reading at or above it earns `parser`, so the two are
 check("AC6: ...and a refusal-blown reading earns `probe` too, so F2 reaches the label and not "
       "only F1", read_ts_mode(_ts_all) == "probe" and _ts_all["clears_f1"],
       f"{read_ts_mode(_ts_all)} clears_f1={_ts_all['clears_f1']}")
+
+
+# ---- TOOL-aMendedFleet-3: `--merge-losses`, a merge that LOSES a definition a parent carried ------
+#
+# ONE fixture history, several resolutions of the same conflicting merge. The base defines `fa`,
+# `fk` and `fz`; side A rewrites `fa`; side B rewrites `fa` too (the conflict), adds `fb` beside a
+# same-named STUB in `t.sh`, and takes `fz` out. Each case checks side A out, merges B without
+# committing, WRITES the resolution, and commits — so the resolution is the case, not git's choice.
+# The stub is the rev-4 class: merge `01c22e155` lost `write_ask_views` while a suite stub of the
+# same name stood in another file, and a check clearing by bare name passed it.
+with build_tempdir() as _td:
+    _r = Path(_td)
+    _git = lambda *a: subprocess.run(["git", *a], cwd=_r, capture_output=True, text=True, encoding="utf-8")  # noqa: E731
+    _git("init", "-q", "-b", "main")
+    for _k, _v in (("user.email", "s@e"), ("user.name", "s"), ("core.autocrlf", "false")):
+        _git("config", _k, _v)
+    _ml_conf = 'LANGS="sh:shell-tokens:parser conf::dark"\n'
+    (_r / ".lexicon.conf").write_text(_ml_conf, encoding="utf-8", newline="\n")
+    (_r / "a.sh").write_text("fa() { :; }\nfk() { :; }\nfz() { :; }\n", encoding="utf-8", newline="\n")
+    _git("add", "-A")
+    _git("commit", "-qm", "base")
+    _git("checkout", "-q", "-b", "sideB")
+    (_r / "a.sh").write_text("fa() { echo B; }\nfb() { :; }\nfk() { :; }\n", encoding="utf-8", newline="\n")
+    (_r / "t.sh").write_text("fb() { echo stub; }\n", encoding="utf-8", newline="\n")
+    _git("add", "-A")
+    _git("commit", "-qm", "side B")
+    _git("checkout", "-q", "-b", "sideA", "main")
+    (_r / "a.sh").write_text("fa() { echo A; }\nfk() { :; }\nfz() { :; }\n", encoding="utf-8", newline="\n")
+    _git("commit", "-qam", "side A")
+    _ml_a = _git("rev-parse", "HEAD").stdout.strip()
+    _ml_runs = {}
+    for _case, _files, _msg in (
+            ("lose", {"a.sh": "fa() { echo A; }\nfk() { :; }\n"}, "merge B, taking side A"),
+            ("keep", {"a.sh": "fa() { echo A; }\nfb() { :; }\nfk() { :; }\n"}, "merge B, keeping both"),
+            ("sup", {"a.sh": "fa() { echo A; }\nfk() { :; }\n"}, "merge B\n\nsuperseded: fb -> fa\n"),
+            ("badsup", {"a.sh": "fa() { echo A; }\nfk() { :; }\n"}, "merge B\n\nsuperseded: fb -> nothere\n"),
+            ("move", {"a.sh": "fb() { :; }\nfk() { :; }\n", "b.sh": "fa() { echo A; }\n"}, "merge B, moving fa"),
+            ("both", {"a.sh": "fa() { echo A; }\nfb() { :; }\n"}, "merge B, taking out fk")):
+        _git("checkout", "-q", "--detach", _ml_a)
+        _git("merge", "--no-commit", "--no-ff", "sideB")
+        for _rel, _body in _files.items():
+            (_r / _rel).write_text(_body, encoding="utf-8", newline="\n")
+        _git("add", "-A")
+        _git("commit", "-qm", _msg)
+        _ml_m = _git("rev-parse", "HEAD").stdout.strip()
+        if _case == "lose":
+            # The RESTORE: one commit on top of the losing merge, re-adding `fb` where it was.
+            (_r / "a.sh").write_text("fa() { echo A; }\nfb() { :; }\nfk() { :; }\n", encoding="utf-8",
+                                     newline="\n")
+            _git("commit", "-qam", "restore fb")
+            _ml_runs["restore"] = subprocess.run(
+                [sys.executable, str(KIT / "lexicon.py"), "--merge-losses", f"{_ml_a}..HEAD"],
+                cwd=_r, capture_output=True, text=True, encoding="utf-8")
+        _ml_runs[_case] = subprocess.run(
+            [sys.executable, str(KIT / "lexicon.py"), "--merge-losses", f"{_ml_a}..{_ml_m}"],
+            cwd=_r, capture_output=True, text=True, encoding="utf-8")
+    _o = {k: (v.returncode, v.stdout + v.stderr) for k, v in _ml_runs.items()}
+    check("AMF3 AC3: a merge resolving to side A and losing side B's `fb` exits 1 naming it, though a "
+          "same-named stub stands in another file",
+          _o["lose"][0] == 1 and "a.sh: fb" in _o["lose"][1] and "parent 2" in _o["lose"][1], f"{_o['lose']}")
+    check("AMF3 AC3/AC4: the same merge keeping both exits 0, and lacking `fz`, which side B took out "
+          "since the base, is no loss", _o["keep"][0] == 0 and "losses=0" in _o["keep"][1], f"{_o['keep']}")
+    check("AMF3 AC3: `superseded: fb -> fa` clears it and is counted",
+          _o["sup"][0] == 0 and "superseded=1" in _o["sup"][1], f"{_o['sup']}")
+    check("AMF3 AC3: `superseded: fb -> nothere` refuses, naming the successor",
+          _o["badsup"][0] == 1 and "nothere" in _o["badsup"][1], f"{_o['badsup']}")
+    check("AMF3 AC4: a commit re-adding `fb` after the losing merge clears it at the range tip, counted",
+          _o["restore"][0] == 0 and "restored=1" in _o["restore"][1], f"{_o['restore']}")
+    check("AMF3 AC4: a merge moving `fa` to a second file exits 0, counted as masked",
+          _o["move"][0] == 0 and "masked=1" in _o["move"][1], f"{_o['move']}")
+    check("AMF3 AC4: a merge taking out `fk`, which both parents carried from the base, exits 1",
+          _o["both"][0] == 1 and "a.sh: fk" in _o["both"][1] and "parents 1 and 2" in _o["both"][1],
+          f"{_o['both']}")
+    check("AMF3 AC10: every run prints its summary line with its seconds",
+          all("seconds=" in v[1] for v in _o.values()), f"{_o}")
+    # AC5 — the reassuring zero of a reader that reads nothing is a DEAD PROBE, never a pass.
+    (_r / ".lexicon.conf").write_text('LANGS="sh::dark conf::dark"\n', encoding="utf-8", newline="\n")
+    _ml_dark = subprocess.run([sys.executable, str(KIT / "lexicon.py"), "--merge-losses", f"{_ml_a}..sideB"],
+                              cwd=_r, capture_output=True, text=True, encoding="utf-8")
+    _ml_dark2 = subprocess.run(
+        [sys.executable, str(KIT / "lexicon.py"), "--merge-losses",
+         f"{_ml_a}..{_git('rev-parse', 'HEAD').stdout.strip()}"],
+        cwd=_r, capture_output=True, text=True, encoding="utf-8")
+    check("AMF3 AC5: a declaration arming no language exits 2 and prints DEAD PROBE",
+          _ml_dark2.returncode == 2 and "DEAD PROBE" in _ml_dark2.stdout,
+          f"rc={_ml_dark2.returncode} {_ml_dark2.stdout}{_ml_dark2.stderr}")
+    check("AMF3: a range holding no merge grades nothing and exits 0 without reading the declaration",
+          _ml_dark.returncode == 0 and "graded=0" in _ml_dark.stdout,
+          f"rc={_ml_dark.returncode} {_ml_dark.stdout}{_ml_dark.stderr}")
+
+
+# ---- TOOL-aMendedFleet-6: the conf reader writes UTF-8 whatever the host's code page -----------
+#
+# `adopt-lexicon.sh` reads the glosses from `--print-rows` through a pipe. Outside Python's UTF-8
+# mode a Windows pipe is the ANSI code page, so the em dash arrived as 0x97 and `lexicon wiring`
+# redded on the hosted runner while passing on a node exporting PYTHONUTF8=1. The child runs with
+# that mode OFF and PYTHONIOENCODING gone, and the arm reads BYTES: a text decode would hide the
+# codec it grades. Where the redirected stdout is UTF-8 anyway, nothing here can red, so it says so.
+_cx_env = {k: v for k, v in os.environ.items() if k != "PYTHONIOENCODING"}
+_cx_env["PYTHONUTF8"] = "0"
+_cx_probe = subprocess.run([sys.executable, "-c", "import sys; print(sys.stdout.encoding)"],
+                           env=_cx_env, capture_output=True)
+if _cx_probe.stdout.strip().lower().replace(b"-", b"") in (b"utf8", b"utf_8"):
+    print("lexicon selftest SKIP — AMF6's codec arm: a redirected stdout with PYTHONUTF8=0 is "
+          f"already {_cx_probe.stdout.strip().decode('ascii', 'replace')} on this host, so "
+          "`lexicon_conf.py`'s UTF-8 reconfigure is UNEXERCISED here. One arm unexercised.")
+else:
+    with build_tempdir() as _td:
+        _cx_conf = Path(_td) / ".lexicon.conf"
+        _cx_conf.write_text(BASE_CONF, encoding="utf-8", newline="\n")
+        _cx = subprocess.run([sys.executable, str(KIT / "lexicon_conf.py"), "--print-rows", str(_cx_conf)],
+                             env=_cx_env, capture_output=True)
+    _cx_97 = b"\x97" in _cx.stdout
+    check("AMF6 AC3: `--print-rows` under the host code page writes the gloss's em dash as UTF-8, "
+          "never the byte 0x97",
+          _cx.returncode == 0 and b"\xe2\x80\x94" in _cx.stdout and not _cx_97,
+          f"codec={_cx_probe.stdout.strip()!r} rc={_cx.returncode} has_0x97={_cx_97} "
+          f"{_cx.stdout[:120]!r} {_cx.stderr[:200]!r}")
 
 
 if FAILURES:

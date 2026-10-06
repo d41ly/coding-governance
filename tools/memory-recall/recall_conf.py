@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The memory-recall kit's project layer: read `.memory-tree.conf`, declare nothing of its own.
 
-gov:kit memory-recall@1.27
+gov:kit memory-recall@1.28
 
 The kit indexes the memory tree the memory-tree kit already declares. Two of that conf's keys are
 read and no third declaration is invented:
@@ -27,7 +27,9 @@ Four OPTIONAL `RECALL_*` keys carry facts that belong to the adopter's corpus an
                             log under the common git dir
 
 A malformed value is a ConfError naming the key, never a silent fallback. Only the first two change
-which strings are ids, so only they enter `digest()`.
+which strings are ids, so only they enter `digest()`. `RECALL_EXCLUDE` (TOOL-aMendedFleet-27) is not
+one of the four: like `RECALL_EXTRA_SOURCES` it changes which documents exist, so it enters
+`digest()` too.
 
 The conf PARSER below is a copy of the twenty lines in codebase-map's map_lib.load_conf, not an
 import of it: kits are copied into adopters independently, and importing across kit directories
@@ -47,7 +49,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree — see query.py's note.
 sys.dont_write_bytecode = True
 
-KIT_MEMORY_RECALL_VERSION = "1.27"
+KIT_MEMORY_RECALL_VERSION = "1.28"
 
 CONF_NAME = ".memory-tree.conf"
 # The DEFAULT: a-z, per the memory-tree hygiene gate's own `node [a-z]` (spec Q1 option (b)).
@@ -175,10 +177,11 @@ def refusal(root: pathlib.Path, why: str) -> str:
 
 _FAMILY_RE = re.compile(r"^[A-Z][A-Z0-9]*$")
 
-# The default cache budget, MEASURED on this tree rather than inherited: one cache here is 2.4 MB,
-# and upstream measured ~110 MB per LIVE worktree on a far larger corpus. 512 sits well above any
-# plausible single-corpus cache, so the cap protects an adopter carrying many worktrees without ever
-# firing on a normal one. Blank in the conf = uncapped; absent = this.
+# The default cache budget. Upstream measured ~110 MB per LIVE worktree; a cache's size here is
+# read off its directory under `<git-common-dir>/recall/cache/`, never typed in this comment,
+# because it moves with every corpus edit. 512 sits above a single cache of that order, so the cap
+# protects an adopter carrying many worktrees without firing on a normal one. Blank in the conf =
+# uncapped; absent = this.
 DEFAULT_CACHE_BUDGET_MB = 512.0
 
 
@@ -205,13 +208,14 @@ class Conf:
     """The RESOLVED values every other module in the kit reads."""
 
     __slots__ = ("root", "path", "memory_root", "families", "node_tag_class", "cache_budget_mb",
-                 "extra_sources", "cited_families", "build_qid_cutoff", "export_dir")
+                 "extra_sources", "cited_families", "build_qid_cutoff", "export_dir", "exclude")
 
     def __init__(self, root: pathlib.Path, memory_root: str, families: tuple[str, ...],
                  cache_budget_mb: float | None = DEFAULT_CACHE_BUDGET_MB,
                  extra_sources: tuple[str, ...] = (), node_tag_class: str = NODE_TAG_CLASS,
                  cited_families: tuple[str, ...] = (),
-                 build_qid_cutoff: dict[str, int] | None = None, export_dir: str | None = None):
+                 build_qid_cutoff: dict[str, int] | None = None, export_dir: str | None = None,
+                 exclude: tuple[str, ...] = ()):
         self.root = root
         self.path = root / CONF_NAME
         self.memory_root = memory_root
@@ -230,6 +234,10 @@ class Conf:
         # DECLARED extra corpus sources, repo-relative. Empty is the pre-widening corpus
         # exactly, which is what an adopter whose conf has no such key must keep getting.
         self.extra_sources = extra_sources
+        # `RECALL_EXCLUDE`: repo-relative glob patterns the ONE corpus walk leaves out
+        # (TOOL-aMendedFleet-27). Globbed where the sources above are declared, because an exclusion
+        # only takes answers away and a glob is what keeps a new archived snapshot from being missed.
+        self.exclude = exclude
 
     def digest(self) -> str:
         """A hash of the RESOLVED values, not of the conf file's bytes.
@@ -256,9 +264,10 @@ class Conf:
         # Measured: without it, editing the declaration left the index warm and the corpus stale,
         # so both arms proving the widening is opt-in were answered by a cached number.
         # `cited_families` is in the blob beside `node_tag_class`: both change which strings are ids.
+        # `exclude` is in it for the `extra_sources` reason: it changes WHICH documents exist.
         blob = "\0".join((self.memory_root, ",".join(sorted(self.families)), self.node_tag_class,
                           " ".join(self.extra_sources), KIT_MEMORY_RECALL_VERSION,
-                          ",".join(sorted(self.cited_families))))
+                          ",".join(sorted(self.cited_families)), " ".join(self.exclude)))
         return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
 
 
@@ -329,7 +338,7 @@ def resolve(root: pathlib.Path | None = None) -> Conf:
                                            "a repo-relative directory inside the root"))
     out = Conf(base, memory_root, families, _budget(conf.get("RECALL_CACHE_BUDGET_MB")),
                tuple(conf.get("RECALL_EXTRA_SOURCES", "").split()), tag_class, cited, cutoff,
-               export_dir)
+               export_dir, tuple(conf.get("RECALL_EXCLUDE", "").split()))
     if root is None:
         _cached = out
     return out
@@ -363,6 +372,7 @@ def main() -> int:
     print(f"CITED_FAMILIES={' '.join(c.cited_families)}")
     print(f"BUILD_QID_CUTOFF={' '.join(f'{k}:{v}' for k, v in sorted(c.build_qid_cutoff.items()))}")
     print(f"EXPORT_DIR={c.export_dir or ''}")
+    print(f"RECALL_EXCLUDE={' '.join(c.exclude)}")
     print(f"CONF_DIGEST={c.digest()}")
     print(f"KIT_VERSION={KIT_MEMORY_RECALL_VERSION}")
     return 0

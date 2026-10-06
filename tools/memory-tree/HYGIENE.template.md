@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.132 -->
+<!-- gov:kit memory-tree@2.133 -->
 # {{MEMORY_ROOT}}/ retention & hygiene
 
 `{{MEMORY_ROOT}}/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -197,7 +197,13 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    `BUILD_README_CAP_BYTES` (25 KB) with `BUILD_README_CAP_LINES` at 0, which means NO independent
    line cap for that class; and a codebase-map dossier ≤ `DOSSIER_CAP_BYTES` (20 KB) with no line cap,
    reached only where a map is adopted and guarded on a non-empty prefix, because an unguarded selector
-   would hand the dossier bound to the whole tree. A cap that is not a whole number, or a zero BYTE cap, is refused before
+   would hand the dossier bound to the whole tree. A build README is priced by its authored bytes:
+   its `wc -c` figure less every line from a `<!-- gen:build-index -->`, `<!-- gen:build-order -->`
+   or `<!-- gen:build-edges -->` marker through its matching close, and less the front matter's
+   `ids:` line, so the generated half never bills the cap at any roster size; a README whose pairs
+   do not balance is priced whole. This check does NOT verify that a region's bytes really are
+   generated — check 9 does, by re-rendering the three regions and byte-comparing them
+   (TOOL-aMendedFleet-84). A cap that is not a whole number, or a zero BYTE cap, is refused before
    any check runs: the gate exits 2 naming the key rather than reporting a tree it could not
    measure (grandfather:
    `curation-debt.txt` exempts either). A guide is MANDATORY reading the charter points a session at,
@@ -303,6 +309,9 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     a record of a moment or an append-only file is not a claim about now. The waiver is not a
     citation. It carries a shrink-only pin (`ORPHAN_ID_PIN`) and a stale-entry guard: a waived
     id that now resolves, or that no present-tense file cites, is a stale row and reds.
+    An id with no record is cited as `missing:` written immediately before the id: it is no orphan,
+    joins no build's roster, and `--report` counts it on its own line. That form naming an id the
+    corpus DEFINES reds in a present-tense file, as marked missing but defined, naming both files.
 15. **dead repo-path citations** — a rooted repo-path citation in the PRESENT-tense corpus that
     resolves to nothing must be registered in `project/corpus-path-unresolved.txt`. A DIRECTORY
     citation counts: it is exactly as broken when it does not resolve, and the flatten left four of
@@ -317,6 +326,9 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     `builds/<slug>/BACKLOG.md`: the ask keeps its path grading and the view's derived text does not.
     The member is replaced rather than dropped, because dropping it alone would take every graded
     ask path token out of this check and report green.
+    The build READMEs `LIVE.md` links are an ADVISORY population: their dead citations, a trailing
+    `:<line>` locator cut first, print as one NON-GATING `HYGIENE advisory check 15:` note and are
+    never registered, because a build README is a record of its moment.
 16. **read-path accounting** — the files `CHARTER` points a session at, under `MEMORY_ROOT`, derived
     from the charter's own text through three token arms. TWO rules, and NO byte budget: rule 3 is
     that every member is byte-capped by check 6 or listed in `READ_PATH_WAIVER`, because a charter
@@ -353,6 +365,9 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     reachable on paper, dead in practice. The `universal` set is budgeted (`UNIVERSAL_BUDGET`)
     because every universal record is emitted on EVERY reviewer's checklist. An invariant is graded
     the same way with no universal escape: unanchored or marked `universal` is a finding.
+    A class anchor that selects no tracked path is reported by one NON-GATING
+    `HYGIENE advisory check 19:` line naming the counts, never the exit status; `gotchas.py --report`
+    lists each one.
 
 20. **one id, one row per document** — within a single row document (the decision index, a backlog
     shard, and the rotated archive of either) an id appears at most once. An archive is recognised by

@@ -39,6 +39,16 @@
 // IT SPELLS NO PATHS. The driver spelling, the ground text, the per-pass checklist command and both
 // document paths arrive in `args`, so this file carries no install-prefix literal and needs no
 // ratchet row and no method-carriers row.
+//
+// `prebuild` IS OPTIONAL AND OFF BY DEFAULT (TOOL-aMendedFleet-74). A caller that passes it — today
+// the command is `python <prefix>/memory-tree/gotchas.py --for-paths` — hands the unit agent the
+// bug-class checklist over its declared write set BEFORE it writes code, beside the post-commit one
+// it always gets. With the key absent the prompt, options and log are byte-identical to the file
+// without it. It stays off until a build has measured whether it cuts checklist-fix commits against
+// builds without it; whichever unit flips that default also gives the parent a switch. Its budget is
+// the checklist's own tiered cut, not a cap chosen here: two budgets would be two answers to one
+// question. The value is refused unless it is a non-empty single-line string with no backtick, since
+// it is spelled into the prompt inside backticks.
 export const meta = {
   name: 'unattended-unit',
   version: '1.1', // gov:kit unattended-unit@1.1 — engine identity (deployed verbatim)
@@ -109,6 +119,18 @@ if (cfg.mode !== 'attended' && cfg.mode !== 'unattended') {
   )
 }
 
+// `prebuild` IS NOT A `check()` CALL EITHER: `check` asserts presence and this key is optional. When
+// present it must be one line with no backtick, or one value could rewrite the prompt around it.
+if (
+  cfg.prebuild !== undefined &&
+  (typeof cfg.prebuild !== 'string' || cfg.prebuild === '' || /[\r\n`]/.test(cfg.prebuild))
+) {
+  throw new Error(
+    'unattended-unit: args `prebuild` must be a non-empty single-line string with no backtick, got ' +
+      JSON.stringify(cfg.prebuild) + '. Omit the key to leave the pre-build checklist off.',
+  )
+}
+
 // `why` is REQUIRED and is never an absence: an empty result with no reason is indistinguishable
 // from a clean pass over nothing.
 const UNIT_SCHEMA = {
@@ -161,6 +183,15 @@ const PROMPT =
   '. The spec is the design; where you must diverge, CHANGE THE SPEC FIRST as a rev-N bump with its ' +
   'section 9 line, then write the code.\n' +
   DRIVER_STEPS +
+  // TOOL-aMendedFleet-74 — empty unless the caller passed `prebuild`, so a default prompt is unchanged.
+  // FILE paths, never a directory: a directory selects the whole catalogue, not a checklist.
+  (cfg.prebuild === undefined
+    ? ''
+    : 'Once your write set is ' + (cfg.mode === 'attended' ? 'written down' : 'declared') +
+      ', and before you write any code, run `' + cfg.prebuild + '` followed by every FILE path in that ' +
+      'write set, never a directory. An item the checklist prints in full is a bug class to design ' +
+      'against now. A one-line item is a pointer: read it when its class matches what you are about ' +
+      'to write. The checklist after your commit still runs as well.\n') +
   // TOOL-aProbedUnit-1 and TOOL-aDeferredBar-1 — ONE block, mode-independent, carrying both builds'
   // literals: the two landed the same rule from two sessions on one day and the merge folded them
   // into one paragraph rather than two answers. The bar is named by ROLE and by its spellings, never
@@ -192,6 +223,8 @@ const PROMPT =
   'naming this unit again, forever.\n' +
   'Then run `' + cfg.checklist + '` and act on what it names ' +
   'before you return. Return committed:false with a `why` rather than a commit you cannot stand behind.'
+
+if (cfg.prebuild !== undefined) log('unit ' + cfg.unitId + ': prebuild checklist `' + cfg.prebuild + '`')
 
 const r = await agent(PROMPT, { label: 'unit:' + cfg.unitId, schema: UNIT_SCHEMA })
 

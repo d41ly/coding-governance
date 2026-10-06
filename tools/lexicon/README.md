@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.18 -->
+<!-- gov:kit lexicon@1.19 -->
 # lexicon — a declared naming vocabulary, gated
 
 An OPT-IN kit that gates two naming predicates against a per-repo DECLARATION, and refuses an import
@@ -425,6 +425,25 @@ offender moves it, and it cuts its re-lists at 40, which can hide a new offender
 This mode carries no line number, no count and no cut; a key repeating inside one file carries
 `#<k>`, its occurrence ordinal there in line order, so two identical offenders stay two. The default
 mode's output is unchanged.
+
+### `--merge-losses <a>..<b>` — a merge that loses a definition a parent carried
+
+`python <kit>/lexicon.py --merge-losses <a>..<b>` grades every two-parent merge in the range at
+DEFINITION level, through the same extractors the naming predicates use. For merge M with parents P1,
+P2 and base B, over the armed paths where M differs from either parent, a `(path, name)` in a parent
+and not in M is a candidate, unless it is in B and absent from the other parent (that side took it
+out). A candidate clears, counted and printed, as `masked` when M defines the name at a path the
+carrying parent did not (a move), `restored` when the range tip defines it at the lost path or at such
+a new path, or `superseded` when M's message carries `superseded: <name> -> <successor>` and M defines
+the successor. What remains is a loss, one line each with the merge, parent, path and name, then the
+remedy. Exit 0 clean, 1 a loss or a `superseded:` line naming no definition, 2 a DEAD PROBE (no
+declaration, no armed language, a failed git call, or armed paths read and no definition found).
+Every run prints one summary line with its counts and seconds. The push-main kit's `pre-push` hook
+runs it over a default-branch push, and its lander runs it at `--prepare` (TOOL-aMendedFleet-3).
+
+What it does NOT see: a body that lost lines under a surviving name, or any loss below definition
+level; a language the declaration does not arm; a loss masked by a same-named definition at a new
+path; an octopus or base-less merge, each skipped by name.
 
 ## Vacuity is armed on BOTH sides
 

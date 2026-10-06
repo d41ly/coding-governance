@@ -372,6 +372,9 @@ done
 o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
 has "S1 the AUDIT stage invokes tier2-review as a SUB-WORKFLOW from the script" "$o" \
     "workflow:${PFX}${KIT}/tier2-review.js"
+# TOOL-aMendedFleet-111 AC8: the spec-audit call passes `workerType: 'none'`, so every judge writes its
+# file and the deferred `next`'s promise that a re-run reuses them holds. Staged red by deleting it.
+has "aMF-111 AC8 the spec-audit call passes workerType none" "$(printf '%s\n' "$o" | grep '^wargs:')" '"workerType":"none"'
 
 # S3 — CONVERGING paired with 0 blockers is REFUSED BY NAME. A loop with nothing left to
 # converge on has converged, so the pairing is this repo's signature for a record no verb
@@ -1053,6 +1056,28 @@ has "scratch: the child REFUSES args with no scratch" "$o" "must carry an explic
 o=$(run_wf "$(printf "$CHILD_ARGS" unattended | sed 's#"ground":"G. goes under /tmp/s. "#"ground":"G. "#')" '{}' "$C")
 has "scratch: the child REFUSES a ground that names no scratch" "$o" "names no \`/tmp/s\`"
 has "scratch: the child prompt opens with the ground that names it" "$childU" "prompt:unit:A-tB-1:G. goes under /tmp/s. "
+
+# TOOL-aMendedFleet-74 — `prebuild` is OPTIONAL and DARK. With it, the paragraph sits between the
+# driver steps and the no-gate paragraph (the two joins pin both neighbours) and a log line names it;
+# attended mode gets the paragraph and still no recording-verb order. Without it nothing appears:
+# the base child read no such key, so its absence is the base prompt. The value is refused before
+# any spawn unless it is a non-empty one-line string with no backtick.
+CHILD_PB='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. goes under /tmp/s. ","checklist":"CK","prebuild":%s,"mode":"%s"}'
+o=$(run_wf "$(printf "$CHILD_PB" '"PB --for-paths"' unattended)" '{}' "$C")
+has "prebuild: the paragraph follows the --brief order" "$o" "--path b1\`. Once your write set is declared, and before you write any code, run \`PB --for-paths\` followed by every FILE path"
+has "prebuild: ...and precedes the no-gate paragraph" "$o" "still runs as well. NO GATE, SUITE OR BAR RUNS"
+has "prebuild: the log names the unit and the command" "$o" "log:unit A-tB-1: prebuild checklist \`PB --for-paths\`"
+o=$(run_wf "$(printf "$CHILD_PB" '"PB --for-paths"' attended)" '{}' "$C")
+has "prebuild: the ATTENDED prompt carries the paragraph" "$o" "Once your write set is written down, and before you write any code, run \`PB --for-paths\`"
+hasnt_ "prebuild: ...and still no --dispatch order" "$o" "--dispatch tB"
+hasnt_ "prebuild absent: no paragraph in the UNATTENDED prompt" "$childU" "Once your write set is"
+hasnt_ "prebuild absent: no paragraph in the ATTENDED prompt" "$childA" "Once your write set is"
+hasnt_ "prebuild absent: no log line" "$childU" "prebuild checklist"
+for v in 7 '""' '"a\nb"' '"a`b"'; do
+  o=$(run_wf "$(printf "$CHILD_PB" "$v" unattended)" '{}' "$C")
+  has "prebuild: the child REFUSES $v" "$o" "THROW unattended-unit: args \`prebuild\`"
+  hasnt_ "prebuild: ...before any spawn for $v" "$o" "agent:unit"
+done
 
 # ========================= F4 (closing review, HIGH) — DISPOSED-BUT-STANDING IS NOT DISPOSED
 # `{disposed:true, standing:['b1']}` validated against DISPOSAL_SCHEMA, cleared a guard that tested
@@ -2549,6 +2574,12 @@ hasnt_ "GH35 ...and no WARNING prints" "$o" "$GH35_WARN"
 # `n=$((n+1))` sites — the PV-AC12 branch's among them, the one region that can SKIP — are not in
 # the static count, so it is a LOWER bound on what a green run executes. Lower it in a reviewed
 # diff or not at all.
+# On the origin/main side: TOOL-aEvidencedLens-8 raised it by the 17 static sites its arms added (478 to
+# 495), its seven-arm S1 loop counted once. TOOL-aEvidencedLens-21 raised it by the 8 static sites its
+# arms added, 371 to 379: the four-pair prelude loop's two sites counted once, and six D21 sites.
+# RAISED 293 -> 294 by TOOL-aMendedFleet-111: the spec-audit call's `workerType` arm (1).
+# MERGED 293 -> 380: theirs raised by 86 to 379, ours by 1 to 294; the merge carries both.
+# On the aGraftedHelix side:
 # RAISED 293 -> 301 by TOOL-aGraftedHelix-3: the eight GH3 sites, counted off the block — the resolver's
 # checklist forwarded and logged (2), its absence warned with no key passed (2), the caller's precedence
 # (2) and the rendered resolver prompt's instruction (2).
@@ -2594,7 +2625,9 @@ hasnt_ "GH35 ...and no WARNING prints" "$o" "$GH35_WARN"
 # loop (one site run four times) and its mid-literal line (1), and the real-tree graded floor, counted by
 # hand (1). Measured on a slice of the GH3, GH29, GH15, BT3 and GH33-GH35 blocks behind this prologue on
 # node a, 2026-10-06. All of them sit on the path a green run takes.
-FLOOR_ASSERTIONS=565
+# MERGED 379 -> 566 at the reconcile of local main into origin/main: base 379, plus aMendedFleet's 1
+# (380) and aGraftedHelix's 186 (565).
+FLOOR_ASSERTIONS=566
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

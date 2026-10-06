@@ -66,6 +66,7 @@ a hand-edited copy reds the adopter's `--check` arm.
 | why it stopped | the record's Summary phase and its Anomalies | the run-state file's last rows, then narration at the last act |
 | what it decided without asking | the record's Decisions, and its Summary's owner-turn counts | the model's `ledger`, which carries the commits' `Decided:` trailers |
 | what it cost | the record's Summary usage lines | the model's cost section, its `usage` field |
+| which gate legs ever go red | `python tools/runlog/runlog.py journal --producer gates --by-leg --legs <gate-leg manifest>`, one row per leg over every bar this clone recorded | its stderr window, whose `bars` is only an upper bound for a guarded or held leg |
 
 ## When a source is missing
 
@@ -103,6 +104,6 @@ a hand-edited copy reds the adopter's `--check` arm.
 
 ## What this does not answer
 
-- Trends across many runs. One run at a time.
+- Trends across many runs. One run at a time, except the gate-leg row above, which counts bars.
 - Whether a decision was right. The record and the model judge no decision's quality, and neither
   does this Skill.

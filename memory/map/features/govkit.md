@@ -12,6 +12,7 @@ gate-legs = ["govkit selfcheck", "govkit selftest", "govkit refusal join", "govk
   "kit epoch (shipped bytes move, the version moves)"]
 kits = ["govkit"]
 git-hooks = []
+harness-hooks = []
 workflow-scripts = []
 skill-engines = ["deploy-governance"]
 rendered-skills = []

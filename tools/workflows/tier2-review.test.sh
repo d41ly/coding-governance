@@ -247,7 +247,7 @@ async function runReview(args, stubs, source) {
   const logs = []
   const agent = async (prompt, opts) => {
     const label = (opts && opts.label) || '(unlabelled)'
-    trace.push({ label: label, prompt: String(prompt), schema: opts && opts.schema })
+    trace.push({ label: label, prompt: String(prompt), schema: opts && opts.schema, agentType: opts && opts.agentType })
     let v = resolveStub(stubs, label)
     if (typeof v === 'function') v = v(label, String(prompt))
     return v === undefined || v === null ? null : JSON.parse(JSON.stringify(v))
@@ -265,8 +265,10 @@ async function runReview(args, stubs, source) {
 
 const B = 'b'.repeat(40)
 const H = 'c'.repeat(40)
-const DIFF = { repo: '/tmp/r', base: B, head: H, round: 1, context: 'ctx', reviewDir: 'memory/reviews' }
-const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 's.md', blob: 'abc1234' }], scratch: '/tmp/s' }
+// TOOL-aMendedFleet-93 S4 - absent `workerType` reads as Plan, so the durable-spawn arms below pin `none`,
+// which spawns exactly as an absent value did before the default.
+const DIFF = { repo: '/tmp/r', base: B, head: H, round: 1, context: 'ctx', reviewDir: 'memory/reviews', workerType: 'none' }
+const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 's.md', blob: 'abc1234' }], scratch: '/tmp/s', workerType: 'none' }
 const buildProbe = (finds, verifies, base, head) => ({ commonDir: '/cd', base: base || B, head: head || H, finds: finds || [], verifies: verifies || [] })
 // One finding per lens, so five lenses make five ids and five batches of one: verify:ids-1-1 .. 5-5.
 const buildLensReturn = (label) => {
@@ -367,6 +369,36 @@ async function runWholeScriptArms() {
   if (checkNoThrow(r, 'dead probe')) {
     ck(r.scanSpawned('find:').length === 5, 'AC4 a dead probe dispatches all five lenses')
     ck(r.logs.some((l) => l.indexOf('nothing could be reused') !== -1), 'AC4 ...and the log says nothing could be reused')
+  }
+
+  // ---- TOOL-aMendedFleet-67 S5 - `workerType` routes the JUDGES and only them, and they write nothing.
+  // ---- The default half reads the first run's judges, so an arm that always sets the option reds here.
+  ck(finds.concat(verifies).every((t) => t.agentType === undefined), 'workerType: none, no judge spawn carries an agentType')
+  const ABSENT = Object.assign({}, DIFF)
+  delete ABSENT.workerType
+  const rd = await runReview(ABSENT, ALL_OK)
+  let KP = ''
+  if (checkNoThrow(rd, 'workerType absent run')) {
+    KP = rd.result.key
+    ck(rd.trace.filter((t) => /^(find|verify):/.test(t.label)).length === 10 &&
+      rd.trace.filter((t) => /^(find|verify):/.test(t.label)).every((t) => t.agentType === 'Plan'),
+      'workerType: absent, every finder and skeptic batch spawns as Plan (TOOL-aMendedFleet-93 S4)')
+  }
+  r = await runReview(Object.assign({}, DIFF, { workerType: 'Plan' }), ALL_OK)
+  if (checkNoThrow(r, 'workerType run')) {
+    ck(r.result.key === KP, 'workerType: an explicit Plan run keys as an absent one')
+    const judges = r.trace.filter((t) => /^(find|verify):/.test(t.label))
+    const orch = r.trace.filter((t) => !/^(find|verify):/.test(t.label))
+    ck(judges.length === 10 && judges.every((t) => t.agentType === 'Plan'), 'workerType: all five finders and five skeptic batches spawn as Plan')
+    ck(orch.length === 2 && orch.every((t) => t.agentType === undefined), 'workerType: the probe and the synthesis carry none: ' + orch.map((t) => t.label).join(' '))
+    ck(judges.every((t) => t.prompt.indexOf('DURABILITY') === -1), 'workerType: no judge is told to write a lens or verify file')
+    ck(judges.every((t) => t.prompt.indexOf('Set path to an empty string') !== -1), 'workerType: every judge is told to return path empty')
+    ck(r.logs.some((l) => l.indexOf('worker type Plan') === 0 && l.indexOf('NOT durable') !== -1), 'workerType: the log says the results are not durable')
+    ck(r.result.key !== K, 'workerType: the key differs from the default run\'s, so no default lens file answers it')
+  }
+  for (const [lbl, v] of [['two words', 'two words'], ['a number', 7], ['65 characters', 'A'.repeat(65)]]) {
+    r = await runReview(Object.assign({}, DIFF, { workerType: v }), ALL_OK)
+    ck(!!r.threw && r.threw.indexOf('workerType') !== -1 && r.trace.length === 0, 'workerType: ' + lbl + ' is refused before any spawn')
   }
 
   // ---- AC2: two lenses die; the re-run is fed the three survivors' files and dispatches exactly two.
@@ -470,6 +502,31 @@ async function runWholeScriptArms() {
   if (checkNoThrow(r, 'AC7 tally fault')) {
     ck(r.result.exit === 'complete' && r.result.blockers === null, 'AC7 a synthesis leaving one confirmed id out: complete beside blockers null')
   }
+
+  // ---- TOOL-aMendedFleet-111 AC7: every deferred note and `durable` follow `workerType`. Under the
+  // ---- absent default, Plan, no judge wrote a file, so the note says a re-run dispatches every judge
+  // ---- again and `durable` is false; under `none` the note keeps "dispatch only" and `durable` is
+  // ---- true. Staged red by restoring the unconditional "dispatch only" wording.
+  const ABS111 = Object.assign({}, DIFF); delete ABS111.workerType
+  r = await runReview(ABS111, buildStubs({ 'find:': null }))
+  if (checkNoThrow(r, 'aMF-111 AC7 absent, lenses dead'))
+    ck(r.result.durable === false && r.result.note.indexOf('dispatches every finder and skeptic again') !== -1 && r.result.note.indexOf('dispatch only') === -1,
+      'aMF-111 AC7 workerType absent, every lens dead: durable false, the note re-dispatches every judge')
+  r = await runReview(DIFF, buildStubs({ 'find:': null }))
+  if (checkNoThrow(r, 'aMF-111 AC7 none, lenses dead'))
+    ck(r.result.durable === true && r.result.note.indexOf('dispatch only find:') !== -1,
+      'aMF-111 AC7 workerType none, every lens dead: durable true, the note dispatches only the dead')
+  r = await runReview(ABS111, buildStubs({ synth: null }))
+  if (checkNoThrow(r, 'aMF-111 AC7 absent, synthesis dead')) {
+    ck(r.result.durable === false && r.result.note.indexOf('every finder and skeptic again, plus the synthesis') !== -1,
+      'aMF-111 AC7 workerType absent, the synthesis dead: durable false, the note re-dispatches every judge and the synthesis')
+    ck(r.logs.some((l) => l.indexOf('the synthesis agent DIED') !== -1 && l.indexOf('plus the synthesis') !== -1 && l.indexOf('dispatches only the synthesis') === -1),
+      'aMF-111 AC7 ...and the synthesis-died log says the same')
+  }
+  r = await runReview(DIFF, buildStubs({ synth: null }))
+  if (checkNoThrow(r, 'aMF-111 AC7 none, synthesis dead'))
+    ck(r.result.durable === true && r.result.note.indexOf('dispatch only the synthesis') !== -1,
+      'aMF-111 AC7 workerType none, the synthesis dead: durable true, the note dispatches only the synthesis')
 
   // ==== TOOL-aSightedSkeptic-5 — five diff lenses, `lensNotes`, and the review-shape bump ===========
   // ---- AC1: the lens set and its ORDER, read off what a complete run actually spawns.
@@ -1281,10 +1338,10 @@ async function runLedgerArms() {
     const rows = al.slice(4)
     const unescaped = (row) => row.split('').filter((ch, i) => ch === '|' && row[i - 1] !== '\\').length
     ck(al[0] === '## Appendix — every finding' && al[1] === '' &&
-      al[2] === '| id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict |' && al[3] === '|---|---|---|---|---|---|---|---|' &&
+      al[2] === '| id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes |' && al[3] === '|---|---|---|---|---|---|---|---|---|' &&
       rows.length === 5 && rows.length === r.result.ledger.length && rows[0].indexOf('| 1 | security | security.js:1 | high | - | refuted |') === 0,
-      'ledger: the appendix is rendered by the harness: heading, eight columns, one row per finding, the refuted one included')
-    ck(rows.length === 5 && rows.every((row) => unescaped(row) === 9) && rows[0].indexOf('x \\| y z') !== -1 && ap.indexOf('\r') === -1,
+      'ledger: the appendix is rendered by the harness: heading, nine columns, one row per finding, the refuted one included')
+    ck(rows.length === 5 && rows.every((row) => unescaped(row) === 10) && rows[0].indexOf('x \\| y z') !== -1 && ap.indexOf('\r') === -1,
       'ledger: the appendix is rendered by the harness: a pipe and a line break in a cell leave the row count unchanged')
     const sp = r.trace.find((t) => t.label === 'synth')
     ck(ap.length > 0 && !!sp && sp.prompt.indexOf(ap) !== -1 && sp.prompt.indexOf('VERBATIM') !== -1,
@@ -1298,6 +1355,23 @@ async function runLedgerArms() {
     const al = ap.split('\n')
     ck(al.length === 9 && ap.split(/\r\n|[\n\r\x0b\x0c\x1c-\x1e\x85\u2028\u2029]/).length === al.length && al[4].indexOf('| p q r s t u v w |') !== -1,
       'ledger: the appendix is rendered by the harness: a U+2028 in a reason cell leaves the row count unchanged')
+  }
+  // ---- TOOL-aMendedFleet-17 AC2: a claim's head labels resolve to the run's item slugs in `classes`,
+  // ---- an out-of-range label stays `C<n>`, and an unlabelled claim renders `-` in the ninth column.
+  const buildLabelLens = (label) => {
+    const lr = buildLensReturn(label)
+    if (lr.lens === 'security') lr.findings[0].claim = 'C2 — x'
+    if (lr.lens === 'correctness') lr.findings[0].claim = '[C1] C9: y'
+    return lr
+  }
+  r = await runReview(Object.assign({}, DIFF, { checklist: ['[ ] alpha-one (universal)', '[ ] beta-two'] }), buildStubs({ 'find:': buildLabelLens }))
+  if (checkNoThrow(r, 'ledger classes')) {
+    const lg = Array.isArray(r.result.ledger) ? r.result.ledger : []
+    const al = (typeof r.result.appendix === 'string' ? r.result.appendix : '').split('\n')
+    ck(lg.length === 5 && JSON.stringify(lg.map((e) => e.classes)) === JSON.stringify([['beta-two'], ['alpha-one', 'C9'], [], [], []]) &&
+      al[2].endsWith(' | fixVerdict | classes |') && al[4].endsWith(' | beta-two |') && al[5].endsWith(' | alpha-one C9 |') &&
+      al.slice(6).every((row) => row.endsWith(' | - |')),
+      'ledger: classes resolves each head label to its item slug, keeps C<n> out of range, and renders - when unlabelled')
   }
 
   // ---- AC6: six exit paths. `confirmed` keeps its per-path type, which unattended-build.js reads.
@@ -1316,6 +1390,14 @@ async function runLedgerArms() {
   // complete path alone, and ABSENT on the other five, since no adjudicated count exists there.
   let regradedSeen = 0
   const regradedWrong = []
+  // TOOL-aMendedFleet-18 - each exit's `shape` matches the S1 grammar at the stage its path reaches,
+  // is logged, and reads `out-tokens=unknown` because the stub runtime's `budget` has no `spent`.
+  const SHAPE_RE = /^review-shape kind=(diff-review|spec-audit) round=\d+ intensity=(full|light) at=(find|verify|synth) raw=(\d+|-) confirmed=(\d+|-) refuted=(\d+|-) unverified=(\d+|-) blocker=(\d+|-) high=(\d+|-) medium=(\d+|-) low=(\d+|-) agents=\d+ out-tokens=unknown$/
+  const shapeStage = { 'every lens dead': 'find', 'no finding raised': 'find', 'every finding refuted': 'verify',
+    'one skeptic batch dead': 'verify', 'the synthesis dead': 'synth', complete: 'synth' }
+  let shapeSeen = 0
+  const shapeWrong = []
+  let synthPromptShape = false
   for (const [what, stubs, ctype, extra] of paths) {
     r = await runReview(DIFF, stubs)
     if (!checkNoThrow(r, 'ledger exit ' + what)) continue
@@ -1323,9 +1405,20 @@ async function runLedgerArms() {
     ck(fieldsOk(r) && typed && extra(r.result), 'ledger: every exit path carries the ledger: ' + what)
     regradedSeen++
     if (what === 'complete' ? !Array.isArray(r.result.regraded) : 'regraded' in r.result) regradedWrong.push(what)
+    shapeSeen++
+    const sh = typeof r.result.shape === 'string' ? r.result.shape : ''
+    if (!SHAPE_RE.test(sh) || sh.indexOf(' at=' + shapeStage[what] + ' ') === -1 || r.logs.indexOf(sh) === -1) shapeWrong.push(what)
+    if (what === 'complete') {
+      const sp = r.trace.find((t) => t.label === 'synth')
+      synthPromptShape = !!sp && sh.length > 0 && sp.prompt.indexOf('<<<SHAPE\n' + sh + '\nSHAPE>>>') !== -1 &&
+        sh.indexOf(' raw=5 confirmed=5 refuted=0 unverified=0 ') !== -1 && sh.indexOf(' agents=11 ') !== -1
+    }
   }
   ck(regradedSeen === 6 && regradedWrong.length === 0,
     'severity: regraded is returned only where a synthesis ran, over the six exit paths' + (regradedWrong.length ? ' — wrong on: ' + regradedWrong.join(', ') : ''))
+  ck(shapeSeen === 6 && shapeWrong.length === 0,
+    'shape: every exit returns and logs a review-shape line at the stage it reached, out-tokens unknown under the stub' + (shapeWrong.length ? ' — wrong on: ' + shapeWrong.join(', ') : ''))
+  ck(synthPromptShape, 'shape: the synthesis is handed the at=synth line the complete return carries, with the run\'s counts')
 
   // ==== TOOL-aEvidencedLens-3 — the spec skeptic confirms by the rubric, re-runs the evidence, and an
   // ==== ORPHANED duplicate is demoted. One finding per lens carries one-line, two-line or no evidence;
@@ -1753,6 +1846,17 @@ printf '%s\n' "$out"
 # RAISED 175 -> 180 by TOOL-aSightedSkeptic-10: 5 assertions, counted off the block — the synthesis-death
 # log's binding grade and rendered fix (2), the deferred log's binding grade (1), one uncertain answer
 # apart from no verdict (1) and an all-uncertain note (1).
+# RAISED 180 -> 181 by TOOL-aMendedFleet-17: 1 assertion, the ledger's `classes` and the appendix's
+# ninth column over labelled, out-of-range and unlabelled claims (1).
+# RAISED 181 -> 183 by TOOL-aMendedFleet-18: 2 assertions, counted off the block — every exit's
+# review-shape line at its stage (1) and the synthesis prompt carrying the complete return's line (1).
+# RAISED 183 -> 188 by TOOL-aMendedFleet-111: 5 assertions, counted off the block — `durable` and the
+# deferred note under an absent and a `none` workerType, for dead lenses (2) and a dead synthesis (2),
+# and the synthesis-died log under the absent type (1).
+# RAISED 188 -> 200 by TOOL-aMendedFleet-67: 12 assertions, counted off the block — the `workerType`
+# arms whose absent-type half TOOL-aMendedFleet-93 rewrote: the default run's judges (1), the absent
+# run (1), the explicit Plan run (7) and the refusal loop's one call over three values (3). Landed
+# unpriced; TOOL-aMendedFleet-112 priced it, and no suite ran in that pass.
 # RAISED 180 -> 186 by TOOL-aGraftedHelix-3: 6 assertions, counted off the block — the block logged and
 # in RUN INTEGRITY (1), the entry as intended behaviour and never an item (1), a caller byDesign beside a
 # block, logged and named (1) and under its own label (1), the count refusal (1) and the header-only
@@ -1777,11 +1881,16 @@ printf '%s\n' "$out"
 # RAISED 231 -> 240 by TOOL-aEvidencedLens-21: 9 assertions, counted off the block — six prelude `spec
 # scratch:` arms for a relative repo, both MSYS spellings, a .. segment and two controls (6), the per-role
 # scratch rule (1) and the unmoved subject beside a moved one and alone (2).
-# MERGED at the second reconcile with origin/main: this side 186 plus main's 60 over 180 = 246.
+# MERGED 180 -> 260 (origin/main side): both builds raised from 180, aMendedFleet by 20 and
+# aEvidencedLens by 60, so the merge carries the sum of the two raises above.
+# MERGED at the second reconcile with origin/main (aGraftedHelix side): this side 186 plus main's 60
+# over 180 = 246.
 # RAISED 246 -> 250 by TOOL-aGraftedHelix-29: 4 assertions, counted off the block — the real checker
 # ran over the fixture range (1), one invariant logged (1), bd-base as intended behaviour with no
 # prompt carrying bd-new's ruling (1) and the added invariant swept as one lens's item (1).
-FLOOR_ASSERTIONS=250
+# MERGED 240 -> 270 at the reconcile of local main into origin/main: base 240, plus aMendedFleet's 20
+# (260) and aGraftedHelix's 10 (250).
+FLOOR_ASSERTIONS=270
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

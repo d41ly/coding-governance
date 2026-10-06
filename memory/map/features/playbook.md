@@ -11,6 +11,7 @@ decisions = ["TOOL-aSiftedPlaybook-1"]
 gate-legs = ["template size gate selftest", "playbook parity", "playbook parity selftest", "playbook render wiring", "playbook render selftest", "charter size", "micro-format definitions", "micro-format gate selftest", "line length", "line-length gate selftest"]
 kits = ["playbook"]
 git-hooks = []
+harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -99,7 +100,7 @@ map had no playbook dossier until now.
   themselves, and no gate reads them for accuracy. `TOOL-aSiftedPlaybook-3` adds structural parity
   checks over three classes of claim; a fluent paraphrase that is subtly wrong still passes, and
   that gate's own header says so.
-- **Nothing enforces that the high-water record shrinks.** `--bump` moves it in either direction and
+- **No check holds the high-water record to shrinking.** `--bump` moves it in either direction and
   says by how much; the visibility is the diff, not a gate.
 
 ## Reuse affordance

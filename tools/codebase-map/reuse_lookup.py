@@ -43,7 +43,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 
 try:  # a non-UTF-8 stdout (stripped CI locale) must degrade a non-ASCII query echo, not crash it
-    sys.stdout.reconfigure(errors="replace")
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except (AttributeError, ValueError):
     pass
 
@@ -63,6 +63,13 @@ NEIGHBOUR_CAP = 12
 # row that nobody has called expensive. Re-measure before trusting it. Cheap to raise, since
 # `n_sources` records what was cut.
 SOURCE_PATHS_CAP = 40
+# The byte budget for the header, candidate and sources blocks; `--budget 0` lifts it. The trailer
+# (partial-recall paragraph + Decision line) is printed outside it at every budget. TOOL-aMendedFleet-36
+# S4: the smallest value on 4096/8192/12288/16384/24576/32768 whose hit@budget over the replay corpus
+# is >= 0.97 of the unbounded hit rate. Measured 2026-10-05 on node a with `replay-phrases.py
+# --budget`, 440 graded phrases, unbounded hit rate 0.845: hit@24576 0.832 (0.985 of it), and the
+# value below, hit@16384 0.807 (0.955), misses the rule. Re-measure when the ranker or corpus moves.
+DEFAULT_BUDGET = 24576
 
 
 @dataclass(frozen=True)
@@ -81,7 +88,8 @@ class Candidate:
     detail: str = ""                # inventory id / owning dossier — human context
 
 
-# MULTI-LINE and COMMENTED arrays are legal TOML. This corpus has NEITHER today — measured, and
+# MULTI-LINE and COMMENTED arrays are legal TOML. This corpus had NEITHER when this was written, at
+# 504533fb4 (2026-09-05) — measured, and
 # said plainly, because an earlier revision of this comment claimed it had both in the build that
 # shipped the rule against assertions with no observation behind them. The handling is kept anyway:
 # the field is authored by hand, both shapes are legal, and without the strip a `# why` comment was
@@ -126,6 +134,10 @@ class Corpus:
     recall_dark: tuple[str, ...] = ()       # layers declared uncovered in .codebase-map.conf
     threshold: int = m.SEAM_FANIN_THRESHOLD_DEFAULT
     has_symbols: bool = False               # was symbols.json present (recall tier adopted)?
+    # TOOL-aMendedFleet-42: name -> files carrying an inlined canonical copy (source left out), and
+    # why the mapping is empty when it is. Read once per corpus, never per candidate.
+    installs: dict = field(default_factory=dict)
+    installs_reason: str = ""
 
 
 @dataclass
@@ -134,7 +146,8 @@ class Ranked:
     is_seed: bool                           # a token-stem / prose match to the query
     fanin: int
     reason: str                             # why it is on the list (for the agent)
-    is_seam: bool = False                   # a symbol whose fan-in >= the seam threshold
+    is_seam: bool = False                   # a symbol whose fan-in + installs >= the seam threshold
+    installs: int = 0                       # files carrying an inlined canonical copy of it
 
 
 @dataclass
@@ -240,6 +253,7 @@ def load_corpus(root: Path | None = None) -> Corpus:
             shared_seams[feature] = prose
 
     recall_dark = tuple(t for t in re.split(r"[,\s]+", conf.get("RECALL_DARK_LAYERS", "")) if t)
+    installs, installs_reason = m._scan_install_sites(root)
     return Corpus(
         candidates=candidates,
         shared_seams=shared_seams,
@@ -248,6 +262,8 @@ def load_corpus(root: Path | None = None) -> Corpus:
         recall_dark=recall_dark,
         threshold=m.seam_fanin_threshold(root),
         has_symbols=has_symbols,
+        installs=installs,
+        installs_reason=installs_reason,
     )
 
 
@@ -331,7 +347,7 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
 
     ranked: list[Ranked] = []
     for name, reason in seeds.items():
-        ranked.append(_rank(pool, corpus.threshold, ref_index, name, True, reason))
+        ranked.append(_rank(pool, corpus, ref_index, name, True, reason))
 
     # RANK THE WHOLE NEIGHBOUR POOL, THEN CAP. The cap used to slice `sorted(neighbours.items())`,
     # which is ALPHABETICAL, so the twelve slots went to the twelve names that sort earliest and
@@ -345,7 +361,7 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
     # Cost: `_rank` is one `fan_in` lookup per name, so this ranks the pool rather than a slice of
     # it. That is the price of the cap meaning anything, and it is paid once per probe.
     neighbour_ranked = [
-        _rank(pool, corpus.threshold, ref_index, name, False, reason)
+        _rank(pool, corpus, ref_index, name, False, reason)
         for name, reason in sorted(neighbours.items())
     ]
     neighbour_ranked.sort(key=_derive_shortlist_key)
@@ -356,24 +372,26 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
                      scan or {})
 
 
-def seed_affordances(corpus: Corpus, ref_index: dict[str, set[str]], top: int) -> list[tuple[Candidate, int]]:
-    """S4b — the bounded big-bang worklist: the ``top`` highest-fan-in seams (fan-in >= the seam
-    threshold) that NO dossier yet declares as a `## Reuse affordance` seam, so the
+def seed_affordances(corpus: Corpus, ref_index: dict[str, set[str]],
+                     top: int) -> list[tuple[Candidate, int, int]]:
+    """S4b — the bounded big-bang worklist: the ``top`` highest-scoring seams (fan-in + installs >=
+    the seam threshold, `TOOL-aMendedFleet-42` S3, the lookup's own test) that NO dossier yet declares as a `## Reuse affordance` seam, so the
     reinvention-prone active surface converges first. A symbol already carrying an affordance seam
     line has BOTH 'symbol' and 'affordance-seam' in its merged sources and is DONE (excluded);
     a symbol below the threshold is not a seam and is not worklist-worthy. Pure + deterministic:
-    ranked by fan-in desc then id. Fan-in is on demand (never committed) — same math as the lookup
-    and --converge so 'a seam' means one thing everywhere."""
-    scored: list[tuple[Candidate, int]] = []
+    ranked by fan-in + installs desc then id; each row is ``(candidate, fan-in, installs)``. Fan-in
+    is on demand (never committed) — same math as the lookup so 'a seam' means one thing everywhere."""
+    scored: list[tuple[Candidate, int, int]] = []
     for cand in corpus.candidates.values():
         if "symbol" not in cand.sources or not cand.files:
             continue  # only indexable symbols can have a fan-in / def file to point at
         if "affordance-seam" in cand.sources:
             continue  # already declared — off the worklist
         fanin = m.fan_in(ref_index, cand.name, cand.files)
-        if fanin >= corpus.threshold:
-            scored.append((cand, fanin))
-    scored.sort(key=lambda cf: (-cf[1], cf[0].name))
+        installs = len(corpus.installs.get(cand.name, ()))
+        if fanin + installs >= corpus.threshold:
+            scored.append((cand, fanin, installs))
+    scored.sort(key=lambda cf: (-(cf[1] + cf[2]), cf[0].name))
     return scored[:top]
 
 
@@ -400,12 +418,15 @@ def _derive_shortlist_key(r: Ranked) -> tuple:
     return (not r.is_seed, -r.fanin, r.candidate.name)
 
 
-def _rank(pool: dict[str, Candidate], threshold: int, ref_index: dict[str, set[str]],
+def _rank(pool: dict[str, Candidate], corpus: Corpus, ref_index: dict[str, set[str]],
           name: str, is_seed: bool, reason: str) -> Ranked:
     cand = pool[name]
     fanin = m.fan_in(ref_index, cand.name, cand.files) if cand.files else 0
-    is_seam = bool(cand.kind) and fanin >= threshold
-    return Ranked(cand, is_seed, fanin, reason, is_seam)
+    # TOOL-aMendedFleet-42 S2: installs make a SEAM and are printed, but never enter the ORDER —
+    # `_derive_shortlist_key` stays on fan-in, which is what the replay floor grades (spec F2).
+    installs = len(corpus.installs.get(cand.name, ()))
+    is_seam = bool(cand.kind) and fanin + installs >= corpus.threshold
+    return Ranked(cand, is_seed, fanin, reason, is_seam, installs)
 
 
 def _counts(corpus: Corpus) -> dict[str, int]:
@@ -415,6 +436,8 @@ def _counts(corpus: Corpus) -> dict[str, int]:
             if s in c:
                 c[s] += 1
     c["shared-seams"] = len(corpus.shared_seams)
+    c["install-files"] = len(set().union(*corpus.installs.values())) if corpus.installs else 0
+    c["install-names"] = len(corpus.installs)
     return c
 
 
@@ -423,24 +446,25 @@ def _counts(corpus: Corpus) -> dict[str, int]:
 # ======================================================================================
 
 
-def render(shortlist: Shortlist, corpus: Corpus) -> str:
-    # ASCII-only output: this prints to a console whose encoding is not guaranteed UTF-8 (a C/
-    # ASCII locale in CI, a Windows codepage), and a `print` of `—`/`·` there raises
-    # UnicodeEncodeError. Data (ids, paths) is already ASCII; keep the separators ASCII too.
+def _render_header(shortlist: Shortlist) -> list[str]:
+    """The banner lines `render` opens with, ending in a blank line. Its own function so
+    `derive_budget_cut` charges exactly the bytes `render` prints."""
     q = shortlist.query
     cc = shortlist.corpus_counts
-    out: list[str] = [
+    return [
         f'# reuse-lookup: "{q}"',
         f"# corpus: {cc.get('symbol', 0)} symbols | {cc.get('inventory', 0)} inventory keys | "
         f"{cc.get('affordance-seam', 0)} affordance seams | {cc.get('shared-seams', 0)} dossiers",
-        f"# a seam = fan-in >= {shortlist.threshold} (SEAM_FANIN_THRESHOLD)",
+        f"# a seam = fan-in + installs >= {shortlist.threshold} (SEAM_FANIN_THRESHOLD)",
         # What the neighbour ranking does NOT mean. Twelve high-fan-in names read as twelve SEAMS
         # to everybody who did not write the ranker, and the fan-in behind them counts bare
         # identifier tokens with no symbol resolution (TOOL-aScouredKit-16) -- so a common short
         # name scores high for reasons that have nothing to do with reuse. The line discloses the
         # signal's limit rather than repairing it, which is a different unit.
+        # TOOL-aMendedFleet-42 dropped the second line's restatement ("never 'this is the seam you
+        # want'") to pay for `+ installs` above: the replay floor's budget arm had zero slack.
         "# neighbours are ranked by fan-in, which counts NAME TOKENS and resolves no symbols:",
-        "# a high rank means 'this name appears a lot', never 'this is the seam you want'",
+        "# a high rank means 'this name appears a lot'",
         # S6 — WHAT THE SCAN COULD NOT SEE, on every call. A fail-open reference scan that reports
         # nothing makes a ranking over half a corpus look exactly like a ranking over all of it,
         # which is the liveness failure `AGENTS.md` §7 names. Three facts, always printed: how many
@@ -450,18 +474,88 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
         _scan_line(shortlist),
         "",
     ]
+
+
+_CANDIDATES_HEAD = "## candidates (ranked - read these before building)"
+_SOURCES_HEAD = "## sources to open"
+_NO_SOURCES = "(no file-backed sources - inspect the candidates above)"
+
+
+def derive_budget_cut(shortlist: Shortlist, corpus: Corpus, budget: int) -> tuple[list[Ranked], int]:
+    """The ranked candidates to SHOW within ``budget`` bytes, and how many were cut.
+
+    TOOL-aMendedFleet-36 S1, the rule of `emit` in the recall kit's `query.py`, copied rather than
+    imported (another kit). Walks the ranking in order, charging each candidate its `_line` plus the
+    source lines it adds that no earlier candidate added, on top of the header, and stops before the
+    first candidate that would take the header + candidates + sources blocks past ``budget``. The
+    FIRST candidate is always shown, so a tight budget never reads as "no seam fits". 0 shows all.
+    """
+    ranked = shortlist.ranked
+    if budget <= 0 or not ranked:
+        return list(ranked), 0
+
+    def measure_bytes(line: str) -> int:
+        return len(line.encode("utf-8")) + 1  # + the newline `render` joins with
+
+    fixed = sum(measure_bytes(x) for x in _render_header(shortlist))
+    fixed += measure_bytes(_CANDIDATES_HEAD) + measure_bytes("") + measure_bytes(_SOURCES_HEAD)
+    root_name = _derive_map_root_name()
+    seen: set[str] = set()
+    cand_bytes = src_bytes = 0
+    shown: list[Ranked] = []
+    for r in ranked:
+        new = []
+        for kind, value in _scan_sources(Shortlist(shortlist.query, [r], (), 0), root_name):
+            label = _render_source_label(kind, value, root_name)
+            if label not in seen and label not in new:
+                new.append(label)
+        c_add = measure_bytes(_line(r, corpus))
+        s_add = sum(measure_bytes(f"- {x}") for x in new)
+        s_total = src_bytes + s_add
+        total = fixed + cand_bytes + c_add + (s_total if s_total else measure_bytes(f"- {_NO_SOURCES}"))
+        if shown and total > budget:
+            break
+        shown.append(r)
+        seen.update(new)
+        cand_bytes += c_add
+        src_bytes = s_total
+    return shown, len(ranked) - len(shown)
+
+
+def render(shortlist: Shortlist, corpus: Corpus, budget: int = 0) -> str:
+    # ASCII-only output: this prints to a console whose encoding is not guaranteed UTF-8 (a C/
+    # ASCII locale in CI, a Windows codepage), and a `print` of `—`/`·` there raises
+    # UnicodeEncodeError. Data (ids, paths) is already ASCII; keep the separators ASCII too.
+    out: list[str] = _render_header(shortlist)
     if shortlist.empty:
         out.append("no seam fits - nothing in the corpus shares a token stem with the query.")
         out.append("If the behaviour is genuinely new, build it; record `none - <why>` in the "
                    "dossier's ## Reuse affordance.")
     else:
-        out.append("## candidates (ranked - read these before building)")
-        for r in shortlist.ranked:
+        shown, n_cut = derive_budget_cut(shortlist, corpus, budget)
+        out.append(_CANDIDATES_HEAD)
+        for r in shown:
             out.append(_line(r, corpus))
         out.append("")
-        out.append("## sources to open")
-        for line in _sources(shortlist, corpus):
+        out.append(_SOURCES_HEAD)
+        for line in _sources(Shortlist(shortlist.query, shown, shortlist.recall_dark,
+                                       shortlist.threshold), corpus):
             out.append(f"- {line}")
+        if n_cut:
+            out.append(f"cut {n_cut} of {len(shortlist.ranked)} candidate(s) past the {budget}-byte "
+                       "budget - rerun with --budget 0 to see them all")
+
+    # TOOL-aMendedFleet-42 S4: the install scan's own totals on every run, and its reason when it
+    # found nothing, so an empty count is never silent. In the FOOTER, beside the partial-recall
+    # notice, because the header is charged against the byte budget and the replay floor's
+    # hit@budget arm had zero slack: a header line there pushed a recorded hit past the cut.
+    cc = shortlist.corpus_counts
+    out.append("")
+    if cc.get("install-files"):
+        out.append(f"# install sites: {cc['install-files']} canonical-copy marker file(s) over "
+                   f"{cc.get('install-names', 0)} name(s) - an install is an inlined copy, not a use")
+    else:
+        out.append(f"# install sites: none found ({corpus.installs_reason or 'no scan ran'})")
 
     # DERIVED, like the banner line above and for the same reason: a conf naming a layer that is
     # not there would print a partial-recall warning about a population the walk never saw, and a
@@ -600,6 +694,8 @@ def _line(r: Ranked, corpus: "Corpus | None" = None) -> str:
         bits.append(", ".join(c.files))
     if c.files:
         bits.append(f"fan-in {r.fanin}")
+    if r.installs:
+        bits.append(f"installs {r.installs}")
     if r.is_seam:
         bits.append("SEAM")
     if c.detail and not c.kind:
@@ -618,7 +714,16 @@ def _line(r: Ranked, corpus: "Corpus | None" = None) -> str:
     return head
 
 
-def _scan_sources(shortlist: Shortlist):
+def _derive_map_root_name() -> str:
+    """Repo-RELATIVE map root (e.g. "memory/map"), not its leaf name — the default MAP_ROOT is
+    nested, and printing "map/features/…" would send the reader to a path that does not exist."""
+    try:
+        return m.map_root().relative_to(m.repo_root()).as_posix()
+    except ValueError:
+        return m.map_root().name
+
+
+def _scan_sources(shortlist: Shortlist, root_name: str = ""):
     """The ONE walk over a shortlist's sources, yielding `(kind, value)` in shortlist order.
 
     `kind` is `symbol`, `dossier` or `inventory`; only the first two are openable PATHS.
@@ -629,11 +734,10 @@ def _scan_sources(shortlist: Shortlist):
     the log while the reader was still shown it (measured: 6 of 19 entries on one live query), and
     the fix for THAT made the two walks agree by copying, which is the same defect one move later.
     Two readers of one fact is the class; one walk with two views is the answer.
+
+    ``root_name`` lets a caller walking candidate by candidate resolve the map root once.
     """
-    try:
-        root_name = m.map_root().relative_to(m.repo_root()).as_posix()
-    except ValueError:
-        root_name = m.map_root().name
+    root_name = root_name or _derive_map_root_name()
     for r in shortlist.ranked:
         c = r.candidate
         for f in c.files:
@@ -668,28 +772,18 @@ def _sources(shortlist: Shortlist, corpus: Corpus) -> list[str]:
     its OWN source: a symbol -> its def file; a declared/prose seam -> its dossier; an inventory
     key -> the inventory (via the generated MAP). `detail` is overloaded per source, so branch
     on which source the candidate came from, not on kind."""
-    # Repo-RELATIVE map root (e.g. "memory/map"), not its leaf name — the default MAP_ROOT is
-    # nested, and printing "map/features/…" would send the reader to a path that does not exist.
-    try:
-        root_name = m.map_root().relative_to(m.repo_root()).as_posix()
-    except ValueError:
-        root_name = m.map_root().name
-    lines: list[str] = []
-    seen: set[str] = set()
+    root_name = _derive_map_root_name()
+    labels = (_render_source_label(k, v, root_name) for k, v in _scan_sources(shortlist, root_name))
+    return list(dict.fromkeys(labels)) or [_NO_SOURCES]
 
-    def add(line: str) -> None:
-        if line not in seen:
-            seen.add(line)
-            lines.append(line)
 
-    for kind, value in _scan_sources(shortlist):
-        if kind == "symbol":
-            add(f"symbol def: {value}")
-        elif kind == "dossier":
-            add(f"dossier: {value}")
-        else:
-            add(f"inventory `{value}` (see {root_name}/generated/MAP.md)")
-    return lines or ["(no file-backed sources - inspect the candidates above)"]
+def _render_source_label(kind: str, value: str, root_name: str) -> str:
+    """One `_scan_sources` entry as the reader sees it; `derive_budget_cut` charges these bytes."""
+    if kind == "symbol":
+        return f"symbol def: {value}"
+    if kind == "dossier":
+        return f"dossier: {value}"
+    return f"inventory `{value}` (see {root_name}/generated/MAP.md)"
 
 
 # ======================================================================================
@@ -722,7 +816,7 @@ def _resolve_git_dir(root: Path) -> Path | None:
     return gitdir
 
 
-def write_lookup(root: Path, query: str, n_shown: int, paths: list[str]) -> None:
+def write_lookup(root: Path, query: str, n_shown: int, paths: list[str], n_cut: int) -> None:
     """Append one JSONL row recording that this probe RAN. Never fatal, never gating.
 
     WHY: ``BUILD-METHOD`` M5 names two reuse probes and only the recall one left evidence, so a
@@ -762,6 +856,9 @@ def write_lookup(root: Path, query: str, n_shown: int, paths: list[str]) -> None
             # one field silently changing what it counts. The two new fields are the path view.
             "shown_paths": paths[:SOURCE_PATHS_CAP],
             "n_sources": len(paths),
+            # TOOL-aMendedFleet-36 S6: `paths` are the SHOWN candidates' sources, and this is how
+            # many ranked candidates the byte budget cut. An older row lacks it: unknown, not zero.
+            "n_cut": n_cut,
         }
         with path.open("a", encoding="utf-8", newline="\n") as fh:
             fh.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -769,10 +866,21 @@ def write_lookup(root: Path, query: str, n_shown: int, paths: list[str]) -> None
         print(f"warning: lookup log not written ({exc})", file=sys.stderr)
 
 
+def _parse_budget(text: str) -> int:
+    """argparse `type` for `--budget`: a non-negative integer, else argparse exits 2."""
+    n = int(text)  # a ValueError here is argparse's "invalid value", exit 2
+    if n < 0:
+        raise argparse.ArgumentTypeError(f"--budget must be >= 0, got {n}")
+    return n
+
+
 def main(argv: list[str] | None = None) -> int:
     # `<kit>` resolved, so the usage line --help prints names this install's real prefix.
     parser = argparse.ArgumentParser(description=__doc__.replace("<kit>", m.kit_rel()))
     parser.add_argument("query", nargs="+", help="a behaviour description, e.g. 'send a templated email'")
+    parser.add_argument("--budget", type=_parse_budget, default=DEFAULT_BUDGET,
+                        help=f"byte budget for the header, candidates and sources (default "
+                             f"{DEFAULT_BUDGET}); 0 shows every candidate")
     args = parser.parse_args(argv)
     query = " ".join(args.query)
 
@@ -802,10 +910,13 @@ def main(argv: list[str] | None = None) -> int:
               f"the corpus. The declaration is stale — delete it rather than carrying a layer that "
               f"is not there.", file=sys.stderr)
     shortlist = assemble_shortlist(query, corpus, ref_index, scan)
-    print(render(shortlist, corpus), end="")
+    print(render(shortlist, corpus, args.budget), end="")
     # AFTER the answer is rendered, so a row means a lookup that ANSWERED. Before it, a crash in
-    # render() would leave evidence of a probe whose result nobody ever saw.
-    write_lookup(m.repo_root(), query, len(shortlist.ranked), derive_source_paths(shortlist))
+    # render() would leave evidence of a probe whose result nobody ever saw. The paths are the
+    # SHOWN candidates' -- the same cut `render` printed, re-derived from the same inputs.
+    shown, n_cut = derive_budget_cut(shortlist, corpus, args.budget)
+    view = Shortlist(shortlist.query, shown, shortlist.recall_dark, shortlist.threshold)
+    write_lookup(m.repo_root(), query, len(shortlist.ranked), derive_source_paths(view), n_cut)
     return 0  # advisory: a RESULT never fails (never a gate). Only the refusal above exits non-zero.
 
 

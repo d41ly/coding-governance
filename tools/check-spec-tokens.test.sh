@@ -33,7 +33,15 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=112
+FLOOR_ASSERTIONS=132
+# RAISED 126 -> 132 at TOOL-aMendedFleet-87, by its six --legs-for `arm` calls: the exact-file
+# guard, the directory guard, the glob guard, the footer, the untracked mark and the refusal.
+# RAISED 119 -> 126 at TOOL-aMendedFleet-75, by its seven covers-join `arm` calls: the dangling id,
+# the count line, the defined id, `none` alone, `none` beside an id, the prose-only id and the field
+# on a continuation line.
+# RAISED 112 -> 119 at TOOL-aMendedFleet-25, by its seven size-join `arm` calls: the held spec and
+# its count, the padded spec, the grown held spec, the terminal spec's stale row, the arm-off line
+# and the non-number refusal.
 # RAISED 109 -> 112 at TOOL-aRepatriatedFork-54, by its three root-install `arm` calls: the untracked
 # bare name, the basename citation and the dotted non-file word.
 # RAISED 32 -> 38 at the closing review's F2, F4, F9 and F10, by the static count of the arms they
@@ -170,6 +178,7 @@ RUNLOG_DIR=$(resolve_kit_dir "$PY" runlog runlog.py "$HERE") || exit 2
 RUNLOG="${RUNLOG_DIR##*/}"
 CODEBASE_MAP_DIR=$(resolve_kit_dir "$PY" codebase-map map_lib.py "$HERE") || exit 2
 pass=0; fail=0
+ARM_ARGS=()          # the checker's argv for the next `arm`; empty is the gate's own run (TOOL-aMendedFleet-87)
 
 scratch() {          # $1 = dir. A repo with one live spec, a manifest and an empty waiver file.
   local d=$1
@@ -199,7 +208,7 @@ SPEC
 
 arm() {              # $1 label · $2 expected rc · $3 dir · $4 expected substring · $5 FORBIDDEN one
   local out rc
-  out=$(cd "$3" && "$PY" "$LINT" 2>&1); rc=$?
+  out=$(cd "$3" && "$PY" "$LINT" ${ARM_ARGS[@]+"${ARM_ARGS[@]}"} 2>&1); rc=$?
   if [ "$rc" != "$2" ]; then
     echo "arm FAIL  $1 — expected rc $2, got $rc"; echo "$out" | head -3; fail=$((fail+1)); return
   fi
@@ -1205,6 +1214,77 @@ else
   printf '%s\n' "$out" | grep -E 'claims|STALE' | head -3; fail=$((fail+1))
 fi
 git -C "$d" reset -q --hard "$clean"
+
+# ---- TOOL-aMendedFleet-25: the size join. One fixture tree with a class row at a small ceiling, a
+#      second live spec over it HELD by a high-water row, and the first spec padded past it.
+d=$base/size; scratch "$d"
+sp=memory/builds/tOne/spec
+cp "$d/$sp/2026-09-02-spec-TOOL-tOne-1.md" "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md"
+printf '%0700d\n' 0 >> "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md"
+held=$(tr -d '\r' < "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md" | wc -c | tr -d '[:space:]')
+printf '# limits\nmemory/builds/*/spec/\t600\n' > "$d/${PFX}template-size-limits.txt"
+printf '%s\t%s\n' "$sp/2026-09-02-spec-TOOL-tOne-2.md" "$held" > "$d/${PFX}template-size-highwater.txt"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm size --no-verify; sized=$(git -C "$d" rev-parse HEAD)
+arm "a spec over the class ceiling with a high-water row is HELD and the line counts it" 0 "$d" "size join · 2 live spec(s) · ceiling 600 from ${PFX}template-size-limits.txt · largest unheld"
+arm "the held count rides the size line" 0 "$d" "1 held at a recorded high-water"
+printf '%0700d\n' 0 >> "$d/$sp/2026-09-02-spec-TOOL-tOne-1.md"
+arm "a live spec padded past the ceiling with no row REDS as [size]" 1 "$d" "[size] \`size <- $sp/2026-09-02-spec-TOOL-tOne-1.md\`"
+git -C "$d" reset -q --hard "$sized"
+printf 'one more line\n' >> "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md"
+arm "a held spec grown by one line REDS naming its recorded high-water" 1 "$d" "held at its recorded high-water $held"
+git -C "$d" reset -q --hard "$sized"
+sed -i 's/^\*\*Status:\*\* OPEN/**Status:** CLOSED/' "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md"
+arm "a high-water row for a terminal spec REDS as stale" 1 "$d" "STALE HIGH-WATER \`$sp/2026-09-02-spec-TOOL-tOne-2.md\` — in ${PFX}template-size-highwater.txt — terminal"
+git -C "$d" reset -q --hard "$sized"
+printf '# limits, no class row\n' > "$d/${PFX}template-size-limits.txt"
+arm "no class row turns the size join off, announced" 0 "$d" "no class row in ${PFX}template-size-limits.txt (arm off)"
+printf 'memory/builds/*/spec/\tlots\n' > "$d/${PFX}template-size-limits.txt"
+arm "a class row that is not a number REFUSES" 1 "$d" "REFUSING — the size join's row for memory/builds/*/spec/"
+git -C "$d" reset -q --hard "$sized"
+
+# ---- TOOL-aMendedFleet-75: the covers join. The scratch spec defines only AC1; each edit appends
+#      one `New arm:` line to its section 7 and the checker re-runs. Staged red by deleting the
+#      scan_arm_covers call.
+d=$base/covers; scratch "$d"
+cs=memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md
+cvbase=$(git -C "$d" rev-parse HEAD)
+printf '\nNew arm: `x.test.sh` · covers AC1 AC9 · a dangling id · none\n' >> "$d/$cs"
+arm "a covers field naming an id section 6 does not define REDS as [covers]" 1 "$d" "[covers] \`covers <- $cs AC9\`" "\`covers <- $cs AC1\`"
+arm "the covers line counts the arm line, the carrier and both tokens" 1 "$d" "covers join · 1 New arm line(s) in 1 live spec(s) · 1 carry a covers field · 2 token(s) graded"
+git -C "$d" reset -q --hard "$cvbase"
+printf '\nNew arm: `x.test.sh` · covers AC1 · a defined id · none\n' >> "$d/$cs"
+arm "a covers field naming a defined id is clean" 0 "$d" "1 carry a covers field" "[covers]"
+git -C "$d" reset -q --hard "$cvbase"
+printf '\nNew arm: `x.test.sh` · covers none · no criterion · none\n' >> "$d/$cs"
+arm "covers none standing alone is clean" 0 "$d" "1 token(s) graded" "[covers]"
+git -C "$d" reset -q --hard "$cvbase"
+printf '\nNew arm: `x.test.sh` · covers none AC1 · none beside an id · none\n' >> "$d/$cs"
+arm "covers none beside an id REDS naming none" 1 "$d" "[covers] \`covers <- $cs none\`"
+git -C "$d" reset -q --hard "$cvbase"
+printf '\nNew arm: `x.test.sh` · AC9 named in prose only · none\n' >> "$d/$cs"
+arm "an id in the line's prose with no covers field is not graded" 0 "$d" "1 New arm line(s) in 1 live spec(s) · 0 carry a covers field" "[covers]"
+git -C "$d" reset -q --hard "$cvbase"
+printf '\nNew arm: `x.test.sh` · a field on the next line\n  · covers AC9 · none\n' >> "$d/$cs"
+arm "a covers field on an indented continuation line is graded" 1 "$d" "[covers] \`covers <- $cs AC9\`"
+git -C "$d" reset -q --hard "$cvbase"
+
+# TOOL-aMendedFleet-87 — the --legs-for query: an exact-file guard, a directory guard, a glob guard
+# and an unguarded leg. Staged red by joining the glob guard as a literal: its UNEVALUATED line goes.
+d=$base/legsfor; scratch "$d"
+mkdir -p "$d/${PFX}x"; printf '#!/bin/sh\n' > "$d/${PFX}x/thing.sh"
+printf '[{"name":"file leg","guard":["%sx/thing.sh"],"chunk":"c","subject":"repo"},{"name":"dir leg","guard":["%sx/"],"chunk":"c","subject":"kit"},{"name":"glob leg","guard":["%sx/*.sh"]},{"name":"free leg","guard":[]}]\n' \
+  "$PFX" "$PFX" "$PFX" > "$d/${PFX}gate-legs.json"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm legs --no-verify
+ARM_ARGS=(--legs-for "${PFX}x/thing.sh")
+arm "legs-for joins an exact-file guard and never a glob guard as a literal" 0 "$d" "  file leg <- ${PFX}x/thing.sh [c/repo]" "  glob leg <- "
+arm "legs-for joins a directory guard the path sits under" 0 "$d" "  dir leg <- ${PFX}x/ [c/kit]"
+arm "legs-for prints a glob guard UNEVALUATED" 0 "$d" "  UNEVALUATED glob leg <- ${PFX}x/*.sh"
+arm "legs-for counts an empty guard list as unguarded in its footer" 0 "$d" "legs-for: 1 of 4 legs carry no guard and run whatever changed"
+ARM_ARGS=(--legs-for "${PFX}x/thing.sh" nosuchpath)
+arm "legs-for marks an untracked path beside a tracked one and still exits 0" 0 "$d" "nosuchpath (not tracked at HEAD)"
+ARM_ARGS=(--legs-for nosuchpath)
+arm "legs-for REFUSES a query in which every path is untracked" 2 "$d" "legs-for: REFUSING — no path given is tracked at HEAD: nosuchpath"
+ARM_ARGS=()
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then

@@ -1348,6 +1348,32 @@ def read_pointer_target(pointer: str) -> tuple:
     return raw, False
 
 
+def derive_ask_locators(ask, clauses: dict) -> tuple:
+    """`(paths, external)` — the in-repo paths an ask is located at, and whether any locator is
+    in another repository. `ask` may be None (an id filed nowhere); `clauses` is its MERGED set.
+
+    ONE LOCATOR SET, TWO READERS (TOOL-aMendedFleet-10): R4 asks whether the tree holds any of
+    these paths, and `--asks --path` asks whether any of them is the file a caller is touching.
+    Walked in two places, the two answers would drift the first time a locator form was added.
+    A `seen` value that parsed to no form contributes nothing, which is what R4 always did.
+    """
+    paths: list = []
+    external = False
+    for value in clauses.get("seen", ()):
+        seen = parse_seen(value)
+        if seen.kind == "external":
+            external = True
+        elif seen.kind:
+            paths.append(seen.path)
+    if ask is not None and ask.pointer:
+        path, is_external = read_pointer_target(ask.pointer)
+        if is_external:
+            external = True
+        elif path:
+            paths.append(path)
+    return tuple(paths), external
+
+
 def derive_ready(grader: Grader, ask_id: str) -> Ready:
     """One ask's grade, its failing rules, its live holds, its merged grant and its live closers.
 
@@ -1400,19 +1426,8 @@ def derive_ready(grader: Grader, ask_id: str) -> Ready:
         missing.append("R3")
 
     # R4 and R6 — LOCATED and BOUNDED, walked together because both read the same locator set.
-    located, external = False, False
-    for value in clauses.get("seen", ()):
-        seen = parse_seen(value)
-        if seen.kind == "external":
-            located, external = True, True
-        elif seen.kind and grader.check_path(seen.path):
-            located = True
-    if ask is not None and ask.pointer:
-        path, is_external = read_pointer_target(ask.pointer)
-        if is_external:
-            located, external = True, True
-        elif path and grader.check_path(path):
-            located = True
+    paths, external = derive_ask_locators(ask, clauses)
+    located = external or any(grader.check_path(path) for path in paths)
     if not located:
         missing.append("R4")
 
@@ -1600,7 +1615,7 @@ def check_family_view(text: str) -> bool:
     return bool(VIEW_H1_RE.match(lines[1].rstrip("\r")))
 
 
-def render_summary_cell(text: str, cap: int = EXCERPT_DEFAULT) -> str:
+def render_summary_cell(text: str, cap: int = EXCERPT_DEFAULT, by_bytes: bool = False) -> str:
     """One ask's TEXT as the view's last cell.
 
     Four reductions, in this order, each for a stated reason. The pointer tail goes because the
@@ -1608,12 +1623,23 @@ def render_summary_cell(text: str, cap: int = EXCERPT_DEFAULT) -> str:
     cell carries no path token the hygiene engine's path check could grade — a generated cell that
     reds a path check is a file nobody can land. A `|` becomes `/` because it would otherwise split
     the row into cells that are not there. And the cut is at a space, so the excerpt ends on a word.
+
+    `by_bytes` measures `cap` in encoded UTF-8 BYTES with the ellipsis's three INSIDE it, for the
+    `--asks --json` summary (TOOL-aMendedFleet-10): a consumer budgeting a feed counts bytes, and
+    a cap in characters lets one em dash in three blow it. The slice drops a trailing partial
+    character rather than splitting it. Off, the view's cell is byte-identical to before.
     """
     body = text.split(ARROW)[0]
     body = _LINK_RE.sub(r"\1", body).replace("`", "").replace("|", "/").strip()
-    if len(body) <= cap:
+    if by_bytes:
+        raw = body.encode("utf-8")
+        if len(raw) <= cap:
+            return body
+        cut = raw[:max(cap - len("…".encode("utf-8")), 0)].decode("utf-8", "ignore")
+    elif len(body) <= cap:
         return body
-    cut = body[:cap]
+    else:
+        cut = body[:cap]
     space = cut.rfind(" ")
     if space > 0:
         cut = cut[:space]

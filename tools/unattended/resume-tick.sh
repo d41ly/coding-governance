@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # resume-tick.sh — the OS-scheduled, OUT-OF-PROCESS resumer for a stalled unattended run.
 # TOOL-aWokenSentinel-5. Registered by the owner as a scheduled task (the README has the line per
-# OS), never by this kit: unregistered it does nothing, and the adopter's --check reports that as
-# INFO, because an adopter who has not registered it has a working kit, not a broken one.
+# OS), never by this kit: unregistered it does nothing, and the adopter's --check and the driver's
+# --preflight report that as a WARNING that refuses nothing, because an adopter who has not
+# registered it has a working kit, not a broken one.
 #
 #   resume-tick.sh [--repo <root>] [--dry-run]
 #

@@ -110,11 +110,13 @@ def check(label: str, cond: bool, detail: str = "") -> None:
 
 
 def git(cwd: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", "-C", str(cwd), *args], capture_output=True, text=True)
+    return subprocess.run(["git", "-C", str(cwd), *args], capture_output=True,
+                          encoding="utf-8", errors="replace")
 
 
 def run(*args: str) -> subprocess.CompletedProcess:
-    return subprocess.run([sys.executable, str(GOVKIT), *args], capture_output=True, text=True)
+    return subprocess.run([sys.executable, str(GOVKIT), *args], capture_output=True,
+                          encoding="utf-8", errors="replace")
 
 
 DEPLOY = ('gov_source = "l"' + NL + f'prefix = "{PFX[:-1]}"' + NL + 'kits = ["check-wiring"]' + NL
@@ -193,7 +195,7 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
     # accepted stop cannot reintroduce it. Run over the 27 shipped descriptors before wiring, it
     # reported 0 hits and 1 near-miss pair, and it reds that same pair with the pre-fix probe staged
     # back in -- both measured. A descriptor that legitimately discriminates two accepted stops by
-    # one file takes a named exemption here rather than a silent widening; none does today.
+    # one file takes a named exemption here rather than a silent widening.
     def derive_probe_paths(block, key):
         spec = (block.get("probe") or {}).get(key) or []
         return set(spec if isinstance(spec, list) else [spec])
@@ -281,6 +283,10 @@ ROLE_KIT_RENDERED = ('id = "demo"' + NL + 'home = "demo"' + NL
                      + 'argv = ["' + sys.executable.replace(chr(92), "/") + '", "-c", "'
                      + REGEN_ARGV + '"]' + NL)
 
+# The harness declares its children's locale rather than inheriting the host's: without this a
+# python child writes the ANSI code page into the pipe that every capture here decodes as UTF-8
+# (TOOL-aMendedFleet-4). It reaches the python grandchildren a bash leg spawns too.
+os.environ["PYTHONIOENCODING"] = "utf-8"
 ROLE_ENV = dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1")
 #: The adopter's own copy, and the two gov vintages of a file whose bytes MOVE between them. The
 #: project-owned pair needs no such movement — it grades a row gov must not touch at all — but the
@@ -294,7 +300,7 @@ ROLE_V2 = "gov's second vintage" + NL
 
 def run_in_gov(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
-                          capture_output=True, text=True, env=ROLE_ENV)
+                          capture_output=True, encoding="utf-8", errors="replace", env=ROLE_ENV)
 
 
 def read_verdict(out: str, path: str) -> str:
@@ -748,7 +754,7 @@ def main() -> int:
             # runner is already inside bash and never sees it, so the harness has to ask for
             # the same shell the runner would have used, or it grades a leg nobody will run.
             lp = subprocess.run(govkit.resolve_shell_argv(argv), cwd=str(g), capture_output=True,
-                                text=True)
+                                encoding="utf-8", errors="replace")
             out = (lp.stdout or "") + (lp.stderr or "")
             check("scratch install: leg '%s' prints its stated verdict where it was installed"
                   % name, want in out, out)

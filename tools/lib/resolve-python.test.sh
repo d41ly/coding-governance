@@ -304,8 +304,9 @@ awk '$0 !~ /^[[:space:]]*#/' "$plant" | grep -qE 'command -v (python3|python|py)
 #
 # TWO EXEMPTIONS, both narrow and both visible in the source being scanned:
 #   * a line marked `gov:literal-python — <reason>`, which is an author's claim with the reason
-#     attached. Measured today: three such lines, each a launcher NAME printed or rendered rather
-#     than executed (a remedy string, a committed Skill render, an adopter-layout fallback).
+#     attached. Which lines carry it is a grep for the marker, not a figure kept here; when this
+#     was written each was a launcher NAME printed or rendered rather than executed (a remedy
+#     string, a committed Skill render, an adopter-layout fallback).
 # Scope is `*.sh`. Widening to .githooks/, *.json and *.md was measured and rejected: 46 further hits
 # across 15 files, every one operator prose, which would need a 46-entry allowlist on day one — an
 # allowlist that size is a second source of truth, not a gate.

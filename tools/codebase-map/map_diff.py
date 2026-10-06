@@ -1,33 +1,38 @@
 """Feature-level digest of a git range via the codebase map (codebase-map kit).
 
     python <kit>/map_diff.py <base>..<head> [--verbose] [--drop-affordance-exempt]
-    python <kit>/map_diff.py <base>..<head> --converge
     python <kit>/map_diff.py <base> <head>  [--verbose]
+    python <kit>/map_diff.py [<base>..<head>] --stale-dossiers [--json]
+    python <kit>/map_diff.py --tree
 
 Attributes every changed file to its claiming feature(s) — keyed attributors first (from
 map_extractors.KEYED_ATTRIBUTORS), then dossier path globs, then foundation globs — and rolls
 up the rest as UNMAPPED (per-top-level-dir counts by default; full list behind --verbose).
-The coverage line is the map's convergence-visibility metric.
+Beneath the header's mixed figure, the population is split by the conf's RECORD_ROOTS into a
+`# code:` line and a `# records:` line. The CODE line is the map's convergence-visibility
+metric; the mixed header measures how much of a range was record writing. RECORD_ROOTS blank
+prints an `undeclared` line instead, and an entry naming no tracked path a DEAD PROBE line.
+
+--tree: attribute every tracked file instead of a range, and print the header and the code and
+record lines only, no per-feature list. Refused with a range, --stale-dossiers or
+--drop-affordance-exempt (a whole tree would clear every grace).
 
 --drop-affordance-exempt (S4a): after attribution, rewrite <MAP_ROOT>/affordance-exempt.toml,
 dropping every feature the range TOUCHED (shrink-only). Touching a graced feature's files
 mechanically removes its grace, so the next gate run demands its `## Reuse affordance` block —
 no human remembering. Commit the rewritten file with the change.
 
---converge (S5): the closing loop. Reports the convergence signals over the range —
-`collision_flags` (each NEW exported symbol that resembles an existing high-fan-in seam of the
-same kind it did NOT wire through — shipped reinvention, over ALL new code) routed as a review
-WARN to <git-common-dir>/codebase-map/reinvention-backlog.md (deduped; it falls back into
-<MAP_ROOT>/ only where git cannot answer at all), plus `new_clones` (the adopted
-clone-ratchet's count, or null) — and the demoted hygiene hints affordance_coverage_% /
-dead_exports (explicitly NOT the convergence signal). A REPORT + WARN, never a gate (F5): a
-convergence metric that hard-fails false-fails on legitimate feature churn. Always exits 0.
+--stale-dossiers: the feature dossiers OLDER THAN THEIR PATHS — a commit touching a path a dossier
+claims is not an ancestor of the dossier's own last commit. Derived from git, no stamp: one
+`git log` over the history reachable from HEAD, or with `<base>..<head>` the commits in that range,
+which lists the dossiers a range touched and did not refresh. Paths under the map root are never a
+claim, and a merge commit carries no paths (a conflict-resolution-only change is not seen). A
+shallow clone prints `live` false instead of a count over an amputated history. `--json` prints
+one object: scope, of, stale, live, note, dossiers. Exit 1 when git cannot read the range.
 
 Exit 2 is the one exception, and it is a REFUSAL rather than a result: the resolved repo root
-carries no .codebase-map.conf. --converge reads only committed artifacts, so it has no project
-layer to fail closed for it, and a mis-rooted run builds its reference index over a root with no
-source under it — no seam then reaches the fan-in threshold, so `collision_flags: 0` is
-structurally guaranteed at exit 0 no matter what the range actually shipped.
+carries no .codebase-map.conf. At a root that was never adopted the digest would report every
+file UNMAPPED and --stale-dossiers every dossier fresh, both at exit 0.
 """
 
 from __future__ import annotations
@@ -48,22 +53,21 @@ from pathlib import Path
 sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 
 try:  # a non-UTF-8 stdout (stripped CI locale) must degrade a non-ASCII print, not crash it
-    sys.stdout.reconfigure(errors="replace")
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except (AttributeError, ValueError):
     pass
 
 import map_lib as m  # noqa: E402
 
-# map_extractors (the project layer) is imported LAZILY inside the attribution path only — the
-# --converge mode needs no project extractors (it reads committed symbols.json + dossiers + conf),
-# so the module stays importable in the kit repo, where selftest.py exercises it without a project
+# map_extractors (the project layer) is imported LAZILY inside the paths that need it, so the
+# module stays importable in the kit repo, where selftest.py exercises it without a project
 # map_extractors.py present.
 
 
 def _changed_files(base: str, head: str) -> list[str]:
     """Changed files in base..head. Fails SOFT (a notice + []) when git cannot resolve the range —
-    a first commit's parent, a typo'd ref, a shallow clone missing the base — so --converge and the
-    digest degrade to 'nothing to diff' and honor their advisory intent, never a raw traceback."""
+    a first commit's parent, a typo'd ref, a shallow clone missing the base — so the digest degrades
+    to 'nothing to diff' and honors its advisory intent, never a raw traceback."""
     out = subprocess.run(
         ["git", "-C", str(m.repo_root()), "diff", "--name-only", f"{base}..{head}"],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
@@ -72,6 +76,32 @@ def _changed_files(base: str, head: str) -> list[str]:
         print(f"# map-diff: cannot resolve range {base}..{head} (bad ref / shallow clone?) - nothing to diff")
         return []
     return [line.strip() for line in out.stdout.splitlines() if line.strip()]
+
+
+def derive_record_roots(root: Path, conf: dict[str, str]) -> tuple[list[str], str | None]:
+    """``(roots, dead)`` from the conf's ``RECORD_ROOTS`` (space- or comma-separated, repo-relative
+    directories whose files are records rather than code). ``dead`` names the first entry that
+    matches no tracked path, so the split cannot be trusted; ``([], None)`` when undeclared.
+    ONE ``git ls-files`` call over every entry."""
+    roots = [r.strip("/") for r in conf.get("RECORD_ROOTS", "").replace(",", " ").split() if r.strip("/")]
+    if not roots:
+        return [], None
+    out = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "-z", "--", *roots],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    tracked = [p for p in out.stdout.split("\0") if p] if out.returncode == 0 else []
+    for r in roots:
+        if not any(p == r or p.startswith(r + "/") for p in tracked):
+            return roots, r
+    return roots, None
+
+
+def render_coverage_line(label: str, mapped: int, total: int) -> str:
+    """``# <label>: mapped <m>/<n> (<p>%)``, or ``n/a (0 files)`` over an empty population."""
+    if not total:
+        return f"# {label}: n/a (0 files)"
+    return f"# {label}: mapped {mapped}/{total} ({100 * mapped // total}%)"
 
 
 def _drop_affordance_exempt(touched: dict[str, list[str]]) -> None:
@@ -93,240 +123,112 @@ def _drop_affordance_exempt(touched: dict[str, list[str]]) -> None:
 
 
 # ======================================================================================
-# --converge (S5): the closing loop over the range
+# --stale-dossiers: dossier freshness, derived from git
 # ======================================================================================
 
 
-def _symbols_at_ref(root: Path, ref: str, rel: str) -> list[dict] | None:
-    """symbols.json rows at a git ref (POSIX rel path), or ``None`` when that ref carries no such
-    file at all.
+def read_commit_paths(root: Path, base: str | None, head: str = "HEAD"):
+    """``(commits, scope)`` for ``measure_dossier_staleness``, or ``None`` on a SHALLOW clone.
 
-    THE None IS THE POINT (ABL-bCandidLoupe-2, ported from adopter ic). This used to fail open to ``[]``
-    for both the absent file and a present-but-empty one, and ``_converge`` cannot tell those apart
-    from a list: with no baseline no seam reaches the fan-in threshold, so ``collision_flags``
-    printed ``0`` on every range whose base predates the SYMBOL tier. Measured on the adopting repo:
-    ``0`` over a range starting before the tier landed, and ``538`` over a base after it — the
-    signal read cleanest exactly where it could see least, which is the confident-empty-answer class
-    ``map_lib`` names at its own line 162 and ``selftest`` already refuses for the mis-rooted CLI.
+    ONE ``git log --topo-order`` over the history reachable from the tips — ``head``, plus ``base``
+    in range scope — printing each commit's sha, parents and touched paths. ``scope`` is ``None``
+    for the whole history, else the commits reachable from head and not from base, which is
+    git's own ``base..head``, derived in process from the printed parents so a dossier committed
+    before the range still names its true last commit. ``--no-renames`` so a rename shows both
+    the path it left and the path it took; a dossier claiming either was moved by it.
 
-    Three states, not two: the ref has the file and it holds rows (a list); the ref has the file and
-    it holds none (an empty list, a real measurement of zero); the ref has no file (``None``, not
-    measurable). Callers decide what to do with the third — they may no longer silently average it
-    into the second."""
-    out = subprocess.run(
-        ["git", "-C", str(root), "show", f"{ref}:{rel}"],
+    The shallow probe resolves the tips in the same call. A shallow history is unmeasurable, not
+    clean: its first commit has parents the clone never fetched, so every ancestry answer is cut.
+    Raises ``MapError`` when git cannot resolve a tip or print the log."""
+    tips = [head] + ([base] if base is not None else [])
+    probe = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "--is-shallow-repository", *tips],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
-    if out.returncode != 0 or not out.stdout.strip():
+    lines = probe.stdout.split()
+    if probe.returncode != 0 or len(lines) != 1 + len(tips):
+        raise m.MapError(f"git cannot resolve {' and '.join(tips)}: "
+                         f"{(probe.stderr.strip().splitlines() or ['no output'])[-1]}")
+    if lines[0] == "true":
         return None
-    try:
-        data = json.loads(out.stdout)
-    except json.JSONDecodeError:
-        return None
-    return data.get("symbols", []) if isinstance(data, dict) else []
-
-
-def _read_symbols(path: Path) -> list[dict]:
-    if not path.is_file():
-        return []
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return []
-    return data.get("symbols", []) if isinstance(data, dict) else []
-
-
-def render_legacy_note(legacy: Path, current: Path, root: Path) -> str:
-    """The line an adopter carrying the pre-move file needs, or `""` when there is nothing to say.
-
-    A separate function so it can be ARMED: the migration case exists only because the
-    destination moved, and a `--converge` run in a clean fixture — which is what AC1 grades —
-    never reaches it. Nothing here DELETES: the file may hold rows nobody has read, and a tool
-    that silently removes a durable record is the shape this unit exists to stop.
-    """
-    # `legacy == current` on the fail-open path, where git could not answer and the destination
-    # fell back into the map tree. Naming the file the run just wrote to, and telling the reader to
-    # delete it, is worse than saying nothing.
-    if not legacy.is_file() or legacy == current:
-        return ""
-    where = legacy.relative_to(root).as_posix() if legacy.is_relative_to(root) else legacy.as_posix()
-    return (f"\nnote: {where} is a LEGACY location and is NO LONGER WRITTEN. Nothing here deletes "
-            f"it — it may hold rows nobody has read. Fold or delete it by hand; new rows go to "
-            f"{current.as_posix()}.")
-
-
-def derive_backlog_path(root: Path) -> Path:
-    """Where the reinvention backlog is written: OUTSIDE the worktree, under the git COMMON dir.
-
-    Ratified by the owner on 2026-09-05, reversing `bConvergentLodestar` F7, which chose a tracked
-    destination. The ground for reversing is practice rather than a defect in F7's reasoning: the
-    rows have never been reviewed by anyone, because the file has never been tracked on any branch
-    and was therefore untracked clutter inside the gated memory tree after every `--converge` run.
-
-    `--git-common-dir`, NEVER `--git-dir`, and the tree is not uniform about this so the choice is
-    stated rather than copied. In a LINKED WORKTREE `--git-dir` is `.git/worktrees/<name>`, which
-    `git worktree remove` deletes outright, taking a durable record with it. ONE existing consumer
-    resolves the common dir for exactly that reason — the memory-recall kit's query entrypoint,
-    whose `<git-common-dir>/recall/queries.jsonl` is the spelling followed here; the gate runner and
-    the lander both use `--git-dir` for records that are meant to die with their worktree. The raw value
-    is RELATIVE (a bare `.git`) at the repo root and absolute elsewhere, so it is resolved either
-    way rather than used as given.
-
-    Fails OPEN back into the map tree where git cannot answer at all: this is a WARN path, never a
-    gate, and refusing to report a convergence signal because a subprocess failed would be a worse
-    trade than writing where the old release wrote.
-    """
-    try:
-        raw = subprocess.run(["git", "-C", str(root), "rev-parse", "--git-common-dir"],
-                             capture_output=True, text=True, encoding="utf-8", check=True).stdout.strip()
-    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
-        return m.map_root(root) / "reinvention-backlog.md"
-    if not raw:
-        return m.map_root(root) / "reinvention-backlog.md"
-    gd = Path(raw)
-    gd = gd if gd.is_absolute() else (root / raw)
-    return gd.resolve() / "codebase-map" / "reinvention-backlog.md"  # a sidecar dir inside the git dir, named for the kit, not the kit's install path
-
-
-def _new_clones(root: Path, conf: dict[str, str]) -> int | None:
-    """new_clones (§4): the adopted verbatim-clone-ratchet's count, read from the file named by
-    CLONE_COUNT_FILE (relative to the repo root) — whatever clone kit is adopted writes its count
-    there and this surfaces it. None when unset/unreadable: the clone signal is OPTIONAL (no clone
-    kit adopted). Folding a duplicate drops the ratchet count -> the signal trends toward zero."""
-    rel = conf.get("CLONE_COUNT_FILE", "").strip()
-    if not rel:
-        return None
-    try:
-        return int((root / rel).read_text(encoding="utf-8").strip())
-    except (OSError, ValueError):
-        return None
-
-
-def _converge(base: str, head: str, files: list[str]) -> int:
-    root = m.repo_root()
-    conf = m.load_conf(root)
-    map_dir = m.map_root(root)
-    sym_rel = f"{conf['MAP_ROOT']}/generated/symbols.json"
-
-    # The HEAD fallback is a DIFFERENT and legitimate path: when the head ref is the checkout, the
-    # working-tree file is the honest answer. Only the committed-ref read can be unmeasurable.
-    head_rows = _symbols_at_ref(root, head, sym_rel)
-    if head_rows is None:
-        head_rows = _read_symbols(map_dir / "generated" / "symbols.json")
-    print(f"# map-diff --converge {base}..{head}")
-    if not head_rows:
-        print("no generated/symbols.json (SYMBOL recall tier not adopted) - nothing to converge.")
-        return 0
-
-    base_rows = _symbols_at_ref(root, base, sym_rel)
-    base_measurable = base_rows is not None
-    if base_rows is None:
-        base_rows = []
-    base_key = {(r["id"], r["kind"], r["file"]) for r in base_rows}
-    new_rows = [r for r in head_rows if (r["id"], r["kind"], r["file"]) not in base_key]
-
-    symbol_files = sorted({r["file"] for r in head_rows})
-    sym_exts = frozenset(Path(r["file"]).suffix for r in head_rows if Path(r["file"]).suffix)
-    ref_index = m.build_reference_index(symbol_files, root=root) if symbol_files else {}
-    range_index = m.reference_index_for(files, root=root, extensions=sym_exts or None)
-
-    texts = m.load_dossier_texts(map_dir)
-    affordance_seams = frozenset(
-        seam for t in texts.values() for seam in m.parse_affordance(t).seams
+    shas = lines[1:]
+    # Every flag below that restates a default is there because a config key can change it, and
+    # the parse reads stdout as data: `log.showSignature` prints gpg text into it.
+    out = subprocess.run(
+        ["git", "-C", str(root), "-c", "core.quotePath=false", "log", "--topo-order",
+         "--no-renames", "--no-show-signature", "--no-color", "--format=%x00%H %P", "--name-only",
+         *shas, "--"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
-    # S1 — EVERY definer of an id at head, so `fan_in` subtracts the definitions rather than one
-    # arbitrary winner. Built here because this is the only place the head symbol table is in hand.
-    definers: dict[str, frozenset[str]] = {}
-    _by_id: dict[str, set[str]] = {}
-    for r in head_rows:
-        _by_id.setdefault(r["id"], set()).add(r["file"])
-    definers = {k: frozenset(v) for k, v in _by_id.items()}
+    if out.returncode != 0:
+        raise m.MapError(f"git log failed: {(out.stderr.strip().splitlines() or ['no output'])[-1]}")
+    commits = []
+    for chunk in out.stdout.split("\0")[1:]:
+        head_line, _, body = chunk.partition("\n")
+        sha, *parents = head_line.split()
+        commits.append((sha, tuple(parents), tuple(p for p in body.splitlines() if p.strip())))
+    if base is None:
+        return commits, None
+    # Topological order: a commit is reachable from a tip exactly when the tip is it, or a commit
+    # already known reachable names it as a parent — one forward pass per tip, no graph walk.
+    from_head, from_base = {shas[0]}, {shas[1]}
+    for sha, parents, _ in commits:
+        if sha in from_head:
+            from_head.update(parents)
+        if sha in from_base:
+            from_base.update(parents)
+    return [c for c in commits if c[0] in from_head], frozenset(from_head - from_base)
 
-    # BOTH parents' changes, and they are orthogonal. `main` guards the whole collision pass on
-    # `base_measurable`, because a base carrying no `symbols.json` gives every seam an absent
-    # baseline and a count would be 0 over nothing measured. This branch changed WHAT the pass is
-    # given (`definers`) and WHERE its output goes (outside the worktree). Taking either side alone
-    # loses the other, which is the auto-took class the merge rule names.
-    flags: list[m.CollisionFlag] = []
-    added: list[m.CollisionFlag] = []
-    backlog_path = derive_backlog_path(root)
-    if base_measurable:
-        flags = m.detect_collisions(
-            new_rows, base_rows, ref_index, range_index,
-            threshold=m.seam_fanin_threshold(root), definers=definers,
-            affordance_seams=affordance_seams,
-        )
 
-        # F7: route each flag to the durable, deduped reinvention backlog — OUTSIDE the worktree.
-        if flags:
-            current = backlog_path.read_text(encoding="utf-8") if backlog_path.is_file() else ""
-            new_text, added = m.append_backlog(current, flags)
-            if added:
-                backlog_path.parent.mkdir(parents=True, exist_ok=True)
-                backlog_path.write_text(new_text, encoding="utf-8", newline="\n")
+def render_stale_dossiers(scope: str, rows: list[dict] | None, *, as_json: bool) -> str:
+    """The ``--stale-dossiers`` answer as text or as one JSON object, from the measured rows.
 
-    # The file this record used to be written to, if a previous release left one behind. NAMED, not
-    # deleted: it is the adopter's file, it may hold rows nobody has read, and a tool that silently
-    # removes a record is the shape this unit exists to stop.
-    legacy = map_dir / "reinvention-backlog.md"
-
-    print("# convergence signals (trend to zero = the repo converges); a WARN, never a gate.")
-    if not base_measurable:
-        # NO NUMBER HERE, deliberately. With no baseline every seam is absent from it, so nothing
-        # reaches the fan-in threshold and a count would be 0 over nothing measured — the defect
-        # ABL-bCandidLoupe-2 recorded. The key stays so a reader grepping for it still sees a row;
-        # the VALUE is the status, which is this repo's own instruction about a probe that cannot
-        # measure: say so, rather than print a confident zero.
-        print(
-            f"\ncollision_flags: DEAD PROBE - the base ref carries no {sym_rel}, so there is no "
-            "baseline to resemble and any count would be a number over nothing measured "
-            "(ABL-bCandidLoupe-2). Re-run against a base at or after the SYMBOL tier landed."
-        )
+    ``rows`` is ``None`` for a shallow clone. ``of`` is every dossier with a commit of its own in
+    whole-history scope, and the dossiers whose claimed paths the range touched in range scope; a
+    dossier no commit carries is named in ``note`` and left out of ``of``. ``live`` is false for a
+    shallow clone, and in whole-history scope when no commit touched any claimed path — a count
+    over nothing touched is not a measurement. An untouched RANGE is a true empty answer."""
+    whole = scope == "HEAD"
+    notes: list[str] = []
+    if rows is None:
+        live, measured = False, []
+        notes.append("the clone is shallow, so its history is cut and no dossier's ancestry can "
+                     "be measured; fetch the full history (git fetch --unshallow)")
     else:
-        print(f"\ncollision_flags: {len(flags)}")
-    for f in flags:
-        print(
-            f"- WARN {f.new} [{f.kind}, {f.file}] resembles seam {f.resembles} (fan-in {f.fanin}) "
-            f"- built new instead of wiring through it; confidence {f.confidence}"
-        )
-    if flags:
-        # The path is OUTSIDE the worktree now, so `relative_to(root)` no longer resolves and the
-        # absolute spelling is the useful one — a reader has to be able to open it.
-        rel = (backlog_path.relative_to(root).as_posix()
-               if backlog_path.is_relative_to(root) else backlog_path.as_posix())
-        dup = len(flags) - len(added)
-        skip = f" ({dup} already recorded, skipped)" if dup else ""
-        print(
-            f"  -> {len(added)} row(s) appended to {rel}{skip}; fold each into its seam "
-            "(or delete the row if genuinely distinct)."
-        )
-    note = render_legacy_note(legacy, backlog_path, root)
-    if note:
-        print(note)
-
-    clones = _new_clones(root, conf)
-    if clones is None:
-        print("\nnew_clones: null (clone-ratchet kit not adopted; set CLONE_COUNT_FILE to surface it)")
-    else:
-        print(f"\nnew_clones: {clones} (verbatim-clone-ratchet count; fold duplicates to trend it down)")
-
-    features = [k for k in texts if k != "foundation"]
-    with_block = sum(1 for k in features if m.parse_affordance(texts[k]).has_block)
-    cov = f"{100 * with_block // len(features)}% ({with_block}/{len(features)})" if features else "n/a"
-    # One reading per ID, not per ROW: a symbol with two definers appeared twice here and was
-    # counted twice, on top of the wrong subtraction S1 corrects.
-    dead = sum(1 for sid, dfs in sorted(definers.items()) if m.fan_in(ref_index, sid, dfs) == 0)
-    print("\n# hygiene hints (NOT the convergence signal - see spec S5):")
-    print(f"affordance_coverage: {cov} of feature dossiers carry a ## Reuse affordance block")
-    print(f"dead_exports: {dead} symbol(s) with fan-in 0 (a hint - a used dup is not dead)")
-    return 0  # report + WARN, never a gate (F5)
+        uncommitted = sorted(r["feature"] for r in rows if r["refreshed"] is None
+                             and (whole or r["touched"]))
+        measured = [r for r in rows if r["refreshed"] is not None and (whole or r["touched"])]
+        live = not whole or any(r["touched"] for r in rows)
+        if not live:
+            notes.append("no commit in the history touched any path a dossier claims")
+        if uncommitted:
+            notes.append("left out of `of`, no commit carries them yet: " + ", ".join(uncommitted))
+    measured.sort(key=lambda r: (-r["behind"], r["feature"]))
+    doc = {
+        "scope": scope, "of": len(measured), "stale": sum(1 for r in measured if r["stale"]),
+        "live": live, "note": "; ".join(notes),
+        "dossiers": [{k: r[k] for k in ("feature", "dossier", "refreshed", "stale", "behind", "newest")}
+                     for r in measured],
+    }
+    if as_json:
+        return json.dumps(doc, indent=1)
+    if not live:
+        return f"# map-diff --stale-dossiers {scope}: DEAD PROBE - {doc['note']}"
+    lines = [f"# map-diff --stale-dossiers {scope}: {doc['stale']} of {doc['of']} dossiers older "
+             "than their paths (report only)"]
+    lines += [f"- {r['feature']} · {r['dossier']} · {r['behind']} behind · newest {r['newest'][:8]}"
+              for r in doc["dossiers"] if r["stale"]]
+    if doc["note"]:
+        lines.append(f"note: {doc['note']}")
+    return "\n".join(lines)
 
 
 def main() -> int:
     # `<kit>` resolved, so every command --help prints is copy-pasteable from the repo root at
     # whatever prefix this kit is installed at, not only at the default one.
     parser = argparse.ArgumentParser(description=__doc__.replace("<kit>", m.kit_rel()))
-    parser.add_argument("range", nargs="+", help="<base>..<head> or <base> <head>")
+    parser.add_argument("range", nargs="*",
+                        help="<base>..<head> or <base> <head>; optional with --stale-dossiers only")
     parser.add_argument("--verbose", action="store_true", help="full unmapped file list")
     parser.add_argument(
         "--drop-affordance-exempt",
@@ -335,37 +237,83 @@ def main() -> int:
         "(shrink-only) so the next gate run demands its '## Reuse affordance' block",
     )
     parser.add_argument(
-        "--converge",
+        "--stale-dossiers",
         action="store_true",
-        help="S5: report the closing-loop convergence signals over the range (collision_flags "
-        "routed to the reinvention backlog + new_clones + demoted hygiene hints). Report + WARN, "
-        "never a gate.",
+        help="list the feature dossiers older than their paths: a commit touching a claimed path "
+        "is not an ancestor of the dossier's last commit. With no range, the whole history at HEAD; "
+        "with <base>..<head>, the dossiers that range touched and did not refresh. Report only.",
+    )
+    parser.add_argument("--json", action="store_true", help="--stale-dossiers: one JSON object")
+    parser.add_argument(
+        "--tree",
+        action="store_true",
+        help="attribute every tracked file instead of a range; prints the header and the code and "
+        "record coverage lines only. Takes no range, --stale-dossiers or --drop-affordance-exempt.",
     )
     args = parser.parse_args()
 
-    if len(args.range) == 1 and ".." in args.range[0]:
+    if args.tree:
+        if args.range or args.stale_dossiers or args.drop_affordance_exempt:
+            parser.error("--tree takes no range, --stale-dossiers or --drop-affordance-exempt")
+        base = head = None
+    elif len(args.range) == 1 and ".." in args.range[0]:
         base, head = args.range[0].split("..", 1)
     elif len(args.range) == 2:
         base, head = args.range
+    elif not args.range and args.stale_dossiers:
+        base, head = None, "HEAD"
     else:
         parser.error("pass <base>..<head> or two refs")
         return 2
 
     # Refuse BEFORE any git call or artifact read: at a root that was never adopted the digest
-    # reports every file UNMAPPED and --converge reports a clean all-clear, both at exit 0.
+    # reports every file UNMAPPED and --stale-dossiers would report every dossier fresh, both at
+    # exit 0.
     try:
         m.require_adopted_root()
     except m.MapError as exc:
         print(f"map-diff refused: {exc}", file=sys.stderr)
         return 2
 
-    files = _changed_files(base, head)
+    if args.stale_dossiers:
+        scope = "HEAD" if base is None else f"{base}..{head}"
+        if base is not None:
+            base = base or "HEAD"  # git's own spelling: an empty side of `..` is HEAD
+        root = m.repo_root()
+        rows = None
+        try:
+            read = read_commit_paths(root, base, head or "HEAD")
+            if read is not None:
+                import map_extractors as ext  # project layer — the claims need the inventory ids
 
-    if args.converge:
-        return _converge(base, head, files)
+                tree = m.load_map_tree(ext.inventory_ids(), root=root, decision_id_re=getattr(
+                    ext, "DECISION_ID_RE", m.DEFAULT_DECISION_ID_RE))
+                rows = m.measure_dossier_staleness(
+                    read[0], tree, m.load_conf(root)["MAP_ROOT"],
+                    keyed_attributors=getattr(ext, "KEYED_ATTRIBUTORS", ()), scope=read[1])
+        except m.MapError as exc:
+            print(f"map-diff: {exc}", file=sys.stderr)
+            return 1
+        print(render_stale_dossiers(scope, rows, as_json=args.json))
+        return 0
+
+    root = m.repo_root()
+    if args.tree:
+        listing = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "-z"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+        )
+        if listing.returncode != 0:
+            print("map-diff --tree: git ls-files failed", file=sys.stderr)
+            return 1
+        files = [p for p in listing.stdout.split("\0") if p]
+        scope = "--tree"
+    else:
+        files = _changed_files(base, head)
+        scope = f"{base}..{head}"
 
     if not files:
-        print(f"map-diff {base}..{head}: no changes")
+        print(f"map-diff {scope}: no changes")
         return 0
 
     import map_extractors as ext  # project layer — only the attribution digest needs it
@@ -380,9 +328,24 @@ def main() -> int:
 
     mapped_count = len(files) - len(unmapped)
     print(
-        f"# map-diff {base}..{head} — {len(files)} files, mapped {mapped_count}/{len(files)} "
+        f"# map-diff {scope} — {len(files)} files, mapped {mapped_count}/{len(files)} "
         f"({100 * mapped_count // len(files)}%)"
     )
+    roots, dead = derive_record_roots(root, m.load_conf(root))
+    if dead is not None:
+        print(f"# code/records: DEAD PROBE - RECORD_ROOTS entry {dead} names no tracked path")
+    elif not roots:
+        print("# code/records: undeclared - set RECORD_ROOTS in .codebase-map.conf")
+    else:
+        unmapped_set = set(unmapped)
+        records = [p for p in files if any(p == r or p.startswith(r + "/") for r in roots)]
+        record_set = set(records)
+        code = [p for p in files if p not in record_set]
+        print(render_coverage_line("code", sum(p not in unmapped_set for p in code), len(code)))
+        print(render_coverage_line("records", sum(p not in unmapped_set for p in records), len(records))
+              + f" under RECORD_ROOTS {' '.join(roots)}")
+    if args.tree:
+        return 0
     for owner in sorted(attributed):
         paths = attributed[owner]
         d = by_feature.get(owner)

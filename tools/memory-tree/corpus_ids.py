@@ -154,6 +154,7 @@ def read(path) -> str:
 # Re-imported here so every caller reaching it as `corpus_ids.parse_conf` keeps working.
 sys.path.insert(0, str(HERE))
 from tree_lib import parse_conf, parse_conf_line  # noqa: E402,F401  the kit's ONE conf parser
+from tree_lib import scan_missing_citations  # noqa: E402  the `missing:` citation form
 
 
 def load_conf(root: str) -> dict:
@@ -458,6 +459,35 @@ def ask_shell(flag: str, root: str) -> str:
 
 
 # ------------------------------------------------------------------------------------ the one walk
+# A trailing `:12` or `:12-30` on a cited path. Cut ONLY for the advisory population below: cutting it
+# inside check 15 proper would move a gated verdict, which is the open ask TOOL-aProbedToolkit-17.
+LINE_LOCATOR = re.compile(r":\d+(?:-\d+)?$")
+
+
+def read_live_readmes(root: str, m: str, tracked_set: set) -> tuple:
+    """`(readmes, links)`: the tracked build READMEs `<m>/LIVE.md` links, resolved relative to that
+    file exactly as walk() resolves its relative links, and how many build links it read.
+
+    A build folder is a record of a moment and stays outside check 15, but a LIVE build's README is
+    what sessions read to orient, so its dead citations are REPORTED, never gated (TOOL-aMendedFleet-24).
+    An untracked `LIVE.md` is an adopter that renders no index: not asked, so `(set(), 0)`.
+    """
+    live = m + "/LIVE.md"
+    if live not in tracked_set:
+        return set(), 0
+    build_link = re.compile(r"^" + re.escape(m) + r"/builds/([^/]+)/")
+    readmes, links = set(), 0
+    for tok in MD_LINK_TARGET.findall(read(os.path.join(root, live))):
+        rel = posixpath.normpath(posixpath.join(m, tok))
+        b = build_link.match(rel)
+        if not b:
+            continue
+        links += 1
+        if rel == f"{m}/builds/{b.group(1)}/README.md" and rel in tracked_set:
+            readmes.add(rel)
+    return readmes, links
+
+
 def walk(root: str, conf: dict) -> dict:
     E = grammar(root)
     # The kit's one route from a bundle to an answer, HANDED the bundle this function already holds.
@@ -499,7 +529,11 @@ def walk(root: str, conf: dict) -> dict:
     defs: dict = {}          # id -> set(paths)
     def_builds: dict = {}    # id -> set(build slugs)
     cites: dict = {}         # id -> set(paths)
-    dead: dict = {}          # (citing file, cited path) -> [count, first line]
+    missing: dict = {}       # id -> set(paths) citing it in the `missing:` form, every file read
+    missing_now: dict = {}   # the same, present-tense files only — check 14's stale clause
+    dead: dict = {}        # (citing file, cited path) -> [count, first line]
+    advisory: dict = {}      # the same shape, for live build READMEs — reported, never gated
+    live_readmes, live_links = read_live_readmes(root, m, tracked_set)
 
     waiver = m + "/" + WAIVER
     for p in corpus:
@@ -516,7 +550,17 @@ def walk(root: str, conf: dict) -> dict:
         # used to count ids cited anywhere, so an adopter's rotated archives and historical builds
         # produced 330 orphans where the present-tense corpus held 4 — two answers to one question.
         now = bool(present.match(p)) and not append_only.match(p)
+        # A live build README is ADMITTED to the path harvest only: no id citation, no check 15 key.
+        admitted = not now and p in live_readmes
+        sink = dead if now else advisory
         for lineno, line in enumerate(text.split("\n"), 1):
+            # The `missing:` form (TOOL-aMendedFleet-26) is blanked out of the line before anything
+            # reads it, so a marked id is neither a citation for check 14 nor an anchor.
+            marked, line = scan_missing_citations(line, E.ID_RE)
+            for i in marked:
+                missing.setdefault(i, set()).add(p)
+                if now:
+                    missing_now.setdefault(i, set()).add(p)
             anchor = anchor_of(line)
             if anchor is None:
                 h = h1_re.match(line)
@@ -545,15 +589,15 @@ def walk(root: str, conf: dict) -> dict:
                             claims = False
                 if claims:
                     def_builds.setdefault(anchor, set()).add(b.group(1))
-            if not now:
+            if not now and not admitted:
                 continue
             # The waiver is check 14's INPUT, not a citation: counted as one, every row kept its own
             # id alive and the stale guard could never fire for an id nothing else cites.
-            if p != waiver:
+            if now and p != waiver:
                 for mm in E.ID_RE.finditer(line):
                     cites.setdefault(mm.group(0), set()).add(p)
             for tok in list(BACKTICKED.findall(line)) + list(MD_LINK_TARGET.findall(line)):
-                cited = tok.rstrip("/")
+                cited = (LINE_LOCATOR.sub("", tok) if admitted else tok).rstrip("/")
                 if any(e in cited for e in ELISION) or "/" not in cited:
                     continue
                 # A token counts as a repo-path citation two ways. (1) Its first segment is a real
@@ -599,10 +643,10 @@ def walk(root: str, conf: dict) -> dict:
                 # a later edit will trust; the reachability arm in the selftest is what stops it
                 # coming back.
                 key = (p, cited)
-                if key in dead:
-                    dead[key][0] += 1
+                if key in sink:
+                    sink[key][0] += 1
                 else:
-                    dead[key] = [1, lineno]
+                    sink[key] = [1, lineno]
 
     # ONE LINE, NAMING THE VERDICT, and only when the skip actually fired over a real population. A
     # gate that silently stops grading is the shape this kit refuses; a count of zero would be noise
@@ -611,9 +655,19 @@ def walk(root: str, conf: dict) -> dict:
     if unarmed_asks:
         v = bconf.verdicts[0]
         notes.append(f"corpus_ids: check 13 skipped {unarmed_asks} ask row(s) — V{v.code}: {v.text}")
+    # Non-gating, and the shell's offender keying skips a line opening `HYGIENE advisory `
+    # (TOOL-aMendedFleet-23). An EMPTY population announces itself rather than reading as clean.
+    if live_links and not live_readmes:
+        notes.append(f"advisory check 15: {m}/LIVE.md links {live_links} build(s) and none resolves to "
+                     f"a tracked build README, so the live-README population is empty and graded nothing")
+    elif advisory:
+        held = len({f for f, _ in advisory})
+        notes.append(f"advisory check 15: {len(advisory)} dead repo-path citation(s) in {held} of "
+                     f"{len(live_readmes)} live build README(s) — corpus_ids.py --report lists them")
     return {
         "tracked": tracked_set, "corpus": corpus, "defs": defs, "def_builds": def_builds,
-        "cites": cites, "dead": dead, "root": root, "conf": conf, "m": m, "notes": notes,
+        "cites": cites, "missing": missing, "missing_now": missing_now, "dead": dead, "advisory": advisory, "root": root, "conf": conf, "m": m,
+        "notes": notes,
     }
 
 
@@ -796,6 +850,12 @@ def checks(w: dict) -> list:
         for i in orphans:
             if i not in waived:
                 bad.append(f"check 14: id {i} is cited but never defined, and is not in {m}/{WAIVER}")
+        # The `missing:` form's stale clause: a present-tense file declaring a gap the corpus has
+        # since filled. A record of a moment is not graded — the id was missing when it was written.
+        for i, citers in sorted(w["missing_now"].items()):
+            if i in w["defs"]:
+                bad.append(f"check 14: id {i} is marked missing but defined — cited missing: in "
+                           f"{', '.join(sorted(citers))}, defined in {', '.join(sorted(w['defs'][i]))}")
         for i in waived:
             if i in w["defs"]:
                 bad.append(f"check 14: {m}/{WAIVER} waives {i}, which now resolves — stale row")
@@ -850,11 +910,15 @@ def cmd_report(root: str, conf: dict) -> int:
     print(f"ids defined      : {len(w['defs'])}")
     print(f"ids cited        : {len(w['cites'])}")
     print(f"orphan ids       : {len(orphans)}  {orphans}")
+    print(f"missing-form ids : {len(w['missing'])}  {sorted(w['missing'])}")
     print(f"build collisions : {len(coll)}  {coll}")
     print(f"dead path cites  : {len(w['dead'])}")
     for note in w["notes"]:
         print(note)
     for k, v in sorted(w["dead"].items()):
+        print(f"    {k[0]}:{v[1]} -> {k[1]} (x{v[0]})")
+    print(f"advisory cites   : {len(w['advisory'])}  (live build READMEs, reported, never gated)")
+    for k, v in sorted(w["advisory"].items()):
         print(f"    {k[0]}:{v[1]} -> {k[1]} (x{v[0]})")
     try:
         members, absent = read_set(w)
@@ -1352,6 +1416,25 @@ def cmd_selftest() -> int:
             lambda: "%s == %d" % (_measure_lines(tM, cM)[0].split('"')[1],
                                   sum("never defined" in l for l in checks(walk(tM, cM)))))
 
+        # TOOL-aMendedFleet-26 — the `missing:` form. The same undefined id as the orphan arm above,
+        # written in the form, is no orphan and is counted on its own; the form naming an id the
+        # corpus DEFINES reds in a present-tense file and is ignored in a record of a moment.
+        tX = os.path.join(base, "missing-form"); os.makedirs(tX)
+        cX = _scratch(tX, extra={
+            "memory/README.md": "# r\n\nContext lives in missing:ARCH-tGhost-9 upstream.\n"})
+        arm("a `missing:` id is not an orphan for check 14", None, lambda: checks(walk(tX, cX)))
+        arm("...and the walk counts it on its own", "{'ARCH-tGhost-9': {'memory/README.md'}}",
+            lambda: walk(tX, cX)["missing"])
+        tY = os.path.join(base, "missing-defined"); os.makedirs(tY)
+        cY = _scratch(tY, extra={
+            "memory/README.md": "# r\n\nSee missing:ARCH-tOne-1 for now.\n",
+            "memory/builds/tOne/spec/2026-08-02-spec-tOne-2.md": "# ARCH-tOne-2 — b\n\nmissing:ARCH-tOne-1\n"})
+        arm("a `missing:` id the corpus defines reds check 14 in a present-tense file",
+            "ARCH-tOne-1 is marked missing but defined — cited missing: in memory/README.md, defined in",
+            lambda: "\n".join(checks(walk(tY, cY))))
+        arm("...and only there: the spec's own marker is a record of a moment", "findings=1;",
+            lambda: "findings=%d;" % sum("marked missing" in l for l in checks(walk(tY, cY))))
+
         # 15 — the four rules.
         DEAD = "# r\n\nSee `memory/gone/never-existed.md` for detail.\n"
         t5 = os.path.join(base, "dead"); os.makedirs(t5)
@@ -1468,6 +1551,40 @@ def cmd_selftest() -> int:
         arm("...and removing the prefix from the conf makes it classified again",
             ".claude/worktrees/whatever",
             lambda: "\n".join(checks(walk(tX, cX2))))
+
+        # 15's ADVISORY population (TOOL-aMendedFleet-24): a build README `LIVE.md` links is read for
+        # paths and REPORTED, never gated. The linked README cites one dead path and one tracked path
+        # with a line locator; a second build absent from `LIVE.md` cites a dead path and is not read.
+        # Routing admitted files into `dead` reds the first three arms below.
+        tL = os.path.join(base, "live-readme"); os.makedirs(tL)
+        cL = _scratch(tL, extra={
+            "memory/LIVE.md": "# live\n\n- [tOne](builds/tOne/README.md)\n",
+            "memory/builds/tOne/README.md":
+                "# tOne\n\nGone: `memory/gone/livedead/`. Kept: `memory/HYGIENE.md:1-2`.\n",
+            "memory/builds/tTwo/README.md": "# tTwo\n\nGone: `memory/gone/unlinked/`.\n"})
+        cL["DEAD_PATH_PIN"] = "0"
+        wL = walk(tL, cL)
+
+        def _check_in(t):
+            out = subprocess.run([sys.executable, os.path.abspath(__file__), "--check"], cwd=t,
+                                 capture_output=True, text=True, encoding="utf-8")
+            adv = [l for l in out.stdout.split("\n") if l.startswith("HYGIENE advisory check 15:")]
+            return f"rc={out.returncode} " + " | ".join(adv)
+
+        arm("a live build README's dead citation is an advisory note, and --check still exits 0",
+            "rc=0 HYGIENE advisory check 15: 1 dead repo-path citation(s) in 1 of 1 live build README(s)",
+            lambda: _check_in(tL))
+        arm("...and the advisory map holds exactly it, the line locator cut", "OK",
+            lambda: "OK" if sorted(wL["advisory"]) == [("memory/builds/tOne/README.md", "memory/gone/livedead")]
+            else str(sorted(wL["advisory"])))
+        arm("...and check 15's dead map stays empty", None, lambda: str(sorted(wL["dead"])))
+        arm("...and a build LIVE.md does not link is not read", None,
+            lambda: str([k for k in wL["advisory"] if "tTwo" in k[0]]))
+        tL0 = os.path.join(base, "live-empty"); os.makedirs(tL0)
+        cL0 = _scratch(tL0, extra={"memory/LIVE.md": "# live\n\n- [tGhost](builds/tGhost/README.md)\n"})
+        cL0["DEAD_PATH_PIN"] = "0"
+        arm("a LIVE.md whose build links resolve to no tracked README says the population is empty",
+            "the live-README population is empty", lambda: "\n".join(walk(tL0, cL0)["notes"]))
 
         # 16 — the charter's read path. STRUCTURAL since TOOL-dSpentCeiling-1: these arms call
         # check_read_path() directly, because it is deliberately NOT reachable from checks(walk(...))

@@ -22,8 +22,32 @@ red at per-id, so a short-circuiting program could never show the floor verdict 
   predicate 4     per-id resolution       every expected id resolves, or red naming it
   predicate 5     the floor               r@k / ceiling vs the pin, or `not evaluated`
 
+The numbers name roles, not run order: the pin is READ before the fixture, because the pin's head
+decides which term lists a question owes.
+
 `not evaluated` is an explicit rule, not a side effect of stopping early: with a `ceiling` of 0
 there is nothing to divide, and printing that beats a 0/0 or a silent skip.
+
+TWO PIN HEADS. `<set>:<substrate>:<metric>@<k>` ranks the bare question over one extracted set
+through `bench.rank_with` -- a configuration no session is served. `served:<metric>@<k>` ranks
+through the CLI's own `query.query_expr` and `query.run_fusion` over sets `query.build_cache`
+builds, so a change to the expression, the rollup or the fusion moves the floor. Under it every
+question owes two term lists, and a graded ROW is one (question, slice) pair: `h`, `R` and the
+ceiling count rows, and each slice's `h` and `R` print so a saturated slice is visible.
+
+WHAT A `served` RUN STILL DOES NOT CHECK. Untracked files: the CLI indexes untracked-not-ignored
+notes and this builds over tracked files only. The `--budget` byte cut `emit` applies to the fused
+list: this grades the ranked list, not the emitted text. And the `k`: the CLI's default is 20,
+the pin's is whatever it names, so a pin at `@5` grades a shallower read than a default query.
+
+`--spec-probes` IS A REPORT, NOT A FLOOR. It harvests the `query.py` question and `--terms` every
+tracked spec's section 10 records, labels each with the foreign ids the same spec cites OUTSIDE
+section 10 (any id section 10 cites is excluded: that is where the author wrote what the probe
+returned), and prints hit@10 of the served path with `n` beside it. Nobody has checked those labels,
+so it pins nothing. What it cannot see: a probe return the author never wrote into section 10
+survives as a label; the corpus graded is today's, records written after the probe included; and
+only ids in the conf's declared families are labels. An empty harvest, or none left after
+de-contamination, prints DEAD PROBE naming the stage and exits 1.
 
 PRECONDITION 3 REPLACED A CHECK THAT COULD NOT FAIL. The spec's rev-3 had it as a predicate asking
 whether the pinned `<metric>@<k>` appeared in the report. Measured while building: `score()` emits
@@ -48,6 +72,7 @@ import json
 import pathlib
 import re
 import shutil
+import sqlite3
 import subprocess
 import sys
 import tempfile
@@ -61,6 +86,7 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 import bench  # noqa: E402
+import extract  # noqa: E402
 import query  # noqa: E402
 import recall_conf  # noqa: E402
 
@@ -81,6 +107,13 @@ PIN_KEY = "RECALL_FLOOR"
 PIN_RE = re.compile(
     r"^(?P<set>[a-z0-9]+):(?P<sub>[a-z0-9]+):(?P<metric>[a-z]+)@(?P<k>\d+)>=(?P<value>\d*\.?\d+)$"
 )
+# The `served` head: no set and no substrate, because the CLI's fused ranking is neither one set nor
+# one `bench` substrate. Under it the floor ranks through `query.query_expr` and `query.run_fusion`.
+SERVED_RE = re.compile(r"^served:(?P<metric>[a-z]+)@(?P<k>\d+)>=(?P<value>\d*\.?\d+)$")
+# The two term lists a question carries under a `served` pin, each one graded ROW: `terms` is the
+# rewrite a session writes after reading the corpus, `naive_terms` one written from the question
+# alone. The naive slice is where the headroom lives; strong terms saturate.
+SLICES = ("terms", "naive_terms")
 
 # The anti-tautology threshold. A question written by reading what the index returns scores ~1.0
 # here; the committed fixture measures min 0.125, mean 0.362, max 0.500, with none at or above 0.60.
@@ -95,12 +128,16 @@ class CheckRefused(Exception):
     """A precondition failed. The message is the whole report -- it names what was missing."""
 
 
-def read_fixture(path: pathlib.Path) -> list[dict]:
+def read_fixture(path: pathlib.Path, slices: tuple = ()) -> list[dict]:
     """Precondition 1. An empty question list is refused HERE rather than downstream.
 
     A fixture with no questions makes the per-id predicate vacuously green and leaves `substrates`
     empty, so the failure would surface as a missing cell three branches later and name the wrong
     thing. That is the `fixture-passes-by-finding-nothing` class arriving through its own gate.
+
+    `slices` names the term lists every question owes -- `SLICES` under a `served` pin, none under a
+    single-pair one. Each list's length must sit inside `query.TERM_BAND`, the band the CLI itself
+    holds a session to, so a list the CLI would refuse is never graded here.
     """
     if not path.is_file():
         raise CheckRefused(f"fixture absent: {path.as_posix()}")
@@ -122,31 +159,50 @@ def read_fixture(path: pathlib.Path) -> list[dict]:
         if not isinstance(ids, list) or any(not isinstance(x, str) for x in ids):
             raise CheckRefused(
                 f"fixture question {i} has a non-string `expected_ids`: {path.as_posix()}")
+        lo, hi = query.TERM_BAND
+        for name in slices:
+            words = q.get(name)
+            if not isinstance(words, list) or any(not isinstance(w, str) or not w.strip()
+                                                  for w in words):
+                raise CheckRefused(
+                    f"fixture question {i} carries no `{name}` word list: {q['query']!r}")
+            if not lo <= len(words) <= hi:
+                raise CheckRefused(
+                    f"fixture question {i} has {len(words)} `{name}`, outside TERM_BAND "
+                    f"{lo}-{hi}: {q['query']!r}")
     return queries
 
 
 def parse_pin(raw: str | None) -> dict:
-    """Precondition 2. `<set>:<sub>:<metric>@<k>>=<float>`, every field in its vocabulary."""
+    """Precondition 2. `served:<metric>@<k>>=<float>` or `<set>:<sub>:<metric>@<k>>=<float>`.
+
+    Both heads parse, so a conf still carrying the single-pair shape grades as it always did.
+    """
     if raw is None:
         raise CheckRefused(f"{PIN_KEY} is not declared in {recall_conf.CONF_NAME}")
     raw = raw.strip().strip('"').strip("'")
     if not raw:
         raise CheckRefused(f"{PIN_KEY} is empty in {recall_conf.CONF_NAME} -- there is no default")
-    m = PIN_RE.match(raw)
+    m = SERVED_RE.match(raw) or PIN_RE.match(raw)
     if not m:
         raise CheckRefused(
-            f"{PIN_KEY} does not parse: {raw!r}; want <set>:<substrate>:<metric>@<k>>=<float>"
+            f"{PIN_KEY} does not parse: {raw!r}; want served:<metric>@<k>>=<float> "
+            f"or <set>:<substrate>:<metric>@<k>>=<float>"
         )
-    if m["set"] not in SETS:
-        raise CheckRefused(f"{PIN_KEY} names set {m['set']!r}; known: {' '.join(SETS)}")
-    if m["sub"] not in SUBS:
-        raise CheckRefused(f"{PIN_KEY} names substrate {m['sub']!r}; known: {' '.join(SUBS)}")
+    served = m.re is SERVED_RE
+    if not served:
+        if m["set"] not in SETS:
+            raise CheckRefused(f"{PIN_KEY} names set {m['set']!r}; known: {' '.join(SETS)}")
+        if m["sub"] not in SUBS:
+            raise CheckRefused(f"{PIN_KEY} names substrate {m['sub']!r}; known: {' '.join(SUBS)}")
     if m["metric"] not in METRICS:
         raise CheckRefused(f"{PIN_KEY} names metric {m['metric']!r}; known: {' '.join(METRICS)}")
+    head = "served" if served else f"{m['set']}:{m['sub']}"
     return {
-        "set": m["set"], "sub": m["sub"], "metric": m["metric"],
+        "served": served, "set": "served" if served else m["set"],
+        "sub": None if served else m["sub"], "metric": m["metric"],
         "k": int(m["k"]), "value": float(m["value"]),
-        "cell": f"{m['set']}:{m['sub']}:{m['metric']}@{m['k']}", "raw": raw,
+        "cell": f"{head}:{m['metric']}@{m['k']}", "raw": raw,
     }
 
 
@@ -214,6 +270,82 @@ def measure_run(data: pathlib.Path, queries: list[dict], pin: dict) -> dict:
     }
 
 
+def build_served_dir(root: pathlib.Path) -> pathlib.Path:
+    """Build the CLI's own two sqlite sets in a throwaway dir, with the CLI's own builder.
+
+    `query.build_cache` over `extract.corpus_inputs` of the root -- tracked files only, where the
+    CLI also takes untracked ones. Nothing about extraction or indexing is restated here.
+    """
+    out = pathlib.Path(tempfile.mkdtemp(prefix="check-recall-served-"))
+    try:
+        files, declared = extract.corpus_inputs(root)
+        query.build_cache(root, out, files, declared)
+    except (OSError, ValueError, sqlite3.Error, subprocess.SubprocessError, SystemExit) as exc:
+        shutil.rmtree(out, ignore_errors=True)
+        raise CheckRefused(f"building the served sets under {root.as_posix()} failed: {exc}") from exc
+    return out
+
+
+def measure_served(dirp: pathlib.Path, queries: list[dict], pin: dict,
+                   slices: tuple = SLICES) -> dict:
+    """One graded ROW per (question, slice), ranked by the CLI's own `query_expr` and `run_fusion`.
+
+    `slices` defaults to both term lists; `--spec-probes` passes `("terms",)`, because a harvested
+    probe carries only the terms its author ran.
+
+    A fused hit satisfies an expected id by `bench.expected_by_target`'s two rules. The anchor map
+    is the served `records.db` `meta` table, and a hit whose `id` column is EMPTY -- how `_write_set`
+    stores a chunk with no parent record -- loses that key before it is judged, so the anchor rule
+    judges it rather than an empty-string comparison.
+    """
+    try:
+        db = sqlite3.connect(f"file:{(dirp / 'records.db').as_posix()}?mode=ro", uri=True)
+        try:
+            rows = db.execute("SELECT m.id, m.path, d.body FROM d JOIN meta m ON m.rowid = d.rowid "
+                              "WHERE m.id != ''").fetchall()
+        finally:
+            db.close()
+    except sqlite3.Error as exc:
+        raise CheckRefused(f"served set unreadable under {dirp.as_posix()}: {exc}") from exc
+    if not rows:
+        raise CheckRefused(
+            f"served set 'records' is EMPTY under {dirp.as_posix()} -- nothing to grade, and a "
+            f"floor over an empty set is satisfied by any corpus"
+        )
+    docs = [{"id": i, "path": p, "text": t} for i, p, t in rows]
+    anchors: dict[str, list[str]] = {}
+    for d in docs:
+        anchors.setdefault(d["id"], []).append(d["path"])
+    key = f"{pin['metric']}@{pin['k']}"
+    per, unresolved = [], []
+    counts = {s: {"h": 0, "R": 0} for s in slices}
+    for q in queries:
+        # Predicate 4 and the overlap audit read the RECORD-level resolution, once per question.
+        targets = bench.expected_by_target(docs, q, anchors)
+        declared = [i.strip() for i in q.get("expected_ids", []) if i.strip()]
+        unresolved.extend(i for i in declared if i not in targets)
+        for s in slices:
+            expr = query.query_expr(q["query"], q[s])
+            fused = query.run_fusion(dirp, expr, pin["k"]) if expr else []
+            judged = [{k: v for k, v in h.items() if k != "id" or v} for h in fused]
+            want = bench.expected_by_target(judged, q, anchors)
+            # `and targets`: a row that cannot resolve is outside R, so it may not count toward h.
+            hit = bool(targets) and bench.score(
+                judged, list(range(len(judged))), want, [pin["k"]])[key] == 1.0
+            per.append({"q": q, "slice": s, "targets": targets, "hit": hit,
+                        "resolves": bool(targets)})
+            counts[s]["R"] += bool(targets)
+            counts[s]["h"] += hit
+    n = len(per)
+    resolved = sum(1 for p in per if p["resolves"])
+    hits = sum(1 for p in per if p["hit"])
+    return {
+        "docs": docs, "per": per, "n": n, "slices": counts,
+        "unresolved": unresolved, "R": resolved, "h": hits,
+        "ceiling": resolved / n, "cell_value": hits / n,
+    }
+
+
 def measure_overlap(run: dict) -> list[dict]:
     """Per question: how much of its vocabulary it shares with the records that answer it.
 
@@ -239,9 +371,14 @@ def measure_overlap(run: dict) -> list[dict]:
             target_terms |= set(bench.terms(run["docs"][i]["text"]))
         qt = list(dict.fromkeys(bench.terms(q["query"])))
         overlap = (len([x for x in qt if x in target_terms]) / max(1, len(qt))) if idx else None
+        # Under a `served` pin `hits` is keyed by slice; under a single-pair pin a keyed `hits`
+        # declares nothing about that cell, so it is not compared.
+        declared = q.get("hits")
+        if isinstance(declared, dict):
+            declared = declared.get(p["slice"]) if p.get("slice") else None
         rows.append({"ids": [i.strip() for i in q.get("expected_ids", []) if i.strip()],
-                     "homes": len(idx), "overlap": overlap,
-                     "hit": p["hit"], "declared_hit": q.get("hits")})
+                     "slice": p.get("slice") or "-", "homes": len(idx), "overlap": overlap,
+                     "hit": p["hit"], "declared_hit": declared})
     return rows
 
 
@@ -254,11 +391,12 @@ def check_audit(run: dict, pin: dict) -> list[str]:
     """
     rows = measure_overlap(run)
     failures = []
-    print(f"{'#':>3}  {'expected id':<28} {'homes':>5} {'hits':>5} {'overlap':>8}")
+    print(f"{'#':>3}  {'expected id':<28} {'slice':<11} {'homes':>5} {'hits':>5} {'overlap':>8}")
     for i, row in enumerate(rows, 1):
         tag = "yes" if row["hit"] else "no"
         shown = "NOT MEAS" if row["overlap"] is None else f"{row['overlap']:.3f}"
-        print(f"{i:>3}  {(row['ids'] or ['-'])[0]:<28} {row['homes']:>5} {tag:>5} {shown:>8}")
+        print(f"{i:>3}  {(row['ids'] or ['-'])[0]:<28} {row['slice']:<11} {row['homes']:>5} "
+              f"{tag:>5} {shown:>8}")
         if row["overlap"] is None:
             failures.append(
                 f"question {i} resolves no target in {pin['set']!r} -- overlap is NOT MEASURED, "
@@ -272,7 +410,10 @@ def check_audit(run: dict, pin: dict) -> list[str]:
         if row["declared_hit"] is not None and bool(row["declared_hit"]) != row["hit"]:
             failures.append(
                 f"question {i} declares hits={row['declared_hit']} and measures {row['hit']}"
+                + (f" in slice {row['slice']}" if row["slice"] != "-" else "")
             )
+    for name, s in run.get("slices", {}).items():
+        print(f"slice {name}: h={s['h']} R={s['R']}")
     h, R = run["h"], run["R"]
     headroom = (h - 1) / (R - 1) if R > 1 else float("nan")
     # Only MEASURED rows enter the summary. Averaging an unmeasured row in as 0.000 is what made the
@@ -293,23 +434,160 @@ def check_audit(run: dict, pin: dict) -> list[str]:
     return failures
 
 
+# -------------------------------------------------------------- --spec-probes: a report, no floor
+
+SPEC_PROBE_K = 10
+SPEC_PROBE_BLIND = (
+    "a REPORT that sets no floor: hit@10 of the served path over the query.py probes recorded in "
+    "every tracked spec's section 10, labelled by the foreign ids the same spec cites outside it. "
+    "It cannot see: a probe return the author never wrote into section 10 (it survives as a label); "
+    "that the corpus graded is today's, including records written after the probe; and any id "
+    "outside the conf's declared families (only those are labels)"
+)
+S10_RE = re.compile(r"^##\s*10\.\s*Reuse audit\b.*$", re.M)
+NEXT_H2_RE = re.compile(r"^##\s", re.M)
+# The closing quote MATCHES the opening one. A character-class close cuts "a spec's question" at the
+# apostrophe -- the rule node d's reuse_lookup harvester recorded; the rule is reused, not the code.
+_QUOTED = r"(?:(?P<{0}d>[\"'])(?P<{0}>.{{1,800}}?)(?P={0}d)|“(?P<{0}c>.{{1,800}}?)”)"
+PROBE_RE = re.compile(
+    r"query\.py\s+" + _QUOTED.format("q")
+    + r"(?:(?:\s+--(?!terms\b)[a-z-]+(?:[ =]\d+)?)*\s+--terms[ =]" + _QUOTED.format("t") + r")?"
+)
+RECALL_LINE_RE = re.compile(r"Recall terms used[^:\n]*:\s*(.+?)(?:\n[ \t]*\n|\Z)", re.S)
+
+
+def read_spec_probes(root: pathlib.Path) -> list[dict]:
+    """Every tracked spec under `<memory root>/builds/*/spec/` (any depth) holding a section-10 probe.
+
+    One dict per spec: its path, build slug, section-10 body, the text OUTSIDE section 10, and its
+    probes, each a question plus the `--terms` it ran -- or the section's `Recall terms used:` list
+    when the invocation carries none, or None when neither exists (the CLI refuses that question).
+    Hard wraps are flattened first; the question itself is the matched-delimiter span.
+    """
+    mem = extract.CONF.memory_root
+    try:
+        listed = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", f"{mem}/builds"],
+                                capture_output=True, text=True, encoding="utf-8", check=True).stdout
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise CheckRefused(f"git ls-files under {root.as_posix()} failed: {exc}") from exc
+    spec_re = re.compile(rf"^{re.escape(mem)}/builds/([^/]+)/spec/.+\.md$")
+    specs = []
+    for rel in sorted(filter(None, listed.split("\0"))):
+        m = spec_re.match(rel)
+        if not m or not (root / rel).is_file():
+            continue
+        text = (root / rel).read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n")
+        head = S10_RE.search(text)
+        if not head:
+            continue
+        nxt = NEXT_H2_RE.search(text, head.end())
+        stop = nxt.start() if nxt else len(text)
+        body = text[head.end():stop]
+        line = RECALL_LINE_RE.search(body)
+        fallback = None
+        if line and "query.py" not in line.group(1):
+            fallback = re.findall(r"[^\s,;`\"']+", line.group(1)) or None
+        probes: dict[tuple, dict] = {}
+        for p in PROBE_RE.finditer(re.sub(r"\s+", " ", body)):
+            question = (p["q"] or p["qc"]).strip()
+            raw = p["t"] or p["tc"]
+            terms = raw.split() if raw and raw.split() else fallback
+            probes.setdefault((question, tuple(terms or ())), {"question": question, "terms": terms})
+        if probes:
+            specs.append({"path": rel, "slug": m.group(1), "s10": body,
+                          "outside": text[:head.start()] + text[stop:],
+                          "probes": list(probes.values())})
+    return specs
+
+
+def derive_probe_labels(spec: dict) -> list[str]:
+    """The ids this spec cites OUTSIDE section 10, minus its own build's, minus any section 10 cites.
+
+    Section 10 is where the author wrote down what the probe returned, so grading the probe on those
+    ids is circular. Every probe of one spec shares this set.
+    """
+    inside = set(extract.ID_RE.findall(spec["s10"]))
+    return [i for i in dict.fromkeys(extract.ID_RE.findall(spec["outside"]))
+            if i.split("-")[1] != spec["slug"] and i not in inside]
+
+
+def print_spec_probes(root: pathlib.Path) -> int:
+    """`--spec-probes`. One row per graded question, one summary line; DEAD PROBE when nothing grades."""
+    specs = read_spec_probes(root)
+    found = sum(len(s["probes"]) for s in specs)
+    if not found:
+        print("check-recall: DEAD PROBE -- the harvest stage found no query.py probe in any tracked "
+              "spec's section 10; a figure over nothing is not a clean zero", file=sys.stderr)
+        return 1
+    dirp = build_served_dir(root)
+    try:
+        try:
+            db = sqlite3.connect(f"file:{(dirp / 'records.db').as_posix()}?mode=ro", uri=True)
+            try:
+                known = {r[0] for r in db.execute("SELECT DISTINCT id FROM meta WHERE id != ''")}
+            finally:
+                db.close()
+        except sqlite3.Error as exc:
+            raise CheckRefused(f"served set unreadable under {dirp.as_posix()}: {exc}") from exc
+        aside: Counter = Counter()
+        unresolved: set[str] = set()
+        queries = []
+        for s in specs:
+            labels = derive_probe_labels(s)
+            unresolved.update(i for i in labels if i not in known)
+            live = [i for i in labels if i in known]
+            for p in s["probes"]:
+                if not p["terms"]:
+                    aside["no-terms"] += 1
+                elif not live:
+                    aside["no-label"] += 1
+                else:
+                    queries.append({"query": p["question"], "terms": p["terms"],
+                                    "expected_ids": live, "path": s["path"]})
+        drops = f"no-terms {aside['no-terms']} · no-label {aside['no-label']}"
+        if not queries:
+            print(f"check-recall: DEAD PROBE -- the de-contamination stage left no question with a "
+                  f"label ({found} probes; {drops})", file=sys.stderr)
+            return 1
+        run = measure_served(dirp, queries, {"metric": "r", "k": SPEC_PROBE_K}, slices=("terms",))
+        for p in run["per"]:
+            print(f"{'hit ' if p['hit'] else 'miss'}  {p['q']['path']}  "
+                  f"[{' '.join(p['q']['expected_ids'])}]  \"{p['q']['query']}\"")
+        n = run["n"]
+        print(f"check-recall: spec-probes -- probes {found} · set aside: {drops} · "
+              f"unresolved ids {len(unresolved)} · n {n} · hit@{SPEC_PROBE_K} "
+              f"{run['h'] / n:.4f} (h {run['h']}, n {n}) -- a report, no floor")
+        return 0
+    finally:
+        shutil.rmtree(dirp, ignore_errors=True)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(add_help=True, description=__doc__.splitlines()[0])
     ap.add_argument("--data-dir", default=None,
-                    help="grade an already-extracted dir instead of extracting (the arms' seam)")
+                    help="grade an already-built dir instead of building one: an extract.py dir "
+                         "under a single-pair pin (the arms' seam), a build_cache dir under served")
     ap.add_argument("--repo", default=None, help="repo root; defaults to the kit's own")
     ap.add_argument("--fixture", default=None, help="fixture path; defaults to the kit's own")
     ap.add_argument("--audit-fixture", action="store_true",
                     help="report per-question homes, hits and overlap; red above OVERLAP_MAX")
+    ap.add_argument("--spec-probes", action="store_true", help=SPEC_PROBE_BLIND)
     args = ap.parse_args()
 
     root = pathlib.Path(args.repo).resolve() if args.repo else recall_conf.repo_root()
+    if args.spec_probes:
+        try:
+            return print_spec_probes(root)
+        except CheckRefused as exc:
+            print(f"check-recall: REFUSED -- {exc}", file=sys.stderr)
+            return 2
     fixture_path = pathlib.Path(args.fixture) if args.fixture else KIT / FIXTURE_NAME
 
     scratch = None
     try:
-        queries = read_fixture(fixture_path)
+        # The pin is read FIRST because it decides which term lists a question owes.
         pin = parse_pin(recall_conf.load_conf(root).get(PIN_KEY))
+        queries = read_fixture(fixture_path, SLICES if pin["served"] else ())
     except CheckRefused as exc:
         print(f"check-recall: REFUSED -- {exc}", file=sys.stderr)
         return 2
@@ -318,13 +596,15 @@ def main() -> int:
         try:
             if args.data_dir:
                 data = pathlib.Path(args.data_dir)
+            elif pin["served"]:
+                data = scratch = build_served_dir(root)
             else:
                 data = scratch = build_data_dir(root)
-            run = measure_run(data, queries, pin)
+            run = (measure_served if pin["served"] else measure_run)(data, queries, pin)
         except CheckRefused as exc:
             # ONE handler over BOTH preconditions. Splitting them left `build_data_dir`'s refusal
-            # escaping as a traceback and exit 1, and it is the only branch the leg's own argv
-            # reaches -- every arm passes --data-dir.
+            # escaping as a traceback and exit 1. The builders are the branch the leg's own argv
+            # reaches; the single-pair arms pass --data-dir and skip them, the served arms do not.
             print(f"check-recall: REFUSED -- {exc}", file=sys.stderr)
             return 2
 
@@ -344,11 +624,13 @@ def main() -> int:
                   f"{', '.join(sorted(set(run['unresolved'])))}")
         else:
             print(f"check-recall: per-id ok -- every expected id resolves in {pin['set']} "
-                  f"({run['R']}/{run['n']} questions)")
+                  f"({run['R']}/{run['n']} {'rows' if pin['served'] else 'questions'})")
 
         # -- predicate 5: the floor. `not evaluated` is a REPORTED state, never a silent skip.
         print(f"check-recall: cell {pin['cell']}  raw {run['cell_value']:.4f}  "
               f"ceiling {run['ceiling']:.4f}")
+        for name, s in run.get("slices", {}).items():
+            print(f"check-recall: slice {name} h={s['h']} R={s['R']}")
         if run["ceiling"] == 0:
             print(f"check-recall: {PIN_KEY} not evaluated -- ceiling is 0, nothing to divide")
         else:

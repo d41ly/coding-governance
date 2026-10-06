@@ -4,7 +4,7 @@
 # Keyed on PATH alone, never <path>:<line> — that keying is what unpinned install-prefix-waivers.txt.
 .claude/skills/unattended/SKILL.md · rendered; its step 0 tells an unattended run to read the method first
 AGENTS.md · the charter's Conventions row, the only carrier that reaches a session with no invocation
-skills/session-kickoff/SKILL.md · Step 5b's hand-back loads the method before the first pass
+skills/session-kickoff/SKILL.md · Step 4 points at M5's two context commands, and Step 5b's hand-back loads the method before the first pass
 tools/memory-tree/README.md · holds the method's displaced sections, and names the file they came from
 tools/memory-tree/adopt-memory-tree.sh · renders the method into an adopting tree
 tools/unattended/SKILL.template.md · the source of the rendered Skill's step 0

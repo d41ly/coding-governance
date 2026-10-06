@@ -134,12 +134,12 @@ KEEPALIVE_DELETE="{{KEEPALIVE_DELETE}}"; KEEPALIVE_INTERVAL="{{KEEPALIVE_INTERVA
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE="{{RESUME_SCHEDULE_CREATE}}"
 RESUME_SCHEDULE_DELETE="{{RESUME_SCHEDULE_DELETE}}"
 # TOOL-aPromptedMandate-5 - ANCHOR_SCOPE is the ONE interpolated key that must NOT keep its
-# placeholder when undeclared. Every adopter shipped today declares it blank, which is legal and
-# means the strict anchor; a placeholder there would red the placeholder arm for the majority case.
+# placeholder when undeclared. An adopter that declares it blank is the common case, which is
+# legal and means the strict anchor; a placeholder there would red the placeholder arm for it.
 ANCHOR_SCOPE=""
 # TOOL-aNamedGesture-1 - AUTH_PARAM is the SECOND such key, and for the reason ANCHOR_SCOPE gives:
-# no adopter declares it today, so keeping the placeholder would red the placeholder arm for every
-# one of them. Pre-set EMPTY rather than to the default, because the default is written once, below,
+# an adopter that declares nothing is the ordinary case, so keeping the placeholder would red the
+# placeholder arm for every such adopter. Pre-set EMPTY rather than to the default, because the default is written once, below,
 # in the derivation - a pre-set default plus a blank-normalisation writes the same literal twice.
 AUTH_PARAM=""
 # MEMORY_TREE_DIR's override is read from the ENVIRONMENT, captured before the conf is sourced so a
@@ -656,17 +656,19 @@ if [ "$MODE" = "--check" ]; then
   echo "unattended: hooks: $N_FRAG fragment(s) wired"
   # THE RESUME TICK'S REGISTRATION, reported and never graded (TOOL-aWokenSentinel-5 S9). Registering
   # `gov-resume-tick` is the OWNER's act, once per node, and an adopter who has not done it has a
-  # working kit, not a broken one — so this is INFO on either answer and the exit code does not
-  # move. Under MSYS `schtasks //query` — a single `/query` from bash is mangled to a Program Files
-  # path, measured 2026-09-16 — elsewhere the crontab listing.
-  case "$(uname -s 2>/dev/null)" in
-    MINGW*|MSYS*|CYGWIN*) if schtasks //query //tn gov-resume-tick >/dev/null 2>&1; then RT_REG=1; else RT_REG=0; fi ;;
-    *) if crontab -l 2>/dev/null | grep -qF resume-tick; then RT_REG=1; else RT_REG=0; fi ;;
-  esac
-  if [ "$RT_REG" = 1 ]; then
+  # working kit, not a broken one — so the exit code does not move on any answer. The probe is the
+  # kit library's one spelling (TOOL-aMendedFleet-61 S6), sourced HERE, after every other use of this
+  # script's own functions, because the library carries a byte-identical `resolve_kit_dir` too. An
+  # unregistered tick is a WARNING, not INFO: a run that stalls here waits for a human.
+  # shellcheck source=lib-unattended.sh
+  . "$KIT_DIR/lib-unattended.sh"
+  read_tick_registration; RT_REG=$?
+  if [ "$RT_REG" = 0 ]; then
     echo "unattended: INFO — the resume tick is registered as gov-resume-tick"
+  elif [ "$RT_REG" = 1 ]; then
+    echo "unattended: WARNING — no scheduled task named gov-resume-tick on this node; the resume tick is unregistered (the kit README has the line)"
   else
-    echo "unattended: INFO — no scheduled task named gov-resume-tick on this node; the resume tick is unregistered (the kit README has the line)"
+    echo "unattended: WARNING — whether gov-resume-tick is registered on this node is UNKNOWN: $TR_WHY"
   fi
   echo "unattended: in sync (skill rendered from template + .unattended.conf)"
   exit 0

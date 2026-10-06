@@ -83,7 +83,7 @@ can discover an existing seam instead of reinventing it. It is a separate plane:
   generated artifact), never a dossier claim. Coverage never sees it, so it cannot fail CI as an
   unclaimed key. `kind` is one of `map_lib.SYMBOL_KINDS` (`function`/`class`/`component`/`const-export`).
 - **id/kind/file ONLY — no fan-in.** Fan-in restales the artifact on nearly every commit; it is
-  computed on demand later (the lookup / `--converge`), never committed. `symbols.json` churns
+  computed on demand later (the lookup), never committed. `symbols.json` churns
   exactly like `inventories.json` (on a symbol add/remove), and is byte-deterministic (sorted
   ids, POSIX paths, LF).
 - **Real parser, or the fail-closed floor — never a leaky regex.** Declare each covered layer in
@@ -108,8 +108,9 @@ can discover an existing seam instead of reinventing it. It is a separate plane:
 
 ## 5. Accepted residuals (know them; don't rediscover them)
 
-- Baseline additions are socially enforced — stateless CI can't tell backfill from evasion;
-  the baseline lives where diffs are conspicuous.
+- Baseline additions are refused against the branch's base, which CI can read only where an
+  `origin` default branch is fetched; without one the gate prints `UNGRADED` and the baseline
+  lives where diffs are conspicuous.
 - Dossier PROSE can rot; keyed claims cannot. Refresh prose when touching the feature.
 - DB/content-defined surfaces (provisioned pages, user data) are not file-enumerable: record
   them as prose notes or an explicit non-goal.

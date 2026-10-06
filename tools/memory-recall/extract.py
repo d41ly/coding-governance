@@ -42,6 +42,7 @@ Reading at a git rev (rather than the worktree) keeps a measurement reproducible
 
 from __future__ import annotations
 
+import fnmatch
 import hashlib
 import json
 import pathlib
@@ -305,7 +306,21 @@ def corpus_files(repo: pathlib.Path, rev: str | None = None,
         names = git(repo, "ls-files", root).splitlines()
         if include_untracked:
             names += git(repo, "ls-files", "--others", "--exclude-standard", root).splitlines()
-    return sorted({p for p in names if p.endswith(".md")})
+    md = {p for p in names if p.endswith(".md")}
+    # `RECALL_EXCLUDE` (TOOL-aMendedFleet-27): shell-style patterns over the repo-relative path, so
+    # `*` spans a slash; case-SENSITIVE on every OS, because git's paths are. A pattern matching
+    # nothing is announced once per process, as an absent declared source is: a mistyped exclusion
+    # would otherwise look exactly like one with nothing left to exclude.
+    for pat in CONF.exclude:
+        hit = {p for p in md if fnmatch.fnmatchcase(p, pat)}
+        if not hit and pat not in _EXCLUDE_ANNOUNCED:
+            _EXCLUDE_ANNOUNCED.add(pat)
+            print(f"recall: RECALL_EXCLUDE pattern matches no corpus path: {pat}", file=sys.stderr)
+        md -= hit
+    return sorted(md)
+
+
+_EXCLUDE_ANNOUNCED: set[str] = set()
 
 
 def corpus_inputs(repo: pathlib.Path, rev: str | None = None,

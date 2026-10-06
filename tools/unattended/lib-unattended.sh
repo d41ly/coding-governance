@@ -30,7 +30,9 @@
 # the generated-output resolver and the commit-time remedy both read; "has this pass committed yet";
 # and `read_advertised_head` with `read_history_range`, the one observation of the remote's tip and the
 # one range rule the two history legs share. The same rule admits the resume tick as a third sourcer,
-# and the health log's appender, the `health_log_sh` block the driver and the tick both write through.
+# and the health log's appender, the `health_log_sh` block the driver and the tick both write through;
+# and the adopter's `--check` as a fourth for `read_tick_registration`, the one probe of whether the
+# resume tick is registered.
 
 # --------------------------------------------------------------------------------- git, once
 # Replace refs and graft advice are both OFF: a leg that reads history must see the history that is
@@ -560,6 +562,24 @@ check_pid_alive() { # pid · [image] · [not-after-utc] -> yes | no | unknown
   case "${2:-}" in ""|absent|"$img") ;; *) echo no; return 0 ;; esac
   case "${3:-}" in ""|absent) ;; *) if st=$(read_pid_start "$1") && [ "$st" \> "$3" ]; then echo no; return 0; fi ;; esac
   echo yes
+}
+
+# THE RESUME TICK'S REGISTRATION, one probe (TOOL-aMendedFleet-61 S4). The adopter's `--check` and
+# the driver's `--preflight` both ask it, so it lives here rather than as a copy in each. Under MSYS
+# `schtasks //query` — a single `/query` from bash is mangled to a Program Files path, measured
+# 2026-09-16 — elsewhere the crontab listing. A probe command that is not on PATH could not ask, and
+# that is not a `no`: it returns 2 with `TR_WHY` naming the missing command.
+read_tick_registration() { # -> 0 registered · 1 not registered · 2 could not ask, TR_WHY says why
+  TR_WHY=""
+  case "$(uname -s 2>/dev/null)" in
+    MINGW*|MSYS*|CYGWIN*)
+      command -v schtasks >/dev/null 2>&1 || { TR_WHY="schtasks is not on PATH"; return 2; }
+      schtasks //query //tn gov-resume-tick >/dev/null 2>&1 || return 1 ;;
+    *)
+      command -v crontab >/dev/null 2>&1 || { TR_WHY="crontab is not on PATH"; return 2; }
+      crontab -l 2>/dev/null | grep -qF resume-tick || return 1 ;;
+  esac
+  return 0
 }
 
 # ------------------------------------------------------------------------------- ids, anchored
@@ -1861,8 +1881,9 @@ pinned_units() {  # commit · build-README-path · [cutoff-date]
   # THE EMPTY-ROSTER REFUSAL, which the sibling also carries and for the same reason: `region` exits
   # 0 with empty stdout for a well-formed pair enclosing nothing, so a BASE README with an id-less
   # units region would otherwise return SUCCESS with an empty roster — and every caller's membership
-  # test then answers "absent" for every unit in the build. Seven tracked build READMEs are in that
-  # state today. Counting the two functions' refusal branches would NOT catch this: both have seven,
+  # test then answers "absent" for every unit in the build. Seven tracked build READMEs were in that
+  # state at ed281374b (2026-08-31).
+  # Counting the two functions' refusal branches would NOT catch this: both have seven,
   # and the sets differ rather than the sizes.
   _pu_ids=$(printf '%s\n' "$_pu_was" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u)
   if [ -z "$_pu_ids" ]; then

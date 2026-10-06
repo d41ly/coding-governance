@@ -343,6 +343,7 @@ write_refusal() { # token · one-line message -> the refusal file, and the run-l
     head-mismatch)  dec=refuse-head ;;
     dirty-tree)     dec=refuse-dirty ;;
     bar-refused)    dec=refuse-bar ;;
+    merge-loss)     dec=refuse-merge-loss ;;
   esac
   { printf '%s\t%s\n' "$1" "${2-}" > "$PUSH_REFUSAL"; } 2>/dev/null
   [ -n "$dec" ] || return 0
@@ -712,6 +713,59 @@ if [ -f "$_sg" ] && . "$_sg" && command -v init_straggler_guard >/dev/null 2>&1 
       RUNLOG_DECISION=refuse-straggler; RUNLOG_CLEAN=1; exit 1
     fi
   done <<< "$push_refs"
+fi
+
+# ---- MERGE LOSS on the default branch — TOOL-aMendedFleet-3 -------------------------------------
+# The charter's §1 Landing says to diff a merge against BOTH parents (the "auto-took" class), and
+# merge `01c22e155` showed what happens when nobody does: it resolved a conflict by taking one side,
+# lost `write_ask_views` — the code of two CLOSED units — and nothing at this boundary noticed. So
+# every two-parent merge in `<remote sha>..<local sha>` of the default-branch update is graded by
+# the lexicon kit's `--merge-losses`, which reads DEFINITIONS through the same extractor its naming
+# gate uses. Only the default ref: that is where a loss lands, and the straggler block above keeps
+# the branch refs. Only the pushed range: history already on the remote is never re-graded.
+#
+# Exit 1 refuses as `merge-loss`, naming each loss and the remedy (a restore commit, or a
+# `superseded: <name> -> <successor>` line in the merge's message). Exit 2 is a DEAD PROBE, which
+# PRINTS and allows, like the straggler block's; no python, no lexicon kit and a brand-new remote
+# branch each print one skip line naming the ref, never silence.
+#
+# WHAT THIS DOES NOT SEE, so a green push is not read as semantic coverage: a body that lost lines
+# under a surviving name, or any loss below definition level (prose, a record row, a conf key); a
+# language `.lexicon.conf` does not arm; a loss masked by a same-named definition at a path the
+# carrying parent did not define it in; and an octopus or base-less merge, which is skipped by name.
+if [ -n "${main_local//0/}" ]; then
+  if [ -z "${main_remote//0/}" ]; then
+    echo "pre-push: the merge-loss check did NOT run over refs/heads/$def — the remote has no such branch yet, so there is no landed range to grade."
+  else
+    _ml_py=$(resolve_python 2>/dev/null || true)
+    _ml_module=""
+    if [ -n "$_ml_py" ]; then
+      for _ml_tree in "$top" "$(cd "$(dirname "$0")/.." && pwd)"; do
+        if _ml_dir=$(resolve_kit_dir "$_ml_py" lexicon lexicon.py "$_ml_tree/${GOV_KITROOT:-.}" 2>/dev/null); then
+          _ml_module="$_ml_tree/$_ml_dir/lexicon.py"; break
+        fi
+      done
+    fi
+    if [ -z "$_ml_py" ]; then
+      echo "pre-push: the merge-loss check did NOT run over refs/heads/$def — no usable python launcher resolved, so no merge in this push was graded."
+    elif [ -z "$_ml_module" ]; then
+      echo "pre-push: the merge-loss check did NOT run over refs/heads/$def — the lexicon kit is installed neither under '$top' nor beside this hook, so no merge in this push was graded."
+    else
+      _ml_out=$(cd "$top" && "$_ml_py" "$_ml_module" --merge-losses "$main_remote..$main_local" 2>&1); _ml_rc=$?
+      if [ "$_ml_rc" = 0 ]; then
+        printf '%s\n' "$_ml_out" | sed 's/^/pre-push: /'
+      elif [ "$_ml_rc" = 2 ]; then
+        echo "pre-push: DEAD PROBE — the merge-loss check could not answer for refs/heads/$def, so this push is ALLOWED on a signal that did not measure:"
+        printf '%s\n' "$_ml_out" | sed 's/^/  /'
+      else
+        why="pre-push: REFUSING — a merge in this push loses a definition one of its parents carried (TOOL-aMendedFleet-3)."
+        echo "$why" >&2
+        printf '%s\n' "$_ml_out" | sed 's/^/  /' >&2
+        echo "  Deliberate override, as always: git push --no-verify" >&2
+        write_refusal merge-loss "$why"; RUNLOG_CLEAN=1; exit 1
+      fi
+    fi
+  fi
 fi
 
 # ---- WHICH BAR RUNS, and has this repository ever seen it? — TOOL-aRepatriatedFork-5 ----------

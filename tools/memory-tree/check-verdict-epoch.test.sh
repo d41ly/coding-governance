@@ -31,10 +31,14 @@ fails=0
 # `exit 1` to `exit 0` left all ten arms green and printed PASS, while run-gates.sh judges a leg
 # purely by its exit status. A gate that has been turned into a printer is exactly the shape this
 # repo exists to catch, and this harness could not see it happen to its own gate.
+# GATE_PUSH_BASE IS THE ARM'S TO SET, never inherited (TOOL-aMendedFleet-65): it moves the gate's
+# base and its verdict, and a suite run under a pre-push bar inherits one naming a gov sha. An arm
+# that wants it passes ARM_GPB.
 arm() { # label · want-rc · expected-substring · dir · [base]
   local label=$1 wantrc=$2 want=$3 dir=$4 base=${5:-}
   local out rc bad=0
-  out=$(cd "$dir" && bash "$GATE" $base 2>&1); rc=$?
+  out=$(cd "$dir" && unset GATE_PUSH_BASE && { [ -z "${ARM_GPB:-}" ] || export GATE_PUSH_BASE=$ARM_GPB; } \
+        && bash "$GATE" $base 2>&1); rc=$?
   [ "$rc" = "$wantrc" ] || bad=1
   case "$out" in *"$want"*) ;; *) bad=1 ;; esac
   if [ "$bad" = 0 ]; then printf 'arm ok    %s\n' "$label"; return; fi
@@ -174,6 +178,43 @@ engine "$F" 1.5 ""
 arm 'an unresolvable base is a REFUSAL, not a pass' 1 'no mainline base' "$F"
 arm 'a bogus base is a named failure' 2 'is not a commit in this repo' "$A" deadbeefdeadbeef
 
+# ---- 5b. THE PUSH BOUNDARY (TOOL-aMendedFleet-65 S7). The lander mints the bump, so a branch owes
+# none: off the boundary an undated engine move is `owed at the lander` and exits 0, and with
+# GATE_PUSH_BASE set the same tree FAILS as it always did. Then the minted merge's shape — the bump
+# made INSIDE a merge onto the base — dates the move, which a `-G` that skips merges never saw.
+# Observed RED against the base gate, which failed the first arm and the merge arm alike.
+G=$(newrepo boundary); engine "$G" 1.5 ""
+( cd "$G" && git add -A && git commit -qm base --no-verify ) >/dev/null
+BASE_G=$(cd "$G" && git rev-parse HEAD)
+( cd "$G" && git checkout -qb feat ) >/dev/null 2>&1
+commit_engine "$G" 1.5 "echo an unbumped behaviour line" "move, no bump"
+arm 'off the push boundary an undated move is owed at the lander, exit 0' 0 'owed at the lander' "$G"
+ARM_GPB=$BASE_G arm '...and with GATE_PUSH_BASE set the same move FAILS' 1 'changes KIT_MEMORY_TREE_VERSION (still 1.5)' "$G"
+# TOOL-aMendedFleet-111 AC3: an ALL-ZERO GATE_PUSH_BASE, which the hook exports on a push creating the
+# default branch, reads as UNSET: the merge-base fallback, so the same move is owed at the lander.
+# Observed RED against the base gate, which exited 2 naming the all-zero commit.
+ARM_GPB=0000000000000000000000000000000000000000 arm '...and an all-zero GATE_PUSH_BASE reads as unset, owed at the lander' 0 'owed at the lander' "$G"
+( cd "$G" && git checkout -q --detach "$BASE_G" && git merge -q --no-ff --no-commit feat ) >/dev/null 2>&1
+engine "$G" 1.6 "echo an unbumped behaviour line"
+( cd "$G" && git add -A && git commit -qm "merge: minted" --no-verify ) >/dev/null
+ARM_GPB=$BASE_G arm '...and a bump minted INTO the merge onto the base dates it' 0 'the version moved 1.5 -> 1.6' "$G"
+
+# ---- 5c. EVERY KIT-VERSION PICKAXE READS MERGES AND PRINTS NO PATCH (TOOL-aMendedFleet-111 AC6). A
+# minted version is introduced by a MERGE, which a pickaxe skips without `--diff-merges=first-parent`;
+# that option alone prints the merge's patch, which a `tail -1` or a sha loop then reads as a commit.
+# Over the tracked scripts of the repository this suite runs in. LIVE: zero hits is a dead probe,
+# since this kit's own gate carries one. Staged red by deleting `--no-patch` from the gate's search.
+pk=$(cd "$(git -C "$HERE" rev-parse --show-toplevel)" && git grep -nE 'log.* -[SG].*KIT_[A-Z_]*_VERSION' -- '*.sh' '*.py' '*.js' 2>/dev/null)
+pk_bad=$(printf '%s\n' "$pk" | grep -v -e '^$' | grep -v -e '--no-patch.*--diff-merges=first-parent' -e '--diff-merges=first-parent.*--no-patch')
+if [ -z "$pk" ]; then
+  fails=$((fails+1)); printf 'arm FAIL  %s\n' 'the kit-version pickaxe scan matched nothing, so it graded nothing (DEAD PROBE)'
+elif [ -n "$pk_bad" ]; then
+  fails=$((fails+1)); printf 'arm FAIL  %s\n' 'a kit-version pickaxe lacks --no-patch or --diff-merges=first-parent:'
+  printf '%s\n' "$pk_bad" | sed 's/^/      /'
+else
+  printf 'arm ok    %s\n' "every kit-version pickaxe reads merges and prints no patch ($(printf '%s\n' "$pk" | grep -c .) site(s))"
+fi
+
 # ---- 6. this repo, right now --------------------------------------------------------------------
 # The live tree must be clean, and it must be clean because the constant MOVED — not because nothing
 # changed. Asserting the message discriminates the two.
@@ -184,7 +225,16 @@ arm 'a bogus base is a named failure' 2 'is not a commit in this repo' "$A" dead
 # It cannot demand a specific clean REASON: which of the two holds depends on whether this branch
 # currently carries an engine change, and both are correct answers. The arms above pin each reason to
 # a fixture where only one of them can be right.
-arm 'the live tree passes, and says so as a clean verdict' 0 'clean —' "$(git -C "$HERE" rev-parse --show-toplevel)"
+#
+# OFF THE PUSH BOUNDARY a branch carrying an undated engine move is `owed at the lander`, exit 0
+# (TOOL-aMendedFleet-65 S7), which is the third correct answer here; `clean —` or that phrase, and
+# never a FAILED, is what this arm accepts.
+live=$(cd "$(git -C "$HERE" rev-parse --show-toplevel)" && unset GATE_PUSH_BASE && bash "$GATE" 2>&1); lrc=$?
+case "$lrc:$live" in
+  0:*"clean —"*|0:*"owed at the lander"*) printf 'arm ok    %s\n' 'the live tree passes, and says so as a clean or owed verdict' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  %s — got rc=%s\n' 'the live tree passes' "$lrc"
+     printf '%s\n' "$live" | sed 's/^/      /' ;;
+esac
 
 if [ "$fails" = 0 ]; then echo "PASS — check-verdict-epoch: all arms held"; exit 0; fi
 echo "FAIL — $fails arm(s) failed"

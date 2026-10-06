@@ -152,6 +152,19 @@
         {"type": "user", "uuid": "n-u2", "timestamp": "2026-09-13T10:01:40.000Z", "version": "9.9.1", "message": {"role": "user", "content": "Owner note for the fixture: @@PLANT_OWNER@@ keep going."}, "origin": {"kind": "human"}},
         {"type": "assistant", "uuid": "n-a5", "timestamp": "2026-09-13T10:05:00.000Z", "version": "9.9.1", "requestId": "req-n5", "message": {"id": "msg-req-n5", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "After the window: wrapping up the fixture."}], "usage": {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}}
       ]
+    },
+    "ready": {
+      "about": "TOOL-aMendedFleet-70. A kickoff whose third request appends the READY card, then one request after READY. --card --append and Kickoff fixture note. are planted over to swap the witness for a text line, or for the injected placeholder.",
+      "main": [
+        {"type": "user", "uuid": "r-u0", "timestamp": "2026-09-13T10:00:00.000Z", "version": "9.9.1", "message": {"role": "user", "content": "Start the fixture work."}, "origin": {"kind": "human"}},
+        {"type": "assistant", "uuid": "r-a1", "timestamp": "2026-09-13T10:00:05.000Z", "version": "9.9.1", "requestId": "req-r1", "message": {"id": "msg-req-r1", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_ready_1", "name": "Read", "input": {"file_path": "fixture-notes.txt"}}], "usage": {"input_tokens": 100, "output_tokens": 10, "cache_read_input_tokens": 1000, "cache_creation_input_tokens": 200}}},
+        {"type": "user", "uuid": "r-u1", "timestamp": "2026-09-13T10:00:06.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_ready_1", "content": "one line of fixture notes", "is_error": false}]}},
+        {"type": "assistant", "uuid": "r-a2", "timestamp": "2026-09-13T10:00:10.000Z", "version": "9.9.1", "requestId": "req-r2", "message": {"id": "msg-req-r2", "role": "assistant", "model": "fixture-model", "content": [{"type": "tool_use", "id": "toolu_ready_2", "name": "Bash", "input": {"command": "git status --short"}}], "usage": {"input_tokens": 5, "output_tokens": 20, "cache_read_input_tokens": 1300, "cache_creation_input_tokens": 50}}},
+        {"type": "user", "uuid": "r-u2", "timestamp": "2026-09-13T10:00:11.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_ready_2", "content": "", "is_error": false}]}},
+        {"type": "assistant", "uuid": "r-a3", "timestamp": "2026-09-13T10:02:00.000Z", "version": "9.9.1", "requestId": "req-r3", "message": {"id": "msg-req-r3", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Kickoff fixture note."}, {"type": "tool_use", "id": "toolu_ready_3", "name": "Bash", "input": {"command": "printf fixture-card | bash fixture-manifest-check.sh --card --append --session fixture"}}], "usage": {"input_tokens": 7, "output_tokens": 30, "cache_read_input_tokens": 1400, "cache_creation_input_tokens": 60}}},
+        {"type": "user", "uuid": "r-u3", "timestamp": "2026-09-13T10:02:01.000Z", "version": "9.9.1", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_ready_3", "content": "card appended", "is_error": false}]}},
+        {"type": "assistant", "uuid": "r-a4", "timestamp": "2026-09-13T10:03:00.000Z", "version": "9.9.1", "requestId": "req-r4", "message": {"id": "msg-req-r4", "role": "assistant", "model": "fixture-model", "content": [{"type": "text", "text": "Starting the fixture work after READY."}], "usage": {"input_tokens": 9, "output_tokens": 40, "cache_read_input_tokens": 1500, "cache_creation_input_tokens": 70}}}
+      ]
     }
   }
 }

@@ -8,9 +8,10 @@ streams = ["tooling", "playbook", "kickoff", "deployer"]
 decisions = []
 
 [claims]
-gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history", "brief-recorded", "unattended protocol size"]
+gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history", "brief-recorded", "unattended protocol size", "unattended skill size"]
 kits = ["unattended"]
 git-hooks = []
+harness-hooks = ["PreToolUse tools/unattended/gate-guard.js", "Stop tools/unattended/stop-guard.js", "StopFailure tools/unattended/stall-recorder.js"]
 workflow-scripts = ["unattended-build.js", "unattended-unit.js"]
 skill-engines = ["session-kickoff"]
 rendered-skills = ["unattended"]
@@ -48,28 +49,25 @@ can author its own authorization has none.
 **THE HARNESS BUYS STAGE ORDER AND CANNOT BUY ENFORCEMENT.** `tools/workflows/unattended-build.js`
 runs SPEC then AUDIT then DISPOSAL and hands the run an ordered ROSTER it dispatches one `Workflow`
 call per unit, so the hand-out is unreachable except through all three and on a TERMINAL `--review`
-verdict — control flow, not a rule an agent remembers. AUDIT is opt-in since
-`TOOL-aBlindedTrial-3`: it runs only when the caller passes `specAudit`; absent, it logs OFF and hands
-out the roster after SPEC with `verdict: NOT-OWED`. It verifies nothing: a Workflow script has no
-filesystem, so every observation is a claim its own agent returned; the refusals live below. TWO
+verdict — control flow, not a rule an agent remembers. AUDIT runs only when the caller passes
+`specAudit` (`TOOL-aBlindedTrial-3`); absent, it logs OFF and hands out the roster after SPEC with
+`verdict: NOT-OWED`. It verifies nothing: a Workflow script has no
+filesystem, so every observation is a claim its own agent returned. TWO
 SHAPES ARE FORCED BY `agent-cap.js` (`TOOL-dFoldedVerdict-4`): DISPOSAL is ONE agent over the whole
 set, and the convergence LOOP sits in the caller while the harness holds the GATE.
 
 **PASS ORDER IS ENFORCED TWICE: ONE PLACE IS BYPASSABLE.** The method's hard floor — never build
-a MISSING or THIN unit — was carried by an agent's memory alone. `plan_state`, the
-M2 classifier, ran at two sites that cannot catch it: `--plan` only reports, and `build-complete`
-runs after every commit has landed, by which point a run that built first and specced afterwards has
-a spec that is neither missing nor thin. `--dispatch` now REFUSES such a pass at the moment of the
-act and is bypassed by not calling the verb; the `pass-order history` leg reads the COMMIT GRAPH,
-asserting each CLOSED unit's build commit had a conforming, non-THIN spec at its FIRST PARENT. Only
-the graph remembers ORDER, which is why the second exists. The first parent, not the pinned BASE:
-the method REQUIRES a run to author a missing spec; what this refuses is authoring it AFTERWARDS.
-`PASS_ORDER_CUTOFF` grandfathers earlier builds, and the leg's liveness line names all three
-populations it walks rather than only the two it grades. `--dispatch` also runs the spec-token
-checker declared as `SPEC_TOKENS_CLI` over the live tree first: this harness closes each unit spec
-in its build commit, so no bar ever grades one (aDeferredBar F3).
+a MISSING or THIN unit — cannot be caught by `plan_state` alone: `--plan` only reports, and
+`build-complete` runs after landing, when a spec written afterwards is neither missing nor thin.
+`--dispatch` REFUSES such a pass at the moment of the act and is bypassed by not calling the verb;
+the `pass-order history` leg reads the COMMIT GRAPH, asserting each CLOSED unit's build commit had a
+conforming, non-THIN spec at its FIRST PARENT, because only the graph remembers ORDER. The first
+parent, not the pinned BASE: a run MUST author a missing spec, and this refuses authoring it
+AFTERWARDS. `PASS_ORDER_CUTOFF` grandfathers earlier builds; the liveness line names all three
+populations the leg walks. `--dispatch` also runs the `SPEC_TOKENS_CLI` checker over the live tree,
+because this harness closes each unit spec in its build commit and no bar grades one (aDeferredBar F3).
 
-**THE DEFINITION OF DONE ASKS ONE QUESTION ABOUT THE WORK AND TWELVE ABOUT THE ARTEFACTS.**
+**THE DEFINITION OF DONE ASKS ONE QUESTION ABOUT THE WORK AND THE REST ABOUT THE ARTEFACTS.**
 `asks-disposed` grades whether the QUESTIONS a run was pointed at ended somewhere the owner
 can accept; every other item grades what it PRODUCED. It folds nothing — status is the
 declared `ASKS_CMD` witness's, and what it reads off the tree is filing, a status ROW and a
@@ -106,8 +104,7 @@ the leg READ them; a phase token or a DoD item spelled into a script is a defect
 in the same file and is read by NEITHER: it is consumed once, by `adopt-unattended.sh`, at render
 time, and its value reaches an agent only through the rendered Skill. The kit owns the
 CORE of both sets and the project may only EXTEND them, asserted against a shrink-only floor —
-without it, deleting an item is a silent, reason-free override of everything keyed on it, and the
-fleet has a recorded pin RAISE indistinguishable from a drain.
+without it, deleting an item is a silent, reason-free override of everything keyed on it.
 
 **Condition 3's two keys may not name one path.** A `SHARED_RECORDS` path may never be declared by a
 pass and a `GENERATED_INDEXES` index may be, alone, so a path under both is answered by whichever
@@ -117,23 +114,19 @@ containment in either direction; the driver refuses such a conf at load and the 
 
 **The run-state file is split mechanically, not by discipline.** The generated region is EMPTY by
 contract and the gate asserts it holds no copy: the unit list is DERIVED from the build README on
-every read, so "current" is the absence of a second answer rather than a comparison between two. The authored region holds only the facts nothing in the tree derives, enumerated in the
-protocol's own section 2 and not counted here: three carriers once held three counts of them at
-once.
+every read, so "current" is the absence of a second answer rather than a comparison between two. The
+authored region holds only the facts nothing in the tree derives, enumerated in the protocol's own
+section 2 and not counted here.
 
-**The template is byte-gated and this feature is kit-conditional.** The unattended rules first landed
-in the domain-rules companion (§1) to stay inside the byte ceiling; v3.0 converged that companion into
-the charter, so they now live in the charter's two `kit:unattended` conditional blocks in §1 — dropped by
-the renderer for a target that did not select the kit. Two amended clauses sit in the unconditional
-body, both written to stay true for a non-adopting re-puller. The Skill's `## Resume` section invokes `/session-kickoff`
-after the reap and the re-schedule (`TOOL-aReplayedCard-3`), so a session resumed after process
-death re-orients and its first commit is not denied on an un-oriented card; `check-unattended.sh`
-check 18 keeps the template's FIRST kickoff mention below its first `--preflight`, and the resume
-mention sits far under both.
+**The template is byte-gated and this feature is kit-conditional.** The rules live in the charter's
+two `kit:unattended` conditional blocks in §1, dropped by the renderer for a target that did not
+select the kit; two amended clauses sit in the unconditional body, true for a non-adopting
+re-puller. The Skill's `## Resume` section invokes `/session-kickoff` after the reap and the
+re-schedule (`TOOL-aReplayedCard-3`), so a resumed session re-orients before its first commit;
+`check-unattended.sh` check 18 keeps the template's FIRST kickoff mention below its first `--preflight`.
 
 **A run is bound by a set of named directives, and each is a POINTER.** The count lives in the
-driver's `DIRECTIVES_CORE` and nowhere here, because this sentence has already been wrong
-about it once. The set is a kit constant the project may extend but not delete; the rules live in the build method and the contract names zero
+driver's `DIRECTIVES_CORE` and nowhere here. The set is a kit constant the project may extend but not delete; the rules live in the build method and the contract names zero
 handles, because naming them twice is the drift the design exists to avoid. A waiver is the owner's,
 taken at preflight and nowhere else — enforced by one branch rather than promised, so a later verb
 cannot take an answer and a re-preflight re-issues the recorded set. A waiver relaxes the directive,
@@ -141,11 +134,9 @@ never a DoD item and never a gate.
 
 **Every remote observation is BOUNDED, and the bound is a file constant.** The kit makes remote
 round-trips on the authorization path — the default-branch HEAD advertisement, the per-branch tip
-under the published anchor, and the leg's own two — and until 2026-08-20 none had a
-deadline. A partitioned endpoint therefore turned `--close` into a silent wait, and the
-same calls inside the leg turned a `git push` into a HUNG push rather than a red one, because the leg
-runs under `.githooks/pre-push`. The tracked incident is a driver selftest that produced zero output
-at 240 s and wedged the bar.
+under the published anchor, and the leg's own two. Unbounded, a partitioned endpoint makes
+`--close` a silent wait and a `git push` a HUNG one rather than a red one, since the leg runs under
+`.githooks/pre-push` (`TOOL-aBoundedVerdict-10`).
 
 Three bounds, because no single mechanism covers every transport: an outer wall clock for blackholed
 packets, `http.lowSpeed{Limit,Time}` for a server that ACCEPTS and then stalls — which no wall clock
@@ -156,48 +147,40 @@ observation and cannot disable credentials for the landing push.
 
 **The load-bearing detail is the CAPTURE, not the deadline.** `out=$(timeout N cmd)` does not bound
 the clock: the substitution reads until EOF, EOF arrives only when the last inherited write end
-closes, and a surviving descendant holds the pipe while `timeout` reports 124 on schedule. Measured
-on node `c` inside the suite that grades it — 8 s through a substitution against a declared 1 s
-bound, 0 s through a file. So the helper redirects to a file and reads it after `timeout` returns,
-with `-k` for the child that ignores SIGTERM. The gate runner carries the identical fix for the
-identical reason, found independently, which is why the arm that proves it MEASURES elapsed time
-rather than asserting a message.
+closes, and a surviving descendant holds the pipe while `timeout` reports 124 on schedule, as
+`TOOL-aBoundedVerdict-13` measured. So the helper redirects to a file and reads it after `timeout`
+returns, with `-k` for the child that ignores SIGTERM, and the arm that proves it MEASURES elapsed
+time rather than asserting a message. The gate runner carries the identical fix.
 
-Two consequences worth knowing before extending this. The helper cannot call the driver's own `GIT()`
+Two consequences. The helper cannot call the driver's own `GIT()`
 wrapper — `timeout` needs an external command and `GIT()` is a shell function — so the dereference
 pins live in named constants that both expand, and the arm checks the constants' VALUES as well as
 their expansion, because an indirection is otherwise a way to weaken a pin while a one-line grep
-stays green. And a transport failure is no longer reported as a semantic answer: the per-branch query
-used to collapse git's 128 into "the remote advertises no tip", telling the operator to push a
-branch that was already pushed.
+stays green. And a transport failure is never reported as a semantic answer: git's 128 on the
+per-branch query is not "the remote advertises no tip".
 
 **What the bound does NOT buy, stated so a green suite is not misread.** No arm drives a blackholed
-endpoint for the full declared bound — that would add the bound to the wall clock of the slowest leg
-on the bar — so the deadline is graded by the mechanism arm plus an elapsed assertion on the
-terminal-record path, and the refusal path is driven by a stub exiting the status `timeout` itself
-returns. The `http.lowSpeed*` and
-`ConnectTimeout` options are asserted BY INSPECTION only: exercising them needs a server that
-authenticates, stalls mid-transfer, and speaks ssh, and no fixture here has one.
+endpoint for the full bound, which would add it to the slowest leg's wall clock: the deadline is
+graded by the mechanism arm plus an elapsed assertion on the terminal-record path, and the refusal
+path by a stub exiting `timeout`'s own status. The `http.lowSpeed*` and `ConnectTimeout` options are
+asserted BY INSPECTION only: no fixture here authenticates, stalls mid-transfer and speaks ssh.
 
-**The kit reads the evidence it already records, from `TOOL-aGradedMandate`.** Four Definition-of-Done
-terms were added or tightened, each consuming a fact the driver already wrote and nothing read. `closing-review-recorded` gained a second term: the LAST `--review` round
-whose subject is the build slug must carry a terminal token, and `CONVERGED` must name zero blockers.
-Two runs in this tree had reached `LANDED` with that item MET while their closing loop stopped at
-BLOCKED with blockers standing, and the incentive was inverted: one more round could oblige a run
-to promote every blocker, while recording nothing owed nothing. `specs-audited` is an eleventh core
-item joining every CLOSED unit to a tracked `spec-audit` binding line, whole-token and expanding the
-`N..M` range form eighteen tracked records use. Since `TOOL-aBlindedTrial-2` it is owed only when
-the README at BASE declares `spec-audit: <date>`, or (`TOOL-aBlindedTrial-7`) the conf at that BASE
-declares `SPEC_AUDIT_DEFAULT` and the README no key — sourced in a subshell, never a sed pipeline; a
-non-date is fail 54 — else a term zero announces `not owed` and the item stays in `DOD_CORE`.
-`build-complete` gained a sixth term
-over `plan_state`'s THIN grade, which `verb_plan` used to compute and overwrite one line later.
+**The Definition of Done reads the evidence the driver already records.** `closing-review-recorded`
+requires the LAST `--review` round whose subject is the build slug to carry a terminal token, and
+`CONVERGED` to name zero blockers, so a closing loop stopped at BLOCKED never reads MET
+(`TOOL-aGradedMandate-1`). `specs-audited` joins every CLOSED unit to a tracked `spec-audit` binding
+line, whole-token and expanding the `N..M` range form (`TOOL-aGradedMandate-2`); it is owed only when
+the README at BASE declares `spec-audit: <date>`, or the conf at that BASE declares
+`SPEC_AUDIT_DEFAULT` and the README no key (`TOOL-aBlindedTrial-7`) — sourced in a subshell, never a
+sed pipeline; a non-date is fail 54 — else a term zero announces `not owed` and the item stays in
+`DOD_CORE`. `build-complete` refuses a CLOSED unit whose spec `plan_state` grades THIN
+(`TOOL-aGradedMandate-4`).
 
 **The parked split has TWO axes and the history side subtracts both.** `PARK_ACTS_OWED` names the acts
 of the `rescope` kind the owner is owed, so a retirement reaches the wrap-up while an addition stays a
-declaration. A `kind:act` member grammar inside `PARK_KINDS_OWED` was tried and REFUSED: the gate leg
-greps the driver for a `park` call site per owed member, and no `park "$rel" rescope:retire` site can
-exist, because the act is a field of the reason. The history complement subtracts the owed acts too —
+declaration. A `kind:act` member grammar inside `PARK_KINDS_OWED` cannot work: the leg greps the
+driver for a `park` call site per owed member, and the act is a field of the reason
+(`TOOL-aGradedMandate-10`). The history complement subtracts the owed acts too —
 without that a retire row matches both alternations and `--status` reports one row as a decision AND
 as a note.
 
@@ -228,23 +211,19 @@ as a note.
 
 seam: `.unattended.conf` — the project declaration surface. Anything that needs to know this repo's
 lander, merge bar, wiring check, bypass ban, scheduler tool names or authorizing token reads it from
-here rather than
-re-deriving or hardcoding. `AUTH_PARAM` is the second key whose BLANK declaration means the kit
-default rather than "off" (`ANCHOR_SCOPE` is the first): the literal lives once, in
-`adopt-unattended.sh`, and the rendered Skill is where a reader learns it. `PHASES_EXTRA` and `DOD_EXTRA` are the sanctioned extension points; the
-core sets are not editable from the project layer.
+here rather than re-deriving or hardcoding. `AUTH_PARAM` and `ANCHOR_SCOPE` read a BLANK
+declaration as the kit default, not "off". `PHASES_EXTRA` and `DOD_EXTRA` are the sanctioned
+extension points; the core sets are not editable from the project layer.
 
 ## Gaps
 
-*Re-derived 2026-08-20 against the tree, not carried forward. Dossier prose is ungated and rots
-silently; re-derive this section whenever the feature is touched.*
+*Dossier prose is ungated and rots silently; re-derive this section whenever the feature is touched.*
 
 - **The junction arm of the adopter e2e is SKIPPED on node `a`**, which cannot create a symlink. It
   reports the skip loudly, but the shape this fleet installs with is unexercised here and needs a
   node that can link.
-- **A bug class this build DISCOVERED is now catalogued but only gated in one place.**
-  `assertion-between-two-derived-values` was found here, in this kit's own leg, and the arm that
-  proves it is this kit's. The class is general — any checker that composes both sides of a
+- **`assertion-between-two-derived-values` is catalogued but gated only here**, by this kit's own
+  arm. The class is general — any checker that composes both sides of a
   comparison has it — and nothing sweeps for it repo-wide.
 - **The DIRECTIVE LAYER is gated on both halves.** Check 16 joins the registry to the Skill's table
   both ways and resolves every cited method section; arms D and E join the protocol's §3 phases, §4
@@ -256,10 +235,9 @@ silently; re-derive this section whenever the feature is touched.*
   (`a-helper-extraction-blinds-a-per-function-rule`). Check 51 and the driver suite's rule 2 declare
   and grade their indirection; rule 1 and checks 39 and 48 read a function the same way and are a
   documented check, not a gate.
-- **The DoD core is `CORE_FLOOR` in `.unattended.conf`, never a count typed here** — this row
-  once said `10:8` and rotted. `closing-review-recorded` joins the pinned BASE to a tracked review
-  record; the base needle is SEVEN characters (git abbreviates to seven here; the eight-char form
-  shipped briefly and matched nothing, an item clearable only by an override the run wrote).
+- **The DoD core is `CORE_FLOOR` in `.unattended.conf`, never a count typed here.**
+  `closing-review-recorded` joins the pinned BASE to a tracked review record by a SEVEN-character
+  base needle, git's abbreviation here; a longer needle matches nothing.
 - **Nothing binds the executing kit to kit code an owner approved.** A run may edit these scripts and
   commit them; the parity legs compare two files one run can change together. This bounds every
   property above and is the reason the protocol names an off-machine verifier as the real control.

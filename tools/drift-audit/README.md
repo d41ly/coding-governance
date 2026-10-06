@@ -1,6 +1,6 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.23` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.24` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `<prefix>/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
 
@@ -90,52 +90,92 @@ Then, in order:
    one's; widen it if your repo writes long justifications above a pin. This tree has two pins
    three lines apart at the same value, which is the case that makes the first half real.
 4. **Seed `PINS` at the values you just measured, not at zero.** A pin above the measured value hides
-   a live regression on day one; a pin below it reds the bar on work nobody did.
+   a live regression on day one; a pin below it reds the bar on work nobody did. Where a gateable
+   signal's rows each carry an `id`, seed `BASELINES` with the measured ids instead of a pin for it.
 4. Wire `--check` into your gate manifest.
 
 ## Layout
 
 | File | Owner | What |
 |---|---|---|
-| `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check` |
+| `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check`, `--delta`, `--escape-ratio` |
 | `drift_signals.template.py` | kit | the project layer's starting point |
-| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK` |
+| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `BASELINES`, `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK`, `REMOTE_CI_WORKFLOW`, `AUTO_MEMORY_DIR`, `DEAD_READINGS_LIMIT`, `DEAD_FILED` |
 | `SKILL.template.md` | kit | rendered to `.claude/skills/drift-audit/SKILL.md` by the adopt script |
 | `adopt-drift-audit.sh` | kit | adopt + the `--check` sync arm for the merge bar |
 | `selftest.py` | kit | the kit's own falsifiability test |
+| `<git-common-dir>/drift-history.tsv` | **node** | written by `--check`: one row per signal per run, never pushed |
 
 Tier 2 needs the two workflow scripts from `<prefix>/workflows/drift-audit-{code,state}.js`.
 
 ## The signals
 
+A report-only signal with no pin by design prints `report only, no pin` in the status column, never
+`over pin 0`: it has nothing to be over, so the column states that rather than raising a red-looking
+word nobody acts on. Its `--json` record carries `null` for both `tolerance` and `pin`. A project
+that wants a threshold for one declares it in its `PINS`, and the column then compares against it.
+Which signals are pinless is the status column's to say, not this paragraph's; a gateable signal
+never is. A gateable signal whose rows each name their offender by `id` may take an id set in
+`BASELINES` instead of a `PINS` count; its status then reads `ok (baseline <n>)` or `OVER BASELINE`.
+
 | Signal | Asks | Gateable |
 |---|---|---|
+| `lexicon_marginal_offense_rate` | how many naming offenders came in per definition added since the commit that adopted the lexicon declaration? Both operands are derived by the lexicon's own extractor at both shas. | no |
 | `ledger_rows_contradicting_git` | does an in-flight row claim "not merged" about a landed sha? | yes |
 | `non_terminal_specs_cited_by_product_source` | does a SPECCED/INPROGRESS spec describe shipped work? | yes |
-| `shrink_only_lists_not_shrinking` | are the lists that promise to shrink actually shrinking? | no |
+| `shrink_only_lists_not_shrinking` | has a list that promises to shrink risen above the lowest count its first-parent history reached (`regrown`), or held at least the rows it was seeded with (`never drained`)? A row whose history cannot be replayed is `unjudgeable`, never an offender. | no |
 | `handkept_inventories_disagreeing_with_source` | does a hand-kept list still match what generates it? | yes |
-| `dangling_pointers_in_own_ledger` | do this node's own rows point at worktrees that exist? | no |
-| `closed_specs_with_no_product_commit` | does a CLOSED spec have a commit that names it and changed the product? | yes |
+| `dangling_pointers_in_own_ledger` | do this node's auto-memory notes (`AUTO_MEMORY_DIR`) name repo paths that `git ls-files` still carries? | no |
+| `closed_specs_with_no_product_commit` | does a CLOSED spec have a commit that names it and changed the product? A spec whose status header carries the field `records-only` declares a records deliverable: it is set aside before the commit join and listed under `records_only` in `--json`, and a `trace-waiver.txt` row beside it reports stale. | yes |
 | `lexicon_verbs_declared_but_unused` | does the verb table still describe the code it was derived from? | yes |
 | `lexicon_ratified_older_than_language_surface` | was the table curated since the languages it grades last moved? | yes |
 | `live_backlog_rows_per_shard` | is a shard’s live set approaching the floor rotation cannot clear? Under `BACKLOG_MODE="builds"`, how many asks derive live, read from the generator’s own live projection? | no |
-| `readme_mechanism_drift` | does a build README still describe a mechanism its own spec set revised? | no |
+| `readme_mechanism_drift` | does a build README still describe a mechanism its own spec set revised? Grades live builds only: a build whose every spec is CLOSED or WONTDO is a frozen record and is skipped, and `of` counts the READMEs of live builds. | no |
 | `backlog_asks_contested` | does an ask carry both closing and declining evidence, or terminal evidence beside a live spec? Not asked under `shards`. | no |
 | `backlog_evidence_sha` | does every `by <sha>` closing an ask resolve to a commit in this clone? Not asked under `shards`. | no |
 | `backlog_asks_unlabelled` | how many live asks carry no severity row? Not asked under `shards`. | no |
+| `open_asks_cited_by_product_source` | does a live ask name work that already shipped? Counts the asks of the generator's live projection whose id tracked `EVIDENCE_GLOBS` source cites, by signal 2's whole-word match in one `git grep`; the detail names each with its status and up to three citing paths. DEAD PROBE when the projection cannot be read or the globs resolve to no file; not asked under `shards`. Report-only until a sampled precision exists, because source legitimately cites an ask it has not fixed yet. | no |
 | `backlog_stragglers` | does a ref still carry backlog row changes unaccounted against the default branch? | no |
 | `asks_disposed_overrides` | how often did a run buy the `asks-disposed` Definition-of-Done item with an override? | no |
 | `run_records_nonterminal_but_merged` | does a run record still read live after its work reached the default branch? | no |
 | `aborted_work_landed` | does a live ABORTED record dated before `HANDOFF_CUTOFF` have work the content predicate reads landed, with no upheld `work-landed-at`? Cleared by the unattended kit's `--settle`; an archive is listed and not counted. | no |
 | `discarded_work_landed` | did the work of an ABORTED record dated on or after `HANDOFF_CUTOFF`, when ABORTED means discard, land anyway? No verb clears it. Not asked while the key is blank. | no |
-| `legs_retried_after_timeout` | how many legs did the merge bar retry, once and alone, after their own ceiling fired, over the run records this git dir still holds? | no |
-| `fleet_over_budget` | which builds hold more undeclared writes than the unattended kit's per-build `UNDECLARED_WRITE_BUDGET`, read from the `check 23 fleet` line of the newest bar run this git dir holds? Not asked without `.unattended.conf`. | no |
+| `legs_retried_after_timeout` | how many legs did the merge bar retry, once and alone, after their own ceiling fired, over the run records every git dir of the clone still holds — the common dir and each linked worktree's — and which legs, how often each failed on its retry? A removed worktree takes its records with it. | no |
+| `fleet_over_budget` | which builds hold more undeclared writes than the unattended kit's per-build `UNDECLARED_WRITE_BUDGET`, read from the `check 23 fleet` line of the newest bar run any git dir of the clone holds? A line reading `over unjudged` is DEAD PROBE, never 0. Not asked without `.unattended.conf`. | no |
+| `remote_ci_red_streak` | how many consecutive completed runs of the declared remote CI workflow on the default branch failed, newest first? Read through `gh`; DEAD PROBE when `gh` cannot answer, not asked under `--check` or with no workflow declared. | no |
+| `cutoff_keys_armed` | how many `_CUTOFF` keys carry a non-blank value across the tracked root-level `.<name>.conf` files? `of` counts every such assignment. | only where `PINS` declares it |
+| `source_cited_ids_resolving_to_no_record` | does every id cited in tracked source resolve to a record, an anchor line under the memory root or a spec's own H1? | no |
+| `dossiers_older_than_their_paths` | how many codebase-map feature dossiers are older than their paths — a commit touching a path the dossier claims is not an ancestor of the dossier's own last commit? Read from the map kit's own `map_diff.py --stale-dossiers --json`, so the attribution is spelled once; map-root paths are never a claim, and a merge commit carries no paths, so a change made only in a conflict resolution is not seen. The detail is the refresh worklist, most-behind first. Not asked where the map kit is absent or unadopted; DEAD PROBE on a shallow clone or when nothing touched a claimed path. | no |
+| `live_builds_without_activity` | how many live builds are dormant? Counts the `dormant` cells of the `Activity` column the memory-tree generator renders into `LIVE.md` against its `LIVE_DORMANT_DAYS`, found by header name, and defines no dormancy rule of its own; `of` counts the `active` and `dormant` rows, any other cell is unjudgeable, and the detail names each dormant build with its `Last record`. Not asked where `LIVE.md` or its `Activity` column is absent. | no |
+
+### Armed cutoff keys are a budget
+
+Every armed `_CUTOFF` key makes a record's required shape depend on a filename date, so
+`cutoff_keys_armed` is pinned: a change that arms a new key reds `--check` unless an old one stops
+counting in the same change. A key stops counting in one of three ways. Its rule becomes
+unconditional, and the key goes with its readers' date guards. Two keys merge into one. Or the key
+is blanked or unassigned, which disarms its rule. The signal cannot tell the third from the first
+two; the diff shows which one happened. With no `PINS` entry the signal reports and never gates,
+because the shipped example confs arm a key. When no tracked root conf assigns any `_CUTOFF` key
+the signal reads DEAD PROBE, never 0.
 
 **Every signal carries a `live` field.** A signal whose population is empty prints `DEAD PROBE`
 instead of a clean `0`. This is the kit's central rule and it is not decoration: the upstream repo's
 convergence tool shipped a `collision_flags` signal structurally incapable of being non-zero, and
 every reader took the 0 as "converged" for thirteen days. A metric that cannot move is worse than no
 metric, because it is read as good news.
+
+**A report-only probe dead for N readings is named for retirement.** "Ignore its value" is honest
+once and is how a dead probe survives for months. The report reads `--check`'s history,
+`<git-common-dir>/drift-history.tsv`, once per run and before it appends; a READING is the last group
+of a run of consecutive groups at one sha, so a bar re-run at one commit ages nothing. A report-only
+signal dead for at least `DEAD_READINGS_LIMIT` readings in a row (10 when undeclared) prints
+`DEAD PROBE for <k> readings` and asks you to take it out of `SIGNALS`, or to file an ask and map the
+signal to its id in `DEAD_FILED`, after which it prints `filed <id>`. The header carries one `# dead-for-N:`
+line naming the readings it found, or that it found no history; a `DEAD_FILED` entry naming a signal
+that is absent or live is named there too. It is REPORT-ONLY because the history is node-local and
+never pushed: a verdict built on it would pass on a fresh clone and fail on an old one at one sha.
+The `--json` record carries `dead_readings`, `null` when no history was read.
 
 The kit holds itself to that rule — `selftest.py` exercises each gateable signal **twice**, once on a
 fixture where it must be silent and once on a minimal violating fixture where it must fire. An arm
@@ -147,7 +187,9 @@ An unattended run's record can keep saying `LANDING` or `BUILDING` after its wor
 branch, so "did it land?" cannot be answered from the record. The signal reads every tracked
 `RUN.md`, and every rotated `RUN.<phase>.<blob8>.md`, **at HEAD and never in the working tree**. It
 counts a record whose phase is not terminal, whose witness is an ancestor of the base ref, and whose
-witness is neither equal to nor behind the record's own `base:`. It reports and never gates, because
+witness is neither equal to nor behind the record's own `base:`. A `LANDING` record whose landing
+commit, the newest commit at HEAD that changed it, is on the base ref reads **derived LANDED** and is
+neither counted nor unjudgeable; the detail's summary line counts those. It reports and never gates, because
 a sanctioned worktree landing raises the count through nobody's fault.
 
 A witness at or behind its base is **unjudgeable**, not clean. The witness is HEAD at the last verb
@@ -181,6 +223,46 @@ The retired ternary had three branches and conflated the last two into the bare 
 a run that measured NOTHING reported the same word as a clean one. Changing any of these sentences
 is a version bump like any other.
 
+## The reading history — `drift-history.tsv`
+
+Every `--check` run, the mode the merge bar's leg executes, appends one GROUP of rows to
+`drift-history.tsv` in the directory `git rev-parse --git-common-dir` names, so every worktree of a
+clone writes one history. `--offenders`, `--json` (even beside `--check`) and the plain table never
+write. The file is node-local: it lives in the git dir, so git never pushes it.
+
+The first line is a header, `#utc`, `sha`, `base_ref`, `base_sha`, `signal`, `state`, `value`, `of`,
+`key_hash`, tab-separated, and readers locate columns by it, never by position. A group shares `utc`
+and the full HEAD `sha`; `state` is `live`, `dead`, `not-asked` or `declared-empty`; `key_hash` is 16
+hex of the SHA-256 over the record's detail keys as `--offenders` spells them, so it moves when the
+members change at an equal count and not when a line number moves, and is `-` for any state but
+`live`. One group per bar, one row per entry of `SIGNALS`, and no rotation. A write that fails prints one
+`history NOT written` line on stderr and never changes the exit status; a write that succeeds prints
+one stdout line naming the row count and the path.
+
+`--delta <base> <head>` is the history's one reader, and the unattended close prints its output as a
+report-only block. It compares the last group read at BASE or an ancestor of it with the last group read
+inside BASE..HEAD, printing one line per signal whose value, state or `key_hash` moved, and every case
+that cannot produce a delta prints one `skipped` line at exit 0; only an argument that is not a commit
+exits 2.
+
+## The escape ratio — `--escape-ratio <YYYY-MM>`, on demand only
+
+Every signal above reads a RECORD; this mode reads an OUTCOME. `drift_report.py --escape-ratio 2026-09`
+takes the month's product fixes — non-merge commits whose subject's first word is `fix`, with an
+optional scope, touching `PRODUCT_GLOBS` — and calls one ESCAPED when any line its diff takes out,
+blamed in its parent, landed on the base before the fix did. A landing is the first-parent commit that
+first made a commit reachable, and the month's landings are the first-parent commits dated in it, UTC.
+Version and audit stamps are dropped before blame, and a fix left with no line is unclassified and
+outside n. It prints n, escaped, the ratio with its 95% Wilson interval, the DIRECT share — fixes made
+on the first-parent line itself, escaped by construction, so that share measures workflow rather than
+defects — and `--json` lists every fix with its class so any figure can be re-derived by hand.
+
+It costs one blame per fix and file, minutes on a Windows host, which is why it is a mode and never a
+signal, refuses `--check`, `--offenders` and `--delta`, and is on no bar and no card. Two biases are
+known: a fix not called `fix` is missed, and blame credits moved code to its mover. The caveat line it
+always prints is the rule: a difference between two months of one repository is not evidence of an
+effect, so it prints no comparison.
+
 ## What "landed" is measured against — the base ladder
 
 Every ancestry answer, every `git show <base>:<path>` a ratchet reads and the trace walk are
@@ -212,6 +294,18 @@ cited as a **forward** reference ("TODO: see FOO-1") reads identically to one ci
 Chasing a perfect oracle is the expensive way to be wrong. A shrink-only pin drains the population
 without needing one, and it is the idiom these repos already use for exactly this. Lower a pin as its
 population drops; raising one needs the same justification as any other ratchet raise.
+
+**A pin bounds a count, not the offenders it counts.** When one pinned offender drains and a new one
+arrives in the same change, the value does not move and `--check` stays green over a regression. So
+a gateable signal whose detail rows each carry an `id` takes an id set in `BASELINES` instead: a row
+whose `id` the set does not list reds as `new`, a listed id no row carries reds as `stale` until its
+line is deleted, and the set may never gain an id against the base, nor be first seeded above the
+pin the base held. There is no escape for an addition: each such signal has a remedy that is not
+one. Nor is moving a signal out of the set an escape: a signal leaving `BASELINES` for `PINS` is
+pinned no higher than the size of the set the base held, or `--check` reds it as a weakened ratchet.
+A signal named in both `PINS` and `BASELINES`, or a `BASELINES` key naming no gateable signal,
+is refused with exit 2. Signals that never gate keep their pins, because a set would change nothing
+`--check` does. The project layer is never evidence for signal 2, so listing an id does not cite it.
 
 ## Oracles are tightened against FIELD false positives, never speculatively
 

@@ -693,6 +693,132 @@ def entry_members(root: pathlib.Path, entry_id: str, desc: dict, desc_path: str)
     return claimed
 
 
+def derive_marker_basis(root: pathlib.Path, descs: dict[str, tuple[dict, str]]) -> dict[str, set[str]]:
+    """TOOL-aMendedFleet-64 S1. Each entry's `gov:kit` marker population: every tracked path its
+    `entry_members` claim, plus its declared `marker_carriers`, `*.test.sh` excluded.
+
+    ONE function because two readers need the same set: `selfcheck` check 5c grades it and
+    `write_version_carriers` writes it, so a file the fixer would miss is a file the check misses too.
+    `*.test.sh` is out because `check-verdict-epoch.test.sh` carries a marker inside a `sed` that
+    mutates a scratch fixture — noise in a deployer's grep, not a wrong claim.
+    """
+    # `-z` AND A NUL SPLIT, never a whitespace one: git quotes a non-ASCII path and prints a spaced
+    # one raw, so a bare `.split()` here loses both. Same defect as the renormalize guards, one
+    # repository over — a tree carrying no such path never exercises the split, which is exactly
+    # why it would rot.
+    tracked_gov = [f for f in subprocess.run(
+        ["git", "-C", str(root), "ls-files", "-z"],
+        capture_output=True, text=True).stdout.split("\0") if f]
+    tracked_set = set(tracked_gov)
+    # Derived only when a carrier needs resolving: a fixture with no registry has no tool root.
+    troot = (derive_tool_root(root)
+             if any(d.get("marker_carriers") for d, _dp in descs.values()) else "")
+    basis: dict[str, set[str]] = {}
+    for eid, (d, dpath) in descs.items():
+        pref = entry_members(root, eid, d, dpath)
+        # `{prefix}`-tokened, never a literal `tools/`: a descriptor ships to adopters and a
+        # hardcoded prefix in one resolves to nothing in a target installed elsewhere. This is
+        # the class `check-install-prefix.sh` grades, and it caught this line on the first bar.
+        allow = {resolve_prefix_token(c, troot) for c in (d.get("marker_carriers") or [])}
+        basis[eid] = {f for f in allow if f in tracked_set} | {
+            f for f in tracked_gov
+            if not f.endswith(".test.sh")
+            and any(f == p or f.startswith(p.rstrip("/") + "/") for p in pref)}
+    return basis
+
+
+def write_version_carriers(root: pathlib.Path, descs: dict[str, tuple[dict, str]],
+                           basis: dict[str, set[str]]) -> list[tuple[str, str, str, str, str]]:
+    """TOOL-aMendedFleet-64 S2, S3. Write every version carrier in `basis` from its entry's
+    `version_from` constant; return one `(path, entry, carrier id, old, new)` per rewrite.
+
+    Within an entry's basis it rewrites: every `gov:kit <entry>@<n>` marker whose number differs;
+    and, on a line matching ANY entry's `version_from` pattern then an optional quote and a number,
+    that number plus every same-line `gov:kit <alias>@<n>` whose alias is no OTHER entry's id — but
+    only when the line carries this entry's marker, or the file does elsewhere and carries no other
+    entry's marker at all. That ownership clause is what keeps review-harness's `version: ` number
+    out of the drift-audit harnesses its `**` also claims. On the constant's own line only the
+    aliases move; its number is the source.
+
+    WHAT IT DOES NOT DO: mint a value, run a `[[regenerate]]` argv, or touch a file outside the
+    basis. Bytes are kept: read and written as UTF-8 with `newline=""`, split on `\\n` alone, and a
+    file is written only when a byte changed. A file that does not decode is named and skipped.
+    """
+    mk = re.compile(r"gov:kit ([a-z0-9-]+)@([0-9]+(?:\.[0-9]+)*)")
+    numv = re.compile(r"([0-9]+(?:\.[0-9]+)+)")
+    carrier_rxs = []
+    for d, _dp in descs.values():
+        vf = d.get("version_from") or {}
+        if "none" in vf or not vf.get("pattern"):
+            continue
+        try:
+            carrier_rxs.append(re.compile("(?:" + vf["pattern"] + r")['\"]?([0-9]+(?:\.[0-9]+)*)"))
+        except re.error:
+            continue
+    texts: dict[str, list[str]] = {}   # path -> [as read, as rewritten so far]
+    skipped: set[str] = set()
+    rewrites: list[tuple[str, str, str, str, str]] = []
+    for eid, (d, _dp) in sorted(descs.items()):
+        vf = d.get("version_from") or {}
+        if "none" in vf or not vf.get("file") or not vf.get("pattern"):
+            continue
+        m = numv.search(entry_version(root, d) or "")
+        if not m:
+            continue
+        want = m.group(1)
+        home = (d.get("home") or "").rstrip("/")
+        src = f"{home}/{vf['file']}" if home else vf["file"]
+        try:
+            own_rx = re.compile(vf["pattern"])
+        except re.error:
+            continue
+        for f in sorted(basis.get(eid, ())):
+            if f in skipped:
+                continue
+            if f not in texts:
+                fp = root / f
+                if not fp.is_file():
+                    continue
+                try:
+                    with open(fp, encoding="utf-8", newline="") as fh:
+                        raw = fh.read()
+                except UnicodeDecodeError:
+                    print(f"govkit: fix skip {f} · not UTF-8, left untouched")
+                    skipped.add(f)
+                    continue
+                except OSError:
+                    continue
+                texts[f] = [raw, raw]
+            lines = texts[f][1].split("\n")
+            file_ids = {h.group(1) for h in mk.finditer(texts[f][1])}
+            foreign = any(i != eid and i in descs for i in file_ids)
+            const_at = (next((n for n, ln in enumerate(lines) if own_rx.search(ln)), -1)
+                        if f == src else -1)
+            for n, ln in enumerate(lines):
+                line_own = any(h.group(1) == eid for h in mk.finditer(ln))
+                owned = line_own or (eid in file_ids and not foreign)
+                hits = [h for h in (rx.search(ln) for rx in carrier_rxs) if h] if n != const_at else []
+                num = min(hits, key=lambda h: h.start(1)) if hits and owned else None
+                aliases = num is not None or (n == const_at and line_own)
+                edits = []   # (start, end, carrier id, old)
+                if num is not None and num.group(1) != want:
+                    edits.append((num.start(1), num.end(1), eid, num.group(1)))
+                for h in mk.finditer(ln):
+                    cid = h.group(1)
+                    if h.group(2) != want and (cid == eid or (aliases and cid not in descs)):
+                        edits.append((h.start(2), h.end(2), cid, h.group(2)))
+                for s, e, cid, old in sorted(edits, reverse=True):
+                    ln = ln[:s] + want + ln[e:]
+                    rewrites.append((f, eid, cid, old, want))
+                lines[n] = ln
+            texts[f][1] = "\n".join(lines)
+    for f, (raw, cur) in sorted(texts.items()):
+        if cur != raw:
+            with open(root / f, "w", encoding="utf-8", newline="") as fh:
+                fh.write(cur)
+    return sorted(rewrites)
+
+
 # ------------------------------------------------------------------------------- selection + tokens
 # The DEFAULT set is DECLARED IN THE REGISTRY, not here. It began as a constant in this file, and a
 # scratch fixture caught what that meant: the engine named five kits by hand while the registry named
@@ -1517,9 +1643,24 @@ def scan_uncontained_writes(src: str) -> list[tuple[int, str, str]]:
     return sorted(out)
 
 
-def selfcheck(root: pathlib.Path, write: bool = False) -> int:
-    r = Report()
+def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int:
     reg = load_registry(root)
+    if fix:
+        # TOOL-aMendedFleet-64 S4. The carriers are written FIRST, then every arm below grades the
+        # result exactly as it would without the flag. The descriptors are read here on a throwaway
+        # report so a read failure is reported once, by the arms' own read below.
+        fdescs = read_descriptors(root, reg, Report())
+        fixed = write_version_carriers(root, fdescs, derive_marker_basis(root, fdescs))
+        for f, _eid, cid, old, new in fixed:
+            print(f"govkit: fix {f} · {cid} {old} -> {new}")
+        for eid in sorted({row[1] for row in fixed}):
+            argvs = [" ".join(a) for a in derive_regenerate_argvs(root, eid, fdescs[eid][0])]
+            if argvs:
+                print(f"govkit: fix {eid} moved · next: {' ; '.join(argvs)}")
+            else:
+                print(f"govkit: fix {eid} moved · declares no [[regenerate]], nothing to re-render")
+        print(f"govkit: fix total {len(fixed)} carrier(s) rewritten")
+    r = Report()
 
     entries = reg.get("entry", [])
     exempts = reg.get("exempt", [])
@@ -1912,21 +2053,11 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     _numv = re.compile(r"([0-9]+(?:\.[0-9]+)+)")
     # `-z` AND A NUL SPLIT, never a whitespace one: git quotes a non-ASCII path and prints a spaced
     # one raw, so a bare `.split()` here loses both. Same defect as the renormalize guards, one
-    # repository over — gov's own tree today has no such path, which is exactly why it would rot.
-    _tracked_gov = [f for f in subprocess.run(
-        ["git", "-C", str(root), "ls-files", "-z"],
-        capture_output=True, text=True).stdout.split("\0") if f]
-    _claimed: dict[str, set[str]] = {}
-    for eid, (d, dpath) in descs.items():
-        pref = entry_members(root, eid, d, dpath)
-        # `{prefix}`-tokened, never a literal `tools/`: a descriptor ships to adopters and a
-        # hardcoded prefix in one resolves to nothing in a target installed elsewhere. This is
-        # the class `check-install-prefix.sh` grades, and it caught this line on the first bar.
-        allow = {resolve_prefix_token(c, derive_tool_root(root)) for c in (d.get("marker_carriers") or [])}
-        _claimed[eid] = allow | {
-            f for f in _tracked_gov
-            if not f.endswith(".test.sh")
-            and any(f == p or f.startswith(p.rstrip("/") + "/") for p in pref)}
+    # repository over — a tree carrying no such path never exercises the split, which is exactly
+    # why it would rot.
+    # The basis is `derive_marker_basis`, which `selfcheck --fix` writes through too
+    # (TOOL-aMendedFleet-64 S1): one population, so the fixer writes exactly what is graded.
+    _claimed = derive_marker_basis(root, descs)
     _owner: dict[str, str] = {}
     for eid, files in _claimed.items():
         for f in files:
@@ -2287,7 +2418,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     #           legs, and it does not compare a descriptor's guard with the manifest's
     #           (TOOL-aPacedTurnstile-12 records that nothing does).
     if legs_path.is_file():
-        tracked_set = set(_tracked_gov)
+        tracked_set = set(tracked(root))
         graded = readers = 0
         for leg in json.loads(legs_path.read_text(encoding="utf-8")):
             guard = [g for g in (leg.get("guard") or []) if g]
@@ -2391,9 +2522,9 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                    f"must supply no bytes for a carved source, and this is the shape that landed "
                    f"gov's own filled extractors in a target")
         # Does the carve-out change any WRITE, or is it redundant with destination last-wins? Both
-        # figures are reported, and a zero on the second does NOT red. Measured on gov today it IS
-        # zero: both shipped carve-outs sit in front of a seed rule that already wins the same
-        # destination. Reporting only the first figure would hide that; reddening on the second would
+        # figures are reported, and a zero on the second does NOT red. Measured on gov at 0dfc56ffa
+        # (2026-08-16) it WAS zero: both shipped carve-outs sat in front of a seed rule that already
+        # won the same destination. Reporting only the first figure would hide that; reddening on the second would
         # red a true state, which is how a gate teaches its operator to waive it.
         if res["carved"]:
             bare = dict(d, files=[x for x in d.get("files", [])
@@ -3344,9 +3475,9 @@ def check_entry_producer(desc: dict) -> bool:
     performed by the parity gate's own --render mode rather than by a separate adopter"). Previewing
     it as a side-effect would be the same over-promise this unit deletes, moved one mark over.
 
-    A `blocks_adopt` hole makes CONFIGURE skip too. No descriptor here declares one today, so that
-    half is correct and unexercised by the shipped tree; `selftest.py` arms it with a FIXTURE, which
-    is the difference between a guard and a claim.
+    A `blocks_adopt` hole makes CONFIGURE skip too. Whether a shipped descriptor declares one is the
+    descriptors' fact and not this docstring's, so that half is armed by a FIXTURE in `selftest.py`
+    rather than by the shipped tree, which is the difference between a guard and a claim.
     """
     if not ((desc.get("adopt") or {}).get("argv") or []):
         return False
@@ -4116,8 +4247,9 @@ SHELL_EXEC_SITES = {
     # ---- resolve from the argv node, which is now a HIT rather than a silent allowlist entry: the
     # ---- old predicate read literal elements only, so gov's own `git` wrapper presented as
     # ---- `['git', '-C']` and was allowlisted unconditionally -- defeating the `git hook run`
-    # ---- exclusion that IS the guarantee this table's header sells. Every one is gov-controlled
-    # ---- TODAY, and each row exists so the next reader has to re-answer that when a caller changes.
+    # ---- exclusion that IS the guarantee this table's header sells. Each was gov-controlled when
+    # ---- its row was written, and each row exists so the next reader has to re-answer that when a
+    # ---- caller changes.
     # DEPL-dRetiredFork-4. The pathspec-over-stdin runner. Its ARGV is gov's own literal in every
     # caller; what crosses from the target is the PATH LIST, and it crosses on STDIN rather than
     # the command line -- which is the whole point, since the argv form died at 32 KiB after a
@@ -7854,8 +7986,9 @@ def derive_carry_rung(base: bytes, needles: dict[str, str], read_ours,
     """THE LADDER: `verbatim`, `eol`, `relocate`, tried in that order, and the first proof wins (S1).
 
     A LADDER AND NOT A LATTICE (§8 F2). The rungs do not compose, so `relocate` is proved on RAW
-    bytes and never on eol-normalised ones. The spec's grounds, attributed: on the live target every
-    `relocate` row proves on raw bytes and none needs the composition, so composing buys nothing today
+    bytes and never on eol-normalised ones. The spec's grounds, attributed, as measured when this
+    was written at 1f84f5841 (2026-08-25): on the live target every `relocate` row proved on raw
+    bytes and none needed the composition, so composing bought nothing then
     and adds a fourth rung's worth of surface. The cost is stated rather than hidden: an adopter whose
     checkout is CRLF and whose prefix is ALSO non-default falls to local delta on those rows and gets
     the three-way instead of a raw write.
@@ -12183,10 +12316,92 @@ def resolve_version_value_at(root: pathlib.Path, desc: dict, commit: str) -> str
     `check-verdict-epoch.sh` makes about its own candidates, so the first dotted number after the
     pattern is the value. A line with none keeps its whole text, which still compares honestly.
     """
-    line = resolve_entry_version_at(root, desc, commit)
+    return derive_version_value(desc, resolve_entry_version_at(root, desc, commit))
+
+
+def derive_version_value(desc: dict, line: str) -> str:
+    """The first dotted number after an entry's version pattern on `line`, else `line` itself.
+
+    ONE reading for the value at a commit and the value in the working tree, which `mint` grades
+    the merge it is about to commit by; two would let the minter and the leg disagree on a number.
+    """
     m = re.search((desc.get("version_from") or {}).get("pattern") or "^", line)
     v = re.search(r"\d+(?:\.\d+)+", line[m.end():] if m else line)
     return v.group(0) if v else line
+
+
+def derive_regenerate_argvs(root: pathlib.Path, eid: str, desc: dict) -> list[list[str]]:
+    """An entry's declared `[[regenerate]]` argvs, tokens resolved, duplicates dropped, in order.
+
+    `{kit}` is the entry's home, else the tool root, and every other token comes from
+    `canonical_ctx`, so each argv runs from the repo root. `selfcheck --fix` prints these and
+    `mint` runs them: one resolution, so the command printed is the command a landing runs.
+    """
+    ctx = {**canonical_ctx(eid), "kit": (desc.get("home") or "").rstrip("/") or derive_tool_root(root)}
+    out: list[list[str]] = []
+    for g in desc.get("regenerate") or []:
+        argv = [resolve_tokens(str(a), ctx)[0] for a in (g.get("argv") or [])]
+        if argv and argv not in out:
+            out.append(argv)
+    return out
+
+
+def derive_epoch_state(root: pathlib.Path, eid: str, desc: dict, base: str, head: str = "HEAD",
+                       now: str | None = None) -> tuple[str, str, str, int]:
+    """One entry's epoch verdict over `<base>..<head>`: `(kind, text, mover, files)`.
+
+    `kind` is `clean`, `skip`, `moved` (a move no bump dates, the one fault a minted value cures) or
+    `broken` (no source to measure, an unreadable version). `text` is the line `epoch` prints after
+    `epoch: <eid> · `. `now` is the value to grade as the head's; None reads it at `head`, and
+    `mint` passes the working tree's. TOOL-aMendedFleet-65 S2: the leg that grades and the verb
+    that mints call this one function, so they cannot disagree about which entry owes a bump.
+    """
+    rng = f"{base}..{head}"
+    paths = sorted({row["src"] for row in resolve_entry(root, desc, canonical_ctx(eid))["survivors"]
+                    if row.get("src") and row["role"] in EPOCH_ROLES})
+    if not paths:
+        return "broken", f"FAILED · no {'/'.join(EPOCH_ROLES)} source to measure", "", 0
+    vf = desc.get("version_from") or {}
+    if "none" in vf or not vf.get("file"):
+        moved = sorted({p for p in git(root, "-c", "core.quotePath=false", "log", "--format=",
+                                       "--name-only", "--full-history", "--no-merges", rng,
+                                       "--", *paths).splitlines() if p})
+        return "skip", f"skip · no declared version · moved: {' '.join(moved) or 'none'}", "", 0
+    where = head if now is None else "the working tree"
+    if now is None:
+        now = resolve_version_value_at(root, desc, head)
+    if now.startswith("("):
+        return "broken", f"FAILED · version {now} at {where}", "", 0
+    movers = git(root, "rev-list", "--full-history", "--no-merges", rng, "--", *paths).split()
+    if not movers:
+        return "clean", f"clean · {now}", "", 0
+    # THE BASE VOTES FIRST. A branch that moved bytes and then reconciled a mainline that had
+    # bumped the kit carries a merge whose value differs from its first parent, which reads as a
+    # bump below — yet the base already holds the value HEAD holds, with other bytes. Two trees,
+    # one number: the defect itself, so an unchanged value against the base is a FAILED outright.
+    same = resolve_version_value_at(root, desc, base) == now
+    home = (desc.get("home") or "").rstrip("/")
+    vsrc = f"{home}/{vf['file']}" if home else vf["file"]
+    # S is VALIDATED, not matched: `-G` finds commits touching the version line, and only one
+    # whose value differs from its FIRST parent's is a bump. A decoy edit must not launder a
+    # move. Merges are diffed against their first parent, because a value can enter a range
+    # only through a merge — measured: check-wiring's 1.4 -> 1.5 over fd240496..a7c78ad2.
+    bumps = [] if same else [
+        c for c in git(root, "log", "--format=%H", "--no-patch", "--full-history",
+                       "--diff-merges=first-parent", "-G", vf["pattern"], rng, "--", vsrc).split()
+        if resolve_version_value_at(root, desc, c) != resolve_version_value_at(root, desc, c + "^")]
+    loose = movers if not bumps else git(
+        root, "rev-list", "--full-history", "--no-merges", head, f"^{base}",
+        *(f"^{s}" for s in bumps), "--", *paths).split()
+    if not loose:
+        return "clean", f"clean · {now}", "", 0
+    w = loose[0]
+    n = len([p for p in git(root, "diff-tree", "--no-commit-id", "--name-only", "-r", w,
+                            "--", *paths).splitlines() if p])
+    if not bumps:
+        return "moved", (f"FAILED · moved in {w[:10]} ({n} files) · no value change in "
+                         f"{base[:10]}..{head[:10]} (still {now})"), w, n
+    return "moved", f"FAILED · last bump {bumps[0][:10]} precedes last move {w[:10]}", w, n
 
 
 def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
@@ -12210,6 +12425,13 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
     Nor a move made inside a merge's own resolution, and a merge that brings a new value in counts
     as a bump for every move it contains: over a long branchy range that is lenient, and on the
     push-boundary range the base check above is what closes it.
+
+    WHERE THE BUMP IS MADE (TOOL-aMendedFleet-65 S6). The lander mints it, `govkit.py mint`, into the
+    prepared merge or the attended landing's mint commit, so a branch owes none. The obligation
+    therefore binds at the PUSH BOUNDARY: `GATE_PUSH_BASE`, which `.githooks/pre-push` exports for a
+    default-branch push, is the base, and every FAILED line stands. An explicit `--base` grades the
+    same way. With neither, a move no bump dates prints `owed at the lander` and does not fail, so
+    an off-boundary run does NOT check that a branch bumped — only that nothing else is broken.
     Exit 1 on any FAILED line or an unresolvable base, 2 on an unreadable registry, else 0.
     """
     r = Report()
@@ -12218,6 +12440,11 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
         for p in r.problems:
             sys.stderr.write(f"govkit: {p}\n")
         return 2
+    boundary = base is not None
+    # An ALL-ZERO value reads as UNSET (TOOL-aMendedFleet-111 S3): the hook exports the remote's old
+    # sha, forty zeros on a push that CREATES the default branch, and no commit carries that name.
+    if base is None and os.environ.get("GATE_PUSH_BASE", "").strip("0"):
+        base, boundary = os.environ["GATE_PUSH_BASE"], True
     if base is None:
         # The default base is `check-verdict-epoch.sh`'s: the merge-base with the default branch,
         # the remote's first. No base is a FAILED exit 1 and never a zero-status skip, because
@@ -12236,70 +12463,124 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
               " · fetch full history, set GOV_DEFAULT_BRANCH, or pass --base <rev>")
         return 1
     base = rb.stdout.strip()
-    rng = f"{base}..HEAD"
+    failed = 0
+    for eid in sorted(descs):
+        kind, text, w, n = derive_epoch_state(root, eid, descs[eid][0], base)
+        if kind == "moved" and not boundary:
+            print(f"epoch: {eid} · owed at the lander · moved in {w[:10]} ({n} files)")
+            continue
+        print(f"epoch: {eid} · {text}")
+        failed += kind in ("moved", "broken")
+    return 1 if failed else 0
+
+
+def cmd_mint(root: pathlib.Path, base: str, head: str | None) -> int:
+    """TOOL-aMendedFleet-65 S1 — the lander's half of the epoch rule: mint what `epoch` would fail.
+
+    For every entry declaring a version, the `derive_epoch_state` verdict over `<base>..<head>` with
+    the value read from the WORKING TREE, which is the tree the lander is about to commit. A `moved`
+    entry gets its value's last dotted component plus one, written on its `version_from` line; then
+    `write_version_carriers` moves every other carrier and each minted entry's `[[regenerate]]`
+    argvs run from the repo root. `--head` defaults to `MERGE_HEAD` mid-merge, else `HEAD`.
+
+    DOES NOT: choose a bump size, mint an entry with no declared version (announced `skip`), stage or
+    commit anything — the lander does — or undo a partial write on failure; the lander discards the
+    tree when this exits non-zero. Exit 1 on an unresolvable base or head, a `broken` entry, a failed
+    write or a regenerate exiting non-zero; 2 on an unreadable registry; else 0.
+    """
+    r = Report()
+    descs = read_descriptors(root, load_registry(root), r)
+    if r.problems:
+        for p in r.problems:
+            sys.stderr.write(f"govkit: {p}\n")
+        return 2
+    if head is None:
+        mh = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet", "MERGE_HEAD"],
+                            capture_output=True, text=True, encoding="utf-8")
+        head = mh.stdout.strip() if mh.returncode == 0 and mh.stdout.strip() else "HEAD"
+    shas = []
+    for what, rev in (("base", base), ("head", head)):
+        rv = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet", f"{rev}^{{commit}}"],
+                            capture_output=True, text=True, encoding="utf-8")
+        if rv.returncode != 0 or not rv.stdout.strip():
+            print(f"mint: FAILED · no {what} to compare against ({rev})")
+            return 1
+        shas.append(rv.stdout.strip())
+    base, head = shas
+    minted: list[str] = []
     failed = 0
     for eid in sorted(descs):
         desc = descs[eid][0]
-        paths = sorted({row["src"] for row in resolve_entry(root, desc, canonical_ctx(eid))["survivors"]
-                        if row.get("src") and row["role"] in EPOCH_ROLES})
-        if not paths:
-            print(f"epoch: {eid} · FAILED · no {'/'.join(EPOCH_ROLES)} source to measure")
+        now = derive_version_value(desc, entry_version(root, desc))
+        kind, text, _w, _n = derive_epoch_state(root, eid, desc, base, head, now=now)
+        if kind == "skip":
+            print(f"mint: {eid} · skip · no declared version")
+            continue
+        if kind == "clean":
+            print(f"mint: {eid} · clean")
+            continue
+        if kind == "broken":
+            print(f"mint: {eid} · {text}")
             failed += 1
             continue
-        vf = desc.get("version_from") or {}
-        if "none" in vf or not vf.get("file"):
-            moved = sorted({p for p in git(root, "-c", "core.quotePath=false", "log", "--format=",
-                                           "--name-only", "--full-history", "--no-merges", rng,
-                                           "--", *paths).splitlines() if p})
-            print(f"epoch: {eid} · skip · no declared version · moved: {' '.join(moved) or 'none'}")
-            continue
-        now = resolve_version_value_at(root, desc, "HEAD")
-        if now.startswith("("):
-            print(f"epoch: {eid} · FAILED · version {now} at HEAD")
+        if not re.fullmatch(r"\d+(?:\.\d+)+", now):
+            print(f"mint: {eid} · FAILED · version {now} has no dotted number to move")
             failed += 1
             continue
-        movers = git(root, "rev-list", "--full-history", "--no-merges", rng, "--", *paths).split()
-        if not movers:
-            print(f"epoch: {eid} · clean · {now}")
-            continue
-        # THE BASE VOTES FIRST. A branch that moved bytes and then reconciled a mainline that had
-        # bumped the kit carries a merge whose value differs from its first parent, which reads as a
-        # bump below — yet the base already holds the value HEAD holds, with other bytes. Two trees,
-        # one number: the defect itself, so an unchanged value against the base is a FAILED outright.
-        same = resolve_version_value_at(root, desc, base) == now
+        parts = now.split(".")
+        new = ".".join(parts[:-1] + [str(int(parts[-1]) + 1)])
+        vf = desc["version_from"]
         home = (desc.get("home") or "").rstrip("/")
-        vsrc = f"{home}/{vf['file']}" if home else vf["file"]
-        # S is VALIDATED, not matched: `-G` finds commits touching the version line, and only one
-        # whose value differs from its FIRST parent's is a bump. A decoy edit must not launder a
-        # move. Merges are diffed against their first parent, because a value can enter a range
-        # only through a merge — measured: check-wiring's 1.4 -> 1.5 over fd240496..a7c78ad2.
-        bumps = [] if same else [
-            c for c in git(root, "log", "--format=%H", "--no-patch", "--full-history",
-                           "--diff-merges=first-parent", "-G", vf["pattern"], rng, "--", vsrc).split()
-            if resolve_version_value_at(root, desc, c) != resolve_version_value_at(root, desc, c + "^")]
-        loose = movers if not bumps else git(
-            root, "rev-list", "--full-history", "--no-merges", "HEAD", f"^{base}",
-            *(f"^{s}" for s in bumps), "--", *paths).split()
-        if not loose:
-            print(f"epoch: {eid} · clean · {now}")
+        fp = root / (f"{home}/{vf['file']}" if home else vf["file"])
+        wrote = False
+        try:
+            with open(fp, encoding="utf-8", newline="") as fh:
+                lines = fh.read().split("\n")
+            rx = re.compile(vf["pattern"])
+            for i, ln in enumerate(lines):
+                m = rx.search(ln)
+                v = re.search(r"\d+(?:\.\d+)+", ln[m.end():]) if m else None
+                if v:
+                    lines[i] = ln[:m.end() + v.start()] + new + ln[m.end() + v.end():]
+                    with open(fp, "w", encoding="utf-8", newline="") as fh:
+                        fh.write("\n".join(lines))
+                    wrote = True
+                    break
+        except (OSError, UnicodeDecodeError, re.error):
+            pass
+        if not wrote:
+            print(f"mint: {eid} · FAILED · could not write {new} on the version line of {fp.relative_to(root).as_posix()}")
+            failed += 1
             continue
-        failed += 1
-        w = loose[0]
-        if not bumps:
-            n = len([p for p in git(root, "diff-tree", "--no-commit-id", "--name-only", "-r", w,
-                                    "--", *paths).splitlines() if p])
-            print(f"epoch: {eid} · FAILED · moved in {w[:10]} ({n} files) · no value change in "
-                  f"{base[:10]}..HEAD (still {now})")
-        else:
-            print(f"epoch: {eid} · FAILED · last bump {bumps[0][:10]} precedes last move {w[:10]}")
-    return 1 if failed else 0
+        print(f"mint: {eid} · {now} -> {new}")
+        minted.append(eid)
+    if failed:
+        return 1
+    if not minted:
+        return 0
+    write_version_carriers(root, descs, derive_marker_basis(root, descs))
+    for eid in minted:
+        for argv in derive_regenerate_argvs(root, eid, descs[eid][0]):
+            try:
+                p = subprocess.run(resolve_shell_argv(argv), cwd=str(root), capture_output=True,
+                                   text=True, encoding="utf-8", errors="replace")
+                rc, tail = p.returncode, (p.stdout + p.stderr).strip().splitlines()[-5:]
+            except OSError as e:
+                rc, tail = 127, [str(e)]
+            if rc != 0:
+                print(f"mint: {eid} · FAILED · regenerate exited {rc}: {' '.join(argv)}")
+                for ln in tail:
+                    print(f"  {ln}")
+                return 1
+    return 0
 
 
 # ------------------------------------------------------------------------------------------- main
 USAGE = """usage:
-  govkit.py selfcheck
+  govkit.py selfcheck [--write] [--fix]
   govkit.py shipped
   govkit.py epoch [--base <rev>]
+  govkit.py mint --base <rev> [--head <rev>]
   govkit.py plan --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
   govkit.py check --target <path> [--run-discharge]
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
@@ -12308,6 +12589,13 @@ USAGE = """usage:
                    [--staged] [--suggest-pins]
   govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
 
+`selfcheck --fix` writes every kit-version carrier in check 5c's basis (markers, same-line constant
+copies, a harness `version:` field) from its entry's `version_from` constant, then grades as plain
+`selfcheck`; it prints each moved entry's `[[regenerate]]` argv and leaves running it to you.
+`epoch` with no `--base` and no `GATE_PUSH_BASE` reports a move no bump dates as `owed at the
+lander` and passes it: `mint`, which `push-main.sh` runs while it prepares a landing, writes the
+next value of every kit `epoch` would fail over `<base>..<head>` into the working tree, every
+carrier and `[[regenerate]]` argv included. It stages and commits nothing.
 `plan`, `check`, `update` and `adopt` are READ-ONLY and none writes a byte; `update --write` performs
 what `update` printed. `adopt` is the BOOTSTRAP: it writes the receipt an already-installed tree
 never had, by measuring that tree against gov's own history, and `--write` is what records it. It
@@ -12753,22 +13041,37 @@ def main(argv: list[str]) -> int:
         sys.stderr.write(USAGE)
         return 0 if argv else 2
     try:
+        if argv[0] == "selfcheck":
+            # `--write` regenerates the subject pin and `--fix` writes the version carriers
+            # (TOOL-aMendedFleet-64 S4); nothing else is accepted. Kept narrow on purpose:
+            # `selfcheck` is the verb a gate leg runs, and a verb that writes by default would let
+            # the bar repair the very record it is supposed to be grading. Parsed here, before
+            # `parse_args`, so a refusal names both flags rather than the generic one.
+            flags = argv[1:]
+            if len(flags) != len(set(flags)) or any(a not in ("--write", "--fix") for a in flags):
+                raise Refusal("selfcheck takes no arguments except --write and --fix")
+            return selfcheck(repo_root(), write="--write" in flags, fix="--fix" in flags)
         if argv[0] == "epoch":
             # Parsed here and not in `parse_args`: `--base` is this verb's alone.
             if len(argv) not in (1, 3) or (len(argv) == 3 and argv[1] != "--base"):
                 raise Refusal("epoch takes no arguments except --base <rev>")
             return cmd_epoch(repo_root(), argv[2] if len(argv) == 3 else None)
+        if argv[0] == "mint":
+            # TOOL-aMendedFleet-65 S1. `--base` is required: the lander names the tip it lands
+            # onto, and a minter that guessed one could mint against a tip nobody is landing on.
+            opts: dict[str, str] = {}
+            rest = argv[1:]
+            while rest:
+                if rest[0] not in ("--base", "--head") or rest[0] in opts or len(rest) < 2:
+                    raise Refusal("mint takes --base <rev> and an optional --head <rev>, nothing else")
+                opts[rest[0]], rest = rest[1], rest[2:]
+            if "--base" not in opts:
+                raise Refusal("mint needs --base <rev>, the tip the landing sits on")
+            return cmd_mint(repo_root(), opts["--base"], opts.get("--head"))
         (verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV, WRITE_WD,
          PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE, STAGED, ACCEPT_ROLE_MOVES,
          SUGGEST_PINS) = parse_args(argv)
         root = repo_root()
-        if verb == "selfcheck":
-            # `--write` is the ONLY argument, and it regenerates the subject pin. Kept narrow on
-            # purpose: `selfcheck` is the verb a gate leg runs, and a verb that writes by default
-            # would let the bar repair the very record it is supposed to be grading.
-            if len(argv) > 2 or (len(argv) == 2 and argv[1] != "--write"):
-                raise Refusal("selfcheck takes no arguments except --write")
-            return selfcheck(root, write=(len(argv) == 2))
         if verb == "shipped":
             if len(argv) > 1:
                 raise Refusal("shipped takes no arguments")
@@ -12812,4 +13115,6 @@ def main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8", errors="backslashreplace")
     raise SystemExit(main(sys.argv[1:]))

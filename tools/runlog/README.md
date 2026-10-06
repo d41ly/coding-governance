@@ -1,6 +1,6 @@
 # runlog — one line grammar for run logs, and one reader for them
 
-<!-- gov:kit runlog@1.7 -->
+<!-- gov:kit runlog@1.8 -->
 
 Three producers append one line per act to a machine-local journal: the unattended driver, the gate
 runner and the pre-push hook. Several consumers read those lines. This kit gives all of them ONE
@@ -73,6 +73,21 @@ bad count is always printed for a file that exists, so a writer emitting garbage
 file prints `runlog: <path> absent` and exits 0: no producer has written yet, which is a state and not
 an error. Exit 2 means no journal root resolved or the file could not be read.
 
+```bash
+python <this kit>/runlog.py journal --producer gates --by-leg --legs <gate-leg manifest>
+```
+
+`--by-leg` reports gate yield: which legs ever catch anything. stdout carries one JSON row per leg,
+`{"leg", "red", "bars", "last_red", "in_manifest", "always_run"}`, most reds first. A bar is a line
+whose `verdict` is GREEN or RED; `red` counts the bars naming the leg in a `fail.<n>` field. With
+`--legs` every leg the manifest names prints, never-red ones included, and `always_run` is true for a
+leg with no guard whose subject is not `kit` and whose chunk is not `selftests`; without it only legs
+that went red print, and stderr says so. stderr names the window, its bar, red-bar and NONE counts,
+`unattributed` (the `fail_more` the writer's cap left unnamed) and `mismatched` (lines whose `failed`
+disagrees with their named failures plus `fail_more`). The journal names failures, never the legs a
+bar ran, so `bars` is an upper bound for a guarded or held leg. Any producer but `gates` exits 2, and
+so does an unreadable manifest. It reports and removes nothing.
+
 ## The library
 
 | name | what it does |
@@ -126,6 +141,7 @@ python <this kit>/runlog.py extract --slug <slug>            # the sessions the 
 python <this kit>/runlog.py extract --session <sid>          # one session, attributed as given
 python <this kit>/runlog.py extract --discover [--slug <s>]  # runs with no journal: a heuristic
 python <this kit>/runlog.py extract --measure <projects dir>  # rate and peak memory, writes nothing
+python <this kit>/runlog.py extract --ready <projects dir>    # spend before READY, writes nothing
 python <this kit>/runlog.py narration --session <sid> --from <t> --to <t>
 ```
 
@@ -174,6 +190,17 @@ event kind's fields and every rule with its evidence are the unit's spec
 through `render_redacted`, inside a frame that says the text is data. Every quoted line sits under a
 gutter, and a control character prints as its escape, so no text can draw the closing marker. Nothing
 is written to disk.
+
+**`--ready`** reports what each session spent before its kickoff reached READY (TOOL-aMendedFleet-70).
+It reads each main file for the first of two witnesses, a shell call carrying `--card` and `--append`
+as words, or an assistant text line in the READY micro-format that is not the injected `none yet`
+placeholder. It prints, per session reaching READY, the minutes from its first timed record, the
+requests and summed tokens of every `usage` event at or before READY across all splits, and the main
+context at its first request and at its last before READY, then quartiles over those sessions. It
+keeps times and counts only, matching both witnesses in memory, and writes nothing; a root holding no
+session is a `DEAD PROBE`, exit 2. What `--ready` cannot see: a session that reached READY with
+neither witness, which it counts as not ready, and a READY line quoted inside a longer message, which
+it counts as the witness.
 
 **The self-test never reads or writes a real store.** Its `main` aims `HOME`, `USERPROFILE`,
 `LOCALAPPDATA`, `XDG_STATE_HOME` and `CLAUDE_CONFIG_DIR` at a decoy tree holding a canary transcript
@@ -344,8 +371,9 @@ two bounds' difference. A model carrying no `record_window` renders both facts `
 alone. `closed-by` is one of three. `terminal-write`, where a record commit already carries a terminal
 phase: the bound is that commit's time and it is final. `last-activity`, where the run has not closed
 at all: the bound is its last record commit. And `terminal-pending`, where the run-state file is
-terminal but the commit carrying that write has not landed — which is EVERY record the Skill renders
-after `--landed` or `--abort`, because each render rides the commit that carries the run-state write
+terminal but the commit carrying that write has not landed — which is EVERY record rendered at a
+terminal verb: the one `--close` and `--abort` render themselves, and the one the Skill renders
+after `--landed`, because each render rides the commit that carries the run-state write
 the verb just staged. Such a record's closing bound is the last committed record commit, and the
 closer says so, instead of reading `last-activity` beside `terminal: yes`, which describes a run that
 stopped by going quiet. A re-render once that commit has landed reads `terminal-write` with the

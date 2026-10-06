@@ -95,20 +95,78 @@ def _tool_kits() -> list[str]:
     return names
 
 
-def _git_hooks() -> list[str]:
-    """The tracked git hooks in .githooks/ (core.hooksPath points here).
+#: The hook names githooks(5) documents. A name git never runs is not a hook, so a misspelt one
+#: must not be inventoried as live; a hook git adds later fails loudly in _git_hooks until it is
+#: added here (TOOL-aMendedFleet-39).
+GIT_HOOK_NAMES = frozenset({
+    "applypatch-msg", "pre-applypatch", "post-applypatch", "pre-commit", "pre-merge-commit",
+    "prepare-commit-msg", "commit-msg", "post-commit", "pre-rebase", "post-checkout", "post-merge",
+    "pre-push", "pre-receive", "update", "proc-receive", "post-receive", "post-update",
+    "reference-transaction", "push-to-checkout", "pre-auto-gc", "post-rewrite",
+    "sendemail-validate", "fsmonitor-watchman", "p4-changelist", "p4-prepare-changelist",
+    "p4-post-changelist", "p4-pre-submit", "post-index-change",
+})
 
-    A hook's sibling `<stem>.test.sh` is its TEST, not a hook, and is excluded by suffix so a new
-    hook-plus-test pair needs no patch here.
+
+def _git_hooks() -> list[str]:
+    """The tracked git hooks in .githooks/ (core.hooksPath points here) — the files git RUNS.
+
+    A hook's sibling `<stem>.test.sh` is its TEST, and any other file with an extension is a helper
+    a hook sources or calls; neither is a key. An extension-less file whose name is not in
+    GIT_HOOK_NAMES raises, because git will never run it.
     """
     base = ROOT / ".githooks"
     m.no_subdirs(base, "git-hooks")
-    names = sorted(
-        p.name for p in base.iterdir() if p.is_file() and not p.name.endswith(".test.sh")
-    )
+    names = []
+    for p in base.iterdir():
+        if not p.is_file() or p.name.endswith(".test.sh") or p.suffix:
+            continue
+        if p.name not in GIT_HOOK_NAMES:
+            raise m.MapError(
+                f"git-hooks: .githooks/{p.name} is not a hook name git runs (githooks(5)) — "
+                "rename it, give a helper an extension, or add a new git hook to GIT_HOOK_NAMES"
+            )
+        names.append(p.name)
     if not names:
         raise m.MapError("git-hooks: .githooks/ holds no hook files")
-    return names
+    return sorted(names)
+
+
+_PROJECT_SCRIPT = re.compile(r"\$\{CLAUDE_PROJECT_DIR\}/([^\"'\s]+)")
+
+
+def _derive_harness_hooks(doc: object) -> object:
+    """`<event> <script>` for every command hook .claude/settings.json wires.
+
+    The script is the repo-relative path the command runs under ${CLAUDE_PROJECT_DIR}/; several
+    matchers wiring one script on one event are one key. Fail-closed: a non-command hook, a command
+    naming no project script or more than one, and a script not in the tree each raise naming the
+    event and the command.
+    """
+    events = doc["hooks"] if isinstance(doc, dict) else None
+    if not isinstance(events, dict):
+        raise m.MapError("harness-hooks: expected a `hooks` table of events")
+    keys = set()
+    for event, groups in events.items():
+        if not isinstance(groups, list):
+            raise m.MapError(f"harness-hooks: {event}: expected a list of matcher groups")
+        for group in groups:
+            for hook in (group.get("hooks") if isinstance(group, dict) else None) or [None]:
+                cmd = hook.get("command") if isinstance(hook, dict) else None
+                if not isinstance(hook, dict) or hook.get("type") != "command" or not isinstance(cmd, str):
+                    raise m.MapError(f"harness-hooks: {event}: not a command hook: {hook!r}")
+                scripts = _PROJECT_SCRIPT.findall(cmd)
+                if len(scripts) != 1:
+                    raise m.MapError(
+                        f"harness-hooks: {event}: command names {len(scripts)} "
+                        f"${{CLAUDE_PROJECT_DIR}}/ scripts, expected one: {cmd}"
+                    )
+                if not (ROOT / scripts[0]).is_file():
+                    raise m.MapError(
+                        f"harness-hooks: {event}: {scripts[0]} is not a file in the tree: {cmd}"
+                    )
+                keys.add(f"{event} {scripts[0]}")
+    return keys
 
 
 def _gate_legs(doc: object) -> object:
@@ -139,6 +197,10 @@ EXTRACTORS: dict[str, object] = {
     "kits": _tool_kits,
     # The tracked hooks that enforce the bar at the git boundary.
     "git-hooks": _git_hooks,
+    # The harness hooks that steer a session, one key per event and script (TOOL-aMendedFleet-39).
+    "harness-hooks": lambda: m.json_artifact_inventory(
+        ROOT / ".claude" / "settings.json", "harness-hooks", _derive_harness_hooks
+    ),
     # The multi-agent harnesses and the gates over them.
     "workflow-scripts": lambda: m.glob_inventory(
         resolve_kit_dir("workflows", "tier2-review.js", TOOLS), "*.js", "workflow-scripts"
@@ -216,11 +278,60 @@ def _read_lexicon_verbs() -> list[str]:
 # SYMBOL_EXTRACTORS — the reuse RECALL tier. Feeds generated/symbols.json only, never the
 # ratchet, so a new symbol never fails CI.
 #
-# bash is DECLARED RECALL-DARK in .codebase-map.conf rather than covered here: map_lib ships a
-# real parser for Python and an enumeration floor for JS, and nothing for shell. A regex over
-# shell function definitions would be exactly the silently-skips-what-it-forgot extractor the
-# fail-closed law bans, and it would look like coverage.
+# Shell is COVERED by `kit-sh`, through the lexicon kit's tokenizer `parse_shell_defs` rather than
+# a regex: a regex over shell function definitions would be exactly the silently-skips-what-it-forgot
+# extractor the fail-closed law bans, and it reports a function inside a heredoc body as shell.
+# PROJECT-OWNED and never in the template: an adopter without the lexicon has no tokenizer to call.
 # --------------------------------------------------------------------------------------
+
+#: The PRODUCT shell roots (TOOL-aMendedFleet-35 F1): the tool root, the tracked hooks and the
+#: skills. Shell under `memory/builds/` is evidence in a build record, not a seam, and stays out.
+SHELL_ROOTS = (TOOLS, ROOT / ".githooks", ROOT / "skills")
+
+
+def scan_shell_layer(layer: str, roots, *, root: Path | None = None) -> list[dict[str, str]]:
+    """One `function` row per PUBLIC shell definition in every `*.sh` under `roots`.
+
+    Read through the lexicon kit's `parse_shell_defs`, a tokenizer, so a heredoc-embedded function
+    is not a definition. A name starting with `_` is private and skipped, the rule `python_symbols`
+    applies to Python. `file` is POSIX-relative to `root` (the repo root by default).
+
+    FAIL CLOSED, none of which yields a smaller index: a lexicon kit the resolver cannot find, a
+    root that is not a directory, a file the tokenizer refuses, and a layer that yields zero rows
+    over all roots (the `_live_py` liveness rule) each raise MapError.
+    """
+    import sys as _sys
+    root = root or ROOT
+    try:
+        kit = str(resolve_kit_dir("lexicon", "lexicon.py", TOOLS))
+    except LookupError as exc:
+        raise m.MapError(f"{layer}: the shell layer needs the lexicon kit's tokenizer: {exc}") from exc
+    if kit not in _sys.path:
+        _sys.path.insert(0, kit)
+    from lexicon import parse_shell_defs  # noqa: E402
+
+    out: list[dict[str, str]] = []
+    for base in roots:
+        if not Path(base).is_dir():
+            raise m.MapError(f"{layer}: expected directory missing: {Path(base).as_posix()}")
+        for dirpath, dirnames, files in os.walk(base):
+            dirnames[:] = sorted(d for d in dirnames if d not in m._SKIP_DIRS)
+            for name in sorted(files):
+                if not name.endswith(".sh"):
+                    continue
+                path = Path(dirpath) / name
+                # A root outside the tree (a fixture) keeps its absolute POSIX spelling.
+                rel = (path.relative_to(root) if root in path.parents else path).as_posix()
+                try:
+                    defs = parse_shell_defs(path.read_text(encoding="utf-8"))[0]
+                except (SyntaxError, UnicodeDecodeError) as exc:
+                    raise m.MapError(f"{layer}: shell parse error in {rel}: {exc}") from exc
+                for ident in dict.fromkeys(n for n, _line in defs if not n.startswith("_")):
+                    out.append({"id": ident, "kind": "function", "file": rel})
+    if not out:
+        raise m.MapError(f"{layer}: no public shell definition under {[Path(b).as_posix() for b in roots]}")
+    return out
+
 
 def _live_py(layer: str) -> list[dict[str, str]]:
     """Python symbols under tools/, minus the `*.template.py` scaffolding sources.
@@ -271,6 +382,8 @@ SYMBOL_EXTRACTORS: dict[str, object] = {
     "kit-py": lambda: _live_py("kit-py"),
     # Export scan UNION definition probe — see _build_js_layer for why one of them alone indexed 3 of 33.
     "kit-js": lambda: _build_js_layer("kit-js"),
+    # Tokenizer-backed (the lexicon's parse_shell_defs); raises MapError on a file it refuses.
+    "kit-sh": lambda: scan_shell_layer("kit-sh", SHELL_ROOTS),
 }
 
 

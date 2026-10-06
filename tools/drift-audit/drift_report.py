@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.23
+gov:kit drift-audit@1.24
 
     python <prefix>/drift-audit/drift_report.py            # human table, always exits 0
     python <prefix>/drift-audit/drift_report.py --json     # machine-readable, always exits 0
     python <prefix>/drift-audit/drift_report.py --check    # exit 1 if a GATEABLE signal is over its pin
+    python <prefix>/drift-audit/drift_report.py --escape-ratio 2026-09   # on demand, minutes, never the bar
 
 WHY THIS KIT EXISTS. A governance repo gates its CODE contracts hard and its RECORD contracts not at
 all: a memory-hygiene gate checks that a spec Status token is spelled legally, never that it is TRUE.
@@ -22,7 +23,7 @@ can still move over a non-empty population, and a dead probe prints DEAD PROBE i
 
 WHAT IS ENGINE AND WHAT IS PROJECT. The signal implementations are generic over any repo that
 follows the governance playbook (a memory tree, TEMPLATE-SPEC status headers, a per-node in-flight
-ledger, a node registry in the charter). Everything genuinely repo-shaped — which paths are product
+ledger, an agent auto-memory directory). Everything genuinely repo-shaped — which paths are product
 source, which lists promise to shrink, which hand-kept inventories mirror a generated one, and the
 PINS — lives in the project layer `drift_signals.py`, copied from `drift_signals.template.py` at
 adoption. Same split as codebase-map's `map_extractors.py`.
@@ -37,8 +38,11 @@ ponytail: stdlib + git only, no deps, no cache. It runs in seconds; there is not
 from __future__ import annotations
 
 import argparse
+import ast
 import datetime
+import hashlib
 import json
+import math
 import os
 import pathlib
 import re
@@ -85,7 +89,7 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
-KIT_DRIFT_AUDIT_VERSION = "1.23"
+KIT_DRIFT_AUDIT_VERSION = "1.24"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -140,11 +144,14 @@ def load_conf(root: pathlib.Path) -> dict[str, str]:
 
 
 def parse_conf_text(text: str) -> dict[str, str]:
-    """The body of `load_conf` with the file read lifted out, so a conf read from a BLOB is parsed by
-    the same lines as one read from the working tree. TOOL-dUnstuckLanding-15 reads
-    `.unattended.conf` as committed at HEAD through it, and `load_conf` calls it too, so
-    `test_conf_parser_matches_bash` keeps grading the one parser both callers use. The grammar, and
-    its one deliberate divergence from bash, is `load_conf`'s docstring."""
+    """`load_conf`'s grammar over a conf's TEXT, so every root conf this kit reads parses one way.
+
+    Lifted out of `load_conf` unchanged twice over, on two branches: TOOL-aMendedFleet-21 S2 for
+    `build_cutoff_keys_armed`, and TOOL-dUnstuckLanding-15 to read `.unattended.conf` as committed at
+    HEAD from a BLOB. `load_conf` calls it too, so the bash-sourcing comparison in selftest.py keeps
+    grading the one parser every caller uses. The grammar, and its one deliberate divergence from
+    bash, is `load_conf`'s docstring.
+    """
     conf: dict[str, str] = {}
     for raw in text.splitlines():
         line = raw.strip().lstrip("﻿")
@@ -380,6 +387,70 @@ def build_lang_mode_findings(git: "Git", root: pathlib.Path, path: str = ".lexic
                 f"reds nothing else — write why, naming the move as '{ext}: {old} -> {shown}', "
                 f"within {lookback} lines above the LANGS line."
             )
+    return out
+
+
+
+# --------------------------------------------------------------------------------------------
+# TOOL-aMendedFleet-56 S6 — BASELINES is shrink-only, read at the base like the two guards above.
+#
+# A pin bounds a COUNT, so a drained offender and a new one at an equal count read as no change; an
+# id set bounds the offenders themselves. This guard keeps the set from growing: an id the base's
+# set did not carry is a finding, and a FIRST seed may not exceed the pin the base held for that
+# signal. There is no escape: each signal has a remedy that is not an addition.
+#
+# TOOL-aMendedFleet-110: nor is MOVING a signal out of the set. Every signal the base's BASELINES
+# held is graded, listed in the working set or not, so a signal leaving BASELINES for PINS may be
+# pinned no higher than the size of the set the base held. Deleting the set and pinning it at any
+# count used to pass, because only the working dict was walked and an empty one returned early.
+# ponytail: the base layer is read with `ast.literal_eval`, so a non-literal BASELINES or PINS at the
+# base is a finding rather than an evaluation; executing the base's code would be the upgrade.
+def build_baseline_findings(git: "Git", path: str, baselines: dict, pins: dict) -> list:
+    """Findings for every signal whose working `BASELINES` set is WEAKER than the base allows."""
+    base = git.run("show", f"{git.base_ref}:{path}")
+    if base.returncode != 0:
+        return []                          # the layer is new on this branch; nothing to compare
+    try:
+        tree = ast.parse(base.stdout)
+    except SyntaxError as exc:
+        return [f"{path}: the project layer at {git.base_ref} does not parse ({exc.msg}, line "
+                f"{exc.lineno}), so BASELINES cannot be compared against the base"]
+    nodes = {}
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            names = [t.id for t in node.targets if isinstance(t, ast.Name)]
+        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name) and node.value:
+            names = [node.target.id]
+        else:
+            continue
+        for n in names:
+            if n in ("BASELINES", "PINS"):
+                nodes[n] = node.value      # the last assignment wins, as it does on import
+    was = {}
+    for n, v in nodes.items():
+        try:
+            was[n] = ast.literal_eval(v)
+        except ValueError:
+            return [f"{path}: {n} at {git.base_ref} is not a literal, so BASELINES cannot be "
+                    f"compared against the base"]
+    old_sets, old_pins = was.get("BASELINES") or {}, was.get("PINS") or {}
+    out = []
+    for sig, ids in sorted(baselines.items()):
+        if sig in old_sets:
+            for i in sorted(set(ids) - set(old_sets[sig])):
+                out.append(f"{path}: BASELINES[{sig!r}] gained {i} against {git.base_ref}, which "
+                           f"WEAKENS it. The set is shrink-only and has no escape: remove the cause "
+                           f"that makes {i} an offender instead of listing it.")
+        elif len(set(ids)) > old_pins.get(sig, 0):
+            out.append(f"{path}: BASELINES[{sig!r}] is seeded with {len(set(ids))} ids where the "
+                       f"base pins it at {old_pins.get(sig, 0)} in PINS, which WEAKENS it. Seed only "
+                       f"the offenders the base's pin already bounds.")
+    for sig in sorted(set(old_sets) - set(baselines)):
+        size = len(set(old_sets[sig]))
+        if sig in pins and pins[sig] > size:
+            out.append(f"{path}: {sig!r} moved from BASELINES to PINS at {pins[sig]} where the "
+                       f"base's set held {size} ids at {git.base_ref}, which WEAKENS it. Pin it no "
+                       f"higher than {size}, the set's size, and drain from there.")
     return out
 
 
@@ -661,7 +732,10 @@ def signal_spec_status(ctx) -> dict:
         # `-1` was reported with three citations, all of them `-11`'s, on a build whose ids ran
         # past 10. The over-count GROWS with the build: a 30-unit build mis-attributes ids 1, 2
         # and 3 to twenty siblings, each reading as a stale status header nobody can find.
-        hit = ctx.git.run("grep", "-l", "-w", "-F", own.group(1), "--", *ctx.evidence_globs)
+        # THE LAYER IS NOT EVIDENCE (TOOL-aMendedFleet-56 S10): a `BASELINES` list spelling this id
+        # would otherwise cite it, and a listed id could then never drain.
+        hit = ctx.git.run("grep", "-l", "-w", "-F", own.group(1), "--", *ctx.evidence_globs,
+                          *([f":(exclude){ctx.layer_path}"] if ctx.layer_path else []))
         if hit.returncode == 0 and hit.stdout.strip():
             suspect.append({
                 "file": str(p.relative_to(ctx.root)).replace("\\", "/"),
@@ -701,8 +775,60 @@ def _entries(p: pathlib.Path) -> int:
                if ln.strip() and not ln.strip().startswith("#"))
 
 
+def derive_low_waters(git: Git, paths: list) -> dict:
+    """path -> the smallest count of `_entries`-style rows the file held after any commit on the
+    first-parent line, from ONE patch walk over every path together; `None` where the path has no
+    such history, or where the replay ever goes negative, which means a patch was misread and the
+    row cannot be judged. `--no-renames`, so a rename shows as a whole add and the replay stays
+    a count of the file's own lines, not a rename's delta."""
+    out = {p: None for p in paths}
+    if not paths:
+        return out
+    walk = git.run("log", "--first-parent", "--diff-merges=first-parent", "--no-renames", "-p",
+                   "--reverse", "--format=%x01%H", "--", *paths)
+    if walk.returncode != 0:
+        return out
+    headers = {f"diff --git a/{p} b/{p}": p for p in paths}
+    count = {p: 0 for p in paths}
+    broken: set = set()
+    cur, in_hunk, touched = None, False, set()
+    # A trailing commit marker settles the last commit the way every earlier marker does.
+    for ln in walk.stdout.split("\n") + ["\x01"]:
+        if ln.startswith("\x01"):
+            for p in touched:
+                if count[p] < 0:
+                    broken.add(p)
+                elif out[p] is None or count[p] < out[p]:
+                    out[p] = count[p]
+            touched.clear()
+            cur, in_hunk = None, False
+        elif ln.startswith("diff --git "):
+            cur, in_hunk = headers.get(ln), False
+            if cur is not None:
+                touched.add(cur)
+        elif ln.startswith("@@"):
+            in_hunk = cur is not None
+        elif in_hunk and ln[:1] in ("+", "-"):
+            body = ln[1:].strip()
+            if body and not body.startswith("#"):
+                count[cur] += 1 if ln[0] == "+" else -1
+    return {p: (None if p in broken else v) for p, v in out.items()}
+
+
+def check_shrink_row(seed, low_water, entries):
+    """Why a shrink-only row is an offender, or `None`. `regrown`: it holds more rows than the
+    lowest count its history reached. `never drained`: it was seeded with rows and holds at least as
+    many today. A list seeded empty and still empty is neither."""
+    if low_water is not None and entries > low_water:
+        return "regrown"
+    if seed is not None and seed > 0 and entries >= seed:
+        return "never drained"
+    return None
+
+
 def signal_shrink_only(ctx) -> dict:
     rows = []
+    low_waters = derive_low_waters(ctx.git, list(ctx.shrink_only))
     for rel, what in ctx.shrink_only.items():
         p = ctx.root / rel
         now = _entries(p)
@@ -713,25 +839,31 @@ def signal_shrink_only(ctx) -> dict:
             if blob.returncode == 0:
                 seed = sum(1 for ln in blob.stdout.splitlines()
                            if ln.strip() and not ln.strip().startswith("#"))
+        low = low_waters.get(rel)
         rows.append({"file": rel, "what": what, "entries": now, "seed": seed,
-                     "shrunk_by": (seed - now) if seed is not None else None})
-    # TOOL-aScouredKit-3's sibling finding. A list SEEDED EMPTY and still empty has nothing to
-    # drain and never had: `shrunk_by` is pinned at 0 for it, so a bare `<= 0` marked it an offender
-    # forever and the signal could never reach the tolerance of 0 it declares below.
+                     "shrunk_by": (seed - now) if seed is not None else None,
+                     "low_water": low,
+                     "reason": check_shrink_row(seed, low, now) if low is not None else None})
+    # TOOL-aMendedFleet-57. Two reasons, from `check_shrink_row`. `regrown` grades a list against
+    # its LOW-WATER MARK, the smallest count its first-parent history reached: the seed reading alone
+    # let a list seeded at 9 that drained to 0 and grew back to 3 read "shrunk by 6", because 3 was
+    # still under its seed. `never drained` is the seed reading's one surviving case, a list seeded
+    # with rows that holds at least as many today.
     #
-    # The obvious tightening — `shrunk_by < 0` — is WRONG and is refused here rather than left for
-    # someone to re-propose. It would drop the seed>0, now==seed case, which is a list nobody has
-    # drained since the day it was written and is the single case this signal exists for. No row in
-    # this corpus is in that state today, so the regression would have been invisible: a predicate
-    # narrowed past its own subject with no fixture to notice, which is this repo's own
-    # vacuous-selector class. The exclusion is therefore the empty-seeded row alone.
-    stalled = [r for r in rows
-               if r["shrunk_by"] is not None and r["shrunk_by"] <= 0
-               and not (r["seed"] == 0 and r["entries"] == 0)]
+    # TOOL-aScouredKit-3's sibling finding still binds `never drained`: a list SEEDED EMPTY and
+    # still empty has nothing to drain, so it is excluded by `seed > 0`. The obvious tightening of
+    # the seed case to `entries > seed` is WRONG and is refused here rather than left for someone to
+    # re-propose. It would drop the seed>0, now==seed case, which is a list nobody has drained since
+    # the day it was written and is the case this signal first existed for. A predicate narrowed
+    # past its own subject with no fixture to notice is this repo's own vacuous-selector class.
+    #
+    # A row whose low-water could not be replayed is UNJUDGEABLE: counted, and never an offender.
+    stalled = [r for r in rows if r["reason"] is not None]
     return {
         "signal": "shrink_only_lists_not_shrinking",
         "value": len(stalled),
         "of": len(rows),
+        "unjudgeable": sum(1 for r in rows if r["low_water"] is None),
         "tolerance": 0,
         # Report, never gate: a list can legitimately sit still for a week. What it must not do is
         # sit still for a quarter while its own header calls it shrink-only.
@@ -755,6 +887,15 @@ def signal_handkept(ctx) -> dict:
             rows.append({"record": spec["record"], "claims": None, "actual": None,
                          "agrees": False, "error": repr(exc)})
             continue
+        if isinstance(claims, (set, frozenset)) and isinstance(actual, (set, frozenset)):
+            # A NAME-SET pair (TOOL-aMendedFleet-52 S1): a count pair cannot see a stale row standing
+            # in for a missing one, so the row names both halves and stores counts, which `--json`
+            # serialises where a set would not.
+            rows.append({"record": spec["record"], "source": spec.get("source", "?"),
+                         "claims": len(claims), "actual": len(actual),
+                         "missing": sorted(actual - claims), "extra": sorted(claims - actual),
+                         "agrees": claims == actual})
+            continue
         rows.append({"record": spec["record"], "source": spec.get("source", "?"),
                      "claims": claims, "actual": actual, "agrees": claims == actual})
     # A MAGNITUDE, not a per-row boolean. Scored as a boolean over a one-row population the value
@@ -764,7 +905,11 @@ def signal_handkept(ctx) -> dict:
     gap = 0
     pop = 0
     for r in rows:
-        if isinstance(r.get("claims"), int) and isinstance(r.get("actual"), int) and r["claims"] >= 0:
+        if "missing" in r:
+            # Symmetric difference over union: the union is every actual name plus each stale one.
+            gap += len(r["missing"]) + len(r["extra"])
+            pop += r["actual"] + len(r["extra"])
+        elif isinstance(r.get("claims"), int) and isinstance(r.get("actual"), int) and r["claims"] >= 0:
             gap += max(0, r["actual"] - r["claims"])
             pop += r["actual"]
         elif not r["agrees"]:
@@ -783,37 +928,89 @@ def signal_handkept(ctx) -> dict:
 
 
 # --------------------------------------------------------------------------------------------
-# Signal 5 — this node's own ledger pointers that no longer resolve
+# Signal 5 — this node's auto-memory notes naming repo paths the tracked tree no longer carries
 # --------------------------------------------------------------------------------------------
+#
+# TOOL-aMendedFleet-53. The name is kept for its readers (the history rows among them); the
+# per-node ledger shard it used to read retired with the authored session ledger. What it reads now
+# is the agent's auto-memory, declared by the project layer as AUTO_MEMORY_DIR.
 
-_LOCAL_PATH = re.compile(r"(?:[A-Za-z]:[\\/]|/(?:home|Users)/)[A-Za-z0-9_\\/.-]+")
+_BACKTICKED = re.compile(r"`([^`\n]+)`")
+_NOT_A_PATH = set("<>{}*?$|\"'\\")
+_LINE_SUFFIX = re.compile(r":\d+$")
+
+
+def resolve_auto_memory_dir(root: pathlib.Path, declared: str) -> pathlib.Path | None:
+    """Expand an AUTO_MEMORY_DIR declaration; None when it is blank (NOT ASKED).
+
+    `~` is the user's home. `{checkout}` is the PRIMARY checkout's absolute path with every
+    character outside `[A-Za-z0-9-]` turned into `-` — how Claude Code keys a project's
+    auto-memory. The primary checkout is the parent of the common git dir, so every worktree of one
+    clone reads the same directory. If git cannot answer, the token stays unexpanded and the path
+    names no directory, which the signal reports as DEAD with the path it tried."""
+    declared = (declared or "").strip()
+    if not declared:
+        return None
+    if "{checkout}" in declared:
+        out = subprocess.run(["git", "-C", str(root), "rev-parse", "--path-format=absolute",
+                              "--git-common-dir"], capture_output=True, text=True,
+                             encoding="utf-8", errors="replace")
+        common = out.stdout.strip()
+        if out.returncode == 0 and common:
+            key = re.sub(r"[^A-Za-z0-9-]", "-", str(pathlib.Path(common).parent))
+            declared = declared.replace("{checkout}", key)
+    return root / pathlib.Path(declared).expanduser()
 
 
 def signal_dangling_pointers(ctx) -> dict:
-    """Node-scoped ON PURPOSE. Another node's paths live on another machine and are unknowable from
-    this clone; reporting them missing would be the confidently-wrong-answer class. If the node tag
-    cannot be resolved, the probe reports DEAD rather than guessing."""
-    tag = ctx.node_tag
-    if not tag:
-        return {"signal": "dangling_pointers_in_own_ledger", "value": -1, "of": 0, "tolerance": 0,
-                "gateable": False, "live": False,
-                "detail": [{"note": "node tag not resolvable from the charter registry; skipped"}]}
-    f = ctx.ledger_dir / f"{tag}.md"
-    if not f.exists():
-        return {"signal": "dangling_pointers_in_own_ledger", "value": -1, "of": 0, "tolerance": 0,
-                "gateable": False, "live": False,
-                "detail": [{"note": f"no ledger file for node {tag}"}]}
-    txt = f.read_text(encoding="utf-8", errors="replace")
-    paths = sorted({p.replace("\\", "/").rstrip("`,)./") for p in _LOCAL_PATH.findall(txt)})
-    gone = [p for p in paths if not pathlib.Path(p).is_dir()]
+    """Node-scoped ON PURPOSE: the notes live on this machine, so the value is this machine's and
+    the record never gates. Each backticked span carrying a `/`, no whitespace and none of
+    `< > { } * ? $ | " ' \\` is judged — after a trailing `:<digits>` and a trailing `/` go — when its
+    first segment is a top-level entry of `git ls-files`; it resolves when it equals a tracked file
+    or a directory prefix of one. The tracked set is the oracle, not the disk: an untracked
+    leftover would make a stale note read as true."""
+    name = "dangling_pointers_in_own_ledger"
+    d = resolve_auto_memory_dir(ctx.root, ctx.auto_memory_dir)
+    if d is None:
+        return _build_not_asked(name, "the project layer declares no AUTO_MEMORY_DIR, so there is no "
+                                      "node-local memory to audit")
+    dead = {"signal": name, "value": -1, "of": 0, "tolerance": None, "gateable": False,
+            "live": False, "unjudgeable": 0}
+    if not d.is_dir():
+        return {**dead, "detail": [{"note": f"DEAD PROBE — AUTO_MEMORY_DIR resolves to {d}, "
+                                            f"which is not a directory on this node"}]}
+    files = [f for f in ctx.git.run("ls-files", "-z").stdout.split("\0") if f]
+    dirs = {f[:i] for f in files for i, c in enumerate(f) if c == "/"}
+    tops = {f.split("/", 1)[0] for f in files}
+    tracked = set(files) | dirs
+    judged, unreadable = set(), 0
+    for note in sorted(d.glob("*.md")):
+        try:
+            text = note.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            unreadable += 1
+            continue
+        for tok in _BACKTICKED.findall(text):
+            if "/" not in tok or any(c.isspace() or c in _NOT_A_PATH for c in tok):
+                continue
+            tok = _LINE_SUFFIX.sub("", tok).rstrip("/")
+            if tok and tok.split("/", 1)[0] in tops:
+                judged.add((note.name, tok))
+    if not judged:
+        return {**dead, "unjudgeable": unreadable,
+                "detail": [{"note": f"DEAD PROBE — no note under {d} names a judgeable repo path"}]}
+    gone = sorted(p for p in judged if p[1] not in tracked)
     return {
-        "signal": "dangling_pointers_in_own_ledger",
+        "signal": name,
         "value": len(gone),
-        "of": len(paths),
-        "tolerance": 0,
+        "of": len(judged),
+        # Pinless (TOOL-aMendedFleet-51): the value is one machine's notes, so a committed pin
+        # would be another node's wrong answer.
+        "tolerance": None,
         "gateable": False,
-        "live": len(paths) > 0,
-        "detail": [{"node": tag, "gone": gone}],
+        "live": bool(judged),
+        "unjudgeable": unreadable,
+        "detail": [{"note_file": n, "path": p} for n, p in gone],
     }
 
 
@@ -829,6 +1026,10 @@ _HEADER_DATE = re.compile(r"^\*\*Status:\*\*[^\n]*?(\d{4}-\d{2}-\d{2})", re.M)
 # CLOSED only. WONTDO is terminal too and is deliberately NOT judged: an abandoned unit correctly has
 # no product commit, so judging it would manufacture a permanent false positive out of a true record.
 TERMINAL = frozenset({"CLOSED"})
+# TOOL-aMendedFleet-91. A unit whose deliverable is records declares it in its OWN status header, at
+# speccing time where its review reads it, as a whole `·`-separated tail field of exactly these bytes.
+# Matched on the status line alone, so `records-only-ish` and a sentence in the body exempt nothing.
+_RECORDS_ONLY = re.compile(r"·\s*records-only\s*(?:·|$)")
 
 
 def signal_closed_specs_untraceable(ctx) -> dict:
@@ -912,7 +1113,7 @@ def signal_closed_specs_untraceable(ctx) -> dict:
             waived[cols[0].strip()] = cols[-1].strip() if len(cols) > 1 else ""
     used: set[str] = set()
 
-    suspect, checked, unjudged = [], 0, 0
+    suspect, checked, unjudged, records_only = [], 0, 0, []
     for p in sorted(ctx.root.glob(f"{ctx.memory_root}/builds/*/spec/**/*.md")):
         head = p.read_text(encoding="utf-8", errors="replace")[:4000]
         m = _STATUS.search(head)
@@ -933,13 +1134,19 @@ def signal_closed_specs_untraceable(ctx) -> dict:
         # line; the slug guard was added below it, so a pre-slug-era id landed in BOTH the judged
         # denominator and the unjudged count, and a corpus that was entirely pre-slug read as live.
         checked += 1
+        rel = str(p.relative_to(ctx.root)).replace("\\", "/")
+        # BEFORE the slug join, so no sibling's product commit, present or absent, moves the reading.
+        # A waiver row naming this spec is then left unconsumed and the sweep below reports it: the
+        # same fact declared in two places is a finding, not a silence.
+        if _RECORDS_ONLY.search(head[m.start():].split("\n", 1)[0].rstrip()):
+            records_only.append(rel)
+            continue
         # SLUG ONLY, and that is not a narrowing: `\bslug\b` already matches inside
         # `FAMILY-slug-seq`, because the hyphens either side of the slug are non-word bytes.
         # An `id or slug` disjunct reads like a two-key oracle and is one unfalsifiable clause;
         # the id half could never decide a case the slug half did not already decide.
         if re.search(r"\b" + re.escape(slug) + r"\b", subjects):
             continue
-        rel = str(p.relative_to(ctx.root)).replace("\\", "/")
         if rel in waived:
             used.add(rel)
             continue
@@ -951,7 +1158,8 @@ def signal_closed_specs_untraceable(ctx) -> dict:
     for rel in sorted(set(waived) - used):
         suspect.append({
             "file": rel, "id": "(stale waiver)", "slug": "(stale waiver)", "closed": "",
-            "note": "waives a spec that is absent, not terminal, or traceable again",
+            "note": "waives a spec that is absent, not terminal, traceable again, or declaring "
+                    "records-only in its own status header",
         })
     if bad_declaration:
         suspect.append({
@@ -967,6 +1175,7 @@ def signal_closed_specs_untraceable(ctx) -> dict:
         "live": checked > 0,
         "unjudgeable": unjudged,
         "detail": suspect,
+        "records_only": sorted(records_only),
     }
 
 
@@ -1291,7 +1500,7 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
     # Asking whether the REPOSITORY is truncated is the assertion that actually fires. A derived base
     # is only as trustworthy as the history it was derived from.
     if ctx.git.run("rev-parse", "--is-shallow-repository").stdout.strip() == "true":
-        return {"signal": name, "value": 0, "of": 0, "tolerance": 0, "gateable": False,
+        return {"signal": name, "value": 0, "of": 0, "tolerance": None, "gateable": False,
                 "live": False, "unjudgeable": 0,
                 "detail": [{"note": "DEAD PROBE — this is a shallow clone, so the commit that added "
                                     ".lexicon.conf is not necessarily present and a derived base "
@@ -1299,7 +1508,7 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
 
     # L1b — and the base still has to resolve, for a grafted or otherwise mangled history.
     if not base or not ctx.git.is_commit(base):
-        return {"signal": name, "value": 0, "of": 0, "tolerance": 0, "gateable": False,
+        return {"signal": name, "value": 0, "of": 0, "tolerance": None, "gateable": False,
                 "live": False, "unjudgeable": 0,
                 "detail": [{"note": "DEAD PROBE — the commit that added .lexicon.conf does not "
                                     "resolve in this object store (a shallow or grafted clone); "
@@ -1317,7 +1526,7 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
     # L2 and L3 — a population that is empty at either end means the extractor is not reading, which
     # is indistinguishable from a clean window unless it is said out loud.
     if at_base is None or at_head is None or not at_base or not at_head:
-        return {"signal": name, "value": 0, "of": 0, "tolerance": 0, "gateable": False,
+        return {"signal": name, "value": 0, "of": 0, "tolerance": None, "gateable": False,
                 "live": False, "unjudgeable": 0,
                 "detail": [{"note": "DEAD PROBE — the definition population is empty at the base or "
                                     "at HEAD, so the extractor is not reading this tree",
@@ -1355,7 +1564,7 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
     def _measure_pct(a, b):
         return round(100.0 * len(a) / len(b), 1) if b else 0.0
 
-    return {"signal": name, "value": len(offenders), "of": len(gradeable), "tolerance": 0,
+    return {"signal": name, "value": len(offenders), "of": len(gradeable), "tolerance": None,
             "gateable": False, "live": bool(at_base and at_head), "unjudgeable": 0,
             "detail": [
                 {"note": "offenders added per definition added since the declaration was adopted",
@@ -1379,9 +1588,14 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
 # ahead of today's count becomes a scheduled refusal: the day the count crosses it every merge reds
 # until someone raises the pin or closes rows, which is the refusal this signal exists to make
 # unnecessary. `shrink_only_lists_not_shrinking` runs the same way for the same reason. If a later
-# unit gates this, it must pin a MEASURED value with a movement rule AND declare that pin in the
-# shipped conf template — a signal absent from an adopter's PINS falls back to tolerance 0, so a
-# gateable version would red their first run on one open row.
+# unit gates this, it must pin a MEASURED value with a movement rule AND give the record a numeric
+# tolerance — a gateable record with a None one trips the engine's assertion in `main` — AND declare
+# that pin in the shipped conf template.
+#
+# PINLESS since TOOL-aMendedFleet-51: `tolerance` is None and the status column prints `report only,
+# no pin`. Under `BACKLOG_MODE="builds"` the reading is every live ask, which rises with every ask
+# filed, and the shard-rotation floor the old watermark guarded no longer exists. A project that
+# still wants a pin declares one in its PINS, and the status column then compares against it.
 #
 # The terminal set is SPELLED HERE. `.memory-tree.conf` declares no status vocabulary and no sibling
 # module exposes one, so there is nothing to borrow; the engine already hardcodes the same tokens for
@@ -1459,7 +1673,7 @@ def build_live_backlog_rows(ctx) -> dict:
         rows, examined, note = read_asks_projection(ctx, all_rows=False)
         if rows is None:
             return {"signal": "live_backlog_rows_per_shard", "value": 0, "of": 0,
-                    "tolerance": ctx.pins.get("live_backlog_rows_per_shard", 0),
+                    "tolerance": None,
                     "gateable": False, "live": False, "detail": [{"note": note}]}
         per: dict = {}
         for row in rows:
@@ -1469,7 +1683,7 @@ def build_live_backlog_rows(ctx) -> dict:
             "signal": "live_backlog_rows_per_shard",
             "value": len(rows),
             "of": examined,
-            "tolerance": ctx.pins.get("live_backlog_rows_per_shard", 0),
+            "tolerance": None,
             "gateable": False,
             # LIVENESS FROM THE FILES THE PROJECTION READ. A builds-mode tree whose projection
             # examined no ask file cannot move this count.
@@ -1501,15 +1715,10 @@ def build_live_backlog_rows(ctx) -> dict:
         # split per-gate to avoid.
         "value": max((r["live"] for r in judgeable), default=0),
         "of": len(rows),
-        # The threshold comes from the project layer. It is read into `tolerance` here because that
-        # is this signal's declared floor; the status line now compares against the RESOLVED `pin`,
-        # exactly as the gateable branches do, and `pin` falls back to `tolerance` when PINS declares
-        # none — so this read still decides the verdict for this signal either way. The clause that
-        # used to sit here said the report loop compares against `tolerance` rather than `pin`, which
-        # a closing review found true until the same fold made it false and left this sentence
-        # standing. Absent, the threshold is 0 and every non-empty shard reads as over — which trains
-        # a reader to ignore the line, the failure mode this signal is supposed to cure.
-        "tolerance": ctx.pins.get("live_backlog_rows_per_shard", 0),
+        # NO PIN BY DESIGN: None, so the status column prints `report only, no pin` unless the
+        # project's PINS declares one. A fallback of 0 printed `over pin 0` for every non-empty
+        # shard, which trains a reader to ignore the line, the failure this signal is meant to cure.
+        "tolerance": None,
         "gateable": False,
         # A tree with no backlog shards at all cannot move this signal, so it reports DEAD rather than
         # a reassuring 0 — the liveness assertion every signal here carries.
@@ -1687,18 +1896,28 @@ def build_readme_mechanism_drift(ctx) -> dict:
     def _extract_slug(path: str) -> str:
         return path[len(prefix):].split("/")[0] if path.startswith(prefix) else ""
 
+    graded = 0
     for rel in sorted(readmes):
         build = _extract_slug(rel)
         if not build:
             continue
+        # LIVE BUILDS ONLY (TOOL-aMendedFleet-51 S4). A build whose every spec is CLOSED or WONTDO is
+        # a frozen record: 27 of the 31 rows this signal first reported sat in such builds and none
+        # was worth acting on. Liveness is read from the `**Status:**` line of the spec text read
+        # below for the revision log anyway, so no file is read twice.
+        texts = [(sp, _read(ctx, sp)) for sp in specs_by_build.get(build, [])]
+        if not any((m := _STATUS.search(t)) and m.group(1).upper() not in _TERMINAL_STATUSES
+                   for _, t in texts):
+            continue
+        graded += 1
         lines = _read(ctx, rel).split("\n")
         cut = next((i for i, ln in enumerate(lines) if ln.startswith(_GEN_MARK)), len(lines))
         # THE REVISION ENTRIES, read as data. A continuation line is folded into the entry above it,
         # because a revision's reason routinely wraps and the token often sits in the wrap.
         revs = []
-        for sp in specs_by_build.get(build, []):
+        for sp, text in texts:
             inlog = False
-            for ln in _read(ctx, sp).split("\n"):
+            for ln in text.split("\n"):
                 if ln.startswith("## "):
                     inlog = "Revision log" in ln
                     continue
@@ -1759,7 +1978,7 @@ def build_readme_mechanism_drift(ctx) -> dict:
     return {
         "signal": "readme_mechanism_drift",
         "value": len(rows),
-        "of": len(readmes),
+        "of": graded,
         "tolerance": ctx.pins.get("readme_mechanism_drift", 0),
         # REPORT ONLY. `drift-audit records` is an unguarded merge-bar leg, and this predicate reports
         # a POINTER rather than a proven contradiction - gating it would red a merge on a README
@@ -1874,6 +2093,86 @@ def build_backlog_asks_unlabelled(ctx) -> dict:
     return {"signal": name, "value": len(hits), "of": len(judged),
             "tolerance": ctx.pins.get(name, 0), "gateable": False,
             "live": len(judged) > 0, "detail": [{"id": i} for i in hits[:20]]}
+
+
+# Signal 2's sibling for asks (TOOL-aMendedFleet-55): a LIVE ask whose id tracked product source
+# cites may describe work that already shipped. REPORT-ONLY and pinless, because source legitimately
+# cites an ask it has not fixed yet — a forward reference reads exactly like a fix here — and no
+# sampled precision exists to gate on. The population is the generator's live projection with no
+# status rule of this kit's own; the citation test is signal 2's whole-word `-w -F` over
+# EVIDENCE_GLOBS, run ONCE with the ids on stdin so the argument list does not grow with the backlog.
+def build_open_asks_cited_by_source(ctx) -> dict:
+    """Live asks whose id is cited by tracked product source, each with up to three citing paths."""
+    name = "open_asks_cited_by_product_source"
+    rows, skip = read_asks_or_skip(ctx, name, all_rows=False)
+    if skip:
+        return skip
+    judged = [r for r in rows if isinstance(r.get("id"), str) and r["id"].strip()]
+    ids = sorted({r["id"].strip() for r in judged})
+    cited: dict = {}
+    if ids:
+        # `-z` so a path is split from its match by NUL, not by a ':' a path may hold. Exit 1 is
+        # "no match", a clean zero; anything above it is git failing, which judges nothing.
+        hit = subprocess.run(["git", "-C", str(ctx.root), "grep", "-o", "-z", "-w", "-F", "-f", "-",
+                              "--", *ctx.evidence_globs],
+                             input="".join(i + "\n" for i in ids), capture_output=True, text=True,
+                             encoding="utf-8", errors="replace")
+        if hit.returncode > 1:
+            said = ((hit.stderr or "").strip().splitlines() or [f"exit {hit.returncode}"])[-1]
+            return {"signal": name, "value": 0, "of": 0, "tolerance": None, "gateable": False,
+                    "live": False, "detail": [{"note": f"git grep failed: {said[:240]}"}]}
+        for line in hit.stdout.splitlines():
+            path, _, match = line.partition("\0")
+            cited.setdefault(match.strip(), set()).add(path)
+    seen = ctx.git.run("ls-files", "--", *ctx.evidence_globs)
+    evidence_files = len(seen.stdout.split()) if seen.returncode == 0 else 0
+    detail = sorted(({"id": r["id"].strip(), "status": r.get("status"),
+                      "cited_in": sorted(cited[r["id"].strip()])[:3]}
+                     for r in judged if r["id"].strip() in cited), key=lambda d: d["id"])
+    return {"signal": name, "value": len(detail), "of": len(judged),
+            "evidence_files": evidence_files, "tolerance": None, "gateable": False,
+            # Signal 2's two liveness halves: a population, AND evidence globs that resolve.
+            "live": len(judged) > 0 and evidence_files > 0, "detail": detail}
+
+
+# --------------------------------------------------------------------------------------------
+# Signal — armed `*_CUTOFF` keys across the tracked root confs (TOOL-aMendedFleet-21)
+#
+# Every armed dated cutoff makes the required shape of a record depend on a filename date, and
+# nothing priced adding one. This counts them: the population is every `_CUTOFF` assignment in a
+# TRACKED root-level `.<name>.conf`, the value is the NON-BLANK ones. A blank key shapes nothing, so
+# it is in `of` and not in `value`. Spellings in tool source are NOT counted: a comment edit must not
+# move a budget.
+#
+# GATEABLE ONLY WHERE PINS DECLARES IT. The shipped example confs arm a key, so a default tolerance
+# of 0 would red every adopter's first `--check`; a guessed shipped pin is what PINS forbids.
+#
+# What it cannot see: a key BLANKED to meet the pin disarms its rule exactly as making the rule
+# unconditional does, and both read as one fewer. The README says so; the diff shows which.
+# --------------------------------------------------------------------------------------------
+
+
+def build_cutoff_keys_armed(ctx) -> dict:
+    name = "cutoff_keys_armed"
+    tracked = ctx.git.run("ls-files").stdout.splitlines()
+    confs = sorted(f for f in tracked if re.fullmatch(r"\.[^/]+\.conf", f))
+    armed, skipped, of = [], [], 0
+    for f in confs:
+        try:
+            conf = parse_conf_text((ctx.root / f).read_text(encoding="utf-8", errors="replace"))
+        except OSError as exc:
+            skipped.append({"file": f, "note": f"unreadable, skipped: {exc.__class__.__name__}"})
+            continue
+        for k, v in conf.items():
+            if k.endswith("_CUTOFF"):
+                of += 1
+                if v.strip():
+                    armed.append({"file": f, "key": k, "value": v})
+    gateable = name in ctx.pins
+    note = [] if gateable else [{"note": "no budget declared: add a PINS entry"}]
+    return {"signal": name, "value": len(armed), "of": of,
+            "tolerance": ctx.pins.get(name, 0), "gateable": gateable,
+            "live": of > 0, "detail": note + armed + skipped}
 
 
 
@@ -2084,24 +2383,37 @@ def build_backlog_stragglers(ctx) -> dict:
 # the table instead.
 #
 # WHAT IT COUNTS, from the record at HEAD and never from the working tree:
-#   - its phase is not terminal;
+#   - its phase is not terminal, and it is not derived LANDED (below);
 #   - its witness is an ancestor of the base ref;
 #   - its witness is neither equal to nor an ancestor of the record's own `base:`.
 # The third is the one that needs saying. The witness is HEAD at the last verb that writes one, and
 # `--close` writes none, so a run that went from preflight to close leaves its witness AT its base
 # even when its own commits merged. That record is UNJUDGEABLE: counted apart with its reason, never
-# scored clean and never counted, because judging it needs the run's own commits, which three git
+# scored clean and never counted, because judging it needs the run's own commits, which these git
 # calls do not read. The run model reads them.
 #
-# THREE GIT CALLS, whatever the record count: one `ls-tree` to enumerate, one `rev-list --parents`
-# of the base ref, and one `cat-file --batch` HELD OPEN, because the witnesses are only known once the
-# records it returns are read. `cat-file` flushes after every object, so one question and one answer
-# at a time cannot deadlock on a buffer. The witness-to-base order is walked on the parent graph the
-# rev-list printed: the SET of reachable commits alone cannot order two of its members.
+# derived LANDED (owner ruling D12-i2, TOOL-aMendedFleet-47). A `LANDING` record whose landing
+# commit is on the base ref IS landed, and the driver and its gate leg already read it so through
+# `read_landing_commit` in the unattended kit's library. That rule is RE-SPELLED here, offline,
+# because this kit is copy-installed without that one: the landing commit is the newest commit in
+# HEAD's history that changed the record's path. Such a record is excluded BEFORE its witness is
+# placed, so it is neither counted nor unjudgeable, and the detail's summary line counts it.
+#
+# FOUR GIT CALLS AT MOST, whatever the record count: one `ls-tree` to enumerate, one `rev-list
+# --parents` of the base ref, one `cat-file --batch` HELD OPEN, because the witnesses are only known
+# once the records it returns are read, and one `log --name-only` over every `LANDING` record's
+# path, made only where such a record exists. `cat-file` flushes after every object, so one question
+# and one answer at a time cannot deadlock on a buffer. The witness-to-base order is walked on the
+# parent graph the rev-list printed: the SET of reachable commits alone cannot order two of its
+# members. A landing commit is on the base ref exactly when it is a key of that same graph.
 #
 # WHAT IT DOES NOT SEE, said here because a structural count reads as a semantic one. A refused
 # landing leaves no tracked row, so no sub-class can name one, and the detail says so on every run.
 # A shallow clone truncates the rev-list, which can drop a record from the count and never add one.
+# The batched `log` disagrees with the driver's per-record `git log -1` in one shape: a record whose
+# newest change is a MERGE that resolved it, because a merge prints no names without `-m`. It then
+# names an older commit on one side of that merge, which is still on any base ref holding the merge,
+# so the disagreement can only leave a record counted, never derive one the driver would not.
 # --------------------------------------------------------------------------------------------
 
 # The driver's own declarations, SPELLED HERE because this kit is copy-installed and must run in a
@@ -2277,10 +2589,30 @@ def build_nonterminal_merged_runs(ctx) -> dict:
         if shas:
             parents[shas[0]] = shas[1:]
 
-    counted, stale, detail = 0, 0, []
+    # CALL 4 — derived LANDED: each `LANDING` record's landing commit, from ONE `log` over all their
+    # paths. The first commit printed above a path is the newest that changed it.
+    landing_paths = [path for path, rec in parsed if rec["phase"] == "LANDING"]
+    landing: dict = {}
+    if landing_paths:
+        log = ctx.git.run("log", "--format=%x01%H", "--name-only", "--no-renames", "HEAD", "--",
+                          *landing_paths)
+        if log.returncode != 0:
+            return _build_run_dead(name, len(records), "DEAD PROBE — `git log` of the LANDING records "
+                                                       "failed, so no landing commit was read")
+        want, sha = set(landing_paths), ""
+        for line in log.stdout.split("\n"):
+            if line.startswith("\x01"):
+                sha = line[1:].strip()
+            elif line in want and line not in landing:
+                landing[line] = sha
+
+    counted, stale, derived, detail = 0, 0, 0, []
     for path, rec in parsed:
         phase = rec["phase"]
         if phase in _RUN_PHASES_TERMINAL:
+            continue
+        if landing.get(path) in parents:
+            derived += 1                      # derived LANDED: neither counted nor unjudgeable
             continue
         w_in, b_in = rec["witness"], rec["base"]
         why, rel = None, "unknown"
@@ -2319,6 +2651,9 @@ def build_nonterminal_merged_runs(ctx) -> dict:
             continue
         counted += 1
         detail.append(f"{path} {phase} {w_in[:8]} {rel} {_derive_run_subclass(rec['last'])}")
+    # Printed at 0 too, so a drained value is told apart from a probe that stopped reading them.
+    detail.append(f"derived — {derived} of {len(landing_paths)} LANDING records read LANDED: "
+                  f"their landing commit is on {ctx.git.base_ref}")
     detail.append(_RUN_REFUSED_NOTE)
     return {
         "signal": name,
@@ -2331,6 +2666,7 @@ def build_nonterminal_merged_runs(ctx) -> dict:
         # an empty population returned NOT ASKED or DEAD before reaching this line.
         "live": bool(parsed),
         "unjudgeable": stale,
+        "derived_landed": derived,
         "detail": detail,
     }
 
@@ -2753,70 +3089,105 @@ def build_discarded_work_landed(ctx) -> dict:
 # The gate runner retries, once and alone, a leg whose own ceiling fired, and counts a pass on that
 # retry as green. That is right for one bar and invisible across many: a leg that needs its retry on
 # every bar is a leg whose ceiling no longer fits the box, and a green bar says nothing about it. Each
-# run record's verdict file carries `retried <n>`, and this sums it over the records the git dir
-# still holds.
+# run record's verdict file carries `retried <n>`, and this sums it over the records EVERY git dir
+# of the clone still holds — the common dir and each linked worktree's under its `worktrees/` —
+# because the runner writes into whichever git dir ran the bar (TOOL-aMendedFleet-59). The detail
+# is one row per leg, named by the `<i>.retry.leg` rows beside the verdicts: how often it was
+# retried, how often it failed even on its retry, and in how many git dirs.
 #
-# REPORT-ONLY, over a window nobody chose here: the runner keeps a handful of run directories and
-# sweeps the rest, so the figure describes the last few bars of THIS worktree's git dir and is not a
-# history. LIVENESS is a verdict file that carries the key at all. A git dir with no run record, or
+# REPORT-ONLY, over a window nobody chose here: the runner keeps a handful of run directories per
+# git dir and sweeps the rest, and `git worktree remove` deletes a worktree's git dir with its
+# records, so the figure describes the last few bars of each git dir still present and is not a
+# history. LIVENESS is a verdict file that carries the key at all. A clone with no run record, or
 # only records from a runner that predates the retry, cannot move this signal, and it says DEAD
 # PROBE rather than a reassuring 0.
 #
-# WHAT IT DOES NOT CHECK: which legs were retried. The verdict file counts them; the per-leg
-# `<i>.retry.leg` rows beside it name them, and a reader who wants the names reads those.
+# WHAT IT DOES NOT CHECK: whether a retry was a spinning leg or a starved one; a timeout verdict
+# cannot tell them apart. `unattributed` is the verdict sum minus the retry rows read, nonzero when
+# a counted retry names no leg.
 _RUN_RECORD_DIR = "gate-run"
 
 
+def read_git_dirs(ctx) -> list[pathlib.Path]:
+    """The clone's common dir, then every directory under its `worktrees/` in sorted order; empty
+    when git cannot name the common dir."""
+    out = ctx.git.run("rev-parse", "--path-format=absolute", "--git-common-dir")
+    common = out.stdout.strip() if out.returncode == 0 else ""
+    if not common:
+        return []
+    base = pathlib.Path(common)
+    linked = base / "worktrees"
+    return [base] + (sorted(d for d in linked.iterdir() if d.is_dir()) if linked.is_dir() else [])
+
+
 def measure_legs_retried_after_timeout(ctx) -> dict:
-    """`retried` summed over every readable run-record verdict under this worktree's git dir."""
+    """`retried` summed over every readable run-record verdict under every git dir of the clone,
+    with one detail row per leg the `<i>.retry.leg` rows name."""
     name = "legs_retried_after_timeout"
-    rows = []
-    gd = ctx.git.run("rev-parse", "--git-dir")
-    base = pathlib.Path(gd.stdout.strip()) if gd.returncode == 0 and gd.stdout.strip() else None
-    if base is not None and not base.is_absolute():
-        base = ctx.root / base
-    if base is not None:
+    total, of, judged, rows_read = 0, 0, 0, 0
+    holding = set()
+    legs: dict[str, dict] = {}
+    for base in read_git_dirs(ctx):
         for verdict in sorted((base / _RUN_RECORD_DIR).glob("*/verdict")):
             try:
                 text = verdict.read_text(encoding="utf-8", errors="replace")
             except OSError:
                 continue
-            retried = None
+            of += 1
+            holding.add(base)
             for line in text.splitlines():
                 key, _, val = line.rstrip("\r").partition("\t")
                 if key == "retried" and val.strip().isdigit():
-                    retried = int(val.strip())
-            rows.append({"run": verdict.parent.name, "retried": retried})
-    judgeable = [r for r in rows if r["retried"] is not None]
+                    total += int(val.strip())
+                    judged += 1
+                    break
+            for row in sorted(verdict.parent.glob("*.retry.leg")):
+                try:
+                    fields = row.read_text(encoding="utf-8", errors="replace").splitlines()[0].split("\t")
+                except (OSError, IndexError):
+                    continue
+                leg = legs.setdefault(fields[0], {"leg": fields[0], "retried": 0,
+                                                  "failed_after_retry": 0, "git_dirs": set()})
+                leg["retried"] += 1
+                leg["failed_after_retry"] += (fields[1:2] or [""])[0].strip() != "ok"
+                leg["git_dirs"].add(base)
+                rows_read += 1
+    detail = [dict(r, git_dirs=len(r["git_dirs"]))
+              for r in sorted(legs.values(), key=lambda r: (-r["retried"], r["leg"]))]
     return {
         "signal": name,
-        "value": sum(r["retried"] for r in judgeable),
-        "of": len(rows),
+        "value": total,
+        "of": of,
         "tolerance": ctx.pins.get(name, 0),
         "gateable": False,
-        "live": bool(judgeable),
-        "detail": rows,
+        "live": bool(judged),
+        "git_dirs": len(holding),
+        "unattributed": total - rows_read,
+        "detail": detail,
     }
 
 
 # --------------------------------------------------------------------------------------------
-# Signal - builds over their undeclared-write budget (TOOL-dUnstuckLanding-17 S10)
+# Signal - builds over their undeclared-write budget (TOOL-dUnstuckLanding-17 S10; ported ahead of
+# that landing as TOOL-aMendedFleet-92, which reads every git dir of the clone)
 #
 # The unattended kit's check 23 judges each run record against a per-build budget and prints the
 # whole fleet's count on one line that never fails a run:
 #   unattended: check 23 fleet — <n> undeclared write(s) over <g> graded pass(es) in <r> record(s)
 #     · budget <b> per build · over <slug>=<n>…|none · range …|whole (…) · at <head8>
-# This signal READS THAT LINE out of the newest run record the merge bar persisted under this
-# worktree's git dir, through the `_RUN_RECORD_DIR` constant above, and never re-implements check 23:
-# a second copy of its pass-commit join, render skip, ABSORB classification and brief exclusion would
-# be two answers to one question. Running the kit gate instead would cost the leg's whole wall clock
-# against a report measured in seconds.
+# The port printed `budget 0 per run` and no `range` field; the reader takes only the `over` and `at`
+# fields, by their leading word, so either shape parses.
+# This signal READS THAT LINE out of the newest run record the merge bar persisted under any git dir
+# of the clone, through `read_git_dirs` and the `_RUN_RECORD_DIR` constant above, and never
+# re-implements check 23: a second copy of its pass-commit join, render skip, ABSORB classification
+# and brief exclusion would be two answers to one question. Running the kit gate instead would cost
+# the leg's whole wall clock against a report measured in seconds.
 #
 # REPORT-ONLY. Where the total should bind, it binds here and not in a closing run's bar, and it binds
 # nowhere by default: `gateable: False`. NOT ASKED where the repo carries no `.unattended.conf`; DEAD
-# PROBE where it does and no run record holds a fleet line, which is what a git dir that never ran
-# the bar, or ran it before the line existed, looks like. A line that does not parse is detail, never
-# a count.
+# PROBE where it does and no run record holds a fleet line, which is what a clone that never ran the
+# bar, or ran it before the line existed, looks like, and DEAD PROBE where the newest line reads
+# `over unjudged`. A line that does not parse is detail, never a count.
 #
 # WHAT IT DOES NOT CHECK: anything newer than the bar run it read. The `at` sha names the HEAD that
 # bar graded, and the detail says when HEAD has moved past it.
@@ -2872,12 +3243,10 @@ def measure_fleet_over_budget(ctx) -> dict:
     if not (ctx.root / ".unattended.conf").exists():
         return _build_not_asked(name, "no .unattended.conf at the repo root; the unattended kit, whose "
                                       "check 23 prints the fleet line, is not adopted")
-    gd = ctx.git.run("rev-parse", "--git-dir")
-    base = pathlib.Path(gd.stdout.strip()) if gd.returncode == 0 and gd.stdout.strip() else None
-    if base is not None and not base.is_absolute():
-        base = ctx.root / base
     runs = []
-    if base is not None and (base / _RUN_RECORD_DIR).is_dir():
+    for base in read_git_dirs(ctx):
+        if not (base / _RUN_RECORD_DIR).is_dir():
+            continue
         for d in (base / _RUN_RECORD_DIR).iterdir():
             if d.is_dir():
                 try:
@@ -2936,6 +3305,216 @@ def measure_fleet_over_budget(ctx) -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------------
+# Signal - consecutive red runs of the remote CI workflow on the default branch (TOOL-aMendedFleet-8)
+#
+# Every other signal reads the local clone, so a remote CI that has failed for a week was invisible
+# to the one report that exists to say the record no longer matches reality. This reads the newest
+# runs through `gh` and counts the leading reds over COMPLETED runs: `failure`, `timed_out` and
+# `startup_failure` extend the streak, `success` ends it, and every other conclusion, or a run still
+# in flight, carries no verdict and is passed over and listed. A cancelled run therefore cannot fake
+# a green.
+#
+# REPORT-ONLY, and NOT ASKED in two cases: the project layer declares no `REMOTE_CI_WORKFLOW`, or
+# the run is `--check` / `--offenders`, so the merge bar's leg never makes a network call for a value
+# it does not grade. LIVENESS is a `gh` answer holding at least one verdict-bearing run; `gh` absent,
+# failing, timing out, unparseable or empty is DEAD PROBE, never a reassuring 0.
+#
+# WHAT IT DOES NOT CHECK: why a run failed, or which job inside it. The detail names the run ids, and
+# `gh run view <id>` answers the rest. A window that is all red reports its own length with `capped`
+# set: the streak is AT LEAST that, and may be longer than the window shows.
+REMOTE_CI_RUN_LIMIT = 30
+REMOTE_CI_TIMEOUT_S = 20
+_CI_RED = frozenset({"failure", "timed_out", "startup_failure"})
+_CI_GREEN = frozenset({"success"})
+
+
+def read_remote_ci_runs(root: pathlib.Path, workflow: str, branch: str):
+    """`(rows, None)` from `gh run list`, newest first, or `(None, <why>)` when it could not answer."""
+    argv = ["gh", "run", "list", "--workflow", workflow, "--branch", branch,
+            "--limit", str(REMOTE_CI_RUN_LIMIT),
+            "--json", "databaseId,status,conclusion,event,createdAt,headSha"]
+    try:
+        out = subprocess.run(argv, cwd=str(root), capture_output=True, text=True, encoding="utf-8",
+                             errors="replace", timeout=REMOTE_CI_TIMEOUT_S)
+    except FileNotFoundError:
+        return None, "`gh` is not on PATH"
+    except subprocess.TimeoutExpired:
+        return None, f"`gh run list` did not answer within {REMOTE_CI_TIMEOUT_S} s"
+    if out.returncode != 0:
+        first = (out.stderr.strip().splitlines() or ["(no stderr)"])[0]
+        return None, f"`gh run list` exited {out.returncode}: {first}"
+    try:
+        rows = json.loads(out.stdout)
+    except ValueError:
+        return None, "`gh run list` printed output that is not JSON"
+    if not isinstance(rows, list) or not all(isinstance(x, dict) for x in rows):
+        return None, "`gh run list` printed JSON that is not a list of runs"
+    return rows, None
+
+
+def measure_red_streak(rows: list) -> dict:
+    """The leading red streak over verdict-bearing runs, newest first, overall and per event.
+
+    `streak` is None when no run carries a verdict, which the caller reports DEAD. `capped` is true
+    when every verdict-bearing run in the window is red, so the true streak may be longer."""
+    verdicts, passed_over = [], []
+    for x in rows:
+        c = (x.get("conclusion") or "") if x.get("status") == "completed" else ""
+        if c in _CI_RED or c in _CI_GREEN:
+            verdicts.append((x, c in _CI_RED))
+        else:
+            passed_over.append({"run": x.get("databaseId"), "status": x.get("status"),
+                                "conclusion": x.get("conclusion") or "", "event": x.get("event")})
+    streak = next((i for i, (_, red) in enumerate(verdicts) if not red), len(verdicts))
+    by_event = {}
+    for ev in ("push", "schedule"):
+        reds = [red for x, red in verdicts if x.get("event") == ev]
+        by_event[ev] = next((i for i, red in enumerate(reds) if not red), len(reds))
+    newest_red = next((x.get("databaseId") for x, red in verdicts if red), None)
+    newest_green = next((x.get("databaseId") for x, red in verdicts if not red), None)
+    return {"streak": streak if verdicts else None, "examined": len(verdicts),
+            "capped": bool(verdicts) and streak == len(verdicts), "by_event": by_event,
+            "newest_red": newest_red, "newest_green": newest_green, "passed_over": passed_over}
+
+
+def build_remote_ci_red_streak(ctx) -> dict:
+    """Consecutive failed runs of the declared remote CI workflow on the default branch."""
+    name = "remote_ci_red_streak"
+    workflow = getattr(ctx, "remote_ci_workflow", "")
+    if not workflow:
+        return _build_not_asked(name, "the project layer declares no REMOTE_CI_WORKFLOW, so there is no "
+                                      "remote CI to read")
+    if getattr(ctx, "offline", False):
+        return _build_not_asked(name, "skipped under --check and --offenders: the merge bar's leg makes "
+                                      "no network call for a value it does not grade")
+    branch = re.sub(r"^refs/(?:remotes/[^/]+|heads)/", "", ctx.git.base_ref)
+    rows, why = read_remote_ci_runs(ctx.root, workflow, branch)
+    m = measure_red_streak(rows or [])
+    if why is None and m["streak"] is None:
+        why = f"`gh run list` returned {len(rows)} run(s) of {workflow} on {branch} and none carries a verdict"
+    live = why is None
+    if not live:
+        return {"signal": name, "value": 0, "of": 0, "tolerance": 0, "gateable": False,
+                "live": live, "detail": [{"note": f"DEAD PROBE — {why}"}]}
+    summary = {"workflow": workflow, "branch": branch, "newest_red": m["newest_red"],
+               "newest_green": m["newest_green"] if m["newest_green"] is not None else "none in window",
+               "capped": m["capped"], "by_event": m["by_event"], "passed_over": len(m["passed_over"])}
+    return {"signal": name, "value": m["streak"], "of": m["examined"], "tolerance": 0,
+            "gateable": False, "live": live, "detail": [summary, *m["passed_over"]]}
+
+
+# --------------------------------------------------------------------------------------------
+# Signal - codebase-map dossiers older than their paths (TOOL-aMendedFleet-37)
+#
+# REPORT-ONLY, and IT DECIDES NOTHING. The rule — a commit touching a path a dossier claims is not
+# an ancestor of the dossier's own last commit — is the codebase-map kit's, computed by its
+# `map_diff.py --stale-dossiers --json` over its own glob attribution. Spelling the attribution a
+# second time here would be two answers to "which feature owns this path", and they would drift.
+# Three states: NOT ASKED where the map kit does not resolve or the root has not adopted it, DEAD
+# PROBE where the history is shallow, nothing touched a claimed path, or the reader failed, and a
+# count otherwise. The detail is the refresh worklist, most-behind first.
+# --------------------------------------------------------------------------------------------
+
+
+def read_stale_dossiers(ctx):
+    """`(returncode, stdout, stderr)` of `map_diff.py --stale-dossiers --json` at this report's root,
+    or None when the codebase-map kit does not resolve beside this one. `CODEBASE_MAP_ROOT` is
+    pinned to the root this report grades, so the map answers about the same tree."""
+    try:
+        kit = resolve_kit_dir("codebase-map", "map_diff.py", pathlib.Path(__file__).resolve().parent)
+    except LookupError:
+        return None
+    env = dict(os.environ, CODEBASE_MAP_ROOT=str(ctx.root))
+    try:
+        out = subprocess.run([sys.executable, str(kit / "map_diff.py"), "--stale-dossiers", "--json"],
+                             cwd=str(ctx.root), env=env, capture_output=True, text=True,
+                             encoding="utf-8", errors="replace", timeout=600)
+    except (OSError, subprocess.SubprocessError) as exc:
+        return (None, "", f"map_diff.py did not run: {exc}")
+    return (out.returncode, out.stdout, out.stderr)
+
+
+def build_stale_dossiers(ctx) -> dict:
+    name = "dossiers_older_than_their_paths"
+    got = read_stale_dossiers(ctx)
+    if got is None:
+        return _build_not_asked(name, "the codebase-map kit is not installed beside this one")
+    rc, stdout, stderr = got
+    said = ((stderr or "").strip().splitlines() or [f"exit {rc}"])[0][:240]
+    if rc == 2:
+        # map_diff's refusal: the root carries no .codebase-map.conf, so there is no map to grade.
+        return _build_not_asked(name, f"no codebase map is adopted at this root ({said})")
+    try:
+        doc = json.loads(stdout) if rc == 0 else None
+    except ValueError:
+        doc = None
+    if not isinstance(doc, dict) or not isinstance(doc.get("dossiers"), list):
+        live, detail = False, [{"note": f"DEAD PROBE — map_diff.py --stale-dossiers gave no answer: {said}"}]
+    else:
+        live = doc.get("live") is True
+        detail = ([{"note": f"DEAD PROBE — {doc.get('note')}"}] if not live else
+                  ([{"note": doc["note"]}] if doc.get("note") else [])
+                  + [r for r in doc["dossiers"] if isinstance(r, dict) and r.get("stale")])
+    return {"signal": name,
+            "value": int(doc.get("stale") or 0) if live else 0,
+            "of": int(doc.get("of") or 0) if live else 0,
+            "tolerance": ctx.pins.get(name, 0), "gateable": False, "live": live,
+            "unjudgeable": 0, "detail": detail}
+
+
+# --------------------------------------------------------------------------------------------
+# TOOL-aMendedFleet-54 — live builds nobody is working, read from the index generator's own render
+#
+# The dormancy RULE is the memory-tree generator's (`LIVE_DORMANT_DAYS`, its `Activity` column), and
+# this signal defines none of its own: it counts the cells that render wrote, exactly as the backlog
+# signals count the generator's ask projection. The column is found BY HEADER NAME, so a column
+# appended after it moves nothing. REPORT-ONLY and pinless: a dormant build is a state to read, and a
+# ceiling on a count that moves with the calendar would red a tree nobody touched.
+# --------------------------------------------------------------------------------------------
+
+def build_live_builds_without_activity(ctx) -> dict:
+    """Dormant rows of `<memory root>/LIVE.md`'s table; a cell neither `active` nor `dormant` is
+    UNJUDGEABLE, never active. No file, or a table with no `Activity` header, is NOT ASKED."""
+    name = "live_builds_without_activity"
+    rel = f"{ctx.memory_root}/LIVE.md"
+    try:
+        lines = (ctx.root / rel).read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return _build_not_asked(name, f"no {rel}; the memory-tree index is not rendered here")
+    start = next((i for i in range(len(lines) - 1) if lines[i].lstrip().startswith("|")
+                  and re.fullmatch(r"\|?[\s:|-]+\|?", lines[i + 1].strip() or "x")), None)
+    header = ([c.strip() for c in lines[start].strip().strip("|").split("|")]
+              if start is not None else [])
+    if "Activity" not in header:
+        return _build_not_asked(name, f"{rel} carries no table with an Activity column; "
+                                      "a blank LIVE_DORMANT_DAYS renders none, so dormancy is not asked")
+    col, last = header.index("Activity"), (header.index("Last record") if "Last record" in header else None)
+    dormant, active, unjudgeable, detail = 0, 0, 0, []
+    for line in lines[start + 2:]:
+        if not line.lstrip().startswith("|"):
+            break
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        state = cells[col] if col < len(cells) else ""
+        if state == "active":
+            active += 1
+        elif state == "dormant":
+            dormant += 1
+            link = re.search(r"\[([^\]]+)\]", cells[0])
+            row = {"build": link.group(1) if link else cells[0]}
+            if last is not None and last < len(cells):
+                row["last_record"] = cells[last]
+            detail.append(row)
+        else:
+            unjudgeable += 1
+            detail.append({"note": f"unjudgeable Activity cell {state!r}: {line.strip()[:160]}"})
+    return {"signal": name, "value": dormant, "of": dormant + active, "tolerance": None,
+            "gateable": False,
+            # A table with the column and no judgeable row cannot move this count.
+            "live": dormant + active > 0,
+            "unjudgeable": unjudgeable, "detail": detail}
+
+
 SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
@@ -2944,11 +3523,16 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            build_readme_mechanism_drift,
            build_backlog_asks_contested, build_backlog_evidence_sha,
            build_backlog_asks_unlabelled,
+           build_open_asks_cited_by_source,
+           build_cutoff_keys_armed,
            build_source_cited_ids_with_no_record,
            build_backlog_stragglers,
            build_nonterminal_merged_runs,
            build_aborted_work_landed, build_discarded_work_landed,
-           measure_legs_retried_after_timeout, measure_fleet_over_budget]
+           measure_legs_retried_after_timeout, measure_fleet_over_budget,
+           build_remote_ci_red_streak,
+           build_stale_dossiers,
+           build_live_builds_without_activity]
 
 
 # --------------------------------------------------------------------------------------------
@@ -2984,6 +3568,11 @@ class Ctx:
         # — which declares neither name — keeps working instead of tripping a required-attribute
         # refusal, and visibly gets the old unnarrowed behaviour until they fill it.
         self.evidence_globs = list(getattr(proj, "EVIDENCE_GLOBS", None) or proj.PRODUCT_GLOBS)
+        # TOOL-aMendedFleet-8. The remote CI workflow file the red-streak signal reads; BLANK or
+        # undeclared is NOT ASKED. `offline` is set by `main` under --check / --offenders, so the
+        # merge bar's leg never spawns `gh`.
+        self.remote_ci_workflow = (getattr(proj, "REMOTE_CI_WORKFLOW", "") or "").strip()
+        self.offline = False
         fams = _read_families(conf)
         self.own_id_re = _build_own_id_re(root, fams)
         # ONE accessor for both projections, so the citation scan and the definition scan
@@ -2996,29 +3585,22 @@ class Ctx:
         # The project layer itself, so a signal can ask for a declaration the kit does
         # not know about — e.g. DECLARED_EMPTY, which an older adopter will not have.
         self.proj = proj
+        # The layer's repo-relative path, or None outside the tree: signal 2 excludes it from its
+        # evidence and the BASELINES guard reads it at the base (TOOL-aMendedFleet-56).
+        try:
+            self.layer_path = pathlib.Path(proj.__file__).resolve().relative_to(
+                root.resolve()).as_posix()
+        except (AttributeError, TypeError, ValueError):
+            self.layer_path = None
         self.charter = getattr(proj, "CHARTER", None) or self._find_charter()
-        self.node_tag = self._resolve_node_tag()
+        # TOOL-aMendedFleet-53. The auto-memory directory signal 5 audits; BLANK or undeclared is
+        # NOT ASKED, so an older adopter's project layer keeps importing.
+        self.auto_memory_dir = (getattr(proj, "AUTO_MEMORY_DIR", "") or "").strip()
 
     def _find_charter(self) -> str | None:
         for c in _CHARTER_CANDIDATES:
             if (self.root / c).exists():
                 return c
-        return None
-
-    def _resolve_node_tag(self) -> str | None:
-        """Match this machine's user against the charter's node-registry table."""
-        import os
-
-        if not self.charter:
-            return None
-        user = (os.environ.get("USERNAME") or os.environ.get("USER") or "").lower()
-        if not user:
-            return None
-        text = (self.root / self.charter).read_text(encoding="utf-8", errors="replace")
-        for line in text.splitlines():
-            m = re.match(r"\|\s*`([a-z])`\s*\|\s*`?([A-Za-z0-9_@.-]+)`?", line.strip())
-            if m and m.group(2).lower() in user:
-                return m.group(1)
         return None
 
 
@@ -3088,6 +3670,236 @@ def resolve_base_ref(root: pathlib.Path, explicit: str | None) -> str:
                      f"input this report used to grade instead of what landed.")
 
 
+def extract_unlocated(v):
+    """A detail row with its LINE LOCATORS dropped — the `line`/`lines` fields and a trailing
+    `:<digits>` on any string. ONE spelling, shared by `--offenders` and the history's key hash."""
+    if isinstance(v, str):
+        return re.sub(r":\d+$", "", v)
+    if isinstance(v, list):
+        return [extract_unlocated(x) for x in v]
+    if isinstance(v, dict):
+        return {k: extract_unlocated(x) for k, x in v.items() if k not in ("line", "lines")}
+    return v
+
+
+def derive_row_identity(row) -> str:
+    """A detail row's identity for `BASELINES` (TOOL-aMendedFleet-56 S2): its `id` when that is a
+    string, else its unlocated `--offenders` key, so a row with no id is never silently matched."""
+    if isinstance(row, dict) and isinstance(row.get("id"), str):
+        return row["id"]
+    return json.dumps(extract_unlocated(row), sort_keys=True, ensure_ascii=False)
+
+
+# TOOL-aMendedFleet-48. Every `--check` appends one row per signal here, in the git COMMON dir so
+# every worktree of a clone writes one history. Readers locate columns by the header, never by
+# position: the header is the file's whole contract. Node-local, never pushed, never rotated.
+HISTORY_FILE = "drift-history.tsv"
+HISTORY_COLUMNS = ("#utc", "sha", "base_ref", "base_sha", "signal", "state", "value", "of", "key_hash")
+
+
+def build_history_rows(out: list, declared: set, utc: str, sha: str, base_ref: str,
+                       base_sha: str) -> list[str]:
+    """One TSV row per record, in `SIGNALS` order. `key_hash` is the first 16 hex of the SHA-256 of
+    the record's detail keys exactly as `--offenders` spells them, sorted and LF-joined, so a member
+    swap at an equal count moves it and a moved line number does not; `-` for any state but live."""
+    rows = []
+    for s in out:
+        if s.get("not_asked"):
+            state = "not-asked"
+        elif not s["live"]:
+            state = "declared-empty" if s["signal"] in declared else "dead"
+        else:
+            state = "live"
+        key_hash = "-"
+        if state == "live":
+            keys = render_drift_offenders([s], [], [])
+            key_hash = hashlib.sha256("\n".join(sorted(keys)).encode("utf-8")).hexdigest()[:16]
+        rows.append("\t".join((utc, sha, base_ref, base_sha, s["signal"], state,
+                               str(s["value"]), str(s["of"]), key_hash)))
+    return rows
+
+
+def resolve_history_path(root: pathlib.Path) -> pathlib.Path | None:
+    """`<git-common-dir>/drift-history.tsv`, the common dir resolved against the repo root; None
+    when git cannot name one."""
+    out = subprocess.run(["git", "-C", str(root), "rev-parse", "--git-common-dir"],
+                         capture_output=True, text=True, encoding="utf-8", errors="replace")
+    common = out.stdout.strip()
+    if out.returncode != 0 or not common:
+        return None
+    return (root / common).resolve() / HISTORY_FILE
+
+
+def write_drift_history(path: pathlib.Path | None, rows: list[str]) -> None:
+    """Append `rows` in ONE binary write, the header first into an absent or empty file, so two bars
+    on one node interleave whole groups at worst. A failure is one stderr line and never touches the
+    exit status; a success is one stdout line, so a missing line is a visible miss."""
+    try:
+        if path is None:
+            raise OSError("git rev-parse --git-common-dir named no directory")
+        with open(path, "ab") as fh:
+            head = "" if fh.tell() else "\t".join(HISTORY_COLUMNS) + "\n"
+            fh.write((head + "".join(r + "\n" for r in rows)).encode("utf-8"))
+    except OSError as exc:
+        print(f"drift-report: history NOT written to {path}: {exc}", file=sys.stderr)
+        return
+    print(f"drift-report: {len(rows)} history rows appended to {path}")
+
+
+# TOOL-aMendedFleet-49. `--delta <base> <head>`: the history's one reader, beside its writer so the two
+# share HISTORY_COLUMNS. Every case that cannot produce a delta is ONE `skipped` line and exit 0 —
+# never a zero delta, which would read as "nothing moved" when nothing was measured.
+def read_history_groups(path: pathlib.Path | None) -> tuple[list[dict], str]:
+    """The history's groups in append order, each `{utc, sha, rows: {signal: row}, order}`; or no
+    groups and the skip reason. A group is the CONSECUTIVE rows of one write, keyed by utc and sha:
+    the writer appends one group in one binary write, so its rows are never split."""
+    if path is None or not path.is_file():
+        return [], f"no drift history in this clone ({path or 'git named no common dir'})"
+    lines = path.read_bytes().decode("utf-8", errors="replace").splitlines()
+    head = lines[0].split("\t") if lines else []
+    if not set(HISTORY_COLUMNS) <= set(head):
+        return [], f"{path.name} opens with a header this engine does not write"
+    col = {name: head.index(name) for name in HISTORY_COLUMNS}
+    groups: list[dict] = []
+    for ln in lines[1:]:
+        f = ln.split("\t")
+        if len(f) < len(head):
+            continue
+        row = {name: f[i] for name, i in col.items()}
+        key = (row["#utc"], row["sha"])
+        if not groups or groups[-1]["key"] != key:
+            groups.append({"key": key, "sha": row["sha"], "rows": {}, "order": []})
+        if row["signal"] not in groups[-1]["rows"]:
+            groups[-1]["order"].append(row["signal"])
+        groups[-1]["rows"][row["signal"]] = row
+    return groups, ""
+
+
+# TOOL-aMendedFleet-90. A report-only probe DEAD for this many recorded readings in a row stops
+# printing "ignore its value" and names the two ways out. Report only: the history is node-local, so
+# a verdict built on it would not reproduce at a sha.
+DEFAULT_DEAD_READINGS_LIMIT = 10
+
+
+def _read_dead_keys(proj) -> tuple[int, dict]:
+    """(DEAD_READINGS_LIMIT, DEAD_FILED) from the project layer, each absent taking its default; a
+    present-but-malformed one is a named refusal rather than a comparison failing mid-table."""
+    limit = getattr(proj, "DEAD_READINGS_LIMIT", None)
+    limit = DEFAULT_DEAD_READINGS_LIMIT if limit is None else limit
+    if not isinstance(limit, int) or isinstance(limit, bool) or limit < 1:
+        raise DriftError(f"drift_signals.py declares DEAD_READINGS_LIMIT = {limit!r}; it must be a "
+                         f"positive integer, or absent to take the shipped {DEFAULT_DEAD_READINGS_LIMIT}")
+    filed = getattr(proj, "DEAD_FILED", None) or {}
+    if not isinstance(filed, dict) or not all(isinstance(k, str) and isinstance(v, str)
+                                              for k, v in filed.items()):
+        raise DriftError("drift_signals.py declares DEAD_FILED that is not a dict from a signal name "
+                         "to the id of the ask filed for it")
+    return limit, filed
+
+
+def derive_dead_streaks(path: pathlib.Path | None) -> tuple[dict, int] | None:
+    """({signal: trailing readings whose state is `dead`}, readings), or None when the history is
+    missing, unreadable or headerless. A READING is the last group in a run of consecutive groups at
+    one sha, so a bar re-run at one commit does not age a signal; absence ends a streak."""
+    try:
+        groups, why = read_history_groups(path)
+    except OSError:
+        return None
+    if why:
+        return None
+    readings: list[dict] = []
+    for g in groups:
+        if readings and readings[-1]["sha"] == g["sha"]:
+            readings[-1] = g
+        else:
+            readings.append(g)
+    streaks = {}
+    for sig in {s for g in readings for s in g["rows"]}:
+        k = 0
+        for g in reversed(readings):
+            row = g["rows"].get(sig)
+            if row is None or row["state"] != "dead":
+                break
+            k += 1
+        streaks[sig] = k
+    return streaks, len(readings)
+
+
+def derive_drift_delta(root: pathlib.Path, base: str, head: str) -> tuple[int, list[str]]:
+    """(exit, lines) for `--delta`. Exit 2 only when an argument is not a commit; every other miss is
+    one `skipped` line at exit 0. Ancestry comes from ONE `rev-list --parents` over both ends."""
+    shas = []
+    for arg in (base, head):
+        r = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet", arg + "^{commit}"],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if r.returncode != 0 or not r.stdout.strip():
+            return 2, [f"drift-report: --delta: '{arg}' does not resolve to a commit"]
+        shas.append(r.stdout.strip())
+    base_sha, head_sha = shas
+    groups, why = read_history_groups(resolve_history_path(root))
+    if why:
+        return 0, [f"drift-delta: skipped — {why}"]
+    graph = subprocess.run(["git", "-C", str(root), "rev-list", "--parents", head_sha, base_sha],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace")
+    parents = {}
+    for ln in graph.stdout.splitlines():
+        f = ln.split()
+        if f:
+            parents[f[0]] = f[1:]
+
+    def derive_ancestors(start: str) -> set:
+        seen, todo = set(), [start]
+        while todo:
+            c = todo.pop()
+            if c not in seen:
+                seen.add(c)
+                todo.extend(parents.get(c, ()))
+        return seen
+
+    at_base, at_head = derive_ancestors(base_sha), derive_ancestors(head_sha)
+    b = next((g for g in reversed(groups) if g["sha"] in at_base), None)
+    if b is None:
+        return 0, [f"drift-delta: skipped — no reading at or before BASE {base_sha[:8]}"]
+    h = next((g for g in reversed(groups) if g["sha"] in at_head and g["sha"] not in at_base), None)
+    if h is None:
+        return 0, [f"drift-delta: skipped — no reading inside BASE..HEAD "
+                   f"({base_sha[:8]}..{head_sha[:8]})"]
+    return 0, render_drift_delta(b, h, base_sha, head_sha)
+
+
+def render_drift_delta(b: dict, h: dict, base_sha: str, head_sha: str) -> list[str]:
+    """The two readings, then one line per signal that moved, in the HEAD group's order and then any
+    signal only BASE carries. A non-live side prints its state; equal live values with a moved
+    key_hash are `members changed`; a signal one group lacks is `absent`."""
+    def render_side(row):
+        if row is None:
+            return "absent"
+        return row["value"] if row["state"] == "live" else row["state"]
+
+    def render_at(end, g):
+        return f"{end[:8]} read at {g['sha'][:8]} ({'equal' if g['sha'] == end else 'an ancestor'})"
+
+    out = [f"drift-delta: BASE {render_at(base_sha, b)} · HEAD {render_at(head_sha, h)}"]
+    for sig in h["order"] + [s for s in b["order"] if s not in h["rows"]]:
+        x, y = b["rows"].get(sig), h["rows"].get(sig)
+        if x is not None and y is not None and x["state"] == y["state"]:
+            if x["state"] != "live" or (x["value"] == y["value"] and x["key_hash"] == y["key_hash"]):
+                continue
+            tail = " (members changed)" if x["value"] == y["value"] else ""
+            out.append(f"drift-delta:   {sig} {x['value']} -> {y['value']}{tail}")
+            continue
+        lhs, rhs = render_side(x), render_side(y)
+        # A live side beside a non-live or absent one names its state too: `dead -> live 0`.
+        if x is not None and x["state"] == "live":
+            lhs = f"live {lhs}"
+        if y is not None and y["state"] == "live":
+            rhs = f"live {rhs}"
+        out.append(f"drift-delta:   {sig} {lhs} -> {rhs}")
+    if len(out) == 1:
+        out.append("drift-delta:   no signal moved between the two readings")
+    return out
+
+
 def render_drift_offenders(over: list, dead: list, ratchets: list) -> list[str]:
     """`--offenders`: one `<signal>\t<detail key>` line per thing `--check` would red on.
 
@@ -3096,26 +3908,23 @@ def render_drift_offenders(over: list, dead: list, ratchets: list) -> list[str]:
     answers that. So each line is a KEY: every detail row of every gateable signal over its pin, every
     gateable signal that is DEAD, and every weakened ratchet — the three things `--check` exits 1 on,
     and nothing else. No count, no header, no cut: `--check` shows ten detail rows per signal, and a
-    set built from ten can hide the eleventh.
+    set built from ten can hide the eleventh. A signal bounded by `BASELINES` keys only what moved:
+    each of its `new` rows, and `{"stale": "<id>"}` per stale id, never a row its set lists.
 
     A detail row's key is its JSON with sorted keys and its LINE LOCATORS dropped — the `line` field,
     and a trailing `:<digits>` on any string — because an unrelated edit above a finding moves its
     line and would read as a new finding on every branch. A key repeating inside one signal carries
     `#<k>`, its occurrence ordinal, so two identical rows stay two.
     """
-    def extract_unlocated(v):
-        if isinstance(v, str):
-            return re.sub(r":\d+$", "", v)
-        if isinstance(v, list):
-            return [extract_unlocated(x) for x in v]
-        if isinstance(v, dict):
-            return {k: extract_unlocated(x) for k, x in v.items() if k not in ("line", "lines")}
-        return v
-
     rows = []
     for s in over:
+        # A BASELINED record keys only what MOVED: each new row and each stale id (TOOL-aMendedFleet-56 S5).
+        fresh = set(s["new"]) if "baseline" in s else None
         for d in s["detail"]:
-            rows.append((s["signal"], json.dumps(extract_unlocated(d), sort_keys=True, ensure_ascii=False)))
+            if fresh is None or derive_row_identity(d) in fresh:
+                rows.append((s["signal"], json.dumps(extract_unlocated(d), sort_keys=True, ensure_ascii=False)))
+        for i in (s["stale"] if fresh is not None else ()):
+            rows.append((s["signal"], json.dumps({"stale": i}, ensure_ascii=False)))
     for s in dead:
         rows.append((s["signal"], "DEAD — gateable, and its judgeable population is empty"))
     for r in ratchets:
@@ -3126,6 +3935,199 @@ def render_drift_offenders(over: list, dead: list, ratchets: list) -> list[str]:
         line = f"{sig}\t{' '.join(key.split())}"
         seen[line] = seen.get(line, 0) + 1
         out.append(line if seen[line] == 1 else f"{line}#{seen[line]}")
+    return out
+
+
+# --------------------------------------------------------------------------------------------
+# --escape-ratio <month> — an OUTCOME reading, on demand only (TOOL-aMendedFleet-50)
+# --------------------------------------------------------------------------------------------
+# Of one month's product fixes, the share that repaired code which had already reached the base.
+# NOT a signal: it costs a blame per fix and file, so it is never on the bar, never on the card,
+# and it prints no comparison between months — one repository's before and after is not evidence.
+
+# A parent-side line matching one of these is a version or audit stamp, not code a fix repaired.
+ESCAPE_STAMP_PATTERNS = (
+    re.compile(r"gov:kit [A-Za-z0-9_.-]+@"),
+    re.compile(r"\bKIT_[A-Z0-9_]+_VERSION\s*="),
+    re.compile(r'^\s*version\s*=\s*"'),
+    re.compile(r"\blast-(?:audit|body-change):"),
+)
+_FIX_SUBJECT = re.compile(r"fix(?:\([^)]*\))?!?(?:[:\s]|$)")
+_FIX_GREP = r"^fix(\([^)]*\))?!?([:[:space:]]|$)"
+_HUNK = re.compile(r"^@@ -(\d+)(?:,(\d+))? ")
+_BLAME_HEAD = re.compile(r"^([0-9a-f]{40}) \d+ \d+")
+_WILSON_Z = 1.959963984540054
+_ESCAPE_CAVEAT = ("caveat: a difference between two months of one repository is not evidence of "
+                 "an effect")
+
+
+def build_landing_index(git: Git, tip: str) -> tuple[list, dict, dict]:
+    """(first-parent chain oldest first, commit -> landing commit, commit -> committer epoch), from
+    ONE `rev-list --timestamp --parents`. Walking the chain oldest first, every commit newly reachable
+    from a first-parent commit lands with it, so the landings partition the history and a commit's
+    landing's chain index orders when it reached the base."""
+    walk = git.run("rev-list", "--timestamp", "--parents", tip, "--")
+    if walk.returncode != 0 or not walk.stdout.strip():
+        raise DriftError(f"`git rev-list {tip}` returned nothing, so no landing can be placed")
+    parents, stamp = {}, {}
+    for line in walk.stdout.split("\n"):
+        f = line.split()
+        if len(f) >= 2:
+            stamp[f[1]], parents[f[1]] = int(f[0]), f[2:]
+    chain, at = [], tip
+    while at in parents:
+        chain.append(at)
+        at = parents[at][0] if parents[at] else None
+    chain.reverse()
+    landing: dict = {}
+    for f in chain:
+        stack = [f]
+        while stack:
+            c = stack.pop()
+            if c not in landing:
+                landing[c] = f
+                stack.extend(p for p in parents.get(c, ()) if p not in landing)
+    return chain, landing, stamp
+
+
+def read_month_fixes(git: Git, revs: list, globs: list) -> list[dict]:
+    """Every non-merge `fix` commit in `revs` touching `globs`, with its PARENT-SIDE lines — the
+    lines its diff takes out, numbered as they read in its parent — from ONE `git log -U0 -p`.
+    `--full-history`, because default simplification drops a side branch whose merge is TREESAME to
+    main for these paths, and that branch's fixes landed all the same."""
+    log = git.run("-c", "core.quotePath=false", "log", "--no-merges", "--no-renames", "--full-history",
+                  "--no-color", "--no-ext-diff", "--src-prefix=a/", "--dst-prefix=b/", "-U0", "-p",
+                  "-E", f"--grep={_FIX_GREP}", "--format=%x01%H%x02%s", *revs, "--", *globs)
+    if log.returncode != 0:
+        raise DriftError(f"`git log` over the month's landings failed: {log.stderr.strip()[:200]}")
+    fixes, cur, path, left, at = [], None, None, 0, 0
+    for line in log.stdout.split("\n"):
+        if line.startswith("\x01"):
+            sha, _, subject = line[1:].partition("\x02")
+            cur = {"sha": sha, "subject": subject, "lines": {}}
+            path, left = None, 0
+            if _FIX_SUBJECT.match(subject):  # `--grep` reads the body too; the subject decides
+                fixes.append(cur)
+            continue
+        if cur is None:
+            continue
+        if line.startswith("diff --git "):
+            path, left = None, 0
+        elif left == 0 and line.startswith("--- "):
+            p = line[4:].strip('"')
+            path = p[2:] if p.startswith("a/") else None
+        elif m := _HUNK.match(line):
+            at, left = int(m.group(1)), int(m.group(2) or 1)
+        elif left and line.startswith("-") and path:
+            cur["lines"].setdefault(path, []).append((at, line[1:]))
+            at, left = at + 1, left - 1
+    return fixes
+
+
+def check_stamp_line(text: str) -> bool:
+    """True when a parent-side line is a version or audit stamp (`ESCAPE_STAMP_PATTERNS`)."""
+    return any(p.search(text) for p in ESCAPE_STAMP_PATTERNS)
+
+
+def derive_wilson_interval(k: int, n: int) -> tuple[float, float] | None:
+    """The 95% Wilson score interval for k of n; None at n 0. Unlike the normal approximation it
+    stays inside [0, 1] at k 0 and at small n."""
+    if n <= 0:
+        return None
+    p, z2 = k / n, _WILSON_Z * _WILSON_Z
+    mid = (p + z2 / (2 * n)) / (1 + z2 / n)
+    half = _WILSON_Z * math.sqrt(p * (1 - p) / n + z2 / (4 * n * n)) / (1 + z2 / n)
+    return max(0.0, mid - half), min(1.0, mid + half)
+
+
+def measure_escape_ratio(git: Git, base_ref: str, base_sha: str, month: str, globs: list) -> dict:
+    """The `--escape-ratio` result for one `YYYY-MM` month, as the `--json` object.
+
+    A fix is ESCAPED when any parent-side line, stamps filtered out, blames to a commit whose landing
+    is earlier than the fix's own; a boundary or unplaced commit counts as earlier. DIRECT is a fix
+    that is its own landing, made on the first-parent line, and escaped by construction once it blames
+    anything — printed beside the ratio as the share that measures workflow rather than defects.
+    ponytail: one blame per fix and file, about 300 spawns a month; never a signal for that reason."""
+    chain, landing, stamp = build_landing_index(git, base_sha)
+    index = {f: i for i, f in enumerate(chain)}
+    picked = [i for i, f in enumerate(chain) if datetime.datetime.fromtimestamp(
+        stamp[f], datetime.timezone.utc).strftime("%Y-%m") == month]
+    res = {"month": month, "base_ref": base_ref, "base_sha": base_sha, "n": 0, "escaped": 0, "ratio": None, "interval": None, "direct": 0,
+           "unclassified": {}, "fixes": []}
+    if not picked:
+        return res
+    lo, hi = min(picked), max(picked)
+    revs = [chain[hi]] + ([f"^{chain[lo - 1]}"] if lo else [])
+    month_landings = {chain[i] for i in picked}
+    for fx in reversed(read_month_fixes(git, revs, globs)):
+        sha = fx["sha"]
+        own = landing.get(sha)
+        if own not in month_landings:
+            continue
+        row = {"sha": sha, "landing": own, "direct": own == sha, "class": "", "blamed_landings": []}
+        res["fixes"].append(row)
+        kept = {p: [n for n, t in ls if not check_stamp_line(t)] for p, ls in fx["lines"].items()}
+        if not globs:
+            row["class"] = "no-product-globs"
+        elif not fx["lines"]:
+            row["class"] = "addition-only"
+        elif not any(kept.values()):
+            row["class"] = "stamp-only"
+        if row["class"]:
+            res["unclassified"][row["class"]] = res["unclassified"].get(row["class"], 0) + 1
+            continue
+        blamed, bounds = set(), set()
+        for path, nums in kept.items():
+            spans = []
+            for n in sorted(set(nums)):
+                if spans and n == spans[-1][1] + 1:
+                    spans[-1][1] = n
+                else:
+                    spans.append([n, n])
+            args = [a for s, e in spans for a in ("-L", f"{s},{e}")]
+            out = git.run("blame", "--porcelain", *args, f"{sha}^", "--", path)
+            if out.returncode != 0:
+                raise DriftError(f"`git blame` of {path} in {sha[:8]}^ failed: {out.stderr.strip()[:200]}")
+            cur = None
+            for ln in out.stdout.split("\n"):
+                if m := _BLAME_HEAD.match(ln):
+                    cur = m.group(1)
+                    blamed.add(cur)
+                elif ln == "boundary" and cur:
+                    bounds.add(cur)
+        mine = index[own]
+        lands = {landing.get(b, b) for b in blamed}
+        row["blamed_landings"] = sorted(lands, key=lambda f: index.get(f, -1))
+        early = any(b in bounds or index.get(landing.get(b), -1) < mine for b in blamed)
+        row["class"] = "escaped" if early else "contained"
+        res["n"] += 1
+        res["escaped"] += early
+        res["direct"] += row["direct"]
+    if res["n"]:
+        res["ratio"] = res["escaped"] / res["n"]
+        res["interval"] = list(derive_wilson_interval(res["escaped"], res["n"]))
+    return res
+
+
+def render_escape_ratio(res: dict) -> list[str]:
+    """The human form of `measure_escape_ratio`: n, escaped, the ratio and its interval, the DIRECT
+    share, the unclassified counts, then the caveat line, which is printed on every outcome."""
+    out = [f"# escape-ratio {res['month']} (base {res['base_ref']} @ {res['base_sha'][:8]})"]
+    if not res["fixes"]:
+        out.append("n          0 — the month is empty: no product fix landed on the base in it")
+    else:
+        out.append(f"n          {res['n']} product fixes classified")
+        out.append(f"escaped    {res['escaped']}")
+        if res["n"]:
+            lo, hi = res["interval"]
+            out.append(f"ratio      {res['ratio']:.3f} (95% Wilson interval {lo:.3f} to {hi:.3f})")
+            out.append(f"direct     {res['direct']} of {res['n']} ({res['direct'] / res['n']:.3f}) — "
+                       "landed on the first-parent line, escaped by construction once it blames anything")
+        else:
+            out.append("ratio      none — no fix was classified, so there is nothing to divide")
+        un = res["unclassified"]
+        out.append("unclassified " + (", ".join(f"{k} {v}" for k, v in sorted(un.items())) or "0"))
+    out.append(_ESCAPE_CAVEAT)
     return out
 
 
@@ -3141,7 +4143,38 @@ def main(argv: list[str] | None = None) -> int:
                     help="ref that 'landed' means, verbatim (default: refs/remotes/origin/<the "
                          "default branch>; a clone with no origin remote uses the local branch, "
                          "announced)")
+    ap.add_argument("--delta", nargs=2, metavar=("BASE", "HEAD"),
+                    help="print what moved between the history readings at BASE and inside "
+                         "BASE..HEAD; report only, exit 0 unless an argument is not a commit")
+    ap.add_argument("--escape-ratio", metavar="YYYY-MM", default=None,
+                    help="on demand, minutes: the share of that month's product fixes that repaired "
+                         "code already on the base; never part of the report or the bar")
     args = ap.parse_args(argv)
+
+    if args.escape_ratio is not None:
+        # TOOL-aMendedFleet-50 S1: a mode of its own. Beside `--check` it would put a blame per fix
+        # on the bar, and beside `--offenders` or `--delta` neither output would mean what it says.
+        clash = [f for f, on in (("--check", args.check), ("--offenders", args.offenders),
+                                 ("--delta", args.delta)) if on]
+        if clash:
+            print(f"drift-report: --escape-ratio is an on-demand mode and does not combine with "
+                  f"{', '.join(clash)}", file=sys.stderr)
+            return 2
+        if not re.fullmatch(r"\d{4}-(?:0[1-9]|1[0-2])", args.escape_ratio):
+            print(f"drift-report: --escape-ratio wants a month as YYYY-MM (four-digit year, hyphen, "
+                  f"two-digit month), got '{args.escape_ratio}'", file=sys.stderr)
+            return 2
+
+    if args.delta:
+        # Reads the history only: no conf, no signals, no base ladder (TOOL-aMendedFleet-49).
+        try:
+            rc, lines = derive_drift_delta(repo_root(), *args.delta)
+        except DriftError as exc:
+            print(f"drift-report: {exc}", file=sys.stderr)
+            return 2
+        for ln in lines:
+            print(ln, file=sys.stderr if rc else sys.stdout)
+        return rc
 
     try:
         root = repo_root()
@@ -3154,6 +4187,19 @@ def main(argv: list[str] | None = None) -> int:
         # line that keeps it. It also means the key is validated on EVERY run, not only under
         # --check, which is the run an adopter is told to make first.
         lookback = _read_lookback(proj)
+        # TOOL-aMendedFleet-56 S1 and S4: an optional id set per gateable signal, refused before any
+        # signal runs when its shape is wrong or a PINS entry bounds the same signal.
+        baselines = getattr(proj, "BASELINES", None) or {}
+        if not isinstance(baselines, dict) or not all(
+                isinstance(v, (list, tuple)) and all(isinstance(i, str) for i in v)
+                for v in baselines.values()):
+            raise DriftError("drift_signals.py declares BASELINES that is not a dict from a signal "
+                             "name to a list of offender id strings")
+        both = sorted(set(baselines) & set(proj.PINS))
+        if both:
+            raise DriftError(f"{', '.join(both)} is declared in both PINS and BASELINES; a signal "
+                             f"takes ONE bound, a count or an id set, so delete one of the two")
+        dead_limit, dead_filed = _read_dead_keys(proj)
     except DriftError as exc:
         print(f"drift-report: {exc}", file=sys.stderr)
         return 2
@@ -3173,10 +4219,45 @@ def main(argv: list[str] | None = None) -> int:
               f"cannot judge ancestry against it.", file=sys.stderr)
         return 2
     base_at = base_sha.stdout.strip()[:8]
+    if args.escape_ratio is not None:
+        try:
+            res = measure_escape_ratio(Git(root, base_ref), base_ref, base_sha.stdout.strip(),
+                                       args.escape_ratio, list(proj.PRODUCT_GLOBS))
+        except DriftError as exc:
+            print(f"drift-report: {exc}", file=sys.stderr)
+            return 2
+        print(json.dumps(res, indent=1) if args.json else "\n".join(render_escape_ratio(res)))
+        return 0
     ctx = Ctx(root, conf, proj, base_ref)
-    out = [s(ctx) for s in SIGNALS]
+    ctx.offline = bool(args.check or args.offenders)
+    # The hand-kept signal runs LAST and is handed the names every other signal reported, so a
+    # hand-kept list of signal names compares against the engine's own output (TOOL-aMendedFleet-52
+    # S2); the records keep SIGNALS order. Running every signal twice would double the report.
+    by_fn = {fn: fn(ctx) for fn in SIGNALS if fn is not signal_handkept}
+    ctx.signal_names = {s["signal"] for s in by_fn.values()} | {"handkept_inventories_disagreeing_with_source"}
+    out = [by_fn[fn] if fn in by_fn else fn(ctx) for fn in SIGNALS]
     for s in out:
+        # A None tolerance is a report-only signal with NO PIN BY DESIGN (TOOL-aMendedFleet-51): its
+        # pin stays None unless PINS declares one, and the table prints `report only, no pin`. A
+        # gateable record never carries one, because `--check` compares its value against the pin.
+        assert not (s["gateable"] and s["tolerance"] is None), f"{s['signal']}: gateable with no tolerance"
         s["pin"] = ctx.pins.get(s["signal"], s["tolerance"])
+    # TOOL-aMendedFleet-56 S4 and S3. A key naming no gateable record bounds nothing, so it is
+    # refused here, before the table, the JSON, the offender keys and the history write. A baselined
+    # record is then judged on its MEMBERS: `new` rows the set does not carry, `stale` ids no row
+    # carries. A record that is not live judges nothing, so both stay empty and DEAD reports it.
+    stray = sorted(set(baselines) - {s["signal"] for s in out if s["gateable"]})
+    if stray:
+        print(f"drift-report: BASELINES names {', '.join(stray)}, which this report does not "
+              f"produce as a gateable signal; an id set bounds only a gateable one, so delete the "
+              f"entry", file=sys.stderr)
+        return 2
+    for s in out:
+        if s["signal"] in baselines:
+            listed = set(baselines[s["signal"]])
+            have = {derive_row_identity(d) for d in s["detail"]} if s["live"] else listed
+            s["baseline"] = s["pin"] = len(listed)
+            s["new"], s["stale"] = sorted(have - listed), sorted(listed - have)
 
     # THE THREE POPULATIONS `--check` reds on, computed ONCE for both modes that read them, so
     # `--offenders` cannot disagree with `--check` about what is red. Neither function prints, so
@@ -3195,7 +4276,10 @@ def main(argv: list[str] | None = None) -> int:
         declared = set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
         ratchets = ratchet_findings(ctx.git, root, getattr(ctx.proj, "RATCHETS", ()), lookback)
         ratchets += build_lang_mode_findings(ctx.git, root, lookback=lookback)
-        over = [s for s in out if s["gateable"] and s["live"] and s["value"] > s["pin"]]
+        if ctx.layer_path:
+            ratchets += build_baseline_findings(ctx.git, ctx.layer_path, baselines, proj.PINS)
+        over = [s for s in out if s["gateable"] and s["live"] and (
+            bool(s["new"] or s["stale"]) if "baseline" in s else s["value"] > s["pin"])]
         dead = [s for s in out if s["gateable"] and not s["live"] and s["signal"] not in declared]
 
     if args.offenders:
@@ -3204,23 +4288,59 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.buffer.write("".join(k + "\n" for k in keys).encode("utf-8"))
         return 1 if (over or dead or ratchets) else 0
 
+    # TOOL-aMendedFleet-90: the history is read ONCE, here, before `--check` appends this run to it.
+    history_path = resolve_history_path(root)
+    streaks = derive_dead_streaks(history_path)
+    for s in out:
+        s["dead_readings"] = None if streaks is None else streaks[0].get(s["signal"], 0)
+
     if args.json:
         print(json.dumps(out, indent=1))
     else:
-        head = ctx.git.run("rev-parse", "--short=8", "HEAD").stdout.strip()
+        # FULL, because the history row carries HEAD whole; the header shows eight, like base_at.
+        head_sha = ctx.git.run("rev-parse", "HEAD").stdout.strip()
+        head = head_sha[:8]
         # THE BASE IS A HEADER FACT, ref AND sha. Two nodes comparing reports can then see at once
         # whether they graded the same commit, which a bare branch name never told them.
         print(f"# drift-report at {head} (base {base_ref} @ {base_at}) · kit {KIT_DRIFT_AUDIT_VERSION}")
+        # The reader's liveness line: a history it could not read says so, never the old status alone.
+        where = history_path or "no git common dir"
+        print(f"# dead-for-N: {streaks[1]} readings recorded at {where} · limit {dead_limit}"
+              if streaks is not None else f"# dead-for-N: no history at {where}, nothing judged")
+        # A filing must not outlive the death it filed.
+        live_now = {s["signal"]: s["live"] and not s.get("not_asked") for s in out}
+        for sig in sorted(dead_filed):
+            if sig not in live_now or live_now[sig]:
+                why = "is not a signal of this report" if sig not in live_now else "is live in this run"
+                print(f"# dead-for-N: DEAD_FILED names {sig}, which {why}; take the entry out")
         print(f"# {'signal':<48} {'value':>7} {'of':>6}  status")
         for s in out:
             if s.get("not_asked"):
-                status = "not asked — this repo does not adopt what the signal reads"
+                # The record's own note where it carries one: a NOT ASKED that is a mode skip is not
+                # a repo that "does not adopt" what the signal reads (TOOL-aMendedFleet-8 S5).
+                note = next((d.get("note") for d in s["detail"][:1] if isinstance(d, dict)), None)
+                status = f"not asked — {note or 'this repo does not adopt what the signal reads'}"
             elif not s["live"]:
-                status = ("empty by declaration — nothing to measure here yet"
-                          if s["signal"] in set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
-                          else "DEAD PROBE — signal cannot move, ignore its value")
+                k = s["dead_readings"]
+                if s["signal"] in set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ()):
+                    status = "empty by declaration — nothing to measure here yet"
+                elif not s["gateable"] and k is not None and k >= dead_limit:
+                    # TOOL-aMendedFleet-90 S3. A gateable dead record keeps its status: `--check` reds it.
+                    status = (f"DEAD PROBE for {k} readings — filed {dead_filed[s['signal']]}"
+                              if s["signal"] in dead_filed else
+                              f"DEAD PROBE for {k} readings — take it out of SIGNALS, or file an ask "
+                              f"and declare it in DEAD_FILED")
+                else:
+                    status = "DEAD PROBE — signal cannot move, ignore its value"
             elif s["value"] < 0:
                 status = "n/a"
+            elif "baseline" in s:
+                status = ("OVER BASELINE — gateable" if s["new"] or s["stale"]
+                          else f"ok (baseline {s['baseline']})")
+            elif s["pin"] is None:
+                # NOT `over pin 0`: a signal with no pin by design has nothing to be over, and a
+                # red-looking word nobody acts on trains the reader to skip the whole column.
+                status = "report only, no pin"
             elif s["gateable"] and s["value"] > s["pin"]:
                 status = f"OVER PIN {s['pin']} — gateable"
             elif s["gateable"]:
@@ -3242,10 +4362,28 @@ def main(argv: list[str] | None = None) -> int:
         print("\n# detail: rerun with --json")
 
     if args.check:
+        if not args.json:
+            # TOOL-aMendedFleet-48: the bar's reading persists. `--json` never writes, even beside
+            # `--check`, so its stdout stays one JSON document; the write never moves the verdict.
+            utc = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            write_drift_history(resolve_history_path(root), build_history_rows(
+                out, set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ()), utc, head_sha, base_ref,
+                base_sha.stdout.strip()))
         # The populations are computed above, once, for this mode and `--offenders` alike.
         for r in ratchets:
             print(f"\ndrift-report: RATCHET WEAKENED — {r}", file=sys.stderr)
         for s in over:
+            if "baseline" in s:
+                print(f"\ndrift-report: {s['signal']} = {s['value']} against BASELINES "
+                      f"({s['baseline']} listed in {ctx.layer_path}) — this set is shrink-only",
+                      file=sys.stderr)
+                for i in s["new"]:
+                    print(f"  new   {i} — an offender the set does not list: remove its cause, "
+                          f"never list it", file=sys.stderr)
+                for i in s["stale"]:
+                    print(f"  stale {i} — listed but no longer an offender: delete its line from "
+                          f"BASELINES['{s['signal']}']", file=sys.stderr)
+                continue
             print(f"\ndrift-report: {s['signal']} = {s['value']} (pin {s['pin']}) — this list is shrink-only",
                   file=sys.stderr)
             for d in s["detail"][:10]:

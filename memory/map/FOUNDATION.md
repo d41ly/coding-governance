@@ -10,7 +10,8 @@ decisions = []
 [claims]
 gate-legs = ["run-gates evidence"]
 kits = []
-git-hooks = ["gate-env.sh"]
+git-hooks = []
+harness-hooks = ["SessionStart tools/check-wiring.sh"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -20,6 +21,7 @@ backlog-shards = []
 lexicon-verbs = []
 [paths]
 globs = [
+  ".githooks/gate-env.sh",
 ]
 ```
 
@@ -31,10 +33,9 @@ seams, ops tooling, the registries themselves). Feature-shaped items belong in
 
 ## What is claimed here, and why it is not a feature
 
-`git-hooks/gate-env.sh` is THIS repository's gate policy: a file the shipped push hook
-sources when it is present, and that no kit claims. It belongs here rather than in a
-dossier because it is not a feature — it is one repo-local decision about the merge bar,
-and the whole point of its location is that it sits outside every kit's payload. A choice
-written into a file a kit copies is a choice every adopter inherits without making it;
-govkit's selfcheck asserts that separation rather than trusting it.
-TOOL-dUnstalledConvoy-28.
+`SessionStart tools/check-wiring.sh` is claimed here because it is no kit's feature: it wires
+every kit, auto-setting an unset `core.hooksPath` so a fresh clone runs with live gates.
+
+`.githooks/gate-env.sh` is THIS repository's gate policy, sourced by the shipped push hook and
+claimed by no kit, so no adopter inherits a choice it did not make (TOOL-dUnstalledConvoy-28). It
+is a helper git never runs, so it is no `git-hooks` key (TOOL-aMendedFleet-39).
