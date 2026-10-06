@@ -19,12 +19,11 @@
 tools/check-spec-tokens.py	subprocess	2	gov-internal gate, shipped by no descriptor
 tools/codebase-map/rank_harness.py	subprocess	1	project-owned harness, withheld from adopters
 tools/codebase-map/replay-phrases.py	subprocess	1	project-owned harness, withheld from adopters
-tools/codebase-map/selftest.py	subprocess	1	project-owned kit self-test, withheld from adopters
 tools/govkit/fixtures/make_adopter_receipt.py	subprocess	4	govkit test fixture, shipped by no descriptor
 tools/govkit/govkit.py	subprocess	40	gov's deployer, shipped by no descriptor
 tools/govkit/refusal_join.py	subprocess	1	govkit helper, shipped by no descriptor
 tools/govkit/selftest.py	file-io	1	govkit self-test, shipped by no descriptor
-tools/govkit/selftest.py	subprocess	38	govkit self-test, shipped by no descriptor
+tools/govkit/selftest.py	subprocess	24	govkit self-test, shipped by no descriptor
 tools/lexicon/selftest.py	subprocess	31	project-owned kit self-test, withheld from adopters
 tools/memory-recall/check-recall.py	subprocess	1	project-owned recall check, withheld from adopters
 tools/memory-recall/extract.py	subprocess	1	forked recall source, never sent to an adopter

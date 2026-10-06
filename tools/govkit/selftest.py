@@ -224,7 +224,7 @@ def run(*args: str, cwd: pathlib.Path | None = None) -> subprocess.CompletedProc
         _argv += ["--to", GOV_PIN]
     _p = subprocess.run(
         [sys.executable, str(GOVKIT), *_argv],
-        capture_output=True, text=True, cwd=str(cwd) if cwd else None,
+        capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(cwd) if cwd else None,
     )
     if _argv and _argv[0] == "apply" and _p.returncode == 0:
         write_receipt_pin(_argv)
@@ -2743,7 +2743,7 @@ def main() -> int:
             git(g, "commit", "-qm", "s")
             return subprocess.run(
                 [sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), "selfcheck"],
-                capture_output=True, text=True)
+                capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         scratch_gov.n = 0
 
@@ -3002,7 +3002,7 @@ user_skills = "/tmp/gk-fake-skills"
         def _run_selfcheck(root):
             return subprocess.run(
                 [sys.executable, str(root / PFX / KIT_NAMES["govkit"] / "govkit.py"), "selfcheck"],
-                capture_output=True, text=True)
+                capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         base = _run_selfcheck(gcopy)
         check("the gov copy is green before either arm is provoked", base.returncode == 0,
@@ -4671,11 +4671,11 @@ user_skills = "/tmp/gk-fake-skills"
 
         def run_in(g: pathlib.Path) -> subprocess.CompletedProcess:
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"),
-                                   "selfcheck"], capture_output=True, text=True)
+                                   "selfcheck"], capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         def run_in_gov(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
-                                  capture_output=True, text=True)
+                                  capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         def build_scratch_gov_kit(tag: str, kit_toml: str) -> pathlib.Path:
             """A scratch gov tree carrying ONE `demo` entry whose descriptor the caller writes.
@@ -5805,7 +5805,7 @@ user_skills = "/tmp/gk-fake-skills"
                 # unreachable by S1's own mechanism.
                 [sys.executable, str(GOVKIT), "update", "--target", str(cc), "--write",
                  "--to", GOV_PIN],
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8", errors="replace")
             _deadline = time.time() + 30
             while time.time() < _deadline and not _lk.exists() and _first.poll() is None:
                 time.sleep(0.002)
@@ -5861,7 +5861,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         def gov_run(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
-                                  capture_output=True, text=True)
+                                  capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         gv = vintage_gov()
         VA = gout(gv, "rev-parse", "HEAD").strip()
@@ -6666,7 +6666,7 @@ user_skills = "/tmp/gk-fake-skills"
         def gov_update(g: pathlib.Path, t: pathlib.Path, *extra: str):
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"),
                                    "update", "--target", str(t), *extra],
-                                  capture_output=True, text=True)
+                                  capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         def poison(t: pathlib.Path, path: str, drop: tuple[str, ...] = (),
                    **set_to) -> dict:
@@ -7397,7 +7397,7 @@ user_skills = "/tmp/gk-fake-skills"
         def carry_update(g: pathlib.Path, t: pathlib.Path, *extra):
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"),
                                    "update", "--target", str(t), *extra],
-                                  capture_output=True, text=True)
+                                  capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         g9 = carry_gov("c9")
         A9 = gout(g9, "rev-parse", "HEAD").strip()
@@ -9075,7 +9075,7 @@ user_skills = "/tmp/gk-fake-skills"
               and GK11.blob_at(_gc11, _Bc11, f"{PFX}demo/pathy2.txt") == _C11_B.encode(), "")
         _wc11 = subprocess.run([sys.executable, str(_gc11 / PFX / KIT_NAMES["govkit"] / "govkit.py"),
                                 "update", "--target", str(_tc11), "--write"],
-                               capture_output=True, text=True)
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
         check("[-11] S11 the carried rename RECONCILES rather than conflicting",
               _wc11.returncode == 0, _wc11.stdout[-1500:] + _wc11.stderr[-900:])
         check("[-11] S11 ...the file is at its new destination, in the TARGET's own prefix",
@@ -9787,7 +9787,7 @@ user_skills = "/tmp/gk-fake-skills"
         # claim about nothing. `0` is the operator's own revert, spelled here for the same reason.
         _wdr = subprocess.run(
             [sys.executable, str(_gdr / PFX / KIT_NAMES["govkit"] / "govkit.py"),
-             "update", "--target", str(_tdr), "--write"], capture_output=True, text=True,
+             "update", "--target", str(_tdr), "--write"], capture_output=True, text=True, encoding="utf-8", errors="replace",
             env=dict(os.environ, GOVKIT_RERENDER="0"))
         _obdr = _tdr / ".governance" / "outbox"
 
@@ -12854,7 +12854,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         def run_pv_govkit(g: pathlib.Path, *args: str, env: dict | None = None) -> subprocess.CompletedProcess:
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
-                                  capture_output=True, text=True, env=env)
+                                  capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
 
         # THE REAL RENDERER AND THE ARGV THE REAL DESCRIPTOR DECLARES FOR IT. Read, never restated: a
         # fixture argv typed here would keep passing after `kit.toml` stopped declaring it.
@@ -13944,7 +13944,7 @@ user_skills = "/tmp/gk-fake-skills"
 
     def run_govkit(*args: str) -> subprocess.CompletedProcess:
         return subprocess.run([sys.executable, str(_gov / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
-                              capture_output=True, text=True)
+                              capture_output=True, text=True, encoding="utf-8", errors="replace")
 
     # ---- THE OBSERVED-STATE TABLE IS THE ONE SPELLING OF IT ---------------------------------
     # Three copies existed and they disagreed: the reader's state tuple, the validator's
@@ -14353,7 +14353,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         def run_gov13(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"),
-                                   *args], capture_output=True, text=True)
+                                   *args], capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         def read_legs13(t: pathlib.Path) -> list[str]:
             f = t / "scripts" / "gate-legs.json"

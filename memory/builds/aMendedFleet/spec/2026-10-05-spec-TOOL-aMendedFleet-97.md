@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-97 — held-red C1: the kits' Python stdio is UTF-8 on a host whose code page is cp1252
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-05 · order 98
+**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-05 · order 98
 
 <!-- gen:spec-records -->
 
@@ -33,8 +33,10 @@ agree whatever the code page.
   AC6.
 - **S4** — The 15 in-tree captures of an S1 or S2 producer that decode with the locale codec decode
   `encoding="utf-8", errors="replace"`: 14 captures of `govkit.py` in `tools/govkit/selftest.py` and
-  the `gen_map.py` capture in `tools/codebase-map/selftest.py`. The two rows of
-  `memory/project/encoding-posture-sites.txt` for those files fall by the same counts. Observed by AC7.
+  the `gen_map.py` capture in `tools/codebase-map/selftest.py`. The govkit suite's subprocess row of
+  `memory/project/encoding-posture-sites.txt` falls by 14, and the codebase-map suite's subprocess
+  row, which declares that one capture alone since units 86 and 88 drained its other three, is
+  deleted. Observed by AC7.
 - **S5** — The remote observation: the first scheduled run of the remote CI workflow after landing
   carries none of C1's failure signatures. Observed by AC8.
 
@@ -183,12 +185,12 @@ which otherwise hands the arm a `None` stream and an unrelated `TypeError`.
   permission: the behavioural observation is the runlog suite, which no pass runs; AC8 is its remote
   observation.
 - **AC7** — When `python tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills`
-  runs, it prints OK, and the registry's subprocess rows read 24 sites for the govkit suite's file and
-  3 for the codebase-map suite's file.
+  runs, it prints OK, the registry's subprocess row reads 24 sites for the govkit suite's file, and
+  the registry carries no subprocess row for the codebase-map suite's file.
   Red when: a capture S4 names still decodes the locale codec, so the scan measures one more site than
   the shrunk row declares and names the file.
-  figure: PINNED from base counts 38 and 4 less the 14 and 1 S4 changes; a concurrent unit touching
-  either file re-derives them.
+  figure: PINNED from the counts at the pass's HEAD `ef26beda1`, 38 and 1, less the 14 and 1 S4
+  changes; a concurrent unit touching either file re-derives them.
 - **AC8** — When the first scheduled remote CI run after landing completes,
   `gh run view <id> --repo d41ly/coding-governance --log-failed` carries no `UnicodeDecodeError`,
   `UnicodeEncodeError` or U+FFFD expectation line in the eight C1 suites the census names.
@@ -216,6 +218,9 @@ No new arm: the held job on a cp1252 runner already grades every suite this unit
 
 - rev-1 · 2026-10-05 · initial draft; every producer's CI failure reproduced on node a under
   `PYTHONUTF8=0`, and the 15 locale captures of those producers counted.
+- rev-2 · 2026-10-06 · S4 and AC7 re-derived at the pass's HEAD `ef26beda1`: units 86 and 88 left the
+  codebase-map suite's subprocess row declaring 1 site, the `gen_map.py` capture, not 4, so that row
+  is deleted rather than shrunk to 3; the 15 captures and the govkit row's 38 to 24 are unchanged.
 
 ## 10. Reuse audit
 

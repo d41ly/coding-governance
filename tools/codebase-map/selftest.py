@@ -2405,7 +2405,7 @@ def test_every_advertised_gen_map_mode_runs():
     # tree.
     for argv, prints in ((["--check"], False), (["--seed-affordances", "--top", "3"], True)):
         proc = subprocess.run([sys.executable, str(kit / "gen_map.py"), *argv],
-                              capture_output=True, text=True, cwd=str(m.repo_root()))
+                              capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(m.repo_root()))
         assert proc.returncode == 0, f"gen_map.py {' '.join(argv)} exited {proc.returncode}\n{proc.stderr}"
         assert "Traceback" not in proc.stderr, proc.stderr
         if prints:
