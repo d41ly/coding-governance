@@ -43,3 +43,4 @@ DEPL-dGaugedVintage-13	spec and product code in one commit (34492bb6); landed 20
 TOOL-dMuffledSentinel-1	spec written after the code, both in one commit (a3b4ca1e); seen by the leg before landing and landed as-is by owner decision 2026-09-12
 TOOL-dMergedTally-1	spec written after the code (built at ff8f1a4c, spec at a8bc2230) when the unit was re-tiered to Tier-2; seen by the leg before landing and landed as-is by owner decision 2026-09-16
 TOOL-aRepatriatedFork-46	misread: 09dae486 is the adoption records commit (subject names the unit, diff lowers .memory-tree.conf pins); no code precedes the spec 8d36c1d5; first code df18ab42
+TOOL-aMendedFleet-39	misread: 725b14490 is the build's spec commit for units 39 to 52, 82 and 83 (subject names the unit first, diff touches memory/project/curation-debt.txt); the build commit is 80071a028, trailered Pass: TOOL-aMendedFleet-39, after its spec

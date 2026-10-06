@@ -8522,7 +8522,7 @@ write_held_asks() { # slug · R · bar run dir -> one line per red held suite: f
     fi
     reused=""
     if [ -n "${ASKS_CMD:-}" ]; then
-      for f in "$M"/builds/*/BACKLOG.md; do
+      for f in $(GIT ls-files -- ":(glob)$M/builds/*/BACKLOG.md" 2>/dev/null); do
         [ -f "$f" ] || continue
         home=${f%/BACKLOG.md}; home=${home##*/}
         while IFS= read -r cand; do

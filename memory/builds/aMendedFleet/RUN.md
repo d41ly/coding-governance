@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+gates-run: unattended-17913159003445073663-1377593 4653bd50
 keepalive-reaped: yes
 parked-surfaced: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
@@ -774,3 +775,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T18:13:49Z dispatch · item 106c527e TOOL-aMendedFleet-112 · reason tools/unattended/unattended.test.sh tools/workflows/tier2-review.test.sh tools/runlog/selftest.py skills/session-kickoff/manifest-check.test.sh memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-75.md memory/builds/aMendedFleet/spec/2026-10-04-spec-KICK-aMendedFleet-1.md memory/builds/aMendedFleet/spec/2026-10-04-spec-KICK-aMendedFleet-2.md memory/builds/aMendedFleet/spec/2026-10-04-spec-KICK-aMendedFleet-4.md memory/builds/aMendedFleet/spec/2026-10-06-spec-TOOL-aMendedFleet-112.md memory/builds/aMendedFleet/build/2026-10-04-build-KICK-aMendedFleet-1-1-acceptance-ledger.md memory/builds/aMendedFleet/build/2026-10-04-build-KICK-aMendedFleet-2-1-acceptance-ledger.md memory/builds/aMendedFleet/build/2026-10-04-build-KICK-aMendedFleet-4-1-acceptance-ledger.md memory/builds/aMendedFleet/README.md memory/LIVE.md memory/builds/aMendedFleet/BACKLOG.md
 
 2026-10-06T18:55:59Z dispatch · item da8fe061 TOOL-aMendedFleet-25 · reason tools/template-size-highwater.txt
+
+2026-10-06T20:31:31Z dispatch · item 4653bd50 TOOL-aMendedFleet-9 · reason tools/unattended/unattended.sh memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/project/brief-recorded-waiver.txt memory/project/pass-order-waiver.txt
