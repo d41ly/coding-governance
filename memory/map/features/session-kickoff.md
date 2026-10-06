@@ -63,6 +63,9 @@ kit spells no charter path. The verbs run no manifest check and no fetch: those 
 Steps 1 and 2b, where each costs a kickoff rather than every session start. The `drift —` cell
 (`KICK-aMendedFleet-1`) summarises the last group of `drift-history.tsv` in the git common dir, the
 file every bar's drift-audit records leg appends to, by reading that file and never running the report.
+The `overlaps —` cell (`KICK-aMendedFleet-2`) prints the unattended driver's `--overlaps` answer, the
+unmerged remote-tracking refs sharing a path with this tree's branch, read once under a bounded
+`timeout` and found through `resolve_kit_file`, so the kit spells no path of the unattended kit.
 
 The engine's kickoff lands on the card through `--card --append` (`KICK-aReplayedCard-2`), which
 checks every cited path, line range and record id for EXISTENCE in two spawns — one

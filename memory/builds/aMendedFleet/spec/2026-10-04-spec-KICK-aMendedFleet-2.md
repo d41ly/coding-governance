@@ -1,6 +1,6 @@
 # KICK-aMendedFleet-2 — the orientation card shows which unmerged remote refs share paths with this tree's branch
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff+tooling · ratified 2026-10-04 · order 77
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff+tooling · ratified 2026-10-04 · order 77
 
 <!-- gen:spec-records -->
 

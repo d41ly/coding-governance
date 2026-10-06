@@ -126,6 +126,11 @@ cd "$ROOT" || exit 2
 # instruction from nobody. The cap is one constant; the append verb of the next unit refuses against
 # the same one. The env override exists for the self-test's over-cap arm and is not an adopter knob.
 CARD_CAP_BYTES=${CARD_CAP_BYTES:-8192}
+# The `overlaps —` cell's two constants (KICK-aMendedFleet-2): the read's bound in seconds and the
+# row cap. The bound's env override exists for the self-test's slow-driver arm, as CARD_CAP_BYTES's
+# does; neither is an adopter knob.
+CARD_OVERLAP_BOUND=${CARD_OVERLAP_BOUND:-10}
+CARD_OVERLAP_ROWS=5
 
 # The session id, in PRECEDENCE order: `--session` answers FIRST and SUPPRESSES the stdin read;
 # only a caller that passed none falls through to the `{"session_id": …}` JSON the SessionStart hook
@@ -280,7 +285,9 @@ derive_drift_line() {
 # whose startup ran it. The `live —` cell reads the memory-tree conf when there is one and reports
 # `skipped:` otherwise, because this kit requires no other kit. The `drift —` cell, between
 # `worktrees —` and `live —`, is `derive_drift_line`: the last group of `drift-history.tsv` in the
-# git common dir, read from that file and never from a report run.
+# git common dir, read from that file and never from a report run. The `overlaps —` cell, after any
+# `drift —` cell and before `live —`, is `derive_overlaps_line`: the unattended driver's
+# `--overlaps`, which reads local remote-tracking refs and never the network.
 derive_head_state() {   # → HEAD_BRANCH HEAD_SHA HEAD_DIRTY, read once by the card and once by the `now —` line
   local n
   HEAD_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null) || HEAD_BRANCH=HEAD
@@ -310,10 +317,55 @@ render_card() {
   render_tree_cell
   printf 'worktrees — %s\n' "$(git worktree list 2>/dev/null | wc -l | tr -d '[:space:]')"
   derive_drift_line
+  derive_overlaps_line
   printf '%s\n' "$live"
   printf 'recent —\n'
   git log --oneline -5 2>/dev/null
   printf 'READY — none yet\n'
+}
+
+# The `overlaps —` cell (KICK-aMendedFleet-2): which unmerged remote refs share a path with this
+# tree's branch, read through the unattended kit's own `--overlaps` and never joined here, because
+# the driver owns the join, its exclusions and its wording. The card parses nothing inside the
+# probe's lines: the first prints verbatim, later ones indented and cut. THE BOUND IS A KILL INTO A
+# FILE, never a `$( )` capture, which would wait for any grandchild holding the pipe; stdin is
+# /dev/null, since the hook's pipe never closes; GOV_RUNLOG=0 keeps a card write out of the driver
+# journal. Every failure is its own `skipped:` form, never a clean answer, and the card still writes.
+# WHAT THIS DOES NOT CHECK: that the refs are fresh — they are as of this clone's last fetch.
+derive_overlaps_line() {
+  local drv sf rc
+  [ -f "$ROOT/.unattended.conf" ] || { printf 'overlaps — skipped: no .unattended.conf in this tree\n'; return 0; }
+  drv=$(resolve_kit_file unattended unattended.sh)
+  [ -n "$drv" ] || { printf 'overlaps — skipped: no unattended driver resolves in this tree\n'; return 0; }
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { printf 'overlaps — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
+  sf=$(mkdir -p "$CARD_DIR" && mktemp "$CARD_DIR/.overlaps.XXXXXX") \
+    || { printf 'overlaps — skipped: no scratch file under %s to capture the read in\n' "$CARD_DIR"; return 0; }
+  GOV_RUNLOG=0 timeout -k 2 "$CARD_OVERLAP_BOUND" bash "$drv" --overlaps </dev/null >"$sf" 2>/dev/null; rc=$?
+  case "$rc" in
+    0)
+      # ponytail: a cut that splits a UTF-8 character drops the high bytes it left.
+      LC_ALL=C awk -v cap="$CARD_OVERLAP_ROWS" '
+        { sub(/\r$/, "") }
+        NR == 1 { print "overlaps — " $0; next }
+        { l = $0; sub(/^[ \t]+/, "", l); if (l == "") next
+          if (++m > cap) next
+          l = "  " l
+          if (length(l) > 200) { l = substr(l, 1, 200); sub(/[\200-\377]+$/, "", l) }
+          print l }
+        END { if (NR == 0) print "overlaps — skipped: --overlaps exited 0 and printed nothing, so overlaps are unknown, not none"
+              if (m > cap) printf "  … %d more\n", m - cap }' "$sf" ;;
+    124|137)
+      printf 'overlaps — skipped: --overlaps did not answer within %ss, so overlaps are unknown, not none\n' "$CARD_OVERLAP_BOUND" ;;
+    *)
+      LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") }
+        NF && f == "" { f = $0 }
+        END { if (f == "") f = "--overlaps exited " rc " and printed nothing"
+              if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+              print "overlaps — skipped: " f }' "$sf" ;;
+  esac
+  rm -f "$sf" 2>/dev/null
+  return 0
 }
 
 # Persist the rendered card and print the same bytes. Rendered to a variable FIRST so an over-cap
@@ -452,28 +504,35 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 
-# The memory-tree kit's id reader, through the sibling resolver (TOOL-aRepatriatedFork-2 S3): the
-# receipt, which is the only record of a flat or renamed install, then the two probes beside this
-# kit. Anchored at this script's dir FIRST, then at the repo root: the per-machine junction copy
-# resolves into gov's checkout, where neither rung sees the graded repo (closing review round 1
-# L3). An answer counts only if the file is in THIS repo. Gov homes THIS kit under skills/, which
-# no probe walks from, and gov keeps no receipt, so the last rung is the ONE reader this repo
-# TRACKS. It is derived from the index, where the rung it replaced was two spelled prefixes, gov's
-# and the root (TOOL-aRepatriatedFork-24 S8). Two tracked readers are ambiguous, and so is none;
-# either way this returns empty, and the caller says so.
-resolve_id_reader() {
+# A sibling kit's file, `resolve_kit_file <home> <anchor>`, through the sibling resolver
+# (TOOL-aRepatriatedFork-2 S3): the receipt, which is the only record of a flat or renamed install,
+# then the two probes beside this kit. Anchored at this script's dir FIRST, then at the repo root:
+# the per-machine junction copy resolves into gov's checkout, where neither rung sees the graded repo
+# (closing review round 1 L3). An answer counts only if the file is in THIS repo. Gov homes THIS kit
+# under skills/, which no probe walks from, and gov keeps no receipt, so the last rung is the ONE
+# <anchor> this repo TRACKS. It is derived from the index, where the rung it replaced was two spelled
+# prefixes, gov's and the root (TOOL-aRepatriatedFork-24 S8). Two tracked anchors are ambiguous, and
+# so is none; either way this returns empty, and the caller says so. ONE body for every sibling this
+# kit reads — the memory-tree id reader and the unattended driver (TOOL-aGraftedHelix-2 S3) — so no
+# sibling kit's path is spelled here.
+resolve_kit_file() {
   local d py here
   py=$(resolve_python 2>/dev/null) || py=""
   if [ -n "$py" ]; then
     for here in "$MC_DIR" "$ROOT"; do
-      d=$(resolve_kit_dir "$py" memory-tree corpus_ids.py "$here" 2>/dev/null) || continue
-      [ -f "$ROOT/$d/corpus_ids.py" ] && { printf '%s\n' "$ROOT/$d/corpus_ids.py"; return 0; }
+      d=$(resolve_kit_dir "$py" "$1" "$2" "$here" 2>/dev/null) || continue
+      [ -f "$ROOT/$d/$2" ] && { printf '%s\n' "$ROOT/$d/$2"; return 0; }
     done
   fi
-  d=$(git -C "$ROOT" ls-files -- corpus_ids.py '*/corpus_ids.py' 2>/dev/null)
+  d=$(git -C "$ROOT" ls-files -- "$2" "*/$2" 2>/dev/null)
   case "$d" in *"
 "*|"") ;; *) [ -f "$ROOT/$d" ] && printf '%s\n' "$ROOT/$d" ;; esac
   return 0
+}
+
+# The memory-tree kit's id reader.
+resolve_id_reader() {
+  resolve_kit_file memory-tree corpus_ids.py
 }
 
 # One token per line, `<line>\t<kind>\t<token>\t<range>`, kinds `path` (a slash and an extension —

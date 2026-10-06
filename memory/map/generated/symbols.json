@@ -5388,6 +5388,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_overlaps_line",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "derive_owned_engine_refusals",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -9248,6 +9253,16 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "print_overlaps",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "print_own_spec",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "print_pass",
       "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
@@ -13016,6 +13031,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "resolve_kit_file",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "resolve_kit_file",

@@ -780,6 +780,32 @@ reset_tree; git remote set-url origin "$ORIGIN_DIR/absent.git"
 out=$(run --preflight tRun --keepalive-id k1)
 git remote set-url origin "$ORIGIN"
 hit "$out" "unattended: overlap probe UNAVAILABLE — "
+# ---- KICK-aMendedFleet-2: `--overlaps` runs the same probe for a session that never preflights,
+# ---- anchored on the LOCAL refs/remotes/origin/HEAD and never on observe_anchor, so it answers
+# ---- while the remote URL names nothing. Staged red by making print_overlaps call observe_anchor.
+git remote set-head origin main
+reset_tree; add_overlap_commit src/ov.sh ours; build_overlap_ref src/ov.sh theirs ""
+git remote set-url origin "$ORIGIN_DIR/absent.git"
+out=$(bash "$SCRIPT" --overlaps 2>&1); ov_rc=$?
+git remote set-url origin "$ORIGIN"
+same "--overlaps answers with exit 0 while the remote URL names nothing" "$ov_rc" "0"
+hit "$out" "1 sharing a path; this run is NOT blocked"
+hit "$out" "1 shared: src/ov.sh (diff)"
+# AC2: no slug, so its own declared paths are the live specs its diff changed; WONTDO withdraws them.
+print_own_spec() { printf '# X-tOwn-1 — own\n\n**Status:** %s · rev-1 · 2026-10-04 · node z · Tier-1\n\n### Files touched (estimate)\n\n- `src/ov.sh`\n\n## 5. next\n' "$1"; }
+reset_tree; add_overlap_commit memory/builds/tOwn/spec/2026-10-04-spec-X-tOwn-1.md "$(print_own_spec SPECCED)"; build_overlap_ref src/ov.sh theirs ""
+out=$(run --overlaps)
+hit "$out" "1 shared: src/ov.sh (diff)"
+reset_tree; add_overlap_commit memory/builds/tOwn/spec/2026-10-04-spec-X-tOwn-1.md "$(print_own_spec WONTDO)"; build_overlap_ref src/ov.sh theirs ""
+out=$(run --overlaps)
+miss "$out" "src/ov.sh (diff)"
+hit "$out" "1 unmerged remote ref(s) read as of this clone's last fetch, 0 aged out past 14 days, 0 unreadable, no shared path"
+# AC3: an unset remote HEAD is one UNAVAILABLE line at exit 0, never a clean answer.
+git remote set-head origin -d
+out=$(bash "$SCRIPT" --overlaps 2>&1); ov_rc=$?
+same "--overlaps exits 0 with no remote HEAD" "$ov_rc" "0"
+hit "$out" "unattended: overlap probe UNAVAILABLE — refs/remotes/origin/HEAD is unset"
+miss "$out" "no shared path"
 git push -q origin --delete side 2>/dev/null; git update-ref -d refs/remotes/origin/side 2>/dev/null
 reset_tree
 
@@ -12707,7 +12733,9 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 1877 -> 1892 by TOOL-aMendedFleet-60: the overlap probe's 15 hit/miss/same lines in region
 # one beside the concurrent-run arms, COUNTED off the block; no suite ran in the pass, and the block
 # was observed green in a prologue slice and red with the probe's call deleted.
-FLOOR_ASSERTIONS=1892
+# RAISED 1892 -> 1902 by KICK-aMendedFleet-2: the --overlaps verb's 10 hit/miss/same lines in region
+# one, inside the overlap probe's block, COUNTED off the block; no suite ran in the pass.
+FLOOR_ASSERTIONS=1902
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -12830,7 +12858,8 @@ FLOOR_ASSERTIONS=1892
 PROLOGUE_ARMS=18
 # RAISED 208 -> 209: region one's in_shard block-length arm, see FLOOR_ASSERTIONS.
 # RAISED 209 -> 224: the overlap probe's 15 region-one assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=224
+# RAISED 224 -> 234: the --overlaps verb's 10 region-one assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=234
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.

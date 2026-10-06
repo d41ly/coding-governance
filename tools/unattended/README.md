@@ -301,6 +301,13 @@ learned when the second one merges. The summary line always prints, opening
   overlap probe can add or remove an announcement and never a refusal; preflight's outcome is the
   same with or without it. With no observed tip it prints `overlap probe UNAVAILABLE` and the reason,
   and a ref whose diff cannot be read is counted as unreadable, never as clean.
+- **An attended session reads it too.** `unattended.sh --overlaps` runs the same probe with no slug
+  and exits 0 on every path. Its anchor is the local default-branch tracking ref,
+  `refs/remotes/<remote>/HEAD`, never the remote's advertisement, so it reads no network; its own
+  declared paths are the live specs its diff from that tip changed. Other than one remote, or that
+  symref unset, prints `overlap probe UNAVAILABLE`. The session-kickoff kit's orientation card calls
+  it once per session start, bounded, and prints its answer as the `overlaps —` cell
+  (`KICK-aMendedFleet-2`).
 
 ## Running the kit's own checks
 

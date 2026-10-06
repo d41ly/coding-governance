@@ -690,6 +690,7 @@ GOVROOT=$(git -C "$(dirname "$CHECK")" rev-parse --show-toplevel)
 # spelled kit path resolved at gov's prefix only. An empty answer is the checker's own "id
 # citations unchecked" state, and the fixture below then fails naming the clone step.
 eval "$(awk '/^resolve_kit_dir\(\) \{$/,/^}$/' "$CHECK")"
+eval "$(awk '/^resolve_kit_file\(\) \{$/,/^}$/' "$CHECK")"   # the id reader's body since KICK-aMendedFleet-2 S3
 eval "$(awk '/^resolve_id_reader\(\) \{$/,/^}$/' "$CHECK")"
 MC_PY=$(resolve_python 2>/dev/null) || MC_PY=""
 READER=$(ROOT="$GOVROOT" MC_DIR="$(dirname "$CHECK")" resolve_id_reader)
@@ -934,6 +935,29 @@ run_card "drift cell: a header lacking signal is UNKNOWN naming it" "$R" 0 "drif
 { cat "$TMP/dh.keep"; printf '2026-10-04T00:00:00Z\tdeadbeef\to'; } > "$DH"
 run_card "drift cell: a truncated last line is a write in progress" "$R" 0 - --card --write --session "$NONCE-t76d"
 check_eq "drift cell: the truncated line is not counted" "$dh_want" "$(read_drift_cell t76d)"
+
+# KICK-aMendedFleet-2 — the `overlaps —` cell over a stub driver the resolver finds at the repo's
+# own `unattended/unattended.sh`: no conf, an answer of seven rows, a refusal, and a driver that
+# outlives a one-second bound. Staged red by deleting the `derive_overlaps_line` call.
+mkrepo ovcell
+run_card "overlaps cell: no .unattended.conf is a skipped: line at exit 0" "$R" 0 "overlaps — skipped: no .unattended.conf in this tree" --card --write --session "$NONCE-t77a"
+mkdir -p "$R/unattended"; : > "$R/.unattended.conf"
+ov_head="unattended: overlap probe — 7 unmerged remote ref(s) read as of this clone's last fetch, 0 aged out past 14 days, 0 unreadable, 7 sharing a path; this run is NOT blocked"
+{ printf '#!/usr/bin/env bash\n[ "$1" = --overlaps ] || exit 3\necho "%s"\n' "$ov_head"
+  printf 'for i in 1 2 3 4 5 6 7; do echo "  origin/b$i · deadbeef · 0d old · 1 shared: src/x.sh (diff)"; done\n'; } > "$R/unattended/unattended.sh"
+commit_all "$R" "the stub driver and an empty conf"
+run_card "overlaps cell: --card --write over a driver that answers" "$R" 0 - --card --write --session "$NONCE-t77b"
+check_eq "overlaps cell: the probe's first line prints verbatim" "overlaps — $ov_head" "$(grep -m1 '^overlaps — ' "$R/.git/orientation/$NONCE-t77b.md")"
+check_eq "overlaps cell: five rows, indented by two spaces" "5" "$(grep -c '^  origin/b' "$R/.git/orientation/$NONCE-t77b.md")"
+check_eq "overlaps cell: the rest are counted" "  … 2 more" "$(grep -m1 '^  … ' "$R/.git/orientation/$NONCE-t77b.md")"
+check_eq "overlaps cell: sits after drift — and before live —" "worktrees drift overlaps live" \
+  "$(grep -oE '^(worktrees|drift|overlaps|live) — ' "$R/.git/orientation/$NONCE-t77b.md" | cut -d' ' -f1 | tr '\n' ' ' | sed 's/ $//')"
+printf '#!/usr/bin/env bash\necho "unattended: a stub refusal"; exit 2\n' > "$R/unattended/unattended.sh"
+run_card "overlaps cell: a refusing driver is a skipped: line naming its first line" "$R" 0 "overlaps — skipped: unattended: a stub refusal" --card --write --session "$NONCE-t77c"
+printf '#!/usr/bin/env bash\nsleep 5\n' > "$R/unattended/unattended.sh"
+export CARD_OVERLAP_BOUND=1
+run_card "overlaps cell: a driver past the bound is unknown, not none" "$R" 0 "overlaps — skipped: --overlaps did not answer within 1s" --card --write --session "$NONCE-t77d"
+unset CARD_OVERLAP_BOUND
 
 # ---- KICK-aReplayedCard-2: --card --append and --card --check ------------------------------------
 # Every arm runs in the clone's linked worktrees, whose common dir holds the cards. The reader the
@@ -1294,7 +1318,8 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # unraised floor is the one thing that lets a later edit delete the arms and red nothing.
 # +2: C12's pair, the CR-byte check's green and red cases (round 3 M1's left-shift).
 # +2: L3's pair, the junction-copy setup and its graded-ids arm (aRepatriatedFork round 1 L3).
-FLOOR_ASSERTIONS=180
+# +8: the `overlaps —` cell's arms (KICK-aMendedFleet-2), counted off the block; no suite ran in the pass.
+FLOOR_ASSERTIONS=188
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

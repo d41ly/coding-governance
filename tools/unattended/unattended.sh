@@ -27,6 +27,7 @@
 #   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--run <id>] [--set <hashes>]]
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
 #   unattended.sh --version                                        # the kit version, then exit
+#   unattended.sh --overlaps                                       # the overlap probe against the LOCAL default-branch tracking ref, no network
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
 #
@@ -2336,10 +2337,16 @@ check_cross_run_overlap() { # slug - always returns 0
     echo "unattended: overlap probe UNAVAILABLE — this run's own changes since the observed tip ${anc:0:8} cannot be listed"
     rm -rf "$d"; return 0
   fi
+  # A SLUG names this run's build, whose live specs declare. NO SLUG is the attended `--overlaps`
+  # caller (KICK-aMendedFleet-2 S2): its declared paths are those of the live specs its own
+  # `<anchor>...HEAD` diff changed and kept, the rule the loop below applies to a ref.
   if [ -n "$slug" ]; then
     GIT ls-tree -r --name-only HEAD -- "$M/builds/$slug/spec/" > "$d/ourspecs" 2>/dev/null || : > "$d/ourspecs"
-    read_files_touched HEAD "$d/ourspecs" >> "$d/ours" || :
+  else
+    GIT -c core.quotepath=off diff --no-renames --name-status "$anc...HEAD" 2>/dev/null | awk -F'\t' -v m="$M/builds/" '
+      { sub(/\r$/, "") } $1 !~ /^D/ && index($2, m) == 1 && $2 ~ /\/spec\/.*\.md$/ { print $2 }' > "$d/ourspecs"
   fi
+  read_files_touched HEAD "$d/ourspecs" >> "$d/ours" || :
   # NEVER CONTESTED: every shared record, and the index half of every generated pair.
   : > "$d/excl"
   for _co_q in ${SHARED_RECORDS:-}; do printf '%s\n' "$_co_q" >> "$d/excl"; done
@@ -2424,6 +2431,28 @@ check_cross_run_overlap() { # slug - always returns 0
   printf "unattended: overlap probe — %d unmerged remote ref(s) read as of this clone's last fetch, %d aged out past %d days, %d unreadable, " "$n" "$a" "$OVERLAP_AGE_DAYS" "$u"
   if [ "$s" -eq 0 ]; then echo "no shared path"; else echo "$s sharing a path; this run is NOT blocked"; cat "$d/lines"; fi
   rm -rf "$d"
+  return 0
+}
+# `--overlaps`: the probe above for a session that never preflights - the orientation card calls it
+# (KICK-aMendedFleet-2). The anchor is the LOCAL `refs/remotes/<remote>/HEAD` target, never
+# `observe_anchor`, so no ls-remote, no fetch and no network: the refs the probe joins are as of
+# the last fetch either way. No slug, so its own declared paths come from the specs its diff
+# changed. Other than one remote, or no symref, is one UNAVAILABLE line. Always returns 0.
+print_overlaps() {
+  local nrem rem ref
+  nrem=$(GIT remote | grep -c . || true)
+  if [ "$nrem" != 1 ]; then
+    echo "unattended: overlap probe UNAVAILABLE — this clone declares $nrem remotes, and the probe reads the tracking refs of exactly one"
+    return 0
+  fi
+  rem=$(GIT remote | head -1)
+  ref=$(GIT symbolic-ref -q "refs/remotes/$rem/HEAD" 2>/dev/null) || ref=""
+  if [ -z "$ref" ]; then
+    echo "unattended: overlap probe UNAVAILABLE — refs/remotes/$rem/HEAD is unset in this clone, so no local default-branch tip anchors the probe"
+    return 0
+  fi
+  ASHA=$(GIT rev-parse --verify --quiet "$ref^{commit}" 2>/dev/null) || ASHA=""
+  check_cross_run_overlap ""
   return 0
 }
 
@@ -11326,6 +11355,7 @@ while [ $# -gt 0 ]; do
                     CC_TMP=$(mktemp) || { echo "unattended: --check-commit cannot create a scratch file, so it graded nothing"; RUNLOG_CLEAN=1; exit 2; }
                     check_commit_message "${1:-}"; _rl_rc=$?; rm -f "$CC_TMP"; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; RUNLOG_CLEAN=1; exit 0 ;;
+    --overlaps)     print_overlaps; RUNLOG_CLEAN=1; exit 0 ;;
     # THE SET IS THE DISPATCH. A slug-taking verb is recognised by membership in VERBS_SLUG rather
     # than by an alternation typed here, so the declaration is load-bearing: a verb absent from it
     # falls through to refusal 14 and does not run at all. The arm sits LAST because every flag above
