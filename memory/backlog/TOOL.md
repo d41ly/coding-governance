@@ -174,7 +174,6 @@ Cite ids, never line numbers.
 | [TOOL-aProbedToolkit-12](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | A memory-tree VERSION BUMP IS A CORPUS MIGRATION NOBODY HAS COSTED, AND… |
 | [TOOL-aProbedToolkit-13](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | TWO OF THE FOUR KITS SHIP NO WIRING --check, AND THEY ARE THE TWO WHOSE… |
 | [TOOL-aProbedToolkit-14](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | TWO KIT READMEs STATE A DERIVED NUMBER THAT HAS DRIFTED.… |
-| [TOOL-aProbedToolkit-15](../builds/aProbedToolkit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-85 | 2026-09-03 | THE CHARTER OVERSELLS WHAT THE MAP GUARANTEES, AND THE OVERCLAIM SHIPS.… |
 | [TOOL-aProbedToolkit-16](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | memory-recall's HEADLINE CLAIM IS UNPROVEN BY THE ONLY PARTY THAT… |
 | [TOOL-aProbedToolkit-17](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE CHARTER MANDATES file:line AND THE HYGIENE GATE REFUSES IT, SO THE… |
 | [TOOL-aProbedToolkit-18](../builds/aProbedToolkit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-91 | 2026-09-03 | closed_specs_with_no_product_commit CANNOT EXPRESS A UNIT WHOSE… |

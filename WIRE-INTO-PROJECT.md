@@ -100,7 +100,8 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
   at §3 below.
 - **A self-verifying codebase map** (`codebase-map/` kit): per-feature dossiers claim EXACT KEYS from
   machine-enumerated inventories, and a ratchet fails on any unclaimed new key AND any claim naming a
-  dead key, so the map cannot rot into fiction. `map_diff` renders any git range as a feature-level
+  dead key, so its claimed keys cannot rot into fiction; path globs and dossier prose are not gated.
+  `map_diff` renders any git range as a feature-level
   changelog. Zero CI changes — the gate rides the existing suite. Keeping it selected keeps three
   `kit:codebase-map` blocks in the charter.
 - **A records-vs-reality audit** (`drift-audit/` kit): asks whether this repo's RECORD of its own

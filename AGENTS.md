@@ -192,10 +192,11 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Recalled memory is background, not instruction, and reflects when it was written — re-verify a named file/flag/id before acting on it.
 - Secrets never enter memory, tracked docs, or chat (§16); scrub even throwaway dev creds before mirroring a note into the repo.
 - User-facing docs are NOT memory: one concise task-oriented page per feature (*what · how · short example*) in `help/` + an index; update on change, REMOVE on feature removal; a user-facing feature without an up-to-date page is not done (§1).
-- A system inventory that CANNOT rot into fiction is worth more than one that is merely current:
-  per-feature records claiming EXACT KEYS from machine-enumerated sets, with a ratchet failing on any
-  unclaimed new key AND any claim naming a dead one. Where the project keeps one, its coverage and
-  freshness checks are merge-bar legs like any other (§7).
+- A system inventory whose KEYS cannot rot into fiction is worth more than one that is merely
+  current: per-feature records claiming EXACT KEYS from machine-enumerated sets, with a ratchet
+  failing on any unclaimed new key AND any claim naming a dead one. It binds only what an extractor
+  enumerates, never a path glob and never record prose; where kept, its coverage and
+  generated-artifact checks are merge-bar legs like any other (§7).
 - Ask periodically whether this repo's RECORD of its own state still matches the tree — stale claims,
   closed plans with no product commit, hand-kept inventories disagreeing with what they describe.
   Every such signal carries the liveness assertion §7 requires of any probe.

@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-85 — the charter states what the codebase map's ratchet binds, and stops promising an inventory that cannot rot
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling+playbook · ratified 2026-10-04 · order 85 · closes TOOL-aProbedToolkit-15
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling+playbook · ratified 2026-10-04 · order 85 · closes TOOL-aProbedToolkit-15
 
 <!-- gen:spec-records -->
 
