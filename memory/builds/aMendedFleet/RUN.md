@@ -9,12 +9,23 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: cacd8d307477c5aca09d2cfe851fe4e5f425b932 · handoff · 0 touching
+asks-at-landing: PLAY-aMendedFleet-5=OPEN TOOL-aMendedFleet-95=OPEN TOOL-aMendedFleet-96=OPEN TOOL-aMendedFleet-106=OPEN TOOL-aMendedFleet-107=OPEN TOOL-aMendedFleet-108=OPEN TOOL-aMendedFleet-109=OPEN TOOL-aMendedFleet-113=OPEN TOOL-aMendedFleet-114=OPEN TOOL-aMendedFleet-115=OPEN
+units-at-landing: TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33 TOOL-aMendedFleet-34 TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-39 TOOL-aMendedFleet-40 TOOL-aMendedFleet-41 TOOL-aMendedFleet-42 TOOL-aMendedFleet-43 TOOL-aMendedFleet-44 TOOL-aMendedFleet-45 TOOL-aMendedFleet-46 TOOL-aMendedFleet-47 TOOL-aMendedFleet-48 TOOL-aMendedFleet-49 TOOL-aMendedFleet-50 TOOL-aMendedFleet-51 TOOL-aMendedFleet-52 TOOL-aMendedFleet-53 TOOL-aMendedFleet-54 TOOL-aMendedFleet-55 TOOL-aMendedFleet-56 TOOL-aMendedFleet-57 TOOL-aMendedFleet-58 TOOL-aMendedFleet-59 TOOL-aMendedFleet-60 TOOL-aMendedFleet-62 TOOL-aMendedFleet-61 TOOL-aMendedFleet-63 TOOL-aMendedFleet-64 TOOL-aMendedFleet-65 TOOL-aMendedFleet-66 TOOL-aMendedFleet-67 TOOL-aMendedFleet-68 TOOL-aMendedFleet-69 TOOL-aMendedFleet-70 TOOL-aMendedFleet-71 TOOL-aMendedFleet-72 TOOL-aMendedFleet-73 TOOL-aMendedFleet-74 TOOL-aMendedFleet-75 KICK-aMendedFleet-1 KICK-aMendedFleet-2 KICK-aMendedFleet-3 PLAY-aMendedFleet-1 PLAY-aMendedFleet-2 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83 TOOL-aMendedFleet-84 TOOL-aMendedFleet-85 TOOL-aMendedFleet-86 TOOL-aMendedFleet-87 TOOL-aMendedFleet-88 TOOL-aMendedFleet-89 TOOL-aMendedFleet-90 TOOL-aMendedFleet-91 TOOL-aMendedFleet-92 TOOL-aMendedFleet-93 PLAY-aMendedFleet-3 TOOL-aMendedFleet-94 KICK-aMendedFleet-4 PLAY-aMendedFleet-4 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedFleet-99 TOOL-aMendedFleet-100 TOOL-aMendedFleet-101 TOOL-aMendedFleet-102 TOOL-aMendedFleet-103 TOOL-aMendedFleet-104 TOOL-aMendedFleet-105 TOOL-aMendedFleet-110 TOOL-aMendedFleet-111 TOOL-aMendedFleet-112
+hold-run: 
+hold-streak: 1 · at cacd8d30
+resume-owed: none · owner
+held-at: 2026-10-06T20:46:32Z
+hold-reason: The owner directed the build onto main at cacd8d307 by a direct push that skipped the pre-push bar (weekly limits nearly out), after the first close bar's four red legs were fixed in cacd8d307 but before a second bar ran. --close can no longer grade a prepared merge (the advertised tip moved past its first parent), and an abort would record landed work as ABORTED. Owed: a full bar on main, the owner's kit self-tests from the merged tree, the remote-CI observations of units 4-6 and 97-105, and the closing record.
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
 gates-run: unattended-17913159003445073663-1377593 4653bd50
 keepalive-reaped: yes
 parked-surfaced: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 9d9059371c819505eb3bdc799d0f1a404070d0ca
-phase: VERIFYING
+witness: cacd8d307477c5aca09d2cfe851fe4e5f425b932
+phase: HELD
 branch-sha: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 branch-ref: refs/heads/branch/coding-governance-review-1460c9
 may: none
@@ -777,3 +788,7 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T18:55:59Z dispatch · item da8fe061 TOOL-aMendedFleet-25 · reason tools/template-size-highwater.txt
 
 2026-10-06T20:31:31Z dispatch · item 4653bd50 TOOL-aMendedFleet-9 · reason tools/unattended/unattended.sh memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/project/brief-recorded-waiver.txt memory/project/pass-order-waiver.txt
+
+2026-10-06T20:46:36Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aMendedFleet && bash tools/push-main.sh --land --slug aMendedFleet && bash tools/unattended/unattended.sh --settle aMendedFleet
+
+2026-10-06T20:46:36Z hold · item owner-decision · reason until owner · reaped 02179d97 · resume none(owner)
