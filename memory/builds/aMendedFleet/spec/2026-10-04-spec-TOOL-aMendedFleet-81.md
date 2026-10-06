@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-81 — the month shards carry only what never changes after their month
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 81
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 81
 
 <!-- gen:spec-records -->
 
