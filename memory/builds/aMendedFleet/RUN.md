@@ -630,3 +630,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T04:24:15Z dispatch · item 7c494112 TOOL-aMendedFleet-88 · reason memory/builds/aMendedFleet/README.md
 
 2026-10-06T04:30:44Z dispatch · item 7c494112 TOOL-aMendedFleet-88 · reason memory/builds/aMendedFleet/README.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-88.md memory/map/features/codebase-map.md memory/map/generated/symbols.json tools/codebase-map/README.md tools/codebase-map/map_imports.py tools/codebase-map/selftest.py memory/LIVE.md
+
+2026-10-06T04:35:21Z brief · item TOOL-aMendedFleet-89 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
