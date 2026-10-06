@@ -81,10 +81,12 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 ## §2 — Nodes, identity & IDs
 
 - Register every node once, in-repo — tag · machine/user · primary tree · worktree root · **per-node variances** (remote name, harness launch config, credential quirks like an elevated scope for CI-config pushes):
+<!-- when:node-table -->
 
   | Tag | Machine/user | Primary tree (`{{DEFAULT_BRANCH}}` lives here) | Worktree root | Variances |
   |-----|--------------|----------------------------------|---------------|-----------|
   | `{{TAG_A}}` | `{{MACHINE_A}}` | `{{PRIMARY_TREE_A}}` | `{{WORKTREE_ROOT_A}}` | {{VARIANCES_A}} |
+<!-- /when:node-table -->
 
 - Identify your node by machine/user, never by filesystem path — roots can be identical across machines.
 - A new node claims the lowest free one-letter lowercase tag and adds its row in the same commit.

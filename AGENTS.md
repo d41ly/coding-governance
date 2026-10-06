@@ -35,12 +35,15 @@ any other tool reads that file directly before touching one.
 
 ## Node registry
 
-| Tag | Machine/user | Primary tree | Remote |
-|-----|--------------|--------------|--------|
-| `a` | daily-agent | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
-| `b` | agent5 @ `DESKTOP-3J1O6CD` | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
-| `c` | agent-0 @ `DESKTOP-8BKM8GN` | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
-| `d` | d41ly | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
+This is the registry the charter's §2 rules refer to. This render carries no §2 table, so a new
+node adds its row here.
+
+| Tag | Machine/user | Primary tree | Worktree root | Remote | Variances |
+|-----|--------------|--------------|---------------|--------|-----------|
+| `a` | daily-agent | `C:/projects/coding-governance` | `C:/projects/coding-governance/.claude/worktrees` | `origin` (github `d41ly/coding-governance`) | remote `origin`; Windows + Git-Bash, so give `git -C` forward-slash paths |
+| `b` | agent5 @ `DESKTOP-3J1O6CD` | `C:/projects/coding-governance` | `C:/projects/coding-governance/.claude/worktrees` | `origin` (github `d41ly/coding-governance`) | none recorded |
+| `c` | agent-0 @ `DESKTOP-8BKM8GN` | `C:/projects/coding-governance` | `C:/projects/coding-governance/.claude/worktrees` | `origin` (github `d41ly/coding-governance`) | none recorded |
+| `d` | d41ly | `C:/projects/coding-governance` | `C:/projects/coding-governance/.claude/worktrees` | `origin` (github `d41ly/coding-governance`) | none recorded |
 
 IDs are `FAMILY-<slug>-<seq>` (`PLAY`/`KICK`/`TOOL`/`DEPL`); slug = node tag + CamelCase adjective-noun,
 minted once per session. One append-only `memory/DECISIONS.md`; asks are filed per build in
@@ -126,10 +129,6 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 ## §2 — Nodes, identity & IDs
 
 - Register every node once, in-repo — tag · machine/user · primary tree · worktree root · **per-node variances** (remote name, harness launch config, credential quirks like an elevated scope for CI-config pushes):
-
-  | Tag | Machine/user | Primary tree (`main` lives here) | Worktree root | Variances |
-  |-----|--------------|----------------------------------|---------------|-----------|
-  | `a` | `daily-agent` | `C:/projects/coding-governance` | `C:/projects/coding-governance/.claude/worktrees` | remote `origin`; Windows + Git-Bash, so give `git -C` forward-slash paths |
 
 - Identify your node by machine/user, never by filesystem path — roots can be identical across machines.
 - A new node claims the lowest free one-letter lowercase tag and adds its row in the same commit.

@@ -259,3 +259,7 @@ why = "the outbound-call and stored-content rules. Drop them where the project h
 [[block]]
 name = "cross-os"
 why = "the cross-OS and toolchain section. Drop it for a single-OS team."
+
+[[block]]
+name = "node-table"
+why = "the section 2 node table. Drop it where the node registry lives in the file the kickoff manifest's registry: key names, outside the rendered region, so the charter carries one registry."
