@@ -811,10 +811,10 @@ PY
   # ---- a script any row calls with `--shard i/n` is called at ONE arity, and its indices 1..n are
   # ---- each declared exactly once — a missing index is a region nobody runs while the other seven
   # ---- rows report green, which is green-by-absence one row at a time. The canary's REVERSE half
-  # ---- ("declares SHARD_ARITY but is called whole") is deliberately NOT ported: the driver suite
-  # ---- declares an arity and is called whole here on purpose, so that half would red a row this
-  # ---- declaration is right to carry. Scoped to rows that carry `--shard`, so it never reads that
-  # ---- row. WHAT IT DOES NOT CHECK: that a shard runs the region it claims — only the suite's own
+  # ---- ("declares SHARD_ARITY but is called whole") is NOT ported: every suite this declaration
+  # ---- shards is carried as one row per index, and that half is a rule of its own that no row here
+  # ---- needs. Scoped to rows that carry `--shard`, so it never reads an unsharded row.
+  # ---- WHAT IT DOES NOT CHECK: that a shard runs the region it claims — only the suite's own
   # ---- per-mode floor sees that. Run over the real tree before it was wired: 0 sharded scripts.
   shard_faults=$(printf '%s\n' "$POP" | awk -F'\t' '
     { n = split($4, t, " ")

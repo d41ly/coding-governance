@@ -29,7 +29,9 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.29   # gov:kit run-gates@1.29
+KIT_RUN_GATES_VERSION=1.30   # gov:kit run-gates@1.30
+# 1.29 -> 1.30: the shard-join comment in run-selftests.sh stops justifying its unported reverse half
+# by a suite this declaration called whole; the driver suite is sharded rows now (TOOL-aGraftedHelix-41).
 # 1.28 + 1.27 -> 1.29: the reconcile with origin/main 290d0d2d5. Both lines moved the kit from 1.24, so
 # each spelled its own 1.25 onward: this branch's notes are first, then main's, each under its own numbers.
 # 1.27 -> 1.28: every repair the runner makes on its own appends one line to the health log under the

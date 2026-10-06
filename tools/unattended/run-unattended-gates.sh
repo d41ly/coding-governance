@@ -307,7 +307,7 @@ case "$1" in
     echo "               same question asked another way. The --checks half is NOT attributed:"
     echo "               those are repository checks and merge-bar legs."
     echo ""
-    echo "The gate selftest is declared as EIGHT --shard rows and the driver suite as one whole row;"
+    echo "The gate selftest and the driver suite are each declared as --shard rows, one per region;"
     echo "a --shard run is evidence about its region and nothing else, and the whole-suite claim"
     echo "for a sharded suite is the shard JOIN in run-selftests.sh --check: one arity per script,"
     echo "every index 1..n declared exactly once, so no region is green by absence."
@@ -457,7 +457,7 @@ if [ "$ONLY" = selftests ] || [ -z "$ONLY" ]; then
   # `cost verdict(s) WITHHELD` line rather than typed here. TOOL-aBatchedArm-4 S4/S5.
   # `st` FOLLOWS THE RUNNER'S EXIT, WHICH UNDER --pooled MEANS PARITY (TOOL-aBatchedArm-5 S4): a
   # red-by-design row that ran to its own end and matched its calibrated (rc, FAIL, executed)
-  # baseline is green, so a perfect pass over the eight shard rows prints GREEN here; a crash, a
+  # baseline is green, so a perfect pass over the shard rows prints GREEN here; a crash, a
   # kill, a wall, an unrun, an unstarted or a mismatched row is red. The `WITHHELD` line the parse
   # below reads survives parity — the cost verdict stays withheld — so the parse is unchanged.
   # THE BASELINE FLAG IS FORWARDED, not re-implemented (TOOL-dDerivedDocket-1). The baseline

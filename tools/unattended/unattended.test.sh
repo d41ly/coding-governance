@@ -86,9 +86,10 @@ _gk_rel=$(resolve_kit_dir "$_rkd_py" govkit govkit.py "$HERE" 2>/dev/null) \
 
 # ---- THE SHARD CONTRACT (TOOL-aShardedFloor-2) ---------------------------------------------------
 # This suite IS the merge bar's floor: one leg exceeding leg-seconds / width sets the whole bar's
-# wall clock, and no width change moves it. Splitting it into two legs is the only lever that does.
+# wall clock, and no width change moves it. Splitting it into legs is the only lever that does,
+# and `SHARD_ARITY` below is how many.
 #
-# ONE FILE, TWO GUARDED REGIONS — never a physical split. That is refused by a gate, not by taste:
+# ONE FILE, `SHARD_ARITY` GUARDED REGIONS — never a physical split. That is refused by a gate, not by taste:
 # `<prefix>/memory-tree/check-arms.py` maps one gate to EXACTLY one sibling test, and `.memory-tree.conf`
 # pins this pair's armed-branch floor. Split the file and half the branches go unarmed and that pin
 # breaks. The regions are also CONTIGUOUS rather than hashed per arm: the fixture builds three
@@ -100,7 +101,7 @@ _gk_rel=$(resolve_kit_dir "$_rkd_py" govkit govkit.py "$HERE" 2>/dev/null) \
 # would make every shard leg refuse on every bar, forever.
 #
 # BEFORE `mktemp -d`, so a refusal costs ~50 ms and leaves nothing behind.
-SHARD_ARITY=2
+SHARD_ARITY=8
 SHARD=""; SHARD_GIVEN=0
 if [ "${1:-}" = --shard ]; then
   SHARD_GIVEN=1; SHARD="${2:-}"
@@ -543,7 +544,7 @@ add_facts() { # run-state file · the fact lines
 }
 
 # ---- HOISTED FOR THE SHARD CONTRACT ---------------------------------------------------------------
-# These six were defined inside region one, where region two cannot see them. They are MOVED here
+# These six were defined inside region one, where later regions cannot see them. They are MOVED here
 # rather than duplicated: two definitions of one helper is two answers to one question, and the
 # unsharded run would silently take the second.
 #
@@ -622,6 +623,160 @@ crround() { crdrop
               "2026-08-31T00:00:00Z" "$1" "$2" "$3" "${4:+ · $4}" >> memory/builds/tRun/RUN.md; }
 # Restore main to the shared BASE so the later arms see the tree they were written against.
 bcrestore() { git checkout -q main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit; reset_tree; }
+
+# ---- HOISTED FOR THE RE-CUT (TOOL-aGraftedHelix-41) -----------------------------------------------
+# Region two's blocks are regions 2 to `SHARD_ARITY` now, and every helper below is called from a
+# region other than the one that defined it. Each is MOVED here byte-identical, for the reason the
+# six above give: a definition executes nothing, so the unsharded run is unchanged by the move.
+# `build_ask_stub` is the one wrapper. The span it holds was top-level code, so a shard that starts
+# after it never wrote the stub its arms name; its original site calls it, and so does the entry
+# of the region that reads it.
+scope() { printf 'ANCHOR_SCOPE="%s"\n' "$1" >> .unattended.conf; }
+slice_fn() { # <name> -> eval that function out of the SHIPPED driver bytes
+  local s e
+  s=$(grep -n "^$1()" "$SCRIPT" | cut -d: -f1)
+  [ -n "$s" ] || { echo "FAIL cannot find $1() in the driver, so every arm that grades it would grade nothing"; st=1; return 1; }
+  e=$(awk -v s="$s" 'NR>s && /^}/ {print NR; exit}' "$SCRIPT")
+  [ -n "$e" ] || { echo "FAIL cannot find the closing brace of $1() in the driver, so the slice below would be a fragment"; st=1; return 1; }
+  eval "$(sed -n "${s},${e}p" "$SCRIPT")"
+}
+read_lease_hash() { grep -E '^(keepalive|session|pid|host|pid-image|lease-utc): ' memory/builds/tRun/RUN.md | git hash-object --stdin; }
+drop_lease_facts() { sed -i '/^session: /d; /^pid: /d; /^host: /d; /^pid-image: /d; /^lease-utc: /d' memory/builds/tRun/RUN.md; }
+write_aged_commit() { GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -q --allow-empty -m aged --no-verify; }
+build_hold_fixture() { reset_tree
+         run --preflight tRun --keepalive-id k1 >/dev/null
+         git add -A >/dev/null && git commit -q -m build_hold_fixture --no-verify; }
+write_published_conf() { printf 'ANCHOR_SCOPE="published"\n' >> .unattended.conf
+            git add -A >/dev/null && git commit -q -m write_published_conf --no-verify; }
+read_hole_probe() { # kit.toml · hole id -> the shell command its discharge declares
+  awk -v id="$2" '
+    $0 == "id = \"" id "\"" { f = 1; next }
+    f && /^\[\[/ { f = 0 }
+    f && /^discharge = \{ command = / {
+      line = $0
+      sub(/^discharge = \{ command = \["bash", "-c", "/, "", line)
+      sub(/"\] \}$/, "", line)
+      gsub(/\\"/, "\"", line)
+      print line; exit }
+  ' "$1"
+}
+set_lease_fact() { sed -i "s/^$1: .*/$1: $2/" memory/builds/tRun/RUN.md; }
+restore_dd_origin() { git checkout -q -f unit 2>/dev/null; git branch -f main "$BASE"; git push -q -f origin "$BASE":main; rm -f "$STOP7" "$DD_LOG"; }
+build_dd_landing() { # primary|in-place -> DD_C, the landing commit
+  reset_tree; rm -f "$STOP7" "$DD_LOG"
+  sed -i "s/^LANDER_MODE=.*/LANDER_MODE=\"$1\"/" .unattended.conf
+  git add -A >/dev/null; git commit -q -m lander-mode --no-verify >/dev/null 2>&1
+  run --preflight tRun --keepalive-id k1 >/dev/null
+  sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+  fixture; DD_C=$(git rev-parse HEAD); git push -q -f origin HEAD:main
+}
+askmode() { printf '%s\n' "$1" > "$ASKSTUB_DIR/mode.txt"; }
+askrows() { printf '%b' "$1" > "$ASKSTUB_DIR/rows.tsv"; }
+askconf() { printf 'ASKS_CMD="bash %s"\n' "$ASKSTUB" >> .unattended.conf; }
+asksetup() {
+  git checkout -qf main
+  # A mandate over two asks another folder files, and the folder that files them.
+  readme tAskA
+  mutate memory/builds/tAskA/README.md '/^slug: tAskA$/a asks: EXMP-aFoo-3..4'
+  readme tAskP
+  mutate memory/builds/tAskP/README.md '/^slug: tAskP$/a authorized-by: prompt\nasks: EXMP-aFoo-3'
+  readme tAskR
+  mutate memory/builds/tAskR/README.md '/^slug: tAskR$/a authorized-by: recipe\nasks: EXMP-aFoo-3'
+  # CLOSING REVIEW F2 - three spellings of one two-ask mandate: the `-N` continuation the IDLIST
+  # grammar admits, and the two comma forms it refuses. The binding-line expander read the first as
+  # `-3` alone and the second as `-4` alone, and read the third as nothing at all.
+  readme tAskC
+  mutate memory/builds/tAskC/README.md '/^slug: tAskC$/a asks: EXMP-aFoo-3 -4'
+  readme tAskK
+  mutate memory/builds/tAskK/README.md '/^slug: tAskK$/a asks: EXMP-aFoo-3, EXMP-aFoo-4'
+  readme tAskN
+  mutate memory/builds/tAskN/README.md '/^slug: tAskN$/a asks: EXMP-aFoo-3,EXMP-aFoo-4'
+  # A mandate naming one ask this tree files and one it does not, for property P5.
+  readme tAskLate
+  mutate memory/builds/tAskLate/README.md '/^slug: tAskLate$/a asks: EXMP-aFoo-3 EXMP-aFoo-9'
+  # THE FILING HOME: a folder holding a BACKLOG.md and nothing else.
+  mkdir -p memory/builds/aFoo
+  printf '# aFoo — asks\n\n## Asks\n- EXMP-aFoo-3 · filed 2026-09-01 · the first · seen `memory/builds/aFoo/BACKLOG.md` · accept done\n- EXMP-aFoo-4 · filed 2026-09-01 · the second · seen `memory/builds/aFoo/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+    > memory/builds/aFoo/BACKLOG.md
+  # The plan fixture: two planned units nobody has specced, a mandate whose LATER-listed ask holds
+  # the earlier, and one ask this folder filed for itself that the mandate never named.
+  mkdir -p memory/builds/tPlanA
+  printf -- '---\nslug: tPlanA\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: EXMP\nids:\nasks: EXMP-aFoo-3 EXMP-aFoo-4\n---\n\n# tPlanA\n\n<!-- gen:build-index -->\n**Build status:** OPEN · 0 unit(s)\n\n<!-- gen:build-units -->\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n\n<!-- roster:units -->\n1. EXMP-tPlanA-2 — the second\n2. EXMP-tPlanA-10 — the tenth\n<!-- /roster:units -->\n' \
+    > memory/builds/tPlanA/README.md
+  printf '# tPlanA — asks\n\n## Asks\n- EXMP-tPlanA-5 · filed 2026-09-02 · this folder raised it · seen `memory/builds/tPlanA/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+    > memory/builds/tPlanA/BACKLOG.md
+  # ...and the same shape with NO roster rows at all, which is what the scaffold writes for a build
+  # opened over a mandate alone.
+  mkdir -p memory/builds/tMandate
+  printf -- '---\nslug: tMandate\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: EXMP\nids:\nasks: EXMP-aFoo-3..4\n---\n\n# tMandate\n\n<!-- gen:build-index -->\n**Build status:** OPEN · 0 unit(s)\n\n<!-- gen:build-units -->\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n\n<!-- roster:units -->\n<!-- /roster:units -->\n' \
+    > memory/builds/tMandate/README.md
+  # A folder filing a `unit` ask with no roster row, and one filing an ordinary ask.
+  readme tUnitAsk
+  printf '# tUnitAsk — asks\n\n## Asks\n- EXMP-tUnitAsk-9 · filed 2026-09-01 · unit · the unit ask · seen `memory/builds/tUnitAsk/BACKLOG.md` · accept done\n- EXMP-tUnitAsk-4 · filed 2026-09-01 · an ordinary ask · seen `memory/builds/tUnitAsk/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+    > memory/builds/tUnitAsk/BACKLOG.md
+  git add -A >/dev/null && git commit -q -m ask-fixture --no-verify && git push -q -f origin main
+  git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+  ASKP=$(git rev-parse HEAD)
+}
+dispsetup() {
+  git checkout -qf main
+  readme tDisp
+  mutate memory/builds/tDisp/README.md '/^slug: tDisp$/a asks: EXMP-aFoo-3'
+  # A build with NO mandate that files an ask of its own — the F half of the scope.
+  readme tDispF
+  printf '# tDispF — asks\n\n## Asks\n- EXMP-tDispF-1 · filed 2026-09-10 · this build raised it · seen `memory/builds/tDispF/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+    > memory/builds/tDispF/BACKLOG.md
+  # ...and one with neither, which is term zero's second half.
+  readme tDispN
+  git add -A >/dev/null && git commit -q -m disp-fixture --no-verify && git push -q -f origin main
+  git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+  DISPP=$(git rev-parse HEAD); DISPMAIN=$(git rev-parse main)
+}
+dispreset() { git checkout -qf unit >/dev/null 2>&1; git reset -q --hard "$DISPP"; git clean -qfd
+              git branch -qf main "$DISPMAIN"; git push -q -f origin "$DISPMAIN":main
+              mkconf; askconf; git add -A >/dev/null; git commit -q -m dispconf --no-verify; }
+dispbacklog() { # slug · rows
+  printf '# %s — asks\n\n## Asks\n\n## Dispositions\n%b\n' "$1" "$2" > "memory/builds/$1/BACKLOG.md"
+}
+dispspec() { # slug · status · header-tail
+  mkdir -p "memory/builds/$1/spec"
+  printf '# ARCH-%s-1 the unit\n\n**Status:** %s · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture · %s\n\n## 2. Scope\n\n- S1 do it\n\n## 6. Acceptance criteria\n\n- **AC1** it is done\n\n## 7. Gates\n\nthe bar\n' \
+    "$1" "$2" "$3" > "memory/builds/$1/spec/one.md"
+}
+build_ask_stub() {
+ASKSTUB_DIR="$TMP/.git/askstub"; mkdir -p "$ASKSTUB_DIR"
+ASKSTUB="$ASKSTUB_DIR/askstub.sh"
+cat > "$ASKSTUB" <<'ASKSTUBEOF'
+#!/usr/bin/env bash
+set -u
+D="${ASKSTUB_DIR:-.}"
+printf '%s\n' "$*" > "$D/argv.txt"
+MODE=$(cat "$D/mode.txt" 2>/dev/null || echo ok)
+ids=""; seen=0
+for a in "$@"; do
+  case "$a" in --ready) seen=1; continue ;; --*) seen=0; continue ;; esac
+  [ "$seen" = 1 ] && ids="$ids $a"
+done
+case "$MODE" in sleeper) sleep 30; exit 0 ;; silent) exit 0 ;; esac
+echo "askstub: a notice on the OTHER stream, which the parse must not see" >&2
+n=0
+for id in $ids; do
+  n=$((n + 1))
+  case "$MODE" in short) [ "$n" -gt 1 ] && continue ;; esac
+  row=$(grep -E "^$id	" "$D/rows.tsv" 2>/dev/null | head -1)
+  [ -n "$row" ] || row=$(printf '%s\tOPEN\t-\t%s\t-\tyes\t-\t-\t-\t-' "$id" "$(printf '%s' "$id" | cut -d- -f2)")
+  case "$MODE" in
+    tenfield) printf 'ask\t%s\n' "$(printf '%s' "$row" | cut -f1-9)" ;;
+    *)        printf 'ask\t%s\n' "$row" ;;
+  esac
+done
+case "$MODE" in miscount) n=$((n + 1)) ;; esac
+printf 'examined\t%s\n' "$n"
+case "$MODE" in exit1) exit 1 ;; esac
+exit 0
+ASKSTUBEOF
+export ASKSTUB_DIR
+}
 
 # ---- REGION ONE ----------------------------------------------------------------------------------
 # The bodies below are NOT reindented, deliberately. `check-arms.py` reads lines and skips comments,
@@ -1295,7 +1450,7 @@ miss "$out" "close OK"
 # ---- is the exact class this build kept meeting. Each arm then breaks exactly ONE term off it.
 # ---- Terms 4 and 5 are broken in BOTH the README and the run-state copy, so `records-current` stays
 # ---- met and the refusal is attributable to this item alone rather than to two at once.
-bcsetup   # HOISTED: region two rebuilds this epoch by calling the same function.
+bcsetup   # HOISTED: every region after this one rebuilds this epoch by calling the same function.
 
 # GREEN CONTROL: a complete build closes with NO override at all. If this ever needs one, the item
 # has stopped being satisfiable and every arm below is measuring the wrong thing.
@@ -1881,20 +2036,22 @@ same "a no-handle re-preflight left the recorded set intact" \
 # ---- than about 3000 commands: a synthetic `if true; then` over 3000 assignments ran, one over 3500
 # ---- died. Region two had grown past that, so the suite died on entering it, and an earlier red in
 # ---- region one hid the crash from the runner's dead-probe reading. Region two is now cut into
-# ---- `in_shard 2` blocks at top-level seams; this arm holds every such block under 2500 LINES, a
+# ---- `in_shard` blocks at top-level seams; this arm holds every such block under 2500 LINES, a
 # ---- bound on commands with a margin, so the next arm added cannot silently re-cross the ceiling.
-_blk_max=$(awk '/^if in_shard [12]; then/ { s = NR; next } /^fi   # ---- / && s { if (NR - s > m) m = NR - s; s = 0 } END { print m + 0 }' "$HERE/unattended.test.sh")
+# ---- A block closes only at a SEAM line, never at an inner `fi   # ---- ` such as the run_bounded
+# ---- host gate's, and every region label opens one (TOOL-aGraftedHelix-41 S5).
+_blk_max=$(awk '/^if in_shard [0-9]+; then/ { s = NR; next } /^fi   # ---- (end REGION|region [0-9]+ continues)/ && s { if (NR - s > m) m = NR - s; s = 0 } END { print m + 0 }' "$HERE/unattended.test.sh")
 same "no in_shard block of this suite exceeds 2500 lines (longest: $_blk_max)" "$([ "$_blk_max" -gt 0 ] && [ "$_blk_max" -le 2500 ] && echo ok || echo "too long: $_blk_max")" "ok"
 
 fi   # ---- end REGION ONE ----------------------------------------------------------------------
 
-# ---- REGION TWO ----------------------------------------------------------------------------------
-# THE SEAM, and it is measured rather than argued. Region one is everything above; region two is
-# everything below. The only names region two needs from region one are the six hoisted above plus
-# the epoch they build, which is why it opens by calling them.
-#
-# Measured on node a: whole file 398 assertions, region one 196 in 242 s, region two 206 in 145 s.
-# 196 + 206 = 398 + PROLOGUE_ARMS, the four prologue arms both regions pay.
+# ---- REGIONS 2 TO `SHARD_ARITY` ------------------------------------------------------------------
+# THE SEAMS, and they are measured rather than argued. Region one is everything above; the regions
+# below are region two's old blocks, relabelled in text order by TOOL-aGraftedHelix-41's cost census.
+# Each region OPENS by rebuilding what it reads that only another region builds: the epoch, through
+# the six helpers hoisted above, and its own rebuilds after them, all inside an `SH_I` guard so only
+# a shard run executes them. Every helper a region calls from another region's definition is hoisted.
+# A cross-region dependency nothing names here reds its own shard, which is the safe direction.
 if in_shard 2; then
 if [ "$SH_I" = 2 ]; then bcsetup; bcrestore; fi
 
@@ -1902,6 +2059,8 @@ if [ "$SH_I" = 2 ]; then bcsetup; bcrestore; fi
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 out=$(run --phase tRun BUILDING --witness "$(git rev-parse HEAD)")
 hit "$out" "phase BUILDING"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 same "the phase was actually written" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "BUILDING"
 
 # ...and preflight must NOT move it back. It used to rewrite the phase unconditionally, so the very
@@ -3534,14 +3693,16 @@ git add -A && git commit -q -m "the fixture, on the default branch, unmerged" --
 hit "$(run --landed tRun)" "the run's own branch ref does not resolve in this clone, so whether its work reached the local default branch cannot be judged:"
 git checkout -q unit; git branch -f main "$BASE"
 
-fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
-     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
-if in_shard 2; then
+fi   # ---- end REGION 2 ------------------------------------------------------------------------
+if in_shard 3; then
+if [ "$SH_I" = 3 ]; then bcsetup; bcrestore; fi
 
 # ---- THE HONEST LIMIT IS IN THE SOURCE, not only in the protocol. A reader who reaches the second
 # ---- arm has to be told there what it does and does not buy.
 same "the verb's own header states what the local anchor cannot buy" \
   "$(grep -c 'compared with itself' "$SCRIPT")" "1"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 
 # ---- 33/34/35: --abort. It is deliberately NOT symmetric with --landed: an aborted run landed
 # ---- nothing, so the four machine items assert obligations it does not have — but it owes BOTH
@@ -3738,7 +3899,6 @@ miss "$(run --close tRun)" "GATEPROBE-should-not-appear"
 # ---- The build README is committed on `unit` and NOT on `main`, which is the exact state the unit
 # ---- exists for: the merge-base carries no build folder, so the first anchor refuses and the second
 # ---- one is the only thing that can authorize the run.
-scope() { printf 'ANCHOR_SCOPE="%s"\n' "$1" >> .unattended.conf; }
 
 # S5's refusal set FIRST, because it decides whether any of the rest may fire. UNDECLARED, BLANK and
 # MISSPELLED must all keep the strict anchor — a value-set guard whose failing case is untested is
@@ -5007,14 +5167,6 @@ fkspec() { # section-8 body -> a live-status spec at $TMP/fk.md
 # marker-contract harness carried with `+ 45`. The failure is quiet in the worst way: a truncated
 # body still defines the function, so the `declare -F` liveness arm PASSES and every verdict then
 # comes back empty, which reads as the code under test returning nothing.
-slice_fn() { # <name> -> eval that function out of the SHIPPED driver bytes
-  local s e
-  s=$(grep -n "^$1()" "$SCRIPT" | cut -d: -f1)
-  [ -n "$s" ] || { echo "FAIL cannot find $1() in the driver, so every arm that grades it would grade nothing"; st=1; return 1; }
-  e=$(awk -v s="$s" 'NR>s && /^}/ {print NR; exit}' "$SCRIPT")
-  [ -n "$e" ] || { echo "FAIL cannot find the closing brace of $1() in the driver, so the slice below would be a fragment"; st=1; return 1; }
-  eval "$(sed -n "${s},${e}p" "$SCRIPT")"
-}
 slice_fn plan_state
 n=$((n+1)); declare -F plan_state >/dev/null || { echo "FAIL plan_state was not sliced out of the driver, so every fork-mark arm below graded nothing"; st=1; }
 
@@ -5227,9 +5379,6 @@ git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 n=$((n+1)); case "$o" in *"dispatch declared"*) ;; *) echo "FAIL dispatch: a READY unit was REFUSED, so the guard cannot be satisfied -- $o"; st=1 ;; esac
 
-fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
-     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
-if in_shard 2; then
 
 # ---- aDeferredBar closing review F3 - THE DECLARED SPEC-TOKEN CHECKER RUNS BEFORE THE DISPATCH.
 # ---- The memory kit's bar join grades LIVE specs and this harness closes every unit spec in its
@@ -5285,6 +5434,12 @@ else
   # construction.
   echo "skip dispatch: the spec-token checker is not beside this kit at $STC, and govkit's registry exempts check-spec-tokens.py from every adopter ([[exempt]]), so the F3 arms have no subject in this tree and run in gov's"
 fi
+# ---- region 3 ends HERE rather than at the old seam above the spec-token arm group: that group runs
+# ---- over the dispatch fixture the arms before it left, so it cannot open a region (TOOL-aGraftedHelix-41).
+fi   # ---- end REGION 3 ------------------------------------------------------------------------
+
+if in_shard 4; then
+if [ "$SH_I" = 4 ]; then bcsetup; bcrestore; fi
 
 echo "MARK brief" >&2
 # ---------------------------------------------------------------------------------------------
@@ -5303,6 +5458,8 @@ git add memory/builds/tRun/prompts/brief-1.md >/dev/null 2>&1
 
 o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/brief-1.md)
 n=$((n+1)); case "$o" in *"brief recorded"*) ;; *) echo "FAIL brief: a tracked path naming a rostered unit was refused -- $o"; st=1 ;; esac
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 # THE GRAMMAR IS park()'s AND THE ARM READS THE BYTES. A bespoke dash-led row was specified first and
 # no reader in this driver could have matched it, so this asserts the shape the readers actually use.
 n=$((n+1)); grep -qE "^[0-9][0-9-]*T[0-9:]*Z brief · item ARCH-tRun-1 · reason [0-9a-f]{12} memory/builds/tRun/prompts/brief-1.md$" memory/builds/tRun/RUN.md \
@@ -7318,9 +7475,14 @@ miss "$out" "verdict:"
 unset CLAUDE_CONFIG_DIR
 reset_tree
 
-fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
-     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
-if in_shard 2; then
+fi   # ---- end REGION 4 ------------------------------------------------------------------------
+if in_shard 5; then
+if [ "$SH_I" = 5 ]; then bcsetup; bcrestore
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) OWN_PID=$(ps -p $$ | awk -v p=$$ 'NR>1 && $1==p {print $4}') ;;
+  *) OWN_PID=$$ ;;
+esac
+fi
 
 # ---- TOOL-dUnstalledConvoy-5: `--rescope`, the amendment record. M3 now delegates the build's own
 # ---- scope, and an authority with no record is indistinguishable from a run doing what it likes.
@@ -7330,6 +7492,8 @@ reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 
 out=$(run --rescope tRun --act retire --item ARCH-tRun-1 --reason "the probe it needed cannot see this tree")
 hit "$out" "amendment recorded"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 same "exactly one rescope row" "$(grep -c 'rescope · item ' memory/builds/tRun/RUN.md)" "1"
 hit "$(cat memory/builds/tRun/RUN.md)" "rescope · item retire ARCH-tRun-1 · reason the probe it needed cannot see this tree"
 
@@ -8276,17 +8440,9 @@ reset_tree
 # the five facts other than `keepalive` go and `keepalive` stays. `write_aged_commit` puts an empty
 # commit dated past every bound on HEAD, so the one clock reads stale with no clock faked.
 LEASE="$TMP/.git/unattended/tRun.lease"
-read_lease_hash() { grep -E '^(keepalive|session|pid|host|pid-image|lease-utc): ' memory/builds/tRun/RUN.md | git hash-object --stdin; }
-drop_lease_facts() { sed -i '/^session: /d; /^pid: /d; /^host: /d; /^pid-image: /d; /^lease-utc: /d' memory/builds/tRun/RUN.md; }
-write_aged_commit() { GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -q --allow-empty -m aged --no-verify; }
 # A preflighted, COMMITTED, clean fixture at RUNNING whose lease is held by k1. Committed because
 # `--hold` refuses a dirty tree, so an uncommitted fixture would take the dirty refusal while
 # claiming to test something else — the shape this file's `fixture()` comment already records.
-build_hold_fixture() { reset_tree
-         run --preflight tRun --keepalive-id k1 >/dev/null
-         git add -A >/dev/null && git commit -q -m build_hold_fixture --no-verify; }
-write_published_conf() { printf 'ANCHOR_SCOPE="published"\n' >> .unattended.conf
-            git add -A >/dev/null && git commit -q -m write_published_conf --no-verify; }
 
 # ---- AC17: the lease lifecycle, in order, across the verbs that used to write a lease file. NOTHING
 # ---- REFRESHES THE LEASE (TOOL-dDerivedDocket-61): the holder's matching-id resume writes and stages
@@ -8716,18 +8872,6 @@ same "AC10 a preflight over a HELD record left the lease byte-unchanged" "$(read
 
 # ---- AC24: the kit.toml `hold-floor` hole's own discharge command, RESOLVED from the descriptor
 # ---- rather than retyped — which is what stages it RED against a kit.toml carrying no such hole.
-read_hole_probe() { # kit.toml · hole id -> the shell command its discharge declares
-  awk -v id="$2" '
-    $0 == "id = \"" id "\"" { f = 1; next }
-    f && /^\[\[/ { f = 0 }
-    f && /^discharge = \{ command = / {
-      line = $0
-      sub(/^discharge = \{ command = \["bash", "-c", "/, "", line)
-      sub(/"\] \}$/, "", line)
-      gsub(/\\"/, "\"", line)
-      print line; exit }
-  ' "$1"
-}
 HP=$(read_hole_probe "$HERE/kit.toml" hold-floor)
 n=$((n+1)); [ -n "$HP" ] || { echo "FAIL AC24 kit.toml declares no hold-floor hole, so its probe resolves to nothing and this arm cannot pass"; st=1; }
 HD=$(mktemp -d)
@@ -8829,18 +8973,8 @@ reset_tree
 # ==================================================================================================
 DD_CD=$(cd "$(git rev-parse --git-common-dir)" && pwd)
 DD_LOG="$DD_CD/unattended/landed.tRun.log"
-set_lease_fact() { sed -i "s/^$1: .*/$1: $2/" memory/builds/tRun/RUN.md; }
-restore_dd_origin() { git checkout -q -f unit 2>/dev/null; git branch -f main "$BASE"; git push -q -f origin "$BASE":main; rm -f "$STOP7" "$DD_LOG"; }
 # A committed LANDING record on the run branch `unit`, pushed to origin's main, under the landing
 # mode named. The conf edit is committed FIRST, because `--preflight` refuses a dirty tree.
-build_dd_landing() { # primary|in-place -> DD_C, the landing commit
-  reset_tree; rm -f "$STOP7" "$DD_LOG"
-  sed -i "s/^LANDER_MODE=.*/LANDER_MODE=\"$1\"/" .unattended.conf
-  git add -A >/dev/null; git commit -q -m lander-mode --no-verify >/dev/null 2>&1
-  run --preflight tRun --keepalive-id k1 >/dev/null
-  sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
-  fixture; DD_C=$(git rev-parse HEAD); git push -q -f origin HEAD:main
-}
 # The shell's own pid as the record would name it — the Windows pid under MSYS, as `claude.exe`'s is —
 # alive for the whole suite and started long before any lease this block records.
 case "$(uname -s)" in
@@ -8849,9 +8983,9 @@ case "$(uname -s)" in
 esac
 n=$((n+1)); [ -n "$DD_PID" ] || { echo "FAIL fixture: no pid for this shell, so the two-process arm would probe an empty value"; st=1; }
 
-fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
-     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
-if in_shard 2; then
+fi   # ---- end REGION 5 ------------------------------------------------------------------------
+if in_shard 6; then
+if [ "$SH_I" = 6 ]; then bcsetup; bcrestore; fi
 
 # ========================================================== TOOL-dUnstuckLanding-13 — `--handoff` ====
 # A run whose work is sound and which an owner must land, or decide first, ends HELD under a hand-off
@@ -8882,6 +9016,8 @@ sed -i 's/^LANDER_MODE=.*/LANDER_MODE="in-place"/' .unattended.conf; fixture
 seed_handoff_bar GREEN
 out=$(run --handoff tRun --code owner-landing --reason "the owner lands onto the order" --reaped k1)
 hit  "$out" "phase HELD · code owner-landing · until owner"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 hit  "$out" "unattended: hand-off recipe, written as the handoff row - in the run worktree: echo land --prepare --slug tRun && echo land --land --slug tRun"
 same "AC1 the phase" "$(read_run_fact phase)" "HELD"
 same "AC1 the hold code" "$(read_run_fact hold-code)" "owner-landing"
@@ -8995,9 +9131,9 @@ for _ho_case in "2026-01-01 external-prerequisite yes" "2099-01-01 external-prer
   esac
 done
 
-fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+fi   # ---- region 6 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
-if in_shard 2; then
+if in_shard 6; then
 
 # ======================================== TOOL-dUnstuckLanding-14 — the attended terminal, `--settle` ====
 # ---- SELF-CONTAINED, in its own scratch repository with its own bare origin, for the derived-terminal
@@ -9524,9 +9660,21 @@ hit  "$out" "unattended: already settled - memory/builds/tRun/RUN.md reads LANDE
 same "GH36 AC6 the re-run leaves another session's stale claim unmoved" "$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)" "$su_cr"
 rm -rf "$su_dir" "$su_oroot" "$su_out"
 
-fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
-     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
-if in_shard 2; then
+fi   # ---- end REGION 6 ------------------------------------------------------------------------
+if in_shard 7; then
+if [ "$SH_I" = 7 ]; then bcsetup; bcrestore
+STOP7="$(git rev-parse --git-dir)/unattended/stop.tRun.log"; mkdir -p "${STOP7%/*}"
+LEASE="$TMP/.git/unattended/tRun.lease"
+DD_CD=$(cd "$(git rev-parse --git-common-dir)" && pwd)
+DD_LOG="$DD_CD/unattended/landed.tRun.log"
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) DD_PID=$(ps -p $$ | awk -v p=$$ 'NR>1 && $1==p {print $4}') ;;
+  *) DD_PID=$$ ;;
+esac
+GATE_BOUND_LIVE=0
+GATE_BOUND=0
+ROOT="$TMP"
+fi
 
 # ---- AC5: `--liveness` over an aged HELD record reads `state: held` and `verdict: HELD`, never the
 # ---- STALE the resume tick acts on, and prints every key it printed before, in the same order.
@@ -9534,6 +9682,8 @@ build_hold_fixture
 run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/dev/null; fixture; write_aged_commit
 out=$(bash "$SCRIPT" --liveness tRun 2>/dev/null)
 hit "$out" "state: held"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 hit "$out" "stale: yes"
 hit "$out" "verdict: HELD"
 same "AC5 every key still prints, in order" "$(printf '%s\n' "$out" | sed -n 's/^\([a-z-]*\): .*/\1/p' | tr '\n' ' ')" \
@@ -10751,87 +10901,8 @@ rm -rf "$RS_FIX"
 # in each reset deleted the rows an arm had just set; and the stub, swept into the ask fixture's
 # commit, was deleted by the next `reset_tree`, so the in-place close arms ran an ASKS_CMD naming no
 # file. Under `.git` none of that reaches it, and its state holds across resets until an arm sets it.
-ASKSTUB_DIR="$TMP/.git/askstub"; mkdir -p "$ASKSTUB_DIR"
-ASKSTUB="$ASKSTUB_DIR/askstub.sh"
-cat > "$ASKSTUB" <<'ASKSTUBEOF'
-#!/usr/bin/env bash
-set -u
-D="${ASKSTUB_DIR:-.}"
-printf '%s\n' "$*" > "$D/argv.txt"
-MODE=$(cat "$D/mode.txt" 2>/dev/null || echo ok)
-ids=""; seen=0
-for a in "$@"; do
-  case "$a" in --ready) seen=1; continue ;; --*) seen=0; continue ;; esac
-  [ "$seen" = 1 ] && ids="$ids $a"
-done
-case "$MODE" in sleeper) sleep 30; exit 0 ;; silent) exit 0 ;; esac
-echo "askstub: a notice on the OTHER stream, which the parse must not see" >&2
-n=0
-for id in $ids; do
-  n=$((n + 1))
-  case "$MODE" in short) [ "$n" -gt 1 ] && continue ;; esac
-  row=$(grep -E "^$id	" "$D/rows.tsv" 2>/dev/null | head -1)
-  [ -n "$row" ] || row=$(printf '%s\tOPEN\t-\t%s\t-\tyes\t-\t-\t-\t-' "$id" "$(printf '%s' "$id" | cut -d- -f2)")
-  case "$MODE" in
-    tenfield) printf 'ask\t%s\n' "$(printf '%s' "$row" | cut -f1-9)" ;;
-    *)        printf 'ask\t%s\n' "$row" ;;
-  esac
-done
-case "$MODE" in miscount) n=$((n + 1)) ;; esac
-printf 'examined\t%s\n' "$n"
-case "$MODE" in exit1) exit 1 ;; esac
-exit 0
-ASKSTUBEOF
-export ASKSTUB_DIR
-askmode() { printf '%s\n' "$1" > "$ASKSTUB_DIR/mode.txt"; }
-askrows() { printf '%b' "$1" > "$ASKSTUB_DIR/rows.tsv"; }
-askconf() { printf 'ASKS_CMD="bash %s"\n' "$ASKSTUB" >> .unattended.conf; }
+build_ask_stub
 
-asksetup() {
-  git checkout -qf main
-  # A mandate over two asks another folder files, and the folder that files them.
-  readme tAskA
-  mutate memory/builds/tAskA/README.md '/^slug: tAskA$/a asks: EXMP-aFoo-3..4'
-  readme tAskP
-  mutate memory/builds/tAskP/README.md '/^slug: tAskP$/a authorized-by: prompt\nasks: EXMP-aFoo-3'
-  readme tAskR
-  mutate memory/builds/tAskR/README.md '/^slug: tAskR$/a authorized-by: recipe\nasks: EXMP-aFoo-3'
-  # CLOSING REVIEW F2 - three spellings of one two-ask mandate: the `-N` continuation the IDLIST
-  # grammar admits, and the two comma forms it refuses. The binding-line expander read the first as
-  # `-3` alone and the second as `-4` alone, and read the third as nothing at all.
-  readme tAskC
-  mutate memory/builds/tAskC/README.md '/^slug: tAskC$/a asks: EXMP-aFoo-3 -4'
-  readme tAskK
-  mutate memory/builds/tAskK/README.md '/^slug: tAskK$/a asks: EXMP-aFoo-3, EXMP-aFoo-4'
-  readme tAskN
-  mutate memory/builds/tAskN/README.md '/^slug: tAskN$/a asks: EXMP-aFoo-3,EXMP-aFoo-4'
-  # A mandate naming one ask this tree files and one it does not, for property P5.
-  readme tAskLate
-  mutate memory/builds/tAskLate/README.md '/^slug: tAskLate$/a asks: EXMP-aFoo-3 EXMP-aFoo-9'
-  # THE FILING HOME: a folder holding a BACKLOG.md and nothing else.
-  mkdir -p memory/builds/aFoo
-  printf '# aFoo — asks\n\n## Asks\n- EXMP-aFoo-3 · filed 2026-09-01 · the first · seen `memory/builds/aFoo/BACKLOG.md` · accept done\n- EXMP-aFoo-4 · filed 2026-09-01 · the second · seen `memory/builds/aFoo/BACKLOG.md` · accept done\n\n## Dispositions\n' \
-    > memory/builds/aFoo/BACKLOG.md
-  # The plan fixture: two planned units nobody has specced, a mandate whose LATER-listed ask holds
-  # the earlier, and one ask this folder filed for itself that the mandate never named.
-  mkdir -p memory/builds/tPlanA
-  printf -- '---\nslug: tPlanA\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: EXMP\nids:\nasks: EXMP-aFoo-3 EXMP-aFoo-4\n---\n\n# tPlanA\n\n<!-- gen:build-index -->\n**Build status:** OPEN · 0 unit(s)\n\n<!-- gen:build-units -->\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n\n<!-- roster:units -->\n1. EXMP-tPlanA-2 — the second\n2. EXMP-tPlanA-10 — the tenth\n<!-- /roster:units -->\n' \
-    > memory/builds/tPlanA/README.md
-  printf '# tPlanA — asks\n\n## Asks\n- EXMP-tPlanA-5 · filed 2026-09-02 · this folder raised it · seen `memory/builds/tPlanA/BACKLOG.md` · accept done\n\n## Dispositions\n' \
-    > memory/builds/tPlanA/BACKLOG.md
-  # ...and the same shape with NO roster rows at all, which is what the scaffold writes for a build
-  # opened over a mandate alone.
-  mkdir -p memory/builds/tMandate
-  printf -- '---\nslug: tMandate\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: EXMP\nids:\nasks: EXMP-aFoo-3..4\n---\n\n# tMandate\n\n<!-- gen:build-index -->\n**Build status:** OPEN · 0 unit(s)\n\n<!-- gen:build-units -->\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n\n<!-- roster:units -->\n<!-- /roster:units -->\n' \
-    > memory/builds/tMandate/README.md
-  # A folder filing a `unit` ask with no roster row, and one filing an ordinary ask.
-  readme tUnitAsk
-  printf '# tUnitAsk — asks\n\n## Asks\n- EXMP-tUnitAsk-9 · filed 2026-09-01 · unit · the unit ask · seen `memory/builds/tUnitAsk/BACKLOG.md` · accept done\n- EXMP-tUnitAsk-4 · filed 2026-09-01 · an ordinary ask · seen `memory/builds/tUnitAsk/BACKLOG.md` · accept done\n\n## Dispositions\n' \
-    > memory/builds/tUnitAsk/BACKLOG.md
-  git add -A >/dev/null && git commit -q -m ask-fixture --no-verify && git push -q -f origin main
-  git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
-  ASKP=$(git rev-parse HEAD)
-}
 # A RESET THAT ALSO COMMITS THE CONF, because every arm below declares ASKS_CMD and an edited conf
 # is an unstaged path `check_clean` refuses before any of this is reached.
 askreset() { git checkout -qf unit >/dev/null 2>&1; git reset -q --hard "$ASKP"; git clean -qfd
@@ -11243,9 +11314,9 @@ AC15IDL
 fi
 askreset
 
-fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+fi   # ---- region 7 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
-if in_shard 2; then
+if in_shard 7; then
 
 # ==================================================================================================
 # TOOL-dAlignedCarrier-4 — `--status` REPORTS THE TWO CHECKS A NO-ID `--resume` REACHES FIRST.
@@ -11345,43 +11416,18 @@ askreset
 # EVERY ask in the scope, and a second ask doubles the setup of each one while proving nothing the
 # first does not: T2's scope-size arms are where more than one id is load-bearing, and those use the
 # build's own filing to get it.
-dispsetup() {
-  git checkout -qf main
-  readme tDisp
-  mutate memory/builds/tDisp/README.md '/^slug: tDisp$/a asks: EXMP-aFoo-3'
-  # A build with NO mandate that files an ask of its own — the F half of the scope.
-  readme tDispF
-  printf '# tDispF — asks\n\n## Asks\n- EXMP-tDispF-1 · filed 2026-09-10 · this build raised it · seen `memory/builds/tDispF/BACKLOG.md` · accept done\n\n## Dispositions\n' \
-    > memory/builds/tDispF/BACKLOG.md
-  # ...and one with neither, which is term zero's second half.
-  readme tDispN
-  git add -A >/dev/null && git commit -q -m disp-fixture --no-verify && git push -q -f origin main
-  git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
-  DISPP=$(git rev-parse HEAD); DISPMAIN=$(git rev-parse main)
-}
 # THE ANCHOR IS RESET TOO, and that is not tidiness. Several arms below push a commit to `origin
 # main` — the green close needs the run's work to be landed, and the exclusion arm needs a foreign
 # build's commit on the default branch — so an arm that only reset the WORK branch would leave every
 # later preflight refusing on a merge-base that equals HEAD, for a reason belonging to the arm
 # before it.
-dispreset() { git checkout -qf unit >/dev/null 2>&1; git reset -q --hard "$DISPP"; git clean -qfd
-              git branch -qf main "$DISPMAIN"; git push -q -f origin "$DISPMAIN":main
-              mkconf; askconf; git add -A >/dev/null; git commit -q -m dispconf --no-verify; }
 # This build's own `BACKLOG.md` at HEAD — the file every disposition row below lands in. It is THIS
 # build's and never the filing home's, which is what arm AC4-foreign proves.
-dispbacklog() { # slug · rows
-  printf '# %s — asks\n\n## Asks\n\n## Dispositions\n%b\n' "$1" "$2" > "memory/builds/$1/BACKLOG.md"
-}
-dispspec() { # slug · status · header-tail
-  mkdir -p "memory/builds/$1/spec"
-  printf '# ARCH-%s-1 the unit\n\n**Status:** %s · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture · %s\n\n## 2. Scope\n\n- S1 do it\n\n## 6. Acceptance criteria\n\n- **AC1** it is done\n\n## 7. Gates\n\nthe bar\n' \
-    "$1" "$2" "$3" > "memory/builds/$1/spec/one.md"
-}
 dispsetup
 
-fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
-     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
-if in_shard 2; then
+fi   # ---- end REGION 7 ------------------------------------------------------------------------
+if in_shard 8; then
+if [ "$SH_I" = 8 ]; then bcsetup; bcrestore; build_ask_stub; asksetup; dispsetup; fi
 
 # ---- AC2 / AC18 term zero, BOTH halves, and they are different facts. A run in a project with no
 # ---- ask contract at all, and a run in a project that HAS one over a build with nothing to grade.
@@ -11390,6 +11436,8 @@ mkconf; git add -A >/dev/null; git commit -q -m noaskscmd --no-verify
 out=$(run --preflight tDispF --keepalive-id KD-1); git add -A >/dev/null; git commit -q -m pf --no-verify
 out=$(run --close tDispF)
 hit "$out" "skipped — asks-disposed: this build carries no asks: mandate and this project declares no ASKS_CMD, so the ask contract is NOT ADOPTED here and there is nothing this item could grade"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 dispreset
 run --preflight tDispN --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
 out=$(run --close tDispN)
@@ -13279,9 +13327,9 @@ n=$((n+1)); kill -0 "$PL_ORPH" 2>/dev/null || { echo "FAIL AC5/AC9 a verb that d
 n=$((n+1)); grep -q '^reap ' "$pl_out/order.log" 2>/dev/null && { echo "FAIL AC5/AC9 a verb that does not hold the lease called the reaper"; st=1; }
 run_pl_kill "$PL_ORPH"
 
-fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
-if in_shard 2; then
+if in_shard 8; then
 
 # ==================================================================================================
 # TOOL-aGraftedHelix-1 — THE RUN CLAIM ON THE REMOTE. Every arm is the driver over this suite's
@@ -13614,9 +13662,9 @@ hit  "$out" "unattended: REFUSING - RUN_CLAIMS is declared as 'maybe', which is 
 same "AC21 the kit's example ships the switch off" "$(grep -c '^RUN_CLAIMS="off"$' "$HERE/.unattended.conf.example")" "1"
 remove_claim_refs; rm -rf "$GH_BIN"; git remote set-url origin "$ORIGIN"; reset_tree
 
-fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
-if in_shard 2; then
+if in_shard 8; then
 
 # ==================================================================================================
 # TOOL-aGraftedHelix-10 — THE CLAIM PUSH THROUGH THE TRACKED PRE-PUSH HOOK. Every other arm here runs
@@ -13741,9 +13789,9 @@ same "GH11 AC4 the holder's next resume exits 0" "$rc" "0"
 same "GH11 AC4 ...and pushes nothing while the beat is young" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gi_sha"
 rm -rf "$GI_BIN"; remove_claim_refs; reset_tree
 
-fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
-if in_shard 2; then
+if in_shard 8; then
 
 # ==================================================================================================
 # TOOL-aGraftedHelix-12 — EVERY CELL OF THE CLAIM WRITE TABLE, and every write `--beat` declines.
@@ -14265,9 +14313,9 @@ same "GH23 AC5 absent ...leaves the claim under the new keepalive" "$(read_claim
 same "GH23 AC5 absent ...and session s2" "$(read_claim_field tRun session)" "s2"
 rm -rf "$GQ_BIN"; remove_claim_refs; reset_tree
 
-fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
-if in_shard 2; then
+if in_shard 8; then
 
 # ==================================================================================================
 # TOOL-aGraftedHelix-24 — THE `prior-session` ADD RUNS BEFORE write_lease. A mktemp shim on PATH
@@ -14420,9 +14468,9 @@ rm -rf "$GT_BIN"
 check_prior_landed "GH26 AC3 restored"
 remove_claim_refs; reset_tree
 
-fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
-if in_shard 2; then
+if in_shard 8; then
 
 # ==================================================================================================
 # TOOL-aGraftedHelix-32 — THE CLOSING REVIEW'S MINORS IN THE DRIVER. AC18 (M8, L1): the GH26 AC3
@@ -14722,9 +14770,9 @@ miss "$out" "UNATTENDED check 24 FAILED"
 same "GH32 AC15 ...and writes exactly one dispatch row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md)" "1"
 rm -rf "$GU_BIN"; remove_claim_refs; reset_tree
 
-fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
-if in_shard 2; then
+if in_shard 8; then
 
 # ---- AC6: `--hold` refuses, numbered and before any record write, while a recorded bar is alive under
 # ---- a LIVE driver — this suite's own shell stands in for it — and proceeds once the bar has exited.
@@ -15751,7 +15799,7 @@ out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner land
 same "TOOL-dUnstuckLanding-27 L6 the record-alone fallback is announced once" \
   "$(printf '%s\n' "$out" | grep -c "unattended: NOTE - the bar's run record names no staged set, so the bar tie excludes the run-state file alone: $LN_R" || true)" "1"
 rm -rf "$ln_root"
-fi   # ---- end REGION TWO ----------------------------------------------------------------------
+fi   # ---- end REGION 8 ------------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
@@ -16096,7 +16144,14 @@ FLOOR_ASSERTIONS=2549
 #
 # The per-shard floors carry the same proportional discount the unsharded pin does (338 against a
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
-PROLOGUE_ARMS=18
+# THE IDENTITY FOR `SHARD_ARITY` REGIONS (TOOL-aGraftedHelix-41). Every shard pays the prologue once,
+# so the executed counts of shards 1 to `SHARD_ARITY`, less `SHARD_ARITY - 1` times PROLOGUE_ARMS,
+# equal the unsharded count, less the `mutate`s that region 8's entry pays through `asksetup` and
+# `dispsetup`, the one entry that calls builders holding assertion sites. A documented manual check,
+# for the reason above. PROLOGUE_ARMS is RE-READ as the executed count of a shard whose region holds
+# no block, staged by relabelling region 8's blocks as 7 and running `--shard 8/8`: 20 on node a,
+# 2026-10-07, over TOOL-aGraftedHelix-41's build in a clone of its parent.
+PROLOGUE_ARMS=20
 # RAISED 208 -> 209: region one's in_shard block-length arm, see FLOOR_ASSERTIONS.
 # RAISED 209 -> 211: the two closing-review guard-sentence arms, see FLOOR_ASSERTIONS.
 FLOOR_SHARD_1=211
@@ -16129,7 +16184,20 @@ FLOOR_SHARD_1=211
 # RAISED 2312 -> 2335 by TOOL-aGraftedHelix-37: the same 23 region-two GH37 lock assertions, see FLOOR_ASSERTIONS.
 # RAISED 2335 -> 2337 by TOOL-aGraftedHelix-38: the same 2 region-two rule-2 pair assertions, see FLOOR_ASSERTIONS.
 # RAISED 2337 -> 2350 by TOOL-aGraftedHelix-39: the same 13 region-two one-derivation assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=2350
+# RE-CUT by TOOL-aGraftedHelix-41: region two's blocks are regions 2 to `SHARD_ARITY` now, and each
+# floor from here to FLOOR_SHARD_8 is DERIVED as PROLOGUE_ARMS + floor(0.9 x R x a_k / A), where R is
+# 2332, the parent's FLOOR_SHARD_2 less its PROLOGUE_ARMS; a_k is region k's static assertion sites
+# at the parent, cut as this file cuts it; and A, 3090, is their sum over regions 2 to 8. The 0.9 is
+# this derivation's own discount, because static sites stand in for executed counts. The next
+# measured executed count of a shard re-declares its floor at the suite's usual headroom. The RAISED
+# lines above are region two's history.
+FLOOR_SHARD_2=222
+FLOOR_SHARD_3=255
+FLOOR_SHARD_4=390
+FLOOR_SHARD_5=270
+FLOOR_SHARD_6=129
+FLOOR_SHARD_7=312
+FLOOR_SHARD_8=658
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.
@@ -16180,16 +16248,15 @@ FLOOR_SHARD_2=2350
 # +19 for the TOOL-aProbedUnit-6 BOUNDED arms, all in region two.
 # +35 for the TOOL-aProbedUnit-3 `--audit` arms, which sit in region two beside the `--dispatch` arms.
 case "$SH_I" in
-  1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
-  2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
-  *) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
+  0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
+  *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;
 esac
 [ "$n" -ge "$FLOOR" ] || { echo "FAIL executed $n assertions in $MODE against a floor of $FLOOR — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
-# WHAT A GREEN SHARD LEG IS EVIDENCE ABOUT: its own region, and nothing else. Neither shard alone is
-# this suite. A new region-two arm that depends on region-one state passes the unsharded run a
-# developer habitually types and reds only on the bar — there is no gate for that, and the mitigation
-# is this sentence.
-[ "$SH_I" = 0 ] || echo "  (this leg ran $MODE only; the other region was NOT exercised here)"
+# WHAT A GREEN SHARD LEG IS EVIDENCE ABOUT: its own region, and nothing else. No shard alone is this
+# suite. An arm that depends on another region's state passes the unsharded run a developer
+# habitually types and reds only in its own shard — there is no gate for that, and the mitigation is
+# this sentence and the region entries that rebuild what the scan named.
+[ "$SH_I" = 0 ] || echo "  (this leg ran $MODE only; the other $((SHARD_ARITY - 1)) regions were NOT exercised here)"
 # THE TRAILER IS UNCONDITIONAL: a red-but-complete run must still carry one, or the pooled runner
 # reads it as untrailed and writes no reading (aBatchedArm closing D4).
 echo "  ($n assertions executed)"

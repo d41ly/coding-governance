@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-41 — the driver suite runs in the pooled sweep as eight shards cut by its own region costs
 
-**Status:** SPECCED · rev-2 · 2026-10-07 · node a · Tier-2 · base 290d0d2d · streams tooling · order 25 · ratified 2026-10-06
+**Status:** CLOSED · rev-2 · 2026-10-07 · node a · Tier-2 · base 290d0d2d · streams tooling · order 25 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 
