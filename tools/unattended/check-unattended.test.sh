@@ -5358,7 +5358,7 @@ ma_readme "$ma0" tBare 'may: bin/lander-granted.sh'
 ma_readme "$ma0" tPrompt 'authorized-by: prompt'
 for ma_s in tRun tTick tBare tPrompt; do ma_run "$ma0" "$ma_s"; done
 sed -i 's/^mode: slug$/mode: prompt/' "$ma0/memory/builds/tPrompt/RUN.md"
-sed -i 's/^may: none$/may: tools\/lander-granted.sh/' "$ma0/memory/builds/tTick/RUN.md" "$ma0/memory/builds/tBare/RUN.md"
+sed -i 's/^may: none$/may: bin\/lander-granted.sh/' "$ma0/memory/builds/tTick/RUN.md" "$ma0/memory/builds/tBare/RUN.md"
 ( cd "$ma0" || exit 2
   git init -q -b main . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
   git add -A >/dev/null && git commit -q -m base --no-verify
@@ -5381,7 +5381,7 @@ miss "$out" "pins a may: grant while recording an authorization mode that resolv
 miss "$out" "$MA_WRITES"
 hit  "$out" "the ask-mandate second opinions (checks 19, 15 and 37) are VACUOUS on this tree"
 # AC4: a fact that differs from the README's line at BASE reds, naming both values
-ma0_reset; sed -i 's/^may: none$/may: tools\/lander-granted.sh/' "$ma0/memory/builds/tRun/RUN.md"; ma_commit "$ma0" forged
+ma0_reset; sed -i 's/^may: none$/may: bin\/lander-granted.sh/' "$ma0/memory/builds/tRun/RUN.md"; ma_commit "$ma0" forged
 out=$(ma_leg "$ma0")
 hit "$out" "a run-state file pins a may: grant the build README at its own recorded BASE does not declare, so the authority the run says its owner committed is not the authority that README carries - pinned against declared follow: ["
 hit "$out" "pinned against declared follow: [bin/lander-granted.sh] against [none] in memory/builds/tRun/RUN.md"
@@ -5390,7 +5390,7 @@ ma_grant "$ma0" tRun bin/lander-granted.sh; ma_commit "$ma0" "matched at head"
 out=$(ma_leg "$ma0")
 hit "$out" "pinned against declared follow: [bin/lander-granted.sh] against [none] in memory/builds/tRun/RUN.md"
 # AC5: a `prompt` record carrying a grant reds by its mode, whatever its README says
-ma0_reset; sed -i 's/^may: none$/may: tools\/lander-granted.sh/' "$ma0/memory/builds/tPrompt/RUN.md"; ma_commit "$ma0" "prompt grant"
+ma0_reset; sed -i 's/^may: none$/may: bin\/lander-granted.sh/' "$ma0/memory/builds/tPrompt/RUN.md"; ma_commit "$ma0" "prompt grant"
 out=$(ma_leg "$ma0")
 hit "$out" "a run-state file pins a may: grant while recording an authorization mode that resolves at the second anchor, so the grant could be one the run wrote for itself - ruling D12-j honours a grant only under slug: mode [prompt], may: [bin/lander-granted.sh] in memory/builds/tPrompt/RUN.md"
 

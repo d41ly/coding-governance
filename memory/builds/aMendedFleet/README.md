@@ -279,7 +279,7 @@ ids TOOL-aMendedFleet-108 TOOL-aMendedFleet-109
 | [TOOL-aMendedFleet-98 — held-red C2: a Python suite's `bash` resolves to Git-Bash, never the System32 WSL launcher](spec/2026-10-05-spec-TOOL-aMendedFleet-98.md) | 99 | 1 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aMendedFleet-99 — the held job runs its suites from the tree path the bar job uses](spec/2026-10-05-spec-TOOL-aMendedFleet-99.md) | 100 | 1 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aMendedFleet-100 — the shard 2/8 fixture's bare origin commits under its own git identity](spec/2026-10-05-spec-TOOL-aMendedFleet-100.md) | 101 | 1 | CLOSED | rev-1 | 2026-10-05 |
-| [TOOL-aMendedFleet-101 — the G0 grant fixture writes the `may:` path its own assertions read](spec/2026-10-05-spec-TOOL-aMendedFleet-101.md) | 102 | 1 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aMendedFleet-101 — the G0 grant fixture writes the `may:` path its own assertions read](spec/2026-10-05-spec-TOOL-aMendedFleet-101.md) | 102 | 1 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aMendedFleet-102 — the two drifted inline `resolve_kit_dir` copies match their canonical source](spec/2026-10-05-spec-TOOL-aMendedFleet-102.md) | 103 | 1 | SPECCED | rev-1 | 2026-10-05 |
 | [TOOL-aMendedFleet-103 — the hygiene suite's python-parity arm exempts `GRAMMAR_WHERE` beside `GRAMMAR_DIR`](spec/2026-10-05-spec-TOOL-aMendedFleet-103.md) | 104 | 1 | SPECCED | rev-1 | 2026-10-05 |
 | [TOOL-aMendedFleet-104 — the foreign-prefix leg declares `review-replay selftest` a whole run](spec/2026-10-05-spec-TOOL-aMendedFleet-104.md) | 105 | 1 | SPECCED | rev-1 | 2026-10-05 |
