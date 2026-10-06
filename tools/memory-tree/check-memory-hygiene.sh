@@ -841,28 +841,63 @@ if [ -n "$sel6" ]; then
   #
   # The shipped ratio between the classes is stated as an allowance, not an arithmetic identity: a
   # project that moves one key and not another changes it.
+  #
+  # A BUILD README IS PRICED BY ITS AUTHORED BYTES (TOOL-aMendedFleet-84): its `wc -c` figure less
+  # every line from a `<!-- gen:build-index -->`, `<!-- gen:build-order -->` or
+  # `<!-- gen:build-edges -->` marker through its matching close, markers and newlines included, and
+  # less the front matter's one `ids:` line. Those bytes are rendered from the specs at about 308 per
+  # unit, so pricing them made the cap a bound on the roster rather than on what anyone wrote. A
+  # nested pair (`gen:build-units` inside the index region) is counted once; a marker is column-0
+  # equality after one trailing CR, the generator's own reading. A README whose pairs do not balance
+  # prints -1 here and is priced WHOLE, which fails safe. NOT CHECKED HERE: that a region's bytes
+  # really are generated. Check 9 re-renders the three registered regions and byte-compares them, so
+  # prose cannot hide inside one; a pair under any other name is priced as authored. LC_ALL=C makes
+  # `length` count bytes on every node.
+  gen6=$(printf '%s\n' "$sel6" | while IFS= read -r f; do case "$f" in "$M"/builds/*/README.md) printf '%s\n' "$f" ;; esac; done \
+    | LC_ALL=C xargs -r awk '
+    function flush() { if (f != "") { v = (bad || d != 0) ? -1 : s; print v, f } }
+    FNR==1 { flush(); f=FILENAME; d=0; s=0; fm=0; bad=0 }
+    { x=$0; sub(/\r$/, "", x) }
+    FNR==1 && x=="---" { fm=1; next }
+    fm==1 && x=="---" { fm=2; next }
+    fm==1 && x ~ /^ids:/ { s += length($0)+1; next }
+    x=="<!-- gen:build-index -->" || x=="<!-- gen:build-order -->" || x=="<!-- gen:build-edges -->" { d++ }
+    d>0 { s += length($0)+1 }
+    x=="<!-- /gen:build-index -->" || x=="<!-- /gen:build-order -->" || x=="<!-- /gen:build-edges -->" { d--; if (d<0) bad=1 }
+    END { flush() }')
   bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/"           -v icb="$INDEX_CAP_BYTES" -v icl="$INDEX_CAP_LINES"           -v gcb="$GUIDE_CAP_BYTES" -v gcl="$GUIDE_CAP_LINES"           -v rcb="$BUILD_README_CAP_BYTES" -v rcl="$BUILD_README_CAP_LINES"           -v dcb="$DOSSIER_CAP_BYTES" -v dcl="$DOSSIER_CAP_LINES"           -v dp="${MAP_SUB:+$M/$MAP_SUB/features/}" '
-    FNR==NR { if ($NF!="total") b[$NF]=$1; next }
+    # THREE streams, told apart by a file counter: `FNR==NR` names only the first. Each is a printf
+    # of a captured string, so none is ever zero lines and the counter cannot skip one.
+    FNR==1 { fi++ }
+    fi==1 { if ($NF!="total") b[$NF]=$1; next }
+    fi==3 { if (NF) g[$NF]=$1; next }
     $NF=="total" { next }
     { l[$NF]=$1; ord[++n]=$NF }
     END { for(i=1;i<=n;i++){ f=ord[i]
             # +0 on every binding: awk compares an unset or non-numeric -v as a STRING, which reds
             # nothing at all. The validation at conf load is what makes these numbers; this is belt.
-            cb = icb+0; cl = icl+0
+            cb = icb+0; cl = icl+0; rd = 0
             if (index(f, gp) == 1) { cb = gcb+0; cl = gcl+0 }
             # A build README: its own tier, and a 0 line cap means NO independent line cap. The line
             # count is whatever fits the byte budget at the per-line width, so there is no third
             # number to drift against the other two.
-            if (index(f, bp) == 1 && f ~ /\/README\.md$/) { cb = rcb+0; cl = rcl+0 }
+            if (index(f, bp) == 1 && f ~ /\/README\.md$/) { cb = rcb+0; cl = rcl+0; rd = 1 }
             # A codebase-map dossier, GUARDED on a non-empty prefix. `dp` is empty when no map is
             # adopted, and `index(f, "")` is 1 for EVERY string — an unguarded test would hand the
             # dossier bound to the whole tree and silently undo the index cap. The `ex7` selector in
             # check 7 adds its map alternatives under `[ -n "$MAP_SUB" ]` for the same reason.
-            if (dp != "" && index(f, dp) == 1) { cb = dcb+0; cl = dcl+0 }
-            if (b[f]+0>cb || (cl>0 && l[f]+0>cl)) {
-              if (cl>0) printf "%s (%dB %dL > %dB/%dL)\n", f, b[f]+0, l[f]+0, cb, cl
-              else      printf "%s (%dB > %dB; no line cap for this class)\n", f, b[f]+0, cb } } }
-  ' <(printf '%s\n' "$cbytes") <(printf '%s\n' "$clines"))
+            if (dp != "" && index(f, dp) == 1) { cb = dcb+0; cl = dcl+0; rd = 0 }
+            # rd 1: authored price; rd 2: a README whose region pairs do not balance, priced whole.
+            sz = b[f]+0
+            if (rd && (f in g)) { if (g[f]+0 < 0) rd = 2; else sz = b[f] - g[f] }
+            else rd = 0
+            if (sz>cb || (cl>0 && l[f]+0>cl)) {
+              if (rd == 1 && cl>0) printf "%s (%dB authored %dL > %dB/%dL; generated regions not priced in bytes)\n", f, sz, l[f]+0, cb, cl
+              else if (rd == 1)    printf "%s (%dB authored > %dB; generated regions not priced; no line cap for this class)\n", f, sz, cb
+              else if (rd == 2)    printf "%s (%dB > %dB; generated region markers unbalanced, so priced whole; no line cap for this class)\n", f, sz, cb
+              else if (cl>0) printf "%s (%dB %dL > %dB/%dL)\n", f, sz, l[f]+0, cb, cl
+              else      printf "%s (%dB > %dB; no line cap for this class)\n", f, sz, cb } } }
+  ' <(printf '%s\n' "$cbytes") <(printf '%s\n' "$clines") <(printf '%s\n' "$gen6"))
 fi
 derive_waived 6 "$bad6"; bad6="$_UNWAIVED"
 # TWO BRANCHES, because the two classes have DIFFERENT remedies and a message is the only thing a

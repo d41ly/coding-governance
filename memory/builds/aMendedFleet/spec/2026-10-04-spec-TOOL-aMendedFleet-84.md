@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-84 — hygiene check 6 prices a build README by its authored bytes, so generated regions never bill the cap
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 84
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 84
 
 <!-- gen:spec-records -->
 

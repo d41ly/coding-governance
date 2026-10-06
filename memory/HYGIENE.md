@@ -197,7 +197,13 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    `BUILD_README_CAP_BYTES` (25 KB) with `BUILD_README_CAP_LINES` at 0, which means NO independent
    line cap for that class; and a codebase-map dossier ≤ `DOSSIER_CAP_BYTES` (20 KB) with no line cap,
    reached only where a map is adopted and guarded on a non-empty prefix, because an unguarded selector
-   would hand the dossier bound to the whole tree. A cap that is not a whole number, or a zero BYTE cap, is refused before
+   would hand the dossier bound to the whole tree. A build README is priced by its authored bytes:
+   its `wc -c` figure less every line from a `<!-- gen:build-index -->`, `<!-- gen:build-order -->`
+   or `<!-- gen:build-edges -->` marker through its matching close, and less the front matter's
+   `ids:` line, so the generated half never bills the cap at any roster size; a README whose pairs
+   do not balance is priced whole. This check does NOT verify that a region's bytes really are
+   generated — check 9 does, by re-rendering the three regions and byte-comparing them
+   (TOOL-aMendedFleet-84). A cap that is not a whole number, or a zero BYTE cap, is refused before
    any check runs: the gate exits 2 naming the key rather than reporting a tree it could not
    measure (grandfather:
    `curation-debt.txt` exempts either). A guide is MANDATORY reading the charter points a session at,
