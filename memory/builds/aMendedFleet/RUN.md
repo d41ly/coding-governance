@@ -650,3 +650,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T06:24:55Z brief · item TOOL-aMendedFleet-92 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
 
 2026-10-06T06:35:17Z dispatch · item c3aca471 TOOL-aMendedFleet-92 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/drift-audit/drift_report.py tools/drift-audit/selftest.py tools/drift-audit/README.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-92.md memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-92-1-acceptance-ledger.md memory/LIVE.md memory/builds/aMendedFleet/README.md
+
+2026-10-06T07:06:01Z brief · item TOOL-aMendedFleet-93 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
