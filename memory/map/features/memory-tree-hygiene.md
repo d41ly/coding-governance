@@ -41,16 +41,15 @@ globs = [
 
 One shell engine over the tracked contents of `<MEMORY_ROOT>/`, plus the epoch rule that makes its
 verdicts datable. How many numbered checks it carries is derivable from the engine and is not
-written here, for the same reason the H1 stopped saying it. Several of them delegate to sibling
+written here. Several of them delegate to sibling
 Python modules (`gen_build_index.py`, `corpus_ids.py`, `gotchas.py`, `row_grammar.py`, `transition_audit.py`);
 this dossier owns the engine, its self-test, the epoch and the transition audit, not the other modules.
 
-**One leg here belongs to a module this dossier does NOT own**, and that is deliberate rather than
-an oversight to tidy away. `backlog migration selftest` runs `migrate_backlog.py --selftest`, the
+**One leg here belongs to a module this dossier does NOT own**, deliberately. `backlog migration selftest` runs `migrate_backlog.py --selftest`, the
 suite of the shards-to-builds migration PLANNER and of the relocation ENGINE that lives beside it in
 the same module. The leg is CLAIMED here because that module has no dossier of its own and an
 unclaimed key reds the map's coverage gate; it is DECLARED in `tools/memory-tree/kit.toml` beside
-its four module-selftest siblings rather than exempted in the govkit registry, because the module
+its module-selftest siblings rather than exempted in the govkit registry, because the module
 ships to every memory-tree adopter and each of them runs `--plan` in their own deployer build
 (`TOOL-dDerivedDocket-11` fork F8). It is held like those siblings, by `subject = kit`, so no plain
 bar executes it. Its ceiling is pinned at or under the direct-check bound the unattended kit's
@@ -75,8 +74,8 @@ the suite's own scratch tree, one invocation per arm, never over an archive of t
 (`TOOL-aRatifiedRulings-3`), so a red in the live corpus cannot red an arm that grades a conf key.
 Three arms in that block grade the SHIPPED `.memory-tree.conf.example` instead, and they are
 parity rather than behaviour: every key the engine validates, every bare `*_CUTOFF` it presets, and
-— since `TOOL-dDerivedDocket-50` — every key the kit's PYTHON modules read out of a dict must be
-declared there, or named on that arm's own exemption list, which is asserted in both directions so a
+every key the kit's PYTHON modules read out of a dict (`TOOL-dDerivedDocket-50`) must be declared
+there, or named on that arm's own exemption list, which is asserted in both directions so a
 name nothing reads any more reds too. The python arm's receiver is deliberately UNCONSTRAINED: a
 module reaching for a SECOND kit's conf cannot bind it to `conf`, that name being taken by its own,
 so a `conf`-anchored derivation is blind to exactly the cross-kit read the arm exists to catch. Its
@@ -89,38 +88,35 @@ set in the file, because a project conf must not be able to spoof which engine g
 
 ## The size caps — four classes, one line bound
 
-Check 6 is the part that moves most, so it is the part worth writing down.
-
 | class | byte bound | line bound |
 |---|---|---|
-| `guides/*.md` | `GUIDE_CAP_BYTES`, 96 KB (98304) by default | `GUIDE_CAP_LINES`, 1200 by default |
+| `guides/*.md` | `GUIDE_CAP_BYTES`, 96 KB default | `GUIDE_CAP_LINES`, 1200 by default |
 | `builds/*/README.md` | 25 KB (hardcoded) | none |
 | `<MAP_ROOT>/features/*.md` | `DOSSIER_CAP_BYTES` | none |
 | every other row document | `ROW_DOC_CAP_BYTES` | none |
 
 `cl = 0` in the awk means the class has NO line bound, and the comparison is guarded
-(`b>cb || (cl>0 && l>cl)`) so a zero can never read as "everything is over". The message splits on the
-same variable, printing one bound or two.
+(`b>cb || (cl>0 && l>cl)`) so a zero can never read as "everything is over".
 
 **Both byte bounds are DECLARED and neither can be switched off.** They pre-set to the kit default,
 the conf is sourced OVER that, and then a helper re-normalises: blank resolves FORWARD to the default
 rather than skipping the check, and a non-numeric or zero value refuses with `exit 2` naming the key.
 That is deliberately the OPPOSITE of every measured pin in the same conf block, where blank means
 skip — because a cap an adopter can disable by emptying a line is a gate that reports green for a tree
-nobody is checking, and `project/curation-debt.txt` is already the deliberate per-file exemption.
+nobody is checking, and `project/curation-debt.txt` is already the deliberate per-file exemption
+(`TOOL-aRelaxedShard-1`).
 
-**That exemption is now GRADED rather than granted.** A listed file stays IN checks 6, 7 and 8; the
+**That exemption is GRADED rather than granted.** A listed file stays IN checks 6, 7 and 8; the
 findings are partitioned by leading path into the unwaived ones, which fail as before, and the waived
 ones, which are RECORDED. A row that recorded nothing reds as stale, because a row hiding nothing has
-stopped shrinking — the `TOOL.md` row was listed for a byte cap raised past it the same day and
-outlived its own fault by three weeks. The partition helper assigns to a global and returns nothing:
+stopped shrinking. The partition helper assigns to a global and returns nothing:
 a command substitution or a pipe would run it in a subshell and drop every write, leaving a guard
 that reds every row. The per-row report names which of the three each row EARNS, which is how an
 over-wide waiver is made visible without failing a row whose remedy is an open owner call.
 `TOOL-cGradedDebt-1`.
 
-**Check 8 reports its graded ROW count.** `pop_guard` counts shard FILES, so a waiver covering 438
-of 499 rows reported green over an 88% waived population and printed no number at all. The count
+**Check 8 reports its graded ROW count.** `pop_guard` counts shard FILES, so without it a mostly
+waived row population reports green and prints no number. The count
 rides a sentinel line out of the same awk, summed across `xargs` invocations because each runs its
 own `END`, and stripped before the findings are read.
 
@@ -131,25 +127,19 @@ alternatives under the same emptiness guard for the same reason.
 
 ## Constraints & why
 
-**The row line bound is retired, and that was a decision rather than a tidy-up.** At check 7's
-300-char entry budget a 250-line row document may hold 75,000 B, so the byte figure decided every real
-case and the line figure needed rows averaging under 82 B — measured on this corpus's backlog rows at
-253.7. But it DID bind: over check 6's 29-member row class, 22 sat below the 81.92 B/line break-even
-and were line-bound first, every codebase-map dossier among them. `TOOL-aWidenedGuide-1` had refused
-to triple the row allowance for exactly that reason. `TOOL-aRelaxedShard-1` reverses that refusal
-after the owner was shown the population, and buys the dossier sub-population its own tighter bound so
-the relaxation lands on the backlog shards and the decision log that asked for it.
+**Row documents carry no line bound** (`TOOL-aRelaxedShard-1`, which measured the population and
+reverses `TOOL-aWidenedGuide-1`'s refusal). The byte figure decides every real row document; the
+line figure bound first only where rows are short, so the codebase-map dossiers take their own
+tighter byte bound and the relaxation lands on the backlog shards and the decision log.
 
-**The byte axis had never been armed.** Every check-6 fixture in the suite was a line-axis
-construction, so the bound that actually fires in production had no test behind it. Retiring the row
-line bound made fixing that mandatory rather than merely worthwhile, because the one row-class fixture
-carried three contracts asserted THROUGH check 6 naming it — that `RUN.md` enters `index_set` at all,
-that check 7 exempts it, and the per-class scoping control — and all three would have gone quiet
-together while every arm still passed.
+**The byte axis is armed for row documents.** The row-class fixture carries three contracts
+asserted THROUGH check 6 naming it — that `RUN.md` enters `index_set` at all, that check 7 exempts
+it, and the per-class scoping control — so a fixture on the wrong axis silences all three while
+every arm still passes.
 
 **A verdict has an epoch.** The kit version dates what the engine decided, so a diff moving a
 non-comment line of the engine must move `KIT_MEMORY_TREE_VERSION` too; `hygiene-parity.test.sh`
-derives its baseline floor from that constant, and a stale one put the floor before the change.
+derives its baseline floor from that constant, so a stale one puts the floor before the change.
 
 **`--offenders` runs the full check and prints only keys.** One `check <n><TAB><key>` per offender a
 failing check lists, line locators stripped, headers and `… and` lines dropped, a repeat carrying
@@ -159,10 +149,9 @@ The merge bar's red attribution grades this leg with it as a SET. `TOOL-dDerived
 ## Shared seams
 
 - `.memory-tree.conf` — the one declaration both this engine and the sibling Python modules read.
-  The engine's own keys pre-set defaults and the conf is sourced OVER them, which means a blank line
-  OVERRIDES a default with blank. Every measured pin uses that as "skip this check"; the two cap keys
-  must not be skippable, so they are re-normalised after the source instead. Anything adding a
-  non-skippable key to this file needs the same step, and inherits the same trap if it forgets.
+  The engine's own keys pre-set defaults and the conf is sourced OVER them, so a blank line
+  OVERRIDES a default with blank; a non-skippable key needs the re-normalising step the two cap keys
+  take, and inherits the same trap if it forgets.
 - `MAP_SUB` — resolved once, near the top, from `.codebase-map.conf`'s `MAP_ROOT` and only when that
   root is a DIRECT child of the memory root. Both check 6's dossier class and check 7's `ex7`
   exemption key on it, and both guard it for emptiness, because an empty prefix matches every path.
@@ -171,7 +160,7 @@ The merge bar's red attribution grades this leg with it as a SET. `TOOL-dDerived
   be the drift class the kit exists to remove.
 - `KIT_MEMORY_TREE_VERSION` — read by `check-verdict-epoch.sh`, `check-kit-versions.sh` and
   `hygiene-parity.test.sh`, and mirrored as a `gov:kit memory-tree@<v>` marker in every shipped
-  template. One constant, four consumers.
+  template.
 - `BACKLOG_MODE` — the declared layout of an ask, and therefore the population of checks 4, 6, 7, 8,
   10, 13, 15, 20 and 24. The engine resolves it ONCE into `BMODE` (blank reads `shards`) and every
   check reads that; the Python modules read the same key through `backlog.read_conf`, lazily
@@ -203,16 +192,13 @@ that exited 0 having done nothing is refused too. Check 21's `_b21rc` and `n21` 
 
 ## Check 26 — the transition-merge audit
 
-Numbered 25 until the second merge with main, where the reader inventory (`TOOL-dGatedProse-1`)
-had landed under 25 first.
-
-`transition_audit.py` is the one delegate whose population is the commit GRAPH rather than the
+`transition_audit.py` (`TOOL-dDerivedDocket-9`) is the one delegate whose population is the commit GRAPH rather than the
 tracked tree, and the one that is DARK until a project sets `BACKLOG_MODE=builds`. It classifies a
 merge as a TRANSITION by LINEAGE — some parent's lineage holds a shards-mode commit touching the
 watched paths, and some other parent's holds a builds-mode commit — never by a parent's tip conf,
 because a straggler that pulled the new conf early has a builds-mode tip and shards-mode content.
 
-Three properties are worth knowing before touching it. It pins the DEREFERENCE the way the
+It pins the DEREFERENCE the way the
 unattended kit's history leg does (`--no-replace-objects` plus an empty `GIT_GRAFT_FILE`), and both
 halves are armed by fixtures that re-parent a merge and then expect the audit to see through it.
 Its WATCHED PATHS are the backlog directory plus the FAMILY-named rotated archives alone: widening
@@ -222,20 +208,20 @@ keyed by merge sha and a module `CACHE_EPOCH` — never the verdict, which a lat
 changes.
 
 The memory-recall kit is a hard prerequisite under `builds` and is resolved EAGERLY, before any
-merge is classified. Resolving it lazily was measured as a defect: a warm delta cache answers every
-merge without keying a row, so a tree whose recall kit had been deleted reported a clean audit. The
+merge is classified: resolved lazily, a warm delta cache answers every merge without keying a row,
+so a tree with no recall kit reports a clean audit. The
 kit descriptor carries a `requires_if` edge naming that prerequisite, which govkit's selfcheck
 grades and which installs nothing.
 
 The commit-time carrier is the tracked `commit-msg` hook, which is the one hook a clean `git merge`
 and a conflicted merge concluded by `git commit` both reach — `pre-commit` never fires on the clean
-one, measured with git 2.54. It derives every path it uses and announces a skip rather than blocking
+one (`TOOL-dDerivedDocket-9`). It derives every path it uses and announces a skip rather than blocking
 a commit when the kit or a python launcher is missing.
 
 ## The straggler layer — instructing a branch before its merge
 
 Check 26 finds a lost row AFTER a pre-flip branch has merged. `.githooks/straggler-guard.sh` is the
-layer that reaches that branch beforehand, sourced by `pre-commit`, the new `pre-rebase` and
+layer that reaches that branch beforehand, sourced by `pre-commit`, `pre-rebase` and
 `pre-push` through the CALLING HOOK's own directory rather than through the committing tree — a
 pre-flip branch carries the old kit, so a rule resolved through `$top` could never reach it. It
 reads git objects only and decides three predicates: FLIPPED (the default branch's committed conf
@@ -264,17 +250,14 @@ at the merge bar is what guarantees. These layers instruct; the bar decides.
   missing its evidence — and never the truncation, so the message points away from the cause.
   Class: `inline-fence-swallows-the-rest-of-the-file.md`.
 
-- The `builds/*/README.md` class at 25 KB has no byte-axis arm either — `TOOL-aRelaxedShard-2`. A
+- The `builds/*/README.md` class at 25 KB has no byte-axis arm — `TOOL-aRelaxedShard-2`. A
   class whose ONLY bound is bytes is currently unarmed.
 - Checks 6 and 7 measure RAW working-tree bytes, so an adopter without the `eol=lf` pin gets a
   platform-dependent cap: a CRLF checkout adds one byte per line — `TOOL-aRootedPrefix-3`.
-- CLOSED by `TOOL-cSpliceWarden-2`: check 10 resolved a rotated index's live counterpart by fixed
-  path, so it was blind to every `backlog/*.md` shard — it graded 1 of 4 archives here and skipped 3
-  in silence. It now resolves by BASENAME anywhere under the memory root, names a stem that resolves
-  to zero or several rather than skipping it, admits a same-day disambiguator after the date, and
-  reads the reference from the index PREAMBLE instead of a fixed `head -3`. The last two were unfiled
-  and the fourth was found only by running the candidate over the real tree, where fixing the path
-  alone reds three files and two of those reds are false.
+- Check 10 resolves a rotated index's live counterpart by BASENAME anywhere under the memory root,
+  names a stem that resolves to zero or several rather than skipping it, admits a same-day
+  disambiguator after the date, and reads the reference from the index PREAMBLE
+  (`TOOL-cSpliceWarden-2`); a fixed path is blind to every `backlog/*.md` shard.
 - Check 10 grades ANNOUNCEMENT, never CONTENTS. Nothing in this engine asserts that an archive holds
   what the declared `ROTATION_MODE` says it should: the key is validated against its closed set and
   then read by no check — `TOOL-cSpliceWarden-6`.

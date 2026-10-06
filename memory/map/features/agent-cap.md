@@ -63,33 +63,25 @@ disagrees with it is worse than no predicate.
 
 **TWO MODALITIES, because there are two ways a session spawns agents.** A `Workflow` call carries a
 script, so it is read STATICALLY. A direct `Agent` call carries no script, so it is COUNTED at
-runtime. The matcher is therefore the exact-string list `"Workflow|Agent"` in one group. For a whole
-release it was wired on `Workflow` alone, and a session fanning out with direct `Agent` calls met
-no rule at all.
+runtime. The matcher is therefore the exact-string list `"Workflow|Agent"` in one group: wired on
+`Workflow` alone, direct `Agent` calls meet no rule at all.
 
 **Concurrency is not a budget.** `boundedParallel(thunks, 5)` bounds how many run at once; N findings
 still spawn N agents, five at a time. The two rules are separate for that reason, and the arity one
 is the one reviews break.
 
 **The static half READS THE NUMBER, in all three places a bound is written** — the helper call site,
-the helper's own default parameter, and the width a `gov:bounded-fanout` line claims. Until kit 1.2 it
-read none of them: `CAP` reached the remediation text and decided nothing, so two shipped harnesses
-bound their own caps from an `<expr> || 5` fallback — a constant to the guard, a knob to the runtime —
-and a caller could raise the verifier count past a BINDING cap with every gate green. That binder form
-no longer resolves as a bound, for every consumer.
+the helper's own default parameter, and the width a `gov:bounded-fanout` line claims. An
+`<expr> || 5` fallback never resolves as a bound: it is a constant to the guard and a knob to the
+runtime, so a caller could raise the verifier count past a BINDING cap with every gate green.
 
 **All THREE markers are CLAIMS whose shape is checked, never exemptions.** `gov:sequential-agents`
-is the newest and the only one admitting a loop; its bound resolves through the same `boundedK` as
-every other, and its weight is carried by the bounded RECEIVER clause and the one-call sweep rather
-than by the number an author typed. `gov:fixed-verifiers` was always
-shape-checked; `gov:bounded-fanout` used to return early and exempt its line outright, so a line
-slicing fifty wide passed unread. Asymmetry between markers doing the same job is how one of them
-becomes a password.
+is the only one admitting a loop; its bound resolves through the same `boundedK` as every other, and
+its weight is carried by the bounded RECEIVER clause and the one-call sweep rather than by the number
+an author typed. Asymmetry between markers doing the same job is how one of them becomes a password.
 
 **The cap is a FILE CONSTANT and a set `AGENT_CAP` is refused, not ignored.** An environment-settable
-ceiling is the defeatable class this guard exists to remove, and it leaves no diff behind. The header
-advertised that override for two releases after it stopped deciding anything — how a silently-ignored
-knob survives.
+ceiling is the defeatable class this guard exists to remove, and it leaves no diff behind.
 
 **The runtime half claims a NUMBERED SLOT with `O_EXCL`; it does not count.** Read-then-decide loses
 updates, as `TOOL-aNumeralWarden-1` measured. Create-a-token-then-count does not fix it: six concurrent processes each observe a count
@@ -107,8 +99,7 @@ every spawn on a filesystem hiccup is worse than the burst it prevents.
 reads a Workflow script statically; `scratch-guard.js` bounds where agent scratch may be written
 and reads a shell command string. Both deny by stderr plus exit 2, both fail OPEN on stdin
 they cannot parse, and both are matched on a `|`-joined pair of exact tool names because a guard
-wired to one modality leaves the same act available through the other — the lesson `agent-cap`
-learned when `Workflow` alone left direct `Agent` spawns unguarded. The kit entry is still named
+wired to one modality leaves the same act available through the other. The kit entry is still named
 `agent-cap` and versions the whole home: `version_from` is entry-level and single-valued, so a
 second constant would be invisible to govkit rather than gated by it. Each wiring is a
 `harness-hooks` claim.
@@ -124,7 +115,7 @@ target, an absent or replay-written card, then the sentinel-or-mismatch test, an
 exemption — the commit that CREATES a build README carrying `authorized-by:` with a value in the
 unattended driver's `SECOND_ANCHOR_MODES`, pinned by a parity arm. An ABSENT card and a
 replay-written one ALLOW, with a witness line that reaches the debug log and the self-test only:
-a deny on either refused this build's own landing run, with a remedy it could not run. The drive
+a deny on either names a remedy an unattended landing cannot run. The drive
 fold is `buildComparablePath`'s own step, applied to the `-C` target and `cwd` BEFORE the walk and
 to both toplevels before the compare; there is no second normaliser.
 
@@ -156,15 +147,11 @@ is not in the kit — a hook wired to nothing is indistinguishable from a hook t
 and the settings file looks correct either way. `check-hook-destinations.sh` quantifies over
 both populations, fragments AND the adopter scripts that write hook commands, because a kit
 that installs its hook from a script rather than a fragment is otherwise ungraded.
-TOOL-dRetiredFork-14/21 moved these destinations out of `.claude/hooks/` and into the shipping
-kit dir, which is what made a checker necessary rather than merely tidy.
-
 
 `topLevelArgs` in `tools/hooks/agent-cap.js` is the ONE splitter: it splits on top-level commas and
 drops a trailing empty segment. Both the call-site argument walk and the array-literal element counter
-call it, which keeps "what is an element" a single answer. It exists because the two disagreed —
-the `trailing-comma-counted-as-an-element` class, whose worst instance was the element counter's
-off-by-one being normalised into `MAX_LENSES = 6`.
+call it, which keeps "what is an element" a single answer against the
+`trailing-comma-counted-as-an-element` class.
 
 `boundedK` is the one resolver for every bound the file reads — the marker's K, the call-site
 argument and the default parameter. Adding a consumer means adding a call site, never a second
@@ -189,9 +176,9 @@ that no longer states the rule.
 
 The FIFTH rule is the ref-keyed verdict join, lifted from `tools/workflows/check-review-join.sh` by
 `TOOL-dTieredTribunal-14`. It is last because it is the cheapest failure to recover from: the four
-rules above it prevent a BURST, while a mis-keyed join is a wrong verdict that costs a re-run. Adding
-it required INVERTING the raw-primitive block, which alone was written as an early exit-0 and so made
-any later rule unreachable for the scripts the join ban exists to judge. A `--only=<rule>` selector
+rules above it prevent a BURST, while a mis-keyed join is a wrong verdict that costs a re-run. The
+raw-primitive block is never an early exit-0, which would make every later rule unreachable for the
+scripts the join ban judges. A `--only=<rule>` selector
 over a closed set lets the file gate share this predicate instead of re-implementing it, and a WIRED
 command may never carry it — `tools/check-wiring.sh` asserts that, because narrowing a wired hook
 turns the cap rules off with no diff.
@@ -231,41 +218,31 @@ turns the cap rules off with no diff.
 - **The static scan cannot size a dynamically-built array**, by construction. It enforces "use the
   helper" instead, which kills the `parallel(items.map(...))` shape that causes the bursts.
 - **Block comments naming a primitive still trip rule 1.** Line comments and quoted strings are
-  stripped before the scan; block comments are not. Benign and fail-closed, so it stays. **What was
-  NOT fail-closed, until `TOOL-dMispairedQuote-1`:** an apostrophe inside such a comment paired with
-  the quote opening `agent('a'` and blanked the `parallel(` between them, so a block comment carrying
-  a contraction admitted the fan it was supposed to over-report. Fail-closed was the posture and not
-  the behaviour.
+  stripped before the scan; block comments are not. Benign and fail-closed, so it stays; an
+  apostrophe inside one that pairs with a later quote is the residual below (`TOOL-dMispairedQuote-1`).
 - **`renderCodeView` models no regex literal, so rule 2 falls back for such a script.** It inherits
   `blankLiterals`' code-mode branch set, which tests `//`, `/*`, a backtick and the two quote
   characters and nothing else — a backtick inside `/…/` therefore opens template mode and never
-  closes. Failing closed on that was measured to DENY a legal harness, so an unterminated scan
-  instead falls back to the per-line `stripStrings` view and returns the verdict this hook reached
-  before rule 2 moved. The residual is precision, not safety: such a script is judged at the old
-  view's accuracy, and prose punctuation inside it can still be read as structure. `TOOL-aLexedStripper-5`.
-  **The "precision, not safety" half was refuted by measurement** (`TOOL-dMispairedQuote-1`): prose
-  punctuation read as structure was a SAFETY loss on four of the five rules, reproduced at exit 0
-  including a declared cap of 50 read as the helper default of 5. `-5`'s ratified "cannot regress in
-  either direction" argument about this fallback is superseded, because the per-line view it rests on
-  has been re-based.
+  closes. Failing closed on that DENIES a legal harness, so an unterminated scan falls back to the
+  per-line `stripStrings` view (`TOOL-aLexedStripper-5`). The residual is SAFETY, not only
+  precision: prose punctuation read as structure can admit on four of the five rules, as
+  `TOOL-dMispairedQuote-1` measured.
 
 - **Two residuals survive the quote rule, both stated rather than closed** (`TOOL-dMispairedQuote-1`).
   `resolveLiteralEnd` opener-tests only the OPENING quote, so a mispairing needs ONE apostrophe in a
   legal opener position before the fan-out and ANY unescaped quote of the same kind after it. And the
   keyword clause admits a quote after `return`, `case`, `throw` and eight more, every one of which is
-  also an English word — `/* throw 'em */` mispairs. A THIRD, found by the closing diff review: an
-  apostrophe after an operator is in a legal opener position, so `/* rock - 'n roll */` mispairs too. Both are fixtured one arm per member of the
-  declared set rather than sampled, and neither is a regression: all of them admit at the pre-fix
-  revision too. What bounds the consequence is the next bullet.
+  also an English word — `/* throw 'em */` mispairs. A third: an apostrophe after an operator is in
+  a legal opener position, so `/* rock - 'n roll */` mispairs too. Each is fixtured one arm per
+  member of the declared set; none is a regression. What bounds the consequence is the next bullet.
 - **Each view exists TWICE, and that is the mechanism rather than duplication**
   (`TOOL-dMispairedQuote-3`). `renderShippedLine`, `renderShippedView` and `renderShippedBlanks` are
   the pre-fix bodies, frozen and byte-compared against the BASE blob by an arm; `renderStrippedLine`,
   `renderLexedView` and `renderBlankedView` are the corrected ones; and three one-line dispatchers
   over a module-level `VIEW_MODE` choose between them. `runBothViews` runs every rule under both and
   merges, so a denial from either stands. Correcting what counts as a string literal un-hides
-  delimiters as well as fan-outs — three DENY-to-ADMIT moves were reproduced against the corrected
-  views alone — and this makes the change monotone in the DENY direction by construction rather than
-  by argument. The property is gated over the whole tracked corpus plus its own fixtures.
+  delimiters as well as fan-outs, so the corrected views alone can ADMIT what the old ones denied;
+  running both makes the change monotone in the DENY direction by construction. The property is gated over the whole tracked corpus plus its own fixtures.
 
 ## Reuse affordance
 
@@ -276,14 +253,11 @@ seam: agent-cap.boundedK — reuse to resolve a source token to an integer bound
 literal or a file-bound constant never reassigned; extend by adding a CALL SITE, never a second
 resolver, and note that it deliberately refuses an `<expr> || <int>` fallback as a bound.
 
-The MARKED-DERIVATION receiver is the same class one level out, and it was defeated the same way
-until `TOOL-dTieredTribunal-13`. A marked assignment may derive its receiver from a value already
-proven bounded, because a `.filter()` or a `.slice()` cannot grow an array. The branch used to accept
-when ONE non-self reference was bounded, so it never examined the others: a marked ternary whose
-other arm was caller-supplied passed, and an args-supplied array of any length then reached `agent()`
-once per element. That is a caller-settable knob wearing a constant's clothes, which is exactly what
-the `<expr> || <int>` binder was deleted for. Every top-level value branch is now judged on its own
-text against a closed list of three forms, and a branch the walk cannot delimit never qualifies.
+The MARKED-DERIVATION receiver is the same class one level out (`TOOL-dTieredTribunal-13`). A marked
+assignment may derive its receiver from a value already proven bounded, because a `.filter()` or a
+`.slice()` cannot grow an array. Every top-level value branch is judged on its own text against a
+closed list of three forms, so a ternary whose other arm is caller-supplied does not pass, and a
+branch the walk cannot delimit never qualifies.
 seam: check-verifier-fanout.delegation — reuse the shape whenever a merge-bar gate and a live hook
 must apply ONE rule: the gate builds the hook's payload and runs the hook, so there is never a second
 implementation to drift.

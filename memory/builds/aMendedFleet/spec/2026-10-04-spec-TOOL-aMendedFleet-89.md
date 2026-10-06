@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-89 — measured history leaves the dossiers near the byte cap for the records that measured it
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 89
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 89
 
 <!-- gen:spec-records -->
 

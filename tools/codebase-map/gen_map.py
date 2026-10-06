@@ -128,6 +128,9 @@ inventories: `{kit}/map_extractors.py`; gate: see `.codebase-map.conf` GATE_FILE
 - Dossier prose carries no present-tense typed count of an inventory population (gate-enforced,
   digits only). Remedy, one of: freeze it as a past-tense reading that cites the record which
   measured it; point at the file that owns it; or rewrite the sentence without it.
+- Measured history lives in the record that measured it. A dossier states each constraint and its
+  reason in the present tense and cites that record's id; when, where and on which node a figure was
+  measured, and the incident behind a rule, stay in the record, never copied into the dossier.
 """
 
 
