@@ -300,6 +300,11 @@ ORIGIN_DIR=$(mktemp -d); ORIGIN="$ORIGIN_DIR/origin.git"
 # ADV_HEAD is empty, check 15's second half is guarded off and check 9's ancestor-of-HEAD branch
 # is unreachable. The driver test carries the same line for the same reason.
 git init -q --bare "$ORIGIN"
+# An identity on the BARE repo too: check 9's ghost-tip arm runs `commit-tree` INSIDE it, and a bare
+# repo inherits nothing from the worktree, so on a host with no global identity $ghost comes back
+# empty. The driver test carries the same two lines for the same arm shape.
+git --git-dir="$ORIGIN" config user.email t@t.test
+git --git-dir="$ORIGIN" config user.name t
 # SEPARATE LINES, not an && chain: chained, a non-zero from symbolic-ref silently skips the push,
 # `refs/remotes/origin/main` never exists, and the merge-base below resolves EMPTY — which showed
 # up as 33 arms failing with "records no BASE" rather than as anything about this line.

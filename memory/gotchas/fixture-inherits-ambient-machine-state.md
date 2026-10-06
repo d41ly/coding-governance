@@ -79,3 +79,13 @@ clones the tree with `git clone --local` into a temp root on `C:`, and from `D:`
 runner had no such directory. Fixed host-side, as the `bar` job already was: the held job clones to
 the same `PRIMARY_TREE`. The checkout's path, and the volume it shares with the temp root, join the
 list above.
+
+## It bit again in the check suite's ghost-tip arm
+
+`tools/unattended/check-unattended.test.sh` built its bare origin with no identity, and its check-9
+ghost-tip arm runs `git --git-dir="$ORIGIN" commit-tree` inside it. On the hosted runner, which has
+no global identity, shard 2/8 of the held job printed `unable to auto-detect email address`, `$ghost`
+came back empty, and `update-ref` printed `not a valid SHA1`. Fixed with the driver suite's two
+`config user.` lines on the bare repo. The "Where it bit" paragraph above is no longer true of node
+`a`: it now carries a global identity, so only an emptied global config
+(`GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1`) reproduces the failure there.

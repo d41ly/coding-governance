@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-100 — the shard 2/8 fixture's bare origin commits under its own git identity
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · order 101
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · order 101
 
 <!-- gen:spec-records -->
 
