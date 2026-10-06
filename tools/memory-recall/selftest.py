@@ -127,7 +127,7 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 81
+SELFTEST_ARMS = 83
 # 34 -> 58 on 2026-08-24 (adopter ic's recall contrib branch): twenty-four arms — twenty-three ported from
 #   adopter ic's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
@@ -170,6 +170,9 @@ SELFTEST_ARMS = 81
 #   a rank-2 citation counts, an id the row's own terms spell does not (a longer id containing it
 #   does not hold it), a reflog-less row and a row older than its reflog are unattributed, an absent
 #   log and an all-unattributed log both exit 2, and the log is unchanged.
+# 81 -> 83 on 2026-10-06 (TOOL-aMendedFleet-82): TWO arms over `--used`'s head-ancestry arm - a
+#   removed worktree's row is attributed through the one child of its logged `head`, and a `head`
+#   with two children after the query counts the row ambiguous and credits neither.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -3270,6 +3273,62 @@ def test_used_joins_answers_to_the_next_commit():
         cleanup(root)
 
 
+def run_used_after_worktree_removed(twin: bool):
+    """TOOL-aMendedFleet-82's fixture: a linked worktree logs one query row carrying its `head`,
+    commits a citation of the row's first result id, and is removed with `git worktree remove`.
+    `twin` adds a second child of `head` on another branch, made after the row's `at` too."""
+    root, kitdir = make_repo()
+    wt = root.parent / (root.name + "-wt")
+    try:
+        git = ["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t"]
+        subprocess.run([*git, "commit", "-qm", "seed"], check=True, capture_output=True)
+        subprocess.run([*git, "worktree", "add", "-q", "-b", "wt", str(wt)], check=True, capture_output=True)
+        head = query.read_worktree_head(wt)
+        log = git_common_dir(root) / "recall" / "queries.jsonl"
+        log.parent.mkdir(parents=True, exist_ok=True)
+        at = datetime.datetime.now(datetime.UTC).isoformat(timespec="seconds")
+        log.write_text(json.dumps({"qid": 1, "at": at, "type": "query", "query": "q", "terms": [],
+                                   "worktree": str(wt), "head": head,
+                                   "results": [{"set": "records", "id": "TOOL-aFoo-2"}]}) + "\n",
+                       encoding="utf-8", newline="\n")
+        (wt / "notes.md").write_text("cites TOOL-aFoo-2\n", encoding="utf-8", newline="\n")
+        wgit = ["git", "-C", str(wt), "-c", "user.email=t@t", "-c", "user.name=t"]
+        subprocess.run([*wgit, "add", "notes.md"], check=True, capture_output=True)
+        subprocess.run([*wgit, "commit", "-qm", "add notes"], check=True, capture_output=True)
+        if twin:
+            tree_sha = subprocess.run([*git, "rev-parse", f"{head}^{{tree}}"], capture_output=True,
+                                      text=True, encoding="utf-8", check=True).stdout.strip()
+            kid = subprocess.run([*git, "commit-tree", tree_sha, "-p", head, "-m", "sibling"],
+                                 capture_output=True, text=True, encoding="utf-8", check=True).stdout.strip()
+            subprocess.run([*git, "branch", "twin", kid], check=True, capture_output=True)
+        subprocess.run([*git, "worktree", "remove", str(wt)], check=True, capture_output=True)
+        return head, run(root, kitdir, "--used")
+    finally:
+        cleanup(wt)
+        cleanup(root)
+
+
+@check("--used attributes a removed worktree's query row by its logged head's one child")
+def test_used_attributes_a_removed_worktree_by_head():
+    """TOOL-aMendedFleet-82 AC3. Observed RED as `not measured` with the row's `head` deleted."""
+    head, p = run_used_after_worktree_removed(twin=False)
+    assert head and re.fullmatch(r"[0-9a-f]{40,64}", head), f"no head read from the worktree: {head!r}"
+    assert p.returncode == 0 and "answer-used: 1 of 1" in p.stdout, f"wrong figure: {p.stdout}{p.stderr}"
+    assert "attributed by head ancestry: 1 · ambiguous head: 0" in p.stdout, f"wrong head line: {p.stdout}"
+    return p.stdout.splitlines()[0]
+
+
+@check("--used counts a head with two children after the query as ambiguous, crediting neither")
+def test_used_counts_two_head_children_ambiguous():
+    """TOOL-aMendedFleet-82 AC4. Observed RED as `answer-used: 1 of 1` with the earliest child
+    credited instead."""
+    _, p = run_used_after_worktree_removed(twin=True)
+    assert p.returncode == 2 and "answer-used: 1" not in p.stdout, f"a child was credited: {p.stdout}"
+    assert "(1 unattributed," in p.stderr, f"the ambiguous row is not unattributed: {p.stderr}"
+    assert "attributed by head ancestry: 0 · ambiguous head: 1" in p.stderr, f"wrong head line: {p.stderr}"
+    return p.stderr.strip().splitlines()[-1].strip()
+
+
 def main() -> int:
     # The live-log baseline is NOT taken here. It is taken at module scope, above the first `@check`,
     # because every arm runs at decoration time and a baseline taken in this function brackets
@@ -3323,6 +3382,8 @@ def main() -> int:
         test_the_live_log_verdict_is_total_over_its_states,
         # TOOL-aMendedFleet-34: the offline answer-used join
         test_used_joins_answers_to_the_next_commit,
+        # TOOL-aMendedFleet-82: the head-ancestry arm of `--used`
+        test_used_attributes_a_removed_worktree_by_head, test_used_counts_two_head_children_ambiguous,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
     # DECLARED-versus-RAN above is satisfied by deleting an arm from both halves; this is the

@@ -259,7 +259,7 @@ ids TOOL-aMendedFleet-108 TOOL-aMendedFleet-109
 | [PLAY-aMendedFleet-1 — the AGENTS.md wrapper's merge-bar section moves to a guide, without its repeated catalog or dated history](spec/2026-10-04-spec-PLAY-aMendedFleet-1.md) | 79 | 2 | CLOSED | rev-2 | 2026-10-04 |
 | [PLAY-aMendedFleet-2 — an experiment's instruments and result rows are committed beside its record, and the vague-brief arm gates §1 as a HIGH ask](spec/2026-10-04-spec-PLAY-aMendedFleet-2.md) | 80 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-81 — the month shards carry only what never changes after their month](spec/2026-10-04-spec-TOOL-aMendedFleet-81.md) | 81 | 1 | CLOSED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-82 — each recall query row carries the worktree's HEAD, so `--used` attributes a query after its worktree is gone](spec/2026-10-04-spec-TOOL-aMendedFleet-82.md) | 82 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-82 — each recall query row carries the worktree's HEAD, so `--used` attributes a query after its worktree is gone](spec/2026-10-04-spec-TOOL-aMendedFleet-82.md) | 82 | 1 | CLOSED | rev-3 | 2026-10-06 |
 | [TOOL-aMendedFleet-83 — the unattended close sequence lists the dossiers its range touched and did not refresh](spec/2026-10-04-spec-TOOL-aMendedFleet-83.md) | 83 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-84 — hygiene check 6 prices a build README by its authored bytes, so generated regions never bill the cap](spec/2026-10-04-spec-TOOL-aMendedFleet-84.md) | 84 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-85 — the charter states what the codebase map's ratchet binds, and stops promising an inventory that cannot rot](spec/2026-10-04-spec-TOOL-aMendedFleet-85.md) | 85 | 1 | SPECCED | rev-2 | 2026-10-04 |

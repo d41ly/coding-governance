@@ -592,3 +592,7 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T02:10:44Z dispatch · item ee94eb6e TOOL-aMendedFleet-81 · reason memory/ledger/2026-07.md memory/ledger/2026-08.md memory/ledger/2026-09.md memory/ledger/2026-10.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-81.md memory/builds/aMendedFleet/README.md memory/LIVE.md
 
 2026-10-06T02:15:06Z brief · item TOOL-aMendedFleet-82 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
+
+2026-10-06T02:22:53Z dispatch · item 731fc723 TOOL-aMendedFleet-82 · reason tools/memory-recall/query.py tools/memory-recall/README.md tools/memory-recall/selftest.py memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-82.md
+
+2026-10-06T02:29:03Z dispatch · item 731fc723 TOOL-aMendedFleet-82 · reason tools/memory-recall/query.py tools/memory-recall/README.md tools/memory-recall/selftest.py memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-82.md memory/builds/aMendedFleet/README.md

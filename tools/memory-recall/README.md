@@ -69,8 +69,10 @@ python3 <prefix>/memory-recall/query.py --used                     # was each an
 ```
 
 `--used` joins each logged query's result ids to the ids its worktree's next commit cites, in the
-message or the added lines, and reads only live reflogs, so a removed worktree's rows are counted
-unattributed rather than guessed at.
+message or the added lines, through the worktree's live reflog. When that reflog is gone, a row's
+logged `head` sha stands in: the ONE commit any ref reaches whose parents include it, committed at
+or after the query, is its next commit, and two such commits count the row as `ambiguous head`.
+A removed worktree's rows with no `head` are counted unattributed rather than guessed at.
 
 `--terms` is **required**. Rewriting is the measured half of the retrieval gain upstream (records
 recall@20 0.71 → 0.84 on its hard slice) and the CLI cannot produce the terms itself — it is offline
@@ -87,6 +89,8 @@ top-N cut was rejected: logged opens sit beyond rank 20.
 
 The cache (`records.db`, `chunks.db`, `manifest.json`) and the append-only query log
 (`queries.jsonl`) live under `<common-git-dir>/recall/`, keyed by a digest of the worktree path.
+Each query row carries its `worktree` path and `head`, the sha HEAD named at query time (`null` on
+an unborn HEAD), so the row stays attributable after `git worktree remove` takes the reflog.
 `--export`'s aggregate is written beside the log, not into the tree, so no free-text question ever
 reaches a tracked file. The one exception is one you declare: `RECALL_EXPORT_DIR` puts it in the
 tree, and the file carries counts only.

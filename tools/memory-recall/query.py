@@ -248,6 +248,22 @@ def common_git_dir(repo: pathlib.Path) -> pathlib.Path:
     return p.resolve() if p.is_absolute() else (repo / raw).resolve()
 
 
+def read_worktree_head(repo: pathlib.Path) -> str | None:
+    """The sha HEAD names in this worktree, or None on an unborn HEAD or any git failure.
+
+    Logged on every query row so ``--used`` can find the next commit by ANCESTRY once
+    ``git worktree remove`` has taken the reflog (TOOL-aMendedFleet-82). Not ``git()``: that
+    helper raises, and an unborn HEAD must not cost the query its log row.
+    """
+    try:
+        p = subprocess.run(["git", "-C", str(repo), "rev-parse", "--verify", "--quiet", "HEAD"],
+                           capture_output=True, text=True, encoding="utf-8")
+    except OSError:
+        return None
+    sha = p.stdout.strip()
+    return sha if p.returncode == 0 and sha else None
+
+
 # The query path's corpus walk lived HERE as a second enumerator and is gone: `E.corpus_inputs`
 # serves both callers, with `include_untracked=True` the one thing this path asks for.
 
@@ -1219,7 +1235,9 @@ def export(repo: pathlib.Path, tag: str) -> int:
 # query's result ids to the ids its worktree's NEXT commit cites. Offline and read-only: no index,
 # no log row, no file anywhere. A removed worktree's reflog is gone with it, so its rows are counted
 # UNATTRIBUTED rather than guessed at; a time window over `git log --all` would credit a query with
-# a concurrent session's citation.
+# a concurrent session's citation. A row that logged its `head` is the exception (TOOL-aMendedFleet-82):
+# its next commit is the ONE child of that sha committed at or after the query, and two such
+# children are AMBIGUOUS, never a pick.
 
 
 def resolve_worktree_reflog(common: pathlib.Path, worktree: str) -> pathlib.Path | None:
@@ -1283,8 +1301,9 @@ def measure_answer_used(repo: pathlib.Path) -> int:
     common = common_git_dir(repo)
     rows = [r for r in read_log(repo) if r.get("type") == "query"]
     reflogs: dict[str, list[tuple[int, str]] | None] = {}  # worktree -> commit entries, None = no reflog
-    no_id = unattributed = no_commit = 0
+    no_id = unattributed = no_commit = by_head = ambiguous = 0
     pending: list[tuple[dict, list[str], str]] = []  # (row, record ids in rank order, next sha)
+    orphans: list[tuple[dict, list[str], str, float]] = []  # reflog gone, `head` logged: ancestry
     for row in rows:
         ranked = [res.get("id") or "" for res in row.get("results") or []]
         if not any(E.ID_RE.fullmatch(i) for i in ranked):
@@ -1313,7 +1332,12 @@ def measure_answer_used(repo: pathlib.Path) -> int:
         # A row older than the reflog's first entry ran in an earlier tree at this path, or its
         # entries expired: the join key outlived its subject, so the row is not attributed.
         if not entries or at is None or entries[0][0] > at:
-            unattributed += 1
+            # TOOL-aMendedFleet-82: the reflog is gone (or is a later tree's), but a row that
+            # logged its `head` still names the commit its next commit is a child of.
+            if at is not None and row.get("head"):
+                orphans.append((row, ranked, str(row["head"]), at))
+            else:
+                unattributed += 1
             continue
         nxt = next((sha for ts, sha, is_commit in entries if is_commit and ts >= at), None)
         if nxt is None:
@@ -1321,11 +1345,35 @@ def measure_answer_used(repo: pathlib.Path) -> int:
             continue
         pending.append((row, ranked, nxt))
 
+    if orphans:
+        # ONE spawn for the whole parent map, made only when a row needs it: sha, committer time,
+        # parents. A commit no ref reaches is not here, and reads as "no commit after the query".
+        children: dict[str, list[tuple[str, int]]] = collections.defaultdict(list)
+        out = subprocess.run(["git", "-C", str(repo), "log", "--all", "--format=%H %ct %P"],
+                             capture_output=True, text=True, encoding="utf-8", check=True).stdout
+        for line in out.splitlines():
+            sha, ct, *parents = line.split()
+            for par in parents:
+                children[par].append((sha, int(ct)))
+        for row, ranked, head, at in orphans:
+            kids = {sha for sha, ct in children.get(head, []) if ct >= at}
+            if len(kids) == 1:
+                by_head += 1
+                pending.append((row, ranked, kids.pop()))
+            elif kids:
+                # Two worktrees started from one tip would credit each other's citations.
+                ambiguous += 1
+                unattributed += 1
+            else:
+                no_commit += 1
+    head_line = f"  attributed by head ancestry: {by_head} · ambiguous head: {ambiguous}"
+
     if not pending:
         print(f"answer-used: not measured — none of {len(rows)} query row(s) is attributable "
               f"({unattributed} unattributed, {no_commit} no commit after the query, "
               f"{no_id} no record id in results); a removed worktree's reflog is gone",
               file=sys.stderr)
+        print(head_line, file=sys.stderr)
         return 2
     cited = read_cited_ids(repo, sorted({sha for _, _, sha in pending}))
     used = 0
@@ -1351,6 +1399,7 @@ def measure_answer_used(repo: pathlib.Path) -> int:
           f"no commit after the query · {no_id} no record id in results")
     print("  used at rank: " + " ".join(f"{r}:{hist[r]}" for r in range(1, RESULT_CAP + 1))
           + " — a deeper rank is not logged")
+    print(head_line)
     return 0
 
 
@@ -1571,6 +1620,7 @@ def main(argv: list[str] | None = None) -> int:
             "budget": budget,
             "bytes_emitted": spent,
             "worktree": str(repo),
+            "head": read_worktree_head(repo),  # survives the worktree; `--used` reads it
             "n_hits": len(hits),
             "n_shown": shown,  # both tiers: a pointer line shows the path, so it maps to a rank
             "n_snippets": snippets,

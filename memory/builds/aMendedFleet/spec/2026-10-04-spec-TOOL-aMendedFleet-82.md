@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-82 — each recall query row carries the worktree's HEAD, so `--used` attributes a query after its worktree is gone
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 82
+**Status:** CLOSED · rev-3 · 2026-10-06 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 82
 
 <!-- gen:spec-records -->
 
@@ -25,8 +25,8 @@ survives its worktree.
   an unborn HEAD or any git failure. The query row `main` hands to `log_event` gains `"head"` with
   that value. Nothing else in the row moves, and a failure never fails the query, which is
   `log_event`'s existing contract. Observed by AC1, AC2.
-- **S2** — THE ANCESTRY ARM. In `--used`, a query row whose worktree reflog cannot be read and which
-  carries a non-null `head` is attributed by ancestry: its next commit is a commit reachable from any
+- **S2** — THE ANCESTRY ARM. In `--used`, a query row whose worktree reflog cannot be read, or whose
+  `at` predates that reflog's first entry, and which carries a non-null `head` and a readable `at`, is attributed by ancestry: its next commit is a commit reachable from any
   ref whose parents include `head` and whose committer time is at or after the row's `at`. Exactly
   one such commit attributes the row; none puts it in the existing "no commit after the query"
   bucket; more than one leaves it unattributed and counts it as AMBIGUOUS, because two worktrees
@@ -38,7 +38,8 @@ survives its worktree.
 - **S4** — THE REPORT gains a fourth line, `  attributed by head ancestry: <h> · ambiguous head:
   <m>`, below unit 34's three. The head-attributed rows count inside the first line's attributable
   figure, and the ambiguous ones inside the remainder line's unattributed figure, so unit 34's four
-  buckets still sum to the query-row count. Observed by AC3, AC4.
+  buckets still sum to the query-row count. When no row is attributable, the line follows the
+  not-measured message on stderr. Observed by AC3, AC4.
 - **S5** — `tools/memory-recall/README.md` names the `head` field where it describes the query row,
   and says `--used` reads it when a worktree's reflog is gone. Observed by AC5.
 - **S6** — `memory/map/generated/symbols.json` is regenerated for the new definition. NOT OBSERVED
@@ -179,6 +180,9 @@ New arm: `tools/memory-recall/selftest.py` · the AC3 fixture staged red by dele
   log and the query row's assembly at base.
 - rev-2 · 2026-10-04 · S7 · §7 · M2 cross-read: the two new self-test arms move `SELFTEST_ARMS`,
   as `TOOL-aMendedFleet-27` S5 moves it for its one arm; the arm line said the floor moves by none.
+- rev-3 · 2026-10-06 · S2 · S4 · build: a row older than its path's reflog is a removed earlier
+  tree's, so `head` attributes it too; AC4's fixture has nothing attributable, so the head line also
+  follows the not-measured message, or AC4 could not observe it.
 
 ## 10. Reuse audit
 
