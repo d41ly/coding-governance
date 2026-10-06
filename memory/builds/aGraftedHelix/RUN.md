@@ -89,3 +89,7 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-06T03:34:28Z decision · item unit-34-close-handoff · reason question: who runs unit 34's hand-off to the close, the pooled calibration of the five receiving shards and the eight-shard identity; options: a unit of this build, or the main loop at VERIFYING; reason: both are suite runs, which no pass may perform, and the unattended kit's README already makes the pooled suites the DoD for work touching the kit, so the close owns them
 
 2026-10-06T04:01:34Z rescope · item add TOOL-aGraftedHelix-37 · reason discovery by unit 36's builder, left unfixed: two writers finding one stale claim-push.lock at the same moment can both break and take it, because the break is rm -rf then mkdir with no re-check; the mandate brings it into the build
+
+2026-10-06T04:34:33Z brief · item TOOL-aGraftedHelix-37 · reason a2e60ebbeb07 memory/builds/aGraftedHelix/prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md
+
+2026-10-06T04:35:10Z dispatch · item 83afdc95 TOOL-aGraftedHelix-37 · reason tools/unattended tools/push-main.sh tools/push-main.test.sh memory/gotchas/decision-re-derived-by-a-second-process.md memory/guides .claude/skills/unattended/SKILL.md memory/map memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-37.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md

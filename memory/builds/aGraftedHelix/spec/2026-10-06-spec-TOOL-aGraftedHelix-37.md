@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-37 — breaking a stale claim-push lock is a step one writer wins
 
-**Status:** SPECCED · rev-1 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 21 · ratified 2026-10-06
+**Status:** SPECCED · rev-2 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 21 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 
@@ -274,12 +274,17 @@ repository and no remote.
    minutes with `touch -d "@<epoch>"`: busy, the guard is gone, and the health stub holds
    `claim-push-guard-cleared`. The next call is taken, `until` holds digits in the future, `owner`
    holds the token passed, no `.break` directory remains, and the stub holds
-   `claim-push-lock-broken`.
+   `claim-push-lock-broken`. Then `mutate` the copy so an aged guard is never removed, re-source it,
+   and assert the call after the aged one is still busy.
 4. **The interleaving.** One trial of §4's interleaved abandoned-guard probe: no trial has two
    writers proceeding. Then `mutate` the copy so the abandoned-guard removal goes on to take the
-   guard, and assert two writers proceeded. Each wait is bounded at two seconds.
+   guard, and assert two writers proceeded. Each wait is bounded at ten seconds, as the race's is.
 5. **The owner.** A lock whose `owner` reads `w-other`: `remove_claim_push_lock` with `w-me` leaves
-   it. The same call with `w-other` removes it.
+   it. The same call with `w-other` removes it. Then `mutate` the copy so the owner comparison is
+   cut, re-source it, and assert the `w-me` release removes a lock `w-other` holds.
+
+The stubs and assignments shadow the library's health functions in the suite's own shell, so the
+block re-sources `lib-unattended.sh` on its way out.
 
 Every assertion is a `same` or `hit` line, and each `mutate` counts one, so the rise of both floors
 is counted off the block's own lines.
@@ -389,7 +394,8 @@ commit confirms.
   guard in place. A guard aged two minutes leaves the call busy, removes the guard and logs
   `claim-push-guard-cleared` to the health stub. The next call is taken, and its lock holds a future
   `until` and the passed token in `owner`, with no `claim-push.lock.break` directory left and
-  `claim-push-lock-broken` logged.
+  `claim-push-lock-broken` logged. Its `mutate` copy that never removes an aged guard leaves the
+  call after the aged one busy.
   Red when: an aged guard refuses every later call, so the next call is still busy.
 - **AC4** — When the GH37 interleaving arm runs in the same slice, no trial has two writers
   proceeding. Its `mutate` copy, whose abandoned-guard removal goes on to `mkdir` the guard, reports
@@ -397,6 +403,7 @@ commit confirms.
   Red when: the remover takes the guard in the same call.
 - **AC5** — When the GH37 owner arm runs in the same slice, `remove_claim_push_lock` with a token
   other than the one `owner` holds leaves the lock directory, and with the held token removes it.
+  Its `mutate` copy with the owner comparison cut removes the lock on the foreign release.
   Red when: the owner comparison is cut from a scratch copy, so the foreign release removes the lock.
 - **AC6** — When the comment block above `check_claim_push_lock_stale` is printed with
   `awk '/^#/ { b = b $0 "\n"; next } /^check_claim_push_lock_stale\(\)/ { printf "%s", b; exit } { b = "" }' tools/unattended/unattended.sh`,
@@ -475,6 +482,11 @@ the main loop runs the suite once at VERIFYING.
 
 - rev-1 · 2026-10-06 · initial draft, from the unit 37 spec brief, grounded at `5ec5ef30` against
   unit 36's lock, with the race, guard and interleaving probes run on node `a`.
+- rev-2 · 2026-10-06 · at build: §2's S6, "each arm's staged break goes through `mutate`", and §4's
+  S6 disagreed, the latter giving the bound and owner arms no break, so both now carry one in the
+  suite, named in AC3 and AC5. The interleaving arm's waits go from two seconds to ten, the race's bound: a two
+  second wait that fires under a loaded bar breaks the forced order and reds the `mutate` assertion
+  with no defect present. The block re-sources the kit library after its stubs.
 
 ## 10. Reuse audit
 
