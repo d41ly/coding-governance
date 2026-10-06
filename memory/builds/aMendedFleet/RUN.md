@@ -744,3 +744,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T13:57:00Z dispatch · item 18c889d5 TOOL-aMendedFleet-25 · reason tools/drift-audit/drift_signals.py
 
 2026-10-06T14:08:07Z dispatch · item 18c889d5 TOOL-aMendedFleet-25 · reason tools/drift-audit/drift_signals.py memory/LIVE.md
+
+2026-10-06T14:36:38Z dispatch · item 26c67ceb TOOL-aMendedFleet-53 · reason .lexicon.conf
