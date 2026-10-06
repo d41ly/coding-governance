@@ -1678,11 +1678,6 @@
       "file": "tools/runlog/selftest.py"
     },
     {
-      "id": "build_module_index",
-      "kind": "function",
-      "file": "tools/codebase-map/map_imports.py"
-    },
-    {
       "id": "build_moved_age_fixture",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -5056,11 +5051,6 @@
       "id": "derive_evidence",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
-    },
-    {
-      "id": "derive_ext",
-      "kind": "function",
-      "file": "tools/codebase-map/map_imports.py"
     },
     {
       "id": "derive_fact",
@@ -12723,11 +12713,6 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
-      "id": "resolve_import",
-      "kind": "function",
-      "file": "tools/codebase-map/map_imports.py"
-    },
-    {
       "id": "resolve_index_command",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
@@ -12831,11 +12816,6 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/codebase-map/map_extractors.py"
-    },
-    {
-      "id": "resolve_kit_dir",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -16726,21 +16706,6 @@
       "id": "test_malformed_question_refuses",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
-    },
-    {
-      "id": "test_map_imports_has_no_sibling_kit_import",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "test_map_imports_matches_the_kit_it_was_rescued_from",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "test_map_imports_resolution",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_member_outside_the_scope_set_is_dropped",

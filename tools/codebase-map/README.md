@@ -30,12 +30,6 @@ project specifics live in exactly two files the adopting repo owns.
   spelled as a word ("two legs") passes, and so does a count inside a fence, the toml `title`
   included, or a code span. The template reaches a project only when absent, so an existing
   adopter gets the arm by copying it in.
-- `map_imports.py` — an import target to the repo paths it may DENOTE, by AST: `resolve_import`
-  plus the module index it resolves against, language-branched on the IMPORTER's extension because a
-  dot means different things in Python and JS. Returns CANDIDATE paths; an empty list means external
-  or unresolvable, which is not an error. It resolves import STATEMENTS only — not call sites, not
-  attribute receivers — and counts nothing, so a consumer that reads it as a call graph will be
-  wrong. Rescued from the lexicon kit's P3 predicate ahead of that predicate's deletion.
 - `check_gate_coverage.py` — does the INSTALLED gate compare every artifact the engine writes?
   `--list` prints both sets. The adopter's gate is copied once and never again; the engine upgrades
   every time. This reports the SET difference, not a byte diff, because a project is entitled to

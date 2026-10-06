@@ -31,44 +31,8 @@ def derive_install_prefix() -> str:
 
 
 PFX = derive_install_prefix()
-# TOOL-aRepatriatedFork-46: this kit's own directory is named by the NAME it has in this install, and a
-# SIBLING kit is reached through the resolver, which reads the install receipt first.
+# TOOL-aRepatriatedFork-46: this kit's own directory is named by the NAME it has in this install.
 KIT_NAME = Path(os.path.abspath(__file__)).parent.name
-# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
-def resolve_kit_dir(home, anchor, here):
-    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
-
-    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
-       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
-       a memory-recall kit an adopter homed at `scripts/recall/`.
-    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
-    3. refuse — LookupError naming the three places looked; never a guessed prefix.
-    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
-    """
-    import json
-    import pathlib
-    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
-    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
-    receipt = root / ".governance" / "install.json"
-    try:
-        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
-    except (OSError, ValueError, AttributeError):
-        rows = []
-    for row in rows:
-        if not isinstance(row, dict) or not row.get("path"):
-            continue
-        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
-            continue
-        hit = (root / str(row["path"])).absolute()
-        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
-            return hit.parent
-    probes = (here / home, here.parent / home)
-    for cand in probes:
-        if (cand / anchor).is_file():
-            return cand
-    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
-        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
-# <<< resolve_kit_dir
 
 
 # `abspath`, NOT `resolve()`: this insert decides which path string `map_lib.__file__` carries,
@@ -80,7 +44,6 @@ sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 
 import map_lib as m  # noqa: E402
 import reuse_lookup as rl  # noqa: E402
-import map_imports as mi  # noqa: E402
 import map_diff as md  # noqa: E402
 import check_gate_coverage as cg  # noqa: E402
 
@@ -1984,10 +1947,6 @@ def main() -> int:
             lambda: test_baseline_additions_from_git(Path(td)),
         )
     failures += check("identifier tokens: one arm per over-strip class", test_identifier_tokens_per_language)
-    failures += check("map_imports: the rescued resolver's case table", test_map_imports_resolution)
-    failures += check("map_imports: no sibling-kit import (AC7)", test_map_imports_has_no_sibling_kit_import)
-    failures += check("map_imports: same candidates as the kit it was rescued from (AC1)",
-                      test_map_imports_matches_the_kit_it_was_rescued_from)
     failures += check_guarded("identifier tokens: corpus recall + precision floors", test_identifier_tokens_corpus_recall)
     # S2 — EXECUTED and SKIPPED reported separately, always. A single number cannot say which of
     # the two it is, and the whole defect this unit closes was a report that could not tell them
@@ -2004,117 +1963,6 @@ def main() -> int:
     print("PASS" if not failures else f"{failures} FAILURE(S)")
     return 1 if failures else 0
 
-
-
-# --- map_imports: the rescued AST import resolver (TOOL-dTracedLattice-6) -------------------------
-# The rows below are the lexicon kit's own `resolve_import` case table, carried with the code so the
-# arms that covered it there cover it here. They assert on the CANDIDATE SET directly rather than
-# through a glob matcher, because the candidate set is what this module returns and a glob is the
-# consumer's business. Every fixture path below exists so a row can FAIL: `debounce.js`,
-# `thingamajig/thing.js` and `outside/thing.js` were added upstream after three rows were found to
-# be passing on an empty corpus rather than on correct code.
-RI_FILES = [
-    "src/pkg/consumer/a.py",
-    "src/pkg/consumer/helper.py",
-    "src/pkg/shared_core/helper.py",
-    "src/pkg/shared_core/only_there.py",
-    "src/pkg/shared_core/notes.md",
-    "web/consumer/a.js",
-    "web/shared/thing.js",
-    "web/shared/debounce.js",
-    "web/shared/thingamajig/thing.js",
-    "outside/thing.js",
-]
-PY_IMPORTER = "src/pkg/consumer/a.py"
-JS_IMPORTER = "web/consumer/a.js"
-
-
-def test_map_imports_resolution():
-    idx = mi.build_module_index(RI_FILES)
-
-    def resolve_for(target, importer=PY_IMPORTER):
-        return mi.resolve_import(target, importer, idx)
-
-    # A FULLY-QUALIFIED dotted import reaches the far package even though a same-stem local sibling
-    # exists: the language grants the importer's directory no precedence there. The upstream B1
-    # false negative was exactly this crossing vanishing onto the sibling.
-    assert "src/pkg/shared_core/helper.py" in resolve_for("pkg.shared_core.helper"), resolve_for("pkg.shared_core.helper")
-    assert "src/pkg/consumer/helper.py" not in resolve_for("pkg.shared_core.helper")
-    # A BARE name prefers the importer-local sibling...
-    assert resolve_for("helper") == ["src/pkg/consumer/helper.py"], resolve_for("helper")
-    # ...and FALLS BACK across when there is no local sibling. Not directory-bound.
-    assert resolve_for("only_there") == ["src/pkg/shared_core/only_there.py"], resolve_for("only_there")
-    # Extension scoping: a same-stem file of another language is not a resolution.
-    assert resolve_for("notes") == [], resolve_for("notes")
-    # A dotted target whose PATH is inconsistent with the dots denotes nothing tracked. Both of
-    # these are real imports in this tree that touch nothing in it.
-    for target in ("concurrent.helper", "thirdparty.helper"):
-        assert all(not c.startswith("src/") for c in resolve_for(target)), (target, resolve_for(target))
-    # A relative JS specifier resolves against the importer's directory.
-    assert "web/shared/thing.js" in resolve_for("../shared/thing.js", JS_IMPORTER), resolve_for("../shared/thing.js", JS_IMPORTER)
-    # BOUNDARY, not prefix: `../shared/thing` must not land on `thingamajig/thing.js`.
-    assert "web/shared/thingamajig/thing.js" not in resolve_for("../shared/thing.js", JS_IMPORTER)
-    # Escaping the repo root is EXTERNAL, never clamped back in — clamping fabricates a candidate.
-    assert resolve_for("../../../outside/thing.js", JS_IMPORTER) == [], resolve_for("../../../outside/thing.js", JS_IMPORTER)
-    # THE LANGUAGE BRANCH. A JS package specifier carrying a dot is one name, not a namespace path.
-    assert resolve_for("lodash.debounce", JS_IMPORTER) == ["lodash.debounce"], resolve_for("lodash.debounce", JS_IMPORTER)
-    # And a Python leading dot is relative-to-package: `from . import helper` stays in the importer's
-    # own package and must not reach the same-stem file in the other one.
-    rel = resolve_for(".helper")
-    assert "src/pkg/consumer/helper.py" in rel, rel
-    assert "src/pkg/shared_core/helper.py" not in rel, rel
-    # An unresolvable external target denotes nothing in the corpus.
-    assert all(not c.startswith(("src/", "web/")) for c in resolve_for("json")), resolve_for("json")
-
-
-def test_map_imports_has_no_sibling_kit_import():
-    """AC7 — the rescued module reaches into no sibling kit.
-
-    Asserted over the module's own source rather than by a `LAYERS` rule: the lexicon rule that
-    would state this direction rides on predicate P3, which `TOOL-aSurfacedLexicon-2` deletes, so a
-    rule-based assertion would disappear with the thing it was written to outlive.
-    """
-    src = Path(os.path.abspath(__file__)).parent.joinpath("map_imports.py").read_text(encoding="utf-8")
-    for ln, line in enumerate(src.split("\n"), 1):
-        stripped = line.strip()
-        if stripped.startswith(("import ", "from ")):
-            assert "lexicon" not in stripped, f"map_imports.py:{ln} imports a sibling kit: {stripped}"
-
-
-def test_map_imports_matches_the_kit_it_was_rescued_from():
-    """AC1 — same candidates as the original, over the same fixtures.
-
-    SKIPS LOUDLY once the lexicon kit's copy is gone. That is the designed end state, not a hole:
-    `TOOL-aSurfacedLexicon-2` deletes the original, and after it lands this arm has nothing to
-    compare against and says so instead of reporting a green it did not earn.
-    """
-    try:
-        origin = resolve_kit_dir("lexicon", "lexicon.py", Path(os.path.abspath(__file__)).parent) / "lexicon.py"
-    except LookupError:
-        origin = None
-    if origin is None or not origin.exists():
-        raise Skipped("the lexicon kit is not installed here, so the original this module was "
-                      "rescued from cannot be compared against")
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("_lex_origin", origin)
-    lex = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(lex)
-    if not hasattr(lex, "resolve_import"):
-        raise Skipped("the lexicon kit no longer carries `resolve_import`, which is the deletion "
-                      "this module was rescued ahead of")
-    ours, theirs = mi.build_module_index(RI_FILES), lex.build_module_index(RI_FILES)
-    assert ours == theirs, "the module index diverged"
-    cases = [
-        ("pkg.shared_core.helper", PY_IMPORTER), ("helper", PY_IMPORTER),
-        ("only_there", PY_IMPORTER), ("notes", PY_IMPORTER), ("concurrent.helper", PY_IMPORTER),
-        ("thirdparty.helper", PY_IMPORTER), (".helper", PY_IMPORTER), ("json", PY_IMPORTER),
-        ("../shared/thing.js", JS_IMPORTER), ("../../../outside/thing.js", JS_IMPORTER),
-        ("lodash.debounce", JS_IMPORTER), ("thing", JS_IMPORTER),
-    ]
-    for target, importer in cases:
-        a = mi.resolve_import(target, importer, ours)
-        b = lex.resolve_import(target, importer, theirs)
-        assert a == b, f"{target!r} from {importer!r}: rescued {a} vs original {b}"
 
 
 # --- S1: fan-in subtracts EVERY definer (TOOL-dTracedLattice-1) -----------------------------------
