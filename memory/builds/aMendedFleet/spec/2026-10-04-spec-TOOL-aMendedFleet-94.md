@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-94 — the wrapper's product-only prose loads from a path-scoped rule when a session opens a product file
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling+playbook · ratified 2026-10-04 · order 95
+**Status:** CLOSED · rev-3 · 2026-10-06 · node a · Tier-2 · base 7af5f564 · streams tooling+playbook · ratified 2026-10-04 · order 95
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-94-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-94-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -150,8 +152,9 @@ and no adopter receives either, so nothing ships and no kit version moves.
   hook.
 - perf / scale — every session that opens no product file reads about 2.4 KB less, ESTIMATED; one that
   does reads the same bytes as before.
-- error / empty / loading states — a malformed frontmatter or a glob matching nothing loads the rule
-  never, silently; AC1 observes every glob, and AC4 observes the load.
+- error / empty / loading states — a glob matching nothing loads the rule never, silently, and a
+  misspelt `paths` key loads it at EVERY session start, unscoped, with `load_reason` `session_start`;
+  AC1 observes every glob, and AC4 observes the scoped load.
 - observability — the CLI's `InstructionsLoaded` event names every load, with the matching globs.
 - risks — an agent that greps product files through Bash without opening one never triggers the
   load, and whether a Workflow sidechain agent loads path rules is UNVERIFIED. Both lose the
@@ -230,6 +233,10 @@ close.
   consumes-from `TOOL-aMendedFleet-74`, reciprocal to its hands-off; §4 said unit 97 moves its part
   before this unit re-measures, but unit 97 is ordered after it; §8 F2 named unit 68 as reshaping
   the wrapper, which edits the unattended Skill and not `AGENTS.md`.
+- rev-3 · 2026-10-06 · §5 · the build pass observed AC4's staged break: the CLI read a rule whose
+  key was spelt `path` as an unscoped rule and loaded it at session start, so §5's "a malformed
+  frontmatter loads the rule never" was wrong for that malformation; AC4's red still holds, since
+  no `path_glob_match` record names the file.
 
 ## 10. Reuse audit
 
