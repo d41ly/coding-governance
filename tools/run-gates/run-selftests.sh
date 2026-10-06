@@ -583,12 +583,127 @@ for line in open(budgets, encoding="utf-8"):
 PY
 }
 
+# >>> mempause_sh — canonical copy: run-gates.sh in this kit's dir (byte-identical; gated)
+# THE MEMORY PAUSE (TOOL-aGraftedHelix-7). The width is chosen ONCE, from RAM, at start; nothing
+# watched memory while the work ran. A dispatcher calls `check_dispatch_pause <running>` before each
+# dispatch and HOLDS that dispatch while used memory sits above `MEMPAUSE` percent and something is
+# still running. Both runners carry this block byte-identical, so it reads only what its caller set:
+# `MEMPAUSE` (the threshold, 0 = off), `MEMPAUSE_INERT` (1 when the host gave no reading at start)
+# and `MEMPAUSE_ROWS` (the run record's `pauses` file, empty for none). Builtins only, and the
+# decision reads `MEMPAUSE_READ` rather than a command substitution, so a decision forks nothing.
+# A HOLD ALWAYS ENDS: nothing polls, so each decision happens at a completion, and a hold is released
+# when the reading falls (`fell`), when nothing runs (`drained`), when the reading vanishes
+# (`unread`), or at the first completion after `MEMPAUSE_HOLD` seconds (`bound`); the caller closes
+# one the wall's break left open as `wall`. The knob narrows a pool and never turns a leg into
+# anything: under pressure that never falls the pool drains toward width 1 and keeps moving.
+MEMPAUSE_HOLD=300
+case "${GATE_MEMPAUSE_HOLD:-}" in ''|*[!0-9]*|???????*) ;; *) MEMPAUSE_HOLD=$((10#$GATE_MEMPAUSE_HOLD)) ;; esac
+MEMPAUSE_N=0; MEMPAUSE_HELD_S=0; MEMPAUSE_READ=""; MEMPAUSE_PEAK=""; MEMPAUSE_OPEN=""; MEMPAUSE_OPEN_PEAK=0
+MEMPAUSE_FELL=0; MEMPAUSE_BOUND=0; MEMPAUSE_DRAINED=0; MEMPAUSE_UNREAD=0; MEMPAUSE_WALL=0
+# read_mem_used — used memory as a whole percent, on stdout and in MEMPAUSE_READ; rc 1 and nothing
+# when no source reads. The host half is `MemTotal` against `MemAvailable`, or `MemFree` where the
+# file has none (on MSYS that IS Windows' available figure); the cgroup half is its usage over its
+# limit, v2 then v1, with `max` and v1's 19-digit sentinel rejected as `cgroup_ram_mb` rejects them.
+# The HIGHER wins: a wrong source can only make the bar slower, the direction `det_ram_capped` takes.
+read_mem_used() {
+  local f="${GATE_MEMINFO:-/proc/meminfo}" cg="${GATE_CGROUP_ROOT:-/sys/fs/cgroup}" k v _
+  local tot="" av="" fr="" host="" grp="" lim="" use=""
+  MEMPAUSE_READ=""
+  if [ -r "$f" ]; then
+    while read -r k v _; do
+      case "$k" in MemTotal:) tot=$v ;; MemAvailable:) av=$v ;; MemFree:) fr=$v ;; esac
+    done < "$f"
+  fi
+  [ -n "$av" ] || av=$fr
+  case "$tot" in ''|*[!0-9]*|????????????????*) tot="" ;; esac
+  case "$av" in ''|*[!0-9]*|????????????????*) av="" ;; esac
+  if [ -n "$tot" ] && [ -n "$av" ] && [ "$((10#$tot))" -gt 0 ]; then
+    tot=$((10#$tot)); av=$((10#$av)); [ "$av" -le "$tot" ] || av=$tot
+    host=$(( (tot - av) * 100 / tot ))
+  fi
+  for k in memory.max:memory.current memory/memory.limit_in_bytes:memory/memory.usage_in_bytes; do
+    lim=""; use=""
+    { read -r lim < "$cg/${k%%:*}"; read -r use < "$cg/${k#*:}"; } 2>/dev/null
+    case "$lim" in ''|*[!0-9]*|????????????????*) continue ;; esac
+    case "$use" in ''|*[!0-9]*|????????????????*) continue ;; esac
+    [ "$((10#$lim))" -gt 0 ] || continue
+    grp=$(( 10#$use * 100 / 10#$lim )); [ "$grp" -le 100 ] || grp=100
+    break
+  done
+  [ -n "$host$grp" ] || return 1
+  v=${host:-$grp}; [ -n "$grp" ] && [ "$grp" -gt "$v" ] && v=$grp
+  MEMPAUSE_READ=$v
+  printf '%s\n' "$v"
+}
+# check_dispatch_pause <running> — rc 0 HOLDS the next dispatch, rc 1 lets it go. First match:
+# off or INERT; no reading (`unread`); at or under the threshold (`fell`); nothing running
+# (`drained`), so a hold never outlives the last job; an episode held MEMPAUSE_HOLD seconds or more
+# (`bound`), tested only here, so it is released at the first decision after the bound; else hold,
+# opening an episode when none is open.
+check_dispatch_pause() {
+  { [ "${MEMPAUSE:-0}" -gt 0 ] && [ "${MEMPAUSE_INERT:-0}" = 0 ]; } || return 1
+  if ! read_mem_used >/dev/null; then write_pause_row unread; return 1; fi
+  { [ -z "$MEMPAUSE_PEAK" ] || [ "$MEMPAUSE_READ" -gt "$MEMPAUSE_PEAK" ]; } && MEMPAUSE_PEAK=$MEMPAUSE_READ
+  [ -n "$MEMPAUSE_OPEN" ] && [ "$MEMPAUSE_READ" -gt "$MEMPAUSE_OPEN_PEAK" ] && MEMPAUSE_OPEN_PEAK=$MEMPAUSE_READ
+  if [ "$MEMPAUSE_READ" -le "$MEMPAUSE" ]; then write_pause_row fell; return 1; fi
+  if [ "${1:-0}" -le 0 ]; then write_pause_row drained; return 1; fi
+  if [ -n "$MEMPAUSE_OPEN" ] && [ $(( EPOCHSECONDS - MEMPAUSE_OPEN )) -ge "$MEMPAUSE_HOLD" ]; then
+    write_pause_row bound; return 1
+  fi
+  [ -n "$MEMPAUSE_OPEN" ] || { MEMPAUSE_OPEN=$EPOCHSECONDS; MEMPAUSE_OPEN_PEAK=$MEMPAUSE_READ; }
+  return 0
+}
+# write_pause_row <ended-by> — closes the open episode, a no-op when none is open: one `pauses` row,
+# `<started-s> TAB <ended-s> TAB <held-s> TAB <peak-pct> TAB <threshold> TAB <ended-by>`, when the
+# caller set MEMPAUSE_ROWS, and the counters the summary prints either way.
+write_pause_row() {
+  [ -n "$MEMPAUSE_OPEN" ] || return 0
+  local now=$EPOCHSECONDS held
+  held=$(( now - MEMPAUSE_OPEN ))
+  MEMPAUSE_N=$(( MEMPAUSE_N + 1 )); MEMPAUSE_HELD_S=$(( MEMPAUSE_HELD_S + held ))
+  case "$1" in
+    fell) MEMPAUSE_FELL=$(( MEMPAUSE_FELL + 1 )) ;;
+    bound) MEMPAUSE_BOUND=$(( MEMPAUSE_BOUND + 1 )) ;;
+    drained) MEMPAUSE_DRAINED=$(( MEMPAUSE_DRAINED + 1 )) ;;
+    unread) MEMPAUSE_UNREAD=$(( MEMPAUSE_UNREAD + 1 )) ;;
+    *) MEMPAUSE_WALL=$(( MEMPAUSE_WALL + 1 )) ;;
+  esac
+  if [ -n "${MEMPAUSE_ROWS:-}" ]; then
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$MEMPAUSE_OPEN" "$now" "$held" "$MEMPAUSE_OPEN_PEAK" \
+      "${MEMPAUSE:-0}" "$1" >> "$MEMPAUSE_ROWS" 2>/dev/null || true
+  fi
+  MEMPAUSE_OPEN=""; MEMPAUSE_OPEN_PEAK=0
+}
+# render_pause_summary — the ONE `memory:` line a run prints after its pool drains, on every run.
+render_pause_summary() {
+  if [ "${MEMPAUSE:-0}" -le 0 ]; then
+    printf 'memory: pause off\n'
+  elif [ "${MEMPAUSE_INERT:-0}" = 1 ]; then
+    printf 'memory: no reading on this host, so the %s%% pause was INERT\n' "$MEMPAUSE"
+  elif [ "$MEMPAUSE_N" = 0 ]; then
+    printf 'memory: no pause  (peak %s%% used, threshold %s%%)\n' "${MEMPAUSE_PEAK:-?}" "$MEMPAUSE"
+  else
+    printf 'memory: %s pause(s), %ss held  (peak %s%% used, threshold %s%%; fell %s, bound %s, drained %s, unread %s, wall %s)\n' \
+      "$MEMPAUSE_N" "$MEMPAUSE_HELD_S" "${MEMPAUSE_PEAK:-?}" "$MEMPAUSE" \
+      "$MEMPAUSE_FELL" "$MEMPAUSE_BOUND" "$MEMPAUSE_DRAINED" "$MEMPAUSE_UNREAD" "$MEMPAUSE_WALL"
+  fi
+}
+# <<< mempause_sh
+
 # ---- THE WIDTH IS RESOLVED ONCE, BY THE BAR'S OWN RESOLVER. Detection, the profile table, the clamp
 # ---- and the GATE_JOBS override are 200 lines inside `run-gates.sh`; re-implementing them here is
 # ---- the two-spellings drift this repo gates elsewhere. `--print-profile` exits before the
 # ---- turnstile, so asking costs nothing and takes no beacon.
-W=$(bash "$HERE/run-gates.sh" --print-profile 2>/dev/null | awk -F'\t' '$1=="width"{print $2}')
+# THE MEMORY PAUSE'S THRESHOLD comes from the same one call (TOOL-aGraftedHelix-7), so the sweep holds
+# above the percent the bar would, GATE_MEMPAUSE included. No runner beside this one answers nothing,
+# and the pause then reads off.
+_rs_pp=$(bash "$HERE/run-gates.sh" --print-profile 2>/dev/null)
+W=$(printf '%s\n' "$_rs_pp" | awk -F'\t' '$1=="width"{print $2}')
 case "${W:-}" in ''|*[!0-9]*) W=2 ;; esac
+MEMPAUSE=$(printf '%s\n' "$_rs_pp" | awk -F'\t' '$1=="mempause"{print $2}')
+case "${MEMPAUSE:-}" in ''|*[!0-9]*|????*) MEMPAUSE=0 ;; esac
+MEMPAUSE=$((10#$MEMPAUSE)); [ "$MEMPAUSE" -le 100 ] || MEMPAUSE=0
+MEMPAUSE_INERT=0; MEMPAUSE_ROWS=""
 # THE COMPOSITE BOUND: outer x inner never exceeds the profile row's declared width. A spec audit
 # caught this unit and the harness unit each reading that width independently, which at width 8 would
 # be 8 suites x 8 arms = 64 concurrent processes on a host where a bare spawn costs 319 ms.
@@ -1185,6 +1300,8 @@ if [ "$MODE" = sweep ]; then
   # a `wait` that can see it blocks until the wall fires even when every suite finished in seconds.
   disown "$SWEEP_DOG" 2>/dev/null || true
 
+  # A threshold over a host that gives no reading is INERT, decided here with one read of its own.
+  [ "$MEMPAUSE" -gt 0 ] && ! read_mem_used >/dev/null && MEMPAUSE_INERT=1
   i=1; live=0
   while [ "$i" -le "$SW_N" ]; do
     # THE BREACH STOPS THE DISPATCH, and this line is the whole wall. Before the pid fix the
@@ -1195,6 +1312,13 @@ if [ "$MODE" = sweep ]; then
     # of its own walk, and this is that line rather than a second invention.
     [ -e "$SWEEP_ROOT/wall-breached" ] && break
     if [ "${SW_STATE[$((i - 1))]}" = ok ]; then
+      # THE MEMORY PAUSE (TOOL-aGraftedHelix-7): while used memory sits above the threshold and a
+      # suite still runs, wait for one to finish and count it out, then decide again. A hold ends
+      # at the latest when nothing runs, and the wall's breach is re-read after it.
+      while check_dispatch_pause "$live"; do
+        if [ "$_rs_waitn" = 1 ]; then wait -n; live=$((live - 1)); else wait; live=0; fi
+      done
+      [ -e "$SWEEP_ROOT/wall-breached" ] && break
       run_sweep_one "$i" &
       live=$((live + 1))
       if [ "$live" -ge "$OUTER" ]; then
@@ -1204,6 +1328,7 @@ if [ "$MODE" = sweep ]; then
     i=$((i + 1))
   done
   wait
+  render_pause_summary
   kill "$SWEEP_DOG" 2>/dev/null || true
   if [ -r "$SWEEP_ROOT/dog.sleep" ]; then
     read -r _ds < "$SWEEP_ROOT/dog.sleep" 2>/dev/null && kill "$_ds" 2>/dev/null

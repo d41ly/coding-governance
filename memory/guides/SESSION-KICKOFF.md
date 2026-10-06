@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-05T17:42:55+03:00 @ a7e528accd5bfd4e4c97d6e98f8932a980520e0b
+last-audit: 2026-10-06T06:42:00+03:00 @ 910b860855e8b6b568955710a661ac5e34507896
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: a7e528accd5bfd4e4c97d6e98f8932a980520e0b
+last-body-change: 4c00d24d160b97fa39510cd7c7cb4168b10ca13f
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -174,17 +174,17 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 ### Gate commands (the merge bar)
 
 ```bash
-bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY, at the width tools/run-gates/gate-profiles.txt declares for the detected hardware; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
+bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY, at the width gate-profiles.txt declares for this hardware; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
 # Legs report in CHUNKS, each closing with a verdict line, so a red is readable before the run ends. A chunk whose every leg skipped reports skipped, never green.
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD and the docs mode (GATE_DOCS_BASE). .githooks/pre-push decides, and prints which it chose and why
 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
 # Every leg declares a `ceiling` in tools/gate-legs.json; one outliving it gets ONE serial retry (a pass is green); all-HOST exits 4. TOOL-aBoundedCeiling-1
-# The whole RUN has a wall, per profile row; GATE_WALL overrides. A breach kills the legs. TOOL-aQuenchedHarness-1
+# Per profile row: a whole-RUN wall (GATE_WALL; a breach kills the legs, TOOL-aQuenchedHarness-1), and mempause holding dispatch while used memory is above it (TOOL-aGraftedHelix-7)
 GATE_ATTRIBUTE=<rev> bash tools/run-gates/run-gates.sh   # re-run each RED leg at <rev> and print whose red it is: OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE. Report-only, the exit never moves; .githooks/pre-push exports the remote sha. TOOL-dDerivedDocket-23
-bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts and REFUSES any row with no calibrated reading until --pooled --calibrate has run (TOOL-aBatchedArm-5); bare REFUSES; GOV_NODE must be a registry tag; a pooled red keeps each row's output under <git-dir>/gate-logs/selftests/. TOOL-aBatchedArm-4, -5
+bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts and REFUSES an uncalibrated row until --pooled --calibrate; bare REFUSES; GOV_NODE must be a registry tag; a pooled red keeps each row's output under <git-dir>/gate-logs/selftests/. TOOL-aBatchedArm-4, -5
 bash tools/unattended/run-unattended-gates.sh --pooled   # DoD for tools/unattended/ work: pooled PARITY against tools/run-gates/selftest-pooled-evidence.txt, or `--selftests --serial --attribute <BASE>` reading `verdict clean`. TOOL-dDerivedDocket-1
-python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
+python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # bug-class checklist + by-design block for THIS diff; run before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality?
 python tools/govkit/govkit.py epoch --base <base>   # a kit whose shipped bytes moved since <base> and whose version did not: run after a commit that touches a kit. TOOL-aRepatriatedFork-15
 python3 tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills   # text IO that names no encoding; the registry may fall and never rise. TOOL-aRepatriatedFork-3

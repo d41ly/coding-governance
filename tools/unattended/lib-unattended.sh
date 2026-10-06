@@ -26,9 +26,11 @@
 # `resolve_landing_tag` and `scan_landing_nodes`, the one reading of which node may land, the driver
 # and the gate leg both ask; `parse_gate_profile` and
 # `check_gate_wall`, the one reading of the gate runner's profile the driver and the leg both ask; the
-# anchored id tests; path containment; "has this pass committed yet"; and `read_advertised_head` with
-# `read_history_range`, the one observation of the remote's tip and the one range rule the two history
-# legs share. The same rule admits the resume tick as a third sourcer.
+# anchored id tests; path containment; the kit's own place in its repository, `derive_self_rel`, which
+# the generated-output resolver and the commit-time remedy both read; "has this pass committed yet";
+# and `read_advertised_head` with `read_history_range`, the one observation of the remote's tip and the
+# one range rule the two history legs share. The same rule admits the resume tick as a third sourcer,
+# and the health log's appender, the `health_log_sh` block the driver and the tick both write through.
 
 # --------------------------------------------------------------------------------- git, once
 # Replace refs and graft advice are both OFF: a leg that reads history must see the history that is
@@ -55,6 +57,55 @@ GIT_PIN_GRAFTADV=advice.graftFileDeprecated=false
 # loops, which is what `is_published` now does, rather than caching a wrapper that is mostly
 # called from subshells.
 GIT() { git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" "$@"; }
+
+# >>> health_log_sh — canonical copy: health-log.sh in gov's lib dir (byte-identical; gated)
+# I3, THE HEALTH LOG (TOOL-aGraftedHelix-8): `<git-common-dir>/health.log`, one LF-terminated UTF-8
+# line per automatic self-heal, four TAB-separated fields: utc (`YYYY-MM-DDTHH:MM:SS+00:00`), source
+# and event (each `^[a-z][a-z0-9-]*$`), and a detail whose TAB, CR and LF are each folded to one space
+# and which is cut to 240 characters. At HEALTH_LOG_CAP_LINES lines the appender first keeps the
+# newest half, through a temp file and a rename, then appends. `derive_health_log <common-dir>` prints
+# the path and spawns nothing; `resolve_health_log <repo-dir>` asks git once and prints it, or fails
+# printing nothing; `add_health_event <log> <source> <event> <detail>` is the only writer. A refused
+# token, an empty path or a failed write prints ONE `health: NOTE -` line on stderr and returns 0: it
+# never fails its caller. WHAT IT DOES NOT DO: serialize concurrent writers (a trim racing an append
+# can lose that line; ponytail: one rename, a lock file if a lost line is ever observed); validate
+# what a detail means; or tell a repository with no writer installed from one where nothing healed.
+HEALTH_LOG_CAP_LINES=500
+derive_health_log() { printf '%s/health.log\n' "$1"; }
+resolve_health_log() {
+  local _hl_c
+  _hl_c=$(git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
+  _hl_c=${_hl_c%$'\r'}
+  [ -n "$_hl_c" ] || return 1
+  derive_health_log "$_hl_c"
+}
+add_health_event() {
+  local _hl_log=${1:-} _hl_src=${2:-} _hl_ev=${3:-} _hl_d=${4:-} _hl_why="" _hl_n=0 _hl_t
+  local _hl_a=abcdefghijklmnopqrstuvwxyz
+  case "$_hl_src" in ''|[!$_hl_a]*|*[!$_hl_a'0123456789-']*) _hl_why="source '$_hl_src' is not a lowercase token" ;; esac
+  case "$_hl_ev" in ''|[!$_hl_a]*|*[!$_hl_a'0123456789-']*) _hl_why="event '$_hl_ev' is not a lowercase token" ;; esac
+  [ -n "$_hl_log" ] || _hl_why="no log path resolved"
+  if [ -z "$_hl_why" ]; then
+    _hl_d=${_hl_d//$'\t'/ }; _hl_d=${_hl_d//$'\r'/ }; _hl_d=${_hl_d//$'\n'/ }; _hl_d=${_hl_d:0:240}
+    _hl_t=$(date -u +%Y-%m-%dT%H:%M:%S+00:00 2>/dev/null) || _hl_t=""
+    [ -n "$_hl_t" ] || _hl_why="date printed no UTC stamp"
+  fi
+  if [ -z "$_hl_why" ] && [ -f "$_hl_log" ]; then
+    _hl_n=$(wc -l < "$_hl_log" 2>/dev/null) || _hl_n=0
+    _hl_n=${_hl_n//[!0-9]/}
+    if [ "${_hl_n:-0}" -ge "$HEALTH_LOG_CAP_LINES" ]; then
+      { tail -n $((HEALTH_LOG_CAP_LINES / 2)) "$_hl_log" > "$_hl_log.trim.$$" && mv -f "$_hl_log.trim.$$" "$_hl_log"; } 2>/dev/null \
+        || { rm -f "$_hl_log.trim.$$" 2>/dev/null; _hl_why="the trim to the newest $((HEALTH_LOG_CAP_LINES / 2)) lines failed"; }
+    fi
+  fi
+  if [ -z "$_hl_why" ]; then
+    { printf '%s\t%s\t%s\t%s\n' "$_hl_t" "$_hl_src" "$_hl_ev" "$_hl_d" >> "$_hl_log"; } 2>/dev/null && return 0
+    _hl_why="the append failed"
+  fi
+  printf 'health: NOTE - %s: %s; nothing written\n' "${_hl_log:-(no path)}" "$_hl_why" >&2
+  return 0
+}
+# <<< health_log_sh
 
 # THE SIDECAR ROOT, derived ONCE, HERE and nowhere else: `<git-dir>/unattended`, the WORKTREE's git
 # dir — where `gate-logs/` already lives — never the common dir, because a run lives in one
@@ -618,6 +669,25 @@ resolve_shared_records() { # declared value · memory root -> the effective set
     printf '%s' "$1"
   fi
 }
+# WHERE THIS KIT SITS IN ITS REPOSITORY, by the logical walk and never by asking git
+# (TOOL-aGraftedHelix-27). In a linked worktree git exports an absolute GIT_DIR into its hooks, and
+# with no GIT_WORK_TREE beside it git takes the current directory for the work tree's top, so a
+# prefix asked of a kit directory came back empty inside `commit-msg` alone. The walk reads no
+# environment, and through a junction it keeps the ADOPTING repository where git answers the target:
+# memory/gotchas/inherited-git-dir-pins-the-work-tree-to-the-cwd.md. Carried inline, byte-identical,
+# because a copy-installed kit cannot source gov's lib dir; the resolve-python self-test grades it.
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
 # THE GENERATED OUTPUTS, DECLARED BY THE KITS THAT GENERATE THEM - TOOL-aWindowedPass-4. Every reader
 # of `GENERATED_INDEXES` (check 23, check 38, `--dispatch`'s condition 3, and the build-commit pick in
 # the pass-order and brief-recorded legs) calls this at conf load, as they call
@@ -641,8 +711,13 @@ resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memor
   local _rg_root=$1 _rg_decl=$2 _rg_mem=$3 _rg_here _rg_kitrel _rg_tool _rg_map _rg_d _rg_krel _rg_rows
   local _rg_out="" _rg_p _rg_g _rg_w _rg_kv _rg_seen=" "
   _rg_here=$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd) || _rg_here=""
-  _rg_kitrel=$(git -C "${_rg_here:-.}" rev-parse --show-prefix 2>/dev/null) || _rg_kitrel=""
-  _rg_kitrel=${_rg_kitrel%/}
+  # The walk above, not git: a hook's inherited GIT_DIR emptied git's answer (TOOL-aGraftedHelix-27).
+  # No .git above this library is the one state with no tool root to cut, so it is SAID, then read as
+  # the root install it would be; under `--check-commit` an unresolved output is refused anyway.
+  _rg_kitrel=$(derive_self_rel "${_rg_here:-.}") || {
+    _rg_kitrel=""
+    printf 'lib-unattended: resolve_generated_indexes found no .git at or above %s, so only the repository-root kits and the conf pairs were read\n' "${_rg_here:-.}" >&2
+  }
   case "$_rg_kitrel" in */*) _rg_tool=${_rg_kitrel%/*} ;; *) _rg_tool="" ;; esac
   # ABSENT takes the kit default; present and BLANK is kept, as `map_lib.load_conf` keeps it, and then
   # `{map_root}/` resolves to nothing rather than to an absolute `/` (closing review r2, L5).
@@ -878,6 +953,40 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
   done <"$_pf"
   rm -f "$_pf"
   return 1
+}
+
+# ------------------------------------------------- which paths may a dispatched pass write, once
+# Prints one line per KEY, where a key is an anchor and a unit, in the shape of a raw dispatch row:
+#   <utc of the key's first row> dispatch · item <anchor> <unit> · reason <paths>
+# `<paths>` is every path of every row under that key, in first-appearance order, each once, and
+# keys print in the order they first appear. With a second argument `current`, each unit keeps only
+# the key holding its LAST row: the window a commit made NOW is graded in. A file holding no
+# dispatch row prints nothing. TOOL-aGraftedHelix-39.
+#
+# EVERY ROW UNDER ONE KEY STANDS AND THE PASS MAY WRITE THEIR UNION. That is the rule the verbs
+# contract states ("A DECLARATION IS APPEND-ONLY", "both rows stand", TOOL-cMendedVintage-15), and
+# check 23 and `--audit` already graded it. Four readers answered "which paths may this pass write"
+# three different ways before this: the driver's openness test closed an earlier same-anchor row
+# whenever a later one carried a different set, so a re-declaration naming only the paths it ADDED
+# read as one that REPLACED them, and `--check-commit` refused the earlier paths; and that verb also
+# unioned a pass committed at HEAD with a later open row, so a path the earlier pass declared leaked
+# into the later one, which check 23 grades alone. Every reader asks this function now.
+#
+# ONE AWK PROCESS, a file and no pipe: the walk cannot wait on a grandchild's write end. The key is
+# cut with the same expansions every reader of a row already uses, so a grammar change moves them all.
+read_pass_declarations() {  # run-state file · [current]
+  awk -v cur="${2:-}" '
+    index($0, " dispatch · item ") && index($0, " · reason ") {
+      k = $0; sub(/^.* dispatch · item /, "", k); sub(/ · reason .*$/, "", k)
+      p = $0; sub(/^.* · reason /, "", p)
+      if (!(k in at)) { at[k] = $0; sub(/ dispatch · item .*$/, "", at[k]); ord[++n] = k; ps[k] = "" }
+      m = split(p, a, " ")
+      for (i = 1; i <= m; i++) if (!((k, a[i]) in seen)) { seen[k, a[i]] = 1; ps[k] = ps[k] (ps[k] == "" ? "" : " ") a[i] }
+      u = k; sub(/^[^ ]* /, "", u); last[u] = k
+    }
+    END { for (i = 1; i <= n; i++) { k = ord[i]; u = k; sub(/^[^ ]* /, "", u)
+            if (cur == "current" && last[u] != k) continue
+            print at[k] " dispatch · item " k " · reason " ps[k] } }' "$1" 2>/dev/null || :
 }
 
 # ONE ANSWER TO "did this change touch only gen regions" (TOOL-aWindowedPass-3). Check 23 asks it of a
@@ -1385,8 +1494,9 @@ read_run_exclusions() { # witness · base · run-state path -> the exclusion tip
 # landing commit and cannot derive, which is right: no history a remote could carry holds it. An
 # unreadable HEAD copy is NOT LANDING, never read as one. Status 1 prints nothing.
 #
-# THE SIX LEASE-FACT LINES, and nothing else, may differ. `keepalive`, `session`, `pid`, `host`,
-# `pid-image` and `lease-utc` are the lines `write_lease` writes together; a difference that adds,
+# THE SEVEN LEASE-FACT LINES, and nothing else, may differ. `keepalive`, `session`, `pid`, `host`,
+# `pid-image` and `lease-utc` are the lines `write_lease` writes together, and `prior-session` the
+# one the holder row writes beside them (TOOL-aGraftedHelix-20); a difference that adds,
 # removes or rewrites only those holds, and an equal file holds trivially. The header lines before
 # the first hunk are git's, never the file's, so the scan starts at the first `@@`. Two callers and
 # no third: `read_landing_commit` below, and `--landed`'s `primary` clean check in the driver.
@@ -1400,14 +1510,14 @@ check_lease_only_diff() { # run-state file -> 0 when it differs from HEAD in lea
     !h { next }
     /^\\/ { next }
     /^[+-]/ { l = substr($0, 2); sub(/\r$/, "", l)
-              if (l !~ /^(keepalive|session|pid|host|pid-image|lease-utc):( |$)/) bad = 1 }
+              if (l !~ /^(keepalive|session|pid|host|pid-image|lease-utc|prior-session):( |$)/) bad = 1 }
     END { exit bad ? 1 : 0 }'
 }
 
 # "MATCH" IS `check_lease_only_diff`, not byte equality (TOOL-dDerivedDocket-61 S8). `--resume
 # --keepalive-id` re-binds a pushed landing `--landed` has not yet observed, and that re-bind rewrites
-# the six lease-fact lines of a record the push already carried. Committing it would move HEAD off
-# the pushed tip, so it stays a working-copy difference, and a difference confined to those six lines
+# the lease-fact lines of a record the push already carried. Committing it would move HEAD off
+# the pushed tip, so it stays a working-copy difference, and a difference confined to those seven lines
 # is read as none. Every other byte, the phase line among them, must still match.
 #
 # TOOL-dUnstuckLanding-14 S1 - THE OPTIONAL SECOND ARGUMENT is the hand-off code list, and with it

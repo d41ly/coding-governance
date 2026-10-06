@@ -59,6 +59,21 @@ that wrote its lease, or that a launch recorded, existed before the stamp, so an
 its number started after it, whatever its image. `read_pid_start` in `tools/unattended/lib-unattended.sh`
 reads it and `check_pid_alive` compares it; a start the probe cannot read keeps the image reading.
 
+## The third instance: a remote write counts as a write, and so does the rotation
+
+`TOOL-aGraftedHelix-32` (the closing review of that build, M4, and the open ask
+`TOOL-aBranchedMandate-9`). `--preflight` in `tools/unattended/unattended.sh` gates every write on
+its preconditions, then pushed the run's claim to the remote, then archived a finished record and
+scaffolded a fresh one, and only after those read the build README's markers and the record's own.
+A malformed README therefore refused AFTER a live claim was published for a run that never started
+and after the finished record was renamed away, and the retry met its own leftovers as a dirty tree
+while printing "the run-state file is unchanged". The two marker reads are pure, so they moved above
+the gate; everything after the claim write is one function, `write_preflight_record`, whose one
+failure branch in the caller restores both record paths to `HEAD` and writes a claim that call
+CREATED `aborted`, leaving one it renewed or took. The precondition the rotation and the claim need
+is "nothing after me refuses", which no probe answers, so the remedy is an undo rather than an
+order.
+
 ## Where this repo's killers live
 
 The catalogue anchors by PATH and cannot read a verb, so this record names the files where an
@@ -86,6 +101,11 @@ image but a `lease-utc` older than its start reads `no`; RED against a library c
 compare) and by the tick suite's `AC13` image-and-start block (a seeded `launched` field naming the
 sleep under `claude.exe`, or under its own image with a stamp older than its start: the sleep
 survives and attempt 2 launches; RED against a tick copy probing the launched pid by number).
+The third instance is gated by the driver suite's GH32 arms AC7 to AC12: a refusal at the README
+markers, at `write_lease` and at the stage each leaves the tree clean, the claim a call created reads
+`aborted` and one it renewed `live`, and a structural arm asserts that after the claim write
+`verb_preflight` returns 1 only inside the restoring branch. Each read RED against a driver copy with
+the restore, the disposition or the branch structure cut.
 The class itself is gated for the tick alone; the reaper and the driver's bound carry no
 precondition-ordering arm, and the anchors above are what puts this record in front of the diff
 that would add one.

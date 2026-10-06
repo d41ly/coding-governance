@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.68 -->
+<!-- gov:kit unattended@1.85 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -193,6 +193,13 @@ POSIX, one crontab line (the trailing comment names it the way the Windows task 
 bound run and does nothing else — no kill, no launch, no attempt line, no login probe. The two knobs
 it reads, `RESUME_ATTEMPTS` and `RESUME_TURNS`, are the root `.unattended.conf`'s and are announced
 on stderr when absent.
+
+A relaunch appends one `run-resumed` line, and a launch that failed one `resume-failed` line, to the
+health log under the git common dir that the orientation card counts; the driver appends
+`claim-taken-over` when it takes over a stale claim (`TOOL-aGraftedHelix-8`), and
+`claim-push-lock-broken` when it breaks a stale `claim-push.lock` under that lock's guard, or
+`claim-push-guard-cleared` when it removes a guard a crashed writer left (`TOOL-aGraftedHelix-37`). The line format is the
+header of the `health_log_sh` block in `lib-unattended.sh`.
 
 ## The sidecar
 

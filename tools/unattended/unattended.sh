@@ -12,6 +12,7 @@
 #   unattended.sh --liveness <slug>                        # key: value lines and ONE verdict, for an out-of-session reader
 #   unattended.sh --resume <slug> [--keepalive-id <id> [--replaces <id>]]    # the same line, plus the next action; with the id, the resume matrix decides who drives
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
+#   unattended.sh --authorization <slug>                   # grade authorization-reachable alone, as --close would; writes nothing
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
 #   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
@@ -28,6 +29,8 @@
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--playbook-sha <sha>] [--run <id>]]
 #   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--run <id>] [--set <hashes>]]
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
+#   unattended.sh --claims                                         # every run claim on the remote: slug, node, status, beat-age-s, verdict
+#   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --version                                        # the kit version, then exit
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
@@ -48,7 +51,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.68   # gov:kit unattended@1.68 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.85   # gov:kit unattended@1.85 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -93,10 +96,10 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
+VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
-VERBS_INLINE="--plan --phase --check-commit --version"
+VERBS_INLINE="--plan --phase --check-commit --claims --version"
 verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
 is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
 verb_list() { # -> "--a, --b and --c", for a human reading a refusal
@@ -228,7 +231,7 @@ RB_BOUND=""
 # On the UNBOUNDED path, a host with no runnable `timeout`, the command now ignores INT, so a Ctrl-C
 # ends the driver alone and leaves the command running — as a recorded orphan the next reap finds.
 run_bounded() { # argv...
-  local _s _e _rc _d _p _b=${RB_BOUND:-${GATE_BOUND:-0}}
+  local _s _e _rc _d _p _i _b=${RB_BOUND:-${GATE_BOUND:-0}}
   # THE REFUSAL BRANCH KEEPS RB_OUT'S SENTENCE and empties only the two NEW values. That sentence
   # is this branch's ONLY diagnostic -- it is SET here and the function returns before RB_TOOK is
   # computed below, so it is the freshest thing a caller gets -- and check_wiring, the gates-green
@@ -242,12 +245,22 @@ run_bounded() { # argv...
   # GATE_BOUND_LIVE is REMOTE_BOUND_LIVE's sibling and is probed the same way: by RUNNING timeout,
   # never by testing for the binary. With no runnable timeout the command still RUNS, unbounded --
   # a bound may cost speed and may turn a hang into a verdict; it may never turn a check into a skip.
+  # THE RECORD WAITS FOR THE EXEC (TOOL-aGraftedHelix-34 S5). On this platform an exec replaces the
+  # Windows process behind a pid and the procfs start token moves with it, so a token read the moment
+  # `&` returns is the forked shell's whenever the box is loaded - measured 3 of 30 under twelve fork
+  # loops - and `derive_proc_state` then reads this driver's own live command as `reused`. The
+  # wrapper's first act, `: >"$RB_UP"`, runs only in the post-exec image, so the marker proves the
+  # exec; the wait is on that observed condition, bounded at 100 polls of 0.05 s and ended early when
+  # the wrapper is gone, and the variable is unset before the command so its environment is as it
+  # was. A LITERAL bound, because the suite sources this function alone under `set -u`.
   if [ "$GATE_BOUND_LIVE" = 1 ] && [ "$_b" -gt 0 ]; then
-    "${BASH:-bash}" -c '"$@"; exit $?' "$ROOT" timeout -k 5s "$_b" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
+    RB_UP="$_d/up" "${BASH:-bash}" -c ': >"$RB_UP"; unset RB_UP; "$@"; exit $?' "$ROOT" timeout -k 5s "$_b" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
   else
-    "${BASH:-bash}" -c '"$@"; exit $?' "$ROOT" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
+    RB_UP="$_d/up" "${BASH:-bash}" -c ': >"$RB_UP"; unset RB_UP; "$@"; exit $?' "$ROOT" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
   fi
   _p=$!
+  _i=0
+  while [ ! -e "$_d/up" ] && [ "$_i" -lt 100 ] && kill -0 "$_p" 2>/dev/null; do sleep 0.05; _i=$((_i + 1)); done
   write_proc_record "$_p" "$@"
   wait "$_p"; _rc=$?
   _e=$(date +%s); RB_TOOK=$(( _e - _s ))
@@ -480,7 +493,7 @@ MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_B
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="$SHARED_RECORDS_UNDECLARED"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
 ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
-RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
+RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""; RUN_CLAIMS=""
 GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
 DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
@@ -569,6 +582,19 @@ case "$RESUME_SCHEDULE" in
   # gov:resume-schedule-set
   on|off) ;;
   *) echo "unattended: REFUSING - RESUME_SCHEDULE is declared as '$RESUME_SCHEDULE', which is outside the closed set 'on off'. A switch that cannot be resolved is a restart policy nobody declared." >&2
+     RUNLOG_CLEAN=1; exit 2 ;;
+esac
+# TOOL-aGraftedHelix-1 S16 - THE RUN-CLAIM SWITCH, and it lands DARK. Charter section 1 puts Tier-2
+# behaviour behind a default-off flag, and no owner ruling of TOOL-dDerivedDocket-5's shape turns
+# this one on in the kit, so BLANK OR ABSENT IS `off`: an adopter whose conf predates the key is not
+# exposed by a kit update. A value outside the set is a REFUSAL, for LANDER_MODE's reason. The NOTE
+# naming an undeclared switch is printed by --preflight alone, the verb that starts a run, so a verb
+# that never touches a claim prints nothing new; RUN_CLAIMS_SET remembers whether it was declared.
+RUN_CLAIMS_SET=1
+case "$RUN_CLAIMS" in
+  "") RUN_CLAIMS=off; RUN_CLAIMS_SET="" ;;
+  on|off) ;;
+  *) echo "unattended: REFUSING - RUN_CLAIMS is declared as '$RUN_CLAIMS', which is outside the closed set 'on off'. A switch that cannot be resolved is a claim policy nobody declared." >&2
      RUNLOG_CLEAN=1; exit 2 ;;
 esac
 # `read_bound_key` — a bound key DEFAULTED, VALIDATED and ANNOUNCED — lives in `lib-unattended.sh`,
@@ -795,6 +821,8 @@ DOD_NO_OVERRIDE="authorization-reachable pieces-complete"
 #                             and no run can split it.
 #   repo-state-out-of-mandate the repository state at start was outside what the mandate reaches.
 #   gate-red-out-of-scope     a gate is red and its fix lies outside the mandate scope.
+#   claim-lost                another session holds this run's claim on the remote, so the run must
+#                             not drive its slug any more (TOOL-aGraftedHelix-1); check 108 names it.
 # THE RUNAWAY CEILING, and it is a BACKSTOP rather than the mechanism. A SPEC subject is bounded by
 # `REVIEW_ROUNDS` and exits in a disposition; the DIFF review is bounded by the convergence predicate;
 # this ceiling backstops both, so a defect in the predicate cannot produce an unbounded loop. It is
@@ -844,7 +872,7 @@ FOLD_CUTOFF="2026-09-15"
 # reading). Dated by FOLD_CUTOFF's idiom, strictly past the newest record any branch could still
 # write under the old contract: the newest spec-subject `review` row on any ref was 2026-10-05.
 SPEC_COUNTS_CUTOFF="2026-10-06"
-HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope"
+HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope claim-lost"
 # THE HOLD VOCABULARY, a SECOND closed set beside the halt one and never an extension of it. Each
 # names a stop the run cannot fix and did not cause; none of them ends the run. A project extends
 # through HOLD_CODES_EXTRA and deletes nothing, which HOLD_FLOOR pins the way HALT_FLOOR pins the
@@ -1313,8 +1341,9 @@ derive_refreshed_at() { # run-state file · slug · verb -> prints the listing, 
     RF_FACT="$_rf_tip · $_rf_verb · unlisted"; return 0
   fi
   # NOT A LOOP FED BY A REDIRECT HOLDING A SUBSTITUTION (the shell-hygiene leg): `mapfile` over a
-  # process substitution reads to its writer's end, and `awk` drops empty lines and repeats.
-  mapfile -t _rf_paths < <( { readme_of "$_rf_slug"; echo; grep -F ' dispatch · item ' "$_rf_f" 2>/dev/null | sed 's/.* · reason //' | tr ' ' '\n'; } | awk 'NF && !s[$0]++')
+  # process substitution reads to its writer's end, and `awk` drops empty lines and repeats. The
+  # declared paths are the library's keys' unions over every key, which is every row's paths.
+  mapfile -t _rf_paths < <( { readme_of "$_rf_slug"; echo; read_pass_declarations "$_rf_f" | sed 's/.* · reason //' | tr ' ' '\n'; } | awk 'NF && !s[$0]++')
   _rf_m=$(GIT rev-list --count "$_rf_tip" --not "$_rf_base" HEAD 2>/dev/null) || _rf_m="?"
   _rf_n=$(GIT --literal-pathspecs rev-list --count "$_rf_tip" --not "$_rf_base" HEAD -- "${_rf_paths[@]}" 2>/dev/null) || _rf_n="?"
   _rf_rows=$(GIT --literal-pathspecs log -n 10 --format='%h %s' "$_rf_tip" --not "$_rf_base" HEAD -- "${_rf_paths[@]}" 2>/dev/null)
@@ -1334,7 +1363,8 @@ read_recorded_phase() { # run-state file -> the phase fact, exactly as written
 # ------------------------------------------------------------------------------- the landed log
 # THE LEASE IS THE RUN-STATE FACTS, and there is no second record of it (TOOL-dDerivedDocket-61, the
 # owner's ruling of 2026-09-22 as the build's brief relays it). `write_lease` writes six facts
-# together, `keepalive`, `session`, `pid`, `host`, `pid-image` and `lease-utc`: a record carrying
+# together, `keepalive`, `session`, `pid`, `host`, `pid-image` and `lease-utc`, and the holder row
+# writes a seventh beside them, `prior-session` (TOOL-aGraftedHelix-20): a record carrying
 # `lease-utc` is leased, its holder is the `keepalive` fact, its freshness is `check_lease_fresh`
 # over `--liveness`'s own clock and bound, and HELD is its released state. The per-slug lease FILE
 # this section used to hold under the git common dir is retired and nothing reads or writes one, so
@@ -1693,18 +1723,15 @@ observe_anchor() {
     return 1
   fi
   # ---- 24: exactly one remote. With two the kit would be CHOOSING which endpoint to believe, and
-  # ---- the one it believes has to be the one the landing push goes to.
-  nrem=$(GIT remote | grep -c . || true)
-  if [ "$nrem" != 1 ]; then
-    fail 24 "this clone declares a number of remotes other than one, and the anchor has to be the endpoint the landing push goes to, so the kit refuses to pick one: $nrem"
-    return 1
-  fi
-  rem=$(GIT remote | head -1)
+  # ---- the one it believes has to be the one the landing push goes to. The predicate is
+  # ---- `resolve_claim_remote`'s, so the claim reader and this observation count remotes once.
+  resolve_claim_remote || return 1
+  rem="$CR_NAME"
   # ---- 25: observe and push must be the SAME endpoint. A cost-raiser, NOT the property: a relay the
   # ---- run seeded satisfies it with one URL and one config source. Kept because it is free and
   # ---- catches the honest misconfiguration.
   uf=$(GIT ls-remote --get-url "$rem" 2>/dev/null)
-  up=$(GIT remote get-url --push "$rem" 2>/dev/null)
+  up="$CR_URL"
   if [ "$uf" != "$up" ]; then
     # NORMALISE BEFORE JUDGING. A literal comparison read two spellings of one endpoint as two
     # endpoints, and this check gates `authorization-reachable`, which has no override — so a clone
@@ -1765,6 +1792,442 @@ observe_anchor() {
     return 1
   fi
   AREF="$aref"; ASHA="$asha"; AURL="$uf"
+  return 0
+}
+
+# ================================================ THE RUN CLAIM ON THE REMOTE — TOOL-aGraftedHelix-1
+# WHY IT EXISTS. The lease names the session driving a run, and it lives in the run-state file on the
+# run's OWN branch, so two nodes could `--preflight` one slug and learn it only at the merge. A claim
+# is one ref per slug on the remote the landing push goes to, written by compare-and-swap, renewed
+# while the run lives, given a terminal status when it ends, and read before a run starts, is taken
+# over, dispatches a pass or closes. A live claim another session holds refuses a second driver.
+#
+# THE RECORD: `refs/gov/runs/<slug>` names a parentless commit over the empty tree whose message is
+# `gov-claim <slug>`, a blank line, then eight `key: value` lines - slug, node, host, session,
+# keepalive, status, lease-utc, beat-utc. The verdicts, the table of who may write and the call
+# sites are the stops guide's section 7, rendered from STOPS.template.md; this file implements them.
+#
+# DARK BY DEFAULT: nothing below runs while RUN_CLAIMS is `off`; `--claims` then prints `claims: off`.
+#
+# WHAT THIS DOES NOT CHECK. It is no lock against a run holding the push credential, which can force
+# or delete the ref: it stops an ACCIDENTAL second driver, as the lease does. `--liveness` and
+# `--status` stay offline and read no claim, and `--claims` decides nothing about who drives.
+CLAIM_NS="refs/gov/runs"
+CLAIM_CACHE="refs/gov/remote/runs"
+CR_NAME=""; CR_URL=""
+CLAIM_ROWS=""; CL_WHY=""
+CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""; CW_CLS=""; CW_STATUS=""
+WC_WHY=""; WC_BEAT=""
+
+# THE ONE REMOTE, counted once. SETS rather than prints, because check 24 is a `fail` and a `fail`
+# inside a command substitution is captured as the URL with its status lost. `observe_anchor` calls
+# it for its own count, so the claim reader and the anchor cannot disagree about which remote.
+resolve_claim_remote() { # -> CR_NAME and CR_URL; check 24 when the clone declares other than one remote
+  local nrem
+  nrem=$(GIT remote | grep -c . || true)
+  if [ "$nrem" != 1 ]; then
+    fail 24 "this clone declares a number of remotes other than one, and the anchor has to be the endpoint the landing push goes to, so the kit refuses to pick one: $nrem"
+    return 1
+  fi
+  CR_NAME=$(GIT remote | head -1)
+  CR_URL=$(GIT remote get-url --push "$CR_NAME" 2>/dev/null)
+  return 0
+}
+
+# EVERY CLAIM, IN ONE BOUNDED FETCH into this clone's private cache namespace - no FETCH_HEAD, no
+# branch, no remote-tracking ref - then ONE `for-each-ref`, ONE `date` for every age and two `awk`
+# passes, so no claim spawns a process of its own (memory/gotchas/process-creation-is-the-suite-cost.md).
+# An empty namespace is a successful read of nothing. One row per claim, TAB-separated, every field
+# non-empty (`-` when unknown), because an empty field collapses under `read`: slug, node, status,
+# beat-age-s, verdict, sha, session, keepalive, host, lease-utc, beat-utc. `date -f` skips a line it
+# cannot parse and exits 1, so a count of answers that differs from the count asked is a DEAD PROBE
+# and every age reads `-`, with the verdict `unknown`, rather than shifting onto the next claim.
+# The policy says what a failed read prints: `strict` is check 109, `soft` a line, `quiet` nothing.
+read_claims() { # strict|soft|quiet -> 0 with CLAIM_ROWS, or 1 with CL_WHY
+  local pol="$1" d rc alive=1 nask ngot _st=$status _nc=${#RUNLOG_CHECKS[@]}
+  CLAIM_ROWS=""; CL_WHY=""
+  # QUIET IS QUIET FOR CHECK 24 TOO: `--beat` refuses nothing but a missing record, so the remote
+  # count's own refusal is swallowed, status and run-log entry included, and reaches CL_WHY instead.
+  # SOFT TAKES THE SAME BRANCH (TOOL-aGraftedHelix-32): its callers promise a claim step announced
+  # and never failing the verb, so check 24 reaches them only as the one `claims not read` line.
+  if [ "$pol" = quiet ] || [ "$pol" = soft ]; then
+    resolve_claim_remote >/dev/null; rc=$?
+    status=$_st; RUNLOG_CHECKS=("${RUNLOG_CHECKS[@]:0:$_nc}")
+  else
+    resolve_claim_remote; rc=$?
+  fi
+  if [ "$rc" != 0 ]; then
+    CL_WHY="the clone does not declare exactly one remote, check 24"
+  elif ! d=$(mktemp -d); then
+    CL_WHY="cannot create a scratch directory to bound the claim read in"
+  else
+    observe_remote "$d/fetch" fetch --no-tags --no-write-fetch-head --no-auto-maintenance --prune "$CR_URL" "+$CLAIM_NS/*:$CLAIM_CACHE/*" && rc=0 || rc=$?
+    case "$rc" in
+      0) ;;
+      124) CL_WHY="the read was killed by this kit's own ${REMOTE_BOUND}s bound, so nothing was learned: $CR_URL" ;;
+      *) CL_WHY="the remote did not answer, git fetch exited $rc: $CR_URL" ;;
+    esac
+  fi
+  if [ -n "$CL_WHY" ]; then
+    [ -z "${d:-}" ] || rm -rf "$d"
+    case "$pol" in
+      strict) fail 109 "the claims on the remote could not be read, so whether another session drives this slug is unknown rather than no, and nothing was written: $CL_WHY" ;;
+      soft) echo "unattended: claims not read — $CL_WHY" ;;
+    esac
+    return 1
+  fi
+  GIT for-each-ref --format='%01%(refname)%09%(objectname)%0a%(contents)' "$CLAIM_CACHE/" >"$d/refs" 2>/dev/null
+  printf 'now\n' >"$d/stamps"
+  # PATHS REACH awk THROUGH THE ENVIRONMENT: `-v` processes escapes, and a Windows TMPDIR's
+  # backslashes turned `\Users` into `Users` and the stamps into a file nobody read.
+  CL_STF="$d/stamps" awk -v ns="$CLAIM_CACHE/" '
+    function dash(x) { return x == "" ? "-" : x }
+    function flush(  k, ok, st, i) {
+      if (ref == "") return
+      ok = 1
+      for (k in want) if (!(k in v)) ok = 0
+      st = v["status"]
+      if (st != "live" && st != "held" && st != "landed" && st != "aborted") ok = 0
+      if (v["slug"] != slug) ok = 0
+      i = 0
+      if (v["beat-utc"] ~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z$/) { print v["beat-utc"] >> ENVIRON["CL_STF"]; i = ++n }
+      printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", slug, dash(v["node"]), dash(st), sha, dash(v["session"]), dash(v["keepalive"]), dash(v["host"]), dash(v["lease-utc"]), dash(v["beat-utc"]), ok, i
+    }
+    BEGIN { split("slug node host session keepalive status lease-utc beat-utc", K, " "); for (j in K) want[K[j]] = 1 }
+    /^\001/ { flush(); split(substr($0, 2), a, "\t"); ref = a[1]; sha = a[2]; slug = substr(ref, length(ns) + 1); split("", v); next }
+    { sub(/\r$/, ""); p = index($0, ": ")
+      if (p > 1) { k = substr($0, 1, p - 1); if ((k in want) && !(k in v)) { x = substr($0, p + 2); gsub(/\t/, " ", x); v[k] = x } } }
+    END { flush() }' "$d/refs" >"$d/rows"
+  if [ -s "$d/rows" ]; then
+    date -u -f "$d/stamps" +%s >"$d/ages" 2>/dev/null || alive=0
+    nask=$(grep -c '' "$d/stamps"); ngot=$(grep -c '' "$d/ages")
+    [ "$nask" = "$ngot" ] || alive=0
+    CL_AGES="$d/ages" awk -F'\t' -v OFS='\t' -v alive="$alive" -v bound="$RESUME_STALE_BOUND" '
+      BEGIN { if (alive) while ((getline l < ENVIRON["CL_AGES"]) > 0) age[++na] = l }
+      { a = "-"
+        if (alive && $10 == 1 && $11 > 0) { a = age[1] - age[$11 + 1]; if (a < 0) a = 0 }
+        if ($10 != 1 || a == "-") { vd = "unknown"; a = "-" }
+        else if ($3 == "held") vd = "held"
+        else if ($3 == "landed" || $3 == "aborted") vd = "terminal"
+        else if (a + 0 <= bound + 0) vd = "live"
+        else vd = "stale"
+        print $1, $2, $3, a, vd, $4, $5, $6, $7, $8, $9 }' "$d/rows" >"$d/claims"
+    IFS= read -r -d '' CLAIM_ROWS <"$d/claims" || :
+    CLAIM_ROWS=${CLAIM_ROWS%$'\n'}
+  fi
+  rm -rf "$d"
+  return 0
+}
+
+# --claims, interface I2: one TAB-separated row per claim on the remote - slug, node, status,
+# beat-age-s, verdict - sorted by slug, or the single line `claims: none`; exit 2 with check 109 when
+# the remote does not answer, never an empty list. Where RUN_CLAIMS is not `on` it prints the single
+# line `claims: off` and reads nothing (TOOL-aGraftedHelix-32): no verb writes or reads a claim then,
+# so a leftover claim is inert and the read bought a SessionStart fetch for nothing; it shows again
+# once the switch is on. WHAT IT DOES NOT CHECK: who drives anything; it reports and decides nothing.
+print_claims() { # -> the rows on stdout; rc 2 when the remote does not answer
+  [ "$RUN_CLAIMS" = on ] || { echo "claims: off"; return 0; }
+  read_claims strict || return 2
+  if [ -z "$CLAIM_ROWS" ]; then echo "claims: none"; return 0; fi
+  printf '%s\n' "$CLAIM_ROWS" | cut -f1-5
+  return 0
+}
+
+# THE TABLE'S TWO AXES, declared once (TOOL-aGraftedHelix-19): the claim-read classes the function
+# below derives, in the table's row order, and the modes its callers pass, the table's four columns
+# then `beat`. The function refuses a mode outside CLAIM_MODES, and a class it derives outside
+# CLAIM_READS (TOOL-aGraftedHelix-22), each before any claim write; the suite's per-cell arm reads
+# both lines to derive its cells, so a class or mode added here without a typed cell reds that arm.
+# WHAT THIS DOES NOT CHECK: that a member here has a case branch below; the per-cell arm owns that.
+CLAIM_READS="none mine same foreign-live foreign-held foreign-stale foreign-terminal foreign-unknown"
+CLAIM_MODES="preflight take-over holder status beat"
+
+# WHO MAY WRITE THIS SLUG'S CLAIM, by the table in the stops guide's section 7. The identity rows are
+# tested FIRST - none, `mine` (keepalive AND session equal the lease handed in; `absent` compares
+# literally, so two absent sessions fall back on the keepalive), `same session` (the claim's session
+# is this harness's CLAUDE_CODE_SESSION_ID, not `absent`) - and only a FOREIGN claim is read by its
+# verdict, so a claim of this lease the one date call could not age is `mine` with an unknown age,
+# which is due. Modes are the table's columns plus `beat`, which writes only through the none and
+# `mine` rows of the holder column and declines every other row in silence for `--beat` to name.
+# rc 0: write (CW_ACT create|renew|rewrite|take|take-announced|write) · rc 2: `mine` and not due ·
+# rc 1: refused, check 107, 108, 110 or 111 printed · rc 3: not written, announced (status) or declined (beat).
+# TOOL-aGraftedHelix-11 - THE RUN-STATE FILE, sixth, is where a write that does not take the claim
+# copies its identity from, the one `write_claim` is handed too: `--preflight` and a take-over pass
+# none, every other writer passes the record. `mine` keeps the claim's own `node`.
+# TOOL-aGraftedHelix-20 - THE `prior-session` FACT, read from that file HERE and never handed in by a
+# caller (TOOL-aGraftedHelix-23): a SET, its members separated by one space, of the sessions a
+# `--resume` holder-row claim write that did not land may have left the published claim under. The
+# empty value and a missing line are the empty set; `absent` is a member like any other. Handed the
+# record, a holder, `--beat` or status write also reads `mine` a claim of the lease's keepalive under
+# ANY member, and the take-over handed it - the restart row alone - reads `same session` one under the
+# record's keepalive. CW_SESS is the claim's own session when a claim was found, for that holder row.
+# CW_CLS is the claim-read class derived and CW_STATUS the claim's own status, empty with no claim, for
+# the settle's retry, which writes only a `mine` claim still `held` or `live` (TOOL-aGraftedHelix-36).
+check_claim_writable() { # slug · mode · lease keepalive · lease session · the keepalive a write sets · [run-state file]
+  local slug="$1" mode="$2" ka="$3" sid="$4" wka="$5" rel="${6:-}" me="${CLAUDE_CODE_SESSION_ID:-}" row cls due ps=""
+  local c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_btxt=unknown r_host r_sess r_lease
+  CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""; CW_CLS=""; CW_STATUS=""
+  case " $CLAIM_MODES " in
+    *" $mode "*) ;;
+    *) fail 110 "this call passed a claim mode the driver does not declare, so the claim write table has no column for it and nothing was written; declare the mode in CLAIM_MODES beside its case branch, or pass a declared one: mode $mode · CLAIM_MODES $CLAIM_MODES"
+       return 1 ;;
+  esac
+  row=""
+  case $'\n'"$CLAIM_ROWS" in
+    *$'\n'"$slug"$'\t'*) row=$'\n'"$CLAIM_ROWS"; row=${row#*$'\n'"$slug"$'\t'}; row="$slug"$'\t'"${row%%$'\n'*}" ;;
+  esac
+  if [ -z "$row" ]; then
+    cls=none
+  else
+    IFS=$'\t' read -r c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat <<<"$row"
+    CW_SHA="$c_sha"; CW_SESS="$c_sess"; CW_STATUS="$c_status"
+    c_btxt="${c_age}s"; [ "$c_age" != - ] || c_btxt=unknown
+    CW_WHO="$slug · node $c_node · session $c_sess · beat $c_btxt · status $c_status · verdict $c_verdict"
+    CW_FROM="$slug from node $c_node session $c_sess beat-age $c_btxt"
+    if [ -n "$rel" ]; then ps=$(fact "$rel" prior-session) || :; fi
+    if [ "$c_ka" = "$ka" ] && [ "$c_sess" = "$sid" ]; then cls=mine
+    elif [ -n "$ps" ] && [ "$mode" != take-over ] && [ "$c_ka" = "$ka" ] && [[ " $ps " == *" $c_sess "* ]]; then cls=mine
+    elif [ -n "$me" ] && [ "$me" != absent ] && [ "$c_sess" = "$me" ]; then cls=same
+    elif [ -n "$ps" ] && [ "$mode" = take-over ] && [[ " $ps " == *" $c_sess "* ]] && [ "$c_ka" = "$(fact "$rel" keepalive)" ]; then cls=same
+    else cls="foreign-$c_verdict"; fi
+  fi
+  case " $CLAIM_READS " in
+    *" $cls "*) ;;
+    *) fail 111 "this call derived a claim-read class the driver does not declare, so the claim write table has no row for it and nothing was written; declare the class in CLAIM_READS beside its case branch: class $cls · CLAIM_READS $CLAIM_READS"
+       return 1 ;;
+  esac
+  CW_CLS="$cls"
+  if [ "$cls" = mine ]; then
+    [ "$c_node" = - ] || CW_NODE="$c_node"
+    # DUE at a quarter of the stale bound, or when a field the write would set differs - so a holder
+    # still reads its claim on every call and finds a lost one, and pushes at most once per quarter.
+    # The fields are the ones the write COPIES from the record, never this caller's environment, so
+    # a writer under another session - the tick's `--beat`, a Workflow child's `--dispatch` - makes
+    # no write due (TOOL-aGraftedHelix-11 S2). With no record handed in, a write is always due.
+    due=""
+    case "$c_age" in -) due=1 ;; *) [ "$c_age" -ge $((RESUME_STALE_BOUND / 4)) ] && due=1 ;; esac
+    if [ -n "$rel" ]; then
+      r_host=$(fact "$rel" host) || :; r_sess=$(fact "$rel" session) || :; r_lease=$(fact "$rel" lease-utc) || :
+      [ "$c_host" = "${r_host:-absent}" ] && [ "$c_sess" = "${r_sess:-absent}" ] && [ "$c_lease" = "${r_lease:-absent}" ] \
+        && [ "$c_ka" = "$wka" ] && [ "$c_status" = live ] || due=1
+    else
+      due=1
+    fi
+  fi
+  case "$mode:$cls" in
+    *:none) CW_ACT=create ;;
+    preflight:mine|take-over:mine) CW_ACT=renew ;;
+    holder:mine|beat:mine) [ -n "$due" ] || return 2; CW_ACT=renew ;;
+    status:mine|status:same|status:foreign-stale|status:foreign-terminal) CW_ACT=write ;;
+    preflight:same) CW_ACT=rewrite ;;
+    take-over:same|holder:same|take-over:foreign-held|preflight:foreign-terminal) CW_ACT=take ;;
+    preflight:foreign-stale|take-over:foreign-stale) CW_ACT=take-announced ;;
+    beat:*) return 3 ;;
+    preflight:*|take-over:*)
+      fail 107 "another session holds this slug's claim on the remote, so a second driver would start beside it; nothing was written, and the claim names its holder: $CW_WHO"
+      return 1 ;;
+    holder:*)
+      fail 108 "this run does not hold its claim on the remote, because another session's claim is there, so it must not drive the slug and nothing was written; end the run with --abort <slug> --code claim-lost, the halt code for a lost claim: $CW_WHO"
+      return 1 ;;
+    *) echo "unattended: claim not written — $slug is held $c_status by session $c_sess on $c_node, beat $c_btxt"
+       return 3 ;;
+  esac
+  return 0
+}
+
+# THE CLAIM-PUSH LOCK (TOOL-aGraftedHelix-37). `write_claim_push_lock` takes `claim-push.lock` with
+# `mkdir` and writes its deadline into `until` and the caller's token into `owner`. A lock it cannot
+# make is broken only when `check_claim_push_lock_stale` reads it stale - a deadline already passed,
+# or none and a directory older than two minutes - and only by the writer that takes the guard
+# `<lock>.break` with `mkdir`. Holding the guard it re-reads the rule, breaks a lock still stale,
+# makes it again and writes both files before it releases the guard; a re-read finding the lock live,
+# or a re-make losing to a plain `mkdir`, releases the guard and reports busy. So no breaker removes
+# a lock another breaker made. A guard older than one minute was left by a crash: the writer finding
+# it removes it and reports busy, never taking it in the same call, and the next call breaks the
+# lock. Each self-heal appends a health event once the guard is released. `remove_claim_push_lock`
+# clears the lock only while its `owner` reads the caller's token, the turnstile's nonce pattern, so
+# a release never removes the fresh lock of a writer that broke it. `until` stays a bare epoch, the
+# one field the lander's wait reads.
+# WHAT THIS DOES NOT CHECK: removing an abandoned guard is itself unguarded, so two writers removing
+# one at once while a third takes a fresh guard between them can admit two breakers; that needs a
+# writer to die or stall for a minute inside the break, then four writers in one git dir in one
+# window. An owner that outlives its recorded deadline (no runnable `timeout -k`) is breakable while
+# it pushes, and its own release can land between a breaker's re-read and its removal. Both the
+# deadline and the age are wall-clock reads, so a clock stepped forward breaks a live lock.
+# A writer in another git dir takes another lock.
+check_claim_push_lock_stale() { # lock dir -> 0 when its deadline passed, or it has none and is older than two minutes
+  local lu=""; { read -r lu <"$1/until"; } 2>/dev/null || :
+  case "$lu" in *[!0-9]*) lu="" ;; esac
+  if [ -n "$lu" ]; then [ "$lu" -lt "$(date +%s)" ]; return; fi
+  [ -n "$(find "$1" -maxdepth 0 -mmin +2 2>/dev/null)" ]
+}
+write_claim_push_lock() { # lock dir · owner token -> 0 taken, 1 busy
+  local lk="$1" g="$1.break" broke=""
+  if ! mkdir "$lk" 2>/dev/null; then
+    check_claim_push_lock_stale "$lk" || return 1
+    if ! mkdir "$g" 2>/dev/null; then
+      if [ -n "$(find "$g" -maxdepth 0 -mmin +1 2>/dev/null)" ]; then
+        rm -rf "$g"
+        add_health_event "$(resolve_health_log "$ROOT")" unattended claim-push-guard-cleared "$g"
+      fi
+      return 1
+    fi
+    if ! check_claim_push_lock_stale "$lk"; then rmdir "$g" 2>/dev/null; return 1; fi
+    rm -rf "$lk"
+    mkdir "$lk" 2>/dev/null || { rmdir "$g" 2>/dev/null; return 1; }
+    broke=1
+  fi
+  printf '%s\n' "$(( $(date +%s) + REMOTE_BOUND + 10 ))" >"$lk/until" 2>/dev/null || :
+  printf '%s\n' "$2" >"$lk/owner" 2>/dev/null || :
+  if [ -n "$broke" ]; then
+    rmdir "$g" 2>/dev/null
+    add_health_event "$(resolve_health_log "$ROOT")" unattended claim-push-lock-broken "$lk"
+  fi
+  return 0
+}
+remove_claim_push_lock() { # lock dir · owner token -> removes it only while its owner file reads that token
+  local o=""; { read -r o <"$1/owner"; } 2>/dev/null || :
+  [ -n "$2" ] && [ "$o" = "$2" ] && rm -rf "$1"
+  return 0
+}
+
+# ONE CLAIM WRITE, by compare-and-swap on the sha `check_claim_writable` read: `git push --porcelain
+# --force-with-lease=<ref>:<that sha>`, EMPTY for a create. The porcelain status line decides the
+# outcome, never the exit alone: `!` with `(stale info)` or `(fetch first)` is LOST, the ref moved
+# between this call's read and its write; any other `!`, no status line, or the bound firing is NOT
+# COMPLETED and carries git's reason or the exit, so a pre-push refusal is never reported as a race.
+# Every write leaves the ref on the remote, a terminal one included. The commit has a FIXED identity,
+# so a clone with none configured still writes and the claim publishes no address the run's commits
+# do not already carry. The policy says what a failure prints: `strict` checks 108 and 109, `holder`
+# check 108 and a line, `soft` two lines, `quiet` nothing - `--beat` names its own skip.
+# THE PUSH NAMES THE REMOTE, `CR_NAME`, never its URL (TOOL-aGraftedHelix-10). Given a name, the
+# tracked pre-push hook observes `<name>/HEAD` as the default branch, the pushed ref is not that
+# branch, and the hook exits `skip-nondefault`, or runs the branch bar a repository declares as
+# `GOV_BRANCH_GATE_CMD`. Given a URL it observes nothing and, with GOV_DEFAULT_BRANCH unset, refuses
+# every claim. The driver never supplies that variable, so a remote with no recorded HEAD is a
+# `default-branch` refusal and NOT COMPLETED, its message carrying `git remote set-head <name> -a`,
+# which the hook prints only to the stderr this push discards. The hook's refusal file is removed
+# before the push, as push-main removes it, so a token read after it came from THIS push's hook -
+# which holds only because no claim push runs while push-main holds `push-main-active` in the same
+# git dir (TOOL-aGraftedHelix-32): that hook clears both verdict files the lander trusts on every
+# run, so a beat landing mid-bar would erase the landing's verdict. THE TWO WRITERS ARE SERIALISED
+# BY A LOCK AND THE MARKER (TOOL-aGraftedHelix-36 S10): this function takes the directory
+# `claim-push.lock` in the same git dir BEFORE it tests the marker, writes its deadline into the
+# lock's `until`, and releases it on every path out; push-main touches its marker, then waits for no
+# live lock, then clears and pushes. Whichever side moves second sees the other, so the marker test
+# can no longer pass a moment before the lander clears its verdict files. The take, the break of a
+# stale lock and the release are `write_claim_push_lock` and `remove_claim_push_lock`, whose header
+# states their limits (TOOL-aGraftedHelix-37).
+# WHAT THIS DOES NOT CHECK: on a host with no runnable `timeout -k` the push is unbounded, so a push
+# can outlive the deadline it recorded, and a lander past that deadline then pushes beside it.
+# THE IDENTITY IS THE LEASE RECORD'S (TOOL-aGraftedHelix-11), so a writer the OS scheduler launched
+# with no session, or a Workflow child under another one, never rewrites it. Handed the run-state
+# file, the write copies its `session`, `host` and `lease-utc` (the keepalive argument is the
+# record's too); handed none, it is `--preflight` or a take-over taking the claim, and writes this
+# harness's session and host with the one lease stamp the caller also hands `write_lease`. `node` is
+# the claim's own on the `mine` row, this user's elsewhere.
+write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [run-state file] · [lease stamp] -> 0 written, 1 lost, 2 not completed; WC_WHY
+  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" d t c rc l line flag node host sid msg rf="" tok="" lk="" own="" busy=""
+  WC_WHY=""; WC_BEAT=$(read_utc_now)
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  [ -z "$RUNLOG_GITDIR" ] || rf="$RUNLOG_GITDIR/pre-push-refusal"
+  if [ -n "$RUNLOG_GITDIR" ]; then
+    lk="$RUNLOG_GITDIR/claim-push.lock"; own="$BASHPID.$RANDOM"
+    write_claim_push_lock "$lk" "$own" || { lk=""; busy=1; }
+  fi
+  if [ -n "$rel" ]; then
+    sid=$(fact "$rel" session) || :; host=$(fact "$rel" host) || :; lease=$(fact "$rel" lease-utc) || :; lease="${lease:-absent}"
+  else
+    sid="${CLAUDE_CODE_SESSION_ID:-}"; host=$(read_host_name) || host=""; lease="${lease:-$WC_BEAT}"
+  fi
+  sid="${sid:-absent}"; node="${CW_NODE:-${USERNAME:-${USER:-absent}}}"
+  msg=$(printf 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s' \
+    "$slug" "$slug" "${node//[$'\n\r\t']/ }" "${host:-absent}" "${sid//[$'\n\r\t']/ }" "${ka//[$'\n\r\t']/ }" "$st" "$lease" "$WC_BEAT")
+  if [ -n "$busy" ]; then
+    WC_WHY="a claim push from this git dir is in flight; retry once it ends: $RUNLOG_GITDIR/claim-push.lock"; rc=2
+  elif [ -n "$RUNLOG_GITDIR" ] && [ -f "$RUNLOG_GITDIR/push-main-active" ]; then
+    WC_WHY="push-main is landing from this git dir, so a claim push now would clear its verdict files: $RUNLOG_GITDIR/push-main-active"; rc=2
+  elif ! d=$(mktemp); then
+    WC_WHY="cannot create a scratch file to bound the push"; rc=2
+  elif ! t=$(GIT mktree </dev/null) || ! c=$(GIT_AUTHOR_NAME=gov-claim GIT_AUTHOR_EMAIL=gov-claim@invalid GIT_COMMITTER_NAME=gov-claim GIT_COMMITTER_EMAIL=gov-claim@invalid GIT commit-tree "$t" -m "$msg" 2>/dev/null); then
+    WC_WHY="the claim commit could not be built in this clone"; rc=2
+  else
+    [ -z "$rf" ] || rm -f "$rf"
+    observe_remote "$d" push --porcelain "--force-with-lease=$CLAIM_NS/$slug:$CW_SHA" "$CR_NAME" "$c:$CLAIM_NS/$slug" && rc=0 || rc=$?
+    line=""
+    while IFS= read -r l; do
+      case "$l" in ?$'\t'*":$CLAIM_NS/$slug"$'\t'*) line=${l%$'\r'} ;; esac
+    done <"$d"
+    flag=${line:0:1}
+    if [ "$rc" = 124 ]; then WC_WHY="the push was killed by this kit's own ${REMOTE_BOUND}s bound: $CR_URL"; rc=2
+    elif [ -z "$line" ]; then WC_WHY="git push exited $rc and printed no status line for the claim: $CR_URL"; rc=2
+    elif [ "$flag" != '!' ]; then rc=0
+    else
+      case "$line" in
+        *"(stale info)"*|*"(fetch first)"*) WC_WHY="the push was rejected: ${line##*$'\t'}"; rc=1 ;;
+        *) WC_WHY="the push was refused: ${line##*$'\t'}"; rc=2 ;;
+      esac
+    fi
+    if [ "$rc" = 2 ] && [ -n "$rf" ] && [ -f "$rf" ]; then
+      IFS=$'\t' read -r tok _ <"$rf" || :
+      WC_WHY="$WC_WHY · the pre-push hook refused it: ${tok:-an empty refusal file}"
+      [ "$tok" != default-branch ] || WC_WHY="$WC_WHY · fix once: git remote set-head $CR_NAME -a"
+    fi
+  fi
+  [ -z "$lk" ] || remove_claim_push_lock "$lk" "$own"
+  [ -z "${d:-}" ] || rm -f "$d"
+  if [ "$rc" = 0 ]; then
+    # A TAKE-OVER OF A STALE CLAIM IS A SELF-HEAL, logged once per write that landed (I3,
+    # TOOL-aGraftedHelix-8); the claim's own row, read before the write, is the detail.
+    if [ "$CW_ACT" = take-announced ]; then
+      echo "unattended: claim taken over — $CW_WHO"
+      add_health_event "$(resolve_health_log "$ROOT")" unattended claim-taken-over "$CW_FROM"
+    fi
+    return 0
+  fi
+  case "$rc:$pol" in
+    1:strict|1:holder) fail 108 "the claim moved on the remote between this call's read and its write, so another session took the slug first and this run must not drive it; nothing was written, and a run that has a record ends with --abort <slug> --code claim-lost: $slug · $WC_WHY" ;;
+    2:strict) fail 109 "the claim write did not complete, so whether this run holds its slug on the remote is unknown rather than lost, and nothing was written: $slug · $WC_WHY" ;;
+    *:quiet) ;;
+    *) echo "unattended: claim not written — $slug · $WC_WHY" ;;
+  esac
+  return "$rc"
+}
+
+# --beat, the resume tick's heartbeat: renew the claim of a run `--liveness` reads LIVE on this
+# host, through the none and `mine` rows of the holder column only, and print exactly one `beat —`
+# line. It reads the verdict `--liveness` prints and never re-derives it. It refuses nothing but a
+# missing record, because the tick is not the driver: the run's own next verb decides a lost claim.
+# WHAT IT DOES NOT CHECK: it never writes a claim its run does not hold, and a skip is not a refusal.
+write_claim_beat() { # slug -> exactly one `beat —` line
+  local slug="$1" rel f l verdict="" me ka
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run whose claim a beat could renew: $rel"; return 1; }
+  if [ "$RUN_CLAIMS" != on ]; then
+    echo "unattended: beat — $slug · skipped: RUN_CLAIMS is off in $CONF, so no claim is renewed"; return 0
+  fi
+  f=$(mktemp) || { echo "unattended: beat — $slug · skipped: no scratch file for the liveness read"; return 0; }
+  ( print_liveness "$slug" ) >"$f" 2>/dev/null
+  while IFS= read -r l; do case "$l" in "verdict: "*) verdict=${l#verdict: } ;; esac; done <"$f"
+  rm -f "$f"
+  [ "$verdict" = LIVE ] || { echo "unattended: beat — $slug · skipped: verdict ${verdict:-unreadable}"; return 0; }
+  me=$(read_host_name) || me=""
+  case "$(fact "$rel" host)" in ""|absent|"$me") ;; *) echo "unattended: beat — $slug · skipped: leased on $(fact "$rel" host), not this host ${me:-unknown}"; return 0 ;; esac
+  read_claims quiet || { echo "unattended: beat — $slug · skipped: the remote did not answer: $CL_WHY"; return 0; }
+  ka=$(fact "$rel" keepalive)
+  check_claim_writable "$slug" beat "$ka" "$(fact "$rel" session)" "$ka" "$rel"
+  case "$?" in
+    1) echo "unattended: beat — $slug · skipped: the claim write table refused the call"; return 0 ;;
+    2) echo "unattended: beat — $slug · skipped: the beat is not yet due, a quarter of ${RESUME_STALE_BOUND}s"; return 0 ;;
+    3) echo "unattended: beat — $slug · skipped: the claim is not this run's: $CW_WHO"; return 0 ;;
+  esac
+  write_claim "$slug" live "$ka" quiet "$rel"
+  case "$?" in
+    0) echo "unattended: beat — $slug · renewed $WC_BEAT" ;;
+    1) echo "unattended: beat — $slug · skipped: the claim moved, so the run's own next verb decides it: $WC_WHY" ;;
+    *) echo "unattended: beat — $slug · skipped: the write did not complete: $WC_WHY" ;;
+  esac
   return 0
 }
 
@@ -2083,7 +2546,7 @@ scan_dirty_paths() {
   GIT ls-files --others --exclude-standard
 }
 
-# THE OPTIONAL ARGUMENT EXEMPTS ONE FILE, and only while it differs from HEAD in its six lease-fact
+# THE OPTIONAL ARGUMENT EXEMPTS ONE FILE, and only while it differs from HEAD in its seven lease-fact
 # lines alone (`check_lease_only_diff`, TOOL-dDerivedDocket-61 S8). `--landed`'s `primary` branch is
 # its one caller: a pushed landing re-bound by `--resume --keepalive-id` stays uncommitted, because
 # committing it would move HEAD off the pushed tip. `--hold` and `--preflight` pass nothing, so both
@@ -2303,9 +2766,15 @@ check_waivers() { # run-state file
 # stated ground that anything keyed on "the run" would otherwise have to OR the phases together or
 # pick one arbitrarily. NOTHING IS KEYED ON IT, and that was tested by construction rather than read:
 # in a scratch copy with this refusal and leg check 7 both neutered, and two genuinely live records
-# for unrelated builds, the full leg exited 0 green and every verb resolved its own build. The
-# driver's verb population is seventeen and sixteen of them take a `<slug>`; the seventeenth is
-# `--version`, which resolves nothing. The leg's three tree-wide loops all grade per file.
+# for unrelated builds, the full leg exited 0 green and every verb resolved its own build. Every
+# verb that resolves a build takes its `<slug>`, and the ones that take none resolve nothing; the
+# set is VERBS_SLUG and VERBS_INLINE above, never a count written here. The leg's three tree-wide
+# loops all grade per file.
+#
+# THE REMOTE'S CLAIMS ARE ANNOUNCED TOO (TOOL-aGraftedHelix-1 S6): after the local records, every
+# claim on the remote naming ANOTHER slug whose verdict is live, held, stale or unknown, one line
+# each, silent at zero. A terminal claim is not listed. This slug's own claim is not announced here,
+# because --preflight's own claim read refuses or takes it.
 #
 # What the refusal DID buy was a crude staleness signal, and it bought it at a price this fleet paid
 # three times: TOOL-aFusedCharter-4 (three builds wedged at LANDING, cleared only by marking two
@@ -2374,12 +2843,17 @@ check_single_live() {
   fi
   # SILENT AT ZERO. A line printed on every ordinary preflight is a line nobody reads, and the
   # announcement's whole value is that its presence means something.
-  [ "$n" -lt 1 ] && return 0
-  printf 'unattended: %d concurrent unattended run(s) — this run is NOT blocked by them, and none of them is blocked by this one:\n' "$n"
-  for f in $live; do
-    read_derived_phase "$f"
-    printf '  %s · phase %s · witness %s\n' "$f" "$DP_PHASE" "$(fact "$f" witness)"
-  done
+  if [ "$n" -ge 1 ]; then
+    printf 'unattended: %d concurrent unattended run(s) — this run is NOT blocked by them, and none of them is blocked by this one:\n' "$n"
+    for f in $live; do
+      read_derived_phase "$f"
+      printf '  %s · phase %s · witness %s\n' "$f" "$DP_PHASE" "$(fact "$f" witness)"
+    done
+  fi
+  [ "$RUN_CLAIMS" = on ] && [ -n "$CLAIM_ROWS" ] || return 0
+  printf '%s\n' "$CLAIM_ROWS" | awk -F'\t' -v me="${SLUG:-}" '
+    $1 != me && $5 != "terminal" { r[++n] = sprintf("  %s · node %s · status %s · beat %s · verdict %s", $1, $2, $3, ($4 == "-" ? "unknown" : $4 "s"), $5) }
+    END { if (n) { printf "unattended: %d claim(s) on the remote for other slugs — this run is NOT blocked by them:\n", n; for (i = 1; i <= n; i++) print r[i] } }'
   return 0
 }
 
@@ -4651,7 +5125,7 @@ check_keepalive_reaped() { # slug · run-state file -> 0 read back or announced 
 # does NOT check: that the id named by `keepalive` was ever the run's job, that no job under another
 # id still fires, or anything about a stop the hook did not record. One line, one id, one substring.
 verb_landed() { # slug
-  local slug="$1" rel cur head lbranch unp oldest akind rbref rbtip
+  local slug="$1" rel cur head lbranch unp oldest akind rbref rbtip _sk
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to mark landed: $rel"; return 1; }
@@ -4711,6 +5185,14 @@ WTS
       # TOOL-dDerivedDocket-28 S11 - the in-place landing writes no terminal until a rotation that
       # may never come, so the ledger goes HERE, beside the one write this verb makes.
       remove_procs_ledger "$slug"
+      # TOOL-aGraftedHelix-1 S9 (spec rev-7) - THE IN-PLACE LANDING'S STATUS WRITE. This branch stages
+      # nothing, so the claim reads `landed` once the observation above is written, announced and never
+      # failing the verb like the staged writes; left `live` it would age to `stale` and be announced at
+      # every later --preflight of another slug.
+      if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
+        _sk=$(fact "$rel" keepalive)
+        check_claim_writable "$slug" status "$_sk" "$(fact "$rel" session)" "$_sk" "$rel" && write_claim "$slug" landed "$_sk" soft "$rel"
+      fi
       return 0
     fi
     if [ -z "$DP_LANDING" ]; then
@@ -4725,7 +5207,7 @@ WTS
     return 1
   fi
   # S5 - THE PRIMARY CLEAN CHECK EXEMPTS THE RUN-STATE FILE, and only when it differs from HEAD in
-  # its six lease-fact lines alone (`check_lease_only_diff`, TOOL-dDerivedDocket-61 S8): a pushed
+  # its seven lease-fact lines alone (`check_lease_only_diff`, TOOL-dDerivedDocket-61 S8): a pushed
   # landing re-bound by `--resume --keepalive-id` carries exactly that difference, and `fail 55`
   # names that re-bind as its remedy. No other caller of the clean check passes the file.
   check_clean "$rel" || return 1
@@ -4954,6 +5436,13 @@ WTS
   set_fact "$rel" phase LANDED || return 1
   remove_procs_ledger "$slug"
   stage_or_fail "$rel" || return 1
+  # TOOL-aGraftedHelix-1 S9 - THE STATUS WRITE, after the record is staged: the claim reads `landed`.
+  # Announced and never failing the verb when this call may not write it or the write does not
+  # complete, because the local record is the truth and the claim then ages to `stale`.
+  if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
+    _sk=$(fact "$rel" keepalive)
+    check_claim_writable "$slug" status "$_sk" "$(fact "$rel" session)" "$_sk" "$rel" && write_claim "$slug" landed "$_sk" soft "$rel"
+  fi
   if [ "$akind" = remote ]; then
     echo "unattended: phase LANDED · witness $head · anchor remote · observed on $AREF at $ASHA · unpushed on local $lbranch: $unp"
   else
@@ -4997,7 +5486,7 @@ print_abort_notice() { # run-state file · halt code -> prints, never refuses
 }
 
 verb_abort() { # slug · reason · code
-  local slug="$1" reason="$2" code="$3" rel head item ck key
+  local slug="$1" reason="$2" code="$3" rel head item ck key _sk
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to abort: $rel"; return 1; }
@@ -5088,6 +5577,13 @@ verb_abort() { # slug · reason · code
   set_fact "$rel" halt-code "$code" || return 1
   park "$rel" abort "$slug" "$reason" || return 1
   stage_or_fail "$rel" || return 1
+  # TOOL-aGraftedHelix-1 S9 - THE STATUS WRITE, after the record is staged: the claim reads `aborted`.
+  # Announced and never failing the verb when this call may not write it or the write does not
+  # complete, because the local record is the truth and the claim then ages to `stale`.
+  if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
+    _sk=$(fact "$rel" keepalive)
+    check_claim_writable "$slug" status "$_sk" "$(fact "$rel" session)" "$_sk" "$rel" && write_claim "$slug" aborted "$_sk" soft "$rel"
+  fi
   echo "unattended: phase ABORTED · witness $head · halt-code $code · reason recorded as a parked entry"
   return 0
 }
@@ -5165,7 +5661,7 @@ print_interrupted_acts() {
 # over uncommitted work, with a witness naming a commit that is not what the tree holds — and
 # --resume would then return that run to its working phase on a false premise.
 run_hold() { # slug · code · until · reason · reaped · unreachable · pending run
-  local slug="$1" code="$2" until="$3" reason="$4" reaped="$5" unreach="$6" pendrun="${7-}"
+  local slug="$1" code="$2" until="$3" reason="$4" reaped="$5" unreach="$6" pendrun="${7-}" _sk
   local rel cur ka head legal bt rc adv unpushed=""
   local rsname heldat streak owed owedwhy rsrow pendrun_bad=0 inflight
   check_slug "$slug" || return 1
@@ -5381,6 +5877,13 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
   # held it. The stop-guard allows this session's stop and the resume tick skips the run by the
   # verdict `--liveness` prints for it, `HELD` (TOOL-dDerivedDocket-61 S4 to S6).
   stage_or_fail "$rel" || return 1
+  # TOOL-aGraftedHelix-1 S9 - THE STATUS WRITE, after the record is staged: the claim reads `held`.
+  # Announced and never failing the verb when this call may not write it or the write does not
+  # complete, because the local record is the truth and the claim then ages to `stale`.
+  if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
+    _sk=$(fact "$rel" keepalive)
+    check_claim_writable "$slug" status "$_sk" "$(fact "$rel" session)" "$_sk" "$rel" && write_claim "$slug" held "$_sk" soft "$rel"
+  fi
   echo "unattended: phase HELD · code $code · until $until · from $cur · witness $head"
   if [ -n "$unpushed" ]; then
     echo "unattended: the branch tip is UNPUBLISHED and recorded as hold-unpushed — it exists only on this node until a take-over pushes it: $unpushed"
@@ -5501,26 +6004,58 @@ run_handoff() { # slug · code · reason · reaped · unreachable
 #              record admits (protocol section 3)
 #   lease-dead any other non-terminal phase whose `--liveness` verdict is STALE or UNBOUND and whose
 #              work reads landed: `work-landed-at` and `abandoned: <utc>` under the CURRENT phase
-#   settled    the fact this branch would write is already there: said so, exit 0
+#   settled    the fact this branch would write is already there: said so, the claim write retried, exit 0
 #
 # EVERY REFUSAL PRECEDES THE FIRST WRITE, in the spec's order, after the settled test, which writes
-# nothing: the record and its difference from HEAD, the recorded phase and the branch it selects, the advertised tip, then the branch's own test.
+# no record: the record and its difference from HEAD, the recorded phase and the branch it selects, the advertised tip, then the branch's own test.
 # The record is STAGED and never committed: a settle is a records commit made after the work landed,
 # so it rides the next landing from this tree or a batched owner pass, and every deriving reader
 # reads the record correctly before then. A live record only: an archive is immutable.
+# THE SETTLE'S CLAIM WRITE, ONCE (TOOL-aGraftedHelix-36 S4), called by the settle that writes the
+# record (`first`) and by the already-settled exit (`retry`). Handed the record's own keepalive and
+# session, as the status column's other writers are. A retry writes only a claim that reads `mine` and
+# still `held` or `live`, so a re-run over a claim already terminal pushes nothing and one a newer run
+# holds is announced and left. A write that does not complete names the re-run as its remedy.
+# WHAT THIS DOES NOT CHECK: a claim read that fails is announced by `read_claims` and not retried here.
+write_settle_claim() { # slug · run-state file · status to write · first|retry
+  local slug="$1" rel="$2" st="$3" when="$4" _sk
+  [ -n "$st" ] && [ "$RUN_CLAIMS" = on ] || return 0
+  read_claims soft || return 0
+  _sk=$(fact "$rel" keepalive)
+  check_claim_writable "$slug" status "$_sk" "$(fact "$rel" session)" "$_sk" "$rel" || return 0
+  if [ "$when" = retry ]; then
+    [ "$CW_CLS" = mine ] || return 0
+    case "$CW_STATUS" in held|live) ;; *) return 0 ;; esac
+  fi
+  if write_claim "$slug" "$st" "$_sk" soft "$rel"; then
+    [ "$when" = first ] || echo "unattended: claim retried — $slug now reads $st on the remote"
+  else
+    echo "unattended: the settle's claim write did not complete; re-run --settle $slug to retry it"
+  fi
+  return 0
+}
+
 run_settle() { # slug
-  local slug="$1" rel ph br hc cut first wla t8 st_lease
+  local slug="$1" rel ph br hc cut first wla t8 st_lease st_claim
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to settle: $rel"; return 1; }
   ph=$(read_recorded_phase "$rel")
-  # ALREADY SETTLED FIRST, because it writes nothing whatever else holds: a settle is staged and
+  # ALREADY SETTLED FIRST, because it writes no record whatever else holds: a settle is staged and
   # committed later, so the record a re-run meets differs from HEAD's copy by exactly what it wrote.
   wla=$(fact "$rel" work-landed-at)
-  if { [ "$ph" = LANDED ] && [ "$(fact "$rel" landed-by)" = attended ]; } \
-     || { [ "$ph" = ABORTED ] && [ -n "$wla" ]; } \
-     || { ! is_terminal "$ph" && [ "$ph" != HELD ] && [ -n "$wla" ] && [ -n "$(fact "$rel" abandoned)" ]; }; then
-    echo "unattended: already settled - $rel reads $ph${wla:+, work-landed-at $wla}; nothing was written"
+  # A RE-RUN RETRIES THE CLAIM WRITE (TOOL-aGraftedHelix-36 S4): the record is not rewritten, and
+  # the status the settle's branch writes is written again only over a claim still `held` or `live`
+  # under the record's own lease, so a first write that did not complete has a route other than a
+  # hand-deleted ref, and a claim already terminal or another run's is left.
+  st_claim=""
+  if [ "$ph" = LANDED ] && [ "$(fact "$rel" landed-by)" = attended ]; then st_claim=landed
+  elif [ "$ph" = ABORTED ] && [ -n "$wla" ]; then st_claim=-
+  elif ! is_terminal "$ph" && [ "$ph" != HELD ] && [ -n "$wla" ] && [ -n "$(fact "$rel" abandoned)" ]; then st_claim=aborted
+  fi
+  if [ -n "$st_claim" ]; then
+    echo "unattended: already settled - $rel reads $ph${wla:+, work-landed-at $wla}; the record was not rewritten"
+    [ "$st_claim" = - ] || write_settle_claim "$slug" "$rel" "$st_claim" retry
     return 0
   fi
   if ! GIT cat-file -e "HEAD:$rel" 2>/dev/null || ! check_lease_only_diff "$rel"; then
@@ -5612,6 +6147,13 @@ run_settle() { # slug
       set_fact "$rel" abandoned "$(read_utc_now)" || return 1 ;;
   esac
   stage_or_fail "$rel" || return 1
+  # TOOL-aGraftedHelix-31 - THE STATUS WRITE, after the record is staged, as the other terminal verbs
+  # write it: a landed hand-off's `held` claim reads `landed`, and a dead lease's `live` one `aborted`.
+  # Handed the record's own keepalive and session, the claim `run_hold` or the dead holder wrote reads
+  # `mine` whoever settles. The legacy branch writes none: `--abort` wrote that claim when it ended the
+  # run, and the settle adds no phase (spec F1). Announced and never failing the verb.
+  case "$br" in handed) st_claim=landed ;; lease-dead) st_claim=aborted ;; *) st_claim="" ;; esac
+  write_settle_claim "$slug" "$rel" "$st_claim" first
   case "$br" in
     handed) echo "unattended: settled $rel as a landed hand-off - phase LANDED · landed-by attended · landed-derived ${DP_LANDING:0:8} ${DP_TIP:0:8}" ;;
     legacy) echo "unattended: settled $rel as ABORTED with its work landed - work-landed-at $(fact "$rel" work-landed-at)" ;;
@@ -5628,7 +6170,7 @@ check_settled_abandoned() { # run-state file -> 0 when it carries both
 }
 
 verb_preflight() { # slug · keepalive-id
-  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix _pf_gbt="" _pf_ab=""
+  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix _pf_gbt="" _pf_cka _pf_lu="" _pf_ab="" _pf_left _pf_p _pf_act
   # TOOL-dDerivedDocket-16 S6 - THE IDS TEST RUNS FIRST, before `check_slug` and before any anchor
   # work, because it needs no tree. `check_slug`'s own grammar ADMITS an id - letters, digits and
   # dashes, opening on a letter - so an id reached the folder lookup and was refused with a message
@@ -5751,6 +6293,21 @@ verb_preflight() { # slug · keepalive-id
   # answer before any other preflight refusal can, and joining the others let the no-README refusal
   # (and fail 32 under `published`) answer beside it.
   check_filing_home "$slug" || return 1
+  # TOOL-aGraftedHelix-1 S5 - THE CLAIM, READ RIGHT AFTER THE ANCHOR and judged against the lease this
+  # call is about to record: the recorded keepalive on a re-preflight, this id on a first one or a
+  # rotation, and this harness's session. A refusal joins the others through `status`; the WRITE
+  # waits for the write gate below and precedes the rotation and the scaffold, so a lost race or a
+  # write that did not complete leaves the tree untouched.
+  _pf_cka=$(fact "$rel" keepalive)
+  [ "$rotate" != 1 ] && [ -n "$_pf_cka" ] || _pf_cka="$kid"
+  PF_CLAIM=""
+  if [ "$RUN_CLAIMS" = on ]; then
+    if read_claims strict && check_claim_writable "$slug" preflight "$_pf_cka" "${CLAUDE_CODE_SESSION_ID:-absent}" "$_pf_cka"; then
+      PF_CLAIM=1
+    fi
+  elif [ -z "$RUN_CLAIMS_SET" ]; then
+    echo "unattended: NOTE - this project declares no RUN_CLAIMS, so it takes the kit default 'off': no run claims its slug on the remote, and two nodes can preflight one slug and learn it only at the merge. Declare RUN_CLAIMS=\"on\" in $CONF to change it." >&2
+  fi
   check_clean || true
   check_branch || true
   check_wiring || true
@@ -5819,10 +6376,95 @@ verb_preflight() { # slug · keepalive-id
   # TOOL-dDerivedDocket-31 - the cutoff the spec-audit line below grades FORKED with, loaded here so
   # an unreadable one refuses while the tree is still untouched.
   load_fork_cutoff || true
+  # TOOL-aGraftedHelix-32 S6 (TOOL-aBranchedMandate-9) - THE TWO MARKER READS, HERE and not after the
+  # rotation. Both are pure reads, so they join `status` like every refusal above; placed after the
+  # claim write and the rotation, a malformed README archived the finished record and published a
+  # live claim before refusing. The unit list is DERIVED from the README's pair at read time, never
+  # copied, so an unpaired marker is something to refuse rather than to guess around. The record's
+  # own pair is read here only for a record that stays: a rotated one is replaced by the scaffold,
+  # whose markers the write half grades.
+  src=$(readme_of "$slug")
+  if ! region "$src" "$SRC_OPEN" "$SRC_CLOSE" >/dev/null 2>&1; then
+    fail 9 "the build README's generated markers are malformed, and the unit list is DERIVED from there, so an unpaired marker is not something to guess around: $src"
+  fi
+  if [ -f "$rel" ] && [ "$rotate" != 1 ] && ! region "$rel" "$GEN_OPEN" "$GEN_CLOSE" >/dev/null 2>&1; then
+    fail 9 "the run-state file's generated markers are malformed — exactly one open and one close, close after open: $rel"
+  fi
   # NOTHING is written until every precondition above has passed. A verb that writes and then
   # discovers a refusal has already changed the state the refusal was about.
   [ "$status" = 0 ] || { [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"; echo "unattended: --preflight refused; the run-state file is unchanged"; return 1; }
+  # THE CLAIM WRITE, the compare-and-swap that makes this session the slug's driver on the remote.
+  # BEFORE the rotation and the scaffold (memory/gotchas/destructive-step-before-its-precondition.md):
+  # check 108 is a race this call lost and check 109 a write that did not complete, and either leaves
+  # the tree exactly as it was. ONE LEASE STAMP for this take, handed to the claim and to
+  # `write_lease` below, so the claim's `lease-utc` is the record's byte for byte and the holder's
+  # first renewal finds no field differing (TOOL-aGraftedHelix-11 S6).
+  _pf_lu=$(read_utc_now) || _pf_lu=""
+  if [ -n "$PF_CLAIM" ] && ! write_claim "$slug" live "$_pf_cka" strict "" "$_pf_lu"; then
+    [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"
+    echo "unattended: --preflight refused; the run-state file is unchanged"
+    return 1
+  fi
 
+  # TOOL-aGraftedHelix-32 S6 and S7 (TOOL-aBranchedMandate-9) - EVERY REFUSAL AFTER THE CLAIM WRITE
+  # LEAVES THIS CALL'S WRITES UNDONE. The rotation, the scaffold and the facts are one function, and
+  # its one failure branch restores the run-state path and the archive path to their bytes at HEAD,
+  # index and work tree: `check_clean` proved the tree clean at the gate, so HEAD is exactly what
+  # this call found, and "the run-state file is unchanged" is true when it is printed. A claim this
+  # call CREATED is then written `aborted` through the status-write block `--abort` uses, so the next
+  # preflight reads a terminal claim; one it renewed, rewrote or took is left, because ending a renewed
+  # claim ends a live run's and a replaced one cannot be restored, and a claim is never deleted.
+  if ! write_preflight_record; then
+    _pf_left=""
+    for _pf_p in "$rel" ${arch:+"$arch"}; do
+      if [ -n "$(GIT ls-tree --name-only HEAD -- "$_pf_p" 2>/dev/null)" ]; then
+        GIT checkout -q HEAD -- "$_pf_p" >/dev/null 2>&1 || _pf_left="$_pf_left $_pf_p"
+      else
+        { GIT rm --cached -q --ignore-unmatch -- "$_pf_p" >/dev/null 2>&1 && rm -f -- "$_pf_p"; } || _pf_left="$_pf_left $_pf_p"
+      fi
+    done
+    [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"
+    _pf_act=""; [ -z "$PF_CLAIM" ] || _pf_act="$CW_ACT"
+    case "$_pf_act" in
+      create)
+        if read_claims soft && check_claim_writable "$slug" status "$_pf_cka" "${CLAUDE_CODE_SESSION_ID:-absent}" "$_pf_cka" \
+          && write_claim "$slug" aborted "$_pf_cka" soft "" "$_pf_lu"; then
+          echo "unattended: claim marked aborted — $slug, created by this refused call"
+        else
+          echo "unattended: claim left — $slug · create · its status write did not land, so it reads live until it ages to stale after ${RESUME_STALE_BOUND}s"
+        fi ;;
+      "") ;;
+      *) echo "unattended: claim left — $slug · $_pf_act · this call refused after it" ;;
+    esac
+    if [ -n "$_pf_left" ]; then
+      echo "unattended: --preflight refused; the restore did not put back:$_pf_left"
+    else
+      echo "unattended: --preflight refused; the run-state file is unchanged"
+    fi
+    return 1
+  fi
+  # THE LEASE WAS RECORDED ABOVE, by `write_lease` into the run-state facts, and the record is staged:
+  # there is no second lease record to take (TOOL-dDerivedDocket-61).
+  # TOOL-dDerivedDocket-28 S3 - THE RUN'S OWN ORPHANS ARE REAPED HERE, after every precondition passed
+  # and the lease is held: a kill is the least reversible thing this verb does, so a refused preflight
+  # must not have done it.
+  run_orphan_reap "$slug"
+  # RE-READ, like the base above and for the identical reason. Unit 5 froze the anchor triple, so on
+  # a second preflight $AREF/$ASHA hold what was just OBSERVED while the record holds what is pinned.
+  # Printing the observation would be the same lie in the operator's face that the unconditional
+  # base write was on disk, one field over.
+  print_spec_audit_line "$slug" "$rel"
+  echo "unattended: preflight OK — base $base · anchor $(fact "$rel" anchor-ref) at $(fact "$rel" anchor-sha) · keepalive $kid · region copied from $src"
+  return 0
+}
+
+# TOOL-aGraftedHelix-32 S6 - THE WRITE HALF OF --preflight, everything after the claim write: the
+# rotation, the scaffold, the facts, the lease and the stage. Called with no arguments from
+# `verb_preflight` alone, whose locals it reads and sets through bash's dynamic scope, so its body is
+# the one that ran inline before. It exists so its ONE failure branch in the caller can undo it.
+# WHAT THIS DOES NOT CHECK: any precondition - every refusal that needs nothing written is above the
+# caller's write gate, and one placed here costs the caller a restore.
+write_preflight_record() { # -> 0 the record written and staged, or 1 with the check printed
   # ROTATION, HALF TWO: the RENAME, in scaffold_runmd's position and for scaffold_runmd's reason —
   # nothing is written until every precondition above has passed.
   #
@@ -5850,23 +6492,9 @@ verb_preflight() { # slug · keepalive-id
     [ -z "$_pf_ab" ] || echo "unattended: preflight — the record carried abandoned at $_pf_ab, written by --settle over a dead lease whose work landed, so it is retired like a finished one and this run starts on a fresh record"
   fi
 
-  # The unit list is DERIVED at read time, never copied here. A copy has to be refreshed by
-  # something, and the only writer was this verb — which refuses once a run is live. So an ordinary
-  # pass (a spec rev bump moves the build index) left the copy stale with no reachable way to repair
-  # it, and the refusal named a remedy that did not exist. Deriving removes the class rather than
-  # adding a verb to service it. Both markers are still VALIDATED, because a malformed pair is
-  # something to refuse rather than to guess around.
-  #
-  # TOOL-aPromptedMandate-6 fold, review M1 - the README's pair is validated BEFORE the scaffold, not
-  # after it. The comment below has always said the run-state file is created after EVERY precondition
-  # passed, and this one ran later, so a malformed README left an orphan untracked RUN.md behind a
-  # refusal - and the retry then met the DIRTY-TREE refusal instead, naming a cause that was this
-  # verb's own leftover. Observed during this build's first manual reproduction.
-  src=$(readme_of "$slug")
-  if ! region "$src" "$SRC_OPEN" "$SRC_CLOSE" >/dev/null 2>&1; then
-    fail 9 "the build README's generated markers are malformed, and the unit list is DERIVED from there, so an unpaired marker is not something to guess around: $src"
-    return 1
-  fi
+  # The unit list is DERIVED at read time, never copied here, and the README's pair it is derived
+  # from is graded above the write gate with the other reads (TOOL-aGraftedHelix-32 S6), so a
+  # malformed README refuses before the claim write and the rotation rather than after them.
 
   # The run-state file is created here, AFTER every precondition passed. A verb that scaffolds and
   # then discovers a refusal has already changed the state the refusal was about.
@@ -5906,7 +6534,7 @@ verb_preflight() { # slug · keepalive-id
   # is what goes to `write_lease` (TOOL-aWokenSentinel-1), so the keepalive is still written once;
   # the session, pid, host, image and lease-utc beside it are the lease's own and are taken afresh.
   _pf_ka=$(fact "$rel" keepalive); [ -n "$_pf_ka" ] || _pf_ka="$kid"
-  write_lease "$rel" "$_pf_ka" || return 1
+  write_lease "$rel" "$_pf_ka" "$_pf_lu" || return 1
   # TOOL-dUnstuckLanding-20 S4 - THE LANDING NODE, written afresh like the lease because it describes
   # the node holding the run. A hand-off node starts normally and says so from its first record; no
   # preflight refuses on it. Undeclared writes no fact. Read at BASE and at the tip the anchor
@@ -6015,18 +6643,6 @@ verb_preflight() { # slug · keepalive-id
     done
   fi
   stage_or_fail "$rel" || return 1
-  # THE LEASE WAS RECORDED ABOVE, by `write_lease` into the run-state facts, and the record is staged:
-  # there is no second lease record to take (TOOL-dDerivedDocket-61).
-  # TOOL-dDerivedDocket-28 S3 - THE RUN'S OWN ORPHANS ARE REAPED HERE, after every precondition passed
-  # and the lease is held: a kill is the least reversible thing this verb does, so a refused preflight
-  # must not have done it.
-  run_orphan_reap "$slug"
-  # RE-READ, like the base above and for the identical reason. Unit 5 froze the anchor triple, so on
-  # a second preflight $AREF/$ASHA hold what was just OBSERVED while the record holds what is pinned.
-  # Printing the observation would be the same lie in the operator's face that the unconditional
-  # base write was on disk, one field over.
-  print_spec_audit_line "$slug" "$rel"
-  echo "unattended: preflight OK — base $base · anchor $(fact "$rel" anchor-ref) at $(fact "$rel" anchor-sha) · keepalive $kid · region copied from $src"
   return 0
 }
 
@@ -6148,19 +6764,28 @@ set_fact() { # file · key · value
 # `pid-alive: no` too (the closing review's round 2, defect E). Each is `absent` when
 # it cannot be derived — a harness exposing no pid has no image — and every reader treats `absent`
 # as "not recorded", which is the pid-only reading the record had before these existed.
-write_lease() { # run-state file · keepalive-id
-  local rel="$1" kid="$2" sid="${CLAUDE_CODE_SESSION_ID:-}" pid="${CLAUDE_PID:-}" gone="" host img
-  set_fact "$rel" keepalive "$kid" || return 1
+# The optional third argument is the `lease-utc` a take site already handed its claim write
+# (TOOL-aGraftedHelix-11 S6); without one the clock is read here.
+# ONE GUARDED WRITE (TOOL-aGraftedHelix-26 S2): a fact that cannot be recorded is check 17 naming
+# it, because every caller returns on this function with no `fail` of its own and only `fail` sets
+# the process exit; `set_fact`'s `mktemp` and `mv` branches return with none. The facts are written
+# in the order they always were, each value computed in its arm, the two probes after `pid`.
+write_lease() { # run-state file · keepalive-id · [lease stamp]
+  local rel="$1" kid="$2" lu="${3:-}" sid="${CLAUDE_CODE_SESSION_ID:-}" pid="${CLAUDE_PID:-}" gone="" k v
   if [ -z "$sid" ] && [ -z "$pid" ]; then gone="session id or pid"
   elif [ -z "$sid" ]; then gone="session id"
   elif [ -z "$pid" ]; then gone="pid"; fi
-  set_fact "$rel" session "${sid:-absent}" || return 1
-  set_fact "$rel" pid "${pid:-absent}" || return 1
-  host=$(read_host_name) || host=""
-  img=$(read_pid_image "${pid:-absent}") || img=""
-  set_fact "$rel" host "${host:-absent}" || return 1
-  set_fact "$rel" pid-image "${img:-absent}" || return 1
-  set_fact "$rel" lease-utc "$(date -u +%Y-%m-%dT%H:%M:%SZ)" || return 1
+  for k in keepalive session pid host pid-image lease-utc; do
+    case "$k" in
+      keepalive) v=$kid ;;
+      session)   v=${sid:-absent} ;;
+      pid)       v=${pid:-absent} ;;
+      host)      v=$(read_host_name) || v=""; v=${v:-absent} ;;
+      pid-image) v=$(read_pid_image "${pid:-absent}") || v=""; v=${v:-absent} ;;
+      lease-utc) v=${lu:-$(date -u +%Y-%m-%dT%H:%M:%SZ)} ;;
+    esac
+    set_fact "$rel" "$k" "$v" || { fail 17 "cannot record the lease: $k in $rel"; return 1; }
+  done
   [ -z "$gone" ] || printf 'unattended: NOTE - this harness exposes no %s, so no out-of-session resumer can find this run; the lease records absent and the hooks and the tick report it UNBOUND rather than guess.\n' "$gone" >&2
   return 0
 }
@@ -6631,10 +7256,10 @@ print_audit() { # slug
   # `--liveness`. The verdict arithmetic below reads them exactly as it read its own locals.
   read_tree_clocks
   now=$TC_NOW; lastc=$TC_LASTC; lastw=$TC_LASTW; dead=$TC_DEAD
-  # THE LATEST PASS PER UNIT, by the awk shape `verb_status` uses for brief rows: split on the
-  # separator, keep rows whose first field ends ` dispatch`, take the ISO from that field, the group
-  # and unit from `item`, the declared set from `reason`. One awk pass and no back-reference, for the
-  # reason that function's comment records.
+  # THE LATEST PASS PER UNIT, from the kit library's `read_pass_declarations` in `current` mode:
+  # one line per unit, the key holding its last row, with that key's FIRST row's ISO and the union of
+  # its rows' paths (TOOL-aGraftedHelix-39 moved the derivation there; this verb's answer is unchanged).
+  # The awk below only splits that line into the fields the loop reads.
   #
   # SAME-ANCHOR ROWS ARE ONE PASS AND THEIR SETS ARE UNIONED; a NEW anchor replaces. This is check
   # 23's key, `(anchor, unit)`, and not the LAST row per unit this first read: `--writes` is
@@ -6642,11 +7267,9 @@ print_audit() { # slug
   # and this repo's own harness produced twelve one-path rows for one unit — so the last row alone
   # asked whether the pass wrote its LAST path, reported a CLOSED unit open for hours, and handed
   # the keepalive a kill order for it (closing review of aProbedUnit, cluster A).
-  rows=$(awk -F' · ' '$1 ~ /^[0-9][0-9-]*T[0-9:]*Z dispatch$/ && $2 ~ /^item / && $3 ~ /^reason / {
+  rows=$(read_pass_declarations "$rel" current | awk -F' · ' '{
        iso = $1; sub(/ dispatch$/, "", iso); it = substr($2, 6); g = it; sub(/ .*/, "", g); u = it; sub(/^[^ ]* /, "", u)
-       if (u in ga && ga[u] == g) dc[u] = dc[u] " " substr($3, 8)
-       else { ga[u] = g; ts[u] = iso; dc[u] = substr($3, 8) }
-     } END { for (u in ga) print u "\t" ts[u] "\t" ga[u] "\t" dc[u] }' "$rel" 2>/dev/null | sort)
+       print u "\t" iso "\t" g "\t" substr($3, 8) }' | sort)
   # A UNIT WHOSE SPEC IS TERMINAL IS NOT OPEN, whatever its rows say. The openness test is a
   # disjointness proof and answers conservatively — a pass that legitimately declared a path it never
   # wrote stays open under it forever — which is the right answer for `--dispatch` and the wrong one
@@ -7107,8 +7730,8 @@ print_resume_orientation() { # run-state file · phase
 # THE TAKE-OVER, in S5's order, and the order is the whole of it: every refusal runs BEFORE the lease
 # is taken, so a refused take-over writes nothing at all — not the lease, not the phase, not the id.
 # A take-over that half-wrote would leave the slug holding a lease for a session that then stopped.
-run_takeover() { # slug · run-state file · keepalive id · held|working · phase
-  local slug="$1" rel="$2" kid="$3" mode="$4" ph="$5" unp hf head how prun ok os op
+run_takeover() { # slug · run-state file · keepalive id · held|working · phase · [restart]
+  local slug="$1" rel="$2" kid="$3" mode="$4" ph="$5" rs="${6:-}" unp hf head how prun ok os op lu
   if [ -z "$kid" ]; then
     verb_status "$slug" || true
     fail 59 "a take-over is a change of driver and the new driver has to name itself, because the lease is keyed on the keepalive id and a blank one wedges the slug until the bound expires — the holder's own later resume would then meet the different-id refusal and --replaces cannot name a blank; nothing was written: pass --keepalive-id"
@@ -7141,6 +7764,21 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
   # witness are re-run beside it, against the PINNED `m-base:`, so the answer is the same function of
   # the same tree that preflight evaluated.
   check_ask_mandate "$slug" "$rel" || return 1
+  # TOOL-aGraftedHelix-1 S7 - THE CLAIM, read and written AFTER the authorization block and BEFORE
+  # anything this take-over writes or kills, judged against the lease it is about to record: this
+  # keepalive and this harness's session. A live claim another session holds is check 107, a race
+  # lost to one check 108, a write that did not complete check 109, and each leaves the record alone.
+  # One lease stamp for the claim and `write_lease` below (TOOL-aGraftedHelix-11 S6), read at the
+  # push and not before the claim read, so `lease-utc` still dates this take as closely as it can.
+  # THE RESTART ROW ALONE hands the record (TOOL-aGraftedHelix-20 S8): the recorded session's own
+  # relaunch reads `same session` a claim an incomplete holder push left under `prior-session`.
+  lu=""
+  if [ "$RUN_CLAIMS" = on ]; then
+    read_claims strict || return 1
+    check_claim_writable "$slug" take-over "$kid" "${CLAUDE_CODE_SESSION_ID:-absent}" "$kid" ${rs:+"$rel"} || return 1
+    lu=$(read_utc_now) || lu=""
+    write_claim "$slug" live "$kid" strict "" "$lu" || return 1
+  fi
   print_interrupted_acts
   # TOOL-dDerivedDocket-28 S3 - the run's own orphaned processes are reaped HERE, after every refusal
   # and before the lease is recorded and the phase moves: the dead session's bar is exactly what a
@@ -7151,7 +7789,7 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
   # resume tick bind to, written by the one function --preflight writes them with. Old values READ
   # BEFORE the write, so the line reports what the record said rather than what was just written twice.
   ok=$(fact "$rel" keepalive); os=$(fact "$rel" session); op=$(fact "$rel" pid)
-  write_lease "$rel" "$kid" || return 1
+  write_lease "$rel" "$kid" "$lu" || return 1
   echo "unattended: lease replaced · keepalive $ok -> $(fact "$rel" keepalive) · session $os -> $(fact "$rel" session) · pid $op -> $(fact "$rel" pid)"
   # TOOL-dDerivedDocket-5 - THE HISTORY ROW, written after every refusal and after the lease, so a
   # refused take-over leaves none. It says which of the two restarts this was: a session the driver
@@ -7244,7 +7882,7 @@ check_holder_worktree() { # slug · run-state file -> 0 passes, 1 with its own r
 # run-state lease and keeps its build folder's clock against the same bound (§8 F13).
 verb_resume() { # slug
   local slug="$1" rel p cond age bound rhc rc ka _rs_at _rs_bt _rs_rc ok os op
-  local ls_utc ls_sid ls_pid ls_hat live me rb cur restart
+  local ls_utc ls_sid ls_pid ls_hat live me rb cur restart lu cw cas ps pv
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to resume: $rel"; return 1; }
@@ -7348,6 +7986,11 @@ verb_resume() { # slug
       write_lease "$rel" "$KID" || return 1
       stage_or_fail "$rel" || return 1
       echo "unattended: landing re-bound · keepalive $ok -> $(fact "$rel" keepalive) · session $os -> $(fact "$rel" session) · pid $op -> $(fact "$rel" pid) · staged, not committed, so HEAD stays the pushed tip; run --landed $slug next"
+      # TOOL-aGraftedHelix-1 S7 - THE RE-BIND WRITES ITS KEEPALIVE INTO THE CLAIM, as a status write
+      # judged against the lease as it stood before the re-bind: announced, never failing the verb.
+      if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
+        check_claim_writable "$slug" status "$ok" "${os:-absent}" "$KID" "$rel" && write_claim "$slug" live "$KID" soft "$rel"
+      fi
       [ -n "$rb" ] || echo "unattended: NOTE - this record names neither a run-branch nor a branch-ref fact, so this re-bind was NOT SCOPED to a branch where its landing's --landed runs"
       verb_status "$slug" || return 1
       return 0
@@ -7410,11 +8053,56 @@ verb_resume() { # slug
   # records the one lease record and stages it, `keepalive` unchanged. A tick's first act is this
   # row, so a write on every call would restage the record every ten minutes and move `lease-utc`.
   if [ -n "$KID" ] && [ "$KID" = "$ka" ]; then
+    # TOOL-aGraftedHelix-1 S7 - THE HOLDER READS ITS CLAIM on every call, so a lost one is found.
+    # Another session's claim is check 108 and nothing is written; a read or a write that does not
+    # complete is announced and the holder goes on, as it does offline at base.
+    # TOOL-aGraftedHelix-18 - THE ORDER: the claim read, the `mine` test and check 108 read the
+    # record's lease facts as they stood BEFORE this row's `write_lease`.
+    # TOOL-aGraftedHelix-20 - and the claim CAS runs BEFORE `write_lease` too, writing the values it is
+    # about to record under the one stamp both are handed, so a race lost here writes nothing local.
+    # A push that does not complete, or a claim that could not be read, still records the lease and
+    # ADDS to the `prior-session` set (TOOL-aGraftedHelix-23) the record's session from before this
+    # call and the read claim's session, each once, on this `write_lease`-due branch alone: the set
+    # only grows until a claim write of THIS row lands, which empties it, written only when non-empty
+    # and staged. No other writer writes or empties it, so a landed `--beat` or `--dispatch` between
+    # two incomplete calls leaves every member a later read may still need.
+    # TOOL-aGraftedHelix-24 - THE ORDER: the add runs BEFORE `write_lease`, the clear after it.
+    # `write_lease` writes `session` and then four more facts, so an add after it could be cut off by
+    # a failure between them, leaving the record at the new session, the claim at the old one and no
+    # member naming it: the next call reads its own claim foreign. An interrupted clear leaves only
+    # members this keepalive's claim no longer carries, and the next landed claim write empties them.
+    # TOOL-aGraftedHelix-26 - BOTH TRIGGERS REACH THE ONE GUARDED ADD: a claim that could not be read
+    # leaves `cw` empty, so no CAS runs and `cas` stays empty. A failed add is check 17, because the
+    # row's return alone exits the call 0: only `fail` sets the process exit.
+    cw=""; cas=""
+    if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
+      check_claim_writable "$slug" holder "$ka" "${ls_sid:-absent}" "$ka" "$rel"; cw=$?
+      [ "$cw" != 1 ] || return 1
+    fi
     if [ -z "$ls_utc" ] || [ "$ls_sid" != "${me:-absent}" ] || [ "$ls_pid" != "${CLAUDE_PID:-absent}" ]; then
       os=$ls_sid; op=$ls_pid
-      write_lease "$rel" "$KID" || return 1
+      lu=$(read_utc_now) || lu=""
+      if [ -n "$cw" ]; then write_claim "$slug" live "$ka" holder "" "$lu"; cas=$?; [ "$cas" != 1 ] || return 1; fi
+      if [ "$RUN_CLAIMS" = on ] && [ "$cas" != 0 ]; then
+        ps=$(fact "$rel" prior-session) || :
+        for pv in "$ls_sid" ${cw:+"$CW_SESS"}; do
+          [ -z "$pv" ] || [[ " $ps " == *" $pv "* ]] || ps="${ps:+$ps }$pv"
+        done
+        [ -z "$ps" ] || set_fact "$rel" prior-session "$ps" \
+          || { fail 17 "cannot record a run fact: prior-session in $rel"; return 1; }
+      fi
+      write_lease "$rel" "$KID" "$lu" || return 1
+      if [ "$cas" = 0 ] && [ -n "$(fact "$rel" prior-session)" ]; then
+        set_fact "$rel" prior-session "" || return 1
+      fi
       stage_or_fail "$rel" || return 1
       echo "unattended: lease recorded · keepalive $KID · session ${os:-none} -> $(fact "$rel" session) · pid ${op:-none} -> $(fact "$rel" pid) · this resume passes the keepalive the record names, so it is the holder"
+    elif [ "$cw" = 0 ]; then
+      write_claim "$slug" live "$ka" holder "$rel"; cas=$?
+      [ "$cas" != 1 ] || return 1
+      if [ "$cas" = 0 ] && [ -n "$(fact "$rel" prior-session)" ]; then
+        { set_fact "$rel" prior-session "" && stage_or_fail "$rel"; } || return 1
+      fi
     fi
     # TOOL-dDerivedDocket-28 S3 - THE HOLDER'S OWN ORPHANS: i26's harness killed the driver mid-bar
     # while the session lived on, so the holder resuming under its own id is the one who finds them.
@@ -7470,8 +8158,24 @@ verb_resume() { # slug
       fail 59 "--replaces says which job is being retired and --keepalive-id says which one takes it on, so a replacement with no new id would leave the lease naming a job that has been reaped: pass --keepalive-id"
       return 1
     fi
+    # TOOL-aGraftedHelix-1 S7 - THE REPLACEMENT WRITES THE NEW KEEPALIVE INTO THE CLAIM, judged as the
+    # holder against the record's own facts, so the holder's own claim reads `mine` and never foreign.
+    # TOOL-aGraftedHelix-11 - it DECIDES `mine` against the facts as they stood before this block and
+    # WRITES the facts it leaves: the values `write_lease` records below, under the one stamp both are
+    # handed. The push stays before that write, so a race lost here still writes nothing. Handed the
+    # record, so a claim an incomplete holder push left under `prior-session` reads `mine` here too
+    # (TOOL-aGraftedHelix-20 S3); the write itself still carries the values `write_lease` records.
+    lu=""
+    if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
+      check_claim_writable "$slug" holder "$ka" "${ls_sid:-absent}" "$KID" "$rel"
+      case "$?" in
+        1) return 1 ;;
+        0) lu=$(read_utc_now) || lu=""
+           write_claim "$slug" live "$KID" holder "" "$lu" || [ "$?" = 2 ] || return 1 ;;
+      esac
+    fi
     ok=$ka; os=$ls_sid; op=$ls_pid
-    write_lease "$rel" "$KID" || return 1
+    write_lease "$rel" "$KID" "$lu" || return 1
     echo "unattended: lease replaced · keepalive $ok -> $(fact "$rel" keepalive) · session ${os:-none} -> $(fact "$rel" session) · pid ${op:-none} -> $(fact "$rel" pid)"
     stage_or_fail "$rel" || return 1
     echo "unattended: keepalive replaced — the run-state file now names $KID in place of $RS_REPLACES"
@@ -7493,7 +8197,7 @@ verb_resume() { # slug
       return 1
     fi
     echo "unattended: the session this record names resumes under a new keepalive, so its process restarted and this resume TAKES THE RUN OVER in its place"
-    run_takeover "$slug" "$rel" "$KID" working "$p" || return 1
+    run_takeover "$slug" "$rel" "$KID" working "$p" restart || return 1
     return 0
   fi
   if [ "$live" = 1 ] && [ -z "$ls_utc" ]; then
@@ -8419,8 +9123,42 @@ check_handoff_override() { # override count -> 0 when none is refused; 1 after f
   return 1
 }
 
+# TOOL-aGraftedHelix-30 - `authorization-reachable`, GRADED ALONE, by the arm --close grades it with.
+# A merge of the remote's default branch can bring in a check the running record cannot satisfy,
+# because the README it grades is pinned at BASE; nothing read that item again until --close, after
+# its bar, so one run built nine more hours on a record that could not close. This verb is that one
+# item, asked at the merge. ONE PREDICATE, ONE SPELLING: it calls `dod_met` and nothing else that
+# grades, so it and the close cannot disagree (the source arm in the suite holds that), and it
+# redirects nothing, which is the defect TOOL-aBoundedVerdict-12 records on this same chain.
+# `TB` tells the two unmet states apart: the base derivation clears it on entry and sets it only on
+# success, so a set `TB` means the README at a derived BASE was read and refused (exit 1, the exits
+# printed), and an empty one means the predicate never reached it (exit 2, no exits).
+# What this does NOT check: every other Definition-of-Done item, and whether the merge is what
+# changed the answer. It writes nothing but the run log's START and END lines.
+print_authorization() { # slug -> 0 met · 1 refused · 2 not evaluated
+  local slug="$1" rel
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run whose authorization can be graded: $rel"; return 1; }
+  refuse_if_terminal "$rel" --authorization || return 1
+  # Its refusals print and are not fatal here, as at --close: no anchor leaves ASHA empty, and the
+  # item below then reads unmet with TB empty, which is the not-evaluated row.
+  observe_anchor || true
+  TB=""
+  if dod_met "$slug" "$rel" authorization-reachable machine; then
+    echo "unattended: authorization-reachable — met · base $TB · anchor $AREF at $ASHA"
+    return 0
+  fi
+  if [ -n "$TB" ]; then
+    echo "unattended: authorization-reachable — refused at base $TB, and --close will refuse this run too, with no override, while the refusal above stands; where that refusal names a working-tree remedy, apply it first. Otherwise the run has two exits. Rotate: commit a build README this driver admits, then --abort $slug --code repo-state-out-of-mandate --reason <text>, then --preflight $slug --keepalive-id <id> onto the new BASE. Hand off: --park $slug --item <the question> --reason <text>, then --handoff $slug --code owner-decision --reason <text> --reaped <id>. Under a slug-mode README, which is the owner's, only the hand-off is the run's to take."
+    status=1; return 1
+  fi
+  echo "unattended: authorization-reachable — not evaluated: the refusal above stopped the predicate before it read the build README at a derived BASE, so it says nothing about this record; answer that refusal and run --authorization $slug again"
+  status=2; return 2
+}
+
 verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
-  local slug="$1" rel item ck unmet=0 i=0 n ov reason _why _lnrec _lnwant
+  local slug="$1" rel item ck unmet=0 i=0 n ov reason _why _ck _lnrec _lnwant
   n=${#OV_ITEMS[@]}
   GG_RUN_FACT=""; GG_INH_FACT=""
   check_slug "$slug" || return 1
@@ -8491,6 +9229,19 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     resolve_landing_node "$rel" "$ASHA"
     [ "$LN_STATE" = "$_lnwant" ] || print_landing_line
     check_handoff_override "$n" || return 1
+  fi
+  # TOOL-aGraftedHelix-1 S8 - A RUN THAT DOES NOT HOLD ITS CLAIM DOES NOT CLOSE, and that is decided
+  # before any Definition-of-Done item is graded: another session's claim, a foreign stale one
+  # included, is check 108, and a claim that cannot be read or renewed is check 109, because a close
+  # that lands a claim it never read is the double landing the claim exists to stop.
+  if [ "$RUN_CLAIMS" = on ]; then
+    read_claims strict || return 1
+    _ck=$(fact "$rel" keepalive)
+    check_claim_writable "$slug" holder "$_ck" "$(fact "$rel" session)" "$_ck" "$rel"
+    case "$?" in
+      1) return 1 ;;
+      0) write_claim "$slug" live "$_ck" strict "$rel" || return 1 ;;
+    esac
   fi
   # Validate EVERY pair before any of them is acted on. The three messages below are byte-unchanged
   # from the single-override form, so their arms stay valid and no per-check ordinal moves.
@@ -10905,31 +11656,17 @@ RESCOPED
 # definitions of "open" is the two-answers class, and the first version of this test was wrong once
 # already (it counted the declaration commit). Openness comes from `pass_commit` in the kit library,
 # which the gate leg calls too.
+#
+# A PASS IS ITS KEY, an anchor and a unit, AND ITS DECLARED SET IS THE KEY'S UNION — the set the
+# library's `read_pass_declarations` prints, which every caller passes here. No row of a key closes
+# another (TOOL-aGraftedHelix-39). The rule this replaces closed an earlier same-anchor row whenever
+# a later one carried a different set (TOOL-cMendedVintage-10), so a re-declaration naming only the
+# paths it ADDED read as one that REPLACED them. That rule existed for a pass that NARROWED and kept
+# its abandoned paths reserved forever, and the union keeps its fix: the pass closes when its commit
+# writes inside ANY path a row named, which releases every one of them. What a narrowing pass now
+# holds is the window before its commit, the conservative direction a disjointness proof wants.
 check_pass_open() { # grp · unit · run-state file · declared set (space-separated)
-  local _g="$1" _u="$2" _rel="$3" _decl="$4" _pcommit _wrote _hit _dp _wp _rows _r _n _at
-  # A SUPERSEDED ROW IS NOT AN OPEN PASS (TOOL-cMendedVintage-10). `--writes` is repeatable and the
-  # record is append-only, so a unit that re-declares — NARROWING, because it discovered it needs
-  # fewer files — leaves earlier rows naming paths no commit of its will ever write. Deciding on the
-  # commit alone reserves those paths forever and refuses every later unit declaring one, which
-  # rewards a pass for writing everything it declared and punishes one for finding it needs less.
-  # The live instance wedged this build: one unit's first row named an engine file it correctly never
-  # touched, and the next unit's declaration of that file was refused against a pass long finished.
-  #
-  # THE LAST ROW CARRYING THIS SET, not the first: a unit may re-declare an IDENTICAL set and those
-  # two rows supersede nothing. A set matching NO row is `--audit`'s union of a unit's same-anchor
-  # rows, which already spans through the last of them and is superseded by nothing — so an unmatched
-  # set falls through to the commit test unchanged. That is what keeps the stall clock reading the
-  # union it built rather than grading every re-declaring unit closed and never reporting it STALLED.
-  _rows=$(grep -F -- " dispatch · item $_g $_u · reason " "$_rel" 2>/dev/null || true)
-  _n=0; _at=0
-  while IFS= read -r _r; do
-    [ -n "$_r" ] || continue
-    _n=$((_n + 1))
-    [ "${_r#* · reason }" = "$_decl" ] && _at=$_n
-  done <<CPOROWS
-$_rows
-CPOROWS
-  [ "$_at" -gt 0 ] && [ "$_at" -lt "$_n" ] && return 1
+  local _g="$1" _u="$2" _rel="$3" _decl="$4" _pcommit _wrote _hit _dp _wp
   # An anchor this clone cannot resolve leaves the pass OPEN — `pass_commit` returns 1 for it.
   # Conservative by choice: the failure of a disjointness proof must be a refusal, never a pass.
   _pcommit=$(pass_commit "$_g" "$_u" "$_rel" || true)
@@ -10962,7 +11699,7 @@ CPOROWS
 # WHAT IT DOES NOT CHECK: a `--no-verify` commit never reaches it, and `Pass: none` is taken at its
 # word. Check 23 still grades both at the close.
 check_commit_message() { # commit message file
-  local msg="$1" f rel="" ref slug trl subj rows r d o u decl st p q ok uncov uncovl briefs cmd kd head
+  local msg="$1" f rel="" ref slug trl subj rows r d o u decl graded st p q ok uncov uncovl briefs cmd kd head
   [ -f "$msg" ] || { fail 49 "--check-commit was given no readable commit message file: ${msg:-(none)}"; return 1; }
   # It runs on EVERY commit, so the candidates are narrowed by one grep for this branch's ref before
   # the holder predicate, which reads the record's facts, confirms each.
@@ -10983,19 +11720,22 @@ check_commit_message() { # commit message file
   # `\r`, which is not blank to awk, so the paragraph never ended (closing review r2, M5). One awk and no
   # `grep` stage: MSYS grep strips CR on its own, which hid this on one node and not on another.
   subj=$(awk '{ sub(/\r$/, "") } /^#/ { next } NF { p = 1 } p && !NF { exit } p { printf "%s ", $0 }' "$msg")
-  # ONE LINE PER OPEN ROW, `<unit> <declared paths>`, through the predicate `--dispatch` and `--audit`
-  # already share, so this verb cannot call a pass open that they call closed. A row it calls closed
-  # BECAUSE ITS PASS COMMIT IS HEAD is kept apart (`O` rows): that is `git commit --amend` on the pass
-  # commit, whose HEAD is the commit being replaced (closing review r1, M4). Only a trailer naming the
-  # unit reopens it, so a records commit after a pass is never asked for a trailer it does not owe.
+  # ONE LINE PER UNIT, `<o|O> <unit> <anchor> <declared paths>`, from the key holding the unit's LAST
+  # row (the library's `current`), which is the window check 23 grades a commit made now in: a row at
+  # a later anchor is a new pass, graded alone, and an earlier pass's paths do not carry into it
+  # (TOOL-aGraftedHelix-39). Openness is the predicate `--dispatch` and `--audit` already share, asked
+  # over the key's union, so this verb cannot call a pass open that they call closed. A key it calls
+  # closed BECAUSE ITS PASS COMMIT IS HEAD is kept apart (`O`): that is `git commit --amend` on the
+  # pass commit, whose HEAD is the commit being replaced (closing review r1, M4). Only a trailer naming
+  # the unit reopens it, so a records commit after a pass is never asked for a trailer it does not owe.
   head=$(GIT rev-parse -q --verify HEAD 2>/dev/null)
-  rows=$(grep -F -- " dispatch · item " "$rel" 2>/dev/null | while IFS= read -r r; do
+  rows=$(read_pass_declarations "$rel" current | while IFS= read -r r; do
       [ -n "$r" ] || continue
       d=${r#* dispatch · item }; d=${d%% · reason *}
       if check_pass_open "${d%% *}" "${d#* }" "$rel" "${r#* · reason }"; then
-        printf 'o %s %s\n' "${d#* }" "${r#* · reason }"
+        printf 'o %s %s %s\n' "${d#* }" "${d%% *}" "${r#* · reason }"
       elif [ -n "$head" ] && [ "$(pass_commit "${d%% *}" "${d#* }" "$rel" || true)" = "$head" ]; then
-        printf 'O %s %s\n' "${d#* }" "${r#* · reason }"
+        printf 'O %s %s %s\n' "${d#* }" "${d%% *}" "${r#* · reason }"
       fi
     done)
   case " $trl " in *" none "*) return 0 ;; esac
@@ -11003,7 +11743,7 @@ check_commit_message() { # commit message file
   # reads until EOF, and the shell-hygiene leg bans it. The dispatch arm creates and removes the file.
   if [ -z "${trl// /}" ]; then
     printf '%s\n' "$rows" > "$CC_TMP"
-    while read -r o u decl; do
+    while read -r o u d decl; do
       [ "$o" = o ] || continue
       id_in "$subj" "$u" || continue
       fail 49 "--check-commit: this commit's subject names $u, an open dispatched pass of $slug, and the message carries no Pass: trailer, so check 23 would take it for that pass's commit; end the message with 'Pass: $u' when it is the pass, or 'Pass: none' when it is not"
@@ -11016,11 +11756,16 @@ check_commit_message() { # commit message file
   # ...and NOT C-QUOTED: by default a non-ASCII path prints as `"docs/caf\303\251.md"`, which no
   # declaration covers and no printed repair can name (closing review r2, M4).
   st=$(git -c core.quotePath=false diff --cached --no-renames --name-only -z 2>/dev/null | tr '\0' '\n')
-  # Repo-relative from git itself: KIT_DIR is the shell's spelling and ROOT is git's, and on MSYS the
-  # two differ by drive form, so stripping one from the other leaves an absolute path in the command.
-  kd=$(git -C "$KIT_DIR" rev-parse --show-prefix 2>/dev/null); kd=${kd%/}; [ -n "$kd" ] || kd=$KIT_DIR
+  # Repo-relative by the library's logical walk: KIT_DIR is the shell's spelling and ROOT is git's, and
+  # on MSYS the two differ by drive form, so stripping one from the other leaves an absolute path in
+  # the command. Not git either: under this hook a linked worktree's GIT_DIR empties git's answer
+  # (TOOL-aGraftedHelix-27).
+  kd=$(derive_self_rel "$KIT_DIR") || kd=""; [ -n "$kd" ] || kd=$KIT_DIR
   for u in $trl; do
-    decl=$(printf '%s\n' "$rows" | awk -v u="$u" '$2 == u { $1 = ""; $2 = ""; print }' | tr '\n' ' ')
+    decl=$(printf '%s\n' "$rows" | awk -v u="$u" '$2 == u { $1 = ""; $2 = ""; $3 = ""; print }' | tr '\n' ' ')
+    # THE PASS THIS COMMIT IS GRADED AGAINST, named in both path refusals below so a refusal says
+    # which declaration it read and not only what fell outside it.
+    graded=$(printf '%s\n' "$rows" | awk -v u="$u" '$2 == u { g = $3; $1 = ""; $2 = ""; $3 = ""; sub(/^ +/, ""); print "graded against the pass at " g ", which declares: " $0; exit }')
     if [ -z "${decl// /}" ]; then
       fail 49 "--check-commit: the Pass: trailer names $u, which has no open dispatched pass in $slug, so nothing declared what this commit may write; declare it first: bash $kd/unattended.sh --dispatch $slug --pass $u --writes <path>"
       return 1
@@ -11043,7 +11788,7 @@ check_commit_message() { # commit message file
     # of it (TOOL-aWindowedPass-6). A widening `--dispatch` would anchor at the commit the amend
     # replaces, a row check 23 never grades, so no widening is offered - only the repairs it honours.
     if [ -n "$uncov" ] && [ -z "$(printf '%s\n' "$rows" | awk -v u="$u" '$1 == "o" && $2 == u { print "y"; exit }')" ]; then
-      fail 49 "--check-commit: pass $u has committed - HEAD is its pass commit, so this is an amend - and it stages paths outside the set it declared before dispatch:$uncov. An amend cannot widen a committed pass: unstage those paths, or commit them as a new commit after a fresh --dispatch for them"
+      fail 49 "--check-commit: pass $u has committed - HEAD is its pass commit, so this is an amend - and it stages paths outside the set it declared before dispatch:$uncov; $graded. An amend cannot widen a committed pass: unstage those paths, or commit them as a new commit after a fresh --dispatch for them"
       return 1
     fi
     if [ -n "$uncov" ]; then
@@ -11055,7 +11800,7 @@ check_commit_message() { # commit message file
       while IFS= read -r q; do
         [ -n "$q" ] && printf -v cmd '%s --writes %q' "$cmd" "$q"
       done < "$CC_TMP"
-      fail 49 "--check-commit: pass $u stages paths outside the set it declared before dispatch, and the declaration can still be widened because the pass has not committed:$uncov — widen it, then commit again: $cmd"
+      fail 49 "--check-commit: pass $u stages paths outside the set it declared before dispatch, and the declaration can still be widened because the pass has not committed:$uncov; $graded — widen it, then commit again: $cmd"
       return 1
     fi
   done
@@ -11064,7 +11809,7 @@ check_commit_message() { # commit message file
 
 verb_dispatch() { # slug · unit · writes...
   local slug="$1" unit="$2"; shift 2
-  local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair
+  local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair _dk
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 49 "no run-state file, so there is no run to declare a dispatch against: $rel"; return 1; }
@@ -11267,12 +12012,12 @@ verb_dispatch() { # slug · unit · writes...
   # carries a pass's OWN declaration, so every pass closed the instant it was declared and this whole
   # proof ran over an empty set. A closing review reproduced that with two controls. The comment is
   # now a function call, which cannot be wrong about what the leg does — `check_pass_open`, shared
-  # with `--audit`. The two verbs ask it over DIFFERENT row sets, on purpose: this loop asks per
-  # ROW, so a row whose set the pass never wrote keeps its paths reserved against a sibling (the
-  # conservative answer a disjointness proof wants); `--audit` asks over the UNION of a unit's
-  # same-anchor rows, because a pass that wrote inside ANY of them is not idle (the true answer a
-  # stall clock wants). One predicate, two populations — stated so nobody "fixes" either to match.
-  sibrows=$(grep -F -- " dispatch · item " "$rel" 2>/dev/null | while IFS= read -r _r; do
+  # with `--audit`. ONE POPULATION, the library's keys (TOOL-aGraftedHelix-39): this loop asks about
+  # EVERY key and `--audit` about each unit's current one, and both ask over the key's union. So a
+  # pass's earlier same-anchor paths stay reserved against a sibling until it commits inside the
+  # union, and are released then. The per-ROW reading this replaced let a re-declaration naming only
+  # its added paths free the earlier ones while the pass was still open.
+  sibrows=$(read_pass_declarations "$rel" | while IFS= read -r _r; do
       [ -n "$_r" ] || continue
       _i=${_r#* dispatch · item }; _i=${_i%% · reason *}
       _g=${_i%% *}; _u=${_i#* }
@@ -11374,9 +12119,27 @@ SIBS
   # more paths declares again; both rows are on the record and a redesign can read them. There is no
   # narrowing refusal, because with grading dark there is nothing for a narrowing to hide from — and a
   # refusal nobody can clear is the stall this build exists to remove.
+  # TOOL-aGraftedHelix-1 S8 - A PASS IS DISPATCHED ONLY BY THE RUN THAT HOLDS ITS CLAIM, read as the
+  # holder and renewed when due, after every local refusal above and BEFORE the row is written:
+  # another session's claim is check 108 and no row; a read or a write that does not complete is
+  # announced and the dispatch goes on, as the holder's paths do offline.
+  if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
+    _dk=$(fact "$rel" keepalive)
+    check_claim_writable "$slug" holder "$_dk" "$(fact "$rel" session)" "$_dk" "$rel"
+    case "$?" in
+      1) return 1 ;;
+      0) write_claim "$slug" live "$_dk" holder "$rel" || [ "$?" = 2 ] || return 1 ;;
+    esac
+  fi
   park "$rel" dispatch "$grp $unit" "$want" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: dispatch declared — $grp $unit · $want"
+  # THE SET NOW IN FORCE, which is the key's union and not the row just parked: a declaration naming
+  # only the paths it adds leaves every earlier same-anchor path standing, and this says so.
+  local _eff
+  _eff=$(read_pass_declarations "$rel" current | grep -F -- " $unit · reason ")
+  _eff=${_eff#* dispatch · item }
+  echo "unattended: dispatch effective — ${_eff%% · reason *} · ${_eff#* · reason }"
   return 0
 }
 
@@ -11788,6 +12551,9 @@ while [ $# -gt 0 ]; do
     --check-commit) shift
                     CC_TMP=$(mktemp) || { echo "unattended: --check-commit cannot create a scratch file, so it graded nothing"; RUNLOG_CLEAN=1; exit 2; }
                     check_commit_message "${1:-}"; _rl_rc=$?; rm -f "$CC_TMP"; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-aGraftedHelix-1 - the remote's claims, read and printed; no slug, because it lists them all.
+    --claims)       refuse_waive_unless_preflight --claims || { RUNLOG_CLEAN=1; exit 1; }
+                    print_claims; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; RUNLOG_CLEAN=1; exit 0 ;;
     # THE SET IS THE DISPATCH. A slug-taking verb is recognised by membership in VERBS_SLUG rather
     # than by an alternation typed here, so the declaration is load-bearing: a verb absent from it
@@ -11819,6 +12585,7 @@ case "$VERB" in
   --liveness)  print_liveness "$SLUG" ;;
   --resume)    verb_resume "$SLUG" "$KID" ;;
   --close)     verb_close "$SLUG" ;;
+  --authorization) print_authorization "$SLUG" ;;
   --landed)    verb_landed "$SLUG" ;;
   --abort)     verb_abort "$SLUG" "$REASON" "$HALT_CODE" ;;
   --hold)      run_hold "$SLUG" "$HALT_CODE" "$HOLD_UNTIL" "$REASON" "$HOLD_REAPED" "$HOLD_UNREACH" "$HOLD_RUN" ;;
@@ -11833,5 +12600,6 @@ case "$VERB" in
   --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$VERDICT" ;;
   --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" ;;
   --dispatch)  verb_dispatch "$SLUG" "$PK_ITEM" "${DP_WRITES[@]}" ;;
+  --beat)      write_claim_beat "$SLUG" ;;
 esac
 RUNLOG_CLEAN=1; exit "$status"

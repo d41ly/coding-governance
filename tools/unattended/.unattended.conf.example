@@ -155,6 +155,14 @@ RESUME_SCHEDULE_DELETE="<your-durable-schedule-delete-tool>"
 RESUME_SCHEDULE_DELAY="1800"
 RESUME_SCHEDULE_LIMIT="6"
 
+# THE RUN CLAIM (TOOL-aGraftedHelix-1): every run claims its slug on the remote the landing push
+# goes to, as the ref `refs/gov/runs/<slug>` written by compare-and-swap, so a second node's
+# `--preflight` of the same slug is refused before it starts rather than met at the merge.
+# `on` or `off`; absent or blank is `off`, and `--preflight` says so on stderr; any other spelling
+# is a refusal. On, a remote that refuses the push refuses `--preflight` with check 109.
+# The kit ships it OFF: turn it on once your remote accepts a push to `refs/gov/runs/<slug>`.
+RUN_CLAIMS="off"
+
 # MEASURE, do not copy. `<phases>:<dod>` — the SIZE of the kit's core sets as your installed copy
 # ships them. Count them in `unattended.sh` (`PHASES_CORE`, `DOD_CORE`) and write the two numbers
 # here. Undeclared or malformed leaves BOTH shrink-only pins unenforced, so both are refusals.
@@ -347,7 +355,7 @@ DOD_EXTRA=""
 # shrink-only and REQUIRED: undeclared or malformed is a refusal, not a defaulted value,
 # because a pin that quietly defaults is a pin nobody set.
 HALT_CODES_EXTRA=""
-HALT_FLOOR="7"
+HALT_FLOOR="8"
 
 # The HOLD VOCABULARY, a SECOND set beside the halt codes and never an extension of them: a halt
 # code ENDS a run and a hold code PAUSES one, and one list would let a pause be recorded as an

@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.68 -->
+<!-- gov:kit unattended@1.85 -->
 
 # Unattended runs
 
@@ -35,10 +35,12 @@ check 58 naming another branch, where this worktree's copy is a HELD or working 
 lease and this worktree is not on its run branch; under
 `in-place`, where a landed record stays LANDING until the next `--preflight` retires it, `--resume`
 prints nothing to resume and `--audit` then refuses with check 51. FIRST,
-`bash {{KIT_DIR}}/unattended.sh --resume <slug> --keepalive-id <your own id>`. For the holder it
-writes nothing, because whether a run is live is derived from what `--liveness` reads, which this
-very tick moves; the act is there to refuse a session that no longer holds the slug before the
-second act runs. SECOND, and ONLY when that first act neither refuses nor prints
+`bash {{KIT_DIR}}/unattended.sh --resume <slug> --keepalive-id <your own id>`. The holder's call
+writes nothing to the record, because whether a run is live is derived from what `--liveness` reads,
+which this very tick moves; where `RUN_CLAIMS` is `on` it reads the run's claim on the remote and
+renews it when due, and a claim another session holds refuses it at check 108, which you end with
+`--abort <slug> --code claim-lost`. The act is there to refuse a session that no longer holds the
+slug before the second act runs. SECOND, and ONLY when that first act neither refuses nor prints
 `still held`, `bash {{KIT_DIR}}/unattended.sh --audit <slug>`. After either of those two outcomes
 this session does not drive the slug, and acting on a `STALLED` verdict would re-dispatch units a
 live holder is driving, or a held run's units — the double drive the lease exists to stop. The verb prints one line per dispatched-and-open unit with how long the TREE has
@@ -685,8 +687,10 @@ definition, so the absence is a decision and not an oversight.
   a shared mutable record. A generated index ALONE is fine — every pass changes a spec header it is
   rendered from — and only the index together with its GENERATOR is refused. The third clause, whether
   a file is a contract the sibling reads, is a judgement no verb can make, and it says so rather than
-  pretending. If a pass discovers it needs another file, re-declare with the WIDER set BEFORE the
-  commit; narrowing is refused, because narrowing after the fact is how a write gets hidden.
+  pretending. If a pass discovers it needs another file, declare again BEFORE the commit, naming only
+  the paths it adds: every row at one anchor stands and the pass may write their union, which
+  `--dispatch` prints as `dispatch effective`. A narrower row is accepted and frees nothing, and a
+  row at a LATER anchor is a new pass, graded on its own.
   **End the pass commit's message with a `Pass: <unit-id>` trailer**, and give a commit that names a
   unit but is no pass `Pass: none`: the gate attributes a commit by its trailer and never by its
   subject once one is present, which is what stops a records commit from being graded as a pass.
@@ -714,7 +718,10 @@ definition, so the absence is a decision and not an oversight.
   **The harness call carries `scratch: <your session scratchpad, absolute>`** — the path your own
   system prompt names, never `$TMPDIR` — and refuses without it; every agent it spawns is told that
   is where temporary files go, and the child receives it in `dispatch.args` and refuses too, both
-  without the key and with a `ground` that does not name it.
+  without the key and with a `ground` that does not name it. **Every call also carries
+  `base: <the run's pinned base fact>`**, audit on or off: it pins the spec audit's checklist and
+  the spec commit's checklist at the base the run was authorized at, and the harness refuses a
+  declared `specAudit` without it.
   **A review the platform killed DEFERS, and you re-run it ONCE.** When the harness returns
   `exit: 'deferred-platform'`, a lens, a skeptic batch or the synthesis of its AUDIT review returned
   nothing: no round was recorded, nothing was built, and every agent that did return left its result
@@ -750,8 +757,9 @@ definition, so the absence is a decision and not an oversight.
 
   It takes a COMMITTED range, so it runs AFTER the commit and never before it — the pre-commit
   spelling resolves to an empty range and prints "touches no file", which reads exactly like a clean
-  checklist and is not one. Its stdout IS the checklist and it always exits 0, so finish it rather
-  than reading its status. A class it names that is already violated is the next pass. (Adopters
+  checklist and is not one. Its stdout IS the checklist and it exits 0 whenever it prints one, and 1
+  with a `HYGIENE gotchas:` line when it refuses the range, so finish it rather than reading its
+  status. A class it names that is already violated is the next pass. (Adopters
   whose memory tree ships without that kit have no such command; the obligation is then whatever
   their own build method names.)
 - Check yourself with `bash {{KIT_DIR}}/unattended.sh --status <slug>`, and the units with
@@ -760,6 +768,13 @@ definition, so the absence is a decision and not an oversight.
 
   ```bash
   bash {{KIT_DIR}}/unattended.sh --liveness <slug>
+  ```
+- Where `RUN_CLAIMS` is `on`, the claims on the remote, which is where a second node driving a slug
+  shows up; the resume tick renews a `LIVE` run's own claim with `--beat`:
+
+  ```bash
+  bash {{KIT_DIR}}/unattended.sh --claims          # one row per claim: slug, node, status, beat age, verdict
+  bash {{KIT_DIR}}/unattended.sh --beat <slug>     # the tick's heartbeat; one `beat —` line
   ```
 
 ## While the work runs
@@ -992,11 +1007,14 @@ moved:
 
 ```bash
 {{LANDER}} --prepare --slug <slug>
+bash {{KIT_DIR}}/unattended.sh --authorization <slug>
 bash {{KIT_DIR}}/unattended.sh --close <slug>
 ```
 
 Make NO second move after the prepare: a move stages the record, and this close refuses a non-empty
-porcelain. A resume after the prepare reads a range that also holds what the merge brought in from
+porcelain. `--authorization` is not one: it stages and writes nothing, and it grades the one
+non-overridable item the prepared merge can break before the close spends its bar. A refusal there
+ends the landing; take one of the two exits it prints. A resume after the prepare reads a range that also holds what the merge brought in from
 the default branch, so it can announce a surface another landing touched: one flagged bar more than
 owed, never one fewer.
 
@@ -1184,7 +1202,11 @@ run-state file for the flag.
 **Reconcile from the remote's own default branch, onto the run branch.** If `--prepare` reports a
 conflict, run `git merge <remote>/<default-branch>` on the run branch, resolve it, commit, and
 `--prepare` again. Nothing in this mode routes through your node's own default branch: that is a ref
-this session can move, and it carries whatever else on this node has not been pushed.
+this session can move, and it carries whatever else on this node has not been pushed. After ANY
+merge of the remote's default branch into the run branch, mid-build included, run
+`bash {{KIT_DIR}}/unattended.sh --authorization <slug>` before the next pass and before `--prepare`
+again: the merge can bring in a check the README pinned at BASE cannot satisfy, and nothing else
+reads that item until the close, after its bar.
 
 **If the lander cannot COMPLETE the landing, nothing is merged anywhere.** That is the remote
 reported unreachable, the race retries exhausted, or a `--close` refused because the lander could

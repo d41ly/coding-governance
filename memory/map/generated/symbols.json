@@ -288,6 +288,16 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "add_health_event",
+      "kind": "function",
+      "file": "tools/lib/health_log.py"
+    },
+    {
+      "id": "add_health_event",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
+    },
+    {
       "id": "add_kit_to_path",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -723,6 +733,11 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "build_fixture",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
       "id": "build_forbidden",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -1001,6 +1016,11 @@
       "id": "build_recipe_refusal",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "build_record",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "build_record_checks",
@@ -1628,6 +1648,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "check_content",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "check_contract_registry",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -1783,6 +1808,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "check_invariant",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "check_is_root",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -1836,6 +1866,11 @@
       "id": "check_packing",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "check_parity",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
     },
     {
       "id": "check_pass",
@@ -1956,6 +1991,11 @@
       "id": "check_registry",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "check_relations",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "check_retired_flags",
@@ -2313,6 +2353,11 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "cmd_check_content",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "cmd_check_format",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2321,6 +2366,11 @@
       "id": "cmd_check_records",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
+    },
+    {
+      "id": "cmd_check_relations",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "cmd_check_rotation",
@@ -2381,6 +2431,11 @@
       "id": "cmd_measure",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "cmd_measure_relations",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "cmd_model",
@@ -2753,6 +2808,16 @@
       "file": "tools/workflows/drift-audit-state.template.js"
     },
     {
+      "id": "deriveRepoPath",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "deriveRepoPath",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "deriveReviewKey",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -2868,6 +2933,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "derive_content_key",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "derive_count",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -2971,6 +3041,16 @@
       "id": "derive_guarded_legs",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "derive_health_log",
+      "kind": "function",
+      "file": "tools/lib/health_log.py"
+    },
+    {
+      "id": "derive_health_log",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
     },
     {
       "id": "derive_id_families",
@@ -3143,9 +3223,19 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "derive_moved_invariants",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "derive_nearest_vintage",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_needle",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
     },
     {
       "id": "derive_node_tag",
@@ -3218,6 +3308,16 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_relation_base",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "derive_relation_successors",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "derive_rename_map",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -3241,6 +3341,11 @@
       "id": "derive_root_confs",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_row_re",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "derive_row_stems",
@@ -3316,6 +3421,16 @@
       "id": "derive_statuses",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "derive_supersession_map",
+      "kind": "function",
+      "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "derive_supersession_order",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "derive_table",
@@ -3548,6 +3663,16 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "extractByDesign",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "extractByDesign",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "extractCommitTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3711,6 +3836,11 @@
       "id": "extract_subject_pins",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
+    },
+    {
+      "id": "extract_supersessions",
+      "kind": "function",
+      "file": "tools/memory-recall/extract.py"
     },
     {
       "id": "extract_text",
@@ -4008,6 +4138,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "load_checker",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
       "id": "load_conf",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -4068,6 +4203,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "load_defined_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "load_deploy",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -4108,6 +4248,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "load_leg_names",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "load_map_tree",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -4121,6 +4266,16 @@
       "id": "load_project_layer",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "load_recall_kit",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "load_records_at",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "load_registry",
@@ -4455,6 +4610,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/workflows/review_replay.py"
     },
     {
@@ -4566,6 +4726,11 @@
       "id": "measure_lone_cr",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "measure_near_match",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "measure_orphans",
@@ -4983,6 +5148,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "parse_sections",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "parse_seen",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -5166,6 +5336,11 @@
       "id": "print_unattributed",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "print_verdict",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
     },
     {
       "id": "print_verdicts",
@@ -5923,6 +6098,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_pauses",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
       "id": "read_pointer",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -5996,6 +6176,11 @@
       "id": "read_registry",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "read_relation_gate",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "read_rev",
@@ -6518,6 +6703,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderChecklistUnion",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "renderChecklistUnion",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "renderCloses",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
@@ -6708,6 +6903,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "render_by_design",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "render_cell",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -6786,6 +6986,11 @@
       "id": "render_grade_tsv",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_heads",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
     },
     {
       "id": "render_id_run",
@@ -7018,6 +7223,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "render_supersession_tag",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
+    },
+    {
       "id": "render_swapped_name",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -7176,6 +7386,16 @@
       "id": "resolveRunPhase",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "resolveSpecEntry",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "resolveSpecEntry",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
     },
     {
       "id": "resolveStamp",
@@ -7348,6 +7568,16 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "resolve_health_log",
+      "kind": "function",
+      "file": "tools/lib/health_log.py"
+    },
+    {
+      "id": "resolve_health_log",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
+    },
+    {
       "id": "resolve_hits",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -7436,6 +7666,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -7551,6 +7786,11 @@
       "id": "resolve_projects_root",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "resolve_range_base",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "resolve_recall_kit",
@@ -7928,6 +8168,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "run_format",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
       "id": "run_fragment_merges",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -7993,6 +8238,16 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "run_node",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
+      "id": "run_pattern",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
       "id": "run_plan",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -8046,6 +8301,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
     },
     {
       "id": "run_selftest",
@@ -8116,6 +8376,11 @@
       "id": "scanWriteTargets",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "scan_added_records",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "scan_anomalies",
@@ -8238,6 +8503,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "scan_head_spellings",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
       "id": "scan_heartbeat_streaks",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -8321,6 +8591,11 @@
       "id": "scan_record_rows",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_records",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "scan_replaced_spellings",
@@ -9418,6 +9693,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_health_appender_failures_return_none_with_one_note",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_hits_disagreement_reds",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -10393,12 +10673,32 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "test_supersession_edges_and_map",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_supersession_order_moves_only_past_a_successor",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_supersession_tag_in_both_renderers",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_survivor_is_derived_from_a_re_read",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_sweep_counts_are_derived_and_complete",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_sweep_logs_one_tree_killed_per_target_and_none_dry",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
     },

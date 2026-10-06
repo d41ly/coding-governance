@@ -8,7 +8,8 @@
 # Fields: gate<TAB>check<TAB>ordinal<TAB>signature.
 #
 # Every row carries the REASON it cannot be armed, moved here with it from the central file.
-unattended.sh	9	1	cannot stage the run-state file, and the gate leg's whole per-run population is the index, so an unstaged run is invisible to every check it has
+# The check-9 stage row left on 2026-10-05: a git shim failing only the run-state file's add arms it
+# (TOOL-aGraftedHelix-32 AC9), so the branch `--preflight`'s restore rides is now asserted.
 #
 # THE TWO ROTATION ROWS (kit 1.6) carry their reason, per the rule above. Both sit BELOW two
 # pre-write refusals that a fixture CAN reach — a derived name occupied by a non-file, and one

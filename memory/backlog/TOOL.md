@@ -38,7 +38,6 @@ Cite ids, never line numbers.
 | [TOOL-aBoundedVerdict-32](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-20 | TOOL-cBriefedPilot-18 AC9 was CLAIMED at a close it was not met at. It… |
 | [TOOL-aBranchedMandate-5](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | adopt-drift-audit.sh diffs its render with no [ -s ] test, so… |
 | [TOOL-aBranchedMandate-8](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | --preflight OVERWRITES a live non-terminal run-state file, losing the… |
-| [TOOL-aBranchedMandate-9](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | --preflight's rotation and scaffold run BEFORE checks that can return… |
 | [TOOL-aBranchedMandate-10](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | map_extractors.template.py unions the two JS scans with a bare +,… |
 | [TOOL-aBranchedMandate-11](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | govkit.py's blocked skip reason is unreachable behind cmd_apply's early… |
 | [TOOL-aCandidStub-1](../builds/aCandidStub/BACKLOG.md) | OPEN | — | — | 2026-08-10 | tools/hooks/agent-cap.js blesses an identifier bound from an EMPTY… |
@@ -87,6 +86,9 @@ Cite ids, never line numbers.
 | [TOOL-aGradedMandate-13](../builds/aGradedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-31 | THE EMPTY-ROSTER VACUITY IS CLOSED IN THE LEG AND STILL OPEN IN THE… |
 | [TOOL-aGradedMandate-14](../builds/aGradedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-31 | TWO SKIP ANNOUNCEMENTS EACH CERTIFY THAT THE OTHER ARM RAN, AND NEITHER… |
 | [TOOL-aGradedMandate-15](../builds/aGradedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-31 | CHECK 24 JOINS UNIT IDS BY MENTION RATHER THAN BY OWNERSHIP, which is… |
+| [TOOL-aGraftedHelix-42](../builds/aGraftedHelix/BACKLOG.md) | OPEN | MED | — | 2026-10-06 | the build harness's spec stage gives a writer no channel for evidence… |
+| [TOOL-aGraftedHelix-43](../builds/aGraftedHelix/BACKLOG.md) | OPEN | MED | — | 2026-10-06 | spec passes run reproduction work that belongs to a build pass: unit… |
+| [TOOL-aGraftedHelix-44](../builds/aGraftedHelix/BACKLOG.md) | OPEN | MED | — | 2026-10-06 | the spec template's per-criterion obligations (a Red-when clause and a… |
 | [TOOL-aHoistedPass-11](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | the child's prompt between dispatches is UNGUARDED: agent-cap.js's… |
 | [TOOL-aHoistedPass-12](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | the read-window narrowing is CONDITIONAL on scriptPath, not name: or an… |
 | [TOOL-aHoistedPass-13](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | export const meta has NO enforcer. Both readers SELECT by it, so… |

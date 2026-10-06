@@ -58,8 +58,15 @@ The checker is also the writer of the session's orientation card (`--card --writ
 --replay`, `--card --path`; `KICK-aReplayedCard-1`). The card lives under the git common dir, so
 every worktree of one repository shares the directory and a card names the tree it was written in;
 every startup cell is derived, the `node —` cell through the manifest's own `registry:` key, so the
-kit spells no charter path. The verbs run no manifest check and no fetch: those stay in the engine's
-Steps 1 and 2b, where each costs a kickoff rather than every session start.
+kit spells no charter path. The verbs run no manifest check and move no branch: those stay in the
+engine's Steps 1 and 2b, where each costs a kickoff rather than every session start. The one remote
+contact is the `claims —` cell (`TOOL-aGraftedHelix-2`): in a tree with `.unattended.conf`, the
+written card runs the unattended driver's `--claims` once under a kill bound, found through the same
+sibling resolver as the id reader, and lists the remote's run claims by the driver's verdict, hiding
+`stale` and `terminal` ones older than the checker's `CARD_CLAIMS_HIDE_S`; a replay reads no remote.
+Where the conf's `RUN_CLAIMS` is not `on` the driver answers `claims: off` without a read and the
+cell reads `skipped: RUN_CLAIMS is off`, so the shipped dark default pays no fetch per session start
+and the card never reads the switch itself (`TOOL-aGraftedHelix-32`).
 
 The engine's kickoff lands on the card through `--card --append` (`KICK-aReplayedCard-2`), which
 checks every cited path, line range and record id for EXISTENCE in two spawns — one

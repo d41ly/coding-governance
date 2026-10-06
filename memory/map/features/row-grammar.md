@@ -94,6 +94,33 @@ check 20's capture on green for that reason, since swallowing it would silence t
   declared families would assert one value against another the same call derives, which is the
   tautology that let the wrong-families arm pass by finding nothing.
 
+### Check 27 — a new record that ranks as a near match names its relation
+
+`--check-relations [<base>]` is hygiene check 27, `TOOL-aGraftedHelix-9`. `scan_records` enumerates
+the population once: every decision row the grammar keys, then every gotcha under `gotchas/`. The
+records whose identity is absent at the mainline merge-base are ranked with the memory-recall kit's
+own `bench.build_index`. The base is `origin/<branch>`, then `<branch>`, read the way
+`check-verdict-epoch.sh` reads it. A top hit clearing `NEAR_MATCH_GATE`'s floor that shares a
+four-character term must be named, have a named successor, or be answered with a relation token.
+The predicate is pinned rather than tuned, because the floor was measured with exactly this
+construction. `--measure-relations [<floor> [<base>]]` is that measurement, shipped: it replays
+history and reproduces the spec's graded pairs at `5266d22e` exactly. The recall kit is reached through
+the canonical `resolve_kit_dir` block. A blank key is NOT ARMED and reads no history; an absent kit
+while armed is a named refusal. The superseded-by map is derived only when a near match is otherwise
+unsatisfied, from `TOOL-aGraftedHelix-4`'s two functions and never from the query cache, which a
+hygiene leg must not write.
+
+### Check 28 — one text, one record
+
+`--check-content [<base>]` is hygiene check 28, `TOOL-aGraftedHelix-6`, check 27's exact half over
+the same `scan_records` population and the same base. `derive_content_key` folds a row's text after
+its id, or a gotcha's `body` after its front matter, into one key: links to their text, ISO dates and
+emphasis dropped, case and whitespace folded, a leading separator run stripped, so a decision
+re-minted in the index's other row shape keys the same. A key two identities hold reds when one
+holder was added since the base; one identity held twice is checks 20 and 24's. A duplicate whose
+every holder had landed is counted and never reported, so a kit update cannot red a corpus nobody may
+edit, and with no mainline base every key is graded. It is always on: no conf key and no pin.
+
 ### The marker contract
 
 Four live readers parse the generated-region markers: `apply_region` in the index generator

@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 124 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 95 · guides: 9 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 124 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 103 · guides: 9 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -207,6 +207,9 @@ Inventories: gate-legs: 124 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 
 | key | claimant |
 |---|---|
 | `a-folded-field-leaves-its-row-shape-docs-behind.md` | build-method |
+| `a-grep-for-a-word-is-a-presence-probe.md` | memory-tree-hygiene |
+| `a-helper-extraction-blinds-a-per-function-rule.md` | unattended |
+| `a-merged-in-check-can-refuse-a-pinned-record.md` | unattended-mandate |
 | `a-new-leg-trips-a-growing-set-of-meta-gates.md` | run-gates |
 | `a-new-local-collides-in-a-long-function.md` | govkit |
 | `a-pair-exists-and-it-is-the-wrong-one.md` | agent-cap |
@@ -224,8 +227,10 @@ Inventories: gate-legs: 124 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 
 | `bash-c-multiline-flattens-under-msys.md` | agent-cap |
 | `borrowed-seed-inherits-its-head-state.md` | unattended |
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
+| `canary-waits-on-a-rendezvous-not-a-clock.md` | run-gates |
 | `check-format-grades-two-populations.md` | build-readme-surface |
 | `concurrency-is-not-a-budget.md` | baseline |
+| `concurrent-runs-are-announced-not-refused.md` | unattended-mandate |
 | `conf-value-interpolated-into-a-regex.md` | agent-cap |
 | `containment-tested-one-way.md` | unattended |
 | `criterion-asserts-what-its-own-command-cannot-show.md` | build-method |
@@ -250,6 +255,7 @@ Inventories: gate-legs: 124 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 
 | `heredoc-escape-reaches-the-regex.md` | baseline |
 | `hookspath-resolves-into-another-checkout.md` | run-gates |
 | `id-matched-as-a-substring.md` | unattended |
+| `inherited-git-dir-pins-the-work-tree-to-the-cwd.md` | unattended-mandate |
 | `inline-fence-swallows-the-rest-of-the-file.md` | memory-tree-hygiene |
 | `inline-marker-breaks-a-line-continuation.md` | install-prefix |
 | `inputs-inside-the-subjects-reach.md` | unattended |
@@ -266,6 +272,7 @@ Inventories: gate-legs: 124 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 
 | `observation-before-the-last-fold-of-the-same-commit.md` | build-method |
 | `observed-by-claim-no-arm-discharges.md` | review-harnesses |
 | `one-value-field-records-a-mixed-outcome.md` | build-method |
+| `orchestrator-hand-off-owed-a-disposition.md` | unattended-stops |
 | `pin-copied-from-another-corpus.md` | baseline |
 | `pin-gated-checks-arm-nothing-without-a-pin.md` | memory-tree-hygiene |
 | `porcelain-diff-names-a-rename-by-its-destination.md` | unattended |
@@ -289,6 +296,7 @@ Inventories: gate-legs: 124 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 
 | `suite-edited-while-bash-executes-it.md` | memory-tree-hygiene |
 | `suite-invalidated-by-a-commit-under-it.md` | run-gates |
 | `swallowed-delegate-reads-as-clean.md` | memory-tree-hygiene |
+| `sweep-issues-no-cost-verdict.md` | run-gates |
 | `text-mode-read-eats-a-bare-cr.md` | unattended |
 | `trace-profile-measures-itself.md` | unattended |
 | `trailing-comma-counted-as-an-element.md` | agent-cap |

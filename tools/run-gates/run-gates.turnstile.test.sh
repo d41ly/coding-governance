@@ -142,7 +142,9 @@ bad=0
 # counted on the branch where the first bar never establishes (one FAIL and four SKIPs).
 # Raised from 71 to 74 by TOOL-dDerivedDocket-64, which adds arm 6c inside the position fixture:
 # three assertions, every one unconditional, counted off the block rather than read off a run.
-FLOOR_ASSERTIONS=74
+# Raised from 74 to 78 by TOOL-aGraftedHelix-8: one health-log line each in arms 3, 7c, 16 and 22,
+# arm 22's counted on its never-established branch too, as a SKIP.
+FLOOR_ASSERTIONS=78
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -253,6 +255,12 @@ printf '%s' "$out3" | grep -q 'dead holder (pid 999999)' \
   || { nope "a dead holder was not reaped by its PID"; printf '%s\n' "$out3" | tail -4 | sed 's/^/      /'; }
 printf '%s' "$out3" | grep -q 'gates GREEN' \
   && ok "the run proceeded after reaping a dead holder" || nope "the run did not complete after the reap"
+# TOOL-aGraftedHelix-8: the reap is a self-heal, so it leaves ONE I3 line in the repository's health
+# log, naming the dead pid. The log is read by its fields; its stamp and fold are the resolver suite's.
+hl3=$(awk -F'\t' '$2 == "run-gates" && $3 == "beacon-reaped"' "$R3/.git/health.log" 2>/dev/null)
+[ "$(printf '%s' "$hl3" | grep -c .)" = 1 ] && [ "$(printf '%s' "$hl3" | cut -f4)" = "dead holder pid 999999" ] \
+  && ok "the dead holder's reap appended one beacon-reaped line naming its pid" \
+  || nope "the dead holder's reap left '$(printf '%s' "$hl3" | tr '\t\n' ' ;')' in the health log, not one beacon-reaped line"
 
 # ------------------------------------------- 4: a LIVE but stalled holder is reaped on the TTL -----
 # Against the UNMODIFIED runner: the holder's PID is this shell, which is unquestionably alive, and
@@ -538,6 +546,11 @@ fi
   || nope "the expired run recorded no positive wait (got '${q9b:-<absent>}')"
 [ "$rc9b" = 0 ] && ok "expiring contributed nothing to the exit code" \
                 || nope "the expired run exited $rc9b — the turnstile changed the verdict"
+# TOOL-aGraftedHelix-8: failing open is the turnstile healing a wedge, so it is ONE turnstile-expired line.
+hl9b=$(awk -F'\t' '$2 == "run-gates" && $3 == "turnstile-expired"' "$R9b/.git/health.log" 2>/dev/null)
+[ "$(printf '%s' "$hl9b" | grep -c .)" = 1 ] && printf '%s' "$hl9b" | cut -f4 | grep -qE '^waited [0-9]+s bound [0-9]+s$' \
+  && ok "the expired wait appended one turnstile-expired line with its waited and bound seconds" \
+  || nope "the expired wait left '$(printf '%s' "$hl9b" | tr '\t\n' ' ;')' in the health log, not one turnstile-expired line"
 
 R10=$tmp/quiet; mk_repo "$R10"
 legs "$R10" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
@@ -787,6 +800,11 @@ printf '%s' "$out14" | grep -q 'gates GREEN' \
 [ "$(ls -1 "$Q14" 2>/dev/null | wc -l)" -eq 0 ] \
   && ok "the dead ticket is gone, so the NEXT bar does not meet it either" \
   || nope "the dead ticket survived the run that swept it"
+# TOOL-aGraftedHelix-8: the sweep is a self-heal, so it is ONE ticket-swept line naming the dead pid.
+hl14=$(awk -F'\t' '$2 == "run-gates" && $3 == "ticket-swept"' "$R14/.git/health.log" 2>/dev/null)
+[ "$(printf '%s' "$hl14" | grep -c .)" = 1 ] && [ "$(printf '%s' "$hl14" | cut -f4)" = "dead waiter pid 999999" ] \
+  && ok "the dead waiter's sweep appended one ticket-swept line naming its pid" \
+  || nope "the dead waiter's sweep left '$(printf '%s' "$hl14" | tr '\t\n' ' ;')' in the health log, not one ticket-swept line"
 
 # ---- 17: the AGE signal fires on a ticket whose PID is ALIVE -----------------------------------
 # Against the UNMODIFIED runner, exactly as arm 4 does for the holder: the ticket's PID is this
@@ -956,6 +974,12 @@ if [ -n "$w22" ]; then
   { [ ! -e "$A22/gate-work.deadmine" ] && grep -q 'sweeping the scratch of a dead bar (pid 999999)' "$tmp/out22b"; } \
     && ok "control: the second bar swept, and announced, a dead bar of THIS repository's scratch" \
     || { nope "the second bar did not sweep a dead bar's scratch, so the two survivals below prove nothing"; tail -4 "$tmp/out22b" | sed 's/^/      /'; }
+  # TOOL-aGraftedHelix-8: ONE scratch-swept line for the one dead bar of this repository, and none
+  # for the foreign owner the sweep spared.
+  hl22=$(awk -F'\t' '$2 == "run-gates" && $3 == "scratch-swept"' "$R22/.git/health.log" 2>/dev/null)
+  [ "$(printf '%s' "$hl22" | grep -c .)" = 1 ] && [ "$(printf '%s' "$hl22" | cut -f4)" = "dead bar pid 999999" ] \
+    && ok "the dead bar's scratch sweep appended one scratch-swept line naming its pid" \
+    || nope "the dead bar's scratch sweep left '$(printf '%s' "$hl22" | tr '\t\n' ' ;')' in the health log, not one scratch-swept line"
   [ -d "$w22" ] && [ -f "$w22/owner" ] \
     && ok "a LIVE bar's scratch survived a second bar's sweep" \
     || nope "a second bar removed the scratch of a bar that was still running"
@@ -973,6 +997,7 @@ else
   skipped "the live bar's survival: the first bar never established"
   skipped "the foreign owner's survival: the first bar never established"
   skipped "the first bar's verdict: the first bar never established"
+  skipped "the scratch-swept health line: the first bar never established"
 fi
 
 echo

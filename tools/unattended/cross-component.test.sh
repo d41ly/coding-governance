@@ -40,8 +40,11 @@ same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]
 # exactly those shapes and nothing else: a FAILED line, or any other line, still reaches the arm. It
 # was copied from the filter of the same name in the leg's own suite beside this file, and the two
 # suites share no sourced helper, so a new announcement shape in the leg is owed to both.
-remove_announcements() { # leg output -> the same output without the check-45/46 announcement lines
-  printf '%s\n' "$1" | grep -v -E '^unattended: (LANDER_MODE [^ ]+ \((declared|defaulted)\) — |RESUME_SCHEDULE [^ ]+ \((declared|defaulted)\) — |RESUME_SCHEDULE is off — |SELFTESTS_OWED_PATHS is blank — |SELFTESTS_OWED_PATHS entry [^ ]+ — resolves to tracked paths$)'
+# Check 23's FLEET line is one too, printed on every run that grades a pass and never failing the
+# leg; arm 3b redded on it from its landing until TOOL-aGraftedHelix-34 S4 added it here and asserted
+# it in that arm instead.
+remove_announcements() { # leg output -> the same output without the check-23/45/46 announcement lines
+  printf '%s\n' "$1" | grep -v -E '^unattended: (LANDER_MODE [^ ]+ \((declared|defaulted)\) — |RESUME_SCHEDULE [^ ]+ \((declared|defaulted)\) — |RESUME_SCHEDULE is off — |SELFTESTS_OWED_PATHS is blank — |SELFTESTS_OWED_PATHS entry [^ ]+ — resolves to tracked paths$|check 23 fleet — )'
 }
 
 # ---- THE KIT RUNNER'S PARSER, before the fixture because it needs none: --checks takes no mode,
@@ -236,6 +239,11 @@ git push -qf origin unit
 out=$(leg); rc=$?
 same "arm 3b: the leg is silent over what the driver produced, exit code" "$rc" "0"
 same "arm 3b: the leg is silent over what the driver produced, output" "$(remove_announcements "$out")" ""
+# ...and the fleet line it no longer counts as noise SAYS the silence: the pass was graded, and its
+# write was inside the lane. A graded population of zero would make "0 undeclared" a probe that read
+# nothing, so that is refused beside it.
+hit  "$out" "unattended: check 23 fleet — 0 undeclared write(s) over "
+miss "$out" "undeclared write(s) over 0 graded pass(es)"
 
 
 # ---- ARM 4a/4b: the SCOPE-INTEGRITY seam, RE-AIMED by the aBoundedVerdict merge. These arms were
@@ -289,7 +297,8 @@ sed -i 's/^mode: prompt$/mode: slug/' memory/builds/tPrompt/RUN.md
 git add -A >/dev/null && git commit -q -m "forged mode" --no-verify && git push -qf origin unit2
 hit "$(leg)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare"
 
-FLOOR_ASSERTIONS=21
+# RAISED 21 -> 23 by exactly arm 3b's fleet-line pair, TOOL-aGraftedHelix-34 S4.
+FLOOR_ASSERTIONS=23
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 # THE TRAILER IS UNCONDITIONAL: a red-but-complete run must still carry one, or the pooled runner
 # reads it as untrailed and writes no reading (aBatchedArm closing D4).

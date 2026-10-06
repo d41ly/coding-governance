@@ -64,7 +64,6 @@ tools/unattended/gate-guard.test.sh	PARITY	1	surfaced by the one-hop widening, T
 tools/unattended/unattended.sh	<<<	2	surfaced by the one-hop widening, TOOL-cMendedVintage-12
 tools/unattended/unattended.sh	BRIEFED	1	predates the gate
 tools/unattended/unattended.sh	BRIEFROWS	1	predates the gate
-tools/unattended/unattended.sh	CPOROWS	1	surfaced by the one-hop widening, TOOL-cMendedVintage-12
 tools/unattended/unattended.sh	PARKED	1	predates the gate
 tools/unattended/unattended.sh	PROPOSED	1	predates the gate
 tools/unattended/unattended.sh	RESCOPED	1	predates the gate

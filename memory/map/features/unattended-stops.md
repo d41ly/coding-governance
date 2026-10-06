@@ -14,7 +14,7 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["liveness-negative-from-another-population.md"]
+gotcha-classes = ["liveness-negative-from-another-population.md", "orchestrator-hand-off-owed-a-disposition.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -50,6 +50,24 @@ worktree at most. Elsewhere `--liveness` reads `ELSEWHERE`, second after `TERMIN
 by name, the stop-guard allows, and the matrix's HELD and working rows refuse a leased record at check
 58, naming where the run is driven from (`TOOL-dDerivedDocket-62`). A record naming no branch is
 graded where it is read, and the tick acts on none of its copies.
+
+**Two nodes meet at the remote, not at the merge.** The lease lives on the run's own branch, so with
+`RUN_CLAIMS` on every run also claims `refs/gov/runs/<slug>` on the landing remote by
+compare-and-swap: `--preflight` and a take-over refuse another session's live claim (check 107), the
+holder's verbs refuse one at check 108 and end with halt code `claim-lost`, a claim read or write that
+does not complete is check 109, and `--claims` lists them all. The beat is a remote fact, so the
+record is never restaged for it (`TOOL-aGraftedHelix-1`). Where `RUN_CLAIMS` is off, `--claims` prints
+`claims: off` and reads nothing. A claim push waits while push-main holds `push-main-active` in the
+same git dir, and a `--preflight` refused after its claim write restores the record and writes a claim
+it created `aborted` (`TOOL-aGraftedHelix-32`). The claim push takes `claim-push.lock` in that git dir
+before it tests the marker, and push-main touches its marker before it waits on the lock, so the two
+pushes serialise. A stale lock is broken only under its guard directory `claim-push.lock.break`, by
+the one writer that takes it and re-reads the deadline there, and released only by its `owner`
+(`TOOL-aGraftedHelix-37`); a `--settle` re-run over a settled record retries the claim's status write through
+`write_settle_claim`, over a `held` or `live` claim of the record's own lease alone
+(`TOOL-aGraftedHelix-36`). The class `orchestrator-hand-off-owed-a-disposition.md`
+is claimed here because its remedy is a stop: a discovery handed to the orchestrator resolves to a
+unit or to a row `--park` writes, and the close checks every such line does.
 
 **The holder keeps its own `--replaces`.** The matrix reads `--replaces` above the same-session row,
 and that row takes only a caller under a pid the record does not name, because a restart is a new

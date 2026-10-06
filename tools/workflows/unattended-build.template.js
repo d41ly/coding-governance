@@ -1,11 +1,11 @@
 export const meta = {
   name: 'unattended-build',
-  version: '1.2', // gov:kit unattended-build@1.2 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
+  version: '1.12', // gov:kit unattended-build@1.12 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
-    'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal. AUDIT is opt-in: with no `specAudit` arg the stage announces itself OFF by declaration and the roster follows SPEC completion.',
+    'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal. The SPEC stage ends in ONE commit of the specs its writers authored, so the audit pins them at HEAD in the same call. AUDIT is opt-in: with no `specAudit` arg the stage announces itself OFF by declaration and the roster follows SPEC completion.',
   phases: [
-    { title: 'Spec', detail: 'author every missing spec, in the declared order, no code' },
-    { title: 'Audit', detail: 'delegate to tier2-review.js as a spec-audit, passing `context` (the build README and run mandate), `specs` (the spec format and every sibling spec), `checklist` (the resolver\'s gotchas.py --for-paths output) and `scratch`, plus `priorFindings` and a per-subject `prevBlob` on a fold re-invoke; record the round, after the disposal at zero blockers so the disposition field is what was promoted. Only when `specAudit` is declared: absent, the stage logs OFF by declaration and delegates nothing' },
+    { title: 'Spec', detail: 'author every missing spec, in the declared order, no code; then ONE agent commits the authored specs' },
+    { title: 'Audit', detail: 'delegate to tier2-review.js as a spec-audit, passing `context` (the build README and run mandate), `specs` (the spec format and every sibling spec), `checklist` (a caller\'s, else the resolver\'s gotchas.py --for-paths output, merged with the spec commit\'s checklist items, its by-design block left out; that checklist reads its invariants at the pinned `base` when one is passed, else at the spec commit\'s parent, which is the block the audit-OFF hand-out carries) and `scratch`, plus `priorFindings` and a per-subject `prevBlob` on a fold re-invoke; record the round, after the disposal at zero blockers so the disposition field is what was promoted. Only when `specAudit` is declared: absent, the stage logs OFF by declaration and delegates nothing' },
     { title: 'Disposal', detail: 'dispose every confirmed and unverified finding by severity over the whole spec set, then hand out the roster, withheld on a clean round until its spec-audit record exists' },
   ],
 }
@@ -104,7 +104,8 @@ export const meta = {
 //      THE SPEC STAGE IS A BOUNDED PARALLEL FAN at TOOL-aStagedLane-3, of writers over groups of
 //      slices. That does not contradict the ratified `parallelism route:
 //      none` above: the verdict failed on E4, two passes COMMITTING without racing one index, and
-//      the spec writers author and never commit — the caller commits once after they return.
+//      the spec writers author and never commit — one commit stage commits once after they return,
+//      or the caller does when it pinned `subjects` (TOOL-aGraftedHelix-15).
 //      Leaving this claim unscoped would have left the file's own header describing a shape it no
 //      longer has, which is the drift class this repository gates for.
 //
@@ -114,6 +115,24 @@ export const meta = {
 //      caller error can build on a spec set the review is still working through. The owner's
 //      2026-09-01 ruling survives in the half that matters — the verdict decides, and NO round cap
 //      exists anywhere in this file.
+
+// ---------------------------------------------------------------------------------------------
+// THE SPEC COMMIT (TOOL-aGraftedHelix-15). The writers author and never commit, and the AUDIT
+// resolver pins each spec at `HEAD`, so every first call on a build with a MISSING spec and a
+// declared audit threw `no spec subjects could be pinned`, and a re-invoke under `resumeFromRunId`
+// replayed the resolver's cached empty answer: `wf_7b67cf1d-995`, the second throw in 20 ms. ONE
+// agent now commits the authored specs after the fan has returned, when it is the only writer left,
+// and the program writes each committed path back onto its unit.
+// WHAT IT BUYS: one call from SPEC through AUDIT on a build whose specs it authors, and a roster
+// whose authored units carry their committed `specPath`.
+// WHAT IT CANNOT BUY: proof the commit happened. `sha` is its agent's claim; the cross-check is the
+// resolver's separate read at `HEAD` on the audit route, and `--dispatch`'s MISSING refusal off it.
+// It does not commit a disposal fold or a promoted spec, which stay the caller's to commit. It does
+// not run beside caller `subjects`, which say the caller committed. It does not make a refusal
+// resume-safe: a resume replays every agent call whose prompt is unchanged, so each refusal that
+// asks for a commit names the re-invoke that is (`resumeRemedy`). A caller committing in the same
+// worktree while this call is outstanding meets git's index lock, which the stage reports as
+// `committed: false`.
 
 // --- cap-{{FANOUT_CAP}} fan-out, INLINED FROM THE SIBLING REVIEW HARNESS (TOOL-aStagedLane-3 S2) ----------
 // NOT A REUSE — A COPY, and the difference cost this spec two review rounds. `boundedParallel` was
@@ -144,7 +163,9 @@ function chunk(a, n) {
 // { repo: "/abs/path/to/worktree",                 // REQUIRED
 //   slug: "<build slug>",                           // REQUIRED
 //   scratch: "<absolute session scratchpad>",       // REQUIRED — the path the caller's OWN system prompt names
-//   base: "<immutable sha>",                        // the review anchor, for the record
+//   base: "<immutable sha>",                        // REQUIRED beside `specAudit`, 7-40 lowercase hex: the run's
+//                                                   //   pinned base, the review anchor; the spec audit's
+//                                                   //   checklist reads invariants at it
 //   units: [{ id, order, specPath, briefPath,      // ORDERED by the caller, from --plan
 //            specBriefPath,                        //   optional: the per-unit SPEC brief
 //            closes,                               //   optional: [<ask id>], the asks this unit answers
@@ -166,8 +187,11 @@ function chunk(a, n) {
 //   prevSubjects: [{ path, blob }],                 // ON A FOLD RE-INVOKE (callee round > 1): the pinned set
 //                                                   //   the CONVERGING return handed back; each matching
 //                                                   //   subject carries its blob to the callee as `prevBlob`
-//   priorFindings: [{ ... }]                        // ON A FOLD RE-INVOKE: the CONVERGING return's
+//   priorFindings: [{ ... }],                       // ON A FOLD RE-INVOKE: the CONVERGING return's
 //                                                   //   `priorFindings`, the previous round's confirmed set
+//   checklist: "<the checker's stdout>"             // optional: the spec audit's checklist, winning over
+//                                                   //   the resolver's `--for-paths` run; used only when
+//                                                   //   it carries a `- ` item, and announced otherwise
 // }
 // TOOL-aEvidencedLens-5 - the two fold args are REFUSED at a callee round of 1 (a fresh generation has
 // no previous round) and refused by name when malformed, before any agent spawns.
@@ -328,6 +352,16 @@ if (!specAudit && auditShaped.length) {
       '`spec-audit: <date>` value as `specAudit` — the driver\'s preflight line names which the build declared.',
   )
 }
+// TOOL-aGraftedHelix-36 S3 - A DECLARED AUDIT CARRIES ITS BASE, refused here before any agent spawns.
+// The audit reads its by-design block at the run's pinned base, and with none it read the working tree,
+// where an invariant this build added stands as by design on its own audit; a warning in a log nobody
+// reads was the only trace. The audit-OFF route keeps running with no `base` (unit 35's warning).
+if (specAudit && !/^[0-9a-f]{7,40}$/.test(base)) {
+  throw new Error('unattended-build: `specAudit` is declared beside no pinned `base` (got ' +
+    JSON.stringify(a.base) + '). The audit reads its by-design block at that base, and read at none ' +
+    'an invariant this build added stands as by design on its own audit. Pass the run-state file\'s ' +
+    '`base` fact under a mandate, else the sha the build branched from.')
+}
 if (subjectRound > roundNo) {
   throw new Error(
     'unattended-build: `subjectRound` ' + subjectRound + ' is above `round` ' + roundNo + '. A subject ' +
@@ -409,9 +443,48 @@ const DRIVER = 'bash {{TOOL_ROOT}}unattended/unattended.sh'
 // this unit deletes, and the child cannot carry it: a shipped kit file names nothing outside itself
 // by literal, so it lives in the parent, whose install paths are filled in when it is rendered.
 const CHECKLIST = 'python {{MEMORY_TREE_DIR}}/gotchas.py --for-diff HEAD~1..HEAD'
+// TOOL-aGraftedHelix-15 S5 - ONE REMEDY CLOSES EVERY REFUSAL THAT ASKS FOR A COMMIT, computed once so
+// the sites cannot drift into two answers. The remedy used to name the same arguments again, and
+// under `resumeFromRunId` that is the replay: the Workflow runtime returns cached results for the
+// longest unchanged prefix of agent calls, so the stage that refused answers the same way however
+// the tree has moved since. A FRESH call re-runs the writers, which count each committed spec
+// `alreadyPresent`, so no commit stage runs and nothing fills `specPath`: the rebuilt `units` is
+// what carries the paths, and the resolver then reads `HEAD` live. `subjects` is offered only where
+// it is legal, beside a declared audit and never beside `auditIds`.
+const resumeRemedy =
+  ' Once the specs are committed, rebuild `units` from `' + DRIVER + ' --plan ' + slug + ' --paths`, so ' +
+  'every unit carries its committed `specPath`, then ' +
+  (!specAudit
+    ? 're-invoke fresh, WITHOUT `resumeFromRunId`.'
+    : auditIds.length
+      ? 're-invoke fresh, WITHOUT `resumeFromRunId`; `subjects` cannot stand beside `auditIds`, so pinning ' +
+        'them is no route on this call.'
+      : 're-invoke fresh, WITHOUT `resumeFromRunId`, or resume with `subjects` pinned as {path, blob} from ' +
+        '`git ls-tree HEAD -- <spec path>`.') +
+  ' A resume replays every agent call whose prompt is unchanged, so its cached answer returns this same ' +
+  'refusal however the tree has moved since.'
 // TOOL-aEvidencedLens-5 S3 - the spec audit's checklist. A spec precedes its code, so there is no diff:
 // the resolver runs this over the paths the subjects' `Files touched (estimate)` sections declare.
 const AUDIT_CHECKLIST = 'python {{MEMORY_TREE_DIR}}/gotchas.py --for-paths'
+// TOOL-aGraftedHelix-29 S9 - the checker reads the audit's by-design block AT THE RUN'S PINNED BASE, so
+// an invariant this build added or edited is an item on its own audit and never an exemption. Only a
+// `base` of the shape `badSubject` tests is forwarded; beside a declared audit any other value is
+// refused above (TOOL-aGraftedHelix-36 S3), so the audit always reads at one.
+// TOOL-aGraftedHelix-35 - the audit's block is the RESOLVER'S alone: the spec commit's checklist joins
+// it for its items, and `renderChecklistUnion` leaves that checklist's by-design block out. The spec
+// commit's own checker reads at this same base too, through `SPEC_COMMIT_CHECKLIST` below, because the
+// audit-OFF hand-out carries that checklist whole as `specCommit.checklist`.
+const auditBase = /^[0-9a-f]{7,40}$/.test(base) ? base : ''
+// TOOL-aGraftedHelix-35 S3 - THE SPEC COMMIT'S CHECKLIST, ONE constant read by the commit stage's step 6,
+// the union's label and the `checklist from` line. With `auditBase` set it is the resolver's verb pinned
+// at that base over the paths the spec commit wrote, so an invariant an earlier pass of this build added
+// is an item, never by design; with none it is `CHECKLIST`, whose block is read at the spec commit's
+// parent, inside the build, and the audit-OFF route warns where `specCommit` is stored. `--no-renames`
+// lists a renamed path's source too. The command substitution splits on whitespace, so a path carrying
+// a space is split, which the commit block's own `for f in $changed` loop already assumes away.
+const SPEC_COMMIT_CHECKLIST = auditBase
+  ? AUDIT_CHECKLIST + ' --base ' + auditBase + ' $(git diff --no-renames --name-only HEAD~1..HEAD)'
+  : CHECKLIST
 const ordered = units.slice().sort(function (x, y) {
   const ox = Number.isInteger(x.order) ? x.order : 1e9
   const oy = Number.isInteger(y.order) ? y.order : 1e9
@@ -441,6 +514,66 @@ function renderCloses(list) {
     .map(function (u) { return '  ' + u.id + ': this unit closes ' + u.closes.join(' ') })
     .join('\n')
 }
+// TOOL-aGraftedHelix-15 S10 - TWO CHECKER OUTPUTS BECOME ONE, never an append. The review harness reads
+// ONE by-design block per checklist string (the first head it finds) and folds every later line that
+// does not open `- ` into the item above it, so a second output appended whole would hand the lenses
+// its invariants as bug classes and glue its header lines onto the first output's last item. This
+// writes the header lines of both first, the label between them, then both item sets, an item whose
+// first line is already listed dropped with its continuation, then ONE by-design head counting the
+// union of both blocks' entries. The head is COPIED from `tier2-review.js`'s `BY_DESIGN_HEAD`, because
+// workflow scripts cannot import, and it is emitted from ONE declaration, `BY_DESIGN_FORMAT`, never a
+// literal in the return (TOOL-aGraftedHelix-32 S3). `check_by_design_parity.py` evaluates both lines
+// against the head the catalogue renders and reds on any other spelling it finds, so every copy is
+// one figure with a stated source and a gate.
+// A block whose own head disagrees with its entries carries that difference into the merged head as
+// `gap`, so the review harness's head-count refusal still fires on a truncated block.
+// TOOL-aGraftedHelix-35 S1/S2 - THE MERGED BLOCK IS THE FIRST INPUT'S ALONE. The second input is the
+// spec commit's checklist, whose block is read at that commit's parent when no `base` is pinned, inside
+// the build, so a ruling an earlier pass added could exempt the specs being audited. Its head, its
+// entries and its `INVARIANTS_READ_PREFIX` header line are left out whatever command produced it, so the
+// merged checklist states one read point; its class and NEW/CHANGED items still merge. Then a kept entry
+// whose invariant name is a whitespace-separated token on the first line of any item, from either input,
+// is omitted, so a ruling one input itemises as moved never stands as by design beside it. The head
+// counts the entries that remain plus `gap`.
+// WHAT IT DOES NOT CHECK: that either input is the checker's stdout. A checker header reworded away from
+// `INVARIANTS_READ_PREFIX` passes into the merged preamble, though no entry rides with it, because the
+// block is cut by the parity-gated `BY_DESIGN_HEAD`. An entry not of the `- <name> — ` shape is never
+// matched by name, so it is kept.
+const BY_DESIGN_HEAD = /^# by design — (\d+) invariant\(s\) this selection touches$/
+const BY_DESIGN_FORMAT = '# by design — {n} invariant(s) this selection touches'
+const INVARIANTS_READ_PREFIX = '# invariants are read '
+function renderChecklistUnion(first, label, second) {
+  const head = [], items = [], design = []
+  let gap = 0
+  const texts = [first, '# ' + label, second]
+  for (let t = 0; t < texts.length; t++) {
+    const theirs = t === texts.length - 1
+    let inDesign = false, cur = -1
+    for (const raw of String(texts[t]).replace(/\r\n/g, '\n').split('\n')) {
+      const line = raw.replace(/\s+$/, '')
+      if (!line) continue
+      const m = BY_DESIGN_HEAD.exec(line)
+      if (m) { inDesign = true; if (!theirs) gap += Number(m[1]); continue }
+      if (inDesign && line.indexOf('- ') === 0) {
+        if (!theirs) { gap--; if (design.indexOf(line) === -1) design.push(line) }
+        continue
+      }
+      inDesign = false
+      if (line.indexOf('- ') === 0) {
+        cur = items.some(function (i) { return i.split('\n')[0] === line }) ? -2 : items.push(line) - 1
+      } else if (cur === -1) {
+        if (!(theirs && line.indexOf(INVARIANTS_READ_PREFIX) === 0)) head.push(line)
+      } else if (cur >= 0) items[cur] += '\n' + line
+    }
+  }
+  const named = {}
+  for (const i of items) for (const tok of i.split('\n')[0].split(/\s+/)) named[tok] = true
+  const kept = design.filter(function (e) {
+    const m = /^- (\S+) — /.exec(e)
+    return !(m && named[m[1]] === true)
+  })
+  return head.concat(items, [BY_DESIGN_FORMAT.replace('{n}', String(kept.length + gap))], kept).join('\n')
+}
 
 // --- the stage return schemas -----------------------------------------------------------------
 // EVERY stage agent returns a schema-validated object, so a stage that cannot answer REFUSES rather
@@ -454,14 +587,18 @@ function renderCloses(list) {
 // AUDIT's `verdict` is REQUIRED for one specific reason: an absent verdict would otherwise read as
 // "nothing blocking", which is the one absence that would let this harness build on an unreviewed
 // spec set.
+//
+// TOOL-aGraftedHelix-33 S6 - the three lists take ONE item schema whose enum is the roster's ids,
+// derived from `units` and never typed, so the platform bounces a path or a typo back to its writer.
+const SPEC_ENTRY = { type: 'string', enum: units.map(function (u) { return u.id }) }
 const SPEC_SCHEMA = {
   type: 'object',
   required: ['authored', 'alreadyPresent', 'refused', 'summary'],
   additionalProperties: true,
   properties: {
-    authored: { type: 'array', items: { type: 'string' } },
-    alreadyPresent: { type: 'array', items: { type: 'string' } },
-    refused: { type: 'array', items: { type: 'string' } },
+    authored: { type: 'array', items: SPEC_ENTRY },
+    alreadyPresent: { type: 'array', items: SPEC_ENTRY },
+    refused: { type: 'array', items: SPEC_ENTRY },
     summary: { type: 'string' },
   },
 }
@@ -509,8 +646,34 @@ const SUBJECTS_SCHEMA = {
     checklist: { type: 'string' },
     checklistPaths: { type: 'array', items: { type: 'string' } },
     checklistError: { type: 'string' },
+    // TOOL-aGraftedHelix-15 S4 - OPTIONAL for the same reason: each spec that exists in the working
+    // tree and has no blob at `HEAD`. An entry refuses the call, naming the paths; never an empty set.
+    notAtHead: {
+      type: 'array',
+      items: { type: 'object', properties: { path: { type: 'string' } }, required: ['path'] },
+    },
   },
   required: ['subjects'],
+}
+// TOOL-aGraftedHelix-15 S1 - the commit stage's return, COPIED from `UNIT_SCHEMA` in the unit child,
+// because workflow scripts cannot import. `sha` carries no pattern there either: the script checks it,
+// so a bad value refuses by name instead of failing validation into a null. `checklist` is optional,
+// so a double that omits it still validates, and an empty string is carried as no checklist.
+const SPEC_COMMIT_SCHEMA = {
+  type: 'object',
+  required: ['committed', 'sha', 'why', 'specs', 'summary'],
+  additionalProperties: true,
+  properties: {
+    committed: { type: 'boolean' },
+    sha: { type: 'string' },
+    why: { type: 'string' },
+    specs: {
+      type: 'array',
+      items: { type: 'object', required: ['id', 'path'], properties: { id: { type: 'string' }, path: { type: 'string' } } },
+    },
+    summary: { type: 'string' },
+    checklist: { type: 'string' },
+  },
 }
 
 // `AUDIT_SCHEMA` LIVED HERE AND IS GONE. It bound the AGENT return that no longer exists, and
@@ -636,7 +799,8 @@ const GROUND =
 // would contend on one git index, which is the recorded experiment E4 that
 // `TOOL-cBriefedPilot-21` ratified `parallelism route: none` on and `TOOL-cBriefedPilot-28`
 // records as never actually run. Authoring-only keeps this stage clear of that verdict instead of
-// contradicting it unremarked; PER-UNIT DISPATCH IS STRICTLY SEQUENTIAL and is the caller's, made
+// contradicting it unremarked: the ONE commit is the commit stage's below, after the fan has
+// returned, when no writer is left to contend with it (TOOL-aGraftedHelix-15). PER-UNIT DISPATCH IS STRICTLY SEQUENTIAL and is the caller's, made
 // one main-loop `Workflow` call at a time off the roster this program returns.
 //
 // SLICES COME FROM THE CALLER, grouped by the declared `order` verb — this runtime has no
@@ -705,10 +869,13 @@ const specResults = await boundedParallel(
           'DO NOT WRITE PRODUCT CODE in this stage. It authors designs and nothing else — a unit ' +
           'built here would be the exact defect this harness exists to remove. ' +
           'AUTHOR ONLY — DO NOT COMMIT, and do not run the build-index generator. You are one of ' +
-          'several writers running at once: the caller commits once after all of you return, and ' +
-          'regenerates the index once. A writer that commits contends with its siblings on one git ' +
+          'several writers running at once: one committer commits once after all of you return and ' +
+          'regenerates the index once: this program\'s commit stage, or the caller when it pinned ' +
+          '`subjects`. A writer that commits contends with its siblings on one git ' +
           'index, which is the experiment this repository has NOT run. ' +
-          'NAME every unit you could not spec, in `refused`, with the reason in your summary.',
+          'NAME every unit you could not spec, in `refused`, with the reason in your summary. ' +
+          'Name every unit in `authored`, `alreadyPresent` and `refused` by its unit id, exactly as this ' +
+          'roster spells it, never by a path.',
         { label: 'spec:' + slug + ':g' + gi, phase: 'Spec', schema: SPEC_SCHEMA },
       )
     }
@@ -723,7 +890,49 @@ const specResults = await boundedParallel(
 // object is always truthy, so without this an entirely dead spec stage would present as a clean
 // object with empty arrays and reach AUDIT and the hand-out on whatever specs already existed. That is
 // the refusal this file spends six lines justifying, deleted by accident.
+//
+// TOOL-aGraftedHelix-33 S1, S2 - WHICH UNIT AN `authored` ENTRY DENOTES, whatever its spelling. Run
+// `wf_dff1cb65-954`'s writers returned one id and three spec paths, and a merge matching ids alone
+// committed one spec of four and handed out three empty `specPath`s with nothing refused.
+// `deriveRepoPath` is the ONE fold of a path an agent or the caller spelled, `repoFold` reused for the
+// prefix; it keeps case and every `..`, so the third arm can refuse a path that climbs.
+const specFolder = 'memory/builds/' + slug + '/spec/'
+function deriveRepoPath(p) {
+  if (typeof p !== 'string') return ''
+  let s = p.trim()
+  s = s.replace(/\\/g, '/') // the backslash fold
+  s = s.replace(/^\/([A-Za-z])(?=\/|$)/, '$1:') // the MSYS drive fold
+  if (s.toLowerCase().indexOf(repoFold + '/') === 0) s = s.slice(repoFold.length + 1)
+  while (s.indexOf('./') === 0) s = s.slice(2)
+  return s
+}
+// Three arms, the first match winning, and an arm matching two units resolves to none: the id; the
+// folded caller `specPath`; a basename under `specFolder` in hygiene check 5's recording grammar written
+// in terms of the unit's id - `<date>-spec-[<F>-]<rest>[-<tail>].md`. That grammar is copied into a
+// second language here, and the commit stage's H1 agreement below turns its drift into a refusal.
+function resolveSpecEntry(entry) {
+  const id = typeof entry === 'string' ? entry.trim() : ''
+  const byId = units.filter(function (u) { return id && u.id === id })
+  if (byId.length) return byId.length === 1 ? byId[0] : null
+  const p = deriveRepoPath(entry)
+  if (!p) return null
+  const byPath = units.filter(function (u) { return deriveRepoPath(u.specPath) === p }) // the second arm
+  if (byPath.length) return byPath.length === 1 ? byPath[0] : null
+  const m = /^[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-(.+)\.md$/.exec(p.split('/').pop())
+  if (!m || p.indexOf(specFolder) !== 0 || p.split('/').indexOf('..') !== -1) return null
+  const byName = units.filter(function (u) {
+    const uid = String(u.id)
+    const dash = uid.indexOf('-')
+    if (dash === -1) return false
+    return [uid, uid.slice(dash + 1)].some(function (h) { // the family is optional
+      return m[1] === h || (m[1].indexOf(h + '-') === 0 && /^[a-z0-9][a-z0-9-]*$/.test(m[1].slice(h.length + 1))) // so is the tail
+    })
+  })
+  return byName.length === 1 ? byName[0] : null
+}
 const specced = { authored: [], alreadyPresent: [], refused: [], summary: '' }
+const pathEntries = []
+const unplaced = []
 let liveWriters = 0
 specResults.forEach(function (r, gi) {
   const gUnits = [].concat.apply([], specGroups[gi] || [])
@@ -733,11 +942,32 @@ specResults.forEach(function (r, gi) {
     return
   }
   liveWriters++
-  ;['authored', 'alreadyPresent', 'refused'].forEach(function (k) {
+  ;['alreadyPresent', 'refused'].forEach(function (k) {
     if (Array.isArray(r[k])) specced[k] = specced[k].concat(r[k])
+  })
+  // TOOL-aGraftedHelix-33 S3 - `authored` is RESOLVED here, so every later reader of it reads unit ids:
+  // `authoredIds`, the attended exemption `speccedNow` and `speccedCount`. It stays BENEATH the schema's
+  // enum: the suite's doubles and a resumed run's replay reach this merge without the platform's
+  // validation, the reason `tier2-review.js` gives for re-testing its own enums.
+  ;(Array.isArray(r.authored) ? r.authored : []).forEach(function (entry) {
+    const u = resolveSpecEntry(entry)
+    if (!u) {
+      unplaced.push('group ' + gi + ' authored ' + JSON.stringify(entry) + ' (folded ' +
+        JSON.stringify(deriveRepoPath(entry)) + '), which names no roster unit by id and no unit\'s spec by path')
+      return
+    }
+    if (u.id !== String(entry).trim()) {
+      pathEntries.push({ id: u.id, entry: entry, path: deriveRepoPath(entry) })
+      log('spec stage: group ' + gi + ' authored ' + JSON.stringify(entry) + ', resolved by path to ' + u.id)
+    }
+    if (specced.authored.indexOf(u.id) === -1) specced.authored.push(u.id)
   })
   specced.summary += 'group ' + gi + ': ' + (r.summary || '(no summary)') + '; '
 })
+if (unplaced.length) {
+  throw new Error('unattended-build: ' + unplaced.join('; ') + '. Refusing before the commit stage: a spec ' +
+    'no unit owns would be left uncommitted while the run reported it specced.' + resumeRemedy)
+}
 if (!specResults.length || liveWriters === 0) {
   throw new Error(
     'unattended-build: EVERY spec writer returned nothing (' + specGroups.length + ' group(s)), so ' +
@@ -755,6 +985,185 @@ const speccedCount =
   (Array.isArray(specced.authored) ? specced.authored.length : 0) +
   (Array.isArray(specced.alreadyPresent) ? specced.alreadyPresent.length : 0)
 if (specRefused.length) log('spec stage: ' + specRefused.length + ' unit(s) REFUSED — ' + specRefused.join(', '))
+
+// ==================================== TOOL-aGraftedHelix-15 S1 — THE SPEC COMMIT, after the fan
+// WHY HERE. The fan has fully returned, so this agent is the only writer, and one committer after a
+// barrier keeps the reason `TOOL-aStagedLane-3` gave for author-never-commit: N writers contending on
+// one git index. Before it, the AUDIT resolver below read `HEAD` for specs nothing had committed.
+// WHEN. `authoredIds` is what the writers authored that `units` carries and `specRefused` does not.
+// The stage runs when that is non-empty and the caller pinned no `subjects`, audit declared or not
+// (the spec's F2): one rule for who commits. Pinned `subjects` mean the caller committed, and a stage
+// there would turn the resume-with-`subjects` remedy into a replay of a cached failure.
+// WHAT IT CANNOT VERIFY, said where a reader looks: this runtime has no filesystem, so `committed` and
+// `sha` are the agent's claim. The cross-check is the resolver's own read at `HEAD` on the audit
+// route, and `--dispatch`'s MISSING refusal off it.
+// ONE test, the refused exclusion: the merge settled roster membership and duplicates (TOOL-aGraftedHelix-33 S3).
+const authoredIds = specced.authored.filter(function (id) {
+  return specRefused.indexOf(id) === -1
+})
+let specCommit = null
+if (!authoredIds.length) {
+  log('spec stage: no commit — the writers authored no unit of this roster')
+} else if (Array.isArray(a.subjects)) {
+  log('spec stage: no commit — the caller pinned `subjects`, so ' + authoredIds.join(', ') + ' is left to the caller to commit')
+} else {
+  // TOOL-aGraftedHelix-16 — THE GIT SEQUENCE IS ONE FENCED BLOCK, and the prose around it names each
+  // line's PURPOSE without spelling a command of it a second time: the block is the one copy an agent
+  // runs and the suite's real-git arm extracts and runs, so the two cannot diverge. `set -e` stops it
+  // at the first failing step instead of committing past a failed render. THE RE-ADD after the render
+  // is the fix: the generator rewrites every tracked spec's records region, so a spec staged before it
+  // went into the commit as its pre-render blob and the resolver's `HEAD:` compare refused it. The
+  // delta loop compares PATHS (TOOL-aGraftedHelix-21), so an authored spec, which the record holds, is
+  // staged by the re-add alone. THE TWO LISTINGS are one command, `--untracked-files=all` both times:
+  // plain porcelain collapses a wholly untracked directory to one `?? <dir>/` line the per-file record
+  // never holds, and the loop staged another writer's directory whole. Comparing by path keeps a
+  // recorded file whose status letters moved during the render (` M` to ` D`) out of the commit. THE
+  // RECORD IS A SHELL VARIABLE and the agent's Bash tool keeps none between calls, so the block runs as
+  // ONE invocation and tests `${rec+x}` twice, never by emptiness, since a clean tree's record is set
+  // and empty: once before its first side effect, and once before the loop, where a refusal names the
+  // cleanup the staged specs and rendered views leave owed. THE INPUT CHECK
+  // refuses before anything is staged when a generator input carries an unstaged change, because the
+  // generator reads tracked bytes off the DISK and would render views the commit does not hold
+  // (`TOOL-dMendedRecall-2` rev-3 S3's rule); `-B` keeps its bytecode out of the delta (its rev-2 S2).
+  // `<attribution trailer>` is a placeholder because the charter's trailer is the agent's to know.
+  // The loop's membership test sits in its own `if`: a no-match `grep` in a command substitution
+  // would end the block under `set -e` on a call with no foreign change.
+  // TOOL-aGraftedHelix-32 S1 - THE COMMIT NAMES ITS OWN PATHS: the specs and the `delta` the loop staged.
+  // A pathless commit took the WHOLE index, so an entry staged before the block, the run's own RUN.md
+  // that the driver's verbs leave staged among them, rode a `Pass: none` commit no pass check grades.
+  // The loop reads its listing through process substitution, never a pipe, so `delta` outlives it.
+  const commitBlock = [
+    'set -e',
+    'rec=$(git status --porcelain --untracked-files=all)',
+    'if [ -z "${rec+x}" ]; then echo "refused, nothing staged or rendered: the record of step 1, rec, is unset, so this block was split across Bash calls; run it as ONE invocation" >&2; exit 1; fi',
+    'root=$(set -- <spec paths>; printf \'%s\' "${1%%/builds/*}")',
+    'changed=$(git diff --name-only -- "$root" .memory-tree.conf {{MEMORY_TREE_DIR}})',
+    'dirty=\'\'',
+    'for f in $changed; do case " <spec paths> " in *" $f "*) ;; *) dirty="$dirty $f" ;; esac; done',
+    'if [ -n "$(git ls-files --others -- .memory-tree.conf)" ]; then dirty="$dirty .memory-tree.conf"; fi',
+    'if [ -n "$dirty" ]; then echo "refused, nothing staged or rendered: an input of the build-index generator carries a change the index does not hold:$dirty" >&2; exit 1; fi',
+    'git add -- <spec paths>',
+    'python -B {{MEMORY_TREE_DIR}}/gen_build_index.py --write',
+    'git add -- <spec paths>',
+    'if [ -z "${rec+x}" ]; then echo "refused before the commit: the record of step 1, rec, is unset, so this block was split across Bash calls; the specs are staged and the views rendered, so restore every unstaged path under the memory root other than <spec paths>, then run git reset -q -- <spec paths>, then run the block again as ONE invocation" >&2; exit 1; fi',
+    'delta=()',
+    'while IFS= read -r line; do',
+    '  if printf \'%s\\n\' "$rec" | cut -c4- | grep -xF -- "${line#???}" >/dev/null; then :; else git add -- "${line#???}"; delta+=("${line#???}"); fi',
+    'done < <(git status --porcelain --untracked-files=all)',
+    'git commit --only -q -m \'spec(' + slug + '): ' + authoredIds.join(' ') + '\' -m \'Committed by the spec commit stage of the build harness.\' --trailer \'Pass: none\' --trailer \'<attribution trailer>\' -- <spec paths> "${delta[@]}"',
+    'git status --porcelain -- <spec paths>',
+  ].join('\n')
+  const sc = await agent(
+    GROUND +
+      'COMMIT the specs this build\'s SPEC writers just authored, in ONE commit: ' + authoredIds.join(', ') +
+      '. Every writer has returned, so you are the only writer. Do not edit any spec. In ' + repo +
+      ', in this order:\n' +
+      '1. Find each id\'s spec: the file under `' + specFolder + '` whose H1 line opens `# <id> —`, which is ' +
+      'the key `gen_build_index.py` reads the id from; its basename ends `-spec-<id>.md`, and the status ' +
+      'header carries no id. Return them as `specs`, one `{id, path}` per id, repo-relative and forward-slashed.\n' +
+      '2. Run the block below in ' + repo + ' exactly as written, except that every `<spec paths>` becomes ' +
+      'those paths, space-separated, and `<attribution trailer>` becomes the attribution trailer the ' +
+      'charter mandates. It is the only copy of this stage\'s git sequence: add no step to it. Run it as ' +
+      'ONE Bash invocation: its record of the tree is a shell variable, and your Bash tool keeps no shell ' +
+      'state between calls, so a block split across calls loses the record and refuses. Its lines, ' +
+      'in order: record the tree before anything is staged, every untracked file listed singly, and every ' +
+      'path that record lists other than those specs is FOREIGN, and is never staged by this stage; ' +
+      'refuse, with nothing staged or rendered, when that record is missing; refuse, with nothing staged or rendered, ' +
+      'when an input of the build-index generator carries a change the index does not hold, the inputs ' +
+      'being the memory root the specs sit under, the memory-tree conf and the generator\'s own directory, ' +
+      'because the generator reads tracked bytes off the disk and would render views the commit does not ' +
+      'hold; stage the specs, because the generator renders over tracked specs only; render the generated ' +
+      'views without writing bytecode caches; stage the specs AGAIN, because the render rewrote their ' +
+      'records region after they were staged; refuse when the record is missing there, naming the cleanup ' +
+      'the staged specs and rendered views leave owed; stage each path the render changed whose PATH the ' +
+      'record does not list, listed the same way and compared by path alone, which are the generator\'s ' +
+      'outputs; commit ONCE on the checked-out branch, naming only the specs and the paths that loop ' +
+      'staged, so an entry already staged before the block stays staged and out of the commit, the message closing ' +
+      'on one trailer block of `Pass: none` and the attribution trailer; and list the specs\' own status, ' +
+      'which must be empty. Never `git add -A` or `git add -u`, never --no-verify, never amend, never push ' +
+      'or merge.\n' +
+      '```sh\n' + commitBlock + '\n```\n' +
+      '3. A step that exits non-zero stops the block: return `committed: false` with that step\'s output ' +
+      'in `why`. That is how a refusal from the input check, a hook, the generator or git reaches this ' +
+      'program. Do not edit a spec to clear it, and do not retry around it.\n' +
+      '4. When the block\'s last line prints anything, a spec is left dirty after the commit: return ' +
+      '`committed: false` and quote those porcelain lines in `why`.\n' +
+      '5. Return `sha` as the full 40-hex `git rev-parse HEAD`.\n' +
+      '6. Run `' + SPEC_COMMIT_CHECKLIST + '` over the commit just made and return its stdout VERBATIM as ' +
+      '`checklist`, whatever its exit status; an empty selection returns an empty string.',
+    { label: 'commit:specs:' + slug, phase: 'Spec', schema: SPEC_COMMIT_SCHEMA },
+  )
+  // S3 — FIVE REFUSALS, in the order the spec's table states, each before the resolver can spawn and
+  // each ending in the one remedy. Nothing past this line can verify the commit, so a return that
+  // does not read as one is refused by name rather than trusted.
+  // TOOL-aGraftedHelix-33 S4 - each returned path is FOLDED once, here, so the outside test, the fill
+  // and the log all read the one repo-relative spelling `deriveRepoPath` gives.
+  const committedSpecs = (sc && Array.isArray(sc.specs) ? sc.specs : []).map(function (s) {
+    return s && typeof s === 'object' ? Object.assign({}, s, { path: deriveRepoPath(s.path) }) : s
+  })
+  // A unit placed by PATH must have committed THAT file: the agent finds an id's spec by its H1, the
+  // key `gen_build_index.py` reads, so a basename route the H1 disagrees with refuses and never places
+  // a file the H1 does not define.
+  const strayed = pathEntries.filter(function (pe) {
+    const row = committedSpecs.find(function (s) { return s && s.id === pe.id })
+    return authoredIds.indexOf(pe.id) !== -1 && row && row.path !== pe.path
+  })
+  let refusal = ''
+  if (!sc) {
+    refusal = 'the spec commit stage returned nothing, so the authored specs (' + authoredIds.join(', ') + ') are on disk and uncommitted'
+  } else if (sc.committed !== true) {
+    refusal = 'the spec commit stage did not commit: ' + JSON.stringify(sc.why)
+  } else if (!/^[0-9a-f]{40}$/.test(String(sc.sha))) {
+    refusal = 'the spec commit stage returned `sha` ' + JSON.stringify(sc.sha) + ', which is not a full 40-hex object name'
+  } else {
+    const unnamed = authoredIds.filter(function (id) {
+      return !committedSpecs.some(function (s) { return s && s.id === id })
+    })
+    const outside = committedSpecs.filter(function (s) {
+      return !s || typeof s.path !== 'string' || s.path.indexOf(specFolder) !== 0 || s.path.split('/').indexOf('..') !== -1
+    })
+    if (unnamed.length) {
+      refusal = 'the spec commit stage named no committed spec for ' + unnamed.join(', ')
+    } else if (outside.length) {
+      refusal = 'the spec commit stage named a path outside `' + specFolder + '`: ' +
+        outside.map(function (s) { return (s && s.id) + ' at ' + JSON.stringify(s && s.path) }).join('; ')
+    } else if (strayed.length) {
+      refusal = strayed.map(function (pe) {
+        const row = committedSpecs.find(function (s) { return s && s.id === pe.id })
+        return 'a writer named ' + pe.id + ' by ' + JSON.stringify(pe.entry) + ' (folded ' + JSON.stringify(pe.path) +
+          '), but the spec whose H1 defines ' + pe.id + ' was committed at ' + JSON.stringify(row.path) + ' in ' + sc.sha
+      }).join('; ')
+    }
+  }
+  if (refusal) {
+    throw new Error('unattended-build: ' + refusal + '. Refusing before any audit or hand-out reads a spec ' +
+      'nothing is known to have committed.' + resumeRemedy)
+  }
+  specCommit = { sha: sc.sha, checklist: typeof sc.checklist === 'string' && sc.checklist.trim() ? sc.checklist : '' }
+  log('spec stage: committed ' + committedSpecs.length + ' spec(s) at ' + sc.sha)
+  // TOOL-aGraftedHelix-35 S4 - the audit-OFF hand-out carries this checklist whole, so an unpinned one is
+  // said out loud; on the audit route the union leaves its block out and the resolver warns instead.
+  if (!specAudit && SPEC_COMMIT_CHECKLIST === CHECKLIST) {
+    log('WARNING: the spec commit\'s checklist reads invariants at its parent — no pinned `base` was passed, ' +
+      'so an invariant this build added in an earlier pass can stand as by design in `specCommit.checklist`')
+  }
+  // S2 — THE PATH FILL. `--plan <slug> --paths` prints an empty path for a spec nothing has committed,
+  // so a unit the writers just authored arrives with none; the committed path is written onto it here,
+  // and `auditUnits` and `buildUnits` both filter `ordered` after this line, so the resolver's roster
+  // and the hand-out's read it. A caller path that differs loses, because the committed one is the file
+  // history holds, and the log names both.
+  // TOOL-aGraftedHelix-33 S5 - the caller's path is folded for the COMPARE only: an absolute spelling
+  // of the committed file is rewritten without being called a difference.
+  for (const s of committedSpecs) {
+    const u = ordered.find(function (x) { return x.id === s.id })
+    if (!u || u.specPath === s.path) continue
+    const differs = deriveRepoPath(u.specPath) !== s.path
+    log('spec stage: ' + u.id + ' specPath ' + (u.specPath
+      ? u.specPath + ' -> ' + s.path + (differs ? ' — the caller\'s path differs, and the committed one wins' : '')
+      : '-> ' + s.path))
+    u.specPath = s.path
+  }
+}
 
 // ================================================ STAGE 2 — AUDIT, and the gate on its verdict
 // ONE ROUND HERE, THE LOOP IN THE CALLER — see the header for why that split is forced.
@@ -822,8 +1231,22 @@ if (!specAudit) {
 // and cannot watch the file between the check and the read. A caller-supplied set never enters
 // the branch and carries no `tree`, so the compare cannot read it; `badSubject` below grades both.
 let subjects = Array.isArray(a.subjects) ? a.subjects : null
+// THE SPEC AUDIT GETS A CHECKLIST (TOOL-aEvidencedLens-5 S3, which TOOL-aGraftedHelix-3 S9 built in
+// parallel and merged into this one mechanism). The resolver already runs git per spec, so it also
+// runs the bug-class checker over the paths the specs' `### Files touched` sub-heads name, and the
+// stage forwards its stdout as the audit's `checklist`: the classes, and the by-design block the review
+// harness cuts out of it. The Files-touched paths and never a tool root, because `--for-paths` over a
+// whole kit selects most of the catalogue (TOOL-aWeighedCompass-14). A caller's `checklist` wins, as a
+// caller's `subjects` does (aGraftedHelix-3 S9), under the same `- ` item rule as the resolver's.
+// WHAT THIS DOES NOT CHECK: that the agent ran the command it was told to or returned its stdout
+// unaltered; the harness's head-count refusal catches a truncated block.
 let checklist = null
+let checklistFrom = null
 let checklistWhy = 'a caller-pinned `subjects` skipped the resolver, so no resolver ran to produce one'
+if (typeof a.checklist === 'string') {
+  if (/^- /m.test(a.checklist)) { checklist = a.checklist; checklistFrom = 'the caller\'s checklist argument' }
+  else checklistWhy = 'the caller\'s `checklist` carries no line starting `- `, so no bug class selected'
+}
 // SCOPED AFTER A DISPOSAL. With `auditIds` the resolver sees only the promoted units, so the audit
 // reads the specs no spec-audit record names yet and not the whole set a terminal round already
 // closed; the subject key above is what lets the driver accept that round at all.
@@ -835,6 +1258,30 @@ if (specAudit && !subjects) {
   // on `auditIds.length` alone and asserted a scoping a supplied `subjects` had bypassed. The pair is
   // refused at the args block now, so this branch is the only one `auditIds` can reach.
   if (auditIds.length) log('audit round ' + roundNo + ': scoped to ' + auditIds.length + ' promoted unit(s) — ' + auditIds.join(', ') + ' · subject ' + subject)
+  // TOOL-aGraftedHelix-15 S4 — TWO REFUSALS BEFORE THE RESOLVER SPAWNS. An audit set the writers
+  // refused whole leaves `liveWriters` above zero, so the all-dead throw never fired and the resolver
+  // returned nothing to pin. And a unit with no `specPath` the writers did not refuse was audited by
+  // nobody, silently: the resolver's prompt skips a pathless unit. After the fill above such a unit can
+  // only be one the writers counted `alreadyPresent` with no path from the caller, which is what a
+  // `units` copied from `--plan <slug> --paths` while its spec was MISSING carries, and what a fresh
+  // re-invoke after a hand commit meets, since no commit stage then runs and nothing fills the path.
+  const unrefusedAudit = auditUnits.filter(function (u) { return specRefused.indexOf(u.id) === -1 })
+  if (!unrefusedAudit.length) {
+    throw new Error(
+      'unattended-build: the SPEC writers refused every audit unit (' + auditUnits.map(function (u) { return u.id }).join(', ') +
+        '; ' + specced.summary.trim() + '), so no spec is left to pin at round ' + roundNo + '. Spec them, then ' +
+        're-invoke.' + resumeRemedy,
+    )
+  }
+  const pathless = unrefusedAudit.filter(function (u) { return !u.specPath }).map(function (u) { return u.id })
+  if (pathless.length) {
+    throw new Error(
+      'unattended-build: audit unit(s) ' + pathless.join(', ') + ' carry no `specPath`, and the resolver ' +
+        'skips a unit with no path, so nobody would audit them. `units` was copied from `' + DRIVER +
+        ' --plan ' + slug + ' --paths` while the spec was MISSING, which prints an empty path; re-read it ' +
+        'now the spec is committed.' + resumeRemedy,
+    )
+  }
   const res = await agent(
     GROUND +
       'Resolve the blob of every spec in this build so an audit can be pinned at immutable bytes.\n' +
@@ -843,9 +1290,13 @@ if (specAudit && !subjects) {
       '`git hash-object <specPath>` in ' + repo + ' and return both as the full 40-character object ' +
       'names — `blob` and `tree` respectively, one entry per spec. Return ONLY units whose spec ' +
       'exists and whose blob resolves; an unspecced unit is omitted rather than given an invented ' +
-      'hash. Paths are repo-relative and forward-slashed.\n\n' +
+      'hash. Paths are repo-relative and forward-slashed.\n' +
+      'A spec path that EXISTS in the working tree and does NOT resolve at HEAD goes in `notAtHead` as ' +
+      '`{path}`, and never in `subjects`: it is a spec nothing has committed, so no blob can pin it.\n\n' +
       'Then the bug-class checklist: read each resolved spec\'s `### Files touched (estimate)` section, ' +
-      'collect its backticked paths, union them, and run `' + AUDIT_CHECKLIST + ' <paths>` in ' + repo +
+      'the sub-head spelled with or without ` (estimate)`, ' +
+      'collect its backticked paths, union them, and run `' + AUDIT_CHECKLIST +
+      (auditBase ? ' --base ' + auditBase : '') + ' <paths>` in ' + repo +
       ' with a 120-second timeout. Return its stdout verbatim as `checklist` and the paths as ' +
       '`checklistPaths`. Return NO `checklist` and a `checklistError` naming why instead when no path ' +
       'was declared, the command exits non-zero (name the code), it times out, or its stdout carries no ' +
@@ -854,11 +1305,19 @@ if (specAudit && !subjects) {
   )
   subjects = (res && Array.isArray(res.subjects)) ? res.subjects : []
   // S3/S8 - a checklist reaches the callee only when it carries a `- ` item, which is what its
-  // `parseChecklist` refuses otherwise; every other outcome is announced, never passed as ''.
-  if (res && typeof res.checklist === 'string' && /^- /m.test(res.checklist)) checklist = res.checklist
-  else checklistWhy = res && typeof res.checklist === 'string' && res.checklist.trim()
-    ? 'no bug class selected'
-    : (res && typeof res.checklistError === 'string' && res.checklistError) || 'the resolver returned neither `checklist` nor `checklistError`'
+  // `parseChecklist` refuses otherwise; every other outcome is announced, never passed as ''. A
+  // caller's usable `checklist` already won above, so the resolver's is read only in its absence.
+  if (checklist === null) {
+    if (res && typeof res.checklist === 'string' && /^- /m.test(res.checklist)) {
+      checklist = res.checklist
+      checklistFrom = '--for-paths over ' + (Array.isArray(res.checklistPaths) ? res.checklistPaths.length : 0) + ' path(s)' +
+        (auditBase ? ' at base ' + auditBase.slice(0, 12) : '')
+      // The one route on which the audit's by-design block is the stdout of the command this stage ran,
+      // and a declared audit with no pinned base never reaches it (S3's refusal above).
+    } else checklistWhy = res && typeof res.checklist === 'string' && res.checklist.trim()
+      ? 'no bug class selected'
+      : (res && typeof res.checklistError === 'string' && res.checklistError) || 'the resolver returned neither `checklist` nor `checklistError`'
+  }
   // THE PRE-FLIGHT, INSIDE THE BRANCH so a supplied `{path, blob}` set never reads as dirty. The
   // field refusal comes first and is distinct from the dirty verdict: the suite's runner evaluates
   // no schema, so a resolver that omits `tree` or abbreviates a side is refused NAMING THE FIELD,
@@ -873,13 +1332,25 @@ if (specAudit && !subjects) {
         'pre-flight cannot compare them.',
     )
   }
+  // S4 — A SPEC ON DISK AND NOT AT HEAD REFUSES, a partial set included: auditing the resolved half
+  // and rostering the rest unaudited is the gap the clean-round `owed` filter names on its own path.
+  // Read as a non-empty array and never defaulted, because an entry read as an empty set is the
+  // bare empty-subject refusal this unit exists to replace with a named one.
+  const notAtHead = res && Array.isArray(res.notAtHead) ? res.notAtHead : []
+  if (notAtHead.length) {
+    throw new Error(
+      'unattended-build: ' + notAtHead.length + ' spec(s) exist on disk and not at HEAD, so no blob pins them: ' +
+        notAtHead.map(function (e) { return e && e.path ? e.path : JSON.stringify(e) }).join(', ') +
+        '. Commit them; an audit is pinned at bytes history holds.' + resumeRemedy,
+    )
+  }
   const dirty = subjects.filter(function (s) { return s.tree !== s.blob })
   if (dirty.length) {
     throw new Error(
       'unattended-build: ' + dirty.length + ' subject(s) differ between HEAD and the working tree, so a lens ' +
         'would read text the pin does not name: ' +
         dirty.map(function (s) { return s.path + ' HEAD ' + s.blob + ' tree ' + s.tree }).join('; ') +
-        '. Commit the fold, then re-invoke with the same arguments; an audit is pinned at bytes history holds.',
+        '. Commit the fold; an audit is pinned at bytes history holds.' + resumeRemedy,
     )
   }
   // `tier2-review.js` takes `{path, blob}` and that contract is not this stage's to widen.
@@ -892,7 +1363,16 @@ if (specAudit && !subjects.length) {
   throw new Error(
     'unattended-build: no spec subjects could be pinned at round ' + roundNo + '. A spec-audit over ' +
       'an empty subject set would grade nothing and report it as a clean round, which is the exact ' +
-      'shape this stage exists to prevent.',
+      'shape this stage exists to prevent. ' +
+      // S4 — THE CAUSE IT CAN NOW STATE. Past the pathless, all-refused and `notAtHead` refusals, a
+      // resolver that pinned nothing was handed only unrefused units that carried a path, none of
+      // which resolved at HEAD or exists on disk; a caller's empty `subjects` is the one other way here.
+      (Array.isArray(a.subjects)
+        ? 'The caller passed an empty `subjects`.'
+        : 'Every audit unit the writers did not refuse carried a spec path, and none resolved at HEAD or ' +
+          'exists on disk, so the paths in `units` are wrong: re-read them from `' + DRIVER + ' --plan ' +
+          slug + ' --paths`.') +
+      resumeRemedy,
   )
 }
 const badSubject = !specAudit ? -1 : subjects.findIndex(function (s) {
@@ -936,13 +1416,37 @@ const auditContext = 'Build ' + slug + ': read memory/builds/' + slug + '/README
   '/ (the file whose name carries run-mandate; under a run with no prompt the README is the mandate) FIRST - ' +
   'they state what the build is for.'
 // S2 - the spec format first, then every non-empty sibling spec path not under audit this round, once,
-// in roster order. Non-empty BEFORE the subject exclusion: a spec the spec stage just authored carries ''.
+// in roster order. Non-empty BEFORE the subject exclusion: a spec the spec stage just authored carries ''
+// wherever the commit stage did not run to fill its path.
 const auditSpecs = ['memory/TEMPLATE-SPEC.md']
 for (const u of ordered) {
   if (typeof u.specPath === 'string' && u.specPath && subjectPaths.indexOf(u.specPath) === -1 &&
       auditSpecs.indexOf(u.specPath) === -1) auditSpecs.push(u.specPath)
 }
-if (specAudit && checklist === null) log('WARNING: no `checklist` for the audit: ' + checklistWhy)
+// TOOL-aGraftedHelix-15 S10 — THE SPEC COMMIT'S CHECKLIST REACHES THE AUDIT. BUILD-METHOD M6 owes the
+// checklist over every pass's commit, acted on before the next pass, and the next pass here is this
+// audit. Merged after the caller's or the resolver's, never appended (`renderChecklistUnion` says why),
+// and held to the same `- ` item rule: a union with no item is not passed, and the absence says so.
+// TOOL-aGraftedHelix-35 - its ITEMS join the audit and its by-design block is left out, so the audit's
+// block is the first input's alone; the `checklist from` line says so and names where it was read.
+// Off the audit route the hand-out carries it instead, as `specCommit`, block and all.
+if (specAudit && specCommit && specCommit.checklist) {
+  const commitFrom = 'the spec commit ' + specCommit.sha.slice(0, 12) +
+    (SPEC_COMMIT_CHECKLIST === CHECKLIST ? '\'s --for-diff' : '\'s --for-paths at base ' + auditBase.slice(0, 12)) +
+    ' (its by-design block left out)'
+  const merged = renderChecklistUnion(checklist || '',
+    'the spec commit ' + specCommit.sha + ' — ' + SPEC_COMMIT_CHECKLIST, specCommit.checklist)
+  if (/^- /m.test(merged)) {
+    checklistFrom = (checklist !== null ? checklistFrom + ', merged with ' : '') + commitFrom
+    checklist = merged
+  } else checklistWhy += '; ' + commitFrom + ' selected no bug class either'
+}
+// The checklist line is said ONCE per audited round, either way: a missing checklist is a lens set
+// sweeping none of the project's recurring classes, which must never read like one that swept them.
+if (specAudit) {
+  if (checklist !== null) log('audit round ' + roundNo + ': checklist from ' + checklistFrom)
+  else log('WARNING: no `checklist` for the audit: ' + checklistWhy)
+}
 
 // `null` WITH THE AUDIT OFF, and null is the right word: the adapter below reads `auRaw` as the callee's
 // return, and the callee was never called. Every check it runs is guarded on `specAudit`, so a null
@@ -1623,8 +2127,9 @@ if (disposeFirst) await writeRound(promotedIds.length ? ' --disposition promote'
 // `authored` ALONE, and the distinction is the whole point of the exemption. Only the units THIS
 // invocation wrote have a stale entry-time state; a unit the stage reported as `alreadyPresent` is
 // one it did NOT touch, so its entry-time grade is current and exempting it would bypass the
-// THIN/FORKED refusal on an agent's say-so.
-const speccedNow = Array.isArray(specced.authored) ? specced.authored : []
+// THIN/FORKED refusal on an agent's say-so. The list holds unit ids: the merge resolved a path-named
+// entry to its unit (TOOL-aGraftedHelix-33 S3), so a path entry is exempted like an id.
+const speccedNow =Array.isArray(specced.authored) ? specced.authored : []
 let planRefusal = ''
 const skippedDone = []
 if (attended) {
@@ -1705,10 +2210,12 @@ if (attended && !buildUnits.length) {
 // the second is the WORK LIST, and they differ exactly when attended mode has some-but-not-all
 // terminal units.
 //
-// `specPath` IS EMPTY FOR EVERY UNIT THE SPEC STAGE JUST AUTHORED, and this program cannot fix it:
-// `units` arrives in `args` and nothing here writes the field back. It is carried so a caller that
-// already had a path does not lose it, and `resolvePathsWith` names the command that resolves the
-// rest. A run that dispatches straight off this array hands a child an empty spec path.
+// THE COMMIT STAGE FILLS `specPath` for every unit the SPEC stage authored (TOOL-aGraftedHelix-15 S2),
+// so it stays empty only on a call whose commit stage did not run — caller `subjects`, or nothing
+// authored — for a unit the caller passed without a path. `resolvePathsWith` names the command that
+// resolves those. A run that dispatches straight off this array hands such a child an empty spec path.
+// `specCommit` rides the audit-OFF hand-out only: on the audit route the spec commit's checklist items
+// went to the audit, which is the pass M6 says acts on them, and its by-design block was left out.
 const handOut = {
   slug: slug,
   mode: mode,
@@ -1741,7 +2248,10 @@ const handOut = {
       (roundNo + 1) + ', auditIds: ' + JSON.stringify(promotedIds) + ' and no subjectRound and no ' +
       '`subjects`, so they take a fresh subject and the resolver scopes to them; dispatch the roster ' +
       'below for every unit that is not one of them.'
-    : 'dispatch the roster below, one main-loop Workflow call per unit',
+    : (!specAudit && specCommit && specCommit.checklist
+        ? 'ACT on `specCommit.checklist`, the bug-class checklist over the spec commit ' + specCommit.sha +
+          ', before the first --dispatch; then '
+        : '') + 'dispatch the roster below, one main-loop Workflow call per unit',
   roster: buildUnits.map(function (u) {
     return { id: u.id, order: u.order, specPath: u.specPath || '', briefPath: u.briefPath || '' }
   }),
@@ -1787,6 +2297,7 @@ const handOut = {
     (specAudit ? '' : 'spec audit OFF by declaration — NOT-OWED, no round reviewed or recorded · ') +
     'prologue complete; ' + buildUnits.length + ' unit(s) to dispatch',
 }
+if (!specAudit && specCommit) handOut.specCommit = specCommit
 // A CLEAN ROUND LEAVES NO RECORD, AND THE ROSTER IS WITHHELD UNTIL ONE EXISTS (closing review round
 // 2, cluster D). `tier2-review.js` returns `report: null` on both clean paths — zero findings, every
 // finding refuted — and writes the `**Serves:** spec-audit` binding line only in the synthesis pass
@@ -1803,8 +2314,9 @@ const handOut = {
 if (cleanRound && !attended) {
   // OWED IS WHAT THE CALLEE READ, never the roster. `subjects` is what `tier2-review.js` was handed
   // — caller-supplied, or resolver-returned only for units whose spec path resolves at HEAD — and a
-  // unit the spec stage just authored has no `specPath` yet (its own comment above the hand-out
-  // says so), so the roster minus the refused set names units no audit opened. A binding line over
+  // unit the spec stage authored carries its committed `specPath` only where the commit stage ran
+  // (the comment above the hand-out says when it did not), so the roster minus the refused set can
+  // name units no audit opened. A binding line over
   // those would certify an audit that never read them. Round-3 cluster B of aProbedUnit.
   const owed = auditUnits
     .filter(function (u) {
@@ -1816,8 +2328,7 @@ if (cleanRound && !attended) {
     throw new Error(
       'unattended-build: the clean round at ' + roundNo + ' covered NO unit — none of the audit ' +
         'units has a spec path among the subjects the callee was handed — so there is nothing a ' +
-        'spec-audit record could bind. Commit the authored specs and re-invoke; a clean round ' +
-        'over nothing certifies nothing.',
+        'spec-audit record could bind; a clean round over nothing certifies nothing.' + resumeRemedy,
     )
   }
   const uncovered = auditUnits
