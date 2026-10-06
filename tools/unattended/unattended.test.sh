@@ -7432,6 +7432,15 @@ n=$((n+1))
 [ "$_rc" = 0 ] || { echo "FAIL run_bounded returned $_rc for a command that finished inside its bound"; st=1; }
 hit "$RB_OUT" "alive"
 
+# ...and the process record WAITS FOR THE EXEC (TOOL-aGraftedHelix-36 S9): a recorder stub that
+# reads whether the wrapper's marker existed when it ran. RED with the wait loop deleted from a copy
+# of the driver: the record then runs the moment `&` returns, before the child shell has started.
+rm -f "$TMP/rb-up.log"
+write_proc_record() { [ -e "$_d/up" ] && echo up || echo early; } >>"$TMP/rb-up.log"
+run_bounded bash -c 'exit 0'
+same "GH36 the process record waits for the exec marker" "$(cat "$TMP/rb-up.log" 2>/dev/null)" "up"
+write_proc_record() { :; }
+
 # ...and with the bound INERT the command still RUNS, exit status intact. A bound may cost speed and
 # may turn a hang into a verdict; it may never turn a check into a skip.
 GATE_BOUND_LIVE=0
@@ -9096,7 +9105,7 @@ hit "$out" "attended LANDED 1"
 same "AC1 the leg reds no check 15 on the settled record" \
   "$(printf '%s\n' "$out" | grep -F "$SU_R" | grep -c 'UNATTENDED check 15 FAILED' || true)" "0"
 su_b=$(read_su_sum)
-hit "$(run_su --settle tRun)" "unattended: already settled - memory/builds/tRun/RUN.md reads LANDED; nothing was written"
+hit "$(run_su --settle tRun)" "unattended: already settled - memory/builds/tRun/RUN.md reads LANDED; the record was not rewritten"
 same "AC1 a second settle wrote nothing" "$(read_su_sum)" "$su_b"
 
 # ---- AC9: --resume over the landed hand-off, before it is settled, has nothing to resume, names
@@ -9399,6 +9408,42 @@ same "GH31 AC4 the settle wrote LANDED" "$(read_su_fact "$SU_R" phase)" "LANDED"
 same "GH31 AC4 the settle staged the record" "$(run_su_git diff --cached --name-only)" "$SU_R"
 hit  "$out" "unattended: claim not written — tRun is held live by session other-session"
 same "GH31 AC4 the foreign claim is unmoved" "$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)" "$su_cr"
+# ---- TOOL-aGraftedHelix-36 S4: a re-run of --settle retries the claim write. AC5: a first write
+# ---- that does not complete, push-main holding its marker in this git dir, names the re-run; the
+# ---- re-run over the settled record writes the claim `landed`; a third re-run pushes nothing. RED
+# ---- against the parent's driver, whose already-settled exit wrote nothing, so the claim stayed held.
+SU_CLAIMS=on write_su_handoff owner-landing
+run_su_git push -q origin HEAD:main
+su_gd=$(run_su_git rev-parse --absolute-git-dir); : > "$su_gd/push-main-active"
+out=$(CLAUDE_CODE_SESSION_ID=owner-session run_su --settle tRun); su_rc=$?
+same "GH36 AC5 the settle exits 0 with its claim write refused" "$su_rc" "0"
+same "GH36 AC5 ...and wrote LANDED" "$(read_su_fact "$SU_R" phase)" "LANDED"
+hit  "$out" "unattended: the settle's claim write did not complete; re-run --settle tRun to retry it"
+same "GH36 AC5 ...and --claims reads the claim held" "$(run_su --claims | awk -F'\t' '$1 == "tRun" { print $3 }')" "held"
+rm -f "$su_gd/push-main-active"
+out=$(CLAUDE_CODE_SESSION_ID=owner-session run_su --settle tRun)
+hit  "$out" "unattended: already settled - memory/builds/tRun/RUN.md reads LANDED; the record was not rewritten"
+hit  "$out" "unattended: claim retried — tRun now reads landed on the remote"
+same "GH36 AC5 the re-run's claim reads landed terminal" "$(run_su --claims | awk -F'\t' '$1 == "tRun" { print $3, $5 }')" "landed terminal"
+su_cr=$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)
+out=$(CLAUDE_CODE_SESSION_ID=owner-session run_su --settle tRun)
+hit  "$out" "unattended: already settled - memory/builds/tRun/RUN.md reads LANDED; the record was not rewritten"
+miss "$out" "claim retried"
+same "GH36 AC5 a third re-run leaves the claim ref unmoved" "$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)" "$su_cr"
+# ---- AC6: a fresh `live` claim another session holds over the settled record is announced and left.
+seed_su_claim tRun other-session k9 live "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+su_cr=$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)
+out=$(CLAUDE_CODE_SESSION_ID=owner-session run_su --settle tRun)
+hit  "$out" "unattended: claim not written — tRun is held live by session other-session"
+same "GH36 AC6 the re-run leaves another session's claim unmoved" "$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)" "$su_cr"
+# ---- ...and a STALE one, which the status column would write: the retry writes only a `mine` claim.
+seed_su_claim tRun other-session k9 live 2000-01-01T00:00:00Z
+su_cr=$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)
+# ---- Each unmoved ref rides beside a positive read of the same run, so a verb that refused before
+# ---- the retry could not pass these arms by writing nothing (fixture-passes-by-finding-nothing).
+out=$(CLAUDE_CODE_SESSION_ID=owner-session run_su --settle tRun)
+hit  "$out" "unattended: already settled - memory/builds/tRun/RUN.md reads LANDED; the record was not rewritten"
+same "GH36 AC6 the re-run leaves another session's stale claim unmoved" "$(git --git-dir="$su_origin" rev-parse refs/gov/runs/tRun)" "$su_cr"
 rm -rf "$su_dir" "$su_oroot" "$su_out"
 
 fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
@@ -14349,7 +14394,28 @@ hit  "$out" "unattended: beat — tRun · skipped: the write did not complete: p
 same "GH32 AC6 the beat prints one beat line" "$(printf '%s\n' "$out" | grep -c '^unattended: beat — ')" "1"
 same "GH32 AC6 ...leaves pre-push-refusal byte-identical" "$(git hash-object "$gu_gd/pre-push-refusal" 2>/dev/null)" "$gu_rf"
 same "GH32 AC6 ...and the claim ref unmoved" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gu_sha"
+same "GH36 AC14 a write the marker refused leaves no claim-push lock" "$([ -e "$gu_gd/claim-push.lock" ] && echo left || echo none)" "none"
 rm -f "$gu_gd/push-main-active" "$gu_gd/pre-push-refusal"
+remove_claim_refs; reset_tree
+# ---- TOOL-aGraftedHelix-36 AC14 (L1): a claim push takes `claim-push.lock` in its git dir before it
+# ---- tests push-main's marker, so a live lock another writer holds skips the beat, naming the lock,
+# ---- and a lock whose deadline passed is cleared, taken and released. RED against the parent's driver,
+# ---- which tested the marker alone and pushed beside a held lock.
+build_claim_held
+seed_claim tRun fixture-session k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+gu_gd=$(git rev-parse --absolute-git-dir); gu_sha=$(read_claim_ref tRun)
+mkdir -p "$gu_gd/claim-push.lock"; echo "$(( $(date +%s) + 60 ))" > "$gu_gd/claim-push.lock/until"
+out=$(run --beat tRun)
+hit  "$out" "unattended: beat — tRun · skipped: the write did not complete: a claim push from this git dir is in flight; retry once it ends: "
+hit  "$out" "claim-push.lock"
+same "GH36 AC14 a live lock leaves one beat line" "$(printf '%s\n' "$out" | grep -c '^unattended: beat — ')" "1"
+same "GH36 AC14 ...and the claim ref unmoved" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gu_sha"
+echo "$(( $(date +%s) - 5 ))" > "$gu_gd/claim-push.lock/until"
+out=$(run --beat tRun)
+hit  "$out" "unattended: beat — tRun · renewed "
+same "GH36 AC14 an expired lock is cleared and the claim renewed" "$([ "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" = "$gu_sha" ] && echo unmoved || echo moved)" "moved"
+same "GH36 AC14 ...and no lock directory remains" "$([ -e "$gu_gd/claim-push.lock" ] && echo left || echo none)" "none"
+rm -rf "$gu_gd/claim-push.lock"
 remove_claim_refs; reset_tree
 # ---- AC7: a finished record over a README missing its build-index close refuses at check 9 before the
 # ---- rotation; a live record missing its generated close refuses before the claim write.
@@ -15676,7 +15742,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ledger AC6 and AC12 token-liveness arms (2, region two). MEASURED on slices behind this prologue on
 # node a, 2026-10-06: `cr` 38 -> 40, `s4pw` 35 -> 37, `pl` 79 -> 81, each red under its staged break;
 # no suite ran.
-FLOOR_ASSERTIONS=2488
+# RAISED 2488 -> 2511 by TOOL-aGraftedHelix-36: 23 region-two assertions, the exec-marker record arm
+# (1, S9), the settle's claim retry (14, S4) and the claim-push lock (8, S10), counted off the block's
+# own `hit`/`miss`/`same` lines and each observed red under its staged break on a slice behind this
+# prologue on node a, 2026-10-06; no suite ran.
+FLOOR_ASSERTIONS=2511
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -15825,7 +15895,8 @@ FLOOR_SHARD_1=211
 # RAISED 2243 -> 2266: the same 23 region-two --authorization assertions, see FLOOR_ASSERTIONS.
 # RAISED 2266 -> 2285: the same 19 region-two --settle claim assertions, see FLOOR_ASSERTIONS.
 # RAISED 2285 -> 2289: the settle drive and the two ledger token-liveness arms, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=2289
+# RAISED 2289 -> 2312: the same 23 region-two exec-marker, settle-retry and lock assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=2312
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

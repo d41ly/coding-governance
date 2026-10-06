@@ -1095,6 +1095,10 @@ ck "a shipped file absent from the install -> UNWIRED naming it" "$r"; rm -rf "$
 # worktree with the install drifting from the primary too: still UNWIRED.
 newrepo; skill_fixture 1; install_engine 'engine
 '
+# A bare origin with its HEAD set, so the note's merge base resolves (TOOL-aGraftedHelix-36 S6).
+SKOR=$(mktemp -d); git init -q --bare "$SKOR"; git -C "$SKOR" symbolic-ref HEAD refs/heads/main
+git remote add origin "$SKOR"; git push -q origin main >/dev/null 2>&1
+git fetch -q origin >/dev/null 2>&1; git remote set-head origin main >/dev/null 2>&1
 SKWT=$(mktemp -d); rmdir "$SKWT"; git worktree add -q -b skbr "$SKWT" >/dev/null 2>&1
 ( cd "$SKWT" && printf 'edited\n' > skills/session-kickoff/SKILL.md && git commit -q -am edit )
 out=$(cd "$SKWT" && skill_run)
@@ -1107,7 +1111,27 @@ install_engine 'DIFFERENT
 out=$(cd "$SKWT" && skill_run)
 case "$out" in "UNWIRED  skill"*"differs from tracked in: SKILL.md"*) r=1 ;; *) r=0 ;; esac
 ck "the same worktree with the install drifting from the primary too -> UNWIRED" "$r"
-git worktree remove --force "$SKWT" >/dev/null 2>&1; rm -rf "$SKWT" "$FAKEHOME"; cleanup
+# ...with no remote HEAD to take a merge base from, the editing worktree cannot earn its note.
+install_engine 'engine
+'
+git remote set-head origin -d >/dev/null 2>&1
+out=$(cd "$SKWT" && skill_run)
+case "$out" in "UNWIRED  skill"*"no single remote's HEAD resolves"*) r=1 ;; *) r=0 ;; esac
+ck "an engine-editing worktree with no remote HEAD -> UNWIRED" "$r"
+git remote set-head origin main >/dev/null 2>&1
+# ...and a worktree branched from an origin/main whose engine edit the primary never took, with no
+# engine edit of its own, while the install matches the lagging primary: UNWIRED, naming the
+# fast-forward. RED with the branch-change condition cut: the lagging worktree read the note.
+SKCL=$(mktemp -d); rmdir "$SKCL"; git clone -q "$SKOR" "$SKCL" >/dev/null 2>&1
+( cd "$SKCL" && git config user.email t@e && git config user.name t \
+    && printf 'upstream\n' > skills/session-kickoff/SKILL.md && git commit -q -am upstream && git push -q origin main ) >/dev/null 2>&1
+git fetch -q origin >/dev/null 2>&1
+SKLG=$(mktemp -d); rmdir "$SKLG"; git worktree add -q -b sklag "$SKLG" origin/main >/dev/null 2>&1
+out=$(cd "$SKLG" && skill_run)
+case "$out" in "UNWIRED  skill"*"in: SKILL.md"*"pull --ff-only"*) r=1 ;; *) r=0 ;; esac
+ck "a worktree off an origin/main the primary lags, no engine edit of its own -> UNWIRED, fast-forward the primary" "$r"
+git worktree remove --force "$SKLG" >/dev/null 2>&1
+git worktree remove --force "$SKWT" >/dev/null 2>&1; rm -rf "$SKWT" "$SKLG" "$SKCL" "$SKOR" "$FAKEHOME"; cleanup
 
 # AC7 — the adopter shape: the install exists, the repo tracks no kit source. Without this state the
 # check is a permanent false alarm in every adopting repo.

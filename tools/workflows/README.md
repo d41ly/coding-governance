@@ -6,7 +6,7 @@ Three gates in this directory read the tree and delegate their verdict to the ag
 |---|---|
 | `check-review-join.sh` | no ref-keyed verdict join, and every agent wave a source scan can see is counted |
 | `check-verifier-fanout.sh` | the committed harnesses obey the verify-stage cap |
-| `check-workflow-syntax.js` | every workflow script parses |
+| `check-workflow-syntax.js` | every workflow script parses, and a second pass reds a pathless `git commit` on any code line, `git -C` included, printing how many lines it graded; a zero beside the build harness render is a dead probe |
 
 `tier2-review.js` is the ready-made harness they exist to protect. It carries this directory's
 version under **two** kit ids, and both are paired — see its line 3 and `check-kit-versions.sh`.

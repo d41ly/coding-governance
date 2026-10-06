@@ -698,11 +698,16 @@ def cmd_for_diff(root: str, conf: dict, rng: str) -> int:
     The by-design block is read at the commit the range diffs from (TOOL-aGraftedHelix-29). A range
     opening `-` is refused before `git diff` sees it, since `--output=<file>` would write a file, and a
     range git refuses is a named `Problem` where it was a traceback.
+
+    The touched set names BOTH sides of a rename (TOOL-aGraftedHelix-36 S1): porcelain `git diff`
+    detects renames and names only the destination, which left a renamed invariant's base record
+    outside `changed` and so inside the by-design block, exempting the very ruling the range moved.
+    NUL-separated, so a path carrying a newline or a space is one entry.
     """
     if rng.startswith("-"):
         raise Problem(f"gotchas: '{rng}' opens with '-', which git would read as an option — pass a range")
     try:
-        changed = [p for p in run("git", "diff", "--name-only", rng, cwd=root).split("\n") if p]
+        changed = [p for p in run("git", "diff", "--no-renames", "--name-only", "-z", rng, cwd=root).split("\0") if p]
     except subprocess.CalledProcessError as exc:
         raise Problem(f"gotchas: git diff cannot read the range '{rng}' — "
                       f"{((exc.stderr or '').strip().splitlines() or [f'git exited {exc.returncode}'])[0]}") from None
@@ -1086,6 +1091,17 @@ def cmd_selftest() -> int:
         rtext = run_capture(lambda: cmd_for_diff(tb, cb, "HEAD~1..HEAD"))
         arm("--for-diff: an invariant the range TAKES OUT is an item named from the base's text", "[rc=0]",
             lambda: 0 if extract_block(rtext) == [head0] and item + "inv-one" in rtext else 1)
+
+        # A range that RENAMES the ruling with a small edit (TOOL-aGraftedHelix-36 S1). Porcelain diff
+        # names only the destination, so the read without `--no-renames` left the base's inv-one in
+        # the block as an exemption; read red against that touched set.
+        tr2, cr2 = build_tree("bd-mv", {"inv-one.md": build_invariant("inv-one")})
+        write_commit(tr2, {gate: "#!/usr/bin/env bash\n# rename\n", f"{cat}inv-one.md": None,
+                           f"{cat}inv-two.md": build_invariant("inv-two", over={"Actually": "It is the moved ruling."})})
+        mtext = run_capture(lambda: cmd_for_diff(tr2, cr2, "HEAD~1..HEAD"))
+        arm("--for-diff: an invariant the range RENAMES is two items and never in the block", "[rc=0]",
+            lambda: 0 if extract_block(mtext) == [head0] and item + "inv-one" in mtext
+            and item + "inv-two" in mtext else 1)
 
         # Two refusals, through the process: a range git cannot resolve, and one git would read as an option.
         pb = run_cli(tb, "--for-diff", "nosuchrev..HEAD")

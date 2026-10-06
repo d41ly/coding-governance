@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-36 — the rotated run's closing review MEDIUM and LOW findings, fixed as one batch
 
-**Status:** SPECCED · rev-2 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 20 · ratified 2026-10-06
+**Status:** CLOSED · rev-2 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 20 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 

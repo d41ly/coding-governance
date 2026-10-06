@@ -45,8 +45,10 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a gi
 # driver suite is the seams and the floors. Three carriers can break at a cut and each is handled
 # once: shell VARIABLES (none cross a boundary — scanned per boundary, recorded in the build),
 # FUNCTIONS (every region-defined helper is HOISTED; the block below `anchor_restore` names the
-# population and its derivation) and REFS (`read_topo` at every boundary, `run_landed_replay`
-# at the boundaries where the unsharded run's topology differs from a fresh start).
+# population and its derivation) and REFS, which the nine re-cut seams restore by `anchor_restore`
+# and then read with `read_topo s1` to `s9` as their instrument, the eight region starts with
+# `read_topo 2` to `8`, and `run_landed_replay` where the unsharded run's topology differs from a
+# fresh start. `check_helpers_hoisted` is the standing check on the hoist rule (TOOL-aGraftedHelix-36).
 SHARD_ARITY=8
 SHARD=""; SHARD_GIVEN=0
 if [ "${1:-}" = --shard ]; then
@@ -777,6 +779,22 @@ C42P
 write_c42_conf() { # GATE_WALL · GATE_PROFILE_CMD
   printf 'GATE_WALL="%s"\nGATE_PROFILE_CMD="%s"\n' "$1" "$2" >> .unattended.conf
 }
+
+# ---- THE HOIST RULE, STANDING (TOOL-aGraftedHelix-36 S11). A helper defined inside a shard region is
+# ---- stranded for every later caller in a shard that does not run that region, which is how 31 came
+# ---- to live in region 8 before unit 34 hoisted them. One prologue arm, so every shard pays it: no
+# ---- column-0 function definition between the first `if in_shard` line and the floor line. A file
+# ---- with no region or no floor line is a DEAD PROBE, never a clean read. WHAT THIS DOES NOT CHECK:
+# ---- an indented definition, which is a string a fixture writes, or a helper defined inside `eval`.
+check_helpers_hoisted() { # <suite file> -> 0 and nothing printed, or 1 naming each definition
+  awk '/^if in_shard/ { r++ } /^FLOOR_ASSERTIONS=/ { f = 1; exit }
+       r && /^[A-Za-z_][A-Za-z0-9_]*\(\) *\{/ { print FILENAME ":" NR ": " $0; bad = 1 }
+       END { if (!r || !f) { print "DEAD PROBE: no shard region or no floor line read in " FILENAME; exit 1 }
+             exit bad }' "$1"
+}
+_hh=$(check_helpers_hoisted "$HERE/check-unattended.test.sh"); _hrc=$?
+n=$((n+1)); [ "$_hrc" = 0 ] && [ -z "$_hh" ] \
+  || { echo "FAIL a helper is defined inside a shard region, stranded for any shard that does not run it: $_hh"; st=1; }
 
 # ---- REGION 1 ------------------------------------------------------------------------------------
 # Bodies are NOT reindented: `check-arms.py` reads lines and skips comments, so an unindented wrapper
@@ -4178,7 +4196,7 @@ hit "$(run_skip_leg)" "wrote $BRIEF in memory/builds/tRun/RUN.md"
 
 fi   # ---- a re-cut seam of the region-8 span (TOOL-aGraftedHelix-34 S7): the section below is region 3's
 if in_shard 3; then
-cd "$TMP" || exit 2; anchor_restore   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
+cd "$TMP" || exit 2; anchor_restore; read_topo s1   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
 # ---- EACH RUN AGAINST ITS OWN BUDGET (TOOL-aWindowedPass-5, TOOL-dUnstuckLanding-17). The run this
 # ---- branch drives fails when its counted writes exceed its per-build budget, 0 here, so ONE counted
 # ---- write fails it; the same record read from a detached HEAD binds no run and is only printed. This
@@ -4541,7 +4559,7 @@ reset_tree
 
 fi   # ---- a re-cut seam of the region-8 span (TOOL-aGraftedHelix-34 S7): the section below is region 8's
 if in_shard 8; then
-cd "$TMP" || exit 2; anchor_restore   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
+cd "$TMP" || exit 2; anchor_restore; read_topo s2   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
 # ============== TOOL-dDerivedDocket-4: the phase-read routing, the core floor, --phase ============
 # CHECKS 39 AND 40 here are the pair this unit's spec calls 32 and 33: main numbered its own 32 and
 # 33 first, and the reconcile merge kept main's numbers and moved this pair.
@@ -4697,7 +4715,7 @@ reset_tree
 
 fi   # ---- a re-cut seam of the region-8 span (TOOL-aGraftedHelix-34 S7): the section below is region 1's
 if in_shard 1; then
-cd "$TMP" || exit 2; anchor_restore   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
+cd "$TMP" || exit 2; anchor_restore; read_topo s3   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
 # ---- TOOL-dDerivedDocket-3 — checks 44 and 45 (this build's 34 and 35, renumbered above main's 34 to 36) ----
 # ---- ITS OWN scratch repository, for the reason the driver suite's sibling block gives: these arms
 # ---- edit the SKILL TEMPLATE and the DRIVER the leg reads its closed set out of, and doing that in
@@ -4861,7 +4879,7 @@ rm -rf "$lm_dir"
 
 fi   # ---- a re-cut seam of the region-8 span (TOOL-aGraftedHelix-34 S7): the section below is region 8's
 if in_shard 8; then
-cd "$TMP" || exit 2; anchor_restore   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
+cd "$TMP" || exit 2; anchor_restore; read_topo s4   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
 # ==== TOOL-dDerivedDocket-52: resolve_introducing_commit, over scratch fixtures ==================
 # THE FUNCTION IS EXTRACTED AND SOURCED, the way the driver suite's bound arms grade `run_bounded`:
 # nothing calls this resolver at its own commit — unit 18's S2 is its first caller, at a later order
@@ -5078,7 +5096,7 @@ rm -f "$ric_fn"; rm -rf "$ric_root"
 
 fi   # ---- a re-cut seam of the region-8 span (TOOL-aGraftedHelix-34 S7): the section below is region 5's
 if in_shard 5; then
-cd "$TMP" || exit 2; anchor_restore   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
+cd "$TMP" || exit 2; anchor_restore; read_topo s5   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
 # ---- TOOL-dDerivedDocket-18: THE ASK-MANDATE SECOND OPINIONS ------------------------------------
 # Six arms over the four facts the ask path pins (`asks:`, `m-base:`, `asks-ready:` and the
 # `asks-at-landing:` freeze), each observed RED here and each beside the control that shows the
@@ -5392,7 +5410,7 @@ rm -rf "$ak_root"
 
 fi   # ---- a re-cut seam of the region-8 span (TOOL-aGraftedHelix-34 S7): the section below is region 8's
 if in_shard 8; then
-cd "$TMP" || exit 2; anchor_restore   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
+cd "$TMP" || exit 2; anchor_restore; read_topo s6   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
 # ==== TOOL-dDerivedDocket-54: check_touching_commit_reachable, over one scratch fixture ==========
 # SOURCED FROM THE KIT LIBRARY rather than extracted: the predicate lives in `lib-unattended.sh`,
 # which defines functions and nothing else, so sourcing it is exactly how its callers reach it.
@@ -5510,7 +5528,7 @@ hit "$(sed -n '/THE WALK IS UNSIMPLIFIED ON PURPOSE/,+4p' "$TMP/$KIT_REL/lib-una
 rm -rf "$tc_root"
 fi   # ---- a re-cut seam of the region-8 span (TOOL-aGraftedHelix-34 S7): the section below is region 6's
 if in_shard 6; then
-cd "$TMP" || exit 2; anchor_restore   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
+cd "$TMP" || exit 2; anchor_restore; read_topo s7   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
 # ==== TOOL-dDerivedDocket-19: THE GRANT, SECOND-OPINIONED ========================================
 # Three arms of check 19 over the `may:` fact. The first two compare the fact against the README at
 # the recorded BASE and against the recorded mode; the third walks each run's OWN commits for a
@@ -5857,7 +5875,7 @@ rm -rf "$ma_root"
 
 fi   # ---- a re-cut seam of the region-8 span (TOOL-aGraftedHelix-34 S7): the section below is region 1's
 if in_shard 1; then
-cd "$TMP" || exit 2; anchor_restore   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
+cd "$TMP" || exit 2; anchor_restore; read_topo s8   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
 # ================== TOOL-dDerivedDocket-22 — the derived terminal, graded by the leg ==============
 # ---- In the shared fixture, each arm from `reset_tree` and each one that pushes restoring the
 # ---- remote's anchor, so no later arm inherits a moved tip. The leg is run with the report channel
@@ -6112,7 +6130,7 @@ reset_tree
 
 fi   # ---- a re-cut seam of the region-8 span (TOOL-aGraftedHelix-34 S7): the section below is region 7's
 if in_shard 7; then
-cd "$TMP" || exit 2; anchor_restore   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
+cd "$TMP" || exit 2; anchor_restore; read_topo s9   # every section after a re-cut seam starts from the prologue's fixture, refs and remote
 # ==== TOOL-dDerivedDocket-30: the conf hoist, the allow-list join and the flag arm =================
 # ---- AC3. `--only 28` used to die on `set -u` at check 30, because the conf import sat inside the
 # ---- guard it skips. Now it exits 0, announces one skip per numbered check after the 28 region on
@@ -6614,25 +6632,29 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- the same unit, moves no unsharded count. It moves six region-8 sections to regions 1, 3, 5, 6
 # ---- and 7, so each per-shard floor below moves by what its slice EXECUTED, read off a slice of the
 # ---- prologue, the normalization line and the section on node a, 2026-10-06 (the prologue alone
-# ---- executes 0): checks 44 to 46, 21, and the derived terminal, 50, to region 1; check 23's
+# ---- then executed 0, and executes 1 since the hoist arm below): checks 44 to 46, 21, and the derived terminal, 50, to region 1; check 23's
 # ---- budget-to-ceiling arms, 72, to region 3; the ask-mandate opinions, 68, to region 5; the grant
 # ---- and rounds arms, 77, to region 6; the conf hoist through check 51, 126, to region 7. A receiving
 # ---- floor rises by 97 % of its sections, the discount every floor here carries; region 8's floor is
 # ---- re-read whole, 97 % of its four remaining sections' executed counts (108, 34, 38 and 32, so 205),
 # ---- because the old 402 had fallen far below the 626 that region ran; this pass runs no suite.
-FLOOR_ASSERTIONS=953
+# ---- RAISED 953 -> 954 by TOOL-aGraftedHelix-36 S11: `check_helpers_hoisted`'s one prologue arm,
+# ---- which every shard executes too, so each FLOOR_SHARD_k below rises by the same 1. MEASURED on a
+# ---- slice of the prologue on node a, 2026-10-06, n 0 -> 1, green, and red with a column-0 helper
+# ---- planted inside region 8 of a scratch copy; this pass runs no suite.
+FLOOR_ASSERTIONS=954
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
-FLOOR_SHARD_1=158
-FLOOR_SHARD_2=66
-FLOOR_SHARD_3=127
-FLOOR_SHARD_4=100
-FLOOR_SHARD_5=132
-FLOOR_SHARD_6=149
-FLOOR_SHARD_7=214
-FLOOR_SHARD_8=205
+FLOOR_SHARD_1=159
+FLOOR_SHARD_2=67
+FLOOR_SHARD_3=128
+FLOOR_SHARD_4=101
+FLOOR_SHARD_5=133
+FLOOR_SHARD_6=150
+FLOOR_SHARD_7=215
+FLOOR_SHARD_8=206
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;

@@ -51,7 +51,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.81   # gov:kit unattended@1.81 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.82   # gov:kit unattended@1.82 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -1815,7 +1815,7 @@ CLAIM_NS="refs/gov/runs"
 CLAIM_CACHE="refs/gov/remote/runs"
 CR_NAME=""; CR_URL=""
 CLAIM_ROWS=""; CL_WHY=""
-CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""
+CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""; CW_CLS=""; CW_STATUS=""
 WC_WHY=""; WC_BEAT=""
 
 # THE ONE REMOTE, counted once. SETS rather than prints, because check 24 is a `fail` and a `fail`
@@ -1960,10 +1960,12 @@ CLAIM_MODES="preflight take-over holder status beat"
 # record, a holder, `--beat` or status write also reads `mine` a claim of the lease's keepalive under
 # ANY member, and the take-over handed it - the restart row alone - reads `same session` one under the
 # record's keepalive. CW_SESS is the claim's own session when a claim was found, for that holder row.
+# CW_CLS is the claim-read class derived and CW_STATUS the claim's own status, empty with no claim, for
+# the settle's retry, which writes only a `mine` claim still `held` or `live` (TOOL-aGraftedHelix-36).
 check_claim_writable() { # slug · mode · lease keepalive · lease session · the keepalive a write sets · [run-state file]
   local slug="$1" mode="$2" ka="$3" sid="$4" wka="$5" rel="${6:-}" me="${CLAUDE_CODE_SESSION_ID:-}" row cls due ps=""
   local c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_btxt=unknown r_host r_sess r_lease
-  CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""
+  CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""; CW_CLS=""; CW_STATUS=""
   case " $CLAIM_MODES " in
     *" $mode "*) ;;
     *) fail 110 "this call passed a claim mode the driver does not declare, so the claim write table has no column for it and nothing was written; declare the mode in CLAIM_MODES beside its case branch, or pass a declared one: mode $mode · CLAIM_MODES $CLAIM_MODES"
@@ -1977,7 +1979,7 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     cls=none
   else
     IFS=$'\t' read -r c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat <<<"$row"
-    CW_SHA="$c_sha"; CW_SESS="$c_sess"
+    CW_SHA="$c_sha"; CW_SESS="$c_sess"; CW_STATUS="$c_status"
     c_btxt="${c_age}s"; [ "$c_age" != - ] || c_btxt=unknown
     CW_WHO="$slug · node $c_node · session $c_sess · beat $c_btxt · status $c_status · verdict $c_verdict"
     CW_FROM="$slug from node $c_node session $c_sess beat-age $c_btxt"
@@ -1993,6 +1995,7 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     *) fail 111 "this call derived a claim-read class the driver does not declare, so the claim write table has no row for it and nothing was written; declare the class in CLAIM_READS beside its case branch: class $cls · CLAIM_READS $CLAIM_READS"
        return 1 ;;
   esac
+  CW_CLS="$cls"
   if [ "$cls" = mine ]; then
     [ "$c_node" = - ] || CW_NODE="$c_node"
     # DUE at a quarter of the stale bound, or when a field the write would set differs - so a holder
@@ -2050,7 +2053,15 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # before the push, as push-main removes it, so a token read after it came from THIS push's hook -
 # which holds only because no claim push runs while push-main holds `push-main-active` in the same
 # git dir (TOOL-aGraftedHelix-32): that hook clears both verdict files the lander trusts on every
-# run, so a beat landing mid-bar would erase the landing's verdict. One writer per verdict file.
+# run, so a beat landing mid-bar would erase the landing's verdict. THE TWO WRITERS ARE SERIALISED
+# BY A LOCK AND THE MARKER (TOOL-aGraftedHelix-36 S10): this function takes the directory
+# `claim-push.lock` in the same git dir BEFORE it tests the marker, writes its deadline into the
+# lock's `until`, and releases it on every path out; push-main touches its marker, then waits for no
+# live lock, then clears and pushes. Whichever side moves second sees the other, so the marker test
+# can no longer pass a moment before the lander clears its verdict files. A lock whose deadline has
+# passed, or that carries none and is older than two minutes, is cleared and taken once.
+# WHAT THIS DOES NOT CHECK: on a host with no runnable `timeout -k` the push is unbounded, so a push
+# can outlive the deadline it recorded, and a lander past that deadline then pushes beside it.
 # THE IDENTITY IS THE LEASE RECORD'S (TOOL-aGraftedHelix-11), so a writer the OS scheduler launched
 # with no session, or a Workflow child under another one, never rewrites it. Handed the run-state
 # file, the write copies its `session`, `host` and `lease-utc` (the keepalive argument is the
@@ -2058,10 +2069,25 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # harness's session and host with the one lease stamp the caller also hands `write_lease`. `node` is
 # the claim's own on the `mine` row, this user's elsewhere.
 write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [run-state file] · [lease stamp] -> 0 written, 1 lost, 2 not completed; WC_WHY
-  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" d t c rc l line flag node host sid msg rf="" tok=""
+  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" d t c rc l line flag node host sid msg rf="" tok="" lk="" lu busy=""
   WC_WHY=""; WC_BEAT=$(read_utc_now)
   [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
   [ -z "$RUNLOG_GITDIR" ] || rf="$RUNLOG_GITDIR/pre-push-refusal"
+  if [ -n "$RUNLOG_GITDIR" ]; then
+    lk="$RUNLOG_GITDIR/claim-push.lock"
+    if ! mkdir "$lk" 2>/dev/null; then
+      lu=""; { read -r lu <"$lk/until"; } 2>/dev/null || :
+      case "$lu" in *[!0-9]*) lu="" ;; esac
+      if { [ -n "$lu" ] && [ "$lu" -lt "$(date +%s)" ]; } \
+         || { [ -z "$lu" ] && [ -n "$(find "$lk" -maxdepth 0 -mmin +2 2>/dev/null)" ]; }; then
+        rm -rf "$lk"; mkdir "$lk" 2>/dev/null || busy=1
+      else
+        busy=1
+      fi
+    fi
+    if [ -n "$busy" ]; then lk=""
+    else printf '%s\n' "$(( $(date +%s) + REMOTE_BOUND + 10 ))" >"$lk/until" 2>/dev/null || :; fi
+  fi
   if [ -n "$rel" ]; then
     sid=$(fact "$rel" session) || :; host=$(fact "$rel" host) || :; lease=$(fact "$rel" lease-utc) || :; lease="${lease:-absent}"
   else
@@ -2070,7 +2096,9 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
   sid="${sid:-absent}"; node="${CW_NODE:-${USERNAME:-${USER:-absent}}}"
   msg=$(printf 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s' \
     "$slug" "$slug" "${node//[$'\n\r\t']/ }" "${host:-absent}" "${sid//[$'\n\r\t']/ }" "${ka//[$'\n\r\t']/ }" "$st" "$lease" "$WC_BEAT")
-  if [ -n "$RUNLOG_GITDIR" ] && [ -f "$RUNLOG_GITDIR/push-main-active" ]; then
+  if [ -n "$busy" ]; then
+    WC_WHY="a claim push from this git dir is in flight; retry once it ends: $RUNLOG_GITDIR/claim-push.lock"; rc=2
+  elif [ -n "$RUNLOG_GITDIR" ] && [ -f "$RUNLOG_GITDIR/push-main-active" ]; then
     WC_WHY="push-main is landing from this git dir, so a claim push now would clear its verdict files: $RUNLOG_GITDIR/push-main-active"; rc=2
   elif ! d=$(mktemp); then
     WC_WHY="cannot create a scratch file to bound the push"; rc=2
@@ -2099,6 +2127,7 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
       [ "$tok" != default-branch ] || WC_WHY="$WC_WHY · fix once: git remote set-head $CR_NAME -a"
     fi
   fi
+  [ -z "$lk" ] || rm -rf "$lk"
   [ -z "${d:-}" ] || rm -f "$d"
   if [ "$rc" = 0 ]; then
     # A TAKE-OVER OF A STALE CLAIM IS A SELF-HEAL, logged once per write that landed (I3,
@@ -5928,26 +5957,58 @@ run_handoff() { # slug · code · reason · reaped · unreachable
 #              record admits (protocol section 3)
 #   lease-dead any other non-terminal phase whose `--liveness` verdict is STALE or UNBOUND and whose
 #              work reads landed: `work-landed-at` and `abandoned: <utc>` under the CURRENT phase
-#   settled    the fact this branch would write is already there: said so, exit 0
+#   settled    the fact this branch would write is already there: said so, the claim write retried, exit 0
 #
 # EVERY REFUSAL PRECEDES THE FIRST WRITE, in the spec's order, after the settled test, which writes
-# nothing: the record and its difference from HEAD, the recorded phase and the branch it selects, the advertised tip, then the branch's own test.
+# no record: the record and its difference from HEAD, the recorded phase and the branch it selects, the advertised tip, then the branch's own test.
 # The record is STAGED and never committed: a settle is a records commit made after the work landed,
 # so it rides the next landing from this tree or a batched owner pass, and every deriving reader
 # reads the record correctly before then. A live record only: an archive is immutable.
+# THE SETTLE'S CLAIM WRITE, ONCE (TOOL-aGraftedHelix-36 S4), called by the settle that writes the
+# record (`first`) and by the already-settled exit (`retry`). Handed the record's own keepalive and
+# session, as the status column's other writers are. A retry writes only a claim that reads `mine` and
+# still `held` or `live`, so a re-run over a claim already terminal pushes nothing and one a newer run
+# holds is announced and left. A write that does not complete names the re-run as its remedy.
+# WHAT THIS DOES NOT CHECK: a claim read that fails is announced by `read_claims` and not retried here.
+write_settle_claim() { # slug · run-state file · status to write · first|retry
+  local slug="$1" rel="$2" st="$3" when="$4" _sk
+  [ -n "$st" ] && [ "$RUN_CLAIMS" = on ] || return 0
+  read_claims soft || return 0
+  _sk=$(fact "$rel" keepalive)
+  check_claim_writable "$slug" status "$_sk" "$(fact "$rel" session)" "$_sk" "$rel" || return 0
+  if [ "$when" = retry ]; then
+    [ "$CW_CLS" = mine ] || return 0
+    case "$CW_STATUS" in held|live) ;; *) return 0 ;; esac
+  fi
+  if write_claim "$slug" "$st" "$_sk" soft "$rel"; then
+    [ "$when" = first ] || echo "unattended: claim retried — $slug now reads $st on the remote"
+  else
+    echo "unattended: the settle's claim write did not complete; re-run --settle $slug to retry it"
+  fi
+  return 0
+}
+
 run_settle() { # slug
-  local slug="$1" rel ph br hc cut first wla t8 st_lease _sk st_claim
+  local slug="$1" rel ph br hc cut first wla t8 st_lease st_claim
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to settle: $rel"; return 1; }
   ph=$(read_recorded_phase "$rel")
-  # ALREADY SETTLED FIRST, because it writes nothing whatever else holds: a settle is staged and
+  # ALREADY SETTLED FIRST, because it writes no record whatever else holds: a settle is staged and
   # committed later, so the record a re-run meets differs from HEAD's copy by exactly what it wrote.
   wla=$(fact "$rel" work-landed-at)
-  if { [ "$ph" = LANDED ] && [ "$(fact "$rel" landed-by)" = attended ]; } \
-     || { [ "$ph" = ABORTED ] && [ -n "$wla" ]; } \
-     || { ! is_terminal "$ph" && [ "$ph" != HELD ] && [ -n "$wla" ] && [ -n "$(fact "$rel" abandoned)" ]; }; then
-    echo "unattended: already settled - $rel reads $ph${wla:+, work-landed-at $wla}; nothing was written"
+  # A RE-RUN RETRIES THE CLAIM WRITE (TOOL-aGraftedHelix-36 S4): the record is not rewritten, and
+  # the status the settle's branch writes is written again only over a claim still `held` or `live`
+  # under the record's own lease, so a first write that did not complete has a route other than a
+  # hand-deleted ref, and a claim already terminal or another run's is left.
+  st_claim=""
+  if [ "$ph" = LANDED ] && [ "$(fact "$rel" landed-by)" = attended ]; then st_claim=landed
+  elif [ "$ph" = ABORTED ] && [ -n "$wla" ]; then st_claim=-
+  elif ! is_terminal "$ph" && [ "$ph" != HELD ] && [ -n "$wla" ] && [ -n "$(fact "$rel" abandoned)" ]; then st_claim=aborted
+  fi
+  if [ -n "$st_claim" ]; then
+    echo "unattended: already settled - $rel reads $ph${wla:+, work-landed-at $wla}; the record was not rewritten"
+    [ "$st_claim" = - ] || write_settle_claim "$slug" "$rel" "$st_claim" retry
     return 0
   fi
   if ! GIT cat-file -e "HEAD:$rel" 2>/dev/null || ! check_lease_only_diff "$rel"; then
@@ -6045,10 +6106,7 @@ run_settle() { # slug
   # `mine` whoever settles. The legacy branch writes none: `--abort` wrote that claim when it ended the
   # run, and the settle adds no phase (spec F1). Announced and never failing the verb.
   case "$br" in handed) st_claim=landed ;; lease-dead) st_claim=aborted ;; *) st_claim="" ;; esac
-  if [ -n "$st_claim" ] && [ "$RUN_CLAIMS" = on ] && read_claims soft; then
-    _sk=$(fact "$rel" keepalive)
-    check_claim_writable "$slug" status "$_sk" "$(fact "$rel" session)" "$_sk" "$rel" && write_claim "$slug" "$st_claim" "$_sk" soft "$rel"
-  fi
+  write_settle_claim "$slug" "$rel" "$st_claim" first
   case "$br" in
     handed) echo "unattended: settled $rel as a landed hand-off - phase LANDED · landed-by attended · landed-derived ${DP_LANDING:0:8} ${DP_TIP:0:8}" ;;
     legacy) echo "unattended: settled $rel as ABORTED with its work landed - work-landed-at $(fact "$rel" work-landed-at)" ;;

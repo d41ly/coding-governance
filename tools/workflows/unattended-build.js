@@ -1,6 +1,6 @@
 export const meta = {
   name: 'unattended-build',
-  version: '1.11', // gov:kit unattended-build@1.11 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
+  version: '1.12', // gov:kit unattended-build@1.12 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
     'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal. The SPEC stage ends in ONE commit of the specs its writers authored, so the audit pins them at HEAD in the same call. AUDIT is opt-in: with no `specAudit` arg the stage announces itself OFF by declaration and the roster follows SPEC completion.',
   phases: [
@@ -163,7 +163,9 @@ function chunk(a, n) {
 // { repo: "/abs/path/to/worktree",                 // REQUIRED
 //   slug: "<build slug>",                           // REQUIRED
 //   scratch: "<absolute session scratchpad>",       // REQUIRED — the path the caller's OWN system prompt names
-//   base: "<immutable sha>",                        // the review anchor; the spec audit's checklist reads invariants at it
+//   base: "<immutable sha>",                        // REQUIRED beside `specAudit`, 7-40 lowercase hex: the run's
+//                                                   //   pinned base, the review anchor; the spec audit's
+//                                                   //   checklist reads invariants at it
 //   units: [{ id, order, specPath, briefPath,      // ORDERED by the caller, from --plan
 //            specBriefPath,                        //   optional: the per-unit SPEC brief
 //            closes,                               //   optional: [<ask id>], the asks this unit answers
@@ -350,6 +352,16 @@ if (!specAudit && auditShaped.length) {
       '`spec-audit: <date>` value as `specAudit` — the driver\'s preflight line names which the build declared.',
   )
 }
+// TOOL-aGraftedHelix-36 S3 - A DECLARED AUDIT CARRIES ITS BASE, refused here before any agent spawns.
+// The audit reads its by-design block at the run's pinned base, and with none it read the working tree,
+// where an invariant this build added stands as by design on its own audit; a warning in a log nobody
+// reads was the only trace. The audit-OFF route keeps running with no `base` (unit 35's warning).
+if (specAudit && !/^[0-9a-f]{7,40}$/.test(base)) {
+  throw new Error('unattended-build: `specAudit` is declared beside no pinned `base` (got ' +
+    JSON.stringify(a.base) + '). The audit reads its by-design block at that base, and read at none ' +
+    'an invariant this build added stands as by design on its own audit. Pass the run-state file\'s ' +
+    '`base` fact under a mandate, else the sha the build branched from.')
+}
 if (subjectRound > roundNo) {
   throw new Error(
     'unattended-build: `subjectRound` ' + subjectRound + ' is above `round` ' + roundNo + '. A subject ' +
@@ -456,7 +468,8 @@ const resumeRemedy =
 const AUDIT_CHECKLIST = 'python tools/memory-tree/gotchas.py --for-paths'
 // TOOL-aGraftedHelix-29 S9 - the checker reads the audit's by-design block AT THE RUN'S PINNED BASE, so
 // an invariant this build added or edited is an item on its own audit and never an exemption. Only a
-// `base` of the shape `badSubject` tests is forwarded; any other value pins nothing and is warned of.
+// `base` of the shape `badSubject` tests is forwarded; beside a declared audit any other value is
+// refused above (TOOL-aGraftedHelix-36 S3), so the audit always reads at one.
 // TOOL-aGraftedHelix-35 - the audit's block is the RESOLVER'S alone: the spec commit's checklist joins
 // it for its items, and `renderChecklistUnion` leaves that checklist's by-design block out. The spec
 // commit's own checker reads at this same base too, through `SPEC_COMMIT_CHECKLIST` below, because the
@@ -1299,11 +1312,8 @@ if (specAudit && !subjects) {
       checklist = res.checklist
       checklistFrom = '--for-paths over ' + (Array.isArray(res.checklistPaths) ? res.checklistPaths.length : 0) + ' path(s)' +
         (auditBase ? ' at base ' + auditBase.slice(0, 12) : '')
-      // The one route on which the audit's by-design block is the stdout of the command this stage ran.
-      if (!auditBase) {
-        log('WARNING: the audit\'s checklist reads invariants from the working tree — no pinned `base` was passed, ' +
-          'so an invariant this build added can stand as by design')
-      }
+      // The one route on which the audit's by-design block is the stdout of the command this stage ran,
+      // and a declared audit with no pinned base never reaches it (S3's refusal above).
     } else checklistWhy = res && typeof res.checklist === 'string' && res.checklist.trim()
       ? 'no bug class selected'
       : (res && typeof res.checklistError === 'string' && res.checklistError) || 'the resolver returned neither `checklist` nor `checklistError`'

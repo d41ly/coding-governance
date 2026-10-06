@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.131 -->
+<!-- gov:kit memory-tree@2.132 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -181,7 +181,7 @@ checklist over what you just committed, and act on it before the next pass begin
 python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD
 ```
 
-**It takes a COMMITTED range and always exits 0**: the trap and the reading are beside its row in `tools/memory-tree/README.md`.
+**It takes a COMMITTED range, exits 0 whenever it prints a checklist, and 1 with a `HYGIENE gotchas:` line when it refuses the range**: the trap and the reading are beside its row in `tools/memory-tree/README.md`.
 
 **A pass runs no merge bar and no self-test suite.** Its verification is the direct check its
 spec's acceptance names — a checker run on a staged break, a `--selftest` flag, a fixture — and a

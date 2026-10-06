@@ -129,7 +129,10 @@ fixed tail and reds on a spelling outside the evaluated set. It rides `check-pro
 in check mode over the memory-tree directory that leg already resolves, so no new leg exists and the
 sibling kit stays a derived path. Its `--selftest` runs from the build-harness suite, not the bar.
 `check-workflow-syntax.js` also bans a `git commit` line with no ` -- ` pathspec in any workflow
-script, since a pathless commit takes every entry already staged (`TOOL-aGraftedHelix-32`).
+script, since a pathless commit takes every entry already staged (`TOOL-aGraftedHelix-32`). The pass
+grades a commit anywhere on a code line, `git -C` included, skips comments and `git commit-tree`,
+prints how many lines it graded, and reds a zero beside the build harness render as a dead probe; the
+build harness refuses a declared `specAudit` beside no pinned `base` (`TOOL-aGraftedHelix-36`).
 
 ## Gaps
 

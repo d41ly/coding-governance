@@ -28,7 +28,7 @@
 # rewriting settings.json, the file the SessionStart hook lives in. Each auto-fix that sets a value
 # appends one `hookspath-set` or `merge-driver-set` line to the health log under the git common dir,
 # which the orientation card counts; the format is the `health_log_sh` block's header below.
-KIT_CHECK_WIRING_VERSION=1.25   # gov:kit check-wiring@1.25 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.26   # gov:kit check-wiring@1.26 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -1235,16 +1235,36 @@ check_skill_install() {
   # branch lands. Reporting it UNWIRED made `--check` fail in exactly that worktree, and the unattended
   # driver's preflight delegates to `--check`, so a build editing the engine could never re-preflight
   # (aGraftedHelix, 2026-10-05). The install drifting from the primary as well still reds below.
-  # WHAT THIS DOES NOT CHECK: that the primary checkout is on the default branch, or current.
+  # THE NOTE IS EARNED BY THE BRANCH'S OWN EDIT (TOOL-aGraftedHelix-36 S6). Under the shipped junction
+  # install the install IS the primary checkout, so matching it proved nothing: a primary that lags
+  # the branch's base matched too, and the note hid a stale engine. Every differing file must also
+  # differ between HEAD and its merge base with the clone's one remote's HEAD; otherwise the primary
+  # lags, or no tip resolves to tell, and the line is UNWIRED with a fast-forward of the primary as
+  # its remedy. WHAT THIS DOES NOT CHECK: that the primary checkout is on the default branch; and an
+  # engine edit left uncommitted in this worktree is not the branch's own, so it reads UNWIRED.
   if [ -n "$bad" ] && ! [ "$primary" -ef "$ROOT" ] && [ -d "$primary/$rel" ]; then
-    local pbad=""
+    local pbad="" r tip="" mb="" own=""
     for f in SKILL.md MANIFEST-TEMPLATE.md manifest-check.sh; do
       a=$(LC_ALL=C tr -d '\r' < "$inst/$f" | cksum)
       b=$(LC_ALL=C tr -d '\r' < "$primary/$rel/$f" 2>/dev/null | cksum)
       [ "$a" = "$b" ] || pbad="$pbad $f"
     done
     if [ -z "$pbad" ]; then
-      echo "note     skill     — this worktree's branch edits the engine in:${bad}; the install matches the primary checkout's, so the edit reaches it when the branch lands"
+      r=$(git remote 2>/dev/null); case "$r" in *$'\n'*) r="" ;; esac
+      [ -z "$r" ] || tip=$(git rev-parse -q --verify "refs/remotes/$r/HEAD" 2>/dev/null)
+      [ -z "$tip" ] || mb=$(git merge-base HEAD "$tip" 2>/dev/null)
+      [ -z "$mb" ] || own=1
+      for f in $bad; do [ -n "$own" ] || break; git diff --quiet "$mb" HEAD -- "$rel/$f" && own=""; done
+      if [ -n "$own" ]; then
+        echo "note     skill     — this worktree's branch edits the engine in:${bad}; the install matches the primary checkout's, so the edit reaches it when the branch lands"
+        return
+      fi
+      if [ -n "$mb" ]; then
+        echo "UNWIRED  skill     — the installed engine differs from tracked in:${bad}; the install matches the primary checkout, which lags this branch's base. Fix: git -C $primary pull --ff-only"
+      else
+        echo "UNWIRED  skill     — the installed engine differs from tracked in:${bad}; the install matches the primary checkout, and no single remote's HEAD resolves to tell this branch's own edit from a primary that lags. Fix: git remote set-head <remote> -a, or git -C $primary pull --ff-only"
+      fi
+      unwired=$((unwired+1))
       return
     fi
   fi

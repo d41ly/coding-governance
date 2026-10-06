@@ -208,6 +208,31 @@ derive_push_failure() {  # -> refused | unreachable | unchanged | race on stdout
   echo race
 }
 
+# THE CLAIM-PUSH LOCK (TOOL-aGraftedHelix-36 S10). A run-claim writer in this git dir takes the
+# directory `claim-push.lock` before it tests this script's marker, and holds it across its push,
+# whose pre-push hook clears both verdict files this script reads. The marker is touched FIRST and
+# this waits SECOND, so a claim push already past its marker test finishes, and its hook's clear
+# lands, before the verdict files are cleared for this push. The bound is the deadline the writer
+# records in the lock's `until`, never a copy of its kit's constant, under CLAIM_WAIT_CEILING for a
+# lock that carries none or one further out. Always 0: an expired or ceiling-bound lock is announced
+# and passed, never cleared here, because the writer clears a stale lock on its next take.
+# WHAT THIS DOES NOT CHECK: a writer in ANOTHER git dir, whose hook clears that git dir's files.
+CLAIM_WAIT_CEILING=120
+check_claim_push_clear() {  # -> 0 always, once no live lock holds this git dir or its bound passed
+  local lk="$gd/claim-push.lock" u t0 now why=""
+  t0=$(date +%s); now=$t0
+  while [ -d "$lk" ]; do
+    u=""; { read -r u <"$lk/until"; } 2>/dev/null || :
+    case "$u" in *[!0-9]*) u="" ;; esac
+    if [ -n "$u" ] && [ "$u" -le "$now" ]; then why="whose deadline passed"; break; fi
+    if [ $(( now - t0 )) -ge "$CLAIM_WAIT_CEILING" ]; then why="after the ${CLAIM_WAIT_CEILING}s ceiling"; break; fi
+    sleep 1; now=$(date +%s)
+  done
+  [ "$now" = "$t0" ] || echo "push-main: waited $(( now - t0 ))s for a claim push in flight in this git dir" >&2
+  [ -z "$why" ] || echo "push-main: proceeding past a claim-push lock $why: $lk" >&2
+  return 0
+}
+
 # THE LANDER MARKER, when the project declares one. It carries the pushed COMMIT, not just its own
 # existence: a bare touched file is satisfied by any previous landing, which is the
 # pass-by-finding-anything shape the unattended kit's own Definition of Done was stuck in before
@@ -510,25 +535,31 @@ cmd_land() {
       exit 1
     fi
     check_carry_set "$R" || exit 1
+    # IN THIS WORKTREE'S OWN GIT DIR, which is the one the pre-push hook reads when the push is
+    # issued from here. The lander marker below is the one resolved against the COMMON dir; the two
+    # files answer different questions and live in different places on purpose. Touched BEFORE the
+    # clear and held until the verdict files are read (TOOL-aGraftedHelix-36 S10).
+    touch "$marker"
+    check_claim_push_clear
     # The hook's verdict and the bar it vetted are cleared before every push, as the attended path
     # clears them, so a file an earlier push's hook wrote cannot be read as this one's answer.
     rm -f "$refusal" "$barfile"
-    # IN THIS WORKTREE'S OWN GIT DIR, which is the one the pre-push hook reads when the push is
-    # issued from here. The lander marker below is the one resolved against the COMMON dir; the two
-    # files answer different questions and live in different places on purpose.
-    touch "$marker"
     echo "push-main: gating + pushing ${t:0:8} to $def (attempt $attempt/$max)..." >&2
     # HEAD, never refs/heads/<def>: the local default branch is shared by every build on this node,
     # and publishing it is the defect these flags close. Its output is SHOWN and never read (S2).
     git push "$remote" "HEAD:refs/heads/$def" >&2
     rc=$?
-    rm -f "$marker"
     if [ "$rc" -eq 0 ]; then
       write_lander_marker || exit 1
+      cls=landed
+    else
+      cls=$(derive_push_failure)
+    fi
+    rm -f "$marker"
+    if [ "$cls" = landed ]; then
       echo "push-main: landed $def on $remote." >&2
       exit 0
     fi
-    cls=$(derive_push_failure)
     case "$cls" in
       race)
         # RE-PREPARE, rather than merging the new tip INTO the branch. That reconcile makes a merge
@@ -613,23 +644,29 @@ while [ "$attempt" -le "$max" ]; do
     fi
   fi
 
-  rm -f "$refusal" "$barfile"
+  # The marker first, then the wait for a claim push in flight, then the clear (TOOL-aGraftedHelix-36
+  # S10); the marker stays until the verdict files have been read.
   touch "$marker"
+  check_claim_push_clear
+  rm -f "$refusal" "$barfile"
   echo "push-main: gating + pushing $def (attempt $attempt/$max)..." >&2
   # THE PUSH'S OUTPUT IS SHOWN, NEVER READ (S2). It carries the bar's own output, so classifying on
   # its words let any leg that printed `connection` report a red bar as an unreachable remote
   # (TOOL-aHonedRuleset-10), and any leg that printed `rejected` fake a race and re-run the bar.
   git push "$remote" "$def" >&2
   rc=$?
-  rm -f "$marker"
   if [ "$rc" -eq 0 ]; then
     write_lander_marker || exit 1
+    cls=landed
+  else
+    # The hook's verdict first, then a probe, then ancestry: derive_push_failure, shared with --land.
+    cls=$(derive_push_failure)
+  fi
+  rm -f "$marker"
+  if [ "$cls" = landed ]; then
     echo "push-main: landed $def on $remote." >&2
     exit 0
   fi
-
-  # The hook's verdict first, then a probe, then ancestry: derive_push_failure, shared with --land.
-  cls=$(derive_push_failure)
   case "$cls" in
     race)
       echo "push-main: push rejected — $remote/$def advanced during the gate; re-reconciling and re-gating..." >&2

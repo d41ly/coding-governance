@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.81 -->
+<!-- gov:kit unattended@1.82 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -324,8 +324,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `work-landed-at: <witness> <tip>` when the content predicate reads the run's own commits on the
   advertised tip and none reverted; the working one gains `abandoned` too and keeps its phase. It
   refuses, numbered and before any write, everything else, an unanswered remote and an undecidable
-  predicate; a settled record is said so, with nothing written. It STAGES and never commits. The
-  contract is `UNATTENDED-STOPS.md` §12.
+  predicate; a settled record is said so and not rewritten, and the re-run retries the run claim's
+  status write over a claim of the record's own lease still `held` or `live`, so a first write that
+  did not complete names this re-run as its remedy. It STAGES and never commits. The contract is
+  `UNATTENDED-STOPS.md` §12.
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
   effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
   nothing, so the machine items assert obligations it does not have, while the idle-wake is still

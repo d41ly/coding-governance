@@ -9,7 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 290d0d2d5ae893a2d723a2247ad788035d3bffdf · park · 9 touching
+refreshed-at: 290d0d2d5ae893a2d723a2247ad788035d3bffdf · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 7dca26485330e71ec546c9c2d5625f32ba038c15
 phase: BUILDING
@@ -85,3 +85,5 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-06T02:41:25Z brief · item TOOL-aGraftedHelix-36 · reason a2e60ebbeb07 memory/builds/aGraftedHelix/prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md
 
 2026-10-06T02:42:03Z dispatch · item b56ec1fd TOOL-aGraftedHelix-36 · reason tools/unattended tools/workflows tools/memory-tree tools/push-main.sh tools/push-main.test.sh tools/check-wiring.sh tools/check-wiring.test.sh tools/check-wiring.fragment.json tools/govkit/entries memory/gotchas/decision-re-derived-by-a-second-process.md memory/gotchas/orchestrator-hand-off-owed-a-disposition.md memory/gotchas/porcelain-diff-names-a-rename-by-its-destination.md memory/guides .claude/skills/unattended/SKILL.md memory/map memory/HYGIENE.md memory/TEMPLATE-SPEC.md memory/builds/aGraftedHelix/spec/2026-10-06-spec-TOOL-aGraftedHelix-36.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md
+
+2026-10-06T03:34:28Z decision · item unit-34-close-handoff · reason question: who runs unit 34's hand-off to the close, the pooled calibration of the five receiving shards and the eight-shard identity; options: a unit of this build, or the main loop at VERIFYING; reason: both are suite runs, which no pass may perform, and the unattended kit's README already makes the pooled suites the DoD for work touching the kit, so the close owns them

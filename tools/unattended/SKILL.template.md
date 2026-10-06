@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.81 -->
+<!-- gov:kit unattended@1.82 -->
 
 # Unattended runs
 
@@ -716,7 +716,10 @@ definition, so the absence is a decision and not an oversight.
   **The harness call carries `scratch: <your session scratchpad, absolute>`** — the path your own
   system prompt names, never `$TMPDIR` — and refuses without it; every agent it spawns is told that
   is where temporary files go, and the child receives it in `dispatch.args` and refuses too, both
-  without the key and with a `ground` that does not name it.
+  without the key and with a `ground` that does not name it. **Every call also carries
+  `base: <the run's pinned base fact>`**, audit on or off: it pins the spec audit's checklist and
+  the spec commit's checklist at the base the run was authorized at, and the harness refuses a
+  declared `specAudit` without it.
   **A review the platform killed DEFERS, and you re-run it ONCE.** When the harness returns
   `exit: 'deferred-platform'`, a lens, a skeptic batch or the synthesis of its AUDIT review returned
   nothing: no round was recorded, nothing was built, and every agent that did return left its result
@@ -752,8 +755,9 @@ definition, so the absence is a decision and not an oversight.
 
   It takes a COMMITTED range, so it runs AFTER the commit and never before it — the pre-commit
   spelling resolves to an empty range and prints "touches no file", which reads exactly like a clean
-  checklist and is not one. Its stdout IS the checklist and it always exits 0, so finish it rather
-  than reading its status. A class it names that is already violated is the next pass. (Adopters
+  checklist and is not one. Its stdout IS the checklist and it exits 0 whenever it prints one, and 1
+  with a `HYGIENE gotchas:` line when it refuses the range, so finish it rather than reading its
+  status. A class it names that is already violated is the next pass. (Adopters
   whose memory tree ships without that kit have no such command; the obligation is then whatever
   their own build method names.)
 - Check yourself with `bash {{KIT_DIR}}/unattended.sh --status <slug>`, and the units with

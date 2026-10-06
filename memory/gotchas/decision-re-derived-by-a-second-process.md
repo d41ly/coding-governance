@@ -60,11 +60,22 @@ verdict; it deletes it. The remedy is the same channel rule turned on writers: e
 trusts has exactly one writer per push, so `write_claim` pushes nothing while `push-main-active`
 sits in that git dir, returning its not-completed code with a reason naming the marker.
 
+That guard was itself a check-then-act (`TOOL-aGraftedHelix-36`, from the rotated closing review's
+L1): a claim push that tested the marker a moment before push-main touched it went on to push, and
+its hook cleared the files the lander had just cleared and was about to have rewritten. The window is
+closed by a lock both sides honour in the same git dir. `write_claim` takes `claim-push.lock` before
+it tests the marker, records its deadline in it, and releases it on every path; push-main touches
+its marker, then waits for no live lock, then clears its verdict files and pushes, and clears the
+marker only after it has read them. Whichever side moves second sees the other.
+
 ## Its gate
 
 The verdict-file instance is **gated by** the driver suite's GH32 AC6 arm, which plants
 `push-main-active` and a `pre-push-refusal` beside a due beat and asserts the file byte-identical and
-the claim ref unmoved; it read RED against a driver copy without the guard.
+the claim ref unmoved; it read RED against a driver copy without the guard. The lock is gated by
+the driver suite's GH36 AC14 arms, a live lock skipping the beat and an expired one cleared and
+released, and by `tools/push-main.test.sh` cases 2d and 2e, the lander waiting on a live lock and
+passing an expired one; each read RED with its half of the lock cut.
 
 No class-wide machine gate: a predicate that found two processes reading one name would red on every
 sanctioned shared setting. The instance is gated by `tools/push-main.test.sh` arms H1 and H1b, which

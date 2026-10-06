@@ -59,7 +59,11 @@ does not complete is check 109, and `--claims` lists them all. The beat is a rem
 record is never restaged for it (`TOOL-aGraftedHelix-1`). Where `RUN_CLAIMS` is off, `--claims` prints
 `claims: off` and reads nothing. A claim push waits while push-main holds `push-main-active` in the
 same git dir, and a `--preflight` refused after its claim write restores the record and writes a claim
-it created `aborted` (`TOOL-aGraftedHelix-32`). The class `orchestrator-hand-off-owed-a-disposition.md`
+it created `aborted` (`TOOL-aGraftedHelix-32`). The claim push takes `claim-push.lock` in that git dir
+before it tests the marker, and push-main touches its marker before it waits on the lock, so the two
+pushes serialise; a `--settle` re-run over a settled record retries the claim's status write through
+`write_settle_claim`, over a `held` or `live` claim of the record's own lease alone
+(`TOOL-aGraftedHelix-36`). The class `orchestrator-hand-off-owed-a-disposition.md`
 is claimed here because its remedy is a stop: a discovery handed to the orchestrator resolves to a
 unit or to a row `--park` writes, and the close checks every such line does.
 
