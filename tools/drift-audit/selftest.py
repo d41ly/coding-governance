@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 397
+CHECK_FLOOR = 402
+# 397 -> 402, TOOL-aMendedFleet-91: the five records-only checks of signal 6.
 # 383 -> 397, TOOL-aMendedFleet-90: the fourteen checks of `test_dead_streaks`.
 # 377 -> 383, TOOL-aMendedFleet-59: the six every-git-dir checks in `test_legs_retried_after_timeout`.
 # 365 -> 377, TOOL-aMendedFleet-57: the twelve checks of `test_shrink_low_water`.
@@ -703,6 +704,40 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
           [d["id"] for d in v6w2["detail"]] == ["(stale waiver)"],
           f"got {v6w2['detail']} -- a stale waiver is being swallowed")
     waiver.unlink()
+
+    # THE RECORDS-ONLY VERB (TOOL-aMendedFleet-91). One fixture, CLOSED and certified by nothing, so
+    # it FIRES bare: asserted first, or the exemption arm passes without the verb doing anything.
+    ro_rel = SPEC_DIR_FOR_FIXTURE + "/2026-02-02-spec-aRecords-1.md"
+    ro = r / ro_rel
+    ro_h1 = "# TOOL-aRecords-1 — a census, records and nothing else\n\n"
+    ro_status = "**Status:** CLOSED · rev-1 · 2026-02-02 · node a · Tier-1 · base 0000000"
+
+    # (status tail, body, waiver row, label, detail ids wanted, records_only wanted). The body arm
+    # spells the token between `·` separators, so a read of the whole text rather than the status
+    # line alone reds it.
+    for tail, body, row, why, want, listed in (
+        ("", "", "", "the records-only fixture fires BEFORE it declares the verb",
+         ["TOOL-aRecords-1"], []),
+        (" · records-only · order 7", "", "", "a CLOSED spec declaring records-only is silent and listed",
+         [], [ro_rel]),
+        (" · records-only", "", ro_rel + "\tTOOL-aRecords-1\tdeclared twice\n",
+         "the verb beside a waiver row reports the row stale, naming the declaration",
+         ["(stale waiver)"], [ro_rel]),
+        (" · records-only-ish", "", "", "a lookalike tail token exempts nothing",
+         ["TOOL-aRecords-1"], []),
+        ("", "\n## 1. Goal\n\nIts tail would read · records-only · were it declared.\n", "",
+         "records-only in body prose exempts nothing", ["TOOL-aRecords-1"], []),
+    ):
+        ro.write_text(ro_h1 + ro_status + tail + "\n" + body, encoding="utf-8", newline="\n")
+        if row:
+            waiver.write_text(row, encoding="utf-8", newline="\n")
+        got = report(r)["closed_specs_with_no_product_commit"]
+        if row:
+            waiver.unlink()
+        named = not row or bool(got["detail"]) and "records-only" in got["detail"][0].get("note", "")
+        check(why, [d["id"] for d in got["detail"]] == want and got["records_only"] == listed
+              and named, f"got {got['detail']} records_only={got.get('records_only')}")
+    ro.unlink()
 
     # --- 3 — --check honours the pin in BOTH directions -------------------------------------
     print("--check pin semantics")

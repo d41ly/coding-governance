@@ -1014,6 +1014,10 @@ _HEADER_DATE = re.compile(r"^\*\*Status:\*\*[^\n]*?(\d{4}-\d{2}-\d{2})", re.M)
 # CLOSED only. WONTDO is terminal too and is deliberately NOT judged: an abandoned unit correctly has
 # no product commit, so judging it would manufacture a permanent false positive out of a true record.
 TERMINAL = frozenset({"CLOSED"})
+# TOOL-aMendedFleet-91. A unit whose deliverable is records declares it in its OWN status header, at
+# speccing time where its review reads it, as a whole `·`-separated tail field of exactly these bytes.
+# Matched on the status line alone, so `records-only-ish` and a sentence in the body exempt nothing.
+_RECORDS_ONLY = re.compile(r"·\s*records-only\s*(?:·|$)")
 
 
 def signal_closed_specs_untraceable(ctx) -> dict:
@@ -1097,7 +1101,7 @@ def signal_closed_specs_untraceable(ctx) -> dict:
             waived[cols[0].strip()] = cols[-1].strip() if len(cols) > 1 else ""
     used: set[str] = set()
 
-    suspect, checked, unjudged = [], 0, 0
+    suspect, checked, unjudged, records_only = [], 0, 0, []
     for p in sorted(ctx.root.glob(f"{ctx.memory_root}/builds/*/spec/**/*.md")):
         head = p.read_text(encoding="utf-8", errors="replace")[:4000]
         m = _STATUS.search(head)
@@ -1118,13 +1122,19 @@ def signal_closed_specs_untraceable(ctx) -> dict:
         # line; the slug guard was added below it, so a pre-slug-era id landed in BOTH the judged
         # denominator and the unjudged count, and a corpus that was entirely pre-slug read as live.
         checked += 1
+        rel = str(p.relative_to(ctx.root)).replace("\\", "/")
+        # BEFORE the slug join, so no sibling's product commit, present or absent, moves the reading.
+        # A waiver row naming this spec is then left unconsumed and the sweep below reports it: the
+        # same fact declared in two places is a finding, not a silence.
+        if _RECORDS_ONLY.search(head[m.start():].split("\n", 1)[0].rstrip()):
+            records_only.append(rel)
+            continue
         # SLUG ONLY, and that is not a narrowing: `\bslug\b` already matches inside
         # `FAMILY-slug-seq`, because the hyphens either side of the slug are non-word bytes.
         # An `id or slug` disjunct reads like a two-key oracle and is one unfalsifiable clause;
         # the id half could never decide a case the slug half did not already decide.
         if re.search(r"\b" + re.escape(slug) + r"\b", subjects):
             continue
-        rel = str(p.relative_to(ctx.root)).replace("\\", "/")
         if rel in waived:
             used.add(rel)
             continue
@@ -1136,7 +1146,8 @@ def signal_closed_specs_untraceable(ctx) -> dict:
     for rel in sorted(set(waived) - used):
         suspect.append({
             "file": rel, "id": "(stale waiver)", "slug": "(stale waiver)", "closed": "",
-            "note": "waives a spec that is absent, not terminal, or traceable again",
+            "note": "waives a spec that is absent, not terminal, traceable again, or declaring "
+                    "records-only in its own status header",
         })
     if bad_declaration:
         suspect.append({
@@ -1152,6 +1163,7 @@ def signal_closed_specs_untraceable(ctx) -> dict:
         "live": checked > 0,
         "unjudgeable": unjudged,
         "detail": suspect,
+        "records_only": sorted(records_only),
     }
 
 

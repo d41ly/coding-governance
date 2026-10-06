@@ -52,6 +52,11 @@ PRODUCT_GLOBS: list[str] = [
 # because cTracedPromise-1 §3 rules it out in writing. The remedy is a row in
 # `memory/project/trace-waiver.txt`, which now exists and carries the first five.
 #
+# A RECORDS-ONLY unit (a journal, an evaluation, a census) does NOT take a waiver row: it declares
+# `records-only` as a field of its own status header when it is specced (TOOL-aMendedFleet-91), and
+# the signal sets it aside before the slug join. The waiver keeps the other shape, a unit whose
+# product landed before the id-in-subject convention.
+#
 # It is a grandfather, not a knob to tune until the number looks good. Before that commit the subjects
 # were `feat(memory-tree)!: U1 — …` and `fix(aStandingWrit): …` — the unit number or the slug, never
 # the id — so 36 CLOSED specs are correctly unjudgeable. A cutoff of 2026-08-12 would read 0 misses

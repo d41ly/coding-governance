@@ -99,8 +99,10 @@ TRACE_CUTOFF: str = ""
 TRACE_GLOBS: list[str] = []
 
 # TRACE_WAIVER: where the signal's per-spec waiver registry lives, repo-relative. One row per waived
-# spec, `<spec path><TAB><reason>`, for a CLOSED unit no TRACE_GLOBS subject can ever name, such as a
-# records-only or tooling-only deliverable. BLANK keeps `<MEMORY_ROOT>/project/trace-waiver.txt`,
+# spec, `<spec path><TAB><reason>`, for a CLOSED unit no TRACE_GLOBS subject can ever name, such as
+# one whose product landed before your id-in-subject convention. A records-only deliverable takes NO
+# row: its spec declares `records-only` as a `·`-separated field of its status header, and the signal
+# sets it aside and lists it under `records_only`. BLANK keeps `<MEMORY_ROOT>/project/trace-waiver.txt`,
 # where an absent file is an empty waiver set. Declare it when your memory tree has no `project/`
 # directory. A DECLARED path that is absent or outside the tree is a finding of its own.
 TRACE_WAIVER: str = ""

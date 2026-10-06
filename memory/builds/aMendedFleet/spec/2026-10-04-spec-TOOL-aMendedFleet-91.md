@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-91 — a spec's status header declares a records-only deliverable, and the product-commit signal reads it
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes TOOL-aProbedToolkit-18 · advances TOOL-aReplayedCard-6 · order 91
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes TOOL-aProbedToolkit-18 · advances TOOL-aReplayedCard-6 · order 91
 
 <!-- gen:spec-records -->
 

@@ -642,3 +642,7 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-06T05:22:02Z dispatch · item e0647a17 TOOL-aMendedFleet-90 · reason tools/drift-audit/drift_report.py tools/drift-audit/drift_signals.template.py tools/drift-audit/selftest.py tools/drift-audit/README.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-90.md memory/builds/aMendedFleet/README.md
 
 2026-10-06T05:38:25Z brief · item TOOL-aMendedFleet-91 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
+
+2026-10-06T05:53:01Z dispatch · item 5fab7a84 TOOL-aMendedFleet-91 · reason tools/drift-audit/drift_report.py tools/drift-audit/drift_signals.py tools/drift-audit/drift_signals.template.py tools/drift-audit/selftest.py tools/drift-audit/README.md memory/project/trace-waiver.txt memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-91.md memory/builds/aMendedFleet/README.md
+
+2026-10-06T06:09:41Z dispatch · item 5fab7a84 TOOL-aMendedFleet-91 · reason tools/drift-audit/drift_report.py tools/drift-audit/drift_signals.py tools/drift-audit/drift_signals.template.py tools/drift-audit/selftest.py tools/drift-audit/README.md memory/project/trace-waiver.txt memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-91.md memory/builds/aMendedFleet/README.md memory/backlog/TOOL.md

@@ -126,7 +126,7 @@ never is. A gateable signal whose rows each name their offender by `id` may take
 | `shrink_only_lists_not_shrinking` | has a list that promises to shrink risen above the lowest count its first-parent history reached (`regrown`), or held at least the rows it was seeded with (`never drained`)? A row whose history cannot be replayed is `unjudgeable`, never an offender. | no |
 | `handkept_inventories_disagreeing_with_source` | does a hand-kept list still match what generates it? | yes |
 | `dangling_pointers_in_own_ledger` | do this node's auto-memory notes (`AUTO_MEMORY_DIR`) name repo paths that `git ls-files` still carries? | no |
-| `closed_specs_with_no_product_commit` | does a CLOSED spec have a commit that names it and changed the product? | yes |
+| `closed_specs_with_no_product_commit` | does a CLOSED spec have a commit that names it and changed the product? A spec whose status header carries the field `records-only` declares a records deliverable: it is set aside before the commit join and listed under `records_only` in `--json`, and a `trace-waiver.txt` row beside it reports stale. | yes |
 | `lexicon_verbs_declared_but_unused` | does the verb table still describe the code it was derived from? | yes |
 | `lexicon_ratified_older_than_language_surface` | was the table curated since the languages it grades last moved? | yes |
 | `live_backlog_rows_per_shard` | is a shard’s live set approaching the floor rotation cannot clear? Under `BACKLOG_MODE="builds"`, how many asks derive live, read from the generator’s own live projection? | no |
