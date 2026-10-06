@@ -286,7 +286,7 @@ ids TOOL-aMendedFleet-108 TOOL-aMendedFleet-109
 | [TOOL-aMendedFleet-105 — the reaper's verification settles, so a member dying as it is signalled is not a survivor](spec/2026-10-05-spec-TOOL-aMendedFleet-105.md) | 106 | 1 | SPECCED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 55 bound to this build, across 3 record folder(s).
+Records: 57 bound to this build, across 3 record folder(s).
 
 Ids no record names: KICK-aMendedFleet-1 KICK-aMendedFleet-2 KICK-aMendedFleet-3 KICK-aMendedFleet-4 PLAY-aMendedFleet-2 PLAY-aMendedFleet-3 PLAY-aMendedFleet-4 TOOL-aMendedFleet-11 TOOL-aMendedFleet-15 TOOL-aMendedFleet-18 TOOL-aMendedFleet-20 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23
 TOOL-aMendedFleet-24 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-30 TOOL-aMendedFleet-34 TOOL-aMendedFleet-36 TOOL-aMendedFleet-4 TOOL-aMendedFleet-40 TOOL-aMendedFleet-41 TOOL-aMendedFleet-42 TOOL-aMendedFleet-43 TOOL-aMendedFleet-44 TOOL-aMendedFleet-45 TOOL-aMendedFleet-46

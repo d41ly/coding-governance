@@ -7,6 +7,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-06-build-TOOL-aMendedFleet-93-ab.py](../build/2026-10-06-build-TOOL-aMendedFleet-93-ab.py) | journal | — |
+| [2026-10-06-build-TOOL-aMendedFleet-93-arm-a-report.md](../build/2026-10-06-build-TOOL-aMendedFleet-93-arm-a-report.md) | journal | — |
+| [2026-10-06-build-TOOL-aMendedFleet-93-arm-b-report.md](../build/2026-10-06-build-TOOL-aMendedFleet-93-arm-b-report.md) | journal | — |
 | [2026-10-06-build-TOOL-aMendedFleet-93-run-brief.md](../build/2026-10-06-build-TOOL-aMendedFleet-93-run-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
