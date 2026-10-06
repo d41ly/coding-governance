@@ -25,7 +25,9 @@
 # `check 23 exclusion UNAVAILABLE`, which share check 7's predicate (TOOL-aSightedSkeptic-13), and
 # check 23's `check 23 SOLO` line with its run's graded-and-overlapped count, an undeclared write the
 # check found and did not count because its pass overlapped no sibling (TOOL-aWindowedPass-1), and its
-# `check 23 OTHER RUN` line, counted writes of a run this tree does not drive (TOOL-aWindowedPass-5). They are not skips. An exclusion is a positive
+# `check 23 OTHER RUN` line, counted writes of a run this tree does not drive (TOOL-aWindowedPass-5), and
+# its `check 23 fleet` line, every graded record's counted writes totalled, which never fails the leg
+# (TOOL-aMendedFleet-92). They are not skips. An exclusion is a positive
 # finding that CHANGED THE VERDICT — a record the check stopped counting — and the reader of a green
 # run is entitled to know which one and on what evidence. Routing them through REPORT was the first
 # implementation and it made the exclusion invisible on every bar run, which is the check-quietly-
@@ -3672,6 +3674,9 @@ ds_unavail=0
 # THE RUN THIS TREE DRIVES (TOOL-aWindowedPass-5): the record whose run branch is the branch checked
 # out here. A detached HEAD binds none. Read once; every record below is compared against it.
 DS_HEAD_REF=$(GIT symbolic-ref -q HEAD 2>/dev/null || true)
+# THE FLEET TOTALS (TOOL-aMendedFleet-92): counted writes, graded passes, graded records and one
+# `<slug>=<n>` pair per record holding a counted write, summed across every record graded below.
+ds_fleet_n=0; ds_fleet_g=0; ds_fleet_r=0; ds_fleet_over=""
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
@@ -3715,6 +3720,7 @@ for f in $RUNS; do
     ds_unavail=1
     printf 'unattended: check 23 exclusion UNAVAILABLE — no advertised default-branch tip resolves in this clone, so a LANDING record already on the remote cannot be told from a live one; every LANDING record with dispatch rows is graded\n'
   fi
+  ds_fleet_r=$((ds_fleet_r + 1))
   while IFS= read -r dsrow; do
     [ -n "$dsrow" ] || continue
     dsitem=${dsrow#* dispatch · item }; dsitem=${dsitem%% · reason *}
@@ -3857,6 +3863,7 @@ DSSIBS
   done <<DSROWS
 $dsrows
 DSROWS
+  ds_fleet_g=$((ds_fleet_g + ds_run_graded))
   [ -n "$ds_pend" ] || continue
   # ---- OVERLAP (TOOL-aWindowedPass-1 S1/S2). A declaration is the disjointness proof for passes that
   # ---- ran AT THE SAME TIME, so only a pass whose window overlapped a sibling unit's is counted: one
@@ -3929,6 +3936,7 @@ DSPEND
   # ---- WHAT THIS DOES NOT CHECK: a run nobody drives from a checkout is never failed by this check,
   # ---- on the bar or anywhere else, until a tree on its branch runs the leg.
   [ "$ds_over_n" -gt 0 ] || continue
+  ds_fleet_n=$((ds_fleet_n + ds_over_n)); ds_fleet_over="$ds_fleet_over $dsslug=$ds_over_n"
   dsrb=$(fact_of "$f" run-branch); [ -n "$dsrb" ] || dsrb=$(fact_of "$f" branch-ref)
   if [ -z "$dsrb" ]; then
     # A RECORD NAMING NO RUN BRANCH (a detached preflight) matches no checkout, its own close included,
@@ -3940,6 +3948,18 @@ DSPEND
     printf 'unattended: check 23 OTHER RUN %s: %s counted, graded at its own close - this tree drives %s\n' "$f" "$ds_over_n" "${DS_HEAD_REF:-a detached HEAD, which binds no run}"
   fi
 done
+# ---- THE FLEET LINE (TOOL-aMendedFleet-92), on the default channel under header exception TWO,
+# ---- whenever a record reached grading. It totals the per-run counts above and never fails the leg:
+# ---- each run is still graded against zero, at its own close. One contract between two kits, its
+# ---- head and first field in node d's words: the drift report's `measure_fleet_over_budget` anchors
+# ---- on the head and reads the `over` and `at` fields by their leading word.
+# ---- WHAT THIS DOES NOT CHECK: a record skipped or excluded above is in no total, and the line binds
+# ---- nowhere - it is the one place a run nobody drives from a checkout is seen at all.
+if [ "$ds_fleet_r" -gt 0 ]; then
+  ds_fleet_over=${ds_fleet_over# }; ds_fleet_at=$(GIT rev-parse HEAD 2>/dev/null)
+  printf 'unattended: check 23 fleet — %s undeclared write(s) over %s graded pass(es) in %s record(s) · budget 0 per run · over %s · at %s\n' \
+    "$ds_fleet_n" "$ds_fleet_g" "$ds_fleet_r" "${ds_fleet_over:-none}" "${ds_fleet_at:0:8}"
+fi
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): every tracked build README carries EXACTLY ONE well-formed
 # ---- `gen:build-units` pair. The driver reads its unit list from that region for four questions -

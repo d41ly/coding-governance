@@ -2738,6 +2738,118 @@ def measure_legs_retried_after_timeout(ctx) -> dict:
 
 
 # --------------------------------------------------------------------------------------------
+# Signal - live runs holding counted undeclared writes (TOOL-aMendedFleet-92, from node d's
+# dUnstuckLanding unit 17)
+#
+# The unattended kit's check 23 grades the run a checkout drives against zero, and prints every
+# graded record's counted writes on one line that never fails a run:
+#   unattended: check 23 fleet — <n> undeclared write(s) over <g> graded pass(es) in <r> record(s)
+#     · budget 0 per run · over <slug>=<n>…|none · at <head8>
+# This signal READS THAT LINE out of the newest run record the merge bar persisted under any git dir
+# of the clone, through `read_git_dirs` and the `_RUN_RECORD_DIR` constant above, and never
+# re-implements check 23: a second copy of its pass-commit join, render skip, ABSORB classification
+# and brief exclusion would be two answers to one question. Running the kit gate instead would cost
+# the leg's whole wall clock against a report measured in seconds.
+#
+# REPORT-ONLY. The total binds nowhere: `gateable: False`. NOT ASKED where the repo carries no
+# `.unattended.conf`; DEAD PROBE where it does and no run record holds a fleet line, which is what a
+# clone that never ran the bar, or ran it before the line existed, looks like. A line that does not
+# parse is detail, never a count. The reader takes only the `over` and `at` fields, by their leading
+# word, so a line carrying no `range` field parses.
+#
+# WHAT IT DOES NOT CHECK: anything newer than the bar run it read. The `at` sha names the HEAD that
+# bar graded, and the detail says when HEAD has moved past it.
+_FLEET_HEAD = "unattended: check 23 fleet — "
+
+
+def _parse_fleet_line(line: str):
+    """The fleet line's `over` pairs, its record count and its `at` sha, or None when it does not parse."""
+    if not line.startswith(_FLEET_HEAD):
+        return None
+    fields = line[len(_FLEET_HEAD):].rstrip("\r\n").split(" · ")
+    m = re.match(r"^(\d+) undeclared write\(s\) over (\d+) graded pass\(es\) in (\d+) record\(s\)$",
+                 fields[0])
+    if not m:
+        return None
+    over, at = None, None
+    for fld in fields[1:]:
+        word, _, rest = fld.partition(" ")
+        if word == "over":
+            over = []
+            for tok in rest.split():
+                slug, eq, n = tok.partition("=")
+                if eq and slug and n.isdigit():
+                    over.append((slug, int(n)))
+        elif word == "at":
+            at = rest.strip()
+    if over is None or not at:
+        return None
+    return {"over": over, "records": int(m.group(3)), "at": at}
+
+
+def measure_fleet_over_budget(ctx) -> dict:
+    """Builds over their undeclared-write budget, read from the newest bar run's check 23 fleet line."""
+    name = "fleet_over_budget"
+    if not (ctx.root / ".unattended.conf").exists():
+        return _build_not_asked(name, "no .unattended.conf at the repo root; the unattended kit, whose "
+                                      "check 23 prints the fleet line, is not adopted")
+    runs = []
+    for base in read_git_dirs(ctx):
+        if not (base / _RUN_RECORD_DIR).is_dir():
+            continue
+        for d in (base / _RUN_RECORD_DIR).iterdir():
+            if d.is_dir():
+                try:
+                    runs.append((d.stat().st_mtime, d.name, d))
+                except OSError:
+                    continue
+    runs.sort(reverse=True)
+    found, unparsed = None, []
+    for _mtime, run_id, d in runs:
+        for out in sorted(d.glob("*.out")):
+            try:
+                text = out.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            for line in text.splitlines():
+                if not line.startswith(_FLEET_HEAD):
+                    continue
+                got = _parse_fleet_line(line)
+                if got is None:
+                    unparsed.append(f"{run_id}/{out.name}: a fleet line that does not parse: {line[:160]}")
+                    continue
+                found = (run_id, got)
+                break
+            if found:
+                break
+        if found:
+            break
+    if found is None:
+        return _build_run_dead(name, 0, "DEAD PROBE — .unattended.conf is present and no run record under "
+                                        f"the git dir's {_RUN_RECORD_DIR}/ carries a check 23 fleet line"
+                                        + (f"; {len(unparsed)} carried one that does not parse" if unparsed else ""))
+    run_id, got = found
+    head = ctx.git.run("rev-parse", "HEAD")
+    head8 = head.stdout.strip()[:8] if head.returncode == 0 else ""
+    moved = bool(head8) and not head8.startswith(got["at"][:8])
+    detail = [f"{slug} {n} at {got['at']}" + (f" (HEAD has moved to {head8} since)" if moved else "")
+              for slug, n in got["over"]]
+    detail.append(f"read from run record {run_id}")
+    detail.extend(unparsed)
+    return {
+        "signal": name,
+        "value": len(got["over"]),
+        "of": got["records"],
+        "tolerance": ctx.pins.get(name, 0),
+        # REPORT ONLY — a closing run's bar never fails on the fleet total (spec F4).
+        "gateable": False,
+        "live": bool(got),
+        "unjudgeable": 0,
+        "detail": detail,
+    }
+
+
+# --------------------------------------------------------------------------------------------
 # Signal - consecutive red runs of the remote CI workflow on the default branch (TOOL-aMendedFleet-8)
 #
 # Every other signal reads the local clone, so a remote CI that has failed for a week was invisible
@@ -2960,7 +3072,7 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            build_source_cited_ids_with_no_record,
            build_backlog_stragglers,
            build_nonterminal_merged_runs,
-           measure_legs_retried_after_timeout,
+           measure_legs_retried_after_timeout, measure_fleet_over_budget,
            build_remote_ci_red_streak,
            build_stale_dossiers,
            build_live_builds_without_activity]

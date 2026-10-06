@@ -139,6 +139,7 @@ never is. A gateable signal whose rows each name their offender by `id` may take
 | `asks_disposed_overrides` | how often did a run buy the `asks-disposed` Definition-of-Done item with an override? | no |
 | `run_records_nonterminal_but_merged` | does a run record still read live after its work reached the default branch? | no |
 | `legs_retried_after_timeout` | how many legs did the merge bar retry, once and alone, after their own ceiling fired, over the run records every git dir of the clone still holds — the common dir and each linked worktree's — and which legs, how often each failed on its retry? A removed worktree takes its records with it. | no |
+| `fleet_over_budget` | which live runs hold undeclared writes counted against check 23's per-run zero, read from the `check 23 fleet` line of the newest bar run any git dir of the clone holds? Not asked without `.unattended.conf`. | no |
 | `remote_ci_red_streak` | how many consecutive completed runs of the declared remote CI workflow on the default branch failed, newest first? Read through `gh`; DEAD PROBE when `gh` cannot answer, not asked under `--check` or with no workflow declared. | no |
 | `cutoff_keys_armed` | how many `_CUTOFF` keys carry a non-blank value across the tracked root-level `.<name>.conf` files? `of` counts every such assignment. | only where `PINS` declares it |
 | `source_cited_ids_resolving_to_no_record` | does every id cited in tracked source resolve to a record, an anchor line under the memory root or a spec's own H1? | no |

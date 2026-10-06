@@ -93,7 +93,9 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 402
+CHECK_FLOOR = 411
+# 402 -> 411, TOOL-aMendedFleet-92: the nine checks of `test_fleet_over_budget`, COUNTED off the arm
+# rather than measured, because the unit pass runs no suite; the close's run re-reads it.
 # 397 -> 402, TOOL-aMendedFleet-91: the five records-only checks of signal 6.
 # 383 -> 397, TOOL-aMendedFleet-90: the fourteen checks of `test_dead_streaks`.
 # 377 -> 383, TOOL-aMendedFleet-59: the six every-git-dir checks in `test_legs_retried_after_timeout`.
@@ -2897,6 +2899,56 @@ def test_legs_retried_after_timeout(tmp: pathlib.Path) -> None:
           [d["leg"] for d in got["detail"]] == ["leg a", "leg b"], f"got {got['detail']}")
 
 
+_FLEET_SIG = "fleet_over_budget"
+
+
+def _write_fleet_out(r: pathlib.Path, run: str, line: str) -> pathlib.Path:
+    """One leg's stdout in a run record under the fixture's git dir, where the gate runner writes it."""
+    d = r / ".git" / "gate-run" / run
+    d.mkdir(parents=True, exist_ok=True)
+    out = d / "0.out"
+    out.write_text("unattended: some other line\n" + line + "\n", encoding="utf-8", newline="\n")
+    return out
+
+
+def test_fleet_over_budget(tmp: pathlib.Path) -> None:
+    """TOOL-dUnstuckLanding-17 S10: the builds over budget, read from the newest bar run's fleet line.
+
+    NOT ASKED without the unattended kit's conf, DEAD where the conf is present and no run record
+    carries the line, and it MOVES with the line: one build over budget reads 1, `over none` reads 0
+    while staying live, and deleting the record returns it to DEAD rather than a reassuring 0.
+    """
+    print("builds over their undeclared-write budget, over the check 23 fleet line")
+    r = make_repo(tmp, name="fleet")
+    got = report(r)[_FLEET_SIG]
+    check("no .unattended.conf: the signal is NOT ASKED", got.get("not_asked") is True, f"got {got}")
+    (r / ".unattended.conf").write_text("MEMORY_ROOT=memory\n", encoding="utf-8", newline="\n")
+    got = report(r)[_FLEET_SIG]
+    check("a conf and no run record: DEAD, not a clean 0",
+          got["live"] is False and not got.get("not_asked"), f"got {got}")
+    head8 = run(["git", "rev-parse", "HEAD"], r).stdout.strip()[:8]
+    out = _write_fleet_out(r, "fx", "unattended: check 23 fleet — 3 undeclared write(s) over 9 graded pass(es) "
+                                    "in 4 record(s) · budget 0 per build · over aFixture=2 · range whole (x) · at 0badc0de")
+    got = report(r)[_FLEET_SIG]
+    check("one build over budget reads value 1", got["value"] == 1, f"got {got['value']}")
+    check("`of` is the record count the line states", got["of"] == 4, f"got {got['of']}")
+    check("report-only: the fleet total is never a refusal", got["gateable"] is False)
+    check("the detail names the build and its count", any("aFixture 2" in str(d) for d in got["detail"]),
+          f"detail {got['detail']}")
+    check("the detail notes that HEAD moved past the line's `at`",
+          any("moved to " + head8 in str(d) for d in got["detail"]), f"detail {got['detail']}")
+    out.write_text("unattended: check 23 fleet — 0 undeclared write(s) over 9 graded pass(es) in 4 record(s) "
+                   "· budget 0 per build · over none · range whole (x) · at " + head8 + "\n",
+                   encoding="utf-8", newline="\n")
+    got = report(r)[_FLEET_SIG]
+    check("`over none` reads 0 and stays LIVE", got["value"] == 0 and got["live"] is True, f"got {got}")
+    out.unlink()
+    got = report(r)[_FLEET_SIG]
+    check("deleting the record returns it to DEAD, not a live 0",
+          got["live"] is False, f"live={got['live']} value={got['value']}")
+
+
+
 def test_cutoff_keys_armed(tmp: pathlib.Path) -> None:
     """TOOL-aMendedFleet-21: armed `_CUTOFF` keys in TRACKED root confs, pinned only where declared.
 
@@ -3751,6 +3803,7 @@ def main() -> int:
         test_backlog_ask_signals(tmp)
         test_asks_disposed_overrides(tmp)
         test_legs_retried_after_timeout(tmp)
+        test_fleet_over_budget(tmp)
         test_remote_ci_red_streak(tmp)
         test_auto_memory_pointers(tmp)
         test_cutoff_keys_armed(tmp)

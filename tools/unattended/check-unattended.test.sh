@@ -4099,6 +4099,39 @@ miss "$out" "UNATTENDED check 23 FAILED"
 git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
 reset_tree
 
+# ---- THE FLEET LINE (TOOL-aMendedFleet-92): every graded record's counted writes, totalled on one
+# ---- default-channel line the drift report reads. It never fails the leg; it prints whenever a record
+# ---- reached grading, and a record excluded before grading is in no total.
+# A: a live record with one counted write - one fleet line, naming the record's slug
+reset_tree
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+out=$(run)
+same "the fleet line prints once for a graded population" "$(grep -c '^unattended: check 23 fleet — ' <<<"$out")" "1"
+hit  "$out" "unattended: check 23 fleet — 1 undeclared write(s) over 1 graded pass(es) in 1 record(s) · budget 0 per run · over tRun=1 · at $(git rev-parse HEAD | cut -c1-8)"
+# B: a graded record with no counted write - `0` and `over none`, and the line still prints
+reset_tree
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+out=$(run)
+hit  "$out" "unattended: check 23 fleet — 0 undeclared write(s) over 1 graded pass(es) in 1 record(s) · budget 0 per run · over none · at "
+miss "$out" "check 23 FAILED"
+# C: the only record is derived LANDED - excluded before grading, so no fleet line prints
+reset_tree
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "tRun lands" --no-verify
+git push -q -f origin HEAD:main
+out=$(run)
+hit  "$out" "check 23 EXCLUDED memory/builds/tRun/RUN.md"
+miss "$out" "check 23 fleet"
+git push -q -f origin "$ANCHOR0":main
+reset_tree
+
 # ---- THE TRAILER, READ ONE WAY EVERYWHERE (closing review r1, M3 and L2).
 # M3: a trailered pass commit whose SUBJECT mentions a sibling is still that pass's alone, and graded
 reset_tree; write_run_branch
