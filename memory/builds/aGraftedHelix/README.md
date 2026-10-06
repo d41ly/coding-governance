@@ -148,7 +148,7 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraf
 | [TOOL-aGraftedHelix-34 — every red arm of the owed unattended suites is fixed, the two pool races are closed, and gate shard 8 is re-cut](spec/2026-10-06-spec-TOOL-aGraftedHelix-34.md) | 18 | 2 | CLOSED | rev-3 | 2026-10-06 |
 | [TOOL-aGraftedHelix-35 — no by-design entry reaches a spec audit unless it stood at the run's pinned base, and the spec commit's checklist reads its invariants there](spec/2026-10-06-spec-TOOL-aGraftedHelix-35.md) | 19 | 2 | CLOSED | rev-1 | 2026-10-06 |
 | [TOOL-aGraftedHelix-36 — the rotated run's closing review MEDIUM and LOW findings, fixed as one batch](spec/2026-10-06-spec-TOOL-aGraftedHelix-36.md) | 20 | 2 | CLOSED | rev-2 | 2026-10-06 |
-| [TOOL-aGraftedHelix-37 — breaking a stale claim-push lock is a step one writer wins](spec/2026-10-06-spec-TOOL-aGraftedHelix-37.md) | 21 | 2 | SPECCED | rev-2 | 2026-10-06 |
+| [TOOL-aGraftedHelix-37 — breaking a stale claim-push lock is a step one writer wins](spec/2026-10-06-spec-TOOL-aGraftedHelix-37.md) | 21 | 2 | SPECCED | rev-3 | 2026-10-06 |
 <!-- /gen:build-units -->
 
 Records: 55 bound to this build, across 4 record folder(s).

@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-37 — breaking a stale claim-push lock is a step one writer wins
 
-**Status:** SPECCED · rev-2 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 21 · ratified 2026-10-06
+**Status:** SPECCED · rev-3 · 2026-10-06 · node a · Tier-2 · base 290d0d2d · streams tooling · order 21 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 
@@ -133,7 +133,9 @@ The race is real on node `a`, but it needs one writer to lag the other by about 
 Its stale read must come before the first writer's removal, and its own removal after the first
 writer's `mkdir`. Released together, both remove the same stale lock and one `mkdir` wins. A lagging
 writer reproduces it on every trial. The suite arm therefore shadows the second writer's `date` with
-a function that waits, bounded at ten seconds, for the first writer's verdict file. That waits
+a command first on that writer's `PATH` that waits, bounded at ten seconds, for the first writer's
+verdict file, and it starts the first writer only once the second has entered that wait, so the
+losing order is forced rather than released on `go` and hoped for. That waits
 without a fixed sleep, so it holds on a fast host as well as a slow one, and it took about 0.6 s a
 trial here. Rows 3 and 4 also show the arm can fail: the re-read cut is its staged break.
 
@@ -264,10 +266,13 @@ repository and no remote.
    nothing fails naming that function, since an empty file would grade nothing. Set
    `REMOTE_BOUND=60` and `ROOT="$TMP"` as plain assignments. Stub `resolve_health_log` to print a
    scratch path, and `add_health_event` to append its third argument to the file it is handed. Then
-   source the file.
+   source the file. A writer's shadows of `date`, `find` and `rm` are executables in a directory put
+   first on that writer's `PATH`, never shell functions: a function named for a command leads with
+   no declared verb, so the lexicon leg counts it, and its verb pin may only fall.
 2. **The race.** Five trials, two writers, a stale lock pre-staged in each. Writer 2's `date` is
-   shadowed as §4's probe describes. Assert no trial has two writers proceeding and every trial has
-   exactly one. Then `mutate` a copy, deleting the re-read line under the guard, re-source it, rerun
+   shadowed as §4's probe describes, writer 2 starts first, and writer 1 starts once writer 2's
+   shim has marked itself waiting, so writer 2's stale read precedes writer 1's whole take. Assert
+   no trial has two writers proceeding and every trial has exactly one. Then `mutate` a copy, deleting the re-read line under the guard, re-source it, rerun
    the five trials, and assert at least one trial had two. The exactly-one assertion keeps a take
    that always reports busy from passing.
 3. **The bound.** A stale lock and a fresh guard: busy, and the guard stays. The guard aged two
@@ -362,7 +367,8 @@ Each was tested by a probe that could make it lose, and the probe's result is in
   counted by the orientation card's `health —` line. No new stdout line.
 - risks — Edits to `unattended.sh` shift lines under the install-prefix waivers, which are
   line-keyed, so the builder reads that leg's verdict and re-keys any moved waiver. The race arm
-  depends on bash shadowing `date` inside a command substitution, which the probes exercised. The
+  depends on a `PATH` shim of `date` being found from inside a command substitution, which holds
+  because assigning `PATH` clears bash's command hash. The
   arm's waits are bounded, so a stuck writer ends its trial rather than the suite.
 - testing — Every new assertion is observed red on its staged break before it lands. AC2 reproduces
   the defect on the parent's driver. The suite runs once at VERIFYING, at the main loop.
@@ -487,6 +493,12 @@ the main loop runs the suite once at VERIFYING.
   suite, named in AC3 and AC5. The interleaving arm's waits go from two seconds to ten, the race's bound: a two
   second wait that fires under a loaded bar breaks the forced order and reds the `mutate` assertion
   with no defect present. The block re-sources the kit library after its stubs.
+- rev-3 · 2026-10-06 · at build, S6 in §4 and the risks line of §5: the writers' shadows of `date`, `find` and `rm` become executables
+  on a per-writer `PATH`. Written as nested shell functions, as rev-1 had them, the lexicon leg read
+  `date`, `find`, `rm` and a second `date` as four verb offenders, 1068 against its pin of 1064.
+  The race arm no longer releases its writers together on `go`: writer 1 starts once writer 2's
+  shim marks itself waiting, so writer 2's stale read precedes writer 1's whole take by
+  construction rather than by the fork order of two background starts.
 
 ## 10. Reuse audit
 
