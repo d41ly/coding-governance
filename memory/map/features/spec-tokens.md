@@ -163,6 +163,10 @@ shape, never a waiver row, because a shape generalises to specs nobody has writt
 - `python tools/check-spec-tokens.py` — the leg. Silent plus exit 0 is compliance.
 - `python tools/check-spec-tokens.py --list` — every hit AND near-miss, exit 0. The authoring aid,
   and the pre-wiring instrument section 7 of the charter requires before a predicate is wired.
+- `python tools/check-spec-tokens.py --legs-for <path>...` (or `-` for stdin) — a query, not a join:
+  the legs whose guard each path trips by the guards join's own rule, broad ones marked, glob guards
+  printed UNEVALUATED, and the unguarded count as a footer. Grades no spec; exit 2 when every path
+  is untracked (TOOL-aMendedFleet-87).
 - `memory/project/spec-token-waivers.txt` — the shrink-only exception registry.
 
 ## The section-7 contract (TOOL-aJoinedCanon-7)

@@ -33,7 +33,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=126
+FLOOR_ASSERTIONS=132
+# RAISED 126 -> 132 at TOOL-aMendedFleet-87, by its six --legs-for `arm` calls: the exact-file
+# guard, the directory guard, the glob guard, the footer, the untracked mark and the refusal.
 # RAISED 119 -> 126 at TOOL-aMendedFleet-75, by its seven covers-join `arm` calls: the dangling id,
 # the count line, the defined id, `none` alone, `none` beside an id, the prose-only id and the field
 # on a continuation line.
@@ -176,6 +178,7 @@ RUNLOG_DIR=$(resolve_kit_dir "$PY" runlog runlog.py "$HERE") || exit 2
 RUNLOG="${RUNLOG_DIR##*/}"
 CODEBASE_MAP_DIR=$(resolve_kit_dir "$PY" codebase-map map_lib.py "$HERE") || exit 2
 pass=0; fail=0
+ARM_ARGS=()          # the checker's argv for the next `arm`; empty is the gate's own run (TOOL-aMendedFleet-87)
 
 scratch() {          # $1 = dir. A repo with one live spec, a manifest and an empty waiver file.
   local d=$1
@@ -205,7 +208,7 @@ SPEC
 
 arm() {              # $1 label · $2 expected rc · $3 dir · $4 expected substring · $5 FORBIDDEN one
   local out rc
-  out=$(cd "$3" && "$PY" "$LINT" 2>&1); rc=$?
+  out=$(cd "$3" && "$PY" "$LINT" ${ARM_ARGS[@]+"${ARM_ARGS[@]}"} 2>&1); rc=$?
   if [ "$rc" != "$2" ]; then
     echo "arm FAIL  $1 — expected rc $2, got $rc"; echo "$out" | head -3; fail=$((fail+1)); return
   fi
@@ -1264,6 +1267,24 @@ git -C "$d" reset -q --hard "$cvbase"
 printf '\nNew arm: `x.test.sh` · a field on the next line\n  · covers AC9 · none\n' >> "$d/$cs"
 arm "a covers field on an indented continuation line is graded" 1 "$d" "[covers] \`covers <- $cs AC9\`"
 git -C "$d" reset -q --hard "$cvbase"
+
+# TOOL-aMendedFleet-87 — the --legs-for query: an exact-file guard, a directory guard, a glob guard
+# and an unguarded leg. Staged red by joining the glob guard as a literal: its UNEVALUATED line goes.
+d=$base/legsfor; scratch "$d"
+mkdir -p "$d/${PFX}x"; printf '#!/bin/sh\n' > "$d/${PFX}x/thing.sh"
+printf '[{"name":"file leg","guard":["%sx/thing.sh"],"chunk":"c","subject":"repo"},{"name":"dir leg","guard":["%sx/"],"chunk":"c","subject":"kit"},{"name":"glob leg","guard":["%sx/*.sh"]},{"name":"free leg","guard":[]}]\n' \
+  "$PFX" "$PFX" "$PFX" > "$d/${PFX}gate-legs.json"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm legs --no-verify
+ARM_ARGS=(--legs-for "${PFX}x/thing.sh")
+arm "legs-for joins an exact-file guard and never a glob guard as a literal" 0 "$d" "  file leg <- ${PFX}x/thing.sh [c/repo]" "  glob leg <- "
+arm "legs-for joins a directory guard the path sits under" 0 "$d" "  dir leg <- ${PFX}x/ [c/kit]"
+arm "legs-for prints a glob guard UNEVALUATED" 0 "$d" "  UNEVALUATED glob leg <- ${PFX}x/*.sh"
+arm "legs-for counts an empty guard list as unguarded in its footer" 0 "$d" "legs-for: 1 of 4 legs carry no guard and run whatever changed"
+ARM_ARGS=(--legs-for "${PFX}x/thing.sh" nosuchpath)
+arm "legs-for marks an untracked path beside a tracked one and still exits 0" 0 "$d" "nosuchpath (not tracked at HEAD)"
+ARM_ARGS=(--legs-for nosuchpath)
+arm "legs-for REFUSES a query in which every path is untracked" 2 "$d" "legs-for: REFUSING — no path given is tracked at HEAD: nosuchpath"
+ARM_ARGS=()
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then

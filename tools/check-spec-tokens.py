@@ -150,6 +150,15 @@ would report the join as set while it graded nothing.
 
   python <prefix>/check-spec-tokens.py            # assert; exit 1 on an unwaived hit
   python <prefix>/check-spec-tokens.py --list     # every hit and near-miss, authoring aid, exit 0
+  python <prefix>/check-spec-tokens.py --legs-for <path>...   # the legs each path's guards trip
+  git diff --name-only A..B | python <prefix>/check-spec-tokens.py --legs-for -   # paths on stdin
+
+--legs-for (TOOL-aMendedFleet-87) is a QUERY, not a join: it runs before the spec walk, grades no
+spec and exits 0. It reads the guards through `check_guard_trips`, the guards join's own trip rule,
+keeps the broad guards that join drops and marks them, and prints the chunk and subject the runner's
+hold rule reads without applying that rule. A guard carrying `*`, `?` or `[` is printed UNEVALUATED
+under every path, because the runner's `git diff` would expand it and this rule compares literals.
+A query in which EVERY path is untracked exits 2.
 """
 import datetime
 import json
@@ -516,6 +525,66 @@ def derive_guarded_legs(rows):
 def render_broad(broad):
     """The excluded set as the report prints it, count-descending then by name; `none` when empty."""
     return " ".join(f"{g} ({n})" for g, n in sorted(broad.items(), key=lambda kv: (-kv[1], kv[0]))) or "none"
+
+
+# A guard spelled with git pathspec glob magic. `check_guard_trips` compares literals, so such a
+# guard is reported UNEVALUATED by --legs-for rather than joined (TOOL-aMendedFleet-87 S4).
+GLOB_MAGIC = re.compile(r"[*?\[]")
+
+
+def derive_tripped_legs(path, rows):
+    """`(name, guard, chunk, subject)` for every leg of `rows` that `path` trips through a LITERAL
+    guard, one per leg, its first tripping guard in manifest order. A glob guard is never joined."""
+    out = []
+    for r in rows:
+        hit = next((g for g in r.get("guard") or []
+                    if not GLOB_MAGIC.search(g) and check_guard_trips(path, g)), None)
+        if hit:
+            out.append((r["name"], hit, r.get("chunk", "-"), r.get("subject", "-")))
+    return out
+
+
+def print_legs_for(root, files, paths):
+    """The --legs-for query (TOOL-aMendedFleet-87): print, per path, the legs whose guard it trips;
+    return the exit status. A lone `-` reads the paths from stdin, one per line."""
+    if paths == ["-"]:
+        paths = sys.stdin.buffer.read().decode("utf-8").splitlines()
+    paths = [p.strip().replace("\\", "/") for p in paths if p.strip()]
+    if not paths:
+        print("legs-for: REFUSING — no path given, so there is nothing to join")
+        return 2
+    legs_path, troot = derive_legs_path(root)
+    if legs_path is None or not legs_path.exists():
+        print(f"legs-for: REFUSING — no single {LEGS_NAME} is derivable under {root.as_posix()}")
+        return 1
+    try:
+        rows = json.loads(legs_path.read_bytes().decode("utf-8"))
+        for r in rows:
+            if r.get("guard"):
+                r["guard"] = [resolve_prefix_token(g, troot) for g in r["guard"]]
+        broad = derive_guarded_legs(rows)[1]
+    except Exception as exc:  # noqa: BLE001 - a malformed manifest is a refusal, not a pass
+        print(f"legs-for: REFUSING — {LEGS_NAME} did not parse: {exc}")
+        return 1
+    untracked = [p for p in paths
+                 if p.rstrip("/") not in files and not any(f.startswith(p.rstrip("/") + "/") for f in files)]
+    if len(untracked) == len(paths):
+        print(f"legs-for: REFUSING — no path given is tracked at HEAD: {' '.join(paths)}; "
+              "a query over nothing but typos answers nothing")
+        return 2
+    globs = [(r["name"], g) for r in rows for g in r.get("guard") or [] if GLOB_MAGIC.search(g)]
+    for p in paths:
+        print(p + (" (not tracked at HEAD)" if p in untracked else ""))
+        tripped = derive_tripped_legs(p, rows)
+        for name, g, chunk, subject in tripped:
+            print(f"  {name} <- {g} [{chunk}/{subject}]" + (" broad" if g in broad else ""))
+        for name, g in globs:
+            print(f"  UNEVALUATED {name} <- {g}")
+        if not tripped:
+            print("  no guarded leg")
+    free = sum(1 for r in rows if not r.get("guard"))
+    print(f"legs-for: {free} of {len(rows)} legs carry no guard and run whatever changed")
+    return 0
 
 
 def check_cutoff_relation(root, key, value):
@@ -937,6 +1006,8 @@ def main(argv):
         return 2
 
     files = read_tracked(root)
+    if "--legs-for" in argv:   # a query, branched ahead of the spec walk: it grades no spec
+        return print_legs_for(root, files, argv[argv.index("--legs-for") + 1:])
     allspecs = sorted(f for f in files
                       if re.match(r"memory/builds/[^/]+/spec/.*\.md$", f))
     specs, frozen = [], 0

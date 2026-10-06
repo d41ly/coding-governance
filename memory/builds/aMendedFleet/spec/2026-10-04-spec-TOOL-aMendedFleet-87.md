@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-87 — a query joins changed paths to the gate legs that guard them
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 87
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 87
 
 <!-- gen:spec-records -->
 
@@ -29,7 +29,8 @@ command and agrees with the spec gate by construction.
   `  <leg> <- <guard> [<chunk>/<subject>]`, with ` broad` appended where the guard is in the broad
   set `derive_guarded_legs` returns; a path tripping nothing prints `  no guarded leg`. One footer
   line, `legs-for: <u> of <t> legs carry no guard and run whatever changed`, counted from the
-  manifest. The chunk and subject are printed as the manifest holds them; the query does not restate
+  manifest: a row with no `guard` key OR an empty list, the runner's own reading, which skips the
+  guard pass for an empty guard field. The chunk and subject are printed as the manifest holds them; the query does not restate
   the runner's hold rule. Exit 0. Observed by AC1, AC3 and AC4.
 - **S3** — A path no tracked file equals or sits under prints `(not tracked at HEAD)` after it and is
   still joined, because a range's deleted files are legitimate input. When EVERY path given is
@@ -81,6 +82,7 @@ Read at base `7af5f564`; `git diff --stat 7af5f564 HEAD` over every file below i
 | Name | Kind | Cell |
 |---|---|---|
 | `derive_tripped_legs` | function in `check-spec-tokens.py` | `py.function`; `--suggest` answered OK |
+| `print_legs_for` | function in `check-spec-tokens.py` | `py.function`; `--suggest` answered OK |
 | `--legs-for` | CLI flag | none |
 
 ### Files touched (estimate)
@@ -119,9 +121,9 @@ Read at base `7af5f564`; `git diff --stat 7af5f564 HEAD` over every file below i
 - **AC1** — When `python tools/check-spec-tokens.py --legs-for tools/codebase-map/map_diff.py` runs
   after the unit's commit, it prints `codebase-map kit selftest`, `codebase-map gate coverage` and
   `codebase-map adopter e2e` each with its guard, and a footer whose unguarded count equals the
-  number of rows in `tools/gate-legs.json` with no `guard` key.
+  number of rows in `tools/gate-legs.json` with no `guard` key or an empty one.
   Red when: a guarded leg is missing, or the footer miscounts.
-  figure: DERIVED from the manifest at observation; 58 of 124 at writing.
+  figure: DERIVED from the manifest at observation; 58 of 124 at writing, 59 of 125 at build.
 - **AC2** — When `git diff --name-only HEAD~1..HEAD` is piped into
   `python tools/check-spec-tokens.py --legs-for -` after the unit's commit, it prints one block per
   path the commit changed.
@@ -167,6 +169,10 @@ New arm: tools/check-spec-tokens.test.sh · a scratch manifest with one exact-fi
 - rev-2 · 2026-10-04 · §3 · the M2 cross-read: the Non-goal said unit 78 owns wiring this query into
   kickoff, while `KICK-aMendedFleet-3`'s scope spells exactly two context commands and never this
   one; the Non-goal now says no unit of this build wires it.
+- rev-3 · 2026-10-06 · S2, AC1, §4 Inventory · the build pass: the manifest now carries five rows
+  with an EMPTY `guard` list, which the runner treats as unguarded, so "no `guard` key" would have
+  undercounted the footer by five; S2 and AC1 now count a missing key or an empty list. The mode's
+  printing body is a second function, `print_legs_for`, added to the Inventory.
 
 ## 10. Reuse audit
 

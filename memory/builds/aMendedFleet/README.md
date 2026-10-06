@@ -264,7 +264,7 @@ ids TOOL-aMendedFleet-108 TOOL-aMendedFleet-109
 | [TOOL-aMendedFleet-84 — hygiene check 6 prices a build README by its authored bytes, so generated regions never bill the cap](spec/2026-10-04-spec-TOOL-aMendedFleet-84.md) | 84 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-85 — the charter states what the codebase map's ratchet binds, and stops promising an inventory that cannot rot](spec/2026-10-04-spec-TOOL-aMendedFleet-85.md) | 85 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-86 — the map digest reports code coverage apart from record coverage](spec/2026-10-04-spec-TOOL-aMendedFleet-86.md) | 86 | 1 | CLOSED | rev-2 | 2026-10-04 |
-| [TOOL-aMendedFleet-87 — a query joins changed paths to the gate legs that guard them](spec/2026-10-04-spec-TOOL-aMendedFleet-87.md) | 87 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-87 — a query joins changed paths to the gate legs that guard them](spec/2026-10-04-spec-TOOL-aMendedFleet-87.md) | 87 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-88 — `map_imports.py` is deleted, having no consumer](spec/2026-10-04-spec-TOOL-aMendedFleet-88.md) | 88 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-89 — measured history leaves the dossiers near the byte cap for the records that measured it](spec/2026-10-04-spec-TOOL-aMendedFleet-89.md) | 89 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-90 — a report-only drift signal DEAD for N recorded readings is named for retirement or a filed ask](spec/2026-10-04-spec-TOOL-aMendedFleet-90.md) | 90 | 1 | SPECCED | rev-2 | 2026-10-04 |

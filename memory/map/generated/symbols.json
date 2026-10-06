@@ -5888,6 +5888,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_tripped_legs",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "derive_unit_key",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -9216,6 +9221,11 @@
       "id": "print_leg_window",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
+    },
+    {
+      "id": "print_legs_for",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "print_liveness",
