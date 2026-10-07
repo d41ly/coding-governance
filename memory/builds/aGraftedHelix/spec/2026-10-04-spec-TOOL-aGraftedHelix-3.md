@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-3 — invariant records in the bug-class catalogue become the review's by-design list
 
-**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 3 · ratified 2026-10-04
+**Status:** CLOSED · rev-5 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 3 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -91,7 +91,9 @@ needed. The unit also routes the checklist into the spec audit, which has never 
 
 ### Edges
 
-none
+- **hands-off** `TOOL-aGraftedHelix-29` — the `invariant` kind, `render_by_design` and the
+  by-design block this unit built, which that unit reads at a range's base rather than in the
+  tree under review.
 
 ## 4. Design
 
@@ -490,6 +492,8 @@ New arm: tools/workflows/unattended-build.test.sh · a caller checklist beside t
 - rev-4 · 2026-10-05 · §4 · the seed table leads each row with its record, not its ruling id: a
   row leading with an id anchors it under this build folder, and hygiene check 13 read the three
   rulings as claimed by two build folders. Columns reordered; no content moved.
+- rev-5 · 2026-10-07 · §3 · the hands-off edge to TOOL-aGraftedHelix-29 mirrors that unit's
+  consumes-from, which hygiene check 12 read as one-ended. No content moved.
 
 ## 10. Reuse audit
 
