@@ -171,3 +171,4 @@ memory/builds/aEvidencedLens/README.md
 memory/builds/aWardedAudit/README.md
 memory/builds/aGraftedHelix/README.md
 memory/builds/dThriftyLanding/README.md
+memory/builds/aClassedKnob/README.md
