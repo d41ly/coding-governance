@@ -11103,6 +11103,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_ir_policy",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "read_journal",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
