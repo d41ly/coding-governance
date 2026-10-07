@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-47 — check-arms.py discovers a refusal that is not a fail call, and every one it finds is armed or waived with a printed reason
 
-**Status:** SPECCED · rev-2 · 2026-10-07 · node a · Tier-2 · base e1f4d8c0 · streams tooling · order 28 · closes TOOL-aDeferredBar-8
+**Status:** SPECCED · rev-3 · 2026-10-07 · node a · Tier-2 · base e1f4d8c0 · streams tooling · order 28 · closes TOOL-aDeferredBar-8
 
 <!-- gen:spec-records -->
 
@@ -75,9 +75,9 @@ adopted on 2026-10-07, check 24's block included.
   reason field, the switch, and what it does NOT check (§4 "Gaps it leaves"). The pin file's header
   documents the fifth field and names `ARMS_REFUSALS` as the switch under which rows carrying it are
   read. `tools/memory-tree/README.md` updates its `check-arms.py` row and gains
-  an "Upgrading to" section naming the key and the `--emit-pin` step. Per §8 F3's recommendation, the
-  meta-gate paragraph of `tools/memory-tree/HYGIENE.template.md` is rewritten and re-rendered into
-  `memory/HYGIENE.md`. Observed by AC9.
+  an "Upgrading to" section naming the key and the `--emit-pin` step. §8 F3 resolved (c) under
+  delegation (rev-3), so the meta-gate paragraph of `tools/memory-tree/HYGIENE.template.md` is NOT
+  rewritten: the template and `memory/HYGIENE.md` move by the version marker alone. Observed by AC9.
 - **S9** — The class record `memory/gotchas/a-grep-for-a-word-is-a-presence-probe.md` names the gate.
   Its "Documented check, no machine gate" paragraph is rewritten to say the delegated dispatch block
   is graded by `python tools/memory-tree/check-arms.py --check` under `ARMS_REFUSALS`. Observed by
@@ -371,7 +371,8 @@ No leg, gate file or gotcha record is minted. The three functions enter the map'
 - `tools/memory-tree/.memory-tree.conf.example`
 - `tools/memory-tree/kit.toml`
 - `tools/memory-tree/README.md`
-- `tools/memory-tree/HYGIENE.template.md` and `memory/HYGIENE.md`, per §8 F3
+- `tools/memory-tree/HYGIENE.template.md` and `memory/HYGIENE.md`, the version marker only, because
+  §8 F3 resolved (c)
 - `memory/gotchas/a-grep-for-a-word-is-a-presence-probe.md`, and `memory/gotchas/INDEX.md` if the
   generator moves it
 - `memory/map/generated/symbols.json`, and whatever else `gen_map.py --write` moves beside it
@@ -433,14 +434,15 @@ therefore taken after it lands, and a site it adds is discovered here like any o
   row, and `--report`'s reason-line column and `UNREASONED` rows. The leg's log grows by one line per
   waived row.
 - risks — The pin grows from zero rows to the waived count, every row with a reason. `memory/HYGIENE.md`
-  says its working state is empty, which F3's rewrite must not leave claiming. The switch keeps every
+  says its working state is empty, and with F3 resolved (c) it keeps saying so until the owner takes
+  the rewrite; the pin's own header and `--report` state the live population. The switch keeps every
   adopter's verdict where it was.
 - testing — The `--selftest` arms of §4 (AC1), the red observed before any arm (AC2), and check 24's
   engine arm on a staged break (AC4).
 - migration — None for data. An adopter reads the README's upgrade section; the example conf ships the
   key blank.
-- user docs — The docstring, the pin header, the kit README row and its upgrade section, and the
-  HYGIENE carrier per F3. No `help/` page, because the kit is internal.
+- user docs — The docstring, the pin header, and the kit README row and its upgrade section. The
+  HYGIENE carrier is the owner's turn, F3. No `help/` page, because the kit is internal.
 
 ## 6. Acceptance criteria
 
@@ -539,6 +541,9 @@ above directly.
   (c) trips §12's ban. Option (a) costs the largest waived set, every row with a reason, and one
   printed line per row on every run of the leg.
   Recommendation: (a).
+  RESOLVED (agent, 2026-10-07, delegated): (a). Option (c) fails the `install-prefix` gate through
+  §12's kit-literal ban, M3's first veto. Option (b) survives the vetoes and grades fewer sites, so
+  the most feature-rich survivor is (a).
 - **F2 — How is a delegated site armed?**
   (a) An `# arm-signature:` marker in its block declares the text its callee prints on refusal, and
   an arm asserting that text arms it. (b) Each delegated refusal is routed through a literal of the
@@ -550,6 +555,9 @@ above directly.
   line to every delegated red. Option (c) contradicts the owner's ruling that check 24's block is
   armed. Option (a) adds one comment grammar, and trusts its text until the suite runs.
   Recommendation: (a).
+  RESOLVED (agent, 2026-10-07, delegated): (a). Option (c) fails S5, which arms check 24's block,
+  M3's first veto. Option (b) survives but changes seven checks' printed and keyed output, so (a) is
+  the survivor with the fewest follow-ups.
 - **F3 — May this unit edit the governance carrier `memory/HYGIENE.md`?** Its meta-gate paragraph
   states signature 1 as THE population, which the switch makes false. It also says the pin's
   working state is empty. (a) Rewrite the paragraph in `tools/memory-tree/HYGIENE.template.md` to
@@ -559,6 +567,11 @@ above directly.
   M3's veto 2 makes any carrier edit the owner's. Option (b) states a predicate the module owns a
   second time (`two-answers-to-one-question`), and option (c) ships that class.
   Recommendation: (a).
+  RESOLVED (agent, 2026-10-07, delegated): (c). Options (a) and (b) change a governance carrier,
+  which M3's second veto reserves to the owner, and no `may:` grant in the build README names it.
+  Option (c) is the one survivor. The carrier's sentence stays TRUE for signature 1, which is all it
+  states; it is incomplete, not wrong, and its claim that the pin is empty was already false before
+  this unit. The rewrite of (a) is the owner's turn, and the return of this pass names it.
 - **F4 — Does check 24's block print its capture on a green run?** It does not today.
   `row_grammar.py --check-rotation` prints its `ROTATION_MODE` UNDECLARED and `snapshot`
   announcements at exit 0, and the block never shows them. Blocks 20, 27 and 28 print theirs.
@@ -568,6 +581,9 @@ above directly.
   change; where the key is unset, that line is the UNDECLARED announcement. Option (b) leaves a skip
   that looks like a pass in the block this unit arms (`swallowed-delegate-reads-as-clean`).
   Recommendation: (a).
+  RESOLVED (agent, 2026-10-07, delegated): (a). Neither option trips a veto: one more output line is
+  no new public surface. Option (a) satisfies S5's clean-run arm, which (b) leaves unwritten, so it
+  is the more feature-rich survivor.
 
 ## 9. Revision log
 
@@ -577,6 +593,9 @@ above directly.
   `4fc54f77`, in §4's new subsection; S6 lengthens arms only inside the dispatched write set and
   waives a driving arm elsewhere with its line named; the census re-derived at the build; Files
   touched gains the two lengthened suites and the re-rendered carriers. No acceptance criterion moved.
+- rev-3 · 2026-10-07 · §8's four forks resolved under delegation: F1, F2 and F4 take (a); F3 takes
+  (c), because (a) and (b) edit a governance carrier, so S8 drops the HYGIENE paragraph rewrite and
+  §5 says the carrier is the owner's turn. No acceptance criterion moved.
 
 ## 10. Reuse audit
 
