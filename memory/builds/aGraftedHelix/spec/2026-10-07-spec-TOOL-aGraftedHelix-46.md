@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-46 — govkit reads a quoted conf value followed by a comment the way the shell that sources it does
 
-**Status:** SPECCED · rev-2 · 2026-10-07 · node a · Tier-1 · base e1f4d8c0 · streams tooling · order 27
+**Status:** SPECCED · rev-3 · 2026-10-07 · node a · Tier-1 · base e1f4d8c0 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
@@ -237,6 +237,8 @@ New arm: `tools/govkit/selftest.py` · covers AC1 AC2 AC3 AC4 · `check_conf_rea
     the same bash arm.
   - Recommendation: (a). It is the smaller diff and adds no runtime dependency to `check` or
     `update`. The §2 scope above is written for (a); choosing (b) rewrites S1 and §4 "The reader".
+  RESOLVED (agent, 2026-10-07, delegated): (a). Option (b) fails AC1 and AC2 as written, which
+  grade a govkit-owned `parse_conf_assignment`, so M3's first veto removes it.
 - **F2 — Does this unit also take the process-monitor kit's line readers?** `run_sweep` in
   `tools/process-monitor/reap.py` and `main` in `tools/process-monitor/classify.py` read
   `PROCMON_AGE_CEILING`, `PROCMON_SPIN_RATE` and `PROCMON_REAP_MODE` by a `startswith` match and a
@@ -247,11 +249,16 @@ New arm: `tools/govkit/selftest.py` · covers AC1 AC2 AC3 AC4 · `check_conf_rea
   - (b) Fold it in here. That widens this Tier-1 unit's write set to a shipped kit and owes that
     kit's version bump in every carrier.
   - Recommendation: (a). One mechanism per spec, and the class here is govkit's reader.
+  RESOLVED (agent, 2026-10-07, delegated): (a). Option (b) is a second mechanism in one spec,
+  which M2's one-mechanism rule refuses, and it widens a Tier-1 write set to a shipped kit, which
+  M3's third veto removes. The readers stay handed off as §3 states.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-07 · initial draft, from the owner's adoption of 2026-10-07 and the unit's brief.
 - rev-2 · 2026-10-07 · AC1's cost line no longer backticks the selftest file, which the spec-token bar join read as a suite cited as the observation; the slice itself is unchanged.
+- rev-3 · 2026-10-07 · node a · §8: the build pass resolved both forks under the run's delegation,
+  F1 (a) and F2 (a), each by its own recommendation. No scope, design or criterion moves.
 
 ## 10. Reuse audit
 

@@ -162,7 +162,7 @@ ids TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 TOOL-aGraftedHelix-42 TOOL-aGraf
 | [TOOL-aGraftedHelix-40 — the playbook arm prints its leg's evidence on a miss, and the resume-tick arms grade detachment by a child that outlives the tick](spec/2026-10-06-spec-TOOL-aGraftedHelix-40.md) | 24 | 2 | CLOSED | rev-1 | 2026-10-06 |
 | [TOOL-aGraftedHelix-41 — the driver suite runs in the pooled sweep as eight shards cut by its own region costs](spec/2026-10-06-spec-TOOL-aGraftedHelix-41.md) | 25 | 2 | CLOSED | rev-2 | 2026-10-07 |
 | [TOOL-aGraftedHelix-45 — a leg bans a location probe asked from a moved directory unless it scrubs an inherited GIT_DIR or a registry row waives it](spec/2026-10-07-spec-TOOL-aGraftedHelix-45.md) | 26 | 2 | CLOSED | rev-3 | 2026-10-07 |
-| [TOOL-aGraftedHelix-46 — govkit reads a quoted conf value followed by a comment the way the shell that sources it does](spec/2026-10-07-spec-TOOL-aGraftedHelix-46.md) | 27 | 1 | SPECCED | rev-2 | 2026-10-07 |
+| [TOOL-aGraftedHelix-46 — govkit reads a quoted conf value followed by a comment the way the shell that sources it does](spec/2026-10-07-spec-TOOL-aGraftedHelix-46.md) | 27 | 1 | SPECCED | rev-3 | 2026-10-07 |
 | [TOOL-aGraftedHelix-47 — check-arms.py discovers a refusal that is not a fail call, and every one it finds is armed or waived with a printed reason](spec/2026-10-07-spec-TOOL-aGraftedHelix-47.md) | 28 | 2 | SPECCED | rev-1 | 2026-10-07 |
 <!-- /gen:build-units -->
 
