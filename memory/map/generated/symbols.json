@@ -3843,6 +3843,11 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "check_receipt_vintage",
+      "kind": "function",
+      "file": "tools/memory-tree/check-verdict-epoch.sh"
+    },
+    {
       "id": "check_record",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -19836,6 +19841,11 @@
       "id": "write_receipt",
       "kind": "function",
       "file": "tools/check-wiring.test.sh"
+    },
+    {
+      "id": "write_receipt",
+      "kind": "function",
+      "file": "tools/memory-tree/check-verdict-epoch.test.sh"
     },
     {
       "id": "write_receipt_pin",
