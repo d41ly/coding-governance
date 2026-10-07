@@ -1,6 +1,6 @@
 # TOOL-aClassedKnob-1 — the pre-push self-test classifies every runner knob and reads the adopter's own policy
 
-**Status:** SPECCED · rev-1 · 2026-10-07 · node a · Tier-1 · base c83ef509 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-10-07 · node a · Tier-1 · base c83ef509 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
