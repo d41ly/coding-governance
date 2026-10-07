@@ -48,11 +48,11 @@ fail() { echo "TESTSUITE-COUNTS FAILED — $1"; status=1; }
 
 [ -f "$MANIFEST" ] || { echo "testsuite-counts: no $MANIFEST, so the population would be empty and this leg would pass by finding nothing"; exit 2; }
 
-# Every `*.test.sh` the manifest names, deduplicated. Selected from the argv strings rather than by
-# globbing the tree, so the leg's population and the bar's are the same set by construction.
-# A `{prefix}` token (gov's own manifest, TOOL-aRepatriatedFork-29 §8 F1) resolves to this gate's
-# own directory, which is the tool root the manifest sits in.
-suites=$(grep -oE '"[^"]*\.test\.sh"' "$MANIFEST" | tr -d '"' \
+# Every `*.test.sh` the manifest names, deduplicated, from the argv strings rather than the tree, so
+# the leg's population and the bar's are one set. A string opening with `:` is a git PATHSPEC, such
+# as `:!*.test.sh`, and never a suite. A `{prefix}` token (TOOL-aRepatriatedFork-29 §8 F1) resolves
+# to this gate's own directory, which is the tool root the manifest sits in.
+suites=$(grep -oE '"[^":][^"]*\.test\.sh"' "$MANIFEST" | tr -d '"' \
   | while IFS= read -r _s; do resolve_prefix_sh "$_s" "${_self_pre%/}"; done | sort -u)
 if [ -z "$suites" ]; then
   fail "the gate manifest names no *.test.sh, so this leg would grade an empty population — the vacuous-selector shape it exists to prevent"

@@ -232,6 +232,13 @@ hit "$(run)" "a harness self-test pins SELFTEST_FLOOR of ZERO, which nothing can
 build_harness_inert ${PFX}hi.test.sh; manifest ${PFX}h.test.sh ${PFX}hi.test.sh
 hit "$(run)" "a harness self-test pins SELFTEST_FLOOR but never reaches run_arms, or does not source the harness, so nothing prints its executed count and nothing reads the pin: ${PFX}hi.test.sh"
 
+# ---- a git PATHSPEC in an argv is not a suite. A leg excluding the suites from its own population
+# ---- spells `:!*.test.sh`, which ends like a suite path and names no file (TOOL-aGraftedHelix-45).
+build_ok ${PFX}a.test.sh; manifest ${PFX}a.test.sh ':!*.test.sh'
+out=$(run); rc=$?
+same "a pathspec excluding the suites is not read as a suite" "$rc" "0"
+miss "$out" "cannot read"
+
 # ---- a manifest naming a suite that is not on disk must NOT be skipped silently.
 manifest ${PFX}a.test.sh ${PFX}gone.test.sh
 hit "$(run)" "the gate manifest names a self-test this leg cannot read, and skipping it silently removes it from the population: ${PFX}gone.test.sh"
@@ -241,7 +248,7 @@ hit "$(run)" "the gate manifest names a self-test this leg cannot read, and skip
 manifest
 hit "$(run)" "the gate manifest names no *.test.sh, so this leg would grade an empty population"
 
-FLOOR_ASSERTIONS=18
+FLOOR_ASSERTIONS=20
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
