@@ -257,6 +257,41 @@ if [ -z "$W" ]; then
   exit 0
 fi
 
+# A VENDORED ENGINE IS DATED BY GOV, NOT BY THE PULL'S COMMIT ORDER (TOOL-aClassedKnob-3). An adopter's
+# pull may write gov's bytes in several commits, the constant first, and the rule below then reads
+# gov's own bump as older than gov's own change. When the committed install receipt at HEAD records
+# every scanned file with `oid` = its blob at HEAD = `gov_oid`, and the engine row's version is the
+# constant at HEAD, these are gov's unmodified bytes at a vintage gov's lander dated, so the range has
+# nothing of its own to date. A local edit moves a blob off the receipt and falls through to the rule.
+# gov has no receipt, so gov's own verdict never takes this path.
+# WHAT THIS DOES NOT CHECK: that the receipt is honest. A hand-edited row claiming gov's blob for a
+# local edit passes here; the receipt is govkit's record and is graded there.
+check_receipt_vintage() {  # -> 0 when the receipt at HEAD vouches for every scanned blob at version $now
+  local py tree
+  py=$(resolve_python 2>/dev/null) || return 1
+  git cat-file -e "HEAD:.governance/install.json" 2>/dev/null || return 1
+  tree=$(git ls-tree HEAD -- $SCAN 2>/dev/null) || return 1
+  git show "HEAD:.governance/install.json" 2>/dev/null | "$py" -c '
+import json, re, sys
+scan, now, engine, tree = sys.argv[1].split(), sys.argv[2], sys.argv[3], sys.argv[4]
+blobs = {}
+for line in tree.splitlines():
+    meta, _, path = line.partition("\t")
+    blobs[path] = meta.split()[2]
+rows = {r.get("path"): r for r in (json.load(sys.stdin).get("files") or []) if isinstance(r, dict)}
+for f in scan:
+    r = rows.get(f) or {}
+    if not blobs.get(f) or r.get("oid") != blobs[f] or r.get("gov_oid") != blobs[f]:
+        sys.exit(1)
+m = re.match(r"KIT_MEMORY_TREE_VERSION=([0-9.]+)", str(rows[engine].get("version") or ""))
+sys.exit(0 if m and m.group(1) == now else 1)
+' "$SCAN" "$now" "$ENGINE" "$tree"
+}
+if check_receipt_vintage; then
+  echo "verdict-epoch: clean — vendored at gov's memory-tree $now: every scanned file at HEAD is gov's own blob as .governance/install.json records it, so gov's landing dated them ($moved line(s) moved in $W)"
+  exit 0
+fi
+
 # S — the NEWEST commit in the range that actually CHANGES the constant's value. Candidates come from
 # a `-G` search: `-S` counts OCCURRENCES of a string, and `KIT_MEMORY_TREE_VERSION=` occurs exactly
 # once before and once after a bump, so the count never moves and the bump is never reported —

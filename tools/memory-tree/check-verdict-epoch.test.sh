@@ -215,6 +215,35 @@ else
   printf 'arm ok    %s\n' "every kit-version pickaxe reads merges and prints no patch ($(printf '%s\n' "$pk" | grep -c .) site(s))"
 fi
 
+# ---- 5d. A VENDORED ENGINE IS READ AGAINST ITS INSTALL RECEIPT (TOOL-aClassedKnob-3). An adopter's pull
+# writes gov's bytes in two commits, the bump FIRST: the topological rule alone reads that as a bump
+# older than its change. The control runs before the receipt exists; the receipt then vouches for the
+# blob at HEAD; a later local edit and a receipt naming another version each fall back to the rule.
+write_receipt() { # $1=dir $2=version -> commits a receipt vouching for the engine's blob at HEAD
+  local p="${PFX}${KIT_NAME}/check-memory-hygiene.sh" o
+  o=$(cd "$1" && git ls-tree HEAD -- "$p" | awk '{print $3}')
+  mkdir -p "$1/.governance"
+  printf '{"schema": 3, "files": [{"path": "%s", "role": "engine", "kit": "memory-tree", "version": "KIT_MEMORY_TREE_VERSION=%s   # gov:kit memory-tree@%s", "oid": "%s", "gov_oid": "%s"}]}\n' \
+    "$p" "$2" "$2" "$o" "$o" > "$1/.governance/install.json"
+  ( cd "$1" && git add -A && git commit -qm receipt --no-verify ) >/dev/null
+}
+V=$(newrepo vendored); commit_engine "$V" 1.5 "" base
+BASE_V=$(cd "$V" && git rev-parse HEAD)
+commit_engine "$V" 1.6 "" 'pull 1: the constant'
+commit_engine "$V" 1.6 "echo gov's engine change" 'pull 2: the engine bytes'
+ARM_GPB=$BASE_V arm 'a two-commit pull, bump first, with no receipt FAILS (control)' 1 'the bump is OLDER' "$V"
+write_receipt "$V" 1.6
+ARM_GPB=$BASE_V arm '...and a receipt vouching for every scanned blob at HEAD reads it clean' 0 "vendored at gov's memory-tree 1.6" "$V"
+commit_engine "$V" 1.6 "echo gov's engine change
+echo a local edit" 'local edit, no bump'
+ARM_GPB=$BASE_V arm '...and a local edit the receipt does not record still FAILS' 1 'the bump is OLDER' "$V"
+V2=$(newrepo vendored-mismatch); commit_engine "$V2" 1.5 "" base
+BASE_V2=$(cd "$V2" && git rev-parse HEAD)
+commit_engine "$V2" 1.6 "" 'pull 1: the constant'
+commit_engine "$V2" 1.6 "echo gov's engine change" 'pull 2: the engine bytes'
+write_receipt "$V2" 1.5
+ARM_GPB=$BASE_V2 arm '...and a receipt naming another version than the constant still FAILS' 1 'the bump is OLDER' "$V2"
+
 # ---- 6. this repo, right now --------------------------------------------------------------------
 # The live tree must be clean, and it must be clean because the constant MOVED — not because nothing
 # changed. Asserting the message discriminates the two.
