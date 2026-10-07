@@ -1074,14 +1074,46 @@ case "$_o" in
 esac
 
 # AC11, the hook's half: its own reader, sliced out of the SHIPPED hook, run over this repository at
-# HEAD, resolves land with a bound of 10.
+# HEAD, resolves the policy THIS repository declares. ADOPTER-CORRECT (TOOL-aClassedKnob-1): the
+# expectation is derived, never gov's own `land 10`, because an adopter may declare park. The oracle is
+# the shell's own reading, the committed gate-env.sh SOURCED in a subshell as KIT_REL is above, mapped
+# through the kit contract the hook states: an absent file or a blank key reads land, a value outside
+# `park land` reads park, and a bound that is not a positive integer reads none. A declaration the
+# hook's line reader and the shell read differently reds here, naming both.
 _ir_fns=$(awk '/^read_policy_key\(\)/,/^}/; /^read_policy_at\(\)/,/^}/' "$SRC/.githooks/pre-push")
-_o=$( cd "$SRC" && _gate_env_rel=".githooks/gate-env.sh" && def=main && eval "$_ir_fns" \
-      && read_policy_at "$(git rev-parse HEAD)" && printf '%s %s' "$PP_POLICY" "$PP_MAX_AGE" )
-case "$_o" in
-  "land 10") ok "IR AC11 this repository at HEAD reads land with an age bound of 10" ;;
-  *) bad "IR AC11 this repository at HEAD read: ${_o:-<nothing>}" ;;
-esac
+read_ir_policy() { # <repo> <sha> -> "<policy> <bound>" as the sliced hook reader resolves it
+  ( cd "$1" && _gate_env_rel=".githooks/gate-env.sh" && def=main && eval "$_ir_fns" \
+    && read_policy_at "$2" && printf '%s %s' "$PP_POLICY" "$PP_MAX_AGE" )
+}
+_ir_want=$( cd "$SRC" || exit 1
+  if _b=$(git show HEAD:.githooks/gate-env.sh 2>/dev/null); then
+    unset INHERITED_RED INHERITED_RED_MAX_AGE
+    eval "$_b" >/dev/null 2>&1
+    _p=${INHERITED_RED:-}; _a=${INHERITED_RED_MAX_AGE:-}
+  else _p=""; _a=""; fi
+  case "$_p" in ''|land) _p=land ;; park) ;; *) _p=park ;; esac
+  case "$_a" in ''|0*|*[!0-9]*) _a="" ;; esac
+  printf '%s %s' "$_p" "$_a" )
+_o=$(read_ir_policy "$SRC" "$(cd "$SRC" && git rev-parse HEAD)")
+if [ -n "${_ir_want% }" ] && [ "$_o" = "$_ir_want" ]; then
+  ok "IR AC11 this repository at HEAD reads the policy its own gate-env.sh declares: '$_o'"
+else
+  bad "IR AC11 this repository at HEAD read '${_o:-<nothing>}', its committed gate-env.sh declares '$_ir_want'"
+fi
+# AC11, the reader's failing case: two fixture commits gov's own values cannot satisfy, one declaring
+# park with a bound of 7 and one with no gate-env.sh at all, which reads the kit default land, unbounded.
+_d="$tmp/ir-ac11-reader"; mkdir -p "$_d/.githooks"
+( cd "$_d" && git init -q && git config user.email t@example.com && git config user.name t \
+  && printf 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=7\n' > .githooks/gate-env.sh \
+  && git add .githooks/gate-env.sh && git commit -q -m park7 \
+  && git rm -q .githooks/gate-env.sh && git commit -q -m absent ) >/dev/null 2>&1
+_o1=$(read_ir_policy "$_d" "$(git -C "$_d" rev-parse HEAD~1 2>/dev/null)")
+_o2=$(read_ir_policy "$_d" "$(git -C "$_d" rev-parse HEAD 2>/dev/null)")
+if [ "$_o1" = "park 7" ] && [ "$_o2" = "land " ]; then
+  ok "IR AC11 the hook's reader reads park 7 where it is declared, and land unbounded where gate-env.sh is absent"
+else
+  bad "IR AC11 the hook's reader read '${_o1:-<nothing>}' for park 7 and '${_o2:-<nothing>}' for an absent gate-env.sh"
+fi
 
 cd "$pfx_home" || exit 2
 
@@ -1200,7 +1232,12 @@ cd "$pfx_home" || exit 2
 #   GATE_AMBIENT_TMP GATE_HOST_RATIO — assigned in the runner, from TMPDIR and as a source constant.
 #   GATE_DOCS_BASE — the hook clears it for every bar, a STUB included, and sets it only on a doc-only
 #     decision (TOOL-dThriftyLanding-3), as it sets GATE_BASE on the path where that matters.
-BAR_INERT_KNOBS="GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_HELD GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+#   GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_MEMINFO — the memory pause's threshold, its hold bound and the
+#     reading it takes, GATE_CGROUP_ROOT's sibling: a hold narrows the pool and always ends, and an
+#     unreadable host makes it INERT (TOOL-aGraftedHelix-7). Width class.
+#   GATE_CENSUS_EVERY — the foreign-load census period; the census writes evidence into each `.leg`
+#     row and decides no verdict (TOOL-aGraftedHelix-5). Classified by TOOL-aClassedKnob-1.
+BAR_INERT_KNOBS="GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_HELD GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
 read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
 check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
   local knobs cleared scrubbed k n
