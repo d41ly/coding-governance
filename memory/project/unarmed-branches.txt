@@ -9,7 +9,7 @@
 # Rows of the second shape are read only while `.memory-tree.conf` sets ARMS_REFUSALS="graded"; with
 # it blank, `check-arms.py --check` counts them on its OFF line and reads none. Their REASON is the
 # last field and the gate PRINTS it on every run, one `check-arms: waived` line per row, so a waiver
-# is never silent: an empty reason and the placeholder REASON-OWED, which `--emit-pin` writes, are
+# is never silent: an empty reason, and the placeholder `--emit-pin` writes in its place, are
 # refused. A reason says why no arm reaches the site — no sibling suite, no arm staging the
 # precondition it names, or an arm that drives it from a suite outside the unit that pinned it. A
 # signature-2 signature is the site's message, its block's `# arm-signature:` marker, or for an
