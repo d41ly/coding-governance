@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-45 — a leg bans a location probe asked from a moved directory unless it scrubs an inherited GIT_DIR or a registry row waives it
 
-**Status:** CLOSED · rev-2 · 2026-10-07 · node a · Tier-2 · base e1f4d8c0 · streams tooling+kickoff · order 26 · ratified 2026-10-07
+**Status:** CLOSED · rev-3 · 2026-10-07 · node a · Tier-2 · base e1f4d8c0 · streams tooling+kickoff · order 26 · ratified 2026-10-07
 
 <!-- gen:spec-records -->
 
@@ -44,7 +44,11 @@ predicate can decide it.
   arguments and a `[[gate_leg]]` block in `tools/gate-lint/kit.toml`. The gate-lint dossier lists the
   leg's name under `gate-legs`, with the generated map refreshed. A header-only registry under
   `memory/project/` is named in `PROJECT_REGISTRY_EXTRA` in `.memory-tree.conf`.
-  Observed by AC2, AC8 and AC9.
+  Observed by AC2, AC8 and AC9. The row's `:!*.test.sh` exclusion ends like a suite path, and
+  `tools/check-testsuite-counts.sh` selects every quoted manifest string ending in `.test.sh`, so it
+  refused the row as naming a suite it cannot read. Its selector skips a string opening with `:`,
+  which is a git pathspec and never a file, and its self-test gains the arm that pins that, with its
+  floor raised by the two assertions the arm adds.
 - **S6** — Every bare site in the population is scrubbed in place, one token per line, so no line
   moves. The one exception is `read_settle_command` in `tools/unattended/unattended.sh`. It
   calls `derive_self_rel`, which unit 27 made the answer to the same question for its sibling probe
@@ -258,6 +262,7 @@ siblings.
 - `tools/check-line-length.sh`
 - `tools/check-playbook-parity.sh`
 - `tools/check-testsuite-counts.sh`
+- `tools/check-testsuite-counts.test.sh`
 - `tools/drift-audit/adopt-drift-audit.sh`
 - `tools/memory-tree/check-verdict-epoch.sh`
 - `tools/process-monitor/adopt-process-monitor.sh`
@@ -462,6 +467,9 @@ runs the bar once, and the kit suites stay the owner's manual run (owner ruling 
   registry pair gains: the key shape with its refusal phrases, a reason map, and per-key
   undeclared text for `check_registry`. S9 adds the kit descriptor's and the dossier's leg-count
   sentences and the subject pin the new leg owes, which the pass found graded by `govkit selfcheck`.
+- rev-3 · 2026-10-07 · node a · S5 adds the testsuite-counts selector fix. After the build commit,
+  that checker read the new row's `:!*.test.sh` pathspec as a self-test it could not read and
+  refused; a slice of its self-test's prologue plus the new arm went red against it before the fix.
 
 ## 10. Reuse audit
 
