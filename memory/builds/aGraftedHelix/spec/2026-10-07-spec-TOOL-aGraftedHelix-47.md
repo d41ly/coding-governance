@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-47 — check-arms.py discovers a refusal that is not a fail call, and every one it finds is armed or waived with a printed reason
 
-**Status:** SPECCED · rev-1 · 2026-10-07 · node a · Tier-2 · base e1f4d8c0 · streams tooling · order 28 · closes TOOL-aDeferredBar-8
+**Status:** SPECCED · rev-2 · 2026-10-07 · node a · Tier-2 · base e1f4d8c0 · streams tooling · order 28 · closes TOOL-aDeferredBar-8
 
 <!-- gen:spec-records -->
 
@@ -62,7 +62,10 @@ adopted on 2026-10-07, check 24's block included.
   gains a marker naming text the arm already asserts. The UNWIRED refusal of
   `tools/unattended/adopt-unattended.sh`, the instance `TOOL-aDeferredBar-8` was filed for, is armed
   this way. Every remaining site is pinned in `memory/project/unarmed-branches.txt` with its reason.
-  Observed by AC5 and AC6.
+  An arm is lengthened only in a suite inside this unit's dispatched write set, the memory-tree and
+  unattended kits' (rev-2). A driving arm in another kit's suite is waived with a reason naming that
+  arm's line, because lengthening it moves that kit's shipped bytes and version. Observed by AC5
+  and AC6.
 - **S7** — Configuration. `.memory-tree.conf` declares `ARMS_REFUSALS="graded"` with a comment naming
   this unit. Its `ARMS_FLOORS` line is re-emitted by `--emit-floors`, so every discovered gate is
   floored. `tools/memory-tree/.memory-tree.conf.example` ships the key blank, and
@@ -258,6 +261,41 @@ reason.
 `--report`'s reason-line column is the defence against a false association: the builder and a
 reviewer read which line each reasoned site took its signature from.
 
+### Refinements measured at the build (rev-2)
+
+Rules 1 to 3 above hold. The build refines how each is read, and every refinement was measured over
+the real tree at `4fc54f77`, after units 45 and 46 landed.
+
+- **Quoted spans carry across lines.** The reader tracks single, double and `$'…'` quotes, a command
+  substitution inside double quotes, comments and here-document bodies across the whole file. A line
+  that opens inside a quote belongs to the statement above it, so check 20's `' "$rowg"; status=1`
+  takes its statement's print and indentation. A script that ends inside a quote or a here-document
+  by this reading is refused by name, because reading the rest as clean would hide its sites.
+- **Rule (a) takes the LAST print before the exit in its statement**, not the first: the first is
+  often the data a pipe tests, as in `echo "$x" | grep -q y || { echo "…"; exit 1; }`. Its first
+  argument may be double-quoted, single-quoted, `$'…'` or bare. In a printf format a conversion
+  counts as an interpolation, a positional or special parameter such as `$0` counts as one in any
+  print, and `\"`, a backslash-escaped backtick and `\\` are read as the characters the shell prints.
+- **Rule (c) reads its left side from the raw line.** A command whose words are all quoted is blank
+  once quotes are masked, so `"$PY" "$KIT_DIR/scaffold_lexicon.py" "$CONF" || exit 1` fell through
+  to the walk and took an unrelated message.
+- **Rule (d)'s walk also stops at another site**, and it prefers the topmost print at the
+  statement's OWN indentation over one nested deeper in an earlier compound. Measured against the
+  rev-1 walk: six associations moved and every one moved to its own message. Examples are
+  `tools/push-main.sh` line 763, which took line 718's message across a whole loop and now takes
+  line 762's, and `tools/memory-recall/adopt-memory-recall.sh` line 175, which took line 163's and
+  now takes 172's DRIFTED line. Two walks stay long. The `tools/run-gates/run-gates.sh` wall
+  refusal reads its block's capture print and is delegated. The `tools/lib/lib-selftest.sh` probe
+  exit reads an `echo "----"` and is delegated. Both are pinned by source line.
+- **A marker belongs to the first site below it**, with no other site between them.
+- **`--emit-pin` writes refusal rows only under `graded`**, because under OFF they would not be read.
+
+The census at the build, re-derived by `--check` and `--report`: 158 sites in 26 scripts, 118
+reasoned and 40 delegated, and 10 unreasoned lines. The sites are within 2 per cent of the PINNED
+census. The unreasoned lines are 44 per cent under it, because a here-document body and a quote
+continuation are no longer candidates. The walk refinements moved one site from reasoned to
+delegated and left the unreasoned count where it was. The acceptance ledger records both totals.
+
 ### Arming and waiving
 
 S6 applies one rule per site, in the order `--report` lists them.
@@ -306,6 +344,8 @@ set as the label says.
 | `scan_refusal_sites` | `check-arms.py` | function, cell `py.function` |
 | `derive_refusal_reason` | `check-arms.py` | function, cell `py.function` |
 | `read_arm_marker` | `check-arms.py` | function, cell `py.function` |
+| `scan_shell_lines`, `extract_print_message`, `check_refusal_switch`, `check_refusal_sites` | `check-arms.py` | functions, cell `py.function`, rev-2 |
+| `run_rot24_gate` | the hygiene suite | shell function, the check 24 fixture's runner, rev-2 |
 | `# arm-signature: ` | a comment in a gate's block | marker grammar |
 | `exit`, `status` | pin column 2 | pin row kinds |
 | `REASON-OWED` | pin column 5 | the placeholder `--emit-pin` writes and `--check` refuses |
@@ -322,7 +362,11 @@ No leg, gate file or gotcha record is minted. The three functions enter the map'
 - `tools/memory-tree/check-memory-hygiene.sh`, check 24's block and any delegated block S6 marks
 - `tools/memory-tree/check-memory-hygiene.test.sh`
 - `tools/unattended/adopt-unattended.test.sh`, the UNWIRED assertion
-- the other sibling suites whose existing arms S6 lengthens, each named in the acceptance ledger
+- the other sibling suites whose existing arms S6 lengthens, each named in the acceptance ledger:
+  rev-2 adds `tools/memory-tree/check-verdict-epoch.test.sh` and
+  `tools/unattended/check-pass-order.test.sh`
+- every carrier `adopt-memory-tree.sh --render` re-renders at the bumped version, rev-2:
+  `memory/TEMPLATE-SPEC.md` and two guides beside `memory/HYGIENE.md`
 - `.memory-tree.conf`
 - `tools/memory-tree/.memory-tree.conf.example`
 - `tools/memory-tree/kit.toml`
@@ -529,6 +573,10 @@ above directly.
 
 - rev-1 · 2026-10-07 · initial draft from the unit 45 to 47 spec brief, grounded at `e1f4d8c0` on node
   `a`, with §4's census and the two association rules measured by a read-only probe over the tree.
+- rev-2 · 2026-10-07 · the build's refinements of rules 1 to 3, each measured over the tree at
+  `4fc54f77`, in §4's new subsection; S6 lengthens arms only inside the dispatched write set and
+  waives a driving arm elsewhere with its line named; the census re-derived at the build; Files
+  touched gains the two lengthened suites and the re-rendered carriers. No acceptance criterion moved.
 
 ## 10. Reuse audit
 
