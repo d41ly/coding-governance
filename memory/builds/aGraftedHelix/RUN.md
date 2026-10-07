@@ -10,21 +10,21 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 asks-at-landing: TOOL-aGraftedHelix-42=OPEN TOOL-aGraftedHelix-43=OPEN TOOL-aGraftedHelix-44=OPEN
-units-at-landing: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-26 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33 TOOL-aGraftedHelix-34 TOOL-aGraftedHelix-35 TOOL-aGraftedHelix-36 TOOL-aGraftedHelix-37 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39 TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41
+units-at-landing: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-26 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33 TOOL-aGraftedHelix-34 TOOL-aGraftedHelix-35 TOOL-aGraftedHelix-36 TOOL-aGraftedHelix-37 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39 TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 TOOL-aGraftedHelix-45 TOOL-aGraftedHelix-46 TOOL-aGraftedHelix-47
 hold-run: 
-hold-streak: 1 · at fff8b642
+hold-streak: 1 · at aa02d2c7
 resume-owed: none · owner
-held-at: 2026-10-06T22:34:26Z
-hold-reason: the run is complete (41 units CLOSED) and merged with local main's reconcile; whether it lands through the lander or rides the owner's merged local main is the owner's call, given the 2026-10-06 rulings that local main gather every session and that the kit self-tests run by hand from that tree
+held-at: 2026-10-07T02:02:09Z
+hold-reason: units 45 to 47 are built on the owner's decisions of 2026-10-07; five open discoveries are parked as post-build-discoveries for the owner, and the build rides local main per the owner's landing ruling
 hold-until: owner
 hold-code: owner-decision
 held-from: VERIFYING
 parked-surfaced: yes, 4 surfaced
 keepalive-reaped: yes
-refreshed-at: c83ef509cb6bcb2b7f55ede2846499a37821d98c · park · 3 touching
+refreshed-at: c83ef509cb6bcb2b7f55ede2846499a37821d98c · handoff · 3 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: e1f4d8c0c6abc835e8fbd41fd3878e4452b8c922
-phase: VERIFYING
+witness: aa02d2c7b8ac638ba21c712f02a5d96685a106e1
+phase: HELD
 branch-sha: 018b5675727d4c3f316e5b6c53b11c688f03a472
 branch-ref: refs/heads/branch/helixir-review-gov-adoption-ce32e1
 may: none
@@ -175,3 +175,7 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-07T01:22:55Z dispatch · item 4fc54f77 TOOL-aGraftedHelix-47 · reason tools/memory-tree tools/unattended tools/drift-audit tools/lexicon tools/memory-recall tools/runlog tools/lib tools/process-monitor tools/check-kit-versions.sh tools/check-dead-paths.sh tools/check-hook-destinations.sh tools/gate-legs.json tools/push-main.sh tools/run-gates .githooks memory/project/unarmed-branches.txt memory/HYGIENE.md memory/gotchas/a-grep-for-a-word-is-a-presence-probe.md memory/guides .claude/skills memory/map memory/builds/aGraftedHelix/spec/2026-10-07-spec-TOOL-aGraftedHelix-47.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md .memory-tree.conf memory/TEMPLATE-SPEC.md
 
 2026-10-07T01:58:38Z decision · item post-build-discoveries · reason question: what to do with five items the last units left open; options per item: adopt as a unit, backlog as an ask, or leave; items: (1) process-monitor's conf readers refuse a commented quoted value and never read an export prefix (unit 46, fails closed); (2) memory/HYGIENE.md's meta-gate paragraph still says the arms pin is EMPTY and names one signature, and its rewrite is the owner's turn under M3 veto 2 (unit 47); (3) nine waived refusal rows name arms in other kits' suites that should be lengthened to the whole signature (unit 47); (4) govkit selfcheck reports check-kit-versions asserting KIT_GOVKIT_VERSION with no registry entry claiming it (unit 46, predates the build); (5) check 9's LIVE.md render reads uncommitted product files, so a records commit made mid-pass can red (unit 45)
+
+2026-10-07T02:02:15Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aGraftedHelix && bash tools/push-main.sh --land --slug aGraftedHelix && bash tools/unattended/unattended.sh --settle aGraftedHelix
+
+2026-10-07T02:02:15Z hold · item owner-decision · reason until owner · reaped 3b95b0bd · resume none(owner)
