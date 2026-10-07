@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-47 — check-arms.py discovers a refusal that is not a fail call, and every one it finds is armed or waived with a printed reason
 
-**Status:** SPECCED · rev-3 · 2026-10-07 · node a · Tier-2 · base e1f4d8c0 · streams tooling · order 28 · closes TOOL-aDeferredBar-8
+**Status:** CLOSED · rev-3 · 2026-10-07 · node a · Tier-2 · base e1f4d8c0 · streams tooling · order 28 · closes TOOL-aDeferredBar-8
 
 <!-- gen:spec-records -->
 

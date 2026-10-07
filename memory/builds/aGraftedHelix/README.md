@@ -111,7 +111,7 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 44 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
+**Build status:** CLOSED · 44 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
 ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13
 ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-26
 ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33 TOOL-aGraftedHelix-34 TOOL-aGraftedHelix-35 TOOL-aGraftedHelix-36 TOOL-aGraftedHelix-37 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39
@@ -163,7 +163,7 @@ ids TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 TOOL-aGraftedHelix-42 TOOL-aGraf
 | [TOOL-aGraftedHelix-41 — the driver suite runs in the pooled sweep as eight shards cut by its own region costs](spec/2026-10-06-spec-TOOL-aGraftedHelix-41.md) | 25 | 2 | CLOSED | rev-2 | 2026-10-07 |
 | [TOOL-aGraftedHelix-45 — a leg bans a location probe asked from a moved directory unless it scrubs an inherited GIT_DIR or a registry row waives it](spec/2026-10-07-spec-TOOL-aGraftedHelix-45.md) | 26 | 2 | CLOSED | rev-3 | 2026-10-07 |
 | [TOOL-aGraftedHelix-46 — govkit reads a quoted conf value followed by a comment the way the shell that sources it does](spec/2026-10-07-spec-TOOL-aGraftedHelix-46.md) | 27 | 1 | CLOSED | rev-3 | 2026-10-07 |
-| [TOOL-aGraftedHelix-47 — check-arms.py discovers a refusal that is not a fail call, and every one it finds is armed or waived with a printed reason](spec/2026-10-07-spec-TOOL-aGraftedHelix-47.md) | 28 | 2 | SPECCED | rev-3 | 2026-10-07 |
+| [TOOL-aGraftedHelix-47 — check-arms.py discovers a refusal that is not a fail call, and every one it finds is armed or waived with a printed reason](spec/2026-10-07-spec-TOOL-aGraftedHelix-47.md) | 28 | 2 | CLOSED | rev-3 | 2026-10-07 |
 <!-- /gen:build-units -->
 
 Records: 67 bound to this build, across 4 record folder(s).

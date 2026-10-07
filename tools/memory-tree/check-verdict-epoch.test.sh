@@ -91,7 +91,7 @@ commit_engine "$H" 1.6 "echo one" "bump BUNDLED with the change"
 arm 'a bump bundled with the change is clean (W == S)' 0 'the version moved 1.5 -> 1.6' "$H" "$BASE_H"
 commit_engine "$H" 1.6 "echo one
 echo two" "a LATER change with no bump"
-arm 'a change AFTER the bump is caught' 1 'the bump is OLDER than the change it claims to date' "$H" "$BASE_H"
+arm 'a change AFTER the bump is caught' 1 'verdict-epoch: FAILED — the bump is OLDER than the change it claims to date.' "$H" "$BASE_H"
 arm '...and the failure names both commits' 1 'last KIT_MEMORY_TREE_VERSION change' "$H" "$BASE_H"
 commit_engine "$H" 1.7 "echo one
 echo two" "bump placed AFTER the last change"
@@ -175,7 +175,7 @@ F="$TMP/nomain"; mkdir -p "$F"
 ( cd "$F" && git init -q -b work . && git config user.email t@t.test && git config user.name t   && git config commit.gpgsign false ) >/dev/null 2>&1
 engine "$F" 1.5 ""
 ( cd "$F" && git add -A && git commit -qm base --no-verify ) >/dev/null
-arm 'an unresolvable base is a REFUSAL, not a pass' 1 'no mainline base' "$F"
+arm 'an unresolvable base is a REFUSAL, not a pass' 1 'verdict-epoch: FAILED — no mainline base to compare against, so this gate cannot judge' "$F"
 arm 'a bogus base is a named failure' 2 'is not a commit in this repo' "$A" deadbeefdeadbeef
 
 # ---- 5b. THE PUSH BOUNDARY (TOOL-aMendedFleet-65 S7). The lander mints the bump, so a branch owes

@@ -31,7 +31,7 @@ set -u
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.134   # gov:kit memory-tree@2.134 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.135   # gov:kit memory-tree@2.135 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -1364,8 +1364,16 @@ fi
 # the assertion is a corpus walk over ROW DOCUMENTS, and this file must not spell a second row
 # grammar. The first cut of this check did exactly that and five of six evasions passed silently —
 # a bold-wrapped id among them, which `memory/DECISIONS.md` carries fifteen of. TOOL-cSpliceWarden-6.
+# The capture is printed on a GREEN run too, as blocks 20, 27 and 28 print theirs: the module's
+# UNDECLARED and `snapshot` announcements arrive at exit 0, and a block that swallowed them turned
+# each back into a skip that looks like a pass (TOOL-aGraftedHelix-47, F4). The marker below is the
+# text the module prints on its `cut` refusal, which the suite's check 24 engine arm asserts, so
+# check-arms.py reads this delegated site as armed.
 if [ "$STAGED" = 0 ]; then
-  if ! rotm=$("$_PY" "$HERE/row_grammar.py" --check-rotation 2>&1); then
+  if rotm=$("$_PY" "$HERE/row_grammar.py" --check-rotation 2>&1); then
+    [ -z "$rotm" ] || printf '%s\n' "$rotm"
+  else
+    # arm-signature: and this tree does not honour it
     printf '%s\n' "$rotm"; status=1
     [ "$OFFENDERS" = 0 ] || add_offender_keys 24 $'\n'"$rotm"
   fi
@@ -2488,6 +2496,8 @@ if [ "$STAGED" = 0 ]; then
   ids=$("$_PY" "$HERE/corpus_ids.py" --check 2>&1); _idsrc=$?
   [ -n "$ids" ] && printf '%s
 ' "$ids"
+  # The suite's check 13 claimant arm drives this exit through the engine (TOOL-aGraftedHelix-47).
+  # arm-signature: is claimed by
   [ "$_idsrc" -ne 0 ] && status=1
   [ "$_idsrc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 13-16 $'\n'"$ids"
 fi
@@ -2534,6 +2544,7 @@ if [ "$STAGED" = 0 ]; then
   if relm=$("$_PY" "$HERE/row_grammar.py" --check-relations 2>&1); then
     [ -z "$relm" ] || printf '%s\n' "$relm"
   else
+    # arm-signature: near-matches
     printf '%s\n' "$relm"; status=1
     [ "$OFFENDERS" = 0 ] || add_offender_keys 27 $'\n'"$relm"
   fi
@@ -2547,6 +2558,7 @@ if [ "$STAGED" = 0 ]; then
   if contm=$("$_PY" "$HERE/row_grammar.py" --check-content 2>&1); then
     [ -z "$contm" ] || printf '%s\n' "$contm"
   else
+    # arm-signature: records hold one content key
     printf '%s\n' "$contm"; status=1
     [ "$OFFENDERS" = 0 ] || add_offender_keys 28 $'\n'"$contm"
   fi
