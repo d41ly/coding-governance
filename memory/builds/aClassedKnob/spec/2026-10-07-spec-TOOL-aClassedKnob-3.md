@@ -1,6 +1,6 @@
 # TOOL-aClassedKnob-3 — the verdict epoch reads an adopter's vendored engine against its install receipt
 
-**Status:** SPECCED · rev-1 · 2026-10-07 · node a · Tier-1 · base 56c2b82e · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-10-07 · node a · Tier-1 · base 56c2b82e · streams tooling · order 2
 
 <!-- gen:spec-records -->
 

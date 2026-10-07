@@ -49,12 +49,12 @@ none
 |---|---|---|---|
 | 1 | `TOOL-aClassedKnob-1` | CLOSED | H49 classifies the four memory-pause and census knobs; IR AC11 reads the repository's own policy |
 | 2 | `TOOL-aClassedKnob-2` | CLOSED | arm 2d releases its lock after the lander has reached it, not on a wall-clock deadline |
-| 3 | `TOOL-aClassedKnob-3` | SPECCED | verdict epoch reads a vendored engine against the install receipt, not the pull's commit order |
+| 3 | `TOOL-aClassedKnob-3` | CLOSED | verdict epoch reads a vendored engine against the install receipt, not the pull's commit order |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 3 unit(s) · node a · opened 2026-10-07 · streams tooling
+**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-10-07 · streams tooling
 ids TOOL-aClassedKnob-1 TOOL-aClassedKnob-2 TOOL-aClassedKnob-3
 
 <!-- gen:build-units -->
@@ -62,7 +62,7 @@ ids TOOL-aClassedKnob-1 TOOL-aClassedKnob-2 TOOL-aClassedKnob-3
 |---|---|---|---|---|---|
 | [TOOL-aClassedKnob-1 — the pre-push self-test classifies every runner knob and reads the adopter's own policy](spec/2026-10-07-spec-TOOL-aClassedKnob-1.md) | 1 | 1 | CLOSED | rev-1 | 2026-10-07 |
 | [TOOL-aClassedKnob-2 — push-main arm 2d holds its lock until the lander has reached it](spec/2026-10-07-spec-TOOL-aClassedKnob-2.md) | 1 | 1 | CLOSED | rev-1 | 2026-10-07 |
-| [TOOL-aClassedKnob-3 — the verdict epoch reads an adopter's vendored engine against its install receipt](spec/2026-10-07-spec-TOOL-aClassedKnob-3.md) | 2 | 1 | SPECCED | rev-1 | 2026-10-07 |
+| [TOOL-aClassedKnob-3 — the verdict epoch reads an adopter's vendored engine against its install receipt](spec/2026-10-07-spec-TOOL-aClassedKnob-3.md) | 2 | 1 | CLOSED | rev-1 | 2026-10-07 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).
