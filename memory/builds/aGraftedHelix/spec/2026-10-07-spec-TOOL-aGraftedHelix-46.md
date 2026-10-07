@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-aGraftedHelix-46-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aGraftedHelix-46-1-acceptance-ledger.md) | journal | — |
 | [2026-10-07-prompt-TOOL-aGraftedHelix-45-1-spec-brief.md](../prompts/2026-10-07-prompt-TOOL-aGraftedHelix-45-1-spec-brief.md) | journal | TOOL-aGraftedHelix-45 TOOL-aGraftedHelix-47 |
 
 <!-- /gen:spec-records -->
