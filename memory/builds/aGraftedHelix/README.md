@@ -166,7 +166,7 @@ ids TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 TOOL-aGraftedHelix-42 TOOL-aGraf
 | [TOOL-aGraftedHelix-47 — check-arms.py discovers a refusal that is not a fail call, and every one it finds is armed or waived with a printed reason](spec/2026-10-07-spec-TOOL-aGraftedHelix-47.md) | 28 | 2 | SPECCED | rev-1 | 2026-10-07 |
 <!-- /gen:build-units -->
 
-Records: 65 bound to this build, across 4 record folder(s).
+Records: 66 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
