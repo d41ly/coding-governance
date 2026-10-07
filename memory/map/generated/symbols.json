@@ -3113,6 +3113,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "check_conf_reader_parity",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_conformance",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -9416,6 +9421,11 @@
       "id": "parse_conf",
       "kind": "function",
       "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
+      "id": "parse_conf_assignment",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "parse_conf_line",

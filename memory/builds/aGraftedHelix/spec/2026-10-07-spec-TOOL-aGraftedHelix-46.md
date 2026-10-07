@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-46 — govkit reads a quoted conf value followed by a comment the way the shell that sources it does
 
-**Status:** SPECCED · rev-3 · 2026-10-07 · node a · Tier-1 · base e1f4d8c0 · streams tooling · order 27
+**Status:** CLOSED · rev-3 · 2026-10-07 · node a · Tier-1 · base e1f4d8c0 · streams tooling · order 27 · ratified 2026-10-07
 
 <!-- gen:spec-records -->
 
