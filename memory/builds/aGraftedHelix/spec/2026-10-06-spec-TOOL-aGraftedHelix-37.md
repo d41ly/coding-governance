@@ -7,7 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-build-TOOL-aGraftedHelix-37-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aGraftedHelix-37-1-acceptance-ledger.md) | journal | — |
-| [2026-10-06-build-TOOL-aGraftedHelix-29-runlog-b9bb22c3.md](../build/2026-10-06-build-TOOL-aGraftedHelix-29-runlog-b9bb22c3.md) | journal | TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33 TOOL-aGraftedHelix-34 TOOL-aGraftedHelix-35 TOOL-aGraftedHelix-36 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39 TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 |
+| [2026-10-06-build-TOOL-aGraftedHelix-29-runlog-b9bb22c3.md](../build/2026-10-06-build-TOOL-aGraftedHelix-29-runlog-b9bb22c3.md) | journal | TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33 TOOL-aGraftedHelix-34 TOOL-aGraftedHelix-35 TOOL-aGraftedHelix-36 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39 TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 TOOL-aGraftedHelix-45 TOOL-aGraftedHelix-46 TOOL-aGraftedHelix-47 |
 | [2026-10-06-prompt-TOOL-aGraftedHelix-37-1-spec-brief.md](../prompts/2026-10-06-prompt-TOOL-aGraftedHelix-37-1-spec-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

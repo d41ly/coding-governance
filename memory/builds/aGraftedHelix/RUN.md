@@ -19,9 +19,9 @@ hold-reason: the run is complete (41 units CLOSED) and merged with local main's 
 hold-until: owner
 hold-code: owner-decision
 held-from: VERIFYING
-parked-surfaced: yes, 3 surfaced
+parked-surfaced: yes, 4 surfaced
 keepalive-reaped: yes
-refreshed-at: cacd8d307477c5aca09d2cfe851fe4e5f425b932 · handoff · 0 touching
+refreshed-at: c83ef509cb6bcb2b7f55ede2846499a37821d98c · park · 3 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: e1f4d8c0c6abc835e8fbd41fd3878e4452b8c922
 phase: VERIFYING
@@ -173,3 +173,5 @@ base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 2026-10-07T00:53:28Z dispatch · item 4fc54f77 TOOL-aGraftedHelix-47 · reason tools/memory-tree tools/unattended tools/drift-audit tools/lexicon tools/memory-recall tools/runlog tools/lib tools/process-monitor tools/check-kit-versions.sh tools/check-dead-paths.sh tools/check-hook-destinations.sh tools/gate-legs.json tools/push-main.sh tools/run-gates .githooks memory/project/unarmed-branches.txt memory/HYGIENE.md memory/gotchas/a-grep-for-a-word-is-a-presence-probe.md memory/guides .claude/skills memory/map memory/builds/aGraftedHelix/spec/2026-10-07-spec-TOOL-aGraftedHelix-47.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md .memory-tree.conf
 
 2026-10-07T01:22:55Z dispatch · item 4fc54f77 TOOL-aGraftedHelix-47 · reason tools/memory-tree tools/unattended tools/drift-audit tools/lexicon tools/memory-recall tools/runlog tools/lib tools/process-monitor tools/check-kit-versions.sh tools/check-dead-paths.sh tools/check-hook-destinations.sh tools/gate-legs.json tools/push-main.sh tools/run-gates .githooks memory/project/unarmed-branches.txt memory/HYGIENE.md memory/gotchas/a-grep-for-a-word-is-a-presence-probe.md memory/guides .claude/skills memory/map memory/builds/aGraftedHelix/spec/2026-10-07-spec-TOOL-aGraftedHelix-47.md memory/builds/aGraftedHelix/build memory/builds/aGraftedHelix/README.md .memory-tree.conf memory/TEMPLATE-SPEC.md
+
+2026-10-07T01:58:38Z decision · item post-build-discoveries · reason question: what to do with five items the last units left open; options per item: adopt as a unit, backlog as an ask, or leave; items: (1) process-monitor's conf readers refuse a commented quoted value and never read an export prefix (unit 46, fails closed); (2) memory/HYGIENE.md's meta-gate paragraph still says the arms pin is EMPTY and names one signature, and its rewrite is the owner's turn under M3 veto 2 (unit 47); (3) nine waived refusal rows name arms in other kits' suites that should be lengthened to the whole signature (unit 47); (4) govkit selfcheck reports check-kit-versions asserting KIT_GOVKIT_VERSION with no registry entry claiming it (unit 46, predates the build); (5) check 9's LIVE.md render reads uncommitted product files, so a records commit made mid-pass can red (unit 45)
