@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-08
 streams: tooling
 roster: TOOL
-ids: TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5
+ids: TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6
 ---
 
 # dLadderedRemote — every kit probe finds the remote by the lander's ladder, not by the name origin
@@ -61,12 +61,13 @@ none
 | 3 | `TOOL-dLadderedRemote-3` | INPROGRESS | a ban leg on literal `origin` refs in kit code, observed RED at 40a8b8c3 |
 | 4 | `TOOL-dLadderedRemote-4` | INPROGRESS | the tier-2 review harness requires `base` instead of defaulting to `origin/main` |
 | 5 | `TOOL-dLadderedRemote-5` | INPROGRESS | the closing review's minors: a tighter ban, an unambiguous ladder, prose naming the ladder |
+| 6 | `TOOL-dLadderedRemote-6` | INPROGRESS | the round-2 minors: the ban's lost defaults, variables and argv; the guard's message and branch read |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 5 unit(s) · node d · opened 2026-10-08 · streams tooling
-ids TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5
+**Build status:** INPROGRESS · 6 unit(s) · node d · opened 2026-10-08 · streams tooling
+ids TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -75,14 +76,15 @@ ids TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dL
 | [TOOL-dLadderedRemote-3 — a ban leg reds a literal origin ref in kit code](spec/2026-10-08-spec-TOOL-dLadderedRemote-3.md) | 2 | 2 | INPROGRESS | rev-3 | 2026-10-08 |
 | [TOOL-dLadderedRemote-2 — every probe that read a literal origin carries the ladder inline and keeps its own fallback beneath it](spec/2026-10-08-spec-TOOL-dLadderedRemote-2.md) | 3 | 2 | INPROGRESS | rev-3 | 2026-10-08 |
 | [TOOL-dLadderedRemote-4 — the tier-2 review harness requires a diff review's base instead of defaulting to origin/main](spec/2026-10-08-spec-TOOL-dLadderedRemote-4.md) | 3 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
-| [TOOL-dLadderedRemote-5 — the closing review's minors: a tighter ban, an unambiguous ladder, and prose that names the ladder](spec/2026-10-08-spec-TOOL-dLadderedRemote-5.md) | 4 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
+| [TOOL-dLadderedRemote-5 — the closing review's minors: a tighter ban, an unambiguous ladder, and prose that names the ladder](spec/2026-10-08-spec-TOOL-dLadderedRemote-5.md) | 4 | 2 | INPROGRESS | rev-2 | 2026-10-08 |
+| [TOOL-dLadderedRemote-6 — the round-2 minors: the ban's lost defaults, variables and argv, and two small honesty fixes](spec/2026-10-08-spec-TOOL-dLadderedRemote-6.md) | 5 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dLadderedRemote-6.
 
-Ids no `spec-audit` record has ever named: TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5.
+Ids no `spec-audit` record has ever named: TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -93,6 +95,7 @@ Ids no `spec-audit` record has ever named: TOOL-dLadderedRemote-1 TOOL-dLaddered
 | 2 | `TOOL-dLadderedRemote-3` | no |
 | 3 | `TOOL-dLadderedRemote-2`, `TOOL-dLadderedRemote-4` | yes |
 | 4 | `TOOL-dLadderedRemote-5` | no |
+| 5 | `TOOL-dLadderedRemote-6` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
