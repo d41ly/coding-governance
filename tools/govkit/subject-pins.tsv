@@ -114,6 +114,7 @@ runlog skill wiring	repo	wiring
 scratch-guard self-test	kit	selftests
 selftest harness self-test	kit	selftests
 settings-merge selftest	kit	selftests
+shell hygiene (a location probe asked from a moved directory)	repo	product
 shell hygiene (a loop fed by a command substitution)	repo	product
 shell-hygiene selftest	kit	selftests
 spec tokens (a spec's own names resolve)	repo	declarations

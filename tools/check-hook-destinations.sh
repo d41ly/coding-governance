@@ -46,7 +46,7 @@ cd "$ROOT" || exit 2
 st=0
 # THE TOOL ROOT, DERIVED (TOOL-aRepatriatedFork-29 S3): this gate sits in it, beside the deployer,
 # the resolver and the two readers it asks. Underivable is a refusal, never a guessed prefix.
-if ! SELF_PRE=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
+if ! SELF_PRE=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
   echo "hook-dest: cannot derive this gate's own directory from '$_self_dir' — REFUSING"
   exit 2
 fi

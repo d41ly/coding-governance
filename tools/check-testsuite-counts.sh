@@ -28,7 +28,7 @@ set -u
 _self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "testsuite-counts: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
-_self_pre=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || { echo "testsuite-counts: cannot derive this gate's own directory from '$_self_dir', so the manifest beside it cannot be found"; exit 2; }
+_self_pre=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || { echo "testsuite-counts: cannot derive this gate's own directory from '$_self_dir', so the manifest beside it cannot be found"; exit 2; }
 MANIFEST="${GATE_LEGS:-${_self_pre}gate-legs.json}"
 # The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test.
@@ -48,11 +48,11 @@ fail() { echo "TESTSUITE-COUNTS FAILED — $1"; status=1; }
 
 [ -f "$MANIFEST" ] || { echo "testsuite-counts: no $MANIFEST, so the population would be empty and this leg would pass by finding nothing"; exit 2; }
 
-# Every `*.test.sh` the manifest names, deduplicated. Selected from the argv strings rather than by
-# globbing the tree, so the leg's population and the bar's are the same set by construction.
-# A `{prefix}` token (gov's own manifest, TOOL-aRepatriatedFork-29 §8 F1) resolves to this gate's
-# own directory, which is the tool root the manifest sits in.
-suites=$(grep -oE '"[^"]*\.test\.sh"' "$MANIFEST" | tr -d '"' \
+# Every `*.test.sh` the manifest names, deduplicated, from the argv strings rather than the tree, so
+# the leg's population and the bar's are one set. A string opening with `:` is a git PATHSPEC, such
+# as `:!*.test.sh`, and never a suite. A `{prefix}` token (TOOL-aRepatriatedFork-29 §8 F1) resolves
+# to this gate's own directory, which is the tool root the manifest sits in.
+suites=$(grep -oE '"[^":][^"]*\.test\.sh"' "$MANIFEST" | tr -d '"' \
   | while IFS= read -r _s; do resolve_prefix_sh "$_s" "${_self_pre%/}"; done | sort -u)
 if [ -z "$suites" ]; then
   fail "the gate manifest names no *.test.sh, so this leg would grade an empty population — the vacuous-selector shape it exists to prevent"

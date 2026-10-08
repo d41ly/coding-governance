@@ -37,10 +37,12 @@ finding line read back, and the same run on a clean tree reading the green summa
 break the probe would miss, a deleted `status=1` or a deleted print, and watch the arm go red. A grep
 may locate the block for a reader; it is never the observation.
 
-**Documented check, no machine gate.** The class gate would teach `tools/memory-tree/check-arms.py`
-to count a delegated dispatch block, one that sets `status=1` with no `fail <n>` call, as a refusal
-needing an armed sibling test. `TOOL-aGraftedHelix-13` declined it in scope, because it changes
-another leg's predicate and reds check 24's block, which has no engine arm; the open ask
-`TOOL-aDeferredBar-8` asks that script for a second discovery signature of exactly this kind. Until
-it lands, a review of a diff adding a delegated block to the hygiene engine asks whether some arm
-RUNS the engine over it and has seen that arm red.
+**Gated by `python tools/memory-tree/check-arms.py --check`, under `ARMS_REFUSALS`.** Its second
+discovery signature, from `TOOL-aGraftedHelix-47`, counts a delegated dispatch block, one that
+prints a module's capture and sets `status=1` with no `fail <n>` call, as a refusal site. The site
+reads ARMED only when the block's `# arm-signature:` marker names text that a positive assertion in
+the engine's sibling suite carries, which an engine arm is the only natural place to write; check
+24's block gained its arm in that unit. Otherwise the site is pinned in
+`memory/project/unarmed-branches.txt` with a reason the gate prints on every run. The gate trusts
+the marker: it does not check that the arm RUNS the engine or has been seen red, so a review of a
+diff adding a delegated block still asks both.

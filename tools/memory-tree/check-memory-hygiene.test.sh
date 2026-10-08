@@ -1870,7 +1870,7 @@ mkdir -p "$H/memory/project" "$H/memory/architecture/project" "$H/memory/archite
 outh=$(cd "$H" && bash "$SCRIPT" 2>/dev/null); rch=$?
 [ "$rch" = 0 ] && { echo "FAIL a half-migrated tree exited 0 — every flat selector matched nothing and the gate was green"; st=1; }
 n=$((n+1))
-grep -qF 'selected an EMPTY population' <<<"$outh" || { echo "FAIL no empty-population report on a half-migrated tree"; st=1; }
+grep -qF 'HYGIENE FAILED — a check selected an EMPTY population. An empty selection prints nothing,' <<<"$outh" || { echo "FAIL no empty-population report on a half-migrated tree"; st=1; }
 n=$((n+1))
 for c in 3 4 5 8 12; do
   grep -qE "^    check $c: " <<<"$outh" || { echo "FAIL check $c did not report its empty population on a half-migrated tree"; st=1; }
@@ -3584,9 +3584,15 @@ cp "$HERE"/*.sh "$HERE"/*.py "$C28/$KIT_REL"/
 run_cont28_gate() { local _b=$1; shift; ( cd "$C28" && git checkout -q "$_b" && GOV_DEFAULT_BRANCH=main bash "$C28/$KIT_REL/check-memory-hygiene.sh" "$@" 2>&1 ); }
 o28=$(run_cont28_gate arm); r28rc=$?
 _c28l=$(grep -E '^check 28: ' <<<"$o28")
-_c28x=$(grep -E '^check [0-9]+:' <<<"$o28" | grep -vE '^check 28: ')
+# Check 24's UNDECLARED announcement is excluded BY ITS TEXT: the block prints it at exit 0 since
+# TOOL-aGraftedHelix-47, and it is a `check 24:` line that is no offence. Declaring the mode instead
+# would add a project-key line to the --offenders run below.
+_c28x=$(grep -E '^check [0-9]+:' <<<"$o28" | grep -vE '^check 28: |^check 24: ROTATION_MODE is UNDECLARED')
 n=$((n+1))
+# The middle line carries the block's `# arm-signature:` text, the module's own words on every
+# content refusal, so check-arms.py reads check 28's delegated site as armed (TOOL-aGraftedHelix-47).
 if [ "$r28rc" != 0 ] && grep -qF 'memory/gotchas/held-once.md (held-once)' <<<"$_c28l" \
+   && grep -qF 'records hold one content key' <<<"$_c28l" \
    && grep -qF 'memory/gotchas/held-twice.md (held-twice)' <<<"$_c28l" && [ -z "$_c28x" ]; then
   echo "ok   check 28 through the engine: a branch adding a gotcha whose body main holds reds the leg, naming both, and no other check"
 else
@@ -3602,6 +3608,67 @@ n=$((n+1))
 case "$r28rc:$o28" in
   0:*"row-grammar: check 28 graded 2 record(s)"*) echo "ok   check 28 through the engine: the clean main exits 0 and prints the module's graded summary" ;;
   *) echo "FAIL check 28 through the engine: the clean main exited $r28rc, or the green run did not print the 'row-grammar: check 28 graded 2' summary - the block drops its capture on exit 0:"; printf '%s\n' "$o28" | sed 's/^/      /'; st=1 ;;
+esac
+
+# ---- TOOL-aGraftedHelix-47 — CHECK 24's DISPATCH BLOCK, observed THROUGH THE ENGINE, for the reason
+# ---- the check-28 arms above exist: `row_grammar.py --selftest` arms the predicate and never runs
+# ---- this script, and check-arms.py reads the block's `# arm-signature:` marker as ARMED only by a
+# ---- positive assertion of that text here. Copy-installed on the check-28 shape with
+# ---- ROTATION_MODE="cut". Main holds a rotated decision archive its live index announces on line 3,
+# ---- the preamble check 10 reads, as the TOOL-aRelaxedShard-4 rotation block announces its own, so
+# ---- checks 9 and 10 accept it. The branch adds to that archive an id the live index also holds,
+# ---- so 24 is its only offence. The clean run must PRINT the module's verdict, because the block
+# ---- swallowed its capture at exit 0 until this unit (F4 of its spec).
+C24=$TMP/rot24
+mkdir -p "$C24/$KIT_REL"
+cp "$HERE"/*.sh "$HERE"/*.py "$C24/$KIT_REL"/
+(
+  cd "$C24" || exit 1
+  git init -q . && git symbolic-ref HEAD refs/heads/main
+  git config user.email t@t.test; git config user.name t; git config core.autocrlf false
+  mkdir -p memory/builds/tOne/spec memory/project memory/gotchas memory/archive
+  printf '/%s/\n__pycache__/\n' "${KIT_REL%%/*}" > .gitignore
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\nROTATION_MODE="cut"\n' > .memory-tree.conf
+  printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
+  printf '# r\n' > memory/README.md
+  printf '# d\n\n> Rotated 2026-07-01 to [archive/DECISIONS.2026-07-01.md](archive/DECISIONS.2026-07-01.md).\n\n- ARCH-tOne-1 - a decision\n' > memory/DECISIONS.md
+  printf '# rotated\n' > memory/archive/DECISIONS.2026-07-01.md
+  printf '# stale-header-waiver.txt -- EMPTY is expected; the file must exist.\n' > memory/project/stale-header-waiver.txt
+  printf -- '---\nslug: tOne\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\nids: ARCH-tOne-1\nstatus: OPEN\n---\n\n# tOne\n\n<!-- gen:build-index -->\n\n<!-- /gen:build-index -->\n' > memory/builds/tOne/README.md
+  printf '# ARCH-tOne-1 - a unit\n\nbody\n' > memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md
+  printf -- '---\nname: held-once\ndescription: a fixture class\nkind: class\nuniversal: true\n---\n\n# A class\n\nA fixture body naming its resolution. No machine gate.\n' > memory/gotchas/held-once.md
+  git add -A && git -c commit.gpgsign=false commit -q -m base --no-verify
+  "$_PY" "$KIT_REL/gen_build_index.py" --write && "$_PY" "$KIT_REL/gotchas.py" --write
+  git add -A && git -c commit.gpgsign=false commit -q -m gen --no-verify
+  git checkout -q -b arm
+  printf -- '- ARCH-tOne-1 - the live id, rotated without being cut from the index\n' >> memory/archive/DECISIONS.2026-07-01.md
+  "$_PY" "$KIT_REL/gen_build_index.py" --write
+  git add -A && git -c commit.gpgsign=false commit -q -m uncut --no-verify
+) >/dev/null 2>&1
+run_rot24_gate() { local _b=$1; shift; ( cd "$C24" && git checkout -q "$_b" && GOV_DEFAULT_BRANCH=main bash "$C24/$KIT_REL/check-memory-hygiene.sh" "$@" 2>&1 ); }
+o24=$(run_rot24_gate arm); r24rc=$?
+_c24x=$(grep -E '^check [0-9]+:' <<<"$o24" | grep -vE '^check 24: ')
+n=$((n+1))
+case "$r24rc:$o24" in
+  0:*) echo "FAIL check 24 through the engine: the branch holding an id in both the archive and its live index exited 0 - the block swallowed the module's exit or never ran it:"; printf '%s\n' "$o24" | sed 's/^/      /'; st=1 ;;
+  *"and this tree does not honour it"*)
+    if [ -z "$_c24x" ]; then
+      echo "ok   check 24 through the engine: an id in both a cut archive and its live index reds the leg with the module's refusal, and no other check"
+    else
+      echo "FAIL check 24 through the engine: the branch run printed another check's line, so the exit is not 24's to claim:"; printf '%s\n' "$_c24x" | sed 's/^/      /'; st=1
+    fi ;;
+  *) echo "FAIL check 24 through the engine: the branch run exited $r24rc without the module's cut refusal in its output - the block dropped the capture it exists to print:"; printf '%s\n' "$o24" | sed 's/^/      /'; st=1 ;;
+esac
+# stderr DROPPED, unlike every other run of this fixture: the declared ROTATION_MODE draws the
+# engine's project-key announcement there, and it is no offender key.
+_c24k=$( ( cd "$C24" && git checkout -q arm && GOV_DEFAULT_BRANCH=main bash "$C24/$KIT_REL/check-memory-hygiene.sh" --offenders 2>/dev/null ) | cut -f1 | sort -u)
+n=$((n+1))
+[ "$_c24k" = "check 24" ] || { echo "FAIL check 24 through the engine: --offenders keyed the branch as [$(printf '%s' "$_c24k" | tr '\n' ',')] rather than check 24 alone - another check offends, or the block keys nothing under 24"; st=1; }
+o24=$(run_rot24_gate main); r24rc=$?
+n=$((n+1))
+case "$r24rc:$o24" in
+  0:*"rotation-mode: clean ("*) echo "ok   check 24 through the engine: the clean main exits 0 and prints the module's clean verdict" ;;
+  *) echo "FAIL check 24 through the engine: the clean main exited $r24rc, or the green run did not print 'rotation-mode: clean (' - the block drops its capture on exit 0:"; printf '%s\n' "$o24" | sed 's/^/      /'; st=1 ;;
 esac
 
 # THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
@@ -3648,7 +3715,9 @@ esac
 # never skipped, because that fixture needs no sibling kit.
 # RAISED 538 -> 539 by TOOL-aGraftedHelix-17: its no-check-28 arm on the check-27 branch run,
 # top-level and skipped aloud with that block's other four.
-FLOOR_ASSERTIONS=539
+# RAISED 539 -> 542 by TOOL-aGraftedHelix-47: its three check-24 engine arms, each top-level and
+# never skipped, because that fixture needs no sibling kit.
+FLOOR_ASSERTIONS=542
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

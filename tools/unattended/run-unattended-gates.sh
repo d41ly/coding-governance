@@ -50,13 +50,13 @@
 # and that limit is unchanged by how this script is invoked.
 set -u
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
+ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
   echo "run-unattended-gates: not a git work tree"; exit 2; }
 cd "$ROOT" || exit 2
 # THIS KIT'S OWN PATHS ARE DERIVED (TOOL-aRepatriatedFork-2 S2): the `--kit` filter is this kit's
 # repo-relative dir, and the runner sits in the run-gates kit beside it. Both were spelled at gov's
 # prefix, so at another install `--selftests` ran a missing script and the filter matched nothing.
-KIT_REL=$(git -C "$HERE" rev-parse --show-prefix 2>/dev/null) || KIT_REL=""
+KIT_REL=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-prefix 2>/dev/null) || KIT_REL=""
 KIT_REL=${KIT_REL%/}
 # TOOL-aRepatriatedFork-46: the runner's kit is a SIBLING, found through the resolver, which reads the
 # install receipt before it probes beside this kit and one level up, rather than typed after this

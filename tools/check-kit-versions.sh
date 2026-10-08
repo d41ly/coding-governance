@@ -19,7 +19,7 @@ cd "$ROOT" || exit 2
 # its own check. `git -C <dir> rev-parse --show-prefix` and not a string strip, because a Windows
 # junction makes two spellings of one tree differ; an empty answer is the repo root, told apart from
 # a failure by git's exit status.
-if ! K=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
+if ! K=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
   echo "kit-versions: cannot derive this gate's own directory from '$_self_dir' — REFUSING rather than guessing the kit root"
   exit 2
 fi
