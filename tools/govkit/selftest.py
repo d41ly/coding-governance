@@ -11859,6 +11859,9 @@ user_skills = "/tmp/gk-fake-skills"
             # pin the value in both directions; until build dPolishedVitrine this line said "the
             # S6 arms below" did, and none of them sets it.
             "_cmd_update": None,
+            # TOOL-aMeteredSweep-1. `mint` prints a regenerate argv only when it FAILED, never the
+            # one it is about to run, so there is no announcement for a needle to pin.
+            "cmd_mint": None,
         }
         # ---- DEPL-dRetiredFork-5, ROUND 2. THE VERDICT ARMS WERE SWAPPED ----------------------
         # The first version of `run_kit_check`'s outcome block re-asked `_oc.get("ok")` after
