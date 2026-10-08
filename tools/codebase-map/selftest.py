@@ -1599,23 +1599,23 @@ def test_baseline_additions_from_git(tmp: Path):
     try:
         gone, reason = m.resolve_compare_base(tmp)
         assert gone is None and reason == "no remote to compare against", (gone, reason)
-        run_git("remote", "add", "incms", "../incms.git")
-        run_git("update-ref", "refs/remotes/incms/main", bare)
-        run_git("symbolic-ref", "refs/remotes/incms/HEAD", "refs/remotes/incms/main")
+        run_git("remote", "add", "upstream", "../upstream.git")
+        run_git("update-ref", "refs/remotes/upstream/main", bare)
+        run_git("symbolic-ref", "refs/remotes/upstream/HEAD", "refs/remotes/upstream/main")
         got, why = m.resolve_compare_base(tmp)
-        assert got == bare and why == "merge-base of HEAD and incms/main", (got, why)
+        assert got == bare and why == "merge-base of HEAD and upstream/main", (got, why)
         # TOOL-dLadderedRemote-5: the OBSERVED branch, never GOV_DEFAULT_BRANCH, picks the base.
         os.environ["GOV_DEFAULT_BRANCH"] = "elsewhere"
         same, why = m.resolve_compare_base(tmp)
-        assert same == bare and why == "merge-base of HEAD and incms/main", (same, why)
+        assert same == bare and why == "merge-base of HEAD and upstream/main", (same, why)
         del os.environ["GOV_DEFAULT_BRANCH"]
         run_git("remote", "add", "origin", "../origin.git")
         run_git("update-ref", "refs/remotes/origin/main", seeded)
         refused, why = m.resolve_compare_base(tmp)
         assert refused is None and "export GOV_REMOTE=<remote>" in why, (refused, why)
-        os.environ["GOV_REMOTE"] = "incms"
+        os.environ["GOV_REMOTE"] = "upstream"
         chosen, why = m.resolve_compare_base(tmp)
-        assert chosen == bare and "incms/main" in why, (chosen, why)
+        assert chosen == bare and "upstream/main" in why, (chosen, why)
     finally:
         os.environ.pop("GOV_REMOTE", None)
         os.environ.update(saved)

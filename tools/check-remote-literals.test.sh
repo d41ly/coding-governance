@@ -40,8 +40,8 @@ GATE_SRC="$HERE/check-remote-literals.sh"
 FLOOR_ASSERTIONS=30
 PASS=0
 FAIL=0
-ok()  { PASS=$((PASS+1)); }
-bad() { FAIL=$((FAIL+1)); echo "  FAIL: $1"; }
+add_pass() { PASS=$((PASS+1)); }
+add_fail() { FAIL=$((FAIL+1)); echo "  FAIL: $1"; }
 
 TMPROOT=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMPROOT"' EXIT
@@ -52,14 +52,14 @@ arm() {
   local out rc
   out=$("$@" 2>&1); rc=$?
   if [ "$rc" -ne "$want" ]; then
-    bad "$label — wanted rc=$want got $rc: $(printf '%s' "$out" | head -3)"; return
+    add_fail "$label — wanted rc=$want got $rc: $(printf '%s' "$out" | head -3)"; return
   fi
-  case "$out" in *"$needle"*) ok ;; *) bad "$label — rc was right but the message was not: $(printf '%s' "$out" | head -3)" ;; esac
+  case "$out" in *"$needle"*) add_pass ;; *) add_fail "$label — rc was right but the message was not: $(printf '%s' "$out" | head -3)" ;; esac
 }
 
-# mkrepo <dir> — a committed repo carrying the gate at this suite's own prefix and one clean file, so
+# build_repo <dir> — a committed repo carrying the gate at this suite's own prefix and one clean file, so
 # the population is never empty unless an arm empties it on purpose.
-mkrepo() {
+build_repo() {
   local d="$1"
   mkdir -p "$d/${PFX}kit"
   ( cd "$d" && git init -q && git config core.autocrlf false \
@@ -68,13 +68,13 @@ mkrepo() {
   printf 'echo clean\n' > "$d/${PFX}kit/clean.sh"
   ( cd "$d" && git add -A && git commit -qm base ) || return 1
 }
-# plant <dir> <relpath> <line> — write one line into a tracked file of the scratch repo
-plant() {
+# write_plant <dir> <relpath> <line> — write one line into a tracked file of the scratch repo
+write_plant() {
   mkdir -p "$(dirname "$1/$2")"
   printf '%s\n' "$3" > "$1/$2"
   ( cd "$1" && git add -A ) || return 1
 }
-gate() { ( cd "$1" && bash "${PFX}check-remote-literals.sh" "${@:2}" ); }
+run_gate() { ( cd "$1" && bash "${PFX}check-remote-literals.sh" "${@:2}" ); }
 
 N="ori""gin"
 # The tables are written to scratch FILES and the loops read those, never a heredoc: a loop fed by a
@@ -119,24 +119,24 @@ k=0
 while IFS='|' read -r shape rel line; do
   [ -n "$shape" ] || continue
   k=$((k+1)); d="$TMPROOT/red$k"
-  mkrepo "$d" || { echo "remote-literals.test: could not build $d"; exit 2; }
-  plant "$d" "$rel" "$line" || exit 2
-  arm "RED $shape is named" 1 "$rel:1:" -- gate "$d"
+  build_repo "$d" || { echo "remote-literals.test: could not build $d"; exit 2; }
+  write_plant "$d" "$rel" "$line" || exit 2
+  arm "RED $shape is named" 1 "$rel:1:" -- run_gate "$d"
   # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
   if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${FAIL:-0}" = 0 ] && echo "PASS (${PASS:-1} assertions)" || echo "FAIL (${PASS:-1} assertions)"; [ "${FAIL:-0}" = 0 ] && exit 0; exit 1; fi
 done < "$RED_TABLE"
-[ "$k" = 17 ] || bad "the RED table read as $k rows, not 17"
+[ "$k" = 17 ] || add_fail "the RED table read as $k rows, not 17"
 
 # ---- GREEN: the same bytes where they must not be named --------------------------------------------
 k=0
 while IFS='|' read -r what rel line; do
   [ -n "$what" ] || continue
   k=$((k+1)); d="$TMPROOT/green$k"
-  mkrepo "$d" || exit 2
-  plant "$d" "$rel" "$line" || exit 2
-  arm "GREEN $what" 0 "remote-literals: clean" -- gate "$d"
+  build_repo "$d" || exit 2
+  write_plant "$d" "$rel" "$line" || exit 2
+  arm "GREEN $what" 0 "remote-literals: clean" -- run_gate "$d"
 done < "$GREEN_TABLE"
-[ "$k" = 10 ] || bad "the GREEN table read as $k rows, not 10"
+[ "$k" = 10 ] || add_fail "the GREEN table read as $k rows, not 10"
 
 # ---- the population refuses to be vacuous ----------------------------------------------------------
 d="$TMPROOT/empty"
@@ -145,12 +145,12 @@ mkdir -p "$d/${PFX}"
 cp "$GATE_SRC" "$d/${PFX}check-remote-literals.sh"
 printf 'notes\n' > "$d/notes.txt"
 ( cd "$d" && git add notes.txt && git commit -qm base ) || exit 2
-arm "an empty population is a DEAD PROBE, never clean" 2 "DEAD PROBE" -- gate "$d"
+arm "an empty population is a DEAD PROBE, never clean" 2 "DEAD PROBE" -- run_gate "$d"
 
-d="$TMPROOT/usage"; mkrepo "$d" || exit 2
-arm "an unknown mode refuses" 2 "usage:" -- gate "$d" --nope
-d="$TMPROOT/list"; mkrepo "$d" || exit 2
-arm "--list prints the population" 0 "population  ${PFX}kit/clean.sh" -- gate "$d" --list
+d="$TMPROOT/usage"; build_repo "$d" || exit 2
+arm "an unknown mode refuses" 2 "usage:" -- run_gate "$d" --nope
+d="$TMPROOT/list"; build_repo "$d" || exit 2
+arm "--list prints the population" 0 "population  ${PFX}kit/clean.sh" -- run_gate "$d" --list
 
 if [ "$PASS" -lt "$FLOOR_ASSERTIONS" ]; then
   echo "check-remote-literals.test FAILED — $PASS arm(s) executed, below the floor of $FLOOR_ASSERTIONS;"

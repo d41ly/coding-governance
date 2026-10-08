@@ -278,27 +278,27 @@ done
 # row is about that. The ambient GOV_REMOTE and GOV_DEFAULT_BRANCH are cleared per row, so a node that
 # exports either cannot make a row pass. WHAT THIS DOES NOT CHECK: any consumer's call site, which is
 # the suite of the kit that calls it, nor a remote URL — the ladder never reads one.
-rr_fx() { # dir -> a repo on branch `feature` with one empty commit and no remote
+build_rr_fixture() { # dir -> a repo on branch `feature` with one empty commit and no remote
   git init -q -b main "$1" && git -C "$1" -c user.email=t@e -c user.name=t commit -q --allow-empty -m x \
     && git -C "$1" checkout -q -b feature
 }
-rr_remote() { # dir name [default] -> the remote configured, its tracking ref at HEAD, and HEAD's symref
+add_rr_remote() { # dir name [default] -> the remote configured, its tracking ref at HEAD, and HEAD's symref
   git -C "$1" remote add "$2" "../$2.git" && git -C "$1" update-ref "refs/remotes/$2/${3:-main}" HEAD \
     && git -C "$1" symbolic-ref "refs/remotes/$2/HEAD" "refs/remotes/$2/${3:-main}"
 }
 RR="$TMP/rr"; mkdir -p "$RR"
-rr_fx "$RR/one" && rr_remote "$RR/one" incms
-rr_fx "$RR/two" && rr_remote "$RR/two" incms && rr_remote "$RR/two" origin
-rr_fx "$RR/up" && rr_remote "$RR/up" incms && rr_remote "$RR/up" origin trunk && git -C "$RR/up" config branch.feature.remote origin
-rr_fx "$RR/none"
-rr_fx "$RR/nohead" && git -C "$RR/nohead" remote add r ../r.git
-rr_fx "$RR/dot" && rr_remote "$RR/dot" incms && git -C "$RR/dot" config branch.feature.remote .
+build_rr_fixture "$RR/one" && add_rr_remote "$RR/one" incms
+build_rr_fixture "$RR/two" && add_rr_remote "$RR/two" incms && add_rr_remote "$RR/two" origin
+build_rr_fixture "$RR/up" && add_rr_remote "$RR/up" incms && add_rr_remote "$RR/up" origin trunk && git -C "$RR/up" config branch.feature.remote origin
+build_rr_fixture "$RR/none"
+build_rr_fixture "$RR/nohead" && git -C "$RR/nohead" remote add r ../r.git
+build_rr_fixture "$RR/dot" && add_rr_remote "$RR/dot" incms && git -C "$RR/dot" config branch.feature.remote .
 # TOOL-dLadderedRemote-5: the two refusal texts no row graded, then the two names a SHORT ref read
 # ambiguously — a tag sharing the branch's name, and a local branch named like the remote's default.
-rr_fx "$RR/detached" && rr_remote "$RR/detached" incms && rr_remote "$RR/detached" origin && git -C "$RR/detached" checkout -q --detach
-rr_fx "$RR/badcfg" && rr_remote "$RR/badcfg" incms && git -C "$RR/badcfg" config branch.feature.remote zz
-rr_fx "$RR/tag" && rr_remote "$RR/tag" incms && rr_remote "$RR/tag" origin trunk && git -C "$RR/tag" config branch.feature.remote origin && git -C "$RR/tag" tag feature
-rr_fx "$RR/ambig" && rr_remote "$RR/ambig" incms && git -C "$RR/ambig" branch incms/main
+build_rr_fixture "$RR/detached" && add_rr_remote "$RR/detached" incms && add_rr_remote "$RR/detached" origin && git -C "$RR/detached" checkout -q --detach
+build_rr_fixture "$RR/badcfg" && add_rr_remote "$RR/badcfg" incms && git -C "$RR/badcfg" config branch.feature.remote zz
+build_rr_fixture "$RR/tag" && add_rr_remote "$RR/tag" incms && add_rr_remote "$RR/tag" origin trunk && git -C "$RR/tag" config branch.feature.remote origin && git -C "$RR/tag" tag feature
+build_rr_fixture "$RR/ambig" && add_rr_remote "$RR/ambig" incms && git -C "$RR/ambig" branch incms/main
 RR_ROWS="one||incms|main|main|
 two|||||cannot choose a remote: GOV_REMOTE is unset, branch feature has no configured remote, and this repository has 2 remotes (incms origin). Name it: export GOV_REMOTE=<remote>.
 two|GOV_REMOTE=incms|incms|main|main|

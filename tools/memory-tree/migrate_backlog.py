@@ -2769,7 +2769,7 @@ DAY_SEED, DAY_STRAG, DAY_LATER, DAY_HEAD = ("2026-03-01", "2026-04-02", "2026-04
 # The fixtures' remote, named through one constant and deliberately NOT the conventional name, so
 # every landing-form arm also exercises the remote ladder on a node that names its remote after the
 # project (TOOL-dLadderedRemote-2).
-FX_REMOTE = "incms"
+FX_REMOTE = "upstream"
 
 FX_SEED_ROWS = (
     "- EXMP-aFoo-1 · OPEN · the first ask, which the straggler closes",

@@ -2665,7 +2665,7 @@ def cmd_selftest():
             b1 = run("git", "rev-parse", "HEAD", cwd=f1).strip()
             # The remote is CONFIGURED, because the ladder reads configuration and a ref alone names no
             # remote; it is named through a variable and not after the convention (TOOL-dLadderedRemote-2).
-            rg_remote = "incms"
+            rg_remote = "upstream"
             run("git", "remote", "add", rg_remote, f"../{rg_remote}.git", cwd=f1)
             run("git", "update-ref", f"refs/remotes/{rg_remote}/main", b0, cwd=f1)
             set_branch(f1, "main", add_rows(restated))

@@ -863,10 +863,10 @@ n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
   || { echo "canary: with no resolvable BASE a guarded leg did not fail safe to RUN"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 # Pass 2 with the remote's HEAD pinned: the guard path resolves and the unchanged leg must SKIP. The
-# remote is named incms, not origin, and it is CONFIGURED: the ladder reads configuration, and a node
+# remote is named upstream, not origin, and it is CONFIGURED: the ladder reads configuration, and a node
 # that names its remote after the project scopes like any other (TOOL-dLadderedRemote-2 AC4).
-( cd "$G" && git remote add incms ../incms.git && git update-ref refs/remotes/incms/main HEAD \
-  && git symbolic-ref refs/remotes/incms/HEAD refs/remotes/incms/main ) >/dev/null 2>&1
+( cd "$G" && git remote add upstream ../upstream.git && git update-ref refs/remotes/upstream/main HEAD \
+  && git symbolic-ref refs/remotes/upstream/HEAD refs/remotes/upstream/main ) >/dev/null 2>&1
 for w in 1 4; do
 n=$((n+1))
 n=$((n+1))

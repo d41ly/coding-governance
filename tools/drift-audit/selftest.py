@@ -2211,13 +2211,13 @@ def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
     # TOOL-dLadderedRemote-2 — the remote is the LADDER'S, not one called `origin`. Every env value
     # is cleared, so the answer is the repository's own and an ambient export cannot pass an arm.
     clear = {"GOV_DEFAULT_BRANCH": "", "GOV_REMOTE": ""}
-    run(["git", "remote", "add", "incms", str(bare)], r)
-    run(["git", "update-ref", "refs/remotes/incms/main", tip], r)
-    run(["git", "symbolic-ref", "refs/remotes/incms/HEAD", "refs/remotes/incms/main"], r)
+    run(["git", "remote", "add", "upstream", str(bare)], r)
+    run(["git", "update-ref", "refs/remotes/upstream/main", tip], r)
+    run(["git", "symbolic-ref", "refs/remotes/upstream/HEAD", "refs/remotes/upstream/main"], r)
     one = run([sys.executable, REPORT_REL], r, env=clear)
     first = one.stdout.splitlines()[0] if one.stdout.strip() else ""
-    check("AC1 (dLadderedRemote): the ONLY remote named incms resolves refs/remotes/incms/main",
-          re.search(r"\(base refs/remotes/incms/main @ [0-9a-f]{8}\)", first) is not None,
+    check("AC1 (dLadderedRemote): the ONLY remote named upstream resolves refs/remotes/upstream/main",
+          re.search(r"\(base refs/remotes/upstream/main @ [0-9a-f]{8}\)", first) is not None,
           first or one.stderr[-300:])
     run(["git", "remote", "add", "origin", str(bare)], r)
     two = run([sys.executable, REPORT_REL, "--json"], r, env=clear)
@@ -2225,10 +2225,10 @@ def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
           two.returncode == 2 and not two.stdout.strip(), f"rc={two.returncode} {two.stdout[-200:]}")
     check("AC2 (dLadderedRemote): ...and the refusal names GOV_REMOTE",
           "export GOV_REMOTE=<remote>" in two.stderr, two.stderr[-400:])
-    chosen = run([sys.executable, REPORT_REL], r, env={**clear, "GOV_REMOTE": "incms"})
+    chosen = run([sys.executable, REPORT_REL], r, env={**clear, "GOV_REMOTE": "upstream"})
     first = chosen.stdout.splitlines()[0] if chosen.stdout.strip() else ""
-    check("AC3 (dLadderedRemote): GOV_REMOTE=incms beside origin resolves refs/remotes/incms/main",
-          re.search(r"\(base refs/remotes/incms/main @ [0-9a-f]{8}\)", first) is not None,
+    check("AC3 (dLadderedRemote): GOV_REMOTE=upstream beside origin resolves refs/remotes/upstream/main",
+          re.search(r"\(base refs/remotes/upstream/main @ [0-9a-f]{8}\)", first) is not None,
           first or chosen.stderr[-300:])
 
 
