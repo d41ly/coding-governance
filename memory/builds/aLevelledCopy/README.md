@@ -3,9 +3,8 @@ slug: aLevelledCopy
 node: a
 opened: 2026-10-09
 streams: tooling+deployer
-status: INPROGRESS
 roster: TOOL+DEPL
-ids: DEPL-aLevelledCopy-1 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3
+ids: DEPL-aLevelledCopy-1 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4
 authorized-by: prompt
 ---
 
@@ -56,23 +55,31 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 0 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
-ids DEPL-aLevelledCopy-1 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3
+**Build status:** OPEN · 4 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
+ids DEPL-aLevelledCopy-1 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [DEPL-aLevelledCopy-1 — govkit update carries gov's exec bit onto an existing engine row](spec/2026-10-09-spec-DEPL-aLevelledCopy-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aLevelledCopy-1 — receipt-sync grades a mismatched row through the target's clean filter](spec/2026-10-09-spec-TOOL-aLevelledCopy-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aLevelledCopy-2 — check-wiring sets core.sshCommand from push-main's keepalive string](spec/2026-10-09-spec-TOOL-aLevelledCopy-2.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aLevelledCopy-3 — gov's executed hooks are 100755, and check-wiring grades a hook's index mode](spec/2026-10-09-spec-TOOL-aLevelledCopy-3.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: DEPL-aLevelledCopy-1 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `DEPL-aLevelledCopy-1`, `TOOL-aLevelledCopy-1`, `TOOL-aLevelledCopy-2` | yes |
+| 2 | `TOOL-aLevelledCopy-3` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
