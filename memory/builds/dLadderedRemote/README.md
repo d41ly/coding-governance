@@ -56,34 +56,34 @@ none
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-dLadderedRemote-1` | INPROGRESS | the ladder as two canonicals in the lib dir, parity rows and one truth table both must print |
-| 2 | `TOOL-dLadderedRemote-2` | INPROGRESS | every site reading a literal `origin` carries the ladder inline and keeps its own fallback beneath it |
-| 3 | `TOOL-dLadderedRemote-3` | INPROGRESS | a ban leg on literal `origin` refs in kit code, observed RED at 40a8b8c3 |
-| 4 | `TOOL-dLadderedRemote-4` | INPROGRESS | the tier-2 review harness requires `base` instead of defaulting to `origin/main` |
-| 5 | `TOOL-dLadderedRemote-5` | INPROGRESS | the closing review's minors: a tighter ban, an unambiguous ladder, prose naming the ladder |
-| 6 | `TOOL-dLadderedRemote-6` | INPROGRESS | the round-2 minors: the ban's lost defaults, variables and argv; the guard's message and branch read |
-| 7 | `TOOL-dLadderedRemote-7` | INPROGRESS | the round-3 minors: the ban's last false positives, an honest header, the runbook's full list |
-| 8 | `TOOL-dLadderedRemote-8` | INPROGRESS | the round-4 minors: two restored ban spellings and four exact sentences |
-| 9 | `TOOL-dLadderedRemote-9` | INPROGRESS | the round-5 minors, at the review's exit: argv lists followed by more arguments, three sentences |
+| 1 | `TOOL-dLadderedRemote-1` | CLOSED | the ladder as two canonicals in the lib dir, parity rows and one truth table both must print |
+| 2 | `TOOL-dLadderedRemote-2` | CLOSED | every site reading a literal `origin` carries the ladder inline and keeps its own fallback beneath it |
+| 3 | `TOOL-dLadderedRemote-3` | CLOSED | a ban leg on literal `origin` refs in kit code, observed RED at 40a8b8c3 |
+| 4 | `TOOL-dLadderedRemote-4` | CLOSED | the tier-2 review harness requires `base` instead of defaulting to `origin/main` |
+| 5 | `TOOL-dLadderedRemote-5` | CLOSED | the closing review's minors: a tighter ban, an unambiguous ladder, prose naming the ladder |
+| 6 | `TOOL-dLadderedRemote-6` | CLOSED | the round-2 minors: the ban's lost defaults, variables and argv; the guard's message and branch read |
+| 7 | `TOOL-dLadderedRemote-7` | CLOSED | the round-3 minors: the ban's last false positives, an honest header, the runbook's full list |
+| 8 | `TOOL-dLadderedRemote-8` | CLOSED | the round-4 minors: two restored ban spellings and four exact sentences |
+| 9 | `TOOL-dLadderedRemote-9` | CLOSED | the round-5 minors, at the review's exit: argv lists followed by more arguments, three sentences |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 9 unit(s) · node d · opened 2026-10-08 · streams tooling
+**Build status:** CLOSED · 9 unit(s) · node d · opened 2026-10-08 · streams tooling
 ids TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6 TOOL-dLadderedRemote-7 TOOL-dLadderedRemote-8 TOOL-dLadderedRemote-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dLadderedRemote-1 — the remote ladder has one canonical per language, and one truth table holds both](spec/2026-10-08-spec-TOOL-dLadderedRemote-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
-| [TOOL-dLadderedRemote-3 — a ban leg reds a literal origin ref in kit code](spec/2026-10-08-spec-TOOL-dLadderedRemote-3.md) | 2 | 2 | INPROGRESS | rev-3 | 2026-10-08 |
-| [TOOL-dLadderedRemote-2 — every probe that read a literal origin carries the ladder inline and keeps its own fallback beneath it](spec/2026-10-08-spec-TOOL-dLadderedRemote-2.md) | 3 | 2 | INPROGRESS | rev-3 | 2026-10-08 |
-| [TOOL-dLadderedRemote-4 — the tier-2 review harness requires a diff review's base instead of defaulting to origin/main](spec/2026-10-08-spec-TOOL-dLadderedRemote-4.md) | 3 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
-| [TOOL-dLadderedRemote-5 — the closing review's minors: a tighter ban, an unambiguous ladder, and prose that names the ladder](spec/2026-10-08-spec-TOOL-dLadderedRemote-5.md) | 4 | 2 | INPROGRESS | rev-2 | 2026-10-08 |
-| [TOOL-dLadderedRemote-6 — the round-2 minors: the ban's lost defaults, variables and argv, and two small honesty fixes](spec/2026-10-08-spec-TOOL-dLadderedRemote-6.md) | 5 | 2 | INPROGRESS | rev-2 | 2026-10-08 |
-| [TOOL-dLadderedRemote-7 — the round-3 minors: the ban's last false positives, its honest header, and the runbook's full list](spec/2026-10-08-spec-TOOL-dLadderedRemote-7.md) | 6 | 2 | INPROGRESS | rev-2 | 2026-10-08 |
-| [TOOL-dLadderedRemote-8 — the round-4 minors: two restored ban spellings and four exact sentences](spec/2026-10-08-spec-TOOL-dLadderedRemote-8.md) | 7 | 2 | INPROGRESS | rev-2 | 2026-10-08 |
-| [TOOL-dLadderedRemote-9 — the round-5 minors: argv lists followed by more arguments, and three exact sentences](spec/2026-10-08-spec-TOOL-dLadderedRemote-9.md) | 8 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
+| [TOOL-dLadderedRemote-1 — the remote ladder has one canonical per language, and one truth table holds both](spec/2026-10-08-spec-TOOL-dLadderedRemote-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-08 |
+| [TOOL-dLadderedRemote-3 — a ban leg reds a literal origin ref in kit code](spec/2026-10-08-spec-TOOL-dLadderedRemote-3.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-08 |
+| [TOOL-dLadderedRemote-2 — every probe that read a literal origin carries the ladder inline and keeps its own fallback beneath it](spec/2026-10-08-spec-TOOL-dLadderedRemote-2.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-08 |
+| [TOOL-dLadderedRemote-4 — the tier-2 review harness requires a diff review's base instead of defaulting to origin/main](spec/2026-10-08-spec-TOOL-dLadderedRemote-4.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-08 |
+| [TOOL-dLadderedRemote-5 — the closing review's minors: a tighter ban, an unambiguous ladder, and prose that names the ladder](spec/2026-10-08-spec-TOOL-dLadderedRemote-5.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-08 |
+| [TOOL-dLadderedRemote-6 — the round-2 minors: the ban's lost defaults, variables and argv, and two small honesty fixes](spec/2026-10-08-spec-TOOL-dLadderedRemote-6.md) | 5 | 2 | CLOSED | rev-2 | 2026-10-08 |
+| [TOOL-dLadderedRemote-7 — the round-3 minors: the ban's last false positives, its honest header, and the runbook's full list](spec/2026-10-08-spec-TOOL-dLadderedRemote-7.md) | 6 | 2 | CLOSED | rev-2 | 2026-10-08 |
+| [TOOL-dLadderedRemote-8 — the round-4 minors: two restored ban spellings and four exact sentences](spec/2026-10-08-spec-TOOL-dLadderedRemote-8.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-08 |
+| [TOOL-dLadderedRemote-9 — the round-5 minors: argv lists followed by more arguments, and three exact sentences](spec/2026-10-08-spec-TOOL-dLadderedRemote-9.md) | 8 | 2 | CLOSED | rev-1 | 2026-10-08 |
 <!-- /gen:build-units -->
 
 Records: 7 bound to this build, across 3 record folder(s).

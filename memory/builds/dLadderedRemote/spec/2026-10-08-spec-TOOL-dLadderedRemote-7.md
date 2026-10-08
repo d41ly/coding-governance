@@ -1,6 +1,6 @@
 # TOOL-dLadderedRemote-7 — the round-3 minors: the ban's last false positives, its honest header, and the runbook's full list
 
-**Status:** INPROGRESS · rev-2 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 6
+**Status:** CLOSED · rev-2 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 

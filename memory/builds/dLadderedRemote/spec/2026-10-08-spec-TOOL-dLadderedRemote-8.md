@@ -1,6 +1,6 @@
 # TOOL-dLadderedRemote-8 — the round-4 minors: two restored ban spellings and four exact sentences
 
-**Status:** INPROGRESS · rev-2 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 7
+**Status:** CLOSED · rev-2 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 

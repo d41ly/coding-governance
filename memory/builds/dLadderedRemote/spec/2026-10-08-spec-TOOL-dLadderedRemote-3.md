@@ -1,6 +1,6 @@
 # TOOL-dLadderedRemote-3 — a ban leg reds a literal origin ref in kit code
 
-**Status:** INPROGRESS · rev-3 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 

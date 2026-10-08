@@ -1,6 +1,6 @@
 # TOOL-dLadderedRemote-9 — the round-5 minors: argv lists followed by more arguments, and three exact sentences
 
-**Status:** INPROGRESS · rev-1 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 8
+**Status:** CLOSED · rev-1 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 

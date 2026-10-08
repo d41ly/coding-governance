@@ -1,6 +1,6 @@
 # TOOL-dLadderedRemote-1 — the remote ladder has one canonical per language, and one truth table holds both
 
-**Status:** INPROGRESS · rev-1 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
