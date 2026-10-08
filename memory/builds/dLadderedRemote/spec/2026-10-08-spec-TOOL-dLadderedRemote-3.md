@@ -1,11 +1,12 @@
 # TOOL-dLadderedRemote-3 — a ban leg reds a literal origin ref in kit code
 
-**Status:** INPROGRESS · rev-2 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 2
+**Status:** INPROGRESS · rev-3 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md](../build/2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md) | journal | TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 |
 | [2026-10-08-review-TOOL-dLadderedRemote-2-closing-diff-round1.md](../reviews/2026-10-08-review-TOOL-dLadderedRemote-2-closing-diff-round1.md) | diff-review | TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-4 |
 
 <!-- /gen:spec-records -->
@@ -43,6 +44,7 @@ the defect, which is how one fixed lander and twelve unfixed probes came to coex
   the predicate it introduces
 - **hands-off** `TOOL-dLadderedRemote-2` — the hits in kit sites, which that unit drains
 - **hands-off** `TOOL-dLadderedRemote-4` — the hit in the review harness's default base
+- **hands-off** `TOOL-dLadderedRemote-5` — the predicate and population gaps the closing review found
 
 ## 4. Design
 
@@ -129,6 +131,8 @@ none
 - rev-1 · 2026-10-08 · initial draft.
 - rev-2 · 2026-10-08 · S3 · the ban leg sits in the `declarations` chunk, as built; closing review
   round 1 item 19, folded by `TOOL-dLadderedRemote-5`.
+- rev-3 · 2026-10-08 · §3 · the hands-off edge to `TOOL-dLadderedRemote-5`, the batch unit the closing
+  review promoted.
 
 ## 10. Reuse audit
 

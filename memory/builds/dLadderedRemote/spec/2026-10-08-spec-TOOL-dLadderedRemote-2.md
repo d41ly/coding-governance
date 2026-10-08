@@ -1,11 +1,12 @@
 # TOOL-dLadderedRemote-2 — every probe that read a literal origin carries the ladder inline and keeps its own fallback beneath it
 
-**Status:** INPROGRESS · rev-2 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 3
+**Status:** INPROGRESS · rev-3 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md](../build/2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md) | journal | TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 |
 | [2026-10-08-build-TOOL-dLadderedRemote-2-1-site-probe.md](../build/2026-10-08-build-TOOL-dLadderedRemote-2-1-site-probe.md) | journal | — |
 | [2026-10-08-review-TOOL-dLadderedRemote-2-closing-diff-round1.md](../reviews/2026-10-08-review-TOOL-dLadderedRemote-2-closing-diff-round1.md) | diff-review | TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 |
 
@@ -79,6 +80,8 @@ nothing resolved stays exactly as it was, so the only behaviour that moves is wh
 - **consumes-from** `TOOL-dLadderedRemote-1` — the two canonical blocks every site inlines; without
   them there is nothing byte-identical to inline
 - **consumes-from** `TOOL-dLadderedRemote-3` — the ban leg, which this unit turns from red to green
+- **hands-off** `TOOL-dLadderedRemote-5` — the closing review's minors at these sites: the observed
+  branch at run-gates and map_lib, liveness on a refusal, `base_from`, govkit's currency, and prose
 
 ## 4. Design
 
@@ -195,6 +198,8 @@ none
 - rev-2 · 2026-10-08 · S4 · S5 · §7 · what the build pass found: check 3's message stays put and the
   refusal prints beside it; the render reads the observed branch, not the environment; the
   codebase-map arm lives in the kit selftest, since the repo-subject coverage test runs on every bar.
+- rev-3 · 2026-10-08 · §3 · the hands-off edge to `TOOL-dLadderedRemote-5`, the batch unit the closing
+  review promoted.
 
 ## 10. Reuse audit
 

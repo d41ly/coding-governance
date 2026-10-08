@@ -20,7 +20,7 @@ upstream, and `GOV_REMOTE` is unset. `pick` is `two` with `GOV_REMOTE=incms`. Ev
 | Site | one | two | pick |
 |---|---|---|---|
 | `render_playbook.derive_default_branch` | `trunk` | `main`, refusal on stderr | `trunk` |
-| `govkit.resolve_measurer_currency` | unverified, `incms did not answer` | unverified, the refusal | unverified, `incms did not answer` |
+| `govkit.resolve_measurer_currency` | unverified, `incms did not answer` | unverified, the refusal | unverified, the refusal (unit 5 sets the target's `GOV_REMOTE` aside here) |
 | `migrate_backlog.resolve_default_tip` | `trunk` and its sha | `Refusal` naming `GOV_REMOTE` | `trunk` and its sha |
 | `row_grammar.derive_relation_base` | merge-base with `incms/trunk` | `Problem` naming `GOV_REMOTE` | merge-base with `incms/trunk` |
 | runlog `read_refs` `origin_head` | `refs/remotes/incms/trunk` | None, so local fallback | `refs/remotes/incms/trunk` |
