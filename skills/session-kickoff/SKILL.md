@@ -39,10 +39,10 @@ not a meeting.
   holding the default branch (often the dir literally named `main`). Ask only if ambiguous.
 - No git anywhere → say so and ask whether to run a scope-only kickoff (Steps 3 + 5) or stop.
 - Detect **remote** by the ladder every kit inlines: `GOV_REMOTE`, else the current branch's
-  configured remote, else the repository's only remote; several and none chosen → ask, naming
-  `GOV_REMOTE`. Then the **default branch**: `GOV_DEFAULT_BRANCH`, else the target of
-  `refs/remotes/<remote>/HEAD` with `refs/remotes/<remote>/` stripped; fallback: `main` if it exists,
-  else `master`. No remote → note it, skip fetch/ff.
+  configured remote, else the repository's only remote (`git remote`); several and none chosen →
+  ask, naming `GOV_REMOTE`. Then the **default branch**: `GOV_DEFAULT_BRANCH`, else the target of
+  `git symbolic-ref refs/remotes/<remote>/HEAD` with `refs/remotes/<remote>/` stripped; fallback:
+  `main` if it exists, else `master`. No remote → note it, skip fetch/ff.
 - On Windows under a POSIX shell (MSYS/Git-Bash), give `git -C` **forward-slash** paths
   (`/c/repo`), never backslash — backslash drive paths get mangled.
 
