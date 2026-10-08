@@ -729,10 +729,13 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   way, and none assumes it is called `origin`: `GOV_REMOTE`, else the current branch's configured
   remote, else the repository's only remote. A clone with several remotes and none chosen refuses,
   naming `GOV_REMOTE`; export it once per node, as a per-node variance. The default branch is
-  `GOV_DEFAULT_BRANCH`, else what that remote's HEAD names (`git remote set-head <remote> -a`).
+  `GOV_DEFAULT_BRANCH`, else what that remote's HEAD names (`git remote set-head <remote> -a`) —
+  except for three readers that take ONLY what the remote's HEAD names, so an environment value
+  cannot move what they grade against: the run-gates scope base, the codebase-map baseline assert
+  and the playbook render. A checkout with no HEAD symref (common in CI) sets it with `set-head`.
 - The tracked pre-commit **branch guard** (refuse a primary-tree commit while off the default branch).
   coding-governance ships a portable reference block in its own `.githooks/pre-commit` (default branch
-  `GOV_DEFAULT_BRANCH`, else the HEAD of the remote the ladder below resolves, else `main`; only fires in the primary tree,
+  `GOV_DEFAULT_BRANCH`, else the HEAD of the remote the ladder above resolves, else `main`; only fires in the primary tree,
   not linked worktrees; red/green self-test `.githooks/pre-commit.test.sh`) — copy that block into the
   project's pre-commit. For a multi-worktree project, also add a per-machine install that points
   `core.hooksPath` at an **out-of-tree copy** under `$(git rev-parse --git-common-dir)`, so a branch that

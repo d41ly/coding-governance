@@ -1618,6 +1618,7 @@ def test_baseline_additions_from_git(tmp: Path):
         assert chosen == bare and "upstream/main" in why, (chosen, why)
     finally:
         os.environ.pop("GOV_REMOTE", None)
+        os.environ.pop("GOV_DEFAULT_BRANCH", None)
         os.environ.update(saved)
 
 

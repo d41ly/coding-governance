@@ -1,6 +1,6 @@
-# Acceptance ledger — dLadderedRemote, units 1 to 5
+# Acceptance ledger — dLadderedRemote, units 1 to 6
 
-**Serves:** journal TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5
+**Serves:** journal TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6
 
 Node `d`, 2026-10-08. Every observation below was a direct check of one change: a truth-table arm,
 an arm in the affected kit's own suite run alone, a staged break, or the cross-site probe recorded
@@ -63,3 +63,14 @@ probed by extracting its two changed functions. The merge bar is the main loop's
   `incms/main` merge-base; letting the environment select made it return `None`.
 - AC6 — `git grep` — over the seven files, `set-head origin` and `origin/HEAD` matched nothing, and
   `WIRE-INTO-PROJECT.md` names `GOV_REMOTE` twice.
+
+**Evidences:** TOOL-dLadderedRemote-6
+- AC1 — `check-remote-literals.sh` — the self-test named all seven new spellings, 39 arms; with the
+  argv-list pattern removed, the `--prune` argv row went unnamed.
+- AC2 — `check-remote-literals.sh` — `self.origin = origin` in a `.py` file and `const base = origin;`
+  in a `.js` file stayed clean, and the real tree read `remote-literals: clean — 144 file(s)`.
+- AC3 — `WIRE-INTO-PROJECT.md` — the ladder bullet names the run-gates scope base, the codebase-map
+  baseline assert and the playbook render as observed-only, and the guard bullet says `above`.
+- AC4 — `.githooks/pre-commit` — with a tag named `main`, a commit on `main` was allowed, and with
+  two remotes and the pin set the commit printed no `GOV_REMOTE` line; the guard reading
+  `--short HEAD` refused the tagged commit.

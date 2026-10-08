@@ -70,9 +70,14 @@ gc=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
 if [ -n "$gd" ] && [ "$gd" = "$gc" ]; then          # primary tree, not a linked worktree
   # GOV_DEFAULT_BRANCH FIRST and independent of the ladder: a ladder refusal returns before it sets
   # RR_BRANCH, and the pin must still hold there. The refusal is announced, never swallowed.
-  resolve_remote_sh || echo "pre-commit: branch guard: $RR_WHY The default branch falls back to GOV_DEFAULT_BRANCH, else main." >&2
+  # The refusal is announced only where it decides something: with GOV_DEFAULT_BRANCH set the pin
+  # decides, and printing it on every commit would be noise nobody acts on.
+  if ! resolve_remote_sh && [ -z "${GOV_DEFAULT_BRANCH:-}" ]; then
+    echo "pre-commit: branch guard: $RR_WHY The default branch falls back to main." >&2
+  fi
   def=${GOV_DEFAULT_BRANCH:-${RR_BRANCH:-main}}
-  branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
+  # The FULL ref, never `--short`: a tag named like the branch makes the short form `heads/<b>`.
+  branch=$(git symbolic-ref --quiet HEAD 2>/dev/null || true); branch=${branch#refs/heads/}
   if [ -n "$branch" ] && [ "$branch" != "$def" ]; then
     echo "pre-commit: refusing a commit in the primary tree while on '$branch' (default: '$def')."
     echo "  Feature work belongs in a sibling worktree (playbook §3), not on the primary tree."

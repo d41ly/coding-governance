@@ -27,16 +27,21 @@
 #   1. a tracking ref — `refs/remotes/` then the name, then anything but a name character;
 #   2. a short ref or prefix — the name then `/`, led by anything but a name character, `.`, `/` or
 #      `$`, so `${x#<name>/}` and `removeprefix("<name>/")` count and a variable `$<name>/x` does not;
-#   3. a default — the name QUOTED after `or`, `||` or `??`; the name after `${x-`, `${x:-`, `${x=` or
-#      `${x:=`; or the name quoted as a call's last argument after a comma, as in `.get(k, "<name>")`;
-#   4. an assignment — a variable set to the name, quoted or not, as in `REMOTE=<name>`;
-#   5. a remedy — `set-head`, `fetch`, `get-url`, `ls-remote`, `set-url`, `push` or `pull` then the
-#      name, or `remote.<name>.` as a config key.
+#   3. a default — the name QUOTED after `or`, `||` or `??`; the name after any `${...-`, `${...:-`,
+#      `${...=` or `${...:=`, whatever the parameter (`${1:-<name>}` included); or the name quoted as
+#      a call's or a list's last argument after a comma, as in `.get(k, "<name>")`;
+#   4. an assignment — a variable set to the QUOTED name in any file, or to the bare name in a shell
+#      file only, as in `REMOTE=<name>`: in Python or JS the bare form reads a variable;
+#   5. a remedy — `set-head`, `fetch`, `get-url`, `ls-remote`, `set-url`, `push` or `pull`, any
+#      flags, then the name; the same verb QUOTED in an argv list followed by quoted flags and the
+#      quoted name, as in `["git", "fetch", "<name>"]`; or `remote.<name>.` as a config key.
 #
 # WHAT THIS GATE DOES NOT CHECK, said out loud because a structural ban reads as a semantic one:
 #   * a remote name held in a VARIABLE and joined at run time, which spells nothing;
-#   * a bare QUOTED name passed as a git argument anywhere but last, which cannot be told from a
-#     dictionary key of the same spelling — `govkit.py` uses that word as a field name;
+#   * a bare QUOTED name passed as a git argument anywhere but last and outside the argv shape above,
+#     which cannot be told from a dictionary key of the same spelling — `govkit.py` uses that word as
+#     a field name;
+#   * a call or an argv list WRAPPED across lines: every shape reads one line;
 #   * a revision range such as `<name>..HEAD`, and a comparison such as `== "<name>"`;
 #   * a Python docstring or a message string QUOTING an old spelling is a hit, not a skip: only the
 #     comment leaders above are skipped, so reword the string;
@@ -75,22 +80,36 @@ fi
 N="ori""gin"   # assembled, so this file does not spell what it bans
 Q="[\"'\`]"
 END="([^A-Za-z0-9_-]|\$)"
+VERB="(set-head|fetch|get-url|ls-remote|set-url|push|pull)"
 PATTERNS=(
   "refs/remotes/$N([^A-Za-z0-9_.-]|\$)"
   "(^|[^A-Za-z0-9_./\$-])$N/"
   "(^|[^A-Za-z0-9_])or[[:space:]]+$Q$N$Q"
   "(\\|\\||\\?\\?)[[:space:]]*$Q$N$Q"
-  "\\$\\{[A-Za-z_][A-Za-z0-9_]*:?[-=]$Q?$N$END"
-  ",[[:space:]]*$Q$N$Q[[:space:]]*\\)"
-  "(^|[^A-Za-z0-9_])[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=[[:space:]]*$Q?$N$Q?([[:space:];,)]|\$)"
-  "(set-head|fetch|get-url|ls-remote|set-url|push|pull)[[:space:]]+$N$END"
+  "\\$\\{[^}]*[-=]$Q?$N$END"
+  ",[[:space:]]*$Q$N$Q[[:space:]]*[])]"
+  "(^|[^A-Za-z0-9_])[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=[[:space:]]*$Q$N$Q"
+  "$VERB([[:space:]]+-[^[:space:]]+)*[[:space:]]+$N$END"
+  "$Q$VERB$Q([[:space:]]*,[[:space:]]*$Q-[^\"'\`]*$Q)*[[:space:]]*,[[:space:]]*$Q$N$Q"
   "remote\\.$N\\."
 )
+# THE UNQUOTED ASSIGNMENT is a literal only in shell, where `REMOTE=<name>` is a string; in Python or
+# JS the same bytes read a VARIABLE, so this shape runs over the shell population alone.
+SH_PATTERNS=(
+  "(^|[^A-Za-z0-9_])[A-Za-z_][A-Za-z0-9_]*=$N([[:space:];]|\$)"
+)
+if [ -n "$TROOT" ]; then SH_INCLUDE=("$TROOT/*.sh" "skills/*.sh" ".githooks/*")
+else SH_INCLUDE=("*.sh" ".githooks/*"); fi
 args=()
 for p in "${PATTERNS[@]}"; do args+=(-e "$p"); done
+sh_args=()
+for p in "${SH_PATTERNS[@]}"; do sh_args+=(-e "$p"); done
 
 # `git grep` prints <path>:<line>:<text>; the awk drops a comment line and keeps the rest verbatim.
-hits=$(git grep -n -I -E "${args[@]}" -- "${INCLUDE[@]}" "${EXCLUDE[@]}" 2>/dev/null \
+# The shell-only pass appends to the general one, and both go through the one comment filter.
+hits=$({ git grep -n -I -E "${args[@]}" -- "${INCLUDE[@]}" "${EXCLUDE[@]}" 2>/dev/null
+         git grep -n -I -E "${sh_args[@]}" -- "${SH_INCLUDE[@]}" "${EXCLUDE[@]}" ":(exclude)*.py" ":(exclude)*.js" 2>/dev/null; } \
+       | sort -u -t: -k1,1 -k2,2n \
        | awk '{ t = $0; sub(/^[^:]*:[0-9]+:/, "", t); sub(/^[ \t]+/, "", t)
                p = $0; sub(/:.*/, "", p)
                if (t ~ /^#/) next

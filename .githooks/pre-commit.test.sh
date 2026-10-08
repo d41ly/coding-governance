@@ -52,7 +52,17 @@ echo l2 > l2; git add l2
 out=$(GOV_DEFAULT_BRANCH= git commit -q -m l2 2>&1); ck "two remotes and no pin: refused against the main fallback" $? 1
 printf '%s\n' "$out" | grep -q 'export GOV_REMOTE=<remote>'; ck "...and the refusal names GOV_REMOTE" $? 0
 GOV_DEFAULT_BRANCH=trunk git commit -q -m l2 2>/dev/null; ck "two remotes with GOV_DEFAULT_BRANCH=trunk: the pin holds" $? 0
+# TOOL-dLadderedRemote-6: where the pin decides, the refusal is not printed on every commit.
+echo l3 > l3; git add l3
+out=$(GOV_DEFAULT_BRANCH=trunk git commit -q -m l3 2>&1)
+printf '%s\n' "$out" | grep -q 'GOV_REMOTE'; ck "...and with the pin set it prints no GOV_REMOTE line" $? 1
 git remote remove origin; git remote remove incms
+# A TAG named like the default branch makes `symbolic-ref --short HEAD` read `heads/main`, and a guard
+# reading the short form refused a commit ON the default branch (TOOL-dLadderedRemote-6).
+git checkout -q main; git tag main
+echo t3 > t3; git add t3
+git commit -q -m t3 2>/dev/null; ck "a tag named like the default branch does not refuse a commit on it" $? 0
+git tag -d main >/dev/null
 
 # ---- the codebase-map leg ------------------------------------------------------------------------
 # A stand-in gate, red while a flag file exists. The hook consumes only the gate's exit status and

@@ -37,7 +37,7 @@ PFX="${KIT_REL:+$KIT_REL/}"
 GATE_SRC="$HERE/check-remote-literals.sh"
 [ -f "$GATE_SRC" ] || { echo "remote-literals.test: no gate at $GATE_SRC"; exit 2; }
 
-FLOOR_ASSERTIONS=30
+FLOOR_ASSERTIONS=39
 PASS=0
 FAIL=0
 add_pass() { PASS=$((PASS+1)); }
@@ -100,6 +100,14 @@ RED_TABLE="$TMPROOT/red.tsv"; GREEN_TABLE="$TMPROOT/green.tsv"
   printf '%s\n' "a push remedy|${PFX}kit/s.sh|git push $N HEAD:main"
   printf '%s\n' "a skills js file|skills/kit/t.js|const r = opts.remote ?? \"$N\""
   printf '%s\n' "a product file named like a test|${PFX}kit/latest_probe.py|    os.system(\"git fetch $N main\")"
+  # TOOL-dLadderedRemote-6: the round-2 review's escapes, one arm per alternative.
+  printf '%s\n' "a positional default|${PFX}kit/w.sh|remote=\${1:-$N}"
+  printf '%s\n' "default after -|${PFX}kit/x.sh|r=\${R-$N}"
+  printf '%s\n' "default after =|${PFX}kit/y.sh|r=\${R=$N}"
+  printf '%s\n' "a config key|${PFX}kit/z.sh|git config --get remote.$N.url"
+  printf '%s\n' "a pull with a flag|${PFX}kit/aa.sh|git pull --ff-only $N main"
+  printf '%s\n' "a fetch with a flag|${PFX}kit/ab.sh|git fetch --quiet $N main"
+  printf '%s\n' "an argv list|${PFX}kit/ac.py|    subprocess.run([\"git\", \"fetch\", \"--prune\", \"$N\", \"main\"])"
 } > "$RED_TABLE"
 {
   printf '%s\n' "a *.test.sh file|${PFX}kit/x.test.sh|git update-ref refs/remotes/$N/main HEAD"
@@ -113,6 +121,9 @@ RED_TABLE="$TMPROOT/red.tsv"; GREEN_TABLE="$TMPROOT/green.tsv"
   # TOOL-dLadderedRemote-5: a VARIABLE named like the remote is not a literal remote.
   printf '%s\n' "a variable named like the remote, shell|${PFX}kit/u.sh|$N=\$RR_REMOTE; git rev-parse \"\$$N/HEAD\""
   printf '%s\n' "a variable named like the remote, js|${PFX}kit/v.js|const k = rec.a || $N.kind"
+  # TOOL-dLadderedRemote-6: a bare name on an assignment's right is a VARIABLE outside shell.
+  printf '%s\n' "a python variable assignment|${PFX}kit/ad.py|        self.$N = $N"
+  printf '%s\n' "a js variable assignment|${PFX}kit/ae.js|const base = $N;"
 } > "$GREEN_TABLE"
 # ---- RED: one shape per arm ------------------------------------------------------------------------
 k=0
@@ -125,7 +136,7 @@ while IFS='|' read -r shape rel line; do
   # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
   if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${FAIL:-0}" = 0 ] && echo "PASS (${PASS:-1} assertions)" || echo "FAIL (${PASS:-1} assertions)"; [ "${FAIL:-0}" = 0 ] && exit 0; exit 1; fi
 done < "$RED_TABLE"
-[ "$k" = 17 ] || add_fail "the RED table read as $k rows, not 17"
+[ "$k" = 24 ] || add_fail "the RED table read as $k rows, not 24"
 
 # ---- GREEN: the same bytes where they must not be named --------------------------------------------
 k=0
@@ -136,7 +147,7 @@ while IFS='|' read -r what rel line; do
   write_plant "$d" "$rel" "$line" || exit 2
   arm "GREEN $what" 0 "remote-literals: clean" -- run_gate "$d"
 done < "$GREEN_TABLE"
-[ "$k" = 10 ] || add_fail "the GREEN table read as $k rows, not 10"
+[ "$k" = 12 ] || add_fail "the GREEN table read as $k rows, not 12"
 
 # ---- the population refuses to be vacuous ----------------------------------------------------------
 d="$TMPROOT/empty"

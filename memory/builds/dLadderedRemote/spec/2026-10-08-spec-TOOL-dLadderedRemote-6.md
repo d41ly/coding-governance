@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md](../build/2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md) | journal | TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 |
 
 <!-- /gen:spec-records -->
 
@@ -85,7 +87,7 @@ one report.
 
 ## 7. Gates
 
-`remote literals (kit code names no remote)` · `remote literals self-test` · `codebase-map kit selftest` · `push-main self-test`
+`remote literals (kit code names no remote)` · `remote literals self-test` · `codebase-map kit selftest` · `push-main self-test` · `codebase-map gate coverage` · `codebase-map adopter e2e`
 
 New arm: tools/check-remote-literals.test.sh · covers AC1 AC2 · one pattern removed at a time · FLOOR_ASSERTIONS
 New arm: .githooks/pre-commit.test.sh · covers AC4 · the guard reading `--short HEAD` · none
