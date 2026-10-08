@@ -1,6 +1,6 @@
-# Acceptance ledger — dLadderedRemote, units 1 to 7
+# Acceptance ledger — dLadderedRemote, units 1 to 8
 
-**Serves:** journal TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6 TOOL-dLadderedRemote-7
+**Serves:** journal TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6 TOOL-dLadderedRemote-7 TOOL-dLadderedRemote-8
 
 Node `d`, 2026-10-08. Every observation below was a direct check of one change: a truth-table arm,
 an arm in the affected kit's own suite run alone, a staged break, or the cross-site probe recorded
@@ -83,3 +83,12 @@ probed by extracting its two changed functions. The merge bar is the main loop's
   dedupes on the whole line. Observed by reading: NTFS cannot host a path holding a colon.
 - AC3 — `migrate_backlog` — the runbook's ladder bullet names `migrate_backlog.py` and the straggler
   guard as observed-first readers that only cross-check the pin.
+
+**Evidences:** TOOL-dLadderedRemote-8
+- AC1 — `check-remote-literals.sh` — the self-test named `subprocess.run(["git", "remote", "show",
+  "origin"])` and `r=${!ref:-origin}`, every GREEN row stayed clean, 45 arms, and the real tree read
+  clean. With the list-in-call shape removed, or the `!` removed from the expansion head, that row
+  went unnamed.
+- AC2 — `WIRE-INTO-PROJECT.md` — the runbook says the pin chooses when nothing is observed, the skill's
+  remote bullet names the `.` and unknown-name rungs, the govkit row counts two interpolated values,
+  and the ban's header names the colon-path false RED.

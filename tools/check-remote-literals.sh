@@ -29,8 +29,10 @@
 #      `$`, so `${x#<name>/}` and `removeprefix("<name>/")` count and a variable `$<name>/x` does not;
 #   3. a default — the name QUOTED after `or`, `||` or `??`; the name after a parameter expansion's
 #      `-`, `:-`, `=` or `:=`, the parameter being a name, a digit or a special parameter with an
-#      optional `[...]` subscript (`${1:-<name>}` and `${opts[r]:-<name>}` included); or the name
-#      quoted as a call's last argument after a comma, as in `.get(k, "<name>")`;
+#      optional `[...]` subscript and an optional `!` (`${1:-<name>}`, `${opts[r]:-<name>}` and
+#      `${!ref:-<name>}` included); the name quoted as a call's last argument after a comma, as in
+#      `.get(k, "<name>")`; or as the last element of a list passed straight into a call, as in
+#      `run(["git", "remote", "show", "<name>"])` — a bare key list is not inside a call;
 #   4. an assignment — a variable set to the QUOTED name in any file, or to the bare name in a shell
 #      file only, as in `REMOTE=<name>`: in Python or JS the bare form reads a variable;
 #   5. a remedy — `set-head`, `fetch`, `get-url`, `ls-remote`, `set-url`, `push` or `pull`, any
@@ -40,8 +42,10 @@
 # WHAT THIS GATE DOES NOT CHECK, said out loud because a structural ban reads as a semantic one:
 #   * a remote name held in a VARIABLE and joined at run time, which spells nothing;
 #   * a bare QUOTED name passed as a git argument anywhere but last and outside the argv shape above,
-#     which cannot be told from a dictionary key of the same spelling — `govkit.py` uses that word as
-#     a field name;
+#     or last in a list that is not passed straight into a call, which cannot be told from a
+#     dictionary key or a key list of the same spelling — `govkit.py` uses that word as a field name;
+#   * nothing of a PATH HOLDING A COLON is lost, but its comment lines are: the filter splits a hit
+#     on its first colon, so a comment there reads as a hit — a false RED, never a missed one;
 #   * a call or an argv list WRAPPED across lines: every shape reads one line;
 #   * a flag's SEPARATE value between a remedy verb and the name, as in `fetch --depth 1 <name>`:
 #     the flag group admits dash-led words only;
@@ -89,7 +93,8 @@ PATTERNS=(
   "(^|[^A-Za-z0-9_./\$-])$N/"
   "(^|[^A-Za-z0-9_])or[[:space:]]+$Q$N$Q"
   "(\\|\\||\\?\\?)[[:space:]]*$Q$N$Q"
-  "\\$\\{([A-Za-z_][A-Za-z0-9_]*|[0-9]+|[@*#?!\$-])(\\[[^]]*\\])?:?[-=]$Q?$N$END"
+  "\\$\\{!?([A-Za-z_][A-Za-z0-9_]*|[0-9]+|[@*#?!\$-])(\\[[^]]*\\])?:?[-=]$Q?$N$END"
+  ",[[:space:]]*$Q$N$Q[[:space:]]*\\][[:space:]]*\\)"
   ",[[:space:]]*$Q$N$Q[[:space:]]*\\)"
   "(^|[^A-Za-z0-9_])[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=[[:space:]]*$Q$N$Q"
   "$VERB([[:space:]]+-[^[:space:]]+)*[[:space:]]+$N$END"
@@ -110,7 +115,7 @@ for p in "${SH_PATTERNS[@]}"; do sh_args+=(-e "$p"); done
 
 # `git grep` prints <path>:<line>:<text>; the awk drops a comment line and keeps the rest verbatim.
 # The shell-only pass appends to the general one, and both go through the one comment filter. The
-# merge dedupes on the WHOLE line: a key split on `:` collapses two paths that each hold a colon.
+# merge dedupes on the WHOLE line, so two distinct hits are never collapsed into one.
 hits=$({ git grep -n -I -E "${args[@]}" -- "${INCLUDE[@]}" "${EXCLUDE[@]}" 2>/dev/null
          git grep -n -I -E "${sh_args[@]}" -- "${SH_INCLUDE[@]}" "${EXCLUDE[@]}" ":(exclude)*.py" ":(exclude)*.js" 2>/dev/null; } \
        | awk '!seen[$0]++' \

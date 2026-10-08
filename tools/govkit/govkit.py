@@ -4325,8 +4325,8 @@ SHELL_EXEC_SITES = {
     "git_pathspec": "gov",
     # TOOL-dLadderedRemote-2. The remote ladder's nested reader, inlined byte-identical from the gov
     # lib dir: `["git", "-C", str(root), *args]`, and every `*args` is a literal in that block —
-    # `remote`, `symbolic-ref`, `config branch.<cur>.remote`. The one interpolated value is a branch
-    # or remote NAME read back from the same repository, never a target token.
+    # `remote`, `symbolic-ref`, `config branch.<cur>.remote`. The two interpolated values are a branch
+    # NAME and a remote NAME, each read back from the same repository and never a target token.
     "read": "gov",
     "git": "gov",                    # gov's own wrapper: `["git", "-C", str(root), *args]`, and the
                                      # `*args` is what the census cannot read. A future
