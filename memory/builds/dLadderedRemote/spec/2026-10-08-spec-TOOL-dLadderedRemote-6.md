@@ -6,7 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md](../build/2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md) | journal | TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-7 TOOL-dLadderedRemote-8 |
+| [2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md](../build/2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md) | journal | TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-7 TOOL-dLadderedRemote-8 TOOL-dLadderedRemote-9 |
 | [2026-10-08-review-TOOL-dLadderedRemote-6-closing-diff-round3.md](../reviews/2026-10-08-review-TOOL-dLadderedRemote-6-closing-diff-round3.md) | diff-review | TOOL-dLadderedRemote-5 |
 
 <!-- /gen:spec-records -->

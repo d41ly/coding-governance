@@ -37,7 +37,7 @@ PFX="${KIT_REL:+$KIT_REL/}"
 GATE_SRC="$HERE/check-remote-literals.sh"
 [ -f "$GATE_SRC" ] || { echo "remote-literals.test: no gate at $GATE_SRC"; exit 2; }
 
-FLOOR_ASSERTIONS=45
+FLOOR_ASSERTIONS=46
 PASS=0
 FAIL=0
 add_pass() { PASS=$((PASS+1)); }
@@ -110,6 +110,8 @@ RED_TABLE="$TMPROOT/red.tsv"; GREEN_TABLE="$TMPROOT/green.tsv"
   # TOOL-dLadderedRemote-8: two escapes unit 7's narrowing made.
   printf '%s\n' "a list last inside a call|${PFX}kit/aj.py|    subprocess.run([\"git\", \"remote\", \"show\", \"$N\"])"
   printf '%s\n' "an indirect expansion default|${PFX}kit/ak.sh|r=\${!ref:-$N}"
+  # TOOL-dLadderedRemote-9: the list followed by more arguments, which is how this codebase calls git.
+  printf '%s\n' "a list then keyword arguments|${PFX}kit/al.py|    subprocess.run([\"git\", \"remote\", \"show\", \"$N\"], check=True)"
   printf '%s\n' "an argv list|${PFX}kit/ac.py|    subprocess.run([\"git\", \"fetch\", \"--prune\", \"$N\", \"main\"])"
 } > "$RED_TABLE"
 {
@@ -145,7 +147,7 @@ while IFS='|' read -r shape rel line; do
   # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
   if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${FAIL:-0}" = 0 ] && echo "PASS (${PASS:-1} assertions)" || echo "FAIL (${PASS:-1} assertions)"; [ "${FAIL:-0}" = 0 ] && exit 0; exit 1; fi
 done < "$RED_TABLE"
-[ "$k" = 26 ] || add_fail "the RED table read as $k rows, not 26"
+[ "$k" = 27 ] || add_fail "the RED table read as $k rows, not 27"
 
 # ---- GREEN: the same bytes where they must not be named --------------------------------------------
 k=0

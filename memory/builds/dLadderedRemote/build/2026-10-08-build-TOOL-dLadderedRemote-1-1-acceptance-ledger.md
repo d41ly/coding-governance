@@ -1,6 +1,6 @@
-# Acceptance ledger — dLadderedRemote, units 1 to 8
+# Acceptance ledger — dLadderedRemote, units 1 to 9
 
-**Serves:** journal TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6 TOOL-dLadderedRemote-7 TOOL-dLadderedRemote-8
+**Serves:** journal TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6 TOOL-dLadderedRemote-7 TOOL-dLadderedRemote-8 TOOL-dLadderedRemote-9
 
 Node `d`, 2026-10-08. Every observation below was a direct check of one change: a truth-table arm,
 an arm in the affected kit's own suite run alone, a staged break, or the cross-site probe recorded
@@ -92,3 +92,11 @@ probed by extracting its two changed functions. The merge bar is the main loop's
 - AC2 — `WIRE-INTO-PROJECT.md` — the runbook says the pin chooses when nothing is observed, the skill's
   remote bullet names the `.` and unknown-name rungs, the govkit row counts two interpolated values,
   and the ban's header names the colon-path false RED.
+
+**Evidences:** TOOL-dLadderedRemote-9
+- AC1 — `check-remote-literals.sh` — the self-test named `subprocess.run(["git", "remote", "show",
+  "origin"], check=True)`, every GREEN row stayed clean, 46 arms, and the real tree read clean; under
+  unit 8's gate that row went unnamed.
+- AC2 — `WIRE-INTO-PROJECT.md` — the runbook names the conf precondition of the guard's cross-check and
+  the two fallbacks, and the ban's header states the colon-path false RED, the `:<digits>:` exception
+  and the key-list hit.

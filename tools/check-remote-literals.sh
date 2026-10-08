@@ -31,8 +31,8 @@
 #      `-`, `:-`, `=` or `:=`, the parameter being a name, a digit or a special parameter with an
 #      optional `[...]` subscript and an optional `!` (`${1:-<name>}`, `${opts[r]:-<name>}` and
 #      `${!ref:-<name>}` included); the name quoted as a call's last argument after a comma, as in
-#      `.get(k, "<name>")`; or as the last element of a list passed straight into a call, as in
-#      `run(["git", "remote", "show", "<name>"])` — a bare key list is not inside a call;
+#      `.get(k, "<name>")`; or as the last element of a list opened right after `(` or `,`, as in
+#      `run(["git", "remote", "show", "<name>"], check=True)` — a list assigned to a name is not;
 #   4. an assignment — a variable set to the QUOTED name in any file, or to the bare name in a shell
 #      file only, as in `REMOTE=<name>`: in Python or JS the bare form reads a variable;
 #   5. a remedy — `set-head`, `fetch`, `get-url`, `ls-remote`, `set-url`, `push` or `pull`, any
@@ -42,10 +42,15 @@
 # WHAT THIS GATE DOES NOT CHECK, said out loud because a structural ban reads as a semantic one:
 #   * a remote name held in a VARIABLE and joined at run time, which spells nothing;
 #   * a bare QUOTED name passed as a git argument anywhere but last and outside the argv shape above,
-#     or last in a list that is not passed straight into a call, which cannot be told from a
-#     dictionary key or a key list of the same spelling — `govkit.py` uses that word as a field name;
-#   * nothing of a PATH HOLDING A COLON is lost, but its comment lines are: the filter splits a hit
-#     on its first colon, so a comment there reads as a hit — a false RED, never a missed one;
+#     or last in a list assigned to a name, which cannot be told from a dictionary key or a key list
+#     of the same spelling — `govkit.py` uses that word as a field name;
+#   * a PATH HOLDING A COLON: the filter splits a hit on its first colon, so a comment line there is
+#     not skipped and reads as a hit, a false RED; only a path holding `:<digits>:` followed by a
+#     comment leader can hide a real hit.
+#
+# WHAT IT REDS THAT IS NOT A REMOTE: a key list or tuple whose last element is the name, passed
+# straight into a call (`w.writerow(["kit", "<name>"])`, `itemgetter("kit", "<name>")`). Hoist the
+# list into a named constant, which no shape reads as a call argument.
 #   * a call or an argv list WRAPPED across lines: every shape reads one line;
 #   * a flag's SEPARATE value between a remedy verb and the name, as in `fetch --depth 1 <name>`:
 #     the flag group admits dash-led words only;
@@ -94,7 +99,7 @@ PATTERNS=(
   "(^|[^A-Za-z0-9_])or[[:space:]]+$Q$N$Q"
   "(\\|\\||\\?\\?)[[:space:]]*$Q$N$Q"
   "\\$\\{!?([A-Za-z_][A-Za-z0-9_]*|[0-9]+|[@*#?!\$-])(\\[[^]]*\\])?:?[-=]$Q?$N$END"
-  ",[[:space:]]*$Q$N$Q[[:space:]]*\\][[:space:]]*\\)"
+  "(\\(|,)[[:space:]]*\\[[^]]*,[[:space:]]*$Q$N$Q[[:space:]]*\\]"
   ",[[:space:]]*$Q$N$Q[[:space:]]*\\)"
   "(^|[^A-Za-z0-9_])[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=[[:space:]]*$Q$N$Q"
   "$VERB([[:space:]]+-[^[:space:]]+)*[[:space:]]+$N$END"
