@@ -4323,6 +4323,11 @@ SHELL_EXEC_SITES = {
     # the command line -- which is the whole point, since the argv form died at 32 KiB after a
     # partial write. Classified `gov` because no target value reaches the argv it builds.
     "git_pathspec": "gov",
+    # TOOL-dLadderedRemote-2. The remote ladder's nested reader, inlined byte-identical from the gov
+    # lib dir: `["git", "-C", str(root), *args]`, and every `*args` is a literal in that block —
+    # `remote`, `symbolic-ref`, `config branch.<cur>.remote`. The one interpolated value is a branch
+    # or remote NAME read back from the same repository, never a target token.
+    "read": "gov",
     "git": "gov",                    # gov's own wrapper: `["git", "-C", str(root), *args]`, and the
                                      # `*args` is what the census cannot read. A future
                                      # `git(target, "hook", "run", ...)` must move this to
