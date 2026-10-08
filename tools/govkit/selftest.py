@@ -13197,6 +13197,14 @@ user_skills = "/tmp/gk-fake-skills"
             # hook is the target's own, see `seed_pv_hook`.
             shutil.copy2(_pvREAL / "check-verifier-fanout.sh",
                          g / PFX / KIT_NAMES["workflows"] / "check-verifier-fanout.sh")
+            # TOOL-aGraftedHelix-28 made the real parity script require this sibling wherever the
+            # target tracks a `gotchas.py`, which `build_pv_target`'s stub is. A STUB, as that
+            # `gotchas.py` is: the by-design head pair is that checker's own suite's subject, and
+            # these arms grade migration, which the real one would only red over synthetic
+            # templates carrying no head (TOOL-aMeteredSweep-1).
+            (g / PFX / KIT_NAMES["workflows"] / "check_by_design_parity.py").write_text(
+                "# a stub: the by-design head pair is graded by the real checker's own suite\n",
+                encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
             git(g, "config", "user.name", "t")

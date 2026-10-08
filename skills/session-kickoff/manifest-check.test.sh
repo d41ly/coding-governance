@@ -1374,6 +1374,11 @@ remove_claims() { git -C "$CLB" for-each-ref --format='delete %(refname)' refs/g
 git -C "$CWT" show 'HEAD^:.unattended.conf' > "$CWT/.unattended.conf" 2>/dev/null \
   || { echo "FAIL claims fixture: the cloned tip carries no .unattended.conf to restore in $CWT"; fail=$((fail+1)); }
 export CARD_OVERLAP_BOUND=1
+# THE REAL DRIVER'S READ IS BOUNDED GENEROUSLY HERE (TOOL-aMeteredSweep-1). These arms grade what the
+# cell says about the claims, never how fast the read is, and on a loaded node `a` `--claims` took
+# 18 s against the shipped 15: nine arms read `skipped` and redded. The bound's own behaviour is
+# AC5's, which sets its own, and S4 pins the shipped default; neither reads this value.
+export CARD_CLAIMS_BOUND=120
 grep -q '^RUN_CLAIMS="on"$' "$CWT/.unattended.conf" || printf 'RUN_CLAIMS="on"\n' >> "$CWT/.unattended.conf"
 # The stored card's `claims —` cell, every numeric beat age masked: the clock moves between seed and read.
 # It ends at the `health —` line TOOL-aGraftedHelix-8 puts between it and `recent —`.
@@ -1437,13 +1442,16 @@ echo "info AGH2 AC10 card write wall: ${cl_ms_on} ms with the claims read, ${cl_
 # AC5 — a driver that never answers: the bound fires, the cell says so, and the write returns
 # without waiting for the sleeper. It sleeps on `--claims` alone: the `overlaps —` read calls the same
 # driver first, and its own bound plus kill grace would otherwise spend this arm's wall (KICK-aMendedFleet-2).
-printf '#!/bin/sh\n[ "$1" = --claims ] || exit 0\nsleep 30\n' > "$CLDRV"
+# The verdict is RELATIVE TO THE SLEEPER (TOOL-aMeteredSweep-1): a write that waited for it takes 120 s
+# or more, and one that did not takes what a card write costs, which read 24 s on a loaded node `a`
+# against the 10 s this arm used to demand.
+printf '#!/bin/sh\n[ "$1" = --claims ] || exit 0\nsleep 120\n' > "$CLDRV"
 export CARD_CLAIMS_BOUND=2; t0=$(date +%s)
 run_card "AGH2 AC5 a driver that sleeps past CARD_CLAIMS_BOUND reads skipped: naming the bound" "$CWT" 0 \
   "claims — skipped: --claims did not answer within 2s" --card --write --session "$NONCE-c5"
-cl_s=$(( $(date +%s) - t0 )); unset CARD_CLAIMS_BOUND
-[ "$cl_s" -lt 10 ] && { echo "ok   AGH2 AC5 the write returned in ${cl_s}s, under 10, not after the sleeper"; pass=$((pass+1)); } \
-  || { echo "FAIL AGH2 AC5 the write returned in ${cl_s}s, not under 10: the read waited for the sleeper"; fail=$((fail+1)); }
+cl_s=$(( $(date +%s) - t0 )); export CARD_CLAIMS_BOUND=120
+[ "$cl_s" -lt 100 ] && { echo "ok   AGH2 AC5 the write returned in ${cl_s}s, under 100, not after the 120 s sleeper"; pass=$((pass+1)); } \
+  || { echo "FAIL AGH2 AC5 the write returned in ${cl_s}s, not under 100: the read waited for the sleeper"; fail=$((fail+1)); }
 # The arms above prove the bound for 2 and the hide age only between two hours and three days; the
 # SHIPPED values are the spec's, pinned by reading them, as AC7's CARD_CAP_BYTES pin does.
 grep -qE '^CARD_CLAIMS_BOUND=\$\{CARD_CLAIMS_BOUND:-15\}$' "$CHECK" && grep -qE '^CARD_CLAIMS_HIDE_S=86400$' "$CHECK" \
@@ -1510,7 +1518,7 @@ check_eq "AGH32 AC14 ...the git shim logs no fetch" "0" "$(grep -c 'fetch' "$TMP
 check_eq "AGH32 AC14 ...and it saw the card's own git calls, so that zero is a reading" "yes" "$([ -s "$TMP/gshim/git.log" ] && echo yes || echo no)"
 cp "$TMP/cl.on.conf" "$CWT/.unattended.conf"
 git -C "$CCLONE" remote set-url origin "$CLURL0"
-rm -f "$CWT/.unattended.conf"; unset CARD_OVERLAP_BOUND
+rm -f "$CWT/.unattended.conf"; unset CARD_OVERLAP_BOUND CARD_CLAIMS_BOUND
 
 # ---- TOOL-aGraftedHelix-8: the `health —` cell, each arm observed RED on a staged break first -----
 # The log is the card clone's own `<common-dir>/health.log`, seeded here and removed after; nothing

@@ -3056,6 +3056,14 @@ sleep "$secs"
 [ -z "$pre" ] && doit
 exit 0
 SH
+cat > "$MP/r/fx/await.sh" <<'SH'
+#!/usr/bin/env bash
+# await.sh <file> <secs> — wait, bounded at 60 s, for <file> to exist, then sleep <secs>. An arm
+# whose verdict is an ORDER of completions keys each on the row of the leg it must follow.
+for _ in $(seq 1 600); do [ -f "$1" ] && break; sleep 0.1; done
+sleep "$2"
+exit 0
+SH
 ( cd "$MP/r" && git add -A && git commit -qm mempause ) >/dev/null 2>&1
 write_mp_meminfo() { printf 'MemTotal: 1000 kB\nMemAvailable: %s kB\n' "$(( (100 - $2) * 10 ))" > "$1"; }
 run_mp_bar() { # run id · manifest · VAR=value… -> MP_OUT (stdout), MP_ERR (stderr) and MP_RC
@@ -3110,19 +3118,27 @@ check_mp_value "AC5 the verdict file reads paused 1" "$(awk -F'\t' '$1 == "pause
 check_mp_value "AC5 stdout carries one memory: 1 pause(s) line" "$(printf '%s\n' "$MP_OUT" | grep -c '^memory: 1 pause(s)')" 1
 
 # 11c. AC6 — a hold is BOUNDED per episode, and a hold with nothing running is DRAINED. B turns the
-#      pressure on as it ends at 1 s and D is held; C ends at 4 s, past D's 2 s bound, so D is
-#      released `bound`; E is held from then until A ends at 8 s and closes `drained`. B writes at its
+#      pressure on as it ends at 1 s and D is held; C ends 18 s after B's row, past D's 15 s bound, so D
+#      is released `bound`; E is held from then until A ends after D and closes `drained`. B writes at its
 #      END, never its start: a start-of-leg write races C's own dispatch decision, and C held there
 #      turns every later episode into `drained` — observed twice in five runs before the move.
+#      ORDERED BY ROWS WHERE IT CAN BE (TOOL-aMeteredSweep-1). A ended at a fixed 8 s, and on a host
+#      where one leg's own bookkeeping takes seconds D was still running then, so E's episode closed
+#      `bound`: red in a quiet re-run, while the loaded bar redded AC14 instead. A now ends only after
+#      D's row exists, so the completion that empties the pool is A's. ONE CLOCK REMAINS and cannot
+#      go: E's episode opens with A and D running, and D's completion must come inside the bound.
+#      Measured, a no-op leg's own runner bookkeeping passed 6 s on node `a` under load, so the
+#      bound is 15 s and C ends 18 s after B's row; the run-length check bounds a HANG, not speed.
 write_mp_meminfo "$MP/x/m6" 10
-printf '[{"name": "A6", "argv": ["bash", "fx/mp.sh", "8"]},\n {"name": "B6", "argv": ["bash", "fx/mp.sh", "1", "write", "%s", "95"]},\n {"name": "C6", "argv": ["bash", "fx/mp.sh", "4"]},\n {"name": "D6", "argv": ["bash", "fx/ok.sh"]},\n {"name": "E6", "argv": ["bash", "fx/ok.sh"]}]\n' \
-  "$MP/x/m6" > "$MP/x/ac6.json"
+_mpr6=$(resolve_mp_record ac6)
+printf '[{"name": "A6", "argv": ["bash", "fx/await.sh", "%s", "0"]},\n {"name": "B6", "argv": ["bash", "fx/mp.sh", "1", "write", "%s", "95"]},\n {"name": "C6", "argv": ["bash", "fx/await.sh", "%s", "18"]},\n {"name": "D6", "argv": ["bash", "fx/ok.sh"]},\n {"name": "E6", "argv": ["bash", "fx/ok.sh"]}]\n' \
+  "$_mpr6/3.leg" "$MP/x/m6" "$_mpr6/1.leg" > "$MP/x/ac6.json"
 _mpt0=$(date +%s)
-run_mp_bar ac6 "$MP/x/ac6.json" GATE_MEMPAUSE=90 GATE_MEMPAUSE_HOLD=2 GATE_MEMINFO="$MP/x/m6"; _mprc6=$MP_RC
+run_mp_bar ac6 "$MP/x/ac6.json" GATE_MEMPAUSE=90 GATE_MEMPAUSE_HOLD=15 GATE_MEMINFO="$MP/x/m6"; _mprc6=$MP_RC
 _mpt1=$(date +%s)
 check_mp_value "AC6 one episode ends bound and one drained" "$(read_mp_ends ac6)" "bound drained "
 check_mp_value "AC6 every leg reports" "$(printf '%s\n' "$MP_OUT" | grep -c '^GATE ok ')" 5
-check_mp_value "AC6 the bar finishes inside 60 s" "$([ $(( _mpt1 - _mpt0 )) -lt 60 ] && echo yes)" yes
+check_mp_value "AC6 the bar finishes inside 150 s" "$([ $(( _mpt1 - _mpt0 )) -lt 150 ] && echo yes)" yes
 write_mp_meminfo "$MP/x/m6" 10
 run_mp_bar ac6off "$MP/x/ac6.json" GATE_MEMPAUSE=0 GATE_MEMINFO="$MP/x/m6"
 check_mp_value "AC6 its exit equals the same fixture's with the pause off" "$_mprc6" "$MP_RC"
@@ -3179,16 +3195,19 @@ printf '[{"name": "C14", "argv": ["bash", "fx/ok.sh"]},\n {"name": "A14", "argv"
   > "$MP/x/ac14.json"
 cat > "$MP/x/serve.sh" <<'SH'
 #!/usr/bin/env bash
-# serve.sh <fifo> <file to await> — reads 1 to 3 (the INERT probe and the first two dispatches) answer
-# 10 %; read 4 answers 95 % once <file to await> exists and one more second has passed; later reads 95 %.
-f=$1; await=$2; c=0
+# serve.sh <fifo> <file to await> <trigger>... — a read answers 10 % until any <trigger> row exists,
+# then 95 %, and the first such read first waits for <file to await> and one second more. KEYED ON
+# ROWS, NOT ON A READ COUNT (TOOL-aMeteredSweep-1): an MSYS reader can take two writer opens before
+# its EOF, which advanced a count by two, served 95 % to the second dispatch and opened a second
+# episode, red in two of three quiet runs. A doubled read now serves the same answer twice.
+f=$1; await=$2; shift 2; held=""
 while :; do
   exec 3>"$f" || exit 0
-  c=$((c + 1)); pct=95
-  if [ "$c" -le 3 ]; then pct=10
-  elif [ "$c" -eq 4 ]; then
+  pct=10
+  for t in "$@"; do [ -f "$t" ] && pct=95; done
+  if [ "$pct" = 95 ] && [ -z "$held" ]; then
     for _ in $(seq 1 200); do [ -f "$await" ] && break; sleep 0.1; done
-    sleep 1
+    sleep 1; held=1
   fi
   printf 'MemTotal: 1000 kB\nMemAvailable: %s kB\n' "$(( (100 - pct) * 10 ))" >&3
   exec 3>&-
@@ -3199,7 +3218,9 @@ if ! mkfifo "$MP/x/fifo" 2>/dev/null; then
   echo "canary: SKIP arm 11g's forced-branch half — this host has no mkfifo, so the FIFO that holds a decision until the last leg is gone cannot be built"
 else
   run_mp_bar ac14seed "$MP/x/ac14.json" GATE_JOBS=2 GATE_MEMPAUSE=0
-  bash "$MP/x/serve.sh" "$MP/x/fifo" "$(resolve_mp_record ac14)/1.leg" >/dev/null 2>&1 & _mpsv=$!
+  # The trigger is the FIRST quick leg's row, C's or Y's, whichever the seed's ledger dispatched second.
+  bash "$MP/x/serve.sh" "$MP/x/fifo" "$(resolve_mp_record ac14)/1.leg" \
+    "$(resolve_mp_record ac14)/0.leg" "$(resolve_mp_record ac14)/2.leg" >/dev/null 2>&1 & _mpsv=$!
   run_mp_bar ac14 "$MP/x/ac14.json" GATE_JOBS=2 GATE_MEMPAUSE=90 GATE_MEMINFO="$MP/x/fifo"
   # A writer blocked opening the FIFO is released by a read-write open, which never blocks itself.
   kill "$_mpsv" 2>/dev/null; exec 4<>"$MP/x/fifo"; exec 4>&-; wait "$_mpsv" 2>/dev/null

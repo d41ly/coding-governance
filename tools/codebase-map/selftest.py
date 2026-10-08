@@ -2237,7 +2237,8 @@ def test_gate_coverage_passes_a_customised_gate(tmp: Path):
     staleness, which is the reason this check compares SETS and not bytes.
     """
     customised = ('# a project comment the template does not have\n'
-                  'fresh = {gen_dir / "inventories.json": x, gen_dir / "MAP.md": y}\n'
+                  'fresh = {gen_dir / "inventories.json": x, gen_dir / "MAP.md": y,\n'
+                  '         gen_dir / "CARDS.md": z}\n'
                   'CONDITIONAL_TIERS = [\n'
                   '    ("symbol", "all_symbols", "symbols.json", "render_symbols_json"),\n'
                   ']\n'
