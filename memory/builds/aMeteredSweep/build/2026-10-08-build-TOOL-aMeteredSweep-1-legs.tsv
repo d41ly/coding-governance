@@ -1,0 +1,129 @@
+# **Serves:** journal TOOL-aMeteredSweep-1
+# The profiled bar at fa68a767, node a, 2026-10-07: GATE_FULL=1 GATE_SELFTESTS=1, width 8, contended. Rows by the -legtable.py beside this file.
+secs	leg	chunk	subject	ceiling	pool	retry_secs	final	foreign
+5769	run-gates canary	selftests	repo	13200	fail		fail	5
+4801	memory-hygiene self-test	selftests	kit	4800	timeout	1442	ok	5
+3937	unattended kit gate	declarations	repo	16040	ok		ok	5
+3775	govkit selftest	selftests	kit	11750	fail		fail	3
+3252	manifest-check self-test	selftests	kit	4370	fail		fail	5
+2322	check-wiring self-test	selftests	kit	2320	timeout	601	ok	2
+2294	run-gates evidence	selftests	kit	7040	ok		ok	5
+2015	drift-audit selftest	selftests	kit	2300	ok		ok	5
+1978	run-gates turnstile	selftests	kit	8210	ok		ok	5
+1801	agent-cap self-test	selftests	kit	1800	timeout	717	ok	5
+1786	pre-push self-test	selftests	repo	1780	timeout	402	ok	3
+1658	foreign-prefix parity (every self-test at three prefixes)	selftests	repo	7500	fail		fail	4
+1480	run-selftests self-test	selftests	kit	2040	ok		ok	3
+1201	run-gates run-log line	selftests	kit	1200	timeout	175	fail	4
+1050	pass-order history	declarations	repo	5400	ok		ok	5
+969	hook destinations self-test	selftests	kit	1620	ok		ok	4
+793	brief-recorded	declarations	repo	900	ok		ok	5
+770	row-keyed merge driver replay	selftests	kit	2750	ok		ok	5
+722	runlog selftest	selftests	kit	720	timeout	151	ok	1
+702	unattended-build self-test	selftests	kit	700	timeout	199	ok	1
+692	memory-recall kit selftest	selftests	kit	2730	ok		ok	1
+582	push-main self-test	selftests	repo	580	timeout	242	ok	2
+568	profile-bar selftest	selftests	kit	1910	ok		ok	4
+564	pre-push run-log line	selftests	repo	600	ok		ok	3
+558	corpus-ids selftest	selftests	kit	2690	ok		ok	5
+477	lexicon selftest	selftests	kit	880	ok		ok	3
+473	pre-push bar self-test	selftests	repo	600	ok		ok	2
+419	playbook parity selftest	selftests	kit	1380	ok		ok	1
+410	verdict-epoch self-test	selftests	kit	1130	ok		ok	1
+384	scratch-guard self-test	selftests	kit	490	ok		ok	5
+307	python resolver (behaviour + inline parity + idiom ban)	wiring	kit	350	fail		fail	1
+300	backlog migration selftest	selftests	kit	300	timeout	104	ok	5
+277	transition-audit arms	declarations	repo	900	ok		ok	3
+274	straggler-guard arms	declarations	repo	300	ok		ok	3
+253	process-monitor adopter selftest	selftests	kit	420	ok		ok	1
+241	row-grammar selftest	selftests	kit	300	ok		ok	5
+225	build-index selftest	selftests	kit	350	ok		ok	5
+218	review-join self-test	selftests	kit	300	ok		ok	1
+216	micro-format gate selftest	selftests	kit	560	ok		ok	1
+215	dead-path carriers self-test	selftests	kit	2070	ok		ok	1
+194	template size gate selftest	selftests	kit	710	ok		ok	1
+181	line-length gate selftest	selftests	kit	930	ok		ok	1
+154	gotchas selftest	selftests	kit	300	ok		ok	5
+151	spec-tokens self-test	selftests	kit	330	fail		fail	3
+144	verifier fan-out self-test	selftests	kit	300	ok		ok	1
+143	run-gates adopter e2e	e2e	kit	460	ok		ok	4
+136	install-prefix self-test	selftests	kit	1670	ok		ok	2
+129	memory hygiene	records	repo	12720	ok		ok	2
+124	branch-guard self-test	selftests	repo	300	ok		ok	4
+121	playbook validity gate	declarations	repo	4940	ok		ok	5
+113	hook destinations (every declared hook path ships)	product	repo	2940	ok		ok	4
+110	govkit acceptance matrix	declarations	repo	7030	ok		ok	3
+107	agent-cap restatement self-test	selftests	kit	1100	ok		ok	3
+106	marker contracts	declarations	repo	1840	ok		ok	3
+95	recall floor arms	selftests	repo	300	ok		ok	0
+92	agent-instructions self-test	selftests	kit	330	ok		ok	1
+90	codebase-map adopter e2e	e2e	kit	540	ok		ok	0
+89	drift-audit records	declarations	repo	540	ok		ok	1
+83	check-arms selftest	selftests	kit	300	ok		ok	5
+76	method-carriers self-test	selftests	kit	460	ok		ok	2
+60	codebase-map kit selftest	selftests	kit	300	fail		fail	0
+57	kit version markers	declarations	repo	660	ok		ok	1
+48	unattended skill wiring	wiring	repo	300	ok		ok	5
+36	govkit selfcheck	declarations	repo	310	ok		ok	1
+34	micro-format definitions	product	repo	650	ok		ok	1
+34	kickoff-manifest ratchet	records	repo	640	ok		ok	1
+32	playbook parity	product	repo	560	ok		ok	1
+27	review-join ban (no ref-keyed join)	declarations	repo	300	ok		ok	1
+27	process-monitor census selftest	selftests	kit	180	ok		ok	0
+25	testsuite counts self-test	selftests	kit	350	ok		ok	3
+23	every held leg is budgeted, every budget row resolves	declarations	repo	300	ok		ok	3
+22	method carriers (every pointer declared)	declarations	repo	1230	ok		ok	1
+21	agent-cap restatement	product	repo	640	ok		ok	3
+20	install-prefix (shipped surface)	product	repo	2940	ok		ok	4
+20	review-protocol parity (kit vs dogfood)	declarations	repo	300	ok		ok	1
+20	kit epoch (shipped bytes move, the version moves)	declarations	repo	300	ok		ok	1
+18	kit-placeholders self-test	selftests	kit	180	ok		ok	3
+17	run-gates gov canary	selftests	repo	300	fail		fail	4
+17	lexicon wiring	wiring	repo	330	ok		ok	1
+17	pytest-guardrails self-test	selftests	kit	300	ok		ok	1
+17	selftest harness self-test	selftests	kit	370	ok		ok	3
+16	settings-merge selftest	selftests	kit	300	ok		ok	0
+15	verdict epoch (kit version dates the engine)	declarations	repo	300	ok		ok	1
+14	process-monitor wiring	records	repo	180	ok		ok	0
+13	recall floor	declarations	repo	300	ok		ok	0
+12	run-gates wiring	wiring	repo	300	ok		ok	2
+12	tier2-review self-test	selftests	kit	1800	ok		ok	1
+12	line length	product	repo	300	ok		ok	1
+12	dead-path carriers (deleted files still named)	declarations	repo	430	ok		ok	1
+11	extract-arms self-test	selftests	kit	300	ok		ok	3
+11	placeholder-catalogue self-test	selftests	kit	300	ok		ok	1
+11	kit/dogfood doc parity	declarations	repo	300	ok		ok	1
+10	lexicon naming predicates	declarations	repo	300	ok		ok	1
+10	testsuite counts (every bar self-test prints one)	declarations	repo	630	ok		ok	3
+9	kickoff engine size <=18KiB	product	repo	300	ok		ok	1
+9	build-method size	product	repo	300	ok		ok	1
+9	codebase-map coverage + freshness	declarations	repo	300	ok		ok	0
+8	runlog skill wiring	wiring	repo	300	ok		ok	1
+8	unattended protocol size	product	repo	300	ok		ok	1
+7	unattended skill size	product	repo	300	ok		ok	1
+7	encoding posture (text IO names its encoding)	product	repo	300	ok		ok	1
+7	charter size	product	repo	300	ok		ok	1
+7	template size <=48KiB	product	repo	300	ok		ok	1
+5	verifier fan-out	declarations	repo	300	ok		ok	3
+5	harness arms (fail branches armed or pinned)	declarations	repo	300	ok		ok	5
+4	drift-audit wiring	wiring	repo	300	ok		ok	0
+4	shell-hygiene selftest	selftests	kit	300	ok		ok	1
+4	runlog record schema	declarations	repo	180	ok		ok	1
+4	shell hygiene (a loop fed by a command substitution)	product	repo	300	ok		ok	1
+3	shell hygiene (a location probe asked from a moved directory)	product	repo	300	ok		ok	1
+3	memory-recall skill wiring	wiring	repo	300	ok		ok	0
+3	codebase-map gate coverage	declarations	repo	180	ok		ok	0
+3	build README slot contract	records	repo	300	ok		ok	1
+2	agent-instructions wiring	wiring	repo	300	ok		ok	1
+2	row-driver view refusal	declarations	repo	300	ok		ok	1
+2	kit placeholders (a declared token its adopter substitutes)	declarations	repo	180	ok		ok	3
+2	workflow script syntax	wiring	repo	300	ok		ok	1
+2	govkit refusal join	declarations	repo	300	ok		ok	3
+2	review-replay selftest	selftests	kit	300	ok		ok	1
+1	spec tokens (a spec's own names resolve)	declarations	repo	180	ok		ok	3
+1	playbook render selftest	selftests	kit	300	ok		ok	3
+1	playbook placeholder catalogue	product	repo	300	ok		ok	1
+1	playbook render wiring	wiring	repo	300	ok		ok	3
+1	leg ceilings clear their evidenced maximum	declarations	repo	300	ok		ok	3
+1	receipt sync (installed files match the receipt)	declarations	repo	300	ok		ok	3
+1	govkit runbook parity	declarations	repo	300	ok		ok	3

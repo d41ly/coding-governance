@@ -1678,11 +1678,6 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
-      "id": "build_hv_repo",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
-    },
-    {
       "id": "build_id_sort_key",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -3478,19 +3473,9 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
-      "id": "check_hv_line",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
-    },
-    {
       "id": "check_hv_value",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
-    },
-    {
-      "id": "check_hv_value",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
     },
     {
       "id": "check_id",
@@ -3668,11 +3653,6 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
-      "id": "check_mp_value",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
-    },
-    {
       "id": "check_msys_addressable",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
@@ -3781,11 +3761,6 @@
       "id": "check_pp_value",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
-    },
-    {
-      "id": "check_pp_value",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
     },
     {
       "id": "check_preflip",
@@ -6251,11 +6226,6 @@
       "id": "derive_self_rel",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.test.sh"
-    },
-    {
-      "id": "derive_self_rel",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
     },
     {
       "id": "derive_self_rel",
@@ -11138,11 +11108,6 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
-      "id": "read_hv_record",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
-    },
-    {
       "id": "read_id_list",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -11443,29 +11408,14 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
-      "id": "read_mp_ends",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
-    },
-    {
       "id": "read_mp_key",
-      "kind": "function",
-      "file": "tools/run-gates/run-gates.test.sh"
-    },
-    {
-      "id": "read_mp_key",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
-    },
-    {
-      "id": "read_mp_leg",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "read_mp_leg",
       "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
+      "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "read_named_hold",
@@ -11606,11 +11556,6 @@
       "id": "read_pp_key",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
-    },
-    {
-      "id": "read_pp_key",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
     },
     {
       "id": "read_probe_allow",
@@ -14095,11 +14040,6 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
-    },
-    {
-      "id": "resolve_kit_dir",
-      "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
     {
@@ -14266,11 +14206,6 @@
       "id": "resolve_mp_record",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
-    },
-    {
-      "id": "resolve_mp_record",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
     },
     {
       "id": "resolve_native",
@@ -14621,11 +14556,6 @@
       "id": "resolve_python",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.test.sh"
-    },
-    {
-      "id": "resolve_python",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
     },
     {
       "id": "resolve_python",
@@ -15628,11 +15558,6 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
-      "id": "run_hv_bar",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
-    },
-    {
       "id": "run_hygiene_offenders",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -15751,11 +15676,6 @@
       "id": "run_mp_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
-    },
-    {
-      "id": "run_mp_bar",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
     },
     {
       "id": "run_node",
@@ -19916,11 +19836,6 @@
       "id": "write_mp_meminfo",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
-    },
-    {
-      "id": "write_mp_meminfo",
-      "kind": "function",
-      "file": "tools/run-gates/zz-slice-mp.sh"
     },
     {
       "id": "write_nest_pair",

@@ -4,7 +4,17 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-08-build-TOOL-aMeteredSweep-1-legs.tsv](../build/2026-10-08-build-TOOL-aMeteredSweep-1-legs.tsv) | journal | — |
+| [2026-10-08-build-TOOL-aMeteredSweep-1-legtable.py](../build/2026-10-08-build-TOOL-aMeteredSweep-1-legtable.py) | journal | — |
+| [2026-10-08-build-TOOL-aMeteredSweep-1-research-govkit-unattended.md](../build/2026-10-08-build-TOOL-aMeteredSweep-1-research-govkit-unattended.md) | research | — |
+| [2026-10-08-build-TOOL-aMeteredSweep-1-research-memorytree-suites.md](../build/2026-10-08-build-TOOL-aMeteredSweep-1-research-memorytree-suites.md) | research | — |
+| [2026-10-08-build-TOOL-aMeteredSweep-1-research-other-legs.md](../build/2026-10-08-build-TOOL-aMeteredSweep-1-research-other-legs.md) | research | — |
+| [2026-10-08-build-TOOL-aMeteredSweep-1-research-rungates-suites.md](../build/2026-10-08-build-TOOL-aMeteredSweep-1-research-rungates-suites.md) | research | — |
+| [2026-10-08-build-TOOL-aMeteredSweep-1-research-runner.md](../build/2026-10-08-build-TOOL-aMeteredSweep-1-research-runner.md) | research | — |
+| [2026-10-08-build-TOOL-aMeteredSweep-1-runner-instruments.txt](../build/2026-10-08-build-TOOL-aMeteredSweep-1-runner-instruments.txt) | research | — |
+| [2026-10-08-build-TOOL-aMeteredSweep-1-speed-research.md](../build/2026-10-08-build-TOOL-aMeteredSweep-1-speed-research.md) | research | — |
 
 <!-- /gen:spec-records -->
 
