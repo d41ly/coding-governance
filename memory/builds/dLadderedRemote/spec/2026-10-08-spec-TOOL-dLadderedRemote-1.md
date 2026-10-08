@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-08-review-TOOL-dLadderedRemote-2-closing-diff-round1.md](../reviews/2026-10-08-review-TOOL-dLadderedRemote-2-closing-diff-round1.md) | diff-review | TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 |
 
 <!-- /gen:spec-records -->
 

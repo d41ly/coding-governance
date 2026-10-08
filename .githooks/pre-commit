@@ -64,8 +64,10 @@ resolve_remote_sh() {
 gd=$(git rev-parse --path-format=absolute --git-dir 2>/dev/null)
 gc=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
 if [ -n "$gd" ] && [ "$gd" = "$gc" ]; then          # primary tree, not a linked worktree
-  resolve_remote_sh || true
-  def=${RR_BRANCH:-main}
+  # GOV_DEFAULT_BRANCH FIRST and independent of the ladder: a ladder refusal returns before it sets
+  # RR_BRANCH, and the pin must still hold there. The refusal is announced, never swallowed.
+  resolve_remote_sh || echo "pre-commit: branch guard: $RR_WHY The default branch falls back to GOV_DEFAULT_BRANCH, else main." >&2
+  def=${GOV_DEFAULT_BRANCH:-${RR_BRANCH:-main}}
   branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
   if [ -n "$branch" ] && [ "$branch" != "$def" ]; then
     echo "pre-commit: refusing a commit in the primary tree while on '$branch' (default: '$def')."
