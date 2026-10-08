@@ -1,6 +1,6 @@
 # TOOL-aQuotedBrief-1 — the prompt record carries a self-contained brief, its session sources, and the owner's confirmation
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base fa68a767 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base fa68a767 · streams tooling · order 1 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -219,10 +219,13 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 AC4 AC5 AC6 AC7 �
 - **F2 — Should an owner edit at the confirmation get a second confirmation?**
   Recommendation: no. The prompt path has one owner turn by design, the answer is recorded verbatim,
   and the owner is present to interrupt before the push.
+  RESOLVED (owner, 2026-10-09): no second confirmation.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · §8 · owner resolved F2: an edit at the confirmation is folded and recorded,
+  with no second confirmation.
 
 ## 10. Reuse audit
 

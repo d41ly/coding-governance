@@ -34,14 +34,16 @@ wrote for itself, so an item merged away or dropped at orientation still closes 
 
 ## Build-level rules
 
-Three units, one mechanism each. Unit 1 defines the brief and its confirmation. Unit 2 refuses a
-first preflight on a branch carrying anything beyond this build's folder. Unit 3 gives each brief
+Three units, one mechanism each. Unit 1 defines the brief and its confirmation. Unit 2 starts a run
+whose tree is dirty or whose branch carries commits in a fresh worktree, and refuses a first
+preflight on a branch carrying anything beyond this build's folder. Unit 3 gives each brief
 item a disposition and grades it as a new `build-complete` term, so no core DoD item is added and no
 adopter's `CORE_FLOOR` moves. It does not use asks: both adopters run `BACKLOG_MODE` `shards`. Unit 3
 consumes unit 1's items section; unit 2 is independent of both.
 Both refusals are guards against accident, not a security boundary: a run with shell access can
-rewrite its own history. The kit version moves once, after the last unit lands. Owner decisions:
-confirmation applies only to a session-derived brief (owner, 2026-10-09).
+rewrite its own history. The kit version moves once, after the last unit lands. Owner decisions,
+2026-10-09: confirmation applies only to a session-derived brief, an edit there is not confirmed
+again, and an unclean tree starts the run in a fresh worktree rather than stopping it.
 
 ## Parked decisions
 
@@ -52,7 +54,7 @@ none
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-aQuotedBrief-1` | SPECCED | the prompt record carries a self-contained brief, the session words it used, and the owner's confirmation when it used any |
-| 2 | `TOOL-aQuotedBrief-2` | SPECCED | a first preflight refuses a branch carrying commits beyond this build's folder |
+| 2 | `TOOL-aQuotedBrief-2` | SPECCED | a run that cannot start clean starts in a fresh worktree, and a first preflight refuses a branch carrying commits beyond this build's folder |
 | 3 | `TOOL-aQuotedBrief-3` | SPECCED | each brief item carries its disposition at BASE, joined to the roster, and a seventh `build-complete` term grades it |
 
 <!-- /roster:units -->
@@ -64,8 +66,8 @@ ids TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aQuotedBrief-1 — the prompt record carries a self-contained brief, its session sources, and the owner's confirmation](spec/2026-10-09-spec-TOOL-aQuotedBrief-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [TOOL-aQuotedBrief-2 — a first preflight refuses a branch carrying commits beyond this build's folder](spec/2026-10-09-spec-TOOL-aQuotedBrief-2.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-09 |
+| [TOOL-aQuotedBrief-1 — the prompt record carries a self-contained brief, its session sources, and the owner's confirmation](spec/2026-10-09-spec-TOOL-aQuotedBrief-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-10-09 |
+| [TOOL-aQuotedBrief-2 — a run that cannot start clean starts in a fresh worktree, and a first preflight refuses a carried branch](spec/2026-10-09-spec-TOOL-aQuotedBrief-2.md) | 1 | 2 | SPECCED | rev-2 | 2026-10-09 |
 | [TOOL-aQuotedBrief-3 — every brief item carries its disposition, and `build-complete` grades each one](spec/2026-10-09-spec-TOOL-aQuotedBrief-3.md) | 2 | 2 | SPECCED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
