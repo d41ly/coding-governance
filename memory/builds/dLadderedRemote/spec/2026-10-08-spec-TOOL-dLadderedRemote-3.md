@@ -1,6 +1,6 @@
 # TOOL-dLadderedRemote-3 — a ban leg reds a literal origin ref in kit code
 
-**Status:** INPROGRESS · rev-1 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 2
+**Status:** INPROGRESS · rev-2 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -24,7 +24,7 @@ the defect, which is how one fixed lander and twelve unfixed probes came to coex
   Observed by AC1, AC2, AC3.
 - **S2** — `tools/check-remote-literals.test.sh`, its red and green self-test over a scratch repo.
   Observed by AC2, AC3.
-- **S3** — two legs in `tools/gate-legs.json`, the ban as a `repo`-subject leg in the `product`
+- **S3** — two legs in `tools/gate-legs.json`, the ban as a `repo`-subject leg in the `declarations`
   chunk and its self-test as a `kit`-subject leg, plus two `[[exempt]]` rows in
   `tools/govkit/registry.toml` declaring both files gov-internal. Every meta-gate the new legs trip
   is satisfied in this unit. Observed by AC4.
@@ -127,6 +127,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-08 · initial draft.
+- rev-2 · 2026-10-08 · S3 · the ban leg sits in the `declarations` chunk, as built; closing review
+  round 1 item 19, folded by `TOOL-dLadderedRemote-5`.
 
 ## 10. Reuse audit
 

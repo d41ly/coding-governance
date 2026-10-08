@@ -15,24 +15,31 @@
 # a fixture that needs a remote names it through a variable, and a test file is outside the population.
 #
 # THE POPULATION is every tracked `*.sh`, `*.py` and `*.js` under this gate's own tool root and under
-# `skills/`, and every tracked file under `.githooks/` — LESS `*.test.sh`, any path carrying
-# `selftest`, `test_*.py`, anything under a `fixtures/` directory, and Markdown. A fixture that
-# creates the remote on purpose is not a defect. Each LINE whose first non-blank text is `#`, `//`,
-# `/*` or `*` is a comment and is skipped: a comment recording what a site used to read is history.
+# `skills/`, and every tracked file under `.githooks/` — LESS `*.test.sh`, a `*selftest*.py`, a
+# `test_*.py` by basename, anything under a `fixtures/` directory, and Markdown. A fixture that
+# creates the remote on purpose is not a defect, and the exclusions match test files by their NAME so
+# product code such as a self-test RUNNER stays graded (TOOL-dLadderedRemote-5). A LINE whose first
+# non-blank text is `#` is a comment and is skipped, and so is one led by `//`, `/*` or `*` in a
+# `*.js` file only: in shell a `*)` line is a `case` arm, which is code.
 #
-# THE PREDICATE, four shapes, each written once below and each built through `$N` so this file does
+# THE PREDICATE, five shapes, each written once below and each built through `$N` so this file does
 # not spell what it bans:
 #   1. a tracking ref — `refs/remotes/` then the name, then anything but a name character;
-#   2. a short ref — the name then `/HEAD`, `/main`, `/master`, or an interpolation `/$` or `/{`;
-#   3. a default — the name quoted after `or`, `||` or `:-`, as in `remote = x or "<name>"`;
-#   4. a remedy — `set-head`, `fetch`, `get-url`, `ls-remote` or `set-url` then the name.
+#   2. a short ref or prefix — the name then `/`, led by anything but a name character, `.`, `/` or
+#      `$`, so `${x#<name>/}` and `removeprefix("<name>/")` count and a variable `$<name>/x` does not;
+#   3. a default — the name QUOTED after `or`, `||` or `??`; the name after `${x-`, `${x:-`, `${x=` or
+#      `${x:=`; or the name quoted as a call's last argument after a comma, as in `.get(k, "<name>")`;
+#   4. an assignment — a variable set to the name, quoted or not, as in `REMOTE=<name>`;
+#   5. a remedy — `set-head`, `fetch`, `get-url`, `ls-remote`, `set-url`, `push` or `pull` then the
+#      name, or `remote.<name>.` as a config key.
 #
 # WHAT THIS GATE DOES NOT CHECK, said out loud because a structural ban reads as a semantic one:
 #   * a remote name held in a VARIABLE and joined at run time, which spells nothing;
-#   * a bare QUOTED name passed as a git argument, which cannot be told from a dictionary key of the
-#     same spelling — `govkit.py` uses that word as a field name;
-#   * a Python docstring or a message string QUOTING an old spelling is a hit, not a skip: only `#`,
-#     `//`, `/*` and `*` lines are comments to this gate, so reword the string;
+#   * a bare QUOTED name passed as a git argument anywhere but last, which cannot be told from a
+#     dictionary key of the same spelling — `govkit.py` uses that word as a field name;
+#   * a revision range such as `<name>..HEAD`, and a comparison such as `== "<name>"`;
+#   * a Python docstring or a message string QUOTING an old spelling is a hit, not a skip: only the
+#     comment leaders above are skipped, so reword the string;
 #   * any file type outside the population, and every untracked file — stage before you run it.
 set -u
 _self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""
@@ -51,11 +58,12 @@ MODE="${1:---check}"
 case "$MODE" in --check|--list) ;; *) echo "usage: $(basename "$0") [--check|--list]"; exit 2 ;; esac
 
 if [ -n "$TROOT" ]; then
-  INCLUDE=("$TROOT/*.sh" "$TROOT/*.py" "$TROOT/*.js" "skills/*.sh" "skills/*.py" ".githooks/*")
+  INCLUDE=("$TROOT/*.sh" "$TROOT/*.py" "$TROOT/*.js" "skills/*.sh" "skills/*.py" "skills/*.js" ".githooks/*")
 else
   INCLUDE=("*.sh" "*.py" "*.js" ".githooks/*")
 fi
-EXCLUDE=(":(exclude)*.test.sh" ":(exclude)*selftest*" ":(exclude)*test_*.py" ":(exclude)*/fixtures/*" ":(exclude)*.md")
+EXCLUDE=(":(exclude)*.test.sh" ":(exclude,glob)**/*selftest*.py" ":(exclude,glob)**/test_*.py"
+         ":(exclude,glob)**/fixtures/**" ":(exclude)*.md")
 
 pop=$(git ls-files -- "${INCLUDE[@]}" "${EXCLUDE[@]}")
 npop=$(printf '%s' "$pop" | grep -c . || true)
@@ -64,14 +72,19 @@ if [ "$npop" -eq 0 ]; then
   exit 2
 fi
 
-N=origin
+N="ori""gin"   # assembled, so this file does not spell what it bans
 Q="[\"'\`]"
+END="([^A-Za-z0-9_-]|\$)"
 PATTERNS=(
   "refs/remotes/$N([^A-Za-z0-9_.-]|\$)"
-  "(^|[^A-Za-z0-9_./-])$N/(HEAD|main|master|[\${])"
+  "(^|[^A-Za-z0-9_./\$-])$N/"
   "(^|[^A-Za-z0-9_])or[[:space:]]+$Q$N$Q"
-  "(\\|\\||:-)[[:space:]]*$Q?$N([^A-Za-z0-9_-]|\$)"
-  "(set-head|fetch|get-url|ls-remote|set-url)[[:space:]]+$N([^A-Za-z0-9_-]|\$)"
+  "(\\|\\||\\?\\?)[[:space:]]*$Q$N$Q"
+  "\\$\\{[A-Za-z_][A-Za-z0-9_]*:?[-=]$Q?$N$END"
+  ",[[:space:]]*$Q$N$Q[[:space:]]*\\)"
+  "(^|[^A-Za-z0-9_])[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=[[:space:]]*$Q?$N$Q?([[:space:];,)]|\$)"
+  "(set-head|fetch|get-url|ls-remote|set-url|push|pull)[[:space:]]+$N$END"
+  "remote\\.$N\\."
 )
 args=()
 for p in "${PATTERNS[@]}"; do args+=(-e "$p"); done
@@ -79,7 +92,10 @@ for p in "${PATTERNS[@]}"; do args+=(-e "$p"); done
 # `git grep` prints <path>:<line>:<text>; the awk drops a comment line and keeps the rest verbatim.
 hits=$(git grep -n -I -E "${args[@]}" -- "${INCLUDE[@]}" "${EXCLUDE[@]}" 2>/dev/null \
        | awk '{ t = $0; sub(/^[^:]*:[0-9]+:/, "", t); sub(/^[ \t]+/, "", t)
-               if (t ~ /^(#|\/\/|\/\*|\*)/) next; print }' || true)
+               p = $0; sub(/:.*/, "", p)
+               if (t ~ /^#/) next
+               if (p ~ /\.js$/ && t ~ /^(\/\/|\/\*|\*)/) next
+               print }' || true)
 
 if [ "$MODE" = --list ]; then
   printf '%s\n' "$pop" | sed 's/^/population  /'

@@ -1604,6 +1604,11 @@ def test_baseline_additions_from_git(tmp: Path):
         run_git("symbolic-ref", "refs/remotes/incms/HEAD", "refs/remotes/incms/main")
         got, why = m.resolve_compare_base(tmp)
         assert got == bare and why == "merge-base of HEAD and incms/main", (got, why)
+        # TOOL-dLadderedRemote-5: the OBSERVED branch, never GOV_DEFAULT_BRANCH, picks the base.
+        os.environ["GOV_DEFAULT_BRANCH"] = "elsewhere"
+        same, why = m.resolve_compare_base(tmp)
+        assert same == bare and why == "merge-base of HEAD and incms/main", (same, why)
+        del os.environ["GOV_DEFAULT_BRANCH"]
         run_git("remote", "add", "origin", "../origin.git")
         run_git("update-ref", "refs/remotes/origin/main", seeded)
         refused, why = m.resolve_compare_base(tmp)

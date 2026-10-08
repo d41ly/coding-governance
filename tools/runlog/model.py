@@ -645,7 +645,10 @@ def resolve_remote(root):
 
     names = read("remote").split()
     listed = " ".join(names) or "none"
-    cur = read("symbolic-ref", "--quiet", "--short", "HEAD")
+    # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous
+    # (`heads/x`, `remotes/r/x`), and the prefix is stripped exactly instead.
+    cur = read("symbolic-ref", "--quiet", "HEAD")
+    cur = cur[len("refs/heads/"):] if cur.startswith("refs/heads/") else ""
     remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
     if not remote and cur:
         remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
@@ -663,17 +666,20 @@ def resolve_remote(root):
                             "export GOV_REMOTE=<remote>." % (how, remote, listed))
     observed = ""
     if remote:
-        head = read("symbolic-ref", "--quiet", "--short", "refs/remotes/" + remote + "/HEAD")
-        if head.startswith(remote + "/") and len(head) > len(remote) + 1:
-            observed = head[len(remote) + 1:]
+        pre = "refs/remotes/" + remote + "/"
+        head = read("symbolic-ref", "--quiet", pre + "HEAD")
+        if head.startswith(pre) and len(head) > len(pre):
+            observed = head[len(pre):]
     return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
 # <<< remote_ladder_py
 
 
 def read_refs(root) -> dict:
     """Every branch and remote-tracking ref with its sha, the checked-out branch, and the target of
-    the remote's HEAD, the remote being the ladder's. ONE ref listing; a detached HEAD costs one
-    more. The key keeps its name `origin_head`, which `resolve_default_ref` and the model's readers
+    the remote's HEAD, the remote being the ladder's. ONE ref listing through `run_git`; a detached
+    HEAD costs one more. The inlined ladder spawns up to four git processes of its own, which
+    `GIT_CALLS` does NOT count, so the model's git-call figure understates this read by that many
+    (TOOL-dLadderedRemote-5). The key keeps its name `origin_head`, which `resolve_default_ref` and the model's readers
     spell, though it now names whichever remote the ladder resolved (TOOL-dLadderedRemote-2). A
     ladder refusal or no remote leaves it None, so the reader falls back to a local main or master
     exactly as a clone without that symref always did."""

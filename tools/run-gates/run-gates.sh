@@ -267,13 +267,15 @@ redact() { sed -E 's#://[^/@[:space:]]+:[^/@[:space:]]+@#://***:***@#g'; }
 # is what <remote>/HEAD names; RR_BRANCH is GOV_DEFAULT_BRANCH, else RR_OBSERVED. Fetches nothing.
 # RR_GIT names the git command, so a caller holding a pinned wrapper function passes it.
 resolve_remote_sh() {
-  local _rr_git=${RR_GIT:-git} _rr_names _rr_n _rr_list _rr_cur _rr_where _rr_how=GOV_REMOTE _rr_head
+  local _rr_git=${RR_GIT:-git} _rr_names _rr_n _rr_list _rr_cur _rr_where _rr_how=GOV_REMOTE _rr_head _rr_bad
   RR_REMOTE=${GOV_REMOTE:-}; RR_BRANCH=""; RR_OBSERVED=""; RR_WHY=""
   _rr_names=$("$_rr_git" remote 2>/dev/null) || _rr_names=""
   _rr_n=$(printf "%s" "$_rr_names" | grep -c . || true)
   _rr_list=$(printf "%s" "$_rr_names" | tr "\n" " ")
   [ -n "$_rr_list" ] || _rr_list=none
-  _rr_cur=$("$_rr_git" symbolic-ref --quiet --short HEAD 2>/dev/null) || _rr_cur=""
+  # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous.
+  _rr_cur=$("$_rr_git" symbolic-ref --quiet HEAD 2>/dev/null) || _rr_cur=""
+  case "$_rr_cur" in refs/heads/?*) _rr_cur=${_rr_cur#refs/heads/} ;; *) _rr_cur="" ;; esac
   if [ -z "$RR_REMOTE" ] && [ -n "$_rr_cur" ]; then
     RR_REMOTE=$("$_rr_git" config "branch.$_rr_cur.remote" 2>/dev/null) || RR_REMOTE=""
     _rr_how="branch.$_rr_cur.remote"
@@ -285,14 +287,16 @@ resolve_remote_sh() {
     RR_WHY="cannot choose a remote: GOV_REMOTE is unset, $_rr_where has no configured remote, and this repository has $_rr_n remotes ($_rr_list). Name it: export GOV_REMOTE=<remote>."
     return 1
   fi
-  if [ -n "$RR_REMOTE" ] && ! printf "%s\n" "$_rr_names" | grep -qxF -- "$RR_REMOTE"; then
+  # A name holding whitespace is no remote: `grep -F` would split it into several patterns.
+  case "$RR_REMOTE" in *[[:space:]]*) _rr_bad=1 ;; *) _rr_bad=0 ;; esac
+  if [ -n "$RR_REMOTE" ] && { [ "$_rr_bad" = 1 ] || ! printf "%s\n" "$_rr_names" | grep -qxF -- "$RR_REMOTE"; }; then
     RR_WHY="$_rr_how names $RR_REMOTE, which is no remote of this repository ($_rr_list). Name one that is: export GOV_REMOTE=<remote>."
     RR_REMOTE=""
     return 1
   fi
   if [ -n "$RR_REMOTE" ]; then
-    _rr_head=$("$_rr_git" symbolic-ref --quiet --short "refs/remotes/$RR_REMOTE/HEAD" 2>/dev/null) || _rr_head=""
-    case "$_rr_head" in "$RR_REMOTE"/?*) RR_OBSERVED=${_rr_head#"$RR_REMOTE"/} ;; esac
+    _rr_head=$("$_rr_git" symbolic-ref --quiet "refs/remotes/$RR_REMOTE/HEAD" 2>/dev/null) || _rr_head=""
+    case "$_rr_head" in "refs/remotes/$RR_REMOTE"/?*) RR_OBSERVED=${_rr_head#"refs/remotes/$RR_REMOTE"/} ;; esac
   fi
   RR_BRANCH=${GOV_DEFAULT_BRANCH:-$RR_OBSERVED}
   return 0
@@ -306,7 +310,14 @@ resolve_remote_sh() {
 if ! resolve_remote_sh && [ -z "${GATE_BASE:-}" ]; then
   echo "run-gates: no scope base — $RR_WHY Every guarded leg runs." >&2
 fi
-DEFBR=$RR_BRANCH
+# The OBSERVED branch, never GOV_DEFAULT_BRANCH: an environment value must not move the scope base
+# a guarded leg is skipped against (TOOL-aStandingWrit-5's class), and this read never consulted it.
+DEFBR=$RR_OBSERVED
+# What the evidence row `base_from` records when no GATE_BASE is given: a ladder refusal, no remote at
+# all, or the remote and branch the base came from — three answers, never one spelling for two.
+if [ -n "$RR_WHY" ]; then BASE_FROM_LADDER=ladder-refused
+elif [ -z "$RR_REMOTE" ]; then BASE_FROM_LADDER=no-remote
+else BASE_FROM_LADDER="$RR_REMOTE/${DEFBR:-main}"; fi
 # THE BASE IS THE BRANCH POINT, not the remote tip, so a branch is graded on what IT changed
 # rather than on everything that landed while it was open. The merge-base is used only where it
 # is a PROPER ANCESTOR of HEAD; otherwise the remote tip stands.
@@ -2213,7 +2224,7 @@ if [ -n "$RUNDIR" ]; then
     printf 'started\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     printf 'head\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"
     printf 'base\t%s\n' "$BASE"
-    printf 'base_from\t%s\n' "${GATE_BASE:+GATE_BASE}${GATE_BASE:-${RR_REMOTE:-no-remote}/${DEFBR:-main}}"
+    printf 'base_from\t%s\n' "${GATE_BASE:+GATE_BASE}${GATE_BASE:-$BASE_FROM_LADDER}"
     printf 'fingerprint\t%s\n' "$FPRINT_START"
     printf 'tree_clean\t%s\n' "$TREE_CLEAN"
     printf 'manifest\t%s\n' "$LEGS_FILE"

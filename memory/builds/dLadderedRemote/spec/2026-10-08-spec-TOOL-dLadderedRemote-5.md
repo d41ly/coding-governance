@@ -117,7 +117,7 @@ the header.
 
 ## 7. Gates
 
-`python resolver (behaviour + inline parity + idiom ban)` · `remote literals (kit code names no remote)` · `remote literals self-test` · `codebase-map kit selftest` · `run-gates canary` · `runlog selftest` · `govkit selftest` · `drift-audit selftest` · `every held leg is budgeted, every budget row resolves`
+`python resolver (behaviour + inline parity + idiom ban)` · `remote literals (kit code names no remote)` · `remote literals self-test` · `codebase-map kit selftest` · `run-gates canary` · `runlog selftest` · `govkit selftest` · `drift-audit selftest` · `every held leg is budgeted, every budget row resolves` · `manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `pre-push run-log line` · `run-gates run-log line` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `recall floor arms` · `run-gates gov canary` · `govkit refusal join` · `govkit acceptance matrix`
 
 New arm: tools/lib/resolve-python.test.sh · covers AC1 · `--short` restored in one canonical · none
 New arm: tools/check-remote-literals.test.sh · covers AC2 AC3 · one pattern removed at a time · FLOOR_ASSERTIONS

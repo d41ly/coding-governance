@@ -1470,7 +1470,10 @@ def resolve_remote(root):
 
     names = read("remote").split()
     listed = " ".join(names) or "none"
-    cur = read("symbolic-ref", "--quiet", "--short", "HEAD")
+    # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous
+    # (`heads/x`, `remotes/r/x`), and the prefix is stripped exactly instead.
+    cur = read("symbolic-ref", "--quiet", "HEAD")
+    cur = cur[len("refs/heads/"):] if cur.startswith("refs/heads/") else ""
     remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
     if not remote and cur:
         remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
@@ -1488,9 +1491,10 @@ def resolve_remote(root):
                             "export GOV_REMOTE=<remote>." % (how, remote, listed))
     observed = ""
     if remote:
-        head = read("symbolic-ref", "--quiet", "--short", "refs/remotes/" + remote + "/HEAD")
-        if head.startswith(remote + "/") and len(head) > len(remote) + 1:
-            observed = head[len(remote) + 1:]
+        pre = "refs/remotes/" + remote + "/"
+        head = read("symbolic-ref", "--quiet", pre + "HEAD")
+        if head.startswith(pre) and len(head) > len(pre):
+            observed = head[len(pre):]
     return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
 # <<< remote_ladder_py
 
@@ -1499,18 +1503,20 @@ def resolve_compare_base(root: Path) -> tuple[str | None, str]:
     """The sha the baseline's shrink-only assert compares against, and why — or None and why not.
 
     THE MERGE BAR'S OWN RULE, copied rather than imported because a kit may not read a sibling
-    kit: the remote and default branch the remote ladder inlined above resolves (`main` when no
+    kit: the remote the ladder inlined above resolves and the branch its HEAD names (`main` when no
     branch is named), its merge-base with HEAD where that is a PROPER ancestor of HEAD, else the
     remote tip itself. So a branch is graded on what IT changed, and a key the default branch
     deleted after the branch opened is not misread as one the branch added. Fetches nothing: no
     remote-tracking ref, no answer; a ladder refusal is no answer either, and says why
     (TOOL-dLadderedRemote-2)."""
-    remote, branch, _observed, refusal = resolve_remote(root)
+    # The OBSERVED branch, never GOV_DEFAULT_BRANCH: an environment value must not move the base a
+    # shrink-only assert grades against, and this read never consulted it (TOOL-aStandingWrit-5).
+    remote, _branch, observed, refusal = resolve_remote(root)
     if refusal:
         return None, refusal
     if not remote:
         return None, "no remote to compare against"
-    branch = branch or "main"
+    branch = observed or "main"
     tip = (_read_git_text(root, "rev-parse", "--verify", "-q", f"refs/remotes/{remote}/{branch}^{{commit}}") or "").strip()
     if not tip:
         return None, f"no {remote}/{branch} ref to compare against (never fetched)"

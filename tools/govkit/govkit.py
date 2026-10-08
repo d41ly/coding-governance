@@ -577,7 +577,10 @@ def resolve_remote(root):
 
     names = read("remote").split()
     listed = " ".join(names) or "none"
-    cur = read("symbolic-ref", "--quiet", "--short", "HEAD")
+    # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous
+    # (`heads/x`, `remotes/r/x`), and the prefix is stripped exactly instead.
+    cur = read("symbolic-ref", "--quiet", "HEAD")
+    cur = cur[len("refs/heads/"):] if cur.startswith("refs/heads/") else ""
     remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
     if not remote and cur:
         remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
@@ -595,9 +598,10 @@ def resolve_remote(root):
                             "export GOV_REMOTE=<remote>." % (how, remote, listed))
     observed = ""
     if remote:
-        head = read("symbolic-ref", "--quiet", "--short", "refs/remotes/" + remote + "/HEAD")
-        if head.startswith(remote + "/") and len(head) > len(remote) + 1:
-            observed = head[len(remote) + 1:]
+        pre = "refs/remotes/" + remote + "/"
+        head = read("symbolic-ref", "--quiet", pre + "HEAD")
+        if head.startswith(pre) and len(head) > len(pre):
+            observed = head[len(pre):]
     return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
 # <<< remote_ladder_py
 
@@ -639,8 +643,15 @@ def resolve_measurer_currency(root: pathlib.Path, to_commit: str) -> tuple[str, 
     # THE REMOTE IS THE LADDER'S (TOOL-dLadderedRemote-2): this read `branch.main.remote` and
     # defaulted to a literal name, which half-implemented the lander's ladder and asked a remote
     # that does not exist on a node naming its remote after the project. A refusal or no remote at
-    # all is `unverified` with the reason, never a guessed remote.
-    remote, _branch, _observed, refusal = resolve_remote(root)
+    # all is `unverified` with the reason, never a guessed remote. GOV_REMOTE is set aside for this
+    # one read: it names the TARGET repository's remote, and an operator exporting it for an adopter's
+    # update must not steer which remote the gov checkout asks (TOOL-dLadderedRemote-5).
+    _held = os.environ.pop("GOV_REMOTE", None)
+    try:
+        remote, _branch, _observed, refusal = resolve_remote(root)
+    finally:
+        if _held is not None:
+            os.environ["GOV_REMOTE"] = _held
     if refusal or not remote:
         return _memo.setdefault(_key, ("unverified", refusal or "this checkout has no remote to ask"))
     try:

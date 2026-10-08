@@ -198,7 +198,10 @@ def resolve_remote(root):
 
     names = read("remote").split()
     listed = " ".join(names) or "none"
-    cur = read("symbolic-ref", "--quiet", "--short", "HEAD")
+    # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous
+    # (`heads/x`, `remotes/r/x`), and the prefix is stripped exactly instead.
+    cur = read("symbolic-ref", "--quiet", "HEAD")
+    cur = cur[len("refs/heads/"):] if cur.startswith("refs/heads/") else ""
     remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
     if not remote and cur:
         remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
@@ -216,9 +219,10 @@ def resolve_remote(root):
                             "export GOV_REMOTE=<remote>." % (how, remote, listed))
     observed = ""
     if remote:
-        head = read("symbolic-ref", "--quiet", "--short", "refs/remotes/" + remote + "/HEAD")
-        if head.startswith(remote + "/") and len(head) > len(remote) + 1:
-            observed = head[len(remote) + 1:]
+        pre = "refs/remotes/" + remote + "/"
+        head = read("symbolic-ref", "--quiet", pre + "HEAD")
+        if head.startswith(pre) and len(head) > len(pre):
+            observed = head[len(pre):]
     return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
 # <<< remote_ladder_py
 

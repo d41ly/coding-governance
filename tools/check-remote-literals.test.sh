@@ -37,7 +37,7 @@ PFX="${KIT_REL:+$KIT_REL/}"
 GATE_SRC="$HERE/check-remote-literals.sh"
 [ -f "$GATE_SRC" ] || { echo "remote-literals.test: no gate at $GATE_SRC"; exit 2; }
 
-FLOOR_ASSERTIONS=19
+FLOOR_ASSERTIONS=30
 PASS=0
 FAIL=0
 ok()  { PASS=$((PASS+1)); }
@@ -89,6 +89,17 @@ RED_TABLE="$TMPROOT/red.tsv"; GREEN_TABLE="$TMPROOT/green.tsv"
   printf '%s\n' "default after :-|${PFX}kit/f.sh|r=\${GOV_REMOTE:-$N}"
   printf '%s\n' "remedy|${PFX}kit/g.py|    raise Refusal(\"run git remote set-head $N -a\")"
   printf '%s\n' "a shipped git hook|.githooks/pre-commit|def=\$(git symbolic-ref --short refs/remotes/$N/HEAD)"
+  # TOOL-dLadderedRemote-5: the spellings the round-1 review found escaping, and two product files the
+  # old path exclusions hid by matching `selftest` and `test_` anywhere in a path.
+  printf '%s\n' "a shell case arm|${PFX}kit/m.sh|  *) def=\$(git symbolic-ref --short refs/remotes/$N/HEAD) ;;"
+  printf '%s\n' "a prefix strip, shell|${PFX}kit/n.sh|obs=\${obs#$N/}"
+  printf '%s\n' "a prefix strip, python|${PFX}kit/o.py|    branch = ref.removeprefix(\"$N/\")"
+  printf '%s\n' "a defaulted get|${PFX}kit/p.py|    r = os.environ.get(\"GOV_REMOTE\", \"$N\")"
+  printf '%s\n' "default after :=|${PFX}kit/q.sh|r=\${GOV_REMOTE:=$N}"
+  printf '%s\n' "an unquoted assignment|${PFX}kit/r.sh|REMOTE=$N"
+  printf '%s\n' "a push remedy|${PFX}kit/s.sh|git push $N HEAD:main"
+  printf '%s\n' "a skills js file|skills/kit/t.js|const r = opts.remote ?? \"$N\""
+  printf '%s\n' "a product file named like a test|${PFX}kit/latest_probe.py|    os.system(\"git fetch $N main\")"
 } > "$RED_TABLE"
 {
   printf '%s\n' "a *.test.sh file|${PFX}kit/x.test.sh|git update-ref refs/remotes/$N/main HEAD"
@@ -99,6 +110,9 @@ RED_TABLE="$TMPROOT/red.tsv"; GREEN_TABLE="$TMPROOT/green.tsv"
   printf '%s\n' "a // comment|${PFX}kit/i.js|// the default used to be $N/main"
   printf '%s\n' "a Markdown file|${PFX}kit/README.md|run git remote set-head $N -a"
   printf '%s\n' "a name merely containing the word|${PFX}kit/j.py|    origins = rec.get(\"${N}al_${N}s\")"
+  # TOOL-dLadderedRemote-5: a VARIABLE named like the remote is not a literal remote.
+  printf '%s\n' "a variable named like the remote, shell|${PFX}kit/u.sh|$N=\$RR_REMOTE; git rev-parse \"\$$N/HEAD\""
+  printf '%s\n' "a variable named like the remote, js|${PFX}kit/v.js|const k = rec.a || $N.kind"
 } > "$GREEN_TABLE"
 # ---- RED: one shape per arm ------------------------------------------------------------------------
 k=0
@@ -111,7 +125,7 @@ while IFS='|' read -r shape rel line; do
   # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
   if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${FAIL:-0}" = 0 ] && echo "PASS (${PASS:-1} assertions)" || echo "FAIL (${PASS:-1} assertions)"; [ "${FAIL:-0}" = 0 ] && exit 0; exit 1; fi
 done < "$RED_TABLE"
-[ "$k" = 8 ] || bad "the RED table read as $k rows, not 8"
+[ "$k" = 17 ] || bad "the RED table read as $k rows, not 17"
 
 # ---- GREEN: the same bytes where they must not be named --------------------------------------------
 k=0
@@ -122,7 +136,7 @@ while IFS='|' read -r what rel line; do
   plant "$d" "$rel" "$line" || exit 2
   arm "GREEN $what" 0 "remote-literals: clean" -- gate "$d"
 done < "$GREEN_TABLE"
-[ "$k" = 8 ] || bad "the GREEN table read as $k rows, not 8"
+[ "$k" = 10 ] || bad "the GREEN table read as $k rows, not 10"
 
 # ---- the population refuses to be vacuous ----------------------------------------------------------
 d="$TMPROOT/empty"

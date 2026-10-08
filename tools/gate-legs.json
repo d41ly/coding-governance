@@ -266,7 +266,8 @@
     ],
     "guard": [
       "{prefix}/",
-      "{prefix}/lib/"
+      "{prefix}/lib/",
+      ".githooks/"
     ],
     "chunk": "wiring",
     "subject": "kit",

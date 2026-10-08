@@ -293,6 +293,12 @@ rr_fx "$RR/up" && rr_remote "$RR/up" incms && rr_remote "$RR/up" origin trunk &&
 rr_fx "$RR/none"
 rr_fx "$RR/nohead" && git -C "$RR/nohead" remote add r ../r.git
 rr_fx "$RR/dot" && rr_remote "$RR/dot" incms && git -C "$RR/dot" config branch.feature.remote .
+# TOOL-dLadderedRemote-5: the two refusal texts no row graded, then the two names a SHORT ref read
+# ambiguously — a tag sharing the branch's name, and a local branch named like the remote's default.
+rr_fx "$RR/detached" && rr_remote "$RR/detached" incms && rr_remote "$RR/detached" origin && git -C "$RR/detached" checkout -q --detach
+rr_fx "$RR/badcfg" && rr_remote "$RR/badcfg" incms && git -C "$RR/badcfg" config branch.feature.remote zz
+rr_fx "$RR/tag" && rr_remote "$RR/tag" incms && rr_remote "$RR/tag" origin trunk && git -C "$RR/tag" config branch.feature.remote origin && git -C "$RR/tag" tag feature
+rr_fx "$RR/ambig" && rr_remote "$RR/ambig" incms && git -C "$RR/ambig" branch incms/main
 RR_ROWS="one||incms|main|main|
 two|||||cannot choose a remote: GOV_REMOTE is unset, branch feature has no configured remote, and this repository has 2 remotes (incms origin). Name it: export GOV_REMOTE=<remote>.
 two|GOV_REMOTE=incms|incms|main|main|
@@ -300,7 +306,11 @@ up||origin|trunk|trunk|
 one|GOV_REMOTE=nosuch||||GOV_REMOTE names nosuch, which is no remote of this repository (incms). Name one that is: export GOV_REMOTE=<remote>.
 none|GOV_DEFAULT_BRANCH=dev||dev||
 nohead|GOV_DEFAULT_BRANCH=main|r|main||
-dot||incms|main|main|"
+dot||incms|main|main|
+detached|||||cannot choose a remote: GOV_REMOTE is unset, a detached HEAD has no configured remote, and this repository has 2 remotes (incms origin). Name it: export GOV_REMOTE=<remote>.
+badcfg|||||branch.feature.remote names zz, which is no remote of this repository (incms). Name one that is: export GOV_REMOTE=<remote>.
+tag||origin|trunk|trunk|
+ambig||incms|main|main|"
 rr_k=0
 while IFS='|' read -r fx envset want; do
   [ -n "$fx" ] || continue
@@ -312,7 +322,7 @@ while IFS='|' read -r fx envset want; do
   [ "$rr_py" = "$want" ] || bad "remote ladder row $rr_k ($fx ${envset:-no env}): Python printed '$rr_py', the table says '$want'"; ok
   [ "$rr_sh" = "$want" ] || bad "remote ladder row $rr_k ($fx ${envset:-no env}): shell printed '$rr_sh', the table says '$want'"; ok
 done <<<"$RR_ROWS"
-[ "$rr_k" = 8 ] || bad "the remote ladder table read as $rr_k rows, not 8"; ok
+[ "$rr_k" = 12 ] || bad "the remote ladder table read as $rr_k rows, not 12"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver
