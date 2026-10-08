@@ -60,11 +60,12 @@ none
 | 2 | `TOOL-dLadderedRemote-2` | INPROGRESS | every site reading a literal `origin` carries the ladder inline and keeps its own fallback beneath it |
 | 3 | `TOOL-dLadderedRemote-3` | INPROGRESS | a ban leg on literal `origin` refs in kit code, observed RED at 40a8b8c3 |
 | 4 | `TOOL-dLadderedRemote-4` | INPROGRESS | the tier-2 review harness requires `base` instead of defaulting to `origin/main` |
+| 5 | `TOOL-dLadderedRemote-5` | INPROGRESS | the closing review's minors: a tighter ban, an unambiguous ladder, prose naming the ladder |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 4 unit(s) · node d · opened 2026-10-08 · streams tooling
+**Build status:** INPROGRESS · 5 unit(s) · node d · opened 2026-10-08 · streams tooling
 ids TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5
 
 <!-- gen:build-units -->
@@ -74,13 +75,14 @@ ids TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dL
 | [TOOL-dLadderedRemote-3 — a ban leg reds a literal origin ref in kit code](spec/2026-10-08-spec-TOOL-dLadderedRemote-3.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
 | [TOOL-dLadderedRemote-2 — every probe that read a literal origin carries the ladder inline and keeps its own fallback beneath it](spec/2026-10-08-spec-TOOL-dLadderedRemote-2.md) | 3 | 2 | INPROGRESS | rev-2 | 2026-10-08 |
 | [TOOL-dLadderedRemote-4 — the tier-2 review harness requires a diff review's base instead of defaulting to origin/main](spec/2026-10-08-spec-TOOL-dLadderedRemote-4.md) | 3 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
+| [TOOL-dLadderedRemote-5 — the closing review's minors: a tighter ban, an unambiguous ladder, and prose that names the ladder](spec/2026-10-08-spec-TOOL-dLadderedRemote-5.md) | 4 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dLadderedRemote-5.
 
-Ids no `spec-audit` record has ever named: TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4.
+Ids no `spec-audit` record has ever named: TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -90,6 +92,7 @@ Ids no `spec-audit` record has ever named: TOOL-dLadderedRemote-1 TOOL-dLaddered
 | 1 | `TOOL-dLadderedRemote-1` | no |
 | 2 | `TOOL-dLadderedRemote-3` | no |
 | 3 | `TOOL-dLadderedRemote-2`, `TOOL-dLadderedRemote-4` | yes |
+| 4 | `TOOL-dLadderedRemote-5` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
