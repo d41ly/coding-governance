@@ -86,6 +86,8 @@
       "recall floor",
       "recall floor arms",
       "receipt sync (installed files match the receipt)",
+      "remote literals (kit code names no remote)",
+      "remote literals self-test",
       "review-join ban (no ref-keyed join)",
       "review-join self-test",
       "review-protocol parity (kit vs dogfood)",
