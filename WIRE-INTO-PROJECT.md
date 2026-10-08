@@ -732,7 +732,9 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   `GOV_DEFAULT_BRANCH`, else what that remote's HEAD names (`git remote set-head <remote> -a`) —
   except for three readers that take ONLY what the remote's HEAD names, so an environment value
   cannot move what they grade against: the run-gates scope base, the codebase-map baseline assert
-  and the playbook render. A checkout with no HEAD symref (common in CI) sets it with `set-head`.
+  and the playbook render. Two more take the observed branch FIRST and only cross-check
+  `GOV_DEFAULT_BRANCH`: `migrate_backlog.py` refuses on a mismatch, and the straggler guard warns.
+  A checkout with no HEAD symref (common in CI) sets it with `set-head`.
 - The tracked pre-commit **branch guard** (refuse a primary-tree commit while off the default branch).
   coding-governance ships a portable reference block in its own `.githooks/pre-commit` (default branch
   `GOV_DEFAULT_BRANCH`, else the HEAD of the remote the ladder above resolves, else `main`; only fires in the primary tree,

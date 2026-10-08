@@ -1,6 +1,6 @@
-# Acceptance ledger — dLadderedRemote, units 1 to 6
+# Acceptance ledger — dLadderedRemote, units 1 to 7
 
-**Serves:** journal TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6
+**Serves:** journal TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6 TOOL-dLadderedRemote-7
 
 Node `d`, 2026-10-08. Every observation below was a direct check of one change: a truth-table arm,
 an arm in the affected kit's own suite run alone, a staged break, or the cross-site probe recorded
@@ -74,3 +74,12 @@ probed by extracting its two changed functions. The merge bar is the main loop's
 - AC4 — `.githooks/pre-commit` — with a tag named `main`, a commit on `main` was allowed, and with
   two remotes and the pin set the commit printed no `GOV_REMOTE` line; the guard reading
   `--short HEAD` refused the tagged commit.
+
+**Evidences:** TOOL-dLadderedRemote-7
+- AC1 — `check-remote-literals.sh` — the four new GREEN rows stayed clean with every RED row still
+  named, 43 arms. A mutant running the shell-only pass over every file named the `.js` and `.py`
+  no-space rows, and unit 6's gate named the JS template and the Python key list.
+- AC2 — `!seen[$0]++` — the header lists a flag's separate value as invisible, and the merge
+  dedupes on the whole line. Observed by reading: NTFS cannot host a path holding a colon.
+- AC3 — `migrate_backlog` — the runbook's ladder bullet names `migrate_backlog.py` and the straggler
+  guard as observed-first readers that only cross-check the pin.

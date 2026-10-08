@@ -27,13 +27,14 @@
 #   1. a tracking ref — `refs/remotes/` then the name, then anything but a name character;
 #   2. a short ref or prefix — the name then `/`, led by anything but a name character, `.`, `/` or
 #      `$`, so `${x#<name>/}` and `removeprefix("<name>/")` count and a variable `$<name>/x` does not;
-#   3. a default — the name QUOTED after `or`, `||` or `??`; the name after any `${...-`, `${...:-`,
-#      `${...=` or `${...:=`, whatever the parameter (`${1:-<name>}` included); or the name quoted as
-#      a call's or a list's last argument after a comma, as in `.get(k, "<name>")`;
+#   3. a default — the name QUOTED after `or`, `||` or `??`; the name after a parameter expansion's
+#      `-`, `:-`, `=` or `:=`, the parameter being a name, a digit or a special parameter with an
+#      optional `[...]` subscript (`${1:-<name>}` and `${opts[r]:-<name>}` included); or the name
+#      quoted as a call's last argument after a comma, as in `.get(k, "<name>")`;
 #   4. an assignment — a variable set to the QUOTED name in any file, or to the bare name in a shell
 #      file only, as in `REMOTE=<name>`: in Python or JS the bare form reads a variable;
 #   5. a remedy — `set-head`, `fetch`, `get-url`, `ls-remote`, `set-url`, `push` or `pull`, any
-#      flags, then the name; the same verb QUOTED in an argv list followed by quoted flags and the
+#      dash-led flags, then the name; the same verb QUOTED in an argv list followed by quoted flags and the
 #      quoted name, as in `["git", "fetch", "<name>"]`; or `remote.<name>.` as a config key.
 #
 # WHAT THIS GATE DOES NOT CHECK, said out loud because a structural ban reads as a semantic one:
@@ -42,6 +43,8 @@
 #     which cannot be told from a dictionary key of the same spelling — `govkit.py` uses that word as
 #     a field name;
 #   * a call or an argv list WRAPPED across lines: every shape reads one line;
+#   * a flag's SEPARATE value between a remedy verb and the name, as in `fetch --depth 1 <name>`:
+#     the flag group admits dash-led words only;
 #   * a revision range such as `<name>..HEAD`, and a comparison such as `== "<name>"`;
 #   * a Python docstring or a message string QUOTING an old spelling is a hit, not a skip: only the
 #     comment leaders above are skipped, so reword the string;
@@ -86,8 +89,8 @@ PATTERNS=(
   "(^|[^A-Za-z0-9_./\$-])$N/"
   "(^|[^A-Za-z0-9_])or[[:space:]]+$Q$N$Q"
   "(\\|\\||\\?\\?)[[:space:]]*$Q$N$Q"
-  "\\$\\{[^}]*[-=]$Q?$N$END"
-  ",[[:space:]]*$Q$N$Q[[:space:]]*[])]"
+  "\\$\\{([A-Za-z_][A-Za-z0-9_]*|[0-9]+|[@*#?!\$-])(\\[[^]]*\\])?:?[-=]$Q?$N$END"
+  ",[[:space:]]*$Q$N$Q[[:space:]]*\\)"
   "(^|[^A-Za-z0-9_])[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=[[:space:]]*$Q$N$Q"
   "$VERB([[:space:]]+-[^[:space:]]+)*[[:space:]]+$N$END"
   "$Q$VERB$Q([[:space:]]*,[[:space:]]*$Q-[^\"'\`]*$Q)*[[:space:]]*,[[:space:]]*$Q$N$Q"
@@ -106,10 +109,11 @@ sh_args=()
 for p in "${SH_PATTERNS[@]}"; do sh_args+=(-e "$p"); done
 
 # `git grep` prints <path>:<line>:<text>; the awk drops a comment line and keeps the rest verbatim.
-# The shell-only pass appends to the general one, and both go through the one comment filter.
+# The shell-only pass appends to the general one, and both go through the one comment filter. The
+# merge dedupes on the WHOLE line: a key split on `:` collapses two paths that each hold a colon.
 hits=$({ git grep -n -I -E "${args[@]}" -- "${INCLUDE[@]}" "${EXCLUDE[@]}" 2>/dev/null
          git grep -n -I -E "${sh_args[@]}" -- "${SH_INCLUDE[@]}" "${EXCLUDE[@]}" ":(exclude)*.py" ":(exclude)*.js" 2>/dev/null; } \
-       | sort -u -t: -k1,1 -k2,2n \
+       | awk '!seen[$0]++' \
        | awk '{ t = $0; sub(/^[^:]*:[0-9]+:/, "", t); sub(/^[ \t]+/, "", t)
                p = $0; sub(/:.*/, "", p)
                if (t ~ /^#/) next

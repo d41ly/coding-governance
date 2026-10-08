@@ -37,7 +37,7 @@ PFX="${KIT_REL:+$KIT_REL/}"
 GATE_SRC="$HERE/check-remote-literals.sh"
 [ -f "$GATE_SRC" ] || { echo "remote-literals.test: no gate at $GATE_SRC"; exit 2; }
 
-FLOOR_ASSERTIONS=39
+FLOOR_ASSERTIONS=43
 PASS=0
 FAIL=0
 add_pass() { PASS=$((PASS+1)); }
@@ -124,6 +124,12 @@ RED_TABLE="$TMPROOT/red.tsv"; GREEN_TABLE="$TMPROOT/green.tsv"
   # TOOL-dLadderedRemote-6: a bare name on an assignment's right is a VARIABLE outside shell.
   printf '%s\n' "a python variable assignment|${PFX}kit/ad.py|        self.$N = $N"
   printf '%s\n' "a js variable assignment|${PFX}kit/ae.js|const base = $N;"
+  # TOOL-dLadderedRemote-7: the same bytes with NO spaces, which only the shell-only pass's file filter
+  # keeps clean, and two keys spelled like the remote that the default and last-argument shapes see.
+  printf '%s\n' "a js assignment with no spaces|${PFX}kit/af.js|let r=$N;"
+  printf '%s\n' "a python assignment with no spaces|${PFX}kit/ag.py|x=$N"
+  printf '%s\n' "a js template comparing a variable|${PFX}kit/ah.js|const label = \`\${a.kind===$N ? 1 : 2}\`;"
+  printf '%s\n' "a python key list|${PFX}kit/ai.py|FIELDS = [\"kit\", \"$N\"]"
 } > "$GREEN_TABLE"
 # ---- RED: one shape per arm ------------------------------------------------------------------------
 k=0
@@ -147,7 +153,7 @@ while IFS='|' read -r what rel line; do
   write_plant "$d" "$rel" "$line" || exit 2
   arm "GREEN $what" 0 "remote-literals: clean" -- run_gate "$d"
 done < "$GREEN_TABLE"
-[ "$k" = 12 ] || add_fail "the GREEN table read as $k rows, not 12"
+[ "$k" = 16 ] || add_fail "the GREEN table read as $k rows, not 16"
 
 # ---- the population refuses to be vacuous ----------------------------------------------------------
 d="$TMPROOT/empty"
