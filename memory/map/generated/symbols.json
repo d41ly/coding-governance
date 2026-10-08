@@ -14643,6 +14643,21 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "resolve_remote",
+      "kind": "function",
+      "file": "tools/lib/resolve_remote.py"
+    },
+    {
+      "id": "resolve_remote_sh",
+      "kind": "function",
+      "file": "tools/lib/resolve-remote.sh"
+    },
+    {
+      "id": "resolve_remote_sh",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
       "id": "resolve_repair_sides",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -14946,6 +14961,16 @@
       "id": "rr",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "rr_fx",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "rr_remote",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
     },
     {
       "id": "rreset",

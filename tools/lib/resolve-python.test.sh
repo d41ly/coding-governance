@@ -173,6 +173,8 @@ resolve_prefix_sh|$ROOT/$KIT_REL/kit-rel.sh|$KIT_REL/kit-rel
 mempause_sh|$ROOT/$RUNGATES_DIR/run-gates.sh|$RUNGATES_DIR/run-gates.sh
 health_log_sh|$ROOT/$KIT_REL/health-log.sh|$KIT_REL/health-log
 health_log_py|$ROOT/$KIT_REL/health_log.py|$KIT_REL/health_log
+remote_ladder_py|$ROOT/$KIT_REL/resolve_remote.py|$KIT_REL/resolve_remote
+remote_ladder_sh|$ROOT/$KIT_REL/resolve-remote.sh|$KIT_REL/resolve-remote
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -190,6 +192,9 @@ health_log_py|$ROOT/$KIT_REL/health_log.py|$KIT_REL/health_log
 # health_log_sh and health_log_py (TOOL-aGraftedHelix-8) are the health log's appender, one canonical
 # per language beside this file; every writer kit and the card engine carry one inline, and §2c below
 # holds the two canonicals to one format. The runbook's embedded migration program carries the Python one, so the population grep reads that one Markdown file too.
+# remote_ladder_py and remote_ladder_sh (TOOL-dLadderedRemote-1) are the remote and default-branch
+# ladder, one canonical per language beside this file; every probe that asks which ref "landed"
+# means carries one inline, and §2d below holds the two canonicals to one truth table.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
@@ -266,6 +271,48 @@ for lang in sh py; do
     [ "$got" = "$want" ] || bad "the $lang appender over a $start-line log left '$got' (lines, first line, last line's fields), not '$want'"; ok
   done
 done
+
+# ---- 2d. THE REMOTE LADDER, BEHAVIOUR (TOOL-dLadderedRemote-1) ------------------------------------
+# Parity holds each inline copy to its canonical; this holds the two CANONICALS to one truth table,
+# refusal text included, over git fixtures whose remotes are named anything but `origin` where the
+# row is about that. The ambient GOV_REMOTE and GOV_DEFAULT_BRANCH are cleared per row, so a node that
+# exports either cannot make a row pass. WHAT THIS DOES NOT CHECK: any consumer's call site, which is
+# the suite of the kit that calls it, nor a remote URL — the ladder never reads one.
+rr_fx() { # dir -> a repo on branch `feature` with one empty commit and no remote
+  git init -q -b main "$1" && git -C "$1" -c user.email=t@e -c user.name=t commit -q --allow-empty -m x \
+    && git -C "$1" checkout -q -b feature
+}
+rr_remote() { # dir name [default] -> the remote configured, its tracking ref at HEAD, and HEAD's symref
+  git -C "$1" remote add "$2" "../$2.git" && git -C "$1" update-ref "refs/remotes/$2/${3:-main}" HEAD \
+    && git -C "$1" symbolic-ref "refs/remotes/$2/HEAD" "refs/remotes/$2/${3:-main}"
+}
+RR="$TMP/rr"; mkdir -p "$RR"
+rr_fx "$RR/one" && rr_remote "$RR/one" incms
+rr_fx "$RR/two" && rr_remote "$RR/two" incms && rr_remote "$RR/two" origin
+rr_fx "$RR/up" && rr_remote "$RR/up" incms && rr_remote "$RR/up" origin trunk && git -C "$RR/up" config branch.feature.remote origin
+rr_fx "$RR/none"
+rr_fx "$RR/nohead" && git -C "$RR/nohead" remote add r ../r.git
+rr_fx "$RR/dot" && rr_remote "$RR/dot" incms && git -C "$RR/dot" config branch.feature.remote .
+RR_ROWS="one||incms|main|main|
+two|||||cannot choose a remote: GOV_REMOTE is unset, branch feature has no configured remote, and this repository has 2 remotes (incms origin). Name it: export GOV_REMOTE=<remote>.
+two|GOV_REMOTE=incms|incms|main|main|
+up||origin|trunk|trunk|
+one|GOV_REMOTE=nosuch||||GOV_REMOTE names nosuch, which is no remote of this repository (incms). Name one that is: export GOV_REMOTE=<remote>.
+none|GOV_DEFAULT_BRANCH=dev||dev||
+nohead|GOV_DEFAULT_BRANCH=main|r|main||
+dot||incms|main|main|"
+rr_k=0
+while IFS='|' read -r fx envset want; do
+  [ -n "$fx" ] || continue
+  rr_k=$((rr_k+1))
+  # shellcheck disable=SC2086
+  rr_py=$(env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH $envset "$REALPY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); from resolve_remote import resolve_remote; print("|".join(resolve_remote(sys.argv[2])))' "$HERE" "$RR/$fx" | tr -d '\r')
+  # shellcheck disable=SC2086
+  rr_sh=$(cd "$RR/$fx" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH $envset bash -c '. "$1"; resolve_remote_sh; printf "%s|%s|%s|%s\n" "$RR_REMOTE" "$RR_BRANCH" "$RR_OBSERVED" "$RR_WHY"' _ "$HERE/resolve-remote.sh")
+  [ "$rr_py" = "$want" ] || bad "remote ladder row $rr_k ($fx ${envset:-no env}): Python printed '$rr_py', the table says '$want'"; ok
+  [ "$rr_sh" = "$want" ] || bad "remote ladder row $rr_k ($fx ${envset:-no env}): shell printed '$rr_sh', the table says '$want'"; ok
+done <<<"$RR_ROWS"
+[ "$rr_k" = 8 ] || bad "the remote ladder table read as $rr_k rows, not 8"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

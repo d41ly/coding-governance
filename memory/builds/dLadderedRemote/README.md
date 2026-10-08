@@ -56,24 +56,24 @@ none
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-dLadderedRemote-1` | SPECCED | the ladder as two canonicals in the lib dir, parity rows and one truth table both must print |
-| 2 | `TOOL-dLadderedRemote-2` | SPECCED | every site reading a literal `origin` carries the ladder inline and keeps its own fallback beneath it |
-| 3 | `TOOL-dLadderedRemote-3` | SPECCED | a ban leg on literal `origin` refs in kit code, observed RED at 40a8b8c3 |
-| 4 | `TOOL-dLadderedRemote-4` | SPECCED | the tier-2 review harness requires `base` instead of defaulting to `origin/main` |
+| 1 | `TOOL-dLadderedRemote-1` | INPROGRESS | the ladder as two canonicals in the lib dir, parity rows and one truth table both must print |
+| 2 | `TOOL-dLadderedRemote-2` | INPROGRESS | every site reading a literal `origin` carries the ladder inline and keeps its own fallback beneath it |
+| 3 | `TOOL-dLadderedRemote-3` | INPROGRESS | a ban leg on literal `origin` refs in kit code, observed RED at 40a8b8c3 |
+| 4 | `TOOL-dLadderedRemote-4` | INPROGRESS | the tier-2 review harness requires `base` instead of defaulting to `origin/main` |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 4 unit(s) · node d · opened 2026-10-08 · streams tooling
+**Build status:** INPROGRESS · 4 unit(s) · node d · opened 2026-10-08 · streams tooling
 ids TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dLadderedRemote-1 — the remote ladder has one canonical per language, and one truth table holds both](spec/2026-10-08-spec-TOOL-dLadderedRemote-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-08 |
-| [TOOL-dLadderedRemote-3 — a ban leg reds a literal origin ref in kit code](spec/2026-10-08-spec-TOOL-dLadderedRemote-3.md) | 2 | 2 | SPECCED | rev-1 | 2026-10-08 |
-| [TOOL-dLadderedRemote-2 — every probe that read a literal origin carries the ladder inline and keeps its own fallback beneath it](spec/2026-10-08-spec-TOOL-dLadderedRemote-2.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-08 |
-| [TOOL-dLadderedRemote-4 — the tier-2 review harness requires a diff review's base instead of defaulting to origin/main](spec/2026-10-08-spec-TOOL-dLadderedRemote-4.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-08 |
+| [TOOL-dLadderedRemote-1 — the remote ladder has one canonical per language, and one truth table holds both](spec/2026-10-08-spec-TOOL-dLadderedRemote-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
+| [TOOL-dLadderedRemote-3 — a ban leg reds a literal origin ref in kit code](spec/2026-10-08-spec-TOOL-dLadderedRemote-3.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
+| [TOOL-dLadderedRemote-2 — every probe that read a literal origin carries the ladder inline and keeps its own fallback beneath it](spec/2026-10-08-spec-TOOL-dLadderedRemote-2.md) | 3 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
+| [TOOL-dLadderedRemote-4 — the tier-2 review harness requires a diff review's base instead of defaulting to origin/main](spec/2026-10-08-spec-TOOL-dLadderedRemote-4.md) | 3 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).
