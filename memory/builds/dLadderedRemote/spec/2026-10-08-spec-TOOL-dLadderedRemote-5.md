@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md](../build/2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md) | journal | TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-6 |
 | [2026-10-08-review-TOOL-dLadderedRemote-5-closing-diff-round2.md](../reviews/2026-10-08-review-TOOL-dLadderedRemote-5-closing-diff-round2.md) | diff-review | TOOL-dLadderedRemote-2 |
+| [2026-10-08-review-TOOL-dLadderedRemote-6-closing-diff-round3.md](../reviews/2026-10-08-review-TOOL-dLadderedRemote-6-closing-diff-round3.md) | diff-review | TOOL-dLadderedRemote-6 |
 
 <!-- /gen:spec-records -->
 

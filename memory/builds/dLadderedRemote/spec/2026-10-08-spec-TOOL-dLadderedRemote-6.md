@@ -1,12 +1,13 @@
 # TOOL-dLadderedRemote-6 — the round-2 minors: the ban's lost defaults, variables and argv, and two small honesty fixes
 
-**Status:** INPROGRESS · rev-1 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 5
+**Status:** INPROGRESS · rev-2 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md](../build/2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md) | journal | TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 |
+| [2026-10-08-review-TOOL-dLadderedRemote-6-closing-diff-round3.md](../reviews/2026-10-08-review-TOOL-dLadderedRemote-6-closing-diff-round3.md) | diff-review | TOOL-dLadderedRemote-5 |
 
 <!-- /gen:spec-records -->
 
@@ -42,6 +43,7 @@ Its items N1 to N7 are this unit's scope.
 ### Edges
 
 - **consumes-from** `TOOL-dLadderedRemote-5` — the widened ban and the guard this unit corrects
+- **hands-off** `TOOL-dLadderedRemote-7` — the round-3 review's corrections to this unit's ban and runbook text
 
 ## 4. Design
 
@@ -99,6 +101,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-08 · initial draft, from the round-2 closing review.
+- rev-2 · 2026-10-08 · §3 · the hands-off edge to `TOOL-dLadderedRemote-7`, the round-3 batch unit.
 
 ## 10. Reuse audit
 
