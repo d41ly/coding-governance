@@ -1,6 +1,6 @@
 # TOOL-dLadderedRemote-2 — every probe that read a literal origin carries the ladder inline and keeps its own fallback beneath it
 
-**Status:** INPROGRESS · rev-1 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 3
+**Status:** INPROGRESS · rev-2 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -29,11 +29,12 @@ nothing resolved stays exactly as it was, so the only behaviour that moves is wh
   row `base_from` names the resolved remote. Observed by AC4, AC2.
 - **S4** — `tools/unattended/unattended.sh`: `default_branch` keeps `AREF` and `GOV_DEFAULT_BRANCH`
   first, then reads the ladder's `observed` through `RR_GIT=GIT`; `derive_liveness` reads
-  `refs/remotes/<remote>/<d>` before the local branch. Check 3's refusal text carries the ladder's
-  refusal when there is one. Observed by AC5.
-- **S5** — `tools/playbook/render_playbook.py`, `derive_default_branch`: the ladder's `branch`
-  first, then the local `main`/`master` fallback, which is also what a refusal reaches. Observed by
-  AC5.
+  `refs/remotes/<remote>/<d>` before the local branch. Check 3's `fail` text is unchanged, so no
+  armed signature strands; the ladder's refusal prints on stderr beside it. Observed by AC5.
+- **S5** — `tools/playbook/render_playbook.py`, `derive_default_branch`: the ladder's `observed`
+  first, never `GOV_DEFAULT_BRANCH`, because a render the bar byte-compares must not move with an
+  operator's environment. Then the local `main`/`master` fallback, which is also what a refusal
+  reaches, announced on stderr. Observed by AC5.
 - **S6** — `tools/govkit/govkit.py`: `resolve_measurer_currency` probes the ladder's remote, and a
   refusal or no remote reads `unverified` with the reason; the epoch default base merge-bases
   `<remote>/<branch or main>` before the local branch, and a refusal is its failed exit 1 naming
@@ -178,7 +179,7 @@ from its lander once AC7 holds there.
 `drift-audit records` · `drift-audit selftest` · `codebase-map coverage + freshness` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `memory hygiene` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `python resolver (behaviour + inline parity + idiom ban)` · `install-prefix (shipped surface)` · `encoding posture (text IO names its encoding)` · `pre-push run-log line` · `run-gates run-log line` · `runlog selftest` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `straggler-guard arms` · `verdict-epoch self-test` · `remote literals (kit code names no remote)`
 
 New arm: tools/drift-audit/selftest.py · covers AC1 AC2 AC3 · a fixture with no `origin` remote, staged against the 40a8b8c3 `resolve_base_ref` · none
-New arm: tools/codebase-map/test_codebase_map.py · covers AC4 AC2 · the same fixture against the 40a8b8c3 `resolve_compare_base` · none
+New arm: tools/codebase-map/selftest.py · covers AC4 AC2 · the same fixture against the 40a8b8c3 `resolve_compare_base` · none
 New arm: tools/run-gates/run-gates.test.sh · covers AC4 AC2 · the guarded canary with its remote named `incms` · none
 
 ## 8. Open questions
@@ -188,6 +189,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-08 · initial draft.
+- rev-2 · 2026-10-08 · S4 · S5 · §7 · what the build pass found: check 3's message stays put and the
+  refusal prints beside it; the render reads the observed branch, not the environment; the
+  codebase-map arm lives in the kit selftest, since the repo-subject coverage test runs on every bar.
 
 ## 10. Reuse audit
 

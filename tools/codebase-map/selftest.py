@@ -1592,8 +1592,28 @@ def test_baseline_additions_from_git(tmp: Path):
     assert added == {"flags": ["b"], "routes": ["r"]}, f"an added key must be named: {added}"
     none, why = m.derive_baseline_additions(tmp, bare)
     assert none is None and "no memory/map/baseline.toml" in why, (none, why)
-    gone, reason = m.resolve_compare_base(tmp)
-    assert gone is None and "origin/main" in reason, (gone, reason)
+    # TOOL-dLadderedRemote-2: the remote is the LADDER'S, not one called `origin`. The ambient
+    # GOV_REMOTE and GOV_DEFAULT_BRANCH are cleared for these arms, so a node exporting either
+    # cannot make one pass, and restored after.
+    saved = {k: os.environ.pop(k) for k in ("GOV_REMOTE", "GOV_DEFAULT_BRANCH") if k in os.environ}
+    try:
+        gone, reason = m.resolve_compare_base(tmp)
+        assert gone is None and reason == "no remote to compare against", (gone, reason)
+        run_git("remote", "add", "incms", "../incms.git")
+        run_git("update-ref", "refs/remotes/incms/main", bare)
+        run_git("symbolic-ref", "refs/remotes/incms/HEAD", "refs/remotes/incms/main")
+        got, why = m.resolve_compare_base(tmp)
+        assert got == bare and why == "merge-base of HEAD and incms/main", (got, why)
+        run_git("remote", "add", "origin", "../origin.git")
+        run_git("update-ref", "refs/remotes/origin/main", seeded)
+        refused, why = m.resolve_compare_base(tmp)
+        assert refused is None and "export GOV_REMOTE=<remote>" in why, (refused, why)
+        os.environ["GOV_REMOTE"] = "incms"
+        chosen, why = m.resolve_compare_base(tmp)
+        assert chosen == bare and "incms/main" in why, (chosen, why)
+    finally:
+        os.environ.pop("GOV_REMOTE", None)
+        os.environ.update(saved)
 
 
 def test_identifier_tokens_per_language():

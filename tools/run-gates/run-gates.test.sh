@@ -121,7 +121,8 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=324
+# 324 -> 326, TOOL-dLadderedRemote-2: the two arms of the canary's ladder-refusal pass, counted off the arm.
+FLOOR_ASSERTIONS=326
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -861,9 +862,11 @@ o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
   || { echo "canary: with no resolvable BASE a guarded leg did not fail safe to RUN"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
-# Pass 2 with origin/HEAD pinned: the guard path resolves and the unchanged leg must SKIP.
-( cd "$G" && git update-ref refs/remotes/origin/main HEAD \
-  && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
+# Pass 2 with the remote's HEAD pinned: the guard path resolves and the unchanged leg must SKIP. The
+# remote is named incms, not origin, and it is CONFIGURED: the ladder reads configuration, and a node
+# that names its remote after the project scopes like any other (TOOL-dLadderedRemote-2 AC4).
+( cd "$G" && git remote add incms ../incms.git && git update-ref refs/remotes/incms/main HEAD \
+  && git symbolic-ref refs/remotes/incms/HEAD refs/remotes/incms/main ) >/dev/null 2>&1
 for w in 1 4; do
 n=$((n+1))
 n=$((n+1))
@@ -881,6 +884,17 @@ done
 n=$((n+1))
 grep -q '^guarded	' "$G/.git/gate-ledger.tsv" 2>/dev/null \
   || { echo "canary: the skipped leg's cached row was dropped by the ledger rewrite"; fail=1; }
+# TOOL-dLadderedRemote-2 AC2: a second remote and none chosen is a REFUSAL the runner announces, naming
+# GOV_REMOTE, and then the fail-safe: every guarded leg runs, and none is skipped against a guess.
+( cd "$G" && git remote add origin ../origin.git && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+o=$( cd "$G" && GATE_FULL= GATE_BASE= GOV_REMOTE= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^run-gates: no scope base — cannot choose a remote: .*export GOV_REMOTE=<remote>' \
+  || { echo "canary: two remotes and none chosen did not announce the ladder's refusal"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
+  || { echo "canary: with the ladder refusing, a guarded leg did not fail safe to RUN"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+( cd "$G" && git remote remove origin ) >/dev/null 2>&1
 
 # 3h2. SUBJECT: a kit-subject leg is HELD unless asked, and GATE_FULL does not ask.
 #     TOOL-dUnstalledConvoy-26. A kit self-test stages a break into a copy of a checker and asserts
@@ -1785,6 +1799,7 @@ printf '%s\n' '[' \
   ']' > "$BB/${PFX}gate-legs.json"
 ( cd "$BB" && git init -q -b main . && git config user.email c@t && git config user.name c \
    && git add -A && git commit -qm seed \
+   && git remote add origin ../origin.git \
    && git update-ref refs/remotes/origin/main HEAD \
    && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
 # diverge: the branch touches ga/, then the default branch advances on gb/ only
@@ -1858,6 +1873,7 @@ printf '%s\n' '[' \
   '  {"name": "free", "argv": ["bash", "fx/a.sh"], "chunk": "here"}' \
   ']' > "$CK/${PFX}gate-legs.json"
 ( cd "$CK" && git add -A && git commit -qm two \
+   && { git remote add origin ../origin.git 2>/dev/null || :; } \
    && git update-ref refs/remotes/origin/main HEAD \
    && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
 sout=$( cd "$CK" && env GATE_FULL= GATE_BASE= bash $KIT_REL/run-gates.sh 2>&1 )

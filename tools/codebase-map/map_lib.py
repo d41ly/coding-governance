@@ -1442,24 +1442,83 @@ def _read_git_text(root: Path, *args: str) -> str | None:
     return r.stdout if r.returncode == 0 else None
 
 
+# The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
+# named on its marker line and gated by the resolve-python self-test.
+# >>> remote_ladder_py -- canonical copy: resolve_remote.py in the gov lib dir (byte-identical; gated)
+def resolve_remote(root):
+    """-> (remote, branch, observed, refusal) for the repository at <root>. Fetches nothing.
+
+    remote    GOV_REMOTE, else branch.<current>.remote unless it is ".", else the ONLY remote.
+              Several remotes and none chosen, or a chosen name that is not a remote here, is a
+              REFUSAL naming GOV_REMOTE. No remote at all is remote "" and NO refusal: the caller
+              keeps its own no-remote fallback.
+    observed  the branch refs/remotes/<remote>/HEAD names, or "". A caller whose GOV_DEFAULT_BRANCH
+              only CROSS-CHECKS the observation reads this one.
+    branch    GOV_DEFAULT_BRANCH, else observed, else "".
+    A refusal empties the other three, so no caller can pick a remote the ladder refused.
+    """
+    import os
+    import subprocess
+
+    def read(*args):
+        try:
+            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        return p.stdout.strip() if p.returncode == 0 else ""
+
+    names = read("remote").split()
+    listed = " ".join(names) or "none"
+    cur = read("symbolic-ref", "--quiet", "--short", "HEAD")
+    remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
+    if not remote and cur:
+        remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
+        if remote == ".":
+            remote = ""
+    if not remote and len(names) == 1:
+        remote = names[0]
+    if not remote and len(names) > 1:
+        where = "branch " + cur if cur else "a detached HEAD"
+        return "", "", "", ("cannot choose a remote: GOV_REMOTE is unset, %s has no configured remote, "
+                            "and this repository has %d remotes (%s). Name it: export GOV_REMOTE=<remote>."
+                            % (where, len(names), listed))
+    if remote and remote not in names:
+        return "", "", "", ("%s names %s, which is no remote of this repository (%s). Name one that is: "
+                            "export GOV_REMOTE=<remote>." % (how, remote, listed))
+    observed = ""
+    if remote:
+        head = read("symbolic-ref", "--quiet", "--short", "refs/remotes/" + remote + "/HEAD")
+        if head.startswith(remote + "/") and len(head) > len(remote) + 1:
+            observed = head[len(remote) + 1:]
+    return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
+# <<< remote_ladder_py
+
+
 def resolve_compare_base(root: Path) -> tuple[str | None, str]:
     """The sha the baseline's shrink-only assert compares against, and why — or None and why not.
 
     THE MERGE BAR'S OWN RULE, copied rather than imported because a kit may not read a sibling
-    kit: the default branch `refs/remotes/origin/HEAD` names (`main` when it names none), its
-    merge-base with HEAD where that is a PROPER ancestor of HEAD, else the remote tip itself. So a
-    branch is graded on what IT changed, and a key the default branch deleted after the branch
-    opened is not misread as one the branch added. Fetches nothing: no `origin` ref, no answer."""
-    ref = (_read_git_text(root, "symbolic-ref", "--short", "refs/remotes/origin/HEAD") or "").strip()
-    branch = ref.removeprefix("origin/") or "main"
-    tip = (_read_git_text(root, "rev-parse", "--verify", "-q", f"refs/remotes/origin/{branch}^{{commit}}") or "").strip()
+    kit: the remote and default branch the remote ladder inlined above resolves (`main` when no
+    branch is named), its merge-base with HEAD where that is a PROPER ancestor of HEAD, else the
+    remote tip itself. So a branch is graded on what IT changed, and a key the default branch
+    deleted after the branch opened is not misread as one the branch added. Fetches nothing: no
+    remote-tracking ref, no answer; a ladder refusal is no answer either, and says why
+    (TOOL-dLadderedRemote-2)."""
+    remote, branch, _observed, refusal = resolve_remote(root)
+    if refusal:
+        return None, refusal
+    if not remote:
+        return None, "no remote to compare against"
+    branch = branch or "main"
+    tip = (_read_git_text(root, "rev-parse", "--verify", "-q", f"refs/remotes/{remote}/{branch}^{{commit}}") or "").strip()
     if not tip:
-        return None, f"no origin/{branch} ref to compare against (no remote, or never fetched)"
+        return None, f"no {remote}/{branch} ref to compare against (never fetched)"
     head = (_read_git_text(root, "rev-parse", "--verify", "-q", "HEAD") or "").strip()
     mb = (_read_git_text(root, "merge-base", "HEAD", tip) or "").strip()
     if mb and mb != head:
-        return mb, f"merge-base of HEAD and origin/{branch}"
-    return tip, f"origin/{branch} tip"
+        return mb, f"merge-base of HEAD and {remote}/{branch}"
+    return tip, f"{remote}/{branch} tip"
 
 
 def derive_baseline_additions(root: Path, base: str) -> tuple[dict[str, list[str]] | None, str]:

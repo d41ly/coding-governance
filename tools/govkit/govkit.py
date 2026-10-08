@@ -549,6 +549,59 @@ def entry_version(root: pathlib.Path, desc: dict) -> str:
     return "(unresolvable)"
 
 
+# The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
+# named on its marker line and gated by the resolve-python self-test.
+# >>> remote_ladder_py -- canonical copy: resolve_remote.py in the gov lib dir (byte-identical; gated)
+def resolve_remote(root):
+    """-> (remote, branch, observed, refusal) for the repository at <root>. Fetches nothing.
+
+    remote    GOV_REMOTE, else branch.<current>.remote unless it is ".", else the ONLY remote.
+              Several remotes and none chosen, or a chosen name that is not a remote here, is a
+              REFUSAL naming GOV_REMOTE. No remote at all is remote "" and NO refusal: the caller
+              keeps its own no-remote fallback.
+    observed  the branch refs/remotes/<remote>/HEAD names, or "". A caller whose GOV_DEFAULT_BRANCH
+              only CROSS-CHECKS the observation reads this one.
+    branch    GOV_DEFAULT_BRANCH, else observed, else "".
+    A refusal empties the other three, so no caller can pick a remote the ladder refused.
+    """
+    import os
+    import subprocess
+
+    def read(*args):
+        try:
+            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        return p.stdout.strip() if p.returncode == 0 else ""
+
+    names = read("remote").split()
+    listed = " ".join(names) or "none"
+    cur = read("symbolic-ref", "--quiet", "--short", "HEAD")
+    remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
+    if not remote and cur:
+        remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
+        if remote == ".":
+            remote = ""
+    if not remote and len(names) == 1:
+        remote = names[0]
+    if not remote and len(names) > 1:
+        where = "branch " + cur if cur else "a detached HEAD"
+        return "", "", "", ("cannot choose a remote: GOV_REMOTE is unset, %s has no configured remote, "
+                            "and this repository has %d remotes (%s). Name it: export GOV_REMOTE=<remote>."
+                            % (where, len(names), listed))
+    if remote and remote not in names:
+        return "", "", "", ("%s names %s, which is no remote of this repository (%s). Name one that is: "
+                            "export GOV_REMOTE=<remote>." % (how, remote, listed))
+    observed = ""
+    if remote:
+        head = read("symbolic-ref", "--quiet", "--short", "refs/remotes/" + remote + "/HEAD")
+        if head.startswith(remote + "/") and len(head) > len(remote) + 1:
+            observed = head[len(remote) + 1:]
+    return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
+# <<< remote_ladder_py
+
+
 def resolve_measurer_currency(root: pathlib.Path, to_commit: str) -> tuple[str, str]:
     """Is the GOV checkout doing the measuring current with its own remote?
 
@@ -583,9 +636,13 @@ def resolve_measurer_currency(root: pathlib.Path, to_commit: str) -> tuple[str, 
     _key = (str(root), to_commit)
     if _key in _memo:
         return _memo[_key]
-    _rn = subprocess.run(["git", "-C", str(root), "config", "--get", "branch.main.remote"],
-                         capture_output=True, text=True)
-    remote = (_rn.stdout.strip() or "origin")
+    # THE REMOTE IS THE LADDER'S (TOOL-dLadderedRemote-2): this read `branch.main.remote` and
+    # defaulted to a literal name, which half-implemented the lander's ladder and asked a remote
+    # that does not exist on a node naming its remote after the project. A refusal or no remote at
+    # all is `unverified` with the reason, never a guessed remote.
+    remote, _branch, _observed, refusal = resolve_remote(root)
+    if refusal or not remote:
+        return _memo.setdefault(_key, ("unverified", refusal or "this checkout has no remote to ask"))
     try:
         adv = subprocess.run(["git", "-C", str(root), "ls-remote", "--symref", "--exit-code",
                               remote, "HEAD"], capture_output=True, text=True, timeout=20)
@@ -12448,9 +12505,15 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
     if base is None:
         # The default base is `check-verdict-epoch.sh`'s: the merge-base with the default branch,
         # the remote's first. No base is a FAILED exit 1 and never a zero-status skip, because
-        # run-gates judges a leg by its exit code and a silent 0 reads as a pass forever.
-        dflt = os.environ.get("GOV_DEFAULT_BRANCH") or "main"
-        for ref in (f"origin/{dflt}", dflt):
+        # run-gates judges a leg by its exit code and a silent 0 reads as a pass forever. The
+        # remote and its branch are the ladder's (TOOL-dLadderedRemote-2); a refusal is that
+        # failed exit, naming it, and no remote at all leaves only the local branch.
+        remote, dflt, _observed, refusal = resolve_remote(root)
+        if refusal:
+            print(f"epoch: FAILED · no base to compare against · {refusal}")
+            return 1
+        dflt = dflt or "main"
+        for ref in ((f"{remote}/{dflt}", dflt) if remote else (dflt,)):
             mb = subprocess.run(["git", "-C", str(root), "merge-base", ref, "HEAD"],
                                 capture_output=True, text=True, encoding="utf-8")
             if mb.returncode == 0 and mb.stdout.strip():
