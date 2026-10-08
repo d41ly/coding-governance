@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-08
 streams: tooling
 roster: TOOL
-ids: TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6 TOOL-dLadderedRemote-7
+ids: TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6 TOOL-dLadderedRemote-7 TOOL-dLadderedRemote-8
 ---
 
 # dLadderedRemote — every kit probe finds the remote by the lander's ladder, not by the name origin
@@ -63,12 +63,13 @@ none
 | 5 | `TOOL-dLadderedRemote-5` | INPROGRESS | the closing review's minors: a tighter ban, an unambiguous ladder, prose naming the ladder |
 | 6 | `TOOL-dLadderedRemote-6` | INPROGRESS | the round-2 minors: the ban's lost defaults, variables and argv; the guard's message and branch read |
 | 7 | `TOOL-dLadderedRemote-7` | INPROGRESS | the round-3 minors: the ban's last false positives, an honest header, the runbook's full list |
+| 8 | `TOOL-dLadderedRemote-8` | INPROGRESS | the round-4 minors: two restored ban spellings and four exact sentences |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 7 unit(s) · node d · opened 2026-10-08 · streams tooling
-ids TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6 TOOL-dLadderedRemote-7
+**Build status:** INPROGRESS · 8 unit(s) · node d · opened 2026-10-08 · streams tooling
+ids TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6 TOOL-dLadderedRemote-7 TOOL-dLadderedRemote-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -79,14 +80,15 @@ ids TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dL
 | [TOOL-dLadderedRemote-4 — the tier-2 review harness requires a diff review's base instead of defaulting to origin/main](spec/2026-10-08-spec-TOOL-dLadderedRemote-4.md) | 3 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
 | [TOOL-dLadderedRemote-5 — the closing review's minors: a tighter ban, an unambiguous ladder, and prose that names the ladder](spec/2026-10-08-spec-TOOL-dLadderedRemote-5.md) | 4 | 2 | INPROGRESS | rev-2 | 2026-10-08 |
 | [TOOL-dLadderedRemote-6 — the round-2 minors: the ban's lost defaults, variables and argv, and two small honesty fixes](spec/2026-10-08-spec-TOOL-dLadderedRemote-6.md) | 5 | 2 | INPROGRESS | rev-2 | 2026-10-08 |
-| [TOOL-dLadderedRemote-7 — the round-3 minors: the ban's last false positives, its honest header, and the runbook's full list](spec/2026-10-08-spec-TOOL-dLadderedRemote-7.md) | 6 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
+| [TOOL-dLadderedRemote-7 — the round-3 minors: the ban's last false positives, its honest header, and the runbook's full list](spec/2026-10-08-spec-TOOL-dLadderedRemote-7.md) | 6 | 2 | INPROGRESS | rev-2 | 2026-10-08 |
+| [TOOL-dLadderedRemote-8 — the round-4 minors: two restored ban spellings and four exact sentences](spec/2026-10-08-spec-TOOL-dLadderedRemote-8.md) | 7 | 2 | INPROGRESS | rev-1 | 2026-10-08 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 6 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dLadderedRemote-8.
 
-Ids no `spec-audit` record has ever named: TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6 TOOL-dLadderedRemote-7.
+Ids no `spec-audit` record has ever named: TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6 TOOL-dLadderedRemote-7 TOOL-dLadderedRemote-8.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -99,6 +101,7 @@ Ids no `spec-audit` record has ever named: TOOL-dLadderedRemote-1 TOOL-dLaddered
 | 4 | `TOOL-dLadderedRemote-5` | no |
 | 5 | `TOOL-dLadderedRemote-6` | no |
 | 6 | `TOOL-dLadderedRemote-7` | no |
+| 7 | `TOOL-dLadderedRemote-8` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
