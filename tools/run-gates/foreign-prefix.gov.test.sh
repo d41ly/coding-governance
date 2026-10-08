@@ -27,8 +27,8 @@
 #      prints there, less this leg's own row, skipped while iterating rather than edited out.
 #   5. THE PROBE. Each row runs with FOREIGN_PREFIX_PROBE=1, which every suite honours by stopping
 #      after its first subject-touching arm with the line `foreign-prefix-probe: stopped after 1 arm`,
-#      in a pool of the width `run-gates.sh --print-profile` reports, each bounded by its own declared
-#      budget. One line per row as it completes is the progress, and the heartbeat a registered run
+#      in a pool of the width `run-gates.sh --print-profile` reports, each killed as a HANG at HANG_FACTOR
+#      times its declared budget. One line per row as it completes is the progress, and the heartbeat a registered run
 #      reads. A row is green when it exits 0 and, unless declared whole below, printed the marker.
 #   6. FAIL FAST at the PREFIX grain (§8 F3 (a)): a red prefix is finished, so every red row at it is
 #      named in one run, then each later prefix prints `not run`. The clone must be clean after each
@@ -238,14 +238,21 @@ if not n:
 }
 
 # ---- ONE ROW, S6. Writes its verdict file and prints its one line as it completes.
-run_row() { # $1 = prefix label, $2 = run dir, $3 = row, $4 = bound seconds, $5 = argv, $6 = probe|whole
+# THE BUDGET IS A HANG GUARD HERE, NOT A COST VERDICT (TOOL-aMeteredSweep-1). This leg asks whether a
+# suite passes at another prefix; whether it fits its budget is `run-selftests.sh --serial`'s question,
+# asked on a quiet host. Each budget is a quiet reading, and inside a loaded bar six rows overran theirs
+# at all three prefixes while every one of them was passing. A row is killed at HANG_FACTOR times its
+# budget, and that kill reads as a hang, which is the only thing this bound now claims.
+HANG_FACTOR=3
+run_row() { # $1 = prefix label, $2 = run dir, $3 = row, $4 = budget seconds, $5 = argv, $6 = probe|whole
   local d="$2" rc s marked=0 v=ok why=""
   mkdir -p "$d/tmp"
   s=$SECONDS
-  FOREIGN_PREFIX_PROBE=1 SELFTEST_INNER_WIDTH=1 TMPDIR="$d/tmp" timeout -k 5 "$4" bash -c "$5" > "$d/out" 2>&1
+  FOREIGN_PREFIX_PROBE=1 SELFTEST_INNER_WIDTH=1 TMPDIR="$d/tmp" timeout -k 5 "$(( $4 * HANG_FACTOR ))" bash -c "$5" > "$d/out" 2>&1
   rc=$?
   grep -qxF "$MARKER" "$d/out" && marked=1
-  if [ "$rc" != 0 ]; then v=red; why="exit $rc"
+  if [ "$rc" = 124 ] || [ "$rc" = 137 ]; then v=red; why="a hang: killed at ${HANG_FACTOR}x its $4 s budget"
+  elif [ "$rc" != 0 ]; then v=red; why="exit $rc"
   elif [ "$6" = probe ] && [ "$marked" = 0 ]; then v=red; why="an undeclared whole run: it printed no probe marker, so it ran every arm"
   elif [ "$6" = whole ] && [ "$marked" = 1 ]; then v=red; why="a stale whole-run declaration: it printed the probe marker"
   fi
