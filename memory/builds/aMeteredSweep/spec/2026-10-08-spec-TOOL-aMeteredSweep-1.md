@@ -1,6 +1,6 @@
 # TOOL-aMeteredSweep-1 — every red of a full bar with self-tests on the reconciled main, fixed
 
-**Status:** OPEN · rev-1 · 2026-10-08 · node a · Tier-1 · base fa68a767 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-10-08 · node a · Tier-1 · base fa68a767 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -46,11 +46,15 @@ green on a quiet host.
   AC1.
 - S9. `run-gates canary` — its memory-pause arm re-run on a quiet host decides whether it is a
   defect or contention; a defect is fixed here. Observed by AC1.
+- S10. `foreign-prefix parity` — a row's declared budget becomes a hang guard at three times its
+  value, read as a hang, because this leg grades parity and its budgets are quiet readings: at the
+  fix commit six passing rows overran theirs inside the loaded bar. Observed by AC1 and AC4.
 
 ## 3. Non-goals (OUT)
 
 No speed work beyond S6; the measured levers are the research record's, proposed and not built. No
-ceiling or budget is raised to turn a red green.
+leg ceiling or declared budget is raised to turn a red green; S10 changes what one leg reads a budget
+as, and the budget rows are untouched.
 
 ### Edges
 
@@ -76,6 +80,9 @@ capturing it through a command substitution; the descriptor scan becomes one `aw
 - `tools/run-gates/run-gates.runlog.test.sh`
 - `tools/govkit/govkit.py`
 - `tools/govkit/selftest.py`
+- `tools/run-gates/run-gates.test.sh`
+- `skills/session-kickoff/manifest-check.test.sh`
+- `tools/run-gates/foreign-prefix.gov.test.sh`
 
 ## 5. Production-readiness checklist
 
@@ -94,6 +101,9 @@ capturing it through a command substitution; the descriptor scan becomes one `aw
 - **AC3** — When the guide's two pointers are renamed, or the spec-tokens suite runs with
   `core.autocrlf=true`, the canary and the suite red and green respectively. Red when: the canary
   passes without the pointers, or the suite reds on a CRLF checkout.
+- **AC4** — When the parity leg's row runner `run_row`, sliced out alone, is handed a row that outlives three times
+  its budget, the row reds as a hang, and a fast row stays green. Red when: an overrun is read as
+  anything but a hang, or a row is killed at its bare budget.
 
 ## 7. Gates
 
@@ -103,7 +113,7 @@ capturing it through a command substitution; the descriptor scan becomes one `aw
 `run-gates canary` · `memory hygiene` · `codebase-map adopter e2e` · `codebase-map gate coverage` ·
 `govkit acceptance matrix` · `govkit refusal join` · `recall floor` · `recall floor arms` ·
 `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` ·
-`verifier fan-out self-test`
+`verifier fan-out self-test` · `lexicon naming predicates` · `scratch-guard self-test`
 
 ## 8. Open questions
 
@@ -112,3 +122,4 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-08 · initial draft.
+- rev-2 · 2026-10-08 · S10 and AC4: the verification bar redded foreign-prefix parity on six passing rows that overran quiet budgets.

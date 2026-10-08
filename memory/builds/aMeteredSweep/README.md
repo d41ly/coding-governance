@@ -53,7 +53,7 @@ ids TOOL-aMeteredSweep-1
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aMeteredSweep-1 — every red of a full bar with self-tests on the reconciled main, fixed](spec/2026-10-08-spec-TOOL-aMeteredSweep-1.md) | 1 | 1 | OPEN | rev-1 | 2026-10-08 |
+| [TOOL-aMeteredSweep-1 — every red of a full bar with self-tests on the reconciled main, fixed](spec/2026-10-08-spec-TOOL-aMeteredSweep-1.md) | 1 | 1 | OPEN | rev-2 | 2026-10-08 |
 <!-- /gen:build-units -->
 
 Records: 9 bound to this build, across 2 record folder(s).
