@@ -1,12 +1,13 @@
 # TOOL-dLadderedRemote-8 — the round-4 minors: two restored ban spellings and four exact sentences
 
-**Status:** INPROGRESS · rev-1 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 7
+**Status:** INPROGRESS · rev-2 · 2026-10-08 · node d · Tier-2 · base 40a8b8c3 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md](../build/2026-10-08-build-TOOL-dLadderedRemote-1-1-acceptance-ledger.md) | journal | TOOL-dLadderedRemote-1 TOOL-dLadderedRemote-2 TOOL-dLadderedRemote-3 TOOL-dLadderedRemote-4 TOOL-dLadderedRemote-5 TOOL-dLadderedRemote-6 TOOL-dLadderedRemote-7 |
+| [2026-10-08-review-TOOL-dLadderedRemote-8-closing-diff-round5.md](../reviews/2026-10-08-review-TOOL-dLadderedRemote-8-closing-diff-round5.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 
@@ -36,6 +37,7 @@ the last two rounds each found an escape the previous narrowing made.
 ### Edges
 
 - **consumes-from** `TOOL-dLadderedRemote-7` — the narrowed ban and the runbook text this unit corrects
+- **hands-off** `TOOL-dLadderedRemote-9` — the round-5 review's corrections to this unit's shape and sentences
 
 ## 4. Design
 
@@ -79,6 +81,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-08 · initial draft, from the round-4 closing review.
+- rev-2 · 2026-10-08 · §3 · the hands-off edge to `TOOL-dLadderedRemote-9`, the round-5 batch unit.
 
 ## 10. Reuse audit
 
