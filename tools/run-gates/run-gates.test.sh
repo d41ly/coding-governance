@@ -2270,25 +2270,33 @@ check_attr_line "$(run_attr_bar "$AT/rc" GATE_ATTRIBUTE=HEAD)" "lexicon naming p
 # must read it DEAD PROBE `cut by the wall`, count it, and the runner must return near the wall
 # rather than after the sleep. Graded as a margin against the sleep, not as a literal, for the
 # load reasons the wall arms above record.
+# THE WALL IS CALIBRATED, NOT TYPED (TOOL-aMeteredSweep-1). A fixed 8 s wall broke before the
+# attribution pass began on a host where one spawn cost a quarter of a second, so no attr line
+# existed to grade. The same bar is first timed with no attribution; the wall is twice that reading
+# plus 8 s, and R sleeps three walls and a minute, read from a file OUTSIDE the repository so it is
+# set after the measurement without moving R's tree.
 AW="$AT/aw"; mkdir -p "$AW/$KIT_REL" "$AW/fx" "$AW/data"
 cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$AW/$KIT_REL/" 2>/dev/null
 ( cd "$AW" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
     && git config core.autocrlf false ) >/dev/null 2>&1
-printf '#!/usr/bin/env bash\ncase "$(cat data/m.txt)" in slow) sleep 120;; esac\necho "FAIL w"\nexit 1\n' > "$AW/fx/w.sh"
+printf '#!/usr/bin/env bash\ncase "$(cat data/m.txt)" in slow) sleep "$(cat '"'%s'"')";; esac\necho "FAIL w"\nexit 1\n' "$AT/aw.sleep" > "$AW/fx/w.sh"
 printf 'slow\n' > "$AW/data/m.txt"
 printf '[\n  {"name": "walled", "argv": ["bash", "fx/w.sh"]}\n]\n' > "$AW/$ATL"
 ( cd "$AW" && git add -A && git commit -qm R ) >/dev/null 2>&1
 printf 'fail\n' > "$AW/data/m.txt"
+_aws=$(date +%s); run_attr_bar "$AW" >/dev/null; _awcal=$(( $(date +%s) - _aws ))
+_awwall=$(( 2 * _awcal + 8 )); _awsl=$(( 3 * _awwall + 60 )); printf '%s\n' "$_awsl" > "$AT/aw.sleep"
+echo "canary: attribution — AC15 calibrated: the bar without attribution took ${_awcal}s, so the wall is ${_awwall}s and R sleeps ${_awsl}s"
 _aws=$(date +%s)
-awout=$(run_attr_bar "$AW" GATE_ATTRIBUTE=HEAD GATE_WALL=8); awrc=$?
+awout=$(run_attr_bar "$AW" GATE_ATTRIBUTE=HEAD GATE_WALL="$_awwall"); awrc=$?
 _awel=$(( $(date +%s) - _aws ))
 check_attr_line "$awout" "walled" "DEAD PROBE · cut by the wall" "AC15 an R run the wall cuts"
 n=$((n+1))
 printf '%s\n' "$awout" | grep -qE '^attributed 0 of 1 red legs against [0-9a-f]{8} · DEAD PROBE 1$' \
   || { echo "canary: attribution — AC15 the summary did not count the wall-cut leg"; fail=1; }
 n=$((n+1))
-{ [ "$awrc" = 1 ] && [ "$_awel" -lt 100 ]; } \
-  || { echo "canary: attribution — AC15 the runner outlived its own wall: exit $awrc after ${_awel}s against an 8s wall and a 120s R run"; fail=1; }
+{ [ "$awrc" = 1 ] && [ "$_awel" -lt $(( _awsl - 20 )) ]; } \
+  || { echo "canary: attribution — AC15 the runner outlived its own wall: exit $awrc after ${_awel}s against a ${_awwall}s wall and a ${_awsl}s R run"; fail=1; }
 # AC3 and AC17 of TOOL-dDerivedDocket-24 — AGE AND OWNER. A twelve-landing first-parent line whose one
 # leg goes red at a chosen landing and stays red; L is one unrelated commit past R. Under
 # `GATE_INHERITED_RED_MAX_AGE=10` a red that arrived inside the window reads INHERITED with its age and
