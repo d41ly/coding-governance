@@ -36,8 +36,8 @@ in both readers of the rule, so a namesake anywhere else is not consulted at all
   self-test's cross-reader arm compares both readers' homes for every declared stem. Observed by AC6.
 - **S6** — The carriers stating the basename rule state the declared-home rule instead: the HYGIENE
   catalogue and its kit template, the memory-tree README (an upgrade note) and the hygiene dossier.
-  Observed by AC7 for the catalogue, its template and the dossier. The README's upgrade note is NOT
-  OBSERVED — prose an upgrading adopter reads, graded by no arm.
+  Observed by AC7 for the catalogue, its template and the dossier. The README's upgrade note is
+  NOT OBSERVED — prose an upgrading adopter reads, graded by no arm.
 
 ## 3. Non-goals (OUT)
 

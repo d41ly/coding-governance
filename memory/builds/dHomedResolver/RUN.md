@@ -47,3 +47,7 @@ base: b39dff78aae970c8428289aa781cf21f79c6fbff
 2026-10-09T15:53:15Z review · item dHomedResolver · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 7 · disposition promote
 
 2026-10-09T15:53:22Z rescope · item add TOOL-dHomedResolver-5 · reason promoted from the closing diff review round 1: its five mediums and two lows (items M1, M2, L1, L2), batched into one unit by the severity rule
+
+2026-10-09T15:58:33Z brief · item TOOL-dHomedResolver-5 · reason af820f14ce85 memory/builds/dHomedResolver/prompts/2026-10-09-prompt-TOOL-dHomedResolver-5-1-build-brief.md
+
+2026-10-09T16:09:13Z dispatch · item 996609b2 TOOL-dHomedResolver-5 · reason memory/builds/dHomedResolver/README.md memory/builds/dHomedResolver/build/2026-10-09-build-TOOL-dHomedResolver-5-1-acceptance-ledger.md memory/builds/dHomedResolver/prompts/2026-10-09-prompt-TOOL-dHomedResolver-5-1-build-brief.md memory/builds/dHomedResolver/spec/2026-10-09-spec-TOOL-dHomedResolver-1.md memory/builds/dHomedResolver/spec/2026-10-09-spec-TOOL-dHomedResolver-5.md tools/memory-tree/gen_build_index.py tools/memory-tree/row_grammar.py

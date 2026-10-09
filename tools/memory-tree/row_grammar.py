@@ -2114,6 +2114,18 @@ def cmd_selftest():
             "does not partition the family: ARCH-tBoth-2",
             lambda: cap(t24n, _c24n, cmd_check_rotation))
 
+        # (b3) A MISSING HOME. A `cut` archive whose family has no shard is named, and its
+        # exclusivity half is said to be ungraded. No arm reached this branch before
+        # TOOL-dHomedResolver-1 either; the closing review found the gap and refuted it as older than
+        # the build, and TOOL-dHomedResolver-5 adopts it.
+        t24m = os.path.join(base, "rotnohome"); os.makedirs(t24m)
+        c24m = _tree(t24m, "- ARCH-tOne-1 · one\n", pin="0",
+                     archives={"ARCH.2026-01-01.md": "- ARCH-tGone-3 · CLOSED · its shard is gone\n"})
+        _c24m = dict(c24m); _c24m["ROTATION_MODE"] = "cut"
+        arm("a cut archive whose declared home is not tracked is named, and its half is ungraded",
+            "declares its live index at memory/backlog/ARCH.md, which is not tracked",
+            lambda: cap(t24m, _c24m, cmd_check_rotation))
+
         # A DECISIONS archive has no lifecycle token per row, so the terminal half is a category
         # error there and is deliberately not asserted. Without this arm, scoping it out is
         # indistinguishable from forgetting it.

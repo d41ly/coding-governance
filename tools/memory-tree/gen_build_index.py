@@ -62,6 +62,7 @@ import json
 import os
 import pathlib
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -2304,16 +2305,19 @@ def check_archives_tracked(root: str, conf: dict) -> None:
     empty one — a guard that cannot list the folder must not report it clean.
     """
     m = conf["MEMORY_ROOT"]
-    out = run("git", "ls-files", "--others", "--exclude-standard", "--", f"{m}/archive/", cwd=root)
-    untracked = sorted(p for p in out.split("\n") if p)
+    # `-z`: verbatim names, so a space or a non-ASCII byte survives into the remedy as itself rather
+    # than C-quoted under `core.quotePath` (TOOL-dHomedResolver-5, L1).
+    out = run("git", "ls-files", "-z", "--others", "--exclude-standard", "--", f"{m}/archive/",
+              cwd=root)
+    untracked = sorted(p for p in out.split("\0") if p)
     if untracked:
         listed = "\n".join(f"    {p}" for p in untracked)
         raise Problem(
             f"REFUSED — {len(untracked)} file(s) under {m}/archive/ are untracked, and every "
             f"artifact here derives from git ls-files, so a row moved into one reads as deleted "
             f"and a render would rewrite every README citing it:\n{listed}\n"
-            f"Stage the archive first — git add {' '.join(untracked)} — then re-run. Nothing was "
-            f"written.")
+            f"Stage the archive first — git add -- {' '.join(shlex.quote(p) for p in untracked)} — "
+            f"then re-run. Nothing was written.")
 
 
 def cmd_check(root: str, conf: dict) -> int:
@@ -3441,6 +3445,10 @@ def cmd_new_build(root: str, conf: dict, args: dict) -> int:
     """
     m = conf["MEMORY_ROOT"]
     slug = args["slug"]
+    # FIRST, before the slug probe and before any write: the cmd_write this returns would refuse a
+    # half-staged rotation only after the README and its contract row were written and staged, and
+    # the staged README then blocks the re-run the refusal asks for (TOOL-dHomedResolver-5, M1).
+    check_archives_tracked(root, conf)
     if not backlog.SLUG_RE.match(slug) or not (slug[0].isalpha() and slug[0].islower()):
         raise Problem(f"`{slug}` is not a build slug: a slug is the node's own lower-case tag "
                       f"followed by a CamelCase adjective-noun, letters and digits only")
@@ -3799,15 +3807,38 @@ def cmd_selftest() -> int:
         os.makedirs(os.path.join(th, "memory", "archive"))
         arch_h = os.path.join(th, "memory", "archive", "DECISIONS.2026-08-02.md")
         write_text(arch_h, "# rotated\n\n- ARCH-tOne-1 · a row this rotation moved here\n")
-        readme_h = os.path.join(th, "memory", "builds", "tOne", "README.md")
-        before_h = read_text(readme_h)
         arm("--write REFUSES while a file under the archive folder is untracked, and names it",
             "memory/archive/DECISIONS.2026-08-02.md", lambda: _read_mode(cmd_write, th, conf_h))
         arm("the --write refusal names its remedy, staging the archive first", "git add",
             lambda: _read_mode(cmd_write, th, conf_h))
-        arm("a refused --write wrote nothing", "True", lambda: str(read_text(readme_h) == before_h))
+        # NOTHING WRITTEN, counted at the writer (TOOL-dHomedResolver-5, M2). The byte compare this
+        # replaces could not fail: the fixture is a rendered fixed point and the untracked archive is
+        # invisible to plan(), so a render that ran straight past the guard wrote identical bytes.
+        # A shim on `write_text` counts EVERY write before the refusal, whatever it would change.
+        _writes_h = []
+        _real_write_h = globals()["write_text"]
+
+        def _write_counted_h(path, text):
+            _writes_h.append(path)
+            return _real_write_h(path, text)
+
+        globals()["write_text"] = _write_counted_h
+        try:
+            _read_mode(cmd_write, th, conf_h)
+        finally:
+            globals()["write_text"] = _real_write_h
+        arm("a refused --write calls the writer ZERO times", "writes=0",
+            lambda: f"writes={len(_writes_h)} {_writes_h[:3]}")
         arm("--check refuses with the same remedy instead of printing --write as one", "git add",
             lambda: _read_mode(cmd_check, th, conf_h))
+        # A NAME WITH A SPACE stays ONE argument in the printed remedy (TOOL-dHomedResolver-5, L1).
+        # It sorts before the dotted archive, so the remedy's first path is the quoted one.
+        sp_h = os.path.join(th, "memory", "archive", "DECISIONS 2026-08-03.md")
+        write_text(sp_h, "# rotated, under a name with a space\n")
+        arm("the remedy quotes a path with a space as ONE argument after `git add --`",
+            "git add -- 'memory/archive/DECISIONS 2026-08-03.md'",
+            lambda: _read_mode(cmd_write, th, conf_h)[1])
+        os.remove(sp_h)
         # THE IGNORED NEIGHBOUR. git will not stage an ignored file, so refusing one would be a
         # refusal with no remedy. The positive is the rc: a guard that refused everything would
         # pass every arm above and fail only this one.
@@ -5698,6 +5729,21 @@ def cmd_selftest() -> int:
             lambda: _read_refusal("aFoo", ["EXMP-aFoo-3"]))
         arm("and it says WHICH probe found it", "already touched memory/builds/aFoo/",
             lambda: _read_refusal("aFoo", ["EXMP-aFoo-3"]))
+        # A HALF-STAGED ROTATION refuses BEFORE --new-build writes (TOOL-dHomedResolver-5, M1). At
+        # 04b0b239 the guard fired inside the cmd_write it returns, after the README and its
+        # contract row were written and staged, so the refusal's "Nothing was written" was false and
+        # the re-run it asked for was then refused by the slug probe.
+        _hs_arch = os.path.join(sc, "memory", "archive", "DECISIONS.2026-08-05.md")
+        os.makedirs(os.path.dirname(_hs_arch), exist_ok=True)
+        write_text(_hs_arch, "# rotated, and nobody staged it\n")
+        _hs_contract = os.path.join(sc, "memory", CONTRACT_REGISTRY)
+        arm("--new-build REFUSES over an untracked archive and leaves no folder behind",
+            "rc=1 folder=False", lambda: _read_refusal("zHalfStaged", ["EXMP-aFoo-10"]))
+        arm("the --new-build refusal names its remedy", "git add",
+            lambda: _read_refusal("zHalfStaged", ["EXMP-aFoo-10"]))
+        arm("and it added no contract row", "False",
+            lambda: str(os.path.isfile(_hs_contract) and "zHalfStaged" in read_text(_hs_contract)))
+        os.remove(_hs_arch)
         _sc_conf3 = _build_backlog_fixture(sc, _build_sc_tree(
             [_build_sc_ask(3, "ungradeable", clauses=()),
              _build_sc_ask(4, "ungradeable too", clauses=())]))
