@@ -1,6 +1,6 @@
 # PLAY-aDistilledCharter-1 — the charter template v4.0, with a disposition for every v3.5 rule
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 4
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 4
 
 <!-- gen:spec-records -->
 
@@ -31,9 +31,10 @@ silently.
 - **S4** — The disposition ledger of §4 maps every v3.5 rule to its destination, and each
   destination resolves. Observed by AC5.
 - **S5** — v3.5 is archived as `memory/archive/coding-governance-agents.template-v-3-5.md`, the
-  marker reads `v4.0`, and the `coding-governance-agents.template.md` row of
-  `tools/template-size-limits.txt` and `tools/template-size-highwater.txt` re-declares the ceiling
-  just above the new size. Observed by AC6.
+  marker reads `v4.0`, and `tools/template-size-highwater.txt` re-records the template at its new
+  size, so any growth warns. The ceiling row in `tools/template-size-limits.txt` stays 49152: the
+  leg's own name, `template size <=48KiB`, states it, and some thirty records cite that name, so
+  lowering it is a rename and an owner decision, not a fold. Observed by AC6.
 - **S6** — The placeholder `PROSE_AUDIT` leaves `tools/govkit/entries/playbook.kit.toml`. It
   named an audit script no tree has, and v4.0 has no line it fills. Observed by AC1.
   **Readers:** by name: `playbook.kit.toml`, the v3.5 template's §16; by value: NO VALUE READERS —
@@ -264,8 +265,9 @@ Lines are v3.5's at BASE. A destination is one of: `practice [h]` and `format [h
   in the template, `moved` paths and headings grepped in the guides, `gated` names looked up in
   `tools/gate-legs.json`, `fact` keys grepped as placeholders), none is missing. Red when: one is.
   cost: a scripted pass, minutes.
-- **AC6** — When `bash tools/check-template-size.sh` runs, the template is green under its new row,
-  and `memory/archive/` holds the v3.5 bytes of BASE. Red when: the row still reads 49152.
+- **AC6** — When `bash tools/check-template-size.sh` runs, the template is green and its high-water
+  in `tools/template-size-highwater.txt` equals its new size, and `memory/archive/` holds the v3.5
+  bytes of BASE. Red when: the high-water still reads 48597, or the archive differs from BASE.
 
 ## 7. Gates
 
@@ -278,6 +280,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · S5 · AC6 · the ceiling row stays 49152 and only the high-water moves: the
+  leg is named for the ceiling and about thirty records cite the name.
 
 ## 10. Reuse audit
 
