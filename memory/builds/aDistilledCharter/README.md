@@ -79,7 +79,7 @@ ids TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7
 | [TOOL-aDistilledCharter-2 — the fleet registry assigns every node one tag and the renderer generates the node table from it](spec/2026-10-09-spec-TOOL-aDistilledCharter-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-10-09 |
 | [PLAY-aDistilledCharter-2 — the review protocol carries the security checklist and the tier definitions the charter drops](spec/2026-10-09-spec-PLAY-aDistilledCharter-2.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-09 |
 | [PLAY-aDistilledCharter-3 — the hygiene guide carries the id-minting protocol the charter drops](spec/2026-10-09-spec-PLAY-aDistilledCharter-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [PLAY-aDistilledCharter-1 — the charter template v4.0, with a disposition for every v3.5 rule](spec/2026-10-09-spec-PLAY-aDistilledCharter-1.md) | 4 | 2 | SPECCED | rev-2 | 2026-10-09 |
+| [PLAY-aDistilledCharter-1 — the charter template v4.0, with a disposition for every v3.5 rule](spec/2026-10-09-spec-PLAY-aDistilledCharter-1.md) | 4 | 2 | SPECCED | rev-3 | 2026-10-09 |
 | [PLAY-aDistilledCharter-4 — gov adopts v4.0: its wrapper folds into section 2 and its charter re-renders](spec/2026-10-09-spec-PLAY-aDistilledCharter-4.md) | 5 | 1 | SPECCED | rev-2 | 2026-10-09 |
 | [TOOL-aDistilledCharter-4 — every live citation of a charter section number is re-pointed](spec/2026-10-09-spec-TOOL-aDistilledCharter-4.md) | 6 | 1 | SPECCED | rev-1 | 2026-10-09 |
 | [TOOL-aDistilledCharter-3 — the parity gate drops the retired pairs, the canary re-points, and a new arm bans section-number citations](spec/2026-10-09-spec-TOOL-aDistilledCharter-3.md) | 7 | 2 | SPECCED | rev-2 | 2026-10-09 |

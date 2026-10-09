@@ -1,6 +1,6 @@
 # PLAY-aDistilledCharter-1 — the charter template v4.0, with a disposition for every v3.5 rule
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 4
+**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 4
 
 <!-- gen:spec-records -->
 
@@ -38,10 +38,9 @@ silently.
   size, so any growth warns. The ceiling row in `tools/template-size-limits.txt` stays 49152: the
   leg's own name, `template size <=48KiB`, states it, and some thirty records cite that name, so
   lowering it is a rename and an owner decision, not a fold. Observed by AC6.
-- **S6** — The placeholder `PROSE_AUDIT` leaves `tools/govkit/entries/playbook.kit.toml`. It
-  named an audit script no tree has, and v4.0 has no line it fills. Observed by AC1.
-  **Readers:** by name: `playbook.kit.toml`, the v3.5 template's §16; by value: NO VALUE READERS —
-  its value was the default prose `none yet`, which nothing compares.
+- **S6** — v4.0 has no line `PROSE_AUDIT` fills: it named an audit script no tree has. Its row
+  stays in `tools/govkit/entries/playbook.kit.toml` as a legacy row, because a seeded v3.x template
+  still names it (`TOOL-aDistilledCharter-2` rev-2). Observed by AC1.
 
 ## 3. Non-goals (OUT)
 
@@ -283,6 +282,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-3 · 2026-10-09 · S6 · `PROSE_AUDIT` stays declared as legacy, agreeing with
+  TOOL-aDistilledCharter-2 rev-2, which keeps every name a v3.x template uses.
 - rev-2 · 2026-10-09 · S5 · AC6 · the ceiling row stays 49152 and only the high-water moves: the
   leg is named for the ceiling and about thirty records cite the name.
 
