@@ -262,12 +262,18 @@ def derive_lexicon_conf(root: Path, _a: dict, _e: Path | None = None) -> str:
 # carries one tag everywhere. A repository overrides a cell for one node under `[nodes.<tag>]`.
 FLEET_NAME = 'fleet.toml'
 NODE_KEYS = ('primary_tree', 'worktree_root', 'variances')
-# A `drop_blocks` member naming one of these is NOTED, never refused: the regenerate an adopter's
-# `update` runs (unless GOVKIT_RERENDER=0) must succeed, never roll the kit back over a removed block.
+# LEGACY v3.x blocks. The descriptor still DECLARES them (TOOL-aDistilledCharter-2 rev-2): an
+# adopter's template is a seed `govkit update` never rewrites, so the regenerate it runs (unless
+# GOVKIT_RERENDER=0) renders a v3.x template with this engine and must not roll the kit back. A
+# `drop_blocks` member naming one of these is NOTED, never refused, when the template has no fence.
 RETIRED_BLOCKS = {
     'node-table': 'v4.0 renders the node registry from the fleet registry',
     'security-outbound': 'v4.0 keeps no outbound-only charter line; the review protocol carries them',
 }
+# The template major version this engine ships with. An older one renders as it always did, and the
+# render notes that a newer one is available to reseed.
+TEMPLATE_MAJOR = 4
+TEMPLATE_MARKER_RE = re.compile(r'<!--\s*governance-template:\s*v([0-9]+)\.([0-9]+)\s*-->')
 
 
 def read_fleet(path: Path) -> list[dict]:
@@ -822,8 +828,6 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
     drop_names = list(cfg.get('drop_blocks') or [])
 
     declared_blocks = {b['name'] for b in blocks}
-    retired = [d for d in drop_names if d in RETIRED_BLOCKS]
-    drop_names = [d for d in drop_names if d not in RETIRED_BLOCKS]
     for d in drop_names:
         if d not in declared_blocks:
             raise Refusal(f'drop_blocks names `{d}`, which the descriptor declares nowhere. A member '
@@ -838,6 +842,10 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
                       f'at the installed template, or pass a different --charter')
     text = read_input(template, 'the charter template')
     present = check_fences(text, entries, declared_blocks)
+    # A legacy block whose fence this template does not carry is noted, never refused: it is a v4.0
+    # template under a deploy.toml written for v3.x. With the fence present it drops as it always did.
+    retired = [d for d in drop_names if d in RETIRED_BLOCKS and ('when', d) not in present]
+    drop_names = [d for d in drop_names if d not in retired]
     for d in drop_names:
         if ('when', d) not in present:
             raise Refusal(f'drop_blocks names `{d}` but no when fence in the template carries it')
@@ -848,6 +856,11 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
 
     notes = [f'retired   drop_blocks {d} — {RETIRED_BLOCKS[d]}; remove it from deploy.toml'
              for d in retired]
+    marker = TEMPLATE_MARKER_RE.search(text)
+    if marker and int(marker.group(1)) < TEMPLATE_MAJOR:
+        notes.append(f'legacy    template v{marker.group(1)}.{marker.group(2)} at '
+                     f'{template.as_posix()} — this engine ships v{TEMPLATE_MAJOR}.x; reseed the '
+                     f'template from gov, then re-render')
     by_key = {r['key']: r for r in rows}
     for key in sorted(set(PLACEHOLDER_RE.findall(text))):
         row = by_key.get(key)
@@ -1170,9 +1183,38 @@ def run_selftest() -> int:
           and 'INSTALLED' in installed,
           'a claim takes the lowest free letter, once per identity, never in an installed copy',
           f'got {got!r} rows {rows_after} again {again!r} installed {installed!r}')
-    arm_fixture('a retired drop_blocks member is noted, never refused', trailer_desc, 'plain\n',
+    arm_fixture('a legacy drop_blocks member with no fence is noted, never refused',
+                trailer_desc + '\n[[block]]\nname = "node-table"\n', 'plain\n',
                 'drop_blocks = ["node-table"]\n' + ans, in_body='plain',
                 in_notes='retired   drop_blocks node-table')
+    # TOOL-aDistilledCharter-2 rev-2 (closing review round 1, R1). A SEEDED v3.x template renders
+    # under THIS engine and its SHIPPED declarations, because `update` never rewrites a seed and a
+    # refusal here rolls the kit back. The declarations are the real ones beside this engine, so the
+    # arm fails the day a legacy name leaves the descriptor.
+    real_engine = Path(__file__).resolve().parent
+    v3 = ('<!-- governance-template: v3.5 -->\n<!-- when:node-table -->\n'
+          '| `{{TAG_A}}` | `{{MACHINE_A}}` | `{{PRIMARY_TREE_A}}` | `{{WORKTREE_ROOT_A}}` | '
+          '{{VARIANCES_A}} |\n<!-- /when:node-table -->\n<!-- when:security-outbound -->\nSSRF\n'
+          '<!-- /when:security-outbound -->\naudit {{PROSE_AUDIT}}\n')
+    for drops, want_row in (('', True), ('drop_blocks = ["node-table"]\n', False)):
+        with tempfile.TemporaryDirectory() as td:
+            tgt = Path(td)
+            (tgt / '.governance').mkdir()
+            (tgt / 'TPL.md').write_text(v3, encoding='utf-8')
+            (tgt / '.governance' / 'deploy.toml').write_text(
+                'kits = ["lexicon"]\n' + drops + '\n[answers]\nplaybook_path = "TPL.md"\n'
+                'machine_a = "u"\nprimary_tree_a = "C:/p/x"\nworktree_root_a = "C:/p/x/w"\n'
+                'variances_a = "none"\n', encoding='utf-8')
+            try:
+                body, notes = render(real_engine, real_engine.parent.parent, tgt)
+                err = None
+            except Refusal as e:
+                body, notes, err = '', [], str(e)
+        check_arm(err is None and ('`C:/p/x`' in body) == want_row and 'SSRF' in body
+                  and any('reseed' in n for n in notes),
+                  f'a v3.x template renders under the shipped declarations '
+                  f'({"node-table dropped" if drops else "every block kept"}) and notes a reseed',
+                  f'refused: {err}' if err else f'body {body!r} notes {notes!r}')
     import contextlib
     import io
     for outside, want_note in (('## Node registry\n\n| `a` | `u` |\n\n', True), ('# head\n\n', False)):

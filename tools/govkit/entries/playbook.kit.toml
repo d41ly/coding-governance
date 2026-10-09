@@ -131,6 +131,50 @@ class = "derived"
 probe = "node_table"
 why = "the section-3 node registry, one row per node of the fleet registry beside the engine (`fleet.toml`), with the repository's `[nodes.<tag>]` overrides. Gov is the one allocator, so a machine carries one tag in every adopter (TOOL-aDistilledCharter-2). It replaced TAG_A, MACHINE_A, PRIMARY_TREE_A, WORKTREE_ROOT_A and VARIANCES_A, which rendered one row from whichever node ran the render"
 
+# --- LEGACY: names a v3.x template uses and v4.0 does not. KEPT DECLARED (TOOL-aDistilledCharter-2
+# rev-2, closing review round 1, R1): an adopter's template is a SEED that `govkit update` never
+# rewrites, so after an update the v4.0 engine renders the adopter's v3.x template, and a refusal on
+# one of these names rolls the kit back. They resolve exactly as they did; the render notes a v3.x
+# marker and asks for a reseed.
+
+[[placeholder]]
+key = "TAG_A"
+class = "defaulted"
+default = "a"
+legacy = "v3"
+why = "LEGACY v3.x: the node tag of the one-row section 2 table. v4.0 renders every node from the fleet registry (NODE_TABLE)"
+
+[[placeholder]]
+key = "MACHINE_A"
+class = "asked"
+legacy = "v3"
+why = "LEGACY v3.x: the one-row table's machine and user. Stated, never sniffed from the environment"
+
+[[placeholder]]
+key = "PRIMARY_TREE_A"
+class = "asked"
+legacy = "v3"
+why = "LEGACY v3.x: the one-row table's primary tree"
+
+[[placeholder]]
+key = "WORKTREE_ROOT_A"
+class = "asked"
+legacy = "v3"
+why = "LEGACY v3.x: the one-row table's worktree root"
+
+[[placeholder]]
+key = "VARIANCES_A"
+class = "asked"
+legacy = "v3"
+why = "LEGACY v3.x: the one-row table's per-node quirks"
+
+[[placeholder]]
+key = "PROSE_AUDIT"
+class = "defaulted"
+default = "none yet — the thresholds still bind"
+legacy = "v3"
+why = "LEGACY v3.x: the prose-audit script v3.5 named; v4.0 has no line it fills"
+
 # --- asked. The renderer refuses rather than guessing; that posture is govkit's, inherited here.
 
 [[placeholder]]
@@ -235,3 +279,14 @@ why = "section 2: this repository's own rules, one `- ` bullet per line, from `[
 name = "cross-os"
 why = "the cross-OS and toolchain section. Drop it for a single-OS team."
 
+# LEGACY blocks, kept declared for the same reason as the legacy placeholders above. A v4.0 template
+# carries neither fence; a `drop_blocks` member naming one is then noted, never refused.
+[[block]]
+name = "node-table"
+legacy = "v3"
+why = "LEGACY v3.x: the one-row section 2 node table, dropped where the registry lived outside the region."
+
+[[block]]
+name = "security-outbound"
+legacy = "v3"
+why = "LEGACY v3.x: the outbound-call and stored-content rules, which v4.0 moved to the review protocol."
