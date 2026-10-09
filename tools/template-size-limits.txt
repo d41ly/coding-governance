@@ -112,7 +112,8 @@ memory/guides/BUILD-METHOD.md	30720
 # `build-method size`'s reason: the kit ships the template and no size gate. What an adopter gets
 # instead is the adopter's own announcement, which compares the render against its GUIDE_CAP_BYTES.
 # WHAT THIS DOES NOT COVER: the file's line count, which only the adopter's GUIDE_CAP_LINES reads.
-memory/guides/UNATTENDED-PROTOCOL.md	65692
+# 66712, re-pinned with no headroom by TOOL-aFrugalTurnstile-10: the owner's prompt asks for §6's scoped-then-full landing rule.
+memory/guides/UNATTENDED-PROTOCOL.md	66712
 
 # --- the unattended Skill, as rendered ----------------------------------------------------------
 # 10240 bytes = 10 KiB, CR-stripped (TOOL-aMendedFleet-68 S5). The Skill is the first file every

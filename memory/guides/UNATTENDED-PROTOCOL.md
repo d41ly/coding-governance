@@ -341,7 +341,7 @@ something no machine could have checked:
 
 | Item | Checked by | Asserts |
 |---|---|---|
-| `gates-green` | machine | the project's full merge bar ran on the tip being landed, and its verdict is one the inherited-red policy of `UNATTENDED-STOPS.md` §13 lands |
+| `gates-green` | machine | the project's full merge bar ran on the tip being landed — under a declared post-merge bar (§6), the bar the push boundary decides for it, which a recorded green covering that tip meets — and its verdict is one the inherited-red policy of `UNATTENDED-STOPS.md` §13 lands |
 | `records-current` | machine | the run-state file's GENERATED region is EMPTY — the unit list is derived from the build README on every read, so "current" is the absence of a second copy rather than a comparison between two — AND both marker pairs are well-formed, the run-state file's own and the build README's. Well-formedness is read from the region reader's EXIT STATUS, not from empty output: a malformed pair prints nothing and exits non-zero, so testing emptiness alone scores a broken pair as SATISFIED, passing loudest when the file is least readable |
 | `authorization-reachable` | machine | the build README is reachable from the pinned BASE, parses as build front matter, and names this build |
 | `landed-via-lander` | machine, PRE-LANDING | a lander is DECLARED, and that is the whole predicate. It runs inside `--close`, BEFORE the landing it names, so it cannot observe the push nor fail for anything the run did. The observation lives in `--landed`, the only verb after it |
@@ -425,13 +425,24 @@ which discards the entire bar the mandate leaned on.
 
 **`LANDER_MODE` says which SHAPE the landing has.** `primary` grades the BRANCH and lands through
 the node's own default branch. `in-place` is ORDERED and the full-green stamp forces it: `--prepare`
-onto the advertised tip, `--close` grading THAT merge under `GATE_FULL=1` and committing on it,
-`--land`, `--landed`; a reconcile never routes through the local default branch.
+onto the advertised tip, `--close` grading THAT merge under `GATE_FULL=1` and committing on it, or
+under the boundary's decision where a post-merge bar is declared, `--land`, `--landed`; a reconcile
+never routes through the local default branch.
 `LANDED` is also DERIVED (D12-i2) from a pushed `LANDING` commit.
 `UNATTENDED-STOPS.md` carries the rest.
 **A node `LANDING_NODES` does not declare lands nothing**: its `--close` refuses an override, writes
 a met bar's facts and names `--handoff --code owner-landing`. The close's own node decides. That
 hand-off's bar tie excludes only paths the close staged, each while HEAD holds the blob staged.
+
+**A declared post-merge bar lets a landing take the scoped bar.** `GATE_POST_MERGE` is declared
+at R in the pre-push hook's gate-env file: `local` has the lander start the post-merge bar on
+this node, and `ci` leaves it to remote CI. Under either, `--close` asks the pre-push hook's
+`--decide` for the prepared merge and runs that bar: full, scoped to the base it names, or none
+where a recorded green already covers the tree. Its green is recorded, so the landing push scopes
+over the close's own record commit alone. The full bar then runs on the landed sha, and its red
+is BINDING: published as `refs/gov/bar-red`, it forces FULL on every later landing that descends
+from it until a full green descends from it too. A project whose own rules demand a full bar per
+landing relaxes them itself.
 
 `landed-via-lander` is the machine-checked DoD item for this, and the gate greps the close path for
 a bypass flag in both directions: the lander must be present, the flag must be absent.
@@ -500,7 +511,7 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `RECALL_CLI` | the repo-relative path to the retrieval CLI whose query log `reuse-probed` reads. OPTIONAL: blank or absent means the recall kit is not adopted, and the item then reports an ANNOUNCED SKIP rather than an unmeetable UNMET, so a project that took this kit and not that one is not wedged by a core item it can never satisfy. |
 | `MAP_CLI` | the repo-relative path to the codebase-map probe whose lookup log `reuse-probed` also reads — the other half of the build method's M5 pair. OPTIONAL, on exactly `RECALL_CLI`'s terms: blank or absent means that kit is not adopted, and the item announces a skip only when NEITHER is declared. |
 | `SPEC_TOKENS_CLI` | the repo-relative path to the spec-token checker `--dispatch` runs over the live tree BEFORE it admits a build pass, refusing the dispatch on a non-zero exit. OPTIONAL, on `RECALL_CLI`'s terms: blank or absent means no spec-token checker is carried, and the verb announces the skip on stdout rather than passing over it. |
-| `GATE_POLICY_FILE` | the file `INHERITED_RED` and its age bound are read from, at R and never sourced. OPTIONAL: blank reads the pre-push hook's file, else `land`, announced. `UNATTENDED-STOPS.md` |
+| `GATE_POLICY_FILE` | the file `INHERITED_RED`, its age bound and `GATE_POST_MERGE` are read from, at R and never sourced. OPTIONAL: blank reads the pre-push hook's file, else `land`, announced. `UNATTENDED-STOPS.md` |
 | `ASKS_CMD` | the ask generator the driver calls, in the shapes `UNATTENDED-ASKS.md` lists. OPTIONAL: blank or absent means not adopted, and the skip is announced |
 | `PROCMON_CMD` | the reaper, called `<cmd> --kill-msys <pid>` once per recorded orphan. OPTIONAL: blank turns reaping off, announced. `UNATTENDED-STOPS.md` |
 | `RESUME_SCHEDULE` · `RESUME_SCHEDULE_CREATE` · `RESUME_SCHEDULE_DELETE` · `RESUME_SCHEDULE_DELAY` · `RESUME_SCHEDULE_LIMIT` | the durable restart a hold owes. `UNATTENDED-STOPS.md` |
