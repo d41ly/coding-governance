@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: tooling+deployer
 roster: TOOL+DEPL
-ids: DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2
+ids: DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 DEPL-aBenchedProbe-4 TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2
 authorized-by: prompt
 ---
 
@@ -40,6 +40,7 @@ ceiling to say so. The owner's prose is the mandate, recorded under
 - Out of scope, owned by the concurrent run aThriftyLanding: `.githooks/pre-push`, the stamp
   predicate, `GATE_REUSE` and the turnstile in run-gates, the unattended protocol, the charter's §1.
 - One kit-version bump per touched kit, after the last unit.
+- Units 5 and 6 are the closing review's promotions (M4); both write `govkit.py` and `selftest.py`, so 6 follows 5.
 
 ## Parked decisions
 
@@ -53,11 +54,13 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 2 | `TOOL-aBenchedProbe-2` | run-gates' held-count summary names its predicate rather than "every self-test" |
 | 3 | `DEPL-aBenchedProbe-1` | govkit selfcheck reds a descriptor self-test leg whose subject is not `kit` |
 | 4 | `DEPL-aBenchedProbe-2` | a descriptor leg's `ceiling` travels into the adopter's manifest, and pre-push's declares one |
+| 5 | `DEPL-aBenchedProbe-3` | 7j4's liveness reds bind only where a self-test population exists (review H1) |
+| 6 | `DEPL-aBenchedProbe-4` | regression arms for the keep rule, 7j4 and the 7h ceiling clause (review minors) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
-ids DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2
+ids DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 DEPL-aBenchedProbe-4 TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -68,7 +71,7 @@ ids DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 TOOL-aBenchedProbe-1 TOOL-aBenched
 | [DEPL-aBenchedProbe-2 — a descriptor leg's `ceiling` travels into the adopter's manifest](spec/2026-10-09-spec-DEPL-aBenchedProbe-2.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

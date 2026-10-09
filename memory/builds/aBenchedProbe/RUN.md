@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: de219c587207cbd2234e40d87abfe8f001f029ee
-phase: BUILDING
+witness: 91c34abf72cfc7a1f3326d4941c8881dc156845b
+phase: REVIEWING
 branch-sha: 2b26f187f03cc991edbf40b25550e6590e97d26e
 branch-ref: refs/heads/branch/keen-chaplygin-6b0703
 may: none
@@ -53,3 +53,9 @@ base: 2b26f187f03cc991edbf40b25550e6590e97d26e
 2026-10-09T19:47:46Z dispatch · item 1696d09d DEPL-aBenchedProbe-2 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/entries/push-main.kit.toml tools/run-gates/README.md memory/builds/aBenchedProbe/spec/2026-10-09-spec-DEPL-aBenchedProbe-2.md memory/builds/aBenchedProbe/build/2026-10-09-build-DEPL-aBenchedProbe-2-1-acceptance-ledger.md memory/builds/aBenchedProbe/README.md memory/LIVE.md memory/ledger/2026-10.md memory/guides/SESSION-KICKOFF.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
 
 2026-10-09T19:48:14Z brief · item DEPL-aBenchedProbe-2 · reason 646acc691479 memory/builds/aBenchedProbe/prompts/2026-10-09-prompt-TOOL-aBenchedProbe-1-2-build-brief.md
+
+2026-10-09T20:18:02Z review · item aBenchedProbe · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 7 · disposition promote
+
+2026-10-09T20:18:43Z rescope · item add DEPL-aBenchedProbe-3 · reason closing review round 1 HIGH H1: govkit selfcheck 7j4's liveness reds fire on govkit selftest.py's minimal scratch-gov fixtures and its AC5 fixture, so the govkit selftest suite reds
+
+2026-10-09T20:19:21Z rescope · item add DEPL-aBenchedProbe-4 · reason closing review round 1 minors batched: H-M1 the receipt-after-keep and second-apply arm, H-M2 persistent staged-break arms for 7j4 and the 7h ceiling clause, H-L1 the dead manifest_chunk pre-init, H-L2 CE4's leg check tied to the keep line

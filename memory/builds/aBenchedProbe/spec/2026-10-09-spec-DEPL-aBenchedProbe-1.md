@@ -9,6 +9,7 @@
 | [2026-10-09-prompt-TOOL-aBenchedProbe-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aBenchedProbe-1-1-spec-brief.md) | journal | TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2 DEPL-aBenchedProbe-2 |
 | [2026-10-09-prompt-TOOL-aBenchedProbe-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aBenchedProbe-1-2-build-brief.md) | journal | TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2 DEPL-aBenchedProbe-2 |
 | [2026-10-09-prompt-TOOL-aBenchedProbe-1.md](../prompts/2026-10-09-prompt-TOOL-aBenchedProbe-1.md) | research | TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2 DEPL-aBenchedProbe-2 |
+| [2026-10-09-review-TOOL-aBenchedProbe-1-closing-diff-round1.md](../reviews/2026-10-09-review-TOOL-aBenchedProbe-1-closing-diff-round1.md) | diff-review | TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2 DEPL-aBenchedProbe-2 |
 
 <!-- /gen:spec-records -->
 
