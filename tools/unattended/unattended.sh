@@ -3140,7 +3140,8 @@ check_prompt_brief() { # slug · base
 # anchor tip nor the local default branch, with its paths. A path passes when it is under this build's
 # folder or an index in the resolved GENERATED_INDEXES covers it. Called from verb_preflight only, and
 # only when no run-state file existed as the verb started (S3): a later preflight's commits are the
-# run's own. The header byte `\x01` keeps a sha-shaped path and an empty commit apart.
+# run's own. The header byte `\x01` keeps a sha-shaped path and an empty commit apart, and
+# `--no-renames` lists a rename by both names, so a file moved INTO the build folder is graded too.
 # WHAT THIS DOES NOT CHECK: it trusts local refs, so a local default branch moved onto the run's
 # commits hides them; a run with shell access can rewrite its branch; a merge commit lists no paths,
 # and what it brings in is graded only as the commits it lists. A guard against accident, not a
@@ -3150,7 +3151,7 @@ check_branch_carried() { # slug
   [ -n "$ASHA" ] || return 0
   def=$(default_branch 2>/dev/null) || def=""
   [ -n "$def" ] && GIT rev-parse -q --verify "refs/heads/$def" >/dev/null 2>&1 && ex="refs/heads/$def"
-  if ! out=$(GIT -c core.quotepath=off log --format=%x01%h --name-only HEAD --not "$ASHA" ${ex:+"$ex"} 2>/dev/null); then
+  if ! out=$(GIT -c core.quotepath=off log --no-renames --format=%x01%h --name-only HEAD --not "$ASHA" ${ex:+"$ex"} 2>/dev/null); then
     hit="none, the listing itself failed - HEAD --not $ASHA${ex:+ $ex}"
   else
     while IFS= read -r line; do

@@ -11,6 +11,11 @@ each was observed red against a copy of this pass's driver with that criterion's
 the generated-index loop removed (AC2, 2 FAIL lines), the first-preflight guard removed (AC4, 2), the
 local-default exclusion removed (AC5, 2).
 
+The gotchas pass over the first commit (`porcelain-diff-names-a-rename-by-its-destination`) found
+that rename detection listed a file moved into the build folder by its destination only, which
+passed. Spec rev-4 adds `--no-renames` and a rename arm beside AC1: the slice then printed
+`SLICE n=36 st=0`, and against the first commit's driver the rename arm printed its one FAIL line.
+
 **Evidences:** TOOL-aQuotedBrief-2
 - AC1 — `--preflight tBr` on a prompt-mode build-folder commit above a commit adding `stray.txt` printed check 114 ending `the commit and the first such path: <short sha> stray.txt`, no `preflight OK`, and no `RUN.md` (slice, red on the pre-pass driver, which wrote `RUN.md`)
 - AC2 — the build-folder commit alone, carrying a re-rendered `memory/LIVE.md` with `GENERATED_INDEXES="memory/LIVE.md:gen.py"` on the default branch, printed `preflight OK` and no check 114 (slice, red with the generated-index loop staged out)

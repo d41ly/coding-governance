@@ -4316,6 +4316,7 @@ git branch -f main "$BASE"
 # ---- AC1: a prompt-mode build-folder commit on top of a commit touching a file outside it refuses,
 # ---- naming that commit and file, and writes no RUN.md.
 reset_tree; scope published; printf 'GENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
+printf 'a tracked file the rename arm below moves\n' > moved.txt
 git add -A >/dev/null && git commit -q -m cb-conf --no-verify; git branch -f main HEAD; git push -q -f origin HEAD:main
 _cb_main=$(git rev-parse HEAD)
 printf 'stray\n' > stray.txt; git add -A >/dev/null && git commit -q -m stray --no-verify
@@ -4334,6 +4335,15 @@ git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin 
 out=$(CARRIED_LIVE=1 run --preflight tBr --keepalive-id k1)
 hit  "$out" "preflight OK"
 miss "$out" "a first preflight found this branch carrying a commit"
+# ---- A carried RENAME into the build folder is listed by both names (`--no-renames`), so the file it
+# ---- takes off the default branch's tree is graded; with rename detection only the destination shows.
+git reset -q --hard "$_cb_main"; git clean -qfd
+readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+git mv moved.txt memory/builds/tBr/moved.txt
+git add -A >/dev/null && git commit -q -m mv --no-verify; git push -q -f origin unit 2>/dev/null
+_cb_sha=$(git rev-parse --short HEAD)
+out=$(CARRIED_LIVE=1 run --preflight tBr --keepalive-id k1)
+hit  "$out" "a first preflight found this branch carrying a commit the default branch does not hold that touches a path outside this build's folder and the declared generated indexes, and it would land with the run without passing through the spec loop; start the run in a fresh worktree off the default branch, carrying only the build folder - the commit and the first such path: $_cb_sha moved.txt"
 git checkout -qf unit; git branch -f main "$BASE"; git push -q -f origin "$BASE":main
 reset_tree
 
@@ -16529,10 +16539,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # + aGraftedHelix's 631 (1918 -> 2549) = 2633.
 # RAISED 2633 -> 2657 by TOOL-aQuotedBrief-1: the prompt-record arms beside check 89's in region
 # three, 24 assertions, run as a slice of the prologue and that block on node a, 2026-10-09; no suite ran.
-# RAISED 2657 -> 2671 by TOOL-aQuotedBrief-2: the carried-branch arms (check 114) after the prompt-record
-# arms in region three, 14 assertions, run as a slice of the prologue and that block on node a,
+# RAISED 2657 -> 2673 by TOOL-aQuotedBrief-2: the carried-branch arms (check 114) after the prompt-record
+# arms in region three, 16 assertions, run as a slice of the prologue and that block on node a,
 # 2026-10-09; no suite ran.
-FLOOR_ASSERTIONS=2671
+FLOOR_ASSERTIONS=2673
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -16715,8 +16725,8 @@ FLOOR_SHARD_1=267
 # lines above are region two's history.
 FLOOR_SHARD_2=222
 # RAISED 255 -> 279 by TOOL-aQuotedBrief-1: the same 24 region-three prompt-record assertions, see FLOOR_ASSERTIONS.
-# RAISED 279 -> 293 by TOOL-aQuotedBrief-2: the same 14 region-three carried-branch assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_3=293
+# RAISED 279 -> 295 by TOOL-aQuotedBrief-2: the same 16 region-three carried-branch assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=295
 FLOOR_SHARD_4=390
 FLOOR_SHARD_5=270
 FLOOR_SHARD_6=129

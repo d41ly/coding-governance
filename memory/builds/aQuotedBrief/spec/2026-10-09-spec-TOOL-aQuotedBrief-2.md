@@ -1,6 +1,6 @@
 # TOOL-aQuotedBrief-2 — a run that cannot start clean starts in a fresh worktree, and a first preflight refuses a carried branch
 
-**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base fa68a767 · streams tooling · order 1 · ratified 2026-10-09
+**Status:** CLOSED · rev-4 · 2026-10-09 · node a · Tier-2 · base fa68a767 · streams tooling · order 1 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -85,8 +85,11 @@ Read at `fa68a767` on 2026-10-09.
 ### The predicate
 
 ```
-git -c core.quotepath=off log --format=%x01%h --name-only HEAD --not <anchor tip> [refs/heads/<default>]
+git -c core.quotepath=off log --no-renames --format=%x01%h --name-only HEAD --not <anchor tip> [refs/heads/<default>]
 ```
+
+`--no-renames` lists a rename by both names: with rename detection on, a file moved off the default
+branch's tree into the build folder shows only its destination, which passes.
 
 The header line opens with a `\x01` byte, which git quotes in any path, so a path whose name looks
 like a short sha is never read as a commit, and a commit with no paths, such as an empty one, is not
@@ -218,6 +221,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · th
   `core.quotepath` off, because `%h` alone reads an empty commit's sha as a path; the suite's driver
   helpers stand the local default branch at `HEAD` for every arm but this unit's, because about a
   hundred first preflights commit a conf edit on the run branch.
+- rev-4 · 2026-10-09 · §4 · build: the predicate takes `--no-renames`, found by the gotchas pass over
+  rev-3's commit: rename detection showed a file moved into the build folder by its destination only.
 
 ## 10. Reuse audit
 
