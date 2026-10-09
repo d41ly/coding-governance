@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # adopt-process-monitor.sh — wire the process-monitor kit into a project.
 #
-# gov:kit process-monitor@0.16
+# gov:kit process-monitor@0.17
 #
 # Run from anywhere INSIDE the target repo AFTER copying this kit dir in as `<prefix>/process-monitor/`.
 # The kit dir's NAME is load-bearing; the one-segment prefix is free and every path below is DERIVED
@@ -24,7 +24,7 @@
 #   Exit 0 = adopted / wired · 1 = unwired or refused · 2 = wrong invocation or not a repo.
 set -u
 
-KIT_PROCESS_MONITOR_VERSION="0.16"   # gov:kit process-monitor@0.16 — the deployer's read (kit.toml version_from)
+KIT_PROCESS_MONITOR_VERSION="0.17"   # gov:kit process-monitor@0.17 — the deployer's read (kit.toml version_from)
 
 # >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
@@ -69,7 +69,7 @@ for _a in "${@:-}"; do
 done
 
 KIT_DIR="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$(git -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)" || {
+ROOT="$(unset GIT_DIR GIT_WORK_TREE; git -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)" || {
   echo "process-monitor: not a git repo" >&2; exit 2; }
 # The kit's own directory, repo-relative and DERIVED. No literal prefix appears in this file: a
 # `tools/` literal in shipped bytes resolves to nothing in an adopter installed elsewhere, and an
@@ -80,7 +80,7 @@ ROOT="$(git -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)" || {
 # `/c/projects/...`, so the prefix strip never matches and every invocation refused. Two spellings
 # of one path is the bug class this whole kit exists to reason about; git is asked the question
 # instead of two answers being compared.
-KIT_REL="$(cd "$KIT_DIR" && git rev-parse --show-prefix 2>/dev/null)"
+KIT_REL="$(unset GIT_DIR GIT_WORK_TREE; cd "$KIT_DIR" && git rev-parse --show-prefix 2>/dev/null)"
 KIT_REL="${KIT_REL%/}"
 [ -n "$KIT_REL" ] || {
   echo "process-monitor: cannot derive this kit's directory relative to $ROOT" >&2; exit 2; }

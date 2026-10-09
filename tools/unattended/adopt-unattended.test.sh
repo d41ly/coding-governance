@@ -268,7 +268,7 @@ same "arm 1 --check agrees with what --render just wrote" "$?" "0"
 mv "$A/.claude/settings.json" "$A/.claude/settings.json.aside"
 out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
 same "arm 1a --check refuses with the settings file gone" "$rc" "1"
-hit "$out" "gate-guard hook is UNWIRED"
+hit "$out" "gate-guard hook is UNWIRED —"
 mv "$A/.claude/settings.json.aside" "$A/.claude/settings.json"
 # The marker under the WRONG EVENT, then under the wrong MATCHER: present in the file, never fired.
 sed 's/PreToolUse/PostToolUse/' "$A/.claude/settings.json" > "$A/.claude/s.tmp" && mv "$A/.claude/s.tmp" "$A/.claude/settings.json"
@@ -561,7 +561,7 @@ fi
 # ---- writes, so an operator never gets a Skill rendered against declarations that do not exist.
 F="$TMP/noconf"; seed "$F"; rm -f "$F/.unattended.conf"
 out=$( cd "$F" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
-hit "$out" "no .unattended.conf at the repo root"
+hit "$out" "unattended: no .unattended.conf at the repo root — render it after adopting the project layer"
 same "arm 5 refuses" "$rc" "1"
 absent "$F/.claude/skills/unattended/SKILL.md" "arm 5 left a half-stamped adoption"
 
@@ -569,7 +569,7 @@ absent "$F/.claude/skills/unattended/SKILL.md" "arm 5 left a half-stamped adopti
 # ---- keeps a broken INSTALL from reading as a repo problem.
 G="$TMP/notemplate"; seed "$G"; rm -f "$G/$KIT_REL/SKILL.template.md"
 out=$( cd "$G" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
-hit "$out" "SKILL.template.md is missing from the kit"
+hit "$out" "unattended: SKILL.template.md is missing from the kit at"
 same "arm 6 refuses" "$rc" "1"
 absent "$G/.claude/skills/unattended/SKILL.md" "arm 6 wrote despite a missing template"
 
@@ -628,7 +628,7 @@ absent "$H9c/.claude/skills/unattended/SKILL.md" "arm 9 wrote a Skill for an ove
 S10="$TMP/stamp"; seed "$S10"; cp "$HERE/.unattended.conf.example" "$S10/.unattended.conf"
 out=$( cd "$S10" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
 same "arm 10 --check refuses a conf still carrying a path token" "$rc" "1"
-hit "$out" "still carries a path token this adopter stamps"
+hit "$out" "unattended: .unattended.conf still carries a path token this adopter stamps — run"
 hit "$(grep -c '{{TOOL_ROOT}}' "$S10/.unattended.conf")" "3"
 ( cd "$S10" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
 same "arm 10 LANDER is stamped at this tool root" "$(grep '^LANDER=' "$S10/.unattended.conf")" "LANDER=\"bash ${TR_T}push-main.sh\""
@@ -657,7 +657,7 @@ sed -e 's/{{RESUME_SCHEDULE_CREATE}}/PreUpgradeCreate/g' -e 's/{{RESUME_SCHEDULE
     "$H10/$KIT_REL/SKILL.template.md" > "$H10/.claude/skills/unattended/SKILL.md"
 out=$( cd "$H10" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
 same "arm 11 --check refuses on the placeholder in the render it just made" "$rc" "1"
-hit "$out" "the render this check just made carries an unfilled placeholder"
+hit "$out" "unattended: the render this check just made carries an unfilled placeholder — .unattended.conf declares no value for it, so re-rendering would refuse and the installed Skill cannot be brought into sync"
 hit "$out" "{{RESUME_SCHEDULE_CREATE}}"
 # ---- ...and OFF renders one FIXED literal in place of both tool names, so a project that opted out
 # ---- says so in the sentence where a tool name would stand rather than carrying a placeholder,

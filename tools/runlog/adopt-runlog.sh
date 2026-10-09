@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # adopt-runlog.sh — render the runlog Skill, and check that the rendered copy has not drifted.
-# gov:kit runlog@1.8
+# gov:kit runlog@1.9
 #
 #   bash <this kit>/adopt-runlog.sh --scaffold    # render .claude/skills/runlog/SKILL.md
 #   bash <this kit>/adopt-runlog.sh --check       # the gate leg: is the rendered Skill a fresh render?
@@ -42,13 +42,13 @@ set -u
 # HERE before any cd: `$0` may be relative, and resolving it after moving would resolve it against
 # the wrong directory.
 HERE="$(cd "$(dirname "$0")" && pwd)" || exit 2
-ROOT="$(cd "$HERE" && git rev-parse --show-toplevel 2>/dev/null)" || {
+ROOT="$(unset GIT_DIR GIT_WORK_TREE; cd "$HERE" && git rev-parse --show-toplevel 2>/dev/null)" || {
   echo "runlog: the directory holding this script is not inside a git repository"; exit 2; }
 cd "$ROOT" || exit 2
 ROOT="$(pwd)"
 # The kit dir as the repository spells it, RELATIVE, and computed by git so the two operands cannot
 # be two spellings of one directory. A kit installed at the repository root renders as `.`.
-KIT_REL="$(cd "$HERE" && git rev-parse --show-prefix)" || exit 2
+KIT_REL="$(unset GIT_DIR GIT_WORK_TREE; cd "$HERE" && git rev-parse --show-prefix)" || exit 2
 KIT_REL="${KIT_REL%/}"
 [ -n "$KIT_REL" ] || KIT_REL="."
 

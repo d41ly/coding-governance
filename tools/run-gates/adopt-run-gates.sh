@@ -45,7 +45,7 @@ done
 # strings; the block below says why.
 KITDIR=$(cd "$(dirname "$0")" && pwd)
 if [ -z "$TARGET" ]; then
-  TARGET=$(cd "$KITDIR" && git rev-parse --show-toplevel 2>/dev/null) || {
+  TARGET=$(unset GIT_DIR GIT_WORK_TREE; cd "$KITDIR" && git rev-parse --show-toplevel 2>/dev/null) || {
     echo "adopt-run-gates: $KITDIR is not inside a git work tree, and no --target was given" >&2
     exit 2
   }
@@ -58,8 +58,8 @@ TARGETN=$(cd "$TARGET" 2>/dev/null && pwd) || { echo "adopt-run-gates: --target 
 # outside it. Measured here: this refusal fired on a scratch target the e2e had just built around
 # this very kit. Both answers below come from the SAME command run in two directories, so they are
 # the same flavour by construction.
-kit_top=$(cd "$KITDIR" && git rev-parse --show-toplevel 2>/dev/null) || kit_top=""
-tgt_top=$(cd "$TARGETN" && git rev-parse --show-toplevel 2>/dev/null) || tgt_top=""
+kit_top=$(unset GIT_DIR GIT_WORK_TREE; cd "$KITDIR" && git rev-parse --show-toplevel 2>/dev/null) || kit_top=""
+tgt_top=$(unset GIT_DIR GIT_WORK_TREE; cd "$TARGETN" && git rev-parse --show-toplevel 2>/dev/null) || tgt_top=""
 [ -n "$kit_top" ] && [ "$kit_top" = "$tgt_top" ] || {
   echo "adopt-run-gates: REFUSING — this kit at $KITDIR does not belong to the target tree $TARGETN." >&2
   echo "adopt-run-gates: git reports the kit's tree as '${kit_top:-<none>}' and the target's as" >&2
@@ -69,7 +69,7 @@ tgt_top=$(cd "$TARGETN" && git rev-parse --show-toplevel 2>/dev/null) || tgt_top
 }
 # The install prefix, relative to the tree BOTH sides just agreed on. Derived through git so the two
 # operands share one spelling; a `pwd`-vs-`rev-parse` strip is the defect above.
-KITREL=$(cd "$KITDIR" && git rev-parse --show-prefix 2>/dev/null); KITREL=${KITREL%/}
+KITREL=$(unset GIT_DIR GIT_WORK_TREE; cd "$KITDIR" && git rev-parse --show-prefix 2>/dev/null); KITREL=${KITREL%/}
 [ -n "$KITREL" ] || KITREL="."
 
 RUNNER="$KITDIR/run-gates.sh"

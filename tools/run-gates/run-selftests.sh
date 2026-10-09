@@ -35,13 +35,13 @@
 # with two arms red for long enough that nobody can say when they broke.
 set -u
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
+ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
   echo "run-selftests: not a git work tree"; exit 2; }
 cd "$ROOT" || exit 2
 # THIS SCRIPT'S OWN REPO-RELATIVE PATH, DERIVED. Spelling it as a literal would ship gov's
 # prefix into an adopter installed elsewhere, where it resolves to nothing -- the install-prefix
 # ban, which this file is graded by. An empty derivation REFUSES rather than printing `bash `.
-SELF="$(git -C "$(dirname -- "$0")" rev-parse --show-prefix 2>/dev/null)$(basename -- "$0")"
+SELF="$(unset GIT_DIR GIT_WORK_TREE; git -C "$(dirname -- "$0")" rev-parse --show-prefix 2>/dev/null)$(basename -- "$0")"
 [ -n "$SELF" ] || { echo "run-selftests: cannot derive this script's own path" >&2; exit 2; }
 
 BUDGETS="$HERE/selftest-budgets.txt"
@@ -50,7 +50,7 @@ LEGS="${GATE_LEGS:-$(dirname -- "$HERE")/gate-legs.json}"
 # THE TOOL ROOT, derived the same way (TOOL-aRepatriatedFork-29 S2): the manifest, this kit's
 # declaration and its evidence header name their paths through the `{prefix}` token, and every
 # reader below resolves it against this answer. Empty is the repo root, a legal install.
-TROOT=$(git -C "$(dirname -- "$HERE")" rev-parse --show-prefix 2>/dev/null) || {
+TROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$(dirname -- "$HERE")" rev-parse --show-prefix 2>/dev/null) || {
   echo "run-selftests: cannot derive the tool root above $HERE" >&2; exit 2; }
 TROOT=${TROOT%/}
 
@@ -1800,7 +1800,7 @@ if [ -n "$ATTRIBUTE" ]; then
   # ---- no entry to `git worktree list` at all.
   # ---- THE PATHS ARE DERIVED. A kit file names nothing outside itself by literal (charter §12):
   # ---- a `tools/…` spelling here resolves to nothing at another install prefix.
-  HERE_REL=$(git -C "$HERE" rev-parse --show-prefix 2>/dev/null) || HERE_REL=""
+  HERE_REL=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-prefix 2>/dev/null) || HERE_REL=""
   R_BUDGETS="$ATTR_TMP/budgets-at-R"; : > "$R_BUDGETS"
   git show "$RSHA:${HERE_REL}$(basename -- "$BUDGETS")" > "$R_BUDGETS" 2>/dev/null || : > "$R_BUDGETS"
   R_LEGS="$ATTR_TMP/legs-at-R"
@@ -1810,8 +1810,8 @@ if [ -n "$ATTRIBUTE" ]; then
   # own spelling, the way SELF is derived above; a manifest outside this repo is copied as before.
   LEGS_REL=""
   _legs_dir=$(dirname -- "$LEGS")
-  if [ "$(git -C "$_legs_dir" rev-parse --show-toplevel 2>/dev/null)" = "$ROOT" ]; then
-    LEGS_REL="$(git -C "$_legs_dir" rev-parse --show-prefix 2>/dev/null)$(basename -- "$LEGS")"
+  if [ "$(unset GIT_DIR GIT_WORK_TREE; git -C "$_legs_dir" rev-parse --show-toplevel 2>/dev/null)" = "$ROOT" ]; then
+    LEGS_REL="$(unset GIT_DIR GIT_WORK_TREE; git -C "$_legs_dir" rev-parse --show-prefix 2>/dev/null)$(basename -- "$LEGS")"
   fi
   if [ -n "$LEGS_REL" ]; then
     git show "$RSHA:$LEGS_REL" > "$R_LEGS" 2>/dev/null || printf '[]\n' > "$R_LEGS"

@@ -38,7 +38,7 @@ ARCH-bOrderlyAtlas-1.)
 | `README.md` | this file. |
 | `corpus_ids.py` | the id + path classifier behind checks 13-16 (13-15 pinned, 16 structural) (`--report` / `--check` / `--measure` / `--print-defined-ids` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a four-rule registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from the memory-recall kit and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every pin is measured per corpus; checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none. `--print-defined-ids` prints the id grammar as a POSIX ERE on its first line, then every id the corpus DEFINES, for a caller that must join cited ids against the set without spelling the grammar — the kickoff checker's `--card --append` is that caller. |
 | `gotchas.py` | the bug-class catalogue behind checks 17-19 (`--check` / `--write` / `--report` / `--for-diff <range>` / `--for-paths <path>...` / `--declares` / `--selftest`). Anchors are DERIVED from each record's body, not authored; `--for-diff`'s stdout IS the reviewer's checklist for that diff, ranked by anchor specificity (`path`, then `directory`, then `basename`, universals first and outside the ranking) and cut at a tier boundary: whole tiers print in full while they fit `CHECKLIST_FULL_BUDGET`, 12, and every class from the first tier that does not prints as one line. No class leaves it. A `kind: invariant` record (a `decision:` key and five sections, graded by checks 18-19, its guard resolved against `LEG_MANIFEST`) is never ranked: it closes the checklist as the `# by design — <n> invariant(s) this selection touches` block, which the review harness hands its lenses as `byDesign`. The block is read at the subject's base, `--for-diff`'s range base or `--for-paths --base <rev>`, so an invariant the subject adds, edits or takes out prints as a `NEW/CHANGED invariant` item instead and never exempts its own change. |
-| `check-arms.py` | the harness meta-gate: every `fail` BRANCH is armed by a positive assertion naming its own failure text, or pinned in a shrink-only list. Keyed on the call site, pinned in both directions, and excluded from its own scan. Arms are read from the gate's `<stem>.test.sh` and an optional `<stem>.local.test.sh`; pins from `<MEMORY_ROOT>/project/unarmed-branches.txt` and a sidecar `unarmed-branches.txt` beside the gate, and `--report` names the file that armed or pinned each branch. Floored per gate by `ARMS_FLOORS`, which is REFUSED blank while any gate is discovered; `--emit-floors` prints the measured line. Its helpers come from `tree_lib.py`, the one module the kit's engines share, so no engine imports a sibling engine. |
+| `check-arms.py` | the harness meta-gate: every `fail` BRANCH is armed by a positive assertion naming its own failure text, or pinned in a shrink-only list. Keyed on the call site, pinned in both directions, and excluded from its own scan. Arms are read from the gate's `<stem>.test.sh` and an optional `<stem>.local.test.sh`; pins from `<MEMORY_ROOT>/project/unarmed-branches.txt` and a sidecar `unarmed-branches.txt` beside the gate, and `--report` names the file that armed or pinned each branch. Floored per gate by `ARMS_FLOORS`, which is REFUSED blank while any gate is discovered; `--emit-floors` prints the measured line. Its helpers come from `tree_lib.py`, the one module the kit's engines share, so no engine imports a sibling engine. With `ARMS_REFUSALS="graded"` a SECOND signature grades every refusal site that is not a fail call, an `exit 1` or `status=1` in a tracked `*.sh` outside the memory root, armed by its sibling suite or pinned with a five-field row whose reason the gate prints; blank, it prints one OFF line counting what it skips. Ships blank. |
 | `kit-dogfood-parity.test.sh` | the two docs this kit SHIPS must equal the two an adopting repo RUNS ON, modulo the tool-root install prefix (`--check` / `--render`). |
 | `adopt-memory-tree.sh` | `--scaffold` an empty tree that passes once its conf declares the keys the gate reads from the config (new projects). `--render` re-renders the four rendered documents in a tree that already carries the adoption marker, and writes nothing else — the mode `[[regenerate]]` names, and the only one that refreshes them after adoption. It REFUSES on a tree with no marker, and on a kit directory missing any of the four templates, rather than replacing your committed rule set with a placeholder. |
 | `HYGIENE.template.md` | the rule set, copied to `memory/HYGIENE.md` at scaffold time. |
@@ -437,6 +437,28 @@ so it takes signed records and one switch-over commit, and the adopter runbook g
 grammar, the verdicts and the fold it switches to are
 [Backlog modes](#backlog-modes--authored-shards-and-per-build-asks) above. Install the memory-recall
 kit before you switch — check 26 keys every row through its anchor grammar and has no degraded mode.
+
+## Upgrading to 2.135 — `check-arms.py` grows a second discovery signature, shipped dark
+
+**Nothing changes until `ARMS_REFUSALS` is set to `graded`.** Blank or absent, `--check` grades
+exactly what it graded before and prints one more line, the OFF line, counting the refusal sites it
+does not grade. A refusal site is an `exit 1` or `status=1` in a tracked `*.sh` outside the memory
+root that is not a `fail <n> "…"` call: an adopter's `--check` that prints a reason and exits, or a
+gate's delegated block that prints a module's capture. The module docstring states the predicate,
+the reason walk, the `# arm-signature:` marker and what it does not check; read it there.
+
+**To switch it on**, set the key, then run `python <kit>/check-arms.py --emit-pin`. Its refusal rows
+carry five fields, the last a reason written as `REASON-OWED`, which the gate refuses: replace each
+with why no arm reaches that site, and paste the rows into `<MEMORY_ROOT>/project/unarmed-branches.txt`.
+A site your sibling suite already drives is better ARMED than waived: lengthen that arm's assertion
+to the whole signature `--report` prints, or, for a delegated block, add a marker naming the text the
+arm already asserts. Then re-run `--emit-floors` and paste its line, because every script holding a
+site is now a gate whose floor counts sites. Every waived row prints a `check-arms: waived` line on
+every run, so the leg's log grows by one line per row.
+
+**Check 24's block now prints its capture on a green run**, as blocks 20, 27 and 28 already did. A
+tree with `ROTATION_MODE` unset gains one `check 24: ROTATION_MODE is UNDECLARED` line on every full
+run; it was computed before and thrown away.
 
 ## Arms and pins that travel with their gates — TOOL-aRepatriatedFork-18
 

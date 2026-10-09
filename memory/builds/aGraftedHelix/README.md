@@ -5,7 +5,7 @@ opened: 2026-10-04
 streams: tooling+kickoff
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-26 TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33 TOOL-aGraftedHelix-34 TOOL-aGraftedHelix-35 TOOL-aGraftedHelix-36 TOOL-aGraftedHelix-37 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39 TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 TOOL-aGraftedHelix-42 TOOL-aGraftedHelix-43 TOOL-aGraftedHelix-44
+ids: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-26 TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33 TOOL-aGraftedHelix-34 TOOL-aGraftedHelix-35 TOOL-aGraftedHelix-36 TOOL-aGraftedHelix-37 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39 TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 TOOL-aGraftedHelix-42 TOOL-aGraftedHelix-43 TOOL-aGraftedHelix-44 TOOL-aGraftedHelix-45 TOOL-aGraftedHelix-46 TOOL-aGraftedHelix-47
 ---
 
 # aGraftedHelix — six helixir mechanisms, grafted onto the kits that own their surface
@@ -104,15 +104,18 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
 | 39 | `TOOL-aGraftedHelix-39` | 2 | ADOPTED: a re-dispatch of an open pass is reported to drop the paths an earlier row declared, against the append-only contract; reproduced first, then one derivation of a pass's declared set for every reader |
 | 40 | `TOOL-aGraftedHelix-40` | 2 | ADOPTED: the two red arms of the pooled sweep at VERIFYING, the playbook leg missing a commented BYPASS_BAN spelling and the resume-tick detachment arm graded by a clock |
 | 41 | `TOOL-aGraftedHelix-41` | 2 | ADOPTED: the driver suite runs in the pooled sweep as shards sized from its own region costs, so one row no longer sets the sweep's floor alone |
+| 45 | `TOOL-aGraftedHelix-45` | 2 | OWNER-ADOPTED: a gate bans the unscrubbed `git -C <dir> rev-parse --show-*` location probe in shipped shell, every hit scrubbed or waived with a printed reason |
+| 46 | `TOOL-aGraftedHelix-46` | 1 | OWNER-ADOPTED: govkit reads a quoted conf value followed by a comment the way the shell that sources it does |
+| 47 | `TOOL-aGraftedHelix-47` | 2 | OWNER-ADOPTED: check-arms.py discovers a gate that exits 1 with a printed reason and no fail helper, and every block it finds is armed or waived |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 41 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
+**Build status:** CLOSED · 44 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
 ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13
 ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-26
 ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33 TOOL-aGraftedHelix-34 TOOL-aGraftedHelix-35 TOOL-aGraftedHelix-36 TOOL-aGraftedHelix-37 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39
-ids TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 TOOL-aGraftedHelix-42 TOOL-aGraftedHelix-43 TOOL-aGraftedHelix-44
+ids TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 TOOL-aGraftedHelix-42 TOOL-aGraftedHelix-43 TOOL-aGraftedHelix-44 TOOL-aGraftedHelix-45 TOOL-aGraftedHelix-46 TOOL-aGraftedHelix-47
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -124,7 +127,7 @@ ids TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 TOOL-aGraftedHelix-42 TOOL-aGraf
 | [TOOL-aGraftedHelix-2 — the orientation card lists the remote run claims under a two-clock rule](spec/2026-10-04-spec-TOOL-aGraftedHelix-2.md) | 2 | 1 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aGraftedHelix-18 — the holder row decides `mine` before its `write_lease` and copies the claim's identity after it](spec/2026-10-04-spec-TOOL-aGraftedHelix-18.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-19 — the claim write table's rows and modes are driver constants the decision refuses outside of, and the per-cell arm derives its cells from them](spec/2026-10-04-spec-TOOL-aGraftedHelix-19.md) | 3 | 1 | CLOSED | rev-3 | 2026-10-05 |
-| [TOOL-aGraftedHelix-3 — invariant records in the bug-class catalogue become the review's by-design list](spec/2026-10-04-spec-TOOL-aGraftedHelix-3.md) | 3 | 2 | CLOSED | rev-4 | 2026-10-05 |
+| [TOOL-aGraftedHelix-3 — invariant records in the bug-class catalogue become the review's by-design list](spec/2026-10-04-spec-TOOL-aGraftedHelix-3.md) | 3 | 2 | CLOSED | rev-5 | 2026-10-05 |
 | [TOOL-aGraftedHelix-20 — the holder row's claim CAS runs before its `write_lease` under one stamp, and a CAS that does not land leaves a `prior-session` fact the `mine` test accepts](spec/2026-10-04-spec-TOOL-aGraftedHelix-20.md) | 4 | 2 | CLOSED | rev-7 | 2026-10-05 |
 | [TOOL-aGraftedHelix-22 — the claim write decision refuses a derived claim-read class outside `CLAIM_READS`, observed by a criterion and kept by a standing arm](spec/2026-10-04-spec-TOOL-aGraftedHelix-22.md) | 4 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-27 — the driver resolves generated indexes the same inside a git hook as outside one, so a pass commits the index its generator rewrote](spec/2026-10-05-spec-TOOL-aGraftedHelix-27.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-05 |
@@ -158,14 +161,17 @@ ids TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 TOOL-aGraftedHelix-42 TOOL-aGraf
 | [TOOL-aGraftedHelix-39 — one derivation of the paths a dispatched pass may write](spec/2026-10-06-spec-TOOL-aGraftedHelix-39.md) | 23 | 2 | CLOSED | rev-1 | 2026-10-06 |
 | [TOOL-aGraftedHelix-40 — the playbook arm prints its leg's evidence on a miss, and the resume-tick arms grade detachment by a child that outlives the tick](spec/2026-10-06-spec-TOOL-aGraftedHelix-40.md) | 24 | 2 | CLOSED | rev-1 | 2026-10-06 |
 | [TOOL-aGraftedHelix-41 — the driver suite runs in the pooled sweep as eight shards cut by its own region costs](spec/2026-10-06-spec-TOOL-aGraftedHelix-41.md) | 25 | 2 | CLOSED | rev-2 | 2026-10-07 |
+| [TOOL-aGraftedHelix-45 — a leg bans a location probe asked from a moved directory unless it scrubs an inherited GIT_DIR or a registry row waives it](spec/2026-10-07-spec-TOOL-aGraftedHelix-45.md) | 26 | 2 | CLOSED | rev-3 | 2026-10-07 |
+| [TOOL-aGraftedHelix-46 — govkit reads a quoted conf value followed by a comment the way the shell that sources it does](spec/2026-10-07-spec-TOOL-aGraftedHelix-46.md) | 27 | 1 | CLOSED | rev-3 | 2026-10-07 |
+| [TOOL-aGraftedHelix-47 — check-arms.py discovers a refusal that is not a fail call, and every one it finds is armed or waived with a printed reason](spec/2026-10-07-spec-TOOL-aGraftedHelix-47.md) | 28 | 2 | CLOSED | rev-3 | 2026-10-07 |
 <!-- /gen:build-units -->
 
-Records: 64 bound to this build, across 4 record folder(s).
+Records: 68 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-26 TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33 TOOL-aGraftedHelix-34 TOOL-aGraftedHelix-35 TOOL-aGraftedHelix-36
-TOOL-aGraftedHelix-37 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39 TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41.
+TOOL-aGraftedHelix-37 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39 TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 TOOL-aGraftedHelix-45 TOOL-aGraftedHelix-46 TOOL-aGraftedHelix-47.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -197,6 +203,9 @@ TOOL-aGraftedHelix-37 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39 TOOL-aGraftedH
 | 23 | `TOOL-aGraftedHelix-39` | no |
 | 24 | `TOOL-aGraftedHelix-40` | no |
 | 25 | `TOOL-aGraftedHelix-41` | no |
+| 26 | `TOOL-aGraftedHelix-45` | no |
+| 27 | `TOOL-aGraftedHelix-46` | no |
+| 28 | `TOOL-aGraftedHelix-47` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -58,6 +58,56 @@ adopter of this kit, whatever the port's source said: installing the kit install
 `check-memory-hygiene.sh`, which defines the helper, so a fresh adopter has a gate on day one and is
 refused on day one — owner-resolved (section 8 F2 of the unit), and `adopt-memory-tree.sh --scaffold`
 prints the `--emit-floors` command in its next steps for that reason.
+
+SIGNATURE 2 — A REFUSAL THAT IS NOT A FAIL CALL (TOOL-aGraftedHelix-47, closing TOOL-aDeferredBar-8).
+An adopter's `--check` that prints a reason and exits 1, and a gate's delegated block that prints a
+module's capture and sets `status=1`, were invisible to the predicate above. With
+`ARMS_REFUSALS="graded"` in `.memory-tree.conf`, every tracked `*.sh` that is not `*.test.sh` and does
+not sit under MEMORY_ROOT is read for REFUSAL SITES: a line whose code, with quoted spans, comments and
+here-document bodies blanked, carries `exit 1` as a word or assigns `status=1`. A line holding a
+`fail <n> "` call, and the helper's definition, stay signature 1's. A script holding a site is a gate
+beside the helper-defined ones, with the same sibling-test rule. Its reason is decided in order:
+  (a) the last `echo`/`printf` before the exit in the same statement — its first argument's literal,
+      cut by `message_of`, signed by `signature` (a printf conversion counts as an interpolation); a
+      signature under 12 characters makes the site DELEGATED instead;
+  (b) that print carrying no literal (`printf '%s\n' "$capture"; status=1`): DELEGATED;
+  (c) `<command> || exit 1` or `|| { …; exit 1; }` whose left side is not a `[`/`[[`/`test`
+      condition: DELEGATED, because the callee prints the reason;
+  (d) otherwise the BLOCK is walked upward — lines at the statement's indentation or deeper,
+      comments, here-document bodies and quote-continuation lines skipped, stopping at the first
+      blank or shallower line — and its TOPMOST print decides as in (a) or (b);
+  (e) no print: UNREASONED, counted and listed, and not a site.
+A DELEGATED site is signed by the nearest `# arm-signature: <text>` comment above it inside its
+block (at least 12 characters, and no other site between them): the text its callee prints on that
+refusal path. An arm asserting that text arms it. Unmarked, it cannot be armed and its pin key is its
+own source line, whitespace-squeezed. A marker above a REASONED site is refused, because a declared
+signature beside a derived one is two answers to one question, and a marker no delegated site reads
+is refused, so a marker cannot outlive its site silently. A script this module's quote reader leaves
+inside an unterminated quote or here-document is refused by name rather than read as clean.
+
+Keys and pins. A site is keyed (gate, kind, occurrence, signature): kind `exit` or `status`, the
+occurrence counting that gate's sites of that kind sharing that signature, so an inserted refusal
+does not re-key the rows below it. Its pin row has FIVE tab-separated fields, the last its REASON:
+`gate<TAB>kind<TAB>occurrence<TAB>signature<TAB>reason`. An empty reason or the placeholder
+`REASON-OWED`, which `--emit-pin` writes, is refused, and every waived row prints
+`check-arms: waived <gate>:<line> <kind> — <reason>` on every run. Every pin rule above holds for these
+rows: shrink-only, a pinned site that is armed reds, a row naming no live site reds, and a site pinned
+in two files is refused. A script found only by signature 2 with no sibling test is not an error while
+every one of its sites is pinned.
+
+THE SWITCH. Blank or absent is OFF, `graded` is ON, anything else is refused by name. It ships OFF,
+because this file ships to every adopter as `engine` and turning it on reds their unarmed exits on
+upgrade. Discovery runs in BOTH states, because the OFF line's count is that state's liveness
+assertion: OFF prints how many sites go ungraded and how many exit/status pin rows were not read; ON
+prints a census line (sites, scripts, armed, waived, unreasoned) on every run. Under ON the per-gate
+floors count sites beside fail branches, so `--emit-floors` is re-run when the switch moves.
+
+WHAT SIGNATURE 2 DOES NOT CHECK. A reason is prose and nothing checks that it is true. A marker's text
+is trusted until the suite holding its arm runs. Python refusals, exit codes other than 1,
+`return 1`, and hooks without a `.sh` suffix are outside the population. Unreasoned exits are listed
+and never graded. The walk reads indentation, so a block indented against its own nesting can end
+early or late, and a false association reads as a reasoned site with the wrong signature: `--report`
+prints the line each signature was read from, and that column is the only defence.
 """
 from __future__ import annotations
 
@@ -83,6 +133,17 @@ NEGATIVE_RE = re.compile(r"^\s*(miss\b|.*grep -qF .* <<<.*\s&&\s)")
 # indistinguishable from prose about the message, so below this bound nothing is named; a signature
 # shorter than this cannot strand by prefix, because a line holding all of it arms the branch.
 STRAND_MIN = 24
+# Signature 2 (TOOL-aGraftedHelix-47). Every pattern below runs over a line's CODE, the text left
+# once scan_shell_lines has blanked its quoted spans, comments and here-document bodies.
+EXIT_RE = re.compile(r"(?<![\w$-])exit\s+1(?!\w)")
+STATUS_RE = re.compile(r"(?<![\w$-])status=1(?!\w)")
+PRINT_RE = re.compile(r"(?<![\w$./-])(echo|printf)(?![\w-])")
+HEREDOC_RE = re.compile(r"<<(-?)\s*\\?(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\2")
+MARKER_RE = re.compile(r"^\s*#\s*arm-signature:(.*)$")
+TEST_COND_RE = re.compile(r"!?\s*(\[\[?|test)(\s|$)")
+PRINTF_CONV_RE = re.compile(r"%[-+ #0-9.*]*[a-zA-Z%]|\\[a-z\\]")
+REASON_OWED = "REASON-OWED"
+REFUSAL_KINDS = ("exit", "status")
 
 
 class Problem(Exception):
@@ -107,7 +168,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import kit_rel, parse_conf  # noqa: E402  the kit's shared helpers
 
 def load_conf(root):
-    conf = {"MEMORY_ROOT": "memory", "ARMS_FLOORS": ""}
+    conf = {"MEMORY_ROOT": "memory", "ARMS_FLOORS": "", "ARMS_REFUSALS": ""}
     p = os.path.join(root, ".memory-tree.conf")
     if os.path.isfile(p):
         parse_conf(read(p), conf)
@@ -222,8 +283,284 @@ def armed_signatures(root: str, test_rel: str) -> list:
     return out
 
 
-def parse_pin(root: str, m: str) -> list:
-    """Every pin row, from the central file AND every SIDECAR, as (gate, check, ordinal, sig, line, file).
+def check_refusal_switch(conf: dict) -> bool:
+    """`ARMS_REFUSALS`: blank is OFF, `graded` is ON, and anything else is refused by name."""
+    val = conf.get("ARMS_REFUSALS", "").strip()
+    if val not in ("", "graded"):
+        raise Problem(f"check-arms: ARMS_REFUSALS is {val!r} — only blank (signature 2 off) or `graded` "
+                      f"is legal, and guessing which one was meant would grade a tree its owner did "
+                      f"not ask for")
+    return val == "graded"
+
+
+def scan_shell_lines(text: str) -> list:
+    """-> one (raw, code, continued, heredoc) per line of a shell script.
+
+    `code` is `raw` with every quoted span, comment and `$'…'` blanked to spaces, so a pattern over it
+    can only match shell. State carries ACROSS lines, because a message spanning two lines leaves its
+    second line inside a quote (`continued`), and a here-document's body lines are `heredoc`. A
+    command substitution inside double quotes is code again until its closing paren. A script that
+    ENDS inside a quote or a here-document gets a trailing None row, which scan_refusal_sites refuses.
+    """
+    rows, stack, depth, queue, body = [], ["c"], [], [], None
+    for raw in text.split("\n"):
+        if body:
+            rows.append((raw, " " * len(raw), False, True))
+            if (raw.lstrip("\t") if body[0] else raw).strip() == body[1]:
+                body = queue.pop(0) if queue else None
+            continue
+        continued, code, i, n = stack[-1] in "sad", list(raw), 0, len(raw)
+        while i < n:
+            ch, top = raw[i], stack[-1]
+            if top in "sa":
+                if top == "a" and ch == "\\":
+                    code[i:i + 2] = " " * len(code[i:i + 2])
+                    i += 2
+                    continue
+                if ch == "'":
+                    stack.pop()
+                code[i] = " "
+                i += 1
+                continue
+            if top == "d":
+                if ch == "\\":
+                    code[i:i + 2] = " " * len(code[i:i + 2])
+                    i += 2
+                    continue
+                if ch == '"':
+                    stack.pop()
+                elif raw.startswith("$(", i) and not raw.startswith("$((", i):
+                    stack.append("p")
+                    depth.append(0)
+                    code[i:i + 2] = "  "
+                    i += 2
+                    continue
+                code[i] = " "
+                i += 1
+                continue
+            if ch == "\\":
+                i += 2
+                continue
+            if ch == "#" and (i == 0 or raw[i - 1] in " \t;|&()"):
+                code[i:] = " " * (n - i)
+                break
+            if raw.startswith("$'", i):
+                stack.append("a")
+                code[i:i + 2] = "  "
+                i += 2
+                continue
+            if ch in "'\"":
+                stack.append("s" if ch == "'" else "d")
+                code[i] = " "
+                i += 1
+                continue
+            if raw.startswith("$(", i) and not raw.startswith("$((", i):
+                stack.append("p")
+                depth.append(0)
+                i += 2
+                continue
+            if raw.startswith("<<", i) and not raw.startswith("<<<", i):
+                hm = HEREDOC_RE.match(raw, i)
+                if hm:
+                    queue.append((hm.group(1) == "-", hm.group(3)))
+                    i = hm.end()
+                    continue
+            if top == "p":
+                if ch == "(":
+                    depth[-1] += 1
+                elif ch == ")":
+                    if depth[-1]:
+                        depth[-1] -= 1
+                    else:
+                        stack.pop()
+                        depth.pop()
+            i += 1
+        rows.append((raw, "".join(code), continued, False))
+        if queue and body is None:
+            body = queue.pop(0)
+    if stack != ["c"] or body:
+        rows.append(None)                     # unbalanced: the caller refuses the script by name
+    return rows
+
+
+def extract_print_message(raw: str, pm) -> str:
+    """The signature a print at match `pm` of `raw` emits: its first argument's literal, or ''."""
+    rest = raw[pm.end():].lstrip(" \t")
+    while True:
+        om = re.match(r"(-[neE]+|--|-v\s+\S+)\s+", rest)
+        if not om:
+            break
+        rest = rest[om.end():]
+    if rest.startswith('"'):
+        msg = re.sub(r'\\([\\"`])', r"\1", message_of(rest[1:]))   # what the shell prints for \" \` \\
+    elif rest.startswith("$'"):
+        msg = rest[2:].split("'", 1)[0]
+    elif rest.startswith("'"):
+        msg = rest[1:].split("'", 1)[0]
+    else:
+        msg = re.split(r"[;|&<>)]", rest, 1)[0]
+    # A positional or special parameter is an interpolation too: `run $0` prints the script's path,
+    # never the two characters. INTERP_RE is signature 1's and stays as it is, so this is local.
+    msg = re.sub(r"\$[0-9#?*@$!-]", "${_}", msg.split("\n", 1)[0])
+    if pm.group(1) == "printf":
+        msg = PRINTF_CONV_RE.sub("${_}", msg)     # a conversion is an interpolation: no run prints it
+    return signature(msg)
+
+
+def derive_refusal_reason(rows: list, start: int, k: int, pos: int, site_rows: set) -> tuple:
+    """-> (class, signature, 1-based line it was read from) for the site at row `k`, offset `pos`.
+
+    `start` is the row its statement began on (a site line that opens inside a quote belongs to the
+    statement above it). Rules (a)-(e) of the module docstring, first match wins. The (d) walk also
+    stops at another site, whose print is that site's reason and not this one's, and it prefers the
+    topmost print at the statement's OWN indentation over one nested deeper in an earlier compound.
+    """
+    raw = "\n".join(r[0] for r in rows[start:k + 1])
+    code = "\n".join(r[1] for r in rows[start:k + 1])
+    off = sum(len(r[1]) + 1 for r in rows[start:k]) + pos
+
+    def derive_from_print(text, pm, first_row):
+        sig = extract_print_message(text, pm)
+        line = first_row + text.count("\n", 0, pm.start()) + 1
+        return ("reasoned", sig, line) if len(sig) >= 12 else ("delegated", None, line)
+
+    prints = [pm for pm in PRINT_RE.finditer(code) if pm.start() < off]
+    if prints:                                                        # (a), (b)
+        return derive_from_print(raw, prints[-1], start)
+    head = code[:off]
+    bar = head.rfind("||")
+    if bar >= 0 and re.fullmatch(r"\|\|\s*(\{[^{}]*)?", head[bar:]):  # (c)
+        # Split on the CODE, read the RAW: a command whose words are all quoted is blank in `code`.
+        cut = [sm.end() for sm in re.finditer(r"&&|\|\||;|\{|\(|\bthen\b|\bdo\b|\belse\b", head[:bar])]
+        left = raw[cut[-1] if cut else 0:bar].strip()
+        if left and not TEST_COND_RE.match(left):
+            return ("delegated", None, k + 1)
+    indent = len(rows[start][0]) - len(rows[start][0].lstrip())        # (d)
+    top, deep = None, None
+    for j in range(start - 1, -1, -1):
+        r = rows[j]
+        if r[3] or r[2]:
+            continue
+        if not r[0].strip() or j in site_rows:
+            break
+        if not r[1].strip() and r[0].lstrip().startswith("#"):
+            continue
+        ind = len(r[0]) - len(r[0].lstrip())
+        if ind < indent:
+            break
+        if PRINT_RE.search(r[1]):
+            if ind == indent:
+                top = j
+            else:
+                deep = j
+    top = deep if top is None else top
+    if top is None:
+        return ("unreasoned", None, None)                             # (e)
+    end = top
+    while end + 1 < len(rows) and rows[end + 1][2]:
+        end += 1
+    text = "\n".join(r[0] for r in rows[top:end + 1])
+    codetext = "\n".join(r[1] for r in rows[top:end + 1])
+    return derive_from_print(text, PRINT_RE.search(codetext), top)
+
+
+def read_arm_marker(rows: list, start: int, site_rows: set):
+    """-> (text, 1-based line) of the `# arm-signature:` comment nearest above a site, or None.
+
+    The walk is the reason walk's — at the statement's indentation or deeper, stopping at a blank or
+    shallower line — and it also stops at another site, so a marker belongs to exactly ONE site: the
+    first one below it.
+    """
+    indent = len(rows[start][0]) - len(rows[start][0].lstrip())
+    for j in range(start - 1, -1, -1):
+        r = rows[j]
+        if r[3] or r[2]:
+            continue
+        if not r[0].strip() or j in site_rows:
+            return None
+        mm = MARKER_RE.match(r[0])
+        if mm and not r[1].strip():
+            return (mm.group(1).strip(), j + 1)
+        if r[0].lstrip().startswith("#"):
+            continue
+        if len(r[0]) - len(r[0].lstrip()) < indent:
+            return None
+    return None
+
+
+def scan_refusal_sites(root: str, m: str) -> tuple:
+    """Signature 2's population: ({gate: {"sites": [...], "unreasoned": [lines]}}, [errors]).
+
+    Every tracked `*.sh` that is not `*.test.sh` and not under the memory root (a build record can hold
+    a frozen repro script, which is no gate). Derived, never listed.
+    """
+    tracked = [p for p in run("git", "ls-files", cwd=root).split("\n")
+               if p.endswith(".sh") and not p.endswith(".test.sh")
+               and not p.startswith(m.rstrip("/") + "/")]
+    out, errors = {}, []
+    for rel in tracked:
+        try:
+            rows = scan_shell_lines(read(os.path.join(root, rel)))
+        except OSError:
+            continue
+        if rows and rows[-1] is None:
+            errors.append(f"check-arms: {rel} ends inside an unterminated quote or here-document by "
+                          f"this module's reading, so its refusal sites cannot be read — bash and the "
+                          f"reader disagree, and reading the rest as clean would hide every site in it")
+            continue
+        cands = []
+        for k, (raw, code, _cont, here) in enumerate(rows):
+            if here or "fail() {" in raw or HELPER_RE.match(raw) or FAIL_RE.search(raw):
+                continue
+            em, sm = EXIT_RE.search(code), STATUS_RE.search(code)
+            if em or sm:
+                cands.append((k, "exit" if em else "status", (em or sm).start()))
+        site_rows = {k for k, _, _ in cands}
+        sites, unreasoned, markers_read = [], [], set()
+        for k, kind, pos in cands:
+            start = k
+            while start > 0 and rows[start][2]:
+                start -= 1
+            cls, sig, src = derive_refusal_reason(rows, start, k, pos, site_rows - {k})
+            if cls == "unreasoned":
+                unreasoned.append(k + 1)
+                continue
+            mk = read_arm_marker(rows, start, site_rows - {k})
+            if mk:
+                markers_read.add(mk[1])
+                if cls == "reasoned":
+                    errors.append(f"check-arms: {rel}:{mk[1]} carries an arm-signature marker above the "
+                                  f"REASONED site at line {k + 1}, whose signature is derived from its "
+                                  f"own message — a declared one beside it is two answers to one "
+                                  f"question; delete the marker")
+                elif len(mk[0]) < 12:
+                    errors.append(f"check-arms: {rel}:{mk[1]} carries an arm-signature marker shorter "
+                                  f"than 12 characters ({mk[0]!r}), too short to assert on")
+                else:
+                    sig, src = mk[0], mk[1]
+            sites.append({"gate": rel, "kind": kind, "line": k + 1, "cls": cls, "sig": sig,
+                          "src": src, "key_sig": sig or " ".join(rows[k][0].split())})
+        for j, r in enumerate(rows):
+            if not r[3] and MARKER_RE.match(r[0]) and not r[1].strip() and j + 1 not in markers_read:
+                errors.append(f"check-arms: {rel}:{j + 1} carries an arm-signature marker no delegated "
+                              f"site reads — its site was deleted or moved out of the block, and a "
+                              f"marker that outlives its site would arm nothing; delete or re-place it")
+        seen = {}
+        for s in sites:
+            key = (s["kind"], s["key_sig"])
+            seen[key] = seen.get(key, 0) + 1
+            s["occ"] = seen[key]
+        if sites or unreasoned:
+            out[rel] = {"sites": sites, "unreasoned": unreasoned}
+    return out, errors
+
+
+def parse_pin(root: str, m: str, graded: bool = False) -> tuple:
+    """-> (fail rows, refusal rows, refusal rows not read), from the central file AND every SIDECAR.
+
+    A fail row is (gate, check, ordinal, sig, line, file). A row whose second field is `exit` or
+    `status` is signature 2's, carries a fifth field, its REASON, and is returned as a dict — or, with
+    the switch off, is not read at all and only counted, which the OFF line reports.
 
     TOOL-aRepatriatedFork-18 S5. A pin for a SHIPPED gate is a fact about gov's bytes, so it travels
     with them: a tracked `unarmed-branches.txt` in any directory other than the central one pins the
@@ -235,7 +572,7 @@ def parse_pin(root: str, m: str) -> list:
     central = f"{m}/{PIN}"
     sidecars = sorted(p for p in run("git", "ls-files", cwd=root).split("\n")
                       if os.path.basename(p) == os.path.basename(PIN) and p != central)
-    rows = []
+    rows, rrows, unread = [], [], 0
     for label in [central] + sidecars:
         p = os.path.join(root, label)
         if not os.path.isfile(p):
@@ -245,13 +582,28 @@ def parse_pin(root: str, m: str) -> list:
             if not line.strip() or line.lstrip().startswith("#"):
                 continue
             parts = line.split("\t")
+            if len(parts) > 1 and parts[1].strip() in REFUSAL_KINDS:
+                if not graded:
+                    unread += 1
+                    continue
+                # The reason is the LAST field, so an empty one shifts nothing and is refused by name
+                # in cmd_check rather than read as absent.
+                if len(parts) != 5:
+                    raise Problem(f"{label}:{i}: a `{parts[1].strip()}` row takes 5 tab-separated fields "
+                                  f"(gate<TAB>kind<TAB>occurrence<TAB>signature<TAB>reason), got "
+                                  f"{len(parts)}")
+                gate = parts[0].strip()
+                rrows.append({"gate": f"{base}/{gate}" if base else gate, "kind": parts[1].strip(),
+                              "occ": parts[2].strip(), "sig": parts[3].strip(),
+                              "reason": parts[4].strip(), "line": i, "file": label})
+                continue
             if len(parts) != 4:
                 raise Problem(f"{label}:{i}: expected 4 tab-separated fields "
                               f"(gate<TAB>check<TAB>ordinal<TAB>signature), got {len(parts)}")
             gate = parts[0].strip()
             gate = f"{base}/{gate}" if base else gate
             rows.append((gate, parts[1].strip(), parts[2].strip(), parts[3].strip(), i, label))
-    return rows
+    return rows, rrows, unread
 
 
 def parse_floors(conf: dict) -> dict:
@@ -267,6 +619,7 @@ def parse_floors(conf: dict) -> dict:
 
 def classify(root: str, conf: dict, pairs=None) -> dict:
     m = conf["MEMORY_ROOT"]
+    graded = check_refusal_switch(conf)
     pairs = discover(root) if pairs is None else pairs
     brs, errors = [], []
     for gate_rel, test_rel in pairs:
@@ -303,8 +656,75 @@ def classify(root: str, conf: dict, pairs=None) -> dict:
                         b["stranded"] = (f, no)
                         break
         brs.extend(gb)
-    return {"branches": brs, "pinned": parse_pin(root, m), "errors": errors,
-            "pairs": pairs, "m": m}
+    pinned, rpinned, unread = parse_pin(root, m, graded)
+    # SIGNATURE 2 is scanned in BOTH states: the OFF line's count is that state's liveness assertion.
+    found, rerrors = scan_refusal_sites(root, m)
+    sites = [s for g in sorted(found) for s in found[g]["sites"]]
+    for gate_rel in sorted({s["gate"] for s in sites}):
+        test_rel = gate_rel[:-3] + ".test.sh"
+        numbered = []
+        for rel in (test_rel, test_rel[:-len(".test.sh")] + ".local.test.sh"):
+            if os.path.isfile(os.path.join(root, rel)):
+                numbered += [(rel, l) for _, l in armed_signatures(root, rel)]
+        for s in sites:
+            if s["gate"] == gate_rel:
+                s["test"] = test_rel
+                s["test_missing"] = not os.path.isfile(os.path.join(root, test_rel))
+                s["armed"] = next((f for f, l in numbered if s["sig"] and s["sig"] in l), None)
+    if graded:
+        errors.extend(rerrors)
+    gates = sorted({g for g, _ in pairs} | ({s["gate"] for s in sites} if graded else set()))
+    return {"branches": brs, "pinned": pinned, "errors": errors, "pairs": pairs, "m": m,
+            "graded": graded, "sites": sites, "rpinned": rpinned, "unread": unread,
+            "unreasoned": [(g, ln) for g in sorted(found) for ln in found[g]["unreasoned"]],
+            "rerrors": rerrors, "gates": gates}
+
+
+def check_refusal_sites(st: dict) -> tuple:
+    """-> (problems, waived lines, census line) for signature 2, under the switch ON."""
+    bad, waived, rkeys = [], [], {}
+    for r in st["rpinned"]:
+        key = (r["gate"], r["kind"], r["occ"], r["sig"])
+        if key in rkeys:
+            o = rkeys[key]
+            bad.append(f"check-arms: {r['file']}:{r['line']} pins {r['gate']} {r['kind']} site "
+                       f"{r['occ']}, which {o['file']}:{o['line']} already pins — a site is pinned in "
+                       f"exactly one file; delete one of the two rows")
+            continue
+        rkeys[key] = r
+        if r["reason"] in ("", REASON_OWED):
+            what = "an EMPTY reason" if not r["reason"] else f"the placeholder {REASON_OWED}"
+            bad.append(f"check-arms: {r['file']}:{r['line']} pins {r['gate']} {r['kind']} site "
+                       f"{r['occ']} with {what} — a waiver that prints no reason is a silent one; "
+                       f"write why no arm reaches it")
+    armed = 0
+    for s in st["sites"]:
+        r = rkeys.get((s["gate"], s["kind"], str(s["occ"]), s["key_sig"]))
+        if s["armed"]:
+            armed += 1
+            if r:
+                bad.append(f"check-arms: {r['file']}:{r['line']} pins {s['gate']} {s['kind']} site "
+                           f"{s['occ']}, which IS armed now — delete the row (the pin is shrink-only)")
+            continue
+        if r:
+            waived.append(f"check-arms: waived {s['gate']}:{s['line']} {s['kind']} — {r['reason']}")
+            continue
+        why = (f" — and {s['test']} is missing, so nothing can arm it" if s["test_missing"]
+               else " — an unmarked DELEGATED site: mark its block with `# arm-signature: <text its "
+                    "callee prints>` and assert that text, or pin it" if not s["sig"] else "")
+        bad.append(f"check-arms: {s['gate']}:{s['line']} {s['kind']} site ({s['cls']}) has no "
+                   f"POSITIVE assertion naming its own failure text ({s['key_sig']!r}) and is not "
+                   f"pinned in {st['m']}/{PIN} or a sidecar beside the gate{why}")
+    live = {(s["gate"], s["kind"], str(s["occ"]), s["key_sig"]) for s in st["sites"]}
+    for key, r in rkeys.items():
+        if key not in live:
+            bad.append(f"check-arms: {r['file']}:{r['line']} pins {r['gate']} {r['kind']} site "
+                       f"{r['occ']} ({r['sig']!r}), which no live site carries — the refusal was "
+                       f"deleted, reworded, or moved out of the population")
+    census = (f"check-arms: refusal signature — {len(st['sites'])} site(s) in "
+              f"{len({s['gate'] for s in st['sites']})} script(s): {armed} armed, {len(waived)} "
+              f"waived; {len(st['unreasoned'])} unreasoned line(s) not graded")
+    return bad, waived, census
 
 
 def cmd_check(root: str, conf: dict) -> int:
@@ -341,6 +761,18 @@ def cmd_check(root: str, conf: dict) -> int:
                        f"{b['num']} branch {b['ord']} with a stale signature — the message was reworded")
     live = {(b["gate"], str(b["num"]), str(b["ord"])) for b in brs}
     scanned = {g for g, _ in st["pairs"]}
+    graded = st["graded"]
+    sites = st["sites"] if graded else []
+    if graded:
+        rbad, waived, census = check_refusal_sites(st)
+        bad.extend(rbad)
+        for line in waived:
+            print(line)
+        print(census)
+    else:
+        print(f"check-arms: refusal signature OFF — ARMS_REFUSALS is not `graded`, so "
+              f"{len(st['sites'])} refusal site(s) outside fail() go ungraded and {st['unread']} pin "
+              f"row(s) of kind exit or status were not read")
     for r in pin_keys.values():
         if (r[0], r[1], r[2]) not in live:
             why = ("the gate is no longer in the population" if r[0] not in scanned
@@ -349,12 +781,14 @@ def cmd_check(root: str, conf: dict) -> int:
                        f"no longer exists — {why}")
     # PER-GATE floors. An aggregate would let one gate's deletion be masked by another's addition.
     floors = parse_floors(conf)
+    # Under the switch ON a script holding a refusal site is a gate too, and its floor counts sites.
+    floored = set(st["gates"])
     # NON-VACUITY. Both loops below draw their population from this mapping, so an empty or undeclared
     # `ARMS_FLOORS` leaves them iterating nothing and neither can fire. Refused ONLY when a gate is
     # actually discovered: a tree with no gate has nothing to floor. The remedy names this module by
     # its DERIVED path, never a literal prefix, because an adopter copies it verbatim.
-    if not floors and scanned:
-        bad.append(f"check-arms: ARMS_FLOORS is empty or undeclared while {len(scanned)} gate(s) are "
+    if not floors and floored:
+        bad.append(f"check-arms: ARMS_FLOORS is empty or undeclared while {len(floored)} gate(s) are "
                    f"discovered, so both floor arms have an EMPTY population and neither can fire — a "
                    f"gate leaving discovery would be silent. Declare it in .memory-tree.conf, measured "
                    f"against this tree: `python {kit_rel()}/check-arms.py --emit-floors`. A tree with "
@@ -367,19 +801,20 @@ def cmd_check(root: str, conf: dict) -> int:
     # this guard already (above) but only for a gate some pin ROW names, so for every other
     # discovered gate the floors are the only backstop there is.
     for gate_rel in sorted(floors):
-        if gate_rel not in scanned:
+        if gate_rel not in floored:
             bad.append(f"check-arms: ARMS_FLOORS names {gate_rel}, which is NOT in the discovered "
                        f"population — the gate was renamed, moved, or stopped matching the "
                        f"`fail() {{` + call-site predicate. Its branches and arms are no longer "
                        f"counted by anything; fix the gate or remove the floor in a commit that "
                        f"says why")
-    for gate_rel in sorted({b["gate"] for b in brs}):
-        gb = [b for b in brs if b["gate"] == gate_rel]
+    for gate_rel in sorted({b["gate"] for b in brs} | {s["gate"] for s in sites}):
+        gb = [b for b in brs if b["gate"] == gate_rel] + [s for s in sites if s["gate"] == gate_rel]
         want = floors.get(gate_rel)
         if not want:
             continue
         got = (len(gb), sum(1 for b in gb if b["armed"]))
-        for i, label in ((0, "fail branch(es)"), (1, "armed branch(es)")):
+        for i, label in ((0, "fail branch(es) and refusal site(s)" if graded else "fail branch(es)"),
+                         (1, "armed branch(es)")):
             if got[i] < want[i]:
                 bad.append(f"check-arms: {gate_rel} has {got[i]} {label} against a floor of "
                            f"{want[i]} (ARMS_FLOORS) — a guard or an assertion was removed; lower "
@@ -410,7 +845,23 @@ def cmd_report(root: str, conf: dict) -> int:
             print(f"      check {b['num']:>2} branch {b['ord']}  line {b['line']:>4}  "
                   f"{flag} {b['sig']}{tail}{src}")
     print(f"pinned rows   : {len(st['pinned'])}")
-    for e in st["errors"]:
+    # SIGNATURE 2, in both states. `from` is the line the signature was READ from — a reasoned site's
+    # print, a delegated site's marker — and is the only defence against a walk's false association.
+    rpin = {(r["gate"], r["kind"], r["occ"], r["sig"]): r["file"] for r in st["rpinned"]}
+    print(f"refusal signature {'graded' if st['graded'] else 'OFF'} — {len(st['sites'])} site(s)")
+    for gate_rel in sorted({s["gate"] for s in st["sites"]}):
+        gs = [s for s in st["sites"] if s["gate"] == gate_rel]
+        print(f"{gate_rel}  ->  {gs[0]['test']}{'  (missing)' if gs[0]['test_missing'] else ''}")
+        for s in gs:
+            pin = rpin.get((s["gate"], s["kind"], str(s["occ"]), s["key_sig"]))
+            flag = "ARMED " if s["armed"] else "WAIVED" if pin else "      "
+            src = f"  by {s['armed']}" if s["armed"] else f"  in {pin}" if pin else ""
+            print(f"      {s['kind']:<6} site {s['occ']}  line {s['line']:>5}  {flag} {s['cls']:<9} "
+                  f"from {s['src']:>5}  {s['key_sig']}{src}")
+    for gate_rel, ln in st["unreasoned"]:
+        print(f"UNREASONED {gate_rel}:{ln}")
+    print(f"refusal pin rows : {len(st['rpinned'])} read, {st['unread']} not read")
+    for e in st["errors"] + ([] if st["graded"] else st["rerrors"]):
         print("ERROR " + e)
     return 0
 
@@ -422,10 +873,16 @@ def cmd_emit_pin(root: str, conf: dict) -> int:
     print("# failure text. SHRINK-ONLY: a row leaves when its branch gains an arm, and check-arms")
     print("# reds if a pinned branch is armed, if a pinned branch or its gate disappears, or if a")
     print("# message is reworded out from under its signature.")
-    print("# Fields: gate<TAB>check<TAB>ordinal<TAB>signature.")
+    print("# Fields: gate<TAB>check<TAB>ordinal<TAB>signature, and under ARMS_REFUSALS=\"graded\"")
+    print("# gate<TAB>exit|status<TAB>occurrence<TAB>signature<TAB>reason for a refusal site.")
     for b in st["branches"]:
         if not b["armed"]:
             print(f"{b['gate']}\t{b['num']}\t{b['ord']}\t{b['sig']}")
+    if st["graded"]:
+        # The reason is OWED, never guessed: the gate refuses this placeholder until a person writes it.
+        for s in st["sites"]:
+            if not s["armed"]:
+                print(f"{s['gate']}\t{s['kind']}\t{s['occ']}\t{s['key_sig']}\t{REASON_OWED}")
     return 0
 
 
@@ -438,11 +895,13 @@ def cmd_emit_floors(root: str, conf: dict) -> int:
     """
     st = classify(root, conf)
     toks = []
-    for gate_rel, _ in st["pairs"]:
-        gb = [b for b in st["branches"] if b["gate"] == gate_rel]
+    sites = st["sites"] if st["graded"] else []
+    for gate_rel in st["gates"]:
+        gb = ([b for b in st["branches"] if b["gate"] == gate_rel]
+              + [s for s in sites if s["gate"] == gate_rel])
         toks.append(f"{gate_rel}:{len(gb)}:{sum(1 for b in gb if b['armed'])}")
     print('ARMS_FLOORS="' + " ".join(toks) + '"')
-    if not st["pairs"]:
+    if not st["gates"]:
         # A skip announces itself: an empty emission is a declaration of nothing, and pasting it
         # would floor nothing while LOOKING like a declaration.
         print("check-arms: no gate is discovered in this tree, so the line above is EMPTY and floors "
@@ -776,6 +1235,134 @@ def cmd_selftest() -> int:
         arm("S6: without the local suite the same branch is named unarmed",
             f"{PFX}kit/g.sh:3 check 2 branch 1 has no POSITIVE",
             lambda: cmd_check(side, sconf))
+
+        # SIGNATURE 2 (TOOL-aGraftedHelix-47). Every arm builds its own tree, with the switch set as
+        # its label says, so no arm can pass on a sibling's fixture.
+        G, T = f"{PFX}kit/adopt.sh", f"{PFX}kit/adopt.test.sh"
+        PINF = os.path.join("memory", "project", "unarmed-branches.txt")
+
+        def build_refusal_tree(name, files, refusals="graded", floors=""):
+            t = os.path.join(base, name)
+            os.makedirs(t)
+            run("git", "init", "-q", ".", cwd=t)
+            run("git", "config", "user.email", "t@t.test", cwd=t)
+            run("git", "config", "user.name", "t", cwd=t)
+            _w(os.path.join(t, ".memory-tree.conf"), f'MEMORY_ROOT=memory\nARMS_REFUSALS="{refusals}"\n'
+               f'ARMS_FLOORS="{floors}"\n')
+            _w(os.path.join(t, "memory", "project", ".keep"), "")
+            for rel, text in files.items():
+                _w(os.path.join(t, rel), text)
+            run("git", "add", "-A", cwd=t)
+            run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=t)
+            return t, load_conf(t)
+
+        def run_check_text(t, c):
+            sink = []
+            _capture(cmd_check, t, c, sink)
+            return "\n".join(sink)
+
+        def scan_one(t):
+            return scan_refusal_sites(t, "memory")[0].get(G, {"sites": [], "unreasoned": []})
+
+        one = '[ -n "$X" ] || { echo "adopt: a one-line refusal with its reason"; exit 1; }\n'
+        t1, c1 = build_refusal_tree("r1", {G: one, T: 'hit "$o" "adopt: a one-line refusal with its reason"\n'},
+                                    floors=f"{G}:1:1")
+        arm("S1: a script with no fail() helper is discovered by a reasoned exit 1",
+            "refusal signature — 1 site(s) in 1 script(s): 1 armed, 0 waived; 0 unreasoned line(s) "
+            "not graded\n[rc=0]", lambda: cmd_check(t1, c1))
+        t2, _c2 = build_refusal_tree("r2", {G: 'if [ ! -f "$CONF" ]; then\n'
+                                            '  echo "adopt: the topmost line of the block is the reason"\n'
+                                            '  echo "  remedy: a second line that is not the reason"\n'
+                                            '  exit 1\nfi\n'})
+        arm("S1: a multi-line block's reason is its topmost print", "[rc=0]",
+            lambda: 0 if [(s["cls"], s["sig"], s["src"]) for s in scan_one(t2)["sites"]]
+            == [("reasoned", "adopt: the topmost line of the block is the reason", 2)] else 1)
+        cap3 = ('if ! out=$(python3 mod.py 2>&1); then\n  # arm-signature: and the module said no here\n'
+                "  printf '%s\\n' \"$out\"; status=1\nfi\n")
+        t3, c3 = build_refusal_tree("r3", {G: cap3, T: 'hit "$o" "and the module said no here"\n'},
+                                    floors=f"{G}:1:1")
+        arm("S1: a capture-print status=1 is a delegated site signed by its marker", "[rc=0]",
+            lambda: 0 if [(s["kind"], s["cls"], s["sig"]) for s in scan_one(t3)["sites"]]
+            == [("status", "delegated", "and the module said no here")]
+            and "1 armed, 0 waived" in run_check_text(t3, c3) else 1)
+        t4, _c4 = build_refusal_tree("r4", {G: '  echo "adopt: a message above the command here"\n'
+                                            '  write_skill || exit 1\n'})
+        arm("S1: a command-conditioned exit 1 is delegated, not reasoned", "[rc=0]",
+            lambda: 0 if [(s["cls"], s["sig"], s["key_sig"]) for s in scan_one(t4)["sites"]]
+            == [("delegated", None, "write_skill || exit 1")] else 1)
+        t5, _c5 = build_refusal_tree("r5", {G: 'if [ -z "$X" ]; then\n  exit 1\nfi\n'})
+        arm("S1: an exit 1 whose block prints nothing is counted unreasoned, not a site", "[rc=0]",
+            lambda: 0 if scan_one(t5) == {"sites": [], "unreasoned": [2]} else 1)
+        t6, _c6 = build_refusal_tree("r6", {G: 'echo "never exit 1 here, it is quoted"\n'
+                                            "# exit 1 in a comment\ncat <<EOF\nexit 1\nstatus=1\nEOF\n"
+                                            "x=1  # status=1 in a trailing comment\n"
+                                            "msg='a single-quoted exit 1'\n"})
+        arm("S1: exit 1 inside quotes, a comment or a here-document body is not a site", "[rc=0]",
+            lambda: 0 if scan_one(t6) == {"sites": [], "unreasoned": []} else 1)
+        t7, _c7 = build_refusal_tree("r7", {f"{PFX}kit/z.test.sh": one,
+                                            os.path.join("memory", "builds", "x", "repro.sh"): one})
+        arm("S1: a *.test.sh and a script under the memory root are not discovered", "[rc=0]",
+            lambda: 0 if scan_refusal_sites(t7, "memory") == ({}, []) else 1)
+        t8, _c8 = build_refusal_tree("r8", {G: HELPER + '[ -n "$a" ] && { fail 1 "alpha branch message '
+                                            'here"; exit 1; }\n'})
+        arm("S1: a line carrying a fail call is signature 1's alone", "[rc=0]",
+            lambda: 0 if scan_one(t8) == {"sites": [], "unreasoned": []} else 1)
+        t9, c9 = build_refusal_tree("r9", {G: "# arm-signature: a declared text beside a derived one\n"
+                                           '[ -n "$X" ] || { echo "adopt: a reasoned refusal message here"; '
+                                           "exit 1; }\n"})
+        arm("S1: a marker on a reasoned site is refused",
+            f"{G}:1 carries an arm-signature marker above the REASONED site at line 2",
+            lambda: cmd_check(t9, c9))
+        t10, c10 = build_refusal_tree("r10", {G: "# arm-signature: a marker with no site below it\n"
+                                              'echo "nothing refuses here"\n'})
+        arm("S1: a marker no delegated site reads is refused",
+            f"{G}:1 carries an arm-signature marker no delegated site reads", lambda: cmd_check(t10, c10))
+
+        lone = '[ -n "$X" ] || { echo "adopt: a refusal no fixture stages"; exit 1; }\n'
+        row = f"{G}\texit\t1\tadopt: a refusal no fixture stages\t"
+        t11, c11 = build_refusal_tree("r11", {G: lone, T: "# no arm\n", PINF: row + "no fixture stages X\n"},
+                                      floors=f"{G}:1:0")
+        arm("S2: a waived row prints its reason", "[rc=0]",
+            lambda: 0 if f"check-arms: waived {G}:1 exit — no fixture stages X" in run_check_text(t11, c11)
+            and cmd_check(t11, c11) == 0 else 1)
+        t12, c12 = build_refusal_tree("r12", {G: lone, T: "# no arm\n", PINF: row + "\n"},
+                                      floors=f"{G}:1:0")
+
+        def check_owed_refused():
+            first = "with an EMPTY reason" in run_check_text(t12, c12)
+            _w(os.path.join(t12, PINF), row + REASON_OWED + "\n")
+            return 0 if first and f"with the placeholder {REASON_OWED}" in run_check_text(t12, c12) else 1
+        arm("S2: an exit row with an empty reason is refused, and so is REASON-OWED", "[rc=0]",
+            check_owed_refused)
+        t13, c13 = build_refusal_tree("r13", {G: lone, T: 'hit "$o" "adopt: an inserted armed refusal"\n',
+                                              PINF: row + "no fixture stages X\n"}, floors=f"{G}:2:1")
+
+        def check_insert_keeps_key():
+            _w(os.path.join(t13, G), '[ -f "$Y" ] || { echo "adopt: an inserted armed refusal"; exit 1; }\n'
+               + lone)
+            return cmd_check(t13, c13)
+        arm("S2: a refusal inserted above a pinned site does not re-key its row", None,
+            check_insert_keeps_key)
+        NT = f"{PFX}kit/notest.sh"
+        t14, c14 = build_refusal_tree("r14", {NT: lone, PINF: row.replace(G, NT) + "no suite exists\n"},
+                                      floors=f"{NT}:1:0")
+
+        def check_testless():
+            clean = cmd_check(t14, c14) == 0
+            _w(os.path.join(t14, NT), lone + '[ -f "$Y" ] || { echo "adopt: a second refusal unpinned"; '
+               "exit 1; }\n")
+            return 0 if clean and f"{PFX}kit/notest.test.sh is missing, so nothing can arm it" \
+                in run_check_text(t14, c14) else 1
+        arm("S2: a test-less script passes with every site pinned, and one unpinned site names the "
+            "missing test", "[rc=0]", check_testless)
+        t15, c15 = build_refusal_tree("r15", {G: lone, PINF: f"{G}\texit\t1\tonly four fields\n"},
+                                      refusals="")
+        arm("S3: the switch off grades no site, reads no exit row, and prints the OFF line",
+            "so 1 refusal site(s) outside fail() go ungraded and 1 pin row(s) of kind exit or status "
+            "were not read\n[rc=0]", lambda: cmd_check(t15, c15))
+        t16, c16 = build_refusal_tree("r16", {G: lone}, refusals="yes")
+        arm("S7: a switch value other than blank or graded is refused by name",
+            "ARMS_REFUSALS is 'yes'", lambda: cmd_check(t16, c16))
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")

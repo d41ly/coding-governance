@@ -1,6 +1,6 @@
 # Run record
 
-**Serves:** journal TOOL-aGraftedHelix-29..41
+**Serves:** journal TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-29..41 TOOL-aGraftedHelix-45..47
 
 Rendered from the run model by the runlog kit's `record` command. Every value below is drawn from a closed schema, so no line carries free text. Re-render it rather than edit it.
 
@@ -11,28 +11,28 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 - start: b9bb22c36a189968184ed2359181cac601b842f8
 - phase: VERIFYING
 - terminal: no
-- window: 2026-10-05T17:04:37Z to 2026-10-06T22:21:58Z
+- window: 2026-10-05T17:04:37Z to 2026-10-07T01:28:39Z
 - window opened by: git
 - window closed by: last-activity
-- duration: 105441s
-- own commits: 47
-- last own commit: a9fd99db9e4ae567e27aaaa2e7c423a63b368a21
+- duration: 116642s
+- own commits: 62
+- last own commit: 85313733ec9acce7ac17fa66a4d068357f6032ec
 - merged: no
-- units served: 13
+- units served: 17
 - sources present: 7 of 7
-- owner turns: launch 1 · pre-run 4 · in-window 9 · post-close 0
-- usage main: requests 293 · in 648 · out 217362 · cache-read 119657232 · cache-write 3580384
+- owner turns: launch 2 · pre-run 7 · in-window 16 · post-close 0
+- usage main: requests 901 · in 2006 · out 573265 · cache-read 479599578 · cache-write 6985332
 - usage agent: requests 0 · in 0 · out 0 · cache-read 0 · cache-write 0
-- usage workflow: requests 4344 · in 8688 · out 4167383 · cache-read 1256370107 · cache-write 23684059
-- attributed calls: 4031 of 5178
+- usage workflow: requests 8627 · in 17258 · out 7500833 · cache-read 2027929754 · cache-write 45395442
+- attributed calls: 4685 of 10611
 - values withheld: 0
-- commitment: sha256 97b2aea5e8c44c42c1ab486c5b228576b0b5396b4a87d2838564911e93f02f4a · lines 326
+- commitment: sha256 83d56aba4727675aaf0e858d0cf778eae4b45a913ada64abcaaec45eba409f9c · lines 486
 
 ## Timeline
 
-- events: 85 · shown 60 · elided 25
-- elided: 25 events from 2026-10-05T21:30:28Z to 2026-10-06T05:08:51Z
-- withheld rows: verb 123 · push 40 · push-refused 0 · gate 0 · compact 1 · limit 3 · idle 0 · workflow 23
+- events: 115 · shown 60 · elided 55
+- elided: 55 events from 2026-10-05T21:30:28Z to 2026-10-06T21:39:40Z
+- withheld rows: verb 186 · push 56 · push-refused 0 · gate 2 · compact 2 · limit 3 · idle 0 · workflow 81
 
 | UTC | source | event | value | phase | rc | more |
 |---|---|---|---|---|---|---|
@@ -69,69 +69,69 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 | UTC | source | event | value | phase | rc | more |
 |---|---|---|---|---|---|---|
-| 2026-10-06T05:13:18Z | git | commit | 897f1ecf42be | - | - | TOOL-aGraftedHelix-37 |
-| 2026-10-06T05:16:49Z | git | commit | 071c32bce76b | - | - | TOOL-aGraftedHelix-37 |
-| 2026-10-06T05:19:15Z | run-state | phase | 071c32bce76b | VERIFYING | - | - |
-| 2026-10-06T10:57:31Z | git | commit | 7db5d7a8b2d5 | - | - | TOOL-aGraftedHelix-38 |
-| 2026-10-06T10:58:56Z | run-state | brief | TOOL-aGraftedHelix-38 | - | - | - |
-| 2026-10-06T10:59:44Z | run-state | dispatch | TOOL-aGraftedHelix-38 | - | - | - |
-| 2026-10-06T11:06:45Z | run-state | dispatch | TOOL-aGraftedHelix-38 | - | - | - |
-| 2026-10-06T11:17:04Z | git | commit | 333160ad3655 | - | - | TOOL-aGraftedHelix-38 |
-| 2026-10-06T11:30:24Z | run-state | dispatch | TOOL-aGraftedHelix-38 | - | - | - |
-| 2026-10-06T11:30:30Z | git | commit | bc3f3ab0cb01 | - | - | TOOL-aGraftedHelix-38 |
-| 2026-10-06T11:43:58Z | git | commit | 693c58df808c | - | - | TOOL-aGraftedHelix-38 |
-| 2026-10-06T12:12:18Z | git | commit | b32773b58e73 | - | - | TOOL-aGraftedHelix-39 |
-| 2026-10-06T12:13:45Z | run-state | brief | TOOL-aGraftedHelix-39 | - | - | - |
-| 2026-10-06T12:14:27Z | run-state | dispatch | TOOL-aGraftedHelix-39 | - | - | - |
-| 2026-10-06T12:20:34Z | run-state | dispatch | TOOL-aGraftedHelix-39 | - | - | - |
-| 2026-10-06T12:51:39Z | git | commit | 838bb8238356 | - | - | TOOL-aGraftedHelix-39 |
-| 2026-10-06T12:54:43Z | git | commit | b04ab0da05b7 | - | - | TOOL-aGraftedHelix-39 |
-| 2026-10-06T19:48:38Z | git | commit | 9323a3ef55d1 | - | - | TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 |
-| 2026-10-06T20:00:45Z | run-state | brief | TOOL-aGraftedHelix-40 | - | - | - |
-| 2026-10-06T20:02:11Z | run-state | dispatch | TOOL-aGraftedHelix-40 | - | - | - |
-| 2026-10-06T20:05:15Z | run-state | dispatch | TOOL-aGraftedHelix-40 | - | - | - |
-| 2026-10-06T20:15:23Z | git | merge | c849b65e10e9 | - | - | - |
-| 2026-10-06T20:20:56Z | git | commit | d6d50bf0f00f | - | - | TOOL-aGraftedHelix-40 |
-| 2026-10-06T20:26:14Z | git | commit | 62dc8a6c5346 | - | - | TOOL-aGraftedHelix-40 |
-| 2026-10-06T20:28:39Z | run-state | brief | TOOL-aGraftedHelix-41 | - | - | - |
-| 2026-10-06T20:30:05Z | run-state | dispatch | TOOL-aGraftedHelix-41 | - | - | - |
-| 2026-10-06T21:31:37Z | git | commit | 183047ecbbfd | - | - | TOOL-aGraftedHelix-41 |
-| 2026-10-06T21:37:23Z | run-state | dispatch | TOOL-aGraftedHelix-41 | - | - | - |
-| 2026-10-06T21:39:40Z | git | commit | a0aa627ecfde | - | - | TOOL-aGraftedHelix-41 |
 | 2026-10-06T22:17:17Z | git | commit | a9fd99db9e4a | - | - | TOOL-aGraftedHelix-41 |
+| 2026-10-06T22:22:56Z | git | merge | d9ed9da3dc76 | - | - | - |
+| 2026-10-06T22:29:59Z | git | merge | 1e027341830e | - | - | - |
+| 2026-10-06T22:34:53Z | run-state | phase | fff8b6422bdb | HELD | - | - |
+| 2026-10-06T22:41:41Z | run-state | phase | e1f4d8c0c6ab | VERIFYING | - | - |
+| 2026-10-06T23:11:57Z | git | commit | e5e035fa7abe | - | - | TOOL-aGraftedHelix-45 TOOL-aGraftedHelix-46 TOOL-aGraftedHelix-47 |
+| 2026-10-06T23:15:03Z | run-state | brief | TOOL-aGraftedHelix-45 | - | - | - |
+| 2026-10-06T23:16:34Z | git | commit | fe49f33d088e | - | - | TOOL-aGraftedHelix-46 |
+| 2026-10-06T23:23:45Z | run-state | dispatch | TOOL-aGraftedHelix-45 | - | - | - |
+| 2026-10-06T23:37:29Z | run-state | dispatch | TOOL-aGraftedHelix-45 | - | - | - |
+| 2026-10-06T23:48:13Z | git | commit | 764b6d8cece5 | - | - | TOOL-aGraftedHelix-45 |
+| 2026-10-06T23:56:35Z | git | commit | 4f3270dd624e | - | - | TOOL-aGraftedHelix-45 |
+| 2026-10-07T00:05:04Z | git | commit | 928281475211 | - | - | TOOL-aGraftedHelix-45 |
+| 2026-10-07T00:11:17Z | run-state | dispatch | TOOL-aGraftedHelix-45 | - | - | - |
+| 2026-10-07T00:12:12Z | git | commit | bf3f684805c7 | - | - | TOOL-aGraftedHelix-45 |
+| 2026-10-07T00:15:08Z | git | commit | afb3574e83a4 | - | - | TOOL-aGraftedHelix-45 |
+| 2026-10-07T00:22:39Z | git | commit | 3bad769b9d1b | - | - | TOOL-aGraftedHelix-3 |
+| 2026-10-07T00:24:43Z | run-state | brief | TOOL-aGraftedHelix-46 | - | - | - |
+| 2026-10-07T00:26:45Z | run-state | dispatch | TOOL-aGraftedHelix-46 | - | - | - |
+| 2026-10-07T00:30:52Z | git | commit | c39267032007 | - | - | TOOL-aGraftedHelix-46 |
+| 2026-10-07T00:36:16Z | git | commit | a28075622590 | - | - | TOOL-aGraftedHelix-46 |
+| 2026-10-07T00:40:46Z | git | commit | 4fc54f774822 | - | - | TOOL-aGraftedHelix-46 |
+| 2026-10-07T00:43:11Z | run-state | brief | TOOL-aGraftedHelix-47 | - | - | - |
+| 2026-10-07T00:45:41Z | run-state | dispatch | TOOL-aGraftedHelix-47 | - | - | - |
+| 2026-10-07T00:53:28Z | run-state | dispatch | TOOL-aGraftedHelix-47 | - | - | - |
+| 2026-10-07T01:22:55Z | run-state | dispatch | TOOL-aGraftedHelix-47 | - | - | - |
+| 2026-10-07T01:28:39Z | git | commit | 7d7e957493fc | - | - | TOOL-aGraftedHelix-47 |
+| 2026-10-07T01:32:01Z | git | commit | 311cd19af92c | - | - | TOOL-aGraftedHelix-47 |
+| 2026-10-07T01:37:46Z | git | commit | 9fcb70037c78 | - | - | TOOL-aGraftedHelix-47 |
+| 2026-10-07T01:54:00Z | git | commit | 85313733ec9a | - | - | TOOL-aGraftedHelix-47 |
 
 ## Units
 
-- units: 41 · shown 0 · aggregated yes
+- units: 44 · shown 0 · aggregated yes
 
 | # | status | units |
 |---|---|---|
-| 1 | CLOSED | 41 |
+| 1 | CLOSED | 44 |
 
 ## Decisions
 
-- entries: 132 · shown 0 · aggregated yes
+- entries: 154 · shown 0 · aggregated yes
 - trailer near-misses: 0
 - decision-log rows the owner's: 0
-- spec marks: owner-before 0 · owner-inside 1 · agent-before 35 · agent-inside 44
-- excluded rows: proposal 0 · rescope 13 · dispatch 19 · review 1 · brief 13 · hold 0 · resume 0
+- spec marks: owner-before 0 · owner-inside 1 · agent-before 35 · agent-inside 49
+- excluded rows: proposal 0 · rescope 16 · dispatch 26 · review 1 · brief 16 · hold 1 · resume 1
 - review rounds: 1 · shown 1 · aggregated no
 
 | # | source | entries |
 |---|---|---|
-| 1 | decision | 2 |
+| 1 | decision | 4 |
 | 2 | abort | 0 |
 | 3 | override | 0 |
 | 4 | waiver | 0 |
-| 5 | handoff | 0 |
+| 5 | handoff | 1 |
 | 6 | rescope-retire | 0 |
 | 7 | rescope-supersede | 0 |
 | 8 | rescope-defer | 0 |
 | 9 | review | 1 |
-| 10 | trailer | 47 |
-| 11 | spec-mark | 80 |
+| 10 | trailer | 60 |
+| 11 | spec-mark | 85 |
 | 12 | decision-log | 0 |
-| 13 | ledger | 2 |
+| 13 | ledger | 3 |
 
 | # | UTC | verdict | blockers | exit |
 |---|---|---|---|---|
@@ -139,7 +139,7 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 ## Conformance
 
-- items: 17 · shown 17 · aggregated no
+- items: 20 · shown 20 · aggregated no
 
 | # | item | unit | state |
 |---|---|---|---|
@@ -156,42 +156,39 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | 11 | brief-before-build | TOOL-aGraftedHelix-39 | MET |
 | 12 | brief-before-build | TOOL-aGraftedHelix-40 | MET |
 | 13 | brief-before-build | TOOL-aGraftedHelix-41 | MET |
-| 14 | phases-walked | - | UNJUDGEABLE |
-| 15 | green-at-close | - | UNJUDGEABLE |
-| 16 | keepalive-reaped | - | MET |
-| 17 | review-exited | - | MET |
+| 14 | brief-before-build | TOOL-aGraftedHelix-45 | MET |
+| 15 | brief-before-build | TOOL-aGraftedHelix-46 | MET |
+| 16 | brief-before-build | TOOL-aGraftedHelix-47 | MET |
+| 17 | phases-walked | - | UNJUDGEABLE |
+| 18 | green-at-close | - | UNJUDGEABLE |
+| 19 | keepalive-reaped | - | MET |
+| 20 | review-exited | - | MET |
 
 ## Anomalies
 
-- anomalies: 10 · shown 10 · aggregated no
+- anomalies: 43 · shown 0 · aggregated yes
 
-| # | kind | subclass |
-|---|---|---|
-| 1 | out-of-band-edit | - |
-| 2 | refusal-loop | - |
-| 3 | destructive-git | - |
-| 4 | destructive-git | - |
-| 5 | destructive-git | - |
-| 6 | destructive-git | - |
-| 7 | destructive-git | - |
-| 8 | destructive-git | - |
-| 9 | destructive-git | - |
-| 10 | destructive-git | - |
+| # | kind | subclass | count |
+|---|---|---|---|
+| 1 | out-of-band-edit | - | 1 |
+| 2 | refusal-loop | - | 1 |
+| 3 | destructive-git | - | 32 |
+| 4 | multi-run-session | - | 9 |
 
 ## Coverage
 
 - journal starts: 2 joined of 3 record-creating
 - unjoined starts: 1
-- sessions: 1 named · 1 extracted
-- idle gaps: judged yes · near an owner turn 1
+- sessions: 2 named · 2 extracted
+- idle gaps: judged yes · near an owner turn 0
 - anomaly kinds: judged 12 of 12
 
 | # | source | state | lines | bad |
 |---|---|---|---|---|
 | 1 | run-state | present | - | - |
-| 2 | driver | present | 246 | 0 |
-| 3 | gates | present | 0 | 0 |
-| 4 | pushes | present | 40 | 0 |
+| 2 | driver | present | 372 | 0 |
+| 3 | gates | present | 2 | 0 |
+| 4 | pushes | present | 56 | 0 |
 | 5 | git | present | - | - |
 | 6 | transcripts | present | - | - |
 | 7 | build-folder | present | - | - |
@@ -200,8 +197,8 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 ```json
 {"schema":1,"sections":{
-"Summary":{"facts":{"run-state":"memory/builds/aGraftedHelix/RUN.md","run":"2 of 2","start":"b9bb22c36a189968184ed2359181cac601b842f8","phase":"VERIFYING","terminal":"no","window":"2026-10-05T17:04:37Z to 2026-10-06T22:21:58Z","window opened by":"git","window closed by":"last-activity","duration":"105441s","own commits":"47","last own commit":"a9fd99db9e4ae567e27aaaa2e7c423a63b368a21","merged":"no","units served":"13","sources present":"7 of 7","owner turns":"launch 1 · pre-run 4 · in-window 9 · post-close 0","usage main":"requests 293 · in 648 · out 217362 · cache-read 119657232 · cache-write 3580384","usage agent":"requests 0 · in 0 · out 0 · cache-read 0 · cache-write 0","usage workflow":"requests 4344 · in 8688 · out 4167383 · cache-read 1256370107 · cache-write 23684059","attributed calls":"4031 of 5178","values withheld":"0","commitment":"sha256 97b2aea5e8c44c42c1ab486c5b228576b0b5396b4a87d2838564911e93f02f4a · lines 326"},"tables":[]},
-"Timeline":{"facts":{"events":"85 · shown 60 · elided 25","elided":"25 events from 2026-10-05T21:30:28Z to 2026-10-06T05:08:51Z","withheld rows":"verb 123 · push 40 · push-refused 0 · gate 0 · compact 1 · limit 3 · idle 0 · workflow 23"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
+"Summary":{"facts":{"run-state":"memory/builds/aGraftedHelix/RUN.md","run":"2 of 2","start":"b9bb22c36a189968184ed2359181cac601b842f8","phase":"VERIFYING","terminal":"no","window":"2026-10-05T17:04:37Z to 2026-10-07T01:28:39Z","window opened by":"git","window closed by":"last-activity","duration":"116642s","own commits":"62","last own commit":"85313733ec9acce7ac17fa66a4d068357f6032ec","merged":"no","units served":"17","sources present":"7 of 7","owner turns":"launch 2 · pre-run 7 · in-window 16 · post-close 0","usage main":"requests 901 · in 2006 · out 573265 · cache-read 479599578 · cache-write 6985332","usage agent":"requests 0 · in 0 · out 0 · cache-read 0 · cache-write 0","usage workflow":"requests 8627 · in 17258 · out 7500833 · cache-read 2027929754 · cache-write 45395442","attributed calls":"4685 of 10611","values withheld":"0","commitment":"sha256 83d56aba4727675aaf0e858d0cf778eae4b45a913ada64abcaaec45eba409f9c · lines 486"},"tables":[]},
+"Timeline":{"facts":{"events":"115 · shown 60 · elided 55","elided":"55 events from 2026-10-05T21:30:28Z to 2026-10-06T21:39:40Z","withheld rows":"verb 186 · push 56 · push-refused 0 · gate 2 · compact 2 · limit 3 · idle 0 · workflow 81"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
 ["2026-10-05T17:04:37Z","run-state","phase","018b5675727d","RUNNING","-","-"],
 ["2026-10-05T17:05:33Z","run-state","phase","b9bb22c36a18","SPECCING","-","-"],
 ["2026-10-05T17:38:58Z","git","commit","43bdf3aef8c1","-","-","TOOL-aGraftedHelix-29"],
@@ -233,55 +230,55 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["2026-10-05T21:25:51Z","git","commit","843d5c0b3495","-","-","TOOL-aGraftedHelix-33"],
 ["2026-10-05T21:27:13Z","git","commit","4b21bbd7a885","-","-","TOOL-aGraftedHelix-33"]]},
 {"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
-["2026-10-06T05:13:18Z","git","commit","897f1ecf42be","-","-","TOOL-aGraftedHelix-37"],
-["2026-10-06T05:16:49Z","git","commit","071c32bce76b","-","-","TOOL-aGraftedHelix-37"],
-["2026-10-06T05:19:15Z","run-state","phase","071c32bce76b","VERIFYING","-","-"],
-["2026-10-06T10:57:31Z","git","commit","7db5d7a8b2d5","-","-","TOOL-aGraftedHelix-38"],
-["2026-10-06T10:58:56Z","run-state","brief","TOOL-aGraftedHelix-38","-","-","-"],
-["2026-10-06T10:59:44Z","run-state","dispatch","TOOL-aGraftedHelix-38","-","-","-"],
-["2026-10-06T11:06:45Z","run-state","dispatch","TOOL-aGraftedHelix-38","-","-","-"],
-["2026-10-06T11:17:04Z","git","commit","333160ad3655","-","-","TOOL-aGraftedHelix-38"],
-["2026-10-06T11:30:24Z","run-state","dispatch","TOOL-aGraftedHelix-38","-","-","-"],
-["2026-10-06T11:30:30Z","git","commit","bc3f3ab0cb01","-","-","TOOL-aGraftedHelix-38"],
-["2026-10-06T11:43:58Z","git","commit","693c58df808c","-","-","TOOL-aGraftedHelix-38"],
-["2026-10-06T12:12:18Z","git","commit","b32773b58e73","-","-","TOOL-aGraftedHelix-39"],
-["2026-10-06T12:13:45Z","run-state","brief","TOOL-aGraftedHelix-39","-","-","-"],
-["2026-10-06T12:14:27Z","run-state","dispatch","TOOL-aGraftedHelix-39","-","-","-"],
-["2026-10-06T12:20:34Z","run-state","dispatch","TOOL-aGraftedHelix-39","-","-","-"],
-["2026-10-06T12:51:39Z","git","commit","838bb8238356","-","-","TOOL-aGraftedHelix-39"],
-["2026-10-06T12:54:43Z","git","commit","b04ab0da05b7","-","-","TOOL-aGraftedHelix-39"],
-["2026-10-06T19:48:38Z","git","commit","9323a3ef55d1","-","-","TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41"],
-["2026-10-06T20:00:45Z","run-state","brief","TOOL-aGraftedHelix-40","-","-","-"],
-["2026-10-06T20:02:11Z","run-state","dispatch","TOOL-aGraftedHelix-40","-","-","-"],
-["2026-10-06T20:05:15Z","run-state","dispatch","TOOL-aGraftedHelix-40","-","-","-"],
-["2026-10-06T20:15:23Z","git","merge","c849b65e10e9","-","-","-"],
-["2026-10-06T20:20:56Z","git","commit","d6d50bf0f00f","-","-","TOOL-aGraftedHelix-40"],
-["2026-10-06T20:26:14Z","git","commit","62dc8a6c5346","-","-","TOOL-aGraftedHelix-40"],
-["2026-10-06T20:28:39Z","run-state","brief","TOOL-aGraftedHelix-41","-","-","-"],
-["2026-10-06T20:30:05Z","run-state","dispatch","TOOL-aGraftedHelix-41","-","-","-"],
-["2026-10-06T21:31:37Z","git","commit","183047ecbbfd","-","-","TOOL-aGraftedHelix-41"],
-["2026-10-06T21:37:23Z","run-state","dispatch","TOOL-aGraftedHelix-41","-","-","-"],
-["2026-10-06T21:39:40Z","git","commit","a0aa627ecfde","-","-","TOOL-aGraftedHelix-41"],
-["2026-10-06T22:17:17Z","git","commit","a9fd99db9e4a","-","-","TOOL-aGraftedHelix-41"]]}]},
-"Units":{"facts":{"units":"41 · shown 0 · aggregated yes"},"tables":[{"name":"by-status","header":["#","status","units"],"rows":[
-["1","CLOSED","41"]]}]},
-"Decisions":{"facts":{"entries":"132 · shown 0 · aggregated yes","trailer near-misses":"0","decision-log rows the owner's":"0","spec marks":"owner-before 0 · owner-inside 1 · agent-before 35 · agent-inside 44","excluded rows":"proposal 0 · rescope 13 · dispatch 19 · review 1 · brief 13 · hold 0 · resume 0","review rounds":"1 · shown 1 · aggregated no"},"tables":[{"name":"by-source","header":["#","source","entries"],"rows":[
-["1","decision","2"],
+["2026-10-06T22:17:17Z","git","commit","a9fd99db9e4a","-","-","TOOL-aGraftedHelix-41"],
+["2026-10-06T22:22:56Z","git","merge","d9ed9da3dc76","-","-","-"],
+["2026-10-06T22:29:59Z","git","merge","1e027341830e","-","-","-"],
+["2026-10-06T22:34:53Z","run-state","phase","fff8b6422bdb","HELD","-","-"],
+["2026-10-06T22:41:41Z","run-state","phase","e1f4d8c0c6ab","VERIFYING","-","-"],
+["2026-10-06T23:11:57Z","git","commit","e5e035fa7abe","-","-","TOOL-aGraftedHelix-45 TOOL-aGraftedHelix-46 TOOL-aGraftedHelix-47"],
+["2026-10-06T23:15:03Z","run-state","brief","TOOL-aGraftedHelix-45","-","-","-"],
+["2026-10-06T23:16:34Z","git","commit","fe49f33d088e","-","-","TOOL-aGraftedHelix-46"],
+["2026-10-06T23:23:45Z","run-state","dispatch","TOOL-aGraftedHelix-45","-","-","-"],
+["2026-10-06T23:37:29Z","run-state","dispatch","TOOL-aGraftedHelix-45","-","-","-"],
+["2026-10-06T23:48:13Z","git","commit","764b6d8cece5","-","-","TOOL-aGraftedHelix-45"],
+["2026-10-06T23:56:35Z","git","commit","4f3270dd624e","-","-","TOOL-aGraftedHelix-45"],
+["2026-10-07T00:05:04Z","git","commit","928281475211","-","-","TOOL-aGraftedHelix-45"],
+["2026-10-07T00:11:17Z","run-state","dispatch","TOOL-aGraftedHelix-45","-","-","-"],
+["2026-10-07T00:12:12Z","git","commit","bf3f684805c7","-","-","TOOL-aGraftedHelix-45"],
+["2026-10-07T00:15:08Z","git","commit","afb3574e83a4","-","-","TOOL-aGraftedHelix-45"],
+["2026-10-07T00:22:39Z","git","commit","3bad769b9d1b","-","-","TOOL-aGraftedHelix-3"],
+["2026-10-07T00:24:43Z","run-state","brief","TOOL-aGraftedHelix-46","-","-","-"],
+["2026-10-07T00:26:45Z","run-state","dispatch","TOOL-aGraftedHelix-46","-","-","-"],
+["2026-10-07T00:30:52Z","git","commit","c39267032007","-","-","TOOL-aGraftedHelix-46"],
+["2026-10-07T00:36:16Z","git","commit","a28075622590","-","-","TOOL-aGraftedHelix-46"],
+["2026-10-07T00:40:46Z","git","commit","4fc54f774822","-","-","TOOL-aGraftedHelix-46"],
+["2026-10-07T00:43:11Z","run-state","brief","TOOL-aGraftedHelix-47","-","-","-"],
+["2026-10-07T00:45:41Z","run-state","dispatch","TOOL-aGraftedHelix-47","-","-","-"],
+["2026-10-07T00:53:28Z","run-state","dispatch","TOOL-aGraftedHelix-47","-","-","-"],
+["2026-10-07T01:22:55Z","run-state","dispatch","TOOL-aGraftedHelix-47","-","-","-"],
+["2026-10-07T01:28:39Z","git","commit","7d7e957493fc","-","-","TOOL-aGraftedHelix-47"],
+["2026-10-07T01:32:01Z","git","commit","311cd19af92c","-","-","TOOL-aGraftedHelix-47"],
+["2026-10-07T01:37:46Z","git","commit","9fcb70037c78","-","-","TOOL-aGraftedHelix-47"],
+["2026-10-07T01:54:00Z","git","commit","85313733ec9a","-","-","TOOL-aGraftedHelix-47"]]}]},
+"Units":{"facts":{"units":"44 · shown 0 · aggregated yes"},"tables":[{"name":"by-status","header":["#","status","units"],"rows":[
+["1","CLOSED","44"]]}]},
+"Decisions":{"facts":{"entries":"154 · shown 0 · aggregated yes","trailer near-misses":"0","decision-log rows the owner's":"0","spec marks":"owner-before 0 · owner-inside 1 · agent-before 35 · agent-inside 49","excluded rows":"proposal 0 · rescope 16 · dispatch 26 · review 1 · brief 16 · hold 1 · resume 1","review rounds":"1 · shown 1 · aggregated no"},"tables":[{"name":"by-source","header":["#","source","entries"],"rows":[
+["1","decision","4"],
 ["2","abort","0"],
 ["3","override","0"],
 ["4","waiver","0"],
-["5","handoff","0"],
+["5","handoff","1"],
 ["6","rescope-retire","0"],
 ["7","rescope-supersede","0"],
 ["8","rescope-defer","0"],
 ["9","review","1"],
-["10","trailer","47"],
-["11","spec-mark","80"],
+["10","trailer","60"],
+["11","spec-mark","85"],
 ["12","decision-log","0"],
-["13","ledger","2"]]},
+["13","ledger","3"]]},
 {"name":"rounds","header":["#","UTC","verdict","blockers","exit"],"rows":[
 ["1","2026-10-06T01:52:42Z","CLEAN WITH FIXES","0","CONVERGED"]]}]},
-"Conformance":{"facts":{"items":"17 · shown 17 · aggregated no"},"tables":[{"name":"items","header":["#","item","unit","state"],"rows":[
+"Conformance":{"facts":{"items":"20 · shown 20 · aggregated no"},"tables":[{"name":"items","header":["#","item","unit","state"],"rows":[
 ["1","brief-before-build","TOOL-aGraftedHelix-29","MET"],
 ["2","brief-before-build","TOOL-aGraftedHelix-30","MET"],
 ["3","brief-before-build","TOOL-aGraftedHelix-31","MET"],
@@ -295,26 +292,23 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["11","brief-before-build","TOOL-aGraftedHelix-39","MET"],
 ["12","brief-before-build","TOOL-aGraftedHelix-40","MET"],
 ["13","brief-before-build","TOOL-aGraftedHelix-41","MET"],
-["14","phases-walked","-","UNJUDGEABLE"],
-["15","green-at-close","-","UNJUDGEABLE"],
-["16","keepalive-reaped","-","MET"],
-["17","review-exited","-","MET"]]}]},
-"Anomalies":{"facts":{"anomalies":"10 · shown 10 · aggregated no"},"tables":[{"name":"anomalies","header":["#","kind","subclass"],"rows":[
-["1","out-of-band-edit","-"],
-["2","refusal-loop","-"],
-["3","destructive-git","-"],
-["4","destructive-git","-"],
-["5","destructive-git","-"],
-["6","destructive-git","-"],
-["7","destructive-git","-"],
-["8","destructive-git","-"],
-["9","destructive-git","-"],
-["10","destructive-git","-"]]}]},
-"Coverage":{"facts":{"journal starts":"2 joined of 3 record-creating","unjoined starts":"1","sessions":"1 named · 1 extracted","idle gaps":"judged yes · near an owner turn 1","anomaly kinds":"judged 12 of 12"},"tables":[{"name":"sources","header":["#","source","state","lines","bad"],"rows":[
+["14","brief-before-build","TOOL-aGraftedHelix-45","MET"],
+["15","brief-before-build","TOOL-aGraftedHelix-46","MET"],
+["16","brief-before-build","TOOL-aGraftedHelix-47","MET"],
+["17","phases-walked","-","UNJUDGEABLE"],
+["18","green-at-close","-","UNJUDGEABLE"],
+["19","keepalive-reaped","-","MET"],
+["20","review-exited","-","MET"]]}]},
+"Anomalies":{"facts":{"anomalies":"43 · shown 0 · aggregated yes"},"tables":[{"name":"by-kind","header":["#","kind","subclass","count"],"rows":[
+["1","out-of-band-edit","-","1"],
+["2","refusal-loop","-","1"],
+["3","destructive-git","-","32"],
+["4","multi-run-session","-","9"]]}]},
+"Coverage":{"facts":{"journal starts":"2 joined of 3 record-creating","unjoined starts":"1","sessions":"2 named · 2 extracted","idle gaps":"judged yes · near an owner turn 0","anomaly kinds":"judged 12 of 12"},"tables":[{"name":"sources","header":["#","source","state","lines","bad"],"rows":[
 ["1","run-state","present","-","-"],
-["2","driver","present","246","0"],
-["3","gates","present","0","0"],
-["4","pushes","present","40","0"],
+["2","driver","present","372","0"],
+["3","gates","present","2","0"],
+["4","pushes","present","56","0"],
 ["5","git","present","-","-"],
 ["6","transcripts","present","-","-"],
 ["7","build-folder","present","-","-"]]}]}}}

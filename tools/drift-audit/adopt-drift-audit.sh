@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # adopt-drift-audit.sh — wire the drift-audit kit into a project.
 #
-# gov:kit drift-audit@1.24
+# gov:kit drift-audit@1.25
 #
 # Run from anywhere INSIDE the target repo AFTER copying this kit dir in as `<prefix>/drift-audit/`.
 # The kit dir's NAME is load-bearing; the one-segment prefix is free and every path below is derived
@@ -42,7 +42,7 @@ for _a in "${@:-}"; do
 done
 
 KIT_DIR="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$(git -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)" || { echo "drift-audit: not a git repo"; exit 2; }
+ROOT="$(unset GIT_DIR GIT_WORK_TREE; git -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)" || { echo "drift-audit: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
 CONF="$ROOT/.memory-tree.conf"

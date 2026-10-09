@@ -351,7 +351,7 @@ T=$(mkfixture run build-first)
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "build BEFORE spec: the leg REDS" "$rc" "1"
 has  "build BEFORE spec: the message names the unit" "$o" "ARCH-tOrder-1"
-has  "build BEFORE spec: the message says what happened" "$o" "BUILT before a conforming spec"
+has  "build BEFORE spec: the message says what happened" "$o" "pass-order FAILED — a unit was BUILT before a conforming spec for it existed"
 has  "build BEFORE spec: the unit was graded, not skipped" "$o" "graded 1 closed unit"
 rm -rf "$T"
 

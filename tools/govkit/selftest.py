@@ -785,6 +785,80 @@ def check_answers_parity(tmp: pathlib.Path) -> None:
           and want["kit.review-harness.memory_root"] == "docs/mem", f"engine {got!r} govkit {want!r}")
 
 
+# TOOL-aGraftedHelix-46. The legal spellings of the spec's evidence table; `K=plain` doubles as the
+# sentinel. Bash is the reference because every kit adopter SOURCES its conf.
+CONF_PARITY_ROWS = (
+    "K='--no-verify'",
+    'K="--no-verify"   # the flag the lander bans',
+    "K='--no-verify'   # note",
+    'K="<your-tool>"   # fill me',
+    'K=""   # left blank',
+    "K=   # note",
+    "K=plain   # note",
+    "K=#x",
+    'K="a # b"',
+    'export K="TOOL DEPL"',
+    "K=plain",
+)
+
+
+def check_conf_reader_parity(tmp: pathlib.Path) -> None:
+    """TOOL-aGraftedHelix-46 S3. One spelling table fed to three readers: govkit's
+    `parse_conf_assignment`, the memory-tree kit's `parse_conf_line`, and bash sourcing the line
+    through govkit's own `resolve_shell_argv`. A sentinel proves bash ran before any row is graded,
+    because a bare `bash` from Windows Python can be the WSL launcher, which reads nothing here
+    (`memory/gotchas/subprocess-resolves-a-different-shell.md`). Then three verdict rows run
+    `read_conf_key_gaps` over a fixture conf.
+
+    WHAT IT DOES NOT CHECK: spellings outside the table, the `check` and `update` verbs end to end
+    (their arms already cover the gap wording), and any conf reader outside govkit and the
+    memory-tree kit."""
+    G = govkit_module()
+    spec = importlib.util.spec_from_file_location(
+        "tree_lib_conf_parity", KIT_DIRS["memory-tree"] / "tree_lib.py")
+    tl = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(tl)
+
+    def read_bash_value(n: int, line: str) -> tuple[str | None, list[str], str]:
+        d = tmp / f"crp-{n}"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "c").write_text(line + "\n", encoding="utf-8", newline="\n")
+        argv = G.resolve_shell_argv(["bash", "-c", "set -a; . ./c; printf '%s' \"${K-<UNSET>}\""])
+        try:
+            p = subprocess.run(argv, cwd=str(d), capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", timeout=60)
+        except (OSError, subprocess.SubprocessError) as e:
+            return None, argv, f"{e.__class__.__name__}: {e}"
+        return (p.stdout if p.returncode == 0 else None), argv, p.stderr
+
+    got, argv, err = read_bash_value(0, "K=plain")
+    if got != "plain":
+        check("[aGH-46 AC4] the bash reference reads the sentinel K=plain as plain", False,
+              f"argv {argv!r} read {got!r} {err}".strip())
+        return
+    graded = 0
+    for n, line in enumerate(CONF_PARITY_ROWS, 1):
+        want, _argv, err = read_bash_value(n, line)
+        pa, pl = G.parse_conf_assignment(line), tl.parse_conf_line(line)
+        va = pa[1] if pa and pa[0] == "K" else None
+        vl = pl[1] if pl and pl[0] == "K" else None
+        check(f"[aGH-46 AC1] bash, parse_conf_assignment and parse_conf_line agree on {line}",
+              want is not None and va == want and vl == want,
+              f"bash {want!r} parse_conf_assignment {va!r} parse_conf_line {vl!r} {err}".strip())
+        graded += 1
+    t = tmp / "crp-verdict"
+    t.mkdir(parents=True, exist_ok=True)
+    (t / "c.conf").write_text(
+        'KEEPALIVE_CREATE="<your-schedule-create-tool>"   # fill me\n'
+        'BYPASS_BAN=""   # left blank\nLANDER=   # note\n', encoding="utf-8", newline="\n")
+    keys = ["KEEPALIVE_CREATE", "BYPASS_BAN", "LANDER"]
+    gaps = dict(G.read_conf_key_gaps(t, {"config": {"file": "c.conf", "required_keys_gate": keys}}))
+    for k, want in zip(keys, ("placeholder", "empty", "empty")):
+        check(f"[aGH-46 AC3] read_conf_key_gaps reads {k} as {want}", gaps.get(k) == want, repr(gaps))
+    check("[aGH-46 AC1] every row of the conf parity table was graded",
+          graded == len(CONF_PARITY_ROWS), f"{graded} of {len(CONF_PARITY_ROWS)}")
+
+
 def check_pytest_ini_probe(tmp: pathlib.Path) -> None:
     """DEPL-aRepatriatedFork-14 AC2, AC1's class — the `pytest-ini-knobs` hole through `check`.
 
@@ -2175,6 +2249,7 @@ def main() -> int:
 
         check_playbook_hole_modes(tmp / "pb")
         check_answers_parity(tmp / "ap")
+        check_conf_reader_parity(tmp / "crp")
         check_shipped_verb(tmp)
         check_epoch_verb(tmp)
         check_mint_verb(tmp)
