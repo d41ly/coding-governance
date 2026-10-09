@@ -1,12 +1,13 @@
 # TOOL-aRoutedQuill-3 — every pushed commit that touches a product path names a unit specced before it
 
-**Status:** SPECCED · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4 · ratified 2026-10-09
+**Status:** INPROGRESS · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
+| [2026-10-09-prompt-TOOL-aRoutedQuill-3-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-3-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

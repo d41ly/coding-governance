@@ -71,7 +71,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 9 unit(s) · node a · opened 2026-10-09 · streams tooling+kickoff+playbook+deployer
+**Build status:** INPROGRESS · 9 unit(s) · node a · opened 2026-10-09 · streams tooling+kickoff+playbook+deployer
 ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7
 
 <!-- gen:build-units -->
@@ -80,7 +80,7 @@ ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuil
 | [TOOL-aRoutedQuill-1 — a Tier-1 spec is a micro-spec, and check 12 grades its sections by heading text](spec/2026-10-09-spec-TOOL-aRoutedQuill-1.md) | 1 | 2 | CLOSED | rev-3 | 2026-10-09 |
 | [KICK-aRoutedQuill-1 — the kickoff writes a brief the owner confirms, and the card routes the session to its units](spec/2026-10-09-spec-KICK-aRoutedQuill-1.md) | 2 | 2 | CLOSED | rev-5 | 2026-10-09 |
 | [TOOL-aRoutedQuill-2 — scratch-guard refuses a product write no buildable unit on the card owns](spec/2026-10-09-spec-TOOL-aRoutedQuill-2.md) | 3 | 2 | CLOSED | rev-7 | 2026-10-09 |
-| [TOOL-aRoutedQuill-3 — every pushed commit that touches a product path names a unit specced before it](spec/2026-10-09-spec-TOOL-aRoutedQuill-3.md) | 4 | 2 | SPECCED | rev-4 | 2026-10-09 |
+| [TOOL-aRoutedQuill-3 — every pushed commit that touches a product path names a unit specced before it](spec/2026-10-09-spec-TOOL-aRoutedQuill-3.md) | 4 | 2 | INPROGRESS | rev-4 | 2026-10-09 |
 | [TOOL-aRoutedQuill-4 — every subagent starts holding the card's route, stated as facts](spec/2026-10-09-spec-TOOL-aRoutedQuill-4.md) | 4 | 2 | SPECCED | rev-5 | 2026-10-09 |
 | [PLAY-aRoutedQuill-1 — the charter's Definition of Ready: every product-code unit carries a spec before code](spec/2026-10-09-spec-PLAY-aRoutedQuill-1.md) | 5 | 2 | SPECCED | rev-3 | 2026-10-09 |
 | [TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed](spec/2026-10-09-spec-TOOL-aRoutedQuill-5.md) | 5 | 2 | SPECCED | rev-4 | 2026-10-09 |
@@ -88,7 +88,7 @@ ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuil
 | [TOOL-aRoutedQuill-7 — the unattended prompt-brief check reads its sub-head list from the kickoff kit's `--brief-skeleton`](spec/2026-10-09-spec-TOOL-aRoutedQuill-7.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 3 record folder(s).
+Records: 10 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
