@@ -3251,7 +3251,7 @@ hit "$(run)" "the Skill's prompt path puts its owner turn AFTER the branch push,
 # H, the PUSH after preflight. Preflight run first meets the refusal that nothing published
 # authorizes the run - the exact refusal step 1 quotes so the agent does not have to diagnose it.
 reset_tree
-mutate $KIT_REL/SKILL.template.md 's/^4\. \*\*Commit, then PUSH THE BRANCH\*\*.*/4. **Commit.**/'
+mutate $KIT_REL/SKILL.template.md 's/^4\. \*\*Commit, then PUSH THE BRANCH.*/4. **Commit.**/'
 mutate $KIT_REL/SKILL.template.md 's/^6\. \*\*The kickoff hand-back\*\*/6. PUSH THE BRANCH now\n6. **The kickoff hand-back**/'
 hit "$(run)" "the Skill's prompt path puts the branch push AFTER preflight, and preflight run first meets the refusal that nothing published authorizes the run:"
 

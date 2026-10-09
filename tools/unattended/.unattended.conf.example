@@ -501,6 +501,13 @@ DISPOSITION_CUTOFF=""
 # announces that it did.
 BRIEF_RECORDED_CUTOFF=""
 
+# PROMPT_BRIEF_CUTOFF - the date from which `--preflight` refuses a prompt-mode run whose prompt
+# record does not stand on its own: the brief, the session passages it relied on and the owner's
+# confirmation, in the shape the verbs file's prompt path names. Graded on the build README's
+# `opened:` date at the pinned BASE. BLANK in the example, like every sibling cutoff here and for the
+# same reason; blank turns the refusal OFF and `--preflight` announces that it did.
+PROMPT_BRIEF_CUTOFF=""
+
 # RUNLOG_SESSION_VARS - the NAMES of environment variables whose values each run-log START line
 # records as `sess.<NAME>=`, space-separated, eight at most. The run log is the driver's own
 # machine-local journal (protocol section 2); this key only says which session wrote a line. A value
