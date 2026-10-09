@@ -3,8 +3,10 @@
 # (with --fix/--session) wire the zero-risk ones. Spec: memory/builds/aWireWarden/.
 #
 #   check-wiring.sh            # --check (default): report; exit 1 if any installed tool is unwired
-#   check-wiring.sh --fix      # wire the safe cases (core.hooksPath when unset); exit reflects remainder
-#   check-wiring.sh --session  # like --fix but ALWAYS exit 0 — the SessionStart hook mode
+#   check-wiring.sh --fix      # wire the safe cases (core.hooksPath when unset; core.sshCommand when
+#                              # no scope sets it; a hook this checkout tracks 100644 staged 100755,
+#                              # blob unchanged, for the operator to commit); exit reflects remainder
+#   check-wiring.sh --session  # like --fix but ALWAYS exit 0 and stages no hook mode — the SessionStart hook mode
 #   check-wiring.sh --resolve-fragment <f.fragment.json>   # print the fragment's hook path with
 #                              # {kit}/{here} expanded — the value the arms below decide on, twinned
 #                              # on settings-merge.py so the hook-destinations gate can assert parity.
@@ -16,8 +18,9 @@
 # tree with no receipt — gov's own — resolves exactly as the probes always did.
 #
 # SEVERITY IS A VOCABULARY, and only `UNWIRED` gates. `ok` / `skip` / `fixed` / `note` do not. `note`
-# is for a condition that is TRUE and worth printing but is not dormant wiring — today only the eol
-# arm, whose subject is a working copy while the committed bytes are already correct. Reusing
+# is for a condition that is TRUE and worth printing but is not dormant wiring — the eol arm, whose
+# subject is a working copy while the committed bytes are already correct, and the ssh arm, whose
+# subject is an operator's own core.sshCommand that carries no keepalive. Reusing
 # `UNWIRED` there would make the one word that means "this gates" stop meaning it, and a consumer
 # that treats a non-zero exit as a refusal — `.unattended.conf` declares this script as its
 # `WIRING_CHECK` — cannot tell the two apart from the status alone.
@@ -26,9 +29,26 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in. Each auto-fix that sets a value
-# appends one `hookspath-set` or `merge-driver-set` line to the health log under the git common dir,
-# which the orientation card counts; the format is the `health_log_sh` block's header below.
-KIT_CHECK_WIRING_VERSION=1.27   # gov:kit check-wiring@1.27 — the deployer's read
+# appends one `hookspath-set`, `merge-driver-set`, `sshcommand-set` or `hookmode-set` line to the
+# health log under the git common dir, which the orientation card counts; the format is the
+# `health_log_sh` block's header below.
+#
+# The hook-mode arm grades the INDEX mode of every tracked file in the hooks directory whose name is
+# a githooks(5) hook: 100644 there is UNWIRED in this checkout's own directory and a `note` in
+# another checkout's; `--fix` stages 100755 (one health event per hook) and `--session` only
+# reports. WHAT IT DOES NOT CHECK: the filesystem exec bit, a directory no checkout tracks (a skip),
+# a symlinked hook, or a hook name git adds after the pinned list.
+#
+# The ssh arm sets core.sshCommand to push-main.sh's keepalive, derived from that file, only when no
+# scope sets it and a remote pushes over ssh. It stands back, with a `note` and no write, when a
+# non-empty GIT_SSH or GIT_SSH_VARIANT is exported or ssh.variant is set at any scope: those are the
+# operator's choice of SSH program and its dialect, and core.sshCommand outranks GIT_SSH, so setting
+# it would replace that program (TOOL-aLevelledCopy-7). WHAT IT DOES NOT CHECK: a GIT_SSH_COMMAND in
+# someone's environment, which outranks core.sshCommand; a core.sshCommand already present beside a
+# GIT_SSH, which the `ok` and `note` cases grade as they find it because the arm cannot tell who
+# wrote it; HTTPS remotes, which hold no ssh socket; and whether the remote's own idle timeout is
+# shorter than the silence the keepalive tolerates.
+KIT_CHECK_WIRING_VERSION=1.29   # gov:kit check-wiring@1.29 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -532,6 +552,81 @@ check_hook_blobs() { # $1 = resolved hooks dir, $2 = the configured value as wri
   done
 }
 
+# --- the hooks' INDEX mode (TOOL-aLevelledCopy-3) ------------------------------------------------
+# A hook tracked 100644 is checked out non-executable on every POSIX clone, and git there skips it
+# with no more than a hint: the branch guard, the commit-msg check and the pre-push bar all dormant.
+# A Windows node runs it anyway, which is how gov shipped its own four hooks 100644 unnoticed.
+#
+# THE INDEX IS GRADED, never the filesystem bit: `[ -x ]` is true for every file on Windows and on
+# WSL's `/mnt/c`, so it cannot red on the host that hid the defect. The index of the checkout that
+# SUPPLIES the directory is read, by the same own-versus-another rule as `check_hook_blobs`: another
+# checkout's 100644 is a `note`, because gov's linked worktrees name the primary's directory by
+# absolute path and an UNWIRED there would refuse every unattended run until the primary moves.
+#
+# The repair is `--fix` only (F1: a SessionStart hook stages nothing) and uses `--cacheinfo` with the
+# oid the index already holds, because `--chmod=+x` re-hashes the working file and would stage an
+# unstaged edit along with the mode (F3, measured).
+#
+# WHAT THIS DOES NOT CHECK: a hook directory no checkout tracks (announced as a skip); a hook git
+# adds after githooks(5) as pinned below (PINNED, so it is not graded until the list grows); a
+# symlinked hook (mode 120000); and whether the hook's interpreter exists on the POSIX host.
+GIT_HOOK_NAMES="applypatch-msg pre-applypatch post-applypatch pre-commit pre-merge-commit
+prepare-commit-msg commit-msg post-commit pre-rebase post-checkout post-merge pre-push pre-receive
+update proc-receive post-receive post-update reference-transaction push-to-checkout pre-auto-gc
+post-rewrite sendemail-validate fsmonitor-watchman p4-changelist p4-prepare-changelist
+p4-post-changelist p4-pre-submit post-index-change"
+check_hook_modes() { # $1 = resolved hooks dir, $2 = the configured value as written
+  local dir="$1" shown="$2" rp top pfx ls mode oid stage rel path got n=0 bad=0
+  local names=" ${GIT_HOOK_NAMES//$'\n'/ } "
+  rp=$(unset GIT_DIR GIT_WORK_TREE; git -C "$dir" rev-parse --show-toplevel --show-prefix 2>/dev/null) || rp=""
+  top=${rp%%$'\n'*}; pfx=""; case "$rp" in *$'\n'*) pfx=${rp#*$'\n'} ;; esac
+  top=${top%$'\r'}; pfx=${pfx%$'\r'}
+  if [ -z "$top" ]; then
+    echo "skip     hooks     — $shown is tracked by no checkout; its modes are the filesystem's and are not graded"
+    return
+  fi
+  # Paths print relative to $dir, so a nested file carries a `/` and is not a hook git would run.
+  if ! ls=$(git -C "$dir" ls-files -s 2>/dev/null); then
+    echo "note     hooks     — hook modes in $shown: UNKNOWN, git ls-files failed in $top"
+    return
+  fi
+  while read -r mode oid stage rel; do
+    [ "$stage" = 0 ] || continue
+    case "$rel" in */*|'') continue ;; esac
+    case "$names" in *" $rel "*) ;; *) continue ;; esac
+    [ "$mode" = 120000 ] && continue
+    n=$((n+1))
+    [ "$mode" = 100644 ] || continue
+    bad=$((bad+1)); path="$pfx$rel"
+    if ! [ "$top" -ef "$ROOT" ]; then
+      echo "note     hooks     — $rel is tracked 100644 in $top, which supplies $shown; that checkout owns the fix"
+      continue
+    fi
+    if [ "$MODE" = fix ]; then
+      git update-index --cacheinfo "100755,$oid,$path" 2>/dev/null && chmod +x "$path" 2>/dev/null
+      got=$(git ls-files -s -- "$path" 2>/dev/null | awk '{print $1}')
+      if [ "$got" = 100755 ]; then
+        echo "FIXED    hooks     — $path staged 100755 (blob unchanged); commit it"
+        CW_HEALTH_LOG=${CW_HEALTH_LOG:-$(resolve_health_log "$ROOT")}
+        add_health_event "$CW_HEALTH_LOG" check-wiring hookmode-set "$path 100644 -> 100755 · mode $MODE"
+        continue
+      fi
+      echo "UNWIRED  hooks     — $path is tracked 100644 and the repair read back '${got:-nothing}'. Fix by hand: git update-index --cacheinfo 100755,$oid,$path"
+    else
+      echo "UNWIRED  hooks     — $path is tracked 100644; git on a POSIX node will not run it. Fix: bash ${KIT_REL:+$KIT_REL/}$(basename "$0") --fix, then commit the mode change"
+    fi
+    unwired=$((unwired+1))
+  done <<EOF
+$ls
+EOF
+  # LIVENESS: a population of none is a skip, never `ok` over nothing.
+  if [ "$n" = 0 ]; then
+    echo "skip     hooks     — $top tracks no hook-named file directly in $shown, so no mode was graded"
+  elif [ "$bad" = 0 ]; then
+    echo "ok       hooks     — every tracked hook in $shown is executable"
+  fi
+}
+
 # --- Check H: git hooks (core.hooksPath) ---------------------------------------------------------
 check_hooks() {
   if ! { [ -f .githooks/pre-commit ] && git ls-files --error-unmatch .githooks/pre-commit >/dev/null 2>&1; }; then
@@ -545,6 +640,7 @@ check_hooks() {
     if [ -n "$curdir" ] && [ -f "$curdir/pre-commit" ]; then
       echo "ok       hooks     — core.hooksPath -> $cur"
       check_hook_blobs "$curdir" "$cur"
+      check_hook_modes "$curdir" "$cur"
     else
       echo "UNWIRED  hooks     — core.hooksPath='$cur' resolves to no pre-commit; NOT overwriting (deliberate?). Fix: git config core.hooksPath .githooks"
       unwired=$((unwired+1))
@@ -558,11 +654,16 @@ check_hooks() {
       echo "FIXED    hooks     — set core.hooksPath -> .githooks"
       CW_HEALTH_LOG=${CW_HEALTH_LOG:-$(resolve_health_log "$ROOT")}
       add_health_event "$CW_HEALTH_LOG" check-wiring hookspath-set "core.hooksPath -> .githooks · mode $MODE"
+    else
+      # A write that did not take is not a fix: no FIXED, no event, and the run counts it.
+      echo "UNWIRED  hooks     — could not set core.hooksPath (local). Fix: git config core.hooksPath '.githooks'"
+      unwired=$((unwired+1))
     fi
   else
     echo "UNWIRED  hooks     — core.hooksPath unset; .githooks gates (incl. branch guard) dormant. Fix: git config core.hooksPath .githooks"
     unwired=$((unwired+1))
   fi
+  check_hook_modes "$ROOT/.githooks" .githooks
 }
 
 # S2 runs ONCE, before any arm, so the resolved path and its scope are on the record BEFORE any
@@ -1149,6 +1250,9 @@ check_merge_rows() {
         echo "FIXED    merge     — set merge.rows.driver"
         CW_HEALTH_LOG=${CW_HEALTH_LOG:-$(resolve_health_log "$ROOT")}
         add_health_event "$CW_HEALTH_LOG" check-wiring merge-driver-set "merge.rows.driver · mode $MODE"
+      else
+        echo "UNWIRED  merge     — could not set merge.rows.driver (local). Fix: git config merge.rows.driver '$want'"
+        unwired=$((unwired+1))
       fi
     else
       echo "UNWIRED  merge     — paths declare merge=rows but merge.rows.driver is unset; git falls back to a line merge that can duplicate a row. Fix: git config merge.rows.driver '$want'"
@@ -1181,7 +1285,12 @@ check_merge_ours() {
   cur=$(git config merge.ours.driver 2>/dev/null || true)
   if [ -z "$cur" ]; then
     if [ "$DO_FIX" = 1 ]; then
-      git config merge.ours.driver true && echo "FIXED    merge     — set merge.ours.driver"
+      if git config merge.ours.driver true; then
+        echo "FIXED    merge     — set merge.ours.driver"
+      else
+        echo "UNWIRED  merge     — could not set merge.ours.driver (local). Fix: git config merge.ours.driver 'true'"
+        unwired=$((unwired+1))
+      fi
     else
       echo "UNWIRED  merge     — paths declare merge=ours but merge.ours.driver is unset; git has no built-in ours driver, so it falls back to a text merge that conflicts on a generated view. Fix: git config merge.ours.driver true"
       unwired=$((unwired+1))
@@ -1193,6 +1302,114 @@ check_merge_ours() {
   else
     echo "UNWIRED  merge     — merge.ours.driver='$cur', not 'true'; NOT overwriting (deliberate?)"
     unwired=$((unwired+1))
+  fi
+}
+
+# --- the ssh arm: a push outlasts its own pre-push bar ----------------------------------------------
+# The pre-push gate runs inside `git push` AFTER git opened the SSH connection, so the socket idles
+# for the whole bar and the remote drops it. push-main.sh defends its own pushes with a keepalive in
+# GIT_SSH_COMMAND; this gives every other push from the tree the same one through a repo-local
+# core.sshCommand. The value is DERIVED from push-main.sh's one `GOV_SSH_KEEPALIVE='...'` line, read
+# with sed and never sourced, so the option string is spelled once and nothing in that file runs
+# here. The option this arm treats as "a keepalive" is the first `-o` key of that value, derived too.
+# An operator value at ANY scope is never overwritten; a repo-local one would shadow a global
+# identity. (TOOL-aLevelledCopy-2)
+check_ssh_keepalive() {
+  local pm n want ka r url pre host hit="" rc scope cur why vrc
+  pm=$(first_of "$(resolve_receipt_path "" push-main.sh)" "${KIT_REL:+$KIT_REL/}push-main.sh")
+  if [ -z "$pm" ]; then
+    echo "skip     ssh       — push-main is not adopted here, so no pre-push bar holds a push open"
+    return
+  fi
+  n=$(grep -c '^GOV_SSH_KEEPALIVE=' "$pm" 2>/dev/null); n=${n:-0}
+  want=""
+  [ "$n" = 1 ] && want=$(sed -n "s/^GOV_SSH_KEEPALIVE='\([^']*\)'[[:space:]]*\$/\1/p" "$pm")
+  if [ "$n" = 0 ]; then
+    # Kit skew: the checker is newer than the lander beside it. Still UNWIRED — a line lost in gov must red.
+    echo "UNWIRED  ssh       — cannot derive the keepalive from $pm: it holds no GOV_SSH_KEEPALIVE= line, so this push-main.sh predates the definition line or has lost it. Fix: update the push-main kit"
+    unwired=$((unwired+1))
+    return
+  fi
+  if [ -z "$want" ]; then
+    echo "UNWIRED  ssh       — cannot derive the keepalive from $pm: $n line(s) open GOV_SSH_KEEPALIVE=, and the contract is exactly one single-quoted line"
+    unwired=$((unwired+1))
+    return
+  fi
+  ka=${want#* -o }; ka=${ka%%=*}
+  # SSH-shaped: an ssh:// family URL, or scp form `[user@]host:path` with no `/` before the colon
+  # and a host longer than one character, so a drive path like `C:/x` reads as a path.
+  # `for` over the words, not `while read` fed by `<<< "$(...)"`: a here-string holding a command
+  # substitution is the loop shape the shell-hygiene leg refuses, and neither a remote name nor a URL
+  # carries whitespace git would accept.
+  for r in $(git remote 2>/dev/null); do
+    for url in $(git remote get-url --push --all "$r" 2>/dev/null); do
+      url=${url%$'\r'}
+      case "$url" in
+        ssh://*|git+ssh://*|ssh+git://*) hit=$url ;;
+        *://*) ;;
+        *:*) pre=${url%%:*}; host=${pre#*@}
+             case "$pre" in */*) ;; *) [ "${#host}" -gt 1 ] && hit=$url ;; esac ;;
+      esac
+      [ -n "$hit" ] && break
+    done
+    [ -n "$hit" ] && break
+  done
+  if [ -z "$hit" ]; then
+    echo "skip     ssh       — no remote pushes over ssh"
+    return
+  fi
+  # Set or unset is the read's EXIT STATUS, never its output: 1 is unset at every scope, and any other
+  # failure is a key nobody can read, which must not be taken for an absence and overwritten.
+  cur=$(git config --get core.sshCommand 2>/dev/null); rc=$?
+  case $rc in
+    0|1) ;;
+    *) echo "note     ssh       — cannot read core.sshCommand (git config exited $rc); NOT setting it"
+       return ;;
+  esac
+  if [ "$rc" = 1 ]; then
+    # The operator chose the SSH program: git runs GIT_SSH when no core.sshCommand exists, and
+    # GIT_SSH_VARIANT / ssh.variant name its dialect. Asked BEFORE the set/UNWIRED split, so neither
+    # --fix nor --check overrides or advises against that choice. A failed read is not an absence.
+    why=""
+    if [ -n "${GIT_SSH:-}" ]; then why=GIT_SSH
+    elif [ -n "${GIT_SSH_VARIANT:-}" ]; then why=GIT_SSH_VARIANT
+    else
+      git config --get ssh.variant >/dev/null 2>&1; vrc=$?
+      case $vrc in
+        0) why=ssh.variant ;;
+        1) ;;
+        *) echo "note     ssh       — cannot read ssh.variant (git config exit $vrc); NOT setting core.sshCommand"
+           return ;;
+      esac
+    fi
+    if [ -n "$why" ]; then
+      echo "note     ssh       — $why is the operator's choice of SSH program; NOT setting core.sshCommand, which would override it"
+      return
+    fi
+    if [ "$DO_FIX" = 1 ]; then
+      if git config core.sshCommand "$want"; then
+        echo "FIXED    ssh       — set core.sshCommand (local) -> push-main's keepalive"
+        CW_HEALTH_LOG=${CW_HEALTH_LOG:-$(resolve_health_log "$ROOT")}
+        add_health_event "$CW_HEALTH_LOG" check-wiring sshcommand-set "core.sshCommand -> push-main keepalive · mode $MODE"
+      else
+        echo "UNWIRED  ssh       — could not set core.sshCommand (local). Fix: git config core.sshCommand '$want'"
+        unwired=$((unwired+1))
+      fi
+    else
+      echo "UNWIRED  ssh       — core.sshCommand is unset at every scope and remote '$r' pushes over ssh, so a long pre-push bar can lose the socket. Fix: git config core.sshCommand '$want'"
+      unwired=$((unwired+1))
+    fi
+    return
+  fi
+  # Set: the scope only labels the line, so a failed scope read changes the label, never the branch.
+  cur=${cur%$'\r'}
+  scope=$(git config --show-scope --get core.sshCommand 2>/dev/null) && scope=${scope%%$'\t'*} || scope="scope unread"
+  if [ "$cur" = "$want" ]; then
+    echo "ok       ssh       — core.sshCommand carries the keepalive ($scope)"
+  elif [ -n "$ka" ] && [ "${cur#*"$ka"}" != "$cur" ]; then
+    echo "ok       ssh       — core.sshCommand is the operator's ($scope) and carries its own keepalive"
+  else
+    echo "note     ssh       — core.sshCommand is the operator's ($scope); NOT overwriting; it carries no keepalive, so a long pre-push bar can lose the socket"
   fi
 }
 
@@ -1421,6 +1638,7 @@ check_recall_opened
 check_card
 check_merge_rows
 check_merge_ours
+check_ssh_keepalive
 check_eol
 check_skill_install
 check_backlog_stragglers

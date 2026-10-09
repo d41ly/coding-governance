@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.25
+gov:kit drift-audit@1.26
 
     python <prefix>/drift-audit/drift_report.py            # human table, always exits 0
     python <prefix>/drift-audit/drift_report.py --json     # machine-readable, always exits 0
@@ -89,7 +89,7 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
-KIT_DRIFT_AUDIT_VERSION = "1.25"
+KIT_DRIFT_AUDIT_VERSION = "1.26"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -3604,6 +3604,63 @@ class Ctx:
         return None
 
 
+# The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
+# named on its marker line and gated by the resolve-python self-test.
+# >>> remote_ladder_py -- canonical copy: resolve_remote.py in the gov lib dir (byte-identical; gated)
+def resolve_remote(root):
+    """-> (remote, branch, observed, refusal) for the repository at <root>. Fetches nothing.
+
+    remote    GOV_REMOTE, else branch.<current>.remote unless it is ".", else the ONLY remote.
+              Several remotes and none chosen, or a chosen name that is not a remote here, is a
+              REFUSAL naming GOV_REMOTE. No remote at all is remote "" and NO refusal: the caller
+              keeps its own no-remote fallback.
+    observed  the branch refs/remotes/<remote>/HEAD names, or "". A caller whose GOV_DEFAULT_BRANCH
+              only CROSS-CHECKS the observation reads this one.
+    branch    GOV_DEFAULT_BRANCH, else observed, else "".
+    A refusal empties the other three, so no caller can pick a remote the ladder refused.
+    """
+    import os
+    import subprocess
+
+    def read(*args):
+        try:
+            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        return p.stdout.strip() if p.returncode == 0 else ""
+
+    names = read("remote").split()
+    listed = " ".join(names) or "none"
+    # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous
+    # (`heads/x`, `remotes/r/x`), and the prefix is stripped exactly instead.
+    cur = read("symbolic-ref", "--quiet", "HEAD")
+    cur = cur[len("refs/heads/"):] if cur.startswith("refs/heads/") else ""
+    remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
+    if not remote and cur:
+        remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
+        if remote == ".":
+            remote = ""
+    if not remote and len(names) == 1:
+        remote = names[0]
+    if not remote and len(names) > 1:
+        where = "branch " + cur if cur else "a detached HEAD"
+        return "", "", "", ("cannot choose a remote: GOV_REMOTE is unset, %s has no configured remote, "
+                            "and this repository has %d remotes (%s). Name it: export GOV_REMOTE=<remote>."
+                            % (where, len(names), listed))
+    if remote and remote not in names:
+        return "", "", "", ("%s names %s, which is no remote of this repository (%s). Name one that is: "
+                            "export GOV_REMOTE=<remote>." % (how, remote, listed))
+    observed = ""
+    if remote:
+        pre = "refs/remotes/" + remote + "/"
+        head = read("symbolic-ref", "--quiet", pre + "HEAD")
+        if head.startswith(pre) and len(head) > len(pre):
+            observed = head[len(pre):]
+    return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
+# <<< remote_ladder_py
+
+
 def resolve_base_ref(root: pathlib.Path, explicit: str | None) -> str:
     """The ref "landed" means, resolved REMOTE-FIRST. TOOL-dDerivedDocket-21 S1 and S2.
 
@@ -3611,17 +3668,20 @@ def resolve_base_ref(root: pathlib.Path, explicit: str | None) -> str:
     measured against what this returns, so it is the one input to the report that is not the tree.
     It used to be the bare default-branch NAME, which git resolves to the LOCAL branch: the same
     commit then read differently on a node whose local main was stale. Measured, not supposed — an
-    ORPHAN_ID_PIN signal read 0 against a stale local main and 5 against origin, and a pin raise
-    that had already landed on origin read as a WEAKENED RATCHET on the stale node alone.
+    ORPHAN_ID_PIN signal read 0 against a stale local main and 5 against the remote, and a pin raise
+    that had already landed there read as a WEAKENED RATCHET on the stale node alone.
 
     THE LADDER, one answer per rung:
       1. `--base-ref`, verbatim. The escape hatch for every rung below.
-      2. The NAME: `GOV_DEFAULT_BRANCH`, else the last component of `refs/remotes/origin/HEAD`,
-         else a refusal. Unchanged, and the same derivation the push hooks and the lander share.
-      3. `refs/remotes/origin/<name>`, whenever it resolves.
-      4. A clone with NO `origin` remote: `refs/heads/<name>`, ANNOUNCED on stderr. There is no
+      2. The REMOTE and the NAME, from the remote ladder inlined above (TOOL-dLadderedRemote-2):
+         `GOV_REMOTE`, else the branch's configured remote, else the only remote; then
+         `GOV_DEFAULT_BRANCH`, else that remote's HEAD. Several remotes and none chosen is a
+         refusal naming GOV_REMOTE, and so is a remote whose default branch nothing names. This is
+         the lander's derivation, and it used to ask only about a remote called `origin`.
+      3. `refs/remotes/<remote>/<name>`, whenever it resolves.
+      4. A clone with NO remote at all: `refs/heads/<name>`, ANNOUNCED on stderr. There is no
          staler or fresher copy of the branch in such a clone, so local is the record.
-      5. A clone that HAS `origin` and has not fetched the branch: a refusal. It cannot say what
+      5. A clone that HAS the remote and has not fetched the branch: a refusal. It cannot say what
          landed, and falling back to local there is exactly the defect rung 3 removes.
 
     Returns the ref; raises DriftError carrying the refusal. It fetches nothing: a report that
@@ -3630,42 +3690,40 @@ def resolve_base_ref(root: pathlib.Path, explicit: str | None) -> str:
     """
     if explicit:
         return explicit
-    name = os.environ.get("GOV_DEFAULT_BRANCH") or ""
+    remote, name, _observed, refusal = resolve_remote(root)
+    if refusal:
+        raise DriftError(refusal + " Or pass --base-ref. Refusing to guess: every ancestry answer "
+                         "in this report is measured against it.")
     if not name:
-        # `encoding="utf-8"` like every other probe in this file. `text=True` ALONE decodes with
-        # the platform default, which on a cp125x Windows node mis-decodes a non-ASCII branch name
-        # and, under a strict-encoding lint, is a finding in its own right. Reported by adopter ic,
-        # whose encoding-posture leg requires it (ARCH-dReadoptedConvoy-1 S7).
-        head = subprocess.run(["git", "-C", str(root), "symbolic-ref", "--quiet",
-                               "refs/remotes/origin/HEAD"], capture_output=True, text=True,
-                              encoding="utf-8", errors="replace")
-        name = head.stdout.strip().rpartition("/")[2] if head.returncode == 0 else ""
-    if not name:
-        raise DriftError("cannot resolve a default branch. Set GOV_DEFAULT_BRANCH, or pass "
-                         "--base-ref, or `git remote set-head origin -a`. Refusing to guess: every "
-                         "ancestry answer in this report is measured against it.")
+        fix = (f"`git remote set-head {remote} -a`" if remote
+               else "add the remote this repository lands on")
+        raise DriftError(f"cannot resolve a default branch. Set GOV_DEFAULT_BRANCH, or pass "
+                         f"--base-ref, or {fix}. Refusing to guess: every "
+                         f"ancestry answer in this report is measured against it.")
 
+    # `encoding="utf-8"` like every other probe in this file. `text=True` ALONE decodes with the
+    # platform default, which on a cp125x Windows node mis-decodes a non-ASCII branch name and,
+    # under a strict-encoding lint, is a finding in its own right. Reported by adopter ic, whose
+    # encoding-posture leg requires it (ARCH-dReadoptedConvoy-1 S7).
     def read_sha8(ref: str) -> str:
         out = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet",
                               ref + "^{commit}"], capture_output=True, text=True,
                              encoding="utf-8", errors="replace")
         return out.stdout.strip()[:8] if out.returncode == 0 else ""
 
-    tracking = f"refs/remotes/origin/{name}"
-    if read_sha8(tracking):
-        return tracking
-    remote = subprocess.run(["git", "-C", str(root), "remote", "get-url", "origin"],
-                            capture_output=True, text=True, encoding="utf-8", errors="replace")
-    if remote.returncode != 0:
+    if not remote:
         local = f"refs/heads/{name}"
         at = read_sha8(local)
         if at:
             # ANNOUNCED, because a reader must never mistake the fallback for the remote answer.
             # When `at` is empty the caller's resolution check refuses and names the ref.
-            print(f"drift-report: this clone has no origin remote, so the base is local {name} "
+            print(f"drift-report: this clone has no remote, so the base is local {name} "
                   f"@ {at}", file=sys.stderr)
         return local
-    raise DriftError(f"origin has no tracking ref for '{name}'; run `git fetch origin {name}`. "
+    tracking = f"refs/remotes/{remote}/{name}"
+    if read_sha8(tracking):
+        return tracking
+    raise DriftError(f"{remote} has no tracking ref for '{name}'; run `git fetch {remote} {name}`. "
                      f"Refusing to fall back to the local branch: a stale local {name} is the "
                      f"input this report used to grade instead of what landed.")
 
@@ -4140,8 +4198,9 @@ def main(argv: list[str] | None = None) -> int:
                     help="print one <signal> TAB <detail key> per thing --check would red on, and "
                          "nothing else; exits as --check does")
     ap.add_argument("--base-ref", default=None,
-                    help="ref that 'landed' means, verbatim (default: refs/remotes/origin/<the "
-                         "default branch>; a clone with no origin remote uses the local branch, "
+                    help="ref that 'landed' means, verbatim (default: refs/remotes/<remote>/<the "
+                         "default branch>, the remote being GOV_REMOTE, the branch's configured "
+                         "remote or the only one; a clone with no remote uses the local branch, "
                          "announced)")
     ap.add_argument("--delta", nargs=2, metavar=("BASE", "HEAD"),
                     help="print what moved between the history readings at BASE and inside "
