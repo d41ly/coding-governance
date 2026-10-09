@@ -80,9 +80,9 @@ ids DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 P
 | [KICK-aDistilledCharter-1 — the kickoff manifest's §B becomes one-liners, every evicted bullet recorded](spec/2026-10-09-spec-KICK-aDistilledCharter-1.md) | 9 | 1 | SPECCED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4.
+Ids no record names: DEPL-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4.
 
 Ids no `spec-audit` record has ever named: DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4.
 <!-- /gen:build-index -->

@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-09-build-KICK-aDistilledCharter-1-manifest-evictions.md](../build/2026-10-09-build-KICK-aDistilledCharter-1-manifest-evictions.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
