@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-6 — routed against raw: a paired trial on frozen clones of real repositories
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams tooling · order 6
+**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams tooling · order 6 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -148,7 +148,9 @@ Read at `6473ae38` on 2026-10-09.
 
 Fixed across arms: the model, the turn cap summed over a session's invocations, the wall ceiling,
 the disallowed web tools, the proxy instructions, and the frozen template the cell is copied from.
-The owner registers the first three at Ask A. Both arms of one task run in the same wave, so a load
+The owner registers the first three at Ask A. Every arm session, and every agent the trial spawns,
+Workflow agents included, runs at High reasoning effort and never Extra (owner ruling, 2026-10-09);
+the pilot records the setting that pins it, which is UNVERIFIED for a `claude -p` session today. Both arms of one task run in the same wave, so a load
 spike hits the pair. Cells are scored as assigned, never by what they did: a routed cell whose route
 did not engage, such as one that wrote through Bash, is scored as routed and named.
 
@@ -209,7 +211,8 @@ dependencies included, with a local bare repository as its `origin`.
 ### Running an arm
 
 The `run` verb starts one headless session per cell with `claude -p` in the cell, never `--bare`,
-with identical flags for every arm. At most the hook's bound runs at once: `CAP` in
+with identical flags for every arm. Those flags include `--dangerously-skip-permissions`, inside the
+frozen clone only, as `tools/unattended/resume-tick.sh:358` launches a run (F5). At most the hook's bound runs at once: `CAP` in
 `tools/hooks/agent-cap.js:85`, 5 at `6473ae38`. The hook cannot see a `claude -p` process, so the
 driver holds the bound itself.
 
@@ -501,11 +504,13 @@ New arm: none · covers none · the instruments carry their own liveness: the co
   quarter more total cost. Only the third arm can say whether the micro-spec and the gate add
   anything over orientation and a brief, which is the relax option §4's outcome table files.
   Recommendation: three arms.
+  RESOLVED (owner, 2026-10-09): three arms.
 - **F2 — How many tasks, at one replicate per arm?**
   Options: 8, two per stratum; 12, three per stratum; 16, four per stratum. Each task costs about a
   twelfth of the arms. Eight leaves each stratum's signal to two tasks. Sixteen adds a third to the
   bill, while twelve already resolve p far below the registered 0.05.
   Recommendation: 12, with a rerun at 16 only on an INCONCLUSIVE reading.
+  RESOLVED (owner, 2026-10-09): 12 tasks at one replicate per arm, rerun at 16 only on an INCONCLUSIVE reading.
 - **F3 — Which repositories supply the tasks?**
   Options: the two adopters only; the adopters plus gov tasks whose landed diff misses the routing
   machinery, with only that machinery overlaid at the landing tip; gov only. A gov clone at a
@@ -515,18 +520,30 @@ New arm: none · covers none · the instruments carry their own liveness: the co
   in gov's memory, and the owner approves that text at Ask A.
   Recommendation: the adopters only, falling back to the overlay only when they cannot fill a
   stratum.
+  RESOLVED (owner, 2026-10-09): the adopters only, falling back to the overlay only when they cannot fill a stratum.
 - **F4 — Who answers an arm's questions?**
   Options: the owner live; a proxy holding the decision list; nobody. The owner live is the real
   signal but leaves dozens of sessions waiting on a person. Nobody under-credits the brief
   confirmation the route is built around. The proxy's leak is one decision per answer, recorded per
   row.
   Recommendation: the proxy.
+  RESOLVED (owner, 2026-10-09): the proxy.
+- **F5 — How do the arms' headless sessions handle permissions?**
+  Option (a): an explicit allowed-tools list and no bypass, closer to how owners run, with the pilot
+  showing builds finish under it. Option (b): `--dangerously-skip-permissions`, inside the frozen
+  clone only, as `tools/unattended/resume-tick.sh:358` launches a run; an arm can then run any
+  command on the machine without asking. Whether a PreToolUse deny still fires under the bypass is
+  UNVERIFIED, so the pilot must observe one before the main arms run; with none observed, the routed
+  arm cannot be measured and the trial stops at Ask C.
+  RESOLVED (owner, 2026-10-09): (b), bypass inside the frozen clones only.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
 - rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 5 to 6, because `KICK-aRoutedQuill-1` moved
   from order 1 to 2, which shifts every later step by one.
+- rev-3 · 2026-10-09 · §4 · §8 · owner resolves F1 to F4 as recommended, adds F5 resolved as
+  bypass inside the frozen clones only, and runs every session and agent at High effort, never Extra.
 
 ## 10. Reuse audit
 

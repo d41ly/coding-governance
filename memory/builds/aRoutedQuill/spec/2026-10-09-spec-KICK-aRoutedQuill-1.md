@@ -1,6 +1,6 @@
 # KICK-aRoutedQuill-1 — the kickoff writes a brief the owner confirms, and the card routes the session to its units
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams kickoff · order 2 · closes TOOL-aReplayedCard-11
+**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams kickoff · order 2 · closes TOOL-aReplayedCard-11 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -51,7 +51,8 @@ The write gate and the subagent hand-off read that section; this unit writes and
 ## 3. Non-goals (OUT)
 
 - Grading the brief's content. The route check verifies the brief path is tracked inside the build
-  folder; the sections are TOOL-aQuotedBrief-1's structural rule, consumed as F1 decides.
+  folder. The sections of a prompt-mode record are graded by the structural rule TOOL-aQuotedBrief-1
+  builds, and TOOL-aRoutedQuill-7 repoints that rule at this unit's skeleton.
 - Machine-observing that the owner said go. No checker sees a conversation: the session quotes the
   answer, and the owner reads the brief before giving it.
 - Reading a routed unit's status. Whether a unit is buildable is the write gate's question at write
@@ -68,14 +69,16 @@ The write gate and the subagent hand-off read that section; this unit writes and
 
 ### Edges
 
-- **consumes-from** external — TOOL-aQuotedBrief-1's brief shape: the four `##` sections and the
-  five `###` sub-heads its §4 fence spells, which this unit's skeleton spells too; F1 decides which
-  file holds the one copy and which unit lands first.
+- **consumes-from** external — TOOL-aQuotedBrief-1's brief shape as specced: the four `##` sections,
+  the five `###` sub-heads and the two single-line forms its §4 spells. This unit's skeleton spells
+  them byte for byte, so a record written from it passes the five-sub-head rule that unit builds.
 - **hands-off** `TOOL-aRoutedQuill-2` — the `## route` grammar in §4, and the guarantee that a stored
   route's ids, spec pairings and paths resolved at append time. The gate re-reads each routed spec's
   status at write time.
 - **hands-off** `TOOL-aRoutedQuill-4` — the `## route` lines, at most one section per card, for the
   SubagentStart injection to carry verbatim.
+- **hands-off** `TOOL-aRoutedQuill-7` — the `--brief-skeleton` verb, whose `### ` list under
+  `## The brief` that unit's repointed prompt-brief rule reads as its required sub-heads.
 
 ## 4. Design
 
@@ -126,8 +129,9 @@ The attended sequence:
 1. Step 3 derives the task fields as today. When the task writes product code, the session also
    drafts the brief from `--brief-skeleton`. `## The prompt` quotes the message that asked for the
    build. `## The brief` restates the fields as Goal, numbered Items, Acceptance, Gates, Non-goals
-   with every limitation, and Reuse from Step 4's two probes. `## Drawn from the session` quotes each
-   earlier passage the brief relied on.
+   as the cut-line alone, Limitations as every constraint the build must respect, and Reuse from
+   Step 4's two probes. `## Drawn from the session` quotes each earlier passage the brief relied on,
+   naming its speaker.
 2. Step 5 writes the brief to disk, untracked, and echoes it beside the READY card. The READY body
    does not cite the brief's path: the append would annotate an untracked path, and the repair commit
    that follows the append must not sweep the brief in (KICK-aReplayedCard-3).
@@ -173,7 +177,10 @@ exist may carry the route on its READY append, which the verb accepts.
 <the gate legs the build keeps green>
 
 ### Non-goals
-<the cut-line, and every limitation the build must respect>
+<the cut-line: what the build must not build>
+
+### Limitations
+<every constraint the build must respect>
 
 ### Reuse
 <the seam the reuse probe named and the records the recall query returned, or that none fits>
@@ -197,9 +204,20 @@ Answer: <the owner's reply, verbatim>
 
 The record's filename follows check 5's grammar, and check 21 joins its id to the `**Serves:**` set;
 a second brief for the same unit on one date takes the tail `-brief-2`. The four `##` sections and
-the five sub-heads up to `### Non-goals` are TOOL-aQuotedBrief-1's §4 fence. `### Reuse` is new and
-sits last, so a reader grading those five in order still finds them (F1). `## Drawn from the session`
-is the single line `none` when the brief relied on nothing outside the prompt.
+the five sub-heads up to `### Non-goals` are TOOL-aQuotedBrief-1's §4 fence. `### Limitations` and
+`### Reuse` are new and sit after the five, so a reader grading those five in order still finds them.
+
+Four constraints keep the record TOOL-aQuotedBrief-1's:
+
+- Every quote under `## Drawn from the session` names its speaker, `owner` or `agent`.
+- The two single-line forms keep that unit's exact spellings. `## Drawn from the session` is the
+  single line `none` when the brief relied on nothing outside the prompt, and `## Owner confirmation`
+  is then the single line `not asked — the brief draws on nothing outside the prompt`.
+- That unit's rule 5 makes the confirmation mandatory only when the session section holds a quote.
+  An attended kickoff always asks, so its go is always recorded as the `Answer:` line and it never
+  writes the `not asked` form.
+- Nothing under `## The brief` opts a build into the spec audit. `read_audit_ask_record` reads only
+  `## The prompt` (TOOL-aQuotedBrief-1 S6), so an ask written only in the brief opts nothing in.
 
 The route grammar, which TOOL-aRoutedQuill-2 and TOOL-aRoutedQuill-4 read:
 
@@ -315,8 +333,8 @@ against the wording below, the two edits cost 211 bytes:
 - **AC1** — When `bash skills/session-kickoff/manifest-check.sh --brief-skeleton` runs from a
   directory outside any repository, it exits 0 and prints `## The prompt`, `## The brief`,
   `## Drawn from the session`, `## Owner confirmation` and `## route` in that order, with `### Goal`,
-  `### Items`, `### Acceptance`, `### Gates`, `### Non-goals` and `### Reuse` in that order under the
-  brief, and the three route line shapes.
+  `### Items`, `### Acceptance`, `### Gates`, `### Non-goals`, `### Limitations` and `### Reuse` in
+  that order under the brief, and the three route line shapes.
   Red when: a heading is missing or out of order, or the verb exits 2 for want of a repository.
 - **AC2** — When a body carrying a conforming `## route` and no READY line is piped to
   `manifest-check.sh --card --append` against a card whose READY line is real, in the K2 fixture clone
@@ -379,12 +397,20 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC4
   kit, which is opt-in, so a default adopter's attended brief would need a second copy here, and
   `### Reuse` would have no home.
   Recommendation: (a). It costs one rev of a SPECCED spec that no code depends on yet.
+  RESOLVED (owner, 2026-10-09): (a), the kickoff kit holds the one brief shape.
+  The owner had the two sessions settle the sequencing. On 2026-10-09 the session building
+  aQuotedBrief agreed that TOOL-aQuotedBrief-1 builds exactly as specced, with five hard-coded
+  sub-heads, and that repointing its structural rule at `--brief-skeleton` is a new unit,
+  TOOL-aRoutedQuill-7. So the rev of TOOL-aQuotedBrief-1 that option (a) describes does not happen,
+  and the consumes-from edge in §3 stays as written.
 - **F2 — Do limitations get a sub-head of their own?**
-  The owner's list names limitations beside non-goals. Folding them into `### Non-goals`, as §4
-  does, keeps the shape at the five sub-heads TOOL-aQuotedBrief-1 already grades plus `### Reuse`. A
+  The owner's list names limitations beside non-goals. Folding them into `### Non-goals` keeps the
+  shape at the five sub-heads TOOL-aQuotedBrief-1 already grades plus `### Reuse`. A
   `### Limitations` sub-head would separate a constraint, such as a size ceiling, from a cut-line, at
   the cost of one more sub-head every reader and the structural rule carry.
   Recommendation: fold, and revisit only if briefs show the two being confused.
+  RESOLVED (owner, 2026-10-09): own sub-head, `### Limitations`, after `### Non-goals` and before
+  `### Reuse`; §4's skeleton holds the cut-line alone under `### Non-goals`.
 
 ## 9. Revision log
 
@@ -392,6 +418,10 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC4
 - rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 1 to 2, because this unit and
   `TOOL-aRoutedQuill-1` each touch files the kickoff manifest watches, so both re-stamp it and
   cannot share a parallel step.
+- rev-3 · 2026-10-09 · §3 · §4 · §8 · AC1 · owner resolved F1 to (a) and F2 to an own
+  `### Limitations` sub-head; folded the aQuotedBrief session's sequencing (that unit builds as
+  specced, TOOL-aRoutedQuill-7 repoints its rule) and its four record constraints; hands-off to
+  TOOL-aRoutedQuill-7.
 
 ## 10. Reuse audit
 

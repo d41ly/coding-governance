@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-1 — a Tier-1 spec is a micro-spec, and check 12 grades its sections by heading text
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 1 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -343,10 +343,12 @@ New arm: tools/memory-tree/gen_build_index.py, its --selftest · covers AC6 · a
   only at INPROGRESS, as a Tier-2 spec is admitted; (c) refuse it outright. Recommendation: (b). It keeps D6 for every spec the arm graded, costs one conf read and
   one string compare, and closes the grandfather window and the blank-key adopter together. The
   decision is `TOOL-aRoutedQuill-2`'s.
+  RESOLVED (owner, 2026-10-09): (b). The ruling is recorded at `TOOL-aRoutedQuill-2` F4, where this fork was handed.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · §8 · owner resolves F1 as (b), recorded at `TOOL-aRoutedQuill-2` F4.
 
 ## 10. Reuse audit
 

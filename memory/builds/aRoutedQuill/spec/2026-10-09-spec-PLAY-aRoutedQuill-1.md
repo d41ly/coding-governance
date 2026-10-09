@@ -1,6 +1,6 @@
 # PLAY-aRoutedQuill-1 — the charter's Definition of Ready: every product-code unit carries a spec before code
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 5
+**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 5 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -224,6 +224,7 @@ This unit adds no gate arm.
   that target. The fence id is whichever registry entry ships `scratch-guard.js` when this unit
   builds; it is `agent-cap` today, and if the adopter-default unit moves the gate, this fence
   follows it.
+  RESOLVED (owner, 2026-10-09): (a), fenced by the registry entry that ships the gate.
 - **F2 — How does the version move, and does the banner move with it?** (a) Leave it to the
   lander's mint: the marker goes to v3.6, the banner stays at v3.4, and `AGENTS.md` keeps v3.5
   unless something re-renders, which §4 "Evidence" could not confirm. (b) Bump in this unit's last
@@ -232,12 +233,14 @@ This unit adds no gate arm.
   number out of the banner so only the marker carries it, about 6 bytes saved. Recommendation: (b).
   It is the only route that keeps the template, its render and the banner in agreement with no
   unverified step. (c) is the cleaner end state, and it is a separate charter edit.
+  RESOLVED (owner, 2026-10-09): (b), marker and banner to v3.6 by hand in the last template commit, `AGENTS.md` re-rendered.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
 - rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 4 to 5, because `KICK-aRoutedQuill-1` moved
   from order 1 to 2, which shifts every later step by one.
+- rev-3 · 2026-10-09 · §8 · owner resolves F1 (fenced) and F2 (b).
 
 ## 10. Reuse audit
 

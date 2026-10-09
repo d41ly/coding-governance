@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: tooling+kickoff+playbook+deployer
 roster: TOOL+KICK+PLAY
-ids: KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6
+ids: KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7
 ---
 
 # aRoutedQuill — every code build is routed through orientation, a brief and a specced unit
@@ -33,18 +33,21 @@ clear briefs, never the vague prompt where routing should pay.
 
 ## Build-level rules
 
-Eight units, one mechanism each. Owner decisions, 2026-10-09: every product-code write needs a
-specced unit, and a Tier-1 unit takes a micro-spec that still follows the spec template. A Tier-1
-unit admits writes at a conforming SPECCED spec, a Tier-2 unit only at INPROGRESS. The gate has no
-bypass and enforces from landing, with no warn phase. Its kit joins govkit's defaults and is wired
-at install. No spec audit is declared. The write gate routes and the push leg guarantees: a Bash
-write or a hook-less run passes the first and not the second. The gate reads a status the agent
-writes, so approval is recorded, not proven. There is no prompt classifier and no UserPromptSubmit
-gate, which aReplayedCard rejected on harness grounds. Three shared names have one owner each:
-`ROUTED_PATHS` belongs to unit 2, the card's `## route` section to the kickoff unit, and the unit id
-a commit names to unit 3. Kit versions bump once per kit, after the last unit touching it. The
-kickoff unit runs after unit 1, not beside it, because both re-stamp the kickoff manifest. At the
-rev-2 cross-read every unit is FORKED: its open questions go to the owner before any code.
+Nine units, one mechanism each. Owner decisions, 2026-10-09: every product-code write needs a
+specced unit, and a Tier-1 unit takes a micro-spec that still follows the spec template. A Tier-2
+unit admits writes at INPROGRESS; a Tier-1 unit at INPROGRESS, or at SPECCED once the micro-spec
+check has graded it. The gate has no bypass, refuses on a missing card or an unarmed conf, and
+enforces from landing with no warn phase. Its kit joins govkit's defaults, is wired at install and
+reaches existing adopters through `govkit update`. No spec audit is declared. The write gate routes
+and the push leg guarantees: a Bash write or a hook-less run passes the first and not the second.
+The gate reads a status the agent writes, so approval is recorded, not proven. There is no prompt
+classifier and no UserPromptSubmit gate. `ROUTED_PATHS` belongs to the gate unit, the card's
+`## route` and the brief shape to the kickoff unit, and a commit's unit id to the push leg unit.
+The brief shape moves into the kickoff kit after TOOL-aQuotedBrief-1 lands as specced, as agreed
+with that build's session, and the repoint unit points its check at it. Kit versions bump once per
+kit, after its last unit. The kickoff unit runs after the micro-spec unit, because both re-stamp the
+kickoff manifest. Every judgement fork is resolved; one probe settles the two subagent questions
+before the gate and hand-off units build.
 
 ## Parked decisions
 
@@ -62,31 +65,33 @@ none
 | 6 | `TOOL-aRoutedQuill-5` | SPECCED | the gate's kit and the card writer are adopter defaults, wired at install |
 | 7 | `PLAY-aRoutedQuill-1` | SPECCED | the charter's Definition of Ready requires a spec for every product-code unit |
 | 8 | `TOOL-aRoutedQuill-6` | SPECCED | a routed-vs-raw trial on frozen clones of real repos |
+| 9 | `TOOL-aRoutedQuill-7` | SPECCED | the unattended prompt-brief check reads its sub-heads from the kickoff kit's skeleton |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 8 unit(s) · node a · opened 2026-10-09 · streams tooling+kickoff+playbook+deployer
-ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6
+**Build status:** SPECCED · 9 unit(s) · node a · opened 2026-10-09 · streams tooling+kickoff+playbook+deployer
+ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aRoutedQuill-1 — a Tier-1 spec is a micro-spec, and check 12 grades its sections by heading text](spec/2026-10-09-spec-TOOL-aRoutedQuill-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [KICK-aRoutedQuill-1 — the kickoff writes a brief the owner confirms, and the card routes the session to its units](spec/2026-10-09-spec-KICK-aRoutedQuill-1.md) | 2 | 2 | SPECCED | rev-2 | 2026-10-09 |
-| [TOOL-aRoutedQuill-2 — scratch-guard refuses a product write no buildable unit on the card owns](spec/2026-10-09-spec-TOOL-aRoutedQuill-2.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-09 |
-| [TOOL-aRoutedQuill-3 — every pushed commit that touches a product path names a unit specced before it](spec/2026-10-09-spec-TOOL-aRoutedQuill-3.md) | 4 | 2 | SPECCED | rev-2 | 2026-10-09 |
+| [TOOL-aRoutedQuill-1 — a Tier-1 spec is a micro-spec, and check 12 grades its sections by heading text](spec/2026-10-09-spec-TOOL-aRoutedQuill-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-10-09 |
+| [KICK-aRoutedQuill-1 — the kickoff writes a brief the owner confirms, and the card routes the session to its units](spec/2026-10-09-spec-KICK-aRoutedQuill-1.md) | 2 | 2 | SPECCED | rev-3 | 2026-10-09 |
+| [TOOL-aRoutedQuill-2 — scratch-guard refuses a product write no buildable unit on the card owns](spec/2026-10-09-spec-TOOL-aRoutedQuill-2.md) | 3 | 2 | SPECCED | rev-3 | 2026-10-09 |
+| [TOOL-aRoutedQuill-3 — every pushed commit that touches a product path names a unit specced before it](spec/2026-10-09-spec-TOOL-aRoutedQuill-3.md) | 4 | 2 | SPECCED | rev-3 | 2026-10-09 |
 | [TOOL-aRoutedQuill-4 — every subagent starts holding the card's route, stated as facts](spec/2026-10-09-spec-TOOL-aRoutedQuill-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-10-09 |
-| [PLAY-aRoutedQuill-1 — the charter's Definition of Ready: every product-code unit carries a spec before code](spec/2026-10-09-spec-PLAY-aRoutedQuill-1.md) | 5 | 2 | SPECCED | rev-2 | 2026-10-09 |
-| [TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed](spec/2026-10-09-spec-TOOL-aRoutedQuill-5.md) | 5 | 2 | SPECCED | rev-2 | 2026-10-09 |
-| [TOOL-aRoutedQuill-6 — routed against raw: a paired trial on frozen clones of real repositories](spec/2026-10-09-spec-TOOL-aRoutedQuill-6.md) | 6 | 1 | SPECCED | rev-2 | 2026-10-09 |
+| [PLAY-aRoutedQuill-1 — the charter's Definition of Ready: every product-code unit carries a spec before code](spec/2026-10-09-spec-PLAY-aRoutedQuill-1.md) | 5 | 2 | SPECCED | rev-3 | 2026-10-09 |
+| [TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed](spec/2026-10-09-spec-TOOL-aRoutedQuill-5.md) | 5 | 2 | SPECCED | rev-3 | 2026-10-09 |
+| [TOOL-aRoutedQuill-6 — routed against raw: a paired trial on frozen clones of real repositories](spec/2026-10-09-spec-TOOL-aRoutedQuill-6.md) | 6 | 1 | SPECCED | rev-3 | 2026-10-09 |
+| [TOOL-aRoutedQuill-7 — the unattended prompt-brief check reads its sub-head list from the kickoff kit's `--brief-skeleton`](spec/2026-10-09-spec-TOOL-aRoutedQuill-7.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-09 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).
 
-Ids no record names: KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6.
+Ids no record names: KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7.
 
-Ids no `spec-audit` record has ever named: KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6.
+Ids no `spec-audit` record has ever named: KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -98,7 +103,7 @@ Ids no `spec-audit` record has ever named: KICK-aRoutedQuill-1 PLAY-aRoutedQuill
 | 3 | `TOOL-aRoutedQuill-2` | no |
 | 4 | `TOOL-aRoutedQuill-3`, `TOOL-aRoutedQuill-4` | yes |
 | 5 | `PLAY-aRoutedQuill-1`, `TOOL-aRoutedQuill-5` | yes |
-| 6 | `TOOL-aRoutedQuill-6` | no |
+| 6 | `TOOL-aRoutedQuill-6`, `TOOL-aRoutedQuill-7` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

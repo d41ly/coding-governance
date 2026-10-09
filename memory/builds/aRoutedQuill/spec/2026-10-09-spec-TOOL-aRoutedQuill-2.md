@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-2 — scratch-guard refuses a product write no buildable unit on the card owns
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3
+**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -27,8 +27,10 @@ piece and the remedy, and it binds a subagent exactly as it binds the main loop.
   AC3.
 - **S3** — BUILDABLE is decided per `- unit:` line of the card's `## route`: the spec path is
   repo-relative and sits under `<MEMORY_ROOT>/builds/<build slug>/spec/`, the file exists, its H1
-  names that unit id, and its status header reads Tier-1 at SPECCED or INPROGRESS, or Tier-2 at
-  INPROGRESS. One buildable unit admits the write. Observed by AC1 and AC2.
+  names that unit id, and its status header reads Tier-2 at INPROGRESS, Tier-1 at INPROGRESS, or
+  Tier-1 at SPECCED when the micro-spec arm graded it: `SPEC_TIER1_CUTOFF` in the target's
+  `.memory-tree.conf` is set and the spec's filename date is on or after it (F4). One buildable unit
+  admits the write. Observed by AC1 and AC2.
 - **S4** — On a product path, an absent card, a card with no `## route`, and a route with no
   buildable unit each refuse with their own reason and remedy. A card the replay wrote is read like
   any other. Observed by AC2.
@@ -154,7 +156,7 @@ token are stripped before matching. The `- brief:` line is not read here.
 
 | Tier on the spec header | Statuses that admit a write |
 |---|---|
-| Tier-1 | SPECCED, INPROGRESS |
+| Tier-1 | INPROGRESS; SPECCED only when `SPEC_TIER1_CUTOFF` is set and the spec is dated on or after it |
 | Tier-2 | INPROGRESS |
 
 ### The evaluation order
@@ -266,11 +268,14 @@ the move as owed at the lander.
 ## 6. Acceptance criteria
 
 - **AC1** — When the self-test feeds a `Write` payload whose target sits under the fixture's
-  `tools/` entry and whose card routes one unit, the hook exits 0 with empty stderr for a `Tier-2` spec at
-  `INPROGRESS` and a `Tier-1` spec at `SPECCED`, and exits 2 naming the unit, `Tier-2` and
-  `INPROGRESS` for a Tier-2 spec at `SPECCED`; a route of two units, one buildable, exits 0.
-  Red when: a Tier-2 unit admits writes before INPROGRESS, a Tier-1 unit at SPECCED refuses, or an
-  unbuildable unit refuses a route that also holds a buildable one.
+  `tools/` entry and whose card routes one unit, the hook exits 0 with empty stderr for a `Tier-2`
+  spec at `INPROGRESS` and for a `Tier-1` spec at `SPECCED` dated on or after the fixture's
+  `SPEC_TIER1_CUTOFF`. It exits 2 naming the unit, `Tier-2` and `INPROGRESS` for a Tier-2 spec at
+  `SPECCED`, and naming `SPEC_TIER1_CUTOFF` for a Tier-1 spec at `SPECCED` dated before the cutoff
+  or with the key blank. A route of two units, one buildable, exits 0.
+  Red when: a Tier-2 unit admits writes before INPROGRESS, a graded Tier-1 unit at SPECCED refuses,
+  an ungraded Tier-1 unit at SPECCED admits, or an unbuildable unit refuses a route that also holds
+  a buildable one.
 - **AC2** — When the target is a product path and the card is absent, the hook exits 2 naming the
   card path, the session id and `--card --write`; with no `## route`, it exits 2 naming `## route`
   and `/session-kickoff`; when a `- unit:` line names a missing spec, a spec outside
@@ -367,6 +372,7 @@ AC8 and AC9 are direct observations of this repository after the rewire and add 
   to. Option admit: no session is refused for a card it lacks, and the gate stops binding every
   install whose writer is not wired, which is every adopter until TOOL-aRoutedQuill-5.
   Recommendation: refuse both, as S4 and the evaluation order are written.
+  RESOLVED (owner, 2026-10-09): refuse both, as S4 and the evaluation order are written.
 - **F3 — Where does an UNARMED conf go red?**
   Option (a), as written: the hook refuses every write in the repository except to the conf, naming
   the key. Option (b): the hook admits, and the red is a session-start line in `check-wiring.sh`.
@@ -377,6 +383,7 @@ AC8 and AC9 are direct observations of this repository after the rewire and add 
   Recommendation: (a), with TOOL-aRoutedQuill-5's session-start report covering an install that
   has no conf at all. That report is a printed `UNWIRED  routed` line, since `check-wiring.sh
   --session` always exits 0; only its `--check` mode can fail.
+  RESOLVED (owner, 2026-10-09): (a). The hook refuses every write in an unarmed repository except to the conf.
 - **F4 — Does a Tier-1 spec the micro-spec arm never graded admit writes at SPECCED?**
   `TOOL-aRoutedQuill-1`'s F1 hands this decision here. A Tier-1 spec dated before
   `SPEC_TIER1_CUTOFF`, or in a tree whose key is blank, reaches SPECCED with nothing checking its
@@ -386,6 +393,7 @@ AC8 and AC9 are direct observations of this repository after the rewire and add 
   (c): refuse such a spec outright. Recommendation: (b). D6 admits a Tier-1 spec once it CONFORMS,
   and only (b) admits nothing the arm has not graded; it costs one conf read and one string compare
   in `checkBuildable`. Taking (b) moves S3 and AC1 in a rev-3.
+  RESOLVED (owner, 2026-10-09): (b). S3, the admission table and AC1 now admit a Tier-1 spec at SPECCED only when graded.
 
 ## 9. Revision log
 
@@ -395,6 +403,8 @@ AC8 and AC9 are direct observations of this repository after the rewire and add 
   kickoff manifest's stamps; S6 and AC5 now treat an entry covering `MEMORY_ROOT` as UNARMED, as
   units 3 and 5 already did; F3 says the session-start report prints rather than reds; F4 carries
   the Tier-1 admission fork unit 1 handed here.
+- rev-3 · 2026-10-09 · §4 · §8 · S3 · AC1 · owner resolves F2 (refuse an absent or replay-written
+  card), F3 (a) and F4 (b): a Tier-1 spec admits at SPECCED only when `SPEC_TIER1_CUTOFF` graded it.
 
 ## 10. Reuse audit
 

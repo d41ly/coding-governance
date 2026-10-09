@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-3 — every pushed commit that touches a product path names a unit specced before it
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -305,12 +305,14 @@ AC10 is a direct observation of this repository and adds no arm.
   prose still names one with a spec. First-only binds the house shape `build(<slug>): <ID> — <what>`
   harder and reds `TOOL-x-1, -2`-style subjects only when the first id fails.
   Recommendation: any id, stated in the header as what the leg does not check.
+  RESOLVED (owner, 2026-10-09): any id, stated in the header as what the leg does not check.
 - **F2 — Is the attribution the subject alone, as the shared contract says, or
   `read_attribution_tokens`' rule?**
   Subject alone reds the 6 recent routed commits that name their unit only in a `Pass:` trailer.
   The trailer rule reds the 1 that names an id in its subject and carries `Pass: none`, and keeps
   one attribution reading across the kits' history legs.
   Recommendation: the trailer rule, as S2 is written.
+  RESOLVED (owner, 2026-10-09): the trailer rule: an id in the subject or in the `Pass:` trailer attributes the commit.
 - **F3 — Does a close's repair commit or a reconcile's version mint need a unit id?**
   They are 75 of 493 recent routed commits. Option (a): every routed commit names a unit; a repair
   names the unit it repairs and a mint names the build's last unit. Option (b): exempt commits that
@@ -322,6 +324,7 @@ AC10 is a direct observation of this repository and adds no arm.
 - rev-1 · 2026-10-09 · initial draft.
 - rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 3 to 4, because `KICK-aRoutedQuill-1` moved
   from order 1 to 2, which shifts every later step by one.
+- rev-3 · 2026-10-09 · §8 · owner resolves F1 (any id) and F2 (subject or `Pass:` trailer).
 
 ## 10. Reuse audit
 

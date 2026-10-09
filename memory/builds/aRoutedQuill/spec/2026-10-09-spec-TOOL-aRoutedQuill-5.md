@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 5
+**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 5 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -295,26 +295,31 @@ AC10 is a direct observation of the runbook and adds no arm.
   the registry. Printing keeps `update`'s rule that it never widens a target (`govkit.py:9192-9197`)
   and leaves every existing adopter ungated until someone runs `apply --kits`.
   Recommendation: install, and print `default-gained` per entry.
+  RESOLVED (owner, 2026-10-09): install, and print `default-gained` per entry.
 - **F2 — Does `check-wiring` join the default set?**
   It is the reporter D7 names, and without it an adopter's unwired gate or blank key surfaces only
   as a red leg. It adds a SessionStart run to every adopter session and a held self-test leg.
   Recommendation: join.
+  RESOLVED (owner, 2026-10-09): join.
 - **F3 — Does the candidate drop a top-level directory that holds only gov's installed kits?**
   Kept, the adopter's own kit update commits must name a unit. Dropped, a receipt-reading
   derivation decides something the adopter confirms anyway, and a mixed directory needs a rule of
   its own.
   Recommendation: keep it in the candidate; the confirmation step is where the adopter drops it.
+  RESOLVED (owner, 2026-10-09): keep it in the candidate; the adopter drops it when confirming.
 - **F4 — How is `/session-kickoff` made reachable in an adopter?**
   Option (a): the machine junction stays an order `apply` prints, and check-wiring reports a gated
   repository on a machine without it (S9). Option (b): a project-scoped copy under the target's
   `.claude/skills/`, rendered with its paths, which needs a render the kickoff kit does not have.
   Recommendation: (a).
+  RESOLVED (owner, 2026-10-09): (a), the machine junction, and check-wiring reports a gated repository without it.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
 - rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 4 to 5, because `KICK-aRoutedQuill-1` moved
   from order 1 to 2, which shifts every later step by one.
+- rev-3 · 2026-10-09 · §8 · owner resolves F1 (install), F2 (join), F3 (keep) and F4 (a).
 
 ## 10. Reuse audit
 
