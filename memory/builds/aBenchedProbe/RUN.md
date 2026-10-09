@@ -45,3 +45,7 @@ base: 2b26f187f03cc991edbf40b25550e6590e97d26e
 2026-10-09T18:37:10Z brief · item TOOL-aBenchedProbe-2 · reason 646acc691479 memory/builds/aBenchedProbe/prompts/2026-10-09-prompt-TOOL-aBenchedProbe-1-2-build-brief.md
 
 2026-10-09T19:13:56Z dispatch · item 894952cb TOOL-aBenchedProbe-2 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh memory/builds/aBenchedProbe/spec/2026-10-09-spec-TOOL-aBenchedProbe-2.md memory/LIVE.md memory/ledger/2026-10.md memory/builds/aBenchedProbe/README.md memory/guides/SESSION-KICKOFF.md
+
+2026-10-09T19:23:07Z dispatch · item e0448998 DEPL-aBenchedProbe-1 · reason tools/govkit/govkit.py memory/builds/aBenchedProbe/spec/2026-10-09-spec-DEPL-aBenchedProbe-1.md memory/builds/aBenchedProbe/README.md memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-09T19:23:41Z brief · item DEPL-aBenchedProbe-1 · reason 646acc691479 memory/builds/aBenchedProbe/prompts/2026-10-09-prompt-TOOL-aBenchedProbe-1-2-build-brief.md

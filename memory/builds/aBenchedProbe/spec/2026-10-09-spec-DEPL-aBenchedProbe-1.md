@@ -1,6 +1,6 @@
 # DEPL-aBenchedProbe-1 — govkit selfcheck reds a descriptor self-test leg whose subject is not `kit`
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-1 · base 2b26f187 · streams deployer · order 2
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-1 · base 2b26f187 · streams deployer · order 2
 
 <!-- gen:spec-records -->
 

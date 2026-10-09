@@ -2670,6 +2670,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     #          the escape, on the same reason-and-staleness rule as the path exemptions, and S6
     #          refuses a leg that is BOTH claimed and exempted.
     legs_path = resolve_tool_path(root, "gate-legs.json")
+    manifest_chunk: dict = {}  # 7j4 reads it unconditionally and refuses on an absent manifest
     if legs_path.is_file():
         _legs_json = json.loads(legs_path.read_text(encoding="utf-8"))
         manifest = {leg.get("name") for leg in _legs_json}
@@ -3229,6 +3230,55 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                            f"`[[exempt_leg]]` row in <prefix>/govkit/registry.toml")
     r.note(f"declared check: {len(descs)} entries, {len(_no_check)} silent · withheld-path legs: "
            f"{_legs_graded} descriptor leg(s) graded")
+
+    # ---- 7j4: DEPL-aBenchedProbe-1. NO `[[gate_leg]]` IS HELD ON GOV'S BAR AND SHIPPED UNHELD.
+    #          A leg is SELF-TEST-SHAPED when its manifest chunk is `selftests` or the basename of a
+    #          resolved argv element matches `*.test.sh`, `test_*.py` or `*selftest*` (the bare
+    #          `--selftest` flag included). It is EXEMPT when its chunk is present and is anything
+    #          else: gov runs it on every bar, and subject-pins.tsv shows any move of that chunk in a
+    #          diff. A shaped, non-exempt leg whose descriptor subject is not `kit` reaches every
+    #          adopter's default bar while gov holds it. In today's tree every manifest row carries a
+    #          chunk, so the filename clause reds only a row that LOST its chunk; the live predicate
+    #          is `chunk == selftests AND subject != kit`. DOES NOT CHECK: legs outside
+    #          `[[gate_leg]]` (the run-gates canary) or `[[exempt_leg]]` rows; whether gov's chunk is
+    #          right; a self-test whose file name matches none of the globs or that runs indirectly,
+    #          e.g. through `sh -c`; that an exempt leg is cheap.
+    import fnmatch
+    if not legs_path.is_file():
+        r.fail(f"7j4: {legs_path.relative_to(root).as_posix()} is absent, so no leg's chunk is known "
+               f"and a held self-test cannot be told from an exempt check — nothing was graded")
+    else:
+        _j4_graded, _j4_shaped, _j4_exempt = 0, 0, []
+        for eid, (d, _p) in sorted(descs.items()):
+            _ctx = canonical_ctx(eid)
+            for leg in d.get("gate_leg", []):
+                nm = leg.get("name")
+                _j4_graded += 1
+                chunk = manifest_chunk.get(nm)
+                hit = next((s for s in (resolve_tokens(a, _ctx)[0] for a in leg.get("argv", []))
+                            if any(fnmatch.fnmatchcase(posixpath.basename(s), g)
+                                   for g in ("*.test.sh", "test_*.py", "*selftest*"))), None)
+                if chunk != "selftests" and hit is None:
+                    continue
+                _j4_shaped += 1
+                if chunk and chunk != "selftests":
+                    _j4_exempt.append(nm)
+                    continue
+                if leg.get("subject") != "kit":
+                    why = ("manifest chunk `selftests`, so gov holds it" if chunk else
+                           f"argv element {hit}, and the manifest files it in no chunk")
+                    r.fail(f"7j4: entry '{eid}' gate leg '{nm}' is a self-test by its {why}, while its "
+                           f"descriptor subject is '{leg.get('subject')}', so every adopter runs it on "
+                           f"its default bar. Hold it everywhere: `subject = \"kit\"` "
+                           f"in the descriptor and <prefix>/gate-legs.json, then `selfcheck --write`. Or "
+                           f"run it everywhere: file it in a chunk other than `selftests`")
+        if not _j4_graded:
+            r.fail("7j4: graded zero descriptor gate legs — the held-self-test arm saw nothing")
+        elif not _j4_shaped:
+            r.fail("7j4: found zero self-test-shaped legs among "
+                   f"{_j4_graded} — the predicate has stopped matching, so a green here proves nothing")
+        r.note(f"held self-test legs: {_j4_graded} graded, {_j4_shaped} self-test-shaped, "
+               f"exempt by chunk: {', '.join(sorted(_j4_exempt)) or 'none'}")
 
     # ---- 7k: entry-level `scope` is DERIVED and asserted against the declared value. Every
     #          descriptor declares one and the engine read only the rule-level spelling, so the
