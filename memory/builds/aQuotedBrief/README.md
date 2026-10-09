@@ -73,9 +73,9 @@ ids TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3
 | [TOOL-aQuotedBrief-3 — every brief item carries its disposition, and `build-complete` grades each one](spec/2026-10-09-spec-TOOL-aQuotedBrief-3.md) | 2 | 2 | SPECCED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3.
+Ids no record names: TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3.
 
 Ids no `spec-audit` record has ever named: TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3.
 <!-- /gen:build-index -->
