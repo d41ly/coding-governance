@@ -65,3 +65,7 @@ base: ce9192c0ba180a67b49b2ea3fc8edf2fb8afc0cb
 2026-10-09T03:43:55Z rescope · item add TOOL-aLevelledCopy-8 · reason closing review round 1 minors on the check-wiring write set: M3 M4 M5 M7 L1 L2 (ids 16 6 7 13 5 10 14)
 
 2026-10-09T03:44:57Z rescope · item add TOOL-aLevelledCopy-9 · reason closing review round 1 minors on the receipt, govkit and record write set: M2 M6 L3 L4 L5 (ids 4 12 8 15 18 19)
+
+2026-10-09T04:26:05Z dispatch · item 176005b6 TOOL-aLevelledCopy-7 · reason tools/check-wiring.sh tools/check-wiring.test.sh memory/builds/aLevelledCopy/spec/2026-10-09-spec-TOOL-aLevelledCopy-7.md memory/builds/aLevelledCopy/build/2026-10-09-build-TOOL-aLevelledCopy-7-1-acceptance-ledger.md memory/builds/aLevelledCopy/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
+
+2026-10-09T04:26:34Z brief · item TOOL-aLevelledCopy-7 · reason 88b9006aa11f memory/builds/aLevelledCopy/prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1-2-build-brief.md
