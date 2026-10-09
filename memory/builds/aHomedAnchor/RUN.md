@@ -9,21 +9,23 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 5a836bf0fc940029136b4b3fd57a87f35ff40f26 · park · 0 touching
+asks-at-landing: TOOL-aHomedAnchor-8=OPEN TOOL-aHomedAnchor-9=OPEN TOOL-aHomedAnchor-10=OPEN TOOL-aHomedAnchor-11=OPEN TOOL-aHomedAnchor-12=OPEN TOOL-aHomedAnchor-13=OPEN TOOL-aHomedAnchor-14=OPEN TOOL-aHomedAnchor-15=OPEN TOOL-aHomedAnchor-16=OPEN TOOL-aHomedAnchor-17=OPEN TOOL-aHomedAnchor-18=OPEN TOOL-aHomedAnchor-19=OPEN TOOL-aHomedAnchor-20=OPEN TOOL-aHomedAnchor-21=OPEN
+units-at-landing: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7
+refreshed-at: 5a836bf0fc940029136b4b3fd57a87f35ff40f26 · handoff · 0 touching
 hold-run: 
-hold-streak: 1 · at 3ab0d60c
-resume-owed: unattended-resume-ahomedanchor · fire 2026-10-09T09:38:30Z
-held-at: 2026-10-09T09:08:30Z
-hold-reason: the runner exited HOST: straggler-guard arms timed out twice while a spawn cost 16.0x this clone's floor; 62 of 63 legs had already read green in the previous close
-hold-until: probe host
-hold-code: host-degraded
+hold-streak: 1 · at 12930f49
+resume-owed: none · owner
+held-at: 2026-10-09T17:01:07Z
+hold-reason: owner instruction 2026-10-09: skip the bar and land this; the owner lands it by hand
+hold-until: owner
+hold-code: owner-decision
 held-from: VERIFYING
 gates-run: unattended-179153003762917425227-2416772 75ee33ec
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: f9e1b3d8f8c4ccb7fd186a76061b1216a2c2aa1c
-phase: VERIFYING
+witness: 12930f49ff9c33974636c4c1d8c21c7b0730ef19
+phase: HELD
 branch-sha: 11224126c2e48935ee3cc2e802bd3099c0f225fe
 branch-ref: refs/heads/branch/unattended-kit-slug-mode-e3ba61
 may: none
@@ -87,3 +89,7 @@ base: 11224126c2e48935ee3cc2e802bd3099c0f225fe
 2026-10-09T16:36:57Z decision · item land without a bar on the reconciled HEAD? · reason options: run the bar first, or land over the close's 62/63-green bar whose one red leg was HOST-attributed; the owner chose to skip the bar and land (2026-10-09)
 
 2026-10-09T16:52:10Z resume · item aHomedAnchor · reason held · keepalive 04e9f438 · manual
+
+2026-10-09T17:01:52Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aHomedAnchor && bash tools/push-main.sh --land --slug aHomedAnchor && bash tools/unattended/unattended.sh --settle aHomedAnchor
+
+2026-10-09T17:01:56Z hold · item owner-decision · reason until owner · reaped 04e9f438 · resume none(owner)
