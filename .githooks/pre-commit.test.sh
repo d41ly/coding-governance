@@ -138,5 +138,27 @@ else
   echo "SKIP AC2 red-first control NOT RUN: 2143b6d6 is a coding-governance commit this repository does not carry"
 fi
 
+# ---- the unattended skill wiring leg, TOOL-aHomedAnchor-4 AC1/AC2 ---------------------------------
+# A stand-in adopter at the root install says how it was called. Staging the conf runs it with
+# --check; staging an unrelated file does not run it at all.
+ua=unattended; ad=adopt-unattended.sh
+d="$tmp/wiring"; rm -rf "$d"; mkdir -p "$d"
+out=$( cd "$d" || exit 2
+  git init -q -b main; git config user.email t@example.com; git config user.name test
+  git config core.autocrlf false
+  mkdir hk; cp "$HOOK" hk/pre-commit; chmod +x hk/pre-commit; git config core.hooksPath hk
+  mkdir -p "$ua"; printf '#!/usr/bin/env bash
+echo "WIRING RAN $*"
+' > "$ua/$ad"
+  git add -A; git commit -q --no-verify -m fixture
+  echo x > other.txt; git add other.txt; git commit -q -m other 2>&1
+  echo 'ANCHOR_SCOPE="local"' > .unattended.conf; git add .unattended.conf; git commit -q -m conf 2>&1 ); rc=$?
+case "$out" in *"WIRING RAN --check"*) r=$rc ;; *) r=1 ;; esac
+ck "AC1 a staged .unattended.conf runs the adopter with --check" "$r" 0
+n_runs=$(printf '%s
+' "$out" | grep -c 'WIRING RAN' || true)
+[ "$n_runs" = 1 ] && r=0 || r=1
+ck "AC2 an unrelated staged file does not run the adopter (one run, not $n_runs)" "$r" 0
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

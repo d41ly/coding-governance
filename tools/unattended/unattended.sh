@@ -52,7 +52,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.90   # gov:kit unattended@1.90 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.92   # gov:kit unattended@1.92 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -631,6 +631,8 @@ read_bound_key RESUME_STALE_BOUND "$RESUME_STALE_BOUND_DEFAULT" seconds "a run r
 # a tracked `.unattended.conf` could pre-set it and defeat the "--park requires --item" refusal by
 # supplying the item nobody typed.
 PK_ITEM=""; PK_STEP=""
+# Internal state for trusted_base, initialised here for PK_ITEM's reason (TOOL-aHomedAnchor-6 S8).
+TB_IGNORE_RECORD=0
 HALT_CODE=""
 TK_NAME=""; TK_BEAT=""
 # `--plan --paths` is an OUTPUT MODE on an existing verb, not a verb: check 26 joins every declared
@@ -2366,6 +2368,20 @@ resolve_base() { # readme path (may be empty) -> sets RB_BASE, ANCHOR_KIND, BREF
   # The README does not resolve at the merge-base. Widen ONLY when the project declared it; any
   # other value — blank, misspelled, from a newer kit — keeps the strict anchor and the caller gets
   # the same refusal it got before this unit existed.
+  # TOOL-aHomedAnchor-1 S1 - THE THIRD ANCHOR, local history. It widens straight past the run
+  # branch's advertised tip, which it never observes: the owner's ruling is that starting a run costs
+  # no push. The README must be COMMITTED, so it is tested at HEAD, and the derived base is HEAD - the
+  # degenerate code, which only --preflight admits. Every later call reads the RECORDED base instead,
+  # in trusted_base, because on this anchor nothing off this node pins one.
+  # A README NOT COMMITTED AT HEAD falls through to the strict anchor (TOOL-aHomedAnchor-6 S2), so
+  # check_authorization's fail 6 names the missing README rather than fail 16 naming remote history.
+  if [ "$ANCHOR_SCOPE" = local ]; then
+    if ! GIT show "$head:$rel" >/dev/null 2>&1; then
+      ANCHOR_KIND=default-branch; [ "$mb" = "$head" ] && return 2; RB_BASE="$mb"; return 0
+    fi
+    ANCHOR_KIND=local
+    return 2
+  fi
   [ "$ANCHOR_SCOPE" = published ] || { ANCHOR_KIND=default-branch; [ "$mb" = "$head" ] && return 2; RB_BASE="$mb"; return 0; }
   # SILENT. This function's stdout is the VALUE channel — a `fail` raised here lands in the
   # caller's variable instead of reaching the operator, which is how every second-anchor refusal
@@ -2416,7 +2432,7 @@ GG_RUN_FACT=""; GG_INH_FACT=""
 # `staged` beside its attribution, never into the run-state file (implementation review round 2, M2
 # and L1), and read by `check_bar_tied`'s record-only mode.
 WI_STAGED=""; AV_STAGED=""; BT_NOTED=""
-trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
+trusted_base() { # run-state file [· allow-degenerate [· preflight]]  ->  sets TB
   local fresh rc rec head rec0 _tb_rd _tb_alt
   TB=""
   # S1's plumbing: the README beside the run-state file, derived the way the gate leg derives it
@@ -2431,6 +2447,38 @@ trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
   if [ "$rc" = 1 ] && [ -n "$BR_RC" ] && [ "$BR_RC" != 0 ]; then
     emit_branch_fail "$BR_RC"
     return 1
+  fi
+  # TOOL-aHomedAnchor-1 S2 - ON THE LOCAL ANCHOR THE RECORDED BASE IS THE INPUT, because nothing else
+  # exists: no observation off this node pins one, and a value derived here would be HEAD, compared
+  # against itself. This is the evidence-never-an-input rule given up on purpose, the cost the owner
+  # accepted when the anchor was ruled in; what stays is that the base must lie on HEAD's history and
+  # that a run which built nothing has nothing to land. A record --preflight is about to RETIRE
+  # (`TB_IGNORE_RECORD`) is a finished run's, and its base is not this run's.
+  if [ "$ANCHOR_KIND" = local ]; then
+    head=$(GIT rev-parse HEAD)
+    rec=""
+    [ "${TB_IGNORE_RECORD:-0}" = 1 ] || [ ! -f "$1" ] || rec=$(fact "$1" base)
+    # ONLY --preflight may start from no record (TOOL-aHomedAnchor-6 S7): a take-over also passes
+    # allow-degenerate, for a base equal to HEAD, and must not read a deleted line as "start here".
+    if [ -z "$rec" ]; then
+      if [ "${3:-}" = preflight ]; then
+        TB="$head"
+        return 0
+      fi
+      fail 16 "the BASE came from the local anchor and the record pins none, and on that anchor the recorded base is the only one there is, so an absent one is a refusal rather than a pass"
+      return 1
+    fi
+    if ! GIT rev-parse --verify --quiet "$rec^{commit}" >/dev/null 2>&1 \
+       || ! GIT merge-base --is-ancestor "$rec" HEAD 2>/dev/null; then
+      fail 18 "the BASE recorded in the run-state file is not an ancestor of HEAD, and on the local anchor that recorded base is the whole authorization, so a base off this history authorizes nothing: recorded $rec"
+      return 1
+    fi
+    if [ "${2:-}" != "allow-degenerate" ] && [ "$rec" = "$head" ]; then
+      fail 16 "the recorded BASE equals HEAD on the local anchor, so this run built nothing on top of it and has nothing to land"
+      return 1
+    fi
+    TB="$rec"
+    return 0
   fi
   if [ "$rc" = 2 ]; then
     # BASE == HEAD. Legal outright where the caller says so, and only ONE caller does - see
@@ -2520,10 +2568,14 @@ trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
       # THE COST: `fail 18` widens. It now fires only for a base on NEITHER history, which is
       # strictly smaller than before, so S9 carries an arm proving it still has a failing case. A
       # widened guard with no failing-case arm is indistinguishable from a deleted one.
+      # TOOL-aHomedAnchor-1 S3 - the LOCAL anchor's own derivation is any ancestor of HEAD, so a run
+      # it authorized whose folder later reaches the default branch is accepted here for S12's reason.
       if ! GIT merge-base --is-ancestor "$rec" "$fresh" 2>/dev/null \
          && ! { [ "$ANCHOR_SCOPE" = published ] \
                 && _tb_alt=$(branch_tip_quiet) \
-                && GIT merge-base --is-ancestor "$rec" "${_tb_alt##* }" 2>/dev/null; }; then
+                && GIT merge-base --is-ancestor "$rec" "${_tb_alt##* }" 2>/dev/null; } \
+         && ! { [ "$ANCHOR_SCOPE" = local ] \
+                && GIT merge-base --is-ancestor "$rec" HEAD 2>/dev/null; }; then
         fail 18 "the BASE recorded in the run-state file is not an ancestor of the base this history derives, so it names a commit off the history the anchor blesses - which is where a run's own commits live: recorded $rec, derived $fresh"
         return 1
       fi
@@ -3186,7 +3238,8 @@ check_authorization() { # slug · base
   # that commit and is read unchanged. A merge-base that cannot be computed reads as NO default: the
   # owner's side was not observed, and an opt-in nobody can place on it is not the owner's.
   _cb="$base"
-  if [ "$ANCHOR_KIND" = run-branch ]; then
+  # The LOCAL anchor's BASE is a commit on this node too (TOOL-aHomedAnchor-1 S5), read the same way.
+  if [ "$ANCHOR_KIND" = run-branch ] || [ "$ANCHOR_KIND" = local ]; then
     _cb=$(GIT merge-base "$ASHA" "$base" 2>/dev/null) || _cb=""
   fi
   if [ -z "$AUTH_SPEC_AUDIT" ] && ! printf '%s\n' "$_fm" | grep -q '^spec-audit=' \
@@ -3284,6 +3337,17 @@ check_authorization() { # slug · base
       return 1
     fi
   fi
+  # TOOL-aHomedAnchor-1 S5 - THE LOCAL ANCHOR REFUSES THE OPT-IN IN `slug` MODE TOO. The branch above
+  # keys on the mode because, before the local anchor, a `slug` README could only resolve at the
+  # default-branch anchor. On the local anchor it resolves at a commit on this node, which the run
+  # could have written, so the self-opt-in that check refuses is open again for `slug`. Its own
+  # message, so the second-anchor refusal's text and its arms do not move.
+  if [ "$ANCHOR_KIND" = local ] && [ "$AUTH_MODE" = slug ] && printf '%s
+' "$_fm" | grep -q '^spec-audit='; then
+    AUTH_SPEC_AUDIT_DERIVED=""
+    fail 89 "the build README declares spec-audit: and the BASE came from the local anchor, a commit on this node the run could have written, so the opt-in may be the run's own - only the owner opts a build into the pre-code spec audit, by a spec-audit: line in a slug-mode README landed on the default branch or a SPEC_AUDIT_DEFAULT there; delete the line, and leave the opt-in to the owner"
+    return 1
+  fi
   # the declaration seam, evaluated where the MODE exists and nowhere else.
   # Each refusal is its own message: a single ANDed verdict would send a reader to diff a parse
   # against a path, which is the defect the Definition-of-Done evaluation already fixed once by
@@ -3299,6 +3363,12 @@ check_authorization() { # slug · base
     fail 71 "the build README declares an asks: mandate under an authorization mode that resolves at the second anchor, so the run could have written the line that says which asks it may answer - ruling D12-a puts that choice on a commit the owner landed: mode $AUTH_MODE, admissible for a mandate is slug"
     return 1
   fi
+  # TOOL-aHomedAnchor-6 S1 - and a `slug` README on the LOCAL anchor, for fail 78's and fail 89's
+  # reason: it resolves at a commit on this node, so the mandate may be the run's own.
+  if [ -n "$AUTH_ASKS" ] && [ "$ANCHOR_KIND" = local ]; then
+    fail 71 "the build README declares an asks: mandate and the BASE came from the local anchor, a commit on this node the run could have written, so the mandate may be the run's own - ruling D12-a puts the choice of which asks a run answers on a commit the owner landed: asks: [$AUTH_ASKS]"
+    return 1
+  fi
   # ...and a mandate nothing can GRADE is worse than no mandate at all: every later item keyed on it
   # would be met vacuously, by a set nobody ever read.
   if [ -n "$AUTH_ASKS" ] && [ -z "${ASKS_CMD:-}" ]; then
@@ -3312,6 +3382,12 @@ check_authorization() { # slug · base
   # The test is the MODE and not `prompt` alone, so a `recipe` README is refused by the same branch.
   if [ "$AUTH_MAY_SET" = 1 ] && [ "$AUTH_MODE" != slug ]; then
     fail 78 "the build README carries a may: grant under an authorization mode that resolves at the second anchor, so the run could have written the grant it would be acting under - ruling D12-j honours a grant only from a slug-mode README the owner committed at the default-branch anchor: mode $AUTH_MODE, may: [$AUTH_MAY]"
+    return 1
+  fi
+  # TOOL-aHomedAnchor-1 S5 - and a `slug` README on the LOCAL anchor, for the reason the spec-audit
+  # refusal above gives: it resolves at a commit on this node, so the grant may be the run's own.
+  if [ "$AUTH_MAY_SET" = 1 ] && [ "$ANCHOR_KIND" = local ]; then
+    fail 78 "the build README carries a may: grant and the BASE came from the local anchor, a commit on this node the run could have written, so the grant may be the run's own - ruling D12-j honours a grant only from a slug-mode README the owner committed at the default-branch anchor: may: [$AUTH_MAY]"
     return 1
   fi
   # TOOL-dDerivedDocket-19 S3 - THE GRANT GRAMMAR, as a typo guard. One library function normalises the
@@ -6537,10 +6613,14 @@ verb_preflight() { # slug · keepalive-id
   # merge-base == HEAD, HEAD is an ancestor of the tip the REMOTE advertised, so every byte at BASE is
   # on the remote's default branch. Against a local ref that premise was false, which is why this
   # relaxation could not have shipped before the anchor moved.
-  if [ -n "$ASHA" ] && trusted_base "$rel" allow-degenerate; then
+  # TB_IGNORE_RECORD: a record this preflight retires below is a finished run's, and on the local
+  # anchor trusted_base would otherwise take that run's base as this one's (TOOL-aHomedAnchor-1 S2).
+  TB_IGNORE_RECORD="$rotate"
+  if [ -n "$ASHA" ] && trusted_base "$rel" allow-degenerate preflight; then
     base="$TB"
     check_authorization "$slug" "$base" || true
   fi
+  TB_IGNORE_RECORD=0
   # TOOL-aBoundedVerdict-11 S4 - the WORKING COPY's units region must be readable, and this is where
   # an agent meets the requirement rather than discovering it at --close. The region is what every
   # later verb reads for the unit list: --plan's roster join, --status's next unit, --landed's freeze

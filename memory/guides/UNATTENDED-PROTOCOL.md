@@ -1,9 +1,9 @@
-<!-- gov:kit unattended@1.90 -->
+<!-- gov:kit unattended@1.92 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
-each other, so a claim FALSE IN BOTH is green** — three defects here survived exactly that way. A
-parity leg is a copy check, not a truth check; only a reader grades a sentence against the code.*
+each other, so a claim FALSE IN BOTH is green.** A parity leg is a copy check, not a truth check;
+only a reader grades a sentence against the code.*
 
 **Binding.** A session running with no human in the loop follows this document. It is
 project-agnostic: every value that differs per repo is a DECLARATION in the repo-root
@@ -65,7 +65,7 @@ remote advertises for the run's OWN branch — used only when the README does no
 merge-base, and only when that tip is an ancestor of HEAD. Absent, blank or misspelled keeps the
 strict anchor. Both anchors observe the endpoint the landing push goes to.
 
-**It spends THREE things, all put to the owner and accepted.** The first list carried only the first:
+**It spends THREE things, all put to the owner and accepted:**
 
 1. **Self-authorization gets cheaper.** A branch push is not gated by the pre-push hook, so a run can
    authorize ITSELF in two commands, where before it could only authorize its successor (cost 4).
@@ -78,14 +78,19 @@ strict anchor. Both anchors observe the endpoint the landing push goes to.
    refusal, which is why this is narrow rather than a general hole.
 2. **The BAR weakens for adopters who never opt in.** The key gates the DRIVER and cannot gate the
    leg: the conf is a working-tree file the run can commit, so a leg reading it reads its subject's
-   answer. The leg's BASE check therefore asks "published on the remote" in every repo.
+   answer. The leg's BASE check therefore asks "published on the remote" unless the remote's
+   default branch declares `local`.
 3. **Roster integrity becomes satisfiable by construction** on the branch anchor, as qualified above.
 
 None of the three is closed. What the design adds is VISIBILITY: the record names the anchor used.
 
-**What this costs, stated because the previous design paid none of it.** The authorization was once a
-block naming the build and both authorized actions, compared byte-for-byte across the BASE. Moving it
-to the build folder trades these properties:
+**A THIRD ANCHOR, `local`** (`TOOL-aHomedAnchor-1`). Under `ANCHOR_SCOPE="local"`, where the
+first anchor misses, a README committed at HEAD authorizes in any mode, unpushed; later verbs
+read the RECORDED base, an ancestor of HEAD, not HEAD at `--close`. Nothing off this node pins
+it. The leg admits it only where the remote's default-branch conf says `local`. `may:`,
+`asks:` and a `slug` or `recipe` `spec-audit:` are refused.
+
+**What the build-folder authorization costs**, against the byte-compared block it replaced:
 
 1. **Integrity becomes existence.** A README's generated region legitimately moves, so no whole-file
    equality is assertable.
@@ -126,12 +131,10 @@ rather than starting a run bound by a set that resolves to nothing.
 Absent or unreachable authorization → the run does not start, with no override: an override on the
 authorization check IS the authorization check.
 
-**A SECOND item joined that set**, and the driver holds it as a declared list rather than a name in a
-case arm. `pieces-complete` is not overridable either: it is the item that says a `recipe`-mode run
+**A SECOND item joined that set.** `pieces-complete` is not overridable either: it is the item that says a `recipe`-mode run
 produced what the owner asked for, over content nothing else on the merge bar can grade, so an
 override on it is the run certifying its own output. `--abort` is the honest exit when it cannot be
-met. The build that introduced the item ratified this as an acceptance criterion and then shipped
-without it — found by writing the arms that item had never had.
+met.
 
 ## 2. The run-state file
 
@@ -474,7 +477,7 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `WIRING_CHECK` | the non-repairing wiring check `--preflight` delegates to |
 | `KEEPALIVE_CREATE` · `KEEPALIVE_DELETE` | the agent-facing scheduler tool calls, named for the agent to use |
 | `KEEPALIVE_INTERVAL` | the cadence the agent schedules the keepalive at, rendered into the Skill as prose |
-| `ANCHOR_SCOPE` | which anchors may authorize a run: the CLOSED set `default-branch` and `published`. Absent, blank or outside the set keeps `default-branch`, so a typo grants nothing. Gates the DRIVER only — §1 cost 2 |
+| `ANCHOR_SCOPE` | which anchors may authorize a run: the CLOSED set `default-branch`, `published` and `local`. Absent, blank or outside the set keeps `default-branch`, so a typo grants nothing. Gates the DRIVER only — §1 cost 2 |
 | `AUTH_PARAM` | the token an invocation must carry to start a prompt-mode run, rendered into the Skill at its routing row and its opening fence. BLANK or absent is the kit default, stated verbatim by that render. Its ARGUMENT is a prompt file path or the prompt itself. A value that is not a hyphen-led flag, or carries whitespace, a pipe or a backtick, is refused at render time: it lands in a table row and a code span, and each of those ends one early. Gates NOTHING at run time: no script sees the invocation, so this is the gesture and never the authorization, which stays the pushed build folder (§1) |
 | `CORE_FLOOR` | `<phases>:<dod>`, the shrink-only SIZE of the kit's core sets. MANDATORY: undeclared or malformed leaves both pins unenforced, so both are refusals |
 | `DIRECTIVES_EXTRA` | project directive members, appended to the core set |
