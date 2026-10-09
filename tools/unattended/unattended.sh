@@ -541,6 +541,8 @@ DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; PROMPT_BRIEF_CUT
 #     because a run that added its own node to the working copy would grant itself a landing.
 #   * PROMPT_BRIEF_CUTOFF (TOOL-aQuotedBrief-1 S5) - the README `opened:` date from which a
 #     prompt-mode record must carry its brief, read by `check_prompt_brief`. Blank is off, announced.
+#     The value this source binds decides nothing: `read_brief_cutoff` re-reads the key at the
+#     default-branch side of the pinned BASE (TOOL-aQuotedBrief-4), for LANDING_NODES' reason.
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -1724,6 +1726,11 @@ AUTH_MAY_SET=0
 AUTH_SPEC_AUDIT=""
 AUTH_SPEC_AUDIT_DERIVED=""
 AUTH_SPEC_AUDIT_FROM=""
+# TOOL-aQuotedBrief-4 S2 - the DEFAULT-BRANCH SIDE of the pinned BASE, check_authorization's `_cb`,
+# kept so `read_brief_cutoff`'s two callers read the conf at the commit that read SPEC_AUDIT_DEFAULT
+# and never re-derive it. Cleared on that function's entry, so a refusal before the derivation
+# leaves it blank, which the reader takes as unknown and never as an absent key.
+AUTH_CONF_AT=""
 observe_anchor() {
   local v names rem uf up nrem levers adv rc aref asha envd
   # ---- 22: git config supplied through the ENVIRONMENT. A check reading a config its own caller
@@ -3100,6 +3107,28 @@ read_brief_items() {
       print n, kind, args
     }'
 }
+# TOOL-aQuotedBrief-4 S1 - PROMPT_BRIEF_CUTOFF AS THE CONF AT A COMMIT DECLARES IT, read the
+# SPEC_AUDIT_DEFAULT way in check_authorization and for its reasons: the working copy is a file the run
+# commits itself, so a run that blanked the key, or moved it past its README's `opened:`, turned off
+# the grading of its own brief (closing review round 1, H1 and M1). The key is BLANKED first, so a
+# conf predating it cannot inherit the working copy's value through the environment; the sentinel is
+# printed FROM INSIDE the eval'd text, on a descriptor the blob's own redirect does not cover, so it
+# appears iff evaluation reached the end whatever the last statement's status. The TWO newlines of
+# glue are that read's: without the first a blob ending in a comment swallows the printf, without the
+# second a last line ending in a backslash continuation joins the sentinel as a temp-env prefix.
+# Prints the value and returns 0, prints nothing for an ABSENT blob (off), and returns 2 for a blob
+# that ends before the read - a return, an exit, an unbound reference, a syntax error - or for no
+# commit at all, since an unknown side is not an absent key.
+read_brief_cutoff() { # commit -> the value on stdout · 2 when it cannot be known
+  local _cf _v
+  [ -n "${1:-}" ] || return 2
+  _cf=$(GIT show "$1:.unattended.conf" 2>/dev/null) || return 0
+  _v=$( PROMPT_BRIEF_CUTOFF=""; exec 3>&1
+        eval "$_cf"$'\n\n''printf "OK %s" "${PROMPT_BRIEF_CUTOFF:-}" >&3' >/dev/null 2>&1 )
+  case "$_v" in "OK "*) printf '%s' "${_v#OK }" ;; *) return 2 ;; esac
+}
+# Set by check_brief_items when term 7 is OFF, for the build-complete arm to carry on its met return.
+BI_NOTE=""
 # TOOL-aQuotedBrief-3 S3 - `build-complete` TERM 7, read at close: every brief item of a prompt-mode
 # run past PROMPT_BRIEF_CUTOFF is built by CLOSED units or parked as `brief item <n>: ...`. The mode is
 # the run-state fact, the record and the README `opened:` are read at the pinned BASE - the same gate
@@ -3107,15 +3136,28 @@ read_brief_items() {
 # from the generated units region at HEAD, and a `rescope · item supersede` row hands a unit to its
 # successor, followed to the chain's end. Any other run meets the term and says nothing. Returns 1
 # with DOD_OUT naming each unmet item; leaves DOD_OUT alone when met.
+# TOOL-aQuotedBrief-4 S3 and S4 - the cutoff is the one `read_brief_cutoff` finds at the default-branch
+# side of BASE that `authorization-reachable` derived in this shell, never the working copy's. An
+# unknowable one is unmet, naming why; an OFF one is met and sets BI_NOTE, which the caller carries
+# on its met return as term 6 carries its own off-state, so a disabled term is never silent.
 check_brief_items() { # slug
-  local rm rel base opened rec txt rows sup nsup n kind args id u hop lack unmet=""
+  local rm rel base opened rec txt rows sup nsup n kind args id u hop lack unmet="" cut
+  BI_NOTE=""
   rm=$(runmd_of "$1"); rel=$(readme_of "$1")
   [ "$(fact "$rm" mode)" = prompt ] || return 0
   base=$(fact "$rm" base); [ -n "$base" ] || return 0
-  case "${PROMPT_BRIEF_CUTOFF:-}" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;; *) return 0 ;; esac
+  if ! cut=$(read_brief_cutoff "$AUTH_CONF_AT"); then
+    DOD_OUT="the brief-item term is not gradable: the project conf at the default-branch side of the pinned BASE was not derived by authorization-reachable or could not be evaluated to the end, so whether it declares PROMPT_BRIEF_CUTOFF is unknown and is not read as off - commit: ${AUTH_CONF_AT:-(none)}"
+    return 1
+  fi
+  case "$cut" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) BI_NOTE="note — the project conf at the default-branch side of the pinned BASE declares no dated PROMPT_BRIEF_CUTOFF, so the brief-item term is OFF and a brief item is not graded here: ${cut:-blank}"
+       return 0 ;;
+  esac
   opened=$(GIT show "$base:$rel" 2>/dev/null | awk 'NR > 1 && /^---/ { exit } /^opened:/ { v = $2; sub(/\r$/, "", v); print v; exit }')
   case "$opened" in
-    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$PROMPT_BRIEF_CUTOFF" ]] && return 0 ;;
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$cut" ]] && return 0 ;;
   esac
   rows=$(unit_rows "$rel")
   sup=$(sed -n 's/^.* rescope · item supersede \([^ ]*\) -> \([^ ]*\) · reason .*$/\1 \2/p' "$rm" 2>/dev/null)
@@ -3166,19 +3208,25 @@ check_brief_items() { # slug
 # WHAT THIS DOES NOT CHECK: that a brief which relied on the session quoted it - no machine sees the
 # conversation - nor the brief's content: a hollow but non-empty sub-section passes, and a `stale`
 # or `duplicate` disposition is taken as written, since the owner reads it in the authorized record.
+# TOOL-aQuotedBrief-4 S3 - the cutoff is `read_brief_cutoff` at the default-branch side of BASE that
+# check_authorization derived just above, never the working copy's; an unknowable one is fail 116.
 check_prompt_brief() { # slug · base
-  local base="$2" rel dir opened rec why found=0 txt roster items n kind args id planned=""
+  local base="$2" rel dir opened rec why found=0 txt roster items n kind args id planned="" cut
   [ "${AUTH_MODE:-}" = prompt ] && [ -n "$base" ] || return 0
-  case "${PROMPT_BRIEF_CUTOFF:-}" in
+  if ! cut=$(read_brief_cutoff "$AUTH_CONF_AT"); then
+    fail 116 "the project conf at the default-branch side of the pinned BASE was not derived or could not be evaluated to the end, so whether it declares PROMPT_BRIEF_CUTOFF is unknown and is not read as off - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen: ${AUTH_CONF_AT:-(no commit)}"
+    return 1
+  fi
+  case "$cut" in
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
-    *) echo "unattended: NOTE - PROMPT_BRIEF_CUTOFF is blank or not a YYYY-MM-DD date, so this prompt-mode build's record is not graded for a self-contained brief; declare one in $CONF to turn it on: ${PROMPT_BRIEF_CUTOFF:-blank}" >&2
+    *) echo "unattended: NOTE - PROMPT_BRIEF_CUTOFF is blank or not a YYYY-MM-DD date, so this prompt-mode build's record is not graded for a self-contained brief; it is read at the default-branch side of the pinned BASE, so declare one in $CONF there to turn it on: ${cut:-blank}" >&2
        return 0 ;;
   esac
   rel=$(readme_of "$1"); dir=$(dirname "$rel")
   opened=$(GIT show "$base:$rel" 2>/dev/null | awk 'NR > 1 && /^---/ { exit } /^opened:/ { v = $2; sub(/\r$/, "", v); print v; exit }')
   # Only a DATED README before the cutoff is grandfathered; an unreadable date is graded.
   case "$opened" in
-    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$PROMPT_BRIEF_CUTOFF" ]] && return 0 ;;
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$cut" ]] && return 0 ;;
   esac
   # TOOL-aQuotedBrief-3 S2 - the authored roster at BASE, for the join below. A malformed pair reads
   # as empty rather than as whatever `region` printed before refusing, so every plan then fails rule 2.
@@ -3310,6 +3358,7 @@ check_branch_carried() { # slug
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
   local slug="$1" base="$2" rel blob fmslug _fm _pb _mg _sa_shown _cf _sad _cb _pr
+  AUTH_CONF_AT=""
   rel=$(readme_of "$slug")
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
   # replaces: an empty one makes the line below read `git show ":path"` - the git INDEX, i.e. bytes
@@ -3400,6 +3449,7 @@ check_authorization() { # slug · base
   if [ "$ANCHOR_KIND" = run-branch ]; then
     _cb=$(GIT merge-base "$ASHA" "$base" 2>/dev/null) || _cb=""
   fi
+  AUTH_CONF_AT="$_cb"
   if [ -z "$AUTH_SPEC_AUDIT" ] && ! printf '%s\n' "$_fm" | grep -q '^spec-audit=' \
      && [ -n "$_cb" ] && _cf=$(GIT show "$_cb:.unattended.conf" 2>/dev/null); then
     _sad=$( SPEC_AUDIT_DEFAULT=""; exec 3>&1
@@ -10786,6 +10836,8 @@ $_bcopen"
       if [ -z "${SPEC_THIN_CUTOFF:-}" ]; then
         # ---- TERM 7 here too: term 6 is OFF on this path, so nothing it reports can be masked.
         check_brief_items "$slug" || return 1
+        [ -z "$BI_NOTE" ] || _bccarry="${_bccarry:+$_bccarry
+}$BI_NOTE"
         DOD_OUT="${_bccarry:+$_bccarry
 }note — the project declares no SPEC_THIN_CUTOFF, so the THIN term is OFF and a CLOSED unit whose spec states no acceptance criterion is not refused here"
         return 0
@@ -10820,6 +10872,9 @@ $_bcopen"
       # ---- TERM 7 (TOOL-aQuotedBrief-3 S3): every brief item built by CLOSED units or parked. After
       # ---- term 6, returning early with its own DOD_OUT like every term above.
       check_brief_items "$slug" || return 1
+      # TOOL-aQuotedBrief-4 S4 - an OFF term 7 rides the met return with the carried lines.
+      [ -z "$BI_NOTE" ] || _bccarry="${_bccarry:+$_bccarry
+}$BI_NOTE"
       # The carried-forward lines ride every MET return, so a partial landing is never silent.
       [ -z "$_bcskip" ] && { DOD_OUT="$_bccarry"; return 0; }
       DOD_OUT="${_bccarry:+$_bccarry

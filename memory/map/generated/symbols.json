@@ -10613,6 +10613,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_brief_cutoff",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_brief_items",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -19691,6 +19696,11 @@
       "id": "write_declarations",
       "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
+      "id": "write_default_conf",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_dl_landing",

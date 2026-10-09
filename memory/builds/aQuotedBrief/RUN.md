@@ -59,3 +59,7 @@ base: 6473ae38a517a3559f2b7daed67a9820c505bd4d
 2026-10-09T06:42:40Z rescope · item add TOOL-aQuotedBrief-5 · reason Closing review round 1 H2 (id 7): preflight and term 7 test the prompt heading differently, so term 7 can certify a record it did not grade; promoted at the CONVERGED exit
 
 2026-10-09T06:42:47Z rescope · item add TOOL-aQuotedBrief-6 · reason Closing review minors batched: round 1 M2 to M6 and L1 to L4, round 2 low 1; one unit, since every fix writes unattended.sh and its suite
+
+2026-10-09T07:04:23Z dispatch · item a21c87fc TOOL-aQuotedBrief-4 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated/symbols.json memory/builds/aQuotedBrief/spec/2026-10-09-spec-TOOL-aQuotedBrief-4.md memory/builds/aQuotedBrief/README.md memory/LIVE.md memory/builds/aQuotedBrief/build/2026-10-09-build-TOOL-aQuotedBrief-4-8-acceptance-ledger.md
+
+2026-10-09T07:04:40Z brief · item TOOL-aQuotedBrief-4 · reason ecccd34476f8 memory/builds/aQuotedBrief/prompts/2026-10-09-prompt-TOOL-aQuotedBrief-4-7-build-brief.md

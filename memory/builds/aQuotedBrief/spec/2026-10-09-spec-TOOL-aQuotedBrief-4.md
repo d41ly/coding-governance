@@ -1,11 +1,12 @@
 # TOOL-aQuotedBrief-4 — the brief cutoff is read at the owner's side of BASE, and term 7 says when it is off
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aQuotedBrief-4-8-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aQuotedBrief-4-8-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aQuotedBrief-4-7-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aQuotedBrief-4-7-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -70,8 +71,15 @@ Read at `5e2187386` on 2026-10-09.
 | Identifier | Kind | Cell |
 |---|---|---|
 | `read_brief_cutoff` | function | `sh.function`; `python tools/lexicon/lexicon.py --suggest read_brief_cutoff --as sh.function` answered OK |
+| `AUTH_CONF_AT` | global | none graded; `check_authorization`'s `_cb`, kept for both callers |
+| `BI_NOTE` | global | none graded; term 7's off-state, carried on the met return |
+| `write_default_conf` | function | `sh.function`; `--suggest write_default_conf --as sh.function` answered OK |
 
-The refusal takes the next free driver fail number at build time.
+The refusal is check 116, the next free driver fail number at build time. The commit is not
+re-derived: `check_authorization` stores its `_cb` in `AUTH_CONF_AT`, cleared on entry, and both
+callers read that, since preflight calls it just before `check_prompt_brief` and `--close` grades
+`authorization-reachable` before `build-complete` in the same shell. A blank one, a refusal before
+the derivation, reads as unknown, never as off.
 
 ### Files touched (estimate)
 
@@ -129,6 +137,9 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · the pr
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft, promoted from closing review round 1 H1 and M1.
+- rev-2 · 2026-10-09 · §4 · build: the commit is carried from `check_authorization` in
+  `AUTH_CONF_AT` rather than recomputed, the off-state rides `BI_NOTE`, the refusal is check 116,
+  and the fixture's `write_default_conf` commits a cutoff on main and merges it into the run branch.
 
 ## 10. Reuse audit
 
