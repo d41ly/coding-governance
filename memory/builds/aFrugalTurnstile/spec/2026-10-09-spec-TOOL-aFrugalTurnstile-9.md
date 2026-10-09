@@ -270,7 +270,7 @@ The close runs these. A pass runs only the §6 fixture.
   Recommendation: (b), resolved by the main loop across this unit, TOOL-7 and the text units, before
   any of them is built. Whatever is picked, the protocol and charter text must not say the landing
   push is `covered` after a close; under (b) it is scoped over the record commit.
-  RESOLVED (main loop, 2026-10-09, delegated): (b), built in TOOL-aFrugalTurnstile-2 rev-2 S3b; this
+  RESOLVED (agent, 2026-10-09, delegated): (b), built in TOOL-aFrugalTurnstile-2 rev-2 S3b; this
   unit is unchanged and its close writes `kind scoped` with the base its decision adopted.
 - **F3 — Which file carries the declaration the driver reads?**
   Options: the policy file `read_gate_policy` resolves for `INHERITED_RED`, which `GATE_POLICY_FILE`

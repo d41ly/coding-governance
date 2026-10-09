@@ -254,7 +254,7 @@ record and appends one line to a marker file outside the repo. The base hook is
   `1`. Red when: it prints `0`.
 
 - **AC17** — When a wrapper bar (a tracked script that runs the stand-in runner with `GATE_LEGS` at a
-  derived manifest, as inCMS's `scripts/gov-bar.sh` does) earns a `kind full` record at merge M by a
+  derived manifest, as inCMS's gov-bar wrapper does) earns a `kind full` record at merge M by a
   FULL push, and M plus one record-only commit C is pushed, the output carries `scoped gate` naming
   the `gate-bar-green` record at M, and `GATE_BASE` reaches the bar as M. Red when: the base hook's
   line, `the leg manifest differs`, and a FULL bar.
