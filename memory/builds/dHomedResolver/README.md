@@ -5,7 +5,7 @@ opened: 2026-10-09
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-4
+ids: TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-4 TOOL-dHomedResolver-5
 ---
 
 # dHomedResolver — a rotation is graded against its declared home, and a half-staged one is refused
@@ -53,26 +53,28 @@ None yet.
 | 1 | `TOOL-dHomedResolver-1` | 2 | check 10 and check 24 resolve a rotated archive's live index at the stem's declared home |
 | 2 | `TOOL-dHomedResolver-2` | 2 | the build-index generator refuses while a file under the archive folder is untracked |
 | 3 | `TOOL-dHomedResolver-3` | 1 | two gotcha records for the classes units 1 and 2 close |
+| 5 | `TOOL-dHomedResolver-5` | 2 | promoted from the closing review: its five mediums and two lows, batched |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-10-09 · streams tooling
-ids TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-4
+**Build status:** SPECCED · 4 unit(s) · node d · opened 2026-10-09 · streams tooling
+ids TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-4 TOOL-dHomedResolver-5
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dHomedResolver-1 — check 10 and check 24 resolve a rotated archive's live index at the stem's declared home](spec/2026-10-09-spec-TOOL-dHomedResolver-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-09 |
-| [TOOL-dHomedResolver-2 — the build-index generator refuses while a file under the archive folder is untracked](spec/2026-10-09-spec-TOOL-dHomedResolver-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-dHomedResolver-1 — check 10 and check 24 resolve a rotated archive's live index at the stem's declared home](spec/2026-10-09-spec-TOOL-dHomedResolver-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-09 |
+| [TOOL-dHomedResolver-2 — the build-index generator refuses while a file under the archive folder is untracked](spec/2026-10-09-spec-TOOL-dHomedResolver-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-dHomedResolver-3 — two gotcha records for the classes units 1 and 2 close](spec/2026-10-09-spec-TOOL-dHomedResolver-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-dHomedResolver-5 — the closing review's minors: the guard reaches --new-build, its arm can fail, its remedy quotes](spec/2026-10-09-spec-TOOL-dHomedResolver-5.md) | 5 | 2 | SPECCED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dHomedResolver-5.
 
-Ids no `spec-audit` record has ever named: TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3.
+Ids no `spec-audit` record has ever named: TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-5.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -82,6 +84,7 @@ Ids no `spec-audit` record has ever named: TOOL-dHomedResolver-1 TOOL-dHomedReso
 | 1 | `TOOL-dHomedResolver-1` | no |
 | 2 | `TOOL-dHomedResolver-2` | no |
 | 3 | `TOOL-dHomedResolver-3` | no |
+| 5 | `TOOL-dHomedResolver-5` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

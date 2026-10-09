@@ -1,6 +1,6 @@
 # TOOL-dHomedResolver-1 — check 10 and check 24 resolve a rotated archive's live index at the stem's declared home
 
-**Status:** CLOSED · rev-1 · 2026-10-09 · node d · Tier-2 · base 5a836bf0 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-10-09 · node d · Tier-2 · base 5a836bf0 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-09-build-TOOL-dHomedResolver-1-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-dHomedResolver-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-dHomedResolver-1-0-run-mandate.md](../prompts/2026-10-09-prompt-TOOL-dHomedResolver-1-0-run-mandate.md) | journal | TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 |
 | [2026-10-09-prompt-TOOL-dHomedResolver-1-1-build-brief.md](../prompts/2026-10-09-prompt-TOOL-dHomedResolver-1-1-build-brief.md) | journal | — |
+| [2026-10-09-review-TOOL-dHomedResolver-1-2-3-diff-review-round1.md](../reviews/2026-10-09-review-TOOL-dHomedResolver-1-2-3-diff-review-round1.md) | diff-review | TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 |
 
 <!-- /gen:spec-records -->
 
@@ -25,7 +26,8 @@ in both readers of the rule, so a namesake anywhere else is not consulted at all
   family stem to `$M/backlog/<FAMILY>.md`, through one shell function, `resolve_live_index_home`. A namesake
   elsewhere under `$M/` is never read. Observed by AC1 and AC2.
 - **S2** — A home that is not tracked is a NAMED finding naming the archive, the stem and the home,
-  never a `continue`. Several is impossible by construction, and the header says so. Observed by AC3.
+  never a `continue`. Observed by AC3. Several is impossible by construction, and check 10's header
+  says so: that sentence is NOT OBSERVED — header prose no arm reads, checked in the closing review.
 - **S3** — Every property the header names is kept: the `builds` deferral and its count line, the
   same-day disambiguator, and the preamble window. Observed by AC4.
 - **S4** — `check_rotation` in `row_grammar.py` resolves through `resolve_live_index_home`, a Python function
@@ -34,7 +36,8 @@ in both readers of the rule, so a namesake anywhere else is not consulted at all
   self-test's cross-reader arm compares both readers' homes for every declared stem. Observed by AC6.
 - **S6** — The carriers stating the basename rule state the declared-home rule instead: the HYGIENE
   catalogue and its kit template, the memory-tree README (an upgrade note) and the hygiene dossier.
-  Observed by AC7.
+  Observed by AC7 for the catalogue, its template and the dossier. The README's upgrade note is NOT
+  OBSERVED — prose an upgrading adopter reads, graded by no arm.
 
 ## 3. Non-goals (OUT)
 
@@ -146,6 +149,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · §2 S2 and S6: the header sentence and the README note are marked NOT OBSERVED
+  instead of claiming AC3 and AC7, which do not read them (closing review round 1, L2; built by
+  TOOL-dHomedResolver-5).
 
 ## 10. Reuse audit
 

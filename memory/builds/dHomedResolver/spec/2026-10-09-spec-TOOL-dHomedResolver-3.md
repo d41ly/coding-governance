@@ -9,6 +9,7 @@
 | [2026-10-09-build-TOOL-dHomedResolver-3-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-dHomedResolver-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-dHomedResolver-1-0-run-mandate.md](../prompts/2026-10-09-prompt-TOOL-dHomedResolver-1-0-run-mandate.md) | journal | TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 |
 | [2026-10-09-prompt-TOOL-dHomedResolver-3-1-build-brief.md](../prompts/2026-10-09-prompt-TOOL-dHomedResolver-3-1-build-brief.md) | journal | — |
+| [2026-10-09-review-TOOL-dHomedResolver-1-2-3-diff-review-round1.md](../reviews/2026-10-09-review-TOOL-dHomedResolver-1-2-3-diff-review-round1.md) | diff-review | TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 |
 
 <!-- /gen:spec-records -->
 

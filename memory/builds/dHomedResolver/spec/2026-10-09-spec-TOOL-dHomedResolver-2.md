@@ -1,6 +1,6 @@
 # TOOL-dHomedResolver-2 — the build-index generator refuses while a file under the archive folder is untracked
 
-**Status:** CLOSED · rev-1 · 2026-10-09 · node d · Tier-2 · base 5a836bf0 · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-10-09 · node d · Tier-2 · base 5a836bf0 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-09-build-TOOL-dHomedResolver-2-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-dHomedResolver-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-dHomedResolver-1-0-run-mandate.md](../prompts/2026-10-09-prompt-TOOL-dHomedResolver-1-0-run-mandate.md) | journal | TOOL-dHomedResolver-1 TOOL-dHomedResolver-3 |
 | [2026-10-09-prompt-TOOL-dHomedResolver-2-1-build-brief.md](../prompts/2026-10-09-prompt-TOOL-dHomedResolver-2-1-build-brief.md) | journal | — |
+| [2026-10-09-review-TOOL-dHomedResolver-1-2-3-diff-review-round1.md](../reviews/2026-10-09-review-TOOL-dHomedResolver-1-2-3-diff-review-round1.md) | diff-review | TOOL-dHomedResolver-1 TOOL-dHomedResolver-3 |
 
 <!-- /gen:spec-records -->
 
@@ -30,7 +31,8 @@ name the remedy.
   than printing a `--write` remedy that would do the damage. Hygiene check 9 surfaces that refusal.
   Observed by AC2 and AC4.
 - **S4** — The guard's header states what it does NOT check: ignored files, and untracked files
-  outside the archive folder, which are ordinary work in progress. Observed by AC5.
+  outside the archive folder, which are ordinary work in progress. NOT OBSERVED — docstring prose
+  no arm reads; AC5 greps for the guard and its call sites, not for this paragraph.
 - **S5** — The HYGIENE catalogue's check 9 entry and its kit template say the check refuses over an
   untracked archive. Observed by AC5.
 
@@ -45,6 +47,8 @@ name the remedy.
 ### Edges
 
 - **hands-off** `TOOL-dHomedResolver-3` — the gotcha record for the half-staged-move class this unit closes.
+- **hands-off** `TOOL-dHomedResolver-5` — the closing review's fixes to this guard: its reach into
+  `--new-build`, its arm that could not fail, and its remedy's quoting.
 
 ## 4. Design
 
@@ -120,6 +124,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · §2 S4 is marked NOT OBSERVED instead of claiming AC5; §3 Edges hands off to
+  TOOL-dHomedResolver-5 (closing review round 1, L2 and the promotion).
 
 ## 10. Reuse audit
 
