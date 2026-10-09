@@ -1,6 +1,6 @@
 # PLAY-aDistilledCharter-4 — gov adopts v4.0: its wrapper folds into section 2 and its charter re-renders
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams playbook · order 5
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams playbook · order 5
 
 <!-- gen:spec-records -->
 
@@ -29,6 +29,10 @@ conventions. This unit moves what is still true and not stated elsewhere into go
 - **S3** — The `AGENTS.md` row of `tools/template-size-limits.txt` and
   `tools/template-size-highwater.txt` re-declares the charter ceiling just above its new size.
   Observed by AC3.
+- **S4** — `.memory-tree.conf`'s `READ_PATH_WAIVER` names `memory/HYGIENE.md` and
+  `memory/TEMPLATE-SPEC.md`: v4.0's protocol lines cite them, check 16 rule 3 then counts them as
+  read paths under no class cap, and a session reads each only when its trigger holds. Observed by
+  AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -44,7 +48,7 @@ tags.
 
 ### Files touched (estimate)
 
-`AGENTS.md` · `.governance/deploy.toml` · `tools/template-size-limits.txt` · `tools/template-size-highwater.txt`
+`AGENTS.md` · `.governance/deploy.toml` · `tools/template-size-limits.txt` · `tools/template-size-highwater.txt` · `.memory-tree.conf` · `memory/guides/SESSION-KICKOFF.md`
 
 ## 6. Acceptance criteria
 
@@ -55,10 +59,12 @@ tags.
 - **AC3** — When `bash tools/check-template-size.sh AGENTS.md` runs, it is green under the new row,
   and `wc -c AGENTS.md` is below the 32768 bytes a Codex agent reads.
   Red when: the row still reads 64512, or the file exceeds 32768.
+- **AC4** — When `python tools/memory-tree/corpus_ids.py` runs, it prints no `check 16 rule 3` line.
+  Red when: a cited memory path is neither capped nor waived.
 
 ## 7. Gates
 
-`playbook render wiring` · `charter size` · `agent-instructions wiring` · `memory hygiene` · `kickoff-manifest ratchet`
+`playbook render wiring` · `charter size` · `agent-instructions wiring` · `memory hygiene` · `kickoff-manifest ratchet` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms`
 
 ## 8. Open questions
 
@@ -67,3 +73,5 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · S4 · AC4 · the two root guides v4.0 cites join the read-path waiver; the
+  conf is manifest-watched, so the manifest re-stamps in the same commit.
