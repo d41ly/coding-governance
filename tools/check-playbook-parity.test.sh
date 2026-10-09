@@ -169,11 +169,13 @@ fixture() {
   # fixture control -- which is exactly what that arm is for. Three pairs were added when the
   # playbook moved under this gate's protection and out of check-agent-cap-restatement.sh's
   # population; the control failed, correctly, until the fixture carried their sentences.
-  printf 'template {{ALPHA}} {{MEMORY_ROOT}}\nan array LITERAL of <=5 elements passes\nthe hook (matcher `Workflow|Agent`) denies\nat most 5 verify agents TOTAL (batch grows)\nroute through boundedParallel(thunks, 5) always\ndenies any K it cannot resolve to an integer <=5 here\n' \
-    | sed 's/<=/≤/' > "$d/coding-governance-agents.template.md"
+  # v4.0 (TOOL-aDistilledCharter-3) retired four pairs; the verify-agent total is the playbook's one.
+  printf 'template {{ALPHA}} {{MEMORY_ROOT}}\nat most 5 verify agents TOTAL (batch grows)\n' \
+    > "$d/coding-governance-agents.template.md"
   # A root install has no root head to name a kit by, so its runbook names it the way gov's does,
   # through the `<prefix>/` token (VERIFYING repair: a bare `memory-tree/` documents nothing).
-  printf 'runbook {{MEMORY_ROOT}}\nadopt '"${FX:-<prefix>/}${MT_KIT}/"' into the target repo\n' > "$d/WIRE-INTO-PROJECT.md"
+  # The bare `§2` is S4's NEAR-MISS: a section sign with no charter word, counted and never failed.
+  printf 'runbook {{MEMORY_ROOT}}\nadopt '"${FX:-<prefix>/}${MT_KIT}/"' into the target repo\nthe runbook §2 lists the steps\n' > "$d/WIRE-INTO-PROJECT.md"
   printf '# waivers\nhooks   not adopter-facing as a kit.\n' > "$d/${FX}playbook-kit-waivers.txt"
   # The stamp-rule pair (TOOL-aHonedRuleset-5) is the one row whose two homes both sit OUTSIDE
   # <prefix>/: the manifest template states the expression and manifest-check.sh owns it. The control
@@ -259,19 +261,37 @@ arm "AC3 at a root install a declared kit the playbook never names reds by name"
 FX=$PFX
 
 # --- AC2 · the unit's central proof: a stated value drifting from the source that owns it ----------
-arm "AC2 MAX_LENSES drifts from the template's stated bound" red \
-  "a declared value pair disagrees with the source that owns it. Pair lens-array bound" \
-  sh -c 'printf "const MAX_LENSES = 6\n" > '"${PFX}${HOOKS}/agent-cap.js"''
-arm "AC2b the hook matcher drifts from .claude/settings.json" red \
-  "a declared value pair disagrees with the source that owns it. Pair agent-cap hook matcher" \
-  sh -c 'printf "{ \"hooks\": { \"PreToolUse\": [ { \"matcher\": \"Workflow\" } ] } }\n" > .claude/settings.json'
+arm "AC2 MAX_VERIFIERS drifts from the template's stated total" red \
+  "a declared value pair disagrees with the source that owns it. Pair verify-agent total" \
+  sh -c 'printf "const MAX_VERIFIERS = 6\n" > '"${PFX}${HOOKS}/agent-cap.js"''
 
 # --- AC3 · a placeholder added and the catalogue counts not updated ---------------------------------
 
 # --- AC4 · an extraction that matches nothing must never compare empty to empty ----------------------
 arm "AC4 an unresolvable pair reds rather than passing" red \
   "an extraction matched NOTHING, so the pair was never compared" \
-  sh -c 'sed -i "s/an array LITERAL of ≤5 elements passes//" coding-governance-agents.template.md'
+  sh -c 'sed -i "s/at most 5 verify agents TOTAL (batch grows)//" coding-governance-agents.template.md'
+
+# --- S4 · a charter section cited by number (TOOL-aDistilledCharter-3) -------------------------------
+S4_RED="a live file cites a charter section by number, and v4.0 has no numbered sections; cite the handle or the owning guide: "
+arm "S4 a charter section cited by number reds by file" red "${S4_RED}WIRE-INTO-PROJECT.md:" \
+  sh -c 'printf "see the charter'"'"'s §7 here\n" >> WIRE-INTO-PROJECT.md'
+arm "S4 a named v3.5 subsection reds by file" red "${S4_RED}${PFX}${MT_KIT}/engine.sh:" \
+  sh -c 'printf "# see §1 Landing\n" >> '"${PFX}${MT_KIT}/engine.sh"''
+arm "S4 the spec template's own sections are not a hit" ok "" \
+  sh -c 'printf "the spec template'"'"'s §8 readers\n" >> WIRE-INTO-PROJECT.md'
+arm "S4 an untracked template refuses rather than grading nothing" red \
+  "the section-citation surface is empty or lacks the tracked template, so no citation could be found and this stage must not report clean" \
+  sh -c 'printf "coding-governance-agents.template.md\n" > .gitignore && git rm -q --cached coding-governance-agents.template.md'
+# AC3 — the clean fixture's run prints a NON-ZERO near-miss count: a stage that can measure nothing
+# would print zero here, which is the reassuring silence this tree refuses.
+s4d="$TMP/s4_near_miss"
+fixture "$s4d"
+s4out=$(cd "$s4d" && bash ${FX}check-playbook-parity.sh 2>&1)
+case "$s4out" in
+  *"S4 graded "*"; "[1-9]*" line(s) carry a section sign"*) say_ok "S4 a clean run prints a non-zero near-miss count" ;;
+  *) say_fail "S4 a clean run prints a non-zero near-miss count" "got: $s4out" ;;
+esac
 
 # --- AC5 · the derivation broken to lose its sentinel -------------------------------------------------
 arm "AC5 a derivation missing its sentinel reds" red \

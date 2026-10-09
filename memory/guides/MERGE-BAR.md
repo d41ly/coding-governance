@@ -27,7 +27,8 @@ the detected cores and RAM to a named row of knobs, the runner prints the row it
 first leg verdict, and `GATE_JOBS` overrides the width alone. That row also declares a whole-run
 `wall` (`GATE_WALL` overrides): a breach kills the outstanding legs and REDS naming them. Legs are safe together because each
 heavy one is hermetic — its own `mktemp -d` scratch repo, never the real tree. Order is
-scheduled longest-first from a timing cache the runner resolves and NAMES on its own profile line,
+scheduled longest-first from a timing cache the runner resolves and NAMES on its own profile line;
+a leg's own seconds, run by run, are rows of `<git-dir>/gate-ledger.tsv`, never a figure in prose,
 while REPORTING is
 always manifest order, so output is byte-stable whatever the width and a corrupt cache costs wall
 clock only. **A KIT'S SELF-TESTS ARE NOT ON THIS BAR.** Owner ruling, 2026-08-23, and the first kit to take it is

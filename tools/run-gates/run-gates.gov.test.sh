@@ -241,12 +241,22 @@ fi
 # it is guarding is DELETED, which is the same green as a sentence that was never wrong. The first
 # draft of this pair armed only the figure; the fix for it RELOCATED the defect to the formula half
 # and every criterion stayed green.
+#
+# THE SUBJECT MOVED at v4.0 (TOOL-aDistilledCharter-3). The charter states one line about the bar and
+# sends a reader to the merge-bar guide for how it behaves, so both claims are graded THERE, and one
+# more arm holds the pointer that makes the guide the charter's answer. Before the move this canary
+# read `AGENTS.md` for two strings it had stopped carrying, and would have redded on its next run.
 CHARTER="$ROOT/AGENTS.md"
+BAR_GUIDE="$ROOT/memory/guides/MERGE-BAR.md"
 a=$((a+1))
-if [ ! -f "$CHARTER" ]; then
-  echo "gov-canary: $CHARTER is absent, so the charter arms would pass by finding nothing — this is a refusal"
+if [ ! -f "$CHARTER" ] || [ ! -f "$BAR_GUIDE" ]; then
+  echo "gov-canary: $CHARTER or $BAR_GUIDE is absent, so the charter arms would pass by finding nothing — this is a refusal"
   fail=1
 else
+  a=$((a+1))
+  grep -qF 'memory/guides/MERGE-BAR.md' "$CHARTER" \
+    || { echo "gov-canary: $CHARTER no longer sends a reader to memory/guides/MERGE-BAR.md, so the arms below grade a guide nobody is told to read"; fail=1; }
+  CHARTER=$BAR_GUIDE
   # G4 — THE MEASUREMENT, AND THIS ARM STOPPED PINNING ONE. It used to require the charter to state a
   # specific wall/leg-sum pair, and that pair went stale three times in two days: 335s/95s, then
   # 393s/3085s, then 4926 s of leg-sum with a 1565 s floor, then ~265 s once seven legs left the bar.

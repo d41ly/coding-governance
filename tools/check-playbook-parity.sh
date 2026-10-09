@@ -11,6 +11,7 @@
 #
 #   S1 kit coverage      — every kit govkit's registry declares is named in a playbook file or waived.
 #   S2 value parity      — a value the playbook STATES equals the source that OWNS it.
+#   S4 section citations — no live file cites a charter section by number, which v4.0 has none of.
 #
 # THERE IS NO S3. It asserted the placeholder arithmetic a deploy-time catalogue stated, and v3.0
 # deleted that catalogue along with the companion carrying it — the counts have no author left to
@@ -239,11 +240,14 @@ done
 #
 #   <label>~<stated-file>~<stated-extraction>~<owning-file>~<owning-extraction>
 #
-# The field separator is `~` and NOT `|`, because one of the values being compared is the hook
-# matcher `Workflow|Agent` and its extraction regex therefore contains a pipe. With `|` as the
-# delimiter that row silently reparsed into the wrong fields and the gate reported "the owning
-# source does not exist: ]*)`.*/\1/p" — a real failure for a fake reason, which is worse than
-# either a pass or an honest red. `~` appears in none of these patterns.
+# The field separator is `~` and NOT `|`: a hook-matcher pair once compared `Workflow|Agent`, and
+# with `|` as the delimiter that row silently reparsed into the wrong fields — a real failure for a
+# fake reason, which is worse than either a pass or an honest red. `~` appears in none of these.
+#
+# FOUR PAIRS RETIRED at v4.0 (TOOL-aDistilledCharter-3): the lens-array bound, the hook matcher, the
+# bounded-helper width and the resolved-K ceiling. The charter states none of those phrases now; the
+# hook's own README carries its grammar, and the `verifier fan-out` leg compares the harness with
+# the hook. The verify-agent total stays, because the charter's `[bound]` line still states it.
 #
 # The pair list is no longer playbook-only. TOOL-aHonedRuleset-5 added a row whose stated side is
 # the kickoff MANIFEST TEMPLATE, because the value it pins -- the stamp rule's sha expression --
@@ -252,11 +256,7 @@ done
 # the stamp. The datetime half, whether a stamp is FRESH, and whether the sha it names is reachable
 # are manifest-check.sh's checks 3 and 5, not this gate's.
 PAIRS="
-lens-array bound~$TEMPLATE~sed -n 's/.*array LITERAL of ≤\([0-9]\+\) elements.*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_LENSES = \([0-9]\+\).*/\1/p'
-agent-cap hook matcher~$TEMPLATE~sed -n 's/.*matcher \`\([A-Za-z|]*\)\`.*/\1/p'~.claude/settings.json~sed -n 's/.*\"matcher\": \"\(Workflow[^\"]*\)\".*/\1/p'
 verify-agent total~$TEMPLATE~sed -n 's/.*at most \([0-9]\+\) verify agents TOTAL.*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
-bounded-helper width~$TEMPLATE~sed -n 's/.*boundedParallel(thunks, \([0-9]\+\)).*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
-resolved-K ceiling~$TEMPLATE~sed -n 's/.*cannot resolve to an integer ≤\([0-9]\+\).*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
 stamp rule sha expression~skills/session-kickoff/MANIFEST-TEMPLATE.md~sed -n 's/.*Stamp rule: sha = \`\([A-Z]*\)\` on any branch.*/\1/p'~skills/session-kickoff/manifest-check.sh~sed -n 's/^STAMP_SHA_RULE=\"sha = \([A-Z]*\) on any branch\".*/\1/p'
 "
 
@@ -298,6 +298,36 @@ while IFS='~' read -r tag label msg; do
   fail 7 "a declared value pair disagrees with the source that owns it. Pair $label, detail: $msg"
 done < "$PPTMP"
 rm -f "$PPTMP"
+
+# ============================================================== S4 — section citations ==========
+# TOOL-aDistilledCharter-3. The charter has no numbered sections since v4.0: a rule is cited by its
+# handle (`charter [gate]`) or by the guide or gate that owns it. A live file citing a charter section
+# BY NUMBER points at nothing, and the next restructure would leave it pointing at the wrong thing —
+# which is how the runbook's per-section kit-block counts went stale without a word.
+#
+# WHAT IT DOES NOT CATCH, said here so a green run is not misread. A bare `§<n>` with no charter word
+# beside it cannot be told from a citation of the citing document's own sections, so it is counted
+# and printed as a near-miss, never failed. A line citing the SPEC template's own sections
+# (`spec template's §8`) is excluded, because TEMPLATE-SPEC.md's numbered sections are real; a line
+# carrying both forms is excluded whole. Frozen records under the memory tree are outside the surface.
+# This gate's own file is excluded too: it spells the predicate.
+s4_paths=()
+[ -n "${SELF_PRE%/}" ] && s4_paths+=("${SELF_PRE%/}")
+s4_paths+=(skills .githooks .claude/rules .claude/skills memory/guides WIRE-INTO-PROJECT.md README.md
+  AGENTS.md "$TEMPLATE" ":!${SELF_PRE}check-playbook-parity.sh")
+s4_pop=$(git ls-files -- "${s4_paths[@]}" | grep -c . || true)
+if [ "$s4_pop" -eq 0 ] || [ -z "$(git ls-files -- "$TEMPLATE")" ]; then
+  fail 17 "the section-citation surface is empty or lacks the tracked template, so no citation could be found and this stage must not report clean"
+else
+  s4_pred='(^|[^a-z])(charter|template|playbook|governance|agents\.md)(.s)?[^a-z0-9§]{0,3}§[0-9]|§1 Landing|§16 R1'
+  s4_hits=$(git grep -n -I -i -E "$s4_pred" -- "${s4_paths[@]}" 2>/dev/null | grep -v -i "spec template" || true)
+  s4_near=$(git grep -n -I -E '§[0-9]' -- "${s4_paths[@]}" 2>/dev/null | grep -c . || true)
+  while IFS= read -r h; do
+    [ -n "$h" ] || continue
+    fail 16 "a live file cites a charter section by number, and v4.0 has no numbered sections; cite the handle or the owning guide: $h"
+  done <<< "$s4_hits"
+  printf 'playbook-parity: S4 graded %s file(s); %s line(s) carry a section sign, any charter citation among them failed above\n' "$s4_pop" "$s4_near"
+fi
 
 # The success line reads ONLY what the surviving stages assign. The catalogue stage above
 # assigned three counters this line used to print, and the script runs under `set -u` — so
