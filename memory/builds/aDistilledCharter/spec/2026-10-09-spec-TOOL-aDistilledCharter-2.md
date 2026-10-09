@@ -1,6 +1,6 @@
 # TOOL-aDistilledCharter-2 — the fleet registry assigns every node one tag and the renderer generates the node table from it
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 2
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 2
 
 <!-- gen:spec-records -->
 

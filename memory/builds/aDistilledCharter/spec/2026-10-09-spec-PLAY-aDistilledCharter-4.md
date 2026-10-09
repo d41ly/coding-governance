@@ -1,6 +1,6 @@
 # PLAY-aDistilledCharter-4 — gov adopts v4.0: its wrapper folds into section 2 and its charter re-renders
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams playbook · order 5
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams playbook · order 5
 
 <!-- gen:spec-records -->
 

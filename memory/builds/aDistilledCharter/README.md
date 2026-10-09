@@ -58,51 +58,51 @@ DEPL-2 for PLAY-5, and its five others became TOOL-8. Round 3 converged; its six
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aDistilledCharter-1` | SPECCED | the renderer grades one-line regions and renders section 2 from `[charter] adopter_rules` |
-| 2 | `TOOL-aDistilledCharter-2` | SPECCED | the fleet registry assigns every node one tag and the renderer generates the node table from it |
-| 3 | `PLAY-aDistilledCharter-2` | SPECCED | the review protocol carries the security checklist and the tier definitions the charter drops |
-| 4 | `PLAY-aDistilledCharter-3` | SPECCED | the hygiene guide carries the id-minting protocol the charter drops |
-| 5 | `PLAY-aDistilledCharter-1` | SPECCED | the charter template v4.0, with a disposition for every v3.5 rule |
-| 6 | `PLAY-aDistilledCharter-4` | SPECCED | gov adopts v4.0: its wrapper folds into section 2 and its charter re-renders |
-| 7 | `TOOL-aDistilledCharter-4` | SPECCED | every live citation of a charter section number is re-pointed |
-| 8 | `TOOL-aDistilledCharter-3` | SPECCED | the parity gate drops the retired pairs, the canary re-points, and a new arm bans section-number citations |
-| 9 | `DEPL-aDistilledCharter-1` | SPECCED | the runbook adopts v4.0: section 2, the fleet claim and the re-tag step |
-| 10 | `KICK-aDistilledCharter-1` | SPECCED | the kickoff manifest's §B becomes one-liners, every evicted bullet recorded |
-| 11 | `TOOL-aDistilledCharter-5` | SPECCED | the node table's paths come from a stated name, identical on every node |
-| 12 | `TOOL-aDistilledCharter-6` | SPECCED | the hook README's three bound phrases are compared with the hook again |
+| 1 | `TOOL-aDistilledCharter-1` | CLOSED | the renderer grades one-line regions and renders section 2 from `[charter] adopter_rules` |
+| 2 | `TOOL-aDistilledCharter-2` | CLOSED | the fleet registry assigns every node one tag and the renderer generates the node table from it |
+| 3 | `PLAY-aDistilledCharter-2` | CLOSED | the review protocol carries the security checklist and the tier definitions the charter drops |
+| 4 | `PLAY-aDistilledCharter-3` | CLOSED | the hygiene guide carries the id-minting protocol the charter drops |
+| 5 | `PLAY-aDistilledCharter-1` | CLOSED | the charter template v4.0, with a disposition for every v3.5 rule |
+| 6 | `PLAY-aDistilledCharter-4` | CLOSED | gov adopts v4.0: its wrapper folds into section 2 and its charter re-renders |
+| 7 | `TOOL-aDistilledCharter-4` | CLOSED | every live citation of a charter section number is re-pointed |
+| 8 | `TOOL-aDistilledCharter-3` | CLOSED | the parity gate drops the retired pairs, the canary re-points, and a new arm bans section-number citations |
+| 9 | `DEPL-aDistilledCharter-1` | CLOSED | the runbook adopts v4.0: section 2, the fleet claim and the re-tag step |
+| 10 | `KICK-aDistilledCharter-1` | CLOSED | the kickoff manifest's §B becomes one-liners, every evicted bullet recorded |
+| 11 | `TOOL-aDistilledCharter-5` | CLOSED | the node table's paths come from a stated name, identical on every node |
+| 12 | `TOOL-aDistilledCharter-6` | CLOSED | the hook README's three bound phrases are compared with the hook again |
 | 13 | `DEPL-aDistilledCharter-2` | WONTDO | the review protocol ships with every default adoption |
-| 14 | `TOOL-aDistilledCharter-7` | SPECCED | the closing review's medium and low findings, closed as one batch |
-| 15 | `PLAY-aDistilledCharter-5` | SPECCED | the security checklist and the tier definitions ship with the memory tree |
-| 16 | `TOOL-aDistilledCharter-8` | SPECCED | the closing review's round-2 findings, closed as one batch |
-| 17 | `TOOL-aDistilledCharter-9` | SPECCED | the closing review's round-3 findings, closed as one batch |
+| 14 | `TOOL-aDistilledCharter-7` | CLOSED | the closing review's medium and low findings, closed as one batch |
+| 15 | `PLAY-aDistilledCharter-5` | CLOSED | the security checklist and the tier definitions ship with the memory tree |
+| 16 | `TOOL-aDistilledCharter-8` | CLOSED | the closing review's round-2 findings, closed as one batch |
+| 17 | `TOOL-aDistilledCharter-9` | CLOSED | the closing review's round-3 findings, closed as one batch |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 17 unit(s) · node a · opened 2026-10-09 · streams playbook+tooling+deployer+kickoff
+**Build status:** CLOSED · 17 unit(s) · node a · opened 2026-10-09 · streams playbook+tooling+deployer+kickoff
 ids DEPL-aDistilledCharter-1 DEPL-aDistilledCharter-2 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 PLAY-aDistilledCharter-5 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3
 ids TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 TOOL-aDistilledCharter-8 TOOL-aDistilledCharter-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aDistilledCharter-1 — the renderer grades one-line regions and renders section 2 from `[charter] adopter_rules`](spec/2026-10-09-spec-TOOL-aDistilledCharter-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [TOOL-aDistilledCharter-2 — the fleet registry assigns every node one tag and the renderer generates the node table from it](spec/2026-10-09-spec-TOOL-aDistilledCharter-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-10-09 |
-| [PLAY-aDistilledCharter-2 — the review protocol carries the security checklist and the tier definitions the charter drops](spec/2026-10-09-spec-PLAY-aDistilledCharter-2.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-09 |
-| [PLAY-aDistilledCharter-3 — the hygiene guide carries the id-minting protocol the charter drops](spec/2026-10-09-spec-PLAY-aDistilledCharter-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [PLAY-aDistilledCharter-1 — the charter template v4.0, with a disposition for every v3.5 rule](spec/2026-10-09-spec-PLAY-aDistilledCharter-1.md) | 4 | 2 | SPECCED | rev-4 | 2026-10-09 |
-| [PLAY-aDistilledCharter-4 — gov adopts v4.0: its wrapper folds into section 2 and its charter re-renders](spec/2026-10-09-spec-PLAY-aDistilledCharter-4.md) | 5 | 1 | SPECCED | rev-2 | 2026-10-09 |
-| [TOOL-aDistilledCharter-4 — every live citation of a charter section number is re-pointed](spec/2026-10-09-spec-TOOL-aDistilledCharter-4.md) | 6 | 1 | SPECCED | rev-1 | 2026-10-09 |
-| [TOOL-aDistilledCharter-3 — the parity gate drops the retired pairs, the canary re-points, and a new arm bans section-number citations](spec/2026-10-09-spec-TOOL-aDistilledCharter-3.md) | 7 | 2 | SPECCED | rev-2 | 2026-10-09 |
-| [DEPL-aDistilledCharter-1 — the runbook adopts v4.0: section 2, the fleet claim and the re-tag step](spec/2026-10-09-spec-DEPL-aDistilledCharter-1.md) | 8 | 1 | SPECCED | rev-1 | 2026-10-09 |
-| [KICK-aDistilledCharter-1 — the kickoff manifest's §B becomes one-liners, every evicted bullet recorded](spec/2026-10-09-spec-KICK-aDistilledCharter-1.md) | 9 | 1 | SPECCED | rev-1 | 2026-10-09 |
+| [TOOL-aDistilledCharter-1 — the renderer grades one-line regions and renders section 2 from `[charter] adopter_rules`](spec/2026-10-09-spec-TOOL-aDistilledCharter-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-aDistilledCharter-2 — the fleet registry assigns every node one tag and the renderer generates the node table from it](spec/2026-10-09-spec-TOOL-aDistilledCharter-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-09 |
+| [PLAY-aDistilledCharter-2 — the review protocol carries the security checklist and the tier definitions the charter drops](spec/2026-10-09-spec-PLAY-aDistilledCharter-2.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-09 |
+| [PLAY-aDistilledCharter-3 — the hygiene guide carries the id-minting protocol the charter drops](spec/2026-10-09-spec-PLAY-aDistilledCharter-3.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-09 |
+| [PLAY-aDistilledCharter-1 — the charter template v4.0, with a disposition for every v3.5 rule](spec/2026-10-09-spec-PLAY-aDistilledCharter-1.md) | 4 | 2 | CLOSED | rev-4 | 2026-10-09 |
+| [PLAY-aDistilledCharter-4 — gov adopts v4.0: its wrapper folds into section 2 and its charter re-renders](spec/2026-10-09-spec-PLAY-aDistilledCharter-4.md) | 5 | 1 | CLOSED | rev-2 | 2026-10-09 |
+| [TOOL-aDistilledCharter-4 — every live citation of a charter section number is re-pointed](spec/2026-10-09-spec-TOOL-aDistilledCharter-4.md) | 6 | 1 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-aDistilledCharter-3 — the parity gate drops the retired pairs, the canary re-points, and a new arm bans section-number citations](spec/2026-10-09-spec-TOOL-aDistilledCharter-3.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-09 |
+| [DEPL-aDistilledCharter-1 — the runbook adopts v4.0: section 2, the fleet claim and the re-tag step](spec/2026-10-09-spec-DEPL-aDistilledCharter-1.md) | 8 | 1 | CLOSED | rev-1 | 2026-10-09 |
+| [KICK-aDistilledCharter-1 — the kickoff manifest's §B becomes one-liners, every evicted bullet recorded](spec/2026-10-09-spec-KICK-aDistilledCharter-1.md) | 9 | 1 | CLOSED | rev-1 | 2026-10-09 |
 | [DEPL-aDistilledCharter-2 — the review protocol ships with every default adoption](spec/2026-10-09-spec-DEPL-aDistilledCharter-2.md) | 10 | 2 | WONTDO | rev-2 | 2026-10-09 |
-| [TOOL-aDistilledCharter-5 — the node table's paths come from a stated name, identical on every node](spec/2026-10-09-spec-TOOL-aDistilledCharter-5.md) | 10 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [TOOL-aDistilledCharter-6 — the hook README's three bound phrases are compared with the hook again](spec/2026-10-09-spec-TOOL-aDistilledCharter-6.md) | 10 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [TOOL-aDistilledCharter-7 — the closing review's medium and low findings, closed as one batch](spec/2026-10-09-spec-TOOL-aDistilledCharter-7.md) | 11 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [PLAY-aDistilledCharter-5 — the security checklist and the tier definitions ship with the memory tree](spec/2026-10-09-spec-PLAY-aDistilledCharter-5.md) | 12 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [TOOL-aDistilledCharter-8 — the closing review's round-2 findings, closed as one batch](spec/2026-10-09-spec-TOOL-aDistilledCharter-8.md) | 13 | 2 | SPECCED | rev-2 | 2026-10-09 |
-| [TOOL-aDistilledCharter-9 — the closing review's round-3 findings, closed as one batch](spec/2026-10-09-spec-TOOL-aDistilledCharter-9.md) | 14 | 2 | SPECCED | rev-1 | 2026-10-09 |
+| [TOOL-aDistilledCharter-5 — the node table's paths come from a stated name, identical on every node](spec/2026-10-09-spec-TOOL-aDistilledCharter-5.md) | 10 | 2 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-aDistilledCharter-6 — the hook README's three bound phrases are compared with the hook again](spec/2026-10-09-spec-TOOL-aDistilledCharter-6.md) | 10 | 2 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-aDistilledCharter-7 — the closing review's medium and low findings, closed as one batch](spec/2026-10-09-spec-TOOL-aDistilledCharter-7.md) | 11 | 2 | CLOSED | rev-1 | 2026-10-09 |
+| [PLAY-aDistilledCharter-5 — the security checklist and the tier definitions ship with the memory tree](spec/2026-10-09-spec-PLAY-aDistilledCharter-5.md) | 12 | 2 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-aDistilledCharter-8 — the closing review's round-2 findings, closed as one batch](spec/2026-10-09-spec-TOOL-aDistilledCharter-8.md) | 13 | 2 | CLOSED | rev-2 | 2026-10-09 |
+| [TOOL-aDistilledCharter-9 — the closing review's round-3 findings, closed as one batch](spec/2026-10-09-spec-TOOL-aDistilledCharter-9.md) | 14 | 2 | CLOSED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
 Records: 5 bound to this build, across 3 record folder(s).

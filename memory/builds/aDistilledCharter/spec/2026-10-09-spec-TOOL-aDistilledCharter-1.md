@@ -1,6 +1,6 @@
 # TOOL-aDistilledCharter-1 — the renderer grades one-line regions and renders section 2 from `[charter] adopter_rules`
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

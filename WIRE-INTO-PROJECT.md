@@ -2008,7 +2008,7 @@ a `{kit}` token and both the writer and the checker expand it against the fragme
   until you do, an older template still renders and the render notes its marker. The manifest
   carries its own `kickoff-manifest: vN.N`. The `memory-tree/` scripts are identical across repos —
   copy the newer versions in wholesale.
-  **v4.0 (2026-10-09) REPLACES the charter's shape:** sections §0 to §16 are gone. Section 1 is
+  **v4.1 (2026-10-09), the first v4 release, REPLACES the charter's shape:** sections §0 to §16 are gone. Section 1 is
   one-line practices, each with a handle such as `[gate]`; section 2 is the adopter's
   `[charter] adopter_rules`; section 3 is generated. Every v3.5 rule's destination is the ledger in
   `memory/builds/aDistilledCharter/` in gov. Cite a rule by its handle or by the guide or gate that

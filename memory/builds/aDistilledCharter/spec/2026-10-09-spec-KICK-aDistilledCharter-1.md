@@ -1,6 +1,6 @@
 # KICK-aDistilledCharter-1 — the kickoff manifest's §B becomes one-liners, every evicted bullet recorded
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams kickoff · order 9
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams kickoff · order 9
 
 <!-- gen:spec-records -->
 

@@ -1,6 +1,6 @@
 # TOOL-aDistilledCharter-6 — the hook README's three bound phrases are compared with the hook again
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 10
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 

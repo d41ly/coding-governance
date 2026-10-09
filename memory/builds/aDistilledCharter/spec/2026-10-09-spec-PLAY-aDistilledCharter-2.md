@@ -1,6 +1,6 @@
 # PLAY-aDistilledCharter-2 — the review protocol carries the security checklist and the tier definitions the charter drops
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook+tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook+tooling · order 3
 
 <!-- gen:spec-records -->
 

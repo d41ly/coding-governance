@@ -1,6 +1,6 @@
 # TOOL-aDistilledCharter-4 — every live citation of a charter section number is re-pointed
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams tooling+kickoff · order 6
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams tooling+kickoff · order 6
 
 <!-- gen:spec-records -->
 

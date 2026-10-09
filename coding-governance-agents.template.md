@@ -1,11 +1,12 @@
 # {{PROJECT_NAME}} — agent charter
 
-*Rendered from the coding-governance charter template, v4.0. Section 1 binds every repository that
-adopts it; section 2 is this repository's own; section 3 is generated from the kits and answers it
-selected. Change a source and re-render with `<prefix>/playbook/adopt-playbook.sh`; never edit the
-rendered text. Every rule is one line: a tool, gate or protocol named in section 3 carries the detail.*
+*Rendered from the coding-governance charter template, whose version is the marker below. Section 1
+binds every repository that adopts it; section 2 is this repository's own; section 3 is generated
+from the kits and answers it selected. Change a source and re-render with
+`<prefix>/playbook/adopt-playbook.sh`; never edit the rendered text. Every rule is one line: a tool,
+gate or protocol named in section 3 carries the detail.*
 
-<!-- governance-template: v4.0 -->
+<!-- governance-template: v4.1 -->
 
 ## 1. Governing practices
 

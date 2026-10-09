@@ -1,6 +1,6 @@
 # TOOL-aDistilledCharter-3 — the parity gate drops the retired pairs, the canary re-points, and a new arm bans section-number citations
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 7
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 

@@ -1,6 +1,6 @@
 # TOOL-aDistilledCharter-7 — the closing review's medium and low findings, closed as one batch
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+playbook+deployer · order 11
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+playbook+deployer · order 11
 
 <!-- gen:spec-records -->
 

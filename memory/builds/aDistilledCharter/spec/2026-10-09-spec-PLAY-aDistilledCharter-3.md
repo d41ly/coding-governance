@@ -1,6 +1,6 @@
 # PLAY-aDistilledCharter-3 — the hygiene guide carries the id-minting protocol the charter drops
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook+tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook+tooling · order 3
 
 <!-- gen:spec-records -->
 

@@ -1,6 +1,6 @@
 # PLAY-aDistilledCharter-1 — the charter template v4.0, with a disposition for every v3.5 rule
 
-**Status:** SPECCED · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 4
+**Status:** CLOSED · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 4
 
 <!-- gen:spec-records -->
 

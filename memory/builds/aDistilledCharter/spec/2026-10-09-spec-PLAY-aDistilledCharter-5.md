@@ -1,6 +1,6 @@
 # PLAY-aDistilledCharter-5 — the security checklist and the tier definitions ship with the memory tree
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook+tooling · order 12
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook+tooling · order 12
 
 <!-- gen:spec-records -->
 

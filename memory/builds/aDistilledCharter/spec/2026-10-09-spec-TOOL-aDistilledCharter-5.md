@@ -1,6 +1,6 @@
 # TOOL-aDistilledCharter-5 — the node table's paths come from a stated name, identical on every node
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 10
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 

@@ -1,6 +1,6 @@
 # TOOL-aDistilledCharter-9 — the closing review's round-3 findings, closed as one batch
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+playbook · order 14
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+playbook · order 14
 
 <!-- gen:spec-records -->
 

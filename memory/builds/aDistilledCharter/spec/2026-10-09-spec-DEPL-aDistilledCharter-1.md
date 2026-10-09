@@ -1,6 +1,6 @@
 # DEPL-aDistilledCharter-1 — the runbook adopts v4.0: section 2, the fleet claim and the re-tag step
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams deployer · order 8
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams deployer · order 8
 
 <!-- gen:spec-records -->
 
