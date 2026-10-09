@@ -1,6 +1,6 @@
 # TOOL-aBenchedProbe-2 — run-gates' held-count summary names its predicate
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-1 · base 2b26f187 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-1 · base 2b26f187 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

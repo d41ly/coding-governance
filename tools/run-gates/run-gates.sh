@@ -3690,7 +3690,7 @@ skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
 # THE HELD LEGS ARE NAMED, exactly as a guard-skip and a reuse are, and for the same reason: a
 # total that shrank silently reads as a bar that shrank for reasons nobody recorded. Naming the
 # population is what keeps the smaller number from being a smaller lie. TOOL-dUnstalledConvoy-31.
-[ "${ondemands:-0}" -gt 0 ] && skipnote="$skipnote (${ondemands} held: every self-test, GATE_SELFTESTS=1 runs them)"
+[ "${ondemands:-0}" -gt 0 ] && skipnote="$skipnote (${ondemands} held: subject kit or chunk selftests, GATE_SELFTESTS=1 runs them)"
 # A RETRIED LEG IS NAMED IN THE TOTAL TOO (TOOL-dDerivedDocket-26 S2): a green that needed a second
 # attempt is green, and a reader of the one summary line should still be able to see it was one.
 [ "${RETRIED:-0}" -gt 0 ] && skipnote="$skipnote (${RETRIED} retried after timeout)"
