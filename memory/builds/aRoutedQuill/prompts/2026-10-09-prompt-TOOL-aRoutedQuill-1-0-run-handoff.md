@@ -90,3 +90,13 @@ logged line is a DEAD PROBE for that kind, never a "no".
   call, not at session start. Both rollouts now say enforcement begins inside the landing session.
 - The gate widens the one existing `scratch-guard` fragment's matcher. A second fragment for the same
   script would be silently dropped by `settings-merge.py`, which matches on the script's name.
+
+## Corrections made by the run, 2026-10-09
+
+- The push leg grades the WHOLE pushed range from `ROUTED_COMMIT_CUTOFF`, not only the commits after
+  step 4. So from this run's FIRST commit, every commit touching `ROUTED_PATHS` names its unit in the
+  subject or the `Pass:` trailer, not only from step 4 on.
+- Step 4's `TOOL-aRoutedQuill-3` and `TOOL-aRoutedQuill-4` both write `memory/map/generated/`, so they
+  are SEQUENCED, not parallel (`memory/guides/BUILD-METHOD.md` M6 clause 3). The second re-renders
+  `memory/map/generated/` with `python tools/codebase-map/gen_map.py --write` rather than reconciling
+  it by hand.

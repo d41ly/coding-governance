@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-3 — every pushed commit that touches a product path names a unit specced before it
 
-**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4 · ratified 2026-10-09
+**Status:** SPECCED · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -24,10 +24,13 @@ push boundary on the pushed range, and everywhere else over the history since a 
   that touches a product path. The commit passes when at least one id its attribution names has a
   spec at the commit's first parent; otherwise it is a violation naming the commit, its subject, the
   ids it named and the reason. Observed by AC1 and AC2.
-- **S2** — Attribution follows `read_attribution_tokens` in `tools/unattended/lib-unattended.sh`: a
-  `Pass:` trailer, when present, is the attribution, and `Pass: none` names no unit; otherwise the
-  subject's whole tokens are. An id is `<FAMILY>-<slug>-<seq>` over the families `.memory-tree.conf`
-  declares in `FAMILIES`. Observed by AC2.
+- **S2** — Attribution is the union F2 resolved: the ids among the subject's whole tokens together
+  with the ids a `Pass:` trailer names. `Pass: none` adds no id and keeps the subject's, so a commit whose
+  subject names a unit and whose trailer reads `Pass: none` is attributed to that unit. This
+  deliberately differs from `read_attribution_tokens` in `tools/unattended/lib-unattended.sh`,
+  where a trailer replaces the subject: that reader decides which commit is a unit's PASS, and this
+  leg asks only whether a commit is attributed to any unit. An id is `<FAMILY>-<slug>-<seq>` over
+  the families `.memory-tree.conf` declares in `FAMILIES`. Observed by AC2 and AC11.
 - **S3** — Which spec defines an id is answered by `parse_spec_h1` in `tools/memory-tree/tree_lib.py`
   over every spec blob at HEAD. Existence at a commit's first parent is asked for every pair in one
   `git cat-file --batch-check` read. Observed by AC1.
@@ -56,6 +59,14 @@ push boundary on the pushed range, and everywhere else over the history since a 
   `optional_keys` and as documented lines in `.memory-tree.conf.example`, and a README row. Gov's
   manifest, budget file, codebase-map dossier and `.memory-tree.conf` gain the matching rows, and
   `build_git_env` moves to `tree_lib.py` so the kit keeps one git pin policy. Observed by AC10.
+- **S11** — The attended lander's own mint commit names a unit. `tools/push-main.sh` writes
+  `mint: kit versions onto <remote>/<branch> at <sha8>` with `--no-verify`, touching version
+  carriers under `tools/`, inside gov's `ROUTED_PATHS`, and RANGE mode reads no waiver, so without
+  this every attended landing that owes a kit version would red its own pre-push leg. The mint's
+  SUBJECT names the newest unit id the pushed range's own commits attribute, read by S2 over
+  `<remote>/<branch>..HEAD`, and the commit carries a `Pass: none` trailer so the pass-order history
+  leg's `read_attribution_tokens` does not take it for that unit's pass. A range attributing no id
+  leaves the mint subject with none, and the leg reds it as it reds the range. Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -127,7 +138,8 @@ For each commit the log pass yields, in order:
 2. Committer date, its first ten characters, earlier than `ROUTED_COMMIT_CUTOFF`: count as exempt.
 3. No listed path equal to a file entry, or under a directory entry at a segment boundary: count as
    not routed.
-4. Read the attribution by S2. No id: violation, `names no unit`.
+4. Read the attribution by S2, the subject's ids together with the `Pass:` trailer's. No id:
+   violation, `names no unit`.
 5. For each id, every spec path whose H1 defines it at HEAD. An id with none: `no spec defines it at
    HEAD`. A root commit has no parent: `no first parent`.
 6. Query `<first parent>:<path>` for every remaining pair, in one batch after the walk. Any pair
@@ -187,7 +199,7 @@ cutoff. Gov declares the cutoff as the date this unit lands, in the commit that 
 
 ### Files touched (estimate)
 
-`tools/memory-tree/routed_commits.py` · `tools/memory-tree/tree_lib.py` · `tools/memory-tree/transition_audit.py` · `tools/memory-tree/kit.toml` · `tools/memory-tree/.memory-tree.conf.example` · `tools/memory-tree/README.md` · `tools/gate-legs.json` · `tools/run-gates/selftest-budgets.txt` · `.memory-tree.conf` · `memory/map/features/memory-tree-hygiene.md` · `memory/map/generated/symbols.json` · `memory/map/generated/inventories.json` · `memory/map/generated/MAP.md` · `memory/map/generated/CARDS.md`
+`tools/memory-tree/routed_commits.py` · `tools/push-main.sh` · `tools/push-main.test.sh` · `memory/guides/SESSION-KICKOFF.md` · `tools/memory-tree/tree_lib.py` · `tools/memory-tree/transition_audit.py` · `tools/memory-tree/kit.toml` · `tools/memory-tree/.memory-tree.conf.example` · `tools/memory-tree/README.md` · `tools/gate-legs.json` · `tools/run-gates/selftest-budgets.txt` · `.memory-tree.conf` · `memory/map/features/memory-tree-hygiene.md` · `memory/map/generated/symbols.json` · `memory/map/generated/inventories.json` · `memory/map/generated/MAP.md` · `memory/map/generated/CARDS.md`
 
 ### Rollout
 
@@ -199,7 +211,11 @@ pushes that touches a product path names a unit, the build's single kit-version 
 names the build's last unit. Adopters receive the leg when the memory-tree kit's version moves,
 which happens once after the build's last unit touching that kit, and `TOOL-aRoutedQuill-5` scaffolds
 both keys in the same release. Gov's ceiling row is 300 s, in the `declarations` chunk beside
-`pass-order history`.
+`pass-order history`. The lander's mint subject (S11) changes in the same unit, so the first
+attended landing after the leg arms already names its unit; `tools/push-main.sh` moving owes the
+push-main kit's version, minted with the others. `.memory-tree.conf` and `tools/gate-legs.json` are
+both on the kickoff manifest's `watch:` line, so the commit staging them re-stamps `last-audit` in
+`memory/guides/SESSION-KICKOFF.md` with a delta line in its commit message.
 
 ### Alternatives rejected
 
@@ -210,9 +226,10 @@ both keys in the same release. Gov's ceiling row is 300 s, in the `declarations`
   join both make, which spec defines an id, is taken here from `parse_spec_h1`, the kit's declared
   predicate. Pass-order reads a whole token in a spec's first five lines instead, so the two differ
   at the edges: an id cited in a header line passes there and not here, and an H1 below line five
-  passes here and not there. What keeps the attribution readings together is an arm
-  in this file's self-test pinning `Pass:` precedence and `Pass: none`; nothing machine-joins the
-  two files, and that is stated in the header.
+  passes here and not there. The attribution readings differ on purpose (S2): pass-order lets a
+  `Pass:` trailer replace the subject, this leg reads the union. An arm in this file's self-test
+  pins the union and `Pass: none`; nothing machine-joins the two files, and that is stated in the
+  header.
 - **A per-commit spawn**, as pass-order once had. Priced at 751 ms per spawn on node a, it is the
   shape that cost 10184 s.
 - **A sha cutoff.** It grades by graph rather than by a date the committer sets, but every branch
@@ -253,10 +270,12 @@ both keys in the same release. Gov's ceiling row is 300 s, in the `declarations`
   whose spec landed one commit earlier, that commit passes; when the spec lands in the same commit as
   the code, the run exits 1 naming the commit, the spec path and the parent's short sha.
   Red when: a spec committed with its code passes, or a spec committed earlier is not found.
-- **AC2** — When a fixture's routed commit names no id, or carries `Pass: none`, the run exits 1
-  naming the commit and `no unit id`; when its subject names no id and its `Pass:` trailer names the
-  specced unit, it passes.
-  Red when: an unattributed routed commit passes, or a trailer's attribution is ignored.
+- **AC2** — When a fixture's routed commit names no id, or carries `Pass: none` and names no id in
+  its subject, the run exits 1 naming the commit and `no unit id`; when its subject names no id and
+  its `Pass:` trailer names the specced unit, it passes; when its subject names the specced unit and
+  it carries `Pass: none`, it passes.
+  Red when: an unattributed routed commit passes, a trailer's attribution is ignored, or `Pass: none`
+  erases the subject's id.
 - **AC3** — When `GATE_PUSH_BASE` names a fixture commit, only the commits after it are graded, a
   violation before it does not red, a violation after it reds even when `ROUTED_COMMIT_WAIVED`
   lists it, and the summary reads `RANGE`; unset, all zeros or naming no commit, the summary reads
@@ -291,12 +310,22 @@ both keys in the same release. Gov's ceiling row is 300 s, in the `declarations`
   landing prints a `WHOLE` summary naming the cutoff and exits 0.
   Red when: a descriptor row is malformed, or gov's own history since its cutoff carries a commit
   the leg reds.
+- **AC11** — When the self-test's fixture range holds a routed commit attributed to a specced unit
+  followed by a commit shaped as the lander's mint, subject
+  `mint: kit versions onto origin/main at <sha8>` naming that unit and a `Pass: none` trailer,
+  touching a product path, the leg passes it in RANGE mode; the same mint whose subject names no id
+  reds naming `no unit id`. When `tools/push-main.sh` lands from a scratch-clone fixture whose
+  pushed range attributes a unit and owes a kit version, the mint commit's subject names the range's
+  newest unit id and its `Pass:` trailer reads `none`.
+  Red when: the lander's mint reds its own pre-push leg, an id-less mint passes, or the mint lacks
+  `Pass: none`.
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates gov canary` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms` · `memory hygiene` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `install-prefix (shipped surface)` · `leg ceilings clear their evidenced maximum` · `every held leg is budgeted, every budget row resolves` · `kickoff-manifest ratchet` · `pass-order history` · `spec tokens (a spec's own names resolve)`
+`run-gates canary` · `run-gates gov canary` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms` · `memory hygiene` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `install-prefix (shipped surface)` · `leg ceilings clear their evidenced maximum` · `every held leg is budgeted, every budget row resolves` · `kickoff-manifest ratchet` · `pass-order history` · `spec tokens (a spec's own names resolve)` · `push-main self-test`
 
-New arm: routed_commits.py --selftest · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 · a fixture whose spec lands in the same commit as its code, against a predicate that grades nothing · none
+New arm: routed_commits.py --selftest · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC11 · a fixture whose spec lands in the same commit as its code, against a predicate that grades nothing · none
+New arm: push-main.test.sh mint subject · covers AC11 · a lander whose mint subject names no unit id · none
 
 AC10 is a direct observation of this repository and adds no arm.
 
@@ -327,6 +356,13 @@ AC10 is a direct observation of this repository and adds no arm.
 - rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 3 to 4, because `KICK-aRoutedQuill-1` moved
   from order 1 to 2, which shifts every later step by one.
 - rev-3 · 2026-10-09 · §8 · owner resolves F1 (any id) and F2 (subject or `Pass:` trailer).
+- rev-4 · 2026-10-09 · §2 · §4 · §6 · §7 · the M2 cross-read of 2026-10-09 found that
+  `tools/push-main.sh`'s attended mint commit names no unit and touches `ROUTED_PATHS`, so under
+  F3(a) every attended landing owing a kit version would red its own RANGE leg; S11 and AC11 make
+  the mint name the range's newest unit id with `Pass: none`, and S2 and AC2 now read the union
+  F2's resolution states rather than the trailer-replaces-subject rule that would red such a mint.
+  Files touched gains `tools/push-main.sh` and `memory/guides/SESSION-KICKOFF.md`, Gates gains
+  `push-main self-test`, and Rollout re-stamps the kickoff manifest for the watched conf and legs.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-6 — routed against raw: a paired trial on frozen clones of real repositories
 
-**Status:** SPECCED · rev-4 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams tooling · order 6 · ratified 2026-10-09
+**Status:** SPECCED · rev-5 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams tooling · order 6 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -389,7 +389,7 @@ per hygiene check 5: `-6-tasks.tsv`, `-6-decisions.md`, `-6-proxy.md`, `-6-harne
 
 - No kit file is touched, so no kit version is owed; the build's single bump per kit belongs to the
   units that touch kits.
-- Order 5: the trial runs after `TOOL-aRoutedQuill-5` lands. The unit pass writes records only, under
+- Order 6: the trial runs after `TOOL-aRoutedQuill-5` lands. The unit pass writes records only, under
   no `ROUTED_PATHS` entry, so the write gate does not engage on it. Its commits still carry the unit
   id in the subject shape `TOOL-aRoutedQuill-3` grades.
 - The pass returns the stages to the main loop, because a sidechain holds no spawn tool and cannot
@@ -550,6 +550,8 @@ New arm: none · covers none · the instruments carry their own liveness: the co
   bypass inside the frozen clones only, and runs every session and agent at High effort, never Extra.
 - rev-4 · 2026-10-09 · §4 · the owner amends the arms to Opus 5.5 at Medium effort; the trial's
   other agents stay at High, never Extra, and Ask A registers only the non-arm agents' model.
+- rev-5 · 2026-10-09 · §4 · the M2 cross-read of 2026-10-09 found §4 Rollout still said order 5
+  where the status header, the rev-2 line and the build README say order 6; Rollout now reads order 6.
 
 ## 10. Reuse audit
 

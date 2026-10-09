@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-4 — every subagent starts holding the card's route, stated as facts
 
-**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
+**Status:** SPECCED · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -140,7 +140,7 @@ INPROGRESS`. The one-line forms:
 | State | The one line |
 |---|---|
 | no card, no `## route`, or no `- unit:` line | `No unit is routed in this session: <card path> is absent` (or `holds no route`), `so scratch-guard refuses an Edit, Write, MultiEdit or NotebookEdit under ROUTED_PATHS (<value>).` |
-| UNARMED | `<conf> declares no <key>, so scratch-guard refuses every Edit, Write, MultiEdit or NotebookEdit in this repository except to that file.` |
+| UNARMED | `<conf> declares <key> <blank, absent or malformed: the rule its value broke>, so scratch-guard refuses every Edit, Write, MultiEdit or NotebookEdit in this repository except to that file.` The rule is `TOOL-aRoutedQuill-2`'s S6: a blank value, an absent key, or a `ROUTED_PATHS` entry that is absolute, climbs through `..` or covers `MEMORY_ROOT`, the entry named. |
 | conf unreadable | `<conf> could not be read (<code>), so scratch-guard refuses every Edit, Write, MultiEdit or NotebookEdit in this repository.` |
 
 ### The evaluation order
@@ -227,8 +227,10 @@ touching it, and until then `govkit.py epoch` reports the move as owed at the la
   naming the card path and the `ROUTED_PATHS` value.
   Red when: a subagent with no route is told nothing, or is told more than one line.
 - **AC3** — When the fixture's conf declares `ROUTED_PATHS=""`, `additionalContext` is one line
-  naming `ROUTED_PATHS` and the conf; when the fixture holds no conf, or `cwd` sits under no
-  repository, the hook exits 0 with empty stdout.
+  naming `ROUTED_PATHS`, the conf and the blank value; when it declares a `ROUTED_PATHS` entry
+  climbing through `..`, the one line names `ROUTED_PATHS`, the conf, that entry and the `..` rule;
+  when the fixture holds no conf, or `cwd` sits under no repository, the hook exits 0 with empty
+  stdout.
   Red when: an UNARMED repository is described as routed or left silent, or a repository the gate
   admits every write in is told that writes are refused.
 - **AC4** — When the arm scans the texts of AC1, AC2 and AC3, no line opens with a word from its
@@ -293,6 +295,10 @@ AC6 is a direct observation of this repository after the rewire and adds no arm.
   from order 1 to 2, which shifts every later step by one.
 - rev-3 · 2026-10-09 · §4 · Rollout corrected: hooks are re-read on the next tool call, per the
   gotcha catalogue's measurement, so subagents get the context inside the landing session.
+- rev-4 · 2026-10-09 · §4 · AC3 · the M2 cross-read of 2026-10-09 found the UNARMED line said the
+  conf declares no key, true only for a blank or absent key, while `TOOL-aRoutedQuill-2`'s UNARMED
+  also covers an entry that is absolute, climbs through `..` or covers `MEMORY_ROOT`; the line now
+  names the key and the rule it broke, and AC3 adds a `..` entry case.
 
 ## 10. Reuse audit
 

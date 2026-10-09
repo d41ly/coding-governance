@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed
 
-**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 5 · ratified 2026-10-09
+**Status:** SPECCED · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 5 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -181,11 +181,12 @@ included, so a deliberate blank stays a visible refusal.
 ### Rollout
 
 Lands at order 5, after units 2, 3 and 4. Gov itself is already wired and armed by then, so this
-unit changes what adopters receive and nothing in gov's own session. The agent-cap, memory-tree and
-check-wiring kits each bump their version once, after the build's last unit touching that kit; for
-all three that is this unit unless `PLAY-aRoutedQuill-1` or `TOOL-aRoutedQuill-6` touches one. The
-bump commit names this unit, which the ownership leg requires, and `govkit.py selfcheck` runs after
-it because a version marker can sit outside the files the bump edited. An adopter's next
+unit changes what adopters receive and nothing in gov's own session. This unit's moves of the
+agent-cap, memory-tree and check-wiring kits leave each kit's version owed; this unit's own commits
+bump none. The owed versions are minted once, after the build's last unit, as units 1, 2 and 4 also
+state: by the lander, or by the run's own mint commit before the close, which names the build's last
+built unit. `govkit.py selfcheck` runs after that mint because a version marker can sit outside the
+files the mint edited. An adopter's next
 `govkit update --write` installs the three entries, wires every fragment, appends the two keys and
 leaves all of it staged for the adopter to read before committing.
 
@@ -322,6 +323,10 @@ AC10 is a direct observation of the runbook and adds no arm.
 - rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 4 to 5, because `KICK-aRoutedQuill-1` moved
   from order 1 to 2, which shifts every later step by one.
 - rev-3 · 2026-10-09 · §8 · owner resolves F1 (install), F2 (join), F3 (keep) and F4 (a).
+- rev-4 · 2026-10-09 · §4 · the M2 cross-read of 2026-10-09 found §4 Rollout giving this unit its own
+  kit-version bump commit named for this unit, where units 1, 2 and 4 say the versions are minted
+  once by the lander; Rollout now leaves the three kits' versions owed and minted once after the
+  build's last unit, and keeps the selfcheck after the mint.
 
 ## 10. Reuse audit
 

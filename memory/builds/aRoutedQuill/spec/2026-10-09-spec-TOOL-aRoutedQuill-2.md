@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-2 — scratch-guard refuses a product write no buildable unit on the card owns
 
-**Status:** SPECCED · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3 · ratified 2026-10-09
+**Status:** SPECCED · rev-5 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -217,13 +217,15 @@ One commit carries the hook, the widened fragment, gov's re-merged `.claude/sett
 at the next session (`memory/gotchas/settings-edit-takes-effect-mid-session.md`, measured
 2026-08-10), so enforcement begins inside the session that lands this commit. That session, and
 every later one, needs a route on its card before its next product write, this build's own later
-units included. No kit version moves here: the hooks
+units included. `.memory-tree.conf` is on the kickoff manifest's `watch:` line, so that arming
+commit also re-stamps `last-audit` in `memory/guides/SESSION-KICKOFF.md` with a delta line in its
+commit message. No kit version moves here: the hooks
 kit bumps once, after the build's last unit touching it, and until then `govkit.py epoch` reports
 the move as owed at the lander.
 
 ### Files touched (estimate)
 
-`tools/hooks/scratch-guard.js` · `tools/hooks/scratch-guard.test.sh` · `tools/hooks/scratch-guard.fragment.json` · `tools/hooks/agent-cap.js` · `tools/hooks/README.md` · `.claude/settings.json` · `.memory-tree.conf` · `memory/map/features/agent-cap.md` · `memory/map/generated/symbols.json`
+`tools/hooks/scratch-guard.js` · `tools/hooks/scratch-guard.test.sh` · `tools/hooks/scratch-guard.fragment.json` · `tools/hooks/agent-cap.js` · `tools/hooks/README.md` · `.claude/settings.json` · `.memory-tree.conf` · `memory/guides/SESSION-KICKOFF.md` · `memory/map/features/agent-cap.md` · `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -334,7 +336,7 @@ the move as owed at the lander.
 
 ## 7. Gates
 
-`scratch-guard self-test` · `agent-cap self-test` · `hook destinations self-test` · `review-join self-test` · `verifier fan-out self-test` · `check-wiring self-test` · `lexicon naming predicates` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `straggler-guard arms` · `transition-audit arms` · `settings-merge selftest` · `hook destinations (every declared hook path ships)` · `install-prefix (shipped surface)` · `codebase-map coverage + freshness` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`scratch-guard self-test` · `agent-cap self-test` · `hook destinations self-test` · `review-join self-test` · `verifier fan-out self-test` · `check-wiring self-test` · `lexicon naming predicates` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `straggler-guard arms` · `transition-audit arms` · `settings-merge selftest` · `hook destinations (every declared hook path ships)` · `install-prefix (shipped surface)` · `codebase-map coverage + freshness` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `kickoff-manifest ratchet`
 
 New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC10 · the base hook, which exits 0 for every Edit, Write, MultiEdit and NotebookEdit payload and has no readConfKey · FLOOR_ASSERTIONS
 
@@ -411,6 +413,10 @@ AC8 and AC9 are direct observations of this repository after the rewire and add 
   card), F3 (a) and F4 (b): a Tier-1 spec admits at SPECCED only when `SPEC_TIER1_CUTOFF` graded it.
 - rev-4 · 2026-10-09 · §4 · Rollout corrected: hooks are re-read on the next tool call, per the
   gotcha catalogue's measurement, so enforcement starts inside the landing session, not after it.
+- rev-5 · 2026-10-09 · §4 · §7 · the M2 cross-read of 2026-10-09 found Rollout's arming commit
+  stages `.memory-tree.conf`, which the kickoff manifest watches, with no manifest re-stamp; Rollout
+  now re-stamps `last-audit` with a delta line, Files touched gains
+  `memory/guides/SESSION-KICKOFF.md` and Gates gains `kickoff-manifest ratchet`.
 
 ## 10. Reuse audit
 

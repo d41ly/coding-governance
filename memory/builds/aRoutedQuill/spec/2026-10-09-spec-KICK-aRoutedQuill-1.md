@@ -1,6 +1,6 @@
 # KICK-aRoutedQuill-1 — the kickoff writes a brief the owner confirms, and the card routes the session to its units
 
-**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams kickoff · order 2 · closes TOOL-aReplayedCard-11 · ratified 2026-10-09
+**Status:** SPECCED · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams kickoff · order 2 · closes TOOL-aReplayedCard-11 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -243,7 +243,7 @@ byte-identical.
 | R2 | a line outside the grammar, or a missing or repeated `- build:` or `- brief:` line, or no `- unit:` line | 1 |
 | R3 | a unit id absent from `$CARD_TMP/ids` | 1 |
 | R4 | a spec path absent from `$CARD_TMP/tracked`, outside `<MEMORY_ROOT>/builds/<build>/spec/`, or carrying no unfenced H1 whose first token, backticks and asterisks stripped, is the unit id | 1 |
-| R5 | a brief path absent from `$CARD_TMP/tracked`, or outside `<MEMORY_ROOT>/builds/<build>/` | 1 |
+| R5 | a brief path absent from `$CARD_TMP/tracked`, or neither under `<MEMORY_ROOT>/builds/<build>/prompts/` nor that build's `README.md`, the unattended form | 1 |
 | R6 | a body with no real READY line, appended to a card whose READY line is `READY — none yet` | 1 |
 
 No rule spawns git or the reader. R3 to R5 read the two sets the citation check already holds, and
@@ -348,8 +348,9 @@ against the wording below, the two edits cost 211 bytes:
   Red when: the card holds two route sections, or keeps the first.
 - **AC4** — When a route's unit line names an id no spec H1 defines, pairs an id with a spec whose H1
   defines another, or names an untracked spec or one outside the build's `spec/` folder, and when its
-  brief line names a path outside the build folder, `--card --append` exits 1 naming the line and the
-  rule, and `cmp` finds the card byte-identical.
+  brief line names a path outside the build folder, or a tracked path inside it that is neither under
+  its `prompts/` folder nor its `README.md`, such as the unit's own spec, `--card --append` exits 1
+  naming the line and the rule, and `cmp` finds the card byte-identical.
   Red when: any such route is appended, or annotated `UNVERIFIED` instead of refused.
 - **AC5** — When a route body lacks its `- build:` line, carries no `- unit:` line, carries two
   `- brief:` lines, carries a stray line, or the body carries two `## route` sections,
@@ -424,6 +425,10 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC4
   `### Limitations` sub-head; folded the aQuotedBrief session's sequencing (that unit builds as
   specced, TOOL-aRoutedQuill-7 repoints its rule) and its four record constraints; hands-off to
   TOOL-aRoutedQuill-7.
+- rev-4 · 2026-10-09 · §4 · AC4 · the M2 cross-read of 2026-10-09 found R5 admitted any tracked path
+  in the build folder as a brief, so a route naming the unit's own spec as its brief passed; R5 now
+  admits only a path under the build's `prompts/` folder or the build's `README.md`, the unattended
+  form the route grammar already allows, and AC4 adds the own-spec-as-brief refusal.
 
 ## 10. Reuse audit
 
