@@ -58,7 +58,7 @@ A value mixing a slug and ids is refused before any verb.
 
    **`Scope`**: `all` binds every run; a mode binds only a run whose README declared that
    `authorized-by:` value, and waiving its handle on another mode's run is REFUSED.
-1. The build folder authorizes at this project's anchor, `published`; read it, it is the roster.
+1. The build folder authorizes at this project's anchor, `local`; read it, it is the roster.
 2. Only if a handle to waive was named: ONE `AskUserQuestion`, default-deny.
 3. **Preflight:** `bash tools/unattended/unattended.sh --preflight <slug> --keepalive-id <id>`, plus
    `--waive <handle> --reason "<why>"` per confirmed pair. Keep its spec-audit line.
@@ -74,7 +74,7 @@ scaffold recipe: relay it to the owner verbatim, reap the keepalive, and stop.
 ## Start a run from a PROMPT
 
 Only when the invocation carries `--prompt`, and only under the `published` or `local` anchor; this
-project declares `published`. A prompt naming ids takes the scaffold route.
+project declares `local`. A prompt naming ids takes the scaffold route.
 
 1. **Orient from the prose**; RUN the orientation probes before step 3.
 2. **Decide whether to ask, ONCE**: One `AskUserQuestion`, every gap in it.

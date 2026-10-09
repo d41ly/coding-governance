@@ -1,6 +1,6 @@
 # TOOL-aHomedAnchor-3 — re-render the unattended Skill from its template
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-1 · base 40a976d9 · streams tooling · order 3
+**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-1 · base 40a976d9 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

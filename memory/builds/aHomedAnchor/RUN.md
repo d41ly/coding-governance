@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 40a976d9eceb5ddc42300eceaa7dae5267c44005
-phase: SPECCING
+witness: 71a299b2a5e31a35917df51ca964f84f392af0ff
+phase: BUILDING
 branch-sha: 11224126c2e48935ee3cc2e802bd3099c0f225fe
 branch-ref: refs/heads/branch/unattended-kit-slug-mode-e3ba61
 may: none
@@ -55,3 +55,5 @@ base: 11224126c2e48935ee3cc2e802bd3099c0f225fe
 2026-10-09T04:15:46Z rescope · item add TOOL-aHomedAnchor-6 · reason closing review round 1 minors batch, driver and docs write set: M1 M3 M4 M5 M6 M7 M8 M9 L1 L2 L5 L6 L7 L8 (memory/builds/aHomedAnchor/reviews/2026-10-09-review-TOOL-aHomedAnchor-1-implementation-diff-round1.md)
 
 2026-10-09T04:16:09Z rescope · item add TOOL-aHomedAnchor-7 · reason closing review round 1 minors batch, leg write set: M2 M10 L3 L4 (memory/builds/aHomedAnchor/reviews/2026-10-09-review-TOOL-aHomedAnchor-1-implementation-diff-round1.md)
+
+2026-10-09T04:28:05Z dispatch · item 71a299b2 TOOL-aHomedAnchor-3 · reason .claude/skills/unattended/SKILL.md memory/builds/aHomedAnchor/spec/2026-10-09-spec-TOOL-aHomedAnchor-3.md memory/builds/aHomedAnchor/README.md memory/LIVE.md
