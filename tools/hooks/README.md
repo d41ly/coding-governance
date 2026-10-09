@@ -233,7 +233,8 @@ roster size. Count what carries no script; parse what does.
 
 ## scratch-guard's second check: a `git commit` on an un-oriented card
 
-`scratch-guard.js` is the other hook in this home, on the `Bash|PowerShell` matcher, and after its
+`scratch-guard.js` is the other hook in this home, on the
+`Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit` matcher, and for a shell call, after its
 scratch verdict it runs ONE more check, `checkOriented` (`TOOL-aReplayedCard-1`). A `git commit`
 issued by the main loop is refused, exit 2, while the session's orientation card — the file the
 kickoff kit's `manifest-check.sh --card --write` writes at session start under
@@ -276,6 +277,50 @@ before the git token IS read, and a target the shell would expand or that is abs
 witness rather than a walk into an ancestor's `.git`); a session that started before the wiring and
 never restarted — all escape. The guard stops forgetting, not evasion. A READY line's PRESENCE is
 asserted, never its correctness, and there is no waiver.
+
+## scratch-guard's third check: a product write no routed unit owns
+
+`TOOL-aRoutedQuill-2`. One fragment, widened: `scratch-guard.fragment.json` declares the matcher
+`Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit`, and `main` sends a shell call to the two checks
+above and a write tool to `checkRouted`. A second fragment of the same script is not an option:
+`settings-merge.py` joins on the script's basename and moves one of the two out.
+
+**What it refuses.** An `Edit`, `Write`, `MultiEdit` or `NotebookEdit` whose target —
+`tool_input.file_path`, else `tool_input.notebook_path`, resolved against the payload `cwd` — lies
+under a product path, unless the session's orientation card carries a `## route` naming a unit whose
+spec is BUILDABLE. The product paths are `ROUTED_PATHS` in the `.memory-tree.conf` at the target's
+toplevel: whitespace-separated, repo-root-relative, a trailing `/` naming a directory, matched by
+whole segment on the comparable form, so `toolsx/` is not under `tools/`. BUILDABLE means the route
+line's spec sits under `<MEMORY_ROOT>/builds/<build>/spec/`, exists, has an H1 naming the unit, and
+its status header reads Tier-2 at INPROGRESS, Tier-1 at INPROGRESS, or Tier-1 at SPECCED when
+`SPEC_TIER1_CUTOFF` is set and the spec's filename date is on or after it. One buildable unit
+admits.
+
+**The order** is `checkRouted`'s comment, and it is the only statement of it. In short: a target in
+no repository, or in one whose common dir is not the session's (`CLAUDE_PROJECT_DIR`, else the
+payload `cwd`), is not gated, so a scratch clone's writes never meet its own conf; a repository with
+no conf admits with one witness line; a non-product write reads nothing past the conf. An absent
+card, a card with no `## route`, and a route with no buildable unit each refuse with their own
+remedy — `manifest-check.sh --card --write --session <sid>`, `/session-kickoff`, or the status that
+admits. A card the replay wrote is read like any other.
+
+**UNARMED.** A conf that declares `MEMORY_ROOT` or `ROUTED_PATHS` blank or absent, or an entry that
+is absolute, climbs through `..` or covers `MEMORY_ROOT`, refuses EVERY write in that repository
+except one to the conf itself — the edit that arms it. An entry covering `MEMORY_ROOT` would make
+writing a spec need a spec first.
+
+**It fails closed**, unlike the two shell checks: a missing path field, an unreadable conf and a
+throw each refuse with the reason named. There is no `agent_id` exemption: a subagent's payload
+carries the parent's `session_id`, so it reads the parent's card and is judged by the same order.
+
+**The ceiling.** A Bash or PowerShell write is never seen — `sed -i`, an interpreter, a redirect —
+and the push-time leg owns that guarantee. A hook-less or `--bare` run fires no hook. A narrowed
+`ROUTED_PATHS` is a conf diff, not a refusal. A hand-written card is read like the writer's. A spec
+status flipped to INPROGRESS without the owner's approval admits, because the gate reads a status
+the agent writes: approval is recorded, not proven. The gate stops forgetting, not evasion.
+
+`readConfKey(bytes, key)` is this home's one shell-grammar conf reader; `agent-cap.js`'s
+`readSpecAuditDefault` delegates to it.
 
 ## The authoring rule for kit files
 

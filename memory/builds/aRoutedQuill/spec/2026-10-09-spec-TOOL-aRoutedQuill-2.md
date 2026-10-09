@@ -1,11 +1,12 @@
 # TOOL-aRoutedQuill-2 — scratch-guard refuses a product write no buildable unit on the card owns
 
-**Status:** INPROGRESS · rev-6 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3 · ratified 2026-10-09
+**Status:** CLOSED · rev-7 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aRoutedQuill-2-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aRoutedQuill-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md](../build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md) | research | TOOL-aRoutedQuill-4 |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-2-build-brief.md) | journal | — |
@@ -144,6 +145,9 @@ Read at `6473ae38` on 2026-10-09.
 ROUTED_PATHS="tools/ skills/ coding-governance-agents.template.md WIRE-INTO-PROJECT.md"
 ```
 
+Step 3 compares the two common dirs after `realpath`, so an 8.3 spelling and git's long one are one
+directory. The `<build slug>` of S3 is the route's `- build:` value; a route with none builds nothing.
+
 A file is a PRODUCT PATH when its path relative to the target's toplevel, in comparable form, equals
 a file entry or sits under a directory entry by `checkUnderRoot`. The route section is
 `KICK-aRoutedQuill-1`'s; this unit reads it and nothing else on the card:
@@ -206,6 +210,10 @@ memory at `6473ae38` over gov's `.claude/settings.json`, the fragment lands in i
 | `extractRouteUnits` | function | `js.function`; answered OK |
 | `readConfKey` | function | `js.function`; answered OK |
 | `renderRouteDeny` | function | `js.function`; answered OK |
+| `checkUnarmed` | function, S6's predicate | `js.function`; answered OK (rev-7) |
+| `buildNativePath` | function, the MSYS drive fold for the walk | `js.function`; answered OK (rev-7) |
+| `resolveComparableCommon` | function, the common dir 8.3-expanded | `js.function`; answered OK (rev-7) |
+| `run_write`, `write_spec`, `write_route_card`, `write_conf`, `read_conf`, `check_stderr` | self-test helpers | `sh.function`; answered OK (rev-7) |
 | `WRITE_TOOLS` | array constant | none: no constant cell is declared in `.lexicon.conf` |
 | `BUILDABLE_STATUS` | object constant, tier to admitting tokens | none, as above |
 | `ROUTE_CONF` | string constant, `.memory-tree.conf` | none, as above |
@@ -423,6 +431,7 @@ AC8 and AC9 are direct observations of this repository after the rewire and add 
   now re-stamps `last-audit` with a delta line, Files touched gains
   `memory/guides/SESSION-KICKOFF.md` and Gates gains `kickoff-manifest ratchet`.
 - rev-6 · 2026-10-09 · §8 F1 · resolved by the stated probe, run by the unattended run before step 3; the record is `memory/builds/aRoutedQuill/build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md`.
+- rev-7 · 2026-10-09 · §4 · the build pass: the Inventory gains three hook helpers and the self-test's helpers; the common-dir compare in step 3 runs on the realpath, because a linked worktree's `gitdir:` carries git's long spelling while `CLAUDE_PROJECT_DIR` may carry the 8.3 one; BUILDABLE also needs the route's `- build:` line, the slug S3 names; and `run_card`'s stderr grading moved into `check_stderr`, shared with `run_write`.
 
 ## 10. Reuse audit
 

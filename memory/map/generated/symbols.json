@@ -1148,6 +1148,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "buildNativePath",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "buildOpts",
       "kind": "function",
       "file": "tools/workflows/orient-counterfactual.js"
@@ -2673,6 +2678,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkBuildable",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkCommand",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -2708,6 +2718,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkRouted",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkSeqMarker",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -2734,6 +2749,11 @@
     },
     {
       "id": "checkTmpRoot",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkUnarmed",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -4206,6 +4226,11 @@
       "id": "check_status_one_line",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "check_stderr",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "check_substitution",
@@ -6891,6 +6916,11 @@
       "id": "extractFindingClasses",
       "kind": "function",
       "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "extractRouteUnits",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "extract_acceptance",
@@ -10248,6 +10278,26 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "q_append",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "q_ready",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "q_refuse",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "q_route",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
       "id": "qid_exists",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -10329,6 +10379,11 @@
     },
     {
       "id": "readCard",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "readConfKey",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -10761,6 +10816,11 @@
       "id": "read_commit_paths",
       "kind": "function",
       "file": "tools/codebase-map/map_diff.py"
+    },
+    {
+      "id": "read_conf",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "read_conf",
@@ -12833,6 +12893,11 @@
       "file": "tools/workflows/unattended-build.template.js"
     },
     {
+      "id": "renderRouteDeny",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "renderShapeLine",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -13524,6 +13589,11 @@
     },
     {
       "id": "resolveCommonDir",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "resolveComparableCommon",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -16176,6 +16246,11 @@
       "id": "run_wf",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "run_write",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "run_writer",
@@ -19840,6 +19915,11 @@
     {
       "id": "write_conf",
       "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "write_conf",
+      "kind": "function",
       "file": "tools/memory-tree/transition-audit.test.sh"
     },
     {
@@ -20188,6 +20268,11 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "write_route_card",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
       "id": "write_rows_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -20251,6 +20336,11 @@
       "id": "write_spawn_floor",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "write_spec",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "write_spec",

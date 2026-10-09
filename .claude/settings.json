@@ -15,11 +15,16 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/hooks/scratch-guard.js\""
-          },
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/unattended/gate-guard.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/unattended/gate-guard.js\""
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/hooks/scratch-guard.js\""
           }
         ]
       }
