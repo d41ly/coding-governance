@@ -45,8 +45,8 @@ the new arms in `.githooks/pre-push.test.sh` and the DEC covered arm in
   present and wrote on the clean control; the staged slice wrote in both cases.
 - AC14 — `red on inherited legs only` — the inherited red landed rc 0 under `land`, printed the
   declined own-verdict line and wrote no `gate-bar-green`; the staged break wrote one.
-- AC15 — `doc-only` — a `GATE_DOC_PATHS` push scoped docs-only and green printed `this push was
-  scoped doc-only` and wrote nothing; the staged break wrote a `kind scoped` record.
+- AC15 — `doc-only` — a `GATE_DOC_PATHS` push scoped docs-only and green printed the doc-only
+  declined line and wrote nothing; the staged break wrote a `kind scoped` record.
 - AC16 — `1` — the grep printed `1` on the working hook and `0` at `bef97330`.
 - AC17 — `scoped gate` — the wrapper bar's FULL push at M wrote a `kind full` record; M plus one
   commit scoped from `full bar green` M with `GATE_BASE` M at the bar. The base was FULL on both.
