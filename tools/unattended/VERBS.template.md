@@ -582,8 +582,8 @@ the run, which makes "the owner was asked at the start" a property of the commit
    outside the prompt. `## Owner confirmation` holds step 2's question as `Asked: <verbatim>` and the
    reply as `Answer: <verbatim>`; with `none` above it reads
    `not asked — the brief draws on nothing outside the prompt`. From `PROMPT_BRIEF_CUTOFF`,
-   preflight refuses a record that breaks this shape and a build with no such record. A
-   `spec-audit:` ask counts only inside `## The prompt`, never in a section the run wrote.
+   the first preflight refuses a record that breaks this shape and a build with no such record.
+   A `spec-audit:` ask counts only inside `## The prompt`, never in a section the run wrote.
 4. **Commit, then PUSH THE BRANCH**, in that order. Skip the push and preflight refuses with
    `the remote advertises no tip for the branch this run is on, so nothing published authorizes it`.
 5. **Preflight**, as on the slug path; it records the mode from the file you pushed.
