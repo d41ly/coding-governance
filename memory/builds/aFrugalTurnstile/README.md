@@ -6,7 +6,6 @@ streams: tooling+playbook+deployer
 roster: TOOL+PLAY+DEPL
 ids: DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10
 authorized-by: prompt
-status: OPEN
 ---
 
 # aFrugalTurnstile — land a build without paying the full bar again and again
@@ -69,23 +68,43 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-10-09 · streams tooling+playbook+deployer
+**Build status:** OPEN · 12 unit(s) · node a · opened 2026-10-09 · streams tooling+playbook+deployer
 ids DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [DEPL-aFrugalTurnstile-1 — the runbook states what an adopter declares to use each part](spec/2026-10-09-spec-DEPL-aFrugalTurnstile-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [PLAY-aFrugalTurnstile-1 — the charter's §1 Landing states the scoped-then-full path](spec/2026-10-09-spec-PLAY-aFrugalTurnstile-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-1 — staleness counts first-parent landings, and a runner stamp is trusted only for the runner's own manifest](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-10 — the unattended protocol's landing rule states the scoped-then-full path](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-10.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-2 — pre-push records the green of the bar it ran, and a push whose tree carries one runs nothing](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-2.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-3 — the unattended close records the green of the bar it ran](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-3.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-5 — the gate turnstile is host-wide, names its holder, lets nested bars through, and `--hold` admits a foreign bar](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-5.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-4 — lineage reuse: after a red, the boundary's full bar re-runs only failed and moved legs, and may stamp](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-4.md) | 3 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-6 — `post-merge.sh` runs the full bar on a landed sha and publishes its verdict as a remote ref](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-6.md) | 4 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-7 — pre-push binds a post-merge red, and `--decide` prints the boundary's decision](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-7.md) | 4 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-8 — push-main starts the post-merge bar after a landing where it is declared](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-8.md) | 5 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-9 — the unattended close runs the boundary's decision where a post-merge bar is declared](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-9.md) | 5 | 2 | OPEN | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-10 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7
+TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `DEPL-aFrugalTurnstile-1`, `PLAY-aFrugalTurnstile-1`, `TOOL-aFrugalTurnstile-1`, `TOOL-aFrugalTurnstile-10` | yes |
+| 2 | `TOOL-aFrugalTurnstile-2`, `TOOL-aFrugalTurnstile-3`, `TOOL-aFrugalTurnstile-5` | yes |
+| 3 | `TOOL-aFrugalTurnstile-4` | no |
+| 4 | `TOOL-aFrugalTurnstile-6`, `TOOL-aFrugalTurnstile-7` | yes |
+| 5 | `TOOL-aFrugalTurnstile-8`, `TOOL-aFrugalTurnstile-9` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -15,7 +15,7 @@ design decision; do not silently design around it.
 Every spec is **Tier-2**, under the spec template `memory/TEMPLATE-SPEC.md` with all ten sections,
 including `§3 ### Edges` and `§10 Reuse audit`. Filename
 `memory/builds/aFrugalTurnstile/spec/2026-10-09-spec-<FAMILY>-aFrugalTurnstile-<n>.md`; status `OPEN`,
-`rev-1`, `node a`, `base {{BASE8}}`, `streams tooling` (`playbook` for PLAY-1, `deployer` for DEPL-1),
+`rev-1`, `node a`, `base bef97330`, `streams tooling` (`playbook` for PLAY-1, `deployer` for DEPL-1),
 and the header `order` given per unit below. Name the specs you author in `authored` by unit id.
 
 **Invariants for all twelve.**
