@@ -1,6 +1,6 @@
 # PLAY-aDistilledCharter-2 — the review protocol carries the security checklist and the tier definitions the charter drops
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook+tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook+tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -78,8 +78,9 @@ Read at `6473ae38` on 2026-10-09.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `grep -n '^## Tiers\|^## Security boundaries' memory/guides/REVIEW-PROTOCOL.md`
-  runs, both headings print, and each §9 line of v3.5 maps to one bullet under the second.
+- **AC1** — When `grep -n '^## Tiers\|^## Security boundaries' memory/TEMPLATE-SPEC.md` runs,
+  both headings print, and each §9 line of v3.5 maps to one bullet under the second; the sections
+  were written into the review protocol and moved on by `PLAY-aDistilledCharter-5`.
   Red when: a heading is absent or a boundary is missing.
 - **AC2** — When the kit's parity render is re-run over the committed tree,
   `git diff --exit-code memory/guides/REVIEW-PROTOCOL.md` exits 0.
@@ -96,6 +97,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · AC1 · the sections' home moved on to the spec template
+  (`PLAY-aDistilledCharter-5`, closing review round 3, T1).
 
 ## 10. Reuse audit
 

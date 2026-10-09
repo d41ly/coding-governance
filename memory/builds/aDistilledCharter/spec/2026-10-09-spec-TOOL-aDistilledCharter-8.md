@@ -1,12 +1,13 @@
 # TOOL-aDistilledCharter-8 — the closing review's round-2 findings, closed as one batch
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+playbook · order 13
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+playbook · order 13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aDistilledCharter-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aDistilledCharter-1-acceptance-ledger.md) | journal | TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 PLAY-aDistilledCharter-5 |
+| [2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round3.md](../reviews/2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round3.md) | diff-review | PLAY-aDistilledCharter-5 |
 
 <!-- /gen:spec-records -->
 
@@ -18,7 +19,7 @@ sets intersect in `render_playbook.py` and the template, so BUILD-METHOD M4 batc
 
 ## 2. Scope (IN)
 
-- **S1** — N2: the checkout directory is `[charter]` or `[answers]` `checkout_dir` when stated, else
+- **S1** — N2: the checkout directory is the `[answers]` key `checkout_dir` when stated, else
   `project_name`, so a product named apart from its clone states the clone once. Observed by AC1.
 - **S2** — N3: the playbook README's Nodes section says one user holds one tag, and why: the readers
   match the user alone. NOT OBSERVED by a criterion: a sentence.
@@ -81,6 +82,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft, the batch promoted from the closing review round 2.
+- rev-2 · 2026-10-09 · S1 · `checkout_dir` is an `[answers]` key only: `[charter]` refuses a key
+  naming no placeholder (closing review round 3, T5).
 
 ## 10. Reuse audit
 

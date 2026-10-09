@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: playbook+tooling+deployer+kickoff
 roster: PLAY+TOOL+DEPL+KICK
-ids: DEPL-aDistilledCharter-1 DEPL-aDistilledCharter-2 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 PLAY-aDistilledCharter-5 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 TOOL-aDistilledCharter-8
+ids: DEPL-aDistilledCharter-1 DEPL-aDistilledCharter-2 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 PLAY-aDistilledCharter-5 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 TOOL-aDistilledCharter-8 TOOL-aDistilledCharter-9
 ---
 
 # aDistilledCharter — the charter becomes governing practices, adopter rules and a generated block
@@ -41,11 +41,18 @@ once, after the last unit. Owner decisions, 2026-10-09: section 2 lives in `depl
 adopters re-tag to the fleet registry; the manifest's §B trim is in scope; no spec audit is declared.
 The round-1 closing review's blocker folded into TOOL-2; its three HIGH findings became TOOL-5,
 TOOL-6 and DEPL-2, and its twenty-two others the one batch TOOL-7. Round 2's blocker retired
-DEPL-2 for PLAY-5, and its five others became TOOL-8.
+DEPL-2 for PLAY-5, and its five others became TOOL-8. Round 3 converged; its six became TOOL-9.
 
 ## Parked decisions
 
-none
+- Should the `playbook` entry declare `requires = ["memory-tree"]`? The security checklist and three
+  protocol lines need the memory tree. Requiring it refuses a playbook-only adoption; leaving it
+  relies on the runbook's "required". Refused: it changes what an adoption may select.
+- Should the default selection add `review-harness`, `agent-cap` and `settings-merge`? It would put
+  the review protocol and the cap hook in every default adoption. Refused: it installs a settings
+  hook in every adopter.
+- Should the template's 48 KiB ceiling drop near its 12 KB size? The leg is named for 48 KiB and
+  about thirty records cite that name, so lowering it is a rename. Refused: a ceiling is yours.
 
 <!-- roster:units -->
 
@@ -67,20 +74,21 @@ none
 | 14 | `TOOL-aDistilledCharter-7` | SPECCED | the closing review's medium and low findings, closed as one batch |
 | 15 | `PLAY-aDistilledCharter-5` | SPECCED | the security checklist and the tier definitions ship with the memory tree |
 | 16 | `TOOL-aDistilledCharter-8` | SPECCED | the closing review's round-2 findings, closed as one batch |
+| 17 | `TOOL-aDistilledCharter-9` | SPECCED | the closing review's round-3 findings, closed as one batch |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 16 unit(s) · node a · opened 2026-10-09 · streams playbook+tooling+deployer+kickoff
+**Build status:** SPECCED · 17 unit(s) · node a · opened 2026-10-09 · streams playbook+tooling+deployer+kickoff
 ids DEPL-aDistilledCharter-1 DEPL-aDistilledCharter-2 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 PLAY-aDistilledCharter-5 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3
-ids TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 TOOL-aDistilledCharter-8
+ids TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 TOOL-aDistilledCharter-8 TOOL-aDistilledCharter-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aDistilledCharter-1 — the renderer grades one-line regions and renders section 2 from `[charter] adopter_rules`](spec/2026-10-09-spec-TOOL-aDistilledCharter-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-09 |
 | [TOOL-aDistilledCharter-2 — the fleet registry assigns every node one tag and the renderer generates the node table from it](spec/2026-10-09-spec-TOOL-aDistilledCharter-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-10-09 |
-| [PLAY-aDistilledCharter-2 — the review protocol carries the security checklist and the tier definitions the charter drops](spec/2026-10-09-spec-PLAY-aDistilledCharter-2.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-09 |
+| [PLAY-aDistilledCharter-2 — the review protocol carries the security checklist and the tier definitions the charter drops](spec/2026-10-09-spec-PLAY-aDistilledCharter-2.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-09 |
 | [PLAY-aDistilledCharter-3 — the hygiene guide carries the id-minting protocol the charter drops](spec/2026-10-09-spec-PLAY-aDistilledCharter-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-09 |
 | [PLAY-aDistilledCharter-1 — the charter template v4.0, with a disposition for every v3.5 rule](spec/2026-10-09-spec-PLAY-aDistilledCharter-1.md) | 4 | 2 | SPECCED | rev-4 | 2026-10-09 |
 | [PLAY-aDistilledCharter-4 — gov adopts v4.0: its wrapper folds into section 2 and its charter re-renders](spec/2026-10-09-spec-PLAY-aDistilledCharter-4.md) | 5 | 1 | SPECCED | rev-2 | 2026-10-09 |
@@ -93,15 +101,16 @@ ids TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 T
 | [TOOL-aDistilledCharter-6 — the hook README's three bound phrases are compared with the hook again](spec/2026-10-09-spec-TOOL-aDistilledCharter-6.md) | 10 | 2 | SPECCED | rev-1 | 2026-10-09 |
 | [TOOL-aDistilledCharter-7 — the closing review's medium and low findings, closed as one batch](spec/2026-10-09-spec-TOOL-aDistilledCharter-7.md) | 11 | 2 | SPECCED | rev-1 | 2026-10-09 |
 | [PLAY-aDistilledCharter-5 — the security checklist and the tier definitions ship with the memory tree](spec/2026-10-09-spec-PLAY-aDistilledCharter-5.md) | 12 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [TOOL-aDistilledCharter-8 — the closing review's round-2 findings, closed as one batch](spec/2026-10-09-spec-TOOL-aDistilledCharter-8.md) | 13 | 2 | SPECCED | rev-1 | 2026-10-09 |
+| [TOOL-aDistilledCharter-8 — the closing review's round-2 findings, closed as one batch](spec/2026-10-09-spec-TOOL-aDistilledCharter-8.md) | 13 | 2 | SPECCED | rev-2 | 2026-10-09 |
+| [TOOL-aDistilledCharter-9 — the closing review's round-3 findings, closed as one batch](spec/2026-10-09-spec-TOOL-aDistilledCharter-9.md) | 14 | 2 | SPECCED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aDistilledCharter-9.
 
 Ids no `spec-audit` record has ever named: DEPL-aDistilledCharter-1 DEPL-aDistilledCharter-2 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 PLAY-aDistilledCharter-5 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2
-TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 TOOL-aDistilledCharter-8.
+TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 TOOL-aDistilledCharter-8 TOOL-aDistilledCharter-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -121,6 +130,7 @@ TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-
 | 11 | `TOOL-aDistilledCharter-7` | no |
 | 12 | `PLAY-aDistilledCharter-5` | no |
 | 13 | `TOOL-aDistilledCharter-8` | no |
+| 14 | `TOOL-aDistilledCharter-9` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
