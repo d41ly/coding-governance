@@ -65,7 +65,7 @@ cd "$ROOT" || exit 2
 
 # THIS GATE'S TOOL ROOT, DERIVED from where it sits, and an underivable one REFUSES: a literal here
 # would be the install-prefix gate's class, and a root install derives the empty string.
-if ! SELF_PRE=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
+if ! SELF_PRE=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
   echo "remote-literals: cannot derive this gate's own directory from '$_self_dir' — REFUSING"
   exit 2
 fi
