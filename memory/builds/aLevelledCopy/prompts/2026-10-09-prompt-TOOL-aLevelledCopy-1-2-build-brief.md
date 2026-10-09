@@ -20,9 +20,11 @@ adds what the harness prompt does not carry. The mandate is the owner's prompt b
    ledger". Every token must share a backticked token with the criterion it answers.
 3. **Observe every new arm RED first**: stage its break, see it fail, restore, see it pass. Write
    both observations in the ledger paragraph.
-4. **Do not regenerate the codebase map** (`memory/map/generated/*`, `gen_map.py --write`), even
-   where your spec lists it. The main loop regenerates it once, after the last unit, because every
-   unit here stales it.
+4. **Regenerate the codebase map in your own commit** when the pre-commit hook asks for it:
+   `python tools/codebase-map/gen_map.py --write`, then stage only the generated files it changed,
+   declared with `--dispatch` first. The hook's map leg refuses a stale `symbols.json` whenever code
+   is staged, so deferring it to the main loop is not possible. (Corrected after
+   DEPL-aLevelledCopy-1's pass found this; the first version of this item said the opposite.)
 5. **No kit-version bump, no `memory/DECISIONS.md` edit, no backlog edit.** A discovery goes in your
    `summary`.
 6. **Run `python tools/memory-tree/gen_build_index.py --write` after flipping your spec to CLOSED**
