@@ -3089,6 +3089,36 @@ miss "$(run)" "a run's recorded BASE is not on the branch the remote calls its d
 git remote add origin "$ORIGIN"
 reset_tree
 
+# ---- TOOL-aHomedAnchor-2: THE LOCAL ANCHOR, opted into on the REMOTE's default branch. The base is a
+# ---- commit on `unit` that no remote tip carries, which is what the driver's local anchor pins.
+# ---- AC1 and AC4: origin's conf declares `local`, so check 9 admits the base and check 29, whose
+# ---- `slug` README sits on that off-default base, stays silent.
+add_local_scope() { printf 'ANCHOR_SCOPE="local"\n' >> .unattended.conf; }
+anchor_break add_local_scope
+git commit -q --allow-empty -m unit-only --no-verify
+sed -i "s|^base: .*|base: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
+git add -A >/dev/null
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit  "$out" "check 9 admitted by the local anchor — a recorded BASE no remote tip carries, on HEAD's history, in a repo whose default-branch conf declares ANCHOR_SCOPE=local: "
+miss "$out" "a recorded BASE is not published on the remote — it is an ancestor of no tip the remote advertises, so it names a commit that exists only where this run could have authored it: recorded"
+miss "$out" "a run's recorded BASE is not on the branch the remote calls its default, so it came from the second anchor, while the build README there declares a mode whose discipline is that the folder already existed: mode"
+# ---- AC3: the same opt-in does not admit a base off HEAD's history.
+off=$(git commit-tree "$(git rev-parse 'HEAD^{tree}')" -m "a commit off this working history")
+sed -i "s|^base: .*|base: $off|" memory/builds/tRun/RUN.md
+git add -A >/dev/null
+hit  "$(run)" "a recorded BASE is not published on the remote — it is an ancestor of no tip the remote advertises, so it names a commit that exists only where this run could have authored it: recorded $off"
+anchor_restore
+# ---- AC2: `local` in the WORKING TREE only, the remote's default branch unchanged, admits nothing.
+reset_tree
+add_local_scope
+git add -A >/dev/null && git commit -q -m unit-only --no-verify
+sed -i "s|^base: .*|base: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
+git add -A >/dev/null
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit  "$out" "a recorded BASE is not published on the remote — it is an ancestor of no tip the remote advertises, so it names a commit that exists only where this run could have authored it: recorded"
+miss "$out" "check 9 admitted by the local anchor"
+reset_tree
+
 # ---- the DECLARATION SEAM second-opinioned. The record claims a
 # ---- playbook and a count the README at its own BASE does not declare. Two branches, two
 # ---- fixtures, because one arm asserting either message would pass on whichever fired.
@@ -3187,7 +3217,7 @@ hit "$(run)" "the Skill's prompt path puts its owner turn AFTER the branch push,
 # H, the PUSH after preflight. Preflight run first meets the refusal that nothing published
 # authorizes the run - the exact refusal step 1 quotes so the agent does not have to diagnose it.
 reset_tree
-mutate $KIT_REL/SKILL.template.md 's/^4\. \*\*Commit, then PUSH THE BRANCH\.\*\*/4. **Commit.**/'
+mutate $KIT_REL/SKILL.template.md 's/^4\. \*\*Commit, then PUSH THE BRANCH\*\*.*/4. **Commit.**/'
 mutate $KIT_REL/SKILL.template.md 's/^6\. \*\*The kickoff hand-back\*\*/6. PUSH THE BRANCH now\n6. **The kickoff hand-back**/'
 hit "$(run)" "the Skill's prompt path puts the branch push AFTER preflight, and preflight run first meets the refusal that nothing published authorizes the run:"
 

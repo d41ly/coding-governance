@@ -65,7 +65,7 @@ ids TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aHomedAnchor-1 — the driver's third anchor: `ANCHOR_SCOPE="local"` authorizes from local history](spec/2026-10-09-spec-TOOL-aHomedAnchor-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-10-09 |
-| [TOOL-aHomedAnchor-2 — the bar leg admits a local-anchored BASE when origin's default branch declares `local`](spec/2026-10-09-spec-TOOL-aHomedAnchor-2.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-2 — the bar leg admits a local-anchored BASE when origin's default branch declares `local`](spec/2026-10-09-spec-TOOL-aHomedAnchor-2.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).

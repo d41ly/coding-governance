@@ -9,6 +9,9 @@
 #
 #   bash <prefix>/unattended/check-unattended.sh
 #
+# NOT CHECKED (TOOL-aHomedAnchor-2): under a remote default branch declaring ANCHOR_SCOPE=local, that a
+# run's recorded BASE predates the run. Check 9 then asks only that the BASE is on HEAD's history.
+#
 # Exit 0 + no output = clean, EXCEPT for the two announcements named below. Anything else printed
 # is a violation. Exit 2 = misconfigured.
 #
@@ -1304,6 +1307,28 @@ fi
 # per record, 36 times, always about the same sha.
 ADV_HEAD_OK=0
 if [ -n "$ADV_HEAD" ] && GIT cat-file -e "$ADV_HEAD^{commit}" 2>/dev/null; then ADV_HEAD_OK=1; fi
+# ---- TOOL-aHomedAnchor-2 S1 - THE ANCHOR SCOPE THE REMOTE'S DEFAULT BRANCH DECLARES. The driver's
+# ---- `local` anchor pins a BASE nothing off this node observed, so check 9's published test would
+# ---- red every run it authorizes. The leg admits one ONLY where the conf at the tip the remote
+# ---- advertises for its default branch says `local`: the working tree, the recorded BASE and the
+# ---- run branch's tip are all the run's to write, and this blob moves only through a landing,
+# ---- which runs this leg first. PARSED, never evaluated: the driver sources the conf, so the last
+# ---- assignment line wins, and a value spelled through expansion reads as itself and so as strict.
+# ---- No readable HEAD leaves it empty, which is the strict reading.
+read_origin_scope() { # conf blob text -> the last ANCHOR_SCOPE= assignment's value
+  printf '%s\n' "$1" | awk '
+    /^[[:space:]]*ANCHOR_SCOPE=/ {
+      v = $0; sub(/^[[:space:]]*ANCHOR_SCOPE=/, "", v)
+      sub(/\r$/, "", v); sub(/[[:space:]]+#.*$/, "", v); sub(/[[:space:]]+$/, "", v)
+      if (v ~ /^".*"$/ || v ~ /^\047.*\047$/) v = substr(v, 2, length(v) - 2)
+      r = v
+    }
+    END { print r }'
+}
+ORIGIN_SCOPE=""
+if [ "$ADV_HEAD_OK" = 1 ]; then
+  ORIGIN_SCOPE=$(read_origin_scope "$(GIT show "$ADV_HEAD:.unattended.conf" 2>/dev/null)")
+fi
 # THE RUN THIS TREE DRIVES (TOOL-aWindowedPass-5): the record whose run branch is the branch checked
 # out here. A detached HEAD binds none. Read once, here, because check 19's live own-commit arms and
 # check 23 below both compare every record against it.
@@ -2214,6 +2239,10 @@ while IFS= read -r f; do
             fi
           elif [ "$_pubrc" = 2 ]; then
             fail 9 "the remote advertised tips this clone does not have, so whether a recorded BASE is published CANNOT BE OBSERVED and this leg will not answer a question it could not ask; fetch and re-run: recorded $rb in $f"
+          elif [ "$ORIGIN_SCOPE" = local ] && check_head_reaches "$rb"; then
+            # TOOL-aHomedAnchor-2 S2 - the local anchor, opted into on the remote's default branch.
+            # WHAT THIS DOES NOT CHECK: that the BASE predates the run. On that anchor nothing can.
+            report "check 9 admitted by the local anchor — a recorded BASE no remote tip carries, on HEAD's history, in a repo whose default-branch conf declares ANCHOR_SCOPE=local: $rb in $f"
           else
             fail 9 "a recorded BASE is not published on the remote — it is an ancestor of no tip the remote advertises, so it names a commit that exists only where this run could have authored it: recorded $rb in $f"
           fi
@@ -2389,10 +2418,14 @@ while IFS= read -r f; do
       # ---- CANNOT TELL STAYS SILENT, exactly as `is_published` does. An unreadable or unadvertised
       # ---- default-branch tip means the remote could not be observed, and a leg that reds a whole
       # ---- fleet on a network fault is worse than one that waits for the next run.
+      # TOOL-aHomedAnchor-2 S3 - the local anchor admits every mode, so where the remote's default
+      # branch declares it an off-default BASE says nothing about which discipline was claimed.
       case " $SECOND_ANCHOR_MODES " in
         *" $dmode "*) ;;
         *)
-          if [ "$ADV_HEAD_OK" = 1 ] \
+          if [ "$ORIGIN_SCOPE" = local ]; then
+            report "check 29 skipped for $f — the remote's default-branch conf declares ANCHOR_SCOPE=local, which admits mode $dmode off the default branch"
+          elif [ "$ADV_HEAD_OK" = 1 ] \
              && check_rev "$rb" \
              && ! check_adv_reaches "$rb"; then
             fail 29 "a run's recorded BASE is not on the branch the remote calls its default, so it came from the second anchor, while the build README there declares a mode whose discipline is that the folder already existed: mode $dmode, admissible on that anchor are $SECOND_ANCHOR_MODES, base $rb in $f"

@@ -37,3 +37,9 @@ base: 11224126c2e48935ee3cc2e802bd3099c0f225fe
 2026-10-09T02:32:05Z dispatch · item dc8591f4 TOOL-aHomedAnchor-1 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/adopt-unattended.sh tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md tools/unattended/STOPS.template.md tools/unattended/README.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md .claude/skills/unattended/SKILL.md .unattended.conf memory/builds/aHomedAnchor/spec/2026-10-09-spec-TOOL-aHomedAnchor-1.md memory/guides/SESSION-KICKOFF.md
 
 2026-10-09T02:53:06Z dispatch · item 337b5b64 TOOL-aHomedAnchor-1 · reason tools/unattended/unattended.test.sh
+
+2026-10-09T02:58:36Z dispatch · item 026f5eec TOOL-aHomedAnchor-2 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/aHomedAnchor/spec/2026-10-09-spec-TOOL-aHomedAnchor-2.md
+
+2026-10-09T03:31:05Z dispatch · item 026f5eec TOOL-aHomedAnchor-2 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/aHomedAnchor/spec/2026-10-09-spec-TOOL-aHomedAnchor-2.md memory/map/generated/symbols.json
+
+2026-10-09T03:39:12Z dispatch · item 026f5eec TOOL-aHomedAnchor-2 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/aHomedAnchor/spec/2026-10-09-spec-TOOL-aHomedAnchor-2.md memory/map/generated/symbols.json memory/builds/aHomedAnchor/README.md memory/LIVE.md

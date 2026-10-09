@@ -1,6 +1,6 @@
 # TOOL-aHomedAnchor-2 — the bar leg admits a local-anchored BASE when origin's default branch declares `local`
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 11224126 · streams tooling · order 2
+**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2 · base 11224126 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
