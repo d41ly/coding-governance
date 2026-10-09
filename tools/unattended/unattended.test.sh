@@ -495,7 +495,35 @@ export CLAUDE_PID=999999999
 # reported as dirtiness instead of as the thing under test), and a checkout leaves those commits.
 reset_tree() { git checkout -q unit 2>/dev/null; git reset -q --hard "$UNIT0"; git clean -qfd; mkconf; }
 
-run() { bash "$SCRIPT" "$@" 2>&1; }
+# TOOL-aQuotedBrief-2 - A FIRST PREFLIGHT REFUSES A CARRIED BRANCH (check 114), and about a hundred
+# first preflights below commit a conf edit on the run branch only because preflight refuses a dirty
+# tree; that edit stands for the project's own conf, which lives on the default branch. So every
+# driver helper runs through this one, which for a FIRST `--preflight` (no RUN.md for the slug in the
+# cwd's memory tree) stands local `main` at HEAD for the call and puts it back after: the check's own
+# exclusion. An arm exercising check 114 sets CARRIED_LIVE=1. HEAD on main, or no main, is left alone.
+run_main_at_head() { # command... -> its output and status
+  local _ma_on="" _ma_rs="" _ma_b="" _ma_rc _ma_a _ma_p=""
+  if [ -z "${CARRIED_LIVE:-}" ]; then
+    for _ma_a in "$@"; do
+      [ "$_ma_p" = --preflight ] && { [ -e "memory/builds/$_ma_a/RUN.md" ] || _ma_on=1; break; }
+      _ma_p=$_ma_a
+    done
+  fi
+  if [ -n "$_ma_on" ]; then
+    # ONE spawn for both answers; with no main it echoes the ref name back, which is not hex.
+    { read -r _ma_rs; read -r _ma_b; } < <(git rev-parse refs/heads/main --abbrev-ref HEAD 2>/dev/null)
+    case "$_ma_rs" in *[!0-9a-f]*|"") _ma_rs="" ;; esac
+    if [ -n "$_ma_rs" ] && [ -n "$_ma_b" ] && [ "$_ma_b" != main ]; then
+      git update-ref refs/heads/main HEAD 2>/dev/null || _ma_rs=""
+    else
+      _ma_rs=""
+    fi
+  fi
+  "$@"; _ma_rc=$?
+  [ -z "$_ma_rs" ] || git update-ref refs/heads/main "$_ma_rs" 2>/dev/null
+  return "$_ma_rc"
+}
+run() { run_main_at_head bash "$SCRIPT" "$@" 2>&1; }
 
 # ---- EVERY `--dispatch` ARM NEEDS A COMMITTED, READY SPEC for the unit it names. The driver refuses
 # ---- a pass for a unit no tracked spec under the build defines (M2's MISSING, check 49) and one
@@ -4258,6 +4286,57 @@ hit  "$out" "mode prompt; delete the line, and leave the opt-in to the owner - a
 miss "$out" "admitted under prompt mode"
 miss "$out" "does not stand on its own"
 
+# ---- TOOL-aQuotedBrief-2 — A FIRST PREFLIGHT REFUSES A CARRIED BRANCH (check 114): a commit beyond the
+# ---- anchor tip and the local default branch touching anything but the build folder or a declared
+# ---- generated index. Every arm sets CARRIED_LIVE=1, which turns off the helpers' local-main stand-in.
+# ---- A conf edit an arm needs is committed onto main AND origin/main, since on the run branch it would
+# ---- be carried itself; main is put back at the block's end. AC1 and AC3 were observed RED against the
+# ---- pre-pass driver, AC2, AC4 and AC5 against a driver with that criterion's clause staged out.
+# ---- AC3: a slug-mode README on the default branch, and one unrelated commit on the run branch.
+reset_tree; printf 'stray\n' > stray.txt; git add -A >/dev/null && git commit -q -m stray --no-verify
+_cb_sha=$(git rev-parse --short HEAD)
+out=$(CARRIED_LIVE=1 run --preflight tFresh --keepalive-id k1)
+hit  "$out" "a first preflight found this branch carrying a commit the default branch does not hold that touches a path outside this build's folder and the declared generated indexes, and it would land with the run without passing through the spec loop; start the run in a fresh worktree off the default branch, carrying only the build folder - the commit and the first such path: $_cb_sha stray.txt"
+hit  "$out" "  git -C <worktree-root>/tFresh checkout unit -- memory/builds/tFresh/"
+miss "$out" "preflight OK"
+# ---- AC4: the same carried commit under an existing RUN.md is not graded; the re-preflight proceeds.
+reset_tree; printf 'stray\n' > stray.txt; git add -A >/dev/null && git commit -q -m stray --no-verify
+out=$(CARRIED_LIVE=1 run --preflight tRun --keepalive-id k1)
+hit  "$out" "preflight OK"
+miss "$out" "a first preflight found this branch carrying a commit"
+# ---- AC5: commits on a local main ahead of the remote are not carried; only the run's own commit,
+# ---- inside the build folder, is listed.
+reset_tree; printf 'local\n' > local.txt; git add -A >/dev/null && git commit -q -m local-main --no-verify
+git branch -f main HEAD
+printf 'n\n' > memory/builds/tFresh/notes.md; git add -A >/dev/null && git commit -q -m notes --no-verify
+out=$(CARRIED_LIVE=1 run --preflight tFresh --keepalive-id k1)
+hit  "$out" "preflight OK"
+miss "$out" "a first preflight found this branch carrying a commit"
+git branch -f main "$BASE"
+# ---- AC1: a prompt-mode build-folder commit on top of a commit touching a file outside it refuses,
+# ---- naming that commit and file, and writes no RUN.md.
+reset_tree; scope published; printf 'GENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m cb-conf --no-verify; git branch -f main HEAD; git push -q -f origin HEAD:main
+_cb_main=$(git rev-parse HEAD)
+printf 'stray\n' > stray.txt; git add -A >/dev/null && git commit -q -m stray --no-verify
+_cb_sha=$(git rev-parse --short HEAD)
+readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(CARRIED_LIVE=1 run --preflight tBr --keepalive-id k1)
+hit  "$out" "a first preflight found this branch carrying a commit the default branch does not hold that touches a path outside this build's folder and the declared generated indexes, and it would land with the run without passing through the spec loop; start the run in a fresh worktree off the default branch, carrying only the build folder - the commit and the first such path: $_cb_sha stray.txt"
+miss "$out" "preflight OK"
+same "TOOL-aQuotedBrief-2 AC1 a carried branch created no run-state file" "$([ -f memory/builds/tBr/RUN.md ] && echo yes || echo no)" "no"
+# ---- AC2: the build-folder commit alone, with its re-rendered generated index, is admitted.
+git reset -q --hard "$_cb_main"; git clean -qfd
+readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+printf '# live\n' > memory/LIVE.md
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(CARRIED_LIVE=1 run --preflight tBr --keepalive-id k1)
+hit  "$out" "preflight OK"
+miss "$out" "a first preflight found this branch carrying a commit"
+git checkout -qf unit; git branch -f main "$BASE"; git push -q -f origin "$BASE":main
+reset_tree
+
 # ---- TOOL-aWardedAudit-6 S4: a record whose BASE README carries a prompt-mode `spec-audit:` line - the
 # ---- state a run preflighted under a driver before check 89 is left in - reads NOT GRADABLE at the
 # ---- close. No preflight can write that record now, so it is borrowed: a sibling README with no key
@@ -5369,7 +5448,7 @@ esac
 exec "$real_git_128" "\$@"
 STUB128
 chmod +x "$stub128/git"
-out=$(PATH="$stub128:$PATH" bash "$SCRIPT" --preflight tBrT --keepalive-id k1 2>&1)
+out=$(PATH="$stub128:$PATH" run_main_at_head bash "$SCRIPT" --preflight tBrT --keepalive-id k1 2>&1)
 hit "$out" "the remote could not be reached for this run's branch, the wall-clock bound fired, or this side could not create the scratch file the observation needs, so whether the branch is published is UNKNOWN rather than answered no; pushing it is not the remedy, and the endpoint and the local scratch dir are: refs/heads/"
 miss "$out" "push the branch first"
 rm -rf "$stub128"
@@ -9453,7 +9532,7 @@ SUR
 su_unit=$(git -C "$su_dir" rev-parse unit)
 su_base=$(git -C "$su_dir" rev-parse main)
 SU_R=memory/builds/tRun/RUN.md
-run_su() { ( cd "$su_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main bash "$SCRIPT" "$@" 2>&1 ); }
+run_su() { ( cd "$su_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main bash "$SCRIPT" "$@" 2>&1 ); }
 run_su_git() { git -C "$su_dir" "$@"; }
 run_su_leg() { ( cd "$su_dir" && GOV_UNATTENDED_REPORT=1 bash "$HERE/check-unattended.sh" --skip 28 2>&1 ); }
 read_su_sum() { run_su_git hash-object "${1:-$SU_R}"; }
@@ -10256,7 +10335,7 @@ G62_W="$ORIGIN_DIR/g62-wave"
 G62_LEDGER="$DD_CD/unattended/tRun.procs"
 add_wave_worktree() { rm -rf "$G62_W"; git worktree add -q -b wave "$G62_W" >/dev/null 2>&1 || { echo "FAIL fixture: git worktree add failed under $G62_W"; st=1; }; }
 remove_wave_worktree() { git worktree remove --force "$G62_W" >/dev/null 2>&1; git worktree prune; rm -rf "$G62_W"; git branch -q -D wave 2>/dev/null; }
-run_wave() { ( cd "$G62_W" && bash "$SCRIPT" "$@" 2>&1 ); }
+run_wave() { ( cd "$G62_W" && run_main_at_head bash "$SCRIPT" "$@" 2>&1 ); }
 G62_MAIN=$(git worktree list --porcelain | sed -n 's/^worktree //p' | head -n 1)
 
 # ---- AC4: from the sibling, the take-over and the no-id resume are refused at 58 naming the run's
@@ -10495,7 +10574,7 @@ ip_out=$(mktemp -d)
 # helper once carried was written through a heredoc that halved its backslash, and the literal
 # `\n` it left became an unquoted `n` - so `env` ran a command named `n` and every arm below it
 # graded the driver's absence.
-iprun() { ( cd "$ip_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" bash "$SCRIPT" "$@" 2>&1 ); }
+iprun() { ( cd "$ip_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" bash "$SCRIPT" "$@" 2>&1 ); }
 ipgit() { git -C "$ip_dir" "$@"; }
 ipreset() {
   # FORCED: a refused or `primary` close leaves its record staged, a plain checkout refuses over it,
@@ -12263,7 +12342,7 @@ DL_R=memory/builds/tRun/RUN.md
 # The node's LANDED LOG, where in-place `--landed` keeps its observation (TOOL-dDerivedDocket-61 S10);
 # it replaced the retired per-slug lease file this fixture used to reset.
 DL_LOG="$dl_dir/.git/unattended/landed.tRun.log"
-run_dl() { ( cd "$dl_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main DLOUT="$dl_out" bash "$SCRIPT" "$@" 2>&1 ); }
+run_dl() { ( cd "$dl_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main DLOUT="$dl_out" bash "$SCRIPT" "$@" 2>&1 ); }
 run_dl_git() { git -C "$dl_dir" "$@"; }
 read_dl_sum() { run_dl_git hash-object "$DL_R"; }
 init_dl_fixture() {
@@ -12733,7 +12812,7 @@ IHS
   git add -A >/dev/null && git commit -q -m base --no-verify
   git push -q origin main
 ) >/dev/null 2>&1
-run_ih() { ( cd "$ih_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IHOUT="$ih_out" IHMAN="$TOOL_REL/gate-legs.json" bash "$SCRIPT" "$@" 2>&1 ); }
+run_ih() { ( cd "$ih_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IHOUT="$ih_out" IHMAN="$TOOL_REL/gate-legs.json" bash "$SCRIPT" "$@" 2>&1 ); }
 run_ih_repo() { git -C "$ih_dir" "$@"; }
 IHOVR="--override closing-review-recorded --reason fixture-has-no-review --override build-complete --reason fixture-unit-is-open"
 # R's policy body on main, pushed; a fresh unit branch on top of it, preflighted and attested; sets
@@ -13571,7 +13650,7 @@ PL_LEDGER="$pl_dir/.git/unattended/tRun.procs"
 # The one lease record is the run-state facts (TOOL-dDerivedDocket-61): its six lines, hashed.
 read_pl_facts() { grep -E '^(keepalive|session|pid|host|pid-image|lease-utc): ' "$pl_dir/memory/builds/tRun/RUN.md" | git hash-object --stdin; }
 PL_PROCFS=""
-run_pl() { ( cd "$pl_dir" && env -u GATE_SELFTESTS -u UNATTENDED_PROCFS GOV_DEFAULT_BRANCH=main PLOUT="$pl_out" \
+run_pl() { ( cd "$pl_dir" && run_main_at_head env -u GATE_SELFTESTS -u UNATTENDED_PROCFS GOV_DEFAULT_BRANCH=main PLOUT="$pl_out" \
                ${PL_PROCFS:+UNATTENDED_PROCFS="$PL_PROCFS"} bash "$SCRIPT" "$@" 2>&1 ); }
 run_pl_git() { git -C "$pl_dir" "$@"; }
 read_pl_sum() { if [ -f "$1" ]; then git hash-object "$1"; else echo NONE; fi; }
@@ -13813,7 +13892,7 @@ same "AC4 the claim names the preflighting session" "$(read_claim_field tFresh s
 same "AC4 ...live" "$(read_claim_field tFresh status)" "live"
 GH_C2=$(mktemp -d); git clone -q "$TMP" "$GH_C2/c" 2>/dev/null
 ( cd "$GH_C2/c" && git config core.autocrlf false && git remote set-url origin "$ORIGIN" )
-out=$(cd "$GH_C2/c" && CLAUDE_CODE_SESSION_ID=other-session bash "$SCRIPT" --preflight tFresh --keepalive-id k2 2>&1); rc=$?
+out=$(cd "$GH_C2/c" && CLAUDE_CODE_SESSION_ID=other-session run_main_at_head bash "$SCRIPT" --preflight tFresh --keepalive-id k2 2>&1); rc=$?
 n=$((n+1)); [ "$rc" != 0 ] || { echo "FAIL AC4 a second preflight of a live-claimed slug exited 0"; st=1; }
 hit  "$out" "another session holds this slug's claim on the remote, so a second driver would start beside it; nothing was written, and the claim names its holder"
 hit  "$out" "tFresh · node "
@@ -13864,7 +13943,7 @@ case " \$* " in *" push "*"refs/gov/runs/"*) "$GH_GIT" --git-dir="$ORIGIN" updat
 exec "$GH_GIT" "\$@"
 EOF
 chmod +x "$GH_BIN/git"
-out=$(PATH="$GH_BIN:$PATH" bash "$SCRIPT" --preflight tFresh --keepalive-id k1 2>&1)
+out=$(PATH="$GH_BIN:$PATH" run_main_at_head bash "$SCRIPT" --preflight tFresh --keepalive-id k1 2>&1)
 hit  "$out" "the claim moved on the remote between this call's read and its write, so another session took the slug first and this run must not drive it; nothing was written, and a run that has a record ends with --abort <slug> --code claim-lost"
 n=$((n+1)); [ ! -e memory/builds/tFresh/RUN.md ] || { echo "FAIL AC6 a lost race wrote the run-state file"; st=1; }
 same "AC6 the racer's claim stands" "$(read_claim_ref tFresh)" "$GH_RACER"
@@ -13886,7 +13965,7 @@ case " \$* " in *" push "*"refs/gov/runs/"*) printf 'To x\n!\tdeadbeef:refs/gov/
 exec "$GH_GIT" "\$@"
 EOF
 chmod +x "$GH_BIN/git"
-out=$(PATH="$GH_BIN:$PATH" bash "$SCRIPT" --preflight tFresh --keepalive-id k1 2>&1)
+out=$(PATH="$GH_BIN:$PATH" run_main_at_head bash "$SCRIPT" --preflight tFresh --keepalive-id k1 2>&1)
 hit  "$out" "the claim write did not complete, so whether this run holds its slug on the remote is unknown rather than lost, and nothing was written"
 hit  "$out" "[remote rejected] (pre-receive hook declined)"
 miss "$out" "UNATTENDED check 108 FAILED"
@@ -13896,7 +13975,7 @@ cat > "$GH_BIN/git" <<EOF
 case " \$* " in *" push "*"refs/gov/runs/"*) exit 124 ;; esac
 exec "$GH_GIT" "\$@"
 EOF
-out=$(PATH="$GH_BIN:$PATH" bash "$SCRIPT" --preflight tFresh --keepalive-id k1 2>&1)
+out=$(PATH="$GH_BIN:$PATH" run_main_at_head bash "$SCRIPT" --preflight tFresh --keepalive-id k1 2>&1)
 hit  "$out" "UNATTENDED check 109 FAILED"
 miss "$out" "UNATTENDED check 108 FAILED"
 n=$((n+1)); [ ! -e memory/builds/tFresh/RUN.md ] || { echo "FAIL AC17 a killed push wrote the run-state file"; st=1; }
@@ -14087,7 +14166,7 @@ GK_HOOKS=$(mktemp -d); GK_BIN=$(mktemp -d); GK_GIT=$(command -v git)
 GK_GD=$(git rev-parse --absolute-git-dir)
 GK_JOURNAL="$(cd "$(git rev-parse --git-common-dir)" && pwd)/runlog/pushes.log"
 cp "$GK_SRC" "$GK_HOOKS/pre-push"; chmod +x "$GK_HOOKS/pre-push"
-run_hooked() { env -u GOV_DEFAULT_BRANCH -u GOV_RUNLOG -u GOV_BRANCH_GATE_CMD bash "$SCRIPT" "$@" 2>&1; }
+run_hooked() { run_main_at_head env -u GOV_DEFAULT_BRANCH -u GOV_RUNLOG -u GOV_BRANCH_GATE_CMD bash "$SCRIPT" "$@" 2>&1; }
 build_hooked_fixture() { arm_claim_fixture; git config core.hooksPath "$GK_HOOKS"; git remote set-head origin -a >/dev/null 2>&1
           rm -f "$GK_BIN/git" "$GK_GD/pre-push-refusal" "$GK_JOURNAL"; }
 read_hooked_journal() { tail -n 1 "$GK_JOURNAL" 2>/dev/null; }
@@ -15316,7 +15395,7 @@ GWP
   git commit -q --allow-empty -m "unit work" --no-verify
 ) >/dev/null 2>&1
 gw_unit=$(git -C "$gw_dir" rev-parse unit)
-run_gw() { ( cd "$gw_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main GWOUT="$gw_out" bash "$SCRIPT" "$@" 2>&1 ); }
+run_gw() { ( cd "$gw_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main GWOUT="$gw_out" bash "$SCRIPT" "$@" 2>&1 ); }
 run_gw_git() { git -C "$gw_dir" "$@"; }
 read_gw_record() { cat "$gw_dir/memory/builds/tRun/RUN.md"; }
 # THE MARGIN IS READ OUT OF THE DRIVER, never retyped, so a moved constant moves every expected line.
@@ -15650,7 +15729,7 @@ reset_tree
 # ---- three commits unfetched, so the tip is advertised and absent here. The suffix keeps each arm's
 # ---- commits distinct from every earlier arm's, so an unfetched tip is never present by accident.
 rx_root=$(mktemp -d); rx_seq=0
-run_rx() { ( cd "$rx_root/repo" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main bash "$SCRIPT" "$@" 2>&1 ); }
+run_rx() { ( cd "$rx_root/repo" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main bash "$SCRIPT" "$@" 2>&1 ); }
 run_rx_git() { git -C "$rx_root/repo" "$@"; }
 read_rx_fact() { sed -n "s/^$1: //p" "$rx_root/repo/memory/builds/tRx/RUN.md" | head -1; }
 build_rx_fixture() { # fetch: yes|no -> RX_TIP, the remote's main after the three commits
@@ -15785,7 +15864,7 @@ LN_VALUE='a=desk-a/daily-agent d=compeeto/d41ly'
 LN_NB="COMPUTERNAME=desktop-3j1o6cd USERNAME=agent5"
 LN_ND="COMPUTERNAME=compeeto USERNAME=d41ly"
 LN_R=memory/builds/tLn/RUN.md
-run_ln() { local _e=$1; shift; ( cd "$ln_root/repo" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main $_e bash "$SCRIPT" "$@" 2>&1 ); }
+run_ln() { local _e=$1; shift; ( cd "$ln_root/repo" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main $_e bash "$SCRIPT" "$@" 2>&1 ); }
 run_ln_git() { git -C "$ln_root/repo" "$@"; }
 read_ln_fact() { sed -n "s/^$1: //p" "$ln_root/repo/$LN_R" | head -1; }
 build_ln_fixture() { # LANDING_NODES at BASE, `-` for undeclared · the run's own committed value, `-` for BASE's · [older]
@@ -16003,7 +16082,7 @@ same "TOOL-dUnstuckLanding-20 M14 an unevaluable BASE conf records handoff" "$(r
 build_ln_fixture "$LN_VALUE" -
 mkdir -p "$ln_root/bin"; printf '#!/bin/sh\nexit 1\n' > "$ln_root/bin/hostname"; chmod +x "$ln_root/bin/hostname"
 _lnbin=$(cd "$ln_root/bin" && pwd)   # the POSIX spelling: a drive-letter colon would split PATH
-out=$( cd "$ln_root/repo" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main COMPUTERNAME= USERNAME=d41ly PATH="$_lnbin:$PATH" bash "$SCRIPT" --preflight tLn --keepalive-id k1 2>&1 )
+out=$( cd "$ln_root/repo" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main COMPUTERNAME= USERNAME=d41ly PATH="$_lnbin:$PATH" bash "$SCRIPT" --preflight tLn --keepalive-id k1 2>&1 )
 hit  "$out" "unattended: landing — handoff · this node's machine or user cannot be read, machine unread and user d41ly"
 same "TOOL-dUnstuckLanding-20 M14 an unreadable machine records handoff" "$(read_ln_fact landing)" "handoff"
 build_ln_fixture "a=compeeto/d41ly d=compeeto/d41ly" -
@@ -16014,7 +16093,7 @@ same "TOOL-dUnstuckLanding-20 M14 one pair under two tags records handoff" "$(re
 # ---- closing review round 1 L2 (id 22): a user name holding a SPACE is declared with `%20`, decoded
 # ---- before the pair is compared; the value is word-split, so a literal space can never be declared.
 build_ln_fixture "a=desk-a/daily-agent d=compeeto/john%20smith" -
-out=$( cd "$ln_root/repo" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main COMPUTERNAME=compeeto "USERNAME=John Smith" bash "$SCRIPT" --preflight tLn --keepalive-id k1 2>&1 )
+out=$( cd "$ln_root/repo" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main COMPUTERNAME=compeeto "USERNAME=John Smith" bash "$SCRIPT" --preflight tLn --keepalive-id k1 2>&1 )
 hit  "$out" "unattended: landing — lander · node d"
 same "TOOL-dUnstuckLanding-20 L2 a %20-escaped user lands" "$(read_ln_fact landing)" "lander"
 
@@ -16450,7 +16529,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # + aGraftedHelix's 631 (1918 -> 2549) = 2633.
 # RAISED 2633 -> 2657 by TOOL-aQuotedBrief-1: the prompt-record arms beside check 89's in region
 # three, 24 assertions, run as a slice of the prologue and that block on node a, 2026-10-09; no suite ran.
-FLOOR_ASSERTIONS=2657
+# RAISED 2657 -> 2671 by TOOL-aQuotedBrief-2: the carried-branch arms (check 114) after the prompt-record
+# arms in region three, 14 assertions, run as a slice of the prologue and that block on node a,
+# 2026-10-09; no suite ran.
+FLOOR_ASSERTIONS=2671
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -16633,7 +16715,8 @@ FLOOR_SHARD_1=267
 # lines above are region two's history.
 FLOOR_SHARD_2=222
 # RAISED 255 -> 279 by TOOL-aQuotedBrief-1: the same 24 region-three prompt-record assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_3=279
+# RAISED 279 -> 293 by TOOL-aQuotedBrief-2: the same 14 region-three carried-branch assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=293
 FLOOR_SHARD_4=390
 FLOOR_SHARD_5=270
 FLOOR_SHARD_6=129

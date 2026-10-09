@@ -3133,6 +3133,46 @@ check_prompt_brief() { # slug · base
   return 1
 }
 
+# TOOL-aQuotedBrief-2 S1 - A FIRST PREFLIGHT REFUSES A CARRIED BRANCH. Under `ANCHOR_SCOPE=published`
+# the commits a session's branch already carried sit below the pinned BASE, outside every population
+# the run's checks grade (`read_run_commits` reads `endpoint ^BASE`), so they would land with the run
+# under its authorization. One listing: every commit reachable from HEAD and from neither the observed
+# anchor tip nor the local default branch, with its paths. A path passes when it is under this build's
+# folder or an index in the resolved GENERATED_INDEXES covers it. Called from verb_preflight only, and
+# only when no run-state file existed as the verb started (S3): a later preflight's commits are the
+# run's own. The header byte `\x01` keeps a sha-shaped path and an empty commit apart.
+# WHAT THIS DOES NOT CHECK: it trusts local refs, so a local default branch moved onto the run's
+# commits hides them; a run with shell access can rewrite its branch; a merge commit lists no paths,
+# and what it brings in is graded only as the commits it lists. A guard against accident, not a
+# security boundary.
+check_branch_carried() { # slug
+  local slug="$1" def ex="" out line sha="" hit="" q ok cur
+  [ -n "$ASHA" ] || return 0
+  def=$(default_branch 2>/dev/null) || def=""
+  [ -n "$def" ] && GIT rev-parse -q --verify "refs/heads/$def" >/dev/null 2>&1 && ex="refs/heads/$def"
+  if ! out=$(GIT -c core.quotepath=off log --format=%x01%h --name-only HEAD --not "$ASHA" ${ex:+"$ex"} 2>/dev/null); then
+    hit="none, the listing itself failed - HEAD --not $ASHA${ex:+ $ex}"
+  else
+    while IFS= read -r line; do
+      line=${line%$'\r'}
+      case "$line" in
+        $'\001'*) sha=${line#?}; continue ;;
+        ""|"$M/builds/$slug/"*) continue ;;
+      esac
+      ok=""
+      for q in ${GENERATED_INDEXES:-}; do covers "${q%%:*}" "$line" && { ok=1; break; }; done
+      [ -n "$ok" ] || { hit="$sha $line"; break; }
+    done <<<"$out"
+  fi
+  [ -n "$hit" ] || return 0
+  fail 114 "a first preflight found this branch carrying a commit the default branch does not hold that touches a path outside this build's folder and the declared generated indexes, and it would land with the run without passing through the spec loop; start the run in a fresh worktree off the default branch, carrying only the build folder - the commit and the first such path: $hit"
+  cur=$(GIT rev-parse --abbrev-ref HEAD 2>/dev/null) || cur=""
+  echo "  git worktree add -b <new-branch> <worktree-root>/$slug ${def:-<default>}"
+  echo "  git -C <worktree-root>/$slug checkout ${cur:-<old-branch>} -- $M/builds/$slug/"
+  echo "  then re-render the generated indexes, commit, push the branch and preflight again from the new tree"
+  return 1
+}
+
 # ONE comparison enforces BOTH provenance properties. At a pinned merge-base, "was it reachable from
 # the BASE" and "did the run author it" are the same question, so there is one answer and one place
 # for it to be wrong.
@@ -6425,7 +6465,7 @@ check_settled_abandoned() { # run-state file -> 0 when it carries both
 }
 
 verb_preflight() { # slug · keepalive-id
-  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix _pf_gbt="" _pf_cv _pf_tr _pf_cka _pf_lu="" _pf_ab="" _pf_left _pf_p _pf_act
+  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_first="" _pf_ka _pf_miss _pf_fix _pf_gbt="" _pf_cv _pf_tr _pf_cka _pf_lu="" _pf_ab="" _pf_left _pf_p _pf_act
   # TOOL-dDerivedDocket-16 S6 - THE IDS TEST RUNS FIRST, before `check_slug` and before any anchor
   # work, because it needs no tree. `check_slug`'s own grammar ADMITS an id - letters, digits and
   # dashes, opening on a letter - so an id reached the folder lookup and was refused with a message
@@ -6437,6 +6477,8 @@ verb_preflight() { # slug · keepalive-id
   fi
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
+  # TOOL-aQuotedBrief-2 S3 - read BEFORE the rotation below can move or create anything.
+  [ -e "$rel" ] || _pf_first=1
   # ROTATION, HALF ONE: the TEST. A terminal record is not a reason to refuse a NEW run — it is a
   # reason to retire the old one. The refusal below is right about the RECORD and was wrong as a
   # policy about the BUILD: this build's first run aborted with three units left and no second run
@@ -6626,6 +6668,9 @@ verb_preflight() { # slug · keepalive-id
   # TOOL-aQuotedBrief-1 S4 - the prompt record stands on its own; a consumer of AUTH_MODE, so here,
   # and before the write gate below, so a refusal leaves the run-state file unwritten.
   check_prompt_brief "$slug" "${base:-}" || true
+  # TOOL-aQuotedBrief-2 S1 and S3 - a FIRST preflight refuses a branch carrying commits the default
+  # branch lacks outside the build folder; before the write gate, so a refusal writes no RUN.md.
+  [ -z "$_pf_first" ] || check_branch_carried "$slug" || true
   # TOOL-dDerivedDocket-16 S3, S4, S5 and S11 - THE MANDATE'S OWN PRECONDITIONS, evaluated here and
   # not one line lower. Everything they pin is written AFTER the gate below; everything they refuse
   # is refused while the tree is still untouched, which is what lets a refused preflight say the

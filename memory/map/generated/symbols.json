@@ -2978,6 +2978,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_branch_carried",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_break_refuses",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
@@ -15659,6 +15664,11 @@
     },
     {
       "id": "run_ln_rotation",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_main_at_head",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
     },

@@ -61,7 +61,7 @@ A value mixing a slug and ids is refused before any verb.
 1. The build folder authorizes at this project's anchor, `published`; read it, it is the roster.
 2. Only if a handle to waive was named: ONE `AskUserQuestion`, default-deny.
 3. **Preflight:** `bash tools/unattended/unattended.sh --preflight <slug> --keepalive-id <id>`, plus
-   `--waive <handle> --reason "<why>"` per confirmed pair. Keep its spec-audit line.
+   `--waive <handle> --reason "<why>"` per confirmed pair. Keep its spec-audit line. It refuses a carried branch.
 4. Then `/session-kickoff`, if the project ships it — after preflight, never before.
 5. A README carrying `asks:`: read `memory/guides/UNATTENDED-ASKS.md` whole first.
 6. A pre-flip BASE is parked with `tools/memory-tree/migrate_backlog.py --recipe`, never relocated.
@@ -78,7 +78,7 @@ project declares `published`.
 
 1. **Orient from the prose**; RUN the orientation probes before step 3.
 2. **Decide whether to ask, ONCE**: one `AskUserQuestion`, every gap in it; it confirms a brief that quotes the session.
-3. **Write the build folder**, `memory/builds/<slug>/README.md`, with `authorized-by: prompt`, and the prompt record with its brief.
+3. **Dirty tree or carried branch? Use a fresh worktree.** Write the build folder, `memory/builds/<slug>/README.md`, with `authorized-by: prompt`, and the prompt record with its brief.
 4. **Commit, then PUSH THE BRANCH.**
 5. **Preflight**, as on the slug path.
 6. **The kickoff hand-back**, at the slug path's step 4.
@@ -137,8 +137,8 @@ under `in-place` after `bash tools/push-main.sh --prepare --slug <slug>` and
 **TWO items have NO override, and this is where you will meet them: `authorization-reachable` and
 `pieces-complete`.** An override on the
 authorization check IS the authorization check, so the verb refuses the pair rather than recording
-it; and `pieces-complete` is the item saying a recipe-mode run produced what the owner asked for over
-content nothing else on the bar can grade, so an override on it is the run certifying its own output.
+it; and one on `pieces-complete`, a recipe-mode run's claim it produced what was asked, is the
+run certifying its own output.
 
 **A `hold ·` line from `gates-green` is your next step, whatever its code.** The item prints one
 when the bar ended for a reason that is not this run's to fix: `host-degraded` until `probe gate`

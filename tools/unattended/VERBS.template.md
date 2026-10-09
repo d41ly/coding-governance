@@ -457,7 +457,10 @@ one are two acts with two authorizations.
 3. **Preflight**, handing over the idle-wake id and any confirmed pairs:
    `unattended.sh --preflight <slug> --keepalive-id <id> [--waive <handle> --reason "<why>"]`. Its
    refusals are its verb entry's, each names itself, and it writes nothing until all pass. It does
-   NOT refuse because another build is live: it announces the concurrent runs and continues. One line
+   NOT refuse because another build is live: it announces the concurrent runs and continues. A
+   FIRST preflight, with no run-state file yet, refuses a branch carrying a commit the default branch
+   does not hold that touches anything outside this build's folder and the declared generated
+   indexes (check 114), and prints the fresh-worktree recovery. One line
    before `preflight OK` states the spec-audit posture —
    `unattended: spec-audit — opted in by README spec-audit: <date>`;
    `unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: <date>` when the README
@@ -543,6 +546,13 @@ the run, which makes "the owner was asked at the start" a property of the commit
    run, beside any gap question. A cancel writes nothing; an edit is folded into the brief before
    the commit, with no second confirmation. A brief quoting nothing keeps the rule above: ask only
    for gaps.
+   **Then, before step 3, start clean.** When the session's tree is dirty, or its branch carries a
+   commit the default branch does not, create a worktree on a new branch cut from the default
+   branch, fast-forwarded first, and do step 3 onward from it, by absolute path or `git -C`:
+   `git worktree add -b <new-branch> <worktree-root>/<slug> <default>`, where `<worktree-root>` is
+   this node's root in the charter's node registry, or the charter's worktree bootstrap script where
+   it names one. The session's own tree, and any edit in it, is never touched; the resume tick and
+   the lander find the run in its new tree. A clean tree whose branch carries nothing starts in place.
 3. **Write the build folder**, `builds/<slug>/README.md` under the memory root, with ALL SIX required
    front-matter keys — `slug`, `node`, `opened`, `streams`, `roster`, `ids` — plus
    `authorized-by: prompt`, and the generated-region marker pair `gen:build-index` with its close, or
