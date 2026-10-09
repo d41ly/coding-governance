@@ -9,13 +9,22 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 5a836bf0fc940029136b4b3fd57a87f35ff40f26 · park · 0 touching
+units-at-landing: TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3 TOOL-aQuotedBrief-4 TOOL-aQuotedBrief-5 TOOL-aQuotedBrief-6
+hold-run: 
+hold-streak: 1 · at 26da990a
+resume-owed: none · owner
+held-at: 2026-10-09T16:13:50Z
+hold-reason: Six units built and closing-reviewed; the close bar reds only on drift-audit cutoff_keys_armed 31 against a shrink-only pin of 30 (PROMPT_BRIEF_CUTOFF arms a new key), a declared budget only the owner may move. Hygiene and straggler-guard reds were host faults. Landing merge prepared on the branch tip.
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
+refreshed-at: 5a836bf0fc940029136b4b3fd57a87f35ff40f26 · handoff · 0 touching
 gates-run: unattended-179155605568707916595-3569156 fa3d3e0a
 parked-surfaced: 1
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: edacfb43e03ddf8c3bd1e08312374f66fe8fd8b1
-phase: VERIFYING
+witness: 26da990ac0dc89bdb3a5e0195fa2c14bcca8edb7
+phase: HELD
 may: none
 mode: slug
 run-branch: refs/heads/branch/unattended-build-template-5f7d7d
@@ -81,3 +90,7 @@ base: 6473ae38a517a3559f2b7daed67a9820c505bd4d
 2026-10-09T13:31:43Z resume · item aQuotedBrief · reason working · keepalive 530f6b7a · manual
 
 2026-10-09T16:07:21Z decision · item drift-audit cutoff_keys_armed reads 31 against its shrink-only pin of 30, because PROMPT_BRIEF_CUTOFF arms a new key · reason options: raise the pin to 31 with a recorded reason, retire another armed _CUTOFF key in the same change, or drop the cutoff and grade unconditionally; each changes a declared budget or another rule, which build method veto 2 reserves for the owner, so no option survives for the run
+
+2026-10-09T16:14:41Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aQuotedBrief && bash tools/push-main.sh --land --slug aQuotedBrief && bash tools/unattended/unattended.sh --settle aQuotedBrief
+
+2026-10-09T16:14:42Z hold · item owner-decision · reason until owner · reaped 530f6b7a · resume none(owner)
