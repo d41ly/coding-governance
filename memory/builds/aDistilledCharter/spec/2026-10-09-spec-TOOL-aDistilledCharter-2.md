@@ -1,10 +1,13 @@
 # TOOL-aDistilledCharter-2 — the fleet registry assigns every node one tag and the renderer generates the node table from it
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 2
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-09-build-TOOL-aDistilledCharter-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aDistilledCharter-1-acceptance-ledger.md) | journal | TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 |
+| [2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round1.md](../reviews/2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round1.md) | diff-review | TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 |
 
 <!-- /gen:spec-records -->
 
@@ -33,17 +36,18 @@ and its tag once, and every adopter's charter renders its node table from it.
   [--variances <v>]` appends a row with the lowest letter the FLEET has not used and prints it. It
   refuses an existing `user`+`host` pair, a full alphabet, and an installed copy of the engine,
   recognised by the descriptor sitting beside it. Observed by AC4.
-- **S5** — Retired: the placeholders `TAG_A`, `MACHINE_A`, `PRIMARY_TREE_A`, `WORKTREE_ROOT_A`
-  and `VARIANCES_A`, the probe `derive_node_tag`, and the `[[block]]` rows `node-table` and
-  `security-outbound`; the second goes because v4.0 keeps no outbound-specific charter line
-  (PLAY-aDistilledCharter-1 moves them to the review protocol). A `drop_blocks` member naming a
-  retired block is a printed note, never a refusal, so an adopter's next update re-renders instead
-  of rolling back. Observed by AC5.
-  **Readers:** by name: `render_playbook.py` (`PROBES`, the placeholder rows), the template's
-  `when:node-table` and `when:security-outbound` fences and §2 table (PLAY-aDistilledCharter-1
-  removes them), gov's `.governance/deploy.toml` (`drop_blocks`, the four `*_a` answers); by value: `manifest-check.sh`
-  `derive_node_tag`, `run-selftests.sh` `resolve_node_tag` and `read_registry_tags`, and
-  `drift_report.py` `_resolve_node_tag` read the RENDERED table, whose shape §4 keeps.
+- **S5** — The v4.0 template carries none of `TAG_A`, `MACHINE_A`, `PRIMARY_TREE_A`,
+  `WORKTREE_ROOT_A`, `VARIANCES_A` or `PROSE_AUDIT`, nor the `when:node-table` and
+  `when:security-outbound` fences, and the probe `derive_node_tag` goes. The descriptor KEEPS the
+  six placeholder rows and the two block rows, marked legacy, because an adopter's template is a
+  seed `govkit update` never rewrites: a v3.x template must keep rendering under the v4.0 engine,
+  or the update rolls the kit back (closing review round 1, R1). A `drop_blocks` member naming a
+  legacy block whose fence the template does not carry is a printed note, never a refusal. A
+  template whose marker is below `v4.0` renders as before and prints a note to reseed it. Observed by
+  AC5 and AC7.
+  **Readers:** by name: `render_playbook.py` (`PROBES`), gov's `.governance/deploy.toml`
+  (`drop_blocks`, the four `*_a` answers); by value: NO VALUE READERS — the legacy rows stay
+  declared and keep their values for any template that still names them.
 - **S6** — The write mode and `--check` print a note when the charter carries a
   `## Node registry` heading OUTSIDE the region, because the kickoff card reads the first one and
   that one would hold the repository's old tags. Observed by AC6.
@@ -165,6 +169,9 @@ a vendored file the next update overwrites, so it refuses and names gov.
   with no such fence, the render succeeds and its notes carry `retired`. Red when: it refuses.
 - **AC6** — When a fixture charter holds `## Node registry` above the region, `--check` prints the
   stale-registry note. Red when: it is silent.
+- **AC7** — When `render_playbook.py --selftest` renders the v3.5 template archived at
+  `memory/archive/coding-governance-agents.template-v-3-5.md` with BASE's deploy answers, it
+  succeeds and its notes carry `reseed`. Red when: it refuses on a legacy fence or placeholder.
 
 ## 7. Gates
 
@@ -179,6 +186,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · S5 · AC7 · closing review round 1, R1 (BLOCKER): the retired names stay
+  declared as legacy so a seeded v3.x template renders under the v4.0 engine and an update cannot
+  roll back; a v3.x marker prints a reseed note.
 
 ## 10. Reuse audit
 

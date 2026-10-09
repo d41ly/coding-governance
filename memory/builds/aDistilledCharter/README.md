@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: playbook+tooling+deployer+kickoff
 roster: PLAY+TOOL+DEPL+KICK
-ids: DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4
+ids: DEPL-aDistilledCharter-1 DEPL-aDistilledCharter-2 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7
 ---
 
 # aDistilledCharter — the charter becomes governing practices, adopter rules and a generated block
@@ -39,6 +39,8 @@ then citations (TOOL-4) and gate re-keys (TOOL-3); the runbook (DEPL-1) and the 
 (KICK-1) last. Gov's own render is red between TOOL-2 and PLAY-4 by construction. Kit versions move
 once, after the last unit. Owner decisions, 2026-10-09: section 2 lives in `deploy.toml [charter]`;
 adopters re-tag to the fleet registry; the manifest's §B trim is in scope; no spec audit is declared.
+The round-1 closing review's blocker folded into TOOL-2; its three HIGH findings became TOOL-5,
+TOOL-6 and DEPL-2, and its twenty-two others the one batch TOOL-7.
 
 ## Parked decisions
 
@@ -58,18 +60,23 @@ none
 | 8 | `TOOL-aDistilledCharter-3` | SPECCED | the parity gate drops the retired pairs, the canary re-points, and a new arm bans section-number citations |
 | 9 | `DEPL-aDistilledCharter-1` | SPECCED | the runbook adopts v4.0: section 2, the fleet claim and the re-tag step |
 | 10 | `KICK-aDistilledCharter-1` | SPECCED | the kickoff manifest's §B becomes one-liners, every evicted bullet recorded |
+| 11 | `TOOL-aDistilledCharter-5` | SPECCED | the node table's paths come from a stated name, identical on every node |
+| 12 | `TOOL-aDistilledCharter-6` | SPECCED | the hook README's three bound phrases are compared with the hook again |
+| 13 | `DEPL-aDistilledCharter-2` | SPECCED | the review protocol ships with every default adoption |
+| 14 | `TOOL-aDistilledCharter-7` | SPECCED | the closing review's medium and low findings, closed as one batch |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 10 unit(s) · node a · opened 2026-10-09 · streams playbook+tooling+deployer+kickoff
-ids DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4
+**Build status:** SPECCED · 14 unit(s) · node a · opened 2026-10-09 · streams playbook+tooling+deployer+kickoff
+ids DEPL-aDistilledCharter-1 DEPL-aDistilledCharter-2 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4
+ids TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aDistilledCharter-1 — the renderer grades one-line regions and renders section 2 from `[charter] adopter_rules`](spec/2026-10-09-spec-TOOL-aDistilledCharter-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [TOOL-aDistilledCharter-2 — the fleet registry assigns every node one tag and the renderer generates the node table from it](spec/2026-10-09-spec-TOOL-aDistilledCharter-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-10-09 |
+| [TOOL-aDistilledCharter-2 — the fleet registry assigns every node one tag and the renderer generates the node table from it](spec/2026-10-09-spec-TOOL-aDistilledCharter-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-10-09 |
 | [PLAY-aDistilledCharter-2 — the review protocol carries the security checklist and the tier definitions the charter drops](spec/2026-10-09-spec-PLAY-aDistilledCharter-2.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-09 |
 | [PLAY-aDistilledCharter-3 — the hygiene guide carries the id-minting protocol the charter drops](spec/2026-10-09-spec-PLAY-aDistilledCharter-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-09 |
 | [PLAY-aDistilledCharter-1 — the charter template v4.0, with a disposition for every v3.5 rule](spec/2026-10-09-spec-PLAY-aDistilledCharter-1.md) | 4 | 2 | SPECCED | rev-2 | 2026-10-09 |
@@ -78,13 +85,18 @@ ids DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 P
 | [TOOL-aDistilledCharter-3 — the parity gate drops the retired pairs, the canary re-points, and a new arm bans section-number citations](spec/2026-10-09-spec-TOOL-aDistilledCharter-3.md) | 7 | 2 | SPECCED | rev-2 | 2026-10-09 |
 | [DEPL-aDistilledCharter-1 — the runbook adopts v4.0: section 2, the fleet claim and the re-tag step](spec/2026-10-09-spec-DEPL-aDistilledCharter-1.md) | 8 | 1 | SPECCED | rev-1 | 2026-10-09 |
 | [KICK-aDistilledCharter-1 — the kickoff manifest's §B becomes one-liners, every evicted bullet recorded](spec/2026-10-09-spec-KICK-aDistilledCharter-1.md) | 9 | 1 | SPECCED | rev-1 | 2026-10-09 |
+| [DEPL-aDistilledCharter-2 — the review protocol ships with every default adoption](spec/2026-10-09-spec-DEPL-aDistilledCharter-2.md) | 10 | 2 | SPECCED | rev-1 | 2026-10-09 |
+| [TOOL-aDistilledCharter-5 — the node table's paths come from a stated name, identical on every node](spec/2026-10-09-spec-TOOL-aDistilledCharter-5.md) | 10 | 2 | SPECCED | rev-1 | 2026-10-09 |
+| [TOOL-aDistilledCharter-6 — the hook README's three bound phrases are compared with the hook again](spec/2026-10-09-spec-TOOL-aDistilledCharter-6.md) | 10 | 2 | SPECCED | rev-1 | 2026-10-09 |
+| [TOOL-aDistilledCharter-7 — the closing review's medium and low findings, closed as one batch](spec/2026-10-09-spec-TOOL-aDistilledCharter-7.md) | 11 | 2 | SPECCED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
-Ids no record names: DEPL-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4.
+Ids no record names: DEPL-aDistilledCharter-2 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7.
 
-Ids no `spec-audit` record has ever named: DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4.
+Ids no `spec-audit` record has ever named: DEPL-aDistilledCharter-1 DEPL-aDistilledCharter-2 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3
+TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -100,6 +112,8 @@ Ids no `spec-audit` record has ever named: DEPL-aDistilledCharter-1 KICK-aDistil
 | 7 | `TOOL-aDistilledCharter-3` | no |
 | 8 | `DEPL-aDistilledCharter-1` | no |
 | 9 | `KICK-aDistilledCharter-1` | no |
+| 10 | `DEPL-aDistilledCharter-2`, `TOOL-aDistilledCharter-5`, `TOOL-aDistilledCharter-6` | yes |
+| 11 | `TOOL-aDistilledCharter-7` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
