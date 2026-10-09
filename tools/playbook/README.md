@@ -78,6 +78,25 @@ adopter_rules = """
 Unanswered, it renders a single `- none` line. The markers survive into the charter, so a reader
 can see where the shape applies.
 
+## Nodes — one tag per machine, in every repository
+
+`fleet.toml` beside the engine names every node once: its tag, user, host, the directory its
+checkouts sit under, and its machine-level quirks. Gov is the only place a tag is handed out, and the
+file ships into every adopter with this kit, so `{{NODE_TABLE}}` renders the same tag for the same
+machine everywhere. A new node claims its tag in gov's own checkout, then every repository it works
+in re-renders:
+
+```bash
+python <prefix>/playbook/render_playbook.py --claim-node --user <user> --host <host> --projects-root <dir>
+```
+
+The claim takes the lowest letter the fleet has not used and refuses a second claim for one identity.
+In an installed copy it refuses outright, because the next update would overwrite the edit. A
+repository overrides one node's `primary_tree`, `worktree_root` or `variances` under
+`[nodes.<tag>]` in its own `deploy.toml`. The render notes, rather than refuses, a `drop_blocks`
+member naming a block v4.0 retired, and notes a `## Node registry` the charter carries outside the
+region, which readers would take first.
+
 ## Two namespaces, and neither reads a boolean
 
 `kit:<id>` drops when the target did not select that kit. `when:<name>` drops when the name is a

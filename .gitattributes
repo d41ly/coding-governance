@@ -188,6 +188,7 @@ tools/govkit/*.py text eol=lf
 tools/run-gates/*.py text eol=lf
 tools/govkit/entries/*.toml text eol=lf
 tools/*/kit.toml text eol=lf
+tools/playbook/fleet.toml text eol=lf
 
 # The lexicon kit's conf. Pinned for the same determinism reason as the two confs above: it is read
 # by the kit's Python reader AND grepped by `adopt-lexicon.sh`, whose `ratified` extraction strips a

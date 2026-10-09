@@ -167,7 +167,7 @@ def read_conf(root: Path, name: str, key: str) -> str:
     return ''
 
 
-def derive_project_name(root: Path, _a: dict) -> str:
+def derive_project_name(root: Path, _a: dict, _e: Path | None = None) -> str:
     # The PRIMARY tree's name, never the current directory's. `root.resolve().name` answers whatever
     # worktree the render ran in, so a render from a throwaway branch dir baked that dir's name into a
     # committed charter as the product's identity — and the next render from anywhere else produced a
@@ -176,7 +176,7 @@ def derive_project_name(root: Path, _a: dict) -> str:
     return Path(derive_primary_tree(root, _a)).name or root.resolve().name
 
 
-def derive_default_branch(root: Path, _a: dict) -> str:
+def derive_default_branch(root: Path, _a: dict, _e: Path | None = None) -> str:
     ref = read_git(root, 'symbolic-ref', '--short', 'refs/remotes/origin/HEAD')
     if ref:
         return ref.split('/', 1)[-1]
@@ -186,19 +186,19 @@ def derive_default_branch(root: Path, _a: dict) -> str:
     return ''
 
 
-def derive_memory_root(root: Path, _a: dict) -> str:
+def derive_memory_root(root: Path, _a: dict, _e: Path | None = None) -> str:
     return read_conf(root, '.memory-tree.conf', 'MEMORY_ROOT') or 'memory'
 
 
-def derive_memory_disciplines(root: Path, _a: dict) -> str:
+def derive_memory_disciplines(root: Path, _a: dict, _e: Path | None = None) -> str:
     return read_conf(root, '.memory-tree.conf', 'DISCIPLINES')
 
 
-def derive_id_families(root: Path, _a: dict) -> str:
+def derive_id_families(root: Path, _a: dict, _e: Path | None = None) -> str:
     return read_conf(root, '.memory-tree.conf', 'FAMILIES')
 
 
-def derive_ci_file(root: Path, _a: dict) -> str:
+def derive_ci_file(root: Path, _a: dict, _e: Path | None = None) -> str:
     d = root / '.github' / 'workflows'  # the target's CI dir, not the review-harness kit
     if d.is_dir():
         hits = sorted(p.name for p in d.iterdir() if p.suffix in ('.yml', '.yaml'))
@@ -207,7 +207,7 @@ def derive_ci_file(root: Path, _a: dict) -> str:
     return ''
 
 
-def derive_gate_runner(root: Path, _a: dict) -> str:
+def derive_gate_runner(root: Path, _a: dict, _e: Path | None = None) -> str:
     # The run-gates kit through the ONE sibling resolver (TOOL-aRepatriatedFork-2 S3), looked up
     # from this engine when it sits inside the target and from the target's root when it renders a
     # tree it is not installed in. A dir outside the target is no answer, and neither is a miss.
@@ -247,22 +247,157 @@ def derive_gate_runner(root: Path, _a: dict) -> str:
     return ''
 
 
-def derive_lexicon_conf(root: Path, _a: dict) -> str:
+def derive_lexicon_conf(root: Path, _a: dict, _e: Path | None = None) -> str:
     return '.lexicon.conf' if (root / '.lexicon.conf').is_file() else ''
 
 
-def derive_node_tag(_r: Path, _a: dict) -> str:
-    return 'a'
+# NO `derive_machine`, and no probe reading $USERNAME/$COMPUTERNAME at all. One did, and baked one
+# node's identity into a charter committed to a shared remote, so every other node's render differed
+# and the unguarded wiring leg red for them. The node registry is fleet data the operator states —
+# since TOOL-aDistilledCharter-2 in the fleet registry beside this engine, never in the environment.
+
+# --------------------------------------------------------------------------- the fleet registry
+# TOOL-aDistilledCharter-2. Gov is the ONE allocator of node tags: `fleet.toml` ships beside this
+# engine into every adopter, and every adopter's charter renders its node table from it, so a machine
+# carries one tag everywhere. A repository overrides a cell for one node under `[nodes.<tag>]`.
+FLEET_NAME = 'fleet.toml'
+NODE_KEYS = ('primary_tree', 'worktree_root', 'variances')
+# A `drop_blocks` member naming one of these is NOTED, never refused: the regenerate an adopter's
+# `update` runs (unless GOVKIT_RERENDER=0) must succeed, never roll the kit back over a removed block.
+RETIRED_BLOCKS = {
+    'node-table': 'v4.0 renders the node registry from the fleet registry',
+    'security-outbound': 'v4.0 keeps no outbound-only charter line; the review protocol carries them',
+}
 
 
-# NO `derive_machine`. It read $USERNAME/$COMPUTERNAME and baked one node's identity into a charter
-# committed to a shared remote, so every other node's render differed and the unguarded wiring leg
-# red for them — and the only in-band fix rewrites a file with no row-merge driver, hard-conflicting
-# on every cross-node merge. MACHINE_A is an ASKED placeholder now: the node registry is fleet data
-# the operator states, exactly like VARIANCES_A beside it. Ambient environment is not a derivation.
+def read_fleet(path: Path) -> list[dict]:
+    """The fleet registry's rows sorted by tag, every row graded. Refuses naming the row."""
+    try:
+        data = tomllib.loads(path.read_text(encoding='utf-8'))
+    except OSError as e:
+        raise Refusal(f'the fleet registry is not readable at {path.as_posix()} ({e.strerror}); '
+                      f'it ships beside the engine, so the playbook-render kit is incomplete here')
+    except tomllib.TOMLDecodeError as e:
+        raise Refusal(f'the fleet registry at {path.as_posix()} is not valid TOML: {e}')
+    rows = data.get('node') or []
+    if not rows:
+        raise Refusal(f'the fleet registry at {path.as_posix()} names no node, so no node could '
+                      f'identify itself from the charter')
+    tags, idents = set(), set()
+    for n, row in enumerate(rows, 1):
+        tag = row.get('tag')
+        if not (isinstance(tag, str) and re.fullmatch(r'[a-z]', tag)):
+            raise Refusal(f'fleet row {n}: tag {tag!r} is not one lowercase letter')
+        if tag in tags:
+            raise Refusal(f'fleet row {n}: tag `{tag}` is already taken by an earlier row')
+        for key in ('user', 'projects_root'):
+            if not (isinstance(row.get(key), str) and row[key].strip()):
+                raise Refusal(f'fleet row {n} (`{tag}`): `{key}` is empty')
+        for key in ('host', 'variances'):
+            if not isinstance(row.get(key, ''), str):
+                raise Refusal(f'fleet row {n} (`{tag}`): `{key}` must be a string')
+        ident = (row['user'].strip().lower(), row.get('host', '').strip().lower())
+        if ident in idents:
+            raise Refusal(f'fleet row {n} (`{tag}`): user {row["user"]!r} on host '
+                          f'{row.get("host", "")!r} already has a tag')
+        tags.add(tag)
+        idents.add(ident)
+    return sorted(rows, key=lambda r: r['tag'])
 
 
-def derive_primary_tree(root: Path, _a: dict) -> str:
+def resolve_node_overrides(target: Path, tags: set[str]) -> dict[str, dict]:
+    """The target's `[nodes.<tag>]` tables, graded against the fleet's tags and NODE_KEYS."""
+    try:
+        cfg = tomllib.loads((target / '.governance' / 'deploy.toml').read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return {}
+    nodes = cfg.get('nodes') or {}
+    if not isinstance(nodes, dict):
+        raise Refusal('deploy.toml `nodes` must be a table of `[nodes.<tag>]` tables')
+    for tag, table in nodes.items():
+        if tag not in tags:
+            raise Refusal(f'deploy.toml [nodes.{tag}] names a tag the fleet registry does not hold; '
+                          f'claim the node in gov first')
+        if not isinstance(table, dict):
+            raise Refusal(f'deploy.toml [nodes.{tag}] must be a table')
+        bad = sorted(set(table) - set(NODE_KEYS))
+        if bad:
+            raise Refusal(f'deploy.toml [nodes.{tag}] carries {", ".join(bad)}; only '
+                          f'{", ".join(NODE_KEYS)} override a node row')
+        for key, val in table.items():
+            if not (isinstance(val, str) and val.strip()) or '\n' in val:
+                raise Refusal(f'deploy.toml [nodes.{tag}] {key} must be a non-empty single line')
+    return nodes
+
+
+def derive_node_table(root: Path, _a: dict, _e: Path | None = None) -> str:
+    """The section-3 node table, from the fleet registry beside the engine.
+
+    The SHAPE is every reader's contract: `manifest-check.sh` takes the first table under
+    `## Node registry` and matches the user against the Machine/user cell; `run-selftests.sh` and
+    the drift audit match a backticked tag and a backticked user token at the head of a row."""
+    fleet = read_fleet((_e or Path(__file__).resolve().parent) / FLEET_NAME)
+    over = resolve_node_overrides(root, {r['tag'] for r in fleet})
+    checkout = Path(derive_primary_tree(root, _a)).name
+
+    def cell(text: str) -> str:
+        return text.replace('|', r'\|')
+    out = ['| Tag | Machine/user | Primary tree | Worktree root | Variances |',
+           '|-----|--------------|--------------|---------------|-----------|']
+    for r in fleet:
+        o = over.get(r['tag'], {})
+        host = r.get('host', '').strip()
+        ident = f'{r["user"]} @ {host}' if host else r['user']
+        primary = o.get('primary_tree') or f'{r["projects_root"].rstrip("/")}/{checkout}'
+        worktrees = o.get('worktree_root') or f'{primary}/.claude/worktrees'
+        variances = o.get('variances') or r.get('variances', '').strip() or 'none recorded'
+        out.append(f'| `{r["tag"]}` | `{cell(ident)}` | `{cell(primary)}` | `{cell(worktrees)}` '
+                   f'| {cell(variances)} |')
+    return '\n'.join(out)
+
+
+def write_fleet_claim(engine_dir: Path, user: str, host: str, projects_root: str,
+                      variances: str) -> str:
+    """Append a row with the lowest letter the fleet has not used, and return that letter.
+
+    Appends TEXT rather than re-serialising, so the registry's comments survive. Refused in an
+    installed copy — recognised, as `resolve_declaration_paths` recognises one, by the descriptor
+    sitting beside the engine — because the next update would overwrite a local claim."""
+    if (engine_dir / 'playbook.kit.toml').is_file():
+        raise Refusal('this engine is an INSTALLED copy, and its fleet registry is gov\'s: a claim '
+                      'here is overwritten by the next update. Claim the node in gov\'s checkout, '
+                      'then update this repository')
+    for key, val in (('--user', user), ('--projects-root', projects_root)):
+        if not val.strip():
+            raise Refusal(f'{key} is empty')
+    for val in (user, host, projects_root, variances):
+        if any(ord(c) < 32 for c in val):
+            raise Refusal('a claim value carries a control character')
+    path = engine_dir / FLEET_NAME
+    fleet = read_fleet(path)
+    ident = (user.strip().lower(), host.strip().lower())
+    for r in fleet:
+        if (r['user'].strip().lower(), r.get('host', '').strip().lower()) == ident:
+            raise Refusal(f'user {user!r} on host {host!r} already holds tag `{r["tag"]}`')
+    taken = {r['tag'] for r in fleet}
+    free = next((c for c in 'abcdefghijklmnopqrstuvwxyz' if c not in taken), None)
+    if free is None:
+        raise Refusal('the fleet holds all 26 tags; a 27th node needs a wider tag alphabet first')
+    raw = path.read_bytes()
+    eol = b'\r\n' if b'\r\n' in raw else b'\n'
+    row = [f'tag = "{free}"', f'user = {json.dumps(user.strip(), ensure_ascii=False)}',
+           f'host = {json.dumps(host.strip(), ensure_ascii=False)}',
+           f'projects_root = {json.dumps(projects_root.strip(), ensure_ascii=False)}',
+           f'variances = {json.dumps(variances.strip(), ensure_ascii=False)}']
+    block = eol + b'[[node]]' + eol + eol.join(s.encode('utf-8') for s in row) + eol
+    if not raw.endswith(eol):
+        raw += eol
+    path.write_bytes(raw + block)
+    read_fleet(path)  # the appended file must still grade, or the claim wrote something unreadable
+    return free
+
+
+def derive_primary_tree(root: Path, _a: dict, _e: Path | None = None) -> str:
     # The PRIMARY tree, not whichever worktree this render runs from. `--show-toplevel` answers the
     # linked worktree, so a render performed inside one would register that worktree as the node's
     # primary tree — measured on gov's own first render. `--git-common-dir` points at the main
@@ -274,7 +409,7 @@ def derive_primary_tree(root: Path, _a: dict) -> str:
     return top or root.resolve().as_posix()
 
 
-def derive_worktree_root(root: Path, _a: dict) -> str:
+def derive_worktree_root(root: Path, _a: dict, _e: Path | None = None) -> str:
     primary = derive_primary_tree(root, _a)
     return f'{primary}/.claude/worktrees' if primary else ''
 
@@ -288,7 +423,7 @@ PROBES = {
     'ci_file': derive_ci_file,
     'gate_runner': derive_gate_runner,
     'lexicon_conf': derive_lexicon_conf,
-    'node_tag': derive_node_tag,
+    'node_table': derive_node_table,
     'primary_tree': derive_primary_tree,
     'worktree_root': derive_worktree_root,
 }
@@ -561,7 +696,7 @@ def read_charter_table(cfg: dict, rows: list[dict], argv_tokens: set[str]) -> di
 
 
 def resolve_placeholder_value(row: dict, charter: dict, answers: dict,
-                              target: Path) -> tuple[str, str]:
+                              target: Path, engine_dir: Path | None = None) -> tuple[str, str]:
     """One placeholder's value and its note line. Precedence: `[charter]`, `[answers]`, then the
     probe (derived) or the declared default (defaulted). The one site the three classes share."""
     key, cls = row['key'], row.get('class')
@@ -571,7 +706,7 @@ def resolve_placeholder_value(row: dict, charter: dict, answers: dict,
         if probe is None:
             raise Refusal(f'{key} declares probe `{row.get("probe")}`, which this engine does '
                           f'not define')
-        seen = probe(target, answers)
+        seen = probe(target, answers, engine_dir)
         if given:
             # F2, RESOLVED: a redundant answer is a note, never a failure. The empty-probe case is
             # gov's own `ci_file`: no workflow exists yet, and the answer says so.
@@ -658,7 +793,8 @@ def resolve_answers(engine_dir: Path, gov_root: Path, target: Path,
     for key in keys:
         low = key.lower()
         if key.upper() in by_key:
-            out[key] = resolve_placeholder_value(by_key[key.upper()], charter, answers, target)[0]
+            out[key] = resolve_placeholder_value(by_key[key.upper()], charter, answers, target,
+                                                 engine_dir)[0]
             continue
         if low == 'kits':
             out[key] = sorted(read_kits(dep, cfg, entries))
@@ -686,6 +822,8 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
     drop_names = list(cfg.get('drop_blocks') or [])
 
     declared_blocks = {b['name'] for b in blocks}
+    retired = [d for d in drop_names if d in RETIRED_BLOCKS]
+    drop_names = [d for d in drop_names if d not in RETIRED_BLOCKS]
     for d in drop_names:
         if d not in declared_blocks:
             raise Refusal(f'drop_blocks names `{d}`, which the descriptor declares nowhere. A member '
@@ -708,14 +846,15 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
     drop |= {('when', d) for d in drop_names}
     text = remove_fenced(text, drop)
 
-    notes = []
+    notes = [f'retired   drop_blocks {d} — {RETIRED_BLOCKS[d]}; remove it from deploy.toml'
+             for d in retired]
     by_key = {r['key']: r for r in rows}
     for key in sorted(set(PLACEHOLDER_RE.findall(text))):
         row = by_key.get(key)
         if row is None:
             raise Refusal(f'the template carries {{{{{key}}}}} and the descriptor declares no '
                           f'[[placeholder]] row for it, so nothing can supply a value')
-        val, note = resolve_placeholder_value(row, charter, answers, target)
+        val, note = resolve_placeholder_value(row, charter, answers, target, engine_dir)
         notes.append(note)
         # A TOML multi-line string ends in a newline, and the template line holding the token ends in
         # one too; without the strip every multi-line answer adds a blank line after itself.
@@ -947,6 +1086,111 @@ def run_selftest() -> int:
                 '[charter]\nadopter_rules = """\n- one\n- two\n"""' + ans,
                 in_body=f'- one\n- two\n{ONE_LINE_CLOSE}', in_notes='answered  ADOPTER_RULES')
 
+    # TOOL-aDistilledCharter-2 — the fleet registry, the node table it renders, and the claim.
+    fleet_rows = [('a', 'ann', 'HOSTA', 'C:/p', 'quirk | piped'),
+                  ('b', 'bob', '', '/home/bob/src', ''),
+                  ('d', 'dee', 'HOSTD', 'C:/p', '')]
+
+    def build_fleet_text(rows) -> str:
+        return ''.join(f'[[node]]\ntag = "{t}"\nuser = "{u}"\nhost = "{h}"\n'
+                       f'projects_root = "{r}"\nvariances = "{v}"\n\n' for t, u, h, r, v in rows)
+
+    def build_node_render(fleet: str, tail: str = '', checkout: str = 'repo-one'):
+        with tempfile.TemporaryDirectory() as td:
+            eng, tgt = Path(td) / 'engine', Path(td) / checkout
+            eng.mkdir()
+            (tgt / '.governance').mkdir(parents=True)
+            (eng / 'playbook.kit.toml').write_text(
+                '[[placeholder]]\nkey = "NODE_TABLE"\nclass = "derived"\nprobe = "node_table"\n',
+                encoding='utf-8')
+            (eng / 'registry.toml').write_text(REG_FIXTURE, encoding='utf-8')
+            (eng / FLEET_NAME).write_text(fleet, encoding='utf-8')
+            (tgt / 'CHARTER.md').write_text('## Node registry\n\n{{NODE_TABLE}}\n', encoding='utf-8')
+            (tgt / '.governance' / 'deploy.toml').write_text(
+                'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "CHARTER.md"\n' + tail,
+                encoding='utf-8')
+            try:
+                return render(eng, Path(td), tgt)[0], None
+            except Refusal as e:
+                return '', str(e)
+
+    def read_pairs(body: str) -> list:
+        return re.findall(r'^\| `([a-z])` \| `([^`]*)`', body, re.M)
+
+    def tally(ok: bool, name: str, detail: str) -> None:
+        nonlocal passed, failed
+        if ok:
+            passed += 1
+        else:
+            failed += 1
+            print(f'  arm FAIL {name} — {detail}')
+
+    one, e1 = build_node_render(build_fleet_text(fleet_rows))
+    two, e2 = build_node_render(build_fleet_text(fleet_rows), checkout='other-repo')
+    three, e3 = build_node_render(build_fleet_text(fleet_rows[::-1]))
+    want_pairs = [('a', 'ann @ HOSTA'), ('b', 'bob'), ('d', 'dee @ HOSTD')]
+    tally(read_pairs(one) == read_pairs(two) == read_pairs(three) == want_pairs
+          and '`C:/p/repo-one`' in one and '`C:/p/other-repo`' in two and r'quirk \| piped' in one,
+          'one fleet renders the same (tag, identity) pairs in every repository and row order',
+          f'errors {e1, e2, e3}; pairs {read_pairs(one)} / {read_pairs(two)} / {read_pairs(three)}')
+    for name, rows, want in (
+            ('a repeated tag', fleet_rows + [('a', 'zed', 'Z', 'C:/p', '')], 'already taken'),
+            ('a repeated user and host', fleet_rows + [('e', 'ann', 'HOSTA', 'C:/p', '')],
+             'already has a tag'),
+            ('a two-letter tag', fleet_rows + [('ab', 'zed', 'Z', 'C:/p', '')],
+             'not one lowercase letter')):
+        _b, err = build_node_render(build_fleet_text(rows))
+        tally(err is not None and want in err, f'the fleet refuses {name}', f'got {err!r}')
+    body, err = build_node_render(build_fleet_text(fleet_rows), '\n[nodes.b]\nvariances = "x"\n')
+    tally(err is None and '| `b` | `bob` | `/home/bob/src/repo-one` | '
+          '`/home/bob/src/repo-one/.claude/worktrees` | x |' in body and r'quirk \| piped' in body,
+          'a [nodes.<tag>] override moves its one cell and no other row', f'{err!r} {body!r}')
+    for name, tail, want in (('a tag the fleet lacks', '\n[nodes.q]\nvariances = "x"\n',
+                              'does not hold'),
+                             ('an unknown key', '\n[nodes.b]\ncolour = "x"\n', 'only primary_tree')):
+        _b, err = build_node_render(build_fleet_text(fleet_rows), tail)
+        tally(err is not None and want in err, f'[nodes] refuses {name}', f'got {err!r}')
+    with tempfile.TemporaryDirectory() as td:
+        eng = Path(td)
+        (eng / FLEET_NAME).write_text(build_fleet_text(fleet_rows), encoding='utf-8')
+        got = write_fleet_claim(eng, 'cy', 'HOSTC', 'D:/w', '')
+        rows_after = [r['tag'] for r in read_fleet(eng / FLEET_NAME)]
+        try:
+            write_fleet_claim(eng, 'CY', 'hostc', 'D:/w', '')
+            again = 'no refusal'
+        except Refusal as e:
+            again = str(e)
+        (eng / 'playbook.kit.toml').write_text('', encoding='utf-8')
+        try:
+            write_fleet_claim(eng, 'new', 'N', 'D:/w', '')
+            installed = 'no refusal'
+        except Refusal as e:
+            installed = str(e)
+    tally(got == 'c' and rows_after == ['a', 'b', 'c', 'd'] and 'already holds' in again
+          and 'INSTALLED' in installed,
+          'a claim takes the lowest free letter, once per identity, never in an installed copy',
+          f'got {got!r} rows {rows_after} again {again!r} installed {installed!r}')
+    arm_fixture('a retired drop_blocks member is noted, never refused', trailer_desc, 'plain\n',
+                'drop_blocks = ["node-table"]\n' + ans, in_body='plain',
+                in_notes='retired   drop_blocks node-table')
+    import contextlib
+    import io
+    for outside, want_note in (('## Node registry\n\n| `a` | `u` |\n\n', True), ('# head\n\n', False)):
+        with tempfile.TemporaryDirectory() as td:
+            tgt = Path(td)
+            (tgt / '.governance').mkdir()
+            (tgt / '.governance' / 'deploy.toml').write_text(
+                'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
+            (tgt / 'TPL.md').write_text('x\n', encoding='utf-8')
+            (tgt / 'AGENTS.md').write_text(f'{outside}{REGION_OPEN}\nx\n{REGION_CLOSE}\n',
+                                           encoding='utf-8')
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                rc = main(['--target', str(tgt), '--check'])
+        tally(rc == 0 and ('Node registry' in out.getvalue()) == want_note,
+              f'the stale-registry note prints {"when" if want_note else "only when"} a registry '
+              f'sits outside the region', f'rc {rc} out {out.getvalue()!r}')
+
     # S3 / AC5 — the template is never its own charter. Driven through `main`, so the exit code is
     # the one an operator sees, over gov's own declarations and a real registry entry.
     import contextlib
@@ -1088,10 +1332,26 @@ def main(argv: list[str]) -> int:
     ap.add_argument('--selftest', action='store_true')
     # TOOL-aRepatriatedFork-42: another kit's renderer asks for the answers this engine would use.
     ap.add_argument('--answers', nargs='+', metavar='KEY')
+    # TOOL-aDistilledCharter-2: a new node claims its tag once, in gov's own checkout.
+    ap.add_argument('--claim-node', action='store_true')
+    ap.add_argument('--user', default='')
+    ap.add_argument('--host', default='')
+    ap.add_argument('--projects-root', default='')
+    ap.add_argument('--variances', default='')
     a = ap.parse_args(argv)
 
     if a.selftest:
         return run_selftest()
+    if a.claim_node:
+        try:
+            tag = write_fleet_claim(Path(__file__).resolve().parent, a.user, a.host,
+                                    a.projects_root, a.variances)
+        except Refusal as e:
+            print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
+            return 1
+        print(f'render-playbook — claimed tag `{tag}` for {a.user} @ {a.host or "<no host>"}; '
+              f'commit the fleet registry, then re-render every repository this node works in')
+        return 0
     if not a.target:
         ap.error('--target is required')
 
@@ -1125,6 +1385,15 @@ def main(argv: list[str]) -> int:
         return 1
 
     survived = PLACEHOLDER_RE.findall(body)
+
+    # TOOL-aDistilledCharter-2 S6. The kickoff card reads the FIRST `## Node registry` of the
+    # charter, so an authored one above the region keeps this repository's old tags in force.
+    if charter_path.is_file():
+        parts = REGION_MARKER_RE.split(charter_path.read_text(encoding='utf-8'))
+        if re.search(r'^## Node registry', parts[0] + (parts[2] if len(parts) > 2 else ''), re.M):
+            print('render-playbook: NOTE — the charter carries its own `## Node registry` outside '
+                  'the rendered region, and readers take the first one, so this repository still '
+                  'reads its old tags. Delete that section to adopt the fleet tags')
 
     if a.check:
         rc = 0

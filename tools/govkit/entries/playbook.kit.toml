@@ -74,10 +74,9 @@ why = "under a strict byte gate"
 # refuses on a placeholder no row declares, so the population is derived on every run. Two revisions
 # of the spec stated a figure and both were wrong when read.
 
-# PROJECT_NAME, PRIMARY_TREE_A and WORKTREE_ROOT_A are ASKED, for MACHINE_A's reason below: their
-# probes answer from the RENDERING node, and measured 2026-09-23 they answered `vendor` and a
-# `.git/modules/vendor` path at a submodule adopter. Both adopters forked this file to say so;
-# DEPL-aRepatriatedFork-1 S2 retires that fork. An answer outranks any probe now as well (S1).
+# PROJECT_NAME is ASKED: its probe answers from the RENDERING node, and measured 2026-09-23 it answered
+# `vendor` at a submodule adopter. Both adopters forked this file to say so; DEPL-aRepatriatedFork-1 S2
+# retires that fork. An answer outranks any probe now as well (S1).
 [[placeholder]]
 key = "PROJECT_NAME"
 class = "asked"
@@ -127,32 +126,12 @@ kit = "lexicon"
 why = "the naming declaration's path; only reachable when the lexicon block survives"
 
 [[placeholder]]
-key = "TAG_A"
-class = "defaulted"
-default = "a"
-why = "this node's registry tag. DEFAULTED, not derived: its probe returned the constant `a` at every node, so `derived` claimed a measurement nobody made (F1, RESOLVED 2026-09-23)"
-
-[[placeholder]]
-key = "MACHINE_A"
-class = "asked"
-why = "this node's machine and user, which is how a node identifies itself. ASKED, not derived: a probe reading $USERNAME/$COMPUTERNAME bakes one node's identity into a charter committed to a shared remote, so every other node's render differs and the wiring leg reds for them. Fleet data is stated, not sniffed"
-
-[[placeholder]]
-key = "PRIMARY_TREE_A"
-class = "asked"
-why = "where the default branch lives on this node. ASKED for MACHINE_A's reason: a probe answers from whichever node renders, and a submodule adopter's probe derived its `.git/modules/<name>` directory"
-
-[[placeholder]]
-key = "WORKTREE_ROOT_A"
-class = "asked"
-why = "where this node's per-unit worktrees are rooted. ASKED for the same reason as PRIMARY_TREE_A, from whose probe it was derived"
+key = "NODE_TABLE"
+class = "derived"
+probe = "node_table"
+why = "the section-3 node registry, one row per node of the fleet registry beside the engine (`fleet.toml`), with the repository's `[nodes.<tag>]` overrides. Gov is the one allocator, so a machine carries one tag in every adopter (TOOL-aDistilledCharter-2). It replaced TAG_A, MACHINE_A, PRIMARY_TREE_A, WORKTREE_ROOT_A and VARIANCES_A, which rendered one row from whichever node ran the render"
 
 # --- asked. The renderer refuses rather than guessing; that posture is govkit's, inherited here.
-
-[[placeholder]]
-key = "VARIANCES_A"
-class = "asked"
-why = "this node's per-node quirks — a credential scope, a harness launch config. NOT derivable even for the current node: it is knowledge the operator has and the tree does not"
 
 [[placeholder]]
 key = "STREAM_OWNERSHIP"
@@ -259,13 +238,6 @@ why = "section 2: this repository's own rules, one `- ` bullet per line, from `[
 # nothing here refuses too.
 
 [[block]]
-name = "security-outbound"
-why = "the outbound-call and stored-content rules. Drop them where the project has no such surface."
-
-[[block]]
 name = "cross-os"
 why = "the cross-OS and toolchain section. Drop it for a single-OS team."
 
-[[block]]
-name = "node-table"
-why = "the section 2 node table. Drop it where the node registry lives in the file the kickoff manifest's registry: key names, outside the rendered region, so the charter carries one registry."

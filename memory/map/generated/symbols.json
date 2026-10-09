@@ -5868,14 +5868,14 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
-      "id": "derive_node_tag",
+      "id": "derive_node_table",
       "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "derive_node_tag",
       "kind": "function",
-      "file": "tools/playbook/render_playbook.py"
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "derive_opted_out",
@@ -10948,6 +10948,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_fleet",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "read_fm_key_of",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -14231,6 +14236,11 @@
       "id": "resolve_newest_gate_log",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "resolve_node_overrides",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "resolve_node_tag",
@@ -19706,6 +19716,11 @@
       "id": "write_fixture_records",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "write_fleet_claim",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "write_fork_spec",
