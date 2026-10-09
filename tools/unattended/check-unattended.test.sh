@@ -450,6 +450,8 @@ anchor_restore() {
   git checkout -qf unit
   reset_tree
 }
+# TOOL-aHomedAnchor-2 - the opt-in the leg reads off the remote's default branch, appended to a conf.
+add_local_scope() { printf 'ANCHOR_SCOPE="local"\n' >> .unattended.conf; }
 
 # ---- THE HOIST SET (TOOL-aBatchedArm-3 S1). Every helper a region used to define beside its first
 # ---- caller lives here instead, because a function defined in one shard and called from another
@@ -3093,7 +3095,6 @@ reset_tree
 # ---- commit on `unit` that no remote tip carries, which is what the driver's local anchor pins.
 # ---- AC1 and AC4: origin's conf declares `local`, so check 9 admits the base and check 29, whose
 # ---- `slug` README sits on that off-default base, stays silent.
-add_local_scope() { printf 'ANCHOR_SCOPE="local"\n' >> .unattended.conf; }
 anchor_break add_local_scope
 # ---- TOOL-aHomedAnchor-7 AC4: a record whose BASE is on the default branch prints no check 29 skip.
 miss "$(GOV_UNATTENDED_REPORT=1 run)" "check 29 skipped for"
