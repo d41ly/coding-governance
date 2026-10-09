@@ -44,6 +44,8 @@ Both refusals are guards against accident, not a security boundary: a run with s
 rewrite its own history. The kit version moves once, after the last unit lands. Owner decisions,
 2026-10-09: confirmation applies only to a session-derived brief, an edit there is not confirmed
 again, and an unclean tree starts the run in a fresh worktree rather than stopping it.
+M2 classification at preflight (base 6473ae38): all three units READY. Units 1 and 2 share
+`unattended.sh`, its suite and the verbs template, so they build in sequence, 1 then 2 then 3.
 
 ## Parked decisions
 
