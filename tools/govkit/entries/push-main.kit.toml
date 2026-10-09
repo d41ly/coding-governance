@@ -75,6 +75,9 @@ name = "pre-push self-test"
 subject = "kit"
 argv = ["bash", ".githooks/pre-push.test.sh"]
 guard = [".githooks/"]
+# Carried into an adopter's manifest at run-gates 1.2 or later, kept where the adopter raised it, and
+# graded equal to gov's manifest by selfcheck 7h (DEPL-aBenchedProbe-2). The only descriptor leg with one.
+ceiling = 1780
 
 # THE BAR HARNESS, which re-disables the hook's executed-word, option, working-copy and declared arms in a copy
 # on every run and observes the evasions land (TOOL-aRepatriatedFork-5, the owner's F2 ruling). It

@@ -2325,6 +2325,107 @@ def check_mode_never_down(tmp: pathlib.Path) -> None:
             check(label, ok, detail)
 
 
+def check_ceiling_emission(tmp: pathlib.Path) -> None:
+    """DEPL-aBenchedProbe-2 AC1-AC5 — a descriptor leg's `ceiling` travels into the target's manifest
+    and receipt above the run-gates floor, nowhere else, and a hand-set one is kept.
+
+    MODULE-LEVEL so a pass can run it alone. The target is D4's shape: a manifest-kind runner and no
+    run-gates installed, so the floor reader answers True; the below-floor half is the reader alone,
+    for the reason D4 gives (a run-gates install needs a receipt claim a fixture cannot plant)."""
+    gk = govkit_module()
+    # AC2: the floor, read directly.
+    _rg = tmp / "ceiling-floor"
+    _rgs = _rg / PFX / KIT_NAMES["run-gates"] / "run-gates.sh"
+    _rgs.parent.mkdir(parents=True, exist_ok=True)
+    for ver, want in (("1.1", False), ("1.2", True)):
+        _rgs.write_text(f"#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION={ver}\n",
+                        encoding="utf-8", newline="\n")
+        check(f"CE2: a target at run-gates {ver} {'gets' if want else 'does not get'} a ceiling",
+              gk.check_target_reads_subject(_rg, {"prefix": PFX[:-1]},
+                                            floor=gk.CEILING_FLOOR_RUN_GATES) is want, ver)
+    check("CE2: the ceiling floor is the first runner version that certainly admits the key",
+          gk.CEILING_FLOOR_RUN_GATES == (1, 2), str(gk.CEILING_FLOOR_RUN_GATES))
+    check("CE2: the manifest writer routes the ceiling through its own floor",
+          "floor=CEILING_FLOOR_RUN_GATES)" in GOVKIT.read_text(encoding="utf-8"), "")
+
+    # AC1/AC3: an applied push-main carries 1780 on the declaring leg, row and receipt, and no other.
+    t = tmp / "ceiling-install"
+    (t / PFX).mkdir(parents=True, exist_ok=True)
+    (t / ".githooks").mkdir(exist_ok=True)
+    (t / ".governance").mkdir(exist_ok=True)
+    legs = t / PFX / "legs.json"
+    legs.write_text(json.dumps([{"name": "control", "argv": ["true"]}], indent=2) + "\n",
+                    encoding="utf-8", newline="\n")
+    (t / PFX / "runner.sh").write_text('echo "GATE ok    control"\n', encoding="utf-8", newline="\n")
+    (t / ".githooks" / "pre-commit").write_text(
+        "#!/usr/bin/env bash\nset -u\n# govkit:branch-guard\n# /govkit:branch-guard\n",
+        encoding="utf-8", newline="\n")
+    (t / ".governance" / "deploy.toml").write_text(
+        f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["push-main"]\n\n'
+        '[answers]\nmemory_root = "memory"\n\n'
+        f'[gate_runner]\nkind = "manifest"\nfile = "{PFX}legs.json"\n'
+        'grammar = "json-array"\ndedupe_key = "name"\n'
+        f'command = ["bash", "{PFX}runner.sh"]\n'
+        'run_all_env = { GATE_FULL = "1" }\n'
+        'observed_ran = ["GATE ok    {name}"]\n'
+        'observed_failed = ["GATE FAIL  {name}"]\n',
+        encoding="utf-8", newline="\n")
+    git(t, "init", "-q", "-b", "main"); git(t, "config", "user.email", "t@e")
+    git(t, "config", "user.name", "t"); git(t, "config", "core.autocrlf", "false")
+    settle(t, "base")
+    leg = "pre-push self-test"
+    rec = t / ".governance" / "install.json"
+
+    def read_rows() -> dict:
+        return {x.get("name"): x for x in json.loads(legs.read_text(encoding="utf-8"))}
+
+    def read_emitted() -> dict:
+        _d = json.loads(rec.read_text(encoding="utf-8")) if rec.is_file() else {}
+        return {x.get("name"): x for x in (_d.get("gate_runner") or {}).get("emitted", [])}
+
+    p = run("apply", "--target", str(t), "--kits", "push-main")
+    rows, em = read_rows(), read_emitted()
+    check("CE1: the declaring leg's manifest row carries the descriptor's ceiling",
+          rows.get(leg, {}).get("ceiling") == 1780, str(rows.get(leg)) + p.stdout[-600:] + p.stderr[-300:])
+    check("CE1: and the receipt's emitted row records it",
+          em.get(leg, {}).get("ceiling") == 1780, str(em.get(leg)))
+    for other in ("push-main self-test", "pre-push bar self-test"):
+        check(f"CE3: '{other}' declares no ceiling and its row carries none, never a fallback",
+              other in rows and "ceiling" not in rows[other], str(rows.get(other)))
+
+    # AC4: a hand-raised ceiling is the adopter's own, kept and reported, never refused as drift.
+    settle(t, "the push-main install")
+    rows[leg]["ceiling"] = 3600
+    legs.write_text(json.dumps(list(rows.values()), indent=2) + "\n", encoding="utf-8", newline="\n")
+    settle(t, "raise the ceiling")
+    p = run("apply", "--target", str(t), "--kits", "push-main")
+    out = p.stdout + p.stderr
+    check("CE4: a re-apply over a hand-raised ceiling exits 0", p.returncode == 0, out[-900:])
+    check("CE4: the raised ceiling is kept", read_rows().get(leg, {}).get("ceiling") == 3600,
+          str(read_rows().get(leg)))
+    check("CE4: and the keep is reported, naming the leg",
+          "kept the target's ceiling" in out and f"'{leg}'" in out, out[-900:])
+    check("CE4: and it is not refused as drift",
+          "differs from what the receipt recorded" not in out, out[-900:])
+
+    # AC5: a row agreeing with the receipt is gov's, so gov's value lands — the arm that keeps CE4
+    # from passing on a rule that keeps every value.
+    settle(t, "the re-apply")
+    rows = read_rows()
+    rows[leg]["ceiling"] = 1000
+    legs.write_text(json.dumps(list(rows.values()), indent=2) + "\n", encoding="utf-8", newline="\n")
+    _d = json.loads(rec.read_text(encoding="utf-8"))
+    for x in _d["gate_runner"]["emitted"]:
+        if x.get("name") == leg:
+            x["ceiling"] = 1000
+    rec.write_text(json.dumps(_d, indent=2) + "\n", encoding="utf-8", newline="\n")
+    settle(t, "row and receipt agree at 1000")
+    p = run("apply", "--target", str(t), "--kits", "push-main")
+    check("CE5: a ceiling the receipt recorded is gov's to replace",
+          read_rows().get(leg, {}).get("ceiling") == 1780,
+          str(read_rows().get(leg)) + (p.stdout + p.stderr)[-900:])
+
+
 def main() -> int:
     # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
     # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
@@ -5602,6 +5703,9 @@ user_skills = "/tmp/gk-fake-skills"
               _p4b.stdout[-600:] + _p4b.stderr[-300:])
         check("D4: and the adopter's doc_reads is kept, not overwritten",
               _kvb.get("doc_reads") == ["memory/"], str(_kvb))
+
+        # DEPL-aBenchedProbe-2: `ceiling` rides the same writer, kept rather than refused.
+        check_ceiling_emission(tmp)
 
         # AC5 — the header says what the check does NOT decide, in the generated file itself, where
         # a reader who found the pin will actually be looking.

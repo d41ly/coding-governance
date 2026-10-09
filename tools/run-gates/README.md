@@ -379,6 +379,10 @@ the judgement to you. If you want the requirement enforced over YOUR corpus, ass
 of your own — gov does exactly that in `run-gates.gov.test.sh`, which is withheld from this payload
 for the reason that file's header gives.
 
+**A kit leg's ceiling arrives only where its descriptor declares one.** The deployer carries a kit leg's `ceiling` into your manifest at run-gates 1.2 or later,
+and only for a leg whose kit descriptor declares one; a value you set by hand on that row is kept
+and reported rather than overwritten, while a deleted one comes back on the next deployer run.
+
 **Choosing a number.** `<git-dir>/gate-ledger.tsv` already carries one row per leg with its own
 seconds, so the derivation gov used is `max(60, 3 × that leg's measured seconds)`. The factor is
 headroom for the box, not for the code: the same workload has been measured at 10.7 s and 26 s

@@ -2682,6 +2682,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         # liveness assertion — held off every bar while this file reported them running.
         manifest_chunk = {leg.get("name"): leg.get("chunk") for leg in _legs_json}
         manifest_doc_reads = {leg.get("name"): leg.get("doc_reads") for leg in _legs_json}
+        manifest_ceiling = {leg.get("name"): leg.get("ceiling") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             for leg in d.get("gate_leg", []):
@@ -2749,6 +2750,19 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                                f"<prefix>/gate-legs.json says {_m!r} — the descriptor and the "
                                f"manifest disagree about which doc paths this leg reads, so a doc-only "
                                f"push skips it in one tree and runs it in the other")
+                    # AND ABOUT CEILING, where the descriptor declares one (DEPL-aBenchedProbe-2 S5):
+                    # the emitter carries the descriptor's value verbatim into adopters, so it must
+                    # be a positive int (a bool is an int to Python, and not a bound) equal to the
+                    # one gov's own bar runs under. A descriptor declaring none is not compared;
+                    # that is TOOL-aBoundedCeiling-13's remainder, not this clause.
+                    if "ceiling" in leg:
+                        d_ce, m_ce = leg.get("ceiling"), manifest_ceiling.get(nm)
+                        if (isinstance(d_ce, bool) or not isinstance(d_ce, int) or d_ce <= 0
+                                or d_ce != m_ce):
+                            r.fail(f"entry '{eid}' declares gate leg '{nm}' with ceiling {d_ce!r} "
+                                   f"while <prefix>/gate-legs.json says {m_ce!r} — a descriptor "
+                                   f"ceiling must be a positive integer equal to the manifest's, "
+                                   f"because the deployer writes it into every adopter's runner")
                 # AC1b: a name that travels. A digit inside a parenthetical is a COUNT, and a count
                 # in a leg name goes stale exactly where nobody is reading — in somebody else's repo.
                 if re.search(r"\([^)]*\d[^)]*\)", nm):
@@ -4084,6 +4098,14 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 elif _dr_why:
                     print(f"govkit {verb} — gate leg '{nm}': doc_reads omitted ({_dr_why}), so it "
                           f"runs on every doc-only push")
+                # THE CEILING TRAVELS where the descriptor declares one and the target's runner is
+                # at CEILING_FLOOR_RUN_GATES or later, carried verbatim: the descriptor is
+                # gov-authored and selfcheck 7h grades its shape. No fallback to gov's manifest,
+                # which would bound every leg rather than the declaring ones. DEPL-aBenchedProbe-2.
+                _ce = leg.get("ceiling") if check_target_reads_subject(
+                    target, deploy, descs, floor=CEILING_FLOOR_RUN_GATES) else None
+                if _ce is not None:
+                    row["ceiling"] = _ce
                 if nm in by_name:
                     prev = next((e for e in owned and prior if e["name"] == nm), None)
                     # DEPL-cMendedVintage-22. THE SUBJECT OF THIS COMPARISON IS THE TARGET, and for
@@ -4119,6 +4141,19 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                                f"reporting drift rather than replacing it; ownership of the NAME is "
                                f"not ownership of the ROW")
                         continue
+                    # THE KEEP RULE (DEPL-aBenchedProbe-2 S4). A ceiling on the target's row that
+                    # differs from the one the receipt recorded is the adopter's own bound, so it
+                    # is written back and reported, never refused: it sits outside the drift
+                    # comparison above and cannot withhold the manifest. The receipt still records
+                    # gov's value, so a kept bound keeps differing and stays kept, while a row the
+                    # adopter never touched matches and takes gov's new value. WHAT IT DOES NOT DO:
+                    # it does not preserve a DELETED key (an absent ceiling takes gov's value
+                    # back), and it validates no value, kept or emitted.
+                    if "ceiling" in tgt and tgt["ceiling"] != (prev or {}).get("ceiling"):
+                        row["ceiling"] = tgt["ceiling"]
+                        print(f"govkit {verb} — gate leg '{nm}': kept the target's ceiling "
+                              f"{tgt['ceiling']!r} (gov's is {_ce!r}); a ceiling the receipt did "
+                              f"not record is the target's own")
                     existing[by_name[nm]] = row
                 else:
                     existing.append(row)
@@ -4138,6 +4173,10 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                                 # audit of a unit that was about to copy this seam verbatim.
                                 "subject": row.get("subject"),
                                 "doc_reads": row.get("doc_reads"),
+                                # gov's computed value, never a kept one: the S4 keep rule above
+                                # compares the target against THIS, so recording the kept value
+                                # would let the next run overwrite the adopter's bound.
+                                "ceiling": _ce,
                                 "guard_dropped": [{"spec": a, "why": b} for a, b in dropped],
                                 "history_depth": leg.get("history_depth")})
                 if dropped and not guards:
@@ -5614,6 +5653,10 @@ SUBJECT_FLOOR_RUN_GATES = (1, 1)
 # The run-gates version at which `doc_reads` entered that key set, and the runner learned to read it.
 # TOOL-dThriftyLanding-4, against the runner TOOL-dThriftyLanding-1 shipped as 1.25.
 DOC_READS_FLOOR_RUN_GATES = (1, 25)
+# The run-gates version that certainly admits `ceiling`. The canary's key set gained it in db3616531
+# while the runner still read 1.1, and 836e4e27b is the first commit at 1.2, so 1.1 is ambiguous and
+# 1.2 is the first version that cannot red a target's canary on the key. DEPL-aBenchedProbe-2.
+CEILING_FLOOR_RUN_GATES = (1, 2)
 
 
 def derive_doc_reads(leg: dict, ctx: dict[str, str], have: set[str]) -> tuple[list[str] | None, str]:

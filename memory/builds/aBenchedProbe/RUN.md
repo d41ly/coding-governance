@@ -49,3 +49,7 @@ base: 2b26f187f03cc991edbf40b25550e6590e97d26e
 2026-10-09T19:23:07Z dispatch · item e0448998 DEPL-aBenchedProbe-1 · reason tools/govkit/govkit.py memory/builds/aBenchedProbe/spec/2026-10-09-spec-DEPL-aBenchedProbe-1.md memory/builds/aBenchedProbe/README.md memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/ledger/2026-10.md
 
 2026-10-09T19:23:41Z brief · item DEPL-aBenchedProbe-1 · reason 646acc691479 memory/builds/aBenchedProbe/prompts/2026-10-09-prompt-TOOL-aBenchedProbe-1-2-build-brief.md
+
+2026-10-09T19:47:46Z dispatch · item 1696d09d DEPL-aBenchedProbe-2 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/entries/push-main.kit.toml tools/run-gates/README.md memory/builds/aBenchedProbe/spec/2026-10-09-spec-DEPL-aBenchedProbe-2.md memory/builds/aBenchedProbe/build/2026-10-09-build-DEPL-aBenchedProbe-2-1-acceptance-ledger.md memory/builds/aBenchedProbe/README.md memory/LIVE.md memory/ledger/2026-10.md memory/guides/SESSION-KICKOFF.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
+
+2026-10-09T19:48:14Z brief · item DEPL-aBenchedProbe-2 · reason 646acc691479 memory/builds/aBenchedProbe/prompts/2026-10-09-prompt-TOOL-aBenchedProbe-1-2-build-brief.md

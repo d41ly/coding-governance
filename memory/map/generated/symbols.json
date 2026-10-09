@@ -3078,6 +3078,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "check_ceiling_emission",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_ceiling_fired",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
