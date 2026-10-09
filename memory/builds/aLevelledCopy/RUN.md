@@ -57,3 +57,11 @@ base: ce9192c0ba180a67b49b2ea3fc8edf2fb8afc0cb
 2026-10-09T02:55:52Z dispatch · item 33a15c87 TOOL-aLevelledCopy-3 · reason memory/builds/aLevelledCopy/BACKLOG.md
 
 2026-10-09T03:01:25Z dispatch · item 33a15c87 TOOL-aLevelledCopy-3 · reason memory/backlog/DEPL.md memory/backlog/TOOL.md
+
+2026-10-09T03:40:59Z review · item aLevelledCopy · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 14 · disposition promote
+
+2026-10-09T03:42:48Z rescope · item add TOOL-aLevelledCopy-7 · reason closing review round 1 HIGH H1 (id 3) with M1 (id 9), one root cause: the ssh arm overrides an operator's GIT_SSH or ssh.variant
+
+2026-10-09T03:43:55Z rescope · item add TOOL-aLevelledCopy-8 · reason closing review round 1 minors on the check-wiring write set: M3 M4 M5 M7 L1 L2 (ids 16 6 7 13 5 10 14)
+
+2026-10-09T03:44:57Z rescope · item add TOOL-aLevelledCopy-9 · reason closing review round 1 minors on the receipt, govkit and record write set: M2 M6 L3 L4 L5 (ids 4 12 8 15 18 19)

@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: tooling+deployer
 roster: TOOL+DEPL
-ids: DEPL-aLevelledCopy-1 DEPL-aLevelledCopy-2 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4 TOOL-aLevelledCopy-5 TOOL-aLevelledCopy-6
+ids: DEPL-aLevelledCopy-1 DEPL-aLevelledCopy-2 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4 TOOL-aLevelledCopy-5 TOOL-aLevelledCopy-6 TOOL-aLevelledCopy-7 TOOL-aLevelledCopy-8 TOOL-aLevelledCopy-9
 authorized-by: prompt
 ---
 
@@ -39,6 +39,7 @@ prose is the mandate, recorded under [prompts/](prompts/2026-10-09-prompt-TOOL-a
 - Units 2 and 3 both write `check-wiring.sh`, so they are sequenced; 1 and 4 are disjoint from both.
 - Unit 4 is Tier-2: it changes what the deployer writes into an adopter's index.
 - One kit-version bump per touched kit, after the last unit (no per-unit bumps).
+- Units 5 to 7 are the closing review's promotions (M4): 5 and 6 both write `check-wiring.sh`.
 
 ## Parked decisions
 
@@ -46,17 +47,20 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 
 <!-- roster:units -->
 
-| # | Unit | Status | Mechanism |
-|---|---|---|---|
-| 1 | `TOOL-aLevelledCopy-1` | OPEN | receipt-sync grades a mismatched row through the target's clean filter |
-| 2 | `TOOL-aLevelledCopy-2` | OPEN | check-wiring sets core.sshCommand from push-main's keepalive string when unset |
-| 3 | `TOOL-aLevelledCopy-3` | OPEN | gov's executed hooks are 100755, and check-wiring grades a hook's index mode |
-| 4 | `DEPL-aLevelledCopy-1` | OPEN | govkit update carries gov's exec bit onto an existing engine row |
+| # | Unit | Mechanism |
+|---|---|---|
+| 1 | `TOOL-aLevelledCopy-1` | receipt-sync grades a mismatched row through the target's clean filter |
+| 2 | `TOOL-aLevelledCopy-2` | check-wiring sets core.sshCommand from push-main's keepalive string when unset |
+| 3 | `TOOL-aLevelledCopy-3` | gov's executed hooks are 100755, and check-wiring grades a hook's index mode |
+| 4 | `DEPL-aLevelledCopy-1` | govkit update carries gov's exec bit onto an existing engine row |
+| 5 | `TOOL-aLevelledCopy-7` | the ssh arm stands back when the operator chose an SSH program by `GIT_SSH` or `ssh.variant` |
+| 6 | `TOOL-aLevelledCopy-8` | the ssh arm's failure states each get a verdict and an arm (review minors) |
+| 7 | `TOOL-aLevelledCopy-9` | receipt fixtures are hermetic, a renamed row keeps its bit, and the records agree (review minors) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
-ids DEPL-aLevelledCopy-1 DEPL-aLevelledCopy-2 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4 TOOL-aLevelledCopy-5 TOOL-aLevelledCopy-6
+ids DEPL-aLevelledCopy-1 DEPL-aLevelledCopy-2 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4 TOOL-aLevelledCopy-5 TOOL-aLevelledCopy-6 TOOL-aLevelledCopy-7 TOOL-aLevelledCopy-8 TOOL-aLevelledCopy-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -67,7 +71,7 @@ ids DEPL-aLevelledCopy-1 DEPL-aLevelledCopy-2 TOOL-aLevelledCopy-1 TOOL-aLevelle
 | [TOOL-aLevelledCopy-3 — gov's executed hooks are 100755, and check-wiring grades a hook's index mode](spec/2026-10-09-spec-TOOL-aLevelledCopy-3.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 3 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
