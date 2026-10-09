@@ -220,12 +220,6 @@ default = "memory/builds/<slug>/reviews/"
 why = "where a Tier-2 run is persisted as an in-repo artifact; must agree with memory-tree hygiene check 5, which requires <MEMORY_ROOT>/builds/<slug>/reviews/"
 
 [[placeholder]]
-key = "PROSE_AUDIT"
-class = "defaulted"
-default = "none yet — the thresholds still bind"
-why = "the audit script that quantifies chat-prose waste"
-
-[[placeholder]]
 key = "ADOPTER_RULES"
 class = "defaulted"
 default = "- none — this repository adds no rules of its own"
