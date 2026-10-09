@@ -13,6 +13,8 @@ gate-legs = [
   "install-prefix self-test",
   "dead-path carriers (deleted files still named)",
   "dead-path carriers self-test",
+  "remote literals (kit code names no remote)",
+  "remote literals self-test",
   "foreign-prefix parity (every self-test at three prefixes)",
 ]
 kits = []
@@ -34,6 +36,8 @@ globs = [
   "tools/check-dead-paths.sh",
   "tools/check-dead-paths.test.sh",
   "tools/dead-path-waivers.txt",
+  "tools/check-remote-literals.sh",
+  "tools/check-remote-literals.test.sh",
 ]
 ```
 
@@ -159,6 +163,12 @@ template + its two companions" — and those were found by reading, not by the g
 
 `memory/` is out of scope by rule, not convenience: specs, reviews and archived snapshots are
 append-only records describing what WAS true, and rewriting one to please a gate falsifies the record.
+
+A third literal is a NODE'S remote name. `check-remote-literals.sh` (TOOL-dLadderedRemote-3) bans
+kit code spelling `origin` as a tracking ref, a short ref, a default or a remedy, because which
+remote landed means is a per-node variance and every probe now asks the lib dir's remote ladder,
+inlined. Same pure-ban shape: no waiver, test files and comment lines outside it, a bare quoted
+argument invisible to it by design, and an empty population a DEAD PROBE.
 
 ## Shared seams
 

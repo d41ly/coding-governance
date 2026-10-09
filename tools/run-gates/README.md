@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.33` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.34` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -140,8 +140,10 @@ OPT-IN because an advisory input may cause less work only on a run that is not a
 
 The baseline a guard diffs against is the MERGE-BASE with the default branch, so a branch is graded
 on what it changed rather than on everything that landed while it was open — used only where the
-merge-base is a proper ancestor of `HEAD`, with the origin tip standing otherwise. `GATE_BASE`
-outranks both, and an unresolvable baseline runs every leg.
+merge-base is a proper ancestor of `HEAD`, with the remote tip standing otherwise. The remote and its
+branch are the remote ladder's: `GOV_REMOTE`, else the current branch's remote, else the only one, and
+the branch its HEAD names. `GATE_BASE` outranks both, and an unresolvable baseline, a ladder refusal
+included, runs every leg.
 
 ## The docs mode — `doc_reads` and `GATE_DOCS_BASE`
 

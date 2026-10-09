@@ -281,7 +281,8 @@
     ],
     "guard": [
       "{prefix}/",
-      "{prefix}/lib/"
+      "{prefix}/lib/",
+      ".githooks/"
     ],
     "chunk": "wiring",
     "subject": "kit",
@@ -1236,6 +1237,30 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 2070
+  },
+  {
+    "name": "remote literals (kit code names no remote)",
+    "argv": [
+      "bash",
+      "{prefix}/check-remote-literals.sh"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
+    "name": "remote literals self-test",
+    "argv": [
+      "bash",
+      "{prefix}/check-remote-literals.test.sh"
+    ],
+    "guard": [
+      "{prefix}/check-remote-literals.sh",
+      "{prefix}/check-remote-literals.test.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 600
   },
   {
     "name": "govkit selfcheck",

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.25
+gov:kit drift-audit@1.26
 
     python <kit>/selftest.py
 
@@ -93,7 +93,9 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 474
+CHECK_FLOOR = 478
+# 474 -> 478, TOOL-dLadderedRemote-2: the four remote-ladder checks in `test_base_is_remote_tracking`,
+# COUNTED off the arm rather than measured, because the unit pass runs no suite.
 # 414 + 346 -> 474, the merge of origin/main into aMendedFleet: base 277, plus 137 from this
 # branch (277 -> 414) and 69 from origin/main (277 -> 346), is 483, less the nine checks of
 # `test_fleet_over_budget` that both sides counted for ONE arm: TOOL-aMendedFleet-92 ported
@@ -2195,8 +2197,8 @@ def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
     # AC2 — no `origin` at all: the local branch IS the record, and the report says so.
     run(["git", "remote", "remove", "origin"], r)
     loc = run([sys.executable, REPORT_REL, "--json", "--check"], r)
-    check("AC2: a clone with no origin remote names the LOCAL base on stderr",
-          re.search(r"no origin remote, so the base is local main @ [0-9a-f]{8}", loc.stderr)
+    check("AC2: a clone with no remote at all names the LOCAL base on stderr",
+          re.search(r"no remote, so the base is local main @ [0-9a-f]{8}", loc.stderr)
           is not None, loc.stderr[-400:])
     check("AC2: ...and exits as the signals decide, here clean",
           loc.returncode == 0, (loc.stdout[-200:] + loc.stderr)[-400:])
@@ -2205,6 +2207,29 @@ def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
     check("AC2: ...and its header reads refs/heads/main with an eight-hex sha",
           re.search(r"\(base refs/heads/main @ [0-9a-f]{8}\)", first) is not None,
           first or txt.stderr[-300:])
+
+    # TOOL-dLadderedRemote-2 — the remote is the LADDER'S, not one called `origin`. Every env value
+    # is cleared, so the answer is the repository's own and an ambient export cannot pass an arm.
+    clear = {"GOV_DEFAULT_BRANCH": "", "GOV_REMOTE": ""}
+    run(["git", "remote", "add", "upstream", str(bare)], r)
+    run(["git", "update-ref", "refs/remotes/upstream/main", tip], r)
+    run(["git", "symbolic-ref", "refs/remotes/upstream/HEAD", "refs/remotes/upstream/main"], r)
+    one = run([sys.executable, REPORT_REL], r, env=clear)
+    first = one.stdout.splitlines()[0] if one.stdout.strip() else ""
+    check("AC1 (dLadderedRemote): the ONLY remote named upstream resolves refs/remotes/upstream/main",
+          re.search(r"\(base refs/remotes/upstream/main @ [0-9a-f]{8}\)", first) is not None,
+          first or one.stderr[-300:])
+    run(["git", "remote", "add", "origin", str(bare)], r)
+    two = run([sys.executable, REPORT_REL, "--json"], r, env=clear)
+    check("AC2 (dLadderedRemote): two remotes and none chosen REFUSES with exit 2",
+          two.returncode == 2 and not two.stdout.strip(), f"rc={two.returncode} {two.stdout[-200:]}")
+    check("AC2 (dLadderedRemote): ...and the refusal names GOV_REMOTE",
+          "export GOV_REMOTE=<remote>" in two.stderr, two.stderr[-400:])
+    chosen = run([sys.executable, REPORT_REL], r, env={**clear, "GOV_REMOTE": "upstream"})
+    first = chosen.stdout.splitlines()[0] if chosen.stdout.strip() else ""
+    check("AC3 (dLadderedRemote): GOV_REMOTE=upstream beside origin resolves refs/remotes/upstream/main",
+          re.search(r"\(base refs/remotes/upstream/main @ [0-9a-f]{8}\)", first) is not None,
+          first or chosen.stderr[-300:])
 
 
 def test_ratchet_lookback(tmp: pathlib.Path) -> None:
