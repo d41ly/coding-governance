@@ -1578,5 +1578,102 @@ ck "U22 AC3 ...--session wires the unset driver, exit 0" \
 cleanup
 unset GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
 
+# TOOL-aLevelledCopy-2 — the ssh arm. core.sshCommand is DERIVED from push-main.sh's one
+# GOV_SSH_KEEPALIVE line and set only when no scope sets it. Each fixture's global config is a file of
+# its own and system config is cut off, so this node's config cannot decide an arm; the remote is
+# example.invalid, never contacted, and nothing pushes. WANT is the definition line run alone.
+PM=$(src_of "${ROOTPFX}push-main.sh")
+seed_ssh_fixture() {  # $1 = origin URL ("" = no remote) -> a wired repo holding a copy of push-main.sh
+  newrepo; git config core.hooksPath .githooks
+  export GIT_CONFIG_GLOBAL="$D/.git/fixture-global" GIT_CONFIG_NOSYSTEM=1; : > "$GIT_CONFIG_GLOBAL"
+  mkdir -p "${KP:-.}"; cp "$PM" "${KP}push-main.sh"
+  [ -z "$1" ] || git remote add origin "$1"
+}
+if [ -z "$PM" ]; then
+  echo "skip LC2 arms — push-main.sh is not installed beside this suite, so the ssh arm has nothing to derive from"
+else
+WANT=$(eval "$(grep '^GOV_SSH_KEEPALIVE=' "$PM" | tr -d '\r')"; printf '%s' "${GOV_SSH_KEEPALIVE:-}")
+SSHURL=git@example.invalid:o/r.git
+
+# LC2 AC1 — unset: --session sets the derived value byte-for-byte, logs one event; a re-run is ok, silent.
+seed_ssh_fixture "$SSHURL"
+hl="$(git rev-parse --path-format=absolute --git-common-dir)/health.log"
+out=$(chk --session); got=$(git config --local core.sshCommand 2>/dev/null || true)
+n1=$(grep -c $'\tsshcommand-set\t' "$hl" 2>/dev/null); out2=$(chk --session)
+n2=$(grep -c $'\tsshcommand-set\t' "$hl" 2>/dev/null)
+ck "LC2 AC1 unset -> --session sets the derived value, prints FIXED, logs one sshcommand-set" \
+   "$([ -n "$WANT" ] && [ "$got" = "$WANT" ] && [ "${n1:-0}" = 1 ] && printf '%s' "$out" | grep -q '^FIXED    ssh' && echo 1 || echo 0)"
+ck "LC2 AC1 ...a second --session prints ok and logs nothing more" \
+   "$([ "${n2:-0}" = 1 ] && printf '%s' "$out2" | grep -q '^ok       ssh' && echo 1 || echo 0)"
+cleanup
+
+# LC2 AC2 — the value is a DERIVATION: an edited definition line moves what gets set.
+seed_ssh_fixture "$SSHURL"
+sed -i '/^GOV_SSH_KEEPALIVE=/s/ServerAliveInterval=30/ServerAliveInterval=31/' "${KP}push-main.sh"
+chk --session >/dev/null; got=$(git config core.sshCommand 2>/dev/null || true)
+ck "LC2 AC2 an edited definition line is what gets set (31, not a second literal 30)" \
+   "$(case "$got" in *ServerAliveInterval=31*) echo 1 ;; *) echo 0 ;; esac)"
+cleanup
+
+# LC2 AC3 — an operator value at local OR global scope is never overwritten nor shadowed.
+for sc in local global; do
+  seed_ssh_fixture "$SSHURL"
+  git config --$sc core.sshCommand 'ssh -i ~/.ssh/id_test'
+  chk --fix >/dev/null; out=$(chk --session)
+  got=$(git config --show-scope --get-all core.sshCommand 2>/dev/null | tr -d '\r')
+  ck "LC2 AC3 a $sc operator value stays the only value and the run notes its scope" \
+     "$([ "$got" = "$sc"$'\t''ssh -i ~/.ssh/id_test' ] && printf '%s' "$out" | grep -q "^note     ssh       — core.sshCommand is the operator's ($sc)" && echo 1 || echo 0)"
+  cleanup
+done
+
+# LC2 AC4 — an operator value carrying its own keepalive is ok, named as the operator's.
+seed_ssh_fixture "$SSHURL"
+git config core.sshCommand 'ssh -o ServerAliveInterval=15'
+out=$(chk --check)
+ck "LC2 AC4 an operator value with its own keepalive -> ok, named the operator's" \
+   "$(printf '%s' "$out" | grep -q "^ok       ssh       — core.sshCommand is the operator's" && echo 1 || echo 0)"
+cleanup
+
+# LC2 AC5 — an https remote, and no remote at all, skip and set nothing.
+for url in https://example.invalid/o/r.git ""; do
+  seed_ssh_fixture "$url"
+  out=$(chk --session); got=$(git config core.sshCommand 2>/dev/null || true)
+  ck "LC2 AC5 remote '${url:-none}' -> skip, nothing set" \
+     "$([ -z "$got" ] && printf '%s' "$out" | grep -q '^skip     ssh       — no remote pushes over ssh' && echo 1 || echo 0)"
+  cleanup
+done
+
+# LC2 AC6 — a deleted or duplicated definition line cannot be derived from, and that gates.
+for edit in '/^GOV_SSH_KEEPALIVE=/d' '/^GOV_SSH_KEEPALIVE=/p'; do
+  seed_ssh_fixture "$SSHURL"
+  sed -i "$edit" "${KP}push-main.sh"
+  out=$(chk --check); rc=$?
+  ck "LC2 AC6 definition line edited by '$edit' -> UNWIRED naming the file, exit 1" \
+     "$([ "$rc" = 1 ] && printf '%s' "$out" | grep -q "^UNWIRED  ssh       — cannot derive the keepalive from ${KP}push-main.sh" && echo 1 || echo 0)"
+  cleanup
+done
+
+# LC2 AC7 — --check on an unset ssh tree reports the fix and writes nothing.
+seed_ssh_fixture "$SSHURL"
+out=$(chk --check); rc=$?; got=$(git config core.sshCommand 2>/dev/null || true)
+ck "LC2 AC7 --check unset -> UNWIRED with a Fix naming git config core.sshCommand, exit 1, nothing written" \
+   "$([ "$rc" = 1 ] && [ -z "$got" ] && printf '%s' "$out" | grep -q '^UNWIRED  ssh .*Fix: git config core.sshCommand' && echo 1 || echo 0)"
+cleanup
+
+# LC2 AC8 — the option string is spelled ONCE, in push-main.sh's definition line.
+ck "LC2 AC8 one literal, on the GOV_SSH_KEEPALIVE line; the default reads it; none in the checker" \
+   "$([ "$(grep -c ServerAliveInterval "$PM")" = 1 ] && grep ServerAliveInterval "$PM" | grep -q '^GOV_SSH_KEEPALIVE=' \
+      && [ "$(grep -c 'GIT_SSH_COMMAND:=\$GOV_SSH_KEEPALIVE' "$PM")" = 1 ] \
+      && [ "$(grep -c ServerAliveInterval "$SCRIPT")" = 0 ] && echo 1 || echo 0)"
+
+# LC2 AC10 — no push-main.sh: no pre-push bar to outlast, so skip and set nothing.
+seed_ssh_fixture "$SSHURL"; rm -f "${KP}push-main.sh"
+out=$(chk --session); got=$(git config core.sshCommand 2>/dev/null || true)
+ck "LC2 AC10 no push-main.sh -> skip naming push-main, nothing set" \
+   "$([ -z "$got" ] && printf '%s' "$out" | grep -q '^skip     ssh       — push-main is not adopted' && echo 1 || echo 0)"
+cleanup
+unset GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
+fi
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

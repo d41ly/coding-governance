@@ -3,7 +3,8 @@
 # (with --fix/--session) wire the zero-risk ones. Spec: memory/builds/aWireWarden/.
 #
 #   check-wiring.sh            # --check (default): report; exit 1 if any installed tool is unwired
-#   check-wiring.sh --fix      # wire the safe cases (core.hooksPath when unset); exit reflects remainder
+#   check-wiring.sh --fix      # wire the safe cases (core.hooksPath when unset; core.sshCommand when
+#                              # no scope sets it); exit reflects remainder
 #   check-wiring.sh --session  # like --fix but ALWAYS exit 0 — the SessionStart hook mode
 #   check-wiring.sh --resolve-fragment <f.fragment.json>   # print the fragment's hook path with
 #                              # {kit}/{here} expanded — the value the arms below decide on, twinned
@@ -16,8 +17,9 @@
 # tree with no receipt — gov's own — resolves exactly as the probes always did.
 #
 # SEVERITY IS A VOCABULARY, and only `UNWIRED` gates. `ok` / `skip` / `fixed` / `note` do not. `note`
-# is for a condition that is TRUE and worth printing but is not dormant wiring — today only the eol
-# arm, whose subject is a working copy while the committed bytes are already correct. Reusing
+# is for a condition that is TRUE and worth printing but is not dormant wiring — the eol arm, whose
+# subject is a working copy while the committed bytes are already correct, and the ssh arm, whose
+# subject is an operator's own core.sshCommand that carries no keepalive. Reusing
 # `UNWIRED` there would make the one word that means "this gates" stop meaning it, and a consumer
 # that treats a non-zero exit as a refusal — `.unattended.conf` declares this script as its
 # `WIRING_CHECK` — cannot tell the two apart from the status alone.
@@ -26,8 +28,14 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in. Each auto-fix that sets a value
-# appends one `hookspath-set` or `merge-driver-set` line to the health log under the git common dir,
-# which the orientation card counts; the format is the `health_log_sh` block's header below.
+# appends one `hookspath-set`, `merge-driver-set` or `sshcommand-set` line to the health log under the
+# git common dir, which the orientation card counts; the format is the `health_log_sh` block's header
+# below.
+#
+# The ssh arm sets core.sshCommand to push-main.sh's keepalive, derived from that file, only when no
+# scope sets it and a remote pushes over ssh. WHAT IT DOES NOT CHECK: a GIT_SSH_COMMAND in someone's
+# environment, which outranks core.sshCommand; HTTPS remotes, which hold no ssh socket; and whether
+# the remote's own idle timeout is shorter than the silence the keepalive tolerates.
 KIT_CHECK_WIRING_VERSION=1.27   # gov:kit check-wiring@1.27 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
@@ -1196,6 +1204,76 @@ check_merge_ours() {
   fi
 }
 
+# --- the ssh arm: a push outlasts its own pre-push bar ----------------------------------------------
+# The pre-push gate runs inside `git push` AFTER git opened the SSH connection, so the socket idles
+# for the whole bar and the remote drops it. push-main.sh defends its own pushes with a keepalive in
+# GIT_SSH_COMMAND; this gives every other push from the tree the same one through a repo-local
+# core.sshCommand. The value is DERIVED from push-main.sh's one `GOV_SSH_KEEPALIVE='...'` line, read
+# with sed and never sourced, so the option string is spelled once and nothing in that file runs
+# here. The option this arm treats as "a keepalive" is the first `-o` key of that value, derived too.
+# An operator value at ANY scope is never overwritten; a repo-local one would shadow a global
+# identity. (TOOL-aLevelledCopy-2)
+check_ssh_keepalive() {
+  local pm n want ka r url pre host hit="" got scope cur
+  pm=$(first_of "$(resolve_receipt_path "" push-main.sh)" "${KIT_REL:+$KIT_REL/}push-main.sh")
+  if [ -z "$pm" ]; then
+    echo "skip     ssh       — push-main is not adopted here, so no pre-push bar holds a push open"
+    return
+  fi
+  n=$(grep -c '^GOV_SSH_KEEPALIVE=' "$pm" 2>/dev/null); n=${n:-0}
+  want=""
+  [ "$n" = 1 ] && want=$(sed -n "s/^GOV_SSH_KEEPALIVE='\([^']*\)'[[:space:]]*\$/\1/p" "$pm")
+  if [ -z "$want" ]; then
+    echo "UNWIRED  ssh       — cannot derive the keepalive from $pm: $n line(s) open GOV_SSH_KEEPALIVE=, and the contract is exactly one single-quoted line"
+    unwired=$((unwired+1))
+    return
+  fi
+  ka=${want#* -o }; ka=${ka%%=*}
+  # SSH-shaped: an ssh:// family URL, or scp form `[user@]host:path` with no `/` before the colon
+  # and a host longer than one character, so a drive path like `C:/x` reads as a path.
+  while IFS= read -r r; do
+    [ -n "$r" ] || continue
+    while IFS= read -r url; do
+      url=${url%$'\r'}
+      case "$url" in
+        ssh://*|git+ssh://*|ssh+git://*) hit=$url ;;
+        *://*) ;;
+        *:*) pre=${url%%:*}; host=${pre#*@}
+             case "$pre" in */*) ;; *) [ "${#host}" -gt 1 ] && hit=$url ;; esac ;;
+      esac
+      [ -n "$hit" ] && break
+    done <<< "$(git remote get-url --push --all "$r" 2>/dev/null)"
+    [ -n "$hit" ] && break
+  done <<< "$(git remote 2>/dev/null)"
+  if [ -z "$hit" ]; then
+    echo "skip     ssh       — no remote pushes over ssh"
+    return
+  fi
+  got=$(git config --show-scope --get core.sshCommand 2>/dev/null || true)
+  got=${got%$'\r'}
+  if [ -z "$got" ]; then
+    if [ "$DO_FIX" = 1 ]; then
+      if git config core.sshCommand "$want"; then
+        echo "FIXED    ssh       — set core.sshCommand (local) -> push-main's keepalive"
+        CW_HEALTH_LOG=${CW_HEALTH_LOG:-$(resolve_health_log "$ROOT")}
+        add_health_event "$CW_HEALTH_LOG" check-wiring sshcommand-set "core.sshCommand -> push-main keepalive · mode $MODE"
+      fi
+    else
+      echo "UNWIRED  ssh       — core.sshCommand is unset at every scope and remote '$r' pushes over ssh, so a long pre-push bar can lose the socket. Fix: git config core.sshCommand '$want'"
+      unwired=$((unwired+1))
+    fi
+    return
+  fi
+  scope=${got%%$'\t'*}; cur=${got#*$'\t'}
+  if [ "$cur" = "$want" ]; then
+    echo "ok       ssh       — core.sshCommand carries the keepalive ($scope)"
+  elif [ -n "$ka" ] && [ "${cur#*"$ka"}" != "$cur" ]; then
+    echo "ok       ssh       — core.sshCommand is the operator's ($scope) and carries its own keepalive"
+  else
+    echo "note     ssh       — core.sshCommand is the operator's ($scope); NOT overwriting; it carries no keepalive, so a long pre-push bar can lose the socket"
+  fi
+}
+
 # --- Check S: the machine-global /session-kickoff install matches the tracked engine ---------------
 # CONTENT, not link-ness. The obvious check — is the install a junction or a symlink — cannot be
 # written portably here: under MSYS an NTFS junction is not reported by `test -L`, it presents as an
@@ -1421,6 +1499,7 @@ check_recall_opened
 check_card
 check_merge_rows
 check_merge_ours
+check_ssh_keepalive
 check_eol
 check_skill_install
 check_backlog_stragglers

@@ -1,11 +1,12 @@
 # TOOL-aLevelledCopy-2 — check-wiring sets core.sshCommand from push-main's keepalive string
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 1 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aLevelledCopy-2-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aLevelledCopy-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1-1-spec-brief.md) | journal | TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-3 DEPL-aLevelledCopy-1 |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1-2-build-brief.md) | journal | TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-3 DEPL-aLevelledCopy-1 |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-1.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1.md) | research | TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-3 DEPL-aLevelledCopy-1 |
@@ -117,11 +118,14 @@ arm adds about 2 s.
 | Identifier | Kind | Cell |
 |---|---|---|
 | `check_ssh_keepalive` | function in `check-wiring.sh` | `sh.function` |
-| `GOV_SSH_KEEPALIVE` | shell variable in `push-main.sh` | UNVERIFIED whether `.lexicon.conf` grades shell variables; checked with `lexicon.py --suggest` at build |
+| `GOV_SSH_KEEPALIVE` | shell variable in `push-main.sh` | none: `.lexicon.conf` declares no shell-variable surface |
+| `seed_ssh_fixture` | function in `check-wiring.test.sh` | `sh.function` |
 | `sshcommand-set` | health-log event token | `^[a-z][a-z0-9-]*$` (I3) |
 
 `python tools/lexicon/lexicon.py --suggest check_ssh_keepalive --as sh.function` answered OK on
-2026-10-09.
+2026-10-09, and `--suggest seed_ssh_fixture --as sh.function` answered OK at build. `--as
+sh.variable` is refused as an unknown surface, the closed set being function, type, file and
+constant, so the variable is not graded.
 
 ### Observed adopter state (read 2026-10-09)
 
@@ -243,6 +247,11 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft, from the build's spec brief.
+- rev-2 · 2026-10-09 · build: §4 Inventory resolves the UNVERIFIED lexicon row for
+  `GOV_SSH_KEEPALIVE`, since the declaration has no shell-variable surface, and adds the suite's one
+  fixture helper `seed_ssh_fixture`. The arm treats a value as carrying a keepalive when it holds
+  the first `-o` key of the derived value, so `check-wiring.sh` spells no option name and AC8 holds.
+  Status CLOSED.
 
 ## 10. Reuse audit
 

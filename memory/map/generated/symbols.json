@@ -4138,6 +4138,11 @@
       "file": "tools/hooks/agent-cap.test.sh"
     },
     {
+      "id": "check_ssh_keepalive",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
       "id": "check_staged_backlog",
       "kind": "function",
       "file": ".githooks/straggler-guard.sh"
@@ -16871,6 +16876,11 @@
       "id": "seed_spec_h1",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "seed_ssh_fixture",
+      "kind": "function",
+      "file": "tools/check-wiring.test.sh"
     },
     {
       "id": "seed_su_claim",
