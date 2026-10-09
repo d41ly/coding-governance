@@ -140,6 +140,8 @@ Cite ids, never line numbers.
 | [TOOL-aLeakedHandle-4](../builds/aLeakedHandle/BACKLOG.md) | OPEN | — | — | 2026-09-10 | THE CARRIED SITES IN memory/project/substitution-fed-loops.txt ARE A… |
 | [TOOL-aLeakedHandle-5](../builds/aLeakedHandle/BACKLOG.md) | OPEN | — | — | 2026-09-10 | A LEG KILLED WITH **NO DECLARED CEILING** STILL NAMES ONLY AN EXIT… |
 | [TOOL-aLevelledCopy-4](../builds/aLevelledCopy/BACKLOG.md) | OPEN | LOW | — | 2026-10-09 | tools/push-main.sh sets GIT_SSH_COMMAND whenever the environment has… |
+| [TOOL-aLevelledCopy-5](../builds/aLevelledCopy/BACKLOG.md) | OPEN | LOW | — | 2026-10-09 | the eol-only predicate is spelled twice:… |
+| [TOOL-aLevelledCopy-6](../builds/aLevelledCopy/BACKLOG.md) | OPEN | LOW | — | 2026-10-09 | WIRE-INTO-PROJECT.md's wiring-health paragraph lists what… |
 | [TOOL-aLexedStripper-3](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | STILL OPEN after TOOL-dMispairedQuote-1, which deliberately left this… |
 | [TOOL-aLexedStripper-4](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | STILL OPEN after TOOL-dMispairedQuote-1, which changed that function's… |
 | [TOOL-aLexedStripper-7](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | scan_js_definitions in tools/codebase-map/map_lib.py strips BLOCK… |

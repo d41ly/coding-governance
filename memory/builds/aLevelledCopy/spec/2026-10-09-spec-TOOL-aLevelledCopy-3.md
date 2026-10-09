@@ -1,11 +1,12 @@
 # TOOL-aLevelledCopy-3 — gov's executed hooks are 100755, and check-wiring grades a hook's index mode
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 2 · ratified 2026-10-09
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 2 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aLevelledCopy-3-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aLevelledCopy-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1-1-spec-brief.md) | journal | TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 DEPL-aLevelledCopy-1 |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1-2-build-brief.md) | journal | TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 DEPL-aLevelledCopy-1 |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-1.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1.md) | research | TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 DEPL-aLevelledCopy-1 |
@@ -117,7 +118,11 @@ The flow, in order:
    filesystem's and are not graded`, and return.
 2. **Population.** `git -C "$supplier" ls-files -s -- "$dir"` at stage 0, kept where the basename is
    in `GIT_HOOK_NAMES`. A failed `ls-files` prints `note ... UNKNOWN` and returns; it never prints
-   `ok`. Mode 120000 is a symlink and is not graded.
+   `ok`. Mode 120000 is a symlink and is not graded. The listing runs from inside the directory
+   (`git -C "$dir" ls-files -s`), so a path carrying a `/` is a nested file git never runs as a hook
+   and is dropped, and `--show-prefix` turns the rest back into checkout-relative paths. A population
+   of none prints `skip     hooks     — <top> tracks no hook-named file directly in <shown>, so no mode
+   was graded`, never `ok` over nothing.
 3. **Own checkout** (`[ "$supplier" -ef "$ROOT" ]`, compared with `-ef` because node a's TEMP is an
    8.3 short name and a string compare is wrong there). For each 100644 hook:
    - `--check` and `--session`: `UNWIRED  hooks     — <path> is tracked 100644; git on a POSIX node
@@ -130,7 +135,8 @@ The flow, in order:
      prints `UNWIRED` with the command to run by hand, counted.
    - No 100644 hook: one `ok       hooks     — every tracked hook in <shown> is executable` line.
 4. **Another checkout.** A 100644 hook prints `note     hooks     — <hook> is tracked 100644 in
-   <supplier>, which supplies <shown>; that checkout owns the fix`. Never counted. This mirrors
+   <supplier>, which supplies <shown>; that checkout owns the fix`. Never counted. With no 100644
+   hook there, it prints the same `ok` line as step 3. This mirrors
    `check_hook_blobs`, whose header records why a sibling checkout's state never gates here: every
    linked worktree of gov names the primary's directory by absolute path, so until the primary takes
    this landing an `UNWIRED` there would refuse every unattended run's `WIRING_CHECK`.
@@ -299,6 +305,11 @@ the arm RED, then restoring it.
 
 - rev-1 · 2026-10-09 · initial draft from the build's spec brief, with F1 to F3 resolved under the
   mandate and the AC6 fixture's filesystem measured.
+- rev-2 · 2026-10-09 · build: §4 The arm states two cases rev-1 left unwritten. A supplier that
+  tracks no hook-named file in the directory is a `skip`, because rev-1's "no 100644 hook: ok" read
+  literally printed `ok` over an empty population, the vacuous class AC7 exists to refuse. Another
+  checkout with no 100644 hook prints the step-3 `ok` line. The listing's run-from-the-directory
+  shape is written down. Status CLOSED.
 
 ## 10. Reuse audit
 

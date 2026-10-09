@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: tooling+deployer
 roster: TOOL+DEPL
-ids: DEPL-aLevelledCopy-1 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4
+ids: DEPL-aLevelledCopy-1 DEPL-aLevelledCopy-2 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4 TOOL-aLevelledCopy-5 TOOL-aLevelledCopy-6
 authorized-by: prompt
 ---
 
@@ -55,8 +55,8 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 4 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
-ids DEPL-aLevelledCopy-1 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
+ids DEPL-aLevelledCopy-1 DEPL-aLevelledCopy-2 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4 TOOL-aLevelledCopy-5 TOOL-aLevelledCopy-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -64,10 +64,10 @@ ids DEPL-aLevelledCopy-1 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelle
 | [DEPL-aLevelledCopy-1 — govkit update carries gov's exec bit onto an existing engine row](spec/2026-10-09-spec-DEPL-aLevelledCopy-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aLevelledCopy-1 — receipt-sync grades a mismatched row through the target's clean filter](spec/2026-10-09-spec-TOOL-aLevelledCopy-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aLevelledCopy-2 — check-wiring sets core.sshCommand from push-main's keepalive string](spec/2026-10-09-spec-TOOL-aLevelledCopy-2.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-09 |
-| [TOOL-aLevelledCopy-3 — gov's executed hooks are 100755, and check-wiring grades a hook's index mode](spec/2026-10-09-spec-TOOL-aLevelledCopy-3.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aLevelledCopy-3 — gov's executed hooks are 100755, and check-wiring grades a hook's index mode](spec/2026-10-09-spec-TOOL-aLevelledCopy-3.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 8 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

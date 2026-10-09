@@ -36,7 +36,9 @@ newrepo() {   # cd (in THIS shell) into a fresh repo with a tracked .githooks/pr
   D=$(mktemp -d); cd "$D" || exit 2
   git init -q -b main; git config core.autocrlf false; git config user.email t@e; git config user.name t
   mkdir .githooks; printf '#!/bin/sh\nexit 0\n' > .githooks/pre-commit; chmod +x .githooks/pre-commit
-  git add -A; git commit -q -m init
+  # `--chmod=+x`, not the filesystem bit: on a core.fileMode=false host `git add` stages 100644 from
+  # an executable file, and the hook-mode arm would then grade every fixture here (TOOL-aLevelledCopy-3 S7).
+  git add --chmod=+x .githooks/pre-commit; git commit -q -m init
 }
 cleanup() { cd "$REPO"; [ -n "$D" ] && rm -rf "$D"; [ -n "$OOT" ] && rm -rf "$OOT"; D=""; OOT=""; }
 chk() { bash "$SCRIPT" "$@" 2>/dev/null; }   # run the checker, drop stderr noise
@@ -1674,6 +1676,88 @@ ck "LC2 AC10 no push-main.sh -> skip naming push-main, nothing set" \
 cleanup
 unset GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
 fi
+
+# ---- TOOL-aLevelledCopy-3: a tracked hook's INDEX mode -----------------------------------------
+# Every mode below is STAGED (`git add --chmod`, `update-index --chmod`), never taken from the
+# filesystem, so the fixture is the same on a core.fileMode=false host and on a POSIX one. Each arm
+# greps the `hooks` lines: other arms print their own lines in these fixtures.
+seed_mode_fixture() {   # hooks pre-commit + post-merge at 100644, pre-push 100755, two non-hooks 100644
+  newrepo; git config core.hooksPath .githooks
+  printf '#!/bin/sh\nexit 0\n' > .githooks/post-merge; printf '#!/bin/sh\nexit 0\n' > .githooks/pre-push
+  printf 'x=1\n' > .githooks/gate-env.sh; printf '#!/bin/sh\nexit 0\n' > .githooks/pre-commit.test.sh
+  git add --chmod=-x .githooks/post-merge .githooks/gate-env.sh .githooks/pre-commit.test.sh
+  git add --chmod=+x .githooks/pre-push; git update-index --chmod=-x .githooks/pre-commit
+  git commit -q -m modes
+}
+modelines() { printf '%s\n' "$1" | grep '^UNWIRED  hooks.*tracked 100644'; }
+
+newrepo
+ck "LC3 AC9 newrepo stages its pre-commit 100755 whatever core.fileMode says" \
+   "$(git ls-files -s .githooks/pre-commit | grep -q '^100755 ' && echo 1 || echo 0)"
+cleanup
+
+seed_mode_fixture
+m=$(modelines "$(chk --check)")
+ck "LC3 AC2 --check names exactly the two 100644 hooks, pre-commit and post-merge" \
+   "$([ "$(printf '%s\n' "$m" | grep -c .)" = 2 ] && printf '%s' "$m" | grep -q '\.githooks/pre-commit is' \
+      && printf '%s' "$m" | grep -q '\.githooks/post-merge is' \
+      && ! printf '%s' "$m" | grep -q -e pre-push -e gate-env -e '\.test\.sh' && echo 1 || echo 0)"
+# AC3: --fix over a hook carrying an UNSTAGED edit moves the mode and nothing else.
+oids() { git ls-files -s .githooks/pre-commit .githooks/post-merge | awk '{print $2}' | tr '\n' ' '; }
+o_before=$(oids); printf '# unstaged\n' >> .githooks/pre-commit
+hl="$(git rev-parse --path-format=absolute --git-common-dir)/health.log"
+out=$(chk --fix); n1=$(grep -c $'\thookmode-set\t' "$hl" 2>/dev/null)
+modes=$(git ls-files -s .githooks/pre-commit .githooks/post-merge | awk '{print $1}' | tr '\n' ' ')
+cached=$(git diff --cached --numstat -- .githooks | awk '{print $1 $2}' | tr '\n' ' ')
+ck "LC3 AC3 --fix stages 100755 for both, oids unmoved, numstat 0 0, the edit unstaged, two hookmode-set" \
+   "$([ "$modes" = '100755 100755 ' ] && [ "$(oids)" = "$o_before" ] && [ "$cached" = '00 00 ' ] \
+      && git diff --numstat -- .githooks/pre-commit | grep -q $'^1\t0\t' && [ "${n1:-0}" = 2 ] \
+      && [ "$(printf '%s\n' "$out" | grep -c '^FIXED    hooks')" = 2 ] && echo 1 || echo 0)"
+out2=$(chk --fix); n2=$(grep -c $'\thookmode-set\t' "$hl" 2>/dev/null)
+ck "LC3 AC3 ...a second --fix repairs nothing and logs nothing" \
+   "$([ "${n2:-0}" = 2 ] && ! printf '%s' "$out2" | grep -q '^FIXED    hooks' && echo 1 || echo 0)"
+cleanup
+
+seed_mode_fixture
+hl="$(git rev-parse --path-format=absolute --git-common-dir)/health.log"
+out=$(chk --session); rc=$?; n1=$(grep -c $'\thookmode-set\t' "$hl" 2>/dev/null)   # no log at all is zero
+ck "LC3 AC4 --session reports both, exits 0, stages no mode and logs no event" \
+   "$([ "$rc" = 0 ] && [ "$(modelines "$out" | grep -c .)" = 2 ] \
+      && git ls-files -s .githooks/pre-commit | grep -q '^100644 ' && [ "${n1:-0}" = 0 ] && echo 1 || echo 0)"
+cleanup
+
+# AC5: a linked worktree whose core.hooksPath names the PRIMARY's directory grades the primary's
+# index and only notes it, as check_hook_blobs does for a sibling checkout.
+seed_mode_fixture
+OOT=$(mktemp -d); git worktree add -q -b wt "$OOT/wt" 2>/dev/null
+git config core.hooksPath "$D/.githooks"; top=$(git rev-parse --show-toplevel)
+out=$(cd "$OOT/wt" && chk --check)
+ck "LC3 AC5 another checkout's 100644 hook is a note naming that checkout, never UNWIRED" \
+   "$(printf '%s\n' "$out" | grep '^note     hooks' | grep -F "$top" | grep -q 'pre-commit is tracked 100644' \
+      && [ -z "$(modelines "$out")" ] && echo 1 || echo 0)"
+cleanup
+
+# AC6: the defect itself, on a filesystem that honours the exec bit. A Windows git runs a 100644
+# hook anyway, so there the dormancy is not observable and the arm says so instead of passing.
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*)
+    echo "skip LC3 AC6 — $(uname -s) runs a 100644 hook anyway, so a dormant hook cannot be observed here; no pass counted" ;;
+  *)
+    newrepo; printf '#!/bin/sh\nexit 1\n' > .githooks/pre-commit; chmod -x .githooks/pre-commit
+    git add --chmod=-x .githooks/pre-commit; git commit -q -m dormant; git config core.hooksPath .githooks
+    git commit -q --allow-empty -m before >/dev/null 2>&1; rc1=$?
+    chk --fix >/dev/null; git commit -q --allow-empty -m after >/dev/null 2>&1; rc2=$?
+    ck "LC3 AC6 a 100644 hook that exits 1 is skipped by git, and refuses the commit after --fix" \
+       "$([ "$rc1" = 0 ] && [ "$rc2" != 0 ] && echo 1 || echo 0)"
+    cleanup ;;
+esac
+
+newrepo; OOT=$(mktemp -d); printf '#!/bin/sh\nexit 0\n' > "$OOT/pre-commit"; git config core.hooksPath "$OOT"
+out=$(chk --check)
+ck "LC3 AC7 a hooks dir no checkout tracks is an announced skip, never an ok about modes" \
+   "$(printf '%s' "$out" | grep -q '^skip     hooks     — .*tracked by no checkout' \
+      && ! printf '%s' "$out" | grep -q '^ok .*executable' && echo 1 || echo 0)"
+cleanup
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

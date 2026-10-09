@@ -4,8 +4,9 @@
 #
 #   check-wiring.sh            # --check (default): report; exit 1 if any installed tool is unwired
 #   check-wiring.sh --fix      # wire the safe cases (core.hooksPath when unset; core.sshCommand when
-#                              # no scope sets it); exit reflects remainder
-#   check-wiring.sh --session  # like --fix but ALWAYS exit 0 — the SessionStart hook mode
+#                              # no scope sets it; a hook this checkout tracks 100644 staged 100755,
+#                              # blob unchanged, for the operator to commit); exit reflects remainder
+#   check-wiring.sh --session  # like --fix but ALWAYS exit 0 and stages no hook mode — the SessionStart hook mode
 #   check-wiring.sh --resolve-fragment <f.fragment.json>   # print the fragment's hook path with
 #                              # {kit}/{here} expanded — the value the arms below decide on, twinned
 #                              # on settings-merge.py so the hook-destinations gate can assert parity.
@@ -28,9 +29,15 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in. Each auto-fix that sets a value
-# appends one `hookspath-set`, `merge-driver-set` or `sshcommand-set` line to the health log under the
-# git common dir, which the orientation card counts; the format is the `health_log_sh` block's header
-# below.
+# appends one `hookspath-set`, `merge-driver-set`, `sshcommand-set` or `hookmode-set` line to the
+# health log under the git common dir, which the orientation card counts; the format is the
+# `health_log_sh` block's header below.
+#
+# The hook-mode arm grades the INDEX mode of every tracked file in the hooks directory whose name is
+# a githooks(5) hook: 100644 there is UNWIRED in this checkout's own directory and a `note` in
+# another checkout's; `--fix` stages 100755 (one health event per hook) and `--session` only
+# reports. WHAT IT DOES NOT CHECK: the filesystem exec bit, a directory no checkout tracks (a skip),
+# a symlinked hook, or a hook name git adds after the pinned list.
 #
 # The ssh arm sets core.sshCommand to push-main.sh's keepalive, derived from that file, only when no
 # scope sets it and a remote pushes over ssh. WHAT IT DOES NOT CHECK: a GIT_SSH_COMMAND in someone's
@@ -540,6 +547,81 @@ check_hook_blobs() { # $1 = resolved hooks dir, $2 = the configured value as wri
   done
 }
 
+# --- the hooks' INDEX mode (TOOL-aLevelledCopy-3) ------------------------------------------------
+# A hook tracked 100644 is checked out non-executable on every POSIX clone, and git there skips it
+# with no more than a hint: the branch guard, the commit-msg check and the pre-push bar all dormant.
+# A Windows node runs it anyway, which is how gov shipped its own four hooks 100644 unnoticed.
+#
+# THE INDEX IS GRADED, never the filesystem bit: `[ -x ]` is true for every file on Windows and on
+# WSL's `/mnt/c`, so it cannot red on the host that hid the defect. The index of the checkout that
+# SUPPLIES the directory is read, by the same own-versus-another rule as `check_hook_blobs`: another
+# checkout's 100644 is a `note`, because gov's linked worktrees name the primary's directory by
+# absolute path and an UNWIRED there would refuse every unattended run until the primary moves.
+#
+# The repair is `--fix` only (F1: a SessionStart hook stages nothing) and uses `--cacheinfo` with the
+# oid the index already holds, because `--chmod=+x` re-hashes the working file and would stage an
+# unstaged edit along with the mode (F3, measured).
+#
+# WHAT THIS DOES NOT CHECK: a hook directory no checkout tracks (announced as a skip); a hook git
+# adds after githooks(5) as pinned below (PINNED, so it is not graded until the list grows); a
+# symlinked hook (mode 120000); and whether the hook's interpreter exists on the POSIX host.
+GIT_HOOK_NAMES="applypatch-msg pre-applypatch post-applypatch pre-commit pre-merge-commit
+prepare-commit-msg commit-msg post-commit pre-rebase post-checkout post-merge pre-push pre-receive
+update proc-receive post-receive post-update reference-transaction push-to-checkout pre-auto-gc
+post-rewrite sendemail-validate fsmonitor-watchman p4-changelist p4-prepare-changelist
+p4-post-changelist p4-pre-submit post-index-change"
+check_hook_modes() { # $1 = resolved hooks dir, $2 = the configured value as written
+  local dir="$1" shown="$2" rp top pfx ls mode oid stage rel path got n=0 bad=0
+  local names=" ${GIT_HOOK_NAMES//$'\n'/ } "
+  rp=$(git -C "$dir" rev-parse --show-toplevel --show-prefix 2>/dev/null) || rp=""
+  top=${rp%%$'\n'*}; pfx=""; case "$rp" in *$'\n'*) pfx=${rp#*$'\n'} ;; esac
+  top=${top%$'\r'}; pfx=${pfx%$'\r'}
+  if [ -z "$top" ]; then
+    echo "skip     hooks     — $shown is tracked by no checkout; its modes are the filesystem's and are not graded"
+    return
+  fi
+  # Paths print relative to $dir, so a nested file carries a `/` and is not a hook git would run.
+  if ! ls=$(git -C "$dir" ls-files -s 2>/dev/null); then
+    echo "note     hooks     — hook modes in $shown: UNKNOWN, git ls-files failed in $top"
+    return
+  fi
+  while read -r mode oid stage rel; do
+    [ "$stage" = 0 ] || continue
+    case "$rel" in */*|'') continue ;; esac
+    case "$names" in *" $rel "*) ;; *) continue ;; esac
+    [ "$mode" = 120000 ] && continue
+    n=$((n+1))
+    [ "$mode" = 100644 ] || continue
+    bad=$((bad+1)); path="$pfx$rel"
+    if ! [ "$top" -ef "$ROOT" ]; then
+      echo "note     hooks     — $rel is tracked 100644 in $top, which supplies $shown; that checkout owns the fix"
+      continue
+    fi
+    if [ "$MODE" = fix ]; then
+      git update-index --cacheinfo "100755,$oid,$path" 2>/dev/null && chmod +x "$path" 2>/dev/null
+      got=$(git ls-files -s -- "$path" 2>/dev/null | awk '{print $1}')
+      if [ "$got" = 100755 ]; then
+        echo "FIXED    hooks     — $path staged 100755 (blob unchanged); commit it"
+        CW_HEALTH_LOG=${CW_HEALTH_LOG:-$(resolve_health_log "$ROOT")}
+        add_health_event "$CW_HEALTH_LOG" check-wiring hookmode-set "$path 100644 -> 100755 · mode $MODE"
+        continue
+      fi
+      echo "UNWIRED  hooks     — $path is tracked 100644 and the repair read back '${got:-nothing}'. Fix by hand: git update-index --cacheinfo 100755,$oid,$path"
+    else
+      echo "UNWIRED  hooks     — $path is tracked 100644; git on a POSIX node will not run it. Fix: bash ${KIT_REL:+$KIT_REL/}$(basename "$0") --fix, then commit the mode change"
+    fi
+    unwired=$((unwired+1))
+  done <<EOF
+$ls
+EOF
+  # LIVENESS: a population of none is a skip, never `ok` over nothing.
+  if [ "$n" = 0 ]; then
+    echo "skip     hooks     — $top tracks no hook-named file directly in $shown, so no mode was graded"
+  elif [ "$bad" = 0 ]; then
+    echo "ok       hooks     — every tracked hook in $shown is executable"
+  fi
+}
+
 # --- Check H: git hooks (core.hooksPath) ---------------------------------------------------------
 check_hooks() {
   if ! { [ -f .githooks/pre-commit ] && git ls-files --error-unmatch .githooks/pre-commit >/dev/null 2>&1; }; then
@@ -553,6 +635,7 @@ check_hooks() {
     if [ -n "$curdir" ] && [ -f "$curdir/pre-commit" ]; then
       echo "ok       hooks     — core.hooksPath -> $cur"
       check_hook_blobs "$curdir" "$cur"
+      check_hook_modes "$curdir" "$cur"
     else
       echo "UNWIRED  hooks     — core.hooksPath='$cur' resolves to no pre-commit; NOT overwriting (deliberate?). Fix: git config core.hooksPath .githooks"
       unwired=$((unwired+1))
@@ -571,6 +654,7 @@ check_hooks() {
     echo "UNWIRED  hooks     — core.hooksPath unset; .githooks gates (incl. branch guard) dormant. Fix: git config core.hooksPath .githooks"
     unwired=$((unwired+1))
   fi
+  check_hook_modes "$ROOT/.githooks" .githooks
 }
 
 # S2 runs ONCE, before any arm, so the resolved path and its scope are on the record BEFORE any
