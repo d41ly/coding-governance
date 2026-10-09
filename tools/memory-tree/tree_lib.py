@@ -16,6 +16,7 @@ The module name follows the codebase-map kit's `map_lib.py` and the runlog kit's
 """
 from __future__ import annotations
 
+import os
 import pathlib
 import re
 
@@ -223,3 +224,17 @@ def parse_spec_h1(rel: str, text: str, memory_root: str, families) -> tuple[int,
         if m:
             return n, m.group("id")
     return None
+
+
+def build_git_env() -> dict:
+    """The environment every pinned git call in this kit runs under — the kit's ONE pin policy.
+
+    `GIT_GRAFT_FILE=/dev/null` is the spelling the unattended kit's history leg uses and it works
+    under Git for Windows, whose MSYS layer maps the name. A graft file re-parents commits, so
+    without this pin every ancestry answer could be honest about a sha and wrong about what that sha
+    means. Callers add `--no-replace-objects` to the argv. Read by `transition_audit.py` and
+    `routed_commits.py`; it moved here from the first when the second arrived (TOOL-aRoutedQuill-3).
+    """
+    env = dict(os.environ)
+    env["GIT_GRAFT_FILE"] = "/dev/null"
+    return env

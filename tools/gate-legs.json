@@ -467,6 +467,21 @@
     "ceiling": 300
   },
   {
+    "name": "routed-commits selftest",
+    "argv": [
+      "python3",
+      "{prefix}/memory-tree/routed_commits.py",
+      "--selftest"
+    ],
+    "guard": [
+      "{prefix}/lib/",
+      "{prefix}/memory-tree/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
     "name": "row-grammar selftest",
     "argv": [
       "python3",
@@ -983,6 +998,18 @@
     "guard": [],
     "ceiling": 5400,
     "doc_reads": ["memory/builds/", "memory/project/"]
+  },
+  {
+    "name": "routed commits name a specced unit",
+    "argv": [
+      "python3",
+      "{prefix}/memory-tree/routed_commits.py"
+    ],
+    "impure": "its verdict is a function of the commit GRAPH and of the GATE_PUSH_BASE the pre-push hook exports, not of the tree alone: two commits with one tree and different messages grade differently, so a verdict cached on a tree must not be reused (TOOL-aRoutedQuill-3).",
+    "chunk": "declarations",
+    "subject": "repo",
+    "guard": [],
+    "ceiling": 300
   },
   {
     "name": "brief-recorded",

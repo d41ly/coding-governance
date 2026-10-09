@@ -1,11 +1,12 @@
 # TOOL-aRoutedQuill-3 — every pushed commit that touches a product path names a unit specced before it
 
-**Status:** INPROGRESS · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4 · ratified 2026-10-09
+**Status:** CLOSED · rev-5 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aRoutedQuill-3-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aRoutedQuill-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-3-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-3-build-brief.md) | journal | — |
 
@@ -67,7 +68,11 @@ push boundary on the pushed range, and everywhere else over the history since a 
   SUBJECT names the newest unit id the pushed range's own commits attribute, read by S2 over
   `<remote>/<branch>..HEAD`, and the commit carries a `Pass: none` trailer so the pass-order history
   leg's `read_attribution_tokens` does not take it for that unit's pass. A range attributing no id
-  leaves the mint subject with none, and the leg reds it as it reds the range. Observed by AC11.
+  leaves the mint subject with none, and the leg reds it as it reds the range. The lander reads
+  that id from `routed_commits.py --newest-unit <range>`, found through its sibling-kit resolver the
+  way it finds the lexicon and govkit kits, and spells it `mint: kit versions onto <remote>/<branch>
+  at <sha8> for <id>`; no python or no memory-tree kit beside it leaves the subject as it was.
+  Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -165,7 +170,7 @@ push bar runs it again with the hook's own value. An unresolvable value widens a
 
 ```text
 routed-commits: <RANGE <base8>..<head8>|WHOLE (<why>)> · graded <n> · <x> exempt by the <cutoff> cutoff · <m> merge(s) · <r> not routed · <w> waived · <k> spec id(s) at HEAD · ROUTED_PATHS <value>
-routed-commits: graded 0 — the range holds <t> commit(s) and none of its non-merge commits touches ROUTED_PATHS
+routed-commits: graded 0 — the range holds <t> commit(s) and none of its non-merge commits on or after the <cutoff> cutoff touches ROUTED_PATHS <value>
 routed-commits FAILED — a commit touching ROUTED_PATHS names no unit specced before it:
   <sha8> <subject> — <ids or "no unit id"> — <reason>
 ```
@@ -193,6 +198,13 @@ cutoff. Gov declares the cutoff as the date this unit lands, in the commit that 
 | `test_routed_path` | function, the entry match | `py.function`; answered OK |
 | `check_routed_commits` | function, the grade | `py.function`; answered OK |
 | `run_selftest` | function | `py.function`; answered OK |
+| `read_newest_unit` | function, the `--newest-unit` verb S11 reads | `py.function`; answered OK |
+| `run_git` | function, the pinned and counted git call | `py.function`; answered OK |
+| `load_conf` · `check_conf` | functions, the conf read and its S7 refusals | `py.function`; answered OK |
+| `build_id_re` · `extract_unit_ids` · `extract_families` | functions, the S2 id reading | `py.function`; answered OK |
+| `build_fixture` · `set_fixture_conf` | functions, the self-test's one-`fast-import` fixture | `py.function`; answered OK |
+| `Refusal` | type, the S7 exit 2 | `py.type` |
+| `read_mint_unit` | shell function in `tools/push-main.sh` | `sh.function`; answered OK |
 | `ROUTED_COMMIT_CUTOFF` | conf key | none: conf keys carry no naming cell |
 | `ROUTED_COMMIT_WAIVED` | conf key | none, as above |
 | `routed commits name a specced unit` | gate leg, `subject = "repo"`, no guard, no `doc_reads`, `history_depth = "full"` | none |
@@ -364,6 +376,12 @@ AC10 is a direct observation of this repository and adds no arm.
   F2's resolution states rather than the trailer-replaces-subject rule that would red such a mint.
   Files touched gains `tools/push-main.sh` and `memory/guides/SESSION-KICKOFF.md`, Gates gains
   `push-main self-test`, and Rollout re-stamps the kickoff manifest for the watched conf and legs.
+- rev-5 · 2026-10-09 · §2 · §4 · the build: S11 names how the lander reads the unit — a
+  `--newest-unit <range>` verb on this file, reached through push-main's sibling-kit resolver — and
+  the subject's ` for <id>` spelling; the zero line names the cutoff, because a range of exempt
+  commits also grades zero and "touches ROUTED_PATHS" alone would be false there; the Inventory
+  gains the helpers the build wrote. `FAMILIES` prefixes are validated as letters before they reach
+  a regex, the conf-value-into-a-regex class.
 
 ## 10. Reuse audit
 

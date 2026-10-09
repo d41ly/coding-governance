@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-09T23:07:21+03:00 @ 6b02b9d3005b0fab945d4033a3f75f9a6ebc4e18
+last-audit: 2026-10-10T00:01:53+03:00 @ 82edc653e345a6806ae334df2c60bb24bd9c372e
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 6b02b9d3005b0fab945d4033a3f75f9a6ebc4e18
+last-body-change: 82edc653e345a6806ae334df2c60bb24bd9c372e
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -62,7 +62,8 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   `READY — none yet` is REFUSED by `tools/hooks/scratch-guard.js`; an absent or replayed card
   allows. `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-1`. A commit from a tree the card does not
   name refuses too: carry a scratch worktree's diff back as a patch. An Edit or Write under
-  `ROUTED_PATHS` refuses unless the route names a buildable unit (`TOOL-aRoutedQuill-2`).
+  `ROUTED_PATHS` refuses unless the route names a buildable unit (`TOOL-aRoutedQuill-2`); a pushed
+  commit there names a unit specced before it (`TOOL-aRoutedQuill-3`).
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
@@ -258,10 +259,8 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
 - A gate FIXTURE a node may not host: an IGNORED path is never staged, and a name differing only in
   CASE is the same file. Both give an arm that passes because its fixture was never there. `*.bak`
   is ignored on node `d`, on node `a` at NO scope (2026-09-04): run `git check-ignore -v` on YOURS.
-- The template is under a 48 KiB gate, and the gate also WARNS when the file grows past its
-  recorded high-water. Raising the
-  ceiling is an owner decision, not an edit. Read the current
-  margin FROM `bash tools/check-template-size.sh`, never from prose.
+- The template is under a 48 KiB gate that also WARNS past its recorded high-water. Raising the
+  ceiling is an owner decision, not an edit. Read the margin FROM `bash tools/check-template-size.sh`.
 - A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
   and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
   `TOOL-aPromptedMandate-4`.
@@ -270,8 +269,8 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
   loudly rather than redding — re-run quiet before believing a latency claim.
   `TOOL-aPacedTurnstile-2`.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
-  `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
-  here: checks 5, 9 and 21 all fired only once the folder was staged.
+  `git add` returns a clean exit that proves nothing. Stage first, then run it: checks
+  5, 9 and 21 all fired only once the folder was staged.
 - `gate-guard` is a `Bash|PowerShell` hook from the unattended kit: while this branch's
   run-state record is before `VERIFYING` it DENIES a `GATE_FULL=`/`GATE_SELFTESTS=` bar and any
   `*.test.sh` or self-test runner, naming the record. Not a glitch: feed the hook the payload, or

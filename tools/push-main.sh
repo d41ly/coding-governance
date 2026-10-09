@@ -26,7 +26,8 @@
 # KIT VERSIONS ARE MINTED HERE, NOT ON A BRANCH (TOOL-aMendedFleet-65). The minting `--prepare` runs
 # the deployer's `govkit.py mint` over the advertised tip..the branch tip and writes each kit version
 # the landing owes INTO the prepared merge; the attended landing mints over the fetched tip and
-# commits the result as `mint: kit versions onto <remote>/<branch> at <sha8>`. A branch therefore
+# commits the result as `mint: kit versions onto <remote>/<branch> at <sha8> for <unit>`, the
+# newest unit the pushed range names, with a `Pass: none` trailer (TOOL-aRoutedQuill-3). A branch therefore
 # owes no bump: the epoch legs grade one only at the push boundary. Where no deployer resolves beside
 # this lander, which is every adopter, both paths say so in one line and land as before. What a mint
 # does NOT do: re-stamp the kickoff manifest, so a minted carrier on its watch line still reds C5.
@@ -650,6 +651,19 @@ run_minter() {  # base · [head] -> 0 minted, clean or announced-skipped · 1 th
   return 1
 }
 
+# `read_mint_unit <range>` prints the unit id the attended mint commit names (TOOL-aRoutedQuill-3
+# S11): the newest one <range>'s own commits attribute, by the memory-tree kit's routed-commits
+# reading, so the commit its pre-push leg grades names a unit like every other routed commit. Found
+# the way the deployer is found. No python, no kit or no attributed commit prints nothing, and the
+# mint then names no unit, which that leg reds exactly as it reds the range that owed the mint.
+read_mint_unit() {  # range -> the unit id on stdout, or nothing
+  local py dir
+  py=$(resolve_python 2>/dev/null) || return 0
+  dir=$(resolve_kit_dir "$py" memory-tree routed_commits.py "$self_dir" 2>/dev/null) || return 0
+  [ -f "$top/$dir/routed_commits.py" ] || return 0
+  "$py" "$top/$dir/routed_commits.py" --newest-unit "$1" 2>/dev/null | head -n 1
+}
+
 # `--prepare`: merge THIS branch onto the advertised tip, in place, and move the branch to it.
 #
 # THE SUBJECT NAMES THE SLUG AND NO UNIT ID. `build_commit` in the unattended kit joins a commit to
@@ -873,9 +887,11 @@ while [ "$attempt" -le "$max" ]; do
   fi
 
   # MINT, on every attempt (TOOL-aMendedFleet-65 S4): this path has no prepared merge, so the versions
-  # this landing owes over the fetched tip are their own commit. Its subject names no unit id, for
-  # the reason --prepare's does. `--no-verify` for the reason --prepare uses `commit-tree`; the
-  # pre-push bar below grades the commit like every other one it pushes.
+  # this landing owes over the fetched tip are their own commit. `--no-verify` for the reason
+  # --prepare uses `commit-tree`; the pre-push bar below grades the commit like every other one it
+  # pushes. It touches version carriers, which are product paths, so its SUBJECT names the newest
+  # unit the pushed range attributes (TOOL-aRoutedQuill-3 S11) and its `Pass: none` trailer keeps
+  # the unattended kit's pass reader from taking the mint for that unit's pass.
   mt=$(git rev-parse --verify "refs/remotes/$remote/$def")
   if ! run_minter "$mt"; then
     git reset -q --hard HEAD >/dev/null 2>&1 || true
@@ -884,7 +900,8 @@ while [ "$attempt" -le "$max" ]; do
   fi
   if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
     git add -A
-    if ! git commit -q --no-verify -m "mint: kit versions onto $remote/$def at ${mt:0:8}"; then
+    mint_unit=$(read_mint_unit "$mt..HEAD")
+    if ! git commit -q --no-verify -m "mint: kit versions onto $remote/$def at ${mt:0:8}${mint_unit:+ for $mint_unit}" -m "Pass: none"; then
       echo "push-main: could not commit the minted versions. Aborted (no push)." >&2
       exit 1
     fi

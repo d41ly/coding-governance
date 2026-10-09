@@ -446,3 +446,15 @@ LIVE_DORMANT_DAYS=""
 # and an EVIDENCE_GLOBS that resolves to no tracked file each refuse by name before anything is
 # written. BLANK OR ABSENT RENDERS LIVE.md AS BEFORE, byte for byte, and never imports that kit.
 LIVE_LANDED_UNCLOSED=""
+
+# ROUTED_COMMIT_CUTOFF — an ISO date (YYYY-MM-DD). `routed_commits.py`, the `routed commits name a
+# specced unit` leg, grades every non-merge commit committed on or after it that touches a path under
+# ROUTED_PATHS: one naming no unit id, in its subject or a `Pass:` trailer, whose spec existed at the
+# commit's first parent reds. BLANK OR ABSENT REFUSES (exit 2), as does a blank ROUTED_PATHS, so a
+# tree that installs the leg declares both; the adopter scaffolds them. The leg needs full history:
+# a shallow clone refuses, so a CI checkout sets `fetch-depth: 0`.
+#   ROUTED_COMMIT_CUTOFF="2026-10-09"
+# ROUTED_COMMIT_WAIVED — landed commit shas (7 to 40 hex) the leg excuses, whitespace-separated. Read
+# only when it grades the WHOLE history; the push boundary grades the pushed range and reads none. A
+# listed sha that is not a violation reds as stale.
+#   ROUTED_COMMIT_WAIVED=""

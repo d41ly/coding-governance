@@ -702,4 +702,40 @@ else
   echo "  skip — 25 no govkit deployer or lexicon kit beside this lander, so the missing-file arm did not run"
 fi
 
+# 26 — TOOL-aRoutedQuill-3 AC11: the ATTENDED landing's mint commit names the newest unit the pushed
+#      range attributes, `mint: kit versions onto origin/main at <sha8> for <unit>`, and carries a
+#      `Pass: none` trailer, because it touches version carriers under ROUTED_PATHS and the pre-push
+#      routed-commits leg reds a routed commit naming no unit. A clone of this repository at its
+#      committed HEAD is the remote; one commit naming a unit moves the runlog kit, and the lander
+#      runs from main. Observed RED against the base lander, whose mint subject named no unit.
+_mt_rc=$(cd "$HERE" && for d in */; do [ -f "$d/routed_commits.py" ] && { printf '%s' "${d%/}"; break; }; done)
+if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ] && [ -n "$_mt_rc" ]; then
+  git clone -q --bare "$SRC" "$tmp/remote6.git"
+  git clone -q "$tmp/remote6.git" "$tmp/work6"
+  out26=$(
+    cd "$tmp/work6" || exit 1
+    git config user.email t@e; git config user.name t; git config core.autocrlf false
+    git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
+    git push -q -f --no-verify origin main
+    git -C "$tmp/remote6.git" symbolic-ref HEAD refs/heads/main
+    R6=$(git rev-parse HEAD)
+    printf '# a comment line, push-main.test case 26\n' >> "${KIT_REL}$_mt_rl/extract.py"
+    git commit -q --no-verify -am "TOOL-tFix-26: move runlog"
+    unset GATE_PUSH_BASE; bash "$lander" >/dev/null 2>&1 || echo "rc=$?"
+    printf 'tip=%s\n' "$(git rev-parse origin/main)"
+    printf 'head=%s\n' "$(git rev-parse HEAD)"
+    printf 'subject=%s\n' "$(git log -1 --format=%s)"
+    printf 'pass=%s\n' "$(git log -1 --format='%(trailers:key=Pass,valueonly)' | tr -d '\n')"
+    printf 'want=mint: kit versions onto origin/main at %s for TOOL-tFix-26\n' "${R6:0:8}"
+  )
+  _w26=$(printf '%s\n' "$out26" | sed -n 's/^want=//p')
+  case "$out26" in *rc=*) l26=0 ;; *) l26=1 ;; esac
+  [ "$l26" = 1 ] && printf '%s\n' "$out26" | grep -qxF "subject=$_w26" && printf '%s\n' "$out26" | grep -qx 'pass=none' \
+    && [ "$(printf '%s\n' "$out26" | sed -n 's/^tip=//p')" = "$(printf '%s\n' "$out26" | sed -n 's/^head=//p')" ] \
+    && ok "26 the attended mint commit names the range's newest unit and carries Pass: none, and it lands" \
+    || bad "26 the attended mint subject or trailer is wrong, or the landing failed: $out26"
+else
+  echo "  skip — 26 no govkit deployer, runlog kit or memory-tree kit beside this lander, so the mint-subject arm did not run"
+fi
+
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

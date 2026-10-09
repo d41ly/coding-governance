@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = ["TOOL-aRelaxedShard-1", "TOOL-aWidenedGuide-1", "TOOL-dDerivedDocket-31"]
 
 [claims]
-gate-legs = ["memory hygiene", "memory-hygiene self-test", "verdict epoch (kit version dates the engine)", "verdict-epoch self-test", "kit version markers", "kit/dogfood doc parity", "transition-audit arms", "backlog migration selftest", "straggler-guard arms"]
+gate-legs = ["memory hygiene", "memory-hygiene self-test", "verdict epoch (kit version dates the engine)", "verdict-epoch self-test", "kit version markers", "kit/dogfood doc parity", "transition-audit arms", "backlog migration selftest", "straggler-guard arms", "routed commits name a specced unit", "routed-commits selftest"]
 kits = ["memory-tree"]
 git-hooks = ["commit-msg", "pre-rebase"]
 harness-hooks = []
@@ -31,6 +31,7 @@ globs = [
   "tools/memory-tree/transition_audit.py",
   "tools/memory-tree/transition-audit.test.sh",
   "tools/memory-tree/migrate_backlog.py",
+  "tools/memory-tree/routed_commits.py",
   ".githooks/commit-msg",
   ".githooks/pre-rebase",
   ".githooks/straggler-guard.sh",
@@ -244,7 +245,19 @@ case is documented rather than closed: `check-wiring.sh`'s session step marks su
 `hooks own-tree`, the drift signal `backlog_stragglers` lists it from any node's run, and check 26
 at the merge bar is what guarantees. These layers instruct; the bar decides.
 
+**The routed-commits leg grades the COMMITS, not the tree** (`TOOL-aRoutedQuill-3`).
+`routed_commits.py` holds every non-merge commit committed on or after `ROUTED_COMMIT_CUTOFF` that
+touches `ROUTED_PATHS` to naming a unit, in its subject or a `Pass:` trailer, whose spec existed at
+its first parent: the push-time half of the write gate, which sees Edit and Write calls and nothing
+a shell or a hook-less run commits. It reads `GATE_PUSH_BASE` for its RANGE and widens to the whole
+history otherwise, and it shares the transition audit's git pin through `tree_lib.build_git_env`.
+The attended lander's mint names its unit through the leg's `--newest-unit` verb.
+
 ## Gaps
+
+- **Any named unit with a spec at the parent passes the routed-commits leg.** Whether that unit's
+  scope covers the change is not read, a merge's own content is not graded, and the conf it reads is
+  a file the graded run commits — `TOOL-aRoutedQuill-3` §3.
 
 - **The unfenced-body reader is a TOKENIZER, and a document can grep as complete while it sees
   something shorter.** It opens a fence on any line matching a leading-whitespace-tolerant

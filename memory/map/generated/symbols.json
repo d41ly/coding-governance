@@ -215,6 +215,11 @@
     {
       "id": "Refusal",
       "kind": "class",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "Refusal",
+      "kind": "class",
       "file": "tools/playbook/render_playbook.py"
     },
     {
@@ -1515,6 +1520,11 @@
     {
       "id": "build_fixture",
       "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "build_fixture",
+      "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
     },
     {
@@ -1620,7 +1630,7 @@
     {
       "id": "build_git_env",
       "kind": "function",
-      "file": "tools/memory-tree/transition_audit.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "build_gov_index",
@@ -1701,6 +1711,11 @@
       "id": "build_hv_repo",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "build_id_re",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "build_id_sort_key",
@@ -3173,6 +3188,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "check_conf",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
       "id": "check_conf_reader_parity",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -4051,6 +4071,11 @@
       "id": "check_rotation",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "check_routed_commits",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "check_run_call",
@@ -5486,6 +5511,11 @@
       "id": "derive_cli_line",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "derive_commit_range",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "derive_comparator",
@@ -6988,6 +7018,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "extract_families",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
       "id": "extract_files_touched",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -7131,6 +7166,11 @@
       "id": "extract_text",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "extract_unit_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "extract_unlocated",
@@ -8035,6 +8075,11 @@
     {
       "id": "load_conf",
       "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "load_conf",
+      "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
@@ -8156,6 +8201,11 @@
       "id": "load_spec_facts",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "load_spec_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "load_toml",
@@ -8436,6 +8486,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "main",
@@ -11528,6 +11583,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "read_mint_unit",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
       "id": "read_missing_landed_facts",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -11586,6 +11646,11 @@
       "id": "read_new_spec_args",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_newest_unit",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "read_next_line",
@@ -11856,6 +11921,11 @@
       "id": "read_routed_cell",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_routed_commits",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "read_row_at",
@@ -15715,6 +15785,11 @@
     {
       "id": "run_git",
       "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
@@ -16116,6 +16191,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "run_selftest",
@@ -17171,6 +17251,11 @@
       "id": "set_field",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "set_fixture_conf",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "set_group",
@@ -19026,6 +19111,11 @@
       "id": "test_root_that_claims_everything_refuses",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_routed_path",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "test_row_contract_is_complete",

@@ -92,6 +92,8 @@
       "review-join self-test",
       "review-protocol parity (kit vs dogfood)",
       "review-replay selftest",
+      "routed commits name a specced unit",
+      "routed-commits selftest",
       "row-driver view refusal",
       "row-grammar selftest",
       "row-keyed merge driver replay",

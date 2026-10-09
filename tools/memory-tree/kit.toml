@@ -91,7 +91,7 @@ required_keys_render = ["MEMORY_ROOT", "READINESS_ROWS"]
 # declared one executes nothing.
 # BACKLOG_MODE's spelling is frozen — the transition audit classifies commits by it — so it is
 # declared here as well as in the conf example, and a sibling unit's `requires_if` names this entry.
-optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "RECORD_UNDATED_ARTIFACTS", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF", "ARMS_FLOORS", "ARMS_REFUSALS", "LIVE_ROW_PIN", "SEVERITY_UNLABELLED_PIN", "BACKLOG_MODE", "ASK_CUTOFF", "BACKLOG_EXCERPT_CHARS", "PROBE_ALLOW"]
+optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "RECORD_UNDATED_ARTIFACTS", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF", "ARMS_FLOORS", "ARMS_REFUSALS", "LIVE_ROW_PIN", "SEVERITY_UNLABELLED_PIN", "BACKLOG_MODE", "ASK_CUTOFF", "BACKLOG_EXCERPT_CHARS", "PROBE_ALLOW", "ROUTED_COMMIT_CUTOFF", "ROUTED_COMMIT_WAIVED"]
 conditional_keys = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN", "LIVE_LANDED_UNCLOSED"]
 defaults = { MEMORY_ROOT = "memory" }
 
@@ -306,6 +306,23 @@ guard = []
 name = "check-arms selftest"
 subject = "kit"
 argv = ["python3", "{kit}/check-arms.py", "--selftest"]
+guard = ["{kit}/"]
+
+# TOOL-aRoutedQuill-3: every pushed commit touching ROUTED_PATHS names a unit specced before it. No
+# guard and no `doc_reads`: its subject is the commit history, which moves with nobody editing this
+# kit, and a doc-only push can still carry a product file the target's doc class names. Full history,
+# because a shallow clone refuses rather than grading the commits it lost.
+[[gate_leg]]
+name = "routed commits name a specced unit"
+subject = "repo"
+argv = ["python3", "{kit}/routed_commits.py"]
+guard = []
+history_depth = "full"
+
+[[gate_leg]]
+name = "routed-commits selftest"
+subject = "kit"
+argv = ["python3", "{kit}/routed_commits.py", "--selftest"]
 guard = ["{kit}/"]
 
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
