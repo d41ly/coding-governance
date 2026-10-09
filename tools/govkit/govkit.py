@@ -549,6 +549,63 @@ def entry_version(root: pathlib.Path, desc: dict) -> str:
     return "(unresolvable)"
 
 
+# The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
+# named on its marker line and gated by the resolve-python self-test.
+# >>> remote_ladder_py -- canonical copy: resolve_remote.py in the gov lib dir (byte-identical; gated)
+def resolve_remote(root):
+    """-> (remote, branch, observed, refusal) for the repository at <root>. Fetches nothing.
+
+    remote    GOV_REMOTE, else branch.<current>.remote unless it is ".", else the ONLY remote.
+              Several remotes and none chosen, or a chosen name that is not a remote here, is a
+              REFUSAL naming GOV_REMOTE. No remote at all is remote "" and NO refusal: the caller
+              keeps its own no-remote fallback.
+    observed  the branch refs/remotes/<remote>/HEAD names, or "". A caller whose GOV_DEFAULT_BRANCH
+              only CROSS-CHECKS the observation reads this one.
+    branch    GOV_DEFAULT_BRANCH, else observed, else "".
+    A refusal empties the other three, so no caller can pick a remote the ladder refused.
+    """
+    import os
+    import subprocess
+
+    def read(*args):
+        try:
+            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        return p.stdout.strip() if p.returncode == 0 else ""
+
+    names = read("remote").split()
+    listed = " ".join(names) or "none"
+    # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous
+    # (`heads/x`, `remotes/r/x`), and the prefix is stripped exactly instead.
+    cur = read("symbolic-ref", "--quiet", "HEAD")
+    cur = cur[len("refs/heads/"):] if cur.startswith("refs/heads/") else ""
+    remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
+    if not remote and cur:
+        remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
+        if remote == ".":
+            remote = ""
+    if not remote and len(names) == 1:
+        remote = names[0]
+    if not remote and len(names) > 1:
+        where = "branch " + cur if cur else "a detached HEAD"
+        return "", "", "", ("cannot choose a remote: GOV_REMOTE is unset, %s has no configured remote, "
+                            "and this repository has %d remotes (%s). Name it: export GOV_REMOTE=<remote>."
+                            % (where, len(names), listed))
+    if remote and remote not in names:
+        return "", "", "", ("%s names %s, which is no remote of this repository (%s). Name one that is: "
+                            "export GOV_REMOTE=<remote>." % (how, remote, listed))
+    observed = ""
+    if remote:
+        pre = "refs/remotes/" + remote + "/"
+        head = read("symbolic-ref", "--quiet", pre + "HEAD")
+        if head.startswith(pre) and len(head) > len(pre):
+            observed = head[len(pre):]
+    return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
+# <<< remote_ladder_py
+
+
 def resolve_measurer_currency(root: pathlib.Path, to_commit: str) -> tuple[str, str]:
     """Is the GOV checkout doing the measuring current with its own remote?
 
@@ -583,9 +640,20 @@ def resolve_measurer_currency(root: pathlib.Path, to_commit: str) -> tuple[str, 
     _key = (str(root), to_commit)
     if _key in _memo:
         return _memo[_key]
-    _rn = subprocess.run(["git", "-C", str(root), "config", "--get", "branch.main.remote"],
-                         capture_output=True, text=True)
-    remote = (_rn.stdout.strip() or "origin")
+    # THE REMOTE IS THE LADDER'S (TOOL-dLadderedRemote-2): this read `branch.main.remote` and
+    # defaulted to a literal name, which half-implemented the lander's ladder and asked a remote
+    # that does not exist on a node naming its remote after the project. A refusal or no remote at
+    # all is `unverified` with the reason, never a guessed remote. GOV_REMOTE is set aside for this
+    # one read: it names the TARGET repository's remote, and an operator exporting it for an adopter's
+    # update must not steer which remote the gov checkout asks (TOOL-dLadderedRemote-5).
+    _held = os.environ.pop("GOV_REMOTE", None)
+    try:
+        remote, _branch, _observed, refusal = resolve_remote(root)
+    finally:
+        if _held is not None:
+            os.environ["GOV_REMOTE"] = _held
+    if refusal or not remote:
+        return _memo.setdefault(_key, ("unverified", refusal or "this checkout has no remote to ask"))
     try:
         adv = subprocess.run(["git", "-C", str(root), "ls-remote", "--symref", "--exit-code",
                               remote, "HEAD"], capture_output=True, text=True, timeout=20)
@@ -4255,6 +4323,11 @@ SHELL_EXEC_SITES = {
     # the command line -- which is the whole point, since the argv form died at 32 KiB after a
     # partial write. Classified `gov` because no target value reaches the argv it builds.
     "git_pathspec": "gov",
+    # TOOL-dLadderedRemote-2. The remote ladder's nested reader, inlined byte-identical from the gov
+    # lib dir: `["git", "-C", str(root), *args]`, and every `*args` is a literal in that block —
+    # `remote`, `symbolic-ref`, `config branch.<cur>.remote`. The two interpolated values are a branch
+    # NAME and a remote NAME, each read back from the same repository and never a target token.
+    "read": "gov",
     "git": "gov",                    # gov's own wrapper: `["git", "-C", str(root), *args]`, and the
                                      # `*args` is what the census cannot read. A future
                                      # `git(target, "hook", "run", ...)` must move this to
@@ -5034,6 +5107,28 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
     if n_prov and n_prov_ok == 0:
         r.fail("DEAD PROBE: every engine row failed to resolve in this gov checkout, so the "
                "provenance loop measured nothing — a probe that cannot move is not a green one")
+
+    # DEPL-aLevelledCopy-1 S5. A MODE DEFICIT IS A NOTE, NEVER A FAILURE (§8 F2): redding a target
+    # on a state no release has yet let it clear hands it a failure it cannot act on. Measured
+    # against gov's tree at the receipt's `gov_commit` (rev-2): a byte-identical row keeps the
+    # `commit` its bytes came from, so after a carry its own commit still reads `100644`.
+    _mrows = [w for w in rows if w.get("role", "engine") == "engine" and w.get("path")
+              and w.get("source")]
+    _mcommit = receipt.get("gov_commit")
+    if _mrows and _mcommit:
+        try:
+            _midx, _ = index_read(target, [w["path"] for w in _mrows])
+        except Refusal as _merr:
+            r.note(f"mode: not measured — {_merr}")
+            _midx = {}
+        for w in _mrows:
+            _ment = _midx.get(w["path"])
+            if not _ment:
+                continue
+            _mto = resolve_landed_mode(_ment[0], gov_tree_mode(root, _mcommit, w["source"]))
+            if _mto != _ment[0]:
+                r.note(f"mode {w['path']}: the index holds {_ment[0]}, gov ships {_mto} at "
+                       f"{str(_mcommit)[:8]} — `govkit update --write` carries it")
 
     # The sidecar and the receipt are asserted against EACH OTHER. They are two spellings written
     # from one list, and the sidecar — the artifact a target verifies with bash alone — is read by
@@ -6326,21 +6421,56 @@ def index_blob(target: pathlib.Path, oid: str) -> bytes | None:
     return out.stdout if out.returncode == 0 else None
 
 
+@functools.lru_cache(maxsize=None)
+def read_tree_modes(root: pathlib.Path, commit: str) -> dict[str, str]:
+    """DEPL-aLevelledCopy-1 S2. `{path: mode}` for gov's WHOLE tree at a commit, from ONE
+    `ls-tree -r -z`, memoised per (root, commit). The one reader of gov's file modes.
+
+    A per-row read costs one git spawn per row, about 0.75 s each on a Windows node, so a 190-row
+    receipt would pay minutes for a fact one spawn answers. Memoising on the commit string is sound
+    because every caller passes a resolved sha, which names one tree forever. A failed read is an
+    empty map, which every caller reads as "gov's mode unknown" and so carries nothing.
+    """
+    out = subprocess.run(["git", "-C", str(root), "ls-tree", "-r", "-z", commit],
+                         capture_output=True, check=False)
+    modes: dict[str, str] = {}
+    if out.returncode != 0:
+        return modes
+    # `-z` MOVES THE TERMINATOR AND THE QUOTING, NOT THE FIELD ORDER — measured on git 2.55: the
+    # record is still `<mode> blob <oid>\t<path>`, so field 0 is still the mode over a path carrying
+    # a space. The flag is here so a quoted path can never reach this read, not for this field.
+    for rec in out.stdout.decode("utf-8", "replace").split("\0"):
+        meta, _tab, pth = rec.partition("\t")
+        bits = meta.split()
+        if pth and bits:
+            modes[pth] = bits[0]
+    return modes
+
+
 def gov_tree_mode(root: pathlib.Path, commit: str, path: str) -> str | None:
-    """The file mode gov's own tree records for a path at a commit.
+    """The file mode gov's own tree records for a path at a commit — a lookup through
+    `read_tree_modes`, so a whole run pays one spawn per commit rather than one per row.
 
     §8 F1: a row with no existing index entry in the target takes THIS mode rather than a literal
     `100644`. A hook that lands non-executable is a hook that does not run.
     """
-    out = subprocess.run(["git", "-C", str(root), "ls-tree", "-z", commit, "--", path],
-                         capture_output=True, text=True, check=False)
-    if out.returncode != 0 or not out.stdout.strip():
-        return None
-    # `-z` MOVES THE TERMINATOR AND THE QUOTING, NOT THE FIELD ORDER — measured on git 2.55: the
-    # record is still `<mode> blob <oid>\t<path>`, so field 0 is still the mode over a path carrying
-    # a space. The flag is here so a quoted path can never reach this read, not for this field.
-    mode = out.stdout.split()[0]
+    mode = read_tree_modes(root, commit).get(path)
     return mode if mode in ("100644", "100755", "120000") else None
+
+
+def resolve_landed_mode(entry_mode: str | None, gov_mode: str | None) -> str:
+    """DEPL-aLevelledCopy-1 S1. The mode a landed `engine` row takes: the ONE mode rule.
+
+    No index entry: gov's mode, else `100644` (DEPL-dCarriedReceipt-7 §8 F1, unchanged). An entry
+    keeps its mode, with one exception — `100644` where gov ships `100755` is carried UP, so a hook
+    gov made executable runs on a POSIX node. Never down (§8 F1 of this unit): an adopter that set a
+    bit gov lacks keeps it. A symlink on either side is left exactly as the entry has it.
+    """
+    if entry_mode is None:
+        return gov_mode or "100644"
+    if entry_mode == "100644" and gov_mode == "100755":
+        return "100755"
+    return entry_mode
 
 
 def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]],
@@ -8247,7 +8377,8 @@ def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit:
 
 def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src: str | None,
                        data: bytes, to_commit: str,
-                       index: dict[str, tuple[str, str]]) -> tuple[str | None, str | None]:
+                       index: dict[str, tuple[str, str]],
+                       entry_path: str | None = None) -> tuple[str | None, str | None]:
     """Put bytes into the target THROUGH ITS OWN INDEX, and let its filters decide the worktree (S5).
 
     Three plumbing calls, in this order and for this reason. `hash-object -w --stdin` puts the blob
@@ -8259,8 +8390,15 @@ def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src:
     and left the index to catch up, so on a clone with a line-ending filter every file gov landed was
     immediately `modified` in the target's own `git status`.
 
-    MODE from the row's existing index entry, and from gov's tree entry at `commit` for a row with
-    none (§8 F1) — a hook that lands non-executable is a hook that does not run.
+    MODE from `resolve_landed_mode`, which is where the mode rule lives (DEPL-aLevelledCopy-1 S1):
+    the existing entry's, carried up to gov's `100755` at `to_commit`, and gov's own for a row with
+    none — a hook that lands non-executable is a hook that does not run. No receipt field records a
+    file mode; gov's tree answers it at any recorded commit.
+
+    `entry_path` (TOOL-aLevelledCopy-9 S4) names the index key that entry is read from, and
+    defaults to `path`. The renamed arm passes the path it moved FROM: `index` was read before
+    `git mv`, so it holds no entry at the new path, and reading one there handed an adopter's
+    100755 row gov's lower mode while the mode-carry line, which reads the old entry, said otherwise.
 
     Returns `(oid, None)` on success and `(None, why)` on failure. A failure LEAVES the index entry
     rather than half-writing; rolling one back is `-14`'s.
@@ -8270,8 +8408,9 @@ def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src:
     if out.returncode != 0:
         return None, f"git hash-object refused the bytes: {out.stderr.decode('utf-8', 'replace').strip()}"
     oid = out.stdout.decode("utf-8", "replace").strip()
-    entry = index.get(path)
-    mode = entry[0] if entry else ((gov_tree_mode(root, to_commit, src) if src else None) or "100644")
+    entry = index.get(entry_path or path)
+    mode = resolve_landed_mode(entry[0] if entry else None,
+                               gov_tree_mode(root, to_commit, src) if src else None)
     up = subprocess.run(["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
                          f"{mode},{oid},{path}"], capture_output=True, text=True, check=False)
     if up.returncode != 0:
@@ -9194,6 +9333,20 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         print(f"  {v:<18} [{role:<13}] {row['path']}")
         acted.append({"row": row, "c": c, "verdict": v, "how": how})
 
+        # DEPL-aLevelledCopy-1 S3. A MODE IS NOT A BYTE QUESTION, so it is not a verdict: the grid
+        # keys on blob identity and reads a mode-only delta as `current`. The carry is decided here,
+        # from the `index0` read the classifier already used, and rides the acted entry as
+        # `mode_to`. Its line is a SECOND line about the path, outside the row shape, because the
+        # row line is parsed by its trailing path (the lone-CR line's precedent above).
+        _ment = index0.get(row["path"])
+        _msrc = c["renamed_to"][0] if c.get("renamed_to") else row.get("source")
+        if how == "table" and _ment and _msrc:
+            _mto = resolve_landed_mode(_ment[0], gov_tree_mode(root, to_commit, _msrc))
+            if _mto != _ment[0]:
+                acted[-1]["mode_to"] = _mto
+                print(f"govkit update — mode-carry {row['path']} · {_ment[0]} -> {_mto} · "
+                      f"gov at {to_commit[:8]}")
+
     for line in (f"  available (not installed): {e}" for e in available):
         print(line)
     if available:
@@ -9476,7 +9629,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     _touching = set(TOUCHING_VERDICTS) | ({"withdrawn"} if write_withdrawals else set())
     snap_rows: list[dict] = []
     for a in acted:
-        if a["how"] != "table" or a["verdict"] not in _touching:
+        # DEPL-aLevelledCopy-1 S4: a mode carry is a write, so its row is snapshotted like one and
+        # a rolled-back kit puts the pre-run entry back, mode included.
+        if a["how"] != "table" or (a["verdict"] not in _touching and not a.get("mode_to")):
             continue
         _paths = [a["row"]["path"]]
         if a["verdict"] == "renamed" and a["c"].get("renamed_to"):
@@ -9695,6 +9850,22 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                       f"never written by `update`")
             continue
 
+        # DEPL-aLevelledCopy-1 S4. THE MODE ARM, for a verdict that lands no bytes. A touching
+        # verdict takes its mode inside `land_through_index` from the same rule, so this arm skips
+        # those. The entry keeps the blob the target already holds; only its mode moves, and the
+        # working file gains the execute bits so a POSIX `git add` does not take them away again.
+        if a.get("mode_to") and v not in TOUCHING_VERDICTS:
+            _mup = subprocess.run(["git", "-C", str(target), "update-index", "--cacheinfo",
+                                   f"{a['mode_to']},{c['ours_oid']},{row['path']}"],
+                                  capture_output=True, text=True, check=False)
+            if _mup.returncode != 0:
+                r.fail(f"'{row['path']}': `git update-index` would not carry its mode to "
+                       f"{a['mode_to']}: {_mup.stderr.strip()}")
+                continue
+            if a["mode_to"] == "100755" and dp.is_file():
+                os.chmod(dp, dp.stat().st_mode | 0o111)
+            changed.append(row["path"])
+
         if v in RAW_WRITE_VERDICTS:
             data = c["theirs"]
             # ---- DEPL-dCarriedReceipt-9 S11. THE `missing` RESTORE CARRIES TOO, and it is the ONE
@@ -9857,7 +10028,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                        f"left exactly as it was, at its old path and its old vintage")
                 continue
 
-            oid, why = land_through_index(root, target, new_dest, new_src, data, to_commit, index0)
+            oid, why = land_through_index(root, target, new_dest, new_src, data, to_commit, index0,
+                                          entry_path=old_path)
             if oid is None:
                 # NO ARM REACHES THIS, and the skip announces itself rather than passing for
                 # coverage. `land_through_index` fails only when the TARGET's own git refuses —
@@ -12480,9 +12652,15 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
     if base is None:
         # The default base is `check-verdict-epoch.sh`'s: the merge-base with the default branch,
         # the remote's first. No base is a FAILED exit 1 and never a zero-status skip, because
-        # run-gates judges a leg by its exit code and a silent 0 reads as a pass forever.
-        dflt = os.environ.get("GOV_DEFAULT_BRANCH") or "main"
-        for ref in (f"origin/{dflt}", dflt):
+        # run-gates judges a leg by its exit code and a silent 0 reads as a pass forever. The
+        # remote and its branch are the ladder's (TOOL-dLadderedRemote-2); a refusal is that
+        # failed exit, naming it, and no remote at all leaves only the local branch.
+        remote, dflt, _observed, refusal = resolve_remote(root)
+        if refusal:
+            print(f"epoch: FAILED · no base to compare against · {refusal}")
+            return 1
+        dflt = dflt or "main"
+        for ref in ((f"{remote}/{dflt}", dflt) if remote else (dflt,)):
             mb = subprocess.run(["git", "-C", str(root), "merge-base", ref, "HEAD"],
                                 capture_output=True, text=True, encoding="utf-8")
             if mb.returncode == 0 and mb.stdout.strip():

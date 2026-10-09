@@ -1,0 +1,59 @@
+# aLevelledCopy — asks
+
+## Asks
+- TOOL-aLevelledCopy-4 · filed 2026-10-09 · `tools/push-main.sh` sets `GIT_SSH_COMMAND` whenever the environment has none, and an environment value outranks `core.sshCommand`, so a lander push drops whatever identity or proxy an operator put in `core.sshCommand`. The `:=` was written to keep a caller's own `GIT_SSH_COMMAND` and never considered the config key. Once check-wiring sets the same keepalive string as `core.sshCommand` the two agree on a wired tree, so the exposure is an operator value only; deferring to it would drop the keepalive on a value that lacks one, so neither reading is strictly better and this is a decision, not a fix · seen `tools/push-main.sh`@ce9192c0:180 · accept with `core.sshCommand` set to a fixture value naming an identity file and no `GIT_SSH_COMMAND` in the environment, a lander push's ssh invocation carries that identity; with `core.sshCommand` unset it carries the keepalive options; the chosen rule for a value without a keepalive is written beside the definition line
+- TOOL-aLevelledCopy-5 · filed 2026-10-09 · the eol-only predicate is spelled twice: `tools/run-gates/check-receipt.py` ported `govkit cmd_check`'s rule clause for clause (TOOL-aLevelledCopy-1 §8 F1), and each copy is pinned only by its own fixture arms, so an edit to one leaves the receipt-sync leg and `govkit check` giving two verdicts on one row. One canonical block under the lib parity table, carried inline by both, closes it · seen `tools/run-gates/check-receipt.py`@33a15c87:69 · accept the lib parity table names the block, both files carry it byte-identically, and an edit to one copy alone reds the parity leg
+- TOOL-aLevelledCopy-6 · filed 2026-10-09 · `WIRE-INTO-PROJECT.md`'s wiring-health paragraph lists what `check-wiring.sh --session` auto-sets and does not name `core.sshCommand`, and says nothing of the hook-mode arm that `--fix` repairs and `--session` only reports. The runbook is a governance carrier, so a delegated run may not edit it (M3 veto 2) · seen `WIRE-INTO-PROJECT.md`@33a15c87:756 · accept the paragraph names `core.sshCommand` among the session's set-when-unset values and names the hook-mode repair as `--fix` only
+- DEPL-aLevelledCopy-2 · filed 2026-10-09 · `govkit apply` lands a NEW engine row with `write_bytes` and sets no mode, so a fresh target's first `git add` decides it and a hook gov ships 100755 arrives 100644 on a fresh install; DEPL-aLevelledCopy-1 fixed `update` only · seen `tools/govkit/govkit.py`@33a15c87:7338 · accept a fixture `apply` of a kit whose engine hook gov tracks 100755 leaves the target's index entry at 100755, and one gov tracks 100644 at 100644
+- TOOL-aLevelledCopy-10 · filed 2026-10-09 · held red: suite codebase-map kit selftest red at 40a8b8c3 on the daily held job, run 37770195629 · seen `{prefix}/codebase-map/selftest.py`@40a8b8c3 run `python3 {prefix}/codebase-map/selftest.py` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-aLevelledCopy-11 · filed 2026-10-09 · held red: suite foreign-prefix parity (every self-test at three prefixes) red at 40a8b8c3 on the daily held job, run 37770195629 · seen `{prefix}/run-gates/foreign-prefix.gov.test.sh`@40a8b8c3 run `bash {prefix}/run-gates/foreign-prefix.gov.test.sh` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-aLevelledCopy-12 · filed 2026-10-09 · held red: suite corpus-ids selftest red at 40a8b8c3 on the daily held job, run 37770195629 · seen `{prefix}/memory-tree/corpus_ids.py`@40a8b8c3 run `python3 {prefix}/memory-tree/corpus_ids.py --selftest` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-aLevelledCopy-13 · filed 2026-10-09 · held red: suite lexicon selftest red at 40a8b8c3 on the daily held job, run 37770195629 · seen `{prefix}/lexicon/selftest.py`@40a8b8c3 run `python {prefix}/lexicon/selftest.py` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-aLevelledCopy-14 · filed 2026-10-09 · held red: suite govkit selftest red at 40a8b8c3 on the daily held job, run 37770195629 · seen `{prefix}/govkit/selftest.py`@40a8b8c3 run `python {prefix}/govkit/selftest.py` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-aLevelledCopy-15 · filed 2026-10-09 · held red: suite python resolver (behaviour + inline parity + idiom ban) red at 40a8b8c3 on the daily held job, run 37770195629 · seen `{prefix}/lib/resolve-python.test.sh`@40a8b8c3 run `bash {prefix}/lib/resolve-python.test.sh` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-aLevelledCopy-16 · filed 2026-10-09 · held red: suite runlog selftest red at 40a8b8c3 on the daily held job, run 37770195629 · seen `{prefix}/runlog/selftest.py`@40a8b8c3 run `python {prefix}/runlog/selftest.py` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-aLevelledCopy-17 · filed 2026-10-09 · held red: suite run-gates gov canary red at 40a8b8c3 on the daily held job, run 37770195629 · seen `{prefix}/run-gates/run-gates.gov.test.sh`@40a8b8c3 run `bash {prefix}/run-gates/run-gates.gov.test.sh` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-aLevelledCopy-18 · filed 2026-10-09 · held red: suite run-gates canary red at 40a8b8c3 on the daily held job, run 37770195629 · seen `{prefix}/run-gates/run-gates.test.sh`@40a8b8c3 run `bash {prefix}/run-gates/run-gates.test.sh` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-aLevelledCopy-19 · filed 2026-10-09 · held red: suite run-gates run-log line red at 40a8b8c3 on the daily held job, run 37770195629 · seen `{prefix}/run-gates/run-gates.runlog.test.sh`@40a8b8c3 run `bash {prefix}/run-gates/run-gates.runlog.test.sh` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-aLevelledCopy-20 · filed 2026-10-09 · held red: suite unattended driver selftest shard 2/8 red at 40a8b8c3 on the daily held job, run 37770195629 · seen `.github/workflows/remote-ci.yml`@40a8b8c3 · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-aLevelledCopy-21 · filed 2026-10-09 · held red: suite unattended driver selftest shard 8/8 red at 40a8b8c3 on the daily held job, run 37770195629 · seen `.github/workflows/remote-ci.yml`@40a8b8c3 · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-aLevelledCopy-22 · filed 2026-10-09 · held red: suite unattended gate selftest shard 1/8 red at 40a8b8c3 on the daily held job, run 37770195629 · seen `.github/workflows/remote-ci.yml`@40a8b8c3 · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-aLevelledCopy-23 · filed 2026-10-09 · held red: suite unattended-build self-test red at 40a8b8c3 on the daily held job, run 37770195629 · seen `{prefix}/workflows/unattended-build.test.sh`@40a8b8c3 run `bash {prefix}/workflows/unattended-build.test.sh` · accept the suite is green on the daily held job at the default branch's tip
+
+## Dispositions
+- SEV · TOOL-aLevelledCopy-4 · LOW · pre-existing; an operator identity in `core.sshCommand` is the only exposure, and no adopter is known to carry one
+- KEEP · TOOL-aLevelledCopy-4 · a decision between two operator settings, not a defect this build's mandate covers; left for an owner ruling
+- SEV · TOOL-aLevelledCopy-5 · LOW · both copies are fixture-pinned today and agree; drift needs a later one-sided edit
+- KEEP · TOOL-aLevelledCopy-5 · needs a govkit write this build's unit 1 excluded; a later tooling build takes it
+- SEV · TOOL-aLevelledCopy-6 · LOW · documentation only; the checker's own header already names both arms
+- KEEP · TOOL-aLevelledCopy-6 · an owner turn by M3 veto 2, so it waits for the owner rather than a delegated run
+- SEV · DEPL-aLevelledCopy-2 · MED · every fresh POSIX install of a gov hook lands non-executable until the next update carries the bit
+- KEEP · DEPL-aLevelledCopy-2 · a separate deployer mechanism from update's carry; a later deployer build takes it
+- SEV · TOOL-aLevelledCopy-10 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-aLevelledCopy-10 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aLevelledCopy-11 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-aLevelledCopy-11 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aLevelledCopy-12 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-aLevelledCopy-12 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aLevelledCopy-13 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-aLevelledCopy-13 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aLevelledCopy-14 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-aLevelledCopy-14 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aLevelledCopy-15 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-aLevelledCopy-15 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aLevelledCopy-16 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-aLevelledCopy-16 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aLevelledCopy-17 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-aLevelledCopy-17 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aLevelledCopy-18 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-aLevelledCopy-18 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aLevelledCopy-19 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-aLevelledCopy-19 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aLevelledCopy-20 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-aLevelledCopy-20 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aLevelledCopy-21 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-aLevelledCopy-21 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aLevelledCopy-22 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-aLevelledCopy-22 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aLevelledCopy-23 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-aLevelledCopy-23 · filed by an unattended run for the owning build; outside this build's goal

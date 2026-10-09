@@ -146,6 +146,51 @@ read_conf_modes() { # $@ = commits -> one mode token per DISTINCT conf blob amon
   done
 }
 
+# The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
+# named on its marker line and gated by the resolve-python self-test.
+# >>> remote_ladder_sh -- canonical copy: resolve-remote.sh in the gov lib dir (byte-identical; gated)
+# resolve_remote_sh -> RR_REMOTE RR_BRANCH RR_OBSERVED RR_WHY, rc 0; rc 1 with RR_WHY on a refusal.
+# The ladder, row for row, is resolve_remote.py in the gov lib dir: GOV_REMOTE, else the current
+# branch remote unless it is ".", else the ONLY remote; several and none chosen, or a name that is
+# no remote here, refuses naming GOV_REMOTE; no remote at all is RR_REMOTE="" and rc 0. RR_OBSERVED
+# is what <remote>/HEAD names; RR_BRANCH is GOV_DEFAULT_BRANCH, else RR_OBSERVED. Fetches nothing.
+# RR_GIT names the git command, so a caller holding a pinned wrapper function passes it.
+resolve_remote_sh() {
+  local _rr_git=${RR_GIT:-git} _rr_names _rr_n _rr_list _rr_cur _rr_where _rr_how=GOV_REMOTE _rr_head _rr_bad
+  RR_REMOTE=${GOV_REMOTE:-}; RR_BRANCH=""; RR_OBSERVED=""; RR_WHY=""
+  _rr_names=$("$_rr_git" remote 2>/dev/null) || _rr_names=""
+  _rr_n=$(printf "%s" "$_rr_names" | grep -c . || true)
+  _rr_list=$(printf "%s" "$_rr_names" | tr "\n" " ")
+  [ -n "$_rr_list" ] || _rr_list=none
+  # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous.
+  _rr_cur=$("$_rr_git" symbolic-ref --quiet HEAD 2>/dev/null) || _rr_cur=""
+  case "$_rr_cur" in refs/heads/?*) _rr_cur=${_rr_cur#refs/heads/} ;; *) _rr_cur="" ;; esac
+  if [ -z "$RR_REMOTE" ] && [ -n "$_rr_cur" ]; then
+    RR_REMOTE=$("$_rr_git" config "branch.$_rr_cur.remote" 2>/dev/null) || RR_REMOTE=""
+    _rr_how="branch.$_rr_cur.remote"
+    [ "$RR_REMOTE" != . ] || RR_REMOTE=""
+  fi
+  if [ -z "$RR_REMOTE" ] && [ "$_rr_n" -eq 1 ]; then RR_REMOTE=$_rr_names; fi
+  if [ -z "$RR_REMOTE" ] && [ "$_rr_n" -gt 1 ]; then
+    _rr_where="a detached HEAD"; [ -z "$_rr_cur" ] || _rr_where="branch $_rr_cur"
+    RR_WHY="cannot choose a remote: GOV_REMOTE is unset, $_rr_where has no configured remote, and this repository has $_rr_n remotes ($_rr_list). Name it: export GOV_REMOTE=<remote>."
+    return 1
+  fi
+  # A name holding whitespace is no remote: `grep -F` would split it into several patterns.
+  case "$RR_REMOTE" in *[[:space:]]*) _rr_bad=1 ;; *) _rr_bad=0 ;; esac
+  if [ -n "$RR_REMOTE" ] && { [ "$_rr_bad" = 1 ] || ! printf "%s\n" "$_rr_names" | grep -qxF -- "$RR_REMOTE"; }; then
+    RR_WHY="$_rr_how names $RR_REMOTE, which is no remote of this repository ($_rr_list). Name one that is: export GOV_REMOTE=<remote>."
+    RR_REMOTE=""
+    return 1
+  fi
+  if [ -n "$RR_REMOTE" ]; then
+    _rr_head=$("$_rr_git" symbolic-ref --quiet "refs/remotes/$RR_REMOTE/HEAD" 2>/dev/null) || _rr_head=""
+    case "$_rr_head" in "refs/remotes/$RR_REMOTE"/?*) RR_OBSERVED=${_rr_head#"refs/remotes/$RR_REMOTE"/} ;; esac
+  fi
+  RR_BRANCH=${GOV_DEFAULT_BRANCH:-$RR_OBSERVED}
+  return 0
+}
+# <<< remote_ladder_sh
 init_straggler_guard() { # 0 = FLIPPED and the globals are set · 1 = nothing to do here
   # THE DEFAULT BRANCH'S OWN CONF, and the flip is observed WHERE IT LANDS. The remote-tracking
   # default is read first, so a node whose local `main` was never fast-forwarded is not dormant on
@@ -155,9 +200,17 @@ init_straggler_guard() { # 0 = FLIPPED and the globals are set · 1 = nothing to
   # primary-tree branch guard by naming a branch nobody was pushing.
   STRAGGLER_READY=0
   STRAGGLER_WATCHED=()
-  local text="" ref="" def="" mode="" fam famdecl pair obs
-  if text=$(read_blob_at "refs/remotes/origin/HEAD:$STRAGGLER_CONF_REL"); then
-    ref=refs/remotes/origin/HEAD
+  # THE REMOTE IS THE LADDER'S above (TOOL-dLadderedRemote-2). This read a literal remote name, so
+  # on a node whose remote is named after the project it never observed the flip at all. A ladder
+  # refusal is announced and checks nothing, as a clone observing no default branch always was.
+  local text="" ref="" def="" mode="" fam famdecl pair obs rhead=""
+  if ! resolve_remote_sh; then
+    echo "$STRAGGLER_SAY: this clone observes no default branch — $RR_WHY — so the backlog-mode question cannot be asked and NOTHING was checked here."
+    return 1
+  fi
+  [ -z "$RR_REMOTE" ] || rhead="refs/remotes/$RR_REMOTE/HEAD"
+  if [ -n "$rhead" ] && text=$(read_blob_at "$rhead:$STRAGGLER_CONF_REL"); then
+    ref=$rhead
   else
     def=${GOV_DEFAULT_BRANCH:-main}
     if git rev-parse --verify --quiet "refs/heads/$def" >/dev/null 2>&1; then
@@ -165,10 +218,10 @@ init_straggler_guard() { # 0 = FLIPPED and the globals are set · 1 = nothing to
       # The branch is there and carries no conf: the memory-tree kit is not adopted in this
       # repository, which is a legal state and not this layer's business. Silent.
       text=$(read_blob_at "$ref:$STRAGGLER_CONF_REL") || return 1
-    elif git rev-parse --verify --quiet refs/remotes/origin/HEAD >/dev/null 2>&1; then
+    elif [ -n "$rhead" ] && git rev-parse --verify --quiet "$rhead" >/dev/null 2>&1; then
       return 1
     else
-      echo "$STRAGGLER_SAY: this clone observes no default branch — origin/HEAD is unset and '$def' is no local branch — so the backlog-mode question cannot be asked and NOTHING was checked here. Fix once: git remote set-head origin -a, or export GOV_DEFAULT_BRANCH=<a branch that exists>."
+      echo "$STRAGGLER_SAY: this clone observes no default branch — ${rhead:-a remote HEAD} is unset and '$def' is no local branch — so the backlog-mode question cannot be asked and NOTHING was checked here. Fix once: ${RR_REMOTE:+git remote set-head $RR_REMOTE -a, or }export GOV_DEFAULT_BRANCH=<a branch that exists>."
       return 1
     fi
   fi
@@ -204,8 +257,8 @@ init_straggler_guard() { # 0 = FLIPPED and the globals are set · 1 = nothing to
     STRAGGLER_WATCHED+=("$STRAGGLER_MEMORY_ROOT/archive/$fam.*.md")
   done
 
-  if [ -n "${GOV_DEFAULT_BRANCH:-}" ] && [ "$ref" = refs/remotes/origin/HEAD ]; then
-    obs=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || true); obs=${obs#origin/}
+  if [ -n "${GOV_DEFAULT_BRANCH:-}" ] && [ -n "$rhead" ] && [ "$ref" = "$rhead" ]; then
+    obs=$RR_OBSERVED
     if [ -n "$obs" ] && [ "$obs" != "$GOV_DEFAULT_BRANCH" ]; then
       echo "$STRAGGLER_SAY: GOV_DEFAULT_BRANCH names '$GOV_DEFAULT_BRANCH' and this clone observes '$obs' as its default. The OBSERVED branch decides here; the environment value is a cross-check that warns and never selects."
     fi
