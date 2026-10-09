@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-4 — every subagent starts holding the card's route, stated as facts
 
-**Status:** INPROGRESS · rev-5 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
+**Status:** INPROGRESS · rev-6 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -141,8 +141,8 @@ INPROGRESS`. The one-line forms:
 
 | State | The one line |
 |---|---|
-| no card, no `## route`, or no `- unit:` line | `No unit is routed in this session: <card path> is absent` (or `holds no route`), `so scratch-guard refuses an Edit, Write, MultiEdit or NotebookEdit under ROUTED_PATHS (<value>).` |
-| UNARMED | `<conf> declares <key> <blank, absent or malformed: the rule its value broke>, so scratch-guard refuses every Edit, Write, MultiEdit or NotebookEdit in this repository except to that file.` The rule is `TOOL-aRoutedQuill-2`'s S6: a blank value, an absent key, or a `ROUTED_PATHS` entry that is absolute, climbs through `..` or covers `MEMORY_ROOT`, the entry named. |
+| no card, no `## route`, or no `- unit:` line | `No unit is routed in this session: <card path> is absent` (or `holds no route`, or `the route in <card path> names no unit`; with no `session_id`, `the payload carries no session_id`), `so scratch-guard refuses an Edit, Write, MultiEdit or NotebookEdit under ROUTED_PATHS (<value>).` |
+| UNARMED | `<conf> leaves the write gate UNARMED: <reason>, so scratch-guard refuses every Edit, Write, MultiEdit or NotebookEdit in this repository except to that file.` The reason is `checkUnarmed`'s own text, the one the deny prints, so the two cannot word the rule twice: `TOOL-aRoutedQuill-2`'s S6, a blank or absent key, or a `ROUTED_PATHS` entry that is absolute, climbs through `..` or covers `MEMORY_ROOT`, the entry named. |
 | conf unreadable | `<conf> could not be read (<code>), so scratch-guard refuses every Edit, Write, MultiEdit or NotebookEdit in this repository.` |
 
 ### The evaluation order
@@ -156,6 +156,12 @@ INPROGRESS`. The one-line forms:
 5. `session_id` missing, no card under the common dir, no `## route`, or no `- unit:` line → the
    unrouted line.
 6. Otherwise the block of §4 "Data model", cut to `ROUTE_CONTEXT_CAP`.
+
+Past the cap, the closing line reads `<n> more route lines of <card path> are left out of this
+context, which is capped at 10000 characters.` A unit line that is kept keeps its verdict line, and
+one that is cut takes its verdict with it. The verdict reasons are `checkBuildable`'s; its two
+Tier-1 SPECCED reasons ended in a remedy, `— flip it to INPROGRESS`, which S5 forbids here, so they
+now end in the fact `a Tier-1 unit at INPROGRESS admits`, and the deny keeps its own remedy.
 
 A throw anywhere in the branch exits 0 with nothing printed. The card is located exactly as
 `TOOL-aRoutedQuill-2` locates it, so the context and the gate cannot disagree about which card a
@@ -305,6 +311,7 @@ AC6 is a direct observation of this repository after the rewire and adds no arm.
   also covers an entry that is absolute, climbs through `..` or covers `MEMORY_ROOT`; the line now
   names the key and the rule it broke, and AC3 adds a `..` entry case.
 - rev-5 · 2026-10-09 · §8 F1 · resolved by the stated probe, run by the unattended run before step 3; the record is `memory/builds/aRoutedQuill/build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md`.
+- rev-6 · 2026-10-09 · §4 · the build pass: the UNARMED line quotes `checkUnarmed`'s reason rather than a second wording of it; the unrouted line gains the no-unit and no-`session_id` forms; the closing line past the cap is spelled; and `checkBuildable`'s two Tier-1 SPECCED reasons lose their imperative tail, which S5 would have refused in the context.
 
 ## 10. Reuse audit
 
