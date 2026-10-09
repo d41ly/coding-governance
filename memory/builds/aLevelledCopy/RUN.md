@@ -22,12 +22,12 @@ mode: prompt
 run-branch: refs/heads/branch/friendly-napier-49e2c6
 anchor-kind: run-branch
 cli-version: 2.1.293
-lease-utc: 2026-10-08T22:37:33Z
+lease-utc: 2026-10-09T23:15:37Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 12132
+pid: 25052
 session: 7bb9a7dc-5af0-43b9-b4cd-40d8e56c1c70
-keepalive: d8603c01
+keepalive: 7b9327a4
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 40a8b8c32ad1e7f30f36c7be6e71d9a0a67d142a
 anchor-ref: refs/heads/main
@@ -80,3 +80,5 @@ base: ce9192c0ba180a67b49b2ea3fc8edf2fb8afc0cb
 2026-10-09T05:09:54Z dispatch · item 0a09d7a0 TOOL-aLevelledCopy-8 · reason tools/check-wiring.sh tools/check-wiring.test.sh tools/govkit/entries/check-wiring.kit.toml memory/builds/aLevelledCopy/spec/2026-10-09-spec-TOOL-aLevelledCopy-8.md memory/builds/aLevelledCopy/build/2026-10-09-build-TOOL-aLevelledCopy-8-1-acceptance-ledger.md memory/builds/aLevelledCopy/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
 
 2026-10-09T05:10:13Z brief · item TOOL-aLevelledCopy-8 · reason 88b9006aa11f memory/builds/aLevelledCopy/prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1-2-build-brief.md
+
+2026-10-09T23:15:57Z resume · item aLevelledCopy · reason working · keepalive 7b9327a4 · manual
