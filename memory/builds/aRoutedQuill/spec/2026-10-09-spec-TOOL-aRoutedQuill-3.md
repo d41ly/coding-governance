@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-3 — every pushed commit that touches a product path names a unit specced before it
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -189,7 +189,7 @@ cutoff. Gov declares the cutoff as the date this unit lands, in the commit that 
 
 ### Rollout
 
-Lands at order 3, after the write gate. The commit adding the leg also declares gov's
+Lands at order 4, after the write gate. The commit adding the leg also declares gov's
 `ROUTED_COMMIT_CUTOFF`, so gov's bar is never armed without it. Commits other sessions landed earlier
 on the cutoff day are graded too; AC10's run over gov's history names any, and the landing commit
 lists each in `ROUTED_COMMIT_WAIVED`. From then on every commit this build
@@ -320,6 +320,8 @@ AC10 is a direct observation of this repository and adds no arm.
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 3 to 4, because `KICK-aRoutedQuill-1` moved
+  from order 1 to 2, which shifts every later step by one.
 
 ## 10. Reuse audit
 

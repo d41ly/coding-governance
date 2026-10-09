@@ -1,6 +1,6 @@
 # PLAY-aRoutedQuill-1 — the charter's Definition of Ready: every product-code unit carries a spec before code
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 4
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 5
 
 <!-- gen:spec-records -->
 
@@ -150,7 +150,7 @@ profile name `TOOL-aRoutedQuill-1` mints.
 - The version moves once for the playbook kit. This unit is the build's only one touching the
   template, so whichever route §8 F2 picks is also the last. Under F2 (b) the bump rides the last
   commit that edits the template, and `AGENTS.md` is re-rendered in that same commit.
-- It lands at order 4, after the profile and the gate it names exist; D4 puts it in force on
+- It lands at order 5, after the profile and the gate it names exist; D4 puts it in force on
   landing.
 
 ### Alternatives rejected
@@ -236,6 +236,8 @@ This unit adds no gate arm.
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 4 to 5, because `KICK-aRoutedQuill-1` moved
+  from order 1 to 2, which shifts every later step by one.
 
 ## 10. Reuse audit
 

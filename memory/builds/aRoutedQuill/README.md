@@ -42,7 +42,9 @@ write or a hook-less run passes the first and not the second. The gate reads a s
 writes, so approval is recorded, not proven. There is no prompt classifier and no UserPromptSubmit
 gate, which aReplayedCard rejected on harness grounds. Three shared names have one owner each:
 `ROUTED_PATHS` belongs to unit 2, the card's `## route` section to the kickoff unit, and the unit id
-in a commit subject to unit 3. Kit versions bump once per kit, after the last unit touching it.
+a commit names to unit 3. Kit versions bump once per kit, after the last unit touching it. The
+kickoff unit runs after unit 1, not beside it, because both re-stamp the kickoff manifest. At the
+rev-2 cross-read every unit is FORKED: its open questions go to the owner before any code.
 
 ## Parked decisions
 
@@ -70,14 +72,14 @@ ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuil
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [KICK-aRoutedQuill-1 — the kickoff writes a brief the owner confirms, and the card routes the session to its units](spec/2026-10-09-spec-KICK-aRoutedQuill-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-09 |
 | [TOOL-aRoutedQuill-1 — a Tier-1 spec is a micro-spec, and check 12 grades its sections by heading text](spec/2026-10-09-spec-TOOL-aRoutedQuill-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [TOOL-aRoutedQuill-2 — scratch-guard refuses a product write no buildable unit on the card owns](spec/2026-10-09-spec-TOOL-aRoutedQuill-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [TOOL-aRoutedQuill-3 — every pushed commit that touches a product path names a unit specced before it](spec/2026-10-09-spec-TOOL-aRoutedQuill-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [TOOL-aRoutedQuill-4 — every subagent starts holding the card's route, stated as facts](spec/2026-10-09-spec-TOOL-aRoutedQuill-4.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [PLAY-aRoutedQuill-1 — the charter's Definition of Ready: every product-code unit carries a spec before code](spec/2026-10-09-spec-PLAY-aRoutedQuill-1.md) | 4 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed](spec/2026-10-09-spec-TOOL-aRoutedQuill-5.md) | 4 | 2 | SPECCED | rev-1 | 2026-10-09 |
-| [TOOL-aRoutedQuill-6 — routed against raw: a paired trial on frozen clones of real repositories](spec/2026-10-09-spec-TOOL-aRoutedQuill-6.md) | 5 | 1 | SPECCED | rev-1 | 2026-10-09 |
+| [KICK-aRoutedQuill-1 — the kickoff writes a brief the owner confirms, and the card routes the session to its units](spec/2026-10-09-spec-KICK-aRoutedQuill-1.md) | 2 | 2 | SPECCED | rev-2 | 2026-10-09 |
+| [TOOL-aRoutedQuill-2 — scratch-guard refuses a product write no buildable unit on the card owns](spec/2026-10-09-spec-TOOL-aRoutedQuill-2.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-09 |
+| [TOOL-aRoutedQuill-3 — every pushed commit that touches a product path names a unit specced before it](spec/2026-10-09-spec-TOOL-aRoutedQuill-3.md) | 4 | 2 | SPECCED | rev-2 | 2026-10-09 |
+| [TOOL-aRoutedQuill-4 — every subagent starts holding the card's route, stated as facts](spec/2026-10-09-spec-TOOL-aRoutedQuill-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-10-09 |
+| [PLAY-aRoutedQuill-1 — the charter's Definition of Ready: every product-code unit carries a spec before code](spec/2026-10-09-spec-PLAY-aRoutedQuill-1.md) | 5 | 2 | SPECCED | rev-2 | 2026-10-09 |
+| [TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed](spec/2026-10-09-spec-TOOL-aRoutedQuill-5.md) | 5 | 2 | SPECCED | rev-2 | 2026-10-09 |
+| [TOOL-aRoutedQuill-6 — routed against raw: a paired trial on frozen clones of real repositories](spec/2026-10-09-spec-TOOL-aRoutedQuill-6.md) | 6 | 1 | SPECCED | rev-2 | 2026-10-09 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).
@@ -91,11 +93,12 @@ Ids no `spec-audit` record has ever named: KICK-aRoutedQuill-1 PLAY-aRoutedQuill
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `KICK-aRoutedQuill-1`, `TOOL-aRoutedQuill-1` | yes |
-| 2 | `TOOL-aRoutedQuill-2` | no |
-| 3 | `TOOL-aRoutedQuill-3`, `TOOL-aRoutedQuill-4` | yes |
-| 4 | `PLAY-aRoutedQuill-1`, `TOOL-aRoutedQuill-5` | yes |
-| 5 | `TOOL-aRoutedQuill-6` | no |
+| 1 | `TOOL-aRoutedQuill-1` | no |
+| 2 | `KICK-aRoutedQuill-1` | no |
+| 3 | `TOOL-aRoutedQuill-2` | no |
+| 4 | `TOOL-aRoutedQuill-3`, `TOOL-aRoutedQuill-4` | yes |
+| 5 | `PLAY-aRoutedQuill-1`, `TOOL-aRoutedQuill-5` | yes |
+| 6 | `TOOL-aRoutedQuill-6` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -1,6 +1,6 @@
 # KICK-aRoutedQuill-1 — the kickoff writes a brief the owner confirms, and the card routes the session to its units
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams kickoff · order 1 · closes TOOL-aReplayedCard-11
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams kickoff · order 2 · closes TOOL-aReplayedCard-11
 
 <!-- gen:spec-records -->
 
@@ -389,6 +389,9 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC4
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 1 to 2, because this unit and
+  `TOOL-aRoutedQuill-1` each touch files the kickoff manifest watches, so both re-stamp it and
+  cannot share a parallel step.
 
 ## 10. Reuse audit
 

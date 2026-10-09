@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 4
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 5
 
 <!-- gen:spec-records -->
 
@@ -178,7 +178,7 @@ included, so a deliberate blank stays a visible refusal.
 
 ### Rollout
 
-Lands at order 4, after units 2, 3 and 4. Gov itself is already wired and armed by then, so this
+Lands at order 5, after units 2, 3 and 4. Gov itself is already wired and armed by then, so this
 unit changes what adopters receive and nothing in gov's own session. The agent-cap, memory-tree and
 check-wiring kits each bump their version once, after the build's last unit touching that kit; for
 all three that is this unit unless `PLAY-aRoutedQuill-1` or `TOOL-aRoutedQuill-6` touches one. The
@@ -313,6 +313,8 @@ AC10 is a direct observation of the runbook and adds no arm.
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 4 to 5, because `KICK-aRoutedQuill-1` moved
+  from order 1 to 2, which shifts every later step by one.
 
 ## 10. Reuse audit
 

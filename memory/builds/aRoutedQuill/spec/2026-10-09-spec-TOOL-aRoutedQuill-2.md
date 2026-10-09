@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-2 — scratch-guard refuses a product write no buildable unit on the card owns
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -38,8 +38,9 @@ piece and the remedy, and it binds a subagent exactly as it binds the main loop.
   dir is not the session's, is not gated. A write payload carrying neither field refuses. Observed
   by AC3, AC4 and AC6.
 - **S6** — A conf that declares `MEMORY_ROOT` or `ROUTED_PATHS` blank or absent, or an entry that
-  is absolute or climbs through `..`, is UNARMED: every write in that repository refuses except a
-  write to the conf itself. No conf at the target's toplevel admits with one witness line; a conf
+  is absolute, climbs through `..` or covers `MEMORY_ROOT`, is UNARMED: every write in that
+  repository refuses except a write to the conf itself. An entry covering `MEMORY_ROOT` would make
+  writing a spec need a spec first; `TOOL-aRoutedQuill-3` and `TOOL-aRoutedQuill-5` refuse it too. No conf at the target's toplevel admits with one witness line; a conf
   that exists and cannot be read refuses. Observed by AC5 and AC6.
 - **S7** — No `agent_id` exemption: a subagent's write is judged by the same order. Observed by AC7.
 - **S8** — `main` routes the four write tools to `checkRouted` under a catch that refuses with the
@@ -206,7 +207,7 @@ memory at `6473ae38` over gov's `.claude/settings.json`, the fragment lands in i
 
 ### Rollout
 
-Lands at order 2, after both order-1 units. One commit carries the hook, the widened fragment, gov's
+Lands at order 3, after `TOOL-aRoutedQuill-1` at order 1 and `KICK-aRoutedQuill-1` at order 2. One commit carries the hook, the widened fragment, gov's
 re-merged `.claude/settings.json` and gov's `ROUTED_PATHS`, so gov is never wired and unarmed.
 Claude Code snapshots hooks at session start (its documentation; UNVERIFIED on this node), so
 enforcement begins at the first session after the merge. Every later session that writes product
@@ -291,7 +292,8 @@ the move as owed at the lander.
   is not a whole segment.
 - **AC5** — When the fixture's conf declares `ROUTED_PATHS=""`, a `Write` to any other file exits 2
   naming `UNARMED`, `ROUTED_PATHS` and the conf, and a `Write` to the conf exits 0; the same holds
-  with `MEMORY_ROOT` blank and with an entry that climbs through `..`; with no conf in the fixture,
+  with `MEMORY_ROOT` blank, with an entry that climbs through `..`, and with an entry covering
+  `MEMORY_ROOT`; with no conf in the fixture,
   a write to its `tools/` directory exits 0 with one witness line naming the absent conf.
   Red when: a blank or malformed key turns the gate off without a refusal, or the refusal also
   blocks the one edit that arms it.
@@ -372,12 +374,27 @@ AC8 and AC9 are direct observations of this repository after the rewire and add 
   exit-0 witness line reaches nobody (`tools/hooks/scratch-guard.js:66-69`). Under (a) arming is
   the one edit the refusal names and exempts. Neither stops a narrowed key; that is a visible conf
   diff and TOOL-aRoutedQuill-3's leg.
-  Recommendation: (a), with TOOL-aRoutedQuill-5's session-start red covering an install that has
-  no conf at all.
+  Recommendation: (a), with TOOL-aRoutedQuill-5's session-start report covering an install that
+  has no conf at all. That report is a printed `UNWIRED  routed` line, since `check-wiring.sh
+  --session` always exits 0; only its `--check` mode can fail.
+- **F4 — Does a Tier-1 spec the micro-spec arm never graded admit writes at SPECCED?**
+  `TOOL-aRoutedQuill-1`'s F1 hands this decision here. A Tier-1 spec dated before
+  `SPEC_TIER1_CUTOFF`, or in a tree whose key is blank, reaches SPECCED with nothing checking its
+  sections, and every adopter is in that state until it arms the key. Option (a), as S3 is
+  written: admit every Tier-1 spec at SPECCED. Option (b): admit a Tier-1 spec at SPECCED only when
+  the key is set and the spec's filename date is on or after it, else only at INPROGRESS. Option
+  (c): refuse such a spec outright. Recommendation: (b). D6 admits a Tier-1 spec once it CONFORMS,
+  and only (b) admits nothing the arm has not graded; it costs one conf read and one string compare
+  in `checkBuildable`. Taking (b) moves S3 and AC1 in a rev-3.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · §3 · §4 · §8 · S6 · AC5 · cross-read fold: order 2 to 3, because
+  `KICK-aRoutedQuill-1` moved to order 2 when it and `TOOL-aRoutedQuill-1` were found to share the
+  kickoff manifest's stamps; S6 and AC5 now treat an entry covering `MEMORY_ROOT` as UNARMED, as
+  units 3 and 5 already did; F3 says the session-start report prints rather than reds; F4 carries
+  the Tier-1 admission fork unit 1 handed here.
 
 ## 10. Reuse audit
 

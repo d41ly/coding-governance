@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-6 — routed against raw: a paired trial on frozen clones of real repositories
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams tooling · order 5
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -525,6 +525,8 @@ New arm: none · covers none · the instruments carry their own liveness: the co
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 5 to 6, because `KICK-aRoutedQuill-1` moved
+  from order 1 to 2, which shifts every later step by one.
 
 ## 10. Reuse audit
 

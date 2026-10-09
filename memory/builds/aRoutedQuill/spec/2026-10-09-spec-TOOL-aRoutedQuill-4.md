@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-4 — every subagent starts holding the card's route, stated as facts
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -168,7 +168,7 @@ subagent has.
 
 ### Rollout
 
-Lands at order 3, after `TOOL-aRoutedQuill-2`, because both units edit `scratch-guard.js` and this
+Lands at order 4, after `TOOL-aRoutedQuill-2`, because both units edit `scratch-guard.js` and this
 one calls the readers that unit adds. Hooks are snapshotted at session start (Claude Code's
 documentation; UNVERIFIED on this node), so subagents receive the context from the first session
 after the merge. No kit version moves here: the hooks kit bumps once, after the build's last unit
@@ -287,6 +287,8 @@ AC6 is a direct observation of this repository after the rewire and adds no arm.
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 3 to 4, because `KICK-aRoutedQuill-1` moved
+  from order 1 to 2, which shifts every later step by one.
 
 ## 10. Reuse audit
 
