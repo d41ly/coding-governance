@@ -472,7 +472,10 @@ def resolve_prefix_token(spelled, troot):
         return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
     return spelled.replace("{prefix}", troot)
 # <<< resolve_prefix_token
-rows = [resolve_prefix_token(a, sys.argv[2]) for l in json.load(open(sys.argv[1])) for a in l["argv"][1:] if "/" in a or a.endswith(".sh") or a.endswith(".py")]
+# A git PATHSPEC MAGIC argument (`:!memory/`, `:(glob)…`) names a selection, never a script, and
+# TOOL-aGraftedHelix-45 gave a leg two of them; read as paths they redded this arm on every bar
+# since, with a line that does not say FAIL (TOOL-aMeteredSweep-1).
+rows = [resolve_prefix_token(a, sys.argv[2]) for l in json.load(open(sys.argv[1])) for a in l["argv"][1:] if not a.startswith(":") and ("/" in a or a.endswith(".sh") or a.endswith(".py"))]
 sys.stdout.buffer.write(("\n".join(rows) + ("\n" if rows else "")).encode())   # LF bytes (Windows text stdout is CRLF)
 ' "$LEGS_FILE" "$TROOT")
 # ...and that population is REAL PATHS (closing review round 1 M2). A grep over spellings nothing
@@ -686,6 +689,10 @@ printf '%s\n' "$corrupt" | grep -q '^gates GREEN — 4/4 legs passed$' \
 # harness. Both fire only when `timeout` expires, and on a healthy host it never does, so with a
 # hardcoded 60 the outcomes this arm distinguishes could not be exercised at all - a deliverable
 # whose own acceptance is unobservable, which is the unfailable-check class one level up.
+# An EXPORTED CLAMP_BUDGET is kept as given; unset, it is CALIBRATED below once the fixture exists
+# (TOOL-aMeteredSweep-1), because a typed 60 s expired a width-64 subject while its identical control
+# finished on a host where one spawn cost a quarter of a second, and the arm then blamed the clamp.
+CLAMP_BUDGET_GIVEN=${CLAMP_BUDGET:-}
 CLAMP_BUDGET=${CLAMP_BUDGET:-60}
 # The width the clamp is SUPPOSED to yield, mirroring run-gates.sh:81-82 INCLUDING ITS CASE ORDER:
 # `*[!0-9]*` is tested FIRST there, so `nonsense` (8 chars) clamps to 1 and not to 64 despite also
@@ -739,9 +746,24 @@ clamp_expired_verdict() { # width-input -> prints the verdict; 1 = blame the cla
   return 1
 }
 cp "$SCRATCH/fx/instant.sh" "$SCRATCH/fx/slow.sh"; cp "$SCRATCH/fx/instant.sh" "$SCRATCH/fx/mid.sh"
+# THE BUDGET IS THE HOST'S, MEASURED: one width-1 run of this same fixture, bounded only by a hang guard,
+# and three times its seconds plus 30, never under 60. A subject that outlives THAT is three controls
+# slow, which a host's noise does not explain.
+if [ -z "$CLAMP_BUDGET_GIVEN" ]; then
+  _cb0=$(date +%s)
+  GATE_FULL= GATE_BASE= GATE_JOBS=1 timeout 1800 bash -c "cd '$SCRATCH' && bash $KIT_REL/run-gates.sh" >/dev/null 2>&1
+  _cbt=$(( $(date +%s) - _cb0 ))
+  CLAMP_BUDGET=$(( 3 * _cbt + 30 )); [ "$CLAMP_BUDGET" -ge 60 ] || CLAMP_BUDGET=60
+  echo "canary: clamp — calibrated: a width-1 run of the fixture took ${_cbt}s, so each clamp run is bounded at ${CLAMP_BUDGET}s"
+fi
 for w in 0 -3 nonsense 99999999999999999999 999999999999999999999999999999; do
 n=$((n+1))
 n=$((n+1))
+  # THE WIDTH ITSELF, with no clock at all: the resolved profile names the width the clamp produced.
+  n=$((n+1))
+  _cw=$(cd "$SCRATCH" && GATE_FULL= GATE_BASE= GATE_JOBS="$w" bash $KIT_REL/run-gates.sh --print-profile 2>/dev/null | awk -F'\t' '$1 == "width" { print $2 }')
+  [ "$_cw" = "$(clamp_target "$w")" ] \
+    || { echo "canary: GATE_JOBS='$w' resolved width [$_cw], wanted the clamp's [$(clamp_target "$w")]"; fail=1; }
   out=$(GATE_FULL= GATE_BASE= GATE_JOBS="$w" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash $KIT_REL/run-gates.sh" 2>&1); trc=$?
   if [ "$trc" = 124 ]; then
     clamp_expired_verdict "$w"; cv=$?
@@ -777,10 +799,10 @@ esac
 #        It asserts the message ONLY when the control actually finished - on a loaded host it may
 #        not, and an arm that reds there would be naming a cause it never checked, which is the
 #        defect this whole unit removes. Reported as a loud skip instead of a silent pass.
-v=$( CLAMP_BUDGET=60 clamp_expired_verdict 0 2>&1 )
+v=$( clamp_expired_verdict 0 2>&1 )
 case "$v" in
   *"the clamp let it spin"*)  ;;
-  *"BOTH expired"*) echo "canary: SKIP the spun-outcome arm - this host could not finish the control inside 60s, so the outcome it asserts was not produced" ;;
+  *"BOTH expired"*) echo "canary: SKIP the spun-outcome arm - this host could not finish the control inside its ${CLAMP_BUDGET}s budget, so the outcome it asserts was not produced" ;;
   *) echo "canary: the expiry verdict emitted neither outcome when its control was run: $v"; fail=1 ;;
 esac
 #        ...and the two outcomes are DISTINGUISHABLE, which is the whole point of the unit.
@@ -790,7 +812,7 @@ esac
 #        - when what actually happened is that the second outcome was never produced. The arm
 #        directly above already classifies such a host as a SKIP; this one used to red on it.
 v_undec=$( CLAMP_BUDGET=0.05 clamp_expired_verdict 0 2>&1 )
-v_spun=$(  CLAMP_BUDGET=60   clamp_expired_verdict 0 2>&1 )
+v_spun=$(  clamp_expired_verdict 0 2>&1 )
 case "$v_spun" in
   *"BOTH expired"*)
     echo "canary: SKIP the distinguishability arm - this host never produced the spun outcome, so the two messages were never both generated" ;;
