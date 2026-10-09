@@ -109,6 +109,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - That explicit ask has ONE substitute: a committed build folder the run did not create at the default-branch anchor (the protocol names a weaker second), whose shape your merge bar validates. It must be reachable from a BASE observed on the remote rather than read from a local ref. A run with full shell access can still defeat that, and the control that actually binds lives on the remote.
 - An unattended run lands by its protocol's landing rule, not the local-first one above.
 - After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the push boundary DECIDES whether a full bar is owed, against a recorded green and a declared staleness bound.
+- A landing may take the scoped bar only where a full bar is DECLARED to run after the merge, and that bar's red BINDS: a recorded state the push boundary reads, forcing the full bar on every later landing until a full green descends from it — never just a log line.
 - Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). A GENERATED index is never reconciled — re-render it (§5).
 - Land risky behavior dark: Tier-2 ships behind a default-OFF flag or as inert defaulted data, flipped on only after in-place verification — merges without endangering other nodes, reverts cleanly.
 - Migrations are reversible — test up/down/up.
