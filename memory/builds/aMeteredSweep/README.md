@@ -72,5 +72,5 @@ Ids no `spec-audit` record has ever named: TOOL-aMeteredSweep-1.
 
 <!-- gen:build-edges -->
 
-*This build declares no parent and no build declares it as one.*
+- **Child builds:** [aSparedSpawn](../aSparedSpawn/README.md)
 <!-- /gen:build-edges -->
