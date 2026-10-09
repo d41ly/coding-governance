@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-6 — routed against raw: a paired trial on frozen clones of real repositories
 
-**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams tooling · order 6 · ratified 2026-10-09
+**Status:** SPECCED · rev-4 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams tooling · order 6 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -148,11 +148,13 @@ Read at `6473ae38` on 2026-10-09.
 
 Fixed across arms: the model, the turn cap summed over a session's invocations, the wall ceiling,
 the disallowed web tools, the proxy instructions, and the frozen template the cell is copied from.
-The owner registers the first three at Ask A. Every arm session, and every agent the trial spawns,
-Workflow agents included, runs at High reasoning effort and never Extra (owner ruling, 2026-10-09);
-the pilot records the setting that pins it, which is UNVERIFIED for a `claude -p` session today. Both arms of one task run in the same wave, so a load
-spike hits the pair. Cells are scored as assigned, never by what they did: a routed cell whose route
-did not engage, such as one that wrote through Bash, is scored as routed and named.
+Every arm session runs on Opus 5.5 (`claude-opus-5-5`) at Medium reasoning effort, by the owner's
+ruling of 2026-10-09, which amends an earlier High. Every other agent the trial spawns, Workflow
+agents included, runs at High and never Extra. The pilot records the settings that pin both, which
+are UNVERIFIED for a `claude -p` session today. The owner registers the turn cap and the wall
+ceiling at Ask A. Both arms of one task run in the same wave, so a load spike hits the pair. Cells
+are scored as assigned, never by what they did: a routed cell whose route did not engage, such as
+one that wrote through Bash, is scored as routed and named.
 
 ### The tasks
 
@@ -325,8 +327,8 @@ a session no other work shares, so it never runs under the unattended driver. Ev
 needs the owner's explicit opt-in at run time, so each one waits on its own ask:
 
 - **Ask A**, before any agent runs: the task registry with every quoted prompt, the open §8 forks,
-  the model, the turn cap, the wall ceiling, the cost-ratio ceiling, the budget, and the opt-in for
-  the `lists` Workflow call.
+  the non-arm agents' model, the turn cap, the wall ceiling, the cost-ratio ceiling, the budget,
+  and the opt-in for the `lists` Workflow call.
 - **Ask B**, after the pilot sessions: the opt-in for the `pilot` Workflow call.
 - **Ask C**, after the pilot guard passes: the main arms' budget, re-estimated from the pilot's
   measured spend per session, and the proxy's standing line on Workflow requests.
@@ -544,6 +546,8 @@ New arm: none · covers none · the instruments carry their own liveness: the co
   from order 1 to 2, which shifts every later step by one.
 - rev-3 · 2026-10-09 · §4 · §8 · owner resolves F1 to F4 as recommended, adds F5 resolved as
   bypass inside the frozen clones only, and runs every session and agent at High effort, never Extra.
+- rev-4 · 2026-10-09 · §4 · the owner amends the arms to Opus 5.5 at Medium effort; the trial's
+  other agents stay at High, never Extra, and Ask A registers only the non-arm agents' model.
 
 ## 10. Reuse audit
 
