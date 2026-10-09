@@ -51,3 +51,11 @@ base: 6473ae38a517a3559f2b7daed67a9820c505bd4d
 2026-10-09T06:19:05Z review · item aQuotedBrief · reason verdict BLOCKED · blockers 1
 
 2026-10-09T06:34:56Z dispatch · item cc627830 TOOL-aQuotedBrief-1 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/aQuotedBrief/reviews/2026-10-09-review-TOOL-aQuotedBrief-3-closing-diff-round1.md
+
+2026-10-09T06:42:18Z review · item aQuotedBrief · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 2 · minors 11 · disposition promote
+
+2026-10-09T06:42:34Z rescope · item add TOOL-aQuotedBrief-4 · reason Closing review round 1 H1 (with M1, ids 2 11 18): term 7 reads PROMPT_BRIEF_CUTOFF from the working copy at close and is silent when it is off; promoted at the CONVERGED exit
+
+2026-10-09T06:42:40Z rescope · item add TOOL-aQuotedBrief-5 · reason Closing review round 1 H2 (id 7): preflight and term 7 test the prompt heading differently, so term 7 can certify a record it did not grade; promoted at the CONVERGED exit
+
+2026-10-09T06:42:47Z rescope · item add TOOL-aQuotedBrief-6 · reason Closing review minors batched: round 1 M2 to M6 and L1 to L4, round 2 low 1; one unit, since every fix writes unattended.sh and its suite
