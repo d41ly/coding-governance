@@ -289,7 +289,7 @@ Unattended runs — a mandate on disk, not a block of chat
 The unattended run's authorization: the observed anchor and the ask mandate
 
 - status `building` · streams `tooling` · dossier `memory/map/features/unattended-mandate.md`
-- decisions 3: `TOOL-aStandingWrit-2`, `TOOL-dNarrowedAnchor-1`, `TOOL-dDerivedDocket-19`
+- decisions 4: `TOOL-aStandingWrit-2`, `TOOL-dNarrowedAnchor-1`, `TOOL-dDerivedDocket-19`, `TOOL-aHomedAnchor-1`
 - gotcha-classes 3: `a-merged-in-check-can-refuse-a-pinned-record.md`, `concurrent-runs-are-announced-not-refused.md`, `inherited-git-dir-pins-the-work-tree-to-the-cwd.md`
 - globs 6: `tools/unattended/unattended.sh`, `tools/unattended/check-unattended.sh`, `tools/unattended/lib-unattended.sh`, `memory/guides/UNATTENDED-PROTOCOL.md`, `memory/guides/UNATTENDED-ASKS.md`, `.unattended.conf`
 
