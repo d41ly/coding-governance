@@ -132,6 +132,9 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
   suffixes, and forbidden import directions between layers. Opt-in — with no conf it reports NOT
   ADOPTED and exits 0. Keeping it selected keeps its tools line, which names `{{LEXICON_CONF}}`;
   dropping it removes both.
+- **The review protocol** (`review-harness` kit): selected by default since v4.0, because the
+  protocol carries the security checklist and the tier definitions the charter's `[security]` and
+  `[risk]` practices point at. A selection without the kit goes without both.
 - **A kickoff manifest** (`kickoff-manifest` kit): the per-project manifest `/session-kickoff` reads.
   Keeping it selected keeps the `/session-kickoff` tools line. The manifest's merge exception left
   the charter at v4.0: the `kickoff-manifest ratchet` leg refuses a merge that moved watched files

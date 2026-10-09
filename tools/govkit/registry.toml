@@ -43,6 +43,9 @@ default = [
   "memory-recall",
   "run-gates",
   "check-microformats",
+  # DEPL-aDistilledCharter-2: the review protocol carries the security checklist and the tier
+  # definitions the v4.0 charter's [security] and [risk] practices point at.
+  "review-harness",
 ]
 
 # ---------------------------------------------------------------- entries: kits with a directory
