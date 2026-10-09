@@ -1,6 +1,6 @@
 # PLAY-aRoutedQuill-1 — the charter's Definition of Ready: every product-code unit carries a spec before code
 
-**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 5 · ratified 2026-10-09
+**Status:** INPROGRESS · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 5 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 

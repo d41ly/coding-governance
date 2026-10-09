@@ -64,14 +64,14 @@ none
 | 4 | `TOOL-aRoutedQuill-3` | CLOSED | a push-time leg reds a product change whose commit names no unit specced before it |
 | 5 | `TOOL-aRoutedQuill-4` | CLOSED | a SubagentStart hook hands every subagent the routed unit, its spec and its brief |
 | 6 | `TOOL-aRoutedQuill-5` | SPECCED | the gate's kit and the card writer are adopter defaults, wired at install |
-| 7 | `PLAY-aRoutedQuill-1` | SPECCED | the charter's Definition of Ready requires a spec for every product-code unit |
+| 7 | `PLAY-aRoutedQuill-1` | INPROGRESS | the charter's Definition of Ready requires a spec for every product-code unit |
 | 8 | `TOOL-aRoutedQuill-6` | DEFERRED | a routed-vs-raw trial on frozen clones of real repos |
 | 9 | `TOOL-aRoutedQuill-7` | SPECCED | the unattended prompt-brief check reads its sub-heads from the kickoff kit's skeleton |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 9 unit(s) · node a · opened 2026-10-09 · streams tooling+kickoff+playbook+deployer
+**Build status:** INPROGRESS · 9 unit(s) · node a · opened 2026-10-09 · streams tooling+kickoff+playbook+deployer
 ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-8
 
 <!-- gen:build-units -->
@@ -82,7 +82,7 @@ ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuil
 | [TOOL-aRoutedQuill-2 — scratch-guard refuses a product write no buildable unit on the card owns](spec/2026-10-09-spec-TOOL-aRoutedQuill-2.md) | 3 | 2 | CLOSED | rev-7 | 2026-10-09 |
 | [TOOL-aRoutedQuill-3 — every pushed commit that touches a product path names a unit specced before it](spec/2026-10-09-spec-TOOL-aRoutedQuill-3.md) | 4 | 2 | CLOSED | rev-5 | 2026-10-09 |
 | [TOOL-aRoutedQuill-4 — every subagent starts holding the card's route, stated as facts](spec/2026-10-09-spec-TOOL-aRoutedQuill-4.md) | 4 | 2 | CLOSED | rev-6 | 2026-10-09 |
-| [PLAY-aRoutedQuill-1 — the charter's Definition of Ready: every product-code unit carries a spec before code](spec/2026-10-09-spec-PLAY-aRoutedQuill-1.md) | 5 | 2 | SPECCED | rev-3 | 2026-10-09 |
+| [PLAY-aRoutedQuill-1 — the charter's Definition of Ready: every product-code unit carries a spec before code](spec/2026-10-09-spec-PLAY-aRoutedQuill-1.md) | 5 | 2 | INPROGRESS | rev-3 | 2026-10-09 |
 | [TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed](spec/2026-10-09-spec-TOOL-aRoutedQuill-5.md) | 5 | 2 | SPECCED | rev-4 | 2026-10-09 |
 | [TOOL-aRoutedQuill-6 — routed against raw: a paired trial on frozen clones of real repositories](spec/2026-10-09-spec-TOOL-aRoutedQuill-6.md) | 6 | 1 | DEFERRED | rev-5 | 2026-10-09 |
 | [TOOL-aRoutedQuill-7 — the unattended prompt-brief check reads its sub-head list from the kickoff kit's `--brief-skeleton`](spec/2026-10-09-spec-TOOL-aRoutedQuill-7.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-09 |
