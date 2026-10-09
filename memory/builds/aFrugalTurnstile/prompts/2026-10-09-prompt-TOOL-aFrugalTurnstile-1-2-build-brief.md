@@ -57,3 +57,10 @@ prompt beside this file. Your spec is already committed; do NOT re-author it exc
      close's own record commit; it is NOT `covered` (design §6). Say nothing the code units do not
      build. `WIRE-INTO-PROJECT.md`'s working copy is CRLF: edit with the Edit tool and check the
      staged bytes with `git diff --cached | cat -A | head`.
+11. **Commit ONLY your paths, by pathspec, and retry on a held lock.** Up to four unit passes share
+   this worktree concurrently, and a bare `git commit` would sweep a sibling's staged files into
+   yours. Commit with `git commit -F <message file> -- <every path you stage>` (git's `--only` form,
+   which commits exactly those paths whatever else is staged), the message ending in its `Pass:
+   <unit id>` trailer and the `Co-Authored-By:` line. When git reports `index.lock` exists, a
+   sibling's commit hook is running: wait 30 s and retry, for up to 20 minutes, and never delete the
+   lock.
