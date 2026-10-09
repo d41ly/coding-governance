@@ -47,8 +47,8 @@ include = ["README.md"]
 role = "engine"
 to = "{prefix}/hooks/README.md"
 
-# scratch-guard — the second hook in this home. THREE rules for THREE files, not one rule with a
-# three-element include: govkit check 7i quantifies per FILE under a non-flat home, and every rule
+# scratch-guard — the second hook in this home. One rule per file, not one rule with a
+# many-element include: govkit check 7i quantifies per FILE under a non-flat home, and every rule
 # here is already one-per-file for that reason. `.claude/settings.json` is deliberately NOT a
 # destination of this entry — it is owned by `settings-merge`, and check 4 reds on two entries
 # writing one destination. The wiring rides `settings-merge.py --fragment` instead.
@@ -70,6 +70,14 @@ role = "project-owned"
 include = ["scratch-guard.fragment.json"]
 role = "engine"
 to = "{prefix}/hooks/scratch-guard.fragment.json"
+
+# The same script on SubagentStart (TOOL-aRoutedQuill-4): a second fragment is safe here because
+# settings-merge re-matches a marker only within ONE event's groups, so it never moves the
+# PreToolUse entry. An adopter's wiring of it is TOOL-aRoutedQuill-5's.
+[[files]]
+include = ["scratch-guard-subagent.fragment.json"]
+role = "engine"
+to = "{prefix}/hooks/scratch-guard-subagent.fragment.json"
 
 [adopt]
 # RESTORED. TOOL-aQuenchedHarness-3 removed two `[[gate_leg]]` rows from this file and took

@@ -3243,6 +3243,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_ctx",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
       "id": "check_cutoff_armed",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -7463,6 +7468,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "grade_sub",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
       "id": "grammar",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -10538,6 +10548,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "readStatusCells",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "readStdin",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -12843,6 +12858,11 @@
       "file": "tools/workflows/unattended-build.template.js"
     },
     {
+      "id": "renderClosing",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "renderCodeView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -12963,6 +12983,11 @@
       "file": "tools/workflows/unattended-build.template.js"
     },
     {
+      "id": "renderRouteContext",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "renderRouteDeny",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -13016,6 +13041,11 @@
       "id": "renderUtc",
       "kind": "function",
       "file": "tools/unattended/run-lease.js"
+    },
+    {
+      "id": "renderVerdict",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "render_affordance_exempt",
@@ -16253,6 +16283,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_sub",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
       "id": "run_suggest",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -17521,6 +17556,11 @@
       "id": "structure_identity",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "sub_hook",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "subtokens",

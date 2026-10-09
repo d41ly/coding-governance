@@ -12,11 +12,11 @@ PreToolUse guards — fan-out bounded across Workflow+Agent, scratch bounded acr
 - decisions 0
 - gate-legs 9: `agent-cap self-test`, `scratch-guard self-test`, `verifier fan-out`, `verifier fan-out self-test`, `review-protocol parity (kit vs dogfood)`, `agent-cap restatement`, `agent-cap restatement self-test`, `hook destinations (every declared hook path ships)`, `hook destinations self-test`
 - kits 1: `hooks`
-- harness-hooks 2: `PreToolUse tools/hooks/agent-cap.js`, `PreToolUse tools/hooks/scratch-guard.js`
-- gotcha-classes 8: `bash-c-multiline-flattens-under-msys.md`, `git-rm-cached-refuses-a-diverged-index-blob.md`, `trailing-comma-counted-as-an-element.md`, `allowlist-narrower-than-the-root-it-guards.md`, `a-pair-exists-and-it-is-the-wrong-one.md`
+- harness-hooks 3: `PreToolUse tools/hooks/agent-cap.js`, `PreToolUse tools/hooks/scratch-guard.js`, `SubagentStart tools/hooks/scratch-guard.js`
+- gotcha-classes 8: `bash-c-multiline-flattens-under-msys.md`, `git-rm-cached-refuses-a-diverged-index-blob.md`, `trailing-comma-counted-as-an-element.md`, `allowlist-narrower-than-the-root-it-guards.md`
 - guides 1: `REVIEW-PROTOCOL.md`
 - globs 11: `tools/hooks/*`
-- cut 13 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 14 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## annotation-style
 

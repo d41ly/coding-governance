@@ -21,7 +21,7 @@ gate-legs = [
 ]
 kits = ["hooks"]
 git-hooks = []
-harness-hooks = ["PreToolUse tools/hooks/agent-cap.js", "PreToolUse tools/hooks/scratch-guard.js"]
+harness-hooks = ["PreToolUse tools/hooks/agent-cap.js", "PreToolUse tools/hooks/scratch-guard.js", "SubagentStart tools/hooks/scratch-guard.js"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -128,6 +128,14 @@ CLOSED, has no `agent_id` exemption (a subagent's payload carries the parent's `
 refuses on an absent or replay-written card. An UNARMED conf refuses every write but the one to
 itself. A target outside the session's common dir is not gated, so a scratch clone never meets its
 own conf.
+
+**And the same script on a SECOND event, `SubagentStart`** (`TOOL-aRoutedQuill-4`). A second
+fragment, `scratch-guard-subagent.fragment.json` with matcher `*`, is safe where a second PreToolUse
+one is not, because the merger re-matches a marker only within one event's groups. `main` sends a
+`SubagentStart` payload to `renderRouteContext` before any `tool_name` test, and prints its text as
+`additionalContext`: the card's route lines byte for byte, each unit's `checkBuildable` verdict, and
+what the gate refuses, capped at `ROUTE_CONTEXT_CAP` characters. It states facts and never
+directs, prints nothing where the gate admits everything, and never blocks.
 
 **One rule in `agent-cap.js` is not a fan-out bound and reads the payload's ARGS, not the script**
 (`TOOL-aBlindedTrial-4`, for the ruling `TOOL-aBlindedTrial-6`). A `Workflow` call whose

@@ -169,7 +169,8 @@
       "SessionStart tools/check-wiring.sh",
       "SessionStart tools/process-monitor/procmon-hook.js",
       "Stop tools/unattended/stop-guard.js",
-      "StopFailure tools/unattended/stall-recorder.js"
+      "StopFailure tools/unattended/stall-recorder.js",
+      "SubagentStart tools/hooks/scratch-guard.js"
     ],
     "workflow-scripts": [
       "check-workflow-syntax.js",

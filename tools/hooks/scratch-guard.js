@@ -86,6 +86,19 @@
  * hook-less or `--bare` run fires no hook; a narrowed ROUTED_PATHS is a conf diff, not a refusal; a
  * hand-written card with a `## route` is read like the writer's; and a spec status flipped to
  * INPROGRESS without the owner's approval admits, because the gate reads a status the agent writes.
+ *
+ * THE THIRD EVENT: SUBAGENTSTART (TOOL-aRoutedQuill-4). A subagent inherits the hooks but not the
+ * parent's card, so it would meet the write gate blind. Wired by `scratch-guard-subagent.fragment.json`
+ * (matcher `*`), a payload whose `hook_event_name` is `SubagentStart` is answered on stdout with
+ * `hookSpecificOutput.additionalContext`: the card's `## route` lines byte for byte, each routed unit's
+ * `checkBuildable` verdict, and what the gate refuses under `ROUTED_PATHS`. `renderRouteContext` is
+ * the predicate and its comment is the ONE evaluation order. Its silence rules: nothing when the
+ * session directory is in no repository or its toplevel holds no conf (the gate admits every write
+ * there); ONE line when the conf is unreadable or UNARMED, or the session routes no unit. Every
+ * sentence states what holds and none directs, because injected imperatives can trip a model's
+ * prompt-injection defences. Capped at ROUTE_CONTEXT_CAP characters, the harness's own cap: route
+ * lines are cut at a line boundary and a closing line counts what was left out. It never blocks and
+ * never surfaces an error: a throw prints nothing and exits 0.
  */
 'use strict'
 
@@ -780,24 +793,36 @@ function resolveComparableCommon(start) {
 /**
  * Every `- unit:` line of every `## route` section, a section running from its heading to the next
  * `## ` heading or READY line, backticks stripped. `{ build, units: [{ unit, spec }] }`, `spec` ''
- * when the line names none. The `- brief:` line is not read here.
+ * when the line names none. The `- brief:` line is not read here. `lines` is every non-blank line of
+ * those sections, the heading included, as the card holds it, each with the unit it names or null —
+ * what the subagent context copies.
  */
 function extractRouteUnits(text) {
   let inRoute = false
   let build = ''
   let seen = false
   const units = []
+  const lines = []
   for (const raw of String(text || '').split(/\r?\n/)) {
     const line = raw.replace(/`/g, '').trim()
-    if (line === '## route') { inRoute = true; seen = true; continue }
+    if (line === '## route') { inRoute = true; seen = true; lines.push({ text: raw, unit: null }); continue }
     if (line.startsWith('## ') || line.replace(/^- /, '').startsWith('READY — ')) { inRoute = false; continue }
-    if (!inRoute) continue
+    if (!inRoute || line === '') continue
+    let unit = null
     const b = /^- build:\s*(\S+)\s*$/.exec(line)
-    if (b) { build = b[1]; continue }
     const u = /^- unit:\s*(\S+)(?:\s*·\s*spec\s+(\S+))?\s*$/.exec(line)
-    if (u) units.push({ unit: u[1], spec: u[2] || '' })
+    if (b) build = b[1]
+    else if (u) units.push(unit = { unit: u[1], spec: u[2] || '' })
+    lines.push({ text: raw, unit })
   }
-  return { seen, build, units }
+  return { seen, build, units, lines }
+}
+
+/** The status header's first cell and its `Tier-<n>` cell: `{ status, tier }`, '(none)' and '' when absent. */
+function readStatusCells(text) {
+  const st = String(text || '').split(/\r?\n/).find((l) => l.startsWith('**Status:**')) || ''
+  const cells = st.slice('**Status:**'.length).split('·').map((c) => c.trim())
+  return { status: cells[0] || '(none)', tier: cells.find((c) => /^Tier-\d$/.test(c)) || '' }
 }
 
 /**
@@ -821,10 +846,7 @@ function checkBuildable(u, build, top, memRoot, confBytes) {
   const h1 = lines.find((l) => l.startsWith('# ')) || ''
   const h1Id = h1.slice(2).split(/\s/)[0]
   if (h1Id !== u.unit) return `spec ${u.spec} has H1 naming ${h1Id || '(nothing)'}, not ${u.unit}`
-  const st = lines.find((l) => l.startsWith('**Status:**')) || ''
-  const cells = st.slice('**Status:**'.length).split('·').map((c) => c.trim())
-  const status = cells[0] || '(none)'
-  const tier = cells.find((c) => /^Tier-\d$/.test(c)) || ''
+  const { status, tier } = readStatusCells(text)
   const admits = BUILDABLE_STATUS[tier]
   if (!admits) return `spec ${u.spec} names no Tier-1 or Tier-2 on its status header`
   if (!admits.includes(status)) {
@@ -835,8 +857,9 @@ function checkBuildable(u, build, top, memRoot, confBytes) {
   if (tier === 'Tier-1' && status === 'SPECCED') {
     const cutoff = readConfKey(confBytes, 'SPEC_TIER1_CUTOFF') || ''
     const dated = /^(\d{4}-\d{2}-\d{2})-/.exec(path.basename(u.spec))
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(cutoff)) return `Tier-1 at SPECCED, and SPEC_TIER1_CUTOFF is blank, so no check graded its micro-spec — flip it to INPROGRESS`
-    if (!dated || dated[1] < cutoff) return `Tier-1 at SPECCED, dated before SPEC_TIER1_CUTOFF ${cutoff}, so no check graded its micro-spec — flip it to INPROGRESS`
+    // Facts, not a remedy: the subagent context quotes these reasons, and the deny carries its own.
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(cutoff)) return `Tier-1 at SPECCED, and SPEC_TIER1_CUTOFF is blank, so no check graded its micro-spec; a Tier-1 unit at INPROGRESS admits`
+    if (!dated || dated[1] < cutoff) return `Tier-1 at SPECCED, dated before SPEC_TIER1_CUTOFF ${cutoff}, so no check graded its micro-spec; a Tier-1 unit at INPROGRESS admits`
   }
   return ''
 }
@@ -944,12 +967,100 @@ function checkRouted(data, env) {
   return { deny: renderRouteDeny(tool, targetC, entry, confShown, `no unit its card ${card.shown} routes is buildable:\n${reasons.join('\n')}`, 'Make one routed unit buildable — its spec at the status that admits writes — or route the unit that owns this write through /session-kickoff and manifest-check.sh --card --append.') }
 }
 
+// ---- the subagent context (TOOL-aRoutedQuill-4) ------------------------------------------------
+
+/** The harness's cap on a hook's additionalContext, in characters (Claude Code's documentation). */
+const ROUTE_CONTEXT_CAP = 10000
+const WRITE_TOOLS_PROSE = 'an Edit, Write, MultiEdit or NotebookEdit'
+
+/**
+ * What a subagent is told at SubagentStart, or '' to print nothing. THE ONE EVALUATION ORDER:
+ *  1. session directory = `CLAUDE_PROJECT_DIR`, else the payload `cwd`; under no `.git` → ''
+ *  2. no `.memory-tree.conf` at its toplevel → '' (the gate admits every write there)
+ *  3. the conf unreadable, or UNARMED (checkUnarmed) → its one line
+ *  4. `session_id` missing, no card under the common dir, no `## route`, no `- unit:` → one line
+ *  5. otherwise the card path, its route lines byte for byte, one checkBuildable verdict per unit
+ *     line, the ROUTED_PATHS value and what the gate refuses — route lines cut at a line boundary
+ *     to ROUTE_CONTEXT_CAP, a cut unit line taking its verdict with it, and a closing count line
+ * The card is located as checkRouted locates it, so the context and the gate read one card.
+ */
+function renderRouteContext(data, env) {
+  const fs = require('fs')
+  const path = require('path')
+  const start = env.CLAUDE_PROJECT_DIR || (typeof data.cwd === 'string' ? data.cwd : '')
+  if (!start) return ''
+  const hit = resolveToplevel(path.resolve(buildNativePath(start)))
+  const common = hit && resolveCommonDir(hit)
+  if (!common) return ''
+  const top = hit.toplevel
+  const confShown = buildComparablePath(path.join(top, ROUTE_CONF))
+  let confBytes
+  try {
+    confBytes = fs.readFileSync(path.join(top, ROUTE_CONF), 'utf8')
+  } catch (e) {
+    if (e && e.code === 'ENOENT') return ''
+    return `${confShown} could not be read (${(e && e.code) || e}), so scratch-guard refuses every Edit, Write, MultiEdit or NotebookEdit in this repository.`
+  }
+  const memRoot = readConfKey(confBytes, 'MEMORY_ROOT')
+  const routed = readConfKey(confBytes, 'ROUTED_PATHS')
+  const unarmed = checkUnarmed(memRoot, routed)
+  if (unarmed) return `${confShown} leaves the write gate UNARMED: ${unarmed}, so scratch-guard refuses every Edit, Write, MultiEdit or NotebookEdit in this repository except to that file.`
+  const value = routed.trim()
+  const refuses = `so scratch-guard refuses ${WRITE_TOOLS_PROSE} under ROUTED_PATHS (${value}).`
+  const sid = data.session_id ? String(data.session_id) : ''
+  if (!sid) return `No unit is routed in this session: the payload carries no session_id, ${refuses}`
+  const card = readCard(common, sid)
+  if (card.text === null) return `No unit is routed in this session: ${card.shown} is absent, ${refuses}`
+  const route = extractRouteUnits(card.text)
+  if (!route.seen) return `No unit is routed in this session: ${card.shown} holds no route, ${refuses}`
+  if (route.units.length === 0) return `No unit is routed in this session: the route in ${card.shown} names no unit, ${refuses}`
+  const head = `The parent session's orientation card, ${card.shown}, holds this route:`
+  const tail = [
+    `ROUTED_PATHS in ${ROUTE_CONF} is: ${value}`,
+    `scratch-guard refuses ${WRITE_TOOLS_PROSE} under those paths unless a routed unit is buildable.`,
+  ]
+  const renderVerdict = (u) => {
+    const why = checkBuildable(u, route.build, top, memRoot.trim(), confBytes)
+    if (why) return `${u.unit} is not buildable: ${why}.`
+    const st = readStatusCells(fs.readFileSync(path.join(top, buildNativePath(u.spec)), 'utf8'))
+    return `${u.unit} is buildable: ${st.tier} at ${st.status}.`
+  }
+  const renderClosing = (n) => `${n} more route lines of ${card.shown} are left out of this context, which is capped at ${ROUTE_CONTEXT_CAP} characters.`
+  // Budgeted with the closing line at its longest, so whatever count it ends up naming still fits.
+  let budget = ROUTE_CONTEXT_CAP - head.length - tail.reduce((s, l) => s + l.length + 1, 0) - (renderClosing(route.lines.length).length + 1)
+  const kept = []
+  const verdicts = []
+  for (const l of route.lines) {
+    const v = l.unit ? renderVerdict(l.unit) : ''
+    const cost = l.text.length + 1 + (v ? v.length + 1 : 0)
+    if (cost > budget) break
+    budget -= cost
+    kept.push(l.text)
+    if (v) verdicts.push(v)
+  }
+  const out = [head, ...kept, ...verdicts, ...tail]
+  if (kept.length < route.lines.length) out.push(renderClosing(route.lines.length - kept.length))
+  return out.join('\n')
+}
+
 function main() {
   let data
   try {
     data = JSON.parse(readStdin())
   } catch {
     process.exit(0)
+  }
+  if (data && data.hook_event_name === 'SubagentStart') {
+    // NEVER BLOCKS, NEVER SURFACES AN ERROR: a throw prints nothing. Returning rather than exiting
+    // lets node flush a piped stdout, which process.exit does not wait for on every platform.
+    let text = ''
+    try {
+      text = renderRouteContext(data, process.env)
+    } catch {
+      text = ''
+    }
+    if (text) process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'SubagentStart', additionalContext: text } }) + '\n')
+    return
   }
   if (data && WRITE_TOOLS.includes(data.tool_name)) {
     // FAILS CLOSED, unlike the two Bash checks below: a write gate that throws and admits is the
@@ -1001,4 +1112,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, readCard, WRITE_TOOLS, ROUTE_CONF }
+module.exports = { checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP }

@@ -888,6 +888,155 @@ read_conf "W-AC10 a blank double-quoted value reads blank, not absent" '' 'KEY="
 read_conf "W-AC10 a key is matched whole: KEY_X and NOTKEY are not KEY" '<null>' "$(printf 'NOTKEY=x\nKEY_X=y\n')" KEY
 read_conf "W-AC10 the key is compared as a string, never a regex: K.Y does not read KXY" '<null>' 'KXY=1' 'K.Y'
 
+# ==================================================================================================
+# ---- the SUBAGENT CONTEXT (TOOL-aRoutedQuill-4): a SubagentStart payload is answered with the -----
+# ---- card's route, each unit's verdict and what the write gate refuses, as facts -----------------
+# Over the write gate's fixture, conf and cards above. The base hook exits 0 with EMPTY stdout for
+# every SubagentStart payload, so every `json` arm below was observed RED against it; the `empty`
+# arms are their near-misses. The session directory is the linked worktree, whose toplevel holds
+# the conf, and its card is read from the shared common dir exactly as the gate reads it.
+SG_PROJECT="$SG_CWD_WT"
+# sub_hook <payload> — the hook on a SubagentStart payload: stdout to $TMP/out, stderr to $TMP/err.
+# CLAUDE_PROJECT_DIR is UNSET, not blank, when SG_PROJECT is empty; `env -u` precedes every
+# assignment because GNU env refuses it after one.
+sub_hook() {
+  if [ -n "$SG_PROJECT" ]; then
+    printf '%s' "$1" | env -u CLAUDE_PROJECT_DIR CLAUDE_PROJECT_DIR="$SG_PROJECT" HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
+      node "$HOOK" >"$TMP/out" 2>"$TMP/err"
+  else
+    printf '%s' "$1" | env -u CLAUDE_PROJECT_DIR HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
+      node "$HOOK" >"$TMP/out" 2>"$TMP/err"
+  fi
+}
+# grade_sub <name> <exit> <expect> — `empty`: exit 0, stdout and stderr byte-empty; `json`: exit 0,
+# stderr byte-empty, stdout ONE object whose hookSpecificOutput.hookEventName is SubagentStart, its
+# additionalContext written to $TMP/ctx and appended to $TMP/ctx-all for the AC4 scan.
+grade_sub() {
+  local name=$1 got=$2 expect=$3 bad=""
+  : > "$TMP/ctx"
+  if [ "$got" != 0 ]; then bad="exit $got, want 0"
+  elif [ -s "$TMP/err" ]; then bad="stderr is not byte-empty"
+  elif [ "$expect" = empty ]; then [ -s "$TMP/out" ] && bad="stdout is not byte-empty"
+  else
+    "$TESTPY" -c 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8")); h=d["hookSpecificOutput"]; assert h["hookEventName"]=="SubagentStart" and isinstance(h["additionalContext"],str) and h["additionalContext"]; open(sys.argv[2],"w",encoding="utf-8",newline="").write(h["additionalContext"])' "$TMP/out" "$TMP/ctx" 2>/dev/null \
+      || bad="stdout is not one SubagentStart hookSpecificOutput object carrying additionalContext"
+    [ -z "$bad" ] && { cat "$TMP/ctx"; echo; } >> "$TMP/ctx-all"
+  fi
+  if [ -z "$bad" ]; then echo "ok   $name"; pass=$((pass+1))
+  else echo "FAIL $name ($bad)"; sed 's/^/     /' "$TMP/out" "$TMP/err" | head -5; fail=$((fail+1)); fi
+}
+# run_sub <name> <empty|json> [<field>=<value> ...] — fields join a SubagentStart payload's top level.
+run_sub() {
+  local name=$1 expect=$2 payload; shift 2
+  payload=$("$TESTPY" -c 'import json,sys; d={"hook_event_name":"SubagentStart","agent_id":"sub-1","agent_type":"general-purpose"}; d.update(kv.split("=",1) for kv in sys.argv[1:]); print(json.dumps(d))' "$@")
+  case "$payload" in *'"SubagentStart"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
+  sub_hook "$payload"
+  grade_sub "$name" "$?" "$expect"
+}
+# check_ctx <name> <mode> <needle>... over $TMP/ctx — `lines`: each needle is a WHOLE line of it;
+# `one`: it is exactly one line and carries each needle; `has`: it carries each needle. Byte
+# comparison in grep, so no argv re-encoding sits between a needle and the hook's bytes.
+check_ctx() {
+  local name=$1 mode=$2 bad="" needle; shift 2
+  [ -s "$TMP/ctx" ] || bad="the context is empty"
+  [ -z "$bad" ] && [ "$mode" = one ] && [ "$(grep -c '' "$TMP/ctx")" != 1 ] && bad="the context is $(grep -c '' "$TMP/ctx") lines, not one"
+  if [ -z "$bad" ]; then
+    for needle in "$@"; do
+      if [ "$mode" = lines ]; then grep -Fxq -- "$needle" "$TMP/ctx" || { bad="no whole line '$needle'"; break; }
+      else grep -Fq -- "$needle" "$TMP/ctx" || { bad="no '$needle'"; break; }; fi
+    done
+  fi
+  if [ -z "$bad" ]; then echo "ok   $name"; pass=$((pass+1))
+  else echo "FAIL $name ($bad)"; sed 's/^/     /' "$TMP/ctx" | head -12; fail=$((fail+1)); fi
+}
+: > "$TMP/ctx-all"
+SG_RP_SHOWN="$SGP/ app.md"   # the conf's ROUTED_PATHS value as write_conf wrote it
+
+# ---- AC1: a routed card's lines byte-identical, each unit's verdict, and ROUTED_PATHS ------------
+run_sub "S-AC1 a route to a Tier-2 unit at INPROGRESS -> the SubagentStart JSON" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+check_ctx "S-AC1 every ## route line of the card, byte-identical" lines '## route' '- build: bx' "- unit: TOOL-x-1 · spec $SG_SPECS/2026-10-09-spec-TOOL-x-1.md" '- brief: mem/builds/bx/prompts/b.md'
+check_ctx "S-AC1 the card path, the unit named buildable and the ROUTED_PATHS value" has "$SG_CARD_FIX/sgtest-r1.md" 'TOOL-x-1 is buildable' "$SG_RP_SHOWN"
+run_sub "S-AC1 a route to a Tier-2 unit at SPECCED -> the SubagentStart JSON" json session_id=sgtest-r3 "cwd=$SG_CWD_WT"
+check_ctx "S-AC1 the Tier-2 SPECCED unit is named not buildable, with INPROGRESS" has 'TOOL-x-2 is not buildable' 'INPROGRESS'
+# The verdict must agree with the gate on the SAME fixture: the write the gate admits is the unit the
+# context calls buildable, and the one it refuses is the one called not buildable.
+run_write "S-AC1 agreement: the gate admits a Write under sgtest-r1's route" 0 empty Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+run_write "S-AC1 agreement: the gate refuses a Write under sgtest-r3's route" 2 "any;;TOOL-x-2;;INPROGRESS" Write "$SG_T" session_id=sgtest-r3 "cwd=$SG_CWD_WT"
+
+# ---- AC2: no card, or a card with no ## route, is ONE line naming the card and ROUTED_PATHS ------
+run_sub "S-AC2 no card for the session -> the SubagentStart JSON" json session_id=sgtest-s0 "cwd=$SG_CWD_WT"
+check_ctx "S-AC2 no card: one line naming the card path and the ROUTED_PATHS value" one "$SG_CARD_FIX/sgtest-s0.md" "$SG_RP_SHOWN"
+run_sub "S-AC2 a card with no ## route -> the SubagentStart JSON" json session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+check_ctx "S-AC2 no route: one line naming the card path and the ROUTED_PATHS value" one "$SG_CARD_FIX/sgtest-r6.md" "$SG_RP_SHOWN"
+
+# ---- AC3: UNARMED is one line naming the rule broken; no conf and no repository are silent -------
+write_conf ""
+run_sub "S-AC3 ROUTED_PATHS blank -> the SubagentStart JSON" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+check_ctx "S-AC3 blank: one line naming ROUTED_PATHS, the conf and the blank value" one ROUTED_PATHS "$SG_CONF_SHOWN" blank
+write_conf "$SGP/ ../up/"
+run_sub "S-AC3 an entry climbing through .. -> the SubagentStart JSON" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+check_ctx "S-AC3 ..: one line naming ROUTED_PATHS, the conf, the entry and the .. rule" one ROUTED_PATHS "$SG_CONF_SHOWN" '../up/' 'climbs through ..'
+rm -f "$SG_CONF"
+run_sub "S-AC3 no conf at the session toplevel -> exit 0, stdout and stderr EMPTY" empty session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+write_conf "$SGP/ app.md"
+SG_PROJECT=""
+run_sub "S-AC3 cwd under no repository, no CLAUDE_PROJECT_DIR -> exit 0, stdout and stderr EMPTY" empty session_id=sgtest-r1 "cwd=$SG_NOREPO"
+SG_PROJECT="$SG_CWD_WT"
+
+# ---- AC4: every line of every text above states a fact; none directs the subagent ----------------
+# The population is asserted first: a scan over nothing would pass for the reason it exists to catch.
+if [ "$(grep -c . "$TMP/ctx-all")" -ge 12 ] && ! grep -Eq "^(Run|Write|Use|Read|Do|Don't|Never|Always|Append|Ask|Stop)([^A-Za-z]|$)" "$TMP/ctx-all"; then
+  echo "ok   S-AC4 no line of the AC1-AC3 texts opens with an imperative"; pass=$((pass+1))
+else
+  echo "FAIL S-AC4 an AC1-AC3 line opens with an imperative, or the texts were not collected"; grep -En "^(Run|Write|Use|Read|Do|Don't|Never|Always|Append|Ask|Stop)([^A-Za-z]|$)" "$TMP/ctx-all" | head -5; fail=$((fail+1))
+fi
+if [ "$(grep -c . "$TMP/ctx-all")" -ge 12 ] && ! grep -Eiwq 'must|should|do not' "$TMP/ctx-all"; then
+  echo "ok   S-AC4 no line of the AC1-AC3 texts carries must, should or do not"; pass=$((pass+1))
+else
+  echo "FAIL S-AC4 an AC1-AC3 line carries must, should or do not, or the texts were not collected"; grep -Eiwn 'must|should|do not' "$TMP/ctx-all" | head -5; fail=$((fail+1))
+fi
+
+# ---- AC5: a route past the harness cap is cut at a line boundary, with a closing count line ------
+# The cap is read from the hook, and the padding DERIVED from it: unit lines until the route section
+# alone passes 1.2 times the cap in characters (the loop counts in the shell's units, so it aims at 1.3).
+SG_CAP=$(node -p "require(process.argv[1]).ROUTE_CONTEXT_CAP" "$HOOK")
+# A hook exporting no numeric cap is a failure here, and the arms below still run on the harness's.
+case "$SG_CAP" in ''|*[!0-9]*) echo "FAIL S-AC5 the hook exports no numeric ROUTE_CONTEXT_CAP ('$SG_CAP')"; fail=$((fail+1)); SG_CAP=10000 ;; esac
+write_card sgtest-s5 "$SG_TOP_WT" write "$SG_READY"
+{ printf '## route\n- build: bx\n'
+  sg_len=0; sg_unit="- unit: TOOL-x-1 · spec $SG_SPECS/2026-10-09-spec-TOOL-x-1.md"
+  while [ "$sg_len" -le $(( SG_CAP * 13 / 10 )) ]; do printf '%s\n' "$sg_unit"; sg_len=$(( sg_len + ${#sg_unit} + 1 )); done
+  printf -- '- brief: mem/builds/bx/prompts/b.md\n'; } >> "$SG_CARDS/sgtest-s5.md"
+sed -n '/^## route$/,$p' "$SG_CARDS/sgtest-s5.md" > "$TMP/route-s5"
+run_sub "S-AC5 a route padded past the cap -> the SubagentStart JSON" json session_id=sgtest-s5 "cwd=$SG_CWD_WT"
+sg_chars=$(node -p "require('fs').readFileSync(process.argv[1],'utf8').length" "$TMP/ctx")
+sg_routec=$(node -p "require('fs').readFileSync(process.argv[1],'utf8').length" "$TMP/route-s5")
+if [ "$sg_routec" -gt $(( SG_CAP * 12 / 10 )) ] && [ "$sg_chars" -le "$SG_CAP" ]; then
+  echo "ok   S-AC5 a $sg_routec-character route yields $sg_chars characters, within the cap $SG_CAP"; pass=$((pass+1))
+else
+  echo "FAIL S-AC5 a $sg_routec-character route yields $sg_chars characters against the cap $SG_CAP"; fail=$((fail+1))
+fi
+sg_kept=$(grep -cE '^(## route$|- )' "$TMP/ctx")
+if [ "$sg_kept" -gt 1 ] && ! grep -E '^(## route$|- )' "$TMP/ctx" | grep -vFxq -f "$TMP/route-s5"; then
+  echo "ok   S-AC5 every one of the $sg_kept route lines kept is a whole line of the card"; pass=$((pass+1))
+else
+  echo "FAIL S-AC5 a kept route line is not a whole card line, or none was kept ($sg_kept)"; fail=$((fail+1))
+fi
+sg_left=$(( $(grep -c '' "$TMP/route-s5") - sg_kept ))
+sg_last=$(tail -n 1 "$TMP/ctx")
+case "$sg_last" in
+  "$sg_left more route lines of $SG_CARD_FIX/sgtest-s5.md "*)
+    if [ "$sg_left" -gt 0 ]; then echo "ok   S-AC5 the last line names the card and the $sg_left route lines left out"; pass=$((pass+1))
+    else echo "FAIL S-AC5 no route line was left out, so the cut was never exercised"; fail=$((fail+1)); fi ;;
+  *) echo "FAIL S-AC5 the last line does not name the card and the $sg_left route lines left out: $sg_last"; fail=$((fail+1)) ;;
+esac
+
+# ---- AC7: the branch never surfaces an error: a cwd that is not a string, no CLAUDE_PROJECT_DIR --
+SG_PROJECT=""
+sub_hook '{"hook_event_name":"SubagentStart","session_id":"sgtest-r1","cwd":5,"agent_id":"sub-1"}'
+grade_sub "S-AC7 a numeric cwd and no CLAUDE_PROJECT_DIR -> exit 0, stdout and stderr EMPTY" "$?" empty
+SG_PROJECT="$SG_CWD_FIX"
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
@@ -896,8 +1045,10 @@ n=$((pass+fail))
 # its block, 1 from re-targeting the /tmp near-miss) + the 3 its round-1 fold added (clusters J and K).
 # 212 = 164 + the 48 the write gate added (TOOL-aRoutedQuill-2: 40 run_write arms, 7 readConfKey arms
 # and the foreign fixture's build line).
+# 236 = 212 + the 24 the subagent context added (TOOL-aRoutedQuill-4: 7 for AC1, 4 for AC2, 6 for
+# AC3, 2 for AC4, 4 for AC5 and 1 for AC7).
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=212
+FLOOR_ASSERTIONS=236
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

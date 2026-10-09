@@ -1,12 +1,13 @@
 # TOOL-aRoutedQuill-4 — every subagent starts holding the card's route, stated as facts
 
-**Status:** INPROGRESS · rev-6 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
+**Status:** CLOSED · rev-6 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md](../build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md) | research | TOOL-aRoutedQuill-2 |
+| [2026-10-09-build-TOOL-aRoutedQuill-4-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aRoutedQuill-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-5 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-4-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-4-build-brief.md) | journal | — |
 

@@ -282,8 +282,9 @@ asserted, never its correctness, and there is no waiver.
 
 `TOOL-aRoutedQuill-2`. One fragment, widened: `scratch-guard.fragment.json` declares the matcher
 `Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit`, and `main` sends a shell call to the two checks
-above and a write tool to `checkRouted`. A second fragment of the same script is not an option:
-`settings-merge.py` joins on the script's basename and moves one of the two out.
+above and a write tool to `checkRouted`. A second PreToolUse fragment of the same script is not an
+option: `settings-merge.py` joins on the script's basename within an event and moves one of the two
+out.
 
 **What it refuses.** An `Edit`, `Write`, `MultiEdit` or `NotebookEdit` whose target —
 `tool_input.file_path`, else `tool_input.notebook_path`, resolved against the payload `cwd` — lies
@@ -321,6 +322,21 @@ the agent writes: approval is recorded, not proven. The gate stops forgetting, n
 
 `readConfKey(bytes, key)` is this home's one shell-grammar conf reader; `agent-cap.js`'s
 `readSpecAuditDefault` delegates to it.
+
+**The third event: `SubagentStart`** (`TOOL-aRoutedQuill-4`). A subagent inherits the hooks but not
+the parent's card, so `scratch-guard-subagent.fragment.json` wires the same script on `SubagentStart`
+with matcher `*`. A second fragment is safe here where a second PreToolUse one is not, because the
+merger re-matches a marker only within one event's groups. `main` sends that payload to
+`renderRouteContext` before any `tool_name` test and prints
+`{"hookSpecificOutput":{"hookEventName":"SubagentStart","additionalContext":…}}`: the card's path,
+its `## route` lines byte for byte, one `checkBuildable` verdict per unit, the `ROUTED_PATHS` value
+and what the gate refuses under it. Its silence rules: nothing when the session directory
+(`CLAUDE_PROJECT_DIR`, else the payload `cwd`) is in no repository or its toplevel holds no conf,
+since the gate admits every write there; exactly one line when the conf is unreadable or UNARMED,
+or the session routes no unit. Every sentence states what holds and none directs. The text is
+capped at `ROUTE_CONTEXT_CAP`, 10,000 characters, the harness's own cap: past it, route lines are
+cut at a line boundary, a cut unit line takes its verdict with it, and a closing line names the card
+and how many route lines were left out. It never blocks, and a throw prints nothing and exits 0.
 
 ## The authoring rule for kit files
 
