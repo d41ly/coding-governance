@@ -41,3 +41,9 @@ base: 6473ae38a517a3559f2b7daed67a9820c505bd4d
 2026-10-09T03:03:36Z dispatch · item 985e8b18 TOOL-aQuotedBrief-2 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md memory/guides/UNATTENDED-VERBS.md .claude/skills/unattended/SKILL.md memory/map/generated/symbols.json memory/builds/aQuotedBrief/spec/2026-10-09-spec-TOOL-aQuotedBrief-2.md memory/builds/aQuotedBrief/README.md memory/builds/aQuotedBrief/build/2026-10-09-build-TOOL-aQuotedBrief-2-4-acceptance-ledger.md
 
 2026-10-09T03:04:22Z brief · item TOOL-aQuotedBrief-2 · reason dbd5f0cc3586 memory/builds/aQuotedBrief/prompts/2026-10-09-prompt-TOOL-aQuotedBrief-2-3-build-brief.md
+
+2026-10-09T04:32:52Z dispatch · item 98d212d7 TOOL-aQuotedBrief-3 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-PROTOCOL.md memory/map/generated/symbols.json memory/builds/aQuotedBrief/spec/2026-10-09-spec-TOOL-aQuotedBrief-3.md memory/builds/aQuotedBrief/README.md memory/builds/aQuotedBrief/build/2026-10-09-build-TOOL-aQuotedBrief-3-6-acceptance-ledger.md
+
+2026-10-09T04:33:10Z brief · item TOOL-aQuotedBrief-3 · reason aa96088eb99a memory/builds/aQuotedBrief/prompts/2026-10-09-prompt-TOOL-aQuotedBrief-3-5-build-brief.md
+
+2026-10-09T05:44:21Z dispatch · item 98d212d7 TOOL-aQuotedBrief-3 · reason memory/LIVE.md

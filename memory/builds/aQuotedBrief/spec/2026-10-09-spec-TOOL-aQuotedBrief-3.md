@@ -1,11 +1,12 @@
 # TOOL-aQuotedBrief-3 — every brief item carries its disposition, and `build-complete` grades each one
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base fa68a767 · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base fa68a767 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aQuotedBrief-3-6-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aQuotedBrief-3-6-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aQuotedBrief-3-5-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aQuotedBrief-3-5-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -117,7 +118,7 @@ reaches the wrap-up as an item the owner asked for and did not get.
 | Identifier | Kind | Cell |
 |---|---|---|
 | `read_brief_items` | function | `sh.function`; `python tools/lexicon/lexicon.py --suggest read_brief_items --as sh.function` answered OK |
-| `check_brief_items` | function | `sh.function`; asked at build time, `check` and `read` both carried by the declaration |
+| `check_brief_items` | function | `sh.function`; `python tools/lexicon/lexicon.py --suggest check_brief_items --as sh.function` answered OK at build time |
 
 ### Files touched (estimate)
 
@@ -185,6 +186,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · §4 · build: the four join rules share check 115, each naming its rule and,
+  for an item, the item number last; `check_brief_items` is term 7 and `read_brief_items` the item
+  parser both use; term 7 also runs on term 6's `SPEC_THIN_CUTOFF`-blank exit, where term 6 is off.
 
 ## 10. Reuse audit
 

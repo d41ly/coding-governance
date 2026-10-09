@@ -3079,6 +3079,80 @@ read_audit_ask_record() { # build dir · base
   return 1
 }
 
+# TOOL-aQuotedBrief-3 S1 - one line per `### Items` line of a prompt record on stdin: `<n> <kind>
+# [<args>]`. The disposition is the LAST bracketed group, ending the line, so a bracket inside the item
+# text does not move it. Kind `none` when that group is no disposition, `many` when a second
+# disposition group sits right before it; `planned` args are its ids, `duplicate` args the item number.
+read_brief_items() {
+  awk '
+    { sub(/\r$/, ""); sub(/[[:space:]]+$/, "") }
+    /^## / { h2 = $0; sub(/^## +/, "", h2); h3 = ""; next }
+    h2 == "The brief" && /^### / { h3 = $0; sub(/^### +/, "", h3); sub(/[[:space:]]+$/, "", h3); next }
+    h2 != "The brief" || h3 != "Items" || !/^[0-9]+\./ { next }
+    {
+      n = $0; sub(/\..*/, "", n); kind = "none"; args = ""
+      if (match($0, /\[[^][]*\]$/)) {
+        d = substr($0, RSTART + 1, RLENGTH - 2); rest = substr($0, 1, RSTART - 1); sub(/[[:space:]]+$/, "", rest)
+        k = d; sub(/ .*/, "", k); a = d; if (!sub(/^[^ ]+ +/, "", a)) a = ""
+        if (k ~ /^(planned|stale|duplicate|parked)$/ && (k == "stale" || k == "parked" || a != "")) { kind = k; args = a }
+        if (kind != "none" && rest ~ /\[(planned|stale|duplicate|parked)( [^][]*)?\]$/) kind = "many"
+      }
+      print n, kind, args
+    }'
+}
+# TOOL-aQuotedBrief-3 S3 - `build-complete` TERM 7, read at close: every brief item of a prompt-mode
+# run past PROMPT_BRIEF_CUTOFF is built by CLOSED units or parked as `brief item <n>: ...`. The mode is
+# the run-state fact, the record and the README `opened:` are read at the pinned BASE - the same gate
+# as check_prompt_brief, which refused at preflight what this would otherwise grade - statuses come
+# from the generated units region at HEAD, and a `rescope · item supersede` row hands a unit to its
+# successor, followed to the chain's end. Any other run meets the term and says nothing. Returns 1
+# with DOD_OUT naming each unmet item; leaves DOD_OUT alone when met.
+check_brief_items() { # slug
+  local rm rel base opened rec txt rows sup nsup n kind args id u hop lack unmet=""
+  rm=$(runmd_of "$1"); rel=$(readme_of "$1")
+  [ "$(fact "$rm" mode)" = prompt ] || return 0
+  base=$(fact "$rm" base); [ -n "$base" ] || return 0
+  case "${PROMPT_BRIEF_CUTOFF:-}" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;; *) return 0 ;; esac
+  opened=$(GIT show "$base:$rel" 2>/dev/null | awk 'NR > 1 && /^---/ { exit } /^opened:/ { v = $2; sub(/\r$/, "", v); print v; exit }')
+  case "$opened" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$PROMPT_BRIEF_CUTOFF" ]] && return 0 ;;
+  esac
+  rows=$(unit_rows "$rel")
+  sup=$(sed -n 's/^.* rescope · item supersede \([^ ]*\) -> \([^ ]*\) · reason .*$/\1 \2/p' "$rm" 2>/dev/null)
+  nsup=$(printf '%s\n' "$sup" | grep -c .)
+  while IFS= read -r rec; do
+    txt=$(GIT show "$base:$rec" 2>/dev/null)
+    grep -qE '^## The prompt[[:space:]]*\r?$' <<<"$txt" || continue
+    while read -r n kind args; do
+      [ -n "$n" ] || continue
+      grep -qF -- " · item brief item $n:" "$rm" 2>/dev/null && continue
+      lack=""
+      case "$kind" in
+        stale|duplicate) continue ;;
+        planned)
+          for id in $args; do
+            u=$id; hop=0
+            # ponytail: a chain is followed at most as many hops as there are supersede rows, so a cycle ends.
+            while [ "$hop" -lt "$nsup" ]; do
+              id=$(printf '%s\n' "$sup" | awk -v u="$u" '$1 == u { print $2; exit }')
+              [ -n "$id" ] || break
+              u=$id; hop=$((hop + 1))
+            done
+            printf '%s\n' "$rows" | grep -F -- "| [$u " | grep -qF '| CLOSED |' || lack="$lack $u"
+          done
+          [ -n "$lack" ] || continue
+          lack="planned, and not CLOSED:$lack" ;;
+        parked) lack="parked" ;;
+        *) lack="carrying no single disposition" ;;
+      esac
+      unmet="$unmet · item $n $lack, with no parked line naming brief item $n:"
+    done < <(printf '%s\n' "$txt" | read_brief_items)
+  done < <(GIT ls-tree --name-only --full-tree "$base" -- "$(dirname "$rel")/prompts/" 2>/dev/null)
+  [ -z "$unmet" ] && return 0
+  DOD_OUT="a brief item the owner asked for is neither built by CLOSED units nor parked where the wrap-up surfaces it, so the build is not done by its own brief$unmet"
+  return 1
+}
+
 # TOOL-aQuotedBrief-1 S4 - A PROMPT RECORD STANDS ON ITS OWN. A prompt fired mid-session ("yes, spec
 # it") authorizes a run whose scope lives in the conversation, so from PROMPT_BRIEF_CUTOFF, graded on
 # the README's `opened:` date read AT BASE, every record under prompts/ carrying `## The prompt` must
@@ -3088,10 +3162,12 @@ read_audit_ask_record() { # build dir · base
 # refuses rather than passing over an empty population. Called from verb_preflight only, never from
 # check_authorization: --close re-runs that as `authorization-reachable`, which has no override, so a
 # second reading here could only strand a run.
+# TOOL-aQuotedBrief-3 S2 adds the preflight join over `### Items`, its four rules spec section 4 names.
 # WHAT THIS DOES NOT CHECK: that a brief which relied on the session quoted it - no machine sees the
-# conversation - nor the brief's content: a hollow but non-empty sub-section passes.
+# conversation - nor the brief's content: a hollow but non-empty sub-section passes, and a `stale`
+# or `duplicate` disposition is taken as written, since the owner reads it in the authorized record.
 check_prompt_brief() { # slug · base
-  local base="$2" rel dir opened rec why found=0
+  local base="$2" rel dir opened rec why found=0 txt roster items n kind args id planned=""
   [ "${AUTH_MODE:-}" = prompt ] && [ -n "$base" ] || return 0
   case "${PROMPT_BRIEF_CUTOFF:-}" in
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
@@ -3104,8 +3180,13 @@ check_prompt_brief() { # slug · base
   case "$opened" in
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$PROMPT_BRIEF_CUTOFF" ]] && return 0 ;;
   esac
+  # TOOL-aQuotedBrief-3 S2 - the authored roster at BASE, for the join below. A malformed pair reads
+  # as empty rather than as whatever `region` printed before refusing, so every plan then fails rule 2.
+  roster=$(GIT show "$base:$rel" 2>/dev/null | region - "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null) || roster=""
+  roster=$(printf '%s\n' "$roster" | grep -oE "[A-Z]+-$1-[0-9]+" | sort -u)
   while IFS= read -r rec; do
-    why=$(GIT show "$base:$rec" 2>/dev/null | awk '
+    txt=$(GIT show "$base:$rec" 2>/dev/null)
+    why=$(printf '%s\n' "$txt" | awk '
       { sub(/\r$/, "") }
       /^## / { h2 = $0; sub(/^## +/, "", h2); sub(/[[:space:]]+$/, "", h2); seen[h2] = 1; h3 = ""; next }
       h2 == "The brief" && /^### / { h3 = $0; sub(/^### +/, "", h3); sub(/[[:space:]]+$/, "", h3); order = order "|" h3; next }
@@ -3124,12 +3205,42 @@ check_prompt_brief() { # slug · base
       }')
     [ "$why" = skip ] && continue
     found=1
-    [ -z "$why" ] && continue
-    fail 112 "a prompt record at the pinned BASE does not stand on its own, so a resumed session would hold the owner's bytes and not the build they authorized; write the brief, the session quotes and the confirmation its prompt path names - first rule failed, then the record: $why $rec"
-    return 1
+    if [ -n "$why" ]; then
+      fail 112 "a prompt record at the pinned BASE does not stand on its own, so a resumed session would hold the owner's bytes and not the build they authorized; write the brief, the session quotes and the confirmation its prompt path names - first rule failed, then the record: $why $rec"
+      return 1
+    fi
+    # TOOL-aQuotedBrief-3 S2 - THE PREFLIGHT JOIN, rules 1, 2 and 4 per record; rule 3 after the loop,
+    # over every record's plans. Each rule names itself, and an item's number comes last.
+    items=$(printf '%s\n' "$txt" | read_brief_items)
+    while read -r n kind args; do
+      case "$kind" in
+        planned)
+          planned="$planned $args "
+          for id in $args; do
+            printf '%s\n' "$roster" | grep -qxF -- "$id" && continue
+            why="$rec rule 2, a planned unit the authored roster does not carry, $id: item $n"; break 2
+          done ;;
+        duplicate)
+          [ "$(printf '%s\n' "$items" | awk -v m="$args" '$1 == m { print $2; exit }')" = planned ] && continue
+          why="$rec rule 4, a duplicate of item $args, which is not planned: item $n"; break ;;
+        stale|parked) ;;
+        *) why="$rec rule 1, not exactly one disposition among planned, stale, duplicate and parked: item $n"; break ;;
+      esac
+    done < <(printf '%s\n' "$items")
+    [ -n "$why" ] && break
   done < <(GIT ls-tree --name-only --full-tree "$base" -- "$dir/prompts/" 2>/dev/null)
-  [ "$found" = 1 ] && return 0
-  fail 113 "a prompt-mode build past PROMPT_BRIEF_CUTOFF carries no record with ## The prompt under its prompts/ folder at the pinned BASE, and an absent record is not nothing to grade: $base:$dir/prompts/"
+  if [ "$found" != 1 ]; then
+    fail 113 "a prompt-mode build past PROMPT_BRIEF_CUTOFF carries no record with ## The prompt under its prompts/ folder at the pinned BASE, and an absent record is not nothing to grade: $base:$dir/prompts/"
+    return 1
+  fi
+  if [ -z "$why" ]; then
+    for id in $roster; do
+      case "$planned" in *" $id "*) continue ;; esac
+      why="rule 3, a roster unit no planned item names: $id"; break
+    done
+  fi
+  [ -z "$why" ] && return 0
+  fail 115 "a brief item at the pinned BASE does not join the authorized roster, so the close could not tell an item the owner asked for from one the run dropped or added; give every ### Items line the one disposition its prompt path names - the rule failed, after the record holding it: $why"
   return 1
 }
 
@@ -10579,7 +10690,7 @@ dod_met() { # slug · run-state file · item · checker
       # SUPERSEDED as this item applies it by owner ruling TOOL-dUnstuckLanding-23: "a build lands its
       # CLOSED units when every other unit is DEFERRED with an open ask it filed and no CLOSED unit
       # consumes-from one". Term 5's carry-forward half is that ruling; the rest of the rule stands.
-      # SIX terms, ALL required. Terms 1-2 guard the roster itself; term 3 is the only one that can
+      # SEVEN terms, ALL required; term 7 is TOOL-aQuotedBrief-3's, `check_brief_items`. Terms 1-2 guard the roster itself; term 3 is the only one that can
       # see a planned unit nobody specced, because the generated region is rendered from the specs
       # that EXIST; and term 4 is here because term 5 is VACUOUSLY TRUE over an empty selection -
       # `region` exits 0 with empty stdout for a well-formed pair enclosing nothing, so a run-state
@@ -10670,6 +10781,8 @@ $_bcopen"
       # ---- BLANK or absent turns the term off entirely, which is announced rather than silent.
       local _bcthin="" _bcid _bcsp _bcdate
       if [ -z "${SPEC_THIN_CUTOFF:-}" ]; then
+        # ---- TERM 7 here too: term 6 is OFF on this path, so nothing it reports can be masked.
+        check_brief_items "$slug" || return 1
         DOD_OUT="${_bccarry:+$_bccarry
 }note — the project declares no SPEC_THIN_CUTOFF, so the THIN term is OFF and a CLOSED unit whose spec states no acceptance criterion is not refused here"
         return 0
@@ -10701,6 +10814,9 @@ $_bcopen"
         DOD_OUT="a unit is CLOSED against a spec the kit's own predicate grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing ever stated what done meant for it:$_bcthin"
         return 1
       fi
+      # ---- TERM 7 (TOOL-aQuotedBrief-3 S3): every brief item built by CLOSED units or parked. After
+      # ---- term 6, returning early with its own DOD_OUT like every term above.
+      check_brief_items "$slug" || return 1
       # The carried-forward lines ride every MET return, so a partial landing is never silent.
       [ -z "$_bcskip" ] && { DOD_OUT="$_bccarry"; return 0; }
       DOD_OUT="${_bccarry:+$_bccarry

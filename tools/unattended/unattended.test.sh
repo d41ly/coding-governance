@@ -4223,7 +4223,7 @@ miss "$out" "admitted under prompt mode"
 # ---- observed RED against the pre-pass driver, which admitted any prompt record.
 _qb_rec=memory/builds/tBr/prompts/2026-10-09-prompt-mandate.md
 _qb_bare=$'# Run mandate\n\n## The prompt\n\n> Build the widget.\n'
-_qb_brief=$'\n## The brief\n\n### Goal\nBuild the widget.\n\n### Items\n1. The widget.\n\n### Acceptance\nIt renders.\n\n### Gates\nThe bar.\n\n### Non-goals\nNothing else.\n'
+_qb_brief=$'\n## The brief\n\n### Goal\nBuild the widget.\n\n### Items\n1. The widget. [stale it renders at BASE]\n\n### Acceptance\nIt renders.\n\n### Gates\nThe bar.\n\n### Non-goals\nNothing else.\n'
 _qb_ok="$_qb_bare$_qb_brief"$'\n## Drawn from the session\n\nnone\n\n## Owner confirmation\n\nnot asked — the brief draws on nothing outside the prompt\n'
 _qb_unasked="$_qb_bare$_qb_brief"$'\n## Drawn from the session\n\n> yes, spec it as a build\n— owner, turn 4\n\n## Owner confirmation\n\nnot asked — the brief draws on nothing outside the prompt\n'
 _qb_audit="$_qb_bare$_qb_brief"$'\n## Drawn from the session\n\n> opt in to the spec reviews for this build\n— agent, turn 3\n\n## Owner confirmation\n\nAsked: accept this brief?\nAnswer: accept\n'
@@ -4346,6 +4346,98 @@ out=$(CARRIED_LIVE=1 run --preflight tBr --keepalive-id k1)
 hit  "$out" "a first preflight found this branch carrying a commit the default branch does not hold that touches a path outside this build's folder and the declared generated indexes, and it would land with the run without passing through the spec loop; start the run in a fresh worktree off the default branch, carrying only the build folder - the commit and the first such path: $_cb_sha moved.txt"
 git checkout -qf unit; git branch -f main "$BASE"; git push -q -f origin "$BASE":main
 reset_tree
+
+# ---- TOOL-aQuotedBrief-3 — EVERY BRIEF ITEM CARRIES ITS DISPOSITION (check 115) and `build-complete`
+# ---- term 7 grades each one. The preflight arms reuse unit 1's fixture with an authored roster pair;
+# ---- the close arms rebuild the build-complete epoch as a prompt-mode build. Each arm was observed RED
+# ---- against the pre-pass driver, which admitted a brief with no dispositions and closed it green.
+write_brief_record() { # slug · the ### Items lines -> a conforming prompt record carrying them
+  mkdir -p "memory/builds/$1/prompts"
+  printf '%s' "$_qb_bare"$'\n## The brief\n\n### Goal\nBuild the widget.\n\n### Items\n'"$2"$'\n\n### Acceptance\nIt renders.\n\n### Gates\nThe bar.\n\n### Non-goals\nNothing else.\n\n## Drawn from the session\n\nnone\n\n## Owner confirmation\n\nnot asked — the brief draws on nothing outside the prompt\n' > "memory/builds/$1/prompts/2026-10-09-prompt-mandate.md"
+}
+_bq_why="a brief item at the pinned BASE does not join the authorized roster, so the close could not tell an item the owner asked for from one the run dropped or added; give every ### Items line the one disposition its prompt path names - the rule failed, after the record holding it:"
+for _bq_arm in 1 2 3 4 ok; do
+  reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+  roster tBr "1. ARCH-tBr-1 — the unit"
+  case "$_bq_arm" in
+    1)  write_brief_record tBr $'1. The unit. [planned ARCH-tBr-1]\n2. The docs.' ;;
+    2)  write_brief_record tBr $'1. The unit. [planned ARCH-tBr-9]' ;;
+    3)  write_brief_record tBr $'1. The unit. [stale it is built at BASE]' ;;
+    4)  write_brief_record tBr $'1. The unit. [planned ARCH-tBr-1]\n2. Again. [duplicate 3]\n3. Old. [stale it is true at BASE]' ;;
+    ok) write_brief_record tBr $'1. The unit, [bracketed] in its text. [planned ARCH-tBr-1]\n2. Again. [duplicate 1]\n3. Later. [parked the owner decides]' ;;
+  esac
+  scope published; printf 'PROMPT_BRIEF_CUTOFF="2026-07-01"\n' >> .unattended.conf
+  git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+  out=$(run --preflight tBr --keepalive-id k1)
+  case "$_bq_arm" in
+    # ---- AC1: item 2 carries no disposition, so rule 1 refuses naming item 2, and no RUN.md is written.
+    1)  hit  "$out" "$_bq_why $_qb_rec rule 1, not exactly one disposition among planned, stale, duplicate and parked: item 2"
+        same "TOOL-aQuotedBrief-3 AC1 a refused join created no run-state file" "$([ -f memory/builds/tBr/RUN.md ] && echo yes || echo no)" "no" ;;
+    # ---- AC2: a plan naming no roster unit is rule 2; a roster unit no item plans is rule 3.
+    2)  hit  "$out" "$_bq_why $_qb_rec rule 2, a planned unit the authored roster does not carry, ARCH-tBr-9: item 1" ;;
+    3)  hit  "$out" "$_bq_why rule 3, a roster unit no planned item names: ARCH-tBr-1" ;;
+    # ---- AC3: a duplicate of an item nothing builds is rule 4.
+    4)  hit  "$out" "$_bq_why $_qb_rec rule 4, a duplicate of item 3, which is not planned: item 2" ;;
+    # ---- the green control: every rule met, with a bracket inside an item's text, is admitted.
+    ok) hit  "$out" "preflight OK"; miss "$out" "does not join the authorized roster" ;;
+  esac
+  [ "$_bq_arm" = ok ] || miss "$out" "preflight OK"
+done
+# ---- The close arms: the build-complete epoch with `authorized-by: prompt` and a record whose one item
+# ---- plans its one unit, on main so it is the pinned BASE. `build_brief_run` opens a run over it with
+# ---- the cutoff declared (or not), the way `bcopen` opens the slug-mode one.
+bcsetup; git checkout -qf main
+mutate memory/builds/tRun/README.md '/^slug: tRun$/a authorized-by: prompt'
+write_brief_record tRun '1. The unit. [planned ARCH-tRun-1]'
+git add -A >/dev/null && git commit -q -m bq-fixture --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+_bq_base=$(git rev-parse HEAD)
+build_brief_run() { # [cutoff] -> a preflighted prompt-mode run over the fixture above
+  git reset -q --hard "$_bq_base"; git clean -qfd; mkconf
+  # Committed, since preflight refuses a dirty tree and the close would then grade a stale RUN.md.
+  [ -z "${1:-}" ] || { printf 'PROMPT_BRIEF_CUTOFF="%s"\n' "$1" >> .unattended.conf
+                       git add -A >/dev/null && git commit -q -m bq-cutoff --no-verify; }
+  run --preflight tRun --keepalive-id KA-1234 >/dev/null
+  add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
+  printf '2026-08-31T00:00:00Z review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED\n' >> memory/builds/tRun/RUN.md
+}
+_bq_term7="a brief item the owner asked for is neither built by CLOSED units nor parked where the wrap-up surfaces it, so the build is not done by its own brief"
+_bq_ovr="--override closing-review-recorded --reason fixture-build-records-no-review"
+# ---- the green control: the planned unit is CLOSED, so term 7 is met.
+build_brief_run 2026-07-01
+out=$(run --close tRun $_bq_ovr)
+hit  "$out" "close OK"; miss "$out" "$_bq_term7"
+# ---- AC4: the planned unit ended WONTDO with no park naming the item, so term 7 names item 1 and the unit...
+build_brief_run 2026-07-01
+sed -i 's/| CLOSED | rev-1 |/| WONTDO | rev-1 |/' memory/builds/tRun/README.md memory/builds/tRun/RUN.md
+out=$(run --close tRun $_bq_ovr)
+hit  "$out" "$_bq_term7 · item 1 planned, and not CLOSED: ARCH-tRun-1, with no parked line naming brief item 1:"
+miss "$out" "close OK"
+# ---- ...and a parked line naming `brief item 1:` meets it, so the wrap-up carries the item instead.
+run --park tRun --item "brief item 1: the unit" --reason "the owner abandoned it" >/dev/null
+out=$(run --close tRun $_bq_ovr)
+miss "$out" "$_bq_term7"
+# ---- AC5: the WONTDO unit superseded by a CLOSED successor meets term 7; a WONTDO successor does not.
+for _bq_succ in CLOSED WONTDO; do
+  build_brief_run 2026-07-01
+  sed -i 's/| CLOSED | rev-1 |/| WONTDO | rev-1 |/' memory/builds/tRun/README.md memory/builds/tRun/RUN.md
+  sed -i "/^| \[ARCH-tRun-1 /a | [ARCH-tRun-2 — the successor](spec/two.md) | $_bq_succ | rev-1 | 2026-08-01 |" memory/builds/tRun/README.md memory/builds/tRun/RUN.md
+  run --rescope tRun --act supersede --item ARCH-tRun-1 --successor ARCH-tRun-2 --reason "split differently" >/dev/null
+  out=$(run --close tRun $_bq_ovr)
+  if [ "$_bq_succ" = CLOSED ]; then miss "$out" "$_bq_term7"
+  else hit "$out" "$_bq_term7 · item 1 planned, and not CLOSED: ARCH-tRun-2, with no parked line naming brief item 1:"; fi
+done
+# ---- AC7: a README before the cutoff, and a slug-mode build, close as at BASE: the WONTDO unit is terminal.
+build_brief_run
+sed -i 's/| CLOSED | rev-1 |/| WONTDO | rev-1 |/' memory/builds/tRun/README.md memory/builds/tRun/RUN.md
+out=$(run --close tRun $_bq_ovr)
+hit  "$out" "close OK"; miss "$out" "$_bq_term7"
+bcopen
+sed -i 's/| CLOSED | rev-1 |/| WONTDO | rev-1 |/' memory/builds/tRun/README.md memory/builds/tRun/RUN.md
+printf 'PROMPT_BRIEF_CUTOFF="2026-07-01"\n' >> .unattended.conf
+out=$(run --close tRun $_bq_ovr)
+hit  "$out" "close OK"; miss "$out" "$_bq_term7"
+git reset -q --hard; git clean -qfd; bcrestore
 
 # ---- TOOL-aWardedAudit-6 S4: a record whose BASE README carries a prompt-mode `spec-audit:` line - the
 # ---- state a run preflighted under a driver before check 89 is left in - reads NOT GRADABLE at the
@@ -16542,7 +16634,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 2657 -> 2673 by TOOL-aQuotedBrief-2: the carried-branch arms (check 114) after the prompt-record
 # arms in region three, 16 assertions, run as a slice of the prologue and that block on node a,
 # 2026-10-09; no suite ran.
-FLOOR_ASSERTIONS=2673
+# RAISED 2673 -> 2701 by TOOL-aQuotedBrief-3: the brief-item arms (check 115 and build-complete term 7)
+# after the carried-branch arms in region three, 28 assertions counting their `mutate` lines, run as a
+# slice of the prologue and those blocks on node a, 2026-10-09; no suite ran.
+FLOOR_ASSERTIONS=2701
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -16726,7 +16821,8 @@ FLOOR_SHARD_1=267
 FLOOR_SHARD_2=222
 # RAISED 255 -> 279 by TOOL-aQuotedBrief-1: the same 24 region-three prompt-record assertions, see FLOOR_ASSERTIONS.
 # RAISED 279 -> 295 by TOOL-aQuotedBrief-2: the same 16 region-three carried-branch assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_3=295
+# RAISED 295 -> 323 by TOOL-aQuotedBrief-3: the same 28 region-three brief-item assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=323
 FLOOR_SHARD_4=390
 FLOOR_SHARD_5=270
 FLOOR_SHARD_6=129

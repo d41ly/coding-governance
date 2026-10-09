@@ -1278,6 +1278,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_brief_run",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "build_cache",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -2986,6 +2991,11 @@
       "id": "check_break_refuses",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "check_brief_items",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_build_backlog",
@@ -10601,6 +10611,11 @@
       "id": "read_bound_key",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "read_brief_items",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "read_brief_paths",
@@ -19581,6 +19596,11 @@
       "id": "write_br_build",
       "kind": "function",
       "file": "tools/unattended/check-brief-recorded.test.sh"
+    },
+    {
+      "id": "write_brief_record",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_c42_conf",

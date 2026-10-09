@@ -535,7 +535,9 @@ the run, which makes "the owner was asked at the start" a property of the commit
 1. **Orient from the prose**, in the kickoff engine's manner, its steps 0 to 4: derive every field you
    can from the prose, the memory tree and the code, and do not ask yet. **RUN the orientation
    probes here, before step 3 writes the roster** — the engine's step 4 names which; a seam or prior
-   record found after the roster is pushed costs a commit and a push to re-decide.
+   record found after the roster is pushed costs a commit and a push to re-decide. **Decide every
+   brief item's disposition here too**, from those probes, for step 3 to write; it is part of the
+   authorization, so a later change of mind is a parked entry, never an edit.
 2. **Decide whether to ask, ONCE.** The field set is the kickoff checker's,
    `bash <check-script> --task-skeleton`. ACCEPTANCE and GATES are disqualifying; any other gap is
    askable once. **The only owner turn there is**: one `AskUserQuestion`, every gap in it, four
@@ -569,7 +571,12 @@ the run, which makes "the owner was asked at the start" a property of the commit
    **The record stands on its own**, because a resumed session or a later reader holds no
    conversation: `## The prompt` verbatim, then three sections in this order, each non-empty.
    `## The brief` holds `### Goal`, `### Items` (numbered `1.` lines), `### Acceptance`, `### Gates`
-   and `### Non-goals`, in that order. `## Drawn from the session` quotes, verbatim, every passage
+   and `### Non-goals`, in that order. Each item is one line ending in the disposition step 1 decided:
+   `[planned <unit-id> ...]` (step 1 decides all four) `[stale <evidence>]` `[duplicate <n>]` `[parked <reason>]`.
+   Every `planned` id is a roster unit, every roster unit is planned by some item, and a `duplicate`
+   names a `planned` item, or preflight refuses at check 115. `--close` then wants each `planned`
+   item's units CLOSED, a superseded one's successor in its place, unless a `--park` item opens
+   `brief item <n>:`, and a `parked` item always parked so. `## Drawn from the session` quotes, verbatim, every passage
    the brief relied on, each followed by `— owner, <turn or time>` or `— agent, …`, since a brief may
    rest on your own earlier proposal; it is the single line `none` when the brief relied on nothing
    outside the prompt. `## Owner confirmation` holds step 2's question as `Asked: <verbatim>` and the
