@@ -89,6 +89,22 @@ reads every descriptor in one `awk`. The other appendix claims superseded here: 
 `--for-paths` arm at a foreign prefix was a hardcoded `tools` path, fixed; the three reds the
 remaining-legs pass lists as edits in flight are fixed.
 
+## What the second bar added
+
+The verification bar at `a3531d5e` ran with a seeded ledger, so it dispatched longest-first, beside a
+neighbouring repository's bar that made one spawn cost 0.8 s against this clone's recorded 21 ms.
+It took 24,857 s against the first bar's 13,324 s, with 15 legs outliving a ceiling against 9, and
+two of them outliving it again on the serial retry. The load differed between the two runs, so the
+wall clocks do not compare. What the run does show is how heavy the pool's opening is: longest-first
+puts the eight heaviest spawn-bound suites in it together. So lever 2 lands only BESIDE lever 3: an
+order that packs the heaviest legs first needs a width set by measured spawn pressure, or it
+manufactures the ceiling fires that lever 1 then retries.
+
+The fix that held for the clock-bound arms this build touched is the pattern for the rest of the
+flake list: order on a leg's row where an order exists, and where one clock must remain, measure the
+host first (a one-leg bar, or ten spawns over the recorded floor) and derive the bound from that
+reading rather than typing one.
+
 ## The order to build them in
 
 1. Measure width 4, 6 and 8 on this node, quiet and loaded. Every run record retained is width 8.

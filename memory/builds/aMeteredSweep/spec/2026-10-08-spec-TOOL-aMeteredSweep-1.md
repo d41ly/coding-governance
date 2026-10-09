@@ -1,6 +1,6 @@
 # TOOL-aMeteredSweep-1 — every red of a full bar with self-tests on the reconciled main, fixed
 
-**Status:** OPEN · rev-3 · 2026-10-08 · node a · Tier-1 · base fa68a767 · streams tooling · order 1
+**Status:** OPEN · rev-4 · 2026-10-08 · node a · Tier-1 · base fa68a767 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -46,7 +46,9 @@ green on a quiet host.
   AC1.
 - S9. `run-gates canary` — the memory-pause AC6 and AC14 arms order on leg rows, and the one clock
   AC6 cannot lose is calibrated: a one-leg bar is timed first and the hold bound, C's end and the
-  run-length bound derive from that reading. Observed by AC1 and AC5.
+  run-length bound derive from that reading. The attribution arm AC15's 8 s wall is calibrated the
+  same way: the bar is timed with no attribution and the wall and R's sleep derive from it. Observed
+  by AC1 and AC5.
 - S10. `foreign-prefix parity` — a row's declared budget becomes a hang guard at three times its
   value times the host's measured load, read as a hang, because this leg grades parity and its
   budgets are quiet readings: at the fix commit six passing rows overran theirs inside the loaded
@@ -132,3 +134,4 @@ none
 - rev-1 · 2026-10-08 · initial draft.
 - rev-2 · 2026-10-08 · S10 and AC4: the verification bar redded foreign-prefix parity on six passing rows that overran quiet budgets.
 - rev-3 · 2026-10-09 · S9, S10, AC4, AC5: the leftover re-run redded both again beside a neighbouring bar, so the clock in each is measured rather than typed (owner, option 1).
+- rev-4 · 2026-10-09 · S9: the final re-run redded the attribution arm AC15 on its typed 8 s wall, so that wall is calibrated too.
