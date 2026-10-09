@@ -785,6 +785,20 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   `.githooks/gate-env.sh` — your non-code paths, e.g. your memory tree and root markdown. A push that
   changes only those runs just the legs whose `doc_reads` moved; kit legs arrive declared, and a leg of
   your own runs every time until you give it a `doc_reads` list in your manifest.
+- **Optional, to land on the scoped bar and run the full bar after the merge**: declare
+  `GATE_POST_MERGE=local` or `GATE_POST_MERGE=ci` in `.githooks/gate-env.sh` and commit it. A push
+  then lands on the bar the boundary decides, and the full bar runs on the landed sha afterwards. Its
+  red is published as `refs/gov/bar-red` on your remote and forces the full bar on every later landing
+  until a full green descends from it. What each part asks of you:
+
+  | To get | Declare | Where |
+  |---|---|---|
+  | the lag counted in first-parent landings, a push whose tree already carries a recorded green running no bar, and a full bar after a red re-running only what failed or moved | nothing: `govkit update` | — |
+  | the green of your own wrapper bar recorded, at the push boundary and at the unattended close | nothing: both record it | — |
+  | one bar per machine, for a bar that is not the runner | enter it through `<prefix>/run-gates/run-gates.sh --hold -- <your bar>`, or have the bar script re-exec itself through that | your bar script |
+  | the post-merge full bar, its binding red, and the unattended close landing on the scoped bar | `GATE_POST_MERGE=local`, where the lander starts it on the landing machine, or `GATE_POST_MERGE=ci`, where remote CI runs it; committed | `.githooks/gate-env.sh` |
+  | remote CI running it | a job that runs `<prefix>/run-gates/post-merge.sh <sha>` on every push to the default branch, with a token that can push `refs/gov/*` | your CI workflow |
+  | the unattended close landing without a full bar | relaxing any rule of your own that demands a full bar per unattended landing; this kit does not change it for you | your charter |
 
 **Also copy, if you want the gates this repo runs on itself** (each is a leg, none is wired for you):
 

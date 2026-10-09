@@ -74,7 +74,7 @@ ids DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-aFrugalTurnstile-1 — the runbook states what an adopter declares to use each part](spec/2026-10-09-spec-DEPL-aFrugalTurnstile-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [DEPL-aFrugalTurnstile-1 — the runbook states what an adopter declares to use each part](spec/2026-10-09-spec-DEPL-aFrugalTurnstile-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [PLAY-aFrugalTurnstile-1 — the charter's §1 Landing states the scoped-then-full path](spec/2026-10-09-spec-PLAY-aFrugalTurnstile-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-1 — staleness counts first-parent landings, and a runner stamp is trusted only for the runner's own manifest](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-10 — the unattended protocol's landing rule states the scoped-then-full path](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-10.md) | 1 | 2 | OPEN | rev-2 | 2026-10-09 |
@@ -88,7 +88,7 @@ ids DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL
 | [TOOL-aFrugalTurnstile-9 — the unattended close runs the boundary's decision where a post-merge bar is declared](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-9.md) | 5 | 2 | OPEN | rev-2 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 6 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

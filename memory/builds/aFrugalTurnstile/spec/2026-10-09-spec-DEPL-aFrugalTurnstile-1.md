@@ -1,11 +1,12 @@
 # DEPL-aFrugalTurnstile-1 — the runbook states what an adopter declares to use each part
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams deployer · order 1
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams deployer · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-DEPL-aFrugalTurnstile-1-1-acceptance-ledger.md](../build/2026-10-09-build-DEPL-aFrugalTurnstile-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 |
@@ -131,9 +132,10 @@ break the named command reports.
   bullet's text carries `GATE_POST_MERGE=local`, `GATE_POST_MERGE=ci` and `refs/gov/bar-red`.
   Red when: the item is missing, misplaced, or omits the declaration or the binding ref.
 - **AC2** — When `grep -cE '^ *\| ' WIRE-INTO-PROJECT.md` is compared with its base count, it has
-  grown by eight, the table sitting indented under its bullet, and `grep -n -e '--hold --' -e 'post-merge.sh <sha>' -e 'relaxing any rule of your own'
+  grown by seven, the table sitting indented under its bullet, and `grep -n -e '--hold --' -e 'post-merge.sh <sha>' -e 'relaxing any rule of your own'
   WIRE-INTO-PROJECT.md` hits each of the three. Red when: a row of the design's §4 table is missing.
-  figure: eight is DERIVED from §4's table, a header, a separator and six rows.
+  figure: seven is DERIVED from §4's table, a header and six rows; its `|---|` separator carries no
+  `| ` and the pattern does not count it.
 - **AC3** — When `bash tools/check-install-prefix.sh` runs, it exits 0, and
   `grep -n 'run-gates/post-merge.sh' WIRE-INTO-PROJECT.md` shows every hit spelled with `<prefix>/`.
   Red when: the new text names gov's own install prefix.
@@ -153,6 +155,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft, from the build's spec brief and the design record's §4 table.
+- rev-2 · 2026-10-09 · AC2's figure is seven, not eight: the `^ *\| ` pattern does not match the
+  table's `|---|` separator, found by the build pass.
 
 ## 10. Reuse audit
 

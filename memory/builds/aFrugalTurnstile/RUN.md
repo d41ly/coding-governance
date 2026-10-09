@@ -43,3 +43,5 @@ base: bef97330574caabfd43c374dbe8c39b26c560203
 2026-10-09T19:03:23Z dispatch · item 4f363647 TOOL-aFrugalTurnstile-1 · reason .githooks/pre-push .githooks/pre-push.test.sh tools/run-gates/run-gates.sh tools/run-gates/run-gates.evidence.test.sh tools/run-gates/README.md memory/guides/MERGE-BAR.md memory/builds/aFrugalTurnstile/spec/2026-10-09-spec-TOOL-aFrugalTurnstile-1.md memory/builds/aFrugalTurnstile/build/2026-10-09-build-TOOL-aFrugalTurnstile-1-1-acceptance-ledger.md memory/builds/aFrugalTurnstile/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
 
 2026-10-09T19:48:05Z dispatch · item 4f363647 TOOL-aFrugalTurnstile-1 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-10-09T19:55:57Z dispatch · item 89c20a6a DEPL-aFrugalTurnstile-1 · reason WIRE-INTO-PROJECT.md memory/builds/aFrugalTurnstile/spec/2026-10-09-spec-DEPL-aFrugalTurnstile-1.md memory/builds/aFrugalTurnstile/build/2026-10-09-build-DEPL-aFrugalTurnstile-1-1-acceptance-ledger.md memory/builds/aFrugalTurnstile/README.md memory/LIVE.md memory/ledger/2026-10.md
