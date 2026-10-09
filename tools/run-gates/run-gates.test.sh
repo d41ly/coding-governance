@@ -3118,7 +3118,7 @@ check_mp_value "AC5 the verdict file reads paused 1" "$(awk -F'\t' '$1 == "pause
 check_mp_value "AC5 stdout carries one memory: 1 pause(s) line" "$(printf '%s\n' "$MP_OUT" | grep -c '^memory: 1 pause(s)')" 1
 
 # 11c. AC6 — a hold is BOUNDED per episode, and a hold with nothing running is DRAINED. B turns the
-#      pressure on as it ends at 1 s and D is held; C ends 18 s after B's row, past D's 15 s bound, so D
+#      pressure on as it ends at 1 s and D is held; C ends past D's calibrated bound, so D
 #      is released `bound`; E is held from then until A ends after D and closes `drained`. B writes at its
 #      END, never its start: a start-of-leg write races C's own dispatch decision, and C held there
 #      turns every later episode into `drained` — observed twice in five runs before the move.
@@ -3127,18 +3127,27 @@ check_mp_value "AC5 stdout carries one memory: 1 pause(s) line" "$(printf '%s\n'
 #      `bound`: red in a quiet re-run, while the loaded bar redded AC14 instead. A now ends only after
 #      D's row exists, so the completion that empties the pool is A's. ONE CLOCK REMAINS and cannot
 #      go: E's episode opens with A and D running, and D's completion must come inside the bound.
-#      Measured, a no-op leg's own runner bookkeeping passed 6 s on node `a` under load, so the
-#      bound is 15 s and C ends 18 s after B's row; the run-length check bounds a HANG, not speed.
+#      THE CLOCK IS CALIBRATED, NOT TYPED. A fixed 15 s bound still closed `bound bound` when a
+#      neighbouring repository's bar made one spawn cost 0.8 s: D's bookkeeping alone outlived it.
+#      So a one-leg bar of the same no-op fixture is timed first, a reading that includes the
+#      runner's startup and therefore OVERSTATES one leg's bookkeeping, the safe direction. The bound
+#      is twice that reading and never under 15 s, C ends the bound plus the reading plus 3 s after
+#      B's row, and the run-length check, which bounds a HANG and not speed, scales with both.
 write_mp_meminfo "$MP/x/m6" 10
+printf '[{"name": "K6", "argv": ["bash", "fx/ok.sh"]}]\n' > "$MP/x/ac6cal.json"
+_mpc0=$(date +%s); run_mp_bar ac6cal "$MP/x/ac6cal.json" GATE_MEMPAUSE=0; _mpcal=$(( $(date +%s) - _mpc0 ))
+_mphold=$(( _mpcal * 2 )); [ "$_mphold" -ge 15 ] || _mphold=15
+_mpcs=$(( _mphold + _mpcal + 3 )); _mpwall=$(( 4 * (_mphold + _mpcal) + 60 ))
+echo "canary: memory pause — AC6 calibrated: a one-leg bar took ${_mpcal}s, so the bound is ${_mphold}s, C ends ${_mpcs}s after B's row, and the run must end inside ${_mpwall}s"
 _mpr6=$(resolve_mp_record ac6)
-printf '[{"name": "A6", "argv": ["bash", "fx/await.sh", "%s", "0"]},\n {"name": "B6", "argv": ["bash", "fx/mp.sh", "1", "write", "%s", "95"]},\n {"name": "C6", "argv": ["bash", "fx/await.sh", "%s", "18"]},\n {"name": "D6", "argv": ["bash", "fx/ok.sh"]},\n {"name": "E6", "argv": ["bash", "fx/ok.sh"]}]\n' \
-  "$_mpr6/3.leg" "$MP/x/m6" "$_mpr6/1.leg" > "$MP/x/ac6.json"
+printf '[{"name": "A6", "argv": ["bash", "fx/await.sh", "%s", "0"]},\n {"name": "B6", "argv": ["bash", "fx/mp.sh", "1", "write", "%s", "95"]},\n {"name": "C6", "argv": ["bash", "fx/await.sh", "%s", "%s"]},\n {"name": "D6", "argv": ["bash", "fx/ok.sh"]},\n {"name": "E6", "argv": ["bash", "fx/ok.sh"]}]\n' \
+  "$_mpr6/3.leg" "$MP/x/m6" "$_mpr6/1.leg" "$_mpcs" > "$MP/x/ac6.json"
 _mpt0=$(date +%s)
-run_mp_bar ac6 "$MP/x/ac6.json" GATE_MEMPAUSE=90 GATE_MEMPAUSE_HOLD=15 GATE_MEMINFO="$MP/x/m6"; _mprc6=$MP_RC
+run_mp_bar ac6 "$MP/x/ac6.json" GATE_MEMPAUSE=90 GATE_MEMPAUSE_HOLD="$_mphold" GATE_MEMINFO="$MP/x/m6"; _mprc6=$MP_RC
 _mpt1=$(date +%s)
 check_mp_value "AC6 one episode ends bound and one drained" "$(read_mp_ends ac6)" "bound drained "
 check_mp_value "AC6 every leg reports" "$(printf '%s\n' "$MP_OUT" | grep -c '^GATE ok ')" 5
-check_mp_value "AC6 the bar finishes inside 150 s" "$([ $(( _mpt1 - _mpt0 )) -lt 150 ] && echo yes)" yes
+check_mp_value "AC6 the bar finishes inside its calibrated bound" "$([ $(( _mpt1 - _mpt0 )) -lt "$_mpwall" ] && echo yes)" yes
 write_mp_meminfo "$MP/x/m6" 10
 run_mp_bar ac6off "$MP/x/ac6.json" GATE_MEMPAUSE=0 GATE_MEMINFO="$MP/x/m6"
 check_mp_value "AC6 its exit equals the same fixture's with the pause off" "$_mprc6" "$MP_RC"
@@ -3193,19 +3202,27 @@ check_mp_value "AC14 the block holds with a leg running, then check_dispatch_pau
 #      dispatch is the forced branch's. Without its decision the episode outlives the loop as `wall`.
 printf '[{"name": "C14", "argv": ["bash", "fx/ok.sh"]},\n {"name": "A14", "argv": ["bash", "fx/mp.sh", "3"]},\n {"name": "Y14", "argv": ["bash", "fx/mp.sh", "0.5"]}]\n' \
   > "$MP/x/ac14.json"
+# THE RUN'S A ENDS ONLY ONCE THE DECISION HAS BEGUN (TOOL-aMeteredSweep-1). With a fixed 3 s, A could
+# finish before the pass for C counted the pool, which then counted nothing and opened no episode:
+# `[]`, red once in three runs beside a neighbouring bar. The seed keeps the 3 s A, so the ledger it
+# writes still dispatches A first; the run's A waits for the go file the server writes as it starts
+# answering that decision.
+sed 's#"fx/mp.sh", "3"#"fx/await.sh", "'"$MP/x/ac14.go"'", "0"#' "$MP/x/ac14.json" > "$MP/x/ac14run.json"
 cat > "$MP/x/serve.sh" <<'SH'
 #!/usr/bin/env bash
-# serve.sh <fifo> <file to await> <trigger>... — a read answers 10 % until any <trigger> row exists,
-# then 95 %, and the first such read first waits for <file to await> and one second more. KEYED ON
+# serve.sh <fifo> <file to await> <go file> <trigger>... — a read answers 10 % until any <trigger>
+# row exists, then 95 %, and the first such read first writes <go file>, then waits for <file to
+# await> and one second more. KEYED ON
 # ROWS, NOT ON A READ COUNT (TOOL-aMeteredSweep-1): an MSYS reader can take two writer opens before
 # its EOF, which advanced a count by two, served 95 % to the second dispatch and opened a second
 # episode, red in two of three quiet runs. A doubled read now serves the same answer twice.
-f=$1; await=$2; shift 2; held=""
+f=$1; await=$2; go=$3; shift 3; held=""
 while :; do
   exec 3>"$f" || exit 0
   pct=10
   for t in "$@"; do [ -f "$t" ] && pct=95; done
   if [ "$pct" = 95 ] && [ -z "$held" ]; then
+    : > "$go"
     for _ in $(seq 1 200); do [ -f "$await" ] && break; sleep 0.1; done
     sleep 1; held=1
   fi
@@ -3219,9 +3236,9 @@ if ! mkfifo "$MP/x/fifo" 2>/dev/null; then
 else
   run_mp_bar ac14seed "$MP/x/ac14.json" GATE_JOBS=2 GATE_MEMPAUSE=0
   # The trigger is the FIRST quick leg's row, C's or Y's, whichever the seed's ledger dispatched second.
-  bash "$MP/x/serve.sh" "$MP/x/fifo" "$(resolve_mp_record ac14)/1.leg" \
+  bash "$MP/x/serve.sh" "$MP/x/fifo" "$(resolve_mp_record ac14)/1.leg" "$MP/x/ac14.go" \
     "$(resolve_mp_record ac14)/0.leg" "$(resolve_mp_record ac14)/2.leg" >/dev/null 2>&1 & _mpsv=$!
-  run_mp_bar ac14 "$MP/x/ac14.json" GATE_JOBS=2 GATE_MEMPAUSE=90 GATE_MEMINFO="$MP/x/fifo"
+  run_mp_bar ac14 "$MP/x/ac14run.json" GATE_JOBS=2 GATE_MEMPAUSE=90 GATE_MEMINFO="$MP/x/fifo"
   # A writer blocked opening the FIFO is released by a read-write open, which never blocks itself.
   kill "$_mpsv" 2>/dev/null; exec 4<>"$MP/x/fifo"; exec 4>&-; wait "$_mpsv" 2>/dev/null
   if [ "$MP_RC" = 0 ] && [ "$(read_mp_ends ac14)" = "drained " ]; then :; else
