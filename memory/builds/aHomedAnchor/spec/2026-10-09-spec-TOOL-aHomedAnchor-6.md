@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-09-build-TOOL-aHomedAnchor-1-runlog-5ac5d61b.md](../build/2026-10-09-build-TOOL-aHomedAnchor-1-runlog-5ac5d61b.md) | journal | TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-7 |
 | [2026-10-09-build-TOOL-aHomedAnchor-6-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aHomedAnchor-6-1-acceptance-ledger.md) | journal | — |
+| [2026-10-09-prompt-TOOL-aHomedAnchor-1-1-reconstructed-build-briefs.md](../prompts/2026-10-09-prompt-TOOL-aHomedAnchor-1-1-reconstructed-build-briefs.md) | journal | TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-7 |
 
 <!-- /gen:spec-records -->
 
