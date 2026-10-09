@@ -1,10 +1,12 @@
 # TOOL-aHomedAnchor-4 — the pre-commit hook runs the Skill wiring check when its inputs are staged
 
-**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-1 · base 40a976d9 · streams tooling · order 4
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-1 · base 40a976d9 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-09-build-TOOL-aHomedAnchor-4-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aHomedAnchor-4-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

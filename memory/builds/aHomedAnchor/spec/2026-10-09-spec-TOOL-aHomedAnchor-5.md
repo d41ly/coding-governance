@@ -1,10 +1,12 @@
 # TOOL-aHomedAnchor-5 — an adopter arm proves the render of `ANCHOR_SCOPE="local"`
 
-**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-1 · base 40a976d9 · streams tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-1 · base 40a976d9 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-09-build-TOOL-aHomedAnchor-5-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aHomedAnchor-5-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

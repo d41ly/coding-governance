@@ -42,7 +42,8 @@ wrote the build and that no push to origin be required to authorize it. Landing 
   only; the switch is a NEW value `ANCHOR_SCOPE="local"`, so `published` adopters keep
   `TOOL-dNarrowedAnchor-1`'s refusal; the local anchor admits all three modes; the bar leg reads
   the scope from `.unattended.conf` at the remote's default-branch tip, never the working tree.
-- **Classification**: both units MISSING at open; authored by this run, so unreviewed.
+- **Classification**: units 1 and 2 MISSING at open; 3 to 7 promoted by the closing review's round 1
+  (CONVERGED, no blocker). All seven authored by this run; no spec audit was declared.
 
 ## Parked decisions
 
@@ -63,24 +64,24 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 7 unit(s) · node a · opened 2026-10-09 · streams tooling
+**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-10-09 · streams tooling
 ids TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aHomedAnchor-1 — the driver's third anchor: `ANCHOR_SCOPE="local"` authorizes from local history](spec/2026-10-09-spec-TOOL-aHomedAnchor-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-10-09 |
-| [TOOL-aHomedAnchor-2 — the bar leg admits a local-anchored BASE when origin's default branch declares `local`](spec/2026-10-09-spec-TOOL-aHomedAnchor-2.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-10-09 |
-| [TOOL-aHomedAnchor-3 — re-render the unattended Skill from its template](spec/2026-10-09-spec-TOOL-aHomedAnchor-3.md) | 3 | 1 | INPROGRESS | rev-1 | 2026-10-09 |
-| [TOOL-aHomedAnchor-5 — an adopter arm proves the render of `ANCHOR_SCOPE="local"`](spec/2026-10-09-spec-TOOL-aHomedAnchor-5.md) | 3 | 1 | INPROGRESS | rev-1 | 2026-10-09 |
-| [TOOL-aHomedAnchor-4 — the pre-commit hook runs the Skill wiring check when its inputs are staged](spec/2026-10-09-spec-TOOL-aHomedAnchor-4.md) | 4 | 1 | INPROGRESS | rev-1 | 2026-10-09 |
-| [TOOL-aHomedAnchor-6 — the closing review's driver and doc minors, batched](spec/2026-10-09-spec-TOOL-aHomedAnchor-6.md) | 5 | 2 | INPROGRESS | rev-1 | 2026-10-09 |
-| [TOOL-aHomedAnchor-7 — the closing review's leg minors, batched](spec/2026-10-09-spec-TOOL-aHomedAnchor-7.md) | 5 | 2 | INPROGRESS | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-1 — the driver's third anchor: `ANCHOR_SCOPE="local"` authorizes from local history](spec/2026-10-09-spec-TOOL-aHomedAnchor-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-2 — the bar leg admits a local-anchored BASE when origin's default branch declares `local`](spec/2026-10-09-spec-TOOL-aHomedAnchor-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-3 — re-render the unattended Skill from its template](spec/2026-10-09-spec-TOOL-aHomedAnchor-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-5 — an adopter arm proves the render of `ANCHOR_SCOPE="local"`](spec/2026-10-09-spec-TOOL-aHomedAnchor-5.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-4 — the pre-commit hook runs the Skill wiring check when its inputs are staged](spec/2026-10-09-spec-TOOL-aHomedAnchor-4.md) | 4 | 1 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-6 — the closing review's driver and doc minors, batched](spec/2026-10-09-spec-TOOL-aHomedAnchor-6.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-7 — the closing review's leg minors, batched](spec/2026-10-09-spec-TOOL-aHomedAnchor-7.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 9 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7.
 <!-- /gen:build-index -->
