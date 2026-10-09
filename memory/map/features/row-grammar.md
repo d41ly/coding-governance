@@ -91,6 +91,10 @@ check 20's capture on green for that reason, since swallowing it would silence t
   link-wrapped renderings, so grading one as a row document would report a mis-segmented grammar
   against text no author wrote. Check 24 follows the same set out, which is why a family archive is
   check 9's archive guard's there and not a second finding here. `TOOL-dDerivedDocket-8`.
+- `resolve_live_index_home` — check 24 finds a rotated archive's live index at the stem's DECLARED
+  home, `DECISIONS.md` or `backlog/<FAMILY>.md`; check 10's shell function of the same name states the
+  same rule, and the cross-reader arm compares the two through `--print-live-index-home`. The basename
+  search it replaced let a namesake leave the exclusivity half ungraded. `TOOL-dHomedResolver-1`.
 - The vacuity precondition uses a family-INDEPENDENT id shape on purpose. Deriving it from the
   declared families would assert one value against another the same call derives, which is the
   tautology that let the wrong-families arm pass by finding nothing.
