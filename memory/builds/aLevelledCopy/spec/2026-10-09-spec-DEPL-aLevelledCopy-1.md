@@ -1,6 +1,6 @@
 # DEPL-aLevelledCopy-1 — govkit update carries gov's exec bit onto an existing engine row
 
-**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams deployer · order 1 · ratified 2026-10-09
+**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams deployer · order 1 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -89,9 +89,9 @@ the owner's clarification asked for. The aScouredKit wave-3 cross-OS lens record
 
 ### Edges
 
-- **consumes-from** `TOOL-aLevelledCopy-3` — gov's four executed hooks at 100755, the real-world
-  input this unit carries to adopters. The fixtures build their own gov tree, so the build order does
-  not bind any criterion here.
+- **consumes-from** external — gov's four executed hooks at 100755, the real-world input this unit
+  carries to adopters; this build's TOOL-aLevelledCopy-3 ships them, at a later `order`. The fixtures
+  build their own gov tree, so no criterion here rests on that unit, and the edge is not a sibling join.
 - **hands-off** external — `govkit apply` landing a new engine row at gov's mode; filed as an ask at
   the close.
 
@@ -206,8 +206,8 @@ python -c "import sys,pathlib,tempfile; sys.path.insert(0,'tools/govkit'); impor
 - **AC7** — When a read-only `update` runs over a fixture receipt of five engine rows under
   `GIT_TRACE=1`, the trace shows one `ls-tree -r` at the target commit and no per-row `ls-tree`.
   Red when: the `ls-tree` count grows with the row count.
-- **AC8** — When an AC1 target after `--write` has its hook returned to 100644 with `git
-  update-index --chmod=-x` and `govkit check` runs, it prints one note naming the path and both modes
+- **AC8** — When an AC1 target after `--write` has its hook returned to 100644 with
+  `git update-index --chmod=-x` and `govkit check` runs, it prints one note naming the path and both modes
   and its exit status is the one it had before the edit. Red when: no note prints, or the deficit
   fails the check.
 - **AC9** — When each arm's failing case is staged at build time by editing the scratch gov's
@@ -252,6 +252,11 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 · e
   carried row keeps its old `commit`; §6 names `measure_mode_carry` and the two fixtures; AC9's AC1
   break is re-pointed (the old expression reds AC4), its breaks are a build-time observation, and its
   cost line is measured.
+- rev-3 · 2026-10-09 · §3 Edges: the sibling edge onto TOOL-aLevelledCopy-3 becomes an `external`
+  one, because check 12 reads a sibling edge as an ordering claim and that unit is built later; no
+  criterion rested on it. §6 AC8: the `git update-index` token is rewrapped onto one line, because
+  a token split across a line break mispairs every backtick after it and the ledger join read none.
+  Record corrections found by the close's bar; no criterion moves.
 
 ## 10. Reuse audit
 

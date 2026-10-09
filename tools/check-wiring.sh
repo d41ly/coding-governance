@@ -48,7 +48,7 @@
 # GIT_SSH, which the `ok` and `note` cases grade as they find it because the arm cannot tell who
 # wrote it; HTTPS remotes, which hold no ssh socket; and whether the remote's own idle timeout is
 # shorter than the silence the keepalive tolerates.
-KIT_CHECK_WIRING_VERSION=1.28   # gov:kit check-wiring@1.28 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.29   # gov:kit check-wiring@1.29 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -578,7 +578,7 @@ p4-post-changelist p4-pre-submit post-index-change"
 check_hook_modes() { # $1 = resolved hooks dir, $2 = the configured value as written
   local dir="$1" shown="$2" rp top pfx ls mode oid stage rel path got n=0 bad=0
   local names=" ${GIT_HOOK_NAMES//$'\n'/ } "
-  rp=$(git -C "$dir" rev-parse --show-toplevel --show-prefix 2>/dev/null) || rp=""
+  rp=$(unset GIT_DIR GIT_WORK_TREE; git -C "$dir" rev-parse --show-toplevel --show-prefix 2>/dev/null) || rp=""
   top=${rp%%$'\n'*}; pfx=""; case "$rp" in *$'\n'*) pfx=${rp#*$'\n'} ;; esac
   top=${top%$'\r'}; pfx=${pfx%$'\r'}
   if [ -z "$top" ]; then
@@ -1338,9 +1338,11 @@ check_ssh_keepalive() {
   ka=${want#* -o }; ka=${ka%%=*}
   # SSH-shaped: an ssh:// family URL, or scp form `[user@]host:path` with no `/` before the colon
   # and a host longer than one character, so a drive path like `C:/x` reads as a path.
-  while IFS= read -r r; do
-    [ -n "$r" ] || continue
-    while IFS= read -r url; do
+  # `for` over the words, not `while read` fed by `<<< "$(...)"`: a here-string holding a command
+  # substitution is the loop shape the shell-hygiene leg refuses, and neither a remote name nor a URL
+  # carries whitespace git would accept.
+  for r in $(git remote 2>/dev/null); do
+    for url in $(git remote get-url --push --all "$r" 2>/dev/null); do
       url=${url%$'\r'}
       case "$url" in
         ssh://*|git+ssh://*|ssh+git://*) hit=$url ;;
@@ -1349,9 +1351,9 @@ check_ssh_keepalive() {
              case "$pre" in */*) ;; *) [ "${#host}" -gt 1 ] && hit=$url ;; esac ;;
       esac
       [ -n "$hit" ] && break
-    done <<< "$(git remote get-url --push --all "$r" 2>/dev/null)"
+    done
     [ -n "$hit" ] && break
-  done <<< "$(git remote 2>/dev/null)"
+  done
   if [ -z "$hit" ]; then
     echo "skip     ssh       — no remote pushes over ssh"
     return

@@ -1,6 +1,6 @@
 # TOOL-aLevelledCopy-3 — gov's executed hooks are 100755, and check-wiring grades a hook's index mode
 
-**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 2 · ratified 2026-10-09
+**Status:** CLOSED · rev-4 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 2 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -64,7 +64,7 @@ unnoticed in gov or in an adopter.
 
 ### Edges
 
-- **hands-off** `DEPL-aLevelledCopy-1` — gov's four hooks at 100755 are that unit's real-world input; carrying the bit onto an adopter's existing engine row is its work, not this unit's.
+- **hands-off** external — carrying the bit onto an adopter's existing engine row is `govkit update`'s work, which this build's DEPL-aLevelledCopy-1 does at an earlier `order`; gov's four hooks at 100755 are its real-world input.
 - **hands-off** external — an adopter's OWN hooks (inCMS tracks `post-merge` and `commit-msg` at 100644) read `UNWIRED` here until the adopter runs `--fix` once and commits; that commit is the adopter's.
 - **hands-off** external — the single kit-version bump for the check-wiring kit and for whichever kit ships `.githooks/`, after the last unit of this build.
 
@@ -315,6 +315,9 @@ the arm RED, then restoring it.
 - rev-3 · 2026-10-09 · §6 AC6: the `fixture:` line names WSL's own `/tmp`, tmpfs by `df -T`, in
   place of WSL ext4, which the run that observed AC6 did not use. A record correction from the
   closing review's L5 (finding id 19); no criterion moves and the status stays CLOSED.
+- rev-4 · 2026-10-09 · §3 Edges: the sibling hand-off to DEPL-aLevelledCopy-1 becomes an `external`
+  one, because check 12 reads a sibling edge as an ordering claim and that unit is built earlier. A
+  record correction found by the close's bar; no criterion moves.
 
 ## 10. Reuse audit
 

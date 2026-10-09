@@ -1,6 +1,6 @@
 # TOOL-aLevelledCopy-1 — receipt-sync grades a mismatched row through the target's clean filter
 
-**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 1 · ratified 2026-10-09
+**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 1 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -183,8 +183,8 @@ Measured by this build's M12 probe, `build/2026-10-09-build-TOOL-aLevelledCopy-1
   working copy holds no CR byte, which the fixture script asserts before grading so that a fixture
   that staged nothing cannot pass.
   fixture: built by a script kept in this run's scratchpad; the tree holds none today.
-- **AC2** — When one byte of that CRLF working copy is changed, `python
-  tools/run-gates/check-receipt.py <fixture>` prints `DRIFTED` for the row and exits 1. Red when:
+- **AC2** — When one byte of that CRLF working copy is changed,
+  `python tools/run-gates/check-receipt.py <fixture>` prints `DRIFTED` for the row and exits 1. Red when:
   the edited copy grades clean.
 - **AC3** — When `python tools/run-gates/check-receipt.py --selftest` runs, it prints an
   `ARM ok` line for each of arms (a) to (d) and a `fixtures:` line whose two counts are equal, and
@@ -237,6 +237,9 @@ New arm: tools/run-gates/check-receipt.py · covers AC3 AC4 · each arm's break 
   arms writes each fixture's config locally instead of passing `-c`, because `-c` never reaches the
   graded spawn, and shares one repository across arms (a), (b) and (d). AC5 traces to a file,
   because the leg captures git's stderr and `GIT_TRACE=1` therefore shows nothing.
+- rev-3 · 2026-10-09 · §6 AC2: the `python tools/run-gates/check-receipt.py` token is rewrapped onto
+  one line, because a token split across a line break mispairs every backtick after it and the ledger
+  join read none. A record correction found by the close's bar; no criterion moves.
 
 ## 10. Reuse audit
 

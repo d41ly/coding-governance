@@ -1825,7 +1825,7 @@ seed_mode_fixture() {   # hooks pre-commit + post-merge at 100644, pre-push 1007
   git add --chmod=+x .githooks/pre-push; git update-index --chmod=-x .githooks/pre-commit
   git commit -q -m modes
 }
-modelines() { printf '%s\n' "$1" | grep '^UNWIRED  hooks.*tracked 100644'; }
+read_mode_lines() { printf '%s\n' "$1" | grep '^UNWIRED  hooks.*tracked 100644'; }
 
 newrepo
 ck "LC3 AC9 newrepo stages its pre-commit 100755 whatever core.fileMode says" \
@@ -1833,20 +1833,20 @@ ck "LC3 AC9 newrepo stages its pre-commit 100755 whatever core.fileMode says" \
 cleanup
 
 seed_mode_fixture
-m=$(modelines "$(chk --check)")
+m=$(read_mode_lines "$(chk --check)")
 ck "LC3 AC2 --check names exactly the two 100644 hooks, pre-commit and post-merge" \
    "$([ "$(printf '%s\n' "$m" | grep -c .)" = 2 ] && printf '%s' "$m" | grep -q '\.githooks/pre-commit is' \
       && printf '%s' "$m" | grep -q '\.githooks/post-merge is' \
       && ! printf '%s' "$m" | grep -q -e pre-push -e gate-env -e '\.test\.sh' && echo 1 || echo 0)"
 # AC3: --fix over a hook carrying an UNSTAGED edit moves the mode and nothing else.
-oids() { git ls-files -s .githooks/pre-commit .githooks/post-merge | awk '{print $2}' | tr '\n' ' '; }
-o_before=$(oids); printf '# unstaged\n' >> .githooks/pre-commit
+read_hook_oids() { git ls-files -s .githooks/pre-commit .githooks/post-merge | awk '{print $2}' | tr '\n' ' '; }
+o_before=$(read_hook_oids); printf '# unstaged\n' >> .githooks/pre-commit
 hl="$(git rev-parse --path-format=absolute --git-common-dir)/health.log"
 out=$(chk --fix); n1=$(grep -c $'\thookmode-set\t' "$hl" 2>/dev/null)
 modes=$(git ls-files -s .githooks/pre-commit .githooks/post-merge | awk '{print $1}' | tr '\n' ' ')
 cached=$(git diff --cached --numstat -- .githooks | awk '{print $1 $2}' | tr '\n' ' ')
 ck "LC3 AC3 --fix stages 100755 for both, oids unmoved, numstat 0 0, the edit unstaged, two hookmode-set" \
-   "$([ "$modes" = '100755 100755 ' ] && [ "$(oids)" = "$o_before" ] && [ "$cached" = '00 00 ' ] \
+   "$([ "$modes" = '100755 100755 ' ] && [ "$(read_hook_oids)" = "$o_before" ] && [ "$cached" = '00 00 ' ] \
       && git diff --numstat -- .githooks/pre-commit | grep -q $'^1\t0\t' && [ "${n1:-0}" = 2 ] \
       && [ "$(printf '%s\n' "$out" | grep -c '^FIXED    hooks')" = 2 ] && echo 1 || echo 0)"
 out2=$(chk --fix); n2=$(grep -c $'\thookmode-set\t' "$hl" 2>/dev/null)
@@ -1858,7 +1858,7 @@ seed_mode_fixture
 hl="$(git rev-parse --path-format=absolute --git-common-dir)/health.log"
 out=$(chk --session); rc=$?; n1=$(grep -c $'\thookmode-set\t' "$hl" 2>/dev/null)   # no log at all is zero
 ck "LC3 AC4 --session reports both, exits 0, stages no mode and logs no event" \
-   "$([ "$rc" = 0 ] && [ "$(modelines "$out" | grep -c .)" = 2 ] \
+   "$([ "$rc" = 0 ] && [ "$(read_mode_lines "$out" | grep -c .)" = 2 ] \
       && git ls-files -s .githooks/pre-commit | grep -q '^100644 ' && [ "${n1:-0}" = 0 ] && echo 1 || echo 0)"
 cleanup
 
@@ -1870,7 +1870,7 @@ git config core.hooksPath "$D/.githooks"; top=$(git rev-parse --show-toplevel)
 out=$(cd "$OOT/wt" && chk --check)
 ck "LC3 AC5 another checkout's 100644 hook is a note naming that checkout, never UNWIRED" \
    "$(printf '%s\n' "$out" | grep '^note     hooks' | grep -F "$top" | grep -q 'pre-commit is tracked 100644' \
-      && [ -z "$(modelines "$out")" ] && echo 1 || echo 0)"
+      && [ -z "$(read_mode_lines "$out")" ] && echo 1 || echo 0)"
 cleanup
 
 # AC6: the defect itself, on a filesystem that honours the exec bit. A Windows git runs a 100644
