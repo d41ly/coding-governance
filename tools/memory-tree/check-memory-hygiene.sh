@@ -323,6 +323,16 @@ case "$FAM_ALT" in
   *[!A-Za-z0-9_\|]*) echo "HYGIENE — cannot run: a FAMILIES token carries a character that is an ERE metacharacter ('$FAM_ALT'); the rotated-archive predicate would silently widen. Family tokens are [A-Za-z0-9_]"; exit 2 ;;
 esac
 ROTATED_ARCHIVE_ERE="^$M/archive/(DECISIONS|$FAM_ALT)\.[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md$"
+# THE DECLARED HOME of a rotated stem's live index: the decision index at the memory root, a family
+# shard under backlog/. ONE path per stem, so check 10 asks the tree whether that path is tracked and
+# never searches for a file that merely shares the name (TOOL-dHomedResolver-1).
+# `resolve_live_index_home` in row_grammar.py is the Python reader of the same rule, and the
+# row-grammar self-test's cross-reader arm compares the two through `--print-live-index-home` below.
+# No mode is taken: under `builds` check 10 defers a family archive before it asks, and
+# row_grammar.py never selects one.
+resolve_live_index_home() {
+  if [ "$1" = DECISIONS ]; then printf '%s\n' "$M/DECISIONS.md"; else printf '%s\n' "$M/backlog/$1.md"; fi
+}
 case "${1:-}" in
   --print-append-only-ere) printf '%s\n' "$APPEND_ONLY_ERE"; exit 0 ;;
   --print-rotated-archive-ere) printf '%s\n' "$ROTATED_ARCHIVE_ERE"; exit 0 ;;
@@ -333,6 +343,11 @@ case "${1:-}" in
   # parser module, and the arm that compares the two readers over absent, blank, `shards` and
   # `builds` reads this. An unrecognised value never reaches here: it aborted at exit 2 above.
   --print-backlog-mode) printf '%s\n' "$BMODE"; exit 0 ;;
+  # The resolved home of one stem, for the cross-reader arm. A missing stem is a usage error, not an
+  # empty answer: an empty line would compare equal to a Python reader that also returned nothing.
+  --print-live-index-home)
+    [ -n "${2:-}" ] || { echo "HYGIENE — cannot run: --print-live-index-home takes a stem"; exit 2; }
+    resolve_live_index_home "$2"; exit 0 ;;
 esac
 LEGACY=$(grep -vE '^\s*(#|$)' "$M/project/legacy-files.txt" 2>/dev/null || true)
 DEBT=$(grep -vE '^\s*(#|$)' "$M/project/curation-debt.txt" 2>/dev/null || true)
@@ -1295,13 +1310,18 @@ fi
 # evidence that an archive holds what the declared ROTATION_MODE says it should — nothing in this
 # engine asserts that. A structural check reads as a semantic one to everybody who did not write it.
 #
-# THE LIVE INDEX IS RESOLVED BY BASENAME, anywhere under $M/ outside archive/ — not at the fixed path
-# `$M/<stem>.md`. TOOL-cTracedPromise-6 and TOOL-aBoundedVerdict-9 filed the same defect from two
-# angles: every backlog shard lives at `$M/backlog/<FAMILY>.md`, the old `[ -f ]` guard never found
-# one, and `continue` then exempted it in silence. MEASURED 2026-09-12 on this repo: of four rotated
-# archives the shipped check graded exactly ONE — DECISIONS, which happens to sit at the root — and
-# skipped all three TOOL cuts without a word. That is the reassuring-zero shape, on the check whose
-# whole job is catching a lost archive.
+# THE LIVE INDEX IS RESOLVED AT THE STEM'S DECLARED HOME — `$M/DECISIONS.md` for DECISIONS,
+# `$M/backlog/<FAMILY>.md` for a family — through `resolve_live_index_home`, and the check asks the
+# TRACKED set whether that one path is in it. History, because both earlier rules were defects:
+#   * Until TOOL-cSpliceWarden-2 the index was `$M/<stem>.md`, a fixed path no backlog shard occupies.
+#     TOOL-cTracedPromise-6 and TOOL-aBoundedVerdict-9 filed it from two angles: the `[ -f ]` guard
+#     never found a shard and `continue` then exempted it in silence. MEASURED 2026-09-12 on this
+#     repo: of four rotated archives the shipped check graded exactly ONE.
+#   * TOOL-cSpliceWarden-2 then resolved by BASENAME anywhere under $M/ outside archive/. That reached
+#     the shards, and it also reached every file that merely SHARED a stem's name. inCMS core found it
+#     on 2026-10-09: two build-folder ledgers named DECISIONS.md made the stem resolve to three live
+#     indexes, the finding blamed the rotation for a collision it did not cause, and core renamed the
+#     ledgers to land (TOOL-dHomedResolver-1). The declared home keeps the shards and drops the search.
 #
 # TWO MORE, unfiled until TOOL-cSpliceWarden-2, and the second was found only by running the
 # candidate over the real tree before wiring it:
@@ -1318,13 +1338,15 @@ fi
 #     that passed can start failing, and still bounded by the first row, so it cannot swallow one and
 #     cannot be outgrown by a third rotation.
 #
-# A stem resolving to NONE, or to SEVERAL, is a named finding and never a `continue`: a skipped
-# archive prints exactly what a referenced one prints, which is how this check went inert. The
-# membership test is a shell string compare rather than a regex, because the stem is a filename and a
-# `+` or `*` in one would silently widen a `grep -E` predicate.
+# A home that is NOT TRACKED is a named finding and never a `continue`: a skipped archive prints
+# exactly what a referenced one prints, which is how this check went inert. SEVERAL is no longer a
+# case — a declared home is one path — so there is no branch for it to sit in. The membership test
+# is a FIXED-STRING whole-line compare (`grep -qxF`) rather than a regex, because the home is a path
+# and a `+` or `*` in a stem would silently widen a `grep -E` predicate.
 #
-# The enumeration here and `ROTATED`/`row_docs` in row_grammar.py are two readers of ONE rule. They
-# are joined by an arm in the row-grammar self-test, not by this comment.
+# The enumeration here and `ROTATED`/`row_docs` in row_grammar.py are two readers of ONE rule, and
+# so are the two `resolve_live_index_home` functions. Both pairs are joined by the cross-reader arm
+# in the row-grammar self-test, not by this comment.
 bad10=$(printf '%s\n' "$FILES" | grep -E "$ROTATED_ARCHIVE_ERE" | while IFS= read -r a; do
     base=${a##*/}; stem=${base%%.*}
     # UNDER `builds` A FAMILY-STEM ARCHIVE IS NOT THIS CHECK'S. The file at $M/backlog/<FAMILY>.md is
@@ -1337,12 +1359,9 @@ bad10=$(printf '%s\n' "$FILES" | grep -E "$ROTATED_ARCHIVE_ERE" | while IFS= rea
     # alternation is exactly `DECISIONS|$FAM_ALT`, so re-deriving the family list here would be a
     # second spelling of a set two lines of this file already agree on.
     if [ "$BMODE" = builds ] && [ "$stem" != DECISIONS ]; then printf '#left\n'; continue; fi
-    idx=$(printf '%s\n' "$FILES" | grep -v "^$M/archive/" | while IFS= read -r f; do
-        [ "${f##*/}" = "$stem.md" ] && printf '%s\n' "$f"
-      done)
-    n10=$(printf '%s\n' "$idx" | grep -c .)
-    if [ "$n10" -ne 1 ]; then
-      echo "$a (stem '$stem' resolves to $n10 live index(es) named $stem.md under $M/, expected exactly 1:$(printf '%s\n' "$idx" | tr '\n' ' '))"
+    idx=$(resolve_live_index_home "$stem")
+    if ! printf '%s\n' "$FILES" | grep -qxF -- "$idx"; then
+      echo "$a (stem '$stem' declares its live index at $idx, which is not tracked)"
       continue
     fi
     awk 'NR <= 3 { print; next } /^[[:space:]]*[-*][[:space:]]/ { exit } { print }' "$idx" |

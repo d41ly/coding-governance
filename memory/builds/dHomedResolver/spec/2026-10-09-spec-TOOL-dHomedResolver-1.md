@@ -1,12 +1,14 @@
 # TOOL-dHomedResolver-1 — check 10 and check 24 resolve a rotated archive's live index at the stem's declared home
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node d · Tier-2 · base 5a836bf0 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-10-09 · node d · Tier-2 · base 5a836bf0 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-dHomedResolver-1-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-dHomedResolver-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-dHomedResolver-1-0-run-mandate.md](../prompts/2026-10-09-prompt-TOOL-dHomedResolver-1-0-run-mandate.md) | journal | TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 |
+| [2026-10-09-prompt-TOOL-dHomedResolver-1-1-build-brief.md](../prompts/2026-10-09-prompt-TOOL-dHomedResolver-1-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

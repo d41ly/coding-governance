@@ -14273,6 +14273,16 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "resolve_live_index_home",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.sh"
+    },
+    {
+      "id": "resolve_live_index_home",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "resolve_ln_staged",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"

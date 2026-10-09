@@ -2111,12 +2111,14 @@ grep -qF 'memory/archive/ARCH.2026-08-01.md' <<<"$outa" \
 n=$((n+1))
 grep -qF 'memory/archive/ARCH.2026-08-02b.md' <<<"$outa" \
   && { echo "FAIL check 10 red a SAME-DAY DISAMBIGUATED archive its shard announces on line 5 — either the [a-z0-9]* suffix left the filename anchor or the preamble window is short"; st=1; }
-# ---- the ZERO-RESOLUTION branch, which is the one whose `continue` made this check inert. An
-# ---- archive whose stem names no live index must be NAMED, and the message must say how many it
-# ---- resolved to, because "skipped in silence" and "referenced" printed the same nothing before.
+# ---- the MISSING-HOME branch, which is the one whose `continue` made this check inert. An archive
+# ---- whose stem's declared home is not tracked must be NAMED, and the message must say so, because
+# ---- "skipped in silence" and "referenced" printed the same nothing before. The text moved from
+# ---- "resolves to 0 live index(es)" when the resolution became the declared home
+# ---- (TOOL-dHomedResolver-1); the `homed` block below asserts the home path itself.
 n=$((n+1))
-grep -qF "resolves to 0 live index(es)" <<<"$outa" \
-  || { echo "FAIL check 10 SKIPPED an archive whose stem resolves to no live index instead of naming it — that silent \`continue\` is exactly how this check graded 1 of 4 archives for a month"; st=1; }
+grep -qF "declares its live index at memory/backlog/DEPL.md, which is not tracked" <<<"$outa" \
+  || { echo "FAIL check 10 SKIPPED an archive whose declared home is not tracked instead of naming it — that silent \`continue\` is exactly how this check graded 1 of 4 archives for a month"; st=1; }
 n=$((n+1))
 grep -qF 'memory/archive/DEPL.2026-08-04.md' <<<"$outa" \
   || { echo "FAIL check 10's zero-resolution finding does not name the archive it is about"; st=1; }
@@ -2127,6 +2129,50 @@ n=$((n+1))
 outb=$(cd "$A" && bash "$SCRIPT" 2>/dev/null)
 grep -qF 'ARCH-tMoved-1' <<<"$outb" \
   || { echo "FAIL check 14 did NOT flag a rotated id whose archive is present-but-unstaged — the corpus is git ls-files, so that id has no definition and this is the one state where rotation really does orphan"; st=1; }
+
+# ---- TOOL-dHomedResolver-1: check 10 resolves a stem at its DECLARED HOME, never by a basename
+# ---- search. Found by inCMS core on 2026-10-09: two build-folder ledgers named DECISIONS.md made
+# ---- the stem resolve to three live indexes, and check 10 blamed the ROTATION for a collision it
+# ---- did not cause. Core renamed the ledgers to land. Any build file named after a stem did this.
+# ----
+# ---- One tree, three archives. The DECISIONS and ARCH archives are announced by their homes and
+# ---- each has a NAMESAKE in a build folder: those two arms fail at 5a836bf0, where the search
+# ---- counted the namesake. The DEPL archive's home is absent, and it is the POSITIVE control —
+# ---- without a finding that MUST appear, "check 10 printed nothing about the other two" would
+# ---- also be what a check that never ran prints.
+HM=$TMP/homed
+mkdir -p "$HM/memory/builds/tHome/spec" "$HM/memory/builds/tHome/build/ledger" "$HM/memory/archive" \
+         "$HM/memory/backlog" "$HM/memory/project"
+( cd "$HM" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH deployer:DEPL"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
+  printf '# r\n' > memory/README.md
+  printf '# legacy\n' > memory/project/legacy-files.txt
+  printf '# decisions\n\n> Rotated 2026-08-01 to [archive/DECISIONS.2026-08-01.md](archive/DECISIONS.2026-08-01.md).\n\n- ARCH-tHome-2 · a live decision\n' > memory/DECISIONS.md
+  printf '# rotated\n\n- ARCH-tHome-3 · an archived decision\n' > memory/archive/DECISIONS.2026-08-01.md
+  printf '# ARCH backlog\n\n> Rotated 2026-08-01 to [../archive/ARCH.2026-08-01.md](../archive/ARCH.2026-08-01.md).\n\n- ARCH-tHome-1 · OPEN · the owning unit\n' > memory/backlog/ARCH.md
+  printf '# rotated\n\n- ARCH-tHome-4 · CLOSED · a moved row\n' > memory/archive/ARCH.2026-08-01.md
+  printf '# rotated from a family whose declared home is not tracked\n' > memory/archive/DEPL.2026-08-04.md
+  # THE NAMESAKES. Neither is an index and neither announces anything; both share a stem's name.
+  printf '# a build ledger that happens to be called DECISIONS.md\n' > memory/builds/tHome/build/ledger/DECISIONS.md
+  printf '# a build note that happens to be called after a family\n' > memory/builds/tHome/ARCH.md
+  printf -- '---\nslug: tHome\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tHome-1\n---\n\n# tHome\n' > memory/builds/tHome/README.md
+  printf '# ARCH-tHome-1 — the owning unit\n\nbody\n' > memory/builds/tHome/spec/2026-08-01-spec-tHome-1.md
+  git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null 2>&1; git add -A
+  git commit -q -m homed --no-verify )
+outhm=$(cd "$HM" && bash "$SCRIPT" 2>/dev/null)
+c10hm=$(cblock "$outhm" 10)
+n=$((n+1))
+grep -qF 'memory/archive/DECISIONS.2026-08-01.md' <<<"$c10hm" \
+  && { echo "FAIL check 10 red a DECISIONS archive its root index announces, because a build-folder file named DECISIONS.md joined the resolution — the stem's home is memory/DECISIONS.md and nothing else"; st=1; }
+n=$((n+1))
+grep -qF 'memory/archive/ARCH.2026-08-01.md' <<<"$c10hm" \
+  && { echo "FAIL check 10 red a family archive its shard announces, because a build-folder file named ARCH.md joined the resolution — the stem's home is memory/backlog/ARCH.md and nothing else"; st=1; }
+n=$((n+1))
+grep -qF 'memory/archive/DEPL.2026-08-04.md' <<<"$c10hm" \
+  || { echo "FAIL check 10 did not name an archive whose declared home is not tracked — a missing home is a finding, never a continue, and this is also the arm that proves the block above ran"; st=1; }
+n=$((n+1))
+grep -qF 'memory/backlog/DEPL.md' <<<"$c10hm" \
+  || { echo "FAIL check 10's missing-home finding does not name the home it expected, memory/backlog/DEPL.md"; st=1; }
 
 R=$TMP/runanchor
 mkdir -p "$R/memory/builds/tOwner/spec" "$R/memory/builds/tRunBig" "$R/memory/builds/tRunOk" \
@@ -3717,7 +3763,9 @@ esac
 # top-level and skipped aloud with that block's other four.
 # RAISED 539 -> 542 by TOOL-aGraftedHelix-47: its three check-24 engine arms, each top-level and
 # never skipped, because that fixture needs no sibling kit.
-FLOOR_ASSERTIONS=542
+# RAISED 542 -> 546 by TOOL-dHomedResolver-1: its four check-10 declared-home arms over the
+# `homed` fixture, each top-level and never skipped.
+FLOOR_ASSERTIONS=546
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

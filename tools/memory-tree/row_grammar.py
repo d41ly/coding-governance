@@ -238,6 +238,23 @@ def build_rotated_re(conf):
     return re.compile(r"(?:" + stems + r")\.[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md\Z")
 
 
+def resolve_live_index_home(m, stem):
+    """The DECLARED HOME of a rotated stem's live index: one path, never a search.
+
+    `DECISIONS` lives at the memory root and a family's shard under `backlog/`. The rule's other
+    reader is `resolve_live_index_home` in check-memory-hygiene.sh, which check 10 calls; the
+    cross-reader arm in this module's self-test compares the two for every declared stem through
+    the shell's `--print-live-index-home`.
+
+    A search by basename was the rule until TOOL-dHomedResolver-1, and it admitted every file that
+    merely SHARED the stem's name: inCMS core's two build-folder ledgers named DECISIONS.md made the
+    stem resolve to three indexes, so check 24 left the exclusivity half ungraded and check 10
+    blamed the rotation. Under `shards` the population here also holds every file below `backlog/`,
+    so a namesake in a subfolder of it collided in this reader alone.
+    """
+    return f"{m}/DECISIONS.md" if stem == "DECISIONS" else f"{m}/backlog/{stem}.md"
+
+
 def read_backlog_mode(conf):
     """The declared backlog layout, through the PARSER module's one reader — never a second one.
 
@@ -292,8 +309,9 @@ def row_docs(root, m, conf, rev=None):
     The family set is DECLARED rather than derived from the tree, deliberately: resolving an
     archive's stem against a live index would mean that deleting a shard silently removes its
     archives from the scan, which is the vacuity class this module exists to avoid. Check 10 DOES
-    resolve, because its question is "which index should name this"; this one's question is "is this
-    a row document", and a declared answer cannot narrow behind your back.
+    resolve, because its question is "which index should name this" — and it resolves at the stem's
+    declared home, `resolve_live_index_home`, never by a search. This one's question is "is this a
+    row document", and a declared answer cannot narrow behind your back.
 
     THE DECLARED LAYOUT NARROWS IT, and that is a declaration too rather than a resolution. Under
     `builds` the set is `DECISIONS.md` and its own archives, nothing else: the family files are
@@ -839,7 +857,10 @@ def check_rotation(root, conf):
     bad = []
     for a in archives:
         stem = os.path.basename(a).split(".")[0]
-        idx = [p for p in live if os.path.basename(p) == f"{stem}.md"]
+        # The declared home, and only it (TOOL-dHomedResolver-1). `live` is the tracked row-document
+        # set, so a home that is not tracked yields no index and the branch below names it.
+        home = resolve_live_index_home(m, stem)
+        idx = [home] if home in live else []
         # A shard under backlog/ carries a lifecycle token per row; the decision index does not.
         status_bearing = bool(idx) and idx[0].startswith(f"{m}/backlog/")
         rows, ids = [], set()
@@ -871,9 +892,10 @@ def check_rotation(root, conf):
                        f"could not grade them either way: "
                        + ", ".join(f"{r[1]} at line {r[0]}" for r in ungraded[:6]))
         # (b) EXCLUSIVITY. One id, one file.
-        if len(idx) != 1:
-            bad.append(f"    {a}: stem '{stem}' resolves to {len(idx)} live index(es), so the "
-                       f"exclusivity half was NOT graded for it (check 10 reports the resolution)")
+        if not idx:
+            bad.append(f"    {a}: stem '{stem}' declares its live index at {home}, which is not "
+                       f"tracked, so the exclusivity half was NOT graded for it (check 10 reports "
+                       f"the missing home)")
             continue
         live_ids = {mm.group(1) for _n, line in unfenced_lines(read(os.path.join(root, idx[0])))
                     if line is not None and (mm := rowre.match(line))}
@@ -1948,8 +1970,12 @@ def cmd_selftest():
         # two copies free to drift — and the drift is silent in the worst direction, since a narrower
         # Python side simply scans less and still prints a clean count. The shell PRINTS its ERE and
         # this arm asserts the two agree over a tree holding one of every shape.
+        shell_used = []
+
         def resolve_shell_ere(sh, cwd):
             """The shell's own ERE, or None. Every candidate is RUN — being on PATH is not evidence.
+            The candidate that answered is kept in `shell_used`, so the home comparison below asks
+            the SAME shell rather than probing again.
 
             On Windows `bash` resolves to the WSL launcher, which tries to boot a VM and returns
             UTF-16 "the timeout period expired" at rc=1. That is the MS-Store-python3 shape one
@@ -1970,6 +1996,7 @@ def cmd_selftest():
                 out = [l for l in (r.stdout or "").strip().split("\n") if l.strip()]
                 # The print modes sit below an observability echo, so the ERE is the LAST line.
                 if out and out[-1].startswith("^"):
+                    shell_used.append(c)
                     return out[-1]
             return None
 
@@ -2004,9 +2031,26 @@ def cmd_selftest():
             if len(py_set) == len(tracked):
                 return ("VACUOUS — both readers selected EVERY tracked file, so nothing was "
                         "discriminated")
-            return f"JOIN-OK AGREE (both selected {sorted(py_set)} of {len(tracked)} tracked files)"
-        arm("check 10's shell enumeration and row_docs() select the same archives",
-            "JOIN-OK", check_readers_agree)
+            # THE SECOND RULE THE TWO READERS SHARE: where a selected archive's live index lives.
+            # Asked for DECISIONS and every DECLARED family, not only the stems this fixture
+            # rotated, so a family the fixture never archived cannot drift unseen. A shell that
+            # prints nothing is a disagreement, never agreement with a Python reader that did too.
+            stems = ["DECISIONS"] + derive_families(c11)
+            homes = []
+            for stem in stems:
+                r = subprocess.run([shell_used[0], sh, "--print-live-index-home", stem], cwd=t11,
+                                   capture_output=True, text=True, encoding="utf-8", timeout=60)
+                got = [l for l in (r.stdout or "").strip().split("\n") if l.strip()]
+                shell_home = got[-1] if (r.returncode == 0 and got) else None
+                py_home = resolve_live_index_home("memory", stem)
+                if shell_home != py_home:
+                    return (f"DISAGREE on the home of {stem}: shell={shell_home!r} (rc "
+                            f"{r.returncode}) python={py_home!r}")
+                homes.append(py_home)
+            return (f"JOIN-OK AGREE (both selected {sorted(py_set)} of {len(tracked)} tracked files, "
+                    f"and both resolve {len(homes)} stem(s) to {homes})")
+        arm("check 10's shell enumeration and row_docs() select the same archives, and both "
+            "readers resolve every declared stem to the same home", "JOIN-OK", check_readers_agree)
 
         # CHECK 24 — the declared ROTATION_MODE, every branch. TOOL-cSpliceWarden-6.
         # The clean case first, so the reds below are known to be reds and not a broken fixture.
@@ -2049,6 +2093,26 @@ def cmd_selftest():
         arm("an id in BOTH an archive and its live index breaks the partition and is named",
             "does not partition the family: ARCH-tBoth-1",
             lambda: cap(t24d, _c24d, cmd_check_rotation))
+
+        # (b2) A NAMESAKE BESIDE THE HOME. Under `shards` the live set is every tracked file below
+        # backlog/, so a file named ARCH.md in a subfolder of it shares the stem's name. At
+        # 5a836bf0 the basename search counted it, the stem resolved to two indexes, and the
+        # exclusivity half went UNGRADED — so this arm asks for the partition finding itself, which
+        # only a graded half can print (TOOL-dHomedResolver-1).
+        t24n = os.path.join(base, "rotnamesake"); os.makedirs(t24n)
+        c24n = _tree(t24n, "- ARCH-tOne-1 · one\n", pin="0",
+                     shards={"ARCH.md": "- ARCH-tBoth-2 · OPEN · the id the archive also carries\n"},
+                     archives={"ARCH.2026-01-01.md": "- ARCH-tBoth-2 · CLOSED · also live in the shard\n"})
+        os.makedirs(os.path.join(t24n, "memory", "backlog", "sub"))
+        with open(os.path.join(t24n, "memory", "backlog", "sub", "ARCH.md"), "w",
+                  encoding="utf-8") as fh:
+            fh.write("# a note that happens to share the family's name\n")
+        run("git", "add", "-A", cwd=t24n)
+        run("git", "commit", "-q", "-m", "namesake", "--no-verify", cwd=t24n)
+        _c24n = dict(c24n); _c24n["ROTATION_MODE"] = "cut"
+        arm("a NAMESAKE beside the declared home is not an index: the exclusivity half is graded",
+            "does not partition the family: ARCH-tBoth-2",
+            lambda: cap(t24n, _c24n, cmd_check_rotation))
 
         # A DECISIONS archive has no lifecycle token per row, so the terminal half is a category
         # error there and is deliberately not asserted. Without this arm, scoping it out is

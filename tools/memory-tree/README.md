@@ -460,6 +460,18 @@ every run, so the leg's log grows by one line per row.
 tree with `ROTATION_MODE` unset gains one `check 24: ROTATION_MODE is UNDECLARED` line on every full
 run; it was computed before and thrown away.
 
+
+## Upgrading past 2.137 — check 10 resolves a declared home
+
+**Check 10 no longer searches for an index by name.** A rotated archive's live index is now
+`<MEMORY_ROOT>/DECISIONS.md` for a decision archive and `<MEMORY_ROOT>/backlog/<FAMILY>.md` for a
+family one, and only those. The basename search it replaced counted every tracked file that shared a
+stem's name, so a build folder holding a `DECISIONS.md` red every rotation of the decision index with
+`resolves to 3 live index(es)`. If you renamed such files to get a rotation through, the rename stays
+correct and need not be undone. If your index sits anywhere else, check 10 now names the home it
+expected, `declares its live index at <path>, which is not tracked`. Check 24 resolves the same home,
+so its exclusivity half is graded where a namesake used to leave it ungraded. TOOL-dHomedResolver-1.
+
 ## Arms and pins that travel with their gates — TOOL-aRepatriatedFork-18
 
 **A shipped gate ships its sibling suite.** `check-arms.py` reads `<stem>.test.sh` for the arms of
