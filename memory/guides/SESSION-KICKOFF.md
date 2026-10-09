@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-09T16:43:24+03:00 @ 82fe6eb763d33bcb6b06281e7f7643c03763dfd6
+last-audit: 2026-10-09T20:05:15+03:00 @ 2b26f187f03cc991edbf40b25550e6590e97d26e
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 764b6d8cece5533bf0ea3ea116a5e0b58698ab8e
+last-body-change: 2b26f187f03cc991edbf40b25550e6590e97d26e
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -149,6 +149,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   reconcile; the class is `memory/gotchas/text-mode-read-eats-a-bare-cr.md`, which was already
   registered and not read.
   The bytes are NAMED, not shown: a raw CR here was eaten twice by a text-mode rewrite.
+
+- **An adopter's bar holds a leg by `subject = kit` alone**: govkit never emits `chunk`, so a
+  shipped self-test is declared `subject = "kit"` in its descriptor (`aBenchedProbe`).
 
 - **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
   the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
