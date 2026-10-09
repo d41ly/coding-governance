@@ -1,11 +1,12 @@
 # TOOL-aRoutedQuill-2 — scratch-guard refuses a product write no buildable unit on the card owns
 
-**Status:** SPECCED · rev-5 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3 · ratified 2026-10-09
+**Status:** SPECCED · rev-6 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md](../build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md) | research | TOOL-aRoutedQuill-4 |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
 
 <!-- /gen:spec-records -->
@@ -368,6 +369,9 @@ AC8 and AC9 are direct observations of this repository after the rewire and add 
   common dir, rejected because one session's route would admit another session's subagent.
   Recommendation: run the probe before the build pass, expecting yes; on a no, take (a) where the
   environment carries the id, else (b).
+  RESOLVED (agent, 2026-10-09, delegated): yes. Every `agent_id` line, for an `Agent` subagent and a
+  `Workflow` agent alike, carried the main loop's `session_id` byte-equal; the card keyed by the
+  payload's `session_id` is the parent's, and no option is taken. Evidence: `memory/builds/aRoutedQuill/build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md`.
 - **F2 — On a product path, does an absent or replay-written card refuse, unlike the commit deny?**
   `checkOriented` admits both, because during aReplayedCard's own landing the remedy was out of
   reach (`memory/builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-1.md:228-232`).
@@ -417,6 +421,7 @@ AC8 and AC9 are direct observations of this repository after the rewire and add 
   stages `.memory-tree.conf`, which the kickoff manifest watches, with no manifest re-stamp; Rollout
   now re-stamps `last-audit` with a delta line, Files touched gains
   `memory/guides/SESSION-KICKOFF.md` and Gates gains `kickoff-manifest ratchet`.
+- rev-6 · 2026-10-09 · §8 F1 · resolved by the stated probe, run by the unattended run before step 3; the record is `memory/builds/aRoutedQuill/build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md`.
 
 ## 10. Reuse audit
 

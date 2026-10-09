@@ -1,11 +1,12 @@
 # TOOL-aRoutedQuill-4 — every subagent starts holding the card's route, stated as facts
 
-**Status:** SPECCED · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
+**Status:** SPECCED · rev-5 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md](../build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md) | research | TOOL-aRoutedQuill-2 |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-5 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
 
 <!-- /gen:spec-records -->
@@ -287,6 +288,9 @@ AC6 is a direct observation of this repository after the rewire and adds no arm.
   on, so the context and the gate read one card.
   Recommendation: run the probe once for both units before either build pass; take (a) on a
   "does not fire".
+  RESOLVED (agent, 2026-10-09, delegated): it fires for both. `SubagentStart` fired for an `Agent`
+  subagent and for a `Workflow` agent (`agent_type: workflow-subagent`), each with the main loop's
+  `session_id` byte-equal, so the context hook and the gate read one card. Evidence: `memory/builds/aRoutedQuill/build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md`.
 
 ## 9. Revision log
 
@@ -299,6 +303,7 @@ AC6 is a direct observation of this repository after the rewire and adds no arm.
   conf declares no key, true only for a blank or absent key, while `TOOL-aRoutedQuill-2`'s UNARMED
   also covers an entry that is absolute, climbs through `..` or covers `MEMORY_ROOT`; the line now
   names the key and the rule it broke, and AC3 adds a `..` entry case.
+- rev-5 · 2026-10-09 · §8 F1 · resolved by the stated probe, run by the unattended run before step 3; the record is `memory/builds/aRoutedQuill/build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md`.
 
 ## 10. Reuse audit
 
