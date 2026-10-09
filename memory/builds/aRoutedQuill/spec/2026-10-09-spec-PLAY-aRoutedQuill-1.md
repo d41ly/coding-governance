@@ -1,6 +1,6 @@
 # PLAY-aRoutedQuill-1 — the charter's Definition of Ready: every product-code unit carries a spec before code
 
-**Status:** INPROGRESS · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 5 · ratified 2026-10-09
+**Status:** INPROGRESS · rev-4 · 2026-10-10 · node a · Tier-2 · base 6473ae38 · streams playbook · order 5 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -41,10 +41,13 @@ design pass as the owner ruled it.
   with `--bump`, so the growth is priced rather than warned about. Observed by AC4.
 - **S4** — The kickoff manifest's Tier rule (`memory/guides/SESSION-KICKOFF.md:205-207`) gains
   the micro-spec, reading `Tier 1 (a micro-spec before building, then gates + one focused
-  self-review)`. That is a body change, so `last-body-change` advances to the commit making it, in
-  the follow-up commit that also re-stamps `last-audit`. Observed by AC6.
+  self-review)`. That is a body change, so `last-body-change` and `last-audit` both advance, in
+  the same commit, to that commit's parent, the convention the build's earlier units followed.
+  Observed by AC6.
 - **S5** — The template's version marker moves once for this build, by the route §8 F2 settles,
-  and the landed `AGENTS.md` region equals a fresh render after it moves. Observed by AC7.
+  and the landed `AGENTS.md` region equals a fresh render after it moves. The run's dispatch
+  forbids a kit-version move inside a unit pass, so F2 (b)'s act rides the run's one mint commit
+  after the last unit, not this unit's commit. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -147,12 +150,13 @@ profile name `TOOL-aRoutedQuill-1` mints.
 - Re-record both high-water rows with `bash tools/check-template-size.sh --bump` and
   `bash tools/check-template-size.sh --bump AGENTS.md`. The second also absorbs the 95 bytes the
   charter grew before this unit, and the commit message says so.
-- Edit the manifest's Tier rule and re-stamp `last-audit` in the same commit, as the pre-commit
-  manifest ratchet demands for a staged watched file. A follow-up commit advances
-  `last-body-change` to that commit's sha, since a commit cannot name its own.
-- The version moves once for the playbook kit. This unit is the build's only one touching the
-  template, so whichever route §8 F2 picks is also the last. Under F2 (b) the bump rides the last
-  commit that edits the template, and `AGENTS.md` is re-rendered in that same commit.
+- Edit the manifest's Tier rule and re-stamp `last-audit` and `last-body-change` in the same
+  commit, both naming its parent since a commit cannot name its own, as the pre-commit manifest
+  ratchet demands for a staged watched file.
+- The version moves once for the playbook kit. Under F2 (b) the marker and the banner move to v3.6
+  by hand and `AGENTS.md` is re-rendered in one commit. The run forbids a kit-version move inside a
+  unit pass, so that commit is the run's mint after the last unit, which owns it; this unit's
+  commit leaves the marker at v3.5 and the banner at v3.4.
 - It lands at order 5, after the profile and the gate it names exist; D4 puts it in force on
   landing.
 
@@ -203,12 +207,12 @@ profile name `TOOL-aRoutedQuill-1` mints.
 - **AC5** — When `bash tools/check-line-length.sh` and `bash tools/check-playbook-parity.sh` run,
   both report clean.
   Red when: a new line passes 450 characters, or spells `matcher` and a backticked word.
-- **AC6** — When `bash skills/session-kickoff/manifest-check.sh` runs after the follow-up commit, it
+- **AC6** — When `bash skills/session-kickoff/manifest-check.sh` runs after the unit's commit, it
   passes, and `grep -n "micro-spec" memory/guides/SESSION-KICKOFF.md` shows the Tier rule.
   Red when: the stamp or stall check reds, or the Tier rule still gives Tier 1 no spec.
-- **AC7** — When `python tools/govkit/govkit.py epoch` runs on the unit's last commit, the
-  `playbook` row reads `clean` under F2 (b) or `owed at the lander` under F2 (a); and after the
-  landing, `adopt-playbook.sh --target . --check` still passes on the default branch.
+- **AC7** — When `python tools/govkit/govkit.py epoch` runs on the unit's commit, the `playbook`
+  row reads owed, not `broken`; after the run's mint commit it reads `clean`, and
+  `adopt-playbook.sh --target . --check` passes there and on the default branch after landing.
   Red when: the row reads `broken`, or the landed region disagrees with a fresh render.
 
 ## 7. Gates
@@ -244,6 +248,10 @@ This unit adds no gate arm.
 - rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 4 to 5, because `KICK-aRoutedQuill-1` moved
   from order 1 to 2, which shifts every later step by one.
 - rev-3 · 2026-10-09 · §8 · owner resolves F1 (fenced) and F2 (b).
+- rev-4 · 2026-10-10 · §2 · §4 · §6 · build pass: F2 (b)'s marker and banner move rides the run's
+  one mint commit, because the run forbids a kit-version move inside a unit pass, and AC7 reads
+  owed at this unit's commit; the manifest stamps name the commit's parent in that one commit, as
+  the earlier units did, so S4, Rollout and AC6 lose the follow-up commit. F2's option stands.
 
 ## 10. Reuse audit
 
