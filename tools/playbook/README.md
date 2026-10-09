@@ -90,6 +90,9 @@ in re-renders:
 python <prefix>/playbook/render_playbook.py --claim-node --user <user> --host <host> --projects-root <dir>
 ```
 
+A node's primary tree is `<projects_root>/<project_name>`: the committed answer, never the directory
+the rendering clone happens to sit in, so every node renders the same charter.
+
 The claim takes the lowest letter the fleet has not used and refuses a second claim for one identity.
 In an installed copy it refuses outright, because the next update would overwrite the edit. A
 repository overrides one node's `primary_tree`, `worktree_root` or `variances` under

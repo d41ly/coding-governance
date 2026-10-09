@@ -344,7 +344,21 @@ def derive_node_table(root: Path, _a: dict, _e: Path | None = None) -> str:
     the drift audit match a backticked tag and a backticked user token at the head of a row."""
     fleet = read_fleet((_e or Path(__file__).resolve().parent) / FLEET_NAME)
     over = resolve_node_overrides(root, {r['tag'] for r in fleet})
-    checkout = Path(derive_primary_tree(root, _a)).name
+    # TOOL-aDistilledCharter-5. The checkout name is the committed `project_name` answer, never the
+    # rendering clone's directory: two nodes with clones named apart would commit two charters and
+    # red each other's wiring leg, and a submodule's probe answers `vendor`. A node whose clone sits
+    # under another name takes `[nodes.<tag>] primary_tree`.
+    try:
+        cfg = tomllib.loads((root / '.governance' / 'deploy.toml').read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        cfg = {}
+    checkout = next((v.strip() for tbl in ('charter', 'answers')
+                     for k, v in (cfg.get(tbl) or {}).items()
+                     if str(k).lower() == 'project_name' and isinstance(v, str) and v.strip()), '')
+    if not checkout:
+        raise Refusal('NODE_TABLE builds every node\'s primary tree from `project_name`, and '
+                      'deploy.toml answers none. Answer it under [answers] rather than letting the '
+                      'rendering clone\'s directory name stand in for every node')
 
     def render_cell(text: str) -> str:
         return text.replace('|', r'\|')
@@ -1108,7 +1122,8 @@ def run_selftest() -> int:
         return ''.join(f'[[node]]\ntag = "{t}"\nuser = "{u}"\nhost = "{h}"\n'
                        f'projects_root = "{r}"\nvariances = "{v}"\n\n' for t, u, h, r, v in rows)
 
-    def build_node_render(fleet: str, tail: str = '', checkout: str = 'repo-one'):
+    def build_node_render(fleet: str, tail: str = '', checkout: str = 'repo-one',
+                          name: str = 'app'):
         with tempfile.TemporaryDirectory() as td:
             eng, tgt = Path(td) / 'engine', Path(td) / checkout
             eng.mkdir()
@@ -1120,8 +1135,8 @@ def run_selftest() -> int:
             (eng / FLEET_NAME).write_text(fleet, encoding='utf-8')
             (tgt / 'CHARTER.md').write_text('## Node registry\n\n{{NODE_TABLE}}\n', encoding='utf-8')
             (tgt / '.governance' / 'deploy.toml').write_text(
-                'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "CHARTER.md"\n' + tail,
-                encoding='utf-8')
+                'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "CHARTER.md"\n'
+                + (f'project_name = "{name}"\n' if name else '') + tail, encoding='utf-8')
             try:
                 return render(eng, Path(td), tgt)[0], None
             except Refusal as e:
@@ -1143,7 +1158,8 @@ def run_selftest() -> int:
     three, e3 = build_node_render(build_fleet_text(fleet_rows[::-1]))
     want_pairs = [('a', 'ann @ HOSTA'), ('b', 'bob'), ('d', 'dee @ HOSTD')]
     check_arm(read_pairs(one) == read_pairs(two) == read_pairs(three) == want_pairs
-          and '`C:/p/repo-one`' in one and '`C:/p/other-repo`' in two and r'quirk \| piped' in one,
+          and '`C:/p/app`' in one and '`C:/p/app`' in two and 'repo-one' not in one
+          and r'quirk \| piped' in one,
           'one fleet renders the same (tag, identity) pairs in every repository and row order',
           f'errors {e1, e2, e3}; pairs {read_pairs(one)} / {read_pairs(two)} / {read_pairs(three)}')
     for name, rows, want in (
@@ -1155,9 +1171,17 @@ def run_selftest() -> int:
         _b, err = build_node_render(build_fleet_text(rows))
         check_arm(err is not None and want in err, f'the fleet refuses {name}', f'got {err!r}')
     body, err = build_node_render(build_fleet_text(fleet_rows), '\n[nodes.b]\nvariances = "x"\n')
-    check_arm(err is None and '| `b` | `bob` | `/home/bob/src/repo-one` | '
-          '`/home/bob/src/repo-one/.claude/worktrees` | x |' in body and r'quirk \| piped' in body,
+    check_arm(err is None and '| `b` | `bob` | `/home/bob/src/app` | '
+          '`/home/bob/src/app/.claude/worktrees` | x |' in body and r'quirk \| piped' in body,
           'a [nodes.<tag>] override moves its one cell and no other row', f'{err!r} {body!r}')
+    _b, err = build_node_render(build_fleet_text(fleet_rows), name='')
+    check_arm(err is not None and '`project_name`' in err,
+              'a node table with no project_name answer refuses rather than naming the clone',
+              f'got {err!r}')
+    _b, err = build_node_render(build_fleet_text(fleet_rows),
+                                '\n[nodes.b]\nprimary_tree = "E:/elsewhere"\n')
+    check_arm(err is None and '| `b` | `bob` | `E:/elsewhere` | `E:/elsewhere/.claude/worktrees` |' in _b,
+              'a [nodes.<tag>] primary_tree override still wins over project_name', f'{err!r} {_b!r}')
     for name, tail, want in (('a tag the fleet lacks', '\n[nodes.q]\nvariances = "x"\n',
                               'does not hold'),
                              ('an unknown key', '\n[nodes.b]\ncolour = "x"\n', 'only primary_tree')):
