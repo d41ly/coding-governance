@@ -352,6 +352,8 @@ measurement, with no second copy of the same fact.
 nothing, the tree did not move, AND the tree was CLEAN when the run started. CLEAN means
 `git status --porcelain` empty, untracked files included. All five preconditions are what make the
 file's name true, and an implementation that forgets one passes every arm written for the others.
+The stamp also records `manifest`, the repo-relative path of the leg manifest the run read, and the
+pre-push hook trusts it only for a runner bar reading that manifest.
 
 ## Every leg may declare a `ceiling`, and the runner holds it to it
 

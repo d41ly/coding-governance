@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: f624a070a
-phase: SPECCING
+witness: 4f363647191177c6b838bd024c76e8d9dc03cf1b
+phase: BUILDING
 branch-sha: bef97330574caabfd43c374dbe8c39b26c560203
 branch-ref: refs/heads/branch/awesome-cannon-44b2b1
 may: none
@@ -39,3 +39,7 @@ base: bef97330574caabfd43c374dbe8c39b26c560203
 2026-10-09T18:44:25Z brief · item PLAY-aFrugalTurnstile-1 · reason 142385d5e412 memory/builds/aFrugalTurnstile/prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md
 
 2026-10-09T18:45:53Z brief · item DEPL-aFrugalTurnstile-1 · reason 142385d5e412 memory/builds/aFrugalTurnstile/prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md
+
+2026-10-09T19:03:23Z dispatch · item 4f363647 TOOL-aFrugalTurnstile-1 · reason .githooks/pre-push .githooks/pre-push.test.sh tools/run-gates/run-gates.sh tools/run-gates/run-gates.evidence.test.sh tools/run-gates/README.md memory/guides/MERGE-BAR.md memory/builds/aFrugalTurnstile/spec/2026-10-09-spec-TOOL-aFrugalTurnstile-1.md memory/builds/aFrugalTurnstile/build/2026-10-09-build-TOOL-aFrugalTurnstile-1-1-acceptance-ledger.md memory/builds/aFrugalTurnstile/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
+
+2026-10-09T19:48:05Z dispatch · item 4f363647 TOOL-aFrugalTurnstile-1 · reason memory/guides/SESSION-KICKOFF.md

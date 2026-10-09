@@ -303,10 +303,37 @@ else
   i=0; while [ "$i" -le "$lagbound" ]; do i=$((i+1)); echo "lag $i" >> lagfile.txt; git add -A >/dev/null 2>&1; git commit -qm "lag $i" >/dev/null 2>&1; done
   stamp "$base_sha"
   case "$(decide)" in
-    *"FULL gate"*"commits behind the tip"*) ok "12 a record more than GATE_FULL_MAX_LAG=$lagbound commits back → FULL" ;;
+    *"FULL gate"*"first-parent landings behind the tip"*) ok "12 a record more than GATE_FULL_MAX_LAG=$lagbound first-parent landings back → FULL" ;;
     *) bad "12 a stale-by-lag record did not force a full run" ;;
   esac
 fi
+
+# --- 12b: the lag is counted in FIRST-PARENT LANDINGS (TOOL-aFrugalTurnstile-1 AC1; arm 12 is AC2) ---
+# A green at a branch tip, then main takes a 12-commit --no-ff landing, then the branch lands --no-ff.
+# All-commit counting charged the green 14 for that and forced FULL; first-parent counting charges the
+# two landings plus decide's own commit. Arm 12 above keeps the linear run past the bound forcing.
+git checkout -q -b ft-feat >/dev/null 2>&1
+echo f > ftfeat.txt; git add ftfeat.txt >/dev/null 2>&1; git commit -qm "ft feat" >/dev/null 2>&1
+stamp "$(git rev-parse HEAD)"
+git checkout -q main >/dev/null 2>&1; git checkout -q -b ft-side >/dev/null 2>&1
+for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
+  echo "$i" > ftside.txt; git add ftside.txt >/dev/null 2>&1; git commit -qm "ft side $i" >/dev/null 2>&1
+done
+git checkout -q main >/dev/null 2>&1
+git merge -q --no-ff -m "land ft-side" ft-side >/dev/null 2>&1
+git merge -q --no-ff -m "land ft-feat" ft-feat >/dev/null 2>&1
+case "$(decide)" in
+  *"scoped gate"*"first-parent landing(s) back"*) ok "12b a branch green landed after a 12-commit landing scopes, counted in first-parent landings" ;;
+  *) bad "12b a branch green behind two first-parent landings did not scope" ;;
+esac
+
+# --- 12c: a record earned on ANOTHER leg manifest (TOOL-aFrugalTurnstile-1 AC3) -----------------
+stamp "$(git rev-parse HEAD)"
+printf 'manifest\t%s\n' elsewhere/legs.json >> "$(git rev-parse --git-dir)/gate-full-green"
+case "$(decide)" in
+  *"FULL gate"*"leg manifest elsewhere/legs.json"*"reads gate-legs.json"*) ok "12c a record naming a foreign manifest → FULL, naming both manifests" ;;
+  *) bad "12c a record earned on elsewhere/legs.json did not force FULL with both paths named" ;;
+esac
 
 # --- the pushed diff touches the leg manifest -------------------------------------------------
 stamp "$(git rev-parse HEAD)"
@@ -420,6 +447,18 @@ if ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD="bash tracked-bar.sh" git push -q ori
 else
   bad "25 a tracked bar was refused, so 26-27 prove only that the hook refuses everything"
 fi
+
+# 25b — a tracked bar that is NOT this kit's runner adopts no runner stamp (TOOL-aFrugalTurnstile-1
+#       AC4): a green the runner earned proves the runner's legs, never this bar's. The stamp is at the
+#       tip and otherwise valid, so before the unit this push scoped.
+git commit -q --allow-empty -m c25b >/dev/null 2>&1
+stamp "$(git rev-parse HEAD)"
+git commit -q --allow-empty -m c25b2 >/dev/null 2>&1
+line=$( ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD="bash tracked-bar.sh" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true )
+case "$line" in
+  *"FULL gate"*"is not this kit's runner"*) ok "25b a non-runner bar forces FULL and names why no runner stamp is a candidate" ;;
+  *) bad "25b a runner stamp was a candidate for a bar that is not the runner: ${line:-<no decision line>}" ;;
+esac
 
 # 26 — an UNTRACKED bar is refused. $green lives under mktemp, so it is untracked by construction —
 #      the same shape every stub in this file has. GREEN, not red, deliberately: with a red stub the
@@ -1523,7 +1562,7 @@ _lag=$(grep -m1 -oE 'GATE_FULL_MAX_LAG=[0-9]+' "$SRC/.githooks/pre-push" | grep 
 for _i in $(seq 0 "${_lag:-10}"); do printf '%s\n' "$_i" > notes/a.md; git commit -qam "lag $_i"; done
 _o=$(run_docs_push)
 case "$_o" in
-  *"FULL gate on main push"*"doc-only, but"*"commits behind"*) ok "DOCS AC7 the lag bound still forces FULL on a doc-only push, and says so" ;;
+  *"FULL gate on main push"*"doc-only, but"*"first-parent landings behind"*) ok "DOCS AC7 the lag bound still forces FULL on a doc-only push, and says so" ;;
   *) bad "DOCS AC7 expected FULL with doc-only, but and the lag reason, got: $_o" ;;
 esac
 # AC8: an exported GATE_DOCS_BASE never reaches the bar of a push that is not doc-only.

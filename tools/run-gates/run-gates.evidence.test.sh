@@ -146,7 +146,8 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=115
+FLOOR_ASSERTIONS=116
+# RAISED 115 -> 116 by TOOL-aFrugalTurnstile-1: the control stamp's `manifest` key.
 # MERGED 112 / 87 -> 115 at the reconcile with origin/main 290d0d2d5: base 84, plus this branch's 28, plus main's 3.
 # RAISED 110 -> 112 by TOOL-aGraftedHelix-7: AC10's two assertions over a reading taken during a memory pause.
 # RAISED 84 -> 87 by TOOL-dThriftyLanding-2: the shared-stamp control and its two assertions.
@@ -440,6 +441,11 @@ if [ -f "$REC_GD/gate-full-green" ]; then
   grep -q "^manifest_blob	$blob$" "$REC_GD/gate-full-green" \
     && ok "the stamp's manifest_blob is the hash of the manifest THAT RUN READ" \
     || { nope "the stamp's manifest_blob does not match the manifest the run read"; sed 's/^/      /' "$REC_GD/gate-full-green"; }
+  # WHICH manifest, repo-relative (TOOL-aFrugalTurnstile-1 AC6): the pre-push hook refuses a record
+  # whose `manifest` is not the kit sibling, so an absolute or `./`-prefixed spelling costs a full bar.
+  [ "$(awk -F'\t' '$1=="manifest"{print $2}' "$REC_GD/gate-full-green")" = "${PFX}gate-legs.json" ] \
+    && ok "the stamp's manifest names the kit sibling ${PFX}gate-legs.json, repo-relative" \
+    || { nope "the stamp's manifest is not ${PFX}gate-legs.json"; sed 's/^/      /' "$REC_GD/gate-full-green"; }
   stamp_before=$(cat "$REC_GD/gate-full-green")
   # a RED run must neither write nor UPDATE it — the arm that distinguishes the two
   printf '#!/usr/bin/env bash\necho boom\nexit 3\n' > "$REC_T/fx/a.sh"

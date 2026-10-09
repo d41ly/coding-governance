@@ -1,11 +1,12 @@
 # TOOL-aFrugalTurnstile-1 — staleness counts first-parent landings, and a runner stamp is trusted only for the runner's own manifest
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aFrugalTurnstile-1-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md) | research | TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md) | journal | TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md) | journal | TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
@@ -162,6 +163,7 @@ Above predicate 7:
 | `manifest` | key in `gate-full-green` and `gate-inherited-green` | not a definition; no cell |
 | `rec_man` | shell variable in `.githooks/pre-push` | not a definition; no cell |
 | `ig_man` | shell variable in `.githooks/pre-push` | not a definition; no cell |
+| `LEGS_REL` | shell variable in `tools/run-gates/run-gates.sh`, the path both stamps write (rev-2) | not a definition; no cell |
 
 No function is added, so no lexicon cell is consulted.
 
@@ -232,11 +234,13 @@ Every criterion runs the §4 fixture driver; each case's base line is recorded b
   `is not this kit's runner`. Red when: a runner stamp scopes a bar that is not the runner.
 - **AC5** — When the stamp is the suite's shape with no `manifest` key, at the tip, both copies print
   `scoped gate`. Red when: an old stamp is refused, which would cost every adopter its next push.
-- **AC6** — When the fixture's runner copy is run plain over its two unguarded stub legs on a clean
-  tree, `awk -F'\t' '$1=="manifest"{print $2}' .git/gate-full-green` prints `tools/gate-legs.json`
-  for the nested install, `gate-legs.json` for a second fixture with the kit at the repo root, and
-  an absolute path for a run handed an out-of-tree manifest through the runner's manifest override;
-  `pre-push.new` then scopes from the first two stamps and forces FULL on the third.
+- **AC6** — When the S3 block of `tools/run-gates/run-gates.sh`, from `LEGS_REL=${LEGS_FILE#./}` to
+  its `esac`, is evaluated in the fixture's work tree with `LEGS_FILE` set to `tools/gate-legs.json`,
+  `./gate-legs.json`, the absolute in-tree path in the MSYS and in git's spelling, and an out-of-tree
+  manifest, `LEGS_REL` reads `tools/gate-legs.json`, `gate-legs.json`, `tools/gate-legs.json` twice
+  and the absolute path; `pre-push.new` then scopes from stamps carrying the nested and the
+  root-install value and forces FULL on the out-of-tree one. The runner's own stamp is observed by
+  §7's `run-gates.evidence.test.sh` arm at the close, because a unit pass starts no runner.
   Red when: the key is missing, keeps a `./` prefix, or records an in-tree path absolutely.
 - **AC7** — When `awk '/THE INHERITED-GREEN STAMP/,/inherited-green stamp written/' tools/run-gates/run-gates.sh`
   runs, its output carries the same `manifest` line the full-green block writes.
@@ -287,6 +291,10 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC6 · the control
 
 - rev-1 · 2026-10-09 · initial draft, from the build's spec brief and design D1, D2, read against
   the hook and the runner at base.
+- rev-2 · 2026-10-09 · AC6 amended: the S3 block is evaluated lifted from the runner rather than by
+  a runner run, which the unit pass's ground text forbids in any form; the runner's own stamp moves
+  to the §7 evidence arm, which the close runs. §4's inventory gains `LEGS_REL`, the variable the
+  S3 block sets and both stamps print.
 
 ## 10. Reuse audit
 

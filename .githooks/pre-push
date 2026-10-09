@@ -1065,6 +1065,13 @@ _tree_dirty=$(git status --porcelain --ignore-submodules=untracked 2>/dev/null) 
 # behaviourally today's bar — and that was refused on the record: the owner's stated goal is to
 # stop paying the full bar per landing, and 1 defers essentially all of the saving. Lowering it
 # later needs no code.
+# COUNTED IN FIRST-PARENT LANDINGS (TOOL-aFrugalTurnstile-1 S1, design D1), the unit the runner's
+# INHERITED_RED_MAX_AGE already counts in. Counting every commit charged a green earned on a branch
+# tip for every commit each other build's landing carried in while that branch was open, so a
+# multi-commit landing fell past the bound and paid a full bar at the push boundary.
+# WHAT THE FIRST-PARENT COUNT DOES NOT CHECK: how many commits a landing's side branch carried. It
+# trusts the recorded sha to speak for them, which predicates 2 and 5 constrain and the count does
+# not; under a doc-only push, where predicate 5 is waived, a long doc branch now counts as one landing.
 GATE_FULL_MAX_LAG=10
 
 # ---- THE INHERITED-RED POLICY, READ AT R AND NEVER FROM THE PUSHED TREE — TOOL-dDerivedDocket-24 ---
@@ -1136,13 +1143,16 @@ read_policy_at() { # sha -> PP_POLICY (park|land), PP_MAX_AGE (the positive boun
 gd=$(git rev-parse --git-dir 2>/dev/null)
 kitfp=""; [ -n "$GATE_RUNNER" ] && kitfp="$top/${GATE_RUNNER%/*}/gate-fingerprint.sh"
 force=""; lag=0
-rec_sha=""; rec_fp=""; rec_blob=""; rec_st=""
-read_green_file() { # path -> rec_sha rec_fp rec_blob rec_st, each empty when the file is absent
-  rec_sha=""; rec_fp=""; rec_blob=""; rec_st=""
+rec_sha=""; rec_fp=""; rec_blob=""; rec_man=""; rec_st=""
+read_green_file() { # path -> rec_sha rec_fp rec_blob rec_man rec_st, each empty when the file is absent
+  rec_sha=""; rec_fp=""; rec_blob=""; rec_man=""; rec_st=""
   [ -f "$1" ] || return 0
   rec_sha=$(awk -F'\t' '$1=="sha"{print $2}' "$1" 2>/dev/null)
   rec_fp=$(awk -F'\t' '$1=="fingerprint"{print $2}' "$1" 2>/dev/null)
   rec_blob=$(awk -F'\t' '$1=="manifest_blob"{print $2}' "$1" 2>/dev/null)
+  # WHICH MANIFEST THE BLOB BELONGS TO (TOOL-aFrugalTurnstile-1 S4). Absent reads as the kit sibling,
+  # in check_green_record, because that is what every stamp written before the key existed ran.
+  rec_man=$(awk -F'\t' '$1=="manifest"{print $2}' "$1" 2>/dev/null)
   # WHAT THE RECORDED GREEN COVERED. Absent reads as OFF, and that default is the migration: every
   # stamp written before TOOL-dUnstalledConvoy-26 lacks this key, and defaulting the missing case to
   # "covered everything" would make each of them certify legs it never ran.
@@ -1178,22 +1188,22 @@ rec_from=""
 
 # PREDICATES 2 TO 8, ONE FUNCTION, TWO RECORDS (TOOL-dDerivedDocket-24). They were inline and read
 # the full green's fields; the inherited green below must pass exactly the same seven, so the seven
-# became one function over a record's four fields rather than a second copy of them. The label is the
+# became one function over a record's five fields rather than a second copy of them. The label is the
 # only thing that differs, and it is spelled `full green` for the full green, so every message that
 # record printed before is byte-identical. Sets `force` to the first predicate the record fails, or
 # empty, and `lag` to its distance behind the tip.
-check_green_record() { # sha · fingerprint · manifest blob · selftests · label
-  local r_sha=$1 r_fp=$2 r_blob=$3 r_st=$4 label=$5 p2 fresh now_blob
+check_green_record() { # sha · fingerprint · manifest blob · manifest path · selftests · label
+  local r_sha=$1 r_fp=$2 r_blob=$3 r_man=${4:-${KP}gate-legs.json} r_st=$5 label=$6 p2 fresh now_blob
   force=""; lag=0
   # 2. the recorded green is not an ancestor of what is being pushed, so it describes another line of
   #    history entirely.
   if ! git merge-base --is-ancestor "$r_sha" "$main_local" 2>/dev/null; then
     force="the recorded $label ${r_sha:0:8} is not an ancestor of the pushed tip"; return 0
   fi
-  # 3. the recorded green is further behind the tip than the bound allows.
-  lag=$(git rev-list --count "$r_sha..$main_local" 2>/dev/null || echo 0)
+  # 3. the recorded green is further behind the tip than the bound allows, in first-parent landings.
+  lag=$(git rev-list --first-parent --count "$r_sha..$main_local" 2>/dev/null || echo 0)
   if [ "${lag:-0}" -gt "$GATE_FULL_MAX_LAG" ]; then
-    force="the recorded $label is $lag commits behind the tip (bound $GATE_FULL_MAX_LAG)"; return 0
+    force="the recorded $label is $lag first-parent landings behind the tip (bound $GATE_FULL_MAX_LAG)"; return 0
   fi
   # 4. the record's TREE fingerprint does not reproduce AT THE SHA IT NAMES.
   #    AT THE RECORDED SHA, never at the tip. The digest is taken over the committed tree object, so
@@ -1228,6 +1238,13 @@ check_green_record() { # sha · fingerprint · manifest blob · selftests · lab
   # 7. the recorded manifest blob differs from the one this tree holds — the same concern as 6, from
   #    the record's side, and it catches an uncommitted or differently-resolved manifest that a diff
   #    between two commits cannot see.
+  #    A record earned on ANOTHER manifest is refused first (TOOL-aFrugalTurnstile-1 S5): a nested
+  #    runner inside a wrapper bar stamps a green of its own subset, and only the blob kept it out.
+  #    WHAT THE MANIFEST PATH DOES NOT CHECK: that the recorded path held these bytes when the stamp was
+  #    written. The blob compare below checks that; the path only says which manifest the blob belongs to.
+  if [ "$r_man" != "${KP}gate-legs.json" ]; then
+    force="the recorded $label was earned on the leg manifest $r_man, and the bar this push runs reads ${KP}gate-legs.json"; return 0
+  fi
   if [ -n "$r_blob" ]; then
     now_blob=$(git hash-object -- "${KP}gate-legs.json" 2>/dev/null)
     if [ -n "$now_blob" ] && [ "$now_blob" != "$r_blob" ]; then
@@ -1305,7 +1322,7 @@ for _gi in "${!green_candidates[@]}"; do
   read_green_file "$_gf"
   force=""
   [ -n "$rec_sha" ] || force="no recorded full green"
-  [ -z "$force" ] && check_green_record "$rec_sha" "$rec_fp" "$rec_blob" "$rec_st" "full green"
+  [ -z "$force" ] && check_green_record "$rec_sha" "$rec_fp" "$rec_blob" "$rec_man" "$rec_st" "full green"
   if [ -z "$force" ]; then
     [ "$_gi" -gt 0 ] && rec_from=$(green_label "$_gi")
     break
@@ -1333,6 +1350,7 @@ if [ -n "$force" ] && [ -f "$gd/gate-inherited-green" ]; then
   ig_sha=$(awk -F'\t' '$1=="sha"{print $2}' "$_ig" 2>/dev/null)
   ig_fp=$(awk -F'\t' '$1=="fingerprint"{print $2}' "$_ig" 2>/dev/null)
   ig_blob=$(awk -F'\t' '$1=="manifest_blob"{print $2}' "$_ig" 2>/dev/null)
+  ig_man=$(awk -F'\t' '$1=="manifest"{print $2}' "$_ig" 2>/dev/null)
   ig_st=$(awk -F'\t' '$1=="selftests"{print $2}' "$_ig" 2>/dev/null)
   ig_base=$(awk -F'\t' '$1=="base"{print $2}' "$_ig" 2>/dev/null)
   ig_age=$(awk -F'\t' '$1=="max_age"{print $2}' "$_ig" 2>/dev/null)
@@ -1344,7 +1362,7 @@ if [ -n "$force" ] && [ -f "$gd/gate-inherited-green" ]; then
   elif [ "$ig_age" != "$PP_MAX_AGE" ]; then
     inh_why="the inherited green was written under max_age ${ig_age:-none} and the bound at ${main_remote:0:8} is $PP_MAX_AGE"
   else
-    check_green_record "$ig_sha" "$ig_fp" "$ig_blob" "$ig_st" "inherited green"
+    check_green_record "$ig_sha" "$ig_fp" "$ig_blob" "$ig_man" "$ig_st" "inherited green"
     if [ -z "$force" ]; then inh_sha=$ig_sha; else inh_why="the inherited green ${ig_sha:0:8} is refused too: $force"; fi
   fi
   [ -n "$inh_sha" ] || force=$full_force
@@ -1379,6 +1397,16 @@ else
 fi
 RUNLOG_BAR=${RUNLOG_BAR:-default}   # set only once the value is vetted, so a refusal records no bar
 RUNLOG_BAR_PATH=$bar_path; RUNLOG_BAR_BLOB=$bar_blob
+
+# NO RUNNER STAMP IS A CANDIDATE FOR A BAR THAT IS NOT THE RUNNER (TOOL-aFrugalTurnstile-1 S6, design
+# D2). `gate-full-green` and `gate-inherited-green` prove the runner's legs; a declared GATE_CMD naming
+# another script runs other legs, which no runner stamp has seen. Applied AFTER the candidate loop,
+# whatever it concluded, because `bar_record` is only known here (spec F1 (a)); a `stub` bar keeps
+# today's decision, since every decision arm of the hook's own suite runs under the declared stub.
+if [ "$bar_record" = other ]; then
+  force="the bar this push runs is not this kit's runner, so no runner stamp is a candidate (gate-full-green and gate-inherited-green prove the runner's legs, not this bar's)"
+  inh_sha=""; inh_why=""
+fi
 
 # THE DEFAULT BAR WITH NO KIT ROOT — TOOL-aRepatriatedFork-24 S2, the owner's F1 (c). A commit hook
 # skips on a miss, because its legs are an early signal. This is the merge bar, so a push that cannot
@@ -1454,7 +1482,7 @@ _docs_clause=""
 [ -n "$DOCS_ONLY" ] && _docs_clause=" docs-only: $DOCS_N path(s) in GATE_DOC_PATHS at ${main_remote:0:8};"
 if [ -n "$inh_sha" ]; then
   [ -n "$DOCS_ONLY" ] && export GATE_DOCS_BASE="$main_remote"
-  echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause inherited green ${inh_sha:0:8} at base ${main_remote:0:8} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG; the full green was not usable: $full_force — bar: $bar_label"
+  echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause inherited green ${inh_sha:0:8} at base ${main_remote:0:8} is ${lag:-0} first-parent landing(s) back, within $GATE_FULL_MAX_LAG; the full green was not usable: $full_force — bar: $bar_label"
   export GATE_BASE="$inh_sha"
   RUNLOG_DECISION=scoped
 elif [ -n "$force" ]; then
@@ -1463,7 +1491,7 @@ elif [ -n "$force" ]; then
   RUNLOG_DECISION=full
 else
   [ -n "$DOCS_ONLY" ] && export GATE_DOCS_BASE="$main_remote"
-  echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause full green ${rec_sha:0:8}${rec_from:+ from $rec_from} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG — bar: $bar_label"
+  echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause full green ${rec_sha:0:8}${rec_from:+ from $rec_from} is ${lag:-0} first-parent landing(s) back, within $GATE_FULL_MAX_LAG — bar: $bar_label"
   export GATE_BASE="$rec_sha"
   RUNLOG_DECISION=scoped
 fi

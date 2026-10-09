@@ -3878,6 +3878,20 @@ fi
 # same state the bug corrupts is disabled by the bug it exists to catch.
 # A SEVENTH, TOOL-dDerivedDocket-26 S6: the verdict is GREEN and its file was WRITTEN. A bar that
 # refuses its own exit 0 below must not have left the stamp a later push trusts in its place.
+#
+# WHICH MANIFEST BOTH STAMPS RAN (TOOL-aFrugalTurnstile-1 S3, design D2). The blob alone cannot say
+# which file it hashed, so a nested runner inside an adopter's wrapper bar stamped a green of this
+# kit's subset that only an accidental blob mismatch kept the push boundary from trusting as the whole
+# bar. Repo-relative, the spelling the pre-push hook compares with its kit sibling: a leading `./` (a
+# root install's `dirname` answers `.`) is stripped; an absolute value is asked of git, in git's one
+# spelling, and loses the top-level prefix only where git places it inside THIS work tree; a value git
+# cannot place there stays absolute. The run header's own `manifest` key is a different record.
+LEGS_REL=${LEGS_FILE#./}
+case "$LEGS_REL" in
+  /*|?:*) _lr=$(unset GIT_DIR GIT_WORK_TREE; cd "${LEGS_REL%/*}" 2>/dev/null \
+                && [ "$(git rev-parse --show-toplevel 2>/dev/null)" = "$ROOT" ] \
+                && git rev-parse --show-prefix 2>/dev/null) && LEGS_REL=$_lr${LEGS_REL##*/} ;;
+esac
 if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
    && [ ! -f "$WORK/wall.breach" ] \
    && [ "$tree_moved" = no ] && [ "$TREE_CLEAN" = yes ] && [ -n "$FPRINT_START" ] \
@@ -3886,6 +3900,7 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
     printf 'sha\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"
     printf 'fingerprint\t%s\n' "$FPRINT_START"
     printf 'manifest_blob\t%s\n' "$(git hash-object -- "$LEGS_FILE" 2>/dev/null)"
+    printf 'manifest\t%s\n' "$LEGS_REL"
     # WHAT THIS GREEN COVERED. Without it a record named `gate-full-green` cannot say
     # whether the kit-subject legs ran, and the push boundary would trust a partial bar as
     # a whole one. The READER of this field is TOOL-dUnstalledConvoy-27; written without
@@ -3932,6 +3947,7 @@ if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ "$ATTR_LANDABLE" = 1 ] \
     printf 'sha\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"
     printf 'fingerprint\t%s\n' "$FPRINT_START"
     printf 'manifest_blob\t%s\n' "$(git hash-object -- "$LEGS_FILE" 2>/dev/null)"
+    printf 'manifest\t%s\n' "$LEGS_REL"
     printf 'selftests\t%s\n' "${GATE_SELFTESTS:+1}"
     printf 'base\t%s\n' "$ATTR_RSHA"
     printf 'max_age\t%s\n' "$ATTR_MAX_AGE"
