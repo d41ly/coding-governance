@@ -58,13 +58,13 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 2 unit(s) · node a · opened 2026-10-09 · streams tooling
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-10-09 · streams tooling
 ids TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aHomedAnchor-1 — the driver's third anchor: `ANCHOR_SCOPE="local"` authorizes from local history](spec/2026-10-09-spec-TOOL-aHomedAnchor-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-1 — the driver's third anchor: `ANCHOR_SCOPE="local"` authorizes from local history](spec/2026-10-09-spec-TOOL-aHomedAnchor-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-10-09 |
 | [TOOL-aHomedAnchor-2 — the bar leg admits a local-anchored BASE when origin's default branch declares `local`](spec/2026-10-09-spec-TOOL-aHomedAnchor-2.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
