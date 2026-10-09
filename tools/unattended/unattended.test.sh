@@ -4269,6 +4269,17 @@ git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin 
 out=$(run --preflight tBr --keepalive-id k1)
 hit  "$out" "preflight OK"
 miss "$out" "does not stand on its own"
+# ---- Closing review round 1, B1: a build brief with no `## The prompt` that SORTS AFTER the conforming
+# ---- record is the layout every prompt-mode build reaches after its first pass. Its `skip` verdict
+# ---- must not survive the loop into the join, which refused with the bare word as its reason.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_qb_ok" > "$_qb_rec"
+printf '# ARCH-tBr-1 — build brief\n\n- Build the widget.\n' > memory/builds/tBr/prompts/2026-10-09-prompt-tBr-1-1-build-brief.md
+scope published; printf 'PROMPT_BRIEF_CUTOFF="2026-07-01"\n' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "preflight OK"
+miss "$out" "UNATTENDED check 115 FAILED"
 # ---- AC5: a prompt-mode build with no `## The prompt` record refuses naming the empty population.
 reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
 scope published; printf 'PROMPT_BRIEF_CUTOFF="2026-07-01"\n' >> .unattended.conf
@@ -16637,7 +16648,9 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 2673 -> 2701 by TOOL-aQuotedBrief-3: the brief-item arms (check 115 and build-complete term 7)
 # after the carried-branch arms in region three, 28 assertions counting their `mutate` lines, run as a
 # slice of the prologue and those blocks on node a, 2026-10-09; no suite ran.
-FLOOR_ASSERTIONS=2701
+# RAISED 2701 -> 2704 by the aQuotedBrief closing review round 1 fold: the B1 arm, a build brief
+# sorting after the conforming record (mutate, hit, miss).
+FLOOR_ASSERTIONS=2704
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -16822,7 +16835,8 @@ FLOOR_SHARD_2=222
 # RAISED 255 -> 279 by TOOL-aQuotedBrief-1: the same 24 region-three prompt-record assertions, see FLOOR_ASSERTIONS.
 # RAISED 279 -> 295 by TOOL-aQuotedBrief-2: the same 16 region-three carried-branch assertions, see FLOOR_ASSERTIONS.
 # RAISED 295 -> 323 by TOOL-aQuotedBrief-3: the same 28 region-three brief-item assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_3=323
+# RAISED 323 -> 326 by the same B1 arm, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=326
 FLOOR_SHARD_4=390
 FLOOR_SHARD_5=270
 FLOOR_SHARD_6=129

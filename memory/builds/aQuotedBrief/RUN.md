@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 7f681f76d2f599292ffe7d4462864b3c21605333
-phase: BUILDING
+witness: cc627830097f2e88cab5e196fc301fbf1d6f1a40
+phase: REVIEWING
 may: none
 mode: slug
 run-branch: refs/heads/branch/unattended-build-template-5f7d7d
@@ -47,3 +47,7 @@ base: 6473ae38a517a3559f2b7daed67a9820c505bd4d
 2026-10-09T04:33:10Z brief · item TOOL-aQuotedBrief-3 · reason aa96088eb99a memory/builds/aQuotedBrief/prompts/2026-10-09-prompt-TOOL-aQuotedBrief-3-5-build-brief.md
 
 2026-10-09T05:44:21Z dispatch · item 98d212d7 TOOL-aQuotedBrief-3 · reason memory/LIVE.md
+
+2026-10-09T06:19:05Z review · item aQuotedBrief · reason verdict BLOCKED · blockers 1
+
+2026-10-09T06:34:56Z dispatch · item cc627830 TOOL-aQuotedBrief-1 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/aQuotedBrief/reviews/2026-10-09-review-TOOL-aQuotedBrief-3-closing-diff-round1.md

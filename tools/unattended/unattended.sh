@@ -3203,7 +3203,10 @@ check_prompt_brief() { # slug · base
         if (!conf) { print "rule 4"; exit }
         if (drawn != "none" && !(asked && answered)) { print "rule 5"; exit }
       }')
-    [ "$why" = skip ] && continue
+    # The sentinel is CLEARED on the way out: `why` also carries the join's result below, so a
+    # non-prompt record (a spec or build brief) sorting last left `skip` standing and the join
+    # refused a conforming record with that word as its reason (closing review round 1, B1).
+    [ "$why" = skip ] && { why=""; continue; }
     found=1
     if [ -n "$why" ]; then
       fail 112 "a prompt record at the pinned BASE does not stand on its own, so a resumed session would hold the owner's bytes and not the build they authorized; write the brief, the session quotes and the confirmation its prompt path names - first rule failed, then the record: $why $rec"

@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-09-build-TOOL-aQuotedBrief-2-4-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aQuotedBrief-2-4-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aQuotedBrief-2-3-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aQuotedBrief-2-3-build-brief.md) | journal | — |
+| [2026-10-09-review-TOOL-aQuotedBrief-3-closing-diff-round1.md](../reviews/2026-10-09-review-TOOL-aQuotedBrief-3-closing-diff-round1.md) | diff-review | TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-3 |
 
 <!-- /gen:spec-records -->
 
