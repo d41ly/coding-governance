@@ -654,6 +654,10 @@ check_hooks() {
       echo "FIXED    hooks     — set core.hooksPath -> .githooks"
       CW_HEALTH_LOG=${CW_HEALTH_LOG:-$(resolve_health_log "$ROOT")}
       add_health_event "$CW_HEALTH_LOG" check-wiring hookspath-set "core.hooksPath -> .githooks · mode $MODE"
+    else
+      # A write that did not take is not a fix: no FIXED, no event, and the run counts it.
+      echo "UNWIRED  hooks     — could not set core.hooksPath (local). Fix: git config core.hooksPath '.githooks'"
+      unwired=$((unwired+1))
     fi
   else
     echo "UNWIRED  hooks     — core.hooksPath unset; .githooks gates (incl. branch guard) dormant. Fix: git config core.hooksPath .githooks"
@@ -1246,6 +1250,9 @@ check_merge_rows() {
         echo "FIXED    merge     — set merge.rows.driver"
         CW_HEALTH_LOG=${CW_HEALTH_LOG:-$(resolve_health_log "$ROOT")}
         add_health_event "$CW_HEALTH_LOG" check-wiring merge-driver-set "merge.rows.driver · mode $MODE"
+      else
+        echo "UNWIRED  merge     — could not set merge.rows.driver (local). Fix: git config merge.rows.driver '$want'"
+        unwired=$((unwired+1))
       fi
     else
       echo "UNWIRED  merge     — paths declare merge=rows but merge.rows.driver is unset; git falls back to a line merge that can duplicate a row. Fix: git config merge.rows.driver '$want'"
@@ -1278,7 +1285,12 @@ check_merge_ours() {
   cur=$(git config merge.ours.driver 2>/dev/null || true)
   if [ -z "$cur" ]; then
     if [ "$DO_FIX" = 1 ]; then
-      git config merge.ours.driver true && echo "FIXED    merge     — set merge.ours.driver"
+      if git config merge.ours.driver true; then
+        echo "FIXED    merge     — set merge.ours.driver"
+      else
+        echo "UNWIRED  merge     — could not set merge.ours.driver (local). Fix: git config merge.ours.driver 'true'"
+        unwired=$((unwired+1))
+      fi
     else
       echo "UNWIRED  merge     — paths declare merge=ours but merge.ours.driver is unset; git has no built-in ours driver, so it falls back to a text merge that conflicts on a generated view. Fix: git config merge.ours.driver true"
       unwired=$((unwired+1))
@@ -1303,7 +1315,7 @@ check_merge_ours() {
 # An operator value at ANY scope is never overwritten; a repo-local one would shadow a global
 # identity. (TOOL-aLevelledCopy-2)
 check_ssh_keepalive() {
-  local pm n want ka r url pre host hit="" got scope cur why vrc
+  local pm n want ka r url pre host hit="" rc scope cur why vrc
   pm=$(first_of "$(resolve_receipt_path "" push-main.sh)" "${KIT_REL:+$KIT_REL/}push-main.sh")
   if [ -z "$pm" ]; then
     echo "skip     ssh       — push-main is not adopted here, so no pre-push bar holds a push open"
@@ -1312,6 +1324,12 @@ check_ssh_keepalive() {
   n=$(grep -c '^GOV_SSH_KEEPALIVE=' "$pm" 2>/dev/null); n=${n:-0}
   want=""
   [ "$n" = 1 ] && want=$(sed -n "s/^GOV_SSH_KEEPALIVE='\([^']*\)'[[:space:]]*\$/\1/p" "$pm")
+  if [ "$n" = 0 ]; then
+    # Kit skew: the checker is newer than the lander beside it. Still UNWIRED — a line lost in gov must red.
+    echo "UNWIRED  ssh       — cannot derive the keepalive from $pm: it holds no GOV_SSH_KEEPALIVE= line, so this push-main.sh predates the definition line or has lost it. Fix: update the push-main kit"
+    unwired=$((unwired+1))
+    return
+  fi
   if [ -z "$want" ]; then
     echo "UNWIRED  ssh       — cannot derive the keepalive from $pm: $n line(s) open GOV_SSH_KEEPALIVE=, and the contract is exactly one single-quoted line"
     unwired=$((unwired+1))
@@ -1338,9 +1356,15 @@ check_ssh_keepalive() {
     echo "skip     ssh       — no remote pushes over ssh"
     return
   fi
-  got=$(git config --show-scope --get core.sshCommand 2>/dev/null || true)
-  got=${got%$'\r'}
-  if [ -z "$got" ]; then
+  # Set or unset is the read's EXIT STATUS, never its output: 1 is unset at every scope, and any other
+  # failure is a key nobody can read, which must not be taken for an absence and overwritten.
+  cur=$(git config --get core.sshCommand 2>/dev/null); rc=$?
+  case $rc in
+    0|1) ;;
+    *) echo "note     ssh       — cannot read core.sshCommand (git config exited $rc); NOT setting it"
+       return ;;
+  esac
+  if [ "$rc" = 1 ]; then
     # The operator chose the SSH program: git runs GIT_SSH when no core.sshCommand exists, and
     # GIT_SSH_VARIANT / ssh.variant name its dialect. Asked BEFORE the set/UNWIRED split, so neither
     # --fix nor --check overrides or advises against that choice. A failed read is not an absence.
@@ -1365,6 +1389,9 @@ check_ssh_keepalive() {
         echo "FIXED    ssh       — set core.sshCommand (local) -> push-main's keepalive"
         CW_HEALTH_LOG=${CW_HEALTH_LOG:-$(resolve_health_log "$ROOT")}
         add_health_event "$CW_HEALTH_LOG" check-wiring sshcommand-set "core.sshCommand -> push-main keepalive · mode $MODE"
+      else
+        echo "UNWIRED  ssh       — could not set core.sshCommand (local). Fix: git config core.sshCommand '$want'"
+        unwired=$((unwired+1))
       fi
     else
       echo "UNWIRED  ssh       — core.sshCommand is unset at every scope and remote '$r' pushes over ssh, so a long pre-push bar can lose the socket. Fix: git config core.sshCommand '$want'"
@@ -1372,7 +1399,9 @@ check_ssh_keepalive() {
     fi
     return
   fi
-  scope=${got%%$'\t'*}; cur=${got#*$'\t'}
+  # Set: the scope only labels the line, so a failed scope read changes the label, never the branch.
+  cur=${cur%$'\r'}
+  scope=$(git config --show-scope --get core.sshCommand 2>/dev/null) && scope=${scope%%$'\t'*} || scope="scope unread"
   if [ "$cur" = "$want" ]; then
     echo "ok       ssh       — core.sshCommand carries the keepalive ($scope)"
   elif [ -n "$ka" ] && [ "${cur#*"$ka"}" != "$cur" ]; then

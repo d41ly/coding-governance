@@ -1580,6 +1580,31 @@ ck "U22 AC3 ...--session wires the unset driver, exit 0" \
 cleanup
 unset GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
 
+# TOOL-aLevelledCopy-8 S1 — a set-when-unset write that FAILS is UNWIRED, logs no event, and --fix
+# exits 1. "The lock" is an empty config.lock beside the fixture's own config: it fails every local
+# `git config` write on every OS, where chmod is unreliable on MSYS. The ssh arm's half is LC8 AC1.
+for t in hooks ours rows; do
+  newrepo
+  export GIT_CONFIG_GLOBAL="$D/.git/fixture-global" GIT_CONFIG_NOSYSTEM=1; : > "$GIT_CONFIG_GLOBAL"
+  case $t in
+    hooks) key=core.hooksPath; lbl='hooks    ' ;;
+    ours)  key=merge.ours.driver; lbl='merge    '; git config core.hooksPath .githooks
+           printf 'x\n' > ours.txt; printf 'ours.txt merge=ours\n' > .gitattributes; git add -A; git commit -q -m ours ;;
+    rows)  key=merge.rows.driver; lbl='merge    '; git config core.hooksPath .githooks; install_driver "${KP}" ;;
+  esac
+  hl="$(git rev-parse --path-format=absolute --git-common-dir)/health.log"
+  : > .git/config.lock
+  out=$(chk --fix); rc=$?
+  rm -f .git/config.lock
+  got=$(git config "$key" 2>/dev/null || true)
+  n1=$(grep -c -e $'\thookspath-set\t' -e $'\tmerge-driver-set\t' "$hl" 2>/dev/null)
+  ck "LC8 AC2-3 $key write fails under --fix -> UNWIRED 'could not set $key', exit 1, no event, nothing set" \
+     "$([ "$rc" = 1 ] && [ -z "$got" ] && [ "${n1:-0}" = 0 ] && printf '%s' "$out" | grep -qF "UNWIRED  $lbl — could not set $key" \
+        && ! printf '%s' "$out" | grep -q '^FIXED' && echo 1 || echo 0)"
+  cleanup
+done
+unset GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
+
 # TOOL-aLevelledCopy-2 — the ssh arm. core.sshCommand is DERIVED from push-main.sh's one
 # GOV_SSH_KEEPALIVE line and set only when no scope sets it. Each fixture's global config is a file of
 # its own and system config is cut off, so this node's config cannot decide an arm; the remote is
@@ -1594,6 +1619,10 @@ seed_ssh_fixture() {  # $1 = origin URL ("" = no remote) -> a wired repo holding
 }
 if [ -z "$PM" ]; then
   echo "skip LC2 arms — push-main.sh is not installed beside this suite, so the ssh arm has nothing to derive from"
+# Kit skew is an adopter's state only: a tree with an install receipt whose push-main.sh has no
+# definition line updated check-wiring alone. gov's tree has no receipt, so there a lost line still reds.
+elif [ -f "$REPO/.governance/install.json" ] && [ "$(grep -c '^GOV_SSH_KEEPALIVE=' "$PM")" = 0 ]; then
+  echo "skip LC2 arms — the installed push-main.sh predates GOV_SSH_KEEPALIVE (kit skew); check-wiring --check reports it UNWIRED with the remedy"
 else
 WANT=$(eval "$(grep '^GOV_SSH_KEEPALIVE=' "$PM" | tr -d '\r')"; printf '%s' "${GOV_SSH_KEEPALIVE:-}")
 SSHURL=git@example.invalid:o/r.git
@@ -1714,6 +1743,73 @@ got=$(git config core.sshCommand 2>/dev/null || true)
 ck "LC7 AC5 ssh.variant read exits 3 -> note 'cannot read ssh.variant', nothing set" \
    "$([ -z "$got" ] && printf '%s' "$out" | grep -q '^note     ssh       — cannot read ssh.variant (git config exit 3)' && echo 1 || echo 0)"
 cleanup
+
+# TOOL-aLevelledCopy-8 — the ssh arm's failure states. LC8 AC1: the lock (an empty config.lock, see
+# LC8 AC2-3) fails the write, which is UNWIRED under --fix (exit 1) and --session (exit 0) alike.
+seed_ssh_fixture "$SSHURL"
+hl="$(git rev-parse --path-format=absolute --git-common-dir)/health.log"
+: > .git/config.lock
+out=$(chk --fix); rc=$?; out2=$(chk --session); rc2=$?
+rm -f .git/config.lock
+got=$(git config core.sshCommand 2>/dev/null || true); n1=$(grep -c $'\tsshcommand-set\t' "$hl" 2>/dev/null)
+ck "LC8 AC1 core.sshCommand write fails -> UNWIRED 'could not set', --fix exit 1, --session exit 0, no event, nothing set" \
+   "$([ "$rc" = 1 ] && [ "$rc2" = 0 ] && [ -z "$got" ] && [ "${n1:-0}" = 0 ] \
+      && printf '%s' "$out" | grep -q '^UNWIRED  ssh       — could not set core.sshCommand' \
+      && printf '%s' "$out2" | grep -q '^UNWIRED  ssh       — could not set core.sshCommand' && echo 1 || echo 0)"
+cleanup
+
+# LC8 AC4-5 — set or unset is the read's exit status. A git shim first on PATH fails one read: the
+# scope read (129) only relabels an operator's value; the value read (3) is a note, never an absence.
+for t in scope value; do
+  seed_ssh_fixture "$SSHURL"; mkdir "$D/.git/shim"
+  if [ "$t" = scope ]; then
+    git config --global core.sshCommand 'ssh -i ~/.ssh/id_test'
+    printf '#!/bin/sh\ncase " $* " in *" --show-scope "*) exit 129 ;; esac\nexec "%s" "$@"\n' "$(command -v git)" > "$D/.git/shim/git"
+  else
+    printf '#!/bin/sh\n[ "$*" = "config --get core.sshCommand" ] && exit 3\nexec "%s" "$@"\n' "$(command -v git)" > "$D/.git/shim/git"
+  fi
+  chmod +x "$D/.git/shim/git"
+  out=$(export PATH="$D/.git/shim:$PATH"; chk --check); out2=$(export PATH="$D/.git/shim:$PATH"; chk --session)
+  got=$(git config --local core.sshCommand 2>/dev/null || true)
+  if [ "$t" = scope ]; then
+    ck "LC8 AC4 the scope read fails on an operator's global value -> 'scope unread' note, nothing local" \
+       "$([ -z "$got" ] && printf '%s' "$out2" | grep -qF "note     ssh       — core.sshCommand is the operator's (scope unread)" && echo 1 || echo 0)"
+  else
+    ck "LC8 AC5 the core.sshCommand read exits 3 -> note 'cannot read', no UNWIRED ssh, --session writes nothing" \
+       "$([ -z "$got" ] && printf '%s' "$out" | grep -q '^note     ssh       — cannot read core.sshCommand' \
+          && ! printf '%s%s' "$out" "$out2" | grep -q '^UNWIRED  ssh' && echo 1 || echo 0)"
+  fi
+  cleanup
+done
+
+# LC8 AC6 — no definition line is kit skew: still UNWIRED, and the line names the remedy.
+seed_ssh_fixture "$SSHURL"; sed -i '/^GOV_SSH_KEEPALIVE=/d' "${KP}push-main.sh"
+out=$(chk --check); rc=$?
+line=$(printf '%s\n' "$out" | grep '^UNWIRED  ssh       — cannot derive the keepalive from ')
+ck "LC8 AC6 no definition line -> UNWIRED naming ${KP}push-main.sh as predating it, remedy 'update the push-main kit', exit 1" \
+   "$(case "$rc:$line" in "1:"*"${KP}push-main.sh"*predates*"update the push-main kit"*) echo 1 ;; *) echo 0 ;; esac)"
+cleanup
+
+# LC8 AC9 — the definition line is READ with sed, never evaluated: a command substitution in it would
+# create a marker file if any eval or source reached it.
+seed_ssh_fixture "$SSHURL"; sed -i '/^GOV_SSH_KEEPALIVE=/d' "${KP}push-main.sh"
+printf "GOV_SSH_KEEPALIVE='ssh'\$(touch \"%s/ran\")\n" "$D" >> "${KP}push-main.sh"
+out=$(chk --session); got=$(git config core.sshCommand 2>/dev/null || true)
+ck "LC8 AC9 a command substitution in the definition line never runs -> no marker, UNWIRED cannot derive, nothing set" \
+   "$([ ! -e "$D/ran" ] && [ -z "$got" ] && printf '%s' "$out" | grep -q '^UNWIRED  ssh       — cannot derive' && echo 1 || echo 0)"
+cleanup
+
+# LC8 AC10 — the classifier's two untested branches: a drive path is a path, ssh:// is ssh.
+for url in C:/x/origin.git ssh://git@example.invalid/o/r.git; do
+  seed_ssh_fixture "$url"
+  out=$(chk --session); got=$(git config --local core.sshCommand 2>/dev/null || true)
+  case $url in
+    ssh://*) v=$([ -n "$WANT" ] && [ "$got" = "$WANT" ] && printf '%s' "$out" | grep -q '^FIXED    ssh' && echo 1 || echo 0) ;;
+    *)       v=$([ -z "$got" ] && printf '%s' "$out" | grep -q '^skip     ssh       — no remote pushes over ssh' && echo 1 || echo 0) ;;
+  esac
+  ck "LC8 AC10 remote '$url' -> ${url%%:*} classified right (ssh:// set, drive path skipped)" "$v"
+  cleanup
+done
 unset GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
 fi
 

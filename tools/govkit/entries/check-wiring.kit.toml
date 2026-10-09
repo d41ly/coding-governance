@@ -6,6 +6,7 @@ kind = "flat"
 home = "."
 version_from = { file = "check-wiring.sh", pattern = "^KIT_CHECK_WIRING_VERSION=" }
 requires = []
+requires_if = [{ kit = "push-main", why = "TOOL-aLevelledCopy-8: the ssh arm DERIVES core.sshCommand from push-main.sh's one GOV_SSH_KEEPALIVE= definition line, read with sed and never sourced. It degrades to `skip` where push-main is absent, and to a named UNWIRED, whose remedy is updating the push-main kit, where an installed push-main.sh predates that line. A plain `requires` cannot close that skew, since an older push-main still satisfies it, and would refuse every check-wiring selection without the lander. This row is a DECLARATION `govkit selfcheck` grades and nothing else: it installs nothing, orders nothing and couples no update. No condition key: the edge holds wherever push-main is installed" }]
 
 # The fragment is what makes the SessionStart entry RE-MATCHABLE by the merger: `check-wiring.sh
 # --session` used to be wired by hand with no matcher, so it ran on every compaction. It is NOT

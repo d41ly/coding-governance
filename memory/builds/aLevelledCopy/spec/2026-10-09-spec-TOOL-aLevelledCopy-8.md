@@ -1,11 +1,12 @@
 # TOOL-aLevelledCopy-8 — the ssh arm's failure states each get a verdict and an arm
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 4 · ratified 2026-10-09
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 4 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aLevelledCopy-8-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aLevelledCopy-8-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-7-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-7-1-spec-brief.md) | journal | TOOL-aLevelledCopy-7 TOOL-aLevelledCopy-9 |
 
 <!-- /gen:spec-records -->

@@ -59,7 +59,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 7 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
+**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
 ids DEPL-aLevelledCopy-1 DEPL-aLevelledCopy-2 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4 TOOL-aLevelledCopy-5 TOOL-aLevelledCopy-6 TOOL-aLevelledCopy-7 TOOL-aLevelledCopy-8 TOOL-aLevelledCopy-9
 
 <!-- gen:build-units -->
@@ -71,10 +71,10 @@ ids DEPL-aLevelledCopy-1 DEPL-aLevelledCopy-2 TOOL-aLevelledCopy-1 TOOL-aLevelle
 | [TOOL-aLevelledCopy-3 — gov's executed hooks are 100755, and check-wiring grades a hook's index mode](spec/2026-10-09-spec-TOOL-aLevelledCopy-3.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-09 |
 | [TOOL-aLevelledCopy-7 — the ssh arm stands back when the operator chose an SSH program](spec/2026-10-09-spec-TOOL-aLevelledCopy-7.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aLevelledCopy-9 — receipt fixtures are hermetic, a renamed row keeps its bit, the records agree](spec/2026-10-09-spec-TOOL-aLevelledCopy-9.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-09 |
-| [TOOL-aLevelledCopy-8 — the ssh arm's failure states each get a verdict and an arm](spec/2026-10-09-spec-TOOL-aLevelledCopy-8.md) | 4 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aLevelledCopy-8 — the ssh arm's failure states each get a verdict and an arm](spec/2026-10-09-spec-TOOL-aLevelledCopy-8.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 4 record folder(s).
+Records: 13 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
