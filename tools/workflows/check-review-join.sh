@@ -59,7 +59,7 @@ SELF_EXCLUDE='(^|/)(check-review-join\.(sh|js|test\.sh)|agent-cap\.js)$'
 # An EMPTY prefix is a real layout, not a bug: a kit installed at the repository root has no
 # prefix to strip, and the population is then every *.js the repo holds.
 HERE="$(cd "$(dirname "$0")" && pwd)"
-KIT_PREFIX="$(cd "$HERE/.." && git rev-parse --show-prefix 2>/dev/null)"
+KIT_PREFIX="$(unset GIT_DIR GIT_WORK_TREE; cd "$HERE/.." && git rev-parse --show-prefix 2>/dev/null)"
 KIT_PREFIX="${KIT_PREFIX%/}"
 #
 # THE PREFIX PLUS `.claude/workflows/` -- TOOL-aRepatriatedFork-4. Both adopters keep their review

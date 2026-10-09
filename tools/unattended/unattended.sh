@@ -52,7 +52,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.89   # gov:kit unattended@1.89 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.90   # gov:kit unattended@1.90 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -6187,8 +6187,8 @@ HO_ACTIVE=""; HO_UNITS=""; HO_ASKS=""; HO_RECIPE=""
 # nodes; a kit outside any repository is named by the script alone.
 read_settle_command() { # slug -> the settle command an owner runs after the landing
   local _sc_p
-  _sc_p=$(GIT -C "$KIT_DIR" rev-parse --show-prefix 2>/dev/null) || _sc_p=""
-  printf 'bash %sunattended.sh --settle %s' "$_sc_p" "$1"
+  _sc_p=$(derive_self_rel "$KIT_DIR") || _sc_p=""
+  printf 'bash %sunattended.sh --settle %s' "${_sc_p:+$_sc_p/}" "$1"
 }
 render_handoff_recipe() { # slug · run-state file -> the recipe on stdout; 1 when no lander or no branch
   local slug=$1 rel=$2 br

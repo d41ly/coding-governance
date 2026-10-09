@@ -4693,6 +4693,35 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
 CONF_KEY_RX = re.compile(r"^\s*(?:export\s+)?([A-Z][A-Z0-9_]*)=(.*)$")
 
 
+def parse_conf_assignment(line: str) -> tuple[str, str] | None:
+    """One kit conf line -> `(key, value)` as bash reads it under `source`, or `None`.
+
+    TOOL-aGraftedHelix-46. Every kit adopter SOURCES its conf, so a value read any other way grades a
+    value the kit never sees: `K=""   # left blank` peeled one quote layer and kept its comment,
+    which read as a non-empty value and hid an empty required key. The rule is the memory-tree kit's
+    `parse_conf_line` (TOOL-aRepatriatedFork-38), COPIED rather than imported because govkit does
+    not load a kit's engine to read a target; `check_conf_reader_parity` in the selftest pins both
+    copies to bash. Whitespace right after `=` is an empty value; a quoted value, single or double,
+    ends at its matching quote whatever follows; an unquoted value ends at a `#` that follows
+    whitespace, so a `#` opening the word is data. An unterminated quote falls through to the
+    unquoted scan, as `parse_conf_line` does."""
+    m = CONF_KEY_RX.match(line)
+    if not m:
+        return None
+    k, v = m.group(1), m.group(2)
+    if v[:1].isspace():
+        return k, ""
+    v = v.strip()
+    if v[:1] in ("'", '"'):
+        end = v.find(v[0], 1)
+        if end >= 0:
+            return k, v[1:end]
+    cut = next((i for i, ch in enumerate(v) if ch == "#" and i > 0 and v[i - 1].isspace()), -1)
+    if cut >= 0:
+        v = v[:cut].strip()
+    return k, v.strip('"').strip("'")
+
+
 def read_conf_key_gaps(target: pathlib.Path, desc: dict,
                        lists: tuple[str, ...] = ("required_keys_gate", "required_keys_render")
                        ) -> list[tuple[str, str]]:
@@ -4710,10 +4739,11 @@ def read_conf_key_gaps(target: pathlib.Path, desc: dict,
 
     WHAT IT DOES NOT CHECK. It asks whether a key is ASSIGNED and whether its value is the example's
     angle-bracket shape — never whether the value is right, which is the kit's own check. It reads
-    the file and never sources it: the LAST assignment wins, as under `source`, one layer of quotes is
-    stripped, and an unquoted value keeps any trailing comment. The kit's own conf parser (the
-    memory-tree kit's `parse_conf_line`) sits across a kit edge this file does not import over. A
-    key required only under another key's value is a hole's question, not this one's."""
+    the file and never sources it: the LAST assignment wins, as under `source`, and every value is
+    `parse_conf_assignment`'s, which is bash's word rule (TOOL-aGraftedHelix-46). It does not read an
+    unterminated quote, an escaped quote, adjacent concatenation such as `a"b"`, or any spelling bash
+    itself rejects; those are outside the rule, as they are outside `parse_conf_line`'s. A key
+    required only under another key's value is a hole's question, not this one's."""
     cfg = desc.get("config") or {}
     rel = str(cfg.get("file") or "").strip()
     if not rel:
@@ -4731,12 +4761,9 @@ def read_conf_key_gaps(target: pathlib.Path, desc: dict,
         except OSError as e:
             return [(None, f"unreadable: {e.__class__.__name__}: {e}")]
         for ln in _text.splitlines():
-            m = CONF_KEY_RX.match(ln)
-            if m:
-                v = m.group(2).strip()
-                if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
-                    v = v[1:-1]
-                vals[m.group(1)] = v
+            a = parse_conf_assignment(ln)
+            if a:
+                vals[a[0]] = a[1]
     gaps: list[tuple[str, str]] = []
     for k in want:
         if k not in vals:

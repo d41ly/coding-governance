@@ -169,6 +169,21 @@
     "ceiling": 300
   },
   {
+    "name": "shell hygiene (a location probe asked from a moved directory)",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/sh_hygiene.py",
+      "--location-probes",
+      "memory/project/location-probe-waivers.txt",
+      ".",
+      ":!*.test.sh",
+      ":!memory/"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "shell-hygiene selftest",
     "argv": [
       "python3",

@@ -116,7 +116,7 @@ PY="$(resolve_python)" || { echo "$PY"; exit 2; }
 # committed artifact. Measured here: it shipped into the Skill description before this line
 # existed. memory-recall carries the same derivation and the same warning; this is the second
 # time that warning has been paid for.
-KITREL="$(cd "$KIT_DIR" && git rev-parse --show-prefix)" || exit 2
+KITREL="$(unset GIT_DIR GIT_WORK_TREE; cd "$KIT_DIR" && git rev-parse --show-prefix)" || exit 2
 KITREL="${KITREL%/}"
 TEMPLATE="$KIT_DIR/SKILL.template.md"
 SKILL="$ROOT/.claude/skills/lexicon/SKILL.md"

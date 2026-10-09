@@ -42,7 +42,7 @@ ROOT="$(pwd)"
 # — measured, the same tree at the same commit gave --check EXIT 0 from one spelling and a
 # three-hunk DRIFTED diff from the other, and --scaffold writes that into a COMMITTED artifact
 # silently. Works whether the kit sits at <root>/memory-recall/ or <root>/<prefix>/memory-recall/.
-REL="$(cd "$HERE" && git rev-parse --show-prefix)" || exit 2
+REL="$(unset GIT_DIR GIT_WORK_TREE; cd "$HERE" && git rev-parse --show-prefix)" || exit 2
 REL="${REL%/}"
 # THE TOOL ROOT, derived exactly as `adopt-unattended.sh` derives it and for the same reason: the
 # settings merger lives BESIDE this kit rather than inside it, so the closing instruction below has

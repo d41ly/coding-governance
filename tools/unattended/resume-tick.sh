@@ -123,7 +123,7 @@ done
 # bound run. Re-spelled through `pwd` so it shares one spelling with KIT_DIR (MSYS prints the two
 # differently), which is what lets the CONTINUE payload derive the kit's repo-relative path.
 [ -n "$ROOT" ] || ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || ROOT="$PWD"
-_top=$(git -C "$ROOT" rev-parse --show-toplevel 2>/dev/null) || _top=""
+_top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$ROOT" rev-parse --show-toplevel 2>/dev/null) || _top=""
 [ -n "$_top" ] || { echo "resume-tick: REFUSED — $ROOT is not a git repository, so there is no worktree list to walk" >&2; exit 2; }
 ROOT=$(cd "$_top" && pwd)
 

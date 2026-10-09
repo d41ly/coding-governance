@@ -41,8 +41,8 @@ why_no_adopter = "the kit ships no adopter. Its README carries no copy or instal
 # THE HOLE `gate-lint-leg-wiring` IS GONE, discharged rather than deleted. It declared that this kit
 # shipped no leg of its own and that nothing in a target observed it, and it carried
 # `discharge = { command = ["bash", "-c", "exit 1"] }` — undischargeable by construction, which is
-# how a permanent gap gets recorded honestly. The two `[[gate_leg]]` blocks below are what closes
-# it: the kit declares legs, and both run at a target out of the kit's own home.
+# how a permanent gap gets recorded honestly. The `[[gate_leg]]` blocks below are what closes
+# it: the kit declares legs, and each runs at a target out of the kit's own home.
 # TOOL-aLeakedHandle-1. Declaring the leg alone did NOT close the hole at first — its argv named a
 # registry path no rule shipped, so `silenced_legs` withheld it and `apply` exited 1 at every
 # adopter while this comment said otherwise. The correction is that the argv now names nothing
@@ -51,7 +51,7 @@ why_no_adopter = "the kit ships no adopter. Its README carries no copy or instal
 # What has NOT changed is the adopter. There is still none, still no rendered artifact, and so still
 # nothing for `check` to measure — a gate leg is run by the merge bar, not by this verb.
 none = """
-the kit ships no adopter and no rendered artifact, so there is nothing for this verb to run; its two gate legs are declared below and are executed by the bar rather than by `check`
+the kit ships no adopter and no rendered artifact, so there is nothing for this verb to run; its gate legs are declared below and are executed by the bar rather than by `check`
 """
 
 # The tree scan. `subject = "repo"` because a failure of this leg is a statement about the graded
@@ -62,6 +62,17 @@ the kit ships no adopter and no rendered artifact, so there is nothing for this 
 name = "shell hygiene (a loop fed by a command substitution)"
 subject = "repo"
 argv = ["python3", "{kit}/sh_hygiene.py"]
+guard = []
+
+# The location-probe ban, the scanner's second mode (TOOL-aGraftedHelix-45). `subject = "repo"` and
+# no guard for the loop scan's reason: it grades the repository's shell tree, and a new probe can
+# arrive in any file. The argv passes no registry, so an adopter's first run grades against an empty
+# declaration and lists every bare probe it already has — the same posture as the leg above. The
+# home repository's own row passes its registry and excludes its suites and its memory tree.
+[[gate_leg]]
+name = "shell hygiene (a location probe asked from a moved directory)"
+subject = "repo"
+argv = ["python3", "{kit}/sh_hygiene.py", "--location-probes"]
 guard = []
 
 # The self-test arm. `subject = "kit"` puts it under the 2026-08-23 kit-self-test hold deliberately:

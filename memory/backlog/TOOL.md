@@ -52,7 +52,6 @@ Cite ids, never line numbers.
 | [TOOL-aDeferredBar-5](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | HYGIENE CHECK 12'S ACCEPTANCE-WITNESS ARM ACCEPTS A *.test.sh-SHAPED… |
 | [TOOL-aDeferredBar-6](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE SPEC-STAGE WRITER IS NOT TOLD TO RUN THE SPEC-TOKEN CHECKER BEFORE… |
 | [TOOL-aDeferredBar-7](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/check-wiring.sh HAS NO ARM FOR… |
-| [TOOL-aDeferredBar-8](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/memory-tree/check-arms.py DISCOVERS GATES BY A fail() { HELPER,… |
 | [TOOL-aDeferredBar-9](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/unattended/adopt-unattended.test.sh CARRIES NO ASSERTION FLOOR… |
 | [TOOL-aDeferredBar-10](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | AN ACCEPTANCE-LEDGER LINE CAN ASSERT A LEG'S EXIT FOR A TREE THAT MOVED… |
 | [TOOL-aDeferredBar-11](../builds/aDeferredBar/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/memory-recall/test_recall_floor.py IS THE ONE chunk = selftests… |
@@ -215,7 +214,7 @@ Cite ids, never line numbers.
 | [TOOL-aReplayedCard-7](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | manifest-check.sh --card --write spawns about ten git processes for its… |
 | [TOOL-aReplayedCard-8](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | WIRE-INTO-PROJECT.md §4 spells the kickoff-manifest format version… |
 | [TOOL-aReplayedCard-10](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | corpus_ids.py --print-defined-ids is a corpus walk plus the shell… |
-| [TOOL-aReplayedCard-11](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | --card --append accepts a real READY body that carries no ## task… |
+| [TOOL-aReplayedCard-11](../builds/aReplayedCard/BACKLOG.md) | SPECCED | — | KICK-aRoutedQuill-1 | 2026-09-14 | --card --append accepts a real READY body that carries no ## task… |
 | [TOOL-aReplayedCard-12](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | scratch-guard.test.sh's meta-arm re-runs the whole orientation section,… |
 | [TOOL-aReplayedCard-13](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | the deny's drive fold lowercases both toplevels, so on a case-sensitive… |
 | [TOOL-aReplayedCard-14](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | extractCommitTarget resolves repeated -C values cumulatively, a… |

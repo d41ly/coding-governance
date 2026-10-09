@@ -41,7 +41,7 @@ ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "playbook-parity: no
 cd "$ROOT" || exit 2
 # THE TOOL ROOT, DERIVED (TOOL-aRepatriatedFork-29 S3): the directory this gate sits in, which is
 # where the kits, their sources and this gate's waiver file live. Underivable is a refusal.
-if ! SELF_PRE=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
+if ! SELF_PRE=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
   echo "playbook-parity: cannot derive this gate's own directory from '$_self_dir' — REFUSING"
   exit 2
 fi

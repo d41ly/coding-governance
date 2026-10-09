@@ -65,29 +65,27 @@ index on a partial commit.
 
 ## The probes left, and why
 
-The unattended kit's on-demand suite runner, `tools/unattended/run-unattended-gates.sh`, derives
-its root and its kit path by asking git from its own directory, and under an inherited `GIT_DIR` it
-would take the kit directory for the root. The main loop runs it on demand and no hook does. The
-adopter, `tools/unattended/adopt-unattended.sh`, compares the kit's repository identity with the
-adopting repository's by asking git from each; an inherited `GIT_DIR` would make both answer the
-same id. An owner runs it by hand. The resume tick asks git from the root it already holds, so it
-can only agree with how that root was derived. None of the three runs under a hook, which is the
-whole of why they are left.
+None in shipped shell. Every `git -C <dir> rev-parse --show-*` and `cd <dir> && git rev-parse
+--show-*` the leg below found was scrubbed in place by TOOL-aGraftedHelix-45, and the settle
+command the unattended driver prints walks up from its file instead, as `derive_self_rel` does.
+What the leg leaves is what its header lists as a MISS: test suites, which the pre-push bar runs
+with `GIT_DIR` already scrubbed; Python callers, one of them the deferred ask TOOL-aCollapsedScan-8
+in `tools/drift-audit/drift_report.py`; a probe asking the git dir or the common dir, which an
+inherited `GIT_DIR` answers correctly from inside its own repository, so the adopter's identity
+compare in `tools/unattended/adopt-unattended.sh` is counted and not gated; and other subcommands
+run with `-C` into a subdirectory, whose answers move the same way.
 
 ## Its gate
 
-The driver's instance is **gated by** three arms in the driver's self-test: a real commit through
-a `commit-msg` hook in a linked worktree, staging a kit-declared output beside its declared
-generator; the resolver reached through a directory link from a second repository; and the
-resolver called from a library copy outside any repository. The CLASS has **no machine gate**. The
-predicate that finds the probes, a `git -C <dir> rev-parse --show-...` line in shell, printed 26
-lines tree-wide at `f0971667`, and telling which of them a hook can reach is a question about
-callers, not about the line. A gate over them is a mechanism of its own, and its hand-off now has a
-recipient: the parked item `location-probe-class-gate` in the aGraftedHelix run-state file,
-memory/builds/aGraftedHelix/RUN.md, records the question, the options and why no option survived
-for that run, so the orchestrator or the owner may still adopt it. Until then it is a documented
-check: a reviewer of a diff that adds a location probe asks whether a hook or a merge driver can run
-it.
+The CLASS is **gated by** the `shell hygiene (a location probe asked from a moved directory)` leg,
+a second mode of `tools/gate-lint/sh_hygiene.py`. It bans the SPELLING rather than deciding
+reachability, which no line predicate can: a probe in shipped shell opens its own substitution
+with `unset GIT_DIR GIT_WORK_TREE;`, or carries a row in `memory/project/location-probe-waivers.txt`
+whose reason the leg prints on every run. It prints its near misses beside the verdict, so a green
+line is never read as covering them. The driver's instance is also pinned by three arms in the
+driver's self-test: a real commit through a `commit-msg` hook in a linked worktree, the resolver
+reached through a directory link, and the resolver called from a library copy outside any
+repository.
 
 ## What this does NOT say
 

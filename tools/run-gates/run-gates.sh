@@ -29,7 +29,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.31   # gov:kit run-gates@1.31
+KIT_RUN_GATES_VERSION=1.32   # gov:kit run-gates@1.32
 # 1.30 + 1.30 -> 1.31: merging local main's reconcile (a30f4589) into aGraftedHelix. Both lines bumped
 # 1.29 -> 1.30 with different bytes, so the number alone could not tell the two kits apart.
 # 1.29 -> 1.30: the shard-join comment in run-selftests.sh stops justifying its unported reverse half
@@ -211,7 +211,7 @@ KITREL=${KITDIR#"$ROOTN"/}
 # `mktemp -d` read INHERITED where it must read OWN. Git answers in ONE spelling, so ask it; the strip
 # stays as the fallback for a kit dir git cannot place.
 case "$KITREL" in
-  /*) _kr=$(cd "$KITDIR" && git rev-parse --show-prefix 2>/dev/null) && [ -n "$_kr" ] && KITREL=${_kr%/} ;;
+  /*) _kr=$(unset GIT_DIR GIT_WORK_TREE; cd "$KITDIR" && git rev-parse --show-prefix 2>/dev/null) && [ -n "$_kr" ] && KITREL=${_kr%/} ;;
 esac
 LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
 # THE ATTRIBUTION BASE IS THIS BAR'S AND NO LEG'S. Read once and removed from the environment, so a

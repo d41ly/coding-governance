@@ -64,9 +64,9 @@ Three scanners for the failure modes a reader cannot see: PowerShell's decoding 
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/gate-lint.md`
 - decisions 1: `TOOL-aLeakedHandle-1`
-- gate-legs 3: `shell hygiene (a loop fed by a command substitution)`, `shell-hygiene selftest`, `encoding posture (text IO names its encoding)`
+- gate-legs 4: `shell hygiene (a loop fed by a command substitution)`, `shell-hygiene selftest`, `encoding posture (text IO names its encoding)`, `shell hygiene (a location probe asked from a moved directory)`
 - kits 1: `gate-lint`
-- globs 3: `tools/gate-lint/*`, `memory/project/substitution-fed-loops.txt`, `memory/project/encoding-posture-sites.txt`
+- globs 4: `tools/gate-lint/*`, `memory/project/substitution-fed-loops.txt`, `memory/project/encoding-posture-sites.txt`, `memory/project/location-probe-waivers.txt`
 
 ## govkit
 

@@ -1,12 +1,13 @@
 # TOOL-aGraftedHelix-3 — invariant records in the bug-class catalogue become the review's by-design list
 
-**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 3 · ratified 2026-10-04
+**Status:** CLOSED · rev-5 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 3 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-build-TOOL-aGraftedHelix-3-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aGraftedHelix-3-1-acceptance-ledger.md) | journal | — |
+| [2026-10-06-build-TOOL-aGraftedHelix-29-runlog-b9bb22c3.md](../build/2026-10-06-build-TOOL-aGraftedHelix-29-runlog-b9bb22c3.md) | journal | TOOL-aGraftedHelix-29 TOOL-aGraftedHelix-30 TOOL-aGraftedHelix-31 TOOL-aGraftedHelix-32 TOOL-aGraftedHelix-33 TOOL-aGraftedHelix-34 TOOL-aGraftedHelix-35 TOOL-aGraftedHelix-36 TOOL-aGraftedHelix-37 TOOL-aGraftedHelix-38 TOOL-aGraftedHelix-39 TOOL-aGraftedHelix-40 TOOL-aGraftedHelix-41 TOOL-aGraftedHelix-45 TOOL-aGraftedHelix-46 TOOL-aGraftedHelix-47 |
 | [2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md) | journal | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 |
 | [2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md) | journal | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 |
 | [2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 |
@@ -92,7 +93,8 @@ needed. The unit also routes the checklist into the spec audit, which has never 
 ### Edges
 
 - **hands-off** `TOOL-aGraftedHelix-29` — the `invariant` kind, `render_by_design` and the
-  by-design block, which that unit reads at the subject's base instead of the working tree.
+  by-design block this unit built, which that unit reads at a range's base rather than in the
+  tree under review.
 
 ## 4. Design
 
@@ -491,6 +493,8 @@ New arm: tools/workflows/unattended-build.test.sh · a caller checklist beside t
 - rev-4 · 2026-10-05 · §4 · the seed table leads each row with its record, not its ruling id: a
   row leading with an id anchors it under this build folder, and hygiene check 13 read the three
   rulings as claimed by two build folders. Columns reordered; no content moved.
+- rev-5 · 2026-10-07 · §3 · the hands-off edge to TOOL-aGraftedHelix-29 mirrors that unit's
+  consumes-from, which hygiene check 12 read as one-ended. No content moved.
 
 ## 10. Reuse audit
 
