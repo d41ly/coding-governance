@@ -176,3 +176,4 @@ memory/builds/aLevelledCopy/README.md
 memory/builds/aQuotedBrief/README.md
 memory/builds/aRoutedQuill/README.md
 memory/builds/dLadderedRemote/README.md
+memory/builds/aBenchedProbe/README.md
