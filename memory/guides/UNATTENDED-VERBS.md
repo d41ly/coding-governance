@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.91 -->
+<!-- gov:kit unattended@1.92 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -457,7 +457,10 @@ one are two acts with two authorizations.
 3. **Preflight**, handing over the idle-wake id and any confirmed pairs:
    `unattended.sh --preflight <slug> --keepalive-id <id> [--waive <handle> --reason "<why>"]`. Its
    refusals are its verb entry's, each names itself, and it writes nothing until all pass. It does
-   NOT refuse because another build is live: it announces the concurrent runs and continues. One line
+   NOT refuse because another build is live: it announces the concurrent runs and continues. A
+   FIRST preflight, with no run-state file yet, refuses a branch carrying a commit the default branch
+   does not hold that touches anything outside this build's folder and the declared generated
+   indexes (check 114), and prints the fresh-worktree recovery. One line
    before `preflight OK` states the spec-audit posture —
    `unattended: spec-audit — opted in by README spec-audit: <date>`;
    `unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: <date>` when the README
@@ -532,13 +535,26 @@ the run, which makes "the owner was asked at the start" a property of the commit
 1. **Orient from the prose**, in the kickoff engine's manner, its steps 0 to 4: derive every field you
    can from the prose, the memory tree and the code, and do not ask yet. **RUN the orientation
    probes here, before step 3 writes the roster** — the engine's step 4 names which; a seam or prior
-   record found after the roster is pushed costs a commit and a push to re-decide.
+   record found after the roster is pushed costs a commit and a push to re-decide. **Decide every
+   brief item's disposition here too**, from those probes, for step 3 to write; it is part of the
+   authorization, so a later change of mind is a parked entry, never an edit.
 2. **Decide whether to ask, ONCE.** The field set is the kickoff checker's,
    `bash <check-script> --task-skeleton`. ACCEPTANCE and GATES are disqualifying; any other gap is
    askable once. **The only owner turn there is**: one `AskUserQuestion`, every gap in it, four
    options at most per call. If ACCEPTANCE or GATES is still missing after it, stop without writing
    anything: no run started, so `--abort` and `--park` refuse with no run-state file, and protocol
-   §13 exit 5 does not reach here.
+   §13 exit 5 does not reach here. **The call is MANDATORY when step 3's `## Drawn from the session`
+   holds a quote**: it then carries the brief and asks the owner to accept it, edit it or cancel the
+   run, beside any gap question. A cancel writes nothing; an edit is folded into the brief before
+   the commit, with no second confirmation. A brief quoting nothing keeps the rule above: ask only
+   for gaps.
+   **Then, before step 3, start clean.** When the session's tree is dirty, or its branch carries a
+   commit the default branch does not, create a worktree on a new branch cut from the default
+   branch, fast-forwarded first, and do step 3 onward from it, by absolute path or `git -C`:
+   `git worktree add -b <new-branch> <worktree-root>/<slug> <default>`, where `<worktree-root>` is
+   this node's root in the charter's node registry, or the charter's worktree bootstrap script where
+   it names one. The session's own tree, and any edit in it, is never touched; the resume tick and
+   the lander find the run in its new tree. A clean tree whose branch carries nothing starts in place.
 3. **Write the build folder**, `builds/<slug>/README.md` under the memory root, with ALL SIX required
    front-matter keys — `slug`, `node`, `opened`, `streams`, `roster`, `ids` — plus
    `authorized-by: prompt`, and the generated-region marker pair `gen:build-index` with its close, or
@@ -552,6 +568,22 @@ the run, which makes "the owner was asked at the start" a property of the commit
    blind to fencing, so a prompt quoting the marker plants a second one; and a malformed record reds
    the memory gate here, where you can still fix it. The README states the build in its own words
    and points at the record; clarifications ride the record. The roster may be provisional.
+   **The record stands on its own**, because a resumed session or a later reader holds no
+   conversation: `## The prompt` verbatim, then three sections in this order, each non-empty.
+   `## The brief` holds `### Goal`, `### Items` (numbered `1.` lines), `### Acceptance`, `### Gates`
+   and `### Non-goals`, in that order. Each item is one line ending in the disposition step 1 decided:
+   `[planned <unit-id> ...]` (step 1 decides all four) `[stale <evidence>]` `[duplicate <n>]` `[parked <reason>]`.
+   Every `planned` id is a roster unit, every roster unit is planned by some item, and a `duplicate`
+   names a `planned` item, or preflight refuses at check 115. `--close` then wants each `planned`
+   item's units CLOSED, a superseded one's successor in its place, unless a `--park` item opens
+   `brief item <n>:`, and a `parked` item always parked so. `## Drawn from the session` quotes, verbatim, every passage
+   the brief relied on, each followed by `— owner, <turn or time>` or `— agent, …`, since a brief may
+   rest on your own earlier proposal; it is the single line `none` when the brief relied on nothing
+   outside the prompt. `## Owner confirmation` holds step 2's question as `Asked: <verbatim>` and the
+   reply as `Answer: <verbatim>`; with `none` above it reads
+   `not asked — the brief draws on nothing outside the prompt`. From `PROMPT_BRIEF_CUTOFF`,
+   the first preflight refuses a record that breaks this shape and a build with no such record.
+   A `spec-audit:` ask counts only inside `## The prompt`, never in a section the run wrote.
 4. **Commit, then PUSH THE BRANCH**, in that order. Skip the push and preflight refuses with
    `the remote advertises no tip for the branch this run is on, so nothing published authorizes it`.
 5. **Preflight**, as on the slug path; it records the mode from the file you pushed.

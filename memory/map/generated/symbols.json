@@ -1298,6 +1298,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_brief_run",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "build_cache",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -3008,9 +3013,19 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_branch_carried",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_break_refuses",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "check_brief_items",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_build_backlog",
@@ -3866,6 +3881,16 @@
       "id": "check_projection",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "check_prompt_brief",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_prompt_heading",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_provenance_chain",
@@ -10663,6 +10688,16 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_brief_cutoff",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_brief_items",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_brief_paths",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -15833,6 +15868,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_main_at_head",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_merged_build",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -19758,6 +19798,11 @@
       "file": "tools/unattended/check-brief-recorded.test.sh"
     },
     {
+      "id": "write_brief_record",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "write_c42_conf",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -19846,6 +19891,11 @@
       "id": "write_declarations",
       "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
+      "id": "write_default_conf",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_dl_landing",
