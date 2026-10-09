@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aDistilledCharter-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aDistilledCharter-1-acceptance-ledger.md) | journal | TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-7 DEPL-aDistilledCharter-2 |
+| [2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round2.md](../reviews/2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round2.md) | diff-review | TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-7 DEPL-aDistilledCharter-2 |
 
 <!-- /gen:spec-records -->
 

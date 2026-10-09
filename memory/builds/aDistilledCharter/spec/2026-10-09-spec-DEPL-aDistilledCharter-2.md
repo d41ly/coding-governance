@@ -1,12 +1,13 @@
 # DEPL-aDistilledCharter-2 — the review protocol ships with every default adoption
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams deployer · order 10
+**Status:** WONTDO · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams deployer · order 10 · superseded by PLAY-aDistilledCharter-5, closing review round 2 B1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aDistilledCharter-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aDistilledCharter-1-acceptance-ledger.md) | journal | TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 |
+| [2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round2.md](../reviews/2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round2.md) | diff-review | TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 |
 
 <!-- /gen:spec-records -->
 
@@ -78,6 +79,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft, promoted from the closing review round 1, C1 (HIGH).
+- rev-2 · 2026-10-09 · §2 · retired: `review-harness` requires `agent-cap` and `settings-merge`, so
+  the default selection refused every adoption (round 2, B1). The change is reverted.
 
 ## 10. Reuse audit
 

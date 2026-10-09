@@ -1,6 +1,6 @@
 # PLAY-aDistilledCharter-1 — the charter template v4.0, with a disposition for every v3.5 rule
 
-**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 4
+**Status:** SPECCED · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 4
 
 <!-- gen:spec-records -->
 
@@ -168,7 +168,7 @@ Lines are v3.5's at BASE. A destination is one of: `practice [h]` and `format [h
 | §6 162-164 | a value beside its owner rots | practice [one-fact] |
 | §6 165 | in-doc paths repo-root-relative | deleted — `dead-path carriers (deleted files still named)` grades citations; [links] covers user-facing ones |
 | §6 166 | provenance inline | deleted — a style preference no reader acts on before a gate fires |
-| §6 167 | a security-model section per surface | moved `memory/guides/REVIEW-PROTOCOL.md` § Security boundaries |
+| §6 167 | a security-model section per surface | moved `memory/TEMPLATE-SPEC.md` § Security boundaries |
 | §7 171-174, 202-203 | parallel test runner guardrails; structural classes; per-file isolation | tools pytest-parallel-guardrails |
 | §7 175-179 | silent-failure shell scans | tools gate-lint |
 | §7 180-183 | tooling as a declared population | practice [derive]; gated `govkit selfcheck` |
@@ -185,15 +185,15 @@ Lines are v3.5's at BASE. A destination is one of: `practice [h]` and `format [h
 | §7 212-214 | provenance paragraph | deleted — a history note; the history is git's |
 | §7 216-217, 223-224 | failing case observed; a skip announces itself | practice [gate] |
 | §7 218-222, 225-226 | shared-variable guard; predicate over the real tree; gate the class | practice [class] |
-| §8 230-232 | Tier 1, Tier 2, once at the boundary | practice [risk]; moved `memory/guides/REVIEW-PROTOCOL.md` § Tiers |
+| §8 230-232 | Tier 1, Tier 2, once at the boundary | practice [risk]; moved `memory/TEMPLATE-SPEC.md` § Tiers |
 | §8 233, 246-249, 252, 256-260 | lens shape, concrete findings, precision, priming, richness, sidechains, schemas | owned `memory/guides/REVIEW-PROTOCOL.md`; protocol review-harness |
 | §8 234-245 | concurrency and total capped | practice [bound]; gated `verifier fan-out` and the `agent-cap` hook |
 | §8 250 | persist each Tier-2 run | fact REVIEW_DIR |
 | §8 251 | commit an experiment's instruments | practice [records] |
 | §8 253 | verify before done | practice [verify] |
 | §8 254 | commit freely; landing is §1's | practice [land] |
-| §9 264-266, 271-276 | write-boundary sanitize, composite guard, capability gate, authz core, automation principal, draft-only, PII, concurrency, test-env protections | practice [security] [core]; moved `memory/guides/REVIEW-PROTOCOL.md` § Security boundaries |
-| §9 268-269 | URL normalizer; SSRF guard | moved `memory/guides/REVIEW-PROTOCOL.md` § Security boundaries |
+| §9 264-266, 271-276 | write-boundary sanitize, composite guard, capability gate, authz core, automation principal, draft-only, PII, concurrency, test-env protections | practice [security] [core]; moved `memory/TEMPLATE-SPEC.md` § Security boundaries |
+| §9 268-269 | URL normalizer; SSRF guard | moved `memory/TEMPLATE-SPEC.md` § Security boundaries |
 | §10 279-283 | the project's own bug-class checklist | practice [left-shift]; tools memory-tree |
 | §11 288-289 | LF; verify staged bytes | practice [bytes] |
 | §11 290 | toolchain pins | fact TOOLCHAIN_NOTES |
@@ -282,6 +282,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-4 · 2026-10-09 · §4 · the security and tier rows move to `memory/TEMPLATE-SPEC.md`
+  (`PLAY-aDistilledCharter-5`, closing review round 2, B1).
 - rev-3 · 2026-10-09 · S6 · `PROSE_AUDIT` stays declared as legacy, agreeing with
   TOOL-aDistilledCharter-2 rev-2, which keeps every name a v3.x template uses.
 - rev-2 · 2026-10-09 · S5 · AC6 · the ceiling row stays 49152 and only the high-water moves: the
