@@ -9,7 +9,9 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-parked-surfaced: 0
+refreshed-at: 5a836bf0fc940029136b4b3fd57a87f35ff40f26 · park · 0 touching
+gates-run: unattended-179155605568707916595-3569156 fa3d3e0a
+parked-surfaced: 1
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: edacfb43e03ddf8c3bd1e08312374f66fe8fd8b1
@@ -77,3 +79,5 @@ base: 6473ae38a517a3559f2b7daed67a9820c505bd4d
 2026-10-09T10:52:38Z dispatch · item 26dc599c TOOL-aQuotedBrief-6 · reason tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md
 
 2026-10-09T13:31:43Z resume · item aQuotedBrief · reason working · keepalive 530f6b7a · manual
+
+2026-10-09T16:07:21Z decision · item drift-audit cutoff_keys_armed reads 31 against its shrink-only pin of 30, because PROMPT_BRIEF_CUTOFF arms a new key · reason options: raise the pin to 31 with a recorded reason, retire another armed _CUTOFF key in the same change, or drop the cutoff and grade unconditionally; each changes a declared budget or another rule, which build method veto 2 reserves for the owner, so no option survives for the run
