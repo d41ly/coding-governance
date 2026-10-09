@@ -17,12 +17,12 @@ mode: slug
 run-branch: refs/heads/branch/unattended-build-template-5f7d7d
 anchor-kind: default-branch
 cli-version: 2.1.293
-lease-utc: 2026-10-09T01:05:07Z
+lease-utc: 2026-10-09T13:30:26Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 13112
+pid: 4880
 session: 980e4a60-dcd8-4eb9-85ca-c22d52fa116a
-keepalive: c660de97
+keepalive: 530f6b7a
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 6473ae38a517a3559f2b7daed67a9820c505bd4d
 anchor-ref: refs/heads/main
@@ -73,3 +73,5 @@ base: 6473ae38a517a3559f2b7daed67a9820c505bd4d
 2026-10-09T09:05:58Z brief · item TOOL-aQuotedBrief-6 · reason 3b92fbb49e73 memory/builds/aQuotedBrief/prompts/2026-10-09-prompt-TOOL-aQuotedBrief-6-11-build-brief.md
 
 2026-10-09T10:52:38Z dispatch · item 26dc599c TOOL-aQuotedBrief-6 · reason tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md
+
+2026-10-09T13:31:43Z resume · item aQuotedBrief · reason working · keepalive 530f6b7a · manual
