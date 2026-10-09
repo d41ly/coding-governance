@@ -1,11 +1,12 @@
 # PLAY-aRoutedQuill-1 — the charter's Definition of Ready: every product-code unit carries a spec before code
 
-**Status:** INPROGRESS · rev-4 · 2026-10-10 · node a · Tier-2 · base 6473ae38 · streams playbook · order 5 · ratified 2026-10-09
+**Status:** CLOSED · rev-4 · 2026-10-10 · node a · Tier-2 · base 6473ae38 · streams playbook · order 5 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-PLAY-aRoutedQuill-1-1-acceptance-ledger.md](../build/2026-10-09-build-PLAY-aRoutedQuill-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-PLAY-aRoutedQuill-1-build-brief.md](../prompts/2026-10-09-prompt-PLAY-aRoutedQuill-1-build-brief.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
 

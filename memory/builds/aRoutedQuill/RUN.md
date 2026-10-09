@@ -60,3 +60,7 @@ base: 5a836bf0fc940029136b4b3fd57a87f35ff40f26
 2026-10-09T21:37:58Z brief · item TOOL-aRoutedQuill-4 · reason 67b39c2bc3af memory/builds/aRoutedQuill/prompts/2026-10-09-prompt-TOOL-aRoutedQuill-4-build-brief.md
 
 2026-10-09T21:53:14Z dispatch · item b6d2f89a TOOL-aRoutedQuill-4 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/hooks/scratch-guard-subagent.fragment.json tools/hooks/kit.toml tools/hooks/README.md .claude/settings.json memory/map/features/agent-cap.md memory/map/generated/symbols.json memory/map/generated/inventories.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/builds/aRoutedQuill/spec/2026-10-09-spec-TOOL-aRoutedQuill-4.md memory/builds/aRoutedQuill/build/2026-10-09-build-TOOL-aRoutedQuill-4-1-acceptance-ledger.md memory/builds/aRoutedQuill/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-09T22:42:04Z dispatch · item 0585bcf8 PLAY-aRoutedQuill-1 · reason coding-governance-agents.template.md AGENTS.md tools/template-size-highwater.txt memory/guides/SESSION-KICKOFF.md memory/builds/aRoutedQuill/spec/2026-10-09-spec-PLAY-aRoutedQuill-1.md memory/builds/aRoutedQuill/build/2026-10-09-build-PLAY-aRoutedQuill-1-1-acceptance-ledger.md memory/builds/aRoutedQuill/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-09T22:42:24Z brief · item PLAY-aRoutedQuill-1 · reason 0b2e1142e8cf memory/builds/aRoutedQuill/prompts/2026-10-09-prompt-PLAY-aRoutedQuill-1-build-brief.md

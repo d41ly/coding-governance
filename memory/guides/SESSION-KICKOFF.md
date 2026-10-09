@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-10T00:01:53+03:00 @ 82edc653e345a6806ae334df2c60bb24bd9c372e
+last-audit: 2026-10-10T01:51:08+03:00 @ 60aa8598238f636bdca83ad858fd1ee829b47a22
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 82edc653e345a6806ae334df2c60bb24bd9c372e
+last-body-change: 60aa8598238f636bdca83ad858fd1ee829b47a22
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -208,13 +208,13 @@ python tools/memory-tree/gotchas.py --for-paths <the tooling row's entrypoints> 
 
 Tier 2 (a spec before building; the spec audit only where the build or its project declares it, M4) for: a change to the governance template's
 rules, the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
-Tier 1 (gates + one focused self-review).
+Tier 1 (a micro-spec before building, then gates + one focused self-review).
 
 ### ID + work-state protocol
 
 `FAMILY-<slug>-<seq>`, families `PLAY`/`KICK`/`TOOL`/`DEPL` (per `.memory-tree.conf`). Slug = YOUR node tag
-(identify the node by machine/user against the AGENTS.md registry, never by path — all four rows pin the
-same primary tree, so the path cannot tell them apart) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. Work state is
+(identify the node by machine/user against the AGENTS.md registry, never by path: all four rows pin
+one primary tree) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. Work state is
 READ from the GENERATED `memory/LIVE.md` + `memory/ledger/<month>.md` (`gen_build_index.py --write`
 re-renders them from build front matter); there is no authored ledger to update. Build folders are
 `memory/builds/<slug>/`; the discipline is the spec header's `streams` value (`STREAMS_CUTOFF` in
