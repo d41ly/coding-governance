@@ -1,6 +1,6 @@
 # TOOL-aFrugalTurnstile-10 — the unattended protocol's landing rule states the scoped-then-full path
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
+| [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 
 <!-- /gen:spec-records -->
@@ -29,7 +30,7 @@ measured growth, in the open.
   before the paragraph opening "`landed-via-lander` is the machine-checked DoD item". It states,
   in this order: where `GATE_POST_MERGE` is declared and what `local` and `ci` mean; that the close
   runs the bar the boundary decides, through the pre-push hook's `--decide`; that its green is
-  recorded so the landing push is `covered`; that the full bar runs on the landed sha and its red
+  recorded so the landing push scopes over the close's own record commit alone; that the full bar runs on the landed sha and its red
   binds through `refs/gov/bar-red` until a full green descends from it; and that relaxing a
   project's own stricter rule is that project's change. Observed by AC2.
 - **S2 — §6's in-place sentence stays true.** "`--close` grading THAT merge under `GATE_FULL=1` and
@@ -97,11 +98,11 @@ The new §6 paragraph, verbatim, hard-wrapped at the file's width:
 
 ```markdown
 **A declared post-merge bar lets a landing take the scoped bar.** `GATE_POST_MERGE` is declared
-at R in the file `INHERITED_RED` is read from: `local` has the lander start the post-merge bar on
+at R in the pre-push hook's gate-env file: `local` has the lander start the post-merge bar on
 this node, and `ci` leaves it to remote CI. Under either, `--close` asks the pre-push hook's
 `--decide` for the prepared merge and runs that bar: full, scoped to the base it names, or none
-where a recorded green already covers the tree. Its green is recorded, so the landing push is
-`covered` and runs nothing. The full bar then runs on the landed sha, and its red is BINDING:
+where a recorded green already covers the tree. Its green is recorded, so the landing push
+scopes over the close's own record commit alone. The full bar then runs on the landed sha, and its red is BINDING:
 published as `refs/gov/bar-red`, it forces FULL on every later landing that descends from it until
 a full green descends from it too. A project whose own rules demand a full bar per landing relaxes
 them itself.
@@ -159,7 +160,7 @@ break the named command reports.
 - **AC1** — When `cmp tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md`
   runs, it exits 0. Red when: one copy carries an edit the other lacks.
 - **AC2** — When `awk '/^## 6\. Landing/,/^## 7\. /' memory/guides/UNATTENDED-PROTOCOL.md` is piped to
-  `grep -F` once per token, each of `GATE_POST_MERGE`, `--decide`, `covered`, `refs/gov/bar-red`,
+  `grep -F` once per token, each of `GATE_POST_MERGE`, `--decide`, `record commit alone`, `refs/gov/bar-red`,
   `relaxes` and `under the boundary's decision` hits. Red when: a fact S1 or S2 states is missing from §6.
 - **AC3** — When `grep -n '^| .gates-green. |' memory/guides/UNATTENDED-PROTOCOL.md` runs, its one row
   carries `post-merge bar`, and `grep -n '^| .GATE_POLICY_FILE. |'` over the same file shows a row
@@ -196,6 +197,9 @@ trip, named as the build's brief asks. All run once, at the close.
 
 ## 9. Revision log
 
+- rev-2 · 2026-10-09 · S1, the §4 text and AC2: the landing push after a close scopes over the record
+  commit, it is not `covered`, and the declaration is the hook's gate-env file. What disagreed: design
+  §6 rev D4/D11 and TOOL-aFrugalTurnstile-9 F1/F3; the byte figure moves by a handful of bytes.
 - rev-1 · 2026-10-09 · initial draft, from the build's spec brief and design D12, with the text
   measured against the base file.
 

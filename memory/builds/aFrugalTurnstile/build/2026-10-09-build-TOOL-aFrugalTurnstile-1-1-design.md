@@ -151,3 +151,26 @@ by keying the record on the BAR, not by re-hashing the runner's stamp (D2, D3).
 `pre-push full green stamp staleness lag GATE_FULL_MAX_LAG fingerprint scoped boundary reuse
 turnstile manifest_blob`. `reuse_lookup.py` cannot see `.sh` (memory note "reuse_lookup cannot see
 shell seams"), so the seams above were found by reading the files named in §1.
+
+## 6. Revisions after the spec pass (main loop, 2026-10-09, from the twelve specs' §8)
+
+- **rev D4/D11 — the in-place landing push does not carry the graded tree.** `write_close_commit`
+  commits the run-state record on top of the merge the close graded (TOOL-2 F1, TOOL-3 F1, TOOL-9
+  F1), so a first close's landing is never `covered`. Resolved by TOOL-9 F2 option (b), built in
+  TOOL-2 rev-2: a `gate-bar-green` record is a CANDIDATE for the boundary's scoped path, not only a
+  cover. A `kind full` record passes predicates 2, 3, 5, 6 and 8 exactly as a runner stamp does,
+  with the bar compared in place of the manifest blob and the tree in place of the fingerprint. A
+  `kind scoped` record at M is adoptable as the scoped base only when its own `base` is a full green
+  the decision would adopt by the same predicates, with the staleness bound counted from that base,
+  so scoped records cannot chain past a full green. The in-place landing then scopes over the record
+  commit alone. Option (c), grading the record commit, reorders the protocol's in-place close and is
+  an owner turn, not taken. The text units must not say the landing push is `covered` after a close.
+- **rev D6** — `GATE_TURNSTILE_DIR` and `GATE_TURNSTILE_HOLDER` are classified INERT at the
+  boundary, not scrubbed (TOOL-5 F1): `GATE_TURNSTILE=0` already reaches the bar, and a scrubbed
+  holder would queue a pushing leg behind its own parent bar.
+- **rev D9** — `--decide` exits 1 with an empty stdout where the push would be refused (TOOL-7 F1);
+  a red on exactly the adopted green's sha does not clear (TOOL-7 F2, strict descent).
+- **rev D10** — the process-monitor kit has no registration input (TOOL-8 F1): the post-merge
+  child's argv carries its absolute path under the repository root, and its pid lands in the
+  lander's own start record.
+- **rev D11** — the declaration the close reads is the hook's own gate-env file at R (TOOL-9 F3).

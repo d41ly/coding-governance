@@ -1,6 +1,6 @@
 # TOOL-aFrugalTurnstile-2 — pre-push records the green of the bar it ran, and a push whose tree carries one runs nothing
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 2 · ratified 2026-10-09
+**Status:** OPEN · rev-2 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 2 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
+| [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 
 <!-- /gen:spec-records -->
@@ -64,6 +65,19 @@ pays a second full bar because nothing records a green by tree and by bar.
     decision adopted, `inh_sha` when an inherited green was adopted, else `rec_sha`. A FULL decision
     is covered by no scoped record.
   Observed by AC2, AC3, AC6, AC7, AC8, AC9, AC10.
+- **S3b — a bar record is a candidate for the scoped path too (rev-2, design §6 rev D4/D11).** After
+  the runner-stamp candidates in the loop at ~1301 (and for a non-runner bar, in their place, per
+  TOOL-aFrugalTurnstile-1), the same three `gate-bar-green` files are read as candidates for
+  `check_green_record`. A `kind full` record passes predicates 2, 3, 5, 6 and 8 unchanged; predicate 4
+  reads, for a bar record, "its `tree` equals `git rev-parse <sha>^{tree}`, both non-empty", and predicate 7
+  "its `bar` equals `$gate` byte for byte". A `kind scoped` record at sha M is adoptable only when its
+  `base` B, read as a sha, itself passes those predicates as a full green would (the runner stamps
+  and the `kind full` bar records are searched for one whose `sha` is B), and then predicate 3's lag
+  is counted from B, not from M, so a chain of scoped records can never stand further from a full
+  green than the bound. An adopted record exports `GATE_BASE=<its sha>` exactly as a runner stamp
+  does, and the scoped decision line names the record and, for `kind scoped`, its base. Because the
+  bar compare needs the vetted bar, the bar-record candidates are evaluated after the bar vetting
+  (~1381), the placement TOOL-aFrugalTurnstile-1 F1 chose for its own rule. Observed by AC17 to AC20.
 - **S4 — the `covered` decision.** When a candidate covers, the hook prints one line, writes
   `$PUSH_BAR` in the same `printf` shape as ~1563 so push-main's lander-marker logic is unchanged,
   sets `RUNLOG_DECISION=covered`, starts no bar, exports none of `GATE_FULL`, `GATE_BASE`,
@@ -82,8 +96,6 @@ pays a second full bar because nothing records a green by tree and by bar.
 
 - The unattended close's writer (TOOL-aFrugalTurnstile-3) and lineage reuse
   (TOOL-aFrugalTurnstile-4).
-- Making `gate-bar-green` a candidate for predicates 2 to 8. It only covers; every way a push is
-  scoped or forced at base is unchanged.
 - The `--decide` callable and the post-merge red force (TOOL-aFrugalTurnstile-7).
 - Re-grading history-reading legs over a covered push; the header states the gap (S5).
 
@@ -241,11 +253,25 @@ record and appends one line to a marker file outside the repo. The base hook is
 - **AC16** — When `grep -c 'COVERED DOES NOT RE-GRADE HISTORY' .githooks/pre-push` runs, it prints
   `1`. Red when: it prints `0`.
 
+- **AC17** — When a wrapper bar (a tracked script that runs the stand-in runner with `GATE_LEGS` at a
+  derived manifest, as inCMS's `scripts/gov-bar.sh` does) earns a `kind full` record at merge M by a
+  FULL push, and M plus one record-only commit C is pushed, the output carries `scoped gate` naming
+  the `gate-bar-green` record at M, and `GATE_BASE` reaches the bar as M. Red when: the base hook's
+  line, `the leg manifest differs`, and a FULL bar.
+- **AC18** — When a `kind scoped` record at M carries `base` B and a `kind full` record names B, and
+  C on top of M is pushed, the decision is scoped from M with the lag counted from B. Red when: the
+  push is FULL, or it scopes from B.
+- **AC19** — When the `kind scoped` record's `base` names a sha no full green names, the record is
+  refused naming its base, and the decision is what it would be without it. Red when: it is adopted.
+- **AC20** — When the `kind scoped` record's base B stands more than `GATE_FULL_MAX_LAG` first-parent
+  landings behind C although M is one behind, the record is refused on the lag from B. Red when: it
+  is adopted on M's lag.
+
 ## 7. Gates
 
 `pre-push self-test` · `pre-push run-log line` · `pre-push bar self-test` · `push-main self-test` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `install-prefix (shipped surface)` · `remote literals (kit code names no remote)` · `testsuite counts (every bar self-test prints one)`
 
-New arm: .githooks/pre-push.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC12 AC13 AC14 AC15 · the scratch fixture above, each case run against the base hook first · none
+New arm: .githooks/pre-push.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC12 AC13 AC14 AC15 AC17 AC18 AC19 AC20 · the scratch fixture above, each case run against the base hook first · none
 New arm: .githooks/pre-push.runlog.test.sh · covers AC11 · a covered push, plus the exit-table row for the covered exit · `FLOOR_ASSERTIONS` raised by the assertions it adds
 
 The hook header sentence S5 adds, quoted: "COVERED DOES NOT RE-GRADE HISTORY: a push whose tip
@@ -273,6 +299,11 @@ S1 splits with `read -ra`.
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft from design D3 and D4, insertion points read at base bef97330.
+- rev-2 · 2026-10-09 · S3b, AC17 to AC20: a bar record is a candidate for the scoped path, and a
+  scoped record is adoptable on its full-green base. What disagreed: rev-1's non-goal kept bar
+  records cover-only, which left every wrapper-bar adopter's in-place landing FULL because the close
+  commit moves the tree (this spec's F1); resolved by TOOL-aFrugalTurnstile-9 F2 option (b), design
+  §6 rev D4/D11.
 
 ## 10. Reuse audit
 
