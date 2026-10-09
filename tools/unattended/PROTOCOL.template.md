@@ -83,6 +83,30 @@ strict anchor. Both anchors observe the endpoint the landing push goes to.
 
 None of the three is closed. What the design adds is VISIBILITY: the record names the anchor used.
 
+**A THIRD ANCHOR, LOCAL HISTORY, when the project declares it** (`TOOL-aHomedAnchor-1`).
+`ANCHOR_SCOPE="local"` lets the owner start a run from the worktree branch, or the local default
+branch, that committed the build folder, with no push. It widens only where the first anchor
+misses, and it widens to local history rather than to the advertised branch tip: the README must be
+committed at HEAD when `--preflight` pins the BASE, and every later verb reads that RECORDED base,
+which must stay an ancestor of HEAD. All three modes are admitted, `slug` included. Landing is
+unchanged: the lander still pushes the default branch.
+
+It spends more than the second anchor, and the owner accepted it:
+
+1. **Nothing off this node pins the BASE.** The recorded base is the input, not evidence, because
+   no observation exists to compare it with. The run-state file names the anchor `local`.
+2. **The folder need not predate the run**, as on the second anchor, and roster integrity is
+   satisfiable by construction for the same reason.
+3. **The bar admits an unpublished BASE** for every record in a repo whose remote default branch
+   declares `local`. The leg reads that declaration from the conf blob at the tip the remote
+   advertises for its default branch, never from the working tree, so a run cannot opt itself in
+   without landing the change through the bar (`TOOL-aHomedAnchor-2`).
+
+What stays: a `may:` grant and a README `spec-audit:` line are refused on this anchor in every mode,
+because a local README is one the run could have written, and `SPEC_AUDIT_DEFAULT` is read at the
+default-branch side of BASE. The first anchor is still observed, so an unreachable remote still
+refuses `--preflight`.
+
 **What this costs, stated because the previous design paid none of it.** The authorization was once a
 block naming the build and both authorized actions, compared byte-for-byte across the BASE. Moving it
 to the build folder trades these properties:
@@ -474,7 +498,7 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `WIRING_CHECK` | the non-repairing wiring check `--preflight` delegates to |
 | `KEEPALIVE_CREATE` · `KEEPALIVE_DELETE` | the agent-facing scheduler tool calls, named for the agent to use |
 | `KEEPALIVE_INTERVAL` | the cadence the agent schedules the keepalive at, rendered into the Skill as prose |
-| `ANCHOR_SCOPE` | which anchors may authorize a run: the CLOSED set `default-branch` and `published`. Absent, blank or outside the set keeps `default-branch`, so a typo grants nothing. Gates the DRIVER only — §1 cost 2 |
+| `ANCHOR_SCOPE` | which anchors may authorize a run: the CLOSED set `default-branch`, `published` and `local`. Absent, blank or outside the set keeps `default-branch`, so a typo grants nothing. Gates the DRIVER only — §1 cost 2 — except that the leg reads `local` off the remote's default-branch tip |
 | `AUTH_PARAM` | the token an invocation must carry to start a prompt-mode run, rendered into the Skill at its routing row and its opening fence. BLANK or absent is the kit default, stated verbatim by that render. Its ARGUMENT is a prompt file path or the prompt itself. A value that is not a hyphen-led flag, or carries whitespace, a pipe or a backtick, is refused at render time: it lands in a table row and a code span, and each of those ends one early. Gates NOTHING at run time: no script sees the invocation, so this is the gesture and never the authorization, which stays the pushed build folder (§1) |
 | `CORE_FLOOR` | `<phases>:<dod>`, the shrink-only SIZE of the kit's core sets. MANDATORY: undeclared or malformed leaves both pins unenforced, so both are refusals |
 | `DIRECTIVES_EXTRA` | project directive members, appended to the core set |

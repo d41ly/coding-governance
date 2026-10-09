@@ -4299,6 +4299,48 @@ same "50e run-branch: equals the fixture's own git symbolic-ref HEAD" \
 miss "$(cat memory/builds/tRun/RUN.md)" "branch-ref:"
 reset_tree
 
+# ---- TOOL-aHomedAnchor-1: THE LOCAL ANCHOR. A `slug` README committed on a branch the remote does
+# ---- not advertise authorizes a run under `local`, with no push; the same fixture under `published`
+# ---- refuses, so the widening is the new value's and not a leak into the old one.
+# ---- AC1: preflight OK, and the record names the anchor. The remote's `unit` tip is put back after.
+_la_ou=$(git ls-remote origin refs/heads/unit | cut -f1)
+reset_tree; readme tBr; scope local; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q origin --delete unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "preflight OK"
+hit  "$(cat memory/builds/tBr/RUN.md)" "anchor-kind: local"
+# ---- AC4: the recorded BASE equals HEAD, so the run built nothing and the authorization item refuses.
+out=$(run --authorization tBr)
+hit  "$out" "the recorded BASE equals HEAD on the local anchor, so this run built nothing on top of it and has nothing to land"
+# ---- AC3: a recorded BASE off HEAD's history - a parentless commit over the same tree - is refused,
+# ---- because on this anchor the recorded base is the whole authorization.
+git add -A >/dev/null && git commit -q -m rec --no-verify
+_la_off=$(git commit-tree "$(git rev-parse 'HEAD^{tree}')" -m off)
+sed -i "s/^base: .*/base: $_la_off/" memory/builds/tBr/RUN.md
+out=$(run --authorization tBr)
+hit  "$out" "the BASE recorded in the run-state file is not an ancestor of HEAD, and on the local anchor that recorded base is the whole authorization, so a base off this history authorizes nothing: recorded $_la_off"
+# ---- AC2: the same unpushed fixture under `published` keeps its refusal.
+reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q origin --delete unit 2>/dev/null
+hit  "$(run --preflight tBr --keepalive-id k1)" "the remote advertises no tip for the branch this run is on, so nothing published authorizes it; push the branch first"
+# ---- AC5: a local README's grant and opt-in are refused in `slug` mode, and `recipe` passes check 50.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a may: memory/notes.md'
+scope local; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q origin --delete unit 2>/dev/null
+hit  "$(run --preflight tBr --keepalive-id k1)" "the build README carries a may: grant and the BASE came from the local anchor, a commit on this node the run could have written, so the grant may be the run's own - ruling D12-j honours a grant only from a slug-mode README the owner committed at the default-branch anchor: may: ["
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a spec-audit: 2026-10-05'
+scope local; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q origin --delete unit 2>/dev/null
+hit  "$(run --preflight tBr --keepalive-id k1)" "the build README declares spec-audit: and the BASE came from the local anchor, a commit on this node the run could have written, so the opt-in may be the run's own - only the owner opts a build into the pre-code spec audit, by a spec-audit: line in a slug-mode README landed on the default branch or a SPEC_AUDIT_DEFAULT there; delete the line, and leave the opt-in to the owner"
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: recipe'
+scope local; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q origin --delete unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+miss "$out" "the BASE came from the second anchor - a tip this run pushed - while the build README declares a mode whose discipline is that the folder already existed, so the run authorized itself with a declaration that says it did not: mode"
+hit  "$out" "a recipe-mode build README declares no playbook"
+if [ -n "$_la_ou" ]; then git push -q -f origin "$_la_ou:refs/heads/unit" 2>/dev/null; fi
+reset_tree
+
 # ---- 32: the branch is committed but NOT published. Nothing the remote advertises authorizes it.
 reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
 git push -q origin :refs/heads/unit 2>/dev/null

@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 5ac5d61bfc6ac9c31741e2d72975838e176d4e9c
-phase: SPECCING
+witness: dc8591f4ae91b7fe8481ac172b824760c4fbcd65
+phase: BUILDING
 branch-sha: 11224126c2e48935ee3cc2e802bd3099c0f225fe
 branch-ref: refs/heads/branch/unattended-kit-slug-mode-e3ba61
 may: none
@@ -31,3 +31,7 @@ anchor-ref: refs/heads/main
 base: 11224126c2e48935ee3cc2e802bd3099c0f225fe
 
 ## Parked
+
+2026-10-09T02:07:46Z dispatch · item dc8591f4 TOOL-aHomedAnchor-1 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/adopt-unattended.sh tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md tools/unattended/STOPS.template.md tools/unattended/README.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md .claude/skills/unattended/SKILL.md .unattended.conf memory/builds/aHomedAnchor/spec/2026-10-09-spec-TOOL-aHomedAnchor-1.md
+
+2026-10-09T02:32:05Z dispatch · item dc8591f4 TOOL-aHomedAnchor-1 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/adopt-unattended.sh tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md tools/unattended/STOPS.template.md tools/unattended/README.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md .claude/skills/unattended/SKILL.md .unattended.conf memory/builds/aHomedAnchor/spec/2026-10-09-spec-TOOL-aHomedAnchor-1.md memory/guides/SESSION-KICKOFF.md

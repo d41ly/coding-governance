@@ -73,13 +73,13 @@ scaffold recipe: relay it to the owner verbatim, reap the keepalive, and stop.
 
 ## Start a run from a PROMPT
 
-Only when the invocation carries `--prompt`, and only under the `published` anchor; this
+Only when the invocation carries `--prompt`, and only under the `published` or `local` anchor; this
 project declares `published`. A prompt naming ids takes the scaffold route.
 
 1. **Orient from the prose**; RUN the orientation probes before step 3.
 2. **Decide whether to ask, ONCE**: One `AskUserQuestion`, every gap in it.
 3. **Write the build folder**, `memory/builds/<slug>/README.md`, with `authorized-by: prompt`.
-4. **Commit, then PUSH THE BRANCH.** In that order.
+4. **Commit, then PUSH THE BRANCH** under `published`; under `local` the commit is enough.
 5. **Preflight**, as on the slug path.
 6. **The kickoff hand-back**, at the slug path's step 4.
 

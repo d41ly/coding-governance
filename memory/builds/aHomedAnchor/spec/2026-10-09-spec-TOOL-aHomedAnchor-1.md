@@ -1,6 +1,6 @@
 # TOOL-aHomedAnchor-1 — the driver's third anchor: `ANCHOR_SCOPE="local"` authorizes from local history
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 11224126 · streams tooling · order 1
+**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2 · base 11224126 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
