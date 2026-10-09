@@ -574,8 +574,9 @@ turns on the playbook resolution at BASE, the two piece-scoped Definition-of-Don
 was to enforce this was withdrawn unbuilt, so it is prose you keep, on both entry points.
 
 0. **Read the build method WHOLE, and the playbook whole**, then the playbook again per piece: it is
-   segmented for that. Writing the build folder yourself needs `published`, for the prompt path's
-   reason; where the owner landed the folder first, either anchor works and step 4's push is skipped.
+   segmented for that. Writing the build folder yourself needs `published` or `local`, for the
+   prompt path's reason, and under `local` the commit is enough; where the owner landed the folder
+   first, any anchor works and step 4's push is skipped.
 1. **Orient from the playbook**: what one piece IS, where pieces land, which checks run over one and
    which over all N. What it leaves open is usually the COUNT, and which location when its `outputs`
    globs admit more than one.

@@ -61,3 +61,7 @@ base: 11224126c2e48935ee3cc2e802bd3099c0f225fe
 2026-10-09T04:32:43Z dispatch · item 4c80fedd TOOL-aHomedAnchor-5 · reason tools/unattended/adopt-unattended.test.sh memory/builds/aHomedAnchor/spec/2026-10-09-spec-TOOL-aHomedAnchor-5.md memory/builds/aHomedAnchor/README.md memory/LIVE.md
 
 2026-10-09T04:35:22Z dispatch · item 87f19159 TOOL-aHomedAnchor-4 · reason .githooks/pre-commit .githooks/pre-commit.test.sh memory/builds/aHomedAnchor/spec/2026-10-09-spec-TOOL-aHomedAnchor-4.md memory/builds/aHomedAnchor/README.md memory/LIVE.md
+
+2026-10-09T04:39:08Z dispatch · item d3b545f6 TOOL-aHomedAnchor-6 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/builds/aHomedAnchor/spec/2026-10-09-spec-TOOL-aHomedAnchor-6.md memory/builds/aHomedAnchor/README.md memory/LIVE.md
+
+2026-10-09T04:45:27Z dispatch · item d3b545f6 TOOL-aHomedAnchor-6 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/builds/aHomedAnchor/spec/2026-10-09-spec-TOOL-aHomedAnchor-6.md memory/builds/aHomedAnchor/README.md memory/LIVE.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md

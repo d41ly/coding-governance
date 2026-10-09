@@ -79,7 +79,7 @@ project declares `{{ANCHOR_SCOPE}}`. A prompt naming ids takes the scaffold rout
 1. **Orient from the prose**; RUN the orientation probes before step 3.
 2. **Decide whether to ask, ONCE**: One `AskUserQuestion`, every gap in it.
 3. **Write the build folder**, `{{MEMORY_ROOT}}/builds/<slug>/README.md`, with `authorized-by: prompt`.
-4. **Commit, then PUSH THE BRANCH** under `published`; under `local` the commit is enough.
+4. **Commit, then PUSH THE BRANCH**; under `local`, commit only.
 5. **Preflight**, as on the slug path.
 6. **The kickoff hand-back**, at the slug path's step 4.
 

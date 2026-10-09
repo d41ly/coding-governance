@@ -4321,6 +4321,9 @@ cp "$_la_b" memory/builds/tBr/RUN.md; rm -f "$_la_b"
 # ---- AC3: a recorded BASE off HEAD's history - a parentless commit over the same tree - is refused,
 # ---- because on this anchor the recorded base is the whole authorization.
 git add -A >/dev/null && git commit -q -m rec --no-verify
+# ---- TOOL-aHomedAnchor-6 AC3: the HONEST record, its base a proper ancestor of HEAD, reads met. Every
+# ---- other local arm is a refusal, so without this one the local path could refuse every run.
+hit  "$(run --authorization tBr)" "unattended: authorization-reachable — met · base $(git rev-parse HEAD~1)"
 _la_off=$(git commit-tree "$(git rev-parse 'HEAD^{tree}')" -m off)
 sed -i "s/^base: .*/base: $_la_off/" memory/builds/tBr/RUN.md
 out=$(run --authorization tBr)
@@ -4344,6 +4347,57 @@ git push -q origin --delete unit 2>/dev/null
 out=$(run --preflight tBr --keepalive-id k1)
 miss "$out" "the BASE came from the second anchor - a tip this run pushed - while the build README declares a mode whose discipline is that the folder already existed, so the run authorized itself with a declaration that says it did not: mode"
 hit  "$out" "a recipe-mode build README declares no playbook"
+# ---- TOOL-aHomedAnchor-6 AC1: an `asks:` mandate in a local slug README is refused, as `may:` is.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a asks: EXMP-aFoo-3'
+scope local; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q origin --delete unit 2>/dev/null
+hit  "$(run --preflight tBr --keepalive-id k1)" "the build README declares an asks: mandate and the BASE came from the local anchor, a commit on this node the run could have written, so the mandate may be the run's own - ruling D12-a puts the choice of which asks a run answers on a commit the owner landed: asks: ["
+# ---- AC2: a README WRITTEN BUT NOT COMMITTED falls through to the strict anchor, so the refusal names
+# ---- the missing README instead of remote history.
+reset_tree; scope local; git add -A >/dev/null && git commit -q -m sc --no-verify
+git push -q origin --delete unit 2>/dev/null
+readme tBr
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "no build README at the pinned BASE, so nothing committed before this run branched authorizes it"
+miss "$out" "no merge-base against the tip the remote advertises"
+# ---- AC4: the fail 18 widening under `scope local`, on a DEFAULT-BRANCH record, in both directions.
+reset_tree; scope local; git add -A >/dev/null && git commit -q -m sc --no-verify
+run --preflight tRun --keepalive-id k1 >/dev/null
+git add -A >/dev/null && git commit -q -m rec --no-verify
+_la_o=$(git commit-tree "$(git rev-parse 'HEAD^{tree}')" -m orphan)
+sed -i "s/^base: .*/base: $_la_o/" memory/builds/tRun/RUN.md
+hit  "$(run --authorization tRun)" "is not an ancestor of the base this history derives"
+git commit -q --allow-empty -m u1 --no-verify; _la_u=$(git rev-parse HEAD)
+git commit -q --allow-empty -m u2 --no-verify
+sed -i "s/^base: .*/base: $_la_u/" memory/builds/tRun/RUN.md
+miss "$(run --authorization tRun)" "is not an ancestor of the base this history derives"
+# ---- AC5: a re-preflight over a RETIRED local record pins the new HEAD, not the finished run's base.
+reset_tree; readme tBr; scope local; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q origin --delete unit 2>/dev/null
+run --preflight tBr --keepalive-id k1 >/dev/null
+_la_old=$(sed -n 's/^base: //p' memory/builds/tBr/RUN.md)
+sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tBr/RUN.md
+git add -A >/dev/null && git commit -q -m aborted --no-verify
+git commit -q --allow-empty -m next --no-verify
+run --preflight tBr --keepalive-id k2 >/dev/null
+same "aHomedAnchor-6 AC5 the new record pins the new HEAD" "$(sed -n 's/^base: //p' memory/builds/tBr/RUN.md)" "$(git rev-parse HEAD)"
+miss "$(sed -n 's/^base: //p' memory/builds/tBr/RUN.md)" "$_la_old"
+# ---- AC6: a SPEC_AUDIT_DEFAULT committed only on the run branch does not opt a local run in.
+reset_tree; readme tBr; scope local; printf 'SPEC_AUDIT_DEFAULT="2026-10-05"
+' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q origin --delete unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "unattended: spec-audit — not owed (opt-in)"
+miss "$out" "opted in by project default"
+# ---- AC7: a TAKE-OVER of a local record whose base: line was deleted refuses; only --preflight may
+# ---- start from no record.
+reset_tree; readme tBr; scope local; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q origin --delete unit 2>/dev/null
+run --preflight tBr --keepalive-id k1 >/dev/null
+sed -i '/^base: /d' memory/builds/tBr/RUN.md
+git add -A >/dev/null; write_aged_commit
+hit  "$(run --resume tBr --keepalive-id kB)" "the BASE came from the local anchor and the record pins none, and on that anchor the recorded base is the only one there is, so an absent one is a refusal rather than a pass"
 if [ -n "$_la_ou" ]; then git push -q -f origin "$_la_ou:refs/heads/unit" 2>/dev/null; fi
 reset_tree
 

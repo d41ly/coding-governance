@@ -631,6 +631,8 @@ read_bound_key RESUME_STALE_BOUND "$RESUME_STALE_BOUND_DEFAULT" seconds "a run r
 # a tracked `.unattended.conf` could pre-set it and defeat the "--park requires --item" refusal by
 # supplying the item nobody typed.
 PK_ITEM=""; PK_STEP=""
+# Internal state for trusted_base, initialised here for PK_ITEM's reason (TOOL-aHomedAnchor-6 S8).
+TB_IGNORE_RECORD=0
 HALT_CODE=""
 TK_NAME=""; TK_BEAT=""
 # `--plan --paths` is an OUTPUT MODE on an existing verb, not a verb: check 26 joins every declared
@@ -2371,8 +2373,12 @@ resolve_base() { # readme path (may be empty) -> sets RB_BASE, ANCHOR_KIND, BREF
   # no push. The README must be COMMITTED, so it is tested at HEAD, and the derived base is HEAD - the
   # degenerate code, which only --preflight admits. Every later call reads the RECORDED base instead,
   # in trusted_base, because on this anchor nothing off this node pins one.
+  # A README NOT COMMITTED AT HEAD falls through to the strict anchor (TOOL-aHomedAnchor-6 S2), so
+  # check_authorization's fail 6 names the missing README rather than fail 16 naming remote history.
   if [ "$ANCHOR_SCOPE" = local ]; then
-    GIT show "$head:$rel" >/dev/null 2>&1 || return 1
+    if ! GIT show "$head:$rel" >/dev/null 2>&1; then
+      ANCHOR_KIND=default-branch; [ "$mb" = "$head" ] && return 2; RB_BASE="$mb"; return 0
+    fi
     ANCHOR_KIND=local
     return 2
   fi
@@ -2426,7 +2432,7 @@ GG_RUN_FACT=""; GG_INH_FACT=""
 # `staged` beside its attribution, never into the run-state file (implementation review round 2, M2
 # and L1), and read by `check_bar_tied`'s record-only mode.
 WI_STAGED=""; AV_STAGED=""; BT_NOTED=""
-trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
+trusted_base() { # run-state file [· allow-degenerate [· preflight]]  ->  sets TB
   local fresh rc rec head rec0 _tb_rd _tb_alt
   TB=""
   # S1's plumbing: the README beside the run-state file, derived the way the gate leg derives it
@@ -2452,8 +2458,10 @@ trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
     head=$(GIT rev-parse HEAD)
     rec=""
     [ "${TB_IGNORE_RECORD:-0}" = 1 ] || [ ! -f "$1" ] || rec=$(fact "$1" base)
+    # ONLY --preflight may start from no record (TOOL-aHomedAnchor-6 S7): a take-over also passes
+    # allow-degenerate, for a base equal to HEAD, and must not read a deleted line as "start here".
     if [ -z "$rec" ]; then
-      if [ "${2:-}" = "allow-degenerate" ]; then
+      if [ "${3:-}" = preflight ]; then
         TB="$head"
         return 0
       fi
@@ -3353,6 +3361,12 @@ check_authorization() { # slug · base
   # choosing WHICH filed asks a run answers is exactly what ruling D12-a took away from the run.
   if [ -n "$AUTH_ASKS" ] && [ "$AUTH_MODE" != slug ]; then
     fail 71 "the build README declares an asks: mandate under an authorization mode that resolves at the second anchor, so the run could have written the line that says which asks it may answer - ruling D12-a puts that choice on a commit the owner landed: mode $AUTH_MODE, admissible for a mandate is slug"
+    return 1
+  fi
+  # TOOL-aHomedAnchor-6 S1 - and a `slug` README on the LOCAL anchor, for fail 78's and fail 89's
+  # reason: it resolves at a commit on this node, so the mandate may be the run's own.
+  if [ -n "$AUTH_ASKS" ] && [ "$ANCHOR_KIND" = local ]; then
+    fail 71 "the build README declares an asks: mandate and the BASE came from the local anchor, a commit on this node the run could have written, so the mandate may be the run's own - ruling D12-a puts the choice of which asks a run answers on a commit the owner landed: asks: [$AUTH_ASKS]"
     return 1
   fi
   # ...and a mandate nothing can GRADE is worse than no mandate at all: every later item keyed on it
@@ -6602,7 +6616,7 @@ verb_preflight() { # slug · keepalive-id
   # TB_IGNORE_RECORD: a record this preflight retires below is a finished run's, and on the local
   # anchor trusted_base would otherwise take that run's base as this one's (TOOL-aHomedAnchor-1 S2).
   TB_IGNORE_RECORD="$rotate"
-  if [ -n "$ASHA" ] && trusted_base "$rel" allow-degenerate; then
+  if [ -n "$ASHA" ] && trusted_base "$rel" allow-degenerate preflight; then
     base="$TB"
     check_authorization "$slug" "$base" || true
   fi

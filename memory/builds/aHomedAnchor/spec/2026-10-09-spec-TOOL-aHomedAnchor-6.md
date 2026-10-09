@@ -1,6 +1,6 @@
 # TOOL-aHomedAnchor-6 — the closing review's driver and doc minors, batched
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 40a976d9 · streams tooling · order 5
+**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2 · base 40a976d9 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 

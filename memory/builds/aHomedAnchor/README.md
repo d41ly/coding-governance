@@ -74,7 +74,7 @@ ids TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAncho
 | [TOOL-aHomedAnchor-3 — re-render the unattended Skill from its template](spec/2026-10-09-spec-TOOL-aHomedAnchor-3.md) | 3 | 1 | INPROGRESS | rev-1 | 2026-10-09 |
 | [TOOL-aHomedAnchor-5 — an adopter arm proves the render of `ANCHOR_SCOPE="local"`](spec/2026-10-09-spec-TOOL-aHomedAnchor-5.md) | 3 | 1 | INPROGRESS | rev-1 | 2026-10-09 |
 | [TOOL-aHomedAnchor-4 — the pre-commit hook runs the Skill wiring check when its inputs are staged](spec/2026-10-09-spec-TOOL-aHomedAnchor-4.md) | 4 | 1 | INPROGRESS | rev-1 | 2026-10-09 |
-| [TOOL-aHomedAnchor-6 — the closing review's driver and doc minors, batched](spec/2026-10-09-spec-TOOL-aHomedAnchor-6.md) | 5 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-6 — the closing review's driver and doc minors, batched](spec/2026-10-09-spec-TOOL-aHomedAnchor-6.md) | 5 | 2 | INPROGRESS | rev-1 | 2026-10-09 |
 | [TOOL-aHomedAnchor-7 — the closing review's leg minors, batched](spec/2026-10-09-spec-TOOL-aHomedAnchor-7.md) | 5 | 2 | OPEN | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
