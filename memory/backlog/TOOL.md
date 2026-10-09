@@ -214,7 +214,7 @@ Cite ids, never line numbers.
 | [TOOL-aReplayedCard-7](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | manifest-check.sh --card --write spawns about ten git processes for its… |
 | [TOOL-aReplayedCard-8](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | WIRE-INTO-PROJECT.md §4 spells the kickoff-manifest format version… |
 | [TOOL-aReplayedCard-10](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | corpus_ids.py --print-defined-ids is a corpus walk plus the shell… |
-| [TOOL-aReplayedCard-11](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | --card --append accepts a real READY body that carries no ## task… |
+| [TOOL-aReplayedCard-11](../builds/aReplayedCard/BACKLOG.md) | SPECCED | — | KICK-aRoutedQuill-1 | 2026-09-14 | --card --append accepts a real READY body that carries no ## task… |
 | [TOOL-aReplayedCard-12](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | scratch-guard.test.sh's meta-arm re-runs the whole orientation section,… |
 | [TOOL-aReplayedCard-13](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | the deny's drive fold lowercases both toplevels, so on a case-sensitive… |
 | [TOOL-aReplayedCard-14](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | extractCommitTarget resolves repeated -C values cumulatively, a… |
