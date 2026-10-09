@@ -15,11 +15,11 @@ rendered text. Every rule is one line: a tool, gate or protocol named in section
 - [reuse] Reuse before building: find the seam to extend first, and at a kind's second instance extract its factory, never a copy.
 - [consistency] Consistency by construction: tokens, primitives and factories land before the features that use them, and every convention you can gate is gated.
 - [core] One shared core with thin adapters, so logic and authorization live once; data changes additively, with defaults and an upgrade step.
-- [contract] A contract two parties share lands first, as one source with generated copies and a parity gate against a live re-derivation.
+- [contract] A contract two parties share lands first, as one source with generated copies and a parity gate against a live re-derivation; deployables sharing one artifact release together.
 - [derive] Derive over author: status, counts, inventories and indexes are generated or declared and checked both ways, never typed beside what they describe.
 - [one-fact] One fact in one place: a document points at the source that owns a value, or a gate compares the two.
 - [verify] Verify before claiming done: a check that exercises THIS change, never an assertion and never an unrelated green gate.
-- [gate] A gate never seen red is not a gate: observe its failing case, make every skip and every unmovable probe announce itself, and state what it does not check.
+- [gate] A gate never seen red is not a gate: observe its failing case, state what it does not check, and never read a skip, an unmovable probe, an exemption or an empty population as coverage.
 - [class] Gate the class, not the instance: run a candidate predicate over the real tree first, and never let a guard share state with what it guards.
 - [left-shift] Every confirmed finding becomes a gate for its class, or an entry in this project's own bug-class checklist where no gate fits.
 - [bar] The merge bar is the floor and reviews cover only what it cannot: one command runs it, and it is green at the push boundary.
@@ -50,10 +50,10 @@ rendered text. Every rule is one line: a tool, gate or protocol named in section
 
 <!-- one-line -->
 - This repository ships the charter template and the kits under `tools/`, and dogfoods every kit it ships on itself.
-- What ships, kit by kit, is `.claude/rules/product.md`; read it before touching `tools/`, `skills/`, the template or `WIRE-INTO-PROJECT.md`.
+- `.claude/rules/product.md` summarizes what ships; read it before touching `tools/`, `skills/`, the template or `WIRE-INTO-PROJECT.md`.
 - `AGENTS.md` is canonical and `CLAUDE.md` imports it; `tools/agent-instructions/` wires every other agent's filename to it.
 - `skills/session-kickoff/` stays at the repository root, because every machine discovers it through a junction.
-- The memory tree is flat: a spec, review or research record lives in its build's folder, and `memory/project/` holds only waiver registries.
+- The memory tree is flat: a spec, review or research record lives in its build's folder, and `memory/project/` holds only the gates' row registries.
 - The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.toml`, which shrinks unless a recorded decision says otherwise.
 - Work state is read from the generated `memory/LIVE.md` and `memory/ledger/`; there is no authored session ledger.
 - Read `memory/guides/MERGE-BAR.md` before running, scoping or debugging a bar, and before any push.
@@ -75,7 +75,7 @@ rendered text. Every rule is one line: a tool, gate or protocol named in section
 
 <!-- one-line -->
 - Identify your node by machine and user, never by path: every node's checkout may sit at one path.
-- A new node claims its tag once, in the governance repository, with `<prefix>/playbook/render_playbook.py --claim-node`, then re-renders; nobody adds a row here.
+- A new node claims its tag once, in the governance repository, with `<prefix>/playbook/render_playbook.py --claim-node`; each repository receives it at its next `govkit update`.
 - Onboarding a node: clone to its primary tree, claim its tag, seed local memory from the in-repo mirror, and recreate its worktrees, which never sync.
 <!-- /one-line -->
 
@@ -91,8 +91,10 @@ rendered text. Every rule is one line: a tool, gate or protocol named in section
 - `<prefix>/workflows/tier2-review.js` runs a Tier-2 review as one bounded `Workflow`.
 - The agent-cap hook refuses an unbounded fan-out at the tool call; consolidate the fan-out rather than routing around it.
 - `/unattended` starts, resumes or closes a run that merges and pushes with no owner turn.
+- `/runlog` answers what an unattended run did, decided or cost, and why it stopped.
 - `<prefix>/push-main.sh` lands and pushes the default branch, and nothing bypasses it.
-- Parallel pytest runs take the guardrails kit's settings: per-file isolation, per-test timeouts, fail-fast on worker death and crash attribution.
+- `<prefix>/process-monitor/reap.py` reaps processes past their declared ceiling; `--dry-run` lists them first.
+- Parallel pytest runs take the guardrails kit's settings: per-file isolation, per-test timeouts, fail-fast on worker death, crash attribution, structural test classes and opt-in parallelism.
 - The gate-lint scans catch shell failures that are silent by construction, such as case-colliding PowerShell names and BOM-less non-ASCII.
 <!-- /one-line -->
 
@@ -141,6 +143,7 @@ rendered text. Every rule is one line: a tool, gate or protocol named in section
 - [r1] Emit each shape as a bare `- ` list item at column 0: no backticks, fence, bold or heading, and one shape per line.
 - [grammar] A shape is a head keyword, the ` — ` joiner and fields separated by ` · `; `[ · …]` marks an optional trailing field and never appears in an emission.
 - [pair] `BUILD` then `SPEC` sit adjacent in the state block of every final message while a build is in progress; before a spec exists, `SPEC` is omitted.
+- [fields] `SPEC`'s link label is the unit id, `BUILD`'s Tier is the current step's, and `review` and `open` count Tier-2 units build-wide.
 - [gates-line] The `gates` line names every leg the gate manifest defines; a leg not run is a `skipped` line, and a failed leg is prose above everything.
 - [state] A final message opens with its highest-severity item and ends with ONE state block: branch, shas, gates and servers.
 - [links] Cite files as `[text](path)` links, forward-slashed and resolved from the session's working directory.

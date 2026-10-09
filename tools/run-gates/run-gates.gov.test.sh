@@ -268,8 +268,8 @@ else
   # the charter SENDS a reader there. The retired-figures arm below stays and grows: a figure quoted as
   # current is the defect, whichever figure it is.
   a=$((a+1))
-  if grep -qE '335s|~?95s|3085 s|393 s wall' "$CHARTER"; then
-    echo "gov-canary: $CHARTER quotes a retired bar timing as if it were current (335s / 95s / 3085 s / 393 s wall); the bar's per-leg seconds live in <git-dir>/gate-ledger.tsv and prose beside a source that owns a number is the rule this arm exists to hold"; fail=1
+  if grep -qE '335s|~?95s|3085 s|393 s wall' "$ROOT/AGENTS.md" "$BAR_GUIDE"; then
+    echo "gov-canary: AGENTS.md or $BAR_GUIDE quotes a retired bar timing as if it were current (335s / 95s / 3085 s / 393 s wall); the bar's per-leg seconds live in <git-dir>/gate-ledger.tsv and prose beside a source that owns a number is the rule this arm exists to hold"; fail=1
   fi
   a=$((a+1))
   grep -q 'gate-ledger.tsv' "$CHARTER" || { echo "gov-canary: $CHARTER no longer sends a reader to <git-dir>/gate-ledger.tsv for the bar's per-leg seconds, so the negative half above would pass on a charter that says nothing about cost at all — silence and a correct pointer are not the same answer"; fail=1; }
@@ -277,8 +277,8 @@ else
   # its width from a declared table now, so a charter naming a formula is telling a session something
   # it cannot verify anywhere in the tree.
   a=$((a+1))
-  if grep -qF 'min(8, nproc)' "$CHARTER"; then
-    echo "gov-canary: $CHARTER still states the built-in width formula; the width is declared in ${PFX}${KIT}/gate-profiles.txt and read from there"; fail=1
+  if grep -qF 'min(8, nproc)' "$ROOT/AGENTS.md" "$BAR_GUIDE"; then
+    echo "gov-canary: AGENTS.md or $BAR_GUIDE still states the built-in width formula; the width is declared in ${PFX}${KIT}/gate-profiles.txt and read from there"; fail=1
   fi
   a=$((a+1))
   grep -qF ''"${PFX}${KIT}/gate-profiles.txt"'' "$CHARTER" \

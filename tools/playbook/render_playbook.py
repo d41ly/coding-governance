@@ -136,9 +136,13 @@ class Refusal(Exception):
 
 # --------------------------------------------------------------------------- derivation probes
 def read_git(root: Path, *args: str) -> str:
-    """Run git in the target and return stdout, or the empty string when it cannot answer."""
+    """Run git in the target and return stdout, or the empty string when it cannot answer.
+
+    No inherited `GIT_*` variable reaches git (TOOL-aDistilledCharter-7, R6): a hook reached through a
+    `.git` file exports `GIT_DIR`, which outranks `-C` and would answer for the ambient repository."""
+    env = {k: v for k, v in os.environ.items() if not k.startswith('GIT_')}
     try:
-        r = subprocess.run(['git', '-C', root.as_posix(), *args],
+        r = subprocess.run(['git', '-C', root.as_posix(), *args], env=env,
                            capture_output=True, text=True, encoding="utf-8", timeout=30)
         return r.stdout.strip() if r.returncode == 0 else ''
     except (OSError, subprocess.SubprocessError):
@@ -289,7 +293,7 @@ def read_fleet(path: Path) -> list[dict]:
     if not rows:
         raise Refusal(f'the fleet registry at {path.as_posix()} names no node, so no node could '
                       f'identify itself from the charter')
-    tags, idents = set(), set()
+    tags, users = set(), []
     for n, row in enumerate(rows, 1):
         tag = row.get('tag')
         if not (isinstance(tag, str) and re.fullmatch(r'[a-z]', tag)):
@@ -302,13 +306,30 @@ def read_fleet(path: Path) -> list[dict]:
         for key in ('host', 'variances'):
             if not isinstance(row.get(key, ''), str):
                 raise Refusal(f'fleet row {n} (`{tag}`): `{key}` must be a string')
-        ident = (row['user'].strip().lower(), row.get('host', '').strip().lower())
-        if ident in idents:
-            raise Refusal(f'fleet row {n} (`{tag}`): user {row["user"]!r} on host '
-                          f'{row.get("host", "")!r} already has a tag')
+        clash = check_user_clash(row['user'], users)
+        if clash:
+            raise Refusal(f'fleet row {n} (`{tag}`): {clash}')
         tags.add(tag)
-        idents.add(ident)
+        users.append((row['user'], tag))
     return sorted(rows, key=lambda r: r['tag'])
+
+
+def check_user_clash(user: str, held: list[tuple[str, str]]) -> str:
+    """Why `user` cannot join a fleet holding `held` (user, tag) pairs, or '' when it can.
+
+    TOOL-aDistilledCharter-7, R3. Every reader of the rendered table matches the USER alone —
+    `manifest-check.sh` by equality or the `<user> @` prefix, `run-selftests.sh` by a substring of
+    `$USERNAME` — so a second row for one user, on any host, is a node no reader can tell apart, and
+    one user name inside another is the substring reader's wrong answer."""
+    u = user.strip().lower()
+    for other, tag in held:
+        o = other.strip().lower()
+        if u == o:
+            return f'user {user!r} already holds tag `{tag}`, and readers match the user alone'
+        if u in o or o in u:
+            return (f'user {user!r} and the user {other!r} of tag `{tag}` contain one another, and a '
+                    f'reader matching by substring would take the wrong row')
+    return ''
 
 
 def resolve_node_overrides(target: Path, tags: set[str]) -> dict[str, dict]:
@@ -391,14 +412,13 @@ def write_fleet_claim(engine_dir: Path, user: str, host: str, projects_root: str
         if not val.strip():
             raise Refusal(f'{key} is empty')
     for val in (user, host, projects_root, variances):
-        if any(ord(c) < 32 for c in val):
+        if any(ord(c) < 32 or ord(c) == 127 for c in val):
             raise Refusal('a claim value carries a control character')
     path = engine_dir / FLEET_NAME
     fleet = read_fleet(path)
-    ident = (user.strip().lower(), host.strip().lower())
-    for r in fleet:
-        if (r['user'].strip().lower(), r.get('host', '').strip().lower()) == ident:
-            raise Refusal(f'user {user!r} on host {host!r} already holds tag `{r["tag"]}`')
+    clash = check_user_clash(user, [(r['user'], r['tag']) for r in fleet])
+    if clash:
+        raise Refusal(clash)
     taken = {r['tag'] for r in fleet}
     free = next((c for c in 'abcdefghijklmnopqrstuvwxyz' if c not in taken), None)
     if free is None:
@@ -412,8 +432,14 @@ def write_fleet_claim(engine_dir: Path, user: str, host: str, projects_root: str
     block = eol + b'[[node]]' + eol + eol.join(s.encode('utf-8') for s in row) + eol
     if not raw.endswith(eol):
         raw += eol
+    # Parse the WHOLE new file before writing it (R5): a claim that fails here leaves gov's fleet
+    # registry untouched, where a write-then-check left every later render refusing.
+    try:
+        tomllib.loads((raw + block).decode('utf-8'))
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+        raise Refusal(f'the claimed row would leave the fleet registry unreadable ({e}); nothing '
+                      f'was written')
     path.write_bytes(raw + block)
-    read_fleet(path)  # the appended file must still grade, or the claim wrote something unreadable
     return free
 
 
@@ -717,8 +743,23 @@ def read_charter_table(cfg: dict, rows: list[dict], argv_tokens: set[str]) -> di
 
 def resolve_placeholder_value(row: dict, charter: dict, answers: dict,
                               target: Path, engine_dir: Path | None = None) -> tuple[str, str]:
-    """One placeholder's value and its note line. Precedence: `[charter]`, `[answers]`, then the
-    probe (derived) or the declared default (defaulted). The one site the three classes share."""
+    """One placeholder's value and its note line, as the render AND `--answers` both use it.
+
+    TOOL-aDistilledCharter-7. The trailing newlines of a TOML multi-line string go here (R8), so a
+    sibling renderer asking `--answers` gets the value the charter carries; and a value carrying a
+    one-line marker is refused (R7), because it could close a region early and escape the grade."""
+    val, note = resolve_placeholder_raw(row, charter, answers, target, engine_dir)
+    val = str(val).rstrip('\n')
+    if ONE_LINE_OPEN in val or ONE_LINE_CLOSE in val:
+        raise Refusal(f'the value for {row["key"]} carries a one-line region marker, which would let '
+                      f'it close the region the render grades')
+    return val, note
+
+
+def resolve_placeholder_raw(row: dict, charter: dict, answers: dict,
+                            target: Path, engine_dir: Path | None = None) -> tuple[str, str]:
+    """One placeholder's value as stated. Precedence: `[charter]`, `[answers]`, then the probe
+    (derived) or the declared default (defaulted). The one site the three classes share."""
     key, cls = row['key'], row.get('class')
     given = charter.get(key.lower()) or answers.get(key.lower())
     if cls == 'derived':
@@ -1165,7 +1206,12 @@ def run_selftest() -> int:
     for name, rows, want in (
             ('a repeated tag', fleet_rows + [('a', 'zed', 'Z', 'C:/p', '')], 'already taken'),
             ('a repeated user and host', fleet_rows + [('e', 'ann', 'HOSTA', 'C:/p', '')],
-             'already has a tag'),
+             'already holds tag'),
+            # R3: the readers match the user alone, so another host does not make a second row safe.
+            ('one user on a second host', fleet_rows + [('e', 'ANN', 'OTHER', 'C:/p', '')],
+             'already holds tag'),
+            ('one user name inside another', fleet_rows + [('e', 'bobby', 'B2', 'C:/p', '')],
+             'contain one another'),
             ('a two-letter tag', fleet_rows + [('ab', 'zed', 'Z', 'C:/p', '')],
              'not one lowercase letter')):
         _b, err = build_node_render(build_fleet_text(rows))
@@ -1256,6 +1302,54 @@ def run_selftest() -> int:
         check_arm(rc == 0 and ('Node registry' in out.getvalue()) == want_note,
               f'the stale-registry note prints {"when" if want_note else "only when"} a registry '
               f'sits outside the region', f'rc {rc} out {out.getvalue()!r}')
+
+    # TOOL-aDistilledCharter-7 — R5: DEL is refused and the fleet is untouched; R7: a [charter] value
+    # carrying a one-line marker is refused; R8: `--answers` agrees with the render; R6: an inherited
+    # GIT_DIR does not steer a probe at the ambient repository.
+    with tempfile.TemporaryDirectory() as td:
+        eng = Path(td)
+        (eng / FLEET_NAME).write_text(build_fleet_text(fleet_rows), encoding='utf-8')
+        before = (eng / FLEET_NAME).read_bytes()
+        try:
+            write_fleet_claim(eng, 'eve', 'H3', 'C:/p', 'quirk' + chr(127))
+            got = 'no refusal'
+        except Refusal as e:
+            got = str(e)
+        after = (eng / FLEET_NAME).read_bytes()
+    check_arm('control character' in got and before == after,
+              'a claim carrying DEL is refused and leaves the fleet registry untouched',
+              f'got {got!r}, file changed {before != after}')
+    arm_fixture('a [charter] value carrying a one-line marker is refused', rules_desc,
+                region % '{{ADOPTER_RULES}}',
+                f'[charter]\nadopter_rules = """\n- ok\n{ONE_LINE_CLOSE}\nfree prose\n"""' + ans,
+                want='carries a one-line region marker')
+    with tempfile.TemporaryDirectory() as td:
+        eng, tgt = _write_fixture(Path(td), ok_kits, ok_var)
+        (eng / 'playbook.kit.toml').write_text(trailer_desc, encoding='utf-8')
+        dep = tgt / '.governance' / 'deploy.toml'
+        dep.write_text(dep.read_text(encoding='utf-8')
+                       + '\n[charter]\ncommit_trailer = """\nTRAILER\n"""\n', encoding='utf-8')
+        got = resolve_answers(eng, Path(td), tgt, ['commit_trailer'])
+    check_arm(got == {'commit_trailer': 'TRAILER'},
+              '--answers strips a multi-line value exactly as the render does', f'got {got!r}')
+    ambient = read_git(Path(__file__).resolve().parent, 'rev-parse', '--absolute-git-dir')
+    if not ambient:
+        print('  arm SKIP an inherited GIT_DIR does not steer a probe — this engine sits in no git '
+              'repository, so there is no ambient one to leak')
+    else:
+        saved = os.environ.get('GIT_DIR')
+        os.environ['GIT_DIR'] = ambient
+        try:
+            with tempfile.TemporaryDirectory() as td:
+                seen = derive_primary_tree(Path(td), {})
+                want = Path(td).resolve().as_posix()
+        finally:
+            if saved is None:
+                os.environ.pop('GIT_DIR', None)
+            else:
+                os.environ['GIT_DIR'] = saved
+        check_arm(seen == want, 'an inherited GIT_DIR does not steer a probe at the ambient repository',
+                  f'derived {seen!r}, wanted {want!r}')
 
     # S3 / AC5 — the template is never its own charter. Driven through `main`, so the exit code is
     # the one an operator sees, over gov's own declarations and a real registry entry.
@@ -1416,7 +1510,7 @@ def main(argv: list[str]) -> int:
             print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
             return 1
         print(f'render-playbook — claimed tag `{tag}` for {a.user} @ {a.host or "<no host>"}; '
-              f'commit the fleet registry, then re-render every repository this node works in')
+              f'commit the fleet registry; each repository receives it at its next govkit update')
         return 0
     if not a.target:
         ap.error('--target is required')

@@ -4278,6 +4278,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_user_clash",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "check_view_line",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -14271,6 +14276,11 @@
       "id": "resolve_pattern_sets",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "resolve_placeholder_raw",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "resolve_placeholder_value",

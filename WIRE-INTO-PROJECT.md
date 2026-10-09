@@ -122,7 +122,8 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
   filename, and Claude Code does not read `AGENTS.md` natively. Drop it only if exactly one agent
   tool reads this repo; with two, this kit is what stops the second reading a stale copy.
 - **Parallel-test guardrails** (`pytest-parallel-guardrails/` kit): drop it if the project is not
-  Python or does not run `pytest -n auto`. The bug classes it fixes stay in the charter either way.
+  Python or does not run `pytest -n auto`. The charter's one line on the bug classes it fixes is
+  that kit's tools line, so a selection without the kit carries no line on them.
 - **A source-hygiene scan for PowerShell** (`gate-lint/` kit): drop it if the project has no `.ps1`
   files. A repo with none gets a clean report that proves nothing, which is honest and is why it is
   adopted only where the language exists.
@@ -167,8 +168,10 @@ procedure belongs in a guide the rule points at.
 
 An adopter that kept its own registry above the rendered region still reads its OLD tags, because
 readers take the first `## Node registry` in the charter, and the render prints a note saying so. To
-take the fleet's: make sure every node working here holds a fleet row (claim one in gov if not),
-delete the authored `## Node registry` section, remove `node-table` from `drop_blocks`, and re-render.
+take the fleet's: make sure every node working here holds a fleet row — claim one in gov if not,
+and this repository receives it at its next `govkit update`, which refreshes the fleet registry
+beside the engine — then delete the authored `## Node registry` section, remove `node-table` from
+`drop_blocks`, and re-render.
 Ids minted under an old tag stay valid: the all-time slug collision grep protects them, and frozen
 records keep the letter they were written with.
 
@@ -1993,10 +1996,14 @@ a `{kit}` token and both the writer and the checker expand it against the fragme
   re-run `--scaffold`; the cache invalidates itself on the resolved conf, so no manual purge is needed.
 
 - **Precedence on any conflict:** `CLAUDE.md` > manifest > skill — follow the winner, fix the loser.
-- **Pull upstream improvements:** the charter carries `governance-template: vN.N`, and a rendered
-  charter takes a new release by `govkit update`, whose regenerate re-renders the region (unless
-  GOVKIT_RERENDER=0). The manifest carries its own `kickoff-manifest: vN.N`. The `memory-tree/`
-  scripts are identical across repos — copy the newer versions in wholesale.
+- **Pull upstream improvements:** the charter carries `governance-template: vN.N`. `govkit update`
+  refreshes the engine and its declarations and re-renders the region from the template you HAVE
+  (unless GOVKIT_RERENDER=0): the template is a seed it never rewrites, and it reports
+  `reseed-available` when gov's has moved. To take a new template version, copy
+  `<gov>/coding-governance-agents.template.md` over the file `playbook_path` names, then re-render;
+  until you do, an older template still renders and the render notes its marker. The manifest
+  carries its own `kickoff-manifest: vN.N`. The `memory-tree/` scripts are identical across repos —
+  copy the newer versions in wholesale.
   **v4.0 (2026-10-09) REPLACES the charter's shape:** sections §0 to §16 are gone. Section 1 is
   one-line practices, each with a handle such as `[gate]`; section 2 is the adopter's
   `[charter] adopter_rules`; section 3 is generated. Every v3.5 rule's destination is the ledger in

@@ -7,8 +7,7 @@
 #
 # WHY EACH ARM IS A RED PROOF. The gate under test exists to catch coverage checks that pass by
 # checking nothing, so a harness that only ever watched it pass would be the very defect it gates.
-# `coding-governance-agents.template.md` §7: "a new gate is not landed until its failing case has
-# been observed."
+# The charter's `[gate]` practice: a gate is not landed until its failing case has been observed.
 #
 # HOW THE ARMS WORK. Every arm builds a scratch WORKTREE-SHAPED fixture — a real git repo with its
 # own <prefix>/, charter and runbook — and runs the gate inside it. Nothing here mutates the real tree,
@@ -261,6 +260,10 @@ arm "AC3 at a root install an unresolvable registry REFUSES" refuse \
 arm "AC3 at a root install a declared kit the playbook never names reds by name" red \
   "a kit ships and the playbook never names it, with no waiver row to excuse it: orphankit" \
   add_kit "" orphankit
+# TOOL-aDistilledCharter-7, G2: with no tool root to scan, S4 takes every derived kit directory.
+arm "S4 at a root install a kit file citing a charter section reds" red \
+  "a live file cites a charter section by number, and v4.0 has no numbered sections; cite the handle or the owning guide: ${MT_KIT}/engine.sh:" \
+  sh -c 'printf "# see \302\2471 Landing\n" >> '"${MT_KIT}/engine.sh"''
 FX=$PFX
 
 # --- AC2 · the unit's central proof: a stated value drifting from the source that owns it ----------
@@ -286,8 +289,18 @@ arm "S4 a named v3.5 subsection reds by file" red "${S4_RED}${PFX}${MT_KIT}/engi
   sh -c 'printf "# see §1 Landing\n" >> '"${PFX}${MT_KIT}/engine.sh"''
 arm "S4 the spec template's own sections are not a hit" ok "" \
   sh -c 'printf "the spec template'"'"'s §8 readers\n" >> WIRE-INTO-PROJECT.md'
+# TOOL-aDistilledCharter-7, G5: the forms the byte-mode predicate missed, one arm each, and the
+# protocol template's own sections, which are real.
+arm "S4 a curly-apostrophe citation reds" red "${S4_RED}WIRE-INTO-PROJECT.md:" \
+  sh -c 'printf "see the charter\342\200\231s \302\2477\n" >> WIRE-INTO-PROJECT.md'
+arm "S4 a non-breaking-space citation reds" red "${S4_RED}WIRE-INTO-PROJECT.md:" \
+  sh -c 'printf "see the charter\302\240\302\2477\n" >> WIRE-INTO-PROJECT.md'
+arm "S4 a trailing-form citation reds" red "${S4_RED}WIRE-INTO-PROJECT.md:" \
+  sh -c 'printf "as \302\2477 of the charter says\n" >> WIRE-INTO-PROJECT.md'
+arm "S4 the protocol template's own sections are not a hit" ok "" \
+  sh -c 'printf "the protocol template'"'"'s \302\24713 exit\n" >> WIRE-INTO-PROJECT.md'
 arm "S4 an untracked template refuses rather than grading nothing" red \
-  "the section-citation surface is empty or lacks the tracked template, so no citation could be found and this stage must not report clean" \
+  "the section-citation surface is empty, lacks the tracked template or holds no kit file, so no citation could be found and this stage must not report clean" \
   sh -c 'printf "coding-governance-agents.template.md\n" > .gitignore && git rm -q --cached coding-governance-agents.template.md'
 # AC3 — the clean fixture's run prints a NON-ZERO near-miss count: a stage that can measure nothing
 # would print zero here, which is the reassuring silence this tree refuses.

@@ -20,6 +20,8 @@ kits = [
   "memory-recall", "drift-audit", "agent-instructions", "unattended", "lexicon",
   "pytest-parallel-guardrails", "gate-lint", "agent-cap", "review-harness",
   "settings-merge", "check-wiring", "push-main", "check-kit-versions", "check-install-prefix",
+  "runlog",
+  "process-monitor",
 ]
 
 # NO `drop_blocks`. `cross-os` applies: this fleet is multi-OS, four nodes on Windows and POSIX
@@ -56,10 +58,10 @@ user_skills = "~/.claude/skills"
 [charter]
 adopter_rules = """
 - This repository ships the charter template and the kits under `tools/`, and dogfoods every kit it ships on itself.
-- What ships, kit by kit, is `.claude/rules/product.md`; read it before touching `tools/`, `skills/`, the template or `WIRE-INTO-PROJECT.md`.
+- `.claude/rules/product.md` summarizes what ships; read it before touching `tools/`, `skills/`, the template or `WIRE-INTO-PROJECT.md`.
 - `AGENTS.md` is canonical and `CLAUDE.md` imports it; `tools/agent-instructions/` wires every other agent's filename to it.
 - `skills/session-kickoff/` stays at the repository root, because every machine discovers it through a junction.
-- The memory tree is flat: a spec, review or research record lives in its build's folder, and `memory/project/` holds only waiver registries.
+- The memory tree is flat: a spec, review or research record lives in its build's folder, and `memory/project/` holds only the gates' row registries.
 - The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.toml`, which shrinks unless a recorded decision says otherwise.
 - Work state is read from the generated `memory/LIVE.md` and `memory/ledger/`; there is no authored session ledger.
 - Read `memory/guides/MERGE-BAR.md` before running, scoping or debugging a bar, and before any push.

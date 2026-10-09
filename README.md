@@ -25,7 +25,8 @@ machines/sessions on the same repo.
   block (`last-audit` stamp · `watch` pathspecs · `verify-paths` anchors), the
   `manifest-check.sh` gate (placeholders · block parse · anchor sha · tracked anchors ·
   topological drift-vs-stamp · watch liveness; self-test `manifest-check.test.sh`), a kickoff
-  read-repair step in the engine, and a DoD write-back line in the playbook (v2.2). Spec + design
+  read-repair step in the engine, and the `kickoff-manifest ratchet` leg, whose refusals name the
+  write-back a unit owes. Spec + design
   history: `memory/builds/aRatchetForge/`.
 - **`tools/memory-tree/`** — an opt-in kit for a structured, machine-linted `memory/` tree: a FLAT
   `builds/<slug>/` per unit of work, one append-only `DECISIONS.md`, per-family backlog shards, index

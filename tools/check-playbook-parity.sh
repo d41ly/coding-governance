@@ -213,8 +213,10 @@ waived=$(grep -vE '^[[:space:]]*(#|$)' "$WAIVERS" | awk '{print $1}' | sort -u)
 # The first form is THIS install's own root, derived, never gov's literal one: spelled `tools/` it
 # graded every other install against a root it does not have (TOOL-aRepatriatedFork-26, VERIFYING
 # repair). At a root install there is no root head, and a bare `<kit>/` is the substring above.
+# A `kit:<id>` fence NAMES its kit too (TOOL-aDistilledCharter-7, C7): since v4.0 the charter's
+# per-kit tools and protocol lines sit inside one, and spell no install path at all.
 named_in_playbook() { # <kit>
-  grep -qE "${SELF_PRE:+$SELF_PRE$1/|}<prefix>/$1/|\`$1/\`" "$TEMPLATE" "$RUNBOOK" 2>/dev/null
+  grep -qE "${SELF_PRE:+$SELF_PRE$1/|}<prefix>/$1/|\`$1/\`|<!-- kit:$1 -->" "$TEMPLATE" "$RUNBOOK" 2>/dev/null
 }
 
 for k in $kits; do
@@ -315,16 +317,28 @@ rm -f "$PPTMP"
 # (`spec template's §8`) is excluded, because TEMPLATE-SPEC.md's numbered sections are real; a line
 # carrying both forms is excluded whole. Frozen records under the memory tree are outside the surface.
 # This gate's own file and its self-test are excluded too: both spell the predicate on purpose.
-s4_paths=()
+#
+# TOOL-aDistilledCharter-7 widened it after the closing review: every derived kit directory joins the
+# surface, so a ROOT install (empty SELF_PRE) still grades its kits (G2); so do CLAUDE.md and the
+# memory root's own live guides, DECISIONS.md excepted (G8); the pathspec-mode variables are unset,
+# or a `:!` exclusion reads as a file name (G6). The predicate reads git grep's BYTES, so every
+# multibyte separator is an alternative rather than a bracket member (G5).
+unset GIT_LITERAL_PATHSPECS GIT_GLOB_PATHSPECS GIT_NOGLOB_PATHSPECS GIT_ICASE_PATHSPECS
+s4_kitpaths=()
+for k in $kits; do s4_kitpaths+=("${SELF_PRE}$k"); done
+s4_paths=("${s4_kitpaths[@]}")
 [ -n "${SELF_PRE%/}" ] && s4_paths+=("${SELF_PRE%/}")
 s4_paths+=(skills .githooks .claude/rules .claude/skills memory/guides WIRE-INTO-PROJECT.md README.md
-  AGENTS.md "$TEMPLATE" ":!${SELF_PRE}check-playbook-parity.sh" ":!${SELF_PRE}check-playbook-parity.test.sh")
+  AGENTS.md CLAUDE.md "$TEMPLATE" ':(glob)memory/*.md' ':!memory/DECISIONS.md'
+  ":!${SELF_PRE}check-playbook-parity.sh" ":!${SELF_PRE}check-playbook-parity.test.sh")
 s4_pop=$(git ls-files -- "${s4_paths[@]}" | grep -c . || true)
-if [ "$s4_pop" -eq 0 ] || [ -z "$(git ls-files -- "$TEMPLATE")" ]; then
-  fail 17 "the section-citation surface is empty or lacks the tracked template, so no citation could be found and this stage must not report clean"
+s4_kitpop=$(git ls-files -- "${s4_kitpaths[@]}" | grep -c . || true)
+if [ "$s4_pop" -eq 0 ] || [ "$s4_kitpop" -eq 0 ] || [ -z "$(git ls-files -- "$TEMPLATE")" ]; then
+  fail 17 "the section-citation surface is empty, lacks the tracked template or holds no kit file, so no citation could be found and this stage must not report clean"
 else
-  s4_pred='(^|[^a-z])(charter|template|playbook|governance|agents\.md)(.s)?[^a-z0-9§]{0,3}§[0-9]|§1 Landing|§16 R1'
-  s4_hits=$(git grep -n -I -i -E "$s4_pred" -- "${s4_paths[@]}" 2>/dev/null | grep -v -i "spec template" || true)
+  s4_nb=$(printf '\302\240'); s4_nd=$(printf '\342\200\223'); s4_ap=$(printf '\342\200\231')
+  s4_pred='(^|[^a-z])(charter|template|playbook|governance|agents\.md)s?(\.md)?('"'"'s|'"$s4_ap"'s)?([[:space:],:(`-]|'"$s4_nd"'|'"$s4_nb"'){0,3}(§)+ ?[0-9]|§1 Landing|§16 R1|§[0-9]+ (of|in) (the )?(charter|agents\.md)'
+  s4_hits=$(git grep -n -I -i -E "$s4_pred" -- "${s4_paths[@]}" 2>/dev/null | grep -v -i -E '(spec|protocol)[- ]template' || true)
   s4_near=$(git grep -n -I -E '§[0-9]' -- "${s4_paths[@]}" 2>/dev/null | grep -c . || true)
   while IFS= read -r h; do
     [ -n "$h" ] || continue

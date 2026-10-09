@@ -1,6 +1,6 @@
 # aDistilledCharter — acceptance ledger
 
-**Serves:** journal TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1
+**Serves:** journal TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 DEPL-aDistilledCharter-2
 
 Observed on node `a` on 2026-10-09, over this build's branch. Every red proof was a staged break
 observed red and then removed; none was left in the tree.
@@ -19,6 +19,7 @@ observed red and then removed; none was left in the tree.
 - AC4 — `--claim-node` — a scratch copy of the engine holding `fleet.toml` with a, b and d claimed `c`, refused the same identity in another case, and refused once `playbook.kit.toml` sat beside it
 - AC5 — `drop_blocks = ["node-table"]` — renders with a `retired` note, and refuses with `RETIRED_BLOCKS` emptied
 - AC6 — `## Node registry` — `--check` prints the note for a registry outside the region and not otherwise; the arm fails with the note's search disabled
+- AC7 — `memory/archive/coding-governance-agents.template-v-3-5.md` — rendered with BASE's deploy answers under the rev-2 engine, writing the region and noting `legacy    template v3.5 … reseed`; the two v3-template arms against the shipped descriptor fail when the `TAG_A` row leaves it
 
 **Evidences:** TOOL-aDistilledCharter-3
 - AC1 — `bash tools/check-playbook-parity.sh` — prints `pairs in agreement`, naming no retired pair
@@ -36,7 +37,7 @@ observed red and then removed; none was left in the tree.
 - AC3 — `bash tools/check-microformats.sh` — 11 definitions graded, and the definition block is byte-identical to BASE's
 - AC4 — `memory-tree` — a scratch target selecting only it rendered no other kit's tools or protocol line
 - AC5 — `tools/gate-legs.json` — a resolver over the 115 ledger rows found 0 unresolved, and 2 when one handle was renamed
-- AC6 — `tools/template-size-highwater.txt` — records 11455; `bash tools/check-template-size.sh` is green; the archive is the 48597 bytes of BASE
+- AC6 — `tools/template-size-highwater.txt` — recorded 11455 at this unit and 11758 after TOOL-aDistilledCharter-7 restored four clauses; `bash tools/check-template-size.sh` is green; the archive is the 48597 bytes of BASE
 
 **Evidences:** PLAY-aDistilledCharter-2
 - AC1 — `memory/guides/REVIEW-PROTOCOL.md` — `## Tiers` at line 184 and `## Security boundaries` at line 198; each v3.5 §9 rule has a bullet
@@ -49,12 +50,34 @@ observed red and then removed; none was left in the tree.
 **Evidences:** PLAY-aDistilledCharter-4
 - AC1 — `bash tools/playbook/adopt-playbook.sh --target . --check` — `render-playbook OK`
 - AC2 — `bash skills/session-kickoff/manifest-check.sh --card --write` — a probe card's node cell reads `a · daily-agent @ COMPEETO-AGENT`
-- AC3 — `bash tools/check-template-size.sh AGENTS.md` — 13151 of 16384 bytes, below the 32768 a Codex agent reads
+- AC3 — `bash tools/check-template-size.sh AGENTS.md` — 13151 of 16384 bytes at this unit, 13632 after TOOL-aDistilledCharter-7, both below the 32768 a Codex agent reads
 - AC4 — `python tools/memory-tree/corpus_ids.py` — prints no `check 16 rule 3` line
 
 **Evidences:** DEPL-aDistilledCharter-1
 - AC1 — `WIRE-INTO-PROJECT.md` — every remaining section sign names the runbook's own sections or a frozen release note, and S4 is clean over it
 - AC2 — `--claim-node` — the runbook names `adopter_rules` and the claim command
+
+**Evidences:** TOOL-aDistilledCharter-5
+- AC1 — `python tools/playbook/render_playbook.py --selftest` — two clones named apart both render `C:/p/app`, and a `primary_tree` override still wins; with the checkout directory restored as the source, three arms fail
+- AC2 — `project_name` — with no answer the render refuses naming it
+
+**Evidences:** TOOL-aDistilledCharter-6
+- AC1 — `bash tools/check-playbook-parity.sh` — the three README pairs agree; a staged `≤7` in the README's lens bound reds `lens-array bound`
+- AC2 — `const MAX_LENSES = 6` — the restored arm passes in the parity self-test
+
+**Evidences:** DEPL-aDistilledCharter-2
+- AC1 — `python tools/govkit/govkit.py selfcheck` — exits 0 with `review-harness` in `tools/govkit/registry.toml`'s default list
+- AC2 — `grep -n 'review-harness' WIRE-INTO-PROJECT.md` — prints the §2 line on the security checklist
+
+**Evidences:** TOOL-aDistilledCharter-7
+- AC1 — `python tools/playbook/render_playbook.py --selftest` — 51 arms pass, the R3, R5, R7 and R8 arms among them; four staged breaks turned seven arms red
+- AC2 — `GIT_DIR` — the selftest passes with `GIT_DIR` exported to this repository's git dir, and the R6 arm fails with the environment passed through
+- AC3 — `the protocol template's §13` — the curly-apostrophe, non-breaking-space and trailing-form arms red and the protocol-template arm passes, in the parity self-test
+- AC4 — `§1 Landing` — the root-install arm reds on a kit file citing it
+- AC5 — `python3 tools/memory-tree/check-arms.py --emit-floors` — measures `13:11`, now the pin; `bash tools/check-playbook-parity.sh` passes with the `runlog` row drained
+- AC6 — `min(8, nproc)` — a canary slice fails with it in `AGENTS.md` and passes on the tree
+- AC7 — `coding-governance-agents.template.md` — the C5, C6, C8 and C10 clauses are present at 193, 189, 191, 178, 111 and 139 characters, each inside `ONE_LINE_MAX`
+- AC8 — `grep -n 'runlog' AGENTS.md` — prints the tools line at line 94; `manifest-check.sh`'s retrofit step re-renders rather than pulling lines into the playbook
 
 **Evidences:** KICK-aDistilledCharter-1
 - AC1 — `awk` — zero continuation lines between §B's heading and the pointer map
