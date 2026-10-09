@@ -512,7 +512,8 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `LANDED_FACTS_CUTOFF` | from this date a landed record carries its verb's facts. Blank is off |
 | `HANDOFF_CUTOFF` | from this date `ABORTED` means DISCARD, §3. Blank is off |
 | `LANDING_NODES` | `<tag>=<machine>/<user>` pairs that may land, read at BASE and at R; any other node hands off; `%20` spells a space. Blank: every node, announced. §6 |
-| `DISPOSITION_CUTOFF` | the date from which a review exit's RECORDED disposition is read instead of inferred from new unit ids. Graded on the run-state record's own first-commit date; a record before it keeps the id-delta proxy, EXCEPT one with no first-commit date at all — a staged, in-flight record is graded whatever the cutoff says, being the one case that can still record a disposition. Blank or absent grandfathers every record and the leg says so on stdout, because a silently disabled clause reads exactly like a clause finding nothing wrong |
+| `DISPOSITION_CUTOFF` | the date from which a review exit's RECORDED disposition is read instead of inferred from new unit ids. Graded on the run-state record's own first-commit date; a record before it keeps the id-delta proxy, EXCEPT one with no first-commit date at all — a staged, in-flight record is graded whatever the cutoff says. Blank or absent grandfathers every record and the leg says so on stdout |
+| `PROMPT_BRIEF_CUTOFF` | from this `opened:` date preflight refuses a prompt record with no brief. Blank is off. `UNATTENDED-VERBS.md` |
 | `RUNLOG_SESSION_VARS` | the environment variable NAMES, space-separated and eight at most, whose values each run-log START records as `sess.<NAME>=` (§2); a value outside `[A-Za-z0-9_.:-]{1,128}` is written empty and flagged. OPTIONAL: blank records none |
 
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no

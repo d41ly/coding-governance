@@ -3818,6 +3818,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "check_prompt_brief",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_provenance_chain",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"

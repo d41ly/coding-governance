@@ -29,3 +29,11 @@ anchor-ref: refs/heads/main
 base: 6473ae38a517a3559f2b7daed67a9820c505bd4d
 
 ## Parked
+
+2026-10-09T01:25:26Z dispatch · item 759e04fd TOOL-aQuotedBrief-1 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md tools/unattended/PROTOCOL.template.md tools/unattended/.unattended.conf.example memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-PROTOCOL.md .claude/skills/unattended/SKILL.md .unattended.conf memory/map/generated/symbols.json
+
+2026-10-09T01:26:10Z brief · item TOOL-aQuotedBrief-1 · reason 69417c45acd3 memory/builds/aQuotedBrief/prompts/2026-10-09-prompt-TOOL-aQuotedBrief-1-1-build-brief.md
+
+2026-10-09T02:18:55Z dispatch · item 759e04fd TOOL-aQuotedBrief-1 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md tools/unattended/PROTOCOL.template.md tools/unattended/.unattended.conf.example memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-PROTOCOL.md .claude/skills/unattended/SKILL.md .unattended.conf memory/map/generated/symbols.json memory/builds/aQuotedBrief/build/2026-10-09-build-TOOL-aQuotedBrief-1-2-acceptance-ledger.md memory/guides/SESSION-KICKOFF.md
+
+2026-10-09T02:49:46Z dispatch · item 759e04fd TOOL-aQuotedBrief-1 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md tools/unattended/PROTOCOL.template.md tools/unattended/.unattended.conf.example memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-PROTOCOL.md .claude/skills/unattended/SKILL.md .unattended.conf memory/map/generated/symbols.json memory/builds/aQuotedBrief/build/2026-10-09-build-TOOL-aQuotedBrief-1-2-acceptance-ledger.md memory/guides/SESSION-KICKOFF.md memory/builds/aQuotedBrief/spec/2026-10-09-spec-TOOL-aQuotedBrief-1.md memory/builds/aQuotedBrief/README.md

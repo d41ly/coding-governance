@@ -538,7 +538,11 @@ the run, which makes "the owner was asked at the start" a property of the commit
    askable once. **The only owner turn there is**: one `AskUserQuestion`, every gap in it, four
    options at most per call. If ACCEPTANCE or GATES is still missing after it, stop without writing
    anything: no run started, so `--abort` and `--park` refuse with no run-state file, and protocol
-   §13 exit 5 does not reach here.
+   §13 exit 5 does not reach here. **The call is MANDATORY when step 3's `## Drawn from the session`
+   holds a quote**: it then carries the brief and asks the owner to accept it, edit it or cancel the
+   run, beside any gap question. A cancel writes nothing; an edit is folded into the brief before
+   the commit, with no second confirmation. A brief quoting nothing keeps the rule above: ask only
+   for gaps.
 3. **Write the build folder**, `builds/<slug>/README.md` under the memory root, with ALL SIX required
    front-matter keys — `slug`, `node`, `opened`, `streams`, `roster`, `ids` — plus
    `authorized-by: prompt`, and the generated-region marker pair `gen:build-index` with its close, or
@@ -552,6 +556,17 @@ the run, which makes "the owner was asked at the start" a property of the commit
    blind to fencing, so a prompt quoting the marker plants a second one; and a malformed record reds
    the memory gate here, where you can still fix it. The README states the build in its own words
    and points at the record; clarifications ride the record. The roster may be provisional.
+   **The record stands on its own**, because a resumed session or a later reader holds no
+   conversation: `## The prompt` verbatim, then three sections in this order, each non-empty.
+   `## The brief` holds `### Goal`, `### Items` (numbered `1.` lines), `### Acceptance`, `### Gates`
+   and `### Non-goals`, in that order. `## Drawn from the session` quotes, verbatim, every passage
+   the brief relied on, each followed by `— owner, <turn or time>` or `— agent, …`, since a brief may
+   rest on your own earlier proposal; it is the single line `none` when the brief relied on nothing
+   outside the prompt. `## Owner confirmation` holds step 2's question as `Asked: <verbatim>` and the
+   reply as `Answer: <verbatim>`; with `none` above it reads
+   `not asked — the brief draws on nothing outside the prompt`. From `PROMPT_BRIEF_CUTOFF`,
+   preflight refuses a record that breaks this shape and a build with no such record. A
+   `spec-audit:` ask counts only inside `## The prompt`, never in a section the run wrote.
 4. **Commit, then PUSH THE BRANCH**, in that order. Skip the push and preflight refuses with
    `the remote advertises no tip for the branch this run is on, so nothing published authorizes it`.
 5. **Preflight**, as on the slug path; it records the mode from the file you pushed.

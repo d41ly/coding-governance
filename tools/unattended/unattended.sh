@@ -496,7 +496,7 @@ HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI="";
 ASKS_CMD=""; HELD_CI_WORKFLOW=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""; RUN_CLAIMS=""
 GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
-DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
+DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; PROMPT_BRIEF_CUTOFF=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
 # contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
 # is a declared key and defaults here like its neighbours. GOV_RUNLOG is the ENVIRONMENT's switch, so
@@ -539,6 +539,8 @@ DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; RUNLOG_SESSION_V
 #     pairs. Defaulted for SPEC_AUDIT_DEFAULT's reason, and like it the value this source binds
 #     decides nothing: `resolve_landing_node` re-reads the key from the conf blob at the pinned BASE,
 #     because a run that added its own node to the working copy would grant itself a landing.
+#   * PROMPT_BRIEF_CUTOFF (TOOL-aQuotedBrief-1 S5) - the README `opened:` date from which a
+#     prompt-mode record must carry its brief, read by `check_prompt_brief`. Blank is off, announced.
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -3074,6 +3076,60 @@ read_audit_ask_record() { # build dir · base
       printf '%s\n' "$rec"; return 0
     fi
   done < <(GIT ls-tree --name-only --full-tree "$2" -- "$1/prompts/" 2>/dev/null)
+  return 1
+}
+
+# TOOL-aQuotedBrief-1 S4 - A PROMPT RECORD STANDS ON ITS OWN. A prompt fired mid-session ("yes, spec
+# it") authorizes a run whose scope lives in the conversation, so from PROMPT_BRIEF_CUTOFF, graded on
+# the README's `opened:` date read AT BASE, every record under prompts/ carrying `## The prompt` must
+# also carry `## The brief` (five `###` sub-heads in order, each non-empty, `### Items` numbered),
+# `## Drawn from the session` and `## Owner confirmation`, with an `Asked:` and an `Answer:` line
+# whenever the session section is anything but `none`. A prompt-mode build with no such record
+# refuses rather than passing over an empty population. Called from verb_preflight only, never from
+# check_authorization: --close re-runs that as `authorization-reachable`, which has no override, so a
+# second reading here could only strand a run.
+# WHAT THIS DOES NOT CHECK: that a brief which relied on the session quoted it - no machine sees the
+# conversation - nor the brief's content: a hollow but non-empty sub-section passes.
+check_prompt_brief() { # slug · base
+  local base="$2" rel dir opened rec why found=0
+  [ "${AUTH_MODE:-}" = prompt ] && [ -n "$base" ] || return 0
+  case "${PROMPT_BRIEF_CUTOFF:-}" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) echo "unattended: NOTE - PROMPT_BRIEF_CUTOFF is blank or not a YYYY-MM-DD date, so this prompt-mode build's record is not graded for a self-contained brief; declare one in $CONF to turn it on: ${PROMPT_BRIEF_CUTOFF:-blank}" >&2
+       return 0 ;;
+  esac
+  rel=$(readme_of "$1"); dir=$(dirname "$rel")
+  opened=$(GIT show "$base:$rel" 2>/dev/null | awk 'NR > 1 && /^---/ { exit } /^opened:/ { v = $2; sub(/\r$/, "", v); print v; exit }')
+  # Only a DATED README before the cutoff is grandfathered; an unreadable date is graded.
+  case "$opened" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$PROMPT_BRIEF_CUTOFF" ]] && return 0 ;;
+  esac
+  while IFS= read -r rec; do
+    why=$(GIT show "$base:$rec" 2>/dev/null | awk '
+      { sub(/\r$/, "") }
+      /^## / { h2 = $0; sub(/^## +/, "", h2); sub(/[[:space:]]+$/, "", h2); seen[h2] = 1; h3 = ""; next }
+      h2 == "The brief" && /^### / { h3 = $0; sub(/^### +/, "", h3); sub(/[[:space:]]+$/, "", h3); order = order "|" h3; next }
+      h2 == "The brief" && h3 != "" && /[^[:space:]]/ { full[h3] = 1; if (h3 == "Items" && /^[0-9]+\./) items = 1 }
+      h2 == "Drawn from the session" && /[^[:space:]]/ { l = $0; sub(/[[:space:]]+$/, "", l); drawn = drawn (drawn == "" ? "" : "\n") l }
+      h2 == "Owner confirmation" && /[^[:space:]]/ { conf = 1
+        if (/^Asked:[[:space:]]*[^[:space:]]/) asked = 1
+        if (/^Answer:[[:space:]]*[^[:space:]]/) answered = 1 }
+      END {
+        if (!seen["The prompt"]) { print "skip"; exit }
+        if (order != "|Goal|Items|Acceptance|Gates|Non-goals" || !full["Goal"] || !full["Items"] || !full["Acceptance"] || !full["Gates"] || !full["Non-goals"]) { print "rule 1"; exit }
+        if (!items) { print "rule 2"; exit }
+        if (drawn == "") { print "rule 3"; exit }
+        if (!conf) { print "rule 4"; exit }
+        if (drawn != "none" && !(asked && answered)) { print "rule 5"; exit }
+      }')
+    [ "$why" = skip ] && continue
+    found=1
+    [ -z "$why" ] && continue
+    fail 112 "a prompt record at the pinned BASE does not stand on its own, so a resumed session would hold the owner's bytes and not the build they authorized; write the brief, the session quotes and the confirmation its prompt path names - first rule failed, then the record: $why $rec"
+    return 1
+  done < <(GIT ls-tree --name-only --full-tree "$base" -- "$dir/prompts/" 2>/dev/null)
+  [ "$found" = 1 ] && return 0
+  fail 113 "a prompt-mode build past PROMPT_BRIEF_CUTOFF carries no record with ## The prompt under its prompts/ folder at the pinned BASE, and an absent record is not nothing to grade: $base:$dir/prompts/"
   return 1
 }
 
@@ -6567,6 +6623,9 @@ verb_preflight() { # slug · keepalive-id
   # refuse a scoped waiver rather than grant it, and those two spellings differ exactly when the
   # authorization read failed - which is the moment a silent grant would matter most.
   check_waiver_scope || true
+  # TOOL-aQuotedBrief-1 S4 - the prompt record stands on its own; a consumer of AUTH_MODE, so here,
+  # and before the write gate below, so a refusal leaves the run-state file unwritten.
+  check_prompt_brief "$slug" "${base:-}" || true
   # TOOL-dDerivedDocket-16 S3, S4, S5 and S11 - THE MANDATE'S OWN PRECONDITIONS, evaluated here and
   # not one line lower. Everything they pin is written AFTER the gate below; everything they refuse
   # is refused while the tree is still untouched, which is what lets a refused preflight say the

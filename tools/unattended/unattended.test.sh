@@ -217,6 +217,9 @@ MEMORY_ROOT=memory
 UNITS_REGION_CUTOFF="${3-2026-08-19}"
 SPEC_THIN_CUTOFF="${5-}"
 SPEC_AUDIT_DEFAULT="${9-}"
+# DATED PAST every fixture README, for LANDER_MODE's reason below: a blank key NOTEs on stderr at
+# every prompt-mode preflight. The TOOL-aQuotedBrief-1 arms append the cutoff they mean.
+PROMPT_BRIEF_CUTOFF="2099-01-01"
 LANDER="echo land"
 # DECLARED, so the shared fixture keeps BASE's output byte for byte: a blank LANDER_MODE
 # announces its default on stderr, the run helper merges stderr into what every arm reads, and the two
@@ -4184,6 +4187,76 @@ git add -A >/dev/null && git commit -q -m after-base --no-verify
 out=$(run --preflight tBr --keepalive-id k1)
 hit  "$out" "mode prompt; delete the line, and leave the opt-in to the owner - a prompt-mode README is admitted only when its prompt record at the pinned BASE quotes the owner asking for the audit"
 miss "$out" "admitted under prompt mode"
+
+# ---- TOOL-aQuotedBrief-1 — A PROMPT RECORD STANDS ON ITS OWN. From PROMPT_BRIEF_CUTOFF, graded on
+# ---- the README's `opened:` (2026-08-01 in this fixture) at BASE, a prompt-mode record carries the
+# ---- brief, the session quotes and the confirmation. The fixture conf grandfathers every README
+# ---- (2099-01-01), so each arm appends the cutoff it means; the last assignment wins. Each arm was
+# ---- observed RED against the pre-pass driver, which admitted any prompt record.
+_qb_rec=memory/builds/tBr/prompts/2026-10-09-prompt-mandate.md
+_qb_bare=$'# Run mandate\n\n## The prompt\n\n> Build the widget.\n'
+_qb_brief=$'\n## The brief\n\n### Goal\nBuild the widget.\n\n### Items\n1. The widget.\n\n### Acceptance\nIt renders.\n\n### Gates\nThe bar.\n\n### Non-goals\nNothing else.\n'
+_qb_ok="$_qb_bare$_qb_brief"$'\n## Drawn from the session\n\nnone\n\n## Owner confirmation\n\nnot asked — the brief draws on nothing outside the prompt\n'
+_qb_unasked="$_qb_bare$_qb_brief"$'\n## Drawn from the session\n\n> yes, spec it as a build\n— owner, turn 4\n\n## Owner confirmation\n\nnot asked — the brief draws on nothing outside the prompt\n'
+_qb_audit="$_qb_bare$_qb_brief"$'\n## Drawn from the session\n\n> opt in to the spec reviews for this build\n— agent, turn 3\n\n## Owner confirmation\n\nAsked: accept this brief?\nAnswer: accept\n'
+# ---- AC1: a bare record past the cutoff refuses at the new check, naming rule 1, and writes no RUN.md.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_qb_bare" > "$_qb_rec"
+scope published; printf 'PROMPT_BRIEF_CUTOFF="2026-07-01"\n' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "a prompt record at the pinned BASE does not stand on its own, so a resumed session would hold the owner's bytes and not the build they authorized; write the brief, the session quotes and the confirmation its prompt path names - first rule failed, then the record: rule 1 $_qb_rec"
+miss "$out" "preflight OK"
+same "AC1 a bare prompt record created no run-state file" "$([ -f memory/builds/tBr/RUN.md ] && echo yes || echo no)" "no"
+# ---- AC6: the SAME fixture with the key blank is admitted and announces the key is off...
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_qb_bare" > "$_qb_rec"
+scope published; printf 'PROMPT_BRIEF_CUTOFF=""\n' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "unattended: NOTE - PROMPT_BRIEF_CUTOFF is blank or not a YYYY-MM-DD date, so this prompt-mode build's record is not graded for a self-contained brief"
+hit  "$out" "preflight OK"
+# ---- ...and a README opened before a declared cutoff is grandfathered, with no announcement.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_qb_bare" > "$_qb_rec"
+scope published; printf 'PROMPT_BRIEF_CUTOFF="2026-09-01"\n' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "preflight OK"
+miss "$out" "PROMPT_BRIEF_CUTOFF is blank or not a YYYY-MM-DD date"
+miss "$out" "does not stand on its own"
+# ---- AC3: a brief quoting the session with no Asked/Answer pair refuses naming rule 5.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_qb_unasked" > "$_qb_rec"
+scope published; printf 'PROMPT_BRIEF_CUTOFF="2026-07-01"\n' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "first rule failed, then the record: rule 5 $_qb_rec"
+miss "$out" "preflight OK"
+# ---- AC4: a conforming, self-contained record is admitted with no confirmation.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_qb_ok" > "$_qb_rec"
+scope published; printf 'PROMPT_BRIEF_CUTOFF="2026-07-01"\n' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "preflight OK"
+miss "$out" "does not stand on its own"
+# ---- AC5: a prompt-mode build with no `## The prompt` record refuses naming the empty population.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+scope published; printf 'PROMPT_BRIEF_CUTOFF="2026-07-01"\n' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "a prompt-mode build past PROMPT_BRIEF_CUTOFF carries no record with ## The prompt under its prompts/ folder at the pinned BASE, and an absent record is not nothing to grade: "
+same "AC5 an absent record created no run-state file" "$([ -f memory/builds/tBr/RUN.md ] && echo yes || echo no)" "no"
+# ---- AC7: the opt-in phrase quoted only under `## Drawn from the session` opts nothing in: check 89.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt\nspec-audit: 2026-10-05'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_qb_audit" > "$_qb_rec"
+scope published; printf 'PROMPT_BRIEF_CUTOFF="2026-07-01"\n' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "mode prompt; delete the line, and leave the opt-in to the owner - a prompt-mode README is admitted only when its prompt record at the pinned BASE quotes the owner asking for the audit"
+miss "$out" "admitted under prompt mode"
+miss "$out" "does not stand on its own"
 
 # ---- TOOL-aWardedAudit-6 S4: a record whose BASE README carries a prompt-mode `spec-audit:` line - the
 # ---- state a run preflighted under a driver before check 89 is left in - reads NOT GRADABLE at the
@@ -16375,7 +16448,9 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # MERGED at the reconcile of local main (aGraftedHelix) into origin/main (aMendedFleet): both chains
 # above start at the merge base's 1918, so the floor is base 1918 + aMendedFleet's 84 (1918 -> 2002)
 # + aGraftedHelix's 631 (1918 -> 2549) = 2633.
-FLOOR_ASSERTIONS=2633
+# RAISED 2633 -> 2657 by TOOL-aQuotedBrief-1: the prompt-record arms beside check 89's in region
+# three, 24 assertions, run as a slice of the prologue and that block on node a, 2026-10-09; no suite ran.
+FLOOR_ASSERTIONS=2657
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -16557,7 +16632,8 @@ FLOOR_SHARD_1=267
 # measured executed count of a shard re-declares its floor at the suite's usual headroom. The RAISED
 # lines above are region two's history.
 FLOOR_SHARD_2=222
-FLOOR_SHARD_3=255
+# RAISED 255 -> 279 by TOOL-aQuotedBrief-1: the same 24 region-three prompt-record assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=279
 FLOOR_SHARD_4=390
 FLOOR_SHARD_5=270
 FLOOR_SHARD_6=129
