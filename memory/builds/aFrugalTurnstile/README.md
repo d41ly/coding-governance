@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: tooling+playbook+deployer
 roster: TOOL+PLAY+DEPL
-ids: DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10
+ids: DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 TOOL-aFrugalTurnstile-11
 authorized-by: prompt
 ---
 
@@ -65,11 +65,13 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 10 | `TOOL-aFrugalTurnstile-10` | the unattended protocol's landing rule states the scoped-then-full path |
 | 11 | `PLAY-aFrugalTurnstile-1` | the charter's §1 Landing states the scoped-then-full path |
 | 12 | `DEPL-aFrugalTurnstile-1` | the runbook states what an adopter declares to use each part |
+| 13 | `TOOL-aFrugalTurnstile-11` | a scoped green takes its own slot, and the nearest adoptable green wins |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 12 unit(s) · node a · opened 2026-10-09 · streams tooling+playbook+deployer
+**Build status:** OPEN · 13 unit(s) · node a · opened 2026-10-09 · streams tooling+playbook+deployer
 ids DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10
+ids TOOL-aFrugalTurnstile-11
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -81,6 +83,7 @@ ids DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL
 | [TOOL-aFrugalTurnstile-2 — pre-push records the green of the bar it ran, and a push whose tree carries one runs nothing](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-2.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-3 — the unattended close records the green of the bar it ran](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-3.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-5 — the gate turnstile is host-wide, names its holder, lets nested bars through, and `--hold` admits a foreign bar](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-5.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-11 — a scoped green takes its own slot, and the nearest adoptable green wins](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-11.md) | 3 | 2 | OPEN | rev-1 | 2026-10-10 |
 | [TOOL-aFrugalTurnstile-4 — lineage reuse: after a red, the boundary's full bar re-runs only failed and moved legs, and may stamp](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-4.md) | 3 | 2 | OPEN | rev-1 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-6 — `post-merge.sh` runs the full bar on a landed sha and publishes its verdict as a remote ref](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-6.md) | 4 | 2 | OPEN | rev-1 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-7 — pre-push binds a post-merge red, and `--decide` prints the boundary's decision](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-7.md) | 4 | 2 | OPEN | rev-1 | 2026-10-09 |
@@ -90,10 +93,10 @@ ids DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL
 
 Records: 9 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aFrugalTurnstile-11.
 
-Ids no `spec-audit` record has ever named: DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-10 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7
-TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9.
+Ids no `spec-audit` record has ever named: DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-10 TOOL-aFrugalTurnstile-11 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6
+TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -102,7 +105,7 @@ TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9.
 |---|---|---|
 | 1 | `DEPL-aFrugalTurnstile-1`, `PLAY-aFrugalTurnstile-1`, `TOOL-aFrugalTurnstile-1`, `TOOL-aFrugalTurnstile-10` | yes |
 | 2 | `TOOL-aFrugalTurnstile-2`, `TOOL-aFrugalTurnstile-3`, `TOOL-aFrugalTurnstile-5` | yes |
-| 3 | `TOOL-aFrugalTurnstile-4` | no |
+| 3 | `TOOL-aFrugalTurnstile-11`, `TOOL-aFrugalTurnstile-4` | yes |
 | 4 | `TOOL-aFrugalTurnstile-6`, `TOOL-aFrugalTurnstile-7` | yes |
 | 5 | `TOOL-aFrugalTurnstile-8`, `TOOL-aFrugalTurnstile-9` | yes |
 <!-- /gen:build-order -->
