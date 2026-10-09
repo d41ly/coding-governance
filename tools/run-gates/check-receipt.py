@@ -44,6 +44,7 @@ import contextlib
 import hashlib
 import io
 import json
+import os
 import pathlib
 import shutil
 import subprocess
@@ -51,6 +52,9 @@ import sys
 import tempfile
 
 RECEIPT = ".governance/install.json"
+# The environment `check_git_arms` sets for its whole body and restores exactly after it.
+WINDOW_KEYS = ("HOME", "XDG_CONFIG_HOME", "GIT_CONFIG_GLOBAL", "GIT_ATTR_NOSYSTEM",
+               "GIT_CONFIG_NOSYSTEM", "GIT_DEFAULT_HASH")
 
 
 def read_receipt(tree):
@@ -251,6 +255,18 @@ def check_fixtures():
             print_unattributed(json.loads((tree / RECEIPT).read_text(encoding="utf-8"))["files"])
         results.append(("no `unattributed` row prints nothing at all", buf.getvalue() == ""))
 
+        # The no-`.git` guard of `resolve_clean_oids`: CRLF bytes under a receipt naming the LF
+        # bytes. Spawns nothing, so without the guard git would grade it through the HOST's filter.
+        lf = b"line one\nline two\n"
+        tree = write_fixture(base, "nogit", [{"path": "a.txt", "sha256": hashlib.sha256(lf).hexdigest(),
+                                              "oid": derive_blob_oid(lf)}], body=lf.replace(b"\n", b"\r\n"))
+        findings, graded, eol_only = check_engine_rows(tree, json.loads((tree / RECEIPT).read_text(encoding="utf-8"))["files"])
+        results.append(("a tree with no .git consults no clean filter: one DRIFTED and one GIT finding",
+                        graded == 1 and eol_only == 0
+                        and sum(f.startswith("DRIFTED") for f in findings) == 1
+                        and sum(f.startswith("GIT       hash-object --stdin-paths not consulted")
+                                for f in findings) == 1))
+
     results.extend(check_git_arms())
     for label, ok in results:
         print(f"ARM {'ok  ' if ok else 'FAIL'}  {label}")
@@ -266,8 +282,25 @@ def run_fixture_git(repo, *args):
         raise RuntimeError(f"git {args[0]} refused: {out.stderr.decode('utf-8', 'replace').strip()}")
 
 
+def seed_hostile_env(base):
+    """`HOME`, `XDG_CONFIG_HOME` and `GIT_CONFIG_GLOBAL`, pointed at hostile files under `base`.
+
+    Both homes' `git/attributes` say `* text=auto eol=lf` and the global config sets
+    `init.defaultObjectFormat = sha256`: the two host states that turn arms (c) and (a) red where a
+    pin is missing. The fixtures always run under this, so a pin that regresses reds on every host,
+    not only on the rare one carrying the state (C14, a fixture inheriting ambient machine state).
+    """
+    home, xdg = base / "hostile-home", base / "hostile-xdg"
+    for attrs in (home / ".config" / "git", xdg / "git"):
+        attrs.mkdir(parents=True)
+        (attrs / "attributes").write_bytes(b"* text=auto eol=lf\n")
+    (home / "gitconfig").write_bytes(b"[init]\n\tdefaultObjectFormat = sha256\n")
+    return {"HOME": str(home), "XDG_CONFIG_HOME": str(xdg), "GIT_CONFIG_GLOBAL": str(home / "gitconfig")}
+
+
 def check_git_arms():
-    """Four arms over real repositories, for the eol-only rule in the module docstring.
+    """Four arms over real repositories, for the eol-only rule in the module docstring, and one
+    liveness arm proving the hostile state they run under is real.
 
     Each fixture's settings are written into ITS OWN `.git/config`, never passed as `-c`: the graded
     `hash-object` spawn reads the repository's config like any git call, and local config beats a
@@ -276,54 +309,93 @@ def check_git_arms():
     would fail the setup rather than decide the arm. Each arm asserts it graded exactly one row, so
     an arm whose git call failed cannot pass by grading nothing, and a host where git cannot start
     fails all four with the cause named.
+
+    WHAT IS PINNED (TOOL-aLevelledCopy-9). Config is not the only ambient input: gitattributes and
+    the object format come from the host too. Each fixture's `core.attributesFile` names a file that
+    does not exist, which replaces a host's global attributes file and the XDG default; and the
+    whole body runs in an `os.environ` window setting `GIT_ATTR_NOSYSTEM=1`, `GIT_CONFIG_NOSYSTEM=1`
+    and `GIT_DEFAULT_HASH=sha1`, restored in a `finally` so `main`'s grade of a real tree never sees
+    it. A window and not an `env=` argument, because the graded spawn is `resolve_clean_oids`,
+    production code that takes none. The same window points `HOME`, `XDG_CONFIG_HOME` and
+    `GIT_CONFIG_GLOBAL` at `seed_hostile_env`'s files, so every run is a run on a hostile host. The
+    system-attributes pin is set and NOT observed red: no node here has a system gitattributes rule
+    reaching `f.txt`.
+
+    WHAT IS NOT PINNED: the git version, the filesystem's CRLF and exec-bit semantics, and inherited
+    `GIT_DIR`-family variables, which the hook boundary handles.
     """
     labels = ("(a) a CRLF copy committed LF under a later eol=lf pin grades clean, eol-only 1",
               "(b) that CRLF copy with one real byte changed is DRIFTED",
               "(c) a hand-written CRLF copy under autocrlf=false and no pin is DRIFTED",
               "(d) LF bytes that ARE the blob under a wrong sha256 are DRIFTED (the tamper half)")
+    live = "(live) an unpinned probe repository under the hostile state reads eol lf and sha256"
     lf = b"line one\nline two\n"
     base = pathlib.Path(tempfile.mkdtemp())
+    saved = {k: os.environ.get(k) for k in WINDOW_KEYS}
     try:
-        for name, autocrlf in (("pinned", "true"), ("bare", "false")):
-            run_fixture_git(base, "init", "-q", name)
-            with open(base / name / ".git" / "config", "a", encoding="utf-8") as fh:
-                fh.write(f"[core]\n\tautocrlf = {autocrlf}\n\tsafecrlf = false\n\thooksPath = no-hooks\n"
-                         "[commit]\n\tgpgsign = false\n"
-                         "[user]\n\tname = check-receipt\n\temail = check-receipt@invalid\n")
-        pinned, bare = base / "pinned", base / "bare"
+        os.environ.update(seed_hostile_env(base) | {"GIT_ATTR_NOSYSTEM": "1", "GIT_CONFIG_NOSYSTEM": "1",
+                                                    "GIT_DEFAULT_HASH": "sha1"})
+        try:
+            probe_env = {k: v for k, v in os.environ.items() if k != "GIT_DEFAULT_HASH"}
+            subprocess.run(["git", "-C", str(base), "init", "-q", "probe"], capture_output=True, env=probe_env)
+            eol = subprocess.run(["git", "-C", str(base / "probe"), "check-attr", "eol", "--", "f.txt"],
+                                 capture_output=True).stdout.decode("utf-8", "replace").strip()
+            fmt = subprocess.run(["git", "-C", str(base / "probe"), "rev-parse", "--show-object-format"],
+                                 capture_output=True).stdout.decode("utf-8", "replace").strip()
+        except OSError as exc:
+            eol, fmt = f"git could not start: {exc}", ""
+        if fmt not in ("sha1", "sha256"):
+            print(f"SKIP  {live}: its object-format half, which this git cannot report ({fmt or 'no output'})")
+        live_ok = eol.endswith("eol: lf") and fmt != "sha1"
+        results = [(live if live_ok else f"{live} — got eol {eol!r}, object format {fmt!r}", live_ok)]
+
+        try:
+            for name, autocrlf in (("pinned", "true"), ("bare", "false")):
+                run_fixture_git(base, "init", "-q", name)
+                with open(base / name / ".git" / "config", "a", encoding="utf-8") as fh:
+                    fh.write(f"[core]\n\tautocrlf = {autocrlf}\n\tsafecrlf = false\n\thooksPath = no-hooks\n"
+                             f"\tattributesFile = {(base / name / '.git' / 'no-such-attributes').as_posix()}\n"
+                             "[commit]\n\tgpgsign = false\n"
+                             "[user]\n\tname = check-receipt\n\temail = check-receipt@invalid\n")
+            pinned, bare = base / "pinned", base / "bare"
+            (pinned / "f.txt").write_bytes(lf)
+            run_fixture_git(pinned, "add", "f.txt")
+            run_fixture_git(pinned, "commit", "-q", "-m", "engine file, committed LF")
+            (pinned / "f.txt").unlink()
+            run_fixture_git(pinned, "checkout", "--", "f.txt")
+            crlf = (pinned / "f.txt").read_bytes()
+            if b"\r\n" not in crlf:
+                raise RuntimeError("the re-checkout under autocrlf=true wrote no CR byte, so arm (a) would stage nothing")
+            (pinned / ".gitattributes").write_bytes(b"f.txt text eol=lf\n")
+            run_fixture_git(pinned, "add", ".gitattributes")
+            run_fixture_git(pinned, "commit", "-q", "-m", "the eol=lf pin, after the checkout")
+            (bare / "f.txt").write_bytes(lf.replace(b"\n", b"\r\n"))
+        except (OSError, RuntimeError) as exc:
+            return results + [(f"{label} — git could not build the fixture: {exc}", False) for label in labels]
+
+        def run_grade(repo, sha=None):
+            rows = [{"path": "f.txt", "sha256": sha or hashlib.sha256(lf).hexdigest(), "oid": derive_blob_oid(lf)}]
+            return check_engine_rows(repo, rows)
+
+        def check_drifted(got):
+            return got[1] == 1 and got[2] == 0 and len(got[0]) == 1 and got[0][0].startswith("DRIFTED")
+
+        got = []
+        got.append((run_grade(pinned), lambda g: g == ([], 1, 1)))
+        (pinned / "f.txt").write_bytes(crlf.replace(b"one", b"One", 1))
+        got.append((run_grade(pinned), check_drifted))
+        got.append((run_grade(bare), check_drifted))
         (pinned / "f.txt").write_bytes(lf)
-        run_fixture_git(pinned, "add", "f.txt")
-        run_fixture_git(pinned, "commit", "-q", "-m", "engine file, committed LF")
-        (pinned / "f.txt").unlink()
-        run_fixture_git(pinned, "checkout", "--", "f.txt")
-        crlf = (pinned / "f.txt").read_bytes()
-        if b"\r\n" not in crlf:
-            raise RuntimeError("the re-checkout under autocrlf=true wrote no CR byte, so arm (a) would stage nothing")
-        (pinned / ".gitattributes").write_bytes(b"f.txt text eol=lf\n")
-        run_fixture_git(pinned, "add", ".gitattributes")
-        run_fixture_git(pinned, "commit", "-q", "-m", "the eol=lf pin, after the checkout")
-        (bare / "f.txt").write_bytes(lf.replace(b"\n", b"\r\n"))
-    except (OSError, RuntimeError) as exc:
+        got.append((run_grade(pinned, sha=hashlib.sha256(b"not these bytes").hexdigest()), check_drifted))
+        return results + [(label if ok(g) else f"{label} — got {g}", ok(g)) for label, (g, ok) in zip(labels, got)]
+    finally:
+        for k, v in saved.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+        # ponytail: a leaked directory in the OS temp dir beats a red leg from a held handle on Windows.
         shutil.rmtree(base, ignore_errors=True)
-        return [(f"{label} — git could not build the fixture: {exc}", False) for label in labels]
-
-    def run_grade(repo, sha=None):
-        rows = [{"path": "f.txt", "sha256": sha or hashlib.sha256(lf).hexdigest(), "oid": derive_blob_oid(lf)}]
-        return check_engine_rows(repo, rows)
-
-    def check_drifted(got):
-        return got[1] == 1 and got[2] == 0 and len(got[0]) == 1 and got[0][0].startswith("DRIFTED")
-
-    got = []
-    got.append((run_grade(pinned), lambda g: g == ([], 1, 1)))
-    (pinned / "f.txt").write_bytes(crlf.replace(b"one", b"One", 1))
-    got.append((run_grade(pinned), check_drifted))
-    got.append((run_grade(bare), check_drifted))
-    (pinned / "f.txt").write_bytes(lf)
-    got.append((run_grade(pinned, sha=hashlib.sha256(b"not these bytes").hexdigest()), check_drifted))
-    # ponytail: a leaked directory in the OS temp dir beats a red leg from a held handle on Windows.
-    shutil.rmtree(base, ignore_errors=True)
-    return [(label if ok(g) else f"{label} — got {g}", ok(g)) for label, (g, ok) in zip(labels, got)]
 
 
 def main(argv):

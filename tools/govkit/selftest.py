@@ -2113,8 +2113,9 @@ def check_fragment_wiring(tmp: pathlib.Path) -> None:
 def measure_mode_carry(tmp: pathlib.Path, source: str, arms: set) -> dict:
     """DEPL-aLevelledCopy-1 AC1-AC5, AC7, AC8 over scratch govs whose `govkit.py` is `source`, so
     AC9 can hand it a staged break. Returns `{arm: [(label, ok, detail), ...]}`, with the fixture's
-    own liveness under `LIVE`. Two fixtures: `cm` carries every mode case in one update, and `rb`
-    makes a mode carry the only change of a kit whose check then reds. Steps an arm outside `arms`
+    own liveness under `LIVE`. Three fixtures: `cm` carries every mode case in one update, `rb`
+    makes a mode carry the only change of a kit whose check then reds, and `nd` (arm `ND`,
+    TOOL-aLevelledCopy-9) gives an adopter's 100755 rows one touching verdict each. Steps an arm outside `arms`
     alone needs are skipped, which is what keeps a staged run cheap."""
     env = dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1")
     got: dict = {}
@@ -2248,6 +2249,50 @@ def measure_mode_carry(tmp: pathlib.Path, source: str, arms: set) -> dict:
                    "landed-but-inert" in p.stdout and "ROLLED BACK" in p.stdout
                    and read_entry(t, "hook.sh")[0] == "100644",
                    str(read_entry(t, "hook.sh")) + p.stdout[-1500:])
+
+    if "ND" in arms:
+        # TOOL-aLevelledCopy-9 S5. Never-down per touching verdict: four rows the adopter holds at
+        # 100755, gov ships 100644, and gov's next commit gives each a different verdict. `missing`
+        # is the control: that cell means NO index entry, so it takes gov's mode by the rule.
+        kit = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+               '[[files]]\ninclude = "**"\nrole = "engine"\n\n' + tail)
+        g, _a = build_gov("nd", kit, {"ren.sh": "ren 1\nren 2\nren 3\nren 4\n",
+                                      "div.sh": "div 1\ndiv 2\ndiv 3\ndiv 4\n",
+                                      "mis.sh": "mis v1\n", "sta.sh": "sta v1\n"})
+        t = build_target(g, "nd")
+        for rel in ("ren.sh", "div.sh", "mis.sh", "sta.sh"):
+            os.chmod(t / kp / rel, (t / kp / rel).stat().st_mode | 0o111)
+            git(t, "update-index", "--chmod=+x", "--", kp + rel)
+        (t / kp / "div.sh").write_bytes(b"div 1 adopter\ndiv 2\ndiv 3\ndiv 4\n")
+        git(t, "rm", "-q", "-f", "--", kp + "mis.sh")    # -f: its staged chmod is not yet committed
+        settle(t, "the adopter makes four rows executable, edits one and deletes one")
+        add_result("LIVE", "[aLC-9] LIVENESS three rows start 100755 and the deleted one has no entry",
+                   [read_entry(t, x)[0] for x in ("ren.sh", "div.sh", "sta.sh", "mis.sh")]
+                   == ["100755", "100755", "100755", None],
+                   str([read_entry(t, x) for x in ("ren.sh", "div.sh", "sta.sh", "mis.sh")]))
+        (g / PFX / "demo" / "ren.sh").unlink()
+        new = {"ren2.sh": "ren 1\nren 2\nren 3\nren 4 gov\n", "div.sh": "div 1\ndiv 2\ndiv 3\ndiv 4 gov\n",
+               "mis.sh": "mis v2\n", "sta.sh": "sta v2\n"}
+        write_gov(g, kit, new, (), "B")
+        p = run_gov(g, "update", "--target", str(t))
+        rows = [ln.split() for ln in p.stdout.splitlines()]
+        for verdict, rel in (("renamed", "ren.sh"), ("diverged", "div.sh"),
+                             ("missing", "mis.sh"), ("stale", "sta.sh")):
+            add_result("ND", f"[aLC-9 AC5] read-only update reads `{verdict}` for {rel}, once",
+                       rows.count([verdict, "[engine", "]", kp + rel]) == 1, p.stdout[-1500:])
+        p = run_gov(g, "update", "--target", str(t), "--write")
+        add_result("LIVE", "[aLC-9] LIVENESS the --write update exits 0", p.returncode == 0,
+                   (p.stdout + p.stderr)[-1500:])
+        want = {"ren2.sh": ("100755", new["ren2.sh"]),
+                "div.sh": ("100755", "div 1 adopter\ndiv 2\ndiv 3\ndiv 4 gov\n"),
+                "mis.sh": ("100644", new["mis.sh"]), "sta.sh": ("100755", new["sta.sh"])}
+        for rel, (mode, body) in want.items():
+            f = t / kp / rel
+            add_result("ND", f"[aLC-9 AC4 AC5] --write lands {rel} at {mode} with gov's new bytes",
+                       read_entry(t, rel)[0] == mode and f.is_file() and f.read_bytes() == body.encode(),
+                       f"{read_entry(t, rel)} {f.read_bytes() if f.is_file() else None!r}")
+        add_result("ND", "[aLC-9 AC4] the renamed row left its old path",
+                   read_entry(t, "ren.sh") == (None, None), str(read_entry(t, "ren.sh")))
     return got
 
 
@@ -2266,6 +2311,16 @@ def check_mode_carry(tmp: pathlib.Path) -> None:
     real = GOVKIT.read_bytes().decode("utf-8").replace("\r\n", "\n")
     for _arm, res in sorted(measure_mode_carry(tmp / "real", real,
                                                {"AC1", "AC2", "AC3", "AC4", "AC5", "AC7", "AC8"}).items()):
+        for label, ok, detail in res:
+            check(label, ok, detail)
+
+
+def check_mode_never_down(tmp: pathlib.Path) -> None:
+    """TOOL-aLevelledCopy-9 S5 — an adopter's 100755 engine row stays 100755 through every touching
+    verdict that carries an index entry, the renamed one included, over this file's `govkit.py`.
+    The staged breaks of AC4 and AC5 are build-time observations in the unit's acceptance ledger."""
+    real = GOVKIT.read_bytes().decode("utf-8").replace("\r\n", "\n")
+    for _arm, res in sorted(measure_mode_carry(tmp / "real", real, {"ND"}).items()):
         for label, ok, detail in res:
             check(label, ok, detail)
 
@@ -2419,6 +2474,7 @@ def main() -> int:
         check_pytest_ini_probe(tmp / "pi")
         check_update_safety(tmp / "us")
         check_mode_carry(tmp / "mc")
+        check_mode_never_down(tmp / "nd")
         check_hold_region()
 
         # ================= apply =================

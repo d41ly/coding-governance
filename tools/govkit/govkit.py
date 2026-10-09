@@ -8299,7 +8299,8 @@ def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit:
 
 def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src: str | None,
                        data: bytes, to_commit: str,
-                       index: dict[str, tuple[str, str]]) -> tuple[str | None, str | None]:
+                       index: dict[str, tuple[str, str]],
+                       entry_path: str | None = None) -> tuple[str | None, str | None]:
     """Put bytes into the target THROUGH ITS OWN INDEX, and let its filters decide the worktree (S5).
 
     Three plumbing calls, in this order and for this reason. `hash-object -w --stdin` puts the blob
@@ -8316,6 +8317,11 @@ def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src:
     none — a hook that lands non-executable is a hook that does not run. No receipt field records a
     file mode; gov's tree answers it at any recorded commit.
 
+    `entry_path` (TOOL-aLevelledCopy-9 S4) names the index key that entry is read from, and
+    defaults to `path`. The renamed arm passes the path it moved FROM: `index` was read before
+    `git mv`, so it holds no entry at the new path, and reading one there handed an adopter's
+    100755 row gov's lower mode while the mode-carry line, which reads the old entry, said otherwise.
+
     Returns `(oid, None)` on success and `(None, why)` on failure. A failure LEAVES the index entry
     rather than half-writing; rolling one back is `-14`'s.
     """
@@ -8324,7 +8330,7 @@ def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src:
     if out.returncode != 0:
         return None, f"git hash-object refused the bytes: {out.stderr.decode('utf-8', 'replace').strip()}"
     oid = out.stdout.decode("utf-8", "replace").strip()
-    entry = index.get(path)
+    entry = index.get(entry_path or path)
     mode = resolve_landed_mode(entry[0] if entry else None,
                                gov_tree_mode(root, to_commit, src) if src else None)
     up = subprocess.run(["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
@@ -9944,7 +9950,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                        f"left exactly as it was, at its old path and its old vintage")
                 continue
 
-            oid, why = land_through_index(root, target, new_dest, new_src, data, to_commit, index0)
+            oid, why = land_through_index(root, target, new_dest, new_src, data, to_commit, index0,
+                                          entry_path=old_path)
             if oid is None:
                 # NO ARM REACHES THIS, and the skip announces itself rather than passing for
                 # coverage. `land_through_index` fails only when the TARGET's own git refuses —

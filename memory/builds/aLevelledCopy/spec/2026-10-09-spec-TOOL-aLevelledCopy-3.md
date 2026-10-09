@@ -1,6 +1,6 @@
 # TOOL-aLevelledCopy-3 — gov's executed hooks are 100755, and check-wiring grades a hook's index mode
 
-**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 2 · ratified 2026-10-09
+**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 2 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -244,7 +244,8 @@ there, so each criterion greps the `hooks` lines rather than reading the exit st
   --fix` in that fixture, the same `git commit` exits non-zero. Recorded as a line in this build's
   acceptance ledger. Red when: the commit is refused BEFORE `--fix`, which means the fixture's
   filesystem ran the hook anyway and the observation proved nothing, or it succeeds after.
-  fixture: WSL ext4, outside `%TEMP%`, because `/mnt/c` reports every file 0777 and `chmod -x` is a
+  fixture: WSL's own `/tmp`, which `df -T` reported as tmpfs and which honours the exec bit, outside
+  `%TEMP%`, because `/mnt/c` reports every file 0777 and `chmod -x` is a
   no-op there (measured 2026-10-09, node a); the defect half was measured the same day on git 2.53.
   permission: a POSIX host. On a host where `uname` reads MINGW, MSYS or CYGWIN, the self-test's arm
   for this criterion prints that it skipped and why, and counts no pass.
@@ -311,6 +312,9 @@ the arm RED, then restoring it.
   literally printed `ok` over an empty population, the vacuous class AC7 exists to refuse. Another
   checkout with no 100644 hook prints the step-3 `ok` line. The listing's run-from-the-directory
   shape is written down. Status CLOSED.
+- rev-3 · 2026-10-09 · §6 AC6: the `fixture:` line names WSL's own `/tmp`, tmpfs by `df -T`, in
+  place of WSL ext4, which the run that observed AC6 did not use. A record correction from the
+  closing review's L5 (finding id 19); no criterion moves and the status stays CLOSED.
 
 ## 10. Reuse audit
 

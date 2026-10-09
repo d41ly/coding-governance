@@ -1,11 +1,12 @@
 # TOOL-aLevelledCopy-9 — receipt fixtures are hermetic, a renamed row keeps its bit, the records agree
 
-**Status:** OPEN · rev-2 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 3 · ratified 2026-10-09
+**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 3 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aLevelledCopy-9-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aLevelledCopy-9-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-7-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-7-1-spec-brief.md) | journal | TOOL-aLevelledCopy-7 TOOL-aLevelledCopy-8 |
 
 <!-- /gen:spec-records -->
@@ -62,8 +63,12 @@ closes all five, in one batch, because their write set is disjoint from the ssh 
   `cm` and `rb`. In it the adopter makes four engine rows 100755 that gov ships 100644, and gov's next
   commit gives each a different verdict that lands through `land_through_index`: `renamed` (gov moves
   the source), `diverged` merged cleanly (the adopter edits one line and gov another), `missing` (the
-  adopter's worktree copy is absent while its index entry stays) and `stale`. One `update --write` must leave all four at 100755
-  with gov's new bytes, the renamed row at its new path. Observed by AC4, AC5.
+  adopter's deletion is committed) and `stale`. One `update --write` must leave the three rows that
+  carry an index entry at 100755 with gov's new bytes, the renamed row at its new path, and land the
+  `missing` row at gov's 100644. That row is the control, not a fourth never-down case: the
+  classifier reads `missing` only where the index holds NO entry, and a worktree-only deletion with
+  the entry kept is dirty and refused before any verdict, so a `missing` row has no adopter bit to
+  keep and takes the rule's no-entry half. Observed by AC4, AC5.
 - **S6 — the hand-kept status column is a recorded class (L4).** A new section, the roster form, is
   appended to `memory/gotchas/two-answers-to-one-question.md`: the authored `roster:units` table of
   this build's README carried a Status column that read OPEN while the generated units table beside it
@@ -223,10 +228,12 @@ receipt-sync red on its first update.
   cost: about 60 s on node a, run under the default `%TEMP%` because a scratchpad temp root false-reds
   on path length; the whole suite is not run in this pass.
 - **AC5** — When the same `ND` run executes, its read-only `update` prints the verdicts `renamed`,
-  `diverged`, `missing` and `stale` once each for the four rows, and each of the four rows reads
-  100755 after `--write`; when the scratch gov's `govkit.py` copy has `resolve_landed_mode` changed
-  to return gov's mode for every existing entry, all four arms fail. Red when: a row takes a verdict
-  other than its intended one, so its arm passes without the path it names being exercised.
+  `diverged`, `missing` and `stale` once each for the four rows, the `renamed`, `diverged` and
+  `stale` rows read 100755 after `--write`, and the `missing` row reads 100644; when the scratch
+  gov's `govkit.py` copy has `resolve_landed_mode` changed to return gov's mode for every existing
+  entry, the three entry-bearing arms fail and the `missing` arm still passes. Red when: a row takes
+  a verdict other than its intended one, so its arm passes without the path it names being
+  exercised.
 - **AC6** — When `python tools/memory-tree/gotchas.py --check` runs after `--write`, it exits 0;
   `grep -n roster memory/gotchas/two-answers-to-one-question.md` hits the new section; and
   `python tools/memory-tree/gotchas.py --for-paths memory/builds/aLevelledCopy/README.md` lists
@@ -292,6 +299,10 @@ New arm: tools/govkit/selftest.py · covers AC4 AC5 · the pre-build govkit.py, 
 - rev-2 · 2026-10-09 · §4 Files touched: the sibling's write is named in prose rather than as a
   backticked path, because the spec-token guards join read it as this unit's own write and owed two
   legs this unit does not move. No design change.
+- rev-3 · 2026-10-09 · §2 S5 and §6 AC5: the `missing` row is a control landing at gov's 100644,
+  not a fourth 100755 row. Read at build time: `classify_row` takes `o_state` from the index, so
+  `missing` means no index entry, and `dirty_claimed_paths` refuses the worktree-only deletion rev-2
+  described before any verdict; `resolve_landed_mode(None, gov)` is gov's mode by the unchanged rule.
 
 ## 10. Reuse audit
 

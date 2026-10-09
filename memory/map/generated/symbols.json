@@ -3663,6 +3663,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_mode_never_down",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_mp_value",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -16846,6 +16851,11 @@
       "id": "seed_handoff_bar",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "seed_hostile_env",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
     },
     {
       "id": "seed_landing",
