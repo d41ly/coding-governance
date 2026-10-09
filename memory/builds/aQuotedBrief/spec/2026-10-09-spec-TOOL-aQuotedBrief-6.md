@@ -1,11 +1,12 @@
 # TOOL-aQuotedBrief-6 — the closing review's minors: dispositions, re-preflight, the cutoff date, quoting, parks and arms
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 5
+**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aQuotedBrief-6-12-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aQuotedBrief-6-12-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aQuotedBrief-6-11-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aQuotedBrief-6-11-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

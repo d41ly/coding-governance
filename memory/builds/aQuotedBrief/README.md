@@ -67,7 +67,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 6 unit(s) · node a · opened 2026-10-09 · streams tooling
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-10-09 · streams tooling
 ids TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3 TOOL-aQuotedBrief-4 TOOL-aQuotedBrief-5 TOOL-aQuotedBrief-6
 
 <!-- gen:build-units -->
@@ -78,10 +78,10 @@ ids TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3 TOOL-aQuotedBrie
 | [TOOL-aQuotedBrief-3 — every brief item carries its disposition, and `build-complete` grades each one](spec/2026-10-09-spec-TOOL-aQuotedBrief-3.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aQuotedBrief-4 — the brief cutoff is read at the owner's side of BASE, and term 7 says when it is off](spec/2026-10-09-spec-TOOL-aQuotedBrief-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aQuotedBrief-5 — preflight and term 7 recognise a prompt record by one predicate](spec/2026-10-09-spec-TOOL-aQuotedBrief-5.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-09 |
-| [TOOL-aQuotedBrief-6 — the closing review's minors: dispositions, re-preflight, the cutoff date, quoting, parks and arms](spec/2026-10-09-spec-TOOL-aQuotedBrief-6.md) | 5 | 2 | SPECCED | rev-1 | 2026-10-09 |
+| [TOOL-aQuotedBrief-6 — the closing review's minors: dispositions, re-preflight, the cutoff date, quoting, parks and arms](spec/2026-10-09-spec-TOOL-aQuotedBrief-6.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 13 bound to this build, across 4 record folder(s).
+Records: 14 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

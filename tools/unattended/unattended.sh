@@ -3097,18 +3097,22 @@ read_audit_ask_record() { # build dir · base
 # [<args>]`. The disposition is the LAST bracketed group, ending the line, so a bracket inside the item
 # text does not move it. Kind `none` when that group is no disposition, `many` when a second
 # disposition group sits right before it; `planned` args are its ids, `duplicate` args the item number.
+# TOOL-aQuotedBrief-6 S3 and S4 - every kind takes a non-empty argument, so a bare `[stale]` is no
+# disposition; and a non-blank Items line not opening `<n>.` is printed `- none <the line>`, so the
+# join refuses it by rule 1 and term 7 reports it, rather than both reading past it (round 1 M2, M4).
 read_brief_items() {
   awk '
     { sub(/\r$/, ""); sub(/[[:space:]]+$/, "") }
     /^## / { h2 = $0; sub(/^## +/, "", h2); h3 = ""; next }
     h2 == "The brief" && /^### / { h3 = $0; sub(/^### +/, "", h3); sub(/[[:space:]]+$/, "", h3); next }
-    h2 != "The brief" || h3 != "Items" || !/^[0-9]+\./ { next }
+    h2 != "The brief" || h3 != "Items" || !/[^[:space:]]/ { next }
+    !/^[0-9]+\./ { print "-", "none", $0; next }
     {
       n = $0; sub(/\..*/, "", n); kind = "none"; args = ""
       if (match($0, /\[[^][]*\]$/)) {
         d = substr($0, RSTART + 1, RLENGTH - 2); rest = substr($0, 1, RSTART - 1); sub(/[[:space:]]+$/, "", rest)
         k = d; sub(/ .*/, "", k); a = d; if (!sub(/^[^ ]+ +/, "", a)) a = ""
-        if (k ~ /^(planned|stale|duplicate|parked)$/ && (k == "stale" || k == "parked" || a != "")) { kind = k; args = a }
+        if (k ~ /^(planned|stale|duplicate|parked)$/ && a != "") { kind = k; args = a }
         if (kind != "none" && rest ~ /\[(planned|stale|duplicate|parked)( [^][]*)?\]$/) kind = "many"
       }
       print n, kind, args
@@ -3174,7 +3178,10 @@ check_brief_items() { # slug
     check_prompt_heading <<<"$txt" || continue
     while read -r n kind args; do
       [ -n "$n" ] || continue
-      grep -qF -- " · item brief item $n:" "$rm" 2>/dev/null && continue
+      if [ "$n" = - ]; then unmet="$unmet · the ### Items line '$args' opens no <n>., so no unit or park can meet it"; continue; fi
+      # TOOL-aQuotedBrief-6 S6 - a park counts only from the ITEM field of the line park() writes,
+      # anchored at the line's start, so a reason quoting ` · item brief item <n>:` meets nothing.
+      grep -qE -- "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:]+Z [^ ]+ · item brief item $n:" "$rm" 2>/dev/null && continue
       lack=""
       case "$kind" in
         stale|duplicate) continue ;;
@@ -3196,7 +3203,8 @@ check_brief_items() { # slug
       esac
       unmet="$unmet · item $n $lack, with no parked line naming brief item $n:"
     done < <(printf '%s\n' "$txt" | read_brief_items)
-  done < <(GIT ls-tree --name-only --full-tree "$base" -- "$(dirname "$rel")/prompts/" 2>/dev/null)
+  # TOOL-aQuotedBrief-6 S5 - unquoted, so a non-ASCII record name is read and not skipped (round 1 L1).
+  done < <(GIT -c core.quotepath=off ls-tree --name-only --full-tree "$base" -- "$(dirname "$rel")/prompts/" 2>/dev/null)
   [ -z "$unmet" ] && return 0
   DOD_OUT="a brief item the owner asked for is neither built by CLOSED units nor parked where the wrap-up surfaces it, so the build is not done by its own brief$unmet"
   return 1
@@ -3280,11 +3288,15 @@ check_prompt_brief() { # slug · base
           [ "$(printf '%s\n' "$items" | awk -v m="$args" '$1 == m { print $2; exit }')" = planned ] && continue
           why="$rec rule 4, a duplicate of item $args, which is not planned: item $n"; break ;;
         stale|parked) ;;
-        *) why="$rec rule 1, not exactly one disposition among planned, stale, duplicate and parked: item $n"; break ;;
+        *) case "$n" in
+             -) why="$rec rule 1, an ### Items line that opens no <n>., so it is no item the join can read: $args" ;;
+             *) why="$rec rule 1, not exactly one disposition among planned, stale, duplicate and parked: item $n" ;;
+           esac; break ;;
       esac
     done < <(printf '%s\n' "$items")
     [ -n "$why" ] && break
-  done < <(GIT ls-tree --name-only --full-tree "$base" -- "$dir/prompts/" 2>/dev/null)
+  # TOOL-aQuotedBrief-6 S5 - the listing term 7 reads, unquoted the same way.
+  done < <(GIT -c core.quotepath=off ls-tree --name-only --full-tree "$base" -- "$dir/prompts/" 2>/dev/null)
   if [ "$found" != 1 ]; then
     fail 113 "a prompt-mode build past PROMPT_BRIEF_CUTOFF carries no record with ## The prompt under its prompts/ folder at the pinned BASE, and an absent record is not nothing to grade: $base:$dir/prompts/"
     return 1
@@ -6837,7 +6849,9 @@ verb_preflight() { # slug · keepalive-id
   check_waiver_scope || true
   # TOOL-aQuotedBrief-1 S4 - the prompt record stands on its own; a consumer of AUTH_MODE, so here,
   # and before the write gate below, so a refusal leaves the run-state file unwritten.
-  check_prompt_brief "$slug" "${base:-}" || true
+  # TOOL-aQuotedBrief-6 S1 - at a FIRST preflight only, check_branch_carried's gate: a re-preflight
+  # derives a moved BASE, and a roster grown mid-run would fail rule 3 there (round 1 M3).
+  [ -z "$_pf_first" ] || check_prompt_brief "$slug" "${base:-}" || true
   # TOOL-aQuotedBrief-2 S1 and S3 - a FIRST preflight refuses a branch carrying commits the default
   # branch lacks outside the build folder; before the write gate, so a refusal writes no RUN.md.
   [ -z "$_pf_first" ] || check_branch_carried "$slug" || true

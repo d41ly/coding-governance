@@ -4270,6 +4270,36 @@ git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin 
 out=$(run --preflight tBr --keepalive-id k1)
 hit  "$out" "first rule failed, then the record: rule 5 $_qb_rec"
 miss "$out" "preflight OK"
+# ---- TOOL-aQuotedBrief-6 S8 (closing review round 1 L4): structural rules 2, 3 and 4, and the order
+# ---- and non-empty halves of rule 1, each a one-line break of the conforming record. The pre-unit
+# ---- driver already passed these; each was observed RED against a driver with the five predicates
+# ---- staged out of the structural awk.
+for _qb_arm in 2 3 4 1o 1e; do
+  reset_tree; write_default_conf 'PROMPT_BRIEF_CUTOFF="2026-07-01"'; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+  mkdir -p memory/builds/tBr/prompts; printf '%s' "$_qb_ok" > "$_qb_rec"
+  case "$_qb_arm" in
+    2)  mutate "$_qb_rec" 's/^1\. The widget\./The widget./' ;;
+    3)  mutate "$_qb_rec" '/^## Drawn from the session$/,/^none$/d' ;;
+    4)  mutate "$_qb_rec" '/^## Owner confirmation$/,$d' ;;
+    1o) mutate "$_qb_rec" 's/^### Items$/### Tmp/; s/^### Acceptance$/### Items/; s/^### Tmp$/### Acceptance/' ;;
+    1e) mutate "$_qb_rec" '/^### Gates$/{n;d}' ;;
+  esac
+  scope published
+  git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+  out=$(run --preflight tBr --keepalive-id k1)
+  hit  "$out" "first rule failed, then the record: rule ${_qb_arm%[oe]} $_qb_rec"
+  miss "$out" "preflight OK"
+done
+# ---- TOOL-aQuotedBrief-6 AC5: a record whose name carries a non-ASCII character is listed unquoted and
+# ---- graded, not skipped into check 113. Observed RED against the pre-unit driver, which C-quoted it.
+_qb_utf=memory/builds/tBr/prompts/2026-10-09-prompt-mandaté.md
+reset_tree; write_default_conf 'PROMPT_BRIEF_CUTOFF="2026-07-01"'; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_qb_bare" > "$_qb_utf"
+scope published
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "first rule failed, then the record: rule 1 $_qb_utf"
+miss "$out" "UNATTENDED check 113 FAILED"
 # ---- AC4: a conforming, self-contained record is admitted with no confirmation.
 reset_tree; write_default_conf 'PROMPT_BRIEF_CUTOFF="2026-07-01"'; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
 mkdir -p memory/builds/tBr/prompts; printf '%s' "$_qb_ok" > "$_qb_rec"
@@ -4407,7 +4437,11 @@ write_brief_record() { # slug · the ### Items lines -> a conforming prompt reco
   printf '%s' "$_qb_bare"$'\n## The brief\n\n### Goal\nBuild the widget.\n\n### Items\n'"$2"$'\n\n### Acceptance\nIt renders.\n\n### Gates\nThe bar.\n\n### Non-goals\nNothing else.\n\n## Drawn from the session\n\nnone\n\n## Owner confirmation\n\nnot asked — the brief draws on nothing outside the prompt\n' > "memory/builds/$1/prompts/2026-10-09-prompt-mandate.md"
 }
 _bq_why="a brief item at the pinned BASE does not join the authorized roster, so the close could not tell an item the owner asked for from one the run dropped or added; give every ### Items line the one disposition its prompt path names - the rule failed, after the record holding it:"
-for _bq_arm in 1 2 3 4 ok; do
+# TOOL-aQuotedBrief-6 S8 (closing review round 2 low 1) - every arm also carries a build brief with no
+# `## The prompt` SORTING AFTER the mandate, so arm 3 shows rule 3 still fires when a skipped record is
+# the loop's last; observed RED against a driver staged to return once a record is skipped after one
+# was found. Arms stale, bullet and many are AC3, AC4 and round 1 L4's two-disposition half.
+for _bq_arm in 1 2 3 4 stale bullet many ok; do
   reset_tree; write_default_conf 'PROMPT_BRIEF_CUTOFF="2026-07-01"'; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
   roster tBr "1. ARCH-tBr-1 — the unit"
   case "$_bq_arm" in
@@ -4415,8 +4449,12 @@ for _bq_arm in 1 2 3 4 ok; do
     2)  write_brief_record tBr $'1. The unit. [planned ARCH-tBr-9]' ;;
     3)  write_brief_record tBr $'1. The unit. [stale it is built at BASE]' ;;
     4)  write_brief_record tBr $'1. The unit. [planned ARCH-tBr-1]\n2. Again. [duplicate 3]\n3. Old. [stale it is true at BASE]' ;;
+    stale)  write_brief_record tBr $'1. The unit. [planned ARCH-tBr-1]\n2. Old. [stale]' ;;
+    bullet) write_brief_record tBr $'1. The unit. [planned ARCH-tBr-1]\n- The docs.' ;;
+    many)   write_brief_record tBr $'1. The unit. [planned ARCH-tBr-1] [stale it is built]' ;;
     ok) write_brief_record tBr $'1. The unit, [bracketed] in its text. [planned ARCH-tBr-1]\n2. Again. [duplicate 1]\n3. Later. [parked the owner decides]' ;;
   esac
+  printf '# ARCH-tBr-1 — build brief\n\n- Build the widget.\n' > memory/builds/tBr/prompts/2026-10-09-prompt-tBr-1-1-build-brief.md
   scope published
   git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
   out=$(run --preflight tBr --keepalive-id k1)
@@ -4429,11 +4467,32 @@ for _bq_arm in 1 2 3 4 ok; do
     3)  hit  "$out" "$_bq_why rule 3, a roster unit no planned item names: ARCH-tBr-1" ;;
     # ---- AC3: a duplicate of an item nothing builds is rule 4.
     4)  hit  "$out" "$_bq_why $_qb_rec rule 4, a duplicate of item 3, which is not planned: item 2" ;;
+    # ---- TOOL-aQuotedBrief-6 AC3: a bare `[stale]` is no disposition. AC4: a line opening no `<n>.` is
+    # ---- refused by rule 1, named. Both observed RED against the pre-unit driver, which admitted them.
+    stale)  hit "$out" "$_bq_why $_qb_rec rule 1, not exactly one disposition among planned, stale, duplicate and parked: item 2" ;;
+    bullet) hit "$out" "$_bq_why $_qb_rec rule 1, an ### Items line that opens no <n>., so it is no item the join can read: - The docs." ;;
+    # ---- two dispositions on one line; observed RED with the `many` reading staged out.
+    many)   hit "$out" "$_bq_why $_qb_rec rule 1, not exactly one disposition among planned, stale, duplicate and parked: item 1" ;;
     # ---- the green control: every rule met, with a bracket inside an item's text, is admitted.
     ok) hit  "$out" "preflight OK"; miss "$out" "does not join the authorized roster" ;;
   esac
   [ "$_bq_arm" = ok ] || miss "$out" "preflight OK"
 done
+# ---- TOOL-aQuotedBrief-6 AC1: a run admitted at its first preflight grows its roster by a unit no brief
+# ---- item plans, and its RE-preflight is admitted: the join is graded once. Observed RED against the
+# ---- pre-unit driver, which re-graded it at the moved BASE and refused at rule 3.
+reset_tree; write_default_conf 'PROMPT_BRIEF_CUTOFF="2026-07-01"'; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+roster tBr "1. ARCH-tBr-1 — the unit"
+write_brief_record tBr '1. The unit. [planned ARCH-tBr-1]'
+scope published
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "preflight OK"
+mutate memory/builds/tBr/README.md 's/^1\. ARCH-tBr-1 — the unit$/&\n2. ARCH-tBr-2 — a unit added mid-run/'
+git add -A >/dev/null && git commit -q -m grown --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "preflight OK"
+miss "$out" "UNATTENDED check 115 FAILED"
 # Main back to BASE and the run branch back to UNIT0: a loop arm's merged conf would conflict with the
 # cutoff `build_brief_run` commits on main below, and a refused merge grades the fixture's BASE conf.
 git checkout -qf main; git reset -q --hard "$BASE"; git push -q -f origin main; reset_tree
@@ -4516,6 +4575,39 @@ out=$(run --preflight tRun --keepalive-id KA-1234)
 hit  "$out" "preflight OK"; miss "$out" "does not join the authorized roster"
 add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
 printf '2026-08-31T00:00:00Z review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED\n' >> memory/builds/tRun/RUN.md
+out=$(run --close tRun $_bq_ovr)
+hit  "$out" "close OK"; miss "$out" "$_bq_term7"
+# ---- TOOL-aQuotedBrief-6 AC6: a park for ANOTHER item whose reason quotes ` · item brief item 1:` meets
+# ---- nothing. Observed RED against the pre-unit driver, which matched that text anywhere in RUN.md.
+build_brief_run 2026-07-01
+sed -i 's/| CLOSED | rev-1 |/| WONTDO | rev-1 |/' memory/builds/tRun/README.md memory/builds/tRun/RUN.md
+run --park tRun --item "brief item 2: another" --reason "forged · item brief item 1: in a reason" >/dev/null
+out=$(run --close tRun $_bq_ovr)
+hit  "$out" "$_bq_term7 · item 1 planned, and not CLOSED: ARCH-tRun-1, with no parked line naming brief item 1:"
+miss "$out" "close OK"
+# ---- TOOL-aQuotedBrief-6 S8 (closing review round 1 M5): with SPEC_THIN_CUTOFF declared, as this repo
+# ---- declares it, term 7 is reached through the call AFTER term 6, which no other arm takes. Observed
+# ---- RED with that call staged out. The fixture spec's name carries no date, so term 6 skips it.
+build_brief_run 2026-07-01
+sed -i 's/| CLOSED | rev-1 |/| WONTDO | rev-1 |/' memory/builds/tRun/README.md memory/builds/tRun/RUN.md
+printf 'SPEC_THIN_CUTOFF="2026-07-01"\n' >> .unattended.conf
+git add .unattended.conf && git commit -q -m bq-thin --no-verify
+out=$(run --close tRun $_bq_ovr)
+hit  "$out" "$_bq_term7 · item 1 planned, and not CLOSED: ARCH-tRun-1, with no parked line naming brief item 1:"
+miss "$out" "the project declares no SPEC_THIN_CUTOFF"
+# ---- TOOL-aQuotedBrief-6 S8 (closing review round 1 M5): the slug-mode half of AC7 over a BASE that DOES
+# ---- carry a prompt record planning a WONTDO unit, with the cutoff declared there: only the run's mode
+# ---- keeps term 7 off. Observed RED with the `fact mode = prompt` guard staged out.
+git checkout -qf main; git reset -q --hard "$_bq_main"; git clean -qfd
+mutate memory/builds/tRun/README.md '/^authorized-by: prompt$/d'
+printf 'PROMPT_BRIEF_CUTOFF="2026-07-01"\n' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m bq-slug --no-verify && git push -q -f origin main
+git checkout -qf unit; git reset -q --hard "$_bq_base"; git clean -qfd; mkconf
+git merge -q --no-edit main >/dev/null 2>&1
+run --preflight tRun --keepalive-id KA-1234 >/dev/null
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
+printf '2026-08-31T00:00:00Z review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED\n' >> memory/builds/tRun/RUN.md
+sed -i 's/| CLOSED | rev-1 |/| WONTDO | rev-1 |/' memory/builds/tRun/README.md memory/builds/tRun/RUN.md
 out=$(run --close tRun $_bq_ovr)
 hit  "$out" "close OK"; miss "$out" "$_bq_term7"
 # ---- AC7: a README before the cutoff, and a slug-mode build, close as at BASE: the WONTDO unit is terminal.
@@ -16736,7 +16828,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 2714 -> 2724 by TOOL-aQuotedBrief-5: the doubled-space heading arms in region three, AC1 at
 # preflight (two mutate, hit, miss) and AC2 at preflight and close (two mutate, two hit, two miss), run
 # as slices of the prologue and those blocks on node a, 2026-10-09; no suite ran.
-FLOOR_ASSERTIONS=2724
+# RAISED 2724 -> 2768 by TOOL-aQuotedBrief-6: the closing review's missing arms in region three - five
+# structural-rule arms (20), the non-ASCII record name (3), three join-loop arms (9), the re-preflight of
+# a grown roster (5), and the park-reason, THIN-cutoff and slug-mode close arms (7) - run as slices of the
+# prologue and those blocks on node a, 2026-10-09; no suite ran.
+FLOOR_ASSERTIONS=2768
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -16924,7 +17020,8 @@ FLOOR_SHARD_2=222
 # RAISED 323 -> 326 by the same B1 arm, see FLOOR_ASSERTIONS.
 # RAISED 326 -> 336 by TOOL-aQuotedBrief-4: the same 10 region-three cutoff-at-BASE assertions, see FLOOR_ASSERTIONS.
 # RAISED 336 -> 346 by TOOL-aQuotedBrief-5: the same 10 region-three doubled-space heading assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_3=346
+# RAISED 346 -> 390 by TOOL-aQuotedBrief-6: the same 44 region-three assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=390
 FLOOR_SHARD_4=390
 FLOOR_SHARD_5=270
 FLOOR_SHARD_6=129
