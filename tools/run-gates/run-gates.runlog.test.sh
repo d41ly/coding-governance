@@ -746,8 +746,10 @@ scan_exit_sites() { # file... -> one TAB-separated row per shell exit
 cat > "$WORK/exits.tsv" <<'EXITS'
 echo "run-gates: cannot create the run record at $RUNDIR" >&2; exit 2	1	AC8 run-dir
 ' "$LEGS_FILE" "$TIMINGS" "$(dirname "$KITREL")") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }	1	AC8 manifest
-kill -0 "$_me" 2>/dev/null || exit 0	1	exempt: the wall watcher's ( … ) & subshell, which runs no trap of the runner's
+kill -0 "$_me" 2>/dev/null || exit 0	2	exempt: the wall watcher's and the census sampler's ( … ) & subshells, which run no trap of the runner's
 [ -f "$_work/wall.disarm" ] && exit 0	1	exempt: the wall watcher's ( … ) & subshell, which runs no trap of the runner's
+[ -f "$_work/census.disarm" ] && exit 0	1	exempt: the census sampler's ( … ) & subshell, from TOOL-aGraftedHelix-5, which runs no trap of the runner's
+measure_foreign >> "$_f" 2>/dev/null || exit 0	1	exempt: the census sampler's ( … ) & subshell, from TOOL-aGraftedHelix-5, which runs no trap of the runner's
 cd "$dir" || exit 97	1	exempt: run_leg_at's ( … ) subshell, from TOOL-dDerivedDocket-23's red attribution, which runs no trap of the runner's
 exit 1	2	AC2 wall|AC1 red
 exit 2	1	AC2 refused
