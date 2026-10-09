@@ -3373,6 +3373,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "check_git_arms",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
       "id": "check_git_split_parses",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -3489,6 +3494,11 @@
     },
     {
       "id": "check_hook_blobs",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_hook_modes",
       "kind": "function",
       "file": "tools/check-wiring.sh"
     },
@@ -3676,6 +3686,16 @@
       "id": "check_miss",
       "kind": "function",
       "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
+      "id": "check_mode_carry",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_mode_never_down",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "check_mp_value",
@@ -4156,6 +4176,11 @@
       "id": "check_spec_audit",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "check_ssh_keepalive",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
     },
     {
       "id": "check_staged_backlog",
@@ -5336,6 +5361,11 @@
       "id": "derive_bases",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "derive_blob_oid",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
     },
     {
       "id": "derive_bm_r3",
@@ -8688,6 +8718,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "measure_mode_carry",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "measure_near_match",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -11128,6 +11163,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "read_hook_oids",
+      "kind": "function",
+      "file": "tools/check-wiring.test.sh"
+    },
+    {
       "id": "read_hooked_journal",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -11421,6 +11461,11 @@
       "id": "read_mode",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "read_mode_lines",
+      "kind": "function",
+      "file": "tools/check-wiring.test.sh"
     },
     {
       "id": "read_model_counts",
@@ -12071,6 +12116,11 @@
       "id": "read_tree_fingerprint",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "read_tree_modes",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "read_tree_paths",
@@ -13633,6 +13683,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "resolve_clean_oids",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
       "id": "resolve_commit_build",
       "kind": "function",
       "file": "tools/push-main.sh"
@@ -14191,6 +14246,11 @@
       "id": "resolve_landed_log",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "resolve_landed_mode",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "resolve_landing_at",
@@ -15526,6 +15586,11 @@
       "id": "run_f4_filer",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_fixture_git",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
     },
     {
       "id": "run_format",
@@ -16898,6 +16963,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "seed_hostile_env",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
       "id": "seed_landing",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -16906,6 +16976,11 @@
       "id": "seed_log",
       "kind": "function",
       "file": "tools/unattended/resume-tick.test.sh"
+    },
+    {
+      "id": "seed_mode_fixture",
+      "kind": "function",
+      "file": "tools/check-wiring.test.sh"
     },
     {
       "id": "seed_range_fixture",
@@ -16941,6 +17016,11 @@
       "id": "seed_spec_h1",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "seed_ssh_fixture",
+      "kind": "function",
+      "file": "tools/check-wiring.test.sh"
     },
     {
       "id": "seed_su_claim",

@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.33` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.34` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -127,7 +127,7 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `run-gates.runlog.test.sh` | the run-log arms: one line per bar on every exit path after the trap and on every caught signal, withheld from the payload |
 | `adopt-run-gates.sh` | `--check` asserts a target's `[gate_runner]` declaration still matches this runner's output strings |
 | `adopt-run-gates.test.sh` | the adopter e2e, gated on EFFECTS rather than exit codes |
-| `check-receipt.py` | the leg `receipt sync (installed files match the receipt)`: every engine row of `.governance/install.json` still on disk and still hashing to its recorded sha256. The INTEGRITY half only — it reads no `source`, `commit` or `gov_oid`, because those resolve against a gov checkout an adopter does not have, and it grades no `seed`, `merged`, `attributes` or `forked` row. A tree with no receipt is an announced `SKIP`, and four built-in fixture arms run on every invocation so the leg has a verdict there too |
+| `check-receipt.py` | the leg `receipt sync (installed files match the receipt)`: every engine row of `.governance/install.json` still on disk and still hashing to its recorded sha256, or, where the raw bytes miss, hashing through the target's own clean filter to the row's `oid` while the raw bytes' blob does not: that row is graded clean and counted `eol-only` on the summary and `ok` lines, the rule `govkit check` applies, in one `git hash-object --stdin-paths` spawn for every such row. A row with no `oid`, a real edit, a CRLF copy no filter normalizes, a tampered `sha256` over bytes that are the blob, a tree with no `.git` and a git refusal all still red, the last two with a `GIT` line naming why. The INTEGRITY half only — it reads no `source`, `commit` or `gov_oid`, because those resolve against a gov checkout an adopter does not have, and it grades no `seed`, `merged`, `attributes` or `forked` row. A tree with no receipt is an announced `SKIP`, and the built-in fixture arms, the eol-only ones over real git repositories, run on every invocation so the leg has a verdict there too; its `fixtures:` line prints their count |
 | `kit.toml` | this entry, declared as data |
 
 ## Reuse, and the baseline a guard diffs against

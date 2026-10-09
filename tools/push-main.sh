@@ -218,7 +218,10 @@ esac
 # proxy this must not drop. ServerAliveCountMax is deliberately large: the product with the interval
 # is the tolerated silence, and it has to outlast the SLOWEST bar an adopter can produce, not the
 # fastest. Costs one 32-byte keepalive every 30 s on an otherwise idle socket.
-: "${GIT_SSH_COMMAND:=ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=120 -o TCPKeepAlive=yes}"
+# The wiring checker derives `core.sshCommand` from the definition line below by reading this file,
+# never sourcing it, so its shape is a contract: ONE line, `GOV_SSH_KEEPALIVE='...'`, single-quoted.
+GOV_SSH_KEEPALIVE='ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=120 -o TCPKeepAlive=yes'
+: "${GIT_SSH_COMMAND:=$GOV_SSH_KEEPALIVE}"
 export GIT_SSH_COMMAND
 
 # ---- SHARED BY BOTH PATHS -----------------------------------------------------------------------

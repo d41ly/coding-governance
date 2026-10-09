@@ -23,3 +23,17 @@ TOOL-aRepatriatedFork-44	built without a recorded brief at 76d21026: the orchest
 TOOL-aRepatriatedFork-46	misread: 09dae486 is the adoption records commit (subject names the unit, diff moves .memory-tree.conf pins); first code df18ab42, which carries its brief row
 DEPL-aHalvedInstall-5	built without a recorded brief at 1137a5af: added by --rescope after the closing review and built inline with no --brief row; a reconstructed brief sits under the build's prompts/ and the waiver is parked for the owner
 TOOL-aMendedFleet-39	misread: 725b14490 is the build's spec commit (subject names the unit first, diff touches memory/project/curation-debt.txt); the build commit is 80071a028, trailered Pass: TOOL-aMendedFleet-39, which carries its brief row
+#
+# THE aLevelledCopy ROWS are one kind, a LATE ROW, written by that run's close on 2026-10-09. Each
+# unit's `--brief` row was staged during its pass, but the build brief told the pass to stage only
+# its declared paths, so the pass left RUN.md out (commit-msg exempts the run-state file; the brief
+# did not say so) and the main loop committed it in the records commit right after. The row is in
+# history one commit late, with its hash joining the brief that pass was handed. History is
+# append-only, so no honest row can move into the build commit.
+DEPL-aLevelledCopy-1	late row: its --brief row is in RUN.md at 53a8cc080, the records commit right after the pass, because the build brief said to stage declared paths only and the pass left RUN.md for the main loop
+TOOL-aLevelledCopy-1	late row: its --brief row is in RUN.md at ff49508fa, the records commit right after the pass, because the build brief said to stage declared paths only and the pass left RUN.md for the main loop
+TOOL-aLevelledCopy-2	late row: its --brief row is in RUN.md at 33a15c879, the records commit right after the pass, because the build brief said to stage declared paths only and the pass left RUN.md for the main loop
+TOOL-aLevelledCopy-3	late row: its --brief row is in RUN.md at bb6178eab, the records commit right after the pass, because the build brief said to stage declared paths only and the pass left RUN.md for the main loop
+TOOL-aLevelledCopy-7	late row: its --brief row is in RUN.md at dae09ec1f, the records commit right after the pass, because the build brief said to stage declared paths only and the pass left RUN.md for the main loop
+TOOL-aLevelledCopy-9	late row: its --brief row is in RUN.md at 0a09d7a09, the records commit right after the pass, because the build brief said to stage declared paths only and the pass left RUN.md for the main loop
+TOOL-aLevelledCopy-8	late row: its --brief row is in RUN.md at 669816ae7, the records commit right after the pass, because the build brief said to stage declared paths only and the pass left RUN.md for the main loop
