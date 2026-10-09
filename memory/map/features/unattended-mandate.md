@@ -5,7 +5,7 @@ feature = "unattended-mandate"
 title = "The unattended run's authorization: the observed anchor and the ask mandate"
 status = "building"
 streams = ["tooling"]
-decisions = ["TOOL-aStandingWrit-2", "TOOL-dNarrowedAnchor-1", "TOOL-dDerivedDocket-19"]
+decisions = ["TOOL-aStandingWrit-2", "TOOL-dNarrowedAnchor-1", "TOOL-dDerivedDocket-19", "TOOL-aHomedAnchor-1"]
 
 [claims]
 gate-legs = []
@@ -50,6 +50,13 @@ reproduced end to end: preflight printed OK over a base the run had authored, th
 and the push landed. The ref name and tip now come from what the remote advertises for its own HEAD,
 and `GOV_DEFAULT_BRANCH` is a cross-check that can only refuse. Both routes are inert, not detected:
 neither value is read at all.
+
+**`ANCHOR_SCOPE="local"` gives that up on purpose** (`TOOL-aHomedAnchor-1`, owner, 2026-10-09). Where
+the first anchor misses, a README committed at HEAD authorizes a run in any mode with no push, and
+later verbs read the RECORDED base, because no observation off the node exists to derive one from.
+The leg admits such a BASE only where the conf at the remote's advertised default-branch tip
+declares `local`, read off the advertisement and never a local ref (`TOOL-aHomedAnchor-2`), and it
+still reds a local-admitted record pinning `may:` or `asks:`.
 
 **A sha is a NAME, and the dereference is pinned separately.** `git replace` substitutes the object a
 sha resolves to and a graft file rewrites the commit graph, both at a perfectly honest anchor, so
