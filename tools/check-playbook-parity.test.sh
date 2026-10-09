@@ -151,6 +151,9 @@ fixture() {
   cp "$GATE_SRC" "$d/${FX}check-playbook-parity.sh"
   : > "$d/${FX}${MT_KIT}/engine.sh"
   printf 'const CAP = 5\nconst MAX_VERIFIERS = 5\nconst MAX_LENSES = 5\n' > "$d/${FX}${HOOKS}/agent-cap.js"
+  # The hook README states three of the bounds since v4.0 (TOOL-aDistilledCharter-6).
+  printf 'an array LITERAL of <=5 elements\nroute through boundedParallel(thunks, 5)\nany K it cannot resolve to an integer <=5\n' \
+    | sed 's/<=/≤/g' > "$d/${FX}${HOOKS}/README.md"
   # The registry declares the two kits this fixture plants. `lib` is declared and holds no tracked
   # file, so it is no kit; the registry's own directory is declared nowhere, so it is none either.
   printf '[[entry]]\nid = "memory-tree"\ndescriptor = "{prefix}/%s/kit.toml"\n\n[[entry]]\nid = "agent-cap"\ndescriptor = "{prefix}/%s/kit.toml"\n\n[[exempt]]\npath = "{prefix}/lib"\nwhy = "gov-internal"\n' \
@@ -261,6 +264,9 @@ arm "AC3 at a root install a declared kit the playbook never names reds by name"
 FX=$PFX
 
 # --- AC2 · the unit's central proof: a stated value drifting from the source that owns it ----------
+arm "AC2 MAX_LENSES drifts from the hook README's stated bound" red \
+  "a declared value pair disagrees with the source that owns it. Pair lens-array bound" \
+  sh -c 'printf "const MAX_VERIFIERS = 5\nconst MAX_LENSES = 6\n" > '"${PFX}${HOOKS}/agent-cap.js"''
 arm "AC2 MAX_VERIFIERS drifts from the template's stated total" red \
   "a declared value pair disagrees with the source that owns it. Pair verify-agent total" \
   sh -c 'printf "const MAX_VERIFIERS = 6\n" > '"${PFX}${HOOKS}/agent-cap.js"''

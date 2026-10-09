@@ -244,10 +244,11 @@ done
 # with `|` as the delimiter that row silently reparsed into the wrong fields — a real failure for a
 # fake reason, which is worse than either a pass or an honest red. `~` appears in none of these.
 #
-# FOUR PAIRS RETIRED at v4.0 (TOOL-aDistilledCharter-3): the lens-array bound, the hook matcher, the
-# bounded-helper width and the resolved-K ceiling. The charter states none of those phrases now; the
-# hook's own README carries its grammar, and the `verifier fan-out` leg compares the harness with
-# the hook. The verify-agent total stays, because the charter's `[bound]` line still states it.
+# THE STATED SIDE MOVED at v4.0. The charter keeps one digit, the verify-agent total in its `[bound]`
+# line. The lens-array bound, the bounded-helper width and the resolved-K ceiling are stated by the
+# hook's own README now, so those three pairs read it (TOOL-aDistilledCharter-6, closing review
+# round 1, G1: retired outright, their digits would drift with no gate watching). The hook-matcher
+# pair is retired: no prose states the matcher, and `check-wiring.sh` grades the settings file.
 #
 # The pair list is no longer playbook-only. TOOL-aHonedRuleset-5 added a row whose stated side is
 # the kickoff MANIFEST TEMPLATE, because the value it pins -- the stamp rule's sha expression --
@@ -256,7 +257,10 @@ done
 # the stamp. The datetime half, whether a stamp is FRESH, and whether the sha it names is reachable
 # are manifest-check.sh's checks 3 and 5, not this gate's.
 PAIRS="
+lens-array bound~${HK_DIR}/README.md~sed -n 's/.*array LITERAL of ≤\([0-9]\+\) elements.*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_LENSES = \([0-9]\+\).*/\1/p'
 verify-agent total~$TEMPLATE~sed -n 's/.*at most \([0-9]\+\) verify agents TOTAL.*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+bounded-helper width~${HK_DIR}/README.md~sed -n 's/.*boundedParallel(thunks, \([0-9]\+\)).*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+resolved-K ceiling~${HK_DIR}/README.md~sed -n 's/.*cannot resolve to an integer ≤\([0-9]\+\).*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
 stamp rule sha expression~skills/session-kickoff/MANIFEST-TEMPLATE.md~sed -n 's/.*Stamp rule: sha = \`\([A-Z]*\)\` on any branch.*/\1/p'~skills/session-kickoff/manifest-check.sh~sed -n 's/^STAMP_SHA_RULE=\"sha = \([A-Z]*\) on any branch\".*/\1/p'
 "
 
