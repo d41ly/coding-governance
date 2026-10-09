@@ -1,6 +1,6 @@
 # TOOL-aDistilledCharter-3 — the parity gate drops the retired pairs, the canary re-points, and a new arm bans section-number citations
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -68,8 +68,11 @@ Case-insensitive, per line:
 §1 Landing | §16 R1                                                   the two named v3.5 subsections
 ```
 
-A near-miss is `§[0-9]+` on a line of the population with no charter word; it prints with its count
-so the stage visibly measured something on a clean tree. A hit names `file:line` and the match.
+A line citing the SPEC template's own sections (`spec template's §8`) is excluded: it names
+`TEMPLATE-SPEC.md`, whose numbered sections are real, and two live guides cite it that way. A
+near-miss is `§[0-9]+` on a line of the population that is not a hit, the excluded lines among them;
+it prints with its count so the stage visibly measured something on a clean tree. A hit names
+`file:line` and the match.
 
 ### Inventory
 
@@ -125,6 +128,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-09 · §4 · AC2 · the predicate excludes citations of the spec template's sections,
+  which TOOL-aDistilledCharter-4's sweep found live and correct.
 
 ## 10. Reuse audit
 

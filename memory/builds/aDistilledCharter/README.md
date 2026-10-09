@@ -75,7 +75,7 @@ ids DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 P
 | [PLAY-aDistilledCharter-1 — the charter template v4.0, with a disposition for every v3.5 rule](spec/2026-10-09-spec-PLAY-aDistilledCharter-1.md) | 4 | 2 | SPECCED | rev-2 | 2026-10-09 |
 | [PLAY-aDistilledCharter-4 — gov adopts v4.0: its wrapper folds into section 2 and its charter re-renders](spec/2026-10-09-spec-PLAY-aDistilledCharter-4.md) | 5 | 1 | SPECCED | rev-2 | 2026-10-09 |
 | [TOOL-aDistilledCharter-4 — every live citation of a charter section number is re-pointed](spec/2026-10-09-spec-TOOL-aDistilledCharter-4.md) | 6 | 1 | SPECCED | rev-1 | 2026-10-09 |
-| [TOOL-aDistilledCharter-3 — the parity gate drops the retired pairs, the canary re-points, and a new arm bans section-number citations](spec/2026-10-09-spec-TOOL-aDistilledCharter-3.md) | 7 | 2 | SPECCED | rev-1 | 2026-10-09 |
+| [TOOL-aDistilledCharter-3 — the parity gate drops the retired pairs, the canary re-points, and a new arm bans section-number citations](spec/2026-10-09-spec-TOOL-aDistilledCharter-3.md) | 7 | 2 | SPECCED | rev-2 | 2026-10-09 |
 | [DEPL-aDistilledCharter-1 — the runbook adopts v4.0: section 2, the fleet claim and the re-tag step](spec/2026-10-09-spec-DEPL-aDistilledCharter-1.md) | 8 | 1 | SPECCED | rev-1 | 2026-10-09 |
 | [KICK-aDistilledCharter-1 — the kickoff manifest's §B becomes one-liners, every evicted bullet recorded](spec/2026-10-09-spec-KICK-aDistilledCharter-1.md) | 9 | 1 | SPECCED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
