@@ -340,7 +340,10 @@ PINS: dict[str, int] = {
     # which needs the old and new values written here. The keys are not named: read the detail.
     # 29 -> 30 at the reconcile of aMendedFleet with origin/main, 2026-10-06: main's dThriftyLanding
     # handoff verb arrived with its own armed cutoff in .unattended.conf, and no key stopped being armed.
-    "cutoff_keys_armed": 30,
+    # 30 -> 31 at aQuotedBrief's close, 2026-10-09, by owner ruling: TOOL-aQuotedBrief-1 arms
+    # PROMPT_BRIEF_CUTOFF in .unattended.conf, the switch for the brief check and term 7, and no key
+    # stopped being armed.
+    "cutoff_keys_armed": 31,
     # 26 - MEASURED at TOOL-aMendedFleet-37, which added the signal, at its own commit: 26 of 27
     # feature dossiers older than their paths, every one but the codebase-map dossier that unit
     # refreshed. Report-only; the pin is a declared DRAIN, one dossier re-read at a time, and the

@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-09T18:57:38+03:00 @ 3459008235d864fb337e603379d6567c9863d2bb
+last-audit: 2026-10-09T22:00:01+03:00 @ 97b32e950340a7fc8792e0ea23fa2ba7513f4a2f
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 764b6d8cece5533bf0ea3ea116a5e0b58698ab8e
+last-body-change: 295e6bee4df91e133775b04c1456a970a05794f2
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -70,7 +70,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 - **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit
   ask, or a committed build folder the run did not create. What "did not create" admits depends on the
   ANCHOR the project declares, and this file does not paraphrase it — an earlier paraphrase here said
-  "committed before the run's branch existed", which describes one anchor and is false of the other.
+  "committed before the run's branch existed", which describes one anchor and is false of the others.
   `memory/guides/UNATTENDED-PROTOCOL.md` section 1 is the condition.
 - **Governing docs:** `AGENTS.md` (the charter — authoritative) · `coding-governance-agents.template.md`
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + asks in `memory/builds/<slug>/BACKLOG.md`.

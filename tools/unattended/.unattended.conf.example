@@ -295,6 +295,14 @@ DIRECTIVES_FLOOR="17"
 # the file the bar reads, that they author their own authorization. The leg re-derives the same
 # verdict from the recorded BASE and the advertised default-branch tip, so cost 2 above is no longer
 # the whole story: the leg cannot read THIS file, but it can read that.
+#
+# TOOL-aHomedAnchor-1 - `local` is the THIRD value: that first anchor, then LOCAL HISTORY - a build
+# README committed at HEAD when --preflight pins the BASE, in EVERY mode, `slug` included, with no
+# push. An owner starts a run from the worktree branch or the local default branch that wrote the
+# folder. It spends more than `published`: nothing off this node pins the BASE, so the recorded base
+# is the input. The leg admits an unpublished BASE only when THIS key reads `local` in the conf at
+# the tip the remote advertises for its default branch, so the opt-in binds once it has landed. The
+# landing still pushes. Protocol section 1 carries the costs.
 ANCHOR_SCOPE=""
 
 # TOOL-aNamedGesture-1 - the TOKEN that authorizes a prompt-mode run. The Skill's prompt path is
@@ -492,6 +500,13 @@ DISPOSITION_CUTOFF=""
 # back-catalogue from a day their tree knows nothing about. Blank turns the term OFF and the leg
 # announces that it did.
 BRIEF_RECORDED_CUTOFF=""
+
+# PROMPT_BRIEF_CUTOFF - the date from which `--preflight` refuses a prompt-mode run whose prompt
+# record does not stand on its own: the brief, the session passages it relied on and the owner's
+# confirmation, in the shape the verbs file's prompt path names. Graded on the build README's
+# `opened:` date at the pinned BASE. BLANK in the example, like every sibling cutoff here and for the
+# same reason; blank turns the refusal OFF and `--preflight` announces that it did.
+PROMPT_BRIEF_CUTOFF=""
 
 # RUNLOG_SESSION_VARS - the NAMES of environment variables whose values each run-log START line
 # records as `sess.<NAME>=`, space-separated, eight at most. The run log is the driver's own

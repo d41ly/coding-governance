@@ -52,7 +52,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.92   # gov:kit unattended@1.92 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.93   # gov:kit unattended@1.93 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -496,7 +496,7 @@ HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI="";
 ASKS_CMD=""; HELD_CI_WORKFLOW=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""; RUN_CLAIMS=""
 GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
-DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
+DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; PROMPT_BRIEF_CUTOFF=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
 # contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
 # is a declared key and defaults here like its neighbours. GOV_RUNLOG is the ENVIRONMENT's switch, so
@@ -539,6 +539,10 @@ DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; RUNLOG_SESSION_V
 #     pairs. Defaulted for SPEC_AUDIT_DEFAULT's reason, and like it the value this source binds
 #     decides nothing: `resolve_landing_node` re-reads the key from the conf blob at the pinned BASE,
 #     because a run that added its own node to the working copy would grant itself a landing.
+#   * PROMPT_BRIEF_CUTOFF (TOOL-aQuotedBrief-1 S5) - the README `opened:` date from which a
+#     prompt-mode record must carry its brief, read by `check_prompt_brief`. Blank is off, announced.
+#     The value this source binds decides nothing: `read_brief_cutoff` re-reads the key at the
+#     default-branch side of the pinned BASE (TOOL-aQuotedBrief-4), for LANDING_NODES' reason.
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -631,6 +635,8 @@ read_bound_key RESUME_STALE_BOUND "$RESUME_STALE_BOUND_DEFAULT" seconds "a run r
 # a tracked `.unattended.conf` could pre-set it and defeat the "--park requires --item" refusal by
 # supplying the item nobody typed.
 PK_ITEM=""; PK_STEP=""
+# Internal state for trusted_base, initialised here for PK_ITEM's reason (TOOL-aHomedAnchor-6 S8).
+TB_IGNORE_RECORD=0
 HALT_CODE=""
 TK_NAME=""; TK_BEAT=""
 # `--plan --paths` is an OUTPUT MODE on an existing verb, not a verb: check 26 joins every declared
@@ -1722,6 +1728,11 @@ AUTH_MAY_SET=0
 AUTH_SPEC_AUDIT=""
 AUTH_SPEC_AUDIT_DERIVED=""
 AUTH_SPEC_AUDIT_FROM=""
+# TOOL-aQuotedBrief-4 S2 - the DEFAULT-BRANCH SIDE of the pinned BASE, check_authorization's `_cb`,
+# kept so `read_brief_cutoff`'s two callers read the conf at the commit that read SPEC_AUDIT_DEFAULT
+# and never re-derive it. Cleared on that function's entry, so a refusal before the derivation
+# leaves it blank, which the reader takes as unknown and never as an absent key.
+AUTH_CONF_AT=""
 observe_anchor() {
   local v names rem uf up nrem levers adv rc aref asha envd
   # ---- 22: git config supplied through the ENVIRONMENT. A check reading a config its own caller
@@ -2416,6 +2427,20 @@ resolve_base() { # readme path (may be empty) -> sets RB_BASE, ANCHOR_KIND, BREF
   # The README does not resolve at the merge-base. Widen ONLY when the project declared it; any
   # other value — blank, misspelled, from a newer kit — keeps the strict anchor and the caller gets
   # the same refusal it got before this unit existed.
+  # TOOL-aHomedAnchor-1 S1 - THE THIRD ANCHOR, local history. It widens straight past the run
+  # branch's advertised tip, which it never observes: the owner's ruling is that starting a run costs
+  # no push. The README must be COMMITTED, so it is tested at HEAD, and the derived base is HEAD - the
+  # degenerate code, which only --preflight admits. Every later call reads the RECORDED base instead,
+  # in trusted_base, because on this anchor nothing off this node pins one.
+  # A README NOT COMMITTED AT HEAD falls through to the strict anchor (TOOL-aHomedAnchor-6 S2), so
+  # check_authorization's fail 6 names the missing README rather than fail 16 naming remote history.
+  if [ "$ANCHOR_SCOPE" = local ]; then
+    if ! GIT show "$head:$rel" >/dev/null 2>&1; then
+      ANCHOR_KIND=default-branch; [ "$mb" = "$head" ] && return 2; RB_BASE="$mb"; return 0
+    fi
+    ANCHOR_KIND=local
+    return 2
+  fi
   [ "$ANCHOR_SCOPE" = published ] || { ANCHOR_KIND=default-branch; [ "$mb" = "$head" ] && return 2; RB_BASE="$mb"; return 0; }
   # SILENT. This function's stdout is the VALUE channel — a `fail` raised here lands in the
   # caller's variable instead of reaching the operator, which is how every second-anchor refusal
@@ -2466,7 +2491,7 @@ GG_RUN_FACT=""; GG_INH_FACT=""
 # `staged` beside its attribution, never into the run-state file (implementation review round 2, M2
 # and L1), and read by `check_bar_tied`'s record-only mode.
 WI_STAGED=""; AV_STAGED=""; BT_NOTED=""
-trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
+trusted_base() { # run-state file [· allow-degenerate [· preflight]]  ->  sets TB
   local fresh rc rec head rec0 _tb_rd _tb_alt
   TB=""
   # S1's plumbing: the README beside the run-state file, derived the way the gate leg derives it
@@ -2481,6 +2506,38 @@ trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
   if [ "$rc" = 1 ] && [ -n "$BR_RC" ] && [ "$BR_RC" != 0 ]; then
     emit_branch_fail "$BR_RC"
     return 1
+  fi
+  # TOOL-aHomedAnchor-1 S2 - ON THE LOCAL ANCHOR THE RECORDED BASE IS THE INPUT, because nothing else
+  # exists: no observation off this node pins one, and a value derived here would be HEAD, compared
+  # against itself. This is the evidence-never-an-input rule given up on purpose, the cost the owner
+  # accepted when the anchor was ruled in; what stays is that the base must lie on HEAD's history and
+  # that a run which built nothing has nothing to land. A record --preflight is about to RETIRE
+  # (`TB_IGNORE_RECORD`) is a finished run's, and its base is not this run's.
+  if [ "$ANCHOR_KIND" = local ]; then
+    head=$(GIT rev-parse HEAD)
+    rec=""
+    [ "${TB_IGNORE_RECORD:-0}" = 1 ] || [ ! -f "$1" ] || rec=$(fact "$1" base)
+    # ONLY --preflight may start from no record (TOOL-aHomedAnchor-6 S7): a take-over also passes
+    # allow-degenerate, for a base equal to HEAD, and must not read a deleted line as "start here".
+    if [ -z "$rec" ]; then
+      if [ "${3:-}" = preflight ]; then
+        TB="$head"
+        return 0
+      fi
+      fail 16 "the BASE came from the local anchor and the record pins none, and on that anchor the recorded base is the only one there is, so an absent one is a refusal rather than a pass"
+      return 1
+    fi
+    if ! GIT rev-parse --verify --quiet "$rec^{commit}" >/dev/null 2>&1 \
+       || ! GIT merge-base --is-ancestor "$rec" HEAD 2>/dev/null; then
+      fail 18 "the BASE recorded in the run-state file is not an ancestor of HEAD, and on the local anchor that recorded base is the whole authorization, so a base off this history authorizes nothing: recorded $rec"
+      return 1
+    fi
+    if [ "${2:-}" != "allow-degenerate" ] && [ "$rec" = "$head" ]; then
+      fail 16 "the recorded BASE equals HEAD on the local anchor, so this run built nothing on top of it and has nothing to land"
+      return 1
+    fi
+    TB="$rec"
+    return 0
   fi
   if [ "$rc" = 2 ]; then
     # BASE == HEAD. Legal outright where the caller says so, and only ONE caller does - see
@@ -2570,10 +2627,14 @@ trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
       # THE COST: `fail 18` widens. It now fires only for a base on NEITHER history, which is
       # strictly smaller than before, so S9 carries an arm proving it still has a failing case. A
       # widened guard with no failing-case arm is indistinguishable from a deleted one.
+      # TOOL-aHomedAnchor-1 S3 - the LOCAL anchor's own derivation is any ancestor of HEAD, so a run
+      # it authorized whose folder later reaches the default branch is accepted here for S12's reason.
       if ! GIT merge-base --is-ancestor "$rec" "$fresh" 2>/dev/null \
          && ! { [ "$ANCHOR_SCOPE" = published ] \
                 && _tb_alt=$(branch_tip_quiet) \
-                && GIT merge-base --is-ancestor "$rec" "${_tb_alt##* }" 2>/dev/null; }; then
+                && GIT merge-base --is-ancestor "$rec" "${_tb_alt##* }" 2>/dev/null; } \
+         && ! { [ "$ANCHOR_SCOPE" = local ] \
+                && GIT merge-base --is-ancestor "$rec" HEAD 2>/dev/null; }; then
         fail 18 "the BASE recorded in the run-state file is not an ancestor of the base this history derives, so it names a commit off the history the anchor blesses - which is where a run's own commits live: recorded $rec, derived $fresh"
         return 1
       fi
@@ -3113,6 +3174,13 @@ SPEC_AUDIT_ASK_RE='spec-audit:|(^|[^[:alpha:]])opt[ -]?in[[:space:]]+(in|into|to
 # Prints the first prompt record under <build dir>/prompts/ AT <base> whose `## The prompt` section
 # quotes an ask in SPEC_AUDIT_ASK_RE, or returns 1. The quote is the `> ` lines up to the next `## `
 # heading, prefixes stripped and joined with single spaces, because a prompt wraps across lines.
+# TOOL-aQuotedBrief-5 S1 - IS THIS A PROMPT RECORD, one answer for all three readers: stdin holds a
+# line that is `## The prompt`, single space, with only trailing whitespace or a CR after it - the
+# anchor read_audit_ask_record spells below. A doubled space is NOT one: widening preflight's reading
+# would widen what the audit reader must also admit as the owner's words (closing review round 1, H2).
+check_prompt_heading() {
+  grep -qE '^## The prompt[[:space:]]*\r?$'
+}
 read_audit_ask_record() { # build dir · base
   local rec quote
   while IFS= read -r rec; do
@@ -3124,6 +3192,266 @@ read_audit_ask_record() { # build dir · base
       printf '%s\n' "$rec"; return 0
     fi
   done < <(GIT ls-tree --name-only --full-tree "$2" -- "$1/prompts/" 2>/dev/null)
+  return 1
+}
+
+# TOOL-aQuotedBrief-3 S1 - one line per `### Items` line of a prompt record on stdin: `<n> <kind>
+# [<args>]`. The disposition is the LAST bracketed group, ending the line, so a bracket inside the item
+# text does not move it. Kind `none` when that group is no disposition, `many` when a second
+# disposition group sits right before it; `planned` args are its ids, `duplicate` args the item number.
+# TOOL-aQuotedBrief-6 S3 and S4 - every kind takes a non-empty argument, so a bare `[stale]` is no
+# disposition; and a non-blank Items line not opening `<n>.` is printed `- none <the line>`, so the
+# join refuses it by rule 1 and term 7 reports it, rather than both reading past it (round 1 M2, M4).
+read_brief_items() {
+  awk '
+    { sub(/\r$/, ""); sub(/[[:space:]]+$/, "") }
+    /^## / { h2 = $0; sub(/^## +/, "", h2); h3 = ""; next }
+    h2 == "The brief" && /^### / { h3 = $0; sub(/^### +/, "", h3); sub(/[[:space:]]+$/, "", h3); next }
+    h2 != "The brief" || h3 != "Items" || !/[^[:space:]]/ { next }
+    !/^[0-9]+\./ { print "-", "none", $0; next }
+    {
+      n = $0; sub(/\..*/, "", n); kind = "none"; args = ""
+      if (match($0, /\[[^][]*\]$/)) {
+        d = substr($0, RSTART + 1, RLENGTH - 2); rest = substr($0, 1, RSTART - 1); sub(/[[:space:]]+$/, "", rest)
+        k = d; sub(/ .*/, "", k); a = d; if (!sub(/^[^ ]+ +/, "", a)) a = ""
+        if (k ~ /^(planned|stale|duplicate|parked)$/ && a != "") { kind = k; args = a }
+        if (kind != "none" && rest ~ /\[(planned|stale|duplicate|parked)( [^][]*)?\]$/) kind = "many"
+      }
+      print n, kind, args
+    }'
+}
+# TOOL-aQuotedBrief-4 S1 - PROMPT_BRIEF_CUTOFF AS THE CONF AT A COMMIT DECLARES IT, read the
+# SPEC_AUDIT_DEFAULT way in check_authorization and for its reasons: the working copy is a file the run
+# commits itself, so a run that blanked the key, or moved it past its README's `opened:`, turned off
+# the grading of its own brief (closing review round 1, H1 and M1). The key is BLANKED first, so a
+# conf predating it cannot inherit the working copy's value through the environment; the sentinel is
+# printed FROM INSIDE the eval'd text, on a descriptor the blob's own redirect does not cover, so it
+# appears iff evaluation reached the end whatever the last statement's status. The TWO newlines of
+# glue are that read's: without the first a blob ending in a comment swallows the printf, without the
+# second a last line ending in a backslash continuation joins the sentinel as a temp-env prefix.
+# Prints the value and returns 0, prints nothing for an ABSENT blob (off), and returns 2 for a blob
+# that ends before the read - a return, an exit, an unbound reference, a syntax error - or for no
+# commit at all, since an unknown side is not an absent key.
+read_brief_cutoff() { # commit -> the value on stdout · 2 when it cannot be known
+  local _cf _v
+  [ -n "${1:-}" ] || return 2
+  _cf=$(GIT show "$1:.unattended.conf" 2>/dev/null) || return 0
+  _v=$( PROMPT_BRIEF_CUTOFF=""; exec 3>&1
+        eval "$_cf"$'\n\n''printf "OK %s" "${PROMPT_BRIEF_CUTOFF:-}" >&3' >/dev/null 2>&1 )
+  case "$_v" in "OK "*) printf '%s' "${_v#OK }" ;; *) return 2 ;; esac
+}
+# Set by check_brief_items when term 7 is OFF, for the build-complete arm to carry on its met return.
+BI_NOTE=""
+# TOOL-aQuotedBrief-3 S3 - `build-complete` TERM 7, read at close: every brief item of a prompt-mode
+# run past PROMPT_BRIEF_CUTOFF is built by CLOSED units or parked as `brief item <n>: ...`. The mode is
+# the run-state fact, the record and the README `opened:` are read at the pinned BASE - the same gate
+# as check_prompt_brief, which refused at preflight what this would otherwise grade - statuses come
+# from the generated units region at HEAD, and a `rescope · item supersede` row hands a unit to its
+# successor, followed to the chain's end. Any other run meets the term and says nothing. Returns 1
+# with DOD_OUT naming each unmet item; leaves DOD_OUT alone when met.
+# TOOL-aQuotedBrief-4 S3 and S4 - the cutoff is the one `read_brief_cutoff` finds at the default-branch
+# side of BASE that `authorization-reachable` derived in this shell, never the working copy's. An
+# unknowable one is unmet, naming why; an OFF one is met and sets BI_NOTE, which the caller carries
+# on its met return as term 6 carries its own off-state, so a disabled term is never silent.
+check_brief_items() { # slug
+  local rm rel base opened rec txt rows sup nsup n kind args id u hop lack unmet="" cut
+  BI_NOTE=""
+  rm=$(runmd_of "$1"); rel=$(readme_of "$1")
+  [ "$(fact "$rm" mode)" = prompt ] || return 0
+  base=$(fact "$rm" base); [ -n "$base" ] || return 0
+  if ! cut=$(read_brief_cutoff "$AUTH_CONF_AT"); then
+    DOD_OUT="the brief-item term is not gradable: the project conf at the default-branch side of the pinned BASE was not derived by authorization-reachable or could not be evaluated to the end, so whether it declares PROMPT_BRIEF_CUTOFF is unknown and is not read as off - commit: ${AUTH_CONF_AT:-(none)}"
+    return 1
+  fi
+  case "$cut" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) BI_NOTE="note — the project conf at the default-branch side of the pinned BASE declares no dated PROMPT_BRIEF_CUTOFF, so the brief-item term is OFF and a brief item is not graded here: ${cut:-blank}"
+       return 0 ;;
+  esac
+  opened=$(GIT show "$base:$rel" 2>/dev/null | awk 'NR > 1 && /^---/ { exit } /^opened:/ { v = $2; sub(/\r$/, "", v); print v; exit }')
+  case "$opened" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$cut" ]] && return 0 ;;
+  esac
+  rows=$(unit_rows "$rel")
+  sup=$(sed -n 's/^.* rescope · item supersede \([^ ]*\) -> \([^ ]*\) · reason .*$/\1 \2/p' "$rm" 2>/dev/null)
+  nsup=$(printf '%s\n' "$sup" | grep -c .)
+  while IFS= read -r rec; do
+    txt=$(GIT show "$base:$rec" 2>/dev/null)
+    check_prompt_heading <<<"$txt" || continue
+    while read -r n kind args; do
+      [ -n "$n" ] || continue
+      if [ "$n" = - ]; then unmet="$unmet · the ### Items line '$args' opens no <n>., so no unit or park can meet it"; continue; fi
+      # TOOL-aQuotedBrief-6 S6 - a park counts only from the ITEM field of the line park() writes,
+      # anchored at the line's start, so a reason quoting ` · item brief item <n>:` meets nothing.
+      grep -qE -- "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:]+Z [^ ]+ · item brief item $n:" "$rm" 2>/dev/null && continue
+      lack=""
+      case "$kind" in
+        stale|duplicate) continue ;;
+        planned)
+          for id in $args; do
+            u=$id; hop=0
+            # ponytail: a chain is followed at most as many hops as there are supersede rows, so a cycle ends.
+            while [ "$hop" -lt "$nsup" ]; do
+              id=$(printf '%s\n' "$sup" | awk -v u="$u" '$1 == u { print $2; exit }')
+              [ -n "$id" ] || break
+              u=$id; hop=$((hop + 1))
+            done
+            printf '%s\n' "$rows" | grep -F -- "| [$u " | grep -qF '| CLOSED |' || lack="$lack $u"
+          done
+          [ -n "$lack" ] || continue
+          lack="planned, and not CLOSED:$lack" ;;
+        parked) lack="parked" ;;
+        *) lack="carrying no single disposition" ;;
+      esac
+      unmet="$unmet · item $n $lack, with no parked line naming brief item $n:"
+    done < <(printf '%s\n' "$txt" | read_brief_items)
+  # TOOL-aQuotedBrief-6 S5 - unquoted, so a non-ASCII record name is read and not skipped (round 1 L1).
+  done < <(GIT -c core.quotepath=off ls-tree --name-only --full-tree "$base" -- "$(dirname "$rel")/prompts/" 2>/dev/null)
+  [ -z "$unmet" ] && return 0
+  DOD_OUT="a brief item the owner asked for is neither built by CLOSED units nor parked where the wrap-up surfaces it, so the build is not done by its own brief$unmet"
+  return 1
+}
+
+# TOOL-aQuotedBrief-1 S4 - A PROMPT RECORD STANDS ON ITS OWN. A prompt fired mid-session ("yes, spec
+# it") authorizes a run whose scope lives in the conversation, so from PROMPT_BRIEF_CUTOFF, graded on
+# the README's `opened:` date read AT BASE, every record under prompts/ carrying `## The prompt` must
+# also carry `## The brief` (five `###` sub-heads in order, each non-empty, `### Items` numbered),
+# `## Drawn from the session` and `## Owner confirmation`, with an `Asked:` and an `Answer:` line
+# whenever the session section is anything but `none`. A prompt-mode build with no such record
+# refuses rather than passing over an empty population. Called from verb_preflight only, never from
+# check_authorization: --close re-runs that as `authorization-reachable`, which has no override, so a
+# second reading here could only strand a run.
+# TOOL-aQuotedBrief-3 S2 adds the preflight join over `### Items`, its four rules spec section 4 names.
+# WHAT THIS DOES NOT CHECK: that a brief which relied on the session quoted it - no machine sees the
+# conversation - nor the brief's content: a hollow but non-empty sub-section passes, and a `stale`
+# or `duplicate` disposition is taken as written, since the owner reads it in the authorized record.
+# TOOL-aQuotedBrief-4 S3 - the cutoff is `read_brief_cutoff` at the default-branch side of BASE that
+# check_authorization derived just above, never the working copy's; an unknowable one is fail 116.
+check_prompt_brief() { # slug · base
+  local base="$2" rel dir opened rec why found=0 txt roster items n kind args id planned="" cut
+  [ "${AUTH_MODE:-}" = prompt ] && [ -n "$base" ] || return 0
+  if ! cut=$(read_brief_cutoff "$AUTH_CONF_AT"); then
+    fail 116 "the project conf at the default-branch side of the pinned BASE was not derived or could not be evaluated to the end, so whether it declares PROMPT_BRIEF_CUTOFF is unknown and is not read as off - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen: ${AUTH_CONF_AT:-(no commit)}"
+    return 1
+  fi
+  case "$cut" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) echo "unattended: NOTE - PROMPT_BRIEF_CUTOFF is blank or not a YYYY-MM-DD date, so this prompt-mode build's record is not graded for a self-contained brief; it is read at the default-branch side of the pinned BASE, so declare one in $CONF there to turn it on: ${cut:-blank}" >&2
+       return 0 ;;
+  esac
+  rel=$(readme_of "$1"); dir=$(dirname "$rel")
+  opened=$(GIT show "$base:$rel" 2>/dev/null | awk 'NR > 1 && /^---/ { exit } /^opened:/ { v = $2; sub(/\r$/, "", v); print v; exit }')
+  # Only a DATED README before the cutoff is grandfathered; an unreadable date is graded.
+  case "$opened" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$cut" ]] && return 0 ;;
+  esac
+  # TOOL-aQuotedBrief-3 S2 - the authored roster at BASE, for the join below. A malformed pair reads
+  # as empty rather than as whatever `region` printed before refusing, so every plan then fails rule 2.
+  roster=$(GIT show "$base:$rel" 2>/dev/null | region - "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null) || roster=""
+  roster=$(printf '%s\n' "$roster" | grep -oE "[A-Z]+-$1-[0-9]+" | sort -u)
+  while IFS= read -r rec; do
+    txt=$(GIT show "$base:$rec" 2>/dev/null)
+    # TOOL-aQuotedBrief-5 S2 - a record term 7 and the audit reader would skip is skipped here too,
+    # before the structural read, so `##  The prompt` is no prompt record anywhere (check 113).
+    check_prompt_heading <<<"$txt" || continue
+    why=$(printf '%s\n' "$txt" | awk '
+      { sub(/\r$/, "") }
+      /^## / { h2 = $0; sub(/^## +/, "", h2); sub(/[[:space:]]+$/, "", h2); h3 = ""; next }
+      h2 == "The brief" && /^### / { h3 = $0; sub(/^### +/, "", h3); sub(/[[:space:]]+$/, "", h3); order = order "|" h3; next }
+      h2 == "The brief" && h3 != "" && /[^[:space:]]/ { full[h3] = 1; if (h3 == "Items" && /^[0-9]+\./) items = 1 }
+      h2 == "Drawn from the session" && /[^[:space:]]/ { l = $0; sub(/[[:space:]]+$/, "", l); drawn = drawn (drawn == "" ? "" : "\n") l }
+      h2 == "Owner confirmation" && /[^[:space:]]/ { conf = 1
+        if (/^Asked:[[:space:]]*[^[:space:]]/) asked = 1
+        if (/^Answer:[[:space:]]*[^[:space:]]/) answered = 1 }
+      END {
+        if (order != "|Goal|Items|Acceptance|Gates|Non-goals" || !full["Goal"] || !full["Items"] || !full["Acceptance"] || !full["Gates"] || !full["Non-goals"]) { print "rule 1"; exit }
+        if (!items) { print "rule 2"; exit }
+        if (drawn == "") { print "rule 3"; exit }
+        if (!conf) { print "rule 4"; exit }
+        if (drawn != "none" && !(asked && answered)) { print "rule 5"; exit }
+      }')
+    found=1
+    if [ -n "$why" ]; then
+      fail 112 "a prompt record at the pinned BASE does not stand on its own, so a resumed session would hold the owner's bytes and not the build they authorized; write the brief, the session quotes and the confirmation its prompt path names - first rule failed, then the record: $why $rec"
+      return 1
+    fi
+    # TOOL-aQuotedBrief-3 S2 - THE PREFLIGHT JOIN, rules 1, 2 and 4 per record; rule 3 after the loop,
+    # over every record's plans. Each rule names itself, and an item's number comes last.
+    items=$(printf '%s\n' "$txt" | read_brief_items)
+    while read -r n kind args; do
+      case "$kind" in
+        planned)
+          planned="$planned $args "
+          for id in $args; do
+            printf '%s\n' "$roster" | grep -qxF -- "$id" && continue
+            why="$rec rule 2, a planned unit the authored roster does not carry, $id: item $n"; break 2
+          done ;;
+        duplicate)
+          [ "$(printf '%s\n' "$items" | awk -v m="$args" '$1 == m { print $2; exit }')" = planned ] && continue
+          why="$rec rule 4, a duplicate of item $args, which is not planned: item $n"; break ;;
+        stale|parked) ;;
+        *) case "$n" in
+             -) why="$rec rule 1, an ### Items line that opens no <n>., so it is no item the join can read: $args" ;;
+             *) why="$rec rule 1, not exactly one disposition among planned, stale, duplicate and parked: item $n" ;;
+           esac; break ;;
+      esac
+    done < <(printf '%s\n' "$items")
+    [ -n "$why" ] && break
+  # TOOL-aQuotedBrief-6 S5 - the listing term 7 reads, unquoted the same way.
+  done < <(GIT -c core.quotepath=off ls-tree --name-only --full-tree "$base" -- "$dir/prompts/" 2>/dev/null)
+  if [ "$found" != 1 ]; then
+    fail 113 "a prompt-mode build past PROMPT_BRIEF_CUTOFF carries no record with ## The prompt under its prompts/ folder at the pinned BASE, and an absent record is not nothing to grade: $base:$dir/prompts/"
+    return 1
+  fi
+  if [ -z "$why" ]; then
+    for id in $roster; do
+      case "$planned" in *" $id "*) continue ;; esac
+      why="rule 3, a roster unit no planned item names: $id"; break
+    done
+  fi
+  [ -z "$why" ] && return 0
+  fail 115 "a brief item at the pinned BASE does not join the authorized roster, so the close could not tell an item the owner asked for from one the run dropped or added; give every ### Items line the one disposition its prompt path names - the rule failed, after the record holding it: $why"
+  return 1
+}
+
+# TOOL-aQuotedBrief-2 S1 - A FIRST PREFLIGHT REFUSES A CARRIED BRANCH. Under `ANCHOR_SCOPE=published`
+# the commits a session's branch already carried sit below the pinned BASE, outside every population
+# the run's checks grade (`read_run_commits` reads `endpoint ^BASE`), so they would land with the run
+# under its authorization. One listing: every commit reachable from HEAD and from neither the observed
+# anchor tip nor the local default branch, with its paths. A path passes when it is under this build's
+# folder or an index in the resolved GENERATED_INDEXES covers it. Called from verb_preflight only, and
+# only when no run-state file existed as the verb started (S3): a later preflight's commits are the
+# run's own. The header byte `\x01` keeps a sha-shaped path and an empty commit apart, and
+# `--no-renames` lists a rename by both names, so a file moved INTO the build folder is graded too.
+# WHAT THIS DOES NOT CHECK: it trusts local refs, so a local default branch moved onto the run's
+# commits hides them; a run with shell access can rewrite its branch; a merge commit lists no paths,
+# and what it brings in is graded only as the commits it lists. A guard against accident, not a
+# security boundary.
+check_branch_carried() { # slug
+  local slug="$1" def ex="" out line sha="" hit="" q ok cur
+  [ -n "$ASHA" ] || return 0
+  def=$(default_branch 2>/dev/null) || def=""
+  [ -n "$def" ] && GIT rev-parse -q --verify "refs/heads/$def" >/dev/null 2>&1 && ex="refs/heads/$def"
+  if ! out=$(GIT -c core.quotepath=off log --no-renames --format=%x01%h --name-only HEAD --not "$ASHA" ${ex:+"$ex"} 2>/dev/null); then
+    hit="none, the listing itself failed - HEAD --not $ASHA${ex:+ $ex}"
+  else
+    while IFS= read -r line; do
+      line=${line%$'\r'}
+      case "$line" in
+        $'\001'*) sha=${line#?}; continue ;;
+        ""|"$M/builds/$slug/"*) continue ;;
+      esac
+      ok=""
+      for q in ${GENERATED_INDEXES:-}; do covers "${q%%:*}" "$line" && { ok=1; break; }; done
+      [ -n "$ok" ] || { hit="$sha $line"; break; }
+    done <<<"$out"
+  fi
+  [ -n "$hit" ] || return 0
+  fail 114 "a first preflight found this branch carrying a commit the default branch does not hold that touches a path outside this build's folder and the declared generated indexes, and it would land with the run without passing through the spec loop; start the run in a fresh worktree off the default branch, carrying only the build folder - the commit and the first such path: $hit"
+  cur=$(GIT rev-parse --abbrev-ref HEAD 2>/dev/null) || cur=""
+  echo "  git worktree add -b <new-branch> <worktree-root>/$slug ${def:-<default>}"
+  echo "  git -C <worktree-root>/$slug checkout ${cur:-<old-branch>} -- $M/builds/$slug/"
+  echo "  then re-render the generated indexes, commit, push the branch and preflight again from the new tree"
   return 1
 }
 
@@ -3149,6 +3477,7 @@ read_audit_ask_record() { # build dir · base
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
   local slug="$1" base="$2" rel blob fmslug _fm _pb _mg _sa_shown _cf _sad _cb _pr
+  AUTH_CONF_AT=""
   rel=$(readme_of "$slug")
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
   # replaces: an empty one makes the line below read `git show ":path"` - the git INDEX, i.e. bytes
@@ -3236,9 +3565,11 @@ check_authorization() { # slug · base
   # that commit and is read unchanged. A merge-base that cannot be computed reads as NO default: the
   # owner's side was not observed, and an opt-in nobody can place on it is not the owner's.
   _cb="$base"
-  if [ "$ANCHOR_KIND" = run-branch ]; then
+  # The LOCAL anchor's BASE is a commit on this node too (TOOL-aHomedAnchor-1 S5), read the same way.
+  if [ "$ANCHOR_KIND" = run-branch ] || [ "$ANCHOR_KIND" = local ]; then
     _cb=$(GIT merge-base "$ASHA" "$base" 2>/dev/null) || _cb=""
   fi
+  AUTH_CONF_AT="$_cb"
   if [ -z "$AUTH_SPEC_AUDIT" ] && ! printf '%s\n' "$_fm" | grep -q '^spec-audit=' \
      && [ -n "$_cb" ] && _cf=$(GIT show "$_cb:.unattended.conf" 2>/dev/null); then
     _sad=$( SPEC_AUDIT_DEFAULT=""; exec 3>&1
@@ -3334,6 +3665,17 @@ check_authorization() { # slug · base
       return 1
     fi
   fi
+  # TOOL-aHomedAnchor-1 S5 - THE LOCAL ANCHOR REFUSES THE OPT-IN IN `slug` MODE TOO. The branch above
+  # keys on the mode because, before the local anchor, a `slug` README could only resolve at the
+  # default-branch anchor. On the local anchor it resolves at a commit on this node, which the run
+  # could have written, so the self-opt-in that check refuses is open again for `slug`. Its own
+  # message, so the second-anchor refusal's text and its arms do not move.
+  if [ "$ANCHOR_KIND" = local ] && [ "$AUTH_MODE" = slug ] && printf '%s
+' "$_fm" | grep -q '^spec-audit='; then
+    AUTH_SPEC_AUDIT_DERIVED=""
+    fail 89 "the build README declares spec-audit: and the BASE came from the local anchor, a commit on this node the run could have written, so the opt-in may be the run's own - only the owner opts a build into the pre-code spec audit, by a spec-audit: line in a slug-mode README landed on the default branch or a SPEC_AUDIT_DEFAULT there; delete the line, and leave the opt-in to the owner"
+    return 1
+  fi
   # the declaration seam, evaluated where the MODE exists and nowhere else.
   # Each refusal is its own message: a single ANDed verdict would send a reader to diff a parse
   # against a path, which is the defect the Definition-of-Done evaluation already fixed once by
@@ -3349,6 +3691,12 @@ check_authorization() { # slug · base
     fail 71 "the build README declares an asks: mandate under an authorization mode that resolves at the second anchor, so the run could have written the line that says which asks it may answer - ruling D12-a puts that choice on a commit the owner landed: mode $AUTH_MODE, admissible for a mandate is slug"
     return 1
   fi
+  # TOOL-aHomedAnchor-6 S1 - and a `slug` README on the LOCAL anchor, for fail 78's and fail 89's
+  # reason: it resolves at a commit on this node, so the mandate may be the run's own.
+  if [ -n "$AUTH_ASKS" ] && [ "$ANCHOR_KIND" = local ]; then
+    fail 71 "the build README declares an asks: mandate and the BASE came from the local anchor, a commit on this node the run could have written, so the mandate may be the run's own - ruling D12-a puts the choice of which asks a run answers on a commit the owner landed: asks: [$AUTH_ASKS]"
+    return 1
+  fi
   # ...and a mandate nothing can GRADE is worse than no mandate at all: every later item keyed on it
   # would be met vacuously, by a set nobody ever read.
   if [ -n "$AUTH_ASKS" ] && [ -z "${ASKS_CMD:-}" ]; then
@@ -3362,6 +3710,12 @@ check_authorization() { # slug · base
   # The test is the MODE and not `prompt` alone, so a `recipe` README is refused by the same branch.
   if [ "$AUTH_MAY_SET" = 1 ] && [ "$AUTH_MODE" != slug ]; then
     fail 78 "the build README carries a may: grant under an authorization mode that resolves at the second anchor, so the run could have written the grant it would be acting under - ruling D12-j honours a grant only from a slug-mode README the owner committed at the default-branch anchor: mode $AUTH_MODE, may: [$AUTH_MAY]"
+    return 1
+  fi
+  # TOOL-aHomedAnchor-1 S5 - and a `slug` README on the LOCAL anchor, for the reason the spec-audit
+  # refusal above gives: it resolves at a commit on this node, so the grant may be the run's own.
+  if [ "$AUTH_MAY_SET" = 1 ] && [ "$ANCHOR_KIND" = local ]; then
+    fail 78 "the build README carries a may: grant and the BASE came from the local anchor, a commit on this node the run could have written, so the grant may be the run's own - ruling D12-j honours a grant only from a slug-mode README the owner committed at the default-branch anchor: may: [$AUTH_MAY]"
     return 1
   fi
   # TOOL-dDerivedDocket-19 S3 - THE GRANT GRAMMAR, as a typo guard. One library function normalises the
@@ -6419,7 +6773,7 @@ check_settled_abandoned() { # run-state file -> 0 when it carries both
 }
 
 verb_preflight() { # slug · keepalive-id
-  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix _pf_gbt="" _pf_cv _pf_tr _pf_cka _pf_lu="" _pf_ab="" _pf_left _pf_p _pf_act
+  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_first="" _pf_ka _pf_miss _pf_fix _pf_gbt="" _pf_cv _pf_tr _pf_cka _pf_lu="" _pf_ab="" _pf_left _pf_p _pf_act
   # TOOL-dDerivedDocket-16 S6 - THE IDS TEST RUNS FIRST, before `check_slug` and before any anchor
   # work, because it needs no tree. `check_slug`'s own grammar ADMITS an id - letters, digits and
   # dashes, opening on a letter - so an id reached the folder lookup and was refused with a message
@@ -6431,6 +6785,8 @@ verb_preflight() { # slug · keepalive-id
   fi
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
+  # TOOL-aQuotedBrief-2 S3 - read BEFORE the rotation below can move or create anything.
+  [ -e "$rel" ] || _pf_first=1
   # ROTATION, HALF ONE: the TEST. A terminal record is not a reason to refuse a NEW run — it is a
   # reason to retire the old one. The refusal below is right about the RECORD and was wrong as a
   # policy about the BUILD: this build's first run aborted with three units left and no second run
@@ -6587,10 +6943,14 @@ verb_preflight() { # slug · keepalive-id
   # merge-base == HEAD, HEAD is an ancestor of the tip the REMOTE advertised, so every byte at BASE is
   # on the remote's default branch. Against a local ref that premise was false, which is why this
   # relaxation could not have shipped before the anchor moved.
-  if [ -n "$ASHA" ] && trusted_base "$rel" allow-degenerate; then
+  # TB_IGNORE_RECORD: a record this preflight retires below is a finished run's, and on the local
+  # anchor trusted_base would otherwise take that run's base as this one's (TOOL-aHomedAnchor-1 S2).
+  TB_IGNORE_RECORD="$rotate"
+  if [ -n "$ASHA" ] && trusted_base "$rel" allow-degenerate preflight; then
     base="$TB"
     check_authorization "$slug" "$base" || true
   fi
+  TB_IGNORE_RECORD=0
   # TOOL-aBoundedVerdict-11 S4 - the WORKING COPY's units region must be readable, and this is where
   # an agent meets the requirement rather than discovering it at --close. The region is what every
   # later verb reads for the unit list: --plan's roster join, --status's next unit, --landed's freeze
@@ -6617,6 +6977,14 @@ verb_preflight() { # slug · keepalive-id
   # refuse a scoped waiver rather than grant it, and those two spellings differ exactly when the
   # authorization read failed - which is the moment a silent grant would matter most.
   check_waiver_scope || true
+  # TOOL-aQuotedBrief-1 S4 - the prompt record stands on its own; a consumer of AUTH_MODE, so here,
+  # and before the write gate below, so a refusal leaves the run-state file unwritten.
+  # TOOL-aQuotedBrief-6 S1 - at a FIRST preflight only, check_branch_carried's gate: a re-preflight
+  # derives a moved BASE, and a roster grown mid-run would fail rule 3 there (round 1 M3).
+  [ -z "$_pf_first" ] || check_prompt_brief "$slug" "${base:-}" || true
+  # TOOL-aQuotedBrief-2 S1 and S3 - a FIRST preflight refuses a branch carrying commits the default
+  # branch lacks outside the build folder; before the write gate, so a refusal writes no RUN.md.
+  [ -z "$_pf_first" ] || check_branch_carried "$slug" || true
   # TOOL-dDerivedDocket-16 S3, S4, S5 and S11 - THE MANDATE'S OWN PRECONDITIONS, evaluated here and
   # not one line lower. Everything they pin is written AFTER the gate below; everything they refuse
   # is refused while the tree is still untouched, which is what lets a refused preflight say the
@@ -10527,7 +10895,7 @@ dod_met() { # slug · run-state file · item · checker
       # SUPERSEDED as this item applies it by owner ruling TOOL-dUnstuckLanding-23: "a build lands its
       # CLOSED units when every other unit is DEFERRED with an open ask it filed and no CLOSED unit
       # consumes-from one". Term 5's carry-forward half is that ruling; the rest of the rule stands.
-      # SIX terms, ALL required. Terms 1-2 guard the roster itself; term 3 is the only one that can
+      # SEVEN terms, ALL required; term 7 is TOOL-aQuotedBrief-3's, `check_brief_items`. Terms 1-2 guard the roster itself; term 3 is the only one that can
       # see a planned unit nobody specced, because the generated region is rendered from the specs
       # that EXIST; and term 4 is here because term 5 is VACUOUSLY TRUE over an empty selection -
       # `region` exits 0 with empty stdout for a well-formed pair enclosing nothing, so a run-state
@@ -10618,6 +10986,10 @@ $_bcopen"
       # ---- BLANK or absent turns the term off entirely, which is announced rather than silent.
       local _bcthin="" _bcid _bcsp _bcdate
       if [ -z "${SPEC_THIN_CUTOFF:-}" ]; then
+        # ---- TERM 7 here too: term 6 is OFF on this path, so nothing it reports can be masked.
+        check_brief_items "$slug" || return 1
+        [ -z "$BI_NOTE" ] || _bccarry="${_bccarry:+$_bccarry
+}$BI_NOTE"
         DOD_OUT="${_bccarry:+$_bccarry
 }note — the project declares no SPEC_THIN_CUTOFF, so the THIN term is OFF and a CLOSED unit whose spec states no acceptance criterion is not refused here"
         return 0
@@ -10649,6 +11021,12 @@ $_bcopen"
         DOD_OUT="a unit is CLOSED against a spec the kit's own predicate grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing ever stated what done meant for it:$_bcthin"
         return 1
       fi
+      # ---- TERM 7 (TOOL-aQuotedBrief-3 S3): every brief item built by CLOSED units or parked. After
+      # ---- term 6, returning early with its own DOD_OUT like every term above.
+      check_brief_items "$slug" || return 1
+      # TOOL-aQuotedBrief-4 S4 - an OFF term 7 rides the met return with the carried lines.
+      [ -z "$BI_NOTE" ] || _bccarry="${_bccarry:+$_bccarry
+}$BI_NOTE"
       # The carried-forward lines ride every MET return, so a partial landing is never silent.
       [ -z "$_bcskip" ] && { DOD_OUT="$_bccarry"; return 0; }
       DOD_OUT="${_bccarry:+$_bccarry

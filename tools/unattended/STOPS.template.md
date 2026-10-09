@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.92 -->
+<!-- gov:kit unattended@1.93 -->
 # The unattended stop contract — HELD, the hold codes and the lease
 
 *Installed beside `UNATTENDED-PROTOCOL.md` from the unattended kit and byte-compared against the
@@ -95,7 +95,8 @@ that is not what the tree holds — and the take-over would re-verify a mandate 
    store it cannot see; it can only record that somebody did. `--reaped` must name the record's
    `keepalive` fact, which a holder that replaced its own job re-recorded.
 4. The tree must be clean and committed.
-5. Under `ANCHOR_SCOPE=published`, the branch tip must be on its remote.
+5. Under `ANCHOR_SCOPE=published`, the branch tip must be on its remote. Under `local` no push is
+   owed, so a hold parks work that may exist on this node only, and `--scheduled` says so.
 6. An optional `--pending-run <runId>` must be 1 to 64 letters, digits, `_` and `-`. It becomes a fact
    and a checkpoint line, and a separator or a newline inside it would forge a second of either.
 7. The code may not be a hand-off code; `--handoff` writes those.

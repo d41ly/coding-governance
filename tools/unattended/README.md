@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.92 -->
+<!-- gov:kit unattended@1.93 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -127,6 +127,12 @@ a security decision from a value its subject wrote, the class this kit has been 
 times; the derivation is monotone instead. They exist so a party outside this process can re-derive
 the pin without trusting a byte the run wrote, which is the only form of verification §9 concludes
 actually binds.
+
+**Why the local anchor is the exception.** Under `ANCHOR_SCOPE="local"` (`TOOL-aHomedAnchor-1`) the
+recorded `base:` IS the input: the run started from local history with no push, so no observation
+off this node exists to derive one from. The driver still refuses a base off HEAD's history and a
+run that built nothing, and the leg admits such a BASE only when the conf at the remote's
+default-branch tip declares `local`, a byte the run cannot write without landing.
 
 ## Why `brief-recorded` anchors on the build commit
 

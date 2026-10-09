@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.92 -->
+<!-- gov:kit unattended@1.93 -->
 
 # Unattended runs
 
@@ -61,7 +61,7 @@ A value mixing a slug and ids is refused before any verb.
 1. The build folder authorizes at this project's anchor, `{{ANCHOR_SCOPE}}`; read it, it is the roster.
 2. Only if a handle to waive was named: ONE `AskUserQuestion`, default-deny.
 3. **Preflight:** `bash {{KIT_DIR}}/unattended.sh --preflight <slug> --keepalive-id <id>`, plus
-   `--waive <handle> --reason "<why>"` per confirmed pair. Keep its spec-audit line.
+   `--waive <handle> --reason "<why>"` per confirmed pair. Keep its spec-audit line. It refuses a carried branch.
 4. Then `/session-kickoff`, if the project ships it — after preflight, never before.
 5. A README carrying `asks:`: read `{{MEMORY_ROOT}}/guides/UNATTENDED-ASKS.md` whole first.
 6. A pre-flip BASE is parked with `{{MEMORY_TREE_DIR}}/migrate_backlog.py --recipe`, never relocated.
@@ -73,13 +73,13 @@ scaffold recipe: relay it to the owner verbatim, reap the keepalive, and stop.
 
 ## Start a run from a PROMPT
 
-Only when the invocation carries `{{AUTH_PARAM}}`, and only under the `published` anchor; this
-project declares `{{ANCHOR_SCOPE}}`. A prompt naming ids takes the scaffold route.
+Only when the invocation carries `{{AUTH_PARAM}}`, and only under the `published` or `local` anchor; this
+project declares `{{ANCHOR_SCOPE}}`.
 
 1. **Orient from the prose**; RUN the orientation probes before step 3.
-2. **Decide whether to ask, ONCE**: One `AskUserQuestion`, every gap in it.
-3. **Write the build folder**, `{{MEMORY_ROOT}}/builds/<slug>/README.md`, with `authorized-by: prompt`.
-4. **Commit, then PUSH THE BRANCH.** In that order.
+2. **Decide whether to ask, ONCE**: one `AskUserQuestion`, every gap in it; it confirms a brief that quotes the session.
+3. **Dirty tree or carried branch? Use a fresh worktree.** Write the build folder, `{{MEMORY_ROOT}}/builds/<slug>/README.md`, with `authorized-by: prompt`, and the prompt record with its brief.
+4. **Commit, then PUSH THE BRANCH.**
 5. **Preflight**, as on the slug path.
 6. **The kickoff hand-back**, at the slug path's step 4.
 
@@ -137,8 +137,8 @@ under `in-place` after `{{LANDER}} --prepare --slug <slug>` and
 **TWO items have NO override, and this is where you will meet them: `authorization-reachable` and
 `pieces-complete`.** An override on the
 authorization check IS the authorization check, so the verb refuses the pair rather than recording
-it; and `pieces-complete` is the item saying a recipe-mode run produced what the owner asked for over
-content nothing else on the bar can grade, so an override on it is the run certifying its own output.
+it; and one on `pieces-complete`, a recipe-mode run's claim it produced what was asked, is the
+run certifying its own output.
 
 **A `hold ·` line from `gates-green` is your next step, whatever its code.** The item prints one
 when the bar ended for a reason that is not this run's to fix: `host-degraded` until `probe gate`
