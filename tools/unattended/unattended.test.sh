@@ -4312,6 +4312,12 @@ hit  "$(cat memory/builds/tBr/RUN.md)" "anchor-kind: local"
 # ---- AC4: the recorded BASE equals HEAD, so the run built nothing and the authorization item refuses.
 out=$(run --authorization tBr)
 hit  "$out" "the recorded BASE equals HEAD on the local anchor, so this run built nothing on top of it and has nothing to land"
+# ---- ...and a record pinning NO base is a refusal outside --preflight, because on this anchor the
+# ---- recorded base is the only one there is. The line is put back for the arm below.
+_la_b=$(mktemp); cp memory/builds/tBr/RUN.md "$_la_b"
+sed -i '/^base: /d' memory/builds/tBr/RUN.md
+hit  "$(run --authorization tBr)" "the BASE came from the local anchor and the record pins none, and on that anchor the recorded base is the only one there is, so an absent one is a refusal rather than a pass"
+cp "$_la_b" memory/builds/tBr/RUN.md; rm -f "$_la_b"
 # ---- AC3: a recorded BASE off HEAD's history - a parentless commit over the same tree - is refused,
 # ---- because on this anchor the recorded base is the whole authorization.
 git add -A >/dev/null && git commit -q -m rec --no-verify
