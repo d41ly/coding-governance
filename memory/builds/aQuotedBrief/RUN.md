@@ -17,10 +17,10 @@ mode: slug
 run-branch: refs/heads/branch/unattended-build-template-5f7d7d
 anchor-kind: default-branch
 cli-version: 2.1.293
-lease-utc: 2026-10-09T13:30:26Z
-pid-image: claude.exe
+lease-utc: 2026-10-09T13:47:32Z
+pid-image: absent
 host: compeeto-agent
-pid: 4880
+pid: 5428
 session: 980e4a60-dcd8-4eb9-85ca-c22d52fa116a
 keepalive: 530f6b7a
 anchor-url: https://github.com/d41ly/coding-governance.git
