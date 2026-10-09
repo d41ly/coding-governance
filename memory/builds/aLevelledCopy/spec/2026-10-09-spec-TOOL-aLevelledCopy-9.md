@@ -1,6 +1,6 @@
 # TOOL-aLevelledCopy-9 — receipt fixtures are hermetic, a renamed row keeps its bit, the records agree
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 3 · ratified 2026-10-09
+**Status:** OPEN · rev-2 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 3 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -159,7 +159,7 @@ check_mode_never_down --as py.function` both answered OK on 2026-10-09.
 - This build's acceptance ledger under `memory/builds/aLevelledCopy/build/`.
 
 The gotcha record widens the brief's write set by two files under `memory/gotchas/`. Neither sibling
-in this order group writes there: `TOOL-aLevelledCopy-7` writes `tools/check-wiring.sh` and its
+in this order group writes there: `TOOL-aLevelledCopy-7` writes the wiring checker and its
 suite. `TOOL-aLevelledCopy-8` sits at `order 4`, so even a `tools/govkit/govkit.py` write its M5 pick
 might need is sequenced after this unit rather than concurrent with it.
 
@@ -289,6 +289,9 @@ New arm: tools/govkit/selftest.py · covers AC4 AC5 · the pre-build govkit.py, 
 
 - rev-1 · 2026-10-09 · initial draft, from the closing review's M2, L3, M6, L4 and L5 and the
   promotion brief.
+- rev-2 · 2026-10-09 · §4 Files touched: the sibling's write is named in prose rather than as a
+  backticked path, because the spec-token guards join read it as this unit's own write and owed two
+  legs this unit does not move. No design change.
 
 ## 10. Reuse audit
 
