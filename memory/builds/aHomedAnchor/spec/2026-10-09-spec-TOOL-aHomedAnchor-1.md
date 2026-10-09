@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aHomedAnchor-1-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aHomedAnchor-1-1-acceptance-ledger.md) | journal | — |
+| [2026-10-09-build-TOOL-aHomedAnchor-1-runlog-5ac5d61b.md](../build/2026-10-09-build-TOOL-aHomedAnchor-1-runlog-5ac5d61b.md) | journal | TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7 |
 | [2026-10-09-prompt-TOOL-aHomedAnchor-1-0-run-mandate.md](../prompts/2026-10-09-prompt-TOOL-aHomedAnchor-1-0-run-mandate.md) | journal | TOOL-aHomedAnchor-2 |
 | [2026-10-09-review-TOOL-aHomedAnchor-1-implementation-diff-round1.md](../reviews/2026-10-09-review-TOOL-aHomedAnchor-1-implementation-diff-round1.md) | diff-review | TOOL-aHomedAnchor-2 |
 
