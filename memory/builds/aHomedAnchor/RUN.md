@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+landed-by: attended
+landed-derived: 97b32e950340a7fc8792e0ea23fa2ba7513f4a2f 17e8ccb7e478c99116eed0801989141baa3e3e95
 asks-at-landing: TOOL-aHomedAnchor-8=OPEN TOOL-aHomedAnchor-9=OPEN TOOL-aHomedAnchor-10=OPEN TOOL-aHomedAnchor-11=OPEN TOOL-aHomedAnchor-12=OPEN TOOL-aHomedAnchor-13=OPEN TOOL-aHomedAnchor-14=OPEN TOOL-aHomedAnchor-15=OPEN TOOL-aHomedAnchor-16=OPEN TOOL-aHomedAnchor-17=OPEN TOOL-aHomedAnchor-18=OPEN TOOL-aHomedAnchor-19=OPEN TOOL-aHomedAnchor-20=OPEN TOOL-aHomedAnchor-21=OPEN
 units-at-landing: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7
 refreshed-at: 5a836bf0fc940029136b4b3fd57a87f35ff40f26 · handoff · 0 touching
@@ -24,8 +26,8 @@ gates-run: unattended-179153003762917425227-2416772 75ee33ec
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 12930f49ff9c33974636c4c1d8c21c7b0730ef19
-phase: HELD
+witness: 97b32e950340a7fc8792e0ea23fa2ba7513f4a2f
+phase: LANDED
 branch-sha: 11224126c2e48935ee3cc2e802bd3099c0f225fe
 branch-ref: refs/heads/branch/unattended-kit-slug-mode-e3ba61
 may: none
