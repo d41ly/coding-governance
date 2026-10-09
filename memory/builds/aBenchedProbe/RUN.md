@@ -19,12 +19,12 @@ mode: prompt
 run-branch: refs/heads/branch/keen-chaplygin-6b0703
 anchor-kind: run-branch
 cli-version: 2.1.293
-lease-utc: 2026-10-09T17:01:10Z
+lease-utc: 2026-10-09T23:35:33Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 20984
+pid: 31936
 session: 485cb99b-00b3-459e-ba5c-b84631a3e411
-keepalive: 22a01d12
+keepalive: e76c0db2
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 5a836bf0fc940029136b4b3fd57a87f35ff40f26
 anchor-ref: refs/heads/main
@@ -59,3 +59,5 @@ base: 2b26f187f03cc991edbf40b25550e6590e97d26e
 2026-10-09T20:18:43Z rescope · item add DEPL-aBenchedProbe-3 · reason closing review round 1 HIGH H1: govkit selfcheck 7j4's liveness reds fire on govkit selftest.py's minimal scratch-gov fixtures and its AC5 fixture, so the govkit selftest suite reds
 
 2026-10-09T20:19:21Z rescope · item add DEPL-aBenchedProbe-4 · reason closing review round 1 minors batched: H-M1 the receipt-after-keep and second-apply arm, H-M2 persistent staged-break arms for 7j4 and the 7h ceiling clause, H-L1 the dead manifest_chunk pre-init, H-L2 CE4's leg check tied to the keep line
+
+2026-10-09T23:35:59Z resume · item aBenchedProbe · reason working · keepalive e76c0db2 · manual
