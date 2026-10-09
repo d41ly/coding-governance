@@ -75,7 +75,7 @@ rendered text. Every rule is one line: a tool, gate or protocol named in section
 
 <!-- one-line -->
 - Identify your node by machine and user, never by path: every node's checkout may sit at one path.
-- A new node claims its tag once, in the governance repository, with `<prefix>/playbook/render_playbook.py --claim-node`; each repository receives it at its next `govkit update`.
+- A node claims its tag once, in gov, with `<prefix>/playbook/render_playbook.py --claim-node`, re-rendering gov's own charter in that commit; other repositories get it at `govkit update`.
 - Onboarding a node: clone to its primary tree, claim its tag, seed local memory from the in-repo mirror, and recreate its worktrees, which never sync.
 <!-- /one-line -->
 

@@ -131,6 +131,8 @@ MT_KIT="${MT_KIT_DIR##*/}"
 # fixture carries one and DECLARES the kits it plants; an undeclared directory is not a kit.
 GK_DIR=$(resolve_kit_dir "$_rkd_py" govkit registry.toml "$HERE") || exit 2
 GK="${GK_DIR##*/}"
+PB_DIR=$(resolve_kit_dir "$_rkd_py" playbook render_playbook.py "$HERE") || exit 2
+PB="${PB_DIR##*/}"
 # FX is the prefix the NEXT fixture is built at: this suite's own by default, and empty for the
 # root-install arms, which every install owes whatever prefix this suite itself sits at.
 FX=$PFX
@@ -172,8 +174,11 @@ fixture() {
   # playbook moved under this gate's protection and out of check-agent-cap-restatement.sh's
   # population; the control failed, correctly, until the fixture carried their sentences.
   # v4.0 (TOOL-aDistilledCharter-3) retired four pairs; the verify-agent total is the playbook's one.
-  printf 'template {{ALPHA}} {{MEMORY_ROOT}}\nat most 5 verify agents TOTAL (batch grows)\n' \
+  printf '<!-- governance-template: v4.0 -->\ntemplate {{ALPHA}} {{MEMORY_ROOT}}\nat most 5 verify agents TOTAL (batch grows)\n' \
     > "$d/coding-governance-agents.template.md"
+  # TOOL-aDistilledCharter-8: the renderer's TEMPLATE_MAJOR pairs with the template marker's major.
+  mkdir -p "$d/${FX}${PB}"
+  printf 'TEMPLATE_MAJOR = 4\n' > "$d/${FX}${PB}/render_playbook.py"
   # A root install has no root head to name a kit by, so its runbook names it the way gov's does,
   # through the `<prefix>/` token (VERIFYING repair: a bare `memory-tree/` documents nothing).
   # The bare `§2` is S4's NEAR-MISS: a section sign with no charter word, counted and never failed.
@@ -270,6 +275,9 @@ FX=$PFX
 arm "AC2 MAX_LENSES drifts from the hook README's stated bound" red \
   "a declared value pair disagrees with the source that owns it. Pair lens-array bound" \
   sh -c 'printf "const MAX_VERIFIERS = 5\nconst MAX_LENSES = 6\n" > '"${PFX}${HOOKS}/agent-cap.js"''
+arm "AC4 the renderer's TEMPLATE_MAJOR drifts from the template marker" red \
+  "a declared value pair disagrees with the source that owns it. Pair template major" \
+  sh -c 'printf "TEMPLATE_MAJOR = 3\n" > '"${PFX}${PB}/render_playbook.py"''
 arm "AC2 MAX_VERIFIERS drifts from the template's stated total" red \
   "a declared value pair disagrees with the source that owns it. Pair verify-agent total" \
   sh -c 'printf "const MAX_VERIFIERS = 6\n" > '"${PFX}${HOOKS}/agent-cap.js"''

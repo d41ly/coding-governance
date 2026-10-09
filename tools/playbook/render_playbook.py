@@ -373,13 +373,17 @@ def derive_node_table(root: Path, _a: dict, _e: Path | None = None) -> str:
         cfg = tomllib.loads((root / '.governance' / 'deploy.toml').read_text(encoding='utf-8'))
     except (OSError, ValueError):
         cfg = {}
-    checkout = next((v.strip() for tbl in ('charter', 'answers')
+    # TOOL-aDistilledCharter-8, N2: `checkout_dir` when stated — a product named apart from its clone
+    # (`App` cloned as `app/main`) states the clone once — else `project_name`.
+    def read_answer(name: str) -> str:
+        return next((v.strip() for tbl in ('charter', 'answers')
                      for k, v in (cfg.get(tbl) or {}).items()
-                     if str(k).lower() == 'project_name' and isinstance(v, str) and v.strip()), '')
+                     if str(k).lower() == name and isinstance(v, str) and v.strip()), '')
+    checkout = read_answer('checkout_dir') or read_answer('project_name')
     if not checkout:
-        raise Refusal('NODE_TABLE builds every node\'s primary tree from `project_name`, and '
-                      'deploy.toml answers none. Answer it under [answers] rather than letting the '
-                      'rendering clone\'s directory name stand in for every node')
+        raise Refusal('NODE_TABLE builds every node\'s primary tree from `checkout_dir`, else '
+                      '`project_name`, and deploy.toml answers neither. Answer one under [answers] '
+                      'rather than letting the rendering clone\'s directory stand in for every node')
 
     def render_cell(text: str) -> str:
         return text.replace('|', r'\|')
@@ -922,6 +926,12 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
         if row is None:
             raise Refusal(f'the template carries {{{{{key}}}}} and the descriptor declares no '
                           f'[[placeholder]] row for it, so nothing can supply a value')
+        # N6: a legacy row exists only so a SEEDED older template keeps rendering. A template at this
+        # engine's major naming one has regained a name v4.0 retired, which is a refusal, not a value.
+        if row.get('legacy') and marker and int(marker.group(1)) >= TEMPLATE_MAJOR:
+            raise Refusal(f'the template is v{marker.group(1)}.{marker.group(2)} and carries '
+                          f'{{{{{key}}}}}, a legacy {row["legacy"]} placeholder kept only for older '
+                          f'seeded templates')
         val, note = resolve_placeholder_value(row, charter, answers, target, engine_dir)
         notes.append(note)
         # A TOML multi-line string ends in a newline, and the template line holding the token ends in
@@ -1303,6 +1313,31 @@ def run_selftest() -> int:
               f'the stale-registry note prints {"when" if want_note else "only when"} a registry '
               f'sits outside the region', f'rc {rc} out {out.getvalue()!r}')
 
+    # TOOL-aDistilledCharter-8 — N2: `checkout_dir` names the clone when the product is named apart;
+    # N5: `--check` prints the reseed note; N6: a v4 template naming a legacy placeholder is refused.
+    body, err = build_node_render(build_fleet_text(fleet_rows), 'checkout_dir = "app/main"\n',
+                                  name='App')
+    check_arm(err is None and '`C:/p/app/main`' in body and '`C:/p/App`' not in body,
+              'checkout_dir names the clone where the product name differs', f'{err!r} {body!r}')
+    for marker_v, want in (('v3.5', 'reseed'), ('v4.0', 'legacy v3 placeholder')):
+        with tempfile.TemporaryDirectory() as td:
+            tgt = Path(td)
+            (tgt / '.governance').mkdir()
+            (tgt / 'TPL.md').write_text(f'<!-- governance-template: {marker_v} -->\n'
+                                        f'tag {{{{TAG_A}}}}\n', encoding='utf-8')
+            (tgt / '.governance' / 'deploy.toml').write_text(
+                'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                main(['--target', str(tgt)])   # write mode first; its notes are not the observation
+            out, err_out = io.StringIO(), io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err_out):
+                rc = main(['--target', str(tgt), '--check'])
+        said = out.getvalue() + err_out.getvalue()
+        check_arm(want in said and (rc == 0) == (marker_v == 'v3.5'),
+                  f'a {marker_v} template naming a legacy placeholder: --check '
+                  f'{"prints the reseed note" if marker_v == "v3.5" else "refuses it"}',
+                  f'rc {rc}, said {said!r}')
+
     # TOOL-aDistilledCharter-7 — R5: DEL is refused and the fleet is untouched; R7: a [charter] value
     # carrying a one-line marker is refused; R8: `--answers` agrees with the render; R6: an inherited
     # GIT_DIR does not steer a probe at the ambient repository.
@@ -1510,7 +1545,8 @@ def main(argv: list[str]) -> int:
             print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
             return 1
         print(f'render-playbook — claimed tag `{tag}` for {a.user} @ {a.host or "<no host>"}; '
-              f'commit the fleet registry; each repository receives it at its next govkit update')
+              f'commit the fleet registry with the governance charter rendered again beside it; every other '
+              f'repository receives it at its next govkit update')
         return 0
     if not a.target:
         ap.error('--target is required')
@@ -1577,6 +1613,11 @@ def main(argv: list[str]) -> int:
             print(f'render-playbook: SURVIVING PLACEHOLDER in the render: '
                   f'{", ".join(sorted(set(survived)))}', file=sys.stderr)
             rc = 1
+        # N5: the two notes an adopter must act on print here too. `govkit update` runs the
+        # regenerate (unless GOVKIT_RERENDER=0) with its output captured, so `--check` is where they are seen.
+        for n in notes:
+            if n.startswith(('legacy', 'retired')):
+                print(f'  {n}')
         if rc == 0:
             print(f'render-playbook OK — region matches a fresh render, no placeholder survived')
         return rc

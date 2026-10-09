@@ -37,7 +37,10 @@ is the one you choose, once, for every kit (empty for a root install), and the `
   - **Fleet** — every machine that works here must hold a tag in gov's fleet registry,
     `<gov>/<prefix>/playbook/fleet.toml`, which renders the charter's node table in EVERY adopter, so
     one machine carries one tag everywhere. A machine with no row claims one in gov's own checkout:
-    `python <gov>/<prefix>/playbook/render_playbook.py --claim-node --user <u> --host <h> --projects-root <dir>`.
+    `python <gov>/<prefix>/playbook/render_playbook.py --claim-node --user <u> --host <h> --projects-root <dir>`,
+    then re-renders gov's own charter in the same commit, because `govkit update` never reaches gov.
+    A user holds one tag: the table's readers match the user alone, so one user on two machines
+    cannot be told apart.
     Ask only for a per-repository override of one node's `primary_tree`, `worktree_root` or
     `variances`, which goes under `[nodes.<tag>]` in this repository's `deploy.toml`.
   - **This repository's own rules** — mobile-first, design in Figma first, a changed workflow: one

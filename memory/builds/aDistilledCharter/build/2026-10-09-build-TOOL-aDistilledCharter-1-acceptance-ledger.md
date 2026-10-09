@@ -1,6 +1,6 @@
 # aDistilledCharter — acceptance ledger
 
-**Serves:** journal TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 DEPL-aDistilledCharter-2
+**Serves:** journal TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 PLAY-aDistilledCharter-5 TOOL-aDistilledCharter-8
 
 Observed on node `a` on 2026-10-09, over this build's branch. Every red proof was a staged break
 observed red and then removed; none was left in the tree.
@@ -65,10 +65,6 @@ observed red and then removed; none was left in the tree.
 - AC1 — `bash tools/check-playbook-parity.sh` — the three README pairs agree; a staged `≤7` in the README's lens bound reds `lens-array bound`
 - AC2 — `const MAX_LENSES = 6` — the restored arm passes in the parity self-test
 
-**Evidences:** DEPL-aDistilledCharter-2
-- AC1 — `python tools/govkit/govkit.py selfcheck` — exits 0 with `review-harness` in `tools/govkit/registry.toml`'s default list
-- AC2 — `grep -n 'review-harness' WIRE-INTO-PROJECT.md` — prints the §2 line on the security checklist
-
 **Evidences:** TOOL-aDistilledCharter-7
 - AC1 — `python tools/playbook/render_playbook.py --selftest` — 51 arms pass, the R3, R5, R7 and R8 arms among them; four staged breaks turned seven arms red
 - AC2 — `GIT_DIR` — the selftest passes with `GIT_DIR` exported to this repository's git dir, and the R6 arm fails with the environment passed through
@@ -78,6 +74,18 @@ observed red and then removed; none was left in the tree.
 - AC6 — `min(8, nproc)` — a canary slice fails with it in `AGENTS.md` and passes on the tree
 - AC7 — `coding-governance-agents.template.md` — the C5, C6, C8 and C10 clauses are present at 193, 189, 191, 178, 111 and 139 characters, each inside `ONE_LINE_MAX`
 - AC8 — `grep -n 'runlog' AGENTS.md` — prints the tools line at line 94; `manifest-check.sh`'s retrofit step re-renders rather than pulling lines into the playbook
+
+**Evidences:** PLAY-aDistilledCharter-5
+- AC1 — `git diff --exit-code memory/TEMPLATE-SPEC.md` — clean after the dogfood render; `## Tiers` at line 322 and `## Security boundaries` at line 337
+- AC2 — `memory/guides/REVIEW-PROTOCOL.md` — no `## Security boundaries` heading; one paragraph points at the spec template
+- AC3 — `git diff 6473ae38 -- tools/govkit/registry.toml` — prints nothing
+- AC4 — `render_playbook.py --target . --check` — green, and the ledger resolver finds 0 of 115 rows unresolved against the new home
+
+**Evidences:** TOOL-aDistilledCharter-8
+- AC1 — `python tools/playbook/render_playbook.py --selftest` — with `checkout_dir = "app/main"` every default row reads `C:/p/app/main`; the arm fails with `checkout_dir` ignored
+- AC2 — `grep -n 'own charter' coding-governance-agents.template.md` — prints the claim note
+- AC3 — `--check` — over a v3.5-marked fixture prints the reseed note; the arm fails with the note printing removed
+- AC4 — `TEMPLATE_MAJOR = 3` — reds pair `template major` on the tree and in the parity self-test; a v4.0 fixture naming `{{TAG_A}}` is refused, and the arm fails with the refusal disabled
 
 **Evidences:** KICK-aDistilledCharter-1
 - AC1 — `awk` — zero continuation lines between §B's heading and the pointer map

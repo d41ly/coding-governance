@@ -135,9 +135,12 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 HK_DIR="<no hooks kit>"
+PB_DIR="<no playbook-render kit>"
 REGISTRY=""
 if _pp_py=$(resolve_python 2>/dev/null); then
   HK_DIR=$(resolve_kit_dir "$_pp_py" hooks agent-cap.js "$_self_dir" 2>/dev/null) || HK_DIR="<no hooks kit>"
+  # TOOL-aDistilledCharter-8: the renderer's TEMPLATE_MAJOR is a pair whose owner is the template.
+  PB_DIR=$(resolve_kit_dir "$_pp_py" playbook render_playbook.py "$_self_dir" 2>/dev/null) || PB_DIR="<no playbook-render kit>"
   # The S1 population's source, through the same resolver (TOOL-aRepatriatedFork-54).
   REGISTRY=$(resolve_kit_dir "$_pp_py" govkit registry.toml "$_self_dir" 2>/dev/null) && REGISTRY="$REGISTRY/registry.toml"
 fi
@@ -263,6 +266,7 @@ lens-array bound~${HK_DIR}/README.md~sed -n 's/.*array LITERAL of ≤\([0-9]\+\)
 verify-agent total~$TEMPLATE~sed -n 's/.*at most \([0-9]\+\) verify agents TOTAL.*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
 bounded-helper width~${HK_DIR}/README.md~sed -n 's/.*boundedParallel(thunks, \([0-9]\+\)).*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
 resolved-K ceiling~${HK_DIR}/README.md~sed -n 's/.*cannot resolve to an integer ≤\([0-9]\+\).*/\1/p'~${HK_DIR}/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+template major~${PB_DIR}/render_playbook.py~sed -n 's/^TEMPLATE_MAJOR = \([0-9]\+\).*/\1/p'~$TEMPLATE~sed -n 's/.*governance-template: v\([0-9]\+\)\..*/\1/p'
 stamp rule sha expression~skills/session-kickoff/MANIFEST-TEMPLATE.md~sed -n 's/.*Stamp rule: sha = \`\([A-Z]*\)\` on any branch.*/\1/p'~skills/session-kickoff/manifest-check.sh~sed -n 's/^STAMP_SHA_RULE=\"sha = \([A-Z]*\) on any branch\".*/\1/p'
 "
 

@@ -90,8 +90,14 @@ in re-renders:
 python <prefix>/playbook/render_playbook.py --claim-node --user <user> --host <host> --projects-root <dir>
 ```
 
-A node's primary tree is `<projects_root>/<project_name>`: the committed answer, never the directory
-the rendering clone happens to sit in, so every node renders the same charter.
+A node's primary tree is `<projects_root>/<checkout_dir>`, where `checkout_dir` is an `[answers]`
+key defaulting to `project_name`: a committed answer, never the directory the rendering clone
+happens to sit in, so every node renders the same charter.
+
+One user holds one tag. Every reader of the table matches the user alone, so a second row for the
+same user, or one user name inside another, is refused: the readers could not tell them apart.
+Claiming in gov also means rendering gov's own charter again in the same commit: `govkit update`
+never reaches gov.
 
 The claim takes the lowest letter the fleet has not used and refuses a second claim for one identity.
 In an installed copy it refuses outright, because the next update would overwrite the edit. A
