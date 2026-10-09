@@ -134,6 +134,8 @@ if [ "$MODE" = --list ]; then
   printf '%s\n' "$pop" | sed 's/^/population  /'
 fi
 if [ -n "$hits" ]; then
+  # The self-test's verdict arm asserts this text (check-arms, TOOL-aGraftedHelix-47).
+  # arm-signature: name a remote by literal
   printf '%s\n' "$hits"
   echo "remote-literals: FAILED — $(printf '%s\n' "$hits" | grep -c .) line(s) in $npop file(s) name a remote by literal. Resolve it through the remote ladder (resolve_remote / resolve_remote_sh in the gov lib dir, inlined), never by name."
   exit 1

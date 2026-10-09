@@ -37,7 +37,7 @@ PFX="${KIT_REL:+$KIT_REL/}"
 GATE_SRC="$HERE/check-remote-literals.sh"
 [ -f "$GATE_SRC" ] || { echo "remote-literals.test: no gate at $GATE_SRC"; exit 2; }
 
-FLOOR_ASSERTIONS=46
+FLOOR_ASSERTIONS=47
 PASS=0
 FAIL=0
 add_pass() { PASS=$((PASS+1)); }
@@ -148,6 +148,10 @@ while IFS='|' read -r shape rel line; do
   if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${FAIL:-0}" = 0 ] && echo "PASS (${PASS:-1} assertions)" || echo "FAIL (${PASS:-1} assertions)"; [ "${FAIL:-0}" = 0 ] && exit 0; exit 1; fi
 done < "$RED_TABLE"
 [ "$k" = 27 ] || add_fail "the RED table read as $k rows, not 27"
+# The verdict line itself, which check-arms grades as this gate's refusal text.
+d="$TMPROOT/verdict"; build_repo "$d" || exit 2
+write_plant "$d" "${PFX}kit/verdict.sh" "git fetch $N main" || exit 2
+arm "a hit prints the FAILED verdict naming the remedy" 1 "name a remote by literal" -- run_gate "$d"
 
 # ---- GREEN: the same bytes where they must not be named --------------------------------------------
 k=0
