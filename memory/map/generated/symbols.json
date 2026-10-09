@@ -423,6 +423,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "add_local_scope",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
       "id": "add_mode",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -11571,6 +11576,11 @@
       "id": "read_oracle_answer",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_origin_scope",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.sh"
     },
     {
       "id": "read_over_cap_findings",

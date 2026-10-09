@@ -295,6 +295,14 @@ DIRECTIVES_FLOOR="17"
 # the file the bar reads, that they author their own authorization. The leg re-derives the same
 # verdict from the recorded BASE and the advertised default-branch tip, so cost 2 above is no longer
 # the whole story: the leg cannot read THIS file, but it can read that.
+#
+# TOOL-aHomedAnchor-1 - `local` is the THIRD value: that first anchor, then LOCAL HISTORY - a build
+# README committed at HEAD when --preflight pins the BASE, in EVERY mode, `slug` included, with no
+# push. An owner starts a run from the worktree branch or the local default branch that wrote the
+# folder. It spends more than `published`: nothing off this node pins the BASE, so the recorded base
+# is the input. The leg admits an unpublished BASE only when THIS key reads `local` in the conf at
+# the tip the remote advertises for its default branch, so the opt-in binds once it has landed. The
+# landing still pushes. Protocol section 1 carries the costs.
 ANCHOR_SCOPE=""
 
 # TOOL-aNamedGesture-1 - the TOKEN that authorizes a prompt-mode run. The Skill's prompt path is

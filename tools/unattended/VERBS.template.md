@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.92 -->
+<!-- gov:kit unattended@1.93 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -436,11 +436,14 @@ one are two acts with two authorizations.
    **default-branch** anchor the folder was committed before your branch existed, and preflight
    REFUSES a folder you created. Under **published**, the tip the remote advertises for your OWN
    branch also counts, but only where the folder declares `authorized-by: prompt` or `recipe`; a
-   `slug` folder, which is what no `authorized-by:` key means, is refused there. You do not create the
-   run-state file; preflight does.
+   `slug` folder, which is what no `authorized-by:` key means, is refused there. Under **local**, a
+   folder committed anywhere in HEAD's history counts, in every mode `slug` included, with no push.
+   You do not create the run-state file; preflight does.
    - **Not on the default branch? PUSH YOUR BRANCH FIRST** under `published`: an unpushed commit
-     authorizes nothing, and the refusal names the branch the remote does not advertise. Under any
-     other value only the default-branch anchor counts, and the build has to be landed first.
+     authorizes nothing, and the refusal names the branch the remote does not advertise. Under
+     `local`, COMMIT and do not push: the run may start from the worktree branch, or the local
+     default branch, that wrote the folder. Under any other value only the default-branch anchor
+     counts, and the build has to be landed first.
    - **A build already run once is not closed to you.** A `RUN.md` in a terminal phase is RETIRED by
      preflight to `RUN.<phase>.<blob8>.md` beside it, and a fresh one starts; stdout names both paths.
      Never move, edit or delete a finished record yourself.
@@ -524,8 +527,8 @@ whitespace in it; reading that as a prompt would silently make a file the whole 
 
 - **A prompt that NAMES IDS is not this path**: take the scaffold route with those ids and write
   nothing, since a run that wrote its own ask mandate would be authorizing itself.
-- **This path needs `ANCHOR_SCOPE` to be `published`.** Under `default-branch` no folder you author
-  can resolve, so say so and stop, writing no build folder nothing can authorize.
+- **This path needs `ANCHOR_SCOPE` to be `published` or `local`.** Under `default-branch` no folder
+  you author can resolve, so say so and stop, writing no build folder nothing can authorize.
 - **`authorized-by: prompt` in step 3 is not bookkeeping.** Omitted, the folder reads as `slug`, which
   this anchor refuses, and the refusal arrives AFTER the push with no owner turn left.
 
@@ -584,12 +587,13 @@ the run, which makes "the owner was asked at the start" a property of the commit
    `not asked — the brief draws on nothing outside the prompt`. From `PROMPT_BRIEF_CUTOFF`,
    the first preflight refuses a record that breaks this shape and a build with no such record.
    A `spec-audit:` ask counts only inside `## The prompt`, never in a section the run wrote.
-4. **Commit, then PUSH THE BRANCH**, in that order. Skip the push and preflight refuses with
-   `the remote advertises no tip for the branch this run is on, so nothing published authorizes it`.
+4. **Commit, then PUSH THE BRANCH**, in that order, under `published`. Skip the push and preflight
+   refuses with `the remote advertises no tip for the branch this run is on, so nothing published
+   authorizes it`. Under `local` the commit is enough and no push is owed.
 5. **Preflight**, as on the slug path; it records the mode from the file you pushed.
 6. **The kickoff hand-back**, at the slug path's step 4 and for its reason.
 
-**After any later roster change, commit AND PUSH before the next authorization read**: a roster
+**After any later roster change, commit AND, under `published`, PUSH before the next authorization read**: a roster
 grown and committed but not pushed blocks `--close` on `authorization-reachable`, which has no
 override. `researched` and `solution-tested` are scoped `all`, and M12 decides when a build owes them.
 
@@ -602,8 +606,9 @@ turns on the playbook resolution at BASE, the two piece-scoped Definition-of-Don
 was to enforce this was withdrawn unbuilt, so it is prose you keep, on both entry points.
 
 0. **Read the build method WHOLE, and the playbook whole**, then the playbook again per piece: it is
-   segmented for that. Writing the build folder yourself needs `published`, for the prompt path's
-   reason; where the owner landed the folder first, either anchor works and step 4's push is skipped.
+   segmented for that. Writing the build folder yourself needs `published` or `local`, for the
+   prompt path's reason, and under `local` the commit is enough; where the owner landed the folder
+   first, any anchor works and step 4's push is skipped.
 1. **Orient from the playbook**: what one piece IS, where pieces land, which checks run over one and
    which over all N. What it leaves open is usually the COUNT, and which location when its `outputs`
    globs admit more than one.

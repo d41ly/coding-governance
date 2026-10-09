@@ -194,6 +194,17 @@ else
   print_kit_miss "kickoff-manifest" "" manifest-check.sh skills/session-kickoff
 fi
 
+# unattended skill wiring — only when an input of the rendered Skill, or the Skill itself, is staged:
+# the conf it interpolates, a kit template, or the render. TOOL-aHomedAnchor-4 left-shifts the bar's
+# `unattended skill wiring` leg, so a hand-edited render reds here rather than at the push.
+if git diff --cached --name-only -- .unattended.conf '*SKILL.template.md' .claude/skills/unattended/SKILL.md | grep -q .; then
+  if g=$(resolve_kit_gate unattended adopt-unattended.sh); then
+    bash "$g" --check || rc=1
+  else
+    print_kit_miss "unattended skill wiring" unattended adopt-unattended.sh
+  fi
+fi
+
 # template size — only when the template is staged
 if git diff --cached --name-only -- coding-governance-agents.template.md | grep -q .; then
   if g=$(resolve_kit_gate "" check-template-size.sh); then

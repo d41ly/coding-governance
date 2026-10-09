@@ -9,6 +9,9 @@
 #
 #   bash <prefix>/unattended/check-unattended.sh
 #
+# NOT CHECKED (TOOL-aHomedAnchor-2): under a remote default branch declaring ANCHOR_SCOPE=local, that a
+# run's recorded BASE predates the run. Check 9 then asks only that the BASE is on HEAD's history.
+#
 # Exit 0 + no output = clean, EXCEPT for the two announcements named below. Anything else printed
 # is a violation. Exit 2 = misconfigured.
 #
@@ -50,7 +53,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.92   # gov:kit unattended@1.92 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.93   # gov:kit unattended@1.93 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -1304,6 +1307,31 @@ fi
 # per record, 36 times, always about the same sha.
 ADV_HEAD_OK=0
 if [ -n "$ADV_HEAD" ] && GIT cat-file -e "$ADV_HEAD^{commit}" 2>/dev/null; then ADV_HEAD_OK=1; fi
+# ---- TOOL-aHomedAnchor-2 S1 - THE ANCHOR SCOPE THE REMOTE'S DEFAULT BRANCH DECLARES. The driver's
+# ---- `local` anchor pins a BASE nothing off this node observed, so check 9's published test would
+# ---- red every run it authorizes. The leg admits one ONLY where the conf at the tip the remote
+# ---- advertises for its default branch says `local`: the working tree, the recorded BASE and the
+# ---- run branch's tip are all the run's to write, and this blob moves only through a landing,
+# ---- which runs this leg first. PARSED, never evaluated: the driver sources the conf, so the last
+# ---- assignment line wins, and a value spelled through expansion reads as itself and so as strict.
+# ---- No readable HEAD leaves it empty, which is the strict reading.
+# ---- TOOL-aHomedAnchor-7 S3: an `export` prefix is the shell's assignment too, and ANY assignment line
+# ---- whose value carries a `$` or a backtick makes the answer empty, since the shell may read it otherwise.
+read_origin_scope() { # conf blob text -> the last ANCHOR_SCOPE= assignment's value
+  printf '%s\n' "$1" | awk '
+    /^[[:space:]]*(export[[:space:]]+)?ANCHOR_SCOPE=/ {
+      v = $0; sub(/^[[:space:]]*(export[[:space:]]+)?ANCHOR_SCOPE=/, "", v)
+      if (v ~ /[$`]/) bad = 1
+      sub(/\r$/, "", v); sub(/[[:space:]]+#.*$/, "", v); sub(/[[:space:]]+$/, "", v)
+      if (v ~ /^".*"$/ || v ~ /^\047.*\047$/) v = substr(v, 2, length(v) - 2)
+      r = v
+    }
+    END { if (!bad) print r }'
+}
+ORIGIN_SCOPE=""
+if [ "$ADV_HEAD_OK" = 1 ]; then
+  ORIGIN_SCOPE=$(read_origin_scope "$(GIT show "$ADV_HEAD:.unattended.conf" 2>/dev/null)")
+fi
 # THE RUN THIS TREE DRIVES (TOOL-aWindowedPass-5): the record whose run branch is the branch checked
 # out here. A detached HEAD binds none. Read once, here, because check 19's live own-commit arms and
 # check 23 below both compare every record against it.
@@ -2151,6 +2179,9 @@ while IFS= read -r f; do
   # ---- AN ABSENT `base:` LINE IS THE VIOLATION, not the exemption. Wrapping this in `if [ -n ]`
   # ---- meant deleting one line from a run-writable file disarmed the only BASE check on the bar.
   rb=$(fact_of "$f" base)
+  # TOOL-aHomedAnchor-7 S1 - set only by check 9's local admission below, from the advertisement; the
+  # may: and asks: second opinions read it, so a slug mode no longer stands in for the first anchor.
+  rlocal=0
   if [ -z "$rb" ]; then
     fail 9 "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one: $f"
   else
@@ -2214,6 +2245,11 @@ while IFS= read -r f; do
             fi
           elif [ "$_pubrc" = 2 ]; then
             fail 9 "the remote advertised tips this clone does not have, so whether a recorded BASE is published CANNOT BE OBSERVED and this leg will not answer a question it could not ask; fetch and re-run: recorded $rb in $f"
+          elif [ "$ORIGIN_SCOPE" = local ] && check_head_reaches "$rb"; then
+            # TOOL-aHomedAnchor-2 S2 - the local anchor, opted into on the remote's default branch.
+            # WHAT THIS DOES NOT CHECK: that the BASE predates the run. On that anchor nothing can.
+            rlocal=1
+            report "check 9 admitted by the local anchor — a recorded BASE no remote tip carries, on HEAD's history, in a repo whose default-branch conf declares ANCHOR_SCOPE=local: $rb in $f"
           else
             fail 9 "a recorded BASE is not published on the remote — it is an ancestor of no tip the remote advertises, so it names a commit that exists only where this run could have authored it: recorded $rb in $f"
           fi
@@ -2389,10 +2425,14 @@ while IFS= read -r f; do
       # ---- CANNOT TELL STAYS SILENT, exactly as `is_published` does. An unreadable or unadvertised
       # ---- default-branch tip means the remote could not be observed, and a leg that reds a whole
       # ---- fleet on a network fault is worse than one that waits for the next run.
+      # TOOL-aHomedAnchor-2 S3 - the local anchor admits every mode, so where the remote's default
+      # branch declares it an off-default BASE says nothing about which discipline was claimed.
       case " $SECOND_ANCHOR_MODES " in
         *" $dmode "*) ;;
         *)
-          if [ "$ADV_HEAD_OK" = 1 ] \
+          if [ "$ADV_HEAD_OK" = 1 ] && check_rev "$rb" && ! check_adv_reaches "$rb" && [ "$ORIGIN_SCOPE" = local ]; then
+            report "check 29 skipped for $f — the remote's default-branch conf declares ANCHOR_SCOPE=local, which admits mode $dmode off the default branch"
+          elif [ "$ADV_HEAD_OK" = 1 ] \
              && check_rev "$rb" \
              && ! check_adv_reaches "$rb"; then
             fail 29 "a run's recorded BASE is not on the branch the remote calls its default, so it came from the second anchor, while the build README there declares a mode whose discipline is that the folder already existed: mode $dmode, admissible on that anchor are $SECOND_ANCHOR_MODES, base $rb in $f"
@@ -2460,6 +2500,9 @@ while IFS= read -r f; do
       fi
       if [ -n "$recmay" ] || [ "$dmay" != none ]; then
         [ "$recmay" = "$dmay" ] || fail 19 "a run-state file pins a may: grant the build README at its own recorded BASE does not declare, so the authority the run says its owner committed is not the authority that README carries - pinned against declared follow: [${recmay:-(no may: fact)}] against [$dmay] in $f"
+      fi
+      if [ -n "$recmay" ] && [ "$recmay" != none ] && [ "$rlocal" = 1 ]; then
+        fail 19 "a run-state file pins a may: grant on a BASE the local anchor admitted, a commit on this node the run could have written, so the grant could be one the run wrote for itself - ruling D12-j honours a grant only from a slug README the owner committed at the default-branch anchor: may: [$recmay] in $f"
       fi
       if [ -n "$recmay" ] && [ "$recmay" != none ] && [ "${recmode:-$dmode}" != slug ]; then
         fail 19 "a run-state file pins a may: grant while recording an authorization mode that resolves at the second anchor, so the grant could be one the run wrote for itself - ruling D12-j honours a grant only under slug: mode [${recmode:-$dmode}], may: [$recmay] in $f"
@@ -2678,6 +2721,8 @@ WAIVERS
     # ---- not a consequence of the mode one: a `slug` record pinning a mandate with no declared
     # ---- producer is a pinned set nothing ever graded.
     askmode=$(fact_of "$f" mode)
+    [ "$rlocal" != 1 ] \
+      || fail 19 "a run-state file pins an asks: mandate on a BASE the local anchor admitted, a commit on this node the run could have written, so the mandate and the tree it is asserted against could both be this run's own: $f"
     [ "$askmode" = slug ] \
       || fail 19 "a run-state file pins an asks: mandate while recording an authorization mode whose discipline lets the run reach the anchor it writes, so the mandate and the tree it is asserted against could both be this run's own: mode [${askmode:-(none)}] in $f"
     [ -n "$ASKS_CMD" ] \
