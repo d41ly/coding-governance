@@ -98,7 +98,7 @@ tools/dead-path-waivers.txt text eol=lf
 # The rendered recall Skill is compared to a fresh render with plain `diff` by
 # `adopt-memory-recall.sh --check`. The renderer always emits LF, so without this pin a Windows
 # checkout turns the file CRLF and the leg reds on EVERY line — while passing whenever the working
-# copy happens to have just been rendered. That is green-by-accident, not a gate (§7).
+# copy happens to have just been rendered. That is green-by-accident, not a gate (charter [gate]).
 .claude/skills/memory-recall/SKILL.md text eol=lf
 
 # The rendered drift-audit Skill, same reason. Belt-and-braces rather than load-bearing here:

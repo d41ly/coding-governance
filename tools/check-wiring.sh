@@ -1407,7 +1407,7 @@ check_backlog_stragglers() {
   if [ -n "$names" ]; then
     # THE MARK IS NOT IN THIS PROSE, deliberately. A sentence that always carries the marker's own
     # words makes any arm grepping for it pass over a run where nothing was marked — the same
-    # could-not-fail shape the charter's §7 names, one level up from the code.
+    # could-not-fail shape the charter's [class] practice names, one level up from the code.
     echo "note     straggler —${names% ·} still edit the authored backlog shards and owe a relocation before they merge; a marked branch runs its own pre-flip hook files, so only this note, the drift signal and the merge bar reach it. Detail: $py $path --stragglers"
   else
     echo "ok       straggler — no local branch still owes a backlog relocation"

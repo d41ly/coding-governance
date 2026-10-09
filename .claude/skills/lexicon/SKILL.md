@@ -57,7 +57,7 @@ whole point.
 - `scan` — walk a population looking for matches — NOT `search`, which implies stopping at the first
 - `extract` — pull a declared shape out of a larger one — NOT `pluck`, pluck names the taking; extract names the declared shape taken
 - `measure` — count a population and report the number, deciding nothing — NOT `count`, count is the arithmetic; measure counts a population and decides nothing
-- `derive` — compute a value from a source so it never has to be authored — the §5 rule, as a verb — NOT `compute`, compute says a value was produced, not that it never has to be authored
+- `derive` — compute a value from a source so it never has to be authored — the charter's [derive] practice, as a verb — NOT `compute`, compute says a value was produced, not that it never has to be authored
 - `seed` — write an initial value the tool will not overwrite again — NOT `install`, install claims the tool owns the result after; a seed is never overwritten
 - `init` — set up state at construction — NOT `setup`
 - `run` — execute a process to completion and report its outcome — NOT `execute`, the same word twice, and this repo already runs processes

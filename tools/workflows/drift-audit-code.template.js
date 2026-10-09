@@ -125,7 +125,7 @@ EVIDENCE RULES (these decide whether your finding survives the skeptic):
 - Severity: blocker = breaks a merge-bar gate or ships a live defect; high = real user-visible or
   data-integrity impact; medium = real debt with a concrete cost; low = tidy-up.
 
-COST IS A VERDICT, AND THIS LENS HAS A BUDGET. Charter §7: every suite declares a wall-clock ceiling
+COST IS A VERDICT, AND THIS LENS HAS A BUDGET. Charter [cost]: every suite declares a wall-clock ceiling
 and one arriving without a ceiling reds by that fact. Yours is roughly 30 TOOL CALLS. If a question
 cannot be answered inside it, RECORD THE QUESTION AS UNANSWERED and move on — an unanswered question
 on disk is worth more than a perfect one nobody ever receives.

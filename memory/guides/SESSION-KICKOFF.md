@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-09T14:35:06+03:00 @ c4a5cfb55cbbabea85228f0ae7900eedadcf7b45
+last-audit: 2026-10-09T15:00:53+03:00 @ c6838b00d81d6f812ec4ad78baeb536a4454606b
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 764b6d8cece5533bf0ea3ea116a5e0b58698ab8e
@@ -134,8 +134,8 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
   `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one second. Hit twice:
   `tools/unattended/` on 2026-08-21, and `check-memory-hygiene.sh` on 2026-09-13 by two sessions
-  sharing node tag `c`, for 13 conflicts at the landing. Neither time did anyone run it. §3's rule
-  is own STREAMS not files, and a kit is the unit that rule is about.
+  sharing node tag `c`, for 13 conflicts at the landing. Neither time did anyone run it. The charter's
+  [small] practice is own STREAMS, not files, and a kit is the unit that rule is about.
 
 - **A finished or live unattended run ANSWERS QUESTIONS about itself** — `/runlog`, over the run's
   committed record first, the local run model for anything time-shaped (the record carries no event
@@ -158,7 +158,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   36-unit run reached 71 KB against 61,440. A RETIRED record is a rename and stays capped.
 
 - **The orientation card's READY anchor accepts BOTH spellings** (`TOOL-cMendedVintage-16`). A card
-  body written in the charter's §16 R1 list-item form used to be read as carrying no ready line,
+  body written in the charter's [r1] list-item form used to be read as carrying no ready line,
   leaving the sentinel in place and the scratch-guard then blocking the next commit. The writer and
   the hook both widened; the charter did not move.
 

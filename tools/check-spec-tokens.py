@@ -374,7 +374,7 @@ CLAIM_REFUSALS = (
 )
 CLAIMS_WHY = ("a codebase-map dossier claims EXACT inventory keys and no key is a {cls}: {cite}; name "
               "the key the dossier will claim, or describe the thing in prose")
-# THE LIVENESS ASSERTION (charter §7). A zero from this join is the corpus's measured normal state, so a
+# THE LIVENESS ASSERTION (charter [gate]). A zero from this join is the corpus's measured normal state, so a
 # dead arm would report exactly what a clean corpus reports. One refused claim per arm, each verb in
 # UPPERCASE so the case fold is load-bearing on every arm, between them covering all three classes,
 # plus one claim on a real parenthesised leg name that must CLEAR, which is what pins the space clause.

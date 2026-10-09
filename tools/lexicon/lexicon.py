@@ -4171,7 +4171,7 @@ def read_superseded(message: str) -> list:
 
 def check_merge_losses(root: Path, rng: str) -> int:
     """`--merge-losses <a>..<b>`: exit 1 when a two-parent merge in the range LOSES a definition a
-    parent carried. TOOL-aMendedFleet-3, mechanizing the charter's §1 Landing sentence "diff the
+    parent carried. TOOL-aMendedFleet-3, mechanizing the charter's [reconcile] practice, "diff the
     merge against BOTH parents" — merge `01c22e155` took one side and lost `write_ask_views`.
 
     THE RULE. For merge M with parents P1, P2 and base B, over the ARMED paths where M's tree differs

@@ -868,12 +868,12 @@ CARD_PARTS_AWK='{ ln=$0; sub(/\r$/, "", ln)
   if ((want=="tail") == (intail==1)) print ln }'
 
 # THE READY ANCHOR, and the one place it is spelled. The optional leading `- ` is not cosmetic: the
-# charter's §16 R1 requires an emitted micro-format to be a markdown list item — `- ` at column 0 —
+# charter's [r1] rule requires an emitted micro-format to be a markdown list item — `- ` at column 0 —
 # so a kickoff body that OBEYS the charter was read here as carrying NO READY line, and the append
 # then reported success while leaving the sentinel in place and skipping the `tree —` re-render.
 # Both forms are accepted, and that is a WIDENING rather than a swap: the sentinel this script
 # renders is bare, as is every card already on disk, and dropping the bare form would strand them.
-# The reader moves; §16 R1 does not (TOOL-cMendedVintage-16).
+# The reader moves; [r1] does not (TOOL-cMendedVintage-16).
 CARD_READY_RE='^\(- \)\{0,1\}READY — '
 
 # `--card --append`: the body on stdin, checked, annotated, and stored — or refused with the file

@@ -36,7 +36,7 @@ What stayed are the legs whose subject is the REPOSITORY rather than the
 kit, because those go stale with nobody editing it; which, and how many, are its
 `tools/unattended/` rows in `tools/gate-legs.json`. On demand:
 `bash tools/unattended/run-unattended-gates.sh --serial`. The compensating check is written into that kit's
-descriptor, because an exemption is not coverage (§7).
+descriptor, because an exemption is not coverage (charter `[gate]`).
 
 Do not read a leg COUNT out of this paragraph; `tools/gate-legs.json` owns it and prose beside a
 source that owns a number is the rule this file keeps breaking.
@@ -78,7 +78,7 @@ and no job is a required check.
   The marker grammar it enforces is `tools/hooks/README.md`. Ready-made harness:
   `tools/workflows/tier2-review.js`.
 - `memory/guides/UNATTENDED-PROTOCOL.md` — a run that will merge and push with no owner turn replaces
-  the explicit-ask checkpoint with a committed standing mandate, §1 Landing's one substitute.
+  the explicit-ask checkpoint with a committed standing mandate, the charter's `[land]` substitute.
   The BASE that mandate hangs on is OBSERVED from the remote's own HEAD advertisement, never read
   from a local ref and never named by the environment; both of those were reproduced bypasses. §9
   states plainly what a check running under the run's own uid can and cannot buy.
