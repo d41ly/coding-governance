@@ -4296,6 +4296,16 @@ git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin 
 out=$(run --preflight tBr --keepalive-id k1)
 hit  "$out" "a prompt-mode build past PROMPT_BRIEF_CUTOFF carries no record with ## The prompt under its prompts/ folder at the pinned BASE, and an absent record is not nothing to grade: "
 same "AC5 an absent record created no run-state file" "$([ -f memory/builds/tBr/RUN.md ] && echo yes || echo no)" "no"
+# ---- TOOL-aQuotedBrief-5 AC1: a record headed `##  The prompt`, two spaces, is no prompt record - term 7
+# ---- and the audit reader skip it - so a build holding only that one refuses at check 113. Observed RED
+# ---- against the pre-unit driver, whose `sub(/^## +/)` graded it and admitted the build.
+reset_tree; write_default_conf 'PROMPT_BRIEF_CUTOFF="2026-07-01"'; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_qb_ok" > "$_qb_rec"; mutate "$_qb_rec" 's/^## The prompt$/##  The prompt/'
+scope published
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "UNATTENDED check 113 FAILED — a prompt-mode build past PROMPT_BRIEF_CUTOFF carries no record with ## The prompt under its prompts/ folder"
+miss "$out" "preflight OK"
 # ---- AC7: the opt-in phrase quoted only under `## Drawn from the session` opts nothing in: check 89.
 reset_tree; write_default_conf 'PROMPT_BRIEF_CUTOFF="2026-07-01"'; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt\nspec-audit: 2026-10-05'
 mkdir -p memory/builds/tBr/prompts; printf '%s' "$_qb_audit" > "$_qb_rec"
@@ -4490,6 +4500,24 @@ sed -i 's/| CLOSED | rev-1 |/| WONTDO | rev-1 |/' memory/builds/tRun/README.md m
 out=$(run --close tRun $_bq_ovr)
 hit  "$out" "close OK"
 hit  "$out" "note — the project conf at the default-branch side of the pinned BASE declares no dated PROMPT_BRIEF_CUTOFF, so the brief-item term is OFF"
+# ---- TOOL-aQuotedBrief-5 AC2: a second record headed `##  The prompt` planning a unit nothing builds is
+# ---- skipped by BOTH readers: preflight admits the run and term 7 meets green. Observed RED against the
+# ---- pre-unit driver, whose preflight graded that record (check 115, rule 2) while term 7 skipped it.
+git checkout -qf main; git reset -q --hard "$_bq_main"; git clean -qfd
+_bq_dbl=memory/builds/tRun/prompts/2026-10-09-prompt-second.md
+cp memory/builds/tRun/prompts/2026-10-09-prompt-mandate.md "$_bq_dbl"
+mutate "$_bq_dbl" 's/^## The prompt$/##  The prompt/'
+mutate "$_bq_dbl" 's/\[planned ARCH-tRun-1\]/[planned ARCH-tRun-9]/'
+printf 'PROMPT_BRIEF_CUTOFF="2026-07-01"\n' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m bq-dbl --no-verify && git push -q -f origin main
+git checkout -qf unit; git reset -q --hard "$_bq_base"; git clean -qfd; mkconf
+git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit  "$out" "preflight OK"; miss "$out" "does not join the authorized roster"
+add_facts memory/builds/tRun/RUN.md "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
+printf '2026-08-31T00:00:00Z review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED\n' >> memory/builds/tRun/RUN.md
+out=$(run --close tRun $_bq_ovr)
+hit  "$out" "close OK"; miss "$out" "$_bq_term7"
 # ---- AC7: a README before the cutoff, and a slug-mode build, close as at BASE: the WONTDO unit is terminal.
 build_brief_run
 sed -i 's/| CLOSED | rev-1 |/| WONTDO | rev-1 |/' memory/builds/tRun/README.md memory/builds/tRun/RUN.md
@@ -16705,7 +16733,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 2704 -> 2714 by TOOL-aQuotedBrief-4: the cutoff-at-BASE arms in region three, AC1 and AC4 at
 # preflight (mutate, hit, miss each) and AC2 and AC3 at close (two each), run as slices of the prologue
 # and those blocks on node a, 2026-10-09; no suite ran.
-FLOOR_ASSERTIONS=2714
+# RAISED 2714 -> 2724 by TOOL-aQuotedBrief-5: the doubled-space heading arms in region three, AC1 at
+# preflight (two mutate, hit, miss) and AC2 at preflight and close (two mutate, two hit, two miss), run
+# as slices of the prologue and those blocks on node a, 2026-10-09; no suite ran.
+FLOOR_ASSERTIONS=2724
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -16892,7 +16923,8 @@ FLOOR_SHARD_2=222
 # RAISED 295 -> 323 by TOOL-aQuotedBrief-3: the same 28 region-three brief-item assertions, see FLOOR_ASSERTIONS.
 # RAISED 323 -> 326 by the same B1 arm, see FLOOR_ASSERTIONS.
 # RAISED 326 -> 336 by TOOL-aQuotedBrief-4: the same 10 region-three cutoff-at-BASE assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_3=336
+# RAISED 336 -> 346 by TOOL-aQuotedBrief-5: the same 10 region-three doubled-space heading assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=346
 FLOOR_SHARD_4=390
 FLOOR_SHARD_5=270
 FLOOR_SHARD_6=129

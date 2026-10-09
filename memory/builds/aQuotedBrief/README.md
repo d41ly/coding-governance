@@ -77,11 +77,11 @@ ids TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3 TOOL-aQuotedBrie
 | [TOOL-aQuotedBrief-2 — a run that cannot start clean starts in a fresh worktree, and a first preflight refuses a carried branch](spec/2026-10-09-spec-TOOL-aQuotedBrief-2.md) | 1 | 2 | CLOSED | rev-4 | 2026-10-09 |
 | [TOOL-aQuotedBrief-3 — every brief item carries its disposition, and `build-complete` grades each one](spec/2026-10-09-spec-TOOL-aQuotedBrief-3.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aQuotedBrief-4 — the brief cutoff is read at the owner's side of BASE, and term 7 says when it is off](spec/2026-10-09-spec-TOOL-aQuotedBrief-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-09 |
-| [TOOL-aQuotedBrief-5 — preflight and term 7 recognise a prompt record by one predicate](spec/2026-10-09-spec-TOOL-aQuotedBrief-5.md) | 4 | 2 | SPECCED | rev-1 | 2026-10-09 |
+| [TOOL-aQuotedBrief-5 — preflight and term 7 recognise a prompt record by one predicate](spec/2026-10-09-spec-TOOL-aQuotedBrief-5.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-09 |
 | [TOOL-aQuotedBrief-6 — the closing review's minors: dispositions, re-preflight, the cutoff date, quoting, parks and arms](spec/2026-10-09-spec-TOOL-aQuotedBrief-6.md) | 5 | 2 | SPECCED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 4 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-aQuotedBrief-6.
 

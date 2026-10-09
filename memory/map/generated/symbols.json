@@ -3838,6 +3838,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_prompt_heading",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_provenance_chain",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"

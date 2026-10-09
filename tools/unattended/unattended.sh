@@ -3072,6 +3072,13 @@ SPEC_AUDIT_ASK_RE='spec-audit:|(^|[^[:alpha:]])opt[ -]?in[[:space:]]+(in|into|to
 # Prints the first prompt record under <build dir>/prompts/ AT <base> whose `## The prompt` section
 # quotes an ask in SPEC_AUDIT_ASK_RE, or returns 1. The quote is the `> ` lines up to the next `## `
 # heading, prefixes stripped and joined with single spaces, because a prompt wraps across lines.
+# TOOL-aQuotedBrief-5 S1 - IS THIS A PROMPT RECORD, one answer for all three readers: stdin holds a
+# line that is `## The prompt`, single space, with only trailing whitespace or a CR after it - the
+# anchor read_audit_ask_record spells below. A doubled space is NOT one: widening preflight's reading
+# would widen what the audit reader must also admit as the owner's words (closing review round 1, H2).
+check_prompt_heading() {
+  grep -qE '^## The prompt[[:space:]]*\r?$'
+}
 read_audit_ask_record() { # build dir · base
   local rec quote
   while IFS= read -r rec; do
@@ -3164,7 +3171,7 @@ check_brief_items() { # slug
   nsup=$(printf '%s\n' "$sup" | grep -c .)
   while IFS= read -r rec; do
     txt=$(GIT show "$base:$rec" 2>/dev/null)
-    grep -qE '^## The prompt[[:space:]]*\r?$' <<<"$txt" || continue
+    check_prompt_heading <<<"$txt" || continue
     while read -r n kind args; do
       [ -n "$n" ] || continue
       grep -qF -- " · item brief item $n:" "$rm" 2>/dev/null && continue
@@ -3234,9 +3241,12 @@ check_prompt_brief() { # slug · base
   roster=$(printf '%s\n' "$roster" | grep -oE "[A-Z]+-$1-[0-9]+" | sort -u)
   while IFS= read -r rec; do
     txt=$(GIT show "$base:$rec" 2>/dev/null)
+    # TOOL-aQuotedBrief-5 S2 - a record term 7 and the audit reader would skip is skipped here too,
+    # before the structural read, so `##  The prompt` is no prompt record anywhere (check 113).
+    check_prompt_heading <<<"$txt" || continue
     why=$(printf '%s\n' "$txt" | awk '
       { sub(/\r$/, "") }
-      /^## / { h2 = $0; sub(/^## +/, "", h2); sub(/[[:space:]]+$/, "", h2); seen[h2] = 1; h3 = ""; next }
+      /^## / { h2 = $0; sub(/^## +/, "", h2); sub(/[[:space:]]+$/, "", h2); h3 = ""; next }
       h2 == "The brief" && /^### / { h3 = $0; sub(/^### +/, "", h3); sub(/[[:space:]]+$/, "", h3); order = order "|" h3; next }
       h2 == "The brief" && h3 != "" && /[^[:space:]]/ { full[h3] = 1; if (h3 == "Items" && /^[0-9]+\./) items = 1 }
       h2 == "Drawn from the session" && /[^[:space:]]/ { l = $0; sub(/[[:space:]]+$/, "", l); drawn = drawn (drawn == "" ? "" : "\n") l }
@@ -3244,17 +3254,12 @@ check_prompt_brief() { # slug · base
         if (/^Asked:[[:space:]]*[^[:space:]]/) asked = 1
         if (/^Answer:[[:space:]]*[^[:space:]]/) answered = 1 }
       END {
-        if (!seen["The prompt"]) { print "skip"; exit }
         if (order != "|Goal|Items|Acceptance|Gates|Non-goals" || !full["Goal"] || !full["Items"] || !full["Acceptance"] || !full["Gates"] || !full["Non-goals"]) { print "rule 1"; exit }
         if (!items) { print "rule 2"; exit }
         if (drawn == "") { print "rule 3"; exit }
         if (!conf) { print "rule 4"; exit }
         if (drawn != "none" && !(asked && answered)) { print "rule 5"; exit }
       }')
-    # The sentinel is CLEARED on the way out: `why` also carries the join's result below, so a
-    # non-prompt record (a spec or build brief) sorting last left `skip` standing and the join
-    # refused a conforming record with that word as its reason (closing review round 1, B1).
-    [ "$why" = skip ] && { why=""; continue; }
     found=1
     if [ -n "$why" ]; then
       fail 112 "a prompt record at the pinned BASE does not stand on its own, so a resumed session would hold the owner's bytes and not the build they authorized; write the brief, the session quotes and the confirmation its prompt path names - first rule failed, then the record: $why $rec"
