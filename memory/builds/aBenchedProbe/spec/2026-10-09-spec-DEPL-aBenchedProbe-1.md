@@ -2,6 +2,16 @@
 
 **Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-1 · base 2b26f187 · streams deployer · order 2
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-09-prompt-TOOL-aBenchedProbe-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aBenchedProbe-1-1-spec-brief.md) | journal | TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2 DEPL-aBenchedProbe-2 |
+| [2026-10-09-prompt-TOOL-aBenchedProbe-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aBenchedProbe-1-2-build-brief.md) | journal | TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2 DEPL-aBenchedProbe-2 |
+| [2026-10-09-prompt-TOOL-aBenchedProbe-1.md](../prompts/2026-10-09-prompt-TOOL-aBenchedProbe-1.md) | research | TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2 DEPL-aBenchedProbe-2 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 A new `govkit selfcheck` arm refuses any `[[gate_leg]]` that gov holds as a self-test but ships to
