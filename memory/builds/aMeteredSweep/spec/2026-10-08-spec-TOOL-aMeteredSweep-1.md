@@ -1,6 +1,6 @@
 # TOOL-aMeteredSweep-1 — every red of a full bar with self-tests on the reconciled main, fixed
 
-**Status:** OPEN · rev-2 · 2026-10-08 · node a · Tier-1 · base fa68a767 · streams tooling · order 1
+**Status:** OPEN · rev-3 · 2026-10-08 · node a · Tier-1 · base fa68a767 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -44,11 +44,14 @@ green on a quiet host.
 - S8. `govkit selftest` — `cmd_mint` gets its spawn-site row, and the migration fixture's synthetic
   gov ships the by-design checker TOOL-aGraftedHelix-28 made the parity script require. Observed by
   AC1.
-- S9. `run-gates canary` — its memory-pause arm re-run on a quiet host decides whether it is a
-  defect or contention; a defect is fixed here. Observed by AC1.
+- S9. `run-gates canary` — the memory-pause AC6 and AC14 arms order on leg rows, and the one clock
+  AC6 cannot lose is calibrated: a one-leg bar is timed first and the hold bound, C's end and the
+  run-length bound derive from that reading. Observed by AC1 and AC5.
 - S10. `foreign-prefix parity` — a row's declared budget becomes a hang guard at three times its
-  value, read as a hang, because this leg grades parity and its budgets are quiet readings: at the
-  fix commit six passing rows overran theirs inside the loaded bar. Observed by AC1 and AC4.
+  value times the host's measured load, read as a hang, because this leg grades parity and its
+  budgets are quiet readings: at the fix commit six passing rows overran theirs inside the loaded
+  bar, and three times still killed one beside another repository's bar. The load is ten timed
+  spawns over the runner's recorded spawn floor, rounded up and capped at 20. Observed by AC1 and AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -101,9 +104,14 @@ capturing it through a command substitution; the descriptor scan becomes one `aw
 - **AC3** — When the guide's two pointers are renamed, or the spec-tokens suite runs with
   `core.autocrlf=true`, the canary and the suite red and green respectively. Red when: the canary
   passes without the pointers, or the suite reds on a CRLF checkout.
-- **AC4** — When the parity leg's row runner `run_row`, sliced out alone, is handed a row that outlives three times
-  its budget, the row reds as a hang, and a fast row stays green. Red when: an overrun is read as
-  anything but a hang, or a row is killed at its bare budget.
+- **AC4** — When the parity leg's row runner `run_row` and `measure_load_ratio`, sliced out alone,
+  are handed a row that outlives its scaled bound, the row reds as a hang naming both factors, and
+  a fast row stays green. Red when: an overrun is read as anything but a hang, a row is killed at
+  its bare budget, or a host with no recorded floor is scaled at all.
+- **AC5** — When the canary's memory-pause section runs alone, sliced, three times beside another
+  repository's bar, every `check_mp_value` arm of AC6 and AC14 passes each time and AC6 prints its
+  calibration.
+  Red when: either arm reds, or the calibration line is absent.
 
 ## 7. Gates
 
@@ -123,3 +131,4 @@ none
 
 - rev-1 · 2026-10-08 · initial draft.
 - rev-2 · 2026-10-08 · S10 and AC4: the verification bar redded foreign-prefix parity on six passing rows that overran quiet budgets.
+- rev-3 · 2026-10-09 · S9, S10, AC4, AC5: the leftover re-run redded both again beside a neighbouring bar, so the clock in each is measured rather than typed (owner, option 1).
