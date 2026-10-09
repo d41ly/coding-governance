@@ -1,11 +1,12 @@
 # DEPL-aLevelledCopy-1 — govkit update carries gov's exec bit onto an existing engine row
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams deployer · order 1 · ratified 2026-10-09
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams deployer · order 1 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-DEPL-aLevelledCopy-1-1-acceptance-ledger.md](../build/2026-10-09-build-DEPL-aLevelledCopy-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1-1-spec-brief.md) | journal | TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1-2-build-brief.md) | journal | TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-1.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1.md) | research | TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 |
@@ -61,10 +62,12 @@ the owner's clarification asked for. The aScouredKit wave-3 cross-OS lens record
   verdicts, so its kit is in `touched_kits`, is verified after the write, and a rollback restores
   the pre-run entry, mode included. Observed by AC1, AC3, AC4, AC5.
 - **S5 — `govkit check` notes a mode deficit, and never fails on one** (§8 F2). For each engine
-  row, `cmd_check` compares the target's index mode with gov's mode at the ROW's own `commit` through
-  S1, and a row the rule would change gets one `r.note` naming the path, both modes and the remedy,
-  `govkit update --write`. It reads the index with one batched `index_read` and gov's modes with S2,
-  one spawn per distinct row commit. Observed by AC8.
+  row, `cmd_check` compares the target's index mode with gov's mode at the RECEIPT's `gov_commit`
+  through S1, and a row the rule would change gets one `r.note` naming the path, both modes and the
+  remedy, `govkit update --write`. It reads the index with one batched `index_read` and gov's modes
+  with S2, one spawn in all. rev-2: not the row's own `commit`, because `update` re-stamps a row's
+  `commit` only where it lands bytes, so after a mode-only carry the row still names the commit its
+  bytes came from, where gov ships `100644`, and AC8 could never see the deficit. Observed by AC8.
 - **S6 — the receipt is unchanged, said where the writer is.** A receipt row records `sha256`,
   `oid`, `gov_oid` and `commit`, and no file mode: the `mode` key on a `merged` or `attributes` row
   is its block-insertion mode, not a file mode (verified 2026-10-09 against the row builders). So no
@@ -107,7 +110,7 @@ did not already apply.
 A git spawn costs about 0.75 s on node a (PINNED, measured 2026-10-02, memory note "A git spawn
 costs 751ms"). Today `gov_tree_mode` spawns one `ls-tree` per row that has no index entry. S2
 replaces every such read with one `ls-tree -r -z` per distinct commit: one for `update` at
-`to_commit`, and for `check` one per distinct row commit, which is one after any normal update.
+`to_commit`, and for `check` one at the receipt's `gov_commit` (rev-2).
 On a 190-row receipt a per-row read would cost about 140 s.
 
 ### Inventory
@@ -118,6 +121,7 @@ On a 190-row receipt a per-row read would cost about 140 s.
 | `read_tree_modes` | function in `govkit.py` | `py.function` |
 | `mode_to` | key on an `acted` entry | not a definition; no cell |
 | `check_mode_carry` | selftest function in `selftest.py` | `py.function` |
+| `measure_mode_carry` | selftest function in `selftest.py`, the fixtures over a given `govkit.py` text | `py.function` |
 
 `python tools/lexicon/lexicon.py --suggest <name> --as py.function` answered OK for all three
 functions on 2026-10-09.
@@ -166,8 +170,11 @@ is re-run from the primary before it is believed.
 The fixtures follow `check_update_safety`'s scratch-gov construction in `tools/govkit/selftest.py`:
 a scratch gov whose `govkit.py` is a copy taken at build time, a demo kit, `SAFE_REG`, and a target
 installed with `apply`. The new arms live in a module-level `check_mode_carry(tmp)` that `main`
-calls, so each criterion is observed by running that one function alone, under the default
-`%TEMP%` because a scratchpad temp root false-reds on path length:
+calls, which runs `measure_mode_carry(tmp, source, arms)` over this tree's `govkit.py`; rev-2 adds
+that seam so a staged copy runs the same fixtures. Two fixtures cover every arm: `cm` carries each
+mode case in one update, and `rb` makes a mode carry the only change of a kit whose check reds.
+Each criterion is observed by running that one function alone, under the default `%TEMP%` because
+a scratchpad temp root false-reds on path length:
 
 ```bash
 python -c "import sys,pathlib,tempfile; sys.path.insert(0,'tools/govkit'); import selftest as s; s.check_mode_carry(pathlib.Path(tempfile.mkdtemp())); print(s.FAILURES)"
@@ -202,12 +209,16 @@ python -c "import sys,pathlib,tempfile; sys.path.insert(0,'tools/govkit'); impor
   update-index --chmod=-x` and `govkit check` runs, it prints one note naming the path and both modes
   and its exit status is the one it had before the edit. Red when: no note prints, or the deficit
   fails the check.
-- **AC9** — When each arm's failing case is staged by editing the scratch gov's `govkit.py` copy,
-  restoring the old mode expression for AC1, swapping the rule to mirror both directions for AC2,
-  and dropping `mode_to` from the snapshot predicate for AC5, the named arm reports a failure in
-  `s.FAILURES`. Red when: a staged break leaves its arm passing.
-  cost: about 45 s a run on node a, against about an hour for the whole suite, which this pass
-  does not run.
+- **AC9** — When each arm's failing case is staged at build time by editing the scratch gov's
+  `govkit.py` copy handed to `measure_mode_carry` — disabling the S4 mode arm for AC1, swapping
+  the rule to mirror both directions for AC2 and AC6, restoring the old mode expression in
+  `land_through_index` for AC4, and dropping `mode_to` from the snapshot predicate for AC5 — the
+  named arm reports a failure in `s.FAILURES`. Red when: a staged break leaves its arm passing.
+  rev-2: the old mode expression reds AC4 and not AC1, because a mode-only row never reaches
+  `land_through_index`; its carry is the S4 arm's. The breaks are an observation recorded in the
+  acceptance ledger and not committed arms, because each rebuilds a fixture.
+  cost: 137 s for `check_mode_carry` on node a, measured 2026-10-09 over its eight govkit
+  verbs, against about an hour for the whole suite, which this pass does not run.
 
 ## 7. Gates
 
@@ -236,6 +247,10 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 · e
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft, from the build's spec brief and the owner's clarification.
+- rev-2 · 2026-10-09 · built. S5 and §4 Cost read gov's mode at the receipt's `gov_commit`, since a
+  carried row keeps its old `commit`; §6 names `measure_mode_carry` and the two fixtures; AC9's AC1
+  break is re-pointed (the old expression reds AC4), its breaks are a build-time observation, and its
+  cost line is measured.
 
 ## 10. Reuse audit
 

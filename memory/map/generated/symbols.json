@@ -3648,6 +3648,11 @@
       "file": "tools/unattended/stop-guard.test.sh"
     },
     {
+      "id": "check_mode_carry",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_mp_value",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -8653,6 +8658,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "measure_mode_carry",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "measure_near_match",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -12038,6 +12048,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "read_tree_modes",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "read_tree_paths",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -14156,6 +14171,11 @@
       "id": "resolve_landed_log",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "resolve_landed_mode",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "resolve_landing_at",

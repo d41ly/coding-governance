@@ -2110,6 +2110,166 @@ def check_fragment_wiring(tmp: pathlib.Path) -> None:
           gk.run_fragment_merges(t, rows[1:], landed, set(), "update") == {} and not test_wired("stop-guard"))
 
 
+def measure_mode_carry(tmp: pathlib.Path, source: str, arms: set) -> dict:
+    """DEPL-aLevelledCopy-1 AC1-AC5, AC7, AC8 over scratch govs whose `govkit.py` is `source`, so
+    AC9 can hand it a staged break. Returns `{arm: [(label, ok, detail), ...]}`, with the fixture's
+    own liveness under `LIVE`. Two fixtures: `cm` carries every mode case in one update, and `rb`
+    makes a mode carry the only change of a kit whose check then reds. Steps an arm outside `arms`
+    alone needs are skipped, which is what keeps a staged run cheap."""
+    env = dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1")
+    got: dict = {}
+    kp = f"{PFX}demo/"
+
+    def add_result(arm: str, label: str, ok: bool, detail: str = "") -> None:
+        got.setdefault(arm, []).append((label, ok, detail))
+
+    def write_gov(g: pathlib.Path, kit: str, files: dict, execs: tuple, msg: str) -> str:
+        (g / PFX / "demo").mkdir(parents=True, exist_ok=True)
+        (g / PFX / "demo" / "kit.toml").write_bytes(kit.encode("utf-8"))
+        for rel, body in files.items():
+            (g / PFX / "demo" / rel).write_bytes(body.encode("utf-8"))
+        git(g, "add", "-A")
+        for rel in execs:      # both halves: the index for a no-filemode clone, the disk for POSIX
+            os.chmod(g / PFX / "demo" / rel, (g / PFX / "demo" / rel).stat().st_mode | 0o111)
+            git(g, "update-index", "--chmod=+x", "--", kp + rel)
+        git(g, "commit", "-qm", msg)
+        return run_gov_git(g, "rev-parse", "HEAD")
+
+    def build_gov(tag: str, kit: str, files: dict) -> tuple:
+        g = tmp / f"{tag}-gov"
+        (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
+        (g / PFX / KIT_NAMES["govkit"] / "govkit.py").write_bytes(source.encode("utf-8"))
+        shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")
+        (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_bytes(SAFE_REG.encode("utf-8"))
+        for a in (("init", "-q", "-b", "main"), ("config", "user.email", "t@e"),
+                  ("config", "user.name", "t"), ("config", "core.autocrlf", "false")):
+            git(g, *a)
+        return g, write_gov(g, kit, files, (), "A")
+
+    def run_gov(g: pathlib.Path, *args: str, trace: pathlib.Path | None = None):
+        e = dict(env, GIT_TRACE=str(trace)) if trace else env
+        return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
+                              capture_output=True, text=True, encoding="utf-8", env=e)
+
+    def build_target(g: pathlib.Path, tag: str) -> pathlib.Path:
+        t = make_target(tmp / f"{tag}-t", SAFE_DEPLOY)
+        p = run_gov(g, "apply", "--target", str(t))
+        add_result("LIVE", f"[aLC-1] the {tag} fixture installs", p.returncode == 0,
+                   p.stdout[-900:] + p.stderr[-600:])
+        settle(t, "the install")
+        return t
+
+    def read_entry(t: pathlib.Path, rel: str) -> tuple:
+        out = run_gov_git(t, "ls-files", "-s", "--", kp + rel).split()
+        return (out[0], out[1]) if len(out) >= 2 else (None, None)
+
+    def read_carry_lines(out: str, rel: str) -> list:
+        return [ln for ln in out.splitlines() if ln.startswith(f"govkit update — mode-carry {kp}{rel} ")]
+
+    tail = '[adopt]\nargv = []\nmutates_index = false\n'
+    if arms & {"AC1", "AC2", "AC3", "AC4", "AC7", "AC8"}:
+        kit = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+               '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+               '[[files]]\ninclude = ["seed.txt"]\nrole = "seed"\n\n' + tail)
+        g, _a = build_gov("cm", kit, {"hook.sh": "#!/bin/sh\necho hook\n", "own.sh": "own v1\n",
+                                      "both.sh": "both v1\n", "seed.txt": "seed\n", "a.txt": "a\n"})
+        t = build_target(g, "cm")
+        os.chmod(t / kp / "own.sh", (t / kp / "own.sh").stat().st_mode | 0o111)
+        git(t, "update-index", "--chmod=+x", "--", kp + "own.sh")
+        settle(t, "the adopter makes own.sh executable")
+        hook0 = read_entry(t, "hook.sh")
+        add_result("LIVE", "[aLC-1] LIVENESS every fixture row starts where its arm needs it",
+                   hook0[0] == "100644" and read_entry(t, "own.sh")[0] == "100755"
+                   and read_entry(t, "seed.txt")[0] == "100644" and read_entry(t, "both.sh")[0] == "100644",
+                   str([read_entry(t, x) for x in ("hook.sh", "own.sh", "seed.txt", "both.sh")]))
+        b = write_gov(g, kit, {"own.sh": "own v2\n", "both.sh": "both v2\n"},
+                      ("hook.sh", "both.sh", "seed.txt"), "B")
+        trace = tmp / "cm-trace.txt"
+        p = run_gov(g, "update", "--target", str(t), trace=trace)
+        ro = p.stdout
+        add_result("LIVE", "[aLC-1] LIVENESS the read-only update ran and classified the rows",
+                   p.returncode == 0 and f"{kp}hook.sh" in ro, (ro + p.stderr)[-1500:])
+        add_result("AC1", "[aLC-1 AC1] read-only update prints ONE mode-carry line for the hook",
+                   len(read_carry_lines(ro, "hook.sh")) == 1
+                   and "· 100644 -> 100755 ·" in "".join(read_carry_lines(ro, "hook.sh")), ro[-1500:])
+        add_result("AC2", "[aLC-1 AC2] no mode-carry line for a row the adopter made 100755",
+                   not read_carry_lines(ro, "own.sh"), ro[-1500:])
+        add_result("AC3", "[aLC-1 AC3] no mode-carry line for a seed row gov made 100755",
+                   not read_carry_lines(ro, "seed.txt"), ro[-1500:])
+        add_result("AC4", "[aLC-1 AC4] read-only prints the `stale` line AND the mode-carry line",
+                   any(ln.split() == ["stale", "[engine", "]", f"{kp}both.sh"] for ln in ro.splitlines())
+                   and len(read_carry_lines(ro, "both.sh")) == 1, ro[-1500:])
+        tr = [ln for ln in (trace.read_text(encoding="utf-8", errors="replace").splitlines()
+                            if trace.is_file() else []) if " ls-tree " in ln]
+        add_result("AC7", "[aLC-1 AC7] one `ls-tree -r` at the target commit, and no per-row ls-tree",
+                   len([ln for ln in tr if b in ln]) == 1
+                   and all(" -r " in ln for ln in tr if b in ln) and not [ln for ln in tr if " -- " in ln],
+                   "\n".join(tr)[-1500:])
+        p = run_gov(g, "update", "--target", str(t), "--write")
+        add_result("LIVE", "[aLC-1] LIVENESS the --write update exits 0", p.returncode == 0,
+                   (p.stdout + p.stderr)[-1500:])
+        add_result("AC1", "[aLC-1 AC1] --write leaves the hook 100755 with its blob unchanged",
+                   read_entry(t, "hook.sh") == ("100755", hook0[1]), str(read_entry(t, "hook.sh")))
+        add_result("AC2", "[aLC-1 AC2] --write lands gov's new bytes and keeps the adopter's 100755",
+                   read_entry(t, "own.sh")[0] == "100755"
+                   and (t / kp / "own.sh").read_bytes() == b"own v2\n", str(read_entry(t, "own.sh")))
+        add_result("AC3", "[aLC-1 AC3] --write leaves the seed row 100644",
+                   read_entry(t, "seed.txt")[0] == "100644", str(read_entry(t, "seed.txt")))
+        add_result("AC4", "[aLC-1 AC4] --write lands the new bytes at 100755 in one run",
+                   read_entry(t, "both.sh")[0] == "100755"
+                   and (t / kp / "both.sh").read_bytes() == b"both v2\n", str(read_entry(t, "both.sh")))
+        settle(t, "the carry")
+        if "AC1" in arms:
+            p = run_gov(g, "update", "--target", str(t))
+            add_result("AC1", "[aLC-1 AC1] a second read-only update prints no mode-carry line",
+                       p.returncode == 0 and "mode-carry" not in p.stdout, p.stdout[-1500:])
+        if "AC8" in arms:
+            p0 = run_gov(g, "check", "--target", str(t))
+            git(t, "update-index", "--chmod=-x", "--", kp + "hook.sh")
+            p = run_gov(g, "check", "--target", str(t))
+            note = f"mode {kp}hook.sh: the index holds 100644, gov ships 100755 at {b[:8]}"
+            add_result("AC8", "[aLC-1 AC8] check notes the deficit and its exit status does not move",
+                       note in p.stdout and note not in p0.stdout and p.returncode == p0.returncode,
+                       f"before {p0.returncode}, after {p.returncode}\n{p.stdout[-1500:]}")
+
+    if "AC5" in arms:
+        kit = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n'
+               '[check]\nargv = ["bash", "{kit}/check.sh"]\n\n'
+               '[[files]]\ninclude = "**"\nrole = "engine"\n\n' + tail)
+        chk = "! git ls-files -s \"$(dirname \"$0\")/hook.sh\" | grep -q '^100755'\n"
+        g, _a = build_gov("rb", kit, {"hook.sh": "#!/bin/sh\necho hook\n", "check.sh": chk})
+        t = build_target(g, "rb")
+        write_gov(g, kit, {}, ("hook.sh",), "B")
+        p = run_gov(g, "update", "--target", str(t), "--write")
+        add_result("LIVE", "[aLC-1] LIVENESS the rb run decided a mode carry",
+                   len(read_carry_lines(p.stdout, "hook.sh")) == 1, p.stdout[-1500:])
+        add_result("AC5", "[aLC-1 AC5] the carry reds the kit's check, and the rollback puts the hook "
+                   "back at 100644",
+                   "landed-but-inert" in p.stdout and "ROLLED BACK" in p.stdout
+                   and read_entry(t, "hook.sh")[0] == "100644",
+                   str(read_entry(t, "hook.sh")) + p.stdout[-1500:])
+    return got
+
+
+def check_mode_carry(tmp: pathlib.Path) -> None:
+    """DEPL-aLevelledCopy-1 — `update` carries gov's executable bit onto an existing engine row,
+    upgrade only. AC6 calls the rule directly; AC1-AC5, AC7, AC8 run `measure_mode_carry` over
+    this file's `govkit.py`. AC9's staged breaks are a build-time observation, recorded in the unit's
+    acceptance ledger, and not repeated here: each would rebuild a fixture at about 20 s a verb."""
+    rule = govkit_module().resolve_landed_mode
+    for entry, gov, want in ((None, "100755", "100755"), (None, None, "100644"),
+                             ("100644", "100755", "100755"), ("100755", "100644", "100755"),
+                             ("120000", "100755", "120000"), ("100644", "120000", "100644"),
+                             ("100644", "100644", "100644"), ("100755", "100755", "100755")):
+        check(f"[aLC-1 AC6] resolve_landed_mode({entry}, {gov}) is {want}",
+              rule(entry, gov) == want, str(rule(entry, gov)))
+    real = GOVKIT.read_bytes().decode("utf-8").replace("\r\n", "\n")
+    for _arm, res in sorted(measure_mode_carry(tmp / "real", real,
+                                               {"AC1", "AC2", "AC3", "AC4", "AC5", "AC7", "AC8"}).items()):
+        for label, ok, detail in res:
+            check(label, ok, detail)
+
+
 def main() -> int:
     # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
     # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
@@ -2258,6 +2418,7 @@ def main() -> int:
         check_apply_owned(tmp / "ao")
         check_pytest_ini_probe(tmp / "pi")
         check_update_safety(tmp / "us")
+        check_mode_carry(tmp / "mc")
         check_hold_region()
 
         # ================= apply =================
