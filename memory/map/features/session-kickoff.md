@@ -91,6 +91,18 @@ fast-forward and `rev-parse HEAD` as the BASE still run — and appends at Step 
 sections and the READY line through that verb before Step 2b's staged repair is committed
 (`KICK-aReplayedCard-3`), so the deny reads a READY line when the engine's own commit reaches it.
 
+A kickoff whose task writes product code also drafts a brief from `--brief-skeleton`
+(`KICK-aRoutedQuill-1`), which prints the brief record's skeleton and the card's `## route` skeleton
+and, like `--task-skeleton`, answers outside any repository. The owner's answer to the hand-back is
+quoted under the brief's `## Owner confirmation`. The route — one `- build:` line, a `- unit: <id> ·
+spec <path>` line per unit, one `- brief:` line — rides `--card --append`, which grades it by the
+rules beside `check_card_route` with the two sets the citation check already holds: every id
+defined, every spec tracked under the build's `spec/` with an H1 defining its id, the brief tracked
+under the build's `prompts/` or its `README.md`. A miss is refused, never annotated, and a route
+lands only on a card a kickoff has appended to; a later route takes the stored one's place. A tree
+whose conf declares no `MEMORY_ROOT`, read through `read_memory_root`, or whose reader yields no id
+set, refuses a route with exit 2. The append also refuses a real READY body with no `## task`.
+
 The engine also puts the spec-audit question to the owner, once, at Step 3 (`KICK-aBlindedTrial-1`):
 only when the DoR is a design pass and the build method the manifest names makes `spec-audit:` opt-in,
 recommending yes for two or more units or an open §8 fork and no otherwise, because the owner decides

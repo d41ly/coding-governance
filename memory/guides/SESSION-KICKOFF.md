@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-09T21:09:00+03:00 @ 06071f4413922e50bd3d57895e33cf71f397c653
+last-audit: 2026-10-09T21:50:09+03:00 @ db0d57da7efee2f34d28f63a107423ef60b8be41
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 06071f4413922e50bd3d57895e33cf71f397c653
+last-body-change: db0d57da7efee2f34d28f63a107423ef60b8be41
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -58,11 +58,12 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 - **Every session start writes an ORIENTATION CARD** at `<git-common-dir>/orientation/<session_id>.md`
   (`manifest-check.sh --card --write`, wired as a SessionStart hook; `--card --replay` re-injects it
   verbatim after a compaction). Step 1 consumes it; Step 5 appends the READY card through
-  `--card --append`. A main-loop `git commit` in a session whose startup card still reads
-  `READY — none yet` is REFUSED by `tools/hooks/scratch-guard.js` with the remedy in stderr; an
-  absent or replay-written card allows. `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-1`. A commit from
-  any tree the card does not name is refused too, so a scratch worktree cannot commit: carry its diff
-  back as a patch (hit by `dBackdatedFixture`).
+  `--card --append`; a code build's one `## route` of build, unit specs and brief lands only if all
+  resolve (`KICK-aRoutedQuill-1`). A main-loop `git commit` in a session whose
+  startup card still reads `READY — none yet` is REFUSED by `tools/hooks/scratch-guard.js`, naming
+  the remedy; an absent or replay-written card allows. `KICK-aReplayedCard-1`,
+  `TOOL-aReplayedCard-1`. A commit from a tree the card does not name is refused too: carry a scratch
+  worktree's diff back as a patch.
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).

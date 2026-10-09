@@ -21,6 +21,10 @@
 #                                         # cited path, range and id for EXISTENCE in two spawns,
 #                                         # annotate each miss `UNVERIFIED — <token>`, store it
 #   manifest-check.sh --card --check --session <sid>      # the same check over the stored card
+#   manifest-check.sh --brief-skeleton    # the brief record's skeleton and the card's `## route`
+#                                         # skeleton; like --task-skeleton, it needs no repository
+#     A body carrying `## route` is held to the route rules beside `check_card_route`: every unit,
+#     its spec and the brief must RESOLVE, or nothing is appended (KICK-aRoutedQuill-1).
 #     The card verbs run NO manifest check: the session id comes from the SessionStart hook's JSON
 #     on stdin, else --session (--append: --session alone, stdin is the body); the card lives at
 #     <git-common-dir>/orientation/<sid>.md, shared by every worktree; the `node —` cell resolves
@@ -28,11 +32,12 @@
 #     relevance, scope, tier, or the truth of a claim at the line it cites — existence only.
 #
 # Exit 0 + no FAILED lines = clean (WARN:/NOTE: lines permitted). Exit 1 = a check failed — for
-#          the card verbs: a body or card with nothing to check (DEAD PROBE), a --check miss, or a
-#          real READY line with no `## task` beneath it.
+#          the card verbs: a body or card with nothing to check (DEAD PROBE), a --check miss, a
+#          real READY line with no `## task` beneath it, or a body whose `## route` breaks a rule.
 # Exit 2 = environment error (not a git repo / no manifest found / path outside the repo / a card
 #          verb with no session id, a path-shaped one, a card over its byte cap, an append whose
-#          READY line pins a BASE that is not HEAD, or an id reader that could not answer).
+#          READY line pins a BASE that is not HEAD, an id reader that could not answer, or a route
+#          the tree cannot check: no MEMORY_ROOT, or no defined-id set).
 set -u
 KIT_MANIFEST_VERSION="1.22"   # gov:kit kickoff-manifest@1.22 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
@@ -79,14 +84,72 @@ read -r -d '' TASK_SKELETON <<'KICKOFF_TASK_SKELETON' || true
 <!-- /kickoff:task -->
 KICKOFF_TASK_SKELETON
 
-# Both read-only verbs answer BEFORE the repo probe below, because the whole point of `--locations` is
+# THE ONE BRIEF SHAPE, and the card's route shape beneath it (KICK-aRoutedQuill-1). A kickoff whose
+# task writes product code drafts its brief from this, and the session pipes the filled route section
+# to `--card --append`, which grades it by `check_card_route`. It lives here for the reason the task
+# field set does: this script is the one kickoff-kit file overwritten whole in every adopter. The five
+# sub-heads up to `### Non-goals` and the two single-line forms are TOOL-aQuotedBrief-1's §4 fence,
+# spelled byte for byte; `### Limitations` and `### Reuse` follow them, so a reader grading the five in
+# order still finds them. Unlike TASK_SKELETON, nothing seals a copy of this against the constant.
+read -r -d '' BRIEF_SKELETON <<'KICKOFF_BRIEF_SKELETON' || true
+<!-- the brief: <MEMORY_ROOT>/builds/<build>/prompts/<date>-prompt-<FAMILY>-<slug>-<seq>-brief.md, named for the first unit it serves; drafted at Step 3, written at Step 5, committed with that unit's spec after go -->
+# Brief — <build>: <the build in a few words>
+
+**Serves:** research <FAMILY-slug-seq> [<FAMILY-slug-seq> …]
+
+## The prompt
+
+> <the owner's words that asked for this build, verbatim>
+
+## The brief
+
+### Goal
+<the build in one or two sentences, readable with no conversation>
+
+### Items
+1. <one thing the owner asked for>
+
+### Acceptance
+<the observation that proves each item>
+
+### Gates
+<the gate legs the build keeps green>
+
+### Non-goals
+<the cut-line: what the build must not build>
+
+### Limitations
+<every constraint the build must respect>
+
+### Reuse
+<the seam the reuse probe named and the records the recall query returned, or that none fits>
+
+## Drawn from the session
+
+> <a passage the brief relied on, verbatim>
+— <owner|agent>, <turn or time>
+
+## Owner confirmation
+
+Asked: <the hand-back question, verbatim>
+Answer: <the owner's reply, verbatim>
+
+<!-- the card's route: once every spec it names is tracked, pipe from the heading down to --card --append --session <sid>; append again when that set changes -->
+## route
+- build: <build>
+- unit: <FAMILY-slug-seq> · spec <repo-relative path>
+- brief: <repo-relative path of the brief, or of the build README an unattended run was authorized by>
+KICKOFF_BRIEF_SKELETON
+
+# The read-only verbs answer BEFORE the repo probe below, because the whole point of `--locations` is
 # to be readable from OUTSIDE a repository — and the probe exits 2 there without ever reading argv.
 # They print and exit 0, adding no `fail` branch, so the harness meta-gate's shrink-only floor for this
-# script counts neither of them.
+# script counts none of them.
 for _a in "$@"; do
   case "$_a" in
-    --locations)     printf '%s\n' $MANIFEST_LOCATIONS; exit 0 ;;
-    --task-skeleton) printf '%s\n' "$TASK_SKELETON"; exit 0 ;;
+    --locations)      printf '%s\n' $MANIFEST_LOCATIONS; exit 0 ;;
+    --task-skeleton)  printf '%s\n' "$TASK_SKELETON"; exit 0 ;;
+    --brief-skeleton) printf '%s\n' "$BRIEF_SKELETON"; exit 0 ;;
   esac
 done
 
@@ -398,15 +461,20 @@ derive_head_state() {   # → HEAD_BRANCH HEAD_SHA HEAD_DIRTY, read once by the 
   n=$(git status --porcelain 2>/dev/null | wc -l | tr -d '[:space:]')
   if [ "$n" -eq 0 ]; then HEAD_DIRTY=clean; else HEAD_DIRTY="dirty $n"; fi
 }
+# The memory tree's root, the one read of `MEMORY_ROOT` in this script: the `live —` cell and the
+# route rules both call it. Prints the value, empty when the conf declares none; returns 1 when the
+# tree has no `.memory-tree.conf` at all, so a caller can tell the two apart.
+read_memory_root() {
+  [ -f "$ROOT/.memory-tree.conf" ] || return 1
+  sed -n 's/^MEMORY_ROOT=[[:space:]]*//p' "$ROOT/.memory-tree.conf" | head -1 | tr -d '\r"'"'"
+}
 render_card() {
-  local verb="$1" registry="" memroot live conf
+  local verb="$1" registry="" memroot live
   [ -n "$MF" ] && [ -f "$MF" ] && { BLOCK=$(read_block "$MF"); registry=$(getval 'registry'); }
   derive_head_state
-  conf="$ROOT/.memory-tree.conf"
-  if [ ! -f "$conf" ]; then
+  if ! memroot=$(read_memory_root); then
     live='live — skipped: no .memory-tree.conf in this tree'
   else
-    memroot=$(sed -n 's/^MEMORY_ROOT=[[:space:]]*//p' "$conf" | head -1 | tr -d '\r"'"'")
     if [ -z "$memroot" ]; then
       live='live — skipped: .memory-tree.conf declares no MEMORY_ROOT'
     elif [ ! -f "$ROOT/$memroot/LIVE.md" ]; then
@@ -876,10 +944,77 @@ CARD_PARTS_AWK='{ ln=$0; sub(/\r$/, "", ln)
 # The reader moves; §16 R1 does not (TOOL-cMendedVintage-16).
 CARD_READY_RE='^\(- \)\{0,1\}READY — '
 
+# The route rules (KICK-aRoutedQuill-1 §4): a body's `## route` section names its build, each unit
+# with its spec, and the brief, and every one of them resolves or nothing lands — a route is read by
+# the write gate and handed to subagents, so an annotated miss would hand both a line naming nothing.
+# The section runs from `## route` to the line before the next `## ` heading, READY line or the end.
+# R3 to R5 read the two sets `check_card_citations` already holds, so no rule spawns git or the id
+# reader; R4 reads one spec file per unit line. Sets CARD_ROUTE=1 when the body carries a route.
+# WHAT THIS DOES NOT CHECK: the brief's content, a routed unit's status (the write gate's question,
+# asked at write time), or that the owner said go — existence and pairing only.
+CARD_ROUTE=0
+check_card_route() {
+  local body="$1" nready="$2" n memroot verdict rule ln line why where=""
+  CARD_ROUTE=0
+  n=$(grep -c '^## route$' "$body"); n=${n:-0}
+  [ "$n" -gt 0 ] || return 0
+  CARD_ROUTE=1
+  memroot=$(read_memory_root) || memroot=""
+  [ -n "$memroot" ] || { echo "MANIFEST env ERROR — route R0: this tree's .memory-tree.conf declares no MEMORY_ROOT (or there is no conf), so the route's build folder cannot be checked; nothing was appended"; exit 2; }
+  [ -n "$CARD_ID_ERE" ] || { echo "MANIFEST env ERROR — route R0: no defined-id set, because the id reader is absent or could not read the grammar, so the route's unit ids cannot be checked; nothing was appended"; exit 2; }
+  [ "$n" = 1 ] || { echo "MANIFEST route R1 REFUSED — the body carries $n '## route' sections, and a card holds one; the shape is what ${0##*/} --brief-skeleton prints, and nothing was appended"; exit 1; }
+  verdict=$(LC_ALL=C awk -v mr="$memroot" -v root="$ROOT" -v idf="$CARD_TMP/ids" -v trf="$CARD_TMP/tracked" '
+    BEGIN { while ((getline l < idf) > 0) I[l] = 1; while ((getline l < trf) > 0) T[l] = 1 }
+    function out(r, n, s, w) { gsub(/\t/, " ", s); if (!done) printf "%s\t%s\t%s\t%s\n", r, n, s, w; done = 1 }
+    /^## route$/ { inr = 1; at = NR; next }
+    inr && (/^## / || /^(- )?READY — /) { inr = 0 }
+    !inr || done || /^[ \t]*$/ { next }
+    index($0, "`") { out("R2", NR, $0, "a route line carries no backticks"); next }
+    /^- build: [A-Za-z0-9]+$/ { nb++; build = substr($0, 10); next }
+    /^- brief: [^ \t]+$/ { nf++; brief = substr($0, 10); bn = NR; bs = $0; next }
+    /^- unit: [^ \t]+ · spec [^ \t]+$/ {
+      r = substr($0, 9); k = index(r, " · spec ")
+      nu++; uid[nu] = substr(r, 1, k - 1); usp[nu] = substr(r, k + length(" · spec ")); un[nu] = NR; us[nu] = $0; next }
+    { out("R2", NR, $0, "a line outside the route grammar: - build: <build>, - unit: <id> · spec <path>, - brief: <path>") }
+    END {
+      if (done) exit
+      if (nb != 1) out("R2", at, "## route", "the section carries " nb + 0 " - build: lines, and takes exactly one")
+      else if (nf != 1) out("R2", at, "## route", "the section carries " nf + 0 " - brief: lines, and takes exactly one")
+      else if (nu == 0) out("R2", at, "## route", "the section carries no - unit: line")
+      dir = mr "/builds/" build "/"
+      for (i = 1; i <= nu && !done; i++) {
+        if (!(uid[i] in I)) { out("R3", un[i], us[i], "no spec H1, backlog row or decision row defines " uid[i]); break }
+        if (!(usp[i] in T)) { out("R4", un[i], us[i], usp[i] " is not a tracked file"); break }
+        if (index(usp[i], dir "spec/") != 1) { out("R4", un[i], us[i], usp[i] " is outside " dir "spec/"); break }
+        fence = 0; hit = 0; f = root "/" usp[i]
+        while (!hit && (getline l < f) > 0) {
+          sub(/\r$/, "", l)
+          if (l ~ /^ ? ? ?(```|~~~)/) { fence = !fence; continue }
+          if (fence || l !~ /^#[ \t]/) continue
+          split(l, w, /[ \t]+/); t = w[2]; gsub(/[`*]/, "", t); sub(/[:.,;]+$/, "", t)
+          if (t == uid[i]) hit = 1
+        }
+        close(f)
+        if (!hit) out("R4", un[i], us[i], usp[i] " carries no unfenced H1 whose first token is " uid[i])
+      }
+      if (done) exit
+      if (!(brief in T)) out("R5", bn, bs, brief " is not a tracked file")
+      else if (index(brief, dir "prompts/") != 1 && brief != dir "README.md") out("R5", bn, bs, brief " is neither under " dir "prompts/ nor " dir "README.md")
+    }' "$body")
+  if [ -z "$verdict" ] && [ "$nready" = 0 ] && grep "$CARD_READY_RE" "$CARD_TMP/tail" | grep -q 'READY — none yet$'; then
+    verdict=$(printf 'R6\t-\t-\tthe card still reads READY — none yet: no kickoff has appended to it, and a route lands only on an oriented card')
+  fi
+  [ -n "$verdict" ] || return 0
+  IFS=$'\t' read -r rule ln line why <<<"$verdict"
+  [ "$ln" = - ] || where="line $ln: $line — "
+  echo "MANIFEST route $rule REFUSED — $where$why; the shape is what ${0##*/} --brief-skeleton prints, and nothing was appended"
+  exit 1
+}
+
 # `--card --append`: the body on stdin, checked, annotated, and stored — or refused with the file
 # byte-identical. Order: the body's READY-line count, the citation check (its refusals come from a
-# reader that could not answer), DEAD PROBE on zero tokens, the stale-BASE refusal, the card's own
-# shape, the cap. A real-READY body replaces the whole TAIL and re-renders the `tree —` cell; a body
+# reader that could not answer), DEAD PROBE on zero tokens, the `## task` refusal, the stale-BASE
+# refusal, the card's own shape, the route rules, the cap. A real-READY body replaces the whole TAIL and re-renders the `tree —` cell; a body
 # without one goes in before the TAIL's READY line, so the card always ends with its one READY line.
 add_card_body() {
   local body="$CARD_TMP/body" nready ready sha tree bytes l
@@ -890,6 +1025,11 @@ add_card_body() {
   [ "$nready" -le 1 ] || { echo "MANIFEST env ERROR — the body carries $nready READY lines; one card holds one kickoff, so exactly one is accepted and nothing was appended"; exit 2; }
   check_card_citations "$body"
   [ "$CARD_TOKENS" -gt 0 ] || { echo "MANIFEST env ERROR — DEAD PROBE: nothing to check — the body carries no path-shaped and no id-shaped token, so nothing was appended"; exit 1; }
+  # The write-boundary half of `--card --check`'s `## task` refusal (TOOL-aReplayedCard-11): a kickoff
+  # that left no scope does not land. After DEAD PROBE, so a token-free body keeps that verdict.
+  if [ "$nready" = 1 ] && ! grep -q '^## task' "$body"; then
+    echo "MANIFEST env ERROR — the body carries a real READY line and no '## task' section: a kickoff that left no scope does not land on the card, and nothing was appended"; exit 1
+  fi
   derive_head_state
   if [ "$nready" = 1 ]; then
     ready=$(grep -m1 "$CARD_READY_RE" "$body")
@@ -900,6 +1040,7 @@ add_card_body() {
   extract_card_parts "$CARD_FILE"
   [ "$(grep -c "$CARD_READY_RE" "$CARD_TMP/tail")" = 1 ] \
     || { echo "MANIFEST env ERROR — $CARD_FILE holds $(grep -c "$CARD_READY_RE" "$CARD_TMP/tail") READY lines after its startup lines, not one; rewrite it with --card --write --session $CARD_SID, and nothing was appended"; exit 2; }
+  check_card_route "$body" "$nready"
   awk -F '\t' -v m="$CARD_TMP/misses" 'BEGIN { while ((getline l < m) > 0) { split(l, p, "\t"); a[p[1]] = a[p[1]] p[2] "\n" } }
     { print; if (FNR in a) printf "%s", a[FNR] }' "$body" > "$CARD_TMP/annotated"
   if [ "$nready" = 1 ]; then
@@ -907,7 +1048,12 @@ add_card_body() {
     { while IFS= read -r l; do case "$l" in "tree — "*) printf '%s\n' "$tree" ;; *) printf '%s\n' "$l" ;; esac; done < "$CARD_TMP/startup"
       cat "$CARD_TMP/annotated"; } > "$CARD_TMP/new"
   else
-    { cat "$CARD_TMP/startup"; grep -v "$CARD_READY_RE" "$CARD_TMP/tail"; cat "$CARD_TMP/annotated"; grep "$CARD_READY_RE" "$CARD_TMP/tail"; } > "$CARD_TMP/new"
+    # A body carrying a route takes the stored route section's place, so a card holds at most one.
+    grep -v "$CARD_READY_RE" "$CARD_TMP/tail" > "$CARD_TMP/kept"
+    if [ "$CARD_ROUTE" = 1 ]; then
+      awk '/^## route$/ { skip = 1; next } skip && /^## / { skip = 0 } !skip' "$CARD_TMP/kept" > "$CARD_TMP/kept.x" && mv "$CARD_TMP/kept.x" "$CARD_TMP/kept"
+    fi
+    { cat "$CARD_TMP/startup"; cat "$CARD_TMP/kept"; cat "$CARD_TMP/annotated"; grep "$CARD_READY_RE" "$CARD_TMP/tail"; } > "$CARD_TMP/new"
   fi
   bytes=$(wc -c < "$CARD_TMP/new" | tr -d '[:space:]')
   if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then

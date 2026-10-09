@@ -131,9 +131,7 @@ primary-tree commit where project conventions forbid one.
 approaches, or a non-code prereq only the owner knows). Don't hand the user a blank form. Press hardest
 on the three that prevent mid-build churn:
 
-**The field set is the checker's, not this file's.** Ask for it rather than restating it — a second
-spelling here would outrank nothing and drift against the manifest, which is the defect this kit
-spent a build removing:
+**The field set is the checker's, not this file's.** Ask for it rather than restating it:
 
 ```bash
 bash <check-script> --task-skeleton        # the sealed §A field set, verbatim
@@ -148,8 +146,7 @@ defines them, use those. When it does not, the generic heuristic: a new write pa
 an auth/sanitization/egress surface or a shared-contract change is high-risk → the DoR is a **design
 pass**, a written spec (goal · scope · non-goals · acceptance) approved BEFORE building and recorded
 per the project's plan convention. When the project's memory kit ships a spec template, the spec
-follows it — the template states its own section count and the gate that enforces it; do not restate
-that number here, because it has already gone stale in three other carriers.
+follows it.
 
 **The spec audit is the owner's call, asked once.** When the DoR is a design pass AND the build method
 the manifest names makes the audit opt-in (`grep -q 'spec-audit:'` on that carrier; no carrier or no
@@ -163,6 +160,8 @@ carries `spec-audit:` (card `declared <date>`), else when `<repo>/.unattended.co
 If a field still can't be filled after you've DERIVED from the message/memory/code AND asked
 (`AskUserQuestion`) — acceptance + gates especially — say so plainly: it isn't Ready — split or clarify
 before any code.
+
+**A task that writes product code also gets a brief**, from `bash <check-script> --brief-skeleton`.
 
 ## Step 4 — Point at the right code + project protocol
 
@@ -206,7 +205,8 @@ into `bash <check-script> --card --append --session <sid>`, `<sid>` from the `or
 header in context; report a refusal on the card and still stop. Commit Step 2b's staged repair
 AFTER that append, THEN hand control back:
 *"Ready — say go and I'll start, or adjust any field."* Do not start building until the user
-confirms.
+confirms. Quote that answer under the brief's `## Owner confirmation`; its skeleton says when to
+append its `## route`.
 
 ## Step 5b — the unattended hand-back (only inside a run actually started as one)
 

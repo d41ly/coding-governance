@@ -3068,6 +3068,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "check_card_route",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "check_card_unchanged",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
@@ -11451,6 +11456,11 @@
       "id": "read_mem_used",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "read_memory_root",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "read_merge_heads",
