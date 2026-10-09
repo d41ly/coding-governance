@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed
 
-**Status:** SPECCED · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 5 · ratified 2026-10-09
+**Status:** INPROGRESS · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 5 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
