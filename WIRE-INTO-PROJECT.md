@@ -281,7 +281,7 @@ migrates your corpus, so it takes a spec, a signed record and one switch-over co
    planner prints and writes nothing. Fix the unparseable rows first: the writer never drops a row.
 2. **Stragglers.** `python <kit>/migrate_backlog.py --stragglers` walks every local and
    remote-tracking ref for a branch still editing a shard. It refuses to guess your default branch,
-   so set `origin/HEAD` first with `git remote set-head origin -a`. Merge the branches you know
+   so set your remote's HEAD first with `git remote set-head <remote> -a`. Merge the branches you know
    before the switch.
 3. **Sign both worksheets.** Your owner decides which same-id pairs are one subject and gives every
    open ask on a finished build one disposition, as the two signed records the kit README's "Signed
@@ -725,9 +725,21 @@ adoption steps in that kit's README; no wiring beyond the adopter's own `pyproje
 Only if the project runs multiple nodes/worktrees (playbook §3):
 - A `new-stream` script (sibling worktree on a fresh branch off fast-forwarded `main` + dependency
   install) → fill `{{WORKTREE_SCRIPT}}`.
+- **The remote ladder.** Every kit that asks which ref "landed" means resolves the remote the same
+  way, and none assumes it is called `origin`: `GOV_REMOTE`, else the current branch's configured
+  remote, else the repository's only remote. A clone with several remotes and none chosen refuses,
+  naming `GOV_REMOTE`; export it once per node, as a per-node variance. The default branch is
+  `GOV_DEFAULT_BRANCH`, else what that remote's HEAD names (`git remote set-head <remote> -a`) —
+  except for three readers that take ONLY what the remote's HEAD names, so an environment value
+  cannot move what they grade against: the run-gates scope base, the codebase-map baseline assert
+  and the playbook render. Two more take the observed branch FIRST: `migrate_backlog.py` refuses
+  when `GOV_DEFAULT_BRANCH` disagrees with it, and the straggler guard warns, but the guard
+  cross-checks only when the observed HEAD carries `.memory-tree.conf`. Otherwise the pin chooses —
+  the straggler guard falling back to `main` with no pin, and `migrate_backlog.py` refusing.
+  A checkout with no HEAD symref (common in CI) sets it with `set-head`.
 - The tracked pre-commit **branch guard** (refuse a primary-tree commit while off the default branch).
   coding-governance ships a portable reference block in its own `.githooks/pre-commit` (default branch
-  derived from `origin/HEAD`, else `main`; pin via `GOV_DEFAULT_BRANCH`; only fires in the primary tree,
+  `GOV_DEFAULT_BRANCH`, else the HEAD of the remote the ladder above resolves, else `main`; only fires in the primary tree,
   not linked worktrees; red/green self-test `.githooks/pre-commit.test.sh`) — copy that block into the
   project's pre-commit. For a multi-worktree project, also add a per-machine install that points
   `core.hooksPath` at an **out-of-tree copy** under `$(git rev-parse --git-common-dir)`, so a branch that

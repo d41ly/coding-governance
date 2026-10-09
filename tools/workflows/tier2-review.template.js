@@ -89,7 +89,8 @@ function readOutputTokens() {
 }
 
 // --- inputs (via Workflow `args`) ---------------------------------------
-// { base: "<immutable SHA>", head: "HEAD", repo: "/path/to/worktree",
+// { base: "<immutable SHA>",   // REQUIRED on a diff review (TOOL-dLadderedRemote-4); a spec audit ignores it
+//   head: "HEAD", repo: "/path/to/worktree",
 //   context: "what this diff does + the security model + what's by-design",
 //   byDesign: "known/tracked issues reviewers must NOT re-report",
 //   reviewDir: "where synth writes the report (repo-relative)",
@@ -157,7 +158,7 @@ if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg) || !cfg.repo) {
 // single agent spawns, so a typo'd or stale path fails in milliseconds instead of producing a
 // confident review of an empty diff.
 const a = cfg
-const base = a.base || 'origin/main'
+const base = a.base
 const head = a.head || 'HEAD'
 const repo = a.repo || '.'
 // TOOL-dTieredTribunal-11 S1 - the SUBJECT DESCRIPTOR. One field carries the review kind, and six
@@ -179,6 +180,16 @@ if (KINDS.indexOf(kind) === -1) {
   )
 }
 const isSpec = kind === 'spec-audit'
+// TOOL-dLadderedRemote-4 - a DIFF review's base is REQUIRED, and refused before any agent when absent.
+// It defaulted to a literal remote ref, which names nothing on a node whose remote is not called
+// that, and this runtime has no git to resolve the right one. A spec audit has no range and owes none.
+if (!isSpec && !String(base || '').trim()) {
+  throw new Error(
+    'tier2-review: a diff review needs `base`, the immutable sha the diff starts from. It has no ' +
+      'default: this harness cannot read which remote the repository lands on. Pin one with ' +
+      'git rev-parse <the default branch>.',
+  )
+}
 // TOOL-aSightedSkeptic-7 S1/S2 - `intensity`, the CALLER's choice of a full or a light review. A
 // closed set refused outside it, like `kind`, and the harness never picks light itself. A spec audit
 // has no light lens subset (spec F2), so light refuses there rather than buying a full audit silently.
@@ -437,9 +448,8 @@ if (!baseLooksPinned) {
   const why =
     'tier2-review: `base` must be an immutable sha (7-40 hex), not a moving ref. Got ' +
     JSON.stringify(base) +
-    '. M8 forbids a moving ref two paragraphs above the invocation it documents, and the default here ' +
-    'is `origin/main` - so a caller who lets it stand records provenance that points at whatever main ' +
-    'happened to be. Resolve it: git rev-parse <ref>.'
+    '. M8 forbids a moving ref two paragraphs above the invocation it documents: a ref records ' +
+    'provenance that points at whatever that branch happened to be. Resolve it: git rev-parse <ref>.'
   if (round > 1) throw new Error(why)
   log('WARNING: ' + why)
 }
@@ -1637,9 +1647,9 @@ const synth = await agent(
     `If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. ` +
     `Say so where you would otherwise call a zero positive evidence.\n\n` +
     // The range line is what the unattended kit's `closing-review-recorded` joins on, so the value
-    // reaches the record without a human remembering to type it. HONEST LIMIT: `base` defaults to
-    // the REF 'origin/main', and a caller who lets it stand writes a line carrying no sha, which
-    // satisfies nothing. The harness cannot tell whether a mandate is in force — it has no
+    // reaches the record without a human remembering to type it. HONEST LIMIT: `base` is required
+    // but may still be a REF, and a caller who passes one at round 1 writes a line carrying no sha,
+    // which satisfies nothing. The harness cannot tell whether a mandate is in force — it has no
     // filesystem and no repo access — so M8 spelling the invocation with the pinned sha is what
     // makes this work, and the failure surfaces as an unmet DoD item naming the run's own record.
     (isSpec

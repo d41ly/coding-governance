@@ -1237,7 +1237,11 @@ cd "$pfx_home" || exit 2
 #     unreadable host makes it INERT (TOOL-aGraftedHelix-7). Width class.
 #   GATE_CENSUS_EVERY — the foreign-load census period; the census writes evidence into each `.leg`
 #     row and decides no verdict (TOOL-aGraftedHelix-5). Classified by TOOL-aClassedKnob-1.
-BAR_INERT_KNOBS="GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_HELD GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+#   GOV_REMOTE GOV_DEFAULT_BRANCH — read by the runner's inlined remote ladder for the scope base
+#     only (TOOL-dLadderedRemote-2), and the hook sets GATE_BASE or GATE_FULL=1 on every path, either
+#     of which outranks that base. The runner takes the OBSERVED branch, so GOV_DEFAULT_BRANCH selects
+#     nothing there even when it is read (TOOL-dLadderedRemote-5).
+BAR_INERT_KNOBS="GOV_REMOTE GOV_DEFAULT_BRANCH GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_HELD GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
 read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
 check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
   local knobs cleared scrubbed k n

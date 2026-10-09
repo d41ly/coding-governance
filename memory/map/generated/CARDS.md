@@ -86,9 +86,9 @@ dead paths in shipped text — the wrong-prefix half and the deleted-file half, 
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/install-prefix.md`
 - decisions 0
-- gate-legs 5: `install-prefix (shipped surface)`, `install-prefix self-test`, `dead-path carriers (deleted files still named)`, `dead-path carriers self-test`, `foreign-prefix parity (every self-test at three prefixes)`
+- gate-legs 7: `install-prefix (shipped surface)`, `install-prefix self-test`, `dead-path carriers (deleted files still named)`, `dead-path carriers self-test`, `remote literals (kit code names no remote)`, `remote literals self-test`, `foreign-prefix parity (every self-test at three prefixes)`
 - gotcha-classes 2: `inline-marker-breaks-a-line-continuation.md`, `a-spelling-change-strands-its-readers.md`
-- globs 6: `tools/check-install-prefix.sh`, `tools/check-install-prefix.test.sh`, `tools/run-gates/foreign-prefix.gov.test.sh`, `tools/check-dead-paths.sh`, `tools/check-dead-paths.test.sh`, `tools/dead-path-waivers.txt`
+- globs 8: `tools/check-install-prefix.sh`, `tools/check-install-prefix.test.sh`, `tools/run-gates/foreign-prefix.gov.test.sh`, `tools/check-dead-paths.sh`, `tools/check-dead-paths.test.sh`, `tools/dead-path-waivers.txt`, `tools/check-remote-literals.sh`, `tools/check-remote-literals.test.sh`
 
 ## kit-placeholders
 
