@@ -139,7 +139,7 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
 - **The review protocol** (`review-harness` kit): the fan-out caps, the Tier-2 pattern and its
   harness. Optional. The security checklist and the tier definitions the charter's `[security]` and
   `[risk]` practices point at ship with the memory tree, in its spec template, so every adoption
-  carries them whatever it selects.
+  that keeps the required memory tree carries them, whatever else it selects.
 - **A kickoff manifest** (`kickoff-manifest` kit): the per-project manifest `/session-kickoff` reads.
   Keeping it selected keeps the `/session-kickoff` tools line. The manifest's merge exception left
   the charter at v4.0: the `kickoff-manifest ratchet` leg refuses a merge that moved watched files
@@ -155,7 +155,7 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
 - `when:cross-os` — the `[cross-os]` practice and the toolchain fact. Drop it for a single-OS team.
 
 v4.0 retired `node-table` and `security-outbound`: the node registry is generated from the fleet,
-and the outbound rules moved to the review protocol's security checklist. A `drop_blocks` member
+and the outbound rules moved to the spec template's security checklist. A `drop_blocks` member
 naming either is printed as `retired` and ignored; delete it.
 
 Section 1, `[voice]` included, binds every adopter and is not droppable. A project that wants a

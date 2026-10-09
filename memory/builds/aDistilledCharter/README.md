@@ -107,7 +107,7 @@ ids TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 T
 
 Records: 5 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aDistilledCharter-9.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: DEPL-aDistilledCharter-1 DEPL-aDistilledCharter-2 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 PLAY-aDistilledCharter-5 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2
 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 TOOL-aDistilledCharter-8 TOOL-aDistilledCharter-9.

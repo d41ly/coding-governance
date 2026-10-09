@@ -289,4 +289,4 @@ why = "LEGACY v3.x: the one-row section 2 node table, dropped where the registry
 [[block]]
 name = "security-outbound"
 legacy = "v3"
-why = "LEGACY v3.x: the outbound-call and stored-content rules, which v4.0 moved to the review protocol."
+why = "LEGACY v3.x: the outbound-call and stored-content rules, which v4.0 moved to the spec template's security checklist (TEMPLATE-SPEC.md)."

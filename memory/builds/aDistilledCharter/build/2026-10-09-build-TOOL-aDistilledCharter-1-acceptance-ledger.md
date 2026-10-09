@@ -1,6 +1,6 @@
 # aDistilledCharter — acceptance ledger
 
-**Serves:** journal TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 PLAY-aDistilledCharter-5 TOOL-aDistilledCharter-8
+**Serves:** journal TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 PLAY-aDistilledCharter-5 TOOL-aDistilledCharter-8 TOOL-aDistilledCharter-9
 
 Observed on node `a` on 2026-10-09, over this build's branch. Every red proof was a staged break
 observed red and then removed; none was left in the tree.
@@ -40,7 +40,7 @@ observed red and then removed; none was left in the tree.
 - AC6 — `tools/template-size-highwater.txt` — recorded 11455 at this unit and 11758 after TOOL-aDistilledCharter-7 restored four clauses; `bash tools/check-template-size.sh` is green; the archive is the 48597 bytes of BASE
 
 **Evidences:** PLAY-aDistilledCharter-2
-- AC1 — `memory/guides/REVIEW-PROTOCOL.md` — `## Tiers` at line 184 and `## Security boundaries` at line 198; each v3.5 §9 rule has a bullet
+- AC1 — amended rev-2 — the sections moved on to the spec template under PLAY-aDistilledCharter-5; `memory/TEMPLATE-SPEC.md` carries `## Tiers` at line 322 and `## Security boundaries` at 337, one bullet per v3.5 §9 rule
 - AC2 — `git diff --exit-code memory/guides/REVIEW-PROTOCOL.md` — clean after the kit's parity render; the parity test reports 5 pairs in parity
 
 **Evidences:** PLAY-aDistilledCharter-3
@@ -86,6 +86,11 @@ observed red and then removed; none was left in the tree.
 - AC2 — `grep -n 'own charter' coding-governance-agents.template.md` — prints the claim note
 - AC3 — `--check` — over a v3.5-marked fixture prints the reseed note; the arm fails with the note printing removed
 - AC4 — `TEMPLATE_MAJOR = 3` — reds pair `template major` on the tree and in the parity self-test; a v4.0 fixture naming `{{TAG_A}}` is refused, and the arm fails with the refusal disabled
+
+**Evidences:** TOOL-aDistilledCharter-9
+- AC1 — `grep -n 'pattern below' memory/TEMPLATE-SPEC.md` — prints nothing, and neither does the search for `review protocol carries` in the runbook and the engine
+- AC2 — `python tools/playbook/render_playbook.py --selftest` — 55 arms pass with `checkout_dir` under `[answers]`
+- AC3 — `when:node-table` — a current-major fixture carrying the fence is refused, and a legacy member with no fence is noted with the descriptor's `why`; each arm fails under its staged break
 
 **Evidences:** KICK-aDistilledCharter-1
 - AC1 — `awk` — zero continuation lines between §B's heading and the pointer map

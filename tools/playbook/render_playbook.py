@@ -266,14 +266,11 @@ def derive_lexicon_conf(root: Path, _a: dict, _e: Path | None = None) -> str:
 # carries one tag everywhere. A repository overrides a cell for one node under `[nodes.<tag>]`.
 FLEET_NAME = 'fleet.toml'
 NODE_KEYS = ('primary_tree', 'worktree_root', 'variances')
-# LEGACY v3.x blocks. The descriptor still DECLARES them (TOOL-aDistilledCharter-2 rev-2): an
-# adopter's template is a seed `govkit update` never rewrites, so the regenerate it runs (unless
-# GOVKIT_RERENDER=0) renders a v3.x template with this engine and must not roll the kit back. A
-# `drop_blocks` member naming one of these is NOTED, never refused, when the template has no fence.
-RETIRED_BLOCKS = {
-    'node-table': 'v4.0 renders the node registry from the fleet registry',
-    'security-outbound': 'v4.0 keeps no outbound-only charter line; the review protocol carries them',
-}
+# LEGACY v3.x blocks and placeholders are the descriptor's rows carrying `legacy`, read in `render`
+# (TOOL-aDistilledCharter-2 rev-2, -9). An adopter's template is a seed `govkit update` never
+# rewrites, so the regenerate it runs (unless GOVKIT_RERENDER=0) renders a v3.x template with this
+# engine and must not roll the kit back.
+#
 # The template major version this engine ships with. An older one renders as it always did, and the
 # render notes that a newer one is available to reseed.
 TEMPLATE_MAJOR = 4
@@ -373,13 +370,15 @@ def derive_node_table(root: Path, _a: dict, _e: Path | None = None) -> str:
         cfg = tomllib.loads((root / '.governance' / 'deploy.toml').read_text(encoding='utf-8'))
     except (OSError, ValueError):
         cfg = {}
-    # TOOL-aDistilledCharter-8, N2: `checkout_dir` when stated — a product named apart from its clone
-    # (`App` cloned as `app/main`) states the clone once — else `project_name`.
-    def read_answer(name: str) -> str:
-        return next((v.strip() for tbl in ('charter', 'answers')
+    # TOOL-aDistilledCharter-8, N2: the `[answers]` key `checkout_dir` when stated — a product named
+    # apart from its clone (`App` cloned as `app/main`) states the clone once — else `project_name`,
+    # which `[charter]` may carry too. `[charter]` refuses `checkout_dir`: it names no placeholder (-9, T5).
+    def read_answer(name: str, tables: tuple[str, ...]) -> str:
+        return next((v.strip() for tbl in tables
                      for k, v in (cfg.get(tbl) or {}).items()
                      if str(k).lower() == name and isinstance(v, str) and v.strip()), '')
-    checkout = read_answer('checkout_dir') or read_answer('project_name')
+    checkout = read_answer('checkout_dir', ('answers',)) or read_answer('project_name',
+                                                                        ('charter', 'answers'))
     if not checkout:
         raise Refusal('NODE_TABLE builds every node\'s primary tree from `checkout_dir`, else '
                       '`project_name`, and deploy.toml answers neither. Answer one under [answers] '
@@ -901,9 +900,19 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
                       f'at the installed template, or pass a different --charter')
     text = read_input(template, 'the charter template')
     present = check_fences(text, entries, declared_blocks)
+    marker = TEMPLATE_MARKER_RE.search(text)
+    current = bool(marker) and int(marker.group(1)) >= TEMPLATE_MAJOR
+    # The LEGACY blocks are the descriptor's `[[block]]` rows carrying `legacy` (TOOL-aDistilledCharter-9,
+    # T6): one declaration, never a typed copy. A template at this engine's major carrying one's fence
+    # has regained a block v4.0 retired, which is a refusal.
+    legacy = {b['name']: b.get('why', '') for b in blocks if b.get('legacy')}
+    for ns, name in present:
+        if ns == 'when' and name in legacy and current:
+            raise Refusal(f'the template is v{marker.group(1)}.{marker.group(2)} and carries the '
+                          f'when:{name} fence, a legacy block kept only for older seeded templates')
     # A legacy block whose fence this template does not carry is noted, never refused: it is a v4.0
     # template under a deploy.toml written for v3.x. With the fence present it drops as it always did.
-    retired = [d for d in drop_names if d in RETIRED_BLOCKS and ('when', d) not in present]
+    retired = [d for d in drop_names if d in legacy and ('when', d) not in present]
     drop_names = [d for d in drop_names if d not in retired]
     for d in drop_names:
         if ('when', d) not in present:
@@ -913,10 +922,8 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
     drop |= {('when', d) for d in drop_names}
     text = remove_fenced(text, drop)
 
-    notes = [f'retired   drop_blocks {d} — {RETIRED_BLOCKS[d]}; remove it from deploy.toml'
-             for d in retired]
-    marker = TEMPLATE_MARKER_RE.search(text)
-    if marker and int(marker.group(1)) < TEMPLATE_MAJOR:
+    notes = [f'retired   drop_blocks {d} — {legacy[d]}; remove it from deploy.toml' for d in retired]
+    if marker and not current:
         notes.append(f'legacy    template v{marker.group(1)}.{marker.group(2)} at '
                      f'{template.as_posix()} — this engine ships v{TEMPLATE_MAJOR}.x; reseed the '
                      f'template from gov, then re-render')
@@ -1263,10 +1270,28 @@ def run_selftest() -> int:
           and 'INSTALLED' in installed,
           'a claim takes the lowest free letter, once per identity, never in an installed copy',
           f'got {got!r} rows {rows_after} again {again!r} installed {installed!r}')
-    arm_fixture('a legacy drop_blocks member with no fence is noted, never refused',
-                trailer_desc + '\n[[block]]\nname = "node-table"\n', 'plain\n',
-                'drop_blocks = ["node-table"]\n' + ans, in_body='plain',
-                in_notes='retired   drop_blocks node-table')
+    arm_fixture('a legacy drop_blocks member with no fence is noted with the descriptor\'s why',
+                trailer_desc + '\n[[block]]\nname = "node-table"\nlegacy = "v3"\nwhy = "WHY-X"\n',
+                'plain\n', 'drop_blocks = ["node-table"]\n' + ans, in_body='plain',
+                in_notes='retired   drop_blocks node-table — WHY-X')
+    # TOOL-aDistilledCharter-9, T6: a template at this engine's major carrying a legacy fence is
+    # refused, against the SHIPPED descriptor, so the arm fails the day a block loses its legacy mark.
+    with tempfile.TemporaryDirectory() as td:
+        tgt = Path(td)
+        (tgt / '.governance').mkdir()
+        (tgt / 'TPL.md').write_text(f'<!-- governance-template: v{TEMPLATE_MAJOR}.0 -->\n'
+                                    '<!-- when:node-table -->\nrow\n<!-- /when:node-table -->\n',
+                                    encoding='utf-8')
+        (tgt / '.governance' / 'deploy.toml').write_text(
+            'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "TPL.md"\n', encoding='utf-8')
+        here = Path(__file__).resolve().parent
+        try:
+            render(here, here.parent.parent, tgt)
+            got = 'no refusal'
+        except Refusal as e:
+            got = str(e)
+    check_arm('a legacy block kept only for older' in got,
+              'a current-major template carrying a legacy fence is refused', f'got {got!r}')
     # TOOL-aDistilledCharter-2 rev-2 (closing review round 1, R1). A SEEDED v3.x template renders
     # under THIS engine and its SHIPPED declarations, because `update` never rewrites a seed and a
     # refusal here rolls the kit back. The declarations are the real ones beside this engine, so the
