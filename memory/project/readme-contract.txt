@@ -172,8 +172,5 @@ memory/builds/aWardedAudit/README.md
 memory/builds/aGraftedHelix/README.md
 memory/builds/dThriftyLanding/README.md
 memory/builds/aClassedKnob/README.md
-<<<<<<< HEAD
 memory/builds/aHomedAnchor/README.md
-=======
 memory/builds/aQuotedBrief/README.md
->>>>>>> main
