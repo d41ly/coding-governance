@@ -1,11 +1,12 @@
 # TOOL-aLevelledCopy-1 — receipt-sync grades a mismatched row through the target's clean filter
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 1 · ratified 2026-10-09
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 1 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aLevelledCopy-1-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aLevelledCopy-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-build-TOOL-aLevelledCopy-1-m12-probe.md](../build/2026-10-09-build-TOOL-aLevelledCopy-1-m12-probe.md) | research | — |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1-1-spec-brief.md) | journal | TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 DEPL-aLevelledCopy-1 |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1-2-build-brief.md) | journal | TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 DEPL-aLevelledCopy-1 |
@@ -32,7 +33,11 @@ edit still reds. The adopters can then retire that installer duty.
   as graded and clean, when its clean-filter oid equals the row's `oid` AND the blob oid of its RAW
   bytes is not the row's `oid`. Every other mismatched row is `DRIFTED` exactly as today. A row with
   no `oid`, which is a receipt below schema 3, stays `DRIFTED`. When every row matches raw, nothing
-  is spawned. Observed by AC1, AC2, AC5, AC6.
+  is spawned. The spawn runs only where the tree holds a `.git` entry: OUTSIDE a repository
+  `hash-object` does not fail, it hashes through the host's global and system config, which is not
+  the target's filter (measured 2026-10-09 on node a, system `core.autocrlf=true`: a CRLF file
+  outside any repository hashed to its LF blob, exit 0). A tree with no `.git` therefore leaves every
+  candidate `DRIFTED`, and S4's line names why. Observed by AC1, AC2, AC5, AC6, AC7.
 - **S2 — the count is printed.** The `receipt:` summary line and the closing `ok` line each gain
   `eol-only <n>`, as `cmd_check`'s integrity line does, so a green over normalized rows reads
   differently from a green over raw-equal rows. Observed by AC1.
@@ -113,10 +118,12 @@ receipt row in either adopter has one.
 ### Built-in arms
 
 The arms build throwaway repositories under the process's own temporary directory, as the six
-existing arms do, and pass `-c core.autocrlf=<value>` and the committer identity on the command
-line, so a host's system or global config cannot decide them. They spawn git roughly eighteen
-times in total, an estimate of about 14 s per invocation on node a (DERIVED at build time: AC3's
-`figure:` line records the measured wall). The leg's declared ceiling is 300 s.
+existing arms do, and write `core.autocrlf=<value>` and the committer identity into each fixture
+repository's OWN `.git/config`, so a host's system or global config cannot decide them. A `-c` on
+the setup commands would not reach the graded `hash-object` spawn, which reads the repository's
+config like any other git call; local config binds both. Arms (a), (b) and (d) share one repository
+in sequence and (c) takes a second, so git is spawned about eleven times in total (DERIVED at build
+time: AC3's `figure:` line records the measured wall). The leg's declared ceiling is 300 s.
 
 ### Files touched (estimate)
 
@@ -187,7 +194,7 @@ Measured by this build's M12 probe, `build/2026-10-09-build-TOOL-aLevelledCopy-1
   `python <copy> --selftest` runs, the named arm prints `ARM FAIL`: replacing the predicate with a
   CR-stripped sha256 reds arm (c), dropping the raw-blob clause reds arm (d), and dropping the
   clean-filter branch reds arm (a). Red when: a staged break leaves its arm `ok`.
-- **AC5** — When a fixture holding three eol-only rows runs under `GIT_TRACE=1`, the trace shows
+- **AC5** — When a fixture holding three eol-only rows runs under `GIT_TRACE=<file>`, the trace shows
   exactly one more `hash-object --stdin-paths` invocation than the same command over an all-matching
   receipt. Red when: the difference is three, which is a per-row spawn.
 - **AC6** — When the AC1 fixture's row has its `oid` key removed, `python
@@ -224,6 +231,11 @@ New arm: tools/run-gates/check-receipt.py · covers AC3 AC4 · each arm's break 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft, from the build's spec brief and its M12 probe record.
+- rev-2 · 2026-10-09 · build: S1 gains the `.git` precondition, because `hash-object` outside a
+  repository exits 0 on the host's config and would grade AC7's copied fixture clean; §4 Built-in
+  arms writes each fixture's config locally instead of passing `-c`, because `-c` never reaches the
+  graded spawn, and shares one repository across arms (a), (b) and (d). AC5 traces to a file,
+  because the leg captures git's stderr and `GIT_TRACE=1` therefore shows nothing.
 
 ## 10. Reuse audit
 

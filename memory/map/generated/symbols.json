@@ -3343,6 +3343,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "check_git_arms",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
       "id": "check_git_split_parses",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -5311,6 +5316,11 @@
       "id": "derive_bases",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "derive_blob_oid",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
     },
     {
       "id": "derive_bm_r3",
@@ -13613,6 +13623,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "resolve_clean_oids",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
       "id": "resolve_commit_build",
       "kind": "function",
       "file": "tools/push-main.sh"
@@ -15441,6 +15456,11 @@
       "id": "run_f4_filer",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_fixture_git",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
     },
     {
       "id": "run_format",
