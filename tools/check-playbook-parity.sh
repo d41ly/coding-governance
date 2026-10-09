@@ -310,11 +310,11 @@ rm -f "$PPTMP"
 # and printed as a near-miss, never failed. A line citing the SPEC template's own sections
 # (`spec template's §8`) is excluded, because TEMPLATE-SPEC.md's numbered sections are real; a line
 # carrying both forms is excluded whole. Frozen records under the memory tree are outside the surface.
-# This gate's own file is excluded too: it spells the predicate.
+# This gate's own file and its self-test are excluded too: both spell the predicate on purpose.
 s4_paths=()
 [ -n "${SELF_PRE%/}" ] && s4_paths+=("${SELF_PRE%/}")
 s4_paths+=(skills .githooks .claude/rules .claude/skills memory/guides WIRE-INTO-PROJECT.md README.md
-  AGENTS.md "$TEMPLATE" ":!${SELF_PRE}check-playbook-parity.sh")
+  AGENTS.md "$TEMPLATE" ":!${SELF_PRE}check-playbook-parity.sh" ":!${SELF_PRE}check-playbook-parity.test.sh")
 s4_pop=$(git ls-files -- "${s4_paths[@]}" | grep -c . || true)
 if [ "$s4_pop" -eq 0 ] || [ -z "$(git ls-files -- "$TEMPLATE")" ]; then
   fail 17 "the section-citation surface is empty or lacks the tracked template, so no citation could be found and this stage must not report clean"
