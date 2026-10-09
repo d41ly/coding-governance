@@ -1,6 +1,6 @@
 # PLAY-aDistilledCharter-2 — the review protocol carries the security checklist and the tier definitions the charter drops
 
-**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook+tooling · order 3
+**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook+tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -40,6 +40,8 @@ the review protocol the review-harness kit already ships, so every adopter still
 
 - **hands-off** `PLAY-aDistilledCharter-1` — the charter's `[security]` and `[risk]` lines point
   here.
+- **hands-off** `DEPL-aDistilledCharter-2` — the sections it wrote, which that unit meant to ship by default
+- **hands-off** `PLAY-aDistilledCharter-5` — the sections it wrote, which that unit moves on to the spec template
 
 ## 4. Design
 
@@ -99,6 +101,8 @@ none
 - rev-1 · 2026-10-09 · initial draft.
 - rev-2 · 2026-10-09 · AC1 · the sections' home moved on to the spec template
   (`PLAY-aDistilledCharter-5`, closing review round 3, T1).
+- rev-3 · 2026-10-10 · §3 · the hands-off edge back to DEPL-aDistilledCharter-2, PLAY-aDistilledCharter-5, which the closing bar's
+  check 12 found missing.
 
 ## 10. Reuse audit
 

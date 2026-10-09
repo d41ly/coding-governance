@@ -13,7 +13,7 @@
 ## 1. Goal
 
 Round 3 converged with six MEDIUM and LOW findings
-(`reviews/2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round3.md`). BUILD-METHOD M4
+(`reviews/2026-10-09-review-TOOL-aDistilledCharter-8-closing-diff-round3.md`). BUILD-METHOD M4
 promotes them as one batch: their write sets meet in `render_playbook.py` and the descriptor.
 
 ## 2. Scope (IN)

@@ -1,6 +1,6 @@
 # TOOL-aDistilledCharter-1 — the renderer grades one-line regions and renders section 2 from `[charter] adopter_rules`
 
-**Status:** CLOSED · rev-1 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -44,6 +44,7 @@ back without the render refusing it.
 
 - **hands-off** `PLAY-aDistilledCharter-1` — fencing section 1 and section 2 of the template.
 - **hands-off** `PLAY-aDistilledCharter-4` — gov's `[charter] adopter_rules`.
+- **hands-off** `TOOL-aDistilledCharter-2` — the engine it extended, which that unit extends next
 
 ## 4. Design
 
@@ -143,6 +144,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-10 · §3 · the hands-off edge back to TOOL-aDistilledCharter-2, which the closing bar's
+  check 12 found missing.
 
 ## 10. Reuse audit
 

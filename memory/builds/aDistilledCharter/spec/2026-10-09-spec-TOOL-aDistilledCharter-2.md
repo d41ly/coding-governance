@@ -1,6 +1,6 @@
 # TOOL-aDistilledCharter-2 — the fleet registry assigns every node one tag and the renderer generates the node table from it
 
-**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 2
+**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-10-09-build-TOOL-aDistilledCharter-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aDistilledCharter-1-acceptance-ledger.md) | journal | TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 PLAY-aDistilledCharter-5 TOOL-aDistilledCharter-8 TOOL-aDistilledCharter-9 |
 | [2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round1.md](../reviews/2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round1.md) | diff-review | TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 |
-| [2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round2.md](../reviews/2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round2.md) | diff-review | TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 DEPL-aDistilledCharter-2 |
+| [2026-10-09-review-TOOL-aDistilledCharter-7-closing-diff-round2.md](../reviews/2026-10-09-review-TOOL-aDistilledCharter-7-closing-diff-round2.md) | diff-review | TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 DEPL-aDistilledCharter-2 |
 
 <!-- /gen:spec-records -->
 
@@ -71,6 +71,7 @@ and its tag once, and every adopter's charter renders its node table from it.
 - **hands-off** `PLAY-aDistilledCharter-4` — gov's wrapper registry deleted, so the generated one is
   the first.
 - **hands-off** `DEPL-aDistilledCharter-1` — the adopter's re-tag step.
+- **hands-off** `TOOL-aDistilledCharter-5` — `derive_node_table`, whose checkout name that unit takes from an answer
 
 ## 4. Design
 
@@ -190,6 +191,8 @@ none
 - rev-2 · 2026-10-09 · S5 · AC7 · closing review round 1, R1 (BLOCKER): the retired names stay
   declared as legacy so a seeded v3.x template renders under the v4.0 engine and an update cannot
   roll back; a v3.x marker prints a reseed note.
+- rev-3 · 2026-10-10 · §3 · the hands-off edge back to TOOL-aDistilledCharter-5, which the closing bar's
+  check 12 found missing.
 
 ## 10. Reuse audit
 

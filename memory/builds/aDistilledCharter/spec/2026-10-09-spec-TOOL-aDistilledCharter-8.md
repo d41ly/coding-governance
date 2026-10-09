@@ -1,20 +1,20 @@
 # TOOL-aDistilledCharter-8 — the closing review's round-2 findings, closed as one batch
 
-**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+playbook · order 13
+**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+playbook · order 13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aDistilledCharter-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aDistilledCharter-1-acceptance-ledger.md) | journal | TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2 TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 DEPL-aDistilledCharter-1 KICK-aDistilledCharter-1 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 PLAY-aDistilledCharter-5 TOOL-aDistilledCharter-9 |
-| [2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round3.md](../reviews/2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round3.md) | diff-review | PLAY-aDistilledCharter-5 |
+| [2026-10-09-review-TOOL-aDistilledCharter-8-closing-diff-round3.md](../reviews/2026-10-09-review-TOOL-aDistilledCharter-8-closing-diff-round3.md) | diff-review | PLAY-aDistilledCharter-5 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
 Round 2 of the closing review confirmed five MEDIUM and LOW findings in the renderer and the text
-around it (`reviews/2026-10-09-review-PLAY-aDistilledCharter-1-closing-diff-round2.md`). Their write
+around it (`reviews/2026-10-09-review-TOOL-aDistilledCharter-7-closing-diff-round2.md`). Their write
 sets intersect in `render_playbook.py` and the template, so BUILD-METHOD M4 batches them.
 
 ## 2. Scope (IN)
@@ -37,6 +37,7 @@ sets intersect in `render_playbook.py` and the template, so BUILD-METHOD M4 batc
 ### Edges
 
 - **consumes-from** `PLAY-aDistilledCharter-5` — both edit the template; this lands second.
+- **hands-off** `TOOL-aDistilledCharter-9` — the renderer it edited, which that unit edits last
 
 ## 4. Design
 
@@ -84,6 +85,8 @@ none
 - rev-1 · 2026-10-09 · initial draft, the batch promoted from the closing review round 2.
 - rev-2 · 2026-10-09 · S1 · `checkout_dir` is an `[answers]` key only: `[charter]` refuses a key
   naming no placeholder (closing review round 3, T5).
+- rev-3 · 2026-10-10 · §3 · the hands-off edge back to TOOL-aDistilledCharter-9, which the closing bar's
+  check 12 found missing.
 
 ## 10. Reuse audit
 

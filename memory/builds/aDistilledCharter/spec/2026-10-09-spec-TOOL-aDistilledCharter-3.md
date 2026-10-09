@@ -1,6 +1,6 @@
 # TOOL-aDistilledCharter-3 — the parity gate drops the retired pairs, the canary re-points, and a new arm bans section-number citations
 
-**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 7
+**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -52,6 +52,7 @@ citation instead of leaving it to rot.
 - **consumes-from** `PLAY-aDistilledCharter-1` — the v4.0 text the pairs and the canary now read.
 - **consumes-from** `TOOL-aDistilledCharter-4` — a clean surface, so S4 lands green and its red is
   observed on a staged break rather than on the tree.
+- **hands-off** `TOOL-aDistilledCharter-6` — the S2 stage it narrowed, which that unit widens again
 
 ## 4. Design
 
@@ -133,6 +134,8 @@ none
 - rev-1 · 2026-10-09 · initial draft.
 - rev-2 · 2026-10-09 · §4 · AC2 · the predicate excludes citations of the spec template's sections,
   which TOOL-aDistilledCharter-4's sweep found live and correct.
+- rev-3 · 2026-10-10 · §3 · the hands-off edge back to TOOL-aDistilledCharter-6, which the closing bar's
+  check 12 found missing.
 
 ## 10. Reuse audit
 

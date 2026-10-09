@@ -347,7 +347,7 @@ else
   while IFS= read -r h; do
     [ -n "$h" ] || continue
     fail 16 "a live file cites a charter section by number, and v4.0 has no numbered sections; cite the handle or the owning guide: $h"
-  done <<< "$s4_hits"
+  done < <(printf '%s\n' "$s4_hits")
   printf 'playbook-parity: S4 graded %s file(s); %s line(s) carry a section sign, any charter citation among them failed above\n' "$s4_pop" "$s4_near"
 fi
 

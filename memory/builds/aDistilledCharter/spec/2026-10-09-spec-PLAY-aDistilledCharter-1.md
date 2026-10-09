@@ -1,6 +1,6 @@
 # PLAY-aDistilledCharter-1 — the charter template v4.0, with a disposition for every v3.5 rule
 
-**Status:** CLOSED · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 4
+**Status:** CLOSED · rev-5 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams playbook · order 4
 
 <!-- gen:spec-records -->
 
@@ -58,6 +58,7 @@ silently.
 - **consumes-from** `PLAY-aDistilledCharter-2` — the review protocol's security and tier sections.
 - **consumes-from** `PLAY-aDistilledCharter-3` — the hygiene guide's id protocol.
 - **hands-off** `PLAY-aDistilledCharter-4` — gov's re-render.
+- **hands-off** `TOOL-aDistilledCharter-3` — the v4.0 text whose phrases the parity gate and the canary now read
 
 ## 4. Design
 
@@ -288,6 +289,8 @@ none
   TOOL-aDistilledCharter-2 rev-2, which keeps every name a v3.x template uses.
 - rev-2 · 2026-10-09 · S5 · AC6 · the ceiling row stays 49152 and only the high-water moves: the
   leg is named for the ceiling and about thirty records cite the name.
+- rev-5 · 2026-10-10 · §3 · the hands-off edge back to TOOL-aDistilledCharter-3, which the closing bar's
+  check 12 found missing.
 
 ## 10. Reuse audit
 
