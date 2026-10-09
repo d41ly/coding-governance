@@ -118,6 +118,12 @@ PLACEHOLDER_RE = re.compile(r'\{\{([A-Z][A-Z0-9_]*)\}\}')
 REGION_OPEN = '<!-- gov:playbook -->'
 REGION_CLOSE = '<!-- /gov:playbook -->'
 REGION_MARKER_RE = re.compile(r'<!--\s*/?gov:playbook\s*-->')
+# TOOL-aDistilledCharter-1. A ONE-LINE REGION holds rules a reader takes in at a glance: every line
+# a `- ` bullet, none past ONE_LINE_MAX characters, no continuation. Graded AFTER substitution, which
+# is the only moment an adopter's own section 2 exists. The markers survive into the charter.
+ONE_LINE_OPEN = '<!-- one-line -->'
+ONE_LINE_CLOSE = '<!-- /one-line -->'
+ONE_LINE_MAX = 200
 # govkit's TOKEN_RX, spelled again because this engine ships without govkit. `{relpath}` and the
 # seeded three are govkit-derived, so they are never an operator's key.
 ARGV_TOKEN_RE = re.compile(r'(?<!\$)\{([a-z_]+)\}')
@@ -372,6 +378,39 @@ def build_substitution(text: str, key: str, val: str) -> str:
         else:
             out.append(line.replace(token, val))
     return '\n'.join(out)
+
+
+def check_one_line_regions(text: str) -> None:
+    """Refuse a one-line region holding anything but short single-line bullets.
+
+    Line numbers are the RENDERED body's; the refusal quotes the line so an operator can find it in
+    the source it came from — the template for section 1, `[charter] adopter_rules` for section 2.
+    What it does NOT grade: what a rule says, or any line outside a region."""
+    inside = 0
+    for n, line in enumerate(text.split('\n'), 1):
+        bare = line.strip()
+        if bare == ONE_LINE_OPEN:
+            if inside:
+                raise Refusal(f'line {n}: a one-line region opens inside another one, opened at '
+                              f'line {inside}')
+            inside = n
+            continue
+        if bare == ONE_LINE_CLOSE:
+            if not inside:
+                raise Refusal(f'line {n}: a one-line region closes with none open')
+            inside = 0
+            continue
+        if not inside or not bare:
+            continue
+        quoted = line.strip()[:60]
+        if not re.match(r'- \S', line):
+            raise Refusal(f'line {n}: a one-line region holds a line that is not a `- ` bullet, '
+                          f'so a rule spans two lines or is not a rule: {quoted!r}')
+        if len(line.rstrip()) > ONE_LINE_MAX:
+            raise Refusal(f'line {n}: a rule in a one-line region is {len(line.rstrip())} '
+                          f'characters, past the {ONE_LINE_MAX} a one-line rule may take: {quoted!r}')
+    if inside:
+        raise Refusal(f'line {inside}: a one-line region is never closed')
 
 
 # --------------------------------------------------------------------------- the region reader
@@ -678,7 +717,10 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
                           f'[[placeholder]] row for it, so nothing can supply a value')
         val, note = resolve_placeholder_value(row, charter, answers, target)
         notes.append(note)
-        text = build_substitution(text, key, str(val))
+        # A TOML multi-line string ends in a newline, and the template line holding the token ends in
+        # one too; without the strip every multi-line answer adds a blank line after itself.
+        text = build_substitution(text, key, str(val).rstrip('\n'))
+    check_one_line_regions(text)
     for ns, name in sorted(set(present)):
         if (ns, name) in drop:
             notes.append(f'dropped   {ns}:{name}')
@@ -883,6 +925,27 @@ def run_selftest() -> int:
     arm_fixture('a [charter] key naming no placeholder is refused', trailer_desc,
          '{{COMMIT_TRAILER}}\n', '[charter]\ncomit_trailer = "x"' + ans,
          want='[charter] comit_trailer names no declared [[placeholder]]')
+
+    # TOOL-aDistilledCharter-1 — a one-line region admits short single-line bullets and nothing else.
+    rules_desc = ('[[placeholder]]\nkey = "ADOPTER_RULES"\nclass = "defaulted"\n'
+                  'default = "- none — this repository adds no rules of its own"\n')
+    region = f'{ONE_LINE_OPEN}\n%s\n{ONE_LINE_CLOSE}\nend\n'
+    arm_fixture('a continuation line in a one-line region is refused', rules_desc,
+                region % '- a rule\n  that wraps', ans.lstrip(), want='not a `- ` bullet')
+    arm_fixture('an over-length rule in a one-line region is refused', rules_desc,
+                region % ('- ' + 'x' * ONE_LINE_MAX), ans.lstrip(), want=f'past the {ONE_LINE_MAX}')
+    arm_fixture('an unclosed one-line region is refused', rules_desc,
+                f'{ONE_LINE_OPEN}\n- a rule\n', ans.lstrip(), want='never closed')
+    arm_fixture('a nested one-line region is refused', rules_desc,
+                region % f'{ONE_LINE_OPEN}\n- a rule', ans.lstrip(), want='opens inside another')
+    arm_fixture('an unanswered ADOPTER_RULES renders its declared default', rules_desc,
+                region % '{{ADOPTER_RULES}}', ans.lstrip(),
+                in_body=f'- none — this repository adds no rules of its own\n{ONE_LINE_CLOSE}',
+                in_notes='DEFAULTED ADOPTER_RULES')
+    arm_fixture('a multi-line adopter_rules answer renders with no blank line added', rules_desc,
+                region % '{{ADOPTER_RULES}}',
+                '[charter]\nadopter_rules = """\n- one\n- two\n"""' + ans,
+                in_body=f'- one\n- two\n{ONE_LINE_CLOSE}', in_notes='answered  ADOPTER_RULES')
 
     # S3 / AC5 — the template is never its own charter. Driven through `main`, so the exit code is
     # the one an operator sees, over gov's own declarations and a real registry entry.

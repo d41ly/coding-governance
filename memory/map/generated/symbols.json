@@ -3673,6 +3673,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "check_one_line_regions",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "check_ours",
       "kind": "function",
       "file": "tools/settings-merge.py"

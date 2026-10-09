@@ -246,6 +246,12 @@ class = "defaulted"
 default = "none yet — the thresholds still bind"
 why = "the audit script that quantifies chat-prose waste"
 
+[[placeholder]]
+key = "ADOPTER_RULES"
+class = "defaulted"
+default = "- none — this repository adds no rules of its own"
+why = "section 2: this repository's own rules, one `- ` bullet per line, from `[charter] adopter_rules`. DEFAULTED, not asked: an asked key would refuse every adopter's next re-render until it answered, and the update would roll the kit back. The render grades each line (TOOL-aDistilledCharter-1)"
+
 # ---------------------------------------------------------------- the fenceable blocks
 # `when:` fences name a PROJECT PROPERTY that no kit governs, so they cannot be validated against the
 # registry. This is that namespace's declaration, and `drop_blocks` in a target's deploy.toml is

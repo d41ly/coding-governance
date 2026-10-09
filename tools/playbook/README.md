@@ -59,6 +59,25 @@ backtick, angle brackets. That is where a commit trailer such as
   can read it; `govkit check` makes the same join over every selected kit);
 - a control character other than a newline, the `{{` opener, or a `gov:playbook` region marker.
 
+## One-line regions, and section 2
+
+A region between `<!-- one-line -->` and `<!-- /one-line -->` holds rules a reader takes in at a
+glance. After substitution, every non-blank line in one must be a `- ` bullet of at most
+`ONE_LINE_MAX` characters; a continuation line, an over-length rule, a nested opener or an unclosed
+region is a refusal naming the line. The template fences its governing practices this way, and
+section 2 around `{{ADOPTER_RULES}}`, which a target answers as a multi-line `[charter]` string:
+
+```toml
+[charter]
+adopter_rules = """
+- Mobile-first: every screen is designed at 375 px before any wider breakpoint.
+- Every design starts as a Figma frame, and the code follows the frame.
+"""
+```
+
+Unanswered, it renders a single `- none` line. The markers survive into the charter, so a reader
+can see where the shape applies.
+
 ## Two namespaces, and neither reads a boolean
 
 `kit:<id>` drops when the target did not select that kit. `when:<name>` drops when the name is a
