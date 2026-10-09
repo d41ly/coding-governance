@@ -4059,6 +4059,80 @@ fixture
 run --preflight tRun --keepalive-id k1 >/dev/null
 miss "$(run --close tRun)" "GATEPROBE-should-not-appear"
 
+# ---- TOOL-aFrugalTurnstile-3 AC6/AC7: A GREEN CLOSE LEAVES THE BOUNDARY'S `gate-bar-green`, naming
+# ---- the declared GATE_CMD, only when its bar ran full; a bar run without GATE_FULL under `primary`
+# ---- and a red bar write none. RED against the driver at bef97330, which has no writer. The probe is
+# ---- TRACKED and the run-state file `--preflight` writes is committed, so the tree the writer reads
+# ---- is clean. GATE_FULL is spelled on every call: the bar that runs this suite exports it.
+fg_gd=$(git rev-parse --absolute-git-dir)
+reset_tree; readme tRun; rm -f "$fg_gd/gate-bar-green"
+printf '#!/usr/bin/env bash\nexit 0\n' > probe-gate.sh
+mkconf "true" "bash probe-gate.sh"
+fixture
+run --preflight tRun --keepalive-id k1 >/dev/null; fixture
+out=$(GATE_FULL=1 run --close tRun)
+hit  "$out" "unattended: gates-green — recorded gate-bar-green for $(git rev-parse HEAD | cut -c1-8) (kind full)"
+same "TOOL-aFrugalTurnstile-3 AC6 the close's record names the declared GATE_CMD" \
+  "$(awk -F'\t' '$1=="bar"{print $2}' "$fg_gd/gate-bar-green" 2>/dev/null)" "bash probe-gate.sh"
+same "TOOL-aFrugalTurnstile-3 AC6 the close's record is written by unattended" \
+  "$(awk -F'\t' '$1=="by"{print $2}' "$fg_gd/gate-bar-green" 2>/dev/null)" "unattended"
+reset_tree; readme tRun; rm -f "$fg_gd/gate-bar-green"
+printf '#!/usr/bin/env bash\nexit 0\n' > probe-gate.sh
+mkconf "true" "bash probe-gate.sh"
+fixture
+run --preflight tRun --keepalive-id k1 >/dev/null; fixture
+out=$(GATE_FULL= run --close tRun)
+hit  "$out" "unattended: gates-green — no gate-bar-green written: the bar did not run full"
+same "TOOL-aFrugalTurnstile-3 AC7 a bar run without GATE_FULL under primary writes no record" \
+  "$([ -e "$fg_gd/gate-bar-green" ] && echo present || echo absent)" "absent"
+reset_tree; readme tRun; rm -f "$fg_gd/gate-bar-green"
+printf '#!/usr/bin/env bash\nexit 1\n' > probe-gate.sh
+mkconf "true" "bash probe-gate.sh"
+fixture
+run --preflight tRun --keepalive-id k1 >/dev/null; fixture
+out=$(GATE_FULL=1 run --close tRun)
+hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+miss "$out" "gate-bar-green"
+same "TOOL-aFrugalTurnstile-3 AC7 a red bar writes no record" \
+  "$([ -e "$fg_gd/gate-bar-green" ] && echo present || echo absent)" "absent"
+
+# ---- TOOL-aFrugalTurnstile-3 AC8: THE RECORD'S GRAMMAR IS SPELLED TWICE, in the pre-push hook and in
+# ---- this driver, because the hook ships verbatim and sources no kit; this arm holds the two together
+# ---- as `read_policy_key`'s copies are held. Both functions are cut out of their shipped files by
+# ---- `slice_fn`'s awk and sed, called alike in one clean scratch repo, and their key columns compared
+# ---- with each other and with the ten keys in order. A copy of the driver's with `by` dropped must
+# ---- FAIL that comparison, or the comparison is one that cannot fail.
+fg_hook="${HERE%/"$KIT_REL"}/.githooks/pre-push"
+fg_s=$(grep -n '^write_bar_green()' "$fg_hook" 2>/dev/null | cut -d: -f1)
+if [ -z "$fg_s" ]; then
+  echo "SKIP TOOL-aFrugalTurnstile-3 AC8 parity arm: no write_bar_green() in the pre-push hook at $fg_hook, so there is no second spelling to hold the driver's against"
+else
+  fg_keys=$(printf '%s\n' sha tree bar bar_paths kind base selftests run_id by stamped)
+  fg_e=$(awk -v s="$fg_s" 'NR>s && /^}/ {print NR; exit}' "$fg_hook")
+  eval "$(sed -n "${fg_s},${fg_e}p" "$fg_hook" | sed '1s/^write_bar_green()/write_hook_bar_green()/')"
+  slice_fn write_bar_green
+  fg_w=$(mktemp -d)
+  ( cd "$fg_w" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
+      && git config core.autocrlf false && echo a > a && git add a && git commit -q -m one --no-verify ) >/dev/null 2>&1
+  fg_pp=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green" \
+             && write_hook_bar_green "$g" "$(git rev-parse HEAD)" 0 full "" "bash probe-gate.sh" fg-run >/dev/null \
+             && cut -f1 "$g/gate-bar-green" )
+  fg_ud=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green" \
+             && write_bar_green "$g" "$(git rev-parse HEAD)" 0 full "" "bash probe-gate.sh" fg-run >/dev/null \
+             && cut -f1 "$g/gate-bar-green" )
+  same "TOOL-aFrugalTurnstile-3 AC8 the hook's record carries the ten keys in order" "$fg_pp" "$fg_keys"
+  same "TOOL-aFrugalTurnstile-3 AC8 the driver's record carries the hook's keys in order" "$fg_ud" "$fg_pp"
+  eval "$(declare -f write_bar_green | sed 's/by\\tunattended\\n//')"
+  fg_dk=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green" \
+             && write_bar_green "$g" "$(git rev-parse HEAD)" 0 full "" "bash probe-gate.sh" fg-run >/dev/null \
+             && cut -f1 "$g/gate-bar-green" )
+  n=$((n+1)); [ -n "$fg_dk" ] && [ "$fg_dk" != "$fg_pp" ] \
+    || { echo "FAIL TOOL-aFrugalTurnstile-3 AC8 a driver copy with the by key dropped still compared equal to the hook's keys, so the parity comparison cannot fail: [$fg_dk]"; st=1; }
+  unset -f write_bar_green write_hook_bar_green
+  rm -rf "$fg_w"
+fi
+reset_tree
+
 # ---- TOOL-aBranchedMandate-3, S9: the SECOND ANCHOR. Every arm here drives the real bare origin the
 # ---- fixture already builds, because the whole mechanism is an observation of a remote and a
 # ---- fixture that stubbed it would be asserting against this test's own imagination.

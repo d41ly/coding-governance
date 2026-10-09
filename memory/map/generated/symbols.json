@@ -19773,6 +19773,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "write_bar_green",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "write_base_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"

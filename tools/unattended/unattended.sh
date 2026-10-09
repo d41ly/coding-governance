@@ -10098,6 +10098,47 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   return 0
 }
 
+# write_bar_green <git dir> <head before> <rc> <kind> <base> <bar> <run id> — the close's bar's own
+# green, by tree (TOOL-aFrugalTurnstile-3 S1, design D3). The grammar is the pre-push hook's function
+# of the same name (TOOL-aFrugalTurnstile-2): the same preconditions, the same ten keys in the same
+# order, the same `.tmp` rename and the same `.shared` copy into the common dir from a linked worktree;
+# only `by` differs. The hook ships verbatim and sources no kit, so the grammar is spelled twice and
+# held together by a parity arm in this kit's suite, as `read_policy_key` is. SILENT on a red rc, whose
+# output is already the item's; otherwise ONE line, recorded or declined with why.
+write_bar_green() {
+  local g=$1 h=$2 rc=$3 kind=$4 base=$5 bar=$6 run=$7 tree dirty w paths="" cdir cdir_abs g_abs
+  local -a words=()
+  local no="unattended: gates-green — no gate-bar-green written:"
+  [ "$rc" = 0 ] || return 0
+  case "$kind" in
+    full|scoped) ;;
+    "") echo "$no the bar did not run full"; return 0 ;;
+    *) echo "$no the kind '$kind' is neither full nor scoped"; return 0 ;;
+  esac
+  case "$bar" in *$'\t'*|*$'\n'*) echo "$no the bar's command holds a tab or a newline"; return 0 ;; esac
+  if [ "$(GIT rev-parse HEAD 2>/dev/null)" != "$h" ]; then echo "$no HEAD moved"; return 0; fi
+  if ! dirty=$(GIT status --porcelain --ignore-submodules=untracked 2>/dev/null) || [ -n "$dirty" ]; then
+    echo "$no the tree is not clean"; return 0
+  fi
+  tree=$(GIT rev-parse -q --verify "$h^{tree}" 2>/dev/null)
+  if [ -z "$tree" ]; then echo "$no the tree of ${h:0:8} could not be read"; return 0; fi
+  read -ra words <<<"$bar"
+  for w in "${words[@]}"; do case "$w" in */*|*.sh) paths="$paths${paths:+ }$w" ;; esac; done
+  if ! { printf 'sha\t%s\ntree\t%s\nbar\t%s\nbar_paths\t%s\nkind\t%s\nbase\t%s\nselftests\t%s\nrun_id\t%s\nby\tunattended\nstamped\t%s\n' \
+           "$h" "$tree" "$bar" "$paths" "$kind" "$base" "${GATE_SELFTESTS:+1}" "$run" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+           > "$g/gate-bar-green.tmp" && mv -f "$g/gate-bar-green.tmp" "$g/gate-bar-green"; } 2>/dev/null; then
+    echo "$no $g/gate-bar-green could not be written"; return 0
+  fi
+  cdir=$(GIT rev-parse --git-common-dir 2>/dev/null) || cdir=""
+  cdir_abs=""; [ -n "$cdir" ] && cdir_abs=$(cd "$cdir" 2>/dev/null && pwd -P)
+  g_abs=$(cd "$g" 2>/dev/null && pwd -P) || g_abs=""
+  if [ -n "$cdir_abs" ] && [ -n "$g_abs" ] && [ "$cdir_abs" != "$g_abs" ]; then
+    cp "$g/gate-bar-green" "$cdir_abs/gate-bar-green.shared.tmp" 2>/dev/null \
+      && mv -f "$cdir_abs/gate-bar-green.shared.tmp" "$cdir_abs/gate-bar-green.shared" 2>/dev/null
+  fi
+  echo "unattended: gates-green — recorded gate-bar-green for ${h:0:8} (kind $kind)"
+}
+
 # What the driver can honestly answer for each core item. Anything it cannot observe is reported as
 # agent-attested and read back from the record, never invented.
 dod_met() { # slug · run-state file · item · checker
@@ -10130,7 +10171,7 @@ dod_met() { # slug · run-state file · item · checker
       # fixed that call site and did not grep for this one.
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
-      local _grc _gr _gid _ggd _gh _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
+      local _grc _gr _gid _ggd _gh _ghb _gkind _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
       local -a _genv _grb
       # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
       # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
@@ -10192,6 +10233,7 @@ dod_met() { # slug · run-state file · item · checker
           check_inplace_preconditions "$slug" || { GG_HARD=1; return 1; }
           run_orphan_reap "$slug"
           RB_BOUND=$_gbound
+          _ghb=$(GIT rev-parse HEAD 2>/dev/null)
           # shellcheck disable=SC2086
           run_bounded env -u GATE_WALL GATE_FULL=1 "${_genv[@]}" $GATE_CMD; _grc=$?
           RB_BOUND=""
@@ -10200,6 +10242,7 @@ dod_met() { # slug · run-state file · item · checker
           # BOUNDED. TOOL-aBoundedCeiling-6. $GATE_CMD is deliberately unquoted here, as it always
           # was: the project declares a command line, not a path.
           RB_BOUND=$_gbound
+          _ghb=$(GIT rev-parse HEAD 2>/dev/null)
           # shellcheck disable=SC2086
           run_bounded env -u GATE_WALL "${_genv[@]}" $GATE_CMD; _grc=$?
           RB_BOUND=""
@@ -10222,6 +10265,16 @@ dod_met() { # slug · run-state file · item · checker
       # recorded only over an earlier fact, so a stub bar in a project that never ran the runner
       # writes nothing new and an older record can never answer for a newer bar.
       _gh=$(GIT rev-parse HEAD 2>/dev/null)
+      # TOOL-aFrugalTurnstile-3 S2 - THE BAR'S GREEN IS RECORDED BY TREE, in the grammar the push
+      # boundary writes, so a wrapper bar that never earns a usable runner stamp still leaves a green
+      # the boundary can read. `full` under `in-place`, whose bar always runs with GATE_FULL=1; under
+      # `primary` only when this process carries GATE_FULL=1, which the bar inherits. Base is empty.
+      # WHAT THIS RECORD DOES NOT CHECK: it says this bar exited 0 on this tree, never that the push
+      # boundary will run the same bar; that equality is the reader's, which compares the bar string
+      # byte for byte.
+      _gkind=""
+      if [ "$LANDER_MODE" = in-place ] || [ "${GATE_FULL:-}" = 1 ]; then _gkind=full; fi
+      [ -z "$_ggd" ] || write_bar_green "$_ggd" "$_ghb" "$_grc" "$_gkind" "" "$GATE_CMD" "$_gid"
       GG_RUN_FACT="$_gid ${_gh:0:8}"
       if [ "$_grc" = 0 ]; then
         [ "$_gtry" = 1 ] || echo "unattended: gates-green — the one re-run after TREE MOVED exited 0"
