@@ -293,6 +293,11 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     section-wide reading there: at a terminal status, on either tier, each F-item's span carries its
     own mark, quoted marks not counting; a Tier-2 §8 of any other shape reds at ANY status and under
     `--staged`. The grammar is `TEMPLATE-SPEC.md`'s, and a zero population is announced likewise.
+    A Tier-1 spec takes the micro-spec profile once the filename date reaches `SPEC_TIER1_CUTOFF`:
+    every `##` heading is a canonical title, the eight required titles are present, the titles run
+    in canonical order, and no section body is empty. Sections are found by heading TEXT, so the
+    numbering is free; Production-readiness checklist and Reuse audit are optional. One file, no
+    join, so it runs under `--staged`; SHAPE only, and a zero population is announced likewise.
 
 13. **id-definition collision** — one id claimed by two different build folders. A decision-log row
     and its spec's H1 both anchor the same id BY DESIGN (the index points at the record), so

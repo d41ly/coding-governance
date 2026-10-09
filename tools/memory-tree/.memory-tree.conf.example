@@ -122,6 +122,13 @@ READINESS_ROWS_CUTOFF=""
 # never required; set it strictly ahead of your corpus as with the cutoffs above.
 BASE_RESOLVE_CUTOFF=""
 
+# Tier-1 micro-spec ratchet (check 12): from this date a Tier-1 spec carries the eight sections the
+# spec template names — Goal, Scope (IN), Non-goals (OUT), Design, Acceptance criteria, Gates, Open
+# questions, Revision log — found by heading TEXT, in canonical order, none empty, numbering free.
+# Runs under `--staged`. Blank = never required, and a Tier-1 spec then keeps the light profile; set
+# it strictly ahead of your corpus as with the cutoffs above.
+SPEC_TIER1_CUTOFF=""
+
 # Section-7 leg-line ratchet, read by the spec-tokens checker rather than by the hygiene engine:
 # from this date a LIVE spec that CARRIES a `## N. Gates` heading must contribute at least one leg
 # name your gate manifest resolves. A spec with no Gates heading is silent, which is the whole Tier-1

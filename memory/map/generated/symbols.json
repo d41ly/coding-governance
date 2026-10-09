@@ -2373,6 +2373,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "build_t1_eight",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
       "id": "build_table",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -20261,6 +20266,11 @@
       "id": "write_su_record",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_t1_spec",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
       "id": "write_task_register",

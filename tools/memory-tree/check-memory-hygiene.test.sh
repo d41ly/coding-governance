@@ -3466,6 +3466,77 @@ out_fi=$(cd "$FI" && bash "$SCRIPT" --staged 2>/dev/null)
 n=$((n+1))
 grep -qF 'is not F-item shaped' <<<"$out_fi" && { echo "FAIL the F-item shape arm fired with FORK_ITEM_CUTOFF BLANK, the declared off state every adopter ships with"; st=1; }
 
+# ---- TOOL-aRoutedQuill-1 AC1-AC5 — THE TIER-1 MICRO-SPEC ARM, in a tree of its own so no verdict
+# ---- above moves, and under --staged because that is the commit-time grade the write gate trusts.
+# ---- The base engine passes the header-and-revision-log spec of the first arm, which is the red.
+# ---- The green controls are the conforming eight, the same eight renumbered, the key BLANK and a
+# ---- pre-cutoff date, so each silence observes a guard and not the absence of a run.
+T1=$TMP/tier1
+build_t1_eight() { # $1 tier digit -> the eight required sections, numbered 1 to 8
+  printf '# ARCH-tMicro-1 — a micro-spec\n\n**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-%s · base 0123abcd · streams architecture\n\n' "$1"
+  printf '## 1. Goal\n\nG.\n\n## 2. Scope (IN)\n\n- **S1** — s. Observed by AC1.\n\n## 3. Non-goals (OUT)\n\nN.\n\n## 4. Design\n\nD.\n\n'
+  printf '## 5. Acceptance criteria\n\n- **AC1** — When `true` runs, it exits 0.\n  Red when: it exits 1.\n\n## 6. Gates\n\n`memory hygiene`\n\n'
+  printf '## 7. Open questions\n\nnone\n\n## 8. Revision log\n\n- rev-1 · 2026-09-20 · initial draft.\n'
+}
+write_t1_spec() { # $1 filename date, stdin -> the only spec in the tree, staged
+  rm -rf "$T1/memory/builds/tMicro"; mkdir -p "$T1/memory/builds/tMicro/spec"
+  cat > "$T1/memory/builds/tMicro/spec/$1-spec-ARCH-tMicro-1.md"
+  ( cd "$T1" && git add -A ) >/dev/null 2>&1
+}
+mkdir -p "$T1"
+( cd "$T1" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  mkdir -p memory && printf 'sentinel\n' > memory/HYGIENE.md
+  git add -A && git commit -q -m tier1 --no-verify ) >/dev/null 2>&1
+T1_CONF='MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n'
+printf "${T1_CONF}SPEC_TIER1_CUTOFF=\"2026-09-10\"\n" > "$T1/.memory-tree.conf"
+T1_MSG='2026-09-20-spec-ARCH-tMicro-1.md (Tier-1 micro-spec sections, required at/after SPEC_TIER1_CUTOFF 2026-09-10; found by heading text, numbering free): '
+printf '# ARCH-tMicro-1 — thin\n\n**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 1. Revision log\n\n- rev-1 · 2026-09-20 · initial draft.\n' \
+  | write_t1_spec 2026-09-20
+out_t1=$(cd "$T1" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF "${T1_MSG}missing: Goal, Scope (IN), Non-goals (OUT), Design, Acceptance criteria, Gates, Open questions" <<<"$out_t1" \
+  || { echo "FAIL AC1/AC4: the micro-spec arm did not name the seven missing titles of a header-and-revision-log Tier-1 spec under --staged"; st=1; }
+build_t1_eight 1 | write_t1_spec 2026-09-20
+out_t1=$(cd "$T1" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF 'Tier-1 micro-spec sections' <<<"$out_t1" && { echo "FAIL AC2: the micro-spec arm fired on a conforming eight-section Tier-1 spec"; st=1; }
+build_t1_eight 1 | sed 's/^## 5\. Acc/## 6. Acc/; s/^## 6\. Gat/## 7. Gat/; s/^## 7\. Ope/## 8. Ope/; s/^## 8\. Rev/## 9. Rev/' | write_t1_spec 2026-09-20
+out_t1=$(cd "$T1" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF 'Tier-1 micro-spec sections' <<<"$out_t1" && { echo "FAIL AC2: the micro-spec arm graded a renumbered Tier-1 spec by ordinal, not by title"; st=1; }
+build_t1_eight 2 | write_t1_spec 2026-09-20
+out_t1=$(cd "$T1" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF '2026-09-20-spec-ARCH-tMicro-1.md (## sections differ from the canonical ten' <<<"$out_t1" \
+  || { echo "FAIL AC2: the Tier-2 canon admitted the eight micro-spec sections"; st=1; }
+build_t1_eight 1 | sed '/^D\.$/d' | write_t1_spec 2026-09-20
+out_t1=$(cd "$T1" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF "${T1_MSG}empty: Design" <<<"$out_t1" || { echo "FAIL AC3: the micro-spec arm did not name an emptied Design section"; st=1; }
+build_t1_eight 1 | awk '/^## 3\./ { h = 1 } /^## 4\./ { h = 2 } /^## 5\./ { printf "%s", hold; h = 0 } h == 1 { hold = hold $0 "\n"; next } { print }' | write_t1_spec 2026-09-20
+out_t1=$(cd "$T1" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF "${T1_MSG}out of order: Non-goals (OUT)" <<<"$out_t1" || { echo "FAIL AC3: the micro-spec arm did not name Non-goals placed after Design"; st=1; }
+{ build_t1_eight 1; printf '\n## 9. Notes\n\nextra\n'; } | write_t1_spec 2026-09-20
+out_t1=$(cd "$T1" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF "${T1_MSG}not canonical: ## 9. Notes" <<<"$out_t1" || { echo "FAIL AC3: the micro-spec arm did not name a non-canonical heading"; st=1; }
+printf '# ARCH-tMicro-1 — thin\n\n**Status:** SPECCED · rev-1 · 2026-09-01 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 1. Revision log\n\n- rev-1 · 2026-09-01 · initial draft.\n' \
+  | write_t1_spec 2026-09-01
+out_t1=$(cd "$T1" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF 'Tier-1 micro-spec sections' <<<"$out_t1" && { echo "FAIL AC5: the micro-spec arm graded a Tier-1 spec dated BEFORE SPEC_TIER1_CUTOFF"; st=1; }
+out_t1=$(cd "$T1" && bash "$SCRIPT" 2>/dev/null)
+n=$((n+1))
+grep -qF 'the Tier-1 micro-spec arm graded NO spec — SPEC_TIER1_CUTOFF is 2026-09-10' <<<"$out_t1" \
+  || { echo "FAIL AC5: an armed SPEC_TIER1_CUTOFF grading no spec was silent in a full run"; st=1; }
+printf "${T1_CONF}SPEC_TIER1_CUTOFF=\"\"\n" > "$T1/.memory-tree.conf"
+printf '# ARCH-tMicro-1 — thin\n\n**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 1. Revision log\n\n- rev-1 · 2026-09-20 · initial draft.\n' \
+  | write_t1_spec 2026-09-20
+out_t1=$(cd "$T1" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF 'Tier-1 micro-spec sections' <<<"$out_t1" && { echo "FAIL AC5: the micro-spec arm fired with SPEC_TIER1_CUTOFF BLANK, the declared off state every adopter ships with"; st=1; }
+
 # ---- TOOL-aGraftedHelix-14 — CHECK 27's DISPATCH BLOCK, observed THROUGH THE ENGINE. The block
 # ---- delegates to `row_grammar.py --check-relations`, whose own selftest arms the predicate; none of
 # ---- those arms runs this script, so none sees whether the block sets status=1 on the module's
@@ -3717,7 +3788,9 @@ esac
 # top-level and skipped aloud with that block's other four.
 # RAISED 539 -> 542 by TOOL-aGraftedHelix-47: its three check-24 engine arms, each top-level and
 # never skipped, because that fixture needs no sibling kit.
-FLOOR_ASSERTIONS=542
+# RAISED 542 -> 552 by TOOL-aRoutedQuill-1: its ten Tier-1 micro-spec arms, each top-level and
+# never skipped, because that fixture needs no sibling kit.
+FLOOR_ASSERTIONS=552
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-09T19:34:21+03:00 @ 5a836bf0fc940029136b4b3fd57a87f35ff40f26
+last-audit: 2026-10-09T21:09:00+03:00 @ 06071f4413922e50bd3d57895e33cf71f397c653
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 5a836bf0fc940029136b4b3fd57a87f35ff40f26
+last-body-change: 06071f4413922e50bd3d57895e33cf71f397c653
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -119,6 +119,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   criteria or Gates section, keyed on the heading TITLE and NOT the ordinal, which on a Tier-1 spec
   read Gates as acceptance (`TOOL-dBriefedPass-1`). Date-grandfathered on the spec's FILENAME against
   `.unattended.conf`'s `SPEC_THIN_CUTOFF`; BLANK turns the term OFF. `TOOL-aGradedMandate-4`.
+
+- **From `SPEC_TIER1_CUTOFF` a Tier-1 spec is a micro-spec**, graded by heading title in check 12;
+  `gen_build_index.py --new-spec <ID> --tier 1` writes one. `TOOL-aRoutedQuill-1`.
 
 - **From `SPEC_GUARD_LEGS_CUTOFF` (`.memory-tree.conf`) a LIVE spec's §7 leg line must name every
   gate leg its §4 `### Files touched` trips** — `python tools/check-spec-tokens.py --list` prints the

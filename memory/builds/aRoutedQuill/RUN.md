@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: 5a836bf0fc940029136b4b3fd57a87f35ff40f26 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 5a836bf0fc940029136b4b3fd57a87f35ff40f26
-phase: RUNNING
+witness: 06071f4413922e50bd3d57895e33cf71f397c653
+phase: BUILDING
 may: none
 mode: slug
 run-branch: refs/heads/branch/unattended-arouted-quill-71b76b
@@ -32,3 +32,7 @@ base: 5a836bf0fc940029136b4b3fd57a87f35ff40f26
 ## Parked
 
 2026-10-09T17:17:13Z decision · item The README's expected improvement 'An adopter gets the routing by installing gov, with nothing left to wire' is not implied by any spec: under TOOL-aRoutedQuill-5 F4, /session-kickoff stays a per-machine link that apply only prints, and the adopter confirms the scaffolded ROUTED_PATHS. Reword the bullet? · reason Options: reword the README bullet to name the one remaining per-machine step (the M2 cross-read's fix), or widen TOOL-aRoutedQuill-5 to install the kickoff link. Refused: the README's goal and expectations are the owner's description slot, which a run may not amend (M3), and widening unit 5 reverses the owner's F4 ruling.
+
+2026-10-09T17:31:43Z dispatch · item 06071f44 TOOL-aRoutedQuill-1 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/SPEC-TEMPLATE.template.md tools/memory-tree/HYGIENE.template.md tools/memory-tree/.memory-tree.conf.example tools/memory-tree/gen_build_index.py memory/TEMPLATE-SPEC.md memory/HYGIENE.md .memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/builds/aRoutedQuill/spec/2026-10-09-spec-TOOL-aRoutedQuill-1.md memory/builds/aRoutedQuill/build/2026-10-09-build-TOOL-aRoutedQuill-1-1-acceptance-ledger.md memory/builds/aRoutedQuill/README.md memory/map/generated/symbols.json
+
+2026-10-09T17:32:27Z brief · item TOOL-aRoutedQuill-1 · reason a956d5fc4f92 memory/builds/aRoutedQuill/prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-build-brief.md

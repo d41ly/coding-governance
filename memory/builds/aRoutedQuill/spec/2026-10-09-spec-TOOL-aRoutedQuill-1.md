@@ -1,11 +1,12 @@
 # TOOL-aRoutedQuill-1 — a Tier-1 spec is a micro-spec, and check 12 grades its sections by heading text
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 1 · ratified 2026-10-09
+**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 1 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aRoutedQuill-1-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aRoutedQuill-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-build-brief.md) | journal | — |
 
@@ -234,8 +235,9 @@ readiness rows. Tier-2 output stays byte-identical. A template with no Tier-1 fe
 |---|---|---|
 | `SPEC_TIER1_CUTOFF` | conf key and engine preset | none: conf keys carry no naming cell |
 | `t1cut` | awk `-v` variable | none: an awk variable is not a function definition |
+| `SPEC_TITLE_NUMBERS` | python module constant in `gen_build_index.py` | `py.constant`, upper snake |
 
-No function is minted. If the builder extracts the arm into an awk function,
+No function is minted; the generator's title-to-body map is the one constant above. If the builder extracts the arm into an awk function,
 `python tools/lexicon/lexicon.py --suggest check_tier1_canon --as sh.function` answered OK; whether
 the lexicon grades an awk function inside a shell string is UNVERIFIED.
 
@@ -352,6 +354,10 @@ New arm: tools/memory-tree/gen_build_index.py, its --selftest · covers AC6 · a
 
 - rev-1 · 2026-10-09 · initial draft.
 - rev-2 · 2026-10-09 · §8 · owner resolves F1 as (b), recorded at `TOOL-aRoutedQuill-2` F4.
+- rev-3 · 2026-10-09 · build: §4 Inventory names `SPEC_TITLE_NUMBERS`, the generator's
+  title-to-body map S5 needs. The S3 arm sits after the terminal §8 arm, still in the every-tier
+  band above the Tier-1 cut. The AC1-AC5 arms run in a fixture tree of their own, as the F-item
+  shape arms do, so no shared fixture moves. Status CLOSED.
 
 ## 10. Reuse audit
 

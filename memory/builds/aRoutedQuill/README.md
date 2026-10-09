@@ -58,7 +58,7 @@ none
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aRoutedQuill-1` | SPECCED | a Tier-1 spec carries what and how, done, out of scope and how to verify, and check 12 grades it |
+| 1 | `TOOL-aRoutedQuill-1` | CLOSED | a Tier-1 spec carries what and how, done, out of scope and how to verify, and check 12 grades it |
 | 2 | `KICK-aRoutedQuill-1` | SPECCED | kickoff writes the rewritten prompt as a brief the owner confirms, and the card names the routed unit |
 | 3 | `TOOL-aRoutedQuill-2` | SPECCED | a PreToolUse gate refuses a product-path write unless the card routes a buildable unit |
 | 4 | `TOOL-aRoutedQuill-3` | SPECCED | a push-time leg reds a product change whose commit names no unit specced before it |
@@ -77,7 +77,7 @@ ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuil
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aRoutedQuill-1 — a Tier-1 spec is a micro-spec, and check 12 grades its sections by heading text](spec/2026-10-09-spec-TOOL-aRoutedQuill-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-10-09 |
+| [TOOL-aRoutedQuill-1 — a Tier-1 spec is a micro-spec, and check 12 grades its sections by heading text](spec/2026-10-09-spec-TOOL-aRoutedQuill-1.md) | 1 | 2 | CLOSED | rev-3 | 2026-10-09 |
 | [KICK-aRoutedQuill-1 — the kickoff writes a brief the owner confirms, and the card routes the session to its units](spec/2026-10-09-spec-KICK-aRoutedQuill-1.md) | 2 | 2 | SPECCED | rev-4 | 2026-10-09 |
 | [TOOL-aRoutedQuill-2 — scratch-guard refuses a product write no buildable unit on the card owns](spec/2026-10-09-spec-TOOL-aRoutedQuill-2.md) | 3 | 2 | SPECCED | rev-5 | 2026-10-09 |
 | [TOOL-aRoutedQuill-3 — every pushed commit that touches a product path names a unit specced before it](spec/2026-10-09-spec-TOOL-aRoutedQuill-3.md) | 4 | 2 | SPECCED | rev-4 | 2026-10-09 |
@@ -88,7 +88,7 @@ ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuil
 | [TOOL-aRoutedQuill-7 — the unattended prompt-brief check reads its sub-head list from the kickoff kit's `--brief-skeleton`](spec/2026-10-09-spec-TOOL-aRoutedQuill-7.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

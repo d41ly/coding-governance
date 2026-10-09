@@ -7,7 +7,8 @@ follows this shape. Machine-enforced by check 12 of `check-memory-hygiene.sh`: t
 must parse; a Tier-2 spec must carry exactly the ten canonical `##` sections in order (§10 is
 date-gated by `SPEC10_CUTOFF` — specs dated before it keep the NINE-section canon), with no
 empty section bodies, its header `rev-N` logged in §9, and a resolved §8 before a terminal status;
-both tiers must be free of skeleton placeholders. Specs dated before the cutoff are grandfathered
+a Tier-1 spec dated on or after `SPEC_TIER1_CUTOFF` must carry the eight micro-spec sections, found
+by heading text, in canonical order and none empty; both tiers must be free of skeleton placeholders. Specs dated before the cutoff are grandfathered
 by filename date — never retrofit them.
 
 ## SPEC10_CUTOFF — how §10 is phased in
@@ -125,17 +126,22 @@ an absent region cannot be told from a spec nobody has recorded against.
   dossier will claim, or describe the thing in prose. A refusal is waived by the token
   `claims <- <object>`, so a waiver on the bare string answers only the path join.
 - A section that genuinely doesn't apply keeps its heading with the single line `N/A — <why>`.
-  Headings never disappear, and empty bodies are machine-rejected: an absent or hollow section is
-  indistinguishable from a forgotten one.
+  A tier profile's required headings never disappear, and empty bodies are machine-rejected: an
+  absent or hollow section is indistinguishable from a forgotten one.
 - Sub-structure nests as `###` under the ten sections; no additional `##` headings, and no
   annotations on a `##` line (`## 4. Design (rev-2 …)` fails the gate — rev notes live in §9).
 
 ## Tier profiles, sub-specs, and where recurring content lives
 
 - **Tier-2** uses the full ten-section skeleton below (§10 date-gated by `SPEC10_CUTOFF`).
-- **Tier-1** (light profile): the status header + placeholder rules are enforced; the nine-section
-  canon is not — keep it anyway when it helps, or write the few sections that matter. This is
-  HYGIENE.md's "ceremony is conditional" applied to specs.
+- **Tier-1** (micro-spec): a spec dated on or after `SPEC_TIER1_CUTOFF` carries eight `##`
+  sections, found by heading TEXT, in canonical order, none empty: Goal, Scope (IN), Non-goals
+  (OUT), Design, Acceptance criteria, Gates, Open questions, Revision log. Production-readiness
+  checklist and Reuse audit are optional and sit at their canonical place when written; no other
+  `##` title is legal, and numbering is free. Goal, Scope and Design say what and how, Acceptance
+  criteria says when it is done, Non-goals says what is out of scope, and Acceptance criteria with
+  Gates say how to verify it. A Tier-1 spec dated before the cutoff keeps the light profile: the
+  status header and placeholder rules only. The skeleton is below.
 - **Multi-spec builds:** each sub-spec is its own conforming file (dated recording name, any depth
   under `spec/`); the master overview and the owner decision menu live in the build-root
   `README.md` (hygiene check 5 bans free-named files inside `spec/`).
@@ -154,6 +160,52 @@ an absent region cannot be told from a spec nobody has recorded against.
   readers grade (the skeleton's §8 says how),
   and add the `ratified <date>` pointer to the header tail. §8 must read `none` or be fully
   RESOLVED before the status may go CLOSED/WONTDO (machine-checked).
+
+The Tier-1 skeleton — copy the fence's contents; `gen_build_index.py --new-spec <ID> --tier 1`
+writes the same eight headings:
+
+```markdown
+# <FAMILY-slug-seq> — <title>
+
+**Status:** OPEN · rev-1 · YYYY-MM-DD · node <tag> · Tier-1 · base <sha8> · streams <value>
+
+## 1. Goal
+
+What changes and why, in one or two sentences.
+
+## 2. Scope (IN)
+
+- **S1** — What this unit builds, verifiable at done. Observed by AC1.
+
+## 3. Non-goals (OUT)
+
+What an eager builder might include but must not.
+
+## 4. Design
+
+How it works, in a few sentences.
+
+### Files touched (estimate)
+
+`<path>`
+
+## 5. Acceptance criteria
+
+- **AC1** — When `<command>` runs, <the observable result>.
+  Red when: <the break that turns it red>.
+
+## 6. Gates
+
+`<leg>`
+
+## 7. Open questions
+
+none
+
+## 8. Revision log
+
+- rev-1 · YYYY-MM-DD · initial draft.
+```
 
 ## §3 Edges — what this unit takes, and what it leaves
 
