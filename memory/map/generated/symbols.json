@@ -9088,11 +9088,6 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
-      "id": "modelines",
-      "kind": "function",
-      "file": "tools/check-wiring.test.sh"
-    },
-    {
       "id": "module_inventory",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -9291,11 +9286,6 @@
       "id": "offendingLines",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
-    },
-    {
-      "id": "oids",
-      "kind": "function",
-      "file": "tools/check-wiring.test.sh"
     },
     {
       "id": "ok",
@@ -11138,6 +11128,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "read_hook_oids",
+      "kind": "function",
+      "file": "tools/check-wiring.test.sh"
+    },
+    {
       "id": "read_hooked_journal",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -11431,6 +11426,11 @@
       "id": "read_mode",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "read_mode_lines",
+      "kind": "function",
+      "file": "tools/check-wiring.test.sh"
     },
     {
       "id": "read_model_counts",
