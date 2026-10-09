@@ -2129,6 +2129,13 @@ n=$((n+1))
 outb=$(cd "$A" && bash "$SCRIPT" 2>/dev/null)
 grep -qF 'ARCH-tMoved-1' <<<"$outb" \
   || { echo "FAIL check 14 did NOT flag a rotated id whose archive is present-but-unstaged — the corpus is git ls-files, so that id has no definition and this is the one state where rotation really does orphan"; st=1; }
+# ---- TOOL-dHomedResolver-2: in the SAME half-staged state check 9's generator refuses, and the
+# ---- refusal names the archive and the remedy. At 5a836bf0 it reported drift and offered
+# ---- `--write`, which is the one act that renders the moved rows' absence into every README.
+n=$((n+1))
+c9b=$(cblock "$outb" 9)
+{ grep -qF 'memory/archive/ARCH.2026-08-01.md' <<<"$c9b" && grep -qF 'git add' <<<"$c9b"; } \
+  || { echo "FAIL check 9 did not name the unstaged archive and its remedy — a build index derived from git ls-files reads every moved row as deleted, and the generator must refuse rather than offer --write"; st=1; }
 
 # ---- TOOL-dHomedResolver-1: check 10 resolves a stem at its DECLARED HOME, never by a basename
 # ---- search. Found by inCMS core on 2026-10-09: two build-folder ledgers named DECISIONS.md made
@@ -3765,7 +3772,9 @@ esac
 # never skipped, because that fixture needs no sibling kit.
 # RAISED 542 -> 546 by TOOL-dHomedResolver-1: its four check-10 declared-home arms over the
 # `homed` fixture, each top-level and never skipped.
-FLOOR_ASSERTIONS=546
+# RAISED 546 -> 547 by TOOL-dHomedResolver-2: its check-9 refusal arm over the `rotarchive`
+# fixture's half-staged state, top-level and never skipped.
+FLOOR_ASSERTIONS=547
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

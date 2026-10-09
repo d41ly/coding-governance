@@ -248,7 +248,10 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    DERIVED from each build's README front matter (`slug node opened streams roster ids [status]`, at
    column 0, opening at line 1) plus every `**Status:**` header under its `spec/`. A build with no
    README, an unpaired generated-region marker, or two answers to its own status is a NAMED error.
-   Pin the generated files `eol=lf` in `.gitattributes` — the gate byte-compares them.
+   Pin the generated files `eol=lf` in `.gitattributes` — the gate byte-compares them. While any
+   file under `archive/` is untracked, `--check` and `--write` both REFUSE and name it: the index
+   reads `git ls-files`, so a half-staged rotation's moved rows look deleted. Stage the archive
+   first (`TOOL-dHomedResolver-2`).
 10. **rotation note** — every rotated `archive/<STEM>.<date><suffix?>.md` is referenced from its live index, which is resolved at the stem's DECLARED HOME —
     `DECISIONS.md` at the memory root, `backlog/<FAMILY>.md` for a family — and never by searching
     for a file of that name, so a build file that shares a stem's name is not consulted

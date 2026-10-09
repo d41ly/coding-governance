@@ -2284,7 +2284,40 @@ def plan(root: str, conf: dict, create_missing: bool = False, resolve=None) -> t
 
 
 # -------------------------------------------------------------------------------------------- modes
+def check_archives_tracked(root: str, conf: dict) -> None:
+    """Raise when a file under `<MEMORY_ROOT>/archive/` is UNTRACKED. TOOL-dHomedResolver-2.
+
+    Every artifact this module renders derives from `git ls-files`, so a rotation whose archive is
+    not yet staged reads as a deletion: the moved rows' ids look gone, and `--write` re-renders every
+    README citing one. inCMS core did exactly that on 2026-10-09 — seventeen unrelated build
+    READMEs and LIVE.md, rendered over a half-staged rotation, and no line said why. With the
+    archive staged the same render changed nothing. So both verbs refuse, `--check` included: its
+    own remedy line is `--write`, the one act that would do the damage.
+
+    WHAT THIS DOES NOT CHECK. An IGNORED file under the archive folder: git will not stage it, so a
+    refusal would have no remedy. An untracked file ANYWHERE ELSE under the memory root: an unstaged
+    spec draft is ordinary work in progress, and refusing it would make `--write` unusable
+    mid-build. A rotation that MOVED rows into a TRACKED archive and deleted nothing is not this
+    guard's business either; it is a rotation, and the render is right to follow it.
+
+    The git call's exit is asserted by `run()`, so a failed listing raises rather than reading as an
+    empty one — a guard that cannot list the folder must not report it clean.
+    """
+    m = conf["MEMORY_ROOT"]
+    out = run("git", "ls-files", "--others", "--exclude-standard", "--", f"{m}/archive/", cwd=root)
+    untracked = sorted(p for p in out.split("\n") if p)
+    if untracked:
+        listed = "\n".join(f"    {p}" for p in untracked)
+        raise Problem(
+            f"REFUSED — {len(untracked)} file(s) under {m}/archive/ are untracked, and every "
+            f"artifact here derives from git ls-files, so a row moved into one reads as deleted "
+            f"and a render would rewrite every README citing it:\n{listed}\n"
+            f"Stage the archive first — git add {' '.join(untracked)} — then re-run. Nothing was "
+            f"written.")
+
+
 def cmd_check(root: str, conf: dict) -> int:
+    check_archives_tracked(root, conf)
     artifacts, orphans, unmanaged, verdicts, guarded = plan(root, conf)
     bad = []
     for rel, want in sorted(artifacts.items()):
@@ -2461,6 +2494,7 @@ def cmd_survey(root: str, conf: dict) -> int:
 
 
 def cmd_write(root: str, conf: dict) -> int:
+    check_archives_tracked(root, conf)
     artifacts, orphans, unmanaged, verdicts, guarded = plan(root, conf, create_missing=True)
     for rel, text in sorted(artifacts.items()):
         write_text(os.path.join(root, rel), text)
@@ -3751,6 +3785,40 @@ def cmd_selftest() -> int:
             "Ids no record names:", ["TOOL-dLongSlugHere-%d" % n for n in range(40)])) <= IDS_WRAP + 1))
 
     with tempfile.TemporaryDirectory() as base:
+        # TOOL-dHomedResolver-2 — A HALF-STAGED ROTATION IS REFUSED, by --write and by --check.
+        # Every artifact derives from `git ls-files`, so a row moved into an archive nobody has
+        # staged reads as deleted. inCMS core ran --write in exactly that state on 2026-10-09 and
+        # seventeen unrelated build READMEs plus LIVE.md were re-rendered, with no line saying why.
+        # The tree is rendered and committed FIRST, so the only thing the arms below can be
+        # reacting to is the untracked archive; at 5a836bf0 both verbs ran over it in silence.
+        th = os.path.join(base, "halfstaged"); os.makedirs(th)
+        conf_h = _fixture(th, spec_status="INPROGRESS")
+        _read_mode(cmd_write, th, conf_h)
+        run("git", "add", "-A", cwd=th)
+        run("git", "commit", "-q", "-m", "rendered", "--no-verify", cwd=th)
+        os.makedirs(os.path.join(th, "memory", "archive"))
+        arch_h = os.path.join(th, "memory", "archive", "DECISIONS.2026-08-02.md")
+        write_text(arch_h, "# rotated\n\n- ARCH-tOne-1 · a row this rotation moved here\n")
+        readme_h = os.path.join(th, "memory", "builds", "tOne", "README.md")
+        before_h = read_text(readme_h)
+        arm("--write REFUSES while a file under the archive folder is untracked, and names it",
+            "memory/archive/DECISIONS.2026-08-02.md", lambda: _read_mode(cmd_write, th, conf_h))
+        arm("the --write refusal names its remedy, staging the archive first", "git add",
+            lambda: _read_mode(cmd_write, th, conf_h))
+        arm("a refused --write wrote nothing", "True", lambda: str(read_text(readme_h) == before_h))
+        arm("--check refuses with the same remedy instead of printing --write as one", "git add",
+            lambda: _read_mode(cmd_check, th, conf_h))
+        # THE IGNORED NEIGHBOUR. git will not stage an ignored file, so refusing one would be a
+        # refusal with no remedy. The positive is the rc: a guard that refused everything would
+        # pass every arm above and fail only this one.
+        os.remove(arch_h)
+        write_text(os.path.join(th, ".gitignore"), "memory/archive/*.scratch\n")
+        run("git", "add", ".gitignore", cwd=th)
+        run("git", "commit", "-q", "-m", "ignore", "--no-verify", cwd=th)
+        write_text(os.path.join(th, "memory", "archive", "notes.scratch"), "scratch\n")
+        arm("an IGNORED file under the archive folder is not refused", "rc=0",
+            lambda: f"rc={_read_mode(cmd_write, th, conf_h)[0]}")
+
         # AC5 — a build leaves LIVE.md when its units go terminal, with nothing edited by hand.
         t = os.path.join(base, "live"); os.makedirs(t)
         conf = _fixture(t, spec_status="INPROGRESS")

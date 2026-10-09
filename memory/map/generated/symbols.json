@@ -2938,6 +2938,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_archives_tracked",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "check_argv_of",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
