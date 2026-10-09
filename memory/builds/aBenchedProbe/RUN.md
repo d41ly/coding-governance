@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 2b26f187f03cc991edbf40b25550e6590e97d26e
-phase: RUNNING
+witness: de219c587207cbd2234e40d87abfe8f001f029ee
+phase: BUILDING
 branch-sha: 2b26f187f03cc991edbf40b25550e6590e97d26e
 branch-ref: refs/heads/branch/keen-chaplygin-6b0703
 may: none
@@ -31,3 +31,11 @@ anchor-ref: refs/heads/main
 base: 2b26f187f03cc991edbf40b25550e6590e97d26e
 
 ## Parked
+
+2026-10-09T18:06:41Z dispatch · item de219c58 TOOL-aBenchedProbe-1 · reason tools/govkit/entries/push-main.kit.toml tools/gate-legs.json tools/govkit/subject-pins.tsv memory/builds/aBenchedProbe/spec/2026-10-09-spec-TOOL-aBenchedProbe-1.md memory/builds/aBenchedProbe/build/2026-10-09-build-TOOL-aBenchedProbe-1-1-acceptance-ledger.md
+
+2026-10-09T18:07:43Z brief · item TOOL-aBenchedProbe-1 · reason 646acc691479 memory/builds/aBenchedProbe/prompts/2026-10-09-prompt-TOOL-aBenchedProbe-1-2-build-brief.md
+
+2026-10-09T18:17:22Z dispatch · item de219c58 TOOL-aBenchedProbe-1 · reason tools/govkit/entries/push-main.kit.toml tools/gate-legs.json tools/govkit/subject-pins.tsv memory/builds/aBenchedProbe/spec/2026-10-09-spec-TOOL-aBenchedProbe-1.md memory/builds/aBenchedProbe/build/2026-10-09-build-TOOL-aBenchedProbe-1-1-acceptance-ledger.md memory/builds/aBenchedProbe/README.md
+
+2026-10-09T18:21:35Z dispatch · item de219c58 TOOL-aBenchedProbe-1 · reason tools/govkit/entries/push-main.kit.toml tools/gate-legs.json tools/govkit/subject-pins.tsv memory/builds/aBenchedProbe/spec/2026-10-09-spec-TOOL-aBenchedProbe-1.md memory/builds/aBenchedProbe/build/2026-10-09-build-TOOL-aBenchedProbe-1-1-acceptance-ledger.md memory/builds/aBenchedProbe/README.md memory/guides/SESSION-KICKOFF.md

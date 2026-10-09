@@ -56,9 +56,10 @@ argv = []
 mutates_index = false
 why_no_adopter = "the hook is inert until the target points core.hooksPath at it, which is the wiring checker's job"
 
+# The three self-tests below are `kit`: each tests an engine file an adopter receives verbatim, self-tests run on demand only (owner, 2026-10-09), and the adopter's runner holds a `kit` leg unless GATE_SELFTESTS=1.
 [[gate_leg]]
 name = "push-main self-test"
-subject = "repo"
+subject = "kit"
 argv = ["bash", "{prefix}/push-main.test.sh"]
 guard = ["{prefix}/push-main.sh", ".githooks/"]
 
@@ -71,7 +72,7 @@ the self-test is this entry's gate leg and there is no rendered artifact to comp
 
 [[gate_leg]]
 name = "pre-push self-test"
-subject = "repo"
+subject = "kit"
 argv = ["bash", ".githooks/pre-push.test.sh"]
 guard = [".githooks/"]
 
@@ -80,7 +81,7 @@ guard = [".githooks/"]
 # ships so an adopter can retire its own copy: NicoCares carried the original.
 [[gate_leg]]
 name = "pre-push bar self-test"
-subject = "repo"
+subject = "kit"
 argv = ["python3", ".githooks/pre_push_bar_selftest.py"]
 guard = [".githooks/"]
 

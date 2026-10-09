@@ -62,13 +62,13 @@ ids DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 TOOL-aBenchedProbe-1 TOOL-aBenched
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBenchedProbe-1 — the three hook self-tests are declared `subject = "kit"`](spec/2026-10-09-spec-TOOL-aBenchedProbe-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aBenchedProbe-1 — the three hook self-tests are declared `subject = "kit"`](spec/2026-10-09-spec-TOOL-aBenchedProbe-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-09 |
 | [TOOL-aBenchedProbe-2 — run-gates' held-count summary names its predicate](spec/2026-10-09-spec-TOOL-aBenchedProbe-2.md) | 1 | 1 | OPEN | rev-1 | 2026-10-09 |
 | [DEPL-aBenchedProbe-1 — govkit selfcheck reds a descriptor self-test leg whose subject is not `kit`](spec/2026-10-09-spec-DEPL-aBenchedProbe-1.md) | 2 | 1 | OPEN | rev-1 | 2026-10-09 |
 | [DEPL-aBenchedProbe-2 — a descriptor leg's `ceiling` travels into the adopter's manifest](spec/2026-10-09-spec-DEPL-aBenchedProbe-2.md) | 3 | 2 | OPEN | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 2 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
