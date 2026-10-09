@@ -340,7 +340,7 @@ def derive_node_table(root: Path, _a: dict, _e: Path | None = None) -> str:
     over = resolve_node_overrides(root, {r['tag'] for r in fleet})
     checkout = Path(derive_primary_tree(root, _a)).name
 
-    def cell(text: str) -> str:
+    def render_cell(text: str) -> str:
         return text.replace('|', r'\|')
     out = ['| Tag | Machine/user | Primary tree | Worktree root | Variances |',
            '|-----|--------------|--------------|---------------|-----------|']
@@ -351,8 +351,8 @@ def derive_node_table(root: Path, _a: dict, _e: Path | None = None) -> str:
         primary = o.get('primary_tree') or f'{r["projects_root"].rstrip("/")}/{checkout}'
         worktrees = o.get('worktree_root') or f'{primary}/.claude/worktrees'
         variances = o.get('variances') or r.get('variances', '').strip() or 'none recorded'
-        out.append(f'| `{r["tag"]}` | `{cell(ident)}` | `{cell(primary)}` | `{cell(worktrees)}` '
-                   f'| {cell(variances)} |')
+        out.append(f'| `{r["tag"]}` | `{render_cell(ident)}` | `{render_cell(primary)}` | `{render_cell(worktrees)}` '
+                   f'| {render_cell(variances)} |')
     return '\n'.join(out)
 
 
@@ -1117,7 +1117,7 @@ def run_selftest() -> int:
     def read_pairs(body: str) -> list:
         return re.findall(r'^\| `([a-z])` \| `([^`]*)`', body, re.M)
 
-    def tally(ok: bool, name: str, detail: str) -> None:
+    def check_arm(ok: bool, name: str, detail: str) -> None:
         nonlocal passed, failed
         if ok:
             passed += 1
@@ -1129,7 +1129,7 @@ def run_selftest() -> int:
     two, e2 = build_node_render(build_fleet_text(fleet_rows), checkout='other-repo')
     three, e3 = build_node_render(build_fleet_text(fleet_rows[::-1]))
     want_pairs = [('a', 'ann @ HOSTA'), ('b', 'bob'), ('d', 'dee @ HOSTD')]
-    tally(read_pairs(one) == read_pairs(two) == read_pairs(three) == want_pairs
+    check_arm(read_pairs(one) == read_pairs(two) == read_pairs(three) == want_pairs
           and '`C:/p/repo-one`' in one and '`C:/p/other-repo`' in two and r'quirk \| piped' in one,
           'one fleet renders the same (tag, identity) pairs in every repository and row order',
           f'errors {e1, e2, e3}; pairs {read_pairs(one)} / {read_pairs(two)} / {read_pairs(three)}')
@@ -1140,16 +1140,16 @@ def run_selftest() -> int:
             ('a two-letter tag', fleet_rows + [('ab', 'zed', 'Z', 'C:/p', '')],
              'not one lowercase letter')):
         _b, err = build_node_render(build_fleet_text(rows))
-        tally(err is not None and want in err, f'the fleet refuses {name}', f'got {err!r}')
+        check_arm(err is not None and want in err, f'the fleet refuses {name}', f'got {err!r}')
     body, err = build_node_render(build_fleet_text(fleet_rows), '\n[nodes.b]\nvariances = "x"\n')
-    tally(err is None and '| `b` | `bob` | `/home/bob/src/repo-one` | '
+    check_arm(err is None and '| `b` | `bob` | `/home/bob/src/repo-one` | '
           '`/home/bob/src/repo-one/.claude/worktrees` | x |' in body and r'quirk \| piped' in body,
           'a [nodes.<tag>] override moves its one cell and no other row', f'{err!r} {body!r}')
     for name, tail, want in (('a tag the fleet lacks', '\n[nodes.q]\nvariances = "x"\n',
                               'does not hold'),
                              ('an unknown key', '\n[nodes.b]\ncolour = "x"\n', 'only primary_tree')):
         _b, err = build_node_render(build_fleet_text(fleet_rows), tail)
-        tally(err is not None and want in err, f'[nodes] refuses {name}', f'got {err!r}')
+        check_arm(err is not None and want in err, f'[nodes] refuses {name}', f'got {err!r}')
     with tempfile.TemporaryDirectory() as td:
         eng = Path(td)
         (eng / FLEET_NAME).write_text(build_fleet_text(fleet_rows), encoding='utf-8')
@@ -1166,7 +1166,7 @@ def run_selftest() -> int:
             installed = 'no refusal'
         except Refusal as e:
             installed = str(e)
-    tally(got == 'c' and rows_after == ['a', 'b', 'c', 'd'] and 'already holds' in again
+    check_arm(got == 'c' and rows_after == ['a', 'b', 'c', 'd'] and 'already holds' in again
           and 'INSTALLED' in installed,
           'a claim takes the lowest free letter, once per identity, never in an installed copy',
           f'got {got!r} rows {rows_after} again {again!r} installed {installed!r}')
@@ -1187,7 +1187,7 @@ def run_selftest() -> int:
             out = io.StringIO()
             with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
                 rc = main(['--target', str(tgt), '--check'])
-        tally(rc == 0 and ('Node registry' in out.getvalue()) == want_note,
+        check_arm(rc == 0 and ('Node registry' in out.getvalue()) == want_note,
               f'the stale-registry note prints {"when" if want_note else "only when"} a registry '
               f'sits outside the region', f'rc {rc} out {out.getvalue()!r}')
 
