@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+landed-by: attended
+landed-derived: 08f1525446620737ab0b6253219e6654d21bdf09 3d05f1ead941385d5287b75093a851d9dcf5ffd1
 units-at-landing: TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3 TOOL-aQuotedBrief-4 TOOL-aQuotedBrief-5 TOOL-aQuotedBrief-6
 hold-run: 
 hold-streak: 1 · at 26da990a
@@ -23,8 +25,8 @@ gates-run: unattended-179155605568707916595-3569156 fa3d3e0a
 parked-surfaced: 1
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 26da990ac0dc89bdb3a5e0195fa2c14bcca8edb7
-phase: HELD
+witness: 08f1525446620737ab0b6253219e6654d21bdf09
+phase: LANDED
 may: none
 mode: slug
 run-branch: refs/heads/branch/unattended-build-template-5f7d7d
