@@ -22,8 +22,8 @@ gates-run: unattended-179153003762917425227-2416772 75ee33ec
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 3ab0d60cfa255d6193b3245c2405c8f095f49475
-phase: HELD
+witness: f9e1b3d8f8c4ccb7fd186a76061b1216a2c2aa1c
+phase: VERIFYING
 branch-sha: 11224126c2e48935ee3cc2e802bd3099c0f225fe
 branch-ref: refs/heads/branch/unattended-kit-slug-mode-e3ba61
 may: none
@@ -31,12 +31,12 @@ mode: prompt
 run-branch: refs/heads/branch/unattended-kit-slug-mode-e3ba61
 anchor-kind: run-branch
 cli-version: 2.1.293
-lease-utc: 2026-10-09T01:37:27Z
+lease-utc: 2026-10-09T16:50:12Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 27420
 session: 8214b73e-f512-40f8-b204-27abe7b24f72
-keepalive: 511a5962
+keepalive: 04e9f438
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 6473ae38a517a3559f2b7daed67a9820c505bd4d
 anchor-ref: refs/heads/main
@@ -85,3 +85,5 @@ base: 11224126c2e48935ee3cc2e802bd3099c0f225fe
 2026-10-09T09:08:43Z hold · item host-degraded · reason until probe host · reaped 511a5962 · resume unattended-resume-ahomedanchor
 
 2026-10-09T16:36:57Z decision · item land without a bar on the reconciled HEAD? · reason options: run the bar first, or land over the close's 62/63-green bar whose one red leg was HOST-attributed; the owner chose to skip the bar and land (2026-10-09)
+
+2026-10-09T16:52:10Z resume · item aHomedAnchor · reason held · keepalive 04e9f438 · manual
