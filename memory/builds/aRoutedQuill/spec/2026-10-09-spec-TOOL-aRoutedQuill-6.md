@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-6 — routed against raw: a paired trial on frozen clones of real repositories
 
-**Status:** SPECCED · rev-5 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams tooling · order 6 · ratified 2026-10-09
+**Status:** DEFERRED · rev-5 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams tooling · order 6 · advances TOOL-aRoutedQuill-8 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 

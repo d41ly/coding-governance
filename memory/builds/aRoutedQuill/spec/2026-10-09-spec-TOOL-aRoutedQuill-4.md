@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-4 — every subagent starts holding the card's route, stated as facts
 
-**Status:** SPECCED · rev-5 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
+**Status:** INPROGRESS · rev-5 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 

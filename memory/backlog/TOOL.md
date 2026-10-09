@@ -240,6 +240,7 @@ Cite ids, never line numbers.
 | [TOOL-aReplayedCard-18](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | TOOL-aReplayedCard-2's AC9 — one forced compaction in a session started… |
 | [TOOL-aResumedRelay-1](../builds/aResumedRelay/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | the lexicon VERB table needs a CURATION PASS over the deployer's… |
 | [TOOL-aRootedPrefix-3](../builds/aRootedPrefix/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-09 | hygiene checks 6/7 measure RAW working-tree bytes, so an adopter… |
+| [TOOL-aRoutedQuill-8](../builds/aRoutedQuill/BACKLOG.md) | DEFERRED | MED | TOOL-aRoutedQuill-6 | 2026-10-10 | run the routed-against-raw trial TOOL-aRoutedQuill-6 specifies, in an… |
 | [TOOL-aScannedThrottle-3](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | ZERO Defender exclusions are confirmed on node a (Get-MpPreference… |
 | [TOOL-aScannedThrottle-4](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | HVCI/VBS is ON and ENFORCING on node a (Win32_DeviceGuard… |
 | [TOOL-aScannedThrottle-5](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | run-gates canary (466-587s in-bar, 317s standalone, 10-11% of… |
