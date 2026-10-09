@@ -1,12 +1,13 @@
 # TOOL-aFrugalTurnstile-2 — pre-push records the green of the bar it ran, and a push whose tree carries one runs nothing
 
-**Status:** OPEN · rev-2 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 2 · ratified 2026-10-09
+**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 2 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
+| [2026-10-09-build-TOOL-aFrugalTurnstile-2-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
@@ -62,8 +63,9 @@ pays a second full bar because nothing records a green by tree and by bar.
     relation;
   - kind: a runner stamp, or a bar record of kind `full`, covers outright; a bar record of kind
     `scoped` covers only when this push's own decision is scoped and its `base` equals the base that
-    decision adopted, `inh_sha` when an inherited green was adopted, else `rec_sha`. A FULL decision
-    is covered by no scoped record.
+    decision adopted, `inh_sha` when an inherited green was adopted, else `rec_sha`; where the
+    decision adopted a `kind scoped` bar record (S3b), that record's own `base` counts as adopted too
+    (rev-3). A FULL decision is covered by no scoped record.
   Observed by AC2, AC3, AC6, AC7, AC8, AC9, AC10.
 - **S3b — a bar record is a candidate for the scoped path too (rev-2, design §6 rev D4/D11).** After
   the runner-stamp candidates in the loop at ~1301 (and for a non-runner bar, in their place, per
@@ -156,6 +158,7 @@ failure only.
 |---|---|---|
 | `write_bar_green` | function | `sh.function`, `python tools/lexicon/lexicon.py --suggest` answered OK |
 | `check_cover_record` | function | `sh.function`, answered OK |
+| `read_bar_file`, `check_bar_record`, `check_bar_base`, `check_green_manifest` | function (rev-3) | `sh.function`, answered OK |
 | `gate-bar-green`, `gate-bar-green.shared` | git-dir record | none |
 | `covered` | run-log decision value | none |
 
@@ -304,6 +307,13 @@ S1 splits with `read -ra`.
   records cover-only, which left every wrapper-bar adopter's in-place landing FULL because the close
   commit moves the tree (this spec's F1); resolved by TOOL-aFrugalTurnstile-9 F2 option (b), design
   §6 rev D4/D11.
+- rev-3 · 2026-10-09 · build pass. What disagreed: S3's kind rule compared a scoped record's base with
+  `rec_sha` only, so once S3b adopts a `kind scoped` bar record at M, a re-push of M's own tree was
+  refused cover because the record's base B is not M; the adopted record's base now counts as adopted
+  too. The predicate-7 manifest rule moved into `check_green_manifest` so S3 calls it rather than
+  re-spelling it, and S3b's reader and search are three named functions (Inventory). The writer also
+  declines, each with its own line, a kind that is neither `full` nor `scoped`, a bar holding a tab
+  or newline (it would forge record keys), an unreadable tree and an unwritable record.
 
 ## 10. Reuse audit
 

@@ -20,6 +20,11 @@
 # REPORTS a divergence as a `note` (TOOL-aWeldedTribunal-7). It reports; it does not prevent.
 # (The WIRE-INTO-PROJECT.md copy-install path reintroduces the drift a second way; the same check
 # covers it, since it compares whatever core.hooksPath resolves to.)
+#
+# COVERED DOES NOT RE-GRADE HISTORY: a push whose tip tree equals the tree a recorded green graded
+# runs no leg, so a leg that reads history rather than the tree (one the manifest marks impure) is not
+# graded over the pushed commits; a declared post-merge bar grades it. (TOOL-aFrugalTurnstile-2; see
+# THE COVER PASS.)
 set -u
 
 # ---- S2 (TOOL-dScrubbedConduit-1): SCRUB THE ENVIRONMENT GIT INJECTS INTO THIS HOOK ---------------
@@ -1184,7 +1189,42 @@ green_label() { # candidate index -> how the decision line names it
                                           *) printf "the common dir's gate-full-green" ;; esac ;;
   esac
 }
-rec_from=""
+rec_from=""; rec_word="full green"; rec_base=""
+
+# THE BAR'S OWN GREEN, BY TREE (TOOL-aFrugalTurnstile-2, design D3/D4). `gate-bar-green` is what
+# `write_bar_green` below records when THIS hook's bar exits green, whichever bar it was, so a bar that
+# is not the runner has a record too: the runner stamps above prove only the runner's legs. Three
+# places, in the runner stamps' order and for their reason.
+bar_candidates=("$gd/gate-bar-green"); bar_labels=("this git dir's gate-bar-green")
+if [ -n "$_gcd_abs" ]; then
+  if [ "$_gcd_abs" != "$_gd_abs" ]; then
+    bar_candidates+=("$_gcd_abs/gate-bar-green"); bar_labels+=("the common dir's gate-bar-green")
+  fi
+  bar_candidates+=("$_gcd_abs/gate-bar-green.shared"); bar_labels+=("the common dir's gate-bar-green.shared")
+fi
+# read_bar_file <path> — every key a `gate-bar-green` record or a runner stamp carries, by builtins
+# alone, so a candidate costs no process. Each is empty when the file or the key is absent.
+read_bar_file() {
+  local k v
+  bg_sha=""; bg_tree=""; bg_bar=""; bg_kind=""; bg_base=""; bg_st=""; bg_run=""; bg_by=""
+  bg_fp=""; bg_blob=""; bg_man=""
+  [ -f "$1" ] || return 0
+  while IFS=$'\t' read -r k v; do
+    case "$k" in
+      sha) bg_sha=$v ;; tree) bg_tree=$v ;; bar) bg_bar=$v ;; kind) bg_kind=$v ;; base) bg_base=$v ;;
+      selftests) bg_st=$v ;; run_id) bg_run=$v ;; by) bg_by=$v ;;
+      fingerprint) bg_fp=$v ;; manifest_blob) bg_blob=$v ;; manifest) bg_man=$v ;;
+    esac
+  done < "$1"
+}
+
+# check_green_manifest <manifest path> <label> — TOOL-aFrugalTurnstile-1's manifest rule, one copy
+# for predicate 7 and the cover pass. Sets `force`, empty when the record ran this kit's manifest.
+check_green_manifest() {
+  force=""
+  [ "${1:-${KP}gate-legs.json}" = "${KP}gate-legs.json" ] && return 0
+  force="the recorded $2 was earned on the leg manifest $1, and the bar this push runs reads ${KP}gate-legs.json"
+}
 
 # PREDICATES 2 TO 8, ONE FUNCTION, TWO RECORDS (TOOL-dDerivedDocket-24). They were inline and read
 # the full green's fields; the inherited green below must pass exactly the same seven, so the seven
@@ -1192,8 +1232,14 @@ rec_from=""
 # only thing that differs, and it is spelled `full green` for the full green, so every message that
 # record printed before is byte-identical. Sets `force` to the first predicate the record fails, or
 # empty, and `lag` to its distance behind the tip.
-check_green_record() { # sha · fingerprint · manifest blob · manifest path · selftests · label
+# A `gate-bar-green` record passes the same function with its tree and bar as two more arguments
+# (TOOL-aFrugalTurnstile-2 S3b): predicate 4 then compares its `tree` with the tree at its sha, both
+# non-empty, and predicate 7 its `bar` with the bar this push runs, byte for byte. 2, 3, 5, 6 and 8 hold
+# unchanged, because they speak about the sha and the push, not about which program graded it.
+check_green_record() { # sha · fingerprint · manifest blob · manifest path · selftests · label · [tree · bar]
   local r_sha=$1 r_fp=$2 r_blob=$3 r_man=${4:-${KP}gate-legs.json} r_st=$5 label=$6 p2 fresh now_blob
+  local r_tree=${7-} r_bar=${8-} bar_mode="" now_tree
+  [ $# -ge 8 ] && bar_mode=1
   force=""; lag=0
   # 2. the recorded green is not an ancestor of what is being pushed, so it describes another line of
   #    history entirely.
@@ -1211,7 +1257,15 @@ check_green_record() { # sha · fingerprint · manifest blob · manifest path ·
   #    on every push whose tree had moved, which is exactly the population predicates 2 and 3 already
   #    admit — it would force full forever while reading as caution. The helper is CALLED, never
   #    reimplemented: two implementations of one digest disagree silently and then force forever.
-  if [ -n "$r_fp" ] && [ -x "$kitfp" ]; then
+  if [ -n "$bar_mode" ]; then
+    now_tree=$(git rev-parse -q --verify "$r_sha^{tree}" 2>/dev/null)
+    if [ -z "$r_tree" ] || [ -z "$now_tree" ]; then
+      force="the recorded $label's tree or the tree at ${r_sha:0:8} could not be read"; return 0
+    fi
+    if [ "$r_tree" != "$now_tree" ]; then
+      force="the recorded $label names tree ${r_tree:0:8} and ${r_sha:0:8} holds ${now_tree:0:8}"; return 0
+    fi
+  elif [ -n "$r_fp" ] && [ -x "$kitfp" ]; then
     fresh=$(bash "$kitfp" "$r_sha" 2>/dev/null)
     if [ -n "$fresh" ] && [ "$fresh" != "$r_fp" ]; then
       force="the recorded tree fingerprint does not reproduce at ${r_sha:0:8}"; return 0
@@ -1242,8 +1296,12 @@ check_green_record() { # sha · fingerprint · manifest blob · manifest path ·
   #    runner inside a wrapper bar stamps a green of its own subset, and only the blob kept it out.
   #    WHAT THE MANIFEST PATH DOES NOT CHECK: that the recorded path held these bytes when the stamp was
   #    written. The blob compare below checks that; the path only says which manifest the blob belongs to.
-  if [ "$r_man" != "${KP}gate-legs.json" ]; then
-    force="the recorded $label was earned on the leg manifest $r_man, and the bar this push runs reads ${KP}gate-legs.json"; return 0
+  if [ -n "$bar_mode" ]; then
+    if [ "$r_bar" != "$gate" ]; then
+      force="the recorded $label was earned by bar '$r_bar' and this push runs '$gate'"; return 0
+    fi
+  else
+    check_green_manifest "$r_man" "$label"; [ -n "$force" ] && return 0
   fi
   if [ -n "$r_blob" ]; then
     now_blob=$(git hash-object -- "${KP}gate-legs.json" 2>/dev/null)
@@ -1262,6 +1320,50 @@ check_green_record() { # sha · fingerprint · manifest blob · manifest path ·
     force="this push runs the kit self-tests and the recorded $label was earned with them HELD"; return 0
   fi
   return 0
+}
+
+# check_bar_record <path> — whether a `gate-bar-green` record is adoptable as this push's scoped
+# base (TOOL-aFrugalTurnstile-2 S3b). Sets `force` to its first failure or empty, `lag`, and bg_* to
+# that record. A `kind scoped` record at M is adoptable only on a base B that is itself a full green
+# this push would adopt, and `lag` is then B's: M's own lag is checked too, which can only refuse more,
+# so a chain of scoped records never stands further from a full green than the bound.
+check_bar_record() {
+  read_bar_file "$1"
+  force=""; lag=0
+  if [ -z "$bg_sha" ]; then force="it names no sha"; return 0; fi
+  case "$bg_kind" in
+    full|scoped) ;;
+    *) force="its kind reads '${bg_kind:-none}', neither full nor scoped"; return 0 ;;
+  esac
+  check_green_record "$bg_sha" "" "" "" "$bg_st" "$bg_kind bar green" "$bg_tree" "$bg_bar"
+  [ -z "$force" ] && [ "$bg_kind" = scoped ] && check_bar_base "$bg_base"
+  return 0
+}
+
+# check_bar_base <sha> — `force` empty, and `lag` counted from <sha>, when a runner stamp (for the
+# runner's bar only, TOOL-aFrugalTurnstile-1 S6) or a `kind full` bar record names exactly that sha and
+# passes predicates 2 to 8. The readers write LOCAL copies here, so the caller's record is kept.
+check_bar_base() {
+  local want=$1 f found=""
+  local bg_sha bg_tree bg_bar bg_kind bg_base bg_st bg_run bg_by bg_fp bg_blob bg_man
+  if [ -z "$want" ]; then force="it is a scoped green that names no base"; return 0; fi
+  if [ "$bar_record" = runner ]; then
+    for f in "${green_candidates[@]}"; do
+      read_bar_file "$f"
+      [ "$bg_sha" = "$want" ] || continue
+      check_green_record "$bg_sha" "$bg_fp" "$bg_blob" "$bg_man" "$bg_st" "full green"
+      [ -z "$force" ] && return 0
+      found=$force
+    done
+  fi
+  for f in "${bar_candidates[@]}"; do
+    read_bar_file "$f"
+    [ "$bg_kind" = full ] && [ "$bg_sha" = "$want" ] || continue
+    check_green_record "$bg_sha" "" "" "" "$bg_st" "full bar green" "$bg_tree" "$bg_bar"
+    [ -z "$force" ] && return 0
+    found=$force
+  done
+  force="its base ${want:0:8} is no full green this push can adopt${found:+: $found}"
 }
 
 # ---- THE DOC CLASS, READ AT R — TOOL-dThriftyLanding-3 -----------------------------------------
@@ -1408,6 +1510,27 @@ if [ "$bar_record" = other ]; then
   inh_sha=""; inh_why=""
 fi
 
+# A BAR RECORD IS A CANDIDATE FOR THE SCOPED PATH TOO (TOOL-aFrugalTurnstile-2 S3b, design §6 rev
+# D4/D11), so a bar that is not the runner has a candidate again. Read only when nothing above was
+# adopted, so it can turn a FULL decision scoped and never the reverse, and only here, once the bar is
+# vetted, because a record is compared with the bar this push runs. A STUB bar keeps today's decision:
+# no record is ever written for one. The unattended in-place close commits its record on top of the
+# merge its bar graded, so that landing is not covered; it scopes from this record instead.
+if [ -n "$force" ] && [ -z "$inh_sha" ] && [ "$bar_record" != stub ]; then
+  _bar_force=$force; _bar_why=""
+  for _bi in "${!bar_candidates[@]}"; do
+    [ -f "${bar_candidates[$_bi]}" ] || continue
+    check_bar_record "${bar_candidates[$_bi]}"
+    if [ -z "$force" ]; then
+      rec_sha=$bg_sha; rec_from=${bar_labels[$_bi]}; rec_word="$bg_kind bar green"
+      [ "$bg_kind" = scoped ] && rec_base=$bg_base
+      _bar_force=""; _bar_why=""; break
+    fi
+    _bar_why="$_bar_why; ${bar_labels[$_bi]}: $force"
+  done
+  force=$_bar_force${_bar_force:+$_bar_why}
+fi
+
 # THE DEFAULT BAR WITH NO KIT ROOT — TOOL-aRepatriatedFork-24 S2, the owner's F1 (c). A commit hook
 # skips on a miss, because its legs are an early signal. This is the merge bar, so a push that cannot
 # find it and passes is the silent skip the unit exists to remove. It used to name the runner under
@@ -1475,6 +1598,90 @@ if [ -n "$_tree_dirty" ]; then
   write_refusal dirty-tree "$why"; RUNLOG_CLEAN=1; exit 1
 fi
 
+# ---- THE COVER PASS — TOOL-aFrugalTurnstile-2 S3/S4, design D4 -----------------------------------
+# A push whose tip TREE is the tree a recorded green graded, under this same bar, runs no bar at all:
+# every leg that bar ran read that tree, and the push carries it. After every refusal, so a dirty tree,
+# a refused bar and a head mismatch still refuse first; before the decision line, so a covered push
+# prints the covered line INSTEAD of a decision. Candidates: the runner stamps, for the runner's bar
+# only; then the bar records, for any bar but a STUB. The first that covers wins. A scoped record
+# covers only a scoped decision from its own base (rev-3: or from the base of the scoped record the
+# decision adopted). WHAT IT DOES NOT CHECK is the header's COVERED paragraph: legs that read history.
+# check_cover_record <runner|bar> <path> — `cover_why` empty when that record covers this push, else
+# its first failure; bg_* hold the record, and `_tip_tree` the pushed tree once read.
+_tip_tree=""; _tip_fp=""
+check_cover_record() {
+  local tip_blob force=""   # a LOCAL force: check_green_manifest must not clear the decision's own
+  read_bar_file "$2"
+  cover_why=""
+  [ -n "$_tip_tree" ] || _tip_tree=$(git rev-parse -q --verify "$main_local^{tree}" 2>/dev/null)
+  if [ -z "$bg_sha" ] || ! git merge-base --is-ancestor "$bg_sha" "$main_local" 2>/dev/null; then
+    cover_why="sha ${bg_sha:0:8} is not an ancestor of the pushed tip"; return 0
+  fi
+  if [ "$1" = bar ]; then
+    if [ -z "$bg_tree" ] || [ -z "$_tip_tree" ]; then
+      cover_why="its tree or the pushed tip's could not be read"; return 0
+    fi
+    if [ "$bg_tree" != "$_tip_tree" ]; then
+      cover_why="it graded tree ${bg_tree:0:8} and the pushed tip holds ${_tip_tree:0:8}"; return 0
+    fi
+    if [ "$bg_bar" != "$gate" ]; then
+      cover_why="it was earned by bar '$bg_bar' and this push runs '$gate'"; return 0
+    fi
+  else
+    [ -n "$_tip_fp" ] || { [ -x "$kitfp" ] && _tip_fp=$(bash "$kitfp" "$main_local" 2>/dev/null); }
+    if [ -z "$bg_fp" ] || [ -z "$_tip_fp" ]; then
+      cover_why="its tree or the pushed tip's could not be read"; return 0
+    fi
+    if [ "$bg_fp" != "$_tip_fp" ]; then
+      cover_why="it graded tree fingerprint ${bg_fp:0:8} and the pushed tip's is ${_tip_fp:0:8}"; return 0
+    fi
+    check_green_manifest "$bg_man" "full green"
+    if [ -n "$force" ]; then cover_why=$force; return 0; fi
+    tip_blob=$(git rev-parse -q --verify "$main_local:${KP}gate-legs.json" 2>/dev/null)
+    if [ -z "$bg_blob" ] || [ "$bg_blob" != "$tip_blob" ]; then
+      cover_why="its leg manifest blob ${bg_blob:0:8} is not the pushed tip's ${tip_blob:0:8}"; return 0
+    fi
+  fi
+  if [ -n "${GATE_SELFTESTS:-}" ] && [ "$bg_st" != 1 ]; then
+    cover_why="it was earned with the kit self-tests HELD and this push runs them"; return 0
+  fi
+  [ "$1" = bar ] && [ "$bg_kind" != full ] || return 0
+  if [ "$bg_kind" != scoped ]; then
+    cover_why="its kind reads '${bg_kind:-none}', neither full nor scoped"
+  elif [ -z "$_dec_base" ]; then
+    cover_why="it is a scoped green against base ${bg_base:0:8} and this push is FULL"
+  elif [ "$bg_base" != "$_dec_base" ] && { [ -z "$rec_base" ] || [ "$bg_base" != "$rec_base" ]; }; then
+    cover_why="it is a scoped green against base ${bg_base:0:8} and this push scopes from ${_dec_base:0:8}"
+  fi
+  return 0
+}
+_dec_base=""
+if [ -n "$inh_sha" ]; then _dec_base=$inh_sha; elif [ -z "$force" ]; then _dec_base=$rec_sha; fi
+_cov_from=""; _cov_why=""; _cov_bars=""
+if [ "$bar_record" = runner ]; then
+  for _gi in "${!green_candidates[@]}"; do
+    [ -f "${green_candidates[$_gi]}" ] || continue
+    check_cover_record runner "${green_candidates[$_gi]}"
+    if [ -z "$cover_why" ]; then _cov_from=$(green_label "$_gi"); bg_kind=full; bg_by=run-gates; break; fi
+    _cov_why="$_cov_why; $(green_label "$_gi"): $cover_why"
+  done
+fi
+if [ -z "$_cov_from" ] && [ "$bar_record" != stub ]; then
+  for _bi in "${!bar_candidates[@]}"; do
+    [ -f "${bar_candidates[$_bi]}" ] || continue
+    _cov_bars=1
+    check_cover_record bar "${bar_candidates[$_bi]}"
+    if [ -z "$cover_why" ]; then _cov_from=${bar_labels[$_bi]}; break; fi
+    _cov_why="$_cov_why; ${bar_labels[$_bi]}: $cover_why"
+  done
+fi
+if [ -n "$_cov_from" ]; then
+  echo "pre-push: covered on $def push (${main_local:0:8}) — tree ${_tip_tree:0:8} already carries a $bg_kind green: $_cov_from sha ${bg_sha:0:8} run ${bg_run:-none} by ${bg_by:-none} — bar: $bar_label — no bar runs"
+  { printf '%s\t%s\t%s\n' "$RUNLOG_BAR" "$bar_path" "$bar_blob" > "$PUSH_BAR"; } 2>/dev/null
+  RUNLOG_DECISION=covered; RUNLOG_CLEAN=1; exit 0
+fi
+[ -n "$_cov_bars" ] && echo "pre-push: not covered — ${_cov_why#; }"
+
 # THE DECISION AND ITS REASON, on one line, always. A boundary that silently chooses the cheap path
 # is indistinguishable from one that is broken, and this line is the only place the choice is
 # visible to the person whose push it is.
@@ -1491,7 +1698,7 @@ elif [ -n "$force" ]; then
   RUNLOG_DECISION=full
 else
   [ -n "$DOCS_ONLY" ] && export GATE_DOCS_BASE="$main_remote"
-  echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause full green ${rec_sha:0:8}${rec_from:+ from $rec_from} is ${lag:-0} first-parent landing(s) back, within $GATE_FULL_MAX_LAG — bar: $bar_label"
+  echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause $rec_word ${rec_sha:0:8}${rec_from:+ from $rec_from}${rec_base:+, counted from its base ${rec_base:0:8},} is ${lag:-0} first-parent landing(s) back, within $GATE_FULL_MAX_LAG — bar: $bar_label"
   export GATE_BASE="$rec_sha"
   RUNLOG_DECISION=scoped
 fi
@@ -1578,6 +1785,43 @@ check_verdict_record() {
   PP_NOT="the bar exited 0 and its run record reads verdict '${v:-none}', not GREEN"; return 1
 }
 
+# write_bar_green <git dir> <head before> <rc> <kind> <base> <bar> <run id> — the bar's own green, by
+# tree (TOOL-aFrugalTurnstile-2 S1, design D3). Writes `<git dir>/gate-bar-green` through a `.tmp`
+# rename only when the bar's own rc is 0, the kind is `full` or `scoped`, HEAD is still <head before>,
+# the tree is clean and its tree object reads; otherwise prints ONE line naming why and writes nothing.
+# From a linked worktree it is also copied to the common dir's `gate-bar-green.shared`, as the runner
+# shares its stamp. `bar_paths` is split with `read -ra`, never by toggling globbing: the bar self-test
+# anchors on the one glob toggle `check_bar_command` holds. Self-contained, so a slice of it runs alone.
+write_bar_green() {
+  local g=$1 h=$2 rc=$3 kind=$4 base=$5 bar=$6 run=$7 tree dirty w paths="" cdir cdir_abs g_abs
+  local -a words=()
+  local no="pre-push: no gate-bar-green written —"
+  if [ "$rc" != 0 ]; then echo "$no the bar's own verdict was red, and the push lands under INHERITED_RED=land"; return 0; fi
+  case "$kind" in full|scoped) ;; *) echo "$no the decision kind '$kind' is neither full nor scoped"; return 0 ;; esac
+  case "$bar" in *$'\t'*|*$'\n'*) echo "$no the bar's command holds a tab or a newline"; return 0 ;; esac
+  if [ "$(git rev-parse HEAD 2>/dev/null)" != "$h" ]; then echo "$no HEAD moved"; return 0; fi
+  if ! dirty=$(git status --porcelain --ignore-submodules=untracked 2>/dev/null) || [ -n "$dirty" ]; then
+    echo "$no the tree is not clean"; return 0
+  fi
+  tree=$(git rev-parse -q --verify "$h^{tree}" 2>/dev/null)
+  if [ -z "$tree" ]; then echo "$no the tree of ${h:0:8} could not be read"; return 0; fi
+  read -ra words <<<"$bar"
+  for w in "${words[@]}"; do case "$w" in */*|*.sh) paths="$paths${paths:+ }$w" ;; esac; done
+  if ! { printf 'sha\t%s\ntree\t%s\nbar\t%s\nbar_paths\t%s\nkind\t%s\nbase\t%s\nselftests\t%s\nrun_id\t%s\nby\tpre-push\nstamped\t%s\n' \
+           "$h" "$tree" "$bar" "$paths" "$kind" "$base" "${GATE_SELFTESTS:+1}" "$run" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+           > "$g/gate-bar-green.tmp" && mv -f "$g/gate-bar-green.tmp" "$g/gate-bar-green"; } 2>/dev/null; then
+    echo "$no $g/gate-bar-green could not be written"; return 0
+  fi
+  cdir=$(git rev-parse --git-common-dir 2>/dev/null) || cdir=""
+  cdir_abs=""; [ -n "$cdir" ] && cdir_abs=$(cd "$cdir" 2>/dev/null && pwd -P)
+  g_abs=$(cd "$g" 2>/dev/null && pwd -P) || g_abs=""
+  if [ -n "$cdir_abs" ] && [ -n "$g_abs" ] && [ "$cdir_abs" != "$g_abs" ]; then
+    cp "$g/gate-bar-green" "$cdir_abs/gate-bar-green.shared.tmp" 2>/dev/null \
+      && mv -f "$cdir_abs/gate-bar-green.shared.tmp" "$cdir_abs/gate-bar-green.shared" 2>/dev/null
+  fi
+  echo "pre-push: recorded gate-bar-green for ${h:0:8} — kind $kind${base:+ base ${base:0:8}} — bar: $bar"
+}
+
 # THE RUNNER'S ARM SEAMS DO NOT REACH THE BOUNDARY (TOOL-dDerivedDocket-26). `GATE_SPAWN_CMD`,
 # `GATE_SPAWN_FLOOR` and `GATE_VERDICT_FAULT` exist so the runner's own suites can stage a HOST verdict
 # or a refusal; inherited here, the environment of the push would choose how its own red is classified.
@@ -1614,6 +1858,7 @@ if [ "$rc" -eq 0 ]; then
       fi ;;
   esac
 fi
+_own_rc=$rc   # the bar's OWN verdict, before the inherited-red arm below can land it as 0 (S2)
 # A RED ON INHERITED LEGS ONLY LANDS UNDER `land`, and nowhere else (D12-i4), at any age since ruling
 # TOOL-dUnstuckLanding-22. The exit that follows is
 # still this hook's one exit, so the run log's decision stays the gate decision above; the landing is
@@ -1640,6 +1885,18 @@ else
     why="pre-push: refusing — HEAD moved from ${main_local:0:8} to ${_after:0:8} while the bar ran, so its green does not certify the tree being pushed."
     echo "$why" >&2
     write_refusal head-moved "$why"; RUNLOG_CLEAN=1; exit 1
+  fi
+  # THE GREEN IS RECORDED BY TREE (TOOL-aFrugalTurnstile-2 S2), on this hook's own green only. Never
+  # for the STUB, and never on a doc-only scoped push: that bar ran fewer legs than a scoped bar from the
+  # same base, which the record cannot say, so a later push of the same tree could be covered by more
+  # than was graded. Declining costs a saving, never a verdict.
+  if [ "$bar_record" = stub ]; then
+    echo "pre-push: no gate-bar-green written — the bar is the declared STUB"
+  elif [ -n "${GATE_DOCS_BASE:-}" ]; then
+    echo "pre-push: no gate-bar-green written — this push was scoped doc-only"
+  else
+    _bg_base=""; [ "$RUNLOG_DECISION" = scoped ] && _bg_base=${GATE_BASE:-}
+    write_bar_green "$gd" "$main_local" "$_own_rc" "$RUNLOG_DECISION" "$_bg_base" "$gate" "$RUNLOG_GATE_RUN"
   fi
 fi
 RUNLOG_CLEAN=1; exit "$rc"

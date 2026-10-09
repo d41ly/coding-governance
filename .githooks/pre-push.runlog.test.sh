@@ -30,7 +30,7 @@
 #   AC7   the writer adds no external exec, from a linked worktree and from a primary clone, both
 #         write the COMMON journal, and a clone's first push pays one mkdir
 #   AC8   this suite's own declarations: withheld, budgeted, a held leg with a ceiling, an exempt row
-#   DEC   the decisions AC1 does not reach: skip-delete, refuse-manifest, refuse-head, refuse-dirty,
+#   DEC   the decisions AC1 does not reach: skip-delete, refuse-manifest, refuse-head, refuse-dirty, covered,
 #         scoped, branch-gated, and the other two refusals before the loop
 #   CAP   a line over the cap is fitted exactly as the runlog kit's `render_line` fits it, both steps
 #   EXITS every `exit` in the hook maps to a decision or a named exemption, every one after the trap
@@ -49,7 +49,7 @@ SRC="$(cd "$HERE/.." && pwd)"
 # (TOOL-aRepatriatedFork-28), never a literal prefix typed here.
 KIT_REL=$( . "$SRC/.githooks/gate-env.sh" >/dev/null 2>&1; printf '%s' "${GOV_KITROOT:-}" )
 [ -n "$KIT_REL" ] || { echo "pre-push.runlog.test: .githooks/gate-env.sh declares no GOV_KITROOT"; exit 2; }
-FLOOR_ASSERTIONS=246
+FLOOR_ASSERTIONS=249
 n=0; st=0
 SEEN=" "; WRITER_FNS=""
 
@@ -694,6 +694,16 @@ check_dec_rest() {
   run_hook "$WORK/refs.bar" origin "$WORK/remote.git" GOV_GATE_CMD_TEST= GOV_GATE_CMD="bash tracked-bar.sh"
   l=$(measure_lines)
   check "DEC bar: a tracked bar is recorded as tracked" "$RC|$(read_field $l bar)" "0|tracked"
+  # COVERED (TOOL-aFrugalTurnstile-2 AC11): that green wrote gate-bar-green for this tree and bar, so
+  # the same push again runs no bar, still names the vetted bar for the lander, and ends clean.
+  run_hook "$WORK/refs.bar" origin "$WORK/remote.git" GOV_GATE_CMD_TEST= GOV_GATE_CMD="bash tracked-bar.sh"
+  l=$(measure_lines)
+  check "DEC covered: the push lands with no bar" "$RC|$(printf '%s\n' "$OUT" | grep -c 'pre-push: covered on main push')" "0|1"
+  check "DEC covered: decision" "$(read_field $l decision)|$(read_field $l exit)" "covered|clean"
+  check "DEC covered: pre-push-bar holds the vetted bar's three fields" \
+    "$(awk -F'\t' '{ print NF "|" $1 }' "$REPO/.git/pre-push-bar" 2>/dev/null)" "3|tracked"
+  [ "$(read_field $l decision)" = covered ] && add_seen covered
+  rm -f "$REPO/.git/gate-bar-green"
   run_hook "$WORK/refs.bar" origin "$WORK/remote.git" GOV_GATE_CMD_TEST= GOV_GATE_CMD=
   l=$(measure_lines)
   check "DEC bar: no override is recorded as the default bar" "$(read_field $l bar)" default
@@ -976,6 +986,7 @@ scan_exit_sites() { # file -> one TAB-separated row per shell exit
   printf '%s\t%s\t%s\n' 'write_refusal merge-loss "$why"; RUNLOG_CLEAN=1; exit 1' 1 'exempt: the merge-loss refusal, reachable only with a merge losing a definition under an armed .lexicon.conf, which this suite does not build; armed by pre-push.test.sh (TOOL-aMendedFleet-3)'
   printf '%s\t%s\t%s\n' 'write_refusal dirty-tree "$why"; RUNLOG_CLEAN=1; exit 1' 1 refuse-dirty
   printf '%s\t%s\t%s\n' 'write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1' 5 refuse-bar
+  printf '%s\t%s\t%s\n' 'RUNLOG_DECISION=covered; RUNLOG_CLEAN=1; exit 0' 1 covered
   printf '%s\t%s\t%s\n' 'write_refusal head-moved "$why"; RUNLOG_CLEAN=1; exit 1' 1 'full|scoped'
   printf '%s\t%s\t%s\n' 'RUNLOG_CLEAN=1; exit "$rc"' 2 'full|scoped|branch-gated'
 } > "$WORK/exits.tsv"
