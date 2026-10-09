@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-prompt-TOOL-aHomedAnchor-1-0-run-mandate.md](../prompts/2026-10-09-prompt-TOOL-aHomedAnchor-1-0-run-mandate.md) | journal | TOOL-aHomedAnchor-2 |
+| [2026-10-09-review-TOOL-aHomedAnchor-1-implementation-diff-round1.md](../reviews/2026-10-09-review-TOOL-aHomedAnchor-1-implementation-diff-round1.md) | diff-review | TOOL-aHomedAnchor-2 |
 
 <!-- /gen:spec-records -->
 

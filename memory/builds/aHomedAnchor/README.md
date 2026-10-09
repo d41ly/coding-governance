@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: tooling
 roster: TOOL
-ids: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2
+ids: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7
 authorized-by: prompt
 ---
 
@@ -54,25 +54,35 @@ None yet.
 |---|---|---|---|
 | 1 | `TOOL-aHomedAnchor-1` | 2 | the driver's third anchor: `ANCHOR_SCOPE="local"` resolves BASE from local history |
 | 2 | `TOOL-aHomedAnchor-2` | 2 | the bar leg admits a local-anchored BASE when origin's default branch declares `local` |
+| 3 | `TOOL-aHomedAnchor-3` | 1 | re-render the Skill (review round 1, HIGH id 7) |
+| 3 | `TOOL-aHomedAnchor-5` | 1 | an adopter arm proves the `local` render (HIGH id 28, M9) |
+| 4 | `TOOL-aHomedAnchor-4` | 1 | the pre-commit hook runs the wiring check on its inputs (HIGH id 17) |
+| 5 | `TOOL-aHomedAnchor-6` | 2 | the driver and doc minors, batched |
+| 5 | `TOOL-aHomedAnchor-7` | 2 | the leg minors, batched |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-10-09 · streams tooling
-ids TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2
+**Build status:** INPROGRESS · 7 unit(s) · node a · opened 2026-10-09 · streams tooling
+ids TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aHomedAnchor-1 — the driver's third anchor: `ANCHOR_SCOPE="local"` authorizes from local history](spec/2026-10-09-spec-TOOL-aHomedAnchor-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-10-09 |
 | [TOOL-aHomedAnchor-2 — the bar leg admits a local-anchored BASE when origin's default branch declares `local`](spec/2026-10-09-spec-TOOL-aHomedAnchor-2.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-3 — re-render the unattended Skill from its template](spec/2026-10-09-spec-TOOL-aHomedAnchor-3.md) | 3 | 1 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-5 — an adopter arm proves the render of `ANCHOR_SCOPE="local"`](spec/2026-10-09-spec-TOOL-aHomedAnchor-5.md) | 3 | 1 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-4 — the pre-commit hook runs the Skill wiring check when its inputs are staged](spec/2026-10-09-spec-TOOL-aHomedAnchor-4.md) | 4 | 1 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-6 — the closing review's driver and doc minors, batched](spec/2026-10-09-spec-TOOL-aHomedAnchor-6.md) | 5 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-7 — the closing review's leg minors, batched](spec/2026-10-09-spec-TOOL-aHomedAnchor-7.md) | 5 | 2 | OPEN | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7.
 
-Ids no `spec-audit` record has ever named: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2.
+Ids no `spec-audit` record has ever named: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -81,6 +91,9 @@ Ids no `spec-audit` record has ever named: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor
 |---|---|---|
 | 1 | `TOOL-aHomedAnchor-1` | no |
 | 2 | `TOOL-aHomedAnchor-2` | no |
+| 3 | `TOOL-aHomedAnchor-3`, `TOOL-aHomedAnchor-5` | yes |
+| 4 | `TOOL-aHomedAnchor-4` | no |
+| 5 | `TOOL-aHomedAnchor-6`, `TOOL-aHomedAnchor-7` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
