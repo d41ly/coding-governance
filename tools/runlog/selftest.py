@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""selftest.py — the runlog kit's arms. gov:kit runlog@1.9
+"""selftest.py — the runlog kit's arms. gov:kit runlog@1.10
 
     python <this kit>/selftest.py
 
