@@ -1,10 +1,12 @@
 # TOOL-aRoutedQuill-4 — every subagent starts holding the card's route, stated as facts
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-5 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
 
 <!-- /gen:spec-records -->
 
@@ -169,9 +171,9 @@ subagent has.
 ### Rollout
 
 Lands at order 4, after `TOOL-aRoutedQuill-2`, because both units edit `scratch-guard.js` and this
-one calls the readers that unit adds. Hooks are snapshotted at session start (Claude Code's
-documentation; UNVERIFIED on this node), so subagents receive the context from the first session
-after the merge. No kit version moves here: the hooks kit bumps once, after the build's last unit
+one calls the readers that unit adds. A settings edit is live on the next tool call
+(`memory/gotchas/settings-edit-takes-effect-mid-session.md`, measured 2026-08-10), so subagents
+spawned after the merge, in the landing session too, receive the context. No kit version moves here: the hooks kit bumps once, after the build's last unit
 touching it, and until then `govkit.py epoch` reports the move as owed at the lander.
 
 ### Files touched (estimate)
@@ -289,6 +291,8 @@ AC6 is a direct observation of this repository after the rewire and adds no arm.
 - rev-1 · 2026-10-09 · initial draft.
 - rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 3 to 4, because `KICK-aRoutedQuill-1` moved
   from order 1 to 2, which shifts every later step by one.
+- rev-3 · 2026-10-09 · §4 · Rollout corrected: hooks are re-read on the next tool call, per the
+  gotcha catalogue's measurement, so subagents get the context inside the landing session.
 
 ## 10. Reuse audit
 

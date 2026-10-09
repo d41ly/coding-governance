@@ -1,10 +1,12 @@
 # TOOL-aRoutedQuill-2 — scratch-guard refuses a product write no buildable unit on the card owns
 
-**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3 · ratified 2026-10-09
+**Status:** SPECCED · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
 
 <!-- /gen:spec-records -->
 
@@ -209,11 +211,13 @@ memory at `6473ae38` over gov's `.claude/settings.json`, the fragment lands in i
 
 ### Rollout
 
-Lands at order 3, after `TOOL-aRoutedQuill-1` at order 1 and `KICK-aRoutedQuill-1` at order 2. One commit carries the hook, the widened fragment, gov's
-re-merged `.claude/settings.json` and gov's `ROUTED_PATHS`, so gov is never wired and unarmed.
-Claude Code snapshots hooks at session start (its documentation; UNVERIFIED on this node), so
-enforcement begins at the first session after the merge. Every later session that writes product
-code needs a route, this build's own later units included. No kit version moves here: the hooks
+Lands at order 3, after `TOOL-aRoutedQuill-1` at order 1 and `KICK-aRoutedQuill-1` at order 2.
+One commit carries the hook, the widened fragment, gov's re-merged `.claude/settings.json` and gov's
+`ROUTED_PATHS`, so gov is never wired and unarmed. A settings edit is live on the NEXT tool call, not
+at the next session (`memory/gotchas/settings-edit-takes-effect-mid-session.md`, measured
+2026-08-10), so enforcement begins inside the session that lands this commit. That session, and
+every later one, needs a route on its card before its next product write, this build's own later
+units included. No kit version moves here: the hooks
 kit bumps once, after the build's last unit touching it, and until then `govkit.py epoch` reports
 the move as owed at the lander.
 
@@ -405,6 +409,8 @@ AC8 and AC9 are direct observations of this repository after the rewire and add 
   the Tier-1 admission fork unit 1 handed here.
 - rev-3 · 2026-10-09 · §4 · §8 · S3 · AC1 · owner resolves F2 (refuse an absent or replay-written
   card), F3 (a) and F4 (b): a Tier-1 spec admits at SPECCED only when `SPEC_TIER1_CUTOFF` graded it.
+- rev-4 · 2026-10-09 · §4 · Rollout corrected: hooks are re-read on the next tool call, per the
+  gotcha catalogue's measurement, so enforcement starts inside the landing session, not after it.
 
 ## 10. Reuse audit
 
