@@ -1,6 +1,6 @@
 # TOOL-aMeteredSweep-1 — every red of a full bar with self-tests on the reconciled main, fixed
 
-**Status:** OPEN · rev-6 · 2026-10-08 · node a · Tier-1 · base fa68a767 · streams tooling · order 1
+**Status:** CLOSED · rev-6 · 2026-10-08 · node a · Tier-1 · base fa68a767 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -15,6 +15,7 @@
 | [2026-10-08-build-TOOL-aMeteredSweep-1-research-runner.md](../build/2026-10-08-build-TOOL-aMeteredSweep-1-research-runner.md) | research | — |
 | [2026-10-08-build-TOOL-aMeteredSweep-1-runner-instruments.txt](../build/2026-10-08-build-TOOL-aMeteredSweep-1-runner-instruments.txt) | research | — |
 | [2026-10-08-build-TOOL-aMeteredSweep-1-speed-research.md](../build/2026-10-08-build-TOOL-aMeteredSweep-1-speed-research.md) | research | — |
+| [2026-10-09-build-TOOL-aMeteredSweep-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aMeteredSweep-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

@@ -42,21 +42,21 @@ none
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aMeteredSweep-1` | OPEN | the nine reds of the profiled full bar, each fixed at its cause |
+| 1 | `TOOL-aMeteredSweep-1` | CLOSED | the nine reds of the profiled full bar, each fixed at its cause |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node a · opened 2026-10-08 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-10-08 · streams tooling
 ids TOOL-aMeteredSweep-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aMeteredSweep-1 — every red of a full bar with self-tests on the reconciled main, fixed](spec/2026-10-08-spec-TOOL-aMeteredSweep-1.md) | 1 | 1 | OPEN | rev-6 | 2026-10-08 |
+| [TOOL-aMeteredSweep-1 — every red of a full bar with self-tests on the reconciled main, fixed](spec/2026-10-08-spec-TOOL-aMeteredSweep-1.md) | 1 | 1 | CLOSED | rev-6 | 2026-10-08 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 2 record folder(s).
+Records: 10 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
