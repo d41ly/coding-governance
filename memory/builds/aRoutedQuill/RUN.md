@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 5a836bf0fc940029136b4b3fd57a87f35ff40f26 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 5a836bf0fc940029136b4b3fd57a87f35ff40f26
 phase: RUNNING
@@ -29,3 +30,5 @@ anchor-ref: refs/heads/main
 base: 5a836bf0fc940029136b4b3fd57a87f35ff40f26
 
 ## Parked
+
+2026-10-09T17:17:13Z decision · item The README's expected improvement 'An adopter gets the routing by installing gov, with nothing left to wire' is not implied by any spec: under TOOL-aRoutedQuill-5 F4, /session-kickoff stays a per-machine link that apply only prints, and the adopter confirms the scaffolded ROUTED_PATHS. Reword the bullet? · reason Options: reword the README bullet to name the one remaining per-machine step (the M2 cross-read's fix), or widen TOOL-aRoutedQuill-5 to install the kickoff link. Refused: the README's goal and expectations are the owner's description slot, which a run may not amend (M3), and widening unit 5 reverses the owner's F4 ruling.
