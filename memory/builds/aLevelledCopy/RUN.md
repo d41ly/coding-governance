@@ -47,3 +47,13 @@ base: ce9192c0ba180a67b49b2ea3fc8edf2fb8afc0cb
 2026-10-09T01:18:12Z brief · item TOOL-aLevelledCopy-2 · reason 88b9006aa11f memory/builds/aLevelledCopy/prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1-2-build-brief.md
 
 2026-10-09T01:57:51Z dispatch · item ff49508f TOOL-aLevelledCopy-2 · reason tools/push-main.sh tools/check-wiring.sh tools/check-wiring.test.sh memory/builds/aLevelledCopy/spec/2026-10-09-spec-TOOL-aLevelledCopy-2.md memory/builds/aLevelledCopy/build/2026-10-09-build-TOOL-aLevelledCopy-2-1-acceptance-ledger.md memory/map/generated/symbols.json memory/builds/aLevelledCopy/README.md
+
+2026-10-09T02:11:59Z brief · item TOOL-aLevelledCopy-3 · reason 88b9006aa11f memory/builds/aLevelledCopy/prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1-2-build-brief.md
+
+2026-10-09T02:14:43Z dispatch · item 33a15c87 TOOL-aLevelledCopy-3 · reason .githooks/commit-msg .githooks/pre-commit .githooks/pre-push .githooks/pre-rebase tools/check-wiring.sh tools/check-wiring.test.sh memory/builds/aLevelledCopy/spec/2026-10-09-spec-TOOL-aLevelledCopy-3.md memory/builds/aLevelledCopy/build/2026-10-09-build-TOOL-aLevelledCopy-3-1-acceptance-ledger.md memory/map/generated/symbols.json memory/builds/aLevelledCopy/README.md
+
+2026-10-09T02:48:35Z dispatch · item 33a15c87 TOOL-aLevelledCopy-3 · reason .githooks/commit-msg .githooks/pre-commit .githooks/pre-push .githooks/pre-rebase tools/check-wiring.sh tools/check-wiring.test.sh memory/builds/aLevelledCopy/spec/2026-10-09-spec-TOOL-aLevelledCopy-3.md memory/builds/aLevelledCopy/build/2026-10-09-build-TOOL-aLevelledCopy-3-1-acceptance-ledger.md memory/map/generated/symbols.json memory/builds/aLevelledCopy/README.md memory/LIVE.md
+
+2026-10-09T02:55:52Z dispatch · item 33a15c87 TOOL-aLevelledCopy-3 · reason memory/builds/aLevelledCopy/BACKLOG.md
+
+2026-10-09T03:01:25Z dispatch · item 33a15c87 TOOL-aLevelledCopy-3 · reason memory/backlog/DEPL.md memory/backlog/TOOL.md
