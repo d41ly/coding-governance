@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-09T16:43:24+03:00 @ 82fe6eb763d33bcb6b06281e7f7643c03763dfd6
+last-audit: 2026-10-09T20:40:00+03:00 @ bef97330574caabfd43c374dbe8c39b26c560203
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 764b6d8cece5533bf0ea3ea116a5e0b58698ab8e
+last-body-change: bef97330574caabfd43c374dbe8c39b26c560203
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -130,6 +130,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   OR `.unattended.conf`'s `SPEC_AUDIT_DEFAULT` on the default branch; a run never declares either.
   Under neither, none is owed; kickoff asks at READY.**
   `TOOL-aBlindedTrial-6`, `-7`, `TOOL-aWardedAudit-4`, `KICK-aBlindedTrial-1`.
+
+- **Kit code names no remote and probes no location after a `cd`**: two ban legs red both
+  (`dLadderedRemote`, `TOOL-aGraftedHelix-45`); ask the lander's remote ladder instead.
 
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
   `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one second. Hit twice:
