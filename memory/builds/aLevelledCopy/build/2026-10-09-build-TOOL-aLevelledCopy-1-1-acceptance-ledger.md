@@ -26,10 +26,10 @@ and memory hygiene.
   and `GIT_TRACE=1` showed nothing. Observed: 4 `hash-object --stdin-paths` lines over the
   all-matching receipt, all from the arms, and 5 over the three-eol-only receipt.
 - AC6 — `oid` — with the row's `oid` key removed, the row printed `DRIFTED` and the file exited 1.
-- AC7 — `DRIFTED` — the fixture copied without `.git` printed a `GIT` line saying `hash-object
-  --stdin-paths not consulted` because the tree holds no `.git`, then `DRIFTED`, and exited 1. With
-  `PATH` holding only Python's directory, `--selftest` printed `ARM FAIL` for all four git arms
-  naming `[WinError 2]` from git, and exited 1. The live path with git absent printed the `could not
-  start git` line, then `DRIFTED`.
+- AC7 — `DRIFTED` — the fixture copied without `.git` printed a `GIT` line naming `hash-object`
+  as not consulted because the tree holds no `.git`, then `DRIFTED`, and exited 1. With `PATH`
+  holding only Python's directory, `--selftest` printed `ARM FAIL` for all four git arms naming
+  `[WinError 2]` from git, and exited 1. The live path with git absent printed a `GIT` line saying
+  git could not start, then `DRIFTED`.
 - AC8 — `grep -c "true reading" tools/run-gates/check-receipt.py` — it printed 0. The rewritten
   bullet names the target's own clean filter.
