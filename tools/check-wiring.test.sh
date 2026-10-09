@@ -1588,6 +1588,7 @@ PM=$(src_of "${ROOTPFX}push-main.sh")
 seed_ssh_fixture() {  # $1 = origin URL ("" = no remote) -> a wired repo holding a copy of push-main.sh
   newrepo; git config core.hooksPath .githooks
   export GIT_CONFIG_GLOBAL="$D/.git/fixture-global" GIT_CONFIG_NOSYSTEM=1; : > "$GIT_CONFIG_GLOBAL"
+  unset GIT_SSH GIT_SSH_VARIANT   # an operator's SSH choice makes the arm stand back (TOOL-aLevelledCopy-7 S5)
   mkdir -p "${KP:-.}"; cp "$PM" "${KP}push-main.sh"
   [ -z "$1" ] || git remote add origin "$1"
 }
@@ -1598,6 +1599,9 @@ WANT=$(eval "$(grep '^GOV_SSH_KEEPALIVE=' "$PM" | tr -d '\r')"; printf '%s' "${G
 SSHURL=git@example.invalid:o/r.git
 
 # LC2 AC1 — unset: --session sets the derived value byte-for-byte, logs one event; a re-run is ok, silent.
+# The suite's caller is modelled as a plink node: the fixture must cut that off, or AC1 and AC7 go red
+# on exactly the machines TOOL-aLevelledCopy-7 protects (its S5; removing the seed's unset reds them).
+export GIT_SSH=/bin/false GIT_SSH_VARIANT=plink
 seed_ssh_fixture "$SSHURL"
 hl="$(git rev-parse --path-format=absolute --git-common-dir)/health.log"
 out=$(chk --session); got=$(git config --local core.sshCommand 2>/dev/null || true)
@@ -1673,6 +1677,42 @@ seed_ssh_fixture "$SSHURL"; rm -f "${KP}push-main.sh"
 out=$(chk --session); got=$(git config core.sshCommand 2>/dev/null || true)
 ck "LC2 AC10 no push-main.sh -> skip naming push-main, nothing set" \
    "$([ -z "$got" ] && printf '%s' "$out" | grep -q '^skip     ssh       — push-main is not adopted' && echo 1 || echo 0)"
+cleanup
+
+# TOOL-aLevelledCopy-7 — the operator chose the SSH program: a GIT_SSH, a GIT_SSH_VARIANT or an
+# ssh.variant makes the arm note it and write nothing, under --session and --check alike. Each
+# variable is exported inside the run's own subshell, so the next seed starts from none.
+for t in GIT_SSH GIT_SSH_VARIANT ssh.variant; do
+  seed_ssh_fixture "$SSHURL"
+  hl="$(git rev-parse --path-format=absolute --git-common-dir)/health.log"
+  case $t in
+    GIT_SSH) ev=GIT_SSH=/bin/false ;;
+    GIT_SSH_VARIANT) ev=GIT_SSH_VARIANT=ssh ;;
+    *) ev=""; git config --global ssh.variant plink ;;
+  esac
+  out=$([ -z "$ev" ] || export "$ev"; chk --session); got=$(git config core.sshCommand 2>/dev/null || true)
+  n1=$(grep -c $'\tsshcommand-set\t' "$hl" 2>/dev/null)
+  ck "LC7 AC1-3 $t -> --session notes $t as the operator's choice, sets nothing, logs nothing" \
+     "$([ -z "$got" ] && [ "${n1:-0}" = 0 ] && printf '%s' "$out" | grep -q "^note     ssh       — $t is the operator's choice of SSH program" \
+        && ! printf '%s' "$out" | grep -q '^FIXED    ssh' && echo 1 || echo 0)"
+  out=$([ -z "$ev" ] || export "$ev"; chk --check); rc=$?; got=$(git config core.sshCommand 2>/dev/null || true)
+  ck "LC7 AC4 $t -> --check exits 0 with the note, no UNWIRED ssh, no Fix, nothing written" \
+     "$([ "$rc" = 0 ] && [ -z "$got" ] && printf '%s' "$out" | grep -q "^note     ssh       — $t is the operator's choice" \
+        && ! printf '%s' "$out" | grep -q -e '^UNWIRED  ssh' -e 'Fix: git config core.sshCommand' && echo 1 || echo 0)"
+  cleanup
+done
+
+# LC7 AC5 — a failed ssh.variant read is not an absence: git exits 3 for that one read, and the arm
+# notes it and writes nothing rather than taking it as unset. The failing git is a shim first on the
+# run's PATH, not a shell function, because a function named `git` is a definition the lexicon grades.
+seed_ssh_fixture "$SSHURL"
+mkdir "$D/.git/shim"
+printf '#!/bin/sh\n[ "$*" = "config --get ssh.variant" ] && exit 3\nexec "%s" "$@"\n' "$(command -v git)" > "$D/.git/shim/git"
+chmod +x "$D/.git/shim/git"
+out=$(export PATH="$D/.git/shim:$PATH"; chk --session)
+got=$(git config core.sshCommand 2>/dev/null || true)
+ck "LC7 AC5 ssh.variant read exits 3 -> note 'cannot read ssh.variant', nothing set" \
+   "$([ -z "$got" ] && printf '%s' "$out" | grep -q '^note     ssh       — cannot read ssh.variant (git config exit 3)' && echo 1 || echo 0)"
 cleanup
 unset GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
 fi

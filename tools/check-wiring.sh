@@ -40,9 +40,14 @@
 # a symlinked hook, or a hook name git adds after the pinned list.
 #
 # The ssh arm sets core.sshCommand to push-main.sh's keepalive, derived from that file, only when no
-# scope sets it and a remote pushes over ssh. WHAT IT DOES NOT CHECK: a GIT_SSH_COMMAND in someone's
-# environment, which outranks core.sshCommand; HTTPS remotes, which hold no ssh socket; and whether
-# the remote's own idle timeout is shorter than the silence the keepalive tolerates.
+# scope sets it and a remote pushes over ssh. It stands back, with a `note` and no write, when a
+# non-empty GIT_SSH or GIT_SSH_VARIANT is exported or ssh.variant is set at any scope: those are the
+# operator's choice of SSH program and its dialect, and core.sshCommand outranks GIT_SSH, so setting
+# it would replace that program (TOOL-aLevelledCopy-7). WHAT IT DOES NOT CHECK: a GIT_SSH_COMMAND in
+# someone's environment, which outranks core.sshCommand; a core.sshCommand already present beside a
+# GIT_SSH, which the `ok` and `note` cases grade as they find it because the arm cannot tell who
+# wrote it; HTTPS remotes, which hold no ssh socket; and whether the remote's own idle timeout is
+# shorter than the silence the keepalive tolerates.
 KIT_CHECK_WIRING_VERSION=1.27   # gov:kit check-wiring@1.27 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
@@ -1298,7 +1303,7 @@ check_merge_ours() {
 # An operator value at ANY scope is never overwritten; a repo-local one would shadow a global
 # identity. (TOOL-aLevelledCopy-2)
 check_ssh_keepalive() {
-  local pm n want ka r url pre host hit="" got scope cur
+  local pm n want ka r url pre host hit="" got scope cur why vrc
   pm=$(first_of "$(resolve_receipt_path "" push-main.sh)" "${KIT_REL:+$KIT_REL/}push-main.sh")
   if [ -z "$pm" ]; then
     echo "skip     ssh       — push-main is not adopted here, so no pre-push bar holds a push open"
@@ -1336,6 +1341,25 @@ check_ssh_keepalive() {
   got=$(git config --show-scope --get core.sshCommand 2>/dev/null || true)
   got=${got%$'\r'}
   if [ -z "$got" ]; then
+    # The operator chose the SSH program: git runs GIT_SSH when no core.sshCommand exists, and
+    # GIT_SSH_VARIANT / ssh.variant name its dialect. Asked BEFORE the set/UNWIRED split, so neither
+    # --fix nor --check overrides or advises against that choice. A failed read is not an absence.
+    why=""
+    if [ -n "${GIT_SSH:-}" ]; then why=GIT_SSH
+    elif [ -n "${GIT_SSH_VARIANT:-}" ]; then why=GIT_SSH_VARIANT
+    else
+      git config --get ssh.variant >/dev/null 2>&1; vrc=$?
+      case $vrc in
+        0) why=ssh.variant ;;
+        1) ;;
+        *) echo "note     ssh       — cannot read ssh.variant (git config exit $vrc); NOT setting core.sshCommand"
+           return ;;
+      esac
+    fi
+    if [ -n "$why" ]; then
+      echo "note     ssh       — $why is the operator's choice of SSH program; NOT setting core.sshCommand, which would override it"
+      return
+    fi
     if [ "$DO_FIX" = 1 ]; then
       if git config core.sshCommand "$want"; then
         echo "FIXED    ssh       — set core.sshCommand (local) -> push-main's keepalive"

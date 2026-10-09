@@ -1,11 +1,12 @@
 # TOOL-aLevelledCopy-7 — the ssh arm stands back when the operator chose an SSH program
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 3 · ratified 2026-10-09
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base ce9192c0 · streams tooling · order 3 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aLevelledCopy-7-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aLevelledCopy-7-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-7-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-7-1-spec-brief.md) | journal | TOOL-aLevelledCopy-8 TOOL-aLevelledCopy-9 |
 
 <!-- /gen:spec-records -->
@@ -169,8 +170,8 @@ by its arm run alone, as AC8 states.
   on an otherwise wired fixture, it exits 0, prints the matching `note     ssh` line, and prints no
   `UNWIRED  ssh` line and no `Fix: git config core.sshCommand`. Red when: it exits 1 or advises the
   operator to set the key.
-- **AC5** — When the run's `git` is a function exported with `export -f` that exits 3 for `config
-  --get ssh.variant` and defers to the real binary otherwise, and `--session` runs with no
+- **AC5** — When the run's `git` is a shim script first on its `PATH` that exits 3 for `config
+  --get ssh.variant` and execs the real binary otherwise, and `--session` runs with no
   environment trigger, the run prints a `note     ssh` line containing `cannot read ssh.variant` and
   `git config core.sshCommand` prints nothing. Red when: the failed read is taken as unset and the
   key is written.
@@ -216,6 +217,11 @@ New arm: tools/check-wiring.test.sh · covers AC6 · the caller exports GIT_SSH 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft, from the closing review's H1 and M1 and the promotion brief.
+- rev-2 · 2026-10-09 · AC5's failing `git` is a `PATH` shim, not an `export -f` function: the lexicon
+  leg tokenizes code inside `$(…)` and grades a function named `git` as a definition whose name leads
+  with no declared verb. S5's gate is also made unconditional: the suite exports `GIT_SSH` and
+  `GIT_SSH_VARIANT` before the LC2 block, so dropping the seed's `unset` reds LC2 AC1 and AC7 on every
+  node, not only on one that exports them. Status CLOSED, built.
 
 ## 10. Reuse audit
 

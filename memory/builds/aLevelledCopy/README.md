@@ -69,12 +69,12 @@ ids DEPL-aLevelledCopy-1 DEPL-aLevelledCopy-2 TOOL-aLevelledCopy-1 TOOL-aLevelle
 | [TOOL-aLevelledCopy-1 — receipt-sync grades a mismatched row through the target's clean filter](spec/2026-10-09-spec-TOOL-aLevelledCopy-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aLevelledCopy-2 — check-wiring sets core.sshCommand from push-main's keepalive string](spec/2026-10-09-spec-TOOL-aLevelledCopy-2.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aLevelledCopy-3 — gov's executed hooks are 100755, and check-wiring grades a hook's index mode](spec/2026-10-09-spec-TOOL-aLevelledCopy-3.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-09 |
-| [TOOL-aLevelledCopy-7 — the ssh arm stands back when the operator chose an SSH program](spec/2026-10-09-spec-TOOL-aLevelledCopy-7.md) | 3 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aLevelledCopy-7 — the ssh arm stands back when the operator chose an SSH program](spec/2026-10-09-spec-TOOL-aLevelledCopy-7.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aLevelledCopy-9 — receipt fixtures are hermetic, a renamed row keeps its bit, the records agree](spec/2026-10-09-spec-TOOL-aLevelledCopy-9.md) | 3 | 2 | OPEN | rev-2 | 2026-10-09 |
 | [TOOL-aLevelledCopy-8 — the ssh arm's failure states each get a verdict and an arm](spec/2026-10-09-spec-TOOL-aLevelledCopy-8.md) | 4 | 2 | OPEN | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 4 record folder(s).
+Records: 11 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
