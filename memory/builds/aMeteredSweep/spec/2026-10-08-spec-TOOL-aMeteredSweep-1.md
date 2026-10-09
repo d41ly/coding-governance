@@ -16,6 +16,12 @@
 | [2026-10-08-build-TOOL-aMeteredSweep-1-runner-instruments.txt](../build/2026-10-08-build-TOOL-aMeteredSweep-1-runner-instruments.txt) | research | — |
 | [2026-10-08-build-TOOL-aMeteredSweep-1-speed-research.md](../build/2026-10-08-build-TOOL-aMeteredSweep-1-speed-research.md) | research | — |
 | [2026-10-09-build-TOOL-aMeteredSweep-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aMeteredSweep-1-acceptance-ledger.md) | journal | — |
+| [2026-10-09-build-TOOL-aMeteredSweep-1-research2-inprocess.md](../build/2026-10-09-build-TOOL-aMeteredSweep-1-research2-inprocess.md) | research | — |
+| [2026-10-09-build-TOOL-aMeteredSweep-1-research2-menu.md](../build/2026-10-09-build-TOOL-aMeteredSweep-1-research2-menu.md) | research | — |
+| [2026-10-09-build-TOOL-aMeteredSweep-1-research2-retirement.md](../build/2026-10-09-build-TOOL-aMeteredSweep-1-research2-retirement.md) | research | — |
+| [2026-10-09-build-TOOL-aMeteredSweep-1-research2-reuse.md](../build/2026-10-09-build-TOOL-aMeteredSweep-1-research2-reuse.md) | research | — |
+| [2026-10-09-build-TOOL-aMeteredSweep-1-research2-spawns.md](../build/2026-10-09-build-TOOL-aMeteredSweep-1-research2-spawns.md) | research | — |
+| [2026-10-09-build-TOOL-aMeteredSweep-1-research2-wsl.md](../build/2026-10-09-build-TOOL-aMeteredSweep-1-research2-wsl.md) | research | — |
 
 <!-- /gen:spec-records -->
 

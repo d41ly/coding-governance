@@ -56,7 +56,7 @@ ids TOOL-aMeteredSweep-1
 | [TOOL-aMeteredSweep-1 — every red of a full bar with self-tests on the reconciled main, fixed](spec/2026-10-08-spec-TOOL-aMeteredSweep-1.md) | 1 | 1 | CLOSED | rev-6 | 2026-10-08 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 2 record folder(s).
+Records: 16 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

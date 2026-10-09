@@ -1,6 +1,6 @@
 # Research — where the bar's hours go, and the units that remove them
 
-**Serves:** none — research that precedes this build's specs; its units await the owner's scope ruling
+**Serves:** research TOOL-aMeteredSweep-1
 
 Node `a`, 2026-10-09. Two rounds. Round one is aMeteredSweep's
 `2026-10-08-build-TOOL-aMeteredSweep-1-speed-research.md` and its five appendices: the levers per

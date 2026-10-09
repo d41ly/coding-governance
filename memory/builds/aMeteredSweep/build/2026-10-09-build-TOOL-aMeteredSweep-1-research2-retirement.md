@@ -1,8 +1,8 @@
 # Appendix — Refusal surface vs value: unattended kit — research + retirement-review design
 
-**Serves:** none — research that precedes this build's specs; its units await the owner's scope ruling
+**Serves:** research TOOL-aMeteredSweep-1
 
-A read-only research pass by one of five agents on 2026-10-09, kept verbatim below its first heading. Figures are estimates from static counts and one-line timings unless marked measured; the ranked synthesis is `2026-10-09-build-TOOL-aSparedSpawn-0-research.md`.
+A read-only research pass by one of five agents on 2026-10-09, kept verbatim below its first heading. Figures are estimates from static counts and one-line timings unless marked measured; the ranked synthesis is `2026-10-09-build-TOOL-aMeteredSweep-1-research2-menu.md`.
 
 
 Research only. Nothing was run except read-only `grep`/`git log`/`git show` and three in-process Python

@@ -1,8 +1,8 @@
 # Appendix — Running the gate bar or its self-test tier inside WSL2: feasibility, design and risks
 
-**Serves:** none — research that precedes this build's specs; its units await the owner's scope ruling
+**Serves:** research TOOL-aMeteredSweep-1
 
-A read-only research pass by one of five agents on 2026-10-09, kept verbatim below its first heading. Figures are estimates from static counts and one-line timings unless marked measured; the ranked synthesis is `2026-10-09-build-TOOL-aSparedSpawn-0-research.md`.
+A read-only research pass by one of five agents on 2026-10-09, kept verbatim below its first heading. Figures are estimates from static counts and one-line timings unless marked measured; the ranked synthesis is `2026-10-09-build-TOOL-aMeteredSweep-1-research2-menu.md`.
 
 
 This is read-only research on node `a` at worktree `gate-runner-profiling-optimization-5d1f1e`, HEAD `6bc6c949c`. No leg, suite or runner was executed. No repo file was edited and nothing was installed. The probes are listed at the end with their output. Line numbers refer to the worktree's files.

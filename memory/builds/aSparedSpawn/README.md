@@ -6,7 +6,7 @@ streams: tooling
 roster: TOOL
 parents: aMeteredSweep
 status: OPEN
-ids: TOOL-aSparedSpawn-0
+ids:
 ---
 
 # aSparedSpawn — the bar and its self-tests, rebuilt around the cost of a process
@@ -40,7 +40,8 @@ roughly doubled in six weeks while nothing retires one.
 
 ## Parked decisions
 
-- Which units this build carries is the owner's call, from the menu in the research record.
+- Which units this build carries is the owner's call, from the menu in aMeteredSweep's round-two research,
+  `memory/builds/aMeteredSweep/build/2026-10-09-build-TOOL-aMeteredSweep-1-research2-menu.md`.
 
 <!-- roster:units -->
 
@@ -51,13 +52,12 @@ roughly doubled in six weeks while nothing retires one.
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 0 unit(s) · node a · opened 2026-10-09 · streams tooling
-ids TOOL-aSparedSpawn-0
 
 <!-- gen:build-units -->
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 1 record folder(s).
+Records: 0 bound to this build, across 0 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
