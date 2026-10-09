@@ -102,9 +102,9 @@ rendered text. Every rule is one line: a tool, gate or protocol named in section
 
 <!-- one-line -->
 - A build of more than one pass: `memory/guides/BUILD-METHOD.md`.
-- Writing a spec: `memory/TEMPLATE-SPEC.md`.
+- Writing a spec, or adding a write path or surface: `memory/TEMPLATE-SPEC.md`.
 - Any record, index or id under `memory/`: `memory/HYGIENE.md`.
-- Any review, any `Workflow` fan-out, or a change adding a write path or surface: `memory/guides/REVIEW-PROTOCOL.md`.
+- Any review or `Workflow` fan-out: `memory/guides/REVIEW-PROTOCOL.md`.
 - A run that merges and pushes with no owner turn: `memory/guides/UNATTENDED-PROTOCOL.md`.
 <!-- /one-line -->
 

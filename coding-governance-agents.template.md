@@ -119,11 +119,11 @@ rendered text. Every rule is one line: a tool, gate or protocol named in section
 <!-- one-line -->
 <!-- kit:memory-tree -->
 - A build of more than one pass: `{{MEMORY_ROOT}}/guides/BUILD-METHOD.md`.
-- Writing a spec: `{{MEMORY_ROOT}}/TEMPLATE-SPEC.md`.
+- Writing a spec, or adding a write path or surface: `{{MEMORY_ROOT}}/TEMPLATE-SPEC.md`.
 - Any record, index or id under `{{MEMORY_ROOT}}/`: `{{MEMORY_ROOT}}/HYGIENE.md`.
 <!-- /kit:memory-tree -->
 <!-- kit:review-harness -->
-- Any review, any `Workflow` fan-out, or a change adding a write path or surface: `{{MEMORY_ROOT}}/guides/REVIEW-PROTOCOL.md`.
+- Any review or `Workflow` fan-out: `{{MEMORY_ROOT}}/guides/REVIEW-PROTOCOL.md`.
 <!-- /kit:review-harness -->
 <!-- kit:unattended -->
 - A run that merges and pushes with no owner turn: `{{MEMORY_ROOT}}/guides/UNATTENDED-PROTOCOL.md`.
