@@ -1,12 +1,14 @@
 # TOOL-dHomedResolver-3 — two gotcha records for the classes units 1 and 2 close
 
-**Status:** SPECCED · rev-1 · 2026-10-09 · node d · Tier-1 · base 5a836bf0 · streams tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-10-09 · node d · Tier-1 · base 5a836bf0 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-dHomedResolver-3-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-dHomedResolver-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-dHomedResolver-1-0-run-mandate.md](../prompts/2026-10-09-prompt-TOOL-dHomedResolver-1-0-run-mandate.md) | journal | TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 |
+| [2026-10-09-prompt-TOOL-dHomedResolver-3-1-build-brief.md](../prompts/2026-10-09-prompt-TOOL-dHomedResolver-3-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

@@ -63,6 +63,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [heredoc-escape-reaches-the-regex](heredoc-escape-reaches-the-regex.md) | class | 0 | yes | source written through a shell heredoc into a non-raw string turns an escape into a control byte, and the symptom never looks like a quoting problem |
 | [hookspath-resolves-into-another-checkout](hookspath-resolves-into-another-checkout.md) | class | 6 |  | an ABSOLUTE core.hooksPath makes every worktree it governs run the hook files of the one checkout it names, so a push is gated by whatever that checkout happens to have checked out |
 | [id-matched-as-a-substring](id-matched-as-a-substring.md) | class | 3 |  | every id ending in a 1-up sequence is a prefix of nine others, so an unanchored match joins the wrong record |
+| [index-derivation-reads-a-half-staged-move-as-a-deletion](index-derivation-reads-a-half-staged-move-as-a-deletion.md) | class | 3 |  | a derivation over git ls-files reads a move whose destination is not yet staged as a deletion, and a writer driven by it renders that deletion into every file citing what moved |
 | [inherited-git-dir-pins-the-work-tree-to-the-cwd](inherited-git-dir-pins-the-work-tree-to-the-cwd.md) | class | 8 |  | with GIT_DIR set and no GIT_WORK_TREE, git takes the current directory for the work tree's top, so a `git -C <dir>` probe answers about <dir> as if it were the root; git exports GIT_DIR into a linked worktree's hooks, so a location probe that passed in a shell answers wrong inside one |
 | [inline-fence-swallows-the-rest-of-the-file](inline-fence-swallows-the-rest-of-the-file.md) | class | 1 | yes | a triple-backtick written inline in prose opens a fence the reader never closes, so every section after it silently disappears from the checker's view |
 | [inline-marker-breaks-a-line-continuation](inline-marker-breaks-a-line-continuation.md) | class | 5 |  | appending a per-line annotation to the lines a gate selected breaks any of them that ended in a backslash, and the result is valid shell that silently drops the rest of the command |
@@ -74,6 +75,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [liveness-negative-from-another-population](liveness-negative-from-another-population.md) | class | 2 |  | a probe is shown able to read negative on inputs it will never act on, while over its real population a positive is structural, so the liveness assertion passes and certifies nothing |
 | [merge-keeps-both-sides-of-one-derivation](merge-keeps-both-sides-of-one-derivation.md) | class | 2 |  | a conflict-free merge leaves two derivations of one value, disagreeing, and the first is a dead store |
 | [msys-grep-counts-cr-on-every-line](msys-grep-counts-cr-on-every-line.md) | class | 3 |  | on an MSYS node `grep -c $'\r'` matches every line of an LF-only file, so a CR probe reports the whole file as CRLF and a clean tree as dirty |
+| [name-search-resolves-a-namesake](name-search-resolves-a-namesake.md) | class | 6 |  | a resolver that SEARCHES for a file by name where the file's location is declared admits every file sharing the name, and its finding then blames the subject for a collision it did not cause |
 | [naming-leg-grades-what-python-named](naming-leg-grades-what-python-named.md) | class | 1 |  | the naming gate grades nested helpers and dunder methods, and its armed set follows symbols.json, so a new file reds on a later unrelated commit and only at the lander |
 | [node-check-is-not-a-syntax-gate](node-check-is-not-a-syntax-gate.md) | class | 2 |  | node --check exits 0 on a file whose parse fails, because module auto-detection retries the parse and swallows the failure, so a gate built on it cannot go red |
 | [nt-against-a-missing-file-is-true](nt-against-a-missing-file-is-true.md) | class | 2 |  | a -nt b is TRUE when b does not exist, so a has-it-changed test against a stamp nobody wrote yet reports a change on the very first call |
@@ -118,6 +120,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-103 record(s): 100 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+105 record(s): 102 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

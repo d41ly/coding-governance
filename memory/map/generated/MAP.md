@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 128 · kits: 17 · git-hooks: 4 · harness-hooks: 10 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 103 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 128 · kits: 17 · git-hooks: 4 · harness-hooks: 10 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 105 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -271,6 +271,7 @@ Inventories: gate-legs: 128 · kits: 17 · git-hooks: 4 · harness-hooks: 10 · 
 | `heredoc-escape-reaches-the-regex.md` | baseline |
 | `hookspath-resolves-into-another-checkout.md` | run-gates |
 | `id-matched-as-a-substring.md` | unattended |
+| `index-derivation-reads-a-half-staged-move-as-a-deletion.md` | memory-tree-hygiene |
 | `inherited-git-dir-pins-the-work-tree-to-the-cwd.md` | unattended-mandate |
 | `inline-fence-swallows-the-rest-of-the-file.md` | memory-tree-hygiene |
 | `inline-marker-breaks-a-line-continuation.md` | install-prefix |
@@ -282,6 +283,7 @@ Inventories: gate-legs: 128 · kits: 17 · git-hooks: 4 · harness-hooks: 10 · 
 | `liveness-negative-from-another-population.md` | unattended-stops |
 | `merge-keeps-both-sides-of-one-derivation.md` | process-monitor |
 | `msys-grep-counts-cr-on-every-line.md` | session-kickoff |
+| `name-search-resolves-a-namesake.md` | memory-tree-hygiene |
 | `naming-leg-grades-what-python-named.md` | lexicon |
 | `node-check-is-not-a-syntax-gate.md` | review-harnesses |
 | `nt-against-a-missing-file-is-true.md` | runlog |

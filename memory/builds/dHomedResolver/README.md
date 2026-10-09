@@ -57,7 +57,7 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 3 unit(s) · node d · opened 2026-10-09 · streams tooling
+**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-10-09 · streams tooling
 ids TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3
 
 <!-- gen:build-units -->
@@ -65,10 +65,10 @@ ids TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3
 |---|---|---|---|---|---|
 | [TOOL-dHomedResolver-1 — check 10 and check 24 resolve a rotated archive's live index at the stem's declared home](spec/2026-10-09-spec-TOOL-dHomedResolver-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-09 |
 | [TOOL-dHomedResolver-2 — the build-index generator refuses while a file under the archive folder is untracked](spec/2026-10-09-spec-TOOL-dHomedResolver-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-10-09 |
-| [TOOL-dHomedResolver-3 — two gotcha records for the classes units 1 and 2 close](spec/2026-10-09-spec-TOOL-dHomedResolver-3.md) | 3 | 1 | SPECCED | rev-1 | 2026-10-09 |
+| [TOOL-dHomedResolver-3 — two gotcha records for the classes units 1 and 2 close](spec/2026-10-09-spec-TOOL-dHomedResolver-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 7 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
