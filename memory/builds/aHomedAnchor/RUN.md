@@ -9,12 +9,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+hold-run: 
+hold-streak: 1 · at 3ab0d60c
+resume-owed: unattended-resume-ahomedanchor · fire 2026-10-09T09:38:30Z
+held-at: 2026-10-09T09:08:30Z
+hold-reason: the runner exited HOST: straggler-guard arms timed out twice while a spawn cost 16.0x this clone's floor; 62 of 63 legs had already read green in the previous close
+hold-until: probe host
+hold-code: host-degraded
+held-from: VERIFYING
 gates-run: unattended-179153003762917425227-2416772 75ee33ec
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 4e49aeb53a88568ff6c7989c8c38a9d4c324c80b
-phase: VERIFYING
+witness: 3ab0d60cfa255d6193b3245c2405c8f095f49475
+phase: HELD
 branch-sha: 11224126c2e48935ee3cc2e802bd3099c0f225fe
 branch-ref: refs/heads/branch/unattended-kit-slug-mode-e3ba61
 may: none
@@ -72,3 +80,5 @@ base: 11224126c2e48935ee3cc2e802bd3099c0f225fe
 2026-10-09T04:48:05Z dispatch · item 2d5f232c TOOL-aHomedAnchor-7 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/aHomedAnchor/spec/2026-10-09-spec-TOOL-aHomedAnchor-7.md memory/builds/aHomedAnchor/README.md memory/LIVE.md
 
 2026-10-09T05:32:15Z dispatch · item d31d7bc9 TOOL-aHomedAnchor-7 · reason tools/unattended/check-unattended.test.sh
+
+2026-10-09T09:08:43Z hold · item host-degraded · reason until probe host · reaped 511a5962 · resume unattended-resume-ahomedanchor
