@@ -59,7 +59,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
+**Build status:** OPEN · 6 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
 ids DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 DEPL-aBenchedProbe-4 TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2
 
 <!-- gen:build-units -->
@@ -69,13 +69,15 @@ ids DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 DEPL-aBenched
 | [TOOL-aBenchedProbe-2 — run-gates' held-count summary names its predicate](spec/2026-10-09-spec-TOOL-aBenchedProbe-2.md) | 1 | 1 | CLOSED | rev-1 | 2026-10-09 |
 | [DEPL-aBenchedProbe-1 — govkit selfcheck reds a descriptor self-test leg whose subject is not `kit`](spec/2026-10-09-spec-DEPL-aBenchedProbe-1.md) | 2 | 1 | CLOSED | rev-1 | 2026-10-09 |
 | [DEPL-aBenchedProbe-2 — a descriptor leg's `ceiling` travels into the adopter's manifest](spec/2026-10-09-spec-DEPL-aBenchedProbe-2.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-09 |
+| [DEPL-aBenchedProbe-3 — 7j4's liveness reds bind only where a self-test population exists](spec/2026-10-09-spec-DEPL-aBenchedProbe-3.md) | 4 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [DEPL-aBenchedProbe-4 — regression arms for the keep rule, 7j4 and the 7h ceiling clause](spec/2026-10-09-spec-DEPL-aBenchedProbe-4.md) | 5 | 2 | OPEN | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
 Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2.
+Ids no `spec-audit` record has ever named: DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 DEPL-aBenchedProbe-4 TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -85,6 +87,8 @@ Ids no `spec-audit` record has ever named: DEPL-aBenchedProbe-1 DEPL-aBenchedPro
 | 1 | `TOOL-aBenchedProbe-1`, `TOOL-aBenchedProbe-2` | yes |
 | 2 | `DEPL-aBenchedProbe-1` | no |
 | 3 | `DEPL-aBenchedProbe-2` | no |
+| 4 | `DEPL-aBenchedProbe-3` | no |
+| 5 | `DEPL-aBenchedProbe-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
