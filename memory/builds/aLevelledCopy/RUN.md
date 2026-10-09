@@ -69,3 +69,7 @@ base: ce9192c0ba180a67b49b2ea3fc8edf2fb8afc0cb
 2026-10-09T04:26:05Z dispatch · item 176005b6 TOOL-aLevelledCopy-7 · reason tools/check-wiring.sh tools/check-wiring.test.sh memory/builds/aLevelledCopy/spec/2026-10-09-spec-TOOL-aLevelledCopy-7.md memory/builds/aLevelledCopy/build/2026-10-09-build-TOOL-aLevelledCopy-7-1-acceptance-ledger.md memory/builds/aLevelledCopy/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
 
 2026-10-09T04:26:34Z brief · item TOOL-aLevelledCopy-7 · reason 88b9006aa11f memory/builds/aLevelledCopy/prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1-2-build-brief.md
+
+2026-10-09T04:47:58Z brief · item TOOL-aLevelledCopy-9 · reason 88b9006aa11f memory/builds/aLevelledCopy/prompts/2026-10-09-prompt-TOOL-aLevelledCopy-1-2-build-brief.md
+
+2026-10-09T04:52:36Z dispatch · item dae09ec1 TOOL-aLevelledCopy-9 · reason tools/run-gates/check-receipt.py tools/govkit/govkit.py tools/govkit/selftest.py memory/gotchas/two-answers-to-one-question.md memory/gotchas/INDEX.md memory/builds/aLevelledCopy/spec/2026-10-09-spec-TOOL-aLevelledCopy-3.md memory/builds/aLevelledCopy/spec/2026-10-09-spec-TOOL-aLevelledCopy-9.md memory/builds/aLevelledCopy/build/2026-10-09-build-TOOL-aLevelledCopy-9-1-acceptance-ledger.md memory/builds/aLevelledCopy/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
