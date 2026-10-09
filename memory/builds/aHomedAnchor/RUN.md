@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 5a836bf0fc940029136b4b3fd57a87f35ff40f26 · park · 0 touching
 hold-run: 
 hold-streak: 1 · at 3ab0d60c
 resume-owed: unattended-resume-ahomedanchor · fire 2026-10-09T09:38:30Z
@@ -82,3 +83,5 @@ base: 11224126c2e48935ee3cc2e802bd3099c0f225fe
 2026-10-09T05:32:15Z dispatch · item d31d7bc9 TOOL-aHomedAnchor-7 · reason tools/unattended/check-unattended.test.sh
 
 2026-10-09T09:08:43Z hold · item host-degraded · reason until probe host · reaped 511a5962 · resume unattended-resume-ahomedanchor
+
+2026-10-09T16:36:57Z decision · item land without a bar on the reconciled HEAD? · reason options: run the bar first, or land over the close's 62/63-green bar whose one red leg was HOST-attributed; the owner chose to skip the bar and land (2026-10-09)
