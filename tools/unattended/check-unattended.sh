@@ -1315,15 +1315,18 @@ if [ -n "$ADV_HEAD" ] && GIT cat-file -e "$ADV_HEAD^{commit}" 2>/dev/null; then 
 # ---- which runs this leg first. PARSED, never evaluated: the driver sources the conf, so the last
 # ---- assignment line wins, and a value spelled through expansion reads as itself and so as strict.
 # ---- No readable HEAD leaves it empty, which is the strict reading.
+# ---- TOOL-aHomedAnchor-7 S3: an `export` prefix is the shell's assignment too, and ANY assignment line
+# ---- whose value carries a `$` or a backtick makes the answer empty, since the shell may read it otherwise.
 read_origin_scope() { # conf blob text -> the last ANCHOR_SCOPE= assignment's value
   printf '%s\n' "$1" | awk '
-    /^[[:space:]]*ANCHOR_SCOPE=/ {
-      v = $0; sub(/^[[:space:]]*ANCHOR_SCOPE=/, "", v)
+    /^[[:space:]]*(export[[:space:]]+)?ANCHOR_SCOPE=/ {
+      v = $0; sub(/^[[:space:]]*(export[[:space:]]+)?ANCHOR_SCOPE=/, "", v)
+      if (v ~ /[$`]/) bad = 1
       sub(/\r$/, "", v); sub(/[[:space:]]+#.*$/, "", v); sub(/[[:space:]]+$/, "", v)
       if (v ~ /^".*"$/ || v ~ /^\047.*\047$/) v = substr(v, 2, length(v) - 2)
       r = v
     }
-    END { print r }'
+    END { if (!bad) print r }'
 }
 ORIGIN_SCOPE=""
 if [ "$ADV_HEAD_OK" = 1 ]; then
@@ -2176,6 +2179,9 @@ while IFS= read -r f; do
   # ---- AN ABSENT `base:` LINE IS THE VIOLATION, not the exemption. Wrapping this in `if [ -n ]`
   # ---- meant deleting one line from a run-writable file disarmed the only BASE check on the bar.
   rb=$(fact_of "$f" base)
+  # TOOL-aHomedAnchor-7 S1 - set only by check 9's local admission below, from the advertisement; the
+  # may: and asks: second opinions read it, so a slug mode no longer stands in for the first anchor.
+  rlocal=0
   if [ -z "$rb" ]; then
     fail 9 "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one: $f"
   else
@@ -2242,6 +2248,7 @@ while IFS= read -r f; do
           elif [ "$ORIGIN_SCOPE" = local ] && check_head_reaches "$rb"; then
             # TOOL-aHomedAnchor-2 S2 - the local anchor, opted into on the remote's default branch.
             # WHAT THIS DOES NOT CHECK: that the BASE predates the run. On that anchor nothing can.
+            rlocal=1
             report "check 9 admitted by the local anchor — a recorded BASE no remote tip carries, on HEAD's history, in a repo whose default-branch conf declares ANCHOR_SCOPE=local: $rb in $f"
           else
             fail 9 "a recorded BASE is not published on the remote — it is an ancestor of no tip the remote advertises, so it names a commit that exists only where this run could have authored it: recorded $rb in $f"
@@ -2423,7 +2430,7 @@ while IFS= read -r f; do
       case " $SECOND_ANCHOR_MODES " in
         *" $dmode "*) ;;
         *)
-          if [ "$ORIGIN_SCOPE" = local ]; then
+          if [ "$ADV_HEAD_OK" = 1 ] && check_rev "$rb" && ! check_adv_reaches "$rb" && [ "$ORIGIN_SCOPE" = local ]; then
             report "check 29 skipped for $f — the remote's default-branch conf declares ANCHOR_SCOPE=local, which admits mode $dmode off the default branch"
           elif [ "$ADV_HEAD_OK" = 1 ] \
              && check_rev "$rb" \
@@ -2493,6 +2500,9 @@ while IFS= read -r f; do
       fi
       if [ -n "$recmay" ] || [ "$dmay" != none ]; then
         [ "$recmay" = "$dmay" ] || fail 19 "a run-state file pins a may: grant the build README at its own recorded BASE does not declare, so the authority the run says its owner committed is not the authority that README carries - pinned against declared follow: [${recmay:-(no may: fact)}] against [$dmay] in $f"
+      fi
+      if [ -n "$recmay" ] && [ "$recmay" != none ] && [ "$rlocal" = 1 ]; then
+        fail 19 "a run-state file pins a may: grant on a BASE the local anchor admitted, a commit on this node the run could have written, so the grant could be one the run wrote for itself - ruling D12-j honours a grant only from a slug README the owner committed at the default-branch anchor: may: [$recmay] in $f"
       fi
       if [ -n "$recmay" ] && [ "$recmay" != none ] && [ "${recmode:-$dmode}" != slug ]; then
         fail 19 "a run-state file pins a may: grant while recording an authorization mode that resolves at the second anchor, so the grant could be one the run wrote for itself - ruling D12-j honours a grant only under slug: mode [${recmode:-$dmode}], may: [$recmay] in $f"
@@ -2711,6 +2721,8 @@ WAIVERS
     # ---- not a consequence of the mode one: a `slug` record pinning a mandate with no declared
     # ---- producer is a pinned set nothing ever graded.
     askmode=$(fact_of "$f" mode)
+    [ "$rlocal" != 1 ] \
+      || fail 19 "a run-state file pins an asks: mandate on a BASE the local anchor admitted, a commit on this node the run could have written, so the mandate and the tree it is asserted against could both be this run's own: $f"
     [ "$askmode" = slug ] \
       || fail 19 "a run-state file pins an asks: mandate while recording an authorization mode whose discipline lets the run reach the anchor it writes, so the mandate and the tree it is asserted against could both be this run's own: mode [${askmode:-(none)}] in $f"
     [ -n "$ASKS_CMD" ] \

@@ -1,6 +1,6 @@
 # TOOL-aHomedAnchor-7 — the closing review's leg minors, batched
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 40a976d9 · streams tooling · order 5
+**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2 · base 40a976d9 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 

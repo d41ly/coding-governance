@@ -3095,8 +3095,11 @@ reset_tree
 # ---- `slug` README sits on that off-default base, stays silent.
 add_local_scope() { printf 'ANCHOR_SCOPE="local"\n' >> .unattended.conf; }
 anchor_break add_local_scope
+# ---- TOOL-aHomedAnchor-7 AC4: a record whose BASE is on the default branch prints no check 29 skip.
+miss "$(GOV_UNATTENDED_REPORT=1 run)" "check 29 skipped for"
 git commit -q --allow-empty -m unit-only --no-verify
-sed -i "s|^base: .*|base: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
+_hb=$(git rev-parse HEAD)
+sed -i "s|^base: .*|base: $_hb|" memory/builds/tRun/RUN.md
 git add -A >/dev/null
 out=$(GOV_UNATTENDED_REPORT=1 run)
 hit  "$out" "check 9 admitted by the local anchor — a recorded BASE no remote tip carries, on HEAD's history, in a repo whose default-branch conf declares ANCHOR_SCOPE=local: "
@@ -3107,6 +3110,15 @@ off=$(git commit-tree "$(git rev-parse 'HEAD^{tree}')" -m "a commit off this wor
 sed -i "s|^base: .*|base: $off|" memory/builds/tRun/RUN.md
 git add -A >/dev/null
 hit  "$(run)" "a recorded BASE is not published on the remote — it is an ancestor of no tip the remote advertises, so it names a commit that exists only where this run could have authored it: recorded $off"
+# ---- TOOL-aHomedAnchor-7 AC1: back on the local-admitted base, a pinned may: grant and a pinned
+# ---- asks: mandate each red, because a slug mode no longer proves the first anchor there.
+sed -i "s|^base: .*|base: $_hb|" memory/builds/tRun/RUN.md
+sed -i '/^base: /a may: memory/notes.md' memory/builds/tRun/RUN.md
+sed -i '/^base: /a asks: EXMP-aFoo-3' memory/builds/tRun/RUN.md
+git add -A >/dev/null
+out=$(run)
+hit  "$out" "a run-state file pins a may: grant on a BASE the local anchor admitted, a commit on this node the run could have written, so the grant could be one the run wrote for itself - ruling D12-j honours a grant only from a slug README the owner committed at the default-branch anchor: may: [memory/notes.md] in "
+hit  "$out" "a run-state file pins an asks: mandate on a BASE the local anchor admitted, a commit on this node the run could have written, so the mandate and the tree it is asserted against could both be this run's own: "
 anchor_restore
 # ---- AC2: `local` in the WORKING TREE only, the remote's default branch unchanged, admits nothing.
 reset_tree
@@ -3118,6 +3130,27 @@ out=$(GOV_UNATTENDED_REPORT=1 run)
 hit  "$out" "a recorded BASE is not published on the remote — it is an ancestor of no tip the remote advertises, so it names a commit that exists only where this run could have authored it: recorded"
 miss "$out" "check 9 admitted by the local anchor"
 reset_tree
+# ---- TOOL-aHomedAnchor-7 AC2: LOCAL REFS carrying `local` - refs/heads/main and the remote-tracking
+# ---- ref moved to a commit that declares it, never pushed - admit nothing: the leg reads the
+# ---- advertisement, which still names the strict conf.
+git checkout -q main
+add_local_scope; git add -A >/dev/null && git commit -q -m side --no-verify; _side=$(git rev-parse HEAD)
+git checkout -q unit
+git update-ref refs/remotes/origin/main "$_side"
+git commit -q --allow-empty -m unit-only --no-verify
+sed -i "s|^base: .*|base: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
+git add -A >/dev/null
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit  "$out" "a recorded BASE is not published on the remote — it is an ancestor of no tip the remote advertises, so it names a commit that exists only where this run could have authored it: recorded"
+miss "$out" "check 9 admitted by the local anchor"
+git update-ref refs/heads/main "$ANCHOR0"
+reset_tree
+# ---- AC3: the reader's shapes. `export` is an assignment, an expansion reads strict, the last wins.
+eval "$(sed -n '/^read_origin_scope() {/,/^}/p' "$SCRIPT")"
+same "aHomedAnchor-7 AC3 an export prefix reads local" "$(read_origin_scope 'export ANCHOR_SCOPE="local"')" "local"
+same "aHomedAnchor-7 AC3 an expansion reads strict" "$(read_origin_scope 'ANCHOR_SCOPE="${X:-local}"')" ""
+same "aHomedAnchor-7 AC3 a backtick on any assignment reads strict" "$(read_origin_scope "$(printf 'ANCHOR_SCOPE=local\nANCHOR_SCOPE=`true`')")" ""
+same "aHomedAnchor-7 AC3 the last plain assignment wins" "$(read_origin_scope "$(printf 'ANCHOR_SCOPE=local\nANCHOR_SCOPE="published"')")" "published"
 
 # ---- the DECLARATION SEAM second-opinioned. The record claims a
 # ---- playbook and a count the README at its own BASE does not declare. Two branches, two
