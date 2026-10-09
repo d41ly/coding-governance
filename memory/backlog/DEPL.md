@@ -24,6 +24,7 @@ Cite ids, never line numbers.
 | [DEPL-aHoistedPass-7](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | RECIPE MODE IS UNRESOLVED AND THE CARRIER AND THE REGISTRY DISAGREE… |
 | [DEPL-aHoistedPass-8](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | whether a runId survives a compaction is UNVERIFIED, so the prefix… |
 | [DEPL-aHoistedPass-9](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | refusal_join.py's SHRINK-ONLY FLOOR TRAILS ITS POPULATION: BRANCH_PIN… |
+| [DEPL-aLevelledCopy-2](../builds/aLevelledCopy/BACKLOG.md) | OPEN | MED | — | 2026-10-09 | govkit apply lands a NEW engine row with write_bytes and sets no mode,… |
 | [DEPL-aRepatriatedFork-22](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-24 | govkit check takes ~4 min at inCMS: DEPL-13's print-mode probes run its… |
 | [DEPL-aRepatriatedFork-23](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-26 | nc runs its own recall hook outside the kit, beside a copy gov now… |
 | [DEPL-aSealedCaravan-3](../builds/aSealedCaravan/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | WIRE-INTO-PROJECT.md sends the reader to a section 2a for the… |

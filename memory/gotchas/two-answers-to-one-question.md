@@ -110,3 +110,19 @@ scratch it swept — grading 2 orders of the suite's 9 and, once moved, flagging
 `GATE_SELFTESTS=1` over the kits whose fixtures FEED the changed surface, not only the kit it
 edited; and where the fixture can be replaced by a read of the product — the runlog scaffold can be
 captured from the driver rather than retyped — it is.
+
+## The roster form — a hand-kept Status column beside the generated one
+
+A build README carries two tables of its units: the authored `roster:units` table, which plans
+them, and the generated `build-units` region, which `gen_build_index.py` renders from each spec's
+status header. In `aLevelledCopy` the authored roster carried a Status column that read OPEN while
+the generated table beside it read CLOSED rev-2, and the closing review found it (L4, finding id 18).
+An awk walk of every `memory/builds/*/README.md` on 2026-10-09 found 31 of the 144 authored rosters
+carrying a `Status` header, so the shape is common rather than one build's slip.
+
+**The check:** write no status into an authored roster. The generated `build-units` region IS the
+status, and a column beside it is a second answer that is right only on the day it was typed.
+
+**Why it is not gated** (`TOOL-aLevelledCopy-9` §8 F3): refusing the column in the index generator
+would red 31 landed READMEs or need a new cutoff key, which is a memory-tree kit change and its
+version bump, outside the unit that found it. This record is the left-shift until a unit owns that.
