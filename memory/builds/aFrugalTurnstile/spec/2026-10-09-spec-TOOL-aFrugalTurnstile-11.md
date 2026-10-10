@@ -1,10 +1,12 @@
 # TOOL-aFrugalTurnstile-11 — a scoped green takes its own slot, and the nearest adoptable green wins
 
-**Status:** OPEN · rev-1 · 2026-10-10 · node a · Tier-2 · base bef97330 · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-10-10 · node a · Tier-2 · base bef97330 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-09-build-TOOL-aFrugalTurnstile-11-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-11-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -38,7 +40,10 @@ the candidate nearest the tip win.
   scoped one. The staleness bound a `kind scoped` record is held to is still counted from its base
   (TOOL-aFrugalTurnstile-2 S3b); only the PREFERENCE uses its own sha. The bar-record pass runs only
   for a non-STUB bar, as today, and switching from one adopted candidate to another can never turn a
-  scoped decision FULL. The decision line names the adopted record as today. Observed by AC5, AC6.
+  scoped decision FULL. The decision line names the adopted record as today, except that a runner
+  stamp from this git dir that wins over an adoptable bar record is named
+  `this git dir's gate-full-green`, so the line says which record won. An adopted inherited green
+  keeps today's decision: the bar-record pass does not run beside it. Observed by AC5, AC6.
 - **S4 — the header.** The comment above `bar_candidates` states the two slots and why, and the one
   above the selection states the nearest-wins rule and what it does NOT check: that a nearer scoped
   record's base is the SAME full green an adopted runner stamp names. Observed by AC7.
@@ -156,6 +161,9 @@ none
 
 - rev-1 · 2026-10-10 · §2 S1-S5, §6 AC1-AC7: initial draft, adopted mid-build from
   TOOL-aFrugalTurnstile-2's discovery (protocol §11), insertion points read at b99b2dc38.
+- rev-2 · 2026-10-10 · §2 S3: build pass. What disagreed: AC6 wants the line to name the file
+  `gate-full-green`, and today's line names a this-git-dir runner stamp by no file, so S3 now names it
+  when it beat an adoptable bar record. Also stated: an adopted inherited green keeps today's decision.
 
 ## 10. Reuse audit
 

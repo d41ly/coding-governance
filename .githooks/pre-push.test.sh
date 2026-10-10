@@ -1872,4 +1872,64 @@ case "$BG_OUT" in
 esac
 cd "$pfx_home" || exit 2
 
+# TOOL-aFrugalTurnstile-11 AC1, AC3 — a wrapper bar from one git dir: FULL, scoped, then scoped again.
+build_bg_fixture slot1 || bad "BG could not build its fixture"
+echo 1 >> src/x.sh; git commit -qam c1; _c1=$(git rev-parse HEAD); run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
+echo 2 >> src/x.sh; git commit -qam c2; _c2=$(git rev-parse HEAD); run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
+[ "$(read_bg_key "$bg_gd/gate-bar-green" kind)|$(read_bg_key "$bg_gd/gate-bar-green" sha)|$(read_bg_key "$bg_gd/gate-bar-green.scoped" kind)|$(read_bg_key "$bg_gd/gate-bar-green.scoped" sha)" \
+  = "full|$_c1|scoped|$_c2" ] \
+  && ok "BG slot AC1 a scoped push leaves gate-bar-green kind full and writes gate-bar-green.scoped kind scoped" \
+  || bad "BG slot AC1 expected the full record kept and the scoped one in its own slot: $(cat "$bg_gd/gate-bar-green" "$bg_gd/gate-bar-green.scoped" 2>&1)"
+echo 3 >> src/x.sh; git commit -qam c3; run_bg_push GOV_GATE_CMD="$BG_WRAP"
+case "$BG_OUT" in
+  *"FULL gate on main push"*) bad "BG slot AC3 the third push went FULL, the alternation: $BG_OUT" ;;
+  *"scoped gate on main push"*) ok "BG slot AC3 the third push from the same git dir reads scoped gate" ;;
+  *) bad "BG slot AC3 expected a scoped gate line, got: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-11 AC2 — the scoped record from a linked worktree is shared to the common dir.
+build_bg_fixture slot2 || bad "BG could not build its fixture"
+git worktree add -q "$BG_D/wt" -b wtb >/dev/null 2>&1
+( cd "$BG_D/wt" || exit 1; bg_gd=$(git rev-parse --git-dir)
+  echo 1 >> src/x.sh; git commit -qam w1; run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
+  echo 2 >> src/x.sh; git commit -qam w2; run_bg_push GOV_GATE_CMD="$BG_WRAP"
+  [ "$(read_bg_key "$bg_gd/gate-bar-green.scoped" kind)" = scoped ] \
+    && cmp -s "$bg_gd/gate-bar-green.scoped" "$(git rev-parse --git-common-dir)/gate-bar-green.scoped.shared" ) \
+  && ok "BG slot AC2 a linked worktree's scoped record is shared byte-identical as gate-bar-green.scoped.shared" \
+  || bad "BG slot AC2 the common dir holds no byte-identical gate-bar-green.scoped.shared"
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-11 AC4 — a scoped record only in the scoped slot covers a push of its tree.
+build_bg_fixture slot4 || bad "BG could not build its fixture"
+_b=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
+write_bg_record "$bg_gd/gate-bar-green" "$_b" full "" "$BG_WRAP"; write_bg_record "$bg_gd/gate-bar-green.scoped" "$_l" scoped "$_b" "$BG_WRAP"
+_m0=$(read_bg_marks); run_bg_push GOV_GATE_CMD="$BG_WRAP"
+case "$(read_bg_marks)|$BG_OUT" in
+  "$_m0|"*"covered on main push"*"this git dir's gate-bar-green.scoped sha ${_l:0:8}"*"no bar runs"*) ok "BG slot AC4 the cover pass reads the scoped slot" ;;
+  *) bad "BG slot AC4 expected the scoped-slot record to cover with no bar run, got marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-11 AC5 — a runner stamp at F and a scoped record at M (base F): M is nearer, M wins.
+build_bg_fixture slot5 || bad "BG could not build its fixture"
+_f=$(git rev-parse HEAD); write_bg_stamp "$_f"
+echo 1 >> src/x.sh; git commit -qam m; _m=$(git rev-parse HEAD); write_bg_record "$bg_gd/gate-bar-green" "$_m" scoped "$_f" "$BG_RUNNER"
+echo 2 >> src/x.sh; git commit -qam t; run_bg_push
+case "$BG_OUT" in
+  *"scoped gate on main push"*"scoped bar green ${_m:0:8}"*"counted from its base ${_f:0:8}"*"BAR base=$_m full="*) ok "BG slot AC5 the nearer scoped record at M beats the runner stamp at F" ;;
+  *) bad "BG slot AC5 expected the decision to scope from M, got: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-11 AC6 — a runner stamp and a bar record at one sha: the tie keeps the runner stamp.
+build_bg_fixture slot6 || bad "BG could not build its fixture"
+echo 1 >> src/x.sh; git commit -qam s; _s=$(git rev-parse HEAD); write_bg_stamp "$_s"
+write_bg_record "$bg_gd/gate-bar-green" "$_s" full "" "$BG_RUNNER"; echo 2 >> src/x.sh; git commit -qam t; run_bg_push
+case "$BG_OUT" in
+  *"scoped gate on main push"*"full green ${_s:0:8} from this git dir's gate-full-green"*) ok "BG slot AC6 a tie names gate-full-green as the adopted record" ;;
+  *) bad "BG slot AC6 expected the runner stamp named on a tie, got: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

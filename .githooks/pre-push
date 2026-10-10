@@ -1195,13 +1195,22 @@ rec_from=""; rec_word="full green"; rec_base=""
 # `write_bar_green` below records when THIS hook's bar exits green, whichever bar it was, so a bar that
 # is not the runner has a record too: the runner stamps above prove only the runner's legs. Three
 # places, in the runner stamps' order and for their reason.
-bar_candidates=("$gd/gate-bar-green"); bar_labels=("this git dir's gate-bar-green")
-if [ -n "$_gcd_abs" ]; then
-  if [ "$_gcd_abs" != "$_gd_abs" ]; then
-    bar_candidates+=("$_gcd_abs/gate-bar-green"); bar_labels+=("the common dir's gate-bar-green")
+# TWO SLOTS PER PLACE (TOOL-aFrugalTurnstile-11 S1/S2): a `kind full` record lives in `gate-bar-green`,
+# a `kind scoped` one in `gate-bar-green.scoped`. With one slot a scoped push overwrote the full record
+# its own base depended on, so the next push from that git dir found no base and went FULL: a wrapper
+# bar alternated FULL and scoped. The full slots come first, `bar_full_n` of them, and are the only
+# ones `check_bar_base` reads; a scoped record an older writer left in a full slot is read as before.
+bar_candidates=(); bar_labels=()
+for _bs in gate-bar-green gate-bar-green.scoped; do
+  bar_candidates+=("$gd/$_bs"); bar_labels+=("this git dir's $_bs")
+  if [ -n "$_gcd_abs" ]; then
+    if [ "$_gcd_abs" != "$_gd_abs" ]; then
+      bar_candidates+=("$_gcd_abs/$_bs"); bar_labels+=("the common dir's $_bs")
+    fi
+    bar_candidates+=("$_gcd_abs/$_bs.shared"); bar_labels+=("the common dir's $_bs.shared")
   fi
-  bar_candidates+=("$_gcd_abs/gate-bar-green.shared"); bar_labels+=("the common dir's gate-bar-green.shared")
-fi
+  [ "$_bs" = gate-bar-green ] && bar_full_n=${#bar_candidates[@]}
+done
 # read_bar_file <path> — every key a `gate-bar-green` record or a runner stamp carries, by builtins
 # alone, so a candidate costs no process. Each is empty when the file or the key is absent.
 read_bar_file() {
@@ -1356,7 +1365,7 @@ check_bar_base() {
       found=$force
     done
   fi
-  for f in "${bar_candidates[@]}"; do
+  for f in "${bar_candidates[@]:0:bar_full_n}"; do
     read_bar_file "$f"
     [ "$bg_kind" = full ] && [ "$bg_sha" = "$want" ] || continue
     check_green_record "$bg_sha" "" "" "" "$bg_st" "full bar green" "$bg_tree" "$bg_bar"
@@ -1516,19 +1525,35 @@ fi
 # vetted, because a record is compared with the bar this push runs. A STUB bar keeps today's decision:
 # no record is ever written for one. The unattended in-place close commits its record on top of the
 # merge its bar graded, so that landing is not covered; it scopes from this record instead.
-if [ -n "$force" ] && [ -z "$inh_sha" ] && [ "$bar_record" != stub ]; then
-  _bar_force=$force; _bar_why=""
+# NEAREST ADOPTABLE GREEN WINS: among every candidate that passes the predicates, the one whose own sha
+# is fewest first-parent landings behind the tip is adopted, so a scoped green at the graded merge
+# beats an older full green; this does not check that the two name the same base.
+# (TOOL-aFrugalTurnstile-11 S3/S4.) The pass now runs after an adopted runner stamp too, which is the
+# first candidate, and a tie keeps the earlier one: a runner stamp beats a bar record, a full record a
+# scoped one. A scoped record's staleness bound is still counted from its base; only the PREFERENCE uses
+# its own sha. It can only replace one adopted candidate with another, so it never turns scoped FULL.
+if [ -z "$inh_sha" ] && [ "$bar_record" != stub ]; then
+  _bar_force=$force; _bar_why=""; _bar_ok=""
+  _sel_d=""; [ -z "$force" ] && _sel_d=$lag   # the adopted runner stamp's own distance
+  _sel_sha=$rec_sha; _sel_from=$rec_from; _sel_word=$rec_word; _sel_base=$rec_base; _sel_lag=$lag
   for _bi in "${!bar_candidates[@]}"; do
     [ -f "${bar_candidates[$_bi]}" ] || continue
     check_bar_record "${bar_candidates[$_bi]}"
-    if [ -z "$force" ]; then
-      rec_sha=$bg_sha; rec_from=${bar_labels[$_bi]}; rec_word="$bg_kind bar green"
-      [ "$bg_kind" = scoped ] && rec_base=$bg_base
-      _bar_force=""; _bar_why=""; break
+    if [ -n "$force" ]; then _bar_why="$_bar_why; ${bar_labels[$_bi]}: $force"; continue; fi
+    _bar_ok=1; _d=$lag
+    [ "$bg_kind" = scoped ] && _d=$(git rev-list --first-parent --count "$bg_sha..$main_local" 2>/dev/null || echo "$lag")
+    if [ -z "$_sel_d" ] || [ "$_d" -lt "$_sel_d" ]; then
+      _sel_d=$_d; _sel_sha=$bg_sha; _sel_from=${bar_labels[$_bi]}; _sel_word="$bg_kind bar green"; _sel_lag=$lag
+      _sel_base=""; [ "$bg_kind" = scoped ] && _sel_base=$bg_base
     fi
-    _bar_why="$_bar_why; ${bar_labels[$_bi]}: $force"
   done
-  force=$_bar_force${_bar_force:+$_bar_why}
+  if [ -n "$_sel_d" ]; then
+    # A runner stamp that beat an adoptable bar record is named, so the line says which record won.
+    [ -n "$_bar_ok" ] && [ -z "$_bar_force" ] && [ -z "$_sel_from" ] && _sel_from="this git dir's gate-full-green"
+    force=""; rec_sha=$_sel_sha; rec_from=$_sel_from; rec_word=$_sel_word; rec_base=$_sel_base; lag=$_sel_lag
+  else
+    force=$_bar_force$_bar_why
+  fi
 fi
 
 # THE DEFAULT BAR WITH NO KIT ROOT — TOOL-aRepatriatedFork-24 S2, the owner's F1 (c). A commit hook
@@ -1792,12 +1817,14 @@ check_verdict_record() {
 # From a linked worktree it is also copied to the common dir's `gate-bar-green.shared`, as the runner
 # shares its stamp. `bar_paths` is split with `read -ra`, never by toggling globbing: the bar self-test
 # anchors on the one glob toggle `check_bar_command` holds. Self-contained, so a slice of it runs alone.
+# A `kind scoped` record goes to `gate-bar-green.scoped` (and `.scoped.shared`) instead, so it never
+# replaces the full record its base names (TOOL-aFrugalTurnstile-11 S1); the line names the file.
 write_bar_green() {
-  local g=$1 h=$2 rc=$3 kind=$4 base=$5 bar=$6 run=$7 tree dirty w paths="" cdir cdir_abs g_abs
+  local g=$1 h=$2 rc=$3 kind=$4 base=$5 bar=$6 run=$7 tree dirty w paths="" cdir cdir_abs g_abs f=gate-bar-green
   local -a words=()
   local no="pre-push: no gate-bar-green written —"
   if [ "$rc" != 0 ]; then echo "$no the bar's own verdict was red, and the push lands under INHERITED_RED=land"; return 0; fi
-  case "$kind" in full|scoped) ;; *) echo "$no the decision kind '$kind' is neither full nor scoped"; return 0 ;; esac
+  case "$kind" in full) ;; scoped) f=gate-bar-green.scoped ;; *) echo "$no the decision kind '$kind' is neither full nor scoped"; return 0 ;; esac
   case "$bar" in *$'\t'*|*$'\n'*) echo "$no the bar's command holds a tab or a newline"; return 0 ;; esac
   if [ "$(git rev-parse HEAD 2>/dev/null)" != "$h" ]; then echo "$no HEAD moved"; return 0; fi
   if ! dirty=$(git status --porcelain --ignore-submodules=untracked 2>/dev/null) || [ -n "$dirty" ]; then
@@ -1809,17 +1836,17 @@ write_bar_green() {
   for w in "${words[@]}"; do case "$w" in */*|*.sh) paths="$paths${paths:+ }$w" ;; esac; done
   if ! { printf 'sha\t%s\ntree\t%s\nbar\t%s\nbar_paths\t%s\nkind\t%s\nbase\t%s\nselftests\t%s\nrun_id\t%s\nby\tpre-push\nstamped\t%s\n' \
            "$h" "$tree" "$bar" "$paths" "$kind" "$base" "${GATE_SELFTESTS:+1}" "$run" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-           > "$g/gate-bar-green.tmp" && mv -f "$g/gate-bar-green.tmp" "$g/gate-bar-green"; } 2>/dev/null; then
-    echo "$no $g/gate-bar-green could not be written"; return 0
+           > "$g/$f.tmp" && mv -f "$g/$f.tmp" "$g/$f"; } 2>/dev/null; then
+    echo "$no $g/$f could not be written"; return 0
   fi
   cdir=$(git rev-parse --git-common-dir 2>/dev/null) || cdir=""
   cdir_abs=""; [ -n "$cdir" ] && cdir_abs=$(cd "$cdir" 2>/dev/null && pwd -P)
   g_abs=$(cd "$g" 2>/dev/null && pwd -P) || g_abs=""
   if [ -n "$cdir_abs" ] && [ -n "$g_abs" ] && [ "$cdir_abs" != "$g_abs" ]; then
-    cp "$g/gate-bar-green" "$cdir_abs/gate-bar-green.shared.tmp" 2>/dev/null \
-      && mv -f "$cdir_abs/gate-bar-green.shared.tmp" "$cdir_abs/gate-bar-green.shared" 2>/dev/null
+    cp "$g/$f" "$cdir_abs/$f.shared.tmp" 2>/dev/null \
+      && mv -f "$cdir_abs/$f.shared.tmp" "$cdir_abs/$f.shared" 2>/dev/null
   fi
-  echo "pre-push: recorded gate-bar-green for ${h:0:8} — kind $kind${base:+ base ${base:0:8}} — bar: $bar"
+  echo "pre-push: recorded $f for ${h:0:8} — kind $kind${base:+ base ${base:0:8}} — bar: $bar"
 }
 
 # THE RUNNER'S ARM SEAMS DO NOT REACH THE BOUNDARY (TOOL-dDerivedDocket-26). `GATE_SPAWN_CMD`,
