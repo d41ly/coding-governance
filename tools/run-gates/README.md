@@ -132,11 +132,34 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 
 ## Reuse, and the baseline a guard diffs against
 
-`GATE_REUSE=1` skips a leg whose inputs are byte-identical to a recorded green: not declared
-`impure`, its ledger row says `ok`, and the row's input key equals the one computed this run. Any
-missing term means execute — every failure mode is "did more work", never "checked less". It is
-OPT-IN because an advisory input may cause less work only on a run that is not authoritative, and
-`.githooks/pre-push` never sets it. A run that reused anything cannot stamp `gate-full-green`.
+`GATE_REUSE` skips a leg whose inputs are byte-identical to a recorded green, in one of two modes.
+Either way the leg is not declared `impure`, its row in `<git-dir>/gate-ledger.tsv` says `ok`, and
+the row's input key equals the one computed this run. The key hashes the leg's argv, the run's base
+and the leg's guard paths (index entries plus their porcelain lines), or the whole-tree fingerprint
+for an unguarded leg. Any missing term means execute: every failure mode is "did more work", never
+"checked less". The runner reads the knob once, records it as the run header's `reuse` key, and
+unsets it before any leg starts, so a leg's nested runner never inherits a mode.
+
+- **`GATE_REUSE=1`**, or any value but `lineage`, is the OPT-IN mode, for a run you ask for by hand.
+  A run that reused anything in it cannot stamp `gate-full-green`.
+- **`GATE_REUSE=lineage`** also wants the row's `full` field to read `1`, meaning the run that
+  earned it set `GATE_FULL` on a clean tree. Its `manifest_blob` must be this run's, and its `head`
+  must be an ancestor of `HEAD`. A run whose every reuse meets those terms may still stamp
+  `gate-full-green`, which records the count as `reused`. `.githooks/pre-push` exports this mode on
+  its own FULL decision for this runner, and on no other decision or bar. That FULL line ends
+  `— reuse: lineage`. So after a red push, the fix push re-runs the failed legs and the legs whose
+  key moved, and nothing else. The key's base term ties one chain of reuses to one remote base,
+  because a landing moves the base and voids every key.
+
+WHAT LINEAGE REUSE DOES NOT CHECK: that a reused leg's guard names every input the leg reads, or
+that its verdict depends on the tree alone. A reused verdict is only as good as its input key, so
+a too-narrow guard or an undeclared `impure` leg is carried forward until its key moves, the
+remote base moves, or a run without `GATE_REUSE` re-executes it — the post-merge full bar is that
+run.
+
+The ledger is per git dir, so a bar run in one worktree feeds lineage only to pushes from that
+worktree. A row written before these fields existed has an empty `full` and is never
+lineage-reusable. The inherited-green stamp still asks that nothing was reused.
 
 The baseline a guard diffs against is the MERGE-BASE with the default branch, so a branch is graded
 on what it changed rather than on everything that landed while it was open — used only where the
@@ -372,10 +395,13 @@ it costs no process beyond the one `mkdir` a clone's first bar pays for the jour
 
 `<git-dir>/gate-ledger.tsv` is the cross-run store: one row per leg, with the duration in field 2 —
 which is what lets the runner read it as a dispatch hint and `profile_bar.py` read it as a
-measurement, with no second copy of the same fact.
+measurement, with no second copy of the same fact. A row is nine tab-separated fields: name,
+seconds, status, input key, ended-at, run, full, manifest_blob, head. The reuse section above says
+what reads the last four.
 
 `<git-dir>/gate-full-green` is stamped only when the run failed nothing, skipped nothing, reused
-nothing, the tree did not move, AND the tree was CLEAN when the run started. CLEAN means
+nothing but lineage-qualified legs, the tree did not move, AND the tree was CLEAN when the run
+started. CLEAN means
 `git status --porcelain` empty, untracked files included. All five preconditions are what make the
 file's name true, and an implementation that forgets one passes every arm written for the others.
 The stamp also records `manifest`, the repo-relative path of the leg manifest the run read, and the

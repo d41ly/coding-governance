@@ -1,12 +1,13 @@
 # TOOL-aFrugalTurnstile-4 — lineage reuse: after a red, the boundary's full bar re-runs only failed and moved legs, and may stamp
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-10-10 · node a · Tier-2 · base bef97330 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
+| [2026-10-09-build-TOOL-aFrugalTurnstile-4-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
@@ -141,11 +142,18 @@ Stamp key `reused`, the count of reused legs, always written (`0` when none). No
 
 ### Inventory
 
-No function is minted: the lineage branch is inline in the existing reuse block, so the lexicon and
-codebase-map legs grade nothing new. No new `GATE_`/`GOV_` knob is minted: `lineage` is a value of
-`GATE_REUSE`, and the `unset GATE_REUSE` spells no `$`, so H49's knob-class arm keeps its count. New
+No function is minted in the runner or the hook: the lineage branch is inline in the existing reuse
+block. The suite arms of §7 mint eight helpers (rev-2), each leading with a declared verb, and
+`memory/map/generated/symbols.json` is regenerated for them: `build_lin_repo`, `write_lin_fix`,
+`read_lin_header`, `read_lin_stamp` and `check_lin_control` in the evidence suite; `run_lin_push`,
+`read_lin_token` and `read_lin_reused` in `.githooks/pre-push.test.sh`. No new `GATE_`/`GOV_` knob is
+minted: `lineage` is a value of `GATE_REUSE`, the runner reads it once as `${GATE_REUSE:-}` exactly
+as before, and the `unset GATE_REUSE` spells no `$`, so H49's knob-class arm keeps its count. New
 shell variables in the runner: `REUSE_MODE`, `lineage_reuses`, `MANIFEST_BLOB` (hoisted from the
-header so the header, the rows and the stamp read one value), `HEAD_SHA`.
+header so the header, the rows and the stamp read one value), `HEAD_SHA`, the ledger block's
+`lfull`, and the reuse block's temporaries `_lrow` and `_rbase` (associative arrays, unset after the
+block), `_anc_yes` and `_anc_no` (the ancestry memo strings) and the `_`-prefixed row fields. The
+hook gains `_reuse_clause`.
 
 ### Insertion points (read at base `bef97330`)
 
@@ -310,6 +318,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-10 · build pass. §4 Inventory: "no function is minted" held for the runner and
+  the hook only; the §7 arms mint eight suite helpers, now named there with the symbols.json regen
+  they owe, and the runner's temporaries are listed beside its four named variables. No criterion
+  changed.
 
 ## 10. Reuse audit
 

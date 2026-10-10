@@ -65,3 +65,7 @@ base: bef97330574caabfd43c374dbe8c39b26c560203
 2026-10-10T00:27:08Z dispatch · item 587b006f TOOL-aFrugalTurnstile-11 · reason .githooks/pre-push .githooks/pre-push.test.sh memory/builds/aFrugalTurnstile/spec/2026-10-09-spec-TOOL-aFrugalTurnstile-11.md memory/builds/aFrugalTurnstile/build/2026-10-09-build-TOOL-aFrugalTurnstile-11-1-acceptance-ledger.md memory/builds/aFrugalTurnstile/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md
 
 2026-10-10T00:29:03Z brief · item TOOL-aFrugalTurnstile-11 · reason 142385d5e412 memory/builds/aFrugalTurnstile/prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md
+
+2026-10-10T00:54:41Z dispatch · item 295b46b9 TOOL-aFrugalTurnstile-4 · reason tools/run-gates/run-gates.sh tools/run-gates/README.md tools/run-gates/run-gates.evidence.test.sh tools/run-gates/profile_bar.py tools/run-gates/derive-ceilings.py .githooks/pre-push .githooks/pre-push.test.sh memory/builds/aFrugalTurnstile/spec/2026-10-09-spec-TOOL-aFrugalTurnstile-4.md memory/builds/aFrugalTurnstile/build/2026-10-09-build-TOOL-aFrugalTurnstile-4-1-acceptance-ledger.md memory/builds/aFrugalTurnstile/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md
+
+2026-10-10T00:55:31Z brief · item TOOL-aFrugalTurnstile-4 · reason 142385d5e412 memory/builds/aFrugalTurnstile/prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md

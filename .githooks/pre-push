@@ -1718,7 +1718,13 @@ if [ -n "$inh_sha" ]; then
   export GATE_BASE="$inh_sha"
   RUNLOG_DECISION=scoped
 elif [ -n "$force" ]; then
-  echo "pre-push: FULL gate on $def push (${main_local:0:8}) — ${DOCS_ONLY:+doc-only, but }$force${inh_why:+; $inh_why} — bar: $bar_label"
+  # LINEAGE REUSE, on this decision and this bar only (TOOL-aFrugalTurnstile-4 S7, design D5): after
+  # a red, the fix push re-runs the failed legs and the legs whose input key moved, and may still stamp.
+  # Exported AFTER the scrub above, so an inherited GATE_REUSE is still never honoured; a bar that is
+  # not this kit's runner gets nothing, and the runner unsets it before any leg starts.
+  _reuse_clause=""
+  [ "$bar_record" = runner ] && { export GATE_REUSE=lineage; _reuse_clause=" — reuse: lineage"; }
+  echo "pre-push: FULL gate on $def push (${main_local:0:8}) — ${DOCS_ONLY:+doc-only, but }$force${inh_why:+; $inh_why} — bar: $bar_label$_reuse_clause"
   export GATE_FULL=1
   RUNLOG_DECISION=full
 else

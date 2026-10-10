@@ -706,9 +706,10 @@ rec_legs '[ {"name": "one", "argv": ["bash", "fx/a.sh"]}, {"name": "two", "argv"
 rc=$(rec_run GATE_FULL=1)
 cn_v0=$(grep '^gates ' "$REC_OUT")
 # AC6 rides this control run: the ledger block's read of a `.leg` row takes field 7 alone.
-[ "$(grep -c . "$REC_GD/gate-ledger.tsv" 2>/dev/null)" = 2 ] && [ -z "$(awk -F'\t' 'NF != 5' "$REC_GD/gate-ledger.tsv" 2>/dev/null)" ] \
-  && ok "AC6 every gate-ledger row stays five fields, so no key absorbed the eighth" \
-  || { nope "AC6 the ledger lost its five-field shape"; cat -A "$REC_GD/gate-ledger.tsv" 2>/dev/null | sed 's/^/      /'; }
+# Nine fields since TOOL-aFrugalTurnstile-4 S1 added run, full, manifest_blob and head after ended-at.
+[ "$(grep -c . "$REC_GD/gate-ledger.tsv" 2>/dev/null)" = 2 ] && [ -z "$(awk -F'\t' 'NF != 9' "$REC_GD/gate-ledger.tsv" 2>/dev/null)" ] \
+  && ok "AC6 every gate-ledger row stays nine fields, so no key absorbed the eighth" \
+  || { nope "AC6 the ledger lost its nine-field shape"; cat -A "$REC_GD/gate-ledger.tsv" 2>/dev/null | sed 's/^/      /'; }
 mkdir -p "$tmp/ps-fail" "$tmp/ps-nocol" "$tmp/ps-noself"
 printf '#!/bin/sh\nexit 1\n' > "$tmp/ps-fail/ps"
 printf '#!/bin/sh\necho "  UID  TTY  STIME COMMAND"\necho "  u    ?    10:00 bash fx/a.sh"\n' > "$tmp/ps-nocol/ps"
@@ -972,8 +973,9 @@ grep -q '^GATE reuse pb' "$REC_OUT" && ok "control: the green sibling WAS reused
                                     || nope "nothing was reused, so the red arm proves nothing"
 ru_done
 
-# REUSE DEFEATS THE FULL-GREEN STAMP. This is the join the push boundary rests on: a stamp must never
-# be able to describe a run that copied a verdict instead of earning it.
+# OPT-IN REUSE DEFEATS THE FULL-GREEN STAMP. This is the join the push boundary rests on: a stamp must
+# never describe a run that copied a verdict no full run earned. The `lineage` mode, whose reuses a
+# full run on a clean tree did earn, is the one exception, and its arms follow the profiler's below.
 ru_repo
 ru_run GATE_FULL=1 >/dev/null
 [ -f "$RU_GD/gate-full-green" ] && ok "control: the earning run stamped a full green" \
@@ -1005,6 +1007,113 @@ if [ -f "$ROOT/${PFX}${KIT}/profile_bar.py" ]; then
 else
   ok "no profiler ships beside the runner here, so its reuse grammar is not gradeable (stated)"
 fi
+
+# =================================================================================================
+# LINEAGE REUSE (TOOL-aFrugalTurnstile-4). `GATE_REUSE=lineage` reuses only a row that a FULL run on a
+# CLEAN tree earned, on this manifest blob, at an ancestor of HEAD, and a run whose every reuse is of
+# that kind may still stamp. The scratch is ru_repo's plus an unguarded leg `pu`, which writes the
+# GATE_REUSE it sees into the git dir, and a `pb` that stays red until `gb/f` says fixed.
+# EVERY REFUSAL ARM CARRIES ITS CONTROL ON THE SAME LEDGER: it is saved before the lineage run and put
+# back before a GATE_REUSE=1 run, which must reuse `pa`. Without that, a key that never matched would
+# pass the refusal arm as well as the lineage term it names.
+build_lin_repo() {
+  ru_repo || return 1
+  printf '#!/usr/bin/env bash\ngrep -q fixed gb/f\n' > "$RU_T/fx/b.sh"
+  printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_REUSE-unset}" > .git/reuse-leak\n' > "$RU_T/fx/u.sh"
+  echo broken > "$RU_T/gb/f"
+  printf '%s\n' '[' \
+    '  {"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
+    '  {"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]},' \
+    '  {"name": "pu", "argv": ["bash", "fx/u.sh"]}' \
+    ']' > "$RU_T/${PFX}gate-legs.json"
+  ( cd "$RU_T" && git add -A && git commit -qm lineage && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+}
+write_lin_fix() { echo fixed > "$RU_T/gb/f"; ( cd "$RU_T" && git add -A && git commit -qm fix ) >/dev/null 2>&1; }
+read_lin_header() { awk -F'\t' -v k="$1" '$1 == k { print $2 }' "$RU_GD/gate-run/$(cat "$RU_GD/gate-run/current" 2>/dev/null)/header" 2>/dev/null; }
+read_lin_stamp() { awk -F'\t' '$1 == "reused" { print $2 }' "$RU_GD/gate-full-green" 2>/dev/null; }
+check_lin_control() { # <AC label> — restore the saved ledger and prove GATE_REUSE=1 reuses pa from it
+  cp "$tmp/ru.led" "$RU_GD/gate-ledger.tsv"; ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+  grep -q '^GATE reuse pa  ' "$REC_OUT" && ok "$1 control: the same ledger under GATE_REUSE=1 reuses pa, so the key matched" \
+                                        || nope "$1 control: GATE_REUSE=1 did not reuse pa either, so the refusal above proves nothing"
+}
+
+# AC1, AC2, AC8 and AC6 share one scratch: the red full run, the fix, the lineage run, the opt-in run.
+build_lin_repo || { echo "evidence-test: cannot build the lineage scratch"; exit 2; }
+ru_run GATE_FULL=1 >/dev/null
+ru_bad=$(awk -F'\t' -v r="$(read_lin_header run_id)" -v m="$(read_lin_header manifest_blob)" -v h="$(cd "$RU_T" && git rev-parse HEAD)" \
+  'NF != 9 || $6 != r || $7 != "1" || $8 != m || $9 != h' "$RU_GD/gate-ledger.tsv" 2>/dev/null)
+[ "$(grep -c . "$RU_GD/gate-ledger.tsv" 2>/dev/null)" = 3 ] && [ -n "$(read_lin_header run_id)" ] && [ -z "$ru_bad" ] \
+  && ok "AC1 a full run on a clean tree writes nine-field rows naming its run, full 1, its manifest_blob and its head" \
+  || { nope "AC1 the ledger rows do not carry the run, full, manifest_blob and head fields"; cat -A "$RU_GD/gate-ledger.tsv" 2>/dev/null | sed 's/^/      /'; }
+write_lin_fix; rm -f "$RU_GD/gate-full-green"
+ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+grep -q '^GATE reuse pa  ' "$REC_OUT" && grep -q '^GATE ok    pb$' "$REC_OUT" && grep -q '^GATE ok    pu$' "$REC_OUT" \
+  && [ "$(read_lin_stamp)" = 1 ] \
+  && ok "AC2 after a red full run and a fix, a lineage run reuses pa, runs pb and pu, and stamps reused 1" \
+  || { nope "AC2 the lineage run after a fix did not reuse pa alone and stamp reused 1 (stamp '$(read_lin_stamp)')"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
+[ "$(cat "$RU_GD/reuse-leak" 2>/dev/null)" = unset ] && [ "$(read_lin_header reuse)" = lineage ] \
+  && ok "AC8 a leg never inherits the reuse mode, and the header records reuse lineage" \
+  || nope "AC8 the leg saw '$(cat "$RU_GD/reuse-leak" 2>/dev/null)' and the header reuse reads '$(read_lin_header reuse)'"
+rm -f "$RU_GD/gate-full-green"
+ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+grep -q '^GATE reuse pa  ' "$REC_OUT" && [ ! -f "$RU_GD/gate-full-green" ] \
+  && ok "AC6 over lineage-qualifying rows, GATE_REUSE=1 reuses and still writes no full green" \
+  || nope "AC6 the opt-in run did not reuse pa, or it stamped a full green"
+touch "$RU_T/untracked"; ru_run GATE_FULL=1 >/dev/null
+[ "$(grep -c . "$RU_GD/gate-ledger.tsv" 2>/dev/null)" = 3 ] && [ -z "$(awk -F'\t' '$7 != ""' "$RU_GD/gate-ledger.tsv" 2>/dev/null)" ] \
+  && ok "AC1 a full run over an untracked file writes every row with an empty full" \
+  || nope "AC1 a dirty full run wrote a row with full set"
+ru_done
+
+# AC3: rows earned WITHOUT the full flag are not lineage-qualifying. The touch commit makes every leg
+# execute on the earning run, so each one has a row.
+build_lin_repo
+echo x2 > "$RU_T/ga/f"; echo broken2 > "$RU_T/gb/f"; ( cd "$RU_T" && git add -A && git commit -qm touch ) >/dev/null 2>&1
+ru_run >/dev/null; write_lin_fix; cp "$RU_GD/gate-ledger.tsv" "$tmp/ru.led"
+ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+grep -q '^GATE reuse ' "$REC_OUT" && nope "AC3 lineage reused a row a run without the full flag earned" \
+                                  || ok "AC3 lineage reuses nothing from rows with an empty full"
+check_lin_control AC3
+ru_done
+
+# AC4: a row earned on another manifest blob.
+build_lin_repo
+ru_run GATE_FULL=1 >/dev/null; write_lin_fix
+sed 's#"guard": \["gb/"\]},#"guard": ["gb/"]}, {"name": "pd", "argv": ["bash", "fx/a.sh"], "guard": ["gd/"]},#' \
+  "$RU_T/${PFX}gate-legs.json" > "$tmp/ru.legs" && cp "$tmp/ru.legs" "$RU_T/${PFX}gate-legs.json"
+( cd "$RU_T" && git add -A && git commit -qm leg4 ) >/dev/null 2>&1; cp "$RU_GD/gate-ledger.tsv" "$tmp/ru.led"
+ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+grep -q '^GATE ok    pd$' "$REC_OUT" || nope "AC4 fixture: the fourth leg did not run, so the manifest did not move"
+grep -q '^GATE reuse ' "$REC_OUT" && nope "AC4 lineage reused a row earned on another manifest blob" \
+                                  || ok "AC4 lineage reuses nothing once the manifest blob moved"
+check_lin_control AC4
+ru_done
+
+# AC5: a row whose head is a SIBLING of HEAD, with the same ga/ bytes and the same base.
+build_lin_repo
+ru_first=$(cd "$RU_T" && git rev-parse HEAD)
+echo sib > "$RU_T/other"; ( cd "$RU_T" && git add -A && git commit -qm sibling ) >/dev/null 2>&1
+ru_run GATE_FULL=1 >/dev/null
+( cd "$RU_T" && git reset -q --hard "$ru_first" ) >/dev/null 2>&1; write_lin_fix; cp "$RU_GD/gate-ledger.tsv" "$tmp/ru.led"
+ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+grep -q '^GATE reuse ' "$REC_OUT" && nope "AC5 lineage reused a row whose head is not an ancestor of HEAD" \
+                                  || ok "AC5 lineage reuses nothing from a sibling's rows"
+check_lin_control AC5
+ru_done
+
+# AC7: an impure leg runs under lineage, and the run still stamps over the two legs it reused.
+build_lin_repo
+sed 's#"guard": \["ga/"\]}#"guard": ["ga/"], "impure": "reads a remote"}#' "$RU_T/${PFX}gate-legs.json" > "$tmp/ru.legs" \
+  && cp "$tmp/ru.legs" "$RU_T/${PFX}gate-legs.json"
+( cd "$RU_T" && git add -A && git commit -qm impure && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+write_lin_fix; ru_run GATE_FULL=1 >/dev/null; rm -f "$RU_GD/gate-full-green"
+ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+grep -q '^GATE ok    pa$' "$REC_OUT" && grep -q '^GATE reuse pb  ' "$REC_OUT" && grep -q '^GATE reuse pu  ' "$REC_OUT" \
+  && [ "$(read_lin_stamp)" = 2 ] \
+  && ok "AC7 lineage runs the impure pa, reuses pb and pu, and stamps reused 2" \
+  || { nope "AC7 lineage over an impure leg did not run it and stamp reused 2 (stamp '$(read_lin_stamp)')"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
+ru_done
+rm -f "$tmp/ru.led" "$tmp/ru.legs"
 
 # =================================================================================================
 # THE ADMISSION RULE (TOOL-aLeakedHandle-2). `derive-ceilings.py` built its evidence from `ok` rows

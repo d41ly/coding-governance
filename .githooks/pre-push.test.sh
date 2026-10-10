@@ -904,9 +904,15 @@ esac
 
 # A direct green run writes the ledger row; the push then runs over the SAME tree and base, so on the
 # old hook the row's key matched and the red leg was never executed.
+# RE-STAGED BY TOOL-aFrugalTurnstile-4 S9: the row is earned WITHOUT GATE_FULL, so its `full` field is
+# empty. The hook now exports GATE_REUSE=lineage on its own FULL decision, and a row a full run earned
+# would be reused there, because this leg's verdict depends on H49_LEG_RC, which no input key sees:
+# the not-checked class of the runner's reuse block, staged on purpose. An empty `full` keeps this arm
+# testing what it names — `GATE_REUSE=1` semantics would reuse the row, lineage refuses it, and the
+# red leg runs.
 git commit -q --allow-empty -m "h49 GATE_REUSE"
 ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST
-  env GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 GATE_FULL=1 H49_LEG_RC=0 bash "$RUN_GATES/run-gates.sh" >/dev/null 2>&1 )
+  env -u GATE_FULL GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 H49_LEG_RC=0 bash "$RUN_GATES/run-gates.sh" >/dev/null 2>&1 )
 _out=$(run_h49_push GATE_REUSE=1); _rc=$?
 case "$_rc|$(read_h49_token)" in
   0\|*) bad "H49 GATE_REUSE from the environment reused a green row over the RED leg: $_out" ;;
@@ -925,6 +931,80 @@ case "$_rc|$(read_h49_token)|$(read_h49_mark ignored)|$_out" in
   *"|bar-refused||"*gate-legs.json*) ok "H49 an ignored leg manifest is refused as bar-refused before the bar reads it" ;;
   *) bad "H49 expected the ignored manifest to be refused as bar-refused, got rc=$_rc token '$(read_h49_token)': $_out" ;;
 esac
+
+# --- TOOL-aFrugalTurnstile-4 S7: LINEAGE REUSE AT THE BOUNDARY. On a FULL decision for this kit's
+# --- runner the hook exports GATE_REUSE=lineage itself, after the scrub, so the push that fixes a red
+# --- re-runs the failed leg and the legs whose key moved, and lands on a stamp that says `reused 1`.
+# --- No other bar gets the mode. A COPY OF THE REAL RUNNER again, for H49's reason: three legs, `pa`
+# --- guarded on ga/, `pb` guarded on gb/ and red until gb/f says fixed, `pu` unguarded.
+lin="$tmp/lin"; mkdir -p "$lin/hooks"
+cp "$SRC/.githooks/pre-push" "$lin/hooks/pre-push"
+git init -q --bare "$lin/remote.git"; git init -q "$lin/work"
+cd "$lin/work" || exit 2
+git config user.email t@example.com; git config user.name t; git config core.autocrlf false
+git config core.hooksPath "$lin/hooks"
+mkdir -p "$RUN_GATES" fx ga gb
+cp "$SRC/$RUN_GATES_DIR/run-gates.sh" "$SRC/$RUN_GATES_DIR/gate-fingerprint.sh" \
+   "$SRC/$RUN_GATES_DIR/gate-profiles.txt" "$RUN_GATES/"
+printf '#!/usr/bin/env bash\necho a\n' > fx/a.sh
+printf '#!/usr/bin/env bash\ngrep -q fixed gb/f\n' > fx/b.sh
+printf '#!/usr/bin/env bash\necho u\n' > fx/u.sh
+echo x > ga/f; echo broken > gb/f
+printf '%s\n' '[' \
+  '  {"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
+  '  {"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]},' \
+  '  {"name": "pu", "argv": ["bash", "fx/u.sh"]}' \
+  ']' > gate-legs.json
+git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+git remote add origin "$lin/remote.git"
+lin_gd=$(cd "$(git rev-parse --git-dir)" && pwd)
+touch "$lin_gd/push-main-active"
+run_lin_push() { # NAME=VALUE... -> the output of a push of HEAD; the default bar unless the caller names one
+  ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST
+    env GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 "$@" git push -q origin main 2>&1 )
+}
+read_lin_token() { cut -f1 "$lin_gd/pre-push-refusal" 2>/dev/null; }
+read_lin_reused() { awk -F'\t' '$1 == "reused" { print $2 }' "$lin_gd/gate-full-green" 2>/dev/null; }
+
+_out=$(run_lin_push); _rc=$?
+case "$_rc|$(read_lin_token)|$_out" in
+  *"|gate-red|"*"reuse: lineage"*"GATE FAIL  pb"*) ok "LIN AC11 control — the red push is FULL with reuse: lineage, and pb refuses it" ;;
+  *) bad "LIN AC11 control expected a FULL lineage push refused as gate-red on pb, got rc=$_rc token '$(read_lin_token)': $_out" ;;
+esac
+# AC12's inherited arm rides the fix push: an exported GATE_REUSE=1 is still named as not honoured,
+# and the mode the bar receives is the hook's own lineage.
+echo fixed > gb/f; git add -A; git commit -q -m "lin fix"; rm -f "$lin_gd/pre-push-refusal"
+_out=$(run_lin_push GATE_REUSE=1); _rc=$?
+case "$_rc|$(read_lin_reused)|$_out" in
+  "0|1|"*"not honoured from the environment by this bar:"*GATE_REUSE*"— reuse: lineage"*"GATE reuse pa  "*)
+    ok "LIN AC11 the fix push reuses pa from the red run's ledger, lands, and stamps reused 1" ;;
+  *) bad "LIN AC11 expected the fix push to reuse pa, land and stamp reused 1, got rc=$_rc reused '$(read_lin_reused)': $_out" ;;
+esac
+case "$_out" in
+  *"GATE ok    pb"*"GATE ok    pu"*) ok "LIN AC11 control — the fixed leg and the unguarded leg executed on that push" ;;
+  *) bad "LIN AC11 control expected pb and pu to execute on the fix push: $_out" ;;
+esac
+
+# AC12: the declared STUB gets no mode and no clause.
+git commit -q --allow-empty -m "lin stub"; rm -f "$lin_gd"/gate-*green*
+printf '#!/usr/bin/env bash\nexit 0\n' > "$lin/stub.sh"
+_out=$(run_lin_push GOV_GATE_CMD_TEST=1 GOV_GATE_CMD="bash $lin/stub.sh"); _rc=$?
+case "$_rc|$_out" in
+  *"reuse: lineage"*) bad "LIN AC12 the STUB bar's FULL line carries reuse: lineage: $_out" ;;
+  "0|"*"FULL gate on main push"*"bar: STUB"*) ok "LIN AC12 the STUB bar's FULL line names no reuse mode" ;;
+  *) bad "LIN AC12 expected a FULL STUB push with no reuse clause, got rc=$_rc: $_out" ;;
+esac
+# AC12: a declared GATE_CMD naming another tracked script never receives the mode.
+printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_REUSE-unset}" > "%s/other-saw"\nexit 0\n' "$lin" > other-bar.sh
+printf 'GATE_CMD="bash other-bar.sh"\n' > .unattended.conf
+git add -A; git commit -q -m "lin other"; rm -f "$lin_gd"/gate-*green*
+_out=$(run_lin_push GOV_GATE_CMD="bash other-bar.sh"); _rc=$?
+case "$_rc|$(cat "$lin/other-saw" 2>/dev/null)|$_out" in
+  *"reuse: lineage"*) bad "LIN AC12 a non-runner bar's FULL line carries reuse: lineage: $_out" ;;
+  "0|unset|"*) ok "LIN AC12 a declared non-runner bar runs with GATE_REUSE unset" ;;
+  *) bad "LIN AC12 expected the declared bar to run with GATE_REUSE unset, got rc=$_rc saw '$(cat "$lin/other-saw" 2>/dev/null)': $_out" ;;
+esac
+cd "$pfx_home" || exit 2
 # ---- TOOL-dDerivedDocket-24: THE INHERITED-RED POLICY, READ AT R ---------------------------------
 # A scratch repo whose `.githooks/gate-env.sh` at the pushed remote tip R declares the policy under
 # test, and a stub gate that writes the run record a real runner would: a RED verdict and one

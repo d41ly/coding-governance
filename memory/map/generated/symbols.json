@@ -1788,6 +1788,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "build_lin_repo",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "build_line",
       "kind": "function",
       "file": "tools/check-line-length.test.sh"
@@ -3631,6 +3636,11 @@
       "id": "check_leg_claimable",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "check_lin_control",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "check_line",
@@ -11378,6 +11388,26 @@
       "file": ".githooks/straggler-guard.test.sh"
     },
     {
+      "id": "read_lin_header",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "read_lin_reused",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_lin_stamp",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "read_lin_token",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "read_line",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -15833,6 +15863,11 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "run_lin_push",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "run_ln",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -20041,6 +20076,11 @@
       "id": "write_lg_record",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "write_lin_fix",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "write_ln_dod_records",
