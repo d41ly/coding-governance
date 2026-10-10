@@ -10576,6 +10576,18 @@ dod_met() { # slug · run-state file · item · checker
         else echo "unattended: the merge bar is bounded at GATE_BOUND, ${GATE_BOUND}s, and its turnstile queue is charged to that bound — $GB_WHY"; fi
       fi
       if [ "$_gbs" = 1 ]; then _gbound=$GB_SUM; else _gbound=${GATE_BOUND:-0}; fi
+      # TOOL-aFrugalTurnstile-12 S1 - THE BAR'S KNOBS ARE SCRUBBED FROM EVERY CALL BELOW. Its rc-0
+      # result is recorded as a trusted gate-bar-green that stores neither the manifest nor the reuse
+      # mode, so a GATE_LEGS subset or a GATE_REUSE run inherited from the driver would certify the
+      # whole bar for this tree. The hook's BAR_SCRUBBED_KNOBS plus its docs knob; the parity arm in
+      # unattended.test.sh reds when the hook names one this list lacks.
+      local _gk _gknobs="GATE_LEGS GATE_REUSE GATE_DOCS_BASE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT" _gset=""
+      local -a _gscrub=(-u GATE_WALL)
+      for _gk in $_gknobs; do
+        _gscrub+=(-u "$_gk")
+        [ -n "${!_gk+x}" ] && _gset+=" $_gk"
+      done
+      [ -n "$_gset" ] && echo "unattended: gates-green — not honoured from the environment by this bar:$_gset"
       # The git dir comes off the sidecar root's ONE derivation in the library (check 32).
       _ggd=$(resolve_sidecar_dir) && _ggd=${_ggd%/unattended} || _ggd=""
       # S5 - EXIT 3, TREE MOVED, RUNS THE BAR ONCE MORE, and only once. The re-run pins a FRESH run id,
@@ -10651,9 +10663,9 @@ dod_met() { # slug · run-state file · item · checker
           _ghb=$(GIT rev-parse HEAD 2>/dev/null)
           # shellcheck disable=SC2086
           case "$_gdec" in
-            scoped)  run_bounded env -u GATE_WALL -u GATE_FULL GATE_BASE="$_gbase" "${_genv[@]}" $GATE_CMD; _grc=$? ;;
+            scoped)  run_bounded env "${_gscrub[@]}" -u GATE_FULL GATE_BASE="$_gbase" "${_genv[@]}" $GATE_CMD; _grc=$? ;;
             covered) _grc=0 ;;
-            *)       run_bounded env -u GATE_WALL GATE_FULL=1 "${_genv[@]}" $GATE_CMD; _grc=$? ;;
+            *)       run_bounded env "${_gscrub[@]}" GATE_FULL=1 "${_genv[@]}" $GATE_CMD; _grc=$? ;;
           esac
           RB_BOUND=""
         else
@@ -10663,7 +10675,7 @@ dod_met() { # slug · run-state file · item · checker
           RB_BOUND=$_gbound
           _ghb=$(GIT rev-parse HEAD 2>/dev/null)
           # shellcheck disable=SC2086
-          run_bounded env -u GATE_WALL "${_genv[@]}" $GATE_CMD; _grc=$?
+          run_bounded env "${_gscrub[@]}" "${_genv[@]}" $GATE_CMD; _grc=$?
           RB_BOUND=""
         fi
         { [ "$_grc" = 3 ] && [ "$_gtry" = 1 ]; } || break

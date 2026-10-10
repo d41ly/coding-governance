@@ -113,3 +113,9 @@ base: bef97330574caabfd43c374dbe8c39b26c560203
 2026-10-10T14:15:49Z rescope · item add TOOL-aFrugalTurnstile-16 · reason promoted from the closing diff review round 1 at its CONVERGED exit (build method M4): every confirmed finding becomes a unit, one per HIGH item and the minors batched across two disjoint write sets
 
 2026-10-10T14:15:52Z rescope · item add TOOL-aFrugalTurnstile-17 · reason promoted from the closing diff review round 1 at its CONVERGED exit (build method M4): every confirmed finding becomes a unit, one per HIGH item and the minors batched across two disjoint write sets
+
+2026-10-10T14:19:42Z brief · item TOOL-aFrugalTurnstile-12 · reason 142385d5e412 memory/builds/aFrugalTurnstile/prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md
+
+2026-10-10T14:20:21Z dispatch · item d4e5927f TOOL-aFrugalTurnstile-12 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/aFrugalTurnstile/spec/2026-10-09-spec-TOOL-aFrugalTurnstile-12.md memory/builds/aFrugalTurnstile/build/2026-10-09-build-TOOL-aFrugalTurnstile-12-1-acceptance-ledger.md memory/builds/aFrugalTurnstile/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md
+
+2026-10-10T14:22:22Z dispatch · item d4e5927f TOOL-aFrugalTurnstile-12 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/aFrugalTurnstile/build/2026-10-09-build-TOOL-aFrugalTurnstile-12-1-acceptance-ledger.md memory/builds/aFrugalTurnstile/spec/2026-10-10-spec-TOOL-aFrugalTurnstile-12.md memory/builds/aFrugalTurnstile/README.md memory/ledger/2026-10.md

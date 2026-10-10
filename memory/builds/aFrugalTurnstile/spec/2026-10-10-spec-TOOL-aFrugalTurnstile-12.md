@@ -1,10 +1,12 @@
 # TOOL-aFrugalTurnstile-12 — the close's bar runs with the bar knobs scrubbed, so its green certifies the whole bar
 
-**Status:** OPEN · rev-1 · 2026-10-10 · node a · Tier-2 · base bef97330 · streams tooling · order 6
+**Status:** CLOSED · rev-1 · 2026-10-10 · node a · Tier-2 · base bef97330 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-09-build-TOOL-aFrugalTurnstile-12-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-12-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

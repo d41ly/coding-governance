@@ -4167,6 +4167,23 @@ else
 fi
 reset_tree
 
+# ---- TOOL-aFrugalTurnstile-12 AC3: THE CLOSE'S BAR SCRUBS EVERY KNOB THE HOOK SCRUBS. The hook's
+# ---- BAR_SCRUBBED_KNOBS is read off its shipped file and every name in it must appear in the driver's
+# ---- `_gknobs`; a staged driver copy with GATE_REUSE dropped must be named, or the check cannot fail.
+fk_hook="${HERE%/"$KIT_REL"}/.githooks/pre-push"
+fk_hk=$(sed -n 's/^BAR_SCRUBBED_KNOBS="\([^"]*\)"$/\1/p' "$fk_hook" 2>/dev/null)
+if [ -z "$fk_hk" ]; then
+  echo "SKIP TOOL-aFrugalTurnstile-12 AC3 parity arm: no BAR_SCRUBBED_KNOBS line in the pre-push hook at $fk_hook, so there is no list to hold the driver's against"
+else
+  fk_cut='s/^ *local _gk _gknobs="\([^"]*\)".*/\1/p'
+  fk_drv=$(sed -n "$fk_cut" "$SCRIPT")
+  fk_miss=""; for fk_k in $fk_hk; do case " $fk_drv " in *" $fk_k "*) ;; *) fk_miss+=" $fk_k" ;; esac; done
+  same "TOOL-aFrugalTurnstile-12 AC3 every BAR_SCRUBBED_KNOBS name is in the driver's scrub" "${fk_drv:+found}$fk_miss" "found"
+  fk_drv=$(sed 's/\(_gknobs="[^"]*\)GATE_REUSE /\1/' "$SCRIPT" | sed -n "$fk_cut")
+  fk_miss=""; for fk_k in $fk_hk; do case " $fk_drv " in *" $fk_k "*) ;; *) fk_miss+=" $fk_k" ;; esac; done
+  same "TOOL-aFrugalTurnstile-12 AC3 a driver copy with GATE_REUSE dropped is named" "$fk_miss" " GATE_REUSE"
+fi
+
 # ---- TOOL-aBranchedMandate-3, S9: the SECOND ANCHOR. Every arm here drives the real bare origin the
 # ---- fixture already builds, because the whole mechanism is an observation of a remote and a
 # ---- fixture that stubbed it would be asserting against this test's own imagination.
@@ -10964,7 +10981,8 @@ IPL
   cat > bin/bar.sh <<'IPB'
 #!/usr/bin/env bash
 { printf 'GATE_FULL=%s\n' "${GATE_FULL-<unset>}"
-  printf 'GATE_SELFTESTS=%s\n' "${GATE_SELFTESTS-<unset>}"; } > "$IPOUT/barenv.txt"
+  printf 'GATE_SELFTESTS=%s\n' "${GATE_SELFTESTS-<unset>}"
+  printf 'KNOBS=%s %s %s\n' "${GATE_LEGS-<unset>}" "${GATE_REUSE-<unset>}" "${GATE_DOCS_BASE-<unset>}"; } > "$IPOUT/barenv.txt"
 echo "bar-stub ran"
 [ -f poison.txt ] && { echo "bar-stub: leg no-poison FAILED"; exit 1; }
 exit 0
@@ -11479,6 +11497,14 @@ same "TOOL-aFrugalTurnstile-9 AC1 the hook is asked --decide <HEAD> <R>" "$(tr '
 same "TOOL-aFrugalTurnstile-9 AC1 a full answer runs the bar with GATE_FULL=1" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
 same "TOOL-aFrugalTurnstile-9 AC1 the record reads kind full" "$(awk -F'\t' '$1=="kind"{print $2}' "$ft9_gd/gate-bar-green" 2>/dev/null)" "full"
 hit "$out" "pre-push --decide answered 'full stale'"
+# ---- TOOL-aFrugalTurnstile-12 AC1/AC2: THE BAR'S KNOBS EXPORTED BY THE DRIVER'S CALLER NEVER REACH
+# ---- THE BAR whose green is recorded as the whole bar's. RED against the driver at d4e5927f: the stub
+# ---- sees all three.
+init_declared_merge "GATE_POST_MERGE=local"
+out=$(GATE_LEGS=one-leg.json GATE_REUSE=1 GATE_DOCS_BASE=deadbeef FT9_DECISION="full stale" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+same "TOOL-aFrugalTurnstile-12 AC1 AC2 the bar sees GATE_LEGS, GATE_REUSE and GATE_DOCS_BASE unset" \
+  "$(sed -n 's/^KNOBS=//p' "$ip_out/barenv.txt" 2>/dev/null)" "<unset> <unset> <unset>"
+hit "$out" "not honoured from the environment by this bar: GATE_LEGS GATE_REUSE GATE_DOCS_BASE"
 init_declared_merge "GATE_POST_MERGE=local"
 out=$(FT9_DECISION="scoped $ip_base" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 same "TOOL-aFrugalTurnstile-9 AC2 a scoped answer runs the bar with GATE_FULL unset" "$(grep -c '^GATE_FULL=<unset>$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
