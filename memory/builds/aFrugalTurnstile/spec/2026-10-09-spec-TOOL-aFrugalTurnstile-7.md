@@ -1,6 +1,6 @@
 # TOOL-aFrugalTurnstile-7 — pre-push binds a post-merge red, and `--decide` prints the boundary's decision
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -115,6 +115,13 @@ line, and writes nothing. The unattended close then runs the bar the landing pus
     its hand-off, so the cover check and the decide line cannot name two bases.
 
   Observed by AC6 and AC11.
+- **S6b — a scoped record names its FULL base (rev-2).** `write_bar_green`'s `base` argument at the
+  hook's call site is the full green the adopted candidate rests on, not `GATE_BASE`: when the adopted
+  record is a `kind scoped` bar record, its own `base` (`rec_base`); otherwise the adopted sha. Spelled
+  once, as a second output of `resolve_scoped_base`, so the export and the record cannot disagree.
+  TOOL-aFrugalTurnstile-11 found that a scoped record written on top of a scoped base named that
+  scoped sha, which `check_bar_base` refuses, so the push after it fell back to an older full slot.
+  Observed by AC12.
 - **S7 — the text.** The header gains the two sentences in §4 "The header sentences". The
   `.githooks/pre-push.runlog.test.sh` exit table gains one row per new exit site, each `exempt:`
   with its reason: the mode's exit-2 sites, and its `RUNLOG_CLEAN=1; exit 0` decision site. That
@@ -312,6 +319,11 @@ taken with `git show bef97330:.githooks/pre-push`, and then the changed hook.
   the base `--decide` prints equals the `GATE_BASE` the stub bar records on a push of the same tip.
   Red when: a red the record does not descend from leaves the push covered, or the two bases differ.
 
+- **AC12** — When a push scopes from an adopted `kind scoped` record whose `base` is F, the
+  `gate-bar-green.scoped` it writes carries `base` F, and the next push from the same git dir adopts
+  that new record. Red when: the written record's `base` names the scoped sha, and the next push
+  falls back to the older full slot, the behaviour at the previous commit.
+
 ## 7. Gates
 
 `pre-push self-test` · `pre-push run-log line` · `pre-push bar self-test` · `push-main self-test` · `branch-guard self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `lexicon naming predicates` · `transition-audit arms` · `straggler-guard arms` · `remote literals (kit code names no remote)` · `shell hygiene (a loop fed by a command substitution)` · `shell hygiene (a location probe asked from a moved directory)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
@@ -319,7 +331,7 @@ taken with `git show bef97330:.githooks/pre-push`, and then the changed hook.
 The close runs these. A pass runs none of them. The python resolver leg's parity table already reads
 `.githooks/*`, so the inline ladder copy joins its `remote_ladder_sh` row with no table edit.
 
-New arm: .githooks/pre-push.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC9 AC11 · a bare remote with a hand-staged red ref, a declaration committed at R, a git shim counting ls-remote, an unreachable push URL and three decide states · none
+New arm: .githooks/pre-push.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC9 AC11 AC12 · a bare remote with a hand-staged red ref, a declaration committed at R, a git shim counting ls-remote, an unreachable push URL and three decide states · none
 New arm: .githooks/pre-push.runlog.test.sh · covers none · the new decide-mode exit sites, each an exempt row in the exit table · none
 
 ## 8. Open questions
@@ -340,6 +352,8 @@ New arm: .githooks/pre-push.runlog.test.sh · covers none · the new decide-mode
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft, from design D8 and D9 and the spec brief.
+- rev-2 · 2026-10-10 · §2 S6b, §6 AC12: a scoped record names its full base. What disagreed:
+  TOOL-aFrugalTurnstile-11's build found the writer recording the adopted scoped sha as the base.
 
 ## 10. Reuse audit
 
