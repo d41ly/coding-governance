@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: tooling+kickoff+playbook+deployer
 roster: TOOL+KICK+PLAY
-ids: KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-8
+ids: KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-8 TOOL-aRoutedQuill-9 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12
 ---
 
 # aRoutedQuill — every code build is routed through orientation, a brief and a specced unit
@@ -67,12 +67,16 @@ none
 | 7 | `PLAY-aRoutedQuill-1` | INPROGRESS | the charter's Definition of Ready requires a spec for every product-code unit |
 | 8 | `TOOL-aRoutedQuill-6` | DEFERRED | a routed-vs-raw trial on frozen clones of real repos |
 | 9 | `TOOL-aRoutedQuill-7` | CLOSED | the unattended prompt-brief check reads its sub-heads from the kickoff kit's skeleton |
+| 10 | `TOOL-aRoutedQuill-9` | MISSING | the routed-commits leg reads green in WHOLE mode at the landing tip, after every reconcile (closing review round 2's blocker) |
+| 11 | `TOOL-aRoutedQuill-10` | MISSING | the landing push grades the routed-commits leg as remote CI will, when it carries a merge of the remote tip (closing review H1) |
+| 12 | `TOOL-aRoutedQuill-11` | MISSING | check-wiring takes the routed armed-or-unarmed verdict from the write gate's own reader (closing review H2) |
+| 13 | `TOOL-aRoutedQuill-12` | MISSING | the closing review's mediums and lows, M1 to M9 and L1 to L7, batched into one unit |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** DEFERRED · 9 unit(s) · node a · opened 2026-10-09 · streams tooling+kickoff+playbook+deployer
-ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-8
+ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-8 TOOL-aRoutedQuill-9 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -88,7 +92,7 @@ ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuil
 | [TOOL-aRoutedQuill-7 — the unattended prompt-brief check reads its sub-head list from the kickoff kit's `--brief-skeleton`](spec/2026-10-09-spec-TOOL-aRoutedQuill-7.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-10 |
 <!-- /gen:build-units -->
 
-Records: 19 bound to this build, across 4 record folder(s).
+Records: 20 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

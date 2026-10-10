@@ -76,3 +76,13 @@ base: 5a836bf0fc940029136b4b3fd57a87f35ff40f26
 2026-10-10T00:55:34Z brief · item TOOL-aRoutedQuill-7 · reason 716b55fb723a memory/builds/aRoutedQuill/prompts/2026-10-09-prompt-TOOL-aRoutedQuill-7-build-brief.md
 
 2026-10-10T02:20:35Z review · item aRoutedQuill · reason verdict BLOCKED · blockers 1
+
+2026-10-10T02:30:08Z review · item aRoutedQuill · reason verdict BLOCKED · blockers 1 · NON-CONVERGENT · highs 2 · minors 24 · disposition promote
+
+2026-10-10T02:30:21Z rescope · item add TOOL-aRoutedQuill-9 · reason closing review round 2 blocker: the routed-commits leg is red in WHOLE mode at the landing tip, because a reconcile merge brought in cutoff-day mints no waiver names
+
+2026-10-10T02:30:25Z rescope · item add TOOL-aRoutedQuill-10 · reason closing review H1: the landing push grades the routed-commits leg in RANGE mode only, so main's CI sees a WHOLE-mode red the push never saw
+
+2026-10-10T02:30:29Z rescope · item add TOOL-aRoutedQuill-11 · reason closing review H2: check-wiring reads MEMORY_ROOT with a default the write gate rejects, certifying an unarmed conf as armed
+
+2026-10-10T02:30:32Z rescope · item add TOOL-aRoutedQuill-12 · reason closing review minors M1-M9 and L1-L7, batched as the severity rule requires
