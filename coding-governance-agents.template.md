@@ -1,6 +1,6 @@
 # Coding Governance — the agent charter template
 
-*Template **v3.4** · 2026-10-04. One file. One line per directive, and a wrapped line is still one
+*Template **v3.6** · 2026-10-10. One file. One line per directive, and a wrapped line is still one
 rule. This file BECOMES a project's `AGENTS.md`: `<prefix>/playbook/adopt-playbook.sh` fills every
 placeholder and drops the blocks a target has no kit for, so filling it is a program's job and not a
 reader's — see `WIRE-INTO-PROJECT.md` for what a program cannot decide. History lives in the
