@@ -58,13 +58,13 @@ its shards sit frozen under `memory/archive/`.
 <!-- gov:playbook -->
 # Coding Governance — the agent charter template
 
-*Template **v3.4** · 2026-10-04. One file. One line per directive, and a wrapped line is still one
+*Template **v3.6** · 2026-10-10. One file. One line per directive, and a wrapped line is still one
 rule. This file BECOMES a project's `AGENTS.md`: `<prefix>/playbook/adopt-playbook.sh` fills every
 placeholder and drops the blocks a target has no kit for, so filling it is a program's job and not a
 reader's — see `WIRE-INTO-PROJECT.md` for what a program cannot decide. History lives in the
 `…-v-N-N.md` snapshots and in git.*
 
-<!-- governance-template: v3.5 -->
+<!-- governance-template: v3.6 -->
 
 > **What:** a project-agnostic charter for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** deploy it with the renderer; the rules are
@@ -92,8 +92,10 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Locate: read your stream's decision log + backlog (§6) and the derived work-state index (§5); confirm your node tag (§2).
 - Scope: clear acceptance criteria, one stream, small, gates named — if you can't state those, split or clarify first.
 - Reserve: at your session's first work-unit, mint + grep-check a session slug (§2) and open the unit's record (§6).
-- Large new feature (a Tier-2 change): the DoR *is* a design pass — a written spec (goal · scope · non-goals · acceptance) + a bounded production-readiness menu (best-practice implementation, the extra tools it needs, and the cross-cutting concerns: security · perf/scale · a11y · i18n · error/empty/loading states · observability · testing/gates · migration/rollback · `help/` docs). Spec shape: the memory-kit `TEMPLATE-SPEC.md` (check 12).
+- Spec before code: every product-code unit commits a spec in the memory-kit `TEMPLATE-SPEC.md` shape (check 12) first; a Tier-1 unit's is a micro-spec — what and how, when it is done, out of scope, how to verify.
+- Tier-2: the DoR *is* a design pass — the full spec + a bounded production-readiness menu (best-practice implementation, the extra tools it needs, and the cross-cutting concerns: security · perf/scale · a11y · i18n · error/empty/loading states · observability · testing/gates · migration/rollback · `help/` docs).
 - Surface that menu and **get scope approval BEFORE building** (a menu to select from, not scope-creep licence); record the agreed spec per §6.
+- A write gate refuses a product-code write that no specced unit owns.
 - Codebase map adopted (§5)? A design pass touching an UNDOSSIERED feature creates/refreshes that dossier as a DoR item (the pass already reads what the dossier needs) — the map's convergence forcing function.
 
 **Definition of Done — before you call it done:**

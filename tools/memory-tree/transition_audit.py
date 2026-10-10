@@ -47,6 +47,11 @@ import sys
 sys.dont_write_bytecode = True
 
 KIT = pathlib.Path(__file__).resolve().parent
+if str(KIT) not in sys.path:
+    sys.path.append(str(KIT))
+# The kit's one git pin policy, shared with `routed_commits.py` (TOOL-aRoutedQuill-3). A sibling
+# HELPER module, never an engine, so the no-engine-imports invariant holds.
+from tree_lib import build_git_env  # noqa: E402
 
 # The cache's generation. BUMP IT whenever the delta's SHAPE or the rule computing it changes: an
 # entry written by an older rule is not a faster answer, it is a different one. The epoch is stored
@@ -74,19 +79,6 @@ class DeadProbe(Problem):
 
 
 # ------------------------------------------------------------------------------------ git, pinned
-def build_git_env() -> dict:
-    """The environment every git call in this module runs under.
-
-    `GIT_GRAFT_FILE=/dev/null` is the spelling the unattended kit's history leg uses and it
-    works under Git for Windows, whose MSYS layer maps the name. A graft file re-parents commits, so
-    without this pin every ancestry answer below could be honest about a sha and wrong about what
-    that sha means.
-    """
-    env = dict(os.environ)
-    env["GIT_GRAFT_FILE"] = "/dev/null"
-    return env
-
-
 def run_git(root, *args, stdin: bytes | None = None, want_bytes: bool = False):
     """One git call, pinned. Raises `Problem` naming the argv on a non-zero status."""
     argv = ["git", "--no-replace-objects", "-C", str(root), *args]

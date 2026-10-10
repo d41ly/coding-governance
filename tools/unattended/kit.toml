@@ -7,7 +7,9 @@ version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
 # `settings-merge` since TOOL-aRepatriatedFork-11 (section 8 F2): this kit ships hook fragments and its
 # `[check]` grades their wiring, so the install that lands one wires it through the target's own
 # settings-merge.py, and the target's receipt then names the program that wrote its settings file.
-requires = ["memory-tree", "review-harness", "settings-merge"]
+# `kickoff-manifest` since TOOL-aRoutedQuill-7: past PROMPT_BRIEF_SKELETON_CUTOFF a prompt-mode preflight
+# reads the brief's sub-heads from that kit's checker, so an install without it refuses every such run.
+requires = ["memory-tree", "review-harness", "settings-merge", "kickoff-manifest"]
 
 [[files]]
 include = "**"
@@ -250,6 +252,7 @@ means = "render-failed-half-stamped"
 name = "unattended kit gate"
 subject = "repo"
 argv = ["bash", "{kit}/check-unattended.sh"]
+impure = "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint — the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`."
 guard = []
 doc_reads = ["{memory_root}/builds/", "{memory_root}/guides/", "{memory_root}/archive/"]
 red_after_land = true
@@ -268,6 +271,7 @@ red_after_land = true
 name = "pass-order history"
 subject = "repo"
 argv = ["bash", "{kit}/check-pass-order.sh"]
+impure = "its verdict is a function of the REMOTE as well as of the tree: it runs one bounded `ls-remote` to learn the tip the remote advertises and grades only the commits HEAD carries past it (TOOL-dUnstuckLanding-17), so a verdict cached before the remote moved must not be reused."
 guard = []
 doc_reads = ["{memory_root}/builds/", "{memory_root}/project/"]
 red_after_land = true
@@ -283,6 +287,7 @@ red_after_land = true
 name = "brief-recorded"
 subject = "repo"
 argv = ["bash", "{kit}/check-brief-recorded.sh"]
+impure = "its verdict is a function of the REMOTE as well as of the tree: it runs one bounded `ls-remote` to learn the tip the remote advertises and grades only the commits HEAD carries past it (TOOL-dUnstuckLanding-17), so a verdict cached before the remote moved must not be reused."
 guard = []
 doc_reads = ["{memory_root}/builds/", "{memory_root}/project/"]
 red_after_land = true
