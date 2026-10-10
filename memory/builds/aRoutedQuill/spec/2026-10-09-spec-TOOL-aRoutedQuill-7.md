@@ -1,12 +1,13 @@
 # TOOL-aRoutedQuill-7 — the unattended prompt-brief check reads its sub-head list from the kickoff kit's `--brief-skeleton`
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 6 · ratified 2026-10-09
+**Status:** INPROGRESS · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 6 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 |
+| [2026-10-09-prompt-TOOL-aRoutedQuill-7-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-7-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
