@@ -5127,6 +5127,42 @@ user_skills = "/tmp/gk-fake-skills"
         good = run_in(scratch_gov("true", f"{PFX}demo/"))
         check("the scratch gov fixture is GREEN when both facts agree", good.returncode == 0,
               good.stdout + good.stderr)
+        # DEPL-aBenchedProbe-3 S6: no manifest row is in chunk `selftests`, so 7j4's zero-shaped red
+        # stands down, and says so rather than passing silently.
+        check("7j4: ...and it announces that its zero-population reds stood down",
+              "the zero-population reds stand down" in good.stdout, good.stdout)
+
+        # DEPL-aBenchedProbe-3 S5: with a `selftests` row in the manifest the population exists, so
+        # both liveness reds bind. Zero graded: the descriptor declares no [[gate_leg]] at all.
+        _j4a = scratch_gov("true", f"{PFX}demo/", tag="-j4graded")
+        _j4ak = _j4a / PFX / "demo" / "kit.toml"
+        _j4ak.write_text(_j4ak.read_text(encoding="utf-8").split("[[gate_leg]]")[0],
+                         encoding="utf-8", newline="\n")
+        _j4al = _j4a / PFX / "gate-legs.json"
+        _j4arows = json.loads(_j4al.read_text(encoding="utf-8"))
+        _j4arows[0]["chunk"] = "selftests"
+        _j4al.write_text(json.dumps(_j4arows, indent=2) + "\n", encoding="utf-8", newline="\n")
+        # The unclaimed manifest row reds 7h too, so exit 1 alone cannot tell a 7j4 red from a 7j4
+        # note. `emit` prints every note before every problem, and 7j4's own count note follows
+        # its liveness call, so the line is a PROBLEM only when it prints after that count note.
+        _r4a = run_in(_j4a)
+        check("7j4 LIVENESS: a selftests population with ZERO descriptor legs graded REDS",
+              _r4a.returncode == 1 and "7j4: graded zero descriptor gate legs" in _r4a.stdout
+              and _r4a.stdout.find("7j4: graded zero") > _r4a.stdout.find("held self-test legs:"),
+              _r4a.stdout + _r4a.stderr)
+        # Zero shaped: one descriptor leg in a non-selftests chunk, beside an unclaimed held row.
+        _j4b = scratch_gov("true", f"{PFX}demo/", tag="-j4shaped")
+        _j4bl = _j4b / PFX / "gate-legs.json"
+        _j4brows = json.loads(_j4bl.read_text(encoding="utf-8"))
+        _j4brows[0]["chunk"] = "declarations"
+        _j4brows.append({"name": "held", "argv": ["true"], "guard": [], "subject": "kit",
+                         "chunk": "selftests"})
+        _j4bl.write_text(json.dumps(_j4brows, indent=2) + "\n", encoding="utf-8", newline="\n")
+        _r4b = run_in(_j4b)
+        check("7j4 LIVENESS: a selftests population with ZERO self-test-shaped legs REDS",
+              _r4b.returncode == 1 and "7j4: found zero self-test-shaped legs" in _r4b.stdout
+              and _r4b.stdout.find("7j4: found zero") > _r4b.stdout.find("held self-test legs:"),
+              _r4b.stdout + _r4b.stderr)
 
         bad_m = run_in(scratch_gov("false", f"{PFX}demo/"))
         check("mutates_index reds when the declared value is not the measured one",
@@ -5191,9 +5227,13 @@ user_skills = "/tmp/gk-fake-skills"
                     '[config]\nfile = ".lexicon.conf"\n\n'
                     '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
                     '[adopt]\nwhy_no_regenerate = "a fixture adopter"\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = true\n')
+            # DEPL-aBenchedProbe-3 S3: a `selftests` leg is held, so it declares subject `kit` in all
+            # three places. Declared `repo` it is a disagreement 7j4 grades, and this fixture's
+            # premise is a tree where every declared fact agrees.
+            _subj = {nm: ("kit" if chunk == "selftests" else "repo") for nm, _a, _g, chunk in legs}
             for nm, _argv, _guard, _chunk in legs:
                 body += (f'\n[[gate_leg]]\nname = "{nm}"\nargv = ["true"]\nguard = []\n'
-                         f'subject = "repo"\n')
+                         f'subject = "{_subj[nm]}"\n')
             (g / PFX / "demo" / "kit.toml").write_text(body, encoding="utf-8", newline="\n")
             (g / PFX / "demo" / "adopt-demo.sh").write_text(
                 '#!/usr/bin/env bash\ngit add .\n', encoding="utf-8", newline="\n")
@@ -5202,11 +5242,11 @@ user_skills = "/tmp/gk-fake-skills"
             (g / ".lexicon.conf").write_text("VERB_OFFENDER_PIN=0\n", encoding="utf-8",
                                              newline="\n")
             (g / PFX / "gate-legs.json").write_text(
-                json.dumps([{"name": nm, "argv": argv, "guard": guard, "subject": "repo",
+                json.dumps([{"name": nm, "argv": argv, "guard": guard, "subject": _subj[nm],
                              "chunk": chunk} for nm, argv, guard, chunk in legs], indent=2) + "\n",
                 encoding="utf-8", newline="\n")
             (g / PFX / KIT_NAMES["govkit"] / "subject-pins.tsv").write_text(
-                "# fixture pin\n" + "".join(f"{nm}\trepo\t{chunk}\n" for nm, _a, _g, chunk in legs),
+                "# fixture pin\n" + "".join(f"{nm}\t{_subj[nm]}\t{chunk}\n" for nm, _a, _g, chunk in legs),
                 encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
@@ -5442,8 +5482,12 @@ user_skills = "/tmp/gk-fake-skills"
         _wc = run_in_gov(rg, "selfcheck", "--write")
         _rowsc = [l for l in pinf.read_text(encoding="utf-8").split("\n")
                   if l.strip() and not l.startswith("#")]
-        check("AC5: and moving the pin in the same commit records the chunk and passes",
-              _wc.returncode == 0 and _rowsc == ["demo\trepo\tselftests"],
+        # DEPL-aBenchedProbe-3 S4: the leg stays subject `repo` in chunk `selftests`, which is 7j4's
+        # red class, so `--write` writes the pin AND exits 1 on 7j4 (the write sits in 7h, before it).
+        check("AC5: and moving the pin in the same commit records the chunk, while 7j4 reds the "
+              "repo-subject held leg",
+              _wc.returncode == 1 and _rowsc == ["demo\trepo\tselftests"]
+              and "7j4: entry 'demo' gate leg 'demo'" in _wc.stdout,
               str(_rowsc) + _wc.stdout + _wc.stderr)
 
         # AC3 — a NEW leg is UNPINNED, and unpinned reds. A new leg passing by default is the hole:
@@ -13091,6 +13135,12 @@ user_skills = "/tmp/gk-fake-skills"
         _g6ok = a6_gov("shipped", '["bash", "{prefix}/demo/present-engine.sh"]')
         check("[-6] S4 ...while a leg whose engine IS shipped stays green",
               run_in(_g6ok).returncode == 0, run_in(_g6ok).stdout[-900:])
+        # DEPL-aBenchedProbe-3 S6: this descriptor declares two gate legs and the tree has no
+        # manifest, so 7j4 grades nothing and says so in a note rather than refusing.
+        _p6nm = run_in(_g6ok)
+        check("[-6] 7j4 an absent manifest is a NOTE beside declared gate legs, not a refusal",
+              _p6nm.returncode == 0 and "is absent, so no leg's chunk is known" in _p6nm.stdout,
+              _p6nm.stdout[-900:] + _p6nm.stderr[-400:])
 
         # ---- AC4: THE FALSE-POSITIVE GUARD, and it is the arm that fails if the bar is evaluated
         # ---- before the STAGE step. On a first install NOTHING is tracked in the target yet; by

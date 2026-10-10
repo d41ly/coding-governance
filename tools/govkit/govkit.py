@@ -3257,11 +3257,18 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     #          `[[gate_leg]]` (the run-gates canary) or `[[exempt_leg]]` rows; whether gov's chunk is
     #          right; a self-test whose file name matches none of the globs or that runs indirectly,
     #          e.g. through `sh -c`; that an exempt leg is cheap.
+    #          TWO STAND-DOWNS (DEPL-aBenchedProbe-3). An absent manifest is a note, not a refusal,
+    #          because 7h grades no leg at all without one. The zero-graded and zero-shaped liveness
+    #          reds bind only while the manifest holds at least one row in chunk `selftests`; with
+    #          none, a zero is TRUE rather than a broken predicate (7c2's rule), and the note says the
+    #          reds stood down. On gov's tree, 7h2's chunk pins red every `selftests` chunk that
+    #          vanishes from the manifest, so the case this gives up is covered there.
     import fnmatch
     if not legs_path.is_file():
-        r.fail(f"7j4: {legs_path.relative_to(root).as_posix()} is absent, so no leg's chunk is known "
+        r.note(f"7j4: {legs_path.relative_to(root).as_posix()} is absent, so no leg's chunk is known "
                f"and a held self-test cannot be told from an exempt check — nothing was graded")
     else:
+        _j4_pop = sum(1 for c in manifest_chunk.values() if c == "selftests")
         _j4_graded, _j4_shaped, _j4_exempt = 0, 0, []
         for eid, (d, _p) in sorted(descs.items()):
             _ctx = canonical_ctx(eid)
@@ -3286,13 +3293,15 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                            f"its default bar. Hold it everywhere: `subject = \"kit\"` "
                            f"in the descriptor and <prefix>/gate-legs.json, then `selfcheck --write`. Or "
                            f"run it everywhere: file it in a chunk other than `selftests`")
+        _j4_live = r.fail if _j4_pop else r.note
         if not _j4_graded:
-            r.fail("7j4: graded zero descriptor gate legs — the held-self-test arm saw nothing")
+            _j4_live("7j4: graded zero descriptor gate legs — the held-self-test arm saw nothing")
         elif not _j4_shaped:
-            r.fail("7j4: found zero self-test-shaped legs among "
-                   f"{_j4_graded} — the predicate has stopped matching, so a green here proves nothing")
+            _j4_live("7j4: found zero self-test-shaped legs among "
+                     f"{_j4_graded} — the predicate has stopped matching, so a green here proves nothing")
         r.note(f"held self-test legs: {_j4_graded} graded, {_j4_shaped} self-test-shaped, "
-               f"exempt by chunk: {', '.join(sorted(_j4_exempt)) or 'none'}")
+               f"exempt by chunk: {', '.join(sorted(_j4_exempt)) or 'none'} · population {_j4_pop} "
+               f"in chunk selftests" + ("" if _j4_pop else " — the zero-population reds stand down"))
 
     # ---- 7k: entry-level `scope` is DERIVED and asserted against the declared value. Every
     #          descriptor declares one and the engine read only the rule-level spelling, so the
