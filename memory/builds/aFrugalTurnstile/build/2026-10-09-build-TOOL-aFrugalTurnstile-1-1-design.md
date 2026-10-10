@@ -174,3 +174,7 @@ shell seams"), so the seams above were found by reading the files named in §1.
   child's argv carries its absolute path under the repository root, and its pid lands in the
   lander's own start record.
 - **rev D11** — the declaration the close reads is the hook's own gate-env file at R (TOOL-9 F3).
+- **rev D8** — the post-merge red clears only on the FULL green the decision rests on, strictly
+  descending from it (TOOL-aFrugalTurnstile-15): `scoped_full` when a record is adopted, a covering
+  scoped record's base, or a full record's or runner stamp's own sha. TOOL-aFrugalTurnstile-7 S3's
+  "adopted green" is read as that full green; a scoped record's own sha never clears a red.

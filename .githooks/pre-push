@@ -1769,7 +1769,7 @@ print_decision() {
 # Where the gate-env file AT R declares `GATE_POST_MERGE` (`PM_DECL`, read in `classify_docs`), a full bar
 # that went RED after a landing is published as `refs/gov/bar-red` on the remote (`post-merge.sh`), and
 # it binds here through recorded state: present and an ancestor of the tip, it forces FULL until the
-# adopted green STRICTLY descends from it. Unreadable under a declaration forces FULL too. Undeclared,
+# FULL green the decision rests on STRICTLY descends from it. Unreadable under a declaration forces FULL too. Undeclared,
 # nothing is read and no decision moves. It can only force, so the every-predicate-forces rule holds.
 # read_post_merge_red <url> — ONE `git ls-remote --exit-code`, bounded as the unattended kit's
 # `observe_remote` is (60 s wall clock, `-k 5s`, no terminal or credential prompt, ssh connect and batch
@@ -1920,7 +1920,10 @@ if [ -n "$PM_DECL" ]; then
     echo "pre-push: post-merge bar: not read — this push is already FULL"
   else
     read_post_merge_red "${2-}"
-    _pm_x=$rec_sha; [ -n "$inh_sha" ] && _pm_x=$inh_sha; [ -n "$_cov_from" ] && _pm_x=$bg_sha
+    # The FULL green the decision rests on, never a scoped record's own sha (TOOL-aFrugalTurnstile-15,
+    # design rev D8): `scoped_full` when adopted; for a cover, a scoped record's base, else its own sha.
+    _pm_x=$scoped_full
+    if [ -n "$_cov_from" ]; then _pm_x=$bg_sha; [ "$bg_kind" = scoped ] && _pm_x=$bg_base; fi
     check_post_merge_red "$_pm_x"
     resolve_scoped_base
   fi

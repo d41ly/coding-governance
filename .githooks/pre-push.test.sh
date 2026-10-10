@@ -2131,18 +2131,44 @@ esac
 cd "$pfx_home" || exit 2
 
 # AC11 — a covering record binds to the red too; and --decide's scoped base is the push's GATE_BASE.
+# TOOL-aFrugalTurnstile-15: the red that stays covered sits BEFORE the full green _b, since a scoped
+# record's own sha no longer clears a red at its base.
 build_bg_fixture pm-cover "$PM_DECL" || bad "PM could not build its fixture"
-_b=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
-for _red in "$_l" "$_b"; do
+_p=$(git rev-parse HEAD); echo 0 >> src/x.sh; git commit -qam b; _b=$(git rev-parse HEAD)
+echo 1 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
+for _red in "$_l" "$_p"; do
   write_bg_record "$bg_gd/gate-bar-green" "$_b" full "" "$BG_WRAP"; write_bg_record "$bg_gd/gate-bar-green.scoped" "$_l" scoped "$_b" "$BG_WRAP"
   write_pm_red "$_red"; _m0=$(read_bg_marks); run_bg_push GOV_GATE_CMD="$BG_WRAP"
   case "$_red|$(read_bg_marks)|$BG_OUT" in
     "$_l|$((_m0 + 1))|"*"FULL gate on main push"*"RED at ${_l:0:8}"*) ok "PM AC11 a red the covering record does not strictly descend from forces FULL" ;;
-    "$_b|$_m0|"*"covered on main push"*"no bar runs"*) ok "PM AC11 a covering record that descends from the red stays covered" ;;
+    "$_p|$_m0|"*"covered on main push"*"no bar runs"*) ok "PM AC11 a covering record that descends from the red stays covered" ;;
     *) bad "PM AC11 red ${_red:0:8}: unexpected decision, marker $_m0/$(read_bg_marks): $BG_OUT" ;;
   esac
 done
 cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-15 AC1-AC3 — a red clears only on the FULL green the decision rests on. A scoped
+# record at a descendant of the red X, whose base _b is older than X, neither scopes (AC1) nor covers
+# (AC2); a full base strictly descending from X clears it (AC3). AC1 and AC2 are RED against the hook at
+# ebbc83b7, which cleared on the scoped record's own sha.
+for _ac in AC1 AC2 AC3; do
+  build_bg_fixture "pm-full-$_ac" "$PM_DECL" || bad "PM could not build its fixture"
+  _b=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam x; _x=$(git rev-parse HEAD)
+  [ "$_ac" = AC3 ] && { echo f >> src/x.sh; git commit -qam f; _b=$(git rev-parse HEAD); }
+  echo 2 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
+  [ "$_ac" = AC2 ] || { echo 3 >> src/x.sh; git commit -qam t; }
+  write_bg_record "$bg_gd/gate-bar-green" "$_b" full "" "$BG_WRAP"; write_bg_record "$bg_gd/gate-bar-green.scoped" "$_l" scoped "$_b" "$BG_WRAP"
+  write_pm_red "$_x"; _m0=$(read_bg_marks); run_bg_push GOV_GATE_CMD="$BG_WRAP"
+  case "$_ac|$(read_bg_marks)|$BG_OUT" in
+    "AC1|$((_m0 + 1))|"*"FULL gate on main push"*"RED at ${_x:0:8}"*"BAR base= full=1"*|"AC2|$((_m0 + 1))|"*"FULL gate on main push"*"RED at ${_x:0:8}"*"BAR base= full=1"*)
+      case "$BG_OUT" in *cleared*) bad "PM TOOL-aFrugalTurnstile-15 $_ac printed a cleared line: $BG_OUT" ;;
+        *) ok "PM TOOL-aFrugalTurnstile-15 $_ac a scoped record whose base is older than the red forces FULL, no cleared line" ;; esac ;;
+    "AC3|$((_m0 + 1))|"*"red ${_x:0:8} on origin is cleared for this push — the adopted green ${_b:0:8} descends from it"*"scoped gate on main push"*)
+      ok "PM TOOL-aFrugalTurnstile-15 AC3 a full base strictly descending from the red clears it and scopes" ;;
+    *) bad "PM TOOL-aFrugalTurnstile-15 $_ac red ${_x:0:8}: unexpected decision, marker $_m0/$(read_bg_marks): $BG_OUT" ;;
+  esac
+  cd "$pfx_home" || exit 2
+done
 build_bg_fixture pm-base || bad "PM could not build its fixture"
 _f=$(git rev-parse HEAD); write_bg_stamp "$_f"; echo 1 >> src/x.sh; git commit -qam t
 run_pm_decide -- "$(git rev-parse HEAD)" "$(read_pm_remote)"; run_bg_push

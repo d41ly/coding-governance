@@ -1,10 +1,12 @@
 # TOOL-aFrugalTurnstile-15 — a post-merge red clears only on a FULL green that descends from it
 
-**Status:** OPEN · rev-1 · 2026-10-10 · node a · Tier-2 · base bef97330 · streams tooling · order 7
+**Status:** CLOSED · rev-1 · 2026-10-10 · node a · Tier-2 · base bef97330 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-09-build-TOOL-aFrugalTurnstile-15-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-15-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
