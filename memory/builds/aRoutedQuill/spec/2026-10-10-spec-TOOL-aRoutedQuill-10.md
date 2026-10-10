@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-10 — the push boundary's routed-commits run grades the whole history beside the pushed range
 
-**Status:** SPECCED · rev-2 · 2026-10-10 · node a · Tier-2 · base e6585db4 · streams tooling · order 6 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-2 · 2026-10-10 · node a · Tier-2 · base e6585db4 · streams tooling · order 6 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
