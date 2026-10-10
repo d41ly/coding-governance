@@ -6,7 +6,7 @@ placeholder and drops the blocks a target has no kit for, so filling it is a pro
 reader's — see `WIRE-INTO-PROJECT.md` for what a program cannot decide. History lives in the
 `…-v-N-N.md` snapshots and in git.*
 
-<!-- governance-template: v3.5 -->
+<!-- governance-template: v3.6 -->
 
 > **What:** a project-agnostic charter for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** deploy it with the renderer; the rules are

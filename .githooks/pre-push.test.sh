@@ -1753,7 +1753,7 @@ case "${BG_MODE:-green}" in
        printf 'leg x\tINHERITED\t-\t-\t%s\t-\n' "$GATE_ATTRIBUTE" > "$d/attribution"; exit 1 ;;
 esac
 BGSTUB
-  # A WRAPPER BAR, inCMS's gov-bar shape: a tracked script that hands the runner a derived manifest.
+  # A WRAPPER BAR, adopter ic's gov-bar shape (TOOL-aFrugalTurnstile-2 AC17): a tracked script that hands the runner a derived manifest.
   printf '#!/usr/bin/env bash\nexport GATE_LEGS="$(git rev-parse --git-dir)/wrap-legs.json"\nexec bash %s "$@"\n' \
     "$KIT_REL/$RUN_GATES/run-gates.sh" > wrap-bar.sh
   printf '#!/usr/bin/env bash\nexec bash %s "$@"\n' "$KIT_REL/$RUN_GATES/run-gates.sh" > other-bar.sh
