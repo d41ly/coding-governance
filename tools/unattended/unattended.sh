@@ -3346,7 +3346,7 @@ resolve_kickoff_checker() { # -> the path on stdout · 1 with the reason on stdo
 # `|`-joined in order. At BASE because the rule a record is graded by must be as old as the
 # authorization it is part of: a run may edit the kickoff kit, and preflight runs more than once.
 read_brief_subheads() { # base -> the list on stdout · 1 with the reason on stdout
-  local ck tmp out rc list w rest
+  local ck tmp skel rc list w rest
   ck=$(resolve_kickoff_checker) || { echo "$ck"; return 1; }
   tmp=$(mktemp) || { echo "no scratch file could be created for the kickoff checker's blob"; return 1; }
   if ! GIT show "$1:$ck" > "$tmp" 2>/dev/null; then
@@ -3354,10 +3354,10 @@ read_brief_subheads() { # base -> the list on stdout · 1 with the reason on std
   fi
   # ponytail: unbounded, because the verb answers before the checker probes anything; bound it with
   # the driver's timeout wrapper if a checker that hangs on an unknown verb ever ships.
-  out=$(cd "$(dirname "$tmp")" && bash "$tmp" --brief-skeleton 2>/dev/null); rc=$?
+  skel=$(cd "$(dirname "$tmp")" && bash "$tmp" --brief-skeleton 2>/dev/null); rc=$?
   rm -f "$tmp"
   [ "$rc" = 0 ] || { echo "the kickoff checker at the pinned BASE exits $rc on --brief-skeleton: $1:$ck"; return 1; }
-  list=$(printf '%s\n' "$out" | awk '{ sub(/\r$/, "") }
+  list=$(printf '%s\n' "$skel" | awk '{ sub(/\r$/, "") }
     /^## / { if (b) exit; b = ($0 ~ /^## +The brief[[:space:]]*$/); next }
     b && /^### / { h = $0; sub(/^### +/, "", h); sub(/[[:space:]]+$/, "", h); printf "%s%s", (n++ ? "|" : ""), h }')
   [ -n "$list" ] || { echo "the kickoff checker at the pinned BASE prints no ### sub-head under ## The brief for --brief-skeleton: $1:$ck"; return 1; }
