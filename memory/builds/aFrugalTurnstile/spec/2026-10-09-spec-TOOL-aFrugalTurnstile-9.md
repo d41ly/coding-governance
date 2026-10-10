@@ -1,12 +1,13 @@
 # TOOL-aFrugalTurnstile-9 — the unattended close runs the boundary's decision where a post-merge bar is declared
 
-**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 5
+**Status:** CLOSED · rev-4 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
+| [2026-10-09-build-TOOL-aFrugalTurnstile-9-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-9-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
@@ -212,8 +213,9 @@ asked and the bar always sees `GATE_FULL` as 1.
   output carries the `did not answer with one decision line` line, or the `no pre-push hook at` line
   for the removed hook. Red when: any of the six runs the bar scoped or skips it.
 - **AC5** — When R declares no `GATE_POST_MERGE`, the hook's argv file is absent, the bar sees
-  `GATE_FULL` as 1, and the `unattended: gates-green` lines of the output equal the base driver's for the
-  same fixture once run ids and timings are masked with `sed -E 's/unattended-[0-9]+-[0-9]+/ID/g'`.
+  `GATE_FULL` as 1, and the `unattended: gates-green` lines of the output equal those of the driver at
+  this unit's parent `ab2851125` for the same fixture once run ids and short shas are masked with
+  `sed -E 's/unattended-[0-9]+-[0-9]+/ID/g; s/\b[0-9a-f]{8}\b/SHA/g'`.
   Red when: the hook is asked, or any new line appears.
 - **AC6** — When `GATE_POST_MERGE=local` is committed only on the run branch and not at R, the hook's
   argv file is absent and the bar sees `GATE_FULL` as 1; when `.unattended.conf` names a
@@ -294,6 +296,10 @@ The close runs these. A pass runs only the §6 fixture.
   `gate-bar-green`. What disagreed: TOOL-aFrugalTurnstile-11 gave the hook's writer a second slot for
   `kind scoped` after rev-2, and the driver's writer mirrors it so a scoped close never replaces the
   full record its base names.
+- rev-4 · 2026-10-10 · §6 AC5: the comparison driver is this unit's parent `ab2851125`, not base
+  `bef97330`, and the mask also folds 8-hex short shas. What disagreed: observed on a fixture, the
+  driver at HEAD prints `recorded gate-bar-green for <sha8> (kind full)`, TOOL-aFrugalTurnstile-3's
+  line, which the base predates, and the policy line names R's short sha, which differs per fixture.
 
 ## 10. Reuse audit
 
