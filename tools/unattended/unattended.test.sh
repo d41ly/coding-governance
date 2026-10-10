@@ -10918,6 +10918,60 @@ same "the re-close's gates-run names the merge its bar graded" \
 same "the re-close left a clean tree"                  "$(ipgit status --porcelain)" ""
 ipgit checkout -q --detach "$ip_base"; ipgit push -q -f origin HEAD:main; ipgit checkout -q unit
 
+# ---- TOOL-aFrugalTurnstile-9 AC1-AC5 AC7: WHERE R DECLARES GATE_POST_MERGE, THE IN-PLACE CLOSE ASKS
+# ---- `pre-push --decide <HEAD> <R>` and runs the bar it answers. The hook git runs is a STUB reached
+# ---- through core.hooksPath, outside the repo so the tree stays clean, which writes its argv and
+# ---- prints $FT9_DECISION. The declaration is committed on R, origin's main, per case. RED against the
+# ---- driver at bef97330: the argv file is never written and the bar always sees GATE_FULL=1.
+ft9_base0=$ip_base; ft9_hk="$ip_out/ft9hooks"; mkdir -p "$ft9_hk"
+printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$@" > "$IPOUT/argv.txt"\n[ "${1-}" = --decide ] || exit 0\n[ "${FT9_RC:-0}" = 0 ] || exit "$FT9_RC"\n[ -z "$FT9_DECISION" ] || printf "%%s\\n" "$FT9_DECISION"\n' > "$ft9_hk/pre-push"
+ipgit config core.hooksPath "$ft9_hk"
+init_declared_merge() { # $1 = the gate-env line committed at R
+  ipreset; ipgit checkout -q --detach "$ft9_base0"; mkdir -p "$ip_dir/.githooks"
+  printf '%s\n' "$1" > "$ip_dir/.githooks/gate-env.sh"
+  ipgit add -A >/dev/null && ipgit commit -q -m "declaration" --no-verify
+  ip_base=$(ipgit rev-parse HEAD); ipgit checkout -q unit
+  ipprep ""; rm -f "$ip_out/argv.txt" "$ip_out/barenv.txt" "$ft9_gd/gate-bar-green" "$ft9_gd/gate-bar-green.scoped"
+}
+ft9_gd=$(ipgit rev-parse --absolute-git-dir)
+init_declared_merge "GATE_POST_MERGE=local"; ft9_h=$(ipgit rev-parse HEAD)
+out=$(FT9_DECISION="full stale" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+same "TOOL-aFrugalTurnstile-9 AC1 the hook is asked --decide <HEAD> <R>" "$(tr '\n' ' ' < "$ip_out/argv.txt" 2>/dev/null)" "--decide $ft9_h $ip_base "
+same "TOOL-aFrugalTurnstile-9 AC1 a full answer runs the bar with GATE_FULL=1" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+same "TOOL-aFrugalTurnstile-9 AC1 the record reads kind full" "$(awk -F'\t' '$1=="kind"{print $2}' "$ft9_gd/gate-bar-green" 2>/dev/null)" "full"
+hit "$out" "pre-push --decide answered 'full stale'"
+init_declared_merge "GATE_POST_MERGE=local"
+out=$(FT9_DECISION="scoped $ip_base" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+same "TOOL-aFrugalTurnstile-9 AC2 a scoped answer runs the bar with GATE_FULL unset" "$(grep -c '^GATE_FULL=<unset>$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+same "TOOL-aFrugalTurnstile-9 AC2 the scoped slot reads kind scoped and the decision's base" \
+  "$(awk -F'\t' '$1=="kind"||$1=="base"{print $2}' "$ft9_gd/gate-bar-green.scoped" 2>/dev/null | tr '\n' ' ')" "scoped $ip_base "
+init_declared_merge "GATE_POST_MERGE=local"; ft9_gr=$(grep '^gates-run:' "$ip_dir/memory/builds/tRun/RUN.md")
+out=$(FT9_DECISION="covered gate-bar-green@1234abcd" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+same "TOOL-aFrugalTurnstile-9 AC3 a covered answer runs no bar" "$([ -e "$ip_out/barenv.txt" ] && echo ran || echo absent)" "absent"
+same "TOOL-aFrugalTurnstile-9 AC3 a covered close writes no gates-run fact" "$(grep '^gates-run:' "$ip_dir/memory/builds/tRun/RUN.md")" "$ft9_gr"
+hit "$out" "met without a bar: the boundary reads this tree as covered by gate-bar-green@1234abcd"
+for ft9_d in "maybe" "" "scoped deadbeef" $'full a\nfull b' "rc1"; do
+  init_declared_merge "GATE_POST_MERGE=local"; ft9_rc=0; [ "$ft9_d" = rc1 ] && ft9_rc=1
+  out=$(FT9_RC=$ft9_rc FT9_DECISION="$ft9_d" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+  same "TOOL-aFrugalTurnstile-9 AC4 a malformed answer [$ft9_d] runs the full bar" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+  hit "$out" "pre-push --decide did not answer with one decision line"
+done
+init_declared_merge "GATE_POST_MERGE=local"; mv "$ft9_hk/pre-push" "$ft9_hk/pre-push.off"
+out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+mv "$ft9_hk/pre-push.off" "$ft9_hk/pre-push"
+same "TOOL-aFrugalTurnstile-9 AC4 no hook runs the full bar" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+hit "$out" "no pre-push hook at"
+init_declared_merge "# nothing declared"
+out=$(FT9_DECISION="covered x" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+same "TOOL-aFrugalTurnstile-9 AC5 undeclared, the hook is never asked" "$([ -e "$ip_out/argv.txt" ] && echo asked || echo absent)" "absent"
+same "TOOL-aFrugalTurnstile-9 AC5 undeclared, the bar runs with GATE_FULL=1" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+miss "$out" "GATE_POST_MERGE"
+init_declared_merge "GATE_POST_MERGE=yes"
+out=$(FT9_DECISION="covered x" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+same "TOOL-aFrugalTurnstile-9 AC7 a value outside the set never asks the hook" "$([ -e "$ip_out/argv.txt" ] && echo asked || echo absent)" "absent"
+hit "$out" "GATE_POST_MERGE at ${ip_base:0:8} is 'yes', outside 'local ci'"
+ipgit config --unset core.hooksPath; ip_base=$ft9_base0; ipreset
+
 cd "$TMP" || exit 2
 rm -rf "$ip_dir" "$ip_out" "$ip_oroot"
 

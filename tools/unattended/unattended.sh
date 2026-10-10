@@ -8592,19 +8592,24 @@ read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleane
   printf '%s' "$v"
 }
 
-GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""
+GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""; GP_POST_MERGE=""
 # A CONF NAMING NO POLICY FILE READS THE PRE-PUSH HOOK'S OWN (closing review round 1, M7 and M12). The
 # hook reads `$top/.githooks/gate-env.sh` at R on every gated push whatever the conf says, so when the
 # conf is absent at R or its GATE_POLICY_FILE is blank, the driver reads that same file at the same R
 # before it defaults to land. Defaulting first made the two readers disagree in the direction that
 # strands a run: the driver read land and wrote LANDING, and the hook read park and refused the push.
 # The path is spelled as the hook derives it; a named file is still the conf's, read as before.
-read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive integer, or empty) and GP_WHY
+# GP_POST_MERGE IS READ FROM THE HOOK'S OWN FILE AT R, whatever GATE_POLICY_FILE names
+# (TOOL-aFrugalTurnstile-9 S1, spec F3): the hook binds a post-merge red and the lander starts the
+# post-merge bar only where that file declares one, so a declaration read anywhere else could buy a
+# scoped close that no post-merge bar follows.
+read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive integer, or empty), GP_WHY and GP_POST_MERGE
   local r=$1 conf path blob pol age bnd via="" hook=".githooks/gate-env.sh"
-  GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""
+  GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""; GP_POST_MERGE=""
   if [ -z "$r" ]; then
     GP_WHY="no advertised tip was observed, so there is no R to read a gate policy at"; return 0
   fi
+  GP_POST_MERGE=$(read_policy_key "$(GIT show "$r:$hook" 2>/dev/null)" GATE_POST_MERGE)
   # THE CONF'S OWN NAME, derived from the path this driver sourced, so the file is spelled once.
   if ! conf=$(GIT show "$r:${CONF##*/}" 2>/dev/null); then
     via="the project conf is absent at ${r:0:8}, so no policy file is named"
@@ -10104,14 +10109,17 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
 # order, the same `.tmp` rename and the same `.shared` copy into the common dir from a linked worktree;
 # only `by` differs. The hook ships verbatim and sources no kit, so the grammar is spelled twice and
 # held together by a parity arm in this kit's suite, as `read_policy_key` is. SILENT on a red rc, whose
-# output is already the item's; otherwise ONE line, recorded or declined with why.
+# output is already the item's; otherwise ONE line, recorded or declined with why. A `kind scoped`
+# record goes to `gate-bar-green.scoped` (and `.scoped.shared`), the hook's slot rule
+# (TOOL-aFrugalTurnstile-11 S1), so it never replaces the full record its base names.
 write_bar_green() {
-  local g=$1 h=$2 rc=$3 kind=$4 base=$5 bar=$6 run=$7 tree dirty w paths="" cdir cdir_abs g_abs
+  local g=$1 h=$2 rc=$3 kind=$4 base=$5 bar=$6 run=$7 tree dirty w paths="" cdir cdir_abs g_abs f=gate-bar-green
   local -a words=()
   local no="unattended: gates-green — no gate-bar-green written:"
   [ "$rc" = 0 ] || return 0
   case "$kind" in
-    full|scoped) ;;
+    full) ;;
+    scoped) f=gate-bar-green.scoped ;;
     "") echo "$no the bar did not run full"; return 0 ;;
     *) echo "$no the kind '$kind' is neither full nor scoped"; return 0 ;;
   esac
@@ -10126,17 +10134,17 @@ write_bar_green() {
   for w in "${words[@]}"; do case "$w" in */*|*.sh) paths="$paths${paths:+ }$w" ;; esac; done
   if ! { printf 'sha\t%s\ntree\t%s\nbar\t%s\nbar_paths\t%s\nkind\t%s\nbase\t%s\nselftests\t%s\nrun_id\t%s\nby\tunattended\nstamped\t%s\n' \
            "$h" "$tree" "$bar" "$paths" "$kind" "$base" "${GATE_SELFTESTS:+1}" "$run" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-           > "$g/gate-bar-green.tmp" && mv -f "$g/gate-bar-green.tmp" "$g/gate-bar-green"; } 2>/dev/null; then
-    echo "$no $g/gate-bar-green could not be written"; return 0
+           > "$g/$f.tmp" && mv -f "$g/$f.tmp" "$g/$f"; } 2>/dev/null; then
+    echo "$no $g/$f could not be written"; return 0
   fi
   cdir=$(GIT rev-parse --git-common-dir 2>/dev/null) || cdir=""
   cdir_abs=""; [ -n "$cdir" ] && cdir_abs=$(cd "$cdir" 2>/dev/null && pwd -P)
   g_abs=$(cd "$g" 2>/dev/null && pwd -P) || g_abs=""
   if [ -n "$cdir_abs" ] && [ -n "$g_abs" ] && [ "$cdir_abs" != "$g_abs" ]; then
-    cp "$g/gate-bar-green" "$cdir_abs/gate-bar-green.shared.tmp" 2>/dev/null \
-      && mv -f "$cdir_abs/gate-bar-green.shared.tmp" "$cdir_abs/gate-bar-green.shared" 2>/dev/null
+    cp "$g/$f" "$cdir_abs/$f.shared.tmp" 2>/dev/null \
+      && mv -f "$cdir_abs/$f.shared.tmp" "$cdir_abs/$f.shared" 2>/dev/null
   fi
-  echo "unattended: gates-green — recorded gate-bar-green for ${h:0:8} (kind $kind)"
+  echo "unattended: gates-green — recorded $f for ${h:0:8} (kind $kind)"
 }
 
 # What the driver can honestly answer for each core item. Anything it cannot observe is reported as
@@ -10172,6 +10180,7 @@ dod_met() { # slug · run-state file · item · checker
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
       local _grc _gr _gid _ggd _gh _ghb _gkind _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
+      local _gh0 _ghk _gdec=full _gbase="" _grec="" _gdrc _gdl _gok
       local -a _genv _grb
       # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
       # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
@@ -10232,10 +10241,52 @@ dod_met() { # slug · run-state file · item · checker
         if [ "$LANDER_MODE" = in-place ]; then
           check_inplace_preconditions "$slug" || { GG_HARD=1; return 1; }
           run_orphan_reap "$slug"
+          # TOOL-aFrugalTurnstile-9 S2-S4 - WHERE A POST-MERGE BAR IS DECLARED AT R, THE PUSH BOUNDARY
+          # DECIDES THIS BAR. The hook git will run is resolved the way git resolves it, honouring
+          # core.hooksPath, and asked `--decide <HEAD> <R>` once, on the first try only, so a TREE MOVED
+          # re-run grades the same commit under the same decision. One line of `full <why>`, `scoped
+          # <40-hex commit here>` or `covered <record>` is acted on; anything else is today's
+          # GATE_FULL=1 bar, announced. 600 is a PINNED bound against a hung remote, not a timing.
+          # WHAT THIS DOES NOT CHECK: that the tree it grades is the tree the landing push will carry;
+          # the close commits its record on top of this merge, so that push is decided again.
+          if [ "$_gtry" = 1 ]; then
+            case "$GP_POST_MERGE" in
+              local|ci)
+                _gh0=$(GIT rev-parse HEAD 2>/dev/null)
+                _ghk="$(GIT rev-parse --path-format=absolute --git-path hooks 2>/dev/null)/pre-push"
+                if [ ! -f "$_ghk" ]; then
+                  echo "unattended: gates-green — no pre-push hook at $_ghk, so the boundary cannot be asked and the bar runs with GATE_FULL=1 as it does undeclared"
+                else
+                  RB_BOUND=600 run_bounded "${BASH:-bash}" "$_ghk" --decide "$_gh0" "$_gr"; _gdrc=$?
+                  _gdl=${RB_STDOUT%$'\r'}; _gok=""
+                  [ "$_gdrc" = 0 ] && case "$_gdl" in
+                    *$'\n'*|'') ;;
+                    "full "?*) _gok=1 ;;
+                    "covered "?*) _gok=1; _gdec=covered; _grec=${_gdl#covered } ;;
+                    "scoped "*)
+                      _gbase=${_gdl#scoped }
+                      if [ "${#_gbase}" = 40 ] && [ -n "${_gbase##*[!0-9a-f]*}" ] \
+                         && GIT cat-file -e "$_gbase^{commit}" 2>/dev/null; then _gok=1; _gdec=scoped; fi ;;
+                  esac
+                  if [ -n "$_gok" ]; then
+                    echo "unattended: gates-green — GATE_POST_MERGE=$GP_POST_MERGE at ${_gr:0:8}, so the push boundary decides this bar: pre-push --decide answered '$_gdl'"
+                  else
+                    _gdec=full; _gbase=""
+                    echo "unattended: gates-green — pre-push --decide did not answer with one decision line (exit $_gdrc), so the bar runs with GATE_FULL=1 as it does undeclared: ${_gdl%%$'\n'*}"
+                  fi
+                fi ;;
+              '') ;;
+              *) echo "unattended: gates-green — GATE_POST_MERGE at ${_gr:0:8} is '$GP_POST_MERGE', outside 'local ci', so it reads undeclared and the bar runs with GATE_FULL=1" ;;
+            esac
+          fi
           RB_BOUND=$_gbound
           _ghb=$(GIT rev-parse HEAD 2>/dev/null)
           # shellcheck disable=SC2086
-          run_bounded env -u GATE_WALL GATE_FULL=1 "${_genv[@]}" $GATE_CMD; _grc=$?
+          case "$_gdec" in
+            scoped)  run_bounded env -u GATE_WALL -u GATE_FULL GATE_BASE="$_gbase" "${_genv[@]}" $GATE_CMD; _grc=$? ;;
+            covered) _grc=0 ;;
+            *)       run_bounded env -u GATE_WALL GATE_FULL=1 "${_genv[@]}" $GATE_CMD; _grc=$? ;;
+          esac
           RB_BOUND=""
         else
           run_orphan_reap "$slug"
@@ -10268,13 +10319,21 @@ dod_met() { # slug · run-state file · item · checker
       # TOOL-aFrugalTurnstile-3 S2 - THE BAR'S GREEN IS RECORDED BY TREE, in the grammar the push
       # boundary writes, so a wrapper bar that never earns a usable runner stamp still leaves a green
       # the boundary can read. `full` under `in-place`, whose bar always runs with GATE_FULL=1; under
-      # `primary` only when this process carries GATE_FULL=1, which the bar inherits. Base is empty.
+      # `primary` only when this process carries GATE_FULL=1, which the bar inherits. Base is empty
+      # except on the scoped arm below.
       # WHAT THIS RECORD DOES NOT CHECK: it says this bar exited 0 on this tree, never that the push
       # boundary will run the same bar; that equality is the reader's, which compares the bar string
       # byte for byte.
+      # TOOL-aFrugalTurnstile-9 S5 - the kind and base are the bar that RAN: `scoped` with the base the
+      # boundary picked, and a `covered` close ran none, so it writes no record and no `gates-run` fact.
+      if [ "$_gdec" = covered ]; then
+        echo "unattended: gates-green — met without a bar: the boundary reads this tree as covered by $_grec"
+        GG_RUN_FACT=""; DOD_OUT=""; return 0
+      fi
       _gkind=""
       if [ "$LANDER_MODE" = in-place ] || [ "${GATE_FULL:-}" = 1 ]; then _gkind=full; fi
-      [ -z "$_ggd" ] || write_bar_green "$_ggd" "$_ghb" "$_grc" "$_gkind" "" "$GATE_CMD" "$_gid"
+      if [ "$_gdec" = scoped ]; then _gkind=scoped; fi
+      [ -z "$_ggd" ] || write_bar_green "$_ggd" "$_ghb" "$_grc" "$_gkind" "$_gbase" "$GATE_CMD" "$_gid"
       GG_RUN_FACT="$_gid ${_gh:0:8}"
       if [ "$_grc" = 0 ]; then
         [ "$_gtry" = 1 ] || echo "unattended: gates-green — the one re-run after TREE MOVED exited 0"

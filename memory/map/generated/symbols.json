@@ -7623,6 +7623,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "init_declared_merge",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "init_dl_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"

@@ -10,7 +10,6 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 
 | Build | Status | Node | Opened | Streams | Ids (n) | Last record | Activity | Landed-unclosed |
 |---|---|---|---|---|---|---|---|---|
-| [aFrugalTurnstile](builds/aFrugalTurnstile/README.md) | OPEN | a | 2026-10-09 | tooling+playbook+deployer | 13 | 2026-10-10 | active | 0 |
 | [aQuotedBrief](builds/aQuotedBrief/README.md) | SPECCED | a | 2026-10-09 | tooling | 3 | 2026-10-09 | active | 0 |
 | [aRoutedQuill](builds/aRoutedQuill/README.md) | SPECCED | a | 2026-10-09 | tooling+kickoff+playbook+deployer | 9 | 2026-10-09 | active | 0 |
 | [dPinnedHandoff](builds/dPinnedHandoff/README.md) | SPECCED | d | 2026-09-22 | tooling | 3 | 2026-09-28 | active | 0 |

@@ -1,6 +1,6 @@
 # TOOL-aFrugalTurnstile-9 — the unattended close runs the boundary's decision where a post-merge bar is declared
 
-**Status:** OPEN · rev-2 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 5
+**Status:** CLOSED · rev-3 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -37,7 +37,8 @@ already covers the tree. Undeclared, the item is today's `GATE_FULL=1` bar, byte
   exit, no line, two lines, a line outside the three shapes, a scoped base that is not a commit here,
   or no hook file. Observed by AC4.
 - **S5** — The green record design D3 defines is written by the TOOL-3 writer with `kind` and `base`
-  matching the bar that ran: `full` with an empty base, or `scoped` with the decision's base. A
+  matching the bar that ran: `full` with an empty base in `gate-bar-green`, or `scoped` with the
+  decision's base in `gate-bar-green.scoped`, the hook's slot rule (TOOL-aFrugalTurnstile-11). A
   `covered` item writes no record and no `gates-run` fact, because no bar ran. Observed by AC1, AC2
   and AC3.
 - **S6** — Undeclared, under `LANDER_MODE=primary`, and for a value outside `local ci`, the hook is
@@ -198,8 +199,8 @@ asked and the bar always sees `GATE_FULL` as 1.
   the output carries the `pre-push --decide answered 'full stale'` line. Red when: the argv file is
   absent, which is the base driver's behaviour, or the record's kind is not `full`.
 - **AC2** — When `STUB_DECISION` is `scoped ` followed by the full sha of origin's main, the bar's
-  environment file reads `GATE_FULL` as `<unset>` and `GATE_BASE=` that sha, and `gate-bar-green` carries
-  `kind` `scoped` and `base` that sha. Red when: the bar sees `GATE_FULL` as 1, or the record reads
+  environment file reads `GATE_FULL` as `<unset>` and `GATE_BASE=` that sha, and `gate-bar-green.scoped`
+  carries `kind` `scoped` and `base` that sha. Red when: the bar sees `GATE_FULL` as 1, or the record reads
   `kind full`.
 - **AC3** — When `STUB_DECISION='covered gate-bar-green@1234abcd'` and the bar's environment file has
   been removed first, the file is still absent after the close, the item is met, the output carries
@@ -289,6 +290,10 @@ The close runs these. A pass runs only the §6 fixture.
 - rev-1 · 2026-10-09 · initial draft.
 - rev-2 · 2026-10-09 · §8 F2 marked RESOLVED (b) by the main loop; no scope change. What disagreed: F2
   was left open for the main loop, which a READY classification does not admit.
+- rev-3 · 2026-10-10 · S5 and AC2: a scoped record lands in `gate-bar-green.scoped`, not
+  `gate-bar-green`. What disagreed: TOOL-aFrugalTurnstile-11 gave the hook's writer a second slot for
+  `kind scoped` after rev-2, and the driver's writer mirrors it so a scoped close never replaces the
+  full record its base names.
 
 ## 10. Reuse audit
 
