@@ -1,0 +1,189 @@
+# **Serves:** research TOOL-aMeteredSweep-1
+# The runner research appendix's four instruments, verbatim, kept as text so no gate grades them as
+# product code. Copy one out to a .py to re-run it; each reads the profiled run record its header names.
+
+# ===== occ.py =====
+import glob, os, sys, json
+D = sys.argv[1]
+legs = []
+for f in glob.glob(os.path.join(D, "*.leg")):
+    b = os.path.basename(f)[:-4]
+    retry = b.endswith(".retry")
+    idx = int(b.split(".")[0])
+    p = open(f, encoding="utf-8").read().rstrip("\n").split("\t")
+    legs.append(dict(i=idx, retry=retry, name=p[0], st=p[1], rc=p[2], secs=float(p[3]),
+                     s=int(p[4]) / 1e9, e=int(p[5]) / 1e9, foreign=p[7] if len(p) > 7 else ""))
+pool = [l for l in legs if not l["retry"]]
+ret = [l for l in legs if l["retry"]]
+t0 = min(l["s"] for l in pool)
+tend_pool = max(l["e"] for l in pool)
+tend = max(l["e"] for l in legs)
+print("pool legs", len(pool), "retries", len(ret))
+print("first start->last pool end %.0f s; ->last retry end %.0f s" % (tend_pool - t0, tend - t0))
+print("pool leg-seconds %.0f ; retry leg-seconds %.0f" % (sum(l["secs"] for l in pool), sum(l["secs"] for l in ret)))
+# occupancy timeline
+ev = sorted([(l["s"], 1) for l in pool] + [(l["e"], -1) for l in pool])
+cur = 0; last = t0; hist = {}
+for t, d in ev:
+    hist[cur] = hist.get(cur, 0) + (t - last); last = t; cur += d
+print("time at concurrency k (pool phase):")
+for k in sorted(hist):
+    print("  %d: %.0f s" % (k, hist[k]))
+# dispatch gap: for each start after the first wave, the nearest preceding end
+ends = sorted(l["e"] for l in pool)
+starts = sorted(l["s"] for l in pool)
+gaps = []
+import bisect
+for s in starts[8:]:
+    j = bisect.bisect_right(ends, s) - 1
+    if j >= 0:
+        gaps.append(s - ends[j])
+gaps.sort()
+if gaps:
+    print("completion->next-dispatch gap: n=%d median %.2f p90 %.2f max %.2f sum %.0f" % (
+        len(gaps), gaps[len(gaps)//2], gaps[int(len(gaps)*.9)], gaps[-1], sum(gaps)))
+# the first wave
+print("first 8 dispatch offsets:", ["%.1f" % (s - t0) for s in starts[:10]])
+# retry phase
+for l in sorted(ret, key=lambda x: x["s"]):
+    print("retry %-45s start+%.0f secs %.0f st %s" % (l["name"][:45], l["s"] - t0, l["secs"], l["st"]))
+# tail: when did concurrency drop below 8 for the last time
+# legs running in the last 2000 s
+print("canary", [ (l["name"], "%.0f"%(l["s"]-t0), "%.0f"%(l["e"]-t0)) for l in pool if l["secs"]>3000])
+
+# ===== sim.py =====
+"""List-scheduling simulation over the profiled run's measured durations. Durations are held FIXED
+(the contended pool readings), so this isolates ORDER and RETRY policy; it does not model width
+dilation. Read-only."""
+import glob, heapq, os, sys
+RUN = sys.argv[1]
+pool, retry, start = {}, {}, {}
+for f in glob.glob(os.path.join(RUN, "*.leg")):
+    b = os.path.basename(f)[:-4]; i = int(b.split(".")[0])
+    p = open(f, encoding="utf-8").read().split("\t")
+    if ".retry" in b: retry[i] = float(p[3])
+    else: pool[i] = float(p[3]); start[i] = int(p[4])
+idx = sorted(pool)
+def sched(order, dur, W):
+    h = [0.0] * W; heapq.heapify(h); end = 0.0
+    for i in order:
+        t = heapq.heappop(h); t2 = t + dur[i]; end = max(end, t2); heapq.heappush(h, t2)
+    return end
+W = 8
+manifest = idx
+lpt = sorted(idx, key=lambda i: -pool[i])
+ser = sum(retry.values())
+a = sched(manifest, pool, W)
+print("A manifest order, fixed durations, W8: pool %.0f + serial retries %.0f = %.0f" % (a, ser, a + ser))
+b = sched(lpt, pool, W)
+print("B longest-first (oracle), W8: pool %.0f + serial retries %.0f = %.0f" % (b, ser, b + ser))
+# ceilings as the prior: order by declared ceiling (a proxy available with no ledger)
+import json
+legs = json.load(open(sys.argv[2], encoding="utf-8"))
+ceil = {i: legs[i].get("ceiling", 0) for i in idx}
+cp = sorted(idx, key=lambda i: -ceil[i])
+c = sched(cp, pool, W)
+print("C ceiling-ordered (no ledger), W8: pool %.0f + serial retries %.0f = %.0f" % (c, ser, c + ser))
+# retries run concurrently at width 4 after drain instead of serially
+r4 = sched(sorted(retry, key=lambda i: -retry[i]), retry, 4)
+print("   retries at width 4 instead of 1: %.0f (vs %.0f serial)" % (r4, ser))
+# D: no ceiling fires: each killed leg completes in-pool at max(kill*1.15, retry*3.5)
+dur2 = dict(pool)
+for i in retry: dur2[i] = max(pool[i] * 1.15, retry[i] * 3.5)
+d = sched(sorted(idx, key=lambda i: -dur2[i]), dur2, W)
+print("D longest-first, ceilings extended instead of killed (guess model): %.0f" % d)
+print("   floor (longest leg) %.0f ; work/W %.0f" % (max(pool.values()), sum(pool.values()) / W))
+# when did the floor leg start in the real run
+t0 = min(start.values())
+lng = max(pool, key=lambda i: pool[i])
+print("   longest leg idx %d started at +%.0f s in the real run" % (lng, (start[lng] - t0) / 1e9))
+# E: longest-first, and a deferred leg's retry is queued into the SAME pool the moment it is
+# deferred (released at its kill time), instead of after the drain. Retry durations dilated x1.5
+# for running beside the tail. Event simulation.
+def sched_retry(order, dur, rdur, W, rf=1.5):
+    import heapq
+    q = list(order); free = [0.0] * W; heapq.heapify(free); pending = []  # (ready_time, i)
+    end = 0.0
+    while q or pending:
+        t = heapq.heappop(free)
+        pending.sort()
+        if pending and (not q or pending[0][0] <= t):
+            rt, i = pending.pop(0); st = max(t, rt); fin = st + rdur[i] * rf
+        else:
+            i = q.pop(0); st = t; fin = st + dur[i]
+            if i in rdur: pending.append((fin, i))
+        end = max(end, fin); heapq.heappush(free, fin)
+    return end
+e = sched_retry(lpt, pool, retry, W)
+print("E longest-first + retries into the pool tail (x1.5 dilation): %.0f" % e)
+e2 = sched_retry(cp, pool, retry, W)
+print("E2 ceiling-ordered + retries into the pool tail: %.0f" % e2)
+e3 = sched_retry(manifest, pool, retry, W)
+print("E3 manifest order + retries into the pool tail: %.0f" % e3)
+
+# ===== reuse_est.py =====
+"""Estimate leg-seconds a guard-keyed reuse would skip per commit, over recent first-parent main commits.
+
+Read-only: git log / git diff --name-only only. Durations from the profiled run record (.leg, the
+retry's seconds where a leg was retried, since that is its alone cost).
+"""
+import glob, json, os, subprocess, sys
+REPO, RUN = sys.argv[1], sys.argv[2]
+N = int(sys.argv[3]) if len(sys.argv) > 3 else 30
+legs = json.load(open(os.path.join(REPO, "tools/gate-legs.json"), encoding="utf-8"))
+def res(p): return p.replace("{prefix}", "tools")
+secs = {}
+for f in glob.glob(os.path.join(RUN, "*.leg")):
+    p = open(f, encoding="utf-8").read().split("\t")
+    secs.setdefault(p[0], {})["retry" if ".retry" in f else "pool"] = float(p[3])
+def cost(n):
+    s = secs.get(n, {}); return s.get("pool", 0.0)
+def git(*a): return subprocess.run(["git", "-C", REPO] + list(a), capture_output=True, text=True).stdout
+commits = git("log", "--first-parent", "-n", str(N), "--format=%H", "main").split()
+tot_all = sum(cost(l["name"]) for l in legs)
+tot_held = sum(cost(l["name"]) for l in legs if l.get("chunk") == "selftests" or l.get("subject") == "kit")
+print("leg-seconds all %.0f ; held-tier (selftests/kit) %.0f" % (tot_all, tot_held))
+rows = []
+for c in commits:
+    files = git("diff", "--name-only", c + "^1", c).split("\n")
+    files = [f for f in files if f]
+    saved = 0.0; saved_held = 0.0; nre = 0
+    for l in legs:
+        g = [res(x) for x in l.get("guard", [])]
+        if not g or l.get("impure"):
+            continue
+        hit = any(f == x or f.startswith(x.rstrip("/") + "/") or (x.endswith("/") and f.startswith(x)) for f in files for x in g)
+        if not hit:
+            saved += cost(l["name"]); nre += 1
+            if l.get("chunk") == "selftests" or l.get("subject") == "kit":
+                saved_held += cost(l["name"])
+    rows.append((c[:9], len(files), nre, saved, saved_held))
+for r in rows:
+    print("%s files %4d reusable legs %3d  leg-s %6.0f (held tier %6.0f)" % r)
+import statistics
+print("median reusable leg-s %.0f ; mean %.0f" % (statistics.median(r[3] for r in rows), statistics.mean(r[3] for r in rows)))
+print("commits with canary reusable:", sum(1 for c in commits if not any(f.startswith("tools/") for f in git("diff", "--name-only", c + "^1", c).split("\n") if f)), "of", len(commits))
+
+# ===== reuse_sim.py =====
+import glob, json, os, subprocess, sys, heapq
+REPO, RUN, C = sys.argv[1], sys.argv[2], sys.argv[3]
+legs = json.load(open(os.path.join(REPO, "tools/gate-legs.json"), encoding="utf-8"))
+pool, retry = {}, {}
+for f in glob.glob(os.path.join(RUN, "*.leg")):
+    b = os.path.basename(f)[:-4]; i = int(b.split(".")[0]); p = open(f, encoding="utf-8").read().split("\t")
+    (retry if ".retry" in b else pool)[i] = float(p[3])
+files = [f for f in subprocess.run(["git", "-C", REPO, "diff", "--name-only", C + "^1", C], capture_output=True, text=True).stdout.split("\n") if f]
+keep = []
+for i, l in enumerate(legs):
+    g = [x.replace("{prefix}", "tools") for x in l.get("guard", [])]
+    reusable = bool(g) and not l.get("impure") and not any(f.startswith(x) if x.endswith("/") else f == x for f in files for x in g)
+    if not reusable: keep.append(i)
+def sched(order, W=8):
+    h = [0.0] * W; end = 0
+    for i in order:
+        t = heapq.heappop(h); d = pool[i]; heapq.heappush(h, t + d); end = max(end, t + d)
+    return end
+o = sorted(keep, key=lambda i: -pool[i])
+print("commit", C[:9], "files", len(files), "legs left", len(keep), "leg-s left %.0f" % sum(pool[i] for i in keep),
+      "LPT W8 pool %.0f" % sched(o), "retries left %.0f" % sum(retry.get(i, 0) for i in keep),
+      "longest left", legs[o[0]]["name"], "%.0f" % pool[o[0]])

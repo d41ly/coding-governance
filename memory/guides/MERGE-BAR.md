@@ -43,7 +43,8 @@ source that owns a number is the rule this file keeps breaking.
 
 Every leg's output is persisted
 per-leg under `<git-dir>/gate-logs/`, redacted; a RED run also leaves `gate-last-failure.txt`, which
-only the next RED run overwrites. Never pipe the bar through `tail` — it discards the failing row;
+only the next RED run overwrites. Each leg's seconds are a row of `<git-dir>/gate-ledger.tsv`, which is
+the one place a leg's cost is read from. Never pipe the bar through `tail` — it discards the failing row;
 read the durable summary instead.
 
 **The push boundary is where the bar binds.** The inherited-red policy that `AGENTS.md`'s merge-bar
