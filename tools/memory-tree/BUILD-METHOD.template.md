@@ -1,9 +1,9 @@
-<!-- gov:kit memory-tree@2.138 -->
+<!-- gov:kit memory-tree@2.139 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
 
-Binding for any build of more than one pass, attended or not. Template §1 defines a READY unit and a DONE unit;
+Binding for any build of more than one pass, attended or not. The kickoff skill defines a READY unit and the charter a DONE one;
 this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is {{GATE_RUNNER}}.
 **Budget: ≤30720 bytes, ≤400 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
 WHOLE at every pass boundary and a method too expensive to re-read is skipped exactly when it is needed.
@@ -277,7 +277,7 @@ park, not a waiver, and its unit does not close. Left-shift every confirmed find
 
 **Landing** — `land-once-done` and `conflicts-reconciled` between them: merge and push
 authorization, the lander, the bypass ban, additive reconciliation of a shared record, and when a
-build may land at all, a partial landing that carries its deferred units forward included. Both are template §1 Landing and
+build may land at all, a partial landing that carries its deferred units forward included. Both are the charter's `[land]` practice and
 {{UNATTENDED_PROTOCOL}}; neither is restated here.
 
 ## M9 — The wrap-up — a derivation, not a recollection
@@ -298,8 +298,8 @@ from, the line does not go in.**
 
 **Completeness test, the only one that matters:** every row has a source on disk. A field you cannot cite a source
 for is not "unknown" — it is work that did not happen, and *that* is the line the wrap-up leads with. **Format is
-template §16's** — payload first, ONE state block at the bottom — but its routine-completion length budget does not
-apply: §16 budgets a completion message, and this is the only turn the owner gets for the entire build.
+the charter's `[state]` rule** — payload first, ONE state block at the bottom — and no routine-completion brevity
+applies: this is the only turn the owner gets for the entire build.
 
 ## M10 — If the run is unattended
 

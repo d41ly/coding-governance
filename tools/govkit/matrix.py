@@ -702,7 +702,11 @@ def main() -> int:
         # list here would go stale the first time the charter grew a placeholder — which is the
         # rot this file's own header refuses.
         pdesc = govkit.load_toml(ROOT / PFX / KIT_NAMES["govkit"] / "entries" / "playbook.kit.toml")
-        ans = {r["key"].lower(): "stated for the scratch install"
+        # A placeholder whose declared default is a `- ` bullet fills a one-line region the render
+        # grades (aDistilledCharter), so its stub takes the default's shape: derived, not listed.
+        ans = {r["key"].lower(): ("- stated for the scratch install"
+                                  if str(r.get("default", "")).startswith("- ")
+                                  else "stated for the scratch install")
                for r in pdesc.get("placeholder", [])}
         ans["playbook_path"] = "docs/PARALLEL.md"
         (g / ".governance").mkdir(exist_ok=True)

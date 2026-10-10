@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-state',
-  version: '1.26',
+  version: '1.27',
   description:
     "Drift audit Tier 1/2: are this repo's own records still true? Stale maps, stale memory, charter drift, work-state uncertainty, record-gate integrity. Project-agnostic; all repo facts arrive via args.",
   whenToUse:
@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.26
+// gov:kit drift-audit@1.27
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // BOTH THE CONCURRENCY CAP AND THE VERIFIER TOTAL ARE BARE LITERALS, and neither is caller-settable.
 // The retired form bound each of them from an `<expr> || 5` fallback, which read as a constant to the
@@ -129,7 +129,7 @@ EVIDENCE RULES (these decide whether your finding survives the skeptic):
 - Severity: blocker = actively misleads a session into wrong work, or breaks a gate; high = a session
   would make a materially wrong decision from it; medium = real cost; low = tidy-up.
 
-COST IS A VERDICT, AND THIS LENS HAS A BUDGET. Charter §7: every suite declares a wall-clock ceiling
+COST IS A VERDICT, AND THIS LENS HAS A BUDGET. Charter [cost]: every suite declares a wall-clock ceiling
 and one arriving without a ceiling reds by that fact. Yours is roughly 30 TOOL CALLS. If a question
 cannot be answered inside it, RECORD THE QUESTION AS UNANSWERED and move on — an unanswered question
 on disk is worth more than a perfect one nobody ever receives.

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runnable check for the .githooks/pre-commit BRANCH GUARD (playbook §3 enforcement).
+# Runnable check for the .githooks/pre-commit BRANCH GUARD (charter [isolate] enforcement).
 # Spins a throwaway repo, wires this repo's pre-commit via core.hooksPath, and asserts:
 #   1) a commit ON the default branch is allowed
 #   2) a commit parked OFF the default branch in the primary tree is refused
