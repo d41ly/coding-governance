@@ -1622,6 +1622,68 @@ def check_halved_install_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
           "entry 'drift-audit' declares MEMORY_ROOT required, and its adopter")
 
 
+def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
+    """DEPL-aBenchedProbe-4 (closing review H-M2 and H-L1) — selfcheck 7j4 and the 7h ceiling clause
+    were observed red only by hand-staged breaks that left nothing behind. Five breaks in a COPY of gov,
+    sharing runs where the lines they red are disjoint, each asserted on the ONE line that names it:
+    the subject-pin ratchet and the stale-exemption check red on several of the same breaks, so a
+    whole-output substring could pass on the wrong line."""
+    desc = gcopy / PFX / KIT_NAMES["govkit"] / "entries" / "push-main.kit.toml"
+    man = gcopy / PFX / "gate-legs.json"
+    keep = {f: f.read_bytes() for f in (desc, man)}
+    leg = "pre-push self-test"
+
+    def write_staged(f: pathlib.Path, old: str, new: str, label: str) -> None:
+        txt = f.read_text(encoding="utf-8")
+        check(f"[aBP-4] {label} LIVENESS the staged edit matched once", txt.count(old) == 1,
+              f"{txt.count(old)} match(es) in {f.name}")
+        f.write_text(txt.replace(old, new, 1), encoding="utf-8", newline="\n")
+
+    def check_line(out: str, *parts: str) -> bool:
+        return any(all(p in ln for p in parts) for ln in out.splitlines())
+
+    # Run 1: a1 (subject repo in descriptor AND manifest), a2 (a filename-shaped exempt row loses its
+    # chunk), and the 7h ceiling at 1781. Each reds a different line.
+    write_staged(desc, f'name = "{leg}"\nsubject = "kit"', f'name = "{leg}"\nsubject = "repo"', "a1 descriptor")
+    write_staged(man, '"subject": "kit",\n    "ceiling": 1780', '"subject": "repo",\n    "ceiling": 1780',
+          "a1 manifest")
+    write_staged(man, '"chunk": "declarations",\n    "subject": "repo",\n    "ceiling": 1840',
+          '"subject": "repo",\n    "ceiling": 1840', "a2 marker contracts chunk")
+    write_staged(desc, "ceiling = 1780", "ceiling = 1781", "b ceiling 1781")
+    r1 = run_selfcheck(gcopy)
+    o1 = r1.stdout + r1.stderr
+    check("[aBP-4] a1: 7j4 reds a held self-test declared repo, naming entry and leg",
+          r1.returncode != 0 and check_line(o1, "7j4:", f"entry 'push-main' gate leg '{leg}'"), o1[-1500:])
+    check("[aBP-4] a2: 7j4 reds a chunkless filename-shaped leg, naming it and its argv element",
+          check_line(o1, "7j4:", "'marker contracts'", "marker-contract.test.sh"), o1[-1500:])
+    check("[aBP-4] b: 7h reds a descriptor ceiling of 1781 against the manifest",
+          check_line(o1, "entry 'push-main'", f"gate leg '{leg}' with ceiling 1781"), o1[-1500:])
+    for f, b in keep.items():
+        f.write_bytes(b)
+    # Run 2: the 7h ceiling as a bool, which an int-only check must refuse.
+    write_staged(desc, "ceiling = 1780", "ceiling = true", "b ceiling true")
+    r2 = run_selfcheck(gcopy)
+    o2 = r2.stdout + r2.stderr
+    check("[aBP-4] b: 7h reds a descriptor ceiling of true",
+          r2.returncode != 0 and check_line(o2, "entry 'push-main'", f"gate leg '{leg}' with ceiling True"),
+          o2[-1500:])
+    for f, b in keep.items():
+        f.write_bytes(b)
+    # Run 3 (c, H-L1): no manifest. 7h's block is skipped, so 7j4 must still answer for itself, and
+    # with the dead pre-initialisation gone a reader outside its own guard would raise here.
+    man.unlink()
+    r3 = run_selfcheck(gcopy)
+    o3 = r3.stdout + r3.stderr
+    check("[aBP-4] c: with no manifest 7j4 says so, and nothing raises",
+          check_line(o3, "7j4", "gate-legs.json") and "Traceback" not in o3, o3[-1500:])
+    for f, b in keep.items():
+        f.write_bytes(b)
+    # Run 4: restored, attributed here rather than to the arms after this in main().
+    r4 = run_selfcheck(gcopy)
+    check("[aBP-4] ...and the restored copy is green", r4.returncode == 0,
+          (r4.stdout + r4.stderr)[-1500:])
+
+
 def check_update_safety(tmp: pathlib.Path) -> None:
     """DEPL-aRepatriatedFork-17 AC1-AC11, AC14, AC15 — the eight `update` mechanics, over scratch
     govs whose `govkit.py` is a copy of `GOVKIT` taken at build time. Asserted on bytes, index
@@ -2323,6 +2385,123 @@ def check_mode_never_down(tmp: pathlib.Path) -> None:
     for _arm, res in sorted(measure_mode_carry(tmp / "real", real, {"ND"}).items()):
         for label, ok, detail in res:
             check(label, ok, detail)
+
+
+def check_ceiling_emission(tmp: pathlib.Path) -> None:
+    """DEPL-aBenchedProbe-2 AC1-AC5 — a descriptor leg's `ceiling` travels into the target's manifest
+    and receipt above the run-gates floor, nowhere else, and a hand-set one is kept.
+
+    MODULE-LEVEL so a pass can run it alone. The target is D4's shape: a manifest-kind runner and no
+    run-gates installed, so the floor reader answers True; the below-floor half is the reader alone,
+    for the reason D4 gives (a run-gates install needs a receipt claim a fixture cannot plant)."""
+    gk = govkit_module()
+    # AC2: the floor, read directly.
+    _rg = tmp / "ceiling-floor"
+    _rgs = _rg / PFX / KIT_NAMES["run-gates"] / "run-gates.sh"
+    _rgs.parent.mkdir(parents=True, exist_ok=True)
+    for ver, want in (("1.1", False), ("1.2", True)):
+        _rgs.write_text(f"#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION={ver}\n",
+                        encoding="utf-8", newline="\n")
+        check(f"CE2: a target at run-gates {ver} {'gets' if want else 'does not get'} a ceiling",
+              gk.check_target_reads_subject(_rg, {"prefix": PFX[:-1]},
+                                            floor=gk.CEILING_FLOOR_RUN_GATES) is want, ver)
+    check("CE2: the ceiling floor is the first runner version that certainly admits the key",
+          gk.CEILING_FLOOR_RUN_GATES == (1, 2), str(gk.CEILING_FLOOR_RUN_GATES))
+    check("CE2: the manifest writer routes the ceiling through its own floor",
+          "floor=CEILING_FLOOR_RUN_GATES)" in GOVKIT.read_text(encoding="utf-8"), "")
+
+    # AC1/AC3: an applied push-main carries 1780 on the declaring leg, row and receipt, and no other.
+    t = tmp / "ceiling-install"
+    (t / PFX).mkdir(parents=True, exist_ok=True)
+    (t / ".githooks").mkdir(exist_ok=True)
+    (t / ".governance").mkdir(exist_ok=True)
+    legs = t / PFX / "legs.json"
+    legs.write_text(json.dumps([{"name": "control", "argv": ["true"]}], indent=2) + "\n",
+                    encoding="utf-8", newline="\n")
+    (t / PFX / "runner.sh").write_text('echo "GATE ok    control"\n', encoding="utf-8", newline="\n")
+    (t / ".githooks" / "pre-commit").write_text(
+        "#!/usr/bin/env bash\nset -u\n# govkit:branch-guard\n# /govkit:branch-guard\n",
+        encoding="utf-8", newline="\n")
+    (t / ".governance" / "deploy.toml").write_text(
+        f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["push-main"]\n\n'
+        '[answers]\nmemory_root = "memory"\n\n'
+        f'[gate_runner]\nkind = "manifest"\nfile = "{PFX}legs.json"\n'
+        'grammar = "json-array"\ndedupe_key = "name"\n'
+        f'command = ["bash", "{PFX}runner.sh"]\n'
+        'run_all_env = { GATE_FULL = "1" }\n'
+        'observed_ran = ["GATE ok    {name}"]\n'
+        'observed_failed = ["GATE FAIL  {name}"]\n',
+        encoding="utf-8", newline="\n")
+    git(t, "init", "-q", "-b", "main"); git(t, "config", "user.email", "t@e")
+    git(t, "config", "user.name", "t"); git(t, "config", "core.autocrlf", "false")
+    settle(t, "base")
+    leg = "pre-push self-test"
+    rec = t / ".governance" / "install.json"
+
+    def read_rows() -> dict:
+        return {x.get("name"): x for x in json.loads(legs.read_text(encoding="utf-8"))}
+
+    def read_emitted() -> dict:
+        _d = json.loads(rec.read_text(encoding="utf-8")) if rec.is_file() else {}
+        return {x.get("name"): x for x in (_d.get("gate_runner") or {}).get("emitted", [])}
+
+    p = run("apply", "--target", str(t), "--kits", "push-main")
+    rows, em = read_rows(), read_emitted()
+    check("CE1: the declaring leg's manifest row carries the descriptor's ceiling",
+          rows.get(leg, {}).get("ceiling") == 1780, str(rows.get(leg)) + p.stdout[-600:] + p.stderr[-300:])
+    check("CE1: and the receipt's emitted row records it",
+          em.get(leg, {}).get("ceiling") == 1780, str(em.get(leg)))
+    for other in ("push-main self-test", "pre-push bar self-test"):
+        check(f"CE3: '{other}' declares no ceiling and its row carries none, never a fallback",
+              other in rows and "ceiling" not in rows[other], str(rows.get(other)))
+
+    # AC4: a hand-raised ceiling is the adopter's own, kept and reported, never refused as drift.
+    settle(t, "the push-main install")
+    rows[leg]["ceiling"] = 3600
+    legs.write_text(json.dumps(list(rows.values()), indent=2) + "\n", encoding="utf-8", newline="\n")
+    settle(t, "raise the ceiling")
+    p = run("apply", "--target", str(t), "--kits", "push-main")
+    out = p.stdout + p.stderr
+    check("CE4: a re-apply over a hand-raised ceiling exits 0", p.returncode == 0, out[-900:])
+    check("CE4: the raised ceiling is kept", read_rows().get(leg, {}).get("ceiling") == 3600,
+          str(read_rows().get(leg)))
+    # The leg is matched INSIDE the keep line: other prints quote it in the same shape, so two
+    # substrings over the whole output would pass on a keep line naming the wrong leg (H-L2).
+    check("CE4: and the keep is reported, naming the leg",
+          any("kept the target's ceiling" in ln and f"'{leg}'" in ln for ln in out.splitlines()),
+          out[-900:])
+    check("CE4: and it is not refused as drift",
+          "differs from what the receipt recorded" not in out, out[-900:])
+    # DEPL-aBenchedProbe-4 S1 (review H-M1): the keep lasts only if the receipt records GOV's value.
+    # Recording the kept one makes target and receipt agree, so the NEXT update overwrites the bound.
+    check("CE4: the receipt still records gov's ceiling, never the kept one",
+          read_emitted().get(leg, {}).get("ceiling") == 1780, str(read_emitted().get(leg)))
+    settle(t, "the keep")
+    p = run("apply", "--target", str(t), "--kits", "push-main")
+    out = p.stdout + p.stderr
+    check("CE4b: a second apply with no edit exits 0", p.returncode == 0, out[-900:])
+    check("CE4b: the kept ceiling survives it", read_rows().get(leg, {}).get("ceiling") == 3600,
+          str(read_rows().get(leg)) + out[-600:])
+    check("CE4b: and the keep line names the leg again",
+          any("kept the target's ceiling" in ln and f"'{leg}'" in ln for ln in out.splitlines()),
+          out[-900:])
+
+    # AC5: a row agreeing with the receipt is gov's, so gov's value lands — the arm that keeps CE4
+    # from passing on a rule that keeps every value.
+    settle(t, "the re-apply")
+    rows = read_rows()
+    rows[leg]["ceiling"] = 1000
+    legs.write_text(json.dumps(list(rows.values()), indent=2) + "\n", encoding="utf-8", newline="\n")
+    _d = json.loads(rec.read_text(encoding="utf-8"))
+    for x in _d["gate_runner"]["emitted"]:
+        if x.get("name") == leg:
+            x["ceiling"] = 1000
+    rec.write_text(json.dumps(_d, indent=2) + "\n", encoding="utf-8", newline="\n")
+    settle(t, "row and receipt agree at 1000")
+    p = run("apply", "--target", str(t), "--kits", "push-main")
+    check("CE5: a ceiling the receipt recorded is gov's to replace",
+          read_rows().get(leg, {}).get("ceiling") == 1780,
+          str(read_rows().get(leg)) + (p.stdout + p.stderr)[-900:])
 
 
 def main() -> int:
@@ -3374,6 +3553,7 @@ user_skills = "/tmp/gk-fake-skills"
         pk.write_text(pkeep, encoding="utf-8")
 
         check_halved_install_arms(gcopy, _run_selfcheck)
+        check_benched_probe_arms(gcopy, _run_selfcheck)
         # --- TOOL-aWindowedPass-4 AC5: check 6c, a `[[generated]]` row whose generator the kit does
         #     not ship. Staged in the copy and restored, so the arm is observed red and green both.
         gk = gcopy / PFX / KIT_NAMES["codebase-map"] / "kit.toml"
@@ -5026,6 +5206,42 @@ user_skills = "/tmp/gk-fake-skills"
         good = run_in(scratch_gov("true", f"{PFX}demo/"))
         check("the scratch gov fixture is GREEN when both facts agree", good.returncode == 0,
               good.stdout + good.stderr)
+        # DEPL-aBenchedProbe-3 S6: no manifest row is in chunk `selftests`, so 7j4's zero-shaped red
+        # stands down, and says so rather than passing silently.
+        check("7j4: ...and it announces that its zero-population reds stood down",
+              "the zero-population reds stand down" in good.stdout, good.stdout)
+
+        # DEPL-aBenchedProbe-3 S5: with a `selftests` row in the manifest the population exists, so
+        # both liveness reds bind. Zero graded: the descriptor declares no [[gate_leg]] at all.
+        _j4a = scratch_gov("true", f"{PFX}demo/", tag="-j4graded")
+        _j4ak = _j4a / PFX / "demo" / "kit.toml"
+        _j4ak.write_text(_j4ak.read_text(encoding="utf-8").split("[[gate_leg]]")[0],
+                         encoding="utf-8", newline="\n")
+        _j4al = _j4a / PFX / "gate-legs.json"
+        _j4arows = json.loads(_j4al.read_text(encoding="utf-8"))
+        _j4arows[0]["chunk"] = "selftests"
+        _j4al.write_text(json.dumps(_j4arows, indent=2) + "\n", encoding="utf-8", newline="\n")
+        # The unclaimed manifest row reds 7h too, so exit 1 alone cannot tell a 7j4 red from a 7j4
+        # note. `emit` prints every note before every problem, and 7j4's own count note follows
+        # its liveness call, so the line is a PROBLEM only when it prints after that count note.
+        _r4a = run_in(_j4a)
+        check("7j4 LIVENESS: a selftests population with ZERO descriptor legs graded REDS",
+              _r4a.returncode == 1 and "7j4: graded zero descriptor gate legs" in _r4a.stdout
+              and _r4a.stdout.find("7j4: graded zero") > _r4a.stdout.find("held self-test legs:"),
+              _r4a.stdout + _r4a.stderr)
+        # Zero shaped: one descriptor leg in a non-selftests chunk, beside an unclaimed held row.
+        _j4b = scratch_gov("true", f"{PFX}demo/", tag="-j4shaped")
+        _j4bl = _j4b / PFX / "gate-legs.json"
+        _j4brows = json.loads(_j4bl.read_text(encoding="utf-8"))
+        _j4brows[0]["chunk"] = "declarations"
+        _j4brows.append({"name": "held", "argv": ["true"], "guard": [], "subject": "kit",
+                         "chunk": "selftests"})
+        _j4bl.write_text(json.dumps(_j4brows, indent=2) + "\n", encoding="utf-8", newline="\n")
+        _r4b = run_in(_j4b)
+        check("7j4 LIVENESS: a selftests population with ZERO self-test-shaped legs REDS",
+              _r4b.returncode == 1 and "7j4: found zero self-test-shaped legs" in _r4b.stdout
+              and _r4b.stdout.find("7j4: found zero") > _r4b.stdout.find("held self-test legs:"),
+              _r4b.stdout + _r4b.stderr)
 
         bad_m = run_in(scratch_gov("false", f"{PFX}demo/"))
         check("mutates_index reds when the declared value is not the measured one",
@@ -5090,9 +5306,13 @@ user_skills = "/tmp/gk-fake-skills"
                     '[config]\nfile = ".lexicon.conf"\n\n'
                     '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
                     '[adopt]\nwhy_no_regenerate = "a fixture adopter"\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = true\n')
+            # DEPL-aBenchedProbe-3 S3: a `selftests` leg is held, so it declares subject `kit` in all
+            # three places. Declared `repo` it is a disagreement 7j4 grades, and this fixture's
+            # premise is a tree where every declared fact agrees.
+            _subj = {nm: ("kit" if chunk == "selftests" else "repo") for nm, _a, _g, chunk in legs}
             for nm, _argv, _guard, _chunk in legs:
                 body += (f'\n[[gate_leg]]\nname = "{nm}"\nargv = ["true"]\nguard = []\n'
-                         f'subject = "repo"\n')
+                         f'subject = "{_subj[nm]}"\n')
             (g / PFX / "demo" / "kit.toml").write_text(body, encoding="utf-8", newline="\n")
             (g / PFX / "demo" / "adopt-demo.sh").write_text(
                 '#!/usr/bin/env bash\ngit add .\n', encoding="utf-8", newline="\n")
@@ -5101,11 +5321,11 @@ user_skills = "/tmp/gk-fake-skills"
             (g / ".lexicon.conf").write_text("VERB_OFFENDER_PIN=0\n", encoding="utf-8",
                                              newline="\n")
             (g / PFX / "gate-legs.json").write_text(
-                json.dumps([{"name": nm, "argv": argv, "guard": guard, "subject": "repo",
+                json.dumps([{"name": nm, "argv": argv, "guard": guard, "subject": _subj[nm],
                              "chunk": chunk} for nm, argv, guard, chunk in legs], indent=2) + "\n",
                 encoding="utf-8", newline="\n")
             (g / PFX / KIT_NAMES["govkit"] / "subject-pins.tsv").write_text(
-                "# fixture pin\n" + "".join(f"{nm}\trepo\t{chunk}\n" for nm, _a, _g, chunk in legs),
+                "# fixture pin\n" + "".join(f"{nm}\t{_subj[nm]}\t{chunk}\n" for nm, _a, _g, chunk in legs),
                 encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
@@ -5341,8 +5561,12 @@ user_skills = "/tmp/gk-fake-skills"
         _wc = run_in_gov(rg, "selfcheck", "--write")
         _rowsc = [l for l in pinf.read_text(encoding="utf-8").split("\n")
                   if l.strip() and not l.startswith("#")]
-        check("AC5: and moving the pin in the same commit records the chunk and passes",
-              _wc.returncode == 0 and _rowsc == ["demo\trepo\tselftests"],
+        # DEPL-aBenchedProbe-3 S4: the leg stays subject `repo` in chunk `selftests`, which is 7j4's
+        # red class, so `--write` writes the pin AND exits 1 on 7j4 (the write sits in 7h, before it).
+        check("AC5: and moving the pin in the same commit records the chunk, while 7j4 reds the "
+              "repo-subject held leg",
+              _wc.returncode == 1 and _rowsc == ["demo\trepo\tselftests"]
+              and "7j4: entry 'demo' gate leg 'demo'" in _wc.stdout,
               str(_rowsc) + _wc.stdout + _wc.stderr)
 
         # AC3 — a NEW leg is UNPINNED, and unpinned reds. A new leg passing by default is the hole:
@@ -5602,6 +5826,9 @@ user_skills = "/tmp/gk-fake-skills"
               _p4b.stdout[-600:] + _p4b.stderr[-300:])
         check("D4: and the adopter's doc_reads is kept, not overwritten",
               _kvb.get("doc_reads") == ["memory/"], str(_kvb))
+
+        # DEPL-aBenchedProbe-2: `ceiling` rides the same writer, kept rather than refused.
+        check_ceiling_emission(tmp)
 
         # AC5 — the header says what the check does NOT decide, in the generated file itself, where
         # a reader who found the pin will actually be looking.
@@ -12076,6 +12303,9 @@ user_skills = "/tmp/gk-fake-skills"
             # pin the value in both directions; until build dPolishedVitrine this line said "the
             # S6 arms below" did, and none of them sets it.
             "_cmd_update": None,
+            # TOOL-aMeteredSweep-1. `mint` prints a regenerate argv only when it FAILED, never the
+            # one it is about to run, so there is no announcement for a needle to pin.
+            "cmd_mint": None,
         }
         # ---- DEPL-dRetiredFork-5, ROUND 2. THE VERDICT ARMS WERE SWAPPED ----------------------
         # The first version of `run_kit_check`'s outcome block re-asked `_oc.get("ok")` after
@@ -12987,6 +13217,12 @@ user_skills = "/tmp/gk-fake-skills"
         _g6ok = a6_gov("shipped", '["bash", "{prefix}/demo/present-engine.sh"]')
         check("[-6] S4 ...while a leg whose engine IS shipped stays green",
               run_in(_g6ok).returncode == 0, run_in(_g6ok).stdout[-900:])
+        # DEPL-aBenchedProbe-3 S6: this descriptor declares two gate legs and the tree has no
+        # manifest, so 7j4 grades nothing and says so in a note rather than refusing.
+        _p6nm = run_in(_g6ok)
+        check("[-6] 7j4 an absent manifest is a NOTE beside declared gate legs, not a refusal",
+              _p6nm.returncode == 0 and "is absent, so no leg's chunk is known" in _p6nm.stdout,
+              _p6nm.stdout[-900:] + _p6nm.stderr[-400:])
 
         # ---- AC4: THE FALSE-POSITIVE GUARD, and it is the arm that fails if the bar is evaluated
         # ---- before the STAGE step. On a first install NOTHING is tracked in the target yet; by
@@ -13414,6 +13650,14 @@ user_skills = "/tmp/gk-fake-skills"
             # hook is the target's own, see `seed_pv_hook`.
             shutil.copy2(_pvREAL / "check-verifier-fanout.sh",
                          g / PFX / KIT_NAMES["workflows"] / "check-verifier-fanout.sh")
+            # TOOL-aGraftedHelix-28 made the real parity script require this sibling wherever the
+            # target tracks a `gotchas.py`, which `build_pv_target`'s stub is. A STUB, as that
+            # `gotchas.py` is: the by-design head pair is that checker's own suite's subject, and
+            # these arms grade migration, which the real one would only red over synthetic
+            # templates carrying no head (TOOL-aMeteredSweep-1).
+            (g / PFX / KIT_NAMES["workflows"] / "check_by_design_parity.py").write_text(
+                "# a stub: the by-design head pair is graded by the real checker's own suite\n",
+                encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
             git(g, "config", "user.name", "t")

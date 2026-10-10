@@ -69,6 +69,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [inputs-inside-the-subjects-reach](inputs-inside-the-subjects-reach.md) | class | 4 |  | a check whose inputs are all supplied by the thing it distrusts is not a check, however sound its logic |
 | [join-key-widened-by-a-shared-location](join-key-widened-by-a-shared-location.md) | class | 2 |  | a join keyed on WHERE something happened takes every place the subject ever touched, and one of those places is shared by every subject, so the key admits everyone's lines |
 | [ledger-token-wrapped-across-a-line-joins-nothing](ledger-token-wrapped-across-a-line-joins-nothing.md) | class | 2 |  | hygiene check 23 extracts a ledger line's backticked tokens PER LINE, so a token the writer wrapped across a line break belongs to no line and the criterion it answers reads as unanswered |
+| [line-claim-matched-over-the-whole-output](line-claim-matched-over-the-whole-output.md) | class | 2 |  | an arm that asserts a line names X tests two substrings over the whole output, so it passes when X appears on some other line and the line it means names something else |
 | [line-count-reads-empty-capture-as-one](line-count-reads-empty-capture-as-one.md) | class | 4 |  | a line count over a captured variable that adds a newline before counting reads an EMPTY capture as one line, so a one-line assertion cannot fail on a command that wrote nothing |
 | [line-keyed-registry-reds-on-a-file-that-grew](line-keyed-registry-reds-on-a-file-that-grew.md) | class | 3 |  | a waiver keyed <path>:<line> stops matching when anything is inserted above it, so a gate reds on a file whose waived line nobody touched |
 | [liveness-negative-from-another-population](liveness-negative-from-another-population.md) | class | 2 |  | a probe is shown able to read negative on inputs it will never act on, while over its real population a positive is structural, so the liveness assertion passes and certifies nothing |
@@ -118,6 +119,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-103 record(s): 100 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+104 record(s): 101 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

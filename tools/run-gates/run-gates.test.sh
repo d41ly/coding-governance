@@ -473,7 +473,10 @@ def resolve_prefix_token(spelled, troot):
         return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
     return spelled.replace("{prefix}", troot)
 # <<< resolve_prefix_token
-rows = [resolve_prefix_token(a, sys.argv[2]) for l in json.load(open(sys.argv[1])) for a in l["argv"][1:] if "/" in a or a.endswith(".sh") or a.endswith(".py")]
+# A git PATHSPEC MAGIC argument (`:!memory/`, `:(glob)…`) names a selection, never a script, and
+# TOOL-aGraftedHelix-45 gave a leg two of them; read as paths they redded this arm on every bar
+# since, with a line that does not say FAIL (TOOL-aMeteredSweep-1).
+rows = [resolve_prefix_token(a, sys.argv[2]) for l in json.load(open(sys.argv[1])) for a in l["argv"][1:] if not a.startswith(":") and ("/" in a or a.endswith(".sh") or a.endswith(".py"))]
 sys.stdout.buffer.write(("\n".join(rows) + ("\n" if rows else "")).encode())   # LF bytes (Windows text stdout is CRLF)
 ' "$LEGS_FILE" "$TROOT")
 # ...and that population is REAL PATHS (closing review round 1 M2). A grep over spellings nothing
@@ -687,6 +690,10 @@ printf '%s\n' "$corrupt" | grep -q '^gates GREEN — 4/4 legs passed$' \
 # harness. Both fire only when `timeout` expires, and on a healthy host it never does, so with a
 # hardcoded 60 the outcomes this arm distinguishes could not be exercised at all - a deliverable
 # whose own acceptance is unobservable, which is the unfailable-check class one level up.
+# An EXPORTED CLAMP_BUDGET is kept as given; unset, it is CALIBRATED below once the fixture exists
+# (TOOL-aMeteredSweep-1), because a typed 60 s expired a width-64 subject while its identical control
+# finished on a host where one spawn cost a quarter of a second, and the arm then blamed the clamp.
+CLAMP_BUDGET_GIVEN=${CLAMP_BUDGET:-}
 CLAMP_BUDGET=${CLAMP_BUDGET:-60}
 # The width the clamp is SUPPOSED to yield, mirroring run-gates.sh:81-82 INCLUDING ITS CASE ORDER:
 # `*[!0-9]*` is tested FIRST there, so `nonsense` (8 chars) clamps to 1 and not to 64 despite also
@@ -740,9 +747,24 @@ clamp_expired_verdict() { # width-input -> prints the verdict; 1 = blame the cla
   return 1
 }
 cp "$SCRATCH/fx/instant.sh" "$SCRATCH/fx/slow.sh"; cp "$SCRATCH/fx/instant.sh" "$SCRATCH/fx/mid.sh"
+# THE BUDGET IS THE HOST'S, MEASURED: one width-1 run of this same fixture, bounded only by a hang guard,
+# and three times its seconds plus 30, never under 60. A subject that outlives THAT is three controls
+# slow, which a host's noise does not explain.
+if [ -z "$CLAMP_BUDGET_GIVEN" ]; then
+  _cb0=$(date +%s)
+  GATE_FULL= GATE_BASE= GATE_JOBS=1 timeout 1800 bash -c "cd '$SCRATCH' && bash $KIT_REL/run-gates.sh" >/dev/null 2>&1
+  _cbt=$(( $(date +%s) - _cb0 ))
+  CLAMP_BUDGET=$(( 3 * _cbt + 30 )); [ "$CLAMP_BUDGET" -ge 60 ] || CLAMP_BUDGET=60
+  echo "canary: clamp — calibrated: a width-1 run of the fixture took ${_cbt}s, so each clamp run is bounded at ${CLAMP_BUDGET}s"
+fi
 for w in 0 -3 nonsense 99999999999999999999 999999999999999999999999999999; do
 n=$((n+1))
 n=$((n+1))
+  # THE WIDTH ITSELF, with no clock at all: the resolved profile names the width the clamp produced.
+  n=$((n+1))
+  _cw=$(cd "$SCRATCH" && GATE_FULL= GATE_BASE= GATE_JOBS="$w" bash $KIT_REL/run-gates.sh --print-profile 2>/dev/null | awk -F'\t' '$1 == "width" { print $2 }')
+  [ "$_cw" = "$(clamp_target "$w")" ] \
+    || { echo "canary: GATE_JOBS='$w' resolved width [$_cw], wanted the clamp's [$(clamp_target "$w")]"; fail=1; }
   out=$(GATE_FULL= GATE_BASE= GATE_JOBS="$w" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash $KIT_REL/run-gates.sh" 2>&1); trc=$?
   if [ "$trc" = 124 ]; then
     clamp_expired_verdict "$w"; cv=$?
@@ -778,10 +800,10 @@ esac
 #        It asserts the message ONLY when the control actually finished - on a loaded host it may
 #        not, and an arm that reds there would be naming a cause it never checked, which is the
 #        defect this whole unit removes. Reported as a loud skip instead of a silent pass.
-v=$( CLAMP_BUDGET=60 clamp_expired_verdict 0 2>&1 )
+v=$( clamp_expired_verdict 0 2>&1 )
 case "$v" in
   *"the clamp let it spin"*)  ;;
-  *"BOTH expired"*) echo "canary: SKIP the spun-outcome arm - this host could not finish the control inside 60s, so the outcome it asserts was not produced" ;;
+  *"BOTH expired"*) echo "canary: SKIP the spun-outcome arm - this host could not finish the control inside its ${CLAMP_BUDGET}s budget, so the outcome it asserts was not produced" ;;
   *) echo "canary: the expiry verdict emitted neither outcome when its control was run: $v"; fail=1 ;;
 esac
 #        ...and the two outcomes are DISTINGUISHABLE, which is the whole point of the unit.
@@ -791,7 +813,7 @@ esac
 #        - when what actually happened is that the second outcome was never produced. The arm
 #        directly above already classifies such a host as a SKIP; this one used to red on it.
 v_undec=$( CLAMP_BUDGET=0.05 clamp_expired_verdict 0 2>&1 )
-v_spun=$(  CLAMP_BUDGET=60   clamp_expired_verdict 0 2>&1 )
+v_spun=$(  clamp_expired_verdict 0 2>&1 )
 case "$v_spun" in
   *"BOTH expired"*)
     echo "canary: SKIP the distinguishability arm - this host never produced the spun outcome, so the two messages were never both generated" ;;
@@ -1004,7 +1026,7 @@ printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed' \
 # -31 AC2: and it NAMES the held population, or the smaller number is a smaller lie — a bar that
 # shrank with no explanation reads as a bar that shrank for reasons nobody recorded.
 n=$((n+1))
-printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: every self-test, GATE_SELFTESTS=1 runs them)$' \
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: subject kit or chunk selftests, GATE_SELFTESTS=1 runs them)$' \
   || { echo "canary: the summary did not name the held population beside the reduced total"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
 # -31 AC3: the RECORDED figure is the printed one. Two call sites computing one number is how they
 # come to disagree, and the record is what a later run and the push boundary read instead of stdout.
@@ -2286,25 +2308,33 @@ check_attr_line "$(run_attr_bar "$AT/rc" GATE_ATTRIBUTE=HEAD)" "lexicon naming p
 # must read it DEAD PROBE `cut by the wall`, count it, and the runner must return near the wall
 # rather than after the sleep. Graded as a margin against the sleep, not as a literal, for the
 # load reasons the wall arms above record.
+# THE WALL IS CALIBRATED, NOT TYPED (TOOL-aMeteredSweep-1). A fixed 8 s wall broke before the
+# attribution pass began on a host where one spawn cost a quarter of a second, so no attr line
+# existed to grade. The same bar is first timed with no attribution; the wall is twice that reading
+# plus 8 s, and R sleeps three walls and a minute, read from a file OUTSIDE the repository so it is
+# set after the measurement without moving R's tree.
 AW="$AT/aw"; mkdir -p "$AW/$KIT_REL" "$AW/fx" "$AW/data"
 cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$AW/$KIT_REL/" 2>/dev/null
 ( cd "$AW" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
     && git config core.autocrlf false ) >/dev/null 2>&1
-printf '#!/usr/bin/env bash\ncase "$(cat data/m.txt)" in slow) sleep 120;; esac\necho "FAIL w"\nexit 1\n' > "$AW/fx/w.sh"
+printf '#!/usr/bin/env bash\ncase "$(cat data/m.txt)" in slow) sleep "$(cat '"'%s'"')";; esac\necho "FAIL w"\nexit 1\n' "$AT/aw.sleep" > "$AW/fx/w.sh"
 printf 'slow\n' > "$AW/data/m.txt"
 printf '[\n  {"name": "walled", "argv": ["bash", "fx/w.sh"]}\n]\n' > "$AW/$ATL"
 ( cd "$AW" && git add -A && git commit -qm R ) >/dev/null 2>&1
 printf 'fail\n' > "$AW/data/m.txt"
+_aws=$(date +%s); run_attr_bar "$AW" >/dev/null; _awcal=$(( $(date +%s) - _aws ))
+_awwall=$(( 2 * _awcal + 8 )); _awsl=$(( 3 * _awwall + 60 )); printf '%s\n' "$_awsl" > "$AT/aw.sleep"
+echo "canary: attribution — AC15 calibrated: the bar without attribution took ${_awcal}s, so the wall is ${_awwall}s and R sleeps ${_awsl}s"
 _aws=$(date +%s)
-awout=$(run_attr_bar "$AW" GATE_ATTRIBUTE=HEAD GATE_WALL=8); awrc=$?
+awout=$(run_attr_bar "$AW" GATE_ATTRIBUTE=HEAD GATE_WALL="$_awwall"); awrc=$?
 _awel=$(( $(date +%s) - _aws ))
 check_attr_line "$awout" "walled" "DEAD PROBE · cut by the wall" "AC15 an R run the wall cuts"
 n=$((n+1))
 printf '%s\n' "$awout" | grep -qE '^attributed 0 of 1 red legs against [0-9a-f]{8} · DEAD PROBE 1$' \
   || { echo "canary: attribution — AC15 the summary did not count the wall-cut leg"; fail=1; }
 n=$((n+1))
-{ [ "$awrc" = 1 ] && [ "$_awel" -lt 100 ]; } \
-  || { echo "canary: attribution — AC15 the runner outlived its own wall: exit $awrc after ${_awel}s against an 8s wall and a 120s R run"; fail=1; }
+{ [ "$awrc" = 1 ] && [ "$_awel" -lt $(( _awsl - 20 )) ]; } \
+  || { echo "canary: attribution — AC15 the runner outlived its own wall: exit $awrc after ${_awel}s against a ${_awwall}s wall and a ${_awsl}s R run"; fail=1; }
 # AC3 and AC17 of TOOL-dDerivedDocket-24 — AGE AND OWNER. A twelve-landing first-parent line whose one
 # leg goes red at a chosen landing and stays red; L is one unrelated commit past R. Under
 # `GATE_INHERITED_RED_MAX_AGE=10` a red that arrived inside the window reads INHERITED with its age and
@@ -3075,6 +3105,14 @@ sleep "$secs"
 [ -z "$pre" ] && doit
 exit 0
 SH
+cat > "$MP/r/fx/await.sh" <<'SH'
+#!/usr/bin/env bash
+# await.sh <file> <secs> — wait, bounded at 60 s, for <file> to exist, then sleep <secs>. An arm
+# whose verdict is an ORDER of completions keys each on the row of the leg it must follow.
+for _ in $(seq 1 600); do [ -f "$1" ] && break; sleep 0.1; done
+sleep "$2"
+exit 0
+SH
 ( cd "$MP/r" && git add -A && git commit -qm mempause ) >/dev/null 2>&1
 write_mp_meminfo() { printf 'MemTotal: 1000 kB\nMemAvailable: %s kB\n' "$(( (100 - $2) * 10 ))" > "$1"; }
 run_mp_bar() { # run id · manifest · VAR=value… -> MP_OUT (stdout), MP_ERR (stderr) and MP_RC
@@ -3129,19 +3167,36 @@ check_mp_value "AC5 the verdict file reads paused 1" "$(awk -F'\t' '$1 == "pause
 check_mp_value "AC5 stdout carries one memory: 1 pause(s) line" "$(printf '%s\n' "$MP_OUT" | grep -c '^memory: 1 pause(s)')" 1
 
 # 11c. AC6 — a hold is BOUNDED per episode, and a hold with nothing running is DRAINED. B turns the
-#      pressure on as it ends at 1 s and D is held; C ends at 4 s, past D's 2 s bound, so D is
-#      released `bound`; E is held from then until A ends at 8 s and closes `drained`. B writes at its
+#      pressure on as it ends at 1 s and D is held; C ends past D's calibrated bound, so D
+#      is released `bound`; E is held from then until A ends after D and closes `drained`. B writes at its
 #      END, never its start: a start-of-leg write races C's own dispatch decision, and C held there
 #      turns every later episode into `drained` — observed twice in five runs before the move.
+#      ORDERED BY ROWS WHERE IT CAN BE (TOOL-aMeteredSweep-1). A ended at a fixed 8 s, and on a host
+#      where one leg's own bookkeeping takes seconds D was still running then, so E's episode closed
+#      `bound`: red in a quiet re-run, while the loaded bar redded AC14 instead. A now ends only after
+#      D's row exists, so the completion that empties the pool is A's. ONE CLOCK REMAINS and cannot
+#      go: E's episode opens with A and D running, and D's completion must come inside the bound.
+#      THE CLOCK IS CALIBRATED, NOT TYPED. A fixed 15 s bound still closed `bound bound` when a
+#      neighbouring repository's bar made one spawn cost 0.8 s: D's bookkeeping alone outlived it.
+#      So a one-leg bar of the same no-op fixture is timed first, a reading that includes the
+#      runner's startup and therefore OVERSTATES one leg's bookkeeping, the safe direction. The bound
+#      is twice that reading and never under 15 s, C ends the bound plus the reading plus 3 s after
+#      B's row, and the run-length check, which bounds a HANG and not speed, scales with both.
 write_mp_meminfo "$MP/x/m6" 10
-printf '[{"name": "A6", "argv": ["bash", "fx/mp.sh", "8"]},\n {"name": "B6", "argv": ["bash", "fx/mp.sh", "1", "write", "%s", "95"]},\n {"name": "C6", "argv": ["bash", "fx/mp.sh", "4"]},\n {"name": "D6", "argv": ["bash", "fx/ok.sh"]},\n {"name": "E6", "argv": ["bash", "fx/ok.sh"]}]\n' \
-  "$MP/x/m6" > "$MP/x/ac6.json"
+printf '[{"name": "K6", "argv": ["bash", "fx/ok.sh"]}]\n' > "$MP/x/ac6cal.json"
+_mpc0=$(date +%s); run_mp_bar ac6cal "$MP/x/ac6cal.json" GATE_MEMPAUSE=0; _mpcal=$(( $(date +%s) - _mpc0 ))
+_mphold=$(( _mpcal * 2 )); [ "$_mphold" -ge 15 ] || _mphold=15
+_mpcs=$(( _mphold + _mpcal + 3 )); _mpwall=$(( 4 * (_mphold + _mpcal) + 60 ))
+echo "canary: memory pause — AC6 calibrated: a one-leg bar took ${_mpcal}s, so the bound is ${_mphold}s, C ends ${_mpcs}s after B's row, and the run must end inside ${_mpwall}s"
+_mpr6=$(resolve_mp_record ac6)
+printf '[{"name": "A6", "argv": ["bash", "fx/await.sh", "%s", "0"]},\n {"name": "B6", "argv": ["bash", "fx/mp.sh", "1", "write", "%s", "95"]},\n {"name": "C6", "argv": ["bash", "fx/await.sh", "%s", "%s"]},\n {"name": "D6", "argv": ["bash", "fx/ok.sh"]},\n {"name": "E6", "argv": ["bash", "fx/ok.sh"]}]\n' \
+  "$_mpr6/3.leg" "$MP/x/m6" "$_mpr6/1.leg" "$_mpcs" > "$MP/x/ac6.json"
 _mpt0=$(date +%s)
-run_mp_bar ac6 "$MP/x/ac6.json" GATE_MEMPAUSE=90 GATE_MEMPAUSE_HOLD=2 GATE_MEMINFO="$MP/x/m6"; _mprc6=$MP_RC
+run_mp_bar ac6 "$MP/x/ac6.json" GATE_MEMPAUSE=90 GATE_MEMPAUSE_HOLD="$_mphold" GATE_MEMINFO="$MP/x/m6"; _mprc6=$MP_RC
 _mpt1=$(date +%s)
 check_mp_value "AC6 one episode ends bound and one drained" "$(read_mp_ends ac6)" "bound drained "
 check_mp_value "AC6 every leg reports" "$(printf '%s\n' "$MP_OUT" | grep -c '^GATE ok ')" 5
-check_mp_value "AC6 the bar finishes inside 60 s" "$([ $(( _mpt1 - _mpt0 )) -lt 60 ] && echo yes)" yes
+check_mp_value "AC6 the bar finishes inside its calibrated bound" "$([ $(( _mpt1 - _mpt0 )) -lt "$_mpwall" ] && echo yes)" yes
 write_mp_meminfo "$MP/x/m6" 10
 run_mp_bar ac6off "$MP/x/ac6.json" GATE_MEMPAUSE=0 GATE_MEMINFO="$MP/x/m6"
 check_mp_value "AC6 its exit equals the same fixture's with the pause off" "$_mprc6" "$MP_RC"
@@ -3196,18 +3251,29 @@ check_mp_value "AC14 the block holds with a leg running, then check_dispatch_pau
 #      dispatch is the forced branch's. Without its decision the episode outlives the loop as `wall`.
 printf '[{"name": "C14", "argv": ["bash", "fx/ok.sh"]},\n {"name": "A14", "argv": ["bash", "fx/mp.sh", "3"]},\n {"name": "Y14", "argv": ["bash", "fx/mp.sh", "0.5"]}]\n' \
   > "$MP/x/ac14.json"
+# THE RUN'S A ENDS ONLY ONCE THE DECISION HAS BEGUN (TOOL-aMeteredSweep-1). With a fixed 3 s, A could
+# finish before the pass for C counted the pool, which then counted nothing and opened no episode:
+# `[]`, red once in three runs beside a neighbouring bar. The seed keeps the 3 s A, so the ledger it
+# writes still dispatches A first; the run's A waits for the go file the server writes as it starts
+# answering that decision.
+sed 's#"fx/mp.sh", "3"#"fx/await.sh", "'"$MP/x/ac14.go"'", "0"#' "$MP/x/ac14.json" > "$MP/x/ac14run.json"
 cat > "$MP/x/serve.sh" <<'SH'
 #!/usr/bin/env bash
-# serve.sh <fifo> <file to await> — reads 1 to 3 (the INERT probe and the first two dispatches) answer
-# 10 %; read 4 answers 95 % once <file to await> exists and one more second has passed; later reads 95 %.
-f=$1; await=$2; c=0
+# serve.sh <fifo> <file to await> <go file> <trigger>... — a read answers 10 % until any <trigger>
+# row exists, then 95 %, and the first such read first writes <go file>, then waits for <file to
+# await> and one second more. KEYED ON
+# ROWS, NOT ON A READ COUNT (TOOL-aMeteredSweep-1): an MSYS reader can take two writer opens before
+# its EOF, which advanced a count by two, served 95 % to the second dispatch and opened a second
+# episode, red in two of three quiet runs. A doubled read now serves the same answer twice.
+f=$1; await=$2; go=$3; shift 3; held=""
 while :; do
   exec 3>"$f" || exit 0
-  c=$((c + 1)); pct=95
-  if [ "$c" -le 3 ]; then pct=10
-  elif [ "$c" -eq 4 ]; then
+  pct=10
+  for t in "$@"; do [ -f "$t" ] && pct=95; done
+  if [ "$pct" = 95 ] && [ -z "$held" ]; then
+    : > "$go"
     for _ in $(seq 1 200); do [ -f "$await" ] && break; sleep 0.1; done
-    sleep 1
+    sleep 1; held=1
   fi
   printf 'MemTotal: 1000 kB\nMemAvailable: %s kB\n' "$(( (100 - pct) * 10 ))" >&3
   exec 3>&-
@@ -3218,8 +3284,10 @@ if ! mkfifo "$MP/x/fifo" 2>/dev/null; then
   echo "canary: SKIP arm 11g's forced-branch half — this host has no mkfifo, so the FIFO that holds a decision until the last leg is gone cannot be built"
 else
   run_mp_bar ac14seed "$MP/x/ac14.json" GATE_JOBS=2 GATE_MEMPAUSE=0
-  bash "$MP/x/serve.sh" "$MP/x/fifo" "$(resolve_mp_record ac14)/1.leg" >/dev/null 2>&1 & _mpsv=$!
-  run_mp_bar ac14 "$MP/x/ac14.json" GATE_JOBS=2 GATE_MEMPAUSE=90 GATE_MEMINFO="$MP/x/fifo"
+  # The trigger is the FIRST quick leg's row, C's or Y's, whichever the seed's ledger dispatched second.
+  bash "$MP/x/serve.sh" "$MP/x/fifo" "$(resolve_mp_record ac14)/1.leg" "$MP/x/ac14.go" \
+    "$(resolve_mp_record ac14)/0.leg" "$(resolve_mp_record ac14)/2.leg" >/dev/null 2>&1 & _mpsv=$!
+  run_mp_bar ac14 "$MP/x/ac14run.json" GATE_JOBS=2 GATE_MEMPAUSE=90 GATE_MEMINFO="$MP/x/fifo"
   # A writer blocked opening the FIFO is released by a read-write open, which never blocks itself.
   kill "$_mpsv" 2>/dev/null; exec 4<>"$MP/x/fifo"; exec 4>&-; wait "$_mpsv" 2>/dev/null
   if [ "$MP_RC" = 0 ] && [ "$(read_mp_ends ac14)" = "drained " ]; then :; else

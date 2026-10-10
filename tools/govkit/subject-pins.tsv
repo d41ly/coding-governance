@@ -80,14 +80,14 @@ playbook placeholder catalogue	repo	product
 playbook render selftest	kit	selftests
 playbook render wiring	repo	wiring
 playbook validity gate	repo	declarations
-pre-push bar self-test	repo	selftests
+pre-push bar self-test	kit	selftests
 pre-push run-log line	repo	selftests
-pre-push self-test	repo	selftests
+pre-push self-test	kit	selftests
 process-monitor adopter selftest	kit	selftests
 process-monitor census selftest	kit	selftests
 process-monitor wiring	repo	records
 profile-bar selftest	kit	selftests
-push-main self-test	repo	selftests
+push-main self-test	kit	selftests
 pytest-guardrails self-test	kit	selftests
 python resolver (behaviour + inline parity + idiom ban)	kit	wiring
 recall floor	repo	declarations

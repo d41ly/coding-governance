@@ -1012,7 +1012,7 @@ def cmd_selftest() -> int:
         # is reachable at all, and CI is the side that would have been silently wrong.
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
-            cmd_for_paths(t8, c8, ["tools\\some-gate.sh"])
+            cmd_for_paths(t8, c8, [f"{PFX}some-gate.sh".replace("/", "\\")])
         btext = out.getvalue()
         arm("--for-paths reads a backslash path identically to a forward-slash one", "[rc=0]",
             lambda: 0 if btext == ptext else 1)

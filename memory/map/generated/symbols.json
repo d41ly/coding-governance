@@ -423,6 +423,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "add_local_scope",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
       "id": "add_mode",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -1301,6 +1306,11 @@
       "id": "build_big_model",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_brief_run",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "build_cache",
@@ -3018,6 +3028,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "check_benched_probe_arms",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_binary_mode",
       "kind": "function",
       "file": "tools/gate-lint/encoding_posture.py"
@@ -3028,9 +3043,19 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_branch_carried",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_break_refuses",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "check_brief_items",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_build_backlog",
@@ -3096,6 +3121,11 @@
       "id": "check_carry_set",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "check_ceiling_emission",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "check_ceiling_fired",
@@ -3891,6 +3921,16 @@
       "id": "check_projection",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "check_prompt_brief",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_prompt_heading",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_provenance_chain",
@@ -8748,6 +8788,11 @@
       "file": "tools/unattended/stop-guard.test.sh"
     },
     {
+      "id": "measure_load_ratio",
+      "kind": "function",
+      "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
       "id": "measure_lone_cr",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -10733,6 +10778,16 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_brief_cutoff",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_brief_items",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_brief_paths",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -11626,6 +11681,11 @@
       "id": "read_oracle_answer",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_origin_scope",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.sh"
     },
     {
       "id": "read_over_cap_findings",
@@ -15983,6 +16043,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_main_at_head",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_merged_build",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -19958,6 +20023,11 @@
       "file": "tools/unattended/check-brief-recorded.test.sh"
     },
     {
+      "id": "write_brief_record",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "write_c42_conf",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -20046,6 +20116,11 @@
       "id": "write_declarations",
       "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
+      "id": "write_default_conf",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_dl_landing",

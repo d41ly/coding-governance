@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-10T04:41:24+03:00 @ 295b46b98a443cc7aadc2339fe8baae0116f08de
+last-audit: 2026-10-10T09:15:05+03:00 @ dae442565304323d8a634306977aa39e4527b07e
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: b3bd680e68d57ab5188fef007f858586770a84e0
+last-body-change: dae442565304323d8a634306977aa39e4527b07e
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -70,7 +70,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 - **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit
   ask, or a committed build folder the run did not create. What "did not create" admits depends on the
   ANCHOR the project declares, and this file does not paraphrase it — an earlier paraphrase here said
-  "committed before the run's branch existed", which describes one anchor and is false of the other.
+  "committed before the run's branch existed", which describes one anchor and is false of the others.
   `memory/guides/UNATTENDED-PROTOCOL.md` section 1 is the condition.
 - **Governing docs:** `AGENTS.md` (the charter — authoritative) · `coding-governance-agents.template.md`
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + asks in `memory/builds/<slug>/BACKLOG.md`.
@@ -131,8 +131,8 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   Under neither, none is owed; kickoff asks at READY.**
   `TOOL-aBlindedTrial-6`, `-7`, `TOOL-aWardedAudit-4`, `KICK-aBlindedTrial-1`.
 
-- **Kit code names no remote and probes no location after a `cd`**: two ban legs red both
-  (`dLadderedRemote`, `TOOL-aGraftedHelix-45`); ask the lander's remote ladder instead.
+- **Kit code names no remote and probes no location after a `cd`**: two ban legs red
+  both (`dLadderedRemote`, `TOOL-aGraftedHelix-45`).
 
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
   `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one second. Hit twice:
@@ -152,6 +152,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   reconcile; the class is `memory/gotchas/text-mode-read-eats-a-bare-cr.md`, which was already
   registered and not read.
   The bytes are NAMED, not shown: a raw CR here was eaten twice by a text-mode rewrite.
+
+- **An adopter's bar holds a leg by `subject = kit` alone**: govkit never emits `chunk`, so a
+  shipped self-test is declared `subject = "kit"` in its descriptor (`aBenchedProbe`).
 
 - **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
   the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
@@ -266,8 +269,8 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
   and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
   `TOOL-aPromptedMandate-4`.
 - The turnstile serializes bars across the HOST (`~/.gov/gate-turnstile`); an older runner in
-  another repo still contends. `both expired ... unproven either way` means contention and SKIPS
-  that arm loudly — re-run quiet before believing a latency claim. `TOOL-aPacedTurnstile-2`.
+  another repo still contends. A `both expired` arm means contention: re-run it quiet.
+  `TOOL-aPacedTurnstile-2`.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
   here: checks 5, 9 and 21 all fired only once the folder was staged.
