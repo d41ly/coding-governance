@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-14 — a refusal retirement review, and a growth budget beside the floors
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-10-10 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -18,7 +18,9 @@ evidence of firing for about 8% of them, and estimated a first consolidation at 
 driver suite and 4.3 to 8.4 ks serial of the leg suite
 (`2026-10-09-build-TOOL-aMeteredSweep-1-research2-retirement.md` §0 and §5; PINNED, counted at
 6bc6c949c on 2026-10-09, the savings proportional estimates and not timings). This unit builds the
-review, its proof, and the budget. It retires nothing itself: every batch is the owner's.
+review, its proof, and the budget, and retires the first batch the owner approved on 2026-10-10:
+rows 1, 2, 4, 5 and 15 of §4's table, exactly those, with the per-row proof. Every later batch is
+the owner's.
 
 ## 2. Scope (IN)
 
@@ -60,17 +62,61 @@ review, its proof, and the budget. It retires nothing itself: every batch is the
   because a pattern that cannot match cannot refuse anything. The driver's sidecar is seeded with the
   three families the research counted: missing run-state file, missing required flag, and a field
   carrying a newline, carriage return, separator or the bypass flag. Observed by AC5, AC7.
-- **S6** — The first candidate batch, listed in §4 for the owner and decided in F2. NOT OBSERVED: a
-  proposal this unit does not act on.
+- **S6** — The first candidate batch, listed in §4 for the owner and decided in F2. Rows 1, 2, 4, 5
+  and 15 are approved (owner ruling F2 (a)) and built by S7 to S11; every other row waits for a later
+  review. Observed by AC13.
+- **S7** — Row 1, class V, under S1's procedure: the driver's missing-run-state refusals across
+  checks 10, 37, 43, 47, 48, 49, 51, 52 and 88 route through one helper, `require_run_state`, which
+  keeps one arm, and a structural route check in the leg reds a verb that reads its run-state file
+  without it. The per-site refusals it replaces are removed with their arms. Observed by AC8.
+  **Readers:** by name: the arms of `tools/unattended/unattended.test.sh` that pin these refusals
+  spell their messages. by value: `tools/memory-tree/check-arms.py` counts the sites against the
+  `ARMS_FLOORS` token for `tools/unattended/unattended.sh` in `.memory-tree.conf`, and
+  `tools/drift-audit/drift_signals.py` reports that floor's distance; S11 lowers the token.
+- **S8** — Row 2, class V: the driver's required-flag refusals across eleven checks route through a
+  per-verb table, `VERB_REQUIRES`, that one reader enforces and that also renders the required flags
+  in `usage` (`tools/unattended/unattended.sh:121`). Check 14's unknown-argument refusal, which fired
+  in a real run, is outside the row and stays. The per-site refusals and their arms are removed.
+  Observed by AC9.
+  **Readers:** by name: the arms of `tools/unattended/unattended.test.sh` that pin these refusals
+  spell their messages. by value: `tools/memory-tree/check-arms.py` counts the sites against the
+  `ARMS_FLOORS` token for `tools/unattended/unattended.sh` in `.memory-tree.conf`, and
+  `tools/drift-audit/drift_signals.py` reports that floor's distance; S11 lowers the token.
+- **S9** — Row 4, class G: driver checks 110 and 111, which refuse a claim mode outside `CLAIM_MODES`
+  and a read class outside `CLAIM_READS` at run time (`tools/unattended/unattended.sh:1972-1977`),
+  give way to a static join in the leg between those two declarations and the claim function's case
+  arms. Both fixture arms are dropped. Observed by AC10.
+  **Readers:** by name: the arms of `tools/unattended/unattended.test.sh` that pin these refusals
+  spell their messages. by value: `tools/memory-tree/check-arms.py` counts the sites against the
+  `ARMS_FLOORS` token for `tools/unattended/unattended.sh` in `.memory-tree.conf`, and
+  `tools/drift-audit/drift_signals.py` reports that floor's distance; S11 lowers the token.
+- **S10** — Row 5, class F: the driver's environment and internal-failure exits at checks 27, 29, 48,
+  56, 69 and 88 route through one exit-2 helper, `die_env`, which `check-arms.py` exempts by class as
+  it does other environment refusals. The shim arms are dropped, and the pins for checks 27 and 29
+  are removed from `tools/unattended/unarmed-branches.txt` (`:33-34`). Observed by AC11.
+  **Readers:** by name: the arms of `tools/unattended/unattended.test.sh` that pin these refusals
+  spell their messages, and `tools/unattended/unarmed-branches.txt` spells checks 27 and 29 in its
+  pin rows. by value: `tools/memory-tree/check-arms.py` reads those pin rows and counts the sites
+  against the `ARMS_FLOORS` token for `tools/unattended/unattended.sh` in `.memory-tree.conf`, and
+  `tools/drift-audit/drift_signals.py` reports that floor's distance; S11 lowers the token.
+- **S11** — Row 15, tombstones: the leg's check 23 site that refuses a retired key
+  (`tools/unattended/check-unattended.sh:3994`) and its check 47 sites that refuse a retired premise
+  (`:6063`, `:6065`) are retired with no tombstone in their place, per S2. The batch's single commit
+  carries S2's proof for all five rows: one `memory/DECISIONS.md` row each with R1 to R4, survivor and
+  replay filled, both unattended gates' floors and seeded ceilings lowered with comment lines naming
+  those rows, and no refusal site outside the five rows removed. Observed by AC12 and AC13.
+  **Readers:** by name: the arms of `tools/unattended/check-unattended.test.sh` that pin checks 23 and
+  47 spell their messages. by value: `tools/memory-tree/check-arms.py` counts the sites against the
+  `ARMS_FLOORS` token for `tools/unattended/check-unattended.sh`, and
+  `tools/drift-audit/drift_signals.py` reports that floor's distance; this item lowers the token.
 
 ## 3. Non-goals (OUT)
 
-- Retiring or consolidating any site. Every batch, the first included, is the owner's ruling and
-  lands in its own commit after it.
-- Building the family helpers (`require_run_state`, a per-verb required-flag table, a field-shape
-  helper at the write boundary). S5 freezes the families' counts; the helpers are a consolidation
-  batch's work. Until a family's helper exists, raising its ceiling with a dated reason is the only
-  way to add a site to it, and that is stated rather than hidden.
+- Retiring or consolidating any site outside rows 1, 2, 4, 5 and 15. Rows 3, 6 to 14 and 16 wait for
+  a later review and the owner's ruling on it, each batch in its own commit.
+- The field-shape helper at the write boundary (row 3). It is security-shaped under R4, so it is
+  consolidated by a later batch and never retired. Until it exists, raising that family's ceiling with
+  a dated reason is the only way to add a site to it, and that is stated rather than hidden.
 - Generating the candidate list automatically from run records. The research's extraction scripts
   were one-off and node `a` has no local runlog store; the review reads every node's store by hand.
 - Budgets for gates outside the unattended kit. One token adds one, when the owner wants it.
@@ -124,12 +170,43 @@ moved since the research's tree, so the review re-derives them with `check-arms.
 Never candidates (R4): the driver's environment git-config and object guards, the `may:` and
 `spec-audit:` self-authorization refusals on both sides, and the authorization-mode closed set.
 
+### The first batch (owner ruling F2 (a): rows 1, 2, 4, 5 and 15)
+
+The batch is built after S1 to S5 land, in one commit. Its sites are re-derived with
+`check-arms.py --report` on the batch's parent, never taken from the research's line numbers. For
+each row the builder fills R1 to R4 from the sources S1 names, and records which stores were read:
+node `a` holds no local runlog store, so R1 for this batch rests on the committed records and on any
+other node's store the owner supplies before the commit.
+
+The REPLAY field is the refusal line the retiring arm's fixture prints when run once against the
+post-batch tree, from a slice of the suite rather than the whole suite. For rows 1 and 2 the line
+comes from the helper's or the table's single arm; for row 4 from the leg's static join; for row 5
+from the helper's exit-2 path; for row 15 from the survivor the decision row names.
+
+S4's seeded ceilings land before the batch, at the census on the build date, and the batch lowers
+them in its own commit, which is the end state the alternatives below argue for. S5's families are
+seeded after the batch, so rows 1 and 2's families start at the single site each helper leaves.
+
+### Inventory
+
+The batch mints two shell functions and one table in `tools/unattended/unattended.sh`, spelled here
+as the research spelled them: `require_run_state`, `die_env` and `VERB_REQUIRES`. The functions sit
+in the `lexicon naming predicates` shell cell, so each name is confirmed through
+`python3 tools/lexicon/lexicon.py --suggest` before it is written, and a refused verb is renamed
+there rather than added to the table.
+
 ### Files touched (estimate)
 
 - `tools/memory-tree/check-arms.py`
 - `tools/memory-tree/README.md`
 - `tools/memory-tree/.memory-tree.conf.example`
 - `.memory-tree.conf`
+- `memory/DECISIONS.md` — the five retirement rows
+- `tools/unattended/unattended.sh`, `tools/unattended/unattended.test.sh` — rows 1, 2, 4 and 5
+- `tools/unattended/check-unattended.sh`, `tools/unattended/check-unattended.test.sh` — the route
+  check, the claim-table join, and row 15
+- `tools/unattended/unarmed-branches.txt` — the check 27 and 29 pins
+- `tools/unattended/kit.toml`, `tools/memory-tree/kit.toml` — each kit's version, once
 - the driver's family sidecar, beside `tools/unattended/unattended.sh` (new)
 
 ### Alternatives rejected
@@ -152,7 +229,7 @@ Never candidates (R4): the driver's environment git-config and object guards, th
 - observability: every ceiling and family prints with its date and id on every `--check`; `--report` lists unbudgeted gates.
 - risks: a family regex that over-matches reds an innocent site; the zero-match rule catches the under-match, and each pattern is run over the real tree with hits and near-misses printed before seeding.
 - testing: new arms in `check-arms.py --selftest`, each staged red first; the seeded tree green under `--check`.
-- migration: one new conf key, blank in the example conf; the memory-tree and unattended kits each owe a version bump.
+- migration: one new conf key, blank in the example conf; the memory-tree and unattended kits each owe a version bump; the batch lowers two floors and two ceilings in one commit, and reverting that commit restores all four.
 - user docs: `tools/memory-tree/README.md` gains the review procedure, the row grammar, the ceiling and the family sidecar.
 
 ## 6. Acceptance criteria
@@ -175,12 +252,54 @@ Never candidates (R4): the driver's environment git-config and object guards, th
   PINNED at the census `--report` measures on the build date.
 - **AC7** — When a family's pattern matches no refusal site in its gate, `--check` reds naming the
   family. Red when: the dead pattern passes. fixture: the selftest's planted gate, never this tree.
+- **AC8** — Row 1: when `check-arms.py --report` runs after the batch, the driver's missing-run-state
+  refusals count one site, inside `require_run_state`, and its arm still reds a verb run with no
+  run-state file; a scratch verb reading the file without the helper reds the leg's route check.
+  Red when: a second site remains, the arm passes, or the route check passes the scratch verb.
+- **AC9** — Row 2: when a verb runs without a flag `VERB_REQUIRES` lists for it, the driver refuses
+  naming the flag, and the required flags `usage` prints for each verb equal the table's row byte for
+  byte. Red when: a per-site required-flag refusal remains, a listed flag goes unenforced, or the
+  synopsis disagrees with the table.
+- **AC10** — Row 4: when a scratch driver gains a claim mode in its case arms that `CLAIM_MODES` lacks,
+  and separately a read class `CLAIM_READS` lacks, the leg's static join reds naming it, and
+  `grep -c 'check 110\|check 111'` over the driver suite prints 0. Red when: the undeclared mode or
+  class passes, or an arm for either check remains.
+- **AC11** — Row 5: when `check-arms.py --check` runs after the batch, the six checks' environment
+  exits route through `die_env`, exempt by class, and `tools/unattended/unarmed-branches.txt` carries
+  no row for checks 27 or 29; a scratch call of the helper exits 2. Red when: a listed exit remains
+  outside the helper, a pin row survives, or the helper exits anything but 2.
+- **AC12** — Row 15: when `grep -n 'is retired\|retired premise'` runs over the leg after the batch, it
+  finds none of the three tombstone sites, and no new refusal names the retired key or premise.
+  Red when: a tombstone remains, or one is re-added in another form.
+- **AC13** — The proof: when `check-arms.py --check` runs on the post-batch tree, its retirement pass
+  reads one `memory/DECISIONS.md` row per approved row, 1, 2, 4, 5 and 15, each with R1 to R4, a
+  survivor carrying its signature and a replay line; both unattended gates' `ARMS_FLOORS` and
+  `REFUSAL_CEILINGS` tokens sit below the batch parent's, each lowered beside a comment naming a row
+  id; and `check-arms.py --report` at parent and child differ only in the five rows' sites.
+  Red when: a row or field is missing, a survivor lacks its signature, a floor or ceiling did not
+  move, or a site outside the five rows left the census.
+  fixture: R1 cites the stores actually read; node `a` has none, and other nodes' stores are read
+  only if the owner supplies them before the commit.
+  cost: one suite slice per retiring arm for its replay line, seconds to minutes each.
 
 ## 7. Gates
 
-`kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `straggler-guard arms` · `transition-audit arms` · `harness arms (fail branches armed or pinned)` · `check-arms selftest` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene`
+`backlog migration selftest` · `build-index selftest` · `check-arms selftest` ·
+`check-wiring self-test` · `corpus-ids selftest` · `dead-path carriers self-test` ·
+`foreign-prefix parity (every self-test at three prefixes)` · `gotchas selftest` ·
+`install-prefix self-test` · `kit-placeholders self-test` · `kit/dogfood doc parity` ·
+`lexicon naming predicates` · `memory-hygiene self-test` · `push-main self-test` ·
+`python resolver (behaviour + inline parity + idiom ban)` · `recall floor` · `recall floor arms` ·
+`row-grammar selftest` · `row-keyed merge driver replay` · `run-gates canary` ·
+`run-gates evidence` · `settings-merge selftest` · `spec-tokens self-test` ·
+`straggler-guard arms` · `transition-audit arms` · `verdict-epoch self-test` ·
+`harness arms (fail branches armed or pinned)` · `unattended kit gate` ·
+`kit epoch (shipped bytes move, the version moves)` · `memory hygiene` ·
+`spec tokens (a spec's own names resolve)`
 
 New arm: tools/memory-tree/check-arms.py · covers AC1 AC2 AC3 AC4 AC5 AC7 · a survivor signature absent, a ceiling exceeded, a malformed token, a family over its ceiling, a dead family pattern · none
+New arm: tools/unattended/check-unattended.sh, the route check and the claim-table join · covers AC8 AC10 · a scratch verb reading its run state directly, and a scratch claim mode left undeclared · its floor in `ARMS_FLOORS` moves with the batch
+New arm: tools/unattended/unattended.test.sh, one arm each for `require_run_state`, `VERB_REQUIRES` and `die_env` · covers AC8 AC9 AC11 · the helper bypassed, a listed flag unenforced, the helper exiting 1 · its `FLOOR_ASSERTIONS` falls by the arms the batch drops
 
 ## 8. Open questions
 
@@ -190,6 +309,7 @@ New arm: tools/memory-tree/check-arms.py · covers AC1 AC2 AC3 AC4 AC5 AC7 · a 
   - (b) Only when a ceiling reds.
   - (c) Monthly only.
   - Recommendation: (a). A ceiling red alone waits until the budget is spent, which is late.
+  - RESOLVED (owner, 2026-10-10): (a) each minor bump of the unattended kit or monthly, and on any ceiling red.
 - **F2 — Approval of the first batch.** The table in §4 is the candidate list; the owner approves,
   narrows or rejects each row. Before ruling, the research asks for two things: per-arm timings of
   the candidate arms by slice, and the local runlog stores of nodes `b`, `c` and `d`, since node `a`
@@ -199,10 +319,15 @@ New arm: tools/memory-tree/check-arms.py · covers AC1 AC2 AC3 AC4 AC5 AC7 · a 
   - (c) Reject the batch; build the budget only.
   - Recommendation: (b). R1 is the criterion the research is least sure of, and the two readings
     it asks for are cheap next to a retirement that has to be walked back.
+  - RESOLVED (owner, 2026-10-10): (a) approve rows 1, 2, 4, 5 and 15 now.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-10 · §1 §2 §3 §4 §5 §6 §7 S6 S7 S8 S9 S10 S11 AC8 AC9 AC10 AC11 AC12 AC13 · folded the
+  owner's F2 ruling (a): rows 1, 2, 4, 5 and 15 are retired in this unit's first batch under the
+  review procedure, one scope item and one criterion per row plus the batch's proof; the non-goals now
+  exclude only the other rows and row 3's helper.
 
 ## 10. Reuse audit
 

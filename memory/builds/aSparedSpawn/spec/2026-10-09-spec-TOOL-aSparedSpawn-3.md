@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-3 — a ceiling-killed leg retries in the pool's drain tail, and a bar with no ledger dispatches longest-first
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 2
+**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -169,12 +169,14 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC5 AC6 · the sor
     `not alone, HOST not measured` when it had a neighbour. Fewer runs, but a contended second timeout
     becomes a FAIL that today's alone retry would have passed.
   - Recommendation: (a).
+  - RESOLVED (owner, 2026-10-10): (a) nothing; only a pass is final from the tail.
 - **F2 — Does the `GATE retry` line keep its bytes?** Its tail says `one serial retry after the pool
   drains`, which a tail release makes inexact.
   - (a) Reword it to name both, moving the README line, the canary's AC1 pattern and the
     `profile_bar.test.sh` fixture lines in the same commit.
   - (b) Keep the bytes; no reader moves, and the line stays true only of the fallback.
   - Recommendation: (a); every reader is in this kit and the split is on the head and the leg name.
+  - RESOLVED (owner, 2026-10-10): (a) reword the line and move its three readers.
 
 ## 9. Revision log
 

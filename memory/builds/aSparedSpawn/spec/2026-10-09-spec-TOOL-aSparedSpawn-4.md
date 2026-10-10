@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-4 — the runner's own spawns: a handful per leg, two git calls per bar, and a fork count with a ceiling
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-10-10 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -48,13 +48,34 @@ bar, and adds a fork-count arm with a declared ceiling and no clock, so the coun
   constant in the suite with its reason, red on growth and red when stale by more than max(3, 5 %).
   It prints the top `file:line` contributors when red. Observed by AC8 and AC9.
 - **S9** — `tools/run-gates/README.md` names the arm, its ceiling and how to move it. NOT OBSERVED: prose.
+- **S10** — The process-monitor kit dir is resolved inside the legs-parse python. `run-gates.sh` reads
+  the marked `resolve_kit_dir` block once, at top level, into one variable with a builtin
+  `IFS= read -r -d ''`, and the legs-parse program becomes that text followed by today's program. The
+  process-monitor block moves below the parse and reads the dir, or the resolver's refusal, from one
+  leading output line the reader strips. The runner's own `resolve_kit_dir` shell wrapper loses its
+  only caller and is deleted. Observed by AC10.
+  **Readers:** by name: `tools/run-gates/run-gates.sh` spells the runner's wrapper only at its call
+  in the process-monitor block (`:1069`), which this item folds; every other copy defines its own.
+  by value: `tools/run-gates/run-gates.sh` derives `PROCMON_REAP` and `PROCMON_SCOPE` from it
+  (`:1070`), and this item rewires both to the leading line.
+- **S11** — Every remaining copy of the canonical function reads its heredoc with the builtin `read`
+  in place of `"$(cat <<'RKD'`: the suite copies listed under §4, which the spawn-idiom scan of
+  `TOOL-aSparedSpawn-8` does not reach. The region between the `resolve_kit_dir` markers moves no byte
+  in any copy. Observed by AC11.
+- **S12** — The parity suite behind the `python resolver (behaviour + inline parity + idiom ban)` leg
+  gains a ban arm: a `$(cat <<'RKD'` wrapper in any file of its `resolve_kit_dir` population reds,
+  comments stripped first, with a planted specimen proving the predicate fires. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
-- No change to any line the bar prints, any record field, or any verdict.
+- No change to the bytes of any line the bar prints, any record field, or any verdict. The one
+  ORDER change is S10's: the `run-gates: process-monitor:` line prints after the turnstile lines.
 - No change to the atomic renames: `.leg`, `.rc` and the heartbeat keep their `mv`, which is most of
   the six events left per leg.
-- No edit to `resolve_python` or `resolve_kit_dir`, which are parity-gated canonical copies; see F1.
+- No edit to `resolve_python`, and no byte moved between the `resolve_kit_dir` markers in any copy.
+  S10 to S12 change only the wrapper around that region and the gate over it.
+- The product copies' wrappers, which `TOOL-aSparedSpawn-8` converts first because its ban on the
+  idiom lands at order 1 with no registry escape.
 - No turnstile poll-loop cut, no startup-chain trim beyond S7, no `timeout` probe change. The research
   lists them; they belong to the fork-free-readers work across the tree.
 - No repo-wide spawn-budget registry. The ceiling lives in the kit's own suite, since a kit file names
@@ -64,6 +85,8 @@ bar, and adds a fork-count arm with a declared ceiling and no clock, so the coun
 
 - **consumes-from** `TOOL-aSparedSpawn-1` — the sound key definition S5 precomputes; without it the
   precompute would freeze the porcelain-line key the reuse-key unit exists to fix.
+- **consumes-from** `TOOL-aSparedSpawn-8` — the product copies' `resolve_kit_dir` wrappers already
+  reading their heredoc with the builtin `read`; without it S12's ban reds on every product copy.
 - **consumes-from** external — bash's `EPOCHREALTIME` and `mapfile -d`, both present on node `a`'s bash
   5.3.9 per the runner report; S1 keeps a `date` fallback for a shell without the first.
 
@@ -97,13 +120,61 @@ against ledger keys written by a copy of the runner at that unit's landing, over
 **Measured stays measured.** Per-leg figures above are the research's static counts. The arm's first
 run on the cut runner fixes the ceiling, and that number is PINNED in the suite with its date and node.
 
+### The process-monitor fold (S10 to S12, owner ruling F1 (a))
+
+Today the runner spends one python on the kit dir alone: `resolve_kit_dir "$PYBIN" process-monitor
+reap.py "$KITDIR"` at `:1069`, inside the block at `:1065-1087`, through the wrapper at `:144-189`
+whose program is a `$(cat <<'RKD')` capture. It runs whenever `.process-monitor.conf` exists, which it
+does in this repo. The legs-parse python (`legs=` at `:1968`, closing at `:2058`) runs on every bar.
+
+The fold reads the marked block once into a variable with `IFS= read -r -d '' … <<'RKD' || :`, which
+forks nothing. The `|| :` is owed because `read -d ''` returns 1 at end of input. The legs parse
+receives that text ahead of its own program, and three more arguments, home, anchor and here, only
+when the conf exists. Given them, it prints one leading line, the dir or the `LookupError` text, and
+never exits on a refusal. The reader strips that line before today's line-1 handling, so the dispatch
+order and every row keep their bytes. Without the conf the parse prints no extra line, which keeps
+today's zero cost for a repo that has not adopted the monitor.
+
+The block's assignments and its scope probe move below `:2058`, after the turnstile. Its defaults
+(`PROCMON_OK=0` and the not-installed `PROCMON_WHY`) stay where they are, so a trap that fires during
+the turnstile wait reaches `run_leg_reap` (`:1626`) with today's fallback walk. Every other reader of
+those variables (`:1629-1637`) sits on the tree-kill path, which runs only after dispatch.
+
+The wrapper conversion is the same edit in every copy. `TOOL-aSparedSpawn-8` converts the product
+copies at order 1, because its `cat-heredoc` ban has no registry escape and would red on them; this
+unit converts the suite copies its scan skips, then adds S12's ban over the parity population, which
+reads suites, product files and the extensionless hooks alike
+(`tools/lib/resolve-python.test.sh:181-183`). The marked region is not re-rendered from the canonical,
+since no byte of it moves; the existing parity arm proves that.
+
 ### Files touched (estimate)
 
-- `tools/run-gates/run-gates.sh` — every site above.
+- `tools/run-gates/run-gates.sh` — every site above, and S10's fold.
 - `tools/run-gates/run-gates.runlog.test.sh` — the fork-count arm and its ceiling.
 - `tools/run-gates/run-gates.evidence.test.sh` — the key-parity, output-capture and log-name arms.
 - `tools/run-gates/README.md` — the arm and its ceiling.
 - `tools/run-gates/kit.toml` — the kit version, moved once for the build.
+- `tools/lib/resolve-python.test.sh` — S12's ban arm, besides its own wrapper.
+- `memory/map/generated/symbols.json` — regenerated, since S10 deletes a shell function.
+- `tools/hooks/kit.toml`, `tools/memory-tree/kit.toml`, `tools/unattended/kit.toml`,
+  `tools/workflows/kit.toml` — each touched kit's version, moved once after its last edit.
+- S11's suite copies, each file `git grep -l "<<'RKD'" -- '*.test.sh'` lists:
+- `.githooks/pre-push.runlog.test.sh`, `.githooks/pre-push.test.sh`,
+  `skills/session-kickoff/manifest-check.test.sh`, `tools/check-agent-cap-restatement.test.sh`,
+  `tools/check-hook-destinations.test.sh`, `tools/check-line-length.test.sh`,
+  `tools/check-playbook-parity.test.sh`, `tools/check-spec-tokens.test.sh`,
+  `tools/check-testsuite-counts.test.sh`, `tools/check-wiring.test.sh`,
+  `tools/hooks/agent-cap.test.sh`, `tools/hooks/scratch-guard.test.sh`,
+  `tools/memory-tree/check-memory-hygiene.test.sh`,
+  `tools/memory-tree/kit-dogfood-parity.test.sh`, `tools/memory-tree/marker-contract.test.sh`,
+  `tools/memory-tree/merge-rows.test.sh`, `tools/run-gates/run-gates.test.sh`,
+  `tools/run-gates/run-gates.turnstile.test.sh`, `tools/run-gates/run-selftests.test.sh`,
+  `tools/unattended/adopt-unattended.test.sh`, `tools/unattended/check-brief-recorded.test.sh`,
+  `tools/unattended/check-pass-order.test.sh`, `tools/unattended/gate-guard.test.sh`,
+  `tools/unattended/runlog-writer.test.sh`, `tools/unattended/stall-recorder.test.sh`,
+  `tools/unattended/stop-guard.test.sh`, `tools/workflows/check-protocol-parity.test.sh`,
+  `tools/workflows/check-review-join.test.sh`, `tools/workflows/check-verifier-fanout.test.sh`,
+  `tools/workflows/tier2-review.test.sh`, `tools/workflows/unattended-build.test.sh`
 
 ### Alternatives rejected
 
@@ -117,11 +188,16 @@ run on the cut runner fixes the ceiling, and that number is PINNED in the suite 
   is already its own subshell, so the mask is set once there.
 - **Rewriting the runner in Python.** The runner report puts the direct saving at about 1 % of the bar
   against weeks of parity work.
+- **Moving the legs parse up to the process-monitor block** instead of the block down. It would report
+  a manifest parse error before the turnstile rather than after it, and would read the timing cache
+  while another bar may still be rewriting it.
+- **Re-rendering the marked region from the canonical file.** No byte inside the markers changes, so a
+  re-render is a no-op the parity arm already proves; only the wrapper moves.
 
 ## 5. Production-readiness checklist
 
 - security: `redact` must still mask every `user:pass@` the old pipeline masked; the guard is a superset test on `://` and `@`, so it can only run more often than needed, never less.
-- perf / scale: the research's estimate is about 1270 s plus 910 s quiet across the canary family; the real bar gains little directly.
+- perf / scale: the research's estimate is about 1270 s plus 910 s quiet across the canary family; the real bar gains little directly, plus one python per bar where process monitoring is adopted (S10).
 - error / empty / loading states: an empty raw file, a NUL-bearing one and an unborn HEAD each keep today's values, by arm.
 - observability: the arm prints per-leg forks and execs and the top contributors, so a later regression names its line.
 - risks: byte drift in a captured output or a log filename; `umask` reaching a file a reader expects at a wider mode.
@@ -160,22 +236,48 @@ run on the cut runner fixes the ceiling, and that number is PINNED in the suite 
   naming the measured figure, the ceiling and that `file:line` among the top contributors. Red when:
   the per-leg difference does not see one added fork.
   figure: the ceiling is PINNED in the suite from the arm's first run on the cut runner, dated and noded.
+- **AC10** — When the fork-count arm traces one bar over a fixture carrying `.process-monitor.conf`, the
+  count of `$PYBIN` execs before the first leg dispatch is one fewer than a fixture copy of the runner
+  at base traces, and `PROCMON_WHY` matches base's bytes for a found kit, a missing kit and a refusing
+  scope. Red when: the python count is unchanged, or a refusal's text differs or aborts the parse.
+  figure: both python counts DERIVED from the two traces at observation.
+- **AC11** — When the parity arm of `python resolver (behaviour + inline parity + idiom ban)` grades the
+  `resolve_kit_dir` row after the pass, every copy's marked region equals `tools/lib/resolve_kit_dir.py`
+  byte for byte, and its population covers every file `git grep -l '>>> resolve_kit_dir'` lists outside
+  `memory/`. Red when: a wrapper edit moved a byte between the markers, or a copy left the population.
+- **AC12** — When one suite copy's wrapper is reverted to `"$(cat <<'RKD'` in a scratch clone, the S12
+  ban arm reds naming that file, and a comment spelling the same idiom stays silent. Red when: the
+  reverted wrapper passes, or the comment fires.
 
 ## 7. Gates
 
-`run-gates run-log line` · `run-gates evidence` · `run-gates canary` · `run-gates turnstile` ·
-`run-gates gov canary` · `run-gates adopter e2e` · `profile-bar selftest` · `pre-push run-log line` ·
-`push-main self-test` · `check-wiring self-test` · `settings-merge selftest` ·
-`foreign-prefix parity (every self-test at three prefixes)` ·
-`python resolver (behaviour + inline parity + idiom ban)` · `install-prefix self-test` ·
-`dead-path carriers self-test` · `lexicon naming predicates` · `spec-tokens self-test` ·
-`kit-placeholders self-test` · `harness arms (fail branches armed or pinned)` ·
+`agent-cap self-test` · `agent-instructions self-test` · `backlog migration selftest` ·
+`branch-guard self-test` · `build-index selftest` · `check-arms selftest` ·
+`check-wiring self-test` · `codebase-map adopter e2e` · `codebase-map kit selftest` ·
+`corpus-ids selftest` · `dead-path carriers self-test` · `drift-audit selftest` ·
+`foreign-prefix parity (every self-test at three prefixes)` · `gotchas selftest` ·
+`hook destinations self-test` · `install-prefix self-test` · `kit-placeholders self-test` ·
+`kit/dogfood doc parity` · `lexicon naming predicates` · `line-length gate selftest` ·
+`manifest-check self-test` · `memory-hygiene self-test` · `memory-recall kit selftest` ·
+`playbook parity selftest` · `pre-push bar self-test` · `pre-push run-log line` ·
+`pre-push self-test` · `profile-bar selftest` · `push-main self-test` ·
+`pytest-guardrails self-test` · `python resolver (behaviour + inline parity + idiom ban)` ·
+`recall floor` · `recall floor arms` · `review-join self-test` · `row-grammar selftest` ·
+`row-keyed merge driver replay` · `run-gates adopter e2e` · `run-gates canary` ·
+`run-gates evidence` · `run-gates gov canary` · `run-gates run-log line` · `run-gates turnstile` ·
+`run-selftests self-test` · `scratch-guard self-test` · `settings-merge selftest` ·
+`spec-tokens self-test` · `straggler-guard arms` · `tier2-review self-test` ·
+`transition-audit arms` · `unattended-build self-test` · `verdict-epoch self-test` ·
+`verifier fan-out self-test` · `harness arms (fail branches armed or pinned)` ·
 `shell hygiene (a loop fed by a command substitution)` · `codebase-map coverage + freshness` ·
-`testsuite counts (every bar self-test prints one)` · `line length` · `memory hygiene` ·
+`testsuite counts (every bar self-test prints one)` · `line length` · `kit version markers` ·
+`kit epoch (shipped bytes move, the version moves)` ·
+`verdict epoch (kit version dates the engine)` · `memory hygiene` ·
 `spec tokens (a spec's own names resolve)`
 
-New arm: tools/run-gates/run-gates.runlog.test.sh · covers AC8 AC9 · a closed trace descriptor, then one added `$(date +%s)` in a fixture copy of `runleg` · its `FLOOR_ASSERTIONS` rises by the assertions added
+New arm: tools/run-gates/run-gates.runlog.test.sh · covers AC8 AC9 AC10 · a closed trace descriptor, then one added `$(date +%s)` in a fixture copy of `runleg` · its `FLOOR_ASSERTIONS` rises by the assertions added
 New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC1 AC2 AC3 AC4 AC6 AC7 · each builtin swapped back for a variant that loses the byte the arm pins · its `FLOOR_ASSERTIONS` rises by the assertions added
+New arm: tools/lib/resolve-python.test.sh, the S12 ban beside its section 3 ban · covers AC11 AC12 · one suite copy's wrapper reverted to the cat capture in a scratch clone, and a commented specimen · none, the suite pins no assertion floor
 
 ## 8. Open questions
 
@@ -188,10 +290,15 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC1 AC2 AC3 AC4 AC
   - (b) Leave it: this unit touches no canonical copy, and the fold goes with the tree-wide
     fork-free-readers work, which already lists the `resolve_kit_dir` heredoc among its edits.
   - Recommendation: (b); the saving is one python per bar, and the copies are a separate review surface.
+  - RESOLVED (owner, 2026-10-10): (a) fold it in this unit, re-rendering every copy of the canonical function.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-10 · §2 §3 §4 §5 §6 §7 S10 S11 S12 AC10 AC11 AC12 · folded the owner's F1 ruling (a):
+  the process-monitor kit dir moves into the legs-parse python, every suite copy's `resolve_kit_dir`
+  wrapper takes the builtin read, the parity suite gains a ban arm, and the edge to
+  `TOOL-aSparedSpawn-8` names who converts the product copies.
 
 ## 10. Reuse audit
 
@@ -200,5 +307,8 @@ neighbours (`counts`, `build_invocations`, `derive_runner_verbs`) and the `run-g
 the seam extended here is in that kit and the probe did not rank it: `measure_execs`, `run_traced` and
 `build_traced_runner` in `run-gates.runlog.test.sh`, which already trace this runner on their own
 descriptor to count execs after the last leg. The fork-count arm adds a pid field to the same `PS4`.
+For S12 the seam is the section 3 ban of `tools/lib/resolve-python.test.sh`, whose comment strip and
+planted specimen the new ban reuses; for S10 it is the legs-parse program itself, which already
+inlines a parity-gated canonical (`resolve_prefix_token`) the same way.
 
 Recall terms used: runleg spawns exec count xtrace measure_execs baseline EPOCHREALTIME rev-parse runner startup

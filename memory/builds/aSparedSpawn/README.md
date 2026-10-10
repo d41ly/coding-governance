@@ -74,19 +74,19 @@ ids TOOL-aSparedSpawn-15
 |---|---|---|---|---|---|
 | [TOOL-aSparedSpawn-1 — the reuse key hashes what a dirty guarded file holds, and the toolchain it ran under](spec/2026-10-09-spec-TOOL-aSparedSpawn-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
 | [TOOL-aSparedSpawn-2 — the pool width comes from a measured spawn calibration, and dispatch pauses on spawn pressure](spec/2026-10-09-spec-TOOL-aSparedSpawn-2.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-5 — the held self-test tier in WSL2, from an ext4 mirror, with combined verdicts](spec/2026-10-09-spec-TOOL-aSparedSpawn-5.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aSparedSpawn-5 — the held self-test tier in WSL2, from an ext4 mirror, with combined verdicts](spec/2026-10-09-spec-TOOL-aSparedSpawn-5.md) | 1 | 2 | OPEN | rev-2 | 2026-10-10 |
 | [TOOL-aSparedSpawn-6 — the unattended driver as a library, called in process by its suite](spec/2026-10-09-spec-TOOL-aSparedSpawn-6.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-8 — fork-free readers, a spawn-idiom lint that stops regrowth, and a fork-count arm](spec/2026-10-09-spec-TOOL-aSparedSpawn-8.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aSparedSpawn-8 — fork-free readers, a spawn-idiom lint that stops regrowth, and a fork-count arm](spec/2026-10-09-spec-TOOL-aSparedSpawn-8.md) | 1 | 2 | OPEN | rev-2 | 2026-10-10 |
 | [TOOL-aSparedSpawn-10 — foreign-prefix parity probes one shard per sharded suite and pools its whole runs](spec/2026-10-09-spec-TOOL-aSparedSpawn-10.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
 | [TOOL-aSparedSpawn-11 — per-suite levers: five suites stop paying a process for a question they ask once](spec/2026-10-09-spec-TOOL-aSparedSpawn-11.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
 | [TOOL-aSparedSpawn-15 — the remaining clock-bound arms on the flake list, ordered or calibrated](spec/2026-10-09-spec-TOOL-aSparedSpawn-15.md) | 2 | 1 | OPEN | rev-1 | 2026-10-09 |
 | [TOOL-aSparedSpawn-3 — a ceiling-killed leg retries in the pool's drain tail, and a bar with no ledger dispatches longest-first](spec/2026-10-09-spec-TOOL-aSparedSpawn-3.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-4 — the runner's own spawns: a handful per leg, two git calls per bar, and a fork count with a ceiling](spec/2026-10-09-spec-TOOL-aSparedSpawn-4.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aSparedSpawn-4 — the runner's own spawns: a handful per leg, two git calls per bar, and a fork count with a ceiling](spec/2026-10-09-spec-TOOL-aSparedSpawn-4.md) | 2 | 2 | OPEN | rev-2 | 2026-10-10 |
 | [TOOL-aSparedSpawn-7 — `--only` selectors for the unattended gate and the hygiene gate, each naming what ran](spec/2026-10-09-spec-TOOL-aSparedSpawn-7.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
 | [TOOL-aSparedSpawn-9 — fixture templates and environment git identity across the named suites](spec/2026-10-09-spec-TOOL-aSparedSpawn-9.md) | 2 | 1 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-12 — the held self-test tier, selected by the kit whose shipped bytes moved](spec/2026-10-09-spec-TOOL-aSparedSpawn-12.md) | 3 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-13 — content-addressed reuse: declared read classes, a shared cache, a soundness sample](spec/2026-10-09-spec-TOOL-aSparedSpawn-13.md) | 3 | 2 | OPEN | rev-1 | 2026-10-09 |
-| [TOOL-aSparedSpawn-14 — a refusal retirement review, and a growth budget beside the floors](spec/2026-10-09-spec-TOOL-aSparedSpawn-14.md) | 3 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aSparedSpawn-12 — the held self-test tier, selected by the kit whose shipped bytes moved](spec/2026-10-09-spec-TOOL-aSparedSpawn-12.md) | 3 | 2 | OPEN | rev-2 | 2026-10-10 |
+| [TOOL-aSparedSpawn-13 — content-addressed reuse: declared read classes, a shared cache, a soundness sample](spec/2026-10-09-spec-TOOL-aSparedSpawn-13.md) | 3 | 2 | OPEN | rev-2 | 2026-10-10 |
+| [TOOL-aSparedSpawn-14 — a refusal retirement review, and a growth budget beside the floors](spec/2026-10-09-spec-TOOL-aSparedSpawn-14.md) | 3 | 2 | OPEN | rev-2 | 2026-10-10 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).

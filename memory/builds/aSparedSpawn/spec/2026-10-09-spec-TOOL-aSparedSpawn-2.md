@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-2 — the pool width comes from a measured spawn calibration, and dispatch pauses on spawn pressure
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 1
+**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 1 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -188,6 +188,7 @@ New arm: tools/run-gates/run-gates.test.sh · covers AC7 · `spawnpause` added t
   - (b) Replace: rows lose `width`, and a host with no cache uses a built-in default. One source of the
     number, but every node's first bar after landing changes width before anyone has calibrated it.
   - Recommendation: (a).
+  - RESOLVED (owner, 2026-10-10): (a) override only.
 - **F2 — What does the A/B run, and under what load?**
   - (a) The default `GATE_FULL` bar. Cheapest, but the reuse report finds that bar floored by its
     impure `unattended kit gate` leg, so width may read flat for a reason unrelated to spawns.
@@ -197,6 +198,7 @@ New arm: tools/run-gates/run-gates.test.sh · covers AC7 · `spawnpause` added t
     hours per arm, six arms.
   - Load: a declared synthetic spawn loader (repeatable) or a neighbouring bar (realistic, not repeatable).
   - Recommendation: (b), with the synthetic loader, and the bash and foreign counts beside every figure.
+  - RESOLVED (owner, 2026-10-10): (b) a GATE_LEGS subset of the spawn-heaviest held legs, with the synthetic loader.
 
 ## 9. Revision log
 

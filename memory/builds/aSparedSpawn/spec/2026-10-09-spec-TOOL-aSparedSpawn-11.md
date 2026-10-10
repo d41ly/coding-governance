@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-11 — per-suite levers: five suites stop paying a process for a question they ask once
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 2
+**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -203,6 +203,7 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC9 · the unse
   - (b) `worker_threads`, one worker per payload with `fs.readFileSync` patched in the worker; keeps
     real `process.exit` semantics, about 20-40 ms per payload, round one's ~110 s.
   - Recommendation: (a), with S2's parity sample as the guard against the divergence (a) risks.
+  - RESOLVED (owner, 2026-10-10): (a) `vm.Script` with the parity sample.
 
 ## 9. Revision log
 

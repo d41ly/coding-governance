@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-5 — the held self-test tier in WSL2, from an ext4 mirror, with combined verdicts
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-10-10 · node a · Tier-2 · base 22efab65 · streams tooling · order 1 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -45,8 +45,14 @@ hours are expected to fall to tens of minutes (estimate, not measured; `research
   dir. The combiner refuses to write `held-green` until the declared number of consecutive paired
   runs at the current manifest blob agree on every compared leg, and names each disagreeing leg.
   Observed by AC5.
-- **S7** — The host declaration. Two keys in `.githooks/gate-env.sh`, the distro and the mirror path,
-  per F2. A blank or unreachable host refuses with exit 2 naming the key. Observed by AC6.
+- **S7** — The host declaration, PER NODE (owner ruling F2). Each node declares its own distro and
+  mirror path in a node-local, untracked conf, `gate-wsl.conf` in that clone's common git dir, read
+  beside the shared keys and never sourced. `.githooks/gate-env.sh` carries only what every node
+  shares: `GATE_WSL_PARITY_RUNS` and the default mirror `/c/projects/coding-governance`. The combiner's
+  `--host` mode resolves both values, prints each with its source, and the wrapper takes them from it.
+  An undeclared node falls back to the default mirror and WSL's default distro and says so on every
+  run. An unreachable host, or a node-local key outside the two admitted, refuses with exit 2 naming
+  the file and the key. Observed by AC6 and AC8.
 - **S8** — The WSL half's environment: `/mnt/*` stripped from `PATH` (a `command -v` miss costs
   48 ms with it and 0.87 ms without, research probe 3), `TMPDIR` on the mirror's ext4 filesystem, and
   no Windows interop binary reachable. Observed by AC3.
@@ -88,6 +94,29 @@ verdict per leg, and reads each half's `verdict` file for `verdict`, `fingerprin
 `stamped`. The parity file is one row per (run, host, leg): `sha`, `manifest_blob`, host, leg name,
 verdict, run id.
 
+### The per-node host declaration
+
+The node registry in `AGENTS.md` records per-node variances, and `.githooks/gate-env.sh` is one file
+every node shares, so a distro or a mirror path declared only there is one node's answer imposed on
+all. The declaration therefore splits by who owns the value:
+
+| value | lives in | why there |
+|---|---|---|
+| `GATE_WSL_DISTRO` | node-local `gate-wsl.conf` in the clone's common git dir | a distro name is one machine's fact |
+| `GATE_WSL_MIRROR` | node-local `gate-wsl.conf`, else the shared default | the path is one machine's disk |
+| default mirror `/c/projects/coding-governance` | `.githooks/gate-env.sh` | the same default for every node |
+| `GATE_WSL_PARITY_RUNS` | `.githooks/gate-env.sh` | a trust threshold, owned by the repo |
+
+The node-local file is `KEY=value` lines, parsed and never sourced, admitting only the two node keys,
+so no node can lower the parity threshold for itself. The common git dir is per clone and therefore
+per node, every worktree of a node reads the same file, and nothing in it is ever committed, pushed or
+merged; `held-green` and the parity file already live there. The shared keys are read the way
+`.githooks/pre-commit` reads `GOV_KITROOT`: the assignment is parsed, the file is not sourced.
+
+Resolution prints one line per value, `wsl host: distro <value> (<source>)` and the same for the
+mirror, where the source is `declared in <file>`, `shared default` or `WSL default distro`. An
+undeclared distro runs `wsl.exe` with no `-d`, so WSL picks its own default.
+
 ### Flow of one run
 
 1. Refuse a dirty tree, since WSL sees committed objects only. Pin `S=$(git rev-parse HEAD)` and
@@ -109,13 +138,15 @@ refuses.
 ### Inventory
 
 New identifiers, each under the lexicon's verb table: `build_partition`, `check_halves`,
-`write_held_stamp`, `add_parity_rows` and `main` in the combiner; `run_half` in the wrapper. The
-conf keys are `GATE_WSL_DISTRO`, `GATE_WSL_MIRROR` and `GATE_WSL_PARITY_RUNS`.
+`write_held_stamp`, `add_parity_rows`, `resolve_wsl_host` and `main` in the combiner; `run_half` in
+the wrapper. The node-local keys are `GATE_WSL_DISTRO` and `GATE_WSL_MIRROR`; the shared keys are
+`GATE_WSL_MIRROR_DEFAULT` and `GATE_WSL_PARITY_RUNS`. The node-local file is `gate-wsl.conf`.
 
 ### Rollout
 
-Land dark: with `GATE_WSL_DISTRO` blank the wrapper refuses and nothing else changes. The owner sets
-the keys after F1 and F2, runs `--setup` once, then `--paired` until the combiner reports parity.
+Land dark: nothing invokes the wrapper but the owner, and no boundary reads `held-green`. On each node
+that will run it, the owner writes that node's `gate-wsl.conf` or accepts the printed defaults, runs
+`--setup` once, then `--paired` until the combiner reports parity.
 
 ### Files touched (estimate)
 
@@ -125,7 +156,7 @@ the keys after F1 and F2, runs `--setup` once, then `--paired` until the combine
 - `tools/gate-legs.json` — one held leg for the combiner's `--selftest`.
 - `tools/run-gates/selftest-budgets.txt` — that leg's budget row.
 - `tools/run-gates/run-gates.sh` — the kit version line only, if `check-kit-versions.sh` asks.
-- `.githooks/gate-env.sh` — the three host keys, blank by default until F1 and F2.
+- `.githooks/gate-env.sh` — the two shared keys: the default mirror and the parity-run count.
 - `tools/run-gates/README.md` — the user page for the wrapper.
 
 ### Alternatives rejected
@@ -140,6 +171,14 @@ the keys after F1 and F2, runs `--setup` once, then `--paired` until the combine
   selftest alone was 3445 s on the last full Windows ledger (research §4).
 - **A `"host"` key in `tools/gate-legs.json`.** It moves `manifest_blob` for every boundary and needs
   the canary's key-set pin; a sibling declaration file does not.
+- **A distro and mirror column in the `AGENTS.md` node registry.** The registry is a rendered charter
+  table, so the wrapper would parse Markdown a renderer owns, and a node changing its own path would
+  need a tracked commit pushed through the bar before its next run could use it.
+- **Per-node keys only in `.githooks/gate-env.sh`.** Every node sources the same file, so it can hold
+  one answer, which the F2 ruling refuses.
+- **An ignored `gate-env.local.sh` beside it.** The hook sources `.githooks/gate-env.sh` only when it is
+  tracked and unmodified at the pushed sha (`.githooks/gate-env.sh:81-83`); an untracked sibling in the
+  same directory invites exactly the unvetted sourcing that rule exists to stop.
 
 ## 5. Production-readiness checklist
 
@@ -175,21 +214,27 @@ the keys after F1 and F2, runs `--setup` once, then `--paired` until the combine
 - **AC5** — When `held_halves.py --selftest` feeds a parity file holding one disagreeing leg, the
   combine refuses to write `held-green`, names the leg, and prints `parity` below the declared count.
   Red when: the record is written while any compared leg disagrees or fewer paired runs are recorded.
-- **AC6** — When `GATE_WSL_DISTRO` is blank in `.githooks/gate-env.sh`, the wrapper exits 2 and names
-  the key; when the tree is dirty it exits 2 before any half starts.
-  Red when: either case starts a half.
+- **AC6** — When `wsl.exe` cannot reach the resolved distro, or the node-local `gate-wsl.conf` carries a
+  key other than `GATE_WSL_DISTRO` and `GATE_WSL_MIRROR`, the wrapper exits 2 naming the file and key;
+  when the tree is dirty it exits 2 before any half starts. Red when: any of the three starts a half.
 - **AC7** — When the first `--paired` run reaches agreement, the build folder carries its parity rows
   and both halves' wall seconds with the instrument, per charter §8.
   Red when: the figures exist only in a scratch directory, or a paired run is reported without rows.
   cost: one paired run is the whole held tier natively plus its Linux-safe part in WSL, hours on node `a`.
   permission: the held tier is run on demand by the owner (owner ruling 2026-08-27), so the owner runs this.
   figure: PINNED at the paired run's date and sha; nothing re-derives it.
+- **AC8** — When `held_halves.py --selftest` resolves the host over a scratch common git dir holding no
+  `gate-wsl.conf`, it answers the mirror `/c/projects/coding-governance` and no `-d` distro, printing
+  `shared default` and `WSL default distro` as their sources; with a conf declaring both, it answers
+  the declared values and names the file. Red when: the undeclared case resolves silently, or a
+  declared value loses to the shared default.
+  fixture: scratch git dirs built inside the selftest; no node holds a `gate-wsl.conf` today.
 
 ## 7. Gates
 
 `python resolver (behaviour + inline parity + idiom ban)` · `pre-push run-log line` · `push-main self-test` · `check-wiring self-test` · `settings-merge selftest` · `run-gates canary` · `run-gates evidence` · `run-gates turnstile` · `run-gates gov canary` · `foreign-prefix parity (every self-test at three prefixes)` · `run-gates run-log line` · `run-gates adopter e2e` · `profile-bar selftest` · `install-prefix self-test` · `dead-path carriers self-test` · `lexicon naming predicates` · `spec-tokens self-test` · `kit-placeholders self-test` · `branch-guard self-test` · `pre-push self-test` · `pre-push bar self-test` · `transition-audit arms` · `straggler-guard arms` · `every held leg is budgeted, every budget row resolves` · `kit version markers`
 
-New arm: tools/run-gates/held_halves.py --selftest · covers AC1 AC2 AC5 · each refusal staged by a synthetic half that breaks one precondition, RED observed before landing · a new held leg and its budget row
+New arm: tools/run-gates/held_halves.py --selftest · covers AC1 AC2 AC5 AC8 · each refusal and the undeclared-host fallback staged by a synthetic half that breaks one precondition, RED observed before landing · a new held leg and its budget row
 
 ## 8. Open questions
 
@@ -202,6 +247,7 @@ New arm: tools/run-gates/held_halves.py --selftest · covers AC1 AC2 AC5 · each
   - (b) Yes, for the held tier and later the push bar behind the same combiner.
   - (c) No; WSL runs stay advisory and write no record.
   - Recommendation: (a), with `GATE_WSL_PARITY_RUNS` set to 3 consecutive agreeing paired runs.
+  - RESOLVED (owner, 2026-10-10): (a) the held tier only, after the declared agreeing paired runs; never the push bar.
 - **F2 — Which distro and clone path is the declared host?**
   - (a) Conf keys in `.githooks/gate-env.sh`: `GATE_WSL_DISTRO` defaulting to `claude-u26`, the
     machine's default distro, and `GATE_WSL_MIRROR` defaulting to `/c/projects/coding-governance`,
@@ -209,10 +255,15 @@ New arm: tools/run-gates/held_halves.py --selftest · covers AC1 AC2 AC5 · each
   - (b) The same keys with the mirror at `~/gov-mirror`, which needs no root-owned `/c`.
   - (c) No keys; the wrapper takes both as arguments on every run.
   - Recommendation: (a). The keys are blank in the landed file, so nothing runs until the owner sets them.
+  - RESOLVED (owner, 2026-10-10): per host, declared by the owner on each node; `/c/projects/coding-governance` is only the default.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-10 · §2 §4 §6 §7 S7 AC6 AC8 · folded the owner's F2 ruling: distro and mirror are
+  declared per node in a node-local `gate-wsl.conf` in the clone's common git dir, the shared
+  `.githooks/gate-env.sh` keeps only the default mirror and the parity count, an undeclared node
+  falls back and says so, and the registry column and an ignored sibling file are rejected.
 
 ## 10. Reuse audit
 

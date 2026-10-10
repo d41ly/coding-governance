@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-12 — the held self-test tier, selected by the kit whose shipped bytes moved
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-10-10 · node a · Tier-2 · base 22efab65 · streams tooling · order 3 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -15,8 +15,8 @@ when its owning kit's shipped bytes, or the suite file itself, moved since the l
 run of that suite. aMeteredSweep's round-two research replayed that rule over the last 30
 first-parent commits on `main` and it ran 13% of the held tier's leg-seconds, and nothing at all on 23
 of the 30 (`2026-10-09-build-TOOL-aMeteredSweep-1-research2-reuse.md` §4, rule A; PINNED, measured at
-node `a` on 2026-10-09 over the profiled bar at fa68a767, ±2x). That is cheap enough to ask whether the
-tier belongs back on the push boundary, which is the owner's question in §8.
+node `a` on 2026-10-09 over the profiled bar at fa68a767, ±2x). The mode serves developer and
+Definition-of-Done runs; the owner ruled it stays off the push boundary (§8 F1).
 
 ## 2. Scope (IN)
 
@@ -43,14 +43,19 @@ tier belongs back on the push boundary, which is the owner's question in §8.
   EXECUTED with verdict `ok` on a tree whose `TREE_CLEAN` reads `yes`; a red, a retried pass or a
   timeout clears it. Observed by AC5.
 - **S5** — The safety net: a recorded sha more than `GATE_SELFTESTS_MAX_LAG` first-parent commits
-  behind `HEAD` executes the leg, so every held suite runs at least once per that many landings.
-  Default 10, the value of `GATE_FULL_MAX_LAG` in `.githooks/pre-push`. Observed by AC4.
+  behind `HEAD` executes the leg, so no `changed` run holds a suite on a record that old. It bounds
+  staleness per run and promises no cadence, since no boundary runs the mode. Default 10 by owner
+  ruling F2, the value of `GATE_FULL_MAX_LAG` in `.githooks/pre-push`. Observed by AC4.
 - **S6** — `govkit.py shipped --epoch` prints only the rows whose role is in `EPOCH_ROLES`, from the
   same derivation `derive_epoch_state` reads, so "this kit moved" has one answer for the version-bump
   rule and for selection. Observed by AC8.
-- **S7** — The stamp and the boundary. `gate-full-green` writes `selftests changed` for such a run.
-  `check_green_record` in `.githooks/pre-push` treats a `changed` record as covering a push that runs
-  in `changed` mode, and never as covering one that runs every self-test. Observed by AC7.
+- **S7** — The stamp, and NO boundary change (owner ruling F1 (b)). `gate-full-green` writes
+  `selftests changed` for such a run, never `1`, so a partial tier is never recorded as the whole one.
+  `.githooks/pre-push` and `.githooks/gate-env.sh` are not edited: predicate 8 of
+  `check_green_record` (`.githooks/pre-push:1237-1246`) already forces whenever the push runs the
+  self-tests and the record's field is not `1`, and a push with them held, the 2026-08-27 default,
+  accepts the record as it accepts a held one today. A `.githooks/pre-push.test.sh` arm pins both
+  directions. Observed by AC7.
 - **S8** — The figure. The selection instrument the research ran (`select_sim.py`) is committed
   beside this unit's record and replayed after the build, so the 13% is re-derived from the rule as
   built. A records-only Python file is graded by the lexicon leg, so its function names are taken
@@ -58,8 +63,9 @@ tier belongs back on the push boundary, which is the owner's question in §8.
 
 ## 3. Non-goals (OUT)
 
-- Turning `changed` mode ON at any boundary. Whether `.githooks/gate-env.sh` sets it is F1, and this
-  unit builds the mode whatever F1 says.
+- Turning `changed` mode on at any boundary, by owner ruling F1 (b). Nothing exports it at pre-push,
+  `.githooks/gate-env.sh` keeps its on-demand header and values, `.githooks/pre-push` keeps every
+  predicate, and the 2026-08-27 on-demand ruling stands.
 - The unattended kit's suites. They run through `run-unattended-gates.sh --selftests`, not through
   `tools/gate-legs.json`, and need the same rule applied there separately. Named follow-up.
 - Narrowing the broad `{prefix}/` guards with traced reads (the research's U5). The guard fallback in
@@ -87,8 +93,14 @@ The held-tier branch in `tools/run-gates/run-gates.sh` (the `subjects`/`chunks` 
    per bar, and join the changed paths against them.
 4. A leg selected executes as a normal leg. A leg not selected writes the held rc with its reason.
 
+Who sets the mode: a developer, or a Definition-of-Done run, in its own environment. No boundary does,
+and the push boundary reads a `changed` record through the predicate it already has, so this unit
+moves no line of `.githooks/`. The stamp writer at `tools/run-gates/run-gates.sh:3893` and `:3935`
+prints `${GATE_SELFTESTS:+1}` today, which would record a `changed` run as `1`; both become the
+mode's own value for `changed` and keep `1` for every other non-empty value.
+
 The record directory is per git COMMON dir, as `gate-full-green.shared` and the turnstile already are,
-so every worktree on a node shares it and the primary's push sees a branch worktree's run.
+so every worktree on a node shares it and a `changed` run in the primary sees a branch worktree's run.
 
 Why "since the last recorded run" and not "since `BASE`": a record moves only when the suite went
 green on a clean tree, so a red suite keeps executing until it is fixed, and a branch whose `BASE`
@@ -117,8 +129,7 @@ resolves in the dogfood tree; the builder reads it from that README first.
 - `tools/run-gates/run-gates.test.sh`
 - `tools/govkit/govkit.py`
 - `tools/govkit/selftest.py`
-- `.githooks/pre-push`
-- `.githooks/pre-push.test.sh`
+- `.githooks/pre-push.test.sh` — the pin on predicate 8 only; `.githooks/pre-push` is not edited
 - the selection instrument, committed under this build's own build folder (S8)
 
 ### Alternatives rejected
@@ -140,9 +151,9 @@ resolves in the dogfood tree; the builder reads it from that README first.
 - error / empty / loading states: no record, a bad record, an absent govkit and a non-ancestor sha all execute the leg; each held line names its reason.
 - observability: every held leg prints its reason and recorded sha; the run header records the mode; the guard fallback prints the legs it applied to.
 - risks: an under-declared selection set holds a suite that should have run; S5's lag bound caps how long, and a full run that reds an unselected suite is a declaration miss to file.
-- testing: canary arms in the run-gates suite on a fixture with a stub govkit; a govkit selftest arm for `--epoch`; a pre-push arm for the coverage relation.
+- testing: canary arms in the run-gates suite on a fixture with a stub govkit; a govkit selftest arm for `--epoch`; a pre-push arm pinning how the unchanged predicate reads a `changed` record.
 - migration: none; the version bumps under §4 Migration.
-- user docs: `tools/run-gates/README.md` documents the mode, the record and the lag bound; the charter's merge-bar paragraph is unchanged unless F1 turns it on.
+- user docs: `tools/run-gates/README.md` documents the mode as a developer and Definition-of-Done tool, the record and the lag bound; the charter's merge-bar paragraph is unchanged (F1 (b)).
 
 ## 6. Acceptance criteria
 
@@ -162,9 +173,10 @@ resolves in the dogfood tree; the builder reads it from that README first.
   exists for the red leg, or the dirty-tree run wrote one.
 - **AC6** — When govkit cannot be reached from the runner, every held leg selects by its `guard` and
   the bar says so once. Red when: a leg is held with no diff evidence, or the bar is silent about it.
-- **AC7** — When `check_green_record` reads a recorded green carrying `selftests changed`, it accepts it
-  for a push in `changed` mode at that sha and forces for a push that runs every self-test. Red when:
-  the second case is accepted, which would trust a partial tier as the whole one.
+- **AC7** — When a `changed` run's `gate-full-green` is read by the unedited `check_green_record`, the
+  record says `selftests changed`; a push with the self-test switch on forces, and one with it held
+  accepts. `git diff --stat` over `.githooks/` shows only the test file. Red when: the stamp reads `1`,
+  the switch-on push is accepted, or a line of `.githooks/pre-push` or `.githooks/gate-env.sh` moved.
 - **AC8** — When `python tools/govkit/govkit.py shipped --epoch` runs on this tree, every printed role
   is one of `EPOCH_ROLES`, and its rows are exactly the `shipped` rows in those roles. Red when: a
   `project-owned` or `generated` row is printed, or an epoch-role row is missing.
@@ -176,11 +188,21 @@ resolves in the dogfood tree; the builder reads it from that README first.
 
 ## 7. Gates
 
-`govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `run-gates canary` · `pre-push self-test` · `govkit selfcheck` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
+`branch-guard self-test` · `check-wiring self-test` · `dead-path carriers self-test` ·
+`foreign-prefix parity (every self-test at three prefixes)` · `govkit acceptance matrix` ·
+`govkit refusal join` · `govkit selftest` · `install-prefix self-test` ·
+`kit-placeholders self-test` · `lexicon naming predicates` · `pre-push bar self-test` ·
+`pre-push run-log line` · `pre-push self-test` · `profile-bar selftest` · `push-main self-test` ·
+`python resolver (behaviour + inline parity + idiom ban)` · `recall floor arms` ·
+`run-gates adopter e2e` · `run-gates canary` · `run-gates evidence` · `run-gates gov canary` ·
+`run-gates run-log line` · `run-gates turnstile` · `settings-merge selftest` ·
+`spec-tokens self-test` · `straggler-guard arms` · `transition-audit arms` · `govkit selfcheck` ·
+`kit epoch (shipped bytes move, the version moves)` · `memory hygiene` ·
+`spec tokens (a spec's own names resolve)`
 
 New arm: tools/run-gates/run-gates.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · a selection that ignores the moved path, then a record left behind by a red leg · none
 New arm: tools/govkit/selftest.py · covers AC8 · `--epoch` printing a project-owned row · none
-New arm: .githooks/pre-push.test.sh · covers AC7 · a `changed` record accepted for an every-self-test push · none
+New arm: .githooks/pre-push.test.sh · covers AC7 · a `changed` record accepted for a switch-on push, and a stamp writing `1` for a `changed` run · none
 
 ## 8. Open questions
 
@@ -191,15 +213,20 @@ New arm: .githooks/pre-push.test.sh · covers AC7 · a `changed` record accepted
   - (b) No: the mode exists for developer and Definition-of-Done runs only; the ruling stands.
   - Recommendation: (a). The ruling's stated reason was cost on pushes that touch no kit source, and
     under this rule those pushes run no suite.
+  - RESOLVED (owner, 2026-10-10): (b) no; `changed` mode serves developer and Definition-of-Done runs, and the 2026-08-27 ruling stands.
 - **F2 — The "run everything every N" safety net: which N?**
   - (a) N=10, the same number as `GATE_FULL_MAX_LAG`, so the two lag bounds speak one value.
   - (b) A smaller N, more coverage of declaration misses at more cost.
   - (c) No age bound; rely on whoever runs the whole tier by hand.
   - Recommendation: (a), N=10.
+  - RESOLVED (owner, 2026-10-10): (a) N=10.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-10 · §1 §2 §3 §4 §5 §6 §7 S5 S7 AC7 · folded the owner's F1 ruling (b): no push-boundary
+  use, so S7 no longer edits `check_green_record` and moves no line of `.githooks/`; the stamp writes
+  `selftests changed` and the unedited predicate 8 is pinned in both directions; F2's N=10 is kept.
 
 ## 10. Reuse audit
 

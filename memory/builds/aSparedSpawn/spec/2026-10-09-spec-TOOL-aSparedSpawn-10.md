@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-10 — foreign-prefix parity probes one shard per sharded suite and pools its whole runs
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 2
+**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -166,6 +166,7 @@ New arm: tools/run-gates/foreign-prefix.gov.test.sh --plan · covers AC1 AC3 AC4
   - (d) Every shard, as today; take only S3's saving.
   - Recommendation: (a). A version bump is when a prefix defect is likeliest to ship, and rotation
     reaches every region within about n landings.
+  - RESOLVED (owner, 2026-10-10): (a) rotate by commit, and run every shard on a kit version bump.
 
 ## 9. Revision log
 

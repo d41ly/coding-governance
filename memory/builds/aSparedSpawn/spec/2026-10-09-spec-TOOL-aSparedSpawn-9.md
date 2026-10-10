@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-9 — fixture templates and environment git identity across the named suites
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-1 · base 22efab65 · streams tooling · order 2
+**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-1 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -178,6 +178,7 @@ No arm is added or moved. The converted suites are their own observation, at the
   - (b) Leave them out; this unit touches only files outside the scan set.
   - Recommendation: (a). The bump is owed once per build whichever unit moves first, and these four
     hold most of the memory-tree lever's estimated spawns.
+  - RESOLVED (owner, 2026-10-10): (a) include the four engines; one memory-tree bump with the build's other memory-tree edits.
 
 ## 9. Revision log
 
