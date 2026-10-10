@@ -1622,6 +1622,68 @@ def check_halved_install_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
           "entry 'drift-audit' declares MEMORY_ROOT required, and its adopter")
 
 
+def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
+    """DEPL-aBenchedProbe-4 (closing review H-M2 and H-L1) — selfcheck 7j4 and the 7h ceiling clause
+    were observed red only by hand-staged breaks that left nothing behind. Five breaks in a COPY of gov,
+    sharing runs where the lines they red are disjoint, each asserted on the ONE line that names it:
+    the subject-pin ratchet and the stale-exemption check red on several of the same breaks, so a
+    whole-output substring could pass on the wrong line."""
+    desc = gcopy / PFX / KIT_NAMES["govkit"] / "entries" / "push-main.kit.toml"
+    man = gcopy / PFX / "gate-legs.json"
+    keep = {f: f.read_bytes() for f in (desc, man)}
+    leg = "pre-push self-test"
+
+    def write_staged(f: pathlib.Path, old: str, new: str, label: str) -> None:
+        txt = f.read_text(encoding="utf-8")
+        check(f"[aBP-4] {label} LIVENESS the staged edit matched once", txt.count(old) == 1,
+              f"{txt.count(old)} match(es) in {f.name}")
+        f.write_text(txt.replace(old, new, 1), encoding="utf-8", newline="\n")
+
+    def check_line(out: str, *parts: str) -> bool:
+        return any(all(p in ln for p in parts) for ln in out.splitlines())
+
+    # Run 1: a1 (subject repo in descriptor AND manifest), a2 (a filename-shaped exempt row loses its
+    # chunk), and the 7h ceiling at 1781. Each reds a different line.
+    write_staged(desc, f'name = "{leg}"\nsubject = "kit"', f'name = "{leg}"\nsubject = "repo"', "a1 descriptor")
+    write_staged(man, '"subject": "kit",\n    "ceiling": 1780', '"subject": "repo",\n    "ceiling": 1780',
+          "a1 manifest")
+    write_staged(man, '"chunk": "declarations",\n    "subject": "repo",\n    "ceiling": 1840',
+          '"subject": "repo",\n    "ceiling": 1840', "a2 marker contracts chunk")
+    write_staged(desc, "ceiling = 1780", "ceiling = 1781", "b ceiling 1781")
+    r1 = run_selfcheck(gcopy)
+    o1 = r1.stdout + r1.stderr
+    check("[aBP-4] a1: 7j4 reds a held self-test declared repo, naming entry and leg",
+          r1.returncode != 0 and check_line(o1, "7j4:", f"entry 'push-main' gate leg '{leg}'"), o1[-1500:])
+    check("[aBP-4] a2: 7j4 reds a chunkless filename-shaped leg, naming it and its argv element",
+          check_line(o1, "7j4:", "'marker contracts'", "marker-contract.test.sh"), o1[-1500:])
+    check("[aBP-4] b: 7h reds a descriptor ceiling of 1781 against the manifest",
+          check_line(o1, "entry 'push-main'", f"gate leg '{leg}' with ceiling 1781"), o1[-1500:])
+    for f, b in keep.items():
+        f.write_bytes(b)
+    # Run 2: the 7h ceiling as a bool, which an int-only check must refuse.
+    write_staged(desc, "ceiling = 1780", "ceiling = true", "b ceiling true")
+    r2 = run_selfcheck(gcopy)
+    o2 = r2.stdout + r2.stderr
+    check("[aBP-4] b: 7h reds a descriptor ceiling of true",
+          r2.returncode != 0 and check_line(o2, "entry 'push-main'", f"gate leg '{leg}' with ceiling True"),
+          o2[-1500:])
+    for f, b in keep.items():
+        f.write_bytes(b)
+    # Run 3 (c, H-L1): no manifest. 7h's block is skipped, so 7j4 must still answer for itself, and
+    # with the dead pre-initialisation gone a reader outside its own guard would raise here.
+    man.unlink()
+    r3 = run_selfcheck(gcopy)
+    o3 = r3.stdout + r3.stderr
+    check("[aBP-4] c: with no manifest 7j4 says so, and nothing raises",
+          check_line(o3, "7j4", "gate-legs.json") and "Traceback" not in o3, o3[-1500:])
+    for f, b in keep.items():
+        f.write_bytes(b)
+    # Run 4: restored, attributed here rather than to the arms after this in main().
+    r4 = run_selfcheck(gcopy)
+    check("[aBP-4] ...and the restored copy is green", r4.returncode == 0,
+          (r4.stdout + r4.stderr)[-1500:])
+
+
 def check_update_safety(tmp: pathlib.Path) -> None:
     """DEPL-aRepatriatedFork-17 AC1-AC11, AC14, AC15 — the eight `update` mechanics, over scratch
     govs whose `govkit.py` is a copy of `GOVKIT` taken at build time. Asserted on bytes, index
@@ -2403,10 +2465,26 @@ def check_ceiling_emission(tmp: pathlib.Path) -> None:
     check("CE4: a re-apply over a hand-raised ceiling exits 0", p.returncode == 0, out[-900:])
     check("CE4: the raised ceiling is kept", read_rows().get(leg, {}).get("ceiling") == 3600,
           str(read_rows().get(leg)))
+    # The leg is matched INSIDE the keep line: other prints quote it in the same shape, so two
+    # substrings over the whole output would pass on a keep line naming the wrong leg (H-L2).
     check("CE4: and the keep is reported, naming the leg",
-          "kept the target's ceiling" in out and f"'{leg}'" in out, out[-900:])
+          any("kept the target's ceiling" in ln and f"'{leg}'" in ln for ln in out.splitlines()),
+          out[-900:])
     check("CE4: and it is not refused as drift",
           "differs from what the receipt recorded" not in out, out[-900:])
+    # DEPL-aBenchedProbe-4 S1 (review H-M1): the keep lasts only if the receipt records GOV's value.
+    # Recording the kept one makes target and receipt agree, so the NEXT update overwrites the bound.
+    check("CE4: the receipt still records gov's ceiling, never the kept one",
+          read_emitted().get(leg, {}).get("ceiling") == 1780, str(read_emitted().get(leg)))
+    settle(t, "the keep")
+    p = run("apply", "--target", str(t), "--kits", "push-main")
+    out = p.stdout + p.stderr
+    check("CE4b: a second apply with no edit exits 0", p.returncode == 0, out[-900:])
+    check("CE4b: the kept ceiling survives it", read_rows().get(leg, {}).get("ceiling") == 3600,
+          str(read_rows().get(leg)) + out[-600:])
+    check("CE4b: and the keep line names the leg again",
+          any("kept the target's ceiling" in ln and f"'{leg}'" in ln for ln in out.splitlines()),
+          out[-900:])
 
     # AC5: a row agreeing with the receipt is gov's, so gov's value lands — the arm that keeps CE4
     # from passing on a rule that keeps every value.
@@ -3475,6 +3553,7 @@ user_skills = "/tmp/gk-fake-skills"
         pk.write_text(pkeep, encoding="utf-8")
 
         check_halved_install_arms(gcopy, _run_selfcheck)
+        check_benched_probe_arms(gcopy, _run_selfcheck)
         # --- TOOL-aWindowedPass-4 AC5: check 6c, a `[[generated]]` row whose generator the kit does
         #     not ship. Staged in the copy and restored, so the arm is observed red and green both.
         gk = gcopy / PFX / KIT_NAMES["codebase-map"] / "kit.toml"

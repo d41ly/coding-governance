@@ -144,9 +144,9 @@ check-memory-hygiene.sh: the memory tree's structural gate, its per-class size c
 - gate-legs 9: `memory hygiene`, `memory-hygiene self-test`, `verdict epoch (kit version dates the engine)`, `verdict-epoch self-test`, `kit version markers`, `kit/dogfood doc parity`, `transition-audit arms`, `backlog migration selftest`, `straggler-guard arms`
 - kits 1: `memory-tree`
 - git-hooks 2: `commit-msg`, `pre-rebase`
-- gotcha-classes 10: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`, `inline-fence-swallows-the-rest-of-the-file.md`, `record-citing-a-foreign-id-defines-or-orphans-it.md`
+- gotcha-classes 11: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`, `inline-fence-swallows-the-rest-of-the-file.md`, `record-citing-a-foreign-id-defines-or-orphans-it.md`
 - globs 10
-- cut 15 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 16 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## memory-tree-merge-driver
 

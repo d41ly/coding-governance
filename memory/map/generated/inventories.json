@@ -249,6 +249,7 @@
       "inputs-inside-the-subjects-reach.md",
       "join-key-widened-by-a-shared-location.md",
       "ledger-token-wrapped-across-a-line-joins-nothing.md",
+      "line-claim-matched-over-the-whole-output.md",
       "line-count-reads-empty-capture-as-one.md",
       "line-keyed-registry-reds-on-a-file-that-grew.md",
       "liveness-negative-from-another-population.md",

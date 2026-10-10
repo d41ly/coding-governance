@@ -2998,6 +2998,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "check_benched_probe_arms",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_binary_mode",
       "kind": "function",
       "file": "tools/gate-lint/encoding_posture.py"

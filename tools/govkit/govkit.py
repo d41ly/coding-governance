@@ -2670,7 +2670,6 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     #          the escape, on the same reason-and-staleness rule as the path exemptions, and S6
     #          refuses a leg that is BOTH claimed and exempted.
     legs_path = resolve_tool_path(root, "gate-legs.json")
-    manifest_chunk: dict = {}  # 7j4 reads it unconditionally and refuses on an absent manifest
     if legs_path.is_file():
         _legs_json = json.loads(legs_path.read_text(encoding="utf-8"))
         manifest = {leg.get("name") for leg in _legs_json}

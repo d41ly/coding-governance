@@ -1,11 +1,12 @@
 # DEPL-aBenchedProbe-4 — regression arms for the keep rule, 7j4 and the 7h ceiling clause
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 2b26f187 · streams deployer · order 5
+**Status:** CLOSED · rev-1 · 2026-10-10 · node a · Tier-2 · base 2b26f187 · streams deployer · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-10-build-DEPL-aBenchedProbe-4-1-acceptance-ledger.md](../build/2026-10-10-build-DEPL-aBenchedProbe-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-DEPL-aBenchedProbe-3-1-spec-brief.md](../prompts/2026-10-09-prompt-DEPL-aBenchedProbe-3-1-spec-brief.md) | journal | DEPL-aBenchedProbe-3 |
 
 <!-- /gen:spec-records -->

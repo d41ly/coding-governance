@@ -59,7 +59,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 6 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
 ids DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 DEPL-aBenchedProbe-4 TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2
 
 <!-- gen:build-units -->
@@ -70,10 +70,10 @@ ids DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 DEPL-aBenched
 | [DEPL-aBenchedProbe-1 — govkit selfcheck reds a descriptor self-test leg whose subject is not `kit`](spec/2026-10-09-spec-DEPL-aBenchedProbe-1.md) | 2 | 1 | CLOSED | rev-1 | 2026-10-09 |
 | [DEPL-aBenchedProbe-2 — a descriptor leg's `ceiling` travels into the adopter's manifest](spec/2026-10-09-spec-DEPL-aBenchedProbe-2.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-09 |
 | [DEPL-aBenchedProbe-3 — 7j4's liveness reds bind only where a self-test population exists](spec/2026-10-09-spec-DEPL-aBenchedProbe-3.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-10 |
-| [DEPL-aBenchedProbe-4 — regression arms for the keep rule, 7j4 and the 7h ceiling clause](spec/2026-10-09-spec-DEPL-aBenchedProbe-4.md) | 5 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [DEPL-aBenchedProbe-4 — regression arms for the keep rule, 7j4 and the 7h ceiling clause](spec/2026-10-09-spec-DEPL-aBenchedProbe-4.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-10 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 4 record folder(s).
+Records: 9 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
