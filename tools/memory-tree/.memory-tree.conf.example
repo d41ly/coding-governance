@@ -122,6 +122,13 @@ READINESS_ROWS_CUTOFF=""
 # never required; set it strictly ahead of your corpus as with the cutoffs above.
 BASE_RESOLVE_CUTOFF=""
 
+# Tier-1 micro-spec ratchet (check 12): from this date a Tier-1 spec carries the eight sections the
+# spec template names — Goal, Scope (IN), Non-goals (OUT), Design, Acceptance criteria, Gates, Open
+# questions, Revision log — found by heading TEXT, in canonical order, none empty, numbering free.
+# Runs under `--staged`. Blank = never required, and a Tier-1 spec then keeps the light profile; set
+# it strictly ahead of your corpus as with the cutoffs above.
+SPEC_TIER1_CUTOFF=""
+
 # Section-7 leg-line ratchet, read by the spec-tokens checker rather than by the hygiene engine:
 # from this date a LIVE spec that CARRIES a `## N. Gates` heading must contribute at least one leg
 # name your gate manifest resolves. A spec with no Gates heading is silent, which is the whole Tier-1
@@ -439,3 +446,24 @@ LIVE_DORMANT_DAYS=""
 # and an EVIDENCE_GLOBS that resolves to no tracked file each refuse by name before anything is
 # written. BLANK OR ABSENT RENDERS LIVE.md AS BEFORE, byte for byte, and never imports that kit.
 LIVE_LANDED_UNCLOSED=""
+
+# ROUTED_PATHS — the product paths: whitespace-separated, repo-root-relative, a directory entry ending
+# in `/`. The write gate (scratch-guard) refuses an Edit, Write, MultiEdit or NotebookEdit under one
+# unless the session's card routes a buildable unit; a shell write passes the gate, and the
+# routed-commits leg (`routed commits name a specced unit`) grades the commit that carries it. An
+# entry may not be absolute, climb through `..`, cover MEMORY_ROOT or sit under it, or name nothing
+# tracked. BLANK OR ABSENT LEAVES THE GATE UNARMED, which refuses every write and which check-wiring
+# reports. Neither key ships assigned here: `adopt-memory-tree.sh --scaffold` and `--arm-routing` append both, the
+# candidate derived from your tracked top-level directories, for you to confirm before committing.
+#   ROUTED_PATHS="src/ lib/"
+# ROUTED_COMMIT_CUTOFF — an ISO date (YYYY-MM-DD). `routed_commits.py`, the `routed commits name a
+# specced unit` leg, grades every non-merge commit committed on or after it that touches a path under
+# ROUTED_PATHS: one naming no unit id, in its subject or a `Pass:` trailer, whose spec existed at the
+# commit's first parent reds. BLANK OR ABSENT REFUSES (exit 2), as does a blank ROUTED_PATHS, so a
+# tree that installs the leg declares both; the adopter scaffolds them. The leg needs full history:
+# a shallow clone refuses, so a CI checkout sets `fetch-depth: 0`.
+#   ROUTED_COMMIT_CUTOFF="2026-10-09"
+# ROUTED_COMMIT_WAIVED — landed commit shas (7 to 40 hex) the leg excuses, whitespace-separated. Read
+# only when it grades the WHOLE history, which the push boundary grades beside the pushed range; the
+# pushed range itself reads none. A listed sha that is not a violation reds as stale.
+#   ROUTED_COMMIT_WAIVED=""

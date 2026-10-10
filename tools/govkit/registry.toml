@@ -43,6 +43,11 @@ default = [
   "memory-recall",
   "run-gates",
   "check-microformats",
+  # TOOL-aRoutedQuill-5 S1: the write gate and the fan-out cap ship with every default install, wired
+  # by settings-merge, and check-wiring reports an install left unwired or unarmed.
+  "agent-cap",
+  "settings-merge",
+  "check-wiring",
 ]
 
 # ---------------------------------------------------------------- entries: kits with a directory

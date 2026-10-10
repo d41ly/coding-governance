@@ -19,6 +19,7 @@ gate or protocol named in section 3 carries the detail.*
 - [contract] A contract two parties share lands first, as one source with generated copies and a parity gate against a live re-derivation; deployables sharing one artifact release together.
 - [derive] Derive over author: status, counts, inventories and indexes are generated or declared and checked both ways, never typed beside what they describe.
 - [one-fact] One fact in one place: a document points at the source that owns a value, or a gate compares the two.
+- [spec] Spec before code: every product-code unit commits its spec first, a micro-spec for a mechanical change and a full design pass for a substantive one.
 - [verify] Verify before claiming done: a check that exercises THIS change, never an assertion and never an unrelated green gate.
 - [gate] A gate never seen red is not a gate: observe its failing case, state what it does not check, and never read a skip, an unmovable probe, an exemption or an empty population as coverage.
 - [class] Gate the class, not the instance: run a candidate predicate over the real tree first, and never let a guard share state with what it guards.
@@ -91,6 +92,7 @@ gate or protocol named in section 3 carries the detail.*
 - `/lexicon` answers what to call a new function, type or command from `.lexicon.conf`, before the name is written.
 - `<prefix>/workflows/tier2-review.js` runs a Tier-2 review as one bounded `Workflow`.
 - The agent-cap hook refuses an unbounded fan-out at the tool call; consolidate the fan-out rather than routing around it.
+- The write gate refuses a product-code write that no specced unit owns; route the unit through `/session-kickoff` first.
 - `/unattended` starts, resumes or closes a run that merges and pushes with no owner turn.
 - `/runlog` answers what an unattended run did, decided or cost, and why it stopped.
 - `<prefix>/push-main.sh` lands and pushes the default branch, and nothing bypasses it.

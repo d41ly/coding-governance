@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-10T23:29:18+03:00 @ dac07b824d45b479718c699c27f7dfbbfea78046
+last-audit: 2026-10-11T00:03:28+03:00 @ fafaa8b4f54b429a666cb2b2652461a4d554c090
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 60bea5e80cb606e752cab3a8876f253e8090637c
+last-body-change: fafaa8b4f54b429a666cb2b2652461a4d554c090
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -49,6 +49,7 @@ lives where each bullet points.
 - A build of more than one pass runs on `memory/guides/BUILD-METHOD.md`; it is in `watch:`, so editing it re-audits this manifest.
 - A build may amend its own roster (BUILD-METHOD M2, M3) and must run delegated disjoint passes in parallel (M6); both invert a session's default.
 - Every session start writes an orientation card; a commit is refused until its READY line is appended, and only from a tree the card names (`tools/hooks/scratch-guard.js`).
+- A card's `## route` lands only when its build, unit specs and brief all resolve; a write under `ROUTED_PATHS` needs a route naming a buildable unit, and a pushed commit there names a specced one (`TOOL-aRoutedQuill-2`, `-3`).
 - The card's READY anchor accepts both the bare and the `- ` list-item spelling (`TOOL-cMendedVintage-16`).
 - Layout: `main` lives in `C:/projects/coding-governance`; every unit's branch rides its own worktree under `.claude/worktrees/<branch-slug>/`, and `git worktree list` is the inventory.
 - Remote `origin`, default branch `main`; a push needs an explicit ask or the authorization `memory/guides/UNATTENDED-PROTOCOL.md` section 1 defines.
@@ -109,13 +110,15 @@ python tools/memory-tree/gotchas.py --for-paths <the tooling row's entrypoints> 
 
 Tier 2 (a spec before building; the spec audit only where the build or its project declares it, M4) for: a change to the governance template's
 rules, the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
-Tier 1 (gates + one focused self-review).
+Tier 1 (a micro-spec, graded by heading title in check 12 from `SPEC_TIER1_CUTOFF` and written by
+`gen_build_index.py --new-spec <ID> --tier 1`, then gates + one focused self-review;
+`TOOL-aRoutedQuill-1`).
 
 ### ID + work-state protocol
 
 `FAMILY-<slug>-<seq>`, families `PLAY`/`KICK`/`TOOL`/`DEPL` (per `.memory-tree.conf`). Slug = YOUR node tag
-(identify the node by machine/user against the AGENTS.md registry, never by path — all four rows pin the
-same primary tree, so the path cannot tell them apart) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. Work state is
+(identify the node by machine/user against the AGENTS.md registry, never by path: all four rows pin
+one primary tree) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. Work state is
 READ from the GENERATED `memory/LIVE.md` + `memory/ledger/<month>.md` (`gen_build_index.py --write`
 re-renders them from build front matter); there is no authored ledger to update. Build folders are
 `memory/builds/<slug>/`; the discipline is the spec header's `streams` value (`STREAMS_CUTOFF` in
@@ -160,10 +163,8 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
 - A gate FIXTURE a node may not host: an IGNORED path is never staged, and a name differing only in
   CASE is the same file. Both give an arm that passes because its fixture was never there. `*.bak`
   is ignored on node `d`, on node `a` at NO scope (2026-09-04): run `git check-ignore -v` on YOURS.
-- The template is under a 48 KiB gate, and the gate also WARNS when the file grows past its
-  recorded high-water. Raising the
-  ceiling is an owner decision, not an edit. Read the current
-  margin FROM `bash tools/check-template-size.sh`, never from prose.
+- The template is under a 48 KiB gate that also WARNS past its recorded high-water. Raising the
+  ceiling is an owner decision, not an edit. Read the margin FROM `bash tools/check-template-size.sh`.
 - A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
   and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
   `TOOL-aPromptedMandate-4`.
@@ -172,8 +173,8 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
   loudly rather than redding — re-run quiet before believing a latency claim.
   `TOOL-aPacedTurnstile-2`.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
-  `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
-  here: checks 5, 9 and 21 all fired only once the folder was staged.
+  `git add` returns a clean exit that proves nothing. Stage first, then run it: checks
+  5, 9 and 21 all fired only once the folder was staged.
 - `gate-guard` is a `Bash|PowerShell` hook from the unattended kit: while this branch's
   run-state record is before `VERIFYING` it DENIES a `GATE_FULL=`/`GATE_SELFTESTS=` bar and any
   `*.test.sh` or self-test runner, naming the record. Not a glitch: feed the hook the payload, or
@@ -204,5 +205,5 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
   `TMPDIR entries <n>` prints the ambient count, which now grows only from older bars or another
   repository's. The measured cost is in the run-gates kit README.
 - A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is
-  RETIRED (`TOOL-dSpentCeiling-1`); the surviving lesson is general — measure with the checker
-  before and after, never estimate, and record every movement beside the number.
+  RETIRED (`TOOL-dSpentCeiling-1`). Lesson: measure with the checker before and after, never
+  estimate, and record every movement beside the number.

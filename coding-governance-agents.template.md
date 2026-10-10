@@ -18,6 +18,7 @@ gate or protocol named in section 3 carries the detail.*
 - [contract] A contract two parties share lands first, as one source with generated copies and a parity gate against a live re-derivation; deployables sharing one artifact release together.
 - [derive] Derive over author: status, counts, inventories and indexes are generated or declared and checked both ways, never typed beside what they describe.
 - [one-fact] One fact in one place: a document points at the source that owns a value, or a gate compares the two.
+- [spec] Spec before code: every product-code unit commits its spec first, a micro-spec for a mechanical change and a full design pass for a substantive one.
 - [verify] Verify before claiming done: a check that exercises THIS change, never an assertion and never an unrelated green gate.
 - [gate] A gate never seen red is not a gate: observe its failing case, state what it does not check, and never read a skip, an unmovable probe, an exemption or an empty population as coverage.
 - [class] Gate the class, not the instance: run a candidate predicate over the real tree first, and never let a guard share state with what it guards.
@@ -94,6 +95,7 @@ gate or protocol named in section 3 carries the detail.*
 <!-- /kit:review-harness -->
 <!-- kit:agent-cap -->
 - The agent-cap hook refuses an unbounded fan-out at the tool call; consolidate the fan-out rather than routing around it.
+- The write gate refuses a product-code write that no specced unit owns; route the unit through `/session-kickoff` first.
 <!-- /kit:agent-cap -->
 <!-- kit:unattended -->
 - `/unattended` starts, resumes or closes a run that merges and pushes with no owner turn.

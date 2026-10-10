@@ -1,12 +1,17 @@
 # TOOL-aRoutedQuill-2 — scratch-guard refuses a product write no buildable unit on the card owns
 
-**Status:** SPECCED · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3 · ratified 2026-10-09
+**Status:** CLOSED · rev-7 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 3 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aRoutedQuill-2-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aRoutedQuill-2-1-acceptance-ledger.md) | journal | — |
+| [2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md](../build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md) | research | TOOL-aRoutedQuill-4 |
+| [2026-10-10-build-KICK-aRoutedQuill-1-runlog-f0cdcc91.md](../build/2026-10-10-build-KICK-aRoutedQuill-1-runlog-f0cdcc91.md) | journal | KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-9 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12 |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
+| [2026-10-09-prompt-TOOL-aRoutedQuill-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-2-build-brief.md) | journal | — |
+| [2026-10-10-review-TOOL-aRoutedQuill-1-closing-diff-round1.md](../reviews/2026-10-10-review-TOOL-aRoutedQuill-1-closing-diff-round1.md) | diff-review | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-7 |
 
 <!-- /gen:spec-records -->
 
@@ -142,6 +147,9 @@ Read at `6473ae38` on 2026-10-09.
 ROUTED_PATHS="tools/ skills/ coding-governance-agents.template.md WIRE-INTO-PROJECT.md"
 ```
 
+Step 3 compares the two common dirs after `realpath`, so an 8.3 spelling and git's long one are one
+directory. The `<build slug>` of S3 is the route's `- build:` value; a route with none builds nothing.
+
 A file is a PRODUCT PATH when its path relative to the target's toplevel, in comparable form, equals
 a file entry or sits under a directory entry by `checkUnderRoot`. The route section is
 `KICK-aRoutedQuill-1`'s; this unit reads it and nothing else on the card:
@@ -204,6 +212,10 @@ memory at `6473ae38` over gov's `.claude/settings.json`, the fragment lands in i
 | `extractRouteUnits` | function | `js.function`; answered OK |
 | `readConfKey` | function | `js.function`; answered OK |
 | `renderRouteDeny` | function | `js.function`; answered OK |
+| `checkUnarmed` | function, S6's predicate | `js.function`; answered OK (rev-7) |
+| `buildNativePath` | function, the MSYS drive fold for the walk | `js.function`; answered OK (rev-7) |
+| `resolveComparableCommon` | function, the common dir 8.3-expanded | `js.function`; answered OK (rev-7) |
+| `run_write`, `write_spec`, `write_route_card`, `write_conf`, `read_conf`, `check_stderr` | self-test helpers | `sh.function`; answered OK (rev-7) |
 | `WRITE_TOOLS` | array constant | none: no constant cell is declared in `.lexicon.conf` |
 | `BUILDABLE_STATUS` | object constant, tier to admitting tokens | none, as above |
 | `ROUTE_CONF` | string constant, `.memory-tree.conf` | none, as above |
@@ -217,13 +229,15 @@ One commit carries the hook, the widened fragment, gov's re-merged `.claude/sett
 at the next session (`memory/gotchas/settings-edit-takes-effect-mid-session.md`, measured
 2026-08-10), so enforcement begins inside the session that lands this commit. That session, and
 every later one, needs a route on its card before its next product write, this build's own later
-units included. No kit version moves here: the hooks
+units included. `.memory-tree.conf` is on the kickoff manifest's `watch:` line, so that arming
+commit also re-stamps `last-audit` in `memory/guides/SESSION-KICKOFF.md` with a delta line in its
+commit message. No kit version moves here: the hooks
 kit bumps once, after the build's last unit touching it, and until then `govkit.py epoch` reports
 the move as owed at the lander.
 
 ### Files touched (estimate)
 
-`tools/hooks/scratch-guard.js` · `tools/hooks/scratch-guard.test.sh` · `tools/hooks/scratch-guard.fragment.json` · `tools/hooks/agent-cap.js` · `tools/hooks/README.md` · `.claude/settings.json` · `.memory-tree.conf` · `memory/map/features/agent-cap.md` · `memory/map/generated/symbols.json`
+`tools/hooks/scratch-guard.js` · `tools/hooks/scratch-guard.test.sh` · `tools/hooks/scratch-guard.fragment.json` · `tools/hooks/agent-cap.js` · `tools/hooks/README.md` · `.claude/settings.json` · `.memory-tree.conf` · `memory/guides/SESSION-KICKOFF.md` · `memory/map/features/agent-cap.md` · `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -334,7 +348,7 @@ the move as owed at the lander.
 
 ## 7. Gates
 
-`scratch-guard self-test` · `agent-cap self-test` · `hook destinations self-test` · `review-join self-test` · `verifier fan-out self-test` · `check-wiring self-test` · `lexicon naming predicates` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `straggler-guard arms` · `transition-audit arms` · `settings-merge selftest` · `hook destinations (every declared hook path ships)` · `install-prefix (shipped surface)` · `codebase-map coverage + freshness` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`scratch-guard self-test` · `agent-cap self-test` · `hook destinations self-test` · `review-join self-test` · `verifier fan-out self-test` · `check-wiring self-test` · `lexicon naming predicates` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `straggler-guard arms` · `transition-audit arms` · `settings-merge selftest` · `hook destinations (every declared hook path ships)` · `install-prefix (shipped surface)` · `codebase-map coverage + freshness` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `kickoff-manifest ratchet`
 
 New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC10 · the base hook, which exits 0 for every Edit, Write, MultiEdit and NotebookEdit payload and has no readConfKey · FLOOR_ASSERTIONS
 
@@ -366,6 +380,9 @@ AC8 and AC9 are direct observations of this repository after the rewire and add 
   common dir, rejected because one session's route would admit another session's subagent.
   Recommendation: run the probe before the build pass, expecting yes; on a no, take (a) where the
   environment carries the id, else (b).
+  RESOLVED (agent, 2026-10-09, delegated): yes. Every `agent_id` line, for an `Agent` subagent and a
+  `Workflow` agent alike, carried the main loop's `session_id` byte-equal; the card keyed by the
+  payload's `session_id` is the parent's, and no option is taken. Evidence: `memory/builds/aRoutedQuill/build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md`.
 - **F2 — On a product path, does an absent or replay-written card refuse, unlike the commit deny?**
   `checkOriented` admits both, because during aReplayedCard's own landing the remedy was out of
   reach (`memory/builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-1.md:228-232`).
@@ -411,6 +428,12 @@ AC8 and AC9 are direct observations of this repository after the rewire and add 
   card), F3 (a) and F4 (b): a Tier-1 spec admits at SPECCED only when `SPEC_TIER1_CUTOFF` graded it.
 - rev-4 · 2026-10-09 · §4 · Rollout corrected: hooks are re-read on the next tool call, per the
   gotcha catalogue's measurement, so enforcement starts inside the landing session, not after it.
+- rev-5 · 2026-10-09 · §4 · §7 · the M2 cross-read of 2026-10-09 found Rollout's arming commit
+  stages `.memory-tree.conf`, which the kickoff manifest watches, with no manifest re-stamp; Rollout
+  now re-stamps `last-audit` with a delta line, Files touched gains
+  `memory/guides/SESSION-KICKOFF.md` and Gates gains `kickoff-manifest ratchet`.
+- rev-6 · 2026-10-09 · §8 F1 · resolved by the stated probe, run by the unattended run before step 3; the record is `memory/builds/aRoutedQuill/build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md`.
+- rev-7 · 2026-10-09 · §4 · the build pass: the Inventory gains three hook helpers and the self-test's helpers; the common-dir compare in step 3 runs on the realpath, because a linked worktree's `gitdir:` carries git's long spelling while `CLAUDE_PROJECT_DIR` may carry the 8.3 one; BUILDABLE also needs the route's `- build:` line, the slug S3 names; and `run_card`'s stderr grading moved into `check_stderr`, shared with `run_write`.
 
 ## 10. Reuse audit
 

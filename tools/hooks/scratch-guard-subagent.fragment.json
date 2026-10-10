@@ -1,0 +1,7 @@
+{
+  "name": "scratch-guard-subagent",
+  "event": "SubagentStart",
+  "matcher": "*",
+  "marker": "scratch-guard.js",
+  "hook_path": "{kit}/hooks/scratch-guard.js"
+}

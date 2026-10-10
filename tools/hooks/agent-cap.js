@@ -1859,14 +1859,11 @@ function extractBuildSlug(p) {
 // the value ONLY behind whitespace — a `#` glued to a bare word is part of the word to the shell
 // (`2026-09-21#c` is the driver's fail 54), and rev-1 stopped the word there and admitted the date
 // (closing review of units 7/8, R8). null when no assignment exists. The value is returned RAW; the
-// caller decides whether it is a date, so a blank and a non-date are both visible to it.
+// caller decides whether it is a date, so a blank and a non-date are both visible to it. The grammar
+// is the sibling hook's `readConfKey`, the one conf reader in this home (TOOL-aRoutedQuill-2 S9).
 function readSpecAuditDefault(bytes) {
-  let v = null
-  for (const line of String(bytes || '').split(/\r?\n/)) {
-    const m = /^\s*(?:export\s+)?SPEC_AUDIT_DEFAULT=(?:"([^"]*)"|'([^']*)'|(\S*))(?:\s+#.*)?\s*$/.exec(line)
-    if (m) v = m[1] !== undefined ? m[1] : m[2] !== undefined ? m[2] : m[3]
-  }
-  return v
+  const { readConfKey } = require(require('path').join(__dirname, 'scratch-guard.js'))
+  return readConfKey(bytes, 'SPEC_AUDIT_DEFAULT')
 }
 
 // The run-state phases past which no pre-code audit is owed: a record in one is no live run here.

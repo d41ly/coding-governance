@@ -92,6 +92,8 @@ READINESS_ROWS=""
 READINESS_ROWS_CUTOFF="" # date; Tier-2 specs dated >= this must carry every declared §5 row (check 12); blank = never required
 # The TENTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-11).
 BASE_RESOLVE_CUTOFF=""  # date; a LIVE spec dated >= this must have its `base` sha resolve to a real commit (check 12); blank = never required
+# The ELEVENTH cutoff, same semantics and preset for the same adopter argument (TOOL-aRoutedQuill-1).
+SPEC_TIER1_CUTOFF=""    # date; Tier-1 specs dated >= this must carry the eight micro-spec sections by title (check 12); blank = never required
 # Check 6 caps an index file BY CLASS, and the split is between PROSE and ROWS (see check 6 for the
 # reasoning, which is a recorded decision). These are the DEFAULTS; a project overrides any of them
 # in .memory-tree.conf, because the value that suits one corpus is not the value that suits another
@@ -1423,7 +1425,9 @@ done
 # the canonical nine ## sections (exact, in order) · no empty section bodies (write "N/A — <why>") ·
 # header rev logged in §9 · terminal Status (CLOSED/WONTDO) needs a resolved §8. Both tiers: no
 # skeleton placeholders; WONTDO needs a successor/reason in the header tail. Tier-1 skips the
-# section canon ("ceremony is conditional"). Pre-cutoff specs are grandfathered by FILENAME date;
+# section canon ("ceremony is conditional"); from SPEC_TIER1_CUTOFF it takes the micro-spec profile
+# instead (TOOL-aRoutedQuill-1): eight required sections FOUND BY TITLE, in canonical order, none
+# empty, numbering free, Production-readiness checklist and Reuse audit optional. Pre-cutoff specs are grandfathered by FILENAME date;
 # legacy-named files never match the glob. NOTE (shared idiom with checks 6/7/8): reads WORKTREE
 # content in --staged mode, not the staged blob — CI's full run is the tree-wide truth.
 # FORK_ITEM_CUTOFF (TOOL-dDerivedDocket-31) grades §8 PER F-ITEM from its date and makes a Tier-2 §8
@@ -1480,7 +1484,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v icut="$FORK_ITEM_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v rrows="$READINESS_ROWS" -v bcut="$BASE_RESOLVE_CUTOFF" -v rcut="$READINESS_ROWS_CUTOFF" -v stg="$STAGED" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v icut="$FORK_ITEM_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v rrows="$READINESS_ROWS" -v bcut="$BASE_RESOLVE_CUTOFF" -v rcut="$READINESS_ROWS_CUTOFF" -v t1cut="$SPEC_TIER1_CUTOFF" -v stg="$STAGED" '
   # ---- The §8 grammar, ONCE for this program (TOOL-dDerivedDocket-31): the documented mark, the
   # ---- F-item opener, and a span resolved by its own mark. Removing code spans and double-quoted
   # ---- spans only DELETES text, so a stray delimiter pairing with a later one can hide a real mark,
@@ -2005,6 +2009,46 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
         print f " (terminal Status with unresolved §8 Open questions)"
     }
 
+    # ---- TOOL-aRoutedQuill-1: THE TIER-1 MICRO-SPEC CANON, graded by heading TEXT, never by number.
+    # ---- Above the Tier-1 cut, since this arm is the only one here that grades Tier-1 alone, and
+    # ---- guarded by t1cut alone so its population is never an intersection with a sibling key. It
+    # ---- reads one file and joins nothing, so it runs under --staged as the other shape arms do.
+    # ---- The titles come from canon10 with each line stripped of its numbered prefix, so they keep
+    # ---- one spelling in this file; Production-readiness checklist and Reuse audit are optional.
+    # ---- Four classes: a heading not shaped as a numbered title, or naming no canonical title, is
+    # ---- NOT CANONICAL; a canonical title whose canon index does not strictly rise is OUT OF ORDER,
+    # ---- which catches a duplicate too; a required title never seen is MISSING; a section with no
+    # ---- non-blank line before the next heading is EMPTY, the empty-body walk test below.
+    # ---- What it does NOT check: what a section SAYS. A hollow one passes, as on Tier-2.
+    if (t1cut != "" && fdate != "" && fdate >= t1cut && hdr ~ /Tier-1/) {
+      t1n = split(canon10, t1ln, "\n")
+      for (i = 1; i <= t1n; i++) { t1t = t1ln[i]; sub(/^## [0-9]+[.] /, "", t1t); t1title[i] = t1t; t1seen[i] = 0 }
+      t1nc = ""; t1oo = ""; t1em = ""; t1mi = ""; t1last = 0; t1s = ""; t1cnt = 0
+      for (i = 1; i <= n + 1; i++) {
+        L = (i <= n) ? body[i] : "## "
+        if (L !~ /^## /) { if (t1s != "" && L ~ /[^ \t]/) t1cnt++; continue }
+        if (t1s != "" && t1cnt == 0) t1em = t1em (t1em == "" ? "" : ", ") t1s
+        if (i > n) break
+        t1s = L; sub(/^## [0-9]+[.] /, "", t1s); sub(/[ \t]+$/, "", t1s); t1cnt = 0
+        t1k = 0
+        if (L ~ /^## [0-9]+[.] /) for (j = 1; j <= t1n; j++) if (t1title[j] == t1s) { t1k = j; break }
+        if (!t1k) { t1s = L; t1nc = t1nc (t1nc == "" ? "" : ", ") L; continue }
+        if (t1k <= t1last) t1oo = t1oo (t1oo == "" ? "" : ", ") t1s
+        else t1last = t1k
+        t1seen[t1k] = 1
+      }
+      for (j = 1; j <= t1n; j++)
+        if (!t1seen[j] && t1title[j] != "Production-readiness checklist" && t1title[j] != "Reuse audit")
+          t1mi = t1mi (t1mi == "" ? "" : ", ") t1title[j]
+      t1msg = ""
+      if (t1mi != "") t1msg = "missing: " t1mi
+      if (t1oo != "") t1msg = t1msg (t1msg == "" ? "" : "; ") "out of order: " t1oo
+      if (t1em != "") t1msg = t1msg (t1msg == "" ? "" : "; ") "empty: " t1em
+      if (t1nc != "") t1msg = t1msg (t1msg == "" ? "" : "; ") "not canonical: " t1nc
+      if (t1msg != "")
+        print f " (Tier-1 micro-spec sections, required at/after SPEC_TIER1_CUTOFF " t1cut "; found by heading text, numbering free): " t1msg
+    }
+
     if (hdr ~ /Tier-1/) next
     # ---- TOOL-dDerivedDocket-31 S4: THE F-ITEM SHAPE, on a Tier-2 spec at ANY status, because a live
     # ---- spec that never opens an F-item would otherwise escape per-item grading until the day it
@@ -2466,6 +2510,13 @@ if [ "$STAGED" = 0 ] && [ -n "$FORK_ITEM_CUTOFF" ]; then
   _fi_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$FORK_ITEM_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_fi_n:-0}" -gt 0 ] || echo "memory-hygiene: the §8 F-item arms graded NO spec — FORK_ITEM_CUTOFF is $FORK_ITEM_CUTOFF and every tracked spec predates it. That is the intended state at adoption; their coverage is the self-test fixtures and the marker-contract table, not this corpus."
+fi
+# Same notice, same footing, for the Tier-1 micro-spec arm (TOOL-aRoutedQuill-1). Counted by date
+# alone, so Tier-2 specs inflate it: the safe direction, since it can only stay silent too OFTEN.
+if [ "$STAGED" = 0 ] && [ -n "$SPEC_TIER1_CUTOFF" ]; then
+  _t1_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SPEC_TIER1_CUTOFF" \
+    '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
+  [ "${_t1_n:-0}" -gt 0 ] || echo "memory-hygiene: the Tier-1 micro-spec arm graded NO spec — SPEC_TIER1_CUTOFF is $SPEC_TIER1_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
 fi
 # Same notice, same footing, for check 25 (TOOL-dGatedProse-1), keyed on the LIVE count rather than on
 # a cutoff: its population empties by specs CLOSING, which nobody configures and so nobody watches.
