@@ -1430,15 +1430,20 @@ check_ssh_keepalive() {
 # --- Check P: the write gate is ARMED — ROUTED_PATHS and ROUTED_COMMIT_CUTOFF (TOOL-aRoutedQuill-5 S7)
 # A wired gate reads its product paths from `.memory-tree.conf`, and an UNARMED conf refuses every
 # write: a gate that refuses everything looks, from the settings file, exactly like one that works.
-# So this grades the conf by the rules the gate and the ownership leg grade it by: both keys
-# assigned and non-blank, the cutoff an ISO date, and every entry repo-relative, not climbing
-# through `..`, not covering MEMORY_ROOT, and naming something tracked. The FIRST failing rule is
-# named, as the leg names it. With no conf and no wired gate there is nothing to arm, and it skips.
-# Read by sourcing the conf in a subshell, as the straggler arm reads BACKLOG_MODE.
+# THE GATE HALF IS THE GATE'S OWN VERDICT (TOOL-aRoutedQuill-11). One `node` call requires the
+# scratch-guard.js the settings dispatch, reads every key through its `readConfKey` and asks its
+# `checkUnarmed`, so this arm and the gate cannot give two answers about MEMORY_ROOT, a blank
+# ROUTED_PATHS, or an absolute, `..`-climbing or MEMORY_ROOT-covering entry. Its reason prints
+# verbatim. Only on an ARMED verdict does the arm go on to the ownership leg's two extra rules: the
+# cutoff an ISO date, and every entry naming something tracked. That leg reads MEMORY_ROOT with a
+# default of `memory` the gate does not apply; the gate is the stricter reader, so it speaks first.
+# A verdict that cannot be read — no node, no gate file, a gate copy exporting no checkUnarmed —
+# is a skip naming its cause, never a shell re-reading of the keys (spec F1). Nothing here sources
+# the conf. With no conf and no wired gate there is nothing to arm, and it skips.
 # WHAT IT DOES NOT CHECK: that the entries are the RIGHT product paths — a candidate the adopter
 # confirmed is a decision, not a fact this arm can measure — or that the leg is wired at all.
 check_routed() {
-  local gated="" conf vals rp cut mem e c bare why="" arm
+  local gated="" conf out rp cut e c why="" arm frag hookjs reason
   [ -n "$(matchers_of scratch-guard.js 2>/dev/null)" ] && gated=yes
   arm=$(first_of "$(resolve_receipt_path memory-tree adopt-memory-tree.sh)" "${KIT_REL:+$KIT_REL/}memory-tree/adopt-memory-tree.sh")
   arm="bash ${arm:-<memory-tree kit>/adopt-memory-tree.sh} --arm-routing"
@@ -1452,12 +1457,45 @@ check_routed() {
     fi
     return
   fi
-  vals=$( . "./$conf" >/dev/null 2>&1; printf '%s\037%s\037%s' "${ROUTED_PATHS:-}" "${ROUTED_COMMIT_CUTOFF:-}" "${MEMORY_ROOT:-memory}" )
-  IFS=$'\037' read -r rp cut mem <<< "${vals//$'\n'/ }"
-  rp=${rp%$'\r'}; cut=${cut%$'\r'}; mem=${mem%$'\r'}; mem=${mem#./}; mem=${mem%/}
-  if [ -z "${rp//[[:space:]]/}" ]; then
-    why="ROUTED_PATHS is blank or absent"
-  elif [ -z "$cut" ]; then
+  # The gate file the settings dispatch, resolved as the scratch arm resolves it.
+  frag=$(first_of "$(resolve_receipt_path hooks scratch-guard.fragment.json)" "$(resolve_kit_file hooks scratch-guard.fragment.json)")
+  if ! command -v node >/dev/null 2>&1; then
+    reason="no node on PATH"
+  elif [ -z "$frag" ]; then
+    reason="no scratch-guard.fragment.json resolves here"
+  elif ! hookjs=$(resolve_fragment_hook "$frag" 2>&1); then
+    reason=${hookjs##*check-wiring: }
+  elif [ ! -f "$hookjs" ]; then
+    reason="the gate file $hookjs is absent"
+  else
+    # A fixed literal; both inputs ride argv, never interpolated. Any failure prints `ERR <first line>`.
+    out=$(node -e '
+try {
+  const g = require(require("path").resolve(process.argv[1]))
+  if (typeof g.checkUnarmed !== "function" || typeof g.readConfKey !== "function") throw new Error(process.argv[1] + " exports no checkUnarmed or readConfKey")
+  const b = require("fs").readFileSync(process.argv[2], "utf8")
+  const k = (n) => g.readConfKey(b, n) || ""
+  process.stdout.write([g.checkUnarmed(g.readConfKey(b, "MEMORY_ROOT"), g.readConfKey(b, "ROUTED_PATHS")), k("ROUTED_PATHS"), k("ROUTED_COMMIT_CUTOFF")].join("\x1f"))
+} catch (e) { process.stdout.write("ERR " + String(e && e.message || e).split("\n")[0]); process.exit(3) }
+' "$hookjs" "$conf" 2>/dev/null)
+    if [ "${out#*$'\037'}" = "$out" ]; then
+      reason=${out#ERR }; reason=${reason:-node exited with no output}
+    else
+      reason=""
+    fi
+  fi
+  if [ -n "$reason" ]; then
+    echo "skip     routed    — $reason, so the gate's own armed verdict cannot be read here"
+    return
+  fi
+  IFS=$'\037' read -r why rp cut <<< "$out"
+  if [ -n "$why" ]; then
+    echo "UNWIRED  routed    — $why in $conf, so the write gate is UNARMED and refuses every Edit, Write, MultiEdit or NotebookEdit here except to that file. Fix: edit the key there, or delete both keys and run $arm for a derived candidate"
+    unwired=$((unwired+1))
+    return
+  fi
+  # Armed by the gate: the ownership leg's own two rules, over the values readConfKey returned.
+  if [ -z "$cut" ]; then
     why="ROUTED_COMMIT_CUTOFF is blank or absent"
   elif ! printf '%s' "$cut" | grep -qxE '[0-9]{4}-[0-9]{2}-[0-9]{2}'; then
     why="ROUTED_COMMIT_CUTOFF '$cut' is not an ISO date (YYYY-MM-DD)"
@@ -1468,16 +1506,6 @@ check_routed() {
     for e in "${ents[@]}"; do
       c=${e//\\//}
       while [ "${c#./}" != "$c" ]; do c=${c#./}; done
-      bare=${c%/}
-      case "$c" in
-        /*|[A-Za-z]:*|~*) why="ROUTED_PATHS entry $e is absolute"; break ;;
-      esac
-      case "/$c/" in
-        */../*) why="ROUTED_PATHS entry $e climbs through .."; break ;;
-      esac
-      if [ -z "$bare" ] || [ "$bare" = . ] || [ "$mem" = "$bare" ] || [ "${mem#"$bare"/}" != "$mem" ]; then
-        why="ROUTED_PATHS entry $e covers MEMORY_ROOT ($mem)"; break
-      fi
       if [ "${c%/}" != "$c" ]; then
         [ -n "$(git --literal-pathspecs ls-files -- "$c" 2>/dev/null | head -n1)" ] && continue
       else
@@ -1487,7 +1515,7 @@ check_routed() {
     done
   fi
   if [ -n "$why" ]; then
-    echo "UNWIRED  routed    — $why in $conf, so the write gate is UNARMED and the ownership leg refuses. Fix: edit the key there, or delete both keys and run $arm for a derived candidate"
+    echo "UNWIRED  routed    — $why in $conf, so the ownership leg refuses. Fix: edit the key there, or delete both keys and run $arm for a derived candidate"
     unwired=$((unwired+1))
     return
   fi

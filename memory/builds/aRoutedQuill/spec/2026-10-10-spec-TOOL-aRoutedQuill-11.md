@@ -1,11 +1,12 @@
 # TOOL-aRoutedQuill-11 — check-wiring takes the write gate's armed verdict from the gate itself
 
-**Status:** INPROGRESS · rev-2 · 2026-10-10 · node a · Tier-2 · base 5a836bf0 · streams tooling · order 6 · ratified 2026-10-10
+**Status:** CLOSED · rev-3 · 2026-10-10 · node a · Tier-2 · base 5a836bf0 · streams tooling · order 6 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-10-build-TOOL-aRoutedQuill-11-1-acceptance-ledger.md](../build/2026-10-10-build-TOOL-aRoutedQuill-11-1-acceptance-ledger.md) | journal | — |
 | [2026-10-10-prompt-TOOL-aRoutedQuill-11-build-brief.md](../prompts/2026-10-10-prompt-TOOL-aRoutedQuill-11-build-brief.md) | journal | — |
 | [2026-10-10-prompt-TOOL-aRoutedQuill-11-spec-brief.md](../prompts/2026-10-10-prompt-TOOL-aRoutedQuill-11-spec-brief.md) | journal | — |
 
@@ -91,7 +92,10 @@ node -e '<require path.resolve(argv[1]); read argv[2] as utf8; print reason \037
 
 `null` from `readConfKey` prints as empty. A value cannot hold `\037` or a newline, because
 `readConfKey` reads one line per assignment. A non-zero exit, or output with no `\037`, is the S5
-skip and names the cause from stderr's first line.
+skip. The program catches its own failure and prints `ERR <the error's first line>` on stdout,
+which names the cause; stderr is discarded, so a runtime warning there cannot leak into the
+verdict fields. Before the call, `command -v node`, the fragment and the gate file's presence are
+each tested, so those three causes are named without a `node` start.
 
 Then, in order:
 
@@ -218,6 +222,7 @@ New arm: tools/check-wiring.test.sh · covers AC1 AC2 · a conf with no MEMORY_R
 - rev-1 · 2026-10-10 · initial draft, from the spec brief and H2 and M2 of the round-1 closing
   review, with the skeptic's corrected fix for finding 16.
 - rev-2 · 2026-10-10 · §4 · `order 9` became `order 6`: the dispatch order gate counts the carried-forward TOOL-aRoutedQuill-6 (order 6, DEFERRED) as an unfinished earlier step and refused this unit's dispatch at order 9; the main loop still builds 9, 10, 11 and 12 one after another.
+- rev-3 · 2026-10-10 · §4 The one reader · the S5 cause comes from the program's own `ERR` line on stdout, not from stderr's first line, and no node, no fragment and an absent gate file are tested before the call; found while building, because a stderr warning would otherwise share the capture with the verdict fields.
 
 ## 10. Reuse audit
 

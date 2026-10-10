@@ -1112,4 +1112,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP }
+module.exports = { checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP }

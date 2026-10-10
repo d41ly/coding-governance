@@ -94,3 +94,7 @@ base: 5a836bf0fc940029136b4b3fd57a87f35ff40f26
 2026-10-10T03:11:54Z dispatch · item 620ab2f8 TOOL-aRoutedQuill-10 · reason tools/memory-tree/routed_commits.py tools/memory-tree/README.md tools/memory-tree/.memory-tree.conf.example .memory-tree.conf memory/map/features/memory-tree-hygiene.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/CARDS.md memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/aRoutedQuill/spec/2026-10-10-spec-TOOL-aRoutedQuill-10.md memory/builds/aRoutedQuill/build/2026-10-10-build-TOOL-aRoutedQuill-10-1-acceptance-ledger.md memory/builds/aRoutedQuill/README.md memory/LIVE.md memory/ledger/2026-10.md
 
 2026-10-10T03:11:57Z brief · item TOOL-aRoutedQuill-10 · reason 8aedd347cb6c memory/builds/aRoutedQuill/prompts/2026-10-10-prompt-TOOL-aRoutedQuill-10-build-brief.md
+
+2026-10-10T03:20:55Z brief · item TOOL-aRoutedQuill-11 · reason d176e1b9794f memory/builds/aRoutedQuill/prompts/2026-10-10-prompt-TOOL-aRoutedQuill-11-build-brief.md
+
+2026-10-10T03:21:49Z dispatch · item 7bd1cb3b TOOL-aRoutedQuill-11 · reason tools/check-wiring.sh tools/check-wiring.test.sh tools/hooks/scratch-guard.js memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/CARDS.md memory/map/generated/symbols.json memory/builds/aRoutedQuill/spec/2026-10-10-spec-TOOL-aRoutedQuill-11.md memory/builds/aRoutedQuill/build/2026-10-10-build-TOOL-aRoutedQuill-11-1-acceptance-ledger.md memory/builds/aRoutedQuill/README.md memory/LIVE.md memory/ledger/2026-10.md

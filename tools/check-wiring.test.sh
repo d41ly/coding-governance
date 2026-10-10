@@ -400,7 +400,10 @@ JSON
   # TOOL-aRoutedQuill-5: a WIRED gate is graded for its arming and for the machine skill as well, so
   # the fixture arms it — `.githooks/` is the one tracked directory here — and hands HOME a skill
   # install, which keeps this arm's exit code about the scratch arm alone.
-  printf 'ROUTED_PATHS=".githooks/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' > .memory-tree.conf
+  # TOOL-aRoutedQuill-11: the routed arm takes its armed verdict from the gate file itself, so the
+  # stub gives way to the shipped gate; a stub exports no checkUnarmed and the arm would skip.
+  cp "$ROOT_ABS/$HOOKS_DIR/scratch-guard.js" $KIT_REL/${HOOKS}/scratch-guard.js
+  printf 'MEMORY_ROOT=memory\nROUTED_PATHS=".githooks/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' > .memory-tree.conf
   SGHOME=$(mktemp -d); mkdir -p "$SGHOME/.claude/skills/session-kickoff"
   out=$(HOME="$SGHOME" chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       scratch'; } \
@@ -411,7 +414,7 @@ JSON
 
   # TOOL-aRoutedQuill-5 AC7 — an UNARMED conf beside a wired gate. A blank ROUTED_PATHS refuses every
   # product write, and from settings.json that gate looks exactly like one that works.
-  printf 'ROUTED_PATHS=""\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' > .memory-tree.conf
+  printf 'MEMORY_ROOT=memory\nROUTED_PATHS=""\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' > .memory-tree.conf
   out=$(HOME="$SGHOME" chk --check); rc=$?
   ck "RQ5 AC7 a blank ROUTED_PATHS -> UNWIRED routed naming the key, exit 1" \
      "$([ "$rc" = 1 ] && printf '%s' "$out" | grep -q '^UNWIRED  routed    — ROUTED_PATHS is blank' && echo 1 || echo 0)"
@@ -419,9 +422,34 @@ JSON
   ck "RQ5 AC7 ...and --session prints the same line and exits 0" \
      "$([ "$rc" = 0 ] && printf '%s' "$out" | grep -q '^UNWIRED  routed    — ROUTED_PATHS is blank' && echo 1 || echo 0)"
   for _bad in '/abs/' '../up/' 'memory/' 'nothere/'; do
-    printf 'ROUTED_PATHS="%s"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' "$_bad" > .memory-tree.conf
+    printf 'MEMORY_ROOT=memory\nROUTED_PATHS="%s"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' "$_bad" > .memory-tree.conf
     ck "RQ5 AC7 entry $_bad -> UNWIRED routed naming it" \
        "$(HOME="$SGHOME" chk --check | grep -q "^UNWIRED  routed    — ROUTED_PATHS entry $_bad " && echo 1 || echo 0)"
+  done
+
+  # TOOL-aRoutedQuill-11 — the checker and the gate give ONE answer. A conf with no MEMORY_ROOT used
+  # to read `ok routed` because the arm defaulted the key the gate refuses blank.
+  printf 'ROUTED_PATHS=".githooks/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' > .memory-tree.conf
+  out=$(HOME="$SGHOME" chk --check); rc=$?
+  ck "RQ11 AC1 no MEMORY_ROOT -> UNWIRED routed naming the gate's reason, exit 1" \
+     "$([ "$rc" = 1 ] && printf '%s' "$out" | grep -q '^UNWIRED  routed    — MEMORY_ROOT is blank or absent in .memory-tree.conf, so the write gate is UNARMED' && echo 1 || echo 0)"
+  # The parity set: each conf goes to checkUnarmed and to the checker. The last one is armed, the
+  # liveness half: a checker that reds every conf would otherwise agree with every unarmed verdict.
+  _sgjs=$KIT_REL/${HOOKS}/scratch-guard.js
+  for _c in 'ROUTED_PATHS=".githooks/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' \
+            'MEMORY_ROOT=""\nROUTED_PATHS=".githooks/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' \
+            'export MEMORY_ROOT=memory\nROUTED_PATHS="memory/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' \
+            'MEMORY_ROOT=memory\nROUTED_PATHS="/abs/ .githooks/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' \
+            "MEMORY_ROOT='memory'\nROUTED_PATHS='.githooks/'\nROUTED_COMMIT_CUTOFF='2026-10-10'\n"; do
+    printf "$_c" > .memory-tree.conf
+    _gate=$(node -e 'const g=require(require("path").resolve(process.argv[1])),b=require("fs").readFileSync(process.argv[2],"utf8");process.stdout.write(g.checkUnarmed(g.readConfKey(b,"MEMORY_ROOT"),g.readConfKey(b,"ROUTED_PATHS")))' "$_sgjs" .memory-tree.conf 2>&1)
+    _line=$(HOME="$SGHOME" chk --check | grep '^[a-zA-Z]* *routed ')
+    if [ -n "$_gate" ]; then
+      _agree=$(case "$_line" in "UNWIRED  routed    — $_gate in .memory-tree.conf, so the write gate is UNARMED"*) echo 1 ;; *) echo 0 ;; esac)
+    else
+      _agree=$(case "$_line" in "ok       routed "*) echo 1 ;; *) echo 0 ;; esac)
+    fi
+    ck "RQ11 AC2 parity — gate '${_gate:-armed}' and the checker agree ($(printf '%s' "$_c" | head -c 40))" "$_agree"
   done
   rm -f .memory-tree.conf
   out=$(HOME="$SGHOME" chk --check)
