@@ -10902,7 +10902,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 continue
             _ran_gained.add(_res_g)
             _rc_g = subprocess.run(resolve_shell_argv(list(_res_g)), cwd=str(target),
-                                   capture_output=True, text=True).returncode
+                                   capture_output=True, text=True, encoding="utf-8").returncode
             _oc_g = classify_outcome(target, _d_g, _ctx_g, _rc_g)
             print(f"govkit update — default-gained {_ge}: adopter exit {_rc_g}"
                   + (f" — {_oc_g.get('means')}" if _oc_g else ""))
