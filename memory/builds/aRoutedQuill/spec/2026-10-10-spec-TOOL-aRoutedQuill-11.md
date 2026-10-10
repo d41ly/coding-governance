@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-11 — check-wiring takes the write gate's armed verdict from the gate itself
 
-**Status:** SPECCED · rev-2 · 2026-10-10 · node a · Tier-2 · base 5a836bf0 · streams tooling · order 6 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-2 · 2026-10-10 · node a · Tier-2 · base 5a836bf0 · streams tooling · order 6 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
