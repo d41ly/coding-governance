@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aFrugalTurnstile-11-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-11-1-acceptance-ledger.md) | journal | — |
+| [2026-10-10-build-TOOL-aFrugalTurnstile-1-2-measurement.md](../build/2026-10-10-build-TOOL-aFrugalTurnstile-1-2-measurement.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 |
 
 <!-- /gen:spec-records -->
 

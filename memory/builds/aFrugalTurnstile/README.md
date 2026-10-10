@@ -91,7 +91,7 @@ ids TOOL-aFrugalTurnstile-11
 | [TOOL-aFrugalTurnstile-9 — the unattended close runs the boundary's decision where a post-merge bar is declared](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-9.md) | 5 | 2 | CLOSED | rev-4 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 17 bound to this build, across 3 record folder(s).
+Records: 18 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
