@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aFrugalTurnstile-17-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-17-1-acceptance-ledger.md) | journal | — |
+| [2026-10-10-build-DEPL-aFrugalTurnstile-1-runlog-f624a070.md](../build/2026-10-10-build-DEPL-aFrugalTurnstile-1-runlog-f624a070.md) | journal | DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 TOOL-aFrugalTurnstile-11 TOOL-aFrugalTurnstile-12 TOOL-aFrugalTurnstile-13 TOOL-aFrugalTurnstile-14 TOOL-aFrugalTurnstile-15 TOOL-aFrugalTurnstile-16 |
 
 <!-- /gen:spec-records -->
 
