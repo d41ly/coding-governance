@@ -1,12 +1,13 @@
 # TOOL-aFrugalTurnstile-6 — `post-merge.sh` runs the full bar on a landed sha and publishes its verdict as a remote ref
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 4
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
+| [2026-10-09-build-TOOL-aFrugalTurnstile-6-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-6-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
@@ -237,6 +238,7 @@ at writing time, cell `sh.function`. Every one answered OK.
 | `write_bar_green` | the shared D3 record |
 | `write_run_record` | copies the bar's run record into the common dir |
 | `write_post_merge_record` | the local verdict record |
+| `write_refusal` | prints the `REFUSING` line, writes the local record as `REFUSED`, and exits 2 (rev-2) |
 
 Carried inline and not minted: `resolve_remote_sh`, inside the `remote_ladder_sh` markers;
 `derive_self_rel`, inside its markers from `tools/lib/kit-rel.sh`; and `read_policy_key`, the hook's.
@@ -378,6 +380,10 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC1 AC2 AC3 AC4 AC
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft, from design D7 and the spec brief.
+- rev-2 · 2026-10-10 · §4 Inventory: `write_refusal` added. What disagreed: S1 names five exit-2
+  refusals and S3, S4 and the flow add more, each owing the same three acts (the `REFUSING` line,
+  the `REFUSED` record, exit 2), and spelling them inline at every site is the two-answers class.
+  Asked of the lexicon, cell `sh.function`: OK.
 
 ## 10. Reuse audit
 

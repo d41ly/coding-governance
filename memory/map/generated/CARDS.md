@@ -220,8 +220,8 @@ The gate runner, its harnesses, and the adopter that keeps a target's verdict re
 - kits 1: `run-gates`
 - gotcha-classes 14
 - guides 1: `MERGE-BAR.md`
-- globs 21
-- cut 35 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- globs 22
+- cut 36 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## runlog
 

@@ -12,6 +12,10 @@
 # greps the runner) and never executes run-gates.sh. Executing the real runner in place would re-run
 # the whole bar recursively and clobber the live gate-last-summary.txt mid-run, so every case here
 # drives it through GATE_LEGS with its own scratch GIT_DIR.
+#
+# It also carries the post-merge bar's arms (TOOL-aFrugalTurnstile-6 AC1-AC10, between the
+# `post-merge arms` markers near the end): a bare remote and a clone, the kit's `post-merge.sh` run on
+# landed red and green commits, and the remote ref, the two records and the refusals read back.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
@@ -150,7 +154,8 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=116
+FLOOR_ASSERTIONS=136
+# RAISED 116 -> 136 by TOOL-aFrugalTurnstile-6: the post-merge bar's twenty assertions.
 # RAISED 115 -> 116 by TOOL-aFrugalTurnstile-1: the control stamp's `manifest` key.
 # MERGED 112 / 87 -> 115 at the reconcile with origin/main 290d0d2d5: base 84, plus this branch's 28, plus main's 3.
 # RAISED 110 -> 112 by TOOL-aGraftedHelix-7: AC10's two assertions over a reading taken during a memory pause.
@@ -1603,6 +1608,151 @@ printf '%s\n' "$pz_rep" | grep '^# set aside:' | grep -q '[^0-9]1 paused' \
   && ok "AC10 the set-aside line names 1 paused" \
   || { nope "AC10 the set-aside line does not name 1 paused"; printf '%s\n' "$pz_rep" | sed 's/^/      /'; }
 rm -rf "$PZ_T"
+
+# --- THE POST-MERGE BAR (TOOL-aFrugalTurnstile-6 AC1-AC10) -----------------------------------------
+# A bare remote and a clone carrying this kit's runner, its post-merge script and a one-leg manifest
+# whose leg reads `verdict.txt`. c1 is green, c2 red, c3 green, each a child of the one before, all
+# landed. Remotes are named through variables; the turnstile is this suite's own, exported above.
+# >>> post-merge arms
+PM_T=$(mktemp -d); PM_B="$PM_T/b.git"; PM_B2="$PM_T/b2.git"; PM_C="$PM_T/c"; PM_K="${PFX}${KIT}"
+PM_R=up; PM_R2=second; PM_OUT="$PM_T/out"; PM_PROBE="$PM_T/probe"; PM_REF=refs/gov/bar-red
+mkdir -p "$PM_C/$PM_K"
+cp "$ROOT/$PM_K/run-gates.sh" "$ROOT/$PM_K/gate-fingerprint.sh" "$ROOT/$PM_K/gate-profiles.txt" \
+   "$ROOT/$PM_K/lib-attribute.sh" "$ROOT/$PM_K/post-merge.sh" "$PM_C/$PM_K/" \
+  || { echo "evidence-test: cannot copy the kit for the post-merge arms"; exit 2; }
+git init -q --bare -b main "$PM_B" && git init -q --bare -b main "$PM_B2" \
+  || { echo "evidence-test: cannot make the post-merge remotes"; exit 2; }
+# `core.autocrlf false`: the scratch worktree is a fresh CHECKOUT, and a host-wide autocrlf would hand
+# the bar CRLF scripts the fixture never wrote (measured on node a: every bar red on a `\r`).
+( cd "$PM_C" && git init -q -b main . && git config user.email pm@test.invalid && git config user.name pm-test \
+    && git config core.autocrlf false && git remote add "$PM_R" "$PM_B" ) >/dev/null 2>&1 \
+  || { echo "evidence-test: cannot make the post-merge clone"; exit 2; }
+printf '%s\n' '[' '  {"name": "verdict", "argv": ["bash", "-c", "cat verdict.txt; grep -qx green verdict.txt"]}' ']' \
+  > "$PM_C/${PFX}gate-legs.json"
+printf '#!/usr/bin/env bash\n{ env; git rev-parse HEAD; pwd; } > "$PM_PROBE"\n' > "$PM_C/bar.sh"
+pm_commit() { # verdict word · [gate-env text, printf-interpreted] -> prints the new sha, landed on main
+  printf '%s\n' "$1" > "$PM_C/verdict.txt"
+  mkdir -p "$PM_C/.githooks"
+  if [ -n "${2:-}" ]; then printf "$2" > "$PM_C/.githooks/gate-env.sh"; else rm -f "$PM_C/.githooks/gate-env.sh"; fi
+  ( cd "$PM_C" && git add -A && git commit -qm "$1" && git push -q "$PM_R" HEAD:main \
+      && git symbolic-ref "refs/remotes/$PM_R/HEAD" "refs/remotes/$PM_R/main" && git rev-parse HEAD ) 2>/dev/null
+}
+pm_run() { ( cd "$PM_C" && env -u GATE_FULL -u GATE_JOBS -u GATE_PROFILES -u GOV_REMOTE PM_PROBE="$PM_PROBE" ${PM_X:-} \
+               bash "$PM_K/post-merge.sh" "$@" >"$PM_OUT" 2>&1; echo $? ); }
+pm_key() { awk -F'\t' -v k="$2" '$1 == k { print $2; exit }' "$1" 2>/dev/null; }
+pm_red() { git ls-remote "${1:-$PM_B}" "$PM_REF" 2>/dev/null | cut -f1; }
+pm_show() { sed 's/^/      /' "$PM_OUT"; }
+PM_GD="$PM_C/.git"; PM_REC="$PM_GD/gate-post-merge"
+pm_c1=$(pm_commit green); pm_c2=$(pm_commit red); pm_c3=$(pm_commit green)
+[ -n "$pm_c1" ] && [ -n "$pm_c2" ] && [ -n "$pm_c3" ] || { echo "evidence-test: cannot land the post-merge commits"; exit 2; }
+
+# AC1 — a red landing publishes the ref, records RED pushed, and its run record survives the worktree.
+pm_rc=$(pm_run "$pm_c2"); pm_id=$(pm_key "$PM_REC" run_id)
+[ "$pm_rc" = 1 ] && [ "$(pm_red)" = "$pm_c2" ] && [ "$(pm_key "$PM_REC" verdict)" = RED ] && [ "$(pm_key "$PM_REC" published)" = pushed ] \
+  && ok "AC1 a red post-merge exits 1, refs/gov/bar-red names c2, and gate-post-merge reads verdict RED, published pushed" \
+  || { nope "AC1 a red post-merge did not publish (rc=$pm_rc, ref=$(pm_red))"; pm_show; }
+[ -n "$pm_id" ] && grep -rqx red "$PM_GD/gate-run/$pm_id" 2>/dev/null && ! git -C "$PM_C" worktree list | grep -q 'gate-pm\.' \
+  && ok "AC1 gate-run/<run_id>/ in the common dir holds the failing leg's output after the scratch worktree is gone" \
+  || { nope "AC1 the run record went with the worktree, or the worktree survived (id=$pm_id)"; git -C "$PM_C" worktree list | sed 's/^/      /'; }
+
+# AC2 — a green descendant clears it and writes D3's record, by post-merge.
+pm_rc=$(pm_run "$pm_c3"); git ls-remote --exit-code "$PM_B" "$PM_REF" >/dev/null 2>&1; pm_lr=$?
+[ "$pm_rc" = 0 ] && [ "$pm_lr" = 2 ] \
+  && ok "AC2 a green descendant exits 0 and git ls-remote --exit-code of refs/gov/bar-red exits 2" \
+  || { nope "AC2 the green did not clear the ref (rc=$pm_rc, ls-remote rc=$pm_lr)"; pm_show; }
+PM_BG="$PM_GD/gate-bar-green.shared"
+[ "$(cut -f1 "$PM_BG" 2>/dev/null | tr '\n' ' ')" = "sha tree bar bar_paths kind base selftests run_id by stamped " ] \
+  && [ "$(pm_key "$PM_BG" kind)" = full ] && [ "$(pm_key "$PM_BG" by)" = post-merge ] && [ "$(pm_key "$PM_BG" sha)" = "$pm_c3" ] \
+  && [ "$(pm_key "$PM_BG" bar)" = "bash $PM_K/run-gates.sh" ] \
+  && ok "AC2 gate-bar-green.shared carries exactly D3's keys, kind full, by post-merge, and the default bar string" \
+  || { nope "AC2 gate-bar-green.shared differs from D3's grammar"; sed 's/^/      /' "$PM_BG" 2>/dev/null; }
+[ -f "$PM_GD/gate-full-green.shared" ] && ! git -C "$PM_C" worktree list | grep -q 'gate-pm\.' \
+  && ok "AC2 the runner's gate-full-green.shared is present and no gate-pm. worktree is left" \
+  || nope "AC2 gate-full-green.shared is absent, or a gate-pm. worktree survived"
+
+# AC3 — a green that does not descend from the red keeps it.
+git -C "$PM_C" push -q "$PM_R" "$pm_c2:$PM_REF" 2>/dev/null
+pm_rc=$(pm_run "$pm_c1")
+[ "$pm_rc" = 0 ] && [ "$(pm_red)" = "$pm_c2" ] && [ "$(pm_key "$PM_REC" published)" = kept ] \
+  && ok "AC3 a green on c2's parent exits 0, the ref still names c2, and the record reads published kept" \
+  || { nope "AC3 a non-descendant green moved the ref (rc=$pm_rc, ref=$(pm_red))"; pm_show; }
+
+# AC4 — a red never moves the ref backwards.
+git -C "$PM_C" push -q -f "$PM_R" "$pm_c3:$PM_REF" 2>/dev/null
+pm_rc=$(pm_run "$pm_c2")
+[ "$pm_rc" = 1 ] && [ "$(pm_red)" = "$pm_c3" ] && [ "$(pm_key "$PM_REC" published)" = kept ] \
+  && ok "AC4 a red on c2 with the ref at c3 exits 1, keeps c3, and reads published kept" \
+  || { nope "AC4 the ref moved backwards (rc=$pm_rc, ref=$(pm_red))"; pm_show; }
+git -C "$PM_C" push -q "$PM_R" ":$PM_REF" 2>/dev/null
+
+# AC5 — a declared bar runs inside the hold verb, full, in the scratch worktree, with no reuse.
+pm_c4=$(pm_commit green 'GOV_GATE_CMD="bash bar.sh"\n'); rm -f "$PM_PROBE"
+pm_rc=$(PM_X="GATE_REUSE=lineage" pm_run "$pm_c4")
+[ "$pm_rc" = 0 ] && grep -qx 'GATE_FULL=1' "$PM_PROBE" 2>/dev/null && grep -q '^GATE_TURNSTILE_HOLDER=.' "$PM_PROBE" \
+  && ! grep -q '^GATE_REUSE=' "$PM_PROBE" && grep -qx "$pm_c4" "$PM_PROBE" && grep -q 'gate-pm\.[0-9]*$' "$PM_PROBE" \
+  && ok "AC5 the declared bar saw GATE_FULL=1, a holder, no GATE_REUSE, HEAD at the sha and a gate-pm. cwd" \
+  || { nope "AC5 the declared bar ran outside the hold verb, unfull, with reuse, or elsewhere (rc=$pm_rc)"; pm_show; }
+[ "$(pm_key "$PM_BG" bar)" = "bash bar.sh" ] \
+  && ok "AC5 the green record's bar reads bash bar.sh" || nope "AC5 the green record's bar reads '$(pm_key "$PM_BG" bar)'"
+
+# AC6 — a remote that rejects the ref fails the publication, loudly, and the record still lands.
+printf '#!/bin/sh\nwhile read o n r; do case "$r" in refs/gov/*) echo "no gov refs here"; exit 1 ;; esac; done\nexit 0\n' \
+  > "$PM_B/hooks/pre-receive"; chmod +x "$PM_B/hooks/pre-receive"; rm -f "$PM_REC"
+git -C "$PM_B" update-ref -d "$PM_REF" 2>/dev/null
+pm_rc=$(pm_run "$pm_c2")
+[ "$pm_rc" = 1 ] && grep -q 'post-merge: publish FAILED — .*rejected' "$PM_OUT" && [ "$(pm_key "$PM_REC" published)" = failed ] \
+  && [ -n "$(pm_key "$PM_REC" why)" ] \
+  && ok "AC6 a rejected publication exits 1, prints publish FAILED naming the rejection, and records published failed with a why" \
+  || { nope "AC6 a rejected publication was not reported or not recorded (rc=$pm_rc)"; pm_show; }
+rm -f "$PM_B/hooks/pre-receive"
+
+# AC7 — a commit that never landed is refused before any bar.
+( cd "$PM_C" && git checkout -q -b feat && printf 'x\n' > feat.txt && git add feat.txt && git commit -qm feat ) >/dev/null 2>&1
+pm_c5=$(git -C "$PM_C" rev-parse HEAD); git -C "$PM_C" checkout -q main 2>/dev/null; rm -f "$PM_PROBE"
+git -C "$PM_B" update-ref -d "$PM_REF" 2>/dev/null
+pm_rc=$(pm_run "$pm_c5")
+[ "$pm_rc" = 2 ] && grep -q 'post-merge: REFUSING' "$PM_OUT" && [ ! -f "$PM_PROBE" ] && [ -z "$(pm_red)" ] \
+  && ok "AC7 an unlanded commit exits 2 with REFUSING, no bar ran and no ref was pushed" \
+  || { nope "AC7 an unlanded commit was not refused before the bar (rc=$pm_rc)"; pm_show; }
+
+# AC8 — the export form is refused; the hook's accepted forms all read bash bar.sh.
+pm_c6=$(pm_commit green 'export GOV_GATE_CMD="bash bar.sh"\n'); rm -f "$PM_PROBE"
+pm_rc=$(pm_run "$pm_c6")
+[ "$pm_rc" = 2 ] && grep -q 'export GOV_GATE_CMD' "$PM_OUT" && [ ! -f "$PM_PROBE" ] \
+  && ok "AC8 export GOV_GATE_CMD= exits 2 naming the line, and no bar ran" \
+  || { nope "AC8 the export form was not refused (rc=$pm_rc)"; pm_show; }
+for pm_form in "GOV_GATE_CMD='bash bar.sh'\\n" 'GOV_GATE_CMD="bash bar.sh" # the bar\n' 'GOV_GATE_CMD="bash bar.sh"\r\n' \
+               'GOV_GATE_CMD=bash nothing.sh\nGOV_GATE_CMD="bash bar.sh"\n'; do
+  pm_c=$(pm_commit green "$pm_form"); rm -f "$PM_BG"
+  pm_rc=$(pm_run "$pm_c")
+  [ "$pm_rc" = 0 ] && [ "$(pm_key "$PM_BG" bar)" = "bash bar.sh" ] \
+    && ok "AC8 the accepted form $(printf '%q' "$pm_form") resolves to bash bar.sh" \
+    || { nope "AC8 the accepted form $(printf '%q' "$pm_form") resolved to '$(pm_key "$PM_BG" bar)' (rc=$pm_rc)"; pm_show; }
+done
+
+# AC9 — two remotes and a detached HEAD: refused unless named, and --remote publishes there alone.
+git -C "$PM_B" update-ref -d "$PM_REF" 2>/dev/null
+( cd "$PM_C" && git remote add "$PM_R2" "$PM_B2" && git push -q "$PM_R2" main \
+    && git symbolic-ref "refs/remotes/$PM_R2/HEAD" "refs/remotes/$PM_R2/main" && git checkout -q --detach ) >/dev/null 2>&1
+pm_rc=$(pm_run "$pm_c2")
+[ "$pm_rc" = 2 ] && grep -q GOV_REMOTE "$PM_OUT" \
+  && ok "AC9 two remotes, a detached HEAD and no GOV_REMOTE exit 2 naming GOV_REMOTE" \
+  || { nope "AC9 the script chose a remote nobody named (rc=$pm_rc)"; pm_show; }
+pm_rc=$(pm_run "$pm_c2" --remote "$PM_R2")
+[ "$pm_rc" = 1 ] && [ "$(pm_red "$PM_B2")" = "$pm_c2" ] && [ -z "$(pm_red)" ] \
+  && ok "AC9 --remote second publishes the red on the second remote and the first shows none" \
+  || { nope "AC9 --remote did not publish on the named remote alone (rc=$pm_rc)"; pm_show; }
+git -C "$PM_C" checkout -q main 2>/dev/null
+
+# AC10 — no argument, or a sha that names nothing, is a usage refusal and runs no bar.
+pm_rc=$(pm_run)
+[ "$pm_rc" = 2 ] && grep -q 'post-merge: usage:' "$PM_OUT" && ! grep -q 'gate queue' "$PM_OUT" \
+  && ok "AC10 no argument exits 2 with a usage line and no bar" || { nope "AC10 no argument did not refuse (rc=$pm_rc)"; pm_show; }
+pm_rc=$(pm_run 0123456789abcdef0123456789abcdef01234567)
+[ "$pm_rc" = 2 ] && grep -q 'post-merge: usage:' "$PM_OUT" && ! grep -q 'gate queue' "$PM_OUT" \
+  && ok "AC10 a sha naming no commit exits 2 with a usage line and no bar" || { nope "AC10 an unknown sha did not refuse (rc=$pm_rc)"; pm_show; }
+rm -rf "$PM_T"
+# <<< post-merge arms
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "run-gates evidence: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }

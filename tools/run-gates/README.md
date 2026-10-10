@@ -117,6 +117,7 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `run-gates.sh` | the runner. Legs run through a bounded pool, at the width `gate-profiles.txt` declares for the detected hardware; `GATE_JOBS` overrides the width alone |
 | `gate-profiles.txt` | the DECLARED knob table: rows of name, minimum cores, minimum RAM MB, knobs, most-capable-first with a zero-threshold catch-all last. `GATE_PROFILE=<row>` selects one by name and skips detection; `GATE_PROFILES=<path>` reads a different table, and an absent path falls back to the built-in formula — which is the rollback. `GATE_CORES` / `GATE_RAM_MB` replace the detected readings and bypass detection, and `GATE_CGROUP_ROOT` relocates the cgroup files the RAM chain reads |
 | `lib-attribute.sh` | the attribution's two shared halves, SOURCED and never run: the normaliser (`write_normaliser`) and the detached scratch worktree at a base (`add_scratch_worktree` / `remove_scratch_worktree`). The runner sources it only when `GATE_ATTRIBUTE` is set and a leg is red, and `run-selftests.sh` only under `--attribute`, so a copy of either runner without it still runs every other mode |
+| `post-merge.sh` | the post-merge bar: the full bar on a landed sha, run through `--hold` in a scratch worktree, its verdict published as the remote ref `refs/gov/bar-red`; see "The post-merge bar" |
 | `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
 | `profile_bar.py` | the profiling verb: runs the bar, records it as a RUN, and names the regime — floor-bound or packing-bound — so the next fix is chosen from a measurement |
 | `profile_bar.test.sh` | the profiler's own arms |
@@ -255,6 +256,49 @@ common dir, which the orientation card counts (`TOOL-aGraftedHelix-8`): `beacon-
 `ticket-swept`, `scratch-swept`, `turnstile-expired`, `retry-passed` for a serial retry that passed,
 and one `dispatch-paused` per bar the memory pause held; the line format is the header of the
 `health_log_sh` block in `run-gates.sh`.
+
+## The post-merge bar
+
+`post-merge.sh <sha> [--remote <name>]` runs the full bar on a sha that has already LANDED, and
+publishes the verdict where every node reads it (`TOOL-aFrugalTurnstile-6`, design D7). It is the
+after-the-merge half of the scoped-then-full landing path: the push boundary may scope a landing,
+and this script pays the one full bar afterwards, in place of the boundary's.
+
+It makes a detached scratch worktree of `<sha>` at `<common-dir>/gate-pm.<pid>`, reads the bar that
+`<sha>` declares (`GOV_GATE_CMD` in `.githooks/gate-env.sh` as committed there, never sourced, else
+`bash <kit>/run-gates.sh`) and runs it with `GATE_FULL=1` through this kit's own
+`run-gates.sh --hold`, so it queues on the host turnstile like any other bar. Only three keys of that
+file apply: `GOV_GATE_CMD`, `GATE_SELFTESTS` and `GOV_PYTHON`, and a line naming `GOV_GATE_CMD` in
+any other shape, such as `export GOV_GATE_CMD=…`, is a refusal. The caller's `GIT_DIR` family,
+interpreter knobs, arm seams, `GATE_REUSE`, `GATE_RUN_ID` and `GATE_TURNSTILE_HOLDER` are dropped
+and named on one `post-merge: not honoured from the environment:` line. The remote is the lander's
+ladder (`GOV_REMOTE`, which `--remote` sets), and the sha must be an ancestor of that remote's
+default branch as this clone last fetched it.
+
+| exit | means |
+|---|---|
+| 0 | GREEN, and its publication completed |
+| 1 | RED, or any verdict whose publication failed |
+| 2 | REFUSED: a bad argument, an unlanded or unknown sha, no remote or a ladder refusal, a bar the tree at `<sha>` does not track, or a scratch worktree whose HEAD moved under the bar; nothing is published |
+
+**The ref is `refs/gov/bar-red` on the remote.** A RED pushes `<sha>` there when the ref is absent,
+or advances it when it names an ancestor of `<sha>`; any other ref is kept, so a red never moves it
+backwards. A GREEN deletes it when it names `<sha>` or an ancestor; any other ref is kept, so a green
+that does not descend from the red never clears it. Every push is `--force-with-lease` on the sha
+the one bounded `ls-remote` observed, by remote name, from the scratch worktree, and the porcelain
+line decides: a ref that moved in between is a lost race and a failed publication, never an
+overwrite. A ref object missing locally counts as not an ancestor, which keeps the ref.
+
+**Two records, under the git common dir.** `gate-post-merge` holds the last verdict for a reader with
+no network: `sha`, `verdict` (`GREEN`, `RED` or `REFUSED`), `run_id`, `published` (`pushed`,
+`cleared`, `kept`, `none` or `failed`), `why`, `remote` (the name, never a URL) and `stamped`. A
+GREEN also writes `gate-bar-green.shared` in the boundary's record grammar with `kind full` and
+`by post-merge`. When the bar was the runner, its run record is copied to `gate-run/<run id>/` before
+the worktree goes, so a red's leg output survives, and an exit 0 counts green only when that record
+reads `verdict GREEN`.
+
+**Remote CI** can run the same script on the landed sha instead of a local node, with credentials
+that may push a `refs/gov/` ref; which one runs it is the adopter's declaration.
 
 ## `--print-profile` — the resolved profile, for a second reader
 

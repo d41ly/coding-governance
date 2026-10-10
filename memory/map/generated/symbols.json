@@ -3003,6 +3003,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_bar_value",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
       "id": "check_bare_shaped",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -6276,6 +6281,11 @@
       "id": "derive_self_rel",
       "kind": "function",
       "file": "tools/run-gates/adopt-run-gates.test.sh"
+    },
+    {
+      "id": "derive_self_rel",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "derive_self_rel",
@@ -9828,6 +9838,31 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "pm_commit",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "pm_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "pm_red",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "pm_run",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "pm_show",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "pop_guard",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.sh"
@@ -11665,6 +11700,11 @@
     {
       "id": "read_policy_key",
       "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "read_policy_key",
+      "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },
     {
@@ -11791,6 +11831,11 @@
       "id": "read_remote_ci_runs",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "read_remote_red",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "read_rev",
@@ -12566,6 +12611,11 @@
       "id": "remove_procs_ledger",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "remove_red_ref",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "remove_reset_rows",
@@ -14895,6 +14945,11 @@
     {
       "id": "resolve_remote_sh",
       "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "resolve_remote_sh",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
     },
     {
@@ -15490,6 +15545,11 @@
     {
       "id": "run_bar",
       "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "run_bar",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
@@ -16016,6 +16076,11 @@
       "id": "run_rel27_gate",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "run_remote",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "run_render_helper",
@@ -19810,6 +19875,11 @@
     {
       "id": "write_bar_green",
       "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "write_bar_green",
+      "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },
     {
@@ -20163,6 +20233,11 @@
       "file": "tools/unattended/check-arms-groups.test.sh"
     },
     {
+      "id": "write_post_merge_record",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
       "id": "write_pre_fix_spelling",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -20223,9 +20298,19 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "write_red_ref",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
       "id": "write_refs",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
+    },
+    {
+      "id": "write_refusal",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "write_region",
@@ -20266,6 +20351,11 @@
       "id": "write_run_branch",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "write_run_record",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "write_run_record",
