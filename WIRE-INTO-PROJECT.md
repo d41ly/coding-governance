@@ -780,7 +780,9 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   origin BEFORE the pre-push gate so the ~min gate never runs on a stale tree, and bounds a during-gate
   remote race at `GOV_PUSH_MAIN_MAX_RETRIES` (default 3). The `pre-push` hook refuses a raw default-branch
   push that bypasses it (a local marker; `--no-verify` bypasses). Add `bash <prefix>/push-main.test.sh` as a
-  gate-runner leg (the lander self-test).
+  gate-runner leg (the lander self-test) declared `"subject": "kit"`, so your bar holds it unless
+  `GATE_SELFTESTS=1`; do the same for `.githooks/pre-push.test.sh` and `.githooks/pre_push_bar_selftest.py`
+  if you add them. They test gov's engine files, which you never edit, and `govkit` emits them that way.
 - **Optional, to stop a doc push paying the whole bar**: declare `GATE_DOC_PATHS` in
   `.githooks/gate-env.sh` — your non-code paths, e.g. your memory tree and root markdown. A push that
   changes only those runs just the legs whose `doc_reads` moved; kit legs arrive declared, and a leg of
