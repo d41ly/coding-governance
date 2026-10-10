@@ -9,12 +9,15 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-179153449799915119669-2756468 8593ac4d
+asks-at-landing: DEPL-aLevelledCopy-2=OPEN TOOL-aLevelledCopy-4=OPEN TOOL-aLevelledCopy-5=OPEN TOOL-aLevelledCopy-6=OPEN TOOL-aLevelledCopy-10=OPEN TOOL-aLevelledCopy-11=OPEN TOOL-aLevelledCopy-12=OPEN TOOL-aLevelledCopy-13=OPEN TOOL-aLevelledCopy-14=OPEN TOOL-aLevelledCopy-15=OPEN TOOL-aLevelledCopy-16=OPEN TOOL-aLevelledCopy-17=OPEN TOOL-aLevelledCopy-18=OPEN TOOL-aLevelledCopy-19=OPEN TOOL-aLevelledCopy-20=OPEN TOOL-aLevelledCopy-21=OPEN TOOL-aLevelledCopy-22=OPEN TOOL-aLevelledCopy-23=OPEN
+units-at-landing: DEPL-aLevelledCopy-1 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-7 TOOL-aLevelledCopy-9 TOOL-aLevelledCopy-8
+gates-inherited: 76b9c451 kickoff-manifest ratchet
+gates-run: unattended-179158798125942112025-157931 c41dcd03
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 79126924852f9ae7f9f1ad9dd5a28940402fa506
-phase: VERIFYING
+phase: LANDING
 branch-sha: ce9192c0ba180a67b49b2ea3fc8edf2fb8afc0cb
 branch-ref: refs/heads/branch/friendly-napier-49e2c6
 may: none

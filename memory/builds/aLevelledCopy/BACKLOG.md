@@ -19,6 +19,7 @@
 - TOOL-aLevelledCopy-21 · filed 2026-10-09 · held red: suite unattended driver selftest shard 8/8 red at 40a8b8c3 on the daily held job, run 37770195629 · seen `.github/workflows/remote-ci.yml`@40a8b8c3 · accept the suite is green on the daily held job at the default branch's tip
 - TOOL-aLevelledCopy-22 · filed 2026-10-09 · held red: suite unattended gate selftest shard 1/8 red at 40a8b8c3 on the daily held job, run 37770195629 · seen `.github/workflows/remote-ci.yml`@40a8b8c3 · accept the suite is green on the daily held job at the default branch's tip
 - TOOL-aLevelledCopy-23 · filed 2026-10-09 · held red: suite unattended-build self-test red at 40a8b8c3 on the daily held job, run 37770195629 · seen `{prefix}/workflows/unattended-build.test.sh`@40a8b8c3 run `bash {prefix}/workflows/unattended-build.test.sh` · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-aLevelledCopy-24 · filed 2026-10-10 · inherited red: leg kickoff-manifest ratchet red at 76b9c451, introduced by 17e8ccb7 · seen `skills/session-kickoff/manifest-check.sh`@76b9c451 run `bash skills/session-kickoff/manifest-check.sh` · accept the leg is green at the default branch's tip → 17e8ccb7
 
 ## Dispositions
 - SEV · TOOL-aLevelledCopy-4 · LOW · pre-existing; an operator identity in `core.sshCommand` is the only exposure, and no adopter is known to carry one
@@ -57,3 +58,5 @@
 - KEEP · TOOL-aLevelledCopy-22 · filed by an unattended run for the owning build; outside this build's goal
 - SEV · TOOL-aLevelledCopy-23 · HIGH · a held self-test is red on the default branch's daily job
 - KEEP · TOOL-aLevelledCopy-23 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-aLevelledCopy-24 · HIGH · a merge-bar leg is red on the default branch
+- KEEP · TOOL-aLevelledCopy-24 · filed by an unattended run for the owning build; outside this build's goal
