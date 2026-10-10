@@ -967,6 +967,64 @@ def derive_unsatisfied_requires(selection: list[str], descs: dict[str, tuple[dic
     )
 
 
+def derive_default_gained(root: pathlib.Path, base_commit: str | None, to_commit: str,
+                          receipt: dict, descs: dict[str, tuple[dict, str]]) -> tuple[list[str], str]:
+    """TOOL-aRoutedQuill-5 S4: the entries the registry's DEFAULT set gained since this receipt.
+
+    `(gained, why)`. Gained is every id the `[selection] default` holds in gov's registry at
+    `to_commit` and did not hold at the receipt's `gov_commit`, less those the receipt claims and
+    less any id the current registry no longer declares. The answer is the registry's own, read at
+    both vintages through `blob_at`, never a list typed here. A receipt with no `gov_commit`, or a
+    registry unreadable at either vintage, gains nothing, and `why` names which, so the empty answer
+    is never mistaken for "the default did not move".
+    """
+    if not base_commit:
+        return [], "the receipt records no gov_commit, so there is no vintage to compare the default set against"
+    tr = derive_tool_root(root)
+    rel = "/".join(([tr] if tr else []) + [GOVKIT_DIR.name, REGISTRY_NAME])
+    sets = []
+    for commit in (base_commit, to_commit):
+        blob = blob_at(root, commit, rel)
+        if blob is None:
+            return [], f"{rel} does not resolve at {commit[:8]}, so the default set there is unknown"
+        try:
+            sets.append(default_kits(tomllib.loads(blob.decode("utf-8"))))
+        except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+            return [], f"{rel} at {commit[:8]} does not parse ({e}), so the default set there is unknown"
+    was, now = sets
+    claimed = set(receipt.get("kits") or [])
+    return [e for e in now if e not in was and e not in claimed and e in descs], ""
+
+
+def add_deploy_kits(target: pathlib.Path, ids: list[str]) -> str:
+    """TOOL-aRoutedQuill-5 S4: append `ids` to the `kits` list a target's `deploy.toml` declares.
+
+    Returns the descriptor's repo-relative path when it wrote, else ''. A descriptor declaring no
+    `kits` key takes the registry default already, so it is left alone. The edit is TEXTUAL and
+    confined to the one array: everything else in a file the target authored keeps its bytes.
+    """
+    path = target / ".governance" / "deploy.toml"
+    if not ids or not path.is_file():
+        return ""
+    text = path.read_bytes().decode("utf-8")
+    nl = "\r\n" if "\r\n" in text else "\n"
+    m = re.search(r"(?ms)^(kits[ \t]*=[ \t]*\[)(.*?)(\])", text)
+    if not m:
+        return ""
+    have = set(re.findall(r'"([^"]*)"', m.group(2)))
+    add = [i for i in ids if i not in have]
+    if not add:
+        return ""
+    body = m.group(2).rstrip()
+    sep = "" if not body.strip() or body.endswith(",") else ","
+    if "\n" in body:
+        new = body + sep + "".join(f'{nl}  "{i}",' for i in add) + nl
+    else:
+        new = body + sep + (" " if body.strip() else "") + ", ".join(f'"{i}"' for i in add)
+    path.write_bytes((text[:m.start(2)] + new + text[m.end(2):]).encode("utf-8"))
+    return ".governance/deploy.toml"
+
+
 def derive_marker_coupling(root: pathlib.Path,
                            descs: dict[str, tuple[dict, str]]) -> dict[str, set[str]]:
     """Which kits must move TOGETHER, because one ships a file carrying the other's version marker.
@@ -2681,6 +2739,8 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         # liveness assertion — held off every bar while this file reported them running.
         manifest_chunk = {leg.get("name"): leg.get("chunk") for leg in _legs_json}
         manifest_doc_reads = {leg.get("name"): leg.get("doc_reads") for leg in _legs_json}
+        manifest_impure = {leg.get("name"): leg.get("impure") for leg in _legs_json}
+        manifest_ceiling = {leg.get("name"): leg.get("ceiling") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             for leg in d.get("gate_leg", []):
@@ -2748,6 +2808,27 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                                f"<prefix>/gate-legs.json says {_m!r} — the descriptor and the "
                                f"manifest disagree about which doc paths this leg reads, so a doc-only "
                                f"push skips it in one tree and runs it in the other")
+                    # AND ABOUT IMPURITY (TOOL-aRoutedQuill-12 S5), presence included: the row builder
+                    # copies a descriptor's `impure` into a target, so a manifest row carrying it that
+                    # its kit leg lacks ships a leg whose verdict a target's runner may cache on a tree.
+                    if leg.get("impure") != manifest_impure.get(nm):
+                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with impure "
+                               f"{leg.get('impure')!r} while <prefix>/gate-legs.json says "
+                               f"{manifest_impure.get(nm)!r} — the descriptor and the manifest "
+                               f"disagree about whether a verdict cached on a tree may be reused")
+                    # AND ABOUT CEILING, where the descriptor declares one (DEPL-aBenchedProbe-2 S5):
+                    # the emitter carries the descriptor's value verbatim into adopters, so it must
+                    # be a positive int (a bool is an int to Python, and not a bound) equal to the
+                    # one gov's own bar runs under. A descriptor declaring none is not compared;
+                    # that is TOOL-aBoundedCeiling-13's remainder, not this clause.
+                    if "ceiling" in leg:
+                        d_ce, m_ce = leg.get("ceiling"), manifest_ceiling.get(nm)
+                        if (isinstance(d_ce, bool) or not isinstance(d_ce, int) or d_ce <= 0
+                                or d_ce != m_ce):
+                            r.fail(f"entry '{eid}' declares gate leg '{nm}' with ceiling {d_ce!r} "
+                                   f"while <prefix>/gate-legs.json says {m_ce!r} — a descriptor "
+                                   f"ceiling must be a positive integer equal to the manifest's, "
+                                   f"because the deployer writes it into every adopter's runner")
                 # AC1b: a name that travels. A digit inside a parenthetical is a COUNT, and a count
                 # in a leg name goes stale exactly where nobody is reading — in somebody else's repo.
                 if re.search(r"\([^)]*\d[^)]*\)", nm):
@@ -3229,6 +3310,64 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                            f"`[[exempt_leg]]` row in <prefix>/govkit/registry.toml")
     r.note(f"declared check: {len(descs)} entries, {len(_no_check)} silent · withheld-path legs: "
            f"{_legs_graded} descriptor leg(s) graded")
+
+    # ---- 7j4: DEPL-aBenchedProbe-1. NO `[[gate_leg]]` IS HELD ON GOV'S BAR AND SHIPPED UNHELD.
+    #          A leg is SELF-TEST-SHAPED when its manifest chunk is `selftests` or the basename of a
+    #          resolved argv element matches `*.test.sh`, `test_*.py` or `*selftest*` (the bare
+    #          `--selftest` flag included). It is EXEMPT when its chunk is present and is anything
+    #          else: gov runs it on every bar, and subject-pins.tsv shows any move of that chunk in a
+    #          diff. A shaped, non-exempt leg whose descriptor subject is not `kit` reaches every
+    #          adopter's default bar while gov holds it. In today's tree every manifest row carries a
+    #          chunk, so the filename clause reds only a row that LOST its chunk; the live predicate
+    #          is `chunk == selftests AND subject != kit`. DOES NOT CHECK: legs outside
+    #          `[[gate_leg]]` (the run-gates canary) or `[[exempt_leg]]` rows; whether gov's chunk is
+    #          right; a self-test whose file name matches none of the globs or that runs indirectly,
+    #          e.g. through `sh -c`; that an exempt leg is cheap.
+    #          TWO STAND-DOWNS (DEPL-aBenchedProbe-3). An absent manifest is a note, not a refusal,
+    #          because 7h grades no leg at all without one. The zero-graded and zero-shaped liveness
+    #          reds bind only while the manifest holds at least one row in chunk `selftests`; with
+    #          none, a zero is TRUE rather than a broken predicate (7c2's rule), and the note says the
+    #          reds stood down. On gov's tree, 7h2's chunk pins red every `selftests` chunk that
+    #          vanishes from the manifest, so the case this gives up is covered there.
+    import fnmatch
+    if not legs_path.is_file():
+        r.note(f"7j4: {legs_path.relative_to(root).as_posix()} is absent, so no leg's chunk is known "
+               f"and a held self-test cannot be told from an exempt check — nothing was graded")
+    else:
+        _j4_pop = sum(1 for c in manifest_chunk.values() if c == "selftests")
+        _j4_graded, _j4_shaped, _j4_exempt = 0, 0, []
+        for eid, (d, _p) in sorted(descs.items()):
+            _ctx = canonical_ctx(eid)
+            for leg in d.get("gate_leg", []):
+                nm = leg.get("name")
+                _j4_graded += 1
+                chunk = manifest_chunk.get(nm)
+                hit = next((s for s in (resolve_tokens(a, _ctx)[0] for a in leg.get("argv", []))
+                            if any(fnmatch.fnmatchcase(posixpath.basename(s), g)
+                                   for g in ("*.test.sh", "test_*.py", "*selftest*"))), None)
+                if chunk != "selftests" and hit is None:
+                    continue
+                _j4_shaped += 1
+                if chunk and chunk != "selftests":
+                    _j4_exempt.append(nm)
+                    continue
+                if leg.get("subject") != "kit":
+                    why = ("manifest chunk `selftests`, so gov holds it" if chunk else
+                           f"argv element {hit}, and the manifest files it in no chunk")
+                    r.fail(f"7j4: entry '{eid}' gate leg '{nm}' is a self-test by its {why}, while its "
+                           f"descriptor subject is '{leg.get('subject')}', so every adopter runs it on "
+                           f"its default bar. Hold it everywhere: `subject = \"kit\"` "
+                           f"in the descriptor and <prefix>/gate-legs.json, then `selfcheck --write`. Or "
+                           f"run it everywhere: file it in a chunk other than `selftests`")
+        _j4_live = r.fail if _j4_pop else r.note
+        if not _j4_graded:
+            _j4_live("7j4: graded zero descriptor gate legs — the held-self-test arm saw nothing")
+        elif not _j4_shaped:
+            _j4_live("7j4: found zero self-test-shaped legs among "
+                     f"{_j4_graded} — the predicate has stopped matching, so a green here proves nothing")
+        r.note(f"held self-test legs: {_j4_graded} graded, {_j4_shaped} self-test-shaped, "
+               f"exempt by chunk: {', '.join(sorted(_j4_exempt)) or 'none'} · population {_j4_pop} "
+               f"in chunk selftests" + ("" if _j4_pop else " — the zero-population reds stand down"))
 
     # ---- 7k: entry-level `scope` is DERIVED and asserted against the declared value. Every
     #          descriptor declares one and the engine read only the rule-level spelling, so the
@@ -4022,6 +4161,11 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 row = {"name": nm, "argv": argv}
                 if check_target_reads_subject(target, deploy, descs):
                     row["subject"] = leg.get("subject") or "repo"
+                    # IMPURE TRAVELS under the same reader check (TOOL-aRoutedQuill-12 S5): the
+                    # run-gates canary has carried the key since run-gates 1.0, so a runner that
+                    # reads `subject` reads it too, and a leg graded on the commit graph is not cached.
+                    if leg.get("impure"):
+                        row["impure"] = leg["impure"]
                 if guards:
                     row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
                 # DOC READS TRAVEL, all or nothing, and only into a runner that reads them: below
@@ -4034,6 +4178,14 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 elif _dr_why:
                     print(f"govkit {verb} — gate leg '{nm}': doc_reads omitted ({_dr_why}), so it "
                           f"runs on every doc-only push")
+                # THE CEILING TRAVELS where the descriptor declares one and the target's runner is
+                # at CEILING_FLOOR_RUN_GATES or later, carried verbatim: the descriptor is
+                # gov-authored and selfcheck 7h grades its shape. No fallback to gov's manifest,
+                # which would bound every leg rather than the declaring ones. DEPL-aBenchedProbe-2.
+                _ce = leg.get("ceiling") if check_target_reads_subject(
+                    target, deploy, descs, floor=CEILING_FLOOR_RUN_GATES) else None
+                if _ce is not None:
+                    row["ceiling"] = _ce
                 if nm in by_name:
                     prev = next((e for e in owned and prior if e["name"] == nm), None)
                     # DEPL-cMendedVintage-22. THE SUBJECT OF THIS COMPARISON IS THE TARGET, and for
@@ -4069,6 +4221,19 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                                f"reporting drift rather than replacing it; ownership of the NAME is "
                                f"not ownership of the ROW")
                         continue
+                    # THE KEEP RULE (DEPL-aBenchedProbe-2 S4). A ceiling on the target's row that
+                    # differs from the one the receipt recorded is the adopter's own bound, so it
+                    # is written back and reported, never refused: it sits outside the drift
+                    # comparison above and cannot withhold the manifest. The receipt still records
+                    # gov's value, so a kept bound keeps differing and stays kept, while a row the
+                    # adopter never touched matches and takes gov's new value. WHAT IT DOES NOT DO:
+                    # it does not preserve a DELETED key (an absent ceiling takes gov's value
+                    # back), and it validates no value, kept or emitted.
+                    if "ceiling" in tgt and tgt["ceiling"] != (prev or {}).get("ceiling"):
+                        row["ceiling"] = tgt["ceiling"]
+                        print(f"govkit {verb} — gate leg '{nm}': kept the target's ceiling "
+                              f"{tgt['ceiling']!r} (gov's is {_ce!r}); a ceiling the receipt did "
+                              f"not record is the target's own")
                     existing[by_name[nm]] = row
                 else:
                     existing.append(row)
@@ -4088,6 +4253,10 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                                 # audit of a unit that was about to copy this seam verbatim.
                                 "subject": row.get("subject"),
                                 "doc_reads": row.get("doc_reads"),
+                                # gov's computed value, never a kept one: the S4 keep rule above
+                                # compares the target against THIS, so recording the kept value
+                                # would let the next run overwrite the adopter's bound.
+                                "ceiling": _ce,
                                 "guard_dropped": [{"spec": a, "why": b} for a, b in dropped],
                                 "history_depth": leg.get("history_depth")})
                 if dropped and not guards:
@@ -5569,6 +5738,10 @@ SUBJECT_FLOOR_RUN_GATES = (1, 1)
 # The run-gates version at which `doc_reads` entered that key set, and the runner learned to read it.
 # TOOL-dThriftyLanding-4, against the runner TOOL-dThriftyLanding-1 shipped as 1.25.
 DOC_READS_FLOOR_RUN_GATES = (1, 25)
+# The run-gates version that certainly admits `ceiling`. The canary's key set gained it in db3616531
+# while the runner still read 1.1, and 836e4e27b is the first commit at 1.2, so 1.1 is ambiguous and
+# 1.2 is the first version that cannot red a target's canary on the key. DEPL-aBenchedProbe-2.
+CEILING_FLOOR_RUN_GATES = (1, 2)
 
 
 def derive_doc_reads(leg: dict, ctx: dict[str, str], have: set[str]) -> tuple[list[str] | None, str]:
@@ -5699,6 +5872,15 @@ def run_fragment_merges(target: pathlib.Path, rows: list[dict], landed: set[str]
                           cwd=str(target), capture_output=True,
                           text=True, encoding="utf-8").returncode == 0:
             print(f"govkit {verb} — hooks: {p} already wired")
+            continue
+        # TOOL-aRoutedQuill-5 S3. A fragment whose HOOK FILE this target does not hold — an opt-in hook
+        # the target declined, as memory-recall's `recall-opened.js` — is a declined choice, not a
+        # refusal: settings-merge would refuse it, and a REFUSED line on every default install is a
+        # false alarm. The path is settings-merge's own resolution, so the two cannot disagree.
+        hook = subprocess.run([sys.executable, sm, "--resolve-fragment", p], cwd=str(target),
+                              capture_output=True, text=True, encoding="utf-8").stdout.strip()
+        if hook and not (target / hook).exists():
+            print(f"govkit {verb} — hooks: {p} not wired — {hook} is not installed here")
             continue
         # ABSENT OR STALE, asked of settings-merge itself on a scratch copy: `--check` reds on both,
         # and only an entry this run ADDED is one a rollback may remove.
@@ -8594,6 +8776,40 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             raise Refusal(f"the receipt claims kit '{eid}', which is no longer a registry entry — "
                           f"refusing rather than dropping it, which would leave its files owned by "
                           f"nobody")
+    # ---- TOOL-aRoutedQuill-5 S4, owner F1: an entry that JOINED the registry's default set after
+    # ---- this receipt's vintage is installed by `update`, as `apply --kits` would install it. The
+    # ---- widening is the owner's, recorded in the registry; a `--kits`-scoped run gains nothing,
+    # ---- because its scope is the operator's narrower statement. A gained entry whose `requires`
+    # ---- this target cannot satisfy is named and left out, never pulled in after it.
+    gained, _gained_why = ([], "") if kits else derive_default_gained(root, base_commit, to_commit,
+                                                                      receipt, descs)
+    while True:
+        _unmet_g = derive_unsatisfied_requires(gained, descs, receipt)
+        if not _unmet_g:
+            break
+        for _ge, _gd in _unmet_g:
+            if _ge in gained:
+                gained.remove(_ge)
+                print(f"govkit update — default-gained {_ge} NOT installed: it requires '{_gd}', which "
+                      f"this receipt does not claim and the default did not gain; `apply --kits` "
+                      f"both is the route")
+    if _gained_why:
+        print(f"govkit update — default-gained: none computed — {_gained_why}")
+    for _ge in gained:
+        print(f"govkit update — {'default-gained' if write else 'would gain'} {_ge}: the registry's "
+              f"default set holds it at {to_commit[:8]} and did not at {str(base_commit)[:8]}")
+    if gained and write:
+        # THE RECEIPT CLAIMS THEM FROM HERE, so the landing below takes every declared destination as
+        # an unclaimed source and the verify pass baselines them as touched. A failed run that rolls
+        # them back leaves the claim and no rows, and the next run lands them as unclaimed sources.
+        receipt["kits"] = list(claimed) + gained
+        claimed = receipt["kits"]
+        _deploy_w = add_deploy_kits(target, gained)
+        if _deploy_w:
+            subprocess.run(["git", "-C", str(target), "add", "--", _deploy_w], capture_output=True)
+            print(f"govkit update — default-gained: appended {', '.join(gained)} to {_deploy_w}'s kits")
+    elif gained:
+        claimed = list(claimed) + gained
     available = [e for e in all_kits(descs) if e not in claimed]
 
     # ---- THE PRECONDITIONS THIS UNIT ADDS (DEPL-dCarriedReceipt-7), steps 4 and 5 of the build's
@@ -10739,6 +10955,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         _fr_landed = set(changed) | set(renamed) | set(_landed_new)
         _fr_skip = read_inert_kits(deploy) | {str(f.get("kit")) for f in receipt.get("files") or []
                                               if f.get("kit") not in touched_kits}
+        # TOOL-aRoutedQuill-5 S4. THE RUN WHOSE WRITES ADD settings-merge TO THE RECEIPT wires every
+        # fragment the receipt claims, because each one landed UNWIRED for want of it — the card
+        # fragments a default install has carried since kickoff-manifest shipped them. Later runs
+        # wire only what they land, so an adopter's deliberate unwire stays unwired (owner D7).
+        if "settings-merge" in gained:
+            _fr_landed |= {str(f.get("path")) for f in receipt.get("files") or []
+                           if str(f.get("path", "")).endswith(".fragment.json")}
+            _fr_skip = read_inert_kits(deploy)
         # DEPL-aHalvedInstall-4 rev-3 (closing review M3). A HELD kit's fragments are not wired: the
         # merge would write its half-landed command into settings.json, and a stale command it
         # rewrites in place is not one `remove_wired_fragments` can take back. Said per fragment,
@@ -10759,6 +10983,33 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             for _fp in sorted(p for p in _fr_landed if p.endswith(".fragment.json")):
                 print(f"govkit update — hooks: {_fp} landed UNWIRED — GOVKIT_RERENDER=0 is exported, "
                       f"and wiring runs the target's own settings-merge.py")
+        # TOOL-aRoutedQuill-5 S4. A GAINED entry's ADOPTER runs once, as `apply`'s CONFIGURE runs it:
+        # `update` never re-runs an installed kit's adopter, but a gained kit was never configured.
+        # `agent-cap`'s is what wires its built-in `Workflow|Agent` entry, which is no fragment. Same
+        # argv twice runs once; same switch as the fragment wiring, and a held kit is not configured.
+        _ran_gained: set[tuple[str, ...]] = set()
+        for _ge in gained:
+            _d_g = descs[_ge][0]
+            _argv_g = (_d_g.get("adopt") or {}).get("argv") or []
+            if not _argv_g or _ge in _held_kits or _ge in read_inert_kits(deploy):
+                continue
+            _ctx_g = target_context(target, deploy, _ge, _d_g)
+            _res_g = tuple(resolve_tokens(a, _ctx_g)[0] for a in _argv_g)
+            if _res_g in _ran_gained:
+                continue
+            if not _rerender_on:
+                print(f"govkit update — default-gained {_ge}: adopter NOT run — GOVKIT_RERENDER=0 is "
+                      f"exported, and configuring runs target-side code")
+                continue
+            _ran_gained.add(_res_g)
+            _rc_g = subprocess.run(resolve_shell_argv(list(_res_g)), cwd=str(target),
+                                   capture_output=True, text=True, encoding="utf-8").returncode
+            _oc_g = classify_outcome(target, _d_g, _ctx_g, _rc_g)
+            print(f"govkit update — default-gained {_ge}: adopter exit {_rc_g}"
+                  + (f" — {_oc_g.get('means')}" if _oc_g else ""))
+            if not outcome_accepted(_rc_g, _oc_g, declares_outcome_for(_d_g, _rc_g)):
+                r.fail(f"kit '{_ge}': its adopter exited {_rc_g} on the update that gained it, and no "
+                       f"declared outcome accepts that")
 
     # ======================= DEPL-dCarriedReceipt-14 S4..S8 — POST-WRITE VERIFICATION ============
     # Every byte this run was going to move has moved. Now ask each TOUCHED kit the one question it
@@ -11384,7 +11635,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # the refusal then passes for the wrong reason. `written_paths` is the set the verify
             # pass already derives for exactly this question, landings included; re-enumerating the
             # four lists here would be a second answer that omits them.
-            _rn_ours = written_paths | _reaped
+            # TOOL-aRoutedQuill-5 S6: a path a `[[regenerate]]` block DECLARES it writes is this run's
+            # own write too — memory-tree's `--arm-routing` appends to `.memory-tree.conf`, which is
+            # pinned — so it is not somebody's work-in-progress either. Declared paths only, never a
+            # status entry an argv merely touched, and only one CLEAN before the argv ran: a path the
+            # operator had already dirtied stays theirs, and still refuses the renormalize.
+            _rn_ours = written_paths | _reaped | {p for _s in _rg_snap.values()
+                                                  for p in (_s.get("paths") or [])
+                                                  if p not in (_s.get("status") or {})}
             # NO PATHSPEC, FILTERED HERE, for the reason `git_pathspec`'s own header records:
             # `git diff` rejects `--pathspec-from-file` and a large population as argv is a
             # `WinError 206` on a real adopter. One process, no command line, python does the join.

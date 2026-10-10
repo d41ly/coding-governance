@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-6 — routed against raw: a paired trial on frozen clones of real repositories
 
-**Status:** SPECCED · rev-5 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams tooling · order 6 · ratified 2026-10-09
+**Status:** DEFERRED · rev-5 · 2026-10-09 · node a · Tier-1 · base 6473ae38 · streams tooling · order 6 · advances TOOL-aRoutedQuill-8 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -550,7 +550,8 @@ New arm: none · covers none · the instruments carry their own liveness: the co
   bypass inside the frozen clones only, and runs every session and agent at High effort, never Extra.
 - rev-4 · 2026-10-09 · §4 · the owner amends the arms to Opus 5.5 at Medium effort; the trial's
   other agents stay at High, never Extra, and Ask A registers only the non-arm agents' model.
-- rev-5 · 2026-10-09 · §4 · Rollout's order corrected to 6, which rev-2 moved in the header only.
+- rev-5 · 2026-10-09 · §4 · the M2 cross-read of 2026-10-09 found §4 Rollout still said order 5
+  where the status header, the rev-2 line and the build README say order 6; Rollout now reads order 6.
 
 ## 10. Reuse audit
 

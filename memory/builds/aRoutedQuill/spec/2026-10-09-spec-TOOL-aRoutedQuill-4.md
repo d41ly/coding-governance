@@ -1,12 +1,17 @@
 # TOOL-aRoutedQuill-4 — every subagent starts holding the card's route, stated as facts
 
-**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
+**Status:** CLOSED · rev-6 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md](../build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md) | research | TOOL-aRoutedQuill-2 |
+| [2026-10-09-build-TOOL-aRoutedQuill-4-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aRoutedQuill-4-1-acceptance-ledger.md) | journal | — |
+| [2026-10-10-build-KICK-aRoutedQuill-1-runlog-f0cdcc91.md](../build/2026-10-10-build-KICK-aRoutedQuill-1-runlog-f0cdcc91.md) | journal | KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-9 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12 |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-5 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
+| [2026-10-09-prompt-TOOL-aRoutedQuill-4-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-4-build-brief.md) | journal | — |
+| [2026-10-10-review-TOOL-aRoutedQuill-1-closing-diff-round1.md](../reviews/2026-10-10-review-TOOL-aRoutedQuill-1-closing-diff-round1.md) | diff-review | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-7 |
 
 <!-- /gen:spec-records -->
 
@@ -139,8 +144,8 @@ INPROGRESS`. The one-line forms:
 
 | State | The one line |
 |---|---|
-| no card, no `## route`, or no `- unit:` line | `No unit is routed in this session: <card path> is absent` (or `holds no route`), `so scratch-guard refuses an Edit, Write, MultiEdit or NotebookEdit under ROUTED_PATHS (<value>).` |
-| UNARMED | `<conf> declares no <key>, so scratch-guard refuses every Edit, Write, MultiEdit or NotebookEdit in this repository except to that file.` |
+| no card, no `## route`, or no `- unit:` line | `No unit is routed in this session: <card path> is absent` (or `holds no route`, or `the route in <card path> names no unit`; with no `session_id`, `the payload carries no session_id`), `so scratch-guard refuses an Edit, Write, MultiEdit or NotebookEdit under ROUTED_PATHS (<value>).` |
+| UNARMED | `<conf> leaves the write gate UNARMED: <reason>, so scratch-guard refuses every Edit, Write, MultiEdit or NotebookEdit in this repository except to that file.` The reason is `checkUnarmed`'s own text, the one the deny prints, so the two cannot word the rule twice: `TOOL-aRoutedQuill-2`'s S6, a blank or absent key, or a `ROUTED_PATHS` entry that is absolute, climbs through `..` or covers `MEMORY_ROOT`, the entry named. |
 | conf unreadable | `<conf> could not be read (<code>), so scratch-guard refuses every Edit, Write, MultiEdit or NotebookEdit in this repository.` |
 
 ### The evaluation order
@@ -154,6 +159,12 @@ INPROGRESS`. The one-line forms:
 5. `session_id` missing, no card under the common dir, no `## route`, or no `- unit:` line → the
    unrouted line.
 6. Otherwise the block of §4 "Data model", cut to `ROUTE_CONTEXT_CAP`.
+
+Past the cap, the closing line reads `<n> more route lines of <card path> are left out of this
+context, which is capped at 10000 characters.` A unit line that is kept keeps its verdict line, and
+one that is cut takes its verdict with it. The verdict reasons are `checkBuildable`'s; its two
+Tier-1 SPECCED reasons ended in a remedy, `— flip it to INPROGRESS`, which S5 forbids here, so they
+now end in the fact `a Tier-1 unit at INPROGRESS admits`, and the deny keeps its own remedy.
 
 A throw anywhere in the branch exits 0 with nothing printed. The card is located exactly as
 `TOOL-aRoutedQuill-2` locates it, so the context and the gate cannot disagree about which card a
@@ -227,8 +238,10 @@ touching it, and until then `govkit.py epoch` reports the move as owed at the la
   naming the card path and the `ROUTED_PATHS` value.
   Red when: a subagent with no route is told nothing, or is told more than one line.
 - **AC3** — When the fixture's conf declares `ROUTED_PATHS=""`, `additionalContext` is one line
-  naming `ROUTED_PATHS` and the conf; when the fixture holds no conf, or `cwd` sits under no
-  repository, the hook exits 0 with empty stdout.
+  naming `ROUTED_PATHS`, the conf and the blank value; when it declares a `ROUTED_PATHS` entry
+  climbing through `..`, the one line names `ROUTED_PATHS`, the conf, that entry and the `..` rule;
+  when the fixture holds no conf, or `cwd` sits under no repository, the hook exits 0 with empty
+  stdout.
   Red when: an UNARMED repository is described as routed or left silent, or a repository the gate
   admits every write in is told that writes are refused.
 - **AC4** — When the arm scans the texts of AC1, AC2 and AC3, no line opens with a word from its
@@ -285,6 +298,9 @@ AC6 is a direct observation of this repository after the rewire and adds no arm.
   on, so the context and the gate read one card.
   Recommendation: run the probe once for both units before either build pass; take (a) on a
   "does not fire".
+  RESOLVED (agent, 2026-10-09, delegated): it fires for both. `SubagentStart` fired for an `Agent`
+  subagent and for a `Workflow` agent (`agent_type: workflow-subagent`), each with the main loop's
+  `session_id` byte-equal, so the context hook and the gate read one card. Evidence: `memory/builds/aRoutedQuill/build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md`.
 
 ## 9. Revision log
 
@@ -293,6 +309,12 @@ AC6 is a direct observation of this repository after the rewire and adds no arm.
   from order 1 to 2, which shifts every later step by one.
 - rev-3 · 2026-10-09 · §4 · Rollout corrected: hooks are re-read on the next tool call, per the
   gotcha catalogue's measurement, so subagents get the context inside the landing session.
+- rev-4 · 2026-10-09 · §4 · AC3 · the M2 cross-read of 2026-10-09 found the UNARMED line said the
+  conf declares no key, true only for a blank or absent key, while `TOOL-aRoutedQuill-2`'s UNARMED
+  also covers an entry that is absolute, climbs through `..` or covers `MEMORY_ROOT`; the line now
+  names the key and the rule it broke, and AC3 adds a `..` entry case.
+- rev-5 · 2026-10-09 · §8 F1 · resolved by the stated probe, run by the unattended run before step 3; the record is `memory/builds/aRoutedQuill/build/2026-10-09-build-TOOL-aRoutedQuill-2-subagent-payload-probe.md`.
+- rev-6 · 2026-10-09 · §4 · the build pass: the UNARMED line quotes `checkUnarmed`'s reason rather than a second wording of it; the unrouted line gains the no-unit and no-`session_id` forms; the closing line past the cap is spelled; and `checkBuildable`'s two Tier-1 SPECCED reasons lose their imperative tail, which S5 would have refused in the context.
 
 ## 10. Reuse audit
 

@@ -92,6 +92,8 @@
       "review-join self-test",
       "review-protocol parity (kit vs dogfood)",
       "review-replay selftest",
+      "routed commits name a specced unit",
+      "routed-commits selftest",
       "row-driver view refusal",
       "row-grammar selftest",
       "row-keyed merge driver replay",
@@ -167,7 +169,8 @@
       "SessionStart tools/check-wiring.sh",
       "SessionStart tools/process-monitor/procmon-hook.js",
       "Stop tools/unattended/stop-guard.js",
-      "StopFailure tools/unattended/stall-recorder.js"
+      "StopFailure tools/unattended/stall-recorder.js",
+      "SubagentStart tools/hooks/scratch-guard.js"
     ],
     "workflow-scripts": [
       "check-workflow-syntax.js",
@@ -241,6 +244,7 @@
       "guard-fed-the-value-it-supersedes.md",
       "hand-named-gate-list-green-while-the-bar-reds.md",
       "heredoc-escape-reaches-the-regex.md",
+      "history-leg-graded-before-the-reconcile-commit.md",
       "hookspath-resolves-into-another-checkout.md",
       "id-matched-as-a-substring.md",
       "inherited-git-dir-pins-the-work-tree-to-the-cwd.md",
@@ -249,6 +253,7 @@
       "inputs-inside-the-subjects-reach.md",
       "join-key-widened-by-a-shared-location.md",
       "ledger-token-wrapped-across-a-line-joins-nothing.md",
+      "line-claim-matched-over-the-whole-output.md",
       "line-count-reads-empty-capture-as-one.md",
       "line-keyed-registry-reds-on-a-file-that-grew.md",
       "liveness-negative-from-another-population.md",

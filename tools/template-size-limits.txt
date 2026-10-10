@@ -112,7 +112,9 @@ memory/guides/BUILD-METHOD.md	30720
 # `build-method size`'s reason: the kit ships the template and no size gate. What an adopter gets
 # instead is the adopter's own announcement, which compares the render against its GUIDE_CAP_BYTES.
 # WHAT THIS DOES NOT COVER: the file's line count, which only the adopter's GUIDE_CAP_LINES reads.
-memory/guides/UNATTENDED-PROTOCOL.md	65692
+# RAISED 65692 -> 65842 by TOOL-aRoutedQuill-7: its section 8 row for PROMPT_BRIEF_SKELETON_CUTOFF,
+# 150 bytes, paid by the ceiling rather than by a trim of the protocol (owner, 2026-10-09).
+memory/guides/UNATTENDED-PROTOCOL.md	65842
 
 # --- the unattended Skill, as rendered ----------------------------------------------------------
 # 10240 bytes = 10 KiB, CR-stripped (TOOL-aMendedFleet-68 S5). The Skill is the first file every

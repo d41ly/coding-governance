@@ -220,6 +220,9 @@ SPEC_AUDIT_DEFAULT="${9-}"
 # DATED PAST every fixture README, for LANDER_MODE's reason below: a blank key NOTEs on stderr at
 # every prompt-mode preflight. The TOOL-aQuotedBrief-1 arms append the cutoff they mean.
 PROMPT_BRIEF_CUTOFF="2099-01-01"
+# DATED for the same reason, so an arm that dates the key above keeps the five and says nothing; the
+# TOOL-aRoutedQuill-7 arms append the skeleton cutoff they mean.
+PROMPT_BRIEF_SKELETON_CUTOFF="2099-01-01"
 LANDER="echo land"
 # DECLARED, so the shared fixture keeps BASE's output byte for byte: a blank LANDER_MODE
 # announces its default on stderr, the run helper merges stderr into what every arm reads, and the two
@@ -4365,6 +4368,118 @@ git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
 out=$(run --preflight tBr --keepalive-id k1)
 hit  "$out" "UNATTENDED check 116 FAILED — the project conf at the default-branch side of the pinned BASE was not derived or could not be evaluated to the end, so whether it declares PROMPT_BRIEF_CUTOFF is unknown and is not read as off - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen"
 miss "$out" "preflight OK"
+git checkout -qf main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit
+
+# ---- TOOL-aRoutedQuill-7 — RULE 1'S LIST IS THE KICKOFF KIT'S --brief-skeleton AT BASE, for a README
+# ---- opened (2026-08-01 here) on or after PROMPT_BRIEF_SKELETON_CUTOFF; the five before it, and rule 1
+# ---- is an in-order subsequence of either list. The fixture checker is TRACKED on main, so the one
+# ---- tracked manifest-check.sh rung finds it and check 114 does not see a carried file; it logs every
+# ---- call to a spawn log the arm reads. Each arm was observed RED against the pre-unit driver, which
+# ---- graded the five by an exact match and never ran a checker.
+_rq_ck=skills/session-kickoff/manifest-check.sh
+_rq_log="$ORIGIN_DIR/rq-spawn.log"
+_qb_tail=$'\n## Drawn from the session\n\nnone\n\n## Owner confirmation\n\nnot asked — the brief draws on nothing outside the prompt\n'
+_rq_seven="$_qb_bare$_qb_brief"$'\n### Limitations\nNone.\n\n### Reuse\nNone fits.\n'"$_qb_tail"
+_rq_six="$_qb_bare$_qb_brief"$'\n### Limitations\nNone.\n'"$_qb_tail"
+write_rq_checker() { # path · exit code · sub-head... -> a fixture checker printing them under ## The brief
+  local f=$1 rc=$2 h; shift 2
+  mkdir -p "$(dirname "$f")"
+  { echo '#!/usr/bin/env bash'
+    echo "echo \"\$*\" >> '$_rq_log'"
+    echo "[ \"\${1:-}\" = --brief-skeleton ] || exit 3"
+    echo "cat <<'SK'"
+    printf '%s\n' '# Brief' '' '## The prompt' '' '## The brief' ''
+    for h in "$@"; do printf '### %s\nx\n\n' "$h"; done
+    printf '%s\n' '## Drawn from the session' 'SK' "exit $rc"
+  } > "$f"
+}
+write_rq_main() { # conf lines · exit code or none · sub-head... -> both committed on main at BASE, pushed, merged into the run branch
+  local c=$1 rc=$2; shift 2
+  git checkout -qf main; git reset -q --hard "$BASE"
+  printf '%s\n' "$c" >> .unattended.conf
+  [ "$rc" = none ] || write_rq_checker "$_rq_ck" "$rc" "$@"
+  git add -A >/dev/null && git commit -q -m rq-main --no-verify && git push -q -f origin main
+  git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+}
+run_rq_preflight() { # record text -> the preflight's output, the record committed and pushed on the run branch
+  mkdir -p memory/builds/tBr/prompts; printf '%s' "$1" > "$_qb_rec"
+  scope published
+  git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+  : > "$_rq_log"
+  run --preflight tBr --keepalive-id k1
+}
+_rq_on=$'PROMPT_BRIEF_CUTOFF="2026-07-01"\nPROMPT_BRIEF_SKELETON_CUTOFF="2026-07-15"'
+_rq_117="UNATTENDED check 117 FAILED — the brief's sub-heads cannot be read from the kickoff kit at the pinned BASE, so a record past PROMPT_BRIEF_SKELETON_CUTOFF has no list to be graded on and is not graded on the five instead: "
+# ---- AC1: past the key, a five-sub-head record refuses at rule 1 naming ### Limitations, and writes no RUN.md.
+reset_tree; write_rq_main "$_rq_on" 0 Goal Items Acceptance Gates Non-goals Limitations Reuse
+readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+out=$(run_rq_preflight "$_qb_ok")
+hit  "$out" "first rule failed, then the record: rule 1 $_qb_rec, and the sub-head missing, empty or out of order: ### Limitations"
+miss "$out" "preflight OK"
+same "RQ7 AC1 a five-sub-head record past the key created no run-state file" "$([ -f memory/builds/tBr/RUN.md ] && echo yes || echo no)" "no"
+# ---- AC2: the seven the checker prints are admitted, and the checker ran once, on the verb.
+reset_tree; write_rq_main "$_rq_on" 0 Goal Items Acceptance Gates Non-goals Limitations Reuse
+readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+out=$(run_rq_preflight "$_rq_seven")
+hit  "$out" "preflight OK"
+miss "$out" "does not stand on its own"
+same "RQ7 AC2 the checker ran once, on --brief-skeleton" "$(cat "$_rq_log" 2>/dev/null)" "--brief-skeleton"
+# ---- AC3: a README opened before a declared key keeps the five, and the checker never runs.
+reset_tree; write_rq_main $'PROMPT_BRIEF_CUTOFF="2026-07-01"\nPROMPT_BRIEF_SKELETON_CUTOFF="2026-09-01"' 0 Goal Items Acceptance Gates Non-goals Limitations Reuse
+readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+out=$(run_rq_preflight "$_qb_ok")
+hit  "$out" "preflight OK"
+same "RQ7 AC3 a grandfathered record ran no checker" "$(grep -c -- --brief-skeleton "$_rq_log")" "0"
+# ---- F1 (a): rule 1 is an in-order subsequence of the five, so the seven pass before the key too.
+reset_tree; write_rq_main 'PROMPT_BRIEF_CUTOFF="2026-07-01"' none
+readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+out=$(run_rq_preflight "$_rq_seven")
+hit  "$out" "preflight OK"
+miss "$out" "does not stand on its own"
+# ---- AC4: a blank key keeps the five over AC1's fixture, and says it is off.
+reset_tree; write_rq_main $'PROMPT_BRIEF_CUTOFF="2026-07-01"\nPROMPT_BRIEF_SKELETON_CUTOFF=""' 0 Goal Items Acceptance Gates Non-goals Limitations Reuse
+readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+out=$(run_rq_preflight "$_qb_ok")
+hit  "$out" "unattended: NOTE - PROMPT_BRIEF_SKELETON_CUTOFF is blank or not a YYYY-MM-DD date, so this prompt record's brief is graded on the five sub-heads and not on the kickoff kit's --brief-skeleton"
+hit  "$out" "preflight OK"
+# ---- AC5: no checker resolves, and then two are tracked: check 117 names the receipt, both probes and the count.
+reset_tree; write_rq_main "$_rq_on" none
+readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+out=$(run_rq_preflight "$_rq_seven")
+hit  "$out" "$_rq_117"
+hit  "$out" "no session-kickoff kit holding manifest-check.sh in this install: looked in "
+hit  "$out" "the index tracks 0 manifest-check.sh, and only exactly one is taken"
+same "RQ7 AC5 an unresolvable checker created no run-state file" "$([ -f memory/builds/tBr/RUN.md ] && echo yes || echo no)" "no"
+reset_tree; write_rq_main "$_rq_on" 0 Goal Items Acceptance Gates Non-goals Limitations Reuse
+git checkout -qf main; write_rq_checker tools/kickoff/manifest-check.sh 0 Goal Items Acceptance Gates Non-goals
+git add -A >/dev/null && git commit -q -m rq-two --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+out=$(run_rq_preflight "$_rq_seven")
+hit  "$out" "the index tracks 2 manifest-check.sh, and only exactly one is taken"
+miss "$out" "preflight OK"
+# ---- AC6: a checker failing the verb, a skeleton without ### Items, and one with ### Gates before ### Acceptance.
+for _rq_arm in exit items order; do
+  case "$_rq_arm" in
+    exit)  reset_tree; write_rq_main "$_rq_on" 4 Goal Items Acceptance Gates Non-goals Limitations Reuse; _rq_want="exits 4 on --brief-skeleton: " ;;
+    items) reset_tree; write_rq_main "$_rq_on" 0 Goal Acceptance Gates Non-goals Limitations Reuse; _rq_want="first missing or out of place: ### Items, in " ;;
+    order) reset_tree; write_rq_main "$_rq_on" 0 Goal Items Gates Acceptance Non-goals Limitations Reuse; _rq_want="first missing or out of place: ### Gates, in " ;;
+  esac
+  readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+  out=$(run_rq_preflight "$_rq_seven")
+  hit  "$out" "$_rq_117"
+  hit  "$out" "$_rq_want"
+  miss "$out" "preflight OK"
+done
+# ---- AC7: the list is the checker AT BASE: a working-tree edit dropping ### Reuse changes nothing.
+reset_tree; write_rq_main "$_rq_on" 0 Goal Items Acceptance Gates Non-goals Limitations Reuse
+readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_rq_six" > "$_qb_rec"
+scope published
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+mutate "$_rq_ck" '/^### Reuse$/,/^x$/d'
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "first rule failed, then the record: rule 1 $_qb_rec, and the sub-head missing, empty or out of order: ### Reuse"
 git checkout -qf main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit
 
 # ---- TOOL-aQuotedBrief-2 — A FIRST PREFLIGHT REFUSES A CARRIED BRANCH (check 114): a commit beyond the
@@ -16934,7 +17049,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # structural-rule arms (20), the non-ASCII record name (3), three join-loop arms (9), the re-preflight of
 # a grown roster (5), and the park-reason, THIN-cutoff and slug-mode close arms (7) - run as slices of the
 # prologue and those blocks on node a, 2026-10-09; no suite ran.
-FLOOR_ASSERTIONS=2768
+# RAISED 2768 -> 2808 by TOOL-aRoutedQuill-7: the skeleton-list arms in region three, AC1 to AC7 and F1's
+# subsequence arm, 40 assertions counted off the block's own lines and run as a slice of the prologue and
+# that block on node a, 2026-10-10; no suite ran.
+FLOOR_ASSERTIONS=2808
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -17123,7 +17241,8 @@ FLOOR_SHARD_2=222
 # RAISED 326 -> 336 by TOOL-aQuotedBrief-4: the same 10 region-three cutoff-at-BASE assertions, see FLOOR_ASSERTIONS.
 # RAISED 336 -> 346 by TOOL-aQuotedBrief-5: the same 10 region-three doubled-space heading assertions, see FLOOR_ASSERTIONS.
 # RAISED 346 -> 390 by TOOL-aQuotedBrief-6: the same 44 region-three assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_3=390
+# RAISED 390 -> 430 by TOOL-aRoutedQuill-7: the same 40 region-three skeleton-list assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=430
 FLOOR_SHARD_4=390
 FLOOR_SHARD_5=270
 FLOOR_SHARD_6=129

@@ -1,12 +1,16 @@
 # TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed
 
-**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 5 · ratified 2026-10-09
+**Status:** CLOSED · rev-6 · 2026-10-10 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 5 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aRoutedQuill-5-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aRoutedQuill-5-1-acceptance-ledger.md) | journal | — |
+| [2026-10-10-build-KICK-aRoutedQuill-1-runlog-f0cdcc91.md](../build/2026-10-10-build-KICK-aRoutedQuill-1-runlog-f0cdcc91.md) | journal | KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-9 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12 |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
+| [2026-10-09-prompt-TOOL-aRoutedQuill-5-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-5-build-brief.md) | journal | — |
+| [2026-10-10-review-TOOL-aRoutedQuill-1-closing-diff-round1.md](../reviews/2026-10-10-review-TOOL-aRoutedQuill-1-closing-diff-round1.md) | diff-review | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-7 |
 
 <!-- /gen:spec-records -->
 
@@ -24,7 +28,10 @@ makes `check-wiring.sh` report an install that is unwired or unarmed, and states
   `check-wiring`. The `agent-cap` entry ships `scratch-guard.js` and its fragments, and it ships
   `agent-cap.js` too, whose PreToolUse `Workflow|Agent` entry its adopter wires: every default
   adopter gains the fan-out cap with the gate. `settings-merge` is the entry's declared requirement,
-  and `check-wiring` is the reporter owner decision D7 relies on. Observed by AC1.
+  and `check-wiring` is the reporter owner decision D7 relies on. `check-agent-cap-restatement`, a
+  conditional entry requiring `agent-cap`, drops its conditional mark so `--all` reaches it: selfcheck
+  7e reds a dependent of the default set that no declared selection reaches, and the precedent fix
+  for that state left a prose check out of the default set. Observed by AC1.
 - **S2** — The `agent-cap` entry's `requires` gains `kickoff-manifest`, so the gate is never installed
   without the card writer whose `## route` it reads. Observed by AC2.
 - **S3** — With `settings-merge` in every default selection, `run_fragment_merges` wires every
@@ -166,6 +173,7 @@ included, so a deliberate blank stays a visible refusal.
 | Identifier | Kind | Cell |
 |---|---|---|
 | `derive_default_gained` | function | `py.function`; `lexicon.py --suggest` answered OK |
+| `add_deploy_kits` | function | `py.function`; answered OK |
 | `check_routed` | function | `sh.function`; answered OK |
 | `derive_routed_candidate` | function | `sh.function`; answered OK |
 | `write_routed_keys` | function | `sh.function`; answered OK |
@@ -176,16 +184,17 @@ included, so a deliberate blank stays a visible refusal.
 
 ### Files touched (estimate)
 
-`tools/govkit/registry.toml` · `tools/govkit/govkit.py` · `tools/govkit/selftest.py` · `tools/govkit/matrix.py` · `tools/hooks/kit.toml` · `tools/memory-tree/kit.toml` · `tools/memory-tree/adopt-memory-tree.sh` · `tools/memory-tree/.memory-tree.conf.example` · `tools/memory-tree/README.md` · `tools/memory-tree/check-memory-hygiene.test.sh` · `tools/check-wiring.sh` · `tools/check-wiring.test.sh` · `WIRE-INTO-PROJECT.md` · `memory/map/generated/symbols.json`
+`tools/govkit/registry.toml` · `tools/govkit/entries/check-agent-cap-restatement.kit.toml` · `tools/govkit/govkit.py` · `tools/govkit/selftest.py` · `tools/govkit/matrix.py` · `tools/hooks/kit.toml` · `tools/memory-tree/kit.toml` · `tools/memory-tree/adopt-memory-tree.sh` · `tools/memory-tree/.memory-tree.conf.example` · `tools/memory-tree/README.md` · `tools/memory-tree/check-memory-hygiene.test.sh` · `tools/check-wiring.sh` · `tools/check-wiring.test.sh` · `WIRE-INTO-PROJECT.md` · `memory/map/generated/symbols.json`
 
 ### Rollout
 
 Lands at order 5, after units 2, 3 and 4. Gov itself is already wired and armed by then, so this
-unit changes what adopters receive and nothing in gov's own session. The agent-cap, memory-tree and
-check-wiring kits each bump their version once, after the build's last unit touching that kit; for
-all three that is this unit unless `PLAY-aRoutedQuill-1` or `TOOL-aRoutedQuill-6` touches one. The
-bump commit names this unit, which the ownership leg requires, and `govkit.py selfcheck` runs after
-it because a version marker can sit outside the files the bump edited. An adopter's next
+unit changes what adopters receive and nothing in gov's own session. This unit's moves of the
+agent-cap, memory-tree and check-wiring kits leave each kit's version owed; this unit's own commits
+bump none. The owed versions are minted once, after the build's last unit, as units 1, 2 and 4 also
+state: by the lander, or by the run's own mint commit before the close, which names the build's last
+built unit. `govkit.py selfcheck` runs after that mint because a version marker can sit outside the
+files the mint edited. An adopter's next
 `govkit update --write` installs the three entries, wires every fragment, appends the two keys and
 leaves all of it staged for the adopter to read before committing.
 
@@ -279,9 +288,9 @@ leaves all of it staged for the adopter to read before committing.
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit runbook parity` · `recall floor` · `recall floor arms` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `hook destinations (every declared hook path ships)` · `check-wiring self-test` · `transition-audit arms` · `straggler-guard arms` · `memory-hygiene self-test` · `memory hygiene` · `python resolver (behaviour + inline parity + idiom ban)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `harness arms (fail branches armed or pinned)` · `kickoff-manifest ratchet` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC2 AC4 · a registry whose default set gained an entry after the receipt's vintage, against an update that moves only claimed kits · none
+New arm: tools/govkit/selftest.py · covers AC1 AC2 · a registry whose default set gained an entry after the receipt's vintage, against an update that moves only claimed kits · none
 
-New arm: tools/govkit/matrix.py · covers AC3 · a default apply into the matrix's fresh shape, against the base registry that lands fragments unwired · none
+New arm: tools/govkit/matrix.py · covers AC3 AC4 · a default apply into the matrix's fresh shape, against the base registry that lands fragments unwired; and an install from an aged registry updated with `add_deploy_kits` staged out · none
 
 New arm: tools/check-wiring.test.sh · covers AC7 AC8 AC9 · a fixture conf with ROUTED_PATHS blank, a second unwired fragment, and an empty HOME · none
 
@@ -322,6 +331,17 @@ AC10 is a direct observation of the runbook and adds no arm.
 - rev-2 · 2026-10-09 · §3 · §4 · cross-read fold: order 4 to 5, because `KICK-aRoutedQuill-1` moved
   from order 1 to 2, which shifts every later step by one.
 - rev-3 · 2026-10-09 · §8 · owner resolves F1 (install), F2 (join), F3 (keep) and F4 (a).
+- rev-4 · 2026-10-09 · §4 · the M2 cross-read of 2026-10-09 found §4 Rollout giving this unit its own
+  kit-version bump commit named for this unit, where units 1, 2 and 4 say the versions are minted
+  once by the lander; Rollout now leaves the three kits' versions owed and minted once after the
+  build's last unit, and keeps the selfcheck after the mint.
+- rev-5 · 2026-10-10 · §2 · §4 · build divergence: with `agent-cap` in the default set, selfcheck 7e
+  reds `check-agent-cap-restatement`, a conditional entry requiring it that no selection reaches. S1
+  drops that entry's conditional mark so `--all` reaches it, and Files touched names its descriptor.
+  The Inventory gains `add_deploy_kits`, S4's writer of a target's `deploy.toml` `kits` list.
+- rev-6 · 2026-10-10 · §7 · AC4's arm moves from the `selftest.py` line to the `matrix.py` line,
+  whose aged-install shape TOOL-aRoutedQuill-12 added; no selftest arm ever installed from an aged
+  registry, so the selftest line claimed a criterion it did not observe.
 
 ## 10. Reuse audit
 
