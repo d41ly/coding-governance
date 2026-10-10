@@ -27,8 +27,8 @@
 #      prints there, less this leg's own row, skipped while iterating rather than edited out.
 #   5. THE PROBE. Each row runs with FOREIGN_PREFIX_PROBE=1, which every suite honours by stopping
 #      after its first subject-touching arm with the line `foreign-prefix-probe: stopped after 1 arm`,
-#      in a pool of the width `run-gates.sh --print-profile` reports, each bounded by its own declared
-#      budget. One line per row as it completes is the progress, and the heartbeat a registered run
+#      in a pool of the width `run-gates.sh --print-profile` reports, each killed as a HANG at HANG_FACTOR
+#      times its declared budget. One line per row as it completes is the progress, and the heartbeat a registered run
 #      reads. A row is green when it exits 0 and, unless declared whole below, printed the marker.
 #   6. FAIL FAST at the PREFIX grain (§8 F3 (a)): a red prefix is finished, so every red row at it is
 #      named in one run, then each later prefix prints `not run`. The clone must be clean after each
@@ -238,14 +238,45 @@ if not n:
 }
 
 # ---- ONE ROW, S6. Writes its verdict file and prints its one line as it completes.
-run_row() { # $1 = prefix label, $2 = run dir, $3 = row, $4 = bound seconds, $5 = argv, $6 = probe|whole
-  local d="$2" rc s marked=0 v=ok why=""
+# THE BUDGET IS A HANG GUARD HERE, NOT A COST VERDICT (TOOL-aMeteredSweep-1). This leg asks whether a
+# suite passes at another prefix; whether it fits its budget is `run-selftests.sh --serial`'s question,
+# asked on a quiet host. Each budget is a quiet reading, and inside a loaded bar six rows overran theirs
+# at all three prefixes while every one of them was passing. A row is killed at HANG_FACTOR times its
+# budget, and that kill reads as a hang, which is the only thing this bound now claims.
+#
+# AND THE FACTOR SCALES WITH THE HOST'S LOAD, measured, never assumed. Three times a quiet budget still
+# killed a passing row beside another repository's bar, so each prefix first times ten spawns and
+# divides by the runner's own recorded floor, `<git-common-dir>/gate-spawn-floor` (the HOST rule's
+# reading, of the repository under test and never of the scratch clone), rounding up and capping at
+# LOAD_RATIO_MAX. No floor, or one that will not read, leaves the
+# ratio at 1 and says so: an unmeasured host is never scaled by a guess.
+HANG_FACTOR=3
+LOAD_RATIO=1; LOAD_RATIO_MAX=20; LOAD_NOTE=""
+measure_load_ratio() {
+  local f floor whole frac floor_us t0 t1 k bin cur
+  LOAD_RATIO=1
+  f="$(git -C "$ROOT" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)/gate-spawn-floor"
+  { IFS=$'\t' read -r floor _ < "$f"; } 2>/dev/null || { LOAD_NOTE="no spawn floor at $f, so every hang bound is unscaled"; return 0; }
+  case "$floor" in [0-9]*.[0-9][0-9][0-9]) ;; *) LOAD_NOTE="the spawn floor at $f does not read, so every hang bound is unscaled"; return 0 ;; esac
+  whole=${floor%.*}; frac=${floor#*.}; floor_us=$(( 10#$whole * 1000 + 10#$frac ))
+  bin=$(type -P true 2>/dev/null); t0=${EPOCHREALTIME//[.,]/}
+  { [ -n "$bin" ] && [ -n "$t0" ] && [ "$floor_us" -gt 0 ]; } || { LOAD_NOTE="no spawn could be timed, so every hang bound is unscaled"; return 0; }
+  for k in 1 2 3 4 5 6 7 8 9 10; do "$bin" </dev/null >/dev/null 2>&1; done
+  t1=${EPOCHREALTIME//[.,]/}; cur=$(( (10#$t1 - 10#$t0) / 10 ))
+  LOAD_RATIO=$(( (cur + floor_us - 1) / floor_us ))
+  [ "$LOAD_RATIO" -ge 1 ] || LOAD_RATIO=1
+  [ "$LOAD_RATIO" -le "$LOAD_RATIO_MAX" ] || LOAD_RATIO=$LOAD_RATIO_MAX
+  LOAD_NOTE="a spawn costs ${cur} us now against this clone's floor of ${floor_us} us, so every hang bound is x${LOAD_RATIO}"
+}
+run_row() { # $1 = prefix label, $2 = run dir, $3 = row, $4 = budget seconds, $5 = argv, $6 = probe|whole
+  local d="$2" rc s marked=0 v=ok why="" x=$(( HANG_FACTOR * LOAD_RATIO ))
   mkdir -p "$d/tmp"
   s=$SECONDS
-  FOREIGN_PREFIX_PROBE=1 SELFTEST_INNER_WIDTH=1 TMPDIR="$d/tmp" timeout -k 5 "$4" bash -c "$5" > "$d/out" 2>&1
+  FOREIGN_PREFIX_PROBE=1 SELFTEST_INNER_WIDTH=1 TMPDIR="$d/tmp" timeout -k 5 "$(( $4 * x ))" bash -c "$5" > "$d/out" 2>&1
   rc=$?
   grep -qxF "$MARKER" "$d/out" && marked=1
-  if [ "$rc" != 0 ]; then v=red; why="exit $rc"
+  if [ "$rc" = 124 ] || [ "$rc" = 137 ]; then v=red; why="a hang: killed at ${x}x its $4 s budget (${HANG_FACTOR}x, load x${LOAD_RATIO})"
+  elif [ "$rc" != 0 ]; then v=red; why="exit $rc"
   elif [ "$6" = probe ] && [ "$marked" = 0 ]; then v=red; why="an undeclared whole run: it printed no probe marker, so it ran every arm"
   elif [ "$6" = whole ] && [ "$marked" = 1 ]; then v=red; why="a stale whole-run declaration: it printed the probe marker"
   fi
@@ -256,6 +287,7 @@ run_row() { # $1 = prefix label, $2 = run dir, $3 = row, $4 = bound seconds, $5 
 run_at_prefix() { # $1 = prefix, empty for the repo root; returns 1 when the prefix is red
   local p="$1" label="${1:-root}" list n=0 i=0 live=0 name bound argv kind red=0 d v why dirty b0 b1 f
   git reset -q --hard "$BASE" && git clean -qfdx
+  measure_load_ratio; echo "foreign-prefix: [$label] $LOAD_NOTE"
   if ! set_tool_root "$p"; then print_fail "could not move the tool root to ${p:-the repo root}"; return 1; fi
   for f in "$KIT/selftest-budgets.txt" gate-legs.json; do
     b0=$(git rev-parse "$BASE:$TROOT/$f" 2>/dev/null); b1=$(git rev-parse "HEAD:${p:+$p/}$f" 2>/dev/null)

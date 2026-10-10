@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 128 · kits: 17 · git-hooks: 4 · harness-hooks: 10 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 103 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 128 · kits: 17 · git-hooks: 4 · harness-hooks: 10 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 104 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -277,6 +277,7 @@ Inventories: gate-legs: 128 · kits: 17 · git-hooks: 4 · harness-hooks: 10 · 
 | `inputs-inside-the-subjects-reach.md` | unattended |
 | `join-key-widened-by-a-shared-location.md` | runlog |
 | `ledger-token-wrapped-across-a-line-joins-nothing.md` | memory-tree-hygiene |
+| `line-claim-matched-over-the-whole-output.md` | memory-tree-hygiene |
 | `line-count-reads-empty-capture-as-one.md` | unattended |
 | `line-keyed-registry-reds-on-a-file-that-grew.md` | lexicon |
 | `liveness-negative-from-another-population.md` | unattended-stops |

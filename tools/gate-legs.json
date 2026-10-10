@@ -547,7 +547,7 @@
       "{prefix}/lib/"
     ],
     "chunk": "selftests",
-    "subject": "repo",
+    "subject": "kit",
     "ceiling": 1780
   },
   {
@@ -575,7 +575,7 @@
       ".githooks/"
     ],
     "chunk": "selftests",
-    "subject": "repo",
+    "subject": "kit",
     "ceiling": 600
   },
   {
@@ -590,7 +590,7 @@
       "{prefix}/lib/"
     ],
     "chunk": "selftests",
-    "subject": "repo",
+    "subject": "kit",
     "ceiling": 580
   },
   {

@@ -2681,6 +2681,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         # liveness assertion — held off every bar while this file reported them running.
         manifest_chunk = {leg.get("name"): leg.get("chunk") for leg in _legs_json}
         manifest_doc_reads = {leg.get("name"): leg.get("doc_reads") for leg in _legs_json}
+        manifest_ceiling = {leg.get("name"): leg.get("ceiling") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             for leg in d.get("gate_leg", []):
@@ -2748,6 +2749,19 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                                f"<prefix>/gate-legs.json says {_m!r} — the descriptor and the "
                                f"manifest disagree about which doc paths this leg reads, so a doc-only "
                                f"push skips it in one tree and runs it in the other")
+                    # AND ABOUT CEILING, where the descriptor declares one (DEPL-aBenchedProbe-2 S5):
+                    # the emitter carries the descriptor's value verbatim into adopters, so it must
+                    # be a positive int (a bool is an int to Python, and not a bound) equal to the
+                    # one gov's own bar runs under. A descriptor declaring none is not compared;
+                    # that is TOOL-aBoundedCeiling-13's remainder, not this clause.
+                    if "ceiling" in leg:
+                        d_ce, m_ce = leg.get("ceiling"), manifest_ceiling.get(nm)
+                        if (isinstance(d_ce, bool) or not isinstance(d_ce, int) or d_ce <= 0
+                                or d_ce != m_ce):
+                            r.fail(f"entry '{eid}' declares gate leg '{nm}' with ceiling {d_ce!r} "
+                                   f"while <prefix>/gate-legs.json says {m_ce!r} — a descriptor "
+                                   f"ceiling must be a positive integer equal to the manifest's, "
+                                   f"because the deployer writes it into every adopter's runner")
                 # AC1b: a name that travels. A digit inside a parenthetical is a COUNT, and a count
                 # in a leg name goes stale exactly where nobody is reading — in somebody else's repo.
                 if re.search(r"\([^)]*\d[^)]*\)", nm):
@@ -3229,6 +3243,64 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                            f"`[[exempt_leg]]` row in <prefix>/govkit/registry.toml")
     r.note(f"declared check: {len(descs)} entries, {len(_no_check)} silent · withheld-path legs: "
            f"{_legs_graded} descriptor leg(s) graded")
+
+    # ---- 7j4: DEPL-aBenchedProbe-1. NO `[[gate_leg]]` IS HELD ON GOV'S BAR AND SHIPPED UNHELD.
+    #          A leg is SELF-TEST-SHAPED when its manifest chunk is `selftests` or the basename of a
+    #          resolved argv element matches `*.test.sh`, `test_*.py` or `*selftest*` (the bare
+    #          `--selftest` flag included). It is EXEMPT when its chunk is present and is anything
+    #          else: gov runs it on every bar, and subject-pins.tsv shows any move of that chunk in a
+    #          diff. A shaped, non-exempt leg whose descriptor subject is not `kit` reaches every
+    #          adopter's default bar while gov holds it. In today's tree every manifest row carries a
+    #          chunk, so the filename clause reds only a row that LOST its chunk; the live predicate
+    #          is `chunk == selftests AND subject != kit`. DOES NOT CHECK: legs outside
+    #          `[[gate_leg]]` (the run-gates canary) or `[[exempt_leg]]` rows; whether gov's chunk is
+    #          right; a self-test whose file name matches none of the globs or that runs indirectly,
+    #          e.g. through `sh -c`; that an exempt leg is cheap.
+    #          TWO STAND-DOWNS (DEPL-aBenchedProbe-3). An absent manifest is a note, not a refusal,
+    #          because 7h grades no leg at all without one. The zero-graded and zero-shaped liveness
+    #          reds bind only while the manifest holds at least one row in chunk `selftests`; with
+    #          none, a zero is TRUE rather than a broken predicate (7c2's rule), and the note says the
+    #          reds stood down. On gov's tree, 7h2's chunk pins red every `selftests` chunk that
+    #          vanishes from the manifest, so the case this gives up is covered there.
+    import fnmatch
+    if not legs_path.is_file():
+        r.note(f"7j4: {legs_path.relative_to(root).as_posix()} is absent, so no leg's chunk is known "
+               f"and a held self-test cannot be told from an exempt check — nothing was graded")
+    else:
+        _j4_pop = sum(1 for c in manifest_chunk.values() if c == "selftests")
+        _j4_graded, _j4_shaped, _j4_exempt = 0, 0, []
+        for eid, (d, _p) in sorted(descs.items()):
+            _ctx = canonical_ctx(eid)
+            for leg in d.get("gate_leg", []):
+                nm = leg.get("name")
+                _j4_graded += 1
+                chunk = manifest_chunk.get(nm)
+                hit = next((s for s in (resolve_tokens(a, _ctx)[0] for a in leg.get("argv", []))
+                            if any(fnmatch.fnmatchcase(posixpath.basename(s), g)
+                                   for g in ("*.test.sh", "test_*.py", "*selftest*"))), None)
+                if chunk != "selftests" and hit is None:
+                    continue
+                _j4_shaped += 1
+                if chunk and chunk != "selftests":
+                    _j4_exempt.append(nm)
+                    continue
+                if leg.get("subject") != "kit":
+                    why = ("manifest chunk `selftests`, so gov holds it" if chunk else
+                           f"argv element {hit}, and the manifest files it in no chunk")
+                    r.fail(f"7j4: entry '{eid}' gate leg '{nm}' is a self-test by its {why}, while its "
+                           f"descriptor subject is '{leg.get('subject')}', so every adopter runs it on "
+                           f"its default bar. Hold it everywhere: `subject = \"kit\"` "
+                           f"in the descriptor and <prefix>/gate-legs.json, then `selfcheck --write`. Or "
+                           f"run it everywhere: file it in a chunk other than `selftests`")
+        _j4_live = r.fail if _j4_pop else r.note
+        if not _j4_graded:
+            _j4_live("7j4: graded zero descriptor gate legs — the held-self-test arm saw nothing")
+        elif not _j4_shaped:
+            _j4_live("7j4: found zero self-test-shaped legs among "
+                     f"{_j4_graded} — the predicate has stopped matching, so a green here proves nothing")
+        r.note(f"held self-test legs: {_j4_graded} graded, {_j4_shaped} self-test-shaped, "
+               f"exempt by chunk: {', '.join(sorted(_j4_exempt)) or 'none'} · population {_j4_pop} "
+               f"in chunk selftests" + ("" if _j4_pop else " — the zero-population reds stand down"))
 
     # ---- 7k: entry-level `scope` is DERIVED and asserted against the declared value. Every
     #          descriptor declares one and the engine read only the rule-level spelling, so the
@@ -4034,6 +4106,14 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 elif _dr_why:
                     print(f"govkit {verb} — gate leg '{nm}': doc_reads omitted ({_dr_why}), so it "
                           f"runs on every doc-only push")
+                # THE CEILING TRAVELS where the descriptor declares one and the target's runner is
+                # at CEILING_FLOOR_RUN_GATES or later, carried verbatim: the descriptor is
+                # gov-authored and selfcheck 7h grades its shape. No fallback to gov's manifest,
+                # which would bound every leg rather than the declaring ones. DEPL-aBenchedProbe-2.
+                _ce = leg.get("ceiling") if check_target_reads_subject(
+                    target, deploy, descs, floor=CEILING_FLOOR_RUN_GATES) else None
+                if _ce is not None:
+                    row["ceiling"] = _ce
                 if nm in by_name:
                     prev = next((e for e in owned and prior if e["name"] == nm), None)
                     # DEPL-cMendedVintage-22. THE SUBJECT OF THIS COMPARISON IS THE TARGET, and for
@@ -4069,6 +4149,19 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                                f"reporting drift rather than replacing it; ownership of the NAME is "
                                f"not ownership of the ROW")
                         continue
+                    # THE KEEP RULE (DEPL-aBenchedProbe-2 S4). A ceiling on the target's row that
+                    # differs from the one the receipt recorded is the adopter's own bound, so it
+                    # is written back and reported, never refused: it sits outside the drift
+                    # comparison above and cannot withhold the manifest. The receipt still records
+                    # gov's value, so a kept bound keeps differing and stays kept, while a row the
+                    # adopter never touched matches and takes gov's new value. WHAT IT DOES NOT DO:
+                    # it does not preserve a DELETED key (an absent ceiling takes gov's value
+                    # back), and it validates no value, kept or emitted.
+                    if "ceiling" in tgt and tgt["ceiling"] != (prev or {}).get("ceiling"):
+                        row["ceiling"] = tgt["ceiling"]
+                        print(f"govkit {verb} — gate leg '{nm}': kept the target's ceiling "
+                              f"{tgt['ceiling']!r} (gov's is {_ce!r}); a ceiling the receipt did "
+                              f"not record is the target's own")
                     existing[by_name[nm]] = row
                 else:
                     existing.append(row)
@@ -4088,6 +4181,10 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                                 # audit of a unit that was about to copy this seam verbatim.
                                 "subject": row.get("subject"),
                                 "doc_reads": row.get("doc_reads"),
+                                # gov's computed value, never a kept one: the S4 keep rule above
+                                # compares the target against THIS, so recording the kept value
+                                # would let the next run overwrite the adopter's bound.
+                                "ceiling": _ce,
                                 "guard_dropped": [{"spec": a, "why": b} for a, b in dropped],
                                 "history_depth": leg.get("history_depth")})
                 if dropped and not guards:
@@ -4351,6 +4448,11 @@ SHELL_EXEC_SITES = {
     # interpolated into it -- and this table's own definition of `target` is that the target
     # influences the argv, whatever the template's provenance. A paired arm caught it by name.
     "_cmd_update": "target",
+    # TOOL-aMendedFleet-65 gave `mint` the minted kits' `[[regenerate]]` argvs to run, and no row;
+    # TOOL-aMeteredSweep-1 adds it. Gov's own descriptors, tokens from `canonical_ctx`, in gov's tree,
+    # from a writing verb. `target` anyway, on `run_probe_in_empty_dir`'s reasoning: the argv passes
+    # `resolve_tokens`, and the conservative label cannot understate a site's exposure.
+    "cmd_mint": "target",
 }
 # THREE LABELS, because there are three things and two of them were being called one. `gov`: gov
 # wrote the argv and gov controls every value in it. `target`: the target influences the ARGV, so a
@@ -5564,6 +5666,10 @@ SUBJECT_FLOOR_RUN_GATES = (1, 1)
 # The run-gates version at which `doc_reads` entered that key set, and the runner learned to read it.
 # TOOL-dThriftyLanding-4, against the runner TOOL-dThriftyLanding-1 shipped as 1.25.
 DOC_READS_FLOOR_RUN_GATES = (1, 25)
+# The run-gates version that certainly admits `ceiling`. The canary's key set gained it in db3616531
+# while the runner still read 1.1, and 836e4e27b is the first commit at 1.2, so 1.1 is ambiguous and
+# 1.2 is the first version that cannot red a target's canary on the key. DEPL-aBenchedProbe-2.
+CEILING_FLOOR_RUN_GATES = (1, 2)
 
 
 def derive_doc_reads(leg: dict, ctx: dict[str, str], have: set[str]) -> tuple[list[str] | None, str]:
