@@ -37,3 +37,12 @@ TOOL-aLevelledCopy-3	late row: its --brief row is in RUN.md at bb6178eab, the re
 TOOL-aLevelledCopy-7	late row: its --brief row is in RUN.md at dae09ec1f, the records commit right after the pass, because the build brief said to stage declared paths only and the pass left RUN.md for the main loop
 TOOL-aLevelledCopy-9	late row: its --brief row is in RUN.md at 0a09d7a09, the records commit right after the pass, because the build brief said to stage declared paths only and the pass left RUN.md for the main loop
 TOOL-aLevelledCopy-8	late row: its --brief row is in RUN.md at 669816ae7, the records commit right after the pass, because the build brief said to stage declared paths only and the pass left RUN.md for the main loop
+#
+# THE aFrugalTurnstile ROWS are one kind, a LATE ROW, found by that run's main loop on 2026-10-10.
+# The unit harness's agents were told the --brief row was already recorded, and for these three it
+# was not: the main loop had recorded briefs only for the order-1 units. The rows were recorded once
+# the gap was seen and reached history in the next pass commit. History is append-only, so no honest
+# row can move into the three build commits.
+TOOL-aFrugalTurnstile-2	late row: its --brief row is in RUN.md at a90b2d820, two passes after its build commit b99b2dc38, because the main loop recorded no brief before dispatching it
+TOOL-aFrugalTurnstile-3	late row: its --brief row is in RUN.md at a90b2d820, after its build commit b3bd680e6, because the main loop recorded no brief before dispatching it
+TOOL-aFrugalTurnstile-5	late row: its --brief row is in RUN.md at a90b2d820, after its build commit 587b006f7, because the main loop recorded no brief before dispatching it
