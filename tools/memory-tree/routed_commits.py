@@ -574,7 +574,7 @@ def run_selftest() -> int:
             "AC7 a pre-cutoff commit is exempt, a merge is counted, a move out of ROUTED_PATHS reds", out)
 
         # ---- AC11: the lander's mint names the range's unit, with `Pass: none`
-        mint = "mint: kit versions onto origin/main at 1234abcd"
+        mint = "mint: kit versions onto upstream/main at 1234abcd"
         for name, subject, want in (("mint", f"{mint} for TOOL-tFix-1", 0), ("bare", mint, 1)):
             repo, s = build_fixture(root, name, [
                 {"msg": "init", "files": {"README.md": "x\n"}},
