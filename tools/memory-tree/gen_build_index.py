@@ -6117,6 +6117,37 @@ def cmd_selftest() -> int:
         "carries no skeleton fence",
         lambda: render_spec_skeleton("# T\n\n## 1. Goal\n", *_n_args, "", []))
 
+    # TOOL-aRoutedQuill-1 AC6 — a template carrying BOTH fences, the Tier-1 one above a Tier-2 one
+    # that nests a fence. The base generator took the first fence as the start and the last fence
+    # line as the end, so it merged both heading lists; each tier must read its own fence only.
+    _q_t1 = ("```markdown\n# <FAMILY-slug-seq> — <title>\n\n**Status:** OPEN · rev-1 · YYYY-MM-DD · "
+             "node <tag> · Tier-1 · base <sha8>\n\n## 1. Goal\n\n## 2. Scope (IN)\n\n"
+             "## 3. Non-goals (OUT)\n\n## 4. Design\n\n## 5. Acceptance criteria\n\n## 6. Gates\n\n"
+             "## 7. Open questions\n\n## 8. Revision log\n```\n\n")
+    _q_t2 = ("```markdown\n# <FAMILY-slug-seq> — <title>\n\n**Status:** OPEN · rev-1 · YYYY-MM-DD · "
+             "node <tag> · Tier-<1|2> · base <sha8>\n\n## 1. Goal\n\n## 5. Production-readiness "
+             "checklist\n\n## 6. Acceptance criteria\n\n```markdown\n- AC1 example\n```\n\n"
+             "## 9. Revision log\n```\n")
+    _q_both = "# T\n\n" + _q_t1 + _q_t2
+    _q_args = ("memory/TEMPLATE-SPEC.md", "ARCH-aFix-3", "1", "0123abcd", "2026-10-04", "arch")
+    _q_one = render_spec_skeleton(_q_both, *_q_args, "", ["alpha"])
+    _q_two = render_spec_skeleton(_q_both, *(_q_args[:2] + ("2",) + _q_args[3:]), "", ["alpha"])
+    arm("TOOL-aRoutedQuill-1 AC6 — --tier 1 writes the Tier-1 fence's eight headings and nothing else",
+        "['## 1. Goal', '## 2. Scope (IN)', '## 3. Non-goals (OUT)', '## 4. Design', "
+        "'## 5. Acceptance criteria', '## 6. Gates', '## 7. Open questions', '## 8. Revision log']",
+        lambda: str([ln for ln in _q_one.split("\n") if ln.startswith("## ")]))
+    arm("TOOL-aRoutedQuill-1 AC6 — Tier-1 section 5 gets the criterion slot, never the readiness rows",
+        "True False",
+        lambda: "%s %s" % ("- **AC1** — When" in _q_one.split("## 5.")[1].split("## 6.")[0],
+                           "- alpha — " in _q_one))
+    arm("TOOL-aRoutedQuill-1 AC6 — --tier 2 reads the LAST fence only, byte-identical to a template "
+        "without the Tier-1 fence", "True",
+        lambda: str(_q_two == render_spec_skeleton("# T\n\n" + _q_t2, *(_q_args[:2] + ("2",)
+                                                    + _q_args[3:]), "", ["alpha"])))
+    arm("TOOL-aRoutedQuill-1 S5 — --tier 1 against a template with no Tier-1 fence is refused by name",
+        "carries no Tier-1 skeleton fence",
+        lambda: render_spec_skeleton("# T\n\n" + _q_t2, *_q_args, "", []))
+
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it
     # would be one more row in the manifest for a file this one already imports. Its arms print
@@ -6300,6 +6331,13 @@ def cmd_doctor(root: str, conf: dict, slug: str) -> int:
 NEW_SPEC_USAGE = "usage: gen_build_index.py --new-spec <ID> --tier <1|2> [--order <n>] [--base <sha>]"
 #: The slot opener. Check 12's placeholder pattern carries it as its third alternative, both tiers.
 FILL_MARKER = "<fill:"
+#: Each canonical section title and the Tier-2 number whose skeleton body it receives. Bodies are
+#: keyed by TITLE because a Tier-1 micro-spec numbers its sections freely (TOOL-aRoutedQuill-1).
+SPEC_TITLE_NUMBERS = {
+    "Goal": 1, "Scope (IN)": 2, "Non-goals (OUT)": 3, "Design": 4,
+    "Production-readiness checklist": 5, "Acceptance criteria": 6, "Gates": 7,
+    "Open questions": 8, "Revision log": 9, "Reuse audit": 10,
+}
 
 
 def read_new_spec_args(argv: list) -> dict:
@@ -6327,14 +6365,31 @@ def render_spec_skeleton(template: str, template_rel: str, spec_id: str, tier: s
                          today: str, streams: str, order: str, rows: list) -> str:
     """The new spec's bytes: a filled header, the template's `##` headings, a slot per authored part.
 
-    The headings are READ from the skeleton fence of the installed template (F2), so the section
-    canon keeps one spelling; a section's body is chosen by its NUMBER, so a renamed heading is
-    followed. A template with no skeleton fence is a refusal, never a guess.
+    The headings are READ from the tier's skeleton fence of the installed template (F2), so the
+    section canon keeps one spelling. Tier-2 is the LAST fence opening on the placeholder H1 and
+    ends at the file's last fence line, because it nests a fence; Tier-1 is the fence whose status
+    line reads `Tier-1` and ends at its own closing line (TOOL-aRoutedQuill-1). A section's body is
+    chosen by its TITLE, so a Tier-1 spec numbering Acceptance criteria 5 gets the criterion slot.
+    A template with no fence for the tier is a refusal, never a guess.
     """
     lines = template.split("\n")
-    start = next((i for i in range(len(lines) - 1) if lines[i].startswith("```")
-                  and lines[i + 1].startswith("# <FAMILY-slug-seq>")), None)
-    end = max((i for i, line in enumerate(lines) if line.startswith("```")), default=-1)
+    opens = [i for i in range(len(lines) - 1) if lines[i].startswith("```")
+             and lines[i + 1].startswith("# <FAMILY-slug-seq>")]
+    if tier == "1":
+        start = end = None
+        for i in opens:
+            close = next((j for j in range(i + 1, len(lines)) if lines[j].startswith("```")), None)
+            if close is not None and any(line.startswith("**Status:**") and "Tier-1 " in line
+                                         for line in lines[i + 1:close]):
+                start, end = i, close
+                break
+        if start is None:
+            raise Problem(f"--new-spec: {template_rel} carries no Tier-1 skeleton fence (one opening "
+                          f"on `# <FAMILY-slug-seq>` whose status line reads `Tier-1`); nothing "
+                          f"was written")
+    else:
+        start = opens[-1] if opens else None
+        end = max((i for i, line in enumerate(lines) if line.startswith("```")), default=-1)
     headings = [line.rstrip() for line in lines[start + 1:end]
                 if line.startswith("## ")] if start is not None else []
     if not headings:
@@ -6365,8 +6420,8 @@ def render_spec_skeleton(template: str, template_rel: str, spec_id: str, tier: s
               f"· base {base} · streams {streams}" + (f" · order {order}" if order else ""))
     out = [f"# {spec_id} — {fill.format('title')}", "", header]
     for h in headings:
-        num = re.match(r"## (\d+)\.", h)
-        out += ["", h, ""] + bodies.get(int(num.group(1)) if num else 0,
+        title = re.sub(r"^## \d+\.\s*", "", h)
+        out += ["", h, ""] + bodies.get(SPEC_TITLE_NUMBERS.get(title, 0),
                                         [fill.format("this section")])
     return "\n".join(out) + "\n"
 

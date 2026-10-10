@@ -39,7 +39,8 @@
  * than more regexes.
  *
  * FAILS OPEN. Unparseable stdin, an unknown tool, or a missing command all exit 0. This is a hygiene
- * rule, not a containment boundary; a security control would have to fail the other way.
+ * rule, not a containment boundary; a security control would have to fail the other way. The THIRD
+ * check below, the write gate, is the one exception: it fails closed.
  *
  * Protocol: deny = stderr text + exit 2. Allow = print nothing, exit 0. Matches agent-cap.js, which
  * records the choice as version-robust and free of any JSON-schema dependency — with ONE departure,
@@ -67,10 +68,41 @@
  * card, an unwalkable target and the README exemption each write one line to stderr and exit 0.
  * The harness discards stderr on exit 0, so those lines reach the debug log and the self-test and
  * NOBODY ELSE; a present `--write` card that passes prints nothing. Nothing here claims more.
+ *
+ * THE THIRD CHECK: THE WRITE GATE (TOOL-aRoutedQuill-2). An Edit, Write, MultiEdit or NotebookEdit
+ * whose target lies under the repository's declared product paths — `ROUTED_PATHS` in the target
+ * toplevel's `.memory-tree.conf` — is refused unless this session's orientation card carries a
+ * `## route` naming a unit whose spec is BUILDABLE: Tier-2 at INPROGRESS, Tier-1 at INPROGRESS, or
+ * Tier-1 at SPECCED once `SPEC_TIER1_CUTOFF` graded it. `checkRouted` is the predicate and its
+ * comment is the ONE evaluation order. It binds a subagent exactly as the main loop: a subagent's
+ * payload carries the parent's `session_id` (measured, the aRoutedQuill probe record), so it reads
+ * the parent's card. A conf that declares MEMORY_ROOT or ROUTED_PATHS blank, or an entry that is
+ * absolute, climbs through `..` or covers MEMORY_ROOT, is UNARMED: every write in that repository
+ * refuses except one to the conf. A target in no repository, or in one that is not the session's,
+ * is not gated; neither is a repository with no conf (one witness line).
+ *
+ * WHAT ESCAPES THE WRITE GATE — it stops forgetting, not evasion: a Bash or PowerShell write (`sed
+ * -i`, an interpreter, a redirect) is never seen, and the push-time leg owns that guarantee; a
+ * hook-less or `--bare` run fires no hook; a narrowed ROUTED_PATHS is a conf diff, not a refusal; a
+ * hand-written card with a `## route` is read like the writer's; and a spec status flipped to
+ * INPROGRESS without the owner's approval admits, because the gate reads a status the agent writes.
+ *
+ * THE THIRD EVENT: SUBAGENTSTART (TOOL-aRoutedQuill-4). A subagent inherits the hooks but not the
+ * parent's card, so it would meet the write gate blind. Wired by `scratch-guard-subagent.fragment.json`
+ * (matcher `*`), a payload whose `hook_event_name` is `SubagentStart` is answered on stdout with
+ * `hookSpecificOutput.additionalContext`: the card's `## route` lines byte for byte, each routed unit's
+ * `checkBuildable` verdict, and what the gate refuses under `ROUTED_PATHS`. `renderRouteContext` is
+ * the predicate and its comment is the ONE evaluation order. Its silence rules: nothing when the
+ * session directory is in no repository or its toplevel holds no conf (the gate admits every write
+ * there); ONE line when the conf is unreadable or UNARMED, or the session routes no unit. Every
+ * sentence states what holds and none directs, because injected imperatives can trip a model's
+ * prompt-injection defences. Capped at ROUTE_CONTEXT_CAP characters, the harness's own cap: route
+ * lines are cut at a line boundary and a closing line counts what was left out. It never blocks and
+ * never surfaces an error: a throw prints nothing and exits 0.
  */
 'use strict'
 
-const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.31 — ships inside the hooks kit entry
+const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.32 — ships inside the hooks kit entry
 
 const TOOLS = ['Bash', 'PowerShell']
 const MAX_FINDINGS = 6
@@ -718,11 +750,351 @@ function checkOriented(cmd, data) {
   return { deny: renderOrientationDeny(card, ready ? 'tree' : 'sentinel', cardTree, here) }
 }
 
+// ---- the write gate (TOOL-aRoutedQuill-2) -------------------------------------------------------
+
+const WRITE_TOOLS = ['Edit', 'Write', 'MultiEdit', 'NotebookEdit']
+/** The statuses that admit a write, per tier. A Tier-1 SPECCED admits only when graded (F4). */
+const BUILDABLE_STATUS = { 'Tier-1': ['INPROGRESS', 'SPECCED'], 'Tier-2': ['INPROGRESS'] }
+/** The memory-tree conf at the target's toplevel; precedent for a root-level conf literal: agent-cap.js. */
+const ROUTE_CONF = '.memory-tree.conf'
+
+/**
+ * The LAST `<key>=` assignment's value in a shell-style conf, as the shell reads it: double- or
+ * single-quoted or bare, an optional `export`, a trailing `# comment` only behind whitespace — a `#`
+ * glued to a bare word is part of the word. null when no assignment exists; the value is RAW. The
+ * key is compared as a string and never put into a regex (`conf-value-interpolated-into-a-regex`).
+ * Lifted from agent-cap.js's `readSpecAuditDefault`, which now delegates here: one conf grammar
+ * in this home. Ceiling: a multi-line quoted value elsewhere in the conf can hold a line that
+ * reads as an assignment; the shell would not read it so.
+ */
+function readConfKey(bytes, key) {
+  let v = null
+  for (const line of String(bytes || '').split(/\r?\n/)) {
+    const m = /^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(?:"([^"]*)"|'([^']*)'|(\S*))(?:\s+#.*)?\s*$/.exec(line)
+    if (m && m[1] === key) v = m[2] !== undefined ? m[2] : m[3] !== undefined ? m[3] : m[4]
+  }
+  return v
+}
+
+/** An MSYS drive spelling (`/c/x`) folded to the native one on Windows, case kept, for the walk. */
+function buildNativePath(p) {
+  return process.platform === 'win32' ? String(p).replace(/^\/([A-Za-z])(\/|$)/, '$1:/') : String(p)
+}
+
+/** The common dir in comparable form, 8.3 names expanded, or '' when `start` walks to no `.git`. */
+function resolveComparableCommon(start) {
+  const hit = resolveToplevel(start)
+  if (!hit) return { hit: null, common: '', key: '' }
+  const common = resolveCommonDir(hit)
+  if (!common) return { hit, common: '', key: '' }
+  return { hit, common, key: buildComparablePath(resolveRealPath(common) || common) }
+}
+
+/**
+ * Every `- unit:` line of every `## route` section, a section running from its heading to the next
+ * `## ` heading or READY line, backticks stripped. `{ build, units: [{ unit, spec }] }`, `spec` ''
+ * when the line names none. The `- brief:` line is not read here. `lines` is every non-blank line of
+ * those sections, the heading included, as the card holds it, each with the unit it names or null —
+ * what the subagent context copies.
+ */
+function extractRouteUnits(text) {
+  let inRoute = false
+  let build = ''
+  let seen = false
+  const units = []
+  const lines = []
+  for (const raw of String(text || '').split(/\r?\n/)) {
+    const line = raw.replace(/`/g, '').trim()
+    if (line === '## route') { inRoute = true; seen = true; lines.push({ text: raw, unit: null }); continue }
+    if (line.startsWith('## ') || line.replace(/^- /, '').startsWith('READY — ')) { inRoute = false; continue }
+    if (!inRoute || line === '') continue
+    let unit = null
+    const b = /^- build:\s*(\S+)\s*$/.exec(line)
+    const u = /^- unit:\s*(\S+)(?:\s*·\s*spec\s+(\S+))?\s*$/.exec(line)
+    if (b) build = b[1]
+    else if (u) units.push(unit = { unit: u[1], spec: u[2] || '' })
+    lines.push({ text: raw, unit })
+  }
+  return { seen, build, units, lines }
+}
+
+/** The status header's first cell and its `Tier-<n>` cell: `{ status, tier }`, '(none)' and '' when absent. */
+function readStatusCells(text) {
+  const st = String(text || '').split(/\r?\n/).find((l) => l.startsWith('**Status:**')) || ''
+  const cells = st.slice('**Status:**'.length).split('·').map((c) => c.trim())
+  return { status: cells[0] || '(none)', tier: cells.find((c) => /^Tier-\d$/.test(c)) || '' }
+}
+
+/**
+ * S3: is this routed unit BUILDABLE? '' when it is, else the reason. The spec path is repo-relative
+ * under `<MEMORY_ROOT>/builds/<build>/spec/`, the file exists, its H1 names the unit, and its status
+ * header's tier and status admit by BUILDABLE_STATUS — a Tier-1 SPECCED only when the conf's
+ * `SPEC_TIER1_CUTOFF` is set and the spec's filename date is on or after it.
+ */
+function checkBuildable(u, build, top, memRoot, confBytes) {
+  const fs = require('fs')
+  const path = require('path')
+  if (!u.spec) return 'the route line names no spec'
+  if (!build) return 'the route names no - build: line, so the spec\'s build folder cannot be checked'
+  const rel = buildComparablePath(u.spec)
+  if (/^([a-z]:|\/|~)/.test(rel) || rel.split('/').includes('..')) return `spec ${u.spec} is not a repo-relative path`
+  const want = buildComparablePath(memRoot) + '/builds/' + buildComparablePath(build) + '/spec/'
+  // Any depth under the spec folder, as KICK R4 and parse_spec_h1 admit (TOOL-aRoutedQuill-12 S10).
+  if (!rel.startsWith(want)) return `spec ${u.spec} is outside ${want}`
+  let text
+  try { text = fs.readFileSync(path.join(top, buildNativePath(u.spec)), 'utf8') } catch { return `spec ${u.spec} does not exist` }
+  // The H1 read R4 and tree_lib.parse_spec_h1 make (S8): the first UNFENCED `#` line, its first token
+  // with backticks and asterisks stripped and trailing `:.,;` dropped, compared whole.
+  let fenced = false
+  let h1Id = ''
+  for (const l of text.split(/\r?\n/)) {
+    if (/^ ? ? ?(```|~~~)/.test(l)) { fenced = !fenced; continue }
+    if (fenced || !/^#[ \t]/.test(l)) continue
+    h1Id = (l.split(/[ \t]+/)[1] || '').replace(/[`*]/g, '').replace(/[:.,;]+$/, '')
+    break
+  }
+  if (h1Id !== u.unit) return `spec ${u.spec} has H1 naming ${h1Id || '(nothing)'}, not ${u.unit}`
+  const { status, tier } = readStatusCells(text)
+  const admits = BUILDABLE_STATUS[tier]
+  if (!admits) return `spec ${u.spec} names no Tier-1 or Tier-2 on its status header`
+  if (!admits.includes(status)) {
+    return tier === 'Tier-2'
+      ? `${tier} at ${status}: a Tier-2 unit admits writes at INPROGRESS, which follows the owner's scope approval`
+      : `${tier} at ${status}: a Tier-1 unit admits writes at INPROGRESS, or at SPECCED once graded`
+  }
+  if (tier === 'Tier-1' && status === 'SPECCED') {
+    const cutoff = readConfKey(confBytes, 'SPEC_TIER1_CUTOFF') || ''
+    const dated = /^(\d{4}-\d{2}-\d{2})-/.exec(path.basename(u.spec))
+    // Facts, not a remedy: the subagent context quotes these reasons, and the deny carries its own.
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(cutoff)) return `Tier-1 at SPECCED, and SPEC_TIER1_CUTOFF is blank, so no check graded its micro-spec; a Tier-1 unit at INPROGRESS admits`
+    if (!dated || dated[1] < cutoff) return `Tier-1 at SPECCED, dated before SPEC_TIER1_CUTOFF ${cutoff}, so no check graded its micro-spec; a Tier-1 unit at INPROGRESS admits`
+  }
+  return ''
+}
+
+/** S6: why the conf leaves the gate UNARMED, or '' when it is armed. */
+function checkUnarmed(memRoot, routed) {
+  if (!memRoot || !memRoot.trim()) return 'MEMORY_ROOT is blank or absent'
+  if (!routed || !routed.trim()) return 'ROUTED_PATHS is blank or absent'
+  const mem = buildComparablePath(memRoot.trim()).replace(/^\.\//, '')
+  for (const e of routed.trim().split(/\s+/)) {
+    const c = buildComparablePath(e).replace(/^\.\//, '')
+    if (/^([a-z]:|\/|~)/.test(c)) return `ROUTED_PATHS entry ${e} is absolute`
+    if (c.split('/').includes('..')) return `ROUTED_PATHS entry ${e} climbs through ..`
+    // Two-way (TOOL-aRoutedQuill-12 S6): an entry under MEMORY_ROOT covers it as surely as one above it.
+    if (c === '' || c === '.' || checkUnderRoot(mem, c) || checkUnderRoot(c, mem)) return `ROUTED_PATHS entry ${e} covers MEMORY_ROOT (${memRoot}), so writing a spec would need a spec first`
+  }
+  return ''
+}
+
+/** The product-path refusal: target, entry, state, remedy, and what the gate does not reach. */
+function renderRouteDeny(tool, target, entry, conf, state, remedy) {
+  return (
+    `BLOCKED by scratch-guard: this ${tool} targets ${target}, a product path under ROUTED_PATHS entry ` +
+    `\`${entry}\` in ${conf}, and ${state}.\n\n${remedy}\n\nA write outside ROUTED_PATHS — the unit's ` +
+    'spec and the orientation card included — is not gated.\n'
+  )
+}
+
+/**
+ * THE ONE EVALUATION ORDER of the write gate. Returns null to print nothing, `{ witness }` to allow
+ * with one stderr line, `{ deny }` to refuse.
+ *  1. `tool_name` outside WRITE_TOOLS → null
+ *  2. no non-empty `file_path` / `notebook_path`, or a relative one with no payload `cwd` → deny
+ *  3. session repository = common dir of `CLAUDE_PROJECT_DIR`, else of `cwd`; no `.git` above the
+ *     target, no session repository, or a target common dir that differs → null
+ *  4. `<target toplevel>/.memory-tree.conf` absent → witness; present and unreadable → deny
+ *  5. UNARMED (checkUnarmed) → null when the target is the conf, else deny
+ *  6. the target under no ROUTED_PATHS entry → null; only a product path reads the card
+ *  7. `session_id` missing, or no card for it under the common dir → deny, absent
+ *  8. no `## route`, or no `- unit:` line in it → deny, unrouted
+ *  9. any routed unit BUILDABLE (checkBuildable) → null; else deny listing each unit's reason
+ * No `agent_id` exemption: a subagent's write is judged by the same order (S7).
+ */
+function checkRouted(data, env) {
+  const fs = require('fs')
+  const path = require('path')
+  if (!WRITE_TOOLS.includes(data.tool_name)) return null
+  const tool = data.tool_name
+  const ti = data.tool_input && typeof data.tool_input === 'object' ? data.tool_input : {}
+  const raw = [ti.file_path, ti.notebook_path].find((v) => typeof v === 'string' && v !== '')
+  const cwd = typeof data.cwd === 'string' && data.cwd !== '' ? data.cwd : ''
+  if (raw === undefined) {
+    return { deny: `BLOCKED by scratch-guard: this ${tool} payload carries neither tool_input.file_path nor tool_input.notebook_path as a non-empty string, so the write gate cannot place its target and refuses.\n` }
+  }
+  const native = buildNativePath(raw)
+  if (!path.isAbsolute(native) && !cwd) {
+    return { deny: `BLOCKED by scratch-guard: this ${tool} names a relative target (${raw}) in tool_input.file_path or tool_input.notebook_path, and the payload carries no cwd to resolve it against, so the write gate refuses.\n` }
+  }
+  // The target's REAL place (TOOL-aRoutedQuill-12 S4): the realpath of its deepest existing ancestor
+  // with the not-yet-existing tail appended, so a product file reached through a junction or a symlink
+  // is placed, and gated, like its repository spelling.
+  let target = cwd ? path.resolve(buildNativePath(cwd), native) : path.resolve(native)
+  for (let head = target, tail = ''; ;) {
+    if (fs.existsSync(head)) { target = path.join(resolveRealPath(head) || head, tail); break }
+    const up = path.dirname(head)
+    if (up === head) break
+    tail = tail ? path.join(path.basename(head), tail) : path.basename(head)
+    head = up
+  }
+  const sessionStart = env.CLAUDE_PROJECT_DIR || cwd
+  if (!sessionStart) return null
+  const session = resolveComparableCommon(path.resolve(buildNativePath(sessionStart)))
+  const mine = resolveComparableCommon(target)
+  if (!session.key || !mine.key || session.key !== mine.key) return null
+  const top = mine.hit.toplevel
+  const confPath = path.join(top, ROUTE_CONF)
+  const confShown = buildComparablePath(confPath)
+  let confBytes
+  try {
+    confBytes = fs.readFileSync(confPath, 'utf8')
+  } catch (e) {
+    if (e && e.code === 'ENOENT') return { witness: `write gate not armed — no ${ROUTE_CONF} at ${buildComparablePath(top)}` }
+    return { deny: `BLOCKED by scratch-guard: ${confShown} exists and cannot be read (${(e && e.code) || e}), so the write gate cannot decide this ${tool} and refuses.\n` }
+  }
+  const targetC = buildComparablePath(target)
+  const memRoot = readConfKey(confBytes, 'MEMORY_ROOT')
+  const routed = readConfKey(confBytes, 'ROUTED_PATHS')
+  const unarmed = checkUnarmed(memRoot, routed)
+  if (unarmed) {
+    if (targetC === confShown) return null
+    return { deny: `BLOCKED by scratch-guard: the write gate is UNARMED in this repository — ${confShown}: ${unarmed}. The gate reads MEMORY_ROOT and ROUTED_PATHS from that conf, and every write here refuses until both are sound; the one write admitted is to ${confShown} itself.\n` }
+  }
+  const rel = targetC.slice(buildComparablePath(top).length + 1)
+  const entry = routed.trim().split(/\s+/).find((e) => {
+    const c = buildComparablePath(e).replace(/^\.\//, '')
+    return /[\\/]$/.test(e) ? checkUnderRoot(rel, c) : rel === c
+  })
+  if (entry === undefined) return null
+  const sid = data.session_id ? String(data.session_id) : ''
+  const card = sid ? readCard(mine.common, sid) : null
+  if (!card || card.text === null) {
+    const where = card ? `this session has no orientation card at ${card.shown} (session ${sid})` : 'the payload carries no session_id, so no orientation card can be read'
+    return { deny: renderRouteDeny(tool, targetC, entry, confShown, where, `Create the card with manifest-check.sh --card --write --session ${sid || '<session id>'} from the kickoff kit, then run /session-kickoff, which specs the unit, writes its brief and appends a ## route naming it.`) }
+  }
+  const route = extractRouteUnits(card.text)
+  if (!route.seen || route.units.length === 0) {
+    const what = route.seen ? `its ## route at ${card.shown} carries no - unit: line` : `its orientation card ${card.shown} carries no ## route`
+    return { deny: renderRouteDeny(tool, targetC, entry, confShown, what, `Run /session-kickoff: give the unit its spec, then append a ## route naming it through manifest-check.sh --card --append --session ${sid}.`) }
+  }
+  const reasons = []
+  for (const u of route.units) {
+    const why = checkBuildable(u, route.build, top, memRoot.trim(), confBytes)
+    if (!why) return null
+    reasons.push(`  ${u.unit}: ${why}`)
+  }
+  return { deny: renderRouteDeny(tool, targetC, entry, confShown, `no unit its card ${card.shown} routes is buildable:\n${reasons.join('\n')}`, 'Make one routed unit buildable — its spec at the status that admits writes — or route the unit that owns this write through /session-kickoff and manifest-check.sh --card --append.') }
+}
+
+// ---- the subagent context (TOOL-aRoutedQuill-4) ------------------------------------------------
+
+/** The harness's cap on a hook's additionalContext, in characters (Claude Code's documentation). */
+const ROUTE_CONTEXT_CAP = 10000
+const WRITE_TOOLS_PROSE = 'an Edit, Write, MultiEdit or NotebookEdit'
+
+/**
+ * What a subagent is told at SubagentStart, or '' to print nothing. THE ONE EVALUATION ORDER:
+ *  1. session directory = `CLAUDE_PROJECT_DIR`, else the payload `cwd`; under no `.git` → ''
+ *  2. no `.memory-tree.conf` at its toplevel → '' (the gate admits every write there)
+ *  3. the conf unreadable, or UNARMED (checkUnarmed) → its one line
+ *  4. `session_id` missing, no card under the common dir, no `## route`, no `- unit:` → one line
+ *  5. otherwise the card path, its route lines byte for byte, one checkBuildable verdict per unit
+ *     line, the ROUTED_PATHS value and what the gate refuses — route lines cut at a line boundary
+ *     to ROUTE_CONTEXT_CAP, a cut unit line taking its verdict with it, and a closing count line
+ * The card is located as checkRouted locates it, so the context and the gate read one card.
+ */
+function renderRouteContext(data, env) {
+  const fs = require('fs')
+  const path = require('path')
+  const start = env.CLAUDE_PROJECT_DIR || (typeof data.cwd === 'string' ? data.cwd : '')
+  if (!start) return ''
+  const hit = resolveToplevel(path.resolve(buildNativePath(start)))
+  const common = hit && resolveCommonDir(hit)
+  if (!common) return ''
+  const top = hit.toplevel
+  const confShown = buildComparablePath(path.join(top, ROUTE_CONF))
+  let confBytes
+  try {
+    confBytes = fs.readFileSync(path.join(top, ROUTE_CONF), 'utf8')
+  } catch (e) {
+    if (e && e.code === 'ENOENT') return ''
+    return `${confShown} could not be read (${(e && e.code) || e}), so scratch-guard refuses every Edit, Write, MultiEdit or NotebookEdit in this repository.`
+  }
+  const memRoot = readConfKey(confBytes, 'MEMORY_ROOT')
+  const routed = readConfKey(confBytes, 'ROUTED_PATHS')
+  const unarmed = checkUnarmed(memRoot, routed)
+  if (unarmed) return `${confShown} leaves the write gate UNARMED: ${unarmed}, so scratch-guard refuses every Edit, Write, MultiEdit or NotebookEdit in this repository except to that file.`
+  const value = routed.trim()
+  const refuses = `so scratch-guard refuses ${WRITE_TOOLS_PROSE} under ROUTED_PATHS (${value}).`
+  const sid = data.session_id ? String(data.session_id) : ''
+  if (!sid) return `No unit is routed in this session: the payload carries no session_id, ${refuses}`
+  const card = readCard(common, sid)
+  if (card.text === null) return `No unit is routed in this session: ${card.shown} is absent, ${refuses}`
+  const route = extractRouteUnits(card.text)
+  if (!route.seen) return `No unit is routed in this session: ${card.shown} holds no route, ${refuses}`
+  if (route.units.length === 0) return `No unit is routed in this session: the route in ${card.shown} names no unit, ${refuses}`
+  const head = `The parent session's orientation card, ${card.shown}, holds this route:`
+  const tail = [
+    `ROUTED_PATHS in ${ROUTE_CONF} is: ${value}`,
+    `scratch-guard refuses ${WRITE_TOOLS_PROSE} under those paths unless a routed unit is buildable.`,
+  ]
+  const renderVerdict = (u) => {
+    const why = checkBuildable(u, route.build, top, memRoot.trim(), confBytes)
+    if (why) return `${u.unit} is not buildable: ${why}.`
+    const st = readStatusCells(fs.readFileSync(path.join(top, buildNativePath(u.spec)), 'utf8'))
+    return `${u.unit} is buildable: ${st.tier} at ${st.status}.`
+  }
+  const renderClosing = (n) => `${n} more route lines of ${card.shown} are left out of this context, which is capped at ${ROUTE_CONTEXT_CAP} characters.`
+  // Budgeted with the closing line at its longest, so whatever count it ends up naming still fits.
+  let budget = ROUTE_CONTEXT_CAP - head.length - tail.reduce((s, l) => s + l.length + 1, 0) - (renderClosing(route.lines.length).length + 1)
+  const kept = []
+  const verdicts = []
+  for (const l of route.lines) {
+    const v = l.unit ? renderVerdict(l.unit) : ''
+    const cost = l.text.length + 1 + (v ? v.length + 1 : 0)
+    if (cost > budget) break
+    budget -= cost
+    kept.push(l.text)
+    if (v) verdicts.push(v)
+  }
+  const out = [head, ...kept, ...verdicts, ...tail]
+  if (kept.length < route.lines.length) out.push(renderClosing(route.lines.length - kept.length))
+  return out.join('\n')
+}
+
 function main() {
   let data
   try {
     data = JSON.parse(readStdin())
   } catch {
+    process.exit(0)
+  }
+  if (data && data.hook_event_name === 'SubagentStart') {
+    // NEVER BLOCKS, NEVER SURFACES AN ERROR: a throw prints nothing. Returning rather than exiting
+    // lets node flush a piped stdout, which process.exit does not wait for on every platform.
+    let text = ''
+    try {
+      text = renderRouteContext(data, process.env)
+    } catch {
+      text = ''
+    }
+    if (text) process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'SubagentStart', additionalContext: text } }) + '\n')
+    return
+  }
+  if (data && WRITE_TOOLS.includes(data.tool_name)) {
+    // FAILS CLOSED, unlike the two Bash checks below: a write gate that throws and admits is the
+    // silent off D7 gives no bypass. agent-cap.js keeps the same rule for its spec-audit kind (S8).
+    let gate
+    try {
+      gate = checkRouted(data, process.env)
+    } catch (e) {
+      gate = { deny: `BLOCKED by scratch-guard: the write gate threw (${(e && e.message) || e}) and fails closed on a ${data.tool_name}.\n` }
+    }
+    if (gate && gate.deny) {
+      process.stderr.write(gate.deny)
+      process.exit(2)
+    }
+    if (gate && gate.witness) process.stderr.write(`scratch-guard: ${gate.witness}\n`)
     process.exit(0)
   }
   if (!data || !TOOLS.includes(data.tool_name)) process.exit(0)
@@ -759,4 +1131,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION }
+module.exports = { checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP }

@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-10T09:15:05+03:00 @ dae442565304323d8a634306977aa39e4527b07e
+last-audit: 2026-10-11T00:03:28+03:00 @ fafaa8b4f54b429a666cb2b2652461a4d554c090
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: dae442565304323d8a634306977aa39e4527b07e
+last-body-change: fafaa8b4f54b429a666cb2b2652461a4d554c090
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -56,13 +56,13 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   `--check-commit` refuses an undeclared staged path (`TOOL-aWindowedPass-1`, `-3`, `-5`).
 
 - **Every session start writes an ORIENTATION CARD** at `<git-common-dir>/orientation/<session_id>.md`
-  (`manifest-check.sh --card --write`, wired as a SessionStart hook; `--card --replay` re-injects it
-  verbatim after a compaction). Step 1 consumes it; Step 5 appends the READY card through
-  `--card --append`. A main-loop `git commit` in a session whose startup card still reads
-  `READY — none yet` is REFUSED by `tools/hooks/scratch-guard.js` with the remedy in stderr; an
-  absent or replay-written card allows. `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-1`. A commit from
-  any tree the card does not name is refused too, so a scratch worktree cannot commit: carry its diff
-  back as a patch (hit by `dBackdatedFixture`).
+  (`manifest-check.sh --card --write` at SessionStart, `--card --replay` after compaction). Step 5
+  appends READY via `--card --append`; a `## route` (build, unit specs, brief) lands only if all
+  resolve (`KICK-aRoutedQuill-1`). `tools/hooks/scratch-guard.js` refuses a main-loop `git commit`
+  on a card still reading `READY — none yet` (absent or replayed allows; `KICK-aReplayedCard-1`,
+  `TOOL-aReplayedCard-1`) and one from a tree the card does not name: carry a scratch worktree's
+  diff back as a patch. A write under `ROUTED_PATHS` needs a route naming a buildable unit
+  (`TOOL-aRoutedQuill-2`); a pushed commit there names a specced unit (`TOOL-aRoutedQuill-3`).
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
@@ -150,8 +150,8 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   registered and not read.
   The bytes are NAMED, not shown: a raw CR here was eaten twice by a text-mode rewrite.
 
-- **An adopter's bar holds a leg by `subject = kit` alone**: govkit never emits `chunk`, so a
-  shipped self-test is declared `subject = "kit"` in its descriptor (`aBenchedProbe`).
+- **An adopter's bar holds a leg by `subject = kit` alone** (govkit never emits `chunk`): a shipped
+  self-test declares `subject = "kit"` in its descriptor (`aBenchedProbe`).
 
 - **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
   the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
@@ -207,13 +207,15 @@ python tools/memory-tree/gotchas.py --for-paths <the tooling row's entrypoints> 
 
 Tier 2 (a spec before building; the spec audit only where the build or its project declares it, M4) for: a change to the governance template's
 rules, the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
-Tier 1 (gates + one focused self-review).
+Tier 1 (a micro-spec, graded by heading title in check 12 from `SPEC_TIER1_CUTOFF` and written by
+`gen_build_index.py --new-spec <ID> --tier 1`, then gates + one focused self-review;
+`TOOL-aRoutedQuill-1`).
 
 ### ID + work-state protocol
 
 `FAMILY-<slug>-<seq>`, families `PLAY`/`KICK`/`TOOL`/`DEPL` (per `.memory-tree.conf`). Slug = YOUR node tag
-(identify the node by machine/user against the AGENTS.md registry, never by path — all four rows pin the
-same primary tree, so the path cannot tell them apart) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. Work state is
+(identify the node by machine/user against the AGENTS.md registry, never by path: all four rows pin
+one primary tree) + CamelCase adjective-noun, minted once per session; collision-grep `memory/`. Work state is
 READ from the GENERATED `memory/LIVE.md` + `memory/ledger/<month>.md` (`gen_build_index.py --write`
 re-renders them from build front matter); there is no authored ledger to update. Build folders are
 `memory/builds/<slug>/`; the discipline is the spec header's `streams` value (`STREAMS_CUTOFF` in
@@ -258,10 +260,8 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
 - A gate FIXTURE a node may not host: an IGNORED path is never staged, and a name differing only in
   CASE is the same file. Both give an arm that passes because its fixture was never there. `*.bak`
   is ignored on node `d`, on node `a` at NO scope (2026-09-04): run `git check-ignore -v` on YOURS.
-- The template is under a 48 KiB gate, and the gate also WARNS when the file grows past its
-  recorded high-water. Raising the
-  ceiling is an owner decision, not an edit. Read the current
-  margin FROM `bash tools/check-template-size.sh`, never from prose.
+- The template is under a 48 KiB gate that also WARNS past its recorded high-water. Raising the
+  ceiling is an owner decision, not an edit. Read the margin FROM `bash tools/check-template-size.sh`.
 - A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
   and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
   `TOOL-aPromptedMandate-4`.
@@ -270,8 +270,8 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
   loudly rather than redding — re-run quiet before believing a latency claim.
   `TOOL-aPacedTurnstile-2`.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
-  `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
-  here: checks 5, 9 and 21 all fired only once the folder was staged.
+  `git add` returns a clean exit that proves nothing. Stage first, then run it: checks
+  5, 9 and 21 all fired only once the folder was staged.
 - `gate-guard` is a `Bash|PowerShell` hook from the unattended kit: while this branch's
   run-state record is before `VERIFYING` it DENIES a `GATE_FULL=`/`GATE_SELFTESTS=` bar and any
   `*.test.sh` or self-test runner, naming the record. Not a glitch: feed the hook the payload, or
@@ -302,5 +302,5 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
   `TMPDIR entries <n>` prints the ambient count, which now grows only from older bars or another
   repository's. The measured cost is in the run-gates kit README.
 - A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is
-  RETIRED (`TOOL-dSpentCeiling-1`); the surviving lesson is general — measure with the checker
-  before and after, never estimate, and record every movement beside the number.
+  RETIRED (`TOOL-dSpentCeiling-1`). Lesson: measure with the checker before and after, never
+  estimate, and record every movement beside the number.

@@ -397,10 +397,112 @@ JSON
   # denies every matcher there is.
   rm -f .claude/settings.json
   "$py" ${KP}settings-merge.py --fragment $KIT_REL/${HOOKS}/scratch-guard.fragment.json >/dev/null 2>&1
-  out=$(chk --check); rc=$?
+  # TOOL-aRoutedQuill-5: a WIRED gate is graded for its arming and for the machine skill as well, so
+  # the fixture arms it — `.githooks/` is the one tracked directory here — and hands HOME a skill
+  # install, which keeps this arm's exit code about the scratch arm alone.
+  # TOOL-aRoutedQuill-11: the routed arm takes its armed verdict from the gate file itself, so the
+  # stub gives way to the shipped gate; a stub exports no checkUnarmed and the arm would skip.
+  cp "$ROOT_ABS/$HOOKS_DIR/scratch-guard.js" $KIT_REL/${HOOKS}/scratch-guard.js
+  printf 'MEMORY_ROOT=memory\nROUTED_PATHS=".githooks/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' > .memory-tree.conf
+  SGHOME=$(mktemp -d); mkdir -p "$SGHOME/.claude/skills/session-kickoff"
+  out=$(HOME="$SGHOME" chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       scratch'; } \
     && ck "AC13d the fragment's own matcher -> ok, exit 0" 1 \
     || ck "AC13d the fragment's own matcher -> ok, exit 0" 0
+  ck "RQ5 AC7 LIVENESS an armed conf beside a wired gate reads ok routed" \
+     "$(printf '%s' "$out" | grep -q '^ok       routed' && echo 1 || echo 0)"
+
+  # TOOL-aRoutedQuill-5 AC7 — an UNARMED conf beside a wired gate. A blank ROUTED_PATHS refuses every
+  # product write, and from settings.json that gate looks exactly like one that works.
+  printf 'MEMORY_ROOT=memory\nROUTED_PATHS=""\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' > .memory-tree.conf
+  out=$(HOME="$SGHOME" chk --check); rc=$?
+  ck "RQ5 AC7 a blank ROUTED_PATHS -> UNWIRED routed naming the key, exit 1" \
+     "$([ "$rc" = 1 ] && printf '%s' "$out" | grep -q '^UNWIRED  routed    — ROUTED_PATHS is blank' && echo 1 || echo 0)"
+  out=$(HOME="$SGHOME" chk --session); rc=$?
+  ck "RQ5 AC7 ...and --session prints the same line and exits 0" \
+     "$([ "$rc" = 0 ] && printf '%s' "$out" | grep -q '^UNWIRED  routed    — ROUTED_PATHS is blank' && echo 1 || echo 0)"
+  for _bad in '/abs/' '../up/' 'memory/' 'nothere/'; do
+    printf 'MEMORY_ROOT=memory\nROUTED_PATHS="%s"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' "$_bad" > .memory-tree.conf
+    ck "RQ5 AC7 entry $_bad -> UNWIRED routed naming it" \
+       "$(HOME="$SGHOME" chk --check | grep -q "^UNWIRED  routed    — ROUTED_PATHS entry $_bad " && echo 1 || echo 0)"
+  done
+
+  # TOOL-aRoutedQuill-11 — the checker and the gate give ONE answer. A conf with no MEMORY_ROOT used
+  # to read `ok routed` because the arm defaulted the key the gate refuses blank.
+  printf 'ROUTED_PATHS=".githooks/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' > .memory-tree.conf
+  out=$(HOME="$SGHOME" chk --check); rc=$?
+  ck "RQ11 AC1 no MEMORY_ROOT -> UNWIRED routed naming the gate's reason, exit 1" \
+     "$([ "$rc" = 1 ] && printf '%s' "$out" | grep -q '^UNWIRED  routed    — MEMORY_ROOT is blank or absent in .memory-tree.conf, so the write gate is UNARMED' && echo 1 || echo 0)"
+  # The parity set: each conf goes to checkUnarmed and to the checker. The last one is armed, the
+  # liveness half: a checker that reds every conf would otherwise agree with every unarmed verdict.
+  _sgjs=$KIT_REL/${HOOKS}/scratch-guard.js
+  for _c in 'ROUTED_PATHS=".githooks/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' \
+            'MEMORY_ROOT=""\nROUTED_PATHS=".githooks/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' \
+            'export MEMORY_ROOT=memory\nROUTED_PATHS="memory/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' \
+            'MEMORY_ROOT=memory\nROUTED_PATHS="/abs/ .githooks/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' \
+            "MEMORY_ROOT='memory'\nROUTED_PATHS='.githooks/'\nROUTED_COMMIT_CUTOFF='2026-10-10'\n"; do
+    printf "$_c" > .memory-tree.conf
+    _gate=$(node -e 'const g=require(require("path").resolve(process.argv[1])),b=require("fs").readFileSync(process.argv[2],"utf8");process.stdout.write(g.checkUnarmed(g.readConfKey(b,"MEMORY_ROOT"),g.readConfKey(b,"ROUTED_PATHS")))' "$_sgjs" .memory-tree.conf 2>&1)
+    _line=$(HOME="$SGHOME" chk --check | grep '^[a-zA-Z]* *routed ')
+    if [ -n "$_gate" ]; then
+      _agree=$(case "$_line" in "UNWIRED  routed    — $_gate in .memory-tree.conf, so the write gate is UNARMED"*) echo 1 ;; *) echo 0 ;; esac)
+    else
+      _agree=$(case "$_line" in "ok       routed "*) echo 1 ;; *) echo 0 ;; esac)
+    fi
+    ck "RQ11 AC2 parity — gate '${_gate:-armed}' and the checker agree ($(printf '%s' "$_c" | head -c 40))" "$_agree"
+  done
+  rm -f .memory-tree.conf
+  out=$(HOME="$SGHOME" chk --check)
+  ck "RQ5 AC7 a wired gate and NO conf -> UNWIRED routed naming the absent conf" \
+     "$(printf '%s' "$out" | grep -q '^UNWIRED  routed    — .*no .memory-tree.conf' && echo 1 || echo 0)"
+  # TOOL-aRoutedQuill-12 AC4 — with no conf the gate's witness admits every write, and the line says so.
+  ck "RQ12 AC4 ...and says the write gate admits every write here, never that it refuses" \
+     "$(printf '%s' "$out" | grep '^UNWIRED  routed ' | grep -q 'the write gate admits every write here' \
+        && ! printf '%s' "$out" | grep -q 'every product write refuses' && echo 1 || echo 0)"
+  # TOOL-aRoutedQuill-12 AC10 — an entry UNDER MEMORY_ROOT covers it: the gate's two-way verdict, read
+  # through TOOL-aRoutedQuill-11's call, so the checker follows with no containment loop of its own.
+  printf 'MEMORY_ROOT=memory\nROUTED_PATHS="%s"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' '.githooks/ memory/builds/' > .memory-tree.conf
+  ck "RQ12 AC10 an entry under MEMORY_ROOT -> UNWIRED routed naming it as covering MEMORY_ROOT" \
+     "$(HOME="$SGHOME" chk --check | grep -q '^UNWIRED  routed    — ROUTED_PATHS entry memory/builds/ covers MEMORY_ROOT' && echo 1 || echo 0)"
+  rm -f .memory-tree.conf
+
+  # TOOL-aRoutedQuill-5 AC9 — the gate wired, and no /session-kickoff on this machine: the gate's own
+  # refusal names that skill as its remedy, so this is UNWIRED, not the skip it is everywhere else.
+  _nohome=$(mktemp -d)
+  ck "RQ5 AC9 a wired gate on a machine without the skill -> UNWIRED skill naming the runbook" \
+     "$(HOME="$_nohome" chk --check | grep -q '^UNWIRED  skill     — .*WIRE-INTO-PROJECT.md §1' && echo 1 || echo 0)"
+  # TOOL-aRoutedQuill-12 AC3 — the marker on the Bash-only command guard and the SubagentStart context
+  # gates no write: neither the routed nor the skill arm may call that the wired write gate.
+  cp .claude/settings.json "$_nohome/settings.keep"
+  printf '{"hooks": {"PreToolUse": [{"matcher": "Bash|PowerShell", "hooks": [{"type": "command", "command": "node \\"${CLAUDE_PROJECT_DIR}/%s%s/scratch-guard.js\\""}]}], "SubagentStart": [{"matcher": "*", "hooks": [{"type": "command", "command": "node \\"${CLAUDE_PROJECT_DIR}/%s%s/scratch-guard.js\\""}]}]}}\n' \
+    "$KP" "$HOOKS" "$KP" "$HOOKS" > .claude/settings.json
+  out=$(HOME="$_nohome" chk --check)
+  ck "RQ12 AC3 the marker only on Bash|PowerShell and SubagentStart -> no UNWIRED routed and no UNWIRED skill" \
+     "$(printf '%s' "$out" | grep -q '^UNWIRED  \(routed\|skill\) ' && echo 0 || echo 1)"
+  ck "RQ12 AC3 LIVENESS ...and the routed arm still ran, reading a skip" \
+     "$(printf '%s' "$out" | grep -q '^skip     routed ' && echo 1 || echo 0)"
+  cp "$_nohome/settings.keep" .claude/settings.json
+  rm -rf "$_nohome"
+
+  # TOOL-aRoutedQuill-5 AC8 — EVERY fragment the hooks kit ships, each on its own event. The second
+  # fragment is shipped and left unwired, then the PreToolUse matcher is wired under SubagentStart.
+  SGSUB="$ROOT_ABS/$HOOKS_DIR/scratch-guard-subagent.fragment.json"
+  if [ -f "$SGSUB" ]; then
+    cp "$SGSUB" $KIT_REL/${HOOKS}/scratch-guard-subagent.fragment.json
+    out=$(HOME="$SGHOME" chk --check)
+    ck "RQ5 AC8 a shipped, unwired SubagentStart fragment -> UNWIRED naming that entry" \
+       "$(printf '%s' "$out" | grep -q '^UNWIRED  scratch   — .*SubagentStart entry' && echo 1 || echo 0)"
+    ck "RQ5 AC8 LIVENESS ...while the wired PreToolUse fragment still reads ok" \
+       "$(printf '%s' "$out" | grep -q '^ok       scratch   — PreToolUse entry' && echo 1 || echo 0)"
+    printf '{"hooks": {"SubagentStart": [{"matcher": "%s", "hooks": [{"type": "command", "command": "node \\"${CLAUDE_PROJECT_DIR}/%s%s/scratch-guard.js\\""}]}]}}\n' \
+      "$(sed -n 's/.*"matcher": *"\([^"]*\)".*/\1/p' "$SGFRAG")" "$KP" "$HOOKS" > .claude/settings.json
+    out=$(HOME="$SGHOME" chk --check)
+    ck "RQ5 AC8 the PreToolUse matcher wired under SubagentStart -> the PreToolUse entry is UNWIRED" \
+       "$(printf '%s' "$out" | grep -q '^UNWIRED  scratch   — .*PreToolUse entry' && echo 1 || echo 0)"
+  else
+    echo "skip RQ5 AC8 — scratch-guard-subagent.fragment.json not found beside the gate's fragment"
+  fi
+  rm -rf "$SGHOME"
   cleanup
 else
   echo "skip scratch-guard cases — fragment or settings-merge.py not found next to script"
