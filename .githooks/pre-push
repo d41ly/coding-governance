@@ -27,8 +27,9 @@
 # THE COVER PASS.)
 #
 # `pre-push --decide <tip> <remote-sha> [<remote>]` runs this hook's own decision for a push of <tip>
-# over <remote-sha>, prints ONE line on stdout (`full <why>`, `scoped <base>` or `covered <record>`),
-# runs no bar and writes nothing; a push it would refuse exits 1 with an empty stdout, and a bad call
+# over <remote-sha>, prints ONE line on stdout (`full <why>`, `scoped <base>` or `covered <record>`,
+# then a TAB and the vetted bar it decided for, so a caller honours it only for that bar —
+# TOOL-aFrugalTurnstile-13), runs no bar and writes nothing; a push it would refuse exits 1 with an empty stdout, and a bad call
 # exits 2 (TOOL-aFrugalTurnstile-7, design D9; see THE DECIDE MODE).
 # WHAT --decide DOES NOT CHECK: the raw-push marker, the straggler layer and the merge-loss layer,
 # which refuse a push and decide nothing, so a push it reports as scoped can still be refused by
@@ -1760,7 +1761,7 @@ resolve_scoped_base() { # -> scoped_base and scoped_full, both empty on a FULL d
 # print_decision <full|scoped|covered> <why|base|record> — the one `--decide` line, on the fd 3 the mode
 # kept for stdout, and the mode's one exit: nothing after a decision runs under --decide (S6).
 print_decision() {
-  printf '%s %s\n' "$1" "$2" >&3
+  printf '%s %s\t%s\n' "$1" "$2" "$gate" >&3   # the bar decided for, after the LAST tab (TOOL-aFrugalTurnstile-13)
   RUNLOG_CLEAN=1; exit 0
 }
 

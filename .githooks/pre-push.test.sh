@@ -2026,6 +2026,8 @@ run_pm_decide() { # [env…] -- <args> -> PM_OUT (stdout alone) PM_ERR PM_RC for
   local e=(); while [ "$1" != -- ]; do e+=("$1"); shift; done; shift
   PM_OUT=$(env -u GOV_GATE_CMD_TEST -u GOV_GATE_CMD -u GATE_RUN_ID -u GOV_REMOTE GATE_SELFTESTS= BG_MARK="$BG_MARK" "${e[@]}" \
     bash "$BG_D/hooks/pre-push" --decide "$@" 2>"$BG_D/decide.err" </dev/null); PM_RC=$?; PM_ERR=$(cat "$BG_D/decide.err")
+  # TOOL-aFrugalTurnstile-13: the line ends in a TAB and the bar it decided for; PM_BAR takes it off.
+  PM_BAR=""; case "$PM_OUT" in *$'\t'*) PM_BAR=${PM_OUT##*$'\t'}; PM_OUT=${PM_OUT%$'\t'*} ;; esac
 }
 read_pm_sums() { git status >/dev/null 2>&1; find "$bg_gd" -type f | sort | xargs sha1sum; }   # after git's own warm-up
 read_pm_remote() { git ls-remote origin refs/heads/main | cut -f1; }
@@ -2096,6 +2098,10 @@ for _st in none scoped covered; do
     "none|0|1|full "*|"scoped|0|1|scoped $_f"|"covered|0|1|covered "*"gate-bar-green.scoped") ok "PM AC6 $_st: one decision line, exit 0" ;;
     *) bad "PM AC6 $_st expected one $_st line and exit 0, got rc $PM_RC: $PM_OUT" ;;
   esac
+  # TOOL-aFrugalTurnstile-13 AC1: the line names the vetted bar after its last TAB. RED against the hook
+  # at 69426afd, whose line carries no bar field.
+  [ "$_st" != covered ] || { [ "$PM_BAR" = "$BG_WRAP" ] && ok "PM TOOL-aFrugalTurnstile-13 AC1 the decision line ends in a TAB and the vetted bar" \
+    || bad "PM TOOL-aFrugalTurnstile-13 AC1 expected the bar field '$BG_WRAP', got '$PM_BAR'"; }
   { cmp -s "$BG_D/s0" "$BG_D/s1" && [ ! -e "$bg_gd/pre-push-refusal" ] && [ ! -e "$bg_gd/pre-push-bar" ] &&
     [ "$(cat "$bg_gd"/runlog/*.log 2>/dev/null | wc -l)" = "$_j0" ] && [ "$(read_bg_marks)" = "$_m0" ]; } \
     && ok "PM AC6 $_st: no file under the git dir changed, no journal line, no bar" \

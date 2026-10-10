@@ -1,10 +1,12 @@
 # TOOL-aFrugalTurnstile-13 — the close honours a `--decide` answer only for the bar it will run
 
-**Status:** OPEN · rev-1 · 2026-10-10 · node a · Tier-2 · base bef97330 · streams tooling · order 7
+**Status:** CLOSED · rev-1 · 2026-10-10 · node a · Tier-2 · base bef97330 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-09-build-TOOL-aFrugalTurnstile-13-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-13-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

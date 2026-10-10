@@ -11483,6 +11483,7 @@ ipgit checkout -q --detach "$ip_base"; ipgit push -q -f origin HEAD:main; ipgit 
 ft9_base0=$ip_base; ft9_hk="$ip_out/ft9hooks"; mkdir -p "$ft9_hk"
 printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$@" > "$IPOUT/argv.txt"\n[ "${1-}" = --decide ] || exit 0\n[ "${FT9_RC:-0}" = 0 ] || exit "$FT9_RC"\n[ -z "$FT9_DECISION" ] || printf "%%s\\n" "$FT9_DECISION"\n' > "$ft9_hk/pre-push"
 ipgit config core.hooksPath "$ft9_hk"
+ft9_b=$'\t'"bash bin/bar.sh"   # TOOL-aFrugalTurnstile-13: every answer names the bar it decided for
 init_declared_merge() { # $1 = the gate-env line committed at R
   ipreset; ipgit checkout -q --detach "$ft9_base0"; mkdir -p "$ip_dir/.githooks"
   printf '%s\n' "$1" > "$ip_dir/.githooks/gate-env.sh"
@@ -11492,7 +11493,7 @@ init_declared_merge() { # $1 = the gate-env line committed at R
 }
 ft9_gd=$(ipgit rev-parse --absolute-git-dir)
 init_declared_merge "GATE_POST_MERGE=local"; ft9_h=$(ipgit rev-parse HEAD)
-out=$(FT9_DECISION="full stale" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+out=$(FT9_DECISION="full stale$ft9_b"STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 same "TOOL-aFrugalTurnstile-9 AC1 the hook is asked --decide <HEAD> <R>" "$(tr '\n' ' ' < "$ip_out/argv.txt" 2>/dev/null)" "--decide $ft9_h $ip_base "
 same "TOOL-aFrugalTurnstile-9 AC1 a full answer runs the bar with GATE_FULL=1" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
 same "TOOL-aFrugalTurnstile-9 AC1 the record reads kind full" "$(awk -F'\t' '$1=="kind"{print $2}' "$ft9_gd/gate-bar-green" 2>/dev/null)" "full"
@@ -11501,26 +11502,40 @@ hit "$out" "pre-push --decide answered 'full stale'"
 # ---- THE BAR whose green is recorded as the whole bar's. RED against the driver at d4e5927f: the stub
 # ---- sees all three.
 init_declared_merge "GATE_POST_MERGE=local"
-out=$(GATE_LEGS=one-leg.json GATE_REUSE=1 GATE_DOCS_BASE=deadbeef FT9_DECISION="full stale" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+out=$(GATE_LEGS=one-leg.json GATE_REUSE=1 GATE_DOCS_BASE=deadbeef FT9_DECISION="full stale$ft9_b"STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 same "TOOL-aFrugalTurnstile-12 AC1 AC2 the bar sees GATE_LEGS, GATE_REUSE and GATE_DOCS_BASE unset" \
   "$(sed -n 's/^KNOBS=//p' "$ip_out/barenv.txt" 2>/dev/null)" "<unset> <unset> <unset>"
 hit "$out" "not honoured from the environment by this bar: GATE_LEGS GATE_REUSE GATE_DOCS_BASE"
 init_declared_merge "GATE_POST_MERGE=local"
-out=$(FT9_DECISION="scoped $ip_base" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+out=$(FT9_DECISION="scoped $ip_base$ft9_b"STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 same "TOOL-aFrugalTurnstile-9 AC2 a scoped answer runs the bar with GATE_FULL unset" "$(grep -c '^GATE_FULL=<unset>$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
 same "TOOL-aFrugalTurnstile-9 AC2 the scoped slot reads kind scoped and the decision's base" \
   "$(awk -F'\t' '$1=="kind"||$1=="base"{print $2}' "$ft9_gd/gate-bar-green.scoped" 2>/dev/null | tr '\n' ' ')" "scoped $ip_base "
 init_declared_merge "GATE_POST_MERGE=local"; ft9_gr=$(grep '^gates-run:' "$ip_dir/memory/builds/tRun/RUN.md")
-out=$(FT9_DECISION="covered gate-bar-green@1234abcd" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+out=$(FT9_DECISION="covered gate-bar-green@1234abcd$ft9_b"STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 same "TOOL-aFrugalTurnstile-9 AC3 a covered answer runs no bar" "$([ -e "$ip_out/barenv.txt" ] && echo ran || echo absent)" "absent"
 same "TOOL-aFrugalTurnstile-9 AC3 a covered close writes no gates-run fact" "$(grep '^gates-run:' "$ip_dir/memory/builds/tRun/RUN.md")" "$ft9_gr"
 hit "$out" "met without a bar: the boundary reads this tree as covered by gate-bar-green@1234abcd"
-for ft9_d in "maybe" "" "scoped deadbeef" $'full a\nfull b' "rc1"; do
+for ft9_d in "maybe$ft9_b" "" "scoped deadbeef$ft9_b" $'full a\nfull b' "rc1"; do
   init_declared_merge "GATE_POST_MERGE=local"; ft9_rc=0; [ "$ft9_d" = rc1 ] && ft9_rc=1
   out=$(FT9_RC=$ft9_rc FT9_DECISION="$ft9_d" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
   same "TOOL-aFrugalTurnstile-9 AC4 a malformed answer [$ft9_d] runs the full bar" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
   hit "$out" "pre-push --decide did not answer with one decision line"
 done
+# ---- TOOL-aFrugalTurnstile-13 AC2/AC3: THE ANSWER IS HONOURED ONLY FOR THIS CLOSE'S BAR. A covered
+# ---- answer naming another bar, or naming none, runs GATE_CMD with GATE_FULL=1; one naming GATE_CMD
+# ---- is met without a bar. RED against the driver at 69426afd: both refused cases are met without a bar.
+for ft9_d in $'covered gate-bar-green@1234abcd\tbash tools/run-gates/run-gates.sh' "covered gate-bar-green@1234abcd"; do
+  init_declared_merge "GATE_POST_MERGE=local"
+  out=$(FT9_DECISION="$ft9_d" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+  same "TOOL-aFrugalTurnstile-13 AC2 an answer for another bar [$ft9_d] runs the full bar" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+  hit "$out" "not this close's bar 'bash bin/bar.sh'; running the full bar"
+  miss "$out" "met without a bar"
+done
+init_declared_merge "GATE_POST_MERGE=local"
+out=$(FT9_DECISION="covered gate-bar-green@1234abcd$ft9_b" STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+same "TOOL-aFrugalTurnstile-13 AC3 an answer for this close's bar is honoured" "$([ -e "$ip_out/barenv.txt" ] && echo ran || echo absent)" "absent"
+hit "$out" "met without a bar: the boundary reads this tree as covered by gate-bar-green@1234abcd"
 init_declared_merge "GATE_POST_MERGE=local"; mv "$ft9_hk/pre-push" "$ft9_hk/pre-push.off"
 out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 mv "$ft9_hk/pre-push.off" "$ft9_hk/pre-push"

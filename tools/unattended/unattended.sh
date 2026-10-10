@@ -10638,7 +10638,20 @@ dod_met() { # slug · run-state file · item · checker
                   echo "unattended: gates-green — no pre-push hook at $_ghk, so the boundary cannot be asked and the bar runs with GATE_FULL=1 as it does undeclared"
                 else
                   RB_BOUND=600 run_bounded "${BASH:-bash}" "$_ghk" --decide "$_gh0" "$_gr"; _gdrc=$?
-                  _gdl=${RB_STDOUT%$'\r'}; _gok=""
+                  _gdl=${RB_STDOUT%$'\r'}; _gok=""; _gbar=""
+                  # TOOL-aFrugalTurnstile-13 S2 - THE ANSWER IS HONOURED ONLY FOR THE BAR THIS CLOSE
+                  # RUNS. The hook decides for its own bar, named after the line's LAST tab; a line
+                  # with no tab, or a bar that is not $GATE_CMD byte for byte, runs GATE_FULL=1.
+                  _gone=""
+                  case "$_gdl" in
+                    *$'\n'*|'') ;;
+                    *$'\t'*) _gbar=${_gdl##*$'\t'}; _gdl=${_gdl%$'\t'*}; _gone=1 ;;
+                    *) _gone=1 ;;
+                  esac
+                  if [ "$_gdrc" = 0 ] && [ -n "$_gone" ] && [ "$_gbar" != "$GATE_CMD" ]; then
+                    echo "unattended: gates-green — pre-push --decide decided for '$_gbar', not this close's bar '$GATE_CMD'; running the full bar"
+                    _gdrc=bar
+                  fi
                   [ "$_gdrc" = 0 ] && case "$_gdl" in
                     *$'\n'*|'') ;;
                     "full "?*) _gok=1 ;;
@@ -10652,7 +10665,7 @@ dod_met() { # slug · run-state file · item · checker
                     echo "unattended: gates-green — GATE_POST_MERGE=$GP_POST_MERGE at ${_gr:0:8}, so the push boundary decides this bar: pre-push --decide answered '$_gdl'"
                   else
                     _gdec=full; _gbase=""
-                    echo "unattended: gates-green — pre-push --decide did not answer with one decision line (exit $_gdrc), so the bar runs with GATE_FULL=1 as it does undeclared: ${_gdl%%$'\n'*}"
+                    [ "$_gdrc" = bar ] || echo "unattended: gates-green — pre-push --decide did not answer with one decision line (exit $_gdrc), so the bar runs with GATE_FULL=1 as it does undeclared: ${_gdl%%$'\n'*}"
                   fi
                 fi ;;
               '') ;;
