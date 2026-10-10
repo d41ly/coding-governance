@@ -319,8 +319,9 @@ rec_repo() {  # -> sets REC_T (worktree) and REC_GD (git dir)
     ']' > "$REC_T/${PFX}gate-legs.json"
   ( cd "$REC_T" && git add -A && git commit -qm seed ) >/dev/null 2>&1 || return 1
   # A resolvable origin, so guards can compute a BASE and a skip is actually reachable. Without it
-  # BASE is empty, changed() fails safe to "run", and every skip arm passes by finding nothing.
-  ( cd "$REC_T" && git update-ref refs/remotes/origin/main HEAD \
+  # BASE is empty, changed() fails safe to "run", and every skip arm passes by finding nothing. The
+  # remote is CONFIGURED, because the runner's remote ladder reads configuration (TOOL-dLadderedRemote-2).
+  ( cd "$REC_T" && git remote add origin ../origin.git && git update-ref refs/remotes/origin/main HEAD \
       && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
   REC_GD="$REC_T/.git"
 }
@@ -882,7 +883,7 @@ ru_repo() {   # -> RU_T, RU_GD
     '  {"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}' \
     ']' > "$RU_T/${PFX}gate-legs.json"
   ( cd "$RU_T" && git add -A && git commit -qm seed ) >/dev/null 2>&1 || return 1
-  ( cd "$RU_T" && git update-ref refs/remotes/origin/main HEAD \
+  ( cd "$RU_T" && git remote add origin ../origin.git && git update-ref refs/remotes/origin/main HEAD \
       && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
   RU_GD="$RU_T/.git"
 }

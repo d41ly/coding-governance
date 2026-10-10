@@ -154,7 +154,7 @@ def test_baseline_never_gains_a_key() -> None:
     branch's base did not carry is a refusal. The four coverage asserts above cannot see it, since
     moving a claim from a dossier into the baseline keeps every one of them clean.
 
-    UNGRADED, AND SAYS SO, when there is no base to read — no fetched `origin` default branch, or
+    UNGRADED, AND SAYS SO, when there is no base to read — no fetched remote default branch, by the remote ladder, or
     no baseline at the base. The compared sha and both sides' key counts print on every graded run,
     so a comparison of the committed file against itself (CI on the landed tip) is visible."""
     root = m.repo_root()

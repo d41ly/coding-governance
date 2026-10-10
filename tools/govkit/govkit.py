@@ -549,6 +549,63 @@ def entry_version(root: pathlib.Path, desc: dict) -> str:
     return "(unresolvable)"
 
 
+# The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
+# named on its marker line and gated by the resolve-python self-test.
+# >>> remote_ladder_py -- canonical copy: resolve_remote.py in the gov lib dir (byte-identical; gated)
+def resolve_remote(root):
+    """-> (remote, branch, observed, refusal) for the repository at <root>. Fetches nothing.
+
+    remote    GOV_REMOTE, else branch.<current>.remote unless it is ".", else the ONLY remote.
+              Several remotes and none chosen, or a chosen name that is not a remote here, is a
+              REFUSAL naming GOV_REMOTE. No remote at all is remote "" and NO refusal: the caller
+              keeps its own no-remote fallback.
+    observed  the branch refs/remotes/<remote>/HEAD names, or "". A caller whose GOV_DEFAULT_BRANCH
+              only CROSS-CHECKS the observation reads this one.
+    branch    GOV_DEFAULT_BRANCH, else observed, else "".
+    A refusal empties the other three, so no caller can pick a remote the ladder refused.
+    """
+    import os
+    import subprocess
+
+    def read(*args):
+        try:
+            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        return p.stdout.strip() if p.returncode == 0 else ""
+
+    names = read("remote").split()
+    listed = " ".join(names) or "none"
+    # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous
+    # (`heads/x`, `remotes/r/x`), and the prefix is stripped exactly instead.
+    cur = read("symbolic-ref", "--quiet", "HEAD")
+    cur = cur[len("refs/heads/"):] if cur.startswith("refs/heads/") else ""
+    remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
+    if not remote and cur:
+        remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
+        if remote == ".":
+            remote = ""
+    if not remote and len(names) == 1:
+        remote = names[0]
+    if not remote and len(names) > 1:
+        where = "branch " + cur if cur else "a detached HEAD"
+        return "", "", "", ("cannot choose a remote: GOV_REMOTE is unset, %s has no configured remote, "
+                            "and this repository has %d remotes (%s). Name it: export GOV_REMOTE=<remote>."
+                            % (where, len(names), listed))
+    if remote and remote not in names:
+        return "", "", "", ("%s names %s, which is no remote of this repository (%s). Name one that is: "
+                            "export GOV_REMOTE=<remote>." % (how, remote, listed))
+    observed = ""
+    if remote:
+        pre = "refs/remotes/" + remote + "/"
+        head = read("symbolic-ref", "--quiet", pre + "HEAD")
+        if head.startswith(pre) and len(head) > len(pre):
+            observed = head[len(pre):]
+    return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
+# <<< remote_ladder_py
+
+
 def resolve_measurer_currency(root: pathlib.Path, to_commit: str) -> tuple[str, str]:
     """Is the GOV checkout doing the measuring current with its own remote?
 
@@ -583,9 +640,20 @@ def resolve_measurer_currency(root: pathlib.Path, to_commit: str) -> tuple[str, 
     _key = (str(root), to_commit)
     if _key in _memo:
         return _memo[_key]
-    _rn = subprocess.run(["git", "-C", str(root), "config", "--get", "branch.main.remote"],
-                         capture_output=True, text=True)
-    remote = (_rn.stdout.strip() or "origin")
+    # THE REMOTE IS THE LADDER'S (TOOL-dLadderedRemote-2): this read `branch.main.remote` and
+    # defaulted to a literal name, which half-implemented the lander's ladder and asked a remote
+    # that does not exist on a node naming its remote after the project. A refusal or no remote at
+    # all is `unverified` with the reason, never a guessed remote. GOV_REMOTE is set aside for this
+    # one read: it names the TARGET repository's remote, and an operator exporting it for an adopter's
+    # update must not steer which remote the gov checkout asks (TOOL-dLadderedRemote-5).
+    _held = os.environ.pop("GOV_REMOTE", None)
+    try:
+        remote, _branch, _observed, refusal = resolve_remote(root)
+    finally:
+        if _held is not None:
+            os.environ["GOV_REMOTE"] = _held
+    if refusal or not remote:
+        return _memo.setdefault(_key, ("unverified", refusal or "this checkout has no remote to ask"))
     try:
         adv = subprocess.run(["git", "-C", str(root), "ls-remote", "--symref", "--exit-code",
                               remote, "HEAD"], capture_output=True, text=True, timeout=20)
@@ -2613,6 +2681,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         # liveness assertion — held off every bar while this file reported them running.
         manifest_chunk = {leg.get("name"): leg.get("chunk") for leg in _legs_json}
         manifest_doc_reads = {leg.get("name"): leg.get("doc_reads") for leg in _legs_json}
+        manifest_ceiling = {leg.get("name"): leg.get("ceiling") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             for leg in d.get("gate_leg", []):
@@ -2680,6 +2749,19 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                                f"<prefix>/gate-legs.json says {_m!r} — the descriptor and the "
                                f"manifest disagree about which doc paths this leg reads, so a doc-only "
                                f"push skips it in one tree and runs it in the other")
+                    # AND ABOUT CEILING, where the descriptor declares one (DEPL-aBenchedProbe-2 S5):
+                    # the emitter carries the descriptor's value verbatim into adopters, so it must
+                    # be a positive int (a bool is an int to Python, and not a bound) equal to the
+                    # one gov's own bar runs under. A descriptor declaring none is not compared;
+                    # that is TOOL-aBoundedCeiling-13's remainder, not this clause.
+                    if "ceiling" in leg:
+                        d_ce, m_ce = leg.get("ceiling"), manifest_ceiling.get(nm)
+                        if (isinstance(d_ce, bool) or not isinstance(d_ce, int) or d_ce <= 0
+                                or d_ce != m_ce):
+                            r.fail(f"entry '{eid}' declares gate leg '{nm}' with ceiling {d_ce!r} "
+                                   f"while <prefix>/gate-legs.json says {m_ce!r} — a descriptor "
+                                   f"ceiling must be a positive integer equal to the manifest's, "
+                                   f"because the deployer writes it into every adopter's runner")
                 # AC1b: a name that travels. A digit inside a parenthetical is a COUNT, and a count
                 # in a leg name goes stale exactly where nobody is reading — in somebody else's repo.
                 if re.search(r"\([^)]*\d[^)]*\)", nm):
@@ -3161,6 +3243,64 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                            f"`[[exempt_leg]]` row in <prefix>/govkit/registry.toml")
     r.note(f"declared check: {len(descs)} entries, {len(_no_check)} silent · withheld-path legs: "
            f"{_legs_graded} descriptor leg(s) graded")
+
+    # ---- 7j4: DEPL-aBenchedProbe-1. NO `[[gate_leg]]` IS HELD ON GOV'S BAR AND SHIPPED UNHELD.
+    #          A leg is SELF-TEST-SHAPED when its manifest chunk is `selftests` or the basename of a
+    #          resolved argv element matches `*.test.sh`, `test_*.py` or `*selftest*` (the bare
+    #          `--selftest` flag included). It is EXEMPT when its chunk is present and is anything
+    #          else: gov runs it on every bar, and subject-pins.tsv shows any move of that chunk in a
+    #          diff. A shaped, non-exempt leg whose descriptor subject is not `kit` reaches every
+    #          adopter's default bar while gov holds it. In today's tree every manifest row carries a
+    #          chunk, so the filename clause reds only a row that LOST its chunk; the live predicate
+    #          is `chunk == selftests AND subject != kit`. DOES NOT CHECK: legs outside
+    #          `[[gate_leg]]` (the run-gates canary) or `[[exempt_leg]]` rows; whether gov's chunk is
+    #          right; a self-test whose file name matches none of the globs or that runs indirectly,
+    #          e.g. through `sh -c`; that an exempt leg is cheap.
+    #          TWO STAND-DOWNS (DEPL-aBenchedProbe-3). An absent manifest is a note, not a refusal,
+    #          because 7h grades no leg at all without one. The zero-graded and zero-shaped liveness
+    #          reds bind only while the manifest holds at least one row in chunk `selftests`; with
+    #          none, a zero is TRUE rather than a broken predicate (7c2's rule), and the note says the
+    #          reds stood down. On gov's tree, 7h2's chunk pins red every `selftests` chunk that
+    #          vanishes from the manifest, so the case this gives up is covered there.
+    import fnmatch
+    if not legs_path.is_file():
+        r.note(f"7j4: {legs_path.relative_to(root).as_posix()} is absent, so no leg's chunk is known "
+               f"and a held self-test cannot be told from an exempt check — nothing was graded")
+    else:
+        _j4_pop = sum(1 for c in manifest_chunk.values() if c == "selftests")
+        _j4_graded, _j4_shaped, _j4_exempt = 0, 0, []
+        for eid, (d, _p) in sorted(descs.items()):
+            _ctx = canonical_ctx(eid)
+            for leg in d.get("gate_leg", []):
+                nm = leg.get("name")
+                _j4_graded += 1
+                chunk = manifest_chunk.get(nm)
+                hit = next((s for s in (resolve_tokens(a, _ctx)[0] for a in leg.get("argv", []))
+                            if any(fnmatch.fnmatchcase(posixpath.basename(s), g)
+                                   for g in ("*.test.sh", "test_*.py", "*selftest*"))), None)
+                if chunk != "selftests" and hit is None:
+                    continue
+                _j4_shaped += 1
+                if chunk and chunk != "selftests":
+                    _j4_exempt.append(nm)
+                    continue
+                if leg.get("subject") != "kit":
+                    why = ("manifest chunk `selftests`, so gov holds it" if chunk else
+                           f"argv element {hit}, and the manifest files it in no chunk")
+                    r.fail(f"7j4: entry '{eid}' gate leg '{nm}' is a self-test by its {why}, while its "
+                           f"descriptor subject is '{leg.get('subject')}', so every adopter runs it on "
+                           f"its default bar. Hold it everywhere: `subject = \"kit\"` "
+                           f"in the descriptor and <prefix>/gate-legs.json, then `selfcheck --write`. Or "
+                           f"run it everywhere: file it in a chunk other than `selftests`")
+        _j4_live = r.fail if _j4_pop else r.note
+        if not _j4_graded:
+            _j4_live("7j4: graded zero descriptor gate legs — the held-self-test arm saw nothing")
+        elif not _j4_shaped:
+            _j4_live("7j4: found zero self-test-shaped legs among "
+                     f"{_j4_graded} — the predicate has stopped matching, so a green here proves nothing")
+        r.note(f"held self-test legs: {_j4_graded} graded, {_j4_shaped} self-test-shaped, "
+               f"exempt by chunk: {', '.join(sorted(_j4_exempt)) or 'none'} · population {_j4_pop} "
+               f"in chunk selftests" + ("" if _j4_pop else " — the zero-population reds stand down"))
 
     # ---- 7k: entry-level `scope` is DERIVED and asserted against the declared value. Every
     #          descriptor declares one and the engine read only the rule-level spelling, so the
@@ -3966,6 +4106,14 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 elif _dr_why:
                     print(f"govkit {verb} — gate leg '{nm}': doc_reads omitted ({_dr_why}), so it "
                           f"runs on every doc-only push")
+                # THE CEILING TRAVELS where the descriptor declares one and the target's runner is
+                # at CEILING_FLOOR_RUN_GATES or later, carried verbatim: the descriptor is
+                # gov-authored and selfcheck 7h grades its shape. No fallback to gov's manifest,
+                # which would bound every leg rather than the declaring ones. DEPL-aBenchedProbe-2.
+                _ce = leg.get("ceiling") if check_target_reads_subject(
+                    target, deploy, descs, floor=CEILING_FLOOR_RUN_GATES) else None
+                if _ce is not None:
+                    row["ceiling"] = _ce
                 if nm in by_name:
                     prev = next((e for e in owned and prior if e["name"] == nm), None)
                     # DEPL-cMendedVintage-22. THE SUBJECT OF THIS COMPARISON IS THE TARGET, and for
@@ -4001,6 +4149,19 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                                f"reporting drift rather than replacing it; ownership of the NAME is "
                                f"not ownership of the ROW")
                         continue
+                    # THE KEEP RULE (DEPL-aBenchedProbe-2 S4). A ceiling on the target's row that
+                    # differs from the one the receipt recorded is the adopter's own bound, so it
+                    # is written back and reported, never refused: it sits outside the drift
+                    # comparison above and cannot withhold the manifest. The receipt still records
+                    # gov's value, so a kept bound keeps differing and stays kept, while a row the
+                    # adopter never touched matches and takes gov's new value. WHAT IT DOES NOT DO:
+                    # it does not preserve a DELETED key (an absent ceiling takes gov's value
+                    # back), and it validates no value, kept or emitted.
+                    if "ceiling" in tgt and tgt["ceiling"] != (prev or {}).get("ceiling"):
+                        row["ceiling"] = tgt["ceiling"]
+                        print(f"govkit {verb} — gate leg '{nm}': kept the target's ceiling "
+                              f"{tgt['ceiling']!r} (gov's is {_ce!r}); a ceiling the receipt did "
+                              f"not record is the target's own")
                     existing[by_name[nm]] = row
                 else:
                     existing.append(row)
@@ -4020,6 +4181,10 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                                 # audit of a unit that was about to copy this seam verbatim.
                                 "subject": row.get("subject"),
                                 "doc_reads": row.get("doc_reads"),
+                                # gov's computed value, never a kept one: the S4 keep rule above
+                                # compares the target against THIS, so recording the kept value
+                                # would let the next run overwrite the adopter's bound.
+                                "ceiling": _ce,
                                 "guard_dropped": [{"spec": a, "why": b} for a, b in dropped],
                                 "history_depth": leg.get("history_depth")})
                 if dropped and not guards:
@@ -4255,6 +4420,11 @@ SHELL_EXEC_SITES = {
     # the command line -- which is the whole point, since the argv form died at 32 KiB after a
     # partial write. Classified `gov` because no target value reaches the argv it builds.
     "git_pathspec": "gov",
+    # TOOL-dLadderedRemote-2. The remote ladder's nested reader, inlined byte-identical from the gov
+    # lib dir: `["git", "-C", str(root), *args]`, and every `*args` is a literal in that block —
+    # `remote`, `symbolic-ref`, `config branch.<cur>.remote`. The two interpolated values are a branch
+    # NAME and a remote NAME, each read back from the same repository and never a target token.
+    "read": "gov",
     "git": "gov",                    # gov's own wrapper: `["git", "-C", str(root), *args]`, and the
                                      # `*args` is what the census cannot read. A future
                                      # `git(target, "hook", "run", ...)` must move this to
@@ -4278,6 +4448,11 @@ SHELL_EXEC_SITES = {
     # interpolated into it -- and this table's own definition of `target` is that the target
     # influences the argv, whatever the template's provenance. A paired arm caught it by name.
     "_cmd_update": "target",
+    # TOOL-aMendedFleet-65 gave `mint` the minted kits' `[[regenerate]]` argvs to run, and no row;
+    # TOOL-aMeteredSweep-1 adds it. Gov's own descriptors, tokens from `canonical_ctx`, in gov's tree,
+    # from a writing verb. `target` anyway, on `run_probe_in_empty_dir`'s reasoning: the argv passes
+    # `resolve_tokens`, and the conservative label cannot understate a site's exposure.
+    "cmd_mint": "target",
 }
 # THREE LABELS, because there are three things and two of them were being called one. `gov`: gov
 # wrote the argv and gov controls every value in it. `target`: the target influences the ARGV, so a
@@ -5030,6 +5205,28 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
         r.fail("DEAD PROBE: every engine row failed to resolve in this gov checkout, so the "
                "provenance loop measured nothing — a probe that cannot move is not a green one")
 
+    # DEPL-aLevelledCopy-1 S5. A MODE DEFICIT IS A NOTE, NEVER A FAILURE (§8 F2): redding a target
+    # on a state no release has yet let it clear hands it a failure it cannot act on. Measured
+    # against gov's tree at the receipt's `gov_commit` (rev-2): a byte-identical row keeps the
+    # `commit` its bytes came from, so after a carry its own commit still reads `100644`.
+    _mrows = [w for w in rows if w.get("role", "engine") == "engine" and w.get("path")
+              and w.get("source")]
+    _mcommit = receipt.get("gov_commit")
+    if _mrows and _mcommit:
+        try:
+            _midx, _ = index_read(target, [w["path"] for w in _mrows])
+        except Refusal as _merr:
+            r.note(f"mode: not measured — {_merr}")
+            _midx = {}
+        for w in _mrows:
+            _ment = _midx.get(w["path"])
+            if not _ment:
+                continue
+            _mto = resolve_landed_mode(_ment[0], gov_tree_mode(root, _mcommit, w["source"]))
+            if _mto != _ment[0]:
+                r.note(f"mode {w['path']}: the index holds {_ment[0]}, gov ships {_mto} at "
+                       f"{str(_mcommit)[:8]} — `govkit update --write` carries it")
+
     # The sidecar and the receipt are asserted against EACH OTHER. They are two spellings written
     # from one list, and the sidecar — the artifact a target verifies with bash alone — is read by
     # nothing in this repo. Verifying one and trusting the other leaves it unasserted forever.
@@ -5469,6 +5666,10 @@ SUBJECT_FLOOR_RUN_GATES = (1, 1)
 # The run-gates version at which `doc_reads` entered that key set, and the runner learned to read it.
 # TOOL-dThriftyLanding-4, against the runner TOOL-dThriftyLanding-1 shipped as 1.25.
 DOC_READS_FLOOR_RUN_GATES = (1, 25)
+# The run-gates version that certainly admits `ceiling`. The canary's key set gained it in db3616531
+# while the runner still read 1.1, and 836e4e27b is the first commit at 1.2, so 1.1 is ambiguous and
+# 1.2 is the first version that cannot red a target's canary on the key. DEPL-aBenchedProbe-2.
+CEILING_FLOOR_RUN_GATES = (1, 2)
 
 
 def derive_doc_reads(leg: dict, ctx: dict[str, str], have: set[str]) -> tuple[list[str] | None, str]:
@@ -6321,21 +6522,56 @@ def index_blob(target: pathlib.Path, oid: str) -> bytes | None:
     return out.stdout if out.returncode == 0 else None
 
 
+@functools.lru_cache(maxsize=None)
+def read_tree_modes(root: pathlib.Path, commit: str) -> dict[str, str]:
+    """DEPL-aLevelledCopy-1 S2. `{path: mode}` for gov's WHOLE tree at a commit, from ONE
+    `ls-tree -r -z`, memoised per (root, commit). The one reader of gov's file modes.
+
+    A per-row read costs one git spawn per row, about 0.75 s each on a Windows node, so a 190-row
+    receipt would pay minutes for a fact one spawn answers. Memoising on the commit string is sound
+    because every caller passes a resolved sha, which names one tree forever. A failed read is an
+    empty map, which every caller reads as "gov's mode unknown" and so carries nothing.
+    """
+    out = subprocess.run(["git", "-C", str(root), "ls-tree", "-r", "-z", commit],
+                         capture_output=True, check=False)
+    modes: dict[str, str] = {}
+    if out.returncode != 0:
+        return modes
+    # `-z` MOVES THE TERMINATOR AND THE QUOTING, NOT THE FIELD ORDER — measured on git 2.55: the
+    # record is still `<mode> blob <oid>\t<path>`, so field 0 is still the mode over a path carrying
+    # a space. The flag is here so a quoted path can never reach this read, not for this field.
+    for rec in out.stdout.decode("utf-8", "replace").split("\0"):
+        meta, _tab, pth = rec.partition("\t")
+        bits = meta.split()
+        if pth and bits:
+            modes[pth] = bits[0]
+    return modes
+
+
 def gov_tree_mode(root: pathlib.Path, commit: str, path: str) -> str | None:
-    """The file mode gov's own tree records for a path at a commit.
+    """The file mode gov's own tree records for a path at a commit — a lookup through
+    `read_tree_modes`, so a whole run pays one spawn per commit rather than one per row.
 
     §8 F1: a row with no existing index entry in the target takes THIS mode rather than a literal
     `100644`. A hook that lands non-executable is a hook that does not run.
     """
-    out = subprocess.run(["git", "-C", str(root), "ls-tree", "-z", commit, "--", path],
-                         capture_output=True, text=True, check=False)
-    if out.returncode != 0 or not out.stdout.strip():
-        return None
-    # `-z` MOVES THE TERMINATOR AND THE QUOTING, NOT THE FIELD ORDER — measured on git 2.55: the
-    # record is still `<mode> blob <oid>\t<path>`, so field 0 is still the mode over a path carrying
-    # a space. The flag is here so a quoted path can never reach this read, not for this field.
-    mode = out.stdout.split()[0]
+    mode = read_tree_modes(root, commit).get(path)
     return mode if mode in ("100644", "100755", "120000") else None
+
+
+def resolve_landed_mode(entry_mode: str | None, gov_mode: str | None) -> str:
+    """DEPL-aLevelledCopy-1 S1. The mode a landed `engine` row takes: the ONE mode rule.
+
+    No index entry: gov's mode, else `100644` (DEPL-dCarriedReceipt-7 §8 F1, unchanged). An entry
+    keeps its mode, with one exception — `100644` where gov ships `100755` is carried UP, so a hook
+    gov made executable runs on a POSIX node. Never down (§8 F1 of this unit): an adopter that set a
+    bit gov lacks keeps it. A symlink on either side is left exactly as the entry has it.
+    """
+    if entry_mode is None:
+        return gov_mode or "100644"
+    if entry_mode == "100644" and gov_mode == "100755":
+        return "100755"
+    return entry_mode
 
 
 def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]],
@@ -8242,7 +8478,8 @@ def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit:
 
 def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src: str | None,
                        data: bytes, to_commit: str,
-                       index: dict[str, tuple[str, str]]) -> tuple[str | None, str | None]:
+                       index: dict[str, tuple[str, str]],
+                       entry_path: str | None = None) -> tuple[str | None, str | None]:
     """Put bytes into the target THROUGH ITS OWN INDEX, and let its filters decide the worktree (S5).
 
     Three plumbing calls, in this order and for this reason. `hash-object -w --stdin` puts the blob
@@ -8254,8 +8491,15 @@ def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src:
     and left the index to catch up, so on a clone with a line-ending filter every file gov landed was
     immediately `modified` in the target's own `git status`.
 
-    MODE from the row's existing index entry, and from gov's tree entry at `commit` for a row with
-    none (§8 F1) — a hook that lands non-executable is a hook that does not run.
+    MODE from `resolve_landed_mode`, which is where the mode rule lives (DEPL-aLevelledCopy-1 S1):
+    the existing entry's, carried up to gov's `100755` at `to_commit`, and gov's own for a row with
+    none — a hook that lands non-executable is a hook that does not run. No receipt field records a
+    file mode; gov's tree answers it at any recorded commit.
+
+    `entry_path` (TOOL-aLevelledCopy-9 S4) names the index key that entry is read from, and
+    defaults to `path`. The renamed arm passes the path it moved FROM: `index` was read before
+    `git mv`, so it holds no entry at the new path, and reading one there handed an adopter's
+    100755 row gov's lower mode while the mode-carry line, which reads the old entry, said otherwise.
 
     Returns `(oid, None)` on success and `(None, why)` on failure. A failure LEAVES the index entry
     rather than half-writing; rolling one back is `-14`'s.
@@ -8265,8 +8509,9 @@ def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src:
     if out.returncode != 0:
         return None, f"git hash-object refused the bytes: {out.stderr.decode('utf-8', 'replace').strip()}"
     oid = out.stdout.decode("utf-8", "replace").strip()
-    entry = index.get(path)
-    mode = entry[0] if entry else ((gov_tree_mode(root, to_commit, src) if src else None) or "100644")
+    entry = index.get(entry_path or path)
+    mode = resolve_landed_mode(entry[0] if entry else None,
+                               gov_tree_mode(root, to_commit, src) if src else None)
     up = subprocess.run(["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
                          f"{mode},{oid},{path}"], capture_output=True, text=True, check=False)
     if up.returncode != 0:
@@ -9189,6 +9434,20 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         print(f"  {v:<18} [{role:<13}] {row['path']}")
         acted.append({"row": row, "c": c, "verdict": v, "how": how})
 
+        # DEPL-aLevelledCopy-1 S3. A MODE IS NOT A BYTE QUESTION, so it is not a verdict: the grid
+        # keys on blob identity and reads a mode-only delta as `current`. The carry is decided here,
+        # from the `index0` read the classifier already used, and rides the acted entry as
+        # `mode_to`. Its line is a SECOND line about the path, outside the row shape, because the
+        # row line is parsed by its trailing path (the lone-CR line's precedent above).
+        _ment = index0.get(row["path"])
+        _msrc = c["renamed_to"][0] if c.get("renamed_to") else row.get("source")
+        if how == "table" and _ment and _msrc:
+            _mto = resolve_landed_mode(_ment[0], gov_tree_mode(root, to_commit, _msrc))
+            if _mto != _ment[0]:
+                acted[-1]["mode_to"] = _mto
+                print(f"govkit update — mode-carry {row['path']} · {_ment[0]} -> {_mto} · "
+                      f"gov at {to_commit[:8]}")
+
     for line in (f"  available (not installed): {e}" for e in available):
         print(line)
     if available:
@@ -9471,7 +9730,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     _touching = set(TOUCHING_VERDICTS) | ({"withdrawn"} if write_withdrawals else set())
     snap_rows: list[dict] = []
     for a in acted:
-        if a["how"] != "table" or a["verdict"] not in _touching:
+        # DEPL-aLevelledCopy-1 S4: a mode carry is a write, so its row is snapshotted like one and
+        # a rolled-back kit puts the pre-run entry back, mode included.
+        if a["how"] != "table" or (a["verdict"] not in _touching and not a.get("mode_to")):
             continue
         _paths = [a["row"]["path"]]
         if a["verdict"] == "renamed" and a["c"].get("renamed_to"):
@@ -9690,6 +9951,22 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                       f"never written by `update`")
             continue
 
+        # DEPL-aLevelledCopy-1 S4. THE MODE ARM, for a verdict that lands no bytes. A touching
+        # verdict takes its mode inside `land_through_index` from the same rule, so this arm skips
+        # those. The entry keeps the blob the target already holds; only its mode moves, and the
+        # working file gains the execute bits so a POSIX `git add` does not take them away again.
+        if a.get("mode_to") and v not in TOUCHING_VERDICTS:
+            _mup = subprocess.run(["git", "-C", str(target), "update-index", "--cacheinfo",
+                                   f"{a['mode_to']},{c['ours_oid']},{row['path']}"],
+                                  capture_output=True, text=True, check=False)
+            if _mup.returncode != 0:
+                r.fail(f"'{row['path']}': `git update-index` would not carry its mode to "
+                       f"{a['mode_to']}: {_mup.stderr.strip()}")
+                continue
+            if a["mode_to"] == "100755" and dp.is_file():
+                os.chmod(dp, dp.stat().st_mode | 0o111)
+            changed.append(row["path"])
+
         if v in RAW_WRITE_VERDICTS:
             data = c["theirs"]
             # ---- DEPL-dCarriedReceipt-9 S11. THE `missing` RESTORE CARRIES TOO, and it is the ONE
@@ -9852,7 +10129,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                        f"left exactly as it was, at its old path and its old vintage")
                 continue
 
-            oid, why = land_through_index(root, target, new_dest, new_src, data, to_commit, index0)
+            oid, why = land_through_index(root, target, new_dest, new_src, data, to_commit, index0,
+                                          entry_path=old_path)
             if oid is None:
                 # NO ARM REACHES THIS, and the skip announces itself rather than passing for
                 # coverage. `land_through_index` fails only when the TARGET's own git refuses —
@@ -12475,9 +12753,15 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
     if base is None:
         # The default base is `check-verdict-epoch.sh`'s: the merge-base with the default branch,
         # the remote's first. No base is a FAILED exit 1 and never a zero-status skip, because
-        # run-gates judges a leg by its exit code and a silent 0 reads as a pass forever.
-        dflt = os.environ.get("GOV_DEFAULT_BRANCH") or "main"
-        for ref in (f"origin/{dflt}", dflt):
+        # run-gates judges a leg by its exit code and a silent 0 reads as a pass forever. The
+        # remote and its branch are the ladder's (TOOL-dLadderedRemote-2); a refusal is that
+        # failed exit, naming it, and no remote at all leaves only the local branch.
+        remote, dflt, _observed, refusal = resolve_remote(root)
+        if refusal:
+            print(f"epoch: FAILED · no base to compare against · {refusal}")
+            return 1
+        dflt = dflt or "main"
+        for ref in ((f"{remote}/{dflt}", dflt) if remote else (dflt,)):
             mb = subprocess.run(["git", "-C", str(root), "merge-base", ref, "HEAD"],
                                 capture_output=True, text=True, encoding="utf-8")
             if mb.returncode == 0 and mb.stdout.strip():

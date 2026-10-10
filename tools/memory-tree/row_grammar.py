@@ -1114,10 +1114,67 @@ def scan_records(root, conf):
     return out
 
 
+# The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
+# named on its marker line and gated by the resolve-python self-test.
+# >>> remote_ladder_py -- canonical copy: resolve_remote.py in the gov lib dir (byte-identical; gated)
+def resolve_remote(root):
+    """-> (remote, branch, observed, refusal) for the repository at <root>. Fetches nothing.
+
+    remote    GOV_REMOTE, else branch.<current>.remote unless it is ".", else the ONLY remote.
+              Several remotes and none chosen, or a chosen name that is not a remote here, is a
+              REFUSAL naming GOV_REMOTE. No remote at all is remote "" and NO refusal: the caller
+              keeps its own no-remote fallback.
+    observed  the branch refs/remotes/<remote>/HEAD names, or "". A caller whose GOV_DEFAULT_BRANCH
+              only CROSS-CHECKS the observation reads this one.
+    branch    GOV_DEFAULT_BRANCH, else observed, else "".
+    A refusal empties the other three, so no caller can pick a remote the ladder refused.
+    """
+    import os
+    import subprocess
+
+    def read(*args):
+        try:
+            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        return p.stdout.strip() if p.returncode == 0 else ""
+
+    names = read("remote").split()
+    listed = " ".join(names) or "none"
+    # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous
+    # (`heads/x`, `remotes/r/x`), and the prefix is stripped exactly instead.
+    cur = read("symbolic-ref", "--quiet", "HEAD")
+    cur = cur[len("refs/heads/"):] if cur.startswith("refs/heads/") else ""
+    remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
+    if not remote and cur:
+        remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
+        if remote == ".":
+            remote = ""
+    if not remote and len(names) == 1:
+        remote = names[0]
+    if not remote and len(names) > 1:
+        where = "branch " + cur if cur else "a detached HEAD"
+        return "", "", "", ("cannot choose a remote: GOV_REMOTE is unset, %s has no configured remote, "
+                            "and this repository has %d remotes (%s). Name it: export GOV_REMOTE=<remote>."
+                            % (where, len(names), listed))
+    if remote and remote not in names:
+        return "", "", "", ("%s names %s, which is no remote of this repository (%s). Name one that is: "
+                            "export GOV_REMOTE=<remote>." % (how, remote, listed))
+    observed = ""
+    if remote:
+        pre = "refs/remotes/" + remote + "/"
+        head = read("symbolic-ref", "--quiet", pre + "HEAD")
+        if head.startswith(pre) and len(head) > len(pre):
+            observed = head[len(pre):]
+    return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
+# <<< remote_ladder_py
+
+
 def derive_relation_base(root, base=None, check=None):
     """-> the commit check 27 measures from: `base` resolved, or the mainline merge-base.
 
-    `check-verdict-epoch.sh`'s derivation: the merge-base of `origin/<branch>` and HEAD, then of
+    `check-verdict-epoch.sh`'s derivation: the merge-base of `<remote>/<branch>` and HEAD, then of
     `<branch>` and HEAD, with `<branch>` from GOV_DEFAULT_BRANCH or `main`. The remote first, so a
     stale local `main` cannot widen the range. No base while armed is a RED naming it, because the
     bar judges a leg by its exit code and a zero-status skip would read as a pass. `check` names the
@@ -1130,14 +1187,21 @@ def derive_relation_base(root, base=None, check=None):
             raise Problem(f"row-grammar: check {check or RELATION_CHECK} was given the base '{base}', "
                           f"which does not resolve to a commit here")
         return p.stdout.strip()
-    branch = os.environ.get("GOV_DEFAULT_BRANCH", "").strip() or "main"
-    for ref in (f"origin/{branch}", branch):
+    # The remote and its branch are the ladder's (TOOL-dLadderedRemote-2), `main` when none is named;
+    # a refusal is the same red, naming it, because falling back to local is what the remote-first
+    # order exists to prevent.
+    remote, branch, _observed, refusal = resolve_remote(root)
+    if refusal:
+        raise Problem(f"row-grammar: check {RELATION_CHECK} is armed and found no mainline base — {refusal}")
+    branch = branch.strip() or "main"
+    refs = (f"{remote}/{branch}", branch) if remote else (branch,)
+    for ref in refs:
         p = subprocess.run(["git", "merge-base", ref, "HEAD"], cwd=root, capture_output=True,
                            text=True, encoding="utf-8")
         if p.returncode == 0 and p.stdout.strip():
             return p.stdout.strip()
     raise Problem(f"row-grammar: check {RELATION_CHECK} is armed and found no mainline base — neither "
-                  f"origin/{branch} nor {branch} shares history with HEAD, so no added record can be "
+                  f"{' nor '.join(refs)} shares history with HEAD, so no added record can be "
                   f"told from an old one. Fetch full history, set GOV_DEFAULT_BRANCH, or pass a base")
 
 
@@ -2593,27 +2657,31 @@ def cmd_selftest():
             arm("check 27: a base equal to HEAD exits 0 with a graded count of 0",
                 f"rc=0 row-grammar: check 27 graded 0 added record(s) in {b0[:8]}..HEAD",
                 lambda: run_fixture(f1, "--check-relations", b0))
-            # AC14 — the no-argument base. origin/main sits BEHIND a local main that moved on with a
+            # AC14 — the no-argument base. The remote's main sits BEHIND a local main that moved on with a
             # non-record commit, and the branch under test leaves that local main: the merge-base with
             # the REMOTE is b0, with the local main b1, so the base8 printed says which was preferred.
             run("git", "checkout", "-q", "main", cwd=f1)
             _write_commit(f1, "2026-01-15", {"notes.txt": "a commit that adds no record\n"}, msg="b1")
             b1 = run("git", "rev-parse", "HEAD", cwd=f1).strip()
-            run("git", "update-ref", "refs/remotes/origin/main", b0, cwd=f1)
+            # The remote is CONFIGURED, because the ladder reads configuration and a ref alone names no
+            # remote; it is named through a variable and not after the convention (TOOL-dLadderedRemote-2).
+            rg_remote = "upstream"
+            run("git", "remote", "add", rg_remote, f"../{rg_remote}.git", cwd=f1)
+            run("git", "update-ref", f"refs/remotes/{rg_remote}/main", b0, cwd=f1)
             set_branch(f1, "main", add_rows(restated))
-            arm("check 27: with no argument the base is the merge-base with origin/main, not a stale local main",
+            arm("check 27: with no argument the base is the merge-base with the remote main, not a stale local main",
                 f"graded 1 added record(s) in {b0[:8]}..HEAD", lambda: run_fixture(f1, "--check-relations"))
-            # ...and the MERGE-BASE, never the remote tip: here origin/main has moved past the fork.
+            # ...and the MERGE-BASE, never the remote tip: here the remote main has moved past the fork.
             run("git", "checkout", "-q", "-B", "side", b0, cwd=f1)
             _write_commit(f1, "2026-01-20", {"side.txt": "the remote moved on\n"}, msg="side")
-            run("git", "update-ref", "refs/remotes/origin/main", "side", cwd=f1)
+            run("git", "update-ref", f"refs/remotes/{rg_remote}/main", "side", cwd=f1)
             run("git", "checkout", "-q", "arm", cwd=f1)
-            arm("check 27: the base is the merge-base with origin/main, not its tip",
+            arm("check 27: the base is the merge-base with the remote main, not its tip",
                 f"graded 1 added record(s) in {b0[:8]}..HEAD", lambda: run_fixture(f1, "--check-relations"))
             # AC7's missing base, then GOV_DEFAULT_BRANCH naming the only mainline there is.
-            run("git", "update-ref", "-d", "refs/remotes/origin/main", cwd=f1)
+            run("git", "update-ref", "-d", f"refs/remotes/{rg_remote}/main", cwd=f1)
             run("git", "branch", "-m", "main", "trunk", cwd=f1)
-            arm("check 27: no origin/main and no main is a red naming the missing base",
+            arm("check 27: no remote main and no main is a red naming the missing base",
                 "rc=1 row-grammar: check 27 is armed and found no mainline base",
                 lambda: run_fixture(f1, "--check-relations"))
             arm("check 27: GOV_DEFAULT_BRANCH=trunk resolves trunk",

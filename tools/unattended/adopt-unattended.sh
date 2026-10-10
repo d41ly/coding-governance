@@ -165,6 +165,7 @@ fi
 # rendered sentence can never be a hole: there is no value of the key that produces an empty cell.
 case "$ANCHOR_SCOPE" in
   published) ANCHOR_EFFECTIVE=published ;;
+  local)     ANCHOR_EFFECTIVE=local ;;   # TOOL-aHomedAnchor-1 S6
   *)         ANCHOR_EFFECTIVE=default-branch ;;
 esac
 # TOOL-aNamedGesture-1 - the EFFECTIVE authorizing parameter, derived on the same terms and in the

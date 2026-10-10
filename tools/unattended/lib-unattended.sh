@@ -619,7 +619,8 @@ normpath() {  # path -> the same path in one spelling
   # REPEATED SLASHES COLLAPSE FIRST. Stripping the leading `./` before collapsing turns `.//x` into
   # the ABSOLUTE `/x` — a path in a different tree — and every containment answer after that is about
   # somewhere else. Found by the arm written for this function, which is the argument for writing it.
-  while :; do case "$_np" in *//*) _np=$(printf '%s' "$_np" | sed 's|//*|/|g') ;; *) break ;; esac; done
+  # Pattern substitution, never `sed`: a spawn costs about a second on a loaded node `a`.
+  while :; do case "$_np" in *//*) _np=${_np//\/\//\/} ;; *) break ;; esac; done
   while :; do case "$_np" in ./?*) _np=${_np#./} ;; *) break ;; esac; done
   # THE DOT SEGMENTS, interior and trailing. `a/./b`, `a/b/.` and `a/b/./` all name what `a/b` names,
   # and every containment answer in this kit is built on this function — so a declaration spelled with
@@ -631,12 +632,16 @@ normpath() {  # path -> the same path in one spelling
   while :; do case "$_np" in ?*/) _np=${_np%/} ;; *) break ;; esac; done
   printf '%s' "$_np"
 }
+# A HOT CALLER READS `_np` RATHER THAN `$(normpath ...)`: the function leaves its answer there, and a
+# command substitution FORKS. `normpath x >/dev/null; v=$_np` runs in this shell. The fork was the
+# whole cost of `--claims`: 87 of 107 s on node `a` under load, in `covers` and the generated-index
+# resolver, each `$(...)` about a second there (TOOL-aMeteredSweep-1).
 # `covers a b` — b is a, or sits under it. DIRECTIONAL, and what a "may this pass write here"
 # question wants. `overlaps` is what every DISJOINTNESS question wants, and disjointness is what the
 # dispatch refusals are actually asking: testing one direction only refuses the narrow declarations
 # and admits the one that claims everything, because the widest path is under nothing.
 covers() {
-  _ca=$(normpath "$1"); _cb=$(normpath "$2")
+  normpath "$1" >/dev/null; _ca=$_np; normpath "$2" >/dev/null; _cb=$_np
   case "$_cb" in "$_ca"|"$_ca"/*) return 0 ;; esac
   return 1
 }
@@ -645,7 +650,8 @@ overlaps() { covers "$1" "$2" || covers "$2" "$1"; }
 # covers everything and is under nothing, and an empty path is not a path. Named here so the driver
 # and any later reader refuse the same set.
 is_repo_root() {
-  case "$(normpath "$1")" in ""|"."|"./") return 0 ;; esac
+  normpath "$1" >/dev/null
+  case "$_np" in ""|"."|"./") return 0 ;; esac
   return 1
 }
 
@@ -747,19 +753,30 @@ resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memor
   local _rg_lf _rg_rf
   _rg_lf=$(mktemp) && _rg_rf=$(mktemp) || { printf 'lib-unattended: resolve_generated_indexes cannot create a scratch file, so only the conf pairs are read\n' >&2; printf '%s' "$_rg_decl"; return 0; }
   git -C "$_rg_root" ls-files -- ":(glob)${_rg_tool:+$_rg_tool/}*/kit.toml" >"$_rg_lf" 2>/dev/null || :
+  # ONE awk over every descriptor, each row tagged with the file it came from, never one awk per kit:
+  # a spawn is about a second on a loaded node `a` (TOOL-aMeteredSweep-1). A row still closes at the
+  # end of ITS file, as the per-file END did, so a table never runs into the next kit. Tagged by
+  # FILENAME and not by a count, because an empty descriptor opens no first line to count.
+  local -a _rg_fs=()
   while IFS= read -r _rg_d; do
     [ -n "$_rg_d" ] || continue
-    _rg_krel=${_rg_d%/kit.toml}
-    awk '
+    _rg_fs+=("$_rg_root/$_rg_d")
+  done <"$_rg_lf"
+  [ "${#_rg_fs[@]}" -gt 0 ] && awk '
       function val(s) { sub(/^[^=]*=[ \t]*"/, "", s); sub(/".*$/, "", s); return s }
+      function flush() { if (t && p != "") print f "\t" p "\t" g "\t" w; t = 0; p = ""; g = ""; w = "" }
+      FILENAME != f               { flush(); f = FILENAME }
       { sub(/\r$/, "") }
-      /^\[\[generated\]\][ \t]*$/ { if (p != "") print p "\t" g "\t" w; t = 1; p = ""; g = ""; w = ""; next }
-      /^\[/                       { if (t && p != "") print p "\t" g "\t" w; t = 0; p = ""; g = ""; w = ""; next }
+      /^\[\[generated\]\][ \t]*$/ { flush(); t = 1; next }
+      /^\[/                       { flush(); next }
       t && /^path[ \t]*=/         { p = val($0) }
       t && /^generator[ \t]*=/    { g = val($0) }
       t && /^when[ \t]*=/         { w = val($0) }
-      END { if (t && p != "") print p "\t" g "\t" w }' "$_rg_root/$_rg_d" >"$_rg_rf" 2>/dev/null || :
-    while IFS=$'\t' read -r _rg_p _rg_g _rg_w; do
+      END { flush() }' "${_rg_fs[@]}" >"$_rg_rf" 2>/dev/null
+  [ "${#_rg_fs[@]}" -gt 0 ] || : >"$_rg_rf"
+  {
+    while IFS=$'\t' read -r _rg_d _rg_p _rg_g _rg_w; do
+      _rg_d=${_rg_d#"$_rg_root/"}; _rg_krel=${_rg_d%/kit.toml}
       [ -n "$_rg_p" ] && [ -n "$_rg_g" ] || continue
       if [ -n "$_rg_w" ]; then
         _rg_kv=${_rg_w#*:}
@@ -771,11 +788,11 @@ resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memor
       case "$_rg_p" in
         *"{"*|*"}"*) printf 'lib-unattended: %s declares a [[generated]] path with a token this reader cannot resolve, so it is skipped: %s\n' "$_rg_d" "$_rg_p" >&2; continue ;;
       esac
-      _rg_p=$(normpath "$_rg_p"); _rg_g=$(normpath "$_rg_krel/$_rg_g")
+      normpath "$_rg_p" >/dev/null; _rg_p=$_np; normpath "$_rg_krel/$_rg_g" >/dev/null; _rg_g=$_np
       case "$_rg_seen" in *" $_rg_p:$_rg_g "*) continue ;; esac
       _rg_seen="$_rg_seen$_rg_p:$_rg_g "; _rg_out="$_rg_out $_rg_p:$_rg_g"
     done <"$_rg_rf"
-  done <"$_rg_lf"
+  }
   rm -f "$_rg_lf" "$_rg_rf"
   for _rg_p in $_rg_decl; do
     case "$_rg_seen" in *" $_rg_p "*) continue ;; esac

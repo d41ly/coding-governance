@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""model.py — one unattended run's sources joined into one account of it. gov:kit runlog@1.9
+"""model.py — one unattended run's sources joined into one account of it. gov:kit runlog@1.10
 
 A run's evidence is spread across its run-state file, three journals, git, its build folder and, where
 local, its session extracts. `build_run_model` joins them into ONE model of ONE run: a timeline, a
@@ -617,13 +617,78 @@ def read_git_range(root, revs, paths=()) -> list:
     return out
 
 
+# The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
+# named on its marker line and gated by the resolve-python self-test.
+# >>> remote_ladder_py -- canonical copy: resolve_remote.py in the gov lib dir (byte-identical; gated)
+def resolve_remote(root):
+    """-> (remote, branch, observed, refusal) for the repository at <root>. Fetches nothing.
+
+    remote    GOV_REMOTE, else branch.<current>.remote unless it is ".", else the ONLY remote.
+              Several remotes and none chosen, or a chosen name that is not a remote here, is a
+              REFUSAL naming GOV_REMOTE. No remote at all is remote "" and NO refusal: the caller
+              keeps its own no-remote fallback.
+    observed  the branch refs/remotes/<remote>/HEAD names, or "". A caller whose GOV_DEFAULT_BRANCH
+              only CROSS-CHECKS the observation reads this one.
+    branch    GOV_DEFAULT_BRANCH, else observed, else "".
+    A refusal empties the other three, so no caller can pick a remote the ladder refused.
+    """
+    import os
+    import subprocess
+
+    def read(*args):
+        try:
+            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        return p.stdout.strip() if p.returncode == 0 else ""
+
+    names = read("remote").split()
+    listed = " ".join(names) or "none"
+    # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous
+    # (`heads/x`, `remotes/r/x`), and the prefix is stripped exactly instead.
+    cur = read("symbolic-ref", "--quiet", "HEAD")
+    cur = cur[len("refs/heads/"):] if cur.startswith("refs/heads/") else ""
+    remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
+    if not remote and cur:
+        remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
+        if remote == ".":
+            remote = ""
+    if not remote and len(names) == 1:
+        remote = names[0]
+    if not remote and len(names) > 1:
+        where = "branch " + cur if cur else "a detached HEAD"
+        return "", "", "", ("cannot choose a remote: GOV_REMOTE is unset, %s has no configured remote, "
+                            "and this repository has %d remotes (%s). Name it: export GOV_REMOTE=<remote>."
+                            % (where, len(names), listed))
+    if remote and remote not in names:
+        return "", "", "", ("%s names %s, which is no remote of this repository (%s). Name one that is: "
+                            "export GOV_REMOTE=<remote>." % (how, remote, listed))
+    observed = ""
+    if remote:
+        pre = "refs/remotes/" + remote + "/"
+        head = read("symbolic-ref", "--quiet", pre + "HEAD")
+        if head.startswith(pre) and len(head) > len(pre):
+            observed = head[len(pre):]
+    return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
+# <<< remote_ladder_py
+
+
 def read_refs(root) -> dict:
-    """Every branch and remote-tracking ref with its sha, the checked-out branch, and origin/HEAD's
-    target. ONE call; a detached HEAD costs one more."""
+    """Every branch and remote-tracking ref with its sha, the checked-out branch, and the target of
+    the remote's HEAD, the remote being the ladder's. ONE ref listing through `run_git`; a detached
+    HEAD costs one more. The inlined ladder spawns up to four git processes of its own, which
+    `GIT_CALLS` does NOT count, so the model's git-call figure understates this read by that many
+    (TOOL-dLadderedRemote-5). The key keeps its name `origin_head`, which `resolve_default_ref` and the model's readers
+    spell, though it now names whichever remote the ladder resolved (TOOL-dLadderedRemote-2). A
+    ladder refusal or no remote leaves it None, so the reader falls back to a local main or master
+    exactly as a clone without that symref always did."""
     # `for-each-ref` spells a hex byte `%1f`, not `log`'s `%x1f`; the log spelling passes through as
     # text and every line then fails to split, which reads as a clone with no refs at all.
     raw = run_git(root, ["for-each-ref", "--format=%(HEAD)%1f%(refname)%1f%(objectname)%1f%(symref)",
                          "refs/heads", "refs/remotes"]).decode("utf-8", "replace")
+    remote, _branch, _observed, refusal = resolve_remote(root)
+    remote_head = f"refs/remotes/{remote}/HEAD" if remote and not refusal else None
     refs, head, origin_head = {}, None, None
     for line in raw.split("\n"):
         bits = line.split("\x1f")
@@ -633,7 +698,7 @@ def read_refs(root) -> dict:
         refs[name] = sha
         if mark.strip() == "*":
             head = sha
-        if name == "refs/remotes/origin/HEAD" and symref:
+        if remote_head and name == remote_head and symref:
             origin_head = symref
     if raw.strip() and not refs:
         raise ValueError("runlog: for-each-ref printed lines this reader could not split, so every ref "
@@ -644,8 +709,8 @@ def read_refs(root) -> dict:
 
 
 def resolve_default_ref(refs, default_ref=None) -> tuple:
-    """`(refname, branch name)` of the default branch: a given ref, else origin/HEAD's target, else a
-    local main, else a local master. `(None, None)` when none resolves."""
+    """`(refname, branch name)` of the default branch: a given ref, else the remote HEAD's target that
+    `read_refs` resolved, else a local main, else a local master. `(None, None)` when none resolves."""
     table = refs["refs"]
     for cand in (default_ref, refs.get("origin_head"), "refs/heads/main", "refs/heads/master"):
         if cand and cand in table:

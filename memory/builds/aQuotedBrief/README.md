@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: tooling
 roster: TOOL
-ids: TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3
+ids: TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3 TOOL-aQuotedBrief-4 TOOL-aQuotedBrief-5 TOOL-aQuotedBrief-6
 ---
 
 # aQuotedBrief — a prompt fired mid-session stands on its own, starts clean, and closes every item
@@ -44,6 +44,10 @@ Both refusals are guards against accident, not a security boundary: a run with s
 rewrite its own history. The kit version moves once, after the last unit lands. Owner decisions,
 2026-10-09: confirmation applies only to a session-derived brief, an edit there is not confirmed
 again, and an unclean tree starts the run in a fresh worktree rather than stopping it.
+M2 classification at preflight (base 6473ae38): all three units READY. Units 1 and 2 share
+`unattended.sh`, its suite and the verbs template, so they build in sequence, 1 then 2 then 3.
+The closing review converged at round 2 and its findings were promoted: H1 to unit 4, H2 to
+unit 5, the minors to unit 6, built in that order because all three write `unattended.sh`.
 
 ## Parked decisions
 
@@ -56,26 +60,32 @@ none
 | 1 | `TOOL-aQuotedBrief-1` | SPECCED | the prompt record carries a self-contained brief, the session words it used, and the owner's confirmation when it used any |
 | 2 | `TOOL-aQuotedBrief-2` | SPECCED | a run that cannot start clean starts in a fresh worktree, and a first preflight refuses a branch carrying commits beyond this build's folder |
 | 3 | `TOOL-aQuotedBrief-3` | SPECCED | each brief item carries its disposition at BASE, joined to the roster, and a seventh `build-complete` term grades it |
+| 4 | `TOOL-aQuotedBrief-4` | SPECCED | the brief cutoff is read at the default-branch side of BASE, and term 7 says when it is off |
+| 5 | `TOOL-aQuotedBrief-5` | SPECCED | preflight and term 7 recognise a prompt record by one heading predicate |
+| 6 | `TOOL-aQuotedBrief-6` | SPECCED | the closing review's minors, batched: re-preflight, the cutoff date, dispositions, quoting, parks and arms |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 3 unit(s) · node a · opened 2026-10-09 · streams tooling
-ids TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-10-09 · streams tooling
+ids TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3 TOOL-aQuotedBrief-4 TOOL-aQuotedBrief-5 TOOL-aQuotedBrief-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aQuotedBrief-1 — the prompt record carries a self-contained brief, its session sources, and the owner's confirmation](spec/2026-10-09-spec-TOOL-aQuotedBrief-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-10-09 |
-| [TOOL-aQuotedBrief-2 — a run that cannot start clean starts in a fresh worktree, and a first preflight refuses a carried branch](spec/2026-10-09-spec-TOOL-aQuotedBrief-2.md) | 1 | 2 | SPECCED | rev-2 | 2026-10-09 |
-| [TOOL-aQuotedBrief-3 — every brief item carries its disposition, and `build-complete` grades each one](spec/2026-10-09-spec-TOOL-aQuotedBrief-3.md) | 2 | 2 | SPECCED | rev-1 | 2026-10-09 |
+| [TOOL-aQuotedBrief-1 — the prompt record carries a self-contained brief, its session sources, and the owner's confirmation](spec/2026-10-09-spec-TOOL-aQuotedBrief-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-09 |
+| [TOOL-aQuotedBrief-2 — a run that cannot start clean starts in a fresh worktree, and a first preflight refuses a carried branch](spec/2026-10-09-spec-TOOL-aQuotedBrief-2.md) | 1 | 2 | CLOSED | rev-4 | 2026-10-09 |
+| [TOOL-aQuotedBrief-3 — every brief item carries its disposition, and `build-complete` grades each one](spec/2026-10-09-spec-TOOL-aQuotedBrief-3.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-09 |
+| [TOOL-aQuotedBrief-4 — the brief cutoff is read at the owner's side of BASE, and term 7 says when it is off](spec/2026-10-09-spec-TOOL-aQuotedBrief-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-09 |
+| [TOOL-aQuotedBrief-5 — preflight and term 7 recognise a prompt record by one predicate](spec/2026-10-09-spec-TOOL-aQuotedBrief-5.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-aQuotedBrief-6 — the closing review's minors: dispositions, re-preflight, the cutoff date, quoting, parks and arms](spec/2026-10-09-spec-TOOL-aQuotedBrief-6.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 14 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3.
+Ids no `spec-audit` record has ever named: TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3 TOOL-aQuotedBrief-4 TOOL-aQuotedBrief-5 TOOL-aQuotedBrief-6.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -84,6 +94,9 @@ Ids no `spec-audit` record has ever named: TOOL-aQuotedBrief-1 TOOL-aQuotedBrief
 |---|---|---|
 | 1 | `TOOL-aQuotedBrief-1`, `TOOL-aQuotedBrief-2` | yes |
 | 2 | `TOOL-aQuotedBrief-3` | no |
+| 3 | `TOOL-aQuotedBrief-4` | no |
+| 4 | `TOOL-aQuotedBrief-5` | no |
+| 5 | `TOOL-aQuotedBrief-6` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

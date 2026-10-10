@@ -270,20 +270,26 @@ measured against ONE ref, and the report prints it on its header line with the c
 to: `(base refs/remotes/origin/main @ 1a2b3c4d)`. It is resolved remote-first:
 
 1. `--base-ref <ref>`, verbatim. The escape hatch for every rung below.
-2. The default branch's NAME: `GOV_DEFAULT_BRANCH`, else the last component of
-   `refs/remotes/origin/HEAD`, else a refusal (exit 2) naming both and `git remote set-head origin -a`.
-3. `refs/remotes/origin/<name>`, whenever it resolves.
-4. A clone with **no `origin` remote** compares against `refs/heads/<name>` and says so on stderr.
+2. The REMOTE and the default branch's NAME, by the remote ladder every kit inlines
+   (TOOL-dLadderedRemote-2). The remote is `GOV_REMOTE`, else the current branch's configured
+   remote, else the repository's only remote. Several remotes and none chosen refuse with exit 2,
+   naming `GOV_REMOTE`. The name is `GOV_DEFAULT_BRANCH`, else the branch `refs/remotes/<remote>/HEAD`
+   names, else a refusal naming both and `git remote set-head <remote> -a`.
+3. `refs/remotes/<remote>/<name>`, whenever it resolves.
+4. A clone with **no remote at all** compares against `refs/heads/<name>` and says so on stderr.
    There is no staler or fresher copy of the branch in such a clone, so local is the record.
-5. A clone that **has `origin` but no tracking ref** for the branch refuses with exit 2 and names
-   `git fetch origin <name>`. Falling back to local there is the defect this ladder removes.
+5. A clone that **has the remote but no tracking ref** for the branch refuses with exit 2 and names
+   `git fetch <remote> <name>`. Falling back to local there is the defect this ladder removes.
+
+The remote is NOT assumed to be called `origin`: a node that names its remote after the project
+resolves exactly as one that does not.
 
 The base used to be the bare branch name, which git resolves to the LOCAL branch, so the same commit
 read differently on a node whose local `main` was stale: a pin raise already on origin read as a
 weakened ratchet on that node alone. The report never fetches — it is a leg that must run offline,
 and a fetch would move the ref it is grading — so a node wanting a fresher answer fetches first.
-TOOL-dDerivedDocket-21. A CI checkout that fetches branches without
-`refs/remotes/origin/HEAD` still needs `GOV_DEFAULT_BRANCH`, as before.
+TOOL-dDerivedDocket-21. A CI checkout that fetches branches without the remote's HEAD symref still
+needs `GOV_DEFAULT_BRANCH`, as before.
 
 ## Why pins rather than a perfect oracle
 

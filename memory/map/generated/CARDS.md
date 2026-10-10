@@ -86,9 +86,9 @@ dead paths in shipped text — the wrong-prefix half and the deleted-file half, 
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/install-prefix.md`
 - decisions 0
-- gate-legs 5: `install-prefix (shipped surface)`, `install-prefix self-test`, `dead-path carriers (deleted files still named)`, `dead-path carriers self-test`, `foreign-prefix parity (every self-test at three prefixes)`
+- gate-legs 7: `install-prefix (shipped surface)`, `install-prefix self-test`, `dead-path carriers (deleted files still named)`, `dead-path carriers self-test`, `remote literals (kit code names no remote)`, `remote literals self-test`, `foreign-prefix parity (every self-test at three prefixes)`
 - gotcha-classes 2: `inline-marker-breaks-a-line-continuation.md`, `a-spelling-change-strands-its-readers.md`
-- globs 6: `tools/check-install-prefix.sh`, `tools/check-install-prefix.test.sh`, `tools/run-gates/foreign-prefix.gov.test.sh`, `tools/check-dead-paths.sh`, `tools/check-dead-paths.test.sh`, `tools/dead-path-waivers.txt`
+- globs 8: `tools/check-install-prefix.sh`, `tools/check-install-prefix.test.sh`, `tools/run-gates/foreign-prefix.gov.test.sh`, `tools/check-dead-paths.sh`, `tools/check-dead-paths.test.sh`, `tools/dead-path-waivers.txt`, `tools/check-remote-literals.sh`, `tools/check-remote-literals.test.sh`
 
 ## kit-placeholders
 
@@ -144,9 +144,9 @@ check-memory-hygiene.sh: the memory tree's structural gate, its per-class size c
 - gate-legs 9: `memory hygiene`, `memory-hygiene self-test`, `verdict epoch (kit version dates the engine)`, `verdict-epoch self-test`, `kit version markers`, `kit/dogfood doc parity`, `transition-audit arms`, `backlog migration selftest`, `straggler-guard arms`
 - kits 1: `memory-tree`
 - git-hooks 2: `commit-msg`, `pre-rebase`
-- gotcha-classes 10: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`, `inline-fence-swallows-the-rest-of-the-file.md`, `record-citing-a-foreign-id-defines-or-orphans-it.md`
+- gotcha-classes 11: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`, `inline-fence-swallows-the-rest-of-the-file.md`, `record-citing-a-foreign-id-defines-or-orphans-it.md`
 - globs 10
-- cut 15 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 16 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## memory-tree-merge-driver
 
@@ -289,7 +289,7 @@ Unattended runs — a mandate on disk, not a block of chat
 The unattended run's authorization: the observed anchor and the ask mandate
 
 - status `building` · streams `tooling` · dossier `memory/map/features/unattended-mandate.md`
-- decisions 3: `TOOL-aStandingWrit-2`, `TOOL-dNarrowedAnchor-1`, `TOOL-dDerivedDocket-19`
+- decisions 4: `TOOL-aStandingWrit-2`, `TOOL-dNarrowedAnchor-1`, `TOOL-dDerivedDocket-19`, `TOOL-aHomedAnchor-1`
 - gotcha-classes 3: `a-merged-in-check-can-refuse-a-pinned-record.md`, `concurrent-runs-are-announced-not-refused.md`, `inherited-git-dir-pins-the-work-tree-to-the-cwd.md`
 - globs 6: `tools/unattended/unattended.sh`, `tools/unattended/check-unattended.sh`, `tools/unattended/lib-unattended.sh`, `memory/guides/UNATTENDED-PROTOCOL.md`, `memory/guides/UNATTENDED-ASKS.md`, `.unattended.conf`
 

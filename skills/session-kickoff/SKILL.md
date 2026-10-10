@@ -38,9 +38,11 @@ not a meeting.
   multi-stream layout): probe the *immediate* child dirs for git checkouts; prefer the one
   holding the default branch (often the dir literally named `main`). Ask only if ambiguous.
 - No git anywhere → say so and ask whether to run a scope-only kickoff (Steps 3 + 5) or stop.
-- Detect **remote** (`git remote` — prefer `origin`, else the first) and **default branch**
-  (`git symbolic-ref --short refs/remotes/<remote>/HEAD`, strip the `<remote>/` prefix;
-  fallback: `main` if it exists, else `master`). No remote → note it, skip fetch/ff.
+- Detect **remote** by the ladder every kit inlines: `GOV_REMOTE`, else the current branch's
+  configured remote unless it is `.`, else the repository's only remote (`git remote`); several and
+  none chosen, or a chosen name that is no configured remote → ask, naming `GOV_REMOTE`. Then the **default branch**: `GOV_DEFAULT_BRANCH`, else the target of
+  `git symbolic-ref refs/remotes/<remote>/HEAD` with `refs/remotes/<remote>/` stripped; fallback:
+  `main` if it exists, else `master`. No remote → note it, skip fetch/ff.
 - On Windows under a POSIX shell (MSYS/Git-Bash), give `git -C` **forward-slash** paths
   (`/c/repo`), never backslash — backslash drive paths get mangled.
 

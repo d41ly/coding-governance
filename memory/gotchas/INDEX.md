@@ -69,6 +69,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [inputs-inside-the-subjects-reach](inputs-inside-the-subjects-reach.md) | class | 4 |  | a check whose inputs are all supplied by the thing it distrusts is not a check, however sound its logic |
 | [join-key-widened-by-a-shared-location](join-key-widened-by-a-shared-location.md) | class | 2 |  | a join keyed on WHERE something happened takes every place the subject ever touched, and one of those places is shared by every subject, so the key admits everyone's lines |
 | [ledger-token-wrapped-across-a-line-joins-nothing](ledger-token-wrapped-across-a-line-joins-nothing.md) | class | 2 |  | hygiene check 23 extracts a ledger line's backticked tokens PER LINE, so a token the writer wrapped across a line break belongs to no line and the criterion it answers reads as unanswered |
+| [line-claim-matched-over-the-whole-output](line-claim-matched-over-the-whole-output.md) | class | 2 |  | an arm that asserts a line names X tests two substrings over the whole output, so it passes when X appears on some other line and the line it means names something else |
 | [line-count-reads-empty-capture-as-one](line-count-reads-empty-capture-as-one.md) | class | 4 |  | a line count over a captured variable that adds a newline before counting reads an EMPTY capture as one line, so a one-line assertion cannot fail on a command that wrote nothing |
 | [line-keyed-registry-reds-on-a-file-that-grew](line-keyed-registry-reds-on-a-file-that-grew.md) | class | 3 |  | a waiver keyed <path>:<line> stops matching when anything is inserted above it, so a gate reds on a file whose waived line nobody touched |
 | [liveness-negative-from-another-population](liveness-negative-from-another-population.md) | class | 2 |  | a probe is shown able to read negative on inputs it will never act on, while over its real population a positive is structural, so the liveness assertion passes and certifies nothing |
@@ -109,7 +110,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [trace-profile-measures-itself](trace-profile-measures-itself.md) | class | 1 |  | a per-line set -x profile charges its own write overhead to the next line, so its seconds rank by call count and an optimisation aimed at them moves nothing |
 | [trailing-comma-counted-as-an-element](trailing-comma-counted-as-an-element.md) | class | 5 |  | a counter scoring one-plus-every-top-level-comma reads a trailing comma as a real item, so every multi-line literal measures one too many |
 | [trapped-signal-waits-for-the-foreground-child](trapped-signal-waits-for-the-foreground-child.md) | class | 2 |  | a bash script that TRAPS TERM, HUP or INT runs the handler only after its foreground child returns, so a killed script outlives the kill for as long as that child runs |
-| [two-answers-to-one-question](two-answers-to-one-question.md) | class | 18 | yes | a fact stated in two places drifts, and the copies need not disagree loudly to be wrong |
+| [two-answers-to-one-question](two-answers-to-one-question.md) | class | 20 | yes | a fact stated in two places drifts, and the copies need not disagree loudly to be wrong |
 | [two-guards-one-question-two-answers](two-guards-one-question-two-answers.md) | class | 3 |  | two guards that ask one question different ways become jointly unsatisfiable, and the tree they wedge has no legal move left |
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
@@ -118,6 +119,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-103 record(s): 100 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+104 record(s): 101 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

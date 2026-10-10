@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-10T01:41:51+03:00 @ 37c39f9c1bb37f34686be244ac7edc05c99d7511
+last-audit: 2026-10-10T09:15:05+03:00 @ dae442565304323d8a634306977aa39e4527b07e
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 4d4ec7f52c01193dfb78f827691ce34878d213cf
+last-body-change: dae442565304323d8a634306977aa39e4527b07e
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -57,6 +57,7 @@ lives where each bullet points.
 - An unattended run declares a mode, which decides its authorization, its anchor and the directives that bind; the Skill's routing table is the list.
 - The idle-wake only wakes an idle session; resuming a stalled run is the stop-guard's, the stall-recorder's and the resume tick's, from the lease (protocol §5).
 - `GATE_BOUND` bounds every declared command and kills it on breach; nothing bounds an agent-launched process except `tools/process-monitor/`.
+- An adopter's bar holds a leg by `subject = "kit"` alone: govkit never emits `chunk`, so a shipped self-test declares it in its descriptor (`aBenchedProbe`).
 - A CLOSED Tier-2 unit owes an acceptance ledger in a `journal` record; the grammar is `memory/HYGIENE.md` "Acceptance ledger".
 - A live spec retiring a named thing owes a `**Readers:**` clause (hygiene check 25), and a CLOSED unit whose spec grades THIN blocks `build-complete`.
 - A live spec's leg line names every leg its files-touched trips: `python tools/check-spec-tokens.py --list` prints them before the spec is dated.

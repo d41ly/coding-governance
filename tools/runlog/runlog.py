@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""runlog.py — the runlog kit's command line. gov:kit runlog@1.9
+"""runlog.py — the runlog kit's command line. gov:kit runlog@1.10
 
     python <this kit>/runlog.py journal --producer driver|gates|pushes
     python <this kit>/runlog.py journal --producer gates --by-leg [--legs <gate-leg manifest>]

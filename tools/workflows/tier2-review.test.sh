@@ -135,6 +135,13 @@ arm('an unknown kind -> refused', { kind: 'code-review', round: 1 }, 'kind')
 arm('a moving ref as base, round 1 -> warns and proceeds', { round: 1, base: 'origin/main' }, null)
 arm('a moving ref as base, round 2 -> refused', { round: 2, base: 'origin/main' }, MOVING)
 arm('a spec audit ignores base entirely', { kind: 'spec-audit', round: 2, base: 'origin/main', subjects: [{ path: 'a.md', blob: BLOB }] }, null)
+// TOOL-dLadderedRemote-4 — a diff review's base is REQUIRED: it used to default to a literal remote
+// ref, which names nothing on a node whose remote is called something else. Absent and blank are both
+// refused before any agent; a spec audit has no range and still owes none.
+const NO_BASE = 'a diff review needs `base`'
+arm('a diff review with no base -> refused', { round: 1, base: undefined }, NO_BASE)
+arm('a diff review with a blank base -> refused', { round: 1, base: '  ' }, NO_BASE)
+arm('a spec audit with no base -> proceeds', { kind: 'spec-audit', round: 1, base: undefined, subjects: [{ path: 'a.md', blob: BLOB }] }, null)
 
 // ---- TOOL-aSightedSkeptic-7 AC1 — `intensity`, a closed set read in the prelude ----------------------
 // The proceeding arms also read the RESOLVED value back, so they cannot pass over a prelude that never
@@ -1890,7 +1897,8 @@ printf '%s\n' "$out"
 # prompt carrying bd-new's ruling (1) and the added invariant swept as one lens's item (1).
 # MERGED 240 -> 270 at the reconcile of local main into origin/main: base 240, plus aMendedFleet's 20
 # (260) and aGraftedHelix's 10 (250).
-FLOOR_ASSERTIONS=270
+# 270 -> 273, TOOL-dLadderedRemote-4: the three required-base arms, counted off a run of 273.
+FLOOR_ASSERTIONS=273
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

@@ -1343,16 +1343,75 @@ def build_recipe_refusal(root: str, why: str, conf=None):
     return Refusal(why + NEWLINE + NEWLINE.join(read_recipe(root, conf)))
 
 
+# The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
+# named on its marker line and gated by the resolve-python self-test.
+# >>> remote_ladder_py -- canonical copy: resolve_remote.py in the gov lib dir (byte-identical; gated)
+def resolve_remote(root):
+    """-> (remote, branch, observed, refusal) for the repository at <root>. Fetches nothing.
+
+    remote    GOV_REMOTE, else branch.<current>.remote unless it is ".", else the ONLY remote.
+              Several remotes and none chosen, or a chosen name that is not a remote here, is a
+              REFUSAL naming GOV_REMOTE. No remote at all is remote "" and NO refusal: the caller
+              keeps its own no-remote fallback.
+    observed  the branch refs/remotes/<remote>/HEAD names, or "". A caller whose GOV_DEFAULT_BRANCH
+              only CROSS-CHECKS the observation reads this one.
+    branch    GOV_DEFAULT_BRANCH, else observed, else "".
+    A refusal empties the other three, so no caller can pick a remote the ladder refused.
+    """
+    import os
+    import subprocess
+
+    def read(*args):
+        try:
+            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        return p.stdout.strip() if p.returncode == 0 else ""
+
+    names = read("remote").split()
+    listed = " ".join(names) or "none"
+    # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous
+    # (`heads/x`, `remotes/r/x`), and the prefix is stripped exactly instead.
+    cur = read("symbolic-ref", "--quiet", "HEAD")
+    cur = cur[len("refs/heads/"):] if cur.startswith("refs/heads/") else ""
+    remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
+    if not remote and cur:
+        remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
+        if remote == ".":
+            remote = ""
+    if not remote and len(names) == 1:
+        remote = names[0]
+    if not remote and len(names) > 1:
+        where = "branch " + cur if cur else "a detached HEAD"
+        return "", "", "", ("cannot choose a remote: GOV_REMOTE is unset, %s has no configured remote, "
+                            "and this repository has %d remotes (%s). Name it: export GOV_REMOTE=<remote>."
+                            % (where, len(names), listed))
+    if remote and remote not in names:
+        return "", "", "", ("%s names %s, which is no remote of this repository (%s). Name one that is: "
+                            "export GOV_REMOTE=<remote>." % (how, remote, listed))
+    observed = ""
+    if remote:
+        pre = "refs/remotes/" + remote + "/"
+        head = read("symbolic-ref", "--quiet", pre + "HEAD")
+        if head.startswith(pre) and len(head) > len(pre):
+            observed = head[len(pre):]
+    return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
+# <<< remote_ladder_py
+
+
 def resolve_default_tip(root: str) -> tuple:
     """`(name, sha)` for the default branch, as `.githooks/pre-push` resolves it.
 
-    THE OBSERVED `origin/HEAD` WINS and the environment only CROSS-CHECKS it. The recall hit
+    THE OBSERVED remote HEAD WINS and the environment only CROSS-CHECKS it. The recall hit
     `TOOL-aStandingWrit-5` records an environment value that named the branch already checked out
     and disabled a guard by doing so; a resolution that lets the environment SELECT repeats it.
+    The remote is the ladder's (TOOL-dLadderedRemote-2), so a node whose remote is not named after
+    the convention observes its default instead of refusing.
     """
-    code, out = run_unchecked("git", "symbolic-ref", "--short", "refs/remotes/origin/HEAD", cwd=root,
-                              joined=False)
-    observed = out.strip()[len("origin/"):] if code == 0 and out.strip() else ""
+    remote, _branch, observed, refusal = resolve_remote(root)
+    if refusal:
+        raise Refusal(f"migrate-backlog: {refusal}")
     declared = os.environ.get("GOV_DEFAULT_BRANCH", "").strip()
     if observed and declared and observed != declared:
         raise Refusal(f"migrate-backlog: GOV_DEFAULT_BRANCH names `{declared}`, which this clone "
@@ -1360,11 +1419,15 @@ def resolve_default_tip(root: str) -> tuple:
                       f"keyed on that branch, so an unrecognised name would list every ref or none")
     name = observed or declared
     if not name:
-        raise Refusal("migrate-backlog: cannot determine the default branch — origin/HEAD is unset "
-                      "and GOV_DEFAULT_BRANCH is unset. Refusing to guess `main`: a wrong default "
-                      "makes every ref read as a straggler or none of them.\n"
-                      "  Fix once: git remote set-head origin -a")
-    sha = read_rev(root, f"refs/heads/{name}") or read_rev(root, f"refs/remotes/origin/{name}")
+        fix = (f"git remote set-head {remote} -a" if remote
+               else "add the remote this clone lands on, or export GOV_DEFAULT_BRANCH")
+        raise Refusal(f"migrate-backlog: cannot determine the default branch — "
+                      f"{remote + '/HEAD' if remote else 'this clone has no remote, so no HEAD'} is "
+                      f"unset and GOV_DEFAULT_BRANCH is unset. Refusing to guess `main`: a wrong "
+                      f"default makes every ref read as a straggler or none of them.\n"
+                      f"  Fix once: {fix}")
+    sha = read_rev(root, f"refs/heads/{name}") or (
+        read_rev(root, f"refs/remotes/{remote}/{name}") if remote else "")
     if not sha:
         raise Refusal(f"migrate-backlog: the default branch resolves to `{name}`, which is no "
                       f"branch in this clone, so every ref would be compared against nothing")
@@ -2703,6 +2766,11 @@ HOLD_ROWS = (
 DAY_SEED, DAY_STRAG, DAY_LATER, DAY_HEAD = ("2026-03-01", "2026-04-02", "2026-04-20",
                                              "2026-05-03")
 
+# The fixtures' remote, named through one constant and deliberately NOT the conventional name, so
+# every landing-form arm also exercises the remote ladder on a node that names its remote after the
+# project (TOOL-dLadderedRemote-2).
+FX_REMOTE = "upstream"
+
 FX_SEED_ROWS = (
     "- EXMP-aFoo-1 · OPEN · the first ask, which the straggler closes",
     "- EXMP-aFoo-2 · OPEN · the second ask, pointing at memory/gone/old.md",
@@ -2839,7 +2907,7 @@ def seed_landing(base: str, name: str, tip_rows, seed_rows=FX_SEED_ROWS,
                  slugs=("aFoo", "aWho"), head_slug: str = "aFoo") -> tuple:
     """The LANDING shape (S6): a shards-mode default tip under a builds-mode HEAD.
 
-    `origin/HEAD` is written into the fixture, because the landing form admits a ref only when it
+    The remote's HEAD is written into the fixture, because the landing form admits a ref only when it
     IS the default tip and that resolution is the pre-push hook's — observed first, environment
     only as a cross-check.
     """
@@ -2859,8 +2927,9 @@ def seed_landing(base: str, name: str, tip_rows, seed_rows=FX_SEED_ROWS,
     tip = run_commit_on(tree, "main: the rows the default branch kept editing",
                         {"memory/backlog/EXMP.md": render_shard("EXMP", list(tip_rows))},
                         day=DAY_STRAG)
-    run("git", "update-ref", "refs/remotes/origin/main", tip, cwd=tree)
-    run("git", "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main", cwd=tree)
+    run("git", "remote", "add", FX_REMOTE, f"../{FX_REMOTE}.git", cwd=tree)
+    run("git", "update-ref", f"refs/remotes/{FX_REMOTE}/main", tip, cwd=tree)
+    run("git", "symbolic-ref", f"refs/remotes/{FX_REMOTE}/HEAD", f"refs/remotes/{FX_REMOTE}/main", cwd=tree)
     run("git", "checkout", "-q", "flip", cwd=tree)
     return tree, flip, tip
 
@@ -3557,13 +3626,13 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
                           day=DAY_STRAG)
             far = run("git", "rev-parse", "HEAD", cwd=fi).strip()
             run("git", "checkout", "-q", "main", cwd=fi)
-            run("git", "update-ref", "refs/remotes/origin/far", far, cwd=fi)
+            run("git", "update-ref", f"refs/remotes/{FX_REMOTE}/far", far, cwd=fi)
             _rc, out_i = run_engine(fi, ["--stragglers"])
             arm("the inventory examines every local AND remote-tracking ref",
                 "examined 3 ref(s)", lambda: out_i)
             arm("and lists both stragglers", 2, lambda: out_i.count("straggler — "))
             arm("including the remote-tracking one, which is another node's pushed copy",
-                "straggler — refs/remotes/origin/far", lambda: out_i)
+                f"straggler — refs/remotes/{FX_REMOTE}/far", lambda: out_i)
             _rc, out_i2 = run_engine(fi, ["--stragglers", "--local"])
             arm("--local narrows it to refs/heads", 1, lambda: out_i2.count("straggler — "))
             _rc, out_i3 = run_engine(fi, ["--stragglers", "--tsv"])

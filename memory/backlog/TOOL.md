@@ -118,6 +118,20 @@ Cite ids, never line numbers.
 | [TOOL-aHoistedPass-40](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-06 | THE KIT GATE'S IMPORT ALLOW-LIST IS A FOURTH HAND-TYPED SPELLING OF ITS… |
 | [TOOL-aHoistedPass-41](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-06 | THE ONE NAMEABLE VERB DEBT THIS BUILD ADDED IS DEFERRED, NOT TAKEN. Of… |
 | [TOOL-aHoistedPass-42](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-06 | TWO FILES THIS BUILD LANDED HAVE NO RUNNER ANYWHERE, which is… |
+| [TOOL-aHomedAnchor-8](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite codebase-map kit selftest red at 40a8b8c3 on the daily… |
+| [TOOL-aHomedAnchor-9](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite foreign-prefix parity (every self-test at three… |
+| [TOOL-aHomedAnchor-10](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite corpus-ids selftest red at 40a8b8c3 on the daily held… |
+| [TOOL-aHomedAnchor-11](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite lexicon selftest red at 40a8b8c3 on the daily held job,… |
+| [TOOL-aHomedAnchor-12](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite govkit selftest red at 40a8b8c3 on the daily held job,… |
+| [TOOL-aHomedAnchor-13](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite python resolver (behaviour + inline parity + idiom ban)… |
+| [TOOL-aHomedAnchor-14](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite runlog selftest red at 40a8b8c3 on the daily held job,… |
+| [TOOL-aHomedAnchor-15](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite run-gates gov canary red at 40a8b8c3 on the daily held… |
+| [TOOL-aHomedAnchor-16](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite run-gates canary red at 40a8b8c3 on the daily held job,… |
+| [TOOL-aHomedAnchor-17](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite run-gates run-log line red at 40a8b8c3 on the daily… |
+| [TOOL-aHomedAnchor-18](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended driver selftest shard 2/8 red at 40a8b8c3 on… |
+| [TOOL-aHomedAnchor-19](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended driver selftest shard 8/8 red at 40a8b8c3 on… |
+| [TOOL-aHomedAnchor-20](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended gate selftest shard 1/8 red at 40a8b8c3 on… |
+| [TOOL-aHomedAnchor-21](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended-build self-test red at 40a8b8c3 on the daily… |
 | [TOOL-aHonedRuleset-7](../builds/aHonedRuleset/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | tools/memory-tree/HYGIENE.template.md STATES ITS WHOLE CAP TABLE TWICE,… |
 | [TOOL-aHonedRuleset-9](../builds/aHonedRuleset/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | tools/govkit/check_runbook_parity.py IS ON NO BAR — **AND THIS IS THE… |
 | [TOOL-aHonedRuleset-11](../builds/aHonedRuleset/BACKLOG.md) | OPEN | — | — | 2026-09-06 | tools/check-playbook-parity.sh HAS NO WAY TO EXERCISE A CANDIDATE ROW… |
@@ -139,6 +153,24 @@ Cite ids, never line numbers.
 | [TOOL-aKeyedAnnotation-13](../builds/aKeyedAnnotation/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | NOTHING STOPS A SECOND MODULE BINDING THE RECALL EXTRACTOR'S… |
 | [TOOL-aLeakedHandle-4](../builds/aLeakedHandle/BACKLOG.md) | OPEN | — | — | 2026-09-10 | THE CARRIED SITES IN memory/project/substitution-fed-loops.txt ARE A… |
 | [TOOL-aLeakedHandle-5](../builds/aLeakedHandle/BACKLOG.md) | OPEN | — | — | 2026-09-10 | A LEG KILLED WITH **NO DECLARED CEILING** STILL NAMES ONLY AN EXIT… |
+| [TOOL-aLevelledCopy-4](../builds/aLevelledCopy/BACKLOG.md) | OPEN | LOW | — | 2026-10-09 | tools/push-main.sh sets GIT_SSH_COMMAND whenever the environment has… |
+| [TOOL-aLevelledCopy-5](../builds/aLevelledCopy/BACKLOG.md) | OPEN | LOW | — | 2026-10-09 | the eol-only predicate is spelled twice:… |
+| [TOOL-aLevelledCopy-6](../builds/aLevelledCopy/BACKLOG.md) | OPEN | LOW | — | 2026-10-09 | WIRE-INTO-PROJECT.md's wiring-health paragraph lists what… |
+| [TOOL-aLevelledCopy-10](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite codebase-map kit selftest red at 40a8b8c3 on the daily… |
+| [TOOL-aLevelledCopy-11](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite foreign-prefix parity (every self-test at three… |
+| [TOOL-aLevelledCopy-12](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite corpus-ids selftest red at 40a8b8c3 on the daily held… |
+| [TOOL-aLevelledCopy-13](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite lexicon selftest red at 40a8b8c3 on the daily held job,… |
+| [TOOL-aLevelledCopy-14](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite govkit selftest red at 40a8b8c3 on the daily held job,… |
+| [TOOL-aLevelledCopy-15](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite python resolver (behaviour + inline parity + idiom ban)… |
+| [TOOL-aLevelledCopy-16](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite runlog selftest red at 40a8b8c3 on the daily held job,… |
+| [TOOL-aLevelledCopy-17](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite run-gates gov canary red at 40a8b8c3 on the daily held… |
+| [TOOL-aLevelledCopy-18](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite run-gates canary red at 40a8b8c3 on the daily held job,… |
+| [TOOL-aLevelledCopy-19](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite run-gates run-log line red at 40a8b8c3 on the daily… |
+| [TOOL-aLevelledCopy-20](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended driver selftest shard 2/8 red at 40a8b8c3 on… |
+| [TOOL-aLevelledCopy-21](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended driver selftest shard 8/8 red at 40a8b8c3 on… |
+| [TOOL-aLevelledCopy-22](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended gate selftest shard 1/8 red at 40a8b8c3 on… |
+| [TOOL-aLevelledCopy-23](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended-build self-test red at 40a8b8c3 on the daily… |
+| [TOOL-aLevelledCopy-24](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-10 | inherited red: leg kickoff-manifest ratchet red at 76b9c451, introduced… |
 | [TOOL-aLexedStripper-3](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | STILL OPEN after TOOL-dMispairedQuote-1, which deliberately left this… |
 | [TOOL-aLexedStripper-4](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | STILL OPEN after TOOL-dMispairedQuote-1, which changed that function's… |
 | [TOOL-aLexedStripper-7](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | scan_js_definitions in tools/codebase-map/map_lib.py strips BLOCK… |
@@ -214,7 +246,7 @@ Cite ids, never line numbers.
 | [TOOL-aReplayedCard-7](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | manifest-check.sh --card --write spawns about ten git processes for its… |
 | [TOOL-aReplayedCard-8](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | WIRE-INTO-PROJECT.md §4 spells the kickoff-manifest format version… |
 | [TOOL-aReplayedCard-10](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | corpus_ids.py --print-defined-ids is a corpus walk plus the shell… |
-| [TOOL-aReplayedCard-11](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | --card --append accepts a real READY body that carries no ## task… |
+| [TOOL-aReplayedCard-11](../builds/aReplayedCard/BACKLOG.md) | SPECCED | — | KICK-aRoutedQuill-1 | 2026-09-14 | --card --append accepts a real READY body that carries no ## task… |
 | [TOOL-aReplayedCard-12](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | scratch-guard.test.sh's meta-arm re-runs the whole orientation section,… |
 | [TOOL-aReplayedCard-13](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | the deny's drive fold lowercases both toplevels, so on a case-sensitive… |
 | [TOOL-aReplayedCard-14](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | extractCommitTarget resolves repeated -C values cumulatively, a… |

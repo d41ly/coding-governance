@@ -1,10 +1,15 @@
 # TOOL-aQuotedBrief-1 — the prompt record carries a self-contained brief, its session sources, and the owner's confirmation
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base fa68a767 · streams tooling · order 1 · ratified 2026-10-09
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base fa68a767 · streams tooling · order 1 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-09-build-TOOL-aQuotedBrief-1-2-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aQuotedBrief-1-2-acceptance-ledger.md) | journal | — |
+| [2026-10-09-prompt-TOOL-aQuotedBrief-1-1-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aQuotedBrief-1-1-build-brief.md) | journal | — |
+| [2026-10-09-review-TOOL-aQuotedBrief-1-closing-diff-round2.md](../reviews/2026-10-09-review-TOOL-aQuotedBrief-1-closing-diff-round2.md) | diff-review | TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3 |
+| [2026-10-09-review-TOOL-aQuotedBrief-3-closing-diff-round1.md](../reviews/2026-10-09-review-TOOL-aQuotedBrief-3-closing-diff-round1.md) | diff-review | TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3 |
 
 <!-- /gen:spec-records -->
 
