@@ -70,12 +70,12 @@ none
 | 10 | `TOOL-aRoutedQuill-9` | CLOSED | the routed-commits leg reads green in WHOLE mode at the landing tip, after every reconcile (closing review round 2's blocker) |
 | 11 | `TOOL-aRoutedQuill-10` | CLOSED | the landing push grades the routed-commits leg as remote CI will, the whole history beside the pushed range (closing review H1) |
 | 12 | `TOOL-aRoutedQuill-11` | CLOSED | check-wiring takes the routed armed-or-unarmed verdict from the write gate's own reader (closing review H2) |
-| 13 | `TOOL-aRoutedQuill-12` | SPECCED | the closing review's mediums and lows, M1 to M9 and L1 to L7, batched into one unit |
+| 13 | `TOOL-aRoutedQuill-12` | INPROGRESS | the closing review's mediums and lows, M1 to M9 and L1 to L7, batched into one unit |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 13 unit(s) · node a · opened 2026-10-09 · streams tooling+kickoff+playbook+deployer
+**Build status:** INPROGRESS · 13 unit(s) · node a · opened 2026-10-09 · streams tooling+kickoff+playbook+deployer
 ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-8 TOOL-aRoutedQuill-9 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12
 ids TOOL-aRoutedQuill-13
 
@@ -91,7 +91,7 @@ ids TOOL-aRoutedQuill-13
 | [TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed](spec/2026-10-09-spec-TOOL-aRoutedQuill-5.md) | 5 | 2 | CLOSED | rev-5 | 2026-10-10 |
 | [TOOL-aRoutedQuill-10 — the push boundary's routed-commits run grades the whole history beside the pushed range](spec/2026-10-10-spec-TOOL-aRoutedQuill-10.md) | 6 | 2 | CLOSED | rev-2 | 2026-10-10 |
 | [TOOL-aRoutedQuill-11 — check-wiring takes the write gate's armed verdict from the gate itself](spec/2026-10-10-spec-TOOL-aRoutedQuill-11.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-10 |
-| [TOOL-aRoutedQuill-12 — the closing review's mediums and lows, and the bar reds this build's diff carries](spec/2026-10-10-spec-TOOL-aRoutedQuill-12.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-10 |
+| [TOOL-aRoutedQuill-12 — the closing review's mediums and lows, and the bar reds this build's diff carries](spec/2026-10-10-spec-TOOL-aRoutedQuill-12.md) | 6 | 2 | INPROGRESS | rev-2 | 2026-10-10 |
 | [TOOL-aRoutedQuill-6 — routed against raw: a paired trial on frozen clones of real repositories](spec/2026-10-09-spec-TOOL-aRoutedQuill-6.md) | 6 | 1 | DEFERRED | rev-5 | 2026-10-09 |
 | [TOOL-aRoutedQuill-7 — the unattended prompt-brief check reads its sub-head list from the kickoff kit's `--brief-skeleton`](spec/2026-10-09-spec-TOOL-aRoutedQuill-7.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-10 |
 | [TOOL-aRoutedQuill-9 — the routed-commits leg reads green in WHOLE mode at the tip that lands](spec/2026-10-10-spec-TOOL-aRoutedQuill-9.md) | 6 | 1 | CLOSED | rev-2 | 2026-10-10 |

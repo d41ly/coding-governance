@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-12 — the closing review's mediums and lows, and the bar reds this build's diff carries
 
-**Status:** SPECCED · rev-2 · 2026-10-10 · node a · Tier-2 · base e6585db4 · streams tooling+kickoff · order 6 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-2 · 2026-10-10 · node a · Tier-2 · base e6585db4 · streams tooling+kickoff · order 6 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
