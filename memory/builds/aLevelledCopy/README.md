@@ -75,7 +75,7 @@ ids TOOL-aLevelledCopy-13 TOOL-aLevelledCopy-14 TOOL-aLevelledCopy-15 TOOL-aLeve
 | [TOOL-aLevelledCopy-8 — the ssh arm's failure states each get a verdict and an arm](spec/2026-10-09-spec-TOOL-aLevelledCopy-8.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 13 bound to this build, across 4 record folder(s).
+Records: 14 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
