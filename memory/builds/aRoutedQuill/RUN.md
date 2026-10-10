@@ -88,3 +88,5 @@ base: 5a836bf0fc940029136b4b3fd57a87f35ff40f26
 2026-10-10T02:30:32Z rescope · item add TOOL-aRoutedQuill-12 · reason closing review minors M1-M9 and L1-L7, batched as the severity rule requires
 
 2026-10-10T02:57:36Z brief · item TOOL-aRoutedQuill-9 · reason 34d3dd117b22 memory/builds/aRoutedQuill/prompts/2026-10-10-prompt-TOOL-aRoutedQuill-9-build-brief.md
+
+2026-10-10T03:03:10Z dispatch · item a4ab2681 TOOL-aRoutedQuill-9 · reason .memory-tree.conf memory/gotchas/history-leg-graded-before-the-reconcile-commit.md memory/gotchas/INDEX.md memory/map/features/memory-tree-hygiene.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/CARDS.md memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/aRoutedQuill/spec/2026-10-10-spec-TOOL-aRoutedQuill-9.md memory/builds/aRoutedQuill/build/2026-10-10-build-TOOL-aRoutedQuill-9-1-acceptance-ledger.md memory/builds/aRoutedQuill/README.md memory/LIVE.md memory/ledger/2026-10.md

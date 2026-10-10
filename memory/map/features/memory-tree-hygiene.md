@@ -19,7 +19,8 @@ gotcha-classes = ["a-grep-for-a-word-is-a-presence-probe.md",
   "suite-edited-while-bash-executes-it.md", "ledger-token-wrapped-across-a-line-joins-nothing.md", "inline-fence-swallows-the-rest-of-the-file.md",
   "record-citing-a-foreign-id-defines-or-orphans-it.md", "swallowed-delegate-reads-as-clean.md",
   "waiver-row-that-hides-nothing-reds.md", "pin-gated-checks-arm-nothing-without-a-pin.md",
-  "record-without-serves-or-with-a-round-counter.md", "sourced-conf-blank-overrides-the-default.md"]
+  "record-without-serves-or-with-a-round-counter.md", "sourced-conf-blank-overrides-the-default.md",
+  "history-leg-graded-before-the-reconcile-commit.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []

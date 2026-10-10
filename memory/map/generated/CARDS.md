@@ -144,9 +144,9 @@ check-memory-hygiene.sh: the memory tree's structural gate, its per-class size c
 - gate-legs 11: `memory hygiene`, `memory-hygiene self-test`, `verdict epoch (kit version dates the engine)`, `verdict-epoch self-test`, `kit version markers`, `kit/dogfood doc parity`, `transition-audit arms`, `backlog migration selftest`, `straggler-guard arms`, `routed commits name a specced unit`, `routed-commits selftest`
 - kits 1: `memory-tree`
 - git-hooks 2: `commit-msg`, `pre-rebase`
-- gotcha-classes 10: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`
+- gotcha-classes 11: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`
 - globs 11: `tools/memory-tree/check-memory-hygiene.sh`
-- cut 17 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 18 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## memory-tree-merge-driver
 

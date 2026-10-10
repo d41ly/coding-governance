@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 103 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 104 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -272,6 +272,7 @@ Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `guard-fed-the-value-it-supersedes.md` | unattended |
 | `hand-named-gate-list-green-while-the-bar-reds.md` | build-method |
 | `heredoc-escape-reaches-the-regex.md` | baseline |
+| `history-leg-graded-before-the-reconcile-commit.md` | memory-tree-hygiene |
 | `hookspath-resolves-into-another-checkout.md` | run-gates |
 | `id-matched-as-a-substring.md` | unattended |
 | `inherited-git-dir-pins-the-work-tree-to-the-cwd.md` | unattended-mandate |

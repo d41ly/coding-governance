@@ -1,11 +1,12 @@
 # TOOL-aRoutedQuill-9 — the routed-commits leg reads green in WHOLE mode at the tip that lands
 
-**Status:** SPECCED · rev-2 · 2026-10-10 · node a · Tier-1 · base e6585db4 · streams tooling · order 6
+**Status:** CLOSED · rev-2 · 2026-10-10 · node a · Tier-1 · base e6585db4 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-10-build-TOOL-aRoutedQuill-9-1-acceptance-ledger.md](../build/2026-10-10-build-TOOL-aRoutedQuill-9-1-acceptance-ledger.md) | journal | — |
 | [2026-10-10-prompt-TOOL-aRoutedQuill-9-build-brief.md](../prompts/2026-10-10-prompt-TOOL-aRoutedQuill-9-build-brief.md) | journal | — |
 | [2026-10-10-prompt-TOOL-aRoutedQuill-9-spec-brief.md](../prompts/2026-10-10-prompt-TOOL-aRoutedQuill-9-spec-brief.md) | journal | — |
 
