@@ -1,10 +1,12 @@
 # TOOL-aFrugalTurnstile-14 — a run whose tree moved writes no lineage-qualified ledger row
 
-**Status:** OPEN · rev-1 · 2026-10-10 · node a · Tier-2 · base bef97330 · streams tooling · order 6
+**Status:** CLOSED · rev-1 · 2026-10-10 · node a · Tier-2 · base bef97330 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-09-build-TOOL-aFrugalTurnstile-14-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-14-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

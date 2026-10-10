@@ -3784,13 +3784,18 @@ remove_census_watcher
 #
 # Rows, nine tab-separated fields: name, seconds, status, input key, ended-at, run, full,
 # manifest_blob, head. The last four are the run that wrote the row: its id, `1` when it ran with
-# GATE_FULL on a CLEAN tree and empty otherwise, the leg manifest blob it read, and the sha it graded
-# (TOOL-aFrugalTurnstile-4 S1). They are what `GATE_REUSE=lineage` tests, and a carried-forward row
-# keeps the run that EXECUTED it. Advisory for dispatch, DURABLE for the reuse unit that reads the
-# key — a failed write costs wall clock, never a verdict.
+# GATE_FULL on a CLEAN tree that did NOT move while the bar ran, and empty otherwise, the leg
+# manifest blob it read, and the sha it graded (TOOL-aFrugalTurnstile-4 S1). They are what
+# `GATE_REUSE=lineage` tests, and a carried-forward row keeps the run that EXECUTED it. Advisory for
+# dispatch, DURABLE for the reuse unit that reads the key — a failed write costs wall clock, never a
+# verdict. A moved tree blanks `full` (TOOL-aFrugalTurnstile-14 S1): its keys may describe content
+# other than what the leg graded, and a lineage reuse of them could stamp a full green.
+FPRINT_END=$(fingerprint)
+tree_moved=no
+[ -n "$FPRINT_START" ] && [ -n "$FPRINT_END" ] && [ "$FPRINT_START" != "$FPRINT_END" ] && tree_moved=yes
 if [ -n "$LEDGER" ]; then
   new="$WORK/ledger.new"; merged="$WORK/ledger.merged"; : > "$new"
-  lfull=""; [ -n "${GATE_FULL:-}" ] && [ "$TREE_CLEAN" = yes ] && lfull=1
+  lfull=""; [ -n "${GATE_FULL:-}" ] && [ "$TREE_CLEAN" = yes ] && [ "$tree_moved" = no ] && lfull=1
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
     [ -f "$WORK/$i.sec" ] || continue
@@ -3958,9 +3963,7 @@ fi
 # run on a clean tree, same manifest, an ancestor of HEAD, under an equal input key, so the stamp asks
 # that every reuse was one of those. The inherited-green stamp keeps "reused nothing".
 reuses=${reuses:-0}; lineage_reuses=${lineage_reuses:-0}
-FPRINT_END=$(fingerprint)
-tree_moved=no
-[ -n "$FPRINT_START" ] && [ -n "$FPRINT_END" ] && [ "$FPRINT_START" != "$FPRINT_END" ] && tree_moved=yes
+# `tree_moved` is computed ABOVE the ledger block, which reads it (TOOL-aFrugalTurnstile-14 S1).
 # THE BREACH IS READ HERE, from the marker and not from `fails`. A killed leg writes no `.rc`, so
 # whether `fails` moved at all is a RACE between the watcher's kill and the reader's report -- both
 # outcomes were reproduced. The marker is the only fact that is true on every path, so the durable

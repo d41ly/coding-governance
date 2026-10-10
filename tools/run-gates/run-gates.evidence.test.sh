@@ -154,7 +154,8 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=136
+FLOOR_ASSERTIONS=138
+# RAISED 136 -> 138 by TOOL-aFrugalTurnstile-14: a moved tree writes no full row, and lineage reuses none.
 # RAISED 116 -> 136 by TOOL-aFrugalTurnstile-6: the post-merge bar's twenty assertions.
 # RAISED 115 -> 116 by TOOL-aFrugalTurnstile-1: the control stamp's `manifest` key.
 # MERGED 112 / 87 -> 115 at the reconcile with origin/main 290d0d2d5: base 84, plus this branch's 28, plus main's 3.
@@ -1117,6 +1118,25 @@ grep -q '^GATE ok    pa$' "$REC_OUT" && grep -q '^GATE reuse pb  ' "$REC_OUT" &&
   && [ "$(read_lin_stamp)" = 2 ] \
   && ok "AC7 lineage runs the impure pa, reuses pb and pu, and stamps reused 2" \
   || { nope "AC7 lineage over an impure leg did not run it and stamp reused 2 (stamp '$(read_lin_stamp)')"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
+ru_done
+
+# TOOL-aFrugalTurnstile-14: a FULL run on a clean tree whose leg `pu` edits tracked `m` mid-bar (once,
+# while the git-dir flag exists) writes no `full` 1 row, and a lineage run on the restored tree reuses
+# none of its rows and so stamps no full green from reuse.
+build_lin_repo
+echo m > "$RU_T/m"; echo fixed > "$RU_T/gb/f"
+printf '#!/usr/bin/env bash\nif [ -f .git/move-once ]; then rm -f .git/move-once; echo moved >> m; fi\n' > "$RU_T/fx/u.sh"
+( cd "$RU_T" && git add -A && git commit -qm moving && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+touch "$RU_GD/move-once"; ru_run GATE_FULL=1 >/dev/null
+[ -n "$(cd "$RU_T" && git status --porcelain -- m)" ] || nope "AC1 fixture: pu did not edit m, so the tree never moved"
+[ "$(grep -c . "$RU_GD/gate-ledger.tsv" 2>/dev/null)" = 3 ] && [ -z "$(awk -F'\t' '$7 != ""' "$RU_GD/gate-ledger.tsv" 2>/dev/null)" ] \
+  && ok "AC1 (TOOL-14) a full run whose tree moved mid-bar writes every row with an empty full" \
+  || { nope "AC1 (TOOL-14) a full run whose tree moved wrote a row with full set"; cat -A "$RU_GD/gate-ledger.tsv" 2>/dev/null | sed 's/^/      /'; }
+( cd "$RU_T" && git checkout -q -- m ) >/dev/null 2>&1; rm -f "$RU_GD/gate-full-green"
+ru_run GATE_FULL=1 GATE_REUSE=lineage >/dev/null
+! grep -q '^GATE reuse ' "$REC_OUT" && [ "$(read_lin_stamp)" != 1 ] && [ "$(read_lin_stamp)" != 2 ] && [ "$(read_lin_stamp)" != 3 ] \
+  && ok "AC2 (TOOL-14) lineage on the restored tree reuses none of the moved run's rows and stamps no reuse" \
+  || { nope "AC2 (TOOL-14) lineage reused a moved run's row (stamp '$(read_lin_stamp)')"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
 ru_done
 rm -f "$tmp/ru.led" "$tmp/ru.legs"
 

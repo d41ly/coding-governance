@@ -96,16 +96,16 @@ ids TOOL-aFrugalTurnstile-11 TOOL-aFrugalTurnstile-12 TOOL-aFrugalTurnstile-13 T
 | [TOOL-aFrugalTurnstile-8 — push-main starts the post-merge bar after a landing where it is declared](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-8.md) | 5 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-9 — the unattended close runs the boundary's decision where a post-merge bar is declared](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-9.md) | 5 | 2 | CLOSED | rev-4 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-12 — the close's bar runs with the bar knobs scrubbed, so its green certifies the whole bar](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-12.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-10 |
-| [TOOL-aFrugalTurnstile-14 — a run whose tree moved writes no lineage-qualified ledger row](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-14.md) | 6 | 2 | OPEN | rev-1 | 2026-10-10 |
+| [TOOL-aFrugalTurnstile-14 — a run whose tree moved writes no lineage-qualified ledger row](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-14.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-10 |
 | [TOOL-aFrugalTurnstile-17 — the post-merge minors: a clean-tree precondition, two guards armed, the protocol row corrected](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-17.md) | 6 | 2 | OPEN | rev-1 | 2026-10-10 |
 | [TOOL-aFrugalTurnstile-13 — the close honours a `--decide` answer only for the bar it will run](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-13.md) | 7 | 2 | OPEN | rev-1 | 2026-10-10 |
 | [TOOL-aFrugalTurnstile-15 — a post-merge red clears only on a FULL green that descends from it](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-15.md) | 7 | 2 | OPEN | rev-1 | 2026-10-10 |
 | [TOOL-aFrugalTurnstile-16 — the boundary's minors: one scoped base for both writers, the runner-stamp refusals armed, inherited bases and SHA-256 handled](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-16.md) | 8 | 2 | OPEN | rev-1 | 2026-10-10 |
 <!-- /gen:build-units -->
 
-Records: 20 bound to this build, across 4 record folder(s).
+Records: 21 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aFrugalTurnstile-13 TOOL-aFrugalTurnstile-14 TOOL-aFrugalTurnstile-15 TOOL-aFrugalTurnstile-16 TOOL-aFrugalTurnstile-17.
+Ids no record names: TOOL-aFrugalTurnstile-13 TOOL-aFrugalTurnstile-15 TOOL-aFrugalTurnstile-16 TOOL-aFrugalTurnstile-17.
 
 Ids no `spec-audit` record has ever named: DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-10 TOOL-aFrugalTurnstile-11 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6
 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-12 TOOL-aFrugalTurnstile-13 TOOL-aFrugalTurnstile-14 TOOL-aFrugalTurnstile-15 TOOL-aFrugalTurnstile-16 TOOL-aFrugalTurnstile-17.
