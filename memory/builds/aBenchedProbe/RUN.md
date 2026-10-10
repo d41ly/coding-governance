@@ -9,11 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: DEPL-aBenchedProbe-5=OPEN
+units-at-landing: TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2 DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 DEPL-aBenchedProbe-4
+gates-run: unattended-179161311558392827128-989003 c6f40988
 keepalive-reaped: yes
 parked-surfaced: yes, 0 surfaced
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: a590c95f6bd52047f3fb58c70bf06f7ead9b5d7a
-phase: VERIFYING
+phase: LANDING
 branch-sha: 2b26f187f03cc991edbf40b25550e6590e97d26e
 branch-ref: refs/heads/branch/keen-chaplygin-6b0703
 may: none
