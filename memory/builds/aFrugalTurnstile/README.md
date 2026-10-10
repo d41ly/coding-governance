@@ -75,7 +75,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 19 unit(s) · node a · opened 2026-10-09 · streams tooling+playbook+deployer
+**Build status:** CLOSED · 19 unit(s) · node a · opened 2026-10-09 · streams tooling+playbook+deployer
 ids DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10
 ids TOOL-aFrugalTurnstile-11 TOOL-aFrugalTurnstile-12 TOOL-aFrugalTurnstile-13 TOOL-aFrugalTurnstile-14 TOOL-aFrugalTurnstile-15 TOOL-aFrugalTurnstile-16 TOOL-aFrugalTurnstile-17
 
@@ -100,12 +100,12 @@ ids TOOL-aFrugalTurnstile-11 TOOL-aFrugalTurnstile-12 TOOL-aFrugalTurnstile-13 T
 | [TOOL-aFrugalTurnstile-17 — the post-merge minors: a clean-tree precondition, two guards armed, the protocol row corrected](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-17.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-10 |
 | [TOOL-aFrugalTurnstile-13 — the close honours a `--decide` answer only for the bar it will run](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-13.md) | 7 | 2 | CLOSED | rev-1 | 2026-10-10 |
 | [TOOL-aFrugalTurnstile-15 — a post-merge red clears only on a FULL green that descends from it](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-15.md) | 7 | 2 | CLOSED | rev-1 | 2026-10-10 |
-| [TOOL-aFrugalTurnstile-16 — the boundary's minors: one scoped base for both writers, the runner-stamp refusals armed, inherited bases and SHA-256 handled](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-16.md) | 8 | 2 | OPEN | rev-1 | 2026-10-10 |
+| [TOOL-aFrugalTurnstile-16 — the boundary's minors: one scoped base for both writers, the runner-stamp refusals armed, inherited bases and SHA-256 handled](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-16.md) | 8 | 2 | CLOSED | rev-2 | 2026-10-10 |
 <!-- /gen:build-units -->
 
-Records: 24 bound to this build, across 4 record folder(s).
+Records: 25 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aFrugalTurnstile-16.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-10 TOOL-aFrugalTurnstile-11 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6
 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-12 TOOL-aFrugalTurnstile-13 TOOL-aFrugalTurnstile-14 TOOL-aFrugalTurnstile-15 TOOL-aFrugalTurnstile-16 TOOL-aFrugalTurnstile-17.

@@ -10548,7 +10548,7 @@ dod_met() { # slug · run-state file · item · checker
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
       local _grc _gr _gid _ggd _gh _ghb _gkind _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
-      local _gh0 _ghk _gdec=full _gbase="" _grec="" _gdrc _gdl _gok
+      local _gh0 _ghk _gdec=full _gbase="" _gfull="" _grec="" _gdrc _gdl _gok
       local -a _genv _grb
       # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
       # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
@@ -10656,15 +10656,24 @@ dod_met() { # slug · run-state file · item · checker
                     *$'\n'*|'') ;;
                     "full "?*) _gok=1 ;;
                     "covered "?*) _gok=1; _gdec=covered; _grec=${_gdl#covered } ;;
-                    "scoped "*)
-                      _gbase=${_gdl#scoped }
-                      if [ "${#_gbase}" = 40 ] && [ -n "${_gbase##*[!0-9a-f]*}" ] \
-                         && GIT cat-file -e "$_gbase^{commit}" 2>/dev/null; then _gok=1; _gdec=scoped; fi ;;
+                    "scoped "*" "*)
+                      # TOOL-aFrugalTurnstile-16 S1/S3/S4 - `scoped <base> <full-base>`: GATE_BASE is
+                      # the first, the record's base the second, `-` when the base is an inherited
+                      # green no record may name. Either sha is 40 or 64 hex, the hook's shape.
+                      _gbase=${_gdl#scoped }; _gfull=${_gbase#* }; _gbase=${_gbase%% *}
+                      case "${#_gbase}:$_gbase" in
+                        40:*[!0-9a-f]*|64:*[!0-9a-f]*) ;;
+                        40:*|64:*)
+                          case "${#_gfull}:$_gfull" in
+                            1:-) _gok=1 ;; 40:*[!0-9a-f]*|64:*[!0-9a-f]*) ;; 40:*|64:*) _gok=1 ;;
+                          esac ;;
+                      esac
+                      if [ -n "$_gok" ] && GIT cat-file -e "$_gbase^{commit}" 2>/dev/null; then _gdec=scoped; else _gok=""; fi ;;
                   esac
                   if [ -n "$_gok" ]; then
                     echo "unattended: gates-green — GATE_POST_MERGE=$GP_POST_MERGE at ${_gr:0:8}, so the push boundary decides this bar: pre-push --decide answered '$_gdl'"
                   else
-                    _gdec=full; _gbase=""
+                    _gdec=full; _gbase=""; _gfull=""
                     [ "$_gdrc" = bar ] || echo "unattended: gates-green — pre-push --decide did not answer with one decision line (exit $_gdrc), so the bar runs with GATE_FULL=1 as it does undeclared: ${_gdl%%$'\n'*}"
                   fi
                 fi ;;
@@ -10726,7 +10735,13 @@ dod_met() { # slug · run-state file · item · checker
       _gkind=""
       if [ "$LANDER_MODE" = in-place ] || [ "${GATE_FULL:-}" = 1 ]; then _gkind=full; fi
       if [ "$_gdec" = scoped ]; then _gkind=scoped; fi
-      [ -z "$_ggd" ] || write_bar_green "$_ggd" "$_ghb" "$_grc" "$_gkind" "$_gbase" "$GATE_CMD" "$_gid"
+      # TOOL-aFrugalTurnstile-16 S1/S3: a scoped record names the FULL base the hook's writer would,
+      # and none is written over an inherited green, which no later push can adopt as a base.
+      if [ "$_gdec" = scoped ] && [ "$_gfull" = - ]; then
+        echo "unattended: gates-green — no gate-bar-green written: the boundary scoped from an inherited green, which no later push can adopt as a base"
+      else
+        [ -z "$_ggd" ] || write_bar_green "$_ggd" "$_ghb" "$_grc" "$_gkind" "$_gfull" "$GATE_CMD" "$_gid"
+      fi
       GG_RUN_FACT="$_gid ${_gh:0:8}"
       if [ "$_grc" = 0 ]; then
         [ "$_gtry" = 1 ] || echo "unattended: gates-green — the one re-run after TREE MOVED exited 0"

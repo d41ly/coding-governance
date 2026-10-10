@@ -1,10 +1,12 @@
 # TOOL-aFrugalTurnstile-16 — the boundary's minors: one scoped base for both writers, the runner-stamp refusals armed, inherited bases and SHA-256 handled
 
-**Status:** OPEN · rev-1 · 2026-10-10 · node a · Tier-2 · base bef97330 · streams tooling · order 8
+**Status:** CLOSED · rev-2 · 2026-10-10 · node a · Tier-2 · base bef97330 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-10-build-TOOL-aFrugalTurnstile-16-1-acceptance-ledger.md](../build/2026-10-10-build-TOOL-aFrugalTurnstile-16-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -65,7 +67,7 @@ Each criterion is observed in a scratch fixture first against the file at the pr
 `pre-push self-test` · `pre-push run-log line` · `pre-push bar self-test` · `unattended kit gate` · `codebase-map coverage + freshness`
 
 New arm: .githooks/pre-push.test.sh · covers AC1 AC3 AC4 · the AC9 fixture with altered stamps and an inherited green · none
-New arm: tools/unattended/unattended.test.sh · covers AC2 AC5 · the writer parity slice and a 64-hex stub answer · none
+New arm: tools/unattended/unattended.test.sh · covers AC2 · the writer parity slice, kind scoped records compared whole · none
 
 ## 8. Open questions
 
@@ -74,6 +76,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-10 · §1-§7: promoted from the closing review round 1, item M2, M4, L1 and L2.
+- rev-2 · 2026-10-10 · §7: the unattended arm covers AC2 only; AC5 (a 64-hex base) is observed on a SHA-256 close fixture, because the suite builds no SHA-256 repository and a slice cannot reach the inline parse in `dod_met`.
 
 ## 10. Reuse audit
 

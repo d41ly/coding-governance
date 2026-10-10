@@ -2095,7 +2095,7 @@ for _st in none scoped covered; do
   read_pm_sums > "$BG_D/s0"; _j0=$(cat "$bg_gd"/runlog/*.log 2>/dev/null | wc -l); _m0=$(read_bg_marks)
   run_pm_decide "${_e[@]}" -- "$_t" "$_r"; read_pm_sums > "$BG_D/s1"
   case "$_st|$PM_RC|$(printf '%s\n' "$PM_OUT" | grep -c .)|$PM_OUT" in
-    "none|0|1|full "*|"scoped|0|1|scoped $_f"|"covered|0|1|covered "*"gate-bar-green.scoped") ok "PM AC6 $_st: one decision line, exit 0" ;;
+    "none|0|1|full "*|"scoped|0|1|scoped $_f $_f"|"covered|0|1|covered "*"gate-bar-green.scoped") ok "PM AC6 $_st: one decision line, exit 0" ;;
     *) bad "PM AC6 $_st expected one $_st line and exit 0, got rc $PM_RC: $PM_OUT" ;;
   esac
   # TOOL-aFrugalTurnstile-13 AC1: the line names the vetted bar after its last TAB. RED against the hook
@@ -2125,7 +2125,7 @@ esac
 git remote add second "$BG_D/remote.git"; git checkout -q --detach
 run_pm_decide -- "$_t" "$_r"; _o1="$PM_RC|$PM_ERR"; run_pm_decide -- "$_t" "$_r" origin
 case "$_o1|$PM_RC|$PM_OUT" in
-  "2|"*GOV_REMOTE*"|0|scoped $_f") ok "PM AC9 two remotes and none named exit 2 naming GOV_REMOTE; a named one decides" ;;
+  "2|"*GOV_REMOTE*"|0|scoped $_f $_f") ok "PM AC9 two remotes and none named exit 2 naming GOV_REMOTE; a named one decides" ;;
   *) bad "PM AC9 expected exit 2 naming GOV_REMOTE, then a decision, got: $_o1 | $PM_RC $PM_OUT" ;;
 esac
 cd "$pfx_home" || exit 2
@@ -2172,9 +2172,10 @@ done
 build_bg_fixture pm-base || bad "PM could not build its fixture"
 _f=$(git rev-parse HEAD); write_bg_stamp "$_f"; echo 1 >> src/x.sh; git commit -qam t
 run_pm_decide -- "$(git rev-parse HEAD)" "$(read_pm_remote)"; run_bg_push
+_pmb=${PM_OUT#scoped }; _pmb=${_pmb%% *}
 case "$BG_OUT" in
-  *"BAR base=${PM_OUT#scoped } full="*) [ "$PM_OUT" = "scoped $_f" ] && ok "PM AC11 the scoped base --decide prints is the GATE_BASE the bar receives" \
-    || bad "PM AC11 --decide printed '$PM_OUT', not scoped $_f" ;;
+  *"BAR base=$_pmb full="*) [ "$PM_OUT" = "scoped $_f $_f" ] && ok "PM AC11 the scoped base --decide prints is the GATE_BASE the bar receives" \
+    || bad "PM AC11 --decide printed '$PM_OUT', not scoped $_f $_f" ;;
   *) bad "PM AC11 the bar's GATE_BASE differs from --decide's '$PM_OUT': $BG_OUT" ;;
 esac
 cd "$pfx_home" || exit 2
@@ -2192,6 +2193,54 @@ case "$BG_OUT" in
   *"scoped gate on main push"*"scoped bar green ${_c3:0:8}"*) ok "PM AC12 the next push adopts the new scoped record" ;;
   *) bad "PM AC12 expected the push to scope from ${_c3:0:8}, got: $BG_OUT" ;;
 esac
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-16 AC1 — adopting a `kind scoped` record M whose base is B, --decide prints
+# BOTH: `scoped M B`. RED against the hook at 9873a25f, which printed `scoped M` alone.
+build_bg_fixture t16a || bad "T16 could not build its fixture"
+_b=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
+write_bg_record "$bg_gd/gate-bar-green" "$_b" full "" "$BG_WRAP"; write_bg_record "$bg_gd/gate-bar-green.scoped" "$_l" scoped "$_b" "$BG_WRAP"
+echo 2 >> src/x.sh; git commit -qam t; run_pm_decide GOV_GATE_CMD="$BG_WRAP" -- "$(git rev-parse HEAD)" "$(read_pm_remote)"
+[ "$PM_RC|$PM_OUT" = "0|scoped $_l $_b" ] && ok "T16 AC1 an adopted scoped record's line names it and its full base" \
+  || bad "T16 AC1 expected 'scoped ${_l:0:8}… ${_b:0:8}…', got rc $PM_RC: $PM_OUT"
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-16 AC4 — scoping from an inherited green prints `-` as the full base and writes
+# no scoped record, naming the inherited green. RED at 9873a25f: it wrote one with base C.
+build_bg_fixture t16inh 'INHERITED_RED_MAX_AGE=10\n' || bad "T16 could not build its fixture"
+_r=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam c1; _c=$(git rev-parse HEAD); write_bg_stamp "$_c"
+mv "$bg_gd/gate-full-green" "$bg_gd/gate-inherited-green"; printf 'base\t%s\nmax_age\t10\n' "$_r" >> "$bg_gd/gate-inherited-green"
+echo 2 >> src/x.sh; git commit -qam c2; run_pm_decide -- "$(git rev-parse HEAD)" "$_r"; run_bg_push
+case "$PM_OUT|$([ -e "$bg_gd/gate-bar-green.scoped" ] && echo PRESENT)|$BG_OUT" in
+  "scoped $_c -||"*"no gate-bar-green written — this push scoped from the inherited green ${_c:0:8}"*) ok "T16 AC4 an inherited-green scope prints '-' and writes no scoped record" ;;
+  *) bad "T16 AC4 expected 'scoped ${_c:0:8} -' and no scoped record, got: $PM_OUT | $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-16 AC3 — the cover pass refuses a runner stamp with a foreign manifest, another
+# manifest blob or another fingerprint: the bar runs and no cover line prints. With a non-covering bar
+# record planted (bar `bash other-bar.sh`) the `not covered` line prints, and it names the reason.
+# Deleting any of the three refusals reds its arm; the unaltered stamp is the control.
+build_bg_fixture t16stamp || bad "T16 could not build its fixture"
+git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
+git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1
+for _alt in "control:" "manifest:leg manifest tools/other-legs.json" "blob:leg manifest blob 01234567" "fingerprint:graded tree fingerprint 01234567"; do
+  rm -f "$bg_gd"/gate-bar-green*; write_bg_stamp "$_x"
+  case "${_alt%%:*}" in
+    manifest) set_bg_key "$bg_gd/gate-full-green" manifest tools/other-legs.json ;;
+    blob) set_bg_key "$bg_gd/gate-full-green" manifest_blob 0123456789abcdef0123456789abcdef01234567 ;;
+    fingerprint) set_bg_key "$bg_gd/gate-full-green" fingerprint 0123456789abcdef ;;
+  esac
+  write_bg_record "$bg_gd/gate-bar-green" "$_x" full "" "bash other-bar.sh"
+  _m0=$(read_bg_marks); run_bg_push
+  case "${_alt%%:*}|$(read_bg_marks)|$BG_OUT" in
+    "control|$_m0|"*"covered on main push"*) ok "T16 AC3 the unaltered runner stamp covers" ;;
+    control*) bad "T16 AC3 the unaltered runner stamp must cover, got: $BG_OUT" ;;
+    *"covered on main push"*) bad "T16 AC3 a ${_alt%%:*}-altered runner stamp covered: $BG_OUT" ;;
+    *"|$((_m0 + 1))|"*"not covered"*"${_alt#*:}"*) ok "T16 AC3 a ${_alt%%:*}-altered runner stamp is refused, naming it" ;;
+    *) bad "T16 AC3 a ${_alt%%:*}-altered runner stamp: expected the bar to run and '${_alt#*:}', got: $BG_OUT" ;;
+  esac
+done
 cd "$pfx_home" || exit 2
 
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

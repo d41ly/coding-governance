@@ -27,8 +27,9 @@
 # THE COVER PASS.)
 #
 # `pre-push --decide <tip> <remote-sha> [<remote>]` runs this hook's own decision for a push of <tip>
-# over <remote-sha>, prints ONE line on stdout (`full <why>`, `scoped <base>` or `covered <record>`,
-# then a TAB and the vetted bar it decided for, so a caller honours it only for that bar —
+# over <remote-sha>, prints ONE line on stdout (`full <why>`, `scoped <base> <full-base>` or
+# `covered <record>`, where <full-base> is the full green the base rests on, or `-` for an inherited
+# green no scoped record may name — TOOL-aFrugalTurnstile-16; then a TAB and the vetted bar it decided for, so a caller honours it only for that bar —
 # TOOL-aFrugalTurnstile-13), runs no bar and writes nothing; a push it would refuse exits 1 with an empty stdout, and a bad call
 # exits 2 (TOOL-aFrugalTurnstile-7, design D9; see THE DECIDE MODE).
 # WHAT --decide DOES NOT CHECK: the raw-push marker, the straggler layer and the merge-loss layer,
@@ -1747,7 +1748,8 @@ fi
 # THE SCOPED BASE, RESOLVED ONCE (TOOL-aFrugalTurnstile-7 S6/S6b). `scoped_base` is the GATE_BASE a scoped
 # decision exports: the inherited green when one was adopted, else the adopted record's sha, and empty
 # while the decision is FULL. `scoped_full` is the FULL green that base rests on, which a scoped record
-# this push writes must name: a `kind scoped` record's own base, else the adopted sha itself. A scoped
+# this push writes must name: a `kind scoped` record's own base, else the adopted sha itself; over an
+# inherited green no scoped record is written at all (TOOL-aFrugalTurnstile-16 S3). A scoped
 # record naming a scoped sha as its base is one `check_bar_base` refuses, so the push after it fell back to
 # an older full slot (found by TOOL-aFrugalTurnstile-11). The cover check, the GATE_BASE export, the
 # `--decide` line and the record's base all read these two, so no two of them can name different bases.
@@ -1965,7 +1967,10 @@ fi
 # --decide stops here, with the decision just announced: a doc-only one prints plain scoped (S6).
 if [ -n "$DECIDE" ]; then
   if [ "$RUNLOG_DECISION" = full ]; then print_decision full "$force${inh_why:+; $inh_why}"; fi
-  print_decision scoped "$scoped_base"
+  # Both shas, so the close's record names the FULL base the hook's would (TOOL-aFrugalTurnstile-16 S1),
+  # and `-` over an inherited green, which `check_bar_base` never reads, so no record is written (S3).
+  _dfull=$scoped_full; [ -n "$inh_sha" ] && _dfull=-
+  print_decision scoped "$scoped_base $_dfull"
 fi
 # THE BAR'S RUN ID, pinned so this push's END joins the bar's own run-log line by id. Set BEFORE the
 # bar, like the decision, so a push killed mid-bar still names the bar it was waiting on.
@@ -2161,6 +2166,10 @@ else
     echo "pre-push: no gate-bar-green written — the bar is the declared STUB"
   elif [ -n "${GATE_DOCS_BASE:-}" ]; then
     echo "pre-push: no gate-bar-green written — this push was scoped doc-only"
+  elif [ "$RUNLOG_DECISION" = scoped ] && [ -n "$inh_sha" ]; then
+    # TOOL-aFrugalTurnstile-16 S3: `check_bar_base` never reads an inherited green, so a scoped record
+    # resting on one could never be adopted as a base; declining costs nothing it could have saved.
+    echo "pre-push: no gate-bar-green written — this push scoped from the inherited green ${inh_sha:0:8}, which no later push can adopt as a base"
   else
     # A scoped record names the FULL green its base rests on, never a scoped sha (S6b).
     _bg_base=""; [ "$RUNLOG_DECISION" = scoped ] && _bg_base=$scoped_full

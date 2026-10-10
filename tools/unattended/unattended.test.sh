@@ -4156,6 +4156,17 @@ else
              && cut -f1 "$g/gate-bar-green" )
   same "TOOL-aFrugalTurnstile-3 AC8 the hook's record carries the ten keys in order" "$fg_pp" "$fg_keys"
   same "TOOL-aFrugalTurnstile-3 AC8 the driver's record carries the hook's keys in order" "$fg_ud" "$fg_pp"
+  # TOOL-aFrugalTurnstile-16 AC2: the key column alone let the two writers disagree on `base`, so a
+  # kind scoped record with a base is compared WHOLE, every line but `by` and `stamped`, which differ
+  # by design. Both write the scoped slot.
+  fg_sp=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green.scoped" \
+             && write_hook_bar_green "$g" "$(git rev-parse HEAD)" 0 scoped "$(git rev-parse HEAD)" "bash probe-gate.sh" fg-run >/dev/null \
+             && grep -v -e '^by	' -e '^stamped	' "$g/gate-bar-green.scoped" )
+  fg_su=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green.scoped" \
+             && write_bar_green "$g" "$(git rev-parse HEAD)" 0 scoped "$(git rev-parse HEAD)" "bash probe-gate.sh" fg-run >/dev/null \
+             && grep -v -e '^by	' -e '^stamped	' "$g/gate-bar-green.scoped" )
+  n=$((n+1)); [ -n "$fg_sp" ] && [ "$fg_sp" = "$fg_su" ] \
+    || { echo "FAIL TOOL-aFrugalTurnstile-16 AC2 the hook's and the driver's kind scoped records differ beyond by and stamped: [$fg_sp] vs [$fg_su]"; st=1; }
   eval "$(declare -f write_bar_green | sed 's/by\\tunattended\\n//')"
   fg_dk=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green" \
              && write_bar_green "$g" "$(git rev-parse HEAD)" 0 full "" "bash probe-gate.sh" fg-run >/dev/null \
