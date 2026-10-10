@@ -97,7 +97,7 @@ ids TOOL-aRoutedQuill-13
 | [TOOL-aRoutedQuill-9 — the routed-commits leg reads green in WHOLE mode at the tip that lands](spec/2026-10-10-spec-TOOL-aRoutedQuill-9.md) | 6 | 1 | CLOSED | rev-2 | 2026-10-10 |
 <!-- /gen:build-units -->
 
-Records: 32 bound to this build, across 4 record folder(s).
+Records: 33 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

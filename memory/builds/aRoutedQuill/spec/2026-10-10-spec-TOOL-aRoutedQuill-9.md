@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-10-build-KICK-aRoutedQuill-1-runlog-f0cdcc91.md](../build/2026-10-10-build-KICK-aRoutedQuill-1-runlog-f0cdcc91.md) | journal | KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12 |
 | [2026-10-10-build-TOOL-aRoutedQuill-9-1-acceptance-ledger.md](../build/2026-10-10-build-TOOL-aRoutedQuill-9-1-acceptance-ledger.md) | journal | — |
 | [2026-10-10-prompt-TOOL-aRoutedQuill-9-build-brief.md](../prompts/2026-10-10-prompt-TOOL-aRoutedQuill-9-build-brief.md) | journal | — |
 | [2026-10-10-prompt-TOOL-aRoutedQuill-9-spec-brief.md](../prompts/2026-10-10-prompt-TOOL-aRoutedQuill-9-spec-brief.md) | journal | — |
