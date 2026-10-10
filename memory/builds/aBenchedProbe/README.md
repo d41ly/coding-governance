@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: tooling+deployer
 roster: TOOL+DEPL
-ids: DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 DEPL-aBenchedProbe-4 TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2
+ids: DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 DEPL-aBenchedProbe-4 DEPL-aBenchedProbe-5 TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2
 authorized-by: prompt
 ---
 
@@ -37,7 +37,7 @@ ceiling to say so. The owner's prose is the mandate, recorded under
 - Both DEPL units write `govkit.py`; DEPL-2 and TOOL-1 both write the push-main descriptor. Those
   pairs are sequenced. TOOL-2 is disjoint from the rest.
 - DEPL-2 is Tier-2: it changes what the deployer writes into an adopter's leg manifest.
-- Out of scope, owned by the concurrent run aThriftyLanding: `.githooks/pre-push`, the stamp
+- Out of scope, owned by the concurrent run aFrugalTurnstile: `.githooks/pre-push`, the stamp
   predicate, `GATE_REUSE` and the turnstile in run-gates, the unattended protocol, the charter's §1.
 - One kit-version bump per touched kit, after the last unit.
 - Units 5 and 6 are the closing review's promotions (M4); both write `govkit.py` and `selftest.py`, so 6 follows 5.
@@ -60,7 +60,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 6 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
-ids DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 DEPL-aBenchedProbe-4 TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2
+ids DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 DEPL-aBenchedProbe-4 DEPL-aBenchedProbe-5 TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
