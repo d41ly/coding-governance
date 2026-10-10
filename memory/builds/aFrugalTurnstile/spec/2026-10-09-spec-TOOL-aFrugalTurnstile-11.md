@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-09-build-TOOL-aFrugalTurnstile-11-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-11-1-acceptance-ledger.md) | journal | — |
 | [2026-10-10-build-TOOL-aFrugalTurnstile-1-2-measurement.md](../build/2026-10-10-build-TOOL-aFrugalTurnstile-1-2-measurement.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 |
+| [2026-10-10-review-TOOL-aFrugalTurnstile-1-11-diff-review-round1.md](../reviews/2026-10-10-review-TOOL-aFrugalTurnstile-1-11-diff-review-round1.md) | diff-review | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 |
 
 <!-- /gen:spec-records -->
 

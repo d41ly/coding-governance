@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: tooling+playbook+deployer
 roster: TOOL+PLAY+DEPL
-ids: DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 TOOL-aFrugalTurnstile-11
+ids: DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 TOOL-aFrugalTurnstile-11 TOOL-aFrugalTurnstile-12 TOOL-aFrugalTurnstile-13 TOOL-aFrugalTurnstile-14 TOOL-aFrugalTurnstile-15 TOOL-aFrugalTurnstile-16 TOOL-aFrugalTurnstile-17
 authorized-by: prompt
 ---
 
@@ -66,12 +66,18 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 11 | `PLAY-aFrugalTurnstile-1` | the charter's §1 Landing states the scoped-then-full path |
 | 12 | `DEPL-aFrugalTurnstile-1` | the runbook states what an adopter declares to use each part |
 | 13 | `TOOL-aFrugalTurnstile-11` | a scoped green takes its own slot, and the nearest adoptable green wins |
+| 14 | `TOOL-aFrugalTurnstile-12` | the close's bar runs with the bar knobs scrubbed (review H1) |
+| 15 | `TOOL-aFrugalTurnstile-13` | the close honours a --decide answer only for the bar it will run (review H2) |
+| 16 | `TOOL-aFrugalTurnstile-14` | a run whose tree moved writes no lineage-qualified ledger row (review H3) |
+| 17 | `TOOL-aFrugalTurnstile-15` | a post-merge red clears only on a FULL green that descends from it (review H4, M1) |
+| 18 | `TOOL-aFrugalTurnstile-16` | the boundary's review minors (M2, M4, L1, L2) |
+| 19 | `TOOL-aFrugalTurnstile-17` | the post-merge review minors (M3, M5, L3) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 13 unit(s) · node a · opened 2026-10-09 · streams tooling+playbook+deployer
+**Build status:** OPEN · 19 unit(s) · node a · opened 2026-10-09 · streams tooling+playbook+deployer
 ids DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10
-ids TOOL-aFrugalTurnstile-11
+ids TOOL-aFrugalTurnstile-11 TOOL-aFrugalTurnstile-12 TOOL-aFrugalTurnstile-13 TOOL-aFrugalTurnstile-14 TOOL-aFrugalTurnstile-15 TOOL-aFrugalTurnstile-16 TOOL-aFrugalTurnstile-17
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -89,14 +95,20 @@ ids TOOL-aFrugalTurnstile-11
 | [TOOL-aFrugalTurnstile-7 — pre-push binds a post-merge red, and `--decide` prints the boundary's decision](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-7.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-8 — push-main starts the post-merge bar after a landing where it is declared](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-8.md) | 5 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-9 — the unattended close runs the boundary's decision where a post-merge bar is declared](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-9.md) | 5 | 2 | CLOSED | rev-4 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-12 — the close's bar runs with the bar knobs scrubbed, so its green certifies the whole bar](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-12.md) | 6 | 2 | OPEN | rev-1 | 2026-10-10 |
+| [TOOL-aFrugalTurnstile-14 — a run whose tree moved writes no lineage-qualified ledger row](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-14.md) | 6 | 2 | OPEN | rev-1 | 2026-10-10 |
+| [TOOL-aFrugalTurnstile-17 — the post-merge minors: a clean-tree precondition, two guards armed, the protocol row corrected](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-17.md) | 6 | 2 | OPEN | rev-1 | 2026-10-10 |
+| [TOOL-aFrugalTurnstile-13 — the close honours a `--decide` answer only for the bar it will run](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-13.md) | 7 | 2 | OPEN | rev-1 | 2026-10-10 |
+| [TOOL-aFrugalTurnstile-15 — a post-merge red clears only on a FULL green that descends from it](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-15.md) | 7 | 2 | OPEN | rev-1 | 2026-10-10 |
+| [TOOL-aFrugalTurnstile-16 — the boundary's minors: one scoped base for both writers, the runner-stamp refusals armed, inherited bases and SHA-256 handled](spec/2026-10-10-spec-TOOL-aFrugalTurnstile-16.md) | 8 | 2 | OPEN | rev-1 | 2026-10-10 |
 <!-- /gen:build-units -->
 
-Records: 18 bound to this build, across 3 record folder(s).
+Records: 19 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aFrugalTurnstile-12 TOOL-aFrugalTurnstile-13 TOOL-aFrugalTurnstile-14 TOOL-aFrugalTurnstile-15 TOOL-aFrugalTurnstile-16 TOOL-aFrugalTurnstile-17.
 
 Ids no `spec-audit` record has ever named: DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-10 TOOL-aFrugalTurnstile-11 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6
-TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9.
+TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-12 TOOL-aFrugalTurnstile-13 TOOL-aFrugalTurnstile-14 TOOL-aFrugalTurnstile-15 TOOL-aFrugalTurnstile-16 TOOL-aFrugalTurnstile-17.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -108,6 +120,9 @@ TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9.
 | 3 | `TOOL-aFrugalTurnstile-11`, `TOOL-aFrugalTurnstile-4` | yes |
 | 4 | `TOOL-aFrugalTurnstile-6`, `TOOL-aFrugalTurnstile-7` | yes |
 | 5 | `TOOL-aFrugalTurnstile-8`, `TOOL-aFrugalTurnstile-9` | yes |
+| 6 | `TOOL-aFrugalTurnstile-12`, `TOOL-aFrugalTurnstile-14`, `TOOL-aFrugalTurnstile-17` | yes |
+| 7 | `TOOL-aFrugalTurnstile-13`, `TOOL-aFrugalTurnstile-15` | yes |
+| 8 | `TOOL-aFrugalTurnstile-16` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
