@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.34` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.35` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -378,6 +378,10 @@ cannot tell a leg somebody forgot from a leg you deliberately left alone, so it 
 the judgement to you. If you want the requirement enforced over YOUR corpus, assert it in a harness
 of your own — gov does exactly that in `run-gates.gov.test.sh`, which is withheld from this payload
 for the reason that file's header gives.
+
+**A kit leg's ceiling arrives only where its descriptor declares one.** The deployer carries a kit leg's `ceiling` into your manifest at run-gates 1.2 or later,
+and only for a leg whose kit descriptor declares one; a value you set by hand on that row is kept
+and reported rather than overwritten, while a deleted one comes back on the next deployer run.
 
 **Choosing a number.** `<git-dir>/gate-ledger.tsv` already carries one row per leg with its own
 seconds, so the derivation gov used is `max(60, 3 × that leg's measured seconds)`. The factor is

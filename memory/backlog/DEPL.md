@@ -16,6 +16,7 @@ Cite ids, never line numbers.
 
 | Ask | Status | Sev | Decided by | Filed | Summary |
 |---|---|---|---|---|---|
+| [DEPL-aBenchedProbe-5](../builds/aBenchedProbe/BACKLOG.md) | OPEN | LOW | — | 2026-10-10 | WIRE-INTO-PROJECT.md tells a hand-wiring adopter to add bash… |
 | [DEPL-aFerriedDossier-2](../builds/aFerriedDossier/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-16 | Widen unit 3 S5's fixture family with a non-default-prefix entry and… |
 | [DEPL-aFerriedDossier-3](../builds/aFerriedDossier/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-16 | 13 defects inCMS measured in this tree with line numbers: the discarded… |
 | [DEPL-aHoistedPass-2](../builds/aHoistedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | THE ADOPTER GAP IS NARROWED, NOT CLOSED — three clauses left: an… |
