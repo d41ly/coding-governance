@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-7 — the unattended prompt-brief check reads its sub-head list from the kickoff kit's `--brief-skeleton`
 
-**Status:** INPROGRESS · rev-2 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling · order 6 · ratified 2026-10-09
+**Status:** INPROGRESS · rev-3 · 2026-10-10 · node a · Tier-2 · base 6473ae38 · streams tooling · order 6 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -25,7 +25,11 @@ earlier keep the five.
 - **S1** — `check_prompt_brief` takes rule 1's sub-head list from `read_brief_subheads` when the
   build README's `opened:` date at BASE is on or after `PROMPT_BRIEF_SKELETON_CUTOFF`. Before that
   date, or with the key blank, rule 1 keeps the five TOOL-aQuotedBrief-1 hard-codes and the checker
-  is not run. Rule 1's predicate is unchanged; only its list moves. Observed by AC1, AC2, AC3 and AC4.
+  is not run. F1's probe observed an exact match, so by its ruling (a) rule 1 becomes an in-order
+  subsequence over whichever list applies, each listed sub-head non-empty, and its refusal names the
+  first sub-head missing, empty or out of order after the record. The key is read the way
+  `read_brief_cutoff` reads `PROMPT_BRIEF_CUTOFF`, at the default-branch side of BASE, and only once
+  that key has graded the record. Observed by AC1, AC2, AC3 and AC4.
 - **S2** — `read_brief_subheads` resolves the kickoff checker, reads its blob at the pinned BASE,
   runs that copy with `--brief-skeleton`, and prints the `### ` headings between `## The brief` and
   the next `## ` heading, in order. It runs once per preflight, and only when a graded record's
@@ -37,7 +41,8 @@ earlier keep the five.
 - **S4** — The list read from the checker is refused unless it holds the five TOOL-aQuotedBrief-1
   hard-codes in their order. A checker blob that exits non-zero on the verb, or prints no
   `## The brief`, refuses too. Every refusal sits in the brief check, after the authorization read
-  and before the write gate, so a refusal writes no run-state file. Observed by AC6.
+  and before the write gate, so a refusal writes no run-state file. Every refusal of the read, S3's
+  included, is one check, 117, whose message carries the cause. Observed by AC5 and AC6.
 - **S5** — `PROMPT_BRIEF_SKELETON_CUTOFF` is a new date key on the terms of `PROMPT_BRIEF_CUTOFF`:
   blank means off and is announced on stderr. It is declared in `.unattended.conf` at the date this
   unit lands, shipped blank in `tools/unattended/.unattended.conf.example`, given a row in the
@@ -47,9 +52,9 @@ earlier keep the five.
   already names `<check-script> --task-skeleton` for the field set, and the render
   `memory/guides/UNATTENDED-VERBS.md` follows. Observed by AC9.
 - **S7** — `tools/unattended/kit.toml` names `kickoff-manifest` in `requires`. Observed by AC10.
-- **S8** — The unattended kit version moves once, here, because this is the build's only unit
-  touching that kit. The kickoff manifest's `last-audit` moves, because `.unattended.conf` is in its
-  `watch:`, and `memory/map/generated/symbols.json` is regenerated for the two new functions.
+- **S8** — The kickoff manifest's `last-audit` moves, because `.unattended.conf` is in its
+  `watch:`, and `memory/map/generated/symbols.json` is regenerated for the two new functions. The
+  unattended kit version moves once, in the run's own mint after the last unit, never in this pass.
   NOT OBSERVED by a criterion: the kit-version, kit-epoch, kickoff-manifest and codebase-map legs
   that §7 names grade these.
 
@@ -190,14 +195,15 @@ reachable through `--all`.
 
 - Lands at order 6, after TOOL-aQuotedBrief-1 is on main and after KICK-aRoutedQuill-1. It shares
   its step with the trial alone, which touches no file the kickoff manifest watches.
-- `.unattended.conf` declares the key at the landing date. Gov's own prompt-mode builds opened from
-  that day are graded on seven; earlier ones keep five.
+- `.unattended.conf` declares the key at the day after this unit lands, the rule its
+  `PROMPT_BRIEF_CUTOFF` comment states, so no prompt-mode run in flight is refused by a merge.
+  Gov's own prompt-mode builds opened from that day are graded on seven; earlier ones keep five.
 - The protocol has no headroom, so the new §8 row is paid for by raising the protocol's declared
   ceiling in `tools/template-size-limits.txt` by the row's measured bytes, in the same commit, with
   the comment there naming this unit. That is the owner's ruling of 2026-10-09, which covers
   TOOL-aQuotedBrief-1's own row at the same ceiling too.
-- The unattended kit version moves once, as this unit's last commit, across every carrier
-  `tools/check-kit-versions.sh` and `govkit.py selfcheck` name, the Skill render among them;
+- The unattended kit version moves once, in the run's mint after its last unit, across every
+  carrier `tools/check-kit-versions.sh` and `govkit.py selfcheck` name, the Skill render among them;
   `govkit.py selfcheck` runs after it.
 - The kickoff manifest owes `last-audit` with a delta line in the commit message, and
   `gen_map.py --write` runs before the push.
@@ -296,12 +302,18 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 A
   pre-key run to write the five.
   Recommendation: (a), because it keeps one rule and one sentence in the verbs file.
   RESOLVED (owner, 2026-10-09): (a), if the probe shows an exact match.
+  Observed (agent, 2026-10-10): rule 1's awk, run from the driver at `77d9cdf8` over a record with the
+  five plus `### Limitations`, printed `rule 1`; the five alone printed nothing, and the five without
+  `### Goal` printed `rule 1`, so the probe moved. Rule 1 was an exact match, and (a) is built.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
 - rev-2 · 2026-10-09 · §4 · §5 · §8 · owner resolves F1 (a) and rules that the protocol's ceiling
   rises by the new row's bytes rather than the protocol being trimmed.
+- rev-3 · 2026-10-10 · §2 · §4 · §8 · F1's probe observed an exact match, so S1 carries (a); the read's
+  refusals are one check, 117; the key is read at the default-branch side of BASE; the conf date is
+  the day after landing; the kit version moves in the run's mint, not in this pass.
 
 ## 10. Reuse audit
 
