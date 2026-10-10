@@ -448,11 +448,12 @@ LIVE_DORMANT_DAYS=""
 LIVE_LANDED_UNCLOSED=""
 
 # ROUTED_PATHS — the product paths: whitespace-separated, repo-root-relative, a directory entry ending
-# in `/`. The write gate (scratch-guard) refuses an Edit, Write or shell write under one unless the
-# session's card routes a buildable unit, and the ownership leg grades the commits touching one. An
-# entry may not be absolute, climb through `..`, cover MEMORY_ROOT or name nothing tracked. BLANK OR
-# ABSENT LEAVES THE GATE UNARMED, which refuses every write and which check-wiring reports. Neither
-# key ships assigned here: `adopt-memory-tree.sh --scaffold` and `--arm-routing` append both, the
+# in `/`. The write gate (scratch-guard) refuses an Edit, Write, MultiEdit or NotebookEdit under one
+# unless the session's card routes a buildable unit; a shell write passes the gate, and the
+# routed-commits leg (`routed commits name a specced unit`) grades the commit that carries it. An
+# entry may not be absolute, climb through `..`, cover MEMORY_ROOT or sit under it, or name nothing
+# tracked. BLANK OR ABSENT LEAVES THE GATE UNARMED, which refuses every write and which check-wiring
+# reports. Neither key ships assigned here: `adopt-memory-tree.sh --scaffold` and `--arm-routing` append both, the
 # candidate derived from your tracked top-level directories, for you to confirm before committing.
 #   ROUTED_PATHS="src/ lib/"
 # ROUTED_COMMIT_CUTOFF — an ISO date (YYYY-MM-DD). `routed_commits.py`, the `routed commits name a

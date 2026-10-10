@@ -151,7 +151,9 @@ def check_conf(conf: dict, tracked: list) -> tuple:
             raise Refusal(f"ROUTED_PATHS entry {raw} is absolute; entries are repo-root-relative")
         if ".." in entry.split("/"):
             raise Refusal(f"ROUTED_PATHS entry {raw} climbs through ..")
-        if bare in ("", ".") or memory_root == bare or memory_root.startswith(bare + "/"):
+        # Two-way (TOOL-aRoutedQuill-12 S6): an entry under MEMORY_ROOT covers it as surely as one above it.
+        if (bare in ("", ".") or memory_root == bare or memory_root.startswith(bare + "/")
+                or bare.startswith(memory_root + "/")):
             raise Refusal(f"ROUTED_PATHS entry {raw} covers MEMORY_ROOT ({memory_root}), so a spec commit "
                           f"would need a spec before itself")
         if not any(test_routed_path(p, [entry]) for p in tracked):
@@ -318,19 +320,25 @@ def check_routed_commits(repo, env) -> tuple:
 
 
 def read_newest_unit(repo, rev_range: str) -> str:
-    """The first id the newest attributed commit in `rev_range` names, by the union reading; '' when
-    none does. The attended lander's mint names this unit (S11)."""
+    """The first id, walking the non-merge commits of `rev_range` newest first, that a spec at HEAD
+    defines, by the union reading; '' when none does. The attended lander's mint names this unit (S11),
+    so an unspecced id or a merge's id would name one the leg cannot grade (TOOL-aRoutedQuill-12 S2)."""
     repo = pathlib.Path(repo)
-    families = extract_families(load_conf(repo))
+    conf = load_conf(repo)
+    families = extract_families(conf)
     if not families:
         return ""
+    memory_root = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")
+    tracked = [p for p in run_git(repo, "ls-tree", "-r", "-z", "--name-only", "HEAD").decode("utf-8", "replace").split("\0") if p]
+    id_map, _ = load_spec_paths(repo, tracked, memory_root, families)
     id_re = build_id_re(families)
-    raw = run_git(repo, "log", "--no-color", "--format=%s%x1f%(trailers:key=Pass,valueonly,separator=%x20)%x1e",
+    raw = run_git(repo, "log", "--no-merges", "--no-color",
+                  "--format=%s%x1f%(trailers:key=Pass,valueonly,separator=%x20)%x1e",
                   rev_range, "--").decode("utf-8", "replace")
     for rec in raw.split("\x1e"):
-        ids = extract_unit_ids(rec.replace("\x1f", " "), id_re)
-        if ids:
-            return ids[0]
+        for uid in extract_unit_ids(rec.replace("\x1f", " "), id_re):
+            if uid in id_map:
+                return uid
     return ""
 
 
@@ -496,6 +504,7 @@ def run_selftest() -> int:
                 ({"ROUTED_PATHS": "../src/"}, "../src/ climbs", "an entry climbing through .."),
                 ({"ROUTED_PATHS": "/src/"}, "/src/ is absolute", "an absolute entry"),
                 ({"ROUTED_PATHS": "memory/"}, "covers MEMORY_ROOT", "an entry covering MEMORY_ROOT"),
+                ({"ROUTED_PATHS": "src/ memory/builds/"}, "memory/builds/ covers MEMORY_ROOT", "an entry under MEMORY_ROOT"),
                 ({"FAMILIES": ""}, "the id map is empty: FAMILIES is blank", "AC9 FAMILIES blank"),
                 ({"FAMILIES": "tooling:T|X"}, "'T|X' is not letters only", "AC9 a FAMILIES prefix that is not letters")):
             set_fixture_conf(repo, **keys)
@@ -581,6 +590,26 @@ def run_selftest() -> int:
                 print_arm(rc == 1 and f"  {s[3][:8]} " in out and "no unit id" in out, "AC11 an id-less mint reds `no unit id`", out)
                 newest = read_newest_unit(repo, f"{s[1]}..HEAD")
                 print_arm(newest == "TOOL-tFix-1", f"AC11 --newest-unit reads past an id-less commit to the unit (got '{newest}')")
+        # TOOL-aRoutedQuill-12 AC2: an unspecced id and a merge's id are walked past to a specced unit.
+        repo, s = build_fixture(root, "newest", [
+            {"msg": "init", "files": {"README.md": "x\n"}},
+            {"msg": "spec TOOL-tFix-1", "files": {SPEC1: "# TOOL-tFix-1 — one\n"}},
+            {"msg": "TOOL-tFix-1: code", "files": {"src/a.txt": "a\n"}},
+            {"msg": "TOOL-tFix-9: unspecced, newest", "files": {"src/b.txt": "b\n"}},
+        ])
+        set_fixture_conf(repo)
+        newest = read_newest_unit(repo, f"{s[1]}..HEAD")
+        print_arm(newest == "TOOL-tFix-1", f"AC11 --newest-unit walks past an id no spec defines to a specced unit (got '{newest}')")
+        repo, s = build_fixture(root, "newestmerge", [
+            {"msg": "init", "files": {"README.md": "x\n"}},
+            {"msg": "spec TOOL-tFix-1 and TOOL-tFix-2", "files": {SPEC1: "# TOOL-tFix-1 — one\n", SPEC2: "# TOOL-tFix-2 — two\n"}},
+            {"msg": "TOOL-tFix-1: code", "files": {"src/a.txt": "a\n"}},
+            {"msg": "side: docs", "files": {"README.md": "side\n"}, "parent": 2},
+            {"msg": "Merge TOOL-tFix-2 side", "files": {"README.md": "side\n"}, "parent": 3, "merge": [4]},
+        ])
+        set_fixture_conf(repo)
+        newest = read_newest_unit(repo, f"{s[1]}..HEAD")
+        print_arm(newest == "TOOL-tFix-1", f"AC11 --newest-unit skips a newest merge commit's id (got '{newest}')")
     finally:
         shutil.rmtree(root, ignore_errors=True)
     print(f"{SAY} selftest: {'all arms held' if not failed else f'{len(failed)} arm(s) FAILED'}")

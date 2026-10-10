@@ -804,6 +804,88 @@ def main() -> int:
                   any(ln.startswith("ok ") and ln.split()[1] == arm for ln in cw.stdout.splitlines()),
                   cw.stdout + cw.stderr)
 
+        # SHAPE 7 — TOOL-aRoutedQuill-12 S7 (TOOL-aRoutedQuill-5 AC4): an install from an AGED gov copy
+        # whose registry default lacks the entries that unit added, then `update --write` once gov ages
+        # forward. EXPECTED: one `default-gained` line per entry, the receipt and the target's declared
+        # `kits` list claiming each, and every fragment the default lands wired; then a deliberate unwire
+        # of the write gate's fragment survives a second update and the target's check-wiring names it
+        # UNWIRED. build_role_pair's recipe at full scale: the receipt is older than the registry, which
+        # is the only order in which a default can be gained at all.
+        shapes += 1
+        gained_ids = ["agent-cap", "settings-merge", "check-wiring"]
+        ga = tmp.resolve() / "gov-aged"
+        cl = git(tmp.resolve(), "-c", "core.autocrlf=false", "clone", "-q", "--local", str(ROOT), str(ga))
+        reg = ga / PFX / KIT_NAMES["govkit"] / "registry.toml"
+        reg_now = reg.read_bytes() if reg.is_file() else b""
+        aged = reg_now.decode("utf-8")
+        for _e in gained_ids:
+            aged = aged.replace(f'  "{_e}",' + NL, "", 1)
+        check("aged gov: the clone builds and its registry default loses the three entries",
+              cl.returncode == 0 and reg_now and all(f'"{_e}",' not in aged for _e in gained_ids),
+              cl.stderr)
+        reg.write_bytes(aged.encode("utf-8"))
+        git(ga, "config", "user.email", "t@e"); git(ga, "config", "user.name", "t")
+        git(ga, "commit", "-qam", "the aged vintage: a default without the write gate's entries")
+        aged_default = govkit.default_kits(govkit.load_toml(reg))
+        tg = tmp.resolve() / "aged-install"
+        (tg / ".governance").mkdir(parents=True, exist_ok=True)
+        (tg / ".governance" / "deploy.toml").write_text(
+            'gov_source = "local"' + NL + f'prefix = "{PFX[:-1]}"' + NL
+            + "kits = [" + ", ".join('"%s"' % k for k in aged_default) + "]" + NL + "[answers]" + NL
+            + 'memory_root = "memory"' + NL + 'playbook_path = "docs/PARALLEL.md"' + NL
+            + 'playbook_dir = "docs"' + NL + 'manifest_path = "docs/SESSION-KICKOFF.md"' + NL
+            + 'user_skills = "~/.claude/skills"' + NL, encoding="utf-8", newline=NL)
+        (tg / "README.md").write_text("t" + NL, encoding="utf-8", newline=NL)
+        git(tg, "init", "-q", "-b", "main"); git(tg, "config", "user.email", "t@e")
+        git(tg, "config", "user.name", "t"); git(tg, "config", "core.autocrlf", "false")
+        git(tg, "add", "-A"); git(tg, "commit", "-qm", "base")
+        p = run_in_gov(ga, "apply", "--target", str(tg))
+        check("aged install: apply from the aged vintage completes", p.returncode == 0, p.stdout + p.stderr)
+        git(tg, "add", "-A"); git(tg, "commit", "-qm", "the aged install")
+        reg.write_bytes(reg_now)
+        git(ga, "commit", "-qam", "gov ages forward: the default gains the write gate's entries")
+        p = run_in_gov(ga, "update", "--target", str(tg), "--write")
+        out = p.stdout + p.stderr
+        for _e in gained_ids:
+            check(f"aged update: prints default-gained {_e}",
+                  f"govkit update — default-gained {_e}: the registry's default set holds it" in out, out)
+        rcpt = json.loads((tg / ".governance" / "install.json").read_text(encoding="utf-8"))
+        check("aged update: the receipt claims every gained entry",
+              all(_e in (rcpt.get("kits") or []) for _e in gained_ids), str(rcpt.get("kits")))
+        check("aged update: the target's declared kits list gains every entry",
+              all(_e in (govkit.load_toml(tg / ".governance" / "deploy.toml").get("kits") or [])
+                  for _e in gained_ids),
+              (tg / ".governance" / "deploy.toml").read_text(encoding="utf-8"))
+        hooks = [ln for ln in out.splitlines() if " — hooks: " in ln]
+        for frag in ("scratch-guard.fragment.json", "scratch-guard-subagent.fragment.json",
+                     "orientation-card.fragment.json", "orientation-replay.fragment.json",
+                     "check-wiring.fragment.json"):
+            check(f"aged update: the gained {frag} is wired",
+                  any(frag in ln and ln.endswith(" wired") for ln in hooks), NL.join(hooks) or out)
+        rows = [str(f.get("path")) for f in rcpt.get("files") or []]
+        sm = next((r for r in rows if r.endswith("settings-merge.py")), "")
+        gate = next((r for r in rows if r.endswith("/scratch-guard.fragment.json")), "")
+        git(tg, "add", "-A"); git(tg, "commit", "-qm", "the update")
+        uw = subprocess.run([sys.executable, sm, "--fragment", gate, "--unwire"], cwd=str(tg),
+                            capture_output=True, encoding="utf-8", errors="replace")
+        check("aged update: the adopter unwires the write gate's fragment",
+              bool(sm and gate) and uw.returncode == 0 and "unwired" in uw.stdout, uw.stdout + uw.stderr)
+        git(tg, "add", "-A"); git(tg, "commit", "-qm", "the adopter unwires the gate")
+        p = run_in_gov(ga, "update", "--target", str(tg), "--write")
+        out = p.stdout + p.stderr
+        chk = subprocess.run([sys.executable, sm, "--fragment", gate, "--check"], cwd=str(tg),
+                             capture_output=True, encoding="utf-8", errors="replace")
+        check("aged update: a second update leaves the deliberate unwire alone",
+              not any("scratch-guard.fragment.json" in ln and ln.endswith(" wired")
+                      for ln in out.splitlines() if " — hooks: " in ln) and chk.returncode == 1,
+              out + chk.stdout + chk.stderr)
+        cw = subprocess.run(govkit.resolve_shell_argv(["bash", f"{PFX}check-wiring.sh", "--check"]),
+                            cwd=str(tg), capture_output=True, encoding="utf-8", errors="replace",
+                            stdin=subprocess.DEVNULL)
+        check("aged update: the target's check-wiring names the unwired gate UNWIRED",
+              any(ln.startswith("UNWIRED  scratch") for ln in cw.stdout.splitlines()),
+              cw.stdout + cw.stderr)
+
         print(f"govkit-matrix: {shapes} repo shape(s) exercised")
         if shapes == 0:
             print("govkit-matrix: NO shape ran — a matrix over nothing is not a matrix")

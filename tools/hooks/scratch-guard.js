@@ -839,12 +839,20 @@ function checkBuildable(u, build, top, memRoot, confBytes) {
   const rel = buildComparablePath(u.spec)
   if (/^([a-z]:|\/|~)/.test(rel) || rel.split('/').includes('..')) return `spec ${u.spec} is not a repo-relative path`
   const want = buildComparablePath(memRoot) + '/builds/' + buildComparablePath(build) + '/spec/'
-  if (!rel.startsWith(want) || rel.slice(want.length).includes('/')) return `spec ${u.spec} is outside ${want}`
+  // Any depth under the spec folder, as KICK R4 and parse_spec_h1 admit (TOOL-aRoutedQuill-12 S10).
+  if (!rel.startsWith(want)) return `spec ${u.spec} is outside ${want}`
   let text
   try { text = fs.readFileSync(path.join(top, buildNativePath(u.spec)), 'utf8') } catch { return `spec ${u.spec} does not exist` }
-  const lines = text.split(/\r?\n/)
-  const h1 = lines.find((l) => l.startsWith('# ')) || ''
-  const h1Id = h1.slice(2).split(/\s/)[0]
+  // The H1 read R4 and tree_lib.parse_spec_h1 make (S8): the first UNFENCED `#` line, its first token
+  // with backticks and asterisks stripped and trailing `:.,;` dropped, compared whole.
+  let fenced = false
+  let h1Id = ''
+  for (const l of text.split(/\r?\n/)) {
+    if (/^ ? ? ?(```|~~~)/.test(l)) { fenced = !fenced; continue }
+    if (fenced || !/^#[ \t]/.test(l)) continue
+    h1Id = (l.split(/[ \t]+/)[1] || '').replace(/[`*]/g, '').replace(/[:.,;]+$/, '')
+    break
+  }
   if (h1Id !== u.unit) return `spec ${u.spec} has H1 naming ${h1Id || '(nothing)'}, not ${u.unit}`
   const { status, tier } = readStatusCells(text)
   const admits = BUILDABLE_STATUS[tier]
@@ -873,7 +881,8 @@ function checkUnarmed(memRoot, routed) {
     const c = buildComparablePath(e).replace(/^\.\//, '')
     if (/^([a-z]:|\/|~)/.test(c)) return `ROUTED_PATHS entry ${e} is absolute`
     if (c.split('/').includes('..')) return `ROUTED_PATHS entry ${e} climbs through ..`
-    if (c === '' || c === '.' || checkUnderRoot(mem, c)) return `ROUTED_PATHS entry ${e} covers MEMORY_ROOT (${memRoot}), so writing a spec would need a spec first`
+    // Two-way (TOOL-aRoutedQuill-12 S6): an entry under MEMORY_ROOT covers it as surely as one above it.
+    if (c === '' || c === '.' || checkUnderRoot(mem, c) || checkUnderRoot(c, mem)) return `ROUTED_PATHS entry ${e} covers MEMORY_ROOT (${memRoot}), so writing a spec would need a spec first`
   }
   return ''
 }
@@ -917,7 +926,17 @@ function checkRouted(data, env) {
   if (!path.isAbsolute(native) && !cwd) {
     return { deny: `BLOCKED by scratch-guard: this ${tool} names a relative target (${raw}) in tool_input.file_path or tool_input.notebook_path, and the payload carries no cwd to resolve it against, so the write gate refuses.\n` }
   }
-  const target = cwd ? path.resolve(buildNativePath(cwd), native) : path.resolve(native)
+  // The target's REAL place (TOOL-aRoutedQuill-12 S4): the realpath of its deepest existing ancestor
+  // with the not-yet-existing tail appended, so a product file reached through a junction or a symlink
+  // is placed, and gated, like its repository spelling.
+  let target = cwd ? path.resolve(buildNativePath(cwd), native) : path.resolve(native)
+  for (let head = target, tail = ''; ;) {
+    if (fs.existsSync(head)) { target = path.join(resolveRealPath(head) || head, tail); break }
+    const up = path.dirname(head)
+    if (up === head) break
+    tail = tail ? path.join(path.basename(head), tail) : path.basename(head)
+    head = up
+  }
   const sessionStart = env.CLAUDE_PROJECT_DIR || cwd
   if (!sessionStart) return null
   const session = resolveComparableCommon(path.resolve(buildNativePath(sessionStart)))

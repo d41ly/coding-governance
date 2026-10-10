@@ -1,11 +1,12 @@
 # TOOL-aRoutedQuill-12 — the closing review's mediums and lows, and the bar reds this build's diff carries
 
-**Status:** INPROGRESS · rev-2 · 2026-10-10 · node a · Tier-2 · base e6585db4 · streams tooling+kickoff · order 6 · ratified 2026-10-10
+**Status:** CLOSED · rev-3 · 2026-10-10 · node a · Tier-2 · base e6585db4 · streams tooling+kickoff · order 6 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-10-build-TOOL-aRoutedQuill-12-1-acceptance-ledger.md](../build/2026-10-10-build-TOOL-aRoutedQuill-12-1-acceptance-ledger.md) | journal | — |
 | [2026-10-10-prompt-TOOL-aRoutedQuill-12-build-brief.md](../prompts/2026-10-10-prompt-TOOL-aRoutedQuill-12-build-brief.md) | journal | — |
 | [2026-10-10-prompt-TOOL-aRoutedQuill-12-spec-brief.md](../prompts/2026-10-10-prompt-TOOL-aRoutedQuill-12-spec-brief.md) | journal | — |
 
@@ -45,8 +46,9 @@ Line numbers are at `4edeb4678` and move as earlier items land.
   `tools/memory-tree/kit.toml` declares `impure` with gov's text. The govkit row builder copies
   `impure` into the target row under the same `check_target_reads_subject` reader check `subject`
   uses. `govkit.py selfcheck`'s existing descriptor-against-manifest compare, which today joins
-  `doc_reads`, joins `impure` too, so a gov row carrying a field its kit leg lacks reds. Observed by
-  AC6 and AC7.
+  `doc_reads`, joins `impure` too, so a gov row carrying a field its kit leg lacks reds. The three
+  `tools/unattended/kit.toml` legs the manifest marks `impure` declare it with gov's text, so the
+  join is green over today's tree. Observed by AC6 and AC7.
 - **S6** — M7. The "covers MEMORY_ROOT" test is two-way in `checkUnarmed` in
   `tools/hooks/scratch-guard.js` and in `check_conf` in `tools/memory-tree/routed_commits.py`: an
   entry is refused when MEMORY_ROOT sits under it OR it sits under MEMORY_ROOT. `check_routed`
@@ -157,6 +159,9 @@ Read at `4edeb4678` (this branch, which merged origin/main `e6585db4`) on 2026-1
   `tools/gate-legs.json` carries it on the same leg. The row builder at
   `tools/govkit/govkit.py:4079-4097` emits `subject`, `guard` and `doc_reads` only; the selfcheck
   compare at `:2741-2805` joins `doc_reads` between descriptors and the manifest.
+- `tools/gate-legs.json` carries `impure` on three more legs, `unattended kit gate`, `pass-order
+  history` and `brief-recorded`, which `tools/unattended/kit.toml` declares without it. Measured
+  2026-10-10 by listing every manifest row carrying the key.
 - `impure` has been in the run-gates canary's key set since `72fd44d2e` (run-gates 1.0), so every
   runner with a canary reads it. PINNED, measured 2026-10-10.
 - `checkUnarmed` at `tools/hooks/scratch-guard.js:868-878` and `check_conf` at
@@ -219,7 +224,7 @@ realpath step is inline in `checkRouted`.
 
 ### Files touched (estimate)
 
-`skills/session-kickoff/manifest-check.sh` · `skills/session-kickoff/manifest-check.test.sh` · `tools/hooks/scratch-guard.js` · `tools/hooks/scratch-guard.test.sh` · `tools/check-wiring.sh` · `tools/check-wiring.test.sh` · `tools/memory-tree/routed_commits.py` · `tools/memory-tree/kit.toml` · `tools/memory-tree/.memory-tree.conf.example` · `tools/govkit/govkit.py` · `tools/govkit/matrix.py` · `tools/push-main.sh` · `tools/push-main.test.sh` · `memory/project/unarmed-branches.txt` · `tools/template-size-highwater.txt` · `memory/builds/aRoutedQuill/README.md` · `memory/builds/aRoutedQuill/spec/2026-10-09-spec-TOOL-aRoutedQuill-5.md` · `memory/map/generated/symbols.json` · `memory/guides/SESSION-KICKOFF.md`
+`skills/session-kickoff/manifest-check.sh` · `skills/session-kickoff/manifest-check.test.sh` · `tools/hooks/scratch-guard.js` · `tools/hooks/scratch-guard.test.sh` · `tools/check-wiring.sh` · `tools/check-wiring.test.sh` · `tools/memory-tree/routed_commits.py` · `tools/memory-tree/kit.toml` · `tools/unattended/kit.toml` · `tools/memory-tree/.memory-tree.conf.example` · `tools/govkit/govkit.py` · `tools/govkit/matrix.py` · `tools/push-main.sh` · `tools/push-main.test.sh` · `memory/project/unarmed-branches.txt` · `tools/template-size-highwater.txt` · `memory/builds/aRoutedQuill/README.md` · `memory/builds/aRoutedQuill/spec/2026-10-09-spec-TOOL-aRoutedQuill-5.md` · `memory/map/generated/symbols.json` · `memory/guides/SESSION-KICKOFF.md`
 
 ### Rollout
 
@@ -409,6 +414,7 @@ New arm: tools/push-main.test.sh · covers AC16 · a mint helper that keeps a re
 
 - rev-1 · 2026-10-10 · initial draft.
 - rev-2 · 2026-10-10 · §4 · `order 10` became `order 6`: the dispatch order gate counts the carried-forward TOOL-aRoutedQuill-6 (order 6, DEFERRED) as an unfinished earlier step and refused this unit's dispatch at order 10; the main loop still builds 9, 10, 11 and 12 one after another.
+- rev-3 · 2026-10-10 · §2 S5, §4 · the selfcheck `impure` join also reds three `tools/unattended/kit.toml` legs the manifest marks impure, so those three declare it too, and that descriptor joins Files touched; found while building S5.
 
 ## 10. Reuse audit
 

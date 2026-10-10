@@ -737,6 +737,16 @@ check_eq() {
     echo "FAIL $1"; printf '    want: %s\n    got:  %s\n' "$2" "$3"; fail=$((fail+1)); fi
 }
 read_cell() { grep -m1 "^$1 — " "$CARD_HOME/$2.md"; }   # $1=cell $2=session id
+# TOOL-aRoutedQuill-12 AC1 — `read_memory_root` reads the conf as bash does, every spelling bash accepts.
+eval "$(awk '/^read_memory_root\(\) \{$/,/^}$/' "$CHECK")"
+mkdir -p "$TMP/mr"
+for q_conf in 'export MEMORY_ROOT=memory' 'MEMORY_ROOT=memory  # note' 'MEMORY_ROOT="memory"' 'MEMORY_ROOT=other
+MEMORY_ROOT=memory'; do
+  printf '%s\n' "$q_conf" > "$TMP/mr/.memory-tree.conf"
+  check_eq "AC1 read_memory_root reads '$(printf '%s' "$q_conf" | tr '\n' ';')' as bash does" "memory" "$(ROOT="$TMP/mr" read_memory_root)"
+done
+rm -f "$TMP/mr/.memory-tree.conf"
+(ROOT="$TMP/mr" read_memory_root >/dev/null); check_eq "AC1 ...and returns 1 for a tree with no conf" "1" "$?"
 
 # Two fixture registries. REG1: the Remote column repeats the user on EVERY row (a row-wide match
 # hits all three), the matching Machine/user cell is BACKTICKED (equality after stripping), one
@@ -1280,13 +1290,13 @@ mkdir -p "$CWT2/$QB/prompts" "$CWT2/${QSO%/*}" \
   || { echo "FAIL KQ setup: the route fixture commit in worktree B failed"; fail=$((fail+1)); }
 printf '# an untracked spec\n' > "$CWT2/$QB/spec/2026-09-14-spec-untracked.md"
 q_head=$(git -C "$CWT2" rev-parse HEAD)
-q_ready() { printf 'READY — aTest · node a · card-wt2 · base %s · Tier-2 · gates x\n' "$q_head"; }
-q_route() { printf '## route\n- build: zCardFixture\n- unit: %s · spec %s\n- brief: %s\n' "$1" "$2" "${3:-$QBRIEF}"; }   # $1=id $2=spec [$3=brief]
-q_append() { (cd "$CWT2" && bash "$CHECK" --card --append --session "$1" > "$CARD_OUT" 2>&1); }   # stdin = the body
-# q_refuse <name> <sid> <want_exit> <want_text> — the body on stdin; the card must stay byte-identical
+print_route_ready() { printf 'READY — aTest · node a · card-wt2 · base %s · Tier-2 · gates x\n' "$q_head"; }
+print_route_body() { printf '## route\n- build: zCardFixture\n- unit: %s · spec %s\n- brief: %s\n' "$1" "$2" "${3:-$QBRIEF}"; }   # $1=id $2=spec [$3=brief]
+run_route_append() { (cd "$CWT2" && bash "$CHECK" --card --append --session "$1" > "$CARD_OUT" 2>&1); }   # stdin = the body
+# check_route_refusal <name> <sid> <want_exit> <want_text> — the body on stdin; the card must stay byte-identical
 # to "$TMP/<sid>.before". Called with a redirect, never at a pipe's end, so its counters survive.
-q_refuse() {
-  local got; q_append "$2"; got=$?
+check_route_refusal() {
+  local got; run_route_append "$2"; got=$?
   if [ "$got" = "$3" ] && grep -qF -- "$4" "$CARD_OUT" && cmp -s "$TMP/$2.before" "$CARD_HOME/$2.md"; then
     echo "ok   $1"; pass=$((pass+1))
   else
@@ -1295,56 +1305,67 @@ q_refuse() {
 }
 KQ="$NONCE-kq"; KQCARD="$CARD_HOME/$KQ.md"
 run_card "KQ setup: a card in worktree B" "$CWT2" 0 - --card --write --session "$KQ"
-{ printf '## task\n- `AGENTS.md:1`\n'; q_ready; } | q_append "$KQ"; got=$?
+{ printf '## task\n- `AGENTS.md:1`\n'; print_route_ready; } | run_route_append "$KQ"; got=$?
 check_eq "KQ setup: a kickoff body lands on it" "0" "$got"
 
 # AC2 + AC10 — a conforming route with no READY line, under the K2 spawn shims.
 : > "$SPAWN_LOG"
-q_route TOOL-zCardFixture-10 "$QS10" | (cd "$CWT2" && PATH="$SHIM:$PATH" GOV_PYTHON=python bash "$CHECK" --card --append --session "$KQ" > "$CARD_OUT" 2>&1); got=$?   # gov:literal-python — names the SHIM on PATH, which exec's the resolved REAL_PY
+print_route_body TOOL-zCardFixture-10 "$QS10" | (cd "$CWT2" && PATH="$SHIM:$PATH" GOV_PYTHON=python bash "$CHECK" --card --append --session "$KQ" > "$CARD_OUT" 2>&1); got=$?   # gov:literal-python — names the SHIM on PATH, which exec's the resolved REAL_PY
 check_eq "KQ AC2 a conforming route with no READY line appends" "0" "$got"
-check_eq "KQ AC2 ...above the card's last line, its READY line" "- brief: $QBRIEF|$(q_ready)|" "$(tail -2 "$KQCARD" | tr '\n' '|')"
+check_eq "KQ AC2 ...above the card's last line, its READY line" "- brief: $QBRIEF|$(print_route_ready)|" "$(tail -2 "$KQCARD" | tr '\n' '|')"
 check_eq "KQ AC10 the route rules add no git ls-files spawn" "1" "$(grep -c '^ls-files -- ' "$SPAWN_LOG")"
 check_eq "KQ AC10 ...and no id reader spawn" "1" "$(grep -c 'corpus_ids.py --print-defined-ids$' "$SPAWN_LOG")"
 # AC3 — a second route takes the first's place.
-q_route TOOL-zCardFixture-12 "$QS12" | q_append "$KQ"; got=$?
+print_route_body TOOL-zCardFixture-12 "$QS12" | run_route_append "$KQ"; got=$?
 check_eq "KQ AC3 a second route naming another tracked spec appends" "0" "$got"
 check_eq "KQ AC3 ...and the card holds one route section, the second's" "1 1 0" \
   "$(grep -c '^## route' "$KQCARD") $(grep -cxF -- "- unit: TOOL-zCardFixture-12 · spec $QS12" "$KQCARD") $(grep -c '^- unit: TOOL-zCardFixture-10 ' "$KQCARD")"
+# TOOL-aRoutedQuill-12 AC19 — a heading with trailing whitespace is the route the write gate reads
+# after its trim, so it replaces the stored route rather than sitting beside it.
+print_route_body TOOL-zCardFixture-10 "$QS10" | sed '1s/$/ /' | run_route_append "$KQ"; got=$?
+check_eq "KQ AC19 a route whose heading carries a trailing space appends" "0" "$got"
+check_eq "KQ AC19 ...and the card holds one route heading, the new one's" "1 1" \
+  "$(grep -c '^[[:space:]]*## route[[:space:]]*$' "$KQCARD") $(grep -c '^- unit: TOOL-zCardFixture-10 ' "$KQCARD")"
 
 # AC4 — each unresolved route line is refused by its rule, never annotated.
 cp "$KQCARD" "$TMP/$KQ.before"
-q_route TOOL-zCardFixture-11 "$QS10" > "$TMP/qb"; q_refuse "KQ AC4 R3 an id no spec H1 defines is refused" "$KQ" 1 "route R3 REFUSED — line 3: - unit: TOOL-zCardFixture-11" < "$TMP/qb"
-q_route TOOL-zCardFixture-12 "$QS10" > "$TMP/qb"; q_refuse "KQ AC4 R4 an id paired with a spec whose H1 defines another is refused" "$KQ" 1 "carries no unfenced H1 whose first token is TOOL-zCardFixture-12" < "$TMP/qb"
-q_route TOOL-zCardFixture-10 "$QB/spec/2026-09-14-spec-untracked.md" > "$TMP/qb"; q_refuse "KQ AC4 R4 an untracked spec is refused" "$KQ" 1 "route R4 REFUSED — line 3:" < "$TMP/qb"
+print_route_body TOOL-zCardFixture-11 "$QS10" > "$TMP/qb"; check_route_refusal "KQ AC4 R3 an id no spec H1 defines is refused" "$KQ" 1 "route R3 REFUSED — line 3: - unit: TOOL-zCardFixture-11" < "$TMP/qb"
+print_route_body TOOL-zCardFixture-12 "$QS10" > "$TMP/qb"; check_route_refusal "KQ AC4 R4 an id paired with a spec whose H1 defines another is refused" "$KQ" 1 "carries no unfenced H1 whose first token is TOOL-zCardFixture-12" < "$TMP/qb"
+print_route_body TOOL-zCardFixture-10 "$QB/spec/2026-09-14-spec-untracked.md" > "$TMP/qb"; check_route_refusal "KQ AC4 R4 an untracked spec is refused" "$KQ" 1 "route R4 REFUSED — line 3:" < "$TMP/qb"
 grep -q 'is not a tracked file' "$CARD_OUT" && ! grep -q UNVERIFIED "$KQCARD" && { echo "ok   KQ AC4 ...naming the untracked file, never an UNVERIFIED annotation"; pass=$((pass+1)); } \
   || { echo "FAIL KQ AC4 ...naming the untracked file, never an UNVERIFIED annotation"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
-q_route TOOL-zCardOther-1 "$QSO" > "$TMP/qb"; q_refuse "KQ AC4 R4 a spec outside the build's spec/ folder is refused" "$KQ" 1 "is outside $QB/spec/" < "$TMP/qb"
-q_route TOOL-zCardFixture-10 "$QS10" AGENTS.md > "$TMP/qb"; q_refuse "KQ AC4 R5 a brief outside the build folder is refused" "$KQ" 1 "route R5 REFUSED — line 4: - brief: AGENTS.md" < "$TMP/qb"
-q_route TOOL-zCardFixture-10 "$QS10" "$QS10" > "$TMP/qb"; q_refuse "KQ AC4 R5 the unit's own spec as its brief is refused" "$KQ" 1 "is neither under $QB/prompts/ nor $QB/README.md" < "$TMP/qb"
+print_route_body TOOL-zCardOther-1 "$QSO" > "$TMP/qb"; check_route_refusal "KQ AC4 R4 a spec outside the build's spec/ folder is refused" "$KQ" 1 "is outside $QB/spec/" < "$TMP/qb"
+print_route_body TOOL-zCardFixture-10 "$QS10" AGENTS.md > "$TMP/qb"; check_route_refusal "KQ AC4 R5 a brief outside the build folder is refused" "$KQ" 1 "route R5 REFUSED — line 4: - brief: AGENTS.md" < "$TMP/qb"
+print_route_body TOOL-zCardFixture-10 "$QS10" "$QS10" > "$TMP/qb"; check_route_refusal "KQ AC4 R5 the unit's own spec as its brief is refused" "$KQ" 1 "is neither under $QB/prompts/ nor $QB/README.md" < "$TMP/qb"
 # AC5 — a malformed route names its shape and --brief-skeleton.
 printf '## route\n- unit: TOOL-zCardFixture-10 · spec %s\n- brief: %s\n' "$QS10" "$QBRIEF" > "$TMP/qb"
-q_refuse "KQ AC5 R2 a route with no - build: line is refused" "$KQ" 1 "the section carries 0 - build: lines, and takes exactly one; the shape is what manifest-check.sh --brief-skeleton prints" < "$TMP/qb"
+check_route_refusal "KQ AC5 R2 a route with no - build: line is refused" "$KQ" 1 "the section carries 0 - build: lines, and takes exactly one; the shape is what manifest-check.sh --brief-skeleton prints, and nothing was appended" < "$TMP/qb"
 printf '## route\n- build: zCardFixture\n- brief: %s\n' "$QBRIEF" > "$TMP/qb"
-q_refuse "KQ AC5 R2 a route with no - unit: line is refused" "$KQ" 1 "the section carries no - unit: line; the shape is what manifest-check.sh --brief-skeleton prints" < "$TMP/qb"
-{ q_route TOOL-zCardFixture-10 "$QS10"; printf -- '- brief: %s\n' "$QBRIEF"; } > "$TMP/qb"
-q_refuse "KQ AC5 R2 a route with two - brief: lines is refused" "$KQ" 1 "the section carries 2 - brief: lines, and takes exactly one; the shape is what manifest-check.sh --brief-skeleton prints" < "$TMP/qb"
-{ q_route TOOL-zCardFixture-10 "$QS10"; printf -- '- note: a stray line\n'; } > "$TMP/qb"
-q_refuse "KQ AC5 R2 a stray line in a route is refused" "$KQ" 1 "line 5: - note: a stray line — a line outside the route grammar" < "$TMP/qb"
-{ q_route TOOL-zCardFixture-10 "$QS10"; q_route TOOL-zCardFixture-12 "$QS12"; } > "$TMP/qb"
-q_refuse "KQ AC5 R1 a body with two route sections is refused" "$KQ" 1 "route R1 REFUSED — the body carries 2 '## route' sections, and a card holds one; the shape is what manifest-check.sh --brief-skeleton prints" < "$TMP/qb"
+check_route_refusal "KQ AC5 R2 a route with no - unit: line is refused" "$KQ" 1 "the section carries no - unit: line; the shape is what manifest-check.sh --brief-skeleton prints" < "$TMP/qb"
+{ print_route_body TOOL-zCardFixture-10 "$QS10"; printf -- '- brief: %s\n' "$QBRIEF"; } > "$TMP/qb"
+check_route_refusal "KQ AC5 R2 a route with two - brief: lines is refused" "$KQ" 1 "the section carries 2 - brief: lines, and takes exactly one; the shape is what manifest-check.sh --brief-skeleton prints" < "$TMP/qb"
+{ print_route_body TOOL-zCardFixture-10 "$QS10"; printf -- '- note: a stray line\n'; } > "$TMP/qb"
+check_route_refusal "KQ AC5 R2 a stray line in a route is refused" "$KQ" 1 "line 5: - note: a stray line — a line outside the route grammar" < "$TMP/qb"
+{ print_route_body TOOL-zCardFixture-10 "$QS10"; print_route_body TOOL-zCardFixture-12 "$QS12"; } > "$TMP/qb"
+check_route_refusal "KQ AC5 R1 a body with two route sections is refused" "$KQ" 1 "route R1 REFUSED — the body carries 2 '## route' sections, and a card holds one; the shape is what manifest-check.sh --brief-skeleton prints" < "$TMP/qb"
 # AC7 — a real READY line and no `## task`; the K2 AC3 arm above keeps DEAD PROBE for a token-free one.
-{ printf '## open\n- `AGENTS.md:1`\n'; q_ready; } > "$TMP/qb"
-q_refuse "KQ AC7 a real READY body with no ## task section is refused" "$KQ" 1 "the body carries a real READY line and no '## task' section" < "$TMP/qb"
+{ printf '## open\n- `AGENTS.md:1`\n'; print_route_ready; } > "$TMP/qb"
+check_route_refusal "KQ AC7 a real READY body with no ## task section is refused" "$KQ" 1 "MANIFEST env ERROR — the body carries a real READY line and no '## task' section: a kickoff that left no scope does not land on the card, and nothing was appended" < "$TMP/qb"
 # AC8 — a route the tree cannot check: no MEMORY_ROOT, then a reader with no grammar (exit 3, as F1).
 # The memory-tree reader itself exits non-zero over a conf with no MEMORY_ROOT, which refuses before
 # the route rules run; R0's own words are reached in the tree that has neither, the reader hidden.
 cp "$CWT2/.memory-tree.conf" "$TMP/qconf"; sed -i '/^MEMORY_ROOT=/d' "$CWT2/.memory-tree.conf"
-q_route TOOL-zCardFixture-10 "$QS10" > "$TMP/qb"; q_refuse "KQ AC8 a route in a tree whose conf declares no MEMORY_ROOT exits 2" "$KQ" 2 "MANIFEST env ERROR — " < "$TMP/qb"
-q_reader="$CWT2/${READER_REL:-tools/memory-tree/corpus_ids.py}"; mv "$q_reader" "$q_reader.hid"
-q_refuse "KQ AC8 R0 ...and, with no id reader either, R0 names the missing MEMORY_ROOT" "$KQ" 2 "route R0: this tree's .memory-tree.conf declares no MEMORY_ROOT" < "$TMP/qb"
-mv "$q_reader.hid" "$q_reader"; cp "$TMP/qconf" "$CWT2/.memory-tree.conf"
+print_route_body TOOL-zCardFixture-10 "$QS10" > "$TMP/qb"; check_route_refusal "KQ AC8 a route in a tree whose conf declares no MEMORY_ROOT exits 2" "$KQ" 2 "MANIFEST env ERROR — " < "$TMP/qb"
+if [ -n "$READER_REL" ]; then
+  q_reader="$CWT2/$READER_REL"; mv "$q_reader" "$q_reader.hid"
+  check_route_refusal "KQ AC8 R0 ...and, with no id reader either, R0 names the missing MEMORY_ROOT" "$KQ" 2 "route R0: this tree's .memory-tree.conf declares no MEMORY_ROOT" < "$TMP/qb"
+  mv "$q_reader.hid" "$q_reader"
+else
+  echo "skip KQ AC8 R0 with no id reader — gov resolved no id reader, so there is none to hide and R0's MEMORY_ROOT words go unexercised"
+fi
+cp "$TMP/qconf" "$CWT2/.memory-tree.conf"
 mv "$CWT2/$RECALL_REL/extract.py" "$CWT2/$RECALL_REL/extract.py.hid"
-q_refuse "KQ AC8 R0 a route whose id reader exits 3 exits 2" "$KQ" 2 "route R0: no defined-id set" < "$TMP/qb"
+check_route_refusal "KQ AC8 R0 a route whose id reader exits 3 exits 2" "$KQ" 2 "route R0: no defined-id set" < "$TMP/qb"
 grep -q '^NOTE: id citations unchecked' "$CARD_OUT" && { echo "ok   KQ AC8 liveness: the reader took its exit-3 branch"; pass=$((pass+1)); } \
   || { echo "FAIL KQ AC8 liveness: the reader took its exit-3 branch"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 mv "$CWT2/$RECALL_REL/extract.py.hid" "$CWT2/$RECALL_REL/extract.py"
@@ -1352,7 +1373,7 @@ mv "$CWT2/$RECALL_REL/extract.py.hid" "$CWT2/$RECALL_REL/extract.py"
 KQ6="$NONCE-kq6"
 run_card "KQ AC6 setup: a fresh card with the sentinel" "$CWT2" 0 - --card --write --session "$KQ6"
 cp "$CARD_HOME/$KQ6.md" "$TMP/$KQ6.before"
-q_route TOOL-zCardFixture-10 "$QS10" > "$TMP/qb"; q_refuse "KQ AC6 R6 a route on a card still reading READY — none yet is refused" "$KQ6" 1 "route R6 REFUSED — the card still reads READY — none yet: no kickoff has appended to it" < "$TMP/qb"
+print_route_body TOOL-zCardFixture-10 "$QS10" > "$TMP/qb"; check_route_refusal "KQ AC6 R6 a route on a card still reading READY — none yet is refused" "$KQ6" 1 "route R6 REFUSED — the card still reads READY — none yet: no kickoff has appended to it" < "$TMP/qb"
 
 # S1 — a tree without the memory-tree kit: the id half announces its skip, and a startup card with
 # no path citation is DEAD PROBE on --check.

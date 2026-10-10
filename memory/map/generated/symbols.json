@@ -4113,6 +4113,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "check_route_refusal",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
       "id": "check_routed",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -4299,6 +4304,11 @@
     },
     {
       "id": "check_stderr",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "check_sub_context",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
     },
@@ -7518,11 +7528,6 @@
       "file": "tools/govkit/selftest.py"
     },
     {
-      "id": "grade_sub",
-      "kind": "function",
-      "file": "tools/hooks/scratch-guard.test.sh"
-    },
-    {
       "id": "grammar",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -10248,6 +10253,16 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_route_body",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "print_route_ready",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
       "id": "print_scaffold_recipe",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -10396,26 +10411,6 @@
       "id": "python_symbols",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
-    },
-    {
-      "id": "q_append",
-      "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.test.sh"
-    },
-    {
-      "id": "q_ready",
-      "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.test.sh"
-    },
-    {
-      "id": "q_refuse",
-      "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.test.sh"
-    },
-    {
-      "id": "q_route",
-      "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
       "id": "qid_exists",
@@ -14365,6 +14360,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
@@ -14866,6 +14866,11 @@
       "id": "resolve_python",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
     },
     {
       "id": "resolve_python",
@@ -16263,6 +16268,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
+      "id": "run_route_append",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
       "id": "run_row",
       "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
@@ -16374,6 +16384,11 @@
     },
     {
       "id": "run_sub",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "run_sub_hook",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
     },
@@ -17646,11 +17661,6 @@
       "id": "structure_identity",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
-    },
-    {
-      "id": "sub_hook",
-      "kind": "function",
-      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "subtokens",

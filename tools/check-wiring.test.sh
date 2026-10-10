@@ -455,12 +455,33 @@ JSON
   out=$(HOME="$SGHOME" chk --check)
   ck "RQ5 AC7 a wired gate and NO conf -> UNWIRED routed naming the absent conf" \
      "$(printf '%s' "$out" | grep -q '^UNWIRED  routed    — .*no .memory-tree.conf' && echo 1 || echo 0)"
+  # TOOL-aRoutedQuill-12 AC4 — with no conf the gate's witness admits every write, and the line says so.
+  ck "RQ12 AC4 ...and says the write gate admits every write here, never that it refuses" \
+     "$(printf '%s' "$out" | grep '^UNWIRED  routed ' | grep -q 'the write gate admits every write here' \
+        && ! printf '%s' "$out" | grep -q 'every product write refuses' && echo 1 || echo 0)"
+  # TOOL-aRoutedQuill-12 AC10 — an entry UNDER MEMORY_ROOT covers it: the gate's two-way verdict, read
+  # through TOOL-aRoutedQuill-11's call, so the checker follows with no containment loop of its own.
+  printf 'MEMORY_ROOT=memory\nROUTED_PATHS="%s"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' '.githooks/ memory/builds/' > .memory-tree.conf
+  ck "RQ12 AC10 an entry under MEMORY_ROOT -> UNWIRED routed naming it as covering MEMORY_ROOT" \
+     "$(HOME="$SGHOME" chk --check | grep -q '^UNWIRED  routed    — ROUTED_PATHS entry memory/builds/ covers MEMORY_ROOT' && echo 1 || echo 0)"
+  rm -f .memory-tree.conf
 
   # TOOL-aRoutedQuill-5 AC9 — the gate wired, and no /session-kickoff on this machine: the gate's own
   # refusal names that skill as its remedy, so this is UNWIRED, not the skip it is everywhere else.
   _nohome=$(mktemp -d)
   ck "RQ5 AC9 a wired gate on a machine without the skill -> UNWIRED skill naming the runbook" \
      "$(HOME="$_nohome" chk --check | grep -q '^UNWIRED  skill     — .*WIRE-INTO-PROJECT.md §1' && echo 1 || echo 0)"
+  # TOOL-aRoutedQuill-12 AC3 — the marker on the Bash-only command guard and the SubagentStart context
+  # gates no write: neither the routed nor the skill arm may call that the wired write gate.
+  cp .claude/settings.json "$_nohome/settings.keep"
+  printf '{"hooks": {"PreToolUse": [{"matcher": "Bash|PowerShell", "hooks": [{"type": "command", "command": "node \\"${CLAUDE_PROJECT_DIR}/%s%s/scratch-guard.js\\""}]}], "SubagentStart": [{"matcher": "*", "hooks": [{"type": "command", "command": "node \\"${CLAUDE_PROJECT_DIR}/%s%s/scratch-guard.js\\""}]}]}}\n' \
+    "$KP" "$HOOKS" "$KP" "$HOOKS" > .claude/settings.json
+  out=$(HOME="$_nohome" chk --check)
+  ck "RQ12 AC3 the marker only on Bash|PowerShell and SubagentStart -> no UNWIRED routed and no UNWIRED skill" \
+     "$(printf '%s' "$out" | grep -q '^UNWIRED  \(routed\|skill\) ' && echo 0 || echo 1)"
+  ck "RQ12 AC3 LIVENESS ...and the routed arm still ran, reading a skip" \
+     "$(printf '%s' "$out" | grep -q '^skip     routed ' && echo 1 || echo 0)"
+  cp "$_nohome/settings.keep" .claude/settings.json
   rm -rf "$_nohome"
 
   # TOOL-aRoutedQuill-5 AC8 — EVERY fragment the hooks kit ships, each on its own event. The second

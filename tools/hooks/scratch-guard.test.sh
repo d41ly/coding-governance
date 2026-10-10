@@ -872,6 +872,59 @@ rmdir "$SG_CONF"; write_conf "$SGP/ app.md"
 run_write "W-AC7 agent_id with the parent's session_id, buildable route -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT" agent_id=sub-1
 run_write "W-AC7 agent_id with the parent's session_id, unrouted card -> deny" 2 "any;;## route" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1
 
+# ---- TOOL-aRoutedQuill-12: the H1 and depth reads R4 makes, every refusal reason, a junction, the --
+# ---- two-way MEMORY_ROOT test and the fail-closed catch -------------------------------------------
+# AC13 — the H1 read is R4's: the first UNFENCED `#` line, its token stripped of `*`, backticks and
+# trailing `:.,;`. Each spelling below was refused by the raw-token read.
+printf '# TOOL-x-11: title\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-x-11.md"
+printf '# **TOOL-x-12** — title\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-x-12.md"
+printf '```\n# TOOL-y-1\n```\n# TOOL-x-14 — title\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-x-14.md"
+for sg_u in 11 12 14; do
+  write_route_card "sgtest-h$sg_u" write "TOOL-x-$sg_u=$SG_SPECS/2026-10-09-spec-TOOL-x-$sg_u.md"
+  run_write "W-RQ12 AC13 the H1 spelling of TOOL-x-$sg_u reads as the unit -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id="sgtest-h$sg_u" "cwd=$SG_CWD_WT"
+done
+# AC15 — a spec at any depth under the build's spec folder.
+write_spec "$SG_SPECS/units/2026-10-09-spec-TOOL-x-15.md" TOOL-x-15 INPROGRESS Tier-2
+write_route_card sgtest-h15 write "TOOL-x-15=$SG_SPECS/units/2026-10-09-spec-TOOL-x-15.md"
+run_write "W-RQ12 AC15 a spec one folder below the spec folder -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-h15 "cwd=$SG_CWD_WT"
+# AC17 — every buildable verdict this suite had not driven, one arm each.
+write_spec "$SG_SPECS/2026-10-09-spec-TOOL-x-13.md" TOOL-x-13 INPROGRESS Tier-1
+write_route_card sgtest-h13 write "TOOL-x-13=$SG_SPECS/2026-10-09-spec-TOOL-x-13.md"
+run_write "W-RQ12 AC17 Tier-1 at INPROGRESS -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-h13 "cwd=$SG_CWD_WT"
+printf '# TOOL-x-16 — no tier\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-x-16.md"
+write_route_card sgtest-h16 write "TOOL-x-16=$SG_SPECS/2026-10-09-spec-TOOL-x-16.md"
+run_write "W-RQ12 AC17 a spec with no Tier cell -> deny naming the missing tier" 2 "any;;TOOL-x-16;;names no Tier-1 or Tier-2" Write "$SG_T" session_id=sgtest-h16 "cwd=$SG_CWD_WT"
+write_route_card sgtest-h17 write "TOOL-x-1=/$SG_SPECS/2026-10-09-spec-TOOL-x-1.md"
+run_write "W-RQ12 AC17 an absolute spec path -> deny naming it not repo-relative" 2 "any;;TOOL-x-1;;is not a repo-relative path" Write "$SG_T" session_id=sgtest-h17 "cwd=$SG_CWD_WT"
+write_card sgtest-h18 "$SG_TOP_WT" write "$SG_READY"
+printf '## route\n- unit: TOOL-x-1 · spec %s/2026-10-09-spec-TOOL-x-1.md\n' "$SG_SPECS" >> "$SG_CARDS/sgtest-h18.md"
+run_write "W-RQ12 AC17 a route with no - build: line -> deny naming it" 2 "any;;TOOL-x-1;;names no - build: line" Write "$SG_T" session_id=sgtest-h18 "cwd=$SG_CWD_WT"
+write_card sgtest-h19 "$SG_TOP_WT" write "$SG_READY"
+printf '## route\n- build: bx\n- unit: TOOL-x-1\n' >> "$SG_CARDS/sgtest-h19.md"
+run_write "W-RQ12 AC17 a unit line with no spec -> deny naming it" 2 "any;;TOOL-x-1;;the route line names no spec" Write "$SG_T" session_id=sgtest-h19 "cwd=$SG_CWD_WT"
+# AC8 — an entry UNDER MEMORY_ROOT covers it, as surely as one above it.
+write_conf "$SGP/ mem/builds/"
+run_write "W-RQ12 AC8 an entry under MEMORY_ROOT -> deny naming UNARMED and the entry" 2 "any;;UNARMED;;mem/builds/ covers MEMORY_ROOT" Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+write_conf "$SGP/ app.md"
+# AC5 — a product file reached through a junction (a symlink off Windows) is gated like its repository
+# spelling. The link sits outside every repository, so a lexical walk finds no `.git` and admits.
+sg_link="$TMP/sglink"; mkdir -p "$SGWT/$SGP"
+if node -e 'require("fs").symlinkSync(process.argv[1], process.argv[2], "junction")' "$SGWT/$SGP" "$sg_link" 2>"$TMP/err"; then
+  SG_LINK=$(node -p 'require("path").resolve(process.argv[1])' "$sg_link")   # the LINK's spelling; a cd would resolve it
+  run_write "W-RQ12 AC5 the product path through a junction, unrouted card -> deny" 2 "any;;## route" Write "$SG_LINK/a.js" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+  run_write "W-RQ12 AC5 LIVENESS ...and through the repository spelling -> deny" 2 "any;;## route" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+else
+  echo "FAIL W-RQ12 AC5 no junction could be made at $sg_link:"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+fi
+# AC18 — a throw inside checkRouted fails CLOSED. Staged from OUTSIDE the hook: a preloaded stub makes
+# every read of a `.git` path throw, which the linked worktree's `.git` FILE read reaches.
+printf '%s\n' 'const fs = require("fs"); const r = fs.readFileSync' \
+  'fs.readFileSync = function (p, ...a) { if (/[\\/]\.git$/.test(String(p))) throw new Error("stub: the .git read throws"); return r.call(this, p, ...a) }' > "$TMP/sgthrow.js"
+printf '{"tool_name":"Edit","tool_input":{"file_path":"%s"},"session_id":"sgtest-r1","cwd":"%s"}' "$(printf '%s' "$SG_T" | sed 's/\\/\\\\/g')" "$(printf '%s' "$SG_CWD_WT" | sed 's/\\/\\\\/g')" \
+  | HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= CLAUDE_PROJECT_DIR="$SG_PROJECT" \
+    node -r "$TMP/sgthrow.js" "$HOOK" >/dev/null 2>"$TMP/err"
+check_stderr "W-RQ12 AC18 a throw inside checkRouted -> exit 2, failing closed" 2 "$?" "any;;fails closed"
+
 # ---- AC10: readConfKey reads every spelling as the shell does -------------------------------------
 # read_conf <name> <want> <bytes> <key> — `<null>` is the absent-assignment answer.
 read_conf() {
@@ -896,10 +949,10 @@ read_conf "W-AC10 the key is compared as a string, never a regex: K.Y does not r
 # arms are their near-misses. The session directory is the linked worktree, whose toplevel holds
 # the conf, and its card is read from the shared common dir exactly as the gate reads it.
 SG_PROJECT="$SG_CWD_WT"
-# sub_hook <payload> — the hook on a SubagentStart payload: stdout to $TMP/out, stderr to $TMP/err.
+# run_sub_hook <payload> — the hook on a SubagentStart payload: stdout to $TMP/out, stderr to $TMP/err.
 # CLAUDE_PROJECT_DIR is UNSET, not blank, when SG_PROJECT is empty; `env -u` precedes every
 # assignment because GNU env refuses it after one.
-sub_hook() {
+run_sub_hook() {
   if [ -n "$SG_PROJECT" ]; then
     printf '%s' "$1" | env -u CLAUDE_PROJECT_DIR CLAUDE_PROJECT_DIR="$SG_PROJECT" HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
       node "$HOOK" >"$TMP/out" 2>"$TMP/err"
@@ -908,10 +961,10 @@ sub_hook() {
       node "$HOOK" >"$TMP/out" 2>"$TMP/err"
   fi
 }
-# grade_sub <name> <exit> <expect> — `empty`: exit 0, stdout and stderr byte-empty; `json`: exit 0,
+# check_sub_context <name> <exit> <expect> — `empty`: exit 0, stdout and stderr byte-empty; `json`: exit 0,
 # stderr byte-empty, stdout ONE object whose hookSpecificOutput.hookEventName is SubagentStart, its
 # additionalContext written to $TMP/ctx and appended to $TMP/ctx-all for the AC4 scan.
-grade_sub() {
+check_sub_context() {
   local name=$1 got=$2 expect=$3 bad=""
   : > "$TMP/ctx"
   if [ "$got" != 0 ]; then bad="exit $got, want 0"
@@ -930,8 +983,8 @@ run_sub() {
   local name=$1 expect=$2 payload; shift 2
   payload=$("$TESTPY" -c 'import json,sys; d={"hook_event_name":"SubagentStart","agent_id":"sub-1","agent_type":"general-purpose"}; d.update(kv.split("=",1) for kv in sys.argv[1:]); print(json.dumps(d))' "$@")
   case "$payload" in *'"SubagentStart"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
-  sub_hook "$payload"
-  grade_sub "$name" "$?" "$expect"
+  run_sub_hook "$payload"
+  check_sub_context "$name" "$?" "$expect"
 }
 # check_ctx <name> <mode> <needle>... over $TMP/ctx — `lines`: each needle is a WHOLE line of it;
 # `one`: it is exactly one line and carries each needle; `has`: it carries each needle. Byte
@@ -1033,8 +1086,8 @@ esac
 
 # ---- AC7: the branch never surfaces an error: a cwd that is not a string, no CLAUDE_PROJECT_DIR --
 SG_PROJECT=""
-sub_hook '{"hook_event_name":"SubagentStart","session_id":"sgtest-r1","cwd":5,"agent_id":"sub-1"}'
-grade_sub "S-AC7 a numeric cwd and no CLAUDE_PROJECT_DIR -> exit 0, stdout and stderr EMPTY" "$?" empty
+run_sub_hook '{"hook_event_name":"SubagentStart","session_id":"sgtest-r1","cwd":5,"agent_id":"sub-1"}'
+check_sub_context "S-AC7 a numeric cwd and no CLAUDE_PROJECT_DIR -> exit 0, stdout and stderr EMPTY" "$?" empty
 SG_PROJECT="$SG_CWD_FIX"
 
 n=$((pass+fail))

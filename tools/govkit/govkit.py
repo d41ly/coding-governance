@@ -2739,6 +2739,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         # liveness assertion — held off every bar while this file reported them running.
         manifest_chunk = {leg.get("name"): leg.get("chunk") for leg in _legs_json}
         manifest_doc_reads = {leg.get("name"): leg.get("doc_reads") for leg in _legs_json}
+        manifest_impure = {leg.get("name"): leg.get("impure") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             for leg in d.get("gate_leg", []):
@@ -2806,6 +2807,14 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                                f"<prefix>/gate-legs.json says {_m!r} — the descriptor and the "
                                f"manifest disagree about which doc paths this leg reads, so a doc-only "
                                f"push skips it in one tree and runs it in the other")
+                    # AND ABOUT IMPURITY (TOOL-aRoutedQuill-12 S5), presence included: the row builder
+                    # copies a descriptor's `impure` into a target, so a manifest row carrying it that
+                    # its kit leg lacks ships a leg whose verdict a target's runner may cache on a tree.
+                    if leg.get("impure") != manifest_impure.get(nm):
+                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with impure "
+                               f"{leg.get('impure')!r} while <prefix>/gate-legs.json says "
+                               f"{manifest_impure.get(nm)!r} — the descriptor and the manifest "
+                               f"disagree about whether a verdict cached on a tree may be reused")
                 # AC1b: a name that travels. A digit inside a parenthetical is a COUNT, and a count
                 # in a leg name goes stale exactly where nobody is reading — in somebody else's repo.
                 if re.search(r"\([^)]*\d[^)]*\)", nm):
@@ -4080,6 +4089,11 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 row = {"name": nm, "argv": argv}
                 if check_target_reads_subject(target, deploy, descs):
                     row["subject"] = leg.get("subject") or "repo"
+                    # IMPURE TRAVELS under the same reader check (TOOL-aRoutedQuill-12 S5): the
+                    # run-gates canary has carried the key since run-gates 1.0, so a runner that
+                    # reads `subject` reads it too, and a leg graded on the commit graph is not cached.
+                    if leg.get("impure"):
+                        row["impure"] = leg["impure"]
                 if guards:
                     row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
                 # DOC READS TRAVEL, all or nothing, and only into a runner that reads them: below

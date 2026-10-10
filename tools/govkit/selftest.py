@@ -5603,6 +5603,36 @@ user_skills = "/tmp/gk-fake-skills"
         check("D4: and the adopter's doc_reads is kept, not overwritten",
               _kvb.get("doc_reads") == ["memory/"], str(_kvb))
 
+        # ---- RQ12 AC6 (TOOL-aRoutedQuill-12 S5): `impure` TRAVELS, INSTALLED -----------------------
+        # The routed-commits leg grades the commit graph, so a target row without `impure` is a leg a
+        # runner may cache on a tree. Applied for real into D4's runner shape, whose runner carries no
+        # run-gates install, so the reader check that admits `subject` admits `impure` beside it.
+        _d6 = tmp / "impure-install"
+        (_d6 / PFX).mkdir(parents=True, exist_ok=True)
+        (_d6 / ".governance").mkdir(exist_ok=True)
+        (_d6 / PFX / "legs.json").write_text(
+            json.dumps([{"name": "control", "argv": ["true"]}], indent=2) + "\n",
+            encoding="utf-8", newline="\n")
+        (_d6 / PFX / "runner.sh").write_text('echo "GATE ok    control"\n', encoding="utf-8", newline="\n")
+        (_d6 / ".governance" / "deploy.toml").write_text(
+            DEPLOY_FULL +
+            f'\n[gate_runner]\nkind = "manifest"\nfile = "{PFX}legs.json"\n'
+            'grammar = "json-array"\ndedupe_key = "name"\n'
+            f'command = ["bash", "{PFX}runner.sh"]\n'
+            'run_all_env = { GATE_FULL = "1" }\n'
+            'observed_ran = ["GATE ok    {name}"]\n'
+            'observed_failed = ["GATE FAIL  {name}"]\n',
+            encoding="utf-8", newline="\n")
+        git(_d6, "init", "-q", "-b", "main"); git(_d6, "config", "user.email", "t@e")
+        git(_d6, "config", "user.name", "t"); git(_d6, "config", "core.autocrlf", "false")
+        git(_d6, "add", "-A"); git(_d6, "commit", "-qm", "b")
+        _p6 = run("apply", "--target", str(_d6), "--kits", "memory-tree")
+        _rows6 = json.loads((_d6 / PFX / "legs.json").read_text(encoding="utf-8"))
+        _rc6 = next((r for r in _rows6 if r.get("name") == "routed commits name a specced unit"), None)
+        check("RQ12 AC6: the applied routed-commits row carries the impure its descriptor declares",
+              _rc6 is not None and bool(_rc6.get("impure")) and _rc6.get("subject") == "repo",
+              str(_rc6) + _p6.stdout[-600:] + _p6.stderr[-300:])
+
         # AC5 — the header says what the check does NOT decide, in the generated file itself, where
         # a reader who found the pin will actually be looking.
         run_in_gov(rg, "selfcheck", "--write")

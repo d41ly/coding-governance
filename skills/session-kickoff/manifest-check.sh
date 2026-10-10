@@ -463,10 +463,14 @@ derive_head_state() {   # → HEAD_BRANCH HEAD_SHA HEAD_DIRTY, read once by the 
 }
 # The memory tree's root, the one read of `MEMORY_ROOT` in this script: the `live —` cell and the
 # route rules both call it. Prints the value, empty when the conf declares none; returns 1 when the
-# tree has no `.memory-tree.conf` at all, so a caller can tell the two apart.
+# tree has no `.memory-tree.conf` at all, so a caller can tell the two apart. The conf is SOURCED in a
+# subshell, as `derive_routed_candidate` in the memory-tree adopter does, so an exported, quoted,
+# commented or twice-assigned spelling reads as the value bash gives it (TOOL-aRoutedQuill-12 S1).
 read_memory_root() {
+  local v
   [ -f "$ROOT/.memory-tree.conf" ] || return 1
-  sed -n 's/^MEMORY_ROOT=[[:space:]]*//p' "$ROOT/.memory-tree.conf" | head -1 | tr -d '\r"'"'"
+  v=$( set +u; unset MEMORY_ROOT; . "$ROOT/.memory-tree.conf" >/dev/null 2>&1; printf '%s' "${MEMORY_ROOT-}" )
+  printf '%s' "${v%$'\r'}"
 }
 render_card() {
   local verb="$1" registry="" memroot live
@@ -954,19 +958,19 @@ CARD_READY_RE='^\(- \)\{0,1\}READY — '
 # asked at write time), or that the owner said go — existence and pairing only.
 CARD_ROUTE=0
 check_card_route() {
-  local body="$1" nready="$2" n memroot verdict rule ln line why where=""
+  local body="$1" nready="$2" n memroot verdict rule ln line why where="" self=${0##*/}
   CARD_ROUTE=0
-  n=$(grep -c '^## route$' "$body"); n=${n:-0}
+  n=$(grep -c '^[[:space:]]*## route[[:space:]]*$' "$body"); n=${n:-0}
   [ "$n" -gt 0 ] || return 0
   CARD_ROUTE=1
   memroot=$(read_memory_root) || memroot=""
   [ -n "$memroot" ] || { echo "MANIFEST env ERROR — route R0: this tree's .memory-tree.conf declares no MEMORY_ROOT (or there is no conf), so the route's build folder cannot be checked; nothing was appended"; exit 2; }
   [ -n "$CARD_ID_ERE" ] || { echo "MANIFEST env ERROR — route R0: no defined-id set, because the id reader is absent or could not read the grammar, so the route's unit ids cannot be checked; nothing was appended"; exit 2; }
-  [ "$n" = 1 ] || { echo "MANIFEST route R1 REFUSED — the body carries $n '## route' sections, and a card holds one; the shape is what ${0##*/} --brief-skeleton prints, and nothing was appended"; exit 1; }
+  [ "$n" = 1 ] || { echo "MANIFEST route R1 REFUSED — the body carries $n '## route' sections, and a card holds one; the shape is what $self --brief-skeleton prints, and nothing was appended"; exit 1; }
   verdict=$(LC_ALL=C awk -v mr="$memroot" -v root="$ROOT" -v idf="$CARD_TMP/ids" -v trf="$CARD_TMP/tracked" '
     BEGIN { while ((getline l < idf) > 0) I[l] = 1; while ((getline l < trf) > 0) T[l] = 1 }
     function out(r, n, s, w) { gsub(/\t/, " ", s); if (!done) printf "%s\t%s\t%s\t%s\n", r, n, s, w; done = 1 }
-    /^## route$/ { inr = 1; at = NR; next }
+    /^[[:space:]]*## route[[:space:]]*$/ { inr = 1; at = NR; next }
     inr && (/^## / || /^(- )?READY — /) { inr = 0 }
     !inr || done || /^[ \t]*$/ { next }
     index($0, "`") { out("R2", NR, $0, "a route line carries no backticks"); next }
@@ -1007,7 +1011,7 @@ check_card_route() {
   [ -n "$verdict" ] || return 0
   IFS=$'\t' read -r rule ln line why <<<"$verdict"
   [ "$ln" = - ] || where="line $ln: $line — "
-  echo "MANIFEST route $rule REFUSED — $where$why; the shape is what ${0##*/} --brief-skeleton prints, and nothing was appended"
+  echo "MANIFEST route $rule REFUSED — $where$why; the shape is what $self --brief-skeleton prints, and nothing was appended"
   exit 1
 }
 
@@ -1051,7 +1055,7 @@ add_card_body() {
     # A body carrying a route takes the stored route section's place, so a card holds at most one.
     grep -v "$CARD_READY_RE" "$CARD_TMP/tail" > "$CARD_TMP/kept"
     if [ "$CARD_ROUTE" = 1 ]; then
-      awk '/^## route$/ { skip = 1; next } skip && /^## / { skip = 0 } !skip' "$CARD_TMP/kept" > "$CARD_TMP/kept.x" && mv "$CARD_TMP/kept.x" "$CARD_TMP/kept"
+      awk '/^[[:space:]]*## route[[:space:]]*$/ { skip = 1; next } skip && /^## / { skip = 0 } !skip' "$CARD_TMP/kept" > "$CARD_TMP/kept.x" && mv "$CARD_TMP/kept.x" "$CARD_TMP/kept"
     fi
     { cat "$CARD_TMP/startup"; cat "$CARD_TMP/kept"; cat "$CARD_TMP/annotated"; grep "$CARD_READY_RE" "$CARD_TMP/tail"; } > "$CARD_TMP/new"
   fi

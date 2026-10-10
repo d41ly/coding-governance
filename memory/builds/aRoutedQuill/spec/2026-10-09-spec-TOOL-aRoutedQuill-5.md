@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed
 
-**Status:** CLOSED · rev-5 · 2026-10-10 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 5 · ratified 2026-10-09
+**Status:** CLOSED · rev-6 · 2026-10-10 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 5 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
@@ -287,9 +287,9 @@ leaves all of it staged for the adopter to read before committing.
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit runbook parity` · `recall floor` · `recall floor arms` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `hook destinations (every declared hook path ships)` · `check-wiring self-test` · `transition-audit arms` · `straggler-guard arms` · `memory-hygiene self-test` · `memory hygiene` · `python resolver (behaviour + inline parity + idiom ban)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `harness arms (fail branches armed or pinned)` · `kickoff-manifest ratchet` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC2 AC4 · a registry whose default set gained an entry after the receipt's vintage, against an update that moves only claimed kits · none
+New arm: tools/govkit/selftest.py · covers AC1 AC2 · a registry whose default set gained an entry after the receipt's vintage, against an update that moves only claimed kits · none
 
-New arm: tools/govkit/matrix.py · covers AC3 · a default apply into the matrix's fresh shape, against the base registry that lands fragments unwired · none
+New arm: tools/govkit/matrix.py · covers AC3 AC4 · a default apply into the matrix's fresh shape, against the base registry that lands fragments unwired; and an install from an aged registry updated with `add_deploy_kits` staged out · none
 
 New arm: tools/check-wiring.test.sh · covers AC7 AC8 AC9 · a fixture conf with ROUTED_PATHS blank, a second unwired fragment, and an empty HOME · none
 
@@ -338,6 +338,9 @@ AC10 is a direct observation of the runbook and adds no arm.
   reds `check-agent-cap-restatement`, a conditional entry requiring it that no selection reaches. S1
   drops that entry's conditional mark so `--all` reaches it, and Files touched names its descriptor.
   The Inventory gains `add_deploy_kits`, S4's writer of a target's `deploy.toml` `kits` list.
+- rev-6 · 2026-10-10 · §7 · AC4's arm moves from the `selftest.py` line to the `matrix.py` line,
+  whose aged-install shape TOOL-aRoutedQuill-12 added; no selftest arm ever installed from an aged
+  registry, so the selftest line claimed a criterion it did not observe.
 
 ## 10. Reuse audit
 

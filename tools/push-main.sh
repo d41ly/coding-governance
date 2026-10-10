@@ -657,11 +657,14 @@ run_minter() {  # base · [head] -> 0 minted, clean or announced-skipped · 1 th
 # the way the deployer is found. No python, no kit or no attributed commit prints nothing, and the
 # mint then names no unit, which that leg reds exactly as it reds the range that owed the mint.
 read_mint_unit() {  # range -> the unit id on stdout, or nothing
-  local py dir
+  local py dir out
   py=$(resolve_python 2>/dev/null) || return 0
   dir=$(resolve_kit_dir "$py" memory-tree routed_commits.py "$self_dir" 2>/dev/null) || return 0
   [ -f "$top/$dir/routed_commits.py" ] || return 0
-  "$py" "$top/$dir/routed_commits.py" --newest-unit "$1" 2>/dev/null | head -n 1
+  # Output and status apart (TOOL-aRoutedQuill-12 S11): a refusal prints on stdout and exits 2, and
+  # piped straight into `head` its first line became the unit id.
+  out=$("$py" "$top/$dir/routed_commits.py" --newest-unit "$1" 2>/dev/null) || return 0
+  printf '%s\n' "$out" | head -n 1
 }
 
 # `--prepare`: merge THIS branch onto the advertised tip, in place, and move the branch to it.

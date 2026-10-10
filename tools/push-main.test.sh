@@ -738,4 +738,21 @@ else
   echo "  skip — 26 no govkit deployer, runlog kit or memory-tree kit beside this lander, so the mint-subject arm did not run"
 fi
 
+# 27 — TOOL-aRoutedQuill-12 AC16: a `--newest-unit` that REFUSES names no unit. Its refusal prints on
+# stdout and exits 2, so a helper piping it into `head` minted the refusal text as the unit id. The
+# helper runs cut from the lander, its python and kit resolvers stubbed to a shell stub.
+out27=$(
+  eval "$(sed -n '/^read_mint_unit() {/,/^}/p' "$lander")"
+  resolve_python() { echo bash; }
+  resolve_kit_dir() { echo k; }
+  top="$tmp/mint27"; self_dir="$top"; mkdir -p "$top/k"
+  printf 'echo "routed-commits REFUSED — x"; exit 2\n' > "$top/k/routed_commits.py"
+  printf 'refused=[%s]\n' "$(read_mint_unit HEAD~1..HEAD)"
+  printf 'echo TOOL-x-1; exit 0\n' > "$top/k/routed_commits.py"
+  printf 'named=[%s]\n' "$(read_mint_unit HEAD~1..HEAD)"
+)
+printf '%s\n' "$out27" | grep -qx 'refused=\[\]' && printf '%s\n' "$out27" | grep -qx 'named=\[TOOL-x-1\]' \
+  && ok "27 a refusing --newest-unit mints no unit, and an answering one mints its id" \
+  || bad "27 read_mint_unit kept a refusal or lost an answer: $out27"
+
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

@@ -7,5 +7,5 @@ memory/builds/aMendedLedger/spec/units/2026-08-10-spec-aMendedLedger-8-u9-driver
 memory/builds/aQuarriedLantern/spec/2026-08-03-spec-aQuarriedLantern-1.md	63810
 memory/builds/dPolishedVitrine/spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md	59692
 memory/guides/BUILD-METHOD.md	28351
-memory/guides/UNATTENDED-PROTOCOL.md	65692
+memory/guides/UNATTENDED-PROTOCOL.md	65842
 skills/session-kickoff/SKILL.md	18369

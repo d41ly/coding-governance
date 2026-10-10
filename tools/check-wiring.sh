@@ -1444,13 +1444,15 @@ check_ssh_keepalive() {
 # confirmed is a decision, not a fact this arm can measure — or that the leg is wired at all.
 check_routed() {
   local gated="" conf out rp cut e c why="" arm frag hookjs reason
-  [ -n "$(matchers_of scratch-guard.js 2>/dev/null)" ] && gated=yes
-  arm=$(first_of "$(resolve_receipt_path memory-tree adopt-memory-tree.sh)" "${KIT_REL:+$KIT_REL/}memory-tree/adopt-memory-tree.sh")
+  # GATED means a PreToolUse scratch-guard group fires on a WRITE tool (TOOL-aRoutedQuill-12 S3): the
+  # Bash-only command guard and the SubagentStart context carry the same marker and gate no write.
+  matchers_of scratch-guard.js '' PreToolUse 2>/dev/null | grep -qwE 'Edit|Write|MultiEdit|NotebookEdit' && gated=yes
+  arm=$(first_of "$(resolve_receipt_path memory-tree adopt-memory-tree.sh)" "$(resolve_kit_file memory-tree adopt-memory-tree.sh)")
   arm="bash ${arm:-<memory-tree kit>/adopt-memory-tree.sh} --arm-routing"
   conf=$(first_of .memory-tree.conf)
   if [ -z "$conf" ]; then
     if [ -n "$gated" ]; then
-      echo "UNWIRED  routed    — the write gate is wired here and there is no .memory-tree.conf, so ROUTED_PATHS is absent and every product write refuses. Fix: $arm"
+      echo "UNWIRED  routed    — the write gate is wired here and there is no .memory-tree.conf, so no conf arms it and the write gate admits every write here. Fix: $arm"
       unwired=$((unwired+1))
     else
       echo "skip     routed    — no .memory-tree.conf and no wired write gate here, so there is nothing to arm"
@@ -1544,7 +1546,7 @@ check_skill_install() {
     # TOOL-aRoutedQuill-5 S9. A GATED repository needs the skill: the write gate's refusal names
     # /session-kickoff as its remedy, so a gate wired on a machine without it refuses every product
     # write with a remedy nobody here can run. Everywhere else the absent install stays a skip.
-    if [ -n "$(matchers_of scratch-guard.js 2>/dev/null)" ]; then
+    if matchers_of scratch-guard.js '' PreToolUse 2>/dev/null | grep -qwE 'Edit|Write|MultiEdit|NotebookEdit'; then
       echo "UNWIRED  skill     — the write gate is wired here and /session-kickoff is not installed on this machine, so the gate's refusal names a remedy nobody here can run. Fix: link the skill per WIRE-INTO-PROJECT.md §1"
       unwired=$((unwired+1))
       return
