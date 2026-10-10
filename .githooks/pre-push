@@ -1520,9 +1520,9 @@ if [ "$bar_record" = other ]; then
 fi
 
 # A BAR RECORD IS A CANDIDATE FOR THE SCOPED PATH TOO (TOOL-aFrugalTurnstile-2 S3b, design §6 rev
-# D4/D11), so a bar that is not the runner has a candidate again. Read only when nothing above was
-# adopted, so it can turn a FULL decision scoped and never the reverse, and only here, once the bar is
-# vetted, because a record is compared with the bar this push runs. A STUB bar keeps today's decision:
+# D4/D11), so a bar that is not the runner has a candidate again. It can turn a FULL decision scoped
+# and never the reverse, and it is read only here, once the bar is vetted, because a record is compared
+# with the bar this push runs. A STUB bar keeps today's decision:
 # no record is ever written for one. The unattended in-place close commits its record on top of the
 # merge its bar graded, so that landing is not covered; it scopes from this record instead.
 # NEAREST ADOPTABLE GREEN WINS: among every candidate that passes the predicates, the one whose own sha
