@@ -1,12 +1,13 @@
 # TOOL-aFrugalTurnstile-8 — push-main starts the post-merge bar after a landing where it is declared
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 5
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
+| [2026-10-09-build-TOOL-aFrugalTurnstile-8-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-8-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
@@ -109,14 +110,16 @@ followed by the file test `check_merge_losses` uses, and the common dir from the
 
 ```bash
   log="$gcd/gate-post-merge-${tip:0:8}.log"
-  "${BASH:-bash}" "$top/$dir/post-merge.sh" "$tip" --remote "$remote" </dev/null >"$log" 2>&1 &
+  nohup "${BASH:-bash}" "$top/$dir/post-merge.sh" "$tip" --remote "$remote" </dev/null >"$log" 2>&1 &
   pid=$!
   winpid=$(cat "/proc/$pid/winpid" 2>/dev/null || true)
 ```
 
 All three descriptors are redirected because a backgrounded job that keeps the caller's stdout
 makes every `$(...)` capture of push-main wait for the job, and `disown` does not close the
-descriptor (memory note "A backgrounded job holds the caller's stdout"). The child's argv carries
+descriptor (memory note "A backgrounded job holds the caller's stdout"). `nohup` (rev-2) keeps a
+hangup sent to the lander's session from killing the child; `setsid` is not used because Git-Bash
+on node a ships none, measured 2026-10-10 by `command -v setsid`. The child's argv carries
 the absolute path under `$top`, which is a declared process-monitor root in any repo that adopts
 that kit, so the child is attributable by the kit's fence. `--remote "$remote"` hands the child the
 remote this lander resolved and pushed to, so the two cannot pick different remotes.
@@ -286,6 +289,9 @@ The close runs these. A pass runs only the §6 fixture.
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-10 · §4 "The start": the child is started under `nohup`. What disagreed: the build
+  ground asks for a child detached from the lander's session, and rev-1's bare `&` leaves it open to
+  a hangup; `setsid` is absent from Git-Bash on node a, so `nohup` is the portable form.
 
 ## 10. Reuse audit
 

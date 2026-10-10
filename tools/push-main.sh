@@ -31,6 +31,12 @@
 # this lander, which is every adopter, both paths say so in one line and land as before. What a mint
 # does NOT do: re-stamp the kickoff manifest, so a minted carrier on its watch line still reds C5.
 #
+# AFTER A LANDING (TOOL-aFrugalTurnstile-8). Both landing paths read `GATE_POST_MERGE` from the
+# gate-env file committed at the landed tip; `local` starts the run-gates kit's post-merge bar on that
+# tip, detached, and returns at once, logging to `<common-dir>/gate-post-merge-<sha8>.log` and
+# recording the start in `<common-dir>/gate-post-merge.start`; `ci` says remote CI owns it. What
+# this does NOT check: whether that bar ever finished, or what it published.
+#
 # WHY THE FLAGS EXIST — TOOL-dDerivedDocket-2. The attended path lands only from the primary tree
 # with the default branch checked out, and it pushes that branch, which every build on the node
 # shares. A run that is never on it therefore had to leave its own tree to land, and its landing
@@ -340,6 +346,74 @@ write_lander_marker() {  # -> 1 when the push landed but the record could not be
   if ! printf 'landed %s at %s by push-main bar %s %s %s\n' "$def" "$(git rev-parse HEAD)" "$bar" "$barpath" "$barblob" > "$_gcd/$lm"; then
     echo "push-main: pushed $def, but could not write the lander marker at $_gcd/$lm. The push SUCCEEDED and is not recorded." >&2
     return 1
+  fi
+  return 0
+}
+
+# THE POST-MERGE BAR, where the landed tip declares one (TOOL-aFrugalTurnstile-8, design D10). The
+# declaration is `GATE_POST_MERGE` in the gate-env file AS COMMITTED AT THE LANDED TIP, read by
+# `git show` and parsed by `read_policy_key`, a byte-identical copy of the pre-push hook's (the hook
+# ships verbatim and sources no kit; push-main.test.sh holds the pair). Never the working tree, never
+# R, never this environment: the bar that runs is the one the landed commit asks for.
+read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleaned; nothing when none assigns it
+  local line v="" hit=""
+  while IFS= read -r line || [ -n "$line" ]; do
+    line=${line%$'\r'}
+    case "$line" in "$2="*) v=${line#"$2="}; hit=1 ;; esac
+  done <<< "$1"
+  [ -n "$hit" ] || return 0
+  v=${v%%[[:space:]]#*}
+  while [ "${v% }" != "$v" ] || [ "${v%$'\t'}" != "$v" ]; do v=${v%?}; done
+  while [ "${v# }" != "$v" ]; do v=${v# }; done
+  case "$v" in
+    \"*\") v=${v#\"}; v=${v%\"} ;;
+    \'*\') v=${v#\'}; v=${v%\'} ;;
+  esac
+  printf '%s' "$v"
+}
+# `local` starts the run-gates kit's post-merge script on the landed tip, DETACHED: all three streams
+# redirected and under nohup, because a background job that keeps the lander's stdout makes every
+# `$(...)` capture of push-main wait for the whole bar. The start goes to stderr and to a key-per-line
+# record, `<common-dir>/gate-post-merge.start`; the log is per sha so a second landing cannot truncate
+# a bar still writing. `ci` and a value outside the set print one line and start nothing; undeclared
+# prints nothing. Always 0: the landing already happened, so a failure to start is a line, not a code.
+# WHAT THIS DOES NOT CHECK: whether the bar it started ever finished or published a verdict.
+run_post_merge() {  # -> 0 always; one stderr line whenever the landed tip declares anything
+  local tip blob pm py dir gcd log pid winpid
+  tip=$(git rev-parse HEAD 2>/dev/null) || return 0
+  blob=$(git show "$tip:.githooks/gate-env.sh" 2>/dev/null) || return 0
+  pm=$(read_policy_key "$blob" GATE_POST_MERGE)
+  case "$pm" in
+    '')    return 0 ;;
+    ci)    echo "push-main: post-merge bar — GATE_POST_MERGE=ci at ${tip:0:8}, so remote CI runs it; nothing started here." >&2
+           return 0 ;;
+    local) ;;
+    *)     echo "push-main: post-merge bar NOT started — GATE_POST_MERGE at ${tip:0:8} is '$pm', outside 'local ci'." >&2
+           return 0 ;;
+  esac
+  if ! py=$(resolve_python 2>/dev/null); then
+    echo "push-main: post-merge bar NOT started — no usable python launcher, so the run-gates kit could not be located. The landing stands." >&2
+    return 0
+  fi
+  # The FILE test, for check_merge_losses's reason: the resolver answers beside THIS script, `$top` is the cwd's.
+  if ! dir=$(resolve_kit_dir "$py" run-gates post-merge.sh "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/post-merge.sh" ]; then
+    echo "push-main: post-merge bar NOT started — no run-gates kit holding post-merge.sh beside this lander. The landing stands." >&2
+    return 0
+  fi
+  gcd=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || gcd=""
+  if [ -z "$gcd" ]; then
+    echo "push-main: post-merge bar NOT started — the git common dir could not be resolved. The landing stands." >&2
+    return 0
+  fi
+  log="$gcd/gate-post-merge-${tip:0:8}.log"
+  nohup "${BASH:-bash}" "$top/$dir/post-merge.sh" "$tip" --remote "$remote" </dev/null >"$log" 2>&1 &
+  pid=$!
+  winpid=$(cat "/proc/$pid/winpid" 2>/dev/null || true)
+  if printf 'sha\t%s\npid\t%s\nwinpid\t%s\nlog\t%s\nstarted\t%s\nby\tpush-main\n' \
+      "$tip" "$pid" "$winpid" "$log" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$gcd/gate-post-merge.start" 2>/dev/null; then
+    echo "push-main: post-merge bar started on ${tip:0:8} — pid $pid, log $log" >&2
+  else
+    echo "push-main: post-merge bar started on ${tip:0:8} — pid $pid, log $log; the start record could not be written." >&2
   fi
   return 0
 }
@@ -779,6 +853,7 @@ cmd_land() {
     rc=$?
     if [ "$rc" -eq 0 ]; then
       write_lander_marker || exit 1
+      run_post_merge
       cls=landed
     else
       cls=$(derive_push_failure)
@@ -903,6 +978,7 @@ while [ "$attempt" -le "$max" ]; do
   rc=$?
   if [ "$rc" -eq 0 ]; then
     write_lander_marker || exit 1
+    run_post_merge
     cls=landed
   else
     # The hook's verdict first, then a probe, then ancestry: derive_push_failure, shared with --land.

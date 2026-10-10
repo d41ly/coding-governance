@@ -11633,6 +11633,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "read_parser_slice",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
       "id": "read_pass_declarations",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -11693,6 +11698,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_pm_mark",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
       "id": "read_pm_remote",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -11711,6 +11721,11 @@
       "id": "read_pointer_target",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "read_policy_key",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "read_policy_key",
@@ -16048,9 +16063,19 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "run_pm_case",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
       "id": "run_pm_decide",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "run_post_merge",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "run_prefix_commit",

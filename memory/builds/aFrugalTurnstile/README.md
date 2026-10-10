@@ -87,11 +87,11 @@ ids TOOL-aFrugalTurnstile-11
 | [TOOL-aFrugalTurnstile-4 — lineage reuse: after a red, the boundary's full bar re-runs only failed and moved legs, and may stamp](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-10 |
 | [TOOL-aFrugalTurnstile-6 — `post-merge.sh` runs the full bar on a landed sha and publishes its verdict as a remote ref](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-6.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-7 — pre-push binds a post-merge red, and `--decide` prints the boundary's decision](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-7.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-09 |
-| [TOOL-aFrugalTurnstile-8 — push-main starts the post-merge bar after a landing where it is declared](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-8.md) | 5 | 2 | OPEN | rev-1 | 2026-10-09 |
+| [TOOL-aFrugalTurnstile-8 — push-main starts the post-merge bar after a landing where it is declared](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-8.md) | 5 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-aFrugalTurnstile-9 — the unattended close runs the boundary's decision where a post-merge bar is declared](spec/2026-10-09-spec-TOOL-aFrugalTurnstile-9.md) | 5 | 2 | OPEN | rev-2 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 15 bound to this build, across 3 record folder(s).
+Records: 16 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
