@@ -73,7 +73,7 @@ ids DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 DEPL-aBenched
 | [DEPL-aBenchedProbe-4 — regression arms for the keep rule, 7j4 and the 7h ceiling clause](spec/2026-10-09-spec-DEPL-aBenchedProbe-4.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-10 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 4 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

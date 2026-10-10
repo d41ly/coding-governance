@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-10-build-DEPL-aBenchedProbe-1-runlog-d8d21d0e.md](../build/2026-10-10-build-DEPL-aBenchedProbe-1-runlog-d8d21d0e.md) | journal | DEPL-aBenchedProbe-1 DEPL-aBenchedProbe-2 DEPL-aBenchedProbe-3 TOOL-aBenchedProbe-1 TOOL-aBenchedProbe-2 |
 | [2026-10-10-build-DEPL-aBenchedProbe-4-1-acceptance-ledger.md](../build/2026-10-10-build-DEPL-aBenchedProbe-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-DEPL-aBenchedProbe-3-1-spec-brief.md](../prompts/2026-10-09-prompt-DEPL-aBenchedProbe-3-1-spec-brief.md) | journal | DEPL-aBenchedProbe-3 |
 
