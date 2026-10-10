@@ -9,12 +9,22 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-aRoutedQuill-8=DEFERRED TOOL-aRoutedQuill-13=OPEN
+units-at-landing: TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-9
+hold-run: 
+hold-streak: 1 · at 7955316e
+resume-owed: none · owner
+held-at: 2026-10-10T05:04:21Z
+hold-reason: The close's bar is red only on drift-audit's shrink-only cutoff_keys_armed pin (34 against 31): this build arms three new cutoff keys, and moving the pin is the owner's call, parked in RUN.md. Every other red the bar found was fixed on the branch.
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
 parked-surfaced: yes
 keepalive-reaped: yes
-refreshed-at: db08af1b20360b826a73528c1f3b6c1596eb480b · park · 0 touching
+refreshed-at: db08af1b20360b826a73528c1f3b6c1596eb480b · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 31257756bb5d68bf5d074ffde4f02df1d01d312e
-phase: VERIFYING
+witness: 7955316e1c249d092f1711c183412a6237fa29f3
+phase: HELD
 may: none
 mode: slug
 run-branch: refs/heads/branch/unattended-arouted-quill-71b76b
@@ -108,3 +118,7 @@ base: 5a836bf0fc940029136b4b3fd57a87f35ff40f26
 2026-10-10T03:43:47Z dispatch · item 3a150ac1 TOOL-aRoutedQuill-12 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/check-wiring.sh tools/check-wiring.test.sh tools/memory-tree/routed_commits.py tools/memory-tree/kit.toml tools/unattended/kit.toml tools/memory-tree/.memory-tree.conf.example tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/matrix.py tools/push-main.sh tools/push-main.test.sh memory/project/unarmed-branches.txt tools/template-size-highwater.txt memory/builds/aRoutedQuill/README.md memory/builds/aRoutedQuill/spec/2026-10-09-spec-TOOL-aRoutedQuill-5.md memory/builds/aRoutedQuill/spec/2026-10-10-spec-TOOL-aRoutedQuill-12.md memory/builds/aRoutedQuill/build/2026-10-10-build-TOOL-aRoutedQuill-12-1-acceptance-ledger.md memory/map/generated/symbols.json memory/map/generated/inventories.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/ledger/2026-10.md
 
 2026-10-10T05:02:37Z decision · item The drift-audit leg reds: cutoff_keys_armed is 34 against its shrink-only pin of 31 (tools/drift-audit/drift_signals.py:346). This build arms three new cutoff keys, ROUTED_COMMIT_CUTOFF and SPEC_TIER1_CUTOFF in .memory-tree.conf and PROMPT_BRIEF_SKELETON_CUTOFF in .unattended.conf. Raise the pin to 34, or retire three older keys? · reason Options: (a) raise the pin 31 -> 34 in the same commit that lands, as the owner did for aQuotedBrief on 2026-10-09 (30 -> 31); (b) make three long-past cutoffs unconditional or merge them, which changes other kits' rules; (c) drop one of this build's keys, which would grade old specs or commits the owner ruled grandfathered. Refused: a shrink-only pin the run's own diff must move is an owner decision (UNATTENDED-STOPS.md section 15), and (b) and (c) reach outside this build's mandate.
+
+2026-10-10T05:04:30Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aRoutedQuill && bash tools/push-main.sh --land --slug aRoutedQuill && bash tools/unattended/unattended.sh --settle aRoutedQuill
+
+2026-10-10T05:04:30Z hold · item owner-decision · reason until owner · reaped f935a658 · resume none(owner)
