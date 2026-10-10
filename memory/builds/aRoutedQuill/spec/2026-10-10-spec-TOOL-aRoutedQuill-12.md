@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-10-prompt-TOOL-aRoutedQuill-12-build-brief.md](../prompts/2026-10-10-prompt-TOOL-aRoutedQuill-12-build-brief.md) | journal | — |
 | [2026-10-10-prompt-TOOL-aRoutedQuill-12-spec-brief.md](../prompts/2026-10-10-prompt-TOOL-aRoutedQuill-12-spec-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

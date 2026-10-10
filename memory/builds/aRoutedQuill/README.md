@@ -67,10 +67,10 @@ none
 | 7 | `PLAY-aRoutedQuill-1` | INPROGRESS | the charter's Definition of Ready requires a spec for every product-code unit |
 | 8 | `TOOL-aRoutedQuill-6` | DEFERRED | a routed-vs-raw trial on frozen clones of real repos |
 | 9 | `TOOL-aRoutedQuill-7` | CLOSED | the unattended prompt-brief check reads its sub-heads from the kickoff kit's skeleton |
-| 10 | `TOOL-aRoutedQuill-9` | MISSING | the routed-commits leg reads green in WHOLE mode at the landing tip, after every reconcile (closing review round 2's blocker) |
-| 11 | `TOOL-aRoutedQuill-10` | MISSING | the landing push grades the routed-commits leg as remote CI will, when it carries a merge of the remote tip (closing review H1) |
-| 12 | `TOOL-aRoutedQuill-11` | MISSING | check-wiring takes the routed armed-or-unarmed verdict from the write gate's own reader (closing review H2) |
-| 13 | `TOOL-aRoutedQuill-12` | MISSING | the closing review's mediums and lows, M1 to M9 and L1 to L7, batched into one unit |
+| 10 | `TOOL-aRoutedQuill-9` | SPECCED | the routed-commits leg reads green in WHOLE mode at the landing tip, after every reconcile (closing review round 2's blocker) |
+| 11 | `TOOL-aRoutedQuill-10` | SPECCED | the landing push grades the routed-commits leg as remote CI will, when it carries a merge of the remote tip (closing review H1) |
+| 12 | `TOOL-aRoutedQuill-11` | SPECCED | check-wiring takes the routed armed-or-unarmed verdict from the write gate's own reader (closing review H2) |
+| 13 | `TOOL-aRoutedQuill-12` | SPECCED | the closing review's mediums and lows, M1 to M9 and L1 to L7, batched into one unit |
 
 <!-- /roster:units -->
 
@@ -96,7 +96,7 @@ ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuil
 | [TOOL-aRoutedQuill-12 — the closing review's mediums and lows, and the bar reds this build's diff carries](spec/2026-10-10-spec-TOOL-aRoutedQuill-12.md) | 10 | 2 | SPECCED | rev-1 | 2026-10-10 |
 <!-- /gen:build-units -->
 
-Records: 24 bound to this build, across 4 record folder(s).
+Records: 28 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
