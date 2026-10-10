@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aLevelledCopy-9-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aLevelledCopy-9-1-acceptance-ledger.md) | journal | — |
+| [2026-10-10-build-DEPL-aLevelledCopy-1-runlog-9380159b.md](../build/2026-10-10-build-DEPL-aLevelledCopy-1-runlog-9380159b.md) | journal | DEPL-aLevelledCopy-1 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-7 TOOL-aLevelledCopy-8 |
 | [2026-10-09-prompt-TOOL-aLevelledCopy-7-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aLevelledCopy-7-1-spec-brief.md) | journal | TOOL-aLevelledCopy-7 TOOL-aLevelledCopy-8 |
 
 <!-- /gen:spec-records -->

@@ -170,6 +170,7 @@ Cite ids, never line numbers.
 | [TOOL-aLevelledCopy-21](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended driver selftest shard 8/8 red at 40a8b8c3 on… |
 | [TOOL-aLevelledCopy-22](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended gate selftest shard 1/8 red at 40a8b8c3 on… |
 | [TOOL-aLevelledCopy-23](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended-build self-test red at 40a8b8c3 on the daily… |
+| [TOOL-aLevelledCopy-24](../builds/aLevelledCopy/BACKLOG.md) | OPEN | HIGH | — | 2026-10-10 | inherited red: leg kickoff-manifest ratchet red at 76b9c451, introduced… |
 | [TOOL-aLexedStripper-3](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | STILL OPEN after TOOL-dMispairedQuote-1, which deliberately left this… |
 | [TOOL-aLexedStripper-4](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | STILL OPEN after TOOL-dMispairedQuote-1, which changed that function's… |
 | [TOOL-aLexedStripper-7](../builds/aLexedStripper/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-30 | scan_js_definitions in tools/codebase-map/map_lib.py strips BLOCK… |
