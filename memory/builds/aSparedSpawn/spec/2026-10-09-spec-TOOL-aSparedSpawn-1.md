@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-1 — the reuse key hashes what a dirty guarded file holds, and the toolchain it ran under
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -26,7 +26,8 @@ every later reuse unit builds on, so it lands first.
   dirty paths that still exist. Each row becomes `<XY> <blob-or-dash> <path>`. The walk is skipped on
   a clean tree. Observed by AC1, AC2 and AC6.
 - **S2** — `input_key`'s guarded branch (`run-gates.sh:2196-2215`) takes its dirt share from those
-  rows, selected with the guard's pathspec semantics (`p == g`, or `p` under `g` when `g` ends in `/`),
+  rows, selected with the guard's literal pathspec semantics (`p == g`, or `p` under the directory `g`
+  names, with or without its trailing `/`, which is the match the `ls-files -s` component makes),
   in place of the `grep -F` substring match over status lines. The `git ls-files -s` component is
   unchanged. Observed by AC1 and AC2.
 - **S3** — `gate-fingerprint.sh`'s WORKING-TREE form walks with `--untracked-files=all` in both of its
@@ -43,7 +44,9 @@ every later reuse unit builds on, so it lands first.
   - git: `git version` and `git config --get-regexp '^core\.(autocrlf|eol)$'`, two spawns per bar.
   - every other tool a leg names (`node` among them): its resolved location through `type -P`.
   - the environment the legs inherit, read after the runner's own unsets: the name and value of each
-    variable matching `GATE_* GOV_* *_PY GIT_* PYTHON* LC_* LANG TZ PATH`, sorted, except `GATE_REUSE`.
+    variable matching `GATE_* GOV_* *_PY GIT_* PYTHON* LC_* LANG TZ PATH`, sorted, except `GATE_REUSE` and
+    `GATE_TURNSTILE_HELD`, the lineage marker the runner itself exports with a per-run nonce before
+    the first key, which would make every key a miss.
 - **S5** — A source constant `REUSE_SCHEMA`, hashed into every key. A runner change that redefines
   what a reusable `ok` means bumps it, which misses every recorded row at once. Observed by AC5.
 - **S6** — `tools/run-gates/README.md`'s reuse section and its `gate-fingerprint.sh` row say what the
@@ -85,14 +88,16 @@ directory entry is skipped and the file's content never reaches the digest. The 
 digest (`input_key`'s else branch), so the same stale reuse reaches every unguarded leg.
 
 **The walk.** One `-z -uall` status at start feeds three readers: `TREE_CLEAN` (still "the listing is
-empty"; `-uall` cannot make an empty listing non-empty), the per-leg dirt slice, and nothing else.
+empty", and a walk that failed is not clean; `-uall` cannot make an empty listing non-empty), the
+per-leg dirt slice, and nothing else.
 Content is hashed at START, the same instant `FPRINT_START` is taken, so a file edited while a leg runs
 cannot give the earning row a key for bytes the leg did not read. A deleted path carries a dash for its
 blob; its absence is already in the `XY` field.
 
 **The digest** is one `git hash-object --stdin` over the S4 lines in a fixed order, held in a global
 and appended to each key's input as a fourth `---` section, after `REUSE_SCHEMA`. Excluding
-`GATE_REUSE` is what lets the earning run (unset) and the reusing run (set) agree; every other knob
+`GATE_REUSE` is what lets the earning run (unset) and the reusing run (set) agree, and excluding
+`GATE_TURNSTILE_HELD` is what lets any two runs agree, since its value carries this run's nonce; every other knob
 stays in, which makes the key over-sensitive on purpose — a width change is a cache miss, never a
 false hit.
 
@@ -176,6 +181,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-11 · S2, S4, the walk: the guard match is git's literal pathspec, so a directory guard without its slash still sees its dirt; `GATE_TURNSTILE_HELD` is excluded from the digest, since the runner exports a per-run nonce in it; a failed walk is not a clean tree.
 
 ## 10. Reuse audit
 
