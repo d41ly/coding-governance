@@ -250,8 +250,9 @@ at the merge bar is what guarantees. These layers instruct; the bar decides.
 `routed_commits.py` holds every non-merge commit committed on or after `ROUTED_COMMIT_CUTOFF` that
 touches `ROUTED_PATHS` to naming a unit, in its subject or a `Pass:` trailer, whose spec existed at
 its first parent: the push-time half of the write gate, which sees Edit and Write calls and nothing
-a shell or a hook-less run commits. It reads `GATE_PUSH_BASE` for its RANGE and widens to the whole
-history otherwise, and it shares the transition audit's git pin through `tree_lib.build_git_env`.
+a shell or a hook-less run commits. It reads `GATE_PUSH_BASE` for its RANGE, grades the whole history
+beside that range so a push sees the red remote CI would (`TOOL-aRoutedQuill-10`), widens to the
+whole history otherwise, and it shares the transition audit's git pin through `tree_lib.build_git_env`.
 The attended lander's mint names its unit through the leg's `--newest-unit` verb.
 
 ## Gaps

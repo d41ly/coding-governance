@@ -1,11 +1,12 @@
 # TOOL-aRoutedQuill-10 — the push boundary's routed-commits run grades the whole history beside the pushed range
 
-**Status:** INPROGRESS · rev-2 · 2026-10-10 · node a · Tier-2 · base e6585db4 · streams tooling · order 6 · ratified 2026-10-10
+**Status:** CLOSED · rev-2 · 2026-10-10 · node a · Tier-2 · base e6585db4 · streams tooling · order 6 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-10-build-TOOL-aRoutedQuill-10-1-acceptance-ledger.md](../build/2026-10-10-build-TOOL-aRoutedQuill-10-1-acceptance-ledger.md) | journal | — |
 | [2026-10-10-prompt-TOOL-aRoutedQuill-10-build-brief.md](../prompts/2026-10-10-prompt-TOOL-aRoutedQuill-10-build-brief.md) | journal | — |
 | [2026-10-10-prompt-TOOL-aRoutedQuill-10-spec-brief.md](../prompts/2026-10-10-prompt-TOOL-aRoutedQuill-10-spec-brief.md) | journal | — |
 

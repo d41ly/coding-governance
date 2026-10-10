@@ -463,6 +463,6 @@ LIVE_LANDED_UNCLOSED=""
 # a shallow clone refuses, so a CI checkout sets `fetch-depth: 0`.
 #   ROUTED_COMMIT_CUTOFF="2026-10-09"
 # ROUTED_COMMIT_WAIVED — landed commit shas (7 to 40 hex) the leg excuses, whitespace-separated. Read
-# only when it grades the WHOLE history; the push boundary grades the pushed range and reads none. A
-# listed sha that is not a violation reds as stale.
+# only when it grades the WHOLE history, which the push boundary grades beside the pushed range; the
+# pushed range itself reads none. A listed sha that is not a violation reds as stale.
 #   ROUTED_COMMIT_WAIVED=""

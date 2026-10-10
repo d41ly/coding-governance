@@ -12,9 +12,12 @@ must name a unit id whose spec existed at that commit's first parent.
 
 THE RANGE. `$GATE_PUSH_BASE..HEAD` (RANGE) when that variable is set, not all zeros, and names a
 commit in this clone — the pushed commits, at the pre-push hook. Otherwise all of HEAD's history
-(WHOLE), and the summary says why. An unresolvable value WIDENS and never narrows. RANGE reads no
-waiver, so at the push boundary nothing excuses a pushed commit; `ROUTED_COMMIT_WAIVED` is read in
-WHOLE mode only, and a listed sha that is not a violation there reds as stale.
+(WHOLE), and the summary says why. An unresolvable value WIDENS and never narrows. At a resolvable
+base the WHOLE history is graded BESIDE the range (TOOL-aRoutedQuill-10), because remote CI grades
+WHOLE and a red only CI sees must not land: a second summary line, `WHOLE beside RANGE`, and a
+`FAILED in WHOLE` list naming only shas the RANGE half did not. The RANGE half reads no waiver, so
+nothing excuses a pushed commit; `ROUTED_COMMIT_WAIVED` is read wherever WHOLE is graded, the push
+boundary's WHOLE half included, and a listed sha that is not a violation there reds as stale.
 
 ATTRIBUTION is the UNION of the ids among the subject's whole tokens and the ids a `Pass:` trailer
 names; `Pass: none` adds none and keeps the subject's. That deliberately differs from
@@ -226,7 +229,7 @@ def read_routed_commits(repo, rev_args: list) -> list:
 
 
 def check_routed_commits(repo, env) -> tuple:
-    """`(exit code, lines)`: grade the range (S1, S4, S5, S8, S9). Raises Refusal on S7."""
+    """`(exit code, lines)`: grade the range, and WHOLE beside a RANGE (S1, S4, S5, S8, S9). Raises Refusal on S7."""
     repo = pathlib.Path(repo)
     conf = load_conf(repo)
     if run_git(repo, "rev-parse", "--is-shallow-repository").decode("utf-8").strip() == "true":
@@ -239,65 +242,79 @@ def check_routed_commits(repo, env) -> tuple:
         raise Refusal(f"the id map is empty: {spec_count} spec file(s) are tracked under {memory_root}/builds/*/spec/ "
                       f"and no H1 defines an id over FAMILIES {' '.join(families)}")
     mode, rev_args, label = derive_commit_range(repo, env)
-    commits = read_routed_commits(repo, rev_args)
-    total = int(run_git(repo, "rev-list", "--count", *rev_args).decode("utf-8").strip())
-    if total != len(commits):
-        raise Refusal(f"the log pass parsed {len(commits)} commit(s) and `git rev-list --count` reports {total} "
-                      f"over the same range; a truncated stream is not a clean one")
+    # TOOL-aRoutedQuill-10: at a resolvable base the WHOLE history is graded BESIDE the pushed range,
+    # because remote CI grades WHOLE and a red only it sees must not land. The RANGE half reads no waiver.
+    populations = [(mode, rev_args, label, "")]
+    if mode == "RANGE":
+        populations.append(("WHOLE", ["HEAD"], "WHOLE beside RANGE (the history remote CI grades)", " WHOLE"))
     id_re = build_id_re(families)
-    merges = exempt = not_routed = graded = 0
-    violations, pending = [], []
-    for c in commits:
-        if len(c["parents"]) >= 2:
-            merges += 1
-        elif c["date"][:10] < cutoff:
-            exempt += 1
-        elif not any(test_routed_path(p, entries) for p in c["paths"]):
-            not_routed += 1
-        else:
-            graded += 1
-            ids = extract_unit_ids(c["subject"] + " " + c["trailer"], id_re)
-            pairs = [(i, p) for i in ids for p in id_map.get(i, [])]
-            if not ids:
-                violations.append((c, ids, "names no unit"))
-            elif not c["parents"]:
-                violations.append((c, ids, "no first parent"))
-            elif not pairs:
-                violations.append((c, ids, "no spec defines it at HEAD"))
-            else:
-                pending.append((c, ids, pairs))
-    if pending:
-        query = "".join(f"{c['parents'][0]}:{p}\n" for c, _, pairs in pending for _, p in pairs)
-        answers = iter(run_git(repo, "cat-file", "--batch-check", stdin=query.encode("utf-8")).decode("utf-8", "replace").split("\n"))
-        for c, ids, pairs in pending:
-            present = [not next(answers).endswith(" missing") for _ in pairs]
-            if not any(present):
-                paths = ", ".join(sorted({p for _, p in pairs}))
-                violations.append((c, ids, f"no spec at its first parent {c['parents'][0][:8]}: {paths}"))
-    waived_n, stale = 0, []
-    if mode == "WHOLE" and waived:
-        kept = []
-        for v in violations:
-            if any(v[0]["sha"].startswith(w) for w in waived):
-                waived_n += 1
-            else:
-                kept.append(v)
-        stale = [w for w in waived if not any(v[0]["sha"].startswith(w) for v in violations)]
-        violations = kept
     routed = " ".join(entries)
-    lines = [f"{SAY}: {label} · graded {graded} · {exempt} exempt by the {cutoff} cutoff · {merges} merge(s) · "
-             f"{not_routed} not routed · {waived_n} waived · {len(id_map)} spec id(s) at HEAD · ROUTED_PATHS {routed}"]
-    if graded == 0:
-        lines.append(f"{SAY}: graded 0 — the range holds {total} commit(s) and none of its non-merge commits "
-                     f"on or after the {cutoff} cutoff touches ROUTED_PATHS {routed}")
-    if violations:
-        lines.append(f"{SAY} FAILED — a commit touching ROUTED_PATHS names no unit specced before it:")
+    lines, failed, range_shas = [], False, set()
+    for mode, rev_args, label, tag in populations:
+        commits = read_routed_commits(repo, rev_args)
+        total = int(run_git(repo, "rev-list", "--count", *rev_args).decode("utf-8").strip())
+        if total != len(commits):
+            raise Refusal(f"the log pass parsed {len(commits)} commit(s) and `git rev-list --count` reports {total} "
+                          f"over the same range; a truncated stream is not a clean one")
+        merges = exempt = not_routed = graded = 0
+        violations, pending = [], []
+        for c in commits:
+            if len(c["parents"]) >= 2:
+                merges += 1
+            elif c["date"][:10] < cutoff:
+                exempt += 1
+            elif not any(test_routed_path(p, entries) for p in c["paths"]):
+                not_routed += 1
+            else:
+                graded += 1
+                ids = extract_unit_ids(c["subject"] + " " + c["trailer"], id_re)
+                pairs = [(i, p) for i in ids for p in id_map.get(i, [])]
+                if not ids:
+                    violations.append((c, ids, "names no unit"))
+                elif not c["parents"]:
+                    violations.append((c, ids, "no first parent"))
+                elif not pairs:
+                    violations.append((c, ids, "no spec defines it at HEAD"))
+                else:
+                    pending.append((c, ids, pairs))
+        if pending:
+            query = "".join(f"{c['parents'][0]}:{p}\n" for c, _, pairs in pending for _, p in pairs)
+            answers = iter(run_git(repo, "cat-file", "--batch-check", stdin=query.encode("utf-8")).decode("utf-8", "replace").split("\n"))
+            for c, ids, pairs in pending:
+                present = [not next(answers).endswith(" missing") for _ in pairs]
+                if not any(present):
+                    paths = ", ".join(sorted({p for _, p in pairs}))
+                    violations.append((c, ids, f"no spec at its first parent {c['parents'][0][:8]}: {paths}"))
+        waived_n, stale = 0, []
+        if mode == "WHOLE" and waived:
+            kept = []
+            for v in violations:
+                if any(v[0]["sha"].startswith(w) for w in waived):
+                    waived_n += 1
+                else:
+                    kept.append(v)
+            stale = [w for w in waived if not any(v[0]["sha"].startswith(w) for v in violations)]
+            violations = kept
+        failed = failed or bool(violations or stale)
+        lines.append(f"{SAY}: {label} · graded {graded} · {exempt} exempt by the {cutoff} cutoff · {merges} merge(s) · "
+                     f"{not_routed} not routed · {waived_n} waived · {len(id_map)} spec id(s) at HEAD · ROUTED_PATHS {routed}")
+        if graded == 0:
+            lines.append(f"{SAY}:{tag} graded 0 — the range holds {total} commit(s) and none of its non-merge commits "
+                         f"on or after the {cutoff} cutoff touches ROUTED_PATHS {routed}")
+        # S3: a violation is listed once; the WHOLE half names only what the RANGE half did not.
+        violations = [v for v in violations if v[0]["sha"] not in range_shas]
+        if violations and not tag:
+            lines.append(f"{SAY} FAILED — a commit touching ROUTED_PATHS names no unit specced before it:")
+        elif violations:
+            lines.append(f"{SAY} FAILED in WHOLE — a commit outside the pushed range names no unit specced before "
+                         f"it, and remote CI grades it:")
         for c, ids, why in violations:
             lines.append(f"  {c['sha'][:8]} {c['subject']} — {' '.join(ids) or 'no unit id'} — {why}")
-    for w in stale:
-        lines.append(f"{SAY} FAILED — ROUTED_COMMIT_WAIVED lists {w}, which is not a violation in the graded "
-                     f"population: a stale waiver widens nothing, remove it")
-    return (1 if violations or stale else 0), lines
+        range_shas.update(v[0]["sha"] for v in violations)
+        for w in stale:
+            lines.append(f"{SAY} FAILED — ROUTED_COMMIT_WAIVED lists {w}, which is not a violation in the graded "
+                         f"population: a stale waiver widens nothing, remove it")
+    return (1 if failed else 0), lines
 
 
 def read_newest_unit(repo, rev_range: str) -> str:
@@ -402,20 +419,26 @@ def run_selftest() -> int:
             "AC1 a spec landed with its code reds naming the commit, the spec and the parent; one landed earlier passes", out)
         print_arm(red == {s[3][:8], s[4][:8], s[5][:8]} and out.count("no unit id") == 2,
             "AC2 no id and `Pass: none` alone red `no unit id`; a trailer id passes; `Pass: none` keeps the subject's id", out)
-        print_arm("WHOLE (GATE_PUSH_BASE is unset)" in out and "graded 6" in out and "3 not routed" in out,
+        beside = "WHOLE beside RANGE"
+        print_arm("WHOLE (GATE_PUSH_BASE is unset)" in out and "graded 6" in out and "3 not routed" in out
+            and beside not in out,
             "AC3 unset reads WHOLE with its reason and grades the whole history", out)
         rc, out = run_check(repo, {"GATE_PUSH_BASE": s[4]})
-        print_arm(rc == 1 and f"RANGE {s[4][:8]}" in out and f"  {s[5][:8]} " in out
-            and f"  {s[3][:8]} " not in out and f"  {s[4][:8]} " not in out,
+        rng = out.split(f"{SAY} FAILED in WHOLE")[0]
+        print_arm(rc == 1 and f"RANGE {s[4][:8]}" in rng and f"  {s[5][:8]} " in rng
+            and f"  {s[3][:8]} " not in rng and f"  {s[4][:8]} " not in rng,
             "AC3 a resolvable base reads RANGE: a violation after it reds, one before it does not", out)
         set_fixture_conf(repo, ROUTED_COMMIT_WAIVED=s[5])
         rc, out = run_check(repo, {"GATE_PUSH_BASE": s[4]})
-        print_arm(rc == 1 and f"  {s[5][:8]} " in out and "0 waived" in out,
-            "AC3 RANGE reads no waiver: a listed pushed commit still reds", out)
+        rng = out.split(f"{SAY} FAILED in WHOLE")[0]
+        print_arm(rc == 1 and f"  {s[5][:8]} " in rng and "0 waived" in out.split("\n")[0]
+            and f"{SAY} FAILED — a commit touching" in rng,
+            "AC3 RANGE reads no waiver: a listed pushed commit still reds under the RANGE heading", out)
         rc, out = run_check(repo, {"GATE_PUSH_BASE": "0" * 40})
-        print_arm(rc == 1 and "all zeros" in out and f"  {s[3][:8]} " in out, "AC3 an all-zeros base reads WHOLE", out)
+        print_arm(rc == 1 and "all zeros" in out and f"  {s[3][:8]} " in out and beside not in out,
+            "AC3 an all-zeros base reads WHOLE", out)
         rc, out = run_check(repo, {"GATE_PUSH_BASE": "0123456789abcdef0123456789abcdef01234567"})
-        print_arm(rc == 1 and "names no commit" in out and f"  {s[3][:8]} " in out,
+        print_arm(rc == 1 and "names no commit" in out and f"  {s[3][:8]} " in out and beside not in out,
             "AC3 a base naming no commit widens to WHOLE and never narrows", out)
         set_fixture_conf(repo, ROUTED_COMMIT_WAIVED=" ".join(x[:12] for x in s[3:6]))
         rc, out = run_check(repo)
@@ -423,6 +446,41 @@ def run_selftest() -> int:
         set_fixture_conf(repo, ROUTED_COMMIT_WAIVED=" ".join([x[:12] for x in s[3:6]] + [s[2][:12]]))
         rc, out = run_check(repo)
         print_arm(rc == 1 and f"lists {s[2][:12]}" in out and "stale" in out, "AC8 a waiver naming no violation reds as stale", out)
+
+        # ---- TOOL-aRoutedQuill-10: WHOLE graded beside RANGE at a resolvable base
+        repo, s = build_fixture(root, "beside", [
+            {"msg": "init", "files": {"README.md": "x\n"}},
+            {"msg": "spec TOOL-tFix-1", "files": {SPEC1: "# TOOL-tFix-1 — one\n"}},
+            {"msg": "TOOL-tFix-1: local code", "files": {"src/a.txt": "a\n"}},
+            {"msg": "remote: no id", "files": {"src/r.txt": "r\n"}, "parent": 2},
+            {"msg": "Merge remote", "files": {"src/r.txt": "r\n"}, "parent": 3, "merge": [4]},
+        ])
+        set_fixture_conf(repo)
+        rc, out = run_check(repo, {"GATE_PUSH_BASE": s[3]})
+        whole = out.split(f"{SAY} FAILED in WHOLE")[-1]
+        print_arm(rc == 1 and out.startswith(f"{SAY}: RANGE {s[3][:8]}..{s[4][:8]} · graded 1 ") and beside in out
+            and f"{SAY} FAILED in WHOLE" in out and f"  {s[3][:8]} " in whole
+            and f"{SAY} FAILED — a commit touching" not in out,
+            "AC1 a remote-side violation merged into HEAD reds in WHOLE beside a green RANGE", out)
+        repo, s = build_fixture(root, "linear", [
+            {"msg": "init", "files": {"README.md": "x\n"}},
+            {"msg": "spec TOOL-tFix-1", "files": {SPEC1: "# TOOL-tFix-1 — one\n"}},
+            {"msg": "chore: no id", "files": {"src/x.txt": "x\n"}},
+            {"msg": "TOOL-tFix-1: code", "files": {"src/y.txt": "y\n"}},
+        ])
+        set_fixture_conf(repo)
+        rc, out = run_check(repo, {"GATE_PUSH_BASE": s[2]})
+        print_arm(rc == 1 and "0 merge(s)" in out.split("\n")[0] and f"  {s[2][:8]} " in out.split(f"{SAY} FAILED in WHOLE")[-1],
+            "AC2 a linear range with no merge still grades WHOLE beside it and reds an unwaived sha", out)
+        set_fixture_conf(repo, ROUTED_COMMIT_WAIVED=s[2][:12])
+        rc, out = run_check(repo, {"GATE_PUSH_BASE": s[2]})
+        line2 = (out.split("\n") + [""])[1]
+        print_arm(rc == 0 and line2.startswith(f"{SAY}: {beside}") and "1 waived" in line2,
+            "AC2 the sha waived, WHOLE beside RANGE passes and counts it", out)
+        set_fixture_conf(repo, ROUTED_COMMIT_WAIVED=f"{s[2][:12]} {s[3][:12]}")
+        rc, out = run_check(repo, {"GATE_PUSH_BASE": s[2]})
+        print_arm(rc == 1 and f"lists {s[3][:12]}" in out and "stale" in out,
+            "AC3 a stale waiver reds at a resolvable base as it does in WHOLE", out)
 
         # ---- AC4 AC9: refusals
         repo, s = build_fixture(root, "refuse", [
@@ -484,8 +542,11 @@ def run_selftest() -> int:
             before = GIT_SPAWNS[0]
             rc, out = run_check(repo)
             counts.append((GIT_SPAWNS[0] - before, rc, f"graded {n}" in out))
-        print_arm(counts[0][0] == counts[1][0] and all(c[1] == 0 and c[2] for c in counts),
-            f"AC6 3 and 30 routed commits cost the same git spawns ({counts[0][0]}, {counts[1][0]})", repr(counts))
+            before = GIT_SPAWNS[0]
+            rc, out = run_check(repo, {"GATE_PUSH_BASE": s[0]})
+            counts.append((GIT_SPAWNS[0] - before, rc, f"graded {n}" in out and beside in out))
+        print_arm(counts[0][0] == counts[2][0] and counts[1][0] == counts[3][0] and all(c[1] == 0 and c[2] for c in counts),
+            f"AC6 3 and 30 routed commits cost the same git spawns, WHOLE and beside RANGE ({counts})", repr(counts))
 
         # ---- AC7: exempt, merge, and a move out of ROUTED_PATHS
         repo, s = build_fixture(root, "edges", [
