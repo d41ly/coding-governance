@@ -2229,6 +2229,35 @@ n=$((n+1))
 _src_valued=$(awk -F'\t' '/^## /{ if ($2 ~ /^[0-9]+$/) c++ } END{ print c+0 }' "$HERE/build-readme-slot-limits.txt" 2>/dev/null || echo 0)
 [ "$_src_valued" -gt 0 ] || { echo "FAIL adopt --scaffold blanked the SOURCE kit's ceilings; the only write in that script may land under \$ROOT and this one did not"; st=1; }
 
+# ---- TOOL-aRoutedQuill-5 AC5 + AC6 — the two routed keys the adopter APPENDS, derived from the tree
+# ---- it runs in. The fixture tracks two product directories, a dot-directory and the memory root,
+# ---- so a candidate that keeps either of the last two, or drops either of the first, reds.
+n=$((n+1))
+R=$TMP/routed
+mkdir -p "$R/src" "$R/lib" "$R/.github" "$R/memory"
+( cd "$R" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  for _f in src/a lib/b .github/c memory/d; do printf 'x\n' > "$_f"; done
+  git add -A && git commit -q -m base --no-verify )
+_ro=$(cd "$R" && bash "$HERE/adopt-memory-tree.sh" --scaffold 2>&1); _rrc=$?
+[ "$_rrc" = 1 ] || { echo "FAIL AC5 --scaffold with no conf exited $_rrc, not the seed-and-stop 1"; st=1; }
+grep -qx 'ROUTED_PATHS="lib/ src/"' "$R/.memory-tree.conf" 2>/dev/null \
+  || { echo "FAIL AC5 the seeded conf does not hold ROUTED_PATHS=\"lib/ src/\": $(grep '^ROUTED_PATHS' "$R/.memory-tree.conf" 2>/dev/null)"; st=1; }
+grep -qE '^ROUTED_COMMIT_CUTOFF="[0-9]{4}-[0-9]{2}-[0-9]{2}"$' "$R/.memory-tree.conf" 2>/dev/null \
+  || { echo "FAIL AC5 the seeded conf holds no dated ROUTED_COMMIT_CUTOFF"; st=1; }
+{ printf '%s' "$_ro" | grep -q 'ROUTED_PATHS' && printf '%s' "$_ro" | grep -q 'ROUTED_COMMIT_CUTOFF'; } \
+  || { echo "FAIL AC5 the seed-and-stop message does not name both keys: $_ro"; st=1; }
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\n' > "$R/.memory-tree.conf"
+_ro=$(cd "$R" && bash "$HERE/adopt-memory-tree.sh" --arm-routing 2>&1); _rrc=$?
+{ [ "$_rrc" = 0 ] && [ "$(grep -c '^ROUTED_' "$R/.memory-tree.conf")" = 2 ] && printf '%s' "$_ro" | grep -q 'lib/ src/'; } \
+  || { echo "FAIL AC6 --arm-routing on a conf assigning neither key did not append both and print the candidate (rc=$_rrc): $_ro"; st=1; }
+for _kv in 'ROUTED_PATHS=""' 'ROUTED_COMMIT_CUTOFF="2026-01-01"'; do
+  printf 'MEMORY_ROOT=memory\n%s\n' "$_kv" > "$R/.memory-tree.conf"; cp "$R/.memory-tree.conf" "$TMP/routed.keep"
+  _ro=$(cd "$R" && bash "$HERE/adopt-memory-tree.sh" --arm-routing 2>&1)
+  { cmp -s "$R/.memory-tree.conf" "$TMP/routed.keep" && printf '%s' "$_ro" | grep -q 'nothing written'; } \
+    || { echo "FAIL AC6 --arm-routing rewrote a conf that already assigns $_kv: $_ro"; st=1; }
+done
+
 outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null); rca=$?
 [ "$rca" = 0 ] || { echo "FAIL a tree built by adopt-memory-tree.sh --scaffold is not hygiene-clean (rc=$rca):"; printf '%s\n' "$outa" | sed 's/^/      /'; st=1; }
 

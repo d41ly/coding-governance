@@ -55,13 +55,56 @@ FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}
 # existed and still is, because defaulting a missing word to the verb that creates a tree is a
 # widening nobody asked for.
 MODE="${1:-}"
-case "$MODE" in --scaffold|--render) ;; *) echo "usage: $0 --scaffold|--render"; exit 2 ;; esac
+case "$MODE" in --scaffold|--render|--arm-routing) ;; *) echo "usage: $0 --scaffold|--render|--arm-routing"; exit 2 ;; esac
+
+# TOOL-aRoutedQuill-5 S5. The CANDIDATE product set, derived from THIS tree: every tracked top-level
+# directory with a trailing `/`, less the dot-directories and the directory holding MEMORY_ROOT. A
+# candidate, not a decision — the adopter confirms or edits it before committing, which is also where
+# a directory holding only gov's installed kits is dropped if the adopter wants it out (owner F3). A
+# name carrying whitespace is left out: the key's grammar is whitespace-separated.
+# $1 = the conf to read MEMORY_ROOT from, sourced in a subshell as the hygiene gate reads it.
+derive_routed_candidate() {
+  local mem top
+  mem=$( . "$1" >/dev/null 2>&1; printf '%s' "${MEMORY_ROOT:-memory}" )
+  mem=${mem%$'\r'}; mem=${mem#./}; top=${mem%%/*}
+  git -c core.quotePath=false ls-files 2>/dev/null \
+    | sed -n 's#^\([^/]*\)/.*#\1/#p' | LC_ALL=C sort -u \
+    | grep -v -e '^\.' -e '[[:space:]]' | grep -vxF -e "$top/" | paste -sd' ' -
+}
+# Appends ROUTED_PATHS and ROUTED_COMMIT_CUTOFF to the conf $1 when NEITHER key is assigned there,
+# and writes nothing when either is — a blank assignment included, so a deliberate blank stays the
+# visible refusal it is. Prints what it did on stdout, the candidate first.
+write_routed_keys() {
+  local conf=$1 cand today
+  if grep -qE '^[[:space:]]*(export[[:space:]]+)?ROUTED_(PATHS|COMMIT_CUTOFF)=' "$conf"; then
+    echo "memory-tree: ROUTED_PATHS or ROUTED_COMMIT_CUTOFF is already assigned in $conf — nothing written"
+    return 0
+  fi
+  cand=$(derive_routed_candidate "$conf")
+  today=$(date +%Y-%m-%d)
+  [ -z "$(tail -c1 "$conf")" ] || printf '\n' >> "$conf"
+  {
+    echo "# ROUTED_PATHS — product paths a write gate and the ownership leg guard. Derived at adoption from"
+    echo "# the tracked top-level directories; confirm or edit before you commit. Blank refuses every write."
+    echo "ROUTED_PATHS=\"$cand\""
+    echo "# ROUTED_COMMIT_CUTOFF — commits committed before this date are not graded by the ownership leg."
+    echo "ROUTED_COMMIT_CUTOFF=\"$today\""
+  } >> "$conf"
+  echo "memory-tree: appended ROUTED_PATHS=\"$cand\" and ROUTED_COMMIT_CUTOFF=\"$today\" to $conf — confirm the candidate before you commit"
+}
 
 # .memory-tree.conf is REQUIRED — never silently scaffold the built-in DEMO disciplines into a real repo.
 if [ ! -f "$ROOT/.memory-tree.conf" ]; then
   cp "$HERE/.memory-tree.conf.example" "$ROOT/.memory-tree.conf"
-  echo "created .memory-tree.conf from the example — EDIT IT (MEMORY_ROOT, DISCIPLINES, FAMILIES), then re-run." >&2
+  write_routed_keys .memory-tree.conf >&2
+  echo "created .memory-tree.conf from the example — EDIT IT (MEMORY_ROOT, DISCIPLINES, FAMILIES, and the ROUTED_PATHS candidate with its ROUTED_COMMIT_CUTOFF), then re-run." >&2
   exit 1
+fi
+# S6: `--arm-routing` arms an EXISTING conf and does nothing else. It sits above the conf source and
+# the READINESS_ROWS refusal, because arming the write gate must not wait on a render key.
+if [ "$MODE" = "--arm-routing" ]; then
+  write_routed_keys .memory-tree.conf
+  exit 0
 fi
 # TOOL-aJoinedCanon-9: PRESET above the conf source, and it is `set -u` safety rather than a
 # default — there is exactly ONE literal row set and it is the conf. Without this line every adopter

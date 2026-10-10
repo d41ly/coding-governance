@@ -1,11 +1,12 @@
 # TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed
 
-**Status:** INPROGRESS · rev-4 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 5 · ratified 2026-10-09
+**Status:** CLOSED · rev-5 · 2026-10-10 · node a · Tier-2 · base 6473ae38 · streams tooling+deployer · order 5 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-TOOL-aRoutedQuill-5-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aRoutedQuill-5-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-5-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-5-build-brief.md) | journal | — |
 
@@ -25,7 +26,10 @@ makes `check-wiring.sh` report an install that is unwired or unarmed, and states
   `check-wiring`. The `agent-cap` entry ships `scratch-guard.js` and its fragments, and it ships
   `agent-cap.js` too, whose PreToolUse `Workflow|Agent` entry its adopter wires: every default
   adopter gains the fan-out cap with the gate. `settings-merge` is the entry's declared requirement,
-  and `check-wiring` is the reporter owner decision D7 relies on. Observed by AC1.
+  and `check-wiring` is the reporter owner decision D7 relies on. `check-agent-cap-restatement`, a
+  conditional entry requiring `agent-cap`, drops its conditional mark so `--all` reaches it: selfcheck
+  7e reds a dependent of the default set that no declared selection reaches, and the precedent fix
+  for that state left a prose check out of the default set. Observed by AC1.
 - **S2** — The `agent-cap` entry's `requires` gains `kickoff-manifest`, so the gate is never installed
   without the card writer whose `## route` it reads. Observed by AC2.
 - **S3** — With `settings-merge` in every default selection, `run_fragment_merges` wires every
@@ -167,6 +171,7 @@ included, so a deliberate blank stays a visible refusal.
 | Identifier | Kind | Cell |
 |---|---|---|
 | `derive_default_gained` | function | `py.function`; `lexicon.py --suggest` answered OK |
+| `add_deploy_kits` | function | `py.function`; answered OK |
 | `check_routed` | function | `sh.function`; answered OK |
 | `derive_routed_candidate` | function | `sh.function`; answered OK |
 | `write_routed_keys` | function | `sh.function`; answered OK |
@@ -177,7 +182,7 @@ included, so a deliberate blank stays a visible refusal.
 
 ### Files touched (estimate)
 
-`tools/govkit/registry.toml` · `tools/govkit/govkit.py` · `tools/govkit/selftest.py` · `tools/govkit/matrix.py` · `tools/hooks/kit.toml` · `tools/memory-tree/kit.toml` · `tools/memory-tree/adopt-memory-tree.sh` · `tools/memory-tree/.memory-tree.conf.example` · `tools/memory-tree/README.md` · `tools/memory-tree/check-memory-hygiene.test.sh` · `tools/check-wiring.sh` · `tools/check-wiring.test.sh` · `WIRE-INTO-PROJECT.md` · `memory/map/generated/symbols.json`
+`tools/govkit/registry.toml` · `tools/govkit/entries/check-agent-cap-restatement.kit.toml` · `tools/govkit/govkit.py` · `tools/govkit/selftest.py` · `tools/govkit/matrix.py` · `tools/hooks/kit.toml` · `tools/memory-tree/kit.toml` · `tools/memory-tree/adopt-memory-tree.sh` · `tools/memory-tree/.memory-tree.conf.example` · `tools/memory-tree/README.md` · `tools/memory-tree/check-memory-hygiene.test.sh` · `tools/check-wiring.sh` · `tools/check-wiring.test.sh` · `WIRE-INTO-PROJECT.md` · `memory/map/generated/symbols.json`
 
 ### Rollout
 
@@ -328,6 +333,10 @@ AC10 is a direct observation of the runbook and adds no arm.
   kit-version bump commit named for this unit, where units 1, 2 and 4 say the versions are minted
   once by the lander; Rollout now leaves the three kits' versions owed and minted once after the
   build's last unit, and keeps the selfcheck after the mint.
+- rev-5 · 2026-10-10 · §2 · §4 · build divergence: with `agent-cap` in the default set, selfcheck 7e
+  reds `check-agent-cap-restatement`, a conditional entry requiring it that no selection reaches. S1
+  drops that entry's conditional mark so `--all` reaches it, and Files touched names its descriptor.
+  The Inventory gains `add_deploy_kits`, S4's writer of a target's `deploy.toml` `kits` list.
 
 ## 10. Reuse audit
 

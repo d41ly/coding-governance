@@ -358,6 +358,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "add_deploy_kits",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "add_facts",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -4108,6 +4113,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "check_routed",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
       "id": "check_routed_commits",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
@@ -5593,6 +5603,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_default_gained",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_dir_segments",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -6191,6 +6206,11 @@
       "id": "derive_root_confs",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_routed_candidate",
+      "kind": "function",
+      "file": "tools/memory-tree/adopt-memory-tree.sh"
     },
     {
       "id": "derive_row_identity",
@@ -20461,6 +20481,11 @@
       "id": "write_route_card",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "write_routed_keys",
+      "kind": "function",
+      "file": "tools/memory-tree/adopt-memory-tree.sh"
     },
     {
       "id": "write_rows_spec",

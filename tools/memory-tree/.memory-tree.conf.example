@@ -447,6 +447,14 @@ LIVE_DORMANT_DAYS=""
 # written. BLANK OR ABSENT RENDERS LIVE.md AS BEFORE, byte for byte, and never imports that kit.
 LIVE_LANDED_UNCLOSED=""
 
+# ROUTED_PATHS — the product paths: whitespace-separated, repo-root-relative, a directory entry ending
+# in `/`. The write gate (scratch-guard) refuses an Edit, Write or shell write under one unless the
+# session's card routes a buildable unit, and the ownership leg grades the commits touching one. An
+# entry may not be absolute, climb through `..`, cover MEMORY_ROOT or name nothing tracked. BLANK OR
+# ABSENT LEAVES THE GATE UNARMED, which refuses every write and which check-wiring reports. Neither
+# key ships assigned here: `adopt-memory-tree.sh --scaffold` and `--arm-routing` append both, the
+# candidate derived from your tracked top-level directories, for you to confirm before committing.
+#   ROUTED_PATHS="src/ lib/"
 # ROUTED_COMMIT_CUTOFF — an ISO date (YYYY-MM-DD). `routed_commits.py`, the `routed commits name a
 # specced unit` leg, grades every non-merge commit committed on or after it that touches a path under
 # ROUTED_PATHS: one naming no unit id, in its subject or a `Pass:` trailer, whose spec existed at the

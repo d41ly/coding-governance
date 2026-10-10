@@ -4,8 +4,10 @@ id = "check-agent-cap-restatement"
 scope = "repo"
 kind = "flat"
 home = "."
-selectable = "conditional"
-why_conditional = "it polices PROSE about the agent-cap fan-out bound, so it is worth installing only in a target that adopts the agent-cap hook AND writes governance prose of its own; a target that consumes the hook without documenting it has nothing for this to scan"
+# NOT conditional since TOOL-aRoutedQuill-5: `agent-cap` joined the default set, and selfcheck 7e reds
+# a dependent of the default set that no declared selection reaches. `--all` reaches it now; the
+# default does not, because it polices PROSE about the fan-out bound and is worth installing only in
+# a target that writes governance prose of its own.
 version_from = { none = "no version constant exists; measured 2026-08-18." }
 requires = ["agent-cap"]
 sentinel = "check-agent-cap-restatement.sh"

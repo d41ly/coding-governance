@@ -73,6 +73,12 @@ ln -s <gov>/skills/session-kickoff ~/.claude/skills/session-kickoff
 **Verify:** restart Claude Code; `/session-kickoff` is listed. (A project MAY keep its own tuned variant
 alongside — both then appear; pick by description.) Skip this step on a machine that already has it.
 
+**A gated repository needs this on every machine that works in it.** A default `govkit` install wires
+the write gate (§5), and the gate's refusal names `/session-kickoff` as the way to route a unit, so
+`<prefix>/check-wiring.sh` reports `UNWIRED  skill` in a repository whose gate is wired on a machine
+without the skill. `apply` prints this step as an order and never performs it: the link lives
+outside the repository.
+
 <!-- govkit:entry playbook -->
 ## 2 — Install the governance charter (per project)
 
@@ -196,6 +202,15 @@ here would be a kit path the `install-prefix` ban reds on, with no waiver to tak
    fresh tree; set to the old root only when migrating an existing docs tree — see `<prefix>/memory-tree/README.md`).
    Arm the spec-format ratchet: `SPEC_FORMAT_CUTOFF=<adoption date>` — specs dated ≥ it must follow
    `memory/TEMPLATE-SPEC.md` (hygiene check 12); older specs stay grandfathered by filename date.
+   Two keys you do NOT copy: `ROUTED_PATHS`, the product paths the write gate and the ownership leg
+   guard, and `ROUTED_COMMIT_CUTOFF`, the date that leg grades from. `adopt-memory-tree.sh --scaffold`
+   appends both to the conf it seeds and names them in its stop message, the candidate being your
+   tracked top-level directories less dot-directories and the memory root; on an existing conf,
+   `adopt-memory-tree.sh --arm-routing` does the same, and `govkit update` runs it for you. Neither
+   rewrites a key already assigned. Confirm or edit the candidate before you commit — a directory
+   holding only gov's installed kits stays in it unless you drop it — because blank or absent leaves
+   the gate UNARMED and every write refuses, which `<prefix>/check-wiring.sh` reports as
+   `UNWIRED  routed`.
 2. Scaffold + verify:
    ```bash
    cd <project>
@@ -800,6 +815,24 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 - `<prefix>/check-install-prefix.sh` + `<prefix>/check-install-prefix.test.sh` — only if your project also
   ships kits onward. It polices the SHIPPING surface, not an installed one.
 
+**Concurrency guard and write gate (they arrive with a default install):** the hooks kit, which
+carries both, is in `govkit`'s default selection beside `settings-merge` and `check-wiring`, and
+the hooks kit requires `kickoff-manifest`, the card writer whose `## route` the gate reads. `apply`
+and `update --write` wire every hook a default install lands through `settings-merge.py`; an
+adopter who unwires one keeps it unwired, and `check-wiring.sh` reports it. A default install wires:
+
+| Kit | Hook | Event | Matcher |
+|---|---|---|---|
+| `agent-cap` | `agent-cap.js` | PreToolUse | `Workflow\|Agent` |
+| `agent-cap` | `scratch-guard.js` | PreToolUse | `Bash\|PowerShell\|Edit\|Write\|MultiEdit\|NotebookEdit` |
+| `agent-cap` | `scratch-guard.js` | SubagentStart | `*` |
+| `kickoff-manifest` | `manifest-check.sh --card --write` | SessionStart | `startup\|clear` |
+| `kickoff-manifest` | `manifest-check.sh --card --replay` | SessionStart | `resume\|compact` |
+| `check-wiring` | `check-wiring.sh --session` | SessionStart | `startup\|resume\|clear` |
+
+An opt-in hook the target declined, as memory-recall's `recall-opened.js`, lands its fragment and
+is reported `not wired`, never refused. The manual steps below are for a project wiring by hand.
+
 **Concurrency guard (recommended for ANY project that fans out `Workflow` agents — playbook §8):**
 - Copy `<prefix>/hooks/agent-cap.js` (+ its `.test.sh` sibling) into the project **under the same kit
   prefix as your other kits** — `<project>/<prefix>/hooks/`. **NOT `<project>/.claude/hooks/`**, which this runbook prescribed until
@@ -1174,7 +1207,11 @@ it.
 ├── memory/guides/SESSION-KICKOFF.md  # kickoff manifest (v1.4: audit block + sealed §A region + registry key) — the engine reads this
 ├── <prefix>/manifest-check.sh # ratchet gate — engine-identical copy (overwrite wholesale on kit updates)
 ├── .gitattributes               # EOL rules — the checker (+ the memory tree if §3 adopted)
-├── .memory-tree.conf            # memory-tree config           ┐
+├── .claude/settings.json        # the hooks a default install wires (§5's table), by settings-merge
+├── <prefix>/hooks/              # agent-cap.js, scratch-guard.js + their two fragments (hooks kit, default)
+├── <prefix>/settings-merge.py   # the one writer of .claude/settings.json (default)
+├── <prefix>/check-wiring.sh     # reports an unwired hook or an UNARMED ROUTED_PATHS (default)
+├── .memory-tree.conf            # memory-tree config           ┐ (+ ROUTED_PATHS, ROUTED_COMMIT_CUTOFF)
 ├── <prefix>/memory-tree/        # the hygiene kit (copied in)  │ only if §3 adopted
 └── memory/                      # scaffolded tree; LIVE.md = GENERATED work-state index      ┘
 ~/.claude/skills/session-kickoff # the engine (per-MACHINE junction/symlink — not in the repo)

@@ -761,6 +761,49 @@ def main() -> int:
             check("scratch install: leg '%s' answers with a message, not a traceback" % name,
                   "Traceback (most recent call last)" not in out, out)
 
+        # SHAPE 6 — TOOL-aRoutedQuill-5 AC3: a fresh repository taking the REGISTRY DEFAULT, which
+        # declines memory-recall's opt-in hook. EXPECTED: every gate, card and check-wiring fragment
+        # the install lands is `wired`, the declined hook's fragment is `not wired` naming its hook,
+        # nothing lands UNWIRED and nothing is REFUSED; then the target's own check-wiring reads
+        # `ok` for agent-cap, scratch and card. Before the unit the default carried no
+        # settings-merge, so every fragment landed UNWIRED — the state this shape reds on.
+        shapes += 1
+        g = tmp.resolve() / "default-install"
+        g.mkdir(parents=True, exist_ok=True)
+        (g / ".governance").mkdir(exist_ok=True)
+        (g / ".governance" / "deploy.toml").write_text(
+            'gov_source = "local"' + NL + f'prefix = "{PFX[:-1]}"' + NL + "[answers]" + NL
+            + 'memory_root = "memory"' + NL + 'playbook_path = "docs/PARALLEL.md"' + NL
+            + 'playbook_dir = "docs"' + NL + 'manifest_path = "docs/SESSION-KICKOFF.md"' + NL
+            + 'user_skills = "~/.claude/skills"' + NL, encoding="utf-8", newline=NL)
+        (g / "README.md").write_text("t" + NL, encoding="utf-8", newline=NL)
+        git(g, "init", "-q", "-b", "main"); git(g, "config", "user.email", "t@e")
+        git(g, "config", "user.name", "t"); git(g, "config", "core.autocrlf", "false")
+        git(g, "add", "-A"); git(g, "commit", "-qm", "base")
+        p = run("apply", "--target", str(g))
+        out = p.stdout + p.stderr
+        hooks = [ln for ln in out.splitlines() if " — hooks: " in ln]
+        check("default install: apply completes", p.returncode == 0, out)
+        for frag in ("scratch-guard.fragment.json", "scratch-guard-subagent.fragment.json",
+                     "orientation-card.fragment.json", "orientation-replay.fragment.json",
+                     "check-wiring.fragment.json"):
+            check(f"default install: {frag} is wired",
+                  any(frag in ln and ln.endswith(" wired") for ln in hooks), NL.join(hooks))
+        check("default install: the declined opt-in hook's fragment is `not wired`, naming the hook",
+              any("recall-opened.fragment.json not wired" in ln and "recall-opened.js" in ln
+                  for ln in hooks), NL.join(hooks))
+        check("default install: no fragment lands UNWIRED and none is REFUSED",
+              hooks and not any("landed UNWIRED" in ln or "REFUSED" in ln for ln in hooks),
+              NL.join(hooks))
+        # Through govkit's shell resolver: a bare `bash` from a Windows python is the WSL launcher.
+        cw = subprocess.run(govkit.resolve_shell_argv(["bash", f"{PFX}check-wiring.sh", "--check"]),
+                            cwd=str(g), capture_output=True, encoding="utf-8", errors="replace",
+                            stdin=subprocess.DEVNULL)
+        for arm in ("agent-cap", "scratch", "card"):
+            check(f"default install: check-wiring reads `ok` for {arm}",
+                  any(ln.startswith("ok ") and ln.split()[1] == arm for ln in cw.stdout.splitlines()),
+                  cw.stdout + cw.stderr)
+
         print(f"govkit-matrix: {shapes} repo shape(s) exercised")
         if shapes == 0:
             print("govkit-matrix: NO shape ran — a matrix over nothing is not a matrix")

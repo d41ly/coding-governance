@@ -345,7 +345,11 @@ derive_receipt_miss() { # <kit-home> <file> -> a skip reason, or ""
 # EVERY matcher whose group carries the marker, one per line — not just the first. A settings.json
 # may legitimately hold several groups, and `settings-merge.py` ADDS the widened group rather than
 # migrating a stale one, so "the first group mentioning the hook" is the wrong question to ask.
-matchers_of() { # marker [hook-basename] -> the matcher of each group carrying BOTH (empty if absent)
+matchers_of() { # marker [hook-basename] [event] -> the matcher of each group carrying BOTH (empty if absent)
+  # THE THIRD KEY IS THE EVENT (TOOL-aRoutedQuill-5 S8). Without it every event's groups flatten into
+  # one list, so the PreToolUse matcher wired under SubagentStart read as wired. Each event key — the
+  # capitalised name heading an array — starts its own chunk, and only that event's chunk is kept.
+  # Absent, every event is read, exactly as before.
   # A REFUSAL PROPAGATES. The retired form tested the settings path with `|| return 0`, so a
   # missing file was indistinguishable from a present file with no matching group — which is the
   # whole defect. Returning 2 keeps them apart even though `wired` treats both as not-wired.
@@ -359,6 +363,8 @@ matchers_of() { # marker [hook-basename] -> the matcher of each group carrying B
   # reader and in the merger's (the aReplayedCard closing review, F5). Absent, it defaults to the
   # marker itself, so a one-key caller filters twice on one key and reads exactly as before.
   tr -d ' \t\r\n' < "$_sj" \
+    | sed 's/"\([A-Z][A-Za-z]*\)":\[/\n@\1@/g' \
+    | grep -F -e "@${3:+$3@}" \
     | sed 's/{"matcher":/\n{"matcher":/g' \
     | sed 's/\].*$//' \
     | grep -F -e "$1" \
@@ -371,8 +377,8 @@ matchers_of() { # marker [hook-basename] -> the matcher of each group carrying B
 # nothing — and kept printing it after the running copy was deleted. The key is the path behind
 # `${CLAUDE_PROJECT_DIR}/` up to the closing escaped quote, the one spelling settings-merge.py
 # renders, so a path that is a suffix of another cannot match it. Absent, the marker alone joins.
-wired() { # marker · the matcher the fragment declares · [the hook's resolved path]
-  [ -n "$2" ] && matchers_of "$1" "${3:+{CLAUDE_PROJECT_DIR\}/$3\\\"}" | grep -qxF "$2"
+wired() { # marker · the matcher the fragment declares · [the hook's resolved path] · [event]
+  [ -n "$2" ] && matchers_of "$1" "${3:+{CLAUDE_PROJECT_DIR\}/$3\\\"}" "${4:-}" | grep -qxF "$2"
 }
 
 # THE LAUNCHER, resolved by RUNNING each candidate — the block below is the canonical resolver,
@@ -786,57 +792,65 @@ check_agentcap() {
 # agent-cap. A guard that is silent when unwired looks identical to a guard that is passing.
 # Advisory like every other arm: no mode rewrites settings.json.
 check_scratch_guard() {
-  local frag smerge marker hookjs smatcher found
+  local first frag smerge marker hookjs smatcher sevent found
   # TWO RUNGS, the receipt and this checker's own prefix. A third, bare root spelling used to follow
   # them, a guess at a layout the derivation had already missed. A miss is now the skip below, which
   # names both rungs (TOOL-aRepatriatedFork-24 S8), and the same holds for the recall and merge arms.
-  frag=$(first_of "$(resolve_receipt_path hooks scratch-guard.fragment.json)" "$(resolve_kit_file hooks scratch-guard.fragment.json)")
-  if [ -z "$frag" ]; then
+  first=$(first_of "$(resolve_receipt_path hooks scratch-guard.fragment.json)" "$(resolve_kit_file hooks scratch-guard.fragment.json)")
+  if [ -z "$first" ]; then
     local miss; miss=$(derive_receipt_miss hooks scratch-guard.fragment.json)
     echo "skip     scratch   — ${miss:-hooks kit does not ship scratch-guard.fragment.json here (no install-receipt row, and none at ${KIT_REL:+$KIT_REL/}hooks/)}"
     return
   fi
   smerge=$SMERGE
-  marker=$(json_str "$frag" marker)
-  # A REFUSED owned-hook join is UNWIRED naming its reason, never a blank path read as a bad fragment.
-  if ! hookjs=$(resolve_fragment_hook "$frag" 2>&1); then
-    echo "UNWIRED  scratch   — ${hookjs##*check-wiring: }"
-    unwired=$((unwired+1))
-    return
-  fi
-  smatcher=$(json_str "$frag" matcher)
-  if [ -z "$marker" ] || [ -z "$hookjs" ] || [ -z "$smatcher" ]; then
-    echo "UNWIRED  scratch   — $frag declares no marker/matcher/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
-    unwired=$((unwired+1))
-    return
-  fi
-  if [ ! -f "$hookjs" ]; then
-    if wired "$marker" "$smatcher"; then
-      echo "UNWIRED  scratch   — settings.json dispatches the guard but $hookjs is missing; every shell call runs node against nothing. Fix: cp ${frag%/*}/scratch-guard.js $hookjs"
+  # EVERY FRAGMENT THE HOOKS KIT SHIPS, each against its OWN event (TOOL-aRoutedQuill-5 S8). The
+  # kit ships the PreToolUse gate and its SubagentStart context as two fragments, and grading the
+  # first alone read an install with the second unwired as `ok`. The population is the directory the
+  # gate's fragment was found in, so a fragment added there later is graded without an edit here.
+  for frag in "${first%/*}"/*.fragment.json; do
+    [ -f "$frag" ] || continue
+    marker=$(json_str "$frag" marker)
+    sevent=$(json_str "$frag" event)
+    # A REFUSED owned-hook join is UNWIRED naming its reason, never a blank path read as a bad fragment.
+    if ! hookjs=$(resolve_fragment_hook "$frag" 2>&1); then
+      echo "UNWIRED  scratch   — ${hookjs##*check-wiring: }"
       unwired=$((unwired+1))
-    else
-      echo "skip     scratch   — not adopted ($hookjs absent)"
+      continue
     fi
-    return
-  fi
-  if wired "$marker" "$smatcher" "$hookjs"; then
-    echo "ok       scratch   — PreToolUse guard wired in $(render_settings_path) (matcher '$smatcher')"
-    return
-  fi
-  if wired "$marker" "$smatcher"; then
-    echo "UNWIRED  scratch   — settings.json dispatches a guard under '$smatcher', but not the resolved copy $hookjs. Fix: $PY $smerge --fragment $frag"
+    smatcher=$(json_str "$frag" matcher)
+    if [ -z "$marker" ] || [ -z "$hookjs" ] || [ -z "$smatcher" ] || [ -z "$sevent" ]; then
+      echo "UNWIRED  scratch   — $frag declares no marker/matcher/event/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
+      unwired=$((unwired+1))
+      continue
+    fi
+    if [ ! -f "$hookjs" ]; then
+      if wired "$marker" "$smatcher" "" "$sevent"; then
+        echo "UNWIRED  scratch   — settings.json dispatches the $sevent entry but $hookjs is missing; every matching call runs node against nothing. Fix: cp ${frag%/*}/$(basename "$hookjs") $hookjs"
+        unwired=$((unwired+1))
+      else
+        echo "skip     scratch   — not adopted ($hookjs absent)"
+      fi
+      continue
+    fi
+    if wired "$marker" "$smatcher" "$hookjs" "$sevent"; then
+      echo "ok       scratch   — $sevent entry wired in $(render_settings_path) (matcher '$smatcher')"
+      continue
+    fi
+    if wired "$marker" "$smatcher" "" "$sevent"; then
+      echo "UNWIRED  scratch   — settings.json dispatches a $sevent entry under '$smatcher', but not the resolved copy $hookjs. Fix: $PY $smerge --fragment $frag"
+      unwired=$((unwired+1))
+      continue
+    fi
+    # Name the value FOUND rather than reporting a generic miss: an operator told "unwired" about a
+    # hook plainly present in the file concludes the checker is broken. Same reasoning as agent-cap.
+    found=$(matchers_of "$marker" "" "$sevent" | paste -sd, - 2>/dev/null || matchers_of "$marker" "" "$sevent" | tr '\n' ',')
+    if [ -n "$found" ]; then
+      echo "UNWIRED  scratch   — the $sevent entry is wired under matcher '$found', not '$smatcher'; it never fires for the calls the fragment declares. Fix: $PY $smerge --fragment $frag"
+    else
+      echo "UNWIRED  scratch   — $hookjs present but the $sevent entry ($frag) is not in settings.json. Fix: $PY $smerge --fragment $frag"
+    fi
     unwired=$((unwired+1))
-    return
-  fi
-  # Name the value FOUND rather than reporting a generic miss: an operator told "unwired" about a
-  # hook plainly present in the file concludes the checker is broken. Same reasoning as agent-cap.
-  found=$(matchers_of "$marker" | paste -sd, - 2>/dev/null || matchers_of "$marker" | tr '\n' ',')
-  if [ -n "$found" ]; then
-    echo "UNWIRED  scratch   — the guard is wired under matcher '$found', not '$smatcher'; it never fires for the shells the fragment declares. Fix: $PY $smerge --fragment $frag"
-  else
-    echo "UNWIRED  scratch   — $hookjs present but the guard is not in settings.json. Fix: $PY $smerge --fragment $frag"
-  fi
-  unwired=$((unwired+1))
+  done
 }
 
 # --- Check R: recall-opened PostToolUse hook (memory-recall kit — an OPT-IN) ----------------------
@@ -1413,6 +1427,73 @@ check_ssh_keepalive() {
   fi
 }
 
+# --- Check P: the write gate is ARMED — ROUTED_PATHS and ROUTED_COMMIT_CUTOFF (TOOL-aRoutedQuill-5 S7)
+# A wired gate reads its product paths from `.memory-tree.conf`, and an UNARMED conf refuses every
+# write: a gate that refuses everything looks, from the settings file, exactly like one that works.
+# So this grades the conf by the rules the gate and the ownership leg grade it by: both keys
+# assigned and non-blank, the cutoff an ISO date, and every entry repo-relative, not climbing
+# through `..`, not covering MEMORY_ROOT, and naming something tracked. The FIRST failing rule is
+# named, as the leg names it. With no conf and no wired gate there is nothing to arm, and it skips.
+# Read by sourcing the conf in a subshell, as the straggler arm reads BACKLOG_MODE.
+# WHAT IT DOES NOT CHECK: that the entries are the RIGHT product paths — a candidate the adopter
+# confirmed is a decision, not a fact this arm can measure — or that the leg is wired at all.
+check_routed() {
+  local gated="" conf vals rp cut mem e c bare why="" arm
+  [ -n "$(matchers_of scratch-guard.js 2>/dev/null)" ] && gated=yes
+  arm=$(first_of "$(resolve_receipt_path memory-tree adopt-memory-tree.sh)" "${KIT_REL:+$KIT_REL/}memory-tree/adopt-memory-tree.sh")
+  arm="bash ${arm:-<memory-tree kit>/adopt-memory-tree.sh} --arm-routing"
+  conf=$(first_of .memory-tree.conf)
+  if [ -z "$conf" ]; then
+    if [ -n "$gated" ]; then
+      echo "UNWIRED  routed    — the write gate is wired here and there is no .memory-tree.conf, so ROUTED_PATHS is absent and every product write refuses. Fix: $arm"
+      unwired=$((unwired+1))
+    else
+      echo "skip     routed    — no .memory-tree.conf and no wired write gate here, so there is nothing to arm"
+    fi
+    return
+  fi
+  vals=$( . "./$conf" >/dev/null 2>&1; printf '%s\037%s\037%s' "${ROUTED_PATHS:-}" "${ROUTED_COMMIT_CUTOFF:-}" "${MEMORY_ROOT:-memory}" )
+  IFS=$'\037' read -r rp cut mem <<< "${vals//$'\n'/ }"
+  rp=${rp%$'\r'}; cut=${cut%$'\r'}; mem=${mem%$'\r'}; mem=${mem#./}; mem=${mem%/}
+  if [ -z "${rp//[[:space:]]/}" ]; then
+    why="ROUTED_PATHS is blank or absent"
+  elif [ -z "$cut" ]; then
+    why="ROUTED_COMMIT_CUTOFF is blank or absent"
+  elif ! printf '%s' "$cut" | grep -qxE '[0-9]{4}-[0-9]{2}-[0-9]{2}'; then
+    why="ROUTED_COMMIT_CUTOFF '$cut' is not an ISO date (YYYY-MM-DD)"
+  else
+    # `read -a`, never an unquoted `for e in $rp`: an entry holding a glob character would expand
+    # against this checkout's files and grade names nobody wrote.
+    local -a ents; read -r -a ents <<< "$rp"
+    for e in "${ents[@]}"; do
+      c=${e//\\//}
+      while [ "${c#./}" != "$c" ]; do c=${c#./}; done
+      bare=${c%/}
+      case "$c" in
+        /*|[A-Za-z]:*|~*) why="ROUTED_PATHS entry $e is absolute"; break ;;
+      esac
+      case "/$c/" in
+        */../*) why="ROUTED_PATHS entry $e climbs through .."; break ;;
+      esac
+      if [ -z "$bare" ] || [ "$bare" = . ] || [ "$mem" = "$bare" ] || [ "${mem#"$bare"/}" != "$mem" ]; then
+        why="ROUTED_PATHS entry $e covers MEMORY_ROOT ($mem)"; break
+      fi
+      if [ "${c%/}" != "$c" ]; then
+        [ -n "$(git --literal-pathspecs ls-files -- "$c" 2>/dev/null | head -n1)" ] && continue
+      else
+        git --literal-pathspecs ls-files -- "$c" 2>/dev/null | grep -qxF -- "$c" && continue
+      fi
+      why="ROUTED_PATHS entry $e names nothing tracked (a directory entry ends in /)"; break
+    done
+  fi
+  if [ -n "$why" ]; then
+    echo "UNWIRED  routed    — $why in $conf, so the write gate is UNARMED and the ownership leg refuses. Fix: edit the key there, or delete both keys and run $arm for a derived candidate"
+    unwired=$((unwired+1))
+    return
+  fi
+  echo "ok       routed    — ROUTED_PATHS ($rp) and ROUTED_COMMIT_CUTOFF ($cut) are armed in $conf"
+}
+
 # --- Check S: the machine-global /session-kickoff install matches the tracked engine ---------------
 # CONTENT, not link-ness. The obvious check — is the install a junction or a symlink — cannot be
 # written portably here: under MSYS an NTFS junction is not reported by `test -L`, it presents as an
@@ -1432,6 +1513,14 @@ check_skill_install() {
   local fix f a b bad=""
 
   if [ ! -d "$inst" ]; then
+    # TOOL-aRoutedQuill-5 S9. A GATED repository needs the skill: the write gate's refusal names
+    # /session-kickoff as its remedy, so a gate wired on a machine without it refuses every product
+    # write with a remedy nobody here can run. Everywhere else the absent install stays a skip.
+    if [ -n "$(matchers_of scratch-guard.js 2>/dev/null)" ]; then
+      echo "UNWIRED  skill     — the write gate is wired here and /session-kickoff is not installed on this machine, so the gate's refusal names a remedy nobody here can run. Fix: link the skill per WIRE-INTO-PROJECT.md §1"
+      unwired=$((unwired+1))
+      return
+    fi
     echo "skip     skill     — /session-kickoff not installed on this machine (WIRE-INTO-PROJECT.md §1)"
     return
   fi
@@ -1636,6 +1725,7 @@ check_agentcap
 check_scratch_guard
 check_recall_opened
 check_card
+check_routed
 check_merge_rows
 check_merge_ours
 check_ssh_keepalive

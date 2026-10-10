@@ -5764,9 +5764,12 @@ user_skills = "/tmp/gk-fake-skills"
             # by the same rule as `run-gates.gov.test.sh`.
             # 28 -> 29, TOOL-dDerivedDocket-9 (27 -> 28 on its own side; the two added rows summed at
             # the reconcile): memory-tree withholds `transition-audit.test.sh` by the same `project-owned` include (its spec's S12: the suite grades gov's hooks).
+            # 29 -> 31, TOOL-aRoutedQuill-5 S1: `agent-cap` joined the default selection, and it
+            # withholds `agent-cap.test.sh` and `scratch-guard.test.sh` by the same mechanism.
+            # Measured by a default `plan` into a scratch target on 2026-10-10.
             check("...and the playbook file previews as a seed WRITE, not as an order",
                   marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 3
-                  and marks.get("ORDER|project-owned") == 29,
+                  and marks.get("ORDER|project-owned") == 31,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
@@ -5834,6 +5837,72 @@ user_skills = "/tmp/gk-fake-skills"
             check("...and a None receipt is the empty set, never a crash",
                   _gk.derive_unsatisfied_requires(["a-kit"], _descs2, None) == [],
                   "a kit with no `requires` key must yield nothing")
+
+            # ---- TOOL-aRoutedQuill-5 AC1 + AC2, on gov's OWN registry and descriptors: the default
+            # ---- set carries the gate, its writer and its reporter, its requirements close over
+            # ---- itself, and the gate without its card writer is an unsatisfied requirement.
+            _rq_rep = _gk.Report()
+            _rq_reg = _gk.load_registry(GOV_ROOT)
+            _rq_descs = _gk.read_descriptors(GOV_ROOT, _rq_reg, _rq_rep)
+            _rq_dflt = list(_gk.default_kits(_rq_reg))
+            check("RQ5 AC1 the default set holds agent-cap, settings-merge and check-wiring",
+                  {"agent-cap", "settings-merge", "check-wiring"} <= set(_rq_dflt), str(_rq_dflt))
+            check("RQ5 AC1 ...and the default selection's requirements are all satisfied by it",
+                  _gk.derive_unsatisfied_requires(_rq_dflt, _rq_descs, None) == [],
+                  str(_gk.derive_unsatisfied_requires(_rq_dflt, _rq_descs, None)))
+            check("RQ5 AC2 the gate selected without its card writer is an unsatisfied requirement",
+                  ("agent-cap", "kickoff-manifest") in _gk.derive_unsatisfied_requires(
+                      ["agent-cap", "settings-merge"], _rq_descs, {"kits": []}),
+                  str(_gk.derive_unsatisfied_requires(["agent-cap", "settings-merge"], _rq_descs,
+                                                      {"kits": []})))
+
+            # ---- TOOL-aRoutedQuill-5 AC4, the derivation `update` installs from: the entries the
+            # ---- registry's default gained between two vintages, less the claimed ones. `blob_at`
+            # ---- is stood in for, because the arm is about the set arithmetic and gov's history
+            # ---- holds no fixed pair of vintages a later commit cannot move.
+            _rq_regs = {"a" * 40: '[selection]\ndefault = ["playbook"]\n',
+                        "b" * 40: '[selection]\ndefault = ["playbook", "agent-cap", "settings-merge", '
+                                  '"check-wiring"]\n'}
+            _rq_blob = _gk.blob_at
+            _gk.blob_at = lambda _r, c, _p: _rq_regs[c].encode() if c in _rq_regs else None
+            try:
+                _rq_g = _gk.derive_default_gained(GOV_ROOT, "a" * 40, "b" * 40,
+                                                  {"kits": ["playbook", "check-wiring"]}, _rq_descs)
+                _rq_same = _gk.derive_default_gained(GOV_ROOT, "b" * 40, "b" * 40,
+                                                     {"kits": ["playbook"]}, _rq_descs)
+                _rq_none = _gk.derive_default_gained(GOV_ROOT, None, "b" * 40, {"kits": []}, _rq_descs)
+                _rq_gone = _gk.derive_default_gained(GOV_ROOT, "c" * 40, "b" * 40, {"kits": []},
+                                                     _rq_descs)
+            finally:
+                _gk.blob_at = _rq_blob
+            check("RQ5 AC4 an entry that joined the default after the receipt is gained, less a claimed one",
+                  _rq_g == (["agent-cap", "settings-merge"], ""), str(_rq_g))
+            check("RQ5 AC4 LIVENESS ...and an unmoved default gains nothing",
+                  _rq_same == ([], ""), str(_rq_same))
+            check("RQ5 AC4 a receipt with no gov_commit gains nothing and SAYS why",
+                  _rq_none[0] == [] and "gov_commit" in _rq_none[1], str(_rq_none))
+            check("RQ5 AC4 a registry unreadable at the base vintage gains nothing and says why",
+                  _rq_gone[0] == [] and "does not resolve" in _rq_gone[1], str(_rq_gone))
+
+            # ---- ...and `kits` in a target's deploy.toml grows by exactly the gained ids, in place.
+            with tempfile.TemporaryDirectory() as _rq_td:
+                _rq_t = pathlib.Path(_rq_td)
+                (_rq_t / ".governance").mkdir()
+                _rq_dt = _rq_t / ".governance" / "deploy.toml"
+                for _rq_in, _rq_want in (
+                        ('prefix = "t"\nkits = ["playbook"]\n[answers]\n',
+                         'prefix = "t"\nkits = ["playbook", "agent-cap"]\n[answers]\n'),
+                        ('kits = [\n  "playbook",\n]\n', 'kits = [\n  "playbook",\n  "agent-cap",\n]\n'),
+                        ('kits = []\n', 'kits = ["agent-cap"]\n')):
+                    _rq_dt.write_bytes(_rq_in.encode())
+                    _rq_w = _gk.add_deploy_kits(_rq_t, ["agent-cap"])
+                    check(f"RQ5 AC4 add_deploy_kits appends in place: {_rq_in.splitlines()[0]!r}",
+                          _rq_w and _rq_dt.read_bytes().decode() == _rq_want,
+                          _rq_dt.read_bytes().decode())
+                _rq_dt.write_bytes(b'prefix = "t"\n')
+                check("RQ5 AC4 ...and a descriptor declaring no `kits` is left alone",
+                      _gk.add_deploy_kits(_rq_t, ["agent-cap"]) == ""
+                      and _rq_dt.read_bytes() == b'prefix = "t"\n', _rq_dt.read_bytes().decode())
 
             # AN ACCEPTED STOP IS NOT A FAILURE. `memory-tree` seeds the conf and stops by design, so
             # every correct first install exits 1 there; calling that a failure made a default-selection

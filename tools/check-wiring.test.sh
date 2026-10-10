@@ -397,10 +397,63 @@ JSON
   # denies every matcher there is.
   rm -f .claude/settings.json
   "$py" ${KP}settings-merge.py --fragment $KIT_REL/${HOOKS}/scratch-guard.fragment.json >/dev/null 2>&1
-  out=$(chk --check); rc=$?
+  # TOOL-aRoutedQuill-5: a WIRED gate is graded for its arming and for the machine skill as well, so
+  # the fixture arms it — `.githooks/` is the one tracked directory here — and hands HOME a skill
+  # install, which keeps this arm's exit code about the scratch arm alone.
+  printf 'ROUTED_PATHS=".githooks/"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' > .memory-tree.conf
+  SGHOME=$(mktemp -d); mkdir -p "$SGHOME/.claude/skills/session-kickoff"
+  out=$(HOME="$SGHOME" chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       scratch'; } \
     && ck "AC13d the fragment's own matcher -> ok, exit 0" 1 \
     || ck "AC13d the fragment's own matcher -> ok, exit 0" 0
+  ck "RQ5 AC7 LIVENESS an armed conf beside a wired gate reads ok routed" \
+     "$(printf '%s' "$out" | grep -q '^ok       routed' && echo 1 || echo 0)"
+
+  # TOOL-aRoutedQuill-5 AC7 — an UNARMED conf beside a wired gate. A blank ROUTED_PATHS refuses every
+  # product write, and from settings.json that gate looks exactly like one that works.
+  printf 'ROUTED_PATHS=""\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' > .memory-tree.conf
+  out=$(HOME="$SGHOME" chk --check); rc=$?
+  ck "RQ5 AC7 a blank ROUTED_PATHS -> UNWIRED routed naming the key, exit 1" \
+     "$([ "$rc" = 1 ] && printf '%s' "$out" | grep -q '^UNWIRED  routed    — ROUTED_PATHS is blank' && echo 1 || echo 0)"
+  out=$(HOME="$SGHOME" chk --session); rc=$?
+  ck "RQ5 AC7 ...and --session prints the same line and exits 0" \
+     "$([ "$rc" = 0 ] && printf '%s' "$out" | grep -q '^UNWIRED  routed    — ROUTED_PATHS is blank' && echo 1 || echo 0)"
+  for _bad in '/abs/' '../up/' 'memory/' 'nothere/'; do
+    printf 'ROUTED_PATHS="%s"\nROUTED_COMMIT_CUTOFF="2026-10-10"\n' "$_bad" > .memory-tree.conf
+    ck "RQ5 AC7 entry $_bad -> UNWIRED routed naming it" \
+       "$(HOME="$SGHOME" chk --check | grep -q "^UNWIRED  routed    — ROUTED_PATHS entry $_bad " && echo 1 || echo 0)"
+  done
+  rm -f .memory-tree.conf
+  out=$(HOME="$SGHOME" chk --check)
+  ck "RQ5 AC7 a wired gate and NO conf -> UNWIRED routed naming the absent conf" \
+     "$(printf '%s' "$out" | grep -q '^UNWIRED  routed    — .*no .memory-tree.conf' && echo 1 || echo 0)"
+
+  # TOOL-aRoutedQuill-5 AC9 — the gate wired, and no /session-kickoff on this machine: the gate's own
+  # refusal names that skill as its remedy, so this is UNWIRED, not the skip it is everywhere else.
+  _nohome=$(mktemp -d)
+  ck "RQ5 AC9 a wired gate on a machine without the skill -> UNWIRED skill naming the runbook" \
+     "$(HOME="$_nohome" chk --check | grep -q '^UNWIRED  skill     — .*WIRE-INTO-PROJECT.md §1' && echo 1 || echo 0)"
+  rm -rf "$_nohome"
+
+  # TOOL-aRoutedQuill-5 AC8 — EVERY fragment the hooks kit ships, each on its own event. The second
+  # fragment is shipped and left unwired, then the PreToolUse matcher is wired under SubagentStart.
+  SGSUB="$ROOT_ABS/$HOOKS_DIR/scratch-guard-subagent.fragment.json"
+  if [ -f "$SGSUB" ]; then
+    cp "$SGSUB" $KIT_REL/${HOOKS}/scratch-guard-subagent.fragment.json
+    out=$(HOME="$SGHOME" chk --check)
+    ck "RQ5 AC8 a shipped, unwired SubagentStart fragment -> UNWIRED naming that entry" \
+       "$(printf '%s' "$out" | grep -q '^UNWIRED  scratch   — .*SubagentStart entry' && echo 1 || echo 0)"
+    ck "RQ5 AC8 LIVENESS ...while the wired PreToolUse fragment still reads ok" \
+       "$(printf '%s' "$out" | grep -q '^ok       scratch   — PreToolUse entry' && echo 1 || echo 0)"
+    printf '{"hooks": {"SubagentStart": [{"matcher": "%s", "hooks": [{"type": "command", "command": "node \\"${CLAUDE_PROJECT_DIR}/%s%s/scratch-guard.js\\""}]}]}}\n' \
+      "$(sed -n 's/.*"matcher": *"\([^"]*\)".*/\1/p' "$SGFRAG")" "$KP" "$HOOKS" > .claude/settings.json
+    out=$(HOME="$SGHOME" chk --check)
+    ck "RQ5 AC8 the PreToolUse matcher wired under SubagentStart -> the PreToolUse entry is UNWIRED" \
+       "$(printf '%s' "$out" | grep -q '^UNWIRED  scratch   — .*PreToolUse entry' && echo 1 || echo 0)"
+  else
+    echo "skip RQ5 AC8 — scratch-guard-subagent.fragment.json not found beside the gate's fragment"
+  fi
+  rm -rf "$SGHOME"
   cleanup
 else
   echo "skip scratch-guard cases — fragment or settings-merge.py not found next to script"

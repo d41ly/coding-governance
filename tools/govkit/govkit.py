@@ -967,6 +967,64 @@ def derive_unsatisfied_requires(selection: list[str], descs: dict[str, tuple[dic
     )
 
 
+def derive_default_gained(root: pathlib.Path, base_commit: str | None, to_commit: str,
+                          receipt: dict, descs: dict[str, tuple[dict, str]]) -> tuple[list[str], str]:
+    """TOOL-aRoutedQuill-5 S4: the entries the registry's DEFAULT set gained since this receipt.
+
+    `(gained, why)`. Gained is every id the `[selection] default` holds in gov's registry at
+    `to_commit` and did not hold at the receipt's `gov_commit`, less those the receipt claims and
+    less any id the current registry no longer declares. The answer is the registry's own, read at
+    both vintages through `blob_at`, never a list typed here. A receipt with no `gov_commit`, or a
+    registry unreadable at either vintage, gains nothing, and `why` names which, so the empty answer
+    is never mistaken for "the default did not move".
+    """
+    if not base_commit:
+        return [], "the receipt records no gov_commit, so there is no vintage to compare the default set against"
+    tr = derive_tool_root(root)
+    rel = "/".join(([tr] if tr else []) + [GOVKIT_DIR.name, REGISTRY_NAME])
+    sets = []
+    for commit in (base_commit, to_commit):
+        blob = blob_at(root, commit, rel)
+        if blob is None:
+            return [], f"{rel} does not resolve at {commit[:8]}, so the default set there is unknown"
+        try:
+            sets.append(default_kits(tomllib.loads(blob.decode("utf-8"))))
+        except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+            return [], f"{rel} at {commit[:8]} does not parse ({e}), so the default set there is unknown"
+    was, now = sets
+    claimed = set(receipt.get("kits") or [])
+    return [e for e in now if e not in was and e not in claimed and e in descs], ""
+
+
+def add_deploy_kits(target: pathlib.Path, ids: list[str]) -> str:
+    """TOOL-aRoutedQuill-5 S4: append `ids` to the `kits` list a target's `deploy.toml` declares.
+
+    Returns the descriptor's repo-relative path when it wrote, else ''. A descriptor declaring no
+    `kits` key takes the registry default already, so it is left alone. The edit is TEXTUAL and
+    confined to the one array: everything else in a file the target authored keeps its bytes.
+    """
+    path = target / ".governance" / "deploy.toml"
+    if not ids or not path.is_file():
+        return ""
+    text = path.read_bytes().decode("utf-8")
+    nl = "\r\n" if "\r\n" in text else "\n"
+    m = re.search(r"(?ms)^(kits[ \t]*=[ \t]*\[)(.*?)(\])", text)
+    if not m:
+        return ""
+    have = set(re.findall(r'"([^"]*)"', m.group(2)))
+    add = [i for i in ids if i not in have]
+    if not add:
+        return ""
+    body = m.group(2).rstrip()
+    sep = "" if not body.strip() or body.endswith(",") else ","
+    if "\n" in body:
+        new = body + sep + "".join(f'{nl}  "{i}",' for i in add) + nl
+    else:
+        new = body + sep + (" " if body.strip() else "") + ", ".join(f'"{i}"' for i in add)
+    path.write_bytes((text[:m.start(2)] + new + text[m.end(2):]).encode("utf-8"))
+    return ".governance/deploy.toml"
+
+
 def derive_marker_coupling(root: pathlib.Path,
                            descs: dict[str, tuple[dict, str]]) -> dict[str, set[str]]:
     """Which kits must move TOGETHER, because one ships a file carrying the other's version marker.
@@ -5695,6 +5753,15 @@ def run_fragment_merges(target: pathlib.Path, rows: list[dict], landed: set[str]
                           text=True, encoding="utf-8").returncode == 0:
             print(f"govkit {verb} — hooks: {p} already wired")
             continue
+        # TOOL-aRoutedQuill-5 S3. A fragment whose HOOK FILE this target does not hold — an opt-in hook
+        # the target declined, as memory-recall's `recall-opened.js` — is a declined choice, not a
+        # refusal: settings-merge would refuse it, and a REFUSED line on every default install is a
+        # false alarm. The path is settings-merge's own resolution, so the two cannot disagree.
+        hook = subprocess.run([sys.executable, sm, "--resolve-fragment", p], cwd=str(target),
+                              capture_output=True, text=True, encoding="utf-8").stdout.strip()
+        if hook and not (target / hook).exists():
+            print(f"govkit {verb} — hooks: {p} not wired — {hook} is not installed here")
+            continue
         # ABSENT OR STALE, asked of settings-merge itself on a scratch copy: `--check` reds on both,
         # and only an entry this run ADDED is one a rollback may remove.
         stale = False
@@ -8589,6 +8656,40 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             raise Refusal(f"the receipt claims kit '{eid}', which is no longer a registry entry — "
                           f"refusing rather than dropping it, which would leave its files owned by "
                           f"nobody")
+    # ---- TOOL-aRoutedQuill-5 S4, owner F1: an entry that JOINED the registry's default set after
+    # ---- this receipt's vintage is installed by `update`, as `apply --kits` would install it. The
+    # ---- widening is the owner's, recorded in the registry; a `--kits`-scoped run gains nothing,
+    # ---- because its scope is the operator's narrower statement. A gained entry whose `requires`
+    # ---- this target cannot satisfy is named and left out, never pulled in after it.
+    gained, _gained_why = ([], "") if kits else derive_default_gained(root, base_commit, to_commit,
+                                                                      receipt, descs)
+    while True:
+        _unmet_g = derive_unsatisfied_requires(gained, descs, receipt)
+        if not _unmet_g:
+            break
+        for _ge, _gd in _unmet_g:
+            if _ge in gained:
+                gained.remove(_ge)
+                print(f"govkit update — default-gained {_ge} NOT installed: it requires '{_gd}', which "
+                      f"this receipt does not claim and the default did not gain; `apply --kits` "
+                      f"both is the route")
+    if _gained_why:
+        print(f"govkit update — default-gained: none computed — {_gained_why}")
+    for _ge in gained:
+        print(f"govkit update — {'default-gained' if write else 'would gain'} {_ge}: the registry's "
+              f"default set holds it at {to_commit[:8]} and did not at {str(base_commit)[:8]}")
+    if gained and write:
+        # THE RECEIPT CLAIMS THEM FROM HERE, so the landing below takes every declared destination as
+        # an unclaimed source and the verify pass baselines them as touched. A failed run that rolls
+        # them back leaves the claim and no rows, and the next run lands them as unclaimed sources.
+        receipt["kits"] = list(claimed) + gained
+        claimed = receipt["kits"]
+        _deploy_w = add_deploy_kits(target, gained)
+        if _deploy_w:
+            subprocess.run(["git", "-C", str(target), "add", "--", _deploy_w], capture_output=True)
+            print(f"govkit update — default-gained: appended {', '.join(gained)} to {_deploy_w}'s kits")
+    elif gained:
+        claimed = list(claimed) + gained
     available = [e for e in all_kits(descs) if e not in claimed]
 
     # ---- THE PRECONDITIONS THIS UNIT ADDS (DEPL-dCarriedReceipt-7), steps 4 and 5 of the build's
@@ -10734,6 +10835,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         _fr_landed = set(changed) | set(renamed) | set(_landed_new)
         _fr_skip = read_inert_kits(deploy) | {str(f.get("kit")) for f in receipt.get("files") or []
                                               if f.get("kit") not in touched_kits}
+        # TOOL-aRoutedQuill-5 S4. THE RUN WHOSE WRITES ADD settings-merge TO THE RECEIPT wires every
+        # fragment the receipt claims, because each one landed UNWIRED for want of it — the card
+        # fragments a default install has carried since kickoff-manifest shipped them. Later runs
+        # wire only what they land, so an adopter's deliberate unwire stays unwired (owner D7).
+        if "settings-merge" in gained:
+            _fr_landed |= {str(f.get("path")) for f in receipt.get("files") or []
+                           if str(f.get("path", "")).endswith(".fragment.json")}
+            _fr_skip = read_inert_kits(deploy)
         # DEPL-aHalvedInstall-4 rev-3 (closing review M3). A HELD kit's fragments are not wired: the
         # merge would write its half-landed command into settings.json, and a stale command it
         # rewrites in place is not one `remove_wired_fragments` can take back. Said per fragment,
@@ -10754,6 +10863,33 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             for _fp in sorted(p for p in _fr_landed if p.endswith(".fragment.json")):
                 print(f"govkit update — hooks: {_fp} landed UNWIRED — GOVKIT_RERENDER=0 is exported, "
                       f"and wiring runs the target's own settings-merge.py")
+        # TOOL-aRoutedQuill-5 S4. A GAINED entry's ADOPTER runs once, as `apply`'s CONFIGURE runs it:
+        # `update` never re-runs an installed kit's adopter, but a gained kit was never configured.
+        # `agent-cap`'s is what wires its built-in `Workflow|Agent` entry, which is no fragment. Same
+        # argv twice runs once; same switch as the fragment wiring, and a held kit is not configured.
+        _ran_gained: set[tuple[str, ...]] = set()
+        for _ge in gained:
+            _d_g = descs[_ge][0]
+            _argv_g = (_d_g.get("adopt") or {}).get("argv") or []
+            if not _argv_g or _ge in _held_kits or _ge in read_inert_kits(deploy):
+                continue
+            _ctx_g = target_context(target, deploy, _ge, _d_g)
+            _res_g = tuple(resolve_tokens(a, _ctx_g)[0] for a in _argv_g)
+            if _res_g in _ran_gained:
+                continue
+            if not _rerender_on:
+                print(f"govkit update — default-gained {_ge}: adopter NOT run — GOVKIT_RERENDER=0 is "
+                      f"exported, and configuring runs target-side code")
+                continue
+            _ran_gained.add(_res_g)
+            _rc_g = subprocess.run(resolve_shell_argv(list(_res_g)), cwd=str(target),
+                                   capture_output=True, text=True).returncode
+            _oc_g = classify_outcome(target, _d_g, _ctx_g, _rc_g)
+            print(f"govkit update — default-gained {_ge}: adopter exit {_rc_g}"
+                  + (f" — {_oc_g.get('means')}" if _oc_g else ""))
+            if not outcome_accepted(_rc_g, _oc_g, declares_outcome_for(_d_g, _rc_g)):
+                r.fail(f"kit '{_ge}': its adopter exited {_rc_g} on the update that gained it, and no "
+                       f"declared outcome accepts that")
 
     # ======================= DEPL-dCarriedReceipt-14 S4..S8 — POST-WRITE VERIFICATION ============
     # Every byte this run was going to move has moved. Now ask each TOUCHED kit the one question it
@@ -11379,7 +11515,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # the refusal then passes for the wrong reason. `written_paths` is the set the verify
             # pass already derives for exactly this question, landings included; re-enumerating the
             # four lists here would be a second answer that omits them.
-            _rn_ours = written_paths | _reaped
+            # TOOL-aRoutedQuill-5 S6: a path a `[[regenerate]]` block DECLARES it writes is this run's
+            # own write too — memory-tree's `--arm-routing` appends to `.memory-tree.conf`, which is
+            # pinned — so it is not somebody's work-in-progress either. Declared paths only, never a
+            # status entry an argv merely touched, and only one CLEAN before the argv ran: a path the
+            # operator had already dirtied stays theirs, and still refuses the renormalize.
+            _rn_ours = written_paths | _reaped | {p for _s in _rg_snap.values()
+                                                  for p in (_s.get("paths") or [])
+                                                  if p not in (_s.get("status") or {})}
             # NO PATHSPEC, FILTERED HERE, for the reason `git_pathspec`'s own header records:
             # `git diff` rejects `--pathspec-from-file` and a large population as argv is a
             # `WinError 206` on a real adopter. One process, no command line, python does the join.
