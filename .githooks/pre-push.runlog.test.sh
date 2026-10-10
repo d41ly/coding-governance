@@ -976,6 +976,8 @@ scan_exit_sites() { # file -> one TAB-separated row per shell exit
 # third column is the decision a site writes, which the join below requires this run to have SEEN.
 {
   printf '%s\t%s\t%s\n' 'exit 1' 2 'exempt: the two refusals before any journal root, which S1 names as unloggable'
+  printf '%s\t%s\t%s\n' 'exit 2' 1 'exempt: the --decide argument refusals (a wrong count, a tip naming no commit, a bad sha, a ladder refusal), above the journal root and so unloggable by construction (TOOL-aFrugalTurnstile-7 S4)'
+  printf '%s\t%s\t%s\n' 'RUNLOG_CLEAN=1; exit 0' 1 'exempt: the --decide decision exit in print_decision, which runs with the run log switched off and no EXIT trap, so it writes no END (TOOL-aFrugalTurnstile-7 S6)'
   printf '%s\t%s\t%s\n' 'write_refusal default-branch "$why"; exit 1' 3 refuse-default-branch
   printf '%s\t%s\t%s\n' '[ -z "$main_local" ] && { RUNLOG_DECISION=skip-nondefault; RUNLOG_CLEAN=1; exit 0; }' 1 skip-nondefault
   printf '%s\t%s\t%s\n' '[ -z "${main_local//0/}" ] && { RUNLOG_DECISION=skip-delete; RUNLOG_CLEAN=1; exit 0; }' 1 skip-delete

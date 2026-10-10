@@ -25,6 +25,25 @@
 # runs no leg, so a leg that reads history rather than the tree (one the manifest marks impure) is not
 # graded over the pushed commits; a declared post-merge bar grades it. (TOOL-aFrugalTurnstile-2; see
 # THE COVER PASS.)
+#
+# `pre-push --decide <tip> <remote-sha> [<remote>]` runs this hook's own decision for a push of <tip>
+# over <remote-sha>, prints ONE line on stdout (`full <why>`, `scoped <base>` or `covered <record>`),
+# runs no bar and writes nothing; a push it would refuse exits 1 with an empty stdout, and a bad call
+# exits 2 (TOOL-aFrugalTurnstile-7, design D9; see THE DECIDE MODE).
+# WHAT --decide DOES NOT CHECK: the raw-push marker, the straggler layer and the merge-loss layer,
+# which refuse a push and decide nothing, so a push it reports as scoped can still be refused by
+# them; the docs-only narrowing, which it reports as plain scoped, so its caller runs a wider bar and
+# never a narrower one; and anything a sourced gate-env.sh writes, which runs inside this hook in
+# either mode.
+#
+# A POST-MERGE RED BINDS HERE where the gate-env file AT R declares `GATE_POST_MERGE` (design D8; see
+# THE POST-MERGE RED): `refs/gov/bar-red` on the remote, read once with a bounded `git ls-remote`,
+# forces FULL while it is an ancestor of the tip and the adopted green does not strictly descend from it.
+# WHAT THE POST-MERGE READ DOES NOT CHECK: it reads the remote's red ref once, at this push, so a red
+# published after the read binds the next push; it takes a red sha absent from this clone as no
+# ancestor of the tip, which is wrong only in a shallow clone; and a red on exactly the adopted
+# green's sha is not cleared here, since the order of two verdicts on one sha is unknown to this
+# hook. `post-merge.sh` clears that case by deleting the ref on its next green.
 set -u
 
 # ---- S2 (TOOL-dScrubbedConduit-1): SCRUB THE ENVIRONMENT GIT INJECTS INTO THIS HOOK ---------------
@@ -59,6 +78,92 @@ fi
 if ! cd "$top"; then
   echo "pre-push: REFUSING — cannot enter the work tree at '$top'." >&2
   exit 1
+fi
+
+# ---- THE DECIDE MODE — TOOL-aFrugalTurnstile-7 S4/S5/S6, design D9 ---------------------------------
+# `pre-push --decide <tip> <remote-sha> [<remote>]`: the decision code below, run for a push of <tip>
+# over <remote-sha>, with no bar and no write. The unattended close asks it which bar the landing push
+# will owe, so the close's bar and the landing's decision are ONE computation, not a second process
+# re-deriving the first. The remote is the lander's ladder, carried inline because this hook ships
+# verbatim and sources no kit; given, <remote> is handed to it as GOV_REMOTE. The arguments are vetted
+# here, above the journal root, so a bad call is unloggable by construction and exits 2.
+# Then: every message moves to stderr and fd 3 keeps stdout for the one decision line; the run log is
+# switched off and no EXIT trap stays; the refusal and vetted-bar files are emptied as names, so their
+# writers skip; and the ref loop reads one synthesized line for the default branch in place of stdin.
+# The three layers that refuse and decide nothing are skipped (the header's WHAT --decide DOES NOT
+# CHECK); every other refusal still applies and exits 1 with nothing on fd 3.
+# >>> remote_ladder_sh -- canonical copy: resolve-remote.sh in the gov lib dir (byte-identical; gated)
+# resolve_remote_sh -> RR_REMOTE RR_BRANCH RR_OBSERVED RR_WHY, rc 0; rc 1 with RR_WHY on a refusal.
+# The ladder, row for row, is resolve_remote.py in the gov lib dir: GOV_REMOTE, else the current
+# branch remote unless it is ".", else the ONLY remote; several and none chosen, or a name that is
+# no remote here, refuses naming GOV_REMOTE; no remote at all is RR_REMOTE="" and rc 0. RR_OBSERVED
+# is what <remote>/HEAD names; RR_BRANCH is GOV_DEFAULT_BRANCH, else RR_OBSERVED. Fetches nothing.
+# RR_GIT names the git command, so a caller holding a pinned wrapper function passes it.
+resolve_remote_sh() {
+  local _rr_git=${RR_GIT:-git} _rr_names _rr_n _rr_list _rr_cur _rr_where _rr_how=GOV_REMOTE _rr_head _rr_bad
+  RR_REMOTE=${GOV_REMOTE:-}; RR_BRANCH=""; RR_OBSERVED=""; RR_WHY=""
+  _rr_names=$("$_rr_git" remote 2>/dev/null) || _rr_names=""
+  _rr_n=$(printf "%s" "$_rr_names" | grep -c . || true)
+  _rr_list=$(printf "%s" "$_rr_names" | tr "\n" " ")
+  [ -n "$_rr_list" ] || _rr_list=none
+  # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous.
+  _rr_cur=$("$_rr_git" symbolic-ref --quiet HEAD 2>/dev/null) || _rr_cur=""
+  case "$_rr_cur" in refs/heads/?*) _rr_cur=${_rr_cur#refs/heads/} ;; *) _rr_cur="" ;; esac
+  if [ -z "$RR_REMOTE" ] && [ -n "$_rr_cur" ]; then
+    RR_REMOTE=$("$_rr_git" config "branch.$_rr_cur.remote" 2>/dev/null) || RR_REMOTE=""
+    _rr_how="branch.$_rr_cur.remote"
+    [ "$RR_REMOTE" != . ] || RR_REMOTE=""
+  fi
+  if [ -z "$RR_REMOTE" ] && [ "$_rr_n" -eq 1 ]; then RR_REMOTE=$_rr_names; fi
+  if [ -z "$RR_REMOTE" ] && [ "$_rr_n" -gt 1 ]; then
+    _rr_where="a detached HEAD"; [ -z "$_rr_cur" ] || _rr_where="branch $_rr_cur"
+    RR_WHY="cannot choose a remote: GOV_REMOTE is unset, $_rr_where has no configured remote, and this repository has $_rr_n remotes ($_rr_list). Name it: export GOV_REMOTE=<remote>."
+    return 1
+  fi
+  # A name holding whitespace is no remote: `grep -F` would split it into several patterns.
+  case "$RR_REMOTE" in *[[:space:]]*) _rr_bad=1 ;; *) _rr_bad=0 ;; esac
+  if [ -n "$RR_REMOTE" ] && { [ "$_rr_bad" = 1 ] || ! printf "%s\n" "$_rr_names" | grep -qxF -- "$RR_REMOTE"; }; then
+    RR_WHY="$_rr_how names $RR_REMOTE, which is no remote of this repository ($_rr_list). Name one that is: export GOV_REMOTE=<remote>."
+    RR_REMOTE=""
+    return 1
+  fi
+  if [ -n "$RR_REMOTE" ]; then
+    _rr_head=$("$_rr_git" symbolic-ref --quiet "refs/remotes/$RR_REMOTE/HEAD" 2>/dev/null) || _rr_head=""
+    case "$_rr_head" in "refs/remotes/$RR_REMOTE"/?*) RR_OBSERVED=${_rr_head#"refs/remotes/$RR_REMOTE"/} ;; esac
+  fi
+  RR_BRANCH=${GOV_DEFAULT_BRANCH:-$RR_OBSERVED}
+  return 0
+}
+# <<< remote_ladder_sh
+DECIDE=""; _dc_tip=""; _dc_r=""
+if [ "${1-}" = --decide ]; then
+  _dc_why=""
+  if [ "$#" -lt 3 ] || [ "$#" -gt 4 ]; then
+    _dc_why="it takes <tip> <remote-sha> and an optional <remote>, and was given $(( $# - 1 )) argument(s)"
+  elif ! _dc_tip=$(git rev-parse -q --verify "$2^{commit}" 2>/dev/null); then
+    _dc_why="'$2' names no commit"
+  else
+    _dc_r=$3
+    case "${#_dc_r}:$_dc_r" in
+      40:*[!0-9a-f]*|64:*[!0-9a-f]*) _dc_why="'$_dc_r' is not a sha of hex digits" ;;
+      40:*|64:*) ;;
+      *) _dc_why="'$_dc_r' is not a 40- or 64-digit sha" ;;
+    esac
+  fi
+  if [ -z "$_dc_why" ]; then
+    [ "$#" -eq 4 ] && GOV_REMOTE=$4
+    if ! resolve_remote_sh; then _dc_why=$RR_WHY
+    elif [ -z "$RR_REMOTE" ]; then _dc_why="this repository has no remote, so there is no push to decide"
+    fi
+  fi
+  if [ -n "$_dc_why" ]; then
+    echo "pre-push --decide: $_dc_why" >&2
+    echo "usage: pre-push --decide <tip> <remote-sha> [<remote>]" >&2
+    exit 2
+  fi
+  DECIDE=1; GOV_RUNLOG=0
+  set -- "$RR_REMOTE" "$(git remote get-url --push "$RR_REMOTE" 2>/dev/null)"
+  exec 3>&1 1>&2
 fi
 
 # ---- THE RUN LOG — TOOL-dLoggedFlight-4 ------------------------------------------------------------
@@ -336,11 +441,14 @@ PUSH_REFUSAL="$(git rev-parse --git-dir 2>/dev/null)/pre-push-refusal"
 # ITS OWN environment, so a sourced gate-env.sh setting the escape gave a stub-gated push the marker:
 # one decision, two processes, two inputs. Now the lander reads the answer the hook acted on.
 PUSH_BAR="${PUSH_REFUSAL%/*}/pre-push-bar"
-rm -f "$PUSH_REFUSAL" "$PUSH_BAR"
+# --decide writes neither file, so both names are emptied and every writer below is guarded on the name.
+[ -z "$DECIDE" ] || { PUSH_REFUSAL=""; PUSH_BAR=""; }
+[ -z "$PUSH_REFUSAL" ] || rm -f "$PUSH_REFUSAL" "$PUSH_BAR"
 bar_path=""; bar_blob=""
 why=""
 write_refusal() { # token · one-line message -> the refusal file, and the run-log decision the token pairs with
   local dec=""
+  [ -n "$PUSH_REFUSAL" ] || return 0
   case "$1" in
     default-branch) dec=refuse-default-branch ;;
     manifest)       dec=refuse-manifest ;;
@@ -447,6 +555,8 @@ fi
 # reads on its stdin and what the straggler layer walks (TOOL-dDerivedDocket-13). One record and one
 # name for each, where the two builds that added them had spelled two.
 main_local=""; main_remote=""; push_refs=""
+# --decide: the one line git would feed for a push of <tip> over <remote-sha> to the default branch.
+[ -z "$DECIDE" ] || exec < <(printf '%s\n' "refs/heads/$def $_dc_tip refs/heads/$def $_dc_r")
 while read -r _localref localsha remoteref _remotesha; do
   [ "$remoteref" = "refs/heads/$def" ] && { main_local=$localsha; main_remote=$_remotesha; }
   push_refs+="$_localref $localsha $remoteref $_remotesha"$'\n'
@@ -458,6 +568,7 @@ while read -r _localref localsha remoteref _remotesha; do
 done
 write_push_start
 trap 'write_push_end "$?"' EXIT
+[ -z "$DECIDE" ] || trap - EXIT   # --decide keeps no EXIT trap (S5); its run log is switched off as well
 # FROM HERE ON, every exit sets its decision and RUNLOG_CLEAN=1 immediately before it.
 
 # THE REPOSITORY'S OWN GATE POLICY, if it has one. This hook is shipped VERBATIM to every push-main
@@ -669,7 +780,7 @@ fi
 # It runs BELOW the run log's START and EXIT trap, so its one refusal names its decision and sets the
 # clean-exit mark like every exit after them: `refuse-straggler`.
 _sg="$(cd "$(dirname "$0")" && pwd)/straggler-guard.sh"
-if [ -f "$_sg" ] && . "$_sg" && command -v init_straggler_guard >/dev/null 2>&1 &&
+if [ -z "$DECIDE" ] && [ -f "$_sg" ] && . "$_sg" && command -v init_straggler_guard >/dev/null 2>&1 &&
    init_straggler_guard; then
   # The memory-tree kit is FOUND by the sibling-kit resolver above, from the kit root the ladder
   # chose, never composed from a typed kit name (the carried-prefix ban, TOOL-aRepatriatedFork-46).
@@ -738,7 +849,7 @@ fi
 # under a surviving name, or any loss below definition level (prose, a record row, a conf key); a
 # language `.lexicon.conf` does not arm; a loss masked by a same-named definition at a path the
 # carrying parent did not define it in; and an octopus or base-less merge, which is skipped by name.
-if [ -n "${main_local//0/}" ]; then
+if [ -z "$DECIDE" ] && [ -n "${main_local//0/}" ]; then   # --decide skips it: it refuses, never decides
   if [ -z "${main_remote//0/}" ]; then
     echo "pre-push: the merge-loss check did NOT run over refs/heads/$def — the remote has no such branch yet, so there is no landed range to grade."
   else
@@ -1021,7 +1132,7 @@ fi
 # origin BEFORE this full gate so it never runs on a stale tree. The lander sets this marker; a raw
 # push lacks it and is refused (--no-verify bypasses). The kit hook has no code/docs split, so EVERY
 # unmarked default-branch push is refused.
-if [ ! -f "$(git rev-parse --git-dir)/push-main-active" ]; then
+if [ -z "$DECIDE" ] && [ ! -f "$(git rev-parse --git-dir)/push-main-active" ]; then   # --decide: no lander is pushing
   why="pre-push: refusing a raw push to $def — land via ${KP}push-main.sh (it reconciles before the gate), or --no-verify to bypass."
   echo "$why" >&2
   write_refusal raw-push "$why"; RUNLOG_CLEAN=1; exit 1
@@ -1101,8 +1212,9 @@ GATE_FULL_MAX_LAG=10
 # runner under a name only this block may set. `read_policy_key` below is byte-identical to the
 # unattended driver's copy: this hook ships verbatim and sources no kit, so the one parse of this
 # policy is spelled twice, and the two readers must never disagree about a line.
+# `GATE_POST_MERGE` is cleared with them (TOOL-aFrugalTurnstile-7 S1): only R declares it, as `PM_DECL`.
 _gate_env_rel=${_gate_env#"$(git rev-parse --show-toplevel 2>/dev/null)"/}
-unset INHERITED_RED INHERITED_RED_MAX_AGE GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE
+unset INHERITED_RED INHERITED_RED_MAX_AGE GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_POST_MERGE
 
 read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleaned; nothing when none assigns it
   local line v="" hit=""
@@ -1386,12 +1498,15 @@ check_bar_base() {
 # git's default simplification drops a `--no-ff` merge's side branch that nets to nothing on the paths
 # asked about, and every landing here is such a merge. Every failure, and every element that is not a plain
 # repo path, reads as NOT doc-only, which is the decision this hook made before the class existed.
-DOCS_ONLY=""; DOCS_N=0; DOCS_WHY=""
+# The same blob carries the post-merge declaration (TOOL-aFrugalTurnstile-7 S1), so it is read here, at no
+# extra spawn, before the doc class can return early; an absent R or file leaves it undeclared.
+DOCS_ONLY=""; DOCS_N=0; DOCS_WHY=""; PM_DECL=""
 classify_docs() {
   local blob spec all nd nl
   local -a specs=() excl=()
   [ -n "$main_remote" ] && [ -n "${main_remote//0/}" ] && [ -n "$main_local" ] || return 0
   blob=$(git show "$main_remote:$_gate_env_rel" 2>/dev/null) || return 0
+  PM_DECL=$(read_policy_key "$blob" GATE_POST_MERGE)
   read -ra specs <<<"$(read_policy_key "$blob" GATE_DOC_PATHS)"
   [ "${#specs[@]}" -gt 0 ] || return 0
   for spec in "${specs[@]}"; do
@@ -1421,6 +1536,11 @@ classify_docs() {
 }
 classify_docs
 [ -n "$DOCS_WHY" ] && echo "pre-push: $DOCS_WHY" >&2
+# Any value but `local` or `ci` is still read as declared: a typo must not land a red.
+case "$PM_DECL" in
+  ''|local|ci) ;;
+  *) echo "pre-push: GATE_POST_MERGE at ${main_remote:0:8} is '$PM_DECL', outside 'local ci', and is read as declared" ;;
+esac
 
 # 1. no record at all — nothing has ever proven this bar here. Then predicates 2 to 8, per candidate
 #    (TOOL-dThriftyLanding-2). The FIRST candidate's refusal keeps its exact wording, so a clone with
@@ -1623,6 +1743,96 @@ if [ -n "$_tree_dirty" ]; then
   write_refusal dirty-tree "$why"; RUNLOG_CLEAN=1; exit 1
 fi
 
+# THE SCOPED BASE, RESOLVED ONCE (TOOL-aFrugalTurnstile-7 S6/S6b). `scoped_base` is the GATE_BASE a scoped
+# decision exports: the inherited green when one was adopted, else the adopted record's sha, and empty
+# while the decision is FULL. `scoped_full` is the FULL green that base rests on, which a scoped record
+# this push writes must name: a `kind scoped` record's own base, else the adopted sha itself. A scoped
+# record naming a scoped sha as its base is one `check_bar_base` refuses, so the push after it fell back to
+# an older full slot (found by TOOL-aFrugalTurnstile-11). The cover check, the GATE_BASE export, the
+# `--decide` line and the record's base all read these two, so no two of them can name different bases.
+resolve_scoped_base() { # -> scoped_base and scoped_full, both empty on a FULL decision
+  scoped_base=""; scoped_full=""
+  if [ -n "$inh_sha" ]; then scoped_base=$inh_sha; scoped_full=$inh_sha
+  elif [ -z "$force" ]; then scoped_base=$rec_sha; scoped_full=${rec_base:-$rec_sha}
+  fi
+}
+
+# print_decision <full|scoped|covered> <why|base|record> — the one `--decide` line, on the fd 3 the mode
+# kept for stdout, and the mode's one exit: nothing after a decision runs under --decide (S6).
+print_decision() {
+  printf '%s %s\n' "$1" "$2" >&3
+  RUNLOG_CLEAN=1; exit 0
+}
+
+# ---- THE POST-MERGE RED — TOOL-aFrugalTurnstile-7 S2/S3, design D8 ---------------------------------
+# Where the gate-env file AT R declares `GATE_POST_MERGE` (`PM_DECL`, read in `classify_docs`), a full bar
+# that went RED after a landing is published as `refs/gov/bar-red` on the remote (`post-merge.sh`), and
+# it binds here through recorded state: present and an ancestor of the tip, it forces FULL until the
+# adopted green STRICTLY descends from it. Unreadable under a declaration forces FULL too. Undeclared,
+# nothing is read and no decision moves. It can only force, so the every-predicate-forces rule holds.
+# read_post_merge_red <url> — ONE `git ls-remote --exit-code`, bounded as the unattended kit's
+# `observe_remote` is (60 s wall clock, `-k 5s`, no terminal or credential prompt, ssh connect and batch
+# bounds, the low-speed floor), captured to a file outside the git dir and never through a substitution
+# (`bounded-through-a-pipe-is-unbounded`). Sets PM_STATE (present|absent|unreadable), PM_RED and PM_WHY.
+# The URL is never printed: messages name the remote, or "the push URL".
+PM_RED=""; PM_STATE=""; PM_WHY=""
+read_post_merge_red() {
+  local url=${1-} out rc k v
+  PM_RED=""; PM_STATE=unreadable; PM_WHY=""
+  if [ -z "$url" ]; then PM_WHY="this push names no URL to read"; return 0; fi
+  if ! out=$(mktemp 2>/dev/null) || [ -z "$out" ]; then PM_WHY="no scratch file for the read could be made"; return 0; fi
+  if timeout -k 1s 10 true >/dev/null 2>&1; then
+    timeout -k 5s 60 env GIT_TERMINAL_PROMPT=0 "GIT_SSH_COMMAND=ssh -o ConnectTimeout=20 -o BatchMode=yes" \
+      git -c credential.interactive=never -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=60 \
+      ls-remote --exit-code "$url" refs/gov/bar-red </dev/null >"$out" 2>/dev/null
+    rc=$?
+  else
+    echo "pre-push: post-merge bar: this host has no working 'timeout -k', so the read's 60 s wall-clock bound is inert; its transport bounds still apply"
+    env GIT_TERMINAL_PROMPT=0 "GIT_SSH_COMMAND=ssh -o ConnectTimeout=20 -o BatchMode=yes" \
+      git -c credential.interactive=never -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=60 \
+      ls-remote --exit-code "$url" refs/gov/bar-red </dev/null >"$out" 2>/dev/null
+    rc=$?
+  fi
+  while IFS=$'\t' read -r k v; do [ "$v" = refs/gov/bar-red ] && PM_RED=$k; done < "$out"
+  rm -f "$out"
+  case "$rc" in
+    0) case "$PM_RED" in
+         ""|*[!0-9a-f]*) PM_RED=""; PM_WHY="git ls-remote answered 0 with no sha for refs/gov/bar-red" ;;
+         *) PM_STATE=present ;;
+       esac ;;
+    2) PM_STATE=absent ;;
+    124) PM_WHY="the 60 s bound fired" ;;
+    *) PM_WHY="git ls-remote exited $rc" ;;
+  esac
+}
+# check_post_merge_red <adopted sha> — after read_post_merge_red. A force sets `force`, empties the
+# inherited green and the covering record, so the decision block takes its FULL branch and names it.
+check_post_merge_red() {
+  local x=${1-} who=${push_remote:-the push URL} p8
+  case "$PM_STATE" in
+    absent)
+      echo "pre-push: post-merge bar: no red on $who (GATE_POST_MERGE=$PM_DECL at ${main_remote:0:8})"; return 0 ;;
+    present) ;;
+    *)
+      force="GATE_POST_MERGE is declared at ${main_remote:0:8} and refs/gov/bar-red on $who could not be read ($PM_WHY), so a post-merge red cannot be ruled out"
+      inh_sha=""; _cov_from=""; return 0 ;;
+  esac
+  p8=${PM_RED:0:8}
+  # A red absent from this clone is no ancestor of the tip: every ancestor of a local commit is local.
+  if ! git merge-base --is-ancestor "$PM_RED" "$main_local" 2>/dev/null; then
+    echo "pre-push: post-merge bar: red $p8 on $who is not an ancestor of the pushed tip, so it does not bind this push"; return 0
+  fi
+  if [ -n "$x" ] && [ "$x" != "$PM_RED" ] && git merge-base --is-ancestor "$PM_RED" "$x" 2>/dev/null; then
+    echo "pre-push: post-merge bar: red $p8 on $who is cleared for this push — the adopted green ${x:0:8} descends from it"; return 0
+  fi
+  if [ -n "$x" ]; then
+    force="a post-merge full bar is RED at $p8 (refs/gov/bar-red on $who) and the adopted green ${x:0:8} does not descend from it"
+  else
+    force="a post-merge full bar is RED at $p8 (refs/gov/bar-red on $who) and no adopted green descends from it"
+  fi
+  inh_sha=""; _cov_from=""
+}
+
 # ---- THE COVER PASS — TOOL-aFrugalTurnstile-2 S3/S4, design D4 -----------------------------------
 # A push whose tip TREE is the tree a recorded green graded, under this same bar, runs no bar at all:
 # every leg that bar ran read that tree, and the push carries it. After every refusal, so a dirty tree,
@@ -1673,21 +1883,22 @@ check_cover_record() {
   [ "$1" = bar ] && [ "$bg_kind" != full ] || return 0
   if [ "$bg_kind" != scoped ]; then
     cover_why="its kind reads '${bg_kind:-none}', neither full nor scoped"
-  elif [ -z "$_dec_base" ]; then
+  elif [ -z "$scoped_base" ]; then
     cover_why="it is a scoped green against base ${bg_base:0:8} and this push is FULL"
-  elif [ "$bg_base" != "$_dec_base" ] && { [ -z "$rec_base" ] || [ "$bg_base" != "$rec_base" ]; }; then
-    cover_why="it is a scoped green against base ${bg_base:0:8} and this push scopes from ${_dec_base:0:8}"
+  elif [ "$bg_base" != "$scoped_base" ] && [ "$bg_base" != "$scoped_full" ]; then
+    cover_why="it is a scoped green against base ${bg_base:0:8} and this push scopes from ${scoped_base:0:8}"
   fi
   return 0
 }
-_dec_base=""
-if [ -n "$inh_sha" ]; then _dec_base=$inh_sha; elif [ -z "$force" ]; then _dec_base=$rec_sha; fi
-_cov_from=""; _cov_why=""; _cov_bars=""
+resolve_scoped_base
+_cov_from=""; _cov_why=""; _cov_bars=""; _cov_path=""
 if [ "$bar_record" = runner ]; then
   for _gi in "${!green_candidates[@]}"; do
     [ -f "${green_candidates[$_gi]}" ] || continue
     check_cover_record runner "${green_candidates[$_gi]}"
-    if [ -z "$cover_why" ]; then _cov_from=$(green_label "$_gi"); bg_kind=full; bg_by=run-gates; break; fi
+    if [ -z "$cover_why" ]; then
+      _cov_from=$(green_label "$_gi"); _cov_path=${green_candidates[$_gi]}; bg_kind=full; bg_by=run-gates; break
+    fi
     _cov_why="$_cov_why; $(green_label "$_gi"): $cover_why"
   done
 fi
@@ -1696,16 +1907,30 @@ if [ -z "$_cov_from" ] && [ "$bar_record" != stub ]; then
     [ -f "${bar_candidates[$_bi]}" ] || continue
     _cov_bars=1
     check_cover_record bar "${bar_candidates[$_bi]}"
-    if [ -z "$cover_why" ]; then _cov_from=${bar_labels[$_bi]}; break; fi
+    if [ -z "$cover_why" ]; then _cov_from=${bar_labels[$_bi]}; _cov_path=${bar_candidates[$_bi]}; break; fi
     _cov_why="$_cov_why; ${bar_labels[$_bi]}: $cover_why"
   done
 fi
+# THE POST-MERGE RED, once the adopted record is known (S3): the covering record when the cover pass found
+# one, else the inherited green, else the record the decision adopted. A FULL push with no cover does not
+# pay the network read, and says so; a refused push never reached here.
+if [ -n "$PM_DECL" ]; then
+  if [ -z "$_cov_from" ] && [ -n "$force" ]; then
+    echo "pre-push: post-merge bar: not read — this push is already FULL"
+  else
+    read_post_merge_red "${2-}"
+    _pm_x=$rec_sha; [ -n "$inh_sha" ] && _pm_x=$inh_sha; [ -n "$_cov_from" ] && _pm_x=$bg_sha
+    check_post_merge_red "$_pm_x"
+    resolve_scoped_base
+  fi
+fi
 if [ -n "$_cov_from" ]; then
   echo "pre-push: covered on $def push (${main_local:0:8}) — tree ${_tip_tree:0:8} already carries a $bg_kind green: $_cov_from sha ${bg_sha:0:8} run ${bg_run:-none} by ${bg_by:-none} — bar: $bar_label — no bar runs"
-  { printf '%s\t%s\t%s\n' "$RUNLOG_BAR" "$bar_path" "$bar_blob" > "$PUSH_BAR"; } 2>/dev/null
+  [ -z "$DECIDE" ] || print_decision covered "$_cov_path"
+  [ -z "$PUSH_BAR" ] || { printf '%s\t%s\t%s\n' "$RUNLOG_BAR" "$bar_path" "$bar_blob" > "$PUSH_BAR"; } 2>/dev/null
   RUNLOG_DECISION=covered; RUNLOG_CLEAN=1; exit 0
 fi
-[ -n "$_cov_bars" ] && echo "pre-push: not covered — ${_cov_why#; }"
+[ -n "$_cov_bars" ] && [ -n "$_cov_why" ] && echo "pre-push: not covered — ${_cov_why#; }"
 
 # THE DECISION AND ITS REASON, on one line, always. A boundary that silently chooses the cheap path
 # is indistinguishable from one that is broken, and this line is the only place the choice is
@@ -1715,7 +1940,7 @@ _docs_clause=""
 if [ -n "$inh_sha" ]; then
   [ -n "$DOCS_ONLY" ] && export GATE_DOCS_BASE="$main_remote"
   echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause inherited green ${inh_sha:0:8} at base ${main_remote:0:8} is ${lag:-0} first-parent landing(s) back, within $GATE_FULL_MAX_LAG; the full green was not usable: $full_force — bar: $bar_label"
-  export GATE_BASE="$inh_sha"
+  export GATE_BASE="$scoped_base"
   RUNLOG_DECISION=scoped
 elif [ -n "$force" ]; then
   # LINEAGE REUSE, on this decision and this bar only (TOOL-aFrugalTurnstile-4 S7, design D5): after
@@ -1730,8 +1955,13 @@ elif [ -n "$force" ]; then
 else
   [ -n "$DOCS_ONLY" ] && export GATE_DOCS_BASE="$main_remote"
   echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause $rec_word ${rec_sha:0:8}${rec_from:+ from $rec_from}${rec_base:+, counted from its base ${rec_base:0:8},} is ${lag:-0} first-parent landing(s) back, within $GATE_FULL_MAX_LAG — bar: $bar_label"
-  export GATE_BASE="$rec_sha"
+  export GATE_BASE="$scoped_base"
   RUNLOG_DECISION=scoped
+fi
+# --decide stops here, with the decision just announced: a doc-only one prints plain scoped (S6).
+if [ -n "$DECIDE" ]; then
+  if [ "$RUNLOG_DECISION" = full ]; then print_decision full "$force${inh_why:+; $inh_why}"; fi
+  print_decision scoped "$scoped_base"
 fi
 # THE BAR'S RUN ID, pinned so this push's END joins the bar's own run-log line by id. Set BEFORE the
 # bar, like the decision, so a push killed mid-bar still names the bar it was waiting on.
@@ -1928,7 +2158,8 @@ else
   elif [ -n "${GATE_DOCS_BASE:-}" ]; then
     echo "pre-push: no gate-bar-green written — this push was scoped doc-only"
   else
-    _bg_base=""; [ "$RUNLOG_DECISION" = scoped ] && _bg_base=${GATE_BASE:-}
+    # A scoped record names the FULL green its base rests on, never a scoped sha (S6b).
+    _bg_base=""; [ "$RUNLOG_DECISION" = scoped ] && _bg_base=$scoped_full
     write_bar_green "$gd" "$main_local" "$_own_rc" "$RUNLOG_DECISION" "$_bg_base" "$gate" "$RUNLOG_GATE_RUN"
   fi
 fi

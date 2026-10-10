@@ -1978,6 +1978,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_pm_shim",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "build_policy_re",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -11688,6 +11693,16 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_pm_remote",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_pm_sums",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "read_pointer",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -16033,6 +16048,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "run_pm_decide",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "run_prefix_commit",
       "kind": "function",
       "file": ".githooks/pre-commit.test.sh"
@@ -20231,6 +20251,11 @@
       "id": "write_planted",
       "kind": "function",
       "file": "tools/unattended/check-arms-groups.test.sh"
+    },
+    {
+      "id": "write_pm_red",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "write_post_merge_record",
