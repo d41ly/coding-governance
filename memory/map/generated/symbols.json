@@ -8743,6 +8743,11 @@
       "file": "tools/unattended/stop-guard.test.sh"
     },
     {
+      "id": "measure_load_ratio",
+      "kind": "function",
+      "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
       "id": "measure_lone_cr",
       "kind": "function",
       "file": "tools/govkit/govkit.py"

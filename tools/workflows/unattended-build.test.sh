@@ -1581,7 +1581,7 @@ has    "GH15 ...commits with the Pass: none trailer" "$p" '`Pass: none`'
 has    "GH15 ...names the authored id" "$p" "spec(tB): A-tB-1"
 has    "GH15 ...locates a spec by its H1 line" "$p" "whose H1 line opens"
 has    "GH15 ...never stages a path listed before staging" "$p" "is FOREIGN, and is never staged by this stage"
-FIX_PIN="python ${PFX}${MT_KIT}/gotchas.py --for-paths --base $FIX_B \$(git diff --no-renames --name-only HEAD~1..HEAD)"
+FIX_PIN="python ${PFX}${MT_KIT}/gotchas.py --for-paths --base $FIX_B \$(git diff --no-renames --name-only HEAD~1..HEAD)"   # gov:literal-python — an expected prompt string, never run
 has    "GH15 ...and runs the checklist over its commit, pinned at the run's base" "$p" "$FIX_PIN"
 has    "GH15 the commit is logged with its sha" "$o" "log:spec stage: committed 1 spec(s) at $CSHA"
 w=$(printf '%s\n' "$o" | grep '^wargs:')
@@ -2547,8 +2547,8 @@ has    "GH35 ...and both stay items" "$w" 'NEW/CHANGED invariant inv-q — verif
 # WARNS that the hand-out's checklist reads at the spec commit's parent; a pinned base off the audit
 # route warns nothing. Every absence rides beside a positive read of the same run's prompt.
 GH35_P=fedcba9876543210fedcba9876543210fedcba98
-GH35_PIN="python ${PFX}${MT_KIT}/gotchas.py --for-paths --base $GH35_P \$(git diff --no-renames --name-only HEAD~1..HEAD)"
-GH35_UNPIN="python ${PFX}${MT_KIT}/gotchas.py --for-diff HEAD~1..HEAD"
+GH35_PIN="python ${PFX}${MT_KIT}/gotchas.py --for-paths --base $GH35_P \$(git diff --no-renames --name-only HEAD~1..HEAD)"   # gov:literal-python — an expected prompt string, never run
+GH35_UNPIN="python ${PFX}${MT_KIT}/gotchas.py --for-diff HEAD~1..HEAD"   # gov:literal-python — an expected prompt string, never run
 GH35_WARN="log:WARNING: the spec commit's checklist reads invariants at its parent"
 build_gh35_args() { # base · units args -> those args with that base
   printf '%s' "$2" | sed 's#,"base":"'"$FIX_B"'"##; s#"slug":"tB",#"slug":"tB","base":"'"$1"'",#'
