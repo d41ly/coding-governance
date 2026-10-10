@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: tooling+kickoff+playbook+deployer
 roster: TOOL+KICK+PLAY
-ids: KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-8 TOOL-aRoutedQuill-9 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12
+ids: KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-8 TOOL-aRoutedQuill-9 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12 TOOL-aRoutedQuill-13
 ---
 
 # aRoutedQuill — every code build is routed through orientation, a brief and a specced unit
@@ -77,6 +77,7 @@ none
 <!-- gen:build-index -->
 **Build status:** SPECCED · 13 unit(s) · node a · opened 2026-10-09 · streams tooling+kickoff+playbook+deployer
 ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-8 TOOL-aRoutedQuill-9 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12
+ids TOOL-aRoutedQuill-13
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -88,12 +89,12 @@ ids KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuil
 | [TOOL-aRoutedQuill-4 — every subagent starts holding the card's route, stated as facts](spec/2026-10-09-spec-TOOL-aRoutedQuill-4.md) | 4 | 2 | CLOSED | rev-6 | 2026-10-09 |
 | [PLAY-aRoutedQuill-1 — the charter's Definition of Ready: every product-code unit carries a spec before code](spec/2026-10-09-spec-PLAY-aRoutedQuill-1.md) | 5 | 2 | CLOSED | rev-4 | 2026-10-10 |
 | [TOOL-aRoutedQuill-5 — a default govkit install ships the write gate wired and its product paths armed](spec/2026-10-09-spec-TOOL-aRoutedQuill-5.md) | 5 | 2 | CLOSED | rev-5 | 2026-10-10 |
+| [TOOL-aRoutedQuill-10 — the push boundary's routed-commits run grades the whole history beside the pushed range](spec/2026-10-10-spec-TOOL-aRoutedQuill-10.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-10 |
+| [TOOL-aRoutedQuill-11 — check-wiring takes the write gate's armed verdict from the gate itself](spec/2026-10-10-spec-TOOL-aRoutedQuill-11.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-10 |
+| [TOOL-aRoutedQuill-12 — the closing review's mediums and lows, and the bar reds this build's diff carries](spec/2026-10-10-spec-TOOL-aRoutedQuill-12.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-10 |
 | [TOOL-aRoutedQuill-6 — routed against raw: a paired trial on frozen clones of real repositories](spec/2026-10-09-spec-TOOL-aRoutedQuill-6.md) | 6 | 1 | DEFERRED | rev-5 | 2026-10-09 |
 | [TOOL-aRoutedQuill-7 — the unattended prompt-brief check reads its sub-head list from the kickoff kit's `--brief-skeleton`](spec/2026-10-09-spec-TOOL-aRoutedQuill-7.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-10 |
-| [TOOL-aRoutedQuill-9 — the routed-commits leg reads green in WHOLE mode at the tip that lands](spec/2026-10-10-spec-TOOL-aRoutedQuill-9.md) | 7 | 1 | SPECCED | rev-1 | 2026-10-10 |
-| [TOOL-aRoutedQuill-10 — the push boundary's routed-commits run grades the whole history beside the pushed range](spec/2026-10-10-spec-TOOL-aRoutedQuill-10.md) | 8 | 2 | SPECCED | rev-1 | 2026-10-10 |
-| [TOOL-aRoutedQuill-11 — check-wiring takes the write gate's armed verdict from the gate itself](spec/2026-10-10-spec-TOOL-aRoutedQuill-11.md) | 9 | 2 | SPECCED | rev-1 | 2026-10-10 |
-| [TOOL-aRoutedQuill-12 — the closing review's mediums and lows, and the bar reds this build's diff carries](spec/2026-10-10-spec-TOOL-aRoutedQuill-12.md) | 10 | 2 | SPECCED | rev-1 | 2026-10-10 |
+| [TOOL-aRoutedQuill-9 — the routed-commits leg reads green in WHOLE mode at the tip that lands](spec/2026-10-10-spec-TOOL-aRoutedQuill-9.md) | 6 | 1 | SPECCED | rev-2 | 2026-10-10 |
 <!-- /gen:build-units -->
 
 Records: 28 bound to this build, across 4 record folder(s).
@@ -113,11 +114,7 @@ TOOL-aRoutedQuill-9.
 | 3 | `TOOL-aRoutedQuill-2` | no |
 | 4 | `TOOL-aRoutedQuill-3`, `TOOL-aRoutedQuill-4` | yes |
 | 5 | `PLAY-aRoutedQuill-1`, `TOOL-aRoutedQuill-5` | yes |
-| 6 | `TOOL-aRoutedQuill-6`, `TOOL-aRoutedQuill-7` | yes |
-| 7 | `TOOL-aRoutedQuill-9` | no |
-| 8 | `TOOL-aRoutedQuill-10` | no |
-| 9 | `TOOL-aRoutedQuill-11` | no |
-| 10 | `TOOL-aRoutedQuill-12` | no |
+| 6 | `TOOL-aRoutedQuill-10`, `TOOL-aRoutedQuill-11`, `TOOL-aRoutedQuill-12`, `TOOL-aRoutedQuill-6`, `TOOL-aRoutedQuill-7`, `TOOL-aRoutedQuill-9` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

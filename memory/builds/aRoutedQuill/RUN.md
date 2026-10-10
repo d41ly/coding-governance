@@ -86,3 +86,5 @@ base: 5a836bf0fc940029136b4b3fd57a87f35ff40f26
 2026-10-10T02:30:29Z rescope · item add TOOL-aRoutedQuill-11 · reason closing review H2: check-wiring reads MEMORY_ROOT with a default the write gate rejects, certifying an unarmed conf as armed
 
 2026-10-10T02:30:32Z rescope · item add TOOL-aRoutedQuill-12 · reason closing review minors M1-M9 and L1-L7, batched as the severity rule requires
+
+2026-10-10T02:57:36Z brief · item TOOL-aRoutedQuill-9 · reason 34d3dd117b22 memory/builds/aRoutedQuill/prompts/2026-10-10-prompt-TOOL-aRoutedQuill-9-build-brief.md

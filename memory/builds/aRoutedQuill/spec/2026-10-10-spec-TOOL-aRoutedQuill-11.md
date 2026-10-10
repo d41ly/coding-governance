@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-11 — check-wiring takes the write gate's armed verdict from the gate itself
 
-**Status:** SPECCED · rev-1 · 2026-10-10 · node a · Tier-2 · base 5a836bf0 · streams tooling · order 9 · ratified 2026-10-10
+**Status:** SPECCED · rev-2 · 2026-10-10 · node a · Tier-2 · base 5a836bf0 · streams tooling · order 6 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -217,6 +217,7 @@ New arm: tools/check-wiring.test.sh · covers AC1 AC2 · a conf with no MEMORY_R
 
 - rev-1 · 2026-10-10 · initial draft, from the spec brief and H2 and M2 of the round-1 closing
   review, with the skeptic's corrected fix for finding 16.
+- rev-2 · 2026-10-10 · §4 · `order 9` became `order 6`: the dispatch order gate counts the carried-forward TOOL-aRoutedQuill-6 (order 6, DEFERRED) as an unfinished earlier step and refused this unit's dispatch at order 9; the main loop still builds 9, 10, 11 and 12 one after another.
 
 ## 10. Reuse audit
 

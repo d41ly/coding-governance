@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-9 — the routed-commits leg reads green in WHOLE mode at the tip that lands
 
-**Status:** SPECCED · rev-1 · 2026-10-10 · node a · Tier-1 · base e6585db4 · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-10-10 · node a · Tier-1 · base e6585db4 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -167,6 +167,7 @@ none
 
 - rev-1 · 2026-10-10 · initial draft, from the spec brief
   `2026-10-10-prompt-TOOL-aRoutedQuill-9-spec-brief.md`.
+- rev-2 · 2026-10-10 · §4 · `order 7` became `order 6`: the dispatch order gate counts the carried-forward TOOL-aRoutedQuill-6 (order 6, DEFERRED) as an unfinished earlier step and refused this unit's dispatch at order 7; the main loop still builds 9, 10, 11 and 12 one after another.
 
 ## 9. Reuse audit
 

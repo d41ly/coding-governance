@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-12 — the closing review's mediums and lows, and the bar reds this build's diff carries
 
-**Status:** SPECCED · rev-1 · 2026-10-10 · node a · Tier-2 · base e6585db4 · streams tooling+kickoff · order 10 · ratified 2026-10-10
+**Status:** SPECCED · rev-2 · 2026-10-10 · node a · Tier-2 · base e6585db4 · streams tooling+kickoff · order 6 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -408,6 +408,7 @@ New arm: tools/push-main.test.sh · covers AC16 · a mint helper that keeps a re
 ## 9. Revision log
 
 - rev-1 · 2026-10-10 · initial draft.
+- rev-2 · 2026-10-10 · §4 · `order 10` became `order 6`: the dispatch order gate counts the carried-forward TOOL-aRoutedQuill-6 (order 6, DEFERRED) as an unfinished earlier step and refused this unit's dispatch at order 10; the main loop still builds 9, 10, 11 and 12 one after another.
 
 ## 10. Reuse audit
 

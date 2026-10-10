@@ -1,6 +1,6 @@
 # TOOL-aRoutedQuill-10 — the push boundary's routed-commits run grades the whole history beside the pushed range
 
-**Status:** SPECCED · rev-1 · 2026-10-10 · node a · Tier-2 · base e6585db4 · streams tooling · order 8 · ratified 2026-10-10
+**Status:** SPECCED · rev-2 · 2026-10-10 · node a · Tier-2 · base e6585db4 · streams tooling · order 6 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -227,6 +227,7 @@ New arm: tools/memory-tree/routed_commits.py --selftest · covers AC1 AC2 AC3 AC
 ## 9. Revision log
 
 - rev-1 · 2026-10-10 · initial draft, from the spec brief for closing review H1.
+- rev-2 · 2026-10-10 · §4 · `order 8` became `order 6`: the dispatch order gate counts the carried-forward TOOL-aRoutedQuill-6 (order 6, DEFERRED) as an unfinished earlier step and refused this unit's dispatch at order 8; the main loop still builds 9, 10, 11 and 12 one after another.
 
 ## 10. Reuse audit
 
