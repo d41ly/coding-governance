@@ -165,11 +165,20 @@ worktree serves the primary tree's push. It is one slot per clone, last writer w
 worktree's green evicts the first, which costs that push its saving and never its verdict.
 TOOL-dThriftyLanding-1, -2, -3.
 
-## The turnstile — one bar per repository
+## The turnstile — one bar per host
 
-A run claims a beacon under the git COMMON dir before it dispatches, so every worktree of one
-repository shares one beacon and two repositories never contend. A second run takes a time-sorted
-ticket and queues, announcing its position; the runner prints `gate queue: waited <n>s` on exactly
+A run claims a beacon in a HOST directory before it dispatches: `GATE_TURNSTILE_DIR`, else
+`~/.gov/gate-turnstile`. Every repository on the machine shares it, because bars from different
+repositories contend for the same cores and memory (`TOOL-aFrugalTurnstile-5`); the health log and
+the scratch sweep stay per git common dir. A host dir that cannot be created falls back to the common
+dir for the beacon and the queue, with a NOTE, which is per-repository queueing. A runner older than
+this keys on its common dir and does not see the host beacon, so serialization is complete only when
+every repository on the host carries this runner.
+
+The beacon holds `heartbeat`, `pid`, `nonce`, and the holder's name: `repo` (its top level), `run`
+(its run id) and `ttl`. A second run takes a time-sorted ticket and queues, announcing
+`another bar holds this host — <repo> run <id> pid <pid> — queued at position N (waited Ns)`, with
+`-` for a field an older beacon lacks; the runner prints `gate queue: waited <n>s` on exactly
 one line, always, zero when uncontended, so a wrapper can tell waiting from working. The next line is
 `gate queue: acquired <iso-utc> from <state>`, the instant the bar stopped waiting, and the run
 record's header carries the same pair as `acquired` and `acquired_from`, so a bar killed later can
@@ -177,11 +186,27 @@ still be told apart from one that never acquired.
 
 That line is not durable, and the status file beside it is deleted the moment the wait ends, so the
 wait also reaches the RUN RECORD as the paired keys `queued` and `queued_from`, and the summary
-file as its own line. `queued_from` is a closed four-word vocabulary: `held` (queued, then
-acquired), `expired` (burned the bounded wait and ran unqueued), `off` (the turnstile was disabled)
-and `unresolved` (the common dir did not resolve). The last two record a DASH rather than a zero,
-because a zero for a probe that never ran is a reassuring number about nothing. `unresolved` is
-UNARMED and the suite header says why.
+file as its own line. `queued_from` reads `held` (queued, then acquired), `nested` (ran inside the
+bar that holds the host, below), `expired` (burned the bounded wait and ran unqueued), `unticketed`
+(could not write a ticket and ran unqueued at once), `off` (the turnstile was disabled) or
+`unresolved` (neither the host dir nor the common dir resolved). `off` and `unresolved` record a
+DASH rather than a zero, because a zero for a probe that never ran is a reassuring number about
+nothing. `unresolved` is UNARMED and the runner's comment says why.
+
+A holder exports its nonce as `GATE_TURNSTILE_HOLDER` to its legs. A runner that inherits a value
+equal to the live beacon's `nonce` is NESTED inside that bar: it takes no ticket, prints
+`gate queue: nested under <run> — <repo> pid <pid>`, and runs. Without that, a suite's scratch-repo
+bar, or a wrapper bar's inner runner, would queue behind the very bar whose leg started it. Nesting
+trusts an inherited value any process on the host can read from the beacon, so it decides contention
+and never a verdict; the pre-push hook classes both knobs INERT rather than scrubbing them, as it
+does `GATE_TURNSTILE=0`. `run-selftests.sh` gives each pooled row its own `GATE_TURNSTILE_DIR`, so a
+pool's suites do not serialize against each other.
+
+`run-gates.sh --hold -- <command…>` is how a bar that is NOT this runner joins the queue: it takes
+the turnstile exactly as a bar does (or nests, or runs unqueued when that is what a bar would do),
+runs the command from the repository top level right after `gate queue: acquired`, with
+`GATE_TURNSTILE_HOLDER` exported when it holds, releases, and exits with the command's status. It
+writes no run record, ledger row or stamp. `--hold` with no `--` or no command exits 2.
 
 A waiter also rewrites `gate-queue-heartbeat` under its OWN worktree's git dir, beside `gate-logs/`,
 on every tick that does not acquire, holding `waited<TAB><seconds>`. It is for an out-of-process
@@ -191,11 +216,12 @@ healthy queued bar reads as silent and a resumer may kill it. Readers go by its 
 parse it. Unlike the status file it is NEVER removed: a leftover ages out as an old gate log does,
 and a removal at the acquire would drop the newest move just before the first leg lands.
 
-A holder is reaped on either of two signals: a dead PID, or a heartbeat older than the TTL. The TTL
-is DERIVED from the profile row's per-leg `timeout=` when it sets one, because the heartbeat
-refreshes when a leg COMPLETES — so "can the holder still be holding" and "has a leg finished
-lately" are the same question. Release is nonce-guarded and folded into a trap widened to INT, TERM
-and HUP: a run whose beacon was reaped can never delete its successor's.
+A holder is reaped on either of two signals: a dead PID, or a heartbeat older than the HOLDER's TTL,
+read from the beacon's `ttl` and falling back to the waiter's own when the beacon has none, since two
+repositories may run different TTLs. The TTL is derived from the profile row's per-leg `timeout=`
+when it sets one, else `GATE_TURNSTILE_TTL`, and a detached ticker refreshes the heartbeat at a sixth
+of it. Release is nonce-guarded and folded into a trap widened to INT, TERM and HUP: a run whose
+beacon was reaped can never delete its successor's.
 
 It FAILS OPEN. The wait is bounded at a declared multiple of the TTL; on expiry the run says so
 loudly, drops its ticket and proceeds unqueued. `GATE_TURNSTILE=0` disables it entirely. It never

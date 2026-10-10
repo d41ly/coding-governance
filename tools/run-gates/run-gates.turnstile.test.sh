@@ -128,6 +128,11 @@ LIB="${LIB_DIR##*/}"
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "turnstile-test: not a git repo"; exit 2; }
 HERE=$(cd "$(dirname "$0")" && pwd)
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+# THE HOST TURNSTILE IS THIS SUITE'S OWN (TOOL-aFrugalTurnstile-5 S7). The runner's beacon and queue
+# live in a host-wide directory, so a fixture bar left on the default would queue behind every real
+# bar on the machine, and one inside a real bar's leg would NEST and never claim at all. `mk_repo`
+# clears it, so every arm starts on an empty turnstile exactly as a fresh common dir gave it before.
+export GATE_TURNSTILE_DIR="$tmp/gate-turnstile"
 bad=0
 # An EXECUTED assertion count with a floor, carried at birth: a suite that prints a hardcoded total
 # is a suite whose count stops tracking its arms the first time somebody deletes one.
@@ -144,7 +149,9 @@ bad=0
 # three assertions, every one unconditional, counted off the block rather than read off a run.
 # Raised from 74 to 78 by TOOL-aGraftedHelix-8: one health-log line each in arms 3, 7c, 16 and 22,
 # arm 22's counted on its never-established branch too, as a SKIP.
-FLOOR_ASSERTIONS=78
+# Raised from 78 to 101 by TOOL-aFrugalTurnstile-5, which adds arms 23-28: 5, 4, 4, 6, 2 and 2
+# assertions, every one unconditional or counted on both branches, counted off the blocks.
+FLOOR_ASSERTIONS=101
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -169,6 +176,7 @@ hdrkey() {
 # mk_repo <dir> — a scratch repository carrying the runner and its table.
 mk_repo() {
   local d=$1
+  rm -rf "$GATE_TURNSTILE_DIR/gate-bar-beacon" "$GATE_TURNSTILE_DIR/gate-bar-queue" 2>/dev/null
   mkdir -p "$d/${PFX}${KIT}" "$d/${PFX}${LIB}" "$d/fx"
   cp "$HERE/run-gates.sh" "$HERE/gate-profiles.txt" "$d/${PFX}${KIT}/" || return 1
   cp "$HERE/gate-fingerprint.sh" "$d/${PFX}${KIT}/" 2>/dev/null || true
@@ -199,21 +207,12 @@ OCC
 legs()  { printf '%s\n' "$2" > "$1/${PFX}gate-legs.json"; }
 runbg() { ( cd "$1" && shift; env "$@" bash $KIT_REL/run-gates.sh; ) >>"$tmp/out.$RANDOM" 2>&1 & }
 peak()  { awk 'BEGIN{m=0} {if ($1+0>m) m=$1+0} END{print m+0}' "$1/peaks" 2>/dev/null; }
-# RESOLVED ABSOLUTELY, the way the runner resolves it. `git rev-parse --git-common-dir` answers a
-# path RELATIVE to the repo it was asked in — plain `.git` in an ordinary clone — so a helper that
-# returned it verbatim handed every arm a path that means something different from the harness's
-# own cwd. The arms then tested a beacon that never existed and reported "the run never claimed",
-# which is the arm correctly refusing to grade rather than passing, but for the wrong reason.
-beacon(){ local c; c=$(cd "$1" && git rev-parse --git-common-dir) || return 1
-          c=$(cd "$1" && cd "$c" && pwd) || return 1
-          printf '%s/gate-bar-beacon' "$c"; }
-# The QUEUE's path, resolved the same absolute way and for the same reason (TOOL-aReapedTicket-3).
-# The arms below plant tickets in it, so a helper that returned a relative path would have them
-# planting into a directory the runner never reads — the failure `beacon` already carries a comment
-# about, which is why this is a sibling of it rather than a fresh derivation.
-queue(){  local c; c=$(cd "$1" && git rev-parse --git-common-dir) || return 1
-          c=$(cd "$1" && cd "$c" && pwd) || return 1
-          printf '%s/gate-bar-queue' "$c"; }
+# The beacon and the queue of the HOST turnstile every fixture repo shares (TOOL-aFrugalTurnstile-5),
+# under the suite's own `GATE_TURNSTILE_DIR`. The repo argument is kept so each arm still names the
+# repository it is about; the path no longer depends on it. They were the git common dir's, resolved
+# absolutely, and the arms planting there were what that resolution existed for.
+beacon(){ printf '%s/gate-bar-beacon' "$GATE_TURNSTILE_DIR"; }
+queue(){  printf '%s/gate-bar-queue' "$GATE_TURNSTILE_DIR"; }
 
 # ------------------------------------------------------ 1/2: peak occupancy, and its control -------
 # AC1 with AC2 beneath it. AC1 alone passes on an implementation that serializes by accident — two
@@ -629,9 +628,12 @@ else
   realcommon=$(cd "$ROOT" && cd "$(git rev-parse --git-common-dir)" && pwd)
   probe=$tmp/nested; mk_repo "$probe"
   probecommon=$(cd "$probe" && cd "$(git rev-parse --git-common-dir)" && pwd)
+  # Since TOOL-aFrugalTurnstile-5 the BEACON is host-wide and a different common dir no longer keeps a
+  # nested runner off it: nesting does (arm 24). What a separate common dir still keeps apart is the
+  # health log and the scratch owner record, which stay per repository.
   [ "$probecommon" != "$realcommon" ] \
-    && ok "a scratch repo resolves a different git common dir, so a nested runner cannot queue against the real beacon" \
-    || nope "a scratch repo resolved the SAME common dir as the real tree — every nested leg would deadlock on the real beacon"
+    && ok "a scratch repo resolves a different git common dir, so a nested runner's health log and scratch owner stay its own" \
+    || nope "a scratch repo resolved the SAME common dir as the real tree — a nested leg would write the real tree's health log and scratch owner"
 fi
 
 # -------------------------------------- 11: a reaped run does not delete its successor's beacon ---
@@ -858,8 +860,8 @@ printf '%s' "$out16" | grep -q 'sweeping' \
 # reproduction this build started from sent its reader hunting a holder that did not exist.
 if printf '%s' "$out16" | grep -q 'queued at position'; then
   ok "the greppable position tail is still emitted"
-  printf '%s' "$out16" | grep -q 'another bar holds this repository' \
-    && nope "the runner claimed a bar holds the repository while no beacon directory existed" \
+  printf '%s' "$out16" | grep -q 'another bar holds this host' \
+    && nope "the runner claimed a bar holds the host while no beacon directory existed" \
     || ok "with no beacon held, the queued line reports the QUEUE rather than inventing a holder"
 else
   skipped "the position-tail arm: this run never queued, so the line under test was never emitted"
@@ -998,6 +1000,138 @@ else
   skipped "the foreign owner's survival: the first bar never established"
   skipped "the first bar's verdict: the first bar never established"
   skipped "the scratch-swept health line: the first bar never established"
+fi
+
+# ---- 23: ONE BAR PER HOST, and the beacon names its holder (TOOL-aFrugalTurnstile-5 AC1, AC2) -----
+# Two REPOSITORIES under one host dir, which the common-dir key let run at once. The holder's leg
+# waits on a go-file, released only once the second bar has queued or has registered beside it, so
+# neither verdict below rests on a clock. The beacon's fields are read while it is held.
+R23a=$tmp/hostA; R23b=$tmp/hostB; mk_repo "$R23a"; mk_repo "$R23b"; B23=$(beacon "$R23a"); S23=$tmp/shared23
+mkdir -p "$S23"
+printf '#!/usr/bin/env bash\nS=${TS_SHARED:?}\nmkdir -p "$S/live"; mkdir "$S/live/$$"\nls -1 "$S/live" | wc -l >> "$S/peaks"\ni=0; while [ ! -e "$S/go" ] && [ "$i" -lt 1500 ]; do sleep 0.2; i=$((i + 1)); done\nrmdir "$S/live/$$"\nexit 0\n' > "$tmp/hold23.sh"
+printf '[ {"name": "hold", "argv": ["bash", "%s"]} ]\n' "$tmp/hold23.sh" > "$tmp/hold23.json"
+( cd "$R23a" && env TS_SHARED="$S23" GATE_FULL=1 GATE_TURNSTILE_TTL=600 GATE_TURNSTILE_TICK=1 GATE_LEGS="$tmp/hold23.json" \
+    bash $KIT_REL/run-gates.sh ) >"$tmp/out23a" 2>&1 &
+h23=$!
+i23=0; while [ ! -s "$S23/peaks" ] && kill -0 "$h23" 2>/dev/null && [ "$i23" -lt 2400 ]; do sleep 0.1; i23=$((i23 + 1)); done
+f23_repo=$(cat "$B23/repo" 2>/dev/null); f23_run=$(cat "$B23/run" 2>/dev/null)
+f23_ttl=$(cat "$B23/ttl" 2>/dev/null); f23_pid=$(cat "$B23/pid" 2>/dev/null)
+( cd "$R23b" && env TS_SHARED="$S23" GATE_FULL=1 GATE_TURNSTILE_TICK=1 GATE_LEGS="$tmp/hold23.json" \
+    bash $KIT_REL/run-gates.sh ) >"$tmp/out23b" 2>&1 &
+w23=$!
+i23=0
+while ! grep -q 'queued at position' "$tmp/out23b" 2>/dev/null && ! grep -q '^ *2' "$S23/peaks" 2>/dev/null \
+      && kill -0 "$w23" 2>/dev/null && [ "$i23" -lt 2400 ]; do sleep 0.1; i23=$((i23 + 1)); done
+: > "$S23/go"; wait "$w23" 2>/dev/null; wait "$h23" 2>/dev/null
+top23=$(cd "$R23a" && git rev-parse --show-toplevel); run23=$(hdrkey "$R23a" run_id)
+[ -n "$f23_repo" ] && [ "$f23_repo" = "$top23" ] && ok "the host beacon's repo names the holder's top level" \
+  || nope "the host beacon's repo read '$f23_repo', not the holder's top level '$top23'"
+[ -n "$f23_run" ] && [ "$f23_run" = "$run23" ] && ok "the host beacon's run is the holder's run id" \
+  || nope "the host beacon's run read '$f23_run', not the holder's run id '$run23'"
+[ "$f23_ttl" = 600 ] && ok "the host beacon's ttl is the holder's TTL" \
+  || nope "the host beacon's ttl read '$f23_ttl', not the holder's 600"
+[ "$(peak "$S23")" = 1 ] && ok "two repositories under one host dir never held at once (peak 1)" \
+  || nope "two repositories under one host dir ran at once (peak $(peak "$S23"))"
+grep -qF "another bar holds this host — $top23 run $run23 pid $f23_pid — queued at position" "$tmp/out23b" \
+  && ok "the second repository's queue line names the holder's top level, run id and pid" \
+  || { nope "the second repository's bar did not name its holder"; grep -E 'holds|queued' "$tmp/out23b" | sed 's/^/      /'; }
+
+# ---- 24: a runner inside the holder's own leg NESTS rather than queueing (AC3) --------------------
+# The deadlock the host key would otherwise create: a suite's scratch-repo bar queued behind the
+# very bar whose leg started it. THE CONTROL unsets the inherited nonce in the same leg, and the
+# inner bar must then queue; without it, a runner that never queues at all passes the first half.
+# The control's inner TTL of 5 bounds its wait at the 20 s fail-open.
+R24o=$tmp/nestout; R24i=$tmp/nestin; mk_repo "$R24o"; mk_repo "$R24i"
+legs "$R24i" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+# `-u GATE_LEGS` IS LOAD-BEARING: the outer bar's manifest is passed through it, and an inner runner
+# that inherited it would run this same leg again, nesting without end.
+printf '#!/usr/bin/env bash\ncd "%s" && env -u GATE_LEGS bash %s/run-gates.sh > "%s" 2>&1\nexit 0\n' "$R24i" "$KIT_REL" "$tmp/out24in" > "$tmp/nest24.sh"
+printf '#!/usr/bin/env bash\ncd "%s" && env -u GATE_LEGS -u GATE_TURNSTILE_HOLDER GATE_TURNSTILE_TTL=5 bash %s/run-gates.sh > "%s" 2>&1\nexit 0\n' "$R24i" "$KIT_REL" "$tmp/out24un" > "$tmp/unnest24.sh"
+printf '[ {"name": "nest", "argv": ["bash", "%s"]} ]\n' "$tmp/nest24.sh" > "$tmp/nest24.json"
+printf '[ {"name": "unnest", "argv": ["bash", "%s"]} ]\n' "$tmp/unnest24.sh" > "$tmp/unnest24.json"
+( cd "$R24o" && env GATE_FULL=1 GATE_TURNSTILE_TTL=5 GATE_TURNSTILE_TICK=1 GATE_LEGS="$tmp/nest24.json" bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1
+grep -q '^gate queue: nested under ' "$tmp/out24in" 2>/dev/null && ok "a runner started by the holder's leg prints that it is nested" \
+  || { nope "a runner started by the holder's leg did not nest"; tail -4 "$tmp/out24in" 2>/dev/null | sed 's/^/      /'; }
+[ "$(hdrkey "$R24i" queued_from)" = nested ] && ok "the nested run's header reads queued_from nested" \
+  || nope "the nested run's header reads queued_from '$(hdrkey "$R24i" queued_from)', not nested"
+grep -q 'queued at position' "$tmp/out24in" 2>/dev/null && nope "the nested runner queued behind its own parent" \
+  || ok "the nested runner took no place in the queue"
+# The control's OUTER bar runs a TTL of 30 and its inner one 5: the inner waits out 20 s at most,
+# and judges the holder by the holder's 30, so a heartbeat a loaded host delays past 5 s is no reap.
+( cd "$R24o" && env GATE_FULL=1 GATE_TURNSTILE_TTL=30 GATE_TURNSTILE_TICK=1 GATE_LEGS="$tmp/unnest24.json" bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1
+grep -q 'queued at position' "$tmp/out24un" 2>/dev/null && ok "control: with the nonce unset in the same leg, the inner runner queues" \
+  || { nope "control: with the nonce unset the inner runner did not queue, so the nesting half proves nothing"; grep -E 'gate queue|reaping|holds|EXPIRED' "$tmp/out24un" 2>/dev/null | sed 's/^/      /'; }
+
+# ---- 25: staleness is judged by the HOLDER's ttl (AC5) --------------------------------------------
+# A live holder whose heartbeat is 400 s old is fresh under its own ttl of 600 and stale under the
+# waiter's 60. The waiter must queue, not reap, and the beacon must outlive the killed waiter; with
+# the beacon's ttl removed, as an older runner writes it, the waiter's own 60 s applies and it reaps.
+R25=$tmp/hostttl; mk_repo "$R25"; B25=$(beacon "$R25")
+legs "$R25" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+sleep 300 & hp25=$!
+mkdir -p "$B25"; printf '%s' "$hp25" > "$B25/pid"; printf '%s' $(( $(date +%s) - 400 )) > "$B25/heartbeat"
+printf 'planted' > "$B25/nonce"; printf '600' > "$B25/ttl"
+( cd "$R25" && exec env GATE_FULL=1 GATE_TURNSTILE_TTL=60 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >"$tmp/out25a" 2>&1 &
+w25=$!
+i25=0; while ! grep -q 'queued at position\|reaping' "$tmp/out25a" 2>/dev/null && kill -0 "$w25" 2>/dev/null && [ "$i25" -lt 1200 ]; do sleep 0.1; i25=$((i25 + 1)); done
+kill "$w25" 2>/dev/null; wait "$w25" 2>/dev/null
+grep -q 'another bar holds this host' "$tmp/out25a" && ok "a holder fresh under its own ttl is queued behind" \
+  || nope "a holder fresh under its own ttl of 600 was not queued behind"
+grep -q 'reaping' "$tmp/out25a" && nope "the waiter reaped a holder by its OWN ttl of 60 rather than the holder's 600" \
+  || ok "no reaping line for a holder fresh under its own ttl"
+[ -d "$B25" ] && ok "the holder's beacon survived the waiter" || nope "the holder's beacon was removed while it was fresh under its own ttl"
+rm -f "$B25/ttl"
+out25b=$( cd "$R25" && env GATE_FULL=1 GATE_TURNSTILE_TTL=60 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
+printf '%s' "$out25b" | grep -q 'reaping the beacon of a stalled holder (heartbeat [0-9]*s old, ttl 60s)' \
+  && ok "a beacon with no ttl is judged by the waiter's own (stalled, ttl 60s)" \
+  || nope "a beacon with no ttl was not reaped as stalled under the waiter's ttl 60s"
+kill "$hp25" 2>/dev/null; wait "$hp25" 2>/dev/null; rm -rf "$B25"
+
+# ---- 26: `--hold -- <command…>` admits a bar that is not the runner (AC6, AC7) ---------------------
+# The command's status is the run's, the beacon is gone afterwards, the command sees the holder's
+# nonce, and no run record is written. The probe is a file so no quoting crosses the runner.
+R26=$tmp/holdverb; mk_repo "$R26"; B26=$(beacon "$R26")
+legs "$R26" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+cat > "$tmp/probe26.sh" <<'P26'
+echo "holder=${GATE_TURNSTILE_HOLDER:-}"
+echo "nonce=$(cat "$GATE_TURNSTILE_DIR/gate-bar-beacon/nonce" 2>/dev/null)"
+P26
+out26=$( cd "$R26" && bash $KIT_REL/run-gates.sh --hold -- false 2>&1 ); rc26=$?
+{ [ "$rc26" = 1 ] && ! printf '%s' "$out26" | grep -q 'gates GREEN'; } && ok "--hold -- false exits 1 and runs no leg" \
+  || nope "--hold -- false exited $rc26 (or ran the legs)"
+[ -d "$B26" ] && nope "--hold left its beacon behind" || ok "--hold released its beacon"
+out26=$( cd "$R26" && bash $KIT_REL/run-gates.sh --hold -- bash "$tmp/probe26.sh" 2>&1 )
+h26=$(printf '%s\n' "$out26" | sed -n 's/^holder=//p'); n26=$(printf '%s\n' "$out26" | sed -n 's/^nonce=//p')
+[ -n "$h26" ] && [ "$h26" = "$n26" ] && ok "the held command sees GATE_TURNSTILE_HOLDER equal to the beacon's nonce" \
+  || nope "the held command saw holder '$h26' against the beacon's nonce '$n26'"
+( cd "$R26" && bash $KIT_REL/run-gates.sh --hold -- true ) >/dev/null 2>&1 && ok "--hold -- true exits 0" || nope "--hold -- true did not exit 0"
+[ -e "$R26/.git/gate-run" ] && nope "--hold wrote a run record" || ok "--hold wrote no run record"
+out26=$( cd "$R26" && bash $KIT_REL/run-gates.sh --hold 2>&1 ); rc26=$?
+{ [ "$rc26" = 2 ] && printf '%s' "$out26" | grep -q -- '--hold needs a command'; } && ok "--hold with no command exits 2 with its usage line" \
+  || nope "--hold with no command exited $rc26: $(printf '%s' "$out26" | tail -1)"
+
+# ---- 27: an unusable host dir falls back to the common dir, announced (AC12) ----------------------
+R27=$tmp/hostfile; mk_repo "$R27"; : > "$tmp/hostfile27"
+legs "$R27" '[ {"name": "long", "argv": ["bash", "fx/long.sh"]} ]'
+( cd "$R27" && env GATE_TURNSTILE_DIR="$tmp/hostfile27" GATE_FULL=1 TS_LONG=6 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >"$tmp/out27" 2>&1 &
+h27=$!; seen27=0
+i27=0; while kill -0 "$h27" 2>/dev/null && [ "$i27" -lt 2400 ]; do [ -d "$R27/.git/gate-bar-beacon" ] && { seen27=1; break; }; sleep 0.1; i27=$((i27 + 1)); done
+wait "$h27" 2>/dev/null
+grep -q 'could not be created, so this bar queues per repository' "$tmp/out27" && ok "an unusable host dir is announced" \
+  || nope "an unusable host dir fell back silently, or not at all"
+[ "$seen27" = 1 ] && ok "the fallback beacon was claimed under the repository's common dir" \
+  || nope "no beacon appeared under the repository's common dir when the host dir was unusable"
+
+# ---- 28: the default host dir is spelled identically by every reader (AC10) ------------------------
+# A reader of another spelling probes a queue no bar writes and reports "no interrupted act" over it.
+spell28='GATE_TURNSTILE_DIR:-$HOME/.gov/gate-turnstile'
+[ "$(grep -cF "$spell28" "$HERE/run-gates.sh")" -ge 1 ] && ok "the runner spells the default host dir" \
+  || nope "the runner does not spell the default host dir as '$spell28'"
+if ua28=$(resolve_kit_dir "$_rkd_py" unattended unattended.sh "$HERE" 2>/dev/null) && [ -f "$ROOT/$ua28/unattended.sh" ]; then
+  [ "$(grep -cF "$spell28" "$ROOT/$ua28/unattended.sh")" -ge 1 ] && ok "the unattended driver spells it identically" \
+    || nope "the unattended driver reads the turnstile queue under another spelling"
+else
+  skipped "the unattended driver's spelling: that kit is not installed in this tree"
 fi
 
 echo

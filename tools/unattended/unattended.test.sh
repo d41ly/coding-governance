@@ -129,6 +129,9 @@ in_shard() { [ "$SH_I" = 0 ] || [ "$SH_I" = "$1" ]; }
 
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP" "${ORIGIN_DIR:-}"' EXIT
+# A take-over reads the runner's HOST turnstile queue (TOOL-aFrugalTurnstile-5), so on the default every
+# arm would name the dead tickets of whatever bars died on this machine. This suite's own, and empty.
+export GATE_TURNSTILE_DIR="$TMP/gate-turnstile"
 st=0
 n=0
 
@@ -8885,6 +8888,16 @@ hit "$out" "INTERRUPTED — a non-empty index is staged"
 hit "$out" "staged.txt"
 n=$((n+1)); grep -q '^keepalive: kC$' memory/builds/tRun/RUN.md || { echo "FAIL AC7 the take-over did not record the new keepalive"; st=1; }
 n=$((n+1)); grep -q '^session: sOther$' memory/builds/tRun/RUN.md || { echo "FAIL AC7 the take-over did not record its session in the lease facts"; st=1; }
+# ---- TOOL-aFrugalTurnstile-5 AC9: the take-over reads the HOST queue the runner writes. A dead-pid
+# ---- ticket planted there is named; the driver at that unit's base probed only the common dir's
+# ---- queue, which no bar writes any more, and printed "no interrupted act" over it.
+build_hold_fixture
+write_aged_commit
+mkdir -p "$GATE_TURNSTILE_DIR/gate-bar-queue"; : > "$GATE_TURNSTILE_DIR/gate-bar-queue/20000101T000000-999999-1"
+out=$(CLAUDE_CODE_SESSION_ID=sOther run --resume tRun --keepalive-id kC)
+hit "$out" "INTERRUPTED — a turnstile ticket names a pid that is not running"
+miss "$out" "no interrupted act was found"
+rm -rf "$GATE_TURNSTILE_DIR/gate-bar-queue"
 
 # ---- AC19: a LEASELESS working record is surfaced by the age of the newest commit touching its
 # ---- build folder — the population TOOL-aReapedTicket-5 records, which nothing surfaced at all.

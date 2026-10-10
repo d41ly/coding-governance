@@ -1196,9 +1196,10 @@ if [ "$MODE" = sweep ]; then
   # private TMPDIR below is the redirection; this is the observation that it held.
   #
   # ONE ARM, over the TRACKED working tree. It listed the git common dir too and that arm is DELETED
-  # rather than narrowed: that directory is shared by every worktree of the repository and the bar
-  # itself writes `gate-bar-beacon` and `gate-bar-queue` at its top level when it claims the
-  # turnstile, alongside `gate-ledger.tsv`, `gate-logs`, `index`, `logs` and `refs`. The sweep's
+  # rather than narrowed: that directory is shared by every worktree of the repository and holds
+  # `gate-ledger.tsv`, `gate-logs`, `index`, `logs` and `refs`, which any sibling session's bar or git
+  # command rewrites (the turnstile's beacon and queue sit in a host directory since
+  # TOOL-aFrugalTurnstile-5, not here). The sweep's
   # floor is its longest suite, so the window between the two readings is tens of minutes wide: any
   # sibling session running a bar flips the listing, and a whole-run fingerprint cannot name a
   # culprit. An instrument that reds on innocent runs is ignored within two sightings.
@@ -1269,7 +1270,10 @@ if [ "$MODE" = sweep ]; then
     # under them. The whole WALL rendering path below was unreachable dead code as a result.
     # Recording the `timeout` child rather than this subshell is what makes the kill reach the work:
     # `timeout` forwards the signal to its own child, and killing the subshell would leave both.
-    TMPDIR="$d/tmp" "$SWEEP_TIMEOUT" -k 5 "$bound" bash -c "${SW_ARGV[$((k - 1))]}" > "$d/out" 2>&1 &
+    # A PRIVATE TURNSTILE per row (TOOL-aFrugalTurnstile-5 S7): the runner's beacon is host-wide, so
+    # every row's fixture bars would otherwise serialize against each other and against real bars.
+    TMPDIR="$d/tmp" GATE_TURNSTILE_DIR="$d/tmp/gate-turnstile" \
+      "$SWEEP_TIMEOUT" -k 5 "$bound" bash -c "${SW_ARGV[$((k - 1))]}" > "$d/out" 2>&1 &
     tp=$!
     echo "$tp" > "$d/pid"
     wait "$tp"

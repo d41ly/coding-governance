@@ -1,12 +1,13 @@
 # TOOL-aFrugalTurnstile-5 — the gate turnstile is host-wide, names its holder, lets nested bars through, and `--hold` admits a foreign bar
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 2 · ratified 2026-10-09
+**Status:** CLOSED · rev-2 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 2 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-1-1-design.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
+| [2026-10-09-build-TOOL-aFrugalTurnstile-5-1-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aFrugalTurnstile-5-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-1-spec-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1-2-build-brief.md) | journal | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
 | [2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md](../prompts/2026-10-09-prompt-TOOL-aFrugalTurnstile-1.md) | research | TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-10 PLAY-aFrugalTurnstile-1 DEPL-aFrugalTurnstile-1 |
@@ -60,16 +61,20 @@ behind its parent, and a bar that is not this runner can enter the queue through
   no ledger row and no stamp. Observed by AC6, AC7.
 - **S7 — every other reader of the two paths follows them.**
   - `tools/unattended/unattended.sh` `print_interrupted_acts` (~5884) reads the queue at
-    `${GATE_TURNSTILE_DIR:-$HOME/.gov/gate-turnstile}/gate-bar-queue`, the runner's spelling. A blind
-    probe there reports "no interrupted act" over a queue it never read. Observed by AC9.
+    `${GATE_TURNSTILE_DIR:-$HOME/.gov/gate-turnstile}/gate-bar-queue`, the runner's spelling, and
+    the common dir's queue as well, which is where a runner whose host dir could not be created
+    queues. A blind probe there reports "no interrupted act" over a queue it never read. Observed
+    by AC9.
   - `tools/run-gates/run-selftests.sh` exports a per-row `GATE_TURNSTILE_DIR` under each row's
     private `TMPDIR`, so pooled suites isolate their fixture bars as separate common dirs did, and
     its comment at ~1200 stops claiming the beacon sits under the common dir. Observed by AC11.
   - The suites that assert a fixture bar's turnstile state isolate it: the turnstile suite and the
     evidence suite export `GATE_TURNSTILE_DIR` to their own scratch in the prologue, the turnstile
     suite's `beacon()` and `queue()` helpers return paths under it, and `run-gates.test.sh`'s AC3 and
-    AC5 arms plant and its OM arm reads the beacon there. NOT OBSERVED in the pass: suite edits run
-    at VERIFYING.
+    AC5 arms plant and its OM arm reads the beacon there, each bar's `GATE_TURNSTILE_DIR` pointed at
+    that fixture repo's own git dir so the planted paths stay as they were. The unattended suite
+    exports its own `GATE_TURNSTILE_DIR` too, so a take-over arm never names a dead ticket some real
+    bar left on the host. NOT OBSERVED in the pass: suite edits run at VERIFYING.
 - **S8 — the knob classes.** `GATE_TURNSTILE_DIR` and `GATE_TURNSTILE_HOLDER` join
   `BAR_INERT_KNOBS` in `.githooks/pre-push.test.sh`'s H49 arm, beside `GATE_TURNSTILE`, with one
   comment line each (F1). Observed by AC8.
@@ -120,7 +125,7 @@ armed (`ts_tick_stop; ts_release; ts_drop_ticket` on EXIT, INT, TERM and HUP) an
 ### Inventory
 
 No function is minted; the nested test and `--hold` are inline. New names: `TS_HOST`, `TS_RUN`,
-`TS_NESTED` (shell variables); `GATE_TURNSTILE_DIR`, `GATE_TURNSTILE_HOLDER` (environment knobs,
+`TS_NESTED`, and `TS_HOLD`, the array holding `--hold`'s saved command words (shell variables); `GATE_TURNSTILE_DIR`, `GATE_TURNSTILE_HOLDER` (environment knobs,
 classified by S8); `repo`, `run`, `ttl` (beacon files); `nested` (a `queued_from` value); `--hold`
 (a runner verb).
 
@@ -142,6 +147,7 @@ rule lists `unattended.sh` writers as 3 and 9; this unit is a third.
 - `tools/run-gates/run-gates.test.sh`
 - `tools/run-gates/run-gates.evidence.test.sh`
 - `tools/unattended/unattended.sh`
+- `tools/unattended/unattended.test.sh`
 - `.githooks/pre-push.test.sh`
 
 ### Alternatives rejected
@@ -225,10 +231,10 @@ copied in, an occupancy leg and a long leg, committed. Every case runs the base 
 
 `run-gates turnstile` · `run-gates evidence` · `run-gates canary` · `run-gates gov canary` · `run-gates run-log line` · `run-gates adopter e2e` · `profile-bar selftest` · `run-selftests self-test` · `pre-push self-test` · `unattended kit gate` · `install-prefix (shipped surface)` · `remote literals (kit code names no remote)` · `foreign-prefix parity (every self-test at three prefixes)` · `testsuite counts (every bar self-test prints one)`
 
-New arm: tools/run-gates/run-gates.turnstile.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC12 · two scratch repos under one host dir, a planted beacon per case, each run against the base runner first · `FLOOR_ASSERTIONS` raised by the assertions it adds
+New arm: tools/run-gates/run-gates.turnstile.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC12 · two scratch repos under one host dir, a planted beacon per case, each run against the base runner first · `FLOOR_ASSERTIONS` raised by the assertions it adds. AC4 is the existing dead-holder arm, now planting in the host dir through `beacon()`; AC5's arm polls a bounded wait rather than grading 8 s, which the pass observed
 New arm: tools/run-gates/run-gates.turnstile.test.sh · covers AC10 · the default host directory spelled identically in the runner and in the unattended driver, located with the suite's `resolve_kit_dir` and skipped with an announcement where that kit is absent · `FLOOR_ASSERTIONS` raised likewise
 New arm: tools/unattended/unattended.test.sh · covers AC9 · a dead-pid ticket planted in the host queue · none
-New arm: .githooks/pre-push.test.sh · covers AC8 · the H49 class arm over the changed runner · none
+New arm: .githooks/pre-push.test.sh · covers AC8 · the H49 class arm over the changed runner, which is the existing arm with the two knobs classified and not a second copy of it · none
 
 The sentence S9 adds to the turnstile block's header, quoted: "WHAT THIS DOES NOT CHECK: NESTING
 TRUSTS AN INHERITED NONCE, which any process on this host can read from the beacon, so nesting
@@ -254,6 +260,12 @@ and does not see the host beacon."
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft from design D6, the turnstile block read at base bef97330.
+- rev-2 · 2026-10-09 · build pass. §4 Inventory names `TS_HOLD`, the saved command array `--hold`
+  needs. S7: the driver also reads the common dir's queue, where the runner's fallback queues; the
+  run-gates suite's planting arms point `GATE_TURNSTILE_DIR` at each fixture's own git dir; the
+  unattended suite isolates its host queue, so `tools/unattended/unattended.test.sh` joins the
+  files. §7: AC4 rides the rewired dead-holder arm, AC5's suite arm drops the 8 s window, and the
+  AC8 arm is the existing H49 arm. No criterion changed.
 
 ## 10. Reuse audit
 

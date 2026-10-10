@@ -5877,23 +5877,23 @@ print_interrupted_acts() {
       echo "unattended: INTERRUPTED — the newest gate window carries no verdict, so a bar was running when its session stopped: $_gd/gate-run/$_newest"
     fi
   fi
+  # THE QUEUE IS THE RUNNER'S HOST QUEUE (TOOL-aFrugalTurnstile-5 S7), spelled exactly as the runner
+  # spells it; the common dir's is read too, because a runner whose host dir could not be created
+  # falls back to it. A probe of the common dir alone read a queue no bar writes any more.
   _cd=$(cd "$(GIT rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || _cd=""
-  if [ -z "$_cd" ]; then
-    echo "unattended: the git common dir could not be resolved on this node, so the turnstile-ticket probe answered nothing and is reported as UNKNOWN rather than as clean"
-  else
-    _q="$_cd/gate-bar-queue"
-    if [ -d "$_q" ]; then
-      for _tk in "$_q"/*; do
-        [ -e "$_tk" ] || continue
-        _pid=${_tk##*/}; _pid=${_pid#*-}; _pid=${_pid%%-*}
-        case "$_pid" in ""|*[!0-9]*) continue ;; esac
-        if ! kill -0 "$_pid" 2>/dev/null; then
-          _said=1
-          echo "unattended: INTERRUPTED — a turnstile ticket names a pid that is not running, so a queued bar died in the queue: $_tk"
-        fi
-      done
-    fi
-  fi
+  [ -n "$_cd" ] || echo "unattended: the git common dir could not be resolved on this node, so the per-repository fallback queue went unread and is reported as UNKNOWN rather than as clean"
+  for _q in "${GATE_TURNSTILE_DIR:-$HOME/.gov/gate-turnstile}/gate-bar-queue" ${_cd:+"$_cd/gate-bar-queue"}; do
+    [ -d "$_q" ] || continue
+    for _tk in "$_q"/*; do
+      [ -e "$_tk" ] || continue
+      _pid=${_tk##*/}; _pid=${_pid#*-}; _pid=${_pid%%-*}
+      case "$_pid" in ""|*[!0-9]*) continue ;; esac
+      if ! kill -0 "$_pid" 2>/dev/null; then
+        _said=1
+        echo "unattended: INTERRUPTED — a turnstile ticket names a pid that is not running, so a queued bar died in the queue: $_tk"
+      fi
+    done
+  done
   [ "$_said" = 1 ] || echo "unattended: no interrupted act was found by the three probes — a staged index, a gate window with no verdict, a turnstile ticket with a dead pid"
   return 0
 }

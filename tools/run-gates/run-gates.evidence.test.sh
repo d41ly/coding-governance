@@ -137,6 +137,10 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 LIB_DIR=$(resolve_kit_dir "$DC_PY" lib resolve-python.sh "$HERE") || exit 2
 LIB="${LIB_DIR##*/}"
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+# THE HOST TURNSTILE IS THIS SUITE'S OWN (TOOL-aFrugalTurnstile-5 S7): on the host default a fixture bar
+# queues behind every real bar, and inside a real bar's leg it nests and never holds, which AC14's
+# `queued_from held` control would read as the turnstile not running.
+export GATE_TURNSTILE_DIR="$tmp/gate-turnstile"
 # THE MEMORY PAUSE IS OFF for every bar here (TOOL-aGraftedHelix-7): the shipped table turns it on and
 # it reads the HOST's memory, so a box above its threshold would narrow these bars' pools and move the
 # census and timing arms for a reason that is the box's. The canary drives the pause over fixtures.

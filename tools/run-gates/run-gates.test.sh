@@ -2737,10 +2737,11 @@ grep -q '^run-gates: sweeping the scratch of a dead bar (pid [0-9][0-9]*)$' "$OS
 # 8e. AC5 — THE RUNNER'S ARGV IS ABSOLUTE, read the way the process-monitor fence reads it: the pid
 #     from the turnstile beacon, the argv from `/proc/<pid>/cmdline`. Started relatively, as every arm
 #     above is. Red when the re-exec is removed and the argv stays relative (TOOL-aReapedSpinner-14).
-#     A host with no `/proc` says so rather than passing.
+#     A host with no `/proc` says so rather than passing. The bar's `GATE_TURNSTILE_DIR` is this repo's
+#     git dir, so its beacon is read there and never in the host dir (TOOL-aFrugalTurnstile-5).
 rm -f "$OS/ready.a" "$OS/ready.a.go"
 ( cd "$OM" && exec env -u GATE_RUN_ID -u GATE_BASE -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES -u GATE_SELFTESTS \
-    TMPDIR="$OS/amb-argv" GATE_FULL=1 GATE_PROFILE=minimal GATE_WALL=0 GATE_TURNSTILE_TICK=1 \
+    TMPDIR="$OS/amb-argv" GATE_FULL=1 GATE_PROFILE=minimal GATE_WALL=0 GATE_TURNSTILE_TICK=1 GATE_TURNSTILE_DIR="$OM/.git" \
     GATE_LEGS="$OS/hold.json" RG_READY="$OS/ready.a" bash $KIT_REL/run-gates.sh ) >"$OS/argv.out" 2>&1 &
 _abg=$!
 _i=0; while [ ! -s "$OS/ready.a" ] && [ "$_i" -lt 1200 ]; do sleep 0.1; _i=$((_i + 1)); done
@@ -2835,7 +2836,9 @@ printf 'planted' > "$H3/.git/gate-bar-beacon/nonce"
 ( _i=0; while [ ! -f "$H3/.git/gate-queue-status" ] && [ "$_i" -lt 1200 ]; do sleep 0.1; _i=$((_i + 1)); done
   sleep 1; rm -rf "$H3/.git/gate-bar-beacon" ) &
 _hvrel=$!
-run_hv_bar "$H3" "$HV/fine.json" GATE_TURNSTILE=1 GATE_TURNSTILE_TICK=1
+# The turnstile's host dir is pointed at this repo's own git dir (TOOL-aFrugalTurnstile-5), so the
+# beacon planted above is the one the bar reads, and no real bar on the host is queued behind.
+run_hv_bar "$H3" "$HV/fine.json" GATE_TURNSTILE=1 GATE_TURNSTILE_TICK=1 GATE_TURNSTILE_DIR="$H3/.git"
 wait "$_hvrel" 2>/dev/null; kill "$_hvholder" 2>/dev/null; wait "$_hvholder" 2>/dev/null
 _hvw=$(printf '%s\n' "$HV_OUT" | grep -n '^gate queue: waited ' | head -1)
 _hva=$(printf '%s\n' "$HV_OUT" | grep -n '^gate queue: acquired ' | head -1)
@@ -2854,7 +2857,7 @@ mkdir -p "$H5/.git/gate-bar-beacon"
 printf '%s' "$(date +%s)" > "$H5/.git/gate-bar-beacon/heartbeat"
 printf '999999' > "$H5/.git/gate-bar-beacon/pid"
 printf 'dead' > "$H5/.git/gate-bar-beacon/nonce"
-run_hv_bar "$H5" "$HV/fine.json" GATE_TURNSTILE=1 GATE_TURNSTILE_TICK=1
+run_hv_bar "$H5" "$HV/fine.json" GATE_TURNSTILE=1 GATE_TURNSTILE_TICK=1 GATE_TURNSTILE_DIR="$H5/.git"
 check_hv_line "AC5 a dead holder's bar still prints its verdict line" '^gates GREEN — '
 check_hv_value "AC5 and writes its verdict file" "$(read_hv_record "$H5" verdict)" GREEN
 

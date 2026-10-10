@@ -97,6 +97,17 @@ case "$0" in
 esac
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "run-gates: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
+# `--hold -- <command…>` (TOOL-aFrugalTurnstile-5 S6): how a bar that is NOT this runner joins the
+# host turnstile. Parsed here, before anything reads `$1`: the words are kept in `TS_HOLD` and the
+# positional arguments cleared, so no verb test below can mistake a held command for its own. The
+# run then takes the turnstile like a bar and runs the words right after `gate queue: acquired`.
+TS_HOLD=()
+if [ "${1:-}" = "--hold" ]; then
+  if [ "${2:-}" != "--" ] || [ "$#" -lt 3 ]; then
+    echo "run-gates: --hold needs a command: run-gates.sh --hold -- <command…>" >&2; exit 2
+  fi
+  shift 2; TS_HOLD=("$@"); set --
+fi
 # The python-launcher resolver, INLINED byte-identically from resolve-python.sh in gov's lib dir. This
 # kit is deployable (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`), and gov's lib dir is gov-internal and never travels:
 # sourcing it made this runner exit 2 with zero legs run in any tree that did not have it.
@@ -1087,21 +1098,55 @@ fi
 echo "run-gates: process-monitor: $PROCMON_WHY"
 
 
-# ---- the turnstile: one bar per repository at a time (the turnstile unit) -------------------------
+# The run id, derived ONCE here (TOOL-aFrugalTurnstile-5 S2): the beacon names it as `run`, and the
+# run record below opens its directory under the same id. `GATE_RUN_ID` pins it, for the hook and arms.
+TS_RUN="${GATE_RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)-$$}"
+
+# ---- the turnstile: one bar per HOST at a time (the turnstile unit, TOOL-aFrugalTurnstile-5) -----
 # Nothing coordinated two bars before this. `git worktree list` reports well into double figures on
 # this node, and the sibling profiling build measured three full bars running at once with CPU at
 # 39 %, both queues empty, and width 24 running 26 % SLOWER than width 8. The contended resource does
 # not parallelise, so two concurrent bars are worse than two sequential ones and serializing them is
 # the right shape for this machine rather than merely the polite one.
 #
-# THE KEY IS THE GIT COMMON DIR, resolved absolutely. Every worktree of one repository shares it, and
-# two different repositories never do — so "one bar per repo" falls out of the key derivation instead
-# of needing a predicate. The runner's per-worktree `$gd` resolutions above are deliberate and are
-# left exactly as they are: evidence is per-worktree, contention is per-repository.
+# THE KEY IS A HOST DIRECTORY, `GATE_TURNSTILE_DIR` or `~/.gov/gate-turnstile`, resolved absolutely.
+# It was the git common dir, which made two REPOSITORIES two keys: on 2026-10-09 three repositories'
+# bars ran at once on one host and starved each other into timeouts and load flakes. Only the beacon
+# and the queue moved; the health log, the scratch owner record and its sweep stay per common dir,
+# which is why `TS_COMMON` is still resolved. A host dir that cannot be created falls back to the
+# common dir for both, announced, which is the per-repository behaviour this replaced.
+#
+# THE BEACON NAMES ITS HOLDER: `heartbeat`, `pid`, `nonce`, and `repo` (the holder's top level), `run`
+# (its run id) and `ttl`. A waiter prints the holder from them and judges staleness against the
+# HOLDER's `ttl`, because two repositories may run different TTLs; an absent field, as from an older
+# runner's beacon, prints `-` and its TTL falls back to the waiter's own.
+#
+# NESTING. A holder exports `GATE_TURNSTILE_HOLDER`, its nonce, to its legs. A runner that inherits a
+# value EQUAL to the live beacon's nonce runs inside the bar that holds the host, so it takes no
+# ticket and records `queued_from` `nested`; without that, a suite's scratch-repo bar would queue
+# behind the very bar whose leg started it. Compared, not merely present, so a value a dead bar left
+# in some shell nests nothing once a successor holds. `--hold -- <command…>` takes the same turnstile
+# for a command that is not this runner. `queued_from` reads `held`, `nested`, `expired`,
+# `unticketed`, `off` or `unresolved`, assigned in the block after the queue.
+#
+# WHAT THIS DOES NOT CHECK: NESTING TRUSTS AN INHERITED NONCE, which any process on this host can read
+# from the beacon, so nesting decides contention and never a verdict; and a runner older than this
+# change keys on its common dir and does not see the host beacon.
 TS_COMMON=""; TS_DIR=""; TS_TICKET=""; TS_NONCE=""; TS_WAITED=0; TS_HELD=0; TS_Q=""; TS_UNTICKETED=0
+TS_HOST=""; TS_DIR_C=""; TS_NESTED=0
 if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
   TS_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || TS_COMMON=""
   [ -n "$TS_COMMON" ] && TS_COMMON=$(cd "$TS_COMMON" 2>/dev/null && pwd) || TS_COMMON=""
+  TS_HOST=${GATE_TURNSTILE_DIR:-$HOME/.gov/gate-turnstile}
+  if mkdir -p "$TS_HOST" 2>/dev/null && TS_HOST=$(cd "$TS_HOST" 2>/dev/null && pwd) && [ -n "$TS_HOST" ]; then
+    TS_DIR_C="$TS_HOST/gate-bar-beacon"; TS_Q="$TS_HOST/gate-bar-queue"
+  else
+    if [ -n "$TS_COMMON" ]; then
+      echo "run-gates: NOTE - the host turnstile directory '$TS_HOST' could not be created, so this bar queues per repository under $TS_COMMON" >&2
+      TS_DIR_C="$TS_COMMON/gate-bar-beacon"; TS_Q="$TS_COMMON/gate-bar-queue"
+    fi
+    TS_HOST=""
+  fi
 fi
 # THE HEALTH LOG (I3, TOOL-aGraftedHelix-8), derived from the common dir this runner already holds,
 # so no self-heal site below spawns git: the turnstile's here, WORK_COMMON's once it is resolved.
@@ -1193,10 +1238,15 @@ ts_tick_stop() {
 # other cannot: a dead PID is immediate and certain, and a stale heartbeat catches the holder whose
 # PID was recycled or which is alive but wedged.
 ts_try_reap() {
-  local hpid hb age
+  local hpid hb age httl
   [ -d "$TS_DIR_C" ] || return 1
   hpid=$(cat "$TS_DIR_C/pid" 2>/dev/null)
   hb=$(cat "$TS_DIR_C/heartbeat" 2>/dev/null)
+  # THE HOLDER'S TTL is the bound (TOOL-aFrugalTurnstile-5 S3): on a host-wide beacon the holder may be
+  # another repository running a longer one. Anything but a positive integer, as from an older
+  # runner's beacon, falls back to this waiter's own.
+  httl=$(cat "$TS_DIR_C/ttl" 2>/dev/null)
+  num_ok "$httl" || httl=$TS_TTL
   if [ -n "$hpid" ] && ! ts_alive "$hpid"; then
     printf 'run-gates: reaping the beacon of a dead holder (pid %s)\n' "$hpid" >&2
     rm -rf "$TS_DIR_C" 2>/dev/null
@@ -1204,10 +1254,10 @@ ts_try_reap() {
   fi
   case "$hb" in ''|*[!0-9]*) hb=0 ;; esac
   age=$(( $(ts_now) - hb ))
-  if [ "$hb" != 0 ] && [ "$age" -gt "$TS_TTL" ]; then
-    printf 'run-gates: reaping the beacon of a stalled holder (heartbeat %ss old, ttl %ss)\n' "$age" "$TS_TTL" >&2
+  if [ "$hb" != 0 ] && [ "$age" -gt "$httl" ]; then
+    printf 'run-gates: reaping the beacon of a stalled holder (heartbeat %ss old, ttl %ss)\n' "$age" "$httl" >&2
     rm -rf "$TS_DIR_C" 2>/dev/null
-    add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "stalled holder heartbeat ${age}s ttl ${TS_TTL}s"; return 0
+    add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "stalled holder heartbeat ${age}s ttl ${httl}s"; return 0
   fi
   return 1
 }
@@ -1277,9 +1327,14 @@ ts_sweep_queue() {
   [ "$swept" = 1 ]
 }
 
-if [ -n "$TS_COMMON" ]; then
-  TS_DIR_C="$TS_COMMON/gate-bar-beacon"
-  TS_Q="$TS_COMMON/gate-bar-queue"
+# NESTED (S5): inside the bar that holds this host, as its exported nonce says, so no ticket is taken
+# and nothing is claimed; the inherited value stays exported for this run's own legs.
+if [ -n "$TS_DIR_C" ] && [ -n "${GATE_TURNSTILE_HOLDER:-}" ] \
+   && [ "$(cat "$TS_DIR_C/nonce" 2>/dev/null)" = "$GATE_TURNSTILE_HOLDER" ]; then
+  TS_NESTED=1
+  ts_hr=$(cat "$TS_DIR_C/run" 2>/dev/null); ts_hd=$(cat "$TS_DIR_C/repo" 2>/dev/null); ts_hp=$(cat "$TS_DIR_C/pid" 2>/dev/null)
+  echo "gate queue: nested under ${ts_hr:--} — ${ts_hd:--} pid ${ts_hp:--}"
+elif [ -n "$TS_DIR_C" ]; then
   TS_NONCE="$$-$(ts_now)-$RANDOM"
   mkdir -p "$TS_Q" 2>/dev/null || true
   # EVERY RUN TAKES A TICKET, including an uncontended one. A ticket whose name sorts by time is all
@@ -1346,8 +1401,16 @@ if [ -n "$TS_COMMON" ]; then
       TS_DIR="$TS_DIR_C"
       printf '%s' "$(ts_now)" > "$TS_DIR/heartbeat" 2>/dev/null || true
       printf '%s' "$$"        > "$TS_DIR/pid" 2>/dev/null || true
+      # The holder's name, for a waiter's queue line and a nested run's, and the TTL a waiter judges
+      # it by (S2, S3). Written before the nonce, so a run that matches the nonce reads all three.
+      printf '%s' "$ROOT"     > "$TS_DIR/repo" 2>/dev/null || true
+      printf '%s' "$TS_RUN"   > "$TS_DIR/run" 2>/dev/null || true
+      printf '%s' "$TS_TTL"   > "$TS_DIR/ttl" 2>/dev/null || true
       printf '%s' "$TS_NONCE" > "$TS_DIR/nonce" 2>/dev/null || true
       TS_HELD=1
+      # The nonce goes to every leg, so a runner one of them starts NESTS rather than queueing behind
+      # this bar (S5). Exported only on a hold: no other path owns the beacon it would name.
+      export GATE_TURNSTILE_HOLDER="$TS_NONCE"
       # STARTED HERE, after the nonce exists and before the traps below, because the ticker's first
       # act is to compare that nonce. Started earlier it would have nothing to compare against.
       ts_tick_start
@@ -1435,10 +1498,13 @@ if [ -n "$TS_COMMON" ]; then
       # from, nothing held the beacon at all and this line still named one, sending the reader to
       # hunt a holder that did not exist. The `queued at position N (waited Ns)` tail is byte-stable
       # because `run-gates.turnstile.test.sh` greps it; only the leading clause varies.
+      # The holder is NAMED from its beacon (TOOL-aFrugalTurnstile-5 S4): on a host key it may be
+      # another repository, and "someone holds this" sent the reader to search every one of them.
       if [ -d "$TS_DIR_C" ]; then
-        echo "run-gates: another bar holds this repository — queued at position $pos (waited ${TS_WAITED}s)" >&2
+        ts_hr=$(cat "$TS_DIR_C/run" 2>/dev/null); ts_hd=$(cat "$TS_DIR_C/repo" 2>/dev/null); ts_hp=$(cat "$TS_DIR_C/pid" 2>/dev/null)
+        echo "run-gates: another bar holds this host — ${ts_hd:--} run ${ts_hr:--} pid ${ts_hp:--} — queued at position $pos (waited ${TS_WAITED}s)" >&2
       else
-        echo "run-gates: no bar holds this repository, but a ticket sorts ahead of this one — queued at position $pos (waited ${TS_WAITED}s)" >&2
+        echo "run-gates: no bar holds this host, but a ticket sorts ahead of this one — queued at position $pos (waited ${TS_WAITED}s)" >&2
       fi
       [ -n "$gd" ] && printf 'position\t%s\nwaited\t%s\n' "$pos" "$TS_WAITED" > "$gd/gate-queue-status" 2>/dev/null || true
       ts_lastpos=$pos; ts_announced=1
@@ -1447,10 +1513,8 @@ if [ -n "$TS_COMMON" ]; then
   done
   ts_drop_ticket
   [ -n "$gd" ] && rm -f "$gd/gate-queue-status" 2>/dev/null || true
-  # A LINEAGE MARKER for any future nested caller. The primary path needs no exemption predicate —
-  # a nested run in a scratch repo resolves a different common dir and therefore a different beacon —
-  # but a caller that one day nests inside the SAME repo would deadlock against its own parent, and a
-  # marker it can read is cheaper than the incident.
+  # A LINEAGE MARKER, comma-joined and exported on every path out of the queue. It is NOT the nesting
+  # test: that is `GATE_TURNSTILE_HOLDER` compared with the live beacon, exported only on a hold.
   export GATE_TURNSTILE_HELD="${GATE_TURNSTILE_HELD:-}${GATE_TURNSTILE_HELD:+,}$TS_NONCE"
 fi
 
@@ -1475,13 +1539,18 @@ fi
 # keeps the invariant true as written rather than quietly falsifying it: `expired` still means the
 # bound was burned, and a `queued 0` is still unambiguous once the state word is read with it.
 #
+# `nested` (TOOL-aFrugalTurnstile-5) is a run inside the bar that holds the host: it took no ticket
+# and waited nothing, so its `queued 0` is exact rather than a held run's uncontended zero.
+#
 # WHAT THIS DOES NOT CHECK, stated here because a reader will assume otherwise: `unresolved` is
-# UNARMED. Reaching it needs `git rev-parse --git-common-dir` to fail while the runner is already
-# past its own repo guard, and breaking a linked worktree's `commondir` makes `--show-toplevel` fail
-# too, so the runner exits 2 before this line. No fixture in the turnstile suite can produce it.
+# UNARMED. Reaching it needs the host directory AND `git rev-parse --git-common-dir` to fail while
+# the runner is already past its own repo guard, and breaking a linked worktree's `commondir` makes
+# `--show-toplevel` fail too, so the runner exits 2 before this line. No fixture in the turnstile
+# suite can produce it.
 QUEUED="-"; QUEUED_FROM=off
 if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
-  if   [ -z "$TS_COMMON" ]; then QUEUED_FROM=unresolved
+  if   [ -z "$TS_DIR_C" ]; then QUEUED_FROM=unresolved
+  elif [ "$TS_NESTED" = 1 ]; then QUEUED=0; QUEUED_FROM=nested
   elif [ "$TS_HELD" = 1 ];  then QUEUED="$TS_WAITED"; QUEUED_FROM=held
   elif [ "$TS_UNTICKETED" = 1 ]; then QUEUED="$TS_WAITED"; QUEUED_FROM=unticketed
   else                            QUEUED="$TS_WAITED"; QUEUED_FROM=expired
@@ -1507,6 +1576,15 @@ echo "gate queue: waited ${TS_WAITED}s"
 # verdict prefix, so no wrapper counts it as a leg.
 ACQUIRED=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 echo "gate queue: acquired $ACQUIRED from $QUEUED_FROM"
+
+# `--hold` RUNS ITS COMMAND HERE and exits, before the scratch dir, so only the turnstile's own traps
+# are armed around it (TOOL-aFrugalTurnstile-5 S6). No run record, ledger row or stamp is written:
+# the held command is some other bar, and its verdict is its exit status, passed through.
+if [ "${#TS_HOLD[@]}" -gt 0 ]; then
+  "${TS_HOLD[@]}"; ts_rc=$?
+  ts_tick_stop; ts_release; ts_drop_ticket
+  exit "$ts_rc"
+fi
 
 # ---- the scratch dir: OWNED, REDIRECTED and SWEPT (TOOL-dDerivedDocket-25) -----------------------
 # Every hermetic leg makes its own `mktemp -d` scratch, and before this unit every one of them landed
@@ -1911,7 +1989,8 @@ if [ -n "$gd" ]; then
   # The id is seamed for the ARM, not for the runner: an arm that plants a stale completion file has
   # to know which directory the run will open, and without the seam the plant lands somewhere the run
   # never looks and the arm passes by finding nothing.
-  RUNID="${GATE_RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)-$$}"
+  # Derived ONCE, above the turnstile, which writes it into the beacon as `run` (TOOL-aFrugalTurnstile-5 S2).
+  RUNID="$TS_RUN"
   RUNROOT="$gd/gate-run"
   RUNDIR="$RUNROOT/$RUNID"
   if mkdir -p "$RUNDIR" 2>/dev/null; then

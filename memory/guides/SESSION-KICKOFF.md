@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-09T23:10:15+03:00 @ 62aab23b5de544e8824a367291faf9d5f695e918
+last-audit: 2026-10-10T02:37:34+03:00 @ b3bd680e68d57ab5188fef007f858586770a84e0
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: bef97330574caabfd43c374dbe8c39b26c560203
+last-body-change: b3bd680e68d57ab5188fef007f858586770a84e0
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -265,10 +265,9 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
 - A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
   and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
   `TOOL-aPromptedMandate-4`.
-- The turnstile serializes bars WITHIN one repository only; sessions on this node still contend
-  across repos. `both expired ... unproven either way` means contention, and now SKIPS that arm
-  loudly rather than redding — re-run quiet before believing a latency claim.
-  `TOOL-aPacedTurnstile-2`.
+- The turnstile serializes bars across the HOST (`~/.gov/gate-turnstile`); an older runner in
+  another repo still contends. `both expired ... unproven either way` means contention and SKIPS
+  that arm loudly — re-run quiet before believing a latency claim. `TOOL-aPacedTurnstile-2`.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
   here: checks 5, 9 and 21 all fired only once the folder was staged.
