@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: 5a836bf0fc940029136b4b3fd57a87f35ff40f26 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: ff0b3dc327514e020eb47009de931d4dfd78c608
-phase: REVIEWING
+witness: 31257756bb5d68bf5d074ffde4f02df1d01d312e
+phase: VERIFYING
 may: none
 mode: slug
 run-branch: refs/heads/branch/unattended-arouted-quill-71b76b
