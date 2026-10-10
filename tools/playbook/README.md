@@ -59,6 +59,53 @@ backtick, angle brackets. That is where a commit trailer such as
   can read it; `govkit check` makes the same join over every selected kit);
 - a control character other than a newline, the `{{` opener, or a `gov:playbook` region marker.
 
+## One-line regions, and section 2
+
+A region between `<!-- one-line -->` and `<!-- /one-line -->` holds rules a reader takes in at a
+glance. After substitution, every non-blank line in one must be a `- ` bullet of at most
+`ONE_LINE_MAX` characters; a continuation line, an over-length rule, a nested opener or an unclosed
+region is a refusal naming the line. The template fences its governing practices this way, and
+section 2 around `{{ADOPTER_RULES}}`, which a target answers as a multi-line `[charter]` string:
+
+```toml
+[charter]
+adopter_rules = """
+- Mobile-first: every screen is designed at 375 px before any wider breakpoint.
+- Every design starts as a Figma frame, and the code follows the frame.
+"""
+```
+
+Unanswered, it renders a single `- none` line. The markers survive into the charter, so a reader
+can see where the shape applies.
+
+## Nodes — one tag per machine, in every repository
+
+`fleet.toml` beside the engine names every node once: its tag, user, host, the directory its
+checkouts sit under, and its machine-level quirks. Gov is the only place a tag is handed out, and the
+file ships into every adopter with this kit, so `{{NODE_TABLE}}` renders the same tag for the same
+machine everywhere. A new node claims its tag in gov's own checkout, then every repository it works
+in re-renders:
+
+```bash
+python <prefix>/playbook/render_playbook.py --claim-node --user <user> --host <host> --projects-root <dir>
+```
+
+A node's primary tree is `<projects_root>/<checkout_dir>`, where `checkout_dir` is an `[answers]`
+key defaulting to `project_name`: a committed answer, never the directory the rendering clone
+happens to sit in, so every node renders the same charter.
+
+One user holds one tag. Every reader of the table matches the user alone, so a second row for the
+same user, or one user name inside another, is refused: the readers could not tell them apart.
+Claiming in gov also means rendering gov's own charter again in the same commit: `govkit update`
+never reaches gov.
+
+The claim takes the lowest letter the fleet has not used and refuses a second claim for one identity.
+In an installed copy it refuses outright, because the next update would overwrite the edit. A
+repository overrides one node's `primary_tree`, `worktree_root` or `variances` under
+`[nodes.<tag>]` in its own `deploy.toml`. The render notes, rather than refuses, a `drop_blocks`
+member naming a block v4.0 retired, and notes a `## Node registry` the charter carries outside the
+region, which readers would take first.
+
 ## Two namespaces, and neither reads a boolean
 
 `kit:<id>` drops when the target did not select that kit. `when:<name>` drops when the name is a

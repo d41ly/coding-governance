@@ -5,7 +5,7 @@ live code inventories** (a ratchet — new moving parts fail the gate until clai
 dead keys fail too), a **shrink-only baseline** so adoption never blocks work, deterministic
 **generated map artifacts** with a byte-compare freshness gate, and a **git-range digest**
 (`map_diff`) that answers "what did that merge touch, feature-wise". Operationalizes the
-playbook's §5/§6 documentation-currency goals with machine enforcement.
+charter's documentation-currency goals with machine enforcement.
 
 Reference implementation extracted from adopter ic (ARCH-dWovenAtlas-1) after a ground-truth mapping
 pass and two adversarial reviews; the portable engine (`map_lib.py`) is identical across repos —

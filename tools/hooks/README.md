@@ -1,7 +1,7 @@
 # agent-cap — the fan-out guard, and the grammar it enforces
 
 A `PreToolUse` hook that bounds review fan-out at the tool call, where the rule actually gets broken.
-The charter (`§8`) states the two rules; this file states the GRAMMAR the hook recognises, because a
+The charter's `[bound]` practice states the two rules; this file states the GRAMMAR the hook recognises, because a
 grammar is implementation detail of one hook and does not belong in a ruleset every session reads.
 
 ## The two rules

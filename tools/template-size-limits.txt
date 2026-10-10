@@ -57,7 +57,12 @@ skills/session-kickoff/SKILL.md	18432
 # charter really did become 5 KB more expensive to read.
 #
 # The headroom's one known consumer is line-wrapping in the ruleset, which re-renders through here.
-AGENTS.md	64512
+#
+# LOWERED to 16384 (16 KiB) at v4.0, PLAY-aDistilledCharter-4: the charter became the rendered region
+# alone and measured 13151 bytes, so the old row priced 51 KB of growth nobody had asked for. 16 KiB
+# keeps the whole file well under the 32768 bytes a Codex agent reads
+# (the agent-instructions kit's CODEX_MAX), which v3.5 exceeded.
+AGENTS.md	16384
 
 # --- the build method, as rendered -------------------------------------------------------------
 # 27648 bytes = 27 KiB. SEEDED FROM THE MEASUREMENT PLUS THE WORK THIS BUILD FUNDS, 2026-09-05

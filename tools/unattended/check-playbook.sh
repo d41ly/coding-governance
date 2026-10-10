@@ -272,7 +272,7 @@ declared_list() { # body · key -> members space-separated; rc 2 on an untermina
   # Definition-of-Done item that takes no `--override`. No attacker needed; an author formatting an
   # array the ordinary way was enough.
   #
-  # AN UNARMED PARSE REDS RATHER THAN RETURNING THE DECLARED NULL (charter §7). Spanning the value
+  # AN UNARMED PARSE REDS RATHER THAN RETURNING THE DECLARED NULL (charter [gate]). Spanning the value
   # would be the other honest fix; refusing is cheaper and cannot be wrong about what it did not read.
   # THE COMMENT COMES OFF BEFORE THE TERMINATOR TEST, and the order is the whole fix. Round 4's
   # blocker: this ran the `case` on the RAW line, so a `]` anywhere in a trailing comment satisfied
