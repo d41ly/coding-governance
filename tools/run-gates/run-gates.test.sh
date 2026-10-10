@@ -1026,7 +1026,7 @@ printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed' \
 # -31 AC2: and it NAMES the held population, or the smaller number is a smaller lie — a bar that
 # shrank with no explanation reads as a bar that shrank for reasons nobody recorded.
 n=$((n+1))
-printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: every self-test, GATE_SELFTESTS=1 runs them)$' \
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: subject kit or chunk selftests, GATE_SELFTESTS=1 runs them)$' \
   || { echo "canary: the summary did not name the held population beside the reduced total"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
 # -31 AC3: the RECORDED figure is the printed one. Two call sites computing one number is how they
 # come to disagree, and the record is what a later run and the push boundary read instead of stdout.

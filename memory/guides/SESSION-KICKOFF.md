@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-10T08:00:00+03:00 @ 9cba5d3ca4430a61d2ca663f3fd86f4a3beb0495
+last-audit: 2026-10-10T23:14:13+03:00 @ 9e961a3b7059a711cb7b5ba84ee087ec0120e17d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 9cba5d3ca4430a61d2ca663f3fd86f4a3beb0495
+last-body-change: 9e961a3b7059a711cb7b5ba84ee087ec0120e17d
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -56,14 +56,13 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   `--check-commit` refuses an undeclared staged path (`TOOL-aWindowedPass-1`, `-3`, `-5`).
 
 - **Every session start writes an ORIENTATION CARD** at `<git-common-dir>/orientation/<session_id>.md`
-  (`manifest-check.sh --card --write` at SessionStart; `--card --replay` after a compaction).
-  Step 5 appends the READY card through `--card --append`; a code build's one `## route` of build,
-  unit specs and brief lands only if all resolve (`KICK-aRoutedQuill-1`). A main-loop `git commit` on a card still reading
-  `READY — none yet` is REFUSED by `tools/hooks/scratch-guard.js`; an absent or replayed card
-  allows. `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-1`. A commit from a tree the card does not
-  name refuses too: carry a scratch worktree's diff back as a patch. An Edit or Write under
-  `ROUTED_PATHS` refuses unless the route names a buildable unit (`TOOL-aRoutedQuill-2`); a pushed
-  commit there names a unit specced before it (`TOOL-aRoutedQuill-3`).
+  (`manifest-check.sh --card --write` at SessionStart, `--card --replay` after compaction). Step 5
+  appends READY via `--card --append`; a `## route` (build, unit specs, brief) lands only if all
+  resolve (`KICK-aRoutedQuill-1`). `tools/hooks/scratch-guard.js` refuses a main-loop `git commit`
+  on a card still reading `READY — none yet` (absent or replayed allows; `KICK-aReplayedCard-1`,
+  `TOOL-aReplayedCard-1`) and one from a tree the card does not name: carry a scratch worktree's
+  diff back as a patch. A write under `ROUTED_PATHS` needs a route naming a buildable unit
+  (`TOOL-aRoutedQuill-2`); a pushed commit there names a specced unit (`TOOL-aRoutedQuill-3`).
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
@@ -121,9 +120,6 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   read Gates as acceptance (`TOOL-dBriefedPass-1`). Date-grandfathered on the spec's FILENAME against
   `.unattended.conf`'s `SPEC_THIN_CUTOFF`; BLANK turns the term OFF. `TOOL-aGradedMandate-4`.
 
-- **From `SPEC_TIER1_CUTOFF` a Tier-1 spec is a micro-spec**, graded by heading title in check 12;
-  `gen_build_index.py --new-spec <ID> --tier 1` writes one. `TOOL-aRoutedQuill-1`.
-
 - **From `SPEC_GUARD_LEGS_CUTOFF` (`.memory-tree.conf`) a LIVE spec's §7 leg line must name every
   gate leg its §4 `### Files touched` trips** — `python tools/check-spec-tokens.py --list` prints the
   `NEAR [guards]` rows to add BEFORE the spec is dated; a guard more legs share than the checker's
@@ -153,6 +149,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   reconcile; the class is `memory/gotchas/text-mode-read-eats-a-bare-cr.md`, which was already
   registered and not read.
   The bytes are NAMED, not shown: a raw CR here was eaten twice by a text-mode rewrite.
+
+- **An adopter's bar holds a leg by `subject = kit` alone** (govkit never emits `chunk`): a shipped
+  self-test declares `subject = "kit"` in its descriptor (`aBenchedProbe`).
 
 - **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
   the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
@@ -208,7 +207,9 @@ python tools/memory-tree/gotchas.py --for-paths <the tooling row's entrypoints> 
 
 Tier 2 (a spec before building; the spec audit only where the build or its project declares it, M4) for: a change to the governance template's
 rules, the manifest-check gate semantics, or a new/changed kit's contract; a cross-kit change. Otherwise
-Tier 1 (a micro-spec before building, then gates + one focused self-review).
+Tier 1 (a micro-spec, graded by heading title in check 12 from `SPEC_TIER1_CUTOFF` and written by
+`gen_build_index.py --new-spec <ID> --tier 1`, then gates + one focused self-review;
+`TOOL-aRoutedQuill-1`).
 
 ### ID + work-state protocol
 
@@ -301,5 +302,5 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
   `TMPDIR entries <n>` prints the ambient count, which now grows only from older bars or another
   repository's. The measured cost is in the run-gates kit README.
 - A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is
-  RETIRED (`TOOL-dSpentCeiling-1`); the surviving lesson is general — measure with the checker
-  before and after, never estimate, and record every movement beside the number.
+  RETIRED (`TOOL-dSpentCeiling-1`). Lesson: measure with the checker before and after, never
+  estimate, and record every movement beside the number.
