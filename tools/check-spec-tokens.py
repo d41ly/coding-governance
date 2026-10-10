@@ -237,6 +237,9 @@ LIVE = re.compile(r"^\*\*Status:\*\*\s*(OPEN|SPECCED|INPROGRESS|BLOCKED)", re.M)
 # reported as such rather than implied away.
 LEG_LINE = re.compile(r"^[\s]*(`[^`\n]+`[\s]*[·,]?[\s]*)+\.?[\s]*$")
 # TOOL-aJoinedCanon-7: the Gates section is located by HEADING TEXT and never by ordinal.
+# EVERY READ BELOW FOLDS CRLF TO LF (TOOL-aMeteredSweep-1). The heading patterns anchor at `$`, so a
+# spec checked out with CRLF, which core.autocrlf=true does on a Windows node, matched no section
+# heading and every join over it read as an empty spec rather than failing.
 GATES_HEAD = re.compile(r"^## [0-9]+[.] Gates[ \t]*$", re.M)
 # The dated demand, the owner's ruling on this unit's fork. From this date a LIVE spec that CARRIES a
 # Gates heading must contribute at least one graded leg name from it. The heading precondition is the
@@ -627,7 +630,7 @@ def read_conf_key(root, key):
     p = root / ".memory-tree.conf"
     if not p.exists():
         return ""
-    m = re.search(r'^%s=(.*)$' % re.escape(key), p.read_bytes().decode("utf-8", "replace"), re.M)
+    m = re.search(r'^%s=(.*)$' % re.escape(key), p.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n"), re.M)
     if not m:
         return ""
     # TOOL-aRepatriatedFork-38: a quoted value ends at its matching quote and an unquoted one at a
@@ -677,7 +680,7 @@ def read_spec_uids(root, specs):
     """
     uids = {}
     for f in specs:
-        m = SPEC_UID.search((root / f).read_bytes().decode("utf-8", "replace"))
+        m = SPEC_UID.search((root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n"))
         if m:
             uids.setdefault((f.split("/")[2], m.group(1)), []).append(f)
     return uids
@@ -706,7 +709,7 @@ def scan_handoffs(root, specs, uids, cutoff):
         if not m or m.group(1) < cutoff:
             continue
         if f not in cache:
-            cache[f] = (root / f).read_bytes().decode("utf-8", "replace")
+            cache[f] = (root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
         text = cache[f]
         head = NONGOALS_HEAD.search(text)
         if not head:
@@ -741,7 +744,7 @@ def scan_handoffs(root, specs, uids, cutoff):
             parts = []
             for g in uids[(build, target)]:
                 if g not in cache:
-                    cache[g] = (root / g).read_bytes().decode("utf-8", "replace")
+                    cache[g] = (root / g).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
                 parts.append(cache[g])
             sibling = "\n".join(parts)
             for tok in TICK.findall(bullet):
@@ -891,7 +894,7 @@ def read_size_ceilings(tooldir):
         p = tooldir / name
         rows = {}
         if p.exists():
-            for line in p.read_bytes().decode("utf-8", "replace").splitlines():
+            for line in p.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n").splitlines():
                 if not line.strip() or line.lstrip().startswith("#"):
                     continue
                 key, _, val = line.partition("\t")
@@ -1012,7 +1015,7 @@ def main(argv):
                       if re.match(r"memory/builds/[^/]+/spec/.*\.md$", f))
     specs, frozen = [], 0
     for f in allspecs:
-        if LIVE.search((root / f).read_bytes().decode("utf-8", "replace")):
+        if LIVE.search((root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")):
             specs.append(f)
         else:
             frozen += 1
@@ -1091,7 +1094,7 @@ def main(argv):
     c_runs, c_specs, c_cleared = 0, 0, 0
     cv_lines, cv_specs, cv_carriers, cv_graded = 0, 0, 0, 0
     for f in specs:
-        text = (root / f).read_bytes().decode("utf-8", "replace")
+        text = (root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
         m = SPEC_DATE.search("/" + f)
         armed = bool(direct_cut) and bool(m) and m.group(1) >= direct_cut
         g_armed = bool(guards_cut) and bool(m) and m.group(1) >= guards_cut
@@ -1220,7 +1223,7 @@ def main(argv):
                 skipped += 1
                 continue
             graded += 1
-            n = len((root / path).read_bytes().decode("utf-8", "replace").splitlines())
+            n = len((root / path).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n").splitlines())
             if int(line) > n:
                 hits.append((f, "cite", f"{path}:{line}", f"file has {n} lines"))
         # THE CLAIMS JOIN (TOOL-dGatedProse-2): every live spec, and no cutoff (owner, 2026-09-21).

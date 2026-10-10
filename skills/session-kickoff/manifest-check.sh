@@ -39,7 +39,7 @@
 #          READY line pins a BASE that is not HEAD, an id reader that could not answer, or a route
 #          the tree cannot check: no MEMORY_ROOT, or no defined-id set).
 set -u
-KIT_MANIFEST_VERSION="1.22"   # gov:kit kickoff-manifest@1.22 — the registry id
+KIT_MANIFEST_VERSION="1.23"   # gov:kit kickoff-manifest@1.23 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`

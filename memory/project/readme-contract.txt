@@ -172,6 +172,8 @@ memory/builds/aWardedAudit/README.md
 memory/builds/aGraftedHelix/README.md
 memory/builds/dThriftyLanding/README.md
 memory/builds/aClassedKnob/README.md
+memory/builds/aMeteredSweep/README.md
+memory/builds/aSparedSpawn/README.md
 memory/builds/aLevelledCopy/README.md
 memory/builds/aHomedAnchor/README.md
 memory/builds/aQuotedBrief/README.md

@@ -4409,6 +4409,11 @@ SHELL_EXEC_SITES = {
     # interpolated into it -- and this table's own definition of `target` is that the target
     # influences the argv, whatever the template's provenance. A paired arm caught it by name.
     "_cmd_update": "target",
+    # TOOL-aMendedFleet-65 gave `mint` the minted kits' `[[regenerate]]` argvs to run, and no row;
+    # TOOL-aMeteredSweep-1 adds it. Gov's own descriptors, tokens from `canonical_ctx`, in gov's tree,
+    # from a writing verb. `target` anyway, on `run_probe_in_empty_dir`'s reasoning: the argv passes
+    # `resolve_tokens`, and the conservative label cannot understate a site's exposure.
+    "cmd_mint": "target",
 }
 # THREE LABELS, because there are three things and two of them were being called one. `gov`: gov
 # wrote the argv and gov controls every value in it. `target`: the target influences the ARGV, so a

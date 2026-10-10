@@ -241,7 +241,10 @@ fi
 # it is guarding is DELETED, which is the same green as a sentence that was never wrong. The first
 # draft of this pair armed only the figure; the fix for it RELOCATED the defect to the formula half
 # and every criterion stayed green.
-CHARTER="$ROOT/AGENTS.md"
+#
+# THE FILE IS THE MERGE-BAR GUIDE, not `AGENTS.md`: PLAY-aMendedFleet-1 moved the charter's merge-bar
+# section there, and an arm reading the wrapper then redded on a pointer that had moved, not gone.
+CHARTER="$ROOT/memory/guides/MERGE-BAR.md"
 a=$((a+1))
 if [ ! -f "$CHARTER" ]; then
   echo "gov-canary: $CHARTER is absent, so the charter arms would pass by finding nothing — this is a refusal"
