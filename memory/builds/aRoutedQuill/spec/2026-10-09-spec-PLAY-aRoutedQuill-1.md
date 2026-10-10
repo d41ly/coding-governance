@@ -9,6 +9,7 @@
 | [2026-10-09-build-PLAY-aRoutedQuill-1-1-acceptance-ledger.md](../build/2026-10-09-build-PLAY-aRoutedQuill-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-09-prompt-PLAY-aRoutedQuill-1-build-brief.md](../prompts/2026-10-09-prompt-PLAY-aRoutedQuill-1-build-brief.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
+| [2026-10-10-review-TOOL-aRoutedQuill-1-closing-diff-round1.md](../reviews/2026-10-10-review-TOOL-aRoutedQuill-1-closing-diff-round1.md) | diff-review | TOOL-aRoutedQuill-1 KICK-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-7 |
 
 <!-- /gen:spec-records -->
 

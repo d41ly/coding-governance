@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: 5a836bf0fc940029136b4b3fd57a87f35ff40f26 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 06071f4413922e50bd3d57895e33cf71f397c653
-phase: BUILDING
+witness: ff0b3dc327514e020eb47009de931d4dfd78c608
+phase: REVIEWING
 may: none
 mode: slug
 run-branch: refs/heads/branch/unattended-arouted-quill-71b76b
@@ -74,3 +74,5 @@ base: 5a836bf0fc940029136b4b3fd57a87f35ff40f26
 2026-10-10T00:55:22Z dispatch · item 77d9cdf8 TOOL-aRoutedQuill-7 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/kit.toml memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md .unattended.conf memory/guides/SESSION-KICKOFF.md tools/template-size-limits.txt memory/map/features/unattended.md memory/map/generated/symbols.json memory/map/generated/inventories.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/builds/aRoutedQuill/spec/2026-10-09-spec-TOOL-aRoutedQuill-7.md memory/builds/aRoutedQuill/build/2026-10-09-build-TOOL-aRoutedQuill-7-1-acceptance-ledger.md memory/builds/aRoutedQuill/README.md memory/LIVE.md memory/ledger/2026-10.md
 
 2026-10-10T00:55:34Z brief · item TOOL-aRoutedQuill-7 · reason 716b55fb723a memory/builds/aRoutedQuill/prompts/2026-10-09-prompt-TOOL-aRoutedQuill-7-build-brief.md
+
+2026-10-10T02:20:35Z review · item aRoutedQuill · reason verdict BLOCKED · blockers 1
