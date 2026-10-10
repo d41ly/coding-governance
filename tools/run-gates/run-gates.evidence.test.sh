@@ -154,7 +154,8 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=138
+FLOOR_ASSERTIONS=141
+# RAISED 138 -> 141 by TOOL-aFrugalTurnstile-17: a dirty-tree wrapper, a RED-verdict runner, a HEAD-moving bar.
 # RAISED 136 -> 138 by TOOL-aFrugalTurnstile-14: a moved tree writes no full row, and lineage reuses none.
 # RAISED 116 -> 136 by TOOL-aFrugalTurnstile-6: the post-merge bar's twenty assertions.
 # RAISED 115 -> 116 by TOOL-aFrugalTurnstile-1: the control stamp's `manifest` key.
@@ -1749,6 +1750,32 @@ for pm_form in "GOV_GATE_CMD='bash bar.sh'\\n" 'GOV_GATE_CMD="bash bar.sh" # the
     && ok "AC8 the accepted form $(printf '%q' "$pm_form") resolves to bash bar.sh" \
     || { nope "AC8 the accepted form $(printf '%q' "$pm_form") resolved to '$(pm_key "$PM_BG" bar)' (rc=$pm_rc)"; pm_show; }
 done
+
+# TOOL-aFrugalTurnstile-17 AC1-AC3 — a wrapper bar that dirties the tree earns no green record, a
+# runner's exit 0 without verdict GREEN is RED, and a bar that moves the worktree's HEAD is refused.
+git -C "$PM_B" update-ref -d "$PM_REF" 2>/dev/null
+printf '#!/usr/bin/env bash\necho dirtied >> verdict.txt\n' > "$PM_C/dirty.sh"
+pm_c=$(pm_commit green 'GOV_GATE_CMD="bash dirty.sh"\n'); rm -f "$PM_BG"
+pm_rc=$(pm_run "$pm_c")
+[ "$pm_rc" = 0 ] && [ ! -f "$PM_BG" ] && grep -q 'no gate-bar-green.shared written .* not clean' "$PM_OUT" \
+  && ok "TOOL-17 AC1 a wrapper bar that edits a tracked file and exits 0 writes no gate-bar-green.shared and names the dirty tree" \
+  || { nope "TOOL-17 AC1 a dirty tree's green was recorded, or the decline is silent (rc=$pm_rc)"; pm_show; }
+git -C "$PM_C" push -q -f "$PM_R" "$pm_c1:$PM_REF" 2>/dev/null
+cp "$PM_C/$PM_K/run-gates.sh" "$PM_T/run-gates.real"
+printf '#!/usr/bin/env bash\nd=$(git rev-parse --absolute-git-dir)/gate-run/$GATE_RUN_ID; mkdir -p "$d"; printf "verdict\\tRED\\n" > "$d/verdict"\nexit 0\n' \
+  > "$PM_C/$PM_K/run-gates.sh"
+pm_c=$(pm_commit green); cp "$PM_T/run-gates.real" "$PM_C/$PM_K/run-gates.sh"; rm -f "$PM_BG"
+pm_rc=$(pm_run "$pm_c")
+[ "$pm_rc" = 1 ] && [ -n "$(pm_red)" ] && [ ! -f "$PM_BG" ] && grep -q 'does not read verdict GREEN — treating it as RED' "$PM_OUT" \
+  && ok "TOOL-17 AC2 a runner exiting 0 with verdict RED exits 1, refs/gov/bar-red stays, and no green record is written" \
+  || { nope "TOOL-17 AC2 a runner's exit 0 without verdict GREEN read as green (rc=$pm_rc, ref=$(pm_red))"; pm_show; }
+git -C "$PM_C" push -q "$PM_R" ":$PM_REF" 2>/dev/null
+printf '#!/usr/bin/env bash\ngit checkout -q --detach HEAD~1\n' > "$PM_C/mover.sh"
+pm_c=$(pm_commit green 'GOV_GATE_CMD="bash mover.sh"\n'); rm -f "$PM_BG"
+pm_rc=$(pm_run "$pm_c")
+[ "$pm_rc" = 2 ] && grep -q 'post-merge: REFUSING' "$PM_OUT" && [ "$(pm_key "$PM_REC" verdict)" = REFUSED ] && [ ! -f "$PM_BG" ] \
+  && ok "TOOL-17 AC3 a bar that moves the worktree's HEAD exits 2 with REFUSED and writes no green record" \
+  || { nope "TOOL-17 AC3 a bar that moved HEAD was not refused (rc=$pm_rc)"; pm_show; }
 
 # AC9 — two remotes and a detached HEAD: refused unless named, and --remote publishes there alone.
 git -C "$PM_B" update-ref -d "$PM_REF" 2>/dev/null

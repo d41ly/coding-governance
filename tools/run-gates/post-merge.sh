@@ -14,7 +14,8 @@
 # is absent or an ancestor of <sha>; a GREEN deletes the ref when it names <sha> or an ancestor of it.
 # Every push is leased on the sha it observed, so a ref that moved in between is a lost race, never
 # an overwrite. It keeps the last verdict in `<common-dir>/gate-post-merge`, writes a GREEN's record
-# to `<common-dir>/gate-bar-green.shared` (design D3, `by post-merge`), and copies the bar's run
+# to `<common-dir>/gate-bar-green.shared` (design D3, `by post-merge`) only when the scratch worktree is
+# still clean after the bar (TOOL-aFrugalTurnstile-17), and copies the bar's run
 # record to `<common-dir>/gate-run/<run id>/` before the worktree goes.
 #
 # WHAT THIS DOES NOT CHECK: it grades the tree at `<sha>` alone, never the push that landed it; it
@@ -330,8 +331,14 @@ write_run_record() { # -> PM_RUN_COPY, the copy of the bar's run record under th
 }
 
 write_bar_green() { # -> <common-dir>/gate-bar-green.shared in design D3's grammar, by post-merge
-  local tree w paths=""
+  local tree w paths="" dirty
   local -a words=()
+  # The hook's and the driver's writers refuse a dirty tree, and so does this one: a bar judged on rc
+  # and HEAD alone may have rewritten tracked files, and the record would certify the pristine tree.
+  if ! dirty=$(git -C "$WT" status --porcelain --ignore-submodules=untracked 2>/dev/null) || [ -n "$dirty" ]; then
+    echo "post-merge: no gate-bar-green.shared written — the scratch worktree is not clean after the bar"
+    return 0
+  fi
   tree=$(git rev-parse -q --verify "$SHA^{tree}" 2>/dev/null) || tree=""
   read -ra words <<<"$BAR"
   for w in "${words[@]}"; do case "$w" in */*|*.sh) paths="$paths${paths:+ }$w" ;; esac; done
