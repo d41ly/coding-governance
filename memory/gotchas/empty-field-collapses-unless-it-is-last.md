@@ -61,7 +61,7 @@ one of them is last.** If two can, the format is wrong.
 
 The cheap mechanical half is testable, though, and it is what caught this one: **the branch that reads
 the sentinel needs an arm.** A refusal nothing has ever seen fire is the shape this whole tree is
-built to remove — see [[../../AGENTS.md]] §7 and [[suite-invalidated-by-a-commit-under-it]] for the
+built to remove — see [[../../AGENTS.md]]'s `[gate]` practice and [[suite-invalidated-by-a-commit-under-it]] for the
 sibling class where the arm exists but grades the wrong tree.
 
 ## The anchors

@@ -325,7 +325,7 @@ def derive_kit_prefix() -> str:
 
     The recipe below is a command an operator pastes, and this file is COPY-INSTALLED at whatever
     prefix an adopter chose, so a literal `<prefix>/memory-tree` here would render a dead command in
-    their tree. AN EMPTY DERIVATION REFUSES (charter §12): `render_relocation_recipe` refuses one
+    their tree. AN EMPTY DERIVATION REFUSES (the shipped-surface rule check-install-prefix.sh holds): `render_relocation_recipe` refuses one
     too, and refusing twice costs nothing against rendering `python /migrate_backlog.py`, which
     looks like an instruction and is not one.
     """

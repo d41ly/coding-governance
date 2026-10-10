@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runnable scenario suite for manifest-check.sh (spec: the manifest-ratchet design record, coding-governance §3).
+# Runnable scenario suite for manifest-check.sh (spec: the manifest-ratchet design record).
 # Run: bash skills/session-kickoff/manifest-check.test.sh    (exit 0 = all pass)
 set -u
 export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null   # a runner's core.hooksPath/init.templateDir must not reach the throwaway repos
@@ -1177,7 +1177,7 @@ check_eq "K2 AC5 a second append without a READY line leaves the real one, last"
 check_eq "K2 AC5 ...before which the new body sits" '- parked: `AGENTS.md:2`' "$(tail -2 "$K2BCARD" | head -1)"
 check_eq "K2 AC5 ...and the card still holds one READY line and one task section" "1 1" "$(grep -c '^READY — ' "$K2BCARD") $(grep -c '^## task' "$K2BCARD")"
 
-# TOOL-cMendedVintage-16 — the charter-conformant READY line. §16 R1 makes an emitted micro-format
+# TOOL-cMendedVintage-16 — the charter-conformant READY line. The charter's [r1] makes an emitted micro-format
 # a markdown list item, so the form a kickoff actually writes carries a leading `- `. Before the
 # anchor was widened all four arms below failed: the body read as carrying NO READY line, so the
 # append took the no-READY branch, left the sentinel last, skipped the `tree —` re-render, and

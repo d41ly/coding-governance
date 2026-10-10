@@ -1,0 +1,46 @@
+# fleet.toml — every node of the fleet, and the ONE tag it carries in every repository.
+#
+# TOOL-aDistilledCharter-2. A tag used to be the lowest free letter in each repository a node
+# joined, so one machine carried different tags in different adopters and the first letter of its
+# slugs stopped separating it from the others. Gov is now the one allocator: this file ships beside
+# the renderer into every adopter, and every adopter's charter renders its node table from it.
+#
+# CLAIM, NEVER HAND-EDIT A TAG. In gov's own checkout:
+#   python <prefix>/playbook/render_playbook.py --claim-node --user <u> --host <h> --projects-root <r>
+# It takes the lowest letter the FLEET has not used and appends a row. In an installed copy it
+# refuses: this file is gov's, and the next update would overwrite a local claim.
+#
+# A ROW: `tag` one lowercase letter · `user` and `host` the node's identity (`host` may be empty
+# where it was never recorded) · `projects_root` the directory its checkouts sit under · `variances`
+# its machine-level quirks. A repository overrides `primary_tree`, `worktree_root` or `variances`
+# for one node under `[nodes.<tag>]` in its own `.governance/deploy.toml`.
+#
+# Seeded from gov's AGENTS.md registry at 6473ae38, tags unchanged.
+
+[[node]]
+tag = "a"
+user = "daily-agent"
+host = "COMPEETO-AGENT"
+projects_root = "C:/projects"
+variances = "Windows + Git-Bash, so give `git -C` forward-slash paths"
+
+[[node]]
+tag = "b"
+user = "agent5"
+host = "DESKTOP-3J1O6CD"
+projects_root = "C:/projects"
+variances = ""
+
+[[node]]
+tag = "c"
+user = "agent-0"
+host = "DESKTOP-8BKM8GN"
+projects_root = "C:/projects"
+variances = ""
+
+[[node]]
+tag = "d"
+user = "d41ly"
+host = ""
+projects_root = "C:/projects"
+variances = ""

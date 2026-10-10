@@ -157,7 +157,7 @@ with `grep -nE '\{\{[A-Z]'` — no placeholder may survive):*
 - `{{TIER_RULE}}` — one sentence: what forces the higher tier (new write path · migration ·
   auth/sanitization/egress surface · shared-contract change · cross-stream merge) and what it
   requires (spec approval before building / adversarial review). Delete the section if single-tier.
-- `{{ID_PROTOCOL}}` — either "none — no tracked id scheme" or, per governance §1–§2: the id format
+- `{{ID_PROTOCOL}}` — either "none — no tracked id scheme" or, per the hygiene guide's Ids section: the id format
   (e.g. `FAMILY-<slug>-<seq>`), the slug rules + collision grep target, and the ledger file path.
 - `{{CODEBASE_MAP}}` — either "not adopted" or: MAP_ROOT, the digest command verbatim, and the two
   standing rules (ratchet gate rides the test suite; a high-risk unit touching an undossiered

@@ -52,7 +52,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.95   # gov:kit unattended@1.95 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.96   # gov:kit unattended@1.96 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -11737,7 +11737,7 @@ declared_list() { # body · key -> members space-separated; rc 2 on an untermina
   # Definition-of-Done item that takes no `--override`. No attacker needed; an author formatting an
   # array the ordinary way was enough.
   #
-  # AN UNARMED PARSE REDS RATHER THAN RETURNING THE DECLARED NULL (charter §7). Spanning the value
+  # AN UNARMED PARSE REDS RATHER THAN RETURNING THE DECLARED NULL (charter [gate]). Spanning the value
   # would be the other honest fix; refusing is cheaper and cannot be wrong about what it did not read.
   # THE COMMENT COMES OFF BEFORE THE TERMINATOR TEST, and the order is the whole fix. Round 4's
   # blocker: this ran the `case` on the RAW line, so a `]` anywhere in a trailing comment satisfied
