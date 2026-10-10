@@ -508,6 +508,12 @@ BRIEF_RECORDED_CUTOFF=""
 # same reason; blank turns the refusal OFF and `--preflight` announces that it did.
 PROMPT_BRIEF_CUTOFF=""
 
+# PROMPT_BRIEF_SKELETON_CUTOFF - the README `opened:` date from which that brief's `###` sub-heads are
+# the ones the kickoff kit's `manifest-check.sh --brief-skeleton` prints at the pinned BASE, rather
+# than the five the driver keeps for older records. Read only for a record PROMPT_BRIEF_CUTOFF grades.
+# BLANK in the example for the same reason; blank keeps the five and `--preflight` announces that it did.
+PROMPT_BRIEF_SKELETON_CUTOFF=""
+
 # RUNLOG_SESSION_VARS - the NAMES of environment variables whose values each run-log START line
 # records as `sess.<NAME>=`, space-separated, eight at most. The run log is the driver's own
 # machine-local journal (protocol section 2); this key only says which session wrote a line. A value

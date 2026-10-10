@@ -10863,6 +10863,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_brief_subheads",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_build_slug",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -14158,6 +14163,11 @@
       "file": "tools/runlog/runlog_lib.py"
     },
     {
+      "id": "resolve_kickoff_checker",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -16251,6 +16261,11 @@
       "id": "run_row",
       "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
+      "id": "run_rq_preflight",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "run_runlog",
@@ -20491,6 +20506,16 @@
       "id": "write_rows_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_rq_checker",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_rq_main",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_run_branch",

@@ -517,6 +517,7 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `LANDING_NODES` | `<tag>=<machine>/<user>` pairs that may land, read at BASE and at R; any other node hands off; `%20` spells a space. Blank: every node, announced. §6 |
 | `DISPOSITION_CUTOFF` | the date from which a review exit's RECORDED disposition is read instead of inferred from new unit ids. Graded on the run-state record's own first-commit date; a record before it keeps the id-delta proxy, EXCEPT one with no first-commit date at all — a staged, in-flight record is graded whatever the cutoff says. Blank or absent grandfathers every record and the leg says so on stdout |
 | `PROMPT_BRIEF_CUTOFF` | from this `opened:` date preflight refuses a prompt record with no brief. Blank is off. `UNATTENDED-VERBS.md` |
+| `PROMPT_BRIEF_SKELETON_CUTOFF` | from this `opened:` date the brief's sub-heads are the kickoff kit's `--brief-skeleton` at BASE. Blank keeps five |
 | `RUNLOG_SESSION_VARS` | the environment variable NAMES, space-separated and eight at most, whose values each run-log START records as `sess.<NAME>=` (§2); a value outside `[A-Za-z0-9_.:-]{1,128}` is written empty and flagged. OPTIONAL: blank records none |
 
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no

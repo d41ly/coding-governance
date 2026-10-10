@@ -7,7 +7,9 @@ version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
 # `settings-merge` since TOOL-aRepatriatedFork-11 (section 8 F2): this kit ships hook fragments and its
 # `[check]` grades their wiring, so the install that lands one wires it through the target's own
 # settings-merge.py, and the target's receipt then names the program that wrote its settings file.
-requires = ["memory-tree", "review-harness", "settings-merge"]
+# `kickoff-manifest` since TOOL-aRoutedQuill-7: past PROMPT_BRIEF_SKELETON_CUTOFF a prompt-mode preflight
+# reads the brief's sub-heads from that kit's checker, so an install without it refuses every such run.
+requires = ["memory-tree", "review-harness", "settings-merge", "kickoff-manifest"]
 
 [[files]]
 include = "**"

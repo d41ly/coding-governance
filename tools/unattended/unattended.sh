@@ -496,7 +496,7 @@ HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI="";
 ASKS_CMD=""; HELD_CI_WORKFLOW=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""; RUN_CLAIMS=""
 GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
-DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; PROMPT_BRIEF_CUTOFF=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
+DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; PROMPT_BRIEF_CUTOFF=""; PROMPT_BRIEF_SKELETON_CUTOFF=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
 # contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
 # is a declared key and defaults here like its neighbours. GOV_RUNLOG is the ENVIRONMENT's switch, so
@@ -543,6 +543,9 @@ DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; PROMPT_BRIEF_CUT
 #     prompt-mode record must carry its brief, read by `check_prompt_brief`. Blank is off, announced.
 #     The value this source binds decides nothing: `read_brief_cutoff` re-reads the key at the
 #     default-branch side of the pinned BASE (TOOL-aQuotedBrief-4), for LANDING_NODES' reason.
+#   * PROMPT_BRIEF_SKELETON_CUTOFF (TOOL-aRoutedQuill-7 S5) - the README `opened:` date from which
+#     that brief's sub-heads are the kickoff kit's `--brief-skeleton` at BASE, not the five. Blank is
+#     off, announced; re-read beside PROMPT_BRIEF_CUTOFF, and read only for a record that key grades.
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -3232,12 +3235,14 @@ read_brief_items() {
 # Prints the value and returns 0, prints nothing for an ABSENT blob (off), and returns 2 for a blob
 # that ends before the read - a return, an exit, an unbound reference, a syntax error - or for no
 # commit at all, since an unknown side is not an absent key.
-read_brief_cutoff() { # commit -> the value on stdout · 2 when it cannot be known
-  local _cf _v
+# TOOL-aRoutedQuill-7 S1 - the optional second argument names a sibling date key read the same way,
+# PROMPT_BRIEF_SKELETON_CUTOFF; it is only ever a literal from this file, never a conf value.
+read_brief_cutoff() { # commit · key -> the value on stdout · 2 when it cannot be known
+  local _cf _v _k=${2:-PROMPT_BRIEF_CUTOFF}
   [ -n "${1:-}" ] || return 2
   _cf=$(GIT show "$1:.unattended.conf" 2>/dev/null) || return 0
-  _v=$( PROMPT_BRIEF_CUTOFF=""; exec 3>&1
-        eval "$_cf"$'\n\n''printf "OK %s" "${PROMPT_BRIEF_CUTOFF:-}" >&3' >/dev/null 2>&1 )
+  _v=$( eval "$_k=''"; exec 3>&1
+        eval "$_cf"$'\n\n''printf "OK %s" "${'"$_k"':-}" >&3' >/dev/null 2>&1 )
   case "$_v" in "OK "*) printf '%s' "${_v#OK }" ;; *) return 2 ;; esac
 }
 # Set by check_brief_items when term 7 is OFF, for the build-complete arm to carry on its met return.
@@ -3312,6 +3317,60 @@ check_brief_items() { # slug
   return 1
 }
 
+# TOOL-aRoutedQuill-7 - THE BRIEF'S SUB-HEADS COME FROM THE KICKOFF KIT, the one home of the brief's
+# shape (KICK-aRoutedQuill-1), for a README opened on or after PROMPT_BRIEF_SKELETON_CUTOFF. The five
+# TOOL-aQuotedBrief-1 built are the list before it and the FLOOR the skeleton must keep, in order, so a
+# checker that renames or drops one refuses rather than loosening rule 1. Every refusal below prints
+# its reason on stdout and returns 1, since both run in a capture; check_prompt_brief makes it check 117.
+BRIEF_FIVE="Goal|Items|Acceptance|Gates|Non-goals"
+# The checker's repo-relative path: the install receipt and the two probes beside this kit through
+# `resolve_kit_dir`, then the one `manifest-check.sh` the index tracks - gov's own placement, the
+# rung the kickoff kit's `resolve_kit_file` uses. A miss, or two tracked, names every place looked.
+resolve_kickoff_checker() { # -> the path on stdout · 1 with the reason on stdout
+  local py d="" n t
+  if py=$(resolve_python 2>/dev/null) && [ -n "$py" ]; then
+    if d=$(resolve_kit_dir "$py" session-kickoff manifest-check.sh "$KIT_DIR" 2>&1); then
+      case "$d" in .|"") printf 'manifest-check.sh\n' ;; *) printf '%s/manifest-check.sh\n' "$d" ;; esac
+      return 0
+    fi
+  else
+    d="no python launcher resolves, so the install receipt and the two probes beside this kit were not read"
+  fi
+  t=$(GIT -c core.quotepath=off ls-files -- manifest-check.sh '*/manifest-check.sh' 2>/dev/null)
+  n=$(printf '%s' "$t" | grep -c .)
+  [ "$n" = 1 ] && { printf '%s\n' "$t"; return 0; }
+  echo "no single kickoff checker resolves: ${d:-the resolver printed nothing}; the index tracks $n manifest-check.sh, and only exactly one is taken"
+  return 1
+}
+# The sub-heads under `## The brief` in what the checker's blob AT BASE prints for --brief-skeleton,
+# `|`-joined in order. At BASE because the rule a record is graded by must be as old as the
+# authorization it is part of: a run may edit the kickoff kit, and preflight runs more than once.
+read_brief_subheads() { # base -> the list on stdout · 1 with the reason on stdout
+  local ck tmp out rc list w rest
+  ck=$(resolve_kickoff_checker) || { echo "$ck"; return 1; }
+  tmp=$(mktemp) || { echo "no scratch file could be created for the kickoff checker's blob"; return 1; }
+  if ! GIT show "$1:$ck" > "$tmp" 2>/dev/null; then
+    rm -f "$tmp"; echo "the kickoff checker is absent at the pinned BASE: $1:$ck"; return 1
+  fi
+  # ponytail: unbounded, because the verb answers before the checker probes anything; bound it with
+  # the driver's timeout wrapper if a checker that hangs on an unknown verb ever ships.
+  out=$(cd "$(dirname "$tmp")" && bash "$tmp" --brief-skeleton 2>/dev/null); rc=$?
+  rm -f "$tmp"
+  [ "$rc" = 0 ] || { echo "the kickoff checker at the pinned BASE exits $rc on --brief-skeleton: $1:$ck"; return 1; }
+  list=$(printf '%s\n' "$out" | awk '{ sub(/\r$/, "") }
+    /^## / { if (b) exit; b = ($0 ~ /^## +The brief[[:space:]]*$/); next }
+    b && /^### / { h = $0; sub(/^### +/, "", h); sub(/[[:space:]]+$/, "", h); printf "%s%s", (n++ ? "|" : ""), h }')
+  [ -n "$list" ] || { echo "the kickoff checker at the pinned BASE prints no ### sub-head under ## The brief for --brief-skeleton: $1:$ck"; return 1; }
+  rest="|$list|"
+  for w in ${BRIEF_FIVE//|/ }; do
+    case "$rest" in
+      *"|$w|"*) rest="|${rest#*"|$w|"}" ;;
+      *) echo "the kickoff checker's --brief-skeleton at the pinned BASE does not keep the five sub-heads in order, first missing or out of place: ### $w, in $1:$ck"; return 1 ;;
+    esac
+  done
+  printf '%s\n' "$list"
+}
+
 # TOOL-aQuotedBrief-1 S4 - A PROMPT RECORD STANDS ON ITS OWN. A prompt fired mid-session ("yes, spec
 # it") authorizes a run whose scope lives in the conversation, so from PROMPT_BRIEF_CUTOFF, graded on
 # the README's `opened:` date read AT BASE, every record under prompts/ carrying `## The prompt` must
@@ -3327,8 +3386,11 @@ check_brief_items() { # slug
 # or `duplicate` disposition is taken as written, since the owner reads it in the authorized record.
 # TOOL-aQuotedBrief-4 S3 - the cutoff is `read_brief_cutoff` at the default-branch side of BASE that
 # check_authorization derived just above, never the working copy's; an unknowable one is fail 116.
+# TOOL-aRoutedQuill-7 S1 - rule 1's list is the kickoff kit's skeleton for a README opened on or after
+# PROMPT_BRIEF_SKELETON_CUTOFF, read where the cutoff above is, else BRIEF_FIVE; and rule 1 is an
+# IN-ORDER SUBSEQUENCE of it, each listed sub-head non-empty (F1 (a)), naming the first at fault.
 check_prompt_brief() { # slug · base
-  local base="$2" rel dir opened rec why found=0 txt roster items n kind args id planned="" cut
+  local base="$2" rel dir opened rec why at found=0 txt roster items n kind args id planned="" cut skcut want=$BRIEF_FIVE
   [ "${AUTH_MODE:-}" = prompt ] && [ -n "$base" ] || return 0
   if ! cut=$(read_brief_cutoff "$AUTH_CONF_AT"); then
     fail 116 "the project conf at the default-branch side of the pinned BASE was not derived or could not be evaluated to the end, so whether it declares PROMPT_BRIEF_CUTOFF is unknown and is not read as off - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen: ${AUTH_CONF_AT:-(no commit)}"
@@ -3345,6 +3407,18 @@ check_prompt_brief() { # slug · base
   case "$opened" in
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$cut" ]] && return 0 ;;
   esac
+  # ponytail: no unknown-state branch, because the same blob was just evaluated to its end above.
+  skcut=$(read_brief_cutoff "$AUTH_CONF_AT" PROMPT_BRIEF_SKELETON_CUTOFF) || skcut=""
+  case "$skcut" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9])
+      # Only a DATED README before this key keeps the five, as above.
+      case "$opened" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$skcut" ]] && skcut="" ;; esac
+      if [ -n "$skcut" ] && ! want=$(read_brief_subheads "$base"); then
+        fail 117 "the brief's sub-heads cannot be read from the kickoff kit at the pinned BASE, so a record past PROMPT_BRIEF_SKELETON_CUTOFF has no list to be graded on and is not graded on the five instead: $want"
+        return 1
+      fi ;;
+    *) echo "unattended: NOTE - PROMPT_BRIEF_SKELETON_CUTOFF is blank or not a YYYY-MM-DD date, so this prompt record's brief is graded on the five sub-heads and not on the kickoff kit's --brief-skeleton; declare one in $CONF at the default-branch side of the pinned BASE to turn it on: ${skcut:-blank}" >&2 ;;
+  esac
   # TOOL-aQuotedBrief-3 S2 - the authored roster at BASE, for the join below. A malformed pair reads
   # as empty rather than as whatever `region` printed before refusing, so every plan then fails rule 2.
   roster=$(GIT show "$base:$rel" 2>/dev/null | region - "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null) || roster=""
@@ -3354,7 +3428,7 @@ check_prompt_brief() { # slug · base
     # TOOL-aQuotedBrief-5 S2 - a record term 7 and the audit reader would skip is skipped here too,
     # before the structural read, so `##  The prompt` is no prompt record anywhere (check 113).
     check_prompt_heading <<<"$txt" || continue
-    why=$(printf '%s\n' "$txt" | awk '
+    why=$(printf '%s\n' "$txt" | awk -v want="$want" '
       { sub(/\r$/, "") }
       /^## / { h2 = $0; sub(/^## +/, "", h2); sub(/[[:space:]]+$/, "", h2); h3 = ""; next }
       h2 == "The brief" && /^### / { h3 = $0; sub(/^### +/, "", h3); sub(/[[:space:]]+$/, "", h3); order = order "|" h3; next }
@@ -3364,7 +3438,10 @@ check_prompt_brief() { # slug · base
         if (/^Asked:[[:space:]]*[^[:space:]]/) asked = 1
         if (/^Answer:[[:space:]]*[^[:space:]]/) answered = 1 }
       END {
-        if (order != "|Goal|Items|Acceptance|Gates|Non-goals" || !full["Goal"] || !full["Items"] || !full["Acceptance"] || !full["Gates"] || !full["Non-goals"]) { print "rule 1"; exit }
+        nw = split(want, w, "|"); no = split(substr(order, 2), o, "|"); j = 1
+        for (i = 1; i <= no && j <= nw; i++) if (o[i] == w[j]) j++
+        if (j <= nw) { print "rule 1"; print w[j]; exit }
+        for (i = 1; i <= nw; i++) if (!full[w[i]]) { print "rule 1"; print w[i]; exit }
         if (!items) { print "rule 2"; exit }
         if (drawn == "") { print "rule 3"; exit }
         if (!conf) { print "rule 4"; exit }
@@ -3372,7 +3449,8 @@ check_prompt_brief() { # slug · base
       }')
     found=1
     if [ -n "$why" ]; then
-      fail 112 "a prompt record at the pinned BASE does not stand on its own, so a resumed session would hold the owner's bytes and not the build they authorized; write the brief, the session quotes and the confirmation its prompt path names - first rule failed, then the record: $why $rec"
+      at=""; case "$why" in *$'\n'*) at=${why#*$'\n'}; why=${why%%$'\n'*} ;; esac
+      fail 112 "a prompt record at the pinned BASE does not stand on its own, so a resumed session would hold the owner's bytes and not the build they authorized; write the brief, the session quotes and the confirmation its prompt path names - first rule failed, then the record: $why $rec${at:+, and the sub-head missing, empty or out of order: ### $at}"
       return 1
     fi
     # TOOL-aQuotedBrief-3 S2 - THE PREFLIGHT JOIN, rules 1, 2 and 4 per record; rule 3 after the loop,

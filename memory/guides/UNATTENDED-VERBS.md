@@ -573,8 +573,8 @@ the run, which makes "the owner was asked at the start" a property of the commit
    and points at the record; clarifications ride the record. The roster may be provisional.
    **The record stands on its own**, because a resumed session or a later reader holds no
    conversation: `## The prompt` verbatim, then three sections in this order, each non-empty.
-   `## The brief` holds `### Goal`, `### Items` (numbered `1.` lines), `### Acceptance`, `### Gates`
-   and `### Non-goals`, in that order. Each item is one line ending in the disposition step 1 decided:
+   `## The brief` holds the `###` sub-heads `bash <check-script> --brief-skeleton` prints under it,
+   in that order and each non-empty, `### Items` as numbered `1.` lines. Each item is one line ending in the disposition step 1 decided:
    `[planned <unit-id> ...]` (step 1 decides all four) `[stale <evidence>]` `[duplicate <n>]` `[parked <reason>]`.
    Every `planned` id is a roster unit, every roster unit is planned by some item, and a `duplicate`
    names a `planned` item, or preflight refuses at check 115. `--close` then wants each `planned`
