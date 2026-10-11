@@ -470,7 +470,7 @@ tree with `ROTATION_MODE` unset gains one `check 24: ROTATION_MODE is UNDECLARED
 run; it was computed before and thrown away.
 
 
-## Upgrading past 2.137 — check 10 resolves a declared home, and a half-staged rotation is refused
+## Upgrading past 2.139 — check 10 resolves a declared home, and a half-staged rotation is refused
 
 **Check 10 no longer searches for an index by name.** A rotated archive's live index is now
 `<MEMORY_ROOT>/DECISIONS.md` for a decision archive and `<MEMORY_ROOT>/backlog/<FAMILY>.md` for a
