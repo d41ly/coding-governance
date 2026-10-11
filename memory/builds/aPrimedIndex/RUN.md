@@ -93,3 +93,9 @@ base: 15bbfa4f867262f3c862e2473688fc69d0566b7d
 2026-10-11T12:10:45Z dispatch · item 29653d90 TOOL-aPrimedIndex-9 · reason tools/lexicon/adopt-lexicon.sh tools/lexicon/kit.toml tools/lexicon/selftest.py tools/lexicon/README.md memory/map/generated/symbols.json memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-9.md
 
 2026-10-11T13:13:22Z dispatch · item 8ff39559 TOOL-aPrimedIndex-9 · reason tools/lexicon/adopt-lexicon.sh tools/lexicon/kit.toml tools/lexicon/selftest.py tools/lexicon/README.md memory/map/generated/symbols.json memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-9.md memory/map/features/lexicon.md memory/project/unarmed-branches.txt
+
+2026-10-11T14:57:17Z rescope · item add TOOL-aPrimedIndex-10 · reason the lander suite's attribution against origin/main: --land checks the allow record against the prepared sha but pushes HEAD, so every in-place landing, this one included, reports landed UNGATED and exits 4
+
+2026-10-11T14:58:39Z brief · item TOOL-aPrimedIndex-10 · reason 2607f636a7fb memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-10-1-build-brief.md
+
+2026-10-11T15:04:53Z dispatch · item c7604c36 TOOL-aPrimedIndex-10 · reason tools/push-main.sh tools/push-main.test.sh memory/map/features/push-main.md memory/map/generated/symbols.json memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-10.md

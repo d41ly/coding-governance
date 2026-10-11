@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling+deployer
 roster: TOOL+DEPL
-ids: DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 TOOL-aPrimedIndex-5 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-7 TOOL-aPrimedIndex-8 TOOL-aPrimedIndex-9
+ids: DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 TOOL-aPrimedIndex-5 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-7 TOOL-aPrimedIndex-8 TOOL-aPrimedIndex-9 TOOL-aPrimedIndex-10
 authorized-by: prompt
 ---
 
@@ -61,11 +61,12 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 7 | `TOOL-aPrimedIndex-7` | the regen verb's and the runner's review minors, batched |
 | 8 | `TOOL-aPrimedIndex-8` | the lander's review minors, batched, and the fixture that names a unit |
 | 9 | `TOOL-aPrimedIndex-9` | the lexicon render proves freshness alone |
+| 10 | `TOOL-aPrimedIndex-10` | the in-place landing checks the allow record against what it pushed |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 9 unit(s) · node a · opened 2026-10-11 · streams tooling+deployer
-ids DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 TOOL-aPrimedIndex-5 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-7 TOOL-aPrimedIndex-8 TOOL-aPrimedIndex-9
+**Build status:** INPROGRESS · 10 unit(s) · node a · opened 2026-10-11 · streams tooling+deployer
+ids DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 TOOL-aPrimedIndex-5 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-7 TOOL-aPrimedIndex-8 TOOL-aPrimedIndex-9 TOOL-aPrimedIndex-10
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -79,13 +80,14 @@ ids DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedInde
 | [TOOL-aPrimedIndex-7 — the regen verb's and the runner's review minors, batched](spec/2026-10-11-spec-TOOL-aPrimedIndex-7.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aPrimedIndex-8 — the lander's review minors, batched, and the fixture that names a unit](spec/2026-10-11-spec-TOOL-aPrimedIndex-8.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aPrimedIndex-9 — the lexicon render proves freshness alone](spec/2026-10-11-spec-TOOL-aPrimedIndex-9.md) | 5 | 1 | CLOSED | rev-1 | 2026-10-11 |
+| [TOOL-aPrimedIndex-10 — the in-place landing checks the allow record against what it pushed](spec/2026-10-11-spec-TOOL-aPrimedIndex-10.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 14 bound to this build, across 4 record folder(s).
+Records: 15 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-7 TOOL-aPrimedIndex-8 TOOL-aPrimedIndex-9.
+Ids no `spec-audit` record has ever named: DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-10 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-7 TOOL-aPrimedIndex-8 TOOL-aPrimedIndex-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -97,6 +99,7 @@ Ids no `spec-audit` record has ever named: DEPL-aPrimedIndex-1 TOOL-aPrimedIndex
 | 3 | `TOOL-aPrimedIndex-3`, `TOOL-aPrimedIndex-4` | yes |
 | 4 | `DEPL-aPrimedIndex-1`, `TOOL-aPrimedIndex-6`, `TOOL-aPrimedIndex-7`, `TOOL-aPrimedIndex-8` | yes |
 | 5 | `TOOL-aPrimedIndex-9` | no |
+| 6 | `TOOL-aPrimedIndex-10` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
