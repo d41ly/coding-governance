@@ -1,0 +1,14 @@
+# **Serves:** journal TOOL-aPairedSlots-9
+arm	rep	bar	width	start	end	wall	rc	verdict	ok	fail	expected	proof	queued_from	pauses	last
+A	1	c1	8	1791699990	1791704192	4202	1	ended	2026-10-11T07:36:29Z	55	10	65	yes	nested	8	gates RED — 10/65 legs failed (65 held: subject kit or chunk selftests, GATE_SELFTESTS=1 runs them) (2 retried after t
+A	1	c2	8	1791704192	1791708430	4238	1	ended	2026-10-11T08:46:59Z	55	10	65	yes	nested	0	gates RED — 10/65 legs failed (65 held: subject kit or chunk selftests, GATE_SELFTESTS=1 runs them) (2 retried after t
+A	1	MAKESPAN	8/4	1791699990	1791708430	8440	-	-	-	-	-	65	-	-	-
+B	1	c1	4	1791708603	1791714147	5544	143	-	29	4	65	NO	held	0	-
+B	1	c2	8	1791708604	1791714114	5510	143	ended	2026-10-11T08:46:59Z	0	0	65	NO	nested	0	-
+B	1	MAKESPAN	8/4	1791708603	1791714147	5544	-	-	-	-	-	65 NO	-	-	-
+B	1	c1	4	1791736544	1791747691	11147	143	-	0	1	65	NO	nested	8	-
+B	1	c2	4	1791736544	1791747705	11161	143	-	0	1	65	NO	nested	7	-
+B	1	MAKESPAN	8/4	1791736543	1791747705	11162	-	-	-	-	-	65 NO	-	-	-
+C	1	c1	8	1791751433	1791760437	9004	143	-	0	0	65	NO	nested	3	-
+C	1	c2	8	1791751433	1791760443	9010	143	-	0	0	65	NO	nested	3	-
+C	1	MAKESPAN	8/4	1791751432	1791760443	9011	-	-	-	-	-	NO	-	-	-

@@ -46,7 +46,15 @@ the mandate, recorded under [prompts/](prompts/2026-10-11-prompt-TOOL-aPairedSlo
 
 ## Parked decisions
 
-None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
+- **Node a lands at one slot, dark.** The two-bar A/B (TOOL-aPairedSlots-9) measured A1, two bars
+  one after the other, at 8440 s. B1, both at once at half width, ran past 11162 s, and C1, both at
+  once at full width, ran past 8945 s; both were stopped past A1's makespan, so neither meets the
+  rule. All three arm-runs ran beside other sessions' bars, on a host whose kernel pool had leaked to
+  26 GB. To turn two slots on, add `slots=2` to the `capable` row of `tools/run-gates/gate-profiles.txt`,
+  or set `GATE_TURNSTILE_SLOTS=2`; re-measure on a freshly booted host first. The numbers are in
+  [the results record](build/2026-10-11-build-TOOL-aPairedSlots-9-ab-results.md).
+
+Other parked entries live in `RUN.md` and are surfaced in the wrap-up.
 
 <!-- roster:units -->
 
@@ -64,7 +72,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 9 unit(s) · node a · opened 2026-10-11 · streams tooling
+**Build status:** CLOSED · 9 unit(s) · node a · opened 2026-10-11 · streams tooling
 ids TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 TOOL-aPairedSlots-10
 
 <!-- gen:build-units -->
@@ -78,10 +86,10 @@ ids TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlot
 | [TOOL-aPairedSlots-4 — a doc-only bar takes its own key and never queues](spec/2026-10-11-spec-TOOL-aPairedSlots-4.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aPairedSlots-5 — a worktree holds at most one slot, so every path under its git dir stays one bar's](spec/2026-10-11-spec-TOOL-aPairedSlots-5.md) | 5 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aPairedSlots-7 — the common dir's shared files take a second concurrent writer safely](spec/2026-10-11-spec-TOOL-aPairedSlots-7.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-11 |
-| [TOOL-aPairedSlots-9 — node a's slot count and the shared-width rule, set by the two-bar A/B](spec/2026-10-11-spec-TOOL-aPairedSlots-9.md) | 7 | 2 | INPROGRESS | rev-1 | 2026-10-11 |
+| [TOOL-aPairedSlots-9 — node a's slot count and the shared-width rule, set by the two-bar A/B](spec/2026-10-11-spec-TOOL-aPairedSlots-9.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 3 record folder(s).
+Records: 17 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
