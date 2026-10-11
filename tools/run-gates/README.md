@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.35` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.37` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -117,6 +117,7 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `run-gates.sh` | the runner. Legs run through a bounded pool, at the width `gate-profiles.txt` declares for the detected hardware; `GATE_JOBS` overrides the width alone |
 | `gate-profiles.txt` | the DECLARED knob table: rows of name, minimum cores, minimum RAM MB, knobs, most-capable-first with a zero-threshold catch-all last. `GATE_PROFILE=<row>` selects one by name and skips detection; `GATE_PROFILES=<path>` reads a different table, and an absent path falls back to the built-in formula — which is the rollback. `GATE_CORES` / `GATE_RAM_MB` replace the detected readings and bypass detection, and `GATE_CGROUP_ROOT` relocates the cgroup files the RAM chain reads |
 | `lib-attribute.sh` | the attribution's two shared halves, SOURCED and never run: the normaliser (`write_normaliser`) and the detached scratch worktree at a base (`add_scratch_worktree` / `remove_scratch_worktree`). The runner sources it only when `GATE_ATTRIBUTE` is set and a leg is red, and `run-selftests.sh` only under `--attribute`, so a copy of either runner without it still runs every other mode |
+| `post-merge.sh` | the post-merge bar: the full bar on a landed sha, run through `--hold` in a scratch worktree, its verdict published as the remote ref `refs/gov/bar-red`; see "The post-merge bar" |
 | `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
 | `profile_bar.py` | the profiling verb: runs the bar, records it as a RUN, and names the regime — floor-bound or packing-bound — so the next fix is chosen from a measurement |
 | `profile_bar.test.sh` | the profiler's own arms |
@@ -132,11 +133,34 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 
 ## Reuse, and the baseline a guard diffs against
 
-`GATE_REUSE=1` skips a leg whose inputs are byte-identical to a recorded green: not declared
-`impure`, its ledger row says `ok`, and the row's input key equals the one computed this run. Any
-missing term means execute — every failure mode is "did more work", never "checked less". It is
-OPT-IN because an advisory input may cause less work only on a run that is not authoritative, and
-`.githooks/pre-push` never sets it. A run that reused anything cannot stamp `gate-full-green`.
+`GATE_REUSE` skips a leg whose inputs are byte-identical to a recorded green, in one of two modes.
+Either way the leg is not declared `impure`, its row in `<git-dir>/gate-ledger.tsv` says `ok`, and
+the row's input key equals the one computed this run. The key hashes the leg's argv, the run's base
+and the leg's guard paths (index entries plus their porcelain lines), or the whole-tree fingerprint
+for an unguarded leg. Any missing term means execute: every failure mode is "did more work", never
+"checked less". The runner reads the knob once, records it as the run header's `reuse` key, and
+unsets it before any leg starts, so a leg's nested runner never inherits a mode.
+
+- **`GATE_REUSE=1`**, or any value but `lineage`, is the OPT-IN mode, for a run you ask for by hand.
+  A run that reused anything in it cannot stamp `gate-full-green`.
+- **`GATE_REUSE=lineage`** also wants the row's `full` field to read `1`, meaning the run that
+  earned it set `GATE_FULL` on a clean tree. Its `manifest_blob` must be this run's, and its `head`
+  must be an ancestor of `HEAD`. A run whose every reuse meets those terms may still stamp
+  `gate-full-green`, which records the count as `reused`. `.githooks/pre-push` exports this mode on
+  its own FULL decision for this runner, and on no other decision or bar. That FULL line ends
+  `— reuse: lineage`. So after a red push, the fix push re-runs the failed legs and the legs whose
+  key moved, and nothing else. The key's base term ties one chain of reuses to one remote base,
+  because a landing moves the base and voids every key.
+
+WHAT LINEAGE REUSE DOES NOT CHECK: that a reused leg's guard names every input the leg reads, or
+that its verdict depends on the tree alone. A reused verdict is only as good as its input key, so
+a too-narrow guard or an undeclared `impure` leg is carried forward until its key moves, the
+remote base moves, or a run without `GATE_REUSE` re-executes it — the post-merge full bar is that
+run.
+
+The ledger is per git dir, so a bar run in one worktree feeds lineage only to pushes from that
+worktree. A row written before these fields existed has an empty `full` and is never
+lineage-reusable. The inherited-green stamp still asks that nothing was reused.
 
 The baseline a guard diffs against is the MERGE-BASE with the default branch, so a branch is graded
 on what it changed rather than on everything that landed while it was open — used only where the
@@ -165,11 +189,20 @@ worktree serves the primary tree's push. It is one slot per clone, last writer w
 worktree's green evicts the first, which costs that push its saving and never its verdict.
 TOOL-dThriftyLanding-1, -2, -3.
 
-## The turnstile — one bar per repository
+## The turnstile — one bar per host
 
-A run claims a beacon under the git COMMON dir before it dispatches, so every worktree of one
-repository shares one beacon and two repositories never contend. A second run takes a time-sorted
-ticket and queues, announcing its position; the runner prints `gate queue: waited <n>s` on exactly
+A run claims a beacon in a HOST directory before it dispatches: `GATE_TURNSTILE_DIR`, else
+`~/.gov/gate-turnstile`. Every repository on the machine shares it, because bars from different
+repositories contend for the same cores and memory (`TOOL-aFrugalTurnstile-5`); the health log and
+the scratch sweep stay per git common dir. A host dir that cannot be created falls back to the common
+dir for the beacon and the queue, with a NOTE, which is per-repository queueing. A runner older than
+this keys on its common dir and does not see the host beacon, so serialization is complete only when
+every repository on the host carries this runner.
+
+The beacon holds `heartbeat`, `pid`, `nonce`, and the holder's name: `repo` (its top level), `run`
+(its run id) and `ttl`. A second run takes a time-sorted ticket and queues, announcing
+`another bar holds this host — <repo> run <id> pid <pid> — queued at position N (waited Ns)`, with
+`-` for a field an older beacon lacks; the runner prints `gate queue: waited <n>s` on exactly
 one line, always, zero when uncontended, so a wrapper can tell waiting from working. The next line is
 `gate queue: acquired <iso-utc> from <state>`, the instant the bar stopped waiting, and the run
 record's header carries the same pair as `acquired` and `acquired_from`, so a bar killed later can
@@ -177,11 +210,27 @@ still be told apart from one that never acquired.
 
 That line is not durable, and the status file beside it is deleted the moment the wait ends, so the
 wait also reaches the RUN RECORD as the paired keys `queued` and `queued_from`, and the summary
-file as its own line. `queued_from` is a closed four-word vocabulary: `held` (queued, then
-acquired), `expired` (burned the bounded wait and ran unqueued), `off` (the turnstile was disabled)
-and `unresolved` (the common dir did not resolve). The last two record a DASH rather than a zero,
-because a zero for a probe that never ran is a reassuring number about nothing. `unresolved` is
-UNARMED and the suite header says why.
+file as its own line. `queued_from` reads `held` (queued, then acquired), `nested` (ran inside the
+bar that holds the host, below), `expired` (burned the bounded wait and ran unqueued), `unticketed`
+(could not write a ticket and ran unqueued at once), `off` (the turnstile was disabled) or
+`unresolved` (neither the host dir nor the common dir resolved). `off` and `unresolved` record a
+DASH rather than a zero, because a zero for a probe that never ran is a reassuring number about
+nothing. `unresolved` is UNARMED and the runner's comment says why.
+
+A holder exports its nonce as `GATE_TURNSTILE_HOLDER` to its legs. A runner that inherits a value
+equal to the live beacon's `nonce` is NESTED inside that bar: it takes no ticket, prints
+`gate queue: nested under <run> — <repo> pid <pid>`, and runs. Without that, a suite's scratch-repo
+bar, or a wrapper bar's inner runner, would queue behind the very bar whose leg started it. Nesting
+trusts an inherited value any process on the host can read from the beacon, so it decides contention
+and never a verdict; the pre-push hook classes both knobs INERT rather than scrubbing them, as it
+does `GATE_TURNSTILE=0`. `run-selftests.sh` gives each pooled row its own `GATE_TURNSTILE_DIR`, so a
+pool's suites do not serialize against each other.
+
+`run-gates.sh --hold -- <command…>` is how a bar that is NOT this runner joins the queue: it takes
+the turnstile exactly as a bar does (or nests, or runs unqueued when that is what a bar would do),
+runs the command from the repository top level right after `gate queue: acquired`, with
+`GATE_TURNSTILE_HOLDER` exported when it holds, releases, and exits with the command's status. It
+writes no run record, ledger row or stamp. `--hold` with no `--` or no command exits 2.
 
 A waiter also rewrites `gate-queue-heartbeat` under its OWN worktree's git dir, beside `gate-logs/`,
 on every tick that does not acquire, holding `waited<TAB><seconds>`. It is for an out-of-process
@@ -191,11 +240,12 @@ healthy queued bar reads as silent and a resumer may kill it. Readers go by its 
 parse it. Unlike the status file it is NEVER removed: a leftover ages out as an old gate log does,
 and a removal at the acquire would drop the newest move just before the first leg lands.
 
-A holder is reaped on either of two signals: a dead PID, or a heartbeat older than the TTL. The TTL
-is DERIVED from the profile row's per-leg `timeout=` when it sets one, because the heartbeat
-refreshes when a leg COMPLETES — so "can the holder still be holding" and "has a leg finished
-lately" are the same question. Release is nonce-guarded and folded into a trap widened to INT, TERM
-and HUP: a run whose beacon was reaped can never delete its successor's.
+A holder is reaped on either of two signals: a dead PID, or a heartbeat older than the HOLDER's TTL,
+read from the beacon's `ttl` and falling back to the waiter's own when the beacon has none, since two
+repositories may run different TTLs. The TTL is derived from the profile row's per-leg `timeout=`
+when it sets one, else `GATE_TURNSTILE_TTL`, and a detached ticker refreshes the heartbeat at a sixth
+of it. Release is nonce-guarded and folded into a trap widened to INT, TERM and HUP: a run whose
+beacon was reaped can never delete its successor's.
 
 It FAILS OPEN. The wait is bounded at a declared multiple of the TTL; on expiry the run says so
 loudly, drops its ticket and proceeds unqueued. `GATE_TURNSTILE=0` disables it entirely. It never
@@ -206,6 +256,49 @@ common dir, which the orientation card counts (`TOOL-aGraftedHelix-8`): `beacon-
 `ticket-swept`, `scratch-swept`, `turnstile-expired`, `retry-passed` for a serial retry that passed,
 and one `dispatch-paused` per bar the memory pause held; the line format is the header of the
 `health_log_sh` block in `run-gates.sh`.
+
+## The post-merge bar
+
+`post-merge.sh <sha> [--remote <name>]` runs the full bar on a sha that has already LANDED, and
+publishes the verdict where every node reads it (`TOOL-aFrugalTurnstile-6`, design D7). It is the
+after-the-merge half of the scoped-then-full landing path: the push boundary may scope a landing,
+and this script pays the one full bar afterwards, in place of the boundary's.
+
+It makes a detached scratch worktree of `<sha>` at `<common-dir>/gate-pm.<pid>`, reads the bar that
+`<sha>` declares (`GOV_GATE_CMD` in `.githooks/gate-env.sh` as committed there, never sourced, else
+`bash <kit>/run-gates.sh`) and runs it with `GATE_FULL=1` through this kit's own
+`run-gates.sh --hold`, so it queues on the host turnstile like any other bar. Only three keys of that
+file apply: `GOV_GATE_CMD`, `GATE_SELFTESTS` and `GOV_PYTHON`, and a line naming `GOV_GATE_CMD` in
+any other shape, such as `export GOV_GATE_CMD=…`, is a refusal. The caller's `GIT_DIR` family,
+interpreter knobs, arm seams, `GATE_REUSE`, `GATE_RUN_ID` and `GATE_TURNSTILE_HOLDER` are dropped
+and named on one `post-merge: not honoured from the environment:` line. The remote is the lander's
+ladder (`GOV_REMOTE`, which `--remote` sets), and the sha must be an ancestor of that remote's
+default branch as this clone last fetched it.
+
+| exit | means |
+|---|---|
+| 0 | GREEN, and its publication completed |
+| 1 | RED, or any verdict whose publication failed |
+| 2 | REFUSED: a bad argument, an unlanded or unknown sha, no remote or a ladder refusal, a bar the tree at `<sha>` does not track, or a scratch worktree whose HEAD moved under the bar; nothing is published |
+
+**The ref is `refs/gov/bar-red` on the remote.** A RED pushes `<sha>` there when the ref is absent,
+or advances it when it names an ancestor of `<sha>`; any other ref is kept, so a red never moves it
+backwards. A GREEN deletes it when it names `<sha>` or an ancestor; any other ref is kept, so a green
+that does not descend from the red never clears it. Every push is `--force-with-lease` on the sha
+the one bounded `ls-remote` observed, by remote name, from the scratch worktree, and the porcelain
+line decides: a ref that moved in between is a lost race and a failed publication, never an
+overwrite. A ref object missing locally counts as not an ancestor, which keeps the ref.
+
+**Two records, under the git common dir.** `gate-post-merge` holds the last verdict for a reader with
+no network: `sha`, `verdict` (`GREEN`, `RED` or `REFUSED`), `run_id`, `published` (`pushed`,
+`cleared`, `kept`, `none` or `failed`), `why`, `remote` (the name, never a URL) and `stamped`. A
+GREEN also writes `gate-bar-green.shared` in the boundary's record grammar with `kind full` and
+`by post-merge`. When the bar was the runner, its run record is copied to `gate-run/<run id>/` before
+the worktree goes, so a red's leg output survives, and an exit 0 counts green only when that record
+reads `verdict GREEN`.
+
+**Remote CI** can run the same script on the landed sha instead of a local node, with credentials
+that may push a `refs/gov/` ref; which one runs it is the adopter's declaration.
 
 ## `--print-profile` — the resolved profile, for a second reader
 
@@ -346,12 +439,17 @@ it costs no process beyond the one `mkdir` a clone's first bar pays for the jour
 
 `<git-dir>/gate-ledger.tsv` is the cross-run store: one row per leg, with the duration in field 2 —
 which is what lets the runner read it as a dispatch hint and `profile_bar.py` read it as a
-measurement, with no second copy of the same fact.
+measurement, with no second copy of the same fact. A row is nine tab-separated fields: name,
+seconds, status, input key, ended-at, run, full, manifest_blob, head. The reuse section above says
+what reads the last four.
 
 `<git-dir>/gate-full-green` is stamped only when the run failed nothing, skipped nothing, reused
-nothing, the tree did not move, AND the tree was CLEAN when the run started. CLEAN means
+nothing but lineage-qualified legs, the tree did not move, AND the tree was CLEAN when the run
+started. CLEAN means
 `git status --porcelain` empty, untracked files included. All five preconditions are what make the
 file's name true, and an implementation that forgets one passes every arm written for the others.
+The stamp also records `manifest`, the repo-relative path of the leg manifest the run read, and the
+pre-push hook trusts it only for a runner bar reading that manifest.
 
 ## Every leg may declare a `ceiling`, and the runner holds it to it
 

@@ -21,3 +21,4 @@ tools/workflows/unattended-build.template.js · the SOURCE the build harness abo
 tools/template-size-limits.txt · the DECLARED byte ceiling for the rendered method, and the identity of the leg that reads it — a row keyed by the file, never a restatement of what the method says
 tools/template-size-highwater.txt · the MEASURED high-water for the rendered method, written by --bump and never by hand — a measurement of the file, never a restatement of it
 tools/unattended/ASKS.template.md · the ask guide names M2 as the one carrier of how asks group into a unit and points there; it states no rule of the method
+coding-governance-agents.template.md · v4.0's memory-tree protocol line points a build of more than one pass at the method
