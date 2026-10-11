@@ -368,7 +368,7 @@ file per commit, each lowering its own suite rows.
 `check-wiring self-test` · `codebase-map adopter e2e` · `codebase-map kit selftest` ·
 `corpus-ids selftest` · `dead-path carriers self-test` · `drift-audit selftest` ·
 `foreign-prefix parity (every self-test at three prefixes)` · `gotchas selftest` ·
-`govkit refusal join` · `govkit selftest` ·
+`govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` ·
 `install-prefix self-test` · `kit-placeholders self-test` · `kit/dogfood doc parity` ·
 `lexicon naming predicates` · `lexicon selftest` · `manifest-check self-test` ·
 `memory-hygiene self-test` · `memory-recall kit selftest` · `playbook parity selftest` ·
@@ -431,7 +431,7 @@ held unattended driver and gate suites cover S1 and S2 at the owner's manual run
   read, invisible to check 39 inside a nested substitution, routes through `read_recorded_phase`.
   The GH37 race arms re-hook their pauses on `mkdir` and `rm`, the drain having left no `date` in the
   staleness rule. The counter's ceilings hold each entrypoint's fixture, and its leg is exempt because
-  they name this repository's paths, so §7 names the two govkit legs its registry row trips. The
+  they name this repository's paths, so §7 names the three govkit legs its registry row trips. The
   three suite files ride one pass commit, and the extractor
   keys an interpolated message on its literal words.
 
