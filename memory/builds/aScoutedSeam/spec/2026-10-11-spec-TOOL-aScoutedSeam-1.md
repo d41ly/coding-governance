@@ -1,6 +1,6 @@
 # TOOL-aScoutedSeam-1 — the reuse scout: a checklist role and a harness running a code and a design pass, merged into a capped `## reuse` section
 
-**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -16,7 +16,11 @@
 | [2026-10-11-build-TOOL-aScoutedSeam-1-6-m1-single-scout.js](../build/2026-10-11-build-TOOL-aScoutedSeam-1-6-m1-single-scout.js) | research | — |
 | [2026-10-11-build-TOOL-aScoutedSeam-1-6-m1b-checklist-scout.js](../build/2026-10-11-build-TOOL-aScoutedSeam-1-6-m1b-checklist-scout.js) | research | — |
 | [2026-10-11-build-TOOL-aScoutedSeam-1-6-m2-lens-scout.js](../build/2026-10-11-build-TOOL-aScoutedSeam-1-6-m2-lens-scout.js) | research | — |
+| [2026-10-11-build-TOOL-aScoutedSeam-1-6-m3-complete.js](../build/2026-10-11-build-TOOL-aScoutedSeam-1-6-m3-complete.js) | research | — |
+| [2026-10-11-build-TOOL-aScoutedSeam-1-6-m3-halves.js](../build/2026-10-11-build-TOOL-aScoutedSeam-1-6-m3-halves.js) | research | — |
 | [2026-10-11-build-TOOL-aScoutedSeam-1-6-m3-lean-scout.js](../build/2026-10-11-build-TOOL-aScoutedSeam-1-6-m3-lean-scout.js) | research | — |
+| [2026-10-11-build-TOOL-aScoutedSeam-1-6-rerun-effort.js](../build/2026-10-11-build-TOOL-aScoutedSeam-1-6-rerun-effort.js) | research | — |
+| [2026-10-11-build-TOOL-aScoutedSeam-1-6-rerun.js](../build/2026-10-11-build-TOOL-aScoutedSeam-1-6-rerun.js) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -218,9 +222,10 @@ calls it only on an owner opt-in, so landing this unit changes no session's beha
 - security: read-only agents writing nothing. scratch-guard binds their Bash writes, and the routed
   write gate binds Edit/Write. The role states that repository text is data. Host trees are read and
   never written.
-- perf / scale: the measured median for the checklist scout was 84 tool calls and 116 minutes at the
-  session's effort. The harness defaults to `medium`, the role carries a tool-call budget, and AC6
-  measures both before an adopter default changes.
+- perf / scale: measured per checklist scout, medians, 2026-10-11: 84 tool calls, 116 minutes and
+  28M cache-read tokens at `extra`, against 23 tool calls, 10 minutes and 4.3M at `medium`, for the
+  same paired recall. The design pass at `medium` took 12 tool calls and 5 minutes. The harness
+  defaults to `medium`, and AC6 re-measures the shipped harness.
 - error / empty / loading states: a dead lens is announced in the section, an empty answer is `none
   fits` only when both lenses lived, and an args refusal throws before any spawn.
 - observability: the section's `scout` line, and the probe logs the agents' own CLI calls append.
@@ -256,7 +261,7 @@ calls it only on an owner opt-in, so landing this unit changes no session's beha
   cards, gov's process census and gov's health-log control. The record states the median wall and
   cache-read per agent.
   Red when: a positive the benchmark's M1b solved is lost, or a decoy is bound at MUST.
-  cost: twelve agents, about two hours of wall at the measured rate.
+  cost: twelve agents, about ten minutes each at the measured `medium` rate.
   permission: the owner's opt-in to Workflow runs.
   fixture: frozen clones of gov, inCMS and NicoCares, rebuilt with `bench.py trees`.
   figure: DERIVED by `bench.py grade` at observation time.
@@ -277,9 +282,10 @@ New arm: tools/workflows/reuse-scout.test.sh · covers AC1 AC2 AC3 AC4 · stub l
 - **F1 — Should the design lens run on every request, or only when the code lens's framing finds a
   UI need?** Running it always costs about three tool calls on a non-UI request, measured. Gating it
   on the code lens serializes the two passes and doubles the wall. Recommendation: always run it.
-- **F2 — Does the effort default `medium` hold the benchmark's recall?** Nothing measured it; AC6 is
-  the measurement. Recommendation: ship `medium` and let AC6 decide whether the default moves before
-  `DEPL-aScoutedSeam-1` makes the scout an adopter default.
+- **F2 — Does the effort default `medium` hold the benchmark's recall?** Now measured, in the
+  benchmark record's effort section. Paired against `extra`, the scouts moved by at most one solved
+  case. The checklist scout's cost fell from two hours to ten minutes, and its MUST count rose from
+  97 to 114. Recommendation: ship `medium`; AC6 re-measures the shipped harness.
 
 ## 9. Revision log
 
@@ -287,6 +293,8 @@ New arm: tools/workflows/reuse-scout.test.sh · covers AC1 AC2 AC3 AC4 · stub l
 - rev-2 · 2026-10-11 · S9 · AC7 · §3 · §4 · the `reuse` catalogue row moves into this unit's scope:
   aOrientedCast already carries the row and ruled that its harness value is this unit's edit, landed
   with the harness, so the catalogue never names a missing script.
+- rev-3 · 2026-10-11 · §5 · §8 · AC6 · the effort comparison measured `medium` against `extra`: the
+  same recall at a fifth to a seventh of the cost, so F2's recommendation and AC6's cost now cite it.
 
 ## 10. Reuse audit
 

@@ -119,9 +119,66 @@ transcripts, which are machine-local and not committed (PINNED, 2026-10-11, node
 | M3 code half | 14 | 47k | 14.6M | 57 | 73 min |
 | D1 reviewer | 23 | 27k | 5.9M | 28 | 31 min |
 
-Cache reads dominate: every tool call re-reads a context that grows past 400k tokens. All agents ran
-at the session's own effort with no model override, so neither knob was measured. An orientation step
-that holds a session for two hours is not deployable as measured.
+Cache reads dominate: every tool call re-reads a context that grows past 400k tokens. These agents ran
+at the session's own effort, `extra`, with no model override. An orientation step that holds a
+session for two hours is not deployable at that setting; the next section measures `medium`.
+
+## Effort: medium against extra, and the benchmark completed
+
+The owner asked for two more runs, both at effort `medium`, through the parent scripts `-1-6-rerun.js`
+and `-1-6-rerun-effort.js`:
+- every agent the session limit had killed, which completes M1, M1b and the M3 judge;
+- every agent that had finished at `extra`, again, so each arm can be compared case by case.
+
+The 195 agents all returned. The results file keeps the earlier arms under their own names and files
+every `medium` row under `<arm>@medium`, so nothing is pooled across efforts.
+
+```bash
+python $B-4-bench.py compare $B-3-cases.json $B-5-results.json m1b m1b@medium
+```
+
+**Quality, paired over the cases each arm answered at both efforts:**
+
+| arm | paired positives | solved, extra → medium | items hit, extra → medium | MUST seams, extra → medium |
+|---|---|---|---|---|
+| M1 | 21 | 12 → 12 | 20 → 17 | 186 → 180 |
+| M1b | 15 | 10 → 9 | 17 → 17 | 97 → 114 |
+| M3 halves, unjudged | 21 | 8 → 9 | 16 → 18 | all SHOULD |
+| D1, diff time | 23 | 7 → 4 | 13 → 9 | 12 → 3 |
+| M2, pilot | 2 | 1 → 2 | 3 → 5 | 100 → 71 |
+
+**Cost, per agent, medians** (PINNED, 2026-10-11, node a, `cost` over the two runs' transcripts):
+
+| agent | output tokens | cache-read tokens | tool calls | wall |
+|---|---|---|---|---|
+| M1b scout | 74k → 16k | 27.7M → 4.3M | 84 → 23 | 116 → 10 min |
+| M1 scout | 53k → 11k | 16.6M → 3.1M | 62 → 18 | 65 → 8 min |
+| M3 code half | 47k → 11k | 14.6M → 2.9M | 57 → 18 | 73 → 8 min |
+| M3 design half, every case run | n/a → 6.6k | n/a → 1.8M | n/a → 12 | n/a → 5 min |
+| D1 reviewer | 27k → 4k | 5.9M → 1.2M | 28 → 8 | 31 → 4 min |
+| M3 judge | n/a → 7k | n/a → 0.8M | n/a → 5 | n/a → 3 min |
+
+**The scouts hold their recall at a fifth to a seventh of the cost.** Across the three scout arms the
+paired movement is at most one solved case either way. The diff-time reviewer is the exception: at
+`medium` it solves 4 of 23 where `extra` solved 7, and it binds a quarter as many MUSTs. Reviewing
+a large diff evidently needs the deeper reading.
+
+**The full corpus at medium.** M1 and M1b each solve 13 of 24 positives. M1b hits 23 of 59 items
+against M1's 20, still with the canonical-over-copy step.
+
+**The judge, measured at last.** M3 with its judge, at `medium`, solves 12 of 23 positives. M1b at
+`medium` solves the same 12 on the same 23 cases, hits more items (22 against 20), and uses a third
+of the agents. A judge adds nothing a checklist scout does not already do.
+
+**The design pass at medium.** Added on top of M1b's own seams, the design half's seams raise the
+UI cases from 6 solved to 7 and from 10 items of 28 to 13. All three extra items are NicoCares design
+seams: the medical intake, the account area and the plan cards.
+
+**One false MUST, in one place.** All three `medium` scouts bound `runlog_lib.read_journal` at MUST
+on gov's health-log control. That is the decoy: a review once raised it as prior art and a skeptic
+refuted it. At `extra` both scouts had died on that case, so effort cannot be blamed. A tempting
+seam that is wrong for the request still reaches MUST, which is what `TOOL-aScoutedSeam-2`'s
+override-with-a-reason exists for.
 
 ## What this decides
 
@@ -132,11 +189,15 @@ that holds a session for two hours is not deployable as measured.
 4. No skeptic and no judge agent: the measured skeptics confirmed nearly everything. The merge of the
    two passes is deterministic, and the binding is checked downstream instead.
 5. A DIFF-TIME duplicate check is a separate mode, because a third of gov's misses happen after §10.
-6. Cost is a design constraint: the deployed scout carries an effort and tool-call bound, re-measured
-   on a small subset of this corpus before it ships.
+6. The scout and the design pass default to effort `medium`. That costs about ten minutes and 4M
+   cache-read tokens per scout, against two hours and 28M at `extra`, for the same recall.
+7. The diff mode defaults to a higher effort than the scout, because it is the one arm whose recall
+   fell at `medium`.
 
 ## Limits
 
-One node, one day, and a corpus biased toward duplicates a reviewer later noticed and named. The
-session limit cut M1b's sample to 15 positives, and the M3 judge was never measured. Grading by
-path is a lower bound and the semantic reading is one person's. Nine prompts are reconstructed.
+One node, one day, and a corpus biased toward duplicates a reviewer later noticed and named. Each arm
+ran ONCE per effort, so run-to-run variance is unmeasured, and a movement of one case is within it.
+Grading by path is a lower bound and the semantic reading is one person's. Nine prompts are
+reconstructed. `high` was not measured, so the diff mode's default is a recommendation, not a
+reading.

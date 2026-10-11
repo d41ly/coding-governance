@@ -16,6 +16,7 @@ agent arms themselves are the `-1-6-*.js` workflow scripts; `args` writes their 
   m0      <corpus> <tree-root> <out.json> [--budget N]   the shipped reuse_lookup, no agent
   collect <corpus> <results.json> <arm> <task.output> [...]   merge task outputs into one arm
   halves  <corpus> <results.json> <workflows-dir> <run-id> [...]  M3 halves, judge removed
+  collect-runs <corpus> <results.json> <suffix> <task.output> [...]  a re-run parent, arms suffixed
   grade   [--k N] <corpus> <results.json> <arm>          per-case and total, path+symbol matcher
   compare <corpus> <results.json> <arm> [<arm> ...]      paired, over cases every arm answered
   misses  <corpus> <results.json> <arm> [<arm> ...]      ground truth beside each arm's seams
@@ -57,8 +58,16 @@ def read_json(path):
 
 
 def write_json(path, doc):
-    Path(path).write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8",
-                          newline="\n")
+    """Write JSON, keeping the `//` head lines an existing record carries for the hygiene gate."""
+    path = Path(path)
+    head = []
+    if path.exists():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if not line.startswith("//"):
+                break
+            head.append(line)
+    body = json.dumps(doc, indent=1, ensure_ascii=False) + "\n"
+    path.write_text("".join(h + "\n" for h in head) + body, encoding="utf-8", newline="\n")
 
 
 def resolve_slug(repo, sha):
@@ -247,6 +256,36 @@ def cmd_collect(argv):
     print(arm, len(rows), "cases")
 
 
+def cmd_collect_runs(argv):
+    """Merge a re-run parent's output, keyed `<arm>-<n>` or `m2-<short>`, into arms named `<arm><suffix>`.
+
+    An `m3h` run returns each case's two halves; they are filed as one seam list, both halves'
+    candidates at SHOULD, the same union `halves` builds, so the two efforts compare like for like.
+    A null is a dead agent and is left out.
+    """
+    shorts = {c["short"]: c["id"] for c in read_json(argv[0])}
+    dest, suffix = Path(argv[1]), argv[2]
+    acc = read_json(dest) if dest.exists() else {}
+    for p in argv[3:]:
+        for key, per in (read_json(p).get("result") or {}).items():
+            arm, _, tail = key.partition("-")
+            rows = acc.setdefault(arm + suffix, {})
+            if arm == "m2":
+                if per:
+                    rows[shorts.get(tail, tail)] = per
+                continue
+            for short, r in (per or {}).items():
+                if r is None:
+                    continue
+                if arm == "m3h":
+                    seams = [{**x, "binding": "SHOULD", "half": kind}
+                             for kind in ("code", "design") for x in ((r.get(kind) or {}).get("candidates") or [])]
+                    r = {"seams": seams, "halves": [k for k in ("code", "design") if r.get(k)]}
+                rows[shorts.get(short, short)] = r
+    write_json(dest, acc)
+    print({a: len(v) for a, v in acc.items() if a.endswith(suffix)})
+
+
 def cmd_halves(argv):
     """M3 with its judge removed: the union of the code and design halves' candidates, read from the
     journals because most judges died at a session limit while the halves had finished."""
@@ -416,7 +455,7 @@ def cmd_cost(argv):
 
 
 COMMANDS = {"trees": cmd_trees, "resolve": cmd_resolve, "d1": cmd_d1, "args": cmd_args, "m0": cmd_m0,
-            "collect": cmd_collect, "halves": cmd_halves, "grade": cmd_grade, "compare": cmd_compare,
+            "collect": cmd_collect, "collect-runs": cmd_collect_runs, "halves": cmd_halves, "grade": cmd_grade, "compare": cmd_compare,
             "misses": cmd_misses, "cost": cmd_cost}
 
 

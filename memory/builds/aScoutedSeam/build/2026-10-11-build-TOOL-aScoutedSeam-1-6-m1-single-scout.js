@@ -54,7 +54,7 @@ const SLOTS = [0, 1, 2, 3, 4]
 const results = await boundedParallel(SLOTS.map((s) => () => {
   const id = cfg.ids[s]
   if (!id) return Promise.resolve(null)
-  return agent(renderPrompt(cfg.cases[id]), { label: 'm1:' + id, phase: 'Scout', schema: SEAMS })
+  return agent(renderPrompt(cfg.cases[id]), { label: 'm1:' + id, phase: 'Scout', schema: SEAMS, ...(cfg.effort ? { effort: cfg.effort } : {}) })
 }), 5)
 const out = {}
 SLOTS.forEach((s) => { if (cfg.ids[s]) out[cfg.ids[s]] = results[s] })

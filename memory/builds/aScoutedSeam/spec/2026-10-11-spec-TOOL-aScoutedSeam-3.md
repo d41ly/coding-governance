@@ -1,6 +1,6 @@
 # TOOL-aScoutedSeam-3 — the scout's diff mode: a landed diff checked against the tree and the `## reuse` seams
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -46,6 +46,10 @@ arm (`2026-10-11-build-TOOL-aScoutedSeam-1-2-benchmark.md`, arm D1).
   diff mode over the unit's range. Each `bypassed` MUST and each MUST duplicate becomes a fold item
   exactly as a review finding does.
   - AC4 observes it.
+- **S6** — Diff mode runs at effort `high` unless `args.effort` names another. The orient mode's
+  `medium` is not reused here: at `medium` the measured diff reviewer solved 4 of 23 cases where
+  `extra` solved 7, and it bound a quarter as many MUSTs.
+  - AC3 observes it.
 
 ## 3. Non-goals (OUT)
 
@@ -77,6 +81,7 @@ The diff-mode args add three keys to `TOOL-aScoutedSeam-1`'s table:
 | `base` | string | 7-40 hex, resolved by the caller, never a ref name |
 | `head` | string | 7-40 hex, resolved by the caller |
 | `reuse` | string | the `## reuse` section verbatim, or empty |
+| `effort` | string | absent means `high` in diff mode, not the orient mode's `medium` (S6) |
 
 The return:
 
@@ -127,8 +132,9 @@ Inert until a caller passes `mode: "diff"`. The method sentence binds only a bui
 ## 5. Production-readiness checklist
 
 - security: read-only; the agent runs `git diff` and reads files, and writes nothing.
-- perf / scale: the measured reviewer median was 28 tool calls and 31 minutes per diff at the
-  session's effort; the harness's effort default applies.
+- perf / scale: measured per diff reviewer, medians, 2026-10-11: 28 tool calls and 31 minutes at
+  `extra`, against 8 and 4 minutes at `medium`. Recall fell with that cost, which is why S6 sets
+  this mode's default above the scout's.
 - error / empty / loading states: a dead agent returns `lensesLive` 0 and no verdict, never `clean`.
 - observability: the verdict and the wiring rows are the caller's fold input, and they are recorded
   with it.
@@ -146,13 +152,13 @@ Inert until a caller passes `mode: "diff"`. The method sentence binds only a bui
 - **AC2** — When the stub diff agent returns one MUST duplicate and one `bypassed` wiring row, the
   return's `verdict` is `bypassed` and both rows survive the cap.
   Red when: the verdict takes the first finding instead of the strongest.
-- **AC3** — When the shipped harness runs diff mode on the three below-spec gov cases of
+- **AC3** — When the shipped harness runs diff mode at its default effort on the three below-spec gov cases of
   `2026-10-11-build-TOOL-aScoutedSeam-1-3-cases.json`, `bench.py grade` reads at least two of them
   solved, with each run's duplicates collected as its seams. The cases are the quoted-headings brief
   reader, the pooled-sweep wall watchdog and the keyed-decisions id regex.
   Red when: the role's diff section loses the instruction to judge only ADDED code against the tree
   at `base`.
-  cost: three agents, about ninety minutes at the measured rate.
+  cost: three agents at effort `high`, between the measured 4 and 31 minutes each.
   fixture: `bench.py d1` rebuilds the parent worktrees and the diffs.
   figure: DERIVED by `bench.py grade`.
 - **AC4** — When the memory-tree kit re-renders the method, the rendered `BUILD-METHOD.md` carries
@@ -171,10 +177,17 @@ New arm: tools/workflows/reuse-scout.test.sh · covers AC1 AC2 · stub diff retu
   unit catches a duplicate before the next unit copies it. Once per build halves the cost on a large
   build. Recommendation: per unit, because two measured duplicates were copied forward by a sibling
   unit.
+- **F2 — Is `high` enough for diff mode, or should it default to `extra`?** `medium` was measured
+  and lost 3 of 7 solved cases, and `extra` cost 31 minutes per diff; `high` was not measured.
+  Recommendation: `high`, with AC3 as the measurement. If AC3 falls short, the default moves to
+  `extra`.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · S6 · §4 · §5 · §8 · AC3 · the effort comparison measured the diff reviewer at
+  `medium` solving 4 of 23 where `extra` solved 7. This mode therefore defaults to `high`, and F2
+  asks whether `high` is enough.
 
 ## 10. Reuse audit
 

@@ -47,7 +47,7 @@ const framed = await agent([
   'You FRAME a request for a reuse search. Do not search for seams yet beyond what you need to learn the codebase vocabulary.',
   renderTrees(), RULES, REQUEST,
   'Read the tree\'s orientation material first (AGENTS.md/CLAUDE.md, memory/map/generated/CARDS.md or MAP.md if present, the map dossiers\' titles) to learn its vocabulary. Then break the request into 3-10 NEEDS: each a capability, UI element, visual treatment, data shape, behaviour, or infrastructure the build will need (including implied ones the owner did not spell out, e.g. "an image property" implies choosing/uploading media). kind is one of surface | ui-element | visual | behaviour | data | infra | convention. what = the need in plain words. terms = 4-8 alternative phrasings IN THIS CODEBASE\'S OWN VOCABULARY (names you saw in the map, dossiers, directory names) plus generic synonyms — the words existing code for this need would use. surfaces = every existing page, route, block, component, command or feature the request names or implies (e.g. "/intake", "the product cards", "the hero"). ui = true if any need is visual or a UI element. orientation = 2-3 sentences on where things live in this tree.',
-].join('\n\n'), { label: 'frame', phase: 'Frame', schema: NEEDS })
+].join('\n\n'), { label: 'frame', phase: 'Frame', schema: NEEDS, ...(cfg.effort ? { effort: cfg.effort } : {}) })
 if (!framed) throw new Error('frame agent died')
 const needsText = framed.needs.map((n) => 'N' + n.id + ' [' + n.kind + '] ' + n.what + ' — terms: ' + n.terms.join(', ')).join('\n')
 
@@ -71,7 +71,7 @@ const lensOut = await boundedParallel(LENSES.map((L) => () => agent([
   renderTrees(), RULES, REQUEST, 'NEEDS (from the framing pass):\n' + needsText,
   'YOUR LENS — ' + L.brief,
   'Return at most 10 candidates, best first. Each: needs (the N-ids it serves), repo, path (repo-relative), symbol (exact name), fit (use-as-is | extend | wire-through | follow-pattern | constraint), how (how to build WITH it: the call, prop, token, extension point), evidence (what you read, file:line). Return an empty list rather than a weak candidate.',
-].join('\n\n'), { label: 'lens:' + L.key, phase: 'Lenses', schema: CANDS })), 5)
+].join('\n\n'), { label: 'lens:' + L.key, phase: 'Lenses', schema: CANDS, ...(cfg.effort ? { effort: cfg.effort } : {}) })), 5)
 
 const seen = new Map()
 lensOut.forEach((r, li) => {
@@ -98,7 +98,7 @@ const verdictOut = await boundedParallel(batches.map((b, bi) => () => agent([
   renderTrees(), RULES, REQUEST, 'NEEDS:\n' + needsText,
   'CANDIDATES:\n' + b.map((x) => 'id=' + x.id + ' needs=' + x.needs.join(',') + ' ' + x.repo + ':' + x.path + ' :: ' + x.symbol + ' [' + x.fit + '] how: ' + x.how + ' | evidence: ' + x.evidence).join('\n'),
   'For each id return verdict, binding (MUST = building the request without it is a defect a reviewer must reject; SHOULD = strong default; INFO = context only), how (corrected one-line build-with instruction), reason. Copy the integer id exactly.',
-].join('\n\n'), { label: 'verify:' + (bi + 1), phase: 'Verify', schema: VERDICTS })), 5)
+].join('\n\n'), { label: 'verify:' + (bi + 1), phase: 'Verify', schema: VERDICTS, ...(cfg.effort ? { effort: cfg.effort } : {}) })), 5)
 
 const byId = new Map()
 verdictOut.forEach((r) => { if (r) for (const v of r.verdicts) byId.set(v.id, v) })

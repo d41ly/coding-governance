@@ -109,10 +109,10 @@ const results = await boundedParallel(SLOTS.map((s) => async () => {
   if (!id) return null
   const c = cfg.cases[id]
   const halves = await boundedParallel([
-    () => agent(renderCodePrompt(c), { label: 'code:' + id, phase: 'Scout', schema: CANDS }),
-    () => agent(renderDesignPrompt(c), { label: 'design:' + id, phase: 'Scout', schema: CANDS }),
+    () => agent(renderCodePrompt(c), { label: 'code:' + id, phase: 'Scout', schema: CANDS, ...(cfg.effort ? { effort: cfg.effort } : {}) }),
+    () => agent(renderDesignPrompt(c), { label: 'design:' + id, phase: 'Scout', schema: CANDS, ...(cfg.effort ? { effort: cfg.effort } : {}) }),
   ], 2)
-  const judged = await agent(renderJudgePrompt(c, halves[0], halves[1]), { label: 'judge:' + id, phase: 'Judge', schema: SEAMS })
+  const judged = await agent(renderJudgePrompt(c, halves[0], halves[1]), { label: 'judge:' + id, phase: 'Judge', schema: SEAMS, ...(cfg.effort ? { effort: cfg.effort } : {}) })
   return judged ? { ...judged, scoutDead: halves.filter((h) => !h).length,
     nCandidates: (halves[0] ? halves[0].candidates.length : 0) + (halves[1] ? halves[1].candidates.length : 0) } : null
 }), 5)
