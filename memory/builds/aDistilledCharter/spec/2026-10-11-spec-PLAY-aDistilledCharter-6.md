@@ -1,6 +1,6 @@
 # PLAY-aDistilledCharter-6 — the micro-formats are a section-1 rule that binds every final message
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-1 · base 9b743831 · streams playbook · order 18
+**Status:** CLOSED · rev-1 · 2026-10-11 · node a · Tier-1 · base 9b743831 · streams playbook · order 18
 
 <!-- gen:spec-records -->
 

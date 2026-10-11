@@ -75,12 +75,12 @@ DEPL-2 for PLAY-5, and its five others became TOOL-8. Round 3 converged; its six
 | 15 | `PLAY-aDistilledCharter-5` | CLOSED | the security checklist and the tier definitions ship with the memory tree |
 | 16 | `TOOL-aDistilledCharter-8` | CLOSED | the closing review's round-2 findings, closed as one batch |
 | 17 | `TOOL-aDistilledCharter-9` | CLOSED | the closing review's round-3 findings, closed as one batch |
-| 18 | `PLAY-aDistilledCharter-6` | INPROGRESS | the micro-formats are a section-1 rule that binds every final message |
+| 18 | `PLAY-aDistilledCharter-6` | CLOSED | the micro-formats are a section-1 rule that binds every final message |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 18 unit(s) · node a · opened 2026-10-09 · streams playbook+tooling+deployer+kickoff
+**Build status:** CLOSED · 18 unit(s) · node a · opened 2026-10-09 · streams playbook+tooling+deployer+kickoff
 ids DEPL-aDistilledCharter-1 DEPL-aDistilledCharter-2 KICK-aDistilledCharter-1 PLAY-aDistilledCharter-1 PLAY-aDistilledCharter-2 PLAY-aDistilledCharter-3 PLAY-aDistilledCharter-4 PLAY-aDistilledCharter-5 PLAY-aDistilledCharter-6 TOOL-aDistilledCharter-1 TOOL-aDistilledCharter-2
 ids TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 TOOL-aDistilledCharter-7 TOOL-aDistilledCharter-8 TOOL-aDistilledCharter-9
 
@@ -104,7 +104,7 @@ ids TOOL-aDistilledCharter-3 TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 T
 | [PLAY-aDistilledCharter-5 — the security checklist and the tier definitions ship with the memory tree](spec/2026-10-09-spec-PLAY-aDistilledCharter-5.md) | 12 | 2 | CLOSED | rev-1 | 2026-10-09 |
 | [TOOL-aDistilledCharter-8 — the closing review's round-2 findings, closed as one batch](spec/2026-10-09-spec-TOOL-aDistilledCharter-8.md) | 13 | 2 | CLOSED | rev-3 | 2026-10-09 |
 | [TOOL-aDistilledCharter-9 — the closing review's round-3 findings, closed as one batch](spec/2026-10-09-spec-TOOL-aDistilledCharter-9.md) | 14 | 2 | CLOSED | rev-1 | 2026-10-09 |
-| [PLAY-aDistilledCharter-6 — the micro-formats are a section-1 rule that binds every final message](spec/2026-10-11-spec-PLAY-aDistilledCharter-6.md) | 18 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
+| [PLAY-aDistilledCharter-6 — the micro-formats are a section-1 rule that binds every final message](spec/2026-10-11-spec-PLAY-aDistilledCharter-6.md) | 18 | 1 | CLOSED | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
 Records: 7 bound to this build, across 4 record folder(s).
