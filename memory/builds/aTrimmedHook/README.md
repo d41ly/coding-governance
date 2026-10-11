@@ -80,7 +80,7 @@ ids KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHoo
 | [TOOL-aTrimmedHook-7 — the generator and manifest-check minors of the closing review, batched](spec/2026-10-11-spec-TOOL-aTrimmedHook-7.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 18 bound to this build, across 4 record folder(s).
+Records: 19 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

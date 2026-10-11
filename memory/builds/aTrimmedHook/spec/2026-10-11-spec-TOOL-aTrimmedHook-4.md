@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-KICK-aTrimmedHook-1-runlog-2270b345.md](../build/2026-10-11-build-KICK-aTrimmedHook-1-runlog-2270b345.md) | journal | KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3 TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-6 TOOL-aTrimmedHook-7 |
 | [2026-10-11-build-TOOL-aTrimmedHook-4-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aTrimmedHook-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aTrimmedHook-4-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aTrimmedHook-4-1-build-brief.md) | journal | — |
 
