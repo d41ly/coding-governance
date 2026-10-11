@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: c922c7e2a5ca7b4e59cf46aeb57e2f444d725450
-phase: BUILDING
+witness: bac1a4fb5f9fcf5f7d924dcf8e7e17cc924f0149
+phase: REVIEWING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/practical-borg-90829d
@@ -47,3 +47,9 @@ base: 17472e212ffd0d5e3be825502c6169bbeb2e952f
 2026-10-11T09:24:46Z brief · item DEPL-dRemeasuredRender-2 · reason 0e71236573f1 memory/builds/dRemeasuredRender/prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-2-1-build-brief.md
 
 2026-10-11T09:26:57Z dispatch · item 473d2bbc DEPL-dRemeasuredRender-2 · reason WIRE-INTO-PROJECT.md memory/builds/dRemeasuredRender/build/2026-10-11-build-DEPL-dRemeasuredRender-2-1-acceptance-ledger.md memory/builds/dRemeasuredRender/prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-2-1-build-brief.md memory/builds/dRemeasuredRender/spec/2026-10-11-spec-DEPL-dRemeasuredRender-2.md tools/govkit/govkit.py tools/govkit/selftest.py
+
+2026-10-11T09:38:45Z review · item dRemeasuredRender · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 10 · disposition promote
+
+2026-10-11T09:39:59Z rescope · item add DEPL-dRemeasuredRender-3 · reason promoted from the closing diff review round 1, which converged with 1 HIGH and 10 minors
+
+2026-10-11T09:40:00Z rescope · item add DEPL-dRemeasuredRender-4 · reason promoted from the closing diff review round 1, which converged with 1 HIGH and 10 minors

@@ -5,7 +5,7 @@ opened: 2026-10-11
 streams: tooling+deployer
 roster: TOOL+DEPL
 authorized-by: prompt
-ids: DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 TOOL-dRemeasuredRender-1 TOOL-dRemeasuredRender-2
+ids: DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 DEPL-dRemeasuredRender-3 DEPL-dRemeasuredRender-4 TOOL-dRemeasuredRender-1 TOOL-dRemeasuredRender-2
 ---
 
 # dRemeasuredRender — gov's shipped suites scrub their probes, and `govkit update` reports what it rendered
@@ -43,6 +43,9 @@ in `prompts/`.
   (2026-08-23; TOOL-dDerivedDocket-76). Each scrub there is verified by a parse check and a probe
   of the scrubbed line; the full run is handed to the owner at the close.
 - No self-test suite and no bar inside a pass. The bar runs once, at the close.
+- Closing review round 1 converged: 0 blockers, 1 HIGH, 3 MEDIUM, 7 LOW. The HIGH became
+  `DEPL-dRemeasuredRender-3`; the ten minors became `DEPL-dRemeasuredRender-4`, one unit because
+  every fix writes `govkit.py` or its self-test.
 
 ## Parked decisions
 
@@ -55,12 +58,14 @@ None yet.
 | 1 | `TOOL-dRemeasuredRender-1` | 2 | gov's shipped suites scrub every bare location probe, and gov's own row stops excluding them |
 | 2 | `DEPL-dRemeasuredRender-1` | 2 | `update` re-measures a rendered row's receipt from the bytes its render landed |
 | 3 | `DEPL-dRemeasuredRender-2` | 2 | `update` re-probes a hole after the render, and reports only the verdict that stands |
+| 4 | `DEPL-dRemeasuredRender-3` | 2 | a render that stopped at an accepted outcome keeps its receipt (promoted HIGH) |
+| 5 | `DEPL-dRemeasuredRender-4` | 2 | the hole verdict waits for the verify pass, and every KEPT reason has an arm (promoted minors) |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-10-11 · streams tooling+deployer
-ids DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 TOOL-dRemeasuredRender-1 TOOL-dRemeasuredRender-2
+**Build status:** INPROGRESS · 5 unit(s) · node d · opened 2026-10-11 · streams tooling+deployer
+ids DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 DEPL-dRemeasuredRender-3 DEPL-dRemeasuredRender-4 TOOL-dRemeasuredRender-1 TOOL-dRemeasuredRender-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -68,13 +73,15 @@ ids DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 TOOL-dRemeasuredRender-1 T
 | [TOOL-dRemeasuredRender-1 — gov's shipped suites scrub every bare location probe, and gov's own row stops excluding them](spec/2026-10-11-spec-TOOL-dRemeasuredRender-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [DEPL-dRemeasuredRender-1 — `govkit update` re-measures a rendered row's receipt from the bytes its render landed](spec/2026-10-11-spec-DEPL-dRemeasuredRender-1.md) | 2 | 2 | CLOSED | rev-1 | 2026-10-11 |
 | [DEPL-dRemeasuredRender-2 — `govkit update` re-probes a hole after the render, and reports only the verdict that stands](spec/2026-10-11-spec-DEPL-dRemeasuredRender-2.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-11 |
+| [DEPL-dRemeasuredRender-3 — a render that stopped at an accepted outcome without rendering keeps its receipt](spec/2026-10-11-spec-DEPL-dRemeasuredRender-3.md) | 4 | 2 | INPROGRESS | rev-1 | 2026-10-11 |
+| [DEPL-dRemeasuredRender-4 — the closing review's mediums and lows: the hole verdict waits for the verify pass, and every KEPT reason has an arm](spec/2026-10-11-spec-DEPL-dRemeasuredRender-4.md) | 5 | 2 | INPROGRESS | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: DEPL-dRemeasuredRender-3 DEPL-dRemeasuredRender-4.
 
-Ids no `spec-audit` record has ever named: DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 TOOL-dRemeasuredRender-1.
+Ids no `spec-audit` record has ever named: DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 DEPL-dRemeasuredRender-3 DEPL-dRemeasuredRender-4 TOOL-dRemeasuredRender-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -84,6 +91,8 @@ Ids no `spec-audit` record has ever named: DEPL-dRemeasuredRender-1 DEPL-dRemeas
 | 1 | `TOOL-dRemeasuredRender-1` | no |
 | 2 | `DEPL-dRemeasuredRender-1` | no |
 | 3 | `DEPL-dRemeasuredRender-2` | no |
+| 4 | `DEPL-dRemeasuredRender-3` | no |
+| 5 | `DEPL-dRemeasuredRender-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
