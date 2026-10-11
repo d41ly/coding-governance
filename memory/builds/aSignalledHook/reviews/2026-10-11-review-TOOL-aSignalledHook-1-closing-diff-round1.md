@@ -13,7 +13,7 @@ Reviewed range: `b726385f2b5b8fd16802925c02104377253a9045...312f5398c` · ROUND 
 ## Verdict: CLEAN WITH FIXES
 
 Three finder lenses, no separate skeptic: each confirmed finding below was re-established by the
-synthesizer reading the code at 312f5398c, and two were raised independently by two lenses. Five are
+synthesizer reading the code at 312f5398c, and two were raised independently by two lenses. Six are
 folded into the unit (rev-2); one is filed as an ask.
 
 ## Review shape
