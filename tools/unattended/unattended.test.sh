@@ -2367,7 +2367,11 @@ done
 # ---- copy run as `bash ./unattended.sh`). An undeclared exit reds naming its line; a declared fragment
 # ---- no top-level exit carries reds as stale, because a stale row silently widens what it exempts.
 TOPLEVEL_EXITS='the kit library is missing beside this script'
-_tx=$(awk '
+# The scan lands in a FILE and the loops below read it, never a here-string of a captured variable:
+# a loop fed that way is the `shell hygiene (a loop fed by a command substitution)` class
+# (TOOL-aSparedSpawn-10 S8).
+_tx_file="$TMP/u6-toplevel-exits.txt"
+awk '
   /^[A-Za-z_][A-Za-z0-9_]*\(\) *\{.*\} *(#.*)?$/ && !f { next }
   /^[A-Za-z_][A-Za-z0-9_]*\(\) *\{/ && !f { f = 1; next }
   f && /^\}[[:space:]]*(#.*)?$/ { f = 0; next }
@@ -2375,18 +2379,19 @@ _tx=$(awk '
   /^[[:space:]]*#/ { next }
   { c3 = c2; c2 = c1; c1 = $0 }
   /(^|[;&|{( ])exit([ ;)}]|$)/ { gsub(/\t/, " ", c3); gsub(/\t/, " ", c2); printf "%d\t%s %s %s\n", NR, c3, c2, c1 }
-' "$SCRIPT")
-n=$((n+1)); [ -n "$_tx" ] || { echo "FAIL the top-level exit scan found no exit at all, and the missing-library refusal is one, so the scan reads nothing"; st=1; }
+' "$SCRIPT" > "$_tx_file"
+n=$((n+1)); [ -s "$_tx_file" ] || { echo "FAIL the top-level exit scan found no exit at all, and the missing-library refusal is one, so the scan reads nothing"; st=1; }
 while IFS=$'\t' read -r _tx_n _tx_c; do
   [ -n "$_tx_n" ] || continue
   _tx_ok=""
   while IFS= read -r _tx_f; do case "$_tx_c" in *"$_tx_f"*) _tx_ok=1 ;; esac; done <<< "$TOPLEVEL_EXITS"
   n=$((n+1)); [ -n "$_tx_ok" ] || { echo "FAIL the driver exits at top level on line $_tx_n, outside load_driver_conf and main, and no TOPLEVEL_EXITS row names it, so sourcing the driver can end this suite there"; st=1; }
-done <<< "$_tx"
+done < "$_tx_file"
 while IFS= read -r _tx_f; do
-  n=$((n+1)); grep -qF -- "$_tx_f" <<< "$_tx" || { echo "FAIL the TOPLEVEL_EXITS row '$_tx_f' names no top-level exit of the driver, so it is stale"; st=1; }
+  n=$((n+1)); grep -qF -- "$_tx_f" "$_tx_file" || { echo "FAIL the TOPLEVEL_EXITS row '$_tx_f' names no top-level exit of the driver, so it is stale"; st=1; }
   n=$((n+1)); [ "$(grep -cF -- "$_tx_f" "$HERE/unattended.test.sh")" -ge 2 ] || { echo "FAIL the TOPLEVEL_EXITS row '$_tx_f' is asserted by no arm of this suite"; st=1; }
 done <<< "$TOPLEVEL_EXITS"
+rm -f "$_tx_file"
 fi   # ---- end REGION ONE ----------------------------------------------------------------------
 
 # ---- REGIONS 2 TO `SHARD_ARITY` ------------------------------------------------------------------

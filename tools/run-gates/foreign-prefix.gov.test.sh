@@ -4,7 +4,10 @@
 # S1's leg (a calibrate pass plus three pooled runs of every suite whole, hours long and silent) so
 # that it asks only that question.
 #
-#   bash <prefix>/run-gates/foreign-prefix.gov.test.sh [--kit <substring>]
+#   bash <prefix>/run-gates/foreign-prefix.gov.test.sh [--kit <substring>] [--plan]
+#
+# `--plan` prints each row's kind and the dispatch order at gov's own prefix, runs the stale
+# declaration guard, and exits: no clone, no move, no suite run (TOOL-aSparedSpawn-10 S4).
 #
 # WHY. The install-prefix ban grades the SPELLING of kit paths. Whether a suite still RUNS once its
 # tool root sits somewhere else is a different question, and only running it there answers it: a
@@ -30,6 +33,14 @@
 #      in a pool of the width `run-gates.sh --print-profile` reports, each killed as a HANG at HANG_FACTOR
 #      times its declared budget. One line per row as it completes is the progress, and the heartbeat a registered run
 #      reads. A row is green when it exits 0 and, unless declared whole below, printed the marker.
+#      SHARDED FAMILIES are DERIVED, never declared: rows whose argv ends `--shard <i>/<n>` and is
+#      otherwise identical are one family, and one row of each is probed. Every other row prints
+#      `represented · by shard <k>/<n>`, a skip that announces itself and is counted neither graded
+#      nor passed. The representative ROTATES BY COMMIT: HEAD's sha as an integer, mod the family's
+#      selected size, picks a row in shard order; and when the version marker of the suite's kit (the
+#      line its `kit.toml` `version_from` names) differs from HEAD's first parent's, every shard is
+#      probed, since a bump is when a prefix defect is likeliest to ship (TOOL-aSparedSpawn-10 §8 F1
+#      (a)). Each family prints the rule's input and its answer on every run.
 #   6. FAIL FAST at the PREFIX grain (§8 F3 (a)): a red prefix is finished, so every red row at it is
 #      named in one run, then each later prefix prints `not run`. The clone must be clean after each
 #      prefix, or the leg reds naming what a suite wrote outside its scratch.
@@ -37,6 +48,9 @@
 # WHOLE-RUN ROWS are DECLARED in `WHOLE_RUN` below with a reason (§8 F4 (b)), and red in both
 # directions: a declared row that prints the probe marker is a stale declaration, and an undeclared
 # row that prints none is an undeclared whole run. Every declared row is printed on every run.
+# Whole rows enter the SAME pool as the probes, ahead of them and longest budget first, each bounded
+# by `run_row`'s load-scaled hang guard like any other row: their budget is a hang guard here and not
+# a cost verdict, so nothing is gained by holding them for a serial tail (TOOL-aSparedSpawn-10 S3).
 #
 # WHAT THIS DOES NOT CHECK:
 #   * HISTORY-BOUND arms — govkit selftest's vintage arms, say, which read gov's history at its
@@ -48,8 +62,13 @@
 #   * a declaration naming the old root in any spelling but its PATH HEAD — `tools/` followed by a
 #     path. Those keep gov's spelling at every prefix, and the record corpus is never re-spelled;
 #   * an ADOPTER's tree. This moves GOV, it installs into nobody's repository: `govkit apply` has its
-#     own suites, and an apply target lacks the records and withheld suites this leg runs.
-# COST: one prologue and one arm per suite per prefix, pooled; minutes, and held, run once per build.
+#     own suites, and an apply target lacks the records and withheld suites this leg runs;
+#   * EVERY SHARD of a sharded suite. Each shard's probe runs the prologue plus the first arm of its
+#     own region, so a shard-specific prefix defect in a region's first arm is seen only when that
+#     region's shard is the representative — rotation reaches each within about n landings, and a
+#     kit version bump probes them all.
+# COST: one prologue and one arm per suite per prefix, one shard per sharded family, whole rows
+# pooled beside the probes; minutes, and held, run once per build.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "foreign-prefix: not inside a git work tree"; exit 2; }
@@ -121,17 +140,171 @@ WHOLE_RUN=(
 GOV_LAYOUT=(
   "govkit selftest|its first arm is selfcheck over gov's own registry; govkit ships to no adopter, and gov at the repo root is no layout gov has"
 )
-FILTER=""
+FILTER=""; PLAN=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --kit) FILTER=${2:-}; [ -n "$FILTER" ] || { echo "foreign-prefix: --kit takes a substring"; exit 2; }; shift 2 ;;
-    *) echo "usage: bash $0 [--kit <substring>]"; exit 2 ;;
+    --plan) PLAN=1; shift ;;
+    *) echo "usage: bash $0 [--kit <substring>] [--plan]"; exit 2 ;;
   esac
 done
 
 fails=0; passed=0
 print_fail() { fails=$((fails+1)); printf 'FAIL  %s\n' "$*"; }
 print_pass() { passed=$((passed+1)); printf 'ok    %s\n' "$*"; }
+HEADSHA=$(git -C "$ROOT" rev-parse HEAD) || exit 2
+
+# ---- THE POPULATION AND ITS KINDS, S1 to S4 (TOOL-aSparedSpawn-10). ONE classifier for `--plan` and
+# the run: the `--list` text becomes row arrays, each row gets its kind (probe, whole or represented),
+# and the dispatch order is derived from the kinds. `--kit` filters BEFORE families are formed, so a
+# filtered run's family is the rows it selected.
+R_NAME=(); R_BOUND=(); R_ARGV=(); R_KIND=(); R_REP=(); ORDER=()
+declare -A KIT_BUMP=() FAM_WANT=()
+load_population() { # $1 = the `--list` text -> R_NAME R_BOUND R_ARGV, less this leg's own row and every row --kit leaves out
+  local name bound argv
+  R_NAME=(); R_BOUND=(); R_ARGV=()
+  while IFS=$'\t' read -r -u 3 name bound argv; do
+    [ -n "$name" ] || continue
+    [ "$name" = "$SELF_ROW" ] && continue
+    if [ -n "$FILTER" ]; then case "$name $argv" in *"$FILTER"*) ;; *) continue ;; esac; fi
+    R_NAME+=("$name"); R_BOUND+=("$bound"); R_ARGV+=("$argv")
+  done 3< <(printf '%s\n' "$1" | sed -nE 's/^  (.*[^ ]) +([0-9]+)s  (.+)$/\1\t\2\t\3/p')
+  return 0
+}
+
+read_kit_marker() { # $1 = revision, $2 = kit directory under gov's tool root -> the version marker line its kit.toml names; 1 when it names none
+  local toml file pat re=$'(^|\n)version_from[^"\n]*"([^"]+)"[^"\n]*"([^"]+)"'
+  toml=$(git -C "$ROOT" show "$1:$TROOT/$2/kit.toml" 2>/dev/null) || return 1
+  [[ $toml =~ $re ]] || return 1
+  file=${BASH_REMATCH[2]}; pat=${BASH_REMATCH[3]}
+  git -C "$ROOT" show "$1:$TROOT/$2/$file" 2>/dev/null | grep -m1 -E -- "$pat"
+  return 0
+}
+
+derive_row_kinds() { # $1 = label, $2 = prefix (empty for the root) -> R_KIND R_REP FAM_WANT, and one rule line per sharded family
+  local label="$1" p="$2" j k w key stem arity m r x kit path now was bump rep rep_label
+  local -A fam=() seen=()
+  local -a members
+  R_KIND=(); R_REP=(); FAM_WANT=()
+  for j in "${!R_NAME[@]}"; do
+    R_KIND[j]=probe; R_REP[j]=""
+    for w in "${WHOLE_RUN[@]}"; do [ "${w%%|*}" = "${R_NAME[j]}" ] && R_KIND[j]=whole; done
+    [ "${R_KIND[j]}" = probe ] || continue
+    [[ ${R_ARGV[j]} =~ ^(.*)\ --shard\ ([0-9]+)/([0-9]+)$ ]] || continue
+    fam["${BASH_REMATCH[1]} ${BASH_REMATCH[3]}"]+=" ${BASH_REMATCH[2]}:$j"
+  done
+  for j in "${!R_NAME[@]}"; do
+    [ "${R_KIND[j]}" = probe ] || continue
+    [[ ${R_ARGV[j]} =~ ^(.*)\ --shard\ ([0-9]+)/([0-9]+)$ ]] || continue
+    stem=${BASH_REMATCH[1]}; arity=${BASH_REMATCH[3]}; key="$stem $arity"
+    [ -z "${seen[$key]+x}" ] || continue
+    seen[$key]=1
+    # The family's rows in SHARD order, whatever order the population listed them in.
+    members=()
+    for ((k = 1; k <= arity; k++)); do
+      for w in ${fam[$key]}; do [ "${w%%:*}" = "$k" ] && members+=("${w#*:}"); done
+    done
+    m=${#members[@]}
+    # The suite's kit: the first path word, less the prefix, up to its first slash.
+    kit=""
+    for w in $stem; do case "$w" in *.sh|*.py) path=${w#"${p:+$p/}"}; kit=${path%%/*}; break ;; esac; done
+    if [ -z "${KIT_BUMP[$kit]+x}" ]; then
+      if ! git -C "$ROOT" rev-parse -q --verify "$HEADSHA^1" >/dev/null 2>&1; then
+        KIT_BUMP[$kit]="yes|HEAD has no first parent to compare kit '$kit's version marker with"
+      elif ! now=$(read_kit_marker "$HEADSHA" "$kit") || [ -z "$now" ]; then
+        KIT_BUMP[$kit]="no|kit '$kit' declares no version marker at HEAD, so the rotation alone decides"
+      else
+        was=$(read_kit_marker "$HEADSHA^1" "$kit")
+        if [ "$now" = "$was" ]; then KIT_BUMP[$kit]="no|kit '$kit' version marker unchanged since HEAD's first parent ($now)"
+        else KIT_BUMP[$kit]="yes|kit '$kit' version marker moved since HEAD's first parent (${was:-absent} -> $now)"; fi
+      fi
+    fi
+    bump=${KIT_BUMP[$kit]}
+    if [ "${bump%%|*}" = yes ]; then
+      FAM_WANT[$key]=$m
+      echo "foreign-prefix: [$label] family '$stem' · $m shard row(s) · ${bump#*|} · every shard is probed"
+      continue
+    fi
+    # HEAD's sha as an integer, mod the family's selected size, one hex digit at a time: no fork.
+    r=0; x=$HEADSHA
+    while [ -n "$x" ]; do r=$(( (r * 16 + 16#${x:0:1}) % m )); x=${x:1}; done
+    rep=${members[r]}
+    [[ ${R_ARGV[rep]} =~ --shard\ ([0-9]+/[0-9]+)$ ]] && rep_label=${BASH_REMATCH[1]}
+    FAM_WANT[$key]=1
+    for w in "${members[@]}"; do
+      [ "$w" = "$rep" ] && continue
+      R_KIND[w]=represented; R_REP[w]=$rep_label
+    done
+    echo "foreign-prefix: [$label] family '$stem' · rule input HEAD $HEADSHA as an integer mod $m = $r · ${bump#*|} · probes shard $rep_label, represents the other $((m - 1))"
+  done
+  return 0
+}
+
+derive_dispatch_order() { # -> ORDER: every whole row by descending budget (list order on a tie), then every probe row in list order
+  local j k
+  ORDER=()
+  for j in "${!R_NAME[@]}"; do
+    [ "${R_KIND[j]}" = whole ] || continue
+    k=${#ORDER[@]}; ORDER+=("$j")
+    while [ "$k" -gt 0 ] && [ "${R_BOUND[ORDER[k-1]]}" -lt "${R_BOUND[j]}" ]; do ORDER[k]=${ORDER[k-1]}; k=$((k - 1)); done
+    ORDER[k]=$j
+  done
+  for j in "${!R_NAME[@]}"; do
+    if [ "${R_KIND[j]}" = probe ]; then ORDER+=("$j"); fi
+  done
+  return 0
+}
+
+check_declarations() { # -> a FAIL per WHOLE_RUN or GOV_LAYOUT entry naming no row of the loaded population; skipped under --kit
+  # A STALE DECLARATION reds too: a whole-run row naming no row in the population exempts nothing.
+  local names w
+  [ -z "$FILTER" ] || return 0
+  printf -v names '%s\n' "${R_NAME[@]}"
+  for w in "${WHOLE_RUN[@]}"; do
+    printf '%s\n' "$names" | grep -qxF "${w%%|*}" || print_fail "a whole-run declaration names no row in the population: ${w%%|*}"
+  done
+  for w in "${GOV_LAYOUT[@]}"; do
+    printf '%s\n' "$names" | grep -qxF "${w%%|*}" || print_fail "a gov-layout declaration names no row in the population: ${w%%|*}"
+  done
+  return 0
+}
+
+print_plan() { # -> the dispatch order and every represented row, then a count of each family's probes against the rule's answer
+  local j k pos=0 rep=0 key
+  local -A got=()
+  for j in "${ORDER[@]}"; do
+    pos=$((pos + 1)); printf '[plan] %s. %s · %s · %ss budget\n' "$pos" "${R_NAME[j]}" "${R_KIND[j]}" "${R_BOUND[j]}"
+  done
+  for j in "${!R_NAME[@]}"; do
+    if [ "${R_KIND[j]}" = represented ]; then rep=$((rep + 1)); printf '[plan] %s · represented · by shard %s\n' "${R_NAME[j]}" "${R_REP[j]}"; fi
+    [ "${R_KIND[j]}" != whole ] || continue
+    [[ ${R_ARGV[j]} =~ ^(.*)\ --shard\ [0-9]+/([0-9]+)$ ]] || continue
+    key="${BASH_REMATCH[1]} ${BASH_REMATCH[2]}"; got[$key]=${got[$key]:-0}
+    [ "${R_KIND[j]}" = probe ] && got[$key]=$((got[$key] + 1))
+  done
+  for key in "${!got[@]}"; do
+    [ "${got[$key]}" = "${FAM_WANT[$key]:-1}" ] || print_fail "the family '${key% *}' has ${got[$key]} probe row(s) where the rule answers ${FAM_WANT[$key]:-1}"
+  done
+  [ $(( ${#ORDER[@]} + rep )) = "${#R_NAME[@]}" ] || print_fail "the plan names $(( ${#ORDER[@]} + rep )) of the ${#R_NAME[@]} selected row(s), so a row is neither dispatched nor represented"
+  [ "${#R_NAME[@]}" -gt 0 ] || print_fail "at gov's own prefix the population selected no row${FILTER:+ matching '$FILTER'}, so a run would grade nothing"
+  echo "foreign-prefix: plan — ${#R_NAME[@]} selected row(s): ${#ORDER[@]} dispatched, $rep represented; no clone was made and no suite ran"
+  return 0
+}
+
+if [ "$PLAN" = 1 ]; then
+  cd "$ROOT" || exit 2
+  echo "foreign-prefix: plan at ${HEADSHA:0:8} for gov's own prefix '$TROOT'${FILTER:+, rows matching '$FILTER'}"
+  if ! list=$(bash "$TROOT/$KIT/run-selftests.sh" --list 2>&1); then
+    echo "foreign-prefix: run-selftests.sh --list refused at gov's prefix — REFUSING to plan from no population"; exit 2
+  fi
+  load_population "$list"
+  check_declarations
+  derive_row_kinds plan "$TROOT"
+  derive_dispatch_order
+  print_plan
+  [ "$fails" = 0 ] || { echo "FAIL — $fails check(s) failed"; exit 1; }
+  exit 0
+fi
 
 PY=$(resolve_python) || exit 2
 WIDTH=$(bash "$HERE/run-gates.sh" --print-profile 2>/dev/null | awk -F'\t' '$1 == "width" { print $2 }')
@@ -139,7 +312,6 @@ case "$WIDTH" in ''|*[!0-9]*|0) echo "foreign-prefix: run-gates.sh --print-profi
 TMPD=$(mktemp -d) || { echo "foreign-prefix: mktemp failed"; exit 2; }
 [ "${GOV_FOREIGN_KEEP:-0}" = 1 ] || trap 'rm -rf "$TMPD"' EXIT
 G="$TMPD/g"
-HEADSHA=$(git -C "$ROOT" rev-parse HEAD) || exit 2
 git clone -q --no-hardlinks "$ROOT" "$G" || { echo "foreign-prefix: could not clone $ROOT"; exit 2; }
 cd "$G" || exit 2
 # A named branch, not a detached HEAD: govkit's self-test pins a vintage some ref contains.
@@ -285,7 +457,7 @@ run_row() { # $1 = prefix label, $2 = run dir, $3 = row, $4 = budget seconds, $5
 }
 
 run_at_prefix() { # $1 = prefix, empty for the repo root; returns 1 when the prefix is red
-  local p="$1" label="${1:-root}" list n=0 i=0 live=0 name bound argv kind red=0 d v why dirty b0 b1 f
+  local p="$1" label="${1:-root}" list n=0 i=0 r=0 live=0 j name bound argv kind red=0 d v why dirty b0 b1 f note=""
   git reset -q --hard "$BASE" && git clean -qfdx
   measure_load_ratio; echo "foreign-prefix: [$label] $LOAD_NOTE"
   if ! set_tool_root "$p"; then print_fail "could not move the tool root to ${p:-the repo root}"; return 1; fi
@@ -295,15 +467,19 @@ run_at_prefix() { # $1 = prefix, empty for the repo root; returns 1 when the pre
   done
   list=$(bash "${p:+$p/}$KIT/run-selftests.sh" --list 2>&1) || { print_fail "run-selftests.sh --list refused at ${p:-the repo root}: $(printf '%s\n' "$list" | tail -2)"; return 1; }
   rm -rf "$TMPD/runs"; mkdir -p "$TMPD/runs"
-  # The list rides fd 3 and each row reads /dev/null: a suite that reads stdin would otherwise eat
-  # the rest of the population, and the prefix would grade the rows before it as the whole.
-  while IFS=$'\t' read -r -u 3 name bound argv; do
-    [ -n "$name" ] || continue
-    [ "$name" = "$SELF_ROW" ] && continue
-    if [ -n "$FILTER" ]; then case "$name $argv" in *"$FILTER"*) ;; *) continue ;; esac; fi
-    n=$((n + 1))
-    kind=probe
-    for w in "${WHOLE_RUN[@]}"; do [ "${w%%|*}" = "$name" ] && kind=whole; done
+  load_population "$list"
+  derive_row_kinds "$label" "$p"
+  derive_dispatch_order
+  n=${#R_NAME[@]}
+  # A REPRESENTED row is a skip that announces itself (S1): counted neither graded nor passed.
+  for j in "${!R_NAME[@]}"; do
+    [ "${R_KIND[j]}" = represented ] || continue
+    r=$((r + 1)); printf '[%s] %s · represented · by shard %s\n' "$label" "${R_NAME[j]}" "${R_REP[j]}"
+  done
+  # The dispatch order puts every whole row first, longest budget first (S3). Each row reads
+  # /dev/null: a suite that reads stdin would otherwise eat what the pool's caller holds on it.
+  for j in "${ORDER[@]}"; do
+    name=${R_NAME[j]}; bound=${R_BOUND[j]}; argv=${R_ARGV[j]}; kind=${R_KIND[j]}
     if grep -qxF "$name" "$INHERITED"; then
       printf '[%s] %s · %s · not graded · red at gov'"'"'s prefix in the baseline bar run\n' "$label" "$name" "$kind"
       continue
@@ -314,18 +490,11 @@ run_at_prefix() { # $1 = prefix, empty for the repo root; returns 1 when the pre
     fi
     case "$argv" in python3\ *|python\ *) argv="$PY ${argv#* }" ;; esac
     i=$((i + 1)); d="$TMPD/runs/$i"; mkdir -p "$d"; printf '%s\n' "$name" > "$d/name"
-    # A whole row waits for the pool to drain (S6): its budget was measured one suite at a time.
-    if [ "$kind" = whole ]; then printf '%s\t%s\t%s\t%s\n' "$d" "$name" "$bound" "$argv" >> "$TMPD/runs/whole"; continue; fi
     run_row "$label" "$d" "$name" "$bound" "$argv" "$kind" < /dev/null &
     live=$((live + 1))
     if [ "$live" -ge "$WIDTH" ]; then wait -n; live=$((live - 1)); fi
-  done 3< <(printf '%s\n' "$list" | sed -nE 's/^  (.*[^ ]) +([0-9]+)s  (.+)$/\1\t\2\t\3/p')
+  done
   wait
-  if [ -f "$TMPD/runs/whole" ]; then
-    while IFS=$'\t' read -r -u 3 d name bound argv; do
-      run_row "$label" "$d" "$name" "$bound" "$argv" whole < /dev/null
-    done 3< "$TMPD/runs/whole"
-  fi
   [ "$n" -gt 0 ] || { print_fail "at ${p:-the repo root} the population selected no row${FILTER:+ matching '$FILTER'}, so this prefix graded nothing"; return 1; }
   for d in "$TMPD"/runs/*/; do
     [ -f "$d/name" ] || continue
@@ -338,19 +507,19 @@ run_at_prefix() { # $1 = prefix, empty for the repo root; returns 1 when the pre
   done
   dirty=$(git status --porcelain --untracked-files=all 2>/dev/null | head -n 10)
   if [ -n "$dirty" ]; then red=1; print_fail "a suite wrote into the clone at ${p:-the repo root}, outside its scratch: $(printf '%s' "$dirty" | tr '\n' ';')"; fi
-  [ "$red" = 0 ] && print_pass "all $i graded row(s) found their subject at ${p:-the repo root}$( [ "$i" = "$n" ] || printf ', %s not graded, each named above' "$((n - i))")"
+  # The summary counts a represented row APART from the graded ones (S1, AC2).
+  [ "$r" = 0 ] || note=", $r represented by their family's probe shard and not graded"
+  [ "$((n - i - r))" = 0 ] || note="$note, $((n - i - r)) not graded"
+  [ -z "$note" ] || note="$note, each named above"
+  [ "$red" = 0 ] && print_pass "all $i graded row(s) found their subject at ${p:-the repo root}$note"
   return "$red"
 }
 
-# A STALE DECLARATION reds too: a whole-run row naming no row in the population exempts nothing.
+# The stale-declaration guard reads gov's own prefix, before any move; a filtered run skips it, and
+# its listing, as it always did.
 if [ -z "$FILTER" ]; then
-  names=$(bash "$TROOT/$KIT/run-selftests.sh" --list 2>/dev/null | sed -nE 's/^  (.*[^ ]) +([0-9]+)s  (.+)$/\1/p')
-  for w in "${WHOLE_RUN[@]}"; do
-    printf '%s\n' "$names" | grep -qxF "${w%%|*}" || print_fail "a whole-run declaration names no row in the population: ${w%%|*}"
-  done
-  for w in "${GOV_LAYOUT[@]}"; do
-    printf '%s\n' "$names" | grep -qxF "${w%%|*}" || print_fail "a gov-layout declaration names no row in the population: ${w%%|*}"
-  done
+  load_population "$(bash "$TROOT/$KIT/run-selftests.sh" --list 2>/dev/null)"
+  check_declarations
 fi
 
 stopped=""
