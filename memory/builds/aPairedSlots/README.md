@@ -6,7 +6,6 @@ streams: tooling
 roster: TOOL
 ids: TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6
 authorized-by: prompt
-status: OPEN
 ---
 
 # aPairedSlots — two non-doc gate bars at once, and doc-only bars never queue
@@ -63,23 +62,27 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-10-11 · streams tooling
+**Build status:** OPEN · 1 unit(s) · node a · opened 2026-10-11 · streams tooling
 ids TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aPairedSlots-1 — a `slots=<n>` key on each profile row, set for node a by the two-bar A/B](spec/2026-10-11-spec-TOOL-aPairedSlots-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aPairedSlots-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aPairedSlots-1` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
