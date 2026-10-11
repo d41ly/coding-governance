@@ -660,6 +660,24 @@ run_regen() {  # -> 0 regenerated or announced-skipped · 1 a write failed or th
   return 1
 }
 
+# `remove_new_untracked <snapshot>` cleans every untracked file the snapshot does not hold, the snapshot
+# being a sorted NUL-separated `git ls-files --others --exclude-standard -z` taken before `run_regen`.
+# The reset after a failed regeneration restores tracked files only, and a regeneration also CREATES
+# files (a new ledger shard, a render's temporary), which then dirtied the tree the next landing
+# requires clean (TOOL-aPrimedIndex-8). Both callers take the snapshot on a tree they required clean,
+# so every path cleaned is one the regeneration made. NUL-safe end to end; an unreadable state cleans
+# nothing.
+remove_new_untracked() {  # snapshot file -> nothing on stdout
+  local now
+  [ -f "${1:-}" ] || return 0
+  now=$(mktemp) || return 0
+  if git ls-files --others --exclude-standard -z > "$now" 2>/dev/null; then
+    LC_ALL=C sort -z -o "$now" "$now"
+    LC_ALL=C comm -z -13 "$1" "$now" | xargs -0 -r git clean -f -q -- >/dev/null 2>&1 || true
+  fi
+  rm -f "$now"
+}
+
 # ---- KIT VERSIONS, minted at the landing — TOOL-aMendedFleet-65 ----------------------------------
 # `run_minter <base> [<head>]` runs the deployer's `mint` verb, which writes the next version of every
 # kit whose shipped bytes moved in <base>..<head> with no bump dating the move, into the WORKING TREE;
@@ -775,12 +793,15 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
   fi
   # REGENERATE INTO THE MERGE (TOOL-aPrimedIndex-4): after the mint, because a minted version can
   # itself stale an output that stamps it; folded by the same rewrite, same parents and subject.
+  rgsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$rgsnap"
   if ! run_regen; then
     git reset -q --hard "$t" >/dev/null 2>&1 || true
+    remove_new_untracked "$rgsnap"; rm -f "$rgsnap"
     git checkout "$branch" >/dev/null 2>&1 || true
     echo "push-main: the generated outputs this landing owes could not be regenerated (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
     return 1
   fi
+  rm -f "$rgsnap"
   if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
     git add -A
     if ! t=$(git commit-tree "$(git write-tree)" -p "$R" -p "$oldb" -m "$msg") || ! git update-ref --no-deref HEAD "$t"; then
@@ -957,11 +978,14 @@ while [ "$attempt" -le "$max" ]; do
 
   # REGENERATE, on every attempt, after the mint (TOOL-aPrimedIndex-4): its own commit, named and
   # trailered as the mint commit is, so the routed-commits leg and the pass reader read it alike.
+  rgsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$rgsnap"
   if ! run_regen; then
     git reset -q --hard HEAD >/dev/null 2>&1 || true
+    remove_new_untracked "$rgsnap"; rm -f "$rgsnap"
     echo "push-main: the generated outputs this landing owes could not be regenerated (named above). Aborted (no push)." >&2
     exit 1
   fi
+  rm -f "$rgsnap"
   if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
     git add -A
     regen_unit=$(read_mint_unit "$mt..HEAD")

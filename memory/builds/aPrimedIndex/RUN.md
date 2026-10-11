@@ -81,3 +81,5 @@ base: 15bbfa4f867262f3c862e2473688fc69d0566b7d
 2026-10-11T08:37:14Z dispatch · item 32ec9117 TOOL-aPrimedIndex-7 · reason tools/run-gates/regen.py tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/README.md tools/memory-tree/kit.toml tools/unattended/README.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-7.md memory/builds/aPrimedIndex/build/2026-10-11-build-TOOL-aPrimedIndex-7-1-acceptance-ledger.md memory/builds/aPrimedIndex/README.md memory/map/generated/symbols.json
 
 2026-10-11T09:12:47Z dispatch · item 32ec9117 TOOL-aPrimedIndex-7 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-10-11T09:28:11Z dispatch · item 0ab48d83 TOOL-aPrimedIndex-8 · reason tools/push-main.sh tools/push-main.test.sh memory/project/unarmed-branches.txt memory/builds/aPrimedIndex/BACKLOG.md memory/backlog/TOOL.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-8.md memory/builds/aPrimedIndex/build/2026-10-11-build-TOOL-aPrimedIndex-8-1-acceptance-ledger.md memory/builds/aPrimedIndex/README.md memory/map/generated/symbols.json

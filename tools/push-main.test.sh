@@ -685,6 +685,11 @@ if [ -n "$_mt_gk" ] && [ -n "$_ml_lex" ]; then
     git config user.email t@e; git config user.name t; git config core.autocrlf false
     git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
     git rm -q -- "${KIT_REL}$_ml_lex/lexicon.py" "${KIT_REL}$_mt_gk/govkit.py"
+    # The regeneration goes too (TOOL-aPrimedIndex-8): with it present, `--prepare` regenerates after
+    # the mint, the lexicon render cannot read its deleted version, and the landing is refused before
+    # the merge-loss check prints the skip this arm asserts. Absent, the lander names that skip too.
+    _rg25=$(cd "$HERE" && for d in */; do [ -f "$d/regen.py" ] && { printf '%s' "${d%/}"; break; }; done)
+    [ -z "$_rg25" ] || git rm -q -- "${KIT_REL}$_rg25/regen.py"
     git commit -q --no-verify -m "drop the lexicon and govkit files"
     git push -q -f --no-verify origin main
     git -C "$tmp/remote5.git" symbolic-ref HEAD refs/heads/main
@@ -708,6 +713,18 @@ fi
 #      routed-commits leg reds a routed commit naming no unit. A clone of this repository at its
 #      committed HEAD is the remote; one commit naming a unit moves the runlog kit, and the lander
 #      runs from main. Observed RED against the base lander, whose mint subject named no unit.
+#      THE FIXTURE DEFINES ITS UNIT (TOOL-aPrimedIndex-8): the newest-unit reader names only an id a spec
+#      at HEAD defines (TOOL-aRoutedQuill-12), so without one the mint named nothing and this arm redded
+#      against every lander. The spec lands in the clone's first build folder that holds one, because
+#      the index generator refuses a build folder with no README.
+write_unit_spec() { # unit id -> a one-line spec defining it, committed into the fixture's first spec folder
+  local mr d
+  mr=$(sed -n 's/^MEMORY_ROOT=//p' .memory-tree.conf 2>/dev/null | tr -d "\"'" | tail -n 1)
+  for d in "${mr:-memory}"/builds/*/spec; do [ -d "$d" ] && break; done
+  [ -d "$d" ] || return 1
+  printf '# %s — a fixture unit\n' "$1" > "$d/2026-01-01-spec-$1.md"
+  git add "$d/2026-01-01-spec-$1.md" && git commit -q --no-verify -m "a fixture spec defining $1"
+}
 _mt_rc=$(cd "$HERE" && for d in */; do [ -f "$d/routed_commits.py" ] && { printf '%s' "${d%/}"; break; }; done)
 if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ] && [ -n "$_mt_rc" ]; then
   git clone -q --bare "$SRC" "$tmp/remote6.git"
@@ -719,6 +736,7 @@ if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ] && [ -n "$_mt_rc" ]; then
     git push -q -f --no-verify origin main
     git -C "$tmp/remote6.git" symbolic-ref HEAD refs/heads/main
     R6=$(git rev-parse HEAD)
+    write_unit_spec TOOL-tFix-26 || exit 1
     printf '# a comment line, push-main.test case 26\n' >> "${KIT_REL}$_mt_rl/extract.py"
     git commit -q --no-verify -am "TOOL-tFix-26: move runlog"
     unset GATE_PUSH_BASE; bash "$lander" >/dev/null 2>&1 || echo "rc=$?"
@@ -758,7 +776,7 @@ printf '%s\n' "$out27" | grep -qx 'refused=\[\]' && printf '%s\n' "$out27" | gre
   && ok "27 a refusing --newest-unit mints no unit, and an answering one mints its id" \
   || bad "27 read_mint_unit kept a refusal or lost an answer: $out27"
 
-# 28-31 — TOOL-aPrimedIndex-4: the lander REGENERATES the declared generated outputs over the tree it
+# 28-32 — TOOL-aPrimedIndex-4 and -8: the lander REGENERATES the declared generated outputs over the tree it
 #      is about to push. Each arm is a clone of this repository at its committed HEAD, pushed to a bare
 #      remote as main, whose memory root's bug-class index loses one row in a commit; the stale row is
 #      what a reconcile merge leaves behind when the index resolves `merge=ours`. The memory root is
@@ -806,35 +824,39 @@ if [ -n "$_rg_k" ]; then
   out29=$(
     build_regen_fixture "$tmp/remote9.git" "$tmp/work9" || exit 1
     R9=$(git rev-parse HEAD)
+    write_unit_spec TOOL-tFix-29 || exit 1
     write_stale_index 29 || exit 1
     unset GATE_PUSH_BASE; bash "$lander" >/dev/null 2>&1 || echo "rc=$?"
     printf 'subject=%s\n' "$(git log -1 --format=%s)"
     printf 'pass=%s\n' "$(git log -1 --format='%(trailers:key=Pass,valueonly)' | tr -d '\n')"
-    printf 'want=regen: generated outputs onto origin/main at %s\n' "${R9:0:8}"
+    printf 'want=regen: generated outputs onto origin/main at %s for TOOL-tFix-29\n' "${R9:0:8}"
     [ "$(git rev-parse origin/main)" = "$(git rev-parse HEAD)" ] && echo landed=1
     git diff --quiet "$R9" origin/main -- "$_gi" && echo index=restored
   )
   _w29=$(printf '%s\n' "$out29" | sed -n 's/^want=//p')
   case "$out29" in *rc=*) l29=0 ;; *) l29=1 ;; esac
-  [ "$l29" = 1 ] && [ -n "$_w29" ] && printf '%s\n' "$out29" | grep -q "^subject=$_w29" \
+  [ "$l29" = 1 ] && [ -n "$_w29" ] && printf '%s\n' "$out29" | grep -qxF "subject=$_w29" \
     && printf '%s\n' "$out29" | grep -qx 'pass=none' && printf '%s\n' "$out29" | grep -qx 'landed=1' \
     && printf '%s\n' "$out29" | grep -qx 'index=restored' \
     && ok "29 the attended landing commits the regeneration as its own regen: commit with Pass: none, and lands it" \
     || bad "29 the attended regen commit is missing, misnamed or untrailered, or the landing failed: $out29"
 
-  # 30 (AC3) — a regen.py that exits 1 refuses --prepare and leaves the branch where it was.
+  # 30 (AC3) — a regen.py that exits 1 refuses --prepare and leaves the branch where it was. It writes
+  #      an untracked file first, as a new ledger shard or a render's temporary would, and the refused
+  #      landing leaves the tree clean (TOOL-aPrimedIndex-8).
   out30=$(
     build_regen_fixture "$tmp/remote10.git" "$tmp/work10" || exit 1
     git checkout -q -b feat
-    printf 'import sys\nsys.exit(1)\n' > "${KIT_REL}$_rg_k/regen.py"
+    printf 'import pathlib, sys\npathlib.Path("regen-litter.txt").write_text("x", encoding="utf-8")\nsys.exit(1)\n' > "${KIT_REL}$_rg_k/regen.py"
     git commit -q --no-verify -am "TOOL-tFix-30: a failing regeneration"
     B30=$(git rev-parse HEAD)
     unset GATE_PUSH_BASE; bash "$lander" --prepare --slug tRegenFail 2>&1 >/dev/null; echo "rc=$?"
     printf 'branch=%s\n' "$(git rev-parse --abbrev-ref HEAD)"
     [ "$(git rev-parse feat)" = "$B30" ] && echo unmoved=1
+    [ -z "$(git status --porcelain)" ] && echo clean=1
   )
   case "$out30" in
-    *"could NOT be regenerated"*"rc=1"*"branch=feat"*"unmoved=1"*) ok "30 a failing regeneration refuses --prepare and leaves the branch unmoved and checked out" ;;
+    *"could NOT be regenerated"*"rc=1"*"branch=feat"*"unmoved=1"*"clean=1"*) ok "30 a failing regeneration refuses --prepare, leaves the branch unmoved and checked out, and cleans what it created" ;;
     *) bad "30 a failing regeneration was not refused with the branch left where it was: $out30" ;;
   esac
 
@@ -856,8 +878,23 @@ if [ -n "$_rg_k" ]; then
     *"no regen.py beside this lander"*"rc=0"*"parent=ok"*) ok "31 a lander with no regen.py beside it says so in one line and still prepares" ;;
     *) bad "31 a missing regen.py was silent, or refused the landing: $out31" ;;
   esac
+  # 32 (AC3, the attended path) — a regen.py that exits 1 refuses the attended landing with its own
+  #      line, and the remote's main does not move.
+  out32=$(
+    build_regen_fixture "$tmp/remote12.git" "$tmp/work12" || exit 1
+    R12=$(git rev-parse HEAD)
+    printf 'import sys\nsys.exit(1)\n' > "${KIT_REL}$_rg_k/regen.py"
+    git commit -q --no-verify -am "TOOL-tFix-32: a failing regeneration"
+    unset GATE_PUSH_BASE; bash "$lander" 2>&1; echo "rc=$?"
+    [ "$(git ls-remote origin refs/heads/main | cut -f1)" = "$R12" ] && echo unpushed=1
+  )
+  case "$out32" in
+    *"push-main: the generated outputs this landing owes could not be regenerated (named above). Aborted (no push)."*"rc=1"*"unpushed=1"*)
+      ok "32 a failing regeneration refuses the attended landing with its own line, and nothing is pushed" ;;
+    *) bad "32 a failing regeneration did not refuse the attended landing, or something was pushed: $out32" ;;
+  esac
 else
-  echo "  skip — 28-31 no run-gates kit holding regen.py beside this lander, so the regeneration arms did not run"
+  echo "  skip — 28-32 no run-gates kit holding regen.py beside this lander, so the regeneration arms did not run"
 fi
 
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

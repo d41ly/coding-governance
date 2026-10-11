@@ -12838,6 +12838,11 @@
       "file": "tools/unattended/resume-tick.test.sh"
     },
     {
+      "id": "remove_new_untracked",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
       "id": "remove_procs_ledger",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -20786,6 +20791,11 @@
       "id": "write_transcript_lines",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "write_unit_spec",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
     },
     {
       "id": "write_version_carriers",
