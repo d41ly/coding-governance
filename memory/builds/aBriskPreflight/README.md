@@ -33,8 +33,9 @@ prose is the mandate, recorded under [prompts/](prompts/2026-10-11-prompt-TOOL-a
 
 ## Build-level rules
 
-- **Classification (M2)**: seven units, MISSING at open, one mechanism each. Authored by this run,
-  so unreviewed. The spec audit is the owner's opt-in and this build is not opted in.
+- **Classification (M2)**: seven units, MISSING at open, one mechanism each; all seven READY at
+  `3b9c8a50b`, every §8 fork resolved under the delegation. Authored by this run, so unreviewed.
+  The spec audit is the owner's opt-in and this build is not opted in.
 - **No check is weakened.** Every refusal and every `UNWIRED` line a touched arm prints today it
   still prints, observed RED on a staged break and GREEN once restored, through a sliced arm.
 - **Spawns are cut; no timeout or ceiling is raised** to make a slow step pass.
