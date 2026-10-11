@@ -1268,18 +1268,105 @@ fact() { # run-state file · key
 # HELD record under any other code is never derived and never observes the remote: a paused run
 # whose branch somebody merged has not been handed off, and a terminal derived under a live lease
 # would end it through fail 26 (review item M13).
+#
+# TOOL-aBriskPreflight-5 - THE PRIMED FORM, `read_derived_phase --prime <file>...`, for a caller that
+# derives a whole population: the live-run count walked 88 records with one derivation each, and a
+# LANDING one started about eight programs. The prime answers the three sub-questions below once for
+# the population and keeps them in the DPC_ cache; the per-record form takes an answer from the cache
+# when it holds one and computes it exactly as before when it does not, so the derivation is still
+# this one block and a batched call that fails leaves its records to the old reading. Called with no
+# path it empties the cache, which its one caller does before anything in this process writes a
+# record. It prints nothing, never calls `fail`, never touches `status` and returns 0, as the
+# per-record form does. Presence is `${X[$k]+x}`, so a cached empty answer is an answer.
+#   DPC_PHASE / DPC_HOLD - the `phase` and `hold-code` facts, by ONE awk applying `fact`'s rules: one
+#     trailing CR stripped, the section from `## Run facts` to the next `## ` heading, the first line
+#     `<key>:` wins, leading spaces only stripped. A path `[ -f ]` refuses is never cached.
+#   DPC_LANDING - `read_landing_commit`'s answer, empty for its status 1. A record `git diff
+#     --name-only HEAD` does not list has an empty `git diff -U0 HEAD`, so it passes the lease-only
+#     check trivially; a listed one is handed to `check_lease_only_diff` itself. Once that passes, the
+#     phase and hold-code lines are the same bytes in HEAD's copy, so HEAD's phase is the cached one;
+#     the commit is the library's own `git log -1` per record, all in one subshell. The listing is
+#     not `-z`: a NUL stream cannot ride a variable, and without it git quotes a path exactly as the
+#     caller's `ls-files` did, so the two spell every path alike.
+#   DPC_ANC - per landing commit, 1 when it is an ancestor of ADVQ_SHA: one `git rev-list` over all
+#     of them excluding the tip, a commit absent from its output being one the tip reaches. It runs
+#     only where the per-record form would have observed the remote at all.
 DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""; DP_BY=""
-read_derived_phase() { # run-state file -> sets DP_PHASE (the effective phase) and DP_REASON
-  local _dp_hl=""
+declare -A DPC_PHASE=() DPC_HOLD=() DPC_LANDING=() DPC_ANC=()
+read_derived_phase() { # run-state file -> sets DP_PHASE (the effective phase) and DP_REASON; or --prime <file>...
+  local _dp_hl="" _dp_hc _dp_ph _dp_anc _dp_f _dp_c _dp_o _dp_r
+  local -a _dp_fs=() _dp_ls=() _dp_go=() _dp_cs=() _dp_rows=()
+  local -A _dp_seen=()
+  if [ "${1:-}" = --prime ]; then
+    shift
+    DPC_PHASE=(); DPC_HOLD=(); DPC_LANDING=(); DPC_ANC=()
+    # A path awk would read as an option or an assignment is left to the per-record form.
+    for _dp_f in "$@"; do
+      case "$_dp_f" in -*|*=*) continue ;; esac
+      [ -f "$_dp_f" ] && _dp_fs+=("$_dp_f")
+    done
+    [ "${#_dp_fs[@]}" -gt 0 ] || return 0
+    _dp_o=$(LC_ALL=C awk '
+      FNR == 1 { n++; f[n] = FILENAME; sec = 0 }
+      { sub(/\r$/, "") }
+      index($0, "## Run facts") == 1 { sec = 1; next }
+      index($0, "## ") == 1 { sec = 0; next }
+      !sec { next }
+      !(n in ph) && index($0, "phase:") == 1 { v = substr($0, 7); sub(/^ +/, "", v); ph[n] = v }
+      !(n in hc) && index($0, "hold-code:") == 1 { v = substr($0, 11); sub(/^ +/, "", v); hc[n] = v }
+      END { for (i = 1; i <= n; i++) if (index(f[i] ph[i] hc[i], "\037") == 0) printf "%s\037%s\037%s\n", f[i], ph[i], hc[i] }
+    ' "${_dp_fs[@]}" 2>/dev/null) || return 0
+    mapfile -t _dp_rows <<< "$_dp_o"
+    for _dp_r in "${_dp_rows[@]}"; do
+      [ -n "$_dp_r" ] || continue
+      IFS=$'\037' read -r _dp_f _dp_ph _dp_hc <<< "$_dp_r"
+      DPC_PHASE[$_dp_f]=$_dp_ph; DPC_HOLD[$_dp_f]=$_dp_hc
+      case "$_dp_ph" in
+        LANDING) _dp_ls+=("$_dp_f") ;;
+        HELD) check_handoff_code "$_dp_hc" && _dp_ls+=("$_dp_f") ;;
+      esac
+    done
+    [ "${#_dp_ls[@]}" -gt 0 ] || return 0
+    _dp_o=$(GIT diff --name-only HEAD -- "${_dp_ls[@]}" 2>/dev/null) || return 0
+    for _dp_f in "${_dp_ls[@]}"; do
+      case $'\n'"$_dp_o"$'\n' in
+        *$'\n'"$_dp_f"$'\n'*) check_lease_only_diff "$_dp_f" || { DPC_LANDING[$_dp_f]=""; continue; } ;;
+      esac
+      _dp_go+=("$_dp_f")
+    done
+    [ "${#_dp_go[@]}" -gt 0 ] || return 0
+    _dp_o=$(for _dp_f in "${_dp_go[@]}"; do
+              printf '%s\037' "$_dp_f"; GIT log -1 --format=%H HEAD -- "$_dp_f" 2>/dev/null; echo
+            done)
+    mapfile -t _dp_rows <<< "$_dp_o"
+    for _dp_r in "${_dp_rows[@]}"; do
+      case "$_dp_r" in *$'\037'*) ;; *) continue ;; esac
+      _dp_f=${_dp_r%%$'\037'*}; _dp_c=${_dp_r#*$'\037'}
+      DPC_LANDING[$_dp_f]=$_dp_c
+      [ -n "$_dp_c" ] && [ -z "${_dp_seen[$_dp_c]+x}" ] && { _dp_seen[$_dp_c]=1; _dp_cs+=("$_dp_c"); }
+    done
+    [ "${#_dp_cs[@]}" -gt 0 ] && read_advertised_tip || return 0
+    _dp_o=$(GIT rev-list "${_dp_cs[@]}" "^$ADVQ_SHA" 2>/dev/null) || return 0
+    for _dp_c in "${_dp_cs[@]}"; do
+      case $'\n'"$_dp_o"$'\n' in *$'\n'"$_dp_c"$'\n'*) DPC_ANC[$_dp_c]=0 ;; *) DPC_ANC[$_dp_c]=1 ;; esac
+    done
+    return 0
+  fi
   DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""; DP_BY=""
   [ -n "${1:-}" ] || return 0
-  DP_PHASE=$(fact "$1" phase)
+  if [ -n "${DPC_PHASE[$1]+x}" ]; then DP_PHASE=${DPC_PHASE[$1]}; else DP_PHASE=$(fact "$1" phase); fi
   case "$DP_PHASE" in
     LANDING) ;;
-    HELD) check_handoff_code "$(fact "$1" hold-code)" || return 0; _dp_hl="$HOLD_CODES_HANDOFF" ;;
+    HELD)
+      if [ -n "${DPC_HOLD[$1]+x}" ]; then _dp_hc=${DPC_HOLD[$1]}; else _dp_hc=$(fact "$1" hold-code); fi
+      check_handoff_code "$_dp_hc" || return 0; _dp_hl="$HOLD_CODES_HANDOFF" ;;
     *) return 0 ;;
   esac
-  DP_LANDING=$(read_landing_commit "$1" "$_dp_hl") || DP_LANDING=""
+  if [ -n "${DPC_LANDING[$1]+x}" ]; then
+    DP_LANDING=${DPC_LANDING[$1]}
+  else
+    DP_LANDING=$(read_landing_commit "$1" "$_dp_hl") || DP_LANDING=""
+  fi
   if [ -z "$DP_LANDING" ]; then
     DP_REASON="the $DP_PHASE record is not committed as it stands, so no commit carries it to any remote"
     return 0
@@ -1288,7 +1375,12 @@ read_derived_phase() { # run-state file -> sets DP_PHASE (the effective phase) a
     DP_REASON="$ADVQ_WHY"
     return 0
   fi
-  if GIT merge-base --is-ancestor "$DP_LANDING" "$ADVQ_SHA" 2>/dev/null; then
+  if [ -n "${DPC_ANC[$DP_LANDING]+x}" ]; then
+    _dp_anc=${DPC_ANC[$DP_LANDING]}
+  else
+    _dp_anc=0; GIT merge-base --is-ancestor "$DP_LANDING" "$ADVQ_SHA" 2>/dev/null && _dp_anc=1
+  fi
+  if [ "$_dp_anc" = 1 ]; then
     [ "$DP_PHASE" = HELD ] && DP_BY=attended
     DP_PHASE=LANDED; DP_AREF="$ADVQ_REF"; DP_TIP="$ADVQ_SHA"
   else
@@ -2944,7 +3036,7 @@ check_single_live() {
   #
   # FAILS CLOSED. No observation, an uncommitted record, or a landing commit off the tip leaves the
   # record LANDING, and a LANDING record counts as it always did.
-  local anc="${ASHA:-}"
+  local anc="${ASHA:-}" recs=()
   [ -n "$anc" ] && { GIT rev-parse --verify --quiet "$anc^{commit}" >/dev/null 2>&1 || anc=""; }
   for f in $(GIT ls-files ":(glob)$M/builds/*/RUN.md" ":(glob)$M/builds/*/RUN.*.md" 2>/dev/null); do
     # THIS RUN'S OWN RECORD IS NOT A CONCURRENT RUN. It is absent at a first preflight — the file
@@ -2953,6 +3045,12 @@ check_single_live() {
     # this skip the announcement reports the run to itself as its own competitor, which is worse than
     # saying nothing: it is a true-looking count of the wrong population.
     case "$f" in "$M/builds/${SLUG:-}/RUN.md"|"$M/builds/${SLUG:-}/RUN."*".md") continue ;; esac
+    recs+=("$f")
+  done
+  # PRIMED ONCE for the population, so each record is derived once and the announcement below reads
+  # the same answers (TOOL-aBriskPreflight-5); emptied before the claims block.
+  read_derived_phase --prime "${recs[@]}"
+  for f in "${recs[@]}"; do
     read_derived_phase "$f"; p="$DP_PHASE"; [ -n "$p" ] || continue
     if [ "$p" = LANDED ] && [ -n "$DP_LANDING" ]; then
       printf 'unattended: EXCLUDED %s from the live-run count — derived LANDED: its landing commit %s is on %s at %s, so it is a finished run and the next --preflight of its slug retires it\n' "$f" "${DP_LANDING:0:8}" "$DP_AREF" "${DP_TIP:0:8}"
@@ -2987,6 +3085,7 @@ check_single_live() {
       printf '  %s · phase %s · witness %s\n' "$f" "$DP_PHASE" "$(fact "$f" witness)"
     done
   fi
+  read_derived_phase --prime
   [ "$RUN_CLAIMS" = on ] && [ -n "$CLAIM_ROWS" ] || return 0
   printf '%s\n' "$CLAIM_ROWS" | awk -F'\t' -v me="${SLUG:-}" '
     $1 != me && $5 != "terminal" { r[++n] = sprintf("  %s · node %s · status %s · beat %s · verdict %s", $1, $2, $3, ($4 == "-" ? "unknown" : $4 "s"), $5) }

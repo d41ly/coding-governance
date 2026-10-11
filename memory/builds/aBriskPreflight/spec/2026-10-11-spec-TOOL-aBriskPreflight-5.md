@@ -1,12 +1,13 @@
 # TOOL-aBriskPreflight-5 — the live-run count reads every record's phase in one pass and derives each record once
 
-**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md](../build/2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 |
+| [2026-10-11-build-TOOL-aBriskPreflight-5-walk-ab.md](../build/2026-10-11-build-TOOL-aBriskPreflight-5-walk-ab.md) | research | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-5-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-5-build-brief.md) | research | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-5-spec-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-5-spec-brief.md) | research | — |

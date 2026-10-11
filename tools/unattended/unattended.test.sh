@@ -13203,6 +13203,27 @@ out=$(run_dl --preflight tOther --keepalive-id k9)
 hit  "$out" "EXCLUDED memory/builds/tRun/RUN.md from the live-run count — derived LANDED: its landing commit"
 miss "$out" "concurrent unattended run(s)"
 
+# ---- TOOL-aBriskPreflight-5 S5: the PRIMED walk keeps the lease-only gate. A record committed at
+# ---- RUNNING and pushed, whose WORKING COPY alone reads LANDING, is live: its last commit is on the
+# ---- tip, and only the `git diff --name-only` listing hands it to the lease-only check that refuses
+# ---- it a landing commit. A LANDING record staged and never committed is live too: no commit at all.
+# ---- The dirty tree refuses this preflight; the count is announced before that refusal lands.
+init_dl_fixture
+run_dl --preflight tRun --keepalive-id k1 >/dev/null
+run_dl_git add -A >/dev/null && run_dl_git commit -q -m "run state" --no-verify
+run_dl_git push -q origin HEAD:main
+sed -i 's/^phase: .*/phase: LANDING/' "$dl_dir/$DL_R"
+mkdir -p "$dl_dir/memory/builds/tStaged"
+printf '# tStaged — run state\n\n## Run facts\n\nphase: LANDING\n\n## Parked\n' > "$dl_dir/memory/builds/tStaged/RUN.md"
+run_dl_git add memory/builds/tStaged/RUN.md
+out=$(run_dl --preflight tOther --keepalive-id k9)
+hit  "$out" "2 concurrent unattended run(s) — this run is NOT blocked by them"
+hit  "$out" "memory/builds/tRun/RUN.md · phase LANDING"
+hit  "$out" "memory/builds/tStaged/RUN.md · phase LANDING"
+miss "$out" "EXCLUDED memory/builds/tRun/RUN.md"
+miss "$out" "EXCLUDED memory/builds/tStaged/RUN.md"
+run_dl_git reset -q --hard HEAD; run_dl_git clean -qfd
+
 # ---- AC6: a derived-LANDED record. `--resume` has nothing to resume and never calls the lander;
 # ---- `--preflight` then WRITES it LANDED, stages it and retires it, over a default branch that took
 # ---- an owner's `may:` grant after BASE. The whole leg then grades the archive without a check 4,
