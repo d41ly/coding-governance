@@ -65,7 +65,7 @@ ids DEPL-aScoutedSeam-1 KICK-aScoutedSeam-1 TOOL-aScoutedSeam-1 TOOL-aScoutedSea
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aScoutedSeam-1 — the reuse scout: a checklist role and a harness running a code and a design pass, merged into a capped `## reuse` section](spec/2026-10-11-spec-TOOL-aScoutedSeam-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-11 |
+| [TOOL-aScoutedSeam-1 — the reuse scout: a checklist role and a harness running a code and a design pass, merged into a capped `## reuse` section](spec/2026-10-11-spec-TOOL-aScoutedSeam-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-10-11 |
 | [KICK-aScoutedSeam-1 — kickoff asks once, runs the scout on opt-in, and carries its seams onto the card and into the brief](spec/2026-10-11-spec-KICK-aScoutedSeam-1.md) | 2 | 2 | SPECCED | rev-1 | 2026-10-11 |
 | [TOOL-aScoutedSeam-3 — the scout's diff mode: a landed diff checked against the tree and the `## reuse` seams](spec/2026-10-11-spec-TOOL-aScoutedSeam-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-11 |
 | [TOOL-aScoutedSeam-2 — a spec's §10 names every MUST seam its brief carries, or overrides it with a reason, and check 12 grades it](spec/2026-10-11-spec-TOOL-aScoutedSeam-2.md) | 4 | 2 | SPECCED | rev-1 | 2026-10-11 |

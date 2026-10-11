@@ -1,6 +1,6 @@
 # TOOL-aScoutedSeam-1 — the reuse scout: a checklist role and a harness running a code and a design pass, merged into a capped `## reuse` section
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -80,6 +80,11 @@ recovered the token and pattern layer the code pass missed.
 - **S8** — A calibration run of the shipped harness, on a six-case subset of this build's committed
   corpus at effort `medium`. The record lands under this build's `build/`.
   - AC6 observes it.
+- **S9** — This unit's edit of the `reuse` row aOrientedCast's catalogue already carries in
+  `tools/roles/workflows.toml`, to the values of §4. The edit lands after aOrientedCast does and in
+  the same commit as the rendered harness, so the row never names a script the tree lacks.
+  aOrientedCast ruled on 2026-10-11 that the row's harness value is this unit's to write.
+  - AC7 observes it.
 
 ## 3. Non-goals (OUT)
 
@@ -89,8 +94,8 @@ recovered the token and pattern layer the code pass missed.
   it as one tool among several; the benchmark found the design layer by reading, not by inventory.
 - New codebase-map extractors for CSS custom properties, unexported components or DSL vocabulary.
 - Calling the harness at kickoff, writing the card or the brief: `KICK-aScoutedSeam-1`.
-- The `reuse` workflow row in aOrientedCast's catalogue, its front-matter grammar and the rendered
-  agent type: aOrientedCast writes them. This unit hands it the row's values (§4).
+- The catalogue's grammar, its other rows, the role file's front-matter grammar and the rendered
+  agent type: aOrientedCast's. This unit edits only the `reuse` row's values (S9).
 - A model override. `model` stays the catalogue's `inherit` until a measurement argues otherwise.
 
 ### Edges
@@ -102,10 +107,10 @@ recovered the token and pattern layer the code pass missed.
 - **hands-off** `TOOL-aScoutedSeam-2` — grading that a spec names each MUST seam the brief carries.
 - **hands-off** `DEPL-aScoutedSeam-1` — resolving the `hostTrees` argument per node, and quoting the
   calibration's measured cost to adopters.
-- **consumes-from** external — aOrientedCast's role catalogue: the `gov-reuse-scout` slot file and its
-  front-matter grammar, the rendered native agent type, the `reuse` workflow row with a `stages`
-  table, and `handoff.py harness-args`. Without them the harness has no agent type to spawn and the
-  spawn guard refuses its Workflow call.
+- **consumes-from** external — aOrientedCast's role catalogue, LANDED: the `gov-reuse-scout` slot file
+  and its front-matter grammar, the rendered native agent type, the `reuse` workflow row this unit
+  edits, and `handoff.py harness-args`. Without them the harness has no agent type to spawn, the
+  spawn guard refuses its Workflow call, and S9 has no row to edit.
 
 ## 4. Design
 
@@ -155,7 +160,7 @@ READY card held 6547 of the card's 8192 bytes, so a cap above about 1600 refuses
 4. It merges (S4), renders (S5), marks liveness (S6), and returns. It writes nothing; the caller owns
    every write.
 
-### The catalogue row this unit hands aOrientedCast
+### The catalogue row this unit writes (S9)
 
 | key | value |
 |---|---|
@@ -189,6 +194,7 @@ Each function name leads with a declared verb; `boundedParallel` is the hook's a
 - `memory/map/features/review-harnesses.md`
 - `memory/map/generated/symbols.json`
 - `.lexicon.conf`
+- `tools/roles/workflows.toml` (the `reuse` row only)
 
 ### Rollout
 
@@ -254,6 +260,11 @@ calls it only on an owner opt-in, so landing this unit changes no session's beha
   permission: the owner's opt-in to Workflow runs.
   fixture: frozen clones of gov, inCMS and NicoCares, rebuilt with `bench.py trees`.
   figure: DERIVED by `bench.py grade` at observation time.
+- **AC7** — When aOrientedCast's catalogue checker reads `workflows.toml` after this unit lands, the
+  `reuse` row names the rendered `reuse-scout.js` and the `scout` stage, and the checker notes no
+  harness the tree does not hold.
+  Red when: the row is edited in a commit that does not carry the rendered harness.
+  fixture: aOrientedCast's catalogue and checker, landed.
 
 ## 7. Gates
 
@@ -273,6 +284,9 @@ New arm: tools/workflows/reuse-scout.test.sh · covers AC1 AC2 AC3 AC4 · stub l
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · S9 · AC7 · §3 · §4 · the `reuse` catalogue row moves into this unit's scope:
+  aOrientedCast already carries the row and ruled that its harness value is this unit's edit, landed
+  with the harness, so the catalogue never names a missing script.
 
 ## 10. Reuse audit
 
