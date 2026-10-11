@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-4 — a doc-only bar takes its own key and never queues
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 4
+**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 4
 
 <!-- gen:spec-records -->
 

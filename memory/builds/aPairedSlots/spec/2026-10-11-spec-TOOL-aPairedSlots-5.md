@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-5 — a worktree holds at most one slot, so every path under its git dir stays one bar's
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 5
+**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 5
 
 <!-- gen:spec-records -->
 

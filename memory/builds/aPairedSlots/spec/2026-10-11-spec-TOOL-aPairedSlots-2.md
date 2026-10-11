@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-2 — the turnstile is a counting semaphore of `slots` beacons, each reaped and released on its own
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 2
+**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 2
 
 <!-- gen:spec-records -->
 

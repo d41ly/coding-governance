@@ -35,3 +35,7 @@ base: 6dc23b58fe360c0e15168544cf4b03af6550a7ad
 2026-10-11T03:35:49Z rescope · item add TOOL-aPairedSlots-8 · reason the shared-path audit found one leg fixture writing a fixed name in the real common dir: adopt-process-monitor.test.sh's procmon-stamp arms; a separate kit and a separate mechanism
 
 2026-10-11T13:08:57Z rescope · item add TOOL-aPairedSlots-9 · reason owner ruling 2026-10-11 ~15:40 +0300: one repetition per arm, build now; the A/B and the two values it sets (capable slots, TS_SHARE_RULE) move out of TOOL-aPairedSlots-1 and -3 into one unit so those two carry no open fork and build beside the measurement
+
+2026-10-11T13:46:18Z brief · item TOOL-aPairedSlots-1 · reason 79f3a3a61f81 memory/builds/aPairedSlots/prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md
+
+2026-10-11T13:54:04Z dispatch · item 9adf3a45 TOOL-aPairedSlots-1 · reason tools/run-gates/run-gates.sh tools/run-gates/gate-profiles.txt tools/run-gates/README.md tools/run-gates/run-gates.test.sh .githooks/pre-push.test.sh memory/builds/aPairedSlots/spec/2026-10-11-spec-TOOL-aPairedSlots-1.md

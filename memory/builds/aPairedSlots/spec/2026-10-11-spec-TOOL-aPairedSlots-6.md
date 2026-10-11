@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-6 — the unattended driver's gate backstop stays correct with two holders
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-1 · base b6cd02bc · streams tooling · order 1
+**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-1 · base b6cd02bc · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

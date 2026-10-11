@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-1 — a `slots=<n>` key on each profile row, kit default 1, overridable by `GATE_TURNSTILE_SLOTS`
 
-**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 1
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-8 — the process-monitor adopter self-test stamps a fixture's common dir, not the real one
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-1 · base b6cd02bc · streams tooling · order 1
+**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-1 · base b6cd02bc · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
