@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-10 — foreign-prefix parity probes one shard per sharded suite and pools its whole runs
 
-**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -138,6 +138,8 @@ a filtered run's family is the rows it selected.
 - risks — A shard-specific prefix defect waits until rotation reaches its region (F1); whole rows
   now share the pool's load, and the hang bound is measured once per prefix before the pool starts.
 - testing — `--plan` makes classification observable without a clone; the staged breaks in §6.
+  Inside a pass the leg file cannot run at all, `--plan` included, so the pass observes the same
+  classifier through a fixture that runs the plan branch's calls over the leg's own classifier block.
 - migration — If the run-gates kit ships this file, its version bumps; `kit epoch` decides.
 - user docs — N/A — the leg's header is its documentation.
 
@@ -223,6 +225,16 @@ New arm: tools/run-gates/foreign-prefix.gov.test.sh --plan · covers AC1 AC3 AC4
   `a`, so the plan lists once and reuses it for the declaration guard. The inventory names the
   functions the split makes. AC2, AC5 and AC7 run the leg itself, so they are owed at VERIFYING; AC3
   is observed on a hand-built scratch clone at two commits, and AC6 on a scratch copy there.
+- rev-3 · 2026-10-11 · §5 · the build pass. The unattended kit's gate-guard refuses any command that
+  runs this leg's file before VERIFYING, `--plan` included, so AC1, AC3, AC4 and AC6 as worded are
+  observed at VERIFYING with the other owed criteria, and rev-2's scratch-clone and scratch-copy
+  routes for AC3 and AC6 are withdrawn. The pass observes the same classifier through a fixture,
+  committed beside the acceptance ledger as `2026-10-11-build-TOOL-aSparedSpawn-10-plan-fixture.sh`:
+  it extracts the leg's lines from `SELF_ROW=` to the `--plan` branch verbatim and runs that
+  branch's five calls over a hand-built git repository holding the real unattended `kit.toml` and
+  driver, at a root commit, at two commits whose rotation input differs, at a version bump, and
+  with a stale `WHOLE_RUN` entry and a second probe row each staged. AC4's `git grep` half needs no
+  run and is observed in the pass.
 
 ## 10. Reuse audit
 
