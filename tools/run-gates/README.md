@@ -232,6 +232,7 @@ it knows:
 | `ceiling_max` | the largest positive leg `ceiling` in the resolved manifest, or `-` when no leg declares one; ABSENT when the manifest does not parse |
 | `ceilings` · `line` | whether per-leg ceilings are live here, and the profile line a bar prints |
 | `mempause` | the memory pause's effective threshold, `GATE_MEMPAUSE` over the row's own; 0 is off. A host that gives no reading shows as `mempause INERT` on `line` |
+| `spawnpause` · `width_from` | the spawn pause's ratio, 0 for off; and where `width` came from: `row`, `calibrated` or `GATE_JOBS` |
 
 The unattended kit's driver reads `wall`, `queue` and `ceiling_max` to size the backstop of its
 own bar (`TOOL-dDerivedDocket-27`): the wall is armed only after the queue, so the longest a
@@ -265,7 +266,34 @@ has none, which on MSYS is Windows' own available figure; and the cgroup's usage
 `paused` and `paused_s`, the header `mempause`, and every bar prints one line after its pool drains:
 `memory: pause off`, `memory: no reading on this host, …`, `memory: no pause  (peak <p>% used, …)` or
 `memory: <k> pause(s), <s>s held  (…; fell <a>, bound <b>, drained <c>, unread <d>, wall <e>)`. Its
-peak varies with the host, so a reader comparing two bars' whole output filters it by name.
+peak varies with the host, so a reader comparing two bars' whole output filters it by name. A
+seventh field, `<held-by>`, names the reading that held the episode: `memory`, `spawn` or
+`memory+spawn` (next section). The `memory:` line and `paused` count what memory held.
+
+## The spawn calibration and the spawn pause — `--calibrate-width`, `spawnpause=<n>`
+
+The cost that binds a bar on a loaded Windows host is process creation, and a width past the point
+where more concurrent spawns stop raising the spawn rate only dilates every leg. Two levers, both
+TOOL-aSparedSpawn-2:
+
+**`run-gates.sh --calibrate-width`** times K concurrent loops of the spawn `GATE_SPAWN_CMD` names
+(`true` by default) for K in 1, 2, 4, 6 and 8, prints `rates`, `theta`, `pick` and `cache` as TAB
+key/value lines, and writes `<git-common-dir>/gate-host-calibration`: `<pick> TAB <K=rate,…> TAB
+<iso-utc> TAB <boot-epoch>`. The pick is the smallest K whose rate is within the runner's
+`CALIBRATE_THETA` percent of the best. It exits before the turnstile and runs no leg; on a loaded host
+it takes minutes. `GATE_CALIBRATION_RATES=<r1>,…,<r5>` replaces the timed loops with given rates.
+
+**Every bar reads that cache** and never calibrates. A cache that is well formed, under seven days
+old and written in this boot narrows the row's width to the pick, never widens it; `GATE_JOBS`
+outranks both. Otherwise the row stands and the profile line says why: `width 8 uncalibrated:
+absent`, `malformed`, `stale` or `another boot`. The header records `width_from`.
+
+**`spawnpause=<n>`** holds the next dispatch while one spawn costs over `<n>` times this clone's
+`gate-spawn-floor` and a leg runs, on the memory pause's episodes and every one of its release
+rules. The census sampler times three spawns a tick for the reading; `GATE_SPAWN_NOW=<path>` replaces
+it. With no floor recorded the knob is INERT: one `run-gates: NOTE` and a `spawn: no spawn floor
+recorded, …` line. A run with the knob on prints a `spawn:` line after `memory:`; a run with it off
+prints nothing new. Every shipped row declares 0 until the width A/B sets each row's value.
 `derive-ceilings.py` sets aside, as `paused`, any reading whose leg ran while one of its own run's
 episodes was open. `run-selftests.sh --pooled` carries the same block, byte-identical and
 parity-graded, holds its next suite the same way, and prints the same line; it keeps no `pauses` row.

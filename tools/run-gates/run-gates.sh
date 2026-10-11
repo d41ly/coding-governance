@@ -412,7 +412,7 @@ TIMINGS="$LEDGER"
 # slower, and it may turn an unbounded hang into a bounded RED. It may never make the bar check less.
 # KNOWN_KNOBS is the whole implemented set; the canary PINS the same set separately, which is what
 # stops a coverage knob being added without an author reading this paragraph.
-KNOWN_KNOBS="width timeout wall mempause"
+KNOWN_KNOBS="width timeout wall mempause spawnpause"
 PROFILES="${GATE_PROFILES:-$KITREL/gate-profiles.txt}"
 prof_die() { echo "run-gates: $*" >&2; exit 2; }
 
@@ -510,10 +510,16 @@ det_ram_capped() {
 # (`unread`), or at the first completion after `MEMPAUSE_HOLD` seconds (`bound`); the caller closes
 # one the wall's break left open as `wall`. The knob narrows a pool and never turns a leg into
 # anything: under pressure that never falls the pool drains toward width 1 and keeps moving.
+# A SECOND READING, ONE DECISION (TOOL-aSparedSpawn-2): the spawn pause holds on the same episode
+# machinery while one spawn costs over `SPAWNPAUSE` times `SPAWNPAUSE_FLOOR` microseconds, the reading
+# a builtin takes from the file `SPAWNPAUSE_NOW` names. Off unless the caller sets both the ratio and a
+# floor. An episode records which reading held it, and its counters split by that: the memory ones
+# above count what memory held, `SPAWNPAUSE_N` and `SPAWNPAUSE_HELD_S` what spawns held.
 MEMPAUSE_HOLD=300
 case "${GATE_MEMPAUSE_HOLD:-}" in ''|*[!0-9]*|???????*) ;; *) MEMPAUSE_HOLD=$((10#$GATE_MEMPAUSE_HOLD)) ;; esac
 MEMPAUSE_N=0; MEMPAUSE_HELD_S=0; MEMPAUSE_READ=""; MEMPAUSE_PEAK=""; MEMPAUSE_OPEN=""; MEMPAUSE_OPEN_PEAK=0
 MEMPAUSE_FELL=0; MEMPAUSE_BOUND=0; MEMPAUSE_DRAINED=0; MEMPAUSE_UNREAD=0; MEMPAUSE_WALL=0
+MEMPAUSE_OPEN_BY=""; SPAWNPAUSE_N=0; SPAWNPAUSE_HELD_S=0; SPAWNPAUSE_READ=""; SPAWNPAUSE_PEAK=""
 # read_mem_used — used memory as a whole percent, on stdout and in MEMPAUSE_READ; rc 1 and nothing
 # when no source reads. The host half is `MemTotal` against `MemAvailable`, or `MemFree` where the
 # file has none (on MSYS that IS Windows' available figure); the cgroup half is its usage over its
@@ -549,44 +555,85 @@ read_mem_used() {
   MEMPAUSE_READ=$v
   printf '%s\n' "$v"
 }
-# check_dispatch_pause <running> — rc 0 HOLDS the next dispatch, rc 1 lets it go. First match:
-# off or INERT; no reading (`unread`); at or under the threshold (`fell`); nothing running
-# (`drained`), so a hold never outlives the last job; an episode held MEMPAUSE_HOLD seconds or more
-# (`bound`), tested only here, so it is released at the first decision after the bound; else hold,
-# opening an episode when none is open.
+# read_spawn_now — the spawn pause's reading, microseconds a spawn, in SPAWNPAUSE_READ from the file
+# SPAWNPAUSE_NOW names; rc 1 and empty when that file is absent or holds no whole number.
+read_spawn_now() {
+  local v=""
+  SPAWNPAUSE_READ=""
+  { read -r v < "${SPAWNPAUSE_NOW:-}"; } 2>/dev/null || [ -n "$v" ] || return 1
+  v=${v%$'\r'}
+  case "$v" in ''|*[!0-9]*|?????????????*) return 1 ;; esac
+  SPAWNPAUSE_READ=$(( 10#$v ))
+}
+# check_dispatch_pause <running> — rc 0 HOLDS the next dispatch, rc 1 lets it go. First match: both
+# readings off or INERT; no reading over its threshold (`fell`, or `unread` when a live reading gave
+# none, a spawn reading counted only once an episode it held is open, since the sampler's first tick
+# comes a period after dispatch begins); nothing running (`drained`), so a hold never outlives the
+# last job; an episode held MEMPAUSE_HOLD seconds or more (`bound`), tested only here, so it is
+# released at the first decision after the bound; else hold, opening an episode when none is open.
 check_dispatch_pause() {
-  { [ "${MEMPAUSE:-0}" -gt 0 ] && [ "${MEMPAUSE_INERT:-0}" = 0 ]; } || return 1
-  if ! read_mem_used >/dev/null; then write_pause_row unread; return 1; fi
-  { [ -z "$MEMPAUSE_PEAK" ] || [ "$MEMPAUSE_READ" -gt "$MEMPAUSE_PEAK" ]; } && MEMPAUSE_PEAK=$MEMPAUSE_READ
-  [ -n "$MEMPAUSE_OPEN" ] && [ "$MEMPAUSE_READ" -gt "$MEMPAUSE_OPEN_PEAK" ] && MEMPAUSE_OPEN_PEAK=$MEMPAUSE_READ
-  if [ "$MEMPAUSE_READ" -le "$MEMPAUSE" ]; then write_pause_row fell; return 1; fi
+  local mem=0 spawn=0 by="" gone=""
+  { [ "${MEMPAUSE:-0}" -gt 0 ] && [ "${MEMPAUSE_INERT:-0}" = 0 ]; } && mem=1
+  { [ "${SPAWNPAUSE:-0}" -gt 0 ] && [ -n "${SPAWNPAUSE_FLOOR:-}" ]; } && spawn=1
+  [ "$mem$spawn" != 00 ] || return 1
+  if [ "$mem" = 1 ]; then
+    if read_mem_used >/dev/null; then
+      { [ -z "$MEMPAUSE_PEAK" ] || [ "$MEMPAUSE_READ" -gt "$MEMPAUSE_PEAK" ]; } && MEMPAUSE_PEAK=$MEMPAUSE_READ
+      [ -n "$MEMPAUSE_OPEN" ] && [ "$MEMPAUSE_READ" -gt "$MEMPAUSE_OPEN_PEAK" ] && MEMPAUSE_OPEN_PEAK=$MEMPAUSE_READ
+      [ "$MEMPAUSE_READ" -gt "$MEMPAUSE" ] && by=memory
+    else
+      gone=1
+    fi
+  fi
+  if [ "$spawn" = 1 ]; then
+    if read_spawn_now; then
+      { [ -z "$SPAWNPAUSE_PEAK" ] || [ "$SPAWNPAUSE_READ" -gt "$SPAWNPAUSE_PEAK" ]; } && SPAWNPAUSE_PEAK=$SPAWNPAUSE_READ
+      [ "$SPAWNPAUSE_READ" -gt $(( SPAWNPAUSE * SPAWNPAUSE_FLOOR )) ] && by=${by:+$by+}spawn
+    else
+      case "$MEMPAUSE_OPEN_BY" in *spawn*) gone=1 ;; esac
+    fi
+  fi
+  if [ -z "$by" ]; then
+    if [ -n "$gone" ]; then write_pause_row unread; else write_pause_row fell; fi
+    return 1
+  fi
   if [ "${1:-0}" -le 0 ]; then write_pause_row drained; return 1; fi
   if [ -n "$MEMPAUSE_OPEN" ] && [ $(( EPOCHSECONDS - MEMPAUSE_OPEN )) -ge "$MEMPAUSE_HOLD" ]; then
     write_pause_row bound; return 1
   fi
-  [ -n "$MEMPAUSE_OPEN" ] || { MEMPAUSE_OPEN=$EPOCHSECONDS; MEMPAUSE_OPEN_PEAK=$MEMPAUSE_READ; }
+  [ -n "$MEMPAUSE_OPEN" ] || { MEMPAUSE_OPEN=$EPOCHSECONDS; MEMPAUSE_OPEN_PEAK=${MEMPAUSE_READ:-0}; MEMPAUSE_OPEN_BY=$by; }
+  case "$MEMPAUSE_OPEN_BY" in "$by"|memory+spawn) ;; *) MEMPAUSE_OPEN_BY=memory+spawn ;; esac
   return 0
 }
 # write_pause_row <ended-by> — closes the open episode, a no-op when none is open: one `pauses` row,
-# `<started-s> TAB <ended-s> TAB <held-s> TAB <peak-pct> TAB <threshold> TAB <ended-by>`, when the
-# caller set MEMPAUSE_ROWS, and the counters the summary prints either way.
+# `<started-s> TAB <ended-s> TAB <held-s> TAB <peak-pct> TAB <threshold> TAB <ended-by> TAB <held-by>`,
+# when the caller set MEMPAUSE_ROWS, and the counters the summaries print either way. `<held-by>` is
+# `memory`, `spawn` or `memory+spawn`, appended last so no positional reader moves; the memory
+# counters take an episode memory held, the spawn pair one spawns held.
 write_pause_row() {
   [ -n "$MEMPAUSE_OPEN" ] || return 0
   local now=$EPOCHSECONDS held
   held=$(( now - MEMPAUSE_OPEN ))
-  MEMPAUSE_N=$(( MEMPAUSE_N + 1 )); MEMPAUSE_HELD_S=$(( MEMPAUSE_HELD_S + held ))
-  case "$1" in
-    fell) MEMPAUSE_FELL=$(( MEMPAUSE_FELL + 1 )) ;;
-    bound) MEMPAUSE_BOUND=$(( MEMPAUSE_BOUND + 1 )) ;;
-    drained) MEMPAUSE_DRAINED=$(( MEMPAUSE_DRAINED + 1 )) ;;
-    unread) MEMPAUSE_UNREAD=$(( MEMPAUSE_UNREAD + 1 )) ;;
-    *) MEMPAUSE_WALL=$(( MEMPAUSE_WALL + 1 )) ;;
+  case "$MEMPAUSE_OPEN_BY" in
+    *spawn*) SPAWNPAUSE_N=$(( SPAWNPAUSE_N + 1 )); SPAWNPAUSE_HELD_S=$(( SPAWNPAUSE_HELD_S + held )) ;;
+  esac
+  case "$MEMPAUSE_OPEN_BY" in
+    spawn) ;;
+    *)
+      MEMPAUSE_N=$(( MEMPAUSE_N + 1 )); MEMPAUSE_HELD_S=$(( MEMPAUSE_HELD_S + held ))
+      case "$1" in
+        fell) MEMPAUSE_FELL=$(( MEMPAUSE_FELL + 1 )) ;;
+        bound) MEMPAUSE_BOUND=$(( MEMPAUSE_BOUND + 1 )) ;;
+        drained) MEMPAUSE_DRAINED=$(( MEMPAUSE_DRAINED + 1 )) ;;
+        unread) MEMPAUSE_UNREAD=$(( MEMPAUSE_UNREAD + 1 )) ;;
+        *) MEMPAUSE_WALL=$(( MEMPAUSE_WALL + 1 )) ;;
+      esac ;;
   esac
   if [ -n "${MEMPAUSE_ROWS:-}" ]; then
-    printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$MEMPAUSE_OPEN" "$now" "$held" "$MEMPAUSE_OPEN_PEAK" \
-      "${MEMPAUSE:-0}" "$1" >> "$MEMPAUSE_ROWS" 2>/dev/null || true
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$MEMPAUSE_OPEN" "$now" "$held" "$MEMPAUSE_OPEN_PEAK" \
+      "${MEMPAUSE:-0}" "$1" "${MEMPAUSE_OPEN_BY:-memory}" >> "$MEMPAUSE_ROWS" 2>/dev/null || true
   fi
-  MEMPAUSE_OPEN=""; MEMPAUSE_OPEN_PEAK=0
+  MEMPAUSE_OPEN=""; MEMPAUSE_OPEN_PEAK=0; MEMPAUSE_OPEN_BY=""
 }
 # render_pause_summary — the ONE `memory:` line a run prints after its pool drains, on every run.
 render_pause_summary() {
@@ -603,6 +650,21 @@ render_pause_summary() {
   fi
 }
 # <<< mempause_sh
+# render_spawn_summary — the `spawn:` line, after the `memory:` line and only on a run whose row turned
+# the spawn pause on, so a run that leaves it off prints exactly what it printed before
+# (TOOL-aSparedSpawn-2). OUTSIDE the shared block: the self-test runner never sets the knob.
+render_spawn_summary() {
+  [ "${SPAWNPAUSE:-0}" -gt 0 ] || return 0
+  if [ -z "${SPAWNPAUSE_FLOOR:-}" ]; then
+    printf 'spawn: no spawn floor recorded, so the %sx pause was INERT\n' "$SPAWNPAUSE"
+  elif [ "$SPAWNPAUSE_N" = 0 ]; then
+    printf 'spawn: no pause  (peak %s us a spawn, threshold %sx the %s us floor)\n' \
+      "${SPAWNPAUSE_PEAK:-?}" "$SPAWNPAUSE" "$SPAWNPAUSE_FLOOR"
+  else
+    printf 'spawn: %s pause(s), %ss held  (peak %s us a spawn, threshold %sx the %s us floor)\n' \
+      "$SPAWNPAUSE_N" "$SPAWNPAUSE_HELD_S" "${SPAWNPAUSE_PEAK:-?}" "$SPAWNPAUSE" "$SPAWNPAUSE_FLOOR"
+  fi
+}
 
 # >>> health_log_sh — canonical copy: health-log.sh in gov's lib dir (byte-identical; gated)
 # I3, THE HEALTH LOG (TOOL-aGraftedHelix-8): `<git-common-dir>/health.log`, one LF-terminated UTF-8
@@ -653,7 +715,7 @@ add_health_event() {
 }
 # <<< health_log_sh
 
-PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_WALL=0; PROF_MEMPAUSE=0; PROF_TAG=""; PROF_WHERE=""
+PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_WALL=0; PROF_MEMPAUSE=0; PROF_SPAWNPAUSE=0; PROF_TAG=""; PROF_WHERE=""
 if [ -f "$PROFILES" ]; then
   # GATE_PROFILE names a row and SKIPS detection; otherwise the first row both thresholds satisfy.
   if [ -n "${GATE_PROFILE:-}" ]; then PROF_WHERE="detection skipped"
@@ -694,6 +756,10 @@ if [ -f "$PROFILES" ]; then
       # and could never hold. Refused like any malformed knob rather than clamped (TOOL-aGraftedHelix-7).
       [ "${k%%=*}" = mempause ] && [ "$((10#${k#*=}))" -gt 100 ] \
         && prof_die "$PROFILES:$ln: knob 'mempause' is a percent of used memory, 0 to 100: '${k#*=}'"
+      # A WHOLE MULTIPLE OF THE SPAWN FLOOR, bounded so its product with the floor stays inside
+      # int64 arithmetic at every decision (TOOL-aSparedSpawn-2).
+      [ "${k%%=*}" = spawnpause ] && [ "$((10#${k#*=}))" -gt 1000 ] \
+        && prof_die "$PROFILES:$ln: knob 'spawnpause' is a whole multiple of the spawn floor, 0 to 1000: '${k#*=}'"
     done
     declared="$declared $pname"
     [ -n "$sel" ] && continue
@@ -714,7 +780,8 @@ if [ -f "$PROFILES" ]; then
   IFS=, read -ra kv <<<"$selknobs"
   for k in "${kv[@]}"; do
     case "${k%%=*}" in width) PROF_WIDTH=${k#*=} ;; timeout) PROF_TIMEOUT=${k#*=} ;;
-                        wall) PROF_WALL=${k#*=} ;; mempause) PROF_MEMPAUSE=$((10#${k#*=})) ;; esac
+                        wall) PROF_WALL=${k#*=} ;; mempause) PROF_MEMPAUSE=$((10#${k#*=})) ;;
+                        spawnpause) PROF_SPAWNPAUSE=$((10#${k#*=})) ;; esac
   done
   [ -n "$PROF_WIDTH" ] || prof_die "$PROFILES: row '$sel' declares no width knob"
   PROF_TAG="detected"
@@ -765,10 +832,108 @@ if [ "$PROF_TIMEOUT" -gt 0 ] && [ "$CEILINGS_LIVE" = 0 ]; then
   PROF_TIMEOUT=0
 fi
 
+# ---- THE SPAWN CALIBRATION (TOOL-aSparedSpawn-2). The row's width is a CAP and a measured pick may
+# ---- narrow it: `--calibrate-width` times K concurrent spawn loops for each K in CALIBRATE_KS and
+# ---- keeps the smallest K whose aggregate rate is within CALIBRATE_THETA percent of the best, the
+# ---- knee past which more legs share one spawn throughput and only dilate each other. A bar never
+# ---- calibrates; it READS the pick the verb left in `<git-common-dir>/gate-host-calibration`, one
+# ---- line `<width> TAB <K=rate,…> TAB <iso-utc> TAB <boot-epoch or ->`, and uses it only when it is
+# ---- well formed, under CALIBRATE_DAYS old, and written in this boot (a reboot or a scanner update
+# ---- moves spawn cost by integer factors). Precedence: GATE_JOBS, then the lower of row and pick,
+# ---- then the row. A cache that fails a test leaves the row standing and the profile line says
+# ---- `uncalibrated` and which test, because a skip must announce itself.
+# THETA IS PROVISIONAL: the width A/B that sets it (the spec's S1) is owed, so 90 is a declared
+# starting point and not a measurement. It can cost speed and never a verdict.
+CALIBRATE_THETA=90
+CALIBRATE_KS="1 2 4 6 8"
+CALIBRATE_REPS=20
+CALIBRATE_DAYS=7
+# THE ARM SEAM, read once and unset as GATE_SPAWN_CMD is, so no leg's nested runner inherits it: a
+# comma list of one rate per K that stands in for the timed loops, so the selection grades clock-free.
+CAL_RATES_SEAM=${GATE_CALIBRATION_RATES:-}
+unset GATE_CALIBRATION_RATES
+# THE COMMON DIR, resolved ONCE here and reused by the turnstile and the scratch-dir owner below, so
+# the cache read costs a bar no git spawn of its own.
+RG_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || RG_COMMON=""
+[ -n "$RG_COMMON" ] && RG_COMMON=$(cd "$RG_COMMON" 2>/dev/null && pwd) || RG_COMMON=""
+CALIB_FILE=""; [ -n "$RG_COMMON" ] && CALIB_FILE="$RG_COMMON/gate-host-calibration"
+
+# read_boot_epoch — BOOT_EPOCH, this boot's start in epoch seconds from `/proc/uptime` with a builtin
+# read, or `-` where that does not read.
+read_boot_epoch() {
+  local up=""
+  BOOT_EPOCH=-
+  { read -r up _ < /proc/uptime; } 2>/dev/null || return 0
+  up=${up%%.*}
+  case "$up" in ''|*[!0-9]*|??????????*) return 0 ;; esac
+  BOOT_EPOCH=$(( EPOCHSECONDS - 10#$up ))
+}
+# parse_iso_epoch <YYYY-MM-DDTHH:MM:SSZ> — ISO_EPOCH, its epoch seconds by civil-date arithmetic
+# (days from 1970-01-01, the era-of-400-years form), so the cache read spawns nothing; rc 1 on any
+# other shape.
+parse_iso_epoch() {
+  local y m d era yoe doy
+  ISO_EPOCH=""
+  [[ $1 =~ ^([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})Z$ ]] || return 1
+  y=$((10#${BASH_REMATCH[1]})); m=$((10#${BASH_REMATCH[2]})); d=$((10#${BASH_REMATCH[3]}))
+  [ "$m" -le 2 ] && y=$(( y - 1 ))
+  era=$(( y / 400 )); yoe=$(( y - era * 400 ))
+  doy=$(( (153 * (m > 2 ? m - 3 : m + 9) + 2) / 5 + d - 1 ))
+  ISO_EPOCH=$(( (era * 146097 + yoe * 365 + yoe / 4 - yoe / 100 + doy - 719468) * 86400
+    + 10#${BASH_REMATCH[4]} * 3600 + 10#${BASH_REMATCH[5]} * 60 + 10#${BASH_REMATCH[6]} ))
+}
+# read_host_calibration <path> — CALIB_WIDTH, the cached pick, when the cache is valid; else empty,
+# and CALIB_WHY names the first test it failed: `absent`, `malformed`, `stale` (CALIBRATE_DAYS old or
+# more, or dated in the future) or `another boot` (60 s of clock jitter allowed; skipped on a host
+# whose `/proc/uptime` does not read). Builtins only.
+read_host_calibration() {
+  local f=$1 line="" tabs w rates iso boot rest gap
+  CALIB_WIDTH=""; CALIB_WHY=absent
+  [ -n "$f" ] && [ -e "$f" ] || return 0
+  CALIB_WHY=malformed
+  [ -f "$f" ] || return 0
+  { IFS= read -r line < "$f"; } 2>/dev/null || [ -n "$line" ] || return 0
+  line=${line%$'\r'}
+  tabs=${line//[!$'\t']/}
+  [ "${#tabs}" = 3 ] || return 0
+  w=${line%%$'\t'*}; rest=${line#*$'\t'}
+  rates=${rest%%$'\t'*}; rest=${rest#*$'\t'}
+  iso=${rest%%$'\t'*}; boot=${rest#*$'\t'}
+  case "$w" in ''|0*|*[!0-9]*|???*) return 0 ;; esac
+  [ -n "$rates" ] || return 0
+  case "$boot" in -) ;; ''|*[!0-9]*|?????????????*) return 0 ;; esac
+  parse_iso_epoch "$iso" || return 0
+  CALIB_WHY=stale
+  gap=$(( EPOCHSECONDS - ISO_EPOCH ))
+  { [ "$gap" -ge 0 ] && [ "$gap" -lt $(( CALIBRATE_DAYS * 86400 )) ]; } || return 0
+  read_boot_epoch
+  if [ "$BOOT_EPOCH" != - ]; then
+    CALIB_WHY="another boot"
+    [ "$boot" != - ] || return 0
+    gap=$(( BOOT_EPOCH - 10#$boot )); [ "$gap" -ge 0 ] || gap=$(( -gap ))
+    [ "$gap" -le 60 ] || return 0
+  fi
+  CALIB_WIDTH=$(( 10#$w )); CALIB_WHY=""
+}
+read_host_calibration "$CALIB_FILE"
+# F1 (a): the pick NARROWS the row and never widens it, so the row stays a cap on a host that
+# measured past it, and a host never calibrated behaves exactly as before.
+JOBS_ROW=$PROF_WIDTH; WIDTH_FROM=row
+if [ -n "$CALIB_WIDTH" ]; then
+  WIDTH_NOTE=calibrated
+  if [ "${#PROF_WIDTH}" -gt 4 ] || [ "$(( 10#$PROF_WIDTH ))" -gt "$CALIB_WIDTH" ]; then
+    JOBS_ROW=$CALIB_WIDTH; WIDTH_FROM=calibrated
+  fi
+else
+  WIDTH_NOTE="uncalibrated: $CALIB_WHY"
+fi
+# The override names the width itself, so the line carries no note about a cache it did not consult.
+[ -n "${GATE_JOBS:-}" ] && { WIDTH_FROM=GATE_JOBS; WIDTH_NOTE=""; }
+
 # A non-numeric or <1 width is clamped to 1 rather than refused — this knob only schedules work, it
 # can never skip a leg. GATE_JOBS overrides the width ONLY: the row is still selected and still
 # supplies the timeout, which is what keeps the override from disabling the rest of the profile.
-JOBS=${GATE_JOBS:-$PROF_WIDTH}
+JOBS=${GATE_JOBS:-$JOBS_ROW}
 # Bound by LENGTH before any numeric test touches the value. Both `[ "$JOBS" -lt 1 ]` and `$(( JOBS < 1 ))`
 # ERROR on an int64 overflow instead of comparing, so a 20-digit value used to sail past the clamp into a
 # dispatch loop whose own `[ "$(live)" -lt "$JOBS" ]` errored identically: the runner spun forever having
@@ -961,7 +1126,13 @@ fi
 prof_m=off; prof_mrec=off
 [ "$MEMPAUSE" -gt 0 ] && { prof_m="${MEMPAUSE}%"; prof_mrec=$MEMPAUSE; }
 [ "$MEMPAUSE_INERT" = 1 ] && { prof_m=INERT; prof_mrec=inert; }
-PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c, wall $prof_w, mempause $prof_m; $PROF_TAG)"
+# THE SPAWN PAUSE'S RATIO (TOOL-aSparedSpawn-2), the row's alone. Whether a floor exists to multiply
+# is known only once the floor is read, below, which is where an INERT knob says so.
+SPAWNPAUSE=$PROF_SPAWNPAUSE
+prof_s=off; [ "$SPAWNPAUSE" -gt 0 ] && prof_s="${SPAWNPAUSE}x"
+# The spawn ratio sits BEFORE `mempause`, whose field is pinned by the canary as the one that ends
+# at the `;`.
+PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS${WIDTH_NOTE:+ $WIDTH_NOTE}, timeout $prof_t, ceilings $prof_c, wall $prof_w, spawnpause $prof_s, mempause $prof_m; $PROF_TAG)"
 
 # HOISTED ABOVE `--print-profile`, TOOL-dDerivedDocket-27 S3. That verb reports the queue bound,
 # and a queue printed before the TTL is resolved reads 0, which is a bound on nothing. Deriving it
@@ -1017,6 +1188,79 @@ TS_MAXWAIT=$(( TS_TTL * 4 ))
 # fires on a healthy bar that dispatches that leg. A manifest that does not parse prints NO
 # `ceiling_max` line, because "none declared" and "could not read" are two answers, and a reader
 # names the key it did not get.
+# ---- `--calibrate-width` (TOOL-aSparedSpawn-2): the verb that WRITES the cache the width reads above.
+# It exits before the turnstile, as `--print-profile` does, runs no leg and writes no run record. It
+# times what `measure_spawn_cost` times, the `GATE_SPAWN_CMD` seam's command or `true`, in K loops at
+# once for each K, CALIBRATE_REPS spawns a loop, so on a loaded host it is about a minute. A rate is
+# whole spawns a minute across the K loops. Output is TAB key/value, the `--print-profile` grammar.
+# measure_spawn_rate <k> — CAL_RATE, spawns a minute across <k> concurrent loops; empty when a spawn
+# failed, bash has no `EPOCHREALTIME`, or the clock did not move, because a zero is never a rate.
+measure_spawn_rate() {
+  local k=$1 j t0 t1 bad=0
+  local -a pids=()
+  CAL_RATE=""
+  t0=${EPOCHREALTIME:-}; t0=${t0//[.,]/}
+  [ -n "$t0" ] || return 0
+  for ((j=0; j<k; j++)); do
+    ( for ((r=0; r<CALIBRATE_REPS; r++)); do "${CAL_CMD[@]}" </dev/null >/dev/null 2>&1 || exit 1; done ) &
+    pids+=("$!")
+  done
+  for j in "${pids[@]}"; do wait "$j" || bad=1; done
+  t1=${EPOCHREALTIME//[.,]/}
+  [ "$bad" = 0 ] && [ $(( 10#$t1 - 10#$t0 )) -gt 0 ] || return 0
+  CAL_RATE=$(( k * CALIBRATE_REPS * 60000000 / (10#$t1 - 10#$t0) ))
+  [ "$CAL_RATE" -gt 0 ] || CAL_RATE=""
+}
+# derive_calibrated_width <rate>… — CAL_PICK, the first K of CALIBRATE_KS whose rate is at least
+# CALIBRATE_THETA percent of the best: the KNEE, never the maximum, which on a flat curve is noise.
+derive_calibrated_width() {
+  local -a ks=()
+  local r best=0 i=0
+  read -ra ks <<<"$CALIBRATE_KS"
+  CAL_PICK=""
+  for r in "$@"; do [ "$r" -gt "$best" ] && best=$r; done
+  for r in "$@"; do
+    if [ $(( r * 100 )) -ge $(( CALIBRATE_THETA * best )) ]; then CAL_PICK=${ks[$i]}; return 0; fi
+    i=$(( i + 1 ))
+  done
+}
+if [ "${1:-}" = "--calibrate-width" ]; then
+  [ -n "$CALIB_FILE" ] || { echo "run-gates: --calibrate-width: no git common dir resolved, so there is nowhere to keep the pick" >&2; exit 2; }
+  read -ra _cks <<<"$CALIBRATE_KS"
+  _crates=()
+  if [ -n "$CAL_RATES_SEAM" ]; then
+    IFS=, read -ra _crates <<<"$CAL_RATES_SEAM"
+    _cok=1; [ "${#_crates[@]}" = "${#_cks[@]}" ] || _cok=0
+    for _r in "${_crates[@]}"; do case "$_r" in ''|0*|*[!0-9]*|??????????*) _cok=0 ;; esac; done
+    [ "$_cok" = 1 ] || { echo "run-gates: --calibrate-width: GATE_CALIBRATION_RATES='$CAL_RATES_SEAM' is not ${#_cks[@]} positive whole rates, one per K in '$CALIBRATE_KS'" >&2; exit 2; }
+  else
+    CAL_CMD=()
+    if [ -n "${GATE_SPAWN_CMD:-}" ]; then read -ra CAL_CMD <<<"$GATE_SPAWN_CMD"; else CAL_CMD=("$(type -P true 2>/dev/null)"); fi
+    [ -n "${CAL_CMD[0]:-}" ] || { echo "run-gates: --calibrate-width: no spawn command resolves (no 'true' on PATH), so nothing can be timed" >&2; exit 1; }
+    for _k in "${_cks[@]}"; do
+      measure_spawn_rate "$_k"
+      [ -n "$CAL_RATE" ] || { echo "run-gates: --calibrate-width: the spawn rate at K=$_k could not be measured (a spawn failed, or bash has no EPOCHREALTIME), so no pick is written" >&2; exit 1; }
+      _crates+=("$CAL_RATE")
+    done
+  fi
+  derive_calibrated_width "${_crates[@]}"
+  _cfield=""
+  for ((_i=0; _i<${#_cks[@]}; _i++)); do _cfield="$_cfield${_cfield:+,}${_cks[$_i]}=$((10#${_crates[$_i]}))"; done
+  read_boot_epoch
+  _ciso=$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null) || _ciso=""
+  printf 'rates\t%s\n' "$_cfield"
+  printf 'theta\t%s\n' "$CALIBRATE_THETA"
+  printf 'pick\t%s\n'  "$CAL_PICK"
+  if [ -n "$_ciso" ] && { printf '%s\t%s\t%s\t%s\n' "$CAL_PICK" "$_cfield" "$_ciso" "$BOOT_EPOCH" > "$CALIB_FILE.tmp"; } 2>/dev/null \
+     && mv -f "$CALIB_FILE.tmp" "$CALIB_FILE" 2>/dev/null; then
+    printf 'cache\t%s\n' "$CALIB_FILE"
+    exit 0
+  fi
+  rm -f "$CALIB_FILE.tmp" 2>/dev/null
+  echo "run-gates: --calibrate-width: the cache at $CALIB_FILE could not be written, so bars keep the width they had" >&2
+  exit 1
+fi
+
 if [ "${1:-}" = "--print-profile" ]; then
   PROF_CEILING_MAX=$("$PYBIN" -c '
 import json, sys
@@ -1040,6 +1284,8 @@ sys.stdout.write(str(max(c)) if c else "-")
   # The EFFECTIVE threshold, 0 for off. INERT is a fact about the host and rides `line`; a second
   # reader decides it with a read of its own (TOOL-aGraftedHelix-7).
   printf 'mempause\t%s\n'  "$MEMPAUSE"
+  printf 'spawnpause\t%s\n' "$SPAWNPAUSE"
+  printf 'width_from\t%s\n' "$WIDTH_FROM"
   printf 'line\t%s\n'      "$PROF_LINE"
   exit 0
 fi
@@ -1100,8 +1346,7 @@ echo "run-gates: process-monitor: $PROCMON_WHY"
 # left exactly as they are: evidence is per-worktree, contention is per-repository.
 TS_COMMON=""; TS_DIR=""; TS_TICKET=""; TS_NONCE=""; TS_WAITED=0; TS_HELD=0; TS_Q=""; TS_UNTICKETED=0
 if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
-  TS_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || TS_COMMON=""
-  [ -n "$TS_COMMON" ] && TS_COMMON=$(cd "$TS_COMMON" 2>/dev/null && pwd) || TS_COMMON=""
+  TS_COMMON=$RG_COMMON          # resolved once, above the width (TOOL-aSparedSpawn-2)
 fi
 # THE HEALTH LOG (I3, TOOL-aGraftedHelix-8), derived from the common dir this runner already holds,
 # so no self-heal site below spawns git: the turnstile's here, WORK_COMMON's once it is resolved.
@@ -1535,14 +1780,10 @@ echo "gate queue: acquired $ACQUIRED from $QUEUED_FROM"
 # made before it exits.
 GATE_AMBIENT_TMP=${TMPDIR:-/tmp}
 WORK=$(mktemp -d "$GATE_AMBIENT_TMP/gate-work.XXXXXXXX") || { echo "run-gates: cannot create a scratch dir"; exit 2; }
-# THE COMMON DIR THE OWNER NAMES, resolved exactly as the turnstile resolves its key and reused from
-# it when it ran. With the turnstile off it is resolved here, because the sweep must still know which
-# repository a scratch dir belongs to.
-WORK_COMMON=$TS_COMMON
-if [ -z "$WORK_COMMON" ]; then
-  WORK_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || WORK_COMMON=""
-  [ -n "$WORK_COMMON" ] && WORK_COMMON=$(cd "$WORK_COMMON" 2>/dev/null && pwd) || WORK_COMMON=""
-fi
+# THE COMMON DIR THE OWNER NAMES, the one resolution the turnstile's key also takes, made above the
+# width whether or not the turnstile runs, because the sweep must still know which repository a
+# scratch dir belongs to (TOOL-aSparedSpawn-2 moved it there).
+WORK_COMMON=$RG_COMMON
 [ -n "$RG_HEALTH_LOG" ] || [ -z "$WORK_COMMON" ] || RG_HEALTH_LOG=$(derive_health_log "$WORK_COMMON")
 
 write_work_owner() { # -> $WORK/owner, one line: pid TAB common dir TAB start epoch; rc 1 when unwritten
@@ -2355,6 +2596,10 @@ if [ -n "$RUNDIR" ]; then
     # The memory pause's threshold this run held dispatch above, `off`, or `inert` where the host gave
     # no reading (TOOL-aGraftedHelix-7). Outside the run-envelope block for the reason above.
     printf 'mempause\t%s\n' "$prof_mrec"
+    # Where the width came from, `row`, `calibrated` or `GATE_JOBS`, and the spawn pause's ratio, 0
+    # for off (TOOL-aSparedSpawn-2). Outside the run-envelope block for the reason above.
+    printf 'width_from\t%s\n' "$WIDTH_FROM"
+    printf 'spawnpause\t%s\n' "$SPAWNPAUSE"
     # The RESOLVED dispatch order, recorded here because this is the point at which it is in
     # scope. The chunking unit's ordering criteria read it from the record rather than
     # re-deriving it, which is what keeps the record's key set single-sourced.
@@ -2416,7 +2661,10 @@ fi
 # invisible to that assertion, as `remove_group_residue` states.
 GATE_HOST_RATIO=4
 SPAWN_CMD=${GATE_SPAWN_CMD:-}; SPAWN_FLOOR_FILE=${GATE_SPAWN_FLOOR:-}; VERDICT_FAULT=${GATE_VERDICT_FAULT:-}
-unset GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT
+# A FOURTH SEAM, TOOL-aSparedSpawn-2: `GATE_SPAWN_NOW` names a file the spawn pause reads in place of
+# the census sampler's reading, as `GATE_MEMINFO` stands in for `/proc/meminfo`.
+SPAWN_NOW_SEAM=${GATE_SPAWN_NOW:-}
+unset GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT GATE_SPAWN_NOW
 [ -n "$SPAWN_FLOOR_FILE" ] || { [ -n "$WORK_COMMON" ] && SPAWN_FLOOR_FILE="$WORK_COMMON/gate-spawn-floor"; }
 SPAWN_FLOOR_US=""; SPAWN_FLOOR_STATE=absent; SPAWN_US=""
 
@@ -2446,19 +2694,20 @@ read_spawn_floor() {
 # builtin clock is the only one that does not spawn a process of its own inside the measurement, and
 # a zero is NEVER rounded up to a figure. A floor fabricated at one microsecond would read every later
 # double timeout as HOST, which is the fallback-fabricates-the-passing-value class pointed at the host.
+# An optional count replaces the ten: the census sampler times three a tick for the spawn pause.
 measure_spawn_cost() {
   local -a cmd=()
-  local t0 t1 k
+  local t0 t1 k reps=${1:-10}
   SPAWN_US=""
   if [ -n "$SPAWN_CMD" ]; then read -ra cmd <<<"$SPAWN_CMD"; else cmd=("$(type -P true 2>/dev/null)"); fi
   [ -n "${cmd[0]:-}" ] || return 0
   t0=${EPOCHREALTIME:-}; t0=${t0//[.,]/}
   [ -n "$t0" ] || return 0
-  for k in 1 2 3 4 5 6 7 8 9 10; do
+  for ((k=0; k<reps; k++)); do
     "${cmd[@]}" </dev/null >/dev/null 2>&1 || return 0
   done
   t1=${EPOCHREALTIME//[.,]/}
-  SPAWN_US=$(( (10#$t1 - 10#$t0) / 10 ))
+  SPAWN_US=$(( (10#$t1 - 10#$t0) / reps ))
   [ "$SPAWN_US" -gt 0 ] || SPAWN_US=""
 }
 
@@ -2485,6 +2734,14 @@ write_spawn_floor() {
 read_spawn_floor "$SPAWN_FLOOR_FILE"
 [ "$SPAWN_FLOOR_STATE" = unreadable ] \
   && echo "run-gates: the spawn floor at $SPAWN_FLOOR_FILE cannot be read, so it is treated as absent and no leg of this bar can read HOST" >&2
+# THE SPAWN PAUSE'S INPUTS (TOOL-aSparedSpawn-2), the floor as read BEFORE this bar measures, for the
+# reason the retry gives. With no floor the ratio multiplies nothing: the knob is INERT, says so
+# here once, and never reads as a threshold of zero, which would hold every decision, or of infinity.
+SPAWNPAUSE_FLOOR=$SPAWN_FLOOR_US
+SPAWNPAUSE_NOW=${SPAWN_NOW_SEAM:-$WORK/spawn-now}
+if [ "$SPAWNPAUSE" -gt 0 ] && [ -z "$SPAWNPAUSE_FLOOR" ]; then
+  echo "run-gates: NOTE - profile '$PROF_NAME' asks to hold dispatch while one spawn costs over ${SPAWNPAUSE}x the spawn floor, but no floor is recorded at ${SPAWN_FLOOR_FILE:-<no common dir>}, so the spawn pause is INERT this run" >&2
+fi
 _sf_bounded=0
 if [ "$CEILINGS_LIVE" = 1 ]; then
   for ((i=0; i<total; i++)); do
@@ -2899,7 +3156,10 @@ arm_census() {
   [ "$CENSUS_ARMED" = 0 ] || return 0
   CENSUS_ARMED=1
   [ -n "$RUNDIR" ] || return 0
-  local _f="$RUNDIR/census" _c="" _me=$$ _every=$CENSUS_EVERY _work=$WORK
+  local _f="$RUNDIR/census" _c="" _me=$$ _every=$CENSUS_EVERY _work=$WORK _spawn=0
+  # THE SPAWN PAUSE'S READING (TOOL-aSparedSpawn-2): three timed spawns a tick, written tmp-then-rename
+  # to the file the dispatcher reads with a builtin, only while the pause is live and no seam stands in.
+  [ "${SPAWNPAUSE:-0}" -gt 0 ] && [ -n "${SPAWNPAUSE_FLOOR:-}" ] && [ -z "$SPAWN_NOW_SEAM" ] && _spawn=1
   measure_foreign > "$_f" 2>/dev/null
   chmod 600 "$_f" 2>/dev/null || true
   { IFS=$'\t' read -r _ _c _ < "$_f"; } 2>/dev/null
@@ -2911,6 +3171,11 @@ arm_census() {
       sleep "$_every"
       kill -0 "$_me" 2>/dev/null || exit 0
       [ -f "$_work/census.disarm" ] && exit 0
+      if [ "$_spawn" = 1 ]; then
+        measure_spawn_cost 3
+        [ -n "$SPAWN_US" ] && printf '%s\n' "$SPAWN_US" > "$_work/spawn-now.tmp" 2>/dev/null \
+          && mv -f "$_work/spawn-now.tmp" "$_work/spawn-now" 2>/dev/null
+      fi
       measure_foreign >> "$_f" 2>/dev/null || exit 0
     done
   ) >/dev/null 2>&1 &
@@ -3708,6 +3973,7 @@ chunk_close                                # the last chunk has no successor to 
 # THE MEMORY PAUSE'S ONE LINE, after the pool drains and before the serial retry, so a run the wall
 # stopped prints it too. Its peak varies with the host, so a whole-output reader filters it by name.
 render_pause_summary
+render_spawn_summary
 # ONE I3 LINE PER BAR THAT PAUSED, never one per episode (TOOL-aGraftedHelix-8): the summary's counts.
 [ "$MEMPAUSE_N" = 0 ] || add_health_event "$RG_HEALTH_LOG" run-gates dispatch-paused \
   "$MEMPAUSE_N pause(s) ${MEMPAUSE_HELD_S}s held peak ${MEMPAUSE_PEAK:-?}% threshold ${MEMPAUSE:-0}% fell $MEMPAUSE_FELL bound $MEMPAUSE_BOUND drained $MEMPAUSE_DRAINED unread $MEMPAUSE_UNREAD wall $MEMPAUSE_WALL"

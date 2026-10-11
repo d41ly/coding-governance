@@ -177,9 +177,12 @@ def read_margin() -> tuple[int, float, str]:
 def read_pauses(run_dir: str) -> list[tuple[int, int]]:
     """One run's memory pause episodes, `(started, ended)` in epoch seconds, from its `pauses` file.
 
-    A row is `<started> TAB <ended> TAB <held> TAB <peak> TAB <threshold> TAB <ended-by>`, written by
-    the runner's `write_pause_row`; a row that is not six fields with numeric stamps is skipped, and
-    a run with no file had no episode. TOOL-aGraftedHelix-7.
+    A row is `<started> TAB <ended> TAB <held> TAB <peak> TAB <threshold> TAB <ended-by> TAB
+    <held-by>`, written by the runner's `write_pause_row`; a row of fewer than six fields or without
+    numeric stamps is skipped, and a run with no file had no episode. TOOL-aGraftedHelix-7. The
+    seventh field, which reading held the episode, is read by no one here: a memory- or spawn-held
+    episode is contention either way, and a six-field row from before it still counts.
+    TOOL-aSparedSpawn-2.
     """
     try:
         txt = pathlib.Path(run_dir, "pauses").read_text(encoding="utf-8", errors="replace")
@@ -188,7 +191,7 @@ def read_pauses(run_dir: str) -> list[tuple[int, int]]:
     out = []
     for line in txt.splitlines():
         p = line.split("\t")
-        if len(p) == 6 and p[0].isascii() and p[0].isdigit() and p[1].isascii() and p[1].isdigit():
+        if len(p) >= 6 and p[0].isascii() and p[0].isdigit() and p[1].isascii() and p[1].isdigit():
             out.append((int(p[0]), int(p[1])))
     return out
 

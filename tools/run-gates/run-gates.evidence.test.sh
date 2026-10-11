@@ -1556,7 +1556,9 @@ cp "$ROOT/${PFX}${KIT}/derive-ceilings.py" "$ROOT/${PFX}${KIT}/ceiling-margin.tx
   || { echo "evidence-test: cannot copy the ceiling kit for the pause arms"; exit 2; }
 ( cd "$PZ_T" && git init -q -b main . ) >/dev/null 2>&1
 printf '%s\n' '[' '  {"name": "L", "argv": ["true"], "ceiling": 300}' ']' > "$PZ_T/${PFX}gate-legs.json"
-printf '1000\t1010\t10\t95\t90\tfell\n' > "$PZ_T/.git/gate-run/r1/pauses"
+# The row is the runner's seven-field shape, held by `spawn` (TOOL-aSparedSpawn-2): a reader that takes
+# exactly six fields sets nothing aside, and a spawn-held episode is contention like a memory-held one.
+printf '1000\t1010\t10\t0\t90\tfell\tspawn\n' > "$PZ_T/.git/gate-run/r1/pauses"
 { printf 'L\tok\t0\t10.0\t995000000000\t1005000000000\t-\t0\n'
   printf 'L\tok\t0\t20.0\t1020000000000\t1040000000000\t-\t0\n'
   printf 'L\tok\t0\t30.0\t970000000000\t1000000000000\t-\t0\n'; } > "$PZ_T/.git/gate-run/r1/1.leg"

@@ -4283,6 +4283,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_sp_value",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "check_spawn",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
@@ -5511,6 +5516,11 @@
       "id": "derive_cache_key",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "derive_calibrated_width",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "derive_candidates",
@@ -9033,6 +9043,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "measure_spawn_rate",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "measure_timeline_events",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -9766,6 +9781,11 @@
       "id": "parse_iso",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "parse_iso_epoch",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "parse_json_pairs",
@@ -10853,6 +10873,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "read_boot_epoch",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "read_bound_key",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -11386,6 +11411,11 @@
       "id": "read_hooked_journal",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_host_calibration",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "read_host_name",
@@ -12168,9 +12198,29 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_sp_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "read_sp_why",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "read_spawn_floor",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "read_spawn_now",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "read_spawn_now",
+      "kind": "function",
+      "file": "tools/run-gates/run-selftests.sh"
     },
     {
       "id": "read_spec_marks",
@@ -13581,6 +13631,11 @@
       "id": "render_skill_copy",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "render_spawn_summary",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "render_spec",
@@ -16371,6 +16426,16 @@
       "id": "run_skip_leg",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "run_sp_bar",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "run_sp_verb",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
     },
     {
       "id": "run_spec_commit_block",

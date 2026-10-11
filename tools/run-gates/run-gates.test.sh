@@ -122,7 +122,9 @@ fail=0
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
 # 324 -> 326, TOOL-dLadderedRemote-2: the two arms of the canary's ladder-refusal pass, counted off the arm.
-FLOOR_ASSERTIONS=326
+# 326 -> 347, TOOL-aSparedSpawn-2: the pin arm's runner-set half and section 12's 20. Not 348: arm
+# 12c's other-boot half SKIPS on a host with no readable /proc/uptime, so the floor is that count.
+FLOOR_ASSERTIONS=347
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -1382,7 +1384,17 @@ printf '%s\n' "$o" | grep -q 'big' \
 #     the only forcing function a coverage knob would ever meet.
 # `mempause` joined at TOOL-aGraftedHelix-7: it holds a dispatch while used memory is high and every
 # hold ends, so it costs speed and never a leg — read against the invariant before it was pinned.
-PINNED_KNOBS="mempause timeout wall width"
+# `spawnpause` joined at TOOL-aSparedSpawn-2: the same holds on a second reading, the same release
+# rules, so the same verdict against the invariant.
+PINNED_KNOBS="mempause spawnpause timeout wall width"
+# THE RUNNER'S OWN SET IS GRADED TOO, not only the table's: a knob added to KNOWN_KNOBS that no row
+# declares yet would otherwise pass this arm, which is the case TOOL-aSparedSpawn-2 AC7 names.
+n=$((n+1))
+_rkn=$(sed -n 's/^KNOWN_KNOBS="\([^"]*\)".*/\1/p' "$KITDIR/run-gates.sh" | head -1)
+[ -n "${_rkn// /}" ] || { echo "canary: no KNOWN_KNOBS=\"…\" line read from $KITDIR/run-gates.sh, so the runner's set is compared against nothing"; fail=1; }
+for k in $_rkn; do
+  case " $PINNED_KNOBS " in *" $k "*) ;; *) echo "canary: run-gates.sh implements knob key '$k', which is not in this suite's pinned set ($PINNED_KNOBS). Read the governing invariant in the table's header before adding it: no knob may ever turn a leg into a PASS or a SKIP."; fail=1 ;; esac
+done
 PTBL="$KITREL/gate-profiles.txt"
 n=$((n+1))
 if [ ! -f "$PTBL" ]; then
@@ -3293,6 +3305,127 @@ else
   fi
 fi
 rm -rf "$MP" 2>/dev/null || true
+
+# 12. THE SPAWN CALIBRATION AND THE SPAWN PAUSE. TOOL-aSparedSpawn-2. `--calibrate-width` caches the
+#     knee of K concurrent spawn loops' rates, a bar narrows its row's width to that pick, and
+#     `spawnpause=<n>` holds dispatch while one spawn costs over n times the floor. Clock-free through
+#     the seams: `GATE_CALIBRATION_RATES` stands in for the timed loops and `GATE_SPAWN_NOW` for the
+#     sampler's reading. Each arm's fixture is its own repository, so no cache crosses arms.
+SP=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the spawn-calibration arms"; exit 2; }
+mkdir -p "$SP/x"
+build_hv_repo "$SP/r"
+printf 't\t0\t0\twidth=8,timeout=0,wall=0\n' > "$SP/r/$KIT_REL/gate-profiles.txt"
+( cd "$SP/r" && git add -A && git commit -qm spawn ) >/dev/null 2>&1
+SP_CACHE="$SP/r/.git/gate-host-calibration"
+run_sp_verb() { # VAR=value… -> SP_OUT (stdout), SP_RC; the calibrate verb in the fixture
+  SP_OUT=$( cd "$SP/r" && env GATE_PROFILES= GATE_PROFILE= GATE_JOBS= "$@" \
+      bash $KIT_REL/run-gates.sh --calibrate-width 2>"$SP/x/err" ); SP_RC=$?
+}
+read_sp_key() { # key · VAR=value… -> that key of --print-profile in the fixture
+  local k=$1; shift
+  ( cd "$SP/r" && env GATE_PROFILES= GATE_PROFILE= GATE_JOBS= "$@" bash $KIT_REL/run-gates.sh --print-profile 2>/dev/null ) \
+    | awk -F'\t' -v k="$k" '$1 == k { print $2 }'
+}
+check_sp_value() { # label · got · want -> one counted assertion
+  n=$((n+1))
+  [ "$2" = "$3" ] || { echo "canary: spawn calibration — $1: got [$2], wanted [$3]"; fail=1; }
+}
+
+# 12a. AC2 — the KNEE, not the maximum, and no clock under the seam: `false` as the spawn command
+#      fails every timed loop, so a verb that timed anything exits 1 instead of picking.
+run_sp_verb GATE_CALIBRATION_RATES=100,190,350,360,355 GATE_SPAWN_CMD=false
+check_sp_value "AC2 rates flat after K=4 pick 4" "$(printf '%s\n' "$SP_OUT" | awk -F'\t' '$1 == "pick" { print $2 }')|$SP_RC" "4|0"
+run_sp_verb GATE_CALIBRATION_RATES=100,190,350,500,700 GATE_SPAWN_CMD=false
+check_sp_value "AC2 rates still rising at K=8 pick 8" "$(printf '%s\n' "$SP_OUT" | awk -F'\t' '$1 == "pick" { print $2 }')|$SP_RC" "8|0"
+run_sp_verb GATE_CALIBRATION_RATES=100,190
+check_sp_value "AC2 a seam naming two rates for five K exits 2" "$SP_RC" 2
+
+# 12b. AC3 — the verb's cache is one line of four TAB fields, and the bar READS it: the row's 8 narrows
+#      to the pick, on the --print-profile keys, its profile line, and a real bar's header.
+run_sp_verb GATE_CALIBRATION_RATES=100,190,350,360,355
+check_sp_value "AC3 the cache holds one line of four fields" \
+  "$(awk -F'\t' 'NF == 4 { c++ } END { print NR "|" c + 0 }' "$SP_CACHE" 2>/dev/null)" "1|1"
+check_sp_value "AC3 --print-profile reads the cached width" "$(read_sp_key width)|$(read_sp_key width_from)" "4|calibrated"
+check_sp_value "AC3 its profile line says calibrated" \
+  "$(case "$(read_sp_key line)" in *'width 4 calibrated,'*) echo yes ;; esac)" yes
+printf '[{"name": "S1", "argv": ["bash", "fx/ok.sh"]}]\n' > "$SP/x/one.json"
+( cd "$SP/r" && env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_PROFILES= GATE_PROFILE= GATE_JOBS= GATE_TURNSTILE=0 \
+    GATE_RUN_ID=sp3 GATE_LEGS="$SP/x/one.json" bash $KIT_REL/run-gates.sh >/dev/null 2>&1 )
+check_sp_value "AC3 a bar's header records width 4 from calibrated" \
+  "$(awk -F'\t' '$1 == "width" || $1 == "width_from" { printf "%s|", $2 }' "$SP/r/.git/gate-run/sp3/header" 2>/dev/null)" "4|calibrated|"
+
+# 12c. AC4 — every failed test leaves the row's 8 and NAMES the test; GATE_JOBS outranks a valid cache.
+check_sp_value "AC4 GATE_JOBS=3 outranks the valid cache" "$(read_sp_key width GATE_JOBS=3)|$(read_sp_key width_from GATE_JOBS=3)" "3|GATE_JOBS"
+read_sp_why() { read_sp_key line | sed -n 's/.*width \([0-9]*\) uncalibrated: \([a-z ]*\),.*/\1 \2/p'; }
+rm -f "$SP_CACHE"
+check_sp_value "AC4 an absent cache leaves width 8, uncalibrated: absent" "$(read_sp_why)" "8 absent"
+printf 'garbage\n' > "$SP_CACHE"
+check_sp_value "AC4 a malformed cache leaves width 8, uncalibrated: malformed" "$(read_sp_why)" "8 malformed"
+#      Stamped with THIS boot where the host reads one, so the age test alone can refuse it: with a `-`
+#      there, a runner that skipped the age test was refused by the boot test instead, for another cause.
+_spboot=-
+{ read -r _spup _ < /proc/uptime; } 2>/dev/null && _spboot=$(( $(date +%s) - ${_spup%%.*} ))
+printf '4\t1=100,2=190,4=350,6=360,8=355\t2020-01-01T00:00:00Z\t%s\n' "$_spboot" > "$SP_CACHE"
+check_sp_value "AC4 a cache written in 2020 leaves width 8, uncalibrated: stale" "$(read_sp_why)" "8 stale"
+if ! { read -r _spup _ < /proc/uptime; } 2>/dev/null; then
+  echo "canary: SKIP arm 12c's other-boot half — this host has no readable /proc/uptime, so the runner skips the boot test and no other boot can be staged"
+else
+  n=$((n+1))
+  _spup=${_spup%%.*}
+  printf '4\t1=100,2=190,4=350,6=360,8=355\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    "$(( $(date +%s) - _spup - 100000 ))" > "$SP_CACHE"
+  [ "$(read_sp_why)" = "8 another boot" ] \
+    || { echo "canary: spawn calibration — AC4 a cache from a boot 100000 s earlier: got [$(read_sp_why)], wanted [8 another boot]"; fail=1; }
+fi
+rm -f "$SP_CACHE"
+
+# 12d. AC5 — the spawn pause HOLDS on a reading over the ratio, every hold ends `drained` or `bound`, and
+#      every leg still reports. The floor is 1 ms through `GATE_SPAWN_FLOOR`, the reading 5 ms through
+#      `GATE_SPAWN_NOW`, the ratio 2: B and C are held while a leg runs and released as it ends.
+printf '1.000\t2026-01-01T00:00:00Z\n' > "$SP/x/floor"
+printf '5000\n' > "$SP/x/now"
+printf 't\t0\t0\twidth=3,timeout=0,wall=0,spawnpause=2\n' > "$SP/x/t2.txt"
+printf '#!/usr/bin/env bash\nsleep 2\n' > "$SP/r/fx/two.sh"
+printf '[{"name": "A5s", "argv": ["bash", "fx/two.sh"]},\n {"name": "B5s", "argv": ["bash", "fx/ok.sh"]},\n {"name": "C5s", "argv": ["bash", "fx/ok.sh"]}]\n' > "$SP/x/ac5.json"
+run_sp_bar() { # run id · manifest · VAR=value… -> SP_OUT (stdout and stderr), SP_RC
+  SP_OUT=$( cd "$SP/r" && env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_WALL= GATE_PROFILE= GATE_JOBS= GATE_TURNSTILE=0 \
+      GATE_PROFILES="$SP/x/t2.txt" GATE_RUN_ID="$1" GATE_LEGS="$2" "${@:3}" bash $KIT_REL/run-gates.sh 2>&1 ); SP_RC=$?
+}
+run_sp_bar ac5s "$SP/x/ac5.json" GATE_SPAWN_FLOOR="$SP/x/floor" GATE_SPAWN_NOW="$SP/x/now"
+_spr="$SP/r/.git/gate-run/ac5s/pauses"
+check_sp_value "AC5 the bar is green" "$SP_RC" 0
+check_sp_value "AC5 every leg prints its verdict" "$(printf '%s\n' "$SP_OUT" | grep -c '^GATE ok ')" 3
+check_sp_value "AC5 at least one hold, each ending drained or bound and held by spawn" \
+  "$(awk -F'\t' '{ c++ } ($6 != "drained" && $6 != "bound") || $7 != "spawn" { b++ } END { print (c > 0 && b + 0 == 0) ? "yes" : "no:" c "/" b }' "$_spr" 2>/dev/null)" yes
+check_sp_value "AC5 one spawn: line counts the holds, and the memory: line counts none" \
+  "$(printf '%s\n' "$SP_OUT" | grep -c '^spawn: [1-9][0-9]* pause(s)')|$(printf '%s\n' "$SP_OUT" | grep -c '^memory: pause off$')" "1|1"
+#      The control: the same reading UNDER the ratio holds nothing.
+printf '1500\n' > "$SP/x/now"
+run_sp_bar ac5c "$SP/x/ac5.json" GATE_SPAWN_FLOOR="$SP/x/floor" GATE_SPAWN_NOW="$SP/x/now"
+check_sp_value "AC5 a reading under the ratio writes no pauses row" \
+  "$(cat "$SP/r/.git/gate-run/ac5c/pauses" 2>/dev/null | wc -l | tr -d ' ')|$(printf '%s\n' "$SP_OUT" | grep -c '^spawn: no pause ')" "0|1"
+
+# 12e. AC6 — no floor recorded: INERT, announced, never a threshold of zero. The reading is far over any
+#      ratio, so a pause that read the absent floor as 0 would hold.
+printf '5000\n' > "$SP/x/now"
+run_sp_bar ac6s "$SP/x/ac5.json" GATE_SPAWN_FLOOR="$SP/x/no-such-floor" GATE_SPAWN_NOW="$SP/x/now"
+check_sp_value "AC6 one NOTE names the spawn pause INERT" "$(printf '%s\n' "$SP_OUT" | grep -c '^run-gates: NOTE .*spawn pause is INERT')" 1
+check_sp_value "AC6 the summary line says INERT" "$(printf '%s\n' "$SP_OUT" | grep -c '^spawn: no spawn floor recorded, so the 2x pause was INERT$')" 1
+check_sp_value "AC6 no pauses row is written and every leg reports" \
+  "$(cat "$SP/r/.git/gate-run/ac6s/pauses" 2>/dev/null | wc -l | tr -d ' ')|$(printf '%s\n' "$SP_OUT" | grep -c '^GATE ok ')" "0|3"
+
+# 12f. S5's SAMPLER, the reading no seam stands in for: a census tick every second times three spawns
+#      against a 1 us floor, which any real spawn exceeds, so C's decision, taken when B ends at 6 s
+#      with A still running, reads the sampler's file and holds until A ends. Without the sampler's
+#      write there is no reading, and C dispatches with nothing held.
+printf '0.001\t2026-01-01T00:00:00Z\n' > "$SP/x/floor1"
+printf '#!/usr/bin/env bash\nsleep "$1"\n' > "$SP/r/fx/nap.sh"
+printf '[{"name": "A6f", "argv": ["bash", "fx/nap.sh", "10"]},\n {"name": "B6f", "argv": ["bash", "fx/nap.sh", "6"]},\n {"name": "C6f", "argv": ["bash", "fx/ok.sh"]}]\n' > "$SP/x/ac6f.json"
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,spawnpause=2\n' > "$SP/x/t2.txt"
+run_sp_bar s5f "$SP/x/ac6f.json" GATE_SPAWN_FLOOR="$SP/x/floor1" GATE_CENSUS_EVERY=1
+check_sp_value "S5 the sampler's own reading holds C, ending drained, held by spawn, and every leg reports" \
+  "$(cut -f6,7 "$SP/r/.git/gate-run/s5f/pauses" 2>/dev/null | tr '\t\n' ': ')|$(printf '%s\n' "$SP_OUT" | grep -c '^GATE ok ')" "drained:spawn |3"
+rm -rf "$SP" 2>/dev/null || true
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

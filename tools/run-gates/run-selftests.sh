@@ -596,10 +596,16 @@ PY
 # (`unread`), or at the first completion after `MEMPAUSE_HOLD` seconds (`bound`); the caller closes
 # one the wall's break left open as `wall`. The knob narrows a pool and never turns a leg into
 # anything: under pressure that never falls the pool drains toward width 1 and keeps moving.
+# A SECOND READING, ONE DECISION (TOOL-aSparedSpawn-2): the spawn pause holds on the same episode
+# machinery while one spawn costs over `SPAWNPAUSE` times `SPAWNPAUSE_FLOOR` microseconds, the reading
+# a builtin takes from the file `SPAWNPAUSE_NOW` names. Off unless the caller sets both the ratio and a
+# floor. An episode records which reading held it, and its counters split by that: the memory ones
+# above count what memory held, `SPAWNPAUSE_N` and `SPAWNPAUSE_HELD_S` what spawns held.
 MEMPAUSE_HOLD=300
 case "${GATE_MEMPAUSE_HOLD:-}" in ''|*[!0-9]*|???????*) ;; *) MEMPAUSE_HOLD=$((10#$GATE_MEMPAUSE_HOLD)) ;; esac
 MEMPAUSE_N=0; MEMPAUSE_HELD_S=0; MEMPAUSE_READ=""; MEMPAUSE_PEAK=""; MEMPAUSE_OPEN=""; MEMPAUSE_OPEN_PEAK=0
 MEMPAUSE_FELL=0; MEMPAUSE_BOUND=0; MEMPAUSE_DRAINED=0; MEMPAUSE_UNREAD=0; MEMPAUSE_WALL=0
+MEMPAUSE_OPEN_BY=""; SPAWNPAUSE_N=0; SPAWNPAUSE_HELD_S=0; SPAWNPAUSE_READ=""; SPAWNPAUSE_PEAK=""
 # read_mem_used — used memory as a whole percent, on stdout and in MEMPAUSE_READ; rc 1 and nothing
 # when no source reads. The host half is `MemTotal` against `MemAvailable`, or `MemFree` where the
 # file has none (on MSYS that IS Windows' available figure); the cgroup half is its usage over its
@@ -635,44 +641,85 @@ read_mem_used() {
   MEMPAUSE_READ=$v
   printf '%s\n' "$v"
 }
-# check_dispatch_pause <running> — rc 0 HOLDS the next dispatch, rc 1 lets it go. First match:
-# off or INERT; no reading (`unread`); at or under the threshold (`fell`); nothing running
-# (`drained`), so a hold never outlives the last job; an episode held MEMPAUSE_HOLD seconds or more
-# (`bound`), tested only here, so it is released at the first decision after the bound; else hold,
-# opening an episode when none is open.
+# read_spawn_now — the spawn pause's reading, microseconds a spawn, in SPAWNPAUSE_READ from the file
+# SPAWNPAUSE_NOW names; rc 1 and empty when that file is absent or holds no whole number.
+read_spawn_now() {
+  local v=""
+  SPAWNPAUSE_READ=""
+  { read -r v < "${SPAWNPAUSE_NOW:-}"; } 2>/dev/null || [ -n "$v" ] || return 1
+  v=${v%$'\r'}
+  case "$v" in ''|*[!0-9]*|?????????????*) return 1 ;; esac
+  SPAWNPAUSE_READ=$(( 10#$v ))
+}
+# check_dispatch_pause <running> — rc 0 HOLDS the next dispatch, rc 1 lets it go. First match: both
+# readings off or INERT; no reading over its threshold (`fell`, or `unread` when a live reading gave
+# none, a spawn reading counted only once an episode it held is open, since the sampler's first tick
+# comes a period after dispatch begins); nothing running (`drained`), so a hold never outlives the
+# last job; an episode held MEMPAUSE_HOLD seconds or more (`bound`), tested only here, so it is
+# released at the first decision after the bound; else hold, opening an episode when none is open.
 check_dispatch_pause() {
-  { [ "${MEMPAUSE:-0}" -gt 0 ] && [ "${MEMPAUSE_INERT:-0}" = 0 ]; } || return 1
-  if ! read_mem_used >/dev/null; then write_pause_row unread; return 1; fi
-  { [ -z "$MEMPAUSE_PEAK" ] || [ "$MEMPAUSE_READ" -gt "$MEMPAUSE_PEAK" ]; } && MEMPAUSE_PEAK=$MEMPAUSE_READ
-  [ -n "$MEMPAUSE_OPEN" ] && [ "$MEMPAUSE_READ" -gt "$MEMPAUSE_OPEN_PEAK" ] && MEMPAUSE_OPEN_PEAK=$MEMPAUSE_READ
-  if [ "$MEMPAUSE_READ" -le "$MEMPAUSE" ]; then write_pause_row fell; return 1; fi
+  local mem=0 spawn=0 by="" gone=""
+  { [ "${MEMPAUSE:-0}" -gt 0 ] && [ "${MEMPAUSE_INERT:-0}" = 0 ]; } && mem=1
+  { [ "${SPAWNPAUSE:-0}" -gt 0 ] && [ -n "${SPAWNPAUSE_FLOOR:-}" ]; } && spawn=1
+  [ "$mem$spawn" != 00 ] || return 1
+  if [ "$mem" = 1 ]; then
+    if read_mem_used >/dev/null; then
+      { [ -z "$MEMPAUSE_PEAK" ] || [ "$MEMPAUSE_READ" -gt "$MEMPAUSE_PEAK" ]; } && MEMPAUSE_PEAK=$MEMPAUSE_READ
+      [ -n "$MEMPAUSE_OPEN" ] && [ "$MEMPAUSE_READ" -gt "$MEMPAUSE_OPEN_PEAK" ] && MEMPAUSE_OPEN_PEAK=$MEMPAUSE_READ
+      [ "$MEMPAUSE_READ" -gt "$MEMPAUSE" ] && by=memory
+    else
+      gone=1
+    fi
+  fi
+  if [ "$spawn" = 1 ]; then
+    if read_spawn_now; then
+      { [ -z "$SPAWNPAUSE_PEAK" ] || [ "$SPAWNPAUSE_READ" -gt "$SPAWNPAUSE_PEAK" ]; } && SPAWNPAUSE_PEAK=$SPAWNPAUSE_READ
+      [ "$SPAWNPAUSE_READ" -gt $(( SPAWNPAUSE * SPAWNPAUSE_FLOOR )) ] && by=${by:+$by+}spawn
+    else
+      case "$MEMPAUSE_OPEN_BY" in *spawn*) gone=1 ;; esac
+    fi
+  fi
+  if [ -z "$by" ]; then
+    if [ -n "$gone" ]; then write_pause_row unread; else write_pause_row fell; fi
+    return 1
+  fi
   if [ "${1:-0}" -le 0 ]; then write_pause_row drained; return 1; fi
   if [ -n "$MEMPAUSE_OPEN" ] && [ $(( EPOCHSECONDS - MEMPAUSE_OPEN )) -ge "$MEMPAUSE_HOLD" ]; then
     write_pause_row bound; return 1
   fi
-  [ -n "$MEMPAUSE_OPEN" ] || { MEMPAUSE_OPEN=$EPOCHSECONDS; MEMPAUSE_OPEN_PEAK=$MEMPAUSE_READ; }
+  [ -n "$MEMPAUSE_OPEN" ] || { MEMPAUSE_OPEN=$EPOCHSECONDS; MEMPAUSE_OPEN_PEAK=${MEMPAUSE_READ:-0}; MEMPAUSE_OPEN_BY=$by; }
+  case "$MEMPAUSE_OPEN_BY" in "$by"|memory+spawn) ;; *) MEMPAUSE_OPEN_BY=memory+spawn ;; esac
   return 0
 }
 # write_pause_row <ended-by> — closes the open episode, a no-op when none is open: one `pauses` row,
-# `<started-s> TAB <ended-s> TAB <held-s> TAB <peak-pct> TAB <threshold> TAB <ended-by>`, when the
-# caller set MEMPAUSE_ROWS, and the counters the summary prints either way.
+# `<started-s> TAB <ended-s> TAB <held-s> TAB <peak-pct> TAB <threshold> TAB <ended-by> TAB <held-by>`,
+# when the caller set MEMPAUSE_ROWS, and the counters the summaries print either way. `<held-by>` is
+# `memory`, `spawn` or `memory+spawn`, appended last so no positional reader moves; the memory
+# counters take an episode memory held, the spawn pair one spawns held.
 write_pause_row() {
   [ -n "$MEMPAUSE_OPEN" ] || return 0
   local now=$EPOCHSECONDS held
   held=$(( now - MEMPAUSE_OPEN ))
-  MEMPAUSE_N=$(( MEMPAUSE_N + 1 )); MEMPAUSE_HELD_S=$(( MEMPAUSE_HELD_S + held ))
-  case "$1" in
-    fell) MEMPAUSE_FELL=$(( MEMPAUSE_FELL + 1 )) ;;
-    bound) MEMPAUSE_BOUND=$(( MEMPAUSE_BOUND + 1 )) ;;
-    drained) MEMPAUSE_DRAINED=$(( MEMPAUSE_DRAINED + 1 )) ;;
-    unread) MEMPAUSE_UNREAD=$(( MEMPAUSE_UNREAD + 1 )) ;;
-    *) MEMPAUSE_WALL=$(( MEMPAUSE_WALL + 1 )) ;;
+  case "$MEMPAUSE_OPEN_BY" in
+    *spawn*) SPAWNPAUSE_N=$(( SPAWNPAUSE_N + 1 )); SPAWNPAUSE_HELD_S=$(( SPAWNPAUSE_HELD_S + held )) ;;
+  esac
+  case "$MEMPAUSE_OPEN_BY" in
+    spawn) ;;
+    *)
+      MEMPAUSE_N=$(( MEMPAUSE_N + 1 )); MEMPAUSE_HELD_S=$(( MEMPAUSE_HELD_S + held ))
+      case "$1" in
+        fell) MEMPAUSE_FELL=$(( MEMPAUSE_FELL + 1 )) ;;
+        bound) MEMPAUSE_BOUND=$(( MEMPAUSE_BOUND + 1 )) ;;
+        drained) MEMPAUSE_DRAINED=$(( MEMPAUSE_DRAINED + 1 )) ;;
+        unread) MEMPAUSE_UNREAD=$(( MEMPAUSE_UNREAD + 1 )) ;;
+        *) MEMPAUSE_WALL=$(( MEMPAUSE_WALL + 1 )) ;;
+      esac ;;
   esac
   if [ -n "${MEMPAUSE_ROWS:-}" ]; then
-    printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$MEMPAUSE_OPEN" "$now" "$held" "$MEMPAUSE_OPEN_PEAK" \
-      "${MEMPAUSE:-0}" "$1" >> "$MEMPAUSE_ROWS" 2>/dev/null || true
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$MEMPAUSE_OPEN" "$now" "$held" "$MEMPAUSE_OPEN_PEAK" \
+      "${MEMPAUSE:-0}" "$1" "${MEMPAUSE_OPEN_BY:-memory}" >> "$MEMPAUSE_ROWS" 2>/dev/null || true
   fi
-  MEMPAUSE_OPEN=""; MEMPAUSE_OPEN_PEAK=0
+  MEMPAUSE_OPEN=""; MEMPAUSE_OPEN_PEAK=0; MEMPAUSE_OPEN_BY=""
 }
 # render_pause_summary — the ONE `memory:` line a run prints after its pool drains, on every run.
 render_pause_summary() {
