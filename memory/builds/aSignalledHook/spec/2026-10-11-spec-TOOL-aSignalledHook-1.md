@@ -1,6 +1,6 @@
 # TOOL-aSignalledHook-1 — a signal-killed pre-push hook refuses the push, and a success with no hook verdict is caught by the lander
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 1 · advances TOOL-aSurfacedLexicon-25
+**Status:** CLOSED · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 1 · advances TOOL-aSurfacedLexicon-25
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-11-build-TOOL-aSignalledHook-1-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSignalledHook-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aSignalledHook-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aSignalledHook-1-brief.md) | research | — |
+| [2026-10-11-review-TOOL-aSignalledHook-1-closing-diff-round1.md](../reviews/2026-10-11-review-TOOL-aSignalledHook-1-closing-diff-round1.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 
@@ -33,11 +34,14 @@ then the remote contacted, at a date with no run log to confirm the cause; this 
   the foreground, so a trapped signal is handled at once rather than after the bar returns, and the
   hook's exit is still the bar's status. AC1, AC2, AC7.
 - **S3** — the hook clears an allow record `pre-push-allow` in its git dir on every run, and writes
-  `<pushed sha><TAB><gate run id>` there at its one success exit on a default-branch push, never on
-  any other exit. AC3, AC4.
+  `<pushed sha><TAB><gate run id>` there at its success exit on a default-branch push and at its
+  `covered` exit, which allows a push whose tree already carries a green, never on any other exit.
+  AC3, AC4, AC9.
 - **S4** — `tools/push-main.sh` clears that record before every push on both the attended path and
-  `--land`. On a git exit of 0 it requires a record naming the pushed HEAD; without one it prints a
-  `landed UNGATED` line naming the hook, writes no lander marker and exits 4. AC3, AC4.
+  `--land`. On a git exit of 0 it requires a record naming the pushed sha, captured before the push;
+  without one it prints a `landed UNGATED` line naming the hook, writes no lander marker and exits 4.
+  When the remote already held the pushed sha before the push, nothing was pushed and no record is
+  owed, and it says so. A `signalled` refusal is reported as such. AC3, AC4, AC8.
 - **S5** — the run-log suite's TERM arm and its exit-site table move to the new behaviour: TERM while
   the bar runs ends the hook promptly, clean, as `refuse-signal`, with the bar stopped. AC5.
 - **S6** — the hook header's "NO SIGNAL TRAP, ON PURPOSE" paragraph is replaced by what is true now,
@@ -138,7 +142,8 @@ Under this repo's relative `core.hooksPath` each tree runs its own copy, so the 
   would have ended. Red when: the trap is deferred behind a foreground bar until it returns.
 - **AC3** — When `push-main.sh` pushes through a hook that exits 0 without writing `pre-push-allow`
   (the observable a KILLed hook leaves on Git for Windows), it prints `landed UNGATED`, exits 4 and
-  writes no lander marker. Red when: it accepts git's exit 0 alone and prints `landed`.
+  writes no lander marker, on the attended path and on `--land`. Red when: it accepts git's exit 0
+  alone and prints `landed`, on either path.
   fixture: a substitute hook, so the arm runs on any platform; a real KILL reads as success only on
   Git for Windows.
 - **AC4** — When a green push lands through the real hook, `pre-push-allow` names the pushed HEAD and
@@ -151,13 +156,19 @@ Under this repo's relative `core.hooksPath` each tree runs its own copy, so the 
   `signalled`. Red when: an early signal exits through bash's default disposition.
 - **AC7** — When the stub runner exits `254`, the status bash returns once its fork retries are spent,
   the push is refused. Red when: a non-zero bar status other than 1 reads as a pass.
+- **AC8** — When `push-main.sh` is re-run with the remote already at HEAD, it says nothing was pushed
+  and exits 0. Red when: a push of nothing, which leaves no `pre-push-allow`, is reported
+  `landed UNGATED`.
+- **AC9** — When a push is `covered` by a recorded green and runs no bar, the hook still writes
+  `pre-push-allow` naming the pushed commit. Red when: the covered exit writes none and every covered
+  landing reads UNGATED.
 
 ## 7. Gates
 
 `pre-push self-test` · `pre-push run-log line` · `push-main self-test`
 
-New arm: .githooks/pre-push.test.sh · covers AC1 AC2 AC6 AC7 · a stub runner that sleeps, signalled mid-push; a runner exiting 254 · none
-New arm: tools/push-main.test.sh · covers AC3 AC4 · a substitute hook exiting 0 with no allow record; the real hook as control · none
+New arm: .githooks/pre-push.test.sh · covers AC1 AC2 AC6 AC7 AC9 · a stub runner that sleeps, signalled mid-push; a runner exiting 254; a covered push in the BG block · none
+New arm: tools/push-main.test.sh · covers AC3 AC4 AC8 · a substitute hook exiting 0 with no allow record, on both paths; the real hook as control; a re-run with nothing to push · none
 New arm: .githooks/pre-push.runlog.test.sh · covers AC5 · the existing TERM arm, its assertions inverted · none
 
 ## 8. Open questions
@@ -169,6 +180,9 @@ New arm: .githooks/pre-push.runlog.test.sh · covers AC5 · the existing TERM ar
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · first draft.
+- rev-2 · 2026-10-11 · S3 S4 AC3 AC8 AC9 §7 · closing review round 1: the covered exit writes the
+  allow record, a push of nothing is not UNGATED, the pushed sha is captured before the push, and the
+  `--land` path gets its own arm.
 
 ## 10. Reuse audit
 

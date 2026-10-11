@@ -39,8 +39,8 @@
 #
 # WHAT THIS DOES NOT CHECK. Whether a line MEANS anything past the fields named here: the run model is
 # a later unit. The hook's gating decisions as such, which `pre-push.test.sh` grades. A KILL, which
-# runs no trap. Wall time, except in AC3, whose verdict is "the hook ended before its 20 s bar could
-# have" and not a threshold. The lexer is a COPY of the one in the gate runner's run-log suite,
+# runs no trap. Wall time, except in AC3, which applies a 15 s threshold against a 20 s stub bar:
+# a hook that waited the bar out reds it. The lexer is a COPY of the one in the gate runner's run-log suite,
 # changed to key a site on its CODE and not its comment, because kits do not source each other's
 # tests; each copy is graded by its own staged arms.
 set -u

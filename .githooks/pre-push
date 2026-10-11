@@ -1980,6 +1980,10 @@ if [ -n "$_cov_from" ]; then
   echo "pre-push: covered on $def push (${main_local:0:8}) — tree ${_tip_tree:0:8} already carries a $bg_kind green: $_cov_from sha ${bg_sha:0:8} run ${bg_run:-none} by ${bg_by:-none} — bar: $bar_label — no bar runs"
   [ -z "$DECIDE" ] || print_decision covered "$_cov_path"
   [ -z "$PUSH_BAR" ] || { printf '%s\t%s\t%s\n' "$RUNLOG_BAR" "$bar_path" "$bar_blob" > "$PUSH_BAR"; } 2>/dev/null
+  # A COVERED PUSH IS AN ALLOWED ONE (TOOL-aSignalledHook-1, closing review round 1): the tree already
+  # carries a green, so the allow record is written here exactly as at the bar's success exit, naming
+  # the run whose green covers it. Without it the lander reports every covered landing UNGATED.
+  [ -z "$PUSH_ALLOW" ] || { printf '%s\t%s\n' "$main_local" "${bg_run:-covered}" > "$PUSH_ALLOW"; } 2>/dev/null
   RUNLOG_DECISION=covered; RUNLOG_CLEAN=1; exit 0
 fi
 [ -n "$_cov_bars" ] && [ -n "$_cov_why" ] && echo "pre-push: not covered — ${_cov_why#; }"

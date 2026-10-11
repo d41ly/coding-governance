@@ -1902,6 +1902,12 @@ case "$(awk -F'\t' '{print NF"|"$1"|"$2}' "$bg_gd/pre-push-bar" 2>/dev/null)|$(t
   "3|default|$KIT_REL/$RUN_GATES/run-gates.sh|"*"ev=end"*"exit=clean"*"decision=covered"*) ok "BG AC11 a covered push writes pre-push-bar's three fields and an END with decision=covered exit=clean" ;;
   *) bad "BG AC11 pre-push-bar or the END line is wrong: $(cat "$bg_gd/pre-push-bar" 2>/dev/null) / $(tail -1 "$bg_gd/runlog/pushes.log" 2>/dev/null)" ;;
 esac
+# SG covered (TOOL-aSignalledHook-1, closing review round 1): a covered push is an ALLOWED one, so it
+# leaves the allow record push-main requires, naming the pushed commit. Without it the lander read
+# every covered landing as UNGATED.
+[ "$(cut -f1 "$bg_gd/pre-push-allow" 2>/dev/null)" = "$(git rev-parse HEAD)" ] \
+  && ok "SG covered — a covered push writes pre-push-allow naming the pushed commit" \
+  || bad "SG covered — expected pre-push-allow naming $(git rev-parse --short HEAD), got: $(cat "$bg_gd/pre-push-allow" 2>/dev/null || echo '<absent>')"
 set_bg_remote; git checkout -q -b Y; echo 2 >> src/x.sh; git commit -qam Y; run_bg_push; set_bg_remote
 git checkout -q main; git merge -q --no-ff Y -m "merge Y" >/dev/null 2>&1; echo 3 >> src/x.sh; git commit -qam byte
 _m0=$(read_bg_marks); run_bg_push
