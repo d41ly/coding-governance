@@ -1,11 +1,11 @@
 # Session kickoff manifest — coding-governance
 
-<!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
+<!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-11T00:03:28+03:00 @ fafaa8b4f54b429a666cb2b2652461a4d554c090
+last-audit: 2026-10-11T10:11:31+03:00 @ 4617f259a88e844080669830383a5905f0279243
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: fafaa8b4f54b429a666cb2b2652461a4d554c090
+last-body-change: 4617f259a88e844080669830383a5905f0279243
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -25,17 +25,17 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 
 ## §A — Task (the agent DERIVES this per kickoff — the user does NOT fill it)
 
-Derived from the `/session-kickoff` message plus the adjacent memory (`memory/DECISIONS.md`,
-`memory/backlog/`, `memory/builds/<slug>/`) and the code. The field set below is SEALED — check 10
-byte-compares it against the contract `manifest-check.sh` carries, so editing it here reds the bar.
-Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`. The tier lives in
-§B's tier rule, not here.
+Derived per kickoff from the `/session-kickoff` message, `memory/` and the code. The region below is
+SEALED: check 10 byte-compares it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`,
+which restores it. The tier is §B's.
 
 <!-- kickoff:task -->
 > - **Title:** …
 > - **Goal (1–2 sentences):** …
 > - **IN scope:** …
 > - **OUT / non-goals** (explicit cut-line): …
+> - **To-do:** (the steps in order, each naming what it changes) …
+> - **Reuse:** (each seam this extends, by path, or "no seam fits" with the probe's evidence) …
 > - **Acceptance check** (the observation that proves THIS change — a test it adds, a gate it
 >   moves, an observed behavior; *not* an unrelated green check): …
 > - **Gates it must pass:** …

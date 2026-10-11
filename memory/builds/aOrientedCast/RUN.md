@@ -31,3 +31,7 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 ## Parked
 
 2026-10-11T06:09:33Z rescope · item add TOOL-aOrientedCast-9 · reason the M2 cross-read found that no unit makes the unattended Skill and verbs pass roles to the harnesses, so once the write gate and spawn guard land every untyped unattended builder is refused, gov's own concurrent runs included; inside brief item 5 and the confirmed goal (attended or unattended)
+
+2026-10-11T06:49:12Z dispatch · item 4617f259 KICK-aOrientedCast-1 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/MANIFEST-TEMPLATE.md memory/guides/SESSION-KICKOFF.md WIRE-INTO-PROJECT.md memory/map/features/session-kickoff.md memory/map/generated/symbols.json memory/builds/aOrientedCast/spec/2026-10-11-spec-KICK-aOrientedCast-1.md memory/builds/aOrientedCast/build/2026-10-11-build-KICK-aOrientedCast-1-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-11T06:49:24Z brief · item KICK-aOrientedCast-1 · reason 8fe392978328 memory/builds/aOrientedCast/prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md

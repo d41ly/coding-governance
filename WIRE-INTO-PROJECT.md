@@ -725,7 +725,10 @@ the INVOKING directory, not from its own location — run it with the cwd inside
    `## Node registry` names the project's nodes, read by the checker's `--card` verbs for the
    session card's `node —` cell. Without it every card the project writes reads `node — UNKNOWN:
    no registry`, and nothing else fails: the key is what the version WARN is now for.
-6. Bump the manifest marker to `kickoff-manifest: v1.4` **LAST** — the bump silences the kit's
+5c. Re-paste the sealed region from `--task-skeleton` into §A (v1.5) — it gained `**To-do:**` and
+   `**Reuse:**`, and the append refuses a kickoff body without all eight fields filled. Until the
+   marker moves, check 10 still passes the format-1.4 region and prints a NOTE naming this step.
+6. Bump the manifest marker to `kickoff-manifest: v1.5` **LAST** — the bump silences the kit's
    format WARN, the only standing signal that the body still predates the ratchet. The WARN compares
    the marker with the checker's `MANIFEST_FORMAT`, never with `KIT_MANIFEST_VERSION`: that one is
    the kit's vintage and moves whenever its bytes do, with no upgrade step owed.
@@ -1206,7 +1209,7 @@ it.
 <project>/
 ├── AGENTS.md / CLAUDE.md        # (optional) project charter / agent-instruction file (agent-instructions kit)
 ├── docs/PARALLEL.md             # governance playbook, filled (governance-template marker kept) — ONE file; §2 ships no companion
-├── memory/guides/SESSION-KICKOFF.md  # kickoff manifest (v1.4: audit block + sealed §A region + registry key) — the engine reads this
+├── memory/guides/SESSION-KICKOFF.md  # kickoff manifest (v1.5: audit block + sealed eight-field §A region + registry key) — the engine reads this
 ├── <prefix>/manifest-check.sh # ratchet gate — engine-identical copy (overwrite wholesale on kit updates)
 ├── .gitattributes               # EOL rules — the checker (+ the memory tree if §3 adopted)
 ├── .claude/settings.json        # the hooks a default install wires (§5's table), by settings-merge

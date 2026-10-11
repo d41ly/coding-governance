@@ -3138,6 +3138,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "check_card_task",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "check_card_unchanged",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
@@ -13636,6 +13641,11 @@
       "id": "render_symbols_json",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "render_task_section",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
       "id": "render_template",
