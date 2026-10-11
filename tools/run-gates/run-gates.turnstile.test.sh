@@ -1392,6 +1392,35 @@ mkdir -p "$DK/planted42"; printf '%s' "$dead42" > "$DK/planted42/pid"; printf '%
 run_docs_bar "$R42" "$tmp/out42"
 grep -q 'sweeping the docs beacon of a dead holder' "$tmp/out42" && [ ! -e "$DK/planted42" ] \
   && ok "a dead docs beacon was swept by the next doc-only bar" || nope "a dead docs beacon was left standing"
+
+# ================= TOOL-aPairedSlots-5: one slot per worktree =====================================
+# Two bars in ONE worktree would share every file under its git dir, so the claim refuses a second
+# slot to a worktree that holds one; two worktrees of one repository are two git dirs and run at once.
+
+# ---- 43: one worktree holds one slot, two worktrees of one repository hold two (AC1) ---------------
+R43=$tmp/wtOne; mk_repo "$R43"; S43=$tmp/shared43; mkdir -p "$S43"
+# AUTOCRLF OFF BEFORE THE CHECKOUT: a host whose global config converts line endings checks the
+# second worktree out with CRLF, and its runner then refuses the table on a carriage return after its 90 (observed on node a).
+( cd "$R43" && git config core.autocrlf false && git worktree add -q -b w2 "$tmp/wtTwo" ) >/dev/null 2>&1
+run_slot_bar "$R43" "$S43" "$tmp/out43a"; p43a=$SLOT_PID; wait_registered "$S43" 1 "$p43a"
+h43a=$(cat "$BS/pid" 2>/dev/null)
+run_slot_bar "$R43" "$S43" "$tmp/out43b"; p43b=$SLOT_PID
+i43=0; while ! grep -q 'queued at position' "$tmp/out43b" 2>/dev/null && kill -0 "$p43b" 2>/dev/null && [ "$i43" -lt 2400 ]; do sleep 0.1; i43=$((i43 + 1)); done
+peak43=$(peak "$S43")
+: > "$S43/go"; wait "$p43a" "$p43b" 2>/dev/null
+[ "$peak43" = 1 ] && ok "two bars in one worktree never held at once (peak 1)" || nope "two bars in one worktree held at once (peak $peak43)"
+grep -q "held, one by this worktree — .*pid $h43a" "$tmp/out43b" && ok "the second bar's queue line names this worktree's holder" \
+  || { nope "the second bar's queue line did not name this worktree's holder"; grep -E 'held|queued' "$tmp/out43b" | sed 's/^/      /'; }
+S43w=$tmp/shared43w; mkdir -p "$S43w"
+if [ -d "$tmp/wtTwo/$KIT_REL" ]; then
+  run_slot_bar "$R43" "$S43w" "$tmp/out43c"; p43c=$SLOT_PID; wait_registered "$S43w" 1 "$p43c"
+  run_slot_bar "$tmp/wtTwo" "$S43w" "$tmp/out43d"; p43d=$SLOT_PID; wait_registered "$S43w" 2 "$p43d"
+  peak43w=$(peak "$S43w")
+  : > "$S43w/go"; wait "$p43c" "$p43d" 2>/dev/null
+  [ "$peak43w" = 2 ] && ok "two worktrees of one repository held at once (peak 2)" || nope "two worktrees of one repository did not hold at once (peak $peak43w)"
+else
+  nope "the second worktree was not created, so the two-worktree half grades nothing"
+fi
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "turnstile: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }
 [ "$bad" = 0 ] && echo "PASS ($n assertions)"

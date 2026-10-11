@@ -1241,6 +1241,26 @@ scan_dead_docs_beacons() { # -> removes each docs beacon whose pid is dead or wh
   done
   return 0
 }
+# ONE SLOT PER WORKTREE (TOOL-aPairedSlots-5). Everything a bar keeps under its worktree's git dir —
+# the ledger, the run records and `current`, the summary and failure files, the gate logs, the greens
+# and the queue files — assumes one writer, which the single-holder turnstile guaranteed. Two
+# worktrees have two git dirs, so admitting two bars keeps that true for them; two bars in ONE
+# worktree would break it. So above one slot the head does not claim while a slot's `repo` names this
+# run's top level, and waits as it waits for a full host. At one slot the head claims only an empty
+# slot 1, so the predicate is never reached. A slot with no readable `repo`, as an older runner's
+# beacon may be, does not block: it cannot be told apart from another worktree's.
+TS_SAME=""
+check_worktree_unheld() { # -> rc 0 when no slot names this run's top level; rc 1 with that slot's path in TS_SAME
+  local d r
+  TS_SAME=""
+  [ "${TS_SLOTS:-1}" -gt 1 ] || return 0
+  for d in ${TS_SLOT_DIRS[@]+"${TS_SLOT_DIRS[@]}"}; do
+    [ -d "$d" ] || continue
+    r=$(cat "$d/repo" 2>/dev/null)
+    if [ -n "$r" ] && [ "$r" = "$ROOT" ]; then TS_SAME=$d; return 1; fi
+  done
+  return 0
+}
 resolve_free_slot() { # -> rc 0 with TS_DIR and TS_SLOT set by the first slot whose mkdir succeeds, in slot order
   local i=0 d
   for d in ${TS_SLOT_DIRS[@]+"${TS_SLOT_DIRS[@]}"}; do
@@ -1543,7 +1563,7 @@ elif [ -n "$TS_DIR_C" ]; then
     # the pid, which is the whole difference between a fixed wedge and a wedge nobody can see was
     # fixed. TOOL-aBoundedCeiling-12.
     if [ -n "$TS_TICKET" ] && [ "$(ls -1 "$TS_Q" 2>/dev/null | LC_ALL=C sort | head -1)" = "$(basename "$TS_TICKET")" ] \
-       && resolve_free_slot; then
+       && check_worktree_unheld && resolve_free_slot; then
       printf '%s' "$(ts_now)" > "$TS_DIR/heartbeat" 2>/dev/null || true
       printf '%s' "$$"        > "$TS_DIR/pid" 2>/dev/null || true
       # The holder's name, for a waiter's queue line and a nested run's, and the TTL a waiter judges
@@ -1657,6 +1677,8 @@ elif [ -n "$TS_DIR_C" ]; then
         unset _ts_d
         if [ "$TS_HELD_N" -ge "$TS_SLOTS" ]; then
           echo "run-gates: $TS_HELD_N of $TS_SLOTS bar slots on this host are held — $ts_names — queued at position $pos (waited ${TS_WAITED}s)" >&2
+        elif ! check_worktree_unheld; then
+          echo "run-gates: $TS_HELD_N of $TS_SLOTS bar slots on this host are held, one by this worktree — $ts_names — queued at position $pos (waited ${TS_WAITED}s)" >&2
         else
           echo "run-gates: $TS_HELD_N of $TS_SLOTS bar slots on this host are held, and a ticket sorts ahead of this one — queued at position $pos (waited ${TS_WAITED}s)" >&2
         fi

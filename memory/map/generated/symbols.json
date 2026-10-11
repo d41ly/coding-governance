@@ -4543,6 +4543,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "check_worktree_unheld",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "check_written_asks",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
