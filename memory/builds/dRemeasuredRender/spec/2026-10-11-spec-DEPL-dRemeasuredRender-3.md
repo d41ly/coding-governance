@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-DEPL-dRemeasuredRender-1-runlog-c922c7e2.md](../build/2026-10-11-build-DEPL-dRemeasuredRender-1-runlog-c922c7e2.md) | journal | DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 DEPL-dRemeasuredRender-4 TOOL-dRemeasuredRender-1 |
 | [2026-10-11-build-DEPL-dRemeasuredRender-3-1-acceptance-ledger.md](../build/2026-10-11-build-DEPL-dRemeasuredRender-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-DEPL-dRemeasuredRender-3-1-build-brief.md](../prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-3-1-build-brief.md) | journal | — |
 

@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+landed-by: attended
+landed-derived: 6521b2cc86fb1dcfacd3efab7f5b85f3f54d7d4a 6521b2cc86fb1dcfacd3efab7f5b85f3f54d7d4a
 asks-at-landing: TOOL-dRemeasuredRender-2=OPEN TOOL-dRemeasuredRender-3=OPEN TOOL-dRemeasuredRender-4=OPEN
 units-at-landing: TOOL-dRemeasuredRender-1 DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 DEPL-dRemeasuredRender-3 DEPL-dRemeasuredRender-4
 hold-run: 
@@ -24,8 +26,8 @@ gates-run: unattended-179171228056387817732-1509 81b937f4
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 9b37cb4757b7fd49930df79191a0c2571c50ba6e
-phase: HELD
+witness: 6521b2cc86fb1dcfacd3efab7f5b85f3f54d7d4a
+phase: LANDED
 may: none
 mode: prompt
 run-branch: refs/heads/branch/practical-borg-90829d

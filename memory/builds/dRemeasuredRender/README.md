@@ -77,7 +77,7 @@ ids DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 DEPL-dRemeasuredRender-3 D
 | [DEPL-dRemeasuredRender-4 — the closing review's mediums and lows: the hole verdict waits for the verify pass, and every KEPT reason has an arm](spec/2026-10-11-spec-DEPL-dRemeasuredRender-4.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 4 record folder(s).
+Records: 13 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
