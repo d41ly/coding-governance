@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-5 — the held self-test tier in WSL2, from an ext4 mirror, with combined verdicts
 
-**Status:** INPROGRESS · rev-2 · 2026-10-10 · node a · Tier-2 · base 22efab65 · streams tooling · order 1 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 1 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -22,17 +22,23 @@ hours are expected to fall to tens of minutes (estimate, not measured; `research
 - **S1** — A wrapper, `tools/run-gates/run-held-wsl.sh`, run from the Windows side. It refuses a dirty
   tree, pins `S` and the tree fingerprint, partitions the held legs, runs the two halves concurrently
   and hands both to the combiner. It never edits `tools/run-gates/run-gates.sh` behaviour: each half
-  is an ordinary runner invocation over a partition manifest passed through `GATE_LEGS`. Observed by
-  AC1, AC6.
+  is an ordinary runner invocation over a partition manifest passed through `GATE_LEGS`, with
+  `GATE_FULL=1 GATE_SELFTESTS=1` and `GATE_REUSE` unset. Each partition row runs its leg through the
+  wrapper's `--leg` shim, which unsets `GATE_LEGS` and resolves a `python`/`python3` launcher before
+  `exec`: the runner exports `GATE_LEGS` to every leg, and the two canaries read it as their subject,
+  so the gov canary refused a subset and the run-gates canary graded one. Observed by AC1, AC6.
 - **S2** — The WSL mirror. A `--setup` mode clones once from the Windows primary into the declared
   ext4 path, points `origin` at the GitHub URL, and adds a remote `win` used only as a fetch source.
   Every run does `git fetch win` and a detached `git worktree add` at `S` inside the mirror. No WSL
   process writes to the Windows `.git`: no `prune`, `gc`, `worktree` verb, or fetch into it, and no
   `GIT_DIR` or `GIT_COMMON_DIR` crosses into `wsl.exe`. Observed by AC3.
-- **S3** — The Windows-only declaration, `tools/windows-only-legs.txt`: one row per held leg that must
-  run natively, each with its reason. Every row must name a `subject: kit` leg of
-  `tools/gate-legs.json`, so a stale row reds. The partition is derived from it and the manifest,
-  never typed twice. Observed by AC1.
+- **S3** — The Windows-only declaration, `tools/run-gates/windows-only-legs.txt`: one row per held leg
+  that must run natively, each with its reason. It is gov's declaration over gov's legs, so the kit
+  withholds it from adopters as `project-owned`, as it does `selftest-budgets.txt`, and the partition
+  refuses by name where it is absent. The HELD population is the runner's own predicate, a leg whose
+  `subject` is `kit` or whose `chunk` is `selftests`, so the six repo-subject self-tests are partitioned
+  too. Every row must name a held leg of `tools/gate-legs.json`, so a stale row reds. The partition is
+  derived from it and the manifest, never typed twice. Observed by AC1.
 - **S4** — The combiner, `tools/run-gates/held_halves.py`, with a `--selftest` arm set. It refuses
   unless the union of both halves' legs equals the held population exactly once, both verdict files
   exist, both fingerprints equal the pinned one, the WSL half's `HEAD` equals `S`, neither half moved
@@ -45,7 +51,9 @@ hours are expected to fall to tens of minutes (estimate, not measured; `research
 - **S6** — Paired runs. A `--paired` mode runs every Linux-safe held leg on BOTH hosts at one `S` and
   appends one per-leg verdict row per host to a machine-local parity file in the Windows common git
   dir. The combiner refuses to write `held-green` until the declared number of consecutive paired
-  runs at the current manifest blob agree on every compared leg, and names each disagreeing leg.
+  runs at the current manifest blob agree on every compared leg, and names each disagreeing leg. A
+  paired run itself writes no `held-green`: its Windows half runs the whole held population, its
+  verdict is that half's, and the record comes from a plain run once parity is proven.
   Observed by AC5.
 - **S7** — The host declaration, PER NODE (owner ruling F2). Each node declares its own distro and
   mirror path in a node-local, untracked conf, `gate-wsl.conf` in that clone's common git dir, read
@@ -84,12 +92,15 @@ hours are expected to fall to tens of minutes (estimate, not measured; `research
 
 ### Data model
 
-The partition is two JSON manifests, each a filtered copy of the `subject: kit` rows of
-`tools/gate-legs.json`, written to scratch and never committed. Each half writes the runner's normal
-`gate-run/<runid>/` directory in its own git dir. The combiner reads each half's runner stdout through
-`parse_verdicts` (`tools/run-gates/profile_bar.py:103`), which already splits on LF only and keeps one
-verdict per leg, and reads each half's `verdict` file for `verdict`, `fingerprint_end` and
-`tree_moved`.
+The partition is two JSON manifests, each a filtered copy of the held rows of
+`tools/gate-legs.json` whose `argv` is prefixed by the `--leg` shim, written to scratch and never
+committed. Each half writes the runner's normal `gate-run/<runid>/` directory in its own git dir, and
+the wrapper copies that run's `verdict` and `header`, the runner's stdout and a `meta` file (host, run
+id, sha, the full manifest's blob read at `HEAD` of the half's tree, wall seconds) into a half
+directory; the WSL half's comes back to Windows as a `tar` stream over `wsl.exe`. The combiner reads
+each half's runner stdout through `parse_verdicts` (`tools/run-gates/profile_bar.py:103`), which
+already splits on LF only and keeps one verdict per leg, reads each half's `verdict` file for
+`verdict`, `fingerprint_end` and `tree_moved`, and its `header` for `head`.
 
 `held-green`, written to the Windows common git dir, carries tab-separated `sha`, `fingerprint`,
 `manifest_blob` (the FULL manifest's), `hosts windows:<runid>,wsl:<runid>`, `parity <n>/<k>` and
@@ -125,9 +136,11 @@ undeclared distro runs `wsl.exe` with no `-d`, so WSL picks its own default.
    `FP` from `tools/run-gates/gate-fingerprint.sh`; its rev and working-tree forms agree on a clean
    tree (`gate-fingerprint.sh:13-17`).
 2. `held_halves.py --partition` writes the two manifests and prints both blobs.
-3. WSL half: `wsl.exe -d <distro> -- bash <mirror>/tools/run-gates/run-held-wsl.sh --half <S>`, which
-   fetches from `win`, verifies `S`, adds a detached worktree, strips the environment per S8, and runs
-   the runner over the WSL partition with the self-tests switched on. The mirror's turnstile beacon
+3. WSL half: with `WSLENV` emptied, `wsl.exe -d <distro> -e git -C <mirror> fetch win` and a detached
+   `worktree add` at `S`, then `wsl.exe -d <distro> -e bash <worktree>/tools/run-gates/run-held-wsl.sh
+   --half <S> …`, so the half runs the wrapper as committed at `S` rather than the mirror's checkout.
+   It verifies `HEAD` is `S`, strips the environment per S8, and runs the runner over the WSL
+   partition with the self-tests switched on. The mirror's turnstile beacon
    serialises WSL halves from every Windows worktree.
 4. Windows half, concurrently: the runner over the Windows partition, inside the scratch clone.
 5. `held_halves.py --combine` grades both halves and, on acceptance with parity proven, writes
@@ -140,8 +153,10 @@ refuses.
 ### Inventory
 
 New identifiers, each under the lexicon's verb table: `build_partition`, `check_halves`,
-`write_held_stamp`, `add_parity_rows`, `resolve_wsl_host` and `main` in the combiner; `run_half` in
-the wrapper. The node-local keys are `GATE_WSL_DISTRO` and `GATE_WSL_MIRROR`; the shared keys are
+`write_held_stamp`, `add_parity_rows`, `resolve_wsl_host` and `main` in the combiner, with the
+helpers `load_manifest`, `load_half`, `parse_conf`, `measure_parity` and `run_selftest`; `run_half`,
+`run_leg` and `print_refusal` in the wrapper. The new held leg is `held-halves selftest`, unguarded as
+`review-replay selftest` is, so no live spec owes it a §7 entry by guard. The node-local keys are `GATE_WSL_DISTRO` and `GATE_WSL_MIRROR`; the shared keys are
 `GATE_WSL_MIRROR_DEFAULT` and `GATE_WSL_PARITY_RUNS`. The node-local file is `gate-wsl.conf`.
 
 ### Rollout
@@ -154,7 +169,8 @@ that will run it, the owner writes that node's `gate-wsl.conf` or accepts the pr
 
 - `tools/run-gates/run-held-wsl.sh` — new: setup, run, paired and half modes.
 - `tools/run-gates/held_halves.py` — new: partition, combine, parity and `--selftest`.
-- `tools/windows-only-legs.txt` — new: the declared native legs, with reasons.
+- `tools/run-gates/windows-only-legs.txt` — new: the declared native legs, with reasons.
+- `tools/run-gates/kit.toml` — the leg's `[[gate_leg]]` row, and the declaration withheld as `project-owned`.
 - `tools/gate-legs.json` — one held leg for the combiner's `--selftest`.
 - `tools/run-gates/selftest-budgets.txt` — that leg's budget row.
 - `tools/run-gates/run-gates.sh` — the kit version line only, if `check-kit-versions.sh` asks.
@@ -195,7 +211,7 @@ that will run it, the owner writes that node's `gate-wsl.conf` or accepts the pr
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `held_halves.py --selftest` runs, its partition arms show every `subject: kit` leg of
+- **AC1** — When `held_halves.py --selftest` runs, its partition arms show every held leg of
   `tools/gate-legs.json` lands in exactly one half, and a row of `windows-only-legs.txt` naming
   no such leg is refused with exit 2 naming the row.
   Red when: a leg is in both halves or neither, or a stale row passes.
@@ -266,6 +282,13 @@ New arm: tools/run-gates/held_halves.py --selftest · covers AC1 AC2 AC5 AC8 · 
   declared per node in a node-local `gate-wsl.conf` in the clone's common git dir, the shared
   `.githooks/gate-env.sh` keeps only the default mirror and the parity count, an undeclared node
   falls back and says so, and the registry column and an ignored sibling file are rejected.
+- rev-3 · 2026-10-11 · §2 §4 §6 S1 S3 S6 AC1 · the build pass. The held population is the runner's
+  own predicate, kit subject or `selftests` chunk, not kit subject alone, which left six held legs in
+  neither half. Partition rows run through a `--leg` shim that drops `GATE_LEGS`, because the runner
+  exports it to every leg and both canaries read it as their subject. The Windows-only declaration
+  moves into the kit directory as `project-owned`, beside `selftest-budgets.txt`, so the kit
+  descriptor rather than a registry exemption claims it. A paired run writes no `held-green`. The
+  half directories and their `tar` hand-back are named.
 
 ## 10. Reuse audit
 
