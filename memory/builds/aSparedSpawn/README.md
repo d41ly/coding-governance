@@ -73,7 +73,7 @@ ids TOOL-aSparedSpawn-15
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aSparedSpawn-1 — the reuse key hashes what a dirty guarded file holds, and the toolchain it ran under](spec/2026-10-09-spec-TOOL-aSparedSpawn-1.md) | 1 | 2 | CLOSED | rev-3 | 2026-10-09 |
-| [TOOL-aSparedSpawn-2 — the pool width comes from a measured spawn calibration, and dispatch pauses on spawn pressure](spec/2026-10-09-spec-TOOL-aSparedSpawn-2.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-10-09 |
+| [TOOL-aSparedSpawn-2 — the pool width comes from a measured spawn calibration, and dispatch pauses on spawn pressure](spec/2026-10-09-spec-TOOL-aSparedSpawn-2.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-10-11 |
 | [TOOL-aSparedSpawn-5 — the held self-test tier in WSL2, from an ext4 mirror, with combined verdicts](spec/2026-10-09-spec-TOOL-aSparedSpawn-5.md) | 1 | 2 | OPEN | rev-2 | 2026-10-10 |
 | [TOOL-aSparedSpawn-6 — the unattended driver as a library, called in process by its suite](spec/2026-10-09-spec-TOOL-aSparedSpawn-6.md) | 1 | 2 | OPEN | rev-1 | 2026-10-09 |
 | [TOOL-aSparedSpawn-8 — fork-free readers, a spawn-idiom lint that stops regrowth, and a fork-count arm](spec/2026-10-09-spec-TOOL-aSparedSpawn-8.md) | 1 | 2 | OPEN | rev-2 | 2026-10-10 |
