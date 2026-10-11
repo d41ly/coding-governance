@@ -59,3 +59,7 @@ base: 2785323db4e72b8ae2f26660cc3947165a6258fc
 2026-10-11T07:20:26Z rescope · item add TOOL-aTrimmedHook-6 · reason closing review M1, M2, L3, L4: the hygiene-side minors, batched; disjoint from the -7 batch
 
 2026-10-11T07:20:34Z rescope · item add TOOL-aTrimmedHook-7 · reason closing review M3, L1, L5, L2: the generator and manifest-check minors, batched; disjoint from the -6 batch
+
+2026-10-11T07:42:34Z dispatch · item 5b871c5f TOOL-aTrimmedHook-4 · reason tools/memory-tree/gen_build_index.py memory/map/generated/symbols.json memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-4.md memory/builds/aTrimmedHook/README.md memory/builds/aTrimmedHook/build/2026-10-11-build-TOOL-aTrimmedHook-4-1-acceptance-ledger.md memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-4-1-build-brief.md
+
+2026-10-11T07:42:55Z brief · item TOOL-aTrimmedHook-4 · reason 59a1ac36a9af memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-4-1-build-brief.md

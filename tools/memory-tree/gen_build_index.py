@@ -878,10 +878,18 @@ def check_staged_render(root: str, conf: dict) -> tuple:
     if kit == ".." or kit.startswith("../") or os.path.isabs(kit):
         kit = None
     specs = [m + "/", ".memory-tree.conf"] + ([kit + "/"] if kit else [])
+    # THE INDEX THE HOOK WAS HANDED (TOOL-aTrimmedHook-4). `_build_git_env()` drops GIT_INDEX_FILE for
+    # every other caller, because an inherited pointer names a different tree. Here the staged set IS
+    # that index: under `git commit -a`, `commit <paths>` or `commit -i` git hands the hook a temporary
+    # one, and the hygiene shell that decides this function runs at all reads it through its own
+    # `git diff --cached`. Carrying it keeps the two readers on one index.
+    env = _build_git_env()
+    if os.environ.get("GIT_INDEX_FILE"):
+        env["GIT_INDEX_FILE"] = os.environ["GIT_INDEX_FILE"]
     try:
         out = subprocess.run(
             ["git", "diff", "--cached", "--name-status", "--no-renames", "-z", "--", *specs],
-            cwd=root, capture_output=True, check=True, env=_build_git_env()).stdout
+            cwd=root, capture_output=True, check=True, env=env).stdout
     except (OSError, subprocess.CalledProcessError) as exc:
         return True, f"git could not list the staged set ({exc})"
     fields = out.decode("utf-8", "surrogateescape").split("\0")
@@ -900,7 +908,7 @@ def check_staged_render(root: str, conf: dict) -> tuple:
     req = "".join(f"HEAD:{p}\n:{p}\n" for p in modified).encode("utf-8")
     try:
         cat = subprocess.run(["git", "cat-file", "--batch"], cwd=root, input=req,
-                             capture_output=True, check=True, env=_build_git_env()).stdout
+                             capture_output=True, check=True, env=env).stdout
         blobs, pos = [], 0
         for _n in range(2 * len(modified)):
             nl = cat.index(b"\n", pos)
@@ -3881,6 +3889,28 @@ def test_staged_render(arm) -> None:
         arm("TOOL-aTrimmedHook-1 AC4 — a file under the kit's own directory is structural", "True False",
             lambda: "%s %s" % (check_index_input("pfx/kit/backlog.py", "memory", "pfx/kit"),
                                check_index_input("pfx/kitX/x.py", "memory", "pfx/kit")))
+        run("git", "reset", "-q", "--hard", cwd=t)
+        # TOOL-aTrimmedHook-4 AC1 — a structural edit staged ONLY into a temporary index, which is what
+        # git hands a hook under `commit -a`; `.git/index` itself holds nothing staged.
+        _alt = os.path.join(base, "alt-index")
+        shutil.copyfile(os.path.join(t, ".git", "index"), _alt)
+        _rd = os.path.join(t, "memory", "builds", "tOne", "README.md")
+        write_text(_rd, read_text(_rd) + "\n")
+        subprocess.run(["git", "add", "memory/builds/tOne/README.md"], cwd=t, check=True,
+                       capture_output=True, env=dict(_build_git_env(), GIT_INDEX_FILE=_alt))
+        _prev_idx = os.environ.get("GIT_INDEX_FILE")
+        os.environ["GIT_INDEX_FILE"] = _alt
+        try:
+            _alt_verdict = check_staged_render(t, conf)
+        finally:
+            if _prev_idx is None:
+                os.environ.pop("GIT_INDEX_FILE", None)
+            else:
+                os.environ["GIT_INDEX_FILE"] = _prev_idx
+        arm("TOOL-aTrimmedHook-4 AC1 — an edit staged only into the hook's GIT_INDEX_FILE renders", "True",
+            lambda: str(_alt_verdict[0]))
+        arm("TOOL-aTrimmedHook-4 AC1 — with no GIT_INDEX_FILE the default index holds nothing staged",
+            "False", lambda: str(check_staged_render(t, conf)[0]))
         run("git", "reset", "-q", "--hard", cwd=t)
         fam = {pair.split(":")[1] for pair in conf["FAMILIES"].split() if ":" in pair}
         tracked = [p for p in run("git", "ls-files", "--", "memory/", cwd=t).split("\n") if p]

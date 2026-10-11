@@ -1,10 +1,13 @@
 # TOOL-aTrimmedHook-4 — the staged classifier reads the index the hook was handed
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-11-build-TOOL-aTrimmedHook-4-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aTrimmedHook-4-1-acceptance-ledger.md) | journal | — |
+| [2026-10-11-prompt-TOOL-aTrimmedHook-4-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aTrimmedHook-4-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -83,8 +86,9 @@ Order 3. Units 5 and 7 also write this file and follow it.
   Red when: the arm sees a skip with the variable carried.
   cost: one fixture repo; seconds.
 - **AC2** — When `grep -n GIT_INDEX_FILE tools/memory-tree/gen_build_index.py` runs, the hits are the
-  leak list entry and the carry inside `check_staged_render`, and no other function reads the variable.
-  Red when: another function reads it.
+  leak list entry, the carry inside `check_staged_render`, and the `test_staged_render` arm that sets
+  and restores it; no other production function reads the variable.
+  Red when: another production function reads it.
 
 ## 7. Gates
 
@@ -99,6 +103,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft, promoted from the closing review's H1.
+- rev-2 · 2026-10-11 · AC2 counts the selftest arm that sets the variable, which the criterion first
+  read as a second reader
 
 ## 10. Reuse audit
 
