@@ -1,6 +1,6 @@
 # TOOL-aBriskPreflight-10 — the tracked pre-commit hook is executable again
 
-**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-1 · base 271a9004 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-10-11 · node a · Tier-1 · base 271a9004 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
