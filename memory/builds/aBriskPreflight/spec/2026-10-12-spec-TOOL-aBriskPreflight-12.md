@@ -1,6 +1,6 @@
 # TOOL-aBriskPreflight-12 — the closing review's mediums and lows: record bindings and ledgers, RB_TOOK at the child's end, the cache reset, four arms
 
-**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base d19938f3 · streams tooling · order 6 · ratified 2026-10-12
+**Status:** CLOSED · rev-3 · 2026-10-12 · node a · Tier-2 · base d19938f3 · streams tooling · order 6 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 

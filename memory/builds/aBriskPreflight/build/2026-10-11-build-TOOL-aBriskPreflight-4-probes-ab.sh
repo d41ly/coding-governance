@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** research TOOL-aBriskPreflight-4
 # probes-ab.sh <A|B> <outdir> <driver> — TOOL-aBriskPreflight-4 AC10, one arm of the A/B.
 #
 # Runs THIS worktree's four declared preflight probes, read from `.unattended.conf`, through the

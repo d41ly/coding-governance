@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** research TOOL-aBriskPreflight-1
 # run-timed.sh <tree> <label> <outdir> <script> [args...]
 # Runs <script> from <tree> untraced, recording stdout+stderr, rc and wall, and the host's spawn cost
 # measured just before (five /usr/bin/true) so a reading carries the load it was taken under.

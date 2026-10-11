@@ -318,6 +318,25 @@ out=$(run_in "$F1" git push origin "$F3_CLAIM:refs/gov/runs/x" feat); rc=$?
 check_contains "$out" "$F3_MERGE" || print_failure "S4: the mixed push refusal does not name the transition merge sha: $out"; add_arm
 git -C "$F1" tag -d t-strag >/dev/null
 
+# TOOL-aBriskPreflight-12 S8 — THE SKIP ITSELF, observed. The S4 arms above prove only that the layer
+# still runs on a delta. Here the hooks directory is F1's own with its library replaced by a stub that
+# leaves a marker when SOURCED and defines no `init_straggler_guard`, so the layer's setup is false
+# after sourcing and the stub refuses nothing. A claim-only push must never source it; the liveness
+# twin, a root commit over a NON-empty tree, must, or the first half is a predicate matching nothing.
+rm -rf "$F1/hkstub"; cp -r "$F1/hk" "$F1/hkstub"
+printf ': > "%s"\n' "$TMP/sg-sourced" > "$F1/hkstub/straggler-guard.sh"
+git -C "$F1" config core.hooksPath "$F1/hkstub"
+rm -f "$TMP/sg-sourced"
+F3_CLAIMY=$(git -C "$F1" commit-tree -m "claim y" "$(git -C "$F1" mktree </dev/null)")
+out=$(run_in "$F1" git push origin "$F3_CLAIMY:refs/gov/runs/y"); rc=$?
+[ "$rc" = 0 ] || print_failure "S8: a claim-only push over the empty tree was refused (rc=$rc): $out"; add_arm
+[ ! -e "$TMP/sg-sourced" ] || print_failure "S8: a claim-only push over the empty tree still sourced the straggler library"; add_arm
+F3_CLAIMZ=$(git -C "$F1" commit-tree -m "claim z" "$(printf '100644 blob %s\tz\n' "$(printf 'z\n' | git -C "$F1" hash-object -w --stdin)" | git -C "$F1" mktree)")
+run_in "$F1" git push origin "$F3_CLAIMZ:refs/gov/runs/z" >/dev/null
+[ -e "$TMP/sg-sourced" ] || print_failure "S8 LIVENESS: a root commit over a NON-empty tree did not source the straggler library, so the skip arm above matches nothing"; add_arm
+git -C "$F1" config core.hooksPath "$F1/hk"
+rm -rf "$F1/hkstub" "$TMP/sg-sourced"
+
 git -C "$F1" checkout -q feat
 write_relocated "$F1" TOOL-aSeed-1 "$F1_STRAG"
 git -C "$F1" add -A >/dev/null 2>&1; git -C "$F1" commit -q --no-verify -m "account for the relocation"

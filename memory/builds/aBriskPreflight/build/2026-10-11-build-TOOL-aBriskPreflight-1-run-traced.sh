@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** research TOOL-aBriskPreflight-1
 # run-traced.sh <tree> <label> <outdir> <script> [args...]
 # Runs <script> from <tree> under the spawn-counting trace, recording the trace, stdout+stderr, rc and wall.
 tree=$1; label=$2; out=$3; shift 3

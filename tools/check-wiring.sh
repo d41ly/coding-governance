@@ -93,6 +93,9 @@ KIT_REL=${KIT_REL:-}
 # deliberate out-of-tree layout is declared, never discovered by walking past the boundary.
 GOV_SETTINGS_JSON=${GOV_SETTINGS_JSON:-}
 _SETTINGS_CACHE=""
+# Reset at file scope like the cache above (TOOL-aBriskPreflight-12 S5): an inherited `_SJ_RC` would
+# otherwise stand in for the settings read, and the arms would grade a view nobody built here.
+_SJ_RC=""; _SJ_VIEW=""
 settings_json() {
   [ -n "$_SETTINGS_CACHE" ] && { printf '%s\n' "$_SETTINGS_CACHE"; return 0; }
   local cand="" _pref="$ROOT/.claude/settings.json"

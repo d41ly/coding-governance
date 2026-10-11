@@ -8691,8 +8691,8 @@ _cl_kit="$HERE/unattended.sh $HERE/lib-unattended.sh $HERE/check-playbook.sh"
 # AC1 AC2 AC3: the wiring child killed at its own ceiling under a 600 s GATE_BOUND. HOST-GATED on the
 # run_bounded probe above: with no runnable `timeout -k` nothing can fire, and the sleeper passes.
 if [ "$RB_HAVE_TIMEOUT" != 1 ]; then
-  n=$((n+12))
-  echo "  SKIP the wiring-ceiling arms: this host has no runnable 'timeout -k', so the ceiling cannot fire; their 12 assertions are counted, not run"
+  n=$((n+16))
+  echo "  SKIP the wiring-ceiling arms: this host has no runnable 'timeout -k', so the ceiling cannot fire; their 16 assertions are counted, not run"
 else
   reset_tree
   printf '#!/usr/bin/env bash\nsleep 30\n' > slowwire.sh
@@ -8726,6 +8726,15 @@ else
   out=$(run_main_at_head bash dk/u/unattended.sh --preflight tRun --keepalive-id k1 2>&1)
   hit "$out" "unattended: preflight OK"
   miss "$out" "check 4 FAILED"
+  # THE EQUAL PAIR (TOOL-aBriskPreflight-12 S9): a WIRING_CEILING equal to GATE_BOUND gives the kill
+  # to GATE_BOUND, so check 4 keeps the bound's own refusal byte for byte. Red at `-le`.
+  printf '#!/usr/bin/env bash\nsleep 30\n' > slowwire.sh
+  mutate dk/u/unattended.sh 's/^WIRING_CEILING="20"$/WIRING_CEILING="2"/'
+  mutate .unattended.conf 's/^GATE_BOUND=.*/GATE_BOUND="2"/'
+  fixture
+  out=$(run_main_at_head bash dk/u/unattended.sh --preflight tRun --keepalive-id k1 2>&1)
+  hit "$out" "the declared wiring check did not answer within the declared 2s bound"
+  miss "$out" "wall-clock ceiling"
   reset_tree
 fi
 
@@ -8833,8 +8842,29 @@ same "BP4 AC2 each refusal prints at its own check, in the block's order" \
 # ---- and every row names the one driver that started it.
 same "BP4 AC4 the ledger holds one row per started probe, in start order" "$(pf_rows)" \
   "$(printf 'bash wire.sh --check\nbash lander.sh --carry\nbash lander.sh --prepared\nbash profile.sh')"
-same "BP4 AC4 every row names one driver pid" \
-  "$(awk '{ print $3 }' "$(git rev-parse --git-common-dir)/unattended/tRun.procs" 2>/dev/null | sort -u | wc -l | tr -d ' ')" "1"
+# A PID ASSERTION THAT CAN FAIL (TOOL-aBriskPreflight-12 S7). The one it replaces counted distinct
+# field-3 values, which one driver writing every row makes 1 whenever any row exists. This grades
+# both pid fields: four distinct all-digit child pids, and one all-digit driver pid that is none of them.
+same "BP4 AC4 each row names its own child pid and the one driver pid" \
+  "$(awk '{ if ($1 !~ /^[0-9]+$/ || $3 !~ /^[0-9]+$/) bad = "a non-numeric pid on row " NR
+            if (seen[$1]++) bad = "child pid " $1 " on two rows"
+            if (NR > 1 && $3 != d) bad = "two driver pids"
+            d = $3 }
+       END { if (NR != 4) bad = NR " rows"; else if (d in seen) bad = "driver pid " d " is also a child pid"
+             print (bad == "" ? "ok" : bad) }' "$(git rev-parse --git-common-dir)/unattended/tRun.procs" 2>/dev/null)" "ok"
+
+# ---- TOOL-aBriskPreflight-12 S3, AC4: a profile that fails at once behind a slow wiring check reports
+# ---- its OWN wall. It is read only after check_wiring, so a figure taken at the read is the wiring
+# ---- stub's 12 s; the wrapper's end stamp makes it the profile's. The harness clock proves the wiring
+# ---- stub really ran its 12 s, so a fast figure is not a fixture that never waited.
+pf_fixture 'sleep 12; exit 0' 'exit 1' 'exit 3'
+_t0=$(date +%s); out=$(run --preflight tRun --keepalive-id k1); _t1=$(date +%s)
+hit "$out" "the declared GATE_PROFILE_CMD exited 3 after"
+_bpt=$(printf '%s' "$out" | sed -n 's/.*the declared GATE_PROFILE_CMD exited 3 after \([0-9][0-9]*\)s.*/\1/p' | head -1)
+n=$((n+1)); { [ -n "$_bpt" ] && [ "$_bpt" -lt 12 ]; } \
+  || { echo "FAIL BP12 AC4 the profile that exited at once was reported after '${_bpt:-<no figure>}'s, the wiring stub's 12 s wall, so RB_TOOK still runs to the read"; st=1; }
+n=$((n+1)); [ $(( _t1 - _t0 )) -ge 12 ] \
+  || { echo "FAIL BP12 AC4 fixture: --preflight returned in $(( _t1 - _t0 ))s, so the 12 s wiring stub never ran and the figure above grades nothing"; st=1; }
 
 # ---- AC3: the three others are RUNNING while the wiring stub waits for them. Under the sequential
 # ---- driver the stub polls its whole 60 s alone and leaves no OVERLAP.

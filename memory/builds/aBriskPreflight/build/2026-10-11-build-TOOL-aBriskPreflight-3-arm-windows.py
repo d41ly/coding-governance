@@ -1,3 +1,4 @@
+# **Serves:** research TOOL-aBriskPreflight-3
 """Split one traced check-wiring.sh run into its arm windows, and sum each candidate's cost.
 
 usage: python 2026-10-11-build-TOOL-aBriskPreflight-3-arm-windows.py <trace> <check-wiring.sh>

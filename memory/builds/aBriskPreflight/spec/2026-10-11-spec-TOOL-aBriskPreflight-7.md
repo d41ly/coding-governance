@@ -7,6 +7,12 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md](../build/2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 |
+| [2026-10-11-build-TOOL-aBriskPreflight-7-ab-prep.sh](../build/2026-10-11-build-TOOL-aBriskPreflight-7-ab-prep.sh) | research | — |
+| [2026-10-11-build-TOOL-aBriskPreflight-7-ab-rows.log](../build/2026-10-11-build-TOOL-aBriskPreflight-7-ab-rows.log) | research | — |
+| [2026-10-11-build-TOOL-aBriskPreflight-7-ab-run.sh](../build/2026-10-11-build-TOOL-aBriskPreflight-7-ab-run.sh) | research | — |
+| [2026-10-11-build-TOOL-aBriskPreflight-7-ceiling-rows.log](../build/2026-10-11-build-TOOL-aBriskPreflight-7-ceiling-rows.log) | research | — |
+| [2026-10-11-build-TOOL-aBriskPreflight-7-ceilings.sh](../build/2026-10-11-build-TOOL-aBriskPreflight-7-ceilings.sh) | research | — |
+| [2026-10-12-build-TOOL-aBriskPreflight-7-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aBriskPreflight-7-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-7-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-7-build-brief.md) | research | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-7-spec-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-7-spec-brief.md) | research | — |

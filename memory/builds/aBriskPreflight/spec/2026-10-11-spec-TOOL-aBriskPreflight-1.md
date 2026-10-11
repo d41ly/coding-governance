@@ -7,7 +7,13 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md](../build/2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md) | research | TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 |
+| [2026-10-11-build-TOOL-aBriskPreflight-1-host-state.sh](../build/2026-10-11-build-TOOL-aBriskPreflight-1-host-state.sh) | research | — |
+| [2026-10-11-build-TOOL-aBriskPreflight-1-run-timed.sh](../build/2026-10-11-build-TOOL-aBriskPreflight-1-run-timed.sh) | research | — |
+| [2026-10-11-build-TOOL-aBriskPreflight-1-run-traced.sh](../build/2026-10-11-build-TOOL-aBriskPreflight-1-run-traced.sh) | research | — |
+| [2026-10-11-build-TOOL-aBriskPreflight-1-runs.log](../build/2026-10-11-build-TOOL-aBriskPreflight-1-runs.log) | research | — |
 | [2026-10-11-build-TOOL-aBriskPreflight-1-spawns-ab.md](../build/2026-10-11-build-TOOL-aBriskPreflight-1-spawns-ab.md) | research | — |
+| [2026-10-11-build-TOOL-aBriskPreflight-1-trace-gaps.py](../build/2026-10-11-build-TOOL-aBriskPreflight-1-trace-gaps.py) | research | — |
+| [2026-10-11-build-TOOL-aBriskPreflight-1-trace-spawns.py](../build/2026-10-11-build-TOOL-aBriskPreflight-1-trace-spawns.py) | research | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md) | research | TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-1-build-brief.md) | research | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-1-rebuild-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-1-rebuild-brief.md) | research | — |

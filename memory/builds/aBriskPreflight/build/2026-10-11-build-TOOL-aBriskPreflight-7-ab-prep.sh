@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** research TOOL-aBriskPreflight-7
 # ab-prep.sh <arm-dir> <code-sha> <tree-sha>
 # A throwaway clone for one A/B arm of a whole preflight. The memory tree is <tree-sha> (the run's tip),
 # the product code is <code-sha>'s (BASE for the old arm, the tip for the new one), and a fixture build

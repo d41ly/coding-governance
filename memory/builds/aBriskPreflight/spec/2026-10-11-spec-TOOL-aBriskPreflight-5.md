@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md](../build/2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 |
 | [2026-10-11-build-TOOL-aBriskPreflight-5-walk-ab.md](../build/2026-10-11-build-TOOL-aBriskPreflight-5-walk-ab.md) | research | — |
+| [2026-10-11-build-TOOL-aBriskPreflight-5-walk-probe.sh](../build/2026-10-11-build-TOOL-aBriskPreflight-5-walk-probe.sh) | research | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-5-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-5-build-brief.md) | research | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-5-spec-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-5-spec-brief.md) | research | — |

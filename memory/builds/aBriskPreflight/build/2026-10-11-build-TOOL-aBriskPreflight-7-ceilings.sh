@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** research TOOL-aBriskPreflight-7
 # The ceilings instrument for TOOL-aBriskPreflight-7 (spec §4 "The values").
 #
 #   bash memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-7-ceilings.sh

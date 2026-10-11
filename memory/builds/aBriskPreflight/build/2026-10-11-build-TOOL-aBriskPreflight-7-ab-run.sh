@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** research TOOL-aBriskPreflight-7
 # ab-run.sh <rounds> — interleaved whole-preflight A/B: old arm %TEMP%/bp/AO, new arm %TEMP%/bp/AN.
 # Each arm is reset to its fixture commit and its claim deleted from the mirror before it runs, and
 # a run counts only when its output carries `preflight OK` (an A/B arm must prove it ran).

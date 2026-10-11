@@ -327,6 +327,27 @@ JSON
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       agent-cap'; } \
     && ck "AC7d the flag removed -> ok, exit 0" 1 || ck "AC7d the flag removed -> ok, exit 0" 0
+  # BP12 AC7 — AN INHERITED VIEW IS NOT A SETTINGS READ (TOOL-aBriskPreflight-12 S5). The view is
+  # captured from matchers_of's OWN flatten over this correctly wired file, lifted alone as
+  # settings-merge.py's arm 17 lifts it, so state (a) injects exactly what a real read would build.
+  _bpv=$(cd "$D" && bash -c 'settings_json() { printf "%s\n" "$PWD/.claude/settings.json"; }
+    eval "$(awk "/^matchers_of\\(\\) \\{/{on=1} on{print} on && /^}/{exit}" "$1")"; matchers_of; printf "%s" "$_SJ_VIEW"' _ "$SCRIPT")
+  [ -n "$_bpv" ] || ck "BP12 AC7 fixture: matchers_of's flatten built no view to inject" 0
+  # (a) the injected view over a STALE Workflow-only file: the checker must read the file, not the
+  # inheritance. Not over a missing file (spec rev-3): the arm re-reads the file for the shipped path,
+  # so a missing one reds there whether or not the view was inherited, and grades nothing.
+  sed -i 's/"matcher": "Workflow|Agent"/"matcher": "Workflow"/' .claude/settings.json
+  out=$(_SJ_RC=0 _SJ_VIEW=$_bpv chk --check); rc=$?
+  { [ "$rc" = 1 ] && ! printf '%s' "$out" | grep -q 'ok       agent-cap' \
+      && printf '%s' "$out" | grep -q "wired under matcher 'Workflow'"; } \
+    && ck "BP12 AC7 an inherited _SJ_RC=0 view over a stale settings file -> UNWIRED agent-cap, exit 1" 1 \
+    || ck "BP12 AC7 an inherited _SJ_RC=0 view over a stale settings file -> UNWIRED agent-cap, exit 1 [rc=$rc]" 0
+  # (b) an inherited EMPTY view over the correct file: the file's own wiring must still read ok.
+  sed -i 's/"matcher": "Workflow"/"matcher": "Workflow|Agent"/' .claude/settings.json
+  out=$(_SJ_RC=0 _SJ_VIEW= chk --check); rc=$?
+  printf '%s' "$out" | grep -q 'ok       agent-cap' \
+    && ck "BP12 AC7 an inherited empty view over a correct settings file -> ok agent-cap" 1 \
+    || ck "BP12 AC7 an inherited empty view over a correct settings file -> ok agent-cap [rc=$rc]" 0
   cleanup
 else
   echo "skip agent-cap cases — settings-merge.py not found next to script"
@@ -991,6 +1012,30 @@ sed -i.bak 's/tooling:TOOLS"/tooling:TOOL"/' .memory-tree.conf && rm -f .memory-
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
   && ck "AC10 restoring the declared family goes green again" 1 || ck "AC10 restoring the declared family goes green again" 0
+
+# state 5d2 — THE CHUNK FLUSH (TOOL-aBriskPreflight-12 S6). The harvest closes a sed chunk before 8000
+# characters of paths, and no state above crosses it, so the in-loop flush never ran. Here the
+# declared list is pushed past 8000 with many ~50-character paths (MAX_PATH), the index `git ls-files`
+# lists FIRST leads a row with QFIRST and the one it lists LAST a row with QLAST, every other new
+# index empty. Past 8000 there are at least two chunks, so the first index is harvested ONLY by the
+# in-loop flush: QFIRST named is that branch's liveness, in every run. Uppercase sorts first in git's
+# byte order, so `AFIRST.md` precedes `TOOL.md` and the lowercase `zlast.md` follows every pad.
+printf -- '- QFIRST-001 | a row only the first chunk holds\n' > memory/backlog/AFIRST.md
+printf -- '- QLAST-001 | a row only the last chunk holds\n' > memory/backlog/zlast.md
+_bpi=0; while [ "$_bpi" -lt 180 ]; do : > "memory/backlog/pad-$_bpi-chunk-flush-padding-index.md"; _bpi=$((_bpi + 1)); done
+git add -A; git commit -q -m "chunk flush fixture"
+_bpl=$(git ls-files | git check-attr --stdin merge | sed -n 's/: merge: rows$//p')
+_bpn=$(printf '%s\n' "$_bpl" | awk '{ s += length($0) + 1 } END { print s + 0 }')
+[ "$_bpn" -gt 8000 ] && [ "$(printf '%s\n' "$_bpl" | head -n 1)" = memory/backlog/AFIRST.md ] \
+  && [ "$(printf '%s\n' "$_bpl" | tail -n 1)" = memory/backlog/zlast.md ] \
+  && ck "AC10 chunk-flush fixture: the declared list is $_bpn characters, past 8000, AFIRST first and zlast last" 1 \
+  || ck "AC10 chunk-flush fixture: the declared list is $_bpn characters, past 8000, AFIRST first and zlast last (fixture no-op)" 0
+out=$(chk --check); rc=$?
+_bpu=$(printf '%s\n' "$out" | grep '^UNWIRED  merge' | grep 'does not declare')
+{ [ "$rc" = 1 ] && printf '%s' "$_bpu" | grep -q 'QFIRST' && printf '%s' "$_bpu" | grep -q 'QLAST'; } \
+  && ck "AC10 a family only the first chunk holds and one only the last -> one UNWIRED merge line naming both" 1 \
+  || ck "AC10 a family only the first chunk holds and one only the last -> one UNWIRED merge line naming both [rc=$rc: ${_bpu:-no such line}]" 0
+git reset -q --hard HEAD~1
 
 # state 5e — THE INERTNESS CHANNEL THE TWO-PLANE DRIVER OPENS, and state 5d cannot reach it.
 #

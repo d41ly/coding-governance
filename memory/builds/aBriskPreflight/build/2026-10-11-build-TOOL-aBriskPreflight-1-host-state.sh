@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** research TOOL-aBriskPreflight-1
 # host-state.sh <label> <outdir> — one line of host state beside a timing: spawn cost of five
 # /usr/bin/true, a bare $(...) fork, and the kernel pool counters (a leak there inflates every spawn).
 label=$1; out=$2

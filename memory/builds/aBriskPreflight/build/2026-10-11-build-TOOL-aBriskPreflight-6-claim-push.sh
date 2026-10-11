@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# **Serves:** research TOOL-aBriskPreflight-6
 # TOOL-aBriskPreflight-6's instrument: the pre-push hook on a claim-shaped push, one hook at a time.
 #
 #   bash <this> --setup <clone> <source-repo> <rev>

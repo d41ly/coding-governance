@@ -276,10 +276,14 @@ init_bounded() { # argv... -> 0 with RB_HANDLE naming the started child, or 1 wi
   # exec; the wait is on that observed condition, bounded at 100 polls of 0.05 s and ended early when
   # the wrapper is gone, and the variable is unset before the command so its environment is as it
   # was. A LITERAL bound, because the suite sources this function alone under `set -u`.
+  # THE WRAPPER STAMPS THE CHILD'S OWN END (TOOL-aBriskPreflight-12 S3) into `up.end`, with the
+  # `printf '%(%s)T'` builtin so no process is added. The stamp path is taken into `_rbe`, a shell
+  # variable that is never exported, before RB_UP is unset, so the command's environment is still as
+  # it was. A bounded kill returns to the wrapper through `timeout`, so it stamps there too.
   if [ "$GATE_BOUND_LIVE" = 1 ] && [ "$_b" -gt 0 ]; then
-    RB_UP="$_d/up" "${BASH:-bash}" -c ': >"$RB_UP"; unset RB_UP; "$@"; exit $?' "$ROOT" timeout -k 5s "$_b" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
+    RB_UP="$_d/up" "${BASH:-bash}" -c ': >"$RB_UP"; _rbe=$RB_UP.end; unset RB_UP; "$@"; _rbr=$?; printf "%(%s)T\n" -1 >"$_rbe"; exit $_rbr' "$ROOT" timeout -k 5s "$_b" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
   else
-    RB_UP="$_d/up" "${BASH:-bash}" -c ': >"$RB_UP"; unset RB_UP; "$@"; exit $?' "$ROOT" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
+    RB_UP="$_d/up" "${BASH:-bash}" -c ': >"$RB_UP"; _rbe=$RB_UP.end; unset RB_UP; "$@"; _rbr=$?; printf "%(%s)T\n" -1 >"$_rbe"; exit $_rbr' "$ROOT" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
   fi
   _p=$!
   _i=0
@@ -289,13 +293,17 @@ init_bounded() { # argv... -> 0 with RB_HANDLE naming the started child, or 1 wi
   return 0
 }
 # THE OTHER HALF. Split by parameter expansion, so reading a handle starts no process. RB_TOOK runs
-# from the child's own start to this read's return: a synchronous call's figure is today's, and a
-# probe read late can only overstate a child that had already finished.
+# from the child's own start to the child's own end when the wrapper stamped one in `up.end`, so a
+# probe read late reports its own wall and not the wait before its read (TOOL-aBriskPreflight-12 S3).
+# With no all-digit stamp, as when the wrapper itself was killed before writing, it runs to this
+# read's return instead. The stamp is read with the `read` builtin, so no process is added.
 read_bounded() { # handle -> the child's status; RB_OUT, RB_STDOUT, RB_ERR and RB_TOOK as run_bounded sets them
-  local _p=${1%% *} _r=${1#* } _s _d _e _rc
+  local _p=${1%% *} _r=${1#* } _s _d _e="" _rc
   _s=${_r%% *}; _d=${_r#* }
   wait "$_p"; _rc=$?
-  _e=$(date +%s); RB_TOOK=$(( _e - _s ))
+  [ -f "$_d/up.end" ] && read -r _e <"$_d/up.end" 2>/dev/null
+  case "$_e" in ''|*[!0-9]*) _e=$(date +%s) ;; esac
+  RB_TOOK=$(( _e - _s ))
   RB_STDOUT=$(cat "$_d/out" 2>/dev/null)
   RB_ERR=$(cat "$_d/err" 2>/dev/null)
   RB_OUT=$(cat "$_d/out" "$_d/err" 2>/dev/null)

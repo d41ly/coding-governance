@@ -1,6 +1,6 @@
 # TOOL-aBriskPreflight-4 — preflight starts its bounded probes together and collects each at its own check
 
-**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 2 · ratified 2026-10-11
+**Status:** CLOSED · rev-4 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 2 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,8 @@
 |---|---|---|
 | [2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md](../build/2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 |
 | [2026-10-11-build-TOOL-aBriskPreflight-4-probes-ab.md](../build/2026-10-11-build-TOOL-aBriskPreflight-4-probes-ab.md) | research | — |
+| [2026-10-11-build-TOOL-aBriskPreflight-4-probes-ab.sh](../build/2026-10-11-build-TOOL-aBriskPreflight-4-probes-ab.sh) | research | — |
+| [2026-10-12-build-TOOL-aBriskPreflight-4-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aBriskPreflight-4-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-4-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-4-build-brief.md) | research | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-4-spec-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-4-spec-brief.md) | research | — |
@@ -152,8 +154,11 @@ wrapper line exists, as `TOOL-aBoundedCeiling-6` requires of the one bounded run
 
 `RB_TOOK` runs from the child's own start to the moment its read returns. For a synchronous call
 that is today's figure. For a probe it can exceed the child's own wall only when the child finished
-before its reader asked. The one probe whose `RB_TOOK` preflight prints is the wiring check's, in the
-check 4 kill message, where the child ran to its bound, so the printed figure is the bound's.
+before its reader asked. Preflight prints it from two probes, not one: the wiring check's, in the
+check 4 kill message, where the child ran to its bound, and the profile's, in
+`derive_gate_backstop`'s `GB_WHY`, which is read only after every check before it. The second
+overstated a fast-failing profile by the wiring check's whole wall, so TOOL-aBriskPreflight-12 makes
+the figure run to the child's own end where the wrapper stamped one.
 
 ### The order of the block
 
@@ -248,7 +253,8 @@ at writing, and each answered OK.
   would then wait behind three exec waits and three ledger writes, each several spawns at node `a`'s
   measured cost (§8 F2).
 - A wrapper stamp of each child's own end, read for `RB_TOOK`. It changes the wrapper's text for
-  every caller to sharpen a figure no preflight probe prints except at a kill.
+  every caller to sharpen a figure no preflight probe prints except at a kill. TOOL-aBriskPreflight-12
+  adopted it after the closing diff review found that premise false: `GB_WHY` prints the profile's.
 - A second launch line beside `run_bounded`'s for the overlapped form. Two copies of the wrapper are
   the drift `TOOL-aBoundedCeiling-6` removed.
 - A pool collected with `wait -n`, as the gate runner collects its legs. It returns children in
@@ -421,6 +427,10 @@ unit is terminal.
   staged break, the driver with its `read_preflight_probes` call deleted, passed AC5 at 5 s on node
   `a`: the verb's own remainder after `--carry` outlasted the sleeper, so the unread probe finished
   alone before the verb returned. The arm now says when that happened rather than reading as cover.
+- rev-4 · 2026-10-12 · §4 only, the `RB_TOOK` paragraph and the wrapper-stamp alternative. Both
+  rested on the premise that the wiring check's is the only `RB_TOOK` preflight prints; the closing
+  diff review's M2 found `GB_WHY` prints the profile's too, and TOOL-aBriskPreflight-12 adopted the
+  stamp. No criterion of this unit moves.
 
 ## 10. Reuse audit
 

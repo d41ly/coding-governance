@@ -1,3 +1,4 @@
+# **Serves:** research TOOL-aBriskPreflight-1
 """Attribute wall time in a bash xtrace (PS4='+${EPOCHREALTIME} ${LINENO} ') to lines and functions.
 
 usage: python trace_gaps.py <trace> <script>
