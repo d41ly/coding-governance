@@ -57,3 +57,5 @@ base: 6dc23b58fe360c0e15168544cf4b03af6550a7ad
 2026-10-11T15:36:37Z dispatch · item 0c676e32 TOOL-aPairedSlots-8 · reason tools/process-monitor/adopt-process-monitor.test.sh memory/LIVE.md
 
 2026-10-11T16:02:39Z dispatch · item 70caa079 TOOL-aPairedSlots-8 · reason tools/process-monitor/adopt-process-monitor.test.sh memory/LIVE.md
+
+2026-10-11T16:25:50Z dispatch · item 566798c4 TOOL-aPairedSlots-2 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.turnstile.test.sh tools/run-gates/README.md memory/map/generated/symbols.json memory/LIVE.md memory/guides/SESSION-KICKOFF.md

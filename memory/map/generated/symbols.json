@@ -8888,6 +8888,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "measure_held_slots",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "measure_hook_entries",
       "kind": "function",
       "file": "tools/process-monitor/adopt-process-monitor.sh"
@@ -14193,6 +14198,11 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "resolve_free_slot",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "resolve_full_sha",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -16165,11 +16175,6 @@
     {
       "id": "run_hook",
       "kind": "function",
-      "file": "tools/process-monitor/adopt-process-monitor.test.sh"
-    },
-    {
-      "id": "run_hook",
-      "kind": "function",
       "file": "tools/unattended/stall-recorder.test.sh"
     },
     {
@@ -16571,6 +16576,11 @@
       "id": "run_skip_leg",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "run_slot_bar",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
     },
     {
       "id": "run_spec_commit_block",
@@ -20161,6 +20171,11 @@
       "id": "vintage",
       "kind": "function",
       "file": "tools/govkit/census.py"
+    },
+    {
+      "id": "wait_registered",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
     },
     {
       "id": "walk",

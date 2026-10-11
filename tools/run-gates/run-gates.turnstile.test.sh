@@ -176,7 +176,7 @@ hdrkey() {
 # mk_repo <dir> — a scratch repository carrying the runner and its table.
 mk_repo() {
   local d=$1
-  rm -rf "$GATE_TURNSTILE_DIR/gate-bar-beacon" "$GATE_TURNSTILE_DIR/gate-bar-queue" 2>/dev/null
+  rm -rf "$GATE_TURNSTILE_DIR"/gate-bar-beacon "$GATE_TURNSTILE_DIR"/gate-bar-beacon.* "$GATE_TURNSTILE_DIR/gate-bar-queue" 2>/dev/null
   mkdir -p "$d/${PFX}${KIT}" "$d/${PFX}${LIB}" "$d/fx"
   cp "$HERE/run-gates.sh" "$HERE/gate-profiles.txt" "$d/${PFX}${KIT}/" || return 1
   cp "$HERE/gate-fingerprint.sh" "$d/${PFX}${KIT}/" 2>/dev/null || true
@@ -1133,6 +1133,109 @@ if ua28=$(resolve_kit_dir "$_rkd_py" unattended unattended.sh "$HERE" 2>/dev/nul
 else
   skipped "the unattended driver's spelling: that kit is not installed in this tree"
 fi
+
+# ================= TOOL-aPairedSlots-2: the turnstile as a COUNTING SEMAPHORE ===================
+# Every arm below runs its bars at GATE_TURNSTILE_SLOTS=2 under the suite's own host dir, each bar in
+# a repository of its own, so the arms stay true once a worktree may hold only one slot
+# (TOOL-aPairedSlots-5). A hold leg registers, then waits on its own go-file, so no verdict rests on
+# a clock: an arm releases its holders only after it has read what it asserts.
+printf '#!/usr/bin/env bash\nS=${TS_SHARED:?}\nmkdir -p "$S/live"; mkdir "$S/live/$$"\nls -1 "$S/live" | wc -l >> "$S/peaks"\ni=0; while [ ! -e "$S/go" ] && [ "$i" -lt 1500 ]; do sleep 0.2; i=$((i + 1)); done\nrmdir "$S/live/$$"\nexit 0\n' > "$tmp/holdS.sh"
+printf '[ {"name": "hold", "argv": ["bash", "%s"]} ]\n' "$tmp/holdS.sh" > "$tmp/holdS.json"
+# run_slot_bar <repo> <shared dir> <out file> [VAR=value…] — a backgrounded two-slot bar running the hold leg; its pid in SLOT_PID
+run_slot_bar() {
+  local r=$1 s=$2 o=$3; shift 3
+  ( cd "$r" && env TS_SHARED="$s" GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 GATE_TURNSTILE_TTL=600 GATE_TURNSTILE_TICK=1 \
+      GATE_LEGS="$tmp/holdS.json" "$@" bash $KIT_REL/run-gates.sh ) >"$o" 2>&1 &
+  SLOT_PID=$!
+}
+# wait_registered <shared dir> <count> <pid> — until <count> holders have registered there, or <pid> exits
+wait_registered() {
+  # THE COUNT DEFAULTS TO 0. `grep -c` over a file not yet written prints nothing, and an empty
+  # operand makes the comparison an error, which ended this loop at once and let an arm read the
+  # beacons before any holder had registered: observed on the first slice of these arms.
+  local i=0 c
+  while :; do
+    c=$(grep -c . "$1/peaks" 2>/dev/null); c=${c:-0}
+    [ "$c" -lt "$2" ] && kill -0 "$3" 2>/dev/null && [ "$i" -lt 2400 ] || break
+    sleep 0.1; i=$((i + 1))
+  done
+}
+BS=$(beacon x)
+
+# ---- 29: with slots=2 two bars hold at once and a third queues (AC1); its line names both (AC2) -------
+R29a=$tmp/slotA; R29b=$tmp/slotB; R29c=$tmp/slotC; mk_repo "$R29a"; mk_repo "$R29b"; mk_repo "$R29c"
+S29=$tmp/shared29; mkdir -p "$S29"
+run_slot_bar "$R29a" "$S29" "$tmp/out29a"; p29a=$SLOT_PID; wait_registered "$S29" 1 "$p29a"
+run_slot_bar "$R29b" "$S29" "$tmp/out29b"; p29b=$SLOT_PID; wait_registered "$S29" 2 "$p29b"
+h29a=$(cat "$BS/pid" 2>/dev/null); h29b=$(cat "$BS.2/pid" 2>/dev/null)
+run_slot_bar "$R29c" "$tmp/shared29c" "$tmp/out29c"; p29c=$SLOT_PID; mkdir -p "$tmp/shared29c"; : > "$tmp/shared29c/go"
+i29=0; while ! grep -q 'queued at position' "$tmp/out29c" 2>/dev/null && kill -0 "$p29c" 2>/dev/null && [ "$i29" -lt 2400 ]; do sleep 0.1; i29=$((i29 + 1)); done
+peak29=$(peak "$S29")
+: > "$S29/go"; wait "$p29a" "$p29b" "$p29c" 2>/dev/null
+[ "$peak29" = 2 ] && ok "slots=2: two bars held at once (peak 2)" || nope "slots=2: the occupancy peak was $peak29, not 2"
+grep -q 'queued at position' "$tmp/out29c" && ok "slots=2: the third bar queued" \
+  || { nope "slots=2: the third bar did not queue behind two holders"; tail -4 "$tmp/out29c" | sed 's/^/      /'; }
+grep -q "2 of 2 bar slots on this host are held — .*pid $h29a.*pid $h29b\|2 of 2 bar slots on this host are held — .*pid $h29b.*pid $h29a" "$tmp/out29c" \
+  && ok "the third bar's queue line counts two of two slots held and names both holders' pids" \
+  || { nope "the third bar's queue line did not name both holders ($h29a, $h29b)"; grep -E 'held|queued' "$tmp/out29c" | sed 's/^/      /'; }
+[ "$(hdrkey "$R29c" slots)" = 2 ] && ok "the third bar's header records slots 2" || nope "the third bar's header records slots '$(hdrkey "$R29c" slots)'"
+s29a=$(hdrkey "$R29a" slot); s29b=$(hdrkey "$R29b" slot)
+{ [ "$s29a" = 1 ] && [ "$s29b" = 2 ]; } || { [ "$s29a" = 2 ] && [ "$s29b" = 1 ]; } \
+  && ok "the two holders' headers record slots 1 and 2" || nope "the two holders' headers record slot '$s29a' and '$s29b'"
+
+# ---- 30: a dead slot is reaped while the other holder keeps running (AC3) ---------------------------
+R30a=$tmp/reapA; R30b=$tmp/reapB; mk_repo "$R30a"; mk_repo "$R30b"; S30=$tmp/shared30; mkdir -p "$S30"
+legs "$R30b" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+run_slot_bar "$R30a" "$S30" "$tmp/out30a"; p30a=$SLOT_PID; wait_registered "$S30" 1 "$p30a"
+n30a=$(cat "$BS/nonce" 2>/dev/null)
+sh -c 'exit 0' & dead30=$!; wait "$dead30" 2>/dev/null
+mkdir -p "$BS.2"; printf '%s' "$dead30" > "$BS.2/pid"; printf '%s' "$(date +%s)" > "$BS.2/heartbeat"; printf 'planted30' > "$BS.2/nonce"
+out30=$( cd "$R30b" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 ); rc30=$?
+alive30=0; kill -0 "$p30a" 2>/dev/null && alive30=1
+n30after=$(cat "$BS/nonce" 2>/dev/null)
+: > "$S30/go"; wait "$p30a" 2>/dev/null
+[ "$(printf '%s\n' "$out30" | grep -c 'reaping the beacon of a dead holder')" = 1 ] && ok "the dead slot was reaped once" \
+  || nope "the dead slot was not reaped exactly once"
+[ "$rc30" = 0 ] && printf '%s\n' "$out30" | grep -q '^gate queue: acquired' && ok "the bar behind it claimed and ran" \
+  || nope "the bar behind the dead slot did not claim and run (rc $rc30)"
+[ "$alive30" = 1 ] && [ -n "$n30a" ] && [ "$n30after" = "$n30a" ] && ok "the live holder of slot 1 ran on, its nonce untouched" \
+  || nope "the live holder of slot 1 was disturbed (alive $alive30, nonce '$n30a' then '$n30after')"
+
+# ---- 31: a release frees only its own slot, never a sibling's or a successor's (AC4) ------------------
+R31w=$tmp/relW; R31x=$tmp/relX; mk_repo "$R31w"; mk_repo "$R31x"; S31w=$tmp/shared31w; S31x=$tmp/shared31x; mkdir -p "$S31w" "$S31x"
+run_slot_bar "$R31w" "$S31w" "$tmp/out31w"; p31w=$SLOT_PID; wait_registered "$S31w" 1 "$p31w"
+run_slot_bar "$R31x" "$S31x" "$tmp/out31x"; p31x=$SLOT_PID; wait_registered "$S31x" 1 "$p31x"
+n31w=$(cat "$BS/nonce" 2>/dev/null)
+# X holds slot 2. Its nonce is replaced, as a successor's claim after a reap would replace it.
+printf 'successor31' > "$BS.2/nonce"
+: > "$S31x/go"; wait "$p31x" 2>/dev/null
+[ -d "$BS.2" ] && [ "$(cat "$BS.2/nonce" 2>/dev/null)" = successor31 ] && ok "a run whose slot was re-claimed left the successor's beacon" \
+  || nope "a run whose slot was re-claimed removed the successor's beacon"
+[ -d "$BS" ] && [ "$(cat "$BS/nonce" 2>/dev/null)" = "$n31w" ] && ok "a release left the other slot's holder in place" \
+  || nope "a release freed another slot's beacon"
+rm -rf "$BS.2"; : > "$S31w/go"; wait "$p31w" 2>/dev/null
+
+# ---- 32: a runner started by the slot-2 holder's leg NESTS (AC5) -------------------------------------
+R32w=$tmp/nestW; R32o=$tmp/nestO; R32i=$tmp/nestI; mk_repo "$R32w"; mk_repo "$R32o"; mk_repo "$R32i"; S32=$tmp/shared32; mkdir -p "$S32"
+legs "$R32i" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+# The inner runner's TTL of 5 bounds a run that FAILS to nest at a 20 s fail-open, as arm 24's control
+# is bounded; a nested run never waits, so the bound costs a passing run nothing.
+printf '#!/usr/bin/env bash\ncd "%s" && env -u GATE_LEGS GATE_TURNSTILE_TTL=5 bash %s/run-gates.sh > "%s" 2>&1\nexit 0\n' "$R32i" "$KIT_REL" "$tmp/out32in" > "$tmp/nest32.sh"
+printf '[ {"name": "nest", "argv": ["bash", "%s"]} ]\n' "$tmp/nest32.sh" > "$tmp/nest32.json"
+run_slot_bar "$R32w" "$S32" "$tmp/out32w"; p32w=$SLOT_PID; wait_registered "$S32" 1 "$p32w"
+( cd "$R32o" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 GATE_TURNSTILE_TTL=600 GATE_TURNSTILE_TICK=1 GATE_LEGS="$tmp/nest32.json" bash $KIT_REL/run-gates.sh ) >"$tmp/out32o" 2>&1
+s32o=$(hdrkey "$R32o" slot)
+: > "$S32/go"; wait "$p32w" 2>/dev/null
+[ "$s32o" = 2 ] && ok "the outer bar held slot 2 beside slot 1's holder" || nope "the outer bar held slot '$s32o', not 2"
+grep -q '^gate queue: nested under ' "$tmp/out32in" 2>/dev/null && ok "a runner started by the slot-2 holder's leg nests" \
+  || { nope "a runner started by the slot-2 holder's leg did not nest"; tail -4 "$tmp/out32in" 2>/dev/null | sed 's/^/      /'; }
+
+# ---- 33: at the default count a bar writes no slot key (AC6) --------------------------------------
+R33=$tmp/slots1; mk_repo "$R33"; legs "$R33" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+( cd "$R33" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS= bash $KIT_REL/run-gates.sh ) >"$tmp/out33" 2>&1
+[ -z "$(hdrkey "$R33" slots)" ] && [ -z "$(hdrkey "$R33" slot)" ] && ok "a bar at the default count writes neither slots nor slot" \
+  || nope "a bar at the default count wrote a slot key"
+grep -q 'bar slots' "$tmp/out33" && nope "a bar at the default count printed a slots clause" || ok "a bar at the default count printed no slots clause"
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "turnstile: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }

@@ -189,7 +189,7 @@ worktree serves the primary tree's push. It is one slot per clone, last writer w
 worktree's green evicts the first, which costs that push its saving and never its verdict.
 TOOL-dThriftyLanding-1, -2, -3.
 
-## The turnstile — one bar per host
+## The turnstile — `slots` bars per host, one by default
 
 A run claims a beacon in a HOST directory before it dispatches: `GATE_TURNSTILE_DIR`, else
 `~/.gov/gate-turnstile`. Every repository on the machine shares it, because bars from different
@@ -198,6 +198,18 @@ the scratch sweep stay per git common dir. A host dir that cannot be created fal
 dir for the beacon and the queue, with a NOTE, which is per-repository queueing. A runner older than
 this keys on its common dir and does not see the host beacon, so serialization is complete only when
 every repository on the host carries this runner.
+
+**The turnstile admits `slots` holders at once** (`TOOL-aPairedSlots-2`), the selected profile row's
+`slots` knob, 1 where it declares none, `GATE_TURNSTILE_SLOTS` over it. Each holder owns its own
+beacon directory: slot 1 is `gate-bar-beacon`, slot k is `gate-bar-beacon.<k>`. The queue is still
+one FIFO: only the ticket that sorts first claims, it takes the first free slot, and it gives up its
+ticket at once, so a second free slot goes to the next ticket one tick later. A waiter reaps a dead
+or stalled holder slot by slot, each removal guarded by the nonce it judged, and a release frees only
+its own slot. Above one slot a queued bar's line reads
+`<k> of <n> bar slots on this host are held — <repo> run <id> pid <pid>[; …] — queued at position N (waited Ns)`
+and the run record's header gains `slots` and `slot`; at one slot nothing printed or written changes.
+A host whose repositories declare different counts admits the LARGEST, since every runner claims
+among its own slots and all share slot 1 and the queue: a runner older than this claims slot 1 alone.
 
 The beacon holds `heartbeat`, `pid`, `nonce`, and the holder's name: `repo` (its top level), `run`
 (its run id) and `ttl`. A second run takes a time-sorted ticket and queues, announcing
@@ -218,7 +230,7 @@ DASH rather than a zero, because a zero for a probe that never ran is a reassuri
 nothing. `unresolved` is UNARMED and the runner's comment says why.
 
 A holder exports its nonce as `GATE_TURNSTILE_HOLDER` to its legs. A runner that inherits a value
-equal to the live beacon's `nonce` is NESTED inside that bar: it takes no ticket, prints
+equal to the `nonce` of any live slot beacon is NESTED inside that bar: it takes no ticket, prints
 `gate queue: nested under <run> — <repo> pid <pid>`, and runs. Without that, a suite's scratch-repo
 bar, or a wrapper bar's inner runner, would queue behind the very bar whose leg started it. Nesting
 trusts an inherited value any process on the host can read from the beacon, so it decides contention

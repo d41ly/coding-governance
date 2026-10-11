@@ -1127,7 +1127,7 @@ echo "run-gates: process-monitor: $PROCMON_WHY"
 # run record below opens its directory under the same id. `GATE_RUN_ID` pins it, for the hook and arms.
 TS_RUN="${GATE_RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)-$$}"
 
-# ---- the turnstile: one bar per HOST at a time (the turnstile unit, TOOL-aFrugalTurnstile-5) -----
+# ---- the turnstile: `slots` bars per HOST at a time, one by default (TOOL-aFrugalTurnstile-5, TOOL-aPairedSlots-2)
 # Nothing coordinated two bars before this. `git worktree list` reports well into double figures on
 # this node, and the sibling profiling build measured three full bars running at once with CPU at
 # 39 %, both queues empty, and width 24 running 26 % SLOWER than width 8. The contended resource does
@@ -1154,6 +1154,18 @@ TS_RUN="${GATE_RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)-$$}"
 # for a command that is not this runner. `queued_from` reads `held`, `nested`, `expired`,
 # `unticketed`, `off` or `unresolved`, assigned in the block after the queue.
 #
+# A COUNTING SEMAPHORE OF `TS_SLOTS` HOLDERS (TOOL-aPairedSlots-2), the profile row's `slots`. Each
+# holder owns one beacon directory with its own six files: slot 1 is `gate-bar-beacon` itself, so a
+# runner older than this unit, and every reader that names that path, still sees the first holder;
+# slot k is `gate-bar-beacon.<k>`. The queue is unchanged and still one FIFO: only the ticket that
+# sorts first may claim, it takes the first slot whose `mkdir` succeeds, and it gives up its ticket at
+# once, so a second free slot is claimed one tick later by the next ticket and nobody overtakes. A
+# waiter reaps dead or stalled holders slot by slot, each removal guarded by the nonce it judged; a
+# release frees only the slot `TS_DIR` names, under that slot's nonce. A host whose repositories
+# declare different counts admits the largest, since every runner claims among its own slots and all
+# share slot 1 and the queue. At one slot every line printed and every file written is the
+# single-holder runner's.
+#
 # WHAT THIS DOES NOT CHECK: NESTING TRUSTS AN INHERITED NONCE, which any process on this host can read
 # from the beacon, so nesting decides contention and never a verdict; and a runner older than this
 # change keys on its common dir and does not see the host beacon.
@@ -1173,6 +1185,28 @@ if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
     TS_HOST=""
   fi
 fi
+# THE SLOT PATHS, BUILT ONCE (TOOL-aPairedSlots-2). An array rather than a path function, so a claim,
+# a reap or a count over the slots forks nothing per slot on a host where every fork is the cost.
+TS_SLOTS=${PROF_SLOTS:-1}; TS_SLOT=""; TS_SLOT_DIRS=(); TS_HELD_N=0
+if [ -n "$TS_DIR_C" ]; then
+  TS_SLOT_DIRS=("$TS_DIR_C"); _ts_k=2
+  while [ "$_ts_k" -le "$TS_SLOTS" ]; do TS_SLOT_DIRS+=("$TS_DIR_C.$_ts_k"); _ts_k=$((_ts_k + 1)); done
+  unset _ts_k
+fi
+measure_held_slots() { # -> TS_HELD_N, how many of this runner's slot paths exist; builtin tests only
+  local d; TS_HELD_N=0
+  for d in ${TS_SLOT_DIRS[@]+"${TS_SLOT_DIRS[@]}"}; do [ -d "$d" ] && TS_HELD_N=$((TS_HELD_N + 1)); done
+  return 0
+}
+resolve_free_slot() { # -> rc 0 with TS_DIR and TS_SLOT set by the first slot whose mkdir succeeds, in slot order
+  local i=0 d
+  for d in ${TS_SLOT_DIRS[@]+"${TS_SLOT_DIRS[@]}"}; do
+    i=$((i + 1))
+    if mkdir "$d" 2>/dev/null; then TS_DIR=$d; TS_SLOT=$i; return 0; fi
+  done
+  return 1
+}
+
 # THE HEALTH LOG (I3, TOOL-aGraftedHelix-8), derived from the common dir this runner already holds,
 # so no self-heal site below spawns git: the turnstile's here, WORK_COMMON's once it is resolved.
 RG_HEALTH_LOG=""
@@ -1263,28 +1297,38 @@ ts_tick_stop() {
 # other cannot: a dead PID is immediate and certain, and a stale heartbeat catches the holder whose
 # PID was recycled or which is alive but wedged.
 ts_try_reap() {
-  local hpid hb age httl
-  [ -d "$TS_DIR_C" ] || return 1
-  hpid=$(cat "$TS_DIR_C/pid" 2>/dev/null)
-  hb=$(cat "$TS_DIR_C/heartbeat" 2>/dev/null)
-  # THE HOLDER'S TTL is the bound (TOOL-aFrugalTurnstile-5 S3): on a host-wide beacon the holder may be
-  # another repository running a longer one. Anything but a positive integer, as from an older
-  # runner's beacon, falls back to this waiter's own.
-  httl=$(cat "$TS_DIR_C/ttl" 2>/dev/null)
-  num_ok "$httl" || httl=$TS_TTL
-  if [ -n "$hpid" ] && ! ts_alive "$hpid"; then
-    printf 'run-gates: reaping the beacon of a dead holder (pid %s)\n' "$hpid" >&2
-    rm -rf "$TS_DIR_C" 2>/dev/null
-    add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "dead holder pid $hpid"; return 0
-  fi
-  case "$hb" in ''|*[!0-9]*) hb=0 ;; esac
-  age=$(( $(ts_now) - hb ))
-  if [ "$hb" != 0 ] && [ "$age" -gt "$httl" ]; then
-    printf 'run-gates: reaping the beacon of a stalled holder (heartbeat %ss old, ttl %ss)\n' "$age" "$httl" >&2
-    rm -rf "$TS_DIR_C" 2>/dev/null
-    add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "stalled holder heartbeat ${age}s ttl ${httl}s"; return 0
-  fi
-  return 1
+  local d hpid hb age httl hn reaped=1
+  # SLOT BY SLOT (TOOL-aPairedSlots-2): each slot is judged by its own pid and its own ttl, every dead
+  # or stalled one is reaped on this tick, and a live neighbour is never touched. THE REMOVAL IS
+  # NONCE-GUARDED: the nonce read when the slot was judged must still be there, so a slot a successor
+  # claimed between the judgement and the removal survives. That narrows TOOL-aReapedTicket-4's race
+  # to the instant between the re-read and the `rm`; it does not close it.
+  for d in ${TS_SLOT_DIRS[@]+"${TS_SLOT_DIRS[@]}"}; do
+    [ -d "$d" ] || continue
+    hpid=$(cat "$d/pid" 2>/dev/null)
+    hb=$(cat "$d/heartbeat" 2>/dev/null)
+    hn=$(cat "$d/nonce" 2>/dev/null)
+    # THE HOLDER'S TTL is the bound (TOOL-aFrugalTurnstile-5 S3): on a host-wide beacon the holder may be
+    # another repository running a longer one. Anything but a positive integer, as from an older
+    # runner's beacon, falls back to this waiter's own.
+    httl=$(cat "$d/ttl" 2>/dev/null)
+    num_ok "$httl" || httl=$TS_TTL
+    if [ -n "$hpid" ] && ! ts_alive "$hpid"; then
+      [ "$(cat "$d/nonce" 2>/dev/null)" = "$hn" ] || continue
+      printf 'run-gates: reaping the beacon of a dead holder (pid %s)\n' "$hpid" >&2
+      rm -rf "$d" 2>/dev/null
+      add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "dead holder pid $hpid"; reaped=0; continue
+    fi
+    case "$hb" in ''|*[!0-9]*) hb=0 ;; esac
+    age=$(( $(ts_now) - hb ))
+    if [ "$hb" != 0 ] && [ "$age" -gt "$httl" ]; then
+      [ "$(cat "$d/nonce" 2>/dev/null)" = "$hn" ] || continue
+      printf 'run-gates: reaping the beacon of a stalled holder (heartbeat %ss old, ttl %ss)\n' "$age" "$httl" >&2
+      rm -rf "$d" 2>/dev/null
+      add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "stalled holder heartbeat ${age}s ttl ${httl}s"; reaped=0
+    fi
+  done
+  return "$reaped"
 }
 
 # Reap a QUEUE TICKET whose owner cannot still be waiting (TOOL-aReapedTicket-2) — the other half of
@@ -1354,10 +1398,20 @@ ts_sweep_queue() {
 
 # NESTED (S5): inside the bar that holds this host, as its exported nonce says, so no ticket is taken
 # and nothing is claimed; the inherited value stays exported for this run's own legs.
-if [ -n "$TS_DIR_C" ] && [ -n "${GATE_TURNSTILE_HOLDER:-}" ] \
-   && [ "$(cat "$TS_DIR_C/nonce" 2>/dev/null)" = "$GATE_TURNSTILE_HOLDER" ]; then
+# EVERY SLOT BEACON PRESENT is read, slot 1 and each `.<k>` beside it, not 1 to this runner's own
+# count (TOOL-aPairedSlots-2 S5): a fixture bar whose table declares fewer slots than the holder that
+# started it must still find its parent's nonce. A builtin glob, so an unset holder costs nothing.
+TS_NEST_DIR=""
+if [ -n "$TS_DIR_C" ] && [ -n "${GATE_TURNSTILE_HOLDER:-}" ]; then
+  for _ts_d in "$TS_DIR_C" "$TS_DIR_C".*; do
+    [ -d "$_ts_d" ] || continue
+    [ "$(cat "$_ts_d/nonce" 2>/dev/null)" = "$GATE_TURNSTILE_HOLDER" ] && { TS_NEST_DIR=$_ts_d; break; }
+  done
+  unset _ts_d
+fi
+if [ -n "$TS_NEST_DIR" ]; then
   TS_NESTED=1
-  ts_hr=$(cat "$TS_DIR_C/run" 2>/dev/null); ts_hd=$(cat "$TS_DIR_C/repo" 2>/dev/null); ts_hp=$(cat "$TS_DIR_C/pid" 2>/dev/null)
+  ts_hr=$(cat "$TS_NEST_DIR/run" 2>/dev/null); ts_hd=$(cat "$TS_NEST_DIR/repo" 2>/dev/null); ts_hp=$(cat "$TS_NEST_DIR/pid" 2>/dev/null)
   echo "gate queue: nested under ${ts_hr:--} — ${ts_hd:--} pid ${ts_hp:--}"
 elif [ -n "$TS_DIR_C" ]; then
   TS_NONCE="$$-$(ts_now)-$RANDOM"
@@ -1422,8 +1476,7 @@ elif [ -n "$TS_DIR_C" ]; then
     # the pid, which is the whole difference between a fixed wedge and a wedge nobody can see was
     # fixed. TOOL-aBoundedCeiling-12.
     if [ -n "$TS_TICKET" ] && [ "$(ls -1 "$TS_Q" 2>/dev/null | LC_ALL=C sort | head -1)" = "$(basename "$TS_TICKET")" ] \
-       && mkdir "$TS_DIR_C" 2>/dev/null; then
-      TS_DIR="$TS_DIR_C"
+       && resolve_free_slot; then
       printf '%s' "$(ts_now)" > "$TS_DIR/heartbeat" 2>/dev/null || true
       printf '%s' "$$"        > "$TS_DIR/pid" 2>/dev/null || true
       # The holder's name, for a waiter's queue line and a nested run's, and the TTL a waiter judges
@@ -1525,7 +1578,22 @@ elif [ -n "$TS_DIR_C" ]; then
       # because `run-gates.turnstile.test.sh` greps it; only the leading clause varies.
       # The holder is NAMED from its beacon (TOOL-aFrugalTurnstile-5 S4): on a host key it may be
       # another repository, and "someone holds this" sent the reader to search every one of them.
-      if [ -d "$TS_DIR_C" ]; then
+      # ABOVE ONE SLOT the leading clause counts the held slots and names every holder
+      # (TOOL-aPairedSlots-2 S6); the tail is the same bytes at every count.
+      if [ "$TS_SLOTS" -gt 1 ]; then
+        measure_held_slots; ts_names=""
+        for _ts_d in "${TS_SLOT_DIRS[@]}"; do
+          [ -d "$_ts_d" ] || continue
+          ts_hr=$(cat "$_ts_d/run" 2>/dev/null); ts_hd=$(cat "$_ts_d/repo" 2>/dev/null); ts_hp=$(cat "$_ts_d/pid" 2>/dev/null)
+          ts_names="$ts_names${ts_names:+; }${ts_hd:--} run ${ts_hr:--} pid ${ts_hp:--}"
+        done
+        unset _ts_d
+        if [ "$TS_HELD_N" -ge "$TS_SLOTS" ]; then
+          echo "run-gates: $TS_HELD_N of $TS_SLOTS bar slots on this host are held — $ts_names — queued at position $pos (waited ${TS_WAITED}s)" >&2
+        else
+          echo "run-gates: $TS_HELD_N of $TS_SLOTS bar slots on this host are held, and a ticket sorts ahead of this one — queued at position $pos (waited ${TS_WAITED}s)" >&2
+        fi
+      elif [ -d "$TS_DIR_C" ]; then
         ts_hr=$(cat "$TS_DIR_C/run" 2>/dev/null); ts_hd=$(cat "$TS_DIR_C/repo" 2>/dev/null); ts_hp=$(cat "$TS_DIR_C/pid" 2>/dev/null)
         echo "run-gates: another bar holds this host — ${ts_hd:--} run ${ts_hr:--} pid ${ts_hp:--} — queued at position $pos (waited ${TS_WAITED}s)" >&2
       else
@@ -2367,6 +2435,12 @@ if [ -n "$RUNDIR" ]; then
     # additive key breaks none, and a bump could not be armed because nothing reads the field.
     printf 'queued\t%s\n'      "$QUEUED"
     printf 'queued_from\t%s\n' "$QUEUED_FROM"
+    # THE SLOT KEYS (TOOL-aPairedSlots-2 S7), written above one slot ONLY, so a run at the kit default
+    # writes the header it always wrote. `slot` is the slot this run held, `-` when it held none.
+    if [ "${TS_SLOTS:-1}" -gt 1 ]; then
+      printf 'slots\t%s\n' "$TS_SLOTS"
+      printf 'slot\t%s\n'  "${TS_SLOT:--}"
+    fi
     # The reuse mode as given, `lineage`, another value, or empty (TOOL-aFrugalTurnstile-4 S4). Outside
     # the run-envelope block for the reason the queue keys above give.
     printf 'reuse\t%s\n' "$REUSE_MODE"
