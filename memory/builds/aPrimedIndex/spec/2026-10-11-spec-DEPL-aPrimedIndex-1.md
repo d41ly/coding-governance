@@ -1,10 +1,13 @@
 # DEPL-aPrimedIndex-1 — govkit's verdict reader runs the target's runner with its generated-output preflight skipped
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams deployer · order 4
+**Status:** CLOSED · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams deployer · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-11-build-DEPL-aPrimedIndex-1-1-acceptance-ledger.md](../build/2026-10-11-build-DEPL-aPrimedIndex-1-1-acceptance-ledger.md) | journal | — |
+| [2026-10-11-prompt-TOOL-aPrimedIndex-6-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPrimedIndex-6-1-build-brief.md) | journal | TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-7 TOOL-aPrimedIndex-8 |
 
 <!-- /gen:spec-records -->
 

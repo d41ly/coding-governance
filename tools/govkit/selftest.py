@@ -15730,6 +15730,20 @@ user_skills = "/tmp/gk-fake-skills"
         # exists, at the end of its own block; a single sweep here graded 2 of the suite's ~6.
         check_rollback_orders(tmp, "the late scratch (m13, v14-reap)", 2)
 
+    # ---- DEPL-aPrimedIndex-1. THE VERDICT READER SKIPS THE RUNNER'S GENERATED-OUTPUT PREFLIGHT. The
+    # ---- preflight exits 2 before any leg line when a declared output is stale, and an empty map let
+    # ---- apply certify an install it never compared. The fixture runner prints its leg line only when
+    # ---- GATE_REGEN_CHECK=0 reaches it, and otherwise refuses in the preflight's shape.
+    with tempfile.TemporaryDirectory() as _rv:
+        _rvt = pathlib.Path(_rv)
+        (_rvt / "runner.sh").write_text(
+            '[ "${GATE_REGEN_CHECK:-1}" = 0 ] || { echo "run-gates: REFUSED"; exit 2; }\n'
+            'echo "GATE ok    fixture leg"\n', encoding="utf-8", newline="\n")
+        _rvm = govkit_module().read_gate_verdicts(_rvt, {"command": ["bash", "runner.sh"],
+                                                         "observed_ran": ["GATE ok    {name}"]})
+        check("[aPrimedIndex-1] the verdict reader skips the runner's preflight, so a leg still reads",
+              _rvm.get("fixture leg") == "green", repr(_rvm))
+
     print()
     if FAILURES:
         print(f"govkit-selftest: {len(FAILURES)} FAILED — {', '.join(FAILURES)}")

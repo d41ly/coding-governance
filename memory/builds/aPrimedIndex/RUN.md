@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: wf_118c9d70-8b1
-phase: REVIEWING
+witness: 6e515ad124bde1b965900d4de5d1a67d87b21a1e
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/enforce-index-regen-before-bars-acdde6
@@ -63,3 +63,13 @@ base: 15bbfa4f867262f3c862e2473688fc69d0566b7d
 2026-10-11T06:47:34Z rescope · item add TOOL-aPrimedIndex-7 · reason closing review r1 minors batch, regen verb and runner: M1 M2 M4 M5 M6 M7 M10 L1 L3 L4 and the README halves of H1 and L2
 
 2026-10-11T06:47:49Z rescope · item add TOOL-aPrimedIndex-8 · reason closing review r1 minors batch, lander: M3 M8 M9 and the arms of L2; disjoint from TOOL-aPrimedIndex-7's write set
+
+2026-10-11T06:59:54Z brief · item DEPL-aPrimedIndex-1 · reason cf9c7df95cf8 memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-6-1-build-brief.md
+
+2026-10-11T07:00:03Z brief · item TOOL-aPrimedIndex-6 · reason cf9c7df95cf8 memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-6-1-build-brief.md
+
+2026-10-11T07:00:12Z brief · item TOOL-aPrimedIndex-7 · reason cf9c7df95cf8 memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-6-1-build-brief.md
+
+2026-10-11T07:00:23Z brief · item TOOL-aPrimedIndex-8 · reason cf9c7df95cf8 memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-6-1-build-brief.md
+
+2026-10-11T07:02:22Z dispatch · item 6e515ad1 DEPL-aPrimedIndex-1 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/aPrimedIndex/spec/2026-10-11-spec-DEPL-aPrimedIndex-1.md memory/builds/aPrimedIndex/build/2026-10-11-build-DEPL-aPrimedIndex-1-1-acceptance-ledger.md memory/builds/aPrimedIndex/README.md memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-6-1-build-brief.md memory/map/generated/symbols.json

@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-11-prompt-TOOL-aPrimedIndex-6-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPrimedIndex-6-1-build-brief.md) | journal | DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-8 |
 
 <!-- /gen:spec-records -->
 
