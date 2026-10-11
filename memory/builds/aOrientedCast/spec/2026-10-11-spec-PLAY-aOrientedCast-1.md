@@ -1,6 +1,6 @@
 # PLAY-aOrientedCast-1 — the charter: every agent is handed a rendered role, and the main loop delegates
 
-**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams playbook · order 8 · ratified 2026-10-11
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams playbook · order 8 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
