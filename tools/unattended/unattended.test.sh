@@ -3055,8 +3055,10 @@ done <<<"$ug"
 # ---- `_` joins the excluded neighbours since TOOL-dDerivedDocket-24 S10, whose `read_leg_argv` is the
 # ---- first CALL of the resolver with a word after it (`resolve_python 2>/dev/null`): the name ends
 # ---- in `python `, and a launcher word preceded by an identifier character is never a bare launcher.
+# ---- A `local` declaration, a double-quoted string and a `.py` extension are not invocations either: the
+# ---- held job redded on `local base py d`, on prose saying "no python launcher", and on `drift_report.py `.
 n=$((n+1)); [ "$(grep -c '^# >>> resolve_python' "$SCRIPT")" = 1 ] || { echo "FAIL the driver carries no inline resolve_python block, so any launcher it runs is unresolved"; st=1; }
-np=$(awk '/^# >>> resolve_python/{b=1} b{if(/^# <<< resolve_python/)b=0; next} /^[[:space:]]*#/{next} {print NR": "$0}' "$SCRIPT" | grep -E '(^|[^-_[:alnum:]])(python3?|py) ' || true)
+np=$(awk '/^# >>> resolve_python/{b=1} b{if(/^# <<< resolve_python/)b=0; next} /^[[:space:]]*#/{next} /^[[:space:]]*local[[:space:]]/{next} {l=$0; gsub(/"[^"]*"/, """", l); print NR": "l}' "$SCRIPT" | grep -E '(^|[^-_.[:alnum:]])(python3?|py) ' || true)
 n=$((n+1)); [ -z "$np" ] || { echo "FAIL the driver invokes a python launcher without the resolver: $np"; st=1; }
 n=$((n+1)); grep -q 'run_bounded "\$_stpy" "\$SPEC_TOKENS_CLI"' "$SCRIPT" || { echo "FAIL the declared spec-token checker is not run through the resolved launcher"; st=1; }
 
@@ -13805,7 +13807,9 @@ read_ask_back() { AB_WHY="the double reads nothing back"; [ "${F4_READBACK:-no}"
 # refused leg would render views for rows that are not there.
 write_ask_views() { echo "f4-views-double: $1 filed"; }
 run_f4_filer() { # temp store -> the sliced filer's output over the arm's repository; F4_CP_FAILS=backup|restore fails that copy
-  local M=memory ASKS_CMD="bash asks.sh" RB_OUT=""
+  # WI_STAGED and AV_STAGED are the driver's globals the filer appends to (TOOL-dUnstuckLanding-27
+  # S3); unset here, `set -u` killed the filer after the row write and before the views call.
+  local M=memory ASKS_CMD="bash asks.sh" RB_OUT="" WI_STAGED="" AV_STAGED=""
   local -x TMPDIR="$1" F4_BL="memory/builds/tRun/BACKLOG.md" F4_CP_FAILS="${F4_CP_FAILS:-}" F4_REAL_CP
   F4_REAL_CP=$(command -v cp)
   ( cd "$f4_dir" || exit 2

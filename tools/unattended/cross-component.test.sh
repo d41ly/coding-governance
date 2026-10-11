@@ -121,11 +121,14 @@ fi
 # the driver reads as "no profile", exactly as it reads a profile that exits non-zero. `primary` is
 # DECLARED, not blanked: a blank mode announces its default on stderr, which drive() merges into
 # every output an arm reads. The in-place probes are the driver suite's, over a stub lander.
+# The two brief cutoffs are BLANKED: this suite's prompt-mode READMEs carry no prompt record, and the
+# brief rules have their own arms in the driver suite (held job, 2026-10-10: check 115, then 117).
 sed -e 's/^ANCHOR_SCOPE=.*/ANCHOR_SCOPE="published"/' -e 's|^GATE_CMD=.*|GATE_CMD="true"|' \
     -e 's|^WIRING_CHECK=.*|WIRING_CHECK="true"|' -e 's|^KICKOFF_ENGINE=.*|KICKOFF_ENGINE=""|' \
     -e 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI=""|' \
     -e 's/^LANDER_MODE=.*/LANDER_MODE="primary"/' -e 's|^GATE_PROFILE_CMD=.*|GATE_PROFILE_CMD=""|' \
     -e 's|^UNDECLARED_WRITE_BUDGET=.*|UNDECLARED_WRITE_BUDGET="0"|' \
+    -e 's|^PROMPT_BRIEF_CUTOFF=.*|PROMPT_BRIEF_CUTOFF=""|' -e 's|^PROMPT_BRIEF_SKELETON_CUTOFF=.*|PROMPT_BRIEF_SKELETON_CUTOFF=""|' \
     "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/.unattended.conf" > .unattended.conf
 git add -A >/dev/null && git commit -q -m base --no-verify
 git remote add origin ../origin.git && git push -q origin main
