@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-2 — the handoff renderer: a role's constant block and a task block rendered from the card, the brief and the unit, into one prompt file
 
-**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 2
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
