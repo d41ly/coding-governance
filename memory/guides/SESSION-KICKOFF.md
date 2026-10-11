@@ -84,11 +84,11 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   the handles are written here — that is the drift the pointer design exists to avoid. Two invert
   the reflex: a discovery is ADOPTED not parked; the idle-wake precedes orienting. §11 and §5.
 
-- **The idle-wake is not the keepalive.** The cron job wakes an idle session and nothing else; what
-  resumes a stalled run lives OUTSIDE its session — the stop-guard at every turn end, the
-  stall-recorder at every error end, the resume tick from the OS scheduler — reading the LEASE
-  (`session:`, `pid:`, `host:`, `pid-image:`, `lease-utc:`) the driver records and the verdict
-  `--liveness` derives. `RESUME_STALE_BOUND` is the bound they act on. Protocol §5; `aWokenSentinel`.
+- **The idle-wake is not the keepalive.** The cron job only wakes an idle session (nine never fired
+  in 30 h, 2026-10-10); what resumes a stalled run lives OUTSIDE its session — the stop-guard, the
+  stall-recorder, the resume tick from the OS scheduler — reading the LEASE the driver records and
+  the verdict `--liveness` derives against `RESUME_STALE_BOUND`. The tick kills only what it
+  launched: a live STALE session is a `stale-live-pid` health line. Protocol §5; `aSparedHolder`.
 
 - **`GATE_BOUND` bounds every command a project declares, `GATE_CMD` only where no
   `GATE_PROFILE_CMD` is; `GATE_REAP_BOUND` the teardown reap.** This repo declares a profile, so its
