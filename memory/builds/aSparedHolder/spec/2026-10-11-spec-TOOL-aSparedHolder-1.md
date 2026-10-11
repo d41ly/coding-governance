@@ -1,6 +1,6 @@
 # TOOL-aSparedHolder-1 — the resume tick kills only what it launched, and a resumed session waits for its background work
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-1 · base 69e0ff0f · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-10-11 · node a · Tier-1 · base 69e0ff0f · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

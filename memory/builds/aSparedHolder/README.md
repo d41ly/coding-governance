@@ -45,6 +45,8 @@ owner's prose is the mandate, recorded under [prompts/](prompts/2026-10-11-promp
 - **The unattended self-tests are owed** (owner, 2026-10-11: not run this session). The pooled run refused: no pooled
   calibration reading on node a for the 8 driver selftest shards. Run `--selftests --pooled` after
   calibrating, or `--selftests --serial --attribute 69e0ff0f`, from the merged tree.
+- **Landed with no bar** (owner, 2026-10-11): `git push --no-verify` from local main at 75a1a52e, after the
+  attended lander was stopped mid-bar. Gates observed instead are in the spec and this session.
 
 <!-- roster:units -->
 
@@ -54,13 +56,13 @@ owner's prose is the mandate, recorded under [prompts/](prompts/2026-10-11-promp
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-10-11 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-10-11 · streams tooling
 ids TOOL-aSparedHolder-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aSparedHolder-1 — the resume tick kills only what it launched, and a resumed session waits for its background work](spec/2026-10-11-spec-TOOL-aSparedHolder-1.md) | 1 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
+| [TOOL-aSparedHolder-1 — the resume tick kills only what it launched, and a resumed session waits for its background work](spec/2026-10-11-spec-TOOL-aSparedHolder-1.md) | 1 | 1 | CLOSED | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).
