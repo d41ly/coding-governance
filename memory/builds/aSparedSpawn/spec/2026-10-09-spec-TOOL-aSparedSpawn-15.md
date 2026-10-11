@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-15 — the remaining clock-bound arms on the flake list, ordered or calibrated
 
-**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-1 · base 22efab65 · streams tooling · order 2
+**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-1 · base 22efab65 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -38,8 +38,9 @@ item names its class:
   in `ts_tick_start` in `tools/run-gates/run-gates.sh`: each tick reads the nonce through `$(cat ...)`
   and the time through `$(ts_now)`, which is `date +%s`. The tick reads both with builtins, keeping
   `${EPOCHSECONDS:-$(date +%s)}` as its fallback the way the runner's owner record already does. The
-  arm then measures the host before it runs: the shipped `ts_tick_start`, extracted and run for ten
-  ticks with its `sleep` shadowed by a function that spawns `sleep 0`, timed over `EPOCHREALTIME` the
+  arm then measures the host before it runs: the shipped `ts_tick_start` and the two helpers it
+  calls, extracted and run for ten ticks with a `sleep` stub first on its PATH that returns at once
+  and ends the ticker on its eleventh call by replacing the nonce, timed over `EPOCHREALTIME` the
   way `measure_load_ratio` in `tools/run-gates/foreign-prefix.gov.test.sh` times its spawns, giving
   one tick's period as the tick plus the mean body; its TTL becomes three periods and never under
   6 s, with `TS_LONG` the TTL plus 8 s. The tick body's one fewer `cat-file` site lowers its
@@ -188,6 +189,11 @@ none
   is a period that rises with `cat` put back, which a bare spawn reading cannot show. The tick's
   dropped `cat` moves `memory/project/spawn-idiom-sites.txt` from 20 to 19 `cat-file` sites in
   `run-gates.sh`, so §7 names that leg and `recall floor`, whose guard the registry path trips. AC7's cost is the whole selftest at VERIFYING.
+- rev-3 · 2026-10-11 · S3 · the build pass. The tick measurement's `sleep` is a stub on PATH, and the
+  two helpers come from the runner by extraction, rather than three functions defined in the suite:
+  `lexicon naming predicates` grades every definition there, and `sleep`, `ts_alive` and `ts_now`
+  moved its verb pin by three, the class TOOL-aSparedSpawn-11 rev-3 met. The stub costs one spawn
+  where the real `sleep` costs one.
 
 ## 10. Reuse audit
 
