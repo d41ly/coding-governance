@@ -89,8 +89,8 @@ mkdir -p memory/guides ${PFX}unattended .claude/skills/unattended
 cp "$HERE/unattended.sh" "$HERE/check-unattended.sh" "$HERE/lib-unattended.sh" "$HERE/PROTOCOL.template.md" \
    "$HERE/SKILL.template.md" "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" \
    "$HERE/.unattended.conf.example" "$HERE/VERBS.template.md" ${PFX}unattended/
-cp "$(git -C "$HERE" rev-parse --show-toplevel)/memory/guides/BUILD-METHOD.md" memory/guides/
-cp "$(git -C "$HERE" rev-parse --show-toplevel)/memory/guides/UNATTENDED-PROTOCOL.md" memory/guides/
+cp "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/memory/guides/BUILD-METHOD.md" memory/guides/
+cp "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/memory/guides/UNATTENDED-PROTOCOL.md" memory/guides/
 cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
 cp "$HERE/ASKS.template.md" "${PFX}unattended/"
 cp "$HERE/ASKS.template.md" memory/guides/UNATTENDED-ASKS.md
@@ -126,7 +126,7 @@ sed -e 's/^ANCHOR_SCOPE=.*/ANCHOR_SCOPE="published"/' -e 's|^GATE_CMD=.*|GATE_CM
     -e 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI=""|' \
     -e 's/^LANDER_MODE=.*/LANDER_MODE="primary"/' -e 's|^GATE_PROFILE_CMD=.*|GATE_PROFILE_CMD=""|' \
     -e 's|^UNDECLARED_WRITE_BUDGET=.*|UNDECLARED_WRITE_BUDGET="0"|' \
-    "$(git -C "$HERE" rev-parse --show-toplevel)/.unattended.conf" > .unattended.conf
+    "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/.unattended.conf" > .unattended.conf
 git add -A >/dev/null && git commit -q -m base --no-verify
 git remote add origin ../origin.git && git push -q origin main
 

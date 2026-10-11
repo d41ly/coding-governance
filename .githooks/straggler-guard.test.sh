@@ -470,8 +470,8 @@ after=$(git -C "$T" config --get core.hooksPath || true)
 # `C:/Users/…/Temp/…` for one directory, so a text match of the one against the other redded a
 # correct helper at the build's first bar. Git names the printed path's top level itself, the
 # printed path must BE that top level, and the listing must carry it on `side` (the spec's AC14).
-tl=$(git -C "$tout" rev-parse --show-toplevel 2>/dev/null || true)
-tp=$(git -C "$tout" rev-parse --show-prefix 2>/dev/null || echo not-a-tree)
+tl=$(unset GIT_DIR GIT_WORK_TREE; git -C "$tout" rev-parse --show-toplevel 2>/dev/null || true)
+tp=$(unset GIT_DIR GIT_WORK_TREE; git -C "$tout" rev-parse --show-prefix 2>/dev/null || echo not-a-tree)
 { [ -n "$tl" ] && [ -z "$tp" ] && git -C "$T" worktree list --porcelain | tr -d '\r' |
     awk -v p="$tl" '/^worktree / { w = substr($0, 10) } $1 == "branch" && w == p && $2 == "refs/heads/side" { f = 1 } END { exit !f }'; } \
   || print_failure "AC14: the path --topology printed is not a worktree of the fixture on 'side': $tout (git names it '$tl')"; add_arm

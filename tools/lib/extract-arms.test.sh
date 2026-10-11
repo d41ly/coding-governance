@@ -31,7 +31,7 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "extract-arms.test: not inside a gi
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
-ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
+ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
   echo "extract-arms.test: not a git work tree"; exit 2; }
 cd "$ROOT" || exit 2
 . "$ROOT/$KIT_REL/lib-selftest.sh"

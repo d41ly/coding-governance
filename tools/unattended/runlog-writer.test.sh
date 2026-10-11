@@ -161,7 +161,7 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 PY=$(resolve_python 2>/dev/null) || PY=""
 RUNLOG_KIT=""; RUN_GATES_DIR=""
 if [ -n "$PY" ]; then
-  _rw_root=$(git -C "$HERE" rev-parse --show-toplevel)
+  _rw_root=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)
   RUNLOG_KIT=$(resolve_kit_dir "$PY" runlog runlog_lib.py "$HERE" 2>/dev/null) && RUNLOG_KIT="$_rw_root/$RUNLOG_KIT"
   RUN_GATES_DIR=$(resolve_kit_dir "$PY" run-gates selftest-budgets.txt "$HERE" 2>/dev/null) && RUN_GATES_DIR="$_rw_root/$RUN_GATES_DIR"
 fi
@@ -684,7 +684,7 @@ check_ac11_worktree() {
   git worktree add -q "$wt" -b side >/dev/null 2>&1
   (cd "$wt" && bash "$KR/unattended.sh" --status "$SLUG" >/dev/null 2>&1)
   l=$(measure_lines)
-  top=$(git -C "$wt" rev-parse --show-toplevel)
+  top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$wt" rev-parse --show-toplevel)
   gd=$(git -C "$wt" rev-parse --path-format=absolute --git-dir)
   check "AC11 the linked worktree's line lands in the COMMON journal" "$(read_field $((l - 1)) wt)" "$top"
   check "AC11 its own git dir is under worktrees" "$(case "$gd" in */.git/worktrees/*) echo yes ;; esac)" yes

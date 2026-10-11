@@ -1,11 +1,13 @@
 # TOOL-dRemeasuredRender-1 — gov's shipped suites scrub every bare location probe, and gov's own row stops excluding them
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node d · Tier-2 · base 9a8777b8 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-10-11 · node d · Tier-2 · base 9a8777b8 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-dRemeasuredRender-1-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-dRemeasuredRender-1-1-acceptance-ledger.md) | journal | — |
+| [2026-10-11-prompt-TOOL-dRemeasuredRender-1-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-dRemeasuredRender-1-1-build-brief.md) | journal | — |
 | [2026-10-11-prompt-TOOL-dRemeasuredRender-1-brief.md](../prompts/2026-10-11-prompt-TOOL-dRemeasuredRender-1-brief.md) | research | DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 |
 
 <!-- /gen:spec-records -->
@@ -20,8 +22,10 @@ ships.
 ## 2. Scope (IN)
 
 - **S1** — Every bare site `sh_hygiene.py --location-probes` reports at base, run with no registry
-  and no pathspec, is rewritten in place to the scrub the scanner prints for it:
-  `(unset GIT_DIR GIT_WORK_TREE; ...)` opening the command substitution. Observed by AC1, AC3.
+  and no pathspec, is rewritten in place by inserting the scrub the scanner names,
+  `unset GIT_DIR GIT_WORK_TREE;`, opening the command substitution, and nothing else on the line
+  moves. The scanner's remedy line is not pasted, because it drops a trailing comment. Observed by
+  AC1, AC3.
 - **S2** — Gov's own row in `tools/gate-legs.json` drops the `:!*.test.sh` pathspec and keeps
   `:!memory/` and its registry argument. Observed by AC2.
   **Readers:**
@@ -103,8 +107,8 @@ Each touched kit's version moves once, after the last edit, per `tools/check-kit
 - error / empty / loading states — N/A — a substitution's exit status is unchanged by `unset`.
 - observability — the leg's own report; GATED reads 0.
 - risks — a suite that relied on an inherited `GIT_DIR` at a probe site; none does, per §4.
-- testing — every touched suite outside `tools/unattended/` run directly; those six by parse check
-  and a probe of each scrubbed line, under the owner's standing instruction.
+- testing — every touched suite outside `tools/unattended/` runs as its leg in the close's flagged
+  bar; those six by parse check and a probe of the scrub, under the owner's standing instruction.
 - migration — none.
 - user docs — N/A — nothing user-facing moves.
 
@@ -116,14 +120,17 @@ Each touched kit's version moves once, after the last edit, per `tools/check-kit
 - **AC2** — When gov's own row, `shell hygiene (a location probe asked from a moved directory)`,
   runs from `tools/gate-legs.json` without `:!*.test.sh`, it exits 0. Red when: the pathspec is
   dropped while a site is still bare, which is the base state.
-- **AC3** — When each touched suite outside `tools/unattended/` runs directly, it exits 0, and each
-  `tools/unattended/` suite passes `bash -n`. Red when: a rewrite breaks a suite's syntax or an arm.
-  permission: the six `tools/unattended/` suites are under the owner's no-run instruction.
-  cost: the direct suite runs are tens of minutes on node d, so they run once, at the close.
+- **AC3** — When every touched `*.test.sh` is diffed against base, each changed line equals its
+  base line with exactly one `unset GIT_DIR GIT_WORK_TREE; ` inserted, and each suite passes
+  `bash -n`. Red when: a rewrite moves anything beyond the scrub, or breaks a suite's syntax.
+
+The suites themselves run as their legs, listed in §7, once, in the close's flagged bar: a suite
+run is a gate and never an acceptance observation. The six `tools/unattended/` suites are no leg,
+and are not run, under the owner's standing instruction of 2026-08-23.
 
 ## 7. Gates
 
-`shell hygiene (a location probe asked from a moved directory)` · `shell-hygiene selftest` · `line-length gate selftest` · `manifest-check self-test` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `process-monitor adopter selftest` · `run-gates canary` · `run-gates gov canary` · `hook destinations self-test` · `lexicon naming predicates` · `selftest harness self-test` · `extract-arms self-test` · `run-selftests self-test`
+`shell hygiene (a location probe asked from a moved directory)` · `shell-hygiene selftest` · `line-length gate selftest` · `manifest-check self-test` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `process-monitor adopter selftest` · `run-gates canary` · `run-gates gov canary` · `hook destinations self-test` · `lexicon naming predicates` · `selftest harness self-test` · `extract-arms self-test` · `run-selftests self-test` · `straggler-guard arms` · `spec-tokens self-test` · `check-wiring self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `verdict-epoch self-test` · `marker contracts` · `row-keyed merge driver replay` · `transition-audit arms` · `push-main self-test` · `foreign-prefix parity (every self-test at three prefixes)` · `run-gates run-log line` · `run-gates turnstile`
 
 ## 8. Open questions
 
@@ -132,6 +139,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft, from the owner's prompt.
+- rev-2 · 2026-10-11 · S1 · AC3 · §5 · §7 · the scrub is inserted, not pasted from the remedy line,
+  which drops trailing comments; AC3 observes the diff and the parse, and the suite runs move to §7
+  as the legs that run them, since a suite run is no acceptance observation.
 
 ## 10. Reuse audit
 

@@ -111,7 +111,7 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 _rkd_py=$(resolve_python) || { echo "check-verifier-fanout.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
 HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
 HOOKS="${HOOKS_DIR##*/}"
-ROOT="$(git -C "$HERE" rev-parse --show-toplevel)" || exit 2
+ROOT="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" || exit 2
 GATE="$HERE/check-verifier-fanout.sh"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 fails=0
