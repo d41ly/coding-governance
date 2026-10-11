@@ -1,6 +1,6 @@
 # TOOL-aHomedAnchor-24 — the `--overlaps` verb is named on both surfaces an agent reads
 
-**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 6 · closes TOOL-aHomedAnchor-20
+**Status:** CLOSED · rev-2 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 6 · closes TOOL-aHomedAnchor-20
 
 <!-- gen:spec-records -->
 

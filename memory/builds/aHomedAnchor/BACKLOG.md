@@ -18,30 +18,30 @@
 
 ## Dispositions
 - SEV · TOOL-aHomedAnchor-8 · HIGH · a held self-test is red on the default branch's daily job
-- KEEP · TOOL-aHomedAnchor-8 · filed by an unattended run for the owning build; outside this build's goal
+- CLOSED · TOOL-aHomedAnchor-8 · by d006cfc569f22e9f893ae9b57998b47a8bda6c1b · green on the daily held job's run 38045767386 at d006cfc5, which carries this build's landing
 - SEV · TOOL-aHomedAnchor-9 · HIGH · a held self-test is red on the default branch's daily job
-- KEEP · TOOL-aHomedAnchor-9 · filed by an unattended run for the owning build; outside this build's goal
+- CLOSED · TOOL-aHomedAnchor-9 · by TOOL-aHomedAnchor-22 · red only through corpus-ids, whose CLI now writes UTF-8
 - SEV · TOOL-aHomedAnchor-10 · HIGH · a held self-test is red on the default branch's daily job
-- KEEP · TOOL-aHomedAnchor-10 · filed by an unattended run for the owning build; outside this build's goal
+- CLOSED · TOOL-aHomedAnchor-10 · by TOOL-aHomedAnchor-22 · corpus_ids.py writes UTF-8; observed with PYTHONUTF8=0
 - SEV · TOOL-aHomedAnchor-11 · HIGH · a held self-test is red on the default branch's daily job
-- KEEP · TOOL-aHomedAnchor-11 · filed by an unattended run for the owning build; outside this build's goal
+- CLOSED · TOOL-aHomedAnchor-11 · by TOOL-aHomedAnchor-22 · lexicon.py writes UTF-8; observed with PYTHONUTF8=0
 - SEV · TOOL-aHomedAnchor-12 · HIGH · a held self-test is red on the default branch's daily job
-- KEEP · TOOL-aHomedAnchor-12 · filed by an unattended run for the owning build; outside this build's goal
+- CLOSED · TOOL-aHomedAnchor-12 · by TOOL-aHomedAnchor-27 · govkit reads guarded paths as UTF-8, and its selftest prints UTF-8 (unit 22)
 - SEV · TOOL-aHomedAnchor-13 · HIGH · a held self-test is red on the default branch's daily job
-- KEEP · TOOL-aHomedAnchor-13 · filed by an unattended run for the owning build; outside this build's goal
+- CLOSED · TOOL-aHomedAnchor-13 · by d006cfc569f22e9f893ae9b57998b47a8bda6c1b · green on the daily held job's run 38045767386 at d006cfc5, which carries this build's landing
 - SEV · TOOL-aHomedAnchor-14 · HIGH · a held self-test is red on the default branch's daily job
-- KEEP · TOOL-aHomedAnchor-14 · filed by an unattended run for the owning build; outside this build's goal
+- CLOSED · TOOL-aHomedAnchor-14 · by TOOL-aHomedAnchor-22 · runlog.py writes UTF-8; its schema arms pass with PYTHONUTF8=0
 - SEV · TOOL-aHomedAnchor-15 · HIGH · a held self-test is red on the default branch's daily job
-- KEEP · TOOL-aHomedAnchor-15 · filed by an unattended run for the owning build; outside this build's goal
+- CLOSED · TOOL-aHomedAnchor-15 · by d006cfc569f22e9f893ae9b57998b47a8bda6c1b · green on the daily held job's run 38045767386 at d006cfc5, which carries this build's landing
 - SEV · TOOL-aHomedAnchor-16 · HIGH · a held self-test is red on the default branch's daily job
-- KEEP · TOOL-aHomedAnchor-16 · filed by an unattended run for the owning build; outside this build's goal
+- CLOSED · TOOL-aHomedAnchor-16 · by d006cfc569f22e9f893ae9b57998b47a8bda6c1b · green on the daily held job's run 38045767386 at d006cfc5, which carries this build's landing
 - SEV · TOOL-aHomedAnchor-17 · HIGH · a held self-test is red on the default branch's daily job
-- KEEP · TOOL-aHomedAnchor-17 · filed by an unattended run for the owning build; outside this build's goal
+- CLOSED · TOOL-aHomedAnchor-17 · by d006cfc569f22e9f893ae9b57998b47a8bda6c1b · green on the daily held job's run 38045767386 at d006cfc5, which carries this build's landing
 - SEV · TOOL-aHomedAnchor-18 · HIGH · a held self-test is red on the default branch's daily job
-- KEEP · TOOL-aHomedAnchor-18 · filed by an unattended run for the owning build; outside this build's goal
+- CLOSED · TOOL-aHomedAnchor-18 · by TOOL-aHomedAnchor-23 · the launcher arm reads only invocations; the shard itself not re-run, by the owner's ruling
 - SEV · TOOL-aHomedAnchor-19 · HIGH · a held self-test is red on the default branch's daily job
-- KEEP · TOOL-aHomedAnchor-19 · filed by an unattended run for the owning build; outside this build's goal
+- CLOSED · TOOL-aHomedAnchor-19 · by TOOL-aHomedAnchor-26 · the F4 harness initialises the filer's globals; the arm sliced green, the shard not re-run
 - SEV · TOOL-aHomedAnchor-20 · HIGH · a held self-test is red on the default branch's daily job
-- KEEP · TOOL-aHomedAnchor-20 · filed by an unattended run for the owning build; outside this build's goal
+- CLOSED · TOOL-aHomedAnchor-20 · by TOOL-aHomedAnchor-24 · --overlaps is on all three surfaces; the shard not re-run, by the owner's ruling
 - SEV · TOOL-aHomedAnchor-21 · HIGH · a held self-test is red on the default branch's daily job
-- KEEP · TOOL-aHomedAnchor-21 · filed by an unattended run for the owning build; outside this build's goal
+- CLOSED · TOOL-aHomedAnchor-21 · by TOOL-aHomedAnchor-28 · budget re-declared from readings; the suite passes 853 assertions alone

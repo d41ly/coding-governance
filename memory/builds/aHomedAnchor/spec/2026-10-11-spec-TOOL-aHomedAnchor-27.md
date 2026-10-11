@@ -1,6 +1,6 @@
 # TOOL-aHomedAnchor-27 — govkit reads the paths it guards as UTF-8
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 6 · closes TOOL-aHomedAnchor-12
+**Status:** CLOSED · rev-1 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 6 · closes TOOL-aHomedAnchor-12
 
 <!-- gen:spec-records -->
 

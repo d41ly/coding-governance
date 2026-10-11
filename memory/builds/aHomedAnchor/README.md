@@ -71,7 +71,7 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 14 unit(s) · node a · opened 2026-10-09 · streams tooling
+**Build status:** CLOSED · 14 unit(s) · node a · opened 2026-10-09 · streams tooling
 ids TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7 TOOL-aHomedAnchor-8 TOOL-aHomedAnchor-9 TOOL-aHomedAnchor-10 TOOL-aHomedAnchor-11 TOOL-aHomedAnchor-12 TOOL-aHomedAnchor-13 TOOL-aHomedAnchor-14
 ids TOOL-aHomedAnchor-15 TOOL-aHomedAnchor-16 TOOL-aHomedAnchor-17 TOOL-aHomedAnchor-18 TOOL-aHomedAnchor-19 TOOL-aHomedAnchor-20 TOOL-aHomedAnchor-21 TOOL-aHomedAnchor-22 TOOL-aHomedAnchor-23 TOOL-aHomedAnchor-24 TOOL-aHomedAnchor-25 TOOL-aHomedAnchor-26 TOOL-aHomedAnchor-27 TOOL-aHomedAnchor-28
 
@@ -85,13 +85,13 @@ ids TOOL-aHomedAnchor-15 TOOL-aHomedAnchor-16 TOOL-aHomedAnchor-17 TOOL-aHomedAn
 | [TOOL-aHomedAnchor-4 — the pre-commit hook runs the Skill wiring check when its inputs are staged](spec/2026-10-09-spec-TOOL-aHomedAnchor-4.md) | 4 | 1 | CLOSED | rev-1 | 2026-10-09 |
 | [TOOL-aHomedAnchor-6 — the closing review's driver and doc minors, batched](spec/2026-10-09-spec-TOOL-aHomedAnchor-6.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-09 |
 | [TOOL-aHomedAnchor-7 — the closing review's leg minors, batched](spec/2026-10-09-spec-TOOL-aHomedAnchor-7.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-09 |
-| [TOOL-aHomedAnchor-22 — command-line entry points write UTF-8 whatever the platform default](spec/2026-10-11-spec-TOOL-aHomedAnchor-22.md) | 6 | 1 | INPROGRESS | rev-2 | 2026-10-11 |
-| [TOOL-aHomedAnchor-23 — the launcher arm reads an invocation, not a declaration, a string or a file extension](spec/2026-10-11-spec-TOOL-aHomedAnchor-23.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
-| [TOOL-aHomedAnchor-24 — the `--overlaps` verb is named on both surfaces an agent reads](spec/2026-10-11-spec-TOOL-aHomedAnchor-24.md) | 6 | 1 | INPROGRESS | rev-2 | 2026-10-11 |
-| [TOOL-aHomedAnchor-25 — two suite fixtures follow the carriers other builds changed](spec/2026-10-11-spec-TOOL-aHomedAnchor-25.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
-| [TOOL-aHomedAnchor-26 — the F4 filer harness initialises the driver globals the filer appends to](spec/2026-10-11-spec-TOOL-aHomedAnchor-26.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
-| [TOOL-aHomedAnchor-27 — govkit reads the paths it guards as UTF-8](spec/2026-10-11-spec-TOOL-aHomedAnchor-27.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
-| [TOOL-aHomedAnchor-28 — the unattended-build self-test's budget is re-declared from readings](spec/2026-10-11-spec-TOOL-aHomedAnchor-28.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
+| [TOOL-aHomedAnchor-22 — command-line entry points write UTF-8 whatever the platform default](spec/2026-10-11-spec-TOOL-aHomedAnchor-22.md) | 6 | 1 | CLOSED | rev-2 | 2026-10-11 |
+| [TOOL-aHomedAnchor-23 — the launcher arm reads an invocation, not a declaration, a string or a file extension](spec/2026-10-11-spec-TOOL-aHomedAnchor-23.md) | 6 | 1 | CLOSED | rev-1 | 2026-10-11 |
+| [TOOL-aHomedAnchor-24 — the `--overlaps` verb is named on both surfaces an agent reads](spec/2026-10-11-spec-TOOL-aHomedAnchor-24.md) | 6 | 1 | CLOSED | rev-2 | 2026-10-11 |
+| [TOOL-aHomedAnchor-25 — two suite fixtures follow the carriers other builds changed](spec/2026-10-11-spec-TOOL-aHomedAnchor-25.md) | 6 | 1 | CLOSED | rev-1 | 2026-10-11 |
+| [TOOL-aHomedAnchor-26 — the F4 filer harness initialises the driver globals the filer appends to](spec/2026-10-11-spec-TOOL-aHomedAnchor-26.md) | 6 | 1 | CLOSED | rev-1 | 2026-10-11 |
+| [TOOL-aHomedAnchor-27 — govkit reads the paths it guards as UTF-8](spec/2026-10-11-spec-TOOL-aHomedAnchor-27.md) | 6 | 1 | CLOSED | rev-1 | 2026-10-11 |
+| [TOOL-aHomedAnchor-28 — the unattended-build self-test's budget is re-declared from readings](spec/2026-10-11-spec-TOOL-aHomedAnchor-28.md) | 6 | 1 | CLOSED | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
 Records: 12 bound to this build, across 4 record folder(s).

@@ -1,6 +1,6 @@
 # TOOL-aHomedAnchor-22 — command-line entry points write UTF-8 whatever the platform default
 
-**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 6 · closes TOOL-aHomedAnchor-9 TOOL-aHomedAnchor-10 TOOL-aHomedAnchor-11 TOOL-aHomedAnchor-14 · advances TOOL-aHomedAnchor-12
+**Status:** CLOSED · rev-2 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 6 · closes TOOL-aHomedAnchor-9 TOOL-aHomedAnchor-10 TOOL-aHomedAnchor-11 TOOL-aHomedAnchor-14 · advances TOOL-aHomedAnchor-12
 
 <!-- gen:spec-records -->
 

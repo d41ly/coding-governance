@@ -1,6 +1,6 @@
 # TOOL-aHomedAnchor-28 — the unattended-build self-test's budget is re-declared from readings
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 6 · closes TOOL-aHomedAnchor-21
+**Status:** CLOSED · rev-1 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 6 · closes TOOL-aHomedAnchor-21
 
 <!-- gen:spec-records -->
 

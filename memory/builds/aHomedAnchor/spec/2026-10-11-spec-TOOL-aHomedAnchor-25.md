@@ -1,6 +1,6 @@
 # TOOL-aHomedAnchor-25 — two suite fixtures follow the carriers other builds changed
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 6
+**Status:** CLOSED · rev-1 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
