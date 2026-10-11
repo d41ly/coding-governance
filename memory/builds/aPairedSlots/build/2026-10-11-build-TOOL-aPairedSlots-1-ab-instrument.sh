@@ -20,10 +20,10 @@
 # bars share the host, not what two bars do to one common dir's shared files. The second question is
 # TOOL-aPairedSlots-5's, and its own check runs two worktrees of ONE repository.
 #
-# A QUIET HOST AND A HELD TURNSTILE. Before each arm-run the plan waits until no bar outside this
-# instrument's own tree is running, bounded by QUIET_MAX seconds, and then runs the arm under the
-# clone runner's `--hold`, so a bar from a runner that knows the host turnstile queues instead of
-# joining (owner, 2026-10-11: hold per arm-run). A sampler writes the host's load every SAMPLE_EVERY
+# A HELD TURNSTILE AND A QUIET HOST. Each arm-run first takes the clone runner's `--hold`, so a bar
+# from a runner that knows the host turnstile queues instead of joining (owner, 2026-10-11: hold per
+# arm-run), and then, inside the hold, waits until no bar outside this instrument's own tree is
+# running, bounded by QUIET_MAX_HELD seconds. A sampler writes the host's load every SAMPLE_EVERY
 # seconds for the whole arm-run: foreign bars, all bash processes, `/proc/loadavg` and the CPU
 # reading `typeperf` gives. Contamination is RECORDED, never silently excluded.
 # `<root>/heartbeat` moves once a minute while the plan waits or an arm runs, so an out-of-process
@@ -190,20 +190,32 @@ check_quiet() { # root -> rc 0 once no foreign bar runs, 1 after QUIET_MAX secon
 }
 
 cmd_plan() { # root order
-  local root=$1 order=$2 step arm rep q v
+  local root=$1 order=$2 step arm rep v
   # No bar knob of the calling shell reaches an arm: each arm sets the two it means, and the hold
   # exports the holder nonce itself.
   for v in $(compgen -v GATE_); do unset "$v"; done
   for step in $order; do
     arm=${step%?}; rep=${step#?}
-    q=quiet; check_quiet "$root" || q=noisy
-    printf '%s\t%s\t%s\tQUIET\t%s\n' "$(date +%s)" "$arm" "$rep" "$q" >> "$root/plan.log"
-    # The hold is the clone runner's: it takes the host turnstile like a bar and runs this arm with
-    # GATE_TURNSTILE_HOLDER exported, so both of the arm's bars NEST rather than queue behind it.
-    (cd "$root/c1" && bash tools/run-gates/run-gates.sh --hold -- bash "$SELF" arm "$root" "$arm" "$rep") >> "$root/plan.log" 2>&1
+    printf '%s\t%s\t%s\tHOLD\n' "$(date +%s)" "$arm" "$rep" >> "$root/plan.log"
+    # THE HOLD COMES FIRST, the quiet wait inside it (`cmd_held`). The hold is the clone runner's: it
+    # takes the host turnstile like a bar, so every bar from a runner that knows the host turnstile
+    # queues behind the arm from this moment, and the quiet wait only has to outlast the bars already
+    # running and those from older runners. Both of the arm's bars NEST under the hold.
+    (cd "$root/c1" && bash tools/run-gates/run-gates.sh --hold -- bash "$SELF" held "$root" "$arm" "$rep") >> "$root/plan.log" 2>&1
     printf '%s\t%s\t%s\tDONE\trc %s\n' "$(date +%s)" "$arm" "$rep" "$?" >> "$root/plan.log"
   done
   printf '%s\tPLAN\tDONE\n' "$(date +%s)" >> "$root/plan.log"
+}
+
+# Under the hold: wait for the bars already running to finish, bounded by QUIET_MAX, record which,
+# then run the arm. QUIET_MAX defaults to an hour here, below the queue's two-hour bound, so a bar
+# queued behind this hold does not fail open and join the arm it was queued to stay out of.
+cmd_held() { # root arm rep
+  local root=$1 arm=$2 rep=$3 q=quiet
+  QUIET_MAX=${QUIET_MAX_HELD:-3600}
+  check_quiet "$root" || q=noisy
+  printf '%s\t%s\t%s\tQUIET\t%s\n' "$(date +%s)" "$arm" "$rep" "$q"
+  cmd_arm "$root" "$arm" "$rep"
 }
 
 main() {
@@ -211,6 +223,7 @@ main() {
   case "$verb" in
     init) cmd_init "$@" ;;
     plan) cmd_plan "$@" ;;
+    held) cmd_held "$@" ;;
     arm)  cmd_arm "$@" ;;
     *) print_err "usage: init <root> <source-repo> <base> | plan <root> <order> | arm <root> <arm> <rep>"; return 2 ;;
   esac
