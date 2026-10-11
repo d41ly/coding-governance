@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+landed-by: attended
+landed-derived: 62e5f4c4c01c668832fe3485697dd39991b01725 62e5f4c4c01c668832fe3485697dd39991b01725
 asks-at-landing: TOOL-dHomedResolver-6=OPEN TOOL-dHomedResolver-7=OPEN TOOL-dHomedResolver-9=CLOSED
 units-at-landing: TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-5 TOOL-dHomedResolver-8
 hold-run: 
@@ -24,8 +26,8 @@ keepalive-reaped: yes
 refreshed-at: bd8e05f2270aa92335e74e577f8c229098bccad5 · handoff · 0 touching
 gates-run: unattended-17916787078768482032-5067 1f0fcca0
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 69005bc78f65732a9aaeee847f3d8a597abe7278
-phase: HELD
+witness: 62e5f4c4c01c668832fe3485697dd39991b01725
+phase: LANDED
 branch-sha: b39dff78aae970c8428289aa781cf21f79c6fbff
 branch-ref: refs/heads/branch/check-10-declare-resolution-05a19e
 may: none
