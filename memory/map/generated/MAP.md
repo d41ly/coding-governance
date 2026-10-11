@@ -109,7 +109,7 @@ Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `run-gates evidence` | foundation |
 | `run-gates gov canary` | run-gates |
 | `run-gates run-log line` | run-gates |
-| `run-gates turnstile` | run-gates |
+| `run-gates turnstile` | run-gates-turnstile |
 | `run-gates wiring` | run-gates |
 | `run-selftests self-test` | run-gates |
 | `runlog record schema` | runlog |
