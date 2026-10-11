@@ -39,3 +39,7 @@ base: 2785323db4e72b8ae2f26660cc3947165a6258fc
 2026-10-11T06:00:06Z dispatch · item a5542607 TOOL-aTrimmedHook-3 · reason .githooks/commit-msg memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-3.md memory/builds/aTrimmedHook/README.md memory/builds/aTrimmedHook/build/2026-10-11-build-TOOL-aTrimmedHook-3-1-acceptance-ledger.md memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-3-1-build-brief.md
 
 2026-10-11T06:00:11Z brief · item TOOL-aTrimmedHook-3 · reason a050b60c0068 memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-3-1-build-brief.md
+
+2026-10-11T06:03:47Z dispatch · item bd5b47b9 KICK-aTrimmedHook-1 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/aTrimmedHook/spec/2026-10-11-spec-KICK-aTrimmedHook-1.md memory/builds/aTrimmedHook/README.md memory/builds/aTrimmedHook/build/2026-10-11-build-KICK-aTrimmedHook-1-1-acceptance-ledger.md memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-KICK-aTrimmedHook-1-1-build-brief.md
+
+2026-10-11T06:04:01Z brief · item KICK-aTrimmedHook-1 · reason f8f687f0c026 memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-KICK-aTrimmedHook-1-1-build-brief.md

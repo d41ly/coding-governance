@@ -268,6 +268,31 @@ printf '\nunrelated trap note\n' >> "$R/SESSION-KICKOFF.md"     # manifest edit,
 git -C "$R" add -A
 run "staged watch + unrelated manifest edit → C5s" "$R" 1 "check 5 FAILED" --staged
 
+# ---- KICK-aTrimmedHook-1: the staged leg's early exit and C6's one listing -----
+# The exit fires only when nothing staged touches the manifest, its watch list or its verify-paths;
+# a placeholder the leg would report proves the leg did not run. Arm 17 above (a staged watch with no
+# re-stamp) is the C5s half and must stay red. Each other input class gets its own arm.
+mkrepo earlyexit
+write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" "{{PLACEHOLDER}} survives here"
+commit_all "$R" manifest
+echo note > "$R/unrelated.txt"; git -C "$R" add unrelated.txt
+run "staged leg: nothing it reads is staged → one NOTE, exit 0" "$R" 0 "staged leg skipped — nothing staged touches the manifest" --staged
+printf '\nmore\n' >> "$R/memory/guides/SESSION-KICKOFF.md"; git -C "$R" add -A
+run "staged leg: a staged manifest edit still runs C1" "$R" 1 "check 1 FAILED" --staged
+
+mkrepo earlyvp
+write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
+commit_all "$R" manifest
+git -C "$R" rm -q docs/GOV.md
+run "staged leg: a staged verify-path deletion still runs C4" "$R" 1 "is not tracked content" --staged
+
+# C6 counts each literal pathspec from ONE listing: a directory spec and a file spec pass, a glob is
+# asked of git on its own, and arm 20 above keeps the dead-spec red.
+mkrepo c6one
+write_manifest "$R" "$(head_sha "$R")" "Makefile;docs/;Make*" "docs/GOV.md"
+commit_all "$R" manifest
+run "C6: a file, a directory and a glob pathspec all count as alive" "$R" 0 -
+
 # ---- 19 trailing semicolon in watch → parsed clean → 0 ------------------
 mkrepo trailsemi
 write_manifest "$R" "$(head_sha "$R")" "Makefile;" "docs/GOV.md;"
@@ -1707,7 +1732,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # 248 = the base 180 + aMendedFleet's 36 + aGraftedHelix's 32, summed at their reconcile.
 # +31: KICK-aRoutedQuill-1's block — the skeleton verb, the route rules, the `## task` refusal —
 # counted off a scratch slice of the block; no suite ran in the pass.
-FLOOR_ASSERTIONS=279
+# +4: KICK-aTrimmedHook-1's staged early exit and C6 one-listing arms, counted off the block; no
+# suite ran in the pass, the block was observed through a slice.
+FLOOR_ASSERTIONS=283
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced
