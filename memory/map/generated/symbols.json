@@ -2303,6 +2303,11 @@
       "file": "tools/runlog/extract.py"
     },
     {
+      "id": "build_sg_fixture",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "build_simulation",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -4001,6 +4006,11 @@
       "id": "check_provenance_chain",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "check_push_allow",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "check_pytest_ini_probe",
@@ -12233,6 +12243,16 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_sg_tip",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_sg_token",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "read_sheet_row",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -16556,6 +16576,11 @@
       "id": "run_settled_with_stub",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "run_sg_signal",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "run_shuffle_control",
