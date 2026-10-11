@@ -2290,7 +2290,7 @@ def check_archives_tracked(root: str, conf: dict) -> None:
 
     Every artifact this module renders derives from `git ls-files`, so a rotation whose archive is
     not yet staged reads as a deletion: the moved rows' ids look gone, and `--write` re-renders every
-    README citing one. inCMS core did exactly that on 2026-10-09 — seventeen unrelated build
+    README citing one. Adopter ic did exactly that on 2026-10-09 — seventeen unrelated build
     READMEs and LIVE.md, rendered over a half-staged rotation, and no line said why. With the
     archive staged the same render changed nothing. So both verbs refuse, `--check` included: its
     own remedy line is `--write`, the one act that would do the damage.
@@ -3795,7 +3795,7 @@ def cmd_selftest() -> int:
     with tempfile.TemporaryDirectory() as base:
         # TOOL-dHomedResolver-2 — A HALF-STAGED ROTATION IS REFUSED, by --write and by --check.
         # Every artifact derives from `git ls-files`, so a row moved into an archive nobody has
-        # staged reads as deleted. inCMS core ran --write in exactly that state on 2026-10-09 and
+        # staged reads as deleted. Adopter ic ran --write in exactly that state on 2026-10-09 and
         # seventeen unrelated build READMEs plus LIVE.md were re-rendered, with no line saying why.
         # The tree is rendered and committed FIRST, so the only thing the arms below can be
         # reacting to is the untracked archive; at 5a836bf0 both verbs ran over it in silence.

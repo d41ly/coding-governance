@@ -247,7 +247,7 @@ def resolve_live_index_home(m, stem):
     the shell's `--print-live-index-home`.
 
     A search by basename was the rule until TOOL-dHomedResolver-1, and it admitted every file that
-    merely SHARED the stem's name: inCMS core's two build-folder ledgers named DECISIONS.md made the
+    merely SHARED the stem's name: adopter ic's two build-folder ledgers named DECISIONS.md made the
     stem resolve to three indexes, so check 24 left the exclusivity half ungraded and check 10
     blamed the rotation. Under `shards` the population here also holds every file below `backlog/`,
     so a namesake in a subfolder of it collided in this reader alone.

@@ -1320,7 +1320,7 @@ fi
 #     never found a shard and `continue` then exempted it in silence. MEASURED 2026-09-12 on this
 #     repo: of four rotated archives the shipped check graded exactly ONE.
 #   * TOOL-cSpliceWarden-2 then resolved by BASENAME anywhere under $M/ outside archive/. That reached
-#     the shards, and it also reached every file that merely SHARED a stem's name. inCMS core found it
+#     the shards, and it also reached every file that merely SHARED a stem's name. Adopter ic found it
 #     on 2026-10-09: two build-folder ledgers named DECISIONS.md made the stem resolve to three live
 #     indexes, the finding blamed the rotation for a collision it did not cause, and core renamed the
 #     ledgers to land (TOOL-dHomedResolver-1). The declared home keeps the shards and drops the search.

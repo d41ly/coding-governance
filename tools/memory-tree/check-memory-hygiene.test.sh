@@ -2138,7 +2138,7 @@ c9b=$(cblock "$outb" 9)
   || { echo "FAIL check 9 did not name the unstaged archive and its remedy — a build index derived from git ls-files reads every moved row as deleted, and the generator must refuse rather than offer --write"; st=1; }
 
 # ---- TOOL-dHomedResolver-1: check 10 resolves a stem at its DECLARED HOME, never by a basename
-# ---- search. Found by inCMS core on 2026-10-09: two build-folder ledgers named DECISIONS.md made
+# ---- search. Found by adopter ic on 2026-10-09: two build-folder ledgers named DECISIONS.md made
 # ---- the stem resolve to three live indexes, and check 10 blamed the ROTATION for a collision it
 # ---- did not cause. Core renamed the ledgers to land. Any build file named after a stem did this.
 # ----
