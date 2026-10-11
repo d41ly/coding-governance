@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-5 — the review harness spawns each stage as the role its caller names
 
-**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 5 · ratified 2026-10-11
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 5 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
