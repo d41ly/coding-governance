@@ -13614,7 +13614,9 @@ read_ask_back() { AB_WHY="the double reads nothing back"; [ "${F4_READBACK:-no}"
 # refused leg would render views for rows that are not there.
 write_ask_views() { echo "f4-views-double: $1 filed"; }
 run_f4_filer() { # temp store -> the sliced filer's output over the arm's repository; F4_CP_FAILS=backup|restore fails that copy
-  local M=memory ASKS_CMD="bash asks.sh" RB_OUT=""
+  # WI_STAGED and AV_STAGED are the driver's globals the filer appends to (TOOL-dUnstuckLanding-27
+  # S3); unset here, `set -u` killed the filer after the row write and before the views call.
+  local M=memory ASKS_CMD="bash asks.sh" RB_OUT="" WI_STAGED="" AV_STAGED=""
   local -x TMPDIR="$1" F4_BL="memory/builds/tRun/BACKLOG.md" F4_CP_FAILS="${F4_CP_FAILS:-}" F4_REAL_CP
   F4_REAL_CP=$(command -v cp)
   ( cd "$f4_dir" || exit 2
