@@ -293,6 +293,17 @@ write_manifest "$R" "$(head_sha "$R")" "Makefile;docs/;Make*" "docs/GOV.md"
 commit_all "$R" manifest
 run "C6: a file, a directory and a glob pathspec all count as alive" "$R" 0 -
 
+# ---- TOOL-aTrimmedHook-7 (L2): a watch directory of 101 tracked files, one of them non-ASCII, still
+# draws the breadth WARN. The default quoting printed that name C-quoted, so it matched no case and
+# the count stood at 100.
+mkrepo c6utf
+mkdir -p "$R/bulk2"; for i in $(seq 1 100); do echo x > "$R/bulk2/f$i.txt"; done
+echo x > "$R/bulk2/é.txt"
+commit_all "$R" bulk2
+write_manifest "$R" "$(head_sha "$R")" "bulk2/; Makefile" "docs/GOV.md"
+commit_all "$R" manifest
+run "C6: a non-ASCII name counts toward the breadth WARN (101 files)" "$R" 0 "matches 101 tracked files"
+
 # ---- 19 trailing semicolon in watch → parsed clean → 0 ------------------
 mkrepo trailsemi
 write_manifest "$R" "$(head_sha "$R")" "Makefile;" "docs/GOV.md;"
@@ -1734,7 +1745,8 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # counted off a scratch slice of the block; no suite ran in the pass.
 # +4: KICK-aTrimmedHook-1's staged early exit and C6 one-listing arms, counted off the block; no
 # suite ran in the pass, the block was observed through a slice.
-FLOOR_ASSERTIONS=283
+# +1: TOOL-aTrimmedHook-7's non-ASCII breadth arm, observed through a slice; no suite ran in the pass.
+FLOOR_ASSERTIONS=284
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

@@ -71,3 +71,7 @@ base: 2785323db4e72b8ae2f26660cc3947165a6258fc
 2026-10-11T07:57:14Z brief · item TOOL-aTrimmedHook-6 · reason 5a5f12033613 memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-6-1-build-brief.md
 
 2026-10-11T08:00:20Z dispatch · item c907e4e8 TOOL-aTrimmedHook-5 · reason tools/memory-tree/gen_build_index.py memory/map/generated/symbols.json memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-5.md memory/builds/aTrimmedHook/README.md memory/builds/aTrimmedHook/build/2026-10-11-build-TOOL-aTrimmedHook-5-1-acceptance-ledger.md memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-5-1-build-brief.md
+
+2026-10-11T08:04:18Z dispatch · item 3a87a52d TOOL-aTrimmedHook-7 · reason tools/memory-tree/gen_build_index.py memory/map/generated/symbols.json skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-7.md memory/builds/aTrimmedHook/README.md memory/builds/aTrimmedHook/build/2026-10-11-build-TOOL-aTrimmedHook-7-1-acceptance-ledger.md memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-7-1-build-brief.md
+
+2026-10-11T08:04:27Z brief · item TOOL-aTrimmedHook-7 · reason fa508cf344d2 memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-7-1-build-brief.md

@@ -1290,7 +1290,11 @@ if [ "$BLOCK_OK" = 1 ]; then
   # git matches a literal as the path itself or anything under `<spec>/`, which is the case below. A
   # spec carrying glob magic, and any literal counted zero, is asked of git on its own, so a dead
   # verdict is always git's — a case-folding filesystem cannot turn a byte compare into a red.
-  _c6all=$(git ls-files -- "${WATCH[@]}" 2>/dev/null)
+  # `core.quotePath=false` prints a non-ASCII name as itself, so it compares as itself; a name git still
+  # quotes (a quote, a backslash, a control byte) sends every count back to git (TOOL-aTrimmedHook-7).
+  _c6all=$(git -c core.quotePath=false ls-files -- "${WATCH[@]}" 2>/dev/null)
+  _c6q=""
+  case "$_c6all" in \"*|*$'\n'\"*) _c6q=1 ;; esac
   for w in "${WATCH[@]}"; do
     n=0
     case "$w" in
@@ -1299,7 +1303,7 @@ if [ "$BLOCK_OK" = 1 ]; then
            case "$_c6f" in "$w"|"${w%/}"/*) n=$((n+1)) ;; esac
          done <<<"$_c6all" ;;
     esac
-    [ "$n" -gt 0 ] || n=$(git ls-files -- "$w" 2>/dev/null | wc -l | tr -d '[:space:]')
+    { [ "$n" -gt 0 ] && [ -z "$_c6q" ]; } || n=$(git ls-files -- "$w" 2>/dev/null | wc -l | tr -d '[:space:]')
     if [ "$n" -eq 0 ]; then
       fail 6 "watch pathspec '$w' matches no tracked file — update the watch list to the restructured paths."
     elif [ "$n" -gt 100 ]; then

@@ -1318,6 +1318,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_blob_request",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "build_brief_run",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"

@@ -856,7 +856,16 @@ def check_index_input(rel: str, m: str, kit: str | None) -> bool:
     return len(parts) >= 3 and parts[1] in RECORD_KINDS
 
 
-def check_staged_render(root: str, conf: dict) -> tuple:
+def build_blob_request(paths: list) -> bytes:
+    """The `git cat-file --batch` request for each path's HEAD and index blobs.
+
+    Encoded with `surrogateescape`, the error handler the name-status output was DECODED with, so a
+    path holding a byte that is not UTF-8 round-trips instead of raising (TOOL-aTrimmedHook-7).
+    """
+    return "".join(f"HEAD:{p}\n:{p}\n" for p in paths).encode("utf-8", "surrogateescape")
+
+
+def check_staged_render(root: str, conf: dict, here: str | None = None) -> tuple:
     """`(render, reason)` for `--check --staged`: can anything the INDEX stages move the render?
 
     TOOL-aTrimmedHook-1. The roster reads ids out of the prose of EVERY tracked memory file, so a path
@@ -873,9 +882,15 @@ def check_staged_render(root: str, conf: dict) -> tuple:
     `--no-verify` commit is invisible to a skip. Both are the push boundary's, where the render is full.
     """
     m = conf["MEMORY_ROOT"]
-    here = os.path.dirname(os.path.abspath(__file__))
-    kit = os.path.relpath(here, root).replace(os.sep, "/")
-    if kit == ".." or kit.startswith("../") or os.path.isabs(kit):
+    # `here` is the kit's directory; a caller passes it only to place a fixture's kit under its root.
+    here = here or os.path.dirname(os.path.abspath(__file__))
+    try:
+        kit = os.path.relpath(here, root).replace(os.sep, "/")
+    except ValueError:
+        # Another Windows drive: the kit is outside this repository, the answer the branch below gives
+        # (TOOL-aTrimmedHook-7). It must never become a traceback the leg reports as drift.
+        kit = None
+    if kit is not None and (kit == ".." or kit.startswith("../") or os.path.isabs(kit)):
         kit = None
     specs = [m + "/", ".memory-tree.conf"] + ([kit + "/"] if kit else [])
     # THE INDEX THE HOOK WAS HANDED (TOOL-aTrimmedHook-4). `_build_git_env()` drops GIT_INDEX_FILE for
@@ -916,7 +931,7 @@ def check_staged_render(root: str, conf: dict) -> tuple:
         return False, "nothing is staged under the memory root, the conf or the kit"
     families = {pair.split(":")[1] for pair in conf["FAMILIES"].split() if ":" in pair}
     id_re = build_roster_id_re(families)
-    req = "".join(f"HEAD:{p}\n:{p}\n" for p in modified).encode("utf-8")
+    req = build_blob_request(modified)
     try:
         cat = subprocess.run(["git", "cat-file", "--batch"], cwd=root, input=req,
                              capture_output=True, check=True, env=env).stdout
@@ -3934,6 +3949,32 @@ def test_staged_render(arm) -> None:
             lambda: str(check_staged_render(t, dict(conf, LIVE_LANDED_UNCLOSED=""))[0]))
         run("git", "reset", "-q", "--hard", cwd=t)
         run("git", "clean", "-q", "-fd", "--", "src", cwd=t)
+        # TOOL-aTrimmedHook-7 AC1 — a kit on another drive makes os.path.relpath raise; the classifier
+        # must answer, never raise. Nothing is staged here, so the answer is a skip.
+        _real_relpath = os.path.relpath
+        os.path.relpath = lambda *_a, **_k: (_ for _ in ()).throw(ValueError("path is on mount 'D:'"))
+        try:
+            _m3 = check_staged_render(t, conf)
+        except ValueError as exc:
+            _m3 = (f"raised {exc}", "")
+        finally:
+            os.path.relpath = _real_relpath
+        arm("TOOL-aTrimmedHook-7 AC1 — a kit on another drive answers instead of raising", "False",
+            lambda: str(_m3[0]))
+        # AC2 — a path holding a byte that is not UTF-8 reaches the request as a lone surrogate.
+        arm("TOOL-aTrimmedHook-7 AC2 — the blob request round-trips a non-UTF-8 path", "True",
+            lambda: str(build_blob_request(["memory/n\udcff.md"]).endswith(b":memory/n\xff.md\n")))
+        # AC3 — a kit directory UNDER the fixture root, reached through the derivation, not a spelled
+        # prefix: a file staged there renders.
+        os.makedirs(os.path.join(t, "kitdir"), exist_ok=True)
+        write_text(os.path.join(t, "kitdir", "x.py"), "x = 1\n")
+        run("git", "add", "-A", cwd=t)
+        run("git", "commit", "-q", "-m", "kit", "--no-verify", cwd=t)
+        write_text(os.path.join(t, "kitdir", "x.py"), "x = 2\n")
+        run("git", "add", "-A", cwd=t)
+        arm("TOOL-aTrimmedHook-7 AC3 — a file under the derived kit directory renders", "True",
+            lambda: str(check_staged_render(t, conf, here=os.path.join(t, "kitdir"))[0]))
+        run("git", "reset", "-q", "--hard", "HEAD~1", cwd=t)
         fam = {pair.split(":")[1] for pair in conf["FAMILIES"].split() if ":" in pair}
         tracked = [p for p in run("git", "ls-files", "--", "memory/", cwd=t).split("\n") if p]
         _union: dict = {}
