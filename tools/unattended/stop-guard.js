@@ -101,7 +101,7 @@ const REASONS = ['terminal', 'held', 'elsewhere', 'liveness-unreadable', 'backgr
 /**
  * `bash <kitDir>/unattended.sh --liveness <slug>` with cwd at the root, because the driver sources
  * the conf of the tree it runs in; the driver path is forward-slashed because MSYS mangles a
- * backslash path handed to a shell (charter §11). Returns `{stdout, ok}` where `ok` is a zero exit
+ * backslash path handed to a shell (charter [cross-os]). Returns `{stdout, ok}` where `ok` is a zero exit
  * within the bound; a spawn error, a non-zero exit or the bound is `ok: false`.
  */
 function runLiveness(kitDir, root, slug) {

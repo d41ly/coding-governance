@@ -63,8 +63,8 @@ resolve_remote_sh() {
 # <<< remote_ladder_sh
 # Branch guard — refuse a commit in the PRIMARY tree while parked off the default branch.
 # Feature work belongs in a sibling worktree, not by stranding the primary tree on a branch
-# (playbook §3). Default branch: GOV_DEFAULT_BRANCH, else the HEAD of the remote the ladder above
-# resolves (TOOL-dLadderedRemote-2), else main. Override: --no-verify.
+# (charter [isolate]). Default branch: GOV_DEFAULT_BRANCH, else the HEAD of the remote the
+# ladder above resolves (TOOL-dLadderedRemote-2), else main. Override: --no-verify.
 gd=$(git rev-parse --path-format=absolute --git-dir 2>/dev/null)
 gc=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
 if [ -n "$gd" ] && [ "$gd" = "$gc" ]; then          # primary tree, not a linked worktree
@@ -80,7 +80,7 @@ if [ -n "$gd" ] && [ "$gd" = "$gc" ]; then          # primary tree, not a linked
   branch=$(git symbolic-ref --quiet HEAD 2>/dev/null || true); branch=${branch#refs/heads/}
   if [ -n "$branch" ] && [ "$branch" != "$def" ]; then
     echo "pre-commit: refusing a commit in the primary tree while on '$branch' (default: '$def')."
-    echo "  Feature work belongs in a sibling worktree (playbook §3), not on the primary tree."
+    echo "  Feature work belongs in a sibling worktree (charter [isolate]), not on the primary tree."
     rc=1
   fi
 fi

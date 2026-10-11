@@ -834,7 +834,7 @@ if [ -z "$DECIDE" ] && [ -f "$_sg" ] && . "$_sg" && command -v init_straggler_gu
 fi
 
 # ---- MERGE LOSS on the default branch — TOOL-aMendedFleet-3 -------------------------------------
-# The charter's §1 Landing says to diff a merge against BOTH parents (the "auto-took" class), and
+# The charter's [reconcile] practice says to diff a merge against BOTH parents (the "auto-took" class), and
 # merge `01c22e155` showed what happens when nobody does: it resolved a conflict by taking one side,
 # lost `write_ask_views` — the code of two CLOSED units — and nothing at this boundary noticed. So
 # every two-parent merge in `<remote sha>..<local sha>` of the default-branch update is graded by
@@ -1146,7 +1146,7 @@ head=$(git rev-parse HEAD 2>/dev/null || true)
 if [ "$main_local" != "$head" ]; then
   why="pre-push: refusing — pushing $def @ ${main_local:0:8} but this working tree is at ${head:0:8}."
   echo "$why"
-  echo "  Push $def from the primary tree checked out at the pushed tip (playbook §3), or --no-verify."
+  echo "  Push $def from the primary tree checked out at the pushed tip (charter [isolate]), or --no-verify."
   write_refusal head-mismatch "$why"; RUNLOG_CLEAN=1; exit 1
 fi
 

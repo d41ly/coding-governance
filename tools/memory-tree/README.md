@@ -1,6 +1,6 @@
 # memory-tree — structured, machine-linted project memory
 
-A project-agnostic kit that turns the governance playbook's §5/§6 memory-and-decisions *principles*
+A project-agnostic kit that turns the governance charter's memory-and-decisions *principles*
 into a concrete, gated folder structure: one `memory/` tree organised by development discipline, with
 per-feature `builds/` folders, index budgets + rotation, a status vocabulary, a GENERATED work-state
 index, and a hygiene gate that keeps it that way. The owner reads indexes, not files; sessions stop burning tokens
@@ -580,9 +580,9 @@ method.
 - `memory/TEMPLATE-SPEC.md` — spec sections, tiers, sub-spec form, the §8 mark grammar, §10.
 - `memory/guides/REVIEW-PROTOCOL.md` — fan-out and concurrency caps, find→verify→synthesize, the stop rule.
 - `memory/HYGIENE.md` — record placement, filename grammar, size budgets, the status vocabulary.
-- `coding-governance-agents.template.md` §1, §7, §8, §16 — DoR, DoD, landing,
-  gate discipline, diff-scoping, the final-message format. (ONE file since v3.0: the activity-scoped
-  companion sections converged into those §§.)
+- `coding-governance-agents.template.md` — the one-line practices: verify, gate, land, bound, signal,
+  and the micro-formats with their emission rules. (v4.0: three sections, one line per rule; the
+  detail lives in the tools, gates and protocols it names.)
 - `memory/guides/UNATTENDED-PROTOCOL.md` — mandate, run state, phases and witnesses, DoD, keepalive, landing.
 - `memory/guides/UNATTENDED-VERBS.md` — the verb entries, the contract's second half. Same byte-compared pair discipline.
 
