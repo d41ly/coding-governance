@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-1 — the role catalogue: one owner-editable agent definition per role, the workflow table, and the checker that keeps them agreeing
 
-**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 1
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
