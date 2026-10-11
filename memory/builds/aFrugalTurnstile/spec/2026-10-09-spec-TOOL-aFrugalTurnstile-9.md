@@ -1,6 +1,6 @@
 # TOOL-aFrugalTurnstile-9 — the unattended close runs the boundary's decision where a post-merge bar is declared
 
-**Status:** CLOSED · rev-4 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 5
+**Status:** CLOSED · rev-5 · 2026-10-09 · node a · Tier-2 · base bef97330 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -64,6 +64,8 @@ already covers the tree. Undeclared, the item is today's `GATE_FULL=1` bar, byte
 
 - **consumes-from** `TOOL-aFrugalTurnstile-7` — `pre-push --decide <tip> <remote-sha>`, its one-line answer in three shapes and its promise to write nothing; without it every declared close falls back to the full bar, announced
 - **consumes-from** `TOOL-aFrugalTurnstile-3` — the writer of the green record in the gates-green arm, which this unit hands a `kind` and a `base` instead of the fixed `full` it writes for a `GATE_FULL=1` bar
+- **consumes-from** `TOOL-aFrugalTurnstile-11` — a scoped record written by the unattended close
+  goes to the scoped slot by unit 11's rule.
 - **hands-off** external — whether the landing push after an in-place close can be covered at all, which F2 leaves to the main loop because the close commits on top of the graded merge
 
 ## 4. Design
@@ -302,6 +304,7 @@ The close runs these. A pass runs only the §6 fixture.
   `bef97330`, and the mask also folds 8-hex short shas. What disagreed: observed on a fixture, the
   driver at HEAD prints `recorded gate-bar-green for <sha8> (kind full)`, TOOL-aFrugalTurnstile-3's
   line, which the base predates, and the policy line names R's short sha, which differs per fixture.
+- rev-5 · 2026-10-11 · §3 Edges: the reciprocal consumes-from TOOL-aFrugalTurnstile-11, whose hands-off had no match back (hygiene check 12; absorbed by dHomedResolver at d19938f3).
 
 ## 10. Reuse audit
 
