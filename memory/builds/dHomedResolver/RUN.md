@@ -9,13 +9,23 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dHomedResolver-6=OPEN TOOL-dHomedResolver-7=OPEN TOOL-dHomedResolver-9=CLOSED
+units-at-landing: TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-5 TOOL-dHomedResolver-8
+hold-run: 
+hold-streak: 1 · at 69005bc7
+resume-owed: none · owner
+held-at: 2026-10-11T08:45:05Z
+hold-reason: landed by the owner's order in chat on 2026-10-11 at bd8e05f2, pushed with the hook bypassed; a full bar on main and the kit self-tests stay owed
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
 parked-surfaced: yes
 keepalive-reaped: yes
-refreshed-at: fad16fd3d4fa94ac5ff54bf5c0fad67448dcde05 · park · 6 touching
+refreshed-at: bd8e05f2270aa92335e74e577f8c229098bccad5 · handoff · 0 touching
 gates-run: unattended-17916787078768482032-5067 1f0fcca0
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 1fc89aa81cbc4d63fe9529aa070fe638c0759c45
-phase: VERIFYING
+witness: 69005bc78f65732a9aaeee847f3d8a597abe7278
+phase: HELD
 branch-sha: b39dff78aae970c8428289aa781cf21f79c6fbff
 branch-ref: refs/heads/branch/check-10-declare-resolution-05a19e
 may: none
@@ -63,3 +73,7 @@ base: b39dff78aae970c8428289aa781cf21f79c6fbff
 2026-10-11T06:36:16Z dispatch · item 5c8d7625 TOOL-dHomedResolver-8 · reason .memory-tree.conf memory/LIVE.md memory/builds/dHomedResolver/README.md memory/builds/dHomedResolver/build/2026-10-11-build-TOOL-dHomedResolver-8-1-acceptance-ledger.md memory/builds/dHomedResolver/prompts/2026-10-11-prompt-TOOL-dHomedResolver-8-1-build-brief.md memory/builds/dHomedResolver/spec/2026-10-11-spec-TOOL-dHomedResolver-8.md memory/guides/SESSION-KICKOFF.md tools/memory-tree/check-memory-hygiene.test.sh tools/push-main.test.sh
 
 2026-10-11T08:42:03Z decision · item land the build with the hook bypassed, no full bar · reason decided by the owner in chat on 2026-10-11, while the third close's flagged bar was running; that bar was stopped unfinished. A full bar on main and the kit self-tests stay owed
+
+2026-10-11T08:45:07Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dHomedResolver && bash tools/push-main.sh --land --slug dHomedResolver && bash tools/unattended/unattended.sh --settle dHomedResolver
+
+2026-10-11T08:45:07Z hold · item owner-decision · reason until owner · reaped c9b21169 · resume none(owner)
