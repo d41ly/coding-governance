@@ -1,11 +1,12 @@
 # DEPL-dRemeasuredRender-4 — the closing review's mediums and lows: the hole verdict waits for the verify pass, and every KEPT reason has an arm
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node d · Tier-2 · base 9a8777b8 · streams deployer · order 5
+**Status:** CLOSED · rev-1 · 2026-10-11 · node d · Tier-2 · base 9a8777b8 · streams deployer · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-DEPL-dRemeasuredRender-4-1-acceptance-ledger.md](../build/2026-10-11-build-DEPL-dRemeasuredRender-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-DEPL-dRemeasuredRender-4-1-build-brief.md](../prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-4-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

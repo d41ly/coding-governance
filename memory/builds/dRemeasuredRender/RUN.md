@@ -59,3 +59,7 @@ base: 17472e212ffd0d5e3be825502c6169bbeb2e952f
 2026-10-11T09:41:01Z brief · item DEPL-dRemeasuredRender-4 · reason 303ca8242572 memory/builds/dRemeasuredRender/prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-4-1-build-brief.md
 
 2026-10-11T09:42:12Z dispatch · item 0fa8463e DEPL-dRemeasuredRender-3 · reason WIRE-INTO-PROJECT.md memory/builds/dRemeasuredRender/build/2026-10-11-build-DEPL-dRemeasuredRender-3-1-acceptance-ledger.md memory/builds/dRemeasuredRender/prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-3-1-build-brief.md memory/builds/dRemeasuredRender/prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-4-1-build-brief.md memory/builds/dRemeasuredRender/spec/2026-10-11-spec-DEPL-dRemeasuredRender-3.md tools/govkit/govkit.py tools/govkit/selftest.py
+
+2026-10-11T09:47:02Z dispatch · item 57a98c4f DEPL-dRemeasuredRender-4 · reason memory/builds/dRemeasuredRender/build/2026-10-11-build-DEPL-dRemeasuredRender-4-1-acceptance-ledger.md memory/builds/dRemeasuredRender/spec/2026-10-11-spec-DEPL-dRemeasuredRender-4.md memory/gotchas/INDEX.md memory/gotchas/verdict-printed-before-the-step-that-reverts-it.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json tools/govkit/govkit.py tools/govkit/selftest.py
+
+2026-10-11T09:47:49Z dispatch · item 57a98c4f DEPL-dRemeasuredRender-4 · reason memory/map/features/govkit.md

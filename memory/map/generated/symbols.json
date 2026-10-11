@@ -13498,6 +13498,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "render_hole_verdict",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "render_id_run",
       "kind": "function",
       "file": "tools/runlog/record.py"

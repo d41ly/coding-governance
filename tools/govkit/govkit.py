@@ -8724,6 +8724,25 @@ def measure_rendered_rows(root: pathlib.Path, target: pathlib.Path, rows: list[d
     return out
 
 
+def render_hole_verdict(eid: str, hid: str, verdict: str, detail: str, why: str,
+                        rolled: bool) -> str:
+    """The one line `update` prints for a hole re-probed after its kit's render.
+
+    DEPL-dRemeasuredRender-4 S2. Pure, so every verdict kind has an arm without a fixture run. The
+    still-failing line keeps the spelling the early probe printed before DEPL-dRemeasuredRender-2,
+    because that is the line operators already read as undischarged; `rolled` says the probe read
+    the bytes a rollback restored, not the render's."""
+    head = f"govkit update — HOLE {eid}: '{hid}'"
+    after = "after the rollback restored the pre-render bytes" if rolled else "after the render"
+    if verdict == "undischarged":
+        return (f"{head} is undischarged (probe exit {detail}) — {why}" if not rolled else
+                f"{head} is undischarged (probe exit {detail}) {after} — {why}")
+    if verdict == "discharged":
+        return f"{head} is discharged {after}; the early verdict does not stand"
+    return (f"{head} re-probed {after} reads {verdict} ({detail}), so neither verdict is "
+            f"confirmed — {why}")
+
+
 def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
                write_withdrawals: bool = False,
                kits: list[str] | None = None, accept_role_moves: bool = False) -> int:
@@ -10834,6 +10853,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # nothing (memory-tree `not-rendered-here`, lexicon `no-project-layer`), so acceptance is not a
     # render, and re-measuring those rows would certify untouched bytes at this vintage.
     _rr_norender: dict[str, str] = {}
+    # DEPL-dRemeasuredRender-4 S1. Per kit, the holes its early probe called undischarged and what
+    # their re-probe needs, kept for the step after the verify pass.
+    _hu_late: dict[str, tuple] = {}
     if write:
         for _eid in touched_kits:
             _d, _ = descs[_eid]
@@ -10986,23 +11008,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                               "This kit declares no [check] argv, so nothing below can roll its "
                               "writes back: they stay staged, and the render has to be repaired "
                               "by hand before the next update"))
-            # DEPL-dRemeasuredRender-2 S2 + S3. THE VERDICT THAT STANDS, after this kit's argvs and
-            # whether they were accepted or refused: only the holes the early probe called
-            # undischarged are probed again, and only one still failing is called undischarged.
+            # DEPL-dRemeasuredRender-2 S2 + S3. Only the holes the early probe called undischarged
+            # are probed again, accepted argv or refused. The re-probe itself waits for the verify
+            # pass (DEPL-dRemeasuredRender-4 S1), which can still roll this render back.
             if _hu_rr:
-                _d_hu = dict(_d, hole=[h for h in _d.get("hole", []) if h.get("id") in _hu_rr])
-                for _hid, _hv, _hd in run_hole_probes(_eid, _d_hu, _ctx_rr, target, list(claimed),
-                                                      _own_rr):
-                    _hwhy = (_hw_rr.get(_hid) or "no reason declared").splitlines()[0]
-                    if _hv == "undischarged":
-                        print(f"govkit update — HOLE {_eid}: '{_hid}' is undischarged (probe exit "
-                              f"{_hd}) — {_hwhy}")
-                    elif _hv == "discharged":
-                        print(f"govkit update — HOLE {_eid}: '{_hid}' is discharged after the "
-                              f"render; the early verdict does not stand")
-                    else:
-                        print(f"govkit update — HOLE {_eid}: '{_hid}' re-probed after the render "
-                              f"reads {_hv} ({_hd}), so neither verdict is confirmed — {_hwhy}")
+                _hu_late[_eid] = (dict(_d, hole=[h for h in _d.get("hole", [])
+                                                 if h.get("id") in _hu_rr]),
+                                  _ctx_rr, _own_rr, _hw_rr)
             # S1. What THIS kit's argv changed, by status entry, so an undeclared write has a name.
             _rg_after = read_worktree_status(target)
             _rg_before = _rg_snap[_eid]["status"]
@@ -11760,6 +11772,15 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # longer holds. Both receipt writers below derive `install.sums` from the rows, so the sidecar
     # follows without a write of its own. A row this does not re-measure is KEPT and says why, per row,
     # because a receipt that silently stays stale is the defect this closes. The count prints its zeros.
+    # DEPL-dRemeasuredRender-4 S1. THE HOLE VERDICT THAT STANDS, read here for the reason above: a
+    # verdict printed inside the regenerate loop described bytes a rollback could then take away.
+    # A rolled-back kit is re-probed too, over the bytes the rollback restored, and its line says so.
+    for _eid, (_d_hu, _ctx_hu, _own_hu, _hw_hu) in _hu_late.items():
+        for _hid, _hv, _hd in run_hole_probes(_eid, _d_hu, _ctx_hu, target, list(claimed), _own_hu):
+            print(render_hole_verdict(_eid, _hid, _hv, _hd,
+                                      (_hw_hu.get(_hid) or "no reason declared").splitlines()[0],
+                                      _eid in _rolled_kits))
+
     if write and touched_kits:
         _rm_done = _rm_kept = 0
         for _eid in touched_kits:
