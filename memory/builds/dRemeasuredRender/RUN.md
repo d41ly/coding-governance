@@ -9,9 +9,11 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: yes, 0 surfaced
+keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 0fa8463e1e5fb0109717b28964aedec746f9566b
-phase: BUILDING
+witness: b41d79bc66e7bd725c0980d46a5669fe2a889364
+phase: VERIFYING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/practical-borg-90829d
