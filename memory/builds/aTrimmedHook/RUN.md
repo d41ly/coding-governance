@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 22f32233e43f7d50eeee31a5e50c62c4f452858b
-phase: BUILDING
+witness: 704b37056ee032dafa74b1b86a70295f31676678
+phase: REVIEWING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/angry-engelbart-f0995c
@@ -49,3 +49,13 @@ base: 2785323db4e72b8ae2f26660cc3947165a6258fc
 2026-10-11T06:16:22Z brief · item TOOL-aTrimmedHook-2 · reason a1847e4673ab memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-2-1-build-brief.md
 
 2026-10-11T06:19:07Z dispatch · item fd70bb3e TOOL-aTrimmedHook-2 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/README.md tools/memory-tree/gen_build_index.py memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-2.md memory/builds/aTrimmedHook/README.md memory/builds/aTrimmedHook/build/2026-10-11-build-TOOL-aTrimmedHook-2-1-acceptance-ledger.md memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-2-1-build-brief.md
+
+2026-10-11T07:19:50Z review · item aTrimmedHook · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 2 · minors 14 · disposition promote
+
+2026-10-11T07:20:09Z rescope · item add TOOL-aTrimmedHook-4 · reason closing review H1: the staged classifier reads the INDEX the hook was handed, so commit -a and commit <paths> no longer skip on a stale .git/index
+
+2026-10-11T07:20:16Z rescope · item add TOOL-aTrimmedHook-5 · reason closing review H2 and M4: under LIVE_LANDED_UNCLOSED the classifier renders when anything outside its memory pathspec is staged
+
+2026-10-11T07:20:26Z rescope · item add TOOL-aTrimmedHook-6 · reason closing review M1, M2, L3, L4: the hygiene-side minors, batched; disjoint from the -7 batch
+
+2026-10-11T07:20:34Z rescope · item add TOOL-aTrimmedHook-7 · reason closing review M3, L1, L5, L2: the generator and manifest-check minors, batched; disjoint from the -6 batch

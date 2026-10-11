@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling+kickoff
 roster: TOOL+KICK
-ids: KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3
+ids: KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3 TOOL-aTrimmedHook-4 TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-6 TOOL-aTrimmedHook-7
 authorized-by: prompt
 ---
 
@@ -42,6 +42,8 @@ owner's prose, with the orientation that refuted two of its premises, is the man
 - Every skip announces itself, and no full run (STAGED=0) changes behavior.
 - One kit-version bump per touched kit, after the last unit: memory-tree, kickoff-manifest.
 - Owner rulings: the exact classifier for check 9; narrow and skip empties; no spec audit.
+- Units 5 to 8 are the closing review's promotions (M4): 5, 6 and 8 write `gen_build_index.py`, so
+  they are sequenced; 7 writes only the hygiene files and is disjoint from them.
 
 ## Parked decisions
 
@@ -55,11 +57,15 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 2 | `TOOL-aTrimmedHook-2` | hygiene `--staged` narrows FILES, skips PRE_* and empty selections, holds the legacy/debt guard unless a list is staged |
 | 3 | `KICK-aTrimmedHook-1` | `manifest-check.sh --staged` skips, announced, when nothing staged touches the manifest, watch or verify-paths; C6 in one spawn |
 | 4 | `TOOL-aTrimmedHook-3` | `.githooks/commit-msg` runs the unattended driver only when a tracked RUN.md names the current branch |
+| 5 | `TOOL-aTrimmedHook-4` | the staged classifier reads the index the hook was handed (closing review H1) |
+| 6 | `TOOL-aTrimmedHook-5` | under `LIVE_LANDED_UNCLOSED` the classifier renders when anything outside its pathspec is staged (H2, M4) |
+| 7 | `TOOL-aTrimmedHook-6` | the hygiene-side minors, batched (M1, M2, L3, L4) |
+| 8 | `TOOL-aTrimmedHook-7` | the generator and manifest-check minors, batched (M3, L1, L5, L2) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff
-ids KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3
+ids KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3 TOOL-aTrimmedHook-4 TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-6 TOOL-aTrimmedHook-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -70,7 +76,7 @@ ids KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHoo
 | [TOOL-aTrimmedHook-2 — the staged hygiene leg spends no process on a check its staged set cannot reach](spec/2026-10-11-spec-TOOL-aTrimmedHook-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 3 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

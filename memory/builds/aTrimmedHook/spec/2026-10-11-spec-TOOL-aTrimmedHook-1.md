@@ -9,6 +9,7 @@
 | [2026-10-11-build-TOOL-aTrimmedHook-1-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aTrimmedHook-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aTrimmedHook-1-2-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aTrimmedHook-1-2-build-brief.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aTrimmedHook-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aTrimmedHook-1-brief.md) | research | TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3 KICK-aTrimmedHook-1 |
+| [2026-10-11-review-TOOL-aTrimmedHook-1-closing-diff-round1.md](../reviews/2026-10-11-review-TOOL-aTrimmedHook-1-closing-diff-round1.md) | diff-review | TOOL-aTrimmedHook-2 KICK-aTrimmedHook-1 TOOL-aTrimmedHook-3 |
 
 <!-- /gen:spec-records -->
 
