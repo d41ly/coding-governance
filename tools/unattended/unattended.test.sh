@@ -16079,6 +16079,7 @@ GWB
 printf 'name\tstub\n'
 if [ -n "${GWP_WALL:-}" ]; then printf 'wall\t%s\n' "$GWP_WALL"; fi
 if [ -n "${GWP_QUEUE:-}" ]; then printf 'queue\t%s\n' "$GWP_QUEUE"; fi
+if [ -n "${GWP_SLOTS:-}" ]; then printf 'slots\t%s\n' "$GWP_SLOTS"; fi
 if [ -n "${GWP_CMAX:-}" ]; then printf 'ceiling_max\t%s\n' "$GWP_CMAX"; fi
 exit 0
 GWP
@@ -16146,6 +16147,13 @@ out=$(GW_MODE=slow run_gw --close tRun $GWOVR)
 hit  "$out" "unattended: the merge bar is bounded at $((25 + GW_M))s — wall 5 + queue 20 + margin $GW_M (the backstop --preflight pinned)"
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
 miss "$out" "did not answer within"
+
+# TOOL-aPairedSlots-6 AC1: a profile that also prints `slots` 2, as the runner does once a row admits
+# two bars, pins the SAME backstop as AC1 above. RED against a parse that refuses a key it does not know.
+build_gw "" "bash bin/profile.sh" "10"
+out=$(GWP_WALL=5 GWP_QUEUE=20 GWP_SLOTS=2 run_gw --preflight tRun --keepalive-id k1)
+hit  "$out" "unattended: the merge bar is bounded at $((25 + GW_M))s — wall 5 + queue 20 + margin $GW_M (pinned as this run's gate-backstop fact)"
+hit  "$(read_gw_record)" "gate-backstop: $((25 + GW_M)) (wall 5 + queue 20 + margin $GW_M)"
 
 # AC4, the driver's half: a declared wall below the profile's largest ceiling refuses at preflight,
 # naming both numbers, before any write. RED against a comparison with the profile's own wall.
