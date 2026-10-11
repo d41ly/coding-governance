@@ -253,6 +253,7 @@ time; extend by adding keys the deployer resolves, leaving runner-side placehold
 
 ## Affordances
 
+- **Regenerate every declared output** — `bash tools/run-gates/run-gates.sh --regen`; `--regen-check` writes nothing.
 - **Check a target's declaration** — `bash tools/run-gates/adopt-run-gates.sh --check`, which reports
   NOT ADOPTED and exits 0 where no target declares one.
 

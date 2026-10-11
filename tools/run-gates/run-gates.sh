@@ -189,6 +189,15 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 PYBIN=$(resolve_python) || { echo "run-gates: no usable python — required to parse the leg manifest"; exit 2; }
+# ---- THE THREE REGEN VERBS hand over before any bar machinery exists (TOOL-aPrimedIndex-2 S6) -----
+# `regen.py`, beside this runner, regenerates or proves fresh every generated output the kits
+# declare. These spellings exist so the one command a refusal names needs no python launcher of
+# the reader's own: the interpreter is the one just resolved, and the cwd is the toplevel above.
+case "${1:-}" in
+  --regen)       exec "$PYBIN" "$KITDIR/regen.py" --write ;;
+  --regen-check) exec "$PYBIN" "$KITDIR/regen.py" --check ;;
+  --regen-list)  exec "$PYBIN" "$KITDIR/regen.py" --list ;;
+esac
 fails=0; n=0; skips=0; ondemands=0
 
 # The leg manifest, overridable so a fixture can drive this runner without re-running the real bar.

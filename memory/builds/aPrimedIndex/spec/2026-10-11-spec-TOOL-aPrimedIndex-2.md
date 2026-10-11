@@ -1,11 +1,12 @@
 # TOOL-aPrimedIndex-2 — one runner verb rewrites every declared output in stage order, and a second names each stale one
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aPrimedIndex-2-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aPrimedIndex-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aPrimedIndex-1-2-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPrimedIndex-1-2-build-brief.md) | journal | TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 |
 | [2026-10-11-prompt-TOOL-aPrimedIndex-1.md](../prompts/2026-10-11-prompt-TOOL-aPrimedIndex-1.md) | research | TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 |
 
@@ -67,8 +68,11 @@ know which generator a red leg wanted.
    `MEMORY_ROOT` of `.memory-tree.conf` (default `memory`) and `{map_root}` the `MAP_ROOT` of
    `.codebase-map.conf` (default `{memory_root}/map`). A `when` is evaluated as the unattended reader
    evaluates it. A token left unresolved refuses the row.
-4. An argv beginning `python` or `python3` runs under `sys.executable`. Every command runs from the
-   repo root.
+4. An argv beginning `python` or `python3` runs under `sys.executable`; any other program is
+   resolved on `PATH` before it runs. Windows' process creation searches its system directory before
+   `PATH`, and on a node with WSL installed the `bash` there is WSL's, which cannot read a linked
+   worktree's `.git` file: every Git-Bash check read "not a git repo" in TOOL-aPrimedIndex-1's pass.
+   Every command runs from the repo root.
 5. Rows with one `write` and one `check` join into one item listing all their outputs; a
    `[[regenerate]]` row's output is named by its kit. Two rows of one item declaring different
    stages refuse.
@@ -159,6 +163,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · §4 · S1 · a program other than python is resolved on `PATH` before it runs;
+  TOOL-aPrimedIndex-1's pass found WSL's `bash` taken ahead of Git-Bash's.
 
 ## 10. Reuse audit
 

@@ -128,6 +128,7 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `adopt-run-gates.sh` | `--check` asserts a target's `[gate_runner]` declaration still matches this runner's output strings |
 | `adopt-run-gates.test.sh` | the adopter e2e, gated on EFFECTS rather than exit codes |
 | `check-receipt.py` | the leg `receipt sync (installed files match the receipt)`: every engine row of `.governance/install.json` still on disk and still hashing to its recorded sha256, or, where the raw bytes miss, hashing through the target's own clean filter to the row's `oid` while the raw bytes' blob does not: that row is graded clean and counted `eol-only` on the summary and `ok` lines, the rule `govkit check` applies, in one `git hash-object --stdin-paths` spawn for every such row. A row with no `oid`, a real edit, a CRLF copy no filter normalizes, a tampered `sha256` over bytes that are the blob, a tree with no `.git` and a git refusal all still red, the last two with a `GIT` line naming why. The INTEGRITY half only — it reads no `source`, `commit` or `gov_oid`, because those resolve against a gov checkout an adopter does not have, and it grades no `seed`, `merged`, `attributes` or `forked` row. A tree with no receipt is an announced `SKIP`, and the built-in fixture arms, the eol-only ones over real git repositories, run on every invocation so the leg has a verdict there too; its `fixtures:` line prints their count |
+| `regen.py` | the generated-output verb behind `--regen`, `--regen-check` and `--regen-list`: it reads the staged `[[generated]]` and `[[regenerate]]` rows of every tracked kit descriptor and regenerates them in stage order, or proves each fresh without writing; see "Generated outputs" below |
 | `kit.toml` | this entry, declared as data |
 
 ## Generated outputs — declared by the kit that writes them
@@ -157,6 +158,34 @@ disjoint and a later stage reads an earlier one's:
 
 A row with none of the keys keeps exactly its old meaning: the unattended kit reads `[[generated]]`
 for its write-set rules and govkit runs `[[regenerate]]` argvs, and neither reads these keys.
+
+### `--regen`, `--regen-check`, `--regen-list` — one command for every declared output
+
+`regen.py`, beside the runner, reads the declarations above and is reached through the runner's
+first argument, so it needs no python launcher of the reader's own (TOOL-aPrimedIndex-2):
+
+```bash
+bash <prefix>/run-gates/run-gates.sh --regen         # run every write, stage by stage; prints what each stage moved
+bash <prefix>/run-gates/run-gates.sh --regen-check   # run every check; writes nothing
+bash <prefix>/run-gates/run-gates.sh --regen-list    # the resolved items, in run order
+```
+
+The tree is the current directory's git toplevel; the descriptors are the tracked `kit.toml` files
+one directory below the tool root, where this kit sits in its own repository. `--regen` names any
+untracked file first, because the build-index generator enumerates tracked files and does not see a
+record until it is added. A failed write stops before the next stage.
+
+| exit | `--regen` | `--regen-check` |
+|---|---|---|
+| 0 | every write ran | every item fresh |
+| 1 | a write failed or timed out | an item stale, its check failed, or it timed out |
+| 2 | REFUSED: a descriptor that does not parse, a malformed row, an unresolved token, no repository | the same |
+
+`GATE_REGEN_JOBS` bounds concurrency (default 4) and `GATE_REGEN_BOUND` bounds each command in
+seconds (default 900). A command outliving its bound is killed by its own pid, so a descendant it
+spawned can outlive it. **What it does not check:** that a write writes what its row names, or that
+a check grades it; a check red for a reason a regeneration cannot fix reads as stale, and its output
+tail is printed so a reader can tell.
 
 ## Reuse, and the baseline a guard diffs against
 

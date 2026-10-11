@@ -374,6 +374,48 @@ esac
 rm -rf "$_cd" "$_cr"
 fi   # ---- end the HAVE_TIMEOUT gate on arms 1c/1d/1e ----------------------------------------------
 
+# ---- 1r. THE REGEN VERB READS THE DECLARED OUTPUTS. TOOL-aPrimedIndex-2 ----------------------------
+#     A scratch repo holding one fixture kit at THIS kit's tool root, whose tracked descriptor declares
+#     one staged output; its check exits the code written in its `rc` file and its write writes 0
+#     there. The verb, from inside the scratch repo: --check exits 1 with a STALE line on rc 1 and
+#     writes nothing, --write makes it fresh and names the moved file, and a row carrying `write`
+#     alone is refused with exit 2 naming its descriptor. The kit sits at the tool root inside the
+#     scratch repo, because the verb reads the descriptors there.
+#     Staged red by making `build_items` skip a partial row instead of refusing it: 1r-c fails.
+_rr=$(mktemp -d)
+mkdir -p "$_rr/${PFX}fake"
+printf '%s\n' '#!/usr/bin/env bash' 'here=$(cd "$(dirname "$0")" && pwd)' \
+  '[ "${1:-}" = --write ] && { printf 0 > "$here/rc"; exit 0; }' 'exit "$(cat "$here/rc")"' > "$_rr/${PFX}fake/gen.sh"
+printf '%s\n' 'id = "fake"' '' '[[generated]]' 'path = "out.txt"' 'generator = "gen.sh"' 'why = "a fixture output"' \
+  'write = ["bash", "{kit}/gen.sh", "--write"]' 'check = ["bash", "{kit}/gen.sh", "--check"]' 'stage = 1' > "$_rr/${PFX}fake/kit.toml"
+printf 1 > "$_rr/${PFX}fake/rc"
+( cd "$_rr" && git init -q . && git add "${PFX}fake/kit.toml" "${PFX}fake/gen.sh" "${PFX}fake/rc" && git commit -q -m base ) >/dev/null 2>&1
+_rv_out=$(cd "$_rr" && "$PYBIN" "$KITDIR/regen.py" --check 2>&1); _rv_rc=$?
+n=$((n+1))
+case "$_rv_rc:$_rv_out" in
+  1:*"regen: STALE · stage 1 · fake"*"regen: 1 declared · 0 fresh · 1 stale"*) ;;
+  *) echo "canary: 1r-a a staged output whose check exits 1 did not read STALE with exit 1 (rc $_rv_rc)"; fail=1 ;;
+esac
+n=$((n+1))
+[ -z "$(cd "$_rr" && git status --porcelain)" ] || { echo "canary: 1r-a --check wrote into the tree it checked"; fail=1; }
+_rw_out=$(cd "$_rr" && "$PYBIN" "$KITDIR/regen.py" --write 2>&1); _rw_rc=$?
+_rc_out=$(cd "$_rr" && "$PYBIN" "$KITDIR/regen.py" --check 2>&1); _rc_rc=$?
+n=$((n+1))
+case "$_rw_rc:$_rc_rc:$_rw_out" in
+  0:0:*"moved: ${PFX}fake/rc"*) ;;
+  *) echo "canary: 1r-b --write did not make the output fresh and name the file it moved (write rc $_rw_rc, check rc $_rc_rc)"; fail=1 ;;
+esac
+printf '%s\n' 'id = "fake"' '' '[[generated]]' 'path = "out.txt"' 'generator = "gen.sh"' 'why = "a fixture output"' \
+  'write = ["bash", "{kit}/gen.sh", "--write"]' > "$_rr/${PFX}fake/kit.toml"
+( cd "$_rr" && git commit -q -am partial ) >/dev/null 2>&1
+_rl_out=$(cd "$_rr" && "$PYBIN" "$KITDIR/regen.py" --list 2>&1); _rl_rc=$?
+n=$((n+1))
+case "$_rl_rc:$_rl_out" in
+  2:*"REFUSED"*"${PFX}fake/kit.toml"*"all three or none"*) ;;
+  *) echo "canary: 1r-c a [[generated]] row carrying write alone was not refused with exit 2 naming its descriptor (rc $_rl_rc)"; fail=1 ;;
+esac
+rm -rf "$_rr"
+
 # 1a-control: the same predicate over a manifest with NO `impure` key must PASS, and over one with
 #     a near-miss spelling must FAIL. Both halves, because the arm above is a negative search and a
 #     negative search passes just as happily over a population it never selected.
