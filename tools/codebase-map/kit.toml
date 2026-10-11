@@ -149,3 +149,8 @@ why = "a sourced conf: a CR reaches the shell as part of the value"
 path = "{map_root}/generated"
 generator = "gen_map.py"
 why = "symbols.json, inventories.json and MAP.md, regenerated from the tree on every code change"
+# Stage 3, last (TOOL-aPrimedIndex-1): the map reads the renders and the record indexes the
+# earlier stages write, so run-gates' regen.py regenerates it after both.
+write = ["python", "{kit}/gen_map.py", "--write"]
+check = ["python", "{kit}/gen_map.py", "--check"]
+stage = 3

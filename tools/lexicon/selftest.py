@@ -1129,6 +1129,25 @@ with build_tempdir() as td:
     check("B1: ...and the engine's own output rides along, naming the row to paste",
           "pin" in _o and "VERB_OFFENDER_PIN=" in _o, _o)
 
+    # --check-render COMPARES THE RENDER AND NOTHING ELSE (TOOL-aPrimedIndex-9). run-gates' regen
+    # preflight proves this kit's Skill fresh with it; with `--check` there, a naming red no render
+    # can cure read as a stale output and refused every bar. The declaration above still fails its
+    # grade, which is the state the mode must pass through.
+    _skill = root / ".claude" / "skills" / "lexicon" / "SKILL.md"
+    subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--render"], cwd=root,
+                   capture_output=True, text=True)
+    _kept = _skill.read_bytes()
+    _r = subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check-render"], cwd=root,
+                        capture_output=True, text=True)
+    check("--check-render: a fresh Skill passes while the declaration's grade is red",
+          _r.returncode == 0, _r.stdout + _r.stderr)
+    _skill.write_bytes(_kept + b"x")
+    _r = subprocess.run([BASH, f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check-render"], cwd=root,
+                        capture_output=True, text=True)
+    check("--check-render: a Skill one byte off a fresh render reds, naming the drift",
+          _r.returncode == 1 and "lexicon: DRIFTED" in _r.stdout + _r.stderr, _r.stdout + _r.stderr)
+    _skill.write_bytes(_kept)
+
     # A FLAG IS NOT A PATH. This script guarded its argv by ARITY alone, so
     # `scaffold_lexicon.py --help` is a well-formed one-argument call and `--help` became the
     # DESTINATION: the run derived a whole seed and wrote it to a file literally named `--help`.
