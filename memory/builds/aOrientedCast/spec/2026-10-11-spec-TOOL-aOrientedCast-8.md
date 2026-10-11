@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-8 — the roles kit is an adopter default: installed, rendered and reported at install and update
 
-**Status:** INPROGRESS · rev-4 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 7
+**Status:** CLOSED · rev-4 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 

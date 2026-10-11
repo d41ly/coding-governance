@@ -73,3 +73,5 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-11T16:53:51Z rescope · item add TOOL-aOrientedCast-10 · reason owner addendum in session, 2026-10-11: every role runs at a declared effort level read from one owner-editable config (prompts/2026-10-11-prompt-TOOL-aOrientedCast-10-0-owner-addendum.md)
 
 2026-10-11T16:54:49Z rescope · item add TOOL-aOrientedCast-11 · reason owner addendum in session, 2026-10-11: role agents may run no gate or self-test, spec writers only memory hygiene and lexicon, builders only lexicon, mechanically gated (prompts/2026-10-11-prompt-TOOL-aOrientedCast-10-0-owner-addendum.md)
+
+2026-10-11T17:27:39Z dispatch · item 6ca3cb2d TOOL-aOrientedCast-8 · reason tools/govkit/selftest.py memory/builds/aOrientedCast/spec/2026-10-11-spec-TOOL-aOrientedCast-8.md memory/builds/aOrientedCast/build/2026-10-11-build-TOOL-aOrientedCast-8-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md

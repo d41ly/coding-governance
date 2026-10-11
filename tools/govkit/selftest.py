@@ -2594,7 +2594,7 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True) -> None:
         _agents = list((t / ".claude" / "agents").glob("*")) if (t / ".claude" / "agents").is_dir() else []
         check(tag + " ...and writes no agent type and no role index",
               not _agents and not (t / ".claude" / "roles.json").exists(), str(_agents))
-        p = subprocess.run(["bash", str(t / PFX / "check-wiring.sh"), "--check"], cwd=str(t),
+        p = subprocess.run([govkit_module().resolve_bash(), str(t / PFX / "check-wiring.sh"), "--check"], cwd=str(t),
                            capture_output=True, text=True, encoding="utf-8", errors="replace")
         _ln = [ln for ln in p.stdout.splitlines() if ln.startswith("UNWIRED  roles")]
         check(tag + " ...and check-wiring reads UNWIRED roles naming the doc and the CHARTER key",
@@ -2608,14 +2608,14 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True) -> None:
           str(sorted(p.name for p in (kit / "house").glob("*.md"))))
     check("OC8 AC4 ...and renders the /build Skill", (t / ".claude" / "skills" / "build" / "SKILL.md").is_file(),
           "absent")
-    ck = subprocess.run(["bash", str(kit / "adopt-roles.sh"), "--check"], cwd=str(t),
+    ck = subprocess.run([govkit_module().resolve_bash(), str(kit / "adopt-roles.sh"), "--check"], cwd=str(t),
                         capture_output=True, text=True, encoding="utf-8", errors="replace")
     check("OC8 AC4 the target's adopter --check reads its render fresh", ck.returncode == 0,
           ck.stdout + ck.stderr)
     cw = t / PFX / "check-wiring.sh"
 
     def run_wiring():
-        p = subprocess.run(["bash", str(cw), "--check"], cwd=str(t), capture_output=True, text=True,
+        p = subprocess.run([govkit_module().resolve_bash(), str(cw), "--check"], cwd=str(t), capture_output=True, text=True,
                            encoding="utf-8", errors="replace")
         return [ln for ln in p.stdout.splitlines() if ln[:9].strip() and ln[9:18].strip() == "roles"]
 

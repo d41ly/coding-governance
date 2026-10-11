@@ -23,7 +23,10 @@ to a bare `bash`, which a Windows python resolves to the WSL launcher, so those 
 WSL cannot see. With a probe that swapped in `govkit.resolve_bash()` both printed `[]`: the apply,
 the nine agent types, the `--check`, the `ok` and `UNWIRED` lines, and on the no-doc target the
 Skill alone and the `UNWIRED  roles` line naming `AGENTS.md` and `CHARTER`. The write gate refused
-the one-line fix because the spec is CLOSED, so their ledger lines wait for that fix.
+the one-line fix because the spec is CLOSED, so their ledger lines wait for that fix. The reopened
+fix pass replaced the three bare `bash` launches in `check_roles_install` with
+`govkit_module().resolve_bash()`, the launcher the same file already uses, and AC4 and AC13 are
+observed by the main loop against the committed fix, which this pass does not run.
 
 **Evidences:** TOOL-aOrientedCast-8
 - AC1 — `0 unclaimed` — `govkit.py selfcheck --write` exited 0: legs 134 in the manifest, 64 claimed and 70 exempt, `per-file claim: 0 unclaimed file(s)`, surface `0 unclaimed`, and `generated outputs: 8 [[generated]] row(s)`, the 6 at `744e55db` plus this unit's two; it added the `roles adopter self-test` row to the subject pins.
