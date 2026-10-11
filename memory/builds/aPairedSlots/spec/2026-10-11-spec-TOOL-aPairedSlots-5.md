@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-5 — a worktree holds at most one slot, so every path under its git dir stays one bar's
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 5
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -36,8 +36,9 @@ worktrees of one repository give the verdicts they give run serially, with no re
   TOOL-aPairedSlots-8. Observed by AC2.
 - **S3 — two real bars, concurrent against serial.** An instrument under this build's `build/`
   freezes one clone of the build tip with two worktrees, runs a `GATE_FULL=1` bar in each one after
-  the other and then both at once under `GATE_TURNSTILE_SLOTS=2`, and compares them. Observed by
-  AC3.
+  the other and then both at once under `GATE_TURNSTILE_SLOTS=2`, and compares them. NOT OBSERVED in
+  this unit — it is the build's VERIFYING check, run once over the finished tree after
+  TOOL-aPairedSlots-7, whose writers it also exercises, and recorded beside its instrument.
 
 ## 3. Non-goals (OUT)
 
@@ -111,12 +112,6 @@ The audit record and the two-bar instrument are records under this build's own f
   prompt names has a row with a disposition and the measurement or code line behind it, and every
   COLLIDES row names the unit that fixes it.
   Red when: a named path has no row.
-- **AC3** — When the two-bar instrument runs, the concurrent pair and the serial pair give the same
-  set of leg verdicts for each worktree, each worktree's `gate-ledger.tsv` carries a row per leg per
-  bar, the common dir's `gates.log` carries four new whole lines, and all four run records carry a
-  verdict file.
-  Red when: a row, a line or a record is missing or torn, or a leg's verdict differs.
-  cost: two full bars serial and two concurrent, about three hours, run once at VERIFYING.
 
 ## 7. Gates
 
@@ -131,6 +126,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · S3 · AC3 · the two-real-bar check leaves this unit's acceptance for the build's
+  VERIFYING check: it takes about three hours of full bars, exercises TOOL-aPairedSlots-7's writers
+  as much as this unit's rule, and the build's order needs this unit terminal before -7 dispatches.
 
 ## 10. Reuse audit
 

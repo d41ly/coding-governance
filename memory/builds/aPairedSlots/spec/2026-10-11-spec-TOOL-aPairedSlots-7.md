@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-7 — the common dir's shared files take a second concurrent writer safely
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 6
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -16,8 +16,9 @@
 
 Four files in a repository's git common dir are written by every bar of every worktree: the run
 log, the health log, the shared full green and the drift history. With two bars admitted at once
-each of them meets a second writer for the first time. Each is made safe for it, by the change the
-measurement says it needs and no more.
+each of them meets a second writer for the first time. Three are made safe for it here, by the
+change the measurement says each needs and no more; the fourth, the health log, is safe for its
+appends as measured, and its trim is ask TOOL-aPairedSlots-10.
 
 ## 2. Scope (IN)
 
@@ -27,12 +28,6 @@ measurement says it needs and no more.
   through `printf >>` tore 146 of 3200 lines, and of 12000-byte lines 308 of 900, while the same
   lines piped through `cat >>` tore none at 2000 or 12000 bytes. A run-log line grows with its
   failing legs' names and has reached 923 bytes. Observed by AC1.
-- **S2 — the health log trim takes a lock and re-reads before replacing.** The trim in
-  `add_health_event` runs only while it holds a `noclobber` lock file beside the log, created by
-  a builtin redirection, so two bars never trim at once; and it compares the line count it trimmed
-  from with the count just before the `mv`, re-trimming once if a sibling appended meanwhile. The
-  append itself is unchanged: one short line through `>>`, measured whole for 4500 concurrent
-  100-byte lines. Observed by AC2.
 - **S3 — the shared full green is staged under a per-process name.** The copy to
   `gate-full-green.shared` goes through `gate-full-green.shared.tmp.$$`, so two bars stamping at
   once each `mv` a whole file and the last writer wins, as the prompt rules. Observed by AC3.
@@ -48,6 +43,9 @@ measurement says it needs and no more.
 
 - The worktree's own git dir, made per-bar by TOOL-aPairedSlots-5.
 - Rotating or re-capping the health log.
+- The health log's trim. Its writer is the `health_log_sh` block, inlined byte-identical in four kits
+  under a parity gate, with a Python twin, so a lock there is a cross-kit unit; it is ask
+  TOOL-aPairedSlots-10, LOW: a trim runs once per 250 events and its window is one `tail` and one `mv`.
 - Any change to what a line in any of these files says.
 
 ### Edges
@@ -57,19 +55,21 @@ measurement says it needs and no more.
 ## 4. Design
 
 The measurement decided the shape of each fix. Short appends are already whole on this host, so the
-health log append is left alone and only its trim, a copy-and-replace, is serialized. A run-log line
+health log append needs nothing; its trim is a copy-and-replace in a block four kits share, and is
+ask TOOL-aPairedSlots-10 rather than this unit. A run-log line
 can pass the size where builtin `printf` splits its write, and one `cat` per bar is the cheapest
 writer measured whole at every size tried. The shared green is a copy-and-replace whose only defect
 is a fixed staging name. The drift history's appends are already one write each; only its
 header-on-empty decision is racy, and exclusive create closes it.
 
-The health log trim keeps a residual, stated at the site: an append that lands between the
-re-read and the `mv`, a window of two builtins, is lost. Trims happen once per 250 events.
+The drift history keeps a residual: a second writer that appends in the instant between the
+first writer's exclusive create and its one write lands its rows above the header. The window is
+one `open` and one `write` in one process, and the reader skips a history that does not open with
+its header rather than misreading it.
 
 ### Inventory
 
-No function is minted. New paths: `health.log.trim` (the lock file) and
-`gate-full-green.shared.tmp.<pid>` (the staging name).
+No function is minted. New path: `gate-full-green.shared.tmp.<pid>` (the staging name).
 
 ### Files touched (estimate)
 
@@ -103,10 +103,6 @@ No function is minted. New paths: `health.log.trim` (the lock file) and
   bytes into one common dir, `gates.log` holds 150 whole lines, each parsing with `parse_line`.
   Red when: the line is written with `printf >>`, and lines tear.
   cost: about two minutes of spawns on node a.
-- **AC2** — When two fixture bars trim one `health.log` at its cap while a third appends, no line
-  appended before the trim began is absent afterwards except those the cap drops, and
-  `health.log.trim` is gone.
-  Red when: the trim runs unlocked and a sibling's line is lost.
 - **AC3** — When two fixture runners stamp `gate-full-green.shared` at once, the file equals one of
   the two stamps byte for byte and no `gate-full-green.shared.tmp` file remains.
   Red when: the staging name is fixed and the file is torn or empty.
@@ -118,7 +114,7 @@ No function is minted. New paths: `health.log.trim` (the lock file) and
 
 `run-gates canary` · `drift-audit selftest`
 
-New arm: tools/run-gates/run-gates.runlog.test.sh · covers AC1 AC2 AC3 · the writer replaced by printf, the trim unlocked, the staging name fixed · none
+New arm: tools/run-gates/run-gates.runlog.test.sh · covers AC1 AC3 · the writer replaced by printf, the staging name fixed · none
 New arm: tools/drift-audit/selftest.py · covers AC4 · a header written on an empty-file check · none
 
 ## 8. Open questions
@@ -128,13 +124,14 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · §1 · S2 · AC2 · §3 · §4 · the health log trim leaves this unit for ask
+  TOOL-aPairedSlots-10: its writer is a parity-gated block shared by four kits and a Python twin.
 
 ## 10. Reuse audit
 
 The seams are the existing writers: `write_runlog_verdict`, `add_health_event` and the full-green
 stamp in `tools/run-gates/run-gates.sh`, and `write_drift_history` in
-`tools/drift-audit/drift_report.py`. `reuse_lookup.py` named no shared append-lock seam; the
-`noclobber` claim follows the turnstile's own `mkdir` claim in spirit with builtins only. Recall
+`tools/drift-audit/drift_report.py`. `reuse_lookup.py` named no shared append-lock seam. Recall
 returned TOOL-aMendedFleet-48, the drift history's design, whose "interleave whole groups at worst"
 the measurement confirmed.
 
