@@ -74,12 +74,12 @@ ids DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedInde
 | [TOOL-aPrimedIndex-3 — the runner refuses to start a bar while a declared output is stale, before it queues for the host](spec/2026-10-11-spec-TOOL-aPrimedIndex-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aPrimedIndex-4 — the lander regenerates the declared outputs over its merged tree and lands them with the merge](spec/2026-10-11-spec-TOOL-aPrimedIndex-4.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-11 |
 | [DEPL-aPrimedIndex-1 — govkit's verdict reader runs the target's runner with its generated-output preflight skipped](spec/2026-10-11-spec-DEPL-aPrimedIndex-1.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-11 |
-| [TOOL-aPrimedIndex-6 — the pre-push hook scrubs the preflight's skip knob from every bar it runs](spec/2026-10-11-spec-TOOL-aPrimedIndex-6.md) | 4 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPrimedIndex-6 — the pre-push hook scrubs the preflight's skip knob from every bar it runs](spec/2026-10-11-spec-TOOL-aPrimedIndex-6.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aPrimedIndex-7 — the regen verb's and the runner's review minors, batched](spec/2026-10-11-spec-TOOL-aPrimedIndex-7.md) | 4 | 2 | OPEN | rev-1 | 2026-10-11 |
 | [TOOL-aPrimedIndex-8 — the lander's review minors, batched, and the fixture that names a unit](spec/2026-10-11-spec-TOOL-aPrimedIndex-8.md) | 4 | 2 | OPEN | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 4 record folder(s).
+Records: 11 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

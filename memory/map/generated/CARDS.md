@@ -218,10 +218,10 @@ The gate runner, its harnesses, and the adopter that keeps a target's verdict re
 - decisions 9: `TOOL-aPacedTurnstile-1`, `TOOL-aPacedTurnstile-2`, `TOOL-aPacedTurnstile-4`, `TOOL-aPacedTurnstile-5`, `TOOL-aPacedTurnstile-6`, `TOOL-aPacedTurnstile-3`, `TOOL-aPacedTurnstile-7`, `TOOL-aPacedTurnstile-16`, `TOOL-dLoggedFlight-3`
 - gate-legs 13: `run-gates gov canary`, `run-gates adopter e2e`, `run-gates wiring`, `profile-bar selftest`, `run-gates turnstile`, `every held leg is budgeted, every budget row resolves`, `run-selftests self-test`, `selftest harness self-test`, `extract-arms self-test`, `leg ceilings clear their evidenced maximum`, `run-gates run-log line`, `receipt sync (installed files match the receipt)`, `pre-push bar self-test`
 - kits 1: `run-gates`
-- gotcha-classes 14
+- gotcha-classes 15
 - guides 1: `MERGE-BAR.md`
 - globs 21
-- cut 35 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 36 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## runlog
 

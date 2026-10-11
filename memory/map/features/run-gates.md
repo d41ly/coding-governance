@@ -20,7 +20,7 @@ harness-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md",
+gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md", "a-runner-knob-owes-a-push-class.md",
   "hookspath-resolves-into-another-checkout.md",
   "ab-arm-never-did-the-work.md",
   "empty-field-collapses-unless-it-is-last.md",

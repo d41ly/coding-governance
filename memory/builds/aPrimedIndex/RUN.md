@@ -73,3 +73,7 @@ base: 15bbfa4f867262f3c862e2473688fc69d0566b7d
 2026-10-11T07:00:23Z brief · item TOOL-aPrimedIndex-8 · reason cf9c7df95cf8 memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-6-1-build-brief.md
 
 2026-10-11T07:02:22Z dispatch · item 6e515ad1 DEPL-aPrimedIndex-1 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/aPrimedIndex/spec/2026-10-11-spec-DEPL-aPrimedIndex-1.md memory/builds/aPrimedIndex/build/2026-10-11-build-DEPL-aPrimedIndex-1-1-acceptance-ledger.md memory/builds/aPrimedIndex/README.md memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-6-1-build-brief.md memory/map/generated/symbols.json
+
+2026-10-11T07:09:04Z dispatch · item 837ae9ee TOOL-aPrimedIndex-6 · reason .githooks/pre-push memory/gotchas/a-runner-knob-owes-a-push-class.md memory/gotchas/INDEX.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-6.md memory/builds/aPrimedIndex/build/2026-10-11-build-TOOL-aPrimedIndex-6-1-acceptance-ledger.md memory/builds/aPrimedIndex/README.md
+
+2026-10-11T08:24:39Z dispatch · item 837ae9ee TOOL-aPrimedIndex-6 · reason memory/map/features/run-gates.md memory/map/generated/inventories.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/symbols.json
