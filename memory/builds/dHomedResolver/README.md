@@ -5,7 +5,7 @@ opened: 2026-10-09
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-4 TOOL-dHomedResolver-5 TOOL-dHomedResolver-6 TOOL-dHomedResolver-7 TOOL-dHomedResolver-8
+ids: TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-4 TOOL-dHomedResolver-5 TOOL-dHomedResolver-6 TOOL-dHomedResolver-7 TOOL-dHomedResolver-8 TOOL-dHomedResolver-9
 ---
 
 # dHomedResolver — a rotation is graded against its declared home, and a half-staged one is refused
@@ -60,7 +60,7 @@ None yet.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 5 unit(s) · node d · opened 2026-10-09 · streams tooling
-ids TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-4 TOOL-dHomedResolver-5 TOOL-dHomedResolver-6 TOOL-dHomedResolver-7 TOOL-dHomedResolver-8
+ids TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-4 TOOL-dHomedResolver-5 TOOL-dHomedResolver-6 TOOL-dHomedResolver-7 TOOL-dHomedResolver-8 TOOL-dHomedResolver-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
