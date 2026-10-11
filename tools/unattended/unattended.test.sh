@@ -8614,28 +8614,35 @@ write_proc_record() { :; }
 # shellcheck disable=SC1090
 . "$rb_fn"
 
-# ...a plain child that outlives the bound is KILLED, and the WALL CLOCK reflects it. Compared
-# against a 30 s sleeper with a 2 s bound. THE WINDOW IS DECIDED BY A MEASUREMENT, not by taste:
-# the CORRECT construct was measured on node `a` at 12 s under heavy ambient load against that same
-# 2 s bound -- kill-path and scheduling overhead, which does NOT shrink when the sleeper does. So the
-# valid window is (12, sleeper), and a 10 s sleeper made it empty. 30 s gives a real window at half
-# the cost of the 60 s original, which mattered: the control BLOCKS for its full sleep by
-# construction, and this suite's declared budget is 970 s against a measured 906 s.
-_t0=$(date +%s); run_bounded bash -c 'sleep 30' >/dev/null 2>&1; _rc=$?; _t1=$(date +%s)
+# ...a plain child that outlives the bound is KILLED before it can finish. ORDERED ON A MARKER, NOT
+# A WINDOW (TOOL-aSparedSpawn-15 S5): each sleeper writes a marker only when it finishes ON ITS OWN,
+# so "run_bounded returned before the sleeper finished" is the marker being ABSENT at the return,
+# and "the control waited for it" is the marker being PRESENT. The elapsed-time windows these arms
+# used (under 20 s, at least 20 s, against a 2 s bound) were sized from a measurement of 12 s under
+# load and redded on a heavier day. A subject's sleeper is 60 s at no cost, since nothing waits for
+# it, and it is killed through its recorded pid after the assertion; its `wait` then fails, so the
+# kill writes no marker. The control's stays at 30 s, because the control BLOCKS for it by
+# construction.
+_rbm=$TMP/rb-marks; rm -rf "$_rbm"; mkdir -p "$_rbm"
+run_bounded bash -c 'sleep 60 & echo $! > "$1"; wait $! && : > "$2"' _ "$_rbm/child.pid" "$_rbm/child.done" >/dev/null 2>&1; _rc=$?
 n=$((n+1))
-[ $(( _t1 - _t0 )) -lt 20 ] || { echo "FAIL run_bounded took $(( _t1 - _t0 ))s against a 2s bound — the bound is on the verdict, not the clock"; st=1; }
+[ ! -e "$_rbm/child.done" ] || { echo "FAIL run_bounded returned only after its 60 s child finished on its own against a 2s bound — the bound is on the verdict, not the clock"; st=1; }
 n=$((n+1))
 case "$_rc" in 124|137) ;; *) echo "FAIL run_bounded returned $_rc for a killed command; 124 or 137 expected"; st=1 ;; esac
+_rbp=""; { read -r _rbp < "$_rbm/child.pid"; } 2>/dev/null; [ -z "$_rbp" ] || kill "$_rbp" 2>/dev/null
 
 # ...and a backgrounded GRANDCHILD does not hold it, which is the actual defect. The CONTROL is the
-# same command through a command substitution: if the control also returns fast, this host does not
-# reproduce the class and the arm above proved nothing, so that is a FAIL and not a pass.
-_t0=$(date +%s); run_bounded bash -c 'sleep 30 & exit 0' >/dev/null 2>&1; _t1=$(date +%s)
-_t2=$(date +%s); _ctl=$(timeout -k 5s 2 bash -c 'sleep 30 & exit 0' 2>&1); _t3=$(date +%s)
+# same command through a command substitution: if its marker is ABSENT when the substitution
+# returns, this host does not reproduce the class and the arm above proved nothing, so that is a
+# FAIL and not a pass.
+run_bounded bash -c '( sleep 60 & echo $! > "$1"; wait $! && : > "$2" ) & exit 0' _ "$_rbm/grand.pid" "$_rbm/grand.done" >/dev/null 2>&1
 n=$((n+1))
-[ $(( _t1 - _t0 )) -lt 20 ] || { echo "FAIL run_bounded blocked $(( _t1 - _t0 ))s on a backgrounded grandchild — bounded-through-a-pipe-is-unbounded"; st=1; }
+[ ! -e "$_rbm/grand.done" ] || { echo "FAIL run_bounded blocked until its backgrounded grandchild finished on its own — bounded-through-a-pipe-is-unbounded"; st=1; }
+_rbp=""; { read -r _rbp < "$_rbm/grand.pid"; } 2>/dev/null; [ -z "$_rbp" ] || kill "$_rbp" 2>/dev/null
+_ctl=$(timeout -k 5s 2 bash -c '( sleep 30 & wait $! && : > "$1" ) & exit 0' _ "$_rbm/ctl.done" 2>&1)
 n=$((n+1))
-[ $(( _t3 - _t2 )) -ge 20 ] || { echo "FAIL the CONTROL returned in $(( _t3 - _t2 ))s, so this host does not reproduce the pipe defect and the grandchild arm graded nothing"; st=1; }
+[ -e "$_rbm/ctl.done" ] || { echo "FAIL the CONTROL returned before its grandchild finished, so this host does not reproduce the pipe defect and the grandchild arm graded nothing"; st=1; }
+rm -rf "$_rbm"
 
 # ...a command that finishes INSIDE the bound is not killed and its output survives.
 run_bounded bash -c 'echo alive; exit 0'; _rc=$?
@@ -14328,14 +14335,18 @@ read_pl_token() { # pid -> its procfs start token, or `-`
 # THE TOKEN ONCE THE EXEC HAS HAPPENED (TOOL-aGraftedHelix-34 S5). On this platform an exec replaces
 # the Windows process behind a pid and the procfs start token moves with it, so a token read the
 # moment `&` returns is the forked shell's whenever the box is loaded: measured 3 of 30 under twelve
-# fork loops, 0 of 30 idle. Waits on the OBSERVED image, `(<comm>)` in the stat line, bounded at 100
-# polls of 0.1 s; `-` past the bound, which the caller asserts against.
+# fork loops, 0 of 30 idle. Waits on the OBSERVED image, `(<comm>)` in the stat line, up to the
+# 120 s hang bound; `-` past the bound, which the caller asserts against.
+# THIS POLL AND THE TWO IN `write_pl_orphan` EXIT ON THEIR FACT, so each bound is a HANG BOUND of
+# 120 s the pass path never reaches (TOOL-aSparedSpawn-15 S6). They were about 10 s, 30 s and 15 s,
+# counted in polls whose turns spawn, and a spawn on a loaded node `a` costs 632 to 818 ms.
+PL_HANG=120
 read_pl_exec_token() { # pid · comm -> its start token once it runs <comm>, or `-`
-  local l i=0
-  while [ "$i" -lt 100 ]; do
+  local l end=$(( EPOCHSECONDS + PL_HANG ))
+  while [ "$EPOCHSECONDS" -lt "$end" ]; do
     { IFS= read -r l < "/proc/$1/stat"; } 2>/dev/null || break
     case "$l" in *"($2)"*) read_pl_token "$1"; return 0 ;; esac
-    sleep 0.1; i=$((i + 1))
+    sleep 0.1
   done
   printf -- '-'
 }
@@ -14362,24 +14373,24 @@ init_pl_fixture() {
 # names it. Sets PL_ORPH, the recorded wrapper left running, and PL_KIDS, its descendants once the stub
 # sleeps — the wrapper, then `timeout`, then the stub, which exists a moment after the record does.
 write_pl_orphan() { # sleep seconds
-  local _d _i=0 _k
+  local _d _k _end=$(( EPOCHSECONDS + PL_HANG ))
   PL_ORPH=""; PL_KIDS=""
   ( cd "$pl_dir" && exec env -u GATE_SELFTESTS -u UNATTENDED_PROCFS GOV_DEFAULT_BRANCH=main PLOUT="$pl_out" PL_SLEEP="$1" \
       ${PL_PROCFS:+UNATTENDED_PROCFS="$PL_PROCFS"} bash "$SCRIPT" --preflight tRun --keepalive-id k1 ) >/dev/null 2>&1 &
   _d=$!
-  while [ -z "$PL_ORPH" ] && [ "$_i" -lt 300 ]; do
+  while [ -z "$PL_ORPH" ] && [ "$EPOCHSECONDS" -lt "$_end" ]; do
     PL_ORPH=$(awk -v d="$_d" '$3 == d { print $1; exit }' "$PL_LEDGER" 2>/dev/null)
-    [ -n "$PL_ORPH" ] || { sleep 0.1; _i=$((_i + 1)); }
+    [ -n "$PL_ORPH" ] || sleep 0.1
   done
   kill -9 "$_d" 2>/dev/null; wait "$_d" 2>/dev/null
-  n=$((n+1)); [ -n "$PL_ORPH" ] || { echo "FAIL the killed driver $_d left no record in $PL_LEDGER, so every arm on this orphan grades nothing"; st=1; return 1; }
-  _i=0
-  while [ "$_i" -lt 150 ]; do
+  n=$((n+1)); [ -n "$PL_ORPH" ] || { echo "FAIL the killed driver $_d left no record in $PL_LEDGER within the ${PL_HANG} s hang bound, so every arm on this orphan grades nothing"; st=1; return 1; }
+  _end=$(( EPOCHSECONDS + PL_HANG ))
+  while [ "$EPOCHSECONDS" -lt "$_end" ]; do
     PL_KIDS=$(read_pl_kids "$PL_ORPH")
     for _k in $PL_KIDS; do grep -q '(sleep)' "/proc/$_k/stat" 2>/dev/null && return 0; done
-    sleep 0.1; _i=$((_i + 1))
+    sleep 0.1
   done
-  echo "FAIL the orphan $PL_ORPH never grew its sleeping stub, so the arms on it grade a tree that is not the one a bar leaves"; st=1
+  echo "FAIL the orphan $PL_ORPH never grew its sleeping stub within the ${PL_HANG} s hang bound, so the arms on it grade a tree that is not the one a bar leaves"; st=1
   return 1
 }
 true & pl_dead=$!; wait "$pl_dead"

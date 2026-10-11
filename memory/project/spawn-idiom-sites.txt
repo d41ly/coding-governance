@@ -196,7 +196,7 @@ tools/run-gates/run-gates.runlog.test.sh	cat-file	5	predates the lint; `$(<file)
 tools/run-gates/run-gates.runlog.test.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/run-gates/run-gates.runlog.test.sh	printf-subst	4	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.runlog.test.sh	var-pipe	10	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
-tools/run-gates/run-gates.sh	cat-file	20	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.sh	cat-file	19	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.sh	date-fmt	10	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
 tools/run-gates/run-gates.sh	path-subst	7	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/run-gates/run-gates.sh	printf-subst	1	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit

@@ -6552,7 +6552,9 @@ user_skills = "/tmp/gk-fake-skills"
                 [sys.executable, str(GOVKIT), "update", "--target", str(cc), "--write",
                  "--to", GOV_PIN],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8", errors="replace")
-            _deadline = time.time() + 30
+            # A HANG BOUND, never reached on the pass path (TOOL-aSparedSpawn-15 S6): the loop ends
+            # when the lock appears or the first run exits, and 30 s ran out on a loaded host.
+            _deadline = time.time() + 120
             while time.time() < _deadline and not _lk.exists() and _first.poll() is None:
                 time.sleep(0.002)
             if not _lk.exists():

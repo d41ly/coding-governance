@@ -2275,21 +2275,42 @@ fi
 
 # F1. `checkLiteralOpen` copied the whole line prefix per quote, so cost was quadratic in LINE
 # length and every ordinary `return 'x'` paid it. Measured before the fix: 253 KB on one line took
-# 33.8 s against 62 ms at BASE. This arm is a BUDGET, not a verdict: it fails if the hook takes
-# longer on one long line than a generous multiple of the same script split across lines.
+# 33.8 s against 62 ms at BASE. This arm is a RATIO against a CONTROL, never a typed ceiling
+# (TOOL-aSparedSpawn-15 S1): the same 8000 literals ONE PER LINE are timed first, in this process,
+# and the one-line run may take at most four times that plus 2 s, both read from EPOCHREALTIME. A
+# loaded host slows both runs alike, so the verdict stops being a function of the box, while a walk
+# that is quadratic in LINE length grows the one-line run only. The typed 10 s it replaced redded on
+# a loaded node `a`, where one spawn costs 632 to 818 ms. The absolute hook timeout is NOT this arm's
+# question: a slowdown linear in both runs is not the defect it guards. Both runs must ADMIT (exit
+# 0), so a hook that crashed fast on either cannot pass the ratio by doing no work. EVERY LITERAL
+# FOLLOWS `void`: the walk runs only for a quote glued to an identifier, and the `f(a1, 'lit1')`
+# this arm used to time put a comma there, so the restored per-quote copy never ran and the arm
+# could not fail on the regression it names. Measured on node `a`: with the copy restored the
+# one-line run took 19 to 23 s against 0.9 to 1.3 s one per line; shipped, 0.3 to 0.9 s both ways.
 long_one=$("$TESTPY" -c "
 import json
 n = 8000
-line = 'const x = [' + ','.join(\"f(a%d, 'lit%d')\" % (i, i) for i in range(n)) + ']'
+line = 'const x = [' + ','.join(\"f(a%d, void 'lit%d')\" % (i, i) for i in range(n)) + ']'
 print(json.dumps({'tool_name':'Workflow','tool_input':{'script': line}}))
 ")
-t0=$(date +%s)
-printf '%s' "$long_one" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1
-t1=$(date +%s)
-if [ $((t1 - t0)) -le 10 ]; then
-  echo "ok   quadratic budget: 8000 literals on ONE line in $((t1 - t0))s (<= 10s)"; pass=$((pass+1))
+long_ctl=$("$TESTPY" -c "
+import json
+n = 8000
+body = 'const x = [' + chr(10) + (',' + chr(10)).join(\"f(a%d, void 'lit%d')\" % (i, i) for i in range(n)) + chr(10) + ']'
+print(json.dumps({'tool_name':'Workflow','tool_input':{'script': body}}))
+")
+c0=${EPOCHREALTIME//[.,]/}
+printf '%s' "$long_ctl" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; ctl_rc=$?
+c1=${EPOCHREALTIME//[.,]/}
+printf '%s' "$long_one" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; one_rc=$?
+c2=${EPOCHREALTIME//[.,]/}
+ctl_ms=$(( (10#$c1 - 10#$c0) / 1000 )); one_ms=$(( (10#$c2 - 10#$c1) / 1000 )); lim_ms=$(( 4 * ctl_ms + 2000 ))
+if [ "$ctl_rc" != 0 ] || [ "$one_rc" != 0 ]; then
+  echo "FAIL quadratic ratio: the hook exited $one_rc on ONE line and $ctl_rc one per line, not 0 for both, so the timing compares runs that did not do the work"; fail=$((fail+1))
+elif [ "$one_ms" -le "$lim_ms" ]; then
+  echo "ok   quadratic ratio: 8000 literals on ONE line in ${one_ms} ms against ${ctl_ms} ms one per line (<= 4x + 2000 = ${lim_ms} ms)"; pass=$((pass+1))
 else
-  echo "FAIL quadratic budget: 8000 literals on ONE line took $((t1 - t0))s — a hook that times out is NON-BLOCKING"; fail=$((fail+1))
+  echo "FAIL quadratic ratio: 8000 literals on ONE line took ${one_ms} ms against ${ctl_ms} ms one per line (> 4x + 2000 = ${lim_ms} ms) — a walk quadratic in line length is back, and a hook that times out is NON-BLOCKING"; fail=$((fail+1))
 fi
 
 # F2. A throw in the corrected views must not become an admission. This script drives

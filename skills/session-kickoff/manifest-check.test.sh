@@ -847,11 +847,14 @@ exec 9<>"$TMP/openstdin"
 timeout 2 cat <&9 >/dev/null 2>&1; got=$?
 [ "$got" = 124 ] && { echo "ok   S4 liveness: the held stdin reports no EOF, so the arm below can fail"; pass=$((pass+1)); } \
   || { echo "FAIL S4 liveness: the held stdin returned $got, not 124 — it is NOT open (no fifo support?), and the arm below would pass by finding nothing"; fail=$((fail+1)); }
-t0=$(date +%s)
-(cd "$CWT" && timeout 10 bash "$CHECK" --card --path --session "$NONCE-t9s" <&9 > "$CARD_OUT" 2>&1); got=$?
+# The question is "returned rather than blocked", so the bound is a HANG BOUND of 120 s the pass
+# path never reaches (TOOL-aSparedSpawn-15 S6); the 10 s it replaced was a speed ceiling on a host
+# where one spawn costs up to 818 ms loaded. Only the red path, a verb that blocks, pays it.
+t0=$EPOCHSECONDS
+(cd "$CWT" && timeout 120 bash "$CHECK" --card --path --session "$NONCE-t9s" <&9 > "$CARD_OUT" 2>&1); got=$?
 [ "$got" = 0 ] && grep -qF -- "/orientation/$NONCE-t9s.md" "$CARD_OUT" \
-  && { echo "ok   S4 --session returns with stdin held open (wall $(($(date +%s)-t0))s)"; pass=$((pass+1)); } \
-  || { echo "FAIL S4 --session blocked on an open stdin (exit $got; 124 = the bound fired) — read_session_id read stdin although --session had answered"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+  && { echo "ok   S4 --session returns with stdin held open (wall $((EPOCHSECONDS - t0))s)"; pass=$((pass+1)); } \
+  || { echo "FAIL S4 --session blocked on an open stdin (exit $got; 124 = the 120 s hang bound fired) — read_session_id read stdin although --session had answered"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 exec 9>&-; rm -f "$TMP/openstdin"
 
 # AC4 — the node cell: the real registry at HEAD, then the two fixtures, then no key at all.

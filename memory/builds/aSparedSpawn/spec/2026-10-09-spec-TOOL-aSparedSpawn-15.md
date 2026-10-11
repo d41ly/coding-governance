@@ -1,11 +1,13 @@
 # TOOL-aSparedSpawn-15 — the remaining clock-bound arms on the flake list, ordered or calibrated
 
-**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-1 · base 22efab65 · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-1 · base 22efab65 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aSparedSpawn-15-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-15-acceptance-ledger.md) | journal | — |
+| [2026-10-11-build-TOOL-aSparedSpawn-15-direct-checks.sh](../build/2026-10-11-build-TOOL-aSparedSpawn-15-direct-checks.sh) | journal | — |
 | [2026-10-11-prompt-TOOL-aSparedSpawn-15-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-15-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

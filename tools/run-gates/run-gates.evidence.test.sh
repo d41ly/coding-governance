@@ -512,17 +512,31 @@ rec_legs '[ {"name": "slow", "argv": ["bash", "fx/slow.sh"]} ]'
 # taken before the first leg dispatches, so under an 8-wide bar the edit could land BEFORE it and
 # there was nothing to detect. Measured — this arm passed alone and failed inside a full bar run.
 # The run record's own header is the observable that says "the fingerprint has been taken".
-( for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+# AND THE MOVE WAITS FOR NOTHING ELSE (TOOL-aSparedSpawn-15 S4). The mover gave up after 20 polls
+# and moved the tree ANYWAY, so on a loaded host the edit could land after the run had ended and the
+# arm graded a tree that never moved mid-run. It now moves only once the header exists, and if the
+# run ends first it moves nothing and says so: that is a FAIL naming the mover, never a verdict read.
+mv_mark=$REC_T.mover; mv_end=$REC_T.ended; rm -f "$mv_mark" "$mv_end"
+( while :; do
     c="$REC_GD/gate-run/current"
-    [ -f "$c" ] && [ -f "$REC_GD/gate-run/$(cat "$c")/header" ] && break
+    if [ -f "$c" ] && [ -f "$REC_GD/gate-run/$(cat "$c")/header" ]; then
+      echo moved >> "$REC_T/fx/a.sh"; echo yes > "$mv_mark"; exit 0
+    fi
+    [ -f "$mv_end" ] && { echo no > "$mv_mark"; exit 0; }
     sleep 1
-  done
-  echo moved >> "$REC_T/fx/a.sh" ) &
+  done ) &
+mv_pid=$!
 rec_run GATE_FULL=1 >/dev/null
-wait
-grep -q '^tree_moved	yes' "$(rec_dir)/verdict" 2>/dev/null \
-  && ok "a tree that moved mid-run is recorded as moved in the verdict" \
-  || { nope "mid-run tree movement was not recorded"; cat "$(rec_dir)/verdict" 2>/dev/null | sed 's/^/      /'; }
+: > "$mv_end"
+wait "$mv_pid"
+if ! grep -qx yes "$mv_mark" 2>/dev/null; then
+  nope "the mover never saw the header: the run ended before its record's header existed, so nothing moved mid-run and there is no verdict to grade"
+else
+  grep -q '^tree_moved	yes' "$(rec_dir)/verdict" 2>/dev/null \
+    && ok "a tree that moved mid-run is recorded as moved in the verdict" \
+    || { nope "mid-run tree movement was not recorded"; cat "$(rec_dir)/verdict" 2>/dev/null | sed 's/^/      /'; }
+fi
+rm -f "$mv_mark" "$mv_end"
 [ -f "$REC_GD/gate-full-green" ] && nope "full-green stamped although the tree moved mid-run" \
                                  || ok "a tree that moved mid-run defeats the stamp"
 rec_done

@@ -1398,15 +1398,22 @@ ts_drop_ticket() { [ -n "$TS_TICKET" ] && rm -f "$TS_TICKET" 2>/dev/null; TS_TIC
 #
 # The tick is `sleep` then a guarded write, never a write then a sleep: a ticker that writes once
 # before checking anything is a ticker that can refresh a beacon it never owned.
+#
+# NO FORK BUT THE SLEEP AND THE MOVE (TOOL-aSparedSpawn-15 S3). The nonce was `$(cat ...)` and the
+# time `$(ts_now)`, two spawns a tick, and a spawn on a loaded node `a` costs 632 to 818 ms, so a
+# tick ran late by over a second and a live holder read as stalled. Both are builtins now: `read`
+# for the nonce, `$EPOCHSECONDS` for the time, with `ts_now` kept as the fallback where the shell
+# has no `EPOCHSECONDS`.
 ts_tick_start() {
   [ -n "$TS_DIR" ] || return 0
-  local _hp=$$ _d=$TS_DIR _n=$TS_NONCE _every=$TS_TICK_EVERY
+  local _hp=$$ _d=$TS_DIR _n=$TS_NONCE _every=$TS_TICK_EVERY _cur
   (
     while :; do
       sleep "$_every"
-      [ "$(cat "$_d/nonce" 2>/dev/null)" = "$_n" ] || exit 0
+      _cur=""; { IFS= read -r _cur < "$_d/nonce"; } 2>/dev/null
+      [ "$_cur" = "$_n" ] || exit 0
       kill -0 "$_hp" 2>/dev/null || exit 0
-      printf '%s' "$(ts_now)" > "$_d/heartbeat.tmp" 2>/dev/null \
+      printf '%s' "${EPOCHSECONDS:-$(ts_now)}" > "$_d/heartbeat.tmp" 2>/dev/null \
         && mv -f "$_d/heartbeat.tmp" "$_d/heartbeat" 2>/dev/null || true
     done
   # STDIO GOES NOWHERE, and that is the whole point. Backgrounded and disowned, this
