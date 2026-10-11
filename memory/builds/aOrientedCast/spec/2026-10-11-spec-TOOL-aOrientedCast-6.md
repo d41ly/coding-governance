@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-6 — the write gate admits a spec write only from the spec-writer role and a product write only from the builder role
 
-**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 9 · ratified 2026-10-11
+**Status:** OPEN · rev-3 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 9 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -12,6 +12,7 @@
 | [2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md) | journal | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 |
 | [2026-10-11-prompt-TOOL-aOrientedCast-1-3-cross-read.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-3-cross-read.md) | journal | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 |
 | [2026-10-11-prompt-TOOL-aOrientedCast-1.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-1.md) | research | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 |
+| [2026-10-11-prompt-TOOL-aOrientedCast-8-1-fold-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-8-1-fold-brief.md) | journal | TOOL-aOrientedCast-8 |
 | [2026-10-11-prompt-TOOL-aOrientedCast-9-1-fold-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-9-1-fold-brief.md) | journal | KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 |
 
 <!-- /gen:spec-records -->
@@ -59,6 +60,15 @@ and an untyped harness agent are refused both, except for a flip of a spec heade
   fixture, with an index written for the role arms and absent for every arm that exists today, and
   `FLOOR_ASSERTIONS` moves by the count added. Each arm is observed RED on a staged break first.
   Observed by AC1, AC2, AC3 and AC4.
+- **S9** — The cross-kit fold arm in `tools/hooks/scratch-guard.test.sh` (AC10's `--card --append`
+  through the real kickoff writer) sends a READY body whose `## task` holds all eight task fields
+  filled, with its `README.md:1` row moved under a `## read` heading. Since `KICK-aOrientedCast-1`
+  the writer refuses a READY body missing any task field, so the one-line `## task` the arm sends today
+  reds it at the close. The filled section is not typed a second time: the arm takes the
+  `render_task_section` definition from `manifest-check.test.sh`, read from the same place the arm
+  reads the writer (beside `$SG_WRITER`, or the same `SG_WRITER_BASE` blob), and calls it. An empty
+  extraction is a FAIL naming the helper and where it looked, never a fallback to a one-line task.
+  The arm keeps its one `ok` or `FAIL` line, so `FLOOR_ASSERTIONS` does not move. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -331,6 +341,17 @@ the move as owed until then.
   target toplevel's, so the build's own acceptance, an inline spec write refused, is not met.
   fixture: this repository once `TOOL-aOrientedCast-3` has committed its index; the tree holds none at
   `646d4a73`.
+- **AC6** — When a slice of the scratch guard's own arms holding their prologue and the AC10 block,
+  written to a temp script inside the hooks kit and run with `bash`, runs against those arms at
+  `8bf164d40`, it prints `FAIL AC10 the writer's --card --append refused the real READY body` with the
+  writer's task-field refusal beneath it. Against those arms after S9, the same slice prints
+  `ok   AC10 the writer's --card --append landed a real READY body on sgtest-w1` and
+  `ok   AC10 the card the live writer wrote AND appended`, and no `FAIL AC10` line. At `646d4a73`, this
+  header's base, the arm is green either way, because the writer's task-field refusal lands only at
+  `50e09d87a`; the RED half is therefore observed at `8bf164d40`.
+  Red when: the body's task section is typed in this suite rather than taken from
+  `render_task_section`, an empty extraction passes, or the arm stays red against the writer as built.
+  cost: one slice, seconds.
 
 ## 7. Gates
 
@@ -339,6 +360,8 @@ the move as owed until then.
 New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 · the base hook, which admits every spec write and admits a product write from any writer once a routed unit is buildable · FLOOR_ASSERTIONS
 
 AC5 is a direct observation of this repository after `TOOL-aOrientedCast-3` lands and adds no arm.
+AC6 changes the fixture of the existing AC10 arm under `scratch-guard self-test`, already on the line
+above, and adds no arm.
 The close's bar runs the legs above once; no pass runs them.
 
 ## 8. Open questions
@@ -384,6 +407,12 @@ The close's bar runs the legs above once; no pass runs them.
   builder's divergence and status behaviour holds only under `roles.builder` and that an untyped unit
   pass is refused at landing either way, and the unattended caller, `TOOL-aOrientedCast-9`, joins the
   consumes-from edges.
+- rev-3 · 2026-10-11 · §2 · §6 · §7 · the build passes' finding that the scratch guard suite's AC10
+  fold arm reds at the close: it appends a READY body whose `## task` is one line, which the kickoff
+  writer refuses since `KICK-aOrientedCast-1`. S9 gives that body the eight task fields through
+  `render_task_section`, with the `README.md:1` row under `## read`, and AC6 observes the arm RED
+  before and GREEN after through a slice. This unit owns it because it already edits the scratch
+  guard and that suite.
 
 ## 10. Reuse audit
 

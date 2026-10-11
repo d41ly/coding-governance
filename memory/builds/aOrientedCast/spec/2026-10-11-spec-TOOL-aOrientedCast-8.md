@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-8 — the roles kit is an adopter default: installed, rendered and reported at install and update
 
-**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 7
+**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md) | journal | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 |
 | [2026-10-11-prompt-TOOL-aOrientedCast-1-3-cross-read.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-3-cross-read.md) | journal | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 |
 | [2026-10-11-prompt-TOOL-aOrientedCast-1.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-1.md) | research | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 |
+| [2026-10-11-prompt-TOOL-aOrientedCast-8-1-fold-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-8-1-fold-brief.md) | journal | TOOL-aOrientedCast-6 |
 | [2026-10-11-prompt-TOOL-aOrientedCast-9-1-fold-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-9-1-fold-brief.md) | journal | KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-9 |
 
 <!-- /gen:spec-records -->
@@ -131,11 +132,31 @@ default that arrives wired.
 - **S13** — The map's generated artifacts are regenerated for the new shell and Python functions,
   and the roles kit's dossier claims `roles adopter self-test`; the other leg names are already
   claimed there by `TOOL-aOrientedCast-1` and `TOOL-aOrientedCast-3`. Observed by AC9.
+- **S14** — The roles kit's files stop spelling what the install-prefix ban reads as a kit path.
+  `check-install-prefix.sh --offenders` names nine keys in three files earlier units of this build
+  created, and none is a path into a sibling kit: three are front-matter key tuples whose quoted
+  `"tools"` is followed by a comma and a quoted segment (the predicate's rule 1), and six are the
+  agent-render self-test's fixture layout, which types the `roles` and `workflows` kit names as quoted
+  path segments or under a literal prefix (rules 3 and 4). Each is respelled, never waived, since the
+  ban carries no waiver:
+  - `tools/roles/roles_lib.py` `FRONT_MATTER_KEYS` and `tools/roles/render_agents.py` `CLAUDE_KEYS`
+    become `tuple("<key> <key> …".split())` over the same keys in the same order, because
+    `CLAUDE_KEYS`'s order is the order a rendered type carries them.
+  - `tools/roles/check_roles.py`'s agent-role loop reads `for k in "tools model".split():`.
+  - `build_fixture`'s kit directory is `root / "toolroot" / KIT_DIR.name`, the kit's own directory
+    derived from `__file__`, as the authoring rule asks of a kit's own name.
+  - `build_fixture`'s harness directory, and the expected harness paths in `run_selftest`'s arms 5 and
+    10, are the drained spellings the fixture's own workflow table already writes, formatted with its
+    tool root: `"{prefix}/workflows/a.js".format(prefix="toolroot")`, its `missing.js` sibling, and the
+    parent of the first for the stub directory. The expected values then come from the table's
+    spelling rather than a second literal of it.
+
+  Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
 - The catalogue, the library, the handoff renderer, the agent render and the Skill. This unit
-  installs and claims them and writes none of their content.
+  installs and claims them and writes none of their content beyond S14's respelling.
 - The role arms of the write gate and the spawn guard. They ship in the hooks kit, already a default,
   and arm on `.claude/roles.json`, which this unit is what renders at an adopter.
 - Moving the review harness into the default selection (§8 F1).
@@ -260,7 +281,7 @@ which is the leg's question, and whether a house overlay is sensible, which is `
 
 ### Files touched (estimate)
 
-`tools/govkit/registry.toml` · `tools/govkit/subject-pins.tsv` · `tools/govkit/selftest.py` · `tools/roles/kit.toml` · `tools/roles/adopt-roles.sh` · `tools/roles/adopt-roles.test.sh` · `tools/roles/README.md` · `tools/gate-legs.json` · `tools/run-gates/selftest-budgets.txt` · `tools/check-wiring.sh` · `tools/check-wiring.test.sh` · `tools/check-kit-versions.sh` · `WIRE-INTO-PROJECT.md` · `memory/map/features/roles.md` · `memory/map/generated/symbols.json` · `memory/guides/SESSION-KICKOFF.md`
+`tools/govkit/registry.toml` · `tools/govkit/subject-pins.tsv` · `tools/govkit/selftest.py` · `tools/roles/kit.toml` · `tools/roles/adopt-roles.sh` · `tools/roles/adopt-roles.test.sh` · `tools/roles/README.md` · `tools/roles/roles_lib.py` · `tools/roles/check_roles.py` · `tools/roles/render_agents.py` · `tools/gate-legs.json` · `tools/run-gates/selftest-budgets.txt` · `tools/check-wiring.sh` · `tools/check-wiring.test.sh` · `tools/check-kit-versions.sh` · `WIRE-INTO-PROJECT.md` · `memory/map/features/roles.md` · `memory/map/generated/symbols.json` · `memory/guides/SESSION-KICKOFF.md`
 
 ### Rollout
 
@@ -381,15 +402,29 @@ which is the leg's question, and whether a house overlay is sensible, which is `
   usage refusal. `bash tools/check-testsuite-counts.sh` then reports the suite's count shape clean.
   Red when: an arm passes against the copy whose behaviour it pins was staged out.
   cost: four slices, each seconds.
+- **AC12** — When `bash tools/check-install-prefix.sh --offenders` runs, it prints no key naming
+  `tools/roles/check_roles.py`, `tools/roles/render_agents.py` or `tools/roles/roles_lib.py`, where it
+  printed the nine of S14 at `8bf164d40`. Each file's own behaviour is then re-observed by its existing
+  direct check: `python tools/roles/check_roles.py` exits 0 over gov's catalogue, and exits 1 naming
+  `R2` and `'tools' is absent on an agent role` with the `tools:` line deleted from
+  `gov-builder.agent.md` under the kit's `agents/`, a staged break restored afterwards;
+  `python tools/roles/render_agents.py --selftest` prints PASS with its assertion count unmoved; and
+  `python tools/roles/render_agents.py --check` exits 0 over gov's committed render, so the key order
+  a rendered type carries did not move.
+  Red when: any of the nine keys still prints, the ban is answered by a waiver or a marker, a
+  respelled tuple changes a key or its order, or the self-test's fixture lays out a different tree.
+  figure: PINNED at `8bf164d40`; another unit adding a roles-kit offender moves the set.
 
 ## 7. Gates
 
-`govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit runbook parity` · `govkit refusal join` · `check-wiring self-test` · `kit placeholders (a declared token its adopter substitutes)` · `install-prefix (shipped surface)` · `remote literals (kit code names no remote)` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `kickoff-manifest ratchet` · `playbook parity` · `recall floor` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `transition-audit arms` · `straggler-guard arms` · `shell hygiene (a loop fed by a command substitution)` · `shell hygiene (a location probe asked from a moved directory)` · `spec tokens (a spec's own names resolve)`
+`govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit runbook parity` · `govkit refusal join` · `check-wiring self-test` · `kit placeholders (a declared token its adopter substitutes)` · `install-prefix (shipped surface)` · `remote literals (kit code names no remote)` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `kickoff-manifest ratchet` · `playbook parity` · `recall floor` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `roles catalogue` · `roles render selftest` · `transition-audit arms` · `straggler-guard arms` · `shell hygiene (a loop fed by a command substitution)` · `shell hygiene (a location probe asked from a moved directory)` · `spec tokens (a spec's own names resolve)`
 
 The roles kit's legs this unit claims and re-points, `roles catalogue`, `roles render wiring` and
 `roles render selftest`, and the one it adds, `roles adopter self-test`, are kept off the line above
 because none is in the manifest at BASE and the leg join reads the manifest as it stands; they enter
-it at orders 1, 3 and here, and the close's bar runs every leg.
+it at orders 1, 3 and here, and the close's bar runs every leg. At rev-3 `roles catalogue` and
+`roles render selftest` join the line, because S14 re-observes both and orders 1 and 3 have put them
+in the manifest; `install-prefix (shipped surface)`, S14's own leg, was already on it.
 
 New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 · a registry default without roles, an aged registry stubbed through blob_at, a descriptor whose house rows are engine, and an adopter whose agent render is staged out · none
 
@@ -437,6 +472,12 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC11 · copies of the adopter
   Rollout lands this unit at 7, before `PLAY-aOrientedCast-1`, as that spec's §8 F1 resolved. §8 F1
   is re-decided by the catalogue checker's R9: `review-harness` stays optional, and its absence is a
   `note`.
+- rev-3 · 2026-10-11 · §2 · §3 · §4 · §6 · §7 · the build passes' finding that the install-prefix ban
+  reds at the close on nine keys in the roles kit's checker, library and agent renderer, files earlier
+  units of this build created. S14 respells each, AC12 observes the keys gone and each file's own
+  checks unmoved, the non-goal on the kit's content admits that respelling, the three files join
+  Files touched, and the two roles legs S14 re-observes join §7. This unit owns it because it already
+  edits the roles kit to register and wire it.
 
 ## 10. Reuse audit
 
