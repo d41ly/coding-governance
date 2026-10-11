@@ -1,6 +1,6 @@
 # KICK-aTrimmedHook-1 — manifest-check's staged leg returns at once when nothing it reads is staged
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams kickoff · order 1
+**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams kickoff · order 1
 
 <!-- gen:spec-records -->
 
@@ -113,28 +113,28 @@ carrier `tools/check-kit-versions.sh` names.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `manifest-check.test.sh` stages only a file no watch pathspec or verify-path
+- **AC1** — When `manifest-check.sh --staged` runs in a fixture repo that stages only a file no watch pathspec or verify-path
   covers and runs `--staged`, the output is the NOTE line and the exit is 0, with the fixture's
   manifest deliberately carrying a C1 placeholder.
   Red when: the placeholder is reported, or the NOTE is absent.
   cost: one fixture repo; seconds.
-- **AC2** — When `manifest-check.test.sh` stages a watched file with no re-stamp, `--staged` reports C5s.
+- **AC2** — When `manifest-check.sh --staged` runs in a fixture repo that stages a watched file with no re-stamp, `--staged` reports C5s.
   Red when: it exits early. Observed RED first with the exit's diff list emptied.
-- **AC3** — When `manifest-check.test.sh` stages a manifest edit introducing a placeholder, `--staged` reports C1.
+- **AC3** — When `manifest-check.sh --staged` runs in a fixture repo that stages a manifest edit introducing a placeholder, `--staged` reports C1.
   Red when: it exits early.
-- **AC4** — When `manifest-check.test.sh` stages the deletion of a verify-path, `--staged` reports C4.
+- **AC4** — When `manifest-check.sh --staged` runs in a fixture repo that stages the deletion of a verify-path, `--staged` reports C4.
   Red when: it exits early.
 - **AC5** — When `bash skills/session-kickoff/manifest-check.sh` runs with no argument on the real
   tree at BASE and after this unit, the outputs are byte-identical, and `--staged` with the
   manifest staged is too.
   Red when: any byte differs.
-- **AC6** — When `manifest-check.test.sh`'s manifest names a watch pathspec matching nothing, C6 still reports
+- **AC6** — When `manifest-check.sh` runs on a fixture manifest naming a watch pathspec matching nothing, C6 still reports
   it, and a glob pathspec still counts through git.
   Red when: the dead pathspec passes.
 
 ## 7. Gates
 
-`kickoff-manifest ratchet` · `manifest-check self-test` · `harness arms (fail branches armed or pinned)` · `kit version markers` · `codebase-map coverage + freshness` · `lexicon naming predicates`
+`kickoff-manifest ratchet` · `manifest-check self-test` · `scratch-guard self-test` · `harness arms (fail branches armed or pinned)` · `kit version markers` · `codebase-map coverage + freshness` · `lexicon naming predicates`
 
 New arm: skills/session-kickoff/manifest-check.test.sh staged early exit · covers AC1 AC2 AC3 AC4 AC6 · the exit's diff list emptied, and the C6 zero-confirm removed · none
 
@@ -145,6 +145,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft, from the brief and the base profile.
+- rev-2 · 2026-10-11 · the acceptance witnesses name the checker run on a fixture, not the suite that hosts the fixture, after `--dispatch`'s spec-token check refused the suite form; §7 names `scratch-guard self-test`, whose guard `manifest-check.sh` trips
 
 ## 10. Reuse audit
 

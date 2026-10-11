@@ -1,6 +1,6 @@
 # TOOL-aTrimmedHook-3 — `commit-msg` starts the unattended driver only when a run names the branch
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -82,7 +82,7 @@ the process is saved.
   is not written.
   Red when: the marker is written.
   cost: seconds; the scratch clone lives under a short `%TEMP%` root.
-- **AC2** — When the same clone tracks a `memory/builds/x/RUN.md` carrying
+- **AC2** — When the same clone tracks a run-state file under a build folder carrying
   `run-branch: refs/heads/<its branch>`, the marker is written.
   Red when: the marker is absent. Observed RED first with the pre-filter's `grep` pattern broken.
 - **AC3** — When `grep -in 'first narrowing' .githooks/commit-msg` runs, it prints the header line S2
@@ -100,6 +100,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · AC2 names the fixture's run-state file in prose, after the spec-token check refused a path no tree tracks
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aTrimmedHook-2 — the staged hygiene leg spends no process on a check its staged set cannot reach
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -158,22 +158,22 @@ narrowed scope.
 - **AC1** — When `bash tools/memory-tree/check-memory-hygiene.sh --staged` runs with one tracked
   `RUN.md` line staged, its output carries the narrowing line.
   Red when: the line is absent.
-- **AC2** — When `check-memory-hygiene.test.sh`'s new staged arm stages a NEW recording file with a malformed
+- **AC2** — When `check-memory-hygiene.sh --staged` runs in the self-test's fixture tree and the arm stages a NEW recording file with a malformed
   name, the staged leg reports check 5 for it; staging only a one-line edit to an existing file
   prints the S3 line and no check 1, 3, 4 or 5 finding, while an unstaged badly named file exists.
   Red when: the new name is not reported, or the edit-only stage reports one.
   cost: seconds per arm, run through a slice of the self-test.
-- **AC3** — When `check-memory-hygiene.test.sh` stages a `.md` file carrying a broken relative link, the staged leg
+- **AC3** — When `check-memory-hygiene.sh --staged` runs in that fixture tree and the arm stages a `.md` file carrying a broken relative link, the staged leg
   reports check 2 for it.
   Red when: it does not.
-- **AC4** — When `check-memory-hygiene.test.sh` stages an over-cap index file, the staged leg reports check 6 or 7
+- **AC4** — When `check-memory-hygiene.sh --staged` runs in that fixture tree and the arm stages an over-cap index file, the staged leg reports check 6 or 7
   for it; with only a non-index file staged, neither check reports.
   Red when: either expectation fails.
-- **AC5** — When `check-memory-hygiene.test.sh` stages a rotated archive its live index does not reference, check 10
+- **AC5** — When `check-memory-hygiene.sh --staged` runs in that fixture tree and the arm stages a rotated archive its live index does not reference, check 10
   reports it; with no archive or live index staged, the HELD line prints and check 10 reports
   nothing.
   Red when: either expectation fails.
-- **AC6** — When `check-memory-hygiene.test.sh` stages `memory/project/legacy-files.txt` listing an untracked path,
+- **AC6** — When `check-memory-hygiene.sh --staged` runs in that fixture tree and the arm stages `memory/project/legacy-files.txt` listing an untracked path,
   the stale-line guard reports it; with the list unstaged, the HELD line prints.
   Red when: either expectation fails.
 - **AC7** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs with no argument on the real
@@ -198,6 +198,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft, from the brief and the BASE profile.
+- rev-2 · 2026-10-11 · AC2 to AC6 name the checker run on a fixture, not the suite that hosts the fixture, after `--dispatch`'s spec-token check refused the suite form
 
 ## 10. Reuse audit
 
