@@ -13,7 +13,8 @@ gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring"
   "every held leg is budgeted, every budget row resolves", "run-selftests self-test",
   "selftest harness self-test", "extract-arms self-test",
   "leg ceilings clear their evidenced maximum", "run-gates run-log line",
-  "receipt sync (installed files match the receipt)", "pre-push bar self-test"]
+  "receipt sync (installed files match the receipt)", "pre-push bar self-test",
+  "held-halves selftest"]
 kits = ["run-gates"]
 git-hooks = []
 harness-hooks = []
@@ -59,6 +60,9 @@ globs = [
   "tools/run-gates/gate-fingerprint.sh",
   "tools/run-gates/run-gates.turnstile.test.sh",
   "tools/run-gates/run-gates.runlog.test.sh",
+  "tools/run-gates/run-held-wsl.sh",
+  "tools/run-gates/held_halves.py",
+  "tools/run-gates/windows-only-legs.txt",
 ]
 ```
 
@@ -202,6 +206,8 @@ world moved past is indistinguishable from one nobody measured. `TOOL-dDerivedDo
 
 **A waiting bar beats.** On every tick it waits, the turnstile rewrites `gate-queue-heartbeat` under its own worktree's git dir, beside `gate-logs/`, and never removes it, so an out-of-process liveness reader sees a queued bar move before its first leg lands; the unattended driver's clock reads its mtime. `TOOL-dDerivedDocket-64`.
 
+**The held tier can split across hosts, and only the combiner stamps it.** `run-held-wsl.sh` runs the declared Windows-only held legs in a scratch clone and the rest in a WSL worktree of an ext4 mirror, each half a plain runner over a partition, so neither half's git dir is one a boundary reads. `held_halves.py --combine` refuses any half that is missing, moved, at another sha, fingerprint or manifest blob, or that left a held leg unreported or reported twice, and writes `held-green` only after the declared agreeing paired runs. No boundary reads it. `TOOL-aSparedSpawn-5`.
+
 ## Shared seams
 
 **The inlined `resolve_python` block.** Between the `>>> resolve_python` / `<<< resolve_python`
@@ -210,7 +216,10 @@ markers in the runner and in both shipped harnesses, byte-identical to
 opening marker, so pasting the block enrols a new copy with no table row or gate edit.
 
 **The `GATE_LEGS` seam.** Without it the only way to exercise the runner is against the repo, which
-re-runs the whole bar recursively and clobbers the live summary mid-run.
+re-runs the whole bar recursively and clobbers the live summary mid-run. The runner exports it to
+every leg, so a bar over a SUBSET of legs hands the subset to every leg that reads it as its subject:
+the gov canary refuses one and the shipped canary grades one. `run-held-wsl.sh` therefore runs each
+partition row through its `--leg` shim, which unsets it before `exec`. `TOOL-aSparedSpawn-5`.
 
 **The manifest derivation.** Four lines carried identically by the runner and both harnesses, and the
 gov-only canary asserts that identity as SOURCE PARITY rather than by recomputing it, which would be

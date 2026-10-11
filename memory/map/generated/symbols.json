@@ -458,6 +458,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "add_parity_rows",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "add_pass",
       "kind": "function",
       "file": "tools/check-remote-literals.test.sh"
@@ -1956,6 +1961,11 @@
       "id": "build_owner_positions",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "build_partition",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "build_path_probe",
@@ -3491,6 +3501,11 @@
       "id": "check_halved_install_arms",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_halves",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "check_handoff_bar",
@@ -6653,6 +6668,11 @@
       "file": "tools/process-monitor/classify.py"
     },
     {
+      "id": "derive_verdict",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "derive_verdicts",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -8178,6 +8198,11 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "load_declaration",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "load_declarations",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -8228,6 +8253,11 @@
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
     },
     {
+      "id": "load_half",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "load_kit_conf",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -8241,6 +8271,11 @@
       "id": "load_leg_names",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "load_manifest",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "load_map_tree",
@@ -8635,6 +8670,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
     },
     {
@@ -8941,6 +8981,11 @@
       "id": "measure_overlap",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "measure_parity",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "measure_pass",
@@ -9708,6 +9753,11 @@
       "file": "tools/memory-tree/tree_lib.py"
     },
     {
+      "id": "parse_conf",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "parse_conf_assignment",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -10138,6 +10188,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_host",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "print_interrupted_acts",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -10261,6 +10316,16 @@
       "id": "print_recomputed",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "print_refusal",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "print_refusal",
+      "kind": "function",
+      "file": "tools/run-gates/run-held-wsl.sh"
     },
     {
       "id": "print_registry",
@@ -11293,6 +11358,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_git",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "read_git_dirs",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -11813,6 +11883,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "read_parity",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "read_pass_declarations",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -11936,6 +12011,11 @@
       "id": "read_recipe",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_record",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "read_record_cells",
@@ -12835,6 +12915,11 @@
     {
       "id": "remove_scratch",
       "kind": "function",
+      "file": "tools/run-gates/run-held-wsl.sh"
+    },
+    {
+      "id": "remove_scratch",
+      "kind": "function",
       "file": "tools/unattended/runlog-writer.test.sh"
     },
     {
@@ -13466,6 +13551,11 @@
       "id": "render_order_slug",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "render_path",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "render_path_spellings",
@@ -14980,6 +15070,11 @@
     {
       "id": "resolve_python",
       "kind": "function",
+      "file": "tools/run-gates/run-held-wsl.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
@@ -15371,6 +15466,11 @@
       "id": "resolve_worktree_reflog",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "resolve_wsl_host",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "restamp",
@@ -15843,6 +15943,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "run_combine",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
       "id": "run_commit",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -16016,6 +16121,11 @@
       "id": "run_h9",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_half",
+      "kind": "function",
+      "file": "tools/run-gates/run-held-wsl.sh"
     },
     {
       "id": "run_handoff",
@@ -16400,6 +16510,11 @@
     {
       "id": "run_selftest",
       "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
     },
     {
@@ -16551,6 +16666,11 @@
       "id": "run_writer",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "run_wsl",
+      "kind": "function",
+      "file": "tools/run-gates/run-held-wsl.sh"
     },
     {
       "id": "run_wt",
@@ -17341,6 +17461,11 @@
       "id": "seed_gates_run",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "seed_half",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "seed_handoff_bar",
@@ -18571,6 +18696,11 @@
       "id": "test_health_appender_failures_return_none_with_one_note",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_held",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "test_hits_disagreement_reds",
@@ -20331,6 +20461,11 @@
       "id": "write_held_asks",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_held_stamp",
+      "kind": "function",
+      "file": "tools/run-gates/held_halves.py"
     },
     {
       "id": "write_hooks",

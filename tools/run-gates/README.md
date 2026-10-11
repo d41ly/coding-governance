@@ -128,6 +128,9 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `adopt-run-gates.sh` | `--check` asserts a target's `[gate_runner]` declaration still matches this runner's output strings |
 | `adopt-run-gates.test.sh` | the adopter e2e, gated on EFFECTS rather than exit codes |
 | `check-receipt.py` | the leg `receipt sync (installed files match the receipt)`: every engine row of `.governance/install.json` still on disk and still hashing to its recorded sha256, or, where the raw bytes miss, hashing through the target's own clean filter to the row's `oid` while the raw bytes' blob does not: that row is graded clean and counted `eol-only` on the summary and `ok` lines, the rule `govkit check` applies, in one `git hash-object --stdin-paths` spawn for every such row. A row with no `oid`, a real edit, a CRLF copy no filter normalizes, a tampered `sha256` over bytes that are the blob, a tree with no `.git` and a git refusal all still red, the last two with a `GIT` line naming why. The INTEGRITY half only — it reads no `source`, `commit` or `gov_oid`, because those resolve against a gov checkout an adopter does not have, and it grades no `seed`, `merged`, `attributes` or `forked` row. A tree with no receipt is an announced `SKIP`, and the built-in fixture arms, the eol-only ones over real git repositories, run on every invocation so the leg has a verdict there too; its `fixtures:` line prints their count |
+| `run-held-wsl.sh` | the held tier split in two: its Linux-safe legs in WSL2 from an ext4 mirror, the declared Windows-only legs natively, one combined verdict; see below |
+| `held_halves.py` | the split's partition, host resolution, combiner and parity record, with a `--selftest` that builds its own synthetic halves |
+| `windows-only-legs.txt` | gov's declaration of the held legs that run natively, one `<leg> TAB <reason>` row each; withheld from the payload |
 | `kit.toml` | this entry, declared as data |
 
 ## Reuse, and the baseline a guard diffs against
@@ -297,6 +300,37 @@ prints nothing new. Every shipped row declares 0 until the width A/B sets each r
 `derive-ceilings.py` sets aside, as `paused`, any reading whose leg ran while one of its own run's
 episodes was open. `run-selftests.sh --pooled` carries the same block, byte-identical and
 parity-graded, holds its next suite the same way, and prints the same line; it keeps no `pauses` row.
+
+## The held tier in WSL2 — `run-held-wsl.sh`
+
+A spawn costs about a millisecond in WSL2 and tens to hundreds under MSYS, so the held self-test tier
+can run its Linux-safe legs in WSL and only the declared Windows-only legs natively
+(TOOL-aSparedSpawn-5). Dark: nothing invokes it but the owner, and no boundary reads its record.
+
+**Setup, once per node.** Declare the node's host in `<git-common-dir>/gate-wsl.conf`, untracked and
+never committed: `GATE_WSL_DISTRO=<distro>` and `GATE_WSL_MIRROR=<absolute ext4 path>`, the only two
+keys it admits. Without it the run asks WSL's default distro and uses the shared default mirror,
+`GATE_WSL_MIRROR_DEFAULT` in `.githooks/gate-env.sh`, and every run prints each value with its source.
+Then `bash tools/run-gates/run-held-wsl.sh --setup` clones the mirror from this clone, with remote
+`win` as the fetch source and `origin` the hosted URL. The mirror's parent must be writable inside
+WSL; the clone is the only write `--setup` makes.
+
+**A run.** `bash tools/run-gates/run-held-wsl.sh` refuses a dirty tree, pins `HEAD` and its
+fingerprint, and runs two halves at once: the runner under `GATE_FULL=1 GATE_SELFTESTS=1` over the
+Windows-only partition in a scratch `git clone --local`, and over the rest in a detached worktree of
+the mirror after `git fetch win`, with `/mnt/*` off `PATH` and `TMPDIR` on ext4. Each partition row
+runs its leg through the `--leg` shim, which unsets `GATE_LEGS` so no leg grades the partition as its
+subject. `held_halves.py --combine` then refuses, exit 2, on a missing verdict, a fingerprint or
+`HEAD` other than the pinned one, a moved tree, two manifest blobs, or a held leg not reported exactly
+once on its declared host. Otherwise it exits by the runner's precedence, 1, then 4, then 3, then 0.
+
+**Paired runs and `held-green`.** `--paired` runs every Linux-safe held leg on both hosts and appends
+one row per host per leg to `<git-common-dir>/held-parity`; it writes no record. A plain run that
+combines GREEN writes `<git-common-dir>/held-green` only while the last `GATE_WSL_PARITY_RUNS` paired
+runs at this manifest blob agree on every compared leg, and otherwise prints `parity <n>/<k>` and
+the legs that disagreed. `held-green` certifies the held tier at one sha and fingerprint across both
+hosts, and nothing more: it is never `gate-full-green`, the push bar never reads it, and a WSL green
+covers only the POSIX branch of a mixed suite, whose Windows arms the daily `held` CI job keeps.
 
 ## The scratch directory — owned, redirected and swept
 

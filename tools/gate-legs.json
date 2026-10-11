@@ -1168,6 +1168,17 @@
     "ceiling": 1910
   },
   {
+    "name": "held-halves selftest",
+    "argv": [
+      "python3",
+      "{prefix}/run-gates/held_halves.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
     "name": "install-prefix (shipped surface)",
     "argv": [
       "bash",
