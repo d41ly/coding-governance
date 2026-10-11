@@ -65,7 +65,7 @@ roughly doubled in six weeks while nothing retires one.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 15 unit(s) · node a · opened 2026-10-09 · streams tooling
+**Build status:** INPROGRESS · 15 unit(s) · node a · opened 2026-10-09 · streams tooling
 ids TOOL-aSparedSpawn-1 TOOL-aSparedSpawn-2 TOOL-aSparedSpawn-3 TOOL-aSparedSpawn-4 TOOL-aSparedSpawn-5 TOOL-aSparedSpawn-6 TOOL-aSparedSpawn-7 TOOL-aSparedSpawn-8 TOOL-aSparedSpawn-9 TOOL-aSparedSpawn-10 TOOL-aSparedSpawn-11 TOOL-aSparedSpawn-12 TOOL-aSparedSpawn-13 TOOL-aSparedSpawn-14
 ids TOOL-aSparedSpawn-15
 
@@ -81,7 +81,7 @@ ids TOOL-aSparedSpawn-15
 | [TOOL-aSparedSpawn-11 — per-suite levers: five suites stop paying a process for a question they ask once](spec/2026-10-09-spec-TOOL-aSparedSpawn-11.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-11 |
 | [TOOL-aSparedSpawn-15 — the remaining clock-bound arms on the flake list, ordered or calibrated](spec/2026-10-09-spec-TOOL-aSparedSpawn-15.md) | 2 | 1 | CLOSED | rev-3 | 2026-10-11 |
 | [TOOL-aSparedSpawn-3 — a ceiling-killed leg retries in the pool's drain tail, and a bar with no ledger dispatches longest-first](spec/2026-10-09-spec-TOOL-aSparedSpawn-3.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-12 |
-| [TOOL-aSparedSpawn-4 — the runner's own spawns: a handful per leg, two git calls per bar, and a fork count with a ceiling](spec/2026-10-09-spec-TOOL-aSparedSpawn-4.md) | 2 | 2 | OPEN | rev-2 | 2026-10-10 |
+| [TOOL-aSparedSpawn-4 — the runner's own spawns: a handful per leg, two git calls per bar, and a fork count with a ceiling](spec/2026-10-09-spec-TOOL-aSparedSpawn-4.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-10-10 |
 | [TOOL-aSparedSpawn-7 — `--only` selectors for the unattended gate and the hygiene gate, each naming what ran](spec/2026-10-09-spec-TOOL-aSparedSpawn-7.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
 | [TOOL-aSparedSpawn-9 — fixture templates and environment git identity across the named suites](spec/2026-10-09-spec-TOOL-aSparedSpawn-9.md) | 2 | 1 | OPEN | rev-1 | 2026-10-09 |
 | [TOOL-aSparedSpawn-12 — the held self-test tier, selected by the kit whose shipped bytes moved](spec/2026-10-09-spec-TOOL-aSparedSpawn-12.md) | 3 | 2 | OPEN | rev-2 | 2026-10-10 |
