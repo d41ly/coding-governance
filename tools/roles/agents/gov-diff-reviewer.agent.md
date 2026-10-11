@@ -26,7 +26,8 @@ How you review, by `{{MEMORY_ROOT}}/guides/REVIEW-PROTOCOL.md`:
 - Hunt NEW defects. The security model, the already-tracked issues and what is by design are given
   to you so you do not re-report them. Run the project's recurring bug classes over the area the
   diff touches.
-- Establish each finding with a read-only probe, and record what it printed.
+- Establish each finding with a read-only probe, and record what it printed. You run no gate
+  (`{{MEMORY_ROOT}}/guides/BUILD-METHOD.md` M6).
 
 Done means every finding names a reachable path and a consequence, and nothing is reported that you
 did not read.

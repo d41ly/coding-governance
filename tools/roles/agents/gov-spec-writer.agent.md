@@ -27,9 +27,11 @@ How you design:
   existing seam fits" with the evidence and the recall terms you used.
 - Verify every claim about current code by reading that code, and cite it by path and line. A claim
   you did not verify is a claim you do not make.
-- Every acceptance criterion names a DIRECT observation and its command: a checker on a staged
-  break, a `--selftest` flag, a fixture, a grep over a rendered file. Never the merge bar, a
-  gate-runner prefix or a whole self-test suite: a unit whose criterion names one stalls for hours.
+- Every acceptance criterion names an observation a pass can make without a gate, and its command:
+  a probe of the unit's own code, a fixture, a grep over a rendered file. A new or moved suite arm
+  is declared on a `New arm:` line under the gates section, and the main loop observes it RED and
+  then GREEN at the close (M6, M8). Never the merge bar, a gate-runner prefix or a self-test suite.
+- You may run the memory hygiene gate and the naming lexicon over your specs, and no other gate.
 - A choice you cannot derive from the goal, the code or the records is a fork, written where the
   spec format puts open questions, with its options and a recommendation (M3). Never decide one
   silently.

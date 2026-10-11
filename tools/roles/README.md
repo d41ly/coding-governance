@@ -1,4 +1,4 @@
-<!-- gov:kit roles@1.0 -->
+<!-- gov:kit roles@1.1 -->
 # roles — the role catalogue: one agent definition per role, the workflow table, and the checker
 
 A governed session runs its LLM work through ten declared WORKFLOWS — `orient`, `research`, `reuse`,
@@ -83,6 +83,16 @@ refused. The CLI silently runs `xhigh` and `max` as `high` on a model that lacks
 reaches an agent type after `render_agents.py --write` and a NEW session, since a session reads its
 agent registry at start; a harness `efforts` takes effect on the next call. The main session's own
 effort is the owner's setting, which no file here reaches.
+
+`[gates]` (TOOL-aOrientedCast-11) names, per role slot whose `agent` is true, the gate legs that role
+may run, by their name in the tool root's `gate-legs.json`; every other role runs none, because gates
+are the main session's at the merge or push threshold. `load_policy` refuses a key naming no role
+file or an `agent: false` role, a value that is not a list of strings, and a name the manifest holds
+no leg for, which it checks only when the manifest reads. `render_agents.py` writes each role's list
+into the index as `gates`, empty where this table names none, and the manifest's path as
+`gates.manifest`; the hooks kit's scratch guard reads both and refuses a role agent any other gate.
+An adopter that received this file before the table existed gains it only by its own edit, and until
+then every role's list is empty, the strict reading.
 
 ## The agent types
 

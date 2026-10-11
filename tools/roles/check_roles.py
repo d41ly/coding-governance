@@ -30,7 +30,10 @@ touching nothing else, then grades as usual.
   R12 a `house/policy.toml` defect, one line per line of `roles_lib.load_policy`'s refusal: the file
       absent or not TOML, an unknown key, no `default`, a level outside the five, a role entry
       naming no role file or an `agent: false` role, a stages table naming no workflow or a
-      workflow with no stages, or a stage key that workflow does not hold
+      workflow with no stages, or a stage key that workflow does not hold; under `[gates]`, a key
+      naming no role file or an `agent: false` role, a value that is not a list of strings, or a
+      leg name the tool root's gate manifest does not hold, checked only when that manifest reads
+      and a `roles: note:` otherwise (TOOL-aOrientedCast-11)
 
 WHAT THIS DOES NOT CHECK, because a structural check reads as a semantic one to everybody who did not
 write it: the MEANING of a body; the truth of an `enforced-by` entry; a `tools:` name, which moves
@@ -261,7 +264,9 @@ def check_roles(root, kit_dir, write=False):
             add_defect(p, "R10", "overlay carries the token %s; only %s renders" % (token, lib.MEMORY_ROOT_TOKEN))
 
     try:
-        lib.load_policy(kit_dir, roles, workflows)
+        policy_notes = []
+        lib.load_policy(kit_dir, roles, workflows, policy_notes)
+        notes.extend("roles: note: %s" % n for n in policy_notes)
     except lib.RolesError as e:
         defects.extend("roles: %s" % ln for ln in str(e).split("\n"))
 

@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.139 -->
+<!-- gov:kit memory-tree@2.140 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -191,9 +191,10 @@ python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD
 
 **It takes a COMMITTED range, exits 0 whenever it prints a checklist, and 1 with a `HYGIENE gotchas:` line when it refuses the range**: the trap and the reading are beside its row in `tools/memory-tree/README.md`.
 
-**A pass runs no merge bar and no self-test suite.** Its verification is the direct check its
-spec's acceptance names — a checker run on a staged break, a `--selftest` flag, a fixture — and a
-pass that needs a suite verdict returns that need to the main loop rather than running one. The
+**A pass runs no merge bar, no self-test suite and no gate beyond its role's allowlist**, which a
+hook enforces on every role agent. An agent pass verifies with a fixture or a probe of its own code,
+and a pass that needs a gate or suite verdict returns that need to the main loop rather than running
+one; a new arm's RED-first observation is the main loop's, at the close (M8). The
 bar runs ONCE, after the last unit is terminal: at the close under a mandate, at the push boundary
 otherwise. Where a pass touched files a leg guards and the MAIN LOOP judges a bar necessary, the
 plain bar with no flag is the scoped form — at the main loop, never in a child. A pass whose check
@@ -274,6 +275,10 @@ park, not a waiver, and its unit does not close. Left-shift every confirmed find
 `memory/gotchas/` class when the class cannot be gated; a finding fixed and not left-shifted returns.
 
 **Re-read the build README against the code before closing** — every owner ruling and every sentence naming a shipped mechanism. `readme_mechanism_drift` reports only the pairs that spell it identically; the fold owns the rest.
+
+**Observe the owed arms before the bar.** For each `New arm:` line of the build's specs, the main loop
+observes the arm RED on its staged break and GREEN once restored, and records both in that unit's
+acceptance ledger under a `Pass: none` commit.
 
 **Landing** — `land-once-done` and `conflicts-reconciled` between them: merge and push
 authorization, the lander, the bypass ban, additive reconciliation of a shared record, and when a

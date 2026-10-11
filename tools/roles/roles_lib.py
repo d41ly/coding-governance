@@ -10,11 +10,12 @@ RAW (a list is comma-separated on one line, the form Claude Code's own `tools:` 
 a repeated or an unknown key is refused, because a simple parser drops an indented key without a
 word and a repeated one silently keeps the last.
 """
+import json
 import pathlib
 import re
 import tomllib
 
-KIT_ROLES_VERSION = "1.0"
+KIT_ROLES_VERSION = "1.1"
 
 #: Every front-matter key a role file may carry: Claude Code's own, then gov's.
 #: Split from one string, because a quoted `"tools"` beside a quoted segment reads to the
@@ -34,6 +35,10 @@ READ_KEYS = frozenset(
 #: integer form only the loader accepts is refused, so one level is legal on both carriers.
 EFFORT_LEVELS = tuple("low medium high xhigh max".split())
 POLICY_EFFORT_KEYS = ("default", "roles", "stages")
+#: The policy file's tables (TOOL-aOrientedCast-11 adds `gates`).
+POLICY_TABLES = ("effort", "gates")
+#: The gate manifest's file name under the tool root: the leg list the merge-bar runner reads.
+GATE_MANIFEST = "gate-legs.json"
 
 #: The only render token a role body or an overlay may carry.
 MEMORY_ROOT_TOKEN = "{{MEMORY_ROOT}}"
@@ -189,12 +194,29 @@ def load_workflows(kit_dir):
     return entries
 
 
-def load_policy(kit_dir, roles, workflows):
+def load_gate_leg_names(tool_root):
+    """The leg names of `<tool root>/gate-legs.json`, or None when it is absent, unreadable, not
+    JSON, or not a list of objects each carrying a string `name`."""
+    try:
+        with open(pathlib.Path(tool_root) / GATE_MANIFEST, encoding="utf-8") as fh:
+            legs = json.load(fh)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(legs, list) or not all(isinstance(g, dict) and isinstance(g.get("name"), str) for g in legs):
+        return None
+    return {g["name"] for g in legs}
+
+
+def load_policy(kit_dir, roles, workflows, notes=None):
     """The parsed `house/policy.toml`, validated against the roles and the workflow table.
 
     Every defect is collected, then raised once as a RolesError with one line per defect, each
     naming the file, the dotted key and the rule (R12). An absent or unparsable file refuses
     (TOOL-aOrientedCast-10 §8 F3): no fallback level stands in for the owner's.
+
+    `[gates]` (TOOL-aOrientedCast-11) maps a role slot whose `agent` is true to the gate legs it may
+    run, by name. A name is checked against the tool root's gate manifest only when that manifest
+    reads; when it does not, one line is appended to `notes` (when given) instead of a defect.
     """
     path = pathlib.Path(kit_dir) / "house" / "policy.toml"
     where = path.as_posix()
@@ -213,8 +235,9 @@ def load_policy(kit_dir, roles, workflows):
                        % (where, key, value, ", ".join(EFFORT_LEVELS)))
 
     for k in data:
-        if k != "effort":
-            bad.append("%s: R12 — %s — unknown top-level key; the one table is effort" % (where, k))
+        if k not in POLICY_TABLES:
+            bad.append("%s: R12 — %s — unknown top-level key; the tables are %s"
+                       % (where, k, " and ".join(POLICY_TABLES)))
     effort = data.get("effort", {})
     if not isinstance(effort, dict):
         effort = {}
@@ -261,6 +284,28 @@ def load_policy(kit_dir, roles, workflows):
             if stage not in held:
                 bad.append("%s: R12 — %s.%s — is not a stage key of %s, whose keys are %s"
                            % (where, key, stage, name, ", ".join(sorted(held))))
+    gates = data.get("gates", {})
+    if not isinstance(gates, dict):
+        gates = {}
+        bad.append("%s: R12 — gates — is not a table" % where)
+    manifest = (pathlib.Path(kit_dir).parent / GATE_MANIFEST).as_posix()
+    legs = load_gate_leg_names(pathlib.Path(kit_dir).parent) if gates else None
+    for slot, names in gates.items():
+        key = "gates." + slot
+        if slot not in roles:
+            bad.append("%s: R12 — %s — names no role file" % (where, key))
+        elif roles[slot]["keys"].get("agent", "true") == "false":
+            bad.append("%s: R12 — %s — names an agent: false role, so no agent type carries it"
+                       % (where, key))
+        if not isinstance(names, list) or not all(isinstance(n, str) for n in names):
+            bad.append("%s: R12 — %s — is not a list of strings" % (where, key))
+            continue
+        for n in names:
+            if legs is not None and n not in legs:
+                bad.append("%s: R12 — %s — %r names no leg of %s" % (where, key, n, manifest))
+    if gates and legs is None and notes is not None:
+        notes.append("%s cannot be read, so the leg names under [gates] in %s are not checked"
+                     % (manifest, where))
     if bad:
         raise RolesError("\n".join(bad))
     return data

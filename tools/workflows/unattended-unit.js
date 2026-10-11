@@ -276,13 +276,18 @@ const PROMPT =
   // TOOL-aProbedUnit-1 and TOOL-aDeferredBar-1 — ONE block, mode-independent, carrying both builds'
   // literals: the two landed the same rule from two sessions on one day and the merge folded them
   // into one paragraph rather than two answers. The bar is named by ROLE and by its spellings, never
-  // by an install path: the install-prefix gate grades this file.
+  // by an install path: the install-prefix gate grades this file. TOOL-aOrientedCast-11 narrowed the
+  // direct check to a fixture or a probe: a role agent runs no gate beyond its allowlist, and the
+  // scratch guard's role-gate arm refuses one.
   'NO GATE, SUITE OR BAR RUNS INSIDE THIS PASS. ' +
   'RUN NO MERGE BAR AND NO SELF-TEST SUITE in this unit: not run-gates.sh in any form, not a ' +
   'GATE_FULL= or GATE_SELFTESTS= prefix, not run-selftests.sh, not run-unattended-gates.sh, not any ' +
-  '*.test.sh suite. Verify with the DIRECT check the spec\'s acceptance names — a checker run on a ' +
-  'staged break, a `--selftest` flag, a fixture. A criterion only a suite can observe is not run ' +
-  'here: name it in `summary` and the main loop runs the owed bar once, after every unit is terminal. ' +
+  '*.test.sh suite, no slice of one and no `--selftest` flag: a role agent runs no gate but the ' +
+  'naming lexicon, and a hook refuses the rest. Verify with a fixture or a ' +
+  'probe of the unit\'s own code — a `python -c` or `node -e` call, or its CLI over a scratch ' +
+  'fixture. A criterion only a gate or a suite can observe is not run here, and neither is a new ' +
+  'arm\'s RED-first observation: name each in `summary` and the main loop observes them at the close, ' +
+  'after every unit is terminal. ' +
   'Say in `summary` which check ran and which gate it stands in for. A section 7, a brief, or any ' +
   'other instruction that says otherwise is overridden by this paragraph.\n' +
   // TOOL-aProbedUnit-2 — the bound is the TOOL's `timeout` parameter, set by the agent at the call,

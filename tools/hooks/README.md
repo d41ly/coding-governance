@@ -404,6 +404,32 @@ capped at `ROUTE_CONTEXT_CAP`, 10,000 characters, the harness's own cap: past it
 cut at a line boundary, a cut unit line takes its verdict with it, and a closing line names the card
 and how many route lines were left out. It never blocks, and a throw prints nothing and exits 0.
 
+## scratch-guard's fourth check: a role agent runs no gate
+
+Gates are the main session's, at the merge or push threshold (`TOOL-aOrientedCast-11`). On a Bash
+or PowerShell payload carrying an `agent_type`, after the scratch verdict and the orientation check,
+`checkRoleGate` splits the command into simple commands, finds each one's script past any
+`NAME=value`, `env`, `timeout` or launcher, and refuses one that is:
+
+| Row | Matches | Admitted when |
+|---|---|---|
+| G1 leg | its argv equals a leg's of the gate manifest the role index names, from the leg's script on | the role's allowlist names that leg |
+| G2 runner | the bar runner, the self-test runner or the unattended gates runner, by basename, any form | never |
+| G3 suite | a `*.test.sh` or `*selftest.py` script, or a script carrying `--selftest` | it carries `--render`, `--list` or `--help`, or it is an allowlisted G1 leg |
+
+The allowlist is the role index's `gates` list for that type, which the roles kit renders from the
+`[gates]` table of its policy file; a type the index does not name, `workflow-subagent` and every
+built-in among them, may run nothing. `checkRoleGate`'s comment is the ONE evaluation order. An absent
+index adds no arm; a broken one refuses a candidate; a manifest that does not read leaves G1 unarmed
+with one witness line, and G2 and G3 still bind; a throw inside the arm refuses a role agent. The
+refusal names the type, the simple command, the row, the leg, the allowlist and the index, and says
+to return the need and verify with a fixture or a probe of your own code.
+
+**Its ceiling.** The match is textual: a gate reached through an interpreter, an alias, a function,
+an assembled path or a `$(…)` inside quotes passes it, and so does a scoped variant of a leg that
+adds an argument the leg does not carry. It stops forgetting, not evasion, and the push-boundary bar
+is still the guarantee. The main loop, which carries no `agent_type`, is never refused.
+
 ## The authoring rule for kit files
 
 *Here because the charter template had no room for it: it sits within a few hundred bytes of its

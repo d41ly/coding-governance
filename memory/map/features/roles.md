@@ -5,7 +5,7 @@ feature = "roles"
 title = "The role catalogue: one owner-editable agent definition per role with an empty house overlay beside it, the table of the workflows a governed session runs its LLM work through, the library every consumer reads them by, and the leg that holds the three and the governing doc to one another"
 status = "building"
 streams = ["tooling"]
-decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2", "TOOL-aOrientedCast-8", "TOOL-aOrientedCast-10"]
+decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2", "TOOL-aOrientedCast-8", "TOOL-aOrientedCast-10", "TOOL-aOrientedCast-11"]
 
 [claims]
 gate-legs = ["roles adopter self-test", "roles catalogue", "roles render selftest", "roles render wiring"]
@@ -48,7 +48,10 @@ governing doc at `CHARTER` it renders the Skill alone and exits 3, an accepted o
 Every agent type carries the reasoning effort the seeded `house/policy.toml` sets for its role,
 read by `roles_lib.load_policy` and graded as R12, and `handoff.py stage-efforts <workflow>` prints
 the per-stage levels a harness call passes as `efforts`, so one role runs at a workflow's own level
-(TOOL-aOrientedCast-10).
+(TOOL-aOrientedCast-10). The policy's `[gates]` table names the gate legs a role may run, checked
+against the tool root's gate manifest when it reads; the index carries each role's list and the
+manifest's path, which the hooks kit's scratch guard reads to refuse a role agent any other gate
+(TOOL-aOrientedCast-11).
 
 ## Constraints & why
 

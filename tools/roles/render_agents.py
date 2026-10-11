@@ -8,9 +8,12 @@ the repository root: the role's Claude keys, then `effort: <level>` as `roles_li
 reads it from the kit's `house/policy.toml` (TOOL-aOrientedCast-10), then `omitClaudeMd: true`, then gov's `workflow` and
 `writes`, then a body that is `roles_lib.render_role`'s output followed, under `## Charter`, by one
 `### charter §<n>` block per id the role's `charter` key names. Beside them it writes the generated
-index `.claude/roles.json`: every role with its `workflow`, `writes` and `agent`, and `harnesses`, the
-repo-relative scripts of every workflow whose `driver` is `workflow`. Everything is rendered in memory
-first, so a role, overlay or charter section that fails to resolve writes nothing.
+index `.claude/roles.json`: every role with its `workflow`, `writes`, `agent` and `gates`, the gate legs
+the policy's `[gates]` table lets it run (empty where it names none), `harnesses`, the repo-relative
+scripts of every workflow whose `driver` is `workflow`, and `gates.manifest`, the repo-relative path of
+the tool root's gate manifest or null when no file is there (TOOL-aOrientedCast-11; scratch-guard.js reads
+both to refuse a role agent a gate). Everything is rendered in memory first, so a role, overlay or
+charter section that fails to resolve writes nothing.
 
 OWNERSHIP. The renderer owns the agent types its catalogue names plus every name the on-disk index
 lists, which is exactly the set a previous render wrote. `--write` unlinks an owned file the
@@ -64,6 +67,8 @@ RESTART_LINE = ("render_agents: %d agent type(s) changed — a Claude Code sessi
                 "write cannot spawn the change; start a new session in this repository before spawning one.")
 NOTE_LINE = ("render_agents: note — %s is named by the workflow table and absent here; "
              "its kit is not installed")
+MANIFEST_NOTE = ("render_agents: note — %s is absent, so the index names no gate manifest and a role "
+                 "agent's gate-leg row is unarmed")
 #: The self-test fixture's two workflow-driver harnesses, spelled as its own table writes them. The
 #: arms format each with the fixture's tool root instead of typing a second literal of the path.
 FIXTURE_HARNESS = "{prefix}/workflows/a.js"
@@ -104,9 +109,10 @@ def load_catalogue(kit_dir, target_root):
         raise lib.RolesError("%s declares no MEMORY_ROOT, or is absent" % conf.as_posix())
     charter_path = lib.resolve_charter_path(target_root)
     workflows = lib.load_workflows(kit_dir)
+    notes = []
     return {"roles": roles, "workflows": workflows, "memory_root": memory_root,
-            "charter_path": charter_path, "policy": lib.load_policy(kit_dir, roles, workflows),
-            "sections": lib.extract_charter_sections(lib.load_text(charter_path))}
+            "charter_path": charter_path, "policy": lib.load_policy(kit_dir, roles, workflows, notes),
+            "notes": notes, "sections": lib.extract_charter_sections(lib.load_text(charter_path))}
 
 
 def render_agent_file(kit_dir, slot, role, memory_root, sections, charter_path, effort):
@@ -142,10 +148,19 @@ def derive_harness_paths(workflows, tool_root, target_root):
     return sorted(found), sorted(absent)
 
 
-def render_roles_index(roles, harnesses):
-    """The index bytes: every role's `workflow`, `writes` and `agent`, and the harness list."""
-    obj = {"harnesses": harnesses,
+def resolve_gate_manifest(tool_root, target_root):
+    """The tool root's gate manifest, repo-relative, or None when no file is there."""
+    p = pathlib.Path(tool_root) / lib.GATE_MANIFEST
+    return pathlib.Path(os.path.relpath(str(p), str(target_root))).as_posix() if p.is_file() else None
+
+
+def render_roles_index(roles, harnesses, policy, manifest):
+    """The index bytes: every role's `workflow`, `writes`, `agent` and `gates`, the harness list and
+    the gate manifest's path."""
+    allow = policy.get("gates", {})
+    obj = {"gates": {"manifest": manifest}, "harnesses": harnesses,
            "roles": {slot: {"agent": r["keys"].get("agent", "true") == "true",
+                            "gates": list(allow.get(slot, [])),
                             "workflow": r["keys"].get("workflow", ""),
                             "writes": r["keys"].get("writes", "")} for slot, r in roles.items()}}
     return json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=True) + "\n"
@@ -212,12 +227,17 @@ def run_mode(mode, kit_dir, tool_root, target_root):
                     kit_dir, slot, role, cat["memory_root"], cat["sections"], cat["charter_path"],
                     lib.resolve_effort(cat["policy"], slot))
         harnesses, absent = derive_harness_paths(cat["workflows"], tool_root, target_root)
-        rendered[INDEX_REL] = render_roles_index(cat["roles"], harnesses)
+        manifest = resolve_gate_manifest(tool_root, target_root)
+        rendered[INDEX_REL] = render_roles_index(cat["roles"], harnesses, cat["policy"], manifest)
     except lib.RolesError as e:
         print("\n".join("render_agents: " + ln for ln in str(e).split("\n")), file=sys.stderr)
         return 2
     for rel in absent:
         print(NOTE_LINE % rel)
+    if manifest is None:
+        print(MANIFEST_NOTE % (pathlib.Path(tool_root) / lib.GATE_MANIFEST).as_posix())
+    for line in cat["notes"]:
+        print("render_agents: note — %s" % line)
     types = len(rendered) - 1
     kit_rel = pathlib.Path(os.path.relpath(str(kit_dir), str(target_root))).as_posix()
     remedy = "python %s/render_agents.py --write" % kit_rel
@@ -279,7 +299,7 @@ def check_arm(state, arm, ok, what):
 
 
 def run_selftest():
-    """The eleven arms over fixture catalogues; prints PASS or FAIL with the assertion count."""
+    """The twelve arms over fixture catalogues; prints PASS or FAIL with the assertion count."""
     state = {"n": 0, "fail": []}
     roles = {"r-one": ("maxTurns: 7\nworkflow: w1\nreads: input:spec\nwrites: product\n"
                        "charter: §2, §1\n", "Overlay line.\n"),
@@ -391,6 +411,44 @@ def run_selftest():
                   "a refused level exited %d without naming r-two and the five levels" % rc)
         check_arm(state, 11, {p.name: p.read_bytes() for p in agents.glob("*")} == before,
                   "a refused level wrote a file")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        policy = FIXTURE_POLICY + '\n[gates]\nr-one = ["leg a"]\n'
+        kit, tool_root = build_fixture(root, {s: roles[s] for s in ("r-one", "r-two")}, policy)
+        (tool_root / lib.GATE_MANIFEST).write_text(
+            '[{"name": "leg a", "argv": ["bash", "{prefix}/a.sh"]}]\n', encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            rc = run_mode("write", kit, tool_root, root)
+        index_path = root / ".claude" / "roles.json"
+        good = index_path.read_bytes() if index_path.is_file() else b"{}"
+        index = json.loads(good)
+        check_arm(state, 12, rc == 0 and index.get("gates") == {
+            "manifest": "%s/%s" % (FIXTURE_ROOT, lib.GATE_MANIFEST)}, "the index's gates is %r, not the "
+            "fixture's manifest path" % index.get("gates"))
+        held = {s: r.get("gates") for s, r in index.get("roles", {}).items()}
+        check_arm(state, 12, held == {"r-one": ["leg a"], "r-two": []},
+                  "the index's role gates are %r, not r-one's one leg and r-two's none" % held)
+        for staged in ("a role's gates", "the manifest"):
+            broken = json.loads(good)
+            if staged == "the manifest":
+                broken.get("gates", {})["manifest"] = None
+            else:
+                broken.get("roles", {}).get("r-one", {}).pop("gates", None)
+            index_path.write_text(json.dumps(broken, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                rc = run_mode("check", kit, tool_root, root)
+            check_arm(state, 12, rc == 1 and "drift %s" % INDEX_REL in out.getvalue(),
+                      "an index with %s staged out of the render did not read drift" % staged)
+        index_path.write_bytes(good)
+        (kit / "house" / "policy.toml").write_text(FIXTURE_POLICY + '\n[gates]\nr-one = ["nope"]\n',
+                                                   encoding="utf-8")
+        err = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            rc = run_mode("write", kit, tool_root, root)
+        check_arm(state, 12, rc == 2 and "gates.r-one" in err.getvalue() and "'nope'" in err.getvalue(),
+                  "a leg name the manifest does not hold exited %d without naming it" % rc)
+        check_arm(state, 12, index_path.read_bytes() == good, "a refused leg name wrote the index")
     for line in state["fail"]:
         print("render_agents selftest: FAIL %s" % line)
     print("%s (%d assertions)" % ("FAIL" if state["fail"] else "PASS", state["n"]))

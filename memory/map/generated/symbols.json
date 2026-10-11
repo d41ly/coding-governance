@@ -1128,6 +1128,11 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "buildBaseName",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "buildBlankedRun",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -1154,6 +1159,11 @@
     },
     {
       "id": "buildEditResult",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "buildGateWord",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -2758,6 +2768,21 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkGateLeg",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkGateRunner",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkGateSuite",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkHandoffSpawn",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -2779,6 +2804,11 @@
     },
     {
       "id": "checkPosixRootLitter",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkRoleGate",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -8368,6 +8398,11 @@
       "file": "tools/settings-merge.py"
     },
     {
+      "id": "load_gate_leg_names",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "load_generator",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -10754,6 +10789,11 @@
     },
     {
       "id": "readFrontMatterKey",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "readGateLegs",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -13203,6 +13243,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderGateDeny",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "renderHandoffDeny",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -14376,6 +14421,11 @@
       "id": "resolve_full_sha",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "resolve_gate_manifest",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "resolve_gate_path",
@@ -16638,6 +16688,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "run_role_bash",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
       "id": "run_rollup",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -17021,6 +17076,11 @@
       "id": "scan",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "scanCommandHeads",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "scanDenyHits",
@@ -20631,6 +20691,11 @@
       "id": "write_gate_legs",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "write_gate_manifest",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "write_gates_staged",

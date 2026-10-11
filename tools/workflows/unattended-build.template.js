@@ -870,8 +870,9 @@ const GROUND =
   'repository at ' + repo + '. ' +
   'Read `memory/guides/BUILD-METHOD.md` WHOLE before acting; it is the procedure you are bound by. ' +
   'No stage of this program runs the merge bar or a self-test suite, and neither does any agent it ' +
-  'spawns; a unit verifies with the direct check its spec names, and the bar runs once at the main ' +
-  'loop after the last unit is terminal. ' +
+  'spawns: a role agent runs no gate beyond what its role allows, and a hook refuses the rest. A ' +
+  'unit verifies with a fixture or a probe of its own code, and the bar and every new arm\'s ' +
+  'RED-first observation run once at the main loop after the last unit is terminal. ' +
   'The build is `' + slug + '` and its record is `memory/builds/' + slug + '/`. ' +
   // TOOL-aProbedUnit-4 — ONE sentence, in GROUND so it reaches every agent this file spawns and
   // every child it dispatches through `cfg.ground`. OTHER is load-bearing: the scratchpad is itself
@@ -891,8 +892,8 @@ const GROUND =
   // TOOL-aProbedUnit-1 — mode-independent, and it reaches the SPEC writers, who write section 7 and
   // are not children. No path: this travels in `dispatch.args`, which arm (v) scans.
   'No gate, suite or bar runs inside a unit pass: the merge bar runs ONCE, at the close, so a ' +
-  'spec\'s section 7 lists what the close runs, and a pass verifies with the one check that ' +
-  'exercises its change. '
+  'spec\'s section 7 lists what the close runs and declares each new arm on a `New arm:` line, and ' +
+  'a pass verifies with a fixture or a probe of the code it changed. '
 
 // ============================================================== STAGE 1 — SPEC
 // TOOL-aStagedLane-3 — A FAN OVER GROUPS OF SLICES, not one agent holding every unit.
@@ -976,9 +977,11 @@ const specResults = await boundedParallel(
             'than a claim') +
           ', and give its status header the `order` verb this roster names. ' +
           (roles.specWriter ? '' :
-            'Every acceptance criterion names a DIRECT observation with its command — a checker on a staged ' +
-            'break, a `--selftest` flag, a fixture, a grep over a rendered file — never the merge bar, a ' +
-            'GATE_*= prefix or a *.test.sh suite: a unit whose criterion names one runs it and stalls for hours. ' +
+            'Every acceptance criterion names an observation a pass can make without a gate, with its ' +
+            'command — a probe of the unit\'s own code, a fixture, a grep over a rendered file — never the ' +
+            'merge bar, a GATE_*= prefix, a *.test.sh suite or a `--selftest` run: a role agent runs no gate, ' +
+            'so a criterion naming one stalls for hours. A new suite arm goes on a `New arm:` line in section ' +
+            '7, and the main loop observes it at the close. ' +
             'DO NOT WRITE PRODUCT CODE in this stage. It authors designs and nothing else — a unit ' +
             'built here would be the exact defect this harness exists to remove. ') +
           'AUTHOR ONLY — DO NOT COMMIT, and do not run the build-index generator. You are one of ' +

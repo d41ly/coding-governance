@@ -2,7 +2,7 @@
 name: build
 description: Drive an ATTENDED code build through the harness pipeline an unattended run uses - spec writers, the spec audit where the owner declared one, one builder per unit, the closing review and one bar - with every agent spawned as its rendered role. Use after /session-kickoff's READY card and the owner's go, for a build that writes product code. Do NOT use for a run that merges and pushes with no owner turn, which is /unattended, or for a change that writes no product code.
 ---
-<!-- gov:kit roles@1.0 -->
+<!-- gov:kit roles@1.1 -->
 
 # Attended builds
 

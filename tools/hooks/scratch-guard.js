@@ -40,7 +40,8 @@
  *
  * FAILS OPEN. Unparseable stdin, an unknown tool, or a missing command all exit 0. This is a hygiene
  * rule, not a containment boundary; a security control would have to fail the other way. The THIRD
- * check below, the write gate, is the one exception: it fails closed.
+ * check below, the write gate, is one exception: it fails closed. The role-gate arm is the other,
+ * for a payload carrying an `agent_type` only.
  *
  * Protocol: deny = stderr text + exit 2. Allow = print nothing, exit 0. Matches agent-cap.js, which
  * records the choice as version-robust and free of any JSON-schema dependency — with ONE departure,
@@ -101,6 +102,22 @@
  * that role's type. It grades two write classes; `none`, `review` and `records` are declared in the
  * index and read by nothing here.
  *
+ * THE FOURTH CHECK: THE ROLE-GATE ARM (TOOL-aOrientedCast-11). Gates are the main session's, at the
+ * merge or push threshold. On a Bash or PowerShell payload carrying an `agent_type`, AFTER the
+ * scratch verdict and the orientation check, `checkRoleGate` refuses a simple command that runs a
+ * gate the role's allowlist does not name: G1, the argv of a leg of the gate manifest the role
+ * index names (`gates.manifest`), compared word for word from its script on; G2, the bar runner,
+ * the self-test runner or the unattended gates runner, by basename, in any form; G3, a `*.test.sh`
+ * or `*selftest.py` script, or a script carrying `--selftest`, unless it carries `--render`,
+ * `--list` or `--help`. The allowlist is the index's `gates` list for that type, rendered from the
+ * roles kit's policy; a type the index does not name, `workflow-subagent` among them, may run
+ * nothing. `checkRoleGate` is the predicate and its comment is the ONE evaluation order. An absent
+ * index adds no arm; a broken one refuses a candidate; a manifest that does not read leaves G1
+ * unarmed with one witness line while G2 and G3 bind; a throw refuses a role agent. THE CEILING:
+ * the match is textual, so a gate reached through an interpreter, an alias, a function, an
+ * assembled path, a `$(…)` inside quotes, or a scoped variant of a leg with an extra argument
+ * passes it. It stops forgetting, not evasion, and the push-boundary bar is still the guarantee.
+ *
  * THE THIRD EVENT: SUBAGENTSTART (TOOL-aRoutedQuill-4). A subagent inherits the hooks but not the
  * parent's card, so it would meet the write gate blind. Wired by `scratch-guard-subagent.fragment.json`
  * (matcher `*`), a payload whose `hook_event_name` is `SubagentStart` is answered on stdout with
@@ -116,7 +133,7 @@
  */
 'use strict'
 
-const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.32 — ships inside the hooks kit entry
+const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.33 — ships inside the hooks kit entry
 
 const TOOLS = ['Bash', 'PowerShell']
 const MAX_FINDINGS = 6
@@ -919,8 +936,10 @@ const ROLE_INDEX = '.claude/roles.json'
  * S1: the role index, in one of three states. `{ state: 'absent', shown }` when the file does not
  * exist; `{ state: 'broken', shown, why }` when it cannot be read, is not JSON, or is not the shape
  * `{ roles: { <name>: { writes: <string>, agent: <boolean>, … } }, harnesses: [<string>] }`;
- * `{ state: 'ok', shown, roles, harnesses }` otherwise. Only the shape is checked: the value set of
+ * `{ state: 'ok', shown, roles, harnesses, gates }` otherwise. Only the shape is checked: the value set of
  * `writes` belongs to the index's generator, and a value outside it simply admits no class here.
+ * TOOL-aOrientedCast-11 adds two OPTIONAL keys, graded only when present: a role's `gates`, a list of
+ * strings, and the top-level `gates`, `{ manifest: <string|null> }`; `gates` is null when absent.
  */
 function loadRoleIndex(top) {
   const fs = require('fs')
@@ -947,8 +966,18 @@ function loadRoleIndex(top) {
     if (!r || typeof r !== 'object' || Array.isArray(r) || typeof r.writes !== 'string' || typeof r.agent !== 'boolean') {
       return { state: 'broken', shown, why: `${shape}: role ${n} is not` }
     }
+    // TOOL-aOrientedCast-11 S3: a role's `gates`, when present, is a list of leg names.
+    if (r.gates !== undefined && (!Array.isArray(r.gates) || !r.gates.every((g) => typeof g === 'string'))) {
+      return { state: 'broken', shown, why: `${shape}: role ${n}'s gates is not a list of strings` }
+    }
   }
-  return { state: 'ok', shown, roles: d.roles, harnesses: d.harnesses }
+  // ...and the top-level `gates`, when present, is `{ manifest: <string|null> }`. Absent reads as no manifest.
+  const gates = d.gates
+  if (gates !== undefined && (!gates || typeof gates !== 'object' || Array.isArray(gates)
+    || !(gates.manifest === null || typeof gates.manifest === 'string'))) {
+    return { state: 'broken', shown, why: `${shape}: gates is not { manifest: <string|null> }` }
+  }
+  return { state: 'ok', shown, roles: d.roles, harnesses: d.harnesses, gates: gates || null }
 }
 
 /**
@@ -1163,6 +1192,202 @@ function checkRouted(data, env) {
   return { deny: renderRouteDeny(tool, targetC, entry, confShown, `no unit its card ${card.shown} routes is buildable:\n${reasons.join('\n')}`, 'Make one routed unit buildable — its spec at the status that admits writes — or route the unit that owns this write through /session-kickoff and manifest-check.sh --card --append.') }
 }
 
+// ---- the role-gate arm (TOOL-aOrientedCast-11) --------------------------------------------------
+
+/** The launchers whose script is the head; `python3.<n>` is matched by shape. */
+const GATE_LAUNCHERS = ['bash', 'sh', 'python', 'python3', 'py', 'node']
+/** Leading words that change nothing about what runs; `timeout` is read apart for its duration. */
+const GATE_PREFIX_WORDS = ['env', 'export', 'nohup', 'time']
+/** G2, by basename and in any form: the bar runner, the self-test runner, the unattended gates runner. */
+const GATE_RUNNERS = ['run-gates.sh', 'run-selftests.sh', 'run-unattended-gates.sh']
+/** G3's admitting words: a render, a listing or a usage text runs no arm. */
+const GATE_SUITE_ADMITS = ['--render', '--list', '--help']
+
+/** The last segment of a word, either slash, lower-cased, `.exe` dropped. */
+function buildBaseName(w) {
+  return String(w || '').replace(/\\/g, '/').split('/').pop().toLowerCase().replace(/\.exe$/, '')
+}
+
+/**
+ * A word as G1 compares it: a path-bearing word (a slash of either kind) resolved against <base>
+ * in buildComparablePath's form, made relative to the toplevel when it sits under it; any other
+ * word unchanged. One function for the command's words and the manifest's, so the two cannot fold
+ * a path two ways.
+ */
+function buildGateWord(w, base, topC) {
+  if (!/[\\/]/.test(w)) return w
+  const c = buildComparablePath(require('path').resolve(base, w))
+  return c.startsWith(topC + '/') ? c.slice(topC.length + 1) : c
+}
+
+/**
+ * The simple commands of <cmd> and their heads. A simple command is a segment of the blanked view
+ * between `;`, `|`, `&`, `(`, `)` and a newline, its words read from the original text with their
+ * quotes dropped and its redirections removed. The HEAD is the first word after any `NAME=value`,
+ * `env`, `export`, `nohup`, `time`, and `timeout` with its options and duration, then past a
+ * launcher and one option of it: a shell's `-c` scans its body ONCE as a command of its own, a
+ * shell's `-n` executes nothing, and a Python `-c` or `-m` names no script — each ends the segment.
+ * Returns `[{ text, head, argv, launched }]`, argv being the head and every word after it.
+ */
+function scanCommandHeads(cmd, depth = 0) {
+  const view = buildCommandView(cmd)
+  const out = []
+  const seg = /[^;|&()\n]+/g
+  let m
+  while ((m = seg.exec(view)) !== null) {
+    const tok = new RegExp(VIEW_TOKEN, 'g')
+    const words = []
+    let t
+    while ((t = tok.exec(m[0])) !== null) {
+      const at = m.index + t.index
+      words.push(cmd.slice(at, at + t[0].length).replace(/"([^"]*)"|'([^']*)'/g, (_, d, s) => (d !== undefined ? d : s)))
+    }
+    const a = []
+    for (let i = 0; i < words.length; i++) {
+      const r = /^(?:\d*|&)(?:>>?|<{1,3})(.*)$/.exec(words[i])
+      if (!r) a.push(words[i])
+      else if (r[1] === '') i++
+    }
+    let k = 0
+    for (;;) {
+      while (k < a.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(a[k])) k++
+      if (GATE_PREFIX_WORDS.includes(a[k])) { k++; continue }
+      if (a[k] === 'timeout') {
+        k++
+        while (k < a.length && a[k].startsWith('-')) k += /^(?:-[sk]|--signal|--kill-after)$/.test(a[k]) ? 2 : 1
+        if (k < a.length && /^\d/.test(a[k])) k++
+        continue
+      }
+      break
+    }
+    if (k >= a.length) continue
+    const lb = buildBaseName(a[k])
+    let launched = false
+    if (GATE_LAUNCHERS.includes(lb) || /^python3\.\d+$/.test(lb)) {
+      const shell = lb === 'bash' || lb === 'sh'
+      k++
+      const opt = a[k]
+      if (opt !== undefined && opt.startsWith('-')) {
+        if (shell && /^-[A-Za-z]*c[A-Za-z]*$/.test(opt)) {
+          if (depth === 0 && a[k + 1] !== undefined) out.push(...scanCommandHeads(a[k + 1], depth + 1))
+          continue
+        }
+        if (shell && opt === '-n') continue
+        if (!shell && /^-[A-Za-z]*[cm]$/.test(opt)) continue
+        k++
+      }
+      if (k >= a.length) continue
+      launched = true
+    }
+    out.push({ text: cmd.slice(m.index, m.index + m[0].length).trim(), head: a[k], argv: a.slice(k), launched })
+  }
+  return out
+}
+
+/** G2: the head's basename is a runner. */
+function checkGateRunner(c) {
+  return GATE_RUNNERS.includes(buildBaseName(c.head))
+}
+
+/** G3: the head is a suite or a self-test script, or a script carrying `--selftest`, and no admitting word. */
+function checkGateSuite(c) {
+  const b = buildBaseName(c.head)
+  const script = c.launched || /[\\/]/.test(c.head)
+  const hit = b.endsWith('.test.sh') || b.endsWith('selftest.py') || (script && c.argv.includes('--selftest'))
+  return hit && !c.argv.some((w) => GATE_SUITE_ADMITS.includes(w))
+}
+
+/**
+ * The manifest's legs, each `{ name, words }` from its first path-bearing word on with `{prefix}`
+ * resolved to the manifest's own directory, or `{ legs: null, why }` when the index names no
+ * manifest or it does not read as a list. A row with no path-bearing word cannot be a script's
+ * argv and is left out.
+ */
+function readGateLegs(top, index) {
+  const fs = require('fs')
+  const path = require('path')
+  const rel = index.gates && index.gates.manifest
+  if (typeof rel !== 'string' || !rel) return { legs: null, why: `the role index ${index.shown} names no gate manifest` }
+  const p = path.resolve(top, rel)
+  const shown = buildComparablePath(p)
+  let rows
+  try {
+    rows = JSON.parse(fs.readFileSync(p, 'utf8'))
+  } catch (e) {
+    return { legs: null, why: `the gate manifest ${shown} does not read (${(e && (e.code || e.message)) || e})` }
+  }
+  if (!Array.isArray(rows)) return { legs: null, why: `the gate manifest ${shown} is not a list` }
+  const dir = path.dirname(p)
+  const topC = buildComparablePath(top)
+  const legs = []
+  for (const g of rows) {
+    if (!g || typeof g.name !== 'string' || !Array.isArray(g.argv) || !g.argv.every((w) => typeof w === 'string')) continue
+    const words = g.argv.map((w) => w.split('{prefix}').join(dir))
+    const at = words.findIndex((w) => /[\\/]/.test(w))
+    if (at >= 0) legs.push({ name: g.name, words: words.slice(at).map((w) => buildGateWord(w, top, topC)) })
+  }
+  return { legs }
+}
+
+/** G1: the leg whose words equal the command's argv, paths resolved against the payload cwd, or null. */
+function checkGateLeg(c, legs, cwd, top) {
+  if (!legs || !/[\\/]/.test(c.head)) return null
+  const topC = buildComparablePath(top)
+  const argv = c.argv.map((w) => buildGateWord(w, cwd, topC))
+  return legs.find((g) => g.words.length === argv.length && g.words.every((w, i) => w === argv[i])) || null
+}
+
+function renderGateDeny(type, c, row, leg, allow, shown) {
+  return (
+    `BLOCKED by scratch-guard: a role agent runs no gate. Agent type ${type} ran \`${c.text}\`, which is ` +
+    `row ${row}${leg ? `, the leg "${leg.name}"` : ''}.\n\n` +
+    `The allowlist of ${type} in the role index ${shown} is ${allow.length ? allow.map((n) => `"${n}"`).join(', ') : 'empty'}. ` +
+    'Gates run in the main session at the merge or push threshold, so return the need in your result, ' +
+    'and verify your change with a fixture or a probe of your own code.\n'
+  )
+}
+
+/**
+ * THE ONE EVALUATION ORDER of the role-gate arm. Returns null to admit, `{ witness }` to admit with
+ * one stderr line, `{ deny }` to refuse.
+ *  1. `agent_type` absent or empty → null (the main loop runs every gate)
+ *  2. no simple command whose head is a launched script, a path-bearing word, or a G2 or G3 shape
+ *     → null, with no file read
+ *  3. no toplevel above the payload `cwd` → null
+ *  4. loadRoleIndex: absent → null; broken → deny naming the index
+ *  5. the allowlist: the index's `gates` list for the type, else empty — `workflow-subagent` and
+ *     every type the index does not name may run nothing
+ *  6. readGateLegs: no manifest, an absent one or one that does not parse leaves G1 unarmed and
+ *     returns a witness naming it; G2 and G3 still bind
+ *  7. each simple command: an allowlisted G1 leg is admitted whole; else G2, G3, then G1 refuses
+ */
+function checkRoleGate(cmd, data) {
+  const path = require('path')
+  const type = typeof data.agent_type === 'string' ? data.agent_type : ''
+  if (!type) return null
+  const cands = scanCommandHeads(cmd).filter((c) => c.launched || /[\\/]/.test(c.head) || checkGateRunner(c) || checkGateSuite(c))
+  if (cands.length === 0) return null
+  if (typeof data.cwd !== 'string' || !data.cwd) return null
+  const cwd = path.resolve(data.cwd)
+  const hit = resolveToplevel(cwd)
+  if (!hit) return null
+  const index = loadRoleIndex(hit.toplevel)
+  if (index.state === 'absent') return null
+  if (index.state === 'broken') {
+    return { deny: `BLOCKED by scratch-guard: a role agent runs no gate, and the role index ${index.shown} ${index.why}, so the allowlist of ${type} cannot be read. Repair or re-render the index; gates run in the main session at the merge or push threshold.\n` }
+  }
+  const role = index.roles[type]
+  const allow = role && Array.isArray(role.gates) ? role.gates : []
+  const g = readGateLegs(hit.toplevel, index)
+  for (const c of cands) {
+    const leg = checkGateLeg(c, g.legs, cwd, hit.toplevel)
+    if (leg && allow.includes(leg.name)) continue
+    const row = checkGateRunner(c) ? 'G2 runner' : checkGateSuite(c) ? 'G3 suite' : leg ? 'G1 leg' : null
+    if (row) return { deny: renderGateDeny(type, c, row, leg, allow, index.shown) }
+  }
+  return g.legs ? null : { witness: `role-gate row G1 leg unarmed — ${g.why}; rows G2 runner and G3 suite still bind` }
+}
+
 // ---- the subagent context (TOOL-aRoutedQuill-4) ------------------------------------------------
 
 /** The harness's cap on a hook's additionalContext, in characters (Claude Code's documentation). */
@@ -1282,30 +1507,47 @@ function main() {
   // uncaught error exits 1, which surfaces noise on a command that was probably fine. Fail open and
   // stay consistent with the stdin handling above. The self-test pins this arm so the catch cannot
   // quietly become the normal path.
-  let verdict
+  // A throw in either of the first two checks skips what remains of THEM and nothing else: the
+  // role-gate arm below still runs (TOOL-aOrientedCast-11 S6).
+  let verdict = null
   try {
     verdict = checkCommand(cmd, process.env)
   } catch {
-    process.exit(0)
+    verdict = null
   }
-  if (verdict.bad.length > 0) {
+  if (verdict && verdict.bad.length > 0) {
     process.stderr.write(renderDeny(verdict.bad, verdict.allowed))
     process.exit(2)
   }
   // The orientation check, AFTER the scratch verdict and under the same fail-open wrap.
   let orient = null
-  try {
-    orient = checkOriented(cmd, data)
-  } catch {
-    process.exit(0)
+  if (verdict) {
+    try {
+      orient = checkOriented(cmd, data)
+    } catch {
+      orient = null
+    }
   }
   if (orient && orient.deny) {
     process.stderr.write(orient.deny)
     process.exit(2)
   }
   if (orient && orient.witness) process.stderr.write(`scratch-guard: ${orient.witness}\n`)
+  // The role-gate arm, LAST, and it FAILS CLOSED for a role agent as the write gate does: under a
+  // fail-open catch a defect in it would be a silent off (§8 F5). The main loop is never refused.
+  let gate = null
+  try {
+    gate = checkRoleGate(cmd, data)
+  } catch (e) {
+    gate = data.agent_type ? { deny: `BLOCKED by scratch-guard: the role-gate arm threw (${(e && e.message) || e}) and refuses a role agent's ${data.tool_name} call.\n` } : null
+  }
+  if (gate && gate.deny) {
+    process.stderr.write(gate.deny)
+    process.exit(2)
+  }
+  if (gate && gate.witness) process.stderr.write(`scratch-guard: ${gate.witness}\n`)
   process.exit(0)
 }
 
 if (require.main === module) main()
-module.exports = { checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult }
+module.exports = { checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION, checkRouted, checkBuildable, extractRouteUnits, readConfKey, checkUnarmed, readCard, WRITE_TOOLS, ROUTE_CONF, renderRouteContext, ROUTE_CONTEXT_CAP, loadRoleIndex, ROLE_INDEX, checkStatusOnlyEdit, buildEditResult, checkRoleGate, scanCommandHeads }

@@ -91,10 +91,10 @@ ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOriente
 | [TOOL-aOrientedCast-10 — every role runs at its declared effort, from one owner-editable policy file](spec/2026-10-11-spec-TOOL-aOrientedCast-10.md) | 8 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aOrientedCast-6 — the write gate admits a spec write only from the spec-writer role and a product write only from the builder role](spec/2026-10-11-spec-TOOL-aOrientedCast-6.md) | 9 | 2 | CLOSED | rev-3 | 2026-10-12 |
 | [TOOL-aOrientedCast-7 — the spawn guard refuses an Agent or Workflow call that carries no rendered handoff](spec/2026-10-11-spec-TOOL-aOrientedCast-7.md) | 10 | 2 | CLOSED | rev-4 | 2026-10-12 |
-| [TOOL-aOrientedCast-11 — a role agent runs no gate, and the write gate's hook refuses one](spec/2026-10-11-spec-TOOL-aOrientedCast-11.md) | 11 | 2 | INPROGRESS | rev-1 | 2026-10-11 |
+| [TOOL-aOrientedCast-11 — a role agent runs no gate, and the write gate's hook refuses one](spec/2026-10-11-spec-TOOL-aOrientedCast-11.md) | 11 | 2 | INPROGRESS | rev-2 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 25 bound to this build, across 3 record folder(s).
+Records: 26 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

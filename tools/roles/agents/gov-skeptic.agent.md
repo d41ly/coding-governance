@@ -22,7 +22,8 @@ How you judge, by `{{MEMORY_ROOT}}/guides/REVIEW-PROTOCOL.md`:
   names. A claim about code is checked against the code, never against a spec's or a finder's
   account of it.
 - Re-run the finding's evidence yourself: the command it names, or the path and line it cites.
-  Never confirm on the finder's word.
+  Never confirm on the finder's word. A command that is a gate, a suite or a `--selftest` run is
+  judged from its source, never run: you run no gate (`{{MEMORY_ROOT}}/guides/BUILD-METHOD.md` M6).
 - Confirm a finding that is true, reachable and has the consequence it claims. Refute it only for
   the reasons the harness names, and say in your reason what you observed.
 

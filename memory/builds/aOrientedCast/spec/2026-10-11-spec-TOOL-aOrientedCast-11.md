@@ -1,11 +1,12 @@
 # TOOL-aOrientedCast-11 — a role agent runs no gate, and the write gate's hook refuses one
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 11 · ratified 2026-10-11
+**Status:** INPROGRESS · rev-2 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 11 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aOrientedCast-11-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aOrientedCast-11-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aOrientedCast-10-0-owner-addendum.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-10-0-owner-addendum.md) | research | TOOL-aOrientedCast-10 |
 | [2026-10-11-prompt-TOOL-aOrientedCast-10-1-spec-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-10-1-spec-brief.md) | journal | TOOL-aOrientedCast-10 |
 
@@ -73,8 +74,9 @@ and rewrites every text that hands an agent its work to say the same.
   without naming who makes it, and both stay true once that observer is the main loop at the close.
 - Proving an agent did not reach a gate by another route. The arm stops forgetting, not evasion.
 - A waiver, an environment knob or a warn phase. Enforcement starts at landing, by the owner's ruling.
-- A kit version bump. The hooks, roles, workflows and memory-tree kits move once, after their last
-  unit in this build.
+- A kit version bump beyond one per kit. This unit is the build's last to move the hooks, roles,
+  workflows and memory-tree kits, so it bumps each once, on every carrier: hooks 1.32 to 1.33, the
+  review harness 1.45 to 1.46, memory-tree 2.139 to 2.140, roles 1.0 to 1.1 (rev-2).
 
 **The build method is a governance carrier, changed here by the owner's instruction.** The owner's
 addendum of 2026-10-11, quoted in
@@ -297,10 +299,12 @@ wrote after its pass under `Pass: none`. No new record kind is made.
 ### Rollout
 
 Lands at order 11, after `TOOL-aOrientedCast-6` and `TOOL-aOrientedCast-7`, the other two units
-editing the hooks kit. One commit carries the policy table, the library and checker, the renderer and
-gov's re-render, the hook and its arms, the README section, the role blocks, the two harnesses and the
-build harness's render, the build method's template and render, the kickoff manifest's re-stamp and
-the regenerated symbols. A hook script is read afresh on every call, so the arm binds every session
+editing the hooks kit. Two commits carry it (rev-2). The first holds the policy table, the library
+and checker, the renderer, the hook and its arms, the README sections, the role blocks, the two
+harnesses and the build harness's render, the build method's template and render, the four kits'
+version bumps with the `/build` Skill's render, the kickoff manifest's re-stamp and the regenerated
+symbols. The second holds gov's re-rendered agent types and index under its own `--dispatch`, because `--dispatch`
+refuses a generated index declared beside its generator (check 49), and flips this spec CLOSED. A hook script is read afresh on every call, so the arm binds every session
 whose hooks run from a tree holding this commit, from its next subagent shell call; in gov that is the
 landing merge in the primary tree. From then this session's own subagents, and every `Workflow`
 sidechain agent, are refused gates; the close's bar and the red-first observations run in the main
@@ -311,7 +315,7 @@ is empty, the strict reading.
 
 ### Files touched (estimate)
 
-`tools/roles/house/policy.toml` · `tools/roles/roles_lib.py` · `tools/roles/render_agents.py` · `tools/roles/check_roles.py` · `tools/roles/README.md` · `tools/roles/agents/` · `.claude/agents/` · `.claude/roles.json` · `tools/hooks/scratch-guard.js` · `tools/hooks/scratch-guard.test.sh` · `tools/hooks/README.md` · `tools/workflows/unattended-unit.js` · `tools/workflows/unattended-build.template.js` · `tools/workflows/unattended-build.js` · `tools/memory-tree/BUILD-METHOD.template.md` · `memory/guides/BUILD-METHOD.md` · `memory/guides/SESSION-KICKOFF.md` · `memory/map/features/agent-cap.md` · `memory/map/features/roles.md` · `memory/map/generated/symbols.json`
+`tools/roles/house/policy.toml` · `tools/roles/roles_lib.py` · `tools/roles/render_agents.py` · `tools/roles/check_roles.py` · `tools/roles/README.md` · `tools/roles/agents/` · `.claude/agents/` · `.claude/roles.json` · `tools/hooks/scratch-guard.js` · `tools/hooks/scratch-guard.test.sh` · `tools/hooks/README.md` · `tools/workflows/unattended-unit.js` · `tools/workflows/unattended-build.template.js` · `tools/workflows/unattended-build.js` · `tools/memory-tree/BUILD-METHOD.template.md` · `memory/guides/BUILD-METHOD.md` · `memory/guides/SESSION-KICKOFF.md` · `memory/map/features/agent-cap.md` · `memory/map/features/roles.md` · `memory/map/generated/symbols.json` · and for the version bumps (rev-2) `tools/hooks/agent-cap.js` · `tools/workflows/tier2-review.template.js` · `tools/workflows/tier2-review.js` · `tools/memory-tree/check-memory-hygiene.sh` · the memory-tree kit's four doc templates and their renders · `tools/roles/SKILL.template.md` · `.claude/skills/build/SKILL.md`
 
 ### Alternatives rejected
 
@@ -454,6 +458,12 @@ which is the observation this unit itself moves there. No pass runs a leg above.
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-12 · §3 · §4 Rollout · Files touched. The build pass's dispatch carried the run's
+  instruction that this unit, the build's last to move the hooks, workflows and memory-tree kits,
+  bumps each once; the roles kit, created in this build and moved after its 1.0, owes the same, so
+  the non-goal now names the four bumps. `--dispatch` refused gov's re-rendered agent types beside
+  `render_agents.py` (check 49), so the re-render lands in a second commit of the pass, as
+  `TOOL-aOrientedCast-10`'s did.
 
 ## 10. Reuse audit
 
