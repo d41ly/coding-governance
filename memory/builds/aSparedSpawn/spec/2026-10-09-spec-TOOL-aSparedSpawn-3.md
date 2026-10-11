@@ -1,11 +1,12 @@
 # TOOL-aSparedSpawn-3 — a ceiling-killed leg retries in the pool's drain tail, and a bar with no ledger dispatches longest-first
 
-**Status:** INPROGRESS · rev-2 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
+**Status:** CLOSED · rev-2 · 2026-10-12 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aSparedSpawn-3-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-3-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aSparedSpawn-3-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-3-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

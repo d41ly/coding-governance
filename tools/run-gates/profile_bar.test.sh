@@ -405,10 +405,10 @@ import sys, os
 sys.path.insert(0, os.environ["HERE_DIR"])
 import profile_bar as p
 
-text = ("GATE retry  slow leg  (timed out after 9s beside 3 neighbours; one serial retry after the pool drains)\n"
+text = ("GATE retry  slow leg  (timed out after 9s beside 3 neighbours; retried in the pool's tail, and alone after it drains unless that passes)\n"
         "GATE ok    other leg\n"
         "GATE FAIL  red leg  (exit 1)\n"
-        "GATE retry  cut leg  (timed out after 9s beside 3 neighbours; one serial retry after the pool drains)\n"
+        "GATE retry  cut leg  (timed out after 9s beside 3 neighbours; retried in the pool's tail, and alone after it drains unless that passes)\n"
         "GATE ok    slow leg  (retried after timeout)\n"
         "GATE attr  red leg  OWN - a reason\n")
 got = p.parse_verdicts(text)

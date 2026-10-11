@@ -16753,6 +16753,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "run_tail_retry",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "run_takeover",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"

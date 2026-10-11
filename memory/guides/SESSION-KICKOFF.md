@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-11T23:53:56+03:00 @ 7ff2d7c7cbf98c18d00d89e58cde5a8d045acee3
+last-audit: 2026-10-12T01:34:40+03:00 @ 286b839a1123284db7286d38a11a63e9d034dd33
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 7ff2d7c7cbf98c18d00d89e58cde5a8d045acee3
+last-body-change: 286b839a1123284db7286d38a11a63e9d034dd33
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -182,7 +182,7 @@ bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY at the gate-pr
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD and the docs mode (GATE_DOCS_BASE). .githooks/pre-push decides, and prints which it chose and why
 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
-# Every leg declares a `ceiling` in tools/gate-legs.json; one outliving it gets ONE serial retry (a pass is green); all-HOST exits 4. TOOL-aBoundedCeiling-1
+# Each leg's `ceiling` is in tools/gate-legs.json; a leg past it retries in the tail, then alone (a pass is green); all-HOST exits 4. TOOL-aBoundedCeiling-1
 # Per profile row: a whole-RUN wall (GATE_WALL; a breach kills the legs, TOOL-aQuenchedHarness-1), and mempause holding dispatch while used memory is above it (TOOL-aGraftedHelix-7)
 GATE_ATTRIBUTE=<rev> bash tools/run-gates/run-gates.sh   # re-run each RED leg at <rev> and print whose red it is: OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE. Report-only, the exit never moves; .githooks/pre-push exports the remote sha. TOOL-dDerivedDocket-23
 bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts and REFUSES an uncalibrated row until --pooled --calibrate; bare REFUSES; GOV_NODE must be a registry tag; a pooled red keeps each row's output under <git-dir>/gate-logs/selftests/. TOOL-aBatchedArm-4, -5

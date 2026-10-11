@@ -341,7 +341,8 @@ load_baseline() {
   fi
   echo "foreign-prefix: baseline is bar run $(basename "$best") at ${HEADSHA:0:8}"
   for f in "$best"/*.leg; do
-    case "$f" in *.retry.leg) continue ;; esac
+    # A `.tail.leg` is a tail retry the runner set aside, never a first attempt (TOOL-aSparedSpawn-3).
+    case "$f" in *.retry.leg|*.tail.leg) continue ;; esac
     [ -f "$f" ] || continue
     IFS=$'\t' read -r n st _ < "$f"
     d="${f%.leg}.retry.leg"

@@ -2250,11 +2250,12 @@ TREE_CLEAN=no
 # Read the leg manifest as name<RS>guard(comma-joined)<RS>argv(joined by <US>) per line, where
 # RS=\x1e and US=\x1f (non-whitespace, so an empty guard field survives `read`; a tab would collapse).
 # Line 1 is the advisory DISPATCH ORDER: leg indices longest-first from the timing cache the previous
-# run wrote. A leg the cache does not know scores 0 and sorts last; an absent or unreadable cache
-# yields manifest order. It is a scheduling hint only — it can never change a verdict.
+# run wrote. A leg the cache does not know scores its prior instead (TOOL-aSparedSpawn-3 S5: its
+# evidenced maximum, else its scaled ceiling, else 0, and 0 sorts last), so an absent or unreadable
+# cache no longer yields manifest order. It is a scheduling hint only — it can never change a verdict.
 # Command-substitution surfaces a parse failure (a `< <()` process-sub would swallow it).
 legs=$("$PYBIN" -c '
-import json, os, sys
+import json, os, statistics, sys
 try:
     data = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -2290,7 +2291,31 @@ if cache and os.path.exists(cache):
             if len(p) >= 2: durs[p[0]] = float(p[1])
     except Exception:
         durs = {}          # a corrupt cache is a missing cache, never a failed run
-order = sorted(range(len(data)), key=lambda i: -durs.get(data[i]["name"], 0.0))
+# THE PRIORS (TOOL-aSparedSpawn-3 S5), for a leg the ledger holds no seconds for, so a new worktree
+# does not dispatch in manifest order: the largest reading ceiling-evidence.txt beside this runner
+# records for it; else its declared ceiling divided by the MEDIAN ceiling-to-reading ratio over the
+# legs carrying both, re-derived here every bar (about 17 at base 22efab65, so a typed divisor would
+# be wrong), or by 1 when no leg carries both; else 0. argv[4] is that file, and an unreadable one is
+# a missing prior, never a failed run. Ties keep manifest order, since the sort is stable.
+evid = {}
+efile = sys.argv[4] if len(sys.argv) > 4 else ""
+if efile and os.path.exists(efile):
+    try:
+        for line in open(efile, encoding="utf-8"):
+            p = line.rstrip("\n").split("\t")
+            if len(p) >= 2 and not line.startswith("#"):
+                evid[p[0]] = max(evid.get(p[0], 0.0), float(p[1]))
+    except Exception:
+        evid = {}
+ceils = [l["ceiling"] if isinstance(l.get("ceiling"), int) and not isinstance(l.get("ceiling"), bool)
+         and l["ceiling"] > 0 else 0 for l in data]
+ratios = [ceils[i] / evid[data[i]["name"]] for i in range(len(data))
+          if ceils[i] and evid.get(data[i]["name"], 0.0) > 0]
+scale = statistics.median(ratios) if ratios else 1.0
+prior = [durs[data[i]["name"]] if data[i]["name"] in durs
+         else evid[data[i]["name"]] if evid.get(data[i]["name"], 0.0) > 0
+         else ceils[i] / scale for i in range(len(data))]
+order = sorted(range(len(data)), key=lambda i: -prior[i])
 # Line 1 also carries, behind one RS, the python half of the reuse key digest (TOOL-aSparedSpawn-1
 # S4): this interpreter version and its utf8 mode, read here so the digest starts no python of its own.
 rows = [" ".join(str(i) for i in order) + "\x1e" + sys.version.replace("\n", " ")
@@ -2346,7 +2371,7 @@ rows += [l["name"] + "\x1e" + ",".join(resolve_prefix_token(g, troot) for g in l
                             if isinstance(l.get("doc_reads"), list) else "")
          for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
-' "$LEGS_FILE" "$TIMINGS" "$(dirname "$KITREL")") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
+' "$LEGS_FILE" "$TIMINGS" "$(dirname "$KITREL")" "$KITREL/ceiling-evidence.txt") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
@@ -2870,6 +2895,11 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
   # loop would refresh while no leg was making progress, which is the state the reaper exists to
   # detect.
   ts_hb
+  # THE TAIL MARKER (TOOL-aSparedSpawn-3 S1), before `.rc`: a FIRST attempt whose own ceiling fired,
+  # by the predicate `report_one` defers on, read over the same rc, bound and seconds. Written here
+  # because the worker knows at completion what the manifest-order reader may not reach until the
+  # floor leg ends, and the tail where its retry can run exists only while the pool still runs.
+  [ "$fired" = 1 ] && [ -z "$sfx" ] && : > "$WORK/$i.defer"
   printf '%s' "$rc" > "$WORK/$i$sfx.rc.tmp" && mv -f "$WORK/$i$sfx.rc.tmp" "$WORK/$i$sfx.rc"
 }
 
@@ -2961,9 +2991,11 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
        # attribution reads CONTENDED by: 124 under a positive bound, or 137 under a positive bound
        # whose seconds reached it. Every other 137 -- a self-kill, an OOM kill, an operator's or a CI
        # cancel, under a bound or with none -- is a failure now, exactly as it always was.
+       # The worker applied the same predicate when the attempt ended and left a `.defer` marker, so
+       # the retry may already have run in the pool's tail (TOOL-aSparedSpawn-3); the tail says both.
        if check_ceiling_fired "$rc" "$fired" "$secs"; then
          c_defer=$((c_defer+1)); DEFERRED="$DEFERRED $i"
-         printf 'GATE retry  %s  (timed out after %ss beside %s neighbours; one serial retry after the pool drains)\n' \
+         printf "GATE retry  %s  (timed out after %ss beside %s neighbours; retried in the pool's tail, and alone after it drains unless that passes)\n" \
            "${names[$i]}" "$fired" "$(measure_neighbours "$i")"
          return
        fi
@@ -3272,6 +3304,7 @@ RED_LEGS=""; ATTR_CUT=0; WALL_END=0; ATTR_LANDABLE=0; ATTR_LAND_LEGS=""
 # ran again and failed again, the first attempts whose processes were not cleared, and the HOST legs
 # with the lowest ratio among them, which is the figure the `gates HOST` line can claim of all of them.
 DEFERRED=""; RETRIED=0; RETRY_FAILS=0; UNCLEARED=""; HOST_N=0; HOST_LEGS=""; HOST_R10=""; RESIDUE=""
+TAIL_RELEASED=""   # the legs whose retry `run_tail_retry` started in the pool's tail (TOOL-aSparedSpawn-3)
 ATTR_US=$'\x1f'; ATTR_RS=$'\x1e'
 
 # check_ceiling_fired <rc> <bound> <seconds> — rc 0 when the attempt's OWN ceiling fired: 124 under a
@@ -3367,7 +3400,7 @@ derive_host_note() {
     unreadable) HOST_NOTE="the spawn floor could not be read, so HOST was not measured"; return 1 ;;
   esac
   case " $UNCLEARED " in
-    *" $i "*) HOST_NOTE="its first attempt left processes running, so a spawn cost says nothing about the host"; return 1 ;;
+    *" $i "*) HOST_NOTE="an earlier attempt left processes running, so a spawn cost says nothing about the host"; return 1 ;;
   esac
   if ! check_residue_gone "$i" .retry; then
     printf 'run-gates: the serial retry of %s left processes running: %s\n' "${names[$i]}" "$RESIDUE" >&2
@@ -3390,32 +3423,56 @@ derive_host_note() {
 # its worker a background job waited on so it has a pid of its own for the wall to reach, which a
 # foreground call would not: `$BASHPID` there is this shell's, and the wall would kill the runner.
 # Prints one `GATE ok` or `GATE FAIL` line per retried leg and one `---- retry:` line after them.
+#
+# A LEG WHOSE RETRY RAN IN THE POOL'S TAIL (TOOL-aSparedSpawn-3 S3, S4) is read, not run again, when
+# that attempt passed: the same line, the same count, the same health event a serial pass gives. One
+# that did not pass decides nothing (F1, owner 2026-10-10): its files are set aside as `<i>.tail.*`,
+# its processes are verified gone as the first attempt's are, and the leg takes the serial retry
+# below, alone, so every red retry verdict and every HOST reading still comes from an attempt that
+# ran alone after the drain. `<i>.retry.pid` is the witness that a tail attempt started, because the
+# pool's final `wait` has reaped every tail job by now and only the serial retry writes it after.
 run_leg_retry() {
-  local i rc fired secs tail v
+  local i rc fired secs tail v f
   [ -n "$DEFERRED" ] || return 0
   [ -f "$WORK/wall.breach" ] && return 0
   for i in $DEFERRED; do
     [ -f "$WORK/wall.breach" ] && break
-    # THE FIRST ATTEMPT IS VERIFIED CLEAR, never assumed clear: its worker reaped its group before it
-    # wrote `.rc`, and this is the assertion that the reap worked. A survivor is named and the leg is
-    # still retried, but a second timeout then cannot read HOST, since the spawn cost is not
-    # attributable to the host while this bar's own processes are running.
-    if ! check_residue_gone "$i" ""; then
-      printf 'run-gates: the timed-out attempt of %s left processes running before its serial retry: %s\n' \
-        "${names[$i]}" "$RESIDUE" >&2
-      UNCLEARED="$UNCLEARED $i"
+    rc=""
+    if [ -f "$WORK/$i.retry.pid" ]; then
+      [ -f "$WORK/$i.retry.rc" ] && read -r rc < "$WORK/$i.retry.rc"
+      if [ "$rc" != 0 ]; then
+        for f in "$WORK/$i".retry.* ${RUNDIR:+"$RUNDIR/$i".retry.*}; do
+          [ -e "$f" ] && mv -f "$f" "${f%.retry.*}.tail.${f##*.retry.}" 2>/dev/null
+        done
+        if ! check_residue_gone "$i" .tail; then
+          printf 'run-gates: the tail attempt of %s left processes running before its serial retry: %s\n' \
+            "${names[$i]}" "$RESIDUE" >&2
+          UNCLEARED="$UNCLEARED $i"
+        fi
+      fi
     fi
     RETRIED=$((RETRIED + 1))
-    runleg "$i" .retry &
-    wait "$!" 2>/dev/null
-    if [ ! -f "$WORK/$i.retry.rc" ]; then
-      [ -f "$WORK/wall.breach" ] && break      # the wall killed it: the breach block names the leg
-      fails=$((fails + 1)); RETRY_FAILS=$((RETRY_FAILS + 1)); RED_LEGS="$RED_LEGS $i"
-      printf 'GATE FAIL  %s  (no result on its serial retry)\n' "${names[$i]}"
-      FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (no result on its serial retry)"$'\n'
-      continue
+    if [ "$rc" != 0 ]; then
+      # THE FIRST ATTEMPT IS VERIFIED CLEAR, never assumed clear: its worker reaped its group before it
+      # wrote `.rc`, and this is the assertion that the reap worked. A survivor is named and the leg is
+      # still retried, but a second timeout then cannot read HOST, since the spawn cost is not
+      # attributable to the host while this bar's own processes are running.
+      if ! check_residue_gone "$i" ""; then
+        printf 'run-gates: the timed-out attempt of %s left processes running before its serial retry: %s\n' \
+          "${names[$i]}" "$RESIDUE" >&2
+        UNCLEARED="$UNCLEARED $i"
+      fi
+      runleg "$i" .retry &
+      wait "$!" 2>/dev/null
+      if [ ! -f "$WORK/$i.retry.rc" ]; then
+        [ -f "$WORK/wall.breach" ] && break      # the wall killed it: the breach block names the leg
+        fails=$((fails + 1)); RETRY_FAILS=$((RETRY_FAILS + 1)); RED_LEGS="$RED_LEGS $i"
+        printf 'GATE FAIL  %s  (no result on its serial retry)\n' "${names[$i]}"
+        FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (no result on its serial retry)"$'\n'
+        continue
+      fi
+      rc=$(cat "$WORK/$i.retry.rc")
     fi
-    rc=$(cat "$WORK/$i.retry.rc")
     if [ "$rc" = 0 ]; then
       printf 'GATE ok    %s  (retried after timeout)\n' "${names[$i]}"
       add_health_event "$RG_HEALTH_LOG" run-gates retry-passed "${names[$i]} after a $(cat "$WORK/$i.bound" 2>/dev/null || printf '?')s timeout"
@@ -3442,6 +3499,29 @@ run_leg_retry() {
   else v=RED; fi
   printf -- '---- retry: %s  (%s retried, %s failed)\n' "$v" "$RETRIED" "$RETRY_FAILS"
   CHUNK_ROLLUP="${CHUNK_ROLLUP}retry\t${v}\t${RETRIED}\t${RETRY_FAILS}\n"
+  return 0
+}
+
+# run_tail_retry — THE TAIL RELEASE (TOOL-aSparedSpawn-3 S2). Called by the dispatch pass once every
+# first attempt is dispatched: starts ONE marked leg's retry as a pool job while at most one other job
+# runs. One neighbour, typically the floor leg, is the cheapest contention that still uses the idle
+# slots; a retry packed beside several heavy legs recreates what killed it. The markers are a glob and
+# a released leg is remembered in TAIL_RELEASED rather than read from its `.retry.pid`, which the job
+# writes asynchronously, so the decision forks nothing until some marker is unreleased, and only then
+# counts the running jobs. The memory pause holds it as it holds any dispatch.
+run_tail_retry() {
+  local f j
+  for f in "$WORK"/*.defer; do
+    [ -e "$f" ] || return 0
+    j=${f##*/}; j=${j%.defer}
+    case " $TAIL_RELEASED " in *" $j "*) continue ;; esac
+    nlive=$(live)
+    [ "$nlive" -le 1 ] || return 0
+    check_dispatch_pause "$nlive" && return 0
+    TAIL_RELEASED="$TAIL_RELEASED $j"
+    runleg "$j" .retry &
+    return 0
+  done
   return 0
 }
 
@@ -3946,6 +4026,9 @@ while [ "$wi" -lt "$nwalk" ]; do
     arm_census
     runleg "$k" &
   done
+  # THE TAIL RELEASE (TOOL-aSparedSpawn-3 S2), once every first attempt is dispatched: a deferred leg's
+  # retry starts here, beside at most one running job, rather than after the final `wait`.
+  [ "$di" -lt "$ndisp" ] || run_tail_retry
   if [ -f "$WORK/$next.rc" ]; then report_one "$next"; wi=$((wi+1)); continue; fi
   if [ "$(live)" -gt 0 ]; then wait -n 2>/dev/null || true; continue; fi
   # Nothing running. That is NOT yet evidence this leg has no result: `jobs -rp` counts only RUNNING
@@ -3975,7 +4058,9 @@ while [ "$wi" -lt "$nwalk" ]; do
   [ -f "$WORK/$next.rc" ] && continue
   report_one "$next"; wi=$((wi+1))         # genuinely no result: report it, never hang
 done
-write_pause_row wall                       # an episode open now is one the wall's break left; a no-op otherwise
+# An episode open now is one the wall's break left, or a tail release the pause held until the reader
+# finished (TOOL-aSparedSpawn-3), whose leg then takes its serial retry: that one closes `drained`.
+if [ -f "$WORK/wall.breach" ]; then write_pause_row wall; else write_pause_row drained; fi
 wait
 chunk_close                                # the last chunk has no successor to close it
 # THE MEMORY PAUSE'S ONE LINE, after the pool drains and before the serial retry, so a run the wall
@@ -4032,8 +4117,11 @@ if [ -n "$LEDGER" ]; then
   # guards fire are exactly the diff-scoped ones, so a scoped run blanked the dispatch hint the next
   # full run depends on. Carry forward any cached row this run did not measure. A leg dropped from the
   # manifest falls out on its own, because the python side keys the hint on the manifest's names.
+  # KEYED ON THE FILE NAME, never `NR==FNR` (TOOL-aSparedSpawn-3 S7): with an EMPTY first file, which a
+  # run that reused or guard-skipped every leg writes, `NR==FNR` holds for every line of the old ledger,
+  # so each was swallowed as "seen" and the ledger the next bar dispatches by was left empty.
   cp "$new" "$merged" 2>/dev/null || true
-  [ -s "$LEDGER" ] && awk -F'\t' 'NR==FNR{seen[$1]=1;next} !($1 in seen)' "$new" "$LEDGER" >> "$merged" 2>/dev/null
+  [ -s "$LEDGER" ] && awk -F'\t' 'FILENAME==ARGV[1]{seen[$1]=1;next} !($1 in seen)' "$new" "$LEDGER" >> "$merged" 2>/dev/null
   # ATOMIC rather than a copy in place. A reader that opens the ledger while the bar is mid-write
   # got a truncated file before; a rename is the only way this file is ever replaced now.
   mv -f "$merged" "$LEDGER" 2>/dev/null || cp "$merged" "$LEDGER" 2>/dev/null || true

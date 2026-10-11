@@ -124,7 +124,9 @@ fail=0
 # 324 -> 326, TOOL-dLadderedRemote-2: the two arms of the canary's ladder-refusal pass, counted off the arm.
 # 326 -> 347, TOOL-aSparedSpawn-2: the pin arm's runner-set half and section 12's 20. Not 348: arm
 # 12c's other-boot half SKIPS on a host with no readable /proc/uptime, so the floor is that count.
-FLOOR_ASSERTIONS=347
+# 347 -> 356, TOOL-aSparedSpawn-3: arm 9d's AC7 ledger-row assertion and the eight tail-release
+# assertions of 9k to 9m, those behind the `timeout` gate counted on a host without one as well (30 -> 38).
+FLOOR_ASSERTIONS=356
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -2907,6 +2909,10 @@ printf '[{"name": "cached", "argv": ["bash", "fx/ok.sh"]}]\n' > "$HV/cached.json
 run_hv_bar "$H6" "$HV/cached.json"
 run_hv_bar "$H6" "$HV/cached.json" GATE_REUSE=1
 check_hv_line "AC6 control: an ok row with a matching key is reused" '^GATE reuse cached  '
+# TOOL-aSparedSpawn-3 AC7: that bar measured NO leg, so its own ledger rows are empty, and the merge
+# still carries the reused leg's row forward. Keyed on `NR == FNR` it swallowed every row as "seen".
+check_hv_value "aSS3 AC7 a bar that reused its only leg keeps that leg's ledger row" \
+  "$(awk -F'\t' '$1 == "cached" { print "kept" }' "$H6/.git/gate-ledger.tsv" 2>/dev/null)" kept
 awk -F'\t' 'BEGIN { OFS = "\t" } $1 == "cached" { $3 = "retried" } { print }' "$H6/.git/gate-ledger.tsv" > "$HV/ledger.tmp" \
   && cp "$HV/ledger.tmp" "$H6/.git/gate-ledger.tsv"
 run_hv_bar "$H6" "$HV/cached.json" GATE_REUSE=1
@@ -2948,7 +2954,7 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   rm -f "$HV_FLAG" "$HV_FLAG.done" "$HV_FLAG.hung"
   run_hv_bar "$H1" "$HV/contended.json"
   check_hv_value "AC1 the contended bar exits 0" "$HV_RC" 0
-  check_hv_line "AC1 its first timeout is deferred beside ONE neighbour" '^GATE retry  contended  \(timed out after 2s beside 1 neighbours; one serial retry after the pool drains\)$'
+  check_hv_line "AC1 its first timeout is deferred beside ONE neighbour" "^GATE retry  contended  \(timed out after 2s beside 1 neighbours; retried in the pool's tail, and alone after it drains unless that passes\)$"
   check_hv_line "AC1 its serial retry passes" '^GATE ok    contended  \(retried after timeout\)$'
   check_hv_value "AC1 the run record counts it" "$(read_hv_record "$H1" retried)" 1
   check_hv_line "AC2 its chunk closes pending, never green" '^---- chunk default: pending  '
@@ -3046,8 +3052,56 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   check_hv_value "AC11 the worker survived to write the first attempt's row, seconds and all" \
     "$(awk -F'\t' '$2 == "timeout" && $4 ~ /^[0-9]+\.[0-9]+$/ { print "written" }' "${_hvrec}0.leg" 2>/dev/null)" written
   unset HV_GC
+
+  # 9k. TOOL-aSparedSpawn-3 AC1 and AC2 — THE TAIL RELEASE. At width 2, a leg that hangs on its first
+  #     attempt and passes on any later one, beside a sleeper. Its retry starts while the sleeper still
+  #     runs, ordered by the two run-record rows and never by a clock, and the sleeper, as it ends,
+  #     lists the work dir and finds the worker's marker. The report is the serial bar's, line for line.
+  H13="$HV/r13"; build_hv_repo "$H13"
+  export HV_ONCE="$HV/once.flag" HV_PEEK="$HV/tail.peek"; rm -f "$HV_ONCE" "$HV_PEEK"
+  printf '#!/usr/bin/env bash\n[ -f "$HV_ONCE" ] && exit 0\n: > "$HV_ONCE"\nsleep 60\n' > "$H13/fx/once.sh"
+  printf '#!/usr/bin/env bash\nsleep 12\nls "$TMPDIR/.." > "$HV_PEEK" 2>/dev/null\nexit 0\n' > "$H13/fx/sleeper.sh"
+  ( cd "$H13" && git add -A && git commit -qm legs ) >/dev/null 2>&1
+  printf '[{"name": "sleeper", "argv": ["bash", "fx/sleeper.sh"]},\n {"name": "once", "argv": ["bash", "fx/once.sh"], "ceiling": 2}]\n' > "$HV/tail.json"
+  run_hv_bar "$H13" "$HV/tail.json" GATE_JOBS=2
+  _hvrec=$(ls -1td "$H13"/.git/gate-run/*/ 2>/dev/null | head -1)
+  _hvrs=$(awk -F'\t' '{ print $5 }' "${_hvrec}1.retry.leg" 2>/dev/null); _hvse=$(awk -F'\t' '{ print $6 }' "${_hvrec}0.leg" 2>/dev/null)
+  check_hv_value "aSS3 AC1 the tail retry's row starts before the sleeper's row ends ($_hvrs, $_hvse)" \
+    "$(case "$_hvrs$_hvse" in ''|*[!0-9]*) echo unread ;; *) [ "$_hvrs" -lt "$_hvse" ] && echo in-tail || echo after-drain ;; esac)" in-tail
+  check_hv_value "aSS3 AC1 the work dir held the worker's marker for the leg" "$(grep -cx '1.defer' "$HV_PEEK" 2>/dev/null)" 1
+  check_hv_value "aSS3 AC2 the report is the serial bar's: the deferral, one pass, then the retry line" \
+    "$(grep -E '^(GATE|----)' <<<"$HV_OUT" | tr '\n' '|')" \
+    "GATE ok    sleeper|GATE retry  once  (timed out after 2s beside 1 neighbours; retried in the pool's tail, and alone after it drains unless that passes)|---- chunk default: pending  (2 ran, 0 failed, 0 skipped, 0 reused, 0 held)|GATE ok    once  (retried after timeout)|---- retry: green  (1 retried, 0 failed)|----|"
+  unset HV_ONCE HV_PEEK
+
+  # 9l. TOOL-aSparedSpawn-3 AC3 — THE WALL REACHES A TAIL RETRY. A 30 s ceiling and a 50 s wall, which
+  #     fires by 55 s at its 5 s poll: the tail retry starts after the first attempt's 30 s and runs 30 s
+  #     more, so it is alive at 55 s, and it starts before 50 s whenever the release takes under about
+  #     18 s (10 to 14 s measured on node a, the worker's own post-processing included).
+  H14="$HV/r14"; build_hv_repo "$H14"
+  printf '[{"name": "sleeper", "argv": ["bash", "-c", "sleep 150"]},\n {"name": "stall", "argv": ["bash", "fx/hang.sh"], "ceiling": 30}]\n' > "$HV/tail-wall.json"
+  run_hv_bar "$H14" "$HV/tail-wall.json" GATE_JOBS=2 GATE_WALL=50
+  check_hv_line "aSS3 AC3 the breach names the leg whose tail retry it stopped" '^  still running at the wall: stall \(its serial retry\)$'
+  check_hv_value "aSS3 AC3 and no line claims a verdict for it" "$(grep -cE '^GATE (ok|FAIL) +stall ' <<<"$HV_OUT")" 0
+
+  # 9m. TOOL-aSparedSpawn-3 AC4 — A TAIL ATTEMPT THAT DOES NOT PASS DECIDES NOTHING. It is set aside as
+  #     `.tail`, and the serial retry after the drain issues today's FAIL and its HOST note.
+  H15="$HV/r15"; build_hv_repo "$H15"
+  printf '[{"name": "sleeper", "argv": ["bash", "-c", "sleep 15"]},\n {"name": "stubborn", "argv": ["bash", "fx/hang.sh"], "ceiling": 2}]\n' > "$HV/tail-fail.json"
+  rm -f "$HV/nofloor"   # an earlier bar wrote its floor there, and HOST must stay unread here
+  run_hv_bar "$H15" "$HV/tail-fail.json" GATE_JOBS=2 GATE_SPAWN_FLOOR="$HV/nofloor"
+  check_hv_value "aSS3 AC4 one FAIL line, the serial wording and the serial attempt's HOST note" \
+    "$(grep -cxF <<<"$HV_OUT" 'GATE FAIL  stubborn  (timed out after 2s, again on its serial retry; no spawn floor is recorded for this clone, so HOST was not measured)')" 1
+  _hvrec=$(ls -1td "$H15"/.git/gate-run/*/ 2>/dev/null | head -1)
+  _hvse=$(awk -F'\t' '{ print $6 }' "${_hvrec}0.leg" 2>/dev/null)
+  _hvts=$(awk -F'\t' '$2 == "timeout" { print $5 }' "${_hvrec}1.tail.leg" 2>/dev/null)
+  _hvrs=$(awk -F'\t' '{ print $5 }' "${_hvrec}1.retry.leg" 2>/dev/null)
+  check_hv_value "aSS3 AC4 the set-aside tail attempt timed out beside the sleeper ($_hvts, $_hvse)" \
+    "$(case "$_hvts$_hvse" in ''|*[!0-9]*) echo unread ;; *) [ "$_hvts" -lt "$_hvse" ] && echo in-tail || echo after-drain ;; esac)" in-tail
+  check_hv_value "aSS3 AC4 the deciding attempt started after the drain ($_hvrs, $_hvse)" \
+    "$(case "$_hvrs$_hvse" in ''|*[!0-9]*) echo unread ;; *) [ "$_hvrs" -ge "$_hvse" ] && echo after-drain || echo in-tail ;; esac)" after-drain
 else
-  n=$((n+30))
+  n=$((n+38))
   echo "canary: SKIP the ceiling arms of section 9 — this host has no runnable 'timeout -k', so no ceiling can fire and nothing can be deferred, retried or read HOST here"
 fi
 rm -rf "$HV" 2>/dev/null || true

@@ -146,7 +146,8 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=129
+FLOOR_ASSERTIONS=131
+# RAISED 129 -> 131 by TOOL-aSparedSpawn-3: the dispatch-prior arms, AC5 and AC6, one assertion each.
 # RAISED 115 -> 129 by TOOL-aSparedSpawn-1: the content-keyed reuse arms, AC1 to AC6, fourteen assertions.
 # MERGED 112 / 87 -> 115 at the reconcile with origin/main 290d0d2d5: base 84, plus this branch's 28, plus main's 3.
 # RAISED 110 -> 112 by TOOL-aGraftedHelix-7: AC10's two assertions over a reading taken during a memory pause.
@@ -826,6 +827,28 @@ if command -v timeout >/dev/null 2>&1; then
 else
   skipped "AC12 no runnable timeout here, so no ceiling fires and the retry row went UNEXERCISED"
 fi
+
+# --- TOOL-aSparedSpawn-3 AC5, AC6: a leg the ledger has no seconds for dispatches by its prior -----
+# AC5: no ledger and a kit-dir ceiling-evidence.txt at three different maxima, so the header's
+# dispatch key lists the legs largest first, not in manifest order. AC6: a ledger row outranks the
+# evidence for its leg, and a leg with neither sorts by its ceiling over the median
+# ceiling-to-reading ratio (20/1, 50/5 and 30/3 give 10, so a 40 s ceiling reads 4), never as zero.
+rec_repo
+printf '# fixture\na\t1.0\t1\ta\t2026-10-12\trunner\nb\t5.0\t1\ta\t2026-10-12\trunner\nc\t3.0\t1\ta\t2026-10-12\trunner\n' \
+  > "$REC_T/${PFX}${KIT}/ceiling-evidence.txt"
+rec_legs '[ {"name": "a", "argv": ["bash", "fx/a.sh"]}, {"name": "b", "argv": ["bash", "fx/a.sh"]}, {"name": "c", "argv": ["bash", "fx/a.sh"]} ]'
+rc=$(rec_run GATE_FULL=1)
+pr_got=$(awk -F'\t' '$1 == "dispatch" { print $2 }' "$(rec_dir)/header" 2>/dev/null)
+[ "$pr_got" = "1 2 0" ] && ok "AC5 with no ledger the evidence orders dispatch largest first" \
+  || nope "AC5 the dispatch key reads '$pr_got', wanted '1 2 0' (b, c, a)"
+rec_legs '[ {"name": "a", "argv": ["bash", "fx/a.sh"], "ceiling": 20}, {"name": "b", "argv": ["bash", "fx/a.sh"], "ceiling": 50},
+  {"name": "c", "argv": ["bash", "fx/a.sh"], "ceiling": 30}, {"name": "d", "argv": ["bash", "fx/a.sh"], "ceiling": 40} ]'
+printf 'a\t10.0\tok\t-\t0\n' > "$REC_GD/gate-ledger.tsv"
+rc=$(rec_run GATE_FULL=1)
+pr_got=$(awk -F'\t' '$1 == "dispatch" { print $2 }' "$(rec_dir)/header" 2>/dev/null)
+[ "$pr_got" = "0 1 3 2" ] && ok "AC6 the ledger places its leg, and a ceiling-only leg sorts by its scaled ceiling" \
+  || nope "AC6 the dispatch key reads '$pr_got', wanted '0 1 3 2' (a by the ledger, b, d by 40/10, c)"
+rec_done
 # `derive_foreign`, SLICED out of the runner, over a census of one `unknown` and one `2` inside the
 # window; the zeros-only and unknown-only controls are what stop a constant answer passing. The
 # fourth census holds its one sample 15 s BEFORE the leg starts, inside the three-period reach at a

@@ -43,16 +43,22 @@ the TERM — is not failed on the spot, because a bar under its own concurrency 
 a fraction of the time alone. It is printed in its manifest position as
 
 ```
-GATE retry  <leg>  (timed out after <n>s beside <k> neighbours; one serial retry after the pool drains)
+GATE retry  <leg>  (timed out after <n>s beside <k> neighbours; retried in the pool's tail, and alone after it drains unless that passes)
 ```
 
 where `<k>` counts the legs that were running when it timed out. Its chunk closes `pending`, never
-`green`. After the pool drains, and inside the run's wall, each such leg runs once more ALONE under its
-own ceiling and prints its final line: `GATE ok    <leg>  (retried after timeout)`, which counts green,
-or `GATE FAIL  <leg>  (timed out after <n>s, again on its serial retry; …)`, whose note says whether
-HOST was read and why not. One `---- retry: <green|RED|HOST|killed>  (<n> retried, <m> failed)` line
-follows. Any other 137 — a self-kill, an OOM kill, an operator's or a CI cancel, under a bound or with
-none — is an ordinary failure and is never retried; nor is an assertion failure.
+`green`. The worker that saw the ceiling fire leaves a `<i>.defer` marker in the work dir, and once
+every first attempt is dispatched the pool starts that leg's retry as soon as at most one other job
+runs: the pool's TAIL, where the floor leg runs alone and the other slots sit idle. A tail retry that
+passes is final. One that does not decides nothing: its files are set aside as `<i>.tail.*` and,
+after the pool drains and inside the run's wall, the leg runs once more ALONE under its own ceiling,
+as does a deferred leg the tail never reached. Each retried leg prints its final line after the drain,
+in the order it was deferred: `GATE ok    <leg>  (retried after timeout)`, which counts green, or
+`GATE FAIL  <leg>  (timed out after <n>s, again on its serial retry; …)`, whose note says whether
+HOST was read and why not, so a red verdict and a HOST reading always come from an attempt that ran
+alone. One `---- retry: <green|RED|HOST|killed>  (<n> retried, <m> failed)` line follows. Any other
+137 — a self-kill, an OOM kill, an operator's or a CI cancel, under a bound or with none — is an
+ordinary failure and is never retried; nor is an assertion failure.
 
 **HOST is a ratio, never a wall clock.** Each bar with a bounded leg to run times ten spawns of one
 external binary and keeps the lowest figure this clone has ever measured in `gate-spawn-floor` under
@@ -67,8 +73,9 @@ calling it another tenant. A descendant that left that group on its own is invis
 (make the verdict write fail) are arm seams for the suites, not conf keys: the runner unsets each
 once read, and the pre-push hook clears all three before the bar it runs.
 
-The records keep both attempts: the first attempt's `<i>.leg` row reads `timeout` and a
-`<i>.retry.leg` row sits beside it, the verdict file gains `retried <n>`, and the ledger row takes the
+The records keep every attempt: the first attempt's `<i>.leg` row reads `timeout` and a
+`<i>.retry.leg` row sits beside it, with a set-aside tail attempt's `<i>.tail.leg` between them when
+there was one, the verdict file gains `retried <n>`, and the ledger row takes the
 retry's seconds with the status `retried`, which reuse never accepts. The drift report sums `retried`
 across the run records as `legs_retried_after_timeout`.
 
@@ -419,7 +426,14 @@ it costs no process beyond the one `mkdir` a clone's first bar pays for the jour
 
 `<git-dir>/gate-ledger.tsv` is the cross-run store: one row per leg, with the duration in field 2 —
 which is what lets the runner read it as a dispatch hint and `profile_bar.py` read it as a
-measurement, with no second copy of the same fact.
+measurement, with no second copy of the same fact. A run carries forward every row it did not
+measure, so a bar that reused or skipped every leg leaves the store as it found it.
+
+Dispatch is longest-first, and a leg the ledger holds no row for is placed by a PRIOR: the largest
+reading `ceiling-evidence.txt` beside the runner records for it, else its declared `ceiling` divided
+by the median ceiling-to-reading ratio over the legs carrying both (re-derived every bar), else 0. So
+a new worktree, which has no ledger, still starts its heaviest legs first. The order is advisory and
+never moves a verdict; the run header's `dispatch` key records the one a bar used.
 
 `<git-dir>/gate-full-green` is stamped only when the run failed nothing, skipped nothing, reused
 nothing, the tree did not move, AND the tree was CLEAN when the run started. CLEAN means
