@@ -42,7 +42,9 @@ owner's prose is the mandate, recorded under [prompts/](prompts/2026-10-11-promp
 
 ## Parked decisions
 
-None yet.
+- **The unattended self-tests are owed** (owner, 2026-10-11: not run this session). The pooled run refused: no pooled
+  calibration reading on node a for the 8 driver selftest shards. Run `--selftests --pooled` after
+  calibrating, or `--selftests --serial --attribute 69e0ff0f`, from the merged tree.
 
 <!-- roster:units -->
 
