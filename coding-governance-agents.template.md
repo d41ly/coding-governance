@@ -46,8 +46,36 @@ gate or protocol named in section 3 carries the detail.*
 - [tools] Rely on the tools in section 3 before re-deriving anything they answer, and read a tool's refusal rather than routing around it.
 - [voice] Voice: dry, snarky, faintly sarcastic and genuinely friendly; wit never bends a fact, and bad news is delivered straight.
 - [signal] Work reports carry signal, not narration: payload first, one idea per sentence, nothing said twice, and every caveat in a sentence of its own.
-- [formats] The micro-formats in section 3 are mandatory for the events they name and emitted byte-for-byte; they are not negotiable.
+- [formats] The micro-formats below are NON-NEGOTIABLE: every final message carries them, byte-for-byte, for every event it reports; no length, voice or brevity rule overrides them.
 - [default] When nothing here covers it: verify over assert, gate over remember, derive over author, delete over disable, one fact in one place.
+<!-- /one-line -->
+
+### Micro-formats — non-negotiable, in every final message
+
+<!-- microformats -->
+- `committed — <sha> · <branch> · <subject>`
+- `pushed — <remote>/{{DEFAULT_BRANCH}} · <old>..<new> · ff · <n> commits`
+- `merged — --no-ff <branch> → {{DEFAULT_BRANCH}} · <sha>[ · post-merge gates GREEN]`
+- `gates — GREEN · <leg> · <leg> …`
+- `skipped — <leg> · <why>`
+- `up — <service> :<port> · <tree> · admin <user> · pw <pw-or-where-it-lives>`
+- `READY — <slug> · node <tag> · <branch> · base <sha> · Tier-<n> · gates <list>`
+- `BUILD — <slug> · Tier-<n> · <done>/<total> <step> · left <ids|none|unspecced>`
+- `SPEC — [<unit-id>](<path>) · review <ids|none>[ · open <ids|none>]`
+- `unchanged — since <link> · delta <text|none>`
+- `⏳ — <what is running>`
+<!-- /microformats -->
+
+<!-- one-line -->
+- [never-omit] Every final message ends with the state block, short answers and conversation included; repeating it is not saying a thing twice, and omitting it is a defect.
+- [events] Each event in the turn gets its shape: a commit `committed`, a push `pushed`, a merge `merged`, a bar run `gates` or `skipped`, a server `up`, a kickoff `READY`, a long run `⏳`.
+- [r1] Emit each shape as a bare `- ` list item at column 0: no backticks, fence, bold or heading, and one shape per line.
+- [grammar] A shape is a head keyword, the ` — ` joiner and fields separated by ` · `; `[ · …]` marks an optional trailing field and never appears in an emission.
+- [pair] `BUILD` then `SPEC` sit adjacent in the state block of every final message while a build is in progress, one-line replies included; before a spec exists, `SPEC` is omitted.
+- [fields] `SPEC`'s link label is the unit id, `BUILD`'s Tier is the current step's, and `review` and `open` count Tier-2 units build-wide.
+- [gates-line] The `gates` line names every leg the gate manifest defines; a leg not run is a `skipped` line, and a failed leg is prose above everything.
+- [state] A final message opens with its highest-severity item and ends with ONE state block: branch, shas, gates and servers.
+- [links] Cite files as `[text](path)` links, forward-slashed and resolved from the session's working directory.
 <!-- /one-line -->
 
 ## 2. This repository
@@ -150,29 +178,3 @@ gate or protocol named in section 3 carries the detail.*
 - **Toolchain:** {{TOOLCHAIN_NOTES}}.
 <!-- /when:cross-os -->
 - **Commit trailer:** every agent commit ends with `{{COMMIT_TRAILER}}`.
-
-## Micro-formats
-
-<!-- microformats -->
-- `committed — <sha> · <branch> · <subject>`
-- `pushed — <remote>/{{DEFAULT_BRANCH}} · <old>..<new> · ff · <n> commits`
-- `merged — --no-ff <branch> → {{DEFAULT_BRANCH}} · <sha>[ · post-merge gates GREEN]`
-- `gates — GREEN · <leg> · <leg> …`
-- `skipped — <leg> · <why>`
-- `up — <service> :<port> · <tree> · admin <user> · pw <pw-or-where-it-lives>`
-- `READY — <slug> · node <tag> · <branch> · base <sha> · Tier-<n> · gates <list>`
-- `BUILD — <slug> · Tier-<n> · <done>/<total> <step> · left <ids|none|unspecced>`
-- `SPEC — [<unit-id>](<path>) · review <ids|none>[ · open <ids|none>]`
-- `unchanged — since <link> · delta <text|none>`
-- `⏳ — <what is running>`
-<!-- /microformats -->
-
-<!-- one-line -->
-- [r1] Emit each shape as a bare `- ` list item at column 0: no backticks, fence, bold or heading, and one shape per line.
-- [grammar] A shape is a head keyword, the ` — ` joiner and fields separated by ` · `; `[ · …]` marks an optional trailing field and never appears in an emission.
-- [pair] `BUILD` then `SPEC` sit adjacent in the state block of every final message while a build is in progress; before a spec exists, `SPEC` is omitted.
-- [fields] `SPEC`'s link label is the unit id, `BUILD`'s Tier is the current step's, and `review` and `open` count Tier-2 units build-wide.
-- [gates-line] The `gates` line names every leg the gate manifest defines; a leg not run is a `skipped` line, and a failed leg is prose above everything.
-- [state] A final message opens with its highest-severity item and ends with ONE state block: branch, shas, gates and servers.
-- [links] Cite files as `[text](path)` links, forward-slashed and resolved from the session's working directory.
-<!-- /one-line -->
