@@ -192,20 +192,25 @@ check_quiet() { # root -> rc 0 once no foreign bar runs, 1 after QUIET_MAX secon
 }
 
 cmd_plan() { # root order
-  local root=$1 order=$2 step arm rep v
+  local root=$1 order=$2 step arm rep v try rc
   # No bar knob of the calling shell reaches an arm: each arm sets the two it means, and the hold
   # exports the holder nonce itself.
   for v in $(compgen -v GATE_); do unset "$v"; done
   export AB_ROOT_PID=$$
   for step in $order; do
     arm=${step%?}; rep=${step#?}
-    printf '%s\t%s\t%s\tHOLD\n' "$(date +%s)" "$arm" "$rep" >> "$root/plan.log"
     # THE HOLD COMES FIRST, the quiet wait inside it (`cmd_held`). The hold is the clone runner's: it
     # takes the host turnstile like a bar, so every bar from a runner that knows the host turnstile
     # queues behind the arm from this moment, and the quiet wait only has to outlast the bars already
-    # running and those from older runners. Both of the arm's bars NEST under the hold.
-    (cd "$root/c1" && bash tools/run-gates/run-gates.sh --hold -- bash "$SELF" held "$root" "$arm" "$rep") >> "$root/plan.log" 2>&1
-    printf '%s\t%s\t%s\tDONE\trc %s\n' "$(date +%s)" "$arm" "$rep" "$?" >> "$root/plan.log"
+    # running and those from older runners. Both of the arm's bars NEST under the hold. A hold that
+    # failed open comes back 3 and is taken again, at most three times.
+    for try in 1 2 3; do
+      printf '%s\t%s\t%s\tHOLD\ttry %s\n' "$(date +%s)" "$arm" "$rep" "$try" >> "$root/plan.log"
+      (cd "$root/c1" && bash tools/run-gates/run-gates.sh --hold -- bash "$SELF" held "$root" "$arm" "$rep") >> "$root/plan.log" 2>&1
+      rc=$?
+      printf '%s\t%s\t%s\tDONE\trc %s\n' "$(date +%s)" "$arm" "$rep" "$rc" >> "$root/plan.log"
+      [ "$rc" = 3 ] || break
+    done
   done
   printf '%s\tPLAN\tDONE\n' "$(date +%s)" >> "$root/plan.log"
 }
@@ -213,8 +218,18 @@ cmd_plan() { # root order
 # Under the hold: wait for the bars already running to finish, bounded by QUIET_MAX, record which,
 # then run the arm. QUIET_MAX defaults to an hour here, below the queue's two-hour bound, so a bar
 # queued behind this hold does not fail open and join the arm it was queued to stay out of.
+# A HOLD THAT FAILED OPEN HOLDS NOTHING. The runner exports `GATE_TURNSTILE_HOLDER` only on a real
+# hold; after a `WAIT EXPIRED` it runs the command unqueued with no nonce, so the arm's bars would not
+# nest and the second would queue behind the first: B1 of the second launch ran SERIALLY that way for
+# 80 minutes before it was caught. So the arm runs only when the nonce names the live slot-1 beacon,
+# and otherwise this exits 3 for the plan to retry the hold.
 cmd_held() { # root arm rep
-  local root=$1 arm=$2 rep=$3 q=quiet
+  local root=$1 arm=$2 rep=$3 q=quiet live
+  live=$(cat "${GATE_TURNSTILE_DIR:-$HOME/.gov/gate-turnstile}/gate-bar-beacon/nonce" 2>/dev/null)
+  if [ -z "${GATE_TURNSTILE_HOLDER:-}" ] || [ "$live" != "$GATE_TURNSTILE_HOLDER" ]; then
+    printf '%s\t%s\t%s\tNOT-HELD\n' "$(date +%s)" "$arm" "$rep"
+    return 3
+  fi
   QUIET_MAX=${QUIET_MAX_HELD:-3600}
   check_quiet "$root" || q=noisy
   printf '%s\t%s\t%s\tQUIET\t%s\n' "$(date +%s)" "$arm" "$rep" "$q"
