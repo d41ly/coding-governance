@@ -303,10 +303,37 @@ else
   i=0; while [ "$i" -le "$lagbound" ]; do i=$((i+1)); echo "lag $i" >> lagfile.txt; git add -A >/dev/null 2>&1; git commit -qm "lag $i" >/dev/null 2>&1; done
   stamp "$base_sha"
   case "$(decide)" in
-    *"FULL gate"*"commits behind the tip"*) ok "12 a record more than GATE_FULL_MAX_LAG=$lagbound commits back → FULL" ;;
+    *"FULL gate"*"first-parent landings behind the tip"*) ok "12 a record more than GATE_FULL_MAX_LAG=$lagbound first-parent landings back → FULL" ;;
     *) bad "12 a stale-by-lag record did not force a full run" ;;
   esac
 fi
+
+# --- 12b: the lag is counted in FIRST-PARENT LANDINGS (TOOL-aFrugalTurnstile-1 AC1; arm 12 is AC2) ---
+# A green at a branch tip, then main takes a 12-commit --no-ff landing, then the branch lands --no-ff.
+# All-commit counting charged the green 14 for that and forced FULL; first-parent counting charges the
+# two landings plus decide's own commit. Arm 12 above keeps the linear run past the bound forcing.
+git checkout -q -b ft-feat >/dev/null 2>&1
+echo f > ftfeat.txt; git add ftfeat.txt >/dev/null 2>&1; git commit -qm "ft feat" >/dev/null 2>&1
+stamp "$(git rev-parse HEAD)"
+git checkout -q main >/dev/null 2>&1; git checkout -q -b ft-side >/dev/null 2>&1
+for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
+  echo "$i" > ftside.txt; git add ftside.txt >/dev/null 2>&1; git commit -qm "ft side $i" >/dev/null 2>&1
+done
+git checkout -q main >/dev/null 2>&1
+git merge -q --no-ff -m "land ft-side" ft-side >/dev/null 2>&1
+git merge -q --no-ff -m "land ft-feat" ft-feat >/dev/null 2>&1
+case "$(decide)" in
+  *"scoped gate"*"first-parent landing(s) back"*) ok "12b a branch green landed after a 12-commit landing scopes, counted in first-parent landings" ;;
+  *) bad "12b a branch green behind two first-parent landings did not scope" ;;
+esac
+
+# --- 12c: a record earned on ANOTHER leg manifest (TOOL-aFrugalTurnstile-1 AC3) -----------------
+stamp "$(git rev-parse HEAD)"
+printf 'manifest\t%s\n' elsewhere/legs.json >> "$(git rev-parse --git-dir)/gate-full-green"
+case "$(decide)" in
+  *"FULL gate"*"leg manifest elsewhere/legs.json"*"reads gate-legs.json"*) ok "12c a record naming a foreign manifest → FULL, naming both manifests" ;;
+  *) bad "12c a record earned on elsewhere/legs.json did not force FULL with both paths named" ;;
+esac
 
 # --- the pushed diff touches the leg manifest -------------------------------------------------
 stamp "$(git rev-parse HEAD)"
@@ -420,6 +447,18 @@ if ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD="bash tracked-bar.sh" git push -q ori
 else
   bad "25 a tracked bar was refused, so 26-27 prove only that the hook refuses everything"
 fi
+
+# 25b — a tracked bar that is NOT this kit's runner adopts no runner stamp (TOOL-aFrugalTurnstile-1
+#       AC4): a green the runner earned proves the runner's legs, never this bar's. The stamp is at the
+#       tip and otherwise valid, so before the unit this push scoped.
+git commit -q --allow-empty -m c25b >/dev/null 2>&1
+stamp "$(git rev-parse HEAD)"
+git commit -q --allow-empty -m c25b2 >/dev/null 2>&1
+line=$( ( unset GOV_GATE_CMD_TEST; GOV_GATE_CMD="bash tracked-bar.sh" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true )
+case "$line" in
+  *"FULL gate"*"is not this kit's runner"*) ok "25b a non-runner bar forces FULL and names why no runner stamp is a candidate" ;;
+  *) bad "25b a runner stamp was a candidate for a bar that is not the runner: ${line:-<no decision line>}" ;;
+esac
 
 # 26 — an UNTRACKED bar is refused. $green lives under mktemp, so it is untracked by construction —
 #      the same shape every stub in this file has. GREEN, not red, deliberately: with a red stub the
@@ -865,9 +904,15 @@ esac
 
 # A direct green run writes the ledger row; the push then runs over the SAME tree and base, so on the
 # old hook the row's key matched and the red leg was never executed.
+# RE-STAGED BY TOOL-aFrugalTurnstile-4 S9: the row is earned WITHOUT GATE_FULL, so its `full` field is
+# empty. The hook now exports GATE_REUSE=lineage on its own FULL decision, and a row a full run earned
+# would be reused there, because this leg's verdict depends on H49_LEG_RC, which no input key sees:
+# the not-checked class of the runner's reuse block, staged on purpose. An empty `full` keeps this arm
+# testing what it names — `GATE_REUSE=1` semantics would reuse the row, lineage refuses it, and the
+# red leg runs.
 git commit -q --allow-empty -m "h49 GATE_REUSE"
 ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST
-  env GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 GATE_FULL=1 H49_LEG_RC=0 bash "$RUN_GATES/run-gates.sh" >/dev/null 2>&1 )
+  env -u GATE_FULL GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 H49_LEG_RC=0 bash "$RUN_GATES/run-gates.sh" >/dev/null 2>&1 )
 _out=$(run_h49_push GATE_REUSE=1); _rc=$?
 case "$_rc|$(read_h49_token)" in
   0\|*) bad "H49 GATE_REUSE from the environment reused a green row over the RED leg: $_out" ;;
@@ -886,6 +931,80 @@ case "$_rc|$(read_h49_token)|$(read_h49_mark ignored)|$_out" in
   *"|bar-refused||"*gate-legs.json*) ok "H49 an ignored leg manifest is refused as bar-refused before the bar reads it" ;;
   *) bad "H49 expected the ignored manifest to be refused as bar-refused, got rc=$_rc token '$(read_h49_token)': $_out" ;;
 esac
+
+# --- TOOL-aFrugalTurnstile-4 S7: LINEAGE REUSE AT THE BOUNDARY. On a FULL decision for this kit's
+# --- runner the hook exports GATE_REUSE=lineage itself, after the scrub, so the push that fixes a red
+# --- re-runs the failed leg and the legs whose key moved, and lands on a stamp that says `reused 1`.
+# --- No other bar gets the mode. A COPY OF THE REAL RUNNER again, for H49's reason: three legs, `pa`
+# --- guarded on ga/, `pb` guarded on gb/ and red until gb/f says fixed, `pu` unguarded.
+lin="$tmp/lin"; mkdir -p "$lin/hooks"
+cp "$SRC/.githooks/pre-push" "$lin/hooks/pre-push"
+git init -q --bare "$lin/remote.git"; git init -q "$lin/work"
+cd "$lin/work" || exit 2
+git config user.email t@example.com; git config user.name t; git config core.autocrlf false
+git config core.hooksPath "$lin/hooks"
+mkdir -p "$RUN_GATES" fx ga gb
+cp "$SRC/$RUN_GATES_DIR/run-gates.sh" "$SRC/$RUN_GATES_DIR/gate-fingerprint.sh" \
+   "$SRC/$RUN_GATES_DIR/gate-profiles.txt" "$RUN_GATES/"
+printf '#!/usr/bin/env bash\necho a\n' > fx/a.sh
+printf '#!/usr/bin/env bash\ngrep -q fixed gb/f\n' > fx/b.sh
+printf '#!/usr/bin/env bash\necho u\n' > fx/u.sh
+echo x > ga/f; echo broken > gb/f
+printf '%s\n' '[' \
+  '  {"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
+  '  {"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]},' \
+  '  {"name": "pu", "argv": ["bash", "fx/u.sh"]}' \
+  ']' > gate-legs.json
+git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+git remote add origin "$lin/remote.git"
+lin_gd=$(cd "$(git rev-parse --git-dir)" && pwd)
+touch "$lin_gd/push-main-active"
+run_lin_push() { # NAME=VALUE... -> the output of a push of HEAD; the default bar unless the caller names one
+  ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST
+    env GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 "$@" git push -q origin main 2>&1 )
+}
+read_lin_token() { cut -f1 "$lin_gd/pre-push-refusal" 2>/dev/null; }
+read_lin_reused() { awk -F'\t' '$1 == "reused" { print $2 }' "$lin_gd/gate-full-green" 2>/dev/null; }
+
+_out=$(run_lin_push); _rc=$?
+case "$_rc|$(read_lin_token)|$_out" in
+  *"|gate-red|"*"reuse: lineage"*"GATE FAIL  pb"*) ok "LIN AC11 control — the red push is FULL with reuse: lineage, and pb refuses it" ;;
+  *) bad "LIN AC11 control expected a FULL lineage push refused as gate-red on pb, got rc=$_rc token '$(read_lin_token)': $_out" ;;
+esac
+# AC12's inherited arm rides the fix push: an exported GATE_REUSE=1 is still named as not honoured,
+# and the mode the bar receives is the hook's own lineage.
+echo fixed > gb/f; git add -A; git commit -q -m "lin fix"; rm -f "$lin_gd/pre-push-refusal"
+_out=$(run_lin_push GATE_REUSE=1); _rc=$?
+case "$_rc|$(read_lin_reused)|$_out" in
+  "0|1|"*"not honoured from the environment by this bar:"*GATE_REUSE*"— reuse: lineage"*"GATE reuse pa  "*)
+    ok "LIN AC11 the fix push reuses pa from the red run's ledger, lands, and stamps reused 1" ;;
+  *) bad "LIN AC11 expected the fix push to reuse pa, land and stamp reused 1, got rc=$_rc reused '$(read_lin_reused)': $_out" ;;
+esac
+case "$_out" in
+  *"GATE ok    pb"*"GATE ok    pu"*) ok "LIN AC11 control — the fixed leg and the unguarded leg executed on that push" ;;
+  *) bad "LIN AC11 control expected pb and pu to execute on the fix push: $_out" ;;
+esac
+
+# AC12: the declared STUB gets no mode and no clause.
+git commit -q --allow-empty -m "lin stub"; rm -f "$lin_gd"/gate-*green*
+printf '#!/usr/bin/env bash\nexit 0\n' > "$lin/stub.sh"
+_out=$(run_lin_push GOV_GATE_CMD_TEST=1 GOV_GATE_CMD="bash $lin/stub.sh"); _rc=$?
+case "$_rc|$_out" in
+  *"reuse: lineage"*) bad "LIN AC12 the STUB bar's FULL line carries reuse: lineage: $_out" ;;
+  "0|"*"FULL gate on main push"*"bar: STUB"*) ok "LIN AC12 the STUB bar's FULL line names no reuse mode" ;;
+  *) bad "LIN AC12 expected a FULL STUB push with no reuse clause, got rc=$_rc: $_out" ;;
+esac
+# AC12: a declared GATE_CMD naming another tracked script never receives the mode.
+printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_REUSE-unset}" > "%s/other-saw"\nexit 0\n' "$lin" > other-bar.sh
+printf 'GATE_CMD="bash other-bar.sh"\n' > .unattended.conf
+git add -A; git commit -q -m "lin other"; rm -f "$lin_gd"/gate-*green*
+_out=$(run_lin_push GOV_GATE_CMD="bash other-bar.sh"); _rc=$?
+case "$_rc|$(cat "$lin/other-saw" 2>/dev/null)|$_out" in
+  *"reuse: lineage"*) bad "LIN AC12 a non-runner bar's FULL line carries reuse: lineage: $_out" ;;
+  "0|unset|"*) ok "LIN AC12 a declared non-runner bar runs with GATE_REUSE unset" ;;
+  *) bad "LIN AC12 expected the declared bar to run with GATE_REUSE unset, got rc=$_rc saw '$(cat "$lin/other-saw" 2>/dev/null)': $_out" ;;
+esac
+cd "$pfx_home" || exit 2
 # ---- TOOL-dDerivedDocket-24: THE INHERITED-RED POLICY, READ AT R ---------------------------------
 # A scratch repo whose `.githooks/gate-env.sh` at the pushed remote tip R declares the policy under
 # test, and a stub gate that writes the run record a real runner would: a RED verdict and one
@@ -1241,7 +1360,9 @@ cd "$pfx_home" || exit 2
 #     only (TOOL-dLadderedRemote-2), and the hook sets GATE_BASE or GATE_FULL=1 on every path, either
 #     of which outranks that base. The runner takes the OBSERVED branch, so GOV_DEFAULT_BRANCH selects
 #     nothing there even when it is read (TOOL-dLadderedRemote-5).
-BAR_INERT_KNOBS="GOV_REMOTE GOV_DEFAULT_BRANCH GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_HELD GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+#   GATE_TURNSTILE_DIR — where the host beacon and queue live; it decides contention only, as GATE_TURNSTILE=0 does (TOOL-aFrugalTurnstile-5 F1).
+#   GATE_TURNSTILE_HOLDER — a holder's nonce; scrubbing it would queue a pushing leg behind its own parent bar (TOOL-aFrugalTurnstile-5 F1).
+BAR_INERT_KNOBS="GOV_REMOTE GOV_DEFAULT_BRANCH GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
 read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
 check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
   local knobs cleared scrubbed k n
@@ -1523,7 +1644,7 @@ _lag=$(grep -m1 -oE 'GATE_FULL_MAX_LAG=[0-9]+' "$SRC/.githooks/pre-push" | grep 
 for _i in $(seq 0 "${_lag:-10}"); do printf '%s\n' "$_i" > notes/a.md; git commit -qam "lag $_i"; done
 _o=$(run_docs_push)
 case "$_o" in
-  *"FULL gate on main push"*"doc-only, but"*"commits behind"*) ok "DOCS AC7 the lag bound still forces FULL on a doc-only push, and says so" ;;
+  *"FULL gate on main push"*"doc-only, but"*"first-parent landings behind"*) ok "DOCS AC7 the lag bound still forces FULL on a doc-only push, and says so" ;;
   *) bad "DOCS AC7 expected FULL with doc-only, but and the lag reason, got: $_o" ;;
 esac
 # AC8: an exported GATE_DOCS_BASE never reaches the bar of a push that is not doc-only.
@@ -1604,6 +1725,622 @@ case "$(cat "$tmp/docs-wt.out")" in
   *"scoped gate on main push"*"from the common dir's gate-full-green "*) ok "DOCS L3b a linked worktree adopts the primary's stamp and names it" ;;
   *) bad "DOCS L3b expected the common dir's own stamp adopted, got: $(cat "$tmp/docs-wt.out")" ;;
 esac
+cd "$pfx_home" || exit 2
+
+# ---- TOOL-aSignalledHook-1: A SIGNAL REFUSES THE PUSH ----------------------------------------------
+# On Git for Windows a hook that DIES by a signal reads to git as success, and 69e0ff0f landed that way
+# with its bar queued. The hook now traps every catchable signal and refuses through an ordinary exit.
+# A TRACKED stub runner at the runner's own path, so the push takes the default bar exactly as a
+# lander's does. It records its own pid and its parent's — the hook's bash, which spawned it — then
+# sleeps like a bar queued in the turnstile, or exits with the status SG_MODE names.
+# WHAT THIS DOES NOT CHECK: a KILL, which no process can trap. push-main.test.sh grades the lander's
+# half of that, the push git calls successful with no allow record.
+build_sg_fixture() { # tag · gate-env body (printf %b) -> a pushed main carrying the stub runner; cwd moves into it
+  local d="$tmp/sg-$1"
+  mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
+  # A HOOK THAT IS NOT THERE LANDS EVERY PUSH, which reads exactly like the fail-open this block
+  # grades. Measured while building it: a mangled copy path left the hooks dir empty and every arm
+  # "landed". So the arm refuses to grade a fixture whose hook is missing.
+  [ -s "$d/hooks/pre-push" ] || { bad "SG fixture $1 has no hook at $d/hooks/pre-push, so nothing below is graded"; return 1; }
+  git init -q --bare "$d/remote.git"; git init -q "$d/work"
+  cd "$d/work" || return 1
+  git config user.email t@example.com; git config user.name t
+  git config core.hooksPath "$d/hooks"
+  mkdir -p "$KIT_REL/$RUN_GATES" .githooks
+  printf "GOV_KITROOT=%s\n$2" "$KIT_REL" > .githooks/gate-env.sh
+  printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
+  cat > "$KIT_REL/$RUN_GATES/run-gates.sh" <<'SGSTUB'
+#!/usr/bin/env bash
+[ -n "${SG_READY:-}" ] && { echo "$$ $PPID" > "$SG_READY.tmp" && mv "$SG_READY.tmp" "$SG_READY"; }
+case "${SG_MODE:-sleep}" in
+  sleep) exec sleep 30 ;;
+  *) exit "$SG_MODE" ;;
+esac
+SGSTUB
+  git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+  git remote add origin "$d/remote.git"
+  touch "$(git rev-parse --git-dir)/push-main-active"
+  GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
+}
+read_sg_tip() { git ls-remote origin refs/heads/main | cut -f1; }
+read_sg_token() { cut -f1 "$(git rev-parse --git-dir)/pre-push-refusal" 2>/dev/null; }
+# run_sg_signal <signal> -> SG_RC SG_SECS SG_BAR, after sending it to the hook once the stub bar runs.
+# SG_SECS runs from the signal to the push's end, never from the push's start: the hook vets for a
+# minute before any bar on a loaded host, and that is not the delay AC2 is about.
+run_sg_signal() {
+  local ready="$tmp/sg-ready" i pids hp bp t0
+  rm -f "$ready" "$tmp/sg.rc"
+  git commit -q --allow-empty -m "sg $1"
+  ( env -u GOV_GATE_CMD -u GOV_GATE_CMD_TEST GATE_SELFTESTS= SG_READY="$ready" git push origin main \
+      >"$tmp/sg.out" 2>&1; echo $? > "$tmp/sg.rc" ) &
+  i=0; while [ ! -s "$ready" ] && [ "$i" -lt 600 ]; do sleep 0.1; i=$((i + 1)); done
+  pids=$(cat "$ready" 2>/dev/null); bp=${pids%% *}; hp=${pids#* }
+  t0=$SECONDS
+  [ -n "$hp" ] && kill -"$1" "$hp" 2>/dev/null
+  i=0; while [ ! -s "$tmp/sg.rc" ] && [ "$i" -lt 600 ]; do sleep 0.1; i=$((i + 1)); done
+  SG_RC=$(cat "$tmp/sg.rc" 2>/dev/null); SG_SECS=$((SECONDS - t0))
+  i=0; while kill -0 "${bp:-0}" 2>/dev/null && [ "$i" -lt 50 ]; do sleep 0.1; i=$((i + 1)); done
+  SG_BAR=stopped; kill -0 "${bp:-0}" 2>/dev/null && { SG_BAR=running; kill "$bp" 2>/dev/null; }
+  [ -n "$pids" ] || SG_BAR=never-started
+  wait 2>/dev/null
+}
+build_sg_fixture sig '' || bad "SG could not build its fixture"
+for _sig in TERM HUP; do
+  _before=$(read_sg_tip)
+  run_sg_signal "$_sig"
+  case "${SG_RC:-none}|$(read_sg_tip)|$(read_sg_token)|$SG_BAR" in
+    "0|"*) bad "SG AC1 $_sig to the hook mid-bar LANDED the push (git exit 0) — the fail-open: $(cat "$tmp/sg.out")" ;;
+    "none|"*) bad "SG AC1 $_sig to the hook: the push never finished, so nothing was graded" ;;
+    *"|$_before|signalled|stopped") ok "SG AC1 $_sig to the hook mid-bar refuses (rc $SG_RC), leaves the remote unmoved, writes 'signalled' and stops the bar" ;;
+    *) bad "SG AC1 $_sig: expected a refusal with the remote at ${_before:0:8}, token signalled and the bar stopped, got rc $SG_RC tip $(read_sg_tip | cut -c1-8) token '$(read_sg_token)' bar $SG_BAR: $(cat "$tmp/sg.out")" ;;
+  esac
+  # AC2: the stub's 30 s sleep began before the signal, so a hook that waited for it took longer.
+  [ "$SG_SECS" -lt 25 ] && ok "SG AC2 $_sig was handled at once, not after the bar (${SG_SECS}s)" \
+    || bad "SG AC2 $_sig was handled only after the bar returned (${SG_SECS}s against a 30 s stub)"
+done
+# AC6: A SIGNAL BEFORE THE BAR. The fixture's gate-env.sh, which the hook SOURCES, signals the shell
+# sourcing it, so the TERM lands in the hook itself before any bar was started.
+# Its own seeding push is refused the same way, so the build's status is not graded here.
+build_sg_fixture early 'kill -TERM $$\n'
+git commit -q --allow-empty -m "sg early"; _before=$(read_sg_tip)
+_o=$( env -u GOV_GATE_CMD -u GOV_GATE_CMD_TEST GATE_SELFTESTS= git push origin main 2>&1 ); _r=$?
+case "$_r|$(read_sg_tip)|$(read_sg_token)" in
+  "0|"*) bad "SG AC6 TERM before the bar LANDED the push: $_o" ;;
+  *"|$_before|signalled") ok "SG AC6 TERM before the bar refuses as 'signalled' (rc $_r)" ;;
+  *) bad "SG AC6 expected a 'signalled' refusal, got rc $_r token '$(read_sg_token)': $_o" ;;
+esac
+# AC7: 254 IS WHAT bash EXITS WITH once its fork retries are spent (measured, bash 5.3), which is how
+# a bar starved of processes in the turnstile queue ends. It must refuse like any other red.
+cd "$tmp/sg-sig/work" || exit 2
+git commit -q --allow-empty -m "sg 254"; _before=$(read_sg_tip)
+_o=$( env -u GOV_GATE_CMD -u GOV_GATE_CMD_TEST GATE_SELFTESTS= SG_MODE=254 git push origin main 2>&1 ); _r=$?
+case "$_r|$(read_sg_tip)|$(read_sg_token)" in
+  "0|"*) bad "SG AC7 a bar exiting 254 LANDED the push: $_o" ;;
+  *"|$_before|gate-red") ok "SG AC7 a bar exiting 254 (spent fork retries) refuses as gate-red" ;;
+  *) bad "SG AC7 expected a gate-red refusal, got rc $_r token '$(read_sg_token)': $_o" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# ============================================================================================
+# THE BAR'S OWN GREEN, BY TREE — TOOL-aFrugalTurnstile-2. A tracked stand-in runner at the kit path
+# writes its run record and appends one line to a marker OUTSIDE the repo, so "the bar ran" is a line
+# count and never an inference from output. The hook is driven directly with git's stdin line, and the
+# remote moves by --no-verify pushes, so each arm names exactly the R and tip it grades. The declared
+# STUB escape is lifted per push: a STUB never writes or reads a record, which AC4 grades.
+build_bg_fixture() { # tag [gate-env lines] -> a work clone at main=R, pushed; cwd moves in; sets BG_D bg_gd BG_MARK
+  BG_D="$tmp/bg-$1"; mkdir -p "$BG_D/hooks"; cp "$SRC/.githooks/pre-push" "$BG_D/hooks/pre-push"
+  git init -q --bare "$BG_D/remote.git"; git init -q "$BG_D/w"; cd "$BG_D/w" || return 1
+  git config user.email t@example.com; git config user.name t; git config core.autocrlf false
+  git config core.hooksPath "$BG_D/hooks"
+  mkdir -p "$KIT_REL/$RUN_GATES" .githooks notes src
+  cp "$SRC/$RUN_GATES_DIR/gate-fingerprint.sh" "$KIT_REL/$RUN_GATES/"
+  printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
+  cat > "$KIT_REL/$RUN_GATES/run-gates.sh" <<'BGSTUB'
+#!/usr/bin/env bash
+echo "BAR base=${GATE_BASE:-} full=${GATE_FULL:-}"
+printf 'run\n' >> "$BG_MARK"
+d="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"
+case "${BG_MODE:-green}" in
+  green) printf 'verdict\tGREEN\n' > "$d/verdict"; exit 0 ;;
+  red) printf 'verdict\tRED\ntree_moved\tno\nfailed\t1\n' > "$d/verdict"; exit 1 ;;
+  inh) printf 'verdict\tRED\ntree_moved\tno\nfailed\t1\n' > "$d/verdict"
+       printf 'leg x\tINHERITED\t-\t-\t%s\t-\n' "$GATE_ATTRIBUTE" > "$d/attribution"; exit 1 ;;
+esac
+BGSTUB
+  # A WRAPPER BAR, adopter ic's gov-bar shape (TOOL-aFrugalTurnstile-2 AC17): a tracked script that hands the runner a derived manifest.
+  printf '#!/usr/bin/env bash\nexport GATE_LEGS="$(git rev-parse --git-dir)/wrap-legs.json"\nexec bash %s "$@"\n' \
+    "$KIT_REL/$RUN_GATES/run-gates.sh" > wrap-bar.sh
+  printf '#!/usr/bin/env bash\nexec bash %s "$@"\n' "$KIT_REL/$RUN_GATES/run-gates.sh" > other-bar.sh
+  printf 'GATE_CMD="bash wrap-bar.sh"\n' > .unattended.conf
+  printf 'GOV_KITROOT=%s\nINHERITED_RED=land\nGATE_DOC_PATHS="notes/"\n%b' "$KIT_REL" "${2:-}" > .githooks/gate-env.sh
+  printf 'a\n' > notes/a.md; printf 'x\n' > src/x.sh; printf '* text eol=lf\n' > .gitattributes
+  git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+  git remote add origin "$BG_D/remote.git"; git push -q --no-verify origin main >/dev/null 2>&1
+  bg_gd=$(git rev-parse --git-dir); BG_MARK="$BG_D/mark"; : > "$BG_MARK"
+}
+read_bg_marks() { wc -l < "$BG_MARK" | tr -d ' '; }
+run_bg_push() { # [env…] -> BG_OUT BG_RC for a push of HEAD to main over the remote's main
+  local l r; l=$(git rev-parse HEAD); r=$(git ls-remote origin refs/heads/main | cut -f1)
+  touch "$bg_gd/push-main-active"
+  BG_OUT=$(env -u GOV_GATE_CMD_TEST -u GOV_GATE_CMD -u GATE_RUN_ID GATE_SELFTESTS= BG_MARK="$BG_MARK" "$@" \
+    bash "$BG_D/hooks/pre-push" origin "$BG_D/remote.git" <<<"refs/heads/main $l refs/heads/main ${r:-0000000000000000000000000000000000000000}" 2>&1)
+  BG_RC=$?
+}
+set_bg_remote() { git push -q --no-verify origin HEAD:main >/dev/null 2>&1; }
+write_bg_record() { # file · sha · kind · base · bar -> a planted gate-bar-green record
+  printf 'sha\t%s\ntree\t%s\nbar\t%s\nbar_paths\t\nkind\t%s\nbase\t%s\nselftests\t\nrun_id\tplanted\nby\tpre-push\nstamped\tx\n' \
+    "$2" "$(git rev-parse "$2^{tree}")" "$5" "$3" "$4" > "$1"
+}
+read_bg_key() { awk -F'\t' -v k="$2" '$1==k{print $2}' "$1" 2>/dev/null; }
+set_bg_key() { awk -F'\t' -v k="$2" -v v="$3" 'BEGIN{OFS="\t"} $1==k{$2=v} {print}' "$1" > "$1.x" && mv "$1.x" "$1"; }
+write_bg_stamp() { # sha -> a runner gate-full-green with a reproducible fingerprint and the manifest blob
+  printf 'sha\t%s\nfingerprint\t%s\nmanifest_blob\t%s\nmanifest\t%s\nselftests\t\nrun_id\ttest\n' "$1" \
+    "$(bash "$KIT_REL/$RUN_GATES/gate-fingerprint.sh" "$1")" "$(git rev-parse "$1:$KIT_REL/gate-legs.json")" \
+    "$KIT_REL/gate-legs.json" > "$bg_gd/gate-full-green"
+}
+BG_RUNNER="bash $KIT_REL/$RUN_GATES/run-gates.sh"; BG_WRAP="bash wrap-bar.sh"
+
+# AC1, AC2, AC11, AC3 — branch tip X pushed green writes the record; the --no-ff merge of X is covered.
+build_bg_fixture ac1 || bad "BG could not build its fixture"
+git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
+run_bg_push
+case "$BG_RC|$(cut -f1 "$bg_gd/gate-bar-green" 2>/dev/null | tr '\n' ' ')" in
+  "0|sha tree bar bar_paths kind base selftests run_id by stamped ") ok "BG AC1 a green push writes gate-bar-green with the ten keys in order" ;;
+  *) bad "BG AC1 expected the ten keys in order after a green push, got rc $BG_RC: $(cat "$bg_gd/gate-bar-green" 2>/dev/null || echo '<absent>')" ;;
+esac
+[ "$(read_bg_key "$bg_gd/gate-bar-green" sha)|$(read_bg_key "$bg_gd/gate-bar-green" tree)|$(read_bg_key "$bg_gd/gate-bar-green" kind)|$(read_bg_key "$bg_gd/gate-bar-green" by)|$(read_bg_key "$bg_gd/gate-bar-green" bar)" \
+  = "$_x|$(git rev-parse "X^{tree}")|full|pre-push|$BG_RUNNER" ] \
+  && ok "BG AC1 the record names X, its tree, kind full, by pre-push and the vetted bar" \
+  || bad "BG AC1 the record's values are wrong: $(cat "$bg_gd/gate-bar-green" 2>/dev/null)"
+set_bg_remote; git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1
+_m0=$(read_bg_marks); run_bg_push
+case "$BG_RC|$(read_bg_marks)|$BG_OUT" in
+  "0|$_m0|"*"pre-push: covered on main push"*"this git dir's gate-bar-green sha ${_x:0:8}"*"no bar runs"*) ok "BG AC2 the merge of X is covered by X's record and no bar runs" ;;
+  *) bad "BG AC2 expected a covered push with the marker at $_m0, got rc $BG_RC marker $(read_bg_marks): $BG_OUT" ;;
+esac
+case "$(awk -F'\t' '{print NF"|"$1"|"$2}' "$bg_gd/pre-push-bar" 2>/dev/null)|$(tail -1 "$bg_gd/runlog/pushes.log" 2>/dev/null)" in
+  "3|default|$KIT_REL/$RUN_GATES/run-gates.sh|"*"ev=end"*"exit=clean"*"decision=covered"*) ok "BG AC11 a covered push writes pre-push-bar's three fields and an END with decision=covered exit=clean" ;;
+  *) bad "BG AC11 pre-push-bar or the END line is wrong: $(cat "$bg_gd/pre-push-bar" 2>/dev/null) / $(tail -1 "$bg_gd/runlog/pushes.log" 2>/dev/null)" ;;
+esac
+# SG covered (TOOL-aSignalledHook-1, closing review round 1): a covered push is an ALLOWED one, so it
+# leaves the allow record push-main requires, naming the pushed commit. Without it the lander read
+# every covered landing as UNGATED.
+[ "$(cut -f1 "$bg_gd/pre-push-allow" 2>/dev/null)" = "$(git rev-parse HEAD)" ] \
+  && ok "SG covered — a covered push writes pre-push-allow naming the pushed commit" \
+  || bad "SG covered — expected pre-push-allow naming $(git rev-parse --short HEAD), got: $(cat "$bg_gd/pre-push-allow" 2>/dev/null || echo '<absent>')"
+set_bg_remote; git checkout -q -b Y; echo 2 >> src/x.sh; git commit -qam Y; run_bg_push; set_bg_remote
+git checkout -q main; git merge -q --no-ff Y -m "merge Y" >/dev/null 2>&1; echo 3 >> src/x.sh; git commit -qam byte
+_m0=$(read_bg_marks); run_bg_push
+case "$(read_bg_marks)|$BG_OUT" in
+  "$((_m0 + 1))|"*"not covered"*"it graded tree"*) ok "BG AC3 one more byte is not covered, says why, and the bar runs" ;;
+  *) bad "BG AC3 expected not covered with the bar run, got marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# AC4, AC5 — no record for the STUB, none for a red bar.
+build_bg_fixture ac4 || bad "BG could not build its fixture"
+printf '#!/usr/bin/env bash\nexit 0\n' > "$BG_D/stub.sh"
+echo 1 >> src/x.sh; git commit -qam c; run_bg_push GOV_GATE_CMD_TEST=1 GOV_GATE_CMD="bash $BG_D/stub.sh"
+case "$([ -f "$bg_gd/gate-bar-green" ] && echo present)|$BG_OUT" in
+  "|"*"no gate-bar-green written — the bar is the declared STUB"*) ok "BG AC4 the STUB writes no record and says so" ;;
+  *) bad "BG AC4 a STUB push wrote a record or did not say so: $BG_OUT" ;;
+esac
+echo 2 >> src/x.sh; git commit -qam c2; run_bg_push BG_MODE=red
+[ "$BG_RC" = 1 ] && [ ! -f "$bg_gd/gate-bar-green" ] && ok "BG AC5 a red bar writes no record" \
+  || bad "BG AC5 a red bar must write no record, got rc $BG_RC, record $([ -f "$bg_gd/gate-bar-green" ] && echo present)"
+cd "$pfx_home" || exit 2
+
+# AC6, AC7, AC8 — an altered record covers nothing; the unaltered one is the control.
+build_bg_fixture ac6 || bad "BG could not build its fixture"
+git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
+git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1
+for _c in bar selftests tree control; do
+  write_bg_record "$bg_gd/gate-bar-green" "$_x" full "" "$BG_RUNNER"; _e=()
+  case $_c in
+    bar) set_bg_key "$bg_gd/gate-bar-green" bar "bash other-bar.sh"; _want="it was earned by bar" ;;
+    selftests) _e=(GATE_SELFTESTS=1); _want="self-tests HELD" ;;
+    tree) set_bg_key "$bg_gd/gate-bar-green" tree ""; _want="could not be read" ;;
+    control) _want="pre-push: covered on main push" ;;
+  esac
+  _m0=$(read_bg_marks); run_bg_push "${_e[@]}"
+  case "$_c|$(read_bg_marks)|$BG_OUT" in
+    "control|$_m0|"*"$_want"*) ok "BG AC6-8 control: the unaltered record covers the merge" ;;
+    "$_c|$((_m0 + 1))|"*"not covered"*"$_want"*) ok "BG AC6-8 an altered $_c is not covered, says '$_want', and the bar runs" ;;
+    *) bad "BG AC6-8 the $_c case expected '$_want', got marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
+  esac
+done
+cd "$pfx_home" || exit 2
+
+# AC9, AC10 — a runner stamp covers; a scoped record covers only from the adopted base.
+build_bg_fixture ac9 || bad "BG could not build its fixture"
+git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
+git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1; write_bg_stamp "$_x"
+_m0=$(read_bg_marks); run_bg_push
+case "$(read_bg_marks)|$BG_OUT" in
+  "$_m0|"*"covered on main push"*"a full green: this git dir sha ${_x:0:8}"*"by run-gates"*) ok "BG AC9 a runner stamp naming X covers the merge" ;;
+  *) bad "BG AC9 expected the runner stamp to cover, got: $BG_OUT" ;;
+esac
+rm -f "$bg_gd/gate-full-green"; git reset -q --hard origin/main; _r=$(git rev-parse HEAD); write_bg_stamp "$_r"
+echo 2 >> src/x.sh; git commit -qam lin; _l=$(git rev-parse HEAD)
+write_bg_record "$bg_gd/gate-bar-green" "$_l" scoped "$_r" "$BG_RUNNER"
+_m0=$(read_bg_marks); run_bg_push
+case "$(read_bg_marks)|$BG_OUT" in
+  "$_m0|"*"covered on main push"*"a scoped green"*) ok "BG AC10 a scoped record on the adopted base covers" ;;
+  *) bad "BG AC10 a scoped record on the adopted base must cover, got: $BG_OUT" ;;
+esac
+write_bg_record "$bg_gd/gate-bar-green" "$_l" scoped "$_x" "$BG_RUNNER"
+_m0=$(read_bg_marks); run_bg_push
+case "$(read_bg_marks)|$BG_OUT" in
+  "$((_m0 + 1))|"*"a scoped green against base ${_x:0:8}"*) ok "BG AC10 a scoped record on another base is not covered, naming it" ;;
+  *) bad "BG AC10 a scoped record on another base must not cover, got: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# AC12 from a linked worktree; AC13 by slice.
+build_bg_fixture ac12 || bad "BG could not build its fixture"
+git worktree add -q "$BG_D/wt" -b wtb >/dev/null 2>&1
+( cd "$BG_D/wt" || exit 1; bg_gd=$(git rev-parse --git-dir)
+  echo 1 >> src/x.sh; git commit -qam wt; run_bg_push
+  cmp -s "$bg_gd/gate-bar-green" "$(git rev-parse --git-common-dir)/gate-bar-green.shared" ) \
+  && ok "BG AC12 a linked worktree's record is shared byte-identical to the common dir" \
+  || bad "BG AC12 the common dir holds no byte-identical gate-bar-green.shared"
+sed -n '/^write_bar_green() {/,/^}/p' "$SRC/.githooks/pre-push" > "$BG_D/slice.sh"
+( . "$BG_D/slice.sh" || exit 1; rm -f "$bg_gd/gate-bar-green"
+  _h=$(git rev-parse HEAD); git commit -q --allow-empty -m moved
+  write_bar_green "$bg_gd" "$_h" 0 full "" "$BG_RUNNER" r1 >/dev/null
+  _a=$([ -f "$bg_gd/gate-bar-green" ] && echo present)
+  _h=$(git rev-parse HEAD); : > untracked.txt
+  write_bar_green "$bg_gd" "$_h" 0 full "" "$BG_RUNNER" r2 >/dev/null
+  _b=$([ -f "$bg_gd/gate-bar-green" ] && echo present)
+  rm -f untracked.txt; write_bar_green "$bg_gd" "$_h" 0 full "" "$BG_RUNNER" r3 >/dev/null
+  _c=$([ -f "$bg_gd/gate-bar-green" ] && echo present)
+  [ "$_a|$_b|$_c" = "||present" ] ) \
+  && ok "BG AC13 the sliced writer writes nothing with HEAD moved or an untracked file, and writes on the control" \
+  || bad "BG AC13 the sliced writer wrote a record it must not have, or none on the control"
+cd "$pfx_home" || exit 2
+
+# AC14, AC15 — no record for an inherited red landed under land, none for a doc-only push.
+build_bg_fixture ac14 || bad "BG could not build its fixture"
+echo 1 >> src/x.sh; git commit -qam c; run_bg_push BG_MODE=inh
+case "$BG_RC|$([ -f "$bg_gd/gate-bar-green" ] && echo present)|$BG_OUT" in
+  "0||"*"red on inherited legs only"*"no gate-bar-green written"*) ok "BG AC14 an inherited red that lands writes no record" ;;
+  *) bad "BG AC14 expected the inherited landing with no record, got rc $BG_RC: $BG_OUT" ;;
+esac
+git reset -q --hard origin/main; write_bg_stamp "$(git rev-parse HEAD)"; echo b >> notes/a.md; git commit -qam doc; run_bg_push
+case "$([ -f "$bg_gd/gate-bar-green" ] && echo present)|$BG_OUT" in
+  "|"*"docs-only"*"no gate-bar-green written — this push was scoped doc-only"*) ok "BG AC15 a doc-only scoped green writes no record and says so" ;;
+  *) bad "BG AC15 expected no record on a doc-only push, got: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# AC17 — a wrapper bar's full record at M scopes the push of M plus one record-only commit.
+build_bg_fixture ac17 || bad "BG could not build its fixture"
+git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; git checkout -q main
+git merge -q --no-ff X -m "merge X" >/dev/null 2>&1; _m=$(git rev-parse HEAD)
+run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
+echo r >> src/x.sh; git commit -qam "records: close"; run_bg_push GOV_GATE_CMD="$BG_WRAP"
+case "$BG_OUT" in
+  *"scoped gate on main push"*"full bar green ${_m:0:8} from this git dir's gate-bar-green"*"BAR base=$_m full="*) ok "BG AC17 a wrapper bar's full record at M scopes M plus a record commit, with GATE_BASE M" ;;
+  *) bad "BG AC17 expected a scoped decision from the record at ${_m:0:8}, got: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# AC18, AC19, AC20 — a scoped record at M is adopted on its full-green base B, lag counted from B.
+build_bg_fixture ac18 || bad "BG could not build its fixture"
+_b=$(git rev-parse HEAD); for _i in 1 2; do echo "l$_i" >> src/x.sh; git commit -qam "l$_i"; done
+_m=$(git rev-parse HEAD); echo c >> src/x.sh; git commit -qam C; set_bg_remote; echo c2 >> src/x.sh; git commit -qam C2
+write_bg_record "$bg_gd/gate-bar-green.shared" "$_b" full "" "$BG_WRAP"; write_bg_record "$bg_gd/gate-bar-green" "$_m" scoped "$_b" "$BG_WRAP"
+run_bg_push GOV_GATE_CMD="$BG_WRAP"
+case "$BG_OUT" in
+  *"scoped gate on main push"*"scoped bar green ${_m:0:8}"*"counted from its base ${_b:0:8}, is 4 first-parent"*"BAR base=$_m full="*) ok "BG AC18 a scoped record at M is adopted, scoping from M with the lag counted from B" ;;
+  *) bad "BG AC18 expected a scoped decision from M counted from B, got: $BG_OUT" ;;
+esac
+_c=$(git rev-parse HEAD~1)
+write_bg_record "$bg_gd/gate-bar-green" "$_m" scoped "$_c" "$BG_WRAP"; mv "$bg_gd/gate-bar-green.shared" "$BG_D/shared.keep"
+run_bg_push GOV_GATE_CMD="$BG_WRAP"
+case "$BG_OUT" in
+  *"FULL gate on main push"*"its base ${_c:0:8} is no full green this push can adopt"*) ok "BG AC19 a scoped record whose base no full green names is refused, naming its base" ;;
+  *) bad "BG AC19 expected the record refused on its base, got: $BG_OUT" ;;
+esac
+mv "$BG_D/shared.keep" "$bg_gd/gate-bar-green.shared"
+for _i in $(seq 1 10); do echo "p$_i" >> src/x.sh; git commit -qam "p$_i"; done; _m=$(git rev-parse HEAD)
+echo c3 >> src/x.sh; git commit -qam C3; set_bg_remote; echo c4 >> src/x.sh; git commit -qam C4
+write_bg_record "$bg_gd/gate-bar-green" "$_m" scoped "$_b" "$BG_WRAP"; run_bg_push GOV_GATE_CMD="$BG_WRAP"
+case "$BG_OUT" in
+  *"FULL gate on main push"*"its base ${_b:0:8} is no full green this push can adopt: the recorded full bar green is 16 first-parent landings behind"*) ok "BG AC20 a scoped record whose base is past the bound is refused on the base's lag" ;;
+  *) bad "BG AC20 expected the record refused on its base's lag, got: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-11 AC1, AC3 — a wrapper bar from one git dir: FULL, scoped, then scoped again.
+build_bg_fixture slot1 || bad "BG could not build its fixture"
+echo 1 >> src/x.sh; git commit -qam c1; _c1=$(git rev-parse HEAD); run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
+echo 2 >> src/x.sh; git commit -qam c2; _c2=$(git rev-parse HEAD); run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
+[ "$(read_bg_key "$bg_gd/gate-bar-green" kind)|$(read_bg_key "$bg_gd/gate-bar-green" sha)|$(read_bg_key "$bg_gd/gate-bar-green.scoped" kind)|$(read_bg_key "$bg_gd/gate-bar-green.scoped" sha)" \
+  = "full|$_c1|scoped|$_c2" ] \
+  && ok "BG slot AC1 a scoped push leaves gate-bar-green kind full and writes gate-bar-green.scoped kind scoped" \
+  || bad "BG slot AC1 expected the full record kept and the scoped one in its own slot: $(cat "$bg_gd/gate-bar-green" "$bg_gd/gate-bar-green.scoped" 2>&1)"
+echo 3 >> src/x.sh; git commit -qam c3; run_bg_push GOV_GATE_CMD="$BG_WRAP"
+case "$BG_OUT" in
+  *"FULL gate on main push"*) bad "BG slot AC3 the third push went FULL, the alternation: $BG_OUT" ;;
+  *"scoped gate on main push"*) ok "BG slot AC3 the third push from the same git dir reads scoped gate" ;;
+  *) bad "BG slot AC3 expected a scoped gate line, got: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-11 AC2 — the scoped record from a linked worktree is shared to the common dir.
+build_bg_fixture slot2 || bad "BG could not build its fixture"
+git worktree add -q "$BG_D/wt" -b wtb >/dev/null 2>&1
+( cd "$BG_D/wt" || exit 1; bg_gd=$(git rev-parse --git-dir)
+  echo 1 >> src/x.sh; git commit -qam w1; run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
+  echo 2 >> src/x.sh; git commit -qam w2; run_bg_push GOV_GATE_CMD="$BG_WRAP"
+  [ "$(read_bg_key "$bg_gd/gate-bar-green.scoped" kind)" = scoped ] \
+    && cmp -s "$bg_gd/gate-bar-green.scoped" "$(git rev-parse --git-common-dir)/gate-bar-green.scoped.shared" ) \
+  && ok "BG slot AC2 a linked worktree's scoped record is shared byte-identical as gate-bar-green.scoped.shared" \
+  || bad "BG slot AC2 the common dir holds no byte-identical gate-bar-green.scoped.shared"
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-11 AC4 — a scoped record only in the scoped slot covers a push of its tree.
+build_bg_fixture slot4 || bad "BG could not build its fixture"
+_b=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
+write_bg_record "$bg_gd/gate-bar-green" "$_b" full "" "$BG_WRAP"; write_bg_record "$bg_gd/gate-bar-green.scoped" "$_l" scoped "$_b" "$BG_WRAP"
+_m0=$(read_bg_marks); run_bg_push GOV_GATE_CMD="$BG_WRAP"
+case "$(read_bg_marks)|$BG_OUT" in
+  "$_m0|"*"covered on main push"*"this git dir's gate-bar-green.scoped sha ${_l:0:8}"*"no bar runs"*) ok "BG slot AC4 the cover pass reads the scoped slot" ;;
+  *) bad "BG slot AC4 expected the scoped-slot record to cover with no bar run, got marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-11 AC5 — a runner stamp at F and a scoped record at M (base F): M is nearer, M wins.
+build_bg_fixture slot5 || bad "BG could not build its fixture"
+_f=$(git rev-parse HEAD); write_bg_stamp "$_f"
+echo 1 >> src/x.sh; git commit -qam m; _m=$(git rev-parse HEAD); write_bg_record "$bg_gd/gate-bar-green" "$_m" scoped "$_f" "$BG_RUNNER"
+echo 2 >> src/x.sh; git commit -qam t; run_bg_push
+case "$BG_OUT" in
+  *"scoped gate on main push"*"scoped bar green ${_m:0:8}"*"counted from its base ${_f:0:8}"*"BAR base=$_m full="*) ok "BG slot AC5 the nearer scoped record at M beats the runner stamp at F" ;;
+  *) bad "BG slot AC5 expected the decision to scope from M, got: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-11 AC6 — a runner stamp and a bar record at one sha: the tie keeps the runner stamp.
+build_bg_fixture slot6 || bad "BG could not build its fixture"
+echo 1 >> src/x.sh; git commit -qam s; _s=$(git rev-parse HEAD); write_bg_stamp "$_s"
+write_bg_record "$bg_gd/gate-bar-green" "$_s" full "" "$BG_RUNNER"; echo 2 >> src/x.sh; git commit -qam t; run_bg_push
+case "$BG_OUT" in
+  *"scoped gate on main push"*"full green ${_s:0:8} from this git dir's gate-full-green"*) ok "BG slot AC6 a tie names gate-full-green as the adopted record" ;;
+  *) bad "BG slot AC6 expected the runner stamp named on a tie, got: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# THE POST-MERGE RED AND THE DECIDE MODE — TOOL-aFrugalTurnstile-7. A git shim first on PATH logs every
+# argv the hook spawns, so "the red was read" is a count of ls-remote lines, never an inference. The red
+# ref is staged by hand on the bare remote; only post-merge.sh publishes it for real.
+PM_GIT=$(command -v git); PM_DECL='GATE_POST_MERGE=local\n'
+build_pm_shim() { # -> a git shim under BG_D logging every argv to BG_D/shim.log; PM_PATH puts it first
+  mkdir -p "$BG_D/shim"
+  printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*" >> "%s/shim.log"\nexec "%s" "$@"\n' "$BG_D" "$PM_GIT" > "$BG_D/shim/git"
+  chmod +x "$BG_D/shim/git"; : > "$BG_D/shim.log"; PM_PATH="$BG_D/shim:$PATH"
+}
+write_pm_red() { git push -q --no-verify origin "+$1:refs/gov/bar-red" >/dev/null 2>&1; }
+run_pm_decide() { # [env…] -- <args> -> PM_OUT (stdout alone) PM_ERR PM_RC for `pre-push --decide <args>`
+  local e=(); while [ "$1" != -- ]; do e+=("$1"); shift; done; shift
+  PM_OUT=$(env -u GOV_GATE_CMD_TEST -u GOV_GATE_CMD -u GATE_RUN_ID -u GOV_REMOTE GATE_SELFTESTS= BG_MARK="$BG_MARK" "${e[@]}" \
+    bash "$BG_D/hooks/pre-push" --decide "$@" 2>"$BG_D/decide.err" </dev/null); PM_RC=$?; PM_ERR=$(cat "$BG_D/decide.err")
+  # TOOL-aFrugalTurnstile-13: the line ends in a TAB and the bar it decided for; PM_BAR takes it off.
+  PM_BAR=""; case "$PM_OUT" in *$'\t'*) PM_BAR=${PM_OUT##*$'\t'}; PM_OUT=${PM_OUT%$'\t'*} ;; esac
+}
+read_pm_sums() { git status >/dev/null 2>&1; find "$bg_gd" -type f | sort | xargs sha1sum; }   # after git's own warm-up
+read_pm_remote() { git ls-remote origin refs/heads/main | cut -f1; }
+
+# AC1, AC5 — a declared red between the recorded full green and the tip forces FULL, read once.
+for _pm in "local:AC1" "yes:AC5"; do
+  build_bg_fixture "pm-${_pm%%:*}" "GATE_POST_MERGE=${_pm%%:*}\n" || bad "PM could not build its fixture"; build_pm_shim
+  _f=$(git rev-parse HEAD); write_bg_stamp "$_f"; echo 1 >> src/x.sh; git commit -qam p; _p=$(git rev-parse HEAD)
+  echo 2 >> src/x.sh; git commit -qam t; write_pm_red "$_p"; run_bg_push PATH="$PM_PATH"
+  case "$BG_OUT" in
+    *"FULL gate on main push"*"a post-merge full bar is RED at ${_p:0:8} (refs/gov/bar-red on origin)"*"BAR base= full=1"*) ok "PM ${_pm#*:} a declared red the green does not descend from forces FULL" ;;
+    *) bad "PM ${_pm#*:} expected FULL naming the red ${_p:0:8}, got: $BG_OUT" ;;
+  esac
+  [ "$(grep -c ls-remote "$BG_D/shim.log")" = 1 ] && ok "PM ${_pm#*:} the red is read with exactly one ls-remote" \
+    || bad "PM ${_pm#*:} expected one ls-remote, got: $(grep ls-remote "$BG_D/shim.log")"
+  case "${_pm%%:*}|$BG_OUT" in
+    local*) ;;
+    "yes|"*"GATE_POST_MERGE at "*" is 'yes', outside 'local ci', and is read as declared"*) ok "PM AC5 an unknown value is named and read as declared" ;;
+    *) bad "PM AC5 expected the outside 'local ci' line, got: $BG_OUT" ;;
+  esac
+  cd "$pfx_home" || exit 2
+done
+
+# AC2 — the recorded green strictly descends from the red: cleared, and the push scopes.
+build_bg_fixture pm-clear "$PM_DECL" || bad "PM could not build its fixture"
+_p=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam x; _x=$(git rev-parse HEAD); write_bg_stamp "$_x"
+echo 2 >> src/x.sh; git commit -qam t; write_pm_red "$_p"; run_bg_push
+case "$BG_OUT" in
+  *"post-merge bar: red ${_p:0:8} on origin is cleared for this push — the adopted green ${_x:0:8} descends from it"*"scoped gate on main push"*) ok "PM AC2 a green descending from the red clears it and scopes" ;;
+  *) bad "PM AC2 expected the cleared line and a scoped gate, got: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# AC3 — undeclared at R, a present red is never read and the decision does not move.
+build_bg_fixture pm-undecl || bad "PM could not build its fixture"; build_pm_shim
+_f=$(git rev-parse HEAD); write_bg_stamp "$_f"; echo 1 >> src/x.sh; git commit -qam p; _p=$(git rev-parse HEAD)
+echo 2 >> src/x.sh; git commit -qam t; write_pm_red "$_p"; run_bg_push PATH="$PM_PATH"
+case "$(grep -c ls-remote "$BG_D/shim.log")|$BG_OUT" in
+  "0|"*"post-merge bar"*) bad "PM AC3 an undeclared push printed a post-merge line: $BG_OUT" ;;
+  "0|"*"scoped gate on main push"*"full green ${_f:0:8}"*) ok "PM AC3 undeclared: no ls-remote and the decision is unchanged" ;;
+  *) bad "PM AC3 expected no ls-remote and a scoped gate from ${_f:0:8}, got: $(grep ls-remote "$BG_D/shim.log") $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# AC4 — declared, and the push URL reaches nothing: --decide reads unreadable as FULL, never as absent.
+build_bg_fixture pm-unread "$PM_DECL" || bad "PM could not build its fixture"
+_f=$(git rev-parse HEAD); write_bg_stamp "$_f"; echo 1 >> src/x.sh; git commit -qam t
+git remote set-url --push origin "$BG_D/nowhere/x.git"; run_pm_decide -- "$(git rev-parse HEAD)" "$(read_pm_remote)"
+case "$PM_RC|$PM_OUT" in
+  "0|full GATE_POST_MERGE is declared at "*"refs/gov/bar-red on origin could not be read"*) ok "PM AC4 an unreadable red decides full" ;;
+  *) bad "PM AC4 expected one full line naming refs/gov/bar-red as unreadable, got rc $PM_RC: $PM_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# AC6 — three states, one stdout line each, exit 0, and nothing under the git dir moves.
+build_bg_fixture pm-decide || bad "PM could not build its fixture"
+_f=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam t; _t=$(git rev-parse HEAD); _r=$(read_pm_remote)
+for _st in none scoped covered; do
+  _e=()
+  case $_st in
+    scoped) write_bg_stamp "$_f" ;;
+    covered) rm -f "$bg_gd/gate-full-green"; write_bg_record "$bg_gd/gate-bar-green" "$_f" full "" "$BG_WRAP"
+             write_bg_record "$bg_gd/gate-bar-green.scoped" "$_t" scoped "$_f" "$BG_WRAP"; _e=(GOV_GATE_CMD="$BG_WRAP") ;;
+  esac
+  read_pm_sums > "$BG_D/s0"; _j0=$(cat "$bg_gd"/runlog/*.log 2>/dev/null | wc -l); _m0=$(read_bg_marks)
+  run_pm_decide "${_e[@]}" -- "$_t" "$_r"; read_pm_sums > "$BG_D/s1"
+  case "$_st|$PM_RC|$(printf '%s\n' "$PM_OUT" | grep -c .)|$PM_OUT" in
+    "none|0|1|full "*|"scoped|0|1|scoped $_f $_f"|"covered|0|1|covered "*"gate-bar-green.scoped") ok "PM AC6 $_st: one decision line, exit 0" ;;
+    *) bad "PM AC6 $_st expected one $_st line and exit 0, got rc $PM_RC: $PM_OUT" ;;
+  esac
+  # TOOL-aFrugalTurnstile-13 AC1: the line names the vetted bar after its last TAB. RED against the hook
+  # at 69426afd, whose line carries no bar field.
+  [ "$_st" != covered ] || { [ "$PM_BAR" = "$BG_WRAP" ] && ok "PM TOOL-aFrugalTurnstile-13 AC1 the decision line ends in a TAB and the vetted bar" \
+    || bad "PM TOOL-aFrugalTurnstile-13 AC1 expected the bar field '$BG_WRAP', got '$PM_BAR'"; }
+  { cmp -s "$BG_D/s0" "$BG_D/s1" && [ ! -e "$bg_gd/pre-push-refusal" ] && [ ! -e "$bg_gd/pre-push-bar" ] &&
+    [ "$(cat "$bg_gd"/runlog/*.log 2>/dev/null | wc -l)" = "$_j0" ] && [ "$(read_bg_marks)" = "$_m0" ]; } \
+    && ok "PM AC6 $_st: no file under the git dir changed, no journal line, no bar" \
+    || bad "PM AC6 $_st wrote something: $(diff "$BG_D/s0" "$BG_D/s1" | head -3) marks $_m0/$(read_bg_marks)"
+done
+cd "$pfx_home" || exit 2
+
+# AC7, AC9 — a refusal exits 1 with an empty stdout; a bad call or an unchosen remote exits 2.
+build_bg_fixture pm-refuse || bad "PM could not build its fixture"
+_f=$(git rev-parse HEAD); write_bg_stamp "$_f"; echo 1 >> src/x.sh; git commit -qam t; _t=$(git rev-parse HEAD); _r=$(read_pm_remote)
+echo 3 >> src/x.sh; run_pm_decide -- "$_t" "$_r"; _o1="$PM_RC|$PM_OUT"; git checkout -q src/x.sh
+run_pm_decide -- "$_f" "$_r"; _o2="$PM_RC|$PM_OUT"
+[ "$_o1|$_o2|$([ -e "$bg_gd/pre-push-refusal" ] && echo file)" = "1||1||" ] \
+  && ok "PM AC7 a dirty tree and a tip that is not HEAD exit 1 with an empty stdout and no refusal file" \
+  || bad "PM AC7 expected exit 1, empty stdout, no refusal file: dirty '$_o1' tip '$_o2'"
+run_pm_decide -- "$_t"; _o1="$PM_RC|$PM_ERR"; run_pm_decide -- nosuch "$_r"
+case "$_o1|$PM_RC|$PM_ERR" in
+  "2|"*"usage: pre-push --decide"*"|2|"*"usage: pre-push --decide"*) ok "PM AC7 one argument and a tip naming no commit exit 2 with the usage line" ;;
+  *) bad "PM AC7 expected exit 2 and a usage line twice, got: $_o1 | $PM_RC $PM_ERR" ;;
+esac
+git remote add second "$BG_D/remote.git"; git checkout -q --detach
+run_pm_decide -- "$_t" "$_r"; _o1="$PM_RC|$PM_ERR"; run_pm_decide -- "$_t" "$_r" origin
+case "$_o1|$PM_RC|$PM_OUT" in
+  "2|"*GOV_REMOTE*"|0|scoped $_f $_f") ok "PM AC9 two remotes and none named exit 2 naming GOV_REMOTE; a named one decides" ;;
+  *) bad "PM AC9 expected exit 2 naming GOV_REMOTE, then a decision, got: $_o1 | $PM_RC $PM_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# AC11 — a covering record binds to the red too; and --decide's scoped base is the push's GATE_BASE.
+# TOOL-aFrugalTurnstile-15: the red that stays covered sits BEFORE the full green _b, since a scoped
+# record's own sha no longer clears a red at its base.
+build_bg_fixture pm-cover "$PM_DECL" || bad "PM could not build its fixture"
+_p=$(git rev-parse HEAD); echo 0 >> src/x.sh; git commit -qam b; _b=$(git rev-parse HEAD)
+echo 1 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
+for _red in "$_l" "$_p"; do
+  write_bg_record "$bg_gd/gate-bar-green" "$_b" full "" "$BG_WRAP"; write_bg_record "$bg_gd/gate-bar-green.scoped" "$_l" scoped "$_b" "$BG_WRAP"
+  write_pm_red "$_red"; _m0=$(read_bg_marks); run_bg_push GOV_GATE_CMD="$BG_WRAP"
+  case "$_red|$(read_bg_marks)|$BG_OUT" in
+    "$_l|$((_m0 + 1))|"*"FULL gate on main push"*"RED at ${_l:0:8}"*) ok "PM AC11 a red the covering record does not strictly descend from forces FULL" ;;
+    "$_p|$_m0|"*"covered on main push"*"no bar runs"*) ok "PM AC11 a covering record that descends from the red stays covered" ;;
+    *) bad "PM AC11 red ${_red:0:8}: unexpected decision, marker $_m0/$(read_bg_marks): $BG_OUT" ;;
+  esac
+done
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-15 AC1-AC3 — a red clears only on the FULL green the decision rests on. A scoped
+# record at a descendant of the red X, whose base _b is older than X, neither scopes (AC1) nor covers
+# (AC2); a full base strictly descending from X clears it (AC3). AC1 and AC2 are RED against the hook at
+# ebbc83b7, which cleared on the scoped record's own sha.
+for _ac in AC1 AC2 AC3; do
+  build_bg_fixture "pm-full-$_ac" "$PM_DECL" || bad "PM could not build its fixture"
+  _b=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam x; _x=$(git rev-parse HEAD)
+  [ "$_ac" = AC3 ] && { echo f >> src/x.sh; git commit -qam f; _b=$(git rev-parse HEAD); }
+  echo 2 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
+  [ "$_ac" = AC2 ] || { echo 3 >> src/x.sh; git commit -qam t; }
+  write_bg_record "$bg_gd/gate-bar-green" "$_b" full "" "$BG_WRAP"; write_bg_record "$bg_gd/gate-bar-green.scoped" "$_l" scoped "$_b" "$BG_WRAP"
+  write_pm_red "$_x"; _m0=$(read_bg_marks); run_bg_push GOV_GATE_CMD="$BG_WRAP"
+  case "$_ac|$(read_bg_marks)|$BG_OUT" in
+    "AC1|$((_m0 + 1))|"*"FULL gate on main push"*"RED at ${_x:0:8}"*"BAR base= full=1"*|"AC2|$((_m0 + 1))|"*"FULL gate on main push"*"RED at ${_x:0:8}"*"BAR base= full=1"*)
+      case "$BG_OUT" in *cleared*) bad "PM TOOL-aFrugalTurnstile-15 $_ac printed a cleared line: $BG_OUT" ;;
+        *) ok "PM TOOL-aFrugalTurnstile-15 $_ac a scoped record whose base is older than the red forces FULL, no cleared line" ;; esac ;;
+    "AC3|$((_m0 + 1))|"*"red ${_x:0:8} on origin is cleared for this push — the adopted green ${_b:0:8} descends from it"*"scoped gate on main push"*)
+      ok "PM TOOL-aFrugalTurnstile-15 AC3 a full base strictly descending from the red clears it and scopes" ;;
+    *) bad "PM TOOL-aFrugalTurnstile-15 $_ac red ${_x:0:8}: unexpected decision, marker $_m0/$(read_bg_marks): $BG_OUT" ;;
+  esac
+  cd "$pfx_home" || exit 2
+done
+build_bg_fixture pm-base || bad "PM could not build its fixture"
+_f=$(git rev-parse HEAD); write_bg_stamp "$_f"; echo 1 >> src/x.sh; git commit -qam t
+run_pm_decide -- "$(git rev-parse HEAD)" "$(read_pm_remote)"; run_bg_push
+_pmb=${PM_OUT#scoped }; _pmb=${_pmb%% *}
+case "$BG_OUT" in
+  *"BAR base=$_pmb full="*) [ "$PM_OUT" = "scoped $_f $_f" ] && ok "PM AC11 the scoped base --decide prints is the GATE_BASE the bar receives" \
+    || bad "PM AC11 --decide printed '$PM_OUT', not scoped $_f $_f" ;;
+  *) bad "PM AC11 the bar's GATE_BASE differs from --decide's '$PM_OUT': $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# AC12 — a scoped record written on a scoped base names that base's FULL green, and the next push adopts it.
+build_bg_fixture pm-chain || bad "PM could not build its fixture"
+echo 1 >> src/x.sh; git commit -qam c1; _c1=$(git rev-parse HEAD); run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
+echo 2 >> src/x.sh; git commit -qam c2; run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
+echo 3 >> src/x.sh; git commit -qam c3; _c3=$(git rev-parse HEAD); run_bg_push GOV_GATE_CMD="$BG_WRAP"; set_bg_remote
+[ "$(read_bg_key "$bg_gd/gate-bar-green.scoped" sha)|$(read_bg_key "$bg_gd/gate-bar-green.scoped" base)" = "$_c3|$_c1" ] \
+  && ok "PM AC12 the scoped record written on a scoped base names the full green ${_c1:0:8}" \
+  || bad "PM AC12 expected gate-bar-green.scoped at ${_c3:0:8} with base ${_c1:0:8}: $(cat "$bg_gd/gate-bar-green.scoped" 2>&1)"
+echo 4 >> src/x.sh; git commit -qam c4; run_bg_push GOV_GATE_CMD="$BG_WRAP"
+case "$BG_OUT" in
+  *"scoped gate on main push"*"scoped bar green ${_c3:0:8}"*) ok "PM AC12 the next push adopts the new scoped record" ;;
+  *) bad "PM AC12 expected the push to scope from ${_c3:0:8}, got: $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-16 AC1 — adopting a `kind scoped` record M whose base is B, --decide prints
+# BOTH: `scoped M B`. RED against the hook at 9873a25f, which printed `scoped M` alone.
+build_bg_fixture t16a || bad "T16 could not build its fixture"
+_b=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam l; _l=$(git rev-parse HEAD)
+write_bg_record "$bg_gd/gate-bar-green" "$_b" full "" "$BG_WRAP"; write_bg_record "$bg_gd/gate-bar-green.scoped" "$_l" scoped "$_b" "$BG_WRAP"
+echo 2 >> src/x.sh; git commit -qam t; run_pm_decide GOV_GATE_CMD="$BG_WRAP" -- "$(git rev-parse HEAD)" "$(read_pm_remote)"
+[ "$PM_RC|$PM_OUT" = "0|scoped $_l $_b" ] && ok "T16 AC1 an adopted scoped record's line names it and its full base" \
+  || bad "T16 AC1 expected 'scoped ${_l:0:8}… ${_b:0:8}…', got rc $PM_RC: $PM_OUT"
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-16 AC4 — scoping from an inherited green prints `-` as the full base and writes
+# no scoped record, naming the inherited green. RED at 9873a25f: it wrote one with base C.
+build_bg_fixture t16inh 'INHERITED_RED_MAX_AGE=10\n' || bad "T16 could not build its fixture"
+_r=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam c1; _c=$(git rev-parse HEAD); write_bg_stamp "$_c"
+mv "$bg_gd/gate-full-green" "$bg_gd/gate-inherited-green"; printf 'base\t%s\nmax_age\t10\n' "$_r" >> "$bg_gd/gate-inherited-green"
+echo 2 >> src/x.sh; git commit -qam c2; run_pm_decide -- "$(git rev-parse HEAD)" "$_r"; run_bg_push
+case "$PM_OUT|$([ -e "$bg_gd/gate-bar-green.scoped" ] && echo PRESENT)|$BG_OUT" in
+  "scoped $_c -||"*"no gate-bar-green written — this push scoped from the inherited green ${_c:0:8}"*) ok "T16 AC4 an inherited-green scope prints '-' and writes no scoped record" ;;
+  *) bad "T16 AC4 expected 'scoped ${_c:0:8} -' and no scoped record, got: $PM_OUT | $BG_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# TOOL-aFrugalTurnstile-16 AC3 — the cover pass refuses a runner stamp with a foreign manifest, another
+# manifest blob or another fingerprint: the bar runs and no cover line prints. With a non-covering bar
+# record planted (bar `bash other-bar.sh`) the `not covered` line prints, and it names the reason.
+# Deleting any of the three refusals reds its arm; the unaltered stamp is the control.
+build_bg_fixture t16stamp || bad "T16 could not build its fixture"
+git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
+git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1
+for _alt in "control:" "manifest:leg manifest tools/other-legs.json" "blob:leg manifest blob 01234567" "fingerprint:graded tree fingerprint 01234567"; do
+  rm -f "$bg_gd"/gate-bar-green*; write_bg_stamp "$_x"
+  case "${_alt%%:*}" in
+    manifest) set_bg_key "$bg_gd/gate-full-green" manifest tools/other-legs.json ;;
+    blob) set_bg_key "$bg_gd/gate-full-green" manifest_blob 0123456789abcdef0123456789abcdef01234567 ;;
+    fingerprint) set_bg_key "$bg_gd/gate-full-green" fingerprint 0123456789abcdef ;;
+  esac
+  write_bg_record "$bg_gd/gate-bar-green" "$_x" full "" "bash other-bar.sh"
+  _m0=$(read_bg_marks); run_bg_push
+  case "${_alt%%:*}|$(read_bg_marks)|$BG_OUT" in
+    "control|$_m0|"*"covered on main push"*) ok "T16 AC3 the unaltered runner stamp covers" ;;
+    control*) bad "T16 AC3 the unaltered runner stamp must cover, got: $BG_OUT" ;;
+    *"covered on main push"*) bad "T16 AC3 a ${_alt%%:*}-altered runner stamp covered: $BG_OUT" ;;
+    *"|$((_m0 + 1))|"*"not covered"*"${_alt#*:}"*) ok "T16 AC3 a ${_alt%%:*}-altered runner stamp is refused, naming it" ;;
+    *) bad "T16 AC3 a ${_alt%%:*}-altered runner stamp: expected the bar to run and '${_alt#*:}', got: $BG_OUT" ;;
+  esac
+done
 cd "$pfx_home" || exit 2
 
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

@@ -186,6 +186,46 @@ if [ "$rc9b" -eq 0 ] && grep -q "$(git rev-parse HEAD) by push-main bar tracked 
 else
   bad "9b a tracked-bar landing did not write its marker naming the bar (rc $rc9b): $out9b | $(cat "$gcd/unattended-landed" 2>/dev/null)"
 fi
+# SG AC4 (TOOL-aSignalledHook-1) — and the hook that allowed 9b's push says so: its allow record
+#      names the pushed commit, which is the record the lander now requires before it says landed.
+if [ "$(cut -f1 "$gitdir/pre-push-allow" 2>/dev/null)" = "$(git rev-parse HEAD)" ]; then
+  ok "SG AC4 a gated landing leaves the hook's allow record naming the pushed commit"
+else
+  bad "SG AC4 the allow record after 9b reads '$(cat "$gitdir/pre-push-allow" 2>/dev/null)', not $(git rev-parse --short HEAD)"
+fi
+
+# SG AC3 (TOOL-aSignalledHook-1) — A PUSH GIT CALLS SUCCESSFUL WITH NO HOOK VERDICT. On Git for Windows
+#      a hook killed by a signal, KILL included, reads to git as exit 0, and 69e0ff0f landed that way.
+#      The stand-in reproduces what such a hook leaves, on any platform: it vets the bar as `default`,
+#      as the real hook does before its bar runs, and ends 0 with no allow record. The lander must say
+#      the push landed UNGATED, exit 4 and withhold the marker; before the record existed it wrote one.
+mkdir -p "$tmp/killed-hook"
+printf '#!/usr/bin/env bash\nprintf "default\\tstub-bar.sh\\t0\\n" > "$(git rev-parse --git-dir)/pre-push-bar"\nexit 0\n' \
+  > "$tmp/killed-hook/pre-push"
+chmod +x "$tmp/killed-hook/pre-push"
+git commit -q --allow-empty -m sg-ac3
+rm -f "$gcd/unattended-landed"
+git config core.hooksPath "$tmp/killed-hook"
+outsg=$( ( unset GOV_GATE_CMD_TEST; bash "$lander" 2>&1 ) ); rcsg=$?
+git config core.hooksPath .githooks
+case "$rcsg|$([ -f "$gcd/unattended-landed" ] && echo marker || echo none)|$(git -C "$tmp/remote.git" rev-parse main)" in
+  "4|none|$(git rev-parse HEAD)")
+    case "$outsg" in
+      *"landed UNGATED"*) ok "SG AC3 a push with no hook allow record is reported landed UNGATED, exit 4, no lander marker" ;;
+      *) bad "SG AC3 exit 4 and no marker, but the UNGATED line is missing: $outsg" ;;
+    esac ;;
+  0*) bad "SG AC3 the lander called a push with no hook verdict landed (rc 0): $outsg" ;;
+  *) bad "SG AC3 expected rc 4, no marker and the remote at HEAD, got rc $rcsg marker $([ -f "$gcd/unattended-landed" ] && echo yes || echo no): $outsg" ;;
+esac
+# SG re-run (closing review round 1) — NOTHING PUSHED IS NOT UNGATED. The remote now holds HEAD, so git
+#      runs the real hook with no ref lines, it exits as skip-nondefault and writes no allow record, and
+#      git still exits 0. The lander must say nothing was pushed, not that a hook was killed.
+outre=$( ( unset GOV_GATE_CMD_TEST; bash "$lander" 2>&1 ) ); rcre=$?
+case "$rcre|$outre" in
+  *"landed UNGATED"*) bad "SG re-run a push of nothing was reported landed UNGATED (rc $rcre): $outre" ;;
+  "0|"*"already held"*"nothing was pushed"*) ok "SG re-run a lander with nothing to push says so and exits 0, not UNGATED" ;;
+  *) bad "SG re-run expected rc 0 and 'nothing was pushed', got rc $rcre: $outre" ;;
+esac
 
 # H1 — ONE CHANNEL (closing review round 1 H1). The hook and this lander used to answer "was the bar a
 #      stub?" from two environments, and the hook's includes whatever gate-env.sh sets. Here a
@@ -573,6 +613,24 @@ rem=$(git ls-remote "$tmp/remote2.git" refs/heads/main | awk '{print $1}')
   && ok "20 raced, re-prepared, landed; the first prepared merge is an ancestor of the pushed tip" \
   || bad "20 rc=$rc20 $out20"
 
+# SG AC3b (TOOL-aSignalledHook-1, closing review round 1) — the --land path, the one 69e0ff0f took: a
+#      prepared merge pushed through the killed-hook stand-in from SG AC3 is reported landed UNGATED
+#      and exits 4. SG AC3 drives only the attended path, so this guard could be deleted unseen.
+build_main
+git -C "$tmp/wt" checkout -q -B feat "$(git -C "$tmp/work2" rev-parse refs/remotes/origin/main)"
+echo u3 > "$tmp/wt/src-u3.txt"; git -C "$tmp/wt" add src-u3.txt
+git -C "$tmp/wt" commit -q -m "TOOL-tFix-4: unit four"
+run_wt --prepare --slug tFix >/dev/null 2>&1
+t3b=$(git -C "$tmp/wt" rev-parse HEAD)
+git -C "$tmp/wt" config core.hooksPath "$tmp/killed-hook"
+out3b=$( ( unset GOV_GATE_CMD_TEST; run_wt --land --slug tFix 2>&1 ) ); rc3b=$?
+git -C "$tmp/wt" config core.hooksPath .githooks
+case "$rc3b|$(git ls-remote "$tmp/remote2.git" refs/heads/main | awk '{print $1}')|$out3b" in
+  "4|$t3b|"*"landed UNGATED"*) ok "SG AC3b --land through a hook that left no allow record reports landed UNGATED and exits 4" ;;
+  0*) bad "SG AC3b --land called a push with no hook verdict landed (rc 0): $out3b" ;;
+  *) bad "SG AC3b expected rc 4, the remote at ${t3b:0:8} and landed UNGATED, got rc $rc3b: $out3b" ;;
+esac
+
 # 21 — a MISTYPED flag refuses instead of falling through to the attended path, which from this tree
 #      would push the local default branch. Run where that fallthrough would actually land.
 rembefore=$(git ls-remote "$tmp/remote2.git" refs/heads/main | awk '{print $1}')
@@ -707,6 +765,86 @@ else
   echo "  skip — 25 no govkit deployer or lexicon kit beside this lander, so the missing-file arm did not run"
 fi
 
+# ---- THE POST-MERGE BAR AFTER A LANDING — TOOL-aFrugalTurnstile-8 ---------------------------------
+# A sixth fixture with NO pre-push hook wired, so a landing costs seconds: a stub post-merge script in
+# a run-gates dir beside the fixture lander sleeps 8 s, then writes its argv to $MARK. Each case
+# commits its own gate-env declaration and lands; the markers are read once, after one wait. Observed
+# RED against the lander at bef97330 (no marker, no line in any case) and GREEN against the change.
+git init -q --bare "$tmp/remote6.git"
+setup_repo "$tmp/work6" origin "$tmp/remote6.git"
+git config --unset core.hooksPath
+pmk="./${KIT_REL}run-gates"   # the stub kit dir beside the fixture lander; spelled bare for the install-prefix ban
+mkdir -p "$pmk"
+printf '#!/usr/bin/env bash\nsleep 8\necho "$*" > "$MARK"\n' > "$pmk/post-merge.sh"
+git add -A; git commit -q -m "stub post-merge"
+git push -q --no-verify origin main
+git -C "$tmp/remote6.git" symbolic-ref HEAD refs/heads/main
+gcd6=$(cd "$(git rev-parse --git-common-dir)" && pwd)
+run_pm_case() {  # case · gate-env GATE_POST_MERGE line or '' -> pm_out pm_rc pm_secs pm_sha
+  export MARK="$tmp/pm-mark-$1"
+  printf 'GATE_JOBS=1\n%s' "$2" > .githooks/gate-env.sh
+  echo "$1 $RANDOM" > "src-pm-$1.txt"; git add -A; git commit -q -m "pm case $1"
+  local s; s=$(date +%s)
+  pm_out=$(bash "$lander" 2>&1); pm_rc=$?
+  pm_secs=$(( $(date +%s) - s )); pm_sha=$(git rev-parse HEAD)
+}
+run_pm_case p1 $'GATE_POST_MERGE=local\n'; o1=$pm_out; r1=$pm_rc; s1=$pm_secs; h1=$pm_sha
+run_pm_case p3 $'GATE_POST_MERGE=ci\n'; o3=$pm_out
+run_pm_case p4 ''; o4=$pm_out
+run_pm_case p5 $'GATE_POST_MERGE=yes\n'; o5=$pm_out
+run_pm_case p6r $'GATE_POST_MERGE=local\n'
+run_pm_case p6 ''; o6=$pm_out                       # R declares local, the landed commit deletes it
+GATE_POST_MERGE=local run_pm_case p6e ''; o6e=$pm_out  # the environment says local, the tip says nothing
+git rm -q "$pmk/post-merge.sh"
+run_pm_case p7 $'GATE_POST_MERGE=local\n'; o7=$pm_out; r7=$pm_rc; h7=$pm_sha
+git checkout -q HEAD~1 -- "$pmk/post-merge.sh"
+git add -A; git commit -q -m "stub back"; git push -q --no-verify origin main
+git worktree add -q "$tmp/wt6" -b feat6 main
+export MARK="$tmp/pm-mark-p8"
+o8=$(cd "$tmp/wt6" && echo u8 > src-u8.txt && git add src-u8.txt && git commit -q -m "TOOL-tB-1: unit" \
+  && bash "$lander" --prepare --slug tB >/dev/null 2>&1 && bash "$lander" --land --slug tB 2>&1)
+h8=$(git -C "$tmp/wt6" rev-parse HEAD)
+sleep 12
+read_pm_mark() { [ -f "$tmp/pm-mark-$1" ] && cat "$tmp/pm-mark-$1" || echo absent; }
+# AC1 — local: the capture returns before the 8 s child finishes, and the child ran on the landed tip
+[ "$r1" = 0 ] && [ "$s1" -lt 8 ] && [ "$(read_pm_mark p1)" = "$h1 --remote origin" ] \
+  && ok "pm1 GATE_POST_MERGE=local starts the post-merge bar on the landed tip, detached (${s1}s capture)" \
+  || bad "pm1 rc=$r1 secs=$s1 marker='$(read_pm_mark p1)' tip=$h1 $o1"
+# AC2 — the stderr line and the start record in the common dir
+rec=$(cat "$gcd6/gate-post-merge.start" 2>/dev/null)
+rlog=$(printf '%s\n' "$rec" | awk -F'\t' '$1=="log"{print $2}')
+[ "$(printf '%s\n' "$o1" | grep -c "post-merge bar started on ${h1:0:8} — pid")" = 1 ] \
+  && printf '%s\n' "$rec" | grep -q "^pid	[0-9]" && printf '%s\n' "$rec" | grep -q "^by	push-main$" \
+  && [ -n "$rlog" ] && [ -f "$rlog" ] \
+  && ok "pm2 the start is one stderr line and a sha/pid/log/by record" || bad "pm2 record='$rec' $o1"
+# (the record now names the in-place landing's sha, the last start; check AC2's sha on p8 below)
+# AC3, AC4, AC5 — ci says so, undeclared is silent, a value outside the set is named; none starts
+[ "$(printf '%s\n' "$o3" | grep -c 'remote CI runs it')" = 1 ] && [ "$(read_pm_mark p3)" = absent ] \
+  && ok "pm3 ci prints one line and starts nothing" || bad "pm3 marker='$(read_pm_mark p3)' $o3"
+[ "$(printf '%s\n' "$o4" | grep -c 'post-merge')" = 0 ] && [ "$(read_pm_mark p4)" = absent ] \
+  && ok "pm4 undeclared prints nothing and starts nothing" || bad "pm4 marker='$(read_pm_mark p4)' $o4"
+case "$o5" in *"is 'yes', outside 'local ci'"*) l5=1 ;; *) l5=0 ;; esac
+[ "$l5" = 1 ] && [ "$(read_pm_mark p5)" = absent ] \
+  && ok "pm5 a value outside 'local ci' is named and starts nothing" || bad "pm5 marker='$(read_pm_mark p5)' $o5"
+# AC6 — read at the landed tip only: not R, not the environment
+[ "$(printf '%s\n%s\n' "$o6" "$o6e" | grep -c 'post-merge')" = 0 ] && [ "$(read_pm_mark p6)$(read_pm_mark p6e)" = absentabsent ] \
+  && ok "pm6 the declaration is read at the landed tip, never from R or the environment" \
+  || bad "pm6 markers='$(read_pm_mark p6)' '$(read_pm_mark p6e)' $o6 $o6e"
+# AC7 — no kit: a line, exit 0, the landing stands
+[ "$r7" = 0 ] && case "$o7" in *"no run-gates kit holding post-merge.sh"*) true ;; *) false ;; esac \
+  && [ "$(git ls-remote "$tmp/remote6.git" refs/heads/main | cut -f1)" = "$h7" ] \
+  && ok "pm7 a missing post-merge script is one line and exit 0; the landing stands" || bad "pm7 rc=$r7 $o7"
+# AC8 — the in-place path starts it too, on the prepared merge
+[ "$(read_pm_mark p8)" = "$h8 --remote origin" ] && grep -q "^sha	$h8$" "$gcd6/gate-post-merge.start" \
+  && ok "pm8 --land starts the post-merge bar on the prepared merge" || bad "pm8 marker='$(read_pm_mark p8)' tip=$h8 $o8"
+cd "$SRC" || exit 2
+# AC9 — the copied parser is byte-identical to the hook's; a one-byte break in a scratch copy shows
+read_parser_slice() { awk '/^read_policy_key\(\)/,/^}/' "$1"; }
+sed 's/ hit=1 ;;/ hit=2 ;;/' "$HERE/push-main.sh" > "$tmp/pm-copy.sh"
+d9=$(diff <(read_parser_slice "$HERE/push-main.sh") <(read_parser_slice "$SRC/.githooks/pre-push")); d9b=$(diff <(read_parser_slice "$tmp/pm-copy.sh") <(read_parser_slice "$SRC/.githooks/pre-push"))
+[ -z "$d9" ] && [ -n "$(read_parser_slice "$HERE/push-main.sh")" ] && [ -n "$d9b" ] \
+  && ok "pm9 read_policy_key is byte-identical to the pre-push hook's, and a staged break shows" \
+  || bad "pm9 parity diff: $d9 | break diff empty: $([ -z "$d9b" ] && echo yes || echo no)"
 # 26 — TOOL-aRoutedQuill-3 AC11: the ATTENDED landing's mint commit names the newest unit the pushed
 #      range attributes, `mint: kit versions onto origin/main at <sha8> for <unit>`, and carries a
 #      `Pass: none` trailer, because it touches version carriers under ROUTED_PATHS and the pre-push
@@ -727,18 +865,25 @@ write_unit_spec() { # unit id -> a one-line spec defining it, committed into the
 }
 _mt_rc=$(cd "$HERE" && for d in */; do [ -f "$d/routed_commits.py" ] && { printf '%s' "${d%/}"; break; }; done)
 if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ] && [ -n "$_mt_rc" ]; then
-  git clone -q --bare "$SRC" "$tmp/remote6.git"
-  git clone -q "$tmp/remote6.git" "$tmp/work6"
+  git clone -q --bare "$SRC" "$tmp/remote26.git"
+  git clone -q "$tmp/remote26.git" "$tmp/work26"
   out26=$(
-    cd "$tmp/work6" || exit 1
+    cd "$tmp/work26" || exit 1
     git config user.email t@e; git config user.name t; git config core.autocrlf false
     git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
     git push -q -f --no-verify origin main
-    git -C "$tmp/remote6.git" symbolic-ref HEAD refs/heads/main
+    git -C "$tmp/remote26.git" symbolic-ref HEAD refs/heads/main
     R6=$(git rev-parse HEAD)
     write_unit_spec TOOL-tFix-26 || exit 1
     printf '# a comment line, push-main.test case 26\n' >> "${KIT_REL}$_mt_rl/extract.py"
-    git commit -q --no-verify -am "TOOL-tFix-26: move runlog"
+    # The unit needs a SPEC: the lander's mint names only an id a spec at HEAD defines
+    # (TOOL-aRoutedQuill-12 S2), so an unspecced id named no unit and this arm red at b726385f
+    # (TOOL-dHomedResolver-8).
+    mkdir -p memory/builds/tFix/spec
+    printf '# TOOL-tFix-26 — the unit push-main.test case 26 lands\n' \
+      > memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-26.md
+    git add -A
+    git commit -q --no-verify -m "TOOL-tFix-26: move runlog"
     unset GATE_PUSH_BASE; bash "$lander" >/dev/null 2>&1 || echo "rc=$?"
     printf 'tip=%s\n' "$(git rev-parse origin/main)"
     printf 'head=%s\n' "$(git rev-parse HEAD)"

@@ -120,7 +120,7 @@ authored region holds only the facts nothing in the tree derives, enumerated in 
 section 2 and not counted here.
 
 **The template is byte-gated and this feature is kit-conditional.** The rules live in the charter's
-two `kit:unattended` conditional blocks in §1, dropped by the renderer for a target that did not
+two `kit:unattended` conditional blocks in section 3, dropped by the renderer for a target that did not
 select the kit; two amended clauses sit in the unconditional body, true for a non-adopting
 re-puller. The Skill's `## Resume` section invokes `/session-kickoff` after the reap and the
 re-schedule (`TOOL-aReplayedCard-3`), so a resumed session re-orients before its first commit;

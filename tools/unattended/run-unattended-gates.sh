@@ -21,7 +21,7 @@
 # wall clock cannot fall below the longest leg however wide the pool is. The record is
 # memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
 #
-# WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter §7):
+# WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter [gate]):
 # no merge bar and no push runs the self-tests. In gov itself the daily schedule in
 # `.github/workflows/remote-ci.yml` runs each one AFTER landing, under its hang bound and with no
 # cost verdict (TOOL-dDerivedDocket-32); an adopter's tree has that schedule only if it writes one.

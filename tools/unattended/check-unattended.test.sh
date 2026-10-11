@@ -3244,7 +3244,7 @@ reset_tree
 # H, the OWNER TURN after the push. This is the direction that destroys the provenance argument: the
 # one question the path may ask would be asked by a run already authorized, with nobody present.
 reset_tree
-mutate $KIT_REL/SKILL.template.md 's/One `AskUserQuestion`, every gap/One ask, every gap/'
+mutate $KIT_REL/SKILL.template.md 's/[Oo]ne `AskUserQuestion`, every gap/one ask, every gap/'
 mutate $KIT_REL/SKILL.template.md 's/^6\. \*\*The kickoff hand-back\*\*/6. **The kickoff hand-back** AskUserQuestion/'
 hit "$(run)" "the Skill's prompt path puts its owner turn AFTER the branch push, so the one question it is allowed to ask would be asked by a run that is already authorized and has nobody to answer it:"
 

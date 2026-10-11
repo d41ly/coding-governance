@@ -9,7 +9,7 @@
 # it. `<prefix>/unattended/run-unattended-gates.sh` took that ruling for ONE kit. This is the same thing
 # for every kit, which is what the ruling always implied and nobody had built.
 #
-# WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter §7):
+# WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter [gate]):
 # no merge bar and no push runs these. In gov itself the daily schedule in
 # `.github/workflows/remote-ci.yml` runs each one AFTER landing, under its hang bound and with no
 # cost verdict (TOOL-dDerivedDocket-32); an adopter's tree has that schedule only if it writes one.
@@ -274,7 +274,7 @@ SWEEP_TRAILER_RX='PASS \(|assertions executed|this leg ran shard'
 # so the landing order can never matter again. The phrase is the suite's own, verbatim.
 SWEEP_NOBASELINE_RX='expected set not yet observed'
 
-# THE NODE IS THE CHARTER'S §2 REGISTRY TAG, never a hostname, which the registry does not know:
+# THE NODE IS THE CHARTER'S NODE-REGISTRY TAG, never a hostname, which the registry does not know:
 # GOV_NODE when set, else USERNAME/USER matched against the registry table of the charter at the
 # repo root — `AGENTS.md`, then `CLAUDE.md`, the precedent `run-gates.gov.test.sh` spells — with the
 # row regex the drift audit's `_resolve_node_tag` uses (the registry's machine/user token is a
@@ -1012,13 +1012,13 @@ if [ "$MODE" = sweep ]; then
   read_margin || exit 2
   SWEEP_NODE=$(resolve_node_tag) || {
     if [ $? = 2 ]; then
-      echo "run-selftests: GOV_NODE is '${GOV_NODE:-}', which is no tag the charter's §2 node table (AGENTS.md," >&2
+      echo "run-selftests: GOV_NODE is '${GOV_NODE:-}', which is no tag the charter's node registry (AGENTS.md," >&2
       echo "run-selftests: then CLAUDE.md, at the repo root) carries — a reading written under it would red" >&2
       echo "run-selftests: --check on every bar until the tracked file was hand-edited. Nothing was run." >&2
       exit 2
     fi
-    echo "run-selftests: no registry row matches user '${USERNAME:-${USER:-}}' in the charter's §2" >&2
-    echo "run-selftests: node table (AGENTS.md, then CLAUDE.md, at the repo root), and GOV_NODE is" >&2
+    echo "run-selftests: no registry row matches user '${USERNAME:-${USER:-}}' in the charter's" >&2
+    echo "run-selftests: node registry (AGENTS.md, then CLAUDE.md, at the repo root), and GOV_NODE is" >&2
     echo "run-selftests: unset. Pooled evidence is keyed by NODE — a reading taken on another box" >&2
     echo "run-selftests: bounds nothing here — and a hostname is a name the registry does not know." >&2
     echo "run-selftests: Register the node, or set GOV_NODE=<tag>. Nothing was run." >&2
@@ -1196,9 +1196,10 @@ if [ "$MODE" = sweep ]; then
   # private TMPDIR below is the redirection; this is the observation that it held.
   #
   # ONE ARM, over the TRACKED working tree. It listed the git common dir too and that arm is DELETED
-  # rather than narrowed: that directory is shared by every worktree of the repository and the bar
-  # itself writes `gate-bar-beacon` and `gate-bar-queue` at its top level when it claims the
-  # turnstile, alongside `gate-ledger.tsv`, `gate-logs`, `index`, `logs` and `refs`. The sweep's
+  # rather than narrowed: that directory is shared by every worktree of the repository and holds
+  # `gate-ledger.tsv`, `gate-logs`, `index`, `logs` and `refs`, which any sibling session's bar or git
+  # command rewrites (the turnstile's beacon and queue sit in a host directory since
+  # TOOL-aFrugalTurnstile-5, not here). The sweep's
   # floor is its longest suite, so the window between the two readings is tens of minutes wide: any
   # sibling session running a bar flips the listing, and a whole-run fingerprint cannot name a
   # culprit. An instrument that reds on innocent runs is ignored within two sightings.
@@ -1269,7 +1270,10 @@ if [ "$MODE" = sweep ]; then
     # under them. The whole WALL rendering path below was unreachable dead code as a result.
     # Recording the `timeout` child rather than this subshell is what makes the kill reach the work:
     # `timeout` forwards the signal to its own child, and killing the subshell would leave both.
-    TMPDIR="$d/tmp" "$SWEEP_TIMEOUT" -k 5 "$bound" bash -c "${SW_ARGV[$((k - 1))]}" > "$d/out" 2>&1 &
+    # A PRIVATE TURNSTILE per row (TOOL-aFrugalTurnstile-5 S7): the runner's beacon is host-wide, so
+    # every row's fixture bars would otherwise serialize against each other and against real bars.
+    TMPDIR="$d/tmp" GATE_TURNSTILE_DIR="$d/tmp/gate-turnstile" \
+      "$SWEEP_TIMEOUT" -k 5 "$bound" bash -c "${SW_ARGV[$((k - 1))]}" > "$d/out" 2>&1 &
     tp=$!
     echo "$tp" > "$d/pid"
     wait "$tp"
@@ -1798,7 +1802,7 @@ if [ -n "$ATTRIBUTE" ]; then
   # ---- "did this suite fail at R", so R's copy of the suite and R's copy of the declaration are
   # ---- the ones that answer it. Reading them with `git show` is what lets a fully cached run add
   # ---- no entry to `git worktree list` at all.
-  # ---- THE PATHS ARE DERIVED. A kit file names nothing outside itself by literal (charter §12):
+  # ---- THE PATHS ARE DERIVED. A kit file names nothing outside itself by literal (the shipped-surface rule check-install-prefix.sh holds):
   # ---- a `tools/…` spelling here resolves to nothing at another install prefix.
   HERE_REL=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-prefix 2>/dev/null) || HERE_REL=""
   R_BUDGETS="$ATTR_TMP/budgets-at-R"; : > "$R_BUDGETS"
@@ -1931,7 +1935,7 @@ if [ -n "$ATTRIBUTE" ]; then
       # statement that this run attributed less than it selected.
       if [ "$rdead" = 0 ] && [ "$src" != absent ]; then a_n=$((a_n + 1)); fi
     fi
-    # THE L SIDE'S COST VERDICT SURVIVES THE FLAG. Charter §7 says a runner REDS on a breach, and a
+    # THE L SIDE'S COST VERDICT SURVIVES THE FLAG. The charter's [cost] says a runner REDS on a breach, and a
     # mode every self-test unit verifies with is the last place to suspend that. The R side carries
     # no verdict at all: it is evidence nobody asked to be fast.
     if [ -n "$rtook" ]; then

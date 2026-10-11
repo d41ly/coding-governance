@@ -5596,12 +5596,12 @@ def eol_population(target: pathlib.Path) -> dict[str, str]:
     literal paths it returns are what the renormalize touches and what the post-condition re-reads.
     """
     files = subprocess.run(["git", "-C", str(target), "ls-files", "-z"],
-                           capture_output=True, text=True).stdout.split("\0")
+                           capture_output=True, text=True, encoding="utf-8").stdout.split("\0")
     files = [f for f in files if f]
     if not files:
         return {}
     out = subprocess.run(["git", "-C", str(target), "check-attr", "--stdin", "-z", "eol"],
-                         input="\0".join(files), capture_output=True, text=True)
+                         input="\0".join(files), capture_output=True, text=True, encoding="utf-8")
     fields, res = out.stdout.split("\0"), {}
     for i in range(0, len(fields) - 2, 3):
         path, _attr, value = fields[i], fields[i + 1], fields[i + 2]
@@ -7828,7 +7828,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             # Measured on git 2.55: `-z` disables the quoting as well as the terminator, so
             # `core.quotepath=false` beside it would be inert and is deliberately not here.
             _alldiff = subprocess.run(["git", "-C", str(target), "diff", "--name-only", "-z",
-                                       "HEAD"], capture_output=True, text=True)
+                                       "HEAD"], capture_output=True, text=True, encoding="utf-8")
             dirty = [p for p in _alldiff.stdout.split("\0") if p and p in _lfset and p not in ours]
             missing_wt = [p for p in lf_paths if not (target / p).exists()]
             if dirty or missing_wt:
