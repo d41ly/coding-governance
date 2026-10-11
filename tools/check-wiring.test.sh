@@ -499,6 +499,22 @@ JSON
     out=$(HOME="$SGHOME" chk --check)
     ck "RQ5 AC8 the PreToolUse matcher wired under SubagentStart -> the PreToolUse entry is UNWIRED" \
        "$(printf '%s' "$out" | grep -q '^UNWIRED  scratch   — .*PreToolUse entry' && echo 1 || echo 0)"
+    # TOOL-aBriskPreflight-2 AC6 — a SHIPPED fragment with its matcher line taken out, beside a second
+    # fragment that declares one. The reader keeps four keys per path for the whole run, and the
+    # absent key must read as absent: never as the other fragment's value, and never as a pass.
+    rm -f .claude/settings.json
+    for _f in scratch-guard scratch-guard-subagent; do
+      "$py" ${KP}settings-merge.py --fragment $KIT_REL/${HOOKS}/$_f.fragment.json >/dev/null 2>&1
+    done
+    _sgf=$KIT_REL/${HOOKS}/scratch-guard.fragment.json
+    grep -v '"matcher"' "$SGFRAG" > "$_sgf"
+    out=$(HOME="$SGHOME" chk --check)
+    ck "BP2 AC6 a shipped fragment with no matcher -> UNWIRED scratch naming that fragment, never another's matcher" \
+       "$(printf '%s' "$out" | grep -qF "UNWIRED  scratch   — $_sgf declares no marker/matcher/event/hook_path" && echo 1 || echo 0)"
+    cp "$SGFRAG" "$_sgf"
+    out=$(HOME="$SGHOME" chk --check)
+    ck "BP2 AC6 LIVENESS ...and restored, the PreToolUse entry reads ok again" \
+       "$(printf '%s' "$out" | grep -q '^ok       scratch   — PreToolUse entry' && echo 1 || echo 0)"
   else
     echo "skip RQ5 AC8 — scratch-guard-subagent.fragment.json not found beside the gate's fragment"
   fi
@@ -1539,6 +1555,44 @@ for spell in 'absent|' 'blank|BACKLOG_MODE=""' 'quoted|BACKLOG_MODE="builds"' \
 done
 rm -f "$D/.git/mode-kit.py"
 cleanup
+
+# ---- TOOL-aBriskPreflight-2 AC9: the launcher is resolved ONCE, and a run with none still probes ----
+# Every arm that needs python reads `PY_OK`, set beside `PY`, instead of RUNNING the candidates again.
+# Every launcher name is shadowed by a stub that exits 9 and GOV_PYTHON names a fourth, so a memo that
+# read a launcher as resolved hands a stub to the kit resolver and to the straggler inventory: the
+# agent-cap arm then skips a hook that is there, and the straggler line names an exit status. The
+# engine is a stub too, because a run with no python stops before it starts it.
+newrepo
+OOT=$(mktemp -d)
+for _n in python3 python py gov-py; do printf '#!/bin/sh\nexit 9\n' > "$OOT/$_n"; chmod +x "$OOT/$_n"; done
+mkdir -p "./${KP}$HOOKS" "./${KP}${MT_KIT}"; cp "$SCRIPT" "./${KP}check-wiring.sh"; printf '// stub\n' > "${KP}$HOOKS/agent-cap.js"
+printf '# a stub engine\n' > "${KP}${MT_KIT}/migrate_backlog.py"
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="tooling"\nFAMILIES="tooling:TOOL"\nROTATION_MODE="cut"\nBACKLOG_MODE="builds"\n' > .memory-tree.conf
+git add -A; git commit -q -m "no usable python, and a builds-mode memory tree"
+out=$(PATH="$OOT:$PATH" GOV_PYTHON="$OOT/gov-py" bash "./${KP}check-wiring.sh" --check 2>"$OOT/err")
+ck "BP2 AC9 no launcher runs -> stderr carries the resolver's bash-probe note" \
+   "$(grep -q '^note     resolver  — no usable python' "$OOT/err" && echo 1 || echo 0)"
+ck "BP2 AC9 ...stdout says the straggler inventory did not run" \
+   "$(printf '%s' "$out" | grep -q '^note     straggler — no usable python launcher resolved' && echo 1 || echo 0)"
+ck "BP2 AC9 ...and the bash probe rung still finds the shipped agent-cap.js" \
+   "$(printf '%s' "$out" | grep -q '^UNWIRED  agent-cap' && ! printf '%s' "$out" | grep -q '^skip     agent-cap' && echo 1 || echo 0)"
+cleanup
+
+# ---- TOOL-aBriskPreflight-2 AC12: KIT_FILE_PAIRS lists every pair a call site passes -----------------
+# A pair the list lacks still resolves, through a python start of its own, so a stale list is slower
+# and never wrong — which is why nothing but this comparison would ever see it go stale. The literal
+# pairs are the two words after each `resolve_kit_file` outside a comment.
+_kfp='FNR == NR { if (sub(/^KIT_FILE_PAIRS=\(/, "")) { sub(/\).*$/, ""); n = split($0, w, " "); for (i = 1; i < n; i += 2) have[w[i] " " w[i+1]] = 1 }; next }
+  /^[[:space:]]*#/ { next }
+  { s = $0; while (match(s, /resolve_kit_file [A-Za-z0-9_.-]+ [A-Za-z0-9_.-]+/)) { p = substr(s, RSTART + 17, RLENGTH - 17); print ((p in have) ? "listed " : "unlisted ") p; s = substr(s, RSTART + RLENGTH) } }'
+_pairs=$(awk "$_kfp" "$SCRIPT" "$SCRIPT")
+ck "BP2 AC12 every literal pair a resolve_kit_file call site passes is in KIT_FILE_PAIRS" \
+   "$([ -n "$_pairs" ] && ! printf '%s\n' "$_pairs" | grep -q '^unlisted ' && echo 1 || echo 0)"
+_kfd=$(mktemp -d)
+sed '/^KIT_FILE_PAIRS=(/s/ memory-tree merge-rows\.py//' "$SCRIPT" > "$_kfd/cw.sh"
+ck "BP2 AC12 LIVENESS ...and with one pair taken out of the list, the comparison names it" \
+   "$(awk "$_kfp" "$_kfd/cw.sh" "$_kfd/cw.sh" | grep -qx 'unlisted memory-tree merge-rows.py' && echo 1 || echo 0)"
+rm -rf "$_kfd"
 
 # ---- TOOL-aRepatriatedFork-19: the install RECEIPT is the first rung -----------------------------
 # An adopter that homes a kit somewhere no probe spells — the merge driver flat under `scripts/`, the

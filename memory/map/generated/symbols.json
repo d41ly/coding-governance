@@ -7978,11 +7978,6 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
-      "id": "json_str",
-      "kind": "function",
-      "file": "tools/check-wiring.sh"
-    },
-    {
       "id": "key",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -11328,6 +11323,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_fragment_keys",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
       "id": "read_gate",
       "kind": "function",
       "file": "tools/check-install-prefix.test.sh"
@@ -14654,6 +14654,11 @@
     },
     {
       "id": "resolve_kit_file",
+      "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "resolve_kit_files",
       "kind": "function",
       "file": "tools/check-wiring.sh"
     },

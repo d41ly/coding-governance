@@ -1,12 +1,13 @@
 # TOOL-aBriskPreflight-2 — check-wiring reads the settings file and each fragment once, and resolves python once
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 2 · ratified 2026-10-11
+**Status:** CLOSED · rev-1 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 2 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md](../build/2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 |
+| [2026-10-11-build-TOOL-aBriskPreflight-2-spawns-ab.md](../build/2026-10-11-build-TOOL-aBriskPreflight-2-spawns-ab.md) | research | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-2-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-2-build-brief.md) | research | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-2-spec-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-2-spec-brief.md) | research | — |

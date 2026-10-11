@@ -126,7 +126,8 @@ settings_json() {
 # adopter, so this reports. A project that wants it RED promotes it through TOOL-dRetiredFork-16's
 # extension point rather than by changing this kit for everyone.
 render_settings_path() { # the resolved path as a reader wants it: relative in-tree, absolute out
-  local p; p=$(settings_json 2>/dev/null) || { printf '%s\n' "(unresolved)"; return 0; }
+  local p=${_SETTINGS_CACHE:-}
+  [ -n "$p" ] || p=$(settings_json 2>/dev/null) || { printf '%s\n' "(unresolved)"; return 0; }
   case "$p" in
     "$ROOT"/*) printf '%s\n' "${p#"$ROOT"/}" ;;
     *)         printf '%s\n' "$p" ;;
@@ -145,8 +146,36 @@ check_settings_scope() {
 
 
 # ---- the fragment reader, ONE for every arm ------------------------------------------------------
-json_str() {  # value of a top-level "key": "..." in a small flat JSON file
-  sed -n 's|.*"'"$2"'"[[:space:]]*:[[:space:]]*"\([^"]*\)".*|\1|p' "$1" | head -1
+# TOOL-aBriskPreflight-2 S1. It was a `sed | head` per key per fragment, each inside a `$(…)`. Now a
+# fragment is read ONCE per run, by bash's own `read` and `[[ =~ ]]`, starting no process, and its
+# four keys are kept per path, so the subshell `$(resolve_fragment_hook …)` answers from the arm's
+# read. Each value is the one that `sed` yielded: the LAST `"key": "value"` on the FIRST line carrying
+# one (the leading `.*` is leftmost-longest in both engines), a final line with no newline included,
+# and a CR absorbed by the trailing `.*`. A path that is not a file yields four empties and is not kept.
+_FRAG_PATHS=(); _FRAG_MARKERS=(); _FRAG_MATCHERS=(); _FRAG_EVENTS=(); _FRAG_HOOKS=()
+read_fragment_keys() { # fragment path -> FRAG_MARKER FRAG_MATCHER FRAG_EVENT FRAG_HOOK_PATH, the file read once per run
+  local _i=0 _l _hm="" _hc="" _he="" _hh="" _v='[[:space:]]*:[[:space:]]*"([^"]*)".*'
+  local _rm='.*"marker"' _rc='.*"matcher"' _re='.*"event"' _rh='.*"hook_path"'
+  _rm=$_rm$_v; _rc=$_rc$_v; _re=$_re$_v; _rh=$_rh$_v
+  while [ "$_i" -lt "${#_FRAG_PATHS[@]}" ]; do
+    if [ "${_FRAG_PATHS[$_i]}" = "$1" ]; then
+      FRAG_MARKER=${_FRAG_MARKERS[$_i]}; FRAG_MATCHER=${_FRAG_MATCHERS[$_i]}
+      FRAG_EVENT=${_FRAG_EVENTS[$_i]};   FRAG_HOOK_PATH=${_FRAG_HOOKS[$_i]}
+      return 0
+    fi
+    _i=$((_i+1))
+  done
+  FRAG_MARKER=""; FRAG_MATCHER=""; FRAG_EVENT=""; FRAG_HOOK_PATH=""
+  [ -f "$1" ] || return 0
+  # A key FOUND empty stays found: `head -1` took the first matching line even when its value was "".
+  while IFS= read -r _l || [ -n "$_l" ]; do
+    if [ -z "$_hm" ] && [[ $_l =~ $_rm ]]; then FRAG_MARKER=${BASH_REMATCH[1]}; _hm=1; fi
+    if [ -z "$_hc" ] && [[ $_l =~ $_rc ]]; then FRAG_MATCHER=${BASH_REMATCH[1]}; _hc=1; fi
+    if [ -z "$_he" ] && [[ $_l =~ $_re ]]; then FRAG_EVENT=${BASH_REMATCH[1]}; _he=1; fi
+    if [ -z "$_hh" ] && [[ $_l =~ $_rh ]]; then FRAG_HOOK_PATH=${BASH_REMATCH[1]}; _hh=1; fi
+  done < "$1"
+  _FRAG_PATHS[$_i]=$1; _FRAG_MARKERS[$_i]=$FRAG_MARKER; _FRAG_MATCHERS[$_i]=$FRAG_MATCHER
+  _FRAG_EVENTS[$_i]=$FRAG_EVENT; _FRAG_HOOKS[$_i]=$FRAG_HOOK_PATH
 }
 # `{kit}` and `{here}` ARE EXPANDED HERE, at the one place the value is read. A fragment ships
 # verbatim, so it names its kit symbolically rather than spelling a prefix that is only correct in
@@ -170,7 +199,7 @@ resolve_fragment_hook() { # fragment path -> its hook_path, tokens expanded; rc 
     "$PWD"/*)                  frag=${frag#"$PWD"/} ;;
   esac
   [ -f "$frag" ] || { echo "check-wiring: $frag is not a file" >&2; return 1; }
-  hp=$(json_str "$frag" hook_path)
+  read_fragment_keys "$frag"; hp=$FRAG_HOOK_PATH
   [ -n "$hp" ] || { echo "check-wiring: $frag declares no hook_path" >&2; return 1; }
   here=$(dirname "$frag"); [ "$here" = . ] && here=""
   kitpfx=$(dirname "${here:-.}"); [ "$kitpfx" = . ] && kitpfx=""
@@ -345,31 +374,58 @@ derive_receipt_miss() { # <kit-home> <file> -> a skip reason, or ""
 # EVERY matcher whose group carries the marker, one per line — not just the first. A settings.json
 # may legitimately hold several groups, and `settings-merge.py` ADDS the widened group rather than
 # migrating a stale one, so "the first group mentioning the hook" is the wrong question to ask.
-matchers_of() { # marker [hook-basename] [event] -> the matcher of each group carrying BOTH (empty if absent)
+matchers_of() { # marker [hook-basename] [event] -> the matcher of each group carrying BOTH (empty if absent); no argument: build the view only
+  # THE VIEW IS BUILT ONCE PER SHELL (TOOL-aBriskPreflight-2 S2). It was an eight-process pipeline
+  # over the whole settings file on every call. Its first two stages — the flatten and the event-key
+  # split — run once, on the first call, and their output is kept with the resolver's status; every
+  # call then applies the five later tests with builtins only. The parent makes one no-argument call
+  # before any arm (S3), so every pipeline and substitution inherits the view. It is built HERE and
+  # not in a loader beside it, because settings-merge.py's selftest lifts this function alone.
+  # No mode writes the settings file, so a view built once describes the file every arm reads.
+  if [ -z "${_SJ_RC:-}" ]; then
+    local _sj
+    if _sj=$(settings_json 2>/dev/null); then
+      _SJ_VIEW=$(tr -d ' \t\r\n' < "$_sj" | sed 's/"\([A-Z][A-Za-z]*\)":\[/\n@\1@/g'); _SJ_RC=0
+    else
+      _SJ_VIEW=""; _SJ_RC=2
+    fi
+  fi
+  # A REFUSAL PROPAGATES. The retired form tested the settings path with `|| return 0`, so a
+  # missing file was indistinguishable from a present file with no matching group — which is the
+  # whole defect. Returning 2 keeps them apart even though `wired` treats both as not-wired. It is
+  # recorded once, in the view's status, and returned on every call without asking again.
+  [ "$_SJ_RC" = 0 ] || return 2
+  [ "$#" -gt 0 ] || return 0
   # THE THIRD KEY IS THE EVENT (TOOL-aRoutedQuill-5 S8). Without it every event's groups flatten into
   # one list, so the PreToolUse matcher wired under SubagentStart read as wired. Each event key — the
   # capitalised name heading an array — starts its own chunk, and only that event's chunk is kept.
-  # Absent, every event is read, exactly as before.
-  # A REFUSAL PROPAGATES. The retired form tested the settings path with `|| return 0`, so a
-  # missing file was indistinguishable from a present file with no matching group — which is the
-  # whole defect. Returning 2 keeps them apart even though `wired` treats both as not-wired.
-  local _sj; _sj=$(settings_json 2>/dev/null) || return 2
-  # `-e` BEFORE THE MARKER. The card markers are `--write` and `--replay`, dash-leading by design
-  # (they are the verb's own arguments), and a bare `grep -F "$1"` reads one as an OPTION: grep
-  # exits 2, the pipeline yields nothing, and every card check prints UNWIRED over a correctly
-  # merged file forever. TOOL-aReplayedCard-2.
+  # Absent, every chunk carrying an `@` is read, exactly as before.
+  # THE MARKER IS AN OPERAND, NEVER AN OPTION. The card markers are `--write` and `--replay`,
+  # dash-leading by design, and the `grep -F "$1"` this replaced read one as an option until it took
+  # `-e` (TOOL-aReplayedCard-2). Every test below is a QUOTED substring match, which is `grep -F`:
+  # a glob character or a backslash in a marker or a filter matches as itself.
   # THE SECOND KEY, `$2`, is the hook's BASENAME, which the stripped view keeps intact: a bare-flag
   # marker (`--write`) alone took an adopter's own `--write-log` hook for the card writer, in this
   # reader and in the merger's (the aReplayedCard closing review, F5). Absent, it defaults to the
   # marker itself, so a one-key caller filters twice on one key and reads exactly as before.
-  tr -d ' \t\r\n' < "$_sj" \
-    | sed 's/"\([A-Z][A-Za-z]*\)":\[/\n@\1@/g' \
-    | grep -F -e "@${3:+$3@}" \
-    | sed 's/{"matcher":/\n{"matcher":/g' \
-    | sed 's/\].*$//' \
-    | grep -F -e "$1" \
-    | grep -F -e "${2:-$1}" \
-    | sed -n 's/^{"matcher":"\([^"]*\)".*/\1/p'
+  local _nl=$'\n' _m='{"matcher":' _rest="${_SJ_VIEW:-}" _c _p _v
+  while [ -n "$_rest" ]; do
+    _c=${_rest%%"$_nl"*}
+    case "$_rest" in *"$_nl"*) _rest=${_rest#*"$_nl"} ;; *) _rest="" ;; esac
+    case "$_c" in *"@${3:+$3@}"*) ;; *) continue ;; esac
+    # Each piece runs from one `{"matcher":` to the next and is cut at its first `]`; the piece
+    # before the first one can never open with it, so it never yields a matcher and is skipped.
+    while :; do
+      case "$_c" in *"$_m"*) ;; *) break ;; esac
+      _c=${_c#*"$_m"}
+      _p=$_m${_c%%"$_m"*}
+      _p=${_p%%"]"*}
+      case "$_p" in *"${1:-}"*) ;; *) continue ;; esac
+      case "$_p" in *"${2:-${1:-}}"*) ;; *) continue ;; esac
+      _v=${_p#"$_m"}
+      case "$_v" in \"*\"*) _v=${_v#\"}; printf '%s\n' "${_v%%\"*}" ;; esac
+    done
+  done
 }
 # THE THIRD KEY IS THE HOOK'S RESOLVED PATH, as the command names it (the round-1 fold, I1). The
 # basename could not tell two copies of one hook apart: with gov's copy landed beside the kit and
@@ -419,8 +475,10 @@ resolve_python() {
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
 # table. A shell consumer runs it with the python it already resolved, so the receipt rung is
-# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
-# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <here> <home> <anchor> [<home>
+# <anchor> …]` prints, one line per pair from ONE python start, the kit directory REPO-RELATIVE, or an
+# empty line with the resolver's named refusal on stderr (TOOL-aBriskPreflight-2 S5: only the driver
+# after the block moved, so this file's argument order is its own and not the other copies').
 resolve_kit_dir() {
   "$1" -c "$(cat <<'RKD'
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
@@ -461,12 +519,15 @@ def resolve_kit_dir(home, anchor, here):
 RKD
 )"'
 import sys
-try:
-    d = resolve_kit_dir(*sys.argv[1:4])
-except LookupError as e:
-    sys.exit(str(e))
-r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
-print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+for home, anchor in zip(sys.argv[2::2], sys.argv[3::2]):
+    try:
+        d = resolve_kit_dir(home, anchor, sys.argv[1])
+    except LookupError as e:
+        print(e, file=sys.stderr)
+        print()
+        continue
+    r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+    print(d.relative_to(r).as_posix())' "${@:2}"
 }
 # THE PROBE RUNG, through the sibling-kit resolver (TOOL-aRepatriatedFork-46). It used to be a kit's
 # name typed after this checker's own prefix, which is the class the carried-prefix ban counts. The
@@ -475,9 +536,13 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 # launcher the SAME two places are probed in bash (closing review round 1 M6): costing the rung
 # printed `not adopted` over a hook that was present, naming a place nothing had looked at. The awk
 # receipt rung above it runs either way.
+# THE LAUNCHER IS `PY_OK`, set once beside `PY` (TOOL-aBriskPreflight-2 S4): every call here used to
+# RUN each candidate again and then start a second interpreter for the resolver. A pair
+# `resolve_kit_files` answered is read back from its one start; a pair it does not list takes a start
+# of its own, so a stale list costs a start and never a wrong answer.
 resolve_kit_file() { # <kit-home> <file> -> <repo-relative kit dir>/<file>, or nothing
-  local py d
-  if ! py=$(resolve_python 2>/dev/null); then
+  local d i=0
+  if [ -z "${PY_OK:-}" ]; then
     echo "note     resolver  — no usable python, so the probe rung beside this checker ran in bash for $1/$2" >&2
     for d in "${KIT_REL:+$KIT_REL/}$1" "$(dirname -- "${KIT_REL:-.}")/$1"; do
       d=${d#./}
@@ -485,10 +550,41 @@ resolve_kit_file() { # <kit-home> <file> -> <repo-relative kit dir>/<file>, or n
     done
     return 0
   fi
-  d=$(resolve_kit_dir "$py" "$1" "$2" "$_KIT_ROOT/$KIT_REL" 2>/dev/null) || return 0
-  printf '%s/%s\n' "$d" "$2"
+  while [ "$i" -lt "${#_KF_KEYS[@]}" ]; do
+    if [ "${_KF_KEYS[$i]}" = "$1 $2" ]; then
+      [ -n "${_KF_DIRS[$i]}" ] && printf '%s/%s\n' "${_KF_DIRS[$i]}" "$2"
+      return 0
+    fi
+    i=$((i+1))
+  done
+  d=$(resolve_kit_dir "$PY" "$_KIT_ROOT/$KIT_REL" "$1" "$2" 2>/dev/null) || return 0
+  d=${d%$'\r'}
+  [ -n "$d" ] && printf '%s/%s\n' "$d" "$2"
+  return 0
 }
-PY=$(resolve_python 2>/dev/null) || PY=python3   # gov:literal-python — a NAME a remedy prints when no launcher runs; the owned-hook call then refuses by name
+# EVERY `<home> <file>` PAIR AN ARM PASSES `resolve_kit_file`, declared, one line: the self-test
+# compares it with the literal pairs this file's call sites spell, so it cannot drift without a red.
+KIT_FILE_PAIRS=(hooks agent-cap.js hooks scratch-guard.fragment.json memory-recall recall-opened.fragment.json memory-tree merge-rows.py lib pyrun.sh memory-tree adopt-memory-tree.sh)
+_KF_KEYS=(); _KF_DIRS=()
+# ONE python start for every declared pair, run once after the print verb's exit. Its answers reach
+# the arrays by parameter expansion, one line per pair: no loop fed by a substitution, and no IFS
+# split, which would collapse a refused pair's empty line. `$(…)` drops trailing empty lines, so a
+# pair past the last line is a refused one. A start that fails leaves the arrays empty, and every
+# call then takes its own start, exactly as before this existed.
+resolve_kit_files() {
+  local out d i=0 nl=$'\n'
+  [ -n "${PY_OK:-}" ] || return 0
+  out=$(resolve_kit_dir "$PY" "$_KIT_ROOT/$KIT_REL" "${KIT_FILE_PAIRS[@]}" 2>/dev/null) || return 0
+  while [ "$i" -lt "${#KIT_FILE_PAIRS[@]}" ]; do
+    _KF_KEYS+=("${KIT_FILE_PAIRS[$i]} ${KIT_FILE_PAIRS[$((i+1))]}")
+    # A Windows python ends each line CRLF, and `$(…)` drops only the LAST line's: the CR goes here.
+    # Stripped in an assignment: inside a double-quoted `${…}` bash 5 leaves `$'\r'` unexpanded.
+    d=${out%%"$nl"*}; d=${d%$'\r'}; _KF_DIRS+=("$d")
+    case "$out" in *"$nl"*) out=${out#*"$nl"} ;; *) out="" ;; esac
+    i=$((i+2))
+  done
+}
+PY_OK=1; PY=$(resolve_python 2>/dev/null) || { PY_OK=""; PY=python3; }   # gov:literal-python — a NAME a remedy prints when no launcher runs; the owned-hook call then refuses by name
 
 # The merger every remedy names, resolved ONCE across both install layouts. Four arms used to
 # resolve it each; one spelling is one fewer carried literal per arm that names it.
@@ -507,6 +603,7 @@ SMERGE=$(first_of "$(resolve_receipt_path "" settings-merge.py)" "$SMERGE_DEFAUL
 if [ "$MODE" = resolve ]; then
   resolve_fragment_hook "$FRAG_ARG"; exit $?
 fi
+resolve_kit_files
 
 # TOOL-aWeldedTribunal-7 — WHICH HOOK WILL ACTUALLY RUN. The shared `core.hooksPath` applies unless a worktree's config.worktree sets its own,
 # and the value in effect decides which hook files run: an ABSOLUTE value runs the hooks of the
@@ -682,9 +779,12 @@ check_hooks() {
 # exit killed 45 of 76 self-test arms, not one of which was about settings. What the refusal buys is
 # that no arm can read "no file" as "nothing to check": `matchers_of` propagates it, `wired` is then
 # false, and each settings arm reports UNWIRED with the reason instead of passing by absence.
+# ASKED IN THIS SHELL, not in a substitution (TOOL-aBriskPreflight-2 S3), so `_SETTINGS_CACHE`
+# survives it; the no-argument `matchers_of` below then builds the settings view here, once, and every
+# arm's pipeline and substitution inherits both.
 _sj_err=$(mktemp)
-if _sj_for_scope=$(settings_json 2>"$_sj_err"); then
-  check_settings_scope "$_sj_for_scope"
+if settings_json >/dev/null 2>"$_sj_err"; then
+  check_settings_scope "$_SETTINGS_CACHE"
 else
   # THE RESOLVER'S OWN WORDS, not a generic substitute. "You named a path that is not there"
   # and "there is no settings file anywhere" are different operator problems with different
@@ -694,6 +794,7 @@ else
   echo "note     settings    passing by absence."
 fi
 rm -f "$_sj_err"
+matchers_of || :
 
 # --- Check A: agent-cap PreToolUse hook in the resolved settings file -----------------------------
 # Advisory: no mode mutates settings.json (the SessionStart hook must not rewrite its own file).
@@ -809,15 +910,14 @@ check_scratch_guard() {
   # gate's fragment was found in, so a fragment added there later is graded without an edit here.
   for frag in "${first%/*}"/*.fragment.json; do
     [ -f "$frag" ] || continue
-    marker=$(json_str "$frag" marker)
-    sevent=$(json_str "$frag" event)
+    # ONE read of the fragment, all four keys, before the first test; the subshell below answers from it.
+    read_fragment_keys "$frag"; marker=$FRAG_MARKER; sevent=$FRAG_EVENT; smatcher=$FRAG_MATCHER
     # A REFUSED owned-hook join is UNWIRED naming its reason, never a blank path read as a bad fragment.
     if ! hookjs=$(resolve_fragment_hook "$frag" 2>&1); then
       echo "UNWIRED  scratch   — ${hookjs##*check-wiring: }"
       unwired=$((unwired+1))
       continue
     fi
-    smatcher=$(json_str "$frag" matcher)
     if [ -z "$marker" ] || [ -z "$hookjs" ] || [ -z "$smatcher" ] || [ -z "$sevent" ]; then
       echo "UNWIRED  scratch   — $frag declares no marker/matcher/event/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
       unwired=$((unwired+1))
@@ -872,17 +972,16 @@ check_recall_opened() {
     return
   fi
   smerge=$SMERGE
-  marker=$(json_str "$frag" marker)
+  # The MATCHER comes from the fragment too, so this arm still asserts nothing the shipped kit does
+  # not itself declare — the same rule the marker already followed, applied to the half that decides
+  # whether the hook fires at all. ONE read, before the first test.
+  read_fragment_keys "$frag"; marker=$FRAG_MARKER; rmatcher=$FRAG_MATCHER
   # A REFUSED owned-hook join is UNWIRED naming its reason, never a blank path read as a bad fragment.
   if ! hookjs=$(resolve_fragment_hook "$frag" 2>&1); then
     echo "UNWIRED  recall    — ${hookjs##*check-wiring: }"
     unwired=$((unwired+1))
     return
   fi
-  # The MATCHER comes from the fragment too, so this arm still asserts nothing the shipped kit does
-  # not itself declare — the same rule the marker already followed, applied to the half that decides
-  # whether the hook fires at all.
-  rmatcher=$(json_str "$frag" matcher)
   if [ -z "$marker" ] || [ -z "$hookjs" ] || [ -z "$rmatcher" ]; then
     echo "UNWIRED  recall    — $frag declares no marker/matcher/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
     unwired=$((unwired+1))
@@ -939,13 +1038,12 @@ check_card() {
       return
     fi
     nfound=$((nfound+1))
-    marker=$(json_str "$frag" marker)
+    read_fragment_keys "$frag"; marker=$FRAG_MARKER; cmatcher=$FRAG_MATCHER
     if ! hooksh=$(resolve_fragment_hook "$frag" 2>&1); then
       echo "UNWIRED  card      — ${hooksh##*check-wiring: }"
       unwired=$((unwired+1))
       return
     fi
-    cmatcher=$(json_str "$frag" matcher)
     if [ -z "$marker" ] || [ -z "$hooksh" ] || [ -z "$cmatcher" ]; then
       echo "UNWIRED  card      — $frag declares no marker/matcher/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
       unwired=$((unwired+1))
@@ -1738,10 +1836,12 @@ check_backlog_stragglers() {
     echo "skip     straggler — $miss"
     return
   fi
-  if ! command -v resolve_python >/dev/null 2>&1 || ! py=$(resolve_python 2>/dev/null); then
+  # The launcher resolved once at the top (`PY_OK`, TOOL-aBriskPreflight-2 S4), not RUN again here.
+  if [ -z "${PY_OK:-}" ]; then
     echo "note     straggler — no usable python launcher resolved, so the straggler inventory did NOT run and this line is not an all-clear"
     return
   fi
+  py=$PY
   # BOUNDED. The walk is one process per ref pair plus a delta per candidate, and this runs at
   # SessionStart: a repository with hundreds of refs must cost a bounded wait, not an unbounded one.
   # A bound that fires is announced, because a silent timeout is a clean-looking zero.

@@ -45,3 +45,7 @@ base: 271a90045723817f694de4d22c56f88dbcd0063e
 2026-10-11T07:28:52Z dispatch · item 138b0c45 TOOL-aBriskPreflight-6 · reason .githooks/pre-push .githooks/straggler-guard.test.sh .githooks/pre-push.test.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-6-claim-push.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-6-claim-push-ab.md memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-6.md memory/builds/aBriskPreflight/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
 
 2026-10-11T07:29:00Z brief · item TOOL-aBriskPreflight-6 · reason 29e8bec69500 memory/builds/aBriskPreflight/prompts/2026-10-11-prompt-TOOL-aBriskPreflight-6-build-brief.md
+
+2026-10-11T08:09:46Z dispatch · item 20a9e88e TOOL-aBriskPreflight-2 · reason tools/check-wiring.sh tools/check-wiring.test.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-2-spawns-ab.md memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-2.md memory/builds/aBriskPreflight/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
+
+2026-10-11T08:09:56Z brief · item TOOL-aBriskPreflight-2 · reason 162d8aaea8b6 memory/builds/aBriskPreflight/prompts/2026-10-11-prompt-TOOL-aBriskPreflight-2-build-brief.md
