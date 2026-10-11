@@ -46,3 +46,18 @@ a `**Serves:** journal TOOL-aSparedSpawn-10` line, then one `**Evidences:** TOOL
 block holding one `- ACn — <check> — <what was observed>` line per criterion, each naming the
 backticked check that ran and stating plainly when a criterion is owed at VERIFYING instead.
 It rides the pass commit, which also sets the spec's status header to CLOSED.
+
+## Adopted discoveries — two reds this build made, found by TOOL-aSparedSpawn-8
+
+Fold both into this unit: name each as a scope item with its own acceptance criterion in a spec rev
+committed before the code, then fix it.
+
+1. `shell hygiene (a loop fed by a command substitution)` is red since TOOL-aSparedSpawn-6
+   (`786644cee`), which added a second here-string-fed loop to `tools/unattended/unattended.test.sh`.
+   `memory/project/substitution-fed-loops.txt` registers only sites that PREDATE that leg, so a new
+   site is never registered: rewrite the new loop so it is not fed by a command substitution, and
+   observe the leg's checker red before and green after.
+2. The `run-gates-2leg` row of `memory/project/fork-ceilings.txt` sets its ceiling at 96, the highest
+   of four readings (95, 95, 95, 96) of a count the pool's polling makes nondeterministic, so a reading
+   of 97 reds the bar for no defect. Either make the measured count deterministic or give the row a
+   stated margin, and say which in the row's reason.
