@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-8 — the process-monitor adopter self-test stamps a fixture's common dir, not the real one
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-1 · base b6cd02bc · streams tooling · order 1
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-1 · base b6cd02bc · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -48,7 +48,7 @@ what else runs on the machine, through the stamp instead of the census, and take
 - **AC1** — When the throttle arm and the broken-monitor arm run while a second process writes and
   removes `procmon-stamp` in the REAL common dir in a loop, both arms pass.
   Red when: the arms still read the real stamp, and the loop flips one of them.
-- **AC2** — When `grep -n 'GD/procmon-stamp'` runs over the suite, it prints nothing.
+- **AC2** — When `grep -nF '"$GD/procmon-stamp"'` runs over the suite, it prints nothing.
   Red when: an arm still names the real common dir's stamp.
 
 ## 6. Gates
@@ -64,3 +64,5 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · AC2 · the grep names the quoted real-dir path exactly: the fixture's own
+  `CLEAN_GD/procmon-stamp` carries the bare substring, so the rev-1 command could never print nothing.
