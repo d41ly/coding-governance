@@ -52,10 +52,10 @@
 # COST: one prologue and one arm per suite per prefix, pooled; minutes, and held, run once per build.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
-ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "foreign-prefix: not inside a git work tree"; exit 2; }
+ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "foreign-prefix: not inside a git work tree"; exit 2; }
 # The tool root and this kit's directory name, DERIVED. Moving the tool root is the whole leg, so
 # a literal here would be the one path it could never move.
-if ! TROOT=$(git -C "$HERE/.." rev-parse --show-prefix 2>/dev/null); then
+if ! TROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE/.." rev-parse --show-prefix 2>/dev/null); then
   echo "foreign-prefix: cannot derive the tool root above $HERE — REFUSING"; exit 2
 fi
 TROOT=${TROOT%/}

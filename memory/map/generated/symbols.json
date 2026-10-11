@@ -9088,6 +9088,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "measure_rendered_rows",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "measure_replay",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
@@ -13581,6 +13586,11 @@
       "id": "render_health_cell",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "render_hole_verdict",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "render_id_run",

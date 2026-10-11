@@ -53,7 +53,7 @@ export KIT_REL
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SELF="$HERE/$(basename "$0")"
-ROOT="$(git -C "$HERE" rev-parse --show-toplevel)"
+ROOT="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)"
 cd "$ROOT" || exit 2
 st=0
 TMP=$(mktemp -d); SCRATCH=""

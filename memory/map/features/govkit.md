@@ -17,7 +17,7 @@ workflow-scripts = []
 skill-engines = ["deploy-governance"]
 rendered-skills = []
 gotcha-classes = ["fixture-lacks-a-gate-the-consumer-has.md", "a-new-local-collides-in-a-long-function.md",
-  "guard-above-a-fold-makes-its-fallback-dead.md"]
+  "guard-above-a-fold-makes-its-fallback-dead.md", "verdict-printed-before-the-step-that-reverts-it.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []

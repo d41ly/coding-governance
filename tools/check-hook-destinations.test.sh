@@ -24,7 +24,7 @@ derive_self_rel() {
 KIT_REL=$(derive_self_rel "$HERE") || { echo "check-hook-destinations.test: not inside a git repository"; exit 2; }
 # KP is this kit dir as a path head: empty at a root install, where `$KIT_REL/` named `/` (VERIFYING repair).
 KP="${KIT_REL:+$KIT_REL/}"
-ROOT="$(git -C "$HERE" rev-parse --show-toplevel)" || exit 2
+ROOT="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" || exit 2
 GATE="$ROOT/${KP}check-hook-destinations.sh"
 # TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
 # as a literal segment: this suite's own from where it sits, a sibling's through the resolver,

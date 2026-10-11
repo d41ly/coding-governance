@@ -15,8 +15,8 @@ set -u
 # used to spell `<prefix>/` for both, so an adopter had to fork it to run it. KIT_REL is where the pair
 # sits relative to the root, as git reports it: `<prefix>/` here, empty at a root install.
 HERE=$(cd "$(dirname "$0")" && pwd)
-SRC=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "not a git repo"; exit 2; }
-KIT_REL=$(git -C "$HERE" rev-parse --show-prefix 2>/dev/null)
+SRC=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "not a git repo"; exit 2; }
+KIT_REL=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-prefix 2>/dev/null)
 [ -f "$HERE/push-main.sh" ] || { echo "push-main.sh missing beside this suite"; exit 1; }
 [ -f "$SRC/.githooks/pre-push" ] || { echo ".githooks/pre-push missing"; exit 1; }
 lander="${KIT_REL}push-main.sh"   # the lander's path inside every fixture, the same prefix as here

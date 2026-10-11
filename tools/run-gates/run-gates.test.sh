@@ -1469,7 +1469,7 @@ P="$SCRATCH/prof"
 # performed every write it had just refused — there is no `set -e` here, so a message is not a stop.
 # A guard that detects the corruption and then commits it is worse than none, because it also files a
 # report saying it held.
-if [ "$( cd "$P" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null )" = "$( cd "$ROOT" && git rev-parse --show-toplevel 2>/dev/null )" ]; then
+if [ "$( cd "$P" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null )" = "$(unset GIT_DIR GIT_WORK_TREE;  cd "$ROOT" && git rev-parse --show-toplevel 2>/dev/null )" ]; then
   echo "canary: REFUSING — the section-4 scratch $P resolves to the repo under test, so its fixture writes would clobber the real gate-legs.json and rewrite this repo's commit identity. Nothing was written."
   exit 2
 fi
