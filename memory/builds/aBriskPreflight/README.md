@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling
 roster: TOOL
-ids: TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7
+ids: TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-8 TOOL-aBriskPreflight-9
 authorized-by: prompt
 ---
 
@@ -69,7 +69,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 7 unit(s) · node a · opened 2026-10-11 · streams tooling
-ids TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7
+ids TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-8 TOOL-aBriskPreflight-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -79,11 +79,11 @@ ids TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aB
 | [TOOL-aBriskPreflight-6 — the pre-push hook sets up its straggler audit only when a pushed ref can carry a delta](spec/2026-10-11-spec-TOOL-aBriskPreflight-6.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aBriskPreflight-2 — check-wiring reads the settings file and each fragment once, and resolves python once](spec/2026-10-11-spec-TOOL-aBriskPreflight-2.md) | 2 | 1 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aBriskPreflight-4 — preflight starts its bounded probes together and collects each at its own check](spec/2026-10-11-spec-TOOL-aBriskPreflight-4.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-11 |
-| [TOOL-aBriskPreflight-3 — preflight's wiring scope, measured: the whole check stays, every candidate recorded](spec/2026-10-11-spec-TOOL-aBriskPreflight-3.md) | 3 | 1 | SPECCED | rev-1 | 2026-10-11 |
+| [TOOL-aBriskPreflight-3 — preflight's wiring scope, measured: the whole check stays, every candidate recorded](spec/2026-10-11-spec-TOOL-aBriskPreflight-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aBriskPreflight-7 — preflight and the wiring check each declare a wall-clock ceiling and name a breach](spec/2026-10-11-spec-TOOL-aBriskPreflight-7.md) | 4 | 2 | SPECCED | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 22 bound to this build, across 3 record folder(s).
+Records: 23 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
