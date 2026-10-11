@@ -1,11 +1,12 @@
 # TOOL-aOrientedCast-9 — the unattended Skill and verbs pass the renderer's `roles` to every harness call
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 6 · ratified 2026-10-11
+**Status:** CLOSED · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 6 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aOrientedCast-9-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aOrientedCast-9-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aOrientedCast-9-1-fold-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-9-1-fold-brief.md) | journal | KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 |
 
 <!-- /gen:spec-records -->
@@ -41,13 +42,18 @@ their per-stage fallback.
   every judge again. Observed by AC3.
 - **S5** — `memory/guides/UNATTENDED-VERBS.md` is re-installed from the template by
   `adopt-unattended.sh` in the same commit and stays byte-identical to it. Observed by AC4.
+- **S6** — The unattended kit's version moves once, in this unit's commit, because this is the
+  build's last unit touching `tools/unattended/` and the README's build rule puts one bump per touched
+  kit after that kit's last unit. It moves from 1.95 to 1.99, strictly past the 1.98 that `main`
+  carries, so a reconcile resolves to a number past both sides. The adopter re-renders every
+  installed carrier. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
 - The unattended Skill, as §8 F1 resolved. Its drive line names the two build harnesses by
   `scriptPath` and no argument of either; `scratch`, `base` and `specAudit` are composed in the verbs
   carrier, which the Skill names as winning any difference, and `roles` joins them there. The Skill
-  measures 10239 of its 10240-byte ceiling. AC6 observes it unmoved.
+  measures 10239 of its 10240-byte ceiling. AC6 observes it unmoved but for S6's version marker.
 - M8's call block in the memory-tree kit's BUILD-METHOD template, which shows the closing review's
   arguments without `roles`. The rule here and the `/build` Skill both add `roles` to M8's
   composition; the block itself is the external hands-off below.
@@ -55,8 +61,8 @@ their per-stage fallback.
   ran under workerType 'none' as the build harness's audit does". Under `roles` the audit no longer
   does, and the line's own next clause already covers a review under a named type. It is product code
   outside this unit's write set, named in the same hands-off.
-- The harnesses, the renderer, the catalogue and the two guards. This unit edits text a caller reads.
-- A kit-version bump. The unattended kit moves once, in the run's mint commit.
+- The harnesses, the renderer, the catalogue and the two guards. This unit edits text a caller
+  reads, and S6's version markers.
 
 **Why this unit may edit a governance carrier.** `UNATTENDED-VERBS.md` is the unattended protocol's
 companion, a governance carrier, and M3's veto 2 reserves a change to one for the owner. This edit
@@ -173,8 +179,8 @@ hygiene gate re-derives both against its caps.
 - This run is one of the sessions S2 names: its agent registry predates the rendered types, so its
   remaining passes keep calling the harnesses untyped, as the catalogue-render and build-harness
   specs state, and the guards bind it only after the landing merge.
-- The unattended kit's version and its carriers move once, in the run's mint commit;
-  `govkit.py epoch` reports the move owed until then.
+- The unattended kit's version and its carriers move once, in this unit's commit (S6), so
+  `govkit.py epoch` finds the kit's last bump at its last move.
 - Adopters receive the rule at their next `govkit update`, which re-copies the carrier. Where the
   roles kit is absent the rule reads as its no-roles case, and neither guard is armed.
 
@@ -184,7 +190,8 @@ None minted: the rule names existing verbs, fields and files.
 
 ### Files touched (estimate)
 
-`tools/unattended/VERBS.template.md` · `memory/guides/UNATTENDED-VERBS.md`
+`tools/unattended/VERBS.template.md` · `memory/guides/UNATTENDED-VERBS.md` · for S6, every file
+`git grep -l "gov:kit unattended@"` lists, the adopter's renders among them
 
 ### Alternatives rejected
 
@@ -242,10 +249,13 @@ None minted: the rule names existing verbs, fields and files.
   passes no role.
   fixture: the renderer of `TOOL-aOrientedCast-2` and the catalogue of `TOOL-aOrientedCast-1`, both
   landed at earlier orders.
-- **AC6** — When `git diff --exit-code 646d4a73 -- tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md`
-  runs after the pass it exits 0, and `bash tools/check-template-size.sh .claude/skills/unattended/SKILL.md`
-  exits 0.
+- **AC6** — When `git diff -U0 646d4a73 -- tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md`
+  runs after the pass, every changed line it prints carries `gov:kit unattended@`, and
+  `bash tools/check-template-size.sh .claude/skills/unattended/SKILL.md` exits 0.
   Red when: the router grew to restate a rule the verbs carrier owns, or past its ceiling.
+- **AC7** — When `git grep -c "unattended@1\.95"` runs after the pass it prints nothing, and
+  `bash tools/check-kit-versions.sh` exits 0 with every unattended carrier at `1.99`.
+  Red when: a carrier kept the old version, or the bump landed in a source and not its render.
 
 ## 7. Gates
 
@@ -276,6 +286,9 @@ the carrier pair, and every criterion above is a direct read.
 
 - rev-1 · 2026-10-11 · initial draft, from the M2 cross-read's findings 1, 2 and 4 and the main loop's
   decision to add this unit.
+- rev-2 · 2026-10-11 · the dispatch assigned this unit the unattended kit's one version bump, as the
+  build's last unit touching the kit, which §3 had put out of scope: S6 and AC7 added, the non-goal
+  and §4 Rollout's mint-commit line dropped, AC6 amended to admit the version marker the bump moves.
 
 ## 10. Reuse audit
 
