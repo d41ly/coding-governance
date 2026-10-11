@@ -1,11 +1,12 @@
 # TOOL-aBriskPreflight-12 — the closing review's mediums and lows: record bindings and ledgers, RB_TOOK at the child's end, the cache reset, four arms
 
-**Status:** SPECCED · rev-2 · 2026-10-12 · node a · Tier-2 · base d19938f3 · streams tooling · order 6 · ratified 2026-10-12
+**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base d19938f3 · streams tooling · order 6 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-build-TOOL-aBriskPreflight-12-acceptance-ledger.md](../build/2026-10-12-build-TOOL-aBriskPreflight-12-acceptance-ledger.md) | journal | — |
 | [2026-10-12-prompt-TOOL-aBriskPreflight-12-build-brief.md](../prompts/2026-10-12-prompt-TOOL-aBriskPreflight-12-build-brief.md) | research | — |
 | [2026-10-12-prompt-TOOL-aBriskPreflight-12-spec-brief.md](../prompts/2026-10-12-prompt-TOOL-aBriskPreflight-12-spec-brief.md) | research | — |
 
@@ -182,15 +183,17 @@ before the parent's `matchers_of || :` prime. settings-merge.py's arm 17 lifts `
 and reads `${_SJ_RC:-}`, so it still builds the view on its first call. The new arm extends the
 suite's AC7 agent-cap block with two states.
 
-- (a) `_SJ_RC=0` and a crafted `_SJ_VIEW` are exported over the fixture with no settings file. The
-  view is captured from `matchers_of`'s own flatten over that block's correctly wired settings
-  file. Expected: no `ok       agent-cap` line, and exit 1.
+- (a) `_SJ_RC=0` and a crafted `_SJ_VIEW` are exported over the fixture's settings file rewritten to
+  the stale `Workflow`-only matcher of state AC7b. The view is captured from `matchers_of`'s own
+  flatten over that block's correctly wired settings file. Expected: no `ok       agent-cap` line,
+  the `wired under matcher 'Workflow'` refusal, and exit 1.
 - (b) `_SJ_RC=0` and an empty `_SJ_VIEW` are exported over the correctly wired fixture. Expected:
   `ok       agent-cap`.
 
 Before the fix, (a) prints `ok` over the injected view and (b) prints `UNWIRED`, so both sides red.
-The exact line (a) prints with no settings file is UNVERIFIED; the pass reads it from the fixture
-and asserts on that line, keeping the absence of the `ok` line as the discriminating half.
+Not over a missing settings file, as rev-2 had it: the agent-cap arm re-reads the file for the
+shipped path after `wired` answers, so a missing file reds there with or without the inherited view,
+and (a) was observed passing under the staged break. A stale file is graded by the view alone.
 
 ### L2 — the chunk flush
 
@@ -337,7 +340,8 @@ closes every staged break.
   naming `§4` and the review's M2.
   Red when: either false premise still stands, or spec 4 changed with no rev.
 - **AC7** — When the slice of the wiring suite's AC7 block with S5's two states runs against the
-  built script, state (a) prints no `ok       agent-cap` line and exits 1, and state (b) prints
+  built script, state (a) prints no `ok       agent-cap` line, prints the `wired under matcher
+  'Workflow'` refusal and exits 1, and state (b) prints
   `ok       agent-cap`. With the file-scope `_SJ_RC=""; _SJ_VIEW=""` line deleted as a staged break,
   both states red.
   Red when: an inherited `_SJ_RC` still stands in for the settings read.
@@ -350,7 +354,8 @@ closes every staged break.
   figure: 8000 is the script's PINNED chunk limit; the fixture's length is DERIVED per run.
 - **AC9** — When the slice of the driver suite's BP4 block runs against the built driver, the
   rewritten pid assertion passes. With `write_proc_record`'s first printed field set to the constant
-  `1` as a staged break, it reds. The old assertion, `BP4 AC4 every row names one driver pid`, is run
+  `999999` as a staged break, it reds. That constant is a pid no process holds, not `1`, because the
+  driver's reaper reads that ledger and a break must not name a live process. The old assertion, `BP4 AC4 every row names one driver pid`, is run
   once under that same break before the rewrite and passes, which is the defect.
   Red when: the new assertion passes under the constant, as the old one does.
 - **AC10** — When the slice of the straggler suite's F1 setup, F3 and S4 arms with S8's arm runs,
@@ -378,7 +383,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC9 · the BP4 AC2 run's 
 
 New arm: tools/unattended/unattended.test.sh · covers AC11 · a 2 s WIRING_CEILING under a 2 s GATE_BOUND, red at -le · the BP7 skip branch's counted figure
 
-New arm: tools/check-wiring.test.sh · covers AC7 · an exported _SJ_RC=0 over a missing and over a correct settings file, red without the file-scope reset · none
+New arm: tools/check-wiring.test.sh · covers AC7 · an exported _SJ_RC=0 over a stale and over a correct settings file, red without the file-scope reset · none
 
 New arm: tools/check-wiring.test.sh · covers AC8 · a merge=rows list past 8000 characters with QFIRST first and QLAST last, red when the in-loop flush reads nothing · none
 
@@ -420,6 +425,11 @@ New arm: .githooks/straggler-guard.test.sh · covers AC10 · a sourcing-marker s
 - rev-2 · 2026-10-12 · status header (§1 header line) order 7 -> 6, scope S1 to S7 unchanged: no item
   here depends on TOOL-aBriskPreflight-11, whose F2 is parked for the owner, and order 7 would hold
   this unit behind that park at check 49.
+- rev-3 · 2026-10-12 · §4 L1 state (a), AC7, AC9 and §7's AC7 arm line, found at build time. (a)
+  ran over NO settings file, and under the staged break it still printed `UNWIRED  agent-cap`,
+  because the arm re-reads the file for the shipped path, so it could not red; it now runs over the
+  stale `Workflow`-only file of state AC7b. AC9's staged-break constant `1` -> `999999`, a pid no
+  process holds, since the driver's reaper reads the ledger the break writes.
 
 ## 10. Reuse audit
 
