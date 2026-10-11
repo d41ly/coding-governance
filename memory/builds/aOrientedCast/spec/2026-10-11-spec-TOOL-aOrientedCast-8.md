@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-8 — the roles kit is an adopter default: installed, rendered and reported at install and update
 
-**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 7
+**Status:** INPROGRESS · rev-4 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -12,6 +12,7 @@
 | [2026-10-11-prompt-TOOL-aOrientedCast-1-3-cross-read.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-3-cross-read.md) | journal | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 |
 | [2026-10-11-prompt-TOOL-aOrientedCast-1.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-1.md) | research | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 |
 | [2026-10-11-prompt-TOOL-aOrientedCast-8-1-fold-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-8-1-fold-brief.md) | journal | TOOL-aOrientedCast-6 |
+| [2026-10-11-prompt-TOOL-aOrientedCast-8-2-fold-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-8-2-fold-brief.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aOrientedCast-9-1-fold-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-9-1-fold-brief.md) | journal | KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-9 |
 
 <!-- /gen:spec-records -->
@@ -61,11 +62,17 @@ default that arrives wired.
   its output through, the restart notice included. `--check` also runs `render_agents.py --check`
   and exits 1 when either compare fails, naming each stale or absent artifact and the `--scaffold`
   remedy. The usage refusal, the token substitution and the stage binding stay as that unit builds
-  them. Observed by AC4 and AC5.
+  them. A governing doc that `CHARTER` in `.memory-tree.conf` leaves blank, absent or naming no file
+  is a declared outcome, not a refusal (§8 F3): both modes still render or compare the Skill, skip
+  the agent types and the role index, print one line naming the missing doc and the `CHARTER` key,
+  and exit 3. Observed by AC4, AC5 and AC13.
 - **S5** — The descriptor wires the adopter as govkit expects of a kit with a `rendered` row:
   `[adopt]` and `[[regenerate]]` run `--scaffold`, so an update re-renders unless
   `GOVKIT_RERENDER=0` declines it; `[check]` runs `--check`; and `[[outcome]]` reads code 0 with
-  `.claude/roles.json` present as `adopted`. Observed by AC1 and AC4.
+  `.claude/roles.json` present as `adopted`. A second `[[outcome]]` reads code 3 with the rendered
+  Skill present as `no-governing-doc`, `ok = true`, so an apply whose adopter met no governing doc
+  succeeds, as the memory-tree kit's `not-rendered-here` row is accepted. Observed by AC1, AC4 and
+  AC13.
 - **S6** — Every leg the roles kit carries is claimed, each with the subject and ceiling its
   manifest row carries:
   - `roles render wiring`, which `TOOL-aOrientedCast-3` lands running `render_agents.py --check`, has
@@ -89,6 +96,10 @@ default that arrives wired.
 - **S8** — `tools/check-wiring.sh` gains `check_roles`, called after `check_routed`:
   - `skip` when no roles kit resolves, through the receipt first and then the probe, by its
     `workflows.toml`.
+  - `UNWIRED` naming the doc and the `CHARTER` key when the kit resolves and `CHARTER` in
+    `.memory-tree.conf` is blank, absent or names no file (§8 F3). This is read first, so the line
+    names the cause rather than the artifacts it left unrendered. The remedy names writing that doc,
+    `adopt-roles.sh --scaffold` and a new session.
   - `UNWIRED` when the kit resolves and any of these is absent: `.claude/roles.json`; a
     `.claude/agents/<name>.md` for a role file not declaring `agent: false`; the rendered Skill. The
     remedy names `adopt-roles.sh --scaffold` and a new session.
@@ -98,8 +109,8 @@ default that arrives wired.
 
   `check_eol`'s population gains a third named glob, the tracked `.claude/agents/*.md` and
   `.claude/roles.json` carrying the `eol=lf` pin, so a CRLF render is reported and `--fix` rewrites
-  it as it does a rendered Skill. `tools/check-wiring.test.sh` gains the arms for both. Observed by
-  AC6.
+  it as it does a rendered Skill. `tools/check-wiring.test.sh` gains the arms for both, and one for
+  the missing governing doc. Observed by AC6 and AC13.
 - **S9** — `tools/check-kit-versions.sh` gains the roles kit's carrier row: the kit resolved by its
   `roles_lib.py`, a `need` row for `KIT_ROLES_VERSION` there, and a pair check that the
   `gov:kit roles@` marker in the kit's README equals that constant. Observed by AC10.
@@ -110,10 +121,12 @@ default that arrives wired.
     unsatisfied requirement; an aged registry lacking `roles` makes `derive_default_gained` gain it
     and an unmoved one gains nothing; the house rows are `seed`, the Skill row is `rendered` with a
     `[[regenerate]]` present, and the test rows are `project-owned`.
-  - `check_roles_install`, a default `apply` into a scratch target: the role index, nine agent
-    types, ten seeded house overlays and the Skill are present; the target's `adopt-roles.sh --check`
-    exits 0; its `check-wiring.sh --check` reads `ok` for `roles`, and `UNWIRED` once the index is
-    absent.
+  - `check_roles_install`, a default `apply` into a scratch target holding, before the apply, a
+    governing doc at the path the memory-tree seed writes as `CHARTER`, copied from gov's own
+    `AGENTS.md`: the role index, nine agent types, ten seeded house overlays and the Skill are
+    present; the target's `adopt-roles.sh --check` exits 0; its `check-wiring.sh --check` reads `ok`
+    for `roles`, and `UNWIRED` once the index is absent. With `charter=False` it writes no doc, and
+    asserts AC13's shape instead.
 
   The default-plan arm in `main()` re-pins its `SIDE|rendered`, `seed` and `ORDER|project-owned`
   figures to the plan this unit produces. Observed by AC2, AC3 and AC4.
@@ -182,6 +195,9 @@ default that arrives wired.
   fence and gov's `kits` array name.
 - **hands-off** external — whether `review-harness` joins the default selection, which widens every
   adopter's install and is the owner's to decide (§8 F1).
+- **hands-off** external — an ask: whether the memory-tree seed or govkit derives `CHARTER` from
+  the path the playbook lands at, so a default install's governing doc is the one it installed. It
+  changes another kit's install behaviour, a public surface M3's veto 2 keeps for the owner (§8 F3).
 
 ## 4. Design
 
@@ -245,8 +261,8 @@ The sibling specs of this build were read as they stood while this one was writt
 
 | Mode | Writes | Exit |
 |---|---|---|
-| `--scaffold` | the rendered Skill, `.claude/agents/<name>.md` per agent role, `.claude/roles.json` | 0; 1 a token survived, a stage disagrees or the agent render refused; 2 a derivation or the conf failed |
-| `--check` | a temporary Skill render only | 0 fresh; 1 each stale or absent artifact named, with `--scaffold`; 2 as above |
+| `--scaffold` | the rendered Skill, `.claude/agents/<name>.md` per agent role, `.claude/roles.json` | 0; 1 a token survived, a stage disagrees or the agent render refused; 2 a derivation or the conf failed; 3 no governing doc at `CHARTER`, the Skill alone written and the doc and key named |
+| `--check` | a temporary Skill render only | 0 fresh; 1 each stale or absent artifact named, with `--scaffold`; 2 as above; 3 no governing doc at `CHARTER`, the Skill alone compared and the doc and key named |
 | anything else | nothing | 2, usage |
 
 ### The legs, after this unit
@@ -262,6 +278,7 @@ The sibling specs of this build were read as they stood while this one was writt
 
 ```text
 skip     roles     — the roles kit is not installed here
+UNWIRED  roles     — the roles kit is installed and CHARTER in .memory-tree.conf names <doc>, which is not a file, so no agent type is rendered. Fix: write that doc or point CHARTER at it, run bash <kit>/adopt-roles.sh --scaffold, then start a new session
 UNWIRED  roles     — the roles kit is installed and <artifact> is not rendered, so no role agent can be spawned and the role-aware gates are unarmed. Fix: bash <kit>/adopt-roles.sh --scaffold, then start a new session
 note     roles     — <harness path> is named by the role index and absent here; /build cannot drive it until the review harness is installed
 ok       roles     — <n> agent types, the role index and the /build Skill are rendered
@@ -340,6 +357,11 @@ which is the leg's question, and whether a house overlay is sensible, which is `
 
 ## 6. Acceptance criteria
 
+`govkit apply` copies gov's COMMITTED bytes into the target, so AC3, AC4 and AC13 are observable
+only after the pass commit. They are observed against the committed tree, and their ledger lines
+land in a follow-up commit carrying `Pass: none`. This is the one unit of the build whose acceptance
+follows its commit.
+
 - **AC1** — When `python tools/govkit/govkit.py selfcheck` runs, it exits 0 with `0 unclaimed`, every
   roles-kit leg is counted claimed or exempt, and its generated-outputs note counts the two rows this
   unit declares beside every other descriptor's.
@@ -366,6 +388,8 @@ which is the leg's question, and whether a house overlay is sensible, which is `
   adopter's `--scaffold`, it prints a failure naming a missing agent type.
   Red when: the install leaves an artifact unrendered, or an absent harness reads `UNWIRED`.
   cost: one default apply into a scratch target under `%TEMP%`, minutes.
+  fixture: matrix shape 6's target plus a governing doc at the seed's `CHARTER` path, copied from
+  gov's `AGENTS.md` before the apply, since the shape lands the playbook under the target's docs folder as PARALLEL.md.
 - **AC5** — When `bash <prefix>/roles/adopt-roles.sh --check` runs in gov, where the prefix is
   `tools`, it exits 0. After one byte is appended to `gov-builder.md` under `.claude/agents/`, it
   exits 1 naming that file and the `--scaffold` remedy. `bash <prefix>/roles/adopt-roles.sh --scaffold`
@@ -414,6 +438,16 @@ which is the leg's question, and whether a house overlay is sensible, which is `
   Red when: any of the nine keys still prints, the ban is answered by a waiver or a marker, a
   respelled tuple changes a key or its order, or the self-test's fixture lays out a different tree.
   figure: PINNED at `8bf164d40`; another unit adding a roles-kit offender moves the set.
+- **AC13** — When `python -c "import sys, pathlib, tempfile; sys.path.insert(0, 'tools/govkit'); import selftest as s; s.check_roles_install(pathlib.Path(tempfile.mkdtemp(prefix='or')), charter=False); print(s.FAILURES)"`
+  runs, it prints `[]`: in matrix shape 6's target with no doc at `CHARTER`, the default `apply`
+  exits 0, the `/build` Skill is rendered, no `.claude/agents/` file and no `.claude/roles.json` is
+  written, and the target's `check-wiring.sh --check` prints `UNWIRED  roles` naming the doc and
+  `CHARTER`.
+  Red when: the adopter exits an undeclared code on an absent governing doc. That is the adopter at
+  rev-3 behaviour, which the builder observed failing the apply with `R0 — CHARTER names AGENTS.md,
+  which is not a file` and exit 1.
+  cost: one default apply into a scratch target under `%TEMP%`, minutes.
+  fixture: matrix shape 6's target as it builds one, with no governing doc written.
 
 ## 7. Gates
 
@@ -426,9 +460,9 @@ it at orders 1, 3 and here, and the close's bar runs every leg. At rev-3 `roles 
 `roles render selftest` join the line, because S14 re-observes both and orders 1 and 3 have put them
 in the manifest; `install-prefix (shipped surface)`, S14's own leg, was already on it.
 
-New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 · a registry default without roles, an aged registry stubbed through blob_at, a descriptor whose house rows are engine, and an adopter whose agent render is staged out · none
+New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 AC13 · a registry default without roles, an aged registry stubbed through blob_at, a descriptor whose house rows are engine, an adopter whose agent render is staged out, and the rev-3 adopter meeting no governing doc · none
 
-New arm: tools/check-wiring.test.sh · covers AC6 · a fixture holding the roles kit with no role index rendered, then with one, then with a CRLF agent type, then a fixture without the kit · none
+New arm: tools/check-wiring.test.sh · covers AC6 AC13 · a fixture holding the roles kit with no role index rendered, then with one, then with a CRLF agent type, then with no doc at CHARTER, then a fixture without the kit · none
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC11 · copies of the adopter with its stage binding, its surviving-token refusal, its agent compare or its usage refusal staged out · a new floor at the suite's first count
 
@@ -464,6 +498,24 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC11 · copies of the adopter
   Recommendation: (a). It is the option that catches the adopter's own defect earliest, and neither
   option widens an install, a surface or a governance carrier.
   RESOLVED (agent, 2026-10-11, delegated): (a), a `[[gate_leg]]` with `subject = "repo"`.
+- **F3 — What does the adopter do when no governing doc sits at `CHARTER`?**
+  The builder ran a default `plan` and `apply` from `DEPLOY_REGISTRY_DEFAULT` into a scratch target
+  where the playbook lands under the target's docs folder as PARALLEL.md, and the memory-tree seed writes
+  `CHARTER="AGENTS.md"`, which no file holds. `--scaffold` printed `R0 — CHARTER names AGENTS.md,
+  which is not a file` and exited 1, and govkit fails an apply whose adopter exits with no declared
+  outcome (`tools/govkit/govkit.py` near line 7750). Every default install without a governing doc
+  at `CHARTER` failed, and AC4's nine agent types could not be observed in the shape-6 fixture.
+  (1) A declared outcome. The adopter still renders the Skill, skips the agent types and the role
+  index, prints one line naming the missing doc and the conf key, and exits 3, which S5 declares as
+  an accepted `[[outcome]]`; `check-wiring`'s roles arm reports `UNWIRED roles` naming the same doc.
+  (2) Derive `CHARTER` from the playbook's path in the memory-tree seed or in govkit. That changes
+  another kit's install behaviour, a public surface M3's veto 2 keeps for the owner, so it is filed
+  as a §3 Edge `hands-off` for an ask.
+  (3) Declare a governing doc only in the AC3 and AC4 fixtures. Real adopters stay broken.
+  Recommendation: (1). It is the only option that makes a real default install succeed without
+  moving another kit's surface, and it names the defect where an adopter reads it.
+  RESOLVED (agent, 2026-10-11, delegated): (1), exit 3 declared as `no-governing-doc` and an
+  `UNWIRED roles` line naming the doc.
 
 ## 9. Revision log
 
@@ -478,6 +530,13 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC11 · copies of the adopter
   checks unmoved, the non-goal on the kit's content admits that respelling, the three files join
   Files touched, and the two roles legs S14 re-observes join §7. This unit owns it because it already
   edits the roles kit to register and wire it.
+- rev-4 · 2026-10-11 · §2 · §3 · §4 · §6 · §7 · §8 · the builder's finding that a default install
+  with no governing doc at `CHARTER` fails the apply, because the adopter exits 1 and S5 declares
+  only code 0. §8 F3 resolves it to option 1: S4's exit table and S5's outcomes gain exit 3 as
+  `no-governing-doc`, S8 reports `UNWIRED roles` naming the doc, S10's install arm writes a doc for
+  AC4's fixture and takes `charter=False` for AC13, the new criterion, and a §3 Edge files the
+  `CHARTER` derivation as an ask. §6's preamble states that AC3, AC4 and AC13 are observed after the
+  pass commit, with their ledger lines in a `Pass: none` follow-up.
 
 ## 10. Reuse audit
 
