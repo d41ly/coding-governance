@@ -202,6 +202,17 @@ descriptor at the tool root prints one line and spawns nothing. `GATE_REGEN_CHEC
 check with a line naming the knob; the freshness legs still grade every output, so a skip costs an
 early signal and never a verdict.
 
+### The lander regenerates over its merged tree
+
+`<prefix>/push-main.sh` is the verb's second caller (TOOL-aPrimedIndex-4). `--prepare` runs
+`regen.py --write` over the merged tree after the version mint, and what it moved enters the
+prepared merge the way the mint's output does, same parents and same subject. The attended landing
+runs it on every attempt after its mint commit and commits what moved as its own commit, subject
+`regen: generated outputs onto <remote>/<default> at <sha8>`, with a `Pass: none` trailer. That is
+what keeps a reconcile merge, which leaves the `merge=ours` indexes stale, from meeting the push
+bar's refusal. A failed write refuses the landing with the branch left where it was; a lander with
+no `regen.py` beside it says so in one line and lands without it.
+
 ## Reuse, and the baseline a guard diffs against
 
 `GATE_REUSE=1` skips a leg whose inputs are byte-identical to a recorded green: not declared

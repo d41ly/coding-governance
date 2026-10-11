@@ -1,11 +1,12 @@
 # TOOL-aPrimedIndex-4 — the lander regenerates the declared outputs over its merged tree and lands them with the merge
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aPrimedIndex-4-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aPrimedIndex-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aPrimedIndex-1-2-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPrimedIndex-1-2-build-brief.md) | journal | TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 |
 | [2026-10-11-prompt-TOOL-aPrimedIndex-1.md](../prompts/2026-10-11-prompt-TOOL-aPrimedIndex-1.md) | research | TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 |
 

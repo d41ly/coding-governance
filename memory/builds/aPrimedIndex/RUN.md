@@ -47,3 +47,9 @@ base: 15bbfa4f867262f3c862e2473688fc69d0566b7d
 2026-10-11T03:04:50Z dispatch · item d6214c0c TOOL-aPrimedIndex-2 · reason memory/guides/SESSION-KICKOFF.md
 
 2026-10-11T03:21:39Z dispatch · item 3a20991f TOOL-aPrimedIndex-3 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/README.md memory/guides/MERGE-BAR.md memory/guides/SESSION-KICKOFF.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-3.md memory/builds/aPrimedIndex/build/2026-10-11-build-TOOL-aPrimedIndex-3-1-acceptance-ledger.md memory/builds/aPrimedIndex/README.md memory/map/generated/symbols.json
+
+2026-10-11T03:53:36Z dispatch · item 77c7a903 TOOL-aPrimedIndex-4 · reason tools/push-main.sh tools/push-main.test.sh tools/run-gates/README.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-4.md memory/builds/aPrimedIndex/build/2026-10-11-build-TOOL-aPrimedIndex-4-1-acceptance-ledger.md memory/builds/aPrimedIndex/README.md memory/map/generated/symbols.json
+
+2026-10-11T05:56:53Z dispatch · item 77c7a903 TOOL-aPrimedIndex-4 · reason tools/push-main.sh tools/push-main.test.sh tools/run-gates/README.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-4.md memory/builds/aPrimedIndex/build/2026-10-11-build-TOOL-aPrimedIndex-4-1-acceptance-ledger.md memory/builds/aPrimedIndex/README.md memory/map/generated/symbols.json
+
+2026-10-11T06:11:05Z dispatch · item 77c7a903 TOOL-aPrimedIndex-4 · reason memory/builds/aPrimedIndex/BACKLOG.md memory/backlog/TOOL.md

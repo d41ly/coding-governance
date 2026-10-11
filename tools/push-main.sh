@@ -32,6 +32,15 @@
 # this lander, which is every adopter, both paths say so in one line and land as before. What a mint
 # does NOT do: re-stamp the kickoff manifest, so a minted carrier on its watch line still reds C5.
 #
+# GENERATED OUTPUTS ARE REGENERATED HERE TOO (TOOL-aPrimedIndex-4). After the mint, both paths run
+# the run-gates kit's `regen.py --write` over the tree about to be pushed: a reconcile merge leaves
+# the `merge=ours` indexes stale, and the push bar refuses a stale declared output before its first
+# leg. `--prepare` folds what it moved into the prepared merge beside the mint; the attended landing
+# commits it as `regen: generated outputs onto <remote>/<branch> at <sha8> for <unit>`, `Pass: none`.
+# A failed write refuses the landing as a refused mint does. No regen.py beside this lander says so
+# in one line and lands as before. What it does NOT do: prove the result fresh -- the push bar's
+# preflight is that check, and a regeneration cannot fix a check red for another reason.
+#
 # WHY THE FLAGS EXIST — TOOL-dDerivedDocket-2. The attended path lands only from the primary tree
 # with the default branch checked out, and it pushes that branch, which every build on the node
 # shares. A run that is never on it therefore had to leave its own tree to land, and its landing
@@ -623,6 +632,34 @@ check_merge_losses() {  # R · T -> 1 when a merge in R..T loses a definition; 0
   return 0
 }
 
+# ---- GENERATED OUTPUTS, regenerated at the landing — TOOL-aPrimedIndex-4 -------------------------
+# `run_regen` runs the run-gates kit's `regen.py --write` over the WORKING TREE; the caller commits
+# what it wrote. Found the way the minter finds the deployer, from this script's own directory, and
+# the file test under the toplevel for the merge-loss check's reason: the kit can resolve beside
+# this lander while the tree being landed lacks the file. No python or no regen.py prints one line
+# and returns 0, and the push bar's preflight then grades the outputs. A stage that moved nothing is
+# not echoed. On a failed write or a refused declaration the verb's output goes to stderr and this
+# returns 1.
+run_regen() {  # -> 0 regenerated or announced-skipped · 1 a write failed or the declaration was refused
+  local py dir out rc
+  if ! py=$(resolve_python 2>/dev/null); then
+    echo "push-main: generated outputs were NOT regenerated — no usable python launcher; the push bar's preflight grades them."
+    return 0
+  fi
+  if ! dir=$(resolve_kit_dir "$py" run-gates regen.py "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/regen.py" ]; then
+    echo "push-main: generated outputs were NOT regenerated — no regen.py beside this lander; the push bar's preflight grades them."
+    return 0
+  fi
+  out=$("$py" "$top/$dir/regen.py" --write 2>&1); rc=$?
+  if [ "$rc" -eq 0 ]; then
+    printf '%s\n' "$out" | grep -v -e ' · moved: none$' || true
+    return 0
+  fi
+  echo "push-main: the generated outputs could NOT be regenerated (regen.py exit $rc):" >&2
+  printf '%s\n' "$out" | sed 's/^/  /' >&2
+  return 1
+}
+
 # ---- KIT VERSIONS, minted at the landing — TOOL-aMendedFleet-65 ----------------------------------
 # `run_minter <base> [<head>]` runs the deployer's `mint` verb, which writes the next version of every
 # kit whose shipped bytes moved in <base>..<head> with no bump dating the move, into the WORKING TREE;
@@ -734,6 +771,14 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     git reset -q --hard "$t" >/dev/null 2>&1 || true
     git checkout "$branch" >/dev/null 2>&1 || true
     echo "push-main: the kit versions this landing owes could not be minted (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+    return 1
+  fi
+  # REGENERATE INTO THE MERGE (TOOL-aPrimedIndex-4): after the mint, because a minted version can
+  # itself stale an output that stamps it; folded by the same rewrite, same parents and subject.
+  if ! run_regen; then
+    git reset -q --hard "$t" >/dev/null 2>&1 || true
+    git checkout "$branch" >/dev/null 2>&1 || true
+    echo "push-main: the generated outputs this landing owes could not be regenerated (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
     return 1
   fi
   if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
@@ -906,6 +951,22 @@ while [ "$attempt" -le "$max" ]; do
     mint_unit=$(read_mint_unit "$mt..HEAD")
     if ! git commit -q --no-verify -m "mint: kit versions onto $remote/$def at ${mt:0:8}${mint_unit:+ for $mint_unit}" -m "Pass: none"; then
       echo "push-main: could not commit the minted versions. Aborted (no push)." >&2
+      exit 1
+    fi
+  fi
+
+  # REGENERATE, on every attempt, after the mint (TOOL-aPrimedIndex-4): its own commit, named and
+  # trailered as the mint commit is, so the routed-commits leg and the pass reader read it alike.
+  if ! run_regen; then
+    git reset -q --hard HEAD >/dev/null 2>&1 || true
+    echo "push-main: the generated outputs this landing owes could not be regenerated (named above). Aborted (no push)." >&2
+    exit 1
+  fi
+  if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
+    git add -A
+    regen_unit=$(read_mint_unit "$mt..HEAD")
+    if ! git commit -q --no-verify -m "regen: generated outputs onto $remote/$def at ${mt:0:8}${regen_unit:+ for $regen_unit}" -m "Pass: none"; then
+      echo "push-main: could not commit the regenerated outputs. Aborted (no push)." >&2
       exit 1
     fi
   fi

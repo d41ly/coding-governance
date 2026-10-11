@@ -2103,6 +2103,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "build_regen_fixture",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
       "id": "build_region",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -16338,6 +16343,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "run_regen",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
       "id": "run_regen_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -20716,6 +20726,11 @@
       "id": "write_staged",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "write_stale_index",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
     },
     {
       "id": "write_su_aborted",
