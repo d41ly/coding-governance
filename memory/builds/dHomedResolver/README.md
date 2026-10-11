@@ -5,7 +5,7 @@ opened: 2026-10-09
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-4 TOOL-dHomedResolver-5 TOOL-dHomedResolver-6 TOOL-dHomedResolver-7
+ids: TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-4 TOOL-dHomedResolver-5 TOOL-dHomedResolver-6 TOOL-dHomedResolver-7 TOOL-dHomedResolver-8
 ---
 
 # dHomedResolver — a rotation is graded against its declared home, and a half-staged one is refused
@@ -54,12 +54,13 @@ None yet.
 | 2 | `TOOL-dHomedResolver-2` | 2 | the build-index generator refuses while a file under the archive folder is untracked |
 | 3 | `TOOL-dHomedResolver-3` | 1 | two gotcha records for the classes units 1 and 2 close |
 | 5 | `TOOL-dHomedResolver-5` | 2 | promoted from the closing review: its five mediums and two lows, batched |
+| 6 | `TOOL-dHomedResolver-8` | 1 | the three reds the reconcile brought in, which this landing cannot carry |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node d · opened 2026-10-09 · streams tooling
-ids TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-4 TOOL-dHomedResolver-5 TOOL-dHomedResolver-6 TOOL-dHomedResolver-7
+**Build status:** SPECCED · 5 unit(s) · node d · opened 2026-10-09 · streams tooling
+ids TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-4 TOOL-dHomedResolver-5 TOOL-dHomedResolver-6 TOOL-dHomedResolver-7 TOOL-dHomedResolver-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -68,13 +69,14 @@ ids TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHome
 | [TOOL-dHomedResolver-2 — the build-index generator refuses while a file under the archive folder is untracked](spec/2026-10-09-spec-TOOL-dHomedResolver-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-09 |
 | [TOOL-dHomedResolver-3 — two gotcha records for the classes units 1 and 2 close](spec/2026-10-09-spec-TOOL-dHomedResolver-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-09 |
 | [TOOL-dHomedResolver-5 — the closing review's minors: the guard reaches --new-build, its arm can fail, its remedy quotes](spec/2026-10-09-spec-TOOL-dHomedResolver-5.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-dHomedResolver-8 — the three reds the reconcile brought in, which this landing cannot carry](spec/2026-10-11-spec-TOOL-dHomedResolver-8.md) | 6 | 1 | SPECCED | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
 Records: 10 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dHomedResolver-8.
 
-Ids no `spec-audit` record has ever named: TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-5.
+Ids no `spec-audit` record has ever named: TOOL-dHomedResolver-1 TOOL-dHomedResolver-2 TOOL-dHomedResolver-3 TOOL-dHomedResolver-5 TOOL-dHomedResolver-8.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -85,6 +87,7 @@ Ids no `spec-audit` record has ever named: TOOL-dHomedResolver-1 TOOL-dHomedReso
 | 2 | `TOOL-dHomedResolver-2` | no |
 | 3 | `TOOL-dHomedResolver-3` | no |
 | 5 | `TOOL-dHomedResolver-5` | no |
+| 6 | `TOOL-dHomedResolver-8` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

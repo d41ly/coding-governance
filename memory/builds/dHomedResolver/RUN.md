@@ -52,3 +52,5 @@ base: b39dff78aae970c8428289aa781cf21f79c6fbff
 2026-10-09T15:58:33Z brief · item TOOL-dHomedResolver-5 · reason af820f14ce85 memory/builds/dHomedResolver/prompts/2026-10-09-prompt-TOOL-dHomedResolver-5-1-build-brief.md
 
 2026-10-09T16:09:13Z dispatch · item 996609b2 TOOL-dHomedResolver-5 · reason memory/builds/dHomedResolver/README.md memory/builds/dHomedResolver/build/2026-10-09-build-TOOL-dHomedResolver-5-1-acceptance-ledger.md memory/builds/dHomedResolver/prompts/2026-10-09-prompt-TOOL-dHomedResolver-5-1-build-brief.md memory/builds/dHomedResolver/spec/2026-10-09-spec-TOOL-dHomedResolver-1.md memory/builds/dHomedResolver/spec/2026-10-09-spec-TOOL-dHomedResolver-5.md tools/memory-tree/gen_build_index.py tools/memory-tree/row_grammar.py
+
+2026-10-11T06:23:44Z rescope · item add TOOL-dHomedResolver-8 · reason the close's flagged bar reads three reds OWN that origin/main b726385f brought in: the hygiene suite's python-key parity arm (KF3, this build edits that suite), push-main.test.sh arm 26 and the routed-commits leg (their graders' directories this build or its mint touch); all three red identically at b726385f, and none can land without being fixed here
