@@ -2130,7 +2130,11 @@ write_runlog_verdict() { # the status the EXIT trap saw -> one ev=once line appe
   done
   for i in "${!key[@]}"; do line+="${line:+$tab}${key[i]}=${val[i]}"; done
   [ -n "$dir" ] && [ ! -d "$dir" ] && mkdir "$dir" 2>/dev/null
-  [ -n "$dir" ] && { printf '%s\n' "$line" >> "$dir/gates.log"; } 2>/dev/null && return 0
+  # THROUGH `cat`, ONE WRITE PER LINE (TOOL-aPairedSlots-7): two bars of one repository append here at
+  # once. Measured on node a, three concurrent writers of 2000-byte lines through the `printf` builtin's
+  # own redirection tore 146 of 3200, and of 12000-byte lines 308 of 900, while the same lines piped
+  # through `cat` tore none at either size. A line grows with its failing legs' names. One spawn a bar.
+  [ -n "$dir" ] && { printf '%s\n' "$line" | cat >> "$dir/gates.log"; } 2>/dev/null && return 0
   printf 'run-gates: run log — cannot append to %s, so this bar is not recorded there; its verdict, its output and its exit code are unaffected\n' \
     "${dir:-(no git dir resolved)}/gates.log" >&2
   return 0
@@ -4287,8 +4291,12 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = "$linea
     _gcd_abs=$(cd "$_gcd" 2>/dev/null && pwd -P) || _gcd_abs=""
     _gd_abs=$(cd "$gd" 2>/dev/null && pwd -P) || _gd_abs=""
     if [ -n "$_gcd_abs" ] && [ -n "$_gd_abs" ] && [ "$_gcd_abs" != "$_gd_abs" ]; then
-      cp "$gd/gate-full-green" "$_gcd_abs/gate-full-green.shared.tmp" 2>/dev/null \
-        && mv -f "$_gcd_abs/gate-full-green.shared.tmp" "$_gcd_abs/gate-full-green.shared" 2>/dev/null || true
+      # STAGED UNDER THIS PROCESS'S OWN NAME (TOOL-aPairedSlots-7): two bars of one repository stamp at
+      # once, and a fixed staging name let one bar's `cp` truncate the file the other was moving.
+      # Each `mv` now places a whole stamp, and the last writer wins.
+      cp "$gd/gate-full-green" "$_gcd_abs/gate-full-green.shared.tmp.$$" 2>/dev/null \
+        && mv -f "$_gcd_abs/gate-full-green.shared.tmp.$$" "$_gcd_abs/gate-full-green.shared" 2>/dev/null \
+        || rm -f "$_gcd_abs/gate-full-green.shared.tmp.$$" 2>/dev/null || true
     fi
   fi
 fi

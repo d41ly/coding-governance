@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-7 — the common dir's shared files take a second concurrent writer safely
 
-**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 6
+**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-11-build-TOOL-aPairedSlots-5-shared-path-audit.md](../build/2026-10-11-build-TOOL-aPairedSlots-5-shared-path-audit.md) | journal | TOOL-aPairedSlots-5 TOOL-aPairedSlots-8 |
 | [2026-10-11-build-TOOL-aPairedSlots-5-two-bar-check.sh](../build/2026-10-11-build-TOOL-aPairedSlots-5-two-bar-check.sh) | journal | TOOL-aPairedSlots-5 |
+| [2026-10-11-build-TOOL-aPairedSlots-7-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aPairedSlots-7-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md) | journal | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 |
 
 <!-- /gen:spec-records -->
@@ -99,10 +100,11 @@ No function is minted. New path: `gate-full-green.shared.tmp.<pid>` (the staging
 
 ## 6. Acceptance criteria
 
-- **AC1** — When three concurrent fixture runners each write 50 run-log lines padded past 4000
-  bytes into one common dir, `gates.log` holds 150 whole lines, each parsing with `parse_line`.
+- **AC1** — When three concurrent writers each run the runner's own run-log append statement 60
+  times with 20000-byte lines into one directory, `gates.log` holds 180 whole three-field lines.
   Red when: the line is written with `printf >>`, and lines tear.
-  cost: about two minutes of spawns on node a.
+  cost: about two minutes of spawns on node a; the red is likely rather than certain, since the
+  measured tear rate through `printf >>` falls with host load.
 - **AC3** — When two fixture runners stamp `gate-full-green.shared` at once, the file equals one of
   the two stamps byte for byte and no `gate-full-green.shared.tmp` file remains.
   Red when: the staging name is fixed and the file is torn or empty.
@@ -126,6 +128,9 @@ none
 - rev-1 · 2026-10-11 · initial draft.
 - rev-2 · 2026-10-11 · §1 · S2 · AC2 · §3 · §4 · the health log trim leaves this unit for ask
   TOOL-aPairedSlots-10: its writer is a parity-gated block shared by four kits and a Python twin.
+- rev-3 · 2026-10-11 · AC1 · the criterion names the observation the arm makes: the runner's own
+  append statement, extracted and run by three writers of 20000-byte lines, at the size the tear
+  rate through `printf >>` stays observable on this host.
 
 ## 10. Reuse audit
 

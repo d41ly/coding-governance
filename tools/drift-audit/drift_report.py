@@ -3789,14 +3789,24 @@ def resolve_history_path(root: pathlib.Path) -> pathlib.Path | None:
 
 
 def write_drift_history(path: pathlib.Path | None, rows: list[str]) -> None:
-    """Append `rows` in ONE binary write, the header first into an absent or empty file, so two bars
-    on one node interleave whole groups at worst. A failure is one stderr line and never touches the
+    """Append `rows` in ONE binary write, the header first into a file this call created, so two bars
+    on one node interleave whole groups at worst and never write two headers. A failure is one stderr line and never touches the
     exit status; a success is one stdout line, so a missing line is a visible miss."""
     try:
         if path is None:
             raise OSError("git rev-parse --git-common-dir named no directory")
+        # THE HEADER GOES ONLY INTO A FILE THIS WRITER CREATED (TOOL-aPairedSlots-7). Two bars of one
+        # repository can both be the first writer; an empty-file test let both write a header. The
+        # file is CREATED empty by an exclusive open, then every writer appends, so rows a second
+        # writer lands in between are kept rather than overwritten from offset 0.
+        created = False
+        try:
+            with open(path, "xb"):
+                created = True
+        except FileExistsError:
+            pass
+        head = "\t".join(HISTORY_COLUMNS) + "\n" if created else ""
         with open(path, "ab") as fh:
-            head = "" if fh.tell() else "\t".join(HISTORY_COLUMNS) + "\n"
             fh.write((head + "".join(r + "\n" for r in rows)).encode("utf-8"))
     except OSError as exc:
         print(f"drift-report: history NOT written to {path}: {exc}", file=sys.stderr)

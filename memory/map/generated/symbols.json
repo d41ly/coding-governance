@@ -4473,6 +4473,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_two_writers",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
       "id": "check_untouched_r3",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -18424,6 +18429,11 @@
     },
     {
       "id": "test_drift_history",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_drift_history_two_writers",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
     },

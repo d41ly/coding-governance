@@ -46,7 +46,9 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 # AC5's check that both bars printed the acquire line its stdout comparison filters.
 # 210 -> 211, TOOL-aGraftedHelix-7: AC5's check that both bars printed the `memory: ` line its stdout
 # comparison now filters too.
-FLOOR_ASSERTIONS=211
+# 211 -> 217, TOOL-aPairedSlots-7: TWO's six checks, two concurrent writers of the run log and the
+# shared full green, COUNTED off the arm.
+FLOOR_ASSERTIONS=217
 # Where the scratch clone installs the runner: a FIXTURE-INTERNAL path, bound once, never gov's prefix.
 KR=kit/run-gates
 n=0; st=0
@@ -892,6 +894,45 @@ check_cap_fit() {
 
 build_scratch || { echo "FAIL the scratch clone could not be built"; exit 1; }
 
+# TWO WRITERS (TOOL-aPairedSlots-7 AC1, AC3). Two bars of one repository share its common dir, so the
+# run-log append and the shared full green each meet a second concurrent writer. The arm runs the
+# RUNNER'S OWN statements, extracted from `run-gates.sh`, so it grades what ships. AC1: three writers
+# of 20000-byte lines. Tearing through the `printf` builtin's redirection is LIKELY, not certain: on
+# node a it tore 2 of 120 lines at 8000 bytes and 8 of 120 at 20000, and 146 of 3200 at 2000 bytes on
+# a busier host, while `cat` tore none at any size; 180 lines makes a red near-certain. AC3: two
+# stampers, each its own PROCESS as two bars are (a subshell keeps its parent's `$$`), stage under two
+# different names, and after both stamp concurrently the shared file is one whole stamp with no
+# staging file left.
+check_two_writers() {
+  local t rl sg sfx w i line pad dir p1 p2 a b
+  t=$(mktemp -d) || { check "TWO scratch" no yes; return; }
+  rl=$(grep -F '"$dir/gates.log"; } 2>/dev/null && return 0' "$HERE/run-gates.sh" | sed 's/ && return 0$//; s/^ *\[ -n "\$dir" \] && //')
+  check "TWO the runner's run-log append statement is found" "$([ -n "$rl" ] && echo found)" found
+  dir=$t; pad=$(printf '%*s' 20000 '' | tr ' ' x)
+  for w in 1 2 3; do ( for i in $(seq 1 60); do line="w=$w	i=$i	pad=$pad"; eval "$rl"; done ) & done
+  wait
+  check "TWO 180 concurrent 20000-byte run-log lines landed whole" \
+    "$(awk -F'\t' 'NF == 3 && length($3) == 20004 { c++ } END { print c + 0 }' "$t/gates.log" 2>/dev/null)" 180
+  # The stamp statement runs from its `cp` line to the first line that does not continue.
+  sg=$(sed -n '/cp "\$gd\/gate-full-green" "\$_gcd_abs\/gate-full-green\.shared\.tmp/,/[^\\]$/p' "$HERE/run-gates.sh" | sed 's/^ *//; s/\\$//' | tr '\n' ' ')
+  check "TWO the runner's shared-green stamp statement is found" "$([ -n "$sg" ] && echo found)" found
+  sfx=$(printf '%s' "$sg" | sed -n 's/^cp "[^"]*" "[^"]*gate-full-green\.shared\.tmp\([^"]*\)".*/\1/p')
+  p1=$(bash -c "echo stage$sfx"); p2=$(bash -c "echo stage$sfx")
+  check "TWO two stamping processes stage under two different names" "$([ "$p1" != "$p2" ] && echo distinct)" distinct
+  export _gcd_abs=$t/common; mkdir -p "$_gcd_abs" "$t/gA" "$t/gB"
+  printf 'stamp A\n' > "$t/gA/gate-full-green"; printf 'stamp B\n' > "$t/gB/gate-full-green"
+  ( export gd=$t/gA; for i in $(seq 1 25); do bash -c "$sg"; done ) &
+  ( export gd=$t/gB; for i in $(seq 1 25); do bash -c "$sg"; done ) &
+  wait
+  a=$(cat "$_gcd_abs/gate-full-green.shared" 2>/dev/null)
+  check "TWO after two concurrent stampers the shared green is one whole stamp" \
+    "$(case "$a" in 'stamp A'|'stamp B') echo whole ;; *) echo "torn:$a" ;; esac)" whole
+  b=$(ls "$_gcd_abs" | grep -c 'gate-full-green.shared.tmp')
+  check "TWO no staging file is left behind" "$b" 0
+  unset _gcd_abs
+  rm -rf "$t"
+}
+
 check_selected AC1 && check_ac1_red
 check_selected AC2 && check_ac2_paths
 check_selected AC2 && check_ac2_honest
@@ -904,6 +945,7 @@ check_selected AC8 && check_ac8_pre_header
 check_selected AC9 && check_ac9_worktree
 check_selected CAP && check_cap_fit
 check_selected AC8 && check_ac8_exits
+check_selected TWO && check_two_writers
 
 if [ -n "${RGRL_ARMS:-}" ]; then
   echo "SELECTED ($n assertions, arms [$RGRL_ARMS]; the floor of $FLOOR_ASSERTIONS grades only a full run)"

@@ -93,7 +93,7 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 478
+CHECK_FLOOR = 480
 # 474 -> 478, TOOL-dLadderedRemote-2: the four remote-ladder checks in `test_base_is_remote_tracking`,
 # COUNTED off the arm rather than measured, because the unit pass runs no suite.
 # 414 + 346 -> 474, the merge of origin/main into aMendedFleet: base 277, plus 137 from this
@@ -116,6 +116,7 @@ CHECK_FLOOR = 478
 # 327 -> 330, TOOL-aMendedFleet-51: the readme-drift all-CLOSED arm and the two pinless checks.
 # 318 -> 327, TOOL-aMendedFleet-50: the nine checks of `test_escape_ratio`.
 # 309 -> 318, TOOL-aMendedFleet-49: the nine checks of `test_drift_delta`.
+# 478 -> 480, TOOL-aPairedSlots-7: the two checks of `test_drift_history_two_writers`.
 # 302 -> 309, TOOL-aMendedFleet-48: the seven checks of `test_drift_history`.
 # 295 -> 302, TOOL-aMendedFleet-47: the run-records arm's derived-LANDED checks — three derived
 # fixtures left unlisted, their count, the summary line, and the LANDING call-count size's two.
@@ -3631,6 +3632,46 @@ def test_drift_history(tmp: pathlib.Path) -> None:
           "history NOT written to" in squat.stderr and dr.HISTORY_FILE in squat.stderr, squat.stderr[-300:])
 
 
+def test_drift_history_two_writers(tmp: pathlib.Path) -> None:
+    """TOOL-aPairedSlots-7 AC4: two bars of one repository can both be the history's first writer.
+    The arm puts the SECOND writer inside the first one's window: `open` is wrapped so that the first
+    writer's open of the absent file runs the second writer to completion before it returns. An
+    empty-file test then lets both write a header; a header written only by the file's creator lets
+    one. Deterministic, rather than a race the arm would have to win."""
+    print("drift history, two writers (a second first-writer inside the first one's window writes no header)")
+    import builtins
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    path = tmp / "two-writers" / dr.HISTORY_FILE
+    path.parent.mkdir(parents=True, exist_ok=True)
+    real_open = builtins.open
+    fired = []
+
+    def open_with_a_second_writer(file, mode="r", *args, **kwargs):
+        fh = real_open(file, mode, *args, **kwargs)
+        if not fired and pathlib.Path(file) == path and "b" in mode and ("a" in mode or "x" in mode):
+            fired.append(mode)
+            builtins.open = real_open
+            try:
+                dr.write_drift_history(path, ["second\trow"])
+            finally:
+                builtins.open = open_with_a_second_writer
+        return fh
+
+    builtins.open = open_with_a_second_writer
+    try:
+        dr.write_drift_history(path, ["first\trow"])
+    finally:
+        builtins.open = real_open
+    lines = path.read_text(encoding="utf-8").splitlines() if path.is_file() else []
+    header = "\t".join(dr.HISTORY_COLUMNS)
+    check("history, two writers: the second writer ran inside the first one's window",
+          bool(fired), repr(fired))
+    check("history, two writers: exactly one header line, and both rows",
+          lines.count(header) == 1 and "first\trow" in lines and "second\trow" in lines, repr(lines))
+
+
 def test_drift_delta(tmp: pathlib.Path) -> None:
     """TOOL-aMendedFleet-49: `--delta` prints a moved, a hash-only and no unchanged signal between a
     reading at BASE and one at HEAD, and each of the four no-delta cases is one `skipped` line at 0."""
@@ -4328,6 +4369,7 @@ def main() -> int:
         test_nonterminal_merged_runs(tmp)
         test_park_sets_match_the_driver(tmp)
         test_drift_history(tmp)
+        test_drift_history_two_writers(tmp)
         test_drift_delta(tmp)
         test_dead_streaks(tmp)
         test_escape_ratio(tmp)
