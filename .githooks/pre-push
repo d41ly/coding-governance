@@ -22,6 +22,41 @@
 # covers it, since it compares whatever core.hooksPath resolves to.)
 set -u
 
+# ---- A SIGNAL REFUSES THE PUSH — TOOL-aSignalledHook-1 --------------------------------------------
+# On Git for Windows a hook that DIES BY A SIGNAL is read by git as SUCCESS, and the push lands with no
+# bar. MSYS hands a native parent a signal death as exit code `n << 8`, and git takes `code & 0xff`,
+# which is 0. Measured on node a (git 2.54.0.windows.1, MSYS bash 5.3.9): TERM, HUP, INT and KILL sent
+# to this hook's bash, and a TerminateProcess of it, each landed a push its stub bar would have
+# refused. 69e0ff0f landed that way on 2026-10-11 with its bar queued in the turnstile, and its END
+# line reads `rc=0 exit=unclean`: the EXIT trap ran with `$?` still 0, then the signal killed bash.
+#
+# So every signal that CAN be caught is caught from here on, and ends the hook through an ordinary
+# `exit` with a non-zero status, which git reads correctly on every platform. The handler ignores
+# further signals first, so a second one or a write to a dead pipe cannot re-enter it; stops the bar
+# when one runs, whose own TERM trap reaps its legs and drops its turnstile ticket; and refuses as
+# `signalled`. It does not wait for the bar, because a wedged bar would hold the refused push open.
+# The bar runs as a child this hook WAITS on (THE BAR RUNS, below), since a trapped signal is not
+# handled while a foreground child runs, and the bar is the one child that runs for an hour.
+#
+# WHAT THIS CANNOT CATCH: KILL, and a TerminateProcess of this bash. Neither runs a handler, and both
+# still read as success on Git for Windows. The lander catches them after the fact: this hook writes
+# `pre-push-allow` only at its one success exit on a default-branch push, and push-main refuses to
+# call a push with no such record a landing (`landed UNGATED`, no lander marker, exit 4).
+PP_BAR_PID=""
+write_signal_refusal() { # signal name · exit status -> the refusal line and file, then exit
+  trap '' HUP INT QUIT PIPE TERM
+  [ -n "$PP_BAR_PID" ] && kill -TERM "$PP_BAR_PID" 2>/dev/null
+  local why="pre-push: REFUSING — this hook was sent SIG$1${PP_BAR_PID:+ while its bar ran, and the bar was stopped}, so no verdict exists for this push. Push again."
+  echo "$why" >&2
+  if declare -F write_refusal >/dev/null; then write_refusal signalled "$why"; fi
+  RUNLOG_CLEAN=1; exit "$2"
+}
+trap 'write_signal_refusal HUP 129' HUP
+trap 'write_signal_refusal INT 130' INT
+trap 'write_signal_refusal QUIT 131' QUIT
+trap 'write_signal_refusal PIPE 141' PIPE
+trap 'write_signal_refusal TERM 143' TERM
+
 # ---- S2 (TOOL-dScrubbedConduit-1): SCRUB THE ENVIRONMENT GIT INJECTS INTO THIS HOOK ---------------
 # Git exports GIT_DIR whenever the repository is reached through a `.git` FILE rather than a `.git`
 # directory — a LINKED WORKTREE as much as a submodule. A plain top-level clone exports nothing, which
@@ -75,12 +110,15 @@ fi
 # signal behaviour moved. A failed append prints ONE `pre-push: run log` line on stderr and changes
 # neither the exit code nor stdout. `GOV_RUNLOG=0` in the environment writes nothing.
 #
-# NO SIGNAL TRAP, ON PURPOSE. A trapped TERM waits for the foreground child, and the child here is the
-# merge bar, so a TERM trap would hold a killed push for as long as the bar runs. Every exit the hook
-# CHOOSES after the trap sets RUNLOG_CLEAN=1 immediately before it, and the EXIT trap, which an
-# untrapped TERM still runs, writes `exit=clean` or `exit=unclean` from that mark. A KILL runs no
-# trap, so a START with no END is its signature. An unclean END's `rc` is whatever `$?` the trap saw,
-# often 0: read `exit=` first. The run-log suite beside this file enumerates every `exit` in it.
+# SIGNALS ARE TRAPPED, and a signal is a REFUSAL (TOOL-aSignalledHook-1, A SIGNAL REFUSES THE PUSH,
+# above). This block once argued for no trap at all, because a trapped TERM waits for a FOREGROUND
+# child and the bar was one; the bar is now a child this hook waits on, so the trap fires at once.
+# The untrapped version is how 69e0ff0f landed with no bar. Every exit the hook CHOOSES after the
+# trap sets RUNLOG_CLEAN=1 immediately before it, the signal handler's included, and the EXIT trap
+# writes `exit=clean` or `exit=unclean` from that mark: a signal now ends `exit=clean
+# decision=refuse-signal`. A KILL runs no trap, so a START with no END is its signature. An unclean
+# END's `rc` is whatever `$?` the trap saw, often 0: read `exit=` first. The run-log suite beside
+# this file enumerates every `exit` in it.
 #
 # ZERO SPAWNS: builtin reads, parameter expansion, `EPOCHREALTIME` and one `printf >>` per line. A
 # clone's first push pays one `mkdir` for the journal directory, and a clone that has one pays nothing.
@@ -93,7 +131,8 @@ fi
 # the PRIMARY tree's copy of this file: its lines appear once the primary tree has checked this change
 # out, and not before. Under the relative `.githooks` each worktree runs its own copy.
 #
-# WHAT THIS DOES NOT CATCH. The two refusals above; a KILL; and an `exit`, or an EXIT trap of its own,
+# WHAT THIS DOES NOT CATCH. The two refusals above; a KILL or a TerminateProcess, which push-main
+# reports instead as `landed UNGATED` when git lands one; and an `exit`, or an EXIT trap of its own,
 # inside the repository's `.githooks/gate-env.sh`, which is sourced below and is not this file. Every
 # read in the EXIT trap is defaulted, because `set -u` holds there and a handler that aborts on an
 # unset name writes nothing for exactly the push it exists to record.
@@ -331,7 +370,12 @@ PUSH_REFUSAL="$(git rev-parse --git-dir 2>/dev/null)/pre-push-refusal"
 # ITS OWN environment, so a sourced gate-env.sh setting the escape gave a stub-gated push the marker:
 # one decision, two processes, two inputs. Now the lander reads the answer the hook acted on.
 PUSH_BAR="${PUSH_REFUSAL%/*}/pre-push-bar"
-rm -f "$PUSH_REFUSAL" "$PUSH_BAR"
+# THE ALLOW RECORD, the third of the set (TOOL-aSignalledHook-1): `<pushed sha><TAB><gate run id>`,
+# written ONLY at this hook's one success exit on a default-branch push, at the bottom of this file,
+# and cleared here first. Git's exit 0 cannot say a hook allowed a push, because on Git for Windows a
+# hook killed by a signal reads as 0 too; push-main reads this record before it calls a push landed.
+PUSH_ALLOW="${PUSH_REFUSAL%/*}/pre-push-allow"
+rm -f "$PUSH_REFUSAL" "$PUSH_BAR" "$PUSH_ALLOW"
 bar_path=""; bar_blob=""
 why=""
 write_refusal() { # token · one-line message -> the refusal file, and the run-log decision the token pairs with
@@ -344,6 +388,7 @@ write_refusal() { # token · one-line message -> the refusal file, and the run-l
     dirty-tree)     dec=refuse-dirty ;;
     bar-refused)    dec=refuse-bar ;;
     merge-loss)     dec=refuse-merge-loss ;;
+    signalled)      dec=refuse-signal ;;
   esac
   { printf '%s\t%s\n' "$1" "${2-}" > "$PUSH_REFUSAL"; } 2>/dev/null
   [ -n "$dec" ] || return 0
@@ -1562,8 +1607,16 @@ export GATE_PUSH_BASE="$main_remote"
 # THE VETTED BAR, for the lander to read rather than re-derive (H1), once every refusal is behind us.
 { printf '%s\t%s\t%s\n' "$RUNLOG_BAR" "$bar_path" "$bar_blob" > "$PUSH_BAR"; } 2>/dev/null
 set -o noglob                  # run as vetted: the vetting split this value with globbing off (B1)
-$gate </dev/null
+# THE BAR RUNS as a child this hook WAITS on, never in the foreground (TOOL-aSignalledHook-1). bash
+# runs a trap only once a foreground child returns, so a signal sent mid-bar used to be handled an
+# hour late, and `wait` returns the moment a trapped signal arrives. The status is the bar's, exactly
+# as before. A non-interactive shell starts an async child with INT and QUIT ignored, so the runner
+# cannot trap INT here; the handler at the top forwards TERM instead, which the runner does trap.
+$gate </dev/null &
+PP_BAR_PID=$!
+wait "$PP_BAR_PID"
 rc=$?
+PP_BAR_PID=""
 # AN EXIT 0 IS NOT A VERDICT UNTIL THE RECORD SAYS SO (TOOL-dDerivedDocket-26 S6). One push to the
 # default branch proceeded with no bar run while this hook said it was forcing one
 # (TOOL-aSurfacedLexicon-25), and the path that exited 0 was never found. Whatever it was, a runner
@@ -1613,5 +1666,8 @@ else
     echo "$why" >&2
     write_refusal head-moved "$why"; RUNLOG_CLEAN=1; exit 1
   fi
+  # THE ALLOW RECORD (TOOL-aSignalledHook-1), on this exit and no other: the bar's verdict let a
+  # default-branch push through. push-main requires it to name the commit it pushed.
+  { printf '%s\t%s\n' "$main_local" "$RUNLOG_GATE_RUN" > "$PUSH_ALLOW"; } 2>/dev/null
 fi
 RUNLOG_CLEAN=1; exit "$rc"

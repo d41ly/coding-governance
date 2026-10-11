@@ -1606,4 +1606,98 @@ case "$(cat "$tmp/docs-wt.out")" in
 esac
 cd "$pfx_home" || exit 2
 
+# ---- TOOL-aSignalledHook-1: A SIGNAL REFUSES THE PUSH ----------------------------------------------
+# On Git for Windows a hook that DIES by a signal reads to git as success, and 69e0ff0f landed that way
+# with its bar queued. The hook now traps every catchable signal and refuses through an ordinary exit.
+# A TRACKED stub runner at the runner's own path, so the push takes the default bar exactly as a
+# lander's does. It records its own pid and its parent's — the hook's bash, which spawned it — then
+# sleeps like a bar queued in the turnstile, or exits with the status SG_MODE names.
+# WHAT THIS DOES NOT CHECK: a KILL, which no process can trap. push-main.test.sh grades the lander's
+# half of that, the push git calls successful with no allow record.
+build_sg_fixture() { # tag · gate-env body (printf %b) -> a pushed main carrying the stub runner; cwd moves into it
+  local d="$tmp/sg-$1"
+  mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
+  # A HOOK THAT IS NOT THERE LANDS EVERY PUSH, which reads exactly like the fail-open this block
+  # grades. Measured while building it: a mangled copy path left the hooks dir empty and every arm
+  # "landed". So the arm refuses to grade a fixture whose hook is missing.
+  [ -s "$d/hooks/pre-push" ] || { bad "SG fixture $1 has no hook at $d/hooks/pre-push, so nothing below is graded"; return 1; }
+  git init -q --bare "$d/remote.git"; git init -q "$d/work"
+  cd "$d/work" || return 1
+  git config user.email t@example.com; git config user.name t
+  git config core.hooksPath "$d/hooks"
+  mkdir -p "$KIT_REL/$RUN_GATES" .githooks
+  printf "GOV_KITROOT=%s\n$2" "$KIT_REL" > .githooks/gate-env.sh
+  printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
+  cat > "$KIT_REL/$RUN_GATES/run-gates.sh" <<'SGSTUB'
+#!/usr/bin/env bash
+[ -n "${SG_READY:-}" ] && { echo "$$ $PPID" > "$SG_READY.tmp" && mv "$SG_READY.tmp" "$SG_READY"; }
+case "${SG_MODE:-sleep}" in
+  sleep) exec sleep 30 ;;
+  *) exit "$SG_MODE" ;;
+esac
+SGSTUB
+  git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+  git remote add origin "$d/remote.git"
+  touch "$(git rev-parse --git-dir)/push-main-active"
+  GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
+}
+read_sg_tip() { git ls-remote origin refs/heads/main | cut -f1; }
+read_sg_token() { cut -f1 "$(git rev-parse --git-dir)/pre-push-refusal" 2>/dev/null; }
+# run_sg_signal <signal> -> SG_RC SG_SECS SG_BAR, after sending it to the hook once the stub bar runs.
+# SG_SECS runs from the signal to the push's end, never from the push's start: the hook vets for a
+# minute before any bar on a loaded host, and that is not the delay AC2 is about.
+run_sg_signal() {
+  local ready="$tmp/sg-ready" i pids hp bp t0
+  rm -f "$ready" "$tmp/sg.rc"
+  git commit -q --allow-empty -m "sg $1"
+  ( env -u GOV_GATE_CMD -u GOV_GATE_CMD_TEST GATE_SELFTESTS= SG_READY="$ready" git push origin main \
+      >"$tmp/sg.out" 2>&1; echo $? > "$tmp/sg.rc" ) &
+  i=0; while [ ! -s "$ready" ] && [ "$i" -lt 600 ]; do sleep 0.1; i=$((i + 1)); done
+  pids=$(cat "$ready" 2>/dev/null); bp=${pids%% *}; hp=${pids#* }
+  t0=$SECONDS
+  [ -n "$hp" ] && kill -"$1" "$hp" 2>/dev/null
+  i=0; while [ ! -s "$tmp/sg.rc" ] && [ "$i" -lt 600 ]; do sleep 0.1; i=$((i + 1)); done
+  SG_RC=$(cat "$tmp/sg.rc" 2>/dev/null); SG_SECS=$((SECONDS - t0))
+  i=0; while kill -0 "${bp:-0}" 2>/dev/null && [ "$i" -lt 50 ]; do sleep 0.1; i=$((i + 1)); done
+  SG_BAR=stopped; kill -0 "${bp:-0}" 2>/dev/null && { SG_BAR=running; kill "$bp" 2>/dev/null; }
+  [ -n "$pids" ] || SG_BAR=never-started
+  wait 2>/dev/null
+}
+build_sg_fixture sig '' || bad "SG could not build its fixture"
+for _sig in TERM HUP; do
+  _before=$(read_sg_tip)
+  run_sg_signal "$_sig"
+  case "${SG_RC:-none}|$(read_sg_tip)|$(read_sg_token)|$SG_BAR" in
+    "0|"*) bad "SG AC1 $_sig to the hook mid-bar LANDED the push (git exit 0) — the fail-open: $(cat "$tmp/sg.out")" ;;
+    "none|"*) bad "SG AC1 $_sig to the hook: the push never finished, so nothing was graded" ;;
+    *"|$_before|signalled|stopped") ok "SG AC1 $_sig to the hook mid-bar refuses (rc $SG_RC), leaves the remote unmoved, writes 'signalled' and stops the bar" ;;
+    *) bad "SG AC1 $_sig: expected a refusal with the remote at ${_before:0:8}, token signalled and the bar stopped, got rc $SG_RC tip $(read_sg_tip | cut -c1-8) token '$(read_sg_token)' bar $SG_BAR: $(cat "$tmp/sg.out")" ;;
+  esac
+  # AC2: the stub's 30 s sleep began before the signal, so a hook that waited for it took longer.
+  [ "$SG_SECS" -lt 25 ] && ok "SG AC2 $_sig was handled at once, not after the bar (${SG_SECS}s)" \
+    || bad "SG AC2 $_sig was handled only after the bar returned (${SG_SECS}s against a 30 s stub)"
+done
+# AC6: A SIGNAL BEFORE THE BAR. The fixture's gate-env.sh, which the hook SOURCES, signals the shell
+# sourcing it, so the TERM lands in the hook itself before any bar was started.
+# Its own seeding push is refused the same way, so the build's status is not graded here.
+build_sg_fixture early 'kill -TERM $$\n'
+git commit -q --allow-empty -m "sg early"; _before=$(read_sg_tip)
+_o=$( env -u GOV_GATE_CMD -u GOV_GATE_CMD_TEST GATE_SELFTESTS= git push origin main 2>&1 ); _r=$?
+case "$_r|$(read_sg_tip)|$(read_sg_token)" in
+  "0|"*) bad "SG AC6 TERM before the bar LANDED the push: $_o" ;;
+  *"|$_before|signalled") ok "SG AC6 TERM before the bar refuses as 'signalled' (rc $_r)" ;;
+  *) bad "SG AC6 expected a 'signalled' refusal, got rc $_r token '$(read_sg_token)': $_o" ;;
+esac
+# AC7: 254 IS WHAT bash EXITS WITH once its fork retries are spent (measured, bash 5.3), which is how
+# a bar starved of processes in the turnstile queue ends. It must refuse like any other red.
+cd "$tmp/sg-sig/work" || exit 2
+git commit -q --allow-empty -m "sg 254"; _before=$(read_sg_tip)
+_o=$( env -u GOV_GATE_CMD -u GOV_GATE_CMD_TEST GATE_SELFTESTS= SG_MODE=254 git push origin main 2>&1 ); _r=$?
+case "$_r|$(read_sg_tip)|$(read_sg_token)" in
+  "0|"*) bad "SG AC7 a bar exiting 254 LANDED the push: $_o" ;;
+  *"|$_before|gate-red") ok "SG AC7 a bar exiting 254 (spent fork retries) refuses as gate-red" ;;
+  *) bad "SG AC7 expected a gate-red refusal, got rc $_r token '$(read_sg_token)': $_o" ;;
+esac
+cd "$pfx_home" || exit 2
+
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

@@ -190,6 +190,17 @@ identify, report and kill the processes an agent session launched and forgot
 - gotcha-classes 1: `merge-keeps-both-sides-of-one-derivation.md`
 - globs 2: `tools/process-monitor/**`, `.process-monitor.conf`
 
+## push-main
+
+the lander that reconciles, gates and pushes the default branch, and the pre-push hook that refuses any default-branch push it did not gate
+
+- status `shipped` · streams `tooling` · dossier `memory/map/features/push-main.md`
+- decisions 4: `TOOL-aLeasedGauntlet-1`, `TOOL-dLoggedFlight-4`, `TOOL-dDerivedDocket-26`, `TOOL-aSignalledHook-1`
+- gate-legs 2: `pre-push self-test`, `push-main self-test`
+- git-hooks 1: `pre-push`
+- gotcha-classes 1: `signal-killed-hook-reads-as-success.md`
+- globs 4: `tools/push-main.sh`, `tools/push-main.test.sh`, `.githooks/pre-push`, `.githooks/pre-push.test.sh`
+
 ## review-harnesses
 
 Workflow review harnesses — one pipeline, three implementations, one hardened
