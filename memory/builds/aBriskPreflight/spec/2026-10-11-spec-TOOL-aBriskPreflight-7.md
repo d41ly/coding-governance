@@ -1,6 +1,6 @@
 # TOOL-aBriskPreflight-7 — preflight and the wiring check each declare a wall-clock ceiling and name a breach
 
-**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 4 · ratified 2026-10-11
+**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 4 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -321,8 +321,9 @@ their tests as BUILD-METHOD M12 asks.
   `--preflight tRun --keepalive-id k1` over a conf with `GATE_BOUND="600"` and a `--check` stub that
   sleeps 30 s, it prints `the declared wiring check ran past its own 2s wall-clock ceiling and was
   killed after`, the clause `the 600s GATE_BOUND is no longer this check's only kill`, the clause
-  `at the kill against the`, and `--preflight refused; the run-state file is unchanged`. No
-  `RUN.md` exists in the fixture's `tRun` folder, and the `killed after <n>s` figure is under 25.
+  `at the kill against the`, and `--preflight refused; the run-state file is unchanged`. The
+  fixture's `tRun/RUN.md`, which the suite's pristine tree already carries, hashes as it did before
+  the run, and the `killed after <n>s` figure is under 25.
   Red when: the copy is the driver at the pass's parent, where the rewrite is a fixture no-op and
   the stub's 30 s passes check 4 and writes the record; or the refusal names `GATE_BOUND`.
   fixture: `mkconf` at `tools/unattended/unattended.test.sh:210`, the copied-driver idiom at
@@ -473,6 +474,9 @@ New arm: tools/unattended/unattended.test.sh · covers AC7 · a PATH directory w
   takes two untraced preflight rows, not three: a whole preflight on this host outruns the pass's
   600 s command bound, so the A/B's two new-arm rows are the preflight subject's, and the traced
   counts and U windows are named with their sources.
+- rev-3 · 2026-10-11 · AC1 grades the fixture's `tRun/RUN.md` as byte-identical rather than absent:
+  the suite's pristine tree carries one, so "no `RUN.md` exists" was false of the fixture before any
+  run, and the sliced arm read it present on the built driver.
 
 ## 10. Reuse audit
 
