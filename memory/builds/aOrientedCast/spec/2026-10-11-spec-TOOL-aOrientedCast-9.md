@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-9 — the unattended Skill and verbs pass the renderer's `roles` to every harness call
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 6 · ratified 2026-10-11
+**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73581393acbf42f33864a9808c96d00a0c · streams tooling · order 6 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
