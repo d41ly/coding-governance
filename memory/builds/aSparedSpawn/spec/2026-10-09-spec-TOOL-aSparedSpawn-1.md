@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-1 — the reuse key hashes what a dirty guarded file holds, and the toolchain it ran under
 
-**Status:** INPROGRESS · rev-2 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 1
+**Status:** INPROGRESS · rev-3 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -39,8 +39,9 @@ every later reuse unit builds on, so it lands first.
   appended to every key, guarded and unguarded. Observed by AC4.
   - bash: `BASH_VERSION` and `MACHTYPE`, builtins.
   - the MSYS or Cygwin runtime: the first line of `/proc/version`, read with `read`, where it exists.
-  - python: `PYBIN`'s path plus `sys.version` and `sys.flags.utf8_mode`, printed as one more line by
-    the legs-parse python the run already starts, so no new python.
+  - python: `PYBIN`'s path plus `sys.version` and `sys.flags.utf8_mode`, printed by the legs-parse
+    python the run already starts as a second field of its first line, behind one RS after the
+    dispatch order, so no new python and no new row for the leg reader to skip.
   - git: `git version` and `git config --get-regexp '^core\.(autocrlf|eol)$'`, two spawns per bar.
   - every other tool a leg names (`node` among them): its resolved location through `type -P`.
   - the environment the legs inherit, read after the runner's own unsets: the name and value of each
@@ -152,6 +153,8 @@ block already promises. No reader parses the key, so its new shape breaks nothin
   Red when: the digest omits the environment, or hashes `GATE_REUSE` and the precondition arm reds.
 - **AC5** — When a fixture copy of the runner has its `REUSE_SCHEMA` value changed between the earning
   and the reusing run, `GATE reuse` appears on no line. Red when: the constant is not in the key.
+  Its reuse control runs after that miss, never before it: a run that reuses every leg leaves the
+  ledger empty, so a control placed first leaves the schema run nothing to match.
 - **AC6** — When the reusing run follows an earning run on a dirty tree whose guarded file was only
   re-saved with identical bytes (`touch ga/f`), both legs print `GATE reuse`. Red when: the key reads
   mtime or status churn, so a content key never fires on a dirty tree.
@@ -182,6 +185,7 @@ none
 
 - rev-1 · 2026-10-09 · initial draft.
 - rev-2 · 2026-10-11 · S2, S4, the walk: the guard match is git's literal pathspec, so a directory guard without its slash still sees its dirt; `GATE_TURNSTILE_HELD` is excluded from the digest, since the runner exports a per-run nonce in it; a failed walk is not a clean tree.
+- rev-3 · 2026-10-11 · S4, AC5: the python line rides the legs-parse first line as a field rather than as a row; AC5's control follows the schema miss, because the runner's ledger carry-forward (`awk 'NR==FNR'` over an empty first file) empties the ledger after a run that reused every leg, a defect outside this unit that let a control-first arm pass with the constant out of the key.
 
 ## 10. Reuse audit
 
