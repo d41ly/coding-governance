@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md) | journal | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 |
 | [2026-10-11-prompt-TOOL-aPairedSlots-1.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1.md) | research | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 |
 
 <!-- /gen:spec-records -->
@@ -129,7 +130,7 @@ resolves.
   that runner prints `gate queue: nested under`.
   Red when: the nested test reads slots only.
 - **AC4** — When a doc-only bar holds its key and a non-doc bar starts with the slot free, the
-  non-doc bar prints `gate queue: waited 0s` and no `at dispatch` line; and a `GATE_FULL=1` bar
+  non-doc bar prints `gate queue: waited 0s` and no `at dispatch` line; and a full bar
   with `GATE_DOCS_BASE` set queues as a non-doc bar.
   Red when: the docs key is counted as a held slot, or a full bar takes it.
 - **AC5** — When a docs beacon names a dead pid, the next doc-only bar prints

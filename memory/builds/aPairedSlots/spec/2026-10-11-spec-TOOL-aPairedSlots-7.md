@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-11-build-TOOL-aPairedSlots-5-shared-path-audit.md](../build/2026-10-11-build-TOOL-aPairedSlots-5-shared-path-audit.md) | journal | TOOL-aPairedSlots-5 TOOL-aPairedSlots-8 |
 | [2026-10-11-build-TOOL-aPairedSlots-5-two-bar-check.sh](../build/2026-10-11-build-TOOL-aPairedSlots-5-two-bar-check.sh) | journal | TOOL-aPairedSlots-5 |
+| [2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md) | journal | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 |
 
 <!-- /gen:spec-records -->
 
@@ -109,7 +110,7 @@ No function is minted. New paths: `health.log.trim` (the lock file) and
 - **AC3** — When two fixture runners stamp `gate-full-green.shared` at once, the file equals one of
   the two stamps byte for byte and no `gate-full-green.shared.tmp` file remains.
   Red when: the staging name is fixed and the file is torn or empty.
-- **AC4** — When the new arm in `tools/drift-audit/selftest.py` starts two writers on an absent history, the
+- **AC4** — When the drift-audit self-test's new arm starts two `write_drift_history` writers on an absent history, the
   file carries exactly one header line.
   Red when: the header is written on a size check, and two headers land.
 

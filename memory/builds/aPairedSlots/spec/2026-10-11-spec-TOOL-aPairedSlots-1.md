@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-11-build-TOOL-aPairedSlots-1-ab-instrument.sh](../build/2026-10-11-build-TOOL-aPairedSlots-1-ab-instrument.sh) | journal | — |
+| [2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md) | journal | TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 |
 | [2026-10-11-prompt-TOOL-aPairedSlots-1.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1.md) | research | TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 |
 
 <!-- /gen:spec-records -->
@@ -109,7 +110,7 @@ A row without the key reads 1, so every adopter table keeps today's behaviour af
 The fixtures are scratch repos under the session scratch, built the way the canary builds one,
 with a `gate-profiles.txt` row the arm writes.
 
-- **AC1** — When a fixture row declares `slots=3`, `run-gates.sh --print-profile` prints a
+- **AC1** — When a fixture row declares `slots=3`, the runner's profile verb prints a
   `slots` line reading 3, and with the key omitted one reading 1.
   Red when: the key is absent from `KNOWN_KNOBS`, and the row refuses as an unknown knob.
 - **AC2** — When `GATE_TURNSTILE_SLOTS=2` is set over a row declaring none, `--print-profile`
@@ -118,7 +119,7 @@ with a `gate-profiles.txt` row the arm writes.
 - **AC3** — When a fixture bar runs at the effective value 1, its `gate profile:` line is
   byte-identical to the base runner's on the same fixture, and at 2 it carries `, slots 2`.
   Red when: the field is printed unconditionally, and the value-1 line differs from base.
-- **AC5** — When `check_knob_classes` in `.githooks/pre-push.test.sh` is sliced and run over the
+- **AC5** — When `check_knob_classes`, sliced out of the pre-push hook's self-test, runs over the
   changed runner, it prints nothing, and before the classification it names
   `GATE_TURNSTILE_SLOTS`.
   Red when: the knob is left unclassified.

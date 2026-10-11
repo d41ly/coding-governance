@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-11-build-TOOL-aPairedSlots-5-shared-path-audit.md](../build/2026-10-11-build-TOOL-aPairedSlots-5-shared-path-audit.md) | journal | TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 |
 | [2026-10-11-build-TOOL-aPairedSlots-5-two-bar-check.sh](../build/2026-10-11-build-TOOL-aPairedSlots-5-two-bar-check.sh) | journal | TOOL-aPairedSlots-7 |
+| [2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md) | journal | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 |
 | [2026-10-11-prompt-TOOL-aPairedSlots-1.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1.md) | research | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-6 |
 
 <!-- /gen:spec-records -->
@@ -76,7 +77,8 @@ rows beside it.
 
 - `tools/run-gates/run-gates.sh`
 - `tools/run-gates/run-gates.turnstile.test.sh`
-- `memory/builds/aPairedSlots/build/`
+
+The audit record and the two-bar instrument are records under this build's own folder.
 
 ### Alternatives rejected
 

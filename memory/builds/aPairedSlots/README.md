@@ -81,9 +81,9 @@ ids TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlot
 | [TOOL-aPairedSlots-9 — node a's slot count and the shared-width rule, set by the two-bar A/B](spec/2026-10-11-spec-TOOL-aPairedSlots-9.md) | 7 | 2 | OPEN | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aPairedSlots-9.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9.
 <!-- /gen:build-index -->

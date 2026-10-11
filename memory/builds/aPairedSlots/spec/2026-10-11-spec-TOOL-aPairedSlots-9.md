@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md) | journal | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 |
 
 <!-- /gen:spec-records -->
 
@@ -86,8 +88,8 @@ No function or variable is minted. Records: the results record and the rows besi
 
 - `tools/run-gates/gate-profiles.txt`
 - `tools/run-gates/run-gates.sh`
-- `memory/builds/aPairedSlots/build/`
-- `memory/builds/aPairedSlots/README.md`
+
+The results record, its rows and the README's Parked slot are records under this build's own folder.
 
 ### Alternatives rejected
 
