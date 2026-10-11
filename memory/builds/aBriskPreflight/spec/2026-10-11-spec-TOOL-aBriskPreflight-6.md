@@ -1,6 +1,6 @@
 # TOOL-aBriskPreflight-6 — the pre-push hook sets up its straggler audit only when a pushed ref can carry a delta
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 1 · ratified 2026-10-11
+**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 1 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -151,9 +151,10 @@ observation (`symbolic-ref` and `rev-parse`), the `gate-env.sh` vetting (`rev-pa
 
 ### Inventory
 
-No new function, conf key, flag or run-log field. Two hook-local variables: `_sg_cands`, the
-candidate list S1 builds, and `_sg_need`, set when S2's batch finds a candidate of any other shape.
-The lexicon's `sh.function` cell grades nothing new.
+No new function, conf key, flag or run-log field. Hook-local variables, each `_sg_`-prefixed like
+the layer's own: `_sg_cands`, the candidate array S1 builds, `_sg_need`, set unless S2's batch finds
+every candidate an empty root, and the batch's query, answer, rows and index. The lexicon's
+`sh.function` cell grades nothing new.
 
 ### Files touched (estimate)
 
@@ -202,15 +203,20 @@ finds it.
 
 ## 6. Acceptance criteria
 
+"The hook before this unit" below is `.githooks/pre-push` and `.githooks/straggler-guard.sh` at the
+run branch's tip before this unit's code commit, `138b0c457`. That tip carries the run branch's merge
+of `origin/main` at `976a85a25`, which changed the hook after BASE, so BASE's own hook would compare
+two changes at once. The baseline record's figure at BASE is printed beside it.
+
 - **AC1** — When `2026-10-11-build-TOOL-aBriskPreflight-6-claim-push.sh` builds a throwaway clone under
   `%TEMP%/bp6`, it sets `core.hooksPath` to the clone's own hooks, records `origin/HEAD`, and builds a
   claim commit the way `write_claim` does (`git mktree` over empty input, then `git commit-tree`). It
   then feeds `.githooks/pre-push origin <url>` one line naming `refs/gov/runs/x` under
-  `2026-10-11-build-TOOL-aBriskPreflight-1-run-traced.sh`, with BASE's hook and with the built one,
-  A/B interleaved twice, with a host-state line beside each run. For the built hook, forks plus execs
-  multiplied by the per-spawn cost from its host-state line (`spawn5` divided by 5) is at most 30 s,
-  half of `REMOTE_BOUND`. An untraced run of the same push finishes within 30 s. BASE's figures are
-  printed beside them.
+  `2026-10-11-build-TOOL-aBriskPreflight-1-run-traced.sh`, with the hook before this unit and with
+  the built one, A/B interleaved twice, with a host-state line beside each run. For the built hook,
+  forks plus execs multiplied by the per-spawn cost from its host-state line (`spawn5` divided by 5)
+  is at most 30 s, half of `REMOTE_BOUND`. An untraced run of the same push finishes within 30 s. The
+  figures of the hook before this unit are printed beside them.
   Red when: either figure for the built hook is over 30 s.
   figure: DERIVED from each run's host-state line. At writing BASE took 45 forks and 31 execs at
   about 0.75 s each.
@@ -237,20 +243,21 @@ finds it.
   ANY candidate is an empty root, rather than every one, as a staged break, the mixed arm fails.
   Restored, both pass.
   Red when: either staged break leaves its arm passing.
-  fixture: both arms run against BASE's hook first and are refused there too, which is what makes
-  them arms that preserve today's audit rather than new requirements.
+  fixture: both arms run against the hook before this unit first and are refused there too, which
+  is what makes them arms that preserve today's audit rather than new requirements.
 - **AC6** — When `memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-1-trace-spawns.py`
   reads AC1's traced runs, the built hook's `execs by program` table has no `python`, `python3` or
-  `py` row and its `wall by function` table has no `init_straggler_guard` row. BASE's run has both.
+  `py` row and its `wall by function` table has no `init_straggler_guard` row. The run of the hook
+  before this unit has both.
   Red when: either appears for the built hook, so some setup still runs on a claim push.
 - **AC7** — When the branch-bar block of the pre-push suite runs as a sliced arm, the untracked
   branch bar's refusal prints a `Sanctioned use: GOV_BRANCH_GATE_CMD=` line that is byte-identical
-  between BASE's hook and the built one. With S3's condition reduced to the default-branch test, as a
-  staged break, the line changes. Restored, it matches.
+  between the hook before this unit and the built one. With S3's condition reduced to the
+  default-branch test, as a staged break, the line changes. Restored, it matches.
   Red when: the staged break leaves the line unchanged, so the arm never reached the runner.
-  fixture: the line names a runner only when the fixture resolves a kit root. Whether BASE's line
-  names one there is read first. If it prints the placeholder, the slice places the runner where the
-  ladder finds it, and the pre-push suite takes that fixture change.
+  fixture: the line names a runner only when the fixture resolves a kit root. Whether the line of the
+  hook before this unit names one there is read first. If it prints the placeholder, the slice places
+  the runner where the ladder finds it, and the pre-push suite takes that fixture change.
 - **AC8** — When the hook-wired claim block of the unattended suite, the arm `TOOL-aGraftedHelix-10`
   S4 added, runs as a sliced arm with the built hook copied in, its create, CAS update, unset-HEAD
   refusal and stale-refusal-file assertions pass.
@@ -281,6 +288,9 @@ New arm: .githooks/straggler-guard.test.sh · covers AC5 · a tag at, and a clai
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · AC1, AC5, AC6 and AC7 compare against the hook before this unit at `138b0c457`
+  instead of BASE's, because the run branch's merge of `origin/main` at `976a85a25` changed the hook
+  after BASE; the Inventory names every hook-local variable the batch needs, where it named two.
 
 ## 10. Reuse audit
 

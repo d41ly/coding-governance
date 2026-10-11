@@ -41,3 +41,7 @@ base: 271a90045723817f694de4d22c56f88dbcd0063e
 2026-10-11T06:39:36Z dispatch · item d6859204 TOOL-aBriskPreflight-5 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-5-walk-probe.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-5-walk-ab.md memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-5.md memory/builds/aBriskPreflight/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
 
 2026-10-11T06:39:51Z brief · item TOOL-aBriskPreflight-5 · reason 61f6904962f7 memory/builds/aBriskPreflight/prompts/2026-10-11-prompt-TOOL-aBriskPreflight-5-build-brief.md
+
+2026-10-11T07:28:52Z dispatch · item 138b0c45 TOOL-aBriskPreflight-6 · reason .githooks/pre-push .githooks/straggler-guard.test.sh .githooks/pre-push.test.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-6-claim-push.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-6-claim-push-ab.md memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-6.md memory/builds/aBriskPreflight/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
+
+2026-10-11T07:29:00Z brief · item TOOL-aBriskPreflight-6 · reason 29e8bec69500 memory/builds/aBriskPreflight/prompts/2026-10-11-prompt-TOOL-aBriskPreflight-6-build-brief.md
