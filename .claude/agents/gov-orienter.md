@@ -4,6 +4,7 @@ description: Orients one session for one task through the kickoff engine's Steps
 tools: Read, Grep, Glob, Bash
 model: inherit
 maxTurns: 60
+effort: xhigh
 omitClaudeMd: true
 workflow: orient
 writes: none

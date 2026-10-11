@@ -3,6 +3,7 @@ name: gov-spec-reviewer
 description: Hunts defects in a spec set before any code exists, establishing each claim with a read-only probe.
 tools: Read, Grep, Glob, Bash
 model: inherit
+effort: medium
 omitClaudeMd: true
 workflow: spec-review
 writes: none

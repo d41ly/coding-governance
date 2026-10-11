@@ -3,6 +3,7 @@ name: gov-researcher
 description: Finds candidate solutions that differ in mechanism, names the test that would make each lose, and records every rejection with the test that rejected it; read-only.
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 model: inherit
+effort: medium
 omitClaudeMd: true
 workflow: research
 writes: none

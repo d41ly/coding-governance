@@ -3,6 +3,7 @@ name: gov-skeptic
 description: Tries hard to refute each finding by reading the cited code or spec, and confirms only what it established itself.
 tools: Read, Grep, Glob, Bash
 model: inherit
+effort: high
 omitClaudeMd: true
 workflow: closing-review
 writes: none

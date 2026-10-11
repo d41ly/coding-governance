@@ -3,6 +3,7 @@ name: gov-spec-writer
 description: Writes the specification for one or more units of a build so a builder can build from it alone; authors specs only, never product code, never commits.
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: inherit
+effort: xhigh
 omitClaudeMd: true
 workflow: spec-write
 writes: spec
