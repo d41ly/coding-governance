@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-11T09:43:23+03:00 @ 057ab68c73337d42a6a003397e0678b22b1821fb
+last-audit: 2026-10-11T09:43:58+03:00 @ 78110101c6c3e494cd10648a8bfb4cedea9470e3
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 02755258f138ecd3b4a3e9e74788506160525caa
+last-body-change: 78110101c6c3e494cd10648a8bfb4cedea9470e3
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -64,6 +64,7 @@ lives where each bullet points.
 - A live spec's leg line names every leg its files-touched trips: `python tools/check-spec-tokens.py --list` prints them before the spec is dated.
 - A spec audit is owed only where the owner declares `spec-audit:` or `SPEC_AUDIT_DEFAULT`; a run never declares either, and kickoff asks.
 - Before working inside a kit, `git log origin/main --oneline -20 -- tools/<kit>/` shows whether another node is rewriting it.
+- A landing that edits a grader owns every red that grader prints at the tip (KF3): reproduce at R in a detached worktree, then fix or ABSORB it (`memory/guides/UNATTENDED-STOPS.md` §13; `dHomedResolver`).
 - `tools/unattended/check-unattended.sh` carries raw CR bytes in its awk regexes: edit it in binary mode (`memory/gotchas/text-mode-read-eats-a-bare-cr.md`).
 - The read-path byte budget is retired (`TOOL-dSpentCeiling-1`): check 6's per-class caps are the bound, and a sum is not re-added.
 - A live `RUN.md` is outside check 6 by class (`TOOL-cMendedVintage-13`); a retired one is capped.
