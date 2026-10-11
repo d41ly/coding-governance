@@ -1,6 +1,6 @@
 # TOOL-aPrimedIndex-9 — the lexicon render proves freshness alone
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-1 · base 29653d90 · streams tooling · order 5
+**Status:** CLOSED · rev-1 · 2026-10-11 · node a · Tier-1 · base 29653d90 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 

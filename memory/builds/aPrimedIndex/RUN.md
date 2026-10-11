@@ -91,3 +91,5 @@ base: 15bbfa4f867262f3c862e2473688fc69d0566b7d
 2026-10-11T12:05:02Z brief · item TOOL-aPrimedIndex-9 · reason a9b5fa344a63 memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-9-1-build-brief.md
 
 2026-10-11T12:10:45Z dispatch · item 29653d90 TOOL-aPrimedIndex-9 · reason tools/lexicon/adopt-lexicon.sh tools/lexicon/kit.toml tools/lexicon/selftest.py tools/lexicon/README.md memory/map/generated/symbols.json memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-9.md
+
+2026-10-11T13:13:22Z dispatch · item 8ff39559 TOOL-aPrimedIndex-9 · reason tools/lexicon/adopt-lexicon.sh tools/lexicon/kit.toml tools/lexicon/selftest.py tools/lexicon/README.md memory/map/generated/symbols.json memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-9.md memory/map/features/lexicon.md memory/project/unarmed-branches.txt

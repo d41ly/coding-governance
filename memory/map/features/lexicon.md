@@ -61,7 +61,7 @@ globs = [
 
 ## Constraints & why
 
-- Its `[[regenerate]]` render row is staged, stage 1: run-gates' `regen.py` re-renders it on `--regen`, and every bar proves it fresh with this kit's `[check]` first (TOOL-aPrimedIndex-1).
+- Its `[[regenerate]]` render row is staged, stage 1: run-gates' `regen.py` re-renders it on `--regen`, and every bar proves it fresh first with `adopt-lexicon.sh --check-render`, the Skill byte-compare alone, never `[check]`, whose naming grade no re-render cures (TOOL-aPrimedIndex-1, TOOL-aPrimedIndex-9).
 **The verb table is a SCOPING instrument, not a spelling one.** "Which verb is this?" is answerable
 only when a function does one thing, so a name that will not fit is reporting an unclear
 responsibility or a seam in the wrong place. That is the whole value. The kit is OPT-IN — the engine

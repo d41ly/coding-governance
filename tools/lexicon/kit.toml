@@ -97,9 +97,11 @@ mutates_index = false
 # every adopter — measured at two, where it rolled the whole kit back (TOOL-dRetiredFork-29).
 [[regenerate]]
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--render"]
-# Staged for the bar (TOOL-aPrimedIndex-1): run-gates' regen.py re-renders this before a bar
-# and proves it fresh with this kit's [check] argv; stage 1 is a render from a kit template.
+# Staged for the bar (TOOL-aPrimedIndex-1): run-gates' regen.py re-renders this before a bar;
+# stage 1 is a render from a kit template. Its own check, not [check], which also grades naming
+# that no re-render cures (TOOL-aPrimedIndex-9).
 stage = 1
+check = ["bash", "{kit}/adopt-lexicon.sh", "--check-render"]
 
 [check]
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
