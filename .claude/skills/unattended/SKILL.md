@@ -97,17 +97,17 @@ The prompt path: write from `memory/guides/PLAYBOOK-TEMPLATE.md`, validate with
 
 ## Produce pieces ATTENDED
 
-Not a run: the same two record verbs, with `-` for the slug and `--records-root <root>`.
+Not a run: the record verbs, slug `-`, `--records-root <root>`.
 
 ## While it runs
 
 - **A process not in the ledger is never killed**, whatever its command line says: it is reported
   and left to a person, never killed by name, age or spin rate (`UNATTENDED-STOPS.md` §14).
-- No merge bar and no self-test suite inside a pass.
+- No merge bar or self-test suite in a pass.
 
 ```bash
 unattended.sh --phase <slug> BUILDING --witness $(git rev-parse HEAD)
-unattended.sh --park <slug> --item "<the question>" --reason "<options, and why refused>"
+unattended.sh --park <slug> --item "<the question>" --reason "<options; why refused>"
 unattended.sh --propose <slug> --item "<amendment>" --step "<step>" --reason "<why>"
 unattended.sh --brief <slug> --unit <unit-id> --path <the brief file>
 unattended.sh --rescope <slug> --act retire|supersede|add|defer --item <unit-id> --reason "<why>"
@@ -115,6 +115,7 @@ unattended.sh --dispatch <slug> --pass <unit-id> --writes <path> --writes <path>
 unattended.sh --plan <slug> --paths
 unattended.sh --status <slug>
 unattended.sh --claims  # RUN_CLAIMS on
+unattended.sh --overlaps  # local
 unattended.sh --beat <slug>
 unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>
 python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD
