@@ -1286,14 +1286,15 @@ if [ "$MODE" = sweep ]; then
   # it runs its suite -- a total false RED blaming each suite for the runner's own arithmetic. This
   # script already advertises the platform it cannot run on, by probing for `gtimeout`. Probed once,
   # outside the loop, and the fallback is whole seconds with the resolution SAID rather than
-  # silently lost: the peak figure is then blind to a handoff inside one second.
+  # silently lost: the peak figure is then blind to a handoff inside one second. The clock is now
+  # bash's own EPOCHREALTIME, so neither the probe nor a stamp forks `date` (TOOL-aSparedSpawn-8).
   _rs_ns=0
-  case "$(date +%N 2>/dev/null)" in ''|*[!0-9]*) : ;; *) _rs_ns=1 ;; esac
+  case "${EPOCHREALTIME:-}" in ''|*[!0-9.,]*) : ;; *) _rs_ns=1 ;; esac
   if [ "$_rs_ns" = 1 ]; then
-    read_now_ms() { echo $(( $(date +%s%N) / 1000000 )); }
+    read_now_ms() { echo $(( ${EPOCHREALTIME/[.,]/} / 1000 )); }
   else
-    read_now_ms() { echo $(( $(date +%s) * 1000 )); }
-    echo "run-selftests: this date has no sub-second %N, so stamps are whole seconds and the peak"
+    read_now_ms() { echo $(( EPOCHSECONDS * 1000 )); }
+    echo "run-selftests: this bash has no sub-second EPOCHREALTIME, so stamps are whole seconds and the peak"
     echo "run-selftests: figure below cannot separate a pool handoff from a real overlap."
   fi
 
@@ -1885,9 +1886,9 @@ if [ -n "$ATTRIBUTE" ]; then
       continue
     fi
 
-    s=$(date +%s)
+    s=$EPOCHSECONDS
     eval "$argv" > "$ATTR_TMP/l.out" 2>&1; lrc=$?
-    e=$(date +%s); ltook=$(( e - s ))
+    e=$EPOCHSECONDS; ltook=$(( e - s ))
     attr_fails "$ATTR_TMP/l.out" > "$ATTR_TMP/l.set"
     lcount=$(attr_count "$ATTR_TMP/l.set")
     ldead=0
@@ -1936,9 +1937,9 @@ if [ -n "$ATTRIBUTE" ]; then
         rrc=0
         src=fresh
         attr_worktree || exit 2
-        rs=$(date +%s)
+        rs=$EPOCHSECONDS
         ( cd "$ATTR_WT" && eval "$rargv" ) > "$ATTR_TMP/r.out" 2>&1; rrc=$?
-        rtook=$(( $(date +%s) - rs ))
+        rtook=$(( $EPOCHSECONDS - rs ))
         attr_fails "$ATTR_TMP/r.out" > "$ATTR_TMP/r.set"
         # WRITTEN BY RENAME, AND ONLY HERE — after the R run RETURNED. A run killed mid-suite never
         # reaches this line, so a partial set can never be served as the baseline from then on.
@@ -2017,9 +2018,9 @@ while IFS=$'\t' read -r state name budget argv; do
     continue
   fi
   ran=$((ran + 1))
-  s=$(date +%s)
+  s=$EPOCHSECONDS
   out=$(eval "$argv" 2>&1); rc=$?
-  e=$(date +%s); took=$(( e - s ))
+  e=$EPOCHSECONDS; took=$(( e - s ))
   if [ "$rc" -eq 0 ]; then
     printf 'ok    %-46s %5ss\n' "$name" "$took"
   else

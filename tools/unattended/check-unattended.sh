@@ -450,9 +450,9 @@ DERIVED_LANDING_COMMIT=""
 check_derived_landed() { # run-state file -> 0 derived LANDED (sets DERIVED_LANDING_COMMIT) · 1 not · 2 UNAVAILABLE
   DERIVED_LANDING_COMMIT=""
   local _dl_c _dl_hl=""
-  case "$(phase_of "$1")" in
+  phase_of "$1" >/dev/null; case "$_fact_of" in
     LANDING) ;;
-    HELD) case " $HOLD_CODES_HANDOFF " in *" $(fact_of "$1" hold-code) "*) _dl_hl="$HOLD_CODES_HANDOFF" ;; *) return 1 ;; esac ;;
+    HELD) fact_of "$1" hold-code >/dev/null; case " $HOLD_CODES_HANDOFF " in *" $_fact_of "*) _dl_hl="$HOLD_CODES_HANDOFF" ;; *) return 1 ;; esac ;;
     *) return 1 ;;
   esac
   _dl_c=$(read_landing_commit "$1" "$_dl_hl" 2>/dev/null) || return 1
@@ -471,27 +471,46 @@ done
 # cost two processes each. Semantics preserved exactly — the line must be `KEY="…"` with only
 # whitespace after the closing quote, the first such line wins, and anything else (no quotes, a
 # truncated line) yields the empty string, which is the state check 1 refuses by name.
-core_of() { # KEY  ->  the quoted value from $DRIVER
-  local l p="$1=\"" v
-  while IFS= read -r l || [ -n "$l" ]; do
-    l=${l%$'\r'}
-    while :; do case "$l" in *' '|*$'\t') l=${l%?} ;; *) break ;; esac; done
-    case "$l" in
-      "$p"*'"') v=${l#"$p"}; printf '%s\n' "${v%\"}"; return 0 ;;
-    esac
-  done < "$DRIVER"
+# ONE PASS, NOT ONE PER KEY (TOOL-aSparedSpawn-8 S2). A per-call `read` loop over the 13k-line driver
+# cost about a third of a second a key, and twenty-odd keys are read per leg run. One `awk` reads
+# every constant into two arrays instead: `_CORE` holds each `KEY="value"` line and `_BARE` each
+# `KEY=<digits>` line, after the same CR and trailing-whitespace strip, the FIRST match winning in
+# both, so `core_of` and `read_bare_const` below are lookups. An absent key reads empty, as before.
+# Each reader prints its answer and leaves it in a fixed global, `_core_of` or `_bare_const`, the
+# convention `normpath` set in the kit library, so a caller reads it without forking a subshell.
+declare -gA _CORE=() _BARE=()
+mapfile -t _consts < <(awk '
+  { sub(/\r$/, ""); sub(/[ \t]+$/, "") }
+  /^[A-Za-z_][A-Za-z0-9_]*="/ {
+    k = $0; sub(/=.*/, "", k); v = substr($0, length(k) + 3)
+    if (v != "" && substr(v, length(v)) == "\"") print "Q" k "=" substr(v, 1, length(v) - 1)
+    next
+  }
+  /^[A-Za-z_][A-Za-z0-9_]*=[0-9]+$/ { k = $0; sub(/=.*/, "", k); print "B" k "=" substr($0, length(k) + 2) }
+' "$DRIVER")
+for _cr in "${_consts[@]}"; do
+  _ck=${_cr#?}; _ck=${_ck%%=*}; _cv=${_cr#*=}
+  case "$_cr" in
+    Q*) [ -n "${_CORE[$_ck]+x}" ] || _CORE[$_ck]=$_cv ;;
+    B*) [ -n "${_BARE[$_ck]+x}" ] || _BARE[$_ck]=$_cv ;;
+  esac
+done
+unset _consts _cr _ck _cv
+core_of() { # KEY  ->  the quoted value from $DRIVER, printed and left in `_core_of`
+  _core_of=${_CORE[$1]-}
+  [ -z "${_CORE[$1]+x}" ] || printf '%s\n' "$_core_of"
   return 0
 }
-PHASES_CORE=$(core_of PHASES_CORE)
-DOD_CORE=$(core_of DOD_CORE)
-DIRECTIVES_CORE=$(core_of DIRECTIVES_CORE)
-PHASES_TERMINAL=$(core_of PHASES_TERMINAL)
+core_of PHASES_CORE >/dev/null; PHASES_CORE=$_core_of
+core_of DOD_CORE >/dev/null; DOD_CORE=$_core_of
+core_of DIRECTIVES_CORE >/dev/null; DIRECTIVES_CORE=$_core_of
+core_of PHASES_TERMINAL >/dev/null; PHASES_TERMINAL=$_core_of
 # TOOL-aPromptedMandate-2 - the pass-kind subset, read the SAME way as every other core set, so
 # the leg never carries a second spelling of a driver declaration.
-PHASES_PASSKIND=$(core_of PHASES_PASSKIND)
+core_of PHASES_PASSKIND >/dev/null; PHASES_PASSKIND=$_core_of
 # the mode set, read through the SAME parse. A second spelling here is
 # what this unit exists to remove.
-AUTH_MODES=$(core_of AUTH_MODES)
+core_of AUTH_MODES >/dev/null; AUTH_MODES=$_core_of
 AUTH_SCOPES="all $AUTH_MODES"
 if [ -z "$AUTH_MODES" ]; then
   fail 1 "cannot read AUTH_MODES from the driver, so the mode-membership branch and the directive scope join would both pass over an empty set - an empty vocabulary makes every check keyed on it vacuously true: $DRIVER"
@@ -506,7 +525,7 @@ fi
 # fire on EVERY mode, so a failed read would red a fleet of legitimate prompt runs rather than
 # silently pass them. Both failure modes are wrong and this one is louder, which is why it refuses
 # rather than defaulting to the driver's pair.
-SECOND_ANCHOR_MODES=$(core_of SECOND_ANCHOR_MODES)
+core_of SECOND_ANCHOR_MODES >/dev/null; SECOND_ANCHOR_MODES=$_core_of
 if [ -z "$SECOND_ANCHOR_MODES" ]; then
   fail 1 "cannot read SECOND_ANCHOR_MODES from the driver, so check 29 would treat every declared mode as inadmissible on the second anchor and red every branch-anchored run in the tree: $DRIVER"
 fi
@@ -514,42 +533,42 @@ fi
 # The parked-kind taxonomy. Read here for the same reason the four above are: a set declared in the
 # driver and graded nowhere is decoration, and this one has a counter and a Definition-of-Done
 # predicate hanging off it.
-PARK_KINDS_OWED=$(core_of PARK_KINDS_OWED)
+core_of PARK_KINDS_OWED >/dev/null; PARK_KINDS_OWED=$_core_of
 # The ACT axis of the same taxonomy, read for the reason the kind axis is: it has a `--status`
 # counter and a Definition-of-Done predicate hanging off it, and a set declared in the driver and
 # graded nowhere is decoration. A SEPARATE read rather than a widened one, because these are acts and
 # that is kinds.
-PARK_ACTS_OWED=$(core_of PARK_ACTS_OWED)
+core_of PARK_ACTS_OWED >/dev/null; PARK_ACTS_OWED=$_core_of
 # The non-overridable Definition-of-Done set, read for arm 16d below.
-DOD_NO_OVERRIDE=$(core_of DOD_NO_OVERRIDE)
+core_of DOD_NO_OVERRIDE >/dev/null; DOD_NO_OVERRIDE=$_core_of
 # The review loop's runaway backstop, read the same way. The leg holds NO copy of the number: a
 # second spelling of a bound is a bound that goes wrong silently when one copy moves.
-RUNAWAY_CEILING=$(core_of RUNAWAY_CEILING)
+core_of RUNAWAY_CEILING >/dev/null; RUNAWAY_CEILING=$_core_of
 # READ FROM THE DRIVER, never restated — this file's own rule, and fifteen other closed sets
 # already obey it. A restatement drifts silently: widen the driver's set and this leg tells a
 # record it was hand-edited when the driver itself wrote the value.
-REVIEW_DISPOSITIONS=$(core_of REVIEW_DISPOSITIONS)
+core_of REVIEW_DISPOSITIONS >/dev/null; REVIEW_DISPOSITIONS=$_core_of
 # THE FOLD RULE'S OWN CUTOFF, read the same way (closing review of aProbedUnit, round 2, cluster A).
 # DISPOSITION_CUTOFF dates the FIELD; this dates the later rule about the field's VALUE, and a ratchet
 # that grades history needs one per rule it grades — the fold-beside-blockers clause under the
 # field's cutoff alone redded sixteen tracked records the driver itself wrote under the contract that
 # accepted them. Unreadable is named inside check 2 rather than at a `fail` site of its own, because
 # the three pinned check-2 ordinals in memory/project/unarmed-branches.txt sit below this line.
-FOLD_CUTOFF=$(core_of FOLD_CUTOFF)
+core_of FOLD_CUTOFF >/dev/null; FOLD_CUTOFF=$_core_of
 # TOOL-aEvidencedLens-9 S7 - the day a spec subject's terminal row began to carry `highs` and
 # `minors` and stopped folding (TOOL-aEvidencedLens-7 declares it). Read and named exactly as
 # FOLD_CUTOFF is, for the same reason: a ratchet grading history needs one cutoff per rule it grades.
-SPEC_COUNTS_CUTOFF=$(core_of SPEC_COUNTS_CUTOFF)
+core_of SPEC_COUNTS_CUTOFF >/dev/null; SPEC_COUNTS_CUTOFF=$_core_of
 # The halt vocabulary, read the same way. The leg holds NO member token of its own: a prefix
 # alternation could not tell a member from an unrelated identifier, and a sibling unit lands a
 # constant whose name such an alternation would have matched.
-HALT_CODES_CORE=$(core_of HALT_CODES_CORE)
+core_of HALT_CODES_CORE >/dev/null; HALT_CODES_CORE=$_core_of
 # The HOLD vocabulary, read for the reason the halt one is: a set the driver validates against and
 # nothing grades is a vocabulary with a floor nobody enforces.
-HOLD_CODES_CORE=$(core_of HOLD_CODES_CORE)
+core_of HOLD_CODES_CORE >/dev/null; HOLD_CODES_CORE=$_core_of
 # TOOL-dUnstuckLanding-14 S1 - the two hand-off codes, read from the driver for the same reason, so
 # the leg's derived-LANDED predicate admits exactly the HELD records the driver's does.
-HOLD_CODES_HANDOFF=$(core_of HOLD_CODES_HANDOFF)
+core_of HOLD_CODES_HANDOFF >/dev/null; HOLD_CODES_HANDOFF=$_core_of
 HALT_CODES="$HALT_CODES_CORE $HALT_CODES_EXTRA"
 
 # ---- TOOL-dDerivedDocket-18 — the driver's UNQUOTED numeric constants. `core_of` above matches
@@ -561,16 +580,9 @@ HALT_CODES="$HALT_CODES_CORE $HALT_CODES_EXTRA"
 # ---- exactly as `core_of` does on an unreadable line, and the caller names its own skip. Widening
 # ---- this to "anything after the `=`" would import an unquoted expression, a trailing comment and
 # ---- a `$(…)` as though they were constants.
-read_bare_const() { # KEY  ->  the unquoted integer from $DRIVER, or nothing
-  local l p="$1=" v
-  while IFS= read -r l || [ -n "$l" ]; do
-    l=${l%$'\r'}
-    while :; do case "$l" in *' '|*$'\t') l=${l%?} ;; *) break ;; esac; done
-    case "$l" in
-      "$p"*) v=${l#"$p"}
-             case "$v" in ""|*[!0-9]*) ;; *) printf '%s\n' "$v"; return 0 ;; esac ;;
-    esac
-  done < "$DRIVER"
+read_bare_const() { # KEY  ->  the unquoted integer from $DRIVER, or nothing; left in `_bare_const`
+  _bare_const=${_BARE[$1]-}
+  [ -z "${_BARE[$1]+x}" ] || printf '%s\n' "$_bare_const"
   return 0
 }
 # ---- The declared shape of the ask generator's projection, read from the driver for the reason
@@ -585,9 +597,9 @@ ASK_TSV_HEAD=""; ASK_TSV_EXAMINED=""; ASK_TSV_FIELDS=""; ASK_TSV_READ=0
 read_ask_tsv_contract() {
   [ "$ASK_TSV_READ" = 1 ] && return 0
   ASK_TSV_READ=1
-  ASK_TSV_HEAD=$(core_of ASK_TSV_HEAD)
-  ASK_TSV_EXAMINED=$(core_of ASK_TSV_EXAMINED)
-  ASK_TSV_FIELDS=$(read_bare_const ASK_TSV_FIELDS)
+  core_of ASK_TSV_HEAD >/dev/null; ASK_TSV_HEAD=$_core_of
+  core_of ASK_TSV_EXAMINED >/dev/null; ASK_TSV_EXAMINED=$_core_of
+  read_bare_const ASK_TSV_FIELDS >/dev/null; ASK_TSV_FIELDS=$_bare_const
 }
 
 if [ -z "$PHASES_CORE" ] || [ -z "$DOD_CORE" ]; then
@@ -852,8 +864,11 @@ fi
 # heading, which is the scope check 34 grades and the driver's `fact` reads. Over the whole file, a
 # `phase: LANDED` above the heading or a key-shaped line under `## Parked` answered first while
 # check 34 reported clean.
+# The answer is printed and left in `_fact_of`, cleared first, so a caller reads it without a fork
+# and a miss never leaves the previous key's value (TOOL-aSparedSpawn-8 S2).
 fact_of() { # file · key
   local l p="$2:" sec=0
+  _fact_of=""
   while IFS= read -r l || [ -n "$l" ]; do
     l=${l%$'\r'}
     case "$l" in
@@ -862,12 +877,12 @@ fact_of() { # file · key
     esac
     [ "$sec" = 1 ] || continue
     case "$l" in
-      "$p"*) l=${l#"$p"}; while [ "${l# }" != "$l" ]; do l=${l# }; done; printf '%s\n' "$l"; return 0 ;;
+      "$p"*) l=${l#"$p"}; while [ "${l# }" != "$l" ]; do l=${l# }; done; _fact_of=$l; printf '%s\n' "$l"; return 0 ;;
     esac
   done < "$1"
   return 0
 }
-phase_of() { fact_of "$1" phase; }
+phase_of() { fact_of "$1" phase; } # leaves `_fact_of` as fact_of does
 
 # ---- THE HALT VOCABULARY: a shrink-only floor, and every aborted record carrying a legal code.
 # ---- The floor behaves like its two siblings — undeclared or malformed is a REFUSAL, never a
@@ -912,9 +927,9 @@ if [ -n "$HALT_CODES_CORE" ]; then
   hc_bad=""
   for hcf in $(GIT ls-files ":(glob)$M/builds/*/RUN*.md" 2>/dev/null); do
     [ -f "$hcf" ] || continue
-    hcp=$(phase_of "$hcf")
+    phase_of "$hcf" >/dev/null; hcp=$_fact_of
     [ "$hcp" = ABORTED ] || continue
-    hcv=$(fact_of "$hcf" halt-code)
+    fact_of "$hcf" halt-code >/dev/null; hcv=$_fact_of
     if [ -z "$hcv" ]; then
       hc_bad="$hc_bad
   $hcf (phase ABORTED and no halt-code fact, so the record says a run stopped and never says why)"
@@ -1164,9 +1179,9 @@ ADV_NREM_RC=0
 # driver — it reads it as data — so the constants are read FROM it the same way every other core set
 # is, through core_of, rather than spelled a second time here. A leg that carried its own copy of the
 # bound would be the two-answers class, and this file already refuses that shape elsewhere.
-REMOTE_BOUND=$(core_of REMOTE_BOUND)
-REMOTE_CONNECT_BOUND=$(core_of REMOTE_CONNECT_BOUND)
-REMOTE_LOWSPEED_BYTES=$(core_of REMOTE_LOWSPEED_BYTES)
+core_of REMOTE_BOUND >/dev/null; REMOTE_BOUND=$_core_of
+core_of REMOTE_CONNECT_BOUND >/dev/null; REMOTE_CONNECT_BOUND=$_core_of
+core_of REMOTE_LOWSPEED_BYTES >/dev/null; REMOTE_LOWSPEED_BYTES=$_core_of
 # NO FALLBACK. A `${x:-60}` made an unreadable bound indistinguishable from a successful read, and
 # that is exactly how this went green while reading nothing: the driver declared all three UNQUOTED,
 # core_of matches only KEY="value", and every read returned empty. The defaults then restated the
@@ -1996,7 +2011,7 @@ while IFS= read -r f; do
     fail 4 "a run-state file is tracked at a path this leg cannot read, and skipping it silently removes it from every check below: $f"
     continue
   fi
-  ph=$(phase_of "$f")
+  phase_of "$f" >/dev/null; ph=$_fact_of
 
   # ---- 4: the phase token is IN the declared vocabulary. Unit 1 kept the run-state file out of the
   # ---- status-vocabulary check on purpose, so this is the ONLY place a phase is validated.
@@ -2024,7 +2039,7 @@ while IFS= read -r f; do
   # ---- 5: witness PRESENCE, its own branch. Check 6 below reuses the drift oracle's judgeability
   # ---- discipline, which SKIPS a claim carrying no sha — so folding presence into resolution makes
   # ---- naming no witness the cheapest way for a run to say nothing, and it is the sole author here.
-  w=$(fact_of "$f" witness)
+  fact_of "$f" witness >/dev/null; w=$_fact_of
   if [ -z "$w" ]; then
     fail 5 "a phase claim carries no witness, and presence is its own refusal because an oracle that skips an unwitnessed claim can never fire on one: $ph in $f"
   else
@@ -2074,7 +2089,7 @@ while IFS= read -r f; do
     case "$ph" in
       # TOOL-dUnstuckLanding-14 S8 - a landed hand-off, settled or rotated, carries `landed-by:
       # attended` and is graded as its own population, which owes that fact too.
-      LANDED) if [ "$(fact_of "$f" landed-by)" = attended ]; then lfc_pop=attended
+      LANDED) fact_of "$f" landed-by >/dev/null; if [ "$_fact_of" = attended ]; then lfc_pop=attended
               elif { extract_run_facts < "$f"; } 2>/dev/null | grep -q '^landed-derived:'; then lfc_pop=derived; else lfc_pop=landed; fi ;;
       LANDING)
         if lfc_c=$(read_landing_commit "$f"); then
@@ -2115,7 +2130,7 @@ while IFS= read -r f; do
   # ---- the run's own verbs wrote, since both are the record's own facts and a hand edit of all three
   # ---- moves together; nor a record this clone cannot judge: no advertised tip is REPORTED as a
   # ---- skip, never a red.
-  wla=$(fact_of "$f" work-landed-at)
+  fact_of "$f" work-landed-at >/dev/null; wla=$_fact_of
   if [ -n "$wla" ]; then
     if [ "${ADV_HEAD_OK:-0}" != 1 ]; then
       report "check 15 did not grade work-landed-at in $f - no advertised default-branch tip resolves in this clone, so the content predicate has no tip to read"
@@ -2141,7 +2156,7 @@ while IFS= read -r f; do
         *) fail 15 "an ABORTED record claims work-landed-at and HANDOFF_CUTOFF is not a date, so whether it predates the day ABORTED came to mean discard cannot be read, and --settle refuses every such record: ${HANDOFF_CUTOFF:-blank} in $f" ;;
       esac
     fi
-  elif [ -n "$(fact_of "$f" abandoned)" ]; then
+  elif fact_of "$f" abandoned >/dev/null; [ -n "$_fact_of" ]; then
     fail 15 "a record carries abandoned with no work-landed-at, and --settle writes the two together, so the marker that takes it out of the live-run count stands on no proof that its work landed: $f"
   fi
 
@@ -2178,7 +2193,7 @@ while IFS= read -r f; do
   # ---- is not a pin, and every mandate assertion hangs on this value.
   # ---- AN ABSENT `base:` LINE IS THE VIOLATION, not the exemption. Wrapping this in `if [ -n ]`
   # ---- meant deleting one line from a run-writable file disarmed the only BASE check on the bar.
-  rb=$(fact_of "$f" base)
+  fact_of "$f" base >/dev/null; rb=$_fact_of
   # TOOL-aHomedAnchor-7 S1 - set only by check 9's local admission below, from the advertisement; the
   # may: and asks: second opinions read it, so a slug mode no longer stands in for the first anchor.
   rlocal=0
@@ -2294,7 +2309,7 @@ while IFS= read -r f; do
               # chose an anchor by testing ancestry; this asks whether the claim is well-formed and
               # whether history still supports it — two questions the driver never asked, both of which
               # can fail on a record the driver wrote happily.
-              ak=$(fact_of "$f" landed-anchor)
+              fact_of "$f" landed-anchor >/dev/null; ak=$_fact_of
               case "$ak" in
                 remote|"") ;;
                 local) ;;
@@ -2306,7 +2321,7 @@ while IFS= read -r f; do
               # for one would red every rotated record. What it names is TESTED rather than trusted:
               # the landing commit must be on the tip this remote advertises, or a hand-written
               # archive would meet the anchor rule without ever having landed.
-              lfd=$(fact_of "$f" landed-derived)
+              fact_of "$f" landed-derived >/dev/null; lfd=$_fact_of
               if [ -z "$ak" ] && [ -n "$lfd" ]; then
                 lfd_c=${lfd%% *}
                 check_adv_reaches "$lfd_c" \
@@ -2399,7 +2414,7 @@ while IFS= read -r f; do
       # ---- sides read the key with an awk of the same shape, so a parse that is wrong the same way
       # ---- twice agrees wrongly. That is smaller than the class it belongs to - a forged RECORD is
       # ---- still caught, which is the threat - and it is stated here rather than left to be found.
-      recmode=$(fact_of "$f" mode)
+      fact_of "$f" mode >/dev/null; recmode=$_fact_of
       # HOISTED out of the presence guard below (TOOL-dNarrowedAnchor-1). Check 29 needs the DECLARED
       # mode for every run-state file, not only the ones carrying a `mode:` line of their own: a
       # record written before that key existed still has a recorded BASE, and whether that base sits
@@ -2467,8 +2482,8 @@ while IFS= read -r f; do
             NR == 1 { next }
             /^---[[:space:]]*\r?$/ { exit }
             /^pieces:/ { v = $0; sub(/^pieces:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print v; exit }')
-          recpb=$(fact_of "$f" playbook)
-          recn=$(fact_of "$f" pieces)
+          fact_of "$f" playbook >/dev/null; recpb=$_fact_of
+          fact_of "$f" pieces >/dev/null; recn=$_fact_of
           [ "$recpb" = "$dpb" ] || fail 19 "a run-state file records a playbook the build README at its own recorded BASE does not name, so the instructions the run says bound it are not the ones its authorization pointed at - recorded against declared follow: $recpb against $dpb"
           [ "$recn" = "$dn" ] || fail 19 "a run-state file records a piece count the build README at its own recorded BASE does not declare, so the number the run will be measured against is not the number it was asked for - recorded against declared follow: $recn against $dn"
         fi
@@ -2491,7 +2506,7 @@ while IFS= read -r f; do
       # ---- ...and a `may:` other than `none` on a record whose mode is not `slug` reds whatever its
       # ---- README says: the driver refuses the key under every other mode, so such a record was
       # ---- written around it, and a grant a second-anchor run pinned is one it could have authored.
-      recmay=$(fact_of "$f" may)
+      fact_of "$f" may >/dev/null; recmay=$_fact_of
       dmayl=$(read_may_of "$bb")
       if [ -z "$dmayl" ]; then
         dmay=none
@@ -2573,7 +2588,7 @@ while IFS= read -r f; do
         mayend=HEAD
         maylc=""
         [ "$ph" = LANDING ] && maylc=$(read_landing_commit "$f" 2>/dev/null)
-        mayrbr=$(fact_of "$f" run-branch); [ -n "$mayrbr" ] || mayrbr=$(fact_of "$f" branch-ref)
+        fact_of "$f" run-branch >/dev/null; mayrbr=$_fact_of; fact_of "$f" branch-ref >/dev/null; [ -n "$mayrbr" ] || mayrbr=$_fact_of
         if [ -n "$maylc" ] && check_adv_reaches "$maylc"; then
           mayend=$maylc; maywalk=1
         elif [ -n "$DS_HEAD_REF" ] && [ -n "$mayrbr" ] && [ "$mayrbr" != "$DS_HEAD_REF" ]; then
@@ -2699,7 +2714,7 @@ WAIVERS
   # ---- that makes a record mandated. Every one of them is VACUOUS on a record with no `asks:`
   # ---- fact, which can be every record in a tree, so the count is announced after the loop:
   # ---- a skip that looks like a pass is indistinguishable from coverage.
-  recasks=$(fact_of "$f" asks)
+  fact_of "$f" asks >/dev/null; recasks=$_fact_of
   if [ -n "$recasks" ]; then
     asks_n=$((asks_n + 1))
     askslug=${f#"$M/builds/"}; askslug=${askslug%%/*}
@@ -2720,7 +2735,7 @@ WAIVERS
     # ---- written around the driver rather than by it. The blank-conf half is its own refusal and
     # ---- not a consequence of the mode one: a `slug` record pinning a mandate with no declared
     # ---- producer is a pinned set nothing ever graded.
-    askmode=$(fact_of "$f" mode)
+    fact_of "$f" mode >/dev/null; askmode=$_fact_of
     [ "$rlocal" != 1 ] \
       || fail 19 "a run-state file pins an asks: mandate on a BASE the local anchor admitted, a commit on this node the run could have written, so the mandate and the tree it is asserted against could both be this run's own: $f"
     [ "$askmode" = slug ] \
@@ -2761,15 +2776,15 @@ WAIVERS
     # ---- `base:`, because a forged pair that agrees with itself is the whole hazard. Equality is
     # ---- safe here in a way it is not for check 9: this is the merge-base of two FROZEN commits,
     # ---- and a merge-base of two frozen commits never moves.
-    askmb=$(fact_of "$f" m-base)
-    askash=$(fact_of "$f" anchor-sha)
+    fact_of "$f" m-base >/dev/null; askmb=$_fact_of
+    fact_of "$f" anchor-sha >/dev/null; askash=$_fact_of
     askpf=""
     if [ -z "$askmb" ] || ! check_rev "$askmb"; then
       fail 19 "a run-state file pins an asks: mandate and no m-base: this clone can read, so every property about the tree that mandate was asserted against would be graded over an empty blob or, worse, over the index the run itself staged: m-base [${askmb:-(none)}] in $f"
     else
       askhomeseen=""; askhomeblob=""
       for askid in $askids; do
-        askhome=$(ask_home_of "$askid")
+        ask_home_of "$askid" >/dev/null; askhome=$_ask_home
         if [ "$askhome" != "$askhomeseen" ]; then
           askhomeseen=$askhome
           askhomeblob=$(GIT show "$askmb:$M/builds/$askhome/BACKLOG.md" 2>/dev/null || true)
@@ -2832,7 +2847,7 @@ WAIVERS
     # ---- too. Graded on the recorded LANDED alone, this arm would examine nothing in gov's own mode
     # ---- until a rotation, and the second opinion would never fire. Under primary it is due at
     # ---- `--landed`, and only a recorded LANDED is graded, exactly as before.
-    askfz=$(fact_of "$f" asks-at-landing)
+    fact_of "$f" asks-at-landing >/dev/null; askfz=$_fact_of
     askfzdue=0
     if [ "$ph" = LANDED ]; then
       askfzdue=1
@@ -2875,7 +2890,7 @@ WAIVERS
         report "check 19 - $f is published, not re-derived: its preflight commit $askpf is an ancestor of the advertised default tip"
       fi
       if [ "$askrederive" = 1 ]; then
-        askready=$(fact_of "$f" asks-ready)
+        fact_of "$f" asks-ready >/dev/null; askready=$_fact_of
         if run_ask_query "$askslug" "$askmb" $askids; then
           askpairs=""
           for askid in $askids; do askpairs="$askpairs $askid=$(read_ask_row "$askid" ready)"; done
@@ -2902,7 +2917,7 @@ WAIVERS
               askscope="$askscope $askid"
             done
             for askid in $(asks_filed_in "$(GIT show "$askfzp:$M/builds/$askslug/BACKLOG.md" 2>/dev/null)"); do
-              [ "$(ask_home_of "$askid")" = "$askslug" ] || continue
+              ask_home_of "$askid" >/dev/null; [ "$_ask_home" = "$askslug" ] || continue
               case " $askscope " in *" $askid "*) continue ;; esac
               askscope="$askscope $askid"
             done
@@ -3014,12 +3029,12 @@ for c7f in $live; do
   if check_derived_landed "$c7f"; then
     c7drop="$c7drop $c7f"
     printf 'unattended: check 7 EXCLUDED %s — derived LANDED: its landing commit %s is an ancestor of the advertised default-branch tip %s, so the record the push carried is on the remote and it is a finished run rather than a second live one\n' "$c7f" "$DERIVED_LANDING_COMMIT" "$ADV_HEAD"
-  elif [ -n "$(fact_of "$c7f" abandoned)" ]; then
+  elif fact_of "$c7f" abandoned >/dev/null; [ -n "$_fact_of" ]; then
     # TOOL-dUnstuckLanding-14 S7 - `--settle` wrote `abandoned` over a dead lease whose work landed,
     # and `--preflight`'s announcement excludes the same marker, so the two count one population.
     # Whether the marker is UPHELD is check 15's question, not this report's.
     c7drop="$c7drop $c7f"
-    printf 'unattended: check 7 EXCLUDED %s — abandoned at %s: --settle found its lease dead and its work landed at %s, so no session drives it\n' "$c7f" "$(fact_of "$c7f" abandoned)" "$(fact_of "$c7f" work-landed-at)"
+    fact_of "$c7f" abandoned >/dev/null; _c7ab=$_fact_of; fact_of "$c7f" work-landed-at >/dev/null; _c7wl=$_fact_of; printf 'unattended: check 7 EXCLUDED %s — abandoned at %s: --settle found its lease dead and its work landed at %s, so no session drives it\n' "$c7f" "$_c7ab" "$_c7wl"
   else
     c7keep="$c7keep $c7f"; c7n=$((c7n+1))
   fi
@@ -3038,8 +3053,8 @@ done
 if [ "$nlive" -gt 1 ]; then
   printf 'unattended: %d concurrent unattended run(s) — none of them blocks another, and this leg does not fail on the count:
 ' "$nlive"
-  for c7r in $live; do printf '  %s · phase %s
-' "$c7r" "$(phase_of "$c7r")"; done
+  for c7r in $live; do phase_of "$c7r" >/dev/null; printf '  %s · phase %s
+' "$c7r" "$_fact_of"; done
 fi
 
 # ---- 10: the kit ships what this repo runs. ONE pair. The comparison is written here rather than
@@ -3792,8 +3807,8 @@ fi
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac   # frozen retired records are not amendable
-  ph=$(fact_of "$f" phase); case "$ph" in LANDED|ABORTED) continue ;; esac
-  rb=$(fact_of "$f" base)
+  fact_of "$f" phase >/dev/null; ph=$_fact_of; case "$ph" in LANDED|ABORTED) continue ;; esac
+  fact_of "$f" base >/dev/null; rb=$_fact_of
   bslug=${f#"$M/builds/"}; bslug=${bslug%%/*}
   bre="$M/builds/$bslug/README.md"
   [ -f "$bre" ] || continue
@@ -4022,7 +4037,7 @@ for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
   dsslug=${f%/RUN.md}; dsslug=${dsslug##*/}; ds_absorbed=""; ds_win=""; ds_pend=""; ds_run_graded=0; ds_over=""; ds_over_n=0
-  ph=$(fact_of "$f" phase); case "$ph" in LANDED|ABORTED) continue ;; esac
+  fact_of "$f" phase >/dev/null; ph=$_fact_of; case "$ph" in LANDED|ABORTED) continue ;; esac
   # ONE ROW PER (anchor, unit), AND ITS PATHS ARE THE UNION OF EVERY ROW UNDER THAT KEY. The key
   # already carries the anchor, so rows at DIFFERENT anchors stay separate — they are different passes
   # with different windows. What changes is same-anchor rows: `row[k] = $0` overwrote, so a run that
@@ -4206,7 +4221,7 @@ DSROWS
   # ---- cannot be placed, and then every graded pass counts as overlapped, the verdict before this unit
   # ---- — even a single-unit run, so an unplaceable record is graded exactly as it was.
   unset dspos; declare -A dspos=(); dsposok=0
-  dsbase=$(fact_of "$f" base)
+  fact_of "$f" base >/dev/null; dsbase=$_fact_of
   if [ -z "$dsbase" ] || ! check_rev "$dsbase"; then
     report "check 23 overlap unavailable for $f — its base '$dsbase' does not resolve, so no window can be placed and every graded pass is counted as overlapped"
   elif [ "$(printf '%s' "$ds_win" | awk '{ print $3 }' | sort -u | wc -l)" -lt 2 ]; then
@@ -4281,7 +4296,7 @@ DSPEND
   # ---- WHAT THIS DOES NOT CHECK: a run nobody drives from a checkout is never failed by this check,
   # ---- on the bar or anywhere else, until a tree on its branch runs the leg.
   [ "$ds_over_n" -gt 0 ] || continue
-  dsrb=$(fact_of "$f" run-branch); [ -n "$dsrb" ] || dsrb=$(fact_of "$f" branch-ref)
+  fact_of "$f" run-branch >/dev/null; dsrb=$_fact_of; fact_of "$f" branch-ref >/dev/null; [ -n "$dsrb" ] || dsrb=$_fact_of
   if [ -z "$dsrb" ]; then
     # A RECORD NAMING NO RUN BRANCH (a detached preflight) matches no checkout, its own close included,
     # so "graded at its own close" would be false for it (closing review r1, M6). Said distinctly.
@@ -4457,8 +4472,8 @@ fi
 # ---- fix for exactly that drift was a hand-resynchronisation that lasted one verb.
 # ----
 # ---- WHAT THIS DOES NOT CHECK: whether a verb's DESCRIPTION anywhere is true. It joins names.
-VERBS_SLUG=$(core_of VERBS_SLUG)
-VERBS_INLINE=$(core_of VERBS_INLINE)
+core_of VERBS_SLUG >/dev/null; VERBS_SLUG=$_core_of
+core_of VERBS_INLINE >/dev/null; VERBS_INLINE=$_core_of
 VERBS_ALL="$VERBS_SLUG $VERBS_INLINE"
 nverbs=$(_wc=(${VERBS_ALL}); echo ${#_wc[@]})
 if [ "$nverbs" -lt 10 ]; then
@@ -4571,8 +4586,8 @@ fi
 # ----
 # ---- Source-level, because every call site passes a literal and no invocation of this driver can
 # ---- reach a mistyped one. A runtime guard inside park() would be a branch nothing can fire.
-PARK_KINDS=$(core_of PARK_KINDS)
-PARK_KINDS_OWED=$(core_of PARK_KINDS_OWED)
+core_of PARK_KINDS >/dev/null; PARK_KINDS=$_core_of
+core_of PARK_KINDS_OWED >/dev/null; PARK_KINDS_OWED=$_core_of
 # SPACE-SEPARATED, because both joins below are ' word ' membership tests and a newline inside the
 # haystack makes every one of them miss - which reds five correct call sites and would be read as
 # the check being wrong rather than the shell being literal.
@@ -4768,7 +4783,7 @@ for _fr_f in "$HERE"/*.sh "$HERE"/*.js; do
   case "$_fr_f" in *.test.sh) continue ;; esac
   [ -f "$_fr_f" ] && _fr_files+=("$_fr_f")
 done
-_fr_out=$(awk -v KEYS="$_fr_keys" -v EXEMPT="$(cat <<'EXEMPT'
+IFS= read -r -d '' _fr_exempt <<'EXEMPT' || :
 unattended.sh	playbook:	the build README's front matter, a scan its `---` close bounds
 unattended.sh	pieces:	the build README's front matter, a scan its `---` close bounds
 unattended.sh	spec-audit:	the build README's front matter, a scan its `---` close bounds
@@ -4783,7 +4798,7 @@ lib-unattended.sh	(keepalive|	check_lease_only_diff grades git diff -U0 hunk lin
 resume-tick.sh	pid: 	the driver's --liveness stdout, not a run-state file
 stop-guard.js	' + key	parseLiveness reads the driver's --liveness stdout, not a run-state file
 EXEMPT
-)" '
+_fr_out=$(awk -v KEYS="$_fr_keys" -v EXEMPT="${_fr_exempt%$'\n'}" '
   BEGIN {
     n = split(KEYS, ka, " "); alt = ""
     for (i = 1; i <= n; i++) alt = alt (alt == "" ? "" : "|") ka[i]
@@ -4942,10 +4957,10 @@ done
 # ---- and the literal resolved to the 4-byte string `grep`, present nineteen times in the file it
 # ---- names, so the freshness half had no failing input at all. The table is newline-separated and
 # ---- read without splitting now, which is the only shape that survives a value with spaces in it.
-KEY_EXEMPT=$(cat <<'EXEMPTEOF'
+IFS= read -r -d '' KEY_EXEMPT <<'EXEMPTEOF' || :
 legs|check-playbook.sh|ent=$(printf '%s\n' "$body" | grep -oE
 EXEMPTEOF
-)
+KEY_EXEMPT=${KEY_EXEMPT%$'\n'}
 kb_keys=0
 if [ -f "$tpl" ]; then
   # ---- THE TWO CORPORA THE KEY LOOP READS, one pass per file instead of one per (key, file). Each
@@ -5772,7 +5787,11 @@ _lc_hits=${_lc_hits%$'\n'}
 # print_liveness arrived with origin/main (aWokenSentinel); it reads the RECORDED phase because it
 # takes no network.
 # check_commit_message (TOOL-aWindowedPass-3) runs on every commit, and a hook takes no network either.
-PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness run_settle check_commit_message"
+# main reads it once after --close or --abort to decide whether to render the run record: a read of
+# the fact as written, after the verb that wrote it. It used to read it nested inside a runmd_of
+# substitution, a spelling this classifier could not see; the fork-free form made it visible
+# (TOOL-aSparedSpawn-8).
+PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness run_settle check_commit_message main"
 # ---- LIVENESS: the classifier must RECOGNISE the readers' own reads. The two readers are the one
 # ---- place a read of the fact is certain to exist, so each must hold a line the read predicate
 # ---- matches, or the driver reads the fact in a spelling this check no longer sees and the routing

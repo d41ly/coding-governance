@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 131 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 105 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 133 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 105 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -119,9 +119,11 @@ Inventories: gate-legs: 131 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `scratch-guard self-test` | agent-cap |
 | `selftest harness self-test` | run-gates |
 | `settings-merge selftest` | baseline |
+| `shell hygiene (a fork spent on builtin work)` | gate-lint |
 | `shell hygiene (a location probe asked from a moved directory)` | gate-lint |
 | `shell hygiene (a loop fed by a command substitution)` | gate-lint |
 | `shell-hygiene selftest` | gate-lint |
+| `spawn budget (forks per hot entrypoint)` | gate-lint |
 | `spec tokens (a spec's own names resolve)` | spec-tokens |
 | `spec-tokens self-test` | spec-tokens |
 | `straggler-guard arms` | memory-tree-hygiene |

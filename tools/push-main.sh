@@ -276,13 +276,13 @@ derive_push_failure() {  # -> refused | unreachable | unchanged | race on stdout
 CLAIM_WAIT_CEILING=120
 check_claim_push_clear() {  # -> 0 always, once no live lock holds this git dir or its bound passed
   local lk="$gd/claim-push.lock" u t0 now why=""
-  t0=$(date +%s); now=$t0
+  t0=$EPOCHSECONDS; now=$t0
   while [ -d "$lk" ]; do
     u=""; { read -r u <"$lk/until"; } 2>/dev/null || :
     case "$u" in *[!0-9]*) u="" ;; esac
     if [ -n "$u" ] && [ "$u" -le "$now" ]; then why="whose deadline passed"; break; fi
     if [ $(( now - t0 )) -ge "$CLAIM_WAIT_CEILING" ]; then why="after the ${CLAIM_WAIT_CEILING}s ceiling"; break; fi
-    sleep 1; now=$(date +%s)
+    sleep 1; now=$EPOCHSECONDS
   done
   [ "$now" = "$t0" ] || echo "push-main: waited $(( now - t0 ))s for a claim push in flight in this git dir" >&2
   [ -z "$why" ] || echo "push-main: proceeding past a claim-push lock $why: $lk" >&2
@@ -549,7 +549,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -586,7 +587,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])

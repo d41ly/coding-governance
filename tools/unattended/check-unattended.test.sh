@@ -4653,7 +4653,7 @@ cd "$TMP" || exit 2; anchor_restore; read_topo s2   # every section after a re-c
 # ---- CHECK 39, arm one: a direct read of the phase fact in a function that is neither reader.
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
-mutate $KIT_REL/unattended.sh 's|^  read_derived_phase "$rel"; p="$DP_PHASE"; w=$(fact "$rel" witness)$|  p=$(fact "$rel" phase); w=$(fact "$rel" witness)|'
+mutate $KIT_REL/unattended.sh 's|^  read_derived_phase "$rel"; p="$DP_PHASE"; fact "$rel" witness >/dev/null; w=$_fact$|  fact "$rel" phase >/dev/null; p=$_fact; fact "$rel" witness >/dev/null; w=$_fact|'
 out=$(run)
 hit "$out" "the phase fact is read outside the two readers, or the recorded-phase allow-list disagrees with the source, so the effective phase and the recorded one can differ at a call site nobody classified"
 hit "$out" "reads the phase fact directly inside verb_status()"

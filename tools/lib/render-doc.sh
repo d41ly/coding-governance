@@ -88,7 +88,8 @@ render_doc() {
 # renders only where git tracks it (I3). The two protocols render the path of their kit's
 # `rendered` receipt row, the destination govkit wrote, or a phrase (C5, I4).
 derive_kit_paths() {
-  MT_MEMORY_ROOT="${MEMORY_ROOT:-}" "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -125,7 +126,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  MT_MEMORY_ROOT="${MEMORY_ROOT:-}" "$1" -c "${_rkd%$'\n'}"'
 import json
 import os
 import pathlib

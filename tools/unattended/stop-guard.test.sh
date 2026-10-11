@@ -184,7 +184,9 @@ run_hook() {
   case "$1" in *'"session_id"'*) ;; *) print_bad "the payload builder produced nothing"; OUT=""; ERR=""; RC=99; return;; esac
   OUT=$(printf '%s' "$1" | node "$HOOK" 2>"$TMP/err"); RC=$?; ERR=$(cat "$TMP/err")
 }
-derive_sidecar() { printf '%s/.git/unattended/stop.fx.log' "$1"; }
+# The sidecar path, printed and left in `_sidecar`: a call site reads the global and forks no
+# subshell for a printf (TOOL-aSparedSpawn-8 S10).
+derive_sidecar() { printf -v _sidecar '%s/.git/unattended/stop.fx.log' "$1"; printf '%s' "$_sidecar"; }
 # read_field <file> <key> — the LAST line's value, parsed as JSON, never grepped over raw bytes.
 read_field() { "$TESTPY" -c 'import json,sys
 ls=[l for l in open(sys.argv[1],encoding="utf-8").read().splitlines() if l.strip()]
@@ -204,12 +206,12 @@ check_same "AC1 unbound rc" "$RC" "0"
 # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 check_same "AC1 unbound stdout empty" "$OUT" ""
-[ ! -e "$(derive_sidecar "$F")" ] && print_ok "AC1 unbound writes no sidecar" || print_bad "AC1 unbound wrote $(derive_sidecar "$F")"
+derive_sidecar "$F" >/dev/null; [ ! -e "$_sidecar" ] && print_ok "AC1 unbound writes no sidecar" || print_bad "AC1 unbound wrote $_sidecar"
 # the literal `absent` is the driver's spelling of "no lease", so a payload whose session_id IS that
 # word must not bind the record that carries it
 run_hook "$(build_payload "$F" '{"session_id":"absent"}')"
 check_same "AC1 the literal absent never binds" "$OUT" ""
-[ ! -e "$(derive_sidecar "$F")" ] && print_ok "AC1 the literal absent writes no sidecar" || print_bad "AC1 the literal absent wrote a line"
+derive_sidecar "$F" >/dev/null; [ ! -e "$_sidecar" ] && print_ok "AC1 the literal absent writes no sidecar" || print_bad "AC1 the literal absent wrote a line"
 
 # ---- AC2: a bound session on an open run is BLOCKED, the reason names the slug, the count and
 # ---- --plan, and the sidecar holds one block line with blocks 1.
@@ -221,28 +223,28 @@ check_hit "$R" "unattended run fx" "AC2 reason names the slug"
 check_hit "$R" "block 1/6" "AC2 reason counts 1 of the default 6"
 check_hit "$R" "unattended.sh --plan fx" "AC2 reason names --plan"
 check_hit "$R" "phase BUILDING, liveness LIVE" "AC2 reason names phase and verdict"
-check_same "AC2 one sidecar line" "$(measure_lines "$(derive_sidecar "$F")")" "1"
-check_same "AC2 line decision" "$(read_field "$(derive_sidecar "$F")" decision)" "block"
-check_same "AC2 line blocks" "$(read_field "$(derive_sidecar "$F")" blocks)" "1"
-check_same "AC2 line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "run-open"
-check_same "AC2 line phase" "$(read_field "$(derive_sidecar "$F")" phase)" "BUILDING"
-check_same "AC2 line session" "$(read_field "$(derive_sidecar "$F")" session)" "$SID"
+derive_sidecar "$F" >/dev/null; check_same "AC2 one sidecar line" "$(measure_lines "$_sidecar")" "1"
+derive_sidecar "$F" >/dev/null; check_same "AC2 line decision" "$(read_field "$_sidecar" decision)" "block"
+derive_sidecar "$F" >/dev/null; check_same "AC2 line blocks" "$(read_field "$_sidecar" blocks)" "1"
+derive_sidecar "$F" >/dev/null; check_same "AC2 line reason" "$(read_field "$_sidecar" reason)" "run-open"
+derive_sidecar "$F" >/dev/null; check_same "AC2 line phase" "$(read_field "$_sidecar" phase)" "BUILDING"
+derive_sidecar "$F" >/dev/null; check_same "AC2 line session" "$(read_field "$_sidecar" session)" "$SID"
 # the key order is the spec's table, asserted once on the raw line
-check_same "AC2 key order" "$("$TESTPY" -c 'import json,sys;print(" ".join(json.loads(open(sys.argv[1]).read().splitlines()[0]).keys()))' "$(derive_sidecar "$F")")" \
+derive_sidecar "$F" >/dev/null; check_same "AC2 key order" "$("$TESTPY" -c 'import json,sys;print(" ".join(json.loads(open(sys.argv[1]).read().splitlines()[0]).keys()))' "$_sidecar")" \
   "utc session decision reason phase verdict blocks background_tasks stop_hook_active session_crons"
 # a second stop counts 2, from the file
 run_hook "$(build_payload "$F")"
 check_hit "$(extract_reason "$OUT")" "block 2/6" "AC2 the second stop counts from the sidecar"
-check_same "AC2 two sidecar lines" "$(measure_lines "$(derive_sidecar "$F")")" "2"
+derive_sidecar "$F" >/dev/null; check_same "AC2 two sidecar lines" "$(measure_lines "$_sidecar")" "2"
 
 # ---- AC3: a TERMINAL verdict allows, and the allow still writes its line.
 F=$(build_fixture LANDED "$SID"); set_liveness LANDED TERMINAL
 run_hook "$(build_payload "$F")"
 check_same "AC3 terminal rc" "$RC" "0"
 check_same "AC3 terminal stdout empty" "$OUT" ""
-check_same "AC3 line decision" "$(read_field "$(derive_sidecar "$F")" decision)" "allow"
-check_same "AC3 line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "terminal"
-check_same "AC3 line blocks" "$(read_field "$(derive_sidecar "$F")" blocks)" "0"
+derive_sidecar "$F" >/dev/null; check_same "AC3 line decision" "$(read_field "$_sidecar" decision)" "allow"
+derive_sidecar "$F" >/dev/null; check_same "AC3 line reason" "$(read_field "$_sidecar" reason)" "terminal"
+derive_sidecar "$F" >/dev/null; check_same "AC3 line blocks" "$(read_field "$_sidecar" blocks)" "0"
 
 # ---- TOOL-dDerivedDocket-61 AC6: a HELD verdict ALLOWS with reason `held`, ahead of the pending
 # ---- background task this payload carries, and spends no block: a session that held correctly and
@@ -251,12 +253,12 @@ F=$(build_fixture HELD "$SID"); set_liveness HELD HELD
 run_hook "$(build_payload "$F" '{"background_tasks":[{"id":"t1"}]}')"
 check_same "U61 held rc" "$RC" "0"
 check_same "U61 held stdout empty" "$OUT" ""
-check_same "U61 line decision" "$(read_field "$(derive_sidecar "$F")" decision)" "allow"
-check_same "U61 line reason is held, ahead of background-tasks" "$(read_field "$(derive_sidecar "$F")" reason)" "held"
-check_same "U61 line blocks" "$(read_field "$(derive_sidecar "$F")" blocks)" "0"
+derive_sidecar "$F" >/dev/null; check_same "U61 line decision" "$(read_field "$_sidecar" decision)" "allow"
+derive_sidecar "$F" >/dev/null; check_same "U61 line reason is held, ahead of background-tasks" "$(read_field "$_sidecar" reason)" "held"
+derive_sidecar "$F" >/dev/null; check_same "U61 line blocks" "$(read_field "$_sidecar" blocks)" "0"
 set_liveness BUILDING LIVE
 run_hook "$(build_payload "$F")"
-check_same "U61 the same record at BUILDING is blocked run-open" "$(read_field "$(derive_sidecar "$F")" reason)" "run-open"
+derive_sidecar "$F" >/dev/null; check_same "U61 the same record at BUILDING is blocked run-open" "$(read_field "$_sidecar" reason)" "run-open"
 check_same "U61 REASONS carries held directly after terminal" \
   "$(node -e 'const m=require(process.argv[1]);console.log(m.REASONS.slice(0,2).join(" "))' "$(resolve_native "$HOOK")")" "terminal held"
 
@@ -268,8 +270,8 @@ F=$(build_fixture BUILDING "$SID"); set_liveness BUILDING ELSEWHERE
 run_hook "$(build_payload "$F")"
 check_same "U62 elsewhere rc" "$RC" "0"
 check_same "U62 elsewhere stdout empty" "$OUT" ""
-check_same "U62 line reason is elsewhere" "$(read_field "$(derive_sidecar "$F")" reason)" "elsewhere"
-check_same "U62 line blocks" "$(read_field "$(derive_sidecar "$F")" blocks)" "0"
+derive_sidecar "$F" >/dev/null; check_same "U62 line reason is elsewhere" "$(read_field "$_sidecar" reason)" "elsewhere"
+derive_sidecar "$F" >/dev/null; check_same "U62 line blocks" "$(read_field "$_sidecar" blocks)" "0"
 check_same "U62 REASONS carries elsewhere directly after held" \
   "$(node -e 'const m=require(process.argv[1]);console.log(m.REASONS.slice(1,3).join(" "))' "$(resolve_native "$HOOK")")" "held elsewhere"
 
@@ -278,8 +280,8 @@ F=$(build_fixture BUILDING "$SID"); set_liveness BUILDING LIVE
 run_hook "$(build_payload "$F" '{"background_tasks":[{"id":"t1"},{"id":"t2"}]}')"
 check_same "AC4 background rc" "$RC" "0"
 check_same "AC4 background stdout empty" "$OUT" ""
-check_same "AC4 line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "background-tasks"
-check_same "AC4 line background_tasks" "$(read_field "$(derive_sidecar "$F")" background_tasks)" "2"
+derive_sidecar "$F" >/dev/null; check_same "AC4 line reason" "$(read_field "$_sidecar" reason)" "background-tasks"
+derive_sidecar "$F" >/dev/null; check_same "AC4 line background_tasks" "$(read_field "$_sidecar" background_tasks)" "2"
 run_hook "$(build_payload "$F" '{"background_tasks":[]}')"
 check_hit "$(extract_reason "$OUT")" "block 1/6" "AC4 an empty array blocks"
 
@@ -288,22 +290,22 @@ check_hit "$(extract_reason "$OUT")" "block 1/6" "AC4 an empty array blocks"
 # ---- lines never move this session's count.
 render_seedline() { printf '{"utc":"2026-09-16T00:00:00Z","session":"%s","decision":"block","reason":"run-open","phase":"BUILDING","verdict":"LIVE","blocks":%s,"background_tasks":0,"stop_hook_active":false,"session_crons":null}\n' "$1" "$2"; }
 F=$(build_fixture BUILDING "$SID" 'STOP_GUARD_BLOCKS="2"'); set_liveness BUILDING LIVE
-mkdir -p "$F/.git/unattended"; { render_seedline "$SID" 1; render_seedline "$SID" 2; } > "$(derive_sidecar "$F")"
+derive_sidecar "$F" >/dev/null; mkdir -p "$F/.git/unattended"; { render_seedline "$SID" 1; render_seedline "$SID" 2; } > "$_sidecar"
 run_hook "$(build_payload "$F")"
 check_same "AC5 exhausted rc" "$RC" "0"
 check_same "AC5 exhausted stdout empty" "$OUT" ""
-check_same "AC5 line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "blocks-exhausted"
-check_same "AC5 line blocks" "$(read_field "$(derive_sidecar "$F")" blocks)" "2"
+derive_sidecar "$F" >/dev/null; check_same "AC5 line reason" "$(read_field "$_sidecar" reason)" "blocks-exhausted"
+derive_sidecar "$F" >/dev/null; check_same "AC5 line blocks" "$(read_field "$_sidecar" blocks)" "2"
 check_miss "$ERR" "declares no STOP_GUARD_BLOCKS" "AC5 a declared knob prints no NOTE"
-render_seedline "$SID" 1 > "$(derive_sidecar "$F")"
+derive_sidecar "$F" >/dev/null; render_seedline "$SID" 1 > "$_sidecar"
 run_hook "$(build_payload "$F")"
 check_hit "$(extract_reason "$OUT")" "block 2/2" "AC5 one seeded line blocks 2/2"
-{ render_seedline other-session 1; render_seedline other-session 2; } > "$(derive_sidecar "$F")"
+derive_sidecar "$F" >/dev/null; { render_seedline other-session 1; render_seedline other-session 2; } > "$_sidecar"
 # the seed is asserted before the feed: an empty seed reads 0 and passes the next line vacuously
-check_same "AC5 two lines seeded for another session" "$(measure_lines "$(derive_sidecar "$F")")" "2"
+derive_sidecar "$F" >/dev/null; check_same "AC5 two lines seeded for another session" "$(measure_lines "$_sidecar")" "2"
 run_hook "$(build_payload "$F")"
 check_hit "$(extract_reason "$OUT")" "block 1/2" "AC5 another session's lines are not counted"
-check_same "AC5 three lines after the third stop" "$(measure_lines "$(derive_sidecar "$F")")" "3"
+derive_sidecar "$F" >/dev/null; check_same "AC5 three lines after the third stop" "$(measure_lines "$_sidecar")" "3"
 
 # ---- AC6: no knob declared — the NOTE once on stderr and the default 6 in the reason; a malformed
 # ---- knob ALLOWS with knob-malformed at rc 0, never the driver's exit 2, which is a block.
@@ -315,7 +317,7 @@ F=$(build_fixture BUILDING "$SID" 'STOP_GUARD_BLOCKS="zero"'); set_liveness BUIL
 run_hook "$(build_payload "$F")"
 check_same "AC6 malformed rc" "$RC" "0"
 check_same "AC6 malformed stdout empty" "$OUT" ""
-check_same "AC6 line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "knob-malformed"
+derive_sidecar "$F" >/dev/null; check_same "AC6 line reason" "$(read_field "$_sidecar" reason)" "knob-malformed"
 check_hit "$ERR" "not a positive integer" "AC6 malformed says so on stderr"
 F=$(build_fixture BUILDING "$SID" 'export STOP_GUARD_BLOCKS=3 # a comment'); set_liveness BUILDING LIVE
 run_hook "$(build_payload "$F")"
@@ -326,34 +328,34 @@ F=$(build_fixture BUILDING "$SID"); set_liveness BUILDING LIVE
 STOP_GUARD_TEST_LIVENESS_RC=1 run_hook "$(build_payload "$F")"
 check_same "AC7 rc-1 rc" "$RC" "0"
 check_same "AC7 rc-1 stdout empty" "$OUT" ""
-check_same "AC7 rc-1 line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "liveness-unreadable"
-check_same "AC7 rc-1 line verdict" "$(read_field "$(derive_sidecar "$F")" verdict)" "unreadable"
-check_same "AC7 rc-1 line phase" "$(read_field "$(derive_sidecar "$F")" phase)" "unknown"
+derive_sidecar "$F" >/dev/null; check_same "AC7 rc-1 line reason" "$(read_field "$_sidecar" reason)" "liveness-unreadable"
+derive_sidecar "$F" >/dev/null; check_same "AC7 rc-1 line verdict" "$(read_field "$_sidecar" verdict)" "unreadable"
+derive_sidecar "$F" >/dev/null; check_same "AC7 rc-1 line phase" "$(read_field "$_sidecar" phase)" "unknown"
 printf 'phase: BUILDING\nstate: live\n' > "$STOP_GUARD_TEST_LIVENESS"
 run_hook "$(build_payload "$F")"
 check_same "AC7 no-verdict rc" "$RC" "0"
 check_same "AC7 no-verdict stdout empty" "$OUT" ""
-check_same "AC7 no-verdict line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "liveness-unreadable"
+derive_sidecar "$F" >/dev/null; check_same "AC7 no-verdict line reason" "$(read_field "$_sidecar" reason)" "liveness-unreadable"
 # a missing stub is the same class: the spawn fails, the stop allows
 mv "$KIT/unattended.sh" "$KIT/unattended.sh.aside"
 run_hook "$(build_payload "$F")"
 check_same "AC7 no-driver rc" "$RC" "0"
-check_same "AC7 no-driver line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "liveness-unreadable"
+derive_sidecar "$F" >/dev/null; check_same "AC7 no-driver line reason" "$(read_field "$_sidecar" reason)" "liveness-unreadable"
 mv "$KIT/unattended.sh.aside" "$KIT/unattended.sh"
 
 # ---- AC8: session_crons is copied VERBATIM, and stop_hook_active appends the continuation.
 F=$(build_fixture BUILDING "$SID"); set_liveness BUILDING LIVE
 CRONS='[{"id":"c1","schedule":"*/10 * * * *","prompt":"tick"},{"id":"c2","schedule":"0 * * * *","prompt":"wake","extra":[1,2]}]'
 run_hook "$(build_payload "$F" "{\"session_crons\":$CRONS,\"stop_hook_active\":true}")"
-check_same "AC8 crons deep-equal" "$("$TESTPY" -c 'import json,sys
+derive_sidecar "$F" >/dev/null; check_same "AC8 crons deep-equal" "$("$TESTPY" -c 'import json,sys
 line=json.loads(open(sys.argv[1]).read().splitlines()[-1])
-print("same" if line["session_crons"]==json.loads(sys.argv[2]) else "differs")' "$(derive_sidecar "$F")" "$CRONS")" "same"
-check_same "AC8 line stop_hook_active" "$(read_field "$(derive_sidecar "$F")" stop_hook_active)" "true"
+print("same" if line["session_crons"]==json.loads(sys.argv[2]) else "differs")' "$_sidecar" "$CRONS")" "same"
+derive_sidecar "$F" >/dev/null; check_same "AC8 line stop_hook_active" "$(read_field "$_sidecar" stop_hook_active)" "true"
 R=$(extract_reason "$OUT")
 check_same "AC8 reason ends with the continuation" "${R##* This is a continuation the hook already blocked once.}" ""
 check_hit "$R" "This is a continuation the hook already blocked once." "AC8 continuation sentence present"
 run_hook "$(build_payload "$F")"
-check_same "AC8 absent crons is null" "$(read_field "$(derive_sidecar "$F")" session_crons)" "null"
+derive_sidecar "$F" >/dev/null; check_same "AC8 absent crons is null" "$(read_field "$_sidecar" session_crons)" "null"
 check_miss "$(extract_reason "$OUT")" "already blocked once" "AC8 the first stop carries no continuation"
 
 # ---- AC9: a sub-agent-shaped payload never binds: agent_id, then SubagentStop; and the fragment
@@ -365,7 +367,7 @@ check_same "AC9 agent_id stdout empty" "$OUT" ""
 run_hook "$(build_payload "$F" '{"hook_event_name":"SubagentStop"}')"
 check_same "AC9 SubagentStop rc" "$RC" "0"
 check_same "AC9 SubagentStop stdout empty" "$OUT" ""
-[ ! -e "$(derive_sidecar "$F")" ] && print_ok "AC9 neither wrote a line" || print_bad "AC9 a sub-agent payload wrote a line"
+derive_sidecar "$F" >/dev/null; [ ! -e "$_sidecar" ] && print_ok "AC9 neither wrote a line" || print_bad "AC9 a sub-agent payload wrote a line"
 check_same "AC9 fragment event Stop" "$(grep -c '"event": "Stop"' "$HERE/stop-guard.fragment.json")" "1"
 check_same "AC9 fragment never SubagentStop" "$(grep -c SubagentStop "$HERE/stop-guard.fragment.json")" "0"
 # unparseable stdin and an empty session_id are the same silent exit
@@ -402,24 +404,24 @@ check_hit "$R" "block 1/6" "U8-AC1 reason counts 1 of the default 6"
 check_hit "$R" "phase LANDING" "U8-AC1 reason names the phase"
 check_miss "$R" "--plan" "U8-AC1 reason never names --plan"
 check_miss "$R" "--abort" "U8-AC1 reason never names --abort"
-check_same "U8-AC1 line decision" "$(read_field "$(derive_sidecar "$F")" decision)" "block"
-check_same "U8-AC1 line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "landing-unstamped"
-check_same "U8-AC1 line phase" "$(read_field "$(derive_sidecar "$F")" phase)" "LANDING"
-check_same "U8-AC1 line verdict" "$(read_field "$(derive_sidecar "$F")" verdict)" "FINISHED-UNSTAMPED"
-check_same "U8-AC1 line crons deep-equal" "$("$TESTPY" -c 'import json,sys
+derive_sidecar "$F" >/dev/null; check_same "U8-AC1 line decision" "$(read_field "$_sidecar" decision)" "block"
+derive_sidecar "$F" >/dev/null; check_same "U8-AC1 line reason" "$(read_field "$_sidecar" reason)" "landing-unstamped"
+derive_sidecar "$F" >/dev/null; check_same "U8-AC1 line phase" "$(read_field "$_sidecar" phase)" "LANDING"
+derive_sidecar "$F" >/dev/null; check_same "U8-AC1 line verdict" "$(read_field "$_sidecar" verdict)" "FINISHED-UNSTAMPED"
+derive_sidecar "$F" >/dev/null; check_same "U8-AC1 line crons deep-equal" "$("$TESTPY" -c 'import json,sys
 line=json.loads(open(sys.argv[1]).read().splitlines()[-1])
-print("same" if line["session_crons"]==json.loads(sys.argv[2]) else "differs")' "$(derive_sidecar "$F")" "$CRONS")" "same"
+print("same" if line["session_crons"]==json.loads(sys.argv[2]) else "differs")' "$_sidecar" "$CRONS")" "same"
 # ---- U8-AC2: the cap is the shared knob — two seeded landing-unstamped lines against 2 exhaust it,
 # ---- one seeded line blocks 2/2; the seed is asserted before the feed.
 render_landingline() { printf '{"utc":"2026-09-20T00:00:00Z","session":"%s","decision":"block","reason":"landing-unstamped","phase":"LANDING","verdict":"FINISHED-UNSTAMPED","blocks":%s,"background_tasks":0,"stop_hook_active":false,"session_crons":[]}\n' "$1" "$2"; }
 F=$(build_fixture LANDING "$SID" 'STOP_GUARD_BLOCKS="2"'); set_liveness LANDING FINISHED-UNSTAMPED
-mkdir -p "$F/.git/unattended"; { render_landingline "$SID" 1; render_landingline "$SID" 2; } > "$(derive_sidecar "$F")"
-check_same "U8-AC2 two lines seeded" "$(measure_lines "$(derive_sidecar "$F")")" "2"
+derive_sidecar "$F" >/dev/null; mkdir -p "$F/.git/unattended"; { render_landingline "$SID" 1; render_landingline "$SID" 2; } > "$_sidecar"
+derive_sidecar "$F" >/dev/null; check_same "U8-AC2 two lines seeded" "$(measure_lines "$_sidecar")" "2"
 run_hook "$(build_payload "$F")"
 check_same "U8-AC2 exhausted rc" "$RC" "0"
 check_same "U8-AC2 exhausted stdout empty" "$OUT" ""
-check_same "U8-AC2 line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "blocks-exhausted"
-render_landingline "$SID" 1 > "$(derive_sidecar "$F")"
+derive_sidecar "$F" >/dev/null; check_same "U8-AC2 line reason" "$(read_field "$_sidecar" reason)" "blocks-exhausted"
+derive_sidecar "$F" >/dev/null; render_landingline "$SID" 1 > "$_sidecar"
 run_hook "$(build_payload "$F")"
 check_hit "$(extract_reason "$OUT")" "block 2/2" "U8-AC2 one seeded line blocks 2/2"
 # ---- U8-AC3: a pending background task still allows at this verdict — the harness re-invokes.
@@ -427,14 +429,14 @@ F=$(build_fixture LANDING "$SID"); set_liveness LANDING FINISHED-UNSTAMPED
 run_hook "$(build_payload "$F" '{"background_tasks":[{"id":"t1"}]}')"
 check_same "U8-AC3 background rc" "$RC" "0"
 check_same "U8-AC3 background stdout empty" "$OUT" ""
-check_same "U8-AC3 line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "background-tasks"
+derive_sidecar "$F" >/dev/null; check_same "U8-AC3 line reason" "$(read_field "$_sidecar" reason)" "background-tasks"
 # ---- U8-AC5: an UNBOUND record at LANDING never reaches the row — every pre-unit-1 record in the
 # ---- tree keeps ending its turns silently.
 F=$(build_fixture LANDING absent); set_liveness LANDING FINISHED-UNSTAMPED
 run_hook "$(build_payload "$F")"
 check_same "U8-AC5 unbound rc" "$RC" "0"
 check_same "U8-AC5 unbound stdout empty" "$OUT" ""
-[ ! -e "$(derive_sidecar "$F")" ] && print_ok "U8-AC5 unbound writes no sidecar" || print_bad "U8-AC5 unbound wrote $(derive_sidecar "$F")"
+derive_sidecar "$F" >/dev/null; [ ! -e "$_sidecar" ] && print_ok "U8-AC5 unbound writes no sidecar" || print_bad "U8-AC5 unbound wrote $_sidecar"
 
 # ---- AC18: the two bounds side by side — the default under the harness cap, the cap pinned at 8.
 check_same "AC18 BLOCKS_DEFAULT <= HARNESS_CONSECUTIVE_CAP" \
@@ -460,7 +462,7 @@ STOP_GUARD_TEST_LIVENESS_SLEEP=30 STOP_GUARD_LIVENESS_BOUND_MS=500 run_hook "$(b
 T1=$(read_now_ms)
 check_same "AC19 hung liveness rc" "$RC" "0"
 check_same "AC19 hung liveness stdout empty" "$OUT" ""
-check_same "AC19 hung liveness line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "liveness-unreadable"
+derive_sidecar "$F" >/dev/null; check_same "AC19 hung liveness line reason" "$(read_field "$_sidecar" reason)" "liveness-unreadable"
 [ $((T1 - T0)) -lt 10000 ] && print_ok "AC19 the bound fired well inside the 30 s sleep it bounded ($((T1 - T0)) ms)" || print_bad "AC19 the bound did not fire: $((T1 - T0)) ms"
 
 # ---- AC11: ONE arm against the REAL driver, on a `git init` fixture seeded by the adopter suite's
@@ -478,8 +480,8 @@ if [ -f "$FR/$KIT_REL/stop-guard.js" ] && [ -f "$FR/$KIT_REL/unattended.sh" ]; t
   OUT=$(printf '%s' "$(build_payload "$FR")" | node "$FR/$KIT_REL/stop-guard.js" 2>"$TMP/err"); RC=$?
   check_same "AC11 real-driver rc" "$RC" "0"
   check_hit "$(extract_reason "$OUT")" "block 1/6" "AC11 the real driver's open run blocks"
-  check_same "AC11 line verdict is the driver's own" "$(read_field "$(derive_sidecar "$FR")" verdict)" "$REAL_VERDICT"
-  check_same "AC11 line phase" "$(read_field "$(derive_sidecar "$FR")" phase)" "BUILDING"
+  derive_sidecar "$FR" >/dev/null; check_same "AC11 line verdict is the driver's own" "$(read_field "$_sidecar" verdict)" "$REAL_VERDICT"
+  derive_sidecar "$FR" >/dev/null; check_same "AC11 line phase" "$(read_field "$_sidecar" phase)" "BUILDING"
   # ---- TOOL-dDerivedDocket-61 AC10: an OBSERVED in-place landing, read from a LINKED worktree other
   # ---- than the one that landed it, is TERMINAL to the real driver and its stop is allowed
   # ---- `terminal`; without the line in the COMMON dir's landed log the same stop is not. The line is

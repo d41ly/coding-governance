@@ -184,6 +184,33 @@
     "ceiling": 300
   },
   {
+    "name": "shell hygiene (a fork spent on builtin work)",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/sh_hygiene.py",
+      "--spawn-idioms",
+      "memory/project/spawn-idiom-sites.txt",
+      ".",
+      ":!*.test.sh",
+      ":!memory/"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
+    "name": "spawn budget (forks per hot entrypoint)",
+    "argv": [
+      "bash",
+      "{prefix}/gate-lint/fork-count.sh",
+      "memory/project/fork-ceilings.txt",
+      "."
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 2400
+  },
+  {
     "name": "shell-hygiene selftest",
     "argv": [
       "python3",

@@ -142,7 +142,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -179,7 +180,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -1787,7 +1788,7 @@ WORK_COMMON=$RG_COMMON
 [ -n "$RG_HEALTH_LOG" ] || [ -z "$WORK_COMMON" ] || RG_HEALTH_LOG=$(derive_health_log "$WORK_COMMON")
 
 write_work_owner() { # -> $WORK/owner, one line: pid TAB common dir TAB start epoch; rc 1 when unwritten
-  printf '%s\t%s\t%s\n' "$$" "$WORK_COMMON" "${EPOCHSECONDS:-$(date +%s)}" > "$WORK/owner.tmp" 2>/dev/null \
+  printf '%s\t%s\t%s\n' "$$" "$WORK_COMMON" "$EPOCHSECONDS" > "$WORK/owner.tmp" 2>/dev/null \
     && mv -f "$WORK/owner.tmp" "$WORK/owner" 2>/dev/null
 }
 
@@ -2769,7 +2770,7 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
   printf '%s' "$BASHPID" > "$WORK/$i$sfx.pid" 2>/dev/null || true
   local argv; IFS=$'\x1f' read -ra argv <<<"${argvs[$i]}"
   case "${argv[0]}" in python|python3) argv[0]=$PYBIN ;; esac   # the manifest stores the canonical python3; run under the resolved PYBIN
-  s=$(date +%s%N)
+  s=${EPOCHREALTIME/[.,]/}000
   # legs never read stdin — deny it so a stray reader can't hang the bar. The profile's per-leg
   # timeout wraps the exec when the selected row asks for one: a leg that outlives it exits 124 and
   # is reported RED naming itself, never skipped and never green. That is a COVERAGE improvement, not
@@ -2808,7 +2809,7 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
     wait "$tpid" 2>/dev/null; rc=$?
   else "${argv[@]}" </dev/null >"$WORK/$i$sfx.raw" 2>&1; rc=$?; fi
   out=$(cat "$WORK/$i$sfx.raw" 2>/dev/null)
-  e=$(date +%s%N)
+  e=${EPOCHREALTIME/[.,]/}000
   local secs; secs=$(printf '%s.%03d' "$(( (e-s)/1000000000 ))" "$(( ((e-s)/1000000)%1000 ))")
   # THE REAP, IN THE WORKER AND BEFORE ITS COMPLETION SIGNAL (TOOL-dDerivedDocket-26 F5). Whatever the
   # timed-out leg left in its group is killed here, so by the time `.rc` exists the attempt's residue
@@ -3005,11 +3006,11 @@ nwalk=${#WALK[@]}
 disp=($ORDER); ndisp=${#disp[@]}; di=0; wi=0; next=0
 [ "$nwalk" -gt 0 ] && next=${WALK[0]}
 # per-chunk tallies, reset at each boundary
-cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_defer=0; c_t0=$(date +%s)
+cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_defer=0; c_t0=$EPOCHSECONDS
 CHUNK_ROLLUP=""
 chunk_close() {   # emit the verdict for the chunk just finished
   [ -n "$cur_chunk" ] || return 0
-  local secs=$(( $(date +%s) - c_t0 )) verdict
+  local secs=$(( $EPOCHSECONDS - c_t0 )) verdict
   if   [ "$c_fail" -gt 0 ]; then verdict="RED"
   # A CHUNK HOLDING A DEFERRED LEG IS `pending`, NEVER `green` (TOOL-dDerivedDocket-26 S2). Its leg has
   # not passed: it timed out once and waits for its serial retry, whose verdict the `---- retry:` line
@@ -3041,7 +3042,7 @@ chunk_close() {   # emit the verdict for the chunk just finished
   # line invites comparison between runs that are not comparable, which is the whole reason the
   # profiling verb records an envelope.
   CHUNK_ROLLUP="${CHUNK_ROLLUP}chunk\t${cur_chunk}\t${verdict}\t${c_ran}\t${c_fail}\t${c_skip}\t${c_reuse}\t${c_ondemand:-0}\t${secs}\n"
-  cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_defer=0; c_t0=$(date +%s)
+  cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_defer=0; c_t0=$EPOCHSECONDS
 }
 # S2. ARMED AT THE FIRST DISPATCH AND NOT AT PROCESS START. Everything above this point -- the
 # turnstile wait most of all -- is a bar waiting for its turn rather than a bar running, and a wall
@@ -3570,9 +3571,9 @@ derive_attribution() {
     A_WHY="R's argv file $f is absent at R"; return 0
   fi
   rbound=${rce:-$PROF_TIMEOUT}
-  t0=$(date +%s%N)
+  t0=${EPOCHREALTIME/[.,]/}000
   run_leg_at "$ATTR_WT" "$rbound" "$ATMP/$i.r.raw" "$i" both "${rav[@]}"; rc_r=$?
-  t1=$(date +%s%N); rsecs=$(( (t1 - t0) / 1000000000 ))
+  t1=${EPOCHREALTIME/[.,]/}000; rsecs=$(( (t1 - t0) / 1000000000 ))
   if [ -f "$WORK/wall.breach" ]; then ATTR_CUT=1; A_WHY="cut by the wall"; return 0; fi
   [ "$CEILINGS_LIVE" = 1 ] || rbound=0
   if check_ceiling_fired "$rc_r" "$rbound" "$rsecs"; then
@@ -3677,9 +3678,9 @@ check_red_at() {
   IFS="$ATTR_US" read -ra xav <<<"$A_RARGV"
   f=${xav[1]:-}
   if [ -n "$f" ] && [ -f "$f" ] && [ ! -f "$ATTR_WT/$f" ]; then return 1; fi
-  t0=$(date +%s%N)
+  t0=${EPOCHREALTIME/[.,]/}000
   run_leg_at "$ATTR_WT" "$rb" "$ATMP/$i.$tag.raw" "$i-$tag" both "${xav[@]}"; rc_x=$?
-  t1=$(date +%s%N); xsecs=$(( (t1 - t0) / 1000000000 ))
+  t1=${EPOCHREALTIME/[.,]/}000; xsecs=$(( (t1 - t0) / 1000000000 ))
   if [ -f "$WORK/wall.breach" ]; then ATTR_CUT=1; A_AGE_WHY="cut by the wall"; return 2; fi
   if check_ceiling_fired "$rc_x" "$rb" "$xsecs"; then
     A_AGE_WHY="the run at ${sha:0:8} hit its ${rb}s ceiling"; return 2

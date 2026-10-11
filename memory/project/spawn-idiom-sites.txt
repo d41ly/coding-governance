@@ -1,0 +1,310 @@
+# spawn-idiom-sites.txt — the sites the `shell hygiene (a fork spent on builtin work)` leg carries.
+# TOOL-aSparedSpawn-8.
+#
+# A row is `<path> TAB <class> TAB <count> TAB <reason>`. The key is the file and the CLASS — one of
+# `pure-fn-subst`, `printf-subst`, `cat-file`, `path-subst`, `date-fmt` or `var-pipe` — and NEVER a
+# line number, because a line-keyed registry reds on an unrelated edit above the site. The count is
+# how many sites of that class the file carries. The three BANNED classes, `epoch-date`, `cat-heredoc`
+# and `redirected-read`, take no row: the scanner refuses one rather than honouring it.
+#
+# SET EQUALITY IN BOTH DIRECTIONS, and the counts too: a measured (path, class) with no row fails, a
+# row the scan no longer finds fails, and a count that no longer matches fails, so converting a site
+# forces its count down in the same commit. The suites are rows here as well: the registry classes
+# count every tracked `*.test.sh`, so a suite site is carried rather than unseen.
+#
+# A `pure-fn-subst` row's reason names the callees it carries. A callee that keeps its substitution
+# says why — a side effect the caller's shell must not take, or a gate that reads the spelling —
+# and the rest are named as outside the reader set the landing unit converted. The leg prints every
+# row's reason on every run, green included. No total is written here: the scanner derives them.
+.githooks/pre-commit	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+.githooks/pre-commit	var-pipe	4	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+.githooks/pre-commit.test.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+.githooks/pre-commit.test.sh	printf-subst	1	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+.githooks/pre-commit.test.sh	var-pipe	6	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+.githooks/pre-push	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+.githooks/pre-push	pure-fn-subst	7	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: read_policy_key×3 green_label×2 print_kitroot_miss×2
+.githooks/pre-push	var-pipe	6	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+.githooks/pre-push.runlog.test.sh	cat-file	6	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+.githooks/pre-push.runlog.test.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+.githooks/pre-push.runlog.test.sh	printf-subst	4	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+.githooks/pre-push.runlog.test.sh	pure-fn-subst	5	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: check_shape_run×5
+.githooks/pre-push.runlog.test.sh	var-pipe	15	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+.githooks/pre-push.test.sh	cat-file	8	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+.githooks/pre-push.test.sh	pure-fn-subst	3	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: read_h49_mark×3
+.githooks/pre-push.test.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+.githooks/pre-rebase	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+.githooks/straggler-guard.sh	var-pipe	5	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+.githooks/straggler-guard.test.sh	cat-file	3	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+.githooks/straggler-guard.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+.githooks/straggler-guard.test.sh	var-pipe	7	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+skills/session-kickoff/manifest-check.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+skills/session-kickoff/manifest-check.sh	path-subst	3	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+skills/session-kickoff/manifest-check.sh	printf-subst	2	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+skills/session-kickoff/manifest-check.sh	pure-fn-subst	2	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: derive_health_log×1 render_tree_cell×1
+skills/session-kickoff/manifest-check.sh	var-pipe	5	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+skills/session-kickoff/manifest-check.test.sh	cat-file	3	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+skills/session-kickoff/manifest-check.test.sh	path-subst	8	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+skills/session-kickoff/manifest-check.test.sh	printf-subst	10	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+skills/session-kickoff/manifest-check.test.sh	pure-fn-subst	20	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: render_ready_line×19 print_route_ready×1
+skills/session-kickoff/manifest-check.test.sh	var-pipe	15	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/agent-instructions/adopt-agent-instructions.sh	path-subst	3	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/agent-instructions/adopt-agent-instructions.sh	pure-fn-subst	2	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: alias_path×2
+tools/agent-instructions/adopt-agent-instructions.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/agent-instructions/adopt-agent-instructions.test.sh	cat-file	3	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/agent-instructions/adopt-agent-instructions.test.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/agent-instructions/adopt-agent-instructions.test.sh	var-pipe	5	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-agent-cap-restatement.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-agent-cap-restatement.sh	printf-subst	1	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/check-agent-cap-restatement.sh	var-pipe	2	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-agent-cap-restatement.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-agent-cap-restatement.test.sh	var-pipe	11	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-dead-paths.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-dead-paths.sh	printf-subst	1	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/check-dead-paths.sh	pure-fn-subst	1	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: resolve_prefix_sh×1
+tools/check-dead-paths.sh	var-pipe	10	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-dead-paths.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-hook-destinations.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-hook-destinations.sh	var-pipe	10	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-hook-destinations.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-install-prefix.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-install-prefix.sh	var-pipe	2	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-install-prefix.test.sh	cat-file	1	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/check-install-prefix.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-install-prefix.test.sh	printf-subst	2	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/check-install-prefix.test.sh	var-pipe	2	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-kit-placeholders.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-kit-versions.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-line-length.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-line-length.sh	var-pipe	3	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-line-length.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-microformats.sh	var-pipe	2	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-microformats.test.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-microformats.test.sh	var-pipe	2	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-placeholders.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-placeholders.test.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-playbook-parity.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-playbook-parity.sh	var-pipe	4	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-playbook-parity.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-playbook-parity.test.sh	var-pipe	5	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-remote-literals.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-remote-literals.sh	var-pipe	3	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-remote-literals.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-spec-tokens.test.sh	path-subst	6	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-spec-tokens.test.sh	var-pipe	22	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-template-size.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-template-size.sh	var-pipe	3	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-template-size.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-template-size.test.sh	var-pipe	4	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-testsuite-counts.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-testsuite-counts.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-wiring.sh	path-subst	19	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-wiring.sh	pure-fn-subst	5	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: settings_json×5
+tools/check-wiring.sh	var-pipe	3	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/check-wiring.test.sh	cat-file	2	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/check-wiring.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/check-wiring.test.sh	pure-fn-subst	10	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: src_of×10
+tools/check-wiring.test.sh	var-pipe	162	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/codebase-map/adopt-codebase-map.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/codebase-map/adopt-codebase-map.sh	var-pipe	3	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/codebase-map/adopt-codebase-map.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/codebase-map/adopt-codebase-map.test.sh	var-pipe	10	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/drift-audit/adopt-drift-audit.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/drift-audit/adopt-drift-audit.sh	pure-fn-subst	2	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: _wf_missing×2
+tools/govkit/census.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/hooks/agent-cap.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/hooks/agent-cap.test.sh	pure-fn-subst	11	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: apay×10 render_cap_harness×1
+tools/hooks/agent-cap.test.sh	var-pipe	3	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/hooks/scratch-guard.test.sh	cat-file	11	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/hooks/scratch-guard.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/hooks/scratch-guard.test.sh	printf-subst	2	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/hooks/scratch-guard.test.sh	var-pipe	5	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/lexicon/adopt-lexicon.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+tools/lexicon/adopt-lexicon.sh	path-subst	3	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/lexicon/adopt-lexicon.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/lib/extract-arms.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/lib/extract-arms.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/lib/kit-rel.sh	path-subst	3	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/lib/lib-selftest.test.sh	cat-file	13	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/lib/lib-selftest.test.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/lib/pyrun.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/lib/resolve-python.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/lib/resolve-python.test.sh	var-pipe	8	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/lib/resolve-remote.sh	var-pipe	3	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/memory-recall/adopt-memory-recall.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-recall/recall-opened.test.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+tools/memory-recall/recall-opened.test.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-recall/recall-opened.test.sh	var-pipe	12	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/adopt-memory-tree.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/adopt-memory-tree.sh	path-subst	3	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-tree/adopt-memory-tree.sh	pure-fn-subst	3	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: FAMILY_of×3
+tools/memory-tree/adopt-memory-tree.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/check-memory-hygiene.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/check-memory-hygiene.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-tree/check-memory-hygiene.sh	printf-subst	5	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/check-memory-hygiene.sh	var-pipe	27	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/check-memory-hygiene.test.sh	cat-file	1	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/check-memory-hygiene.test.sh	path-subst	7	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-tree/check-memory-hygiene.test.sh	printf-subst	19	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/check-memory-hygiene.test.sh	pure-fn-subst	8	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: derive_bm_r3×8
+tools/memory-tree/check-memory-hygiene.test.sh	var-pipe	48	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/check-method-carriers.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-tree/check-method-carriers.sh	var-pipe	6	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/check-method-carriers.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-tree/check-verdict-epoch.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-tree/check-verdict-epoch.sh	var-pipe	3	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/check-verdict-epoch.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-tree/check-verdict-epoch.test.sh	var-pipe	4	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/hygiene-parity.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-tree/hygiene-parity.test.sh	printf-subst	5	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/hygiene-parity.test.sh	pure-fn-subst	25	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: S×25
+tools/memory-tree/kit-dogfood-parity.test.sh	path-subst	3	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-tree/marker-contract.test.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-tree/marker-contract.test.sh	printf-subst	1	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/marker-contract.test.sh	var-pipe	8	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/merge-rows.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-tree/merge-rows.test.sh	path-subst	8	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-tree/merge-rows.test.sh	printf-subst	6	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/merge-rows.test.sh	pure-fn-subst	1	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: minus×1
+tools/memory-tree/merge-rows.test.sh	var-pipe	43	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/transition-audit.test.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/memory-tree/transition-audit.test.sh	var-pipe	2	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/playbook/adopt-playbook.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/process-monitor/adopt-process-monitor.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/process-monitor/adopt-process-monitor.test.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/process-monitor/adopt-process-monitor.test.sh	printf-subst	1	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/push-main.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/push-main.sh	var-pipe	9	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/push-main.test.sh	cat-file	8	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/push-main.test.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/push-main.test.sh	var-pipe	6	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/run-gates/adopt-run-gates.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/adopt-run-gates.sh	pure-fn-subst	1	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: extract_head×1
+tools/run-gates/adopt-run-gates.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/adopt-run-gates.test.sh	var-pipe	8	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/run-gates/foreign-prefix.gov.test.sh	path-subst	6	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/foreign-prefix.gov.test.sh	var-pipe	3	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/run-gates/lib-attribute.sh	var-pipe	2	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/run-gates/profile_bar.test.sh	cat-file	2	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/run-gates/profile_bar.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/run-gates.evidence.test.sh	cat-file	11	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.evidence.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/run-gates.evidence.test.sh	var-pipe	43	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.gov.test.sh	path-subst	6	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/run-gates.runlog.test.sh	cat-file	5	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.runlog.test.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/run-gates.runlog.test.sh	printf-subst	4	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.runlog.test.sh	var-pipe	10	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.sh	cat-file	20	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.sh	date-fmt	10	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.sh	path-subst	7	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/run-gates.sh	printf-subst	1	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.sh	pure-fn-subst	7	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: derive_fail_tail×2 derive_health_log×2 prof_n×2 measure_neighbours×1
+tools/run-gates/run-gates.sh	var-pipe	6	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.test.sh	cat-file	23	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.test.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.test.sh	path-subst	10	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/run-gates.test.sh	printf-subst	2	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.test.sh	pure-fn-subst	11	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: resolve_mp_record×11
+tools/run-gates/run-gates.test.sh	var-pipe	136	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.turnstile.test.sh	cat-file	11	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.turnstile.test.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-gates.turnstile.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/run-gates.turnstile.test.sh	var-pipe	33	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-held-wsl.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-held-wsl.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/run-selftests.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-selftests.sh	path-subst	9	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/run-selftests.sh	pure-fn-subst	3	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: read_now_ms×2 read_registry_tags×1
+tools/run-gates/run-selftests.sh	var-pipe	10	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-selftests.test.sh	cat-file	1	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/run-gates/run-selftests.test.sh	path-subst	12	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/run-gates/run-selftests.test.sh	printf-subst	3	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/runlog/adopt-runlog.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/runlog/adopt-runlog.sh	var-pipe	2	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/adopt-unattended.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/adopt-unattended.sh	var-pipe	2	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/adopt-unattended.test.sh	cat-file	16	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/unattended/adopt-unattended.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/check-arms-groups.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/check-arms-groups.test.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/check-brief-recorded.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/check-brief-recorded.sh	printf-subst	1	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/unattended/check-brief-recorded.test.sh	path-subst	8	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/check-pass-order.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/check-pass-order.sh	printf-subst	1	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/unattended/check-pass-order.test.sh	path-subst	6	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/check-playbook.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/check-playbook.sh	printf-subst	1	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/unattended/check-playbook.sh	pure-fn-subst	8	declared_list and declared_scalar keep their substitution: check 28 of check-unattended.sh enumerates refusing-parser calls and key reads by the `$(declared_* ` spelling
+tools/unattended/check-playbook.sh	var-pipe	9	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/check-playbook.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/check-playbook.test.sh	printf-subst	4	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/unattended/check-playbook.test.sh	var-pipe	4	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/check-unattended.sh	cat-file	5	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/unattended/check-unattended.sh	path-subst	8	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/check-unattended.sh	printf-subst	2	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/unattended/check-unattended.sh	pure-fn-subst	1	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: resolve_shared_records×1
+tools/unattended/check-unattended.sh	var-pipe	26	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/check-unattended.test.sh	cat-file	16	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/unattended/check-unattended.test.sh	path-subst	10	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/check-unattended.test.sh	printf-subst	8	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/unattended/check-unattended.test.sh	pure-fn-subst	1	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: resolve_shared_records×1
+tools/unattended/check-unattended.test.sh	var-pipe	6	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/cross-component.test.sh	cat-file	2	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/unattended/cross-component.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/gate-guard.test.sh	cat-file	4	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/unattended/gate-guard.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/gate-guard.test.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/lib-unattended.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/lib-unattended.sh	var-pipe	6	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/resume-tick.sh	date-fmt	3	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+tools/unattended/resume-tick.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/resume-tick.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/resume-tick.test.sh	cat-file	4	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/unattended/resume-tick.test.sh	date-fmt	2	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+tools/unattended/resume-tick.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/resume-tick.test.sh	printf-subst	4	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/unattended/resume-tick.test.sh	var-pipe	18	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/run-unattended-gates.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/run-unattended-gates.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/runlog-writer.test.sh	cat-file	3	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/unattended/runlog-writer.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/runlog-writer.test.sh	printf-subst	3	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/unattended/runlog-writer.test.sh	var-pipe	8	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/stall-recorder.test.sh	cat-file	3	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/unattended/stall-recorder.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/stall-recorder.test.sh	pure-fn-subst	22	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: derive_sidecar×22
+tools/unattended/stall-recorder.test.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/stop-guard.test.sh	cat-file	3	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/unattended/stop-guard.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/stop-guard.test.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/unattended.sh	cat-file	6	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/unattended/unattended.sh	date-fmt	7	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+tools/unattended/unattended.sh	path-subst	13	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/unattended.sh	printf-subst	8	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/unattended/unattended.sh	pure-fn-subst	40	declared_list and declared_scalar keep their substitution: check 28 of check-unattended.sh enumerates refusing-parser calls and key reads by the `$(declared_* ` spelling; callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: kinds_re×7 dod×4 read_policy_key×4 directives×2 halt_codes×2 read_cli_version×2 read_hold_codes×2 review_exit_note×2 verbs_all×2 ask_sev_rank×1 derive_next_shape×1 park_kinds_unowed×1 phases×1 resolve_shared_records×1 review_state×1
+tools/unattended/unattended.sh	var-pipe	60	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/unattended/unattended.test.sh	cat-file	17	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/unattended/unattended.test.sh	date-fmt	2	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+tools/unattended/unattended.test.sh	path-subst	13	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/unattended/unattended.test.sh	printf-subst	23	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/unattended/unattended.test.sh	var-pipe	20	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/workflows/check-protocol-parity.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/workflows/check-protocol-parity.test.sh	var-pipe	2	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/workflows/check-review-join.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/workflows/check-review-join.sh	var-pipe	4	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/workflows/check-review-join.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/workflows/check-review-join.test.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/workflows/check-verifier-fanout.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/workflows/check-verifier-fanout.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/workflows/check-verifier-fanout.test.sh	path-subst	5	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/workflows/check-verifier-fanout.test.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/workflows/tier2-review.test.sh	path-subst	4	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/workflows/tier2-review.test.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/workflows/unattended-build.test.sh	cat-file	1	predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+tools/workflows/unattended-build.test.sh	path-subst	6	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+tools/workflows/unattended-build.test.sh	printf-subst	66	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+tools/workflows/unattended-build.test.sh	pure-fn-subst	28	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: build_gh33_writer×14 build_dispose×9 build_gh33_args×5
+tools/workflows/unattended-build.test.sh	var-pipe	62	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit

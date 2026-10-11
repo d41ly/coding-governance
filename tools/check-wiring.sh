@@ -287,7 +287,10 @@ add_health_event() {
 # plus the two-layout arm went RED the moment the bare rung was dropped. What the derivation buys is
 # that the PREFIXED rung is no longer a literal `tools/` that ships verbatim and resolves to nothing
 # at another prefix; the root-install rung stays, waived as it always was.
-first_of() { for c in "$@"; do [ -f "$c" ] && { echo "$c"; return; }; done; }
+# The first candidate that is a file, printed and left in `_first_of`, cleared first, so a caller
+# reads it without forking a subshell (TOOL-aSparedSpawn-8). `c` is LOCAL: run in a substitution
+# the loop variable never reached the caller, and run in this shell it must not either.
+first_of() { local c; _first_of=""; for c in "$@"; do [ -f "$c" ] && { _first_of=$c; echo "$c"; return; }; done; }
 
 # THE RECEIPT RUNG, FIRST in every list that finds a kit file (TOOL-aRepatriatedFork-19 S1). Every
 # probe above is a guess about gov's own `<prefix>/<kit>/` layout, and an adopter that homed a kit at
@@ -422,7 +425,8 @@ resolve_python() {
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -459,7 +463,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -500,7 +504,7 @@ PY=$(resolve_python 2>/dev/null) || PY=python3   # gov:literal-python — a NAME
 # deleted rather than repathed, which is what removes the class instead of moving it.
 # Resolved HERE, above the print verb, since the round-1 fold: `resolve_owned_hook` calls it.
 SMERGE_DEFAULT="${KIT_REL:+$KIT_REL/}settings-merge.py"
-SMERGE=$(first_of "$(resolve_receipt_path "" settings-merge.py)" "$SMERGE_DEFAULT" settings-merge.py); SMERGE=${SMERGE:-$SMERGE_DEFAULT}
+first_of "$(resolve_receipt_path "" settings-merge.py)" "$SMERGE_DEFAULT" settings-merge.py >/dev/null; SMERGE=$_first_of; SMERGE=${SMERGE:-$SMERGE_DEFAULT}
 
 # The print verb answers and leaves BEFORE the settings resolver and the arms run: it is a reader
 # of one fragment, and its output is compared byte-for-byte against settings-merge.py's.
@@ -728,7 +732,7 @@ check_agentcap() {
   #
   # The guard buys no waiver row: with KIT_REL empty the rung IS the bare spelling, so the
   # form the prefix gate bans never appears in the source.
-  shipped=$(first_of "$(resolve_receipt_path hooks agent-cap.js)" "$(resolve_kit_file hooks agent-cap.js)" .claude/hooks/agent-cap.js)
+  first_of "$(resolve_receipt_path hooks agent-cap.js)" "$(resolve_kit_file hooks agent-cap.js)" .claude/hooks/agent-cap.js >/dev/null; shipped=$_first_of
   if [ -z "$shipped" ]; then
     # THE MESSAGE NAMES WHAT THE PROBE ACTUALLY TRIED. It used to advertise three locations
     # for a two-rung probe, one of them a hardcoded install-prefix literal in prose that
@@ -796,7 +800,7 @@ check_scratch_guard() {
   # TWO RUNGS, the receipt and this checker's own prefix. A third, bare root spelling used to follow
   # them, a guess at a layout the derivation had already missed. A miss is now the skip below, which
   # names both rungs (TOOL-aRepatriatedFork-24 S8), and the same holds for the recall and merge arms.
-  first=$(first_of "$(resolve_receipt_path hooks scratch-guard.fragment.json)" "$(resolve_kit_file hooks scratch-guard.fragment.json)")
+  first_of "$(resolve_receipt_path hooks scratch-guard.fragment.json)" "$(resolve_kit_file hooks scratch-guard.fragment.json)" >/dev/null; first=$_first_of
   if [ -z "$first" ]; then
     local miss; miss=$(derive_receipt_miss hooks scratch-guard.fragment.json)
     echo "skip     scratch   — ${miss:-hooks kit does not ship scratch-guard.fragment.json here (no install-receipt row, and none at ${KIT_REL:+$KIT_REL/}hooks/)}"
@@ -865,7 +869,7 @@ check_recall_opened() {
   local frag smerge marker hookjs rmatcher
   # Resolved by path because the kit is COPIED: <root>/memory-recall/ in an adopter,
   # <root>/$KIT_REL/memory-recall/ in this repo.
-  frag=$(first_of "$(resolve_receipt_path memory-recall recall-opened.fragment.json)" "$(resolve_kit_file memory-recall recall-opened.fragment.json)")
+  first_of "$(resolve_receipt_path memory-recall recall-opened.fragment.json)" "$(resolve_kit_file memory-recall recall-opened.fragment.json)" >/dev/null; frag=$_first_of
   if [ -z "$frag" ]; then
     local miss; miss=$(derive_receipt_miss memory-recall recall-opened.fragment.json)
     echo "skip     recall    — ${miss:-memory-recall kit not adopted (no recall-opened.fragment.json: no install-receipt row, and none at ${KIT_REL:+$KIT_REL/}memory-recall/)}"
@@ -932,7 +936,7 @@ check_recall_opened() {
 check_card() {
   local name frag marker hooksh cmatcher found miss nfound=0 nok=0 line=""
   for name in orientation-card orientation-replay; do
-    frag=$(first_of "$(resolve_receipt_path session-kickoff "$name.fragment.json")" "skills/session-kickoff/$name.fragment.json" "${KIT_REL:+$KIT_REL/}$name.fragment.json" "$name.fragment.json")
+    first_of "$(resolve_receipt_path session-kickoff "$name.fragment.json")" "skills/session-kickoff/$name.fragment.json" "${KIT_REL:+$KIT_REL/}$name.fragment.json" "$name.fragment.json" >/dev/null; frag=$_first_of
     if [ -z "$frag" ]; then
       miss=$(derive_receipt_miss session-kickoff "$name.fragment.json")
       echo "skip     card      — ${miss:-kickoff-manifest kit does not ship $name.fragment.json here}"
@@ -1108,7 +1112,7 @@ check_merge_rows() {
   # Resolved by path because the kit is COPIED: <root>/memory-tree/ in an adopter,
   # <root>/$KIT_REL/memory-tree/ here. The remedy string is BUILT from the two resolved paths rather
   # than hand-kept, so it cannot drift from the layout it is describing.
-  drv=$(first_of "$(resolve_receipt_path memory-tree merge-rows.py)" "$(resolve_kit_file memory-tree merge-rows.py)")
+  first_of "$(resolve_receipt_path memory-tree merge-rows.py)" "$(resolve_kit_file memory-tree merge-rows.py)" >/dev/null; drv=$_first_of
   if [ -z "$drv" ]; then
     local miss; miss=$(derive_receipt_miss memory-tree merge-rows.py)
     echo "skip     merge     — ${miss:-memory-tree merge driver not adopted (no merge-rows.py: no install-receipt row, and none at ${KIT_REL:+$KIT_REL/}memory-tree/)}"
@@ -1118,7 +1122,7 @@ check_merge_rows() {
   # guaranteed to have; gov's lib-dir `pyrun.sh` is gov-internal and ships nothing, and a wiring that
   # names it in an adopting repo execs a command that cannot start. A driver that never starts never
   # writes %A, so git reports CONFLICT and leaves the path holding OURS-ONLY content with no markers.
-  launcher=$(first_of "$(dirname "$drv")/merge-rows.sh" "$(resolve_kit_file lib pyrun.sh)")
+  first_of "$(dirname "$drv")/merge-rows.sh" "$(resolve_kit_file lib pyrun.sh)" >/dev/null; launcher=$_first_of
   if [ -z "$launcher" ]; then
     echo "UNWIRED  merge     — $drv is present but no launcher is: expected $(dirname "$drv")/merge-rows.sh beside it. git would exec a command that cannot start, and a driver that never starts leaves OURS-only content with no conflict markers. Fix: re-copy the memory-tree kit"
     unwired=$((unwired+1))
@@ -1330,7 +1334,7 @@ check_merge_ours() {
 # identity. (TOOL-aLevelledCopy-2)
 check_ssh_keepalive() {
   local pm n want ka r url pre host hit="" rc scope cur why vrc
-  pm=$(first_of "$(resolve_receipt_path "" push-main.sh)" "${KIT_REL:+$KIT_REL/}push-main.sh")
+  first_of "$(resolve_receipt_path "" push-main.sh)" "${KIT_REL:+$KIT_REL/}push-main.sh" >/dev/null; pm=$_first_of
   if [ -z "$pm" ]; then
     echo "skip     ssh       — push-main is not adopted here, so no pre-push bar holds a push open"
     return
@@ -1447,9 +1451,9 @@ check_routed() {
   # GATED means a PreToolUse scratch-guard group fires on a WRITE tool (TOOL-aRoutedQuill-12 S3): the
   # Bash-only command guard and the SubagentStart context carry the same marker and gate no write.
   matchers_of scratch-guard.js '' PreToolUse 2>/dev/null | grep -qwE 'Edit|Write|MultiEdit|NotebookEdit' && gated=yes
-  arm=$(first_of "$(resolve_receipt_path memory-tree adopt-memory-tree.sh)" "$(resolve_kit_file memory-tree adopt-memory-tree.sh)")
+  first_of "$(resolve_receipt_path memory-tree adopt-memory-tree.sh)" "$(resolve_kit_file memory-tree adopt-memory-tree.sh)" >/dev/null; arm=$_first_of
   arm="bash ${arm:-<memory-tree kit>/adopt-memory-tree.sh} --arm-routing"
-  conf=$(first_of .memory-tree.conf)
+  first_of .memory-tree.conf >/dev/null; conf=$_first_of
   if [ -z "$conf" ]; then
     if [ -n "$gated" ]; then
       echo "UNWIRED  routed    — the write gate is wired here and there is no .memory-tree.conf, so no conf arms it and the write gate admits every write here. Fix: $arm"
@@ -1460,7 +1464,7 @@ check_routed() {
     return
   fi
   # The gate file the settings dispatch, resolved as the scratch arm resolves it.
-  frag=$(first_of "$(resolve_receipt_path hooks scratch-guard.fragment.json)" "$(resolve_kit_file hooks scratch-guard.fragment.json)")
+  first_of "$(resolve_receipt_path hooks scratch-guard.fragment.json)" "$(resolve_kit_file hooks scratch-guard.fragment.json)" >/dev/null; frag=$_first_of
   if ! command -v node >/dev/null 2>&1; then
     reason="no node on PATH"
   elif [ -z "$frag" ]; then
@@ -1671,7 +1675,7 @@ check_skill_install() {
 # refs for exactly that reason.
 check_backlog_stragglers() {
   local conf mode kit eng path py out rc refs ref names="" wt wtabs hp eff mark
-  conf=$(first_of .memory-tree.conf)
+  first_of .memory-tree.conf >/dev/null; conf=$_first_of
   if [ -z "$conf" ]; then
     echo "skip     straggler — no .memory-tree.conf here, so this repo declares no backlog mode"
     return
@@ -1692,7 +1696,7 @@ check_backlog_stragglers() {
   # THE RECEIPT RUNG FIRST, as in every other arm that finds a kit file (TOOL-aRepatriatedFork-19):
   # the two probes after it are guesses about gov's layout, and an adopter that homed the kit where
   # neither spells it read `not installed` over an installed kit (merge-2 skeptic F4).
-  path=$(first_of "$(resolve_receipt_path "$kit" "$eng")" "${KIT_REL:+$KIT_REL/}$kit/$eng" "$kit/$eng")
+  first_of "$(resolve_receipt_path "$kit" "$eng")" "${KIT_REL:+$KIT_REL/}$kit/$eng" "$kit/$eng" >/dev/null; path=$_first_of
   if [ -z "$path" ]; then
     local miss; miss=$(derive_receipt_miss "$kit" "$eng")
     # The default reason sits in its own assignment: an apostrophe inside `${miss:-…}` within double

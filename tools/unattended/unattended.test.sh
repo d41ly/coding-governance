@@ -3124,7 +3124,7 @@ n=$((n+1)); grep -q 'check-playbook.sh" --counts "$_pb" "$slug" "$_at"' "$SCRIPT
 # ...and the pin is BOUND AND CHECKED before the call rather than passed straight through. `fact`
 # returns empty with exit 0 for an absent key, so an unvalidated pass-through is how an absent BASE
 # reached the leg as "no pin" — round 3, HIGH 2.
-n=$((n+1)); grep -q '_at=$(fact "$rel" base)' "$SCRIPT" \
+n=$((n+1)); grep -q 'fact "$rel" base >/dev/null; _at=$_fact' "$SCRIPT" \
   || { echo "FAIL the close does not bind the BASE before calling, so an absent fact reaches the leg as no pin at all"; st=1; }
 # POINTED AT THE FILE THAT HELD THEM. Round 3, HIGH 5: this grepped the DRIVER, where those names
 # never existed — 0 hits at the pre-fix base too, so it could not fail. They lived in the LEG, six
@@ -13825,7 +13825,7 @@ h9_dir=$(mktemp -d)
     && printf -- '---\nslug: tRun\nroster: ARCH\n---\n' > memory/builds/tRun/README.md \
     && printf 'HELD_CI_WORKFLOW=""\n' > .unattended.conf && git add -A && git commit -q -m blank --no-verify ) >/dev/null 2>&1
 slice_fn write_held_asks; slice_fn read_policy_key; slice_fn read_roster_family
-readme_of() { printf '%s/builds/%s/README.md' "$M" "$1"; }
+readme_of() { _readme="$M/builds/$1/README.md"; printf '%s' "$_readme"; }
 read_leg_argv() { return 1; }
 derive_ask_seq() { printf '7'; }
 read_held_reds() { echo "$2" >> "$h9_dir/.git/h9-calls"; [ -z "$H9_ROWS" ] || printf '%s\n' "$H9_ROWS"; echo "held reader: run 9 at stub · 4 held job(s) read · 3 red"; }
@@ -15686,9 +15686,9 @@ remove_claim_refs; reset_tree
 # ---- TOOL-aGraftedHelix-37: breaking a stale `claim-push.lock` is a step ONE writer wins. The three
 # ---- lock functions are EXTRACTED from the shipped driver and driven over plain directories, never a
 # ---- copy typed here, and an empty extraction fails naming the function. The race runs two writers
-# ---- over a stale lock, the second's `date` waiting (bounded 10 s) for the first's verdict and the
+# ---- over a stale lock, the second's guard `mkdir` waiting (bounded 10 s) for the first's verdict and the
 # ---- first starting once the second waits: the order that let both in on unit 36's inline break.
-# ---- A writer's `date`, `find` and `rm` are SHIMS first on its own PATH, never shell functions: a
+# ---- A writer's `mkdir`, `find` and `rm` are SHIMS first on its own PATH, never shell functions: a
 # ---- function named for a command is a lexicon verb offender, and assigning PATH clears the hash.
 # ---- Every arm's staged break is a `mutate` of the extracted copy, sourced only inside a `$( )`, so
 # ---- the suite's own shell keeps the clean functions; the block unsets them and re-sources the
@@ -15705,26 +15705,31 @@ resolve_health_log() { echo "$gh_d/health"; }
 add_health_event() { echo "$3" >> "$1"; }
 # shellcheck disable=SC1090
 . "$gh_fn"
-GH37_DATE=$(command -v date); GH37_FIND=$(command -v find); GH37_RM=$(command -v rm)
-export GH37_DATE GH37_FIND GH37_RM
+GH37_FIND=$(command -v find); GH37_RM=$(command -v rm); GH37_MKDIR=$(command -v mkdir)
+export GH37_FIND GH37_RM GH37_MKDIR
 mkdir -p "$gh_d/bin-race2" "$gh_d/bin-inter1" "$gh_d/bin-inter2"
-# The race's second writer: its `date` marks `in2`, then waits for the first writer's verdict.
-cat > "$gh_d/bin-race2/date" <<'GH37'
+# THE CLOCK READ FORKS NOTHING NOW: the staleness rule reads `$EPOCHSECONDS`, so no `date` runs inside
+# it to hook (TOOL-aSparedSpawn-8). Each pause sits on the first command the writer runs AFTER the
+# verdict it used to pause inside, which is the same interleaving: the verdict is already taken.
+# The race's second writer: its `mkdir` of the GUARD, the step after its first staleness verdict,
+# marks `in2`, then waits for the first writer's verdict. Its `mkdir` of the lock passes through.
+cat > "$gh_d/bin-race2/mkdir" <<'GH37'
 #!/usr/bin/env bash
-: > "$GH37_X/in2"; i=0; while [ ! -e "$GH37_X/v1" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
-exec "$GH37_DATE" "$@"
+case "${!#}" in
+  *.break) : > "$GH37_X/in2"; i=0; while [ ! -e "$GH37_X/v1" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done ;;
+esac
+exec "$GH37_MKDIR" "$@"
 GH37
-# The interleaving's first writer: its SECOND `date`, the re-read under a guard it holds, marks `in1`
-# and waits for writer 2's verdict.
-cat > "$gh_d/bin-inter1/date" <<'GH37'
+# The interleaving's first writer: its `rm` of the LOCK, the step after the re-read under a guard it
+# holds, marks `in1` and waits for writer 2's verdict. Its `rm` of an aged guard passes through.
+cat > "$gh_d/bin-inter1/rm" <<'GH37'
 #!/usr/bin/env bash
-if [ -e "$GH37_X/d1" ]; then
-  : > "$GH37_X/in1"; i=0
-  while [ ! -e "$GH37_X/v2" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
-else
-  : > "$GH37_X/d1"
-fi
-exec "$GH37_DATE" "$@"
+case "${!#}" in
+  *.break) ;;
+  *) : > "$GH37_X/in1"; i=0
+     while [ ! -e "$GH37_X/v2" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done ;;
+esac
+exec "$GH37_RM" "$@"
 GH37
 # ...and its second writer: `find` marks the guard's age read, `rm` waits for writer 1 to act first.
 cat > "$gh_d/bin-inter2/find" <<'GH37'
@@ -15736,7 +15741,7 @@ cat > "$gh_d/bin-inter2/rm" <<'GH37'
 i=0; while [ ! -e "$GH37_X/in1" ] && [ ! -e "$GH37_X/v1" ] && [ "$i" -lt 100 ]; do sleep 0.1; i=$((i+1)); done
 exec "$GH37_RM" "$@"
 GH37
-chmod +x "$gh_d/bin-race2/date" "$gh_d/bin-inter1/date" "$gh_d/bin-inter2/find" "$gh_d/bin-inter2/rm"
+chmod +x "$gh_d/bin-race2/mkdir" "$gh_d/bin-inter1/rm" "$gh_d/bin-inter2/find" "$gh_d/bin-inter2/rm"
 measure_gh37_race() { # functions file -> `<trials two writers took the lock> <trials exactly one did>`, of five
   local t x lk p i two=0 one=0
   . "$1"
@@ -15819,7 +15824,7 @@ mutate "$gh_cp" 's/\[ "\$o" = "\$2" \] && //'
 same "GH37 AC5 a copy with the owner comparison cut removes another writer's lock" "$( . "$gh_cp"; mkdir -p "$gh_lk"; echo w-other > "$gh_lk/owner"
   remove_claim_push_lock "$gh_lk" w-me; [ -d "$gh_lk" ] && echo kept || echo gone )" "gone"
 unset -f check_claim_push_lock_stale write_claim_push_lock remove_claim_push_lock measure_gh37_race measure_gh37_interleave
-unset REMOTE_BOUND GH37_DATE GH37_FIND GH37_RM
+unset REMOTE_BOUND GH37_FIND GH37_RM GH37_MKDIR
 # shellcheck source=lib-unattended.sh
 . "$HERE/lib-unattended.sh"
 rm -rf "$gh_d"

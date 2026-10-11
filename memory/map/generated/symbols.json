@@ -2338,6 +2338,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_spawn_measured",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "build_spec_commit_repo",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -2501,6 +2506,11 @@
       "id": "build_unnamed_why",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "build_unquoted",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "build_usage",
@@ -3093,6 +3103,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_budgets",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
       "id": "check_build_backlog",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -3101,6 +3116,11 @@
       "id": "check_built_from_history",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "check_calibration",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
     },
     {
       "id": "check_calls_invariant",
@@ -3988,6 +4008,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "check_pure_body",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "check_pytest_ini_probe",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -4306,6 +4331,11 @@
       "id": "check_spawn",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "check_spawn_substitution",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "check_spec_audit",
@@ -8893,6 +8923,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "measure_forks",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
       "id": "measure_gh37_interleave",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -10153,6 +10188,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_contributors",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
       "id": "print_corpus",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
@@ -10391,6 +10431,11 @@
       "id": "print_size_note",
       "kind": "function",
       "file": "tools/agent-instructions/adopt-agent-instructions.sh"
+    },
+    {
+      "id": "print_spawn_populations",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "print_spec_audit_line",
@@ -10983,6 +11028,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_budgets",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
       "id": "read_build_slug",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -11061,6 +11111,11 @@
       "id": "read_closing_evidence",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_code_lines",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "read_commit_paths",
@@ -11346,6 +11401,11 @@
       "id": "read_fork_cutoff",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "read_function_bodies",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "read_gate",
@@ -12228,6 +12288,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_shell_sources",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "read_signal_table_names",
       "kind": "function",
       "file": "tools/drift-audit/drift_signals.py"
@@ -12386,6 +12451,11 @@
       "id": "read_su_sum",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_substitution",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "read_suggestion",
@@ -16530,6 +16600,11 @@
     {
       "id": "run_selftest",
       "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
@@ -16586,6 +16661,11 @@
       "id": "run_sp_verb",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "run_spawn_scan",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "run_spec_commit_block",
@@ -16656,6 +16736,11 @@
       "id": "run_traced",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
+    },
+    {
+      "id": "run_traced",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
     },
     {
       "id": "run_traced",
@@ -17271,6 +17356,16 @@
       "id": "scan_slot_budget",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "scan_spawn_file",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "scan_spawn_tree",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "scan_spec_adds",
@@ -20846,6 +20941,11 @@
       "id": "write_spec",
       "kind": "function",
       "file": "tools/unattended/check-pass-order.test.sh"
+    },
+    {
+      "id": "write_specimen",
+      "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
     },
     {
       "id": "write_staged",

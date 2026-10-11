@@ -130,7 +130,8 @@ resolve_sidecar_dir() { # -> <git-dir>/unattended, or nothing when the git dir c
 # read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
 # prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
 resolve_kit_dir() {
-  "$1" -c "$(cat <<'RKD'
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -167,7 +168,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 RKD
-)"'
+  "$1" -c "${_rkd%$'\n'}"'
 import sys
 try:
     d = resolve_kit_dir(*sys.argv[1:4])
@@ -881,7 +882,7 @@ read_brief_paths() {  # commit · unit · run-state-path
   _rb_f=$(mktemp) || { printf 'lib-unattended: read_brief_paths cannot create a scratch file, so it cannot say which paths a brief row declared\n' >&2; return 2; }
   _rb_b=$(mktemp) || { rm -f "$_rb_f"; printf 'lib-unattended: read_brief_paths cannot create a scratch file, so it cannot say which paths a brief row declared\n' >&2; return 2; }
   GIT show "$1:$3" >"$_rb_f" 2>/dev/null || :
-  _rb_d=$(normpath "$3"); _rb_d=${_rb_d%/*}/prompts/
+  normpath "$3" >/dev/null; _rb_d=$_np; _rb_d=${_rb_d%/*}/prompts/
   # THE `|| [ -n … ]` REPLACES A GUARANTEE THE HEREDOC GAVE FREE. Command substitution stripped the
   # trailing newlines and the heredoc put exactly one back, so every line was terminated; a FILE may
   # end without one, and a bare `read` drops that last line. Without this the repair would silently
@@ -890,7 +891,7 @@ read_brief_paths() {  # commit · unit · run-state-path
   while IFS= read -r _rb_r || [ -n "$_rb_r" ]; do
     case "$_rb_r" in *" brief · item $2 · reason "*) ;; *) continue ;; esac
     _rb_r=${_rb_r#* · reason }
-    _rb_h=${_rb_r%% *}; _rb_p=$(normpath "${_rb_r#* }")
+    _rb_h=${_rb_r%% *}; normpath "${_rb_r#* }" >/dev/null; _rb_p=$_np
     case "$_rb_h" in [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;; *) continue ;; esac
     case "$_rb_p" in "$_rb_d"?*) ;; *) continue ;; esac
     GIT rev-parse --verify --quiet "$1:$_rb_p" </dev/null >"$_rb_b" 2>/dev/null || continue
@@ -2134,6 +2135,6 @@ read_id_list_refusals() { # IDLIST value -> every refused token and why, on ONE 
 # names its home this way, which is what lets the P5 refusal say WHERE to go and look. MOVED HERE
 # from the driver with the expander above, and for the same reason: the leg reads the same blob per
 # home and a second spelling of "which folder" would send the two readers at different files.
-ask_home_of() { # ask id -> the slug segment
-  local _t="${1#*-}"; printf '%s' "${_t%-*}"
+ask_home_of() { # ask id -> the slug segment, printed and left in `_ask_home` (TOOL-aSparedSpawn-8)
+  local _t="${1#*-}"; _ask_home=${_t%-*}; printf '%s' "$_ask_home"
 }
