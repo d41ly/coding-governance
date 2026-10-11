@@ -75,14 +75,14 @@ ids KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHoo
 | [TOOL-aTrimmedHook-3 — `commit-msg` starts the unattended driver only when a run names the branch](spec/2026-10-11-spec-TOOL-aTrimmedHook-3.md) | 1 | 1 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aTrimmedHook-2 — the staged hygiene leg spends no process on a check its staged set cannot reach](spec/2026-10-11-spec-TOOL-aTrimmedHook-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aTrimmedHook-4 — the staged classifier reads the index the hook was handed](spec/2026-10-11-spec-TOOL-aTrimmedHook-4.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-11 |
-| [TOOL-aTrimmedHook-6 — the hygiene-side minors of the closing review, batched](spec/2026-10-11-spec-TOOL-aTrimmedHook-6.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-11 |
+| [TOOL-aTrimmedHook-6 — the hygiene-side minors of the closing review, batched](spec/2026-10-11-spec-TOOL-aTrimmedHook-6.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aTrimmedHook-5 — under LIVE_LANDED_UNCLOSED the classifier renders when anything outside its pathspec is staged](spec/2026-10-11-spec-TOOL-aTrimmedHook-5.md) | 4 | 2 | SPECCED | rev-1 | 2026-10-11 |
 | [TOOL-aTrimmedHook-7 — the generator and manifest-check minors of the closing review, batched](spec/2026-10-11-spec-TOOL-aTrimmedHook-7.md) | 5 | 2 | SPECCED | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 4 record folder(s).
+Records: 14 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-6 TOOL-aTrimmedHook-7.
+Ids no record names: TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-7.
 
 Ids no `spec-audit` record has ever named: KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3 TOOL-aTrimmedHook-4 TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-6 TOOL-aTrimmedHook-7.
 <!-- /gen:build-index -->

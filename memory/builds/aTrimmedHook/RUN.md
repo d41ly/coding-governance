@@ -63,3 +63,9 @@ base: 2785323db4e72b8ae2f26660cc3947165a6258fc
 2026-10-11T07:42:34Z dispatch · item 5b871c5f TOOL-aTrimmedHook-4 · reason tools/memory-tree/gen_build_index.py memory/map/generated/symbols.json memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-4.md memory/builds/aTrimmedHook/README.md memory/builds/aTrimmedHook/build/2026-10-11-build-TOOL-aTrimmedHook-4-1-acceptance-ledger.md memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-4-1-build-brief.md
 
 2026-10-11T07:42:55Z brief · item TOOL-aTrimmedHook-4 · reason 59a1ac36a9af memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-4-1-build-brief.md
+
+2026-10-11T07:54:16Z brief · item TOOL-aTrimmedHook-5 · reason 819d41228a06 memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-5-1-build-brief.md
+
+2026-10-11T07:57:08Z dispatch · item c02feae8 TOOL-aTrimmedHook-6 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh memory/guides/SESSION-KICKOFF.md memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-6.md memory/builds/aTrimmedHook/README.md memory/builds/aTrimmedHook/build/2026-10-11-build-TOOL-aTrimmedHook-6-1-acceptance-ledger.md memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-6-1-build-brief.md
+
+2026-10-11T07:57:14Z brief · item TOOL-aTrimmedHook-6 · reason 5a5f12033613 memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-6-1-build-brief.md

@@ -1536,6 +1536,64 @@ grep -qF 'memory/archive/DECISIONS.2026-08-01.md (not referenced' <<<"$outna" \
   || { echo "FAIL --staged did not run check 10 on a STAGED archive its live index does not reference"; st=1; }
 git reset -q && git checkout -q -- memory/archive/DECISIONS.2026-08-01.md
 
+# ---- TOOL-aTrimmedHook-6: the closing review's hygiene-side minors. Each arm commits its fixture,
+# ---- stages one change, and resets to the commit before it, so the tree above is untouched.
+# A CLONE of the fixture's committed state, so nothing this block does reaches the tree the arms
+# below read; the block returns to the fixture root when it ends.
+_u6dir="$TMP/u6clone"
+git clone -q . "$_u6dir" && cd "$_u6dir" || { echo "FAIL the TOOL-aTrimmedHook-6 block could not clone its fixture"; st=1; }
+git config core.autocrlf false; git config user.email t@t.test; git config user.name t
+_u6base=$(git rev-parse HEAD)
+# AC1 (M1) — dropping a grandfather row is a staged edit that makes a committed name wrong.
+printf '# free\n' > "$D/build/free-notes.md"
+printf '# legacy\n%s\n' "$D/build/free-notes.md" > memory/project/legacy-files.txt
+git add -A >/dev/null 2>&1; git commit -q -m u6legacy --no-verify
+printf '# legacy\n' > memory/project/legacy-files.txt
+git add memory/project/legacy-files.txt
+outu1=$(bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -A3 -F 'HYGIENE check 5 FAILED' <<<"$outu1" | grep -qF "$D/build/free-notes.md" \
+  || { echo "FAIL --staged did not grade names when the grandfather list was staged"; st=1; }
+n=$((n+1))
+grep -qF 'grades the whole tree on this commit' <<<"$outu1" \
+  || { echo "FAIL --staged did not announce the whole-tree grading for a staged grandfather list"; st=1; }
+git reset -q --hard "$_u6base"
+# AC2 (M2) — a rename of a listed file, with the list itself unstaged, runs the stale-line guard.
+printf '# old\n' > "$D/build/legacy-old.md"
+printf '# legacy\n%s\n' "$D/build/legacy-old.md" > memory/project/legacy-files.txt
+git add -A >/dev/null 2>&1; git commit -q -m u6rename --no-verify
+git mv "$D/build/legacy-old.md" "$D/build/2026-08-01-build-tFixture-90.md"
+outu2=$(bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -A3 -F 'legacy-files.txt lists paths that no longer exist (stale-line guard)' <<<"$outu2" | grep -qF "$D/build/legacy-old.md" \
+  || { echo "FAIL --staged held the stale-line guard over a staged rename of a listed path"; st=1; }
+git reset -q --hard "$_u6base"
+# AC3 (L3) — the check 9 relay: a no-id edit to a non-structural file skips, and says so; a new id renders.
+printf '\nno id on this line\n' >> memory/DECISIONS.md
+git add memory/DECISIONS.md
+outu3=$(bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF 'memory-hygiene: check 9: render SKIPPED under --staged' <<<"$outu3" \
+  || { echo "FAIL --staged did not relay check 9's SKIPPED line for a no-id edit"; st=1; }
+git reset -q --hard "$_u6base"
+printf '\ncites ARCH-tFixture-77 now\n' >> memory/DECISIONS.md
+git add memory/DECISIONS.md
+outu4=$(bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF 'check 9: render SKIPPED' <<<"$outu4" \
+  && { echo "FAIL --staged skipped check 9 on an edit citing a new id"; st=1; }
+git reset -q --hard "$_u6base"
+# AC4 (L4) — a rename through the three-field parse grades the NEW name. Into ANOTHER build folder, so
+# a parse keyed on the old path would narrow to the old folder and never see the new one.
+mkdir -p memory/builds/tMoved/spec
+git mv "$D/spec/2026-08-01-spec-tFixture-4.md" "memory/builds/tMoved/spec/renamed-badly.md"
+outu5=$(bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -A3 -F 'HYGIENE check 5 FAILED' <<<"$outu5" | grep -qF "memory/builds/tMoved/spec/renamed-badly.md" \
+  || { echo "FAIL --staged did not grade the NEW name of a staged rename"; st=1; }
+git reset -q --hard "$_u6base"
+cd "$TMP" || exit 2
+
 # ---- SOURCE-level assertions. These three hazards cannot be reached by any fixture on this
 # ---- platform, so they are asserted against the engine's text instead.
 #
@@ -3890,7 +3948,9 @@ esac
 # never skipped, because that fixture needs no sibling kit.
 # RAISED 552 -> 562 by TOOL-aTrimmedHook-2: its ten narrowed-staged-leg arms, each top-level and
 # never skipped, observed through a slice of the fixture prologue and the new block.
-FLOOR_ASSERTIONS=562
+# RAISED 562 -> 568 by TOOL-aTrimmedHook-6: its six staged-minors arms, each top-level and never
+# skipped, run in a clone of the fixture and observed through a slice.
+FLOOR_ASSERTIONS=568
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

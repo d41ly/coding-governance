@@ -514,15 +514,23 @@ declare -A STAGED_SET
 # DELETION is graded by nothing here, as before (`--diff-filter=ACMR`). FILES_ALL keeps the whole
 # listing for check 10, which resolves an archive's live index across the tree.
 STAGED_MD=""; STAGED_NEW=""
+# TOOL-aTrimmedHook-6. THE CONF rides the same call and stays out of STAGED_MD: it and the grandfather
+# list decide which NAMES pass, so a commit staging either is graded over the whole listing, as before
+# the narrowing. `-M` keeps a rename an `R` row for an adopter whose diff.renames is off, and a renamed
+# SOURCE that a registry lists arms the stale-line guard below, as a staged list does.
+_NAMES_WHOLE=""; _RENAMED_LISTED=""
 if [ "$STAGED" = 1 ]; then
   declare -A _SBUILD
   while IFS=$'\t' read -r _st _p1 _p2; do
     [ -n "$_st" ] || continue
     _l=${_p2:-$_p1}
+    if [ "$_l" = .memory-tree.conf ]; then _NAMES_WHOLE=1; continue; fi
+    case "$_st" in R*) [ -z "${LEGACY_SET[$_p1]+x}${DEBT_SET[$_p1]+x}" ] || _RENAMED_LISTED=1 ;; esac
     STAGED_SET["$_l"]=1
     case "$_st" in A*|C*|R*) STAGED_NEW+="$_l"$'\n' ;; esac
     case "$_l" in "$M"/builds/*/*) _b=${_l#"$M"/builds/}; _SBUILD["${_b%%/*}"]=1 ;; esac
-  done <<<"$(git diff --cached --name-status --diff-filter=ACMR -- "$M/**")"
+  done <<<"$(git diff --cached --name-status --diff-filter=ACMR -M -- "$M/**" .memory-tree.conf)"
+  [ -z "${STAGED_SET[$M/project/legacy-files.txt]+x}" ] || _NAMES_WHOLE=1
   FILES=""
   while IFS= read -r _l; do
     [ -n "$_l" ] || continue
@@ -530,14 +538,20 @@ if [ "$STAGED" = 1 ]; then
     case "$_l" in "$M"/builds/*/*) _b=${_l#"$M"/builds/}; [ -n "${_SBUILD[${_b%%/*}]+x}" ] && FILES+="$_l"$'\n' ;; esac
   done <<<"$FILES_ALL"
   FILES=${FILES%$'\n'}; STAGED_MD=${STAGED_MD%$'\n'}; STAGED_NEW=${STAGED_NEW%$'\n'}
-  echo "memory-hygiene: --staged grades the staged files and their own build folders, not the whole tree; the push-boundary run grades the whole tree"
+  if [ -n "$_NAMES_WHOLE" ]; then
+    FILES=$FILES_ALL
+    echo "memory-hygiene: --staged grades the whole tree on this commit — it stages the grandfather list or the conf, which decide which names pass"
+  else
+    echo "memory-hygiene: --staged grades the staged files and their own build folders, not the whole tree; the push-boundary run grades the whole tree"
+  fi
 fi
 in_scope() { [ "$STAGED" = 0 ] && return 0; [ -n "${STAGED_SET[$1]+x}" ]; }   # zero-fork (see LEGACY_SET)
 
-# CHECKS 1, 3, 4 AND 5 GRADE PATH NAMES (TOOL-aTrimmedHook-2). A commit can make one wrong only by
-# staging a NEW name, so under --staged they run when STAGED_NEW holds one, and say so when not.
+# CHECKS 1, 3, 4 AND 5 GRADE PATH NAMES (TOOL-aTrimmedHook-2). A commit makes one wrong by staging a NEW
+# name, or by staging what decides which names pass: the grandfather list or the conf, which grade the
+# whole listing instead (TOOL-aTrimmedHook-6). Otherwise they are skipped under --staged, and say so.
 NAMES_GRADED=1
-if [ "$STAGED" = 1 ] && [ -z "$STAGED_NEW" ]; then
+if [ "$STAGED" = 1 ] && [ -z "$STAGED_NEW" ] && [ -z "$_NAMES_WHOLE" ]; then
   NAMES_GRADED=0
   echo "memory-hygiene: checks 1, 3, 4 and 5 grade path names, and this commit stages no new name; the push-boundary run grades them"
 fi
@@ -1161,7 +1175,10 @@ if [ "$STAGED" = 0 ] || [ -n "$STAGED_MD" ]; then
   if ! drift=$("$_PY" "$HERE/gen_build_index.py" "${_c9[@]}" 2>&1); then fail 9 "generated build index differs from a fresh render:
 $drift"
   else
-    case "$drift" in "build-index: render SKIPPED"*) printf 'memory-hygiene: check 9: %s\n' "${drift#build-index: }" ;; esac
+    # Per LINE (TOOL-aTrimmedHook-6): a warning printed first on the merged stream must not hide the skip.
+    while IFS= read -r _c9l; do
+      case "$_c9l" in "build-index: render SKIPPED"*) printf 'memory-hygiene: check 9: %s\n' "${_c9l#build-index: }"; break ;; esac
+    done <<<"$drift"
   fi
 fi
 
@@ -2725,11 +2742,11 @@ fi
 # One `git ls-files` + set lookups, NOT `git ls-files --error-unmatch` per path — git is a heavyweight
 # fork, so a long grandfather list was one spawn per line (~80s at adopter ic's 522 lines). Entries are
 # literal paths, never globs, so exact membership in the tracked set is equivalent.
-# UNDER --staged IT RUNS ONLY WHEN ONE OF ITS TWO LISTS IS STAGED (TOOL-aTrimmedHook-2): a commit that
-# stages neither can only make a listed path stale by DELETING it, and --staged grades no deletion. The
-# whole-repo listing it builds is the one process here that reads beyond the memory tree.
+# UNDER --staged IT RUNS ONLY WHEN ONE OF ITS TWO LISTS IS STAGED, OR A STAGED RENAME'S SOURCE IS LISTED
+# (TOOL-aTrimmedHook-2, -6): a commit doing neither can make a listed path stale only by DELETING it, and
+# --staged grades no deletion. The whole-repo listing it builds reads beyond the memory tree.
 _C5L=1
-if [ "$STAGED" = 1 ] && [ -z "${STAGED_SET[$M/project/legacy-files.txt]+x}${STAGED_SET[$M/project/curation-debt.txt]+x}" ]; then
+if [ "$STAGED" = 1 ] && [ -z "$_RENAMED_LISTED" ] && [ -z "${STAGED_SET[$M/project/legacy-files.txt]+x}${STAGED_SET[$M/project/curation-debt.txt]+x}" ]; then
   _C5L=0
   [ -z "$LEGACY$DEBT" ] || echo "memory-hygiene: the legacy/debt stale-line guard is HELD under --staged — neither list file is staged; the push-boundary run grades both"
 fi
