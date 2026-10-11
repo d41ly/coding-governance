@@ -201,6 +201,16 @@ Workflow review harnesses — one pipeline, three implementations, one hardened
 - gotcha-classes 3: `degradation-known-but-unreported.md`, `node-check-is-not-a-syntax-gate.md`, `observed-by-claim-no-arm-discharges.md`
 - globs 1: `tools/workflows/*`
 
+## roles
+
+The role catalogue: one owner-editable agent definition per role with an empty house overlay beside it, the table of the workflows a governed session runs it...
+
+- status `building` · streams `tooling` · dossier `memory/map/features/roles.md`
+- decisions 1: `TOOL-aOrientedCast-1`
+- gate-legs 1: `roles catalogue`
+- kits 1: `roles`
+- globs 1: `tools/roles/**`
+
 ## row-grammar
 
 Check 20: id collisions inside a single row document

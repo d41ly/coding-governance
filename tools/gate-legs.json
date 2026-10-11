@@ -1580,6 +1580,16 @@
     "ceiling": 180
   },
   {
+    "name": "roles catalogue",
+    "argv": [
+      "python",
+      "{prefix}/roles/check_roles.py"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120
+  },
+  {
     "name": "leg ceilings clear their evidenced maximum",
     "argv": [
       "python",

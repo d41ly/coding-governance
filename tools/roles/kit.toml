@@ -1,0 +1,16 @@
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/.
+# Contract: memory/builds/aOrientedCast/spec/2026-10-11-spec-TOOL-aOrientedCast-1.md
+
+id = "roles"
+home = "roles"
+scope = "repo"
+
+# The checker reads `.memory-tree.conf` for the governing doc (CHARTER), and a role body points at
+# the memory tree's own documents through {{MEMORY_ROOT}}.
+requires = ["memory-tree"]
+
+# Pinned at the library module, which lands in the SAME unit as this descriptor.
+version_from = { file = "roles_lib.py", pattern = "^KIT_ROLES_VERSION = " }
+
+# IDENTITY ONLY. No [[files]] row yet: each file's govkit role (the house overlays ship as `seed`)
+# and the registry entry arrive with the unit that wires this kit into the deployer.
