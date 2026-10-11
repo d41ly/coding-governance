@@ -146,7 +146,8 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=115
+FLOOR_ASSERTIONS=129
+# RAISED 115 -> 129 by TOOL-aSparedSpawn-1: the content-keyed reuse arms, AC1 to AC6, fourteen assertions.
 # MERGED 112 / 87 -> 115 at the reconcile with origin/main 290d0d2d5: base 84, plus this branch's 28, plus main's 3.
 # RAISED 110 -> 112 by TOOL-aGraftedHelix-7: AC10's two assertions over a reading taken during a memory pause.
 # RAISED 84 -> 87 by TOOL-dThriftyLanding-2: the shared-stamp control and its two assertions.
@@ -972,6 +973,89 @@ rm -f "$RU_GD/gate-full-green"
 ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
 [ -f "$RU_GD/gate-full-green" ] && nope "a run that reused legs stamped a full green" \
                                || ok "a run that reused ANY leg does not stamp a full green"
+ru_done
+
+# THE KEY TAKES WHAT A DIRTY GUARDED FILE HOLDS (TOOL-aSparedSpawn-1). A porcelain line reads ` M ga/f`
+# after the first unstaged edit and after the second, so a key built from it hands the second edit the
+# green the first one earned. Each arm keeps the reuse control on the untouched sibling.
+ru_repo
+echo e1 > "$RU_T/ga/f"
+ru_run GATE_FULL=1 >/dev/null
+echo e2 > "$RU_T/ga/f"
+ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+grep -q '^GATE ok    pa' "$REC_OUT" && ok "AC1 a second unstaged edit to a guarded file is NOT reused" \
+                                    || nope "AC1 a guarded leg was reused across two different unstaged edits — the key read the status line"
+grep -q '^GATE reuse pb' "$REC_OUT" && ok "AC1 control: the untouched leg on that dirty tree WAS reused" \
+                                    || nope "AC1 nothing was reused on the dirty tree, so the arm above proves nothing"
+ru_done
+
+# A FILE INSIDE A NEW UNTRACKED DIRECTORY. The default status mode reports `?? ga/new/` before and after
+# its content changes, so only a walk with `--untracked-files=all` sees the edit.
+ru_repo
+ru_run GATE_FULL=1 >/dev/null
+mkdir -p "$RU_T/ga/new"; echo n1 > "$RU_T/ga/new/f"
+ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+grep -q '^GATE ok    pa' "$REC_OUT" && ok "AC2 a new untracked file under a guard runs its leg" \
+                                    || nope "AC2 a leg was reused although an untracked file appeared under its guard"
+echo n2 > "$RU_T/ga/new/f"
+ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+grep -q '^GATE ok    pa' "$REC_OUT" && ok "AC2 changing that untracked file's content runs the leg again" \
+                                    || nope "AC2 a leg was reused after a file inside an untracked directory changed — the walk collapsed the directory"
+grep -q '^GATE reuse pb' "$REC_OUT" && ok "AC2 control: the sibling leg WAS reused on that run" \
+                                    || nope "AC2 nothing was reused, so the arm above proves nothing"
+ru_done
+
+# THE FINGERPRINT'S WORKING-TREE FORM, which IS the unguarded leg's key, sees the same file.
+ru_repo
+fp_w=$( cd "$RU_T" && bash "$KIT_REL/gate-fingerprint.sh" ); fp_h=$( cd "$RU_T" && bash "$KIT_REL/gate-fingerprint.sh" HEAD )
+[ -n "$fp_w" ] && [ "$fp_w" = "$fp_h" ] && ok "AC3 on a clean tree the working-tree form equals the HEAD form" \
+                                       || nope "AC3 the clean-tree working-tree form '$fp_w' is not the HEAD form '$fp_h'"
+mkdir -p "$RU_T/ud"; echo u1 > "$RU_T/ud/f"
+fp_1=$( cd "$RU_T" && bash "$KIT_REL/gate-fingerprint.sh" )
+echo u2 > "$RU_T/ud/f"
+fp_2=$( cd "$RU_T" && bash "$KIT_REL/gate-fingerprint.sh" )
+[ -n "$fp_1" ] && [ "$fp_1" != "$fp_w" ] && ok "AC3 control: a file in a new untracked directory moves the digest off the clean one" \
+                                         || nope "AC3 the untracked file did not move the digest, so the comparison below grades nothing"
+[ -n "$fp_2" ] && [ "$fp_1" != "$fp_2" ] && ok "AC3 changing that file's content changes the working-tree digest" \
+                                         || nope "AC3 the digest did not move when a file inside an untracked directory changed — the walk collapsed the directory"
+ru_done
+
+# THE ENVIRONMENT IS IN THE KEY, and GATE_REUSE is not: the first reuse arm above is the second half.
+ru_repo
+ru_run GATE_FULL=1 PYTHONUTF8=1 >/dev/null
+ru_run GATE_FULL=1 GATE_REUSE=1 PYTHONUTF8=0 >/dev/null
+grep -q '^GATE reuse ' "$REC_OUT" && nope "AC4 a leg was reused across a PYTHONUTF8 change — the digest omits the environment" \
+                                  || ok "AC4 runs that differ only in PYTHONUTF8 reuse no leg"
+ru_run GATE_FULL=1 GATE_REUSE=1 PYTHONUTF8=0 >/dev/null
+[ "$(grep -c '^GATE reuse ' "$REC_OUT")" = 2 ] && ok "AC4 control: the same environment again reuses every pure leg" \
+                                               || nope "AC4 a repeat under one environment reused nothing, so the arm above proves nothing"
+ru_done
+
+# REUSE_SCHEMA IS IN THE KEY. The control runs AFTER the miss, never before it: a run that reused EVERY
+# leg leaves the ledger empty (its carry-forward `awk 'NR==FNR'` reads an empty first file), so a
+# reusing control placed first left the schema run nothing to match and the arm passed with the
+# constant out of the key. Observed so on node a, 2026-10-11.
+ru_repo
+ru_run GATE_FULL=1 >/dev/null
+sed -i 's/^REUSE_SCHEMA=.*/REUSE_SCHEMA=staged/' "$RU_T/${PFX}${KIT}/run-gates.sh"
+grep -q '^REUSE_SCHEMA=staged$' "$RU_T/${PFX}${KIT}/run-gates.sh" && ok "AC5 the staged schema value is in the runner copy" \
+                                                                  || nope "AC5 the runner copy carries no REUSE_SCHEMA line to change"
+ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+grep -q '^GATE reuse ' "$REC_OUT" && nope "AC5 a leg was reused across a REUSE_SCHEMA change — the constant is not in the key" \
+                                  || ok "AC5 a changed REUSE_SCHEMA reuses no leg"
+ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+[ "$(grep -c '^GATE reuse ' "$REC_OUT")" = 2 ] && ok "AC5 control: the edited runner copy again reuses every pure leg" \
+                                               || nope "AC5 a repeat under the edited runner reused nothing, so the arm above proves nothing"
+ru_done
+
+# A RE-SAVE WITH IDENTICAL BYTES IS THE SAME INPUT: a content key fires on a dirty tree.
+ru_repo
+echo e1 > "$RU_T/ga/f"
+ru_run GATE_FULL=1 >/dev/null
+sleep 1; touch "$RU_T/ga/f"
+ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+[ "$(grep -c '^GATE reuse ' "$REC_OUT")" = 2 ] && ok "AC6 a dirty guarded file re-saved with identical bytes reuses both legs" \
+                                               || { nope "AC6 a touch with identical bytes stopped reuse — the key reads mtime or status churn"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
 ru_done
 
 # THE PROFILER STILL SEES A REUSED LEG. Without this the new verb is dropped by that tool's verdict

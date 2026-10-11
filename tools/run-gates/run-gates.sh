@@ -1952,12 +1952,51 @@ FPRINT_START=$(fingerprint)
 # disk, in a scratch repo with two files. The helper keeps its own walk because it is a separate
 # executable a git hook calls directly and must be self-contained; the other two are the same
 # question asked twice.
-PORCELAIN_START=$(LC_ALL=C git status --porcelain 2>/dev/null | LC_ALL=C sort)
+#
+# THE WALK CARRIES CONTENT (TOOL-aSparedSpawn-1 S1). A porcelain LINE says a file is dirty, never
+# what it holds, so ` M ga/f` keyed an edit-run-edit cycle as one input and reuse handed the second
+# edit a green the first one earned. Each row is now `<XY> <blob-or-dash> <path>`, the blob hashed
+# HERE, at the instant `FPRINT_START` was taken, so a file edited while a leg runs cannot give the
+# earning row a key for bytes that leg never read. `-z` because a quoted path names no file;
+# `--untracked-files=all` because the default mode reports a new directory as `?? d/` and the files
+# inside it would key by nothing. A rename row is followed by its SOURCE field, which is consumed,
+# not read as a path. A deleted path, or anything that is not a regular file, carries a dash: its
+# absence is already in `XY`. A path holding a newline cannot ride `--stdin-paths`, so it fails the
+# walk, and a failed walk is neither clean nor keyable.
+# ponytail: one hash-object over the dirty set; a huge untracked tree pays `-uall` once per bar.
+DIRT_ROWS=(); WALK_OK=no
+if LC_ALL=C git status --porcelain -z --untracked-files=all > "$WORK/walk" 2>/dev/null; then
+  WALK_OK=yes
+  _wx=(); _wp=(); _wi=(); _wf=(); _wsrc=0
+  while IFS= read -r -d '' _we; do
+    if [ "$_wsrc" = 1 ]; then _wsrc=0; continue; fi
+    case ${_we:0:2} in *R*|*C*) _wsrc=1 ;; esac
+    case $_we in *$'\n'*) WALK_OK=no ;; esac
+    _wx+=("${_we:0:2}"); _wp+=("${_we:3}")
+    if [ -f "${_we:3}" ]; then _wi+=("${#_wf[@]}"); _wf+=("${_we:3}"); else _wi+=(-); fi
+  done < "$WORK/walk"
+  _wh=()
+  if [ "${#_wf[@]}" -gt 0 ]; then
+    mapfile -t _wh < <(printf '%s\n' "${_wf[@]}" | git hash-object --stdin-paths 2>/dev/null)
+    [ "${#_wh[@]}" = "${#_wf[@]}" ] || WALK_OK=no
+  fi
+  if [ "$WALK_OK" = yes ] && [ "${#_wp[@]}" -gt 0 ]; then
+    _wr=()
+    for ((_j=0; _j<${#_wp[@]}; _j++)); do
+      _wb=-; [ "${_wi[$_j]}" = - ] || _wb=${_wh[${_wi[$_j]}]}
+      _wr+=("${_wx[$_j]} $_wb ${_wp[$_j]}")
+    done
+    mapfile -t DIRT_ROWS < <(printf '%s\n' "${_wr[@]}" | LC_ALL=C sort)
+    [ "${#DIRT_ROWS[@]}" = "${#_wr[@]}" ] || WALK_OK=no
+  fi
+  unset _wx _wp _wi _wf _wh _wr _wb _we _wsrc _j
+fi
+rm -f "$WORK/walk"
 # CLEAN means this listing EMPTY, untracked-and-unignored files included — not `git diff --quiet`,
 # which is blind to a `??` line and would stamp a green over a tree the at-a-rev fingerprint form
-# cannot reproduce at any sha.
+# cannot reproduce at any sha. A walk that FAILED is not an empty listing, and is never clean.
 TREE_CLEAN=no
-[ -z "$PORCELAIN_START" ] && TREE_CLEAN=yes
+[ "$WALK_OK" = yes ] && [ "${#DIRT_ROWS[@]}" = 0 ] && TREE_CLEAN=yes
 
 # Read the leg manifest as name<RS>guard(comma-joined)<RS>argv(joined by <US>) per line, where
 # RS=\x1e and US=\x1f (non-whitespace, so an empty guard field survives `read`; a tab would collapse).
@@ -2003,7 +2042,10 @@ if cache and os.path.exists(cache):
     except Exception:
         durs = {}          # a corrupt cache is a missing cache, never a failed run
 order = sorted(range(len(data)), key=lambda i: -durs.get(data[i]["name"], 0.0))
-rows = [" ".join(str(i) for i in order)]
+# Line 1 also carries, behind one RS, the python half of the reuse key digest (TOOL-aSparedSpawn-1
+# S4): this interpreter version and its utf8 mode, read here so the digest starts no python of its own.
+rows = [" ".join(str(i) for i in order) + "\x1e" + sys.version.replace("\n", " ")
+        + " utf8_mode=" + str(sys.flags.utf8_mode)]
 # The fourth field is the `impure` declaration, carried through as a PRESENCE rather than as its
 # text: the reason string is for a human reading the manifest, and the runner only ever asks whether
 # there is one. Newlines and the field separators cannot appear in it because it is reduced to a flag
@@ -2061,7 +2103,7 @@ sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
 names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); signatures=(); docreads=(); ORDER=""; first=1
 while IFS= read -r line; do
-  if [ "$first" = 1 ]; then ORDER=$line; first=0; continue; fi
+  if [ "$first" = 1 ]; then IFS=$'\x1e' read -r ORDER PY_ID <<<"$line"; first=0; continue; fi
   IFS=$'\x1e' read -r nm gd_ av im ch sj ce sg dr <<<"$line"
   names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}"); chunks+=("${ch:-default}")
   subjects+=("${sj:-repo}"); ceilings+=("${ce:-}"); signatures+=("${sg:-}"); docreads+=("${dr:-}")
@@ -2186,33 +2228,75 @@ done
 # argv and the resolved base, because the same paths run by a different command, or diffed
 # against a different baseline, are not the same question.
 #
-# INDEX-AND-STATUS rather than a hash of every file: `ls-files -s` is one cheap git call per leg
-# and reads no file content, and the porcelain slice below is taken from the ONE whole-tree
-# status the run already ran. Hashing each guarded file per leg would have re-read most of the
-# tree fifty times to produce a key nothing yet consumes.
+# INDEX-AND-WALK rather than a hash of every file: `ls-files -s` is one cheap git call per leg
+# and carries the committed and staged blobs, and the dirt slice below is taken from the ONE
+# whole-tree walk the run already ran, which hashed each dirty file once (TOOL-aSparedSpawn-1 S1).
 #
-# Empty fingerprint means we could not measure the tree, and an unmeasurable input is NOT a
-# reusable one: the key is a dash, which the reuse unit must treat as "never matches".
+# Empty fingerprint, a failed walk or an empty digest means we could not measure the input, and an
+# unmeasurable input is NOT a reusable one: the key is a dash, which the reuse unit must treat as
+# "never matches".
 input_key() { # leg index -> the key, or a dash
-  local i=$1 gp comp dirt
-  [ -n "$FPRINT_START" ] || { printf '%s' -; return; }
+  local i=$1 gp comp dirt="" r p g
+  [ -n "$FPRINT_START" ] && [ "$WALK_OK" = yes ] && [ -n "$REUSE_DIGEST" ] || { printf '%s' -; return; }
   if [ -n "${guards[$i]}" ]; then
     IFS=, read -ra gp <<<"${guards[$i]}"
     comp=$(git ls-files -s -- "${gp[@]}" 2>/dev/null | LC_ALL=C sort) || comp=""
-    # The guard's share of the dirt. Without it a guarded leg's key would not move when a
-    # guarded file is edited but not committed, which is most of the edits a developer makes.
-    dirt=$(printf '%s\n' "$PORCELAIN_START" | LC_ALL=C grep -F -e "${gp[0]}" 2>/dev/null) || dirt=""
-    local g; for g in "${gp[@]:1}"; do
-      dirt="$dirt$(printf '%s\n' "$PORCELAIN_START" | LC_ALL=C grep -F -e "$g" 2>/dev/null)"
+    # The guard's share of the dirt, matched the way the `ls-files` pathspec above matches: the path
+    # IS the guard, or sits under the directory it names, with or without its slash. A substring
+    # match also took `xga/f` for guard `ga/`. Without this share a guarded leg's key would not move
+    # when a guarded file is edited but not committed, which is most of the edits a developer makes.
+    # ponytail: rows x guards in builtins per leg; an index by top directory if a tree dirties thousands.
+    for r in "${DIRT_ROWS[@]}"; do
+      p=${r:3}; p=${p#* }
+      for g in "${gp[@]}"; do
+        g=${g%/}
+        if [ "$p" = "$g" ] || [ "${p#"$g"/}" != "$p" ]; then dirt+="$r"$'\n'; break; fi
+      done
     done
     comp="$comp
 $dirt"
   else
     comp="$FPRINT_START"
   fi
-  printf '%s\n---\n%s\n---\n%s\n' "${argvs[$i]}" "$BASE" "$comp" \
+  printf '%s\n---\n%s\n---\n%s\n---\n%s\n' "${argvs[$i]}" "$BASE" "$comp" "$REUSE_DIGEST" \
     | git hash-object --stdin 2>/dev/null || printf '%s' -
 }
+
+# WHAT A REUSABLE `ok` MEANS. Bump this when a runner change redefines it: every recorded ledger row
+# then misses at once, which is the "did more work" direction. A constant rather than the runner's
+# own blob, because the runner's comments move in most builds. TOOL-aSparedSpawn-1 S5.
+REUSE_SCHEMA=2
+# THE TOOLCHAIN, ENVIRONMENT AND HOST DIGEST, one per run, the fourth section of EVERY key
+# (TOOL-aSparedSpawn-1 S4). Two runs over identical bytes under a different git, python, bash, MSYS
+# runtime or `PYTHONUTF8` are not the same question. `GATE_REUSE` is left out so the earning run
+# (unset) and the reusing run (set) can agree, and `GATE_TURNSTILE_HELD` because the runner exports a
+# per-run nonce in it above. Every other knob stays in: over-sensitive is a miss, never a false hit.
+# WHAT IT DOES NOT SEE: a tool upgraded IN PLACE at the same path, other than git, which pays
+# `git version`; and any variable outside the prefix set, which a leg may still read.
+REUSE_DIGEST=$(
+  printf 'schema %s\n' "$REUSE_SCHEMA"
+  printf 'bash %s %s\n' "$BASH_VERSION" "$MACHTYPE"
+  if [ -r /proc/version ]; then IFS= read -r r < /proc/version; printf 'runtime %s\n' "$r"; fi
+  printf 'python %s %s\n' "$PYBIN" "$PY_ID"
+  git version 2>/dev/null || exit 1
+  git config --get-regexp '^core\.(autocrlf|eol)$' 2>/dev/null
+  # Every other tool a leg names, by the location it resolves to: argv[0], each once.
+  declare -A seen=()
+  for ((i=0; i<total; i++)); do
+    [ -n "${names[$i]}" ] || continue
+    IFS=$'\x1f' read -r t _ <<<"${argvs[$i]}"
+    [ -n "$t" ] && [ -z "${seen[$t]:-}" ] || continue
+    seen[$t]=1; printf 'tool %s ' "$t"; type -P "$t" || echo
+  done
+  # The environment the legs inherit; `compgen -e` lists the exported names, sorted. PATH is always
+  # exported, so an empty listing is a failed read and fails the digest rather than dropping the env.
+  mapfile -t evs < <(compgen -e)
+  [ "${#evs[@]}" -gt 0 ] || exit 1
+  for v in "${evs[@]}"; do
+    case $v in GATE_REUSE|GATE_TURNSTILE_HELD) continue ;;
+      GATE_*|GOV_*|*_PY|GIT_*|PYTHON*|LC_*|LANG|TZ|PATH) printf 'env %s=%s\n' "$v" "${!v}" ;; esac
+  done
+) && REUSE_DIGEST=$(git hash-object --stdin 2>/dev/null <<<"$REUSE_DIGEST") || REUSE_DIGEST=""
 
 # THE HEADER, written before the first leg dispatches, in a key-per-line grammar. It is what a
 # concurrent reader resolves through `gate-run/current` while the run is in flight, and what
@@ -2265,6 +2349,9 @@ if [ -n "$RUNDIR" ]; then
     # leg's window reaches three periods before its start. Outside the run-envelope block for the
     # reason the queue keys above give.
     printf 'census_every\t%s\n' "$CENSUS_EVERY"
+    # The reuse key's schema (TOOL-aSparedSpawn-1 S5), so a reader can tell a schema miss from a
+    # content miss. Outside the run-envelope block for the reason above.
+    printf 'reuse_schema\t%s\n' "$REUSE_SCHEMA"
     # The memory pause's threshold this run held dispatch above, `off`, or `inert` where the host gave
     # no reading (TOOL-aGraftedHelix-7). Outside the run-envelope block for the reason above.
     printf 'mempause\t%s\n' "$prof_mrec"

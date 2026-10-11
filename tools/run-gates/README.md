@@ -117,7 +117,7 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `run-gates.sh` | the runner. Legs run through a bounded pool, at the width `gate-profiles.txt` declares for the detected hardware; `GATE_JOBS` overrides the width alone |
 | `gate-profiles.txt` | the DECLARED knob table: rows of name, minimum cores, minimum RAM MB, knobs, most-capable-first with a zero-threshold catch-all last. `GATE_PROFILE=<row>` selects one by name and skips detection; `GATE_PROFILES=<path>` reads a different table, and an absent path falls back to the built-in formula — which is the rollback. `GATE_CORES` / `GATE_RAM_MB` replace the detected readings and bypass detection, and `GATE_CGROUP_ROOT` relocates the cgroup files the RAM chain reads |
 | `lib-attribute.sh` | the attribution's two shared halves, SOURCED and never run: the normaliser (`write_normaliser`) and the detached scratch worktree at a base (`add_scratch_worktree` / `remove_scratch_worktree`). The runner sources it only when `GATE_ATTRIBUTE` is set and a leg is red, and `run-selftests.sh` only under `--attribute`, so a copy of either runner without it still runs every other mode |
-| `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
+| `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file, both walked with `--untracked-files=all` so a file inside a new directory is hashed rather than collapsed into its `?? dir/` line; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
 | `profile_bar.py` | the profiling verb: runs the bar, records it as a RUN, and names the regime — floor-bound or packing-bound — so the next fix is chosen from a measurement |
 | `profile_bar.test.sh` | the profiler's own arms |
 | `run-gates.test.sh` | the SHIPPED canary — every assertion here is true in any tree |
@@ -137,6 +137,17 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 missing term means execute — every failure mode is "did more work", never "checked less". It is
 OPT-IN because an advisory input may cause less work only on a run that is not authoritative, and
 `.githooks/pre-push` never sets it. A run that reused anything cannot stamp `gate-full-green`.
+
+The key takes the leg's argv, the baseline, and its inputs: for a guarded leg the `git ls-files -s`
+of its guards plus the walk rows under them, each `<XY> <blob-or-dash> <path>`, the blob hashed at run
+start from one `--untracked-files=all` walk; for an unguarded leg the working-tree fingerprint. Every
+key also takes `REUSE_SCHEMA`, a runner constant bumped when what a reusable `ok` means changes, and
+one digest per run of bash, the MSYS or Cygwin runtime, python and its UTF-8 mode, `git version` and
+its `core.autocrlf`/`core.eol`, the resolved location of every tool a leg names, and the exported
+`GATE_* GOV_* *_PY GIT_* PYTHON* LC_* LANG TZ PATH` variables, less `GATE_REUSE` and
+`GATE_TURNSTILE_HELD`. It does NOT see a tool other than git upgraded in place at the same path, or a
+variable outside that set. A failed walk or digest makes the key a dash, which never matches. The
+header's `reuse_schema` key says which schema a run keyed under.
 
 The baseline a guard diffs against is the MERGE-BASE with the default branch, so a branch is graded
 on what it changed rather than on everything that landed while it was open — used only where the
