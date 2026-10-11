@@ -33,3 +33,5 @@ base: 6dc23b58fe360c0e15168544cf4b03af6550a7ad
 2026-10-11T03:35:23Z rescope · item add TOOL-aPairedSlots-7 · reason the shared-path audit split TOOL-aPairedSlots-5: the four common-dir writers (run log, health log trim, shared full green, drift history header) are one mechanism, the per-worktree slot rule another; M2 one mechanism per spec
 
 2026-10-11T03:35:49Z rescope · item add TOOL-aPairedSlots-8 · reason the shared-path audit found one leg fixture writing a fixed name in the real common dir: adopt-process-monitor.test.sh's procmon-stamp arms; a separate kit and a separate mechanism
+
+2026-10-11T13:08:57Z rescope · item add TOOL-aPairedSlots-9 · reason owner ruling 2026-10-11 ~15:40 +0300: one repetition per arm, build now; the A/B and the two values it sets (capable slots, TS_SHARE_RULE) move out of TOOL-aPairedSlots-1 and -3 into one unit so those two carry no open fork and build beside the measurement

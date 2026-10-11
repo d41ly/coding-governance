@@ -1,6 +1,6 @@
-# TOOL-aPairedSlots-3 — a bar dispatched while another slot is held takes the width the A/B chose
+# TOOL-aPairedSlots-3 — a bar dispatched while another slot is held takes the shared width its rule names
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -24,9 +24,11 @@ measured. The memory pause is confirmed host-wide and is not duplicated.
   the number of slot paths that exist, its own included. It is read once and never again in the
   run. A nested, expired, unticketed, docs or disabled run reads nothing and keeps its width.
   Observed by AC1, AC3.
-- **S2 — the rule.** At a held count of 2 or more, and with `GATE_JOBS` unset, the width is the
-  one F1 resolves: under arm B's rule `JOBS` becomes `JOBS / held`, never below 1; under arm C's it
-  stays. `GATE_JOBS`, when set, is the operator's width and is never divided. Observed by AC1, AC2.
+- **S2 — the rule.** At a held count of 2 or more, and with `GATE_JOBS` unset, the width follows
+  `TS_SHARE_RULE`, a constant beside the turnstile block: `half` (arm B's rule) makes `JOBS` into
+  `JOBS / held`, never below 1, and `full` (arm C's) leaves it. It ships as `full`, which changes
+  no width, until TOOL-aPairedSlots-9 sets it from the A/B. `GATE_JOBS`, when set, is the operator's
+  width and is never divided. Observed by AC1, AC2.
 - **S3 — printed and recorded.** At a held count of 2 or more the run prints one line,
   `gate profile: width <w> at dispatch — <k> of <n> bar slots held (<rule>)`, rebuilds `PROF_LINE`
   with that width so the summary file and the durable copies carry it, and the header's `width`
@@ -50,7 +52,7 @@ measured. The memory pause is confirmed host-wide and is not duplicated.
 ### Edges
 
 - **consumes-from** `TOOL-aPairedSlots-2` — `measure_held_slots` and the slot paths it counts.
-- **consumes-from** `TOOL-aPairedSlots-1` — the arm the A/B chose, recorded in its results.
+- **hands-off** `TOOL-aPairedSlots-9` — the value of `TS_SHARE_RULE`, which the A/B decides.
 
 ## 4. Design
 
@@ -62,7 +64,8 @@ three slots gets a third of the width under arm B's rule, which is the same rule
 
 ### Inventory
 
-No function is minted. New shell variable: `TS_HELD_N` (the held count read at acquire). No new
+No function is minted. New shell variables: `TS_HELD_N` (the held count read at acquire) and
+`TS_SHARE_RULE` (the constant naming the rule, `half` or `full`). No new
 header key: `width` already records the effective width.
 
 ### Files touched (estimate)
@@ -95,8 +98,9 @@ header key: `width` already records the effective width.
 ## 6. Acceptance criteria
 
 - **AC1** — When a fixture bar acquires slot 2 while slot 1 is held, at a profile width of 4 and
-  `GATE_TURNSTILE_SLOTS=2`, its output carries `width 2 at dispatch — 2 of 2 bar slots held` under
-  arm B's rule, or `width 4 at dispatch` under arm C's, and its header's `width` matches.
+  `GATE_TURNSTILE_SLOTS=2`, its output carries `width 2 at dispatch — 2 of 2 bar slots held` from a
+  runner copy whose `TS_SHARE_RULE` is `half`, and `width 4 at dispatch` from one whose rule is
+  `full`, and its header's `width` matches each.
   Red when: the held count is not read, and the width is the profile's under either rule.
 - **AC2** — When the same bar runs with `GATE_JOBS=3`, its header's `width` is 3.
   Red when: the operator's width is divided.
@@ -115,16 +119,14 @@ New arm: tools/run-gates/run-gates.turnstile.test.sh · covers AC1 AC2 AC3 AC4 �
 
 ## 8. Open questions
 
-- **FACT-QUESTION · F1 — Which width does a bar take when it acquires beside another holder: half
-  (arm B) or full (arm C)?** The probe is TOOL-aPairedSlots-1's A/B; the observation is the summed
-  makespan of each arm over its two repetitions; the smaller one's rule is taken, whether or not it
-  beat arm A, so an owner who later flips `slots` gets the better of the two shared widths.
-  Liveness: either arm can be the smaller, and a void arm-run is re-run, never compared.
-  Recommendation: whatever the rows say.
+none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · S2 · AC1 · §8 · the rule becomes the constant `TS_SHARE_RULE`, shipped as
+  `full`; F1 and setting the constant move to TOOL-aPairedSlots-9 on the owner's ruling of
+  2026-10-11 (one repetition per arm, build now).
 
 ## 10. Reuse audit
 
