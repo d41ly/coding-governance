@@ -1,11 +1,13 @@
 # DEPL-dRemeasuredRender-2 — `govkit update` re-probes a hole after the render, and reports only the verdict that stands
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node d · Tier-2 · base 9a8777b8 · streams deployer · order 3
+**Status:** CLOSED · rev-2 · 2026-10-11 · node d · Tier-2 · base 9a8777b8 · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-DEPL-dRemeasuredRender-2-1-acceptance-ledger.md](../build/2026-10-11-build-DEPL-dRemeasuredRender-2-1-acceptance-ledger.md) | journal | — |
+| [2026-10-11-prompt-DEPL-dRemeasuredRender-2-1-build-brief.md](../prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-2-1-build-brief.md) | journal | — |
 | [2026-10-11-prompt-TOOL-dRemeasuredRender-1-brief.md](../prompts/2026-10-11-prompt-TOOL-dRemeasuredRender-1-brief.md) | research | TOOL-dRemeasuredRender-1 DEPL-dRemeasuredRender-1 |
 
 <!-- /gen:spec-records -->
@@ -68,7 +70,7 @@ loop calls it once, before the snapshot and the argvs, and prints `is undischarg
 
 - security — N/A — re-runs a gov-declared probe the run already runs once.
 - perf / scale — one extra probe per hole that failed early; none on a discharged hole.
-- error / empty / loading states — a probe that cannot launch on the re-probe prints nothing new.
+- error / empty / loading states — a re-probe reading neither verdict prints one line saying so.
 - observability — the after-render line names which verdict stands.
 - risks — none beyond one more probe run.
 - testing — two self-test arms, a hole passing only after the render and one failing throughout,
@@ -83,7 +85,7 @@ loop calls it once, before the snapshot and the argvs, and prints `is undischarg
   `is discharged after the render`, and no `is undischarged` line for that hole. Red when: the run
   reports it undischarged, which base does.
 - **AC2** — When the fixture's hole probe fails both before and after the render, the run prints
-  `is undischarged (probe exit` for it after the `ran` line. Red when: the run reports only the
+  `is undischarged (probe exit` for it after the early line. Red when: the run reports only the
   early verdict, which base does.
 
 ## 7. Gates
@@ -99,6 +101,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft, from the owner's prompt.
+- rev-2 · 2026-10-11 · AC2 · §5 · the final line prints inside the kit's regenerate loop, before the
+  `ran` summary, so AC2 orders it after the early line instead; a re-probe reading neither verdict
+  prints a line rather than nothing, so the early line is never left unanswered.
 
 ## 10. Reuse audit
 

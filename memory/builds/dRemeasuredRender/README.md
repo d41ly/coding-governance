@@ -59,7 +59,7 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 3 unit(s) · node d · opened 2026-10-11 · streams tooling+deployer
+**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-10-11 · streams tooling+deployer
 ids DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 TOOL-dRemeasuredRender-1 TOOL-dRemeasuredRender-2
 
 <!-- gen:build-units -->
@@ -67,10 +67,10 @@ ids DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 TOOL-dRemeasuredRender-1 T
 |---|---|---|---|---|---|
 | [TOOL-dRemeasuredRender-1 — gov's shipped suites scrub every bare location probe, and gov's own row stops excluding them](spec/2026-10-11-spec-TOOL-dRemeasuredRender-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [DEPL-dRemeasuredRender-1 — `govkit update` re-measures a rendered row's receipt from the bytes its render landed](spec/2026-10-11-spec-DEPL-dRemeasuredRender-1.md) | 2 | 2 | CLOSED | rev-1 | 2026-10-11 |
-| [DEPL-dRemeasuredRender-2 — `govkit update` re-probes a hole after the render, and reports only the verdict that stands](spec/2026-10-11-spec-DEPL-dRemeasuredRender-2.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-11 |
+| [DEPL-dRemeasuredRender-2 — `govkit update` re-probes a hole after the render, and reports only the verdict that stands](spec/2026-10-11-spec-DEPL-dRemeasuredRender-2.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 7 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1899,6 +1899,38 @@ def check_update_safety(tmp: pathlib.Path) -> None:
           and "receipt: KEPT [rendered] docs/out.md — its render was refused" in p.stdout,
           p.stdout[-1500:] + str(read_row17(t, "docs/out.md")) + str(_rr_before))
 
+    # ---- DEPL-dRemeasuredRender-2 AC1-AC2. A hole whose probe reads the RENDERED file is probed
+    # ---- before the regenerate, where it fails, and again after it. Only the verdict after the
+    # ---- render is called undischarged: `hp` passes once rendered, `hf` fails throughout.
+    for _hpt, _hpcmd in (("hp", '["bash", "-c", "grep -q v2 docs/out.md"]'),
+                         ("hf", '["bash", "-c", "exit 3"]')):
+        kit_hp = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+                  '[[hole]]\nid = "demo-hole"\nkind = "authoring"\nblocks_adopt = false\n'
+                  'blocks_gate = false\nwhy = "the fixture hole"\n'
+                  f'discharge = {{ command = {_hpcmd} }}\n\n'
+                  '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                  '[[files]]\ninclude = ["tpl.md"]\nrole = "rendered"\nto = "docs/out.md"\n\n'
+                  '[[regenerate]]\nargv = ["bash", "{kit}/gen.sh"]\n\n'
+                  '[adopt]\nargv = ["bash", "{kit}/gen.sh"]\nmutates_index = false\n')
+        g, _a = build_gov17(_hpt, kit_hp, {"eng.txt": "v1\n", "gen.sh": gen_cg, "tpl.md": "tpl\n"})
+        t = build_target17(g, _hpt)
+        write_gov17(g, kit_hp, {"eng.txt": "v2\n"}, "B")
+        p = run_gov17(g, "update", "--target", str(t), "--write")
+        _hp_early = p.stdout.find("HOLE demo: 'demo-hole' probes undischarged before the render")
+        _hp_final = p.stdout.find("HOLE demo: 'demo-hole' is undischarged (probe exit")
+        check(f"[dRR-2 {_hpt}] LIVENESS the render ran, and the early probe named the hole",
+              read_bytes17(t / "docs" / "out.md") == b"v2\n" and _hp_early >= 0, p.stdout[-1500:])
+        if _hpt == "hp":
+            check("[dRR-2 AC1] a hole the render discharges is not reported undischarged, and the "
+                  "run says the early verdict does not stand",
+                  _hp_final < 0 and "HOLE demo: 'demo-hole' is discharged after the render; the "
+                  "early verdict does not stand" in p.stdout, p.stdout[-1500:])
+        else:
+            check("[dRR-2 AC2] a hole still failing after the render is reported undischarged, "
+                  "after the early line",
+                  _hp_final > _hp_early >= 0 and "is discharged after the render" not in p.stdout,
+                  p.stdout[-1500:])
+
     # ---- DEPL-aHalvedInstall-4 AC1-AC5. One update moves a kit's conf.sh (which the target edited,
     # ---- so it conflicts), its plain.txt (clean) and its engine (re-rendered). The refused row holds
     # ---- the whole kit back: the clean row is restored, the regenerate is declined, the order says

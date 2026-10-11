@@ -10895,10 +10895,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _own_rr = {f.get("source") for f in receipt.get("files") or []
                        if f.get("role") == "adopter-owned"}
             _hw_rr = {h.get("id"): h.get("why", "") for h in _d.get("hole", [])}
+            # DEPL-dRemeasuredRender-2 S1. THE EARLY PROBE STATES NO VERDICT. A probe that
+            # byte-checks the rendered artifact — lexicon's `lexicon-ratified` runs its adopter's
+            # `--check` — fails here and passes once the render below has run, so "is undischarged"
+            # printed here was a false red the same run's verify contradicted. The probe stays HERE,
+            # because naming a hole before a render that refuses on it is its purpose; its verdict
+            # is the re-probe's below.
+            _hu_rr: list[str] = []
             for _hid, _hv, _hd in run_hole_probes(_eid, _d, _ctx_rr, target, list(claimed), _own_rr):
                 if _hv == "undischarged":
-                    print(f"govkit update — HOLE {_eid}: '{_hid}' is undischarged (probe exit {_hd})"
-                          f" — {(_hw_rr.get(_hid) or 'no reason declared').splitlines()[0]}")
+                    _hu_rr.append(_hid)
+                    print(f"govkit update — HOLE {_eid}: '{_hid}' probes undischarged before the "
+                          f"render (probe exit {_hd}); probed again after it — "
+                          f"{(_hw_rr.get(_hid) or 'no reason declared').splitlines()[0]}")
             # DEPL-aRepatriatedFork-17 S1. A ROLLBACK COVERS WHAT THE RE-RENDER WROTE. The argv
             # below writes outside `written_paths`, so a kit rolled back after it kept its renders.
             # Snapshotted HERE, before the first argv, from the kit's own `rendered`/`generated`
@@ -10970,6 +10979,23 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                               "This kit declares no [check] argv, so nothing below can roll its "
                               "writes back: they stay staged, and the render has to be repaired "
                               "by hand before the next update"))
+            # DEPL-dRemeasuredRender-2 S2 + S3. THE VERDICT THAT STANDS, after this kit's argvs and
+            # whether they were accepted or refused: only the holes the early probe called
+            # undischarged are probed again, and only one still failing is called undischarged.
+            if _hu_rr:
+                _d_hu = dict(_d, hole=[h for h in _d.get("hole", []) if h.get("id") in _hu_rr])
+                for _hid, _hv, _hd in run_hole_probes(_eid, _d_hu, _ctx_rr, target, list(claimed),
+                                                      _own_rr):
+                    _hwhy = (_hw_rr.get(_hid) or "no reason declared").splitlines()[0]
+                    if _hv == "undischarged":
+                        print(f"govkit update — HOLE {_eid}: '{_hid}' is undischarged (probe exit "
+                              f"{_hd}) — {_hwhy}")
+                    elif _hv == "discharged":
+                        print(f"govkit update — HOLE {_eid}: '{_hid}' is discharged after the "
+                              f"render; the early verdict does not stand")
+                    else:
+                        print(f"govkit update — HOLE {_eid}: '{_hid}' re-probed after the render "
+                              f"reads {_hv} ({_hd}), so neither verdict is confirmed — {_hwhy}")
             # S1. What THIS kit's argv changed, by status entry, so an undeclared write has a name.
             _rg_after = read_worktree_status(target)
             _rg_before = _rg_snap[_eid]["status"]
