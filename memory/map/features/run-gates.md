@@ -64,6 +64,7 @@ globs = [
 
 ## Constraints & why
 
+- A bar refuses a stale declared output first (TOOL-aPrimedIndex-3).
 **The run record, and why the completion file is NOT in it.** Every run writes
 `<git-dir>/gate-run/<run-id>/` — a header before dispatch, one TSV row and one redacted output copy
 per leg, a verdict last — and the verdict's ABSENCE is the crash signal. The `.rc` completion file

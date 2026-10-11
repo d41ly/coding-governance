@@ -39,6 +39,7 @@ dossier's `harness-hooks` claim.
 
 ## Constraints & why
 
+- Its `[[regenerate]]` render row is staged, stage 1: run-gates' `regen.py` re-renders it on `--regen`, and every bar proves it fresh with this kit's `[check]` first (TOOL-aPrimedIndex-1).
 - **Stdlib only, offline, no model files.** The kit has to run on every node with nothing installed;
   the four lexical substrates stay importable without the optional dense stack, and a missing
   dependency raises with its install line rather than silently dropping an arm.

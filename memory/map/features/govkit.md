@@ -32,6 +32,7 @@ globs = [
 
 ## Constraints & why
 
+- `read_gate_verdicts` runs the target's runner with `GATE_REGEN_CHECK=0`, so a stale generated output reads as its own leg's red, never as an empty map apply could certify (DEPL-aPrimedIndex-1).
 **The registry is a DECLARATION, and that is the whole design.** No directory listing equals the
 deployable set, and the ways it fails are not symmetric. Some `tools/*` directories are not
 deployable — `tools/lib/` ships nothing, and the gate-runner cluster is a stated non-goal because

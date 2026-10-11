@@ -5,4 +5,4 @@
 
 ## Dispositions
 - SEV · TOOL-aPrimedIndex-5 · LOW · a held self-test's stale fixture; no shipped path is wrong and no bar leg runs the arm
-- KEEP · TOOL-aPrimedIndex-5 · outside this build's mandate, which is the generated-output regeneration; a later build repairs the fixture
+- CLOSED · TOOL-aPrimedIndex-5 · by 4827b2073 · arms 26 and 29 commit a spec defining the unit their commits name, so the newest-unit reader answers and arm 26 passes; adopted by TOOL-aPrimedIndex-8
