@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.140 -->
+<!-- gov:kit memory-tree@2.141 -->
 # {{MEMORY_ROOT}}/ retention & hygiene
 
 `{{MEMORY_ROOT}}/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -272,10 +272,14 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
    DERIVED from each build's README front matter (`slug node opened streams roster ids [status]`, at
    column 0, opening at line 1) plus every `**Status:**` header under its `spec/`. A build with no
    README, an unpaired generated-region marker, or two answers to its own status is a NAMED error.
-   Pin the generated files `eol=lf` in `.gitattributes` — the gate byte-compares them.
-10. **rotation note** — every rotated `archive/<STEM>.<date><suffix?>.md` is referenced from its live index, which is resolved by BASENAME anywhere under the memory root rather than at
-    a fixed path; a stem resolving to zero or several live indexes is a NAMED finding, never a
-    skip. The reference is read from everything above the index's first row, and never fewer
+   Pin the generated files `eol=lf` in `.gitattributes` — the gate byte-compares them. While any
+   file under `archive/` is untracked, `--check` and `--write` both REFUSE and name it: the index
+   reads `git ls-files`, so a half-staged rotation's moved rows look deleted. Stage the archive
+   first (`TOOL-dHomedResolver-2`).
+10. **rotation note** — every rotated `archive/<STEM>.<date><suffix?>.md` is referenced from its live index, which is resolved at the stem's DECLARED HOME —
+    `DECISIONS.md` at the memory root, `backlog/<FAMILY>.md` for a family — and never by searching
+    for a file of that name, so a build file that shares a stem's name is not consulted
+    (`TOOL-dHomedResolver-1`). A home that is not tracked is a NAMED finding, never a skip. The reference is read from everything above the index's first row, and never fewer
     than its first three lines. It grades ANNOUNCEMENT, never the archive's CONTENTS.
     With `BACKLOG_MODE` set to `builds` an archive whose stem is a FAMILY is left to check 9's archive
     guard and COUNTED in one line, because the live file at that stem is a generated view that could
