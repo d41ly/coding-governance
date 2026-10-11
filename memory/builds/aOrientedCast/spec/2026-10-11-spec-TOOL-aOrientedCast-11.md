@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-11 — a role agent runs no gate, and the write gate's hook refuses one
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 11 · ratified 2026-10-11
+**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 11 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
