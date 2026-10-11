@@ -1237,6 +1237,82 @@ R33=$tmp/slots1; mk_repo "$R33"; legs "$R33" '[ {"name": "quick", "argv": ["bash
   || nope "a bar at the default count wrote a slot key"
 grep -q 'bar slots' "$tmp/out33" && nope "a bar at the default count printed a slots clause" || ok "a bar at the default count printed no slots clause"
 
+
+# ================= TOOL-aPairedSlots-3: the shared dispatch width =================================
+# A bar that acquires slot 2 while slot 1 is held reads the held count once and takes the width its
+# rule names. The rule is a constant in the runner, `TS_SHARE_RULE`, so each arm sets it in the
+# fixture repository's own runner copy; the profile is a fixture row of width 4.
+printf 't\t0\t0\twidth=4,timeout=0,wall=0,mempause=0\n' > "$tmp/w4.txt"
+# set_share_rule <repo> <rule> — the fixture runner's TS_SHARE_RULE, asserted to have moved
+set_share_rule() {
+  sed -i "s/^TS_SHARE_RULE=.*/TS_SHARE_RULE=$2/" "$1/$KIT_REL/run-gates.sh"
+  grep -q "^TS_SHARE_RULE=$2\$" "$1/$KIT_REL/run-gates.sh"
+}
+# run_beside_holder <repo> <out> [VAR=value…] — a quick-leg bar run while a slot-1 holder waits
+run_beside_holder() {
+  local r=$1 o=$2 s; shift 2
+  s=$tmp/sharedW.$RANDOM; mkdir -p "$s"
+  run_slot_bar "$WIDTH_W" "$s" "$o.w"; local pw=$SLOT_PID; wait_registered "$s" 1 "$pw"
+  ( cd "$r" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 GATE_PROFILES="$tmp/w4.txt" GATE_PROFILE= GATE_JOBS= "$@" \
+      bash $KIT_REL/run-gates.sh ) >"$o" 2>&1
+  : > "$s/go"; wait "$pw" 2>/dev/null
+}
+WIDTH_W=$tmp/widthW; mk_repo "$WIDTH_W"
+
+# ---- 34: under `half` the bar beside a holder dispatches at half width; under `full` at full (AC1) ---
+R34h=$tmp/widthHalf; R34f=$tmp/widthFull; mk_repo "$R34h"; mk_repo "$R34f"
+legs "$R34h" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'; legs "$R34f" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+if set_share_rule "$R34h" half && set_share_rule "$R34f" full; then
+  run_beside_holder "$R34h" "$tmp/out34h"; run_beside_holder "$R34f" "$tmp/out34f"
+  grep -q '^gate profile: width 2 at dispatch — 2 of 2 bar slots held (half)$' "$tmp/out34h" && [ "$(hdrkey "$R34h" width)" = 2 ] \
+    && ok "half: the bar beside a holder dispatched at width 2 and its header records 2" \
+    || { nope "half: no width-2 dispatch line, or the header width reads '$(hdrkey "$R34h" width)'"; grep 'gate profile' "$tmp/out34h" | sed 's/^/      /'; }
+  grep -q '^gate profile: width 4 at dispatch — 2 of 2 bar slots held (full)$' "$tmp/out34f" && [ "$(hdrkey "$R34f" width)" = 4 ] \
+    && ok "full: the bar beside a holder dispatched at width 4 and its header records 4" \
+    || { nope "full: no width-4 dispatch line, or the header width reads '$(hdrkey "$R34f" width)'"; grep 'gate profile' "$tmp/out34f" | sed 's/^/      /'; }
+else
+  nope "the fixture runner carries no TS_SHARE_RULE line to set, so the width arms grade nothing"
+fi
+
+# ---- 35: the operator's GATE_JOBS is never divided (AC2) -----------------------------------------
+R35=$tmp/widthJobs; mk_repo "$R35"; legs "$R35" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+if set_share_rule "$R35" half; then
+  run_beside_holder "$R35" "$tmp/out35" GATE_JOBS=3
+  [ "$(hdrkey "$R35" width)" = 3 ] && ok "half beside a holder: GATE_JOBS=3 dispatched at 3" \
+    || nope "half beside a holder: GATE_JOBS=3 dispatched at '$(hdrkey "$R35" width)'"
+else
+  nope "the fixture runner carries no TS_SHARE_RULE line to set"
+fi
+
+# ---- 36: a bar alone prints no dispatch line and keeps the profile's width (AC3) -----------------
+R36=$tmp/widthAlone; mk_repo "$R36"; legs "$R36" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+if set_share_rule "$R36" half; then
+  ( cd "$R36" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 GATE_PROFILES="$tmp/w4.txt" GATE_PROFILE= GATE_JOBS= bash $KIT_REL/run-gates.sh ) >"$tmp/out36" 2>&1
+  grep -q 'at dispatch' "$tmp/out36" && nope "a bar holding the only held slot printed a dispatch line" \
+    || ok "a bar holding the only held slot printed no dispatch line"
+  [ "$(hdrkey "$R36" width)" = 4 ] && ok "and its header records the profile's width 4" || nope "and its header records width '$(hdrkey "$R36" width)'"
+else
+  nope "the fixture runner carries no TS_SHARE_RULE line to set"
+fi
+
+# ---- 37: two concurrent bars pause on ONE host reading (AC4) -------------------------------------
+# The memory pause reads a host-wide source, so two bars share it with no second mechanism. One
+# GATE_MEMINFO file at 95 % used under a 90 % threshold, two bars of two legs each: the second leg's
+# dispatch waits while the first runs, in BOTH bars.
+printf 'MemTotal: 1000 kB\nMemAvailable: 50 kB\n' > "$tmp/mem95"
+printf '#!/usr/bin/env bash\nsleep 2\nexit 0\n' > "$tmp/slow37.sh"
+printf '[ {"name": "slow", "argv": ["bash", "%s"]}, {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]\n' "$tmp/slow37.sh" > "$tmp/legs37.json"
+R37a=$tmp/memA; R37b=$tmp/memB; mk_repo "$R37a"; mk_repo "$R37b"
+for r37 in "$R37a" "$R37b"; do
+  ( cd "$r37" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 GATE_JOBS=2 GATE_MEMPAUSE=90 GATE_MEMINFO="$tmp/mem95" GATE_LEGS="$tmp/legs37.json" \
+      bash $KIT_REL/run-gates.sh ) >"$tmp/out37.${r37##*/}" 2>&1 &
+done
+wait
+for r37 in "$R37a" "$R37b"; do
+  id37=$(cat "$r37/.git/gate-run/current" 2>/dev/null)
+  [ -s "$r37/.git/gate-run/$id37/pauses" ] && ok "bar ${r37##*/} paused on the shared host reading" \
+    || nope "bar ${r37##*/} did not pause on the shared host reading"
+done
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "turnstile: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }
 [ "$bad" = 0 ] && echo "PASS ($n assertions)"

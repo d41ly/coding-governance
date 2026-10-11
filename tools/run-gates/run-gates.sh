@@ -995,7 +995,13 @@ if [ -n "${GATE_TURNSTILE_SLOTS:-}" ]; then
   unset _ps_ok
 fi
 prof_s=""; [ "$PROF_SLOTS" -gt 1 ] && prof_s=", slots $PROF_SLOTS"
-PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c, wall $prof_w, mempause $prof_m$prof_s; $PROF_TAG)"
+# THE PROFILE LINE'S ONE TEMPLATE (TOOL-aPairedSlots-3): built here, and rebuilt after the turnstile
+# when a shared dispatch width moves `JOBS`, so the summary file and the durable copies carry the
+# width that dispatched. One function, so the two sites cannot spell the line two ways.
+render_prof_line() { # -> PROF_LINE, from the resolved profile and the current JOBS
+  PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c, wall $prof_w, mempause $prof_m$prof_s; $PROF_TAG)"
+}
+render_prof_line
 
 # HOISTED ABOVE `--print-profile`, TOOL-dDerivedDocket-27 S3. That verb reports the queue bound,
 # and a queue printed before the TTL is resolved reads 0, which is a bound on nothing. Deriving it
@@ -1188,6 +1194,12 @@ fi
 # THE SLOT PATHS, BUILT ONCE (TOOL-aPairedSlots-2). An array rather than a path function, so a claim,
 # a reap or a count over the slots forks nothing per slot on a host where every fork is the cost.
 TS_SLOTS=${PROF_SLOTS:-1}; TS_SLOT=""; TS_SLOT_DIRS=(); TS_HELD_N=0
+# THE SHARED-WIDTH RULE (TOOL-aPairedSlots-3): what a bar's pool width becomes when it acquires a slot
+# while another is held. `half` divides the width by the held count; `full` leaves it. The value is
+# the two-bar A/B's (TOOL-aPairedSlots-9), which sets it; `full` changes no width, so it is the value
+# shipped until that measurement says otherwise. The MEMORY PAUSE needs no counterpart: it reads
+# `/proc/meminfo` or the cgroup pair, both host-wide, so two bars already pause on one reading.
+TS_SHARE_RULE=full
 if [ -n "$TS_DIR_C" ]; then
   TS_SLOT_DIRS=("$TS_DIR_C"); _ts_k=2
   while [ "$_ts_k" -le "$TS_SLOTS" ]; do TS_SLOT_DIRS+=("$TS_DIR_C.$_ts_k"); _ts_k=$((_ts_k + 1)); done
@@ -1677,6 +1689,25 @@ if [ "${#TS_HOLD[@]}" -gt 0 ]; then
   "${TS_HOLD[@]}"; ts_rc=$?
   ts_tick_stop; ts_release; ts_drop_ticket
   exit "$ts_rc"
+fi
+
+# ---- THE SHARED DISPATCH WIDTH (TOOL-aPairedSlots-3) ----------------------------------------------
+# Read ONCE, right after the acquire, by a run that HOLDS a slot at a count above one: the held count
+# is the slot paths that exist, this run's own included. At two or more held, `TS_SHARE_RULE` decides
+# the width, `GATE_JOBS` is the operator's width and is never divided, and one `gate profile:` line
+# names the width that dispatches; the first profile line was printed before the queue on purpose, so
+# this is a second line rather than a rewrite of the first. A nested, expired, unticketed or
+# disabled run holds no slot and reads nothing. The width is not re-read when a neighbour arrives or
+# leaves: the A/B measured a fixed width per bar.
+if [ "${TS_SLOTS:-1}" -gt 1 ] && [ "$TS_HELD" = 1 ]; then
+  measure_held_slots
+  if [ "$TS_HELD_N" -ge 2 ]; then
+    if [ -z "${GATE_JOBS:-}" ] && [ "$TS_SHARE_RULE" = half ]; then
+      JOBS=$(( JOBS / TS_HELD_N )); [ "$JOBS" -ge 1 ] || JOBS=1
+    fi
+    echo "gate profile: width $JOBS at dispatch — $TS_HELD_N of $TS_SLOTS bar slots held ($TS_SHARE_RULE)"
+    render_prof_line
+  fi
 fi
 
 # ---- the scratch dir: OWNED, REDIRECTED and SWEPT (TOOL-dDerivedDocket-25) -----------------------

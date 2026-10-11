@@ -13598,6 +13598,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "render_prof_line",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "render_push_lines",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -15908,6 +15913,11 @@
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
+      "id": "run_beside_holder",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
       "id": "run_bg_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -17656,6 +17666,11 @@
       "id": "set_runstate_fact",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "set_share_rule",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
     },
     {
       "id": "set_tool_root",

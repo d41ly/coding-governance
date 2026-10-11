@@ -1,11 +1,12 @@
 # TOOL-aPairedSlots-3 — a bar dispatched while another slot is held takes the shared width its rule names
 
-**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 3
+**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aPairedSlots-3-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aPairedSlots-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md) | journal | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 |
 | [2026-10-11-prompt-TOOL-aPairedSlots-1.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1.md) | research | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 |
 
