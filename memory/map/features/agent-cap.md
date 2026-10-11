@@ -21,7 +21,7 @@ gate-legs = [
 ]
 kits = ["hooks"]
 git-hooks = []
-harness-hooks = ["PreToolUse tools/hooks/agent-cap.js", "PreToolUse tools/hooks/scratch-guard.js"]
+harness-hooks = ["PreToolUse tools/hooks/agent-cap.js", "PreToolUse tools/hooks/scratch-guard.js", "SubagentStart tools/hooks/scratch-guard.js"]
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
@@ -119,6 +119,24 @@ a deny on either names a remedy an unattended landing cannot run. The drive
 fold is `buildComparablePath`'s own step, applied to the `-C` target and `cwd` BEFORE the walk and
 to both toplevels before the compare; there is no second normaliser.
 
+**And a THIRD check, the write gate, on the same process** (`TOOL-aRoutedQuill-2`). The fragment's
+matcher widened to `Bash|PowerShell|Edit|Write|MultiEdit|NotebookEdit`, one fragment because the
+merger joins on the script's basename, and `main` sends a write tool to `checkRouted`. An edit under
+`ROUTED_PATHS` (the target toplevel's `.memory-tree.conf`) refuses unless the card's `## route`
+names a unit whose spec is buildable by `checkBuildable`. Unlike the two shell checks it fails
+CLOSED, has no `agent_id` exemption (a subagent's payload carries the parent's `session_id`), and
+refuses on an absent or replay-written card. An UNARMED conf refuses every write but the one to
+itself. A target outside the session's common dir is not gated, so a scratch clone never meets its
+own conf.
+
+**And the same script on a SECOND event, `SubagentStart`** (`TOOL-aRoutedQuill-4`). A second
+fragment, `scratch-guard-subagent.fragment.json` with matcher `*`, is safe where a second PreToolUse
+one is not, because the merger re-matches a marker only within one event's groups. `main` sends a
+`SubagentStart` payload to `renderRouteContext` before any `tool_name` test, and prints its text as
+`additionalContext`: the card's route lines byte for byte, each unit's `checkBuildable` verdict, and
+what the gate refuses, capped at `ROUTE_CONTEXT_CAP` characters. It states facts and never
+directs, prints nothing where the gate admits everything, and never blocks.
+
 **One rule in `agent-cap.js` is not a fan-out bound and reads the payload's ARGS, not the script**
 (`TOOL-aBlindedTrial-4`, for the ruling `TOOL-aBlindedTrial-6`). A `Workflow` call whose
 structured `args` carry `kind: "spec-audit"` is denied unless the build README at
@@ -140,6 +158,11 @@ hooks.** It returns the single-token value of a key between the opening `---` an
 `checkAuthorizedReadme` reads `authorized-by:` through it and the spec-audit rule reads
 `spec-audit:`, required lazily inside the rule's try so a withdrawn sibling is a deny, not a crash.
 It takes bytes, not a path: the staged-blob caller has no file to name. One reader keeps "a fenced example in the body is not front matter" one answer (F10) for both keys.
+
+**`readConfKey` in the same file is the ONE shell-grammar conf reader.** The write gate reads
+`MEMORY_ROOT`, `ROUTED_PATHS` and `SPEC_TIER1_CUTOFF` through it, and `agent-cap.js`'s
+`readSpecAuditDefault` delegates to it (`TOOL-aRoutedQuill-2` S9): last assignment wins, the key is
+compared as a string.
 
 **Every declared hook path is asserted to SHIP, in both directions.** A fragment names a
 destination and an adopter script writes one, and neither is any use if the file it points at

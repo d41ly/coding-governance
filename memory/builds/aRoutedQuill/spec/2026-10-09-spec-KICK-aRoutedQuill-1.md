@@ -1,12 +1,16 @@
 # KICK-aRoutedQuill-1 — the kickoff writes a brief the owner confirms, and the card routes the session to its units
 
-**Status:** SPECCED · rev-3 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams kickoff · order 2 · closes TOOL-aReplayedCard-11 · ratified 2026-10-09
+**Status:** CLOSED · rev-5 · 2026-10-09 · node a · Tier-2 · base 6473ae38 · streams kickoff · order 2 · closes TOOL-aReplayedCard-11 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-09-build-KICK-aRoutedQuill-1-1-acceptance-ledger.md](../build/2026-10-09-build-KICK-aRoutedQuill-1-1-acceptance-ledger.md) | journal | — |
+| [2026-10-10-build-KICK-aRoutedQuill-1-runlog-f0cdcc91.md](../build/2026-10-10-build-KICK-aRoutedQuill-1-runlog-f0cdcc91.md) | journal | PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-9 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12 |
+| [2026-10-09-prompt-KICK-aRoutedQuill-1-build-brief.md](../prompts/2026-10-09-prompt-KICK-aRoutedQuill-1-build-brief.md) | journal | — |
 | [2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md](../prompts/2026-10-09-prompt-TOOL-aRoutedQuill-1-0-run-handoff.md) | journal | TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 |
+| [2026-10-10-review-TOOL-aRoutedQuill-1-closing-diff-round1.md](../reviews/2026-10-10-review-TOOL-aRoutedQuill-1-closing-diff-round1.md) | diff-review | TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-7 |
 
 <!-- /gen:spec-records -->
 
@@ -65,7 +69,8 @@ The write gate and the subagent hand-off read that section; this unit writes and
   appends a new route.
 - The sealed task skeleton. `TASK_SKELETON` is untouched, so check 10 compares the same bytes it
   compares today.
-- The engine split KICK-aReplayedCard-5 asks for. This edit fits the engine's headroom (§4 Rollout).
+- The engine split KICK-aReplayedCard-5 asks for. This edit fits the engine's headroom with a
+  same-commit trim (§4 Rollout).
 - The kickoff-manifest kit version. It moves once, after the build's last unit touching that kit.
 - Retrofitting briefs or routes for landed builds or live cards.
 
@@ -110,7 +115,8 @@ Read at `6473ae38` on 2026-10-09.
   (`skills/session-kickoff/SKILL.md:206-207`). The engine is 18087 bytes against a declared ceiling of
   18432 (`tools/template-size-limits.txt`) and a recorded high-water of 18369
   (`tools/template-size-highwater.txt`). PINNED at `6473ae38` on 2026-10-09: 282 bytes before the
-  advisory WARN, 345 before the red.
+  advisory WARN, 345 before the red. RE-MEASURED at `db0d57da` before the build: 18346 bytes, 23
+  before the WARN, because three dLadderedRemote commits grew the engine after the pin.
 - The scratch-guard self-test feeds every backticked `git ` span between the engine's Step 0 and
   Step 5 to the commit deny on a sentinel card (`tools/hooks/scratch-guard.test.sh:609-614`).
 - A record whose `**Serves:**` id no spec H1 defines prints a `B` row
@@ -243,7 +249,7 @@ byte-identical.
 | R2 | a line outside the grammar, or a missing or repeated `- build:` or `- brief:` line, or no `- unit:` line | 1 |
 | R3 | a unit id absent from `$CARD_TMP/ids` | 1 |
 | R4 | a spec path absent from `$CARD_TMP/tracked`, outside `<MEMORY_ROOT>/builds/<build>/spec/`, or carrying no unfenced H1 whose first token, backticks and asterisks stripped, is the unit id | 1 |
-| R5 | a brief path absent from `$CARD_TMP/tracked`, or outside `<MEMORY_ROOT>/builds/<build>/` | 1 |
+| R5 | a brief path absent from `$CARD_TMP/tracked`, or neither under `<MEMORY_ROOT>/builds/<build>/prompts/` nor that build's `README.md`, the unattended form | 1 |
 | R6 | a body with no real READY line, appended to a card whose READY line is `READY — none yet` | 1 |
 
 No rule spawns git or the reader. R3 to R5 read the two sets the citation check already holds, and
@@ -254,8 +260,9 @@ card shape, route rules, cap.
 
 ### Engine text
 
-The engine grows by at most 282 bytes, so neither its ceiling nor its high-water moves. Measured
-against the wording below, the two edits cost 211 bytes:
+The engine ends at or under its recorded high-water, so neither its ceiling nor its high-water
+moves. Measured against the wording below, the two edits cost 211 bytes, and the same commit pays
+for them by cutting two self-referential clauses from Step 3, neither of which a gate reads:
 
 - Step 3, a new paragraph after the "split or clarify before any code" sentence: **A task that writes
   product code also gets a brief**, from `bash <check-script> --brief-skeleton`.
@@ -282,7 +289,7 @@ against the wording below, the two edits cost 211 bytes:
 - The route is inert until TOOL-aRoutedQuill-2 reads it. Nothing requires one before then, and a
   card without one appends and checks as today. The one refusal an existing flow can meet is S8's,
   and Step 5's body always carries `## task`.
-- If the engine edit cannot fit its 282 bytes, the unit trims engine prose in the same commit.
+- If the engine edit cannot fit under the high-water, the unit trims engine prose in the same commit.
   Raising the declared ceiling is an owner decision, and the engine split is its own ask.
 - The manifest owes `last-audit` and `last-body-change` with a delta line in the commit message,
   because `manifest-check.sh` and `SKILL.md` are in its `watch:`.
@@ -299,7 +306,7 @@ against the wording below, the two edits cost 211 bytes:
 - **A brief template shipped as its own file.** A new shipped file needs a descriptor row and a
   destination, while the checker is overwritten whole in every adopter and already hosts the sealed
   task field set the brief restates.
-- **Spelling the two shapes in the engine.** The engine has 282 bytes of headroom, and a route shape
+- **Spelling the two shapes in the engine.** The engine has almost no headroom, and a route shape
   there would be a second spelling beside the checker that parses it.
 - **Requiring `## The brief` inside the brief file.** It refuses an unattended run whose brief is the
   README the owner committed.
@@ -321,7 +328,7 @@ against the wording below, the two edits cost 211 bytes:
   the stored route is readable through `--card --replay`.
 - risks — the attended go is recorded by the session, not observed by a machine. The route check is
   existence and pairing, never truth, and the gate reads a status the agent writes. The engine sits
-  282 bytes under its high-water before this edit.
+  23 bytes under its high-water before this edit, so the edit pays for itself with a trim.
 - testing — arms in `skills/session-kickoff/manifest-check.test.sh` beside the K2 block, in its
   scratch clone, each observed RED against the base checker before it lands; the suite runs once,
   after the build.
@@ -348,8 +355,9 @@ against the wording below, the two edits cost 211 bytes:
   Red when: the card holds two route sections, or keeps the first.
 - **AC4** — When a route's unit line names an id no spec H1 defines, pairs an id with a spec whose H1
   defines another, or names an untracked spec or one outside the build's `spec/` folder, and when its
-  brief line names a path outside the build folder, `--card --append` exits 1 naming the line and the
-  rule, and `cmp` finds the card byte-identical.
+  brief line names a path outside the build folder, or a tracked path inside it that is neither under
+  its `prompts/` folder nor its `README.md`, such as the unit's own spec, `--card --append` exits 1
+  naming the line and the rule, and `cmp` finds the card byte-identical.
   Red when: any such route is appended, or annotated `UNVERIFIED` instead of refused.
 - **AC5** — When a route body lacks its `- build:` line, carries no `- unit:` line, carries two
   `- brief:` lines, carries a stray line, or the body carries two `## route` sections,
@@ -365,7 +373,8 @@ against the wording below, the two edits cost 211 bytes:
   Red when: the task-less body is appended, or the K2 AC3 verdict changes.
 - **AC8** — When a conforming route body is appended in a fixture whose `.memory-tree.conf` declares
   no `MEMORY_ROOT`, and again where the id reader exits 3, `--card --append` exits 2 naming the
-  missing piece, and the card is byte-identical.
+  missing piece, and the card is byte-identical. With no `MEMORY_ROOT` the piece named is the id
+  reader's own failure where the reader is installed, and `MEMORY_ROOT` where it is not.
   Red when: a route is appended with its folder or its ids unchecked.
 - **AC9** — When `grep -n -- '--brief-skeleton' skills/session-kickoff/SKILL.md` runs, it finds the
   Step 3 sentence, and Step 5 names `## Owner confirmation` and `## route`; then
@@ -424,6 +433,17 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC4
   `### Limitations` sub-head; folded the aQuotedBrief session's sequencing (that unit builds as
   specced, TOOL-aRoutedQuill-7 repoints its rule) and its four record constraints; hands-off to
   TOOL-aRoutedQuill-7.
+- rev-4 · 2026-10-09 · §4 · AC4 · the M2 cross-read of 2026-10-09 found R5 admitted any tracked path
+  in the build folder as a brief, so a route naming the unit's own spec as its brief passed; R5 now
+  admits only a path under the build's `prompts/` folder or the build's `README.md`, the unattended
+  form the route grammar already allows, and AC4 adds the own-spec-as-brief refusal.
+- rev-5 · 2026-10-09 · §3 · §4 · §5 · AC8 · build: the engine headroom pinned at `6473ae38` was stale,
+  18346 bytes and 23 under the high-water at `db0d57da`, so §4 Engine text now pays for the two
+  edits by cutting two self-referential Step 3 clauses in the same commit, as Rollout already
+  allowed; the 282-byte figure is kept only as the original pin. AC8's no-`MEMORY_ROOT` half: the
+  memory-tree id reader itself exits 1 over such a conf, so the citation check refuses with exit 2
+  before the route rules run; R0's own words are reached where the reader is absent too, and the
+  arms observe both. The criterion's red mode, a route appended unchecked, is unchanged.
 
 ## 10. Reuse audit
 

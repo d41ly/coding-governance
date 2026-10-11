@@ -125,7 +125,10 @@ That is the population the `impure` key declares, as `TOOL-aPacedTurnstile-5` me
 
 **One leg here grades the DEPLOYER's work rather than the runner's.** `receipt sync` reads
 `.governance/install.json` and reds when an engine row's file is missing or no longer hashes to its
-recorded sha256. It lives here because every adopter installs this kit; the reader that already
+recorded sha256, unless the mismatch is EOL-ONLY: `git hash-object` over the working file (one
+`--stdin-paths` spawn for every candidate) yields the row's `oid` while the raw bytes do not, the
+rule `govkit check` applies, so a CRLF copy under an `eol=lf` pin is clean and a real edit still reds
+(`TOOL-aLevelledCopy-1`). It lives here because every adopter installs this kit; the reader that already
 answers the question needs a gov checkout beside the target, so it never runs on an adopter's bar. It is the INTEGRITY arm alone — no `source`, `commit` or
 `gov_oid`, which resolve only against gov's blobs, and no `seed`, `merged`, `attributes` or `forked`
 row. In THIS repository it always takes its announced-skip path, because there is no receipt here, so
@@ -200,6 +203,24 @@ world moved past is indistinguishable from one nobody measured. `TOOL-dDerivedDo
 **Only a census-clean reading argues a ceiling.** A `.leg` row's eighth field, `foreign`, is the most foreign gate-work trees the run's `census` saw, or `unknown`; it misses other load and Windows processes no MSYS shell spawned. `derive-ceilings.py` sets the rest aside as `contended` or `uncensused`; `--observed` stays admitted, uncensused. `cleanup` stops the turnstile ticker later censuses counted. `TOOL-aGraftedHelix-5`.
 
 **A dispatch waits out memory pressure, and every wait ends.** `mempause` holds the next leg while used memory is above its row's threshold and a leg runs; the `mempause_sh` block both dispatchers carry releases it `fell`, `drained`, `unread`, `bound` or `wall`, so a pool narrows and never deadlocks. Each episode is a `pauses` row, and `derive-ceilings.py` sets its legs' readings aside as `paused`. `TOOL-aGraftedHelix-7`.
+
+**A leg is HELD by `subject == kit` OR `chunk == selftests`, and the summary names that rule.** It
+runs only under `GATE_SELFTESTS=1`; `GATE_FULL` lifts guards, never the hold. An adopter's manifest
+carries no `chunk`, so there only `subject = kit` holds, hence `N held: subject kit or chunk
+selftests` rather than "every self-test" (`TOOL-aBenchedProbe-2`).
+
+**A doc-only push runs only the legs whose doc reads moved.** `GATE_DOCS_BASE=<rev>` (not under
+`GATE_FULL`) skips a leg whose declared `doc_reads` did not move; an undeclared leg falls through to
+its guard. The deployer carries a kit leg's `doc_reads` at run-gates 1.25+ and its `ceiling` at 1.2+
+(`TOOL-dThriftyLanding-1`, `DEPL-aBenchedProbe-2`).
+
+**A full green earned in any worktree serves every push.** A linked worktree's green also lands in a
+separate `.shared` slot in the common dir, never over the primary's own stamp; the push boundary reads
+it last and validates it with its own predicates. One slot per clone: last writer wins, costing a
+saving, never a verdict (`TOOL-dThriftyLanding-2`).
+
+**The remote is asked through the ladder, never spelled.** The runner inlines the gov lib's remote
+ladder byte-identically, so no probe reads a literal `origin` (`TOOL-dLadderedRemote-2`).
 
 **A waiting bar beats.** On every tick it waits, the turnstile rewrites `gate-queue-heartbeat` under its own worktree's git dir, beside `gate-logs/`, and never removes it, so an out-of-process liveness reader sees a queued bar move before its first leg lands; the unattended driver's clock reads its mtime. `TOOL-dDerivedDocket-64`.
 

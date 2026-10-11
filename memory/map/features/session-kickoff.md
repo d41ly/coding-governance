@@ -76,6 +76,27 @@ unmerged remote-tracking refs sharing a path with this tree's branch, read once 
 The `cli —` cell (`KICK-aMendedFleet-4`), directly after `node —`, compares PATH's `claude --version`,
 read once under a bounded `timeout`, with the running session's version from `AI_AGENT`, and prints a
 NOTE when PATH is the older, since every session started from PATH runs that CLI.
+The `health —` cell (`TOOL-aGraftedHelix-8`), after `claims —` and above `recent —`, counts the last
+24 hours of `<git-common-dir>/health.log`, one TAB-separated line per automatic self-heal any kit
+appended, by kind; the window is fixed, never "since the previous card", because cards are per
+session. The log's reader and writer are the inlined `health_log_sh` block, byte-identical to the
+gov lib copy and gated.
+
+Every location probe the checker asks from another directory — the file's toplevel and its prefix —
+runs with `GIT_DIR` and `GIT_WORK_TREE` unset, because a hook inherits them and they would answer for
+the caller's tree instead of the probed one (`TOOL-aGraftedHelix-45`, gated by the shell-hygiene
+location-probe leg).
+
+The engine's Step 0 finds the remote through the same ladder every kit inlines — `GOV_REMOTE`, else the
+current branch's configured remote unless it is `.`, else the repository's only remote; several and
+none chosen asks, naming `GOV_REMOTE` — and the default branch through `GOV_DEFAULT_BRANCH`, else the
+remote's `HEAD` symref, else `main` or `master`. No step spells a literal `origin`
+(`TOOL-dLadderedRemote-5`).
+
+The manifest audits its own freshness, not only its claims: check 7 caps its size (it must be trimmed,
+never the cap raised), and check 9 reds once ten or more watched commits land while `last-body-change`
+stays put, so a manifest nobody re-reads cannot pass by re-stamping `last-audit` alone. A stamp-only
+re-audit is therefore not enough after a long gap: the body has to be re-read and genuinely revised.
 
 The engine's kickoff lands on the card through `--card --append` (`KICK-aReplayedCard-2`), which
 checks every cited path, line range and record id for EXISTENCE in two spawns — one
@@ -90,6 +111,18 @@ replace `git worktree list` and the log in the batch, while the branch, `status 
 fast-forward and `rev-parse HEAD` as the BASE still run — and appends at Step 5, piping its six
 sections and the READY line through that verb before Step 2b's staged repair is committed
 (`KICK-aReplayedCard-3`), so the deny reads a READY line when the engine's own commit reaches it.
+
+A kickoff whose task writes product code also drafts a brief from `--brief-skeleton`
+(`KICK-aRoutedQuill-1`), which prints the brief record's skeleton and the card's `## route` skeleton
+and, like `--task-skeleton`, answers outside any repository. The owner's answer to the hand-back is
+quoted under the brief's `## Owner confirmation`. The route — one `- build:` line, a `- unit: <id> ·
+spec <path>` line per unit, one `- brief:` line — rides `--card --append`, which grades it by the
+rules beside `check_card_route` with the two sets the citation check already holds: every id
+defined, every spec tracked under the build's `spec/` with an H1 defining its id, the brief tracked
+under the build's `prompts/` or its `README.md`. A miss is refused, never annotated, and a route
+lands only on a card a kickoff has appended to; a later route takes the stored one's place. A tree
+whose conf declares no `MEMORY_ROOT`, read through `read_memory_root`, or whose reader yields no id
+set, refuses a route with exit 2. The append also refuses a real READY body with no `## task`.
 
 The engine also puts the spec-audit question to the owner, once, at Step 3 (`KICK-aBlindedTrial-1`):
 only when the DoR is a design pass and the build method the manifest names makes `spec-audit:` opt-in,

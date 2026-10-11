@@ -476,6 +476,13 @@ run_card() {
     | HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
       node "$HOOK" >/dev/null 2>"$TMP/err"
   got=$?
+  check_stderr "$name" "$want" "$got" "$expect"
+}
+
+# check_stderr <name> <want_exit> <got_exit> <stderr-expect> — reads $TMP/err; shared by run_card and
+# run_write so the two runners cannot grade a stderr expectation two ways.
+check_stderr() {
+  local name=$1 want=$2 got=$3 expect=$4 err bad="" mode rest needle
   err=$(cat "$TMP/err")
   if [ "$got" != "$want" ]; then
     echo "FAIL $name (exit $got, want $want)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); return
@@ -728,14 +735,373 @@ else
   echo "FAIL AC11 the hook accepts '$sg_modes_hook' but the driver's SECOND_ANCHOR_MODES is '$sg_modes_driver'"; fail=$((fail+1))
 fi
 
+# ==================================================================================================
+# ---- the WRITE GATE (TOOL-aRoutedQuill-2): an Edit, Write, MultiEdit or NotebookEdit under -------
+# ---- ROUTED_PATHS needs a card routing a BUILDABLE unit -------------------------------------------
+# Over the orientation fixture: targets sit in the LINKED WORKTREE, CLAUDE_PROJECT_DIR is the PRIMARY
+# by default, so every gated arm also proves the linked worktree shares the session's common dir.
+# The product directory is spelled through a variable, because a kit file may not type a kit path.
+# The base hook exits 0 on every write payload and has no readConfKey, so every DENY arm and every
+# readConfKey arm below was observed RED against it; the allow arms are their near-misses.
+SGP=tools
+SG_PROJECT="$SG_CWD_FIX"
+SG_CONF="$SGWT/.memory-tree.conf"
+SG_CONF_SHOWN=$(build_comparable "$SG_CWD_WT")/.memory-tree.conf
+write_conf() { # <ROUTED_PATHS value> [<MEMORY_ROOT value>] [<SPEC_TIER1_CUTOFF value>]
+  printf 'MEMORY_ROOT=%s\nROUTED_PATHS="%s"\nSPEC_TIER1_CUTOFF="%s"\n' "${2-mem}" "$1" "${3-2026-10-01}" > "$SG_CONF"
+}
+write_conf "$SGP/ app.md"
+# write_spec <repo-relative path> <H1 id> <status> <tier>
+write_spec() {
+  mkdir -p "$SGWT/$(dirname "$1")"
+  printf '# %s — a fixture unit\n\n**Status:** %s · rev-1 · 2026-10-09 · node a · %s · base 0000000 · streams tooling · order 1\n' "$2" "$3" "$4" > "$SGWT/$1"
+}
+SG_SPECS=mem/builds/bx/spec
+write_spec "$SG_SPECS/2026-10-09-spec-TOOL-x-1.md" TOOL-x-1 INPROGRESS Tier-2
+write_spec "$SG_SPECS/2026-10-09-spec-TOOL-x-2.md" TOOL-x-2 SPECCED Tier-2
+write_spec "$SG_SPECS/2026-10-09-spec-TOOL-x-3.md" TOOL-x-3 SPECCED Tier-1
+write_spec "$SG_SPECS/2026-09-01-spec-TOOL-x-4.md" TOOL-x-4 SPECCED Tier-1
+write_spec "$SG_SPECS/2026-10-09-spec-TOOL-x-5.md" TOOL-x-9 INPROGRESS Tier-2
+write_spec "mem/builds/other/spec/2026-10-09-spec-TOOL-x-6.md" TOOL-x-6 INPROGRESS Tier-2
+# write_route_card <sid> <writer-verb> <unit>=<spec path> ... — the writer's card with a real READY
+# line, then a `## route` of one build, the given units and a brief, in KICK-aRoutedQuill-1's shape.
+write_route_card() {
+  local sid=$1 verb=$2; shift 2
+  write_card "$sid" "$SG_TOP_WT" "$verb" "$SG_READY"
+  { printf '## route\n- build: bx\n'
+    for u in "$@"; do printf -- '- unit: %s · spec %s\n' "${u%%=*}" "${u#*=}"; done
+    printf -- '- brief: mem/builds/bx/prompts/b.md\n'; } >> "$SG_CARDS/$sid.md"
+}
+# run_write <name> <want_exit> <stderr-expect> <tool> <target|-> [<field>=<value> ...] — <target> is
+# the payload's file_path (notebook_path for NotebookEdit), `-` for neither; fields join the payload
+# top level. stderr is graded as run_card grades it.
+run_write() {
+  local name=$1 want=$2 expect=$3 tool=$4 target=$5; shift 5
+  local payload got
+  payload=$("$TESTPY" -c 'import json,sys; t,p=sys.argv[1],sys.argv[2]; ti={} if p=="-" else {("notebook_path" if t=="NotebookEdit" else "file_path"):p}; d={"tool_name":t,"tool_input":ti}; d.update(kv.split("=",1) for kv in sys.argv[3:]); print(json.dumps(d))' "$tool" "$target" "$@")
+  case "$payload" in *'"tool_name"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
+  printf '%s' "$payload" \
+    | HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= CLAUDE_PROJECT_DIR="$SG_PROJECT" \
+      node "$HOOK" >/dev/null 2>"$TMP/err"
+  got=$?
+  check_stderr "$name" "$want" "$got" "$expect"
+}
+SG_T="$SG_CWD_WT/$SGP/a.js"   # the product target, as node spells the worktree
+
+# ---- AC1: the admission table, per tier and status, and a route of two units ---------------------
+write_route_card sgtest-r1 write "TOOL-x-1=$SG_SPECS/2026-10-09-spec-TOOL-x-1.md"
+run_write "W-AC1 Tier-2 at INPROGRESS -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+write_route_card sgtest-r2 write "TOOL-x-3=$SG_SPECS/2026-10-09-spec-TOOL-x-3.md"
+run_write "W-AC1 Tier-1 at SPECCED dated on or after SPEC_TIER1_CUTOFF -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-r2 "cwd=$SG_CWD_WT"
+write_route_card sgtest-r3 write "TOOL-x-2=$SG_SPECS/2026-10-09-spec-TOOL-x-2.md"
+run_write "W-AC1 Tier-2 at SPECCED -> deny naming the unit, Tier-2 and INPROGRESS" 2 "any;;TOOL-x-2;;Tier-2;;INPROGRESS" Write "$SG_T" session_id=sgtest-r3 "cwd=$SG_CWD_WT"
+write_route_card sgtest-r4 write "TOOL-x-4=$SG_SPECS/2026-09-01-spec-TOOL-x-4.md"
+run_write "W-AC1 Tier-1 at SPECCED dated before SPEC_TIER1_CUTOFF -> deny naming the key" 2 "any;;TOOL-x-4;;SPEC_TIER1_CUTOFF" Write "$SG_T" session_id=sgtest-r4 "cwd=$SG_CWD_WT"
+write_conf "$SGP/ app.md" mem ""
+run_write "W-AC1 Tier-1 at SPECCED with SPEC_TIER1_CUTOFF blank -> deny naming the key" 2 "any;;TOOL-x-3;;SPEC_TIER1_CUTOFF;;blank" Write "$SG_T" session_id=sgtest-r2 "cwd=$SG_CWD_WT"
+write_conf "$SGP/ app.md"
+write_route_card sgtest-r5 write "TOOL-x-2=$SG_SPECS/2026-10-09-spec-TOOL-x-2.md" "TOOL-x-1=$SG_SPECS/2026-10-09-spec-TOOL-x-1.md"
+run_write "W-AC1 a route of two units, the first unbuildable, the second buildable -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-r5 "cwd=$SG_CWD_WT"
+
+# ---- AC2: an absent card, an unrouted one, untrustworthy route lines, and a replay-written card ---
+run_write "W-AC2 no card for the session -> deny naming the card path, the session and --card --write" 2 "any;;$SG_CARD_FIX/sgtest-r0.md;;sgtest-r0;;--card --write --session sgtest-r0" Write "$SG_T" session_id=sgtest-r0 "cwd=$SG_CWD_WT"
+write_card sgtest-r6 "$SG_TOP_WT" write "$SG_READY"
+run_write "W-AC2 a card with no ## route -> deny naming ## route and /session-kickoff" 2 "any;;## route;;/session-kickoff" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_route_card sgtest-r7 write "TOOL-x-7=$SG_SPECS/2026-10-09-spec-TOOL-x-7.md"
+run_write "W-AC2 a route line naming a missing spec -> deny naming the unit and the reason" 2 "any;;TOOL-x-7;;does not exist" Write "$SG_T" session_id=sgtest-r7 "cwd=$SG_CWD_WT"
+write_route_card sgtest-r8 write "TOOL-x-6=mem/builds/other/spec/2026-10-09-spec-TOOL-x-6.md"
+run_write "W-AC2 a spec outside builds/<slug>/spec/ -> deny naming the unit and the reason" 2 "any;;TOOL-x-6;;outside" Write "$SG_T" session_id=sgtest-r8 "cwd=$SG_CWD_WT"
+write_route_card sgtest-r9 write "TOOL-x-5=$SG_SPECS/2026-10-09-spec-TOOL-x-5.md"
+run_write "W-AC2 a spec whose H1 names another unit -> deny naming the unit and the reason" 2 "any;;TOOL-x-5;;H1 naming TOOL-x-9" Write "$SG_T" session_id=sgtest-r9 "cwd=$SG_CWD_WT"
+write_route_card sgtest-ra replay "TOOL-x-1=$SG_SPECS/2026-10-09-spec-TOOL-x-1.md"
+run_write "W-AC2 a replay-written card routing a buildable unit -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-ra "cwd=$SG_CWD_WT"
+
+# ---- AC3: what is not the session's product is not gated; a linked worktree of it is -----------
+mkdir -p "$TMP/norepo/$SGP"; SG_NOREPO=$(cd "$TMP/norepo" && node -p 'process.cwd()')
+run_write "W-AC3 a target under the temp root and no repository, unrouted card -> allow, stderr EMPTY" 0 empty Write "$SG_NOREPO/$SGP/a.js" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+SGFIX2="$TMP/sgfix2"
+if git init -q "$SGFIX2" && printf 'MEMORY_ROOT=mem\nROUTED_PATHS="%s/"\n' "$SGP" > "$SGFIX2/.memory-tree.conf"; then
+  echo "ok   W-AC3 the foreign fixture built: a second repository declaring ROUTED_PATHS"; pass=$((pass+1))
+else
+  echo "FAIL W-AC3 the foreign fixture could not be built"; fail=$((fail+1))
+fi
+SG_CWD_FIX2=$(cd "$SGFIX2" && node -p 'process.cwd()')
+run_write "W-AC3 a product path of a second repository that is not the session's, unrouted card -> allow, stderr EMPTY" 0 empty Write "$SG_CWD_FIX2/$SGP/a.js" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+run_write "W-AC3 the session's repository outside every entry, unrouted card -> allow, stderr EMPTY" 0 empty Write "$SG_CWD_WT/docs/a.md" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+run_write "W-AC3 the linked worktree's product path, CLAUDE_PROJECT_DIR the primary, unrouted card -> deny" 2 "any;;## route" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+SG_PROJECT=""
+run_write "W-AC3 no CLAUDE_PROJECT_DIR: the payload cwd places the session, unrouted card -> deny" 2 "any;;## route" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+SG_PROJECT="$SG_CWD_FIX"
+
+# ---- AC4: every spelling of a product path is gated, and the boundary is a whole segment ---------
+run_write "W-AC4 backslashed target -> deny" 2 "any;;## route" Write "$SG_CWD_WT\\$SGP\\a.js" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+run_write "W-AC4 upper-case segments -> deny" 2 "any;;## route" Write "$SG_CWD_WT/$(printf '%s' "$SGP" | tr a-z A-Z)/A.JS" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+run_write "W-AC4 relative file_path resolved against the payload cwd -> deny" 2 "any;;## route" Write "$SGP/a.js" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+run_write "W-AC4 NotebookEdit's notebook_path -> deny" 2 "any;;## route" NotebookEdit "$SG_CWD_WT/$SGP/n.ipynb" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+run_write "W-AC4 MultiEdit's file_path -> deny" 2 "any;;## route" MultiEdit "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+run_write "W-AC4 Edit's file_path -> deny" 2 "any;;## route" Edit "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+run_write "W-AC4 a file entry itself -> deny" 2 "any;;## route" Write "$SG_CWD_WT/app.md" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+run_write "W-AC4 near-miss: ${SGP}x beside $SGP/ -> allow, stderr EMPTY" 0 empty Write "$SG_CWD_WT/${SGP}x/a.js" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+run_write "W-AC4 near-miss: app.mdx beside the file entry app.md -> allow, stderr EMPTY" 0 empty Write "$SG_CWD_WT/app.mdx" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+run_write "W-AC4 near-miss: a Read is not a write tool -> allow, stderr EMPTY" 0 empty Read "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+
+# ---- AC5: an UNARMED conf refuses every write but the one that arms it; no conf is a witness -----
+write_conf ""
+run_write "W-AC5 ROUTED_PATHS blank -> deny naming UNARMED, ROUTED_PATHS and the conf" 2 "any;;UNARMED;;ROUTED_PATHS;;$SG_CONF_SHOWN" Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+run_write "W-AC5 ROUTED_PATHS blank, a non-product write -> deny (every write refuses)" 2 "any;;UNARMED" Write "$SG_CWD_WT/docs/a.md" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+run_write "W-AC5 ROUTED_PATHS blank, the write to the conf itself -> allow, stderr EMPTY" 0 empty Edit "$SG_CWD_WT/.memory-tree.conf" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_conf "$SGP/" ""
+run_write "W-AC5 MEMORY_ROOT blank -> deny naming UNARMED, ROUTED_PATHS and the conf" 2 "any;;UNARMED;;MEMORY_ROOT;;ROUTED_PATHS;;$SG_CONF_SHOWN" Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+run_write "W-AC5 MEMORY_ROOT blank, the write to the conf itself -> allow, stderr EMPTY" 0 empty Write "$SG_CWD_WT/.memory-tree.conf" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+write_conf "$SGP/ ../up/"
+run_write "W-AC5 an entry climbing through .. -> deny naming UNARMED" 2 "any;;UNARMED;;ROUTED_PATHS;;..;;$SG_CONF_SHOWN" Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+write_conf "$SGP/ mem/"
+run_write "W-AC5 an entry covering MEMORY_ROOT -> deny naming UNARMED" 2 "any;;UNARMED;;covers MEMORY_ROOT;;$SG_CONF_SHOWN" Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+rm -f "$SG_CONF"
+run_write "W-AC5 no conf at the target's toplevel -> allow, one witness line naming the absent conf" 0 "one;;no .memory-tree.conf" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+
+# ---- AC6: the write branch fails CLOSED on a payload or a conf it cannot read --------------------
+write_conf "$SGP/ app.md"
+run_write "W-AC6 neither file_path nor notebook_path -> deny naming both fields" 2 "any;;file_path;;notebook_path" Write - session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+run_write "W-AC6 a relative file_path and no cwd -> deny naming the field and cwd" 2 "any;;file_path;;no cwd" Write "$SGP/a.js" session_id=sgtest-r1
+rm -f "$SG_CONF"; mkdir -p "$SG_CONF"
+run_write "W-AC6 the conf path is a directory (a read error other than ENOENT) -> deny naming the conf" 2 "any;;$SG_CONF_SHOWN;;cannot be read" Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+rmdir "$SG_CONF"; write_conf "$SGP/ app.md"
+
+# ---- AC7: a subagent's write is judged exactly as the main loop's ---------------------------------
+run_write "W-AC7 agent_id with the parent's session_id, buildable route -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT" agent_id=sub-1
+run_write "W-AC7 agent_id with the parent's session_id, unrouted card -> deny" 2 "any;;## route" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT" agent_id=sub-1
+
+# ---- TOOL-aRoutedQuill-12: the H1 and depth reads R4 makes, every refusal reason, a junction, the --
+# ---- two-way MEMORY_ROOT test and the fail-closed catch -------------------------------------------
+# AC13 — the H1 read is R4's: the first UNFENCED `#` line, its token stripped of `*`, backticks and
+# trailing `:.,;`. Each spelling below was refused by the raw-token read.
+printf '# TOOL-x-11: title\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-x-11.md"
+printf '# **TOOL-x-12** — title\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-x-12.md"
+printf '```\n# TOOL-y-1\n```\n# TOOL-x-14 — title\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-x-14.md"
+for sg_u in 11 12 14; do
+  write_route_card "sgtest-h$sg_u" write "TOOL-x-$sg_u=$SG_SPECS/2026-10-09-spec-TOOL-x-$sg_u.md"
+  run_write "W-RQ12 AC13 the H1 spelling of TOOL-x-$sg_u reads as the unit -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id="sgtest-h$sg_u" "cwd=$SG_CWD_WT"
+done
+# AC15 — a spec at any depth under the build's spec folder.
+write_spec "$SG_SPECS/units/2026-10-09-spec-TOOL-x-15.md" TOOL-x-15 INPROGRESS Tier-2
+write_route_card sgtest-h15 write "TOOL-x-15=$SG_SPECS/units/2026-10-09-spec-TOOL-x-15.md"
+run_write "W-RQ12 AC15 a spec one folder below the spec folder -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-h15 "cwd=$SG_CWD_WT"
+# AC17 — every buildable verdict this suite had not driven, one arm each.
+write_spec "$SG_SPECS/2026-10-09-spec-TOOL-x-13.md" TOOL-x-13 INPROGRESS Tier-1
+write_route_card sgtest-h13 write "TOOL-x-13=$SG_SPECS/2026-10-09-spec-TOOL-x-13.md"
+run_write "W-RQ12 AC17 Tier-1 at INPROGRESS -> allow, stderr EMPTY" 0 empty Write "$SG_T" session_id=sgtest-h13 "cwd=$SG_CWD_WT"
+printf '# TOOL-x-16 — no tier\n\n**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a\n' > "$SGWT/$SG_SPECS/2026-10-09-spec-TOOL-x-16.md"
+write_route_card sgtest-h16 write "TOOL-x-16=$SG_SPECS/2026-10-09-spec-TOOL-x-16.md"
+run_write "W-RQ12 AC17 a spec with no Tier cell -> deny naming the missing tier" 2 "any;;TOOL-x-16;;names no Tier-1 or Tier-2" Write "$SG_T" session_id=sgtest-h16 "cwd=$SG_CWD_WT"
+write_route_card sgtest-h17 write "TOOL-x-1=/$SG_SPECS/2026-10-09-spec-TOOL-x-1.md"
+run_write "W-RQ12 AC17 an absolute spec path -> deny naming it not repo-relative" 2 "any;;TOOL-x-1;;is not a repo-relative path" Write "$SG_T" session_id=sgtest-h17 "cwd=$SG_CWD_WT"
+write_card sgtest-h18 "$SG_TOP_WT" write "$SG_READY"
+printf '## route\n- unit: TOOL-x-1 · spec %s/2026-10-09-spec-TOOL-x-1.md\n' "$SG_SPECS" >> "$SG_CARDS/sgtest-h18.md"
+run_write "W-RQ12 AC17 a route with no - build: line -> deny naming it" 2 "any;;TOOL-x-1;;names no - build: line" Write "$SG_T" session_id=sgtest-h18 "cwd=$SG_CWD_WT"
+write_card sgtest-h19 "$SG_TOP_WT" write "$SG_READY"
+printf '## route\n- build: bx\n- unit: TOOL-x-1\n' >> "$SG_CARDS/sgtest-h19.md"
+run_write "W-RQ12 AC17 a unit line with no spec -> deny naming it" 2 "any;;TOOL-x-1;;the route line names no spec" Write "$SG_T" session_id=sgtest-h19 "cwd=$SG_CWD_WT"
+# AC8 — an entry UNDER MEMORY_ROOT covers it, as surely as one above it.
+write_conf "$SGP/ mem/builds/"
+run_write "W-RQ12 AC8 an entry under MEMORY_ROOT -> deny naming UNARMED and the entry" 2 "any;;UNARMED;;mem/builds/ covers MEMORY_ROOT" Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+write_conf "$SGP/ app.md"
+# AC5 — a product file reached through a junction (a symlink off Windows) is gated like its repository
+# spelling. The link sits outside every repository, so a lexical walk finds no `.git` and admits.
+sg_link="$TMP/sglink"; mkdir -p "$SGWT/$SGP"
+if node -e 'require("fs").symlinkSync(process.argv[1], process.argv[2], "junction")' "$SGWT/$SGP" "$sg_link" 2>"$TMP/err"; then
+  SG_LINK=$(node -p 'require("path").resolve(process.argv[1])' "$sg_link")   # the LINK's spelling; a cd would resolve it
+  run_write "W-RQ12 AC5 the product path through a junction, unrouted card -> deny" 2 "any;;## route" Write "$SG_LINK/a.js" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+  run_write "W-RQ12 AC5 LIVENESS ...and through the repository spelling -> deny" 2 "any;;## route" Write "$SG_T" session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+else
+  echo "FAIL W-RQ12 AC5 no junction could be made at $sg_link:"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
+fi
+# AC18 — a throw inside checkRouted fails CLOSED. Staged from OUTSIDE the hook: a preloaded stub makes
+# every read of a `.git` path throw, which the linked worktree's `.git` FILE read reaches.
+printf '%s\n' 'const fs = require("fs"); const r = fs.readFileSync' \
+  'fs.readFileSync = function (p, ...a) { if (/[\\/]\.git$/.test(String(p))) throw new Error("stub: the .git read throws"); return r.call(this, p, ...a) }' > "$TMP/sgthrow.js"
+printf '{"tool_name":"Edit","tool_input":{"file_path":"%s"},"session_id":"sgtest-r1","cwd":"%s"}' "$(printf '%s' "$SG_T" | sed 's/\\/\\\\/g')" "$(printf '%s' "$SG_CWD_WT" | sed 's/\\/\\\\/g')" \
+  | HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= CLAUDE_PROJECT_DIR="$SG_PROJECT" \
+    node -r "$TMP/sgthrow.js" "$HOOK" >/dev/null 2>"$TMP/err"
+check_stderr "W-RQ12 AC18 a throw inside checkRouted -> exit 2, failing closed" 2 "$?" "any;;fails closed"
+
+# ---- AC10: readConfKey reads every spelling as the shell does -------------------------------------
+# read_conf <name> <want> <bytes> <key> — `<null>` is the absent-assignment answer.
+read_conf() {
+  local got
+  # Bracketed, so a node that died printing nothing cannot pass the blank-value arm.
+  got=$(node -e 'const v=require(process.argv[1]).readConfKey(process.argv[2],process.argv[3]);console.log("["+(v===null?"<null>":v)+"]")' "$HOOK" "$3" "$4")
+  if [ "$got" = "[$2]" ]; then echo "ok   $1"; pass=$((pass+1)); else echo "FAIL $1 (read '$got', want '$2')"; fail=$((fail+1)); fi
+}
+read_conf "W-AC10 two assignments: the last wins, an export prefix and a comment behind whitespace" 'dq val' "$(printf 'KEY=first\nexport KEY="dq val"  # c\n')" KEY
+read_conf "W-AC10 single quotes and a trailing comment" 'sq val' "$(printf "KEY='sq val' # c\n")" KEY
+read_conf "W-AC10 a # glued to a bare word is part of the word" '2026-09-21#c' 'KEY=2026-09-21#c' KEY
+read_conf "W-AC10 a bare word and a comment behind whitespace" 'bare' 'KEY=bare # c' KEY
+read_conf "W-AC10 a blank double-quoted value reads blank, not absent" '' 'KEY=""' KEY
+read_conf "W-AC10 a key is matched whole: KEY_X and NOTKEY are not KEY" '<null>' "$(printf 'NOTKEY=x\nKEY_X=y\n')" KEY
+read_conf "W-AC10 the key is compared as a string, never a regex: K.Y does not read KXY" '<null>' 'KXY=1' 'K.Y'
+
+# ==================================================================================================
+# ---- the SUBAGENT CONTEXT (TOOL-aRoutedQuill-4): a SubagentStart payload is answered with the -----
+# ---- card's route, each unit's verdict and what the write gate refuses, as facts -----------------
+# Over the write gate's fixture, conf and cards above. The base hook exits 0 with EMPTY stdout for
+# every SubagentStart payload, so every `json` arm below was observed RED against it; the `empty`
+# arms are their near-misses. The session directory is the linked worktree, whose toplevel holds
+# the conf, and its card is read from the shared common dir exactly as the gate reads it.
+SG_PROJECT="$SG_CWD_WT"
+# run_sub_hook <payload> — the hook on a SubagentStart payload: stdout to $TMP/out, stderr to $TMP/err.
+# CLAUDE_PROJECT_DIR is UNSET, not blank, when SG_PROJECT is empty; `env -u` precedes every
+# assignment because GNU env refuses it after one.
+run_sub_hook() {
+  if [ -n "$SG_PROJECT" ]; then
+    printf '%s' "$1" | env -u CLAUDE_PROJECT_DIR CLAUDE_PROJECT_DIR="$SG_PROJECT" HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
+      node "$HOOK" >"$TMP/out" 2>"$TMP/err"
+  else
+    printf '%s' "$1" | env -u CLAUDE_PROJECT_DIR HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
+      node "$HOOK" >"$TMP/out" 2>"$TMP/err"
+  fi
+}
+# check_sub_context <name> <exit> <expect> — `empty`: exit 0, stdout and stderr byte-empty; `json`: exit 0,
+# stderr byte-empty, stdout ONE object whose hookSpecificOutput.hookEventName is SubagentStart, its
+# additionalContext written to $TMP/ctx and appended to $TMP/ctx-all for the AC4 scan.
+check_sub_context() {
+  local name=$1 got=$2 expect=$3 bad=""
+  : > "$TMP/ctx"
+  if [ "$got" != 0 ]; then bad="exit $got, want 0"
+  elif [ -s "$TMP/err" ]; then bad="stderr is not byte-empty"
+  elif [ "$expect" = empty ]; then [ -s "$TMP/out" ] && bad="stdout is not byte-empty"
+  else
+    "$TESTPY" -c 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8")); h=d["hookSpecificOutput"]; assert h["hookEventName"]=="SubagentStart" and isinstance(h["additionalContext"],str) and h["additionalContext"]; open(sys.argv[2],"w",encoding="utf-8",newline="").write(h["additionalContext"])' "$TMP/out" "$TMP/ctx" 2>/dev/null \
+      || bad="stdout is not one SubagentStart hookSpecificOutput object carrying additionalContext"
+    [ -z "$bad" ] && { cat "$TMP/ctx"; echo; } >> "$TMP/ctx-all"
+  fi
+  if [ -z "$bad" ]; then echo "ok   $name"; pass=$((pass+1))
+  else echo "FAIL $name ($bad)"; sed 's/^/     /' "$TMP/out" "$TMP/err" | head -5; fail=$((fail+1)); fi
+}
+# run_sub <name> <empty|json> [<field>=<value> ...] — fields join a SubagentStart payload's top level.
+run_sub() {
+  local name=$1 expect=$2 payload; shift 2
+  payload=$("$TESTPY" -c 'import json,sys; d={"hook_event_name":"SubagentStart","agent_id":"sub-1","agent_type":"general-purpose"}; d.update(kv.split("=",1) for kv in sys.argv[1:]); print(json.dumps(d))' "$@")
+  case "$payload" in *'"SubagentStart"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
+  run_sub_hook "$payload"
+  check_sub_context "$name" "$?" "$expect"
+}
+# check_ctx <name> <mode> <needle>... over $TMP/ctx — `lines`: each needle is a WHOLE line of it;
+# `one`: it is exactly one line and carries each needle; `has`: it carries each needle. Byte
+# comparison in grep, so no argv re-encoding sits between a needle and the hook's bytes.
+check_ctx() {
+  local name=$1 mode=$2 bad="" needle; shift 2
+  [ -s "$TMP/ctx" ] || bad="the context is empty"
+  [ -z "$bad" ] && [ "$mode" = one ] && [ "$(grep -c '' "$TMP/ctx")" != 1 ] && bad="the context is $(grep -c '' "$TMP/ctx") lines, not one"
+  if [ -z "$bad" ]; then
+    for needle in "$@"; do
+      if [ "$mode" = lines ]; then grep -Fxq -- "$needle" "$TMP/ctx" || { bad="no whole line '$needle'"; break; }
+      else grep -Fq -- "$needle" "$TMP/ctx" || { bad="no '$needle'"; break; }; fi
+    done
+  fi
+  if [ -z "$bad" ]; then echo "ok   $name"; pass=$((pass+1))
+  else echo "FAIL $name ($bad)"; sed 's/^/     /' "$TMP/ctx" | head -12; fail=$((fail+1)); fi
+}
+: > "$TMP/ctx-all"
+SG_RP_SHOWN="$SGP/ app.md"   # the conf's ROUTED_PATHS value as write_conf wrote it
+
+# ---- AC1: a routed card's lines byte-identical, each unit's verdict, and ROUTED_PATHS ------------
+run_sub "S-AC1 a route to a Tier-2 unit at INPROGRESS -> the SubagentStart JSON" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+check_ctx "S-AC1 every ## route line of the card, byte-identical" lines '## route' '- build: bx' "- unit: TOOL-x-1 · spec $SG_SPECS/2026-10-09-spec-TOOL-x-1.md" '- brief: mem/builds/bx/prompts/b.md'
+check_ctx "S-AC1 the card path, the unit named buildable and the ROUTED_PATHS value" has "$SG_CARD_FIX/sgtest-r1.md" 'TOOL-x-1 is buildable' "$SG_RP_SHOWN"
+run_sub "S-AC1 a route to a Tier-2 unit at SPECCED -> the SubagentStart JSON" json session_id=sgtest-r3 "cwd=$SG_CWD_WT"
+check_ctx "S-AC1 the Tier-2 SPECCED unit is named not buildable, with INPROGRESS" has 'TOOL-x-2 is not buildable' 'INPROGRESS'
+# The verdict must agree with the gate on the SAME fixture: the write the gate admits is the unit the
+# context calls buildable, and the one it refuses is the one called not buildable.
+run_write "S-AC1 agreement: the gate admits a Write under sgtest-r1's route" 0 empty Write "$SG_T" session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+run_write "S-AC1 agreement: the gate refuses a Write under sgtest-r3's route" 2 "any;;TOOL-x-2;;INPROGRESS" Write "$SG_T" session_id=sgtest-r3 "cwd=$SG_CWD_WT"
+
+# ---- AC2: no card, or a card with no ## route, is ONE line naming the card and ROUTED_PATHS ------
+run_sub "S-AC2 no card for the session -> the SubagentStart JSON" json session_id=sgtest-s0 "cwd=$SG_CWD_WT"
+check_ctx "S-AC2 no card: one line naming the card path and the ROUTED_PATHS value" one "$SG_CARD_FIX/sgtest-s0.md" "$SG_RP_SHOWN"
+run_sub "S-AC2 a card with no ## route -> the SubagentStart JSON" json session_id=sgtest-r6 "cwd=$SG_CWD_WT"
+check_ctx "S-AC2 no route: one line naming the card path and the ROUTED_PATHS value" one "$SG_CARD_FIX/sgtest-r6.md" "$SG_RP_SHOWN"
+
+# ---- AC3: UNARMED is one line naming the rule broken; no conf and no repository are silent -------
+write_conf ""
+run_sub "S-AC3 ROUTED_PATHS blank -> the SubagentStart JSON" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+check_ctx "S-AC3 blank: one line naming ROUTED_PATHS, the conf and the blank value" one ROUTED_PATHS "$SG_CONF_SHOWN" blank
+write_conf "$SGP/ ../up/"
+run_sub "S-AC3 an entry climbing through .. -> the SubagentStart JSON" json session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+check_ctx "S-AC3 ..: one line naming ROUTED_PATHS, the conf, the entry and the .. rule" one ROUTED_PATHS "$SG_CONF_SHOWN" '../up/' 'climbs through ..'
+rm -f "$SG_CONF"
+run_sub "S-AC3 no conf at the session toplevel -> exit 0, stdout and stderr EMPTY" empty session_id=sgtest-r1 "cwd=$SG_CWD_WT"
+write_conf "$SGP/ app.md"
+SG_PROJECT=""
+run_sub "S-AC3 cwd under no repository, no CLAUDE_PROJECT_DIR -> exit 0, stdout and stderr EMPTY" empty session_id=sgtest-r1 "cwd=$SG_NOREPO"
+SG_PROJECT="$SG_CWD_WT"
+
+# ---- AC4: every line of every text above states a fact; none directs the subagent ----------------
+# The population is asserted first: a scan over nothing would pass for the reason it exists to catch.
+if [ "$(grep -c . "$TMP/ctx-all")" -ge 12 ] && ! grep -Eq "^(Run|Write|Use|Read|Do|Don't|Never|Always|Append|Ask|Stop)([^A-Za-z]|$)" "$TMP/ctx-all"; then
+  echo "ok   S-AC4 no line of the AC1-AC3 texts opens with an imperative"; pass=$((pass+1))
+else
+  echo "FAIL S-AC4 an AC1-AC3 line opens with an imperative, or the texts were not collected"; grep -En "^(Run|Write|Use|Read|Do|Don't|Never|Always|Append|Ask|Stop)([^A-Za-z]|$)" "$TMP/ctx-all" | head -5; fail=$((fail+1))
+fi
+if [ "$(grep -c . "$TMP/ctx-all")" -ge 12 ] && ! grep -Eiwq 'must|should|do not' "$TMP/ctx-all"; then
+  echo "ok   S-AC4 no line of the AC1-AC3 texts carries must, should or do not"; pass=$((pass+1))
+else
+  echo "FAIL S-AC4 an AC1-AC3 line carries must, should or do not, or the texts were not collected"; grep -Eiwn 'must|should|do not' "$TMP/ctx-all" | head -5; fail=$((fail+1))
+fi
+
+# ---- AC5: a route past the harness cap is cut at a line boundary, with a closing count line ------
+# The cap is read from the hook, and the padding DERIVED from it: unit lines until the route section
+# alone passes 1.2 times the cap in characters (the loop counts in the shell's units, so it aims at 1.3).
+SG_CAP=$(node -p "require(process.argv[1]).ROUTE_CONTEXT_CAP" "$HOOK")
+# A hook exporting no numeric cap is a failure here, and the arms below still run on the harness's.
+case "$SG_CAP" in ''|*[!0-9]*) echo "FAIL S-AC5 the hook exports no numeric ROUTE_CONTEXT_CAP ('$SG_CAP')"; fail=$((fail+1)); SG_CAP=10000 ;; esac
+write_card sgtest-s5 "$SG_TOP_WT" write "$SG_READY"
+{ printf '## route\n- build: bx\n'
+  sg_len=0; sg_unit="- unit: TOOL-x-1 · spec $SG_SPECS/2026-10-09-spec-TOOL-x-1.md"
+  while [ "$sg_len" -le $(( SG_CAP * 13 / 10 )) ]; do printf '%s\n' "$sg_unit"; sg_len=$(( sg_len + ${#sg_unit} + 1 )); done
+  printf -- '- brief: mem/builds/bx/prompts/b.md\n'; } >> "$SG_CARDS/sgtest-s5.md"
+sed -n '/^## route$/,$p' "$SG_CARDS/sgtest-s5.md" > "$TMP/route-s5"
+run_sub "S-AC5 a route padded past the cap -> the SubagentStart JSON" json session_id=sgtest-s5 "cwd=$SG_CWD_WT"
+sg_chars=$(node -p "require('fs').readFileSync(process.argv[1],'utf8').length" "$TMP/ctx")
+sg_routec=$(node -p "require('fs').readFileSync(process.argv[1],'utf8').length" "$TMP/route-s5")
+if [ "$sg_routec" -gt $(( SG_CAP * 12 / 10 )) ] && [ "$sg_chars" -le "$SG_CAP" ]; then
+  echo "ok   S-AC5 a $sg_routec-character route yields $sg_chars characters, within the cap $SG_CAP"; pass=$((pass+1))
+else
+  echo "FAIL S-AC5 a $sg_routec-character route yields $sg_chars characters against the cap $SG_CAP"; fail=$((fail+1))
+fi
+sg_kept=$(grep -cE '^(## route$|- )' "$TMP/ctx")
+if [ "$sg_kept" -gt 1 ] && ! grep -E '^(## route$|- )' "$TMP/ctx" | grep -vFxq -f "$TMP/route-s5"; then
+  echo "ok   S-AC5 every one of the $sg_kept route lines kept is a whole line of the card"; pass=$((pass+1))
+else
+  echo "FAIL S-AC5 a kept route line is not a whole card line, or none was kept ($sg_kept)"; fail=$((fail+1))
+fi
+sg_left=$(( $(grep -c '' "$TMP/route-s5") - sg_kept ))
+sg_last=$(tail -n 1 "$TMP/ctx")
+case "$sg_last" in
+  "$sg_left more route lines of $SG_CARD_FIX/sgtest-s5.md "*)
+    if [ "$sg_left" -gt 0 ]; then echo "ok   S-AC5 the last line names the card and the $sg_left route lines left out"; pass=$((pass+1))
+    else echo "FAIL S-AC5 no route line was left out, so the cut was never exercised"; fail=$((fail+1)); fi ;;
+  *) echo "FAIL S-AC5 the last line does not name the card and the $sg_left route lines left out: $sg_last"; fail=$((fail+1)) ;;
+esac
+
+# ---- AC7: the branch never surfaces an error: a cwd that is not a string, no CLAUDE_PROJECT_DIR --
+SG_PROJECT=""
+run_sub_hook '{"hook_event_name":"SubagentStart","session_id":"sgtest-r1","cwd":5,"agent_id":"sub-1"}'
+check_sub_context "S-AC7 a numeric cwd and no CLAUDE_PROJECT_DIR -> exit 0, stdout and stderr EMPTY" "$?" empty
+SG_PROJECT="$SG_CWD_FIX"
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
 # reviewed diff or not at all.
 # 164 = 134 (the suite as landed by aReplayedCard) + the 27 assertions TOOL-aProbedUnit-5 added (26 in
 # its block, 1 from re-targeting the /tmp near-miss) + the 3 its round-1 fold added (clusters J and K).
+# 212 = 164 + the 48 the write gate added (TOOL-aRoutedQuill-2: 40 run_write arms, 7 readConfKey arms
+# and the foreign fixture's build line).
+# 236 = 212 + the 24 the subagent context added (TOOL-aRoutedQuill-4: 7 for AC1, 4 for AC2, 6 for
+# AC3, 2 for AC4, 4 for AC5 and 1 for AC7).
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=164
+FLOOR_ASSERTIONS=236
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

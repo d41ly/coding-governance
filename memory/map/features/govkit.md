@@ -75,21 +75,48 @@ the fix for the first is the `root_relative` rule flag.
 `git -C <dir> rev-parse --show-toplevel` returns `<dir>` itself when an absolute `GIT_DIR` is
 inherited — which is exactly what git exports to a merge driver in a linked worktree, and how the
 row-keyed merge driver was found to be inert in this repo. And a fixed `parents[]` index is correct
-at only one install prefix. The walk inherits nothing and is correct at any prefix.
+at only one install prefix. The walk inherits nothing and is correct at any prefix. Where govkit
+does need a remote — gov's currency check and `epoch`'s default base — it asks the inlined remote
+ladder (`resolve_remote`, `GOV_REMOTE` first), never a literal `origin`; a ladder refusal is an
+`unverified` or a failed exit naming it, never a guessed remote.
+
+**A target's own edit to a gov-owned leg row is drift, except its ceiling.** `write_gate_legs`
+compares the target's row against what the RECEIPT recorded, never against gov's fresh descriptor,
+so a new gov vintage lands on an untouched row and a hand-edited `argv`, guard or `doc_reads` is
+reported rather than overwritten. A `ceiling` that differs from the receipt's is the adopter's own
+bound: it is written back and reported, outside the drift comparison, so it can never withhold
+the manifest. A DELETED ceiling is not preserved — it takes gov's value back.
+
+**`update` carries an exec bit up and never down.** `resolve_landed_mode` is the one mode rule: an
+existing `engine` row keeps its mode except `100644` where gov ships `100755`, and a symlink is left
+alone. `update` prints a `mode-carry` line per carried row; `check` notes a mode deficit and never
+fails on one, because redding a target over a bit it chose is not gov's call.
 
 ## Shared seams
 
 - `tools/govkit/registry.toml` — the population: entries with their descriptor paths, the surface
   globs, and the exemptions with their reasons.
-- `tools/govkit/govkit.py` — `selfcheck`, the read-only `plan`, `check`, `update` and `adopt`, the
-  writing `apply` / `apply --resume` with the receipt, and `intake`. **The COUNT is not spelled**,
-  here or in that file's docstring: this line read "all five verbs" from the commit that landed the
-  sixth until `DEPL-dCarriedReceipt-13` landed the seventh, and `USAGE` and `main`'s dispatch tuple
-  own the set between them with a selftest arm joining the two. `apply` lands the roles it can
-  honour and refuses the others BY NAME, and reports the two steps of the hard order it cannot
-  perform on every run rather than skipping them quietly. `adopt` is the BOOTSTRAP — it writes the
-  receipt an already-installed tree never had by measuring that tree against gov's own history, and
-  it is the only path onto the engine for a repo somebody vendored kits into by hand.
+- `tools/govkit/govkit.py` — `selfcheck` (and `selfcheck --fix`, which writes every kit-version
+  carrier from its entry's `version_from` constant), the read-only `shipped`, `plan`, `check`,
+  `update` and `adopt`, the writing `apply` / `apply --resume` with the receipt, `intake`, and the
+  version pair `epoch` / `mint`. **The COUNT is not spelled**, here or in that file's docstring:
+  this line read "all five verbs" from the commit that landed the sixth, and `USAGE` and `main`'s
+  dispatch tuple own the set between them with a selftest arm joining the two. `apply` lands the
+  roles it can honour, prints one `SKIPPED` line per rule it does not land, naming the role and who
+  does produce it, and refuses the rest BY NAME. `adopt` is the BOOTSTRAP — it writes the receipt
+  an already-installed tree never had by measuring that tree against gov's own history, and it is
+  the only path onto the engine for a repo somebody vendored kits into by hand.
+- `epoch` / `mint` — one verdict, `derive_epoch_state`, read by both. `epoch` fails a kit whose
+  shipped bytes moved with no version bump; with no explicit base and no `GATE_PUSH_BASE` it
+  reports such a move as `owed at the lander` and passes it. `mint`, which `push-main.sh` runs
+  while it prepares a landing, writes the next version of every kit `epoch` would fail into every
+  carrier, so a branch owes no bump of its own.
+- `write_gate_legs` — the ONE leg emitter, shared by `apply` and `update`, into a target runner of
+  `[gate_runner] kind = "manifest"` (the `json-array` grammar, deduped by `name`). Each optional
+  row key travels only when the target's INSTALLED run-gates can read it, measured from its version
+  constant against a floor beside the emitter: `subject`, `doc_reads` and `ceiling` each have one,
+  an unreadable version reads as below the floor, and a target with no run-gates gets every key. `doc_reads` is all-or-nothing against the
+  target's tracked tree, since a list that loses one element skips the leg on exactly that doc push.
 - `tools/check-install-prefix.sh` — ONE pure ban since `TOOL-aRepatriatedFork-30`: any kit-path
   spelling in the tracked shipped surface reds by `<path>:<line>`, with no ratchet, waiver or
   marker to buy one back. Its dossier is `install-prefix.md`.
@@ -125,17 +152,22 @@ survives edits above the branch.
 Named rather than assumed, because a deployer that is quiet about its own holes is the thing this
 unit exists to replace:
 
-- **`merged` and `rendered` roles do not land.** `apply` refuses a `merged` rule by name. Writing a
-  gov-owned region into a target-owned file has no seam anywhere in this repo — measured, nothing
-  here writes a `.gitattributes` block or performs the renormalize that follows it. `rendered`
-  artifacts are produced by the ADOPTERS, so govkit copying one would be a second renderer racing
-  the real one; the receipt records them, `apply` does not write them.
-- **The gate-runner and CI emitter is not built.** S5's last step is reported as SKIPPED on every
-  run.
-- **The runbook demotion and its parity gate are not built.** The Skill exists and points at the
-  deployer, but `WIRE-INTO-PROJECT.md` is still the
-  prose runbook rather than narrative kept honest by a gate asserting every descriptor step has a
-  section and the reverse.
+- **`rendered` rows are never copied.** They are produced by the ADOPTERS, so govkit copying one
+  would be a second renderer racing the real one; the receipt records them, `apply` prints them
+  `SKIPPED`, and selfcheck 3b-ii refuses a descriptor shipping a `rendered` row with no
+  `[[regenerate]]` argv, since that is how `update` refreshes one. `merged` rows DO land now:
+  `apply` writes the source's marker block into the target's file through `write_block`, by line
+  index so an edit outside the block survives, and a `json-pointer` block is delegated to the
+  adopter at CONFIGURE. The `.gitattributes` LF-pin block and the renormalize that follows it are
+  `apply`'s ATTRIBUTES and RENORMALIZE steps.
+- **The gate-runner emitter speaks one grammar, and the CI emitter is not built.** `kind =
+  "manifest"` is implemented; `make`, `npm` and `shell` are refused by name rather than half-written.
+  `[gate_runner.ci]` is only validated (`github-actions` is the one system accepted), and a `ci`
+  receipt row is report-only: nothing writes a CI job into a target.
+- **The runbook parity gate grades presence, not prose.** `check_runbook_parity.py` keys
+  `WIRE-INTO-PROJECT.md`'s sections to registry entries by an entry-id HTML-comment anchor, in both
+  directions, and reds an anchor whose section body is empty. It cannot tell a correct sentence
+  from a wrong one, and its header says so.
 All three AC10 assertions that were open have landed: the version cross-check, the guard-class
 partition, and the derived `mutates_index`. Each carries a LIVENESS arm in the selftest — a scratch
 gov tree fed input that must red — because an assertion finding nothing on a clean tree is
@@ -151,3 +183,15 @@ literally sourced file prints as a report-only near-miss, since a transitive rul
 shared library. Its liveness refusal needs a declared conf, because a manifest with no guarded bar
 leg and nothing to protect is a true zero. Both counts it prints are derived, never written here.
 TOOL-dDerivedDocket-21.
+
+**A self-test gov holds must ship held.** Check 7j4 calls a descriptor `[[gate_leg]]`
+self-test-shaped when its manifest chunk is `selftests` or a resolved argv basename matches
+`*.test.sh`, `test_*.py` or `*selftest*`; a shaped leg filed in any other chunk is exempt, because
+gov runs it on every bar. A shaped, non-exempt leg whose descriptor `subject` is not `kit` reds,
+since every adopter would run it on its default bar while gov holds it. Its zero-graded and
+zero-shaped liveness reds bind only while gov's manifest holds a row in chunk `selftests`, and an
+absent manifest is a note, as 7h treats it. Beside it, 7h holds a descriptor's `doc_reads` equal to
+gov's manifest row, and a declared `ceiling` to a positive integer equal to the manifest's, because
+the emitter carries both verbatim into adopters. The selftest stages 7j4's and the ceiling
+clause's breaks in `check_benched_probe_arms` and exercises the ceiling's emission and keep rule in
+`check_ceiling_emission`. DEPL-aBenchedProbe-1, DEPL-aBenchedProbe-2.

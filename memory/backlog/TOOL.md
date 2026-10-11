@@ -247,7 +247,6 @@ Cite ids, never line numbers.
 | [TOOL-aReplayedCard-7](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | manifest-check.sh --card --write spawns about ten git processes for its… |
 | [TOOL-aReplayedCard-8](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | WIRE-INTO-PROJECT.md §4 spells the kickoff-manifest format version… |
 | [TOOL-aReplayedCard-10](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | corpus_ids.py --print-defined-ids is a corpus walk plus the shell… |
-| [TOOL-aReplayedCard-11](../builds/aReplayedCard/BACKLOG.md) | SPECCED | — | KICK-aRoutedQuill-1 | 2026-09-14 | --card --append accepts a real READY body that carries no ## task… |
 | [TOOL-aReplayedCard-12](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | scratch-guard.test.sh's meta-arm re-runs the whole orientation section,… |
 | [TOOL-aReplayedCard-13](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | the deny's drive fold lowercases both toplevels, so on a case-sensitive… |
 | [TOOL-aReplayedCard-14](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | extractCommitTarget resolves repeated -C values cumulatively, a… |
@@ -257,6 +256,8 @@ Cite ids, never line numbers.
 | [TOOL-aReplayedCard-18](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | TOOL-aReplayedCard-2's AC9 — one forced compaction in a session started… |
 | [TOOL-aResumedRelay-1](../builds/aResumedRelay/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | the lexicon VERB table needs a CURATION PASS over the deployer's… |
 | [TOOL-aRootedPrefix-3](../builds/aRootedPrefix/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-09 | hygiene checks 6/7 measure RAW working-tree bytes, so an adopter… |
+| [TOOL-aRoutedQuill-8](../builds/aRoutedQuill/BACKLOG.md) | DEFERRED | MED | TOOL-aRoutedQuill-6 | 2026-10-10 | run the routed-against-raw trial TOOL-aRoutedQuill-6 specifies, in an… |
+| [TOOL-aRoutedQuill-13](../builds/aRoutedQuill/BACKLOG.md) | OPEN | LOW | — | 2026-10-10 | the --dispatch order gate (check 49) counts a sibling whose spec reads… |
 | [TOOL-aScannedThrottle-3](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | ZERO Defender exclusions are confirmed on node a (Get-MpPreference… |
 | [TOOL-aScannedThrottle-4](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | HVCI/VBS is ON and ENFORCING on node a (Win32_DeviceGuard… |
 | [TOOL-aScannedThrottle-5](../builds/aScannedThrottle/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | run-gates canary (466-587s in-bar, 317s standalone, 10-11% of… |
