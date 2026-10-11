@@ -105,7 +105,7 @@ ids TOOL-aDistilledCharter-4 TOOL-aDistilledCharter-5 TOOL-aDistilledCharter-6 T
 | [TOOL-aDistilledCharter-9 — the closing review's round-3 findings, closed as one batch](spec/2026-10-09-spec-TOOL-aDistilledCharter-9.md) | 14 | 2 | CLOSED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 6 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
