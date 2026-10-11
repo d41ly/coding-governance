@@ -8680,6 +8680,50 @@ def write_conflict_candidate(outbox: pathlib.Path, row: dict, base: bytes, ours:
                  f"ours base theirs > candidate")
 
 
+def measure_rendered_rows(root: pathlib.Path, target: pathlib.Path, rows: list[dict],
+                          to_commit: str, resolve_version) -> list[tuple[dict, str | None]]:
+    """Re-measure each `rendered` receipt row from the bytes its render left on disk, in place.
+
+    DEPL-dRemeasuredRender-1 S1. `update` caps a rendered row at `re-rendered` and lets the kit's
+    `[[regenerate]]` argv rewrite the file, so without this the row's `sha256`, `oid`, `commit` and
+    `version` — and the `install.sums` line derived from it — keep naming the bytes from before the
+    run. Measured at an adopter: a lexicon Skill whose row named one blob while git stored another.
+
+    The stamping rule is the written rows' own: `sha256` hashes the raw bytes that landed, and
+    `commit` and `version` name the vintage this run rendered from. `oid` is the blob the TARGET's
+    clean filter makes of those bytes (`git hash-object --path`), NOT the index entry, because the
+    regenerate may leave its output unstaged and the entry would then name the pre-render blob.
+    `gov_oid` stays gov's: its blob of the row's `source` at that vintage. A source that does not
+    resolve there moves neither `commit`, `version` nor `gov_oid`, because they are one stamp.
+
+    The caller decides WHICH rows reach here — only a kit whose render ran, was accepted and was not
+    rolled back. Returns `(row, None)` per re-measured row and `(row, why)` per row it KEPT, whose
+    record it leaves untouched: an absent file, or a hash git would not compute."""
+    out: list[tuple[dict, str | None]] = []
+    for row in rows:
+        path = str(row.get("path"))
+        dp = target / path
+        if not dp.is_file():
+            out.append((row, "its file is absent after the render"))
+            continue
+        cl = subprocess.run(["git", "-C", str(target), "hash-object", f"--path={path}", "--",
+                             str(dp)], capture_output=True, text=True, encoding="utf-8",
+                            check=False)
+        oid = cl.stdout.strip()
+        if cl.returncode != 0 or not oid:
+            out.append((row, f"`git hash-object` would not hash it ({cl.stderr.strip()[:120]})"))
+            continue
+        row["sha256"] = _sha(dp.read_bytes())
+        row["oid"] = oid
+        tmpl = blob_at(root, to_commit, str(row["source"])) if row.get("source") else None
+        if tmpl is not None:
+            row["gov_oid"] = blob_oid(tmpl)
+            row["commit"] = to_commit
+            row["version"] = resolve_version(row)
+        out.append((row, None))
+    return out
+
+
 def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
                write_withdrawals: bool = False,
                kits: list[str] | None = None, accept_role_moves: bool = False) -> int:
@@ -10782,6 +10826,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # DEPL-aRepatriatedFork-17 S1. Per kit whose declared argv ran: the pre-argv index entry and
     # worktree bytes of every path it is declared to write, and the status it left behind.
     _rg_snap: dict[str, dict] = {}
+    # DEPL-dRemeasuredRender-1 S2. The kits whose declared argv was REFUSED, so their rendered rows
+    # keep the record from before this run rather than being re-measured over a render nobody accepted.
+    _rr_refused: set[str] = set()
     if write:
         for _eid in touched_kits:
             _d, _ = descs[_eid]
@@ -10899,6 +10946,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                                + (f" ({_oc_rr.get('means')})" if _oc_rr else "")
                                + ("  REFUSED" if _bad else ""))
                 if _bad:
+                    _rr_refused.add(_eid)
                     # WHAT HAPPENS NEXT IS SAID, NOT PROMISED. This sentence used to promise that
                     # the verification below "rolls this run back", and for a kit declaring
                     # `[check] none` nothing can: its verify is `landed-unmeasured` and restores
@@ -11672,6 +11720,40 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             else:
                 print("govkit update — renormalize: the pin block governs no tracked path in this "
                       "target, so there is nothing to re-stage")
+
+    # ======================= DEPL-dRemeasuredRender-1 — A RENDERED ROW NAMES WHAT ITS RENDER LANDED =
+    # HERE, after the verify pass and the renormalize, and not inside the regenerate loop: the verify
+    # pass can roll a kit's renders back, and a row stamped before that names bytes the target no
+    # longer holds. Both receipt writers below derive `install.sums` from the rows, so the sidecar
+    # follows without a write of its own. A row this does not re-measure is KEPT and says why, per row,
+    # because a receipt that silently stays stale is the defect this closes. The count prints its zeros.
+    if write and touched_kits:
+        _rm_done = _rm_kept = 0
+        for _eid in touched_kits:
+            _rm_rows = [f for f in receipt.get("files") or []
+                        if f.get("kit") == _eid and f.get("role") == "rendered"]
+            if not _rm_rows:
+                continue
+            if _eid in _rolled_kits:
+                _rm_why = "its kit was rolled back, and the render with it"
+            elif _eid in _rr_refused:
+                _rm_why = "its render was refused"
+            elif _eid not in _rg_snap:
+                _rm_why = "its render did not run this time (the DECLINED line above says why)"
+            else:
+                _rm_why = None
+            _rm_out = ([(_rm_row, _rm_why) for _rm_row in _rm_rows] if _rm_why else
+                       measure_rendered_rows(root, target, _rm_rows, to_commit, _resolve_ver_at))
+            for _rm_row, _rm_w in _rm_out:
+                if _rm_w:
+                    _rm_kept += 1
+                    print(f"govkit update — receipt: KEPT [rendered] {_rm_row.get('path')} — {_rm_w}; "
+                          f"its record still names the bytes from before this run")
+                else:
+                    _rm_done += 1
+                    print(f"govkit update — receipt: re-measured [rendered] {_rm_row.get('path')} "
+                          f"from the bytes its render landed")
+        print(f"govkit update — rendered receipts: {_rm_done} re-measured · {_rm_kept} kept")
 
     # ---- DEPL-cMendedVintage-13 S2 + S3. THE GATE LEGS, emitted by this verb for the first time.
     # ---- Until this landed they arrived on `apply` and on `adopt` and nowhere else, so every

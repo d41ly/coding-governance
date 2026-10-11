@@ -1844,6 +1844,61 @@ def check_update_safety(tmp: pathlib.Path) -> None:
           _gm.read_conf_key_gaps(_cg_t, _cg_d) == [("A", "absent"), ("B", "placeholder")],
           str(_gm.read_conf_key_gaps(_cg_t, _cg_d)))
 
+    # ---- DEPL-dRemeasuredRender-1 AC1-AC3. A kit whose regenerate renders one `rendered` row from
+    # ---- its engine and its template. After `update --write` moves both, the row's receipt and its
+    # ---- `install.sums` line name the rendered bytes, and `check` agrees. The `oid` is graded against
+    # ---- the target's own index entry once the render is staged, never against a second
+    # ---- `hash-object` call, so the arm is not the code under test asking itself.
+    kit_rm = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+              '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+              '[[files]]\ninclude = ["tpl.md"]\nrole = "rendered"\nto = "docs/out.md"\n\n'
+              '[[regenerate]]\nargv = ["bash", "{kit}/gen.sh"]\n\n'
+              '[adopt]\nargv = ["bash", "{kit}/gen.sh"]\nmutates_index = false\n')
+    gen_rm = 'd="$(dirname "$0")"\nmkdir -p docs\ncat "$d/eng.txt" "$d/tpl.md" > docs/out.md\n'
+    g, _a = build_gov17("rm", kit_rm, {"eng.txt": "v1\n", "gen.sh": gen_rm, "tpl.md": "tpl\n"})
+    t = build_target17(g, "rm")
+    _rm_before = dict(read_row17(t, "docs/out.md"))
+    _rm_b = write_gov17(g, kit_rm, {"eng.txt": "v2\n", "tpl.md": "tpl2\n"}, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    _rm_bytes = read_bytes17(t / "docs" / "out.md")
+    _rm_row = read_row17(t, "docs/out.md")
+    _rm_sha = hashlib.sha256(_rm_bytes).hexdigest()
+    check("[dRR-1 AC1] LIVENESS the render ran and rewrote the rendered row's file",
+          _rm_bytes == b"v2\ntpl2\n" and _rm_before.get("sha256") != _rm_sha,
+          repr(_rm_bytes) + str(_rm_before))
+    git(t, "add", "--", "docs/out.md")
+    _rm_idx = subprocess.run(["git", "-C", str(t), "ls-files", "-s", "--", "docs/out.md"],
+                             capture_output=True, text=True).stdout.split()
+    _rm_sums = read_bytes17(t / ".governance" / "install.sums").decode("utf-8")
+    check("[dRR-1 AC1] the rendered row's sha256, oid and install.sums line name the rendered bytes",
+          _rm_row.get("sha256") == _rm_sha and len(_rm_idx) > 1 and _rm_row.get("oid") == _rm_idx[1]
+          and f"{_rm_sha}  docs/out.md\n" in _rm_sums,
+          str(_rm_row) + " idx " + str(_rm_idx) + "\n" + _rm_sums)
+    check("[dRR-1 S1] ...and its commit is the vintage that rendered it, gov_oid gov's template blob",
+          _rm_row.get("commit") == _rm_b
+          and _rm_row.get("gov_oid") == govkit_module().blob_oid(b"tpl2\n"), str(_rm_row))
+    check("[dRR-1 S3] the run says it re-measured the row, and counts it",
+          "receipt: re-measured [rendered] docs/out.md" in p.stdout
+          and "rendered receipts: 1 re-measured · 0 kept" in p.stdout, p.stdout[-1500:])
+    settle(t, "the update")
+    p = run_gov17(g, "check", "--target", str(t))
+    check("[dRR-1 AC2] check agrees with the re-measured receipt", p.returncode == 0,
+          p.stdout[-1500:] + p.stderr[-600:])
+    # AC3: the same kit with a regenerate that writes and then REFUSES. The row keeps its record.
+    gen_rr = ('d="$(dirname "$0")"\nmkdir -p docs\ncat "$d/eng.txt" "$d/tpl.md" > docs/out.md\n'
+              'if grep -q v2 "$d/eng.txt"; then echo "gen: REFUSED" >&2; exit 5; fi\n')
+    g, _a = build_gov17("rr", kit_rm, {"eng.txt": "v1\n", "gen.sh": gen_rr, "tpl.md": "tpl\n"})
+    t = build_target17(g, "rr")
+    _rr_before = dict(read_row17(t, "docs/out.md"))
+    write_gov17(g, kit_rm, {"eng.txt": "v2\n", "tpl.md": "tpl2\n"}, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    check("[dRR-1 AC3] LIVENESS the regenerate really refused",
+          "re-render/regenerate argv exited 5" in p.stdout + p.stderr, (p.stdout + p.stderr)[-1500:])
+    check("[dRR-1 AC3] a refused render's row keeps its record, and the run says KEPT and why",
+          read_row17(t, "docs/out.md") == _rr_before
+          and "receipt: KEPT [rendered] docs/out.md — its render was refused" in p.stdout,
+          p.stdout[-1500:] + str(read_row17(t, "docs/out.md")) + str(_rr_before))
+
     # ---- DEPL-aHalvedInstall-4 AC1-AC5. One update moves a kit's conf.sh (which the target edited,
     # ---- so it conflicts), its plain.txt (clean) and its engine (re-rendered). The refused row holds
     # ---- the whole kit back: the clean row is restored, the regenerate is declined, the order says

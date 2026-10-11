@@ -39,3 +39,7 @@ base: 17472e212ffd0d5e3be825502c6169bbeb2e952f
 2026-10-11T09:17:41Z dispatch · item c922c7e2 TOOL-dRemeasuredRender-1 · reason memory/guides/SESSION-KICKOFF.md
 
 2026-10-11T09:18:01Z dispatch · item c922c7e2 TOOL-dRemeasuredRender-1 · reason memory/builds/dRemeasuredRender/README.md
+
+2026-10-11T09:20:23Z brief · item DEPL-dRemeasuredRender-1 · reason b8a7ad422b24 memory/builds/dRemeasuredRender/prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-1-1-build-brief.md
+
+2026-10-11T09:23:56Z dispatch · item 7a474bab DEPL-dRemeasuredRender-1 · reason WIRE-INTO-PROJECT.md memory/builds/dRemeasuredRender/README.md memory/builds/dRemeasuredRender/build/2026-10-11-build-DEPL-dRemeasuredRender-1-1-acceptance-ledger.md memory/builds/dRemeasuredRender/prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-1-1-build-brief.md memory/builds/dRemeasuredRender/spec/2026-10-11-spec-DEPL-dRemeasuredRender-1.md memory/map/generated/symbols.json tools/govkit/govkit.py tools/govkit/selftest.py

@@ -1,11 +1,13 @@
 # DEPL-dRemeasuredRender-1 — `govkit update` re-measures a rendered row's receipt from the bytes its render landed
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node d · Tier-2 · base 9a8777b8 · streams deployer · order 2
+**Status:** CLOSED · rev-1 · 2026-10-11 · node d · Tier-2 · base 9a8777b8 · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-DEPL-dRemeasuredRender-1-1-acceptance-ledger.md](../build/2026-10-11-build-DEPL-dRemeasuredRender-1-1-acceptance-ledger.md) | journal | — |
+| [2026-10-11-prompt-DEPL-dRemeasuredRender-1-1-build-brief.md](../prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-1-1-build-brief.md) | journal | — |
 | [2026-10-11-prompt-TOOL-dRemeasuredRender-1-brief.md](../prompts/2026-10-11-prompt-TOOL-dRemeasuredRender-1-brief.md) | research | TOOL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 |
 
 <!-- /gen:spec-records -->
