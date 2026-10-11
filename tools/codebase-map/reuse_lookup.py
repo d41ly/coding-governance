@@ -467,7 +467,7 @@ def _render_header(shortlist: Shortlist) -> list[str]:
         "# a high rank means 'this name appears a lot'",
         # S6 — WHAT THE SCAN COULD NOT SEE, on every call. A fail-open reference scan that reports
         # nothing makes a ranking over half a corpus look exactly like a ranking over all of it,
-        # which is the liveness failure `AGENTS.md` §7 names. Three facts, always printed: how many
+        # which is the liveness failure the charter's `[gate]` practice names. Three facts, always printed: how many
         # files the scan read, how many it could not decode, and which language layers it never
         # entered. `unscanned` is the DECLARED set today; `TOOL-dTracedLattice-5` replaces the
         # declaration with a set derived from the corpus.

@@ -1189,7 +1189,7 @@ if (!specAudit) {
 // WHAT WAS WRONG. This stage used to spawn an AGENT whose prompt said: run the shipped harness as
 // a Workflow, with `scriptPath: {{KIT_DIR}}/tier2-review.js`. That agent is a SIDECHAIN agent,
 // and a sidechain holds neither `Workflow` nor `Agent` — the capability is ABSENT, not policed, as
-// `AGENTS.md` §8 states and as the stage agent proved by searching the deferred registry three
+// the review protocol states and as the stage agent proved by searching the deferred registry three
 // times, refusing to fabricate a verdict, and writing nothing. It was right on every count. The
 // stage could never complete, so BUILD was unreachable through this harness and the
 // `passes-harnessed` directive named a route that did not run.

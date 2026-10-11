@@ -220,7 +220,7 @@ means = "render-failed-half-stamped"
 # with the largest putting a 26-minute FLOOR under every full run. Measured node d, 2026-08-23;
 # memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
 #
-# THE COMPENSATING CHECK, because an exemption is not coverage (charter §7). Work touching
+# THE COMPENSATING CHECK, because an exemption is not coverage (charter [gate]). Work touching
 # `<prefix>/unattended/` is not done until ONE of two verdicts is in the landing report: parity GREEN
 # from the pooled self-tests, or `--attribute` against the build's BASE reading `verdict clean` —
 # no NEW FAIL, no DEAD PROBE at L and no OVER BUDGET at L — with every suite reporting an INHERITED

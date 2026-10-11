@@ -69,6 +69,7 @@ Cite ids, never line numbers.
 | [TOOL-aEvidencedLens-16](../builds/aEvidencedLens/BACKLOG.md) | OPEN | MED | — | 2026-10-05 | the build harness's Disposal stage reads a §3 edge as one-ended when… |
 | [TOOL-aFlaggedScaffold-3](../builds/aFlaggedScaffold/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-29 | govkit update CANNOT LAND A SOURCE GOV STARTED SHIPPING. Its… |
 | [TOOL-aFlaggedScaffold-5](../builds/aFlaggedScaffold/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-29 | govkit check CALLS A KIT ADOPTED ON THE EXIT CODE ALONE and never runs… |
+| [TOOL-aFrugalTurnstile-18](../builds/aFrugalTurnstile/BACKLOG.md) | OPEN | LOW | — | 2026-10-11 | a post-merge full bar enters the host turnstile through run-gates.sh… |
 | [TOOL-aGradedDialect-6](../builds/aGradedDialect/BACKLOG.md) | OPEN | — | — | 2026-09-10 | a FIFTH copy of the lexicon armedness predicate lives outside the kit… |
 | [TOOL-aGradedDialect-7](../builds/aGradedDialect/BACKLOG.md) | OPEN | — | — | 2026-09-10 | two UNGUARDED load_conf calls in tools/lexicon/selftest.py, in the… |
 | [TOOL-aGradedDialect-9](../builds/aGradedDialect/BACKLOG.md) | OPEN | — | — | 2026-09-10 | NOTHING GATES A parser DECLARATION AGAINST A WHOLE FILE, and that gap… |

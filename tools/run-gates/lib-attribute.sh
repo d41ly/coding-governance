@@ -18,7 +18,7 @@
 # WHAT THIS FILE DOES NOT DO: decide a verdict. Each runner owns its own classifier; this file owns
 # only the two mechanisms whose divergence would make the two classifiers disagree about their input.
 #
-# NAMES NOTHING OUTSIDE ITSELF. Every path arrives as an argument (charter §12).
+# NAMES NOTHING OUTSIDE ITSELF. Every path arrives as an argument (the shipped-surface rule check-install-prefix.sh holds).
 
 # A string, escaped for use as a literal inside a sed ERE.
 render_rx_literal() { printf '%s' "$1" | sed 's,[][(){}.*+?^$\\|],\\&,g'; }

@@ -181,6 +181,12 @@ one place to change it. There is no environment override, and a set `AGENT_CAP` 
 message rather than ignored — a ceiling that can be raised from the environment leaves no diff behind,
 which is the defeatable class this rule exists to stay out of.
 
+## Tiers and security boundaries
+
+The tier definitions and the security checklist for a new write path or surface live in the
+memory tree's spec template, `TEMPLATE-SPEC.md`, because every adoption keeps the required
+memory tree and a design pass is where a new surface is first decided (PLAY-aDistilledCharter-5).
+
 ## The Tier-2 pattern
 
 Dimension finders (security / correctness / data-integrity / dead-code / integration-seams) emit
