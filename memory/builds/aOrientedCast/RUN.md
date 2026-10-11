@@ -103,3 +103,5 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-11T23:02:48Z brief · item TOOL-aOrientedCast-11 · reason 8fe392978328 memory/builds/aOrientedCast/prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md
 
 2026-10-11T23:19:29Z dispatch · item 7bd7ab2e TOOL-aOrientedCast-11 · reason tools/roles/SKILL.template.md .claude/skills/build/SKILL.md
+
+2026-10-11T23:30:45Z dispatch · item 3a40e7da TOOL-aOrientedCast-11 · reason .claude/agents/gov-builder.md .claude/agents/gov-spec-writer.md .claude/agents/gov-spec-reviewer.md .claude/agents/gov-diff-reviewer.md .claude/agents/gov-skeptic.md .claude/agents/gov-synthesizer.md .claude/roles.json memory/builds/aOrientedCast/spec/2026-10-11-spec-TOOL-aOrientedCast-11.md memory/builds/aOrientedCast/build/2026-10-11-build-TOOL-aOrientedCast-11-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md

@@ -22,7 +22,8 @@ How you review, by `memory/guides/REVIEW-PROTOCOL.md`:
 - Check a claim about code against the CODE, never against the spec's account of it. Grep the
   consumers of every name, value or path a spec renames, retires or changes.
 - Run a criterion's own command when it is read-only and bounded: a criterion already green before
-  the unit is built cannot fail.
+  the unit is built cannot fail. A command that is a gate, a suite or a `--selftest` run is
+  described in your finding, never run: you run no gate (`memory/guides/BUILD-METHOD.md` M6).
 - Establish every finding with a probe, and record the command and what it printed.
 - Hunt NEW defects. The project's recurring bug classes are a checklist to run, and what a spec
   states as a non-goal or a resolved fork is by design, not a finding.
