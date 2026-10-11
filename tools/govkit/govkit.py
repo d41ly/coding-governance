@@ -10829,6 +10829,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # DEPL-dRemeasuredRender-1 S2. The kits whose declared argv was REFUSED, so their rendered rows
     # keep the record from before this run rather than being re-measured over a render nobody accepted.
     _rr_refused: set[str] = set()
+    # DEPL-dRemeasuredRender-3. The kits whose argv exited NON-ZERO through an accepted outcome, to
+    # that outcome's `means`. Every shipped `ok` outcome with a non-zero exit is a stop that renders
+    # nothing (memory-tree `not-rendered-here`, lexicon `no-project-layer`), so acceptance is not a
+    # render, and re-measuring those rows would certify untouched bytes at this vintage.
+    _rr_norender: dict[str, str] = {}
     if write:
         for _eid in touched_kits:
             _d, _ = descs[_eid]
@@ -10954,6 +10959,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 _rr_ran.append(f"{_eid}: {' '.join(_res)} -> exit {_out.returncode}"
                                + (f" ({_oc_rr.get('means')})" if _oc_rr else "")
                                + ("  REFUSED" if _bad else ""))
+                if _out.returncode != 0 and not _bad:
+                    _rr_norender.setdefault(_eid, str((_oc_rr or {}).get("means") or "(unnamed)"))
                 if _bad:
                     _rr_refused.add(_eid)
                     # WHAT HAPPENS NEXT IS SAID, NOT PROMISED. This sentence used to promise that
@@ -11764,6 +11771,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 _rm_why = "its kit was rolled back, and the render with it"
             elif _eid in _rr_refused:
                 _rm_why = "its render was refused"
+            elif _eid in _rr_norender:
+                _rm_why = (f"its render stopped at accepted outcome '{_rr_norender[_eid]}' "
+                           f"without rendering")
             elif _eid not in _rg_snap:
                 _rm_why = "its render did not run this time (the DECLINED line above says why)"
             else:

@@ -1,10 +1,13 @@
 # DEPL-dRemeasuredRender-3 — a render that stopped at an accepted outcome without rendering keeps its receipt
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node d · Tier-2 · base 9a8777b8 · streams deployer · order 4
+**Status:** CLOSED · rev-1 · 2026-10-11 · node d · Tier-2 · base 9a8777b8 · streams deployer · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-11-build-DEPL-dRemeasuredRender-3-1-acceptance-ledger.md](../build/2026-10-11-build-DEPL-dRemeasuredRender-3-1-acceptance-ledger.md) | journal | — |
+| [2026-10-11-prompt-DEPL-dRemeasuredRender-3-1-build-brief.md](../prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-3-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

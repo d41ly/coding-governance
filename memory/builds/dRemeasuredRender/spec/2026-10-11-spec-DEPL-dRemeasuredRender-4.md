@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-11-prompt-DEPL-dRemeasuredRender-4-1-build-brief.md](../prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-4-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

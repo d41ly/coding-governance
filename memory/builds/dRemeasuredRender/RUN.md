@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: bac1a4fb5f9fcf5f7d924dcf8e7e17cc924f0149
-phase: REVIEWING
+witness: 0fa8463e1e5fb0109717b28964aedec746f9566b
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/practical-borg-90829d
@@ -53,3 +53,9 @@ base: 17472e212ffd0d5e3be825502c6169bbeb2e952f
 2026-10-11T09:39:59Z rescope · item add DEPL-dRemeasuredRender-3 · reason promoted from the closing diff review round 1, which converged with 1 HIGH and 10 minors
 
 2026-10-11T09:40:00Z rescope · item add DEPL-dRemeasuredRender-4 · reason promoted from the closing diff review round 1, which converged with 1 HIGH and 10 minors
+
+2026-10-11T09:41:01Z brief · item DEPL-dRemeasuredRender-3 · reason bb0f1a7a486a memory/builds/dRemeasuredRender/prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-3-1-build-brief.md
+
+2026-10-11T09:41:01Z brief · item DEPL-dRemeasuredRender-4 · reason 303ca8242572 memory/builds/dRemeasuredRender/prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-4-1-build-brief.md
+
+2026-10-11T09:42:12Z dispatch · item 0fa8463e DEPL-dRemeasuredRender-3 · reason WIRE-INTO-PROJECT.md memory/builds/dRemeasuredRender/build/2026-10-11-build-DEPL-dRemeasuredRender-3-1-acceptance-ledger.md memory/builds/dRemeasuredRender/prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-3-1-build-brief.md memory/builds/dRemeasuredRender/prompts/2026-10-11-prompt-DEPL-dRemeasuredRender-4-1-build-brief.md memory/builds/dRemeasuredRender/spec/2026-10-11-spec-DEPL-dRemeasuredRender-3.md tools/govkit/govkit.py tools/govkit/selftest.py

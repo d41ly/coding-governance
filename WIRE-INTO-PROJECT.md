@@ -1398,8 +1398,9 @@ re-rendered (its `rendered` and `generated` rows, and any path that block's opti
 names), and names any path it wrote that no snapshot covered. When the render stands, `update
 --write` re-measures each `rendered` row from the bytes it landed, so the row's `sha256`, `oid`,
 `commit` and `version`, and its `install.sums` line, name the file you hold. A rendered row whose
-render did not run, refused or was rolled back keeps its record and prints a `KEPT` line saying why,
-and `rendered receipts: <n> re-measured · <m> kept` counts both. A `[[hole]]` whose probe fails
+render did not run, refused, stopped at an accepted outcome without rendering, or was rolled back
+keeps its record and prints a `KEPT` line saying why, and
+`rendered receipts: <n> re-measured · <m> kept` counts both. A `[[hole]]` whose probe fails
 before the render prints `probes undischarged before the render` and is probed again after it; only
 a hole still failing then prints `is undischarged`, and one the render discharged says so. The
 per-kit version delta reads the

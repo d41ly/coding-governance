@@ -1898,6 +1898,24 @@ def check_update_safety(tmp: pathlib.Path) -> None:
           read_row17(t, "docs/out.md") == _rr_before
           and "receipt: KEPT [rendered] docs/out.md — its render was refused" in p.stdout,
           p.stdout[-1500:] + str(read_row17(t, "docs/out.md")) + str(_rr_before))
+    # DEPL-dRemeasuredRender-3 AC1. A regenerate that exits 3 through a declared `ok = true` outcome
+    # and renders nothing, the shape of memory-tree's `not-rendered-here`: the row keeps its record.
+    kit_ns = kit_rm + '\n[[outcome]]\ncode = 3\nmeans = "not-rendered-here"\nok = true\n'
+    gen_ns = ('d="$(dirname "$0")"\nif grep -q v2 "$d/eng.txt"; then exit 3; fi\nmkdir -p docs\n'
+              'cat "$d/eng.txt" "$d/tpl.md" > docs/out.md\n')
+    g, _a = build_gov17("ns", kit_ns, {"eng.txt": "v1\n", "gen.sh": gen_ns, "tpl.md": "tpl\n"})
+    t = build_target17(g, "ns")
+    _ns_before = dict(read_row17(t, "docs/out.md"))
+    write_gov17(g, kit_ns, {"eng.txt": "v2\n", "tpl.md": "tpl2\n"}, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    check("[dRR-3 AC1] LIVENESS the regenerate stopped at its accepted outcome and rendered nothing",
+          "(not-rendered-here)" in p.stdout and read_bytes17(t / "docs" / "out.md") == b"v1\ntpl\n",
+          p.stdout[-1500:])
+    check("[dRR-3 AC1] an accepted stop's row keeps its record, and the run names the outcome",
+          read_row17(t, "docs/out.md") == _ns_before
+          and "receipt: KEPT [rendered] docs/out.md — its render stopped at accepted outcome "
+              "'not-rendered-here' without rendering" in p.stdout,
+          p.stdout[-1500:] + str(read_row17(t, "docs/out.md")) + str(_ns_before))
 
     # ---- DEPL-dRemeasuredRender-2 AC1-AC2. A hole whose probe reads the RENDERED file is probed
     # ---- before the regenerate, where it fails, and again after it. Only the verdict after the
