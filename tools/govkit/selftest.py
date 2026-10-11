@@ -1864,9 +1864,9 @@ def check_update_safety(tmp: pathlib.Path) -> None:
               '[[regenerate]]\nargv = ["bash", "{kit}/gen.sh"]\n\n'
               '[adopt]\nargv = ["bash", "{kit}/gen.sh"]\nmutates_index = false\n')
     gen_rm = 'd="$(dirname "$0")"\nmkdir -p docs\ncat "$d/eng.txt" "$d/tpl.md" > docs/out.md\n'
-    g, _a = build_gov17("rm", kit_rm, {"eng.txt": "v1\n", "gen.sh": gen_rm, "tpl.md": "tpl\n",
+    g, _a = build_gov17("mr", kit_rm, {"eng.txt": "v1\n", "gen.sh": gen_rm, "tpl.md": "tpl\n",
                                        "ver.sh": "DEMO_VERSION=1.0\n"})
-    t = build_target17(g, "rm")
+    t = build_target17(g, "mr")
     _rm_before = dict(read_row17(t, "docs/out.md"))
     _rm_b = write_gov17(g, kit_rm, {"eng.txt": "v2\n", "tpl.md": "tpl2\n",
                                     "ver.sh": "DEMO_VERSION=1.1\n"}, "B")
@@ -1878,8 +1878,7 @@ def check_update_safety(tmp: pathlib.Path) -> None:
           _rm_bytes == b"v2\ntpl2\n" and _rm_before.get("sha256") != _rm_sha,
           repr(_rm_bytes) + str(_rm_before))
     git(t, "add", "--", "docs/out.md")
-    _rm_idx = subprocess.run(["git", "-C", str(t), "ls-files", "-s", "--", "docs/out.md"],
-                             capture_output=True, text=True).stdout.split()
+    _rm_idx = run_gov_git(t, "ls-files", "-s", "--", "docs/out.md").split()
     _rm_sums = read_bytes17(t / ".governance" / "install.sums").decode("utf-8")
     check("[dRR-1 AC1] the rendered row's sha256, oid and install.sums line name the rendered bytes",
           _rm_row.get("sha256") == _rm_sha and len(_rm_idx) > 1 and _rm_row.get("oid") == _rm_idx[1]

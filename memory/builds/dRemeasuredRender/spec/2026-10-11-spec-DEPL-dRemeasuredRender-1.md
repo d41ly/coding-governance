@@ -1,6 +1,6 @@
 # DEPL-dRemeasuredRender-1 — `govkit update` re-measures a rendered row's receipt from the bytes its render landed
 
-**Status:** CLOSED · rev-1 · 2026-10-11 · node d · Tier-2 · base 9a8777b8 · streams deployer · order 2
+**Status:** CLOSED · rev-2 · 2026-10-11 · node d · Tier-2 · base 9a8777b8 · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
@@ -49,6 +49,8 @@ the target holds.
 
 - **hands-off** `DEPL-dRemeasuredRender-2` — the hole re-probe, sequenced after this unit because
   both write `tools/govkit/govkit.py` and its self-test.
+- **hands-off** `DEPL-dRemeasuredRender-3` — the accepted no-render outcome this unit's re-measure
+  stamped, promoted from the closing review's HIGH.
 - **hands-off** external — nc and inCMS stop re-recording rendered rows by hand at their next pull.
 
 ## 4. Design
@@ -115,6 +117,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft, from the owner's prompt.
+- rev-2 · 2026-10-11 · §3 · the hands-off edge to `DEPL-dRemeasuredRender-3`, which the closing
+  review promoted out of this unit's re-measure.
 
 ## 10. Reuse audit
 
