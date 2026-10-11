@@ -68,7 +68,8 @@ guard = []
 # no guard for the loop scan's reason: it grades the repository's shell tree, and a new probe can
 # arrive in any file. The argv passes no registry, so an adopter's first run grades against an empty
 # declaration and lists every bare probe it already has — the same posture as the leg above. The
-# home repository's own row passes its registry and excludes its suites and its memory tree.
+# home repository's own row passes its registry and excludes its memory tree; it grades its suites,
+# because they ship to every adopter (TOOL-dRemeasuredRender-1).
 [[gate_leg]]
 name = "shell hygiene (a location probe asked from a moved directory)"
 subject = "repo"

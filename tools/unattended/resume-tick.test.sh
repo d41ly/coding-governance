@@ -154,7 +154,7 @@ build_fixture() {
       && git config core.autocrlf false ) || { echo "FAIL fixture: git init failed under $FX"; exit 2; }
   # RE-SPELLED BY GIT: the tick prints worktree paths as `git worktree list` spells them, and on
   # Windows that is the long name of a directory this file may have reached by its 8.3 short one.
-  FX=$( cd "$FX" && git rev-parse --show-toplevel )
+  FX=$(unset GIT_DIR GIT_WORK_TREE;  cd "$FX" && git rev-parse --show-toplevel )
   cat > "$FX/.unattended.conf" <<'EOF'
 MEMORY_ROOT=memory
 UNITS_REGION_CUTOFF="2026-08-19"
@@ -188,7 +188,7 @@ EOF
 add_sibling_worktree() {
   SIB="$GITTMP/rt-sib"; rm -rf "$SIB"
   ( cd "$FX" && git worktree add -q -b "${1:-wave}" "$SIB" ) >/dev/null 2>&1 || { print_bad "fixture: git worktree add failed under $SIB"; return 1; }
-  SIB=$( cd "$SIB" && git rev-parse --show-toplevel )
+  SIB=$(unset GIT_DIR GIT_WORK_TREE;  cd "$SIB" && git rev-parse --show-toplevel )
 }
 # run_tick_over <tick> [args] — OUT, ERR and RC are what the tick did.
 run_tick_over() {
@@ -702,7 +702,7 @@ sed -i "s/^phase: .*/phase: LANDING/; s/^witness: .*/witness: $FIRST/" "$FX/memo
     && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null GIT_COMMITTER_DATE="$(( $(date -u +%s) - 3600 )) +0000" git commit -q -m landing )
 LC61=$( cd "$FX" && git rev-parse HEAD ); W61="$GITTMP/rt-w61"; rm -rf "$W61"
 ( cd "$FX" && git worktree add -q --detach "$W61" "$LC61" ) >/dev/null 2>&1
-W61=$( cd "$W61" && git rev-parse --show-toplevel )
+W61=$(unset GIT_DIR GIT_WORK_TREE;  cd "$W61" && git rev-parse --show-toplevel )
 mkdir -p "$FX_GITDIR/unattended"
 printf '2026-09-27T00:00:00Z landed %s on refs/heads/main at %s\n' "$LC61" "$LC61" > "$FX_GITDIR/unattended/landed.tRun.log"
 check_same "U61 the driver reads the observed landing TERMINAL in W2" "$( cd "$W61" && GOV_DEFAULT_BRANCH=main bash "$KIT/unattended.sh" --liveness tRun 2>/dev/null | sed -n 's/^verdict: //p')" "TERMINAL"

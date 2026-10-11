@@ -870,7 +870,7 @@ check_spec_audit "rule0: kind [\"spec-audit\"] (an array) on the undeclared READ
 # of tier2-review.js that decides `isSpec` — asserting the two agree. An edit to either side reds
 # here until the other follows. The harness sits beside this kit in this repo; an adopter layout
 # without it gets an ANNOUNCED skip, never a silent green.
-T2R=""; _wf_dir=$(resolve_kit_dir "$TESTPY" workflows tier2-review.js "$HERE" 2>/dev/null) && T2R="$(git -C "$HERE" rev-parse --show-toplevel)/$_wf_dir/tier2-review.js"
+T2R=""; _wf_dir=$(resolve_kit_dir "$TESTPY" workflows tier2-review.js "$HERE" 2>/dev/null) && T2R="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_wf_dir/tier2-review.js"
 if [ -f "$T2R" ]; then
   kind_line=$(grep -m1 '^const kind = ' "$T2R")
   for k in '"spec-audit"' '["spec-audit"]' '"diff-review"' '"SPEC-AUDIT"' '{"k":"spec-audit"}' '7'; do
@@ -2138,7 +2138,7 @@ for f in ratified:
 print("population %d scanned, %d denied at BASE, %d denial(s) lost, %d ratified" % (n, denied, len(lost), len(ratified)))
 sys.exit(1 if lost or denied == 0 or not ratified else 0)
 PYEOF
-  "$TESTPY" "$TMP/nr.py" "$TMP/base-hook.js" "$HOOK" "$(git -C "$HERE" rev-parse --show-toplevel)" "$TMP/nrfix" > "$TMP/nr.out" 2>&1
+  "$TESTPY" "$TMP/nr.py" "$TMP/base-hook.js" "$HOOK" "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" "$TMP/nrfix" > "$TMP/nr.out" 2>&1
   if [ $? = 0 ]; then
     echo "ok   no-regress: no denial lost against BASE ($(tail -1 "$TMP/nr.out"))"; pass=$((pass+1))
   else
