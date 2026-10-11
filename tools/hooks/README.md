@@ -323,6 +323,39 @@ the agent writes: approval is recorded, not proven. The gate stops forgetting, n
 `readConfKey(bytes, key)` is this home's one shell-grammar conf reader; `agent-cap.js`'s
 `readSpecAuditDefault` delegates to it.
 
+**The role arm: WHO writes a spec or a product file** (`TOOL-aOrientedCast-6`). The same gate reads
+the payload's `agent_type` against the role index `.claude/roles.json` at the target's toplevel,
+which the roles kit generates; `loadRoleIndex(top)` is the one reader, exported for `agent-cap.js`.
+Two write classes are graded, and nothing else reads the index:
+
+- **spec** — a target under `<MEMORY_ROOT>/builds/<build>/spec/`, at any depth. Admitted only from
+  a role with `agent: true` and `writes = spec`.
+- **product** — a target under `ROUTED_PATHS`. The route arm above runs first and unchanged; once it
+  finds a buildable unit, the write is admitted only from a role with `agent: true` and
+  `writes = product`. A builder with no buildable route meets the route refusal word for word.
+
+The main loop (its payload carries no `agent_type`) and an untyped harness agent
+(`workflow-subagent`) are refused both, with ONE exception: an `Edit`, `MultiEdit` or `Write` on a
+spec whose result differs from the file in exactly one line, its `**Status:**` line, and there only
+in the status and date cells. That flip is admitted from the main loop on any spec, and from a
+`product` role on a spec its card's `## route` names; rev, tier, base, the tail and every section
+stay the spec-writer's.
+
+**Arming.** No index adds no arm, so a repository without the roles kit sees the route gate exactly
+as before. An index that cannot be read, is not JSON, or is not the shape
+`{ roles: { <name>: { writes, agent } }, harnesses: [...] }` refuses every spec and product write,
+naming the file. An index naming no `agent`-true role for a class refuses that class as UNARMED.
+Each refusal names the target, its class, the writer, the roles the index admits, the index, and the
+route to such a role: render its handoff with `handoff.py render --role <name> --build <slug> --part
+task` and pass the output as the prompt of an `Agent` call whose `subagent_type` is that role, or
+name the role in its harness's `roles` argument. A spec refusal also names the status flip.
+
+**Its ceiling**, beside the gate's: a Bash or PowerShell write is never seen; a hand-edited index is
+read like a generated one; a session launched AS a role carries that role's type. The `none`,
+`review` and `records` write classes are declared in the index and graded by nothing here. A hook
+script is read afresh on every call, so the arm binds a session from its next write once the tree
+its hooks run from holds it.
+
 **The third event: `SubagentStart`** (`TOOL-aRoutedQuill-4`). A subagent inherits the hooks but not
 the parent's card, so `scratch-guard-subagent.fragment.json` wires the same script on `SubagentStart`
 with matcher `*`. A second fragment is safe here where a second PreToolUse one is not, because the

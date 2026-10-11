@@ -1153,6 +1153,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "buildEditResult",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "buildHeredocView",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -2763,6 +2768,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkRoleWrite",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkRouted",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -2781,6 +2791,11 @@
       "id": "checkSpecAuditDeclared",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "checkStatusOnlyEdit",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "checkStop",
@@ -8193,6 +8208,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "loadRoleIndex",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "load_affordance_exempt",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -13233,6 +13253,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderRoleDeny",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "renderRoster",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
@@ -16146,6 +16171,11 @@
       "id": "run_driver",
       "kind": "function",
       "file": "tools/unattended/runlog-writer.test.sh"
+    },
+    {
+      "id": "run_edit",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "run_engine",
@@ -20826,6 +20856,11 @@
       "id": "write_rev_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_roles",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
       "id": "write_rounds_line",

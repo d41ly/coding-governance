@@ -87,3 +87,7 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-11T19:54:29Z brief · item TOOL-aOrientedCast-10 · reason 8fe392978328 memory/builds/aOrientedCast/prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md
 
 2026-10-11T20:25:06Z dispatch · item 0f369302 TOOL-aOrientedCast-10 · reason .claude/agents/gov-builder.md .claude/agents/gov-diff-reviewer.md .claude/agents/gov-orienter.md .claude/agents/gov-researcher.md .claude/agents/gov-reuse-scout.md .claude/agents/gov-skeptic.md .claude/agents/gov-spec-reviewer.md .claude/agents/gov-spec-writer.md .claude/agents/gov-synthesizer.md memory/builds/aOrientedCast/build/2026-10-11-build-TOOL-aOrientedCast-10-1-acceptance-ledger.md
+
+2026-10-11T20:42:01Z brief · item TOOL-aOrientedCast-6 · reason 8fe392978328 memory/builds/aOrientedCast/prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md
+
+2026-10-11T20:48:27Z dispatch · item 084070f5 TOOL-aOrientedCast-6 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/hooks/README.md memory/map/features/agent-cap.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/aOrientedCast/spec/2026-10-11-spec-TOOL-aOrientedCast-6.md memory/builds/aOrientedCast/build/2026-10-11-build-TOOL-aOrientedCast-6-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md

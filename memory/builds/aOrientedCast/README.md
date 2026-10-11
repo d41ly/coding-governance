@@ -72,7 +72,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 14 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
+**Build status:** OPEN · 14 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
 ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9 TOOL-aOrientedCast-10 TOOL-aOrientedCast-11
 
 <!-- gen:build-units -->
@@ -89,12 +89,12 @@ ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOriente
 | [TOOL-aOrientedCast-8 — the roles kit is an adopter default: installed, rendered and reported at install and update](spec/2026-10-11-spec-TOOL-aOrientedCast-8.md) | 7 | 2 | CLOSED | rev-4 | 2026-10-11 |
 | [PLAY-aOrientedCast-1 — the charter: every agent is handed a rendered role, and the main loop delegates](spec/2026-10-11-spec-PLAY-aOrientedCast-1.md) | 8 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aOrientedCast-10 — every role runs at its declared effort, from one owner-editable policy file](spec/2026-10-11-spec-TOOL-aOrientedCast-10.md) | 8 | 2 | CLOSED | rev-2 | 2026-10-11 |
-| [TOOL-aOrientedCast-6 — the write gate admits a spec write only from the spec-writer role and a product write only from the builder role](spec/2026-10-11-spec-TOOL-aOrientedCast-6.md) | 9 | 2 | INPROGRESS | rev-3 | 2026-10-11 |
+| [TOOL-aOrientedCast-6 — the write gate admits a spec write only from the spec-writer role and a product write only from the builder role](spec/2026-10-11-spec-TOOL-aOrientedCast-6.md) | 9 | 2 | CLOSED | rev-3 | 2026-10-12 |
 | [TOOL-aOrientedCast-7 — the spawn guard refuses an Agent or Workflow call that carries no rendered handoff](spec/2026-10-11-spec-TOOL-aOrientedCast-7.md) | 10 | 2 | OPEN | rev-2 | 2026-10-11 |
 | [TOOL-aOrientedCast-11 — a role agent runs no gate, and the write gate's hook refuses one](spec/2026-10-11-spec-TOOL-aOrientedCast-11.md) | 11 | 2 | OPEN | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 23 bound to this build, across 3 record folder(s).
+Records: 24 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

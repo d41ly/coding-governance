@@ -127,7 +127,11 @@ names a unit whose spec is buildable by `checkBuildable`. Unlike the two shell c
 CLOSED, has no `agent_id` exemption (a subagent's payload carries the parent's `session_id`), and
 refuses on an absent or replay-written card. An UNARMED conf refuses every write but the one to
 itself. A target outside the session's common dir is not gated, so a scratch clone never meets its
-own conf.
+own conf. Since `TOOL-aOrientedCast-6` the gate also reads WHO writes: a spec under
+`<MEMORY_ROOT>/builds/<build>/spec/` only from a `writes = spec` role, and a product write the route
+admits only from a `writes = product` role, both read from `.claude/roles.json` through the exported
+`loadRoleIndex`. An absent index adds no arm, and a status-and-date-only flip of a spec header stays
+admitted from the main loop and the routed builder.
 
 **And the same script on a SECOND event, `SubagentStart`** (`TOOL-aRoutedQuill-4`). A second
 fragment, `scratch-guard-subagent.fragment.json` with matcher `*`, is safe where a second PreToolUse
