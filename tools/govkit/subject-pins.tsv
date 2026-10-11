@@ -99,6 +99,7 @@ review-join ban (no ref-keyed join)	repo	declarations
 review-join self-test	kit	selftests
 review-protocol parity (kit vs dogfood)	repo	declarations
 review-replay selftest	kit	selftests
+roles adopter self-test	kit	selftests
 roles catalogue	repo	declarations
 roles render selftest	kit	selftests
 roles render wiring	repo	wiring

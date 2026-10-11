@@ -80,8 +80,9 @@ lists, which is the set a previous render wrote. `--write` unlinks an owned type
 longer renders and rewrites the index last; it never touches any other file under
 `.claude/agents/`, where your own definitions may live. `--check` writes nothing, names every
 `missing`, `drift` or `stale` owned path and the remedy, and strips carriage returns from the
-on-disk side, so a CRLF checkout of a correct render reads fresh. It is the `roles render wiring`
-leg, so editing a role, an overlay or a cited charter section without a re-render reds the bar.
+on-disk side, so a CRLF checkout of a correct render reads fresh. The adopter's `--check` runs it
+beside the Skill's compare as the `roles render wiring` leg, so editing a role, an overlay or a
+cited charter section without a re-render reds the bar.
 `--selftest` runs the renderer's arms over a catalogue it builds in a temporary directory and is the
 `roles render selftest` leg. Exit 0, 1 on drift or a failed arm, 2 on usage, a library refusal or a
 zero-role catalogue.
@@ -96,6 +97,36 @@ reports its own name as `agent_type` in the hook payloads and starts without the
 CLI omits it only while a server flag it reads stays on and the caller supplies no user context of
 its own, so a later CLI or a flag flip can re-admit the charter silently; the agent-type probe
 record in the build that shipped this renderer is the instrument to re-run.
+
+## Adopting
+
+`roles` is in govkit's default selection (TOOL-aOrientedCast-8), so `govkit apply` installs it and
+`govkit update --write` installs it where a receipt predates it, printing `default-gained`. It
+requires the kickoff kit, whose card writer every `task:` and `card:` input is read from, and the
+memory-tree kit, whose `.memory-tree.conf` names the memory root and, by `CHARTER`, the governing
+doc the roles' charter ids resolve against.
+
+- The base role files, the workflow table, the library, the checker, the renderers, the adopter and
+  this README are the kit's, overwritten on every update.
+- The ten house overlays under `house/` are SEEDED: you receive each once and own it afterwards,
+  and an update never rewrites one. They are where your project's rules for a role go.
+- The adopter, `bash adopt-roles.sh --scaffold`, runs at install and again at every update unless
+  `GOVKIT_RERENDER=0` declines it. It renders the `/build` Skill, one agent type per agent role
+  under `.claude/agents/` and the role index `.claude/roles.json`, the file the role-aware write
+  gate and spawn guard arm on. `--check` grades all three and is the `roles render wiring` leg.
+- Start a new session after an install or an update that moved an agent type: a running session
+  cannot spawn a type written after it started.
+- `/build` drives the three harnesses the workflow table names, which ship in the `review-harness`
+  kit, not a default. Without it the role agents, the handoffs and the gates still work, and the
+  catalogue checker, the agent render and `check-wiring.sh` each print a `note` per absent harness.
+
+With no governing doc at `CHARTER` the adopter renders the Skill alone and exits 3, naming the doc
+and the key; the descriptor accepts that exit as `no-governing-doc`, so the install succeeds and no
+agent type or role index is written until the doc exists and `--scaffold` runs again.
+
+`check-wiring.sh` reports an install whose render is absent as `UNWIRED  roles`, naming the
+`--scaffold` remedy, a missing governing doc by its path and the `CHARTER` key, and a CRLF agent
+type or role index on its eol line.
 
 ## The `/build` Skill
 

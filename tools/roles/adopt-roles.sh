@@ -1,11 +1,25 @@
 #!/usr/bin/env bash
-# adopt-roles.sh — install the role catalogue's project-facing surface: the `/build` Skill.
+# adopt-roles.sh — install the role catalogue's project-facing surface: the `/build` Skill, one
+# agent type per agent role under `.claude/agents/`, and the role index `.claude/roles.json`.
 #
-#   <prefix>/roles/adopt-roles.sh --scaffold   # render .claude/skills/build/SKILL.md and print its path
-#   <prefix>/roles/adopt-roles.sh --check      # render in memory and byte-compare with the file on disk
+#   <prefix>/roles/adopt-roles.sh --scaffold   # render all three, print each written path and the restart notice
+#   <prefix>/roles/adopt-roles.sh --check      # render in memory and byte-compare all three with the files on disk
 #
-# Exit 0 = rendered / in sync · 1 = stale, absent, a surviving token or a stage disagreement, each
-# named · 2 = usage, a failed derivation, an absent conf or a dead catalogue probe.
+# Exit 0 = rendered / in sync · 1 = stale, absent, a surviving token, a stage disagreement or a
+# refused agent render, each named · 2 = usage, a failed derivation, an absent conf or a dead
+# catalogue probe · 3 = no governing doc at `CHARTER`: the Skill alone rendered or compared, and one
+# line names the doc and the key.
+#
+# NO GOVERNING DOC IS A DECLARED OUTCOME, NOT A REFUSAL (TOOL-aOrientedCast-8 section 8 F3). A default
+# install lands the playbook wherever its answers put it while the memory-tree seed writes
+# `CHARTER="AGENTS.md"`, so a fresh adopter often has no file there. Every agent type appends charter
+# sections, so none can be rendered; the Skill needs no charter, so it still is, and the descriptor's
+# `no-governing-doc` outcome accepts exit 3, so the apply succeeds and check-wiring names the doc.
+#
+# THE AGENT RENDER is `render_agents.py --write` or `--check` beside this file, run through the
+# resolved python; its lines pass through, and under `--check` its own `--write` remedy line is
+# replaced by this script's `--scaffold`, so one leg and one remedy grade all three artifacts
+# (TOOL-aOrientedCast-8 S4).
 #
 # The shape is the unattended kit's adopter (KICK-aOrientedCast-2): the same `.git` walk derives the
 # kit's repo-relative path and the tool root, every `{{TOKEN}}` is substituted literally, and both
@@ -112,11 +126,84 @@ render_skill() { # -> the render on stdout; 1 a stage disagreement or a survivin
 body=$(render_skill && printf X) || exit $?
 body=${body%X}
 
+# The resolver, INLINE: this kit is copy-installed as a standalone directory, so the shared lib does
+# not exist in an adopting repo. Byte-identical to the canonical copy its marker line names.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+PY=$(resolve_python) || exit 2
+AGENTS="$KIT_DIR/render_agents.py"
+[ -f "$AGENTS" ] || { echo "roles: $KIT_REL lacks render_agents.py, so no agent type can be rendered"; exit 2; }
+
+# THE GOVERNING DOC, read with the library's own conf grammar so this decides exactly where the agent
+# render would refuse with R0. A python that cannot read it is exit 2, never a silent "no doc".
+CHARTER=$("$PY" -B -c 'import pathlib, sys
+sys.path.insert(0, sys.argv[1])
+import roles_lib
+print(roles_lib.read_conf_key(pathlib.Path(sys.argv[2]), "CHARTER") or "")' "$KIT_DIR" "$CONF") \
+  || { echo "roles: CHARTER could not be read from $CONF"; exit 2; }
+CHARTER=${CHARTER%$'\r'}
+nodoc=""
+if [ -z "$CHARTER" ]; then
+  nodoc="roles: no governing doc — CHARTER in $CONF is blank or absent, so the agent types and the role index are not rendered. Fix: write the doc, point CHARTER at it, then run bash $KIT_REL/adopt-roles.sh --scaffold"
+elif [ ! -f "$CHARTER" ]; then
+  nodoc="roles: no governing doc — CHARTER in $CONF names $CHARTER, which is not a file, so the agent types and the role index are not rendered. Fix: write that doc or point CHARTER at it, then run bash $KIT_REL/adopt-roles.sh --scaffold"
+fi
+
 if [ "$MODE" = "--check" ]; then
-  [ -f "$OUT" ] || { echo "roles: $OUT is not rendered — run $0 --scaffold"; exit 1; }
-  disk=$(tr -d '\r' < "$OUT" && printf X); disk=${disk%X}
-  [ "$disk" = "$body" ] || { echo "roles: $OUT is out of sync with $KIT_REL/SKILL.template.md — re-render with $0 --scaffold"; exit 1; }
+  stale=0
+  if [ ! -f "$OUT" ]; then
+    echo "roles: $OUT is not rendered"; stale=1
+  else
+    disk=$(tr -d '\r' < "$OUT" && printf X); disk=${disk%X}
+    [ "$disk" = "$body" ] || { echo "roles: $OUT is out of sync with $KIT_REL/SKILL.template.md"; stale=1; }
+  fi
+  if [ -n "$nodoc" ]; then
+    echo "$nodoc"
+  else
+    # The renderer's own remedy names `--write`, which renders the agent types alone; this script's
+    # `--scaffold` is the one remedy for all three artifacts, so that line is replaced below.
+    agents_out=$("$PY" -B "$AGENTS" --check 2>&1); arc=$?
+    printf '%s\n' "$agents_out" | grep -v '^render_agents: remedy — '
+    [ "$arc" -eq 0 ] || stale=1
+  fi
+  [ "$stale" -eq 0 ] || { echo "roles: remedy — bash $KIT_REL/adopt-roles.sh --scaffold"; exit 1; }
+  [ -z "$nodoc" ] || exit 3
   exit 0
+fi
+
+# The agent render FIRST: it renders everything in memory before it writes, so a refusal writes
+# nothing, and the Skill is then not written beside an unrendered catalogue either.
+if [ -z "$nodoc" ]; then
+  "$PY" -B "$AGENTS" --write || { echo "roles: the agent render refused, so nothing more was written — fix what it named and re-run $0 --scaffold"; exit 1; }
 fi
 
 new=""; [ -f "$OUT" ] || new=1
@@ -126,4 +213,5 @@ echo "$OUT"
 # Whether a running session lists a Skill written after it started is UNVERIFIED on this CLI; the
 # line states the conservative rule.
 [ -z "$new" ] || echo "roles: a session started before this write may not list /build until it restarts"
+[ -z "$nodoc" ] || { echo "$nodoc"; exit 3; }
 exit 0

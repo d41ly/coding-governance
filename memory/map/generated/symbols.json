@@ -1545,6 +1545,11 @@
     {
       "id": "build_fixture",
       "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
+      "id": "build_fixture",
+      "kind": "function",
       "file": "tools/roles/render_agents.py"
     },
     {
@@ -3010,6 +3015,11 @@
     {
       "id": "check_arm",
       "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
+    },
+    {
+      "id": "check_arm",
+      "kind": "function",
       "file": "tools/roles/render_agents.py"
     },
     {
@@ -4150,7 +4160,22 @@
     {
       "id": "check_roles",
       "kind": "function",
+      "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_roles",
+      "kind": "function",
       "file": "tools/roles/check_roles.py"
+    },
+    {
+      "id": "check_roles_default",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_roles_install",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "check_rollback_orders",
@@ -15115,6 +15140,11 @@
     {
       "id": "resolve_python",
       "kind": "function",
+      "file": "tools/roles/adopt-roles.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
@@ -15881,6 +15911,11 @@
       "id": "run_ac15_witness",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_adopter",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.test.sh"
     },
     {
       "id": "run_adopter",

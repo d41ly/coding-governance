@@ -92,6 +92,7 @@
       "review-join self-test",
       "review-protocol parity (kit vs dogfood)",
       "review-replay selftest",
+      "roles adopter self-test",
       "roles catalogue",
       "roles render selftest",
       "roles render wiring",

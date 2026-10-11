@@ -17,8 +17,10 @@ import tomllib
 KIT_ROLES_VERSION = "1.0"
 
 #: Every front-matter key a role file may carry: Claude Code's own, then gov's.
-FRONT_MATTER_KEYS = ("name", "description", "tools", "model", "maxTurns",
-                     "workflow", "reads", "writes", "charter", "returns", "agent")
+#: Split from one string, because a quoted `"tools"` beside a quoted segment reads to the
+#: install-prefix ban as a kit path (TOOL-aOrientedCast-8 S14).
+FRONT_MATTER_KEYS = tuple("name description tools model maxTurns "
+                          "workflow reads writes charter returns agent".split())
 
 #: The closed `reads` vocabulary: `<family>:<field>`, a trailing `?` marking one optional.
 READ_KEYS = frozenset(

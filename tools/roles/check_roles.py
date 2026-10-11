@@ -130,7 +130,7 @@ def check_roles(root, kit_dir, write=False):
         if keys.get("agent", "true") not in ("true", "false"):
             add_defect(p, "R2", "agent '%s' is not true or false" % keys["agent"])
         if keys.get("agent", "true") == "true":
-            for k in ("tools", "model"):
+            for k in "tools model".split():
                 if not keys.get(k):
                     add_defect(p, "R2", "'%s' is absent on an agent role" % k)
         seen = set()

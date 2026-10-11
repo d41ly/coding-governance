@@ -1019,8 +1019,11 @@ check_eol() {
   # carrying the pin. The review-harness kit pins those scripts because CR bytes made a shipped
   # harness unlaunchable, and nothing on the wiring side looked at them. It is named beside the Skill
   # glob, so the "every eol=lf path under .claude/" selector the paragraph above forbids stays unwritten.
-  pop=$(git ls-files .claude/skills/ .claude/workflows/ 2>/dev/null \
-        | grep -E '^\.claude/skills/.*\.md$|^\.claude/workflows/[^/]*\.js$' | while IFS= read -r _p; do
+  # A THIRD NAMED GLOB (TOOL-aOrientedCast-8 S8): the roles kit's rendered agent types and its role
+  # index, which `roles render wiring` byte-compares, so a CRLF render is reported here and `--fix`
+  # rewrites it as it does a rendered Skill.
+  pop=$(git ls-files .claude/skills/ .claude/workflows/ .claude/agents/ .claude/roles.json 2>/dev/null \
+        | grep -E '^\.claude/skills/.*\.md$|^\.claude/workflows/[^/]*\.js$|^\.claude/agents/[^/]*\.md$|^\.claude/roles\.json$' | while IFS= read -r _p; do
           [ -n "$_p" ] || continue
           git check-attr eol -- "$_p" 2>/dev/null | sed -n 's/^\(.*\): eol: lf$/\1/p'
         done)
@@ -1524,6 +1527,75 @@ try {
   echo "ok       routed    — ROUTED_PATHS ($rp) and ROUTED_COMMIT_CUTOFF ($cut) are armed in $conf"
 }
 
+# --- Check R: the roles kit's render is present (TOOL-aOrientedCast-8 S8) --------------------------
+# The role catalogue binds only where it is RENDERED: the role-aware write gate and spawn guard arm on
+# `.claude/roles.json`, a role agent is spawnable only from `.claude/agents/<name>.md`, and `/build`
+# is the rendered Skill. An install whose adopter never ran leaves all three absent and nothing else
+# says so, so this arm reports it as `UNWIRED`, with the adopter's `--scaffold` as the remedy.
+#
+# The kit resolves by its `workflows.toml`, receipt first and then the probe, as every arm here does.
+# The harness half reads the role index with the resolved python and prints one `note` per harness
+# it lists that this tree does not hold: `/build` drives those through the review harness, which is
+# not a default kit, so its absence is a fact to print and never a gate (the spec's section 8 F1).
+#
+# WHAT THIS DOES NOT CHECK: whether a rendered file is FRESH, which is the `roles render wiring`
+# leg's byte compare; and whether a house overlay is sensible, which is `roles catalogue`'s. Presence
+# is cheap and this runs at SessionStart on hosts that may have no python; freshness is not.
+check_roles() {
+  local wf kit f name n=0 miss="" py harn h c
+  wf=$(first_of "$(resolve_receipt_path roles workflows.toml)" "$(resolve_kit_file roles workflows.toml)")
+  if [ -z "$wf" ]; then
+    echo "skip     roles     — the roles kit is not installed here"
+    return
+  fi
+  kit=${wf%/*}
+  # THE GOVERNING DOC FIRST (section 8 F3): with none at `CHARTER` the adopter renders the Skill alone
+  # and exits 3, so the cause is named here rather than the artifacts it left unrendered. The conf is
+  # read in shell, since this runs where python may be absent: the last `CHARTER=` line, an optional
+  # `export`, quotes and a trailing ` # comment` stripped.
+  c=$(sed -n 's/^[[:space:]]*\(export[[:space:]]\{1,\}\)\{0,1\}CHARTER=//p' .memory-tree.conf 2>/dev/null | tail -1 \
+      | tr -d '\r' | sed 's/[[:space:]]\{1,\}#.*$//; s/[[:space:]]*$//')
+  c=${c#\"}; c=${c%\"}; c=${c#\'}; c=${c%\'}
+  if [ -z "$c" ] || [ ! -f "$c" ]; then
+    [ -n "$c" ] && c="names $c, which is not a file" || c="is blank or absent"
+    echo "UNWIRED  roles     — the roles kit is installed and CHARTER in .memory-tree.conf $c, so no agent type is rendered. Fix: write that doc or point CHARTER at it, run bash $kit/adopt-roles.sh --scaffold, then start a new session"
+    unwired=$((unwired+1))
+    return
+  fi
+  [ -f .claude/roles.json ] || miss="$miss .claude/roles.json,"
+  for f in "$kit"/agents/*.agent.md; do
+    [ -f "$f" ] || continue
+    # `agent: false` in the front matter, the block between the first two `---` lines, renders no type.
+    tr -d '\r' < "$f" | sed -n '2,/^---$/p' | grep -qE '^agent:[[:space:]]*false[[:space:]]*$' && continue
+    name=${f##*/}; name=${name%.agent.md}; n=$((n+1))
+    [ -f ".claude/agents/$name.md" ] || miss="$miss .claude/agents/$name.md,"
+  done
+  [ -f .claude/skills/build/SKILL.md ] || miss="$miss .claude/skills/build/SKILL.md,"
+  if [ -n "$miss" ]; then
+    miss=${miss%,}
+    case "$miss" in *,*) miss="$miss are" ;; *) miss="$miss is" ;; esac
+    echo "UNWIRED  roles     — the roles kit is installed and${miss} not rendered, so no role agent can be spawned and the role-aware gates are unarmed. Fix: bash $kit/adopt-roles.sh --scaffold, then start a new session"
+    unwired=$((unwired+1))
+    return
+  fi
+  if ! py=$(resolve_python 2>/dev/null); then
+    echo "note     roles     — no usable python, so the harnesses the role index names were not read"
+  elif ! harn=$("$py" -c 'import json, sys
+for h in json.load(open(sys.argv[1], encoding="utf-8")).get("harnesses") or []:
+    print(h)' .claude/roles.json 2>/dev/null); then
+    echo "note     roles     — .claude/roles.json does not parse as the role index, so the harnesses it names were not read"
+  else
+    while IFS= read -r h; do
+      h=${h%$'\r'}   # a Windows python writes CRLF to a pipe, and a CR kept here names no file
+      [ -n "$h" ] && [ ! -f "$h" ] || continue
+      echo "note     roles     — $h is named by the role index and absent here; /build cannot drive it until the review harness is installed"
+    done <<EOF
+$harn
+EOF
+  fi
+  echo "ok       roles     — $n agent types, the role index and the /build Skill are rendered"
+}
+
 # --- Check S: the machine-global /session-kickoff install matches the tracked engine ---------------
 # CONTENT, not link-ness. The obvious check — is the install a junction or a symlink — cannot be
 # written portably here: under MSYS an NTFS junction is not reported by `test -L`, it presents as an
@@ -1756,6 +1828,7 @@ check_scratch_guard
 check_recall_opened
 check_card
 check_routed
+check_roles
 check_merge_rows
 check_merge_ours
 check_ssh_keepalive

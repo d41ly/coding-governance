@@ -655,6 +655,40 @@ exits 0, so an installed-but-undeclared kit is a legal state rather than a red.
    `.claude/skills/lexicon/SKILL.md` as one landing. Pin the Skill to LF — it is a rendered artifact
    its own gate byte-compares.
 
+<!-- govkit:entry roles -->
+## 3g — The roles kit (default)
+
+The role catalogue: one agent definition per governed role, the workflow table that says which role
+drives which workflow, and the `/build` Skill an attended session follows after kickoff's go. It is
+in the default selection, so `govkit apply` installs it, and `govkit update --write` installs it into
+a tree whose receipt predates it, printing `default-gained`.
+
+1. **What the default install renders.** The kit's adopter, `bash <prefix>/roles/adopt-roles.sh
+   --scaffold`, runs at install and at every update unless `GOVKIT_RERENDER=0` declines it. It
+   writes `.claude/skills/build/SKILL.md`, one agent type per agent role under `.claude/agents/`,
+   and `.claude/roles.json`, the role index the hooks kit's write gate and spawn guard arm on. Your
+   own definitions under `.claude/agents/` are never touched. `--check` grades all three and runs
+   as the `roles render wiring` leg.
+2. **The house overlays are yours.** The ten files under `<prefix>/roles/house/` are seeded once and
+   never rewritten by an update. Put your project's rules for a role there; the base files under
+   `agents/` are the kit's and are overwritten. Re-run `--scaffold` after editing one, or the leg
+   reds.
+3. **Restart before spawning.** A Claude Code session reads its agent registry when it starts, so
+   a session that ran the install or the update cannot spawn a newly rendered agent type. Start a
+   new session first.
+4. **`/build` needs the review harness.** The Skill drives the three harnesses the workflow table
+   names, and they ship in the `review-harness` kit, which is not a default. Without it the role
+   agents, the handoffs and the gates still work, and `check-wiring.sh` prints one `note` per absent
+   harness. Add `review-harness` to `kits` in `.governance/deploy.toml` to use `/build`.
+
+The roles need the governing doc `.memory-tree.conf` names by `CHARTER` to carry every `## §<n>`
+section a role's `charter` key cites; `roles catalogue` reds naming the missing one. With no file at
+`CHARTER` the install still succeeds: the adopter renders the Skill alone, renders no agent type and
+no role index, and exits 3, which the kit declares as its `no-governing-doc` outcome. Write that doc,
+or point `CHARTER` at the one you have, then re-run `--scaffold`.
+`check-wiring.sh` reports an install left unrendered as `UNWIRED  roles`, with `--scaffold` as the
+remedy, and names the doc and the `CHARTER` key first when that is the cause.
+
 ## 4 — Write the kickoff manifest (the engine's project layer)
 
 The engine (§1) discovers the manifest by searching `<project>`, **first hit wins**:
@@ -1216,6 +1250,10 @@ it.
 ├── <prefix>/hooks/              # agent-cap.js, scratch-guard.js + their two fragments (hooks kit, default)
 ├── <prefix>/settings-merge.py   # the one writer of .claude/settings.json (default)
 ├── <prefix>/check-wiring.sh     # reports an unwired hook or an UNARMED ROUTED_PATHS (default)
+├── <prefix>/roles/              # the role catalogue + its adopter; house/ overlays are yours (default)
+├── .claude/agents/<role>.md     # one rendered agent type per agent role (roles kit, §3g)
+├── .claude/roles.json           # the role index the write gate and spawn guard arm on (roles kit)
+├── .claude/skills/build/SKILL.md  # the rendered /build Skill (roles kit)
 ├── .memory-tree.conf            # memory-tree config           ┐ (+ ROUTED_PATHS, ROUTED_COMMIT_CUTOFF)
 ├── <prefix>/memory-tree/        # the hygiene kit (copied in)  │ only if §3 adopted
 └── memory/                      # scaffolded tree; LIVE.md = GENERATED work-state index      ┘

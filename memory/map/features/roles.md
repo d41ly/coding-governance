@@ -5,10 +5,10 @@ feature = "roles"
 title = "The role catalogue: one owner-editable agent definition per role with an empty house overlay beside it, the table of the workflows a governed session runs its LLM work through, the library every consumer reads them by, and the leg that holds the three and the governing doc to one another"
 status = "building"
 streams = ["tooling"]
-decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2"]
+decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2", "TOOL-aOrientedCast-8"]
 
 [claims]
-gate-legs = ["roles catalogue", "roles render selftest", "roles render wiring"]
+gate-legs = ["roles adopter self-test", "roles catalogue", "roles render selftest", "roles render wiring"]
 kits = ["roles"]
 git-hooks = []
 harness-hooks = []
@@ -40,7 +40,11 @@ carrying the charter sections the role names instead, beside the generated index
 the hooks read; its `--check` is the `roles render wiring` leg (TOOL-aOrientedCast-3). The kit's
 adopter, `adopt-roles.sh`, renders the `/build` Skill from `SKILL.template.md`: the router an
 attended session follows after kickoff's go, whose `## Stage` headings the render binds to the
-workflow table's stages, and whose `--check` byte-compares the committed render (KICK-aOrientedCast-2).
+workflow table's stages, and whose `--check` byte-compares the committed render (KICK-aOrientedCast-2). The
+kit is a default adopter kit: govkit installs it, seeds the house overlays once, and its adopter
+renders all three artifacts at install and update behind the one `roles render wiring` leg; with no
+governing doc at `CHARTER` it renders the Skill alone and exits 3, an accepted outcome, and
+`check-wiring.sh` reports the install `UNWIRED` naming the doc (TOOL-aOrientedCast-8).
 
 ## Constraints & why
 
@@ -103,8 +107,6 @@ name a previous render wrote, so a stale type is unlinkable without a marker key
 
 ## Gaps
 
-- No `[[files]]` rule and no registry entry yet, so the deployer reports the directory as unclaimed
-  surface until the kit is wired into it.
 - `enforced-by` is graded for presence only: the hook arms and legs it names land with later units of
   the same build, and nothing yet proves each one refuses what it claims.
 - The checker grades shape, cross-references and size, never what a body means.

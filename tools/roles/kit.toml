@@ -1,16 +1,145 @@
 # kit.toml — this entry, declared as data. Read by <prefix>/govkit/.
-# Contract: memory/builds/aOrientedCast/spec/2026-10-11-spec-TOOL-aOrientedCast-1.md
+# Contract: memory/builds/aOrientedCast/spec/2026-10-11-spec-TOOL-aOrientedCast-1.md (identity) and
+# memory/builds/aOrientedCast/spec/2026-10-11-spec-TOOL-aOrientedCast-8.md (the wiring below).
 
 id = "roles"
 home = "roles"
 scope = "repo"
 
-# The checker reads `.memory-tree.conf` for the governing doc (CHARTER), and a role body points at
-# the memory tree's own documents through {{MEMORY_ROOT}}.
-requires = ["memory-tree"]
+# The card every `task:` and `card:` input is read from is written by the kickoff kit's card writer,
+# and the checker, the library and the adopter read the memory root and the governing doc's path from
+# `.memory-tree.conf`.
+requires = ["kickoff-manifest", "memory-tree"]
+
+# `/build` and `handoff.py harness-args` drive the three harnesses `workflows.toml` names, and all
+# three ship in `review-harness`, which is not a default. TOOL-aOrientedCast-8 section 8 F1: a plain
+# requirement would make `apply` refuse every default install, so this is a DECLARATION selfcheck
+# grades and nothing else. Where the harness is absent the catalogue checker, the agent render and
+# check-wiring each print a `note`; the role agents, the handoffs and the gates work everywhere.
+requires_if = [{ kit = "review-harness", why = "TOOL-aOrientedCast-8 section 8 F1: /build and the harness-arguments verb drive the three harnesses workflows.toml names, which review-harness ships. A plain requirement would refuse every default install, since review-harness is not a default; its absence is a note on the catalogue checker, the agent render and check-wiring. No condition key: the edge holds wherever /build is used" }]
 
 # Pinned at the library module, which lands in the SAME unit as this descriptor.
 version_from = { file = "roles_lib.py", pattern = "^KIT_ROLES_VERSION = " }
 
-# IDENTITY ONLY. No [[files]] row yet: each file's govkit role (the house overlays ship as `seed`)
-# and the registry entry arrive with the unit that wires this kit into the deployer.
+# Everything the kit ships is engine, overwritten on every update: the base role files,
+# `workflows.toml`, the library, the checker, the renderers, the adopter, the README and the Skill
+# template. The rules below claim the paths that are not.
+[[files]]
+include = "**"
+role = "engine"
+
+# THE HOUSE OVERLAYS ARE SEEDED. An adopter receives each once and owns it afterwards: it is where
+# that project's own rules for a role live, and `update` never rewrites a seed. EACH IS NAMED, because
+# a LIST include claims literal paths only (the runlog descriptor records the measurement).
+[[files]]
+include = ["house/gov-builder.md", "house/gov-diff-reviewer.md", "house/gov-orienter.md",
+           "house/gov-researcher.md", "house/gov-reuse-scout.md", "house/gov-session.md",
+           "house/gov-skeptic.md", "house/gov-spec-reviewer.md", "house/gov-spec-writer.md",
+           "house/gov-synthesizer.md"]
+role = "seed"
+
+# THE ADOPTER'S SELF-TEST IS WITHHELD, by claiming the destination (TOOL-aQuenchedHarness-3): its
+# subject is the adopter in this directory, so it has a job only when that source changes. Its leg is
+# carried by an [[exempt_leg]] row in the deployer's registry. `render_agents.py --selftest` is a flag
+# inside a shipped script, so it ships with that script as engine.
+[[files]]
+include = ["adopt-roles.test.sh"]
+role = "project-owned"
+
+# THE SKILL IS RENDERED. It names the kit, the tool root and the memory root, three values that
+# differ per repository, so the adopter renders it and its `--check` re-renders and compares. All
+# three tokens are substituted by the adopter by their literal spellings, which the kit-placeholders
+# gate joins against this list.
+[[files]]
+include = ["SKILL.template.md"]
+role = "rendered"
+to = ".claude/skills/build/SKILL.md"
+placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_ROOT"]
+
+[config]
+file = ".memory-tree.conf"
+owner = "memory-tree"
+optional_keys = ["MEMORY_ROOT", "CHARTER"]
+
+[adopt]
+argv = ["bash", "{kit}/adopt-roles.sh", "--scaffold"]
+mutates_index = false
+
+# THE RE-RENDER an update runs unless GOVKIT_RERENDER=0 declines it, which govkit requires of a kit
+# shipping a `rendered` row. `--scaffold` IS the re-render: it rewrites the Skill, every agent type and
+# the role index from the kit and the target's conf whether or not they are already there.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-roles.sh", "--scaffold"]
+
+[check]
+argv = ["bash", "{kit}/adopt-roles.sh", "--check"]
+
+[[outcome]]
+code = 0
+probe = { must_exist = ".claude/roles.json" }
+means = "adopted"
+
+# NO GOVERNING DOC AT `CHARTER`, and it is ACCEPTED (section 8 F3). The memory-tree seed writes
+# `CHARTER="AGENTS.md"` wherever the playbook landed, so a default install often has no doc there.
+# The adopter then renders the Skill alone and exits 3, and `check-wiring` reports `UNWIRED roles`
+# naming the doc; failing the apply instead would fail every such default install. The probe is the
+# Skill, which the adopter writes on this path before it exits.
+[[outcome]]
+code = 3
+probe = { must_exist = ".claude/skills/build/SKILL.md" }
+means = "no-governing-doc"
+ok = true
+
+# THE CATALOGUE LEG SHIPS (section 8 F2). It grades the shipped role files against the adopter's own
+# governing doc and house overlays, so its subject is the adopter's tree, and a broken overlay reds
+# on the adopter's bar before a handoff refuses at run time.
+[[gate_leg]]
+name = "roles catalogue"
+subject = "repo"
+argv = ["python", "{kit}/check_roles.py"]
+guard = []
+ceiling = 120
+
+# THE RENDER'S WIRING LEG SHIPS. One leg grades the agent types, the role index and the Skill
+# together; its subject is the target's own render, which goes stale when an overlay, the conf or the
+# governing doc moves with nobody touching this kit.
+[[gate_leg]]
+name = "roles render wiring"
+subject = "repo"
+argv = ["bash", "{kit}/adopt-roles.sh", "--check"]
+guard = []
+ceiling = 300
+
+[[gate_leg]]
+name = "roles render selftest"
+subject = "kit"
+argv = ["python", "{kit}/render_agents.py", "--selftest"]
+guard = []
+ceiling = 300
+
+# THE OUTPUTS ARE A PROGRAM'S. An agent type is a base role, a house overlay and front matter
+# composed by `render_agents.py`, not one template with tokens, so it is declared here and not as a
+# `rendered` row. The unattended kit reads these rows into its generated set, so a pass's re-render
+# is a generated write rather than an undeclared one.
+[[generated]]
+path = ".claude/agents"
+generator = "render_agents.py"
+why = "one agent type per role whose agent key is true, re-rendered whenever a role file, an overlay, the conf or the governing doc moves"
+
+[[generated]]
+path = ".claude/roles.json"
+generator = "render_agents.py"
+why = "the role index the role-aware write gate and spawn guard read, rendered beside the agent types"
+
+# THREE [[lf_pin]] rows, one per artifact `--check` byte-compares.
+[[lf_pin]]
+pattern = ".claude/agents/*.md"
+why = "rendered agent types the roles render wiring leg byte-compares"
+
+[[lf_pin]]
+pattern = ".claude/roles.json"
+why = "a rendered index the roles render wiring leg byte-compares"
+
+[[lf_pin]]
+pattern = ".claude/skills/build/SKILL.md"
+why = "a rendered artifact its own gate byte-compares"

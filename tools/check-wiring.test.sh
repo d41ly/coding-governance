@@ -1997,5 +1997,69 @@ ck "LC3 AC7 a hooks dir no checkout tracks is an announced skip, never an ok abo
       && ! printf '%s' "$out" | grep -q '^ok .*executable' && echo 1 || echo 0)"
 cleanup
 
+# ---- TOOL-aOrientedCast-8 AC6 — the roles arm. An installed kit left unrendered is UNWIRED under
+# ---- --check and printed the same under --session; a rendered one reads ok with one note per harness
+# ---- the role index names and the tree lacks; a CR-carrying pinned agent type is named by the eol
+# ---- arm's third glob; and a tree without the kit skips. The checker is COPIED into each fixture, so
+# ---- the probe rung resolves the fixture's own kit, never this repository's. The arm grades
+# ---- presence, so the fixture writes each artifact itself rather than running the adopter.
+ROLES_DIR=$(resolve_kit_dir "$_rkd_py" roles workflows.toml "$HERE" 2>/dev/null) || ROLES_DIR=""
+if [ -n "$ROLES_DIR" ]; then
+  RL="${ROLES_DIR##*/}"
+  newrepo; git config core.hooksPath .githooks
+  mkdir -p "./${KP}$RL/agents"
+  cp "$SCRIPT" "./${KP}check-wiring.sh"
+  cp "$REPO/$ROLES_DIR/workflows.toml" "./${KP}$RL/"
+  cp "$REPO/$ROLES_DIR"/agents/*.agent.md "./${KP}$RL/agents/"
+  # A conf whose CHARTER names no file, with a trailing comment the shell read must strip (AC13).
+  printf 'MEMORY_ROOT=memory\nCHARTER="DOC.md"  # the governing doc\n' > .memory-tree.conf
+  git add -A; git commit -q -m "the roles kit, unrendered"
+  out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null); rc=$?
+  ck "OC8 AC13 no doc at CHARTER -> UNWIRED roles naming the doc, the key and the scaffold, exit 1" \
+     "$([ "$rc" = 1 ] && printf '%s\n' "$out" | grep '^UNWIRED  roles ' \
+        | grep -F 'CHARTER in .memory-tree.conf names DOC.md, which is not a file' \
+        | grep -qF "${KP}$RL/adopt-roles.sh --scaffold" && echo 1 || echo 0)"
+  ck "OC8 AC13 ...read first, so the line names the cause and not the artifacts it left unrendered" \
+     "$(printf '%s\n' "$out" | grep '^UNWIRED  roles ' | grep -qF 'roles.json' && echo 0 || echo 1)"
+  printf 'doc\n' > DOC.md; git add -A; git commit -q -m "the governing doc"
+  out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null); rc=$?
+  ck "OC8 AC6 an installed, unrendered roles kit -> UNWIRED roles naming the index and the scaffold, exit 1" \
+     "$([ "$rc" = 1 ] && printf '%s\n' "$out" | grep '^UNWIRED  roles ' | grep -F '.claude/roles.json' \
+        | grep -qF "${KP}$RL/adopt-roles.sh --scaffold" && echo 1 || echo 0)"
+  out=$(bash "./${KP}check-wiring.sh" --session 2>/dev/null); rc=$?
+  ck "OC8 AC6 ...and --session prints the same line and exits 0" \
+     "$([ "$rc" = 0 ] && printf '%s' "$out" | grep -q '^UNWIRED  roles     — .*\.claude/roles\.json' && echo 1 || echo 0)"
+  mkdir -p .claude/agents .claude/skills/build
+  _n=0
+  for _f in "./${KP}$RL"/agents/*.agent.md; do
+    tr -d '\r' < "$_f" | sed -n '2,/^---$/p' | grep -qE '^agent:[[:space:]]*false' && continue
+    _b=${_f##*/}; printf 'x\n' > ".claude/agents/${_b%.agent.md}.md"; _n=$((_n+1))
+  done
+  printf '{"harnesses": ["nowhere/absent-harness.js"], "roles": {}}\n' > .claude/roles.json
+  printf 'x\n' > .claude/skills/build/SKILL.md
+  out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null); rc=$?
+  ck "OC8 AC6 LIVENESS a rendered install reads ok roles, counting its agent types" \
+     "$([ "$rc" = 0 ] && [ "$_n" -gt 0 ] && printf '%s' "$out" | grep -q "^ok       roles     — $_n agent types" && echo 1 || echo 0)"
+  ck "OC8 AC6 ...with one note for the harness the role index names and the tree lacks" \
+     "$([ "$(printf '%s\n' "$out" | grep -c '^note     roles     — nowhere/absent-harness.js is named by the role index')" = 1 ] && echo 1 || echo 0)"
+  ck "OC8 AC6 ...and an absent harness never reads UNWIRED" \
+     "$(printf '%s' "$out" | grep -q '^UNWIRED  roles' && echo 0 || echo 1)"
+  printf '.claude/agents/*.md eol=lf\n.claude/roles.json eol=lf\n' > .gitattributes
+  git add -A; git commit -q -m rendered
+  for _a in .claude/agents/*.md; do break; done
+  printf 'x\r\n' > "$_a"
+  out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null)
+  ck "OC8 AC6 a CR-carrying pinned agent type is named by the eol arm" \
+     "$(printf '%s' "$out" | grep -qF "note     eol       — $_a" && echo 1 || echo 0)"
+  cleanup
+  newrepo; git config core.hooksPath .githooks; mkdir -p "./${KP}"; cp "$SCRIPT" "./${KP}check-wiring.sh"
+  out=$(bash "./${KP}check-wiring.sh" --check 2>/dev/null)
+  ck "OC8 AC6 a tree without the roles kit skips the arm" \
+     "$(printf '%s' "$out" | grep -q '^skip     roles     — the roles kit is not installed here' && echo 1 || echo 0)"
+  cleanup
+else
+  echo "skip OC8 AC6 roles cases — no roles kit resolves beside this suite; no pass counted"
+fi
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

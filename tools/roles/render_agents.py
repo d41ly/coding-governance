@@ -55,7 +55,7 @@ sys.path.insert(0, str(KIT_DIR))
 import roles_lib as lib  # noqa: E402  (the kit's own library, beside this file)
 
 #: Claude Code's own front-matter keys, in the order a rendered type carries them.
-CLAUDE_KEYS = ("name", "description", "tools", "model", "maxTurns")
+CLAUDE_KEYS = tuple("name description tools model maxTurns".split())
 AGENTS_REL = ".claude/agents"
 INDEX_REL = ".claude/roles.json"
 NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
@@ -63,6 +63,11 @@ RESTART_LINE = ("render_agents: %d agent type(s) changed — a Claude Code sessi
                 "write cannot spawn the change; start a new session in this repository before spawning one.")
 NOTE_LINE = ("render_agents: note — %s is named by the workflow table and absent here; "
              "its kit is not installed")
+#: The self-test fixture's two workflow-driver harnesses, spelled as its own table writes them. The
+#: arms format each with the fixture's tool root instead of typing a second literal of the path.
+FIXTURE_HARNESS = "{prefix}/workflows/a.js"
+FIXTURE_MISSING = "{prefix}/workflows/missing.js"
+FIXTURE_ROOT = "toolroot"
 
 
 def derive_tool_root(script_dir):
@@ -236,8 +241,9 @@ def run_mode(mode, kit_dir, tool_root, target_root):
 def build_fixture(root, roles):
     """A catalogue in <root>: kit, overlays, workflow table, conf, governing doc, stub harnesses."""
     root = pathlib.Path(root)
-    kit = root / "toolroot" / "roles"
-    for d in (kit / "agents", kit / "house", root / "toolroot" / "workflows"):
+    kit = root / FIXTURE_ROOT / KIT_DIR.name
+    stubs = (root / FIXTURE_HARNESS.format(prefix=FIXTURE_ROOT)).parent
+    for d in (kit / "agents", kit / "house", stubs):
         d.mkdir(parents=True, exist_ok=True)
     for slot, (extra, overlay) in roles.items():
         (kit / "agents" / (slot + ".agent.md")).write_text(
@@ -245,16 +251,17 @@ def build_fixture(root, roles):
             "Body of %s, under {{MEMORY_ROOT}}.\n" % (slot, slot, extra, slot), encoding="utf-8")
         (kit / "house" / (slot + ".md")).write_text(overlay, encoding="utf-8")
     for stub in ("a.js", "b.js"):
-        (root / "toolroot" / "workflows" / stub).write_text("// stub\n", encoding="utf-8")
+        (stubs / stub).write_text("// stub\n", encoding="utf-8")
     (kit / "workflows.toml").write_text(
-        '[[workflow]]\nname = "w1"\ndriver = "workflow"\nharness = "{prefix}/workflows/a.js"\n\n'
-        '[[workflow]]\nname = "w2"\ndriver = "workflow"\nharness = "{prefix}/workflows/a.js"\n\n'
+        '[[workflow]]\nname = "w1"\ndriver = "workflow"\nharness = "%s"\n\n'
+        '[[workflow]]\nname = "w2"\ndriver = "workflow"\nharness = "%s"\n\n'
         '[[workflow]]\nname = "w3"\ndriver = "program"\nharness = "python {prefix}/roles/x.py"\n\n'
-        '[[workflow]]\nname = "w4"\ndriver = "agent"\nharness = "none"\n', encoding="utf-8")
+        '[[workflow]]\nname = "w4"\ndriver = "agent"\nharness = "none"\n'
+        % (FIXTURE_HARNESS, FIXTURE_HARNESS), encoding="utf-8")
     (root / ".memory-tree.conf").write_text("MEMORY_ROOT=mem\nCHARTER=DOC.md\n", encoding="utf-8")
     (root / "DOC.md").write_text("# Doc\n\n## §1 — One\n\nbody one\n\n## §2 — Two\n\nbody two\n",
                                  encoding="utf-8")
-    return kit, root / "toolroot"
+    return kit, root / FIXTURE_ROOT
 
 
 def check_arm(state, arm, ok, what):
@@ -300,7 +307,7 @@ def run_selftest():
             "two charter ids were not appended in list order")
         check_arm(state, 4, "## Charter" not in texts.get("r-two", "## Charter"),
                   "an empty charter list added a Charter heading")
-        check_arm(state, 5, index["harnesses"] == ["toolroot/workflows/a.js"],
+        check_arm(state, 5, index["harnesses"] == [FIXTURE_HARNESS.format(prefix=FIXTURE_ROOT)],
                   "harnesses is %r, not the one workflow-driver script" % index["harnesses"])
         target = agents / "r-one.md"
         target.write_bytes(target.read_bytes() + b"x")
@@ -334,16 +341,17 @@ def run_selftest():
         check_arm(state, 9, rc == 0, "a CRLF copy of a correct render did not read fresh")
         with open(kit / "workflows.toml", "a", encoding="utf-8") as fh:
             fh.write('\n[[workflow]]\nname = "w5"\ndriver = "workflow"\n'
-                     'harness = "{prefix}/workflows/missing.js"\n')
+                     'harness = "%s"\n' % FIXTURE_MISSING)
+        missing = FIXTURE_MISSING.format(prefix=FIXTURE_ROOT)
         for p in agents.glob("r-*.md"):
             p.unlink()
         out = io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
             rc = run_mode("write", kit, tool_root, root)
         index = json.loads((root / ".claude" / "roles.json").read_text(encoding="utf-8"))
-        check_arm(state, 10, rc == 0 and (NOTE_LINE % "toolroot/workflows/missing.js") in out.getvalue(),
+        check_arm(state, 10, rc == 0 and (NOTE_LINE % missing) in out.getvalue(),
                   "an absent harness did not print its note line, or the write did not exit 0")
-        check_arm(state, 10, "toolroot/workflows/missing.js" in index.get("harnesses", []),
+        check_arm(state, 10, missing in index.get("harnesses", []),
                   "an absent harness is not listed in harnesses at the resolver's path")
         check_arm(state, 10, all((agents / (s + ".md")).is_file() for s in ("r-one", "r-two")),
                   "a write noting an absent harness did not write every type")

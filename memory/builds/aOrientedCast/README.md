@@ -70,7 +70,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 12 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
+**Build status:** OPEN · 12 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
 ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9
 
 <!-- gen:build-units -->
@@ -84,13 +84,13 @@ ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOriente
 | [TOOL-aOrientedCast-5 — the review harness spawns each stage as the role its caller names](spec/2026-10-11-spec-TOOL-aOrientedCast-5.md) | 5 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [KICK-aOrientedCast-2 — the attended router: after kickoff's go, `/build` drives a code build through the harness pipeline](spec/2026-10-11-spec-KICK-aOrientedCast-2.md) | 6 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aOrientedCast-9 — the unattended Skill and verbs pass the renderer's `roles` to every harness call](spec/2026-10-11-spec-TOOL-aOrientedCast-9.md) | 6 | 2 | CLOSED | rev-2 | 2026-10-11 |
-| [TOOL-aOrientedCast-8 — the roles kit is an adopter default: installed, rendered and reported at install and update](spec/2026-10-11-spec-TOOL-aOrientedCast-8.md) | 7 | 2 | INPROGRESS | rev-4 | 2026-10-11 |
+| [TOOL-aOrientedCast-8 — the roles kit is an adopter default: installed, rendered and reported at install and update](spec/2026-10-11-spec-TOOL-aOrientedCast-8.md) | 7 | 2 | CLOSED | rev-4 | 2026-10-11 |
 | [PLAY-aOrientedCast-1 — the charter: every agent is handed a rendered role, and the main loop delegates](spec/2026-10-11-spec-PLAY-aOrientedCast-1.md) | 8 | 2 | OPEN | rev-2 | 2026-10-11 |
 | [TOOL-aOrientedCast-6 — the write gate admits a spec write only from the spec-writer role and a product write only from the builder role](spec/2026-10-11-spec-TOOL-aOrientedCast-6.md) | 9 | 2 | OPEN | rev-3 | 2026-10-11 |
 | [TOOL-aOrientedCast-7 — the spawn guard refuses an Agent or Workflow call that carries no rendered handoff](spec/2026-10-11-spec-TOOL-aOrientedCast-7.md) | 10 | 2 | OPEN | rev-2 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 18 bound to this build, across 3 record folder(s).
+Records: 19 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
