@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.141 -->
+<!-- gov:kit memory-tree@2.142 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
