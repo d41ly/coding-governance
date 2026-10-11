@@ -29,3 +29,7 @@ anchor-ref: refs/heads/main
 base: 6dc23b58fe360c0e15168544cf4b03af6550a7ad
 
 ## Parked
+
+2026-10-11T03:35:23Z rescope · item add TOOL-aPairedSlots-7 · reason the shared-path audit split TOOL-aPairedSlots-5: the four common-dir writers (run log, health log trim, shared full green, drift history header) are one mechanism, the per-worktree slot rule another; M2 one mechanism per spec
+
+2026-10-11T03:35:49Z rescope · item add TOOL-aPairedSlots-8 · reason the shared-path audit found one leg fixture writing a fixed name in the real common dir: adopt-process-monitor.test.sh's procmon-stamp arms; a separate kit and a separate mechanism

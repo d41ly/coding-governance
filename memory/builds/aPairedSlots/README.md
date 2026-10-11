@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling
 roster: TOOL
-ids: TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6
+ids: TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8
 authorized-by: prompt
 ---
 
@@ -35,12 +35,11 @@ the mandate, recorded under [prompts/](prompts/2026-10-11-prompt-TOOL-aPairedSlo
 
 ## Build-level rules
 
-- **Classification (M2)**: six units, MISSING at open, authored this run, one mechanism each.
+- **Classification (M2)**: six units at open, eight after the shared-path audit split unit 5, all authored this run, one mechanism each.
 - Built on aFrugalTurnstile's host-wide turnstile (TOOL-aFrugalTurnstile-5), never on the one it
   replaced; this run's code passes start only once that build has landed on the default branch.
-- Units 1 to 4 all write `tools/run-gates/run-gates.sh` and run in roster order. Unit 5 writes the
-  shared-path sites in the same file and runs after them. Unit 6 writes the unattended kit and is
-  disjoint from the rest.
+- Units 1, 2, 3, 4, 5 and 7 all write `tools/run-gates/run-gates.sh` and run in that order. Unit 6
+  writes the unattended kit and unit 8 the process-monitor self-test; each is disjoint from the rest.
 - Out of scope, owned by aFrugalTurnstile: the scoped and full staleness rules, lineage reuse,
   `post-merge.sh` and the push boundary.
 - One kit-version bump per touched kit, after the last unit.
@@ -57,32 +56,46 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 2 | `TOOL-aPairedSlots-2` | the turnstile is a counting semaphore of `slots` beacons, each reaped and released on its own |
 | 3 | `TOOL-aPairedSlots-3` | a bar dispatched while another slot is held takes the width the A/B chose |
 | 4 | `TOOL-aPairedSlots-4` | a doc-only bar takes its own key and never queues |
-| 5 | `TOOL-aPairedSlots-5` | every path two concurrent bars on one repository both write is made safe or per-bar |
+| 5 | `TOOL-aPairedSlots-5` | a worktree holds at most one slot, so every path under its git dir stays one bar's; the shared-path audit and the two-real-bar check |
 | 6 | `TOOL-aPairedSlots-6` | the unattended driver's gate backstop stays correct with two holders |
+| 7 | `TOOL-aPairedSlots-7` | the common dir's run log, health log trim, shared full green and drift history header take a second concurrent writer safely |
+| 8 | `TOOL-aPairedSlots-8` | the process-monitor adopter self-test stamps a fixture's common dir, not the real one |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node a · opened 2026-10-11 · streams tooling
-ids TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6
+**Build status:** OPEN · 8 unit(s) · node a · opened 2026-10-11 · streams tooling
+ids TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aPairedSlots-1 — a `slots=<n>` key on each profile row, set for node a by the two-bar A/B](spec/2026-10-11-spec-TOOL-aPairedSlots-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPairedSlots-6 — the unattended driver's gate backstop stays correct with two holders](spec/2026-10-11-spec-TOOL-aPairedSlots-6.md) | 1 | 1 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPairedSlots-8 — the process-monitor adopter self-test stamps a fixture's common dir, not the real one](spec/2026-10-11-spec-TOOL-aPairedSlots-8.md) | 1 | 1 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPairedSlots-2 — the turnstile is a counting semaphore of `slots` beacons, each reaped and released on its own](spec/2026-10-11-spec-TOOL-aPairedSlots-2.md) | 2 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPairedSlots-3 — a bar dispatched while another slot is held takes the width the A/B chose](spec/2026-10-11-spec-TOOL-aPairedSlots-3.md) | 3 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPairedSlots-4 — a doc-only bar takes its own key and never queues](spec/2026-10-11-spec-TOOL-aPairedSlots-4.md) | 4 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPairedSlots-5 — a worktree holds at most one slot, so every path under its git dir stays one bar's](spec/2026-10-11-spec-TOOL-aPairedSlots-5.md) | 5 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPairedSlots-7 — the common dir's shared files take a second concurrent writer safely](spec/2026-10-11-spec-TOOL-aPairedSlots-7.md) | 6 | 2 | OPEN | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aPairedSlots-7 TOOL-aPairedSlots-8.
 
-Ids no `spec-audit` record has ever named: TOOL-aPairedSlots-1.
+Ids no `spec-audit` record has ever named: TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-4 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-aPairedSlots-1` | no |
+| 1 | `TOOL-aPairedSlots-1`, `TOOL-aPairedSlots-6`, `TOOL-aPairedSlots-8` | yes |
+| 2 | `TOOL-aPairedSlots-2` | no |
+| 3 | `TOOL-aPairedSlots-3` | no |
+| 4 | `TOOL-aPairedSlots-4` | no |
+| 5 | `TOOL-aPairedSlots-5` | no |
+| 6 | `TOOL-aPairedSlots-7` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
