@@ -35,3 +35,12 @@ a time, inline, because two passes committing at once in one worktree race one g
 - **Never kill a process you did not start.** The host is shared.
 - Out of scope, per the spec: `REMOTE_BOUND`, the default-branch gates below the exits, and
   `straggler-guard.sh`'s own predicates.
+
+## After the mid-build merge
+
+The run branch merged `origin/main` at `976a85a25`, after this brief and the spec were written.
+aFrugalTurnstile and aDistilledCharter landed in between: `tools/unattended/unattended.sh` grew by
+about 200 lines and `.githooks/pre-push` by about 614 (a `--decide` mode, a cover pass and a
+post-merge red read). Every line number in the spec is at BASE `b726385f`: re-locate each site it
+names in the current tree before editing. Where something main changed invalidates a claim the
+spec makes, change the spec first (rev bump, its revision-log line), then the code.
