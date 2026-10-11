@@ -17,9 +17,18 @@ The check-wiring slice and the adopter slices ran their fixtures under a short `
 close owes the merge bar, which runs `govkit selftest`, `govkit acceptance matrix`, the
 `check-wiring self-test` and `roles adopter self-test` whole, and the rest of section 7.
 
+After the pass commit `15588db90` the follow-up observed AC3 as written. AC4 and AC13 are NOT
+observed as written: `check_roles_install` hands its target's `adopt-roles.sh` and `check-wiring.sh`
+to a bare `bash`, which a Windows python resolves to the WSL launcher, so those arms fail on a path
+WSL cannot see. With a probe that swapped in `govkit.resolve_bash()` both printed `[]`: the apply,
+the nine agent types, the `--check`, the `ok` and `UNWIRED` lines, and on the no-doc target the
+Skill alone and the `UNWIRED  roles` line naming `AGENTS.md` and `CHARTER`. The write gate refused
+the one-line fix because the spec is CLOSED, so their ledger lines wait for that fix.
+
 **Evidences:** TOOL-aOrientedCast-8
 - AC1 — `0 unclaimed` — `govkit.py selfcheck --write` exited 0: legs 134 in the manifest, 64 claimed and 70 exempt, `per-file claim: 0 unclaimed file(s)`, surface `0 unclaimed`, and `generated outputs: 8 [[generated]] row(s)`, the 6 at `744e55db` plus this unit's two; it added the `roles adopter self-test` row to the subject pins.
 - AC2 — `[]` — `check_roles_default()` printed `[]` in about six seconds; with `"roles",` taken out of the default it printed `OC8 AC2 the default set holds roles` and `OC8 AC2 a registry aged before roles joined the default gains it`, and printed `[]` again once restored.
+- AC3 — `ORDER|project-owned` — a default `plan` into a matrix shape 6 target at `%TEMP%/oc8p`, made with no `kits` list, exited 0. It previewed the ten `house/` overlays as `write [seed]` rows, the Skill as a `SIDE [rendered]` row, `adopt-roles.test.sh` as an `ORDER [project-owned]` row and three `.gitattributes` rows for the roles kit. The mark counts were `SIDE|rendered` 6, `write|seed` 13 and `ORDER|project-owned` 32, the three figures the default-plan arm pins at `selftest.py:6125` and `:6157-6158`.
 - AC5 — `git diff --exit-code -- .claude/` — `adopt-roles.sh --check` exited 0 in gov; one byte appended to `gov-builder.md` exited 1 naming `drift .claude/agents/gov-builder.md` and the `--scaffold` remedy; `--scaffold` restored it and the diff exited 0.
 - AC6 — `UNWIRED  roles` — the slice of the prologue and the roles block passed 9 of 9: the unrendered kit read `UNWIRED  roles` naming `.claude/roles.json` and the scaffold with exit 1 and the same line with exit 0 under `--session`, the rendered fixture read `ok` counting its agent types with one `note` for its absent harness and no `UNWIRED`, the CRLF agent type was named by the eol arm, and a tree without the kit skipped; with `check_roles` printing `ok` unconditionally six arms failed.
 - AC7 — `18 problem(s) · pin 18` — `check_runbook_parity.py` printed it with no line naming `roles`, and the `govkit:entry roles` anchor is one line of `WIRE-INTO-PROJECT.md`.
