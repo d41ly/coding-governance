@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 9a8777b8b502bce48249884e21e5830abadf3e26 · park · 56 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: f492cf2655c0e607ab5705e8c863fd9d73e29008
 phase: VERIFYING
@@ -75,3 +76,5 @@ base: 2785323db4e72b8ae2f26660cc3947165a6258fc
 2026-10-11T08:04:18Z dispatch · item 3a87a52d TOOL-aTrimmedHook-7 · reason tools/memory-tree/gen_build_index.py memory/map/generated/symbols.json skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-7.md memory/builds/aTrimmedHook/README.md memory/builds/aTrimmedHook/build/2026-10-11-build-TOOL-aTrimmedHook-7-1-acceptance-ledger.md memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-7-1-build-brief.md
 
 2026-10-11T08:04:27Z brief · item TOOL-aTrimmedHook-7 · reason fa508cf344d2 memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-7-1-build-brief.md
+
+2026-10-11T08:53:28Z decision · item brief item 5: the prompt's partial render, gen_build_index.py --check --builds <slugs> · reason options: build it here, or leave it; refused here because the exact classifier already skips the render for the commit the owner measured, and a partial render is a second mechanism in the renderer's cross-build views that no criterion of this build needs

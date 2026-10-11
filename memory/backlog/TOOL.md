@@ -316,6 +316,7 @@ Cite ids, never line numbers.
 | [TOOL-aTracedSpawn-1](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | tools/unattended/unattended.test.sh CANNOT BE RUN UNSHARDED AND DIES AT… |
 | [TOOL-aTracedSpawn-2](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE REMAINING 320 SPAWNS IN check-unattended.sh's FIXTURE FRAME, after… |
 | [TOOL-aTracedSpawn-3](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE SHARD-2 FAILURE COUNT AFTER THE FIXTURE-HEADING FIX IS UNMEASURED,… |
+| [TOOL-aTrimmedHook-8](../builds/aTrimmedHook/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | after this build a one-file RUN.md commit's .githooks/pre-commit still… |
 | [TOOL-aUnblockedFleet-9](../builds/aUnblockedFleet/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-31 | FIVE ACCEPTANCE CRITERIA OF TOOL-aUnblockedFleet-2 ARE WRITTEN,… |
 | [TOOL-aUnmannedHelm-2](../builds/aUnmannedHelm/BACKLOG.md) | OPEN | — | — | 2026-08-10 | the ledger_dir in tools/drift-audit/drift_report.py points at an… |
 | [TOOL-aUnmannedHelm-10](../builds/aUnmannedHelm/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | three root docs (AGENTS.md, WIRE-INTO-PROJECT.md, .gitattributes) come… |
