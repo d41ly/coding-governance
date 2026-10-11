@@ -93,6 +93,8 @@
       "review-protocol parity (kit vs dogfood)",
       "review-replay selftest",
       "roles catalogue",
+      "roles render selftest",
+      "roles render wiring",
       "routed commits name a specced unit",
       "routed-commits selftest",
       "row-driver view refusal",

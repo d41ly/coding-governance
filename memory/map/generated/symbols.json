@@ -1545,6 +1545,11 @@
     {
       "id": "build_fixture",
       "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "build_fixture",
+      "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
     },
     {
@@ -3003,6 +3008,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "check_arm",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "check_ask_mandate",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -4106,6 +4116,11 @@
       "id": "check_render",
       "kind": "function",
       "file": "tools/runlog/adopt-runlog.sh"
+    },
+    {
+      "id": "check_rendered",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "check_residue_gone",
@@ -5798,6 +5813,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "derive_harness_paths",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "derive_head_state",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -6651,6 +6671,11 @@
       "id": "derive_tool_root",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_tool_root",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "derive_transition",
@@ -8163,6 +8188,11 @@
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
+      "id": "load_catalogue",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "load_checker",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
@@ -8296,6 +8326,11 @@
       "id": "load_map_tree",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "load_owned_names",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "load_parse_spec_h1",
@@ -8696,6 +8731,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "main",
@@ -10181,6 +10221,11 @@
       "id": "print_dormant",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "print_drift",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "print_drift_delta",
@@ -13233,6 +13278,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_agent_file",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "render_all",
       "kind": "function",
       "file": "tools/memory-tree/adopt-memory-tree.sh"
@@ -13641,6 +13691,11 @@
       "id": "render_role",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "render_roles_index",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "render_rows",
@@ -16303,6 +16358,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "run_mode",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "run_mp_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -16506,6 +16566,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "run_selftest",
@@ -20671,6 +20736,11 @@
       "id": "write_relocation",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "write_rendered",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
     },
     {
       "id": "write_rev_spec",

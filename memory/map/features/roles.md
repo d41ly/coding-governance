@@ -5,10 +5,10 @@ feature = "roles"
 title = "The role catalogue: one owner-editable agent definition per role with an empty house overlay beside it, the table of the workflows a governed session runs its LLM work through, the library every consumer reads them by, and the leg that holds the three and the governing doc to one another"
 status = "building"
 streams = ["tooling"]
-decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2"]
+decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3"]
 
 [claims]
-gate-legs = ["roles catalogue"]
+gate-legs = ["roles catalogue", "roles render selftest", "roles render wiring"]
 kits = ["roles"]
 git-hooks = []
 harness-hooks = []
@@ -34,6 +34,10 @@ moving part (TOOL-aOrientedCast-1). The handoff renderer, `handoff.py`, is its f
 composes a role with a task block read from the session card, the build's brief record, the
 governing doc and the caller's arguments into one hashed prompt file under the build's `prompts/`,
 checks such a file's hashes, and prints the stage-to-role map a harness takes (TOOL-aOrientedCast-2).
+The agent-type renderer, `render_agents.py`, is its second: it renders each `agent`-true role into a
+Claude Code agent type under `.claude/agents/`, trimmed of the charter by `omitClaudeMd: true` and
+carrying the charter sections the role names instead, beside the generated index `.claude/roles.json`
+the hooks read; its `--check` is the `roles render wiring` leg (TOOL-aOrientedCast-3).
 
 ## Constraints & why
 
@@ -89,6 +93,10 @@ CRLF working copy hashes like its blob.
 - `resolve_kit_dir` is carried inline under the lib dir's parity table, as every consumer carries it.
 - The governing doc's `## §<n> — ` headings are the only contract read from outside the kit; a
   charter rewrite that renumbers sections reds this leg, which is the intended signal.
+
+**The renderer owns the catalogue's names plus the on-disk index's, never the directory.** An
+adopter keeps agent definitions of its own under `.claude/agents/`; the index already records every
+name a previous render wrote, so a stale type is unlinkable without a marker key in each file.
 
 ## Gaps
 

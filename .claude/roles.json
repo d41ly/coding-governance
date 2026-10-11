@@ -1,0 +1,59 @@
+{
+  "harnesses": [
+    "tools/workflows/tier2-review.js",
+    "tools/workflows/unattended-build.js",
+    "tools/workflows/unattended-unit.js"
+  ],
+  "roles": {
+    "gov-builder": {
+      "agent": true,
+      "workflow": "build",
+      "writes": "product"
+    },
+    "gov-diff-reviewer": {
+      "agent": true,
+      "workflow": "closing-review",
+      "writes": "none"
+    },
+    "gov-orienter": {
+      "agent": true,
+      "workflow": "orient",
+      "writes": "none"
+    },
+    "gov-researcher": {
+      "agent": true,
+      "workflow": "research",
+      "writes": "none"
+    },
+    "gov-reuse-scout": {
+      "agent": true,
+      "workflow": "reuse",
+      "writes": "none"
+    },
+    "gov-session": {
+      "agent": false,
+      "workflow": "handoff",
+      "writes": "none"
+    },
+    "gov-skeptic": {
+      "agent": true,
+      "workflow": "closing-review",
+      "writes": "none"
+    },
+    "gov-spec-reviewer": {
+      "agent": true,
+      "workflow": "spec-review",
+      "writes": "none"
+    },
+    "gov-spec-writer": {
+      "agent": true,
+      "workflow": "spec-write",
+      "writes": "spec"
+    },
+    "gov-synthesizer": {
+      "agent": true,
+      "workflow": "closing-review",
+      "writes": "review"
+    }
+  }
+}

@@ -60,6 +60,43 @@ union of the `stages` tables of every workflow whose harness is that script, as 
 Exit 0, 1 on a refusal, 2 on usage or an unarmed tree; the script's header states what it does not
 check.
 
+## The agent types
+
+`python render_agents.py --write | --check | --selftest` renders each role whose `agent` is true
+into a Claude Code agent type, `.claude/agents/<name>.md` (TOOL-aOrientedCast-3). Its front matter
+is the role's Claude keys, then `omitClaudeMd: true`, then the role's `workflow` and `writes` for
+the hooks to read. Its body is `render_role`'s output, then, under `## Charter`, one
+`### charter §<n>` block per id of the role's `charter` key, in the order the key names them, spelled
+as a handoff spells its blocks. An agent started with the charter omitted holds only its system
+prompt and its task, so a harness that hands it no handoff would otherwise give it no charter section
+at all; a typed spawn that IS handed a handoff carries those sections twice, which is the accepted
+cost. Beside the types sits `.claude/roles.json`, the generated index the hooks read: every role
+with its `workflow`, `writes` and `agent`, `agent: false` roles included, and `harnesses`, the
+repo-relative scripts of every workflow whose `driver` is `workflow`. A harness the tree does not
+hold is listed where the resolver places it and printed on a `note` line; it refuses nothing.
+
+**Ownership.** The renderer owns the types its catalogue names plus every name the on-disk index
+lists, which is the set a previous render wrote. `--write` unlinks an owned type the catalogue no
+longer renders and rewrites the index last; it never touches any other file under
+`.claude/agents/`, where your own definitions may live. `--check` writes nothing, names every
+`missing`, `drift` or `stale` owned path and the remedy, and strips carriage returns from the
+on-disk side, so a CRLF checkout of a correct render reads fresh. It is the `roles render wiring`
+leg, so editing a role, an overlay or a cited charter section without a re-render reds the bar.
+`--selftest` runs the renderer's arms over a catalogue it builds in a temporary directory and is the
+`roles render selftest` leg. Exit 0, 1 on drift or a failed arm, 2 on usage, a library refusal or a
+zero-role catalogue.
+
+**Restart.** Claude Code reads its agent registry when a session starts, so a type written, changed
+or unlinked is not spawnable as changed by a session started before the write. `--write` prints one
+line saying so whenever an agent type moved, and `unchanged` when nothing did. After a re-render or
+a pull that moved a type, start a new session before spawning one.
+
+**The CLI floor.** The trim was measured on Claude Code 2.1.292: a type with `omitClaudeMd: true`
+reports its own name as `agent_type` in the hook payloads and starts without the governing doc. The
+CLI omits it only while a server flag it reads stays on and the caller supplies no user context of
+its own, so a later CLI or a flag flip can re-admit the charter silently; the agent-type probe
+record in the build that shipped this renderer is the instrument to re-run.
+
 ## The checker
 
 `python check_roles.py [--root <dir>] [--write]`, run as the `roles catalogue` gate leg. It grades

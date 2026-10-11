@@ -1590,6 +1590,28 @@
     "ceiling": 120
   },
   {
+    "name": "roles render wiring",
+    "argv": [
+      "python",
+      "{prefix}/roles/render_agents.py",
+      "--check"
+    ],
+    "chunk": "wiring",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
+    "name": "roles render selftest",
+    "argv": [
+      "python",
+      "{prefix}/roles/render_agents.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
     "name": "leg ceilings clear their evidenced maximum",
     "argv": [
       "python",
