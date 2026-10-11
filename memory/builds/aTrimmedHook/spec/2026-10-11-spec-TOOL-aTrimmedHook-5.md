@@ -1,10 +1,13 @@
 # TOOL-aTrimmedHook-5 — under LIVE_LANDED_UNCLOSED the classifier renders when anything outside its pathspec is staged
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 4
+**Status:** CLOSED · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-11-build-TOOL-aTrimmedHook-5-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aTrimmedHook-5-1-acceptance-ledger.md) | journal | — |
+| [2026-10-11-prompt-TOOL-aTrimmedHook-5-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aTrimmedHook-5-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

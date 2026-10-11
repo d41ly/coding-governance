@@ -886,16 +886,27 @@ def check_staged_render(root: str, conf: dict) -> tuple:
     env = _build_git_env()
     if os.environ.get("GIT_INDEX_FILE"):
         env["GIT_INDEX_FILE"] = os.environ["GIT_INDEX_FILE"]
+    # UNDER LIVE_LANDED_UNCLOSED THE RENDER READS PRODUCT SOURCE (TOOL-aTrimmedHook-5): LIVE.md's
+    # Landed-unclosed column comes from the drift-audit kit's grep over tracked source, its conf and its
+    # kit. So with the key on, the staged set is read WHOLE and any path outside this function's own
+    # pathspec answers "render". Read as `read_landed_unclosed` reads it, except that a value outside
+    # blank and `1` counts as on: a render is the safe answer, and the render refuses that value.
+    llu = (conf.get("LIVE_LANDED_UNCLOSED") or "").strip()
+    cmd = ["git", "diff", "--cached", "--name-status", "--no-renames", "-z"]
+    if not llu:
+        cmd += ["--", *specs]
     try:
-        out = subprocess.run(
-            ["git", "diff", "--cached", "--name-status", "--no-renames", "-z", "--", *specs],
-            cwd=root, capture_output=True, check=True, env=env).stdout
+        out = subprocess.run(cmd, cwd=root, capture_output=True, check=True, env=env).stdout
     except (OSError, subprocess.CalledProcessError) as exc:
         return True, f"git could not list the staged set ({exc})"
     fields = out.decode("utf-8", "surrogateescape").split("\0")
     modified = []
     for k in range(0, len(fields) - 1, 2):
         st, rel = fields[k], fields[k + 1]
+        if llu and not (rel.startswith(m + "/") or rel == ".memory-tree.conf"
+                        or (kit and rel.startswith(kit + "/"))):
+            return True, (f"{rel} is staged outside the memory root while LIVE_LANDED_UNCLOSED is on, "
+                          f"and the Landed-unclosed column reads tracked product source")
         if not st.startswith("M"):
             return True, f"{rel} is staged as {st}, and an added or deleted path moves the record set"
         if check_index_input(rel, m, kit):
@@ -3912,6 +3923,17 @@ def test_staged_render(arm) -> None:
         arm("TOOL-aTrimmedHook-4 AC1 — with no GIT_INDEX_FILE the default index holds nothing staged",
             "False", lambda: str(check_staged_render(t, conf)[0]))
         run("git", "reset", "-q", "--hard", cwd=t)
+        # TOOL-aTrimmedHook-5 AC1/AC2 — a product-source file staged beside a no-id memory edit.
+        os.makedirs(os.path.join(t, "src"), exist_ok=True)
+        write_text(os.path.join(t, "src", "x.sh"), "echo cites ARCH-tOne-1\n")
+        write_text(notes, read_text(notes) + "a plain line\n")
+        run("git", "add", "-A", cwd=t)
+        arm("TOOL-aTrimmedHook-5 AC1 — under LIVE_LANDED_UNCLOSED=1 a staged source file renders", "True",
+            lambda: str(check_staged_render(t, dict(conf, LIVE_LANDED_UNCLOSED="1"))[0]))
+        arm("TOOL-aTrimmedHook-5 AC2 — with the key blank the same pair skips", "False",
+            lambda: str(check_staged_render(t, dict(conf, LIVE_LANDED_UNCLOSED=""))[0]))
+        run("git", "reset", "-q", "--hard", cwd=t)
+        run("git", "clean", "-q", "-fd", "--", "src", cwd=t)
         fam = {pair.split(":")[1] for pair in conf["FAMILIES"].split() if ":" in pair}
         tracked = [p for p in run("git", "ls-files", "--", "memory/", cwd=t).split("\n") if p]
         _union: dict = {}
