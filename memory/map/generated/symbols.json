@@ -3508,6 +3508,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_handoff",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "check_handoff_bar",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -3906,6 +3911,11 @@
       "id": "check_pid_alive",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "check_placeholder",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "check_playbook_hole_modes",
@@ -6148,6 +6158,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_prompt_name",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "derive_push_failure",
       "kind": "function",
       "file": "tools/push-main.sh"
@@ -6296,6 +6311,11 @@
       "id": "derive_scope",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
+    },
+    {
+      "id": "derive_section_sha",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "derive_self_rel",
@@ -7063,6 +7083,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "extract_brief_section",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "extract_build_readmes",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -7071,6 +7096,11 @@
       "id": "extract_card_parts",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "extract_card_section",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "extract_card_tokens",
@@ -7261,6 +7291,11 @@
       "id": "extract_supersessions",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "extract_task_fields",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "extract_text",
@@ -8656,6 +8691,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/roles/check_roles.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "main",
@@ -10166,6 +10206,11 @@
       "id": "print_gate_backstop",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "print_harness_args",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "print_interrupted_acts",
@@ -13373,6 +13418,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_handoff",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "render_handoff_recipe",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -13985,6 +14035,11 @@
     {
       "id": "resolve_bash",
       "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "resolve_bash",
+      "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
     },
     {
@@ -13998,9 +14053,19 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "resolve_brief_record",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
       "id": "resolve_cache_dir",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "resolve_card_path",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "resolve_carrier_kit",
@@ -14261,6 +14326,11 @@
       "id": "resolve_journal_root",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
+    },
+    {
+      "id": "resolve_kickoff_checker",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "resolve_kickoff_checker",

@@ -5,7 +5,7 @@ feature = "roles"
 title = "The role catalogue: one owner-editable agent definition per role with an empty house overlay beside it, the table of the workflows a governed session runs its LLM work through, the library every consumer reads them by, and the leg that holds the three and the governing doc to one another"
 status = "building"
 streams = ["tooling"]
-decisions = ["TOOL-aOrientedCast-1"]
+decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2"]
 
 [claims]
 gate-legs = ["roles catalogue"]
@@ -30,7 +30,10 @@ could not adjust. This kit makes each role a FILE: a constant block in Claude Co
 format, front matter saying which workflow it serves, which inputs it reads, which path class it
 writes and which governing-doc sections it needs, and an overlay the owner edits instead of the base.
 It is inert until a consumer reads it: nothing spawns from a role file yet, and the leg is the only
-moving part (TOOL-aOrientedCast-1).
+moving part (TOOL-aOrientedCast-1). The handoff renderer, `handoff.py`, is its first consumer: it
+composes a role with a task block read from the session card, the build's brief record, the
+governing doc and the caller's arguments into one hashed prompt file under the build's `prompts/`,
+checks such a file's hashes, and prints the stage-to-role map a harness takes (TOOL-aOrientedCast-2).
 
 ## Constraints & why
 
@@ -65,6 +68,19 @@ catalogue without the review or build harness kits; whether it should is the wir
 owns it rots; `--write` renders it and every run compares it, so a table edit without a re-render
 reds the leg even where every other rule passes.
 
+**The renderer asks the kickoff checker where the card is, and never joins the path itself.** The
+card's location is that checker's rule; spelling it here too would be a second home for it. The
+checker is resolved through the inline kit resolver, then the one tracked file of its name, because
+gov homes it under `skills/`, where no probe walks.
+
+**A `task:` value is read by the kickoff checker's field grammar, ported, not called.** That grammar
+is an awk program inside a shell script; the port is the second implementation, and the renderer's
+fixture renders values from a card that checker accepted, which is the cross-check.
+
+**Each section is hashed on its own, CRLF folded.** The marker sits inside the file, so a
+whole-file hash would contain itself, and a typed agent spawn carries the task section alone; a
+CRLF working copy hashes like its blob.
+
 ## Shared seams
 
 - The front-matter rule is ported from the memory-tree gotcha reader's `parse_front_matter`, and the
@@ -88,3 +104,5 @@ seam: `roles_lib.render_role` — reuse for any route that hands a role to an ag
 extend via the house overlay, never a second composition.
 seam: `roles_lib.load_workflows` + `workflows.toml` — reuse for any consumer that needs which roles
 drive a workflow or which stage key spawns as which role; extend via a new key graded by the checker.
+seam: `handoff.py render` / `harness-args` — reuse for any route that hands an agent its prompt or a
+harness its roles; extend via a new `reads` source in the renderer, never a hand-written prompt.

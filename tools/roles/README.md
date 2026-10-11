@@ -34,6 +34,32 @@ spawn guard for `research`, `spec-review` and `closing-review`; the pre-push hoo
 the memory-tree hygiene leg for `bookkeeping`. `handoff` and `reuse` read `none` with the reason.
 The checker grades that each entry names something, not that the thing exists.
 
+## The handoff renderer
+
+`python handoff.py render --role <name> --build <slug> [--unit <id>] [--card <path>]
+[--input <key>=<value>]... [--out <path> | --stdout] [--part full|task]` turns a role and one task
+into the prompt its agent is handed (TOOL-aOrientedCast-2). The file holds the role as `render_role`
+renders it under `## Role`, then `## Task`: one block per key of the role's `reads`, in declared
+order, then one block per `charter` id. A `task:` key is read from the session card's `## task`
+field by the kickoff checker's field grammar, a `card:` key from that card's section, a `brief:` key
+from the build's brief record, and an `input:` key from `--input`. A required key that resolves to
+nothing, an empty value or a placeholder refuses by name and writes nothing; an optional one is named
+on the task block's `Not supplied` line.
+
+The card is `--card`, else the file the kickoff checker's `--card --path` prints for
+`CLAUDE_CODE_SESSION_ID`, so the card's location stays that checker's rule. The brief record is
+`--input prompt=`, else the one file under the build's `prompts/` folder carrying both a
+`## The prompt` and a `## The brief` line; two such files refuse.
+
+The file is written under the build's `prompts/` folder as
+`<date>-prompt-<id>-<n>-<role without gov->.md`, and its `gov:handoff` marker line carries a hash of
+each section. `python handoff.py check <file>` re-derives both hashes and the marker's path;
+`--part task` prints the marker and the task section alone, which is what a typed agent spawn
+carries. `python handoff.py harness-args <harness>` prints the `roles` object a harness takes: the
+union of the `stages` tables of every workflow whose harness is that script, as one line of JSON.
+Exit 0, 1 on a refusal, 2 on usage or an unarmed tree; the script's header states what it does not
+check.
+
 ## The checker
 
 `python check_roles.py [--root <dir>] [--write]`, run as the `roles catalogue` gate leg. It grades
