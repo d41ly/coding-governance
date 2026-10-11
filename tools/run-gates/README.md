@@ -173,18 +173,24 @@ bash <prefix>/run-gates/run-gates.sh --regen-list    # the resolved items, in ru
 The tree is the current directory's git toplevel; the descriptors are the tracked `kit.toml` files
 one directory below the tool root, where this kit sits in its own repository. `--regen` names any
 untracked file first, because the build-index generator enumerates tracked files and does not see a
-record until it is added. A failed write stops before the next stage.
+record until it is added. A write that exits non-zero is followed by its own check: a fresh check
+makes it `declined`, which a kit's adopter is when it renders nothing in a state its kit declares
+legal, and the stage goes on. A write whose check is not fresh FAILS, and a failed write stops
+before the next stage. `--list` names every `[[regenerate]]` row it skips for carrying no stage.
 
 | exit | `--regen` | `--regen-check` |
 |---|---|---|
 | 0 | every write ran | every item fresh |
-| 1 | a write failed or timed out | an item stale, its check failed, or it timed out |
-| 2 | REFUSED: a descriptor that does not parse, a malformed row, an unresolved token, no repository | the same |
+| 1 | a write failed, or timed out, and its check is not fresh | an item stale, its check failed, or it timed out |
+| 2 | REFUSED: a descriptor that does not parse, a malformed row, an unresolved token, a script an argv names that is not in the tree, no repository | the same |
 
 `GATE_REGEN_JOBS` bounds concurrency (default 4) and `GATE_REGEN_BOUND` bounds each command in
-seconds (default 900). A command outliving its bound is killed by its own pid, so a descendant it
-spawned can outlive it. **What it does not check:** that a write writes what its row names, or that
-a check grades it; a check red for a reason a regeneration cannot fix reads as stale, and its output
+seconds (default 900). A command's output goes to a file and never through a pipe, so the bound
+holds whatever its children do; a command outliving it is killed with its process tree (`taskkill
+/T` on Windows, its process group on POSIX), and an MSYS fork can still escape Windows parentage. A
+`bash` argv runs under the bash `profile_bar.resolve_bash` finds by running each candidate, never by
+`PATH` order, which reaches WSL's first on a default Windows `PATH`. **What it does not check:** that
+a write writes what its row names, or that a check grades it; a check red for a reason a regeneration cannot fix reads as stale, and its output
 tail is printed so a reader can tell.
 
 ### Every bar proves them fresh before it queues
@@ -192,15 +198,19 @@ tail is printed so a reader can tell.
 After its profile and process-monitor lines and before the host turnstile, the runner runs
 `regen.py --check`. A stale, failed or timed-out item, or a declaration the verb refuses, ends the
 run with exit 2, REFUSED, before any leg, naming `--regen` and saying to commit what it moves
-(TOOL-aPrimedIndex-3). Before the queue, because a refusal after an hour in another bar's queue is
+(TOOL-aPrimedIndex-3); a refused declaration gets its own line, because `--regen` cannot cure it. Before the queue, because a refusal after an hour in another bar's queue is
 the cost the check exists to remove. Every bar entry point reaches the runner — a hand-run bar, the
 pre-push hook, the lander's push, the unattended close and remote CI — so this binds all of them.
+govkit's `apply` reads the runner too, for its baseline and after verdicts, and runs it with the
+check skipped, because it compares legs and a stale output reads there as its own leg's red
+(DEPL-aPrimedIndex-1).
 
 The runner never regenerates the tree it grades: at the push boundary the hook refuses a dirty tree,
 and a green earned over an uncommitted regeneration could never be reused. A tree with no kit
 descriptor at the tool root prints one line and spawns nothing. `GATE_REGEN_CHECK=0` skips the
-check with a line naming the knob; the freshness legs still grade every output, so a skip costs an
-early signal and never a verdict.
+check with a line naming the knob. A stale output then reds only where its own leg runs in that bar,
+and a guard can skip that leg, so a skip can turn a refusal into a green. The pre-push hook therefore
+scrubs the knob from the bar that lands (TOOL-aPrimedIndex-6).
 
 ### The lander regenerates over its merged tree
 
@@ -210,8 +220,11 @@ prepared merge the way the mint's output does, same parents and same subject. Th
 runs it on every attempt after its mint commit and commits what moved as its own commit, subject
 `regen: generated outputs onto <remote>/<default> at <sha8>`, with a `Pass: none` trailer. That is
 what keeps a reconcile merge, which leaves the `merge=ours` indexes stale, from meeting the push
-bar's refusal. A failed write refuses the landing with the branch left where it was; a lander with
-no `regen.py` beside it says so in one line and lands without it.
+bar's refusal. A failed write refuses the landing: `--prepare` leaves the branch where it was, and
+the attended landing keeps the reconcile merge and the mint commit it already made on the local
+default branch, as a refused mint does. Either way the files the regeneration created are cleaned
+(TOOL-aPrimedIndex-8). A lander with no `regen.py` beside it says so in one line and lands without
+it.
 
 ## Reuse, and the baseline a guard diffs against
 

@@ -3833,6 +3833,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "check_operand",
+      "kind": "function",
+      "file": "tools/run-gates/regen.py"
+    },
+    {
       "id": "check_ours",
       "kind": "function",
       "file": "tools/settings-merge.py"
@@ -14000,6 +14005,11 @@
     {
       "id": "resolve_bash",
       "kind": "function",
+      "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "resolve_bash",
+      "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
     {
@@ -16556,6 +16566,11 @@
       "id": "run_traced",
       "kind": "function",
       "file": "tools/unattended/runlog-writer.test.sh"
+    },
+    {
+      "id": "run_tree_kill",
+      "kind": "function",
+      "file": "tools/run-gates/regen.py"
     },
     {
       "id": "run_unchecked",

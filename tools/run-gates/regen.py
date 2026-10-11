@@ -27,12 +27,19 @@ that does not parse, a malformed row, an unresolved token, or no repository abov
 WHAT IT DOES NOT CHECK. That a declared write writes what its row names, or that a check grades it:
 the descriptor states both and nothing here compares them. A check red for a reason a regeneration
 cannot fix reads as stale; its output tail is printed so a reader can tell. A command that outlives
-`GATE_REGEN_BOUND` is killed by its own pid only, so a descendant it spawned can outlive it.
+`GATE_REGEN_BOUND` is killed with its process tree (`taskkill /T` on Windows, its process group on
+POSIX); an MSYS fork can escape Windows parentage and outlive it, and the verb still returns at the
+bound, because a child's output goes to a file and never through a pipe the orphan could hold open.
+A write that exits non-zero is followed by its own check, and a fresh check makes it `declined`: a
+kit's adopter may decline to render in a state it declares legal (TOOL-aPrimedIndex-7).
 """
+import importlib.util
 import os
 import shutil
+import signal
 import subprocess
 import sys
+import tempfile
 import time
 import tomllib
 from concurrent.futures import ThreadPoolExecutor
@@ -42,6 +49,8 @@ TOKENS = ("kit", "prefix", "memory_root", "map_root")
 TAIL_LINES = 8
 DEFAULT_JOBS = 4
 DEFAULT_BOUND = 900
+INTERPRETERS = ("python", "python3", "bash")
+BASH = ""
 
 
 class Refusal(Exception):
@@ -144,8 +153,19 @@ def check_stage(stage, where):
     return stage
 
 
-def build_items(root, tool_rel, descriptors):
-    """Every declared item, joined by its (write, check) pair, sorted into run order."""
+def check_operand(argv, root, where):
+    """`argv`, or a Refusal when the script an interpreter would run is not in the tree (review M10): a
+    missing script cannot be regenerated away, so naming it as stale would print a remedy that fails."""
+    if len(argv) > 1 and argv[0] in INTERPRETERS and not argv[1].startswith("-") \
+            and not (root / argv[1]).is_file():
+        raise Refusal(f"{where}: names `{argv[1]}`, which is not in this tree, so the item can neither "
+                      f"run nor be fixed by regenerating")
+    return argv
+
+
+def build_items(root, tool_rel, descriptors, skipped=None):
+    """Every declared item, joined by its (write, check) pair, sorted into run order. A `[[regenerate]]`
+    row carrying no `stage` is not an item; when `skipped` is a list, each such row is added to it."""
     mem = read_conf_value(root / ".memory-tree.conf", "MEMORY_ROOT") or "memory"
     mapr = read_conf_value(root / ".codebase-map.conf", "MAP_ROOT")
     if mapr is None:
@@ -166,7 +186,8 @@ def build_items(root, tool_rel, descriptors):
             if "when" in row and not check_when(root, row["when"], where):
                 continue
             path = resolve_argv([str(row.get("path") or "")], ctx, where)[0] if row.get("path") else ""
-            add = (resolve_argv(row["write"], ctx, where), resolve_argv(row["check"], ctx, where),
+            add = (check_operand(resolve_argv(row["write"], ctx, where), root, where),
+                   check_operand(resolve_argv(row["check"], ctx, where), root, where),
                    check_stage(row["stage"], where), kit, path, where)
             add_item(items, *add)
         kit_check = (d.get("check") or {}).get("argv")
@@ -175,13 +196,16 @@ def build_items(root, tool_rel, descriptors):
             if "stage" not in row:
                 if "check" in row:
                     raise Refusal(f"{where}: carries a check and no stage, so it joins no stage")
+                if skipped is not None:
+                    skipped.append(f"{kit} · [[regenerate]] {render_argv(resolve_argv(row.get('argv'), ctx, where))}")
                 continue
             chk = row.get("check") or kit_check
             if not chk:
                 raise Refusal(f"{where}: is staged, carries no check, and its kit's [check] declares no "
                               f"argv, so nothing can prove it fresh")
             outputs = ", ".join(str(w) for w in row.get("writes") or []) or f"the {kit} render"
-            add_item(items, resolve_argv(row.get("argv"), ctx, where), resolve_argv(chk, ctx, where),
+            add_item(items, check_operand(resolve_argv(row.get("argv"), ctx, where), root, where),
+                     check_operand(resolve_argv(chk, ctx, where), root, where),
                      check_stage(row["stage"], where), kit, outputs, where)
     return sorted(items.values(), key=lambda i: (i["stage"], i["kit"], i["outputs"][0]))
 
@@ -205,6 +229,44 @@ def render_argv(argv):
     return " ".join(a if a and not any(c.isspace() for c in a) else repr(a) for a in argv)
 
 
+def resolve_bash(probe):
+    """A bash that can see `probe`, a tracked file of this tree, from the kit's own
+    `profile_bar.resolve_bash`, which RUNS each candidate rather than trusting `PATH` order (review M5):
+    the default Windows `PATH` lists the system directory, and WSL's `bash` there, before Git's. ''
+    when the resolver cannot be loaded or no candidate answers."""
+    spec = importlib.util.spec_from_file_location("profile_bar", Path(__file__).with_name("profile_bar.py"))
+    if spec is None or spec.loader is None:
+        return ""
+    mod = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(mod)
+        found, _tried = mod.resolve_bash(str(probe))
+    except Exception:  # noqa: BLE001 - any failure to load or run the resolver falls back to PATH
+        return ""
+    return found
+
+
+def run_tree_kill(proc):
+    """Kill a timed-out child and what it started, then reap it: `taskkill /T` on Windows, the child's
+    own process group on POSIX. Each step is best-effort, because the child may already be gone."""
+    try:
+        if os.name == "nt":
+            subprocess.run(["taskkill", "/F", "/T", "/PID", str(proc.pid)], stdout=subprocess.DEVNULL,
+                           stderr=subprocess.DEVNULL, timeout=30)
+        else:
+            os.killpg(proc.pid, signal.SIGKILL)
+    except (OSError, subprocess.SubprocessError):
+        pass
+    try:
+        proc.kill()
+    except OSError:
+        pass
+    try:
+        proc.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        pass
+
+
 def run_command(argv, root, bound):
     """`(status, output, seconds)`: status is the exit code, or 'TIMEOUT', or 127 when it cannot start."""
     run = list(argv)
@@ -214,23 +276,31 @@ def run_command(argv, root, bound):
         # ON PATH, FIRST. Windows' process creation searches its system directory BEFORE `PATH`, and on
         # a node with WSL installed `bash` there is WSL's, which cannot read a linked worktree's `.git`
         # file and reported every Git-Bash check "not a git repo" (measured 2026-10-11, node `a`).
-        run[0] = shutil.which(run[0]) or run[0]
+        run[0] = (BASH if run[0] == "bash" else "") or shutil.which(run[0]) or run[0]
     env = dict(os.environ, GIT_OPTIONAL_LOCKS="0")
     # NO INHERITED PWD. bash keeps an inherited PWD that names its working directory by another
     # spelling, and node `a`'s TEMP is an 8.3 short name git spells long: an adopter comparing the two
     # rendered `../../../../../DAILY-~1/...` paths into a Skill (measured 2026-10-11 in a clone there).
     env.pop("PWD", None)
     t0 = time.monotonic()
-    try:
-        r = subprocess.run(run, cwd=root, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-                           stderr=subprocess.STDOUT, encoding="utf-8", errors="replace", env=env,
-                           timeout=bound)
-        return r.returncode, r.stdout or "", round(time.monotonic() - t0)
-    except subprocess.TimeoutExpired as e:
-        out = e.output if isinstance(e.output, str) else (e.output or b"").decode("utf-8", "replace")
-        return "TIMEOUT", out, round(time.monotonic() - t0)
-    except OSError as e:
-        return 127, f"cannot start {run[0]}: {e}", round(time.monotonic() - t0)
+    # OUTPUT THROUGH A FILE, NEVER A PIPE (review M1). On Windows `subprocess.run`'s timeout handler
+    # kills the child and then reads the pipe to EOF with no bound, so a grandchild holding it kept the
+    # verb waiting past GATE_REGEN_BOUND: measured 6.5 s for `sleep 6 & wait` under a 1 s bound.
+    with tempfile.TemporaryFile() as sink:
+        try:
+            proc = subprocess.Popen(run, cwd=root, stdin=subprocess.DEVNULL, stdout=sink,
+                                    stderr=subprocess.STDOUT, env=env,
+                                    **({} if os.name == "nt" else {"start_new_session": True}))
+        except OSError as e:
+            return 127, f"cannot start {run[0]}: {e}", round(time.monotonic() - t0)
+        try:
+            status = proc.wait(timeout=bound)
+        except subprocess.TimeoutExpired:
+            run_tree_kill(proc)
+            status = "TIMEOUT"
+        sink.seek(0)
+        out = sink.read().decode("utf-8", "replace")
+    return status, out, round(time.monotonic() - t0)
 
 
 def print_tail(out):
@@ -239,12 +309,15 @@ def print_tail(out):
         print(f"regen:     | {line}")
 
 
-def print_items(items):
-    """`--list`: every item in run order, then a derived count line."""
+def print_items(items, skipped=()):
+    """`--list`: every item in run order, each `[[regenerate]]` row skipped for carrying no stage, then a
+    derived count line, so a row the verb does not run is never silent (review L3)."""
     for i in items:
         print(f"regen: stage {i['stage']} · {i['kit']} · {', '.join(i['outputs'])}")
         print(f"regen:   write  {render_argv(i['write'])}")
         print(f"regen:   check  {render_argv(i['check'])}")
+    for s in skipped:
+        print(f"regen: skipped · {s} · carries no stage, so no bar regenerates it")
     stages = sorted({i['stage'] for i in items})
     print(f"regen: {len(items)} declared across {len({i['kit'] for i in items})} kit(s), "
           f"in {len(stages)} stage(s)")
@@ -320,8 +393,14 @@ def run_writes(items, root, jobs, bound):
         for i, (status, out, secs) in zip(group, results):
             if status == 0:
                 continue
-            failed += 1
             why = "timed out" if status == "TIMEOUT" else f"exit {status}"
+            # A WRITE MAY DECLINE IN A LEGAL STATE (review M2): an adopter that renders nothing where its
+            # kit declares that legal exits non-zero while its check passes. Its own check decides.
+            if status != "TIMEOUT" and run_command(i["check"], root, bound)[0] == 0:
+                print(f"regen: declined · stage {stage} · {i['kit']} · {', '.join(i['outputs'])} · write: "
+                      f"{render_argv(i['write'])} ({why}, {secs}s) · its check reads fresh")
+                continue
+            failed += 1
             print(f"regen: FAILED · stage {stage} · {i['kit']} · {', '.join(i['outputs'])} · write: "
                   f"{render_argv(i['write'])} ({why}, {secs}s)")
             print_tail(out)
@@ -346,6 +425,13 @@ def read_knob(name, default):
 
 
 def main(argv):
+    global BASH
+    # UTF-8 OUT, whatever the locale (review M4): outside Python's UTF-8 mode a Windows stdout uses the
+    # code page, and every line here carries `·` or `—`, as `gen_map.py` found before this file.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
     modes = ("--list", "--check", "--write")
     if len(argv) != 2 or argv[1] not in modes:
         print(f"usage: {Path(argv[0]).name} {' | '.join(modes)}", file=sys.stderr)
@@ -355,18 +441,22 @@ def main(argv):
         tool_rel = Path(os.path.relpath(kit_dir.parent, derive_repo_root(kit_dir))).as_posix()
         root = read_toplevel()
         tool_rel = "" if tool_rel == "." else tool_rel
-        items = build_items(root, tool_rel, read_descriptors(root, tool_rel))
+        descriptors = read_descriptors(root, tool_rel)
+        skipped = []
+        items = build_items(root, tool_rel, descriptors, skipped)
         jobs = read_knob("GATE_REGEN_JOBS", DEFAULT_JOBS)
         bound = read_knob("GATE_REGEN_BOUND", DEFAULT_BOUND)
     except Refusal as e:
         print(f"regen: REFUSED — {e}")
         return 2
     if argv[1] == "--list":
-        print_items(items)
+        print_items(items, skipped)
         return 0
     if not items:
         print("regen: 0 declared — no kit descriptor carries a staged row, so nothing was checked or written")
         return 0
+    if any(a == "bash" for i in items for a in (i["write"][0], i["check"][0])):
+        BASH = resolve_bash(root / f"{descriptors[0][0]}/kit.toml")
     if argv[1] == "--check":
         return run_checks(items, root, jobs, bound)
     return run_writes(items, root, jobs, bound)

@@ -129,7 +129,8 @@ mutates_index = true
 argv = ["bash", "{kit}/adopt-memory-tree.sh", "--render"]
 # Staged for the bar (TOOL-aPrimedIndex-1): run-gates' regen.py re-renders this before a bar.
 # This kit's [check] declares none, so the row names the parity leg that byte-compares the four
-# rendered documents; the identical row below joins this one by its argv.
+# rendered documents. The identical row further down carries no stage, so regen.py skips it and
+# `--list` names the skip; staging it would also need this row's check (TOOL-aPrimedIndex-7).
 check = ["bash", "{kit}/kit-dogfood-parity.test.sh"]
 stage = 1
 

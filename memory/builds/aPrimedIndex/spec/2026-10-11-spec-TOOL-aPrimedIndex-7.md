@@ -1,11 +1,12 @@
 # TOOL-aPrimedIndex-7 — the regen verb's and the runner's review minors, batched
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 4
+**Status:** CLOSED · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aPrimedIndex-7-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aPrimedIndex-7-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aPrimedIndex-6-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPrimedIndex-6-1-build-brief.md) | journal | DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-8 |
 
 <!-- /gen:spec-records -->

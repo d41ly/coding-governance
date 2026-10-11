@@ -470,6 +470,84 @@ case "$_re_rc:$_re_out" in
 esac
 rm -rf "$_rr"
 
+# ---- 1t. THE VERB'S REVIEW REPAIRS. TOOL-aPrimedIndex-7 --------------------------------------------
+#     A scratch repo of fixture kits at THIS kit's tool root, each declaring one staged output whose
+#     write and check are inline `bash -c` bodies. 1t-a: a check whose child outlives the bound returns
+#     at the bound, because no pipe waits on it. 1t-b: a stage-1 write that exits 1 while its check is
+#     fresh is `declined` and stage 2 runs. 1t-c: with its check failing too, `--write` stops after
+#     stage 1. 1t-d: the runner hands `--regen-list`, `--regen` and `--regen-check` to the verb before
+#     any bar machinery. 1t-e: a check naming a script that is not in the tree is a refused
+#     declaration, and the runner says so rather than naming `--regen`.
+#     Staged red one break per arm in the verb: the pipe restored, the declined branch dropped, the stop
+#     dropped, the hand-over moved below the bar setup, the operand check dropped.
+_rt=$(mktemp -d)
+mkdir -p "$_rt/${PFX}slow" "$_rt/${PFX}one" "$_rt/${PFX}two"
+printf '%s\n' '[{"name": "quick", "argv": ["bash", "-c", "true"], "subject": "repo", "ceiling": 60}]' > "$_rt/legs.json"
+printf '%s\n' 'id = "slow"' '[[generated]]' 'path = "s"' 'generator = "g"' 'why = "a check that outlives its bound"' \
+  'write = ["bash", "-c", "exit 0"]' 'check = ["bash", "-c", "sleep 8 & wait"]' 'stage = 1' > "$_rt/${PFX}slow/kit.toml"
+( cd "$_rt" && git init -q . && git add "${PFX}slow/kit.toml" && git commit -q -m slow ) >/dev/null 2>&1
+# The verdict's OWN seconds are read, not the verb's wall clock: an interpreter start costs seconds on
+# a loaded Windows node, and the pipe version measured 8 s here, the length of the sleep.
+_ra_out=$(cd "$_rt" && GATE_REGEN_BOUND=2 "$PYBIN" "$KITDIR/regen.py" --check 2>&1); _ra_rc=$?
+_ra_sec=$(printf '%s\n' "$_ra_out" | sed -n 's/.*(timed out, \([0-9][0-9]*\)s).*/\1/p' | head -n 1)
+n=$((n+1))
+case "$_ra_rc:$_ra_out" in
+  1:*"timed out"*) [ -n "$_ra_sec" ] && [ "$_ra_sec" -le 5 ] || { echo "canary: 1t-a a check outliving GATE_REGEN_BOUND=2 took ${_ra_sec:-an unread number of }s to time out, so the bound does not hold the wall clock"; fail=1; } ;;
+  *) echo "canary: 1t-a a check outliving its bound did not read timed out (rc $_ra_rc)"; fail=1 ;;
+esac
+( cd "$_rt" && git rm -q -r "${PFX}slow" && git commit -q -m "no slow" ) >/dev/null 2>&1
+printf '%s\n' 'id = "one"' '[[generated]]' 'path = "o"' 'generator = "g"' 'why = "a stage-1 write that declines"' \
+  'write = ["bash", "-c", "exit 1"]' 'check = ["bash", "-c", "exit 0"]' 'stage = 1' > "$_rt/${PFX}one/kit.toml"
+printf '%s\n' 'id = "two"' '[[generated]]' 'path = "t"' 'generator = "g"' 'why = "a stage-2 write leaving a marker"' \
+  'write = ["bash", "-c", "touch marker"]' 'check = ["bash", "-c", "exit 0"]' 'stage = 2' > "$_rt/${PFX}two/kit.toml"
+( cd "$_rt" && git add "${PFX}one/kit.toml" "${PFX}two/kit.toml" && git commit -q -m stages ) >/dev/null 2>&1
+_rb_out=$(cd "$_rt" && "$PYBIN" "$KITDIR/regen.py" --write 2>&1); _rb_rc=$?
+n=$((n+1))
+case "$_rb_rc:$_rb_out" in
+  0:*"regen: declined · stage 1 · one"*) [ -f "$_rt/marker" ] || { echo "canary: 1t-b a declined stage-1 write stopped stage 2"; fail=1; } ;;
+  *) echo "canary: 1t-b a stage-1 write exiting 1 over a fresh check was not declined, or the verb failed (rc $_rb_rc)"; fail=1 ;;
+esac
+rm -f "$_rt/marker"
+sed -i 's/^check = \["bash", "-c", "exit 0"\]$/check = ["bash", "-c", "exit 1"]/' "$_rt/${PFX}one/kit.toml"
+( cd "$_rt" && git commit -q -am "one fails" ) >/dev/null 2>&1
+_rc_out=$(cd "$_rt" && "$PYBIN" "$KITDIR/regen.py" --write 2>&1); _rc_rc=$?
+n=$((n+1))
+case "$_rc_rc:$_rc_out" in
+  1:*"regen: FAILED · stage 1 · one"*"stopped after stage 1"*) [ ! -f "$_rt/marker" ] || { echo "canary: 1t-c a stage ran after a failed write"; fail=1; } ;;
+  *) echo "canary: 1t-c a failed stage-1 write did not stop the verb with exit 1 (rc $_rc_rc)"; fail=1 ;;
+esac
+sed -i 's/^check = \["bash", "-c", "exit 1"\]$/check = ["bash", "-c", "exit 0"]/' "$_rt/${PFX}one/kit.toml"
+( cd "$_rt" && git commit -q -am "one fresh" ) >/dev/null 2>&1
+_rd_list=$(cd "$_rt" && bash "$KITDIR/run-gates.sh" --regen-list 2>&1)
+_rd_want=$(cd "$_rt" && "$PYBIN" "$KITDIR/regen.py" --list 2>&1)
+_rd_w=$(cd "$_rt" && bash "$KITDIR/run-gates.sh" --regen 2>&1); _rd_wrc=$?
+_rd_c=$(cd "$_rt" && bash "$KITDIR/run-gates.sh" --regen-check 2>&1); _rd_crc=$?
+n=$((n+1))
+if [ "$_rd_list" != "$_rd_want" ] || [ "$_rd_wrc" != 0 ] || [ "$_rd_crc" != 0 ]; then
+  echo "canary: 1t-d the runner's --regen-list, --regen or --regen-check did not hand over to the verb (write rc $_rd_wrc, check rc $_rd_crc)"; fail=1
+fi
+n=$((n+1))
+case "$_rd_w$_rd_c" in
+  *"gate queue:"*|*"gate profile:"*) echo "canary: 1t-d a --regen verb reached the bar's setup"; fail=1 ;;
+esac
+mkdir -p "$_rt/${PFX}three"
+printf '%s\n' 'id = "three"' '[[generated]]' 'path = "h"' 'generator = "g"' 'why = "a check naming a missing script"' \
+  'write = ["bash", "-c", "exit 0"]' 'check = ["bash", "{kit}/gone.sh"]' 'stage = 1' > "$_rt/${PFX}three/kit.toml"
+( cd "$_rt" && git add "${PFX}three/kit.toml" && git commit -q -m three ) >/dev/null 2>&1
+_re_out=$(cd "$_rt" && "$PYBIN" "$KITDIR/regen.py" --list 2>&1); _re_rc=$?
+_re_bar=$(cd "$_rt" && env GATE_FULL=1 GATE_BASE= GATE_REUSE= GATE_LEGS="$_rt/legs.json" bash "$KITDIR/run-gates.sh" 2>&1); _re_brc=$?
+n=$((n+1))
+case "$_re_rc:$_re_out" in
+  2:*"${PFX}three/gone.sh"*"not in this tree"*) ;;
+  *) echo "canary: 1t-e a check naming a missing script was not refused with exit 2 naming it (rc $_re_rc)"; fail=1 ;;
+esac
+n=$((n+1))
+case "$_re_brc:$_re_bar" in
+  2:*"declaration refused"*) case "$_re_bar" in *"regenerate every one"*) echo "canary: 1t-e the runner named --regen for a refused declaration"; fail=1 ;; esac ;;
+  *) echo "canary: 1t-e the runner did not refuse a refused declaration with its own line (rc $_re_brc)"; fail=1 ;;
+esac
+rm -rf "$_rt" 2>/dev/null || true
+
 # 1a-control: the same predicate over a manifest with NO `impure` key must PASS, and over one with
 #     a near-miss spelling must FAIL. Both halves, because the arm above is a negative search and a
 #     negative search passes just as happily over a population it never selected.
