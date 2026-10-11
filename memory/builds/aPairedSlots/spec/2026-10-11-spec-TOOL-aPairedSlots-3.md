@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-3 — a bar dispatched while another slot is held takes the shared width its rule names
 
-**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 3
+**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -65,7 +65,9 @@ three slots gets a third of the width under arm B's rule, which is the same rule
 
 ### Inventory
 
-No function is minted. New shell variables: `TS_HELD_N` (the held count read at acquire) and
+One function is minted, `render_prof_line`, in the `sh.function` cell: the profile line's one
+template, called where the line is first built and again after a dispatch width moves it, so the
+two copies cannot drift. `TS_HELD_N` is TOOL-aPairedSlots-2's; this unit adds the variable
 `TS_SHARE_RULE` (the constant naming the rule, `half` or `full`). No new
 header key: `width` already records the effective width.
 
@@ -128,6 +130,8 @@ none
 - rev-2 · 2026-10-11 · S2 · AC1 · §8 · the rule becomes the constant `TS_SHARE_RULE`, shipped as
   `full`; F1 and setting the constant move to TOOL-aPairedSlots-9 on the owner's ruling of
   2026-10-11 (one repetition per arm, build now).
+- rev-3 · 2026-10-11 · §4 · the profile line's template moves into `render_prof_line`, called at
+  both sites, rather than a second inline copy of it after the dispatch width.
 
 ## 10. Reuse audit
 
