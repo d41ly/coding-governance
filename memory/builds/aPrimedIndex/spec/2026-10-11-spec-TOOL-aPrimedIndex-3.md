@@ -1,11 +1,12 @@
 # TOOL-aPrimedIndex-3 — the runner refuses to start a bar while a declared output is stale, before it queues for the host
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aPrimedIndex-3-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aPrimedIndex-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-build-TOOL-aPrimedIndex-3-m12-probe.md](../build/2026-10-11-build-TOOL-aPrimedIndex-3-m12-probe.md) | research | — |
 | [2026-10-11-prompt-TOOL-aPrimedIndex-1-2-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPrimedIndex-1-2-build-brief.md) | journal | TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-4 |
 | [2026-10-11-prompt-TOOL-aPrimedIndex-1.md](../prompts/2026-10-11-prompt-TOOL-aPrimedIndex-1.md) | research | TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-4 |
@@ -26,8 +27,9 @@ regenerates them all. Every bar entry point reaches the runner, so this binds al
 - **S2** — The refusal names every stale output with its check command and output tail, which the
   verb prints, then one remedy line naming `run-gates.sh --regen` by this kit's derived path and
   saying to commit what it moves. Observed by AC1.
-- **S3** — A fresh set prints the verb's count line and the run continues exactly as before. An
-  empty set prints its zero count, so the skip announces itself. Observed by AC2.
+- **S3** — A fresh set prints the verb's count line and the run continues exactly as before. A tree
+  with no kit descriptor at the tool root prints one line saying none is declared and spawns no
+  python, so the skip announces itself and a suite's scratch bars stay cheap. Observed by AC2.
 - **S4** — `GATE_REGEN_CHECK=0` skips the call with one announced line naming the knob and what a
   stale output does instead: it reds its own leg at the end of the bar. A missing `regen.py` beside
   the runner is announced the same way and the run continues. Observed by AC3.
@@ -124,8 +126,9 @@ acceptance ledger re-measures it on the built runner.
   line or queue line precedes the refusal, or the exit is not 2.
   fixture: built inside the kit dir from the canary's prologue at build time, deleted before commit.
 - **AC2** — When the same slice's check exits 0, the runner prints the verb's count line and every
-  leg line the fixture manifest declares; with no staged row it prints `regen: 0 declared`. Red when:
-  the fresh run is refused, or the empty set prints nothing.
+  leg line the fixture manifest declares; with no kit descriptor at the tool root it prints its own
+  `no kit descriptor under` line, spawns no python, and runs its legs. Red when: the fresh run is
+  refused, or the empty set prints nothing.
 - **AC3** — When the slice sets `GATE_REGEN_CHECK=0` over the stale fixture, the runner prints the
   skip line naming `GATE_REGEN_CHECK` and runs its legs. Red when: the skip is silent or still
   refuses.
@@ -152,6 +155,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · S3 · AC2 · the empty case is a tree with no kit descriptor, announced by the
+  runner's own line with no python spawn; `regen: 0 declared` is the verb's line for descriptors that
+  stage nothing.
 
 ## 10. Reuse audit
 

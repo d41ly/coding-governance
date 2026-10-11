@@ -9,6 +9,11 @@ This section used to enumerate all seventy while telling the reader, two paragra
 split from the manifest — 26 KB of prose restating a file that cannot go stale, in front of the file
 that can. What survives here is what a session cannot get anywhere else.
 
+**A stale generated output refuses the bar before it queues.** Every bar first runs the run-gates
+kit's `--regen-check` over the outputs the kit descriptors declare and exits 2 naming
+`bash tools/run-gates/run-gates.sh --regen` when one is stale; regenerate, commit, run again. The
+lander regenerates over its own merge. The declarations and the verb are that kit's README.
+
 **Guards scope a run, never a verdict.** MOST self-test legs carry a `guard` in the manifest naming
 the kit dir they exercise, so a records-only commit runs only the legs that check this repo's actual
 state. Not all do, and the split is DERIVED from `tools/gate-legs.json` rather than counted here —

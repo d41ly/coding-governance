@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-11T06:02:04+03:00 @ d6214c0c4c001bf000080d1fe627013c4d4a2ab9
+last-audit: 2026-10-11T06:37:46+03:00 @ 3a20991f98621ce709af82fc5626ecbbaf0c0cf9
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: d6214c0c4c001bf000080d1fe627013c4d4a2ab9
+last-body-change: 3a20991f98621ce709af82fc5626ecbbaf0c0cf9
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -179,7 +179,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 ```bash
 bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY, at the width gate-profiles.txt declares for this hardware; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
 # Legs report in CHUNKS, each closing with a verdict line, so a red is readable before the run ends. A chunk whose every leg skipped reports skipped, never green.
-bash tools/run-gates/run-gates.sh --regen   # regenerate every declared generated output; --regen-check, --regen-list. TOOL-aPrimedIndex-2
+bash tools/run-gates/run-gates.sh --regen   # regenerate every declared generated output; a bar refuses while one is stale. TOOL-aPrimedIndex-2, -3
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD and the docs mode (GATE_DOCS_BASE). .githooks/pre-push decides, and prints which it chose and why
 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs

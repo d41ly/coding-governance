@@ -416,6 +416,60 @@ case "$_rl_rc:$_rl_out" in
 esac
 rm -rf "$_rr"
 
+# ---- 1s. EVERY BAR PROVES THE DECLARED OUTPUTS FRESH BEFORE IT QUEUES. TOOL-aPrimedIndex-3 --------
+#     The REAL runner over a one-leg manifest, in a scratch repo holding 1r's fixture kit: a stale check
+#     refuses with exit 2 before any queue or leg line, a fresh one prints the verb's count line and
+#     runs the leg, GATE_REGEN_CHECK=0 skips with a line naming the knob, --print-profile pays for no
+#     check, and a tree with no descriptor at the tool root says so and runs.
+#     Staged red by deleting the preflight block from the runner: 1s-a and 1s-c fail.
+_rr=$(mktemp -d)
+mkdir -p "$_rr/${PFX}fake"
+printf '%s\n' '[{"name": "quick", "argv": ["bash", "-c", "true"], "subject": "repo", "ceiling": 60}]' > "$_rr/legs.json"
+printf '%s\n' '#!/usr/bin/env bash' 'here=$(cd "$(dirname "$0")" && pwd)' \
+  '[ "${1:-}" = --write ] && { printf 0 > "$here/rc"; exit 0; }' 'exit "$(cat "$here/rc")"' > "$_rr/${PFX}fake/gen.sh"
+printf '%s\n' 'id = "fake"' '' '[[generated]]' 'path = "out.txt"' 'generator = "gen.sh"' 'why = "a fixture output"' \
+  'write = ["bash", "{kit}/gen.sh", "--write"]' 'check = ["bash", "{kit}/gen.sh", "--check"]' 'stage = 1' > "$_rr/${PFX}fake/kit.toml"
+printf 1 > "$_rr/${PFX}fake/rc"
+( cd "$_rr" && git init -q . && git add "${PFX}fake/kit.toml" "${PFX}fake/gen.sh" && git commit -q -m base ) >/dev/null 2>&1
+run_regen_bar() { ( cd "$_rr" && env GATE_FULL=1 GATE_BASE= GATE_REUSE= GATE_LEGS="$_rr/legs.json" "$@" bash "$KITDIR/run-gates.sh" 2>&1 ); }
+_rs_out=$(run_regen_bar); _rs_rc=$?
+n=$((n+1))
+case "$_rs_rc:$_rs_out" in
+  2:*"regen: STALE"*"run-gates: REFUSED"*"run-gates.sh --regen"*) ;;
+  *) echo "canary: 1s-a a staged output whose check exits 1 did not refuse the bar with exit 2 and the --regen remedy (rc $_rs_rc)"; fail=1 ;;
+esac
+n=$((n+1))
+case "$_rs_out" in
+  *"gate queue:"*|*"GATE ok"*|*"GATE FAIL"*) echo "canary: 1s-a the refused bar reached the queue or a leg, so the preflight is not ahead of them"; fail=1 ;;
+esac
+printf 0 > "$_rr/${PFX}fake/rc"
+_rf_out=$(run_regen_bar); _rf_rc=$?
+n=$((n+1))
+case "$_rf_rc:$_rf_out" in
+  0:*"regen: 1 declared · 1 fresh · 0 stale"*"GATE ok    quick"*) ;;
+  *) echo "canary: 1s-b a fresh staged output did not print its count line and run the leg (rc $_rf_rc)"; fail=1 ;;
+esac
+printf 1 > "$_rr/${PFX}fake/rc"
+_rk_out=$(run_regen_bar GATE_REGEN_CHECK=0); _rk_rc=$?
+n=$((n+1))
+case "$_rk_rc:$_rk_out" in
+  0:*"NOT checked"*"GATE_REGEN_CHECK=0"*"GATE ok    quick"*) ;;
+  *) echo "canary: 1s-c GATE_REGEN_CHECK=0 over a stale output did not skip with a line naming the knob and run the leg (rc $_rk_rc)"; fail=1 ;;
+esac
+_rp_out=$(cd "$_rr" && bash "$KITDIR/run-gates.sh" --print-profile 2>&1)
+n=$((n+1))
+case "$_rp_out" in
+  *"regen:"*) echo "canary: 1s-d --print-profile ran the generated-output check, which it must not pay for"; fail=1 ;;
+esac
+( cd "$_rr" && git rm -q -r --cached "${PFX}fake" && rm -rf "${PFX}fake" ) >/dev/null 2>&1
+_re_out=$(run_regen_bar); _re_rc=$?
+n=$((n+1))
+case "$_re_rc:$_re_out" in
+  0:*"generated outputs — no kit descriptor under"*"GATE ok    quick"*) ;;
+  *) echo "canary: 1s-e a tree with no kit descriptor did not announce the empty set and run the leg (rc $_re_rc)"; fail=1 ;;
+esac
+rm -rf "$_rr"
+
 # 1a-control: the same predicate over a manifest with NO `impure` key must PASS, and over one with
 #     a near-miss spelling must FAIL. Both halves, because the arm above is a negative search and a
 #     negative search passes just as happily over a population it never selected.

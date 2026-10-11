@@ -65,11 +65,11 @@ ids TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedInde
 |---|---|---|---|---|---|
 | [TOOL-aPrimedIndex-1 — every generated output a bar leg grades declares its write and check commands in its kit's descriptor](spec/2026-10-11-spec-TOOL-aPrimedIndex-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aPrimedIndex-2 — one runner verb rewrites every declared output in stage order, and a second names each stale one](spec/2026-10-11-spec-TOOL-aPrimedIndex-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-11 |
-| [TOOL-aPrimedIndex-3 — the runner refuses to start a bar while a declared output is stale, before it queues for the host](spec/2026-10-11-spec-TOOL-aPrimedIndex-3.md) | 3 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPrimedIndex-3 — the runner refuses to start a bar while a declared output is stale, before it queues for the host](spec/2026-10-11-spec-TOOL-aPrimedIndex-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aPrimedIndex-4 — the lander regenerates the declared outputs over its merged tree and lands them with the merge](spec/2026-10-11-spec-TOOL-aPrimedIndex-4.md) | 3 | 2 | OPEN | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 6 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

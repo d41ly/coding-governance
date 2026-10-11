@@ -16338,6 +16338,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "run_regen_bar",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "run_rel27_gate",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"

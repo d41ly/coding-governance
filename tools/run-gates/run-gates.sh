@@ -5,6 +5,10 @@
 # HOST: every failed leg timed out twice, the second time alone, while one spawn cost more than GATE_HOST_RATIO
 # times this clone's floor. First match wins: 2 REFUSED, 1 RED, 4 HOST, 3 TREE MOVED, 0 GREEN, and exit 0 needs
 # a reported leg line AND a written verdict file (TOOL-dDerivedDocket-26).
+# A STALE GENERATED OUTPUT IS REFUSED before the queue, exit 2 (TOOL-aPrimedIndex-3): every output a kit
+# descriptor stages is proved fresh by `regen.py --check` and none is regenerated here. That check grades
+# nothing a leg does not already grade, so GATE_REGEN_CHECK=0 costs an early signal and never a verdict.
+#   bash <prefix>/run-gates/run-gates.sh --regen | --regen-check | --regen-list   # the verb, no bar
 #   bash <prefix>/run-gates/run-gates.sh             # legs run CONCURRENTLY, at the width
 #                                                    # <prefix>/run-gates/gate-profiles.txt declares
 #                                                    # for the detected cores and RAM
@@ -1094,6 +1098,35 @@ if [ -f "$PROCMON_REAP" ] && [ -f "$PROCMON_SCOPE" ]; then
   fi
 fi
 echo "run-gates: process-monitor: $PROCMON_WHY"
+
+# ---- GENERATED OUTPUTS ARE PROVED FRESH BEFORE THE QUEUE (TOOL-aPrimedIndex-3) ---------------------
+# The legs grade the declared generated outputs at the END of a bar, so a session learned an index
+# was stale an hour in, regenerated it and ran the whole bar again. `regen.py --check` runs every
+# check the kits declare, and a stale, failed or timed-out one, or a declaration it refuses, ends
+# the run here with exit 2 before the turnstile: a refusal after an hour in another bar's queue is
+# the cost this exists to remove. It sits after the profile line, which the canary reads first.
+# NOTHING IS WRITTEN: the runner refuses and names the remedy, never regenerates the tree it grades.
+# WHAT THIS DOES NOT CHECK: anything a leg does not already grade, so a skip costs an early signal
+# and never a verdict. A check red for a reason a regeneration cannot fix refuses too; the verb
+# prints its output tail so the reader can tell. A tree holding no kit descriptor at this kit's
+# tool root is announced and costs no python spawn, which keeps a suite's scratch bars cheap.
+case "$KITREL" in */*) _rg_tool=${KITREL%/*} ;; *) _rg_tool=. ;; esac; _rg_any=0
+for _rg_f in "$_rg_tool"/*/kit.toml; do [ -f "$_rg_f" ] && { _rg_any=1; break; }; done
+if [ "${GATE_REGEN_CHECK:-1}" = 0 ]; then
+  echo "run-gates: generated outputs NOT checked — GATE_REGEN_CHECK=0; a stale one reds its own leg at the end of the bar"
+elif [ ! -f "$KITDIR/regen.py" ]; then
+  echo "run-gates: generated outputs NOT checked — no regen.py beside this runner; a stale one reds its own leg at the end of the bar"
+elif [ "$_rg_any" = 0 ]; then
+  echo "run-gates: generated outputs — no kit descriptor under $_rg_tool/, so none is declared and none was checked"
+else
+  "$PYBIN" "$KITDIR/regen.py" --check; _rg_rc=$?
+  if [ "$_rg_rc" != 0 ]; then
+    echo "run-gates: REFUSED — a declared generated output above is stale or unproven, and a bar over it reds on that alone."
+    echo "  regenerate every one, in stage order:  bash $KITREL/run-gates.sh --regen"
+    echo "  then commit what it moved and run the bar again; GATE_REGEN_CHECK=0 skips this check"
+    exit 2
+  fi
+fi
 
 
 # ---- the turnstile: one bar per repository at a time (the turnstile unit) -------------------------

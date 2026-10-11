@@ -17,7 +17,7 @@ its own, and the canary asserts that.
 |---|---|---|
 | 0 | GREEN: every leg that ran passed, over a tree that did not move, with at least one leg line reported and the run record's verdict file written | `gates GREEN — …` |
 | 1 | RED: one or more legs failed and at least one of them is not HOST, or the whole-run wall fired | `gates RED — …` |
-| 2 | REFUSED: not run from a repository, no usable python, a manifest or profile table it cannot read, a scratch dir or run record it cannot create, a manifest whose every leg is held, a run that reported no leg line (an empty manifest), or a green whose verdict file was not written | a `run-gates:` line, or `gates REFUSED — …` |
+| 2 | REFUSED: not run from a repository, no usable python, a manifest or profile table it cannot read, a scratch dir or run record it cannot create, a manifest whose every leg is held, a run that reported no leg line (an empty manifest), a green whose verdict file was not written, or a declared generated output that is stale or unproven (see "Generated outputs") | a `run-gates:` line, or `gates REFUSED — …` |
 | 3 | TREE MOVED: no leg failed, but the tree changed while the bar ran, so no verdict describes it | `gates TREE MOVED — …` |
 | 4 | HOST: every failed leg timed out twice, the second time alone, while one spawn cost more than `GATE_HOST_RATIO` times this clone's recorded floor, so the verdict is about the host and not the subject | `gates HOST — …` |
 
@@ -186,6 +186,21 @@ seconds (default 900). A command outliving its bound is killed by its own pid, s
 spawned can outlive it. **What it does not check:** that a write writes what its row names, or that
 a check grades it; a check red for a reason a regeneration cannot fix reads as stale, and its output
 tail is printed so a reader can tell.
+
+### Every bar proves them fresh before it queues
+
+After its profile and process-monitor lines and before the host turnstile, the runner runs
+`regen.py --check`. A stale, failed or timed-out item, or a declaration the verb refuses, ends the
+run with exit 2, REFUSED, before any leg, naming `--regen` and saying to commit what it moves
+(TOOL-aPrimedIndex-3). Before the queue, because a refusal after an hour in another bar's queue is
+the cost the check exists to remove. Every bar entry point reaches the runner — a hand-run bar, the
+pre-push hook, the lander's push, the unattended close and remote CI — so this binds all of them.
+
+The runner never regenerates the tree it grades: at the push boundary the hook refuses a dirty tree,
+and a green earned over an uncommitted regeneration could never be reused. A tree with no kit
+descriptor at the tool root prints one line and spawns nothing. `GATE_REGEN_CHECK=0` skips the
+check with a line naming the knob; the freshness legs still grade every output, so a skip costs an
+early signal and never a verdict.
 
 ## Reuse, and the baseline a guard diffs against
 
