@@ -1,10 +1,12 @@
 # TOOL-aBriskPreflight-10 — the tracked pre-commit hook is executable again
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-1 · base 271a9004 · streams tooling · order 5
+**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-1 · base 271a9004 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-11-prompt-TOOL-aBriskPreflight-10-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-10-build-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -62,6 +64,7 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-10-11 · initial draft, authored by the main loop under the discoveries rule.
+- rev-2 · 2026-10-11 · status header (§1 header line) order 5 -> 1, S1 unchanged: the unit depends on no sibling, and order 5 queued an index-only repair behind unit 7's measurement for no reason (check 49 refused its dispatch).
 
 ## 9. Reuse audit
 

@@ -59,3 +59,5 @@ base: 271a90045723817f694de4d22c56f88dbcd0063e
 2026-10-11T14:00:18Z brief · item TOOL-aBriskPreflight-3 · reason 521337f9e3b3 memory/builds/aBriskPreflight/prompts/2026-10-11-prompt-TOOL-aBriskPreflight-3-build-brief.md
 
 2026-10-11T14:42:25Z rescope · item add TOOL-aBriskPreflight-10 · reason origin/main tracks .githooks/pre-commit 100644 since the aDistilledCharter reconcile 60bea5e80; this build met it as a check-4 refusal of its own A/B fixture after the mid-build merge. Restoring 100755 makes the wiring hooks-mode arm, an observable this repo measures, strictly better and makes nothing worse
+
+2026-10-11T15:02:48Z brief · item TOOL-aBriskPreflight-10 · reason 60d7c4d96e4b memory/builds/aBriskPreflight/prompts/2026-10-11-prompt-TOOL-aBriskPreflight-10-build-brief.md
