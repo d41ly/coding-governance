@@ -3,7 +3,6 @@ slug: aPrimedIndex
 node: a
 opened: 2026-10-11
 streams: tooling
-status: INPROGRESS
 roster: TOOL
 ids: TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4
 authorized-by: prompt
@@ -58,23 +57,32 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 0 unit(s) · node a · opened 2026-10-11 · streams tooling
+**Build status:** OPEN · 4 unit(s) · node a · opened 2026-10-11 · streams tooling
 ids TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aPrimedIndex-1 — every generated output a bar leg grades declares its write and check commands in its kit's descriptor](spec/2026-10-11-spec-TOOL-aPrimedIndex-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPrimedIndex-2 — one runner verb rewrites every declared output in stage order, and a second names each stale one](spec/2026-10-11-spec-TOOL-aPrimedIndex-2.md) | 2 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPrimedIndex-3 — the runner refuses to start a bar while a declared output is stale, before it queues for the host](spec/2026-10-11-spec-TOOL-aPrimedIndex-3.md) | 3 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPrimedIndex-4 — the lander regenerates the declared outputs over its merged tree and lands them with the merge](spec/2026-10-11-spec-TOOL-aPrimedIndex-4.md) | 3 | 2 | OPEN | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aPrimedIndex-1` | no |
+| 2 | `TOOL-aPrimedIndex-2` | no |
+| 3 | `TOOL-aPrimedIndex-3`, `TOOL-aPrimedIndex-4` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
