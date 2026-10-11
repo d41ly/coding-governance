@@ -75,3 +75,7 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-11T16:54:49Z rescope · item add TOOL-aOrientedCast-11 · reason owner addendum in session, 2026-10-11: role agents may run no gate or self-test, spec writers only memory hygiene and lexicon, builders only lexicon, mechanically gated (prompts/2026-10-11-prompt-TOOL-aOrientedCast-10-0-owner-addendum.md)
 
 2026-10-11T17:27:39Z dispatch · item 6ca3cb2d TOOL-aOrientedCast-8 · reason tools/govkit/selftest.py memory/builds/aOrientedCast/spec/2026-10-11-spec-TOOL-aOrientedCast-8.md memory/builds/aOrientedCast/build/2026-10-11-build-TOOL-aOrientedCast-8-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-11T18:59:20Z brief · item PLAY-aOrientedCast-1 · reason 8fe392978328 memory/builds/aOrientedCast/prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md
+
+2026-10-11T19:04:43Z dispatch · item 6855d6ae PLAY-aOrientedCast-1 · reason coding-governance-agents.template.md AGENTS.md .governance/deploy.toml tools/template-size-highwater.txt memory/guides/SESSION-KICKOFF.md memory/builds/aOrientedCast/spec/2026-10-11-spec-PLAY-aOrientedCast-1.md memory/builds/aOrientedCast/build/2026-10-11-build-PLAY-aOrientedCast-1-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md

@@ -20,6 +20,7 @@ kits = [
   "memory-recall", "drift-audit", "agent-instructions", "unattended", "lexicon",
   "pytest-parallel-guardrails", "gate-lint", "agent-cap", "review-harness",
   "settings-merge", "check-wiring", "push-main", "check-kit-versions", "check-install-prefix",
+  "roles",
 ]
 
 # `security-outbound` and `cross-os` apply here, so both stay: this fleet is multi-OS (four nodes,

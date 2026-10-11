@@ -96,6 +96,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Tier-2: the DoR *is* a design pass — the full spec + a bounded production-readiness menu (best-practice implementation, the extra tools it needs, and the cross-cutting concerns: security · perf/scale · a11y · i18n · error/empty/loading states · observability · testing/gates · migration/rollback · `help/` docs).
 - Surface that menu and **get scope approval BEFORE building** (a menu to select from, not scope-creep licence); record the agreed spec per §6.
 - A write gate refuses a product-code write that no specced unit owns.
+- Every agent is handed a rendered role; spec writing and review, building and the closing review run only in role agents, and the main loop orients, hands off and keeps the books (`<prefix>/roles/README.md`).
 - Codebase map adopted (§5)? A design pass touching an UNDOSSIERED feature creates/refreshes that dossier as a DoR item (the pass already reads what the dossier needs) — the map's convergence forcing function.
 
 **Definition of Done — before you call it done:**
@@ -291,7 +292,7 @@ matched its target population.
 - Match intensity to target richness: heavy multi-lens earns its tokens on fresh/complex write paths; over hardened code it manufactures refuted noise — review light or skip.
 - Persist each Tier-2 run as an in-repo artifact folder (`memory/builds/<slug>/reviews/`); periodically re-audit the corpus (token cost vs severity-weighted confirmed-finding value) to retune these defaults.
 - Commit an experiment's instruments and result rows beside its unit's record, never only to a temp directory: a figure whose instrument is gone can be neither re-derived nor re-run.
-- Orchestration scripts run in sidechains, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet. A sidechain agent holds NEITHER tool, so it cannot fan out at all: the capability is ABSENT, not policed. It DOES inherit the governing doc and hooks DO fire in it, both measured; the cap sits at the main loop because that is where the fan-out decision is MADE.
+- Orchestration scripts run in sidechains, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet. A sidechain agent holds NEITHER tool, so it cannot fan out at all: the capability is ABSENT, not policed. Hooks DO fire in it, measured; the cap sits at the main loop because that is where the fan-out decision is MADE.
 - Verify before "done": a check that exercises THIS change (its own/affected test, or the relevant gate) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
 - Commit freely as you go (branch/worktree, or local `main` for doc-only per §3); landing is §1's rule, not restated here.
 
