@@ -1075,9 +1075,19 @@ fi
 # PATHS, which git already prints better; this carries STATUS, which git does not — and the status is
 # DERIVED from each build's front matter plus its specs' status headers, so nothing is authored here
 # and nothing rots.
-if [ "$STAGED" = 0 ] || printf '%s\n' "$STAGED_MD" | grep -q .; then
-  if ! drift=$("$_PY" "$HERE/gen_build_index.py" --check 2>&1); then fail 9 "generated build index differs from a fresh render:
-$drift"; fi
+#
+# UNDER --staged THE GENERATOR DECIDES WHETHER TO RENDER (TOOL-aTrimmedHook-1). `--check --staged` asks
+# whether anything the index stages can move the render — a structural path, an added or deleted
+# file, or a file whose cited ids change, because the roster reads ids out of EVERY memory file's
+# prose — and prints one SKIPPED line when nothing can. That line is printed here: a skip announces
+# itself. A render owed is the full `--check`, so its verdict and this fail branch are unchanged.
+if [ "$STAGED" = 0 ] || [ -n "$STAGED_MD" ]; then
+  _c9=(--check); [ "$STAGED" = 1 ] && _c9+=(--staged)
+  if ! drift=$("$_PY" "$HERE/gen_build_index.py" "${_c9[@]}" 2>&1); then fail 9 "generated build index differs from a fresh render:
+$drift"
+  else
+    case "$drift" in "build-index: render SKIPPED"*) printf 'memory-hygiene: check 9: %s\n' "${drift#build-index: }" ;; esac
+  fi
 fi
 
 # 22 — THE REVIEW VERDICT VOCABULARY. A review record has to say what it concluded, in a token

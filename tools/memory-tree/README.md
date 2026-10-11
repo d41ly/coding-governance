@@ -502,6 +502,9 @@ re-key it from the row `--emit-pin` prints.
   checkout is CRLF in the tracked copy — the normalisation keeps the gate honest, the pin keeps the
   committed bytes right, and you want both.
 - The gate is Bash (git-bash on Windows works). The `--staged` leg scopes the file-checks to staged paths.
+  Its check 9 runs `gen_build_index.py --check --staged`, which renders only when a staged path can
+  move the index (a structural path, an added or absent file, or a file whose cited ids change) and
+  otherwise prints one `render SKIPPED` line; the push boundary renders in full.
 - **`memory/project/stale-header-waiver.txt` — a build README header that is PRESENT and unparseable
   is not one that is ABSENT.** The generator raises on the first and would otherwise treat it as the
   second, regenerating the index around a corrupted header. A row here (one build README path, then

@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 2785323db4e72b8ae2f26660cc3947165a6258fc
-phase: SPECCING
+witness: 22f32233e43f7d50eeee31a5e50c62c4f452858b
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/angry-engelbart-f0995c
@@ -29,3 +29,9 @@ anchor-ref: refs/heads/main
 base: 2785323db4e72b8ae2f26660cc3947165a6258fc
 
 ## Parked
+
+2026-10-11T03:26:05Z brief · item TOOL-aTrimmedHook-1 · reason b8c93a8b228e memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-1-2-build-brief.md
+
+2026-10-11T03:46:33Z dispatch · item 3319e1e0 TOOL-aTrimmedHook-1 · reason tools/memory-tree/gen_build_index.py tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/README.md memory/map/generated/symbols.json memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-1.md memory/builds/aTrimmedHook/README.md memory/builds/aTrimmedHook/build/2026-10-11-build-TOOL-aTrimmedHook-1-1-acceptance-ledger.md memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-1-2-build-brief.md
+
+2026-10-11T05:57:40Z dispatch · item 3319e1e0 TOOL-aTrimmedHook-1 · reason tools/memory-tree/gen_build_index.py tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/README.md memory/map/generated/symbols.json memory/builds/aTrimmedHook/spec/2026-10-11-spec-TOOL-aTrimmedHook-1.md memory/builds/aTrimmedHook/README.md memory/builds/aTrimmedHook/build/2026-10-11-build-TOOL-aTrimmedHook-1-1-acceptance-ledger.md memory/builds/aTrimmedHook/prompts/2026-10-11-prompt-TOOL-aTrimmedHook-1-2-build-brief.md memory/guides/SESSION-KICKOFF.md

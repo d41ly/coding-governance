@@ -2153,6 +2153,11 @@
       "file": "tools/govkit/matrix.py"
     },
     {
+      "id": "build_roster_id_re",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "build_rotated_archive_re",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -3638,6 +3643,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "check_index_input",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "check_inherited_override",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -4301,6 +4311,11 @@
       "id": "check_staged_backlog",
       "kind": "function",
       "file": ".githooks/straggler-guard.sh"
+    },
+    {
+      "id": "check_staged_render",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "check_stamp_line",
@@ -7191,6 +7206,11 @@
       "id": "extract_records",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "extract_roster_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "extract_row",
@@ -19491,6 +19511,11 @@
       "id": "test_spine_nested_layout",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_staged_render",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "test_stale_declaration_is_reported_not_honoured",
