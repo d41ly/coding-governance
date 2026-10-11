@@ -25,7 +25,7 @@
 # manufactures rule-B and rule-C reds on correct code while hiding real ones.
 #
 # WHAT IT DOES NOT GRADE, said here because a structural check reads as a semantic one to everybody
-# who did not write it (AGENTS.md §7):
+# who did not write it (charter [gate]):
 #   - ADEQUACY. Whether an arm proves anything, whether a `hit` proves what its author meant, or
 #     whether a branch the suite never names is reachable. It reads linkage, not meaning.
 #   - THE `check_emitted` SET. Whether a group's expected signature set is correct, complete or observed is

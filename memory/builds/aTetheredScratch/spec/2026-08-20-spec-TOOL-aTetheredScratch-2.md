@@ -24,7 +24,7 @@ Remove the litter from the operator's home directory, and repair the cleanup tha
 Measured on node `a` this session: `%TEMP%` holds 6865 entries and **4905 of them are `mrecall-*`**,
 the residue of `tools/memory-recall/selftest.py`. That is 71% of the crowding from one already
 diagnosed defect, `TOOL-aBranchedMandate-6`, OPEN since 2026-08-17 at 3,616 residues and now grown by
-a further 1,289. The bar timeout at `memory/guides/SESSION-KICKOFF.md:223-226` is downstream of it.
+a further 1,289. The bar timeout at `memory/guides/SESSION-KICKOFF.md` (lines 223-226 at this spec's base) is downstream of it.
 
 ## 2. Scope (IN)
 
@@ -48,7 +48,7 @@ a further 1,289. The bar timeout at `memory/guides/SESSION-KICKOFF.md:223-226` i
 
 - **Retargeting `TMPDIR`.** Refused on measurement — see §4. Rev-1 specced it; rev-2 records why it
   was dropped rather than deleting the reasoning, because the next session will have the same idea.
-- **Sweeping the shared `%TEMP%` root itself.** `memory/guides/SESSION-KICKOFF.md:226` says not to,
+- **Sweeping the shared `%TEMP%` root itself.** `memory/guides/SESSION-KICKOFF.md` (lines 226 at this spec's base) says not to,
   in as many words. Only the `mrecall-*` residue and `~/.gov-push/` are removed, both by name.
 - **Any change to `tools/memory-recall/query.py`.** Its `_remove_cache_dir` is already correct and is
   the model being followed, not a thing to edit.

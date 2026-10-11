@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-11T03:21:55+03:00 @ 97ece34314ae9d6bfd89670b9c194fec42d5ea36
+last-audit: 2026-10-11T04:55:40+03:00 @ 02755258f138ecd3b4a3e9e74788506160525caa
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 97ece34314ae9d6bfd89670b9c194fec42d5ea36
+last-body-change: 02755258f138ecd3b4a3e9e74788506160525caa
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -43,127 +43,30 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 
 ## §B — Orientation (derived at instantiation; re-audited every kickoff; accretes)
 
-- A build of more than one pass runs on `memory/guides/BUILD-METHOD.md` — the spec set, the fork
-  rule, the pass loop, regrounding, the closing review, the README re-read and the wrap-up
-  derivation. It is rendered by the memory-tree kit and is in `watch:`, so editing it forces this
-  manifest to be re-audited.
-- **A build MAY restructure itself, and MUST parallelise delegated disjoint passes.** Both are
-  BUILD-METHOD's, both changed under `TOOL-dUnstalledConvoy`, and both invert what a session would
-  otherwise assume: M2/M3 give a run delegated authority to retire, supersede or add units inside the
-  build's stated goal rather than stalling on a spec that turned out wrong, and M6's parallel default
-  now binds delegated passes only. Conditions and bounds are M3's and M6's. Check 23 counts only a
-  pass that overlapped a sibling and fails only the branch's own run, over `UNDECLARED_WRITE_BUDGET`;
-  `--check-commit` refuses an undeclared staged path (`TOOL-aWindowedPass-1`, `-3`, `-5`).
+One line per bullet (KICK-aDistilledCharter-1): a pointer or a trap, never a procedure. The detail
+lives where each bullet points.
 
-- **Every session start writes an ORIENTATION CARD** at `<git-common-dir>/orientation/<session_id>.md`
-  (`manifest-check.sh --card --write` at SessionStart, `--card --replay` after compaction). Step 5
-  appends READY via `--card --append`; a `## route` (build, unit specs, brief) lands only if all
-  resolve (`KICK-aRoutedQuill-1`). `tools/hooks/scratch-guard.js` refuses a main-loop `git commit`
-  on a card still reading `READY — none yet` (absent or replayed allows; `KICK-aReplayedCard-1`,
-  `TOOL-aReplayedCard-1`) and one from a tree the card does not name: carry a scratch worktree's
-  diff back as a patch. A write under `ROUTED_PATHS` needs a route naming a buildable unit
-  (`TOOL-aRoutedQuill-2`); a pushed commit there names a specced unit (`TOOL-aRoutedQuill-3`).
-- **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
-  worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
-  branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
-- **Remote · default branch:** `origin` · `main`.
-- **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit
-  ask, or a committed build folder the run did not create. What "did not create" admits depends on the
-  ANCHOR the project declares, and this file does not paraphrase it — an earlier paraphrase here said
-  "committed before the run's branch existed", which describes one anchor and is false of the others.
-  `memory/guides/UNATTENDED-PROTOCOL.md` section 1 is the condition.
-- **Governing docs:** `AGENTS.md` (the charter — authoritative) · `coding-governance-agents.template.md`
-  (the playbook this repo follows + ships) · `memory/DECISIONS.md` + asks in `memory/builds/<slug>/BACKLOG.md`.
-  Two BINDING guides: `memory/guides/REVIEW-PROTOCOL.md` (fan-out) and
-  `memory/guides/UNATTENDED-PROTOCOL.md` + `UNATTENDED-VERBS.md` (a run that merges and pushes
-  with no owner turn).
-- **An unattended run is bound by DIRECTIVES**, not just by the protocol: a kit-owned set, each one a
-  POINTER into a `BUILD-METHOD.md` section rather than a copy of it, waivable only by the owner at
-  preflight with a named reason. The list an agent reads is the table in the unattended Skill; the
-  registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
-  the handles are written here — that is the drift the pointer design exists to avoid. Two invert
-  the reflex: a discovery is ADOPTED not parked; the idle-wake precedes orienting. §11 and §5.
-
-- **The idle-wake is not the keepalive.** The cron job only wakes an idle session (nine never fired
-  in 30 h, 2026-10-10); what resumes a stalled run lives OUTSIDE its session — the stop-guard, the
-  stall-recorder, the resume tick from the OS scheduler — reading the LEASE the driver records and
-  the verdict `--liveness` derives against `RESUME_STALE_BOUND`. The tick kills only what it
-  launched: a live STALE session is a `stale-live-pid` health line. Protocol §5; `aSparedHolder`.
-
-- **`GATE_BOUND` bounds every command a project declares, `GATE_CMD` only where no
-  `GATE_PROFILE_CMD` is; `GATE_REAP_BOUND` the teardown reap.** This repo declares a profile, so its
-  unattended bar is bounded by the backstop `--preflight` pins: `GATE_WALL` + the queue + a margin. A
-  breach is KILLED, and `gates-green` then says the bar never RETURNED — not a leg FAILING — or,
-  killed before it acquired the repository, prints a hold. None of them bounds an AGENT-launched
-  process; see `tools/process-monitor/`. `TOOL-aBoundedCeiling-6`, `TOOL-dDerivedDocket-27`.
-
-- **An unattended run declares a MODE, and which one decides what binds it**: the authorization
-  discipline, WHICH ANCHOR may authorize it, which scoped directives apply, and whether the
-  piece-scoped Definition-of-Done items evaluate at all or announce a skip. The set is a driver
-  constant and so is the subset admissible on the second anchor, the unattended Skill's routing
-  table names a start path per member, and a leg joins the two in both directions. Neither the
-  members nor their count are written here, for the reason the directives bullet above gives.
-
-- **A CLOSED Tier-2 unit owes an acceptance ledger** — one line per numbered criterion, in a record
-  whose `**Serves:**` kind is `journal`, in one of two forms and no third. The grammar is
-  `memory/HYGIENE.md` under "Acceptance ledger" and the gate reads shape and coverage only. The
-  cutoff is a `.memory-tree.conf` date, so units that closed before the grammar existed are outside
-  it; anything this session closes is inside it.
-
-- **A LIVE spec's §2 item that retires a named thing owes a `**Readers:**` clause**: `by name:` with
-  names a reader spells, then `by value:` with a reader or `NO VALUE READERS` and a reason. Hygiene
-  check 25, with no cutoff. The trigger, both escapes and what counts as a reader are
-  `memory/HYGIENE.md` item 25; the author's line is in the spec template's §2. `TOOL-dGatedProse-1`.
-
-- **A CLOSED unit whose spec grades THIN blocks `build-complete`** — an empty Scope, Acceptance
-  criteria or Gates section, keyed on the heading TITLE and NOT the ordinal, which on a Tier-1 spec
-  read Gates as acceptance (`TOOL-dBriefedPass-1`). Date-grandfathered on the spec's FILENAME against
-  `.unattended.conf`'s `SPEC_THIN_CUTOFF`; BLANK turns the term OFF. `TOOL-aGradedMandate-4`.
-
-- **From `SPEC_GUARD_LEGS_CUTOFF` (`.memory-tree.conf`) a LIVE spec's §7 leg line must name every
-  gate leg its §4 `### Files touched` trips** — `python tools/check-spec-tokens.py --list` prints the
-  `NEAR [guards]` rows to add BEFORE the spec is dated; a guard more legs share than the checker's
-  floor is excluded and printed with its count, a one-segment root such as `tools/` under the sub-head
-  declares nothing, and a spec with no Gates heading is not joined. `TOOL-aBlindedTrial-8`.
-
-- **The pre-code spec audit is owed where the OWNER declares it: a `slug` README's `spec-audit: <date>`
-  OR `.unattended.conf`'s `SPEC_AUDIT_DEFAULT` on the default branch; a run never declares either.
-  Under neither, none is owed; kickoff asks at READY.**
-  `TOOL-aBlindedTrial-6`, `-7`, `TOOL-aWardedAudit-4`, `KICK-aBlindedTrial-1`.
-
-- **Before starting work inside a kit, check whether another node is already rewriting it.**
-  `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one second. Hit twice:
-  `tools/unattended/` on 2026-08-21, and `check-memory-hygiene.sh` on 2026-09-13 by two sessions
-  sharing node tag `c`, for 13 conflicts at the landing. Neither time did anyone run it. §3's rule
-  is own STREAMS not files, and a kit is the unit that rule is about.
-
-- **A finished or live unattended run ANSWERS QUESTIONS about itself** — `/runlog`, over the run's
-  committed record first, the local run model for anything time-shaped (the record carries no event
-  times), and the redacted narration where the transcript is on this machine. Came in with
-  `dLoggedFlight`. It is not a code search: a symbol, caller or filename is still a grep.
-
-- **`tools/unattended/check-unattended.sh` carries four RAW CR BYTES** inside its `sub(...)` awk
-  regexes and one `tr -d`, and any text-mode read destroys all four. Python's universal-newline
-  translation turns a lone CR (0x0D) into LF (0x0A), which leaves the regex holding a newline and
-  silently breaks the checks that use it. Rewrite that file in BYTES. Hit during the 2026-09-21
-  reconcile; the class is `memory/gotchas/text-mode-read-eats-a-bare-cr.md`, which was already
-  registered and not read.
-  The bytes are NAMED, not shown: a raw CR here was eaten twice by a text-mode rewrite.
-
-- **An adopter's bar holds a leg by `subject = kit` alone** (govkit never emits `chunk`): a shipped
-  self-test declares `subject = "kit"` in its descriptor (`aBenchedProbe`).
-
-- **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
-  the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
-
-- **A LIVE run-state file is outside check 6 by CLASS** (`TOOL-cMendedVintage-13`). `RUN.md` at a
-  build root is append-only by design and cannot satisfy a cap measured for authored index rows; a
-  36-unit run reached 71 KB against 61,440. A RETIRED record is a rename and stays capped.
-
-- **The orientation card's READY anchor accepts BOTH spellings** (`TOOL-cMendedVintage-16`). A card
-  body written in the charter's §16 R1 list-item form used to be read as carrying no ready line,
-  leaving the sentinel in place and the scratch-guard then blocking the next commit. The writer and
-  the hook both widened; the charter did not move.
+- A build of more than one pass runs on `memory/guides/BUILD-METHOD.md`; it is in `watch:`, so editing it re-audits this manifest.
+- A build may amend its own roster (BUILD-METHOD M2, M3) and must run delegated disjoint passes in parallel (M6); both invert a session's default.
+- Every session start writes an orientation card; a commit is refused until its READY line is appended, and only from a tree the card names (`tools/hooks/scratch-guard.js`).
+- A card's `## route` lands only when its build, unit specs and brief all resolve; a write under `ROUTED_PATHS` needs a route naming a buildable unit, and a pushed commit there names a specced one (`TOOL-aRoutedQuill-2`, `-3`).
+- The card's READY anchor accepts both the bare and the `- ` list-item spelling (`TOOL-cMendedVintage-16`).
+- Layout: `main` lives in `C:/projects/coding-governance`; every unit's branch rides its own worktree under `.claude/worktrees/<branch-slug>/`, and `git worktree list` is the inventory.
+- Remote `origin`, default branch `main`; a push needs an explicit ask or the authorization `memory/guides/UNATTENDED-PROTOCOL.md` section 1 defines.
+- Governing docs: `AGENTS.md`, the template it renders from, and `memory/DECISIONS.md`; binding guides are `memory/guides/REVIEW-PROTOCOL.md` and the unattended protocol and verbs.
+- An unattended run is bound by directives the unattended Skill lists, waivable only by the owner at preflight; a discovery is adopted, not parked.
+- An unattended run declares a mode, which decides its authorization, its anchor and the directives that bind; the Skill's routing table is the list.
+- The idle-wake at most wakes an idle session (nine never fired in 30 h of pending background work, 2026-10-10); resuming a stalled run is the stop-guard's, the stall-recorder's and the resume tick's, from the lease, and the tick kills only what it launched, so a live STALE session is a `stale-live-pid` health line (protocol §5, `aSparedHolder`).
+- `GATE_BOUND` bounds every declared command and kills it on breach; nothing bounds an agent-launched process except `tools/process-monitor/`.
+- An adopter's bar holds a leg by `subject = "kit"` alone: govkit never emits `chunk`, so a shipped self-test declares it in its descriptor (`aBenchedProbe`).
+- A CLOSED Tier-2 unit owes an acceptance ledger in a `journal` record; the grammar is `memory/HYGIENE.md` "Acceptance ledger".
+- A live spec retiring a named thing owes a `**Readers:**` clause (hygiene check 25), and a CLOSED unit whose spec grades THIN blocks `build-complete`.
+- A live spec's leg line names every leg its files-touched trips: `python tools/check-spec-tokens.py --list` prints them before the spec is dated.
+- A spec audit is owed only where the owner declares `spec-audit:` or `SPEC_AUDIT_DEFAULT`; a run never declares either, and kickoff asks.
+- Before working inside a kit, `git log origin/main --oneline -20 -- tools/<kit>/` shows whether another node is rewriting it.
+- `tools/unattended/check-unattended.sh` carries raw CR bytes in its awk regexes: edit it in binary mode (`memory/gotchas/text-mode-read-eats-a-bare-cr.md`).
+- The read-path byte budget is retired (`TOOL-dSpentCeiling-1`): check 6's per-class caps are the bound, and a sum is not re-added.
+- A live `RUN.md` is outside check 6 by class (`TOOL-cMendedVintage-13`); a retired one is capped.
 
 ### Pointer map (load the row(s) the task touches)
 

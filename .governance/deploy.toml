@@ -20,34 +20,28 @@ kits = [
   "memory-recall", "drift-audit", "agent-instructions", "unattended", "lexicon",
   "pytest-parallel-guardrails", "gate-lint", "agent-cap", "review-harness",
   "settings-merge", "check-wiring", "push-main", "check-kit-versions", "check-install-prefix",
+  "runlog",
+  "process-monitor",
 ]
 
-# `security-outbound` and `cross-os` apply here, so both stay: this fleet is multi-OS (four nodes,
-# Windows and POSIX shells), and the security section's outbound surface exists. `node-table` is
-# dropped (PLAY-aMendedFleet-4): the four-node registry is the wrapper's `## Node registry` table,
-# above the rendered region, and a one-row §2 table beside it was a second, incomplete registry.
-drop_blocks = ["node-table"]
+# NO `drop_blocks`. `cross-os` applies: this fleet is multi-OS, four nodes on Windows and POSIX
+# shells. `node-table` was dropped here until v4.0, when the node registry became the generated table
+# rendered from the fleet registry (PLAY-aDistilledCharter-4), so the wrapper's authored copy went.
 
 [answers]
-# STATED, not sniffed. A probe reading the environment baked node `a`'s identity into a charter on a
-# shared remote; the registry is fleet data and every node's row is authored.
-machine_a = "daily-agent"
-# ASKED since DEPL-aRepatriatedFork-1 S2: their probes answered from the rendering node. These are
-# the values gov's charter already rendered, so the region does not move.
+# ASKED since DEPL-aRepatriatedFork-1 S2: its probe answered from the rendering node. The node
+# answers that sat here went with v4.0: the fleet registry beside the renderer states every node.
 project_name = "coding-governance"
-primary_tree_a = "C:/projects/coding-governance"
-worktree_root_a = "C:/projects/coding-governance/.claude/worktrees"
 # NO `ci_file` ANSWER, deliberately. CI_FILE derives from .github/workflows since
 # TOOL-dDerivedDocket-32, and an answer here would silently revive "none yet" the day the workflow
 # is deleted, where its absence makes the render refuse.
-variances_a = "remote `origin`; Windows + Git-Bash, so give `git -C` forward-slash paths"
 stream_ownership = "no fixed ownership — a solo tooling repo, one stream per work-unit"
 doc_routing_table = "playbook -> the charter template · kickoff -> skills/session-kickoff/ · tooling -> tools/ · deployer -> WIRE-INTO-PROJECT.md"
 product_preamble = "coding-governance ships project-agnostic governance and tooling for running agents across several machines on one repo, and dogfoods every kit it ships"
 repo_layout_map = "root holds the charter template and the runbook · tools/ the deployable kits · skills/session-kickoff/ the kickoff engine · memory/ the dogfooded memory tree"
 command_catalog = "bash tools/run-gates/run-gates.sh (the bar) · GATE_JOBS=1 for the serial rollback · GATE_FULL=1 to ignore every leg guard · bash tools/push-main.sh (the lander)"
 product_context_home = "README.md, plus memory/DECISIONS.md for why anything is the way it is"
-gate_commands = "bash tools/run-gates/run-gates.sh — the legs are single-sourced from tools/gate-legs.json; read that, never a list typed elsewhere"
+gate_commands = "the legs are single-sourced from tools/gate-legs.json; read that, never a list typed elsewhere"
 commit_trailer = "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 worktree_script = "none yet — worktrees are created by hand under .claude/worktrees/"
 kind_factory_map = "kits are the kind: each is a directory under tools/ with a kit.toml descriptor and its own adopter"
@@ -58,3 +52,18 @@ toolchain_notes = "bash + python3 resolved by tools/lib/resolve-python.sh, which
 # where manifest-check.sh finds gov's; the skill installs per machine as a junction to skills/.
 manifest_path = "memory/guides/SESSION-KICKOFF.md"
 user_skills = "~/.claude/skills"
+
+# SECTION 2 of the charter, one rule per line (PLAY-aDistilledCharter-4). Each is what the authored
+# wrapper around the rendered region carried until v4.0 and no practice, guide or answer states.
+[charter]
+adopter_rules = """
+- This repository ships the charter template and the kits under `tools/`, and dogfoods every kit it ships on itself.
+- `.claude/rules/product.md` summarizes what ships; read it before touching `tools/`, `skills/`, the template or `WIRE-INTO-PROJECT.md`.
+- `AGENTS.md` is canonical and `CLAUDE.md` imports it; `tools/agent-instructions/` wires every other agent's filename to it.
+- `skills/session-kickoff/` stays at the repository root, because every machine discovers it through a junction.
+- The memory tree is flat: a spec, review or research record lives in its build's folder, and `memory/project/` holds only the gates' row registries.
+- The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.toml`, which shrinks unless a recorded decision says otherwise.
+- Work state is read from the generated `memory/LIVE.md` and `memory/ledger/`; there is no authored session ledger.
+- Read `memory/guides/MERGE-BAR.md` before running, scoping or debugging a bar, and before any push.
+- `GATE_SELFTESTS=1` runs the held kit self-tests on demand only, and no boundary sets it.
+"""

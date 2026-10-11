@@ -5,4 +5,4 @@
 
 ## Dispositions
 - SEV · DEPL-aBenchedProbe-5 · LOW · documentation only; a govkit-emitted row already carries the subject, and only a hand-wired adopter misses it
-- KEEP · DEPL-aBenchedProbe-5 · a governance carrier this run may not edit (M3 veto 2); left for an owner-authorized edit
+- CLOSED · DEPL-aBenchedProbe-5 · by 36db2dbf4 · the runbook now tells a hand-wiring adopter to declare the lander and hook self-tests "subject": "kit", held unless GATE_SELFTESTS=1 (owner-authorized edit)
