@@ -59,6 +59,7 @@ globs = [
   "tools/run-gates/gate-fingerprint.sh",
   "tools/run-gates/run-gates.turnstile.test.sh",
   "tools/run-gates/run-gates.runlog.test.sh",
+  "tools/run-gates/post-merge.sh",
 ]
 ```
 

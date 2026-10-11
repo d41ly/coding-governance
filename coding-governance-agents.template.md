@@ -6,7 +6,7 @@ from the kits and answers it selected. Change a source and re-render with
 `<prefix>/playbook/adopt-playbook.sh`; never edit the rendered text. Every rule is one line: a tool,
 gate or protocol named in section 3 carries the detail.*
 
-<!-- governance-template: v4.1 -->
+<!-- governance-template: v4.2 -->
 
 ## 1. Governing practices
 
@@ -28,6 +28,7 @@ gate or protocol named in section 3 carries the detail.*
 - [small] Work in small units, one stream each, merged to local {{DEFAULT_BRANCH}} often; risky behaviour lands dark behind a default-off switch.
 - [isolate] Isolate work and runtime: {{DEFAULT_BRANCH}} lives in one tree, and every unit in its own worktree with its own ports and databases.
 - [land] Land on local {{DEFAULT_BRANCH}} as a `--no-ff` merge, gate it, then push; the shared merge and the push each need an explicit ask or the unattended protocol.
+- [post-merge] A scoped landing needs a full bar declared to run after the merge, and its red forces the full bar on every later landing until a full green descends from it.
 - [reconcile] Reconcile shared records additively and diff a merge against both parents; a generated index is re-rendered, never merged.
 - [migrations] Migrations are reversible, tested up, down and up again, and two forks of one parent reconcile through a merge revision, never a rebase.
 - [ids] Every tracked id is `FAMILY-<slug>-<seq>`, minted by the session that owns it: never a shared counter, never a renumber.

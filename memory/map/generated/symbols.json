@@ -1313,6 +1313,11 @@
       "file": "tools/workflows/tier2-review.test.sh"
     },
     {
+      "id": "build_bg_fixture",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "build_big_model",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -1818,6 +1823,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "build_lin_repo",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "build_line",
       "kind": "function",
       "file": "tools/check-line-length.test.sh"
@@ -2001,6 +2011,11 @@
       "id": "build_planted",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_pm_shim",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "build_policy_re",
@@ -3048,6 +3063,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_bar_value",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
       "id": "check_bare_shaped",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -3716,6 +3736,11 @@
       "id": "check_leg_claimable",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "check_lin_control",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
       "id": "check_line",
@@ -6415,6 +6440,11 @@
     {
       "id": "derive_self_rel",
       "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "derive_self_rel",
+      "kind": "function",
       "file": "tools/run-gates/profile_bar.test.sh"
     },
     {
@@ -7756,6 +7786,11 @@
       "id": "inert_only",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "init_declared_merge",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "init_dl_fixture",
@@ -9998,6 +10033,31 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "pm_commit",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "pm_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "pm_red",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "pm_run",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "pm_show",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "pop_guard",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.sh"
@@ -10828,6 +10888,16 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_bg_key",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_bg_marks",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "read_bindings",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -11593,6 +11663,26 @@
       "file": ".githooks/straggler-guard.test.sh"
     },
     {
+      "id": "read_lin_header",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "read_lin_reused",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_lin_stamp",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "read_lin_token",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "read_line",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -11798,6 +11888,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "read_parser_slice",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
       "id": "read_pass_declarations",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -11858,6 +11953,21 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_pm_mark",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
+      "id": "read_pm_remote",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_pm_sums",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "read_pointer",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -11866,6 +11976,16 @@
       "id": "read_pointer_target",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "read_policy_key",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "read_policy_key",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "read_policy_key",
@@ -11996,6 +12116,11 @@
       "id": "read_remote_ci_runs",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "read_remote_red",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "read_rev",
@@ -12776,6 +12901,11 @@
       "id": "remove_procs_ledger",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "remove_red_ref",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "remove_reset_rows",
@@ -15155,6 +15285,11 @@
     {
       "id": "resolve_remote_sh",
       "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "resolve_remote_sh",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
     },
     {
@@ -15750,7 +15885,17 @@
     {
       "id": "run_bar",
       "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "run_bar",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "run_bg_push",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "run_bounded",
@@ -16123,6 +16268,11 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "run_lin_push",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "run_ln",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -16233,6 +16383,21 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "run_pm_case",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
+      "id": "run_pm_decide",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "run_post_merge",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
       "id": "run_prefix_commit",
       "kind": "function",
       "file": ".githooks/pre-commit.test.sh"
@@ -16276,6 +16441,11 @@
       "id": "run_rel27_gate",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "run_remote",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "run_render_helper",
@@ -17401,6 +17571,16 @@
       "id": "set_ak_pristine",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "set_bg_key",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "set_bg_remote",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "set_builds_mode",
@@ -20098,9 +20278,29 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "write_bar_green",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "write_bar_green",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "write_base_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_bg_record",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "write_bg_stamp",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "write_block",
@@ -20373,6 +20573,11 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "write_lin_fix",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
       "id": "write_ln_dod_records",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -20453,6 +20658,16 @@
       "file": "tools/unattended/check-arms-groups.test.sh"
     },
     {
+      "id": "write_pm_red",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "write_post_merge_record",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
       "id": "write_pre_fix_spelling",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -20513,9 +20728,19 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "write_red_ref",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
       "id": "write_refs",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
+    },
+    {
+      "id": "write_refusal",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "write_region",
@@ -20576,6 +20801,11 @@
       "id": "write_run_branch",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "write_run_record",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
     },
     {
       "id": "write_run_record",
