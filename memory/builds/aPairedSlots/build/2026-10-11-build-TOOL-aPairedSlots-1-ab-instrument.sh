@@ -26,6 +26,8 @@
 # joining (owner, 2026-10-11: hold per arm-run). A sampler writes the host's load every SAMPLE_EVERY
 # seconds for the whole arm-run: foreign bars, all bash processes, `/proc/loadavg` and the CPU
 # reading `typeperf` gives. Contamination is RECORDED, never silently excluded.
+# `<root>/heartbeat` moves once a minute while the plan waits or an arm runs, so an out-of-process
+# liveness reader sees a long quiet-host wait as a live task.
 #
 # Usage, all paths forward-slashed:
 #   ab-instrument.sh init <root> <source-repo> <base-sha>  two frozen clones and a frozen bare remote
@@ -57,8 +59,15 @@ cmd_init() { # root source base
   [ -e "$root/remote.git" ] && { print_err "init: $root/remote.git exists; pick a fresh root"; return 1; }
   # FROZEN BY PINNING, NOT BY DELETING: a bare remote advertising exactly `main` at the base, so a
   # leg that reads the default branch reads a value, not an absence. No hook runs on a fetch.
+  # A sha is not fetchable by itself from a repository that does not advertise it, so the source's
+  # remote-tracking default branch is fetched and `main` is then pinned to the FULL base sha, which
+  # must be present after that fetch.
+  base=$(git -C "$src" rev-parse --verify -q "$base^{commit}") || { print_err "init: base names no commit in $src"; return 1; }
   git init -q --bare "$root/remote.git" || return 1
-  git -C "$root/remote.git" fetch -q --no-tags "$src" "$base:refs/heads/main" || return 1
+  git -C "$root/remote.git" fetch -q --no-tags "$src" "+refs/remotes/origin/main:refs/ab/src" || return 1
+  git -C "$root/remote.git" cat-file -e "$base^{commit}" || { print_err "init: $base is not reachable from the source's origin/main"; return 1; }
+  git -C "$root/remote.git" update-ref refs/heads/main "$base" || return 1
+  git -C "$root/remote.git" update-ref -d refs/ab/src
   git -C "$root/remote.git" symbolic-ref HEAD refs/heads/main
   for c in c1 c2; do
     git clone -q --no-hardlinks "$root/remote.git" "$root/$c" || return 1
@@ -105,6 +114,7 @@ run_sampler() { # root arm rep own-pid -> appends rows every SAMPLE_EVERY second
     mf=$(awk '/^MemFree:/ {print $2}' /proc/meminfo 2>/dev/null)
     cpu=$(typeperf '\Processor(_Total)\% Processor Time' -sc 1 2>/dev/null | sed -n 3p | cut -d, -f2 | tr -d '"\r')
     printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$(date +%s)" "$arm" "$rep" "$fb" "$bp" "${la:--}" "${cpu:--}" "${mf:--}" >> "$root/samples.tsv"
+    date +%s > "$root/heartbeat"
     sleep "$SAMPLE_EVERY"
   done
 }
@@ -171,6 +181,7 @@ check_quiet() { # root -> rc 0 once no foreign bar runs, 1 after QUIET_MAX secon
   local root=$1 t0 n
   t0=$(date +%s)
   while :; do
+    date +%s > "$root/heartbeat"
     n=$(scan_foreign_bars "$$")
     [ "$n" = 0 ] && return 0
     [ $(( $(date +%s) - t0 )) -ge "$QUIET_MAX" ] && { print_err "quiet: $n foreign bar(s) still running after ${QUIET_MAX}s; running anyway, recorded"; return 1; }
