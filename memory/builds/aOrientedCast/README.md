@@ -3,7 +3,6 @@ slug: aOrientedCast
 node: a
 opened: 2026-10-11
 streams: tooling+kickoff+playbook
-status: INPROGRESS
 roster: TOOL+KICK+PLAY
 ids: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8
 authorized-by: prompt
@@ -69,23 +68,46 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 0 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
+**Build status:** OPEN · 11 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
 ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [KICK-aOrientedCast-1 — the card's task gains To-do and Reuse, and a READY body lands only with every task field filled](spec/2026-10-11-spec-KICK-aOrientedCast-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aOrientedCast-1 — the role catalogue: one owner-editable agent definition per role, the workflow table, and the checker that keeps them agreeing](spec/2026-10-11-spec-TOOL-aOrientedCast-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aOrientedCast-2 — the handoff renderer: a role's constant block and a task block rendered from the card, the brief and the unit, into one prompt file](spec/2026-10-11-spec-TOOL-aOrientedCast-2.md) | 2 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aOrientedCast-3 — the role catalogue renders native agent types, trimmed of the charter](spec/2026-10-11-spec-TOOL-aOrientedCast-3.md) | 3 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aOrientedCast-4 — the build harnesses spawn their stage agents as catalogue roles](spec/2026-10-11-spec-TOOL-aOrientedCast-4.md) | 4 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aOrientedCast-5 — the review harness spawns each stage as the role its caller names](spec/2026-10-11-spec-TOOL-aOrientedCast-5.md) | 5 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [KICK-aOrientedCast-2 — the attended router: after kickoff's go, `/build` drives a code build through the harness pipeline](spec/2026-10-11-spec-KICK-aOrientedCast-2.md) | 6 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [PLAY-aOrientedCast-1 — the charter: every agent is handed a rendered role, and the main loop delegates](spec/2026-10-11-spec-PLAY-aOrientedCast-1.md) | 7 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aOrientedCast-8 — the roles kit is an adopter default: installed, rendered and reported at install and update](spec/2026-10-11-spec-TOOL-aOrientedCast-8.md) | 8 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aOrientedCast-6 — the write gate admits a spec write only from the spec-writer role and a product write only from the builder role](spec/2026-10-11-spec-TOOL-aOrientedCast-6.md) | 9 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aOrientedCast-7 — the spawn guard refuses an Agent or Workflow call that carries no rendered handoff](spec/2026-10-11-spec-TOOL-aOrientedCast-7.md) | 10 | 2 | OPEN | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 2 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `KICK-aOrientedCast-1`, `TOOL-aOrientedCast-1` | yes |
+| 2 | `TOOL-aOrientedCast-2` | no |
+| 3 | `TOOL-aOrientedCast-3` | no |
+| 4 | `TOOL-aOrientedCast-4` | no |
+| 5 | `TOOL-aOrientedCast-5` | no |
+| 6 | `KICK-aOrientedCast-2` | no |
+| 7 | `PLAY-aOrientedCast-1` | no |
+| 8 | `TOOL-aOrientedCast-8` | no |
+| 9 | `TOOL-aOrientedCast-6` | no |
+| 10 | `TOOL-aOrientedCast-7` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
