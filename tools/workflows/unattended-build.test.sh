@@ -461,7 +461,9 @@ else
   echo "FAIL the file no longer declares per-unit dispatch sequential"; st=1
 fi
 if [ -f "$ROOT/${HOOKS_DIR}/agent-cap.js" ]; then
-  o=$(printf '{"tool_name":"Workflow","tool_input":{"scriptPath":"'"${PFX}${KIT}/unattended-build.js"'"}}' \
+  # `roles` in `args` (TOOL-aOrientedCast-7 S11): where a role index exists, the hook admits a harness
+  # call only when it hands the harness a known role.
+  o=$(printf '{"tool_name":"Workflow","tool_input":{"scriptPath":"'"${PFX}${KIT}/unattended-build.js"'","args":{"roles":{"specWriter":"gov-spec-writer"}}}}' \
       | (cd "$ROOT" && node ${HOOKS_DIR}/agent-cap.js 2>&1); echo "rc=$?")
   n=$((n+1)); case "$o" in *"rc=0"*) echo "ok   agent-cap ADMITS the harness" ;; *) echo "FAIL agent-cap denied the harness -- $o"; st=1 ;; esac
 else

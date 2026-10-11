@@ -1193,6 +1193,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "buildTaskDigest",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "build_aborted_run",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -2751,6 +2756,16 @@
       "id": "checkEmptyTempVar",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkHandoffSpawn",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "checkHarnessCall",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "checkLiteralOpen",
@@ -7128,9 +7143,24 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "extractHandoffMarker",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "extractRouteUnits",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "extractTaskSection",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "extractWorkflowArgs",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "extract_acceptance",
@@ -13173,6 +13203,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderHandoffDeny",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "renderIntent",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -16300,6 +16335,11 @@
     {
       "id": "run_harness",
       "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "run_harness",
+      "kind": "function",
       "file": "tools/lib/lib-selftest.test.sh"
     },
     {
@@ -16711,6 +16751,11 @@
       "id": "run_skip_leg",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "run_spawn",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
     },
     {
       "id": "run_spec_commit_block",
@@ -20598,6 +20643,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "write_handoff",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
       "id": "write_handoff_spec",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
@@ -20856,6 +20906,11 @@
       "id": "write_rev_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_roles",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
     },
     {
       "id": "write_roles",

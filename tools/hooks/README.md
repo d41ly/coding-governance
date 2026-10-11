@@ -167,9 +167,12 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
 
 ## Running ONE rule
 
-`--only=<rule>` narrows the hook to a single rule, over a closed set whose only member today is
-`join`. Anything outside the set is REFUSED with the set named, rather than silently matching
-nothing. It exists so a file gate can share this predicate instead of re-implementing it.
+`--only=<rule>` narrows the hook over a closed set: `join` is rule 5 alone, and `scripts` is rules 1,
+2, 3 and 5, the rules that read a script, without rules 0 and 6, which judge the call. Anything
+outside the set is REFUSED with the set named, rather than silently matching nothing. It exists so a
+file gate can share this predicate instead of re-implementing it: the review-join gate asks for
+`join`, and the verifier fan-out gate for `scripts`, because it feeds committed scripts as inline
+`script` payloads that rule 6 refuses wherever a role index exists.
 
 **A WIRED command must never carry it.** `--only=join` in `.claude/settings.json` would turn the cap
 rules off with no diff and a hook that still looks wired. `<prefix>/check-wiring.sh` asserts its absence.
@@ -187,6 +190,36 @@ reaching a fan-out made outside a workflow script, which is why the matcher must
 
 `AGENT_CAP` in the environment is REFUSED, not honoured — the ceiling is a file constant. A ready-made
 harness that satisfies every rule above ships at `<prefix>/workflows/tier2-review.js`.
+
+## Rule 6 — every agent prompt is a rendered handoff
+
+`TOOL-aOrientedCast-7`. Armed by `.claude/roles.json` at the checkout root of the payload `cwd`,
+read through scratch-guard's `loadRoleIndex`, so the two hooks read one index identically:
+
+- **absent** — no rule; every verdict is as before;
+- **broken** — every `Agent` and `Workflow` call is refused, naming the file;
+- **no `agent`-true role** — every `Agent` call is refused as UNARMED; **an empty `harnesses`
+  list** — every `Workflow` call is refused as UNARMED.
+
+An `Agent` call passes only when `subagent_type` is an `agent`-true role (a built-in type such as
+`Explore` or `general-purpose` never is), and `prompt`, line endings folded and its ends trimmed, is
+exactly the output of `handoff.py render --role <name> --build <slug> --part task`: ONE
+`gov:handoff` marker line naming that role, blank lines, then the `## Task` section of the file the
+marker's `path` names. That path is repo-relative under `builds/<build>/prompts/`; the file must hold
+the same single marker, and its section must hash to the marker's `task-sha`, so a file edited after
+rendering is refused too. A refusal names the first prompt line that differs; resend the file's bytes.
+
+A `Workflow` call passes only by a `scriptPath` listed in `harnesses` (never an inline `script` or a
+`name:` run), with `args.roles` a non-empty object whose every value is an `agent`-true role: pass
+what `handoff.py harness-args <harness>` prints.
+
+ORDER: after the `AGENT_CAP` refusal and the declared-cap read; before rule 4, so a refused spawn
+claims no slot; before rule 0. Skipped under any `--only=`. A throw inside the rule refuses.
+
+**What it does not stop**, said rather than implied: a hook-less or `--bare` run; the agents a running
+harness spawns through its own `agent()`, which is a runtime call and not a tool call; a
+session-to-session message; a hand-written prompt file that agrees with itself; and a hand-edited
+index. It never compares `role-sha` with the role an agent type was rendered from.
 
 ## Lowering the cap — `.agent-cap.conf`
 

@@ -1,12 +1,13 @@
 # TOOL-aOrientedCast-7 — the spawn guard refuses an Agent or Workflow call that carries no rendered handoff
 
-**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 10 · ratified 2026-10-11
+**Status:** CLOSED · rev-3 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 10 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-11-build-TOOL-aOrientedCast-1-cross-read.md](../build/2026-10-11-build-TOOL-aOrientedCast-1-cross-read.md) | research | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-8 |
+| [2026-10-11-build-TOOL-aOrientedCast-7-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aOrientedCast-7-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aOrientedCast-1-1-spec-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-1-spec-brief.md) | journal | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-8 |
 | [2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md) | journal | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-8 |
 | [2026-10-11-prompt-TOOL-aOrientedCast-1-3-cross-read.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-3-cross-read.md) | journal | KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-8 |
@@ -63,6 +64,13 @@ its `args` hand that harness a `roles` object of known roles.
 - **S10** — The arms live in `tools/hooks/agent-cap.test.sh` over a fixture repository the suite
   builds, each observed RED on a staged break first. Every arm that exists today runs with no index,
   which is S2's absent case observed unchanged. Observed by AC1 to AC5.
+- **S11** — The `--only=` selector's closed set gains `scripts`: rules 1, 2, 3 and 5, the rules that
+  read a script, and never rule 0 or rule 6, which judge the call. `check-verifier-fanout.sh` passes
+  it, because that gate feeds every committed workflow script to the hook as an inline `script` from
+  the checkout root, and rule 6 refuses an inline script wherever an index exists, gov's tree
+  included. The `unattended-build.test.sh` arm that asks the hook to admit the build harness passes
+  `roles` in its `args`. A wired command still carries no `--only=`, which `check-wiring.sh` already
+  asserts for any value. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -135,6 +143,12 @@ Read at `646d4a73` on 2026-10-11; nothing under `tools/` or `.claude/` moved bet
 - The file requires `scratch-guard.js` lazily for `readConfKey` and `readFrontMatterKey` (`:1865`,
   `:1947`), and it ends in a bare `main()` (`:2216`), so it exports nothing.
 - `.claude/settings.json:5` wires it on `Workflow|Agent`, so no wiring changes.
+- Two callers outside the hooks kit run the hook on a payload no tool call sends: the
+  `verifier fan-out` leg (`tools/workflows/check-verifier-fanout.sh`) pipes each committed workflow
+  script as an inline `script` with no `cwd`, from the checkout root, and an arm of
+  `tools/workflows/unattended-build.test.sh` pipes the build harness's `scriptPath` with no `args`.
+  Found at the build pass, 2026-10-12, by grepping every caller of `agent-cap.js`; `check-review-join.sh`
+  already passes `--only=join` and never meets rule 6.
 - The `Agent` tool input carries `subagent_type` and `prompt`, and the `Workflow` tool input carries
   `scriptPath`, `script`, `name` and `args`: verified 2026-10-11 on node a from the tool-use blocks the
   measurement below reads.
@@ -259,7 +273,7 @@ owed until then.
 
 ### Files touched (estimate)
 
-`tools/hooks/agent-cap.js` · `tools/hooks/agent-cap.test.sh` · `tools/hooks/README.md` · `memory/map/features/agent-cap.md` · `memory/map/generated/symbols.json`
+`tools/hooks/agent-cap.js` · `tools/hooks/agent-cap.test.sh` · `tools/hooks/README.md` · `tools/workflows/check-verifier-fanout.sh` · `tools/workflows/unattended-build.test.sh` · `memory/map/features/agent-cap.md` · `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -326,9 +340,10 @@ owed until then.
   slot, and an inline `script` that passes rules 1 to 5 exits 0, as at base. With `roles.json` holding
   `{`, both exit 2 naming the index. With no `agent`-true role, the `Agent` call exits 2 naming
   `UNARMED`; with `harnesses` empty, the `Workflow` call exits 2 naming `UNARMED`. Under `--only=join`
-  neither call meets rule 6.
-  Red when: a broken or empty index admits, an absent index moves a verdict, or the join selector runs
-  rule 6.
+  neither call meets rule 6, and under `--only=scripts` the inline `script` exits 0 with the index
+  broken while a raw `parallel(` in it exits 2.
+  Red when: a broken or empty index admits, an absent index moves a verdict, or either selector runs
+  rule 6, or the `scripts` selector skips the fan-out rules.
 - **AC6** — When the `--part task` output of `handoff.py render` for a fixture card, brief and spec is
   passed as `prompt` with `subagent_type` its role, the hook exits 0, and the hook's digest of that
   file's `## Task` section equals the `task-sha` that `handoff.py check` re-derives.
@@ -345,7 +360,7 @@ owed until then.
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `review-join self-test` · `verifier fan-out self-test` · `recall floor` · `recall floor arms` · `agent-cap restatement` · `hook destinations (every declared hook path ships)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`agent-cap self-test` · `scratch-guard self-test` · `hook destinations self-test` · `review-join self-test` · `verifier fan-out self-test` · `verifier fan-out` · `tier2-review self-test` · `unattended-build self-test` · `recall floor` · `recall floor arms` · `agent-cap restatement` · `hook destinations (every declared hook path ships)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/hooks/agent-cap.test.sh · covers AC1 AC2 AC3 AC4 AC5 · the base hook, which admits every Agent call under the slot cap and every Workflow call whose script passes rules 0 to 5 · none
 
@@ -415,6 +430,12 @@ once; no pass runs them.
   `TOOL-aOrientedCast-4`, `TOOL-aOrientedCast-5`, `KICK-aOrientedCast-2` and `TOOL-aOrientedCast-9`,
   and the Rollout's precondition on the unattended verbs is that last unit at its order 6, not an
   unscheduled owner turn.
+- rev-3 · 2026-10-12 · S11 · §4 Evidence · Files touched · AC5. The build pass found that the
+  `verifier fan-out` merge-bar leg pipes every committed workflow script to the hook as an inline
+  `script` from the checkout root, which rule 6 refuses under gov's index, and that an
+  `unattended-build.test.sh` arm asks the hook to admit the build harness with no `roles`. S11 adds
+  `--only=scripts` for the leg and `roles` for the arm; AC5 observes the selector. §7 gains the
+  `verifier fan-out` leg and the two self-tests whose guards the two new paths trip.
 
 ## 10. Reuse audit
 
