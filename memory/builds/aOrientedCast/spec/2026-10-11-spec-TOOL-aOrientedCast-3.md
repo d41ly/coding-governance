@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-3 — the role catalogue renders native agent types, trimmed of the charter
 
-**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 3 · ratified 2026-10-11
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 3 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 

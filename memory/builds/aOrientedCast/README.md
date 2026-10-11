@@ -70,7 +70,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 12 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
+**Build status:** INPROGRESS · 12 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
 ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9
 
 <!-- gen:build-units -->
@@ -79,7 +79,7 @@ ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOriente
 | [KICK-aOrientedCast-1 — the card's task gains To-do and Reuse, and a READY body lands only with every task field filled](spec/2026-10-11-spec-KICK-aOrientedCast-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aOrientedCast-1 — the role catalogue: one owner-editable agent definition per role, the workflow table, and the checker that keeps them agreeing](spec/2026-10-11-spec-TOOL-aOrientedCast-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aOrientedCast-2 — the handoff renderer: a role's constant block and a task block rendered from the card, the brief and the unit, into one prompt file](spec/2026-10-11-spec-TOOL-aOrientedCast-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-11 |
-| [TOOL-aOrientedCast-3 — the role catalogue renders native agent types, trimmed of the charter](spec/2026-10-11-spec-TOOL-aOrientedCast-3.md) | 3 | 2 | OPEN | rev-2 | 2026-10-11 |
+| [TOOL-aOrientedCast-3 — the role catalogue renders native agent types, trimmed of the charter](spec/2026-10-11-spec-TOOL-aOrientedCast-3.md) | 3 | 2 | INPROGRESS | rev-2 | 2026-10-11 |
 | [TOOL-aOrientedCast-4 — the build harnesses spawn their stage agents as catalogue roles](spec/2026-10-11-spec-TOOL-aOrientedCast-4.md) | 4 | 2 | OPEN | rev-2 | 2026-10-11 |
 | [TOOL-aOrientedCast-5 — the review harness spawns each stage as the role its caller names](spec/2026-10-11-spec-TOOL-aOrientedCast-5.md) | 5 | 2 | OPEN | rev-2 | 2026-10-11 |
 | [KICK-aOrientedCast-2 — the attended router: after kickoff's go, `/build` drives a code build through the harness pipeline](spec/2026-10-11-spec-KICK-aOrientedCast-2.md) | 6 | 2 | OPEN | rev-2 | 2026-10-11 |
