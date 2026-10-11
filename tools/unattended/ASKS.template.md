@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.96 -->
+<!-- gov:kit unattended@1.97 -->
 # Unattended runs — the asks
 
 *Installed beside `UNATTENDED-PROTOCOL.md` from the unattended kit, and byte-compared against the
