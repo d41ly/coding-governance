@@ -12298,6 +12298,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_slots_key",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "read_slug",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"

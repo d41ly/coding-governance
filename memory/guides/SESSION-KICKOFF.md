@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-11T04:55:40+03:00 @ 02755258f138ecd3b4a3e9e74788506160525caa
+last-audit: 2026-10-11T17:46:57+03:00 @ effdaaf1d32665296e7b2e727b46a98020db0d6c
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 02755258f138ecd3b4a3e9e74788506160525caa
+last-body-change: effdaaf1d32665296e7b2e727b46a98020db0d6c
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -168,10 +168,11 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
 - A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
   and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
   `TOOL-aPromptedMandate-4`.
-- The turnstile serializes bars WITHIN one repository only; sessions on this node still contend
-  across repos. `both expired ... unproven either way` means contention, and now SKIPS that arm
-  loudly rather than redding — re-run quiet before believing a latency claim.
-  `TOOL-aPacedTurnstile-2`.
+- The turnstile is HOST-wide and admits a profile row's `slots` bars at once, one by default
+  (`TOOL-aFrugalTurnstile-5`, `TOOL-aPairedSlots-1`), but a runner older than aFrugalTurnstile keys
+  on its own common dir and never sees it, so sessions on such checkouts still contend. `both
+  expired ... unproven either way` means contention, and SKIPS that arm loudly rather than redding —
+  re-run quiet before believing a latency claim. `TOOL-aPacedTurnstile-2`.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it: checks
   5, 9 and 21 all fired only once the folder was staged.

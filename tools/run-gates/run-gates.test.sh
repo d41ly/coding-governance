@@ -1382,7 +1382,7 @@ printf '%s\n' "$o" | grep -q 'big' \
 #     the only forcing function a coverage knob would ever meet.
 # `mempause` joined at TOOL-aGraftedHelix-7: it holds a dispatch while used memory is high and every
 # hold ends, so it costs speed and never a leg — read against the invariant before it was pinned.
-PINNED_KNOBS="mempause timeout wall width"
+PINNED_KNOBS="mempause slots timeout wall width"
 PTBL="$KITREL/gate-profiles.txt"
 n=$((n+1))
 if [ ! -f "$PTBL" ]; then
@@ -3151,6 +3151,34 @@ _mpo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/t80.txt" GATE_PROFILE= GATE_MEMPA
           GATE_CGROUP_ROOT="$MP/cg" bash $KIT_REL/run-gates.sh --print-profile 2>&1 )
 check_mp_value "AC1 GATE_MEMPAUSE=x prints one NOTE" "$(printf '%s\n' "$_mpo" | grep -c '^run-gates: NOTE - GATE_MEMPAUSE=')" 1
 check_mp_value "AC1 and leaves the pause off" "$(printf '%s\n' "$_mpo" | awk -F'\t' '$1 == "line" && /mempause off;/ { c++ } END { print c + 0 }')" 1
+
+# 11s. THE SLOTS KNOB (TOOL-aPairedSlots-1 AC1 to AC3), over this section's fixture. `slots` is how
+#      many bars the host turnstile admits; a row without it reads 1, `GATE_TURNSTILE_SLOTS` replaces
+#      the row's value, a malformed override is ignored with a NOTE, 0 refuses, and the profile line
+#      carries the field ONLY above 1, so a bar at the kit default prints the line it always printed.
+read_slots_key() { # VAR=value… -> the `slots` key and the profile line --print-profile prints, TAB-joined
+  ( cd "$MP/r" && env GATE_PROFILES= GATE_PROFILE= GATE_JOBS= GATE_TURNSTILE_SLOTS= GATE_MEMPAUSE= \
+      GATE_CGROUP_ROOT="$MP/cg" "$@" bash $KIT_REL/run-gates.sh --print-profile 2>/dev/null ) \
+    | awk -F'\t' '$1 == "slots" { k = $2 } $1 == "line" { l = $2 } END { printf "%s\t%s", k, l }'
+}
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,mempause=0,slots=3\n' > "$MP/x/ts3.txt"
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,mempause=0\n' > "$MP/x/ts0.txt"
+_slk=$(read_slots_key GATE_PROFILES="$MP/x/ts3.txt")
+check_mp_value "slots AC1 a row declaring slots=3 prints 3" "${_slk%%$'\t'*}" 3
+check_mp_value "slots AC3 and its line carries the field" "$(case "${_slk#*$'\t'}" in *'mempause off, slots 3;'*) echo yes ;; esac)" yes
+_slk=$(read_slots_key GATE_PROFILES="$MP/x/ts0.txt")
+check_mp_value "slots AC1 a row declaring none prints 1" "${_slk%%$'\t'*}" 1
+check_mp_value "slots AC3 and its line is the kit-default line, no slots field" "$(case "${_slk#*$'\t'}" in *slots*) echo field ;; *'mempause off; '*) echo plain ;; esac)" plain
+_slk=$(read_slots_key GATE_PROFILES="$MP/x/ts0.txt" GATE_TURNSTILE_SLOTS=2)
+check_mp_value "slots AC2 GATE_TURNSTILE_SLOTS=2 over a row declaring none prints 2" "${_slk%%$'\t'*}" 2
+_slo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/ts3.txt" GATE_PROFILE= GATE_TURNSTILE_SLOTS=abc GATE_CGROUP_ROOT="$MP/cg" \
+          bash $KIT_REL/run-gates.sh --print-profile 2>&1 )
+check_mp_value "slots AC2 GATE_TURNSTILE_SLOTS=abc prints one NOTE" "$(printf '%s\n' "$_slo" | grep -c "^run-gates: NOTE - GATE_TURNSTILE_SLOTS='abc'")" 1
+check_mp_value "slots AC2 and leaves the row's 3" "$(printf '%s\n' "$_slo" | awk -F'\t' '$1 == "slots" { print $2 }')" 3
+printf 't\t0\t0\twidth=2,timeout=0,wall=0,slots=0\n' > "$MP/x/tsz.txt"
+_slo=$( cd "$MP/r" && env GATE_PROFILES="$MP/x/tsz.txt" GATE_PROFILE= GATE_TURNSTILE_SLOTS= bash $KIT_REL/run-gates.sh --print-profile 2>&1 ); _slrc=$?
+check_mp_value "slots S1 a row carrying slots=0 exits 2" "$_slrc" 2
+check_mp_value "slots S1 and its refusal names the knob" "$(printf '%s\n' "$_slo" | grep -c "knob 'slots'")" 1
 
 # 11b. AC5 — a held dispatch waits for the reading to FALL. A rewrites the meminfo to 10 % after 3 s.
 write_mp_meminfo "$MP/x/m5" 95

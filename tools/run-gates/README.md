@@ -311,6 +311,7 @@ it knows:
 | `name` · `width` · `timeout` | the selected row, the effective width and its per-leg timeout |
 | `wall` | the whole-run wall in seconds, `GATE_WALL` over the row's own; 0 is no wall |
 | `queue` | the turnstile's bounded wait in seconds, the declared multiple of the TTL, derived before the verb exits |
+| `slots` | how many bars the host turnstile admits at once: the row's `slots` knob, 1 where it declares none, `GATE_TURNSTILE_SLOTS` over it. The profile line carries `, slots <n>` only above 1 |
 | `ceiling_max` | the largest positive leg `ceiling` in the resolved manifest, or `-` when no leg declares one; ABSENT when the manifest does not parse |
 | `ceilings` · `line` | whether per-leg ceilings are live here, and the profile line a bar prints |
 | `mempause` | the memory pause's effective threshold, `GATE_MEMPAUSE` over the row's own; 0 is off. A host that gives no reading shows as `mempause INERT` on `line` |

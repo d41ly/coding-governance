@@ -52,6 +52,15 @@
 #                limit, the HIGHER of the two; a host with neither reads INERT and says so.
 #                `GATE_MEMPAUSE=<pct>` overrides the row's value alone. TOOL-aGraftedHelix-7.
 #
+#   slots=<n>    how many bars the host turnstile admits at once; a row that omits it gets 1, the
+#                one-bar-per-host behaviour, and 0 is refused. It schedules bars and never legs: a
+#                bar admitted beside another runs every leg it would have run alone.
+#                `GATE_TURNSTILE_SLOTS=<n>` overrides the row's value alone, and a malformed one is
+#                ignored with a NOTE. A host admits the LARGEST count any of its repositories
+#                declares, because every runner claims among its own slots and all share slot 1.
+#                A row's value is a measurement on that hardware, argued beside the row; node
+#                `a`'s comes from the two-bar A/B of TOOL-aPairedSlots-9. TOOL-aPairedSlots-1.
+#
 # OVERRIDES: `GATE_PROFILE=<name>` selects a row by name and skips detection. `GATE_PROFILES=<path>`
 # points at a different table; a path that does not exist falls back to the built-in formula, which
 # is the documented rollback for this whole mechanism. `GATE_JOBS=<n>` overrides the WIDTH alone and

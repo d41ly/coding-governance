@@ -423,7 +423,10 @@ TIMINGS="$LEDGER"
 # slower, and it may turn an unbounded hang into a bounded RED. It may never make the bar check less.
 # KNOWN_KNOBS is the whole implemented set; the canary PINS the same set separately, which is what
 # stops a coverage knob being added without an author reading this paragraph.
-KNOWN_KNOBS="width timeout wall mempause"
+# `slots` (TOOL-aPairedSlots-1) is how many bars the host turnstile admits at once. It schedules bars
+# and never legs, so it sits inside the invariant: a bar admitted beside another runs every leg it
+# would have run alone.
+KNOWN_KNOBS="width timeout wall mempause slots"
 PROFILES="${GATE_PROFILES:-$KITREL/gate-profiles.txt}"
 prof_die() { echo "run-gates: $*" >&2; exit 2; }
 
@@ -664,7 +667,7 @@ add_health_event() {
 }
 # <<< health_log_sh
 
-PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_WALL=0; PROF_MEMPAUSE=0; PROF_TAG=""; PROF_WHERE=""
+PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_WALL=0; PROF_MEMPAUSE=0; PROF_SLOTS=1; PROF_TAG=""; PROF_WHERE=""
 if [ -f "$PROFILES" ]; then
   # GATE_PROFILE names a row and SKIPS detection; otherwise the first row both thresholds satisfy.
   if [ -n "${GATE_PROFILE:-}" ]; then PROF_WHERE="detection skipped"
@@ -705,6 +708,10 @@ if [ -f "$PROFILES" ]; then
       # and could never hold. Refused like any malformed knob rather than clamped (TOOL-aGraftedHelix-7).
       [ "${k%%=*}" = mempause ] && [ "$((10#${k#*=}))" -gt 100 ] \
         && prof_die "$PROFILES:$ln: knob 'mempause' is a percent of used memory, 0 to 100: '${k#*=}'"
+      # A COUNT OF HOLDERS, so 0 would be a turnstile that admits nothing and every bar would queue to
+      # its fail-open bound. Refused like any malformed knob (TOOL-aPairedSlots-1).
+      [ "${k%%=*}" = slots ] && [ "$((10#${k#*=}))" -lt 1 ] \
+        && prof_die "$PROFILES:$ln: knob 'slots' is how many bars the host turnstile admits at once, 1 or more: '${k#*=}'"
     done
     declared="$declared $pname"
     [ -n "$sel" ] && continue
@@ -725,7 +732,8 @@ if [ -f "$PROFILES" ]; then
   IFS=, read -ra kv <<<"$selknobs"
   for k in "${kv[@]}"; do
     case "${k%%=*}" in width) PROF_WIDTH=${k#*=} ;; timeout) PROF_TIMEOUT=${k#*=} ;;
-                        wall) PROF_WALL=${k#*=} ;; mempause) PROF_MEMPAUSE=$((10#${k#*=})) ;; esac
+                        wall) PROF_WALL=${k#*=} ;; mempause) PROF_MEMPAUSE=$((10#${k#*=})) ;;
+                        slots) PROF_SLOTS=$((10#${k#*=})) ;; esac
   done
   [ -n "$PROF_WIDTH" ] || prof_die "$PROFILES: row '$sel' declares no width knob"
   PROF_TAG="detected"
@@ -972,7 +980,22 @@ fi
 prof_m=off; prof_mrec=off
 [ "$MEMPAUSE" -gt 0 ] && { prof_m="${MEMPAUSE}%"; prof_mrec=$MEMPAUSE; }
 [ "$MEMPAUSE_INERT" = 1 ] && { prof_m=INERT; prof_mrec=inert; }
-PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c, wall $prof_w, mempause $prof_m; $PROF_TAG)"
+# THE SLOT COUNT (TOOL-aPairedSlots-1): the row's `slots`, 1 where it declares none, replaced by
+# `GATE_TURNSTILE_SLOTS`. A malformed override is IGNORED with a NOTE rather than refused, as
+# `GATE_JOBS` is clamped rather than refused: this knob only schedules bars, so the row's value is a
+# safe answer and a refusal would stop a bar over a scheduling preference. The line gains the field
+# ONLY above 1, so a run at the kit default prints the line it printed before the knob existed.
+if [ -n "${GATE_TURNSTILE_SLOTS:-}" ]; then
+  case "$GATE_TURNSTILE_SLOTS" in
+    *[!0-9]*|????????????????*) _ps_ok=0 ;;
+    *) _ps_ok=1; [ "$((10#$GATE_TURNSTILE_SLOTS))" -ge 1 ] || _ps_ok=0 ;;
+  esac
+  if [ "$_ps_ok" = 1 ]; then PROF_SLOTS=$((10#$GATE_TURNSTILE_SLOTS))
+  else echo "run-gates: NOTE - GATE_TURNSTILE_SLOTS='$GATE_TURNSTILE_SLOTS' is not a count of 1 or more, so the profile's $PROF_SLOTS slot(s) stand" >&2; fi
+  unset _ps_ok
+fi
+prof_s=""; [ "$PROF_SLOTS" -gt 1 ] && prof_s=", slots $PROF_SLOTS"
+PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c, wall $prof_w, mempause $prof_m$prof_s; $PROF_TAG)"
 
 # HOISTED ABOVE `--print-profile`, TOOL-dDerivedDocket-27 S3. That verb reports the queue bound,
 # and a queue printed before the TTL is resolved reads 0, which is a bound on nothing. Deriving it
@@ -1046,6 +1069,8 @@ sys.stdout.write(str(max(c)) if c else "-")
   printf 'timeout\t%s\n'   "$PROF_TIMEOUT"
   printf 'wall\t%s\n'      "$WALL"
   printf 'queue\t%s\n'     "$TS_MAXWAIT"
+  # How many bars the host turnstile admits at once, after the override (TOOL-aPairedSlots-1).
+  printf 'slots\t%s\n'     "$PROF_SLOTS"
   [ -n "$PROF_CEILING_MAX" ] && printf 'ceiling_max\t%s\n' "$PROF_CEILING_MAX"
   printf 'ceilings\t%s\n'  "$CEILINGS_LIVE"
   # The EFFECTIVE threshold, 0 for off. INERT is a fact about the host and rides `line`; a second
