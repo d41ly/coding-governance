@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: tooling
 roster: TOOL
-ids: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7 TOOL-aHomedAnchor-8 TOOL-aHomedAnchor-9 TOOL-aHomedAnchor-10 TOOL-aHomedAnchor-11 TOOL-aHomedAnchor-12 TOOL-aHomedAnchor-13 TOOL-aHomedAnchor-14 TOOL-aHomedAnchor-15 TOOL-aHomedAnchor-16 TOOL-aHomedAnchor-17 TOOL-aHomedAnchor-18 TOOL-aHomedAnchor-19 TOOL-aHomedAnchor-20 TOOL-aHomedAnchor-21 TOOL-aHomedAnchor-22 TOOL-aHomedAnchor-23 TOOL-aHomedAnchor-24 TOOL-aHomedAnchor-25 TOOL-aHomedAnchor-26 TOOL-aHomedAnchor-27
+ids: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7 TOOL-aHomedAnchor-8 TOOL-aHomedAnchor-9 TOOL-aHomedAnchor-10 TOOL-aHomedAnchor-11 TOOL-aHomedAnchor-12 TOOL-aHomedAnchor-13 TOOL-aHomedAnchor-14 TOOL-aHomedAnchor-15 TOOL-aHomedAnchor-16 TOOL-aHomedAnchor-17 TOOL-aHomedAnchor-18 TOOL-aHomedAnchor-19 TOOL-aHomedAnchor-20 TOOL-aHomedAnchor-21 TOOL-aHomedAnchor-22 TOOL-aHomedAnchor-23 TOOL-aHomedAnchor-24 TOOL-aHomedAnchor-25 TOOL-aHomedAnchor-26 TOOL-aHomedAnchor-27 TOOL-aHomedAnchor-28
 authorized-by: prompt
 ---
 
@@ -66,13 +66,14 @@ None yet.
 | 6 | `TOOL-aHomedAnchor-25` | 1 | two suite fixtures follow other builds' carriers |
 | 6 | `TOOL-aHomedAnchor-26` | 1 | the F4 harness initialises the filer's driver globals (held ask -19) |
 | 6 | `TOOL-aHomedAnchor-27` | 1 | govkit reads the paths it guards as UTF-8 (held ask -12) |
+| 6 | `TOOL-aHomedAnchor-28` | 1 | the unattended-build self-test's budget re-declared (held ask -21) |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 13 unit(s) · node a · opened 2026-10-09 · streams tooling
+**Build status:** INPROGRESS · 14 unit(s) · node a · opened 2026-10-09 · streams tooling
 ids TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7 TOOL-aHomedAnchor-8 TOOL-aHomedAnchor-9 TOOL-aHomedAnchor-10 TOOL-aHomedAnchor-11 TOOL-aHomedAnchor-12 TOOL-aHomedAnchor-13 TOOL-aHomedAnchor-14
-ids TOOL-aHomedAnchor-15 TOOL-aHomedAnchor-16 TOOL-aHomedAnchor-17 TOOL-aHomedAnchor-18 TOOL-aHomedAnchor-19 TOOL-aHomedAnchor-20 TOOL-aHomedAnchor-21 TOOL-aHomedAnchor-22 TOOL-aHomedAnchor-23 TOOL-aHomedAnchor-24 TOOL-aHomedAnchor-25 TOOL-aHomedAnchor-26 TOOL-aHomedAnchor-27
+ids TOOL-aHomedAnchor-15 TOOL-aHomedAnchor-16 TOOL-aHomedAnchor-17 TOOL-aHomedAnchor-18 TOOL-aHomedAnchor-19 TOOL-aHomedAnchor-20 TOOL-aHomedAnchor-21 TOOL-aHomedAnchor-22 TOOL-aHomedAnchor-23 TOOL-aHomedAnchor-24 TOOL-aHomedAnchor-25 TOOL-aHomedAnchor-26 TOOL-aHomedAnchor-27 TOOL-aHomedAnchor-28
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -90,14 +91,15 @@ ids TOOL-aHomedAnchor-15 TOOL-aHomedAnchor-16 TOOL-aHomedAnchor-17 TOOL-aHomedAn
 | [TOOL-aHomedAnchor-25 — two suite fixtures follow the carriers other builds changed](spec/2026-10-11-spec-TOOL-aHomedAnchor-25.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
 | [TOOL-aHomedAnchor-26 — the F4 filer harness initialises the driver globals the filer appends to](spec/2026-10-11-spec-TOOL-aHomedAnchor-26.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
 | [TOOL-aHomedAnchor-27 — govkit reads the paths it guards as UTF-8](spec/2026-10-11-spec-TOOL-aHomedAnchor-27.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
+| [TOOL-aHomedAnchor-28 — the unattended-build self-test's budget is re-declared from readings](spec/2026-10-11-spec-TOOL-aHomedAnchor-28.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
 Records: 12 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aHomedAnchor-26 TOOL-aHomedAnchor-27.
+Ids no record names: TOOL-aHomedAnchor-26 TOOL-aHomedAnchor-27 TOOL-aHomedAnchor-28.
 
 Ids no `spec-audit` record has ever named: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7 TOOL-aHomedAnchor-22 TOOL-aHomedAnchor-23 TOOL-aHomedAnchor-24 TOOL-aHomedAnchor-25 TOOL-aHomedAnchor-26
-TOOL-aHomedAnchor-27.
+TOOL-aHomedAnchor-27 TOOL-aHomedAnchor-28.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -109,7 +111,7 @@ TOOL-aHomedAnchor-27.
 | 3 | `TOOL-aHomedAnchor-3`, `TOOL-aHomedAnchor-5` | yes |
 | 4 | `TOOL-aHomedAnchor-4` | no |
 | 5 | `TOOL-aHomedAnchor-6`, `TOOL-aHomedAnchor-7` | yes |
-| 6 | `TOOL-aHomedAnchor-22`, `TOOL-aHomedAnchor-23`, `TOOL-aHomedAnchor-24`, `TOOL-aHomedAnchor-25`, `TOOL-aHomedAnchor-26`, `TOOL-aHomedAnchor-27` | yes |
+| 6 | `TOOL-aHomedAnchor-22`, `TOOL-aHomedAnchor-23`, `TOOL-aHomedAnchor-24`, `TOOL-aHomedAnchor-25`, `TOOL-aHomedAnchor-26`, `TOOL-aHomedAnchor-27`, `TOOL-aHomedAnchor-28` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

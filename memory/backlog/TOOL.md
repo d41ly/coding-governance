@@ -131,7 +131,7 @@ Cite ids, never line numbers.
 | [TOOL-aHomedAnchor-18](../builds/aHomedAnchor/BACKLOG.md) | INPROGRESS | HIGH | TOOL-aHomedAnchor-23 | 2026-10-09 | held red: suite unattended driver selftest shard 2/8 red at 40a8b8c3 on… |
 | [TOOL-aHomedAnchor-19](../builds/aHomedAnchor/BACKLOG.md) | INPROGRESS | HIGH | TOOL-aHomedAnchor-26 | 2026-10-09 | held red: suite unattended driver selftest shard 8/8 red at 40a8b8c3 on… |
 | [TOOL-aHomedAnchor-20](../builds/aHomedAnchor/BACKLOG.md) | INPROGRESS | HIGH | TOOL-aHomedAnchor-24 | 2026-10-09 | held red: suite unattended gate selftest shard 1/8 red at 40a8b8c3 on… |
-| [TOOL-aHomedAnchor-21](../builds/aHomedAnchor/BACKLOG.md) | OPEN | HIGH | — | 2026-10-09 | held red: suite unattended-build self-test red at 40a8b8c3 on the daily… |
+| [TOOL-aHomedAnchor-21](../builds/aHomedAnchor/BACKLOG.md) | INPROGRESS | HIGH | TOOL-aHomedAnchor-28 | 2026-10-09 | held red: suite unattended-build self-test red at 40a8b8c3 on the daily… |
 | [TOOL-aHonedRuleset-7](../builds/aHonedRuleset/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | tools/memory-tree/HYGIENE.template.md STATES ITS WHOLE CAP TABLE TWICE,… |
 | [TOOL-aHonedRuleset-9](../builds/aHonedRuleset/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | tools/govkit/check_runbook_parity.py IS ON NO BAR — **AND THIS IS THE… |
 | [TOOL-aHonedRuleset-11](../builds/aHonedRuleset/BACKLOG.md) | OPEN | — | — | 2026-09-06 | tools/check-playbook-parity.sh HAS NO WAY TO EXERCISE A CANDIDATE ROW… |
