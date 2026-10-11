@@ -305,7 +305,7 @@ Cite ids, never line numbers.
 | [TOOL-aSurfacedLexicon-22](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | THE WALK IS FIXED AND THE CEILING NOW MEASURES CONTENTION INSTEAD.… |
 | [TOOL-aSurfacedLexicon-23](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | A CELL CANNOT SAY "PRODUCT CODE, NOT RECORDS", so two surfaces ship… |
 | [TOOL-aSurfacedLexicon-24](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | A SKIP CLAIM WRITTEN AS check(<label>, True) IS A COMMENT WEARING A… |
-| [TOOL-aSurfacedLexicon-25](../builds/aSurfacedLexicon/BACKLOG.md) | INPROGRESS | — | TOOL-aSignalledHook-1 | 2026-09-06 | A PUSH TO THE DEFAULT BRANCH PROCEEDED WITH NO BAR RUN, and the hook… |
+| [TOOL-aSurfacedLexicon-25](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | A PUSH TO THE DEFAULT BRANCH PROCEEDED WITH NO BAR RUN, and the hook… |
 | [TOOL-aTetheredConvoy-1](../builds/aTetheredConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | the playbook template reached origin/main carrying UNRESOLVED conflict… |
 | [TOOL-aTetheredScratch-3](../builds/aTetheredScratch/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | tools/memory-recall/selftest.py leaves 2 EMPTY tmp.* dirs per run that… |
 | [TOOL-aTetheredScratch-4](../builds/aTetheredScratch/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | A TEST FIXTURE COMMITTED INTO THE LIVE REPO. Two commits authored t… |

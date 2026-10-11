@@ -30,24 +30,26 @@ by design, and nothing downstream could tell that landing from a gated one.
 
 ## Parked decisions
 
-none
+- 2026-10-11, owner: land with `git push --no-verify`. The full bar on 4078803e was RED on 9 legs,
+  every one red on origin/main already, after two landings made without a bar. The red attribution
+  read three of them as MIXED because it keys offenders by line number. This unit added no offender.
 
 <!-- roster:units -->
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aSignalledHook-1` | INPROGRESS | trap the hook's catchable signals into a refusal; the lander requires the hook's allow record |
+| 1 | `TOOL-aSignalledHook-1` | CLOSED | trap the hook's catchable signals into a refusal; the lander requires the hook's allow record |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-10-11 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-10-11 · streams tooling
 ids TOOL-aSignalledHook-1 TOOL-aSignalledHook-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aSignalledHook-1 — a signal-killed pre-push hook refuses the push, and a success with no hook verdict is caught by the lander](spec/2026-10-11-spec-TOOL-aSignalledHook-1.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-10-11 |
+| [TOOL-aSignalledHook-1 — a signal-killed pre-push hook refuses the push, and a success with no hook verdict is caught by the lander](spec/2026-10-11-spec-TOOL-aSignalledHook-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-11 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 4 record folder(s).
