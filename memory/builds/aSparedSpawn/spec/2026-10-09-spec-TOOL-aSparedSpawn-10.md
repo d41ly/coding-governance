@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-10 — foreign-prefix parity probes one shard per sharded suite and pools its whole runs
 
-**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -28,20 +28,39 @@ estimates about 2.4 ks a run on node `a`; it is an estimate, not a reading.
   probed and every other row prints `[<prefix>] <row> · represented · by shard <k>/<n>`, a skip that
   announces itself and is counted neither as graded nor as passed. Observed by AC1 and AC2.
 - **S2** — Which shard represents a family is chosen by the rule F1 resolves, and every run prints
-  the rule's input and its answer. Observed by AC3.
+  the rule's input and its answer. The modulus is the family's SELECTED size, which is its arity on
+  an unfiltered run, and the family's rows are taken in shard order. The kit version marker is the
+  line its `kit.toml` `version_from` names, read at HEAD and at HEAD's first parent; a HEAD with no
+  first parent probes every shard, and a kit declaring no marker is said so and rotates. Observed by
+  AC3.
 - **S3** — Whole-run rows are dispatched into the same pool as probe rows, before them and longest
   budget first, each still bounded by `run_row` at `HANG_FACTOR` times `LOAD_RATIO` times its budget.
   The deferral into a serial tail after `wait` (`tools/run-gates/foreign-prefix.gov.test.sh:317-328`)
   is undone. Observed by AC4 and AC5.
-- **S4** — A `--plan` flag prints, for the current prefix, each row's kind (probe, whole or
-  represented) and the dispatch order, then exits without cloning, so the selection is observable in
-  seconds. Observed by AC1, AC3 and AC4.
+- **S4** — A `--plan` flag prints, for gov's own prefix, each row's kind (probe, whole or
+  represented) and the dispatch order, then exits without cloning and without running a suite, so the
+  selection is observable in the time of one `run-selftests.sh --list` (77 s on node `a`, measured
+  2026-10-11). The plan reuses that one listing for the stale-declaration guard. Observed by AC1, AC3
+  and AC4.
 - **S5** — The existing both-directions guards stand and run under `--plan` too: a `WHOLE_RUN` or
   `GOV_LAYOUT` entry naming no row reds, a whole row printing the probe marker reds, a probe row
   printing none reds, and a prefix that selected no row reds. Observed by AC6.
 - **S6** — The header's "WHAT THIS DOES NOT CHECK" list gains the shard line in §4. NOT OBSERVED —
   header prose, read in the diff.
 - **S7** — The leg is timed before and after, quiet, on a frozen clone. Observed by AC7.
+- **S8** — ADOPTED from TOOL-aSparedSpawn-8's pass. `shell hygiene (a loop fed by a command
+  substitution)` is red since `786644cee`, whose top-level exit arm in
+  `tools/unattended/unattended.test.sh` reads a loop over a here-string of a variable assigned from
+  `$(awk …)`. The scan's capture is written to a file under the suite's scratch and the loop reads
+  that file, so the site is gone rather than registered: the registry's `<<<` count for that suite
+  stays the one site that predates the leg. Observed by AC8.
+- **S9** — ADOPTED from TOOL-aSparedSpawn-8's pass. The `run-gates-2leg` row of
+  `memory/project/fork-ceilings.txt` reads 95 or 96 because the pool polls its workers, and its
+  ceiling of 96 reds a reading of 97 for no defect. The row takes a STATED MARGIN rather than a
+  deterministic count: its ceiling becomes 99, the highest reading plus 3, which is also the most the
+  stale direction admits at the lowest reading (95 plus max(3, 5 %)). The row's reason says so.
+  Making the count deterministic means changing the runner's polling, which is not this unit's
+  subject. Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -89,12 +108,19 @@ a filtered run's family is the rows it selected.
 | identifier | kind | cell that grades it |
 |---|---|---|
 | `--plan` | CLI flag of the suite | none |
-| `plan_prefix` or the name `--suggest` returns | shell function | `lexicon naming predicates`, shell cell |
+| `load_population` | shell function: the `--list` text into row arrays, filtered | `lexicon naming predicates`, shell cell |
+| `derive_row_kinds` | shell function: each row's kind and representative, one rule line per family | `lexicon naming predicates`, shell cell |
+| `derive_dispatch_order` | shell function: whole rows by descending budget, then probe rows | `lexicon naming predicates`, shell cell |
+| `read_kit_marker` | shell function: a kit's version marker line at a revision | `lexicon naming predicates`, shell cell |
+| `print_plan` | shell function: the `--plan` body and its one-probe-per-family count | `lexicon naming predicates`, shell cell |
+| `check_declarations` | shell function: the stale `WHOLE_RUN` and `GOV_LAYOUT` guard, shared by both paths | `lexicon naming predicates`, shell cell |
 | `represented` | verdict word on a row line | none |
 
 ### Files touched (estimate)
 
 - `tools/run-gates/foreign-prefix.gov.test.sh`
+- `tools/unattended/unattended.test.sh` (S8)
+- `memory/project/fork-ceilings.txt` (S9)
 
 ### Alternatives rejected
 
@@ -145,13 +171,30 @@ a filtered run's family is the rows it selected.
   figure: DERIVED at observation; round one's ~3000 s per green run is an estimate, not a target.
   cost: two whole runs of the leg, about 4500-5000 s each on node `a` by round one's estimate.
   permission: held suites are the owner's manual run (owner ruling, 2026-10-06).
+- **AC8** — When `python tools/gate-lint/sh_hygiene.py memory/project/substitution-fed-loops.txt`
+  runs before the pass, it names the unattended driver's suite with 2 measured sites at `<<<` against
+  1 declared; after the pass it exits 0 with no finding, and the registry is unchanged.
+  Red when: the checker still names that suite, or the pass widened the registry row instead.
+- **AC9** — When `bash tools/gate-lint/fork-count.sh memory/project/fork-ceilings.txt . --only
+  run-gates-2leg` runs after the pass, the row reads ok at ceiling 99, and the row's reason names the
+  margin and the readings it is set over.
+  Red when: the count reads above 99, the stale direction reds, or the reason states no margin.
 
 ## 7. Gates
 
 `foreign-prefix parity (every self-test at three prefixes)` ·
 `testsuite counts (every bar self-test prints one)` ·
 `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` ·
-`spec tokens (a spec's own names resolve)`
+`spec tokens (a spec's own names resolve)` ·
+`shell hygiene (a loop fed by a command substitution)` ·
+`shell hygiene (a fork spent on builtin work)` · `spawn budget (forks per hot entrypoint)` ·
+`python resolver (behaviour + inline parity + idiom ban)` · `pre-push run-log line` ·
+`push-main self-test` · `check-wiring self-test` · `settings-merge selftest` · `recall floor` ·
+`recall floor arms` · `run-gates canary` · `run-gates evidence` · `run-gates turnstile` ·
+`run-gates gov canary` · `run-gates run-log line` · `run-gates adopter e2e` ·
+`profile-bar selftest` · `install-prefix self-test` · `dead-path carriers self-test` ·
+`spec-tokens self-test` · `kit-placeholders self-test` · `unattended kit gate` ·
+`codebase-map coverage + freshness`
 
 New arm: tools/run-gates/foreign-prefix.gov.test.sh --plan · covers AC1 AC3 AC4 AC6 · a stale WHOLE_RUN entry, and a second probe row forced into one family · FLOOR_ASSERTIONS unchanged
 
@@ -173,6 +216,13 @@ New arm: tools/run-gates/foreign-prefix.gov.test.sh --plan · covers AC1 AC3 AC4
 ## 9. Revision log
 
 - rev-1 · 2026-10-09 · initial draft.
+- rev-2 · 2026-10-11 · §2 §4 §6 §7 S2 S4 S8 S9 AC8 AC9 · the build pass. S8 and S9 adopt the two
+  reds TOOL-aSparedSpawn-8 found, each with its own criterion. S2 says what F1's (a) reads: the
+  modulus is the family's selected size, and the marker is the `version_from` line of the suite's
+  kit at HEAD and at its first parent. S4 no longer promises seconds: one `--list` took 77 s on node
+  `a`, so the plan lists once and reuses it for the declaration guard. The inventory names the
+  functions the split makes. AC2, AC5 and AC7 run the leg itself, so they are owed at VERIFYING; AC3
+  is observed on a hand-built scratch clone at two commits, and AC6 on a scratch copy there.
 
 ## 10. Reuse audit
 
