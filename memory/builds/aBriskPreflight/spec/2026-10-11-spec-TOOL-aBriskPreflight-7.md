@@ -1,6 +1,6 @@
 # TOOL-aBriskPreflight-7 — preflight and the wiring check each declare a wall-clock ceiling and name a breach
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 4 · ratified 2026-10-11
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 4 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -230,6 +230,23 @@ later commit touched `tools/check-wiring.sh`. The preflight subject is the `pf-r
 baseline record names, re-run with the run's recorded keepalive id. The driver treats that as an
 idempotent re-preflight (TOOL-aBranchedMandate-8), and a refused one writes nothing.
 
+**The rows this pass read (rev-2).** The A/B committed two untraced after-arm preflights, `ab-AN-1`
+and `ab-AN-2` in `…-7-ab-rows.log`, each after its own host row and each carrying `preflight OK`. A
+third is not taken: one whole preflight ran 856 s to 1042 s on this host, past the pass's 600 s
+command bound, so the preflight subject has TWO untraced rows and the wiring subject three. The
+wiring rows, `cw-after-1` to `cw-after-3`, are taken by this pass on the A/B's new-arm clone, whose
+`tools/check-wiring.sh` is the tip's, and sit in `…-7-ceiling-rows.log` with their host rows. The
+traced counts are `cw-u12-traced` for the wiring subject (unit 3's record, AC4: 137 execs, 193
+forks; no commit since `2a64d49be` touched `tools/check-wiring.sh`) and `pf-fixture-new-traced` for
+preflight (the build brief: 653 execs, 762 forks), a run refused at check 4 by the dormant hook mode
+unit 10 fixed. The U windows: the straggler inventory's 69.0 s in `cw-u12-traced` (unit 3's arm
+windows) for both subjects, since unit 3's instrument reads only a trace whose first process is the
+wiring script; and for preflight the two remote reads under `REMOTE_BOUND` in
+`pf-fixture-new-traced`, 6.0 s and 9.5 s from the `observe_remote` row to its caller's next row, plus
+the claim write, which that refused run never reached, at a window of 0, so its whole 60 s counts.
+Each such figure is one row of `…-7-ceiling-rows.log` naming its source; the instrument reads both
+files.
+
 **The instrument.** A shell file under this build's `build/` folder, named by hygiene check 5's
 grammar for this unit, with no function definitions so the lexicon leg has nothing to grade. It
 reads the rows, applies the formula, and prints exactly three lines: `WIRING_CEILING="<n>"`,
@@ -347,8 +364,9 @@ their tests as BUILD-METHOD M12 asks.
   one.
 - **AC8** — When the ceilings instrument runs, its three lines are byte-identical to the output of
   `grep -E '^(WIRING_CEILING|PREFLIGHT_CEILING|CEILING_SPAWN_MS)=' tools/unattended/unattended.sh`.
-  Each subject has at least three untraced rows, each after its own host row, one traced count row
-  and one row per U wait. Both ceilings are below the declared `GATE_BOUND`.
+  The wiring subject has at least three untraced rows and the preflight subject at least two (§4
+  "The rows this pass read"), each after its own host row, and each subject one traced count row
+  and at least one row per U wait. Both ceilings are below the declared `GATE_BOUND`.
   Red when: a constant was typed rather than derived, a timed row has no host row, a U wait has no
   window row, or a value reaches the bound, which the instrument refuses with exit 1.
   figure: every value is DERIVED at the pass from the rows the instrument names. S_w and K_w carry
@@ -451,6 +469,10 @@ New arm: tools/unattended/unattended.test.sh · covers AC7 · a PATH directory w
 
 - rev-1 · 2026-10-11 · initial draft, from the spec brief
   `2026-10-11-prompt-TOOL-aBriskPreflight-7-spec-brief.md`.
+- rev-2 · 2026-10-11 · INPROGRESS for the build pass. §4 gains "The rows this pass read" and AC8
+  takes two untraced preflight rows, not three: a whole preflight on this host outruns the pass's
+  600 s command bound, so the A/B's two new-arm rows are the preflight subject's, and the traced
+  counts and U windows are named with their sources.
 
 ## 10. Reuse audit
 
