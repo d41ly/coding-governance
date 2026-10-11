@@ -49,3 +49,7 @@ base: 271a90045723817f694de4d22c56f88dbcd0063e
 2026-10-11T08:09:46Z dispatch · item 20a9e88e TOOL-aBriskPreflight-2 · reason tools/check-wiring.sh tools/check-wiring.test.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-2-spawns-ab.md memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-2.md memory/builds/aBriskPreflight/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
 
 2026-10-11T08:09:56Z brief · item TOOL-aBriskPreflight-2 · reason 162d8aaea8b6 memory/builds/aBriskPreflight/prompts/2026-10-11-prompt-TOOL-aBriskPreflight-2-build-brief.md
+
+2026-10-11T10:07:31Z dispatch · item 900d74e6 TOOL-aBriskPreflight-4 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/features/unattended-stops.md memory/map/generated/symbols.json memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-4.md memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-4-probes-ab.md memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-4-probes-ab.sh memory/builds/aBriskPreflight/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-11T10:08:05Z brief · item TOOL-aBriskPreflight-4 · reason 5651db253a5e memory/builds/aBriskPreflight/prompts/2026-10-11-prompt-TOOL-aBriskPreflight-4-build-brief.md

@@ -231,17 +231,31 @@ RB_BOUND=""
 # already moved the command into its own process group, where a terminal's Ctrl-C never reached it.
 # On the UNBOUNDED path, a host with no runnable `timeout`, the command now ignores INT, so a Ctrl-C
 # ends the driver alone and leaves the command running — as a recorded orphan the next reap finds.
+#
+# TWO HALVES, ONE WRAPPER LINE (TOOL-aBriskPreflight-4 S1). `init_bounded` starts and records the
+# child and leaves its handle in RB_HANDLE; `read_bounded` waits for that child and sets the four
+# values. `run_bounded` is the two back to back, so every caller sees what it always saw. A verb that
+# overlaps several bounded commands starts each through `init_bounded`, keeps each handle in its own
+# variable, and reads each through `read_bounded` where its answer is read; `--preflight`'s probes
+# are the one such verb. The handle is a plain string -- pid, start second, capture directory, the
+# directory last because a path may carry a space -- because the suite sources these alone under
+# `set -u`, where an associative array declared only at file scope would be an indexed one.
+RB_HANDLE=""
 run_bounded() { # argv...
-  local _s _e _rc _d _p _i _b=${RB_BOUND:-${GATE_BOUND:-0}}
+  init_bounded "$@" || return 1
+  read_bounded "$RB_HANDLE"
+}
+init_bounded() { # argv... -> 0 with RB_HANDLE naming the started child, or 1 with RB_OUT's sentence
+  local _s _d _p _i _b=${RB_BOUND:-${GATE_BOUND:-0}}
   # THE REFUSAL BRANCH KEEPS RB_OUT'S SENTENCE and empties only the two NEW values. That sentence
   # is this branch's ONLY diagnostic -- it is SET here and the function returns before RB_TOOK is
   # computed below, so it is the freshest thing a caller gets -- and check_wiring, the gates-green
   # item and --dispatch all print it. Emptying it would make a failed capture refuse with no reason
   # at all. RB_TOOK is the value that genuinely carries over from a previous call and --dispatch
   # prints it beside the sentence, so it is zeroed rather than left reading a time this call never
-  # measured.
+  # measured. RB_HANDLE is emptied so no caller can read a previous child's handle as this one's.
   _d=$(mktemp -d) \
-    || { RB_OUT="run_bounded: cannot create a capture file"; RB_STDOUT=""; RB_ERR=""; RB_TOOK=0; return 1; }
+    || { RB_OUT="run_bounded: cannot create a capture file"; RB_STDOUT=""; RB_ERR=""; RB_TOOK=0; RB_HANDLE=""; return 1; }
   _s=$(date +%s)
   # GATE_BOUND_LIVE is REMOTE_BOUND_LIVE's sibling and is probed the same way: by RUNNING timeout,
   # never by testing for the binary. With no runnable timeout the command still RUNS, unbounded --
@@ -263,6 +277,15 @@ run_bounded() { # argv...
   _i=0
   while [ ! -e "$_d/up" ] && [ "$_i" -lt 100 ] && kill -0 "$_p" 2>/dev/null; do sleep 0.05; _i=$((_i + 1)); done
   write_proc_record "$_p" "$@"
+  RB_HANDLE="$_p $_s $_d"
+  return 0
+}
+# THE OTHER HALF. Split by parameter expansion, so reading a handle starts no process. RB_TOOK runs
+# from the child's own start to this read's return: a synchronous call's figure is today's, and a
+# probe read late can only overstate a child that had already finished.
+read_bounded() { # handle -> the child's status; RB_OUT, RB_STDOUT, RB_ERR and RB_TOOK as run_bounded sets them
+  local _p=${1%% *} _r=${1#* } _s _d _e _rc
+  _s=${_r%% *}; _d=${_r#* }
   wait "$_p"; _rc=$?
   _e=$(date +%s); RB_TOOK=$(( _e - _s ))
   RB_STDOUT=$(cat "$_d/out" 2>/dev/null)
@@ -2800,29 +2823,46 @@ check_branch() {
   return 1
 }
 
-check_wiring() {
-  [ -n "$WIRING_CHECK" ] || { fail 4 "WIRING_CHECK is not declared in .unattended.conf — an undeclared wiring probe is not a passing one"; return 1; }
-  # The NON-repairing mode, by declaration — expressed as an ALLOW-LIST, because the blacklist form
-  # was one substring wide. `*--fix*` is walked through by every other repairing spelling a project
-  # might declare, `--session` among them, and that mode repairs too. Naming what IS permitted makes
-  # the unknown case a refusal instead of a pass.
-  # Every DASH-LED token must be one this kit recognises as read-only. Word-split rather than
-  # substring-matched, so `--session` (which repairs) is refused instead of walking through a
-  # `*--fix*` blacklist, and a bare command with no flags is still legal.
+# THE GUARD, ONE PREDICATE FOR TWO READERS (TOOL-aBriskPreflight-4 S2): `check_wiring` prints its
+# refusals from it, and `init_preflight_probes` asks it before it starts the wiring child, so a
+# repairing command is refused before anything runs rather than after it has. It prints nothing.
+# The NON-repairing mode, by declaration — expressed as an ALLOW-LIST, because the blacklist form
+# was one substring wide. `*--fix*` is walked through by every other repairing spelling a project
+# might declare, `--session` among them, and that mode repairs too. Naming what IS permitted makes
+# the unknown case a refusal instead of a pass.
+# Every DASH-LED token must be one this kit recognises as read-only. Word-split rather than
+# substring-matched, so `--session` (which repairs) is refused instead of walking through a
+# `*--fix*` blacklist, and a bare command with no flags is still legal.
+WR_TOKEN=""
+check_wiring_runnable() { # -> 0 when the declared WIRING_CHECK may run; 1 with WR_TOKEN the first refused flag, empty when none is declared
   local tok
+  WR_TOKEN=""
+  [ -n "$WIRING_CHECK" ] || return 1
   for tok in $WIRING_CHECK; do
     case "$tok" in
       -*) case "$tok" in
             --check|--dry-run|--verify|-n) ;;
-            *) fail 4 "WIRING_CHECK carries a flag this kit does not recognise as READ-ONLY, and preflight delegates to a check rather than a fix; permitted: --check, --dry-run, --verify, -n: $tok" ; return 1 ;;
+            *) WR_TOKEN=$tok; return 1 ;;
           esac ;;
     esac
   done
-  local wout
+  return 0
+}
+
+check_wiring() {
+  if ! check_wiring_runnable; then
+    [ -n "$WIRING_CHECK" ] || { fail 4 "WIRING_CHECK is not declared in .unattended.conf — an undeclared wiring probe is not a passing one"; return 1; }
+    fail 4 "WIRING_CHECK carries a flag this kit does not recognise as READ-ONLY, and preflight delegates to a check rather than a fix; permitted: --check, --dry-run, --verify, -n: $WR_TOKEN"
+    return 1
+  fi
+  local wout _wh=${PF_PROBE_WIRING:-}
+  PF_PROBE_WIRING=""
   # BOUNDED, same helper. TOOL-aBoundedCeiling-6 and TOOL-aPromptedMandate-9: nothing in the
-  # precondition chain had a timeout, and this seam was measured at 1m22s under load.
+  # precondition chain had a timeout, and this seam was measured at 1m22s under load. Under
+  # --preflight the child was STARTED by init_preflight_probes and is only read here; everywhere
+  # else, and when that start could not make its capture, it runs here as it always did.
   # shellcheck disable=SC2086
-  run_bounded $WIRING_CHECK && return 0
+  if [ -n "$_wh" ]; then read_bounded "$_wh"; else run_bounded $WIRING_CHECK; fi && return 0
   local _wrc=$?
   wout=$RB_OUT
   if { [ "$_wrc" = 124 ] || [ "$_wrc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
@@ -2855,6 +2895,14 @@ check_wiring() {
 # the whole reason the probes exist - a 2 says the declaration names a lander that cannot land this
 # way and no retry helps, a 3 says the clone or the network is what failed and the run holds.
 run_lander() { # flag · slug -> the lander's own exit; its output in RB_OUT
+  # A PROBE --preflight ALREADY STARTED is read rather than run again (TOOL-aBriskPreflight-4 S4).
+  # The handle is taken by emptying its variable first, so it is read at most once.
+  local _lh=""
+  case "$1" in
+    --carry)    _lh=${PF_PROBE_CARRY:-};    PF_PROBE_CARRY="" ;;
+    --prepared) _lh=${PF_PROBE_PREPARED:-}; PF_PROBE_PREPARED="" ;;
+  esac
+  if [ -n "$_lh" ]; then read_bounded "$_lh"; return; fi
   # shellcheck disable=SC2086
   run_bounded $LANDER "$1" --slug "$2"
 }
@@ -2882,6 +2930,47 @@ check_lander_mode() { # slug
          return 1 ;;
     esac
   done
+  return 0
+}
+
+# ---- PREFLIGHT'S PROBES, STARTED TOGETHER AND READ WHERE THEY ARE READ. TOOL-aBriskPreflight-4 S3, S5.
+# The wiring check, the lander's `--carry` and `--prepared`, and the profile command read nothing
+# of one another, and waited one after another they were 754 s of a 1561 s preflight on node a. They
+# start here, after check_branch, in the order they are read: the wiring check first because it is
+# the longest child and the first read. Nothing is printed here. Each reader -- check_wiring,
+# run_lander, derive_gate_backstop -- takes its handle where it read its answer before, so every
+# refusal prints at the position and in the order it always did. Starting AFTER check_clean is
+# deliberate: a declared lander or profile command is a project's, and nothing it writes may reach a
+# verdict check_clean has already given. A start that cannot make its capture leaves its handle
+# empty, and its reader then runs the synchronous form and prints that sentence where it always did.
+PF_PROBE_WIRING=""; PF_PROBE_CARRY=""; PF_PROBE_PREPARED=""; PF_PROBE_PROFILE=""
+init_preflight_probes() { # slug -> each declared probe started, its handle in its own PF_PROBE_ variable
+  PF_PROBE_WIRING=""; PF_PROBE_CARRY=""; PF_PROBE_PREPARED=""; PF_PROBE_PROFILE=""
+  # The guard is asked BEFORE the start, so a repairing flag never runs (memory/gotchas/destructive-step-before-its-precondition.md).
+  # shellcheck disable=SC2086
+  if check_wiring_runnable && init_bounded $WIRING_CHECK; then PF_PROBE_WIRING=$RB_HANDLE; fi
+  if [ "$LANDER_MODE" = in-place ]; then
+    # shellcheck disable=SC2086
+    init_bounded $LANDER --carry --slug "$1" && PF_PROBE_CARRY=$RB_HANDLE
+    # shellcheck disable=SC2086
+    init_bounded $LANDER --prepared --slug "$1" && PF_PROBE_PREPARED=$RB_HANDLE
+  fi
+  # shellcheck disable=SC2086
+  if [ -n "$GATE_PROFILE_CMD" ] && init_bounded $GATE_PROFILE_CMD; then PF_PROBE_PROFILE=$RB_HANDLE; fi
+  return 0
+}
+# NO PROBE OUTLIVES THE VERB UNREAD. The one this can meet is `--prepared`'s, when check_lander_mode
+# refused on `--carry` and returned before reading it. It is waited for and its answer discarded --
+# never killed, because a kill is the least reversible act this driver takes and it is the lease
+# holder's reap that owns one. The capture values are put back, so a caller reading them after the
+# block reads what the block's last reader left.
+read_preflight_probes() { # -> every pending probe read and discarded; prints nothing
+  local _h _o=$RB_OUT _so=$RB_STDOUT _e=$RB_ERR _t=$RB_TOOK
+  for _h in "${PF_PROBE_WIRING:-}" "${PF_PROBE_CARRY:-}" "${PF_PROBE_PREPARED:-}" "${PF_PROBE_PROFILE:-}"; do
+    [ -z "$_h" ] || read_bounded "$_h" || true
+  done
+  PF_PROBE_WIRING=""; PF_PROBE_CARRY=""; PF_PROBE_PREPARED=""; PF_PROBE_PROFILE=""
+  RB_OUT=$_o; RB_STDOUT=$_so; RB_ERR=$_e; RB_TOOK=$_t
   return 0
 }
 
@@ -7092,6 +7181,9 @@ verb_preflight() { # slug · keepalive-id
   fi
   check_clean || true
   check_branch || true
+  # TOOL-aBriskPreflight-4 - the four bounded probes start together here and are read below, each by
+  # the check that reads it; read_preflight_probes after the GB_CMP case reads whatever is left.
+  init_preflight_probes "$slug"
   check_wiring || true
   check_method || true
   check_waivers "$rel" || true
@@ -7110,6 +7202,7 @@ verb_preflight() { # slug · keepalive-id
     1) fail 85 "the unattended bar's wall is below the largest declared leg ceiling, so a healthy bar that dispatches that leg is killed by its own wall and every close reads red over a bound nobody chose: $GW_WHY. Raise GATE_WALL in $CONF to at least that ceiling" ;;
     2) echo "unattended: preflight — the wall is not compared with the largest leg ceiling: $GW_WHY" ;;
   esac
+  read_preflight_probes
   # ONE entry point for the base, shared with --close, so the two verbs cannot disagree about which
   # commit they are measuring against. `trusted_base` names its own refusals.
   #
@@ -9270,15 +9363,17 @@ read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS and GR_AGED (comm
 # `--preflight` compares the wall with the largest leg ceiling without running the profile twice.
 GB_SUM=""; GB_WALL=""; GB_QUEUE=""; GB_MARGIN=""; GB_WHY=""; GB_CMP=2
 derive_gate_backstop() { # -> 0 with GB_SUM and its three terms, or 1 with GB_WHY; GB_CMP and GW_WHY either way
-  local _db_rc _db_miss=""
+  local _db_rc _db_miss="" _db_h=${PF_PROBE_PROFILE:-}
+  PF_PROBE_PROFILE=""
   GB_SUM=""; GB_WALL=""; GB_QUEUE=""; GB_MARGIN=""; GB_WHY=""; GB_CMP=2; GW_WHY=""
   if [ -z "$GATE_PROFILE_CMD" ]; then
     GB_WHY="this project declares no GATE_PROFILE_CMD, so the bar has no profile to size a backstop from"
     GW_WHY="this project declares no GATE_PROFILE_CMD, so the wall cannot be compared with the largest leg ceiling"
     return 1
   fi
+  # A profile --preflight already started is read here, where its answer is read (TOOL-aBriskPreflight-4 S4).
   # shellcheck disable=SC2086
-  run_bounded $GATE_PROFILE_CMD; _db_rc=$?
+  if [ -n "$_db_h" ]; then read_bounded "$_db_h"; else run_bounded $GATE_PROFILE_CMD; fi; _db_rc=$?
   if [ "$_db_rc" != 0 ]; then
     GB_WHY="the declared GATE_PROFILE_CMD exited $_db_rc after ${RB_TOOK}s, so it gave no profile to size a backstop from: $GATE_PROFILE_CMD"
     GW_WHY="the declared GATE_PROFILE_CMD exited $_db_rc, so the wall cannot be compared with the largest leg ceiling"

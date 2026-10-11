@@ -1,12 +1,13 @@
 # TOOL-aBriskPreflight-4 — preflight starts its bounded probes together and collects each at its own check
 
-**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 2 · ratified 2026-10-11
+**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 2 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md](../build/2026-10-11-build-TOOL-aBriskPreflight-1-baseline.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 |
+| [2026-10-11-build-TOOL-aBriskPreflight-4-probes-ab.md](../build/2026-10-11-build-TOOL-aBriskPreflight-4-probes-ab.md) | research | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-1-brief.md) | research | TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-4-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-4-build-brief.md) | research | — |
 | [2026-10-11-prompt-TOOL-aBriskPreflight-4-spec-brief.md](../prompts/2026-10-11-prompt-TOOL-aBriskPreflight-4-spec-brief.md) | research | — |
