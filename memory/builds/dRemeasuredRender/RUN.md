@@ -9,13 +9,23 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 692632c12a79d98f5614d9fe2d360a42412a0afc · park · 0 touching
+asks-at-landing: TOOL-dRemeasuredRender-2=OPEN TOOL-dRemeasuredRender-3=OPEN TOOL-dRemeasuredRender-4=OPEN
+units-at-landing: TOOL-dRemeasuredRender-1 DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 DEPL-dRemeasuredRender-3 DEPL-dRemeasuredRender-4
+hold-run: 
+hold-streak: 1 · at 9b37cb47
+resume-owed: none · owner
+held-at: 2026-10-11T14:57:46Z
+hold-reason: the owner landed 692632c1 with the hook bypassed after the close's bar hung in the run-gates canary; a full bar on main and the six unattended suites stay owed
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
+refreshed-at: 692632c12a79d98f5614d9fe2d360a42412a0afc · handoff · 0 touching
 gates-run: unattended-179171228056387817732-1509 81b937f4
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: b41d79bc66e7bd725c0980d46a5669fe2a889364
-phase: VERIFYING
+witness: 9b37cb4757b7fd49930df79191a0c2571c50ba6e
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/practical-borg-90829d
@@ -69,3 +79,7 @@ base: 17472e212ffd0d5e3be825502c6169bbeb2e952f
 2026-10-11T09:47:49Z dispatch · item 57a98c4f DEPL-dRemeasuredRender-4 · reason memory/map/features/govkit.md
 
 2026-10-11T14:57:28Z decision · item land the build with the hook bypassed, no full bar · reason decided by the owner in chat on 2026-10-11, after the second close's bar hung in the run-gates canary's AC14 memory-pause arm (its FIFO writer gone, its inner bar blocked from 15:28); the owner said kill the hung bar and close it with no-verify; landed at 692632c1; a full bar on main and the six unattended suites stay owed
+
+2026-10-11T14:57:49Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dRemeasuredRender && bash tools/push-main.sh --land --slug dRemeasuredRender && bash tools/unattended/unattended.sh --settle dRemeasuredRender
+
+2026-10-11T14:57:49Z hold · item owner-decision · reason until owner · reaped 583359a6 · resume none(owner)
