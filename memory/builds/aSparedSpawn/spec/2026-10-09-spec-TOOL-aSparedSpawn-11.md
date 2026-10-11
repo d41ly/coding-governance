@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-11 — per-suite levers: five suites stop paying a process for a question they ask once
 
-**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -178,8 +178,8 @@ whole argument tuple that reaches `rev-list`.
   Red when: the staged break passes, which means no arm depends on a clean start and the reset is
   unobserved; or `FLOOR_ASSERTIONS` is not met.
 - **AC7** — When `build_commit` is called twice for one range in one shell with `_BC_MEMO` declared and
-  `GIT` shadowed by a counting function, `rev-list` runs once and both calls answer what an
-  undeclared call answers; with no memo declared it runs twice.
+  the `git` that `GIT` runs shadowed on PATH by a counting stub, `rev-list` runs once and both calls
+  answer what an undeclared call answers; with no memo declared it runs twice.
   Red when: the second declared call re-runs `rev-list`, or any answer differs.
 - **AC8** — When `bash tools/unattended/check-pass-order.sh` and
   `bash tools/unattended/check-brief-recorded.sh` run at base and after the pass on the same tree,
@@ -230,6 +230,10 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC9 · the unse
   fixture's copy points at the fixture. `pin` is added as `main` adds it, `BASELINES` fixtures and
   extras other than `--base-ref` stay on `report()`, and AC4 compares over the in-process record's
   fields. The helper is `read_one_signal`, the name the lexicon's `--suggest` admits.
+- rev-3 · 2026-10-11 · AC7 · the build pass. AC7's counter shadows the `git` that `GIT` runs with a
+  stub first on PATH rather than redefining `GIT`: a second `GIT` definition is a second spelling of a
+  name `lexicon naming predicates` grades, and it moved both of that leg's pins by one. The stub
+  counts the same `rev-list` calls and passes every call through to the real git.
 
 ## 10. Reuse audit
 

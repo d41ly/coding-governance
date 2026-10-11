@@ -78,7 +78,7 @@ ids TOOL-aSparedSpawn-15
 | [TOOL-aSparedSpawn-6 — the unattended driver as a library, called in process by its suite](spec/2026-10-09-spec-TOOL-aSparedSpawn-6.md) | 1 | 2 | CLOSED | rev-3 | 2026-10-11 |
 | [TOOL-aSparedSpawn-8 — fork-free readers, a spawn-idiom lint that stops regrowth, and a fork-count arm](spec/2026-10-09-spec-TOOL-aSparedSpawn-8.md) | 1 | 2 | CLOSED | rev-4 | 2026-10-11 |
 | [TOOL-aSparedSpawn-10 — foreign-prefix parity probes one shard per sharded suite and pools its whole runs](spec/2026-10-09-spec-TOOL-aSparedSpawn-10.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-11 |
-| [TOOL-aSparedSpawn-11 — per-suite levers: five suites stop paying a process for a question they ask once](spec/2026-10-09-spec-TOOL-aSparedSpawn-11.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-10-11 |
+| [TOOL-aSparedSpawn-11 — per-suite levers: five suites stop paying a process for a question they ask once](spec/2026-10-09-spec-TOOL-aSparedSpawn-11.md) | 2 | 2 | INPROGRESS | rev-3 | 2026-10-11 |
 | [TOOL-aSparedSpawn-15 — the remaining clock-bound arms on the flake list, ordered or calibrated](spec/2026-10-09-spec-TOOL-aSparedSpawn-15.md) | 2 | 1 | OPEN | rev-1 | 2026-10-09 |
 | [TOOL-aSparedSpawn-3 — a ceiling-killed leg retries in the pool's drain tail, and a bar with no ledger dispatches longest-first](spec/2026-10-09-spec-TOOL-aSparedSpawn-3.md) | 2 | 2 | OPEN | rev-1 | 2026-10-09 |
 | [TOOL-aSparedSpawn-4 — the runner's own spawns: a handful per leg, two git calls per bar, and a fork count with a ceiling](spec/2026-10-09-spec-TOOL-aSparedSpawn-4.md) | 2 | 2 | OPEN | rev-2 | 2026-10-10 |
