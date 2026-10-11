@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 63a43402c4f0c048d04160b131b3853ea5070734 · park · 0 touching
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
@@ -153,3 +154,5 @@ base: bef97330574caabfd43c374dbe8c39b26c560203
 2026-10-10T16:41:04Z dispatch · item 9873a25f TOOL-aFrugalTurnstile-16 · reason memory/builds/aFrugalTurnstile/spec/2026-10-10-spec-TOOL-aFrugalTurnstile-16.md
 
 2026-10-10T21:15:59Z dispatch · item 9873a25f TOOL-aFrugalTurnstile-16 · reason memory/builds/aFrugalTurnstile/build/2026-10-10-build-TOOL-aFrugalTurnstile-16-1-acceptance-ledger.md
+
+2026-10-11T02:31:10Z decision · item land the build with the hook bypassed, no full bar · reason decided by the owner in chat on 2026-10-11, after the close's remote claim push timed out under host load; landed at 63a43402; a full bar on main and the kit self-tests stay owed
