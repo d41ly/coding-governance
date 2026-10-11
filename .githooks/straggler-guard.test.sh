@@ -304,6 +304,20 @@ out=$(run_in "$F1" git push origin feat); rc=$?
 check_contains "$out" "$F3_MERGE" || print_failure "AC5: the push refusal does not name the transition merge sha"; add_arm
 check_contains "$out" "--repair" || print_failure "AC5: the push refusal does not name the repair verb"; add_arm
 
+# TOOL-aBriskPreflight-6 S4 — THE SETUP SHORTCUT STOPS AUDITING NOTHING. The hook skips the layer's
+# setup only when EVERY candidate is a root commit over the empty tree, an unattended claim's shape.
+# A TAG at the unaccounted tip is a candidate like the branch, since a tag can be merged; and a claim
+# ref pushed BESIDE that branch must not carry the branch past the audit.
+git -C "$F1" tag t-strag feat
+out=$(run_in "$F1" git push origin refs/tags/t-strag); rc=$?
+[ "$rc" != 0 ] || print_failure "S4: a tag at a tip holding an UNACCOUNTED transition merge was pushed (rc=$rc)"; add_arm
+check_contains "$out" "$F3_MERGE" || print_failure "S4: the tag push refusal does not name the transition merge sha: $out"; add_arm
+F3_CLAIM=$(git -C "$F1" commit-tree -m "claim x" "$(git -C "$F1" mktree </dev/null)")
+out=$(run_in "$F1" git push origin "$F3_CLAIM:refs/gov/runs/x" feat); rc=$?
+[ "$rc" != 0 ] || print_failure "S4: a claim-shaped ref pushed beside a branch holding an UNACCOUNTED transition merge let the branch through (rc=$rc)"; add_arm
+check_contains "$out" "$F3_MERGE" || print_failure "S4: the mixed push refusal does not name the transition merge sha: $out"; add_arm
+git -C "$F1" tag -d t-strag >/dev/null
+
 git -C "$F1" checkout -q feat
 write_relocated "$F1" TOOL-aSeed-1 "$F1_STRAG"
 git -C "$F1" add -A >/dev/null 2>&1; git -C "$F1" commit -q --no-verify -m "account for the relocation"

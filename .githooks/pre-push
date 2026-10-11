@@ -746,7 +746,11 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 GATE_RUNNER=""; RUNNER_MISS=""
-if [ -n "$KITROOT_FROM" ]; then
+# RESOLVED ONLY FOR A PUSH THAT READS IT (TOOL-aBriskPreflight-6 S3). Its readers are the bar check,
+# which only the branch bar and the default bar call, and the default bar's own lines below the
+# `skip-nondefault` exit. A push carrying neither the default branch nor a declared branch bar reads
+# neither variable, and this resolution's two python starts were most of a claim push's cost.
+if [ -n "$KITROOT_FROM" ] && { [ -n "$main_local" ] || [ -n "${GOV_BRANCH_GATE_CMD:-}" ]; }; then
   if _rg_py=$(resolve_python 2>/dev/null); then
     if _rg_dir=$(resolve_kit_dir "$_rg_py" run-gates run-gates.sh "$top/${GOV_KITROOT:-.}" 2>/dev/null); then
       GATE_RUNNER=$_rg_dir/run-gates.sh
@@ -781,9 +785,41 @@ fi
 #
 # It runs BELOW the run log's START and EXIT trap, so its one refusal names its decision and sets the
 # clean-exit mark like every exit after them: `refuse-straggler`.
-_sg="$(cd "$(dirname "$0")" && pwd)/straggler-guard.sh"
-if [ -z "$DECIDE" ] && [ -f "$_sg" ] && . "$_sg" && command -v init_straggler_guard >/dev/null 2>&1 &&
-   init_straggler_guard; then
+#
+# SET UP ONLY WHERE A PUSHED REF CAN CARRY A DELTA (TOOL-aBriskPreflight-6). The candidates are listed
+# ONCE, by the three tests the loop used to apply itself, and the loop walks that list. Before any
+# setup, one `cat-file --batch-check` asks every candidate for its tree and its first parent. A root
+# commit over the EMPTY tree, the shape of an unattended run's claim, changes no path, so
+# `check_has_delta` can only answer "no delta" for it and the loop would print nothing. When every
+# candidate has that shape, or there is none, the library is not sourced and nothing is resolved, which
+# was most of a claim push's cost. Any other shape, a failed batch or a short answer runs the layer as
+# before, so every ref that can carry a delta keeps every refusal and notice, a branch pushed beside a
+# claim included. The tree's SIZE is read, never the empty tree's id, which differs under SHA-256. What
+# a skip does change: in a degraded clone the library's setup prints one line saying it checked
+# nothing, and on such a push that line is not printed.
+_sg_cands=(); _sg_q=""; _sg_need=""
+while read -r _ _sha _ref _; do
+  [ -n "$_ref" ] || continue
+  [ "$_ref" = "refs/heads/$def" ] && continue
+  [ -z "${_sha//0/}" ] && continue
+  _sg_cands+=("$_sha $_ref")
+  _sg_q+="$_sha^{tree}"$'\n'"$_sha^"$'\n'
+done <<< "$push_refs"
+if [ "${#_sg_cands[@]}" -gt 0 ]; then
+  _sg_need=1
+  if _sg_ans=$(git cat-file --batch-check='%(objecttype) %(objectsize)' <<< "${_sg_q%$'\n'}" 2>/dev/null); then
+    mapfile -t _sg_rows <<< "$_sg_ans"
+    if [ "${#_sg_rows[@]}" = $((2 * ${#_sg_cands[@]})) ]; then
+      _sg_need=""
+      for ((_sg_i = 0; _sg_i < ${#_sg_rows[@]}; _sg_i += 2)); do
+        [ "${_sg_rows[_sg_i]}" = "tree 0" ] && [ "${_sg_rows[_sg_i + 1]}" = "${_sg_cands[_sg_i / 2]%% *}^ missing" ] \
+          || { _sg_need=1; break; }
+      done
+    fi
+  fi
+fi
+if [ -z "$DECIDE" ] && [ -n "$_sg_need" ] && _sg="$(cd "$(dirname "$0")" && pwd)/straggler-guard.sh" &&
+   [ -f "$_sg" ] && . "$_sg" && command -v init_straggler_guard >/dev/null 2>&1 && init_straggler_guard; then
   # The memory-tree kit is FOUND by the sibling-kit resolver above, from the kit root the ladder
   # chose, never composed from a typed kit name (the carried-prefix ban, TOOL-aRepatriatedFork-46).
   # The fallback is the hook directory's own tree: under an absolute `core.hooksPath` the hook that
@@ -800,10 +836,8 @@ if [ -z "$DECIDE" ] && [ -f "$_sg" ] && . "$_sg" && command -v init_straggler_gu
       fi
     done
   fi
-  while read -r _ _sha _ref _; do
-    [ -n "$_ref" ] || continue
-    [ "$_ref" = "refs/heads/$def" ] && continue
-    [ -z "${_sha//0/}" ] && continue
+  for _sg_c in "${_sg_cands[@]}"; do
+    _sha=${_sg_c%% *}; _ref=${_sg_c#* }
     check_has_delta "$_sha" || continue
     if check_preflip "$_sha"; then
       echo "pre-push: note — $_ref predates the per-build backlog and still owes a relocation of its"
@@ -830,7 +864,7 @@ if [ -z "$DECIDE" ] && [ -f "$_sg" ] && . "$_sg" && command -v init_straggler_gu
       echo "  Deliberate override, as always: git push --no-verify"
       RUNLOG_DECISION=refuse-straggler; RUNLOG_CLEAN=1; exit 1
     fi
-  done <<< "$push_refs"
+  done
 fi
 
 # ---- MERGE LOSS on the default branch — TOOL-aMendedFleet-3 -------------------------------------
