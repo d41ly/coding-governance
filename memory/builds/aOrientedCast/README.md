@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling+kickoff+playbook
 roster: TOOL+KICK+PLAY
-ids: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8
+ids: KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9
 authorized-by: prompt
 ---
 
@@ -34,7 +34,8 @@ JavaScript the owner cannot adjust. The owner's prose is the mandate, recorded u
 
 ## Build-level rules
 
-- **Classification (M2)**: eleven units, MISSING at open, one mechanism each.
+- **Classification (M2)**: eleven units MISSING at open, a twelfth added by the M2 cross-read; one
+  mechanism each.
 - Layered on aRoutedQuill's card route, write gate, subagent hand-off and push leg: reused, never
   re-specced. BASE includes its landing.
 - aScoutedSeam owns the reuse-scout's content and its kickoff opt-in. This build ships only that
@@ -65,11 +66,12 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 9 | `TOOL-aOrientedCast-6` | the write gate admits a spec write only from the spec-writer role, a product write only from the builder |
 | 10 | `TOOL-aOrientedCast-7` | the spawn guard refuses an Agent or Workflow call that carries no rendered handoff |
 | 11 | `TOOL-aOrientedCast-8` | the kit is an adopter default, wired at install |
+| 12 | `TOOL-aOrientedCast-9` | the unattended Skill and verbs pass the renderer's `roles` to every harness call (M2 cross-read) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 11 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff+playbook
-ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8
+ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOrientedCast-1 TOOL-aOrientedCast-2 TOOL-aOrientedCast-3 TOOL-aOrientedCast-4 TOOL-aOrientedCast-5 TOOL-aOrientedCast-6 TOOL-aOrientedCast-7 TOOL-aOrientedCast-8 TOOL-aOrientedCast-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -87,7 +89,7 @@ ids KICK-aOrientedCast-1 KICK-aOrientedCast-2 PLAY-aOrientedCast-1 TOOL-aOriente
 | [TOOL-aOrientedCast-7 — the spawn guard refuses an Agent or Workflow call that carries no rendered handoff](spec/2026-10-11-spec-TOOL-aOrientedCast-7.md) | 10 | 2 | OPEN | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 7 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

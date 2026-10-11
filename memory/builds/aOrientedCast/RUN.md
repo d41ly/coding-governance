@@ -29,3 +29,5 @@ anchor-ref: refs/heads/main
 base: 646d4a73581393acbf42f33864a9808c96d00a0c
 
 ## Parked
+
+2026-10-11T06:09:33Z rescope · item add TOOL-aOrientedCast-9 · reason the M2 cross-read found that no unit makes the unattended Skill and verbs pass roles to the harnesses, so once the write gate and spawn guard land every untyped unattended builder is refused, gov's own concurrent runs included; inside brief item 5 and the confirmed goal (attended or unattended)
