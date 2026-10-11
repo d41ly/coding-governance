@@ -57,3 +57,5 @@ base: 271a90045723817f694de4d22c56f88dbcd0063e
 2026-10-11T13:58:36Z dispatch · item 2a64d49b TOOL-aBriskPreflight-3 · reason memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-3-arm-windows.py memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-3-wiring-scope.md memory/builds/aBriskPreflight/BACKLOG.md memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-3.md memory/builds/aBriskPreflight/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json memory/backlog/TOOL.md
 
 2026-10-11T14:00:18Z brief · item TOOL-aBriskPreflight-3 · reason 521337f9e3b3 memory/builds/aBriskPreflight/prompts/2026-10-11-prompt-TOOL-aBriskPreflight-3-build-brief.md
+
+2026-10-11T14:42:25Z rescope · item add TOOL-aBriskPreflight-10 · reason origin/main tracks .githooks/pre-commit 100644 since the aDistilledCharter reconcile 60bea5e80; this build met it as a check-4 refusal of its own A/B fixture after the mid-build merge. Restoring 100755 makes the wiring hooks-mode arm, an observable this repo measures, strictly better and makes nothing worse
