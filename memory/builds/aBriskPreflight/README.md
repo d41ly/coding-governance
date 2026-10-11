@@ -86,10 +86,10 @@ ids TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aB
 | [TOOL-aBriskPreflight-3 — preflight's wiring scope, measured: the whole check stays, every candidate recorded](spec/2026-10-11-spec-TOOL-aBriskPreflight-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aBriskPreflight-7 — preflight and the wiring check each declare a wall-clock ceiling and name a breach](spec/2026-10-11-spec-TOOL-aBriskPreflight-7.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-11 |
 | [TOOL-aBriskPreflight-11 — the ceilings instrument prices every fork at the worst host reading on record](spec/2026-10-12-spec-TOOL-aBriskPreflight-11.md) | 6 | 2 | SPECCED | rev-1 | 2026-10-12 |
-| [TOOL-aBriskPreflight-12 — the closing review's mediums and lows: record bindings and ledgers, RB_TOOK at the child's end, the cache reset, four arms](spec/2026-10-12-spec-TOOL-aBriskPreflight-12.md) | 7 | 2 | SPECCED | rev-1 | 2026-10-12 |
+| [TOOL-aBriskPreflight-12 — the closing review's mediums and lows: record bindings and ledgers, RB_TOOK at the child's end, the cache reset, four arms](spec/2026-10-12-spec-TOOL-aBriskPreflight-12.md) | 6 | 2 | SPECCED | rev-2 | 2026-10-12 |
 <!-- /gen:build-units -->
 
-Records: 28 bound to this build, across 4 record folder(s).
+Records: 29 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -104,8 +104,7 @@ Ids no `spec-audit` record has ever named: TOOL-aBriskPreflight-1 TOOL-aBriskPre
 | 2 | `TOOL-aBriskPreflight-2`, `TOOL-aBriskPreflight-4` | yes |
 | 3 | `TOOL-aBriskPreflight-3` | no |
 | 4 | `TOOL-aBriskPreflight-7` | no |
-| 6 | `TOOL-aBriskPreflight-11` | no |
-| 7 | `TOOL-aBriskPreflight-12` | no |
+| 6 | `TOOL-aBriskPreflight-11`, `TOOL-aBriskPreflight-12` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

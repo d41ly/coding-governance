@@ -1,11 +1,12 @@
 # TOOL-aBriskPreflight-12 — the closing review's mediums and lows: record bindings and ledgers, RB_TOOK at the child's end, the cache reset, four arms
 
-**Status:** SPECCED · rev-1 · 2026-10-12 · node a · Tier-2 · base d19938f3 · streams tooling · order 7 · ratified 2026-10-12
+**Status:** SPECCED · rev-2 · 2026-10-12 · node a · Tier-2 · base d19938f3 · streams tooling · order 6 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-12-prompt-TOOL-aBriskPreflight-12-build-brief.md](../prompts/2026-10-12-prompt-TOOL-aBriskPreflight-12-build-brief.md) | research | — |
 | [2026-10-12-prompt-TOOL-aBriskPreflight-12-spec-brief.md](../prompts/2026-10-12-prompt-TOOL-aBriskPreflight-12-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -416,6 +417,9 @@ New arm: .githooks/straggler-guard.test.sh · covers AC10 · a sourcing-marker s
 
 - rev-1 · 2026-10-12 · initial draft, promoted from the closing diff review round 1 (M1, M2, L1 to
   L5), authored by this run and unreviewed.
+- rev-2 · 2026-10-12 · status header (§1 header line) order 7 -> 6, scope S1 to S7 unchanged: no item
+  here depends on TOOL-aBriskPreflight-11, whose F2 is parked for the owner, and order 7 would hold
+  this unit behind that park at check 49.
 
 ## 10. Reuse audit
 

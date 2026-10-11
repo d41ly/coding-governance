@@ -9,9 +9,10 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 37200355d6033895cd156ec962928fd264084c2b · park · 47 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: feb305b0bb104b7bc983b54db1ff4e7392c2fb44
-phase: REVIEWING
+witness: bb38838401eb288e311f39de5802de1ff9e1b3da
+phase: SPECCING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/sleepy-kapitsa-1f69c8
@@ -73,3 +74,5 @@ base: 271a90045723817f694de4d22c56f88dbcd0063e
 2026-10-11T21:20:12Z rescope · item add TOOL-aBriskPreflight-11 · reason promoted from the closing diff review round 1, HIGH H1: the ceilings instrument's K_w drops the worst host-row fork reading, so WIRING_CEILING understates its own worst-on-record rule
 
 2026-10-11T21:20:56Z rescope · item add TOOL-aBriskPreflight-12 · reason promoted from the closing diff review round 1: the two MEDIUMs (M1 unbound records and missing ledgers, M2 RB_TOOK start-to-read) and five LOWs (L1-L5) batched into one unit
+
+2026-10-11T22:22:35Z decision · item TOOL-aBriskPreflight-11 F2: under the worst-on-record fork price (ab-AO-2's 2.53 s host reading, F1 resolved (a)), PREFLIGHT_CEILING derives to about 4200 s, above GATE_BOUND 3600 s, which spec 7's AC8 forbids. Which way? · reason Options seen: (i) the instrument's below-GATE_BOUND refusal applies to WIRING_CEILING only, since PREFLIGHT_CEILING kills nothing, built as its own unit (lifts WIRING_CEILING to 840 s, closes review H1) - recommended to the owner; (ii) raise GATE_BOUND to >= 4230 s; (iii) type a value below 3600 s by hand; (iv) price forks from after-arm rows only (F1 (b)). Refused: (i) amends spec 7's AC8, an owner-written-for criterion, and is a second mechanism; (ii) raises a bound, a non-goal of the prompt; (iii) is a typed value spec 7's AC8 reds; (iv) is a selector chosen by its outcome (M3 counter-rule). No survivor, so M3 parks it.
