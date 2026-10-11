@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-11
 streams: tooling
 roster: TOOL
-ids: TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-8 TOOL-aBriskPreflight-9 TOOL-aBriskPreflight-10
+ids: TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-8 TOOL-aBriskPreflight-9 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-11 TOOL-aBriskPreflight-12
 authorized-by: prompt
 ---
 
@@ -66,11 +66,13 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 6 | `TOOL-aBriskPreflight-6` | the pre-push straggler layer sets up only when a pushed ref can carry a delta, so a claim push skips it |
 | 7 | `TOOL-aBriskPreflight-7` | preflight and the wiring check each declare a wall-clock ceiling and name a breach |
 | 8 | `TOOL-aBriskPreflight-10` | the tracked pre-commit hook is executable again (adopted discovery) |
+| 9 | `TOOL-aBriskPreflight-11` | the ceilings instrument prices every fork at the worst host reading on record (review H1) |
+| 10 | `TOOL-aBriskPreflight-12` | the closing review's mediums and lows: record bindings and ledgers, RB_TOOK at the child's end, the cache reset, four arms (review M1-M2, L1-L5) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 8 unit(s) · node a · opened 2026-10-11 · streams tooling
-ids TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-8 TOOL-aBriskPreflight-9 TOOL-aBriskPreflight-10
+ids TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aBriskPreflight-4 TOOL-aBriskPreflight-5 TOOL-aBriskPreflight-6 TOOL-aBriskPreflight-7 TOOL-aBriskPreflight-8 TOOL-aBriskPreflight-9 TOOL-aBriskPreflight-10 TOOL-aBriskPreflight-11 TOOL-aBriskPreflight-12
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -85,7 +87,7 @@ ids TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aB
 | [TOOL-aBriskPreflight-7 — preflight and the wiring check each declare a wall-clock ceiling and name a breach](spec/2026-10-11-spec-TOOL-aBriskPreflight-7.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 25 bound to this build, across 3 record folder(s).
+Records: 28 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

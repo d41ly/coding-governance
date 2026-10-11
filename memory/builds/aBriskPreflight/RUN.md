@@ -67,3 +67,9 @@ base: 271a90045723817f694de4d22c56f88dbcd0063e
 2026-10-11T19:05:19Z dispatch · item b91d30f7 TOOL-aBriskPreflight-7 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/README.md memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-7.md memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-7-ceilings.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-7-ceiling-rows.log memory/builds/aBriskPreflight/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
 
 2026-10-11T19:06:10Z brief · item TOOL-aBriskPreflight-7 · reason 0455d49e591f memory/builds/aBriskPreflight/prompts/2026-10-11-prompt-TOOL-aBriskPreflight-7-build-brief.md
+
+2026-10-11T21:19:28Z review · item aBriskPreflight · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 9 · disposition promote
+
+2026-10-11T21:20:12Z rescope · item add TOOL-aBriskPreflight-11 · reason promoted from the closing diff review round 1, HIGH H1: the ceilings instrument's K_w drops the worst host-row fork reading, so WIRING_CEILING understates its own worst-on-record rule
+
+2026-10-11T21:20:56Z rescope · item add TOOL-aBriskPreflight-12 · reason promoted from the closing diff review round 1: the two MEDIUMs (M1 unbound records and missing ledgers, M2 RB_TOOK start-to-read) and five LOWs (L1-L5) batched into one unit
