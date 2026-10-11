@@ -194,6 +194,10 @@ override-with-a-reason exists for.
 7. The diff mode defaults to a higher effort than the scout, because it is the one arm whose recall
    fell at `medium`.
 
+Item 2's checklist scout is superseded by M1c, which adds a generated house index, an implementation
+sketch and a convention census. It solves 16 of 24 by the matcher in each of two runs, where M1b
+solves 13. The trial and its blind-judge comparison are `-1-7-m1c-trial.md`.
+
 ## Limits
 
 One node, one day, and a corpus biased toward duplicates a reviewer later noticed and named. Each arm

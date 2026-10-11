@@ -1,12 +1,13 @@
 # KICK-aScoutedSeam-1 — kickoff asks once, runs the scout on opt-in, and carries its seams onto the card and into the brief
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams kickoff · order 2
+**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams kickoff · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-11-build-TOOL-aScoutedSeam-1-1-failure-analysis.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-1-failure-analysis.md) | research | TOOL-aScoutedSeam-1 TOOL-aScoutedSeam-2 TOOL-aScoutedSeam-3 DEPL-aScoutedSeam-1 |
+| [2026-10-11-build-TOOL-aScoutedSeam-1-7-m1c-trial.md](../build/2026-10-11-build-TOOL-aScoutedSeam-1-7-m1c-trial.md) | research | TOOL-aScoutedSeam-1 |
 
 <!-- /gen:spec-records -->
 
@@ -32,19 +33,24 @@ binding seams on the READY card, as the owner asked, and into the brief the buil
   as absent, never as yes.
   - AC1 and AC5 observe it.
 - **S2** — The invocation. The manifest command catalog gains one line, in `MANIFEST-TEMPLATE.md` and
-  in this repo's `memory/guides/SESSION-KICKOFF.md`. The line runs `handoff.py harness-args
-  reuse-scout` for the `roles` object, then the `Workflow` call by `scriptPath` with the args
-  `TOOL-aScoutedSeam-1` declares. Engine Step 4 gains one clause pointing at that line; the engine
-  carries no procedure.
+  in this repo's `memory/guides/SESSION-KICKOFF.md`. The line runs three things in order:
+  - `gen_map.py --house-index`, with one `--host` per host tree, writing the index beside the card as
+    `<git-common-dir>/orientation/<session>.house-index.md`;
+  - `handoff.py harness-args reuse-scout`, for the `roles` object;
+  - the `Workflow` call by `scriptPath`, with the args `TOOL-aScoutedSeam-1` declares and that path
+    as `index`.
+
+  Engine Step 4 gains one clause pointing at that line; the engine carries no procedure.
   - AC2 observes it.
 - **S3** — Step 5 appends the harness's `section` as a SEVENTH section of the READY body, in the same
   single `--card --append`, so the READY tail never erases it. `--card --append` grades the section:
-  - every line under `## reuse` is one of the five line kinds of `TOOL-aScoutedSeam-1`'s grammar;
+  - every line under `## reuse` is one of the six line kinds of `TOOL-aScoutedSeam-1`'s grammar;
   - the section holds exactly one `scout` line;
   - a malformed line refuses the append, naming that line.
   - AC3 observes it.
 - **S4** — The brief's `### Reuse` sub-head carries the harness's FULL return in the same line
-  grammar: every seam, every constraint, every unmet need and the `scout` line. The card's section is
+  grammar: every seam, every constraint, every convention, every unmet need and the `scout` line. The
+  harness's `edits` are build work, not reuse, and are not carried. The card's section is
   the capped view of that list. `BRIEF_SKELETON`'s placeholder under `### Reuse` says so. When the
   scout did not run, the placeholder's old text stands.
   - AC4 observes it.
@@ -98,7 +104,8 @@ The `## open` answer line takes one of three forms, the same shapes `spec audit:
 
 1. Step 3 resolves the opt-in (S1). With none declared, and a task that writes product code, it asks
    once.
-2. Step 4, on opt-in, runs the catalog line (S2). The card is not touched yet.
+2. Step 4, on opt-in, runs the catalog line (S2): the house index, then the harness. The card is not
+   touched yet.
 3. Step 5 writes the brief with `### Reuse` filled from the return (S4). It appends the READY body
    with `## reuse` as its seventh section (S3), and rewrites the `**Reuse:**` field to its pointer
    (S5).
@@ -107,7 +114,8 @@ The `## open` answer line takes one of three forms, the same shapes `spec audit:
 ### The grammar check
 
 `--card --append` parses `## reuse` with a closed set of line heads: `- MUST `, `- SHOULD `,
-`- constraint `, `- unmet ` and `- scout `. A seam line must carry ` :: ` and ` — `. The check grades
+`- constraint `, `- convention `, `- unmet ` and `- scout `. A seam line must carry ` :: ` and ` — `.
+A convention line must carry `: ` and end in `(<n> of <m>)` with `n` at most `m`. The check grades
 SHAPE: a well-formed line naming the wrong seam passes, and that is `TOOL-aScoutedSeam-2`'s and the
 diff mode's to catch.
 
@@ -149,8 +157,8 @@ card that carries `## reuse`, so no existing card reds.
 
 - security: no new write path. The opt-in keys are read, and a run cannot write its own, by the
   existing self-opt-in rule.
-- perf / scale: the scout's cost is `TOOL-aScoutedSeam-1`'s; kickoff adds one append and one brief
-  sub-head.
+- perf / scale: the scout's cost is `TOOL-aScoutedSeam-1`'s, measured at about 22 minutes per lens
+  at `medium`. Kickoff adds one house-index scan per tree, one append and one brief sub-head.
 - error / empty / loading states: a dead lens is announced in the section and on the READY hand-back.
   A refused append names the line, and the session repairs it before the hand-back.
 - observability: the `## open` answer line and the section's `scout` line.
@@ -171,9 +179,10 @@ card that carries `## reuse`, so no existing card reds.
   procedure.
   Red when: the procedure is written into the engine and the size gate reds.
 - **AC3** — When `manifest-check.sh --card --append` receives a body whose `## reuse` holds a line
-  starting `- maybe `, it refuses naming that line and writes nothing. A conforming section appends
-  and survives `--card --replay`.
-  Red when: the append accepts an unknown line head.
+  starting `- maybe `, it refuses naming that line and writes nothing. It also refuses a line
+  reading `- convention Section width: normal (5 of 3)`. A conforming section with one line of each
+  of the six kinds appends and survives `--card --replay`.
+  Red when: the append accepts an unknown line head, or a convention count above its population.
 - **AC4** — When `manifest-check.sh --brief-skeleton` prints the skeleton, its `### Reuse` placeholder
   names the scout's line grammar and the fallback for a build with no opt-in.
   Red when: the placeholder still names only the two probes.
@@ -201,6 +210,10 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC3 AC4 AC5
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · S2 · S3 · S4 · §4 · §5 · AC3 · `TOOL-aScoutedSeam-1` rev-4 adopted the M1c
+  trial's scout. The catalog line now writes the house index before the harness, and the grammar
+  check gains the `convention` line kind. The brief carries conventions and leaves out the harness's
+  `edits`.
 
 ## 10. Reuse audit
 
@@ -210,6 +223,8 @@ kickoff question and the self-declaration refusal. The front-matter reader is `r
 `skills/session-kickoff/manifest-check.sh`. The brief sub-head is the `### Reuse` of `BRIEF_SKELETON`,
 which aRoutedQuill landed. `tools/codebase-map/reuse_lookup.py "ask the owner once for a dated opt-in
 declared in the build README front matter or a project conf default"` ranked `build`, `load_conf` and
-`parse_conf` by stem and missed all four, so they were found by reading.
+`parse_conf` by stem and missed all four, so they were found by reading. The house index the
+catalog line writes is `TOOL-aScoutedSeam-1`'s mode of `tools/codebase-map/gen_map.py`, and its
+output sits beside the card in the directory `manifest-check.sh` already resolves for it.
 
 Recall terms used: spec-audit opt-in README front matter SPEC_AUDIT_DEFAULT kickoff question card append brief skeleton

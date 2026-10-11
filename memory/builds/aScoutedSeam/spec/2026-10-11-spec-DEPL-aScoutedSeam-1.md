@@ -1,6 +1,6 @@
 # DEPL-aScoutedSeam-1 — adopters get the scout and a resolved host tree, and the adopter-side gaps the research found are handed over
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams deployer+kickoff · order 5
+**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams deployer+kickoff · order 5
 
 <!-- gen:spec-records -->
 
@@ -32,8 +32,10 @@ reads them.
   Every printed path must be a git work tree; one that is not refuses, naming it. The rung that
   answered is printed with the paths.
   - AC1 observes it.
-- **S2** — The kickoff catalog line of `KICK-aScoutedSeam-1` passes the verb's output as `hostTrees`.
-  The role reads a host tree for its design system and its shared code, and never writes it.
+- **S2** — The kickoff catalog line of `KICK-aScoutedSeam-1` passes the verb's output as `hostTrees`,
+  and as one `--host` each to `TOOL-aScoutedSeam-1`'s house index, so the index lists the host's
+  tokens, copies and kinds too. The role reads a host tree for its design system and its shared code,
+  and never writes it.
   - AC2 observes it.
 - **S3** — The adopter's example conf carries both keys blank, with comments: `REUSE_SCOUT_DEFAULT`
   (blank means kickoff asks) and `REUSE_HOST_TREES`. This repo's own `.unattended.conf` carries
@@ -46,7 +48,9 @@ reads them.
     uses, not its internals;
   - keep the charter from denying a design system the repository has;
   - never let a lint opt-out sanction the bypass of a shared seam;
-  - extend a style gate from colour to the lengths and type a token layer owns.
+  - extend a style gate from colour to the lengths and type a token layer owns;
+  - declare the lint-rule directory and the DSL vocabulary in `.codebase-map.conf`'s
+    `HOUSE_INDEX_DIRS` and `HOUSE_INDEX_KINDS`, so the house index lists them.
   - AC4 observes it.
 - **S5** — The scout's files reach an adopter through the kits that already carry them: the
   review-harness kit renders `reuse-scout.js` at the adopter's fan-out cap, the kickoff kit carries
@@ -73,7 +77,9 @@ reads them.
 - **hands-off** external — to the inCMS owner: the media gallery has no dossier (its help key sits
   unclaimed in the map baseline), and `incms/focal-coverage` offers "a bare-URL image, no mediaId" as a
   sanctioned opt-out. Five image fields shipped as text boxes between 2026-07-03 and 07-20 are still
-  at HEAD.
+  at HEAD. The M1c trial's index read the custom lint rules and the DSL node kinds from inCMS paths
+  it hardcoded; the deployed index reads them only once the inCMS owner declares the two
+  house-index keys.
 
 ## 4. Design
 
@@ -164,6 +170,8 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 · a fixtur
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · S2 · S4 · §3 · `TOOL-aScoutedSeam-1` rev-4 added the house index. The host trees
+  feed it, the adopter checklist gains the two listing keys, and the inCMS hand-off names them.
 
 ## 10. Reuse audit
 

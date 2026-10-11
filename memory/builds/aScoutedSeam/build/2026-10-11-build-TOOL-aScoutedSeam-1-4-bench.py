@@ -21,6 +21,10 @@ agent arms themselves are the `-1-6-*.js` workflow scripts; `args` writes their 
   compare <corpus> <results.json> <arm> [<arm> ...]      paired, over cases every arm answered
   misses  <corpus> <results.json> <arm> [<arm> ...]      ground truth beside each arm's seams
   cost    <workflows-dir> [<run-id> ...]                 per-agent medians by arm label
+  index   <corpus> <tree-root> [--only short,short]     each case's house index, beside its trees
+  judge-packets <corpus> <results.json> <out-dir> <tree-root> <arm> [...]   blind judge packets + key
+  judge-collect <corpus> <results.json> <judge-key.json> <task.output> [...]  verdicts under `judge`
+  judged  <corpus> <results.json> <arm|a+b> [...]       the semantic reading over judged cases
 
 `<src-root>` holds plain clones named gov, incms and nicocares. Nothing here writes outside the
 roots it is given. The matcher grades SHAPE: a seam naming a wrapper of the ground-truth seam is a
@@ -454,9 +458,207 @@ def cmd_cost(argv):
         print(f"{arm:<8}{str(ok)[0]:>4}{len(v):>4}{med[0]:>9.0f}{med[1]:>9.0f}{med[2]:>11.0f}{med[3]:>10.0f}{med[4]:>11.0f}")
 
 
+CODE_EXTS = (".py", ".js", ".mjs", ".cjs", ".ts", ".tsx", ".sh")
+GENERIC_NAMES = {"main", "run", "check", "read", "write", "load", "parse", "render", "default", "test", "init",
+                 "key", "keys", "value", "values", "name", "path", "data", "props", "type", "fields", "config"}
+
+
+def measure_fanin(tree):
+    """Files naming each identifier, over the tracked code files: the map's fan-in, derived live."""
+    seen = {}
+    for rel in run_git(tree, "ls-files").splitlines():
+        if not rel.endswith(CODE_EXTS):
+            continue
+        try:
+            text = (Path(tree) / rel).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        for tok in set(re.findall(r"[A-Za-z_][A-Za-z0-9_]{3,}", text)):
+            seen[tok] = seen.get(tok, 0) + 1
+    return seen
+
+
+def extract_head_comment(path):
+    """The first non-empty comment or docstring line of a file, for a one-line description."""
+    try:
+        for line in Path(path).read_text(encoding="utf-8", errors="replace").splitlines()[:25]:
+            s = line.strip().lstrip("#/*\"' ").strip()
+            if len(s) > 12 and not s.startswith(("!", "usr/bin", "-*-")):
+                return s[:140]
+    except OSError:
+        return ""
+    return ""
+
+
+def render_house_index(tree, label):
+    """The house index of one tree: what a scout should know exists before it searches."""
+    tree = Path(tree)
+    out = [f"## {label}: {tree.as_posix()}", ""]
+    libs = [p for d in ("tools/lib", "scripts/lib", "lib") for p in sorted((tree / d).glob("*")) if p.is_file()]
+    if libs:
+        out += ["### Shared libraries", ""] + [f"- `{p.relative_to(tree).as_posix()}` — {extract_head_comment(p)}" for p in libs[:30]] + [""]
+    marks = {}
+    for line in run_git(tree, "grep", "-n", "-o", "-E", "# >>> [A-Za-z_][A-Za-z0-9_-]*", check=False).splitlines():
+        path, _, rest = line.partition(":")
+        name = rest.split("# >>> ", 1)[-1]
+        marks.setdefault(name, set()).add(path)
+    if marks:
+        out += ["### Canonical copies (`# >>> <name>` markers: one function installed byte-identically in several files)", ""]
+        out += [f"- `{n}` — {len(ps)} install site(s), e.g. `{sorted(ps)[0]}`" for n, ps in sorted(marks.items(), key=lambda kv: -len(kv[1]))[:25]] + [""]
+    sym_file = tree / "memory/map/generated/symbols.json"
+    if sym_file.exists():
+        syms = (read_json(sym_file).get("symbols") or [])
+        fan = measure_fanin(tree)
+        ranked = sorted(((fan.get(s["id"], 0) - 1, s) for s in syms
+                         if len(s["id"]) > 4 and s["id"] not in GENERIC_NAMES), key=lambda t: -t[0])
+        top = [(n, s) for n, s in ranked if n >= 3][:45]
+        if top:
+            out += ["### Most-reused symbols (files naming each, definer excluded)", ""]
+            out += [f"- `{s['id']}` ({s.get('kind', '?')}) — `{s['file']}` · fan-in {n}" for n, s in top] + [""]
+    legs = tree / "tools/gate-legs.json"
+    if legs.exists():
+        doc = read_json(legs)
+        names = [l.get("name", "") for l in (doc.get("legs") if isinstance(doc, dict) else doc)]
+        out += ["### Gate legs (every one grades a change; the idiom, parity and ban legs are house rules)", "",
+                " · ".join(n for n in names if n), ""]
+    rules = sorted((tree / "packages/blocks/eslint-rules").glob("*.js")) if (tree / "packages/blocks/eslint-rules").exists() else []
+    if rules:
+        out += ["### Custom lint rules", ""] + [f"- `{p.stem}` — {extract_head_comment(p)}" for p in rules] + [""]
+    gdir = tree / "memory/gotchas"
+    if gdir.exists():
+        slugs = sorted(p.stem for p in gdir.glob("*.md") if p.stem.lower() != "readme")
+        cli = next((c for c in ("tools/memory-tree/gotchas.py", "scripts/memory-tree/gotchas.py") if (tree / c).exists()), None)
+        out += ["### Recorded bug classes" + (f" (run `python {cli} --for-paths <paths>` for the ones your paths can hit)" if cli else ""), "",
+                " · ".join(slugs[:90]) + (f" · and {len(slugs) - 90} more" if len(slugs) > 90 else ""), ""]
+    aff = []
+    for f in sorted((tree / "memory/map/features").glob("*.md")) if (tree / "memory/map/features").exists() else []:
+        block = re.split(r"^## Reuse affordance\s*$", f.read_text(encoding="utf-8", errors="replace"), maxsplit=1, flags=re.M)
+        if len(block) == 2:
+            for line in block[1].split("\n## ", 1)[0].splitlines():
+                if "seam" in line.lower() and len(line.strip()) > 8:
+                    aff.append(f"- {f.stem}: {line.strip().lstrip('- ')[:200]}")
+    if aff:
+        out += ["### Dossier reuse affordances (seams a feature is meant to be reused through)", ""] + aff[:50] + [""]
+    tokens = {}
+    for line in run_git(tree, "grep", "-h", "-o", "-E", r"^\s*--[a-z][a-z0-9-]*\s*:", "--", "*.css", check=False).splitlines():
+        tokens.setdefault(line.strip().rstrip(":").strip(), None)
+    if tokens:
+        names = sorted(tokens)
+        out += [f"### CSS custom properties defined ({len(names)})", "", " ".join(f"`{n}`" for n in names[:220]), ""]
+    vocab = tree / "packages/blocks/src/dsl/vocabulary.ts"
+    if vocab.exists():
+        kinds = sorted(set(re.findall(r"^\s{2,8}([A-Z][A-Za-z]+):\s*\{", vocab.read_text(encoding="utf-8", errors="replace"), flags=re.M)))
+        out += [f"### DSL node kinds (`{vocab.relative_to(tree).as_posix()}`)", "", " ".join(f"`{k}`" for k in kinds[:120]), ""]
+    return "\n".join(out)
+
+
+def cmd_index(argv):
+    """Write each case's house index beside its trees: `<tree-root>/<short>/house-index.md`."""
+    corpus, tree_root = read_json(argv[0]), Path(argv[1])
+    only = set(argv[argv.index("--only") + 1].split(",")) if "--only" in argv else None
+    for c in corpus:
+        if only and c["short"] not in only:
+            continue
+        base = tree_root / c["short"]
+        parts = ["# House index — what already exists, generated before the scout runs", "",
+                 "Read this first. Every name below is a candidate seam or a house rule; verify by opening it.", "",
+                 render_house_index(base / c["repo"], "primary tree")]
+        if c.get("core_point_sha"):
+            parts.append(render_house_index(base / "incms", "host core tree (incms)"))
+        text = "\n".join(parts) + "\n"
+        (base / "house-index.md").write_text(text, encoding="utf-8", newline="\n")
+        print(f"{c['short']} {c['id']:<34} {len(text.encode('utf-8')):>7} bytes")
+
+
+def cmd_judge_packets(argv):
+    """Blind judge packets: per case, the ground truth, the decoys and every named arm's seams under
+    rotated labels, so no arm holds the same slot across cases. The label key goes to `judge-key.json`
+    beside the packets and never into a packet."""
+    corpus, results, out, tree_root = read_json(argv[0]), read_json(argv[1]), Path(argv[2]), Path(argv[3])
+    arms = argv[4:]
+    out.mkdir(parents=True, exist_ok=True)
+    key = {}
+    for n, c in enumerate(corpus):
+        rot = arms[n % len(arms):] + arms[:n % len(arms)]
+        labels, body = {}, []
+        for arm in rot:
+            res = results.get(arm, {}).get(c["id"])
+            if res is None:
+                continue
+            label = f"ARM-{chr(65 + len(labels))}"
+            labels[label] = arm
+            lines = [f"### {label}"]
+            for si, s in enumerate(res.get("seams") or []):
+                lines.append(f"{si}. [{s.get('binding')}] {s.get('repo', '')}:{s.get('path')} :: {s.get('symbol')} | how: {s.get('how', '')}")
+            body.append("\n".join(lines if len(lines) > 1 else lines + ["(no seams)"]))
+        gt = c.get("ground_truth") or []
+        doc = [f"# Judge packet {c['short']}", "", "## Request", "", c["prompt"], "", "## Trees", "",
+               f"- primary ({c['repo']}): {(tree_root / c['short'] / c['repo']).as_posix()}"]
+        if c.get("core_point_sha"):
+            doc.append(f"- host core (incms): {(tree_root / c['short'] / 'incms').as_posix()}")
+        doc += ["", "## Ground truth (item 0 is the primary)", ""]
+        doc += [f"{i}. {g.get('repo', c['repo'])}:{g['path']} :: {g.get('symbol')} — {g.get('why', '')}" for i, g in enumerate(gt)] \
+            or ["none — this is a CONTROL case"]
+        doc += ["", "## Decoys", ""] + ([f"- {d['path']} :: {d.get('symbol', '')} — {d.get('why', '')}" for d in c.get("decoys") or []] or ["none"])
+        doc += ["", "## Arm outputs", ""] + body
+        (out / f"{c['short']}.md").write_text("\n".join(doc) + "\n", encoding="utf-8", newline="\n")
+        key[c["short"]] = labels
+    write_json(out / "judge-key.json", key)
+    print(len(key), "packets")
+
+
+def cmd_judge_collect(argv):
+    """Join blind verdicts back to arms through the key, and file them under `judge` in the results."""
+    corpus, dest, key = read_json(argv[0]), Path(argv[1]), read_json(argv[2])
+    shorts = {c["short"]: c["id"] for c in corpus}
+    acc = read_json(dest) if dest.exists() else {}
+    verdicts = acc.setdefault("judge", {})
+    for p in argv[3:]:
+        res = read_json(p).get("result") or {}
+        for _key, per in res.items():
+            for short, r in (per or {}).items():
+                if not r:
+                    continue
+                for a in r.get("arms") or []:
+                    arm = key.get(short, {}).get(a.get("label"))
+                    if arm:
+                        verdicts.setdefault(arm, {})[shorts[short]] = {k: a.get(k) for k in ("covered", "primary", "wrong", "valid_extra", "score", "note")}
+    write_json(dest, acc)
+    print({a: len(v) for a, v in verdicts.items()})
+
+
+def cmd_judged(argv):
+    """The semantic reading: per arm, primary covered at MUST/SHOULD, items covered, wrong MUSTs,
+    valid extras and mean score, over the cases the judge read for every named arm. With `--union a+b`
+    an arm is the union of two judged arms: an item is covered when either covered it."""
+    corpus, results = read_json(argv[0]), read_json(argv[1])
+    j = results.get("judge", {})
+    arms = argv[2:]
+    def derive_cell(arm, cid):
+        parts = arm.split("+")
+        vs = [j.get(p, {}).get(cid) for p in parts]
+        if any(v is None for v in vs):
+            return None
+        cov = set().union(*[set(v.get("covered") or []) for v in vs])
+        return {"primary": any(v.get("primary") for v in vs), "covered": cov,
+                "wrong": sum(len(v.get("wrong") or []) for v in vs),
+                "extra": sum(v.get("valid_extra") or 0 for v in vs),
+                "score": max(v.get("score") or 0 for v in vs)}
+    common = [c for c in corpus if all(derive_cell(a, c["id"]) is not None for a in arms)]
+    pos = [c for c in common if c.get("ground_truth")]
+    print(f"# judged common {len(common)} ({len(pos)} positive)")
+    for a in arms:
+        cs = [derive_cell(a, c["id"]) for c in pos]
+        ctl = [derive_cell(a, c["id"]) for c in common if not c.get("ground_truth")]
+        print(f"# {a:<24} primary {sum(x['primary'] for x in cs)}/{len(pos)} · items {sum(len(x['covered']) for x in cs)}/"
+              f"{sum(len(c['ground_truth']) for c in pos)} · wrong MUST {sum(x['wrong'] for x in cs + ctl)} · "
+              f"valid extra {sum(x['extra'] for x in cs)} · mean score {statistics.mean(x['score'] for x in cs):.2f}")
+
+
 COMMANDS = {"trees": cmd_trees, "resolve": cmd_resolve, "d1": cmd_d1, "args": cmd_args, "m0": cmd_m0,
             "collect": cmd_collect, "collect-runs": cmd_collect_runs, "halves": cmd_halves, "grade": cmd_grade, "compare": cmd_compare,
-            "misses": cmd_misses, "cost": cmd_cost}
+            "misses": cmd_misses, "cost": cmd_cost, "index": cmd_index,
+            "judge-packets": cmd_judge_packets, "judge-collect": cmd_judge_collect, "judged": cmd_judged}
 
 
 def main(argv):
