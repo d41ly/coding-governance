@@ -189,9 +189,17 @@ function chunk(a, n) {
 //                                                   //   subject carries its blob to the callee as `prevBlob`
 //   priorFindings: [{ ... }],                       // ON A FOLD RE-INVOKE: the CONVERGING return's
 //                                                   //   `priorFindings`, the previous round's confirmed set
-//   checklist: "<the checker's stdout>"             // optional: the spec audit's checklist, winning over
+//   checklist: "<the checker's stdout>",            // optional: the spec audit's checklist, winning over
 //                                                   //   the resolver's `--for-paths` run; used only when
 //                                                   //   it carries a `- ` item, and announced otherwise
+//   roles: { <stage key>: "<agent type>" }          // optional (TOOL-aOrientedCast-4): the catalogue's
+//                                                   //   harness arguments. Keys: specWriter, committer,
+//                                                   //   disposal (spawned here as that type), builder
+//                                                   //   (forwarded in dispatch.args), specFinder, skeptic,
+//                                                   //   synthesis (forwarded to the audit's review call).
+//                                                   //   A named stage leaves out the craft its role carries;
+//                                                   //   an absent key keeps today's prompt byte for byte
+//                                                   //   and is logged as untyped. `{}` equals absent.
 // }
 // TOOL-aEvidencedLens-5 - the two fold args are REFUSED at a callee round of 1 (a fresh generation has
 // no previous round) and refused by name when malformed, before any agent spawns.
@@ -426,6 +434,58 @@ if (MODES.indexOf(mode) === -1) {
   )
 }
 const attended = mode === 'attended'
+// TOOL-aOrientedCast-4 S1 - `roles`, refused by name before any agent spawns, in the order the spec's
+// table states. The shape is COPIED from the review harness's `workerType` test, because workflow
+// scripts cannot import; the protocol-parity leg's agent-type shape arm holds every copy to that one.
+// `none` is the review harness's reserved untyped literal, so an untyped stage is spelled here by
+// leaving its key out, never by naming it.
+const AGENT_TYPE_SHAPE = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/ // owner: tier2-review.template.js `workerType`
+const ROLE_KEYS = ['specWriter', 'committer', 'disposal', 'builder', 'specFinder', 'skeptic', 'synthesis']
+const roles = a.roles === undefined ? {} : a.roles
+if (!roles || typeof roles !== 'object' || Array.isArray(roles)) {
+  throw new Error(
+    'unattended-build: `roles` must be a plain object mapping a stage key to an agent type, got ' +
+      (Array.isArray(roles) ? 'array' : roles === null ? 'null' : typeof roles) + '.',
+  )
+}
+for (const k of Object.keys(roles)) {
+  if (ROLE_KEYS.indexOf(k) === -1) {
+    throw new Error(
+      'unattended-build: `roles` carries the key `' + k + '`, which is no stage of this harness; the keys are ' +
+        ROLE_KEYS.join(', ') + '. Refusing rather than ignoring it: a misspelt stage would spawn untyped with nobody told.',
+    )
+  }
+  if (typeof roles[k] !== 'string' || !AGENT_TYPE_SHAPE.test(roles[k])) {
+    throw new Error(
+      'unattended-build: `roles.' + k + '` must be an agent type name matching ^[A-Za-z][A-Za-z0-9_-]{0,63}$. Got ' +
+        JSON.stringify(roles[k]) + '.',
+    )
+  }
+  if (roles[k] === 'none') {
+    throw new Error(
+      'unattended-build: `roles.' + k + '` is `none`, the review harness\'s reserved untyped literal. An untyped ' +
+        'stage is spelled by leaving its key out of `roles`, as the review harness\'s own `roles` refusal says.',
+    )
+  }
+}
+// S4 - one line per stage key, typed, forwarded or untyped, so a fallback is never a silent one.
+for (const k of ROLE_KEYS) {
+  const reviewKey = k === 'specFinder' || k === 'skeptic' || k === 'synthesis'
+  log('roles: ' + k + ' ' + (roles[k]
+    ? (k === 'builder' ? 'is forwarded to each unit in dispatch.args as the ' + roles[k] + ' agent type'
+      : reviewKey ? 'is forwarded to the audit\'s review call as the ' + roles[k] + ' agent type'
+      : 'spawns as the ' + roles[k] + ' agent type, its role prose left to the role')
+    : (k === 'builder' ? 'is untyped: no role was passed, so each unit\'s builder spawns untyped with its role prose inline'
+      : reviewKey ? 'is untyped: no role was passed, so the review harness keeps its own fallback for that stage'
+      : 'is untyped: no role was passed, so this stage spawns untyped with its role prose inline')))
+}
+// S3 - the one sentence a typed stage's prompt gains, right after its grounding text.
+const ROLE_STAMP = ['This stage runs as the ', ' agent type: your role is your system prompt, and this message is your task. ']
+// S13 - the audit's three review keys, forwarded into the review harness's `roles`; null when none was given.
+let auditRoles = null
+for (const k of ['skeptic', 'specFinder', 'synthesis']) {
+  if (roles[k]) { auditRoles = auditRoles || {}; auditRoles[k] = roles[k] }
+}
 // S7 - warn and continue, which is the owner's ruling AGAINST this file's own recommendation to
 // refuse. A run under a mandate does not get to opt out of the mandate's enforcement by passing an
 // argument, but the owner ruled that saying so loudly beats refusing.
@@ -846,8 +906,11 @@ const specResults = await boundedParallel(
         .filter(function (u) { return u.specBriefPath })
         .map(function (u) { return u.id + ' -> ' + u.specBriefPath })
       const closing = renderCloses(gUnits)
+      // TOOL-aOrientedCast-4 S2/S3 - typed by `roles.specWriter`, which leaves out the three spans the
+      // spec-writer role carries; untyped, every byte below is as it was.
       return agent(
         GROUND +
+          (roles.specWriter ? ROLE_STAMP[0] + roles.specWriter + ROLE_STAMP[1] : '') +
           'SPEC every unit below, IN THIS ORDER. This is YOUR GROUP and it is all you are ' +
           'responsible for; other writers hold the rest of this build concurrently.\n' + gRoster +
           '\n\n' +
@@ -860,14 +923,17 @@ const specResults = await boundedParallel(
               '`closes` verb, and into no other unit\'s:\n' + closing + '\n\n'
             : '') +
           'For each: if a conforming spec already carries that id, leave it alone and count it in ' +
-          'alreadyPresent. Otherwise author it against `memory/TEMPLATE-SPEC.md` at the tier the ' +
-          'kickoff engine assigns, satisfy its section 10 reuse obligation with a real probe rather ' +
-          'than a claim, and give its status header the `order` verb this roster names. ' +
-          'Every acceptance criterion names a DIRECT observation with its command — a checker on a staged ' +
-          'break, a `--selftest` flag, a fixture, a grep over a rendered file — never the merge bar, a ' +
-          'GATE_*= prefix or a *.test.sh suite: a unit whose criterion names one runs it and stalls for hours. ' +
-          'DO NOT WRITE PRODUCT CODE in this stage. It authors designs and nothing else — a unit ' +
-          'built here would be the exact defect this harness exists to remove. ' +
+          'alreadyPresent. Otherwise author it' +
+          (roles.specWriter ? '' : ' against `memory/TEMPLATE-SPEC.md` at the tier the ' +
+            'kickoff engine assigns, satisfy its section 10 reuse obligation with a real probe rather ' +
+            'than a claim') +
+          ', and give its status header the `order` verb this roster names. ' +
+          (roles.specWriter ? '' :
+            'Every acceptance criterion names a DIRECT observation with its command — a checker on a staged ' +
+            'break, a `--selftest` flag, a fixture, a grep over a rendered file — never the merge bar, a ' +
+            'GATE_*= prefix or a *.test.sh suite: a unit whose criterion names one runs it and stalls for hours. ' +
+            'DO NOT WRITE PRODUCT CODE in this stage. It authors designs and nothing else — a unit ' +
+            'built here would be the exact defect this harness exists to remove. ') +
           'AUTHOR ONLY — DO NOT COMMIT, and do not run the build-index generator. You are one of ' +
           'several writers running at once: one committer commits once after all of you return and ' +
           'regenerates the index once: this program\'s commit stage, or the caller when it pinned ' +
@@ -876,7 +942,9 @@ const specResults = await boundedParallel(
           'NAME every unit you could not spec, in `refused`, with the reason in your summary. ' +
           'Name every unit in `authored`, `alreadyPresent` and `refused` by its unit id, exactly as this ' +
           'roster spells it, never by a path.',
-        { label: 'spec:' + slug + ':g' + gi, phase: 'Spec', schema: SPEC_SCHEMA },
+        roles.specWriter
+          ? { label: 'spec:' + slug + ':g' + gi, phase: 'Spec', schema: SPEC_SCHEMA, agentType: roles.specWriter }
+          : { label: 'spec:' + slug + ':g' + gi, phase: 'Spec', schema: SPEC_SCHEMA },
       )
     }
   }),
@@ -1055,6 +1123,8 @@ if (!authoredIds.length) {
   ].join('\n')
   const sc = await agent(
     GROUND +
+      // TOOL-aOrientedCast-4 S3 - the committer has no role span: only the stamp moves.
+      (roles.committer ? ROLE_STAMP[0] + roles.committer + ROLE_STAMP[1] : '') +
       'COMMIT the specs this build\'s SPEC writers just authored, in ONE commit: ' + authoredIds.join(', ') +
       '. Every writer has returned, so you are the only writer. Do not edit any spec. In ' + repo +
       ', in this order:\n' +
@@ -1091,7 +1161,9 @@ if (!authoredIds.length) {
       '5. Return `sha` as the full 40-hex `git rev-parse HEAD`.\n' +
       '6. Run `' + SPEC_COMMIT_CHECKLIST + '` over the commit just made and return its stdout VERBATIM as ' +
       '`checklist`, whatever its exit status; an empty selection returns an empty string.',
-    { label: 'commit:specs:' + slug, phase: 'Spec', schema: SPEC_COMMIT_SCHEMA },
+    roles.committer
+      ? { label: 'commit:specs:' + slug, phase: 'Spec', schema: SPEC_COMMIT_SCHEMA, agentType: roles.committer }
+      : { label: 'commit:specs:' + slug, phase: 'Spec', schema: SPEC_COMMIT_SCHEMA },
   )
   // S3 — FIVE REFUSALS, in the order the spec's table states, each before the resolver can spawn and
   // each ending in the one remedy. Nothing past this line can verify the commit, so a return that
@@ -1468,7 +1540,11 @@ const auRaw = !specAudit ? null : await workflow(
     // TOOL-aMendedFleet-111 S7 - `none`, so every judge writes its lens or verify file and the
     // deferred `next` below, which promises the re-run reuses them, is true. The callee's absent
     // default is Plan, under which no judge writes one and a re-run dispatches every judge again.
+    // With an audit role forwarded below that promise no longer holds, and `next` reads `durable`.
     workerType: 'none',
+    // TOOL-aOrientedCast-4 S13 - the audit's review keys, under the review harness's precedence: a
+    // stage a role names spawns as that type, and `none` above governs only a judge stage none names.
+    ...(auditRoles ? { roles: auditRoles } : {}),
     context: auditContext,
     specs: auditSpecs,
     ...(checklist !== null ? { checklist: checklist } : {}),
@@ -1537,8 +1613,12 @@ if (specAudit && auRaw.exit === 'deferred-platform') {
     auditIds: auditIds,
     roster: [],
     next:
-      'Re-run this workflow ONCE with identical args: the review reuses every lens and skeptic batch that ' +
-      'returned and dispatches only ' + (pending.length ? pending.join(', ') : 'what is missing') + '. ' +
+      'Re-run this workflow ONCE with identical args: ' +
+      // TOOL-aOrientedCast-4 S13 - a judge that ran under a role wrote no file, so no reuse is promised.
+      (auRaw.durable === false
+        ? 'this audit ran its judges under a role, so none wrote a lens or verify file and the re-run dispatches every judge again'
+        : 'the review reuses every lens and skeptic batch that ' +
+          'returned and dispatches only ' + (pending.length ? pending.join(', ') : 'what is missing')) + '. ' +
       (attended
         ? 'On a second deferred-platform, stop and report it to the owner: an attended run has no driver to hold.'
         : 'On a second deferred-platform, hold: ' + DRIVER + ' --hold ' + slug + ' --code platform-limit ' +
@@ -1853,8 +1933,11 @@ if (!specAudit) {
   // `fail 48`s without a run-state file, which is the state attended mode is DEFINED by, so the
   // attended promotion is a README roster row. Until the predicate moved off the verdict this stage
   // was unreachable in that mode and the contradiction was never live.
+  // TOOL-aOrientedCast-4 S2/S3 - typed by `roles.disposal`, which leaves out the edge join's rationale the
+  // role carries; the rule itself and the `edges` contract stay in every case.
   const d = await agent(
     GROUND +
+      (roles.disposal ? ROLE_STAMP[0] + roles.disposal + ROLE_STAMP[1] : '') +
       'BEFORE ANY UNIT IS DISPATCHED, DISPOSE of every CONFIRMED and every UNVERIFIED finding in `' +
       lastReport + '` — the audit exited ' + verdict + ' with ' + au.confirmed + ' confirmed, ' +
       au.blockers + ' at BLOCKER and ' + au.highs + ' at HIGH, and ' + au.unverified +
@@ -1894,9 +1977,10 @@ if (!specAudit) {
       'when they land on several. Nothing is folded: return `folded` as 0. ' +
       'EVERY §3 EDGE YOU WRITE GETS BOTH OF ITS ENDS, in the same pass: a **consumes-from** `X` in ' +
       'one spec is a **hands-off** back in X\'s own §3, amended there as a rev-N bump with its ' +
-      'section 9 line. A bullet written at one end only reds the hygiene gate\'s §3 edge join and ' +
-      'leaves the other author having never read the handoff, which is the whole reason that join ' +
-      'exists. ' +
+      'section 9 line. ' +
+      (roles.disposal ? '' : 'A bullet written at one end only reds the hygiene gate\'s §3 edge join and ' +
+        'leaves the other author having never read the handoff, which is the whole reason that join ' +
+        'exists. ') +
       'You may REFUTE an UNVERIFIED finding — never a CONFIRMED one — where your ' +
       'own reading finds no defect, with a one-line reason per refuted finding in `summary`, and ' +
       'count it in `refuted`. Never parked, never waived, never retired, never re-reviewed. Return ' +
@@ -1910,7 +1994,9 @@ if (!specAudit) {
       'unit that promotion repairs, or the bare string `none`, and `order` is the integer you ' +
       'wrote into its status header. Both fields are REQUIRED, and `edges: []` is a declared ' +
       'absence rather than a missing key.',
-    { label: 'dispose:' + slug, phase: 'Disposal', schema: DISPOSAL_SCHEMA },
+    roles.disposal
+      ? { label: 'dispose:' + slug, phase: 'Disposal', schema: DISPOSAL_SCHEMA, agentType: roles.disposal }
+      : { label: 'dispose:' + slug, phase: 'Disposal', schema: DISPOSAL_SCHEMA },
   )
   // NO PARTIAL HAND-OUT. Deciding which units a standing finding touches needs the tree, which this
   // runtime does not have, so an empty roster is the honest refusal. `d.disposed !== true` covers a
@@ -2276,7 +2362,12 @@ const handOut = {
     // prompt.
     // `scratch` travels for the same reason: the child refuses without it AND refuses a `ground`
     // that does not name it, so a caller copying this object hands the pair the child joins.
-    args: { repo: repo, slug: slug, scratch: scratch, mode: mode, driver: DRIVER, ground: GROUND, checklist: CHECKLIST },
+    // TOOL-aOrientedCast-4 S5 - `roles.builder` travels to the child and nothing else of `roles` does;
+    // with no builder role the object carries no `roles` key, as before.
+    args: {
+      repo: repo, slug: slug, scratch: scratch, mode: mode, driver: DRIVER, ground: GROUND, checklist: CHECKLIST,
+      ...(roles.builder ? { roles: { builder: roles.builder } } : {}),
+    },
     perUnit: ['unitId', 'specPath', 'briefPath'],
     resolvePathsWith: DRIVER + ' --plan ' + slug + ' --paths',
   },

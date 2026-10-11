@@ -350,6 +350,41 @@ Which types omit the charter — verified 2026-10-04, node a, Claude Code 2.1.17
 - UNVERIFIED: whether a custom definition added mid-session is spawnable without restarting the
   session. Name a built-in type unless that has been measured.
 
+## roles — stage agents spawned as catalogue roles
+
+The build harness and the unit harness take an optional `roles` object mapping a stage key to an
+agent type: the catalogue's harness arguments for that harness, which a caller passes as printed.
+A stage it names spawns as that type, its prompt carries one sentence after the grounding text naming
+the type, and the craft its role now carries is left out of the prompt. A stage it does not name spawns
+untyped with today's prompt byte for byte, and the harness logs one line per stage key saying which.
+`{}` and an absent `roles` mean the same thing.
+
+```js
+// unattended-build.js: specWriter, committer and disposal spawn here; builder travels in
+// dispatch.args to each unit; specFinder, skeptic and synthesis are forwarded to the audit's review call
+args: { repo, slug, scratch, units, roles: { specWriter: 'gov-spec-writer', disposal: 'gov-spec-writer',
+        builder: 'gov-builder', specFinder: 'gov-spec-reviewer', skeptic: 'gov-skeptic', synthesis: 'gov-synthesizer' } }
+// unattended-unit.js: its one key
+args: { ..., roles: { builder: 'gov-builder' } }
+```
+
+Each harness refuses, before any agent spawns: a `roles` that is not a plain object, a key outside its
+own set, a value not matching `^[A-Za-z][A-Za-z0-9_-]{0,63}$`, and the value `none`, which is the review
+harness's reserved untyped literal; an untyped stage is spelled by leaving its key out.
+
+- **The builder's hand-back.** With `roles.builder` the unit agent does not edit its spec. It sets the
+  status header to CLOSED with today's date, an edit changing nothing else, and on a divergence it
+  commits nothing and returns `why` opening `DIVERGENCE:`. The unit harness returns `diverged: true`
+  exactly then, so the caller branches on a field: it has the spec-writer role revise the spec and
+  dispatches the unit again. Untyped, the builder keeps today's order to change the spec first.
+- **The audit's roles.** The review keys reach the review harness's `roles` beside `workerType: 'none'`,
+  which then governs only a judge stage no role names. A judge run under a role writes no lens or verify
+  file, so a deferred-platform return whose review says `durable: false` tells the caller the re-run
+  dispatches every judge again, instead of promising a reuse.
+- **The parity arm.** A workflow script cannot import, so each harness that tests an agent type keeps its
+  own copy of the shape. The protocol-parity leg's agent-type shape arm compares every copy in this kit
+  with the one `tier2-review.template.js` owns, and reds on a difference or on an owner yielding none.
+
 ## `review_replay.py` — a review scored for recall against a past round
 
 Stdlib Python, run under the repo's python launcher. It answers one question nothing else here can:
