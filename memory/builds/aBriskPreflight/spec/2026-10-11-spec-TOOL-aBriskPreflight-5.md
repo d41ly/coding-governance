@@ -1,6 +1,6 @@
 # TOOL-aBriskPreflight-5 — the live-run count reads every record's phase in one pass and derives each record once
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -36,7 +36,7 @@ Line numbers are at BASE `b726385f`.
   - The `phase` and `hold-code` facts of every existing record, by one `awk` that applies `fact`'s
     section scope and value rules.
   - For each record whose phase is LANDING, or HELD under a code `check_handoff_code` admits, its
-    landing commit: one `git diff -z --name-only HEAD` over those records, `check_lease_only_diff`
+    landing commit: one `git diff --name-only HEAD` over those records, `check_lease_only_diff`
     for each record that call lists, and one `git log -1 --format=%H HEAD` per remaining record
     inside one subshell.
   - Each landing commit's ancestry against the advertised tip, by one `git rev-list` over all of
@@ -103,7 +103,9 @@ takes the first section line beginning `<key>:`, with leading spaces and only sp
 keys at once, and prints `path`, `phase` and `hold-code` separated by the byte 0x1F. The shell reads
 it with `IFS=$'\037'`. 0x1F is not IFS whitespace, so an empty field stays a field; the
 `empty-field-collapses-unless-it-is-last` gotcha is the tab-separated form of this read. The `awk`
-output is captured into a variable and read from it, which is the feed the shell-hygiene leg admits.
+output is captured into a variable, split into rows by `mapfile`, and each row is read with one
+`read`: no loop is fed by a here-string over that variable, the form the shell-hygiene leg bans one
+assignment away. A non-zero `awk` exit caches nothing.
 A path `[ -f ]` refuses is not cached, and the per-record form reads it as today.
 
 ### Equality 2: the cached landing commit is the one `read_landing_commit` returns
@@ -115,9 +117,12 @@ A path `[ -f ]` refuses is not cached, and the per-record form reads it as today
 - **The lease-only diff.** `git diff --name-only HEAD` lists a record exactly when
   `git diff -U0 HEAD` prints something for it, because both run the same change detection. A
   record it does not list therefore passes `check_lease_only_diff` trivially. A record it does list
-  is handed to `check_lease_only_diff` itself, unchanged. `-z` keeps each path whole, and the driver
-  runs from the work-tree root (`tools/unattended/unattended.sh:480`), so the listed paths and the
-  `ls-files` paths share one root.
+  is handed to `check_lease_only_diff` itself, unchanged. The listing is not `-z`: a NUL stream
+  cannot ride the variable the call is captured into. Without it git quotes a path by
+  `core.quotePath` exactly as the caller's `ls-files` does, so a listed path and its `ls-files` key
+  are one spelling, and a path git quotes fails `[ -f ]` and was never cached. The driver runs from
+  the work-tree root (`tools/unattended/unattended.sh:480`), so the listed paths and the `ls-files`
+  paths share one root.
 - **HEAD's phase.** When the lease-only diff passes, every line that differs is one of the seven
   lease-fact lines. The `phase` and `hold-code` lines and every `## ` heading are therefore the same
   bytes in HEAD's copy and the working copy, so HEAD's phase is the cached phase and no `git show` is
@@ -254,6 +259,11 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · S2 and §4 Equalities 1 and 2, the build pass: the `git diff --name-only` listing drops `-z`, because a NUL
+  stream cannot ride a captured variable and the unquoted listing spells each path as `ls-files`
+  does; the `awk` rows are read through `mapfile` and one `read` each, since a loop fed by a
+  here-string over the captured variable is the shape the shell-hygiene leg refuses; a failed `awk`
+  caches nothing. Every site the spec names was re-located after the mid-build merge and none moved.
 
 ## 9. Reuse audit
 
