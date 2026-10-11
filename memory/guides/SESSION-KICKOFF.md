@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-11T11:44:17+03:00 @ 6fbac31c7dcb2903cdf85a725f261424f8e24981
+last-audit: 2026-10-11T12:09:23+03:00 @ 7f0708597f6e49c7985b12b42130069ba882c944
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 78110101c6c3e494cd10648a8bfb4cedea9470e3
+last-body-change: 7f0708597f6e49c7985b12b42130069ba882c944
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -56,7 +56,7 @@ lives where each bullet points.
 - Governing docs: `AGENTS.md`, the template it renders from, and `memory/DECISIONS.md`; binding guides are `memory/guides/REVIEW-PROTOCOL.md` and the unattended protocol and verbs.
 - An unattended run is bound by directives the unattended Skill lists, waivable only by the owner at preflight; a discovery is adopted, not parked.
 - An unattended run declares a mode, which decides its authorization, its anchor and the directives that bind; the Skill's routing table is the list.
-- The idle-wake only wakes an idle session; resuming a stalled run is the stop-guard's, the stall-recorder's and the resume tick's, from the lease (protocol §5).
+- The idle-wake at most wakes an idle session (nine never fired in 30 h of pending background work, 2026-10-10); resuming a stalled run is the stop-guard's, the stall-recorder's and the resume tick's, from the lease, and the tick kills only what it launched, so a live STALE session is a `stale-live-pid` health line (protocol §5, `aSparedHolder`).
 - `GATE_BOUND` bounds every declared command and kills it on breach; nothing bounds an agent-launched process except `tools/process-monitor/`.
 - An adopter's bar holds a leg by `subject = "kit"` alone: govkit never emits `chunk`, so a shipped self-test declares it in its descriptor (`aBenchedProbe`).
 - A CLOSED Tier-2 unit owes an acceptance ledger in a `journal` record; the grammar is `memory/HYGIENE.md` "Acceptance ledger".
