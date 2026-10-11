@@ -1,6 +1,6 @@
 # KICK-aOrientedCast-1 — the card's task gains To-do and Reuse, and a READY body lands only with every task field filled
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams kickoff · order 1
+**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams kickoff · order 1
 
 <!-- gen:spec-records -->
 

@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: e176dd9331ec50bbcb807ce10f93522892f0ef80
-phase: FOLDING
+witness: 1653081d96a1fa18fe9398f89bb16b87daff6e55
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/deterministic-attended-workflows-943570
