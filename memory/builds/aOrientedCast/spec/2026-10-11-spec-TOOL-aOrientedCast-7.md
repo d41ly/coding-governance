@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-7 — the spawn guard refuses an Agent or Workflow call that carries no rendered handoff
 
-**Status:** CLOSED · rev-3 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 10 · ratified 2026-10-11
+**Status:** CLOSED · rev-4 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 10 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -29,8 +29,8 @@ its `args` hand that harness a `roles` object of known roles.
 
 - **S1** — Rule 6 runs in `main` after the `AGENT_CAP` refusal and the declared-cap read, which deny
   every call, and before rule 4 on an `Agent` call and rule 0 on a `Workflow` call. A spawn rule 6
-  refuses therefore claims no slot. It runs only when no `--only=` selector is given, as rules 0 to 3
-  do. Observed by AC3 and AC5.
+  refuses therefore claims no slot. It runs only when no `--only=` selector is given, as rule 0
+  does. Observed by AC3 and AC5.
 - **S2** — The index is `.claude/roles.json` at the checkout root of the payload `cwd`, read through
   `loadRoleIndex`, which `TOOL-aOrientedCast-6` exports from `scratch-guard.js`. Arming, as §8 F3
   resolved it: an absent index adds no rule; a broken one refuses every `Agent` and `Workflow` call
@@ -436,6 +436,9 @@ once; no pass runs them.
   `unattended-build.test.sh` arm asks the hook to admit the build harness with no `roles`. S11 adds
   `--only=scripts` for the leg and `roles` for the arm; AC5 observes the selector. §7 gains the
   `verifier fan-out` leg and the two self-tests whose guards the two new paths trip.
+- rev-4 · 2026-10-12 · S1. Its "as rules 0 to 3 do" stood beside S11, under which rules 1 to 3 run
+  with `--only=scripts`; it reads "as rule 0 does", which is what the code does. Found by the pass's
+  bug-class checklist (amendment-leaves-its-other-half-standing).
 
 ## 10. Reuse audit
 
