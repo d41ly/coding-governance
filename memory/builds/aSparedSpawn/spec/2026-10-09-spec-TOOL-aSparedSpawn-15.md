@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-15 — the remaining clock-bound arms on the flake list, ordered or calibrated
 
-**Status:** OPEN · rev-1 · 2026-10-09 · node a · Tier-1 · base 22efab65 · streams tooling · order 2
+**Status:** INPROGRESS · rev-1 · 2026-10-09 · node a · Tier-1 · base 22efab65 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
