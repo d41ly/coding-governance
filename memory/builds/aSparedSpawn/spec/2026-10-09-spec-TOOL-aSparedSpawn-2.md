@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-2 — the pool width comes from a measured spawn calibration, and dispatch pauses on spawn pressure
 
-**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 1 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 1 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -52,7 +52,9 @@ already does for memory.
   The age is parsed from `<iso-utc>` by civil-date arithmetic, so the read spawns nothing; a
   future-dated line is stale. The boot test allows 60 seconds of clock jitter, and is skipped where
   this host's `/proc/uptime` does not read. `width_from` is `row`, `calibrated` (the pick narrowed
-  the row) or `GATE_JOBS`, and `--print-profile` prints it as a key.
+  the row) or `GATE_JOBS`, and `--print-profile` prints it as a key. **rev-3:** under `GATE_JOBS`
+  the profile line carries no calibration note, because the override names the width and a cache
+  that was not consulted has nothing to report; the line reads `width <n>,` exactly as before.
 - **S5** — The spawn-pressure pause, a fifth knob `spawnpause=<ratio>` in `KNOWN_KNOBS` and the
   table, 0 or absent meaning off. The census sampler (`arm_census`) also times three spawns on each
   tick and writes the reading to a file in the run's work dir. `check_dispatch_pause` holds the next
@@ -67,6 +69,9 @@ already does for memory.
   seventh field naming which reading held it (`memory`, `spawn` or `memory+spawn`), appended so no
   positional reader moves. The `memory:` line and the verdict's `paused` keys count the episodes the
   memory reading held; a spawn-held episode is counted on the `spawn:` line and recorded in the rows.
+  **rev-3:** `derive-ceilings.py` reads a `pauses` row only when it has exactly six fields, so the
+  seventh would silently empty its census set-aside. Its reader takes six fields or more, and every
+  episode, memory- or spawn-held, sets aside the readings it overlapped, both being contention.
 - **S6** — An arm seam, `GATE_SPAWN_NOW`, naming a file read in place of the sampler's reading, as
   `GATE_MEMINFO` stands in for `/proc/meminfo`. Observed by AC5.
 - **S7** — `PINNED_KNOBS` in the canary (`run-gates.test.sh:1385`) gains `spawnpause` in the same
@@ -133,8 +138,12 @@ tenfold between nodes with identical core counts.
 - `tools/run-gates/README.md` — the verb and its cache.
 - `tools/run-gates/kit.toml` — the kit version, moved once for the build, by the main loop.
 
+- `tools/run-gates/derive-ceilings.py` — its `pauses` reader takes the seventh field (rev-3).
+- `tools/run-gates/run-gates.evidence.test.sh` — the census arm's `pauses` fixture row gains the
+  seventh field the runner now writes, so that arm reds on a length-exact reader (rev-3).
+
 rev-2: the header `width_from` key is read by the calibration arm in the canary rather than by an
-evidence-suite arm, so the evidence suite is not touched.
+evidence-suite arm. rev-3: the evidence suite is touched for the `pauses` fixture row alone.
 - `memory/builds/aSparedSpawn/build/` — the A/B instrument and its rows (S1).
 
 ### Alternatives rejected
@@ -191,7 +200,7 @@ evidence-suite arm, so the evidence suite is not touched.
 
 `run-gates canary` · `run-gates evidence` · `run-gates turnstile` · `run-gates run-log line` ·
 `run-gates gov canary` · `run-gates adopter e2e` · `profile-bar selftest` · `pre-push run-log line` ·
-`push-main self-test` · `check-wiring self-test` · `settings-merge selftest` ·
+`push-main self-test` · `run-selftests self-test` · `check-wiring self-test` · `settings-merge selftest` ·
 `foreign-prefix parity (every self-test at three prefixes)` ·
 `python resolver (behaviour + inline parity + idiom ban)` · `install-prefix self-test` ·
 `dead-path carriers self-test` · `lexicon naming predicates` · `spec-tokens self-test` ·
@@ -233,6 +242,10 @@ New arm: tools/run-gates/run-gates.test.sh · covers AC7 · `spawnpause` added t
   the cache age is parsed without a spawn and the boot test allows 60 s; the ratio is whole, 0 to
   1000; the `spawn:` line prints only with the knob on; the shared pause block moves in both runners
   and its rows gain a seventh `by` field; `width_from` is graded in the canary, not the evidence suite.
+- rev-3 · 2026-10-11 · the continuation pass. §7 names `run-selftests self-test`, whose guard the
+  moved pause block trips; `derive-ceilings.py`'s length-exact `pauses` reader takes the seventh
+  field, and the evidence suite's fixture row carries it; under `GATE_JOBS` the profile line drops
+  the calibration note, which canary arm 4g's `width 3,` match would otherwise red.
 
 ## 10. Reuse audit
 
