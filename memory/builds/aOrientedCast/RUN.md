@@ -79,3 +79,5 @@ base: 646d4a73581393acbf42f33864a9808c96d00a0c
 2026-10-11T18:59:20Z brief · item PLAY-aOrientedCast-1 · reason 8fe392978328 memory/builds/aOrientedCast/prompts/2026-10-11-prompt-TOOL-aOrientedCast-1-2-build-brief.md
 
 2026-10-11T19:04:43Z dispatch · item 6855d6ae PLAY-aOrientedCast-1 · reason coding-governance-agents.template.md AGENTS.md .governance/deploy.toml tools/template-size-highwater.txt memory/guides/SESSION-KICKOFF.md memory/builds/aOrientedCast/spec/2026-10-11-spec-PLAY-aOrientedCast-1.md memory/builds/aOrientedCast/build/2026-10-11-build-PLAY-aOrientedCast-1-1-acceptance-ledger.md memory/builds/aOrientedCast/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-11T19:25:00Z dispatch · item ed5785a5 PLAY-aOrientedCast-1 · reason .claude/agents/gov-builder.md .claude/agents/gov-diff-reviewer.md .claude/agents/gov-orienter.md .claude/agents/gov-researcher.md .claude/agents/gov-reuse-scout.md .claude/agents/gov-skeptic.md .claude/agents/gov-spec-reviewer.md .claude/agents/gov-spec-writer.md .claude/agents/gov-synthesizer.md memory/builds/aOrientedCast/build/2026-10-11-build-PLAY-aOrientedCast-1-1-acceptance-ledger.md

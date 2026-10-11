@@ -54,6 +54,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 - Tier-2: the DoR *is* a design pass — the full spec + a bounded production-readiness menu (best-practice implementation, the extra tools it needs, and the cross-cutting concerns: security · perf/scale · a11y · i18n · error/empty/loading states · observability · testing/gates · migration/rollback · `help/` docs).
 - Surface that menu and **get scope approval BEFORE building** (a menu to select from, not scope-creep licence); record the agreed spec per §6.
 - A write gate refuses a product-code write that no specced unit owns.
+- Every agent is handed a rendered role; spec writing and review, building and the closing review run only in role agents, and the main loop orients, hands off and keeps the books (`<prefix>/roles/README.md`).
 - Codebase map adopted (§5)? A design pass touching an UNDOSSIERED feature creates/refreshes that dossier as a DoR item (the pass already reads what the dossier needs) — the map's convergence forcing function.
 
 **Definition of Done — before you call it done:**

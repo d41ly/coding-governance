@@ -13,7 +13,13 @@ ran `adopt-playbook.sh --target . --check` once while listing the renderer's der
 exited 0, but that is the render-wiring leg and AC2 stays owed to the main loop rather than being
 claimed from that run. The two high-water rows were re-recorded by hand to the measured byte counts,
 because `check-template-size.sh --bump` is a gate-leg command this run reserves; the edit writes the
-same tab-separated, sorted rows that `--bump` writes.
+same tab-separated, sorted rows that `--bump` writes. After the pass commit `ed5785a50` a grep for
+the retired clause outside the memory tree found it in four rendered agent types under
+`.claude/agents/`, which embed charter sections read from `AGENTS.md`; the spec's S2 Readers clause
+names only the template and its render, so it missed them. A follow-up commit re-rendered the agent
+types with `adopt-roles.sh --scaffold`: six changed, the clause now appears in none, and the new
+bullet appears in `gov-orienter.md` and `gov-spec-writer.md`, whose roles carry charter §1. The
+`roles render wiring` leg that compares them is owed to the main loop.
 
 **Evidences:** PLAY-aOrientedCast-1
 - AC1 — `grep -c "It DOES inherit the governing doc"` — 0 in `coding-governance-agents.template.md` and in `AGENTS.md` (1 each at the parent), while `grep -c "Hooks DO fire in it, measured;"` is 1 in each and `grep -n "Every agent is handed a rendered role"` shows the bullet once, at template line 44 and `AGENTS.md` line 99, each directly after the write-gate bullet.
