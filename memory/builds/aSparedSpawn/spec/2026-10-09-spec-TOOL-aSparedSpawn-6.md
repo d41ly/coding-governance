@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-6 — the unattended driver as a library, called in process by its suite
 
-**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 1
+**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -31,12 +31,13 @@ unit 0 below measures first.
   closed sets and `read_bound_key` reads (`:559-629`), `SHARED_RECORDS` and `GENERATED_INDEXES`
   (`:645-671`), `REVIEW_ROUNDS` and its runaway check (`:843-847`) and `PROCFS_ROOT` (`:1463`). It
   EXITS on a refusal, as today. `observe_remote` (`:455`) moves above it. Nothing is re-indented, so
-  column-0 greps still match. Observed by AC2, AC5.
+  column-0 greps still match. An EXECUTED driver calls it right below its definition, so every
+  top-level line after it still runs after the conf, as it always did. Observed by AC2, AC5.
 - **S3** — `main()` wraps the argv state, the runlog install, the parse loop and the dispatch
   (`:13156-13363`). `refuse_waive_unless_preflight` (`:13194`) moves above it as a top-level
   definition. Every `exit` keeps its `RUNLOG_CLEAN=1` marker. Observed by AC2, AC3.
-- **S4** — The entry: the file's last lines return when sourced and run `load_driver_conf` then
-  `main "$@"` when executed. `main` refuses with rc 2, naming the leak, when sourced and
+- **S4** — The entry: the file's last lines return when sourced and run `main "$@"` when executed,
+  whose conf `load_driver_conf` already loaded below its own definition (S2). `main` refuses with rc 2, naming the leak, when sourced and
   `BASH_SUBSHELL` is 0. Observed by AC2, AC4.
 - **S5** — The `$0` and `$$` sites. `KIT_DIR` and `SELF` (`:84`, `:120`) read `BASH_SOURCE[0]`. The
   three `--hold` remedy lines (`:10249`, `:10263`, `:10304`) print `DRIVER_ARGV0`, which is `$0` when
@@ -72,8 +73,8 @@ unit 0 below measures first.
   definition sourced in the prologue, and reds naming each that differs. A static scan for a
   colliding top-level name cannot tell a double fenced in `( … )` or restored after its block from
   one that leaks into every later in-process call, and the comparison grades that property itself.
-  The nine colliding suite helpers the research found are fenced or restored by re-slicing the
-  driver's definition after their block (`slice_fn`); `resolve_python`'s suite copy is the
+  The nine colliding suite helpers the research found are fenced in `( … )` or restored by
+  re-sourcing the driver after their block; `resolve_python`'s suite copy is the
   byte-identical canonical block and compares equal. The top-level-exit arm derives every top-level
   `exit` outside the two function spans and reds unless a declared row names the refusal text beside
   it and the suite holds an arm asserting that text from a driver run as a process. Observed by AC8.
@@ -107,9 +108,10 @@ unit 0 below measures first.
 ### The driver: one file, two entry shapes
 
 ```bash
-# A sourced driver defines and returns; an executed one loads its conf and runs.
+# Below load_driver_conf's definition: an executed driver loads its conf there, in its old order.
+[ "${BASH_SOURCE[0]}" != "$0" ] || load_driver_conf
+# The file's last lines: a sourced driver defines and returns; an executed one runs.
 [ "${BASH_SOURCE[0]}" = "$0" ] || return 0
-load_driver_conf
 main "$@"
 ```
 
@@ -166,7 +168,7 @@ The unattended kit version is bumped once, after the last move, in every carrier
 ### Inventory
 
 New identifiers: `load_driver_conf` (verb `load`), `main` (the reserved entry verb), `run_proc`,
-`run_driver`, `derive_tree_digest`, `render_stable`, and the variables `DRIVER_ARGV0`, `DRIVER_PID`,
+`run_driver`, `run_inproc` (the uncounted in-process body the parity table calls), `derive_tree_digest`, `render_stable`, and the variables `DRIVER_ARGV0`, `DRIVER_PID`,
 `DRV_INPROC_TALLY`, `DRV_PROC_TALLY`, `DRV_FNS` and `UNATTENDED_HARNESS`.
 
 ### Files touched (estimate)
@@ -222,10 +224,10 @@ New identifiers: `load_driver_conf` (verb `load`), `main` (the reserved entry ve
   Red when: an assertion disappears, a mode reds where the other passes, or the count is read
   through `tail`.
   permission: the driver shards are held suites the owner runs on demand; owed at that run.
-- **AC7** — When the parity block runs as a slice (prologue plus that block), every row agrees on
+- **AC7** — When the parity block runs in its shard, every row agrees on
   `render_stable` output, rc and `derive_tree_digest`; with `read_bound_key` staged out of
   `load_driver_conf`, the rc-2 row reds. Red when: the staged break passes.
-  cost: a slice, about a minute; the whole suite is not run for this.
+  permission: a build pass runs no suite and no slice of one; owed at VERIFYING with the shard.
 - **AC8** — When a top-level suite function named like a driver function, or a column-0 `exit` with
   no `run_proc` arm, is staged, the namespace arm and the top-level-exit arm each red naming it.
   Red when: either staged break passes.
@@ -233,8 +235,8 @@ New identifiers: `load_driver_conf` (verb `load`), `main` (the reserved entry ve
   `run_proc`, its `harness:` line reads 0 in-process calls and the run reds; with
   `UNATTENDED_HARNESS=process` the same shard is green. Red when: a zero count passes, or process
   mode reds on an arm in-process mode passes.
-  permission: the staged zero is observed on a slice (prologue plus the tail block); the per-shard
-  runs in both modes are the owner's on-demand cadence.
+  permission: the staged zero is observed on a shard run at VERIFYING, never on a slice in the pass;
+  the per-shard runs in both modes are the owner's on-demand cadence.
 
 ## 7. Gates
 
@@ -260,6 +262,13 @@ none
   run's record; `GATE_BOUND_LIVE` is re-derived there for the suite's top-level assignment. The
   namespace arm compares definitions at shard end instead of scanning names, which cannot tell a
   restored double from a leaking one. Unit 0's load is eight fork loops, not eight shards.
+- rev-3 · 2026-10-11 · §2 §4 §6 S2 S4 S8 AC7 AC9 · the build pass. An executed driver calls
+  `load_driver_conf` right below its definition instead of at the file's end, so the top-level lines
+  after the preamble still run after the conf and a conf still cannot pre-set what they initialise.
+  The colliding suite helpers are restored by re-sourcing the driver after their block, which
+  restores every definition at once where `slice_fn` restores one. `run_inproc` joins the inventory
+  as the parity table's uncounted in-process body. AC7 and AC9 are observed on shard runs at
+  VERIFYING, because the corrected brief forbids a suite slice inside a pass.
 
 ## 10. Reuse audit
 
