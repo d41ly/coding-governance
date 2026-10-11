@@ -352,11 +352,12 @@ Which types omit the charter — verified 2026-10-04, node a, Claude Code 2.1.17
 
 ## roles — stage agents spawned as catalogue roles
 
-The build harness and the unit harness take an optional `roles` object mapping a stage key to an
-agent type: the catalogue's harness arguments for that harness, which a caller passes as printed.
-A stage it names spawns as that type, its prompt carries one sentence after the grounding text naming
-the type, and the craft its role now carries is left out of the prompt. A stage it does not name spawns
-untyped with today's prompt byte for byte, and the harness logs one line per stage key saying which.
+The build harness, the unit harness and the review harness take an optional `roles` object mapping a
+stage key to an agent type: the catalogue's harness arguments for that harness, which a caller passes
+as printed. A stage it names spawns as that type and the craft its role now carries is left out of the
+prompt; in the build and unit harnesses its prompt also carries one sentence after the grounding text
+naming the type. A stage it does not name spawns as it did before roles, untyped in those two and
+under `workerType` in the review harness, and each harness logs one line per stage saying which.
 `{}` and an absent `roles` mean the same thing.
 
 ```js
@@ -366,6 +367,9 @@ args: { repo, slug, scratch, units, roles: { specWriter: 'gov-spec-writer', disp
         builder: 'gov-builder', specFinder: 'gov-spec-reviewer', skeptic: 'gov-skeptic', synthesis: 'gov-synthesizer' } }
 // unattended-unit.js: its one key
 args: { ..., roles: { builder: 'gov-builder' } }
+// tier2-review.js: its four keys, only the running kind's finder key read
+args: { repo, base, head, reviewDir, roles: { diffFinder: 'gov-diff-reviewer', specFinder: 'gov-spec-reviewer',
+        skeptic: 'gov-skeptic', synthesis: 'gov-synthesizer' } }
 ```
 
 Each harness refuses, before any agent spawns: a `roles` that is not a plain object, a key outside its
@@ -381,6 +385,16 @@ harness's reserved untyped literal; an untyped stage is spelled by leaving its k
   which then governs only a judge stage no role names. A judge run under a role writes no lens or verify
   file, so a deferred-platform return whose review says `durable: false` tells the caller the re-run
   dispatches every judge again, instead of promising a reuse.
+- **The review harness's roles.** `tier2-review.js` takes four keys: `diffFinder` and `specFinder` name
+  the finders of a diff review and of a spec audit, only the running kind's key being read; `skeptic`
+  names every skeptic batch; `synthesis` names the synthesis. A key wins over `workerType` for its own
+  stage, `workerType` keeps every judge stage no key names, and the synthesis takes its key or no type;
+  the resume probe never takes one. A roled finder or skeptic is told none of the posture its role
+  carries, and keeps every stage protocol sentence: the acquire step, the rubric, the probe policy, the
+  schemas. Any judge under a type, a role or `workerType`, makes the whole run not durable, so every
+  judge writes no file and a re-run dispatches every finder and skeptic again; a synthesis role alone
+  keeps a `none` run durable and its key. A judge role joins the review key; the synthesis role does not.
+  Compose the object with `<prefix>/roles/handoff.py harness-args tier2-review` rather than by hand.
 - **The parity arm.** A workflow script cannot import, so each harness that tests an agent type keeps its
   own copy of the shape. The protocol-parity leg's agent-type shape arm compares every copy in this kit
   with the one `tier2-review.template.js` owns, and reds on a difference or on an owner yielding none.

@@ -66,7 +66,9 @@ decision has to be made in the orchestrator.
 every lens and skeptic batch writes its result under `<git-common-dir>/review-lenses/<key>/` before
 it returns, and `path` is required on all three agent schemas. A judge writes its file ONLY under
 `none`: the absent default, Plan, holds no Write tool, so a deferred return under it carries
-`durable: false` and a re-run dispatches every judge again (`TOOL-aMendedFleet-111`). The build
+`durable: false` and a re-run dispatches every judge again (`TOOL-aMendedFleet-111`). A judge
+spawned under a role from the harness's `roles` argument is a named type too, so it writes no file
+and the run is not durable (`TOOL-aOrientedCast-5`). The build
 harness's spec audit passes `none` for that reason. The key is the kind, the round, the pinned subject (the
 RESOLVED base and head for a diff review) and a print of `context`, `byDesign` and `priorFindings`.
 One probe agent reads the directory first, because the script has no filesystem, and a file is

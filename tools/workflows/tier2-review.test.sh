@@ -1584,6 +1584,7 @@ async function runLedgerArms() {
   const k2b = await deriveFoldKey('abc1231')
   ck(k1 !== 'threw' && k0 !== k1 && k1 !== k2b && k0 !== k2b, 'fold: the review key moves with prevBlob')
   await runLensYieldArms()
+  await runRolesArms()
 }
 
 // ==== TOOL-aEvidencedLens-6 — `lensYield`, one row per running lens, unique defects counted by ITEM ====
@@ -1673,6 +1674,121 @@ async function runLensYieldArms() {
     ck(scanYield(r, 3) && r.result.skippedLenses.length === 2 && r.result.lensYield.every((e) => r.result.skippedLenses.indexOf(e.lens) === -1),
       'lens yield: a light run carries a row per running lens and none for a skipped one')
   }
+}
+
+// ==== TOOL-aOrientedCast-5 — `roles`, each stage spawned as the catalogue role its caller names =====
+// Every arm is RED against the parent render, which reads no `roles`: no refusal fires, every stage
+// keeps the `workerType` type, the posture sentences stay, the key never moves and no `role ` line is
+// logged. A green arm here says the routing, the prompt variants and the key follow the argument; no
+// live agent of a rendered role type is spawned, so nothing here proves the platform runs one.
+async function runRolesArms() {
+  const FULL = { diffFinder: 'gov-diff-reviewer', specFinder: 'gov-spec-reviewer', skeptic: 'gov-skeptic', synthesis: 'gov-synthesizer' }
+  const ABSW = Object.assign({}, DIFF); delete ABSW.workerType
+  const scanStage = (run, p) => run.trace.filter((t) => t.label.indexOf(p) === 0)
+  const scanTypes = (run, p) => scanStage(run, p).map((t) => t.agentType)
+  const checkAll = (xs, v) => xs.length > 0 && xs.every((x) => x === v)
+  // ---- S1: every malformed `roles` refuses before any spawn, naming the offending key or value.
+  for (const [lbl, v, named] of [['null', null, 'null'], ['an array', [], '[]'], ['a string', 'gov-skeptic', '"gov-skeptic"'],
+    ['an unknown key', { finder: 'x' }, '"finder"'], ['an empty value', { skeptic: '' }, 'skeptic'], ['a value off the shape', { skeptic: '1bad' }, '"1bad"'],
+    ['the none literal', { skeptic: 'none' }, '"none"'], ['a number', { skeptic: 7 }, 'Got 7'], ['a value with a space', { synthesis: 'a b' }, '"a b"']]) {
+    const x = await runReview(Object.assign({}, ABSW, { roles: v }), ALL_OK)
+    ck(!!x.threw && x.threw.indexOf('tier2-review: `roles`') === 0 && x.threw.indexOf(named) !== -1 && x.trace.length === 0,
+      'roles: ' + lbl + ' is refused before any spawn, naming ' + named + (x.threw ? '' : ' (it proceeded)'))
+  }
+  let r = await runReview(Object.assign({}, ABSW, { roles: {} }), ALL_OK)
+  ck(!r.threw && r.result && r.result.exit === 'complete', 'roles: an empty object proceeds' + (r.threw ? ' (threw: ' + r.threw + ')' : ''))
+  // ---- S3: each stage spawns as the type its key names, and the probe never takes one.
+  r = await runReview(Object.assign({}, ABSW, { roles: FULL }), ALL_OK)
+  if (checkNoThrow(r, 'roles full diff')) {
+    ck(checkAll(scanTypes(r, 'find:'), 'gov-diff-reviewer') && checkAll(scanTypes(r, 'verify:'), 'gov-skeptic') &&
+      checkAll(scanTypes(r, 'synth'), 'gov-synthesizer') && checkAll(scanTypes(r, 'resume:probe'), undefined),
+      'roles: a full diff set spawns finders, skeptics and the synthesis as their roles, and the probe untyped')
+  }
+  const rsf = await runReview(Object.assign({}, SPEC, { roles: FULL }), ALL_OK)
+  if (checkNoThrow(rsf, 'roles full spec'))
+    ck(checkAll(scanTypes(rsf, 'find:'), 'gov-spec-reviewer') && checkAll(scanTypes(rsf, 'verify:'), 'gov-skeptic'),
+      'roles: a spec audit spawns its finders as specFinder, never diffFinder')
+  const rsk = await runReview(Object.assign({}, ABSW, { roles: { skeptic: 'gov-skeptic' } }), ALL_OK)
+  if (checkNoThrow(rsk, 'roles skeptic only'))
+    ck(checkAll(scanTypes(rsk, 'find:'), 'Plan') && checkAll(scanTypes(rsk, 'verify:'), 'gov-skeptic') && checkAll(scanTypes(rsk, 'synth'), undefined),
+      'roles: a skeptic key alone moves the skeptics; the finders keep workerType\'s Plan and the synthesis stays untyped')
+  const rsy = await runReview(Object.assign({}, DIFF, { roles: { synthesis: 'gov-synthesizer' } }), ALL_OK)
+  if (checkNoThrow(rsy, 'roles synthesis only'))
+    ck(checkAll(scanTypes(rsy, 'find:'), undefined) && checkAll(scanTypes(rsy, 'verify:'), undefined) && checkAll(scanTypes(rsy, 'synth'), 'gov-synthesizer'),
+      'roles: a synthesis key under workerType none moves the synthesis alone')
+  // ---- S4: a roled judge makes the whole run not durable; a synthesis role does not.
+  const rdf = await runReview(Object.assign({}, DIFF, { roles: { diffFinder: 'gov-diff-reviewer' } }), ALL_OK)
+  if (checkNoThrow(rdf, 'roles finder only')) {
+    const judges = scanStage(rdf, 'find:').concat(scanStage(rdf, 'verify:'))
+    ck(judges.length === 10 && judges.every((t) => t.prompt.indexOf('Write no file') !== -1 && t.prompt.indexOf('DURABILITY') === -1),
+      'roles: under a finder role, every finder and every untyped skeptic is told to write no file')
+  }
+  r = await runReview(Object.assign({}, DIFF, { roles: { diffFinder: 'gov-diff-reviewer' } }), buildStubs({ 'find:': null }))
+  if (checkNoThrow(r, 'roles finder only, lenses dead'))
+    ck(r.result.durable === false && r.result.note.indexOf('dispatches every finder and skeptic again') !== -1,
+      'roles: a finder role with every lens dead returns durable false, and the note re-dispatches every judge')
+  if (rsy.result) {
+    const judges = scanStage(rsy, 'find:').concat(scanStage(rsy, 'verify:'))
+    ck(judges.length === 10 && judges.every((t) => t.prompt.indexOf('DURABILITY') !== -1), 'roles: a synthesis role leaves every judge its DURABILITY clause')
+  }
+  r = await runReview(Object.assign({}, DIFF, { roles: { synthesis: 'gov-synthesizer' } }), buildStubs({ 'find:': null }))
+  if (checkNoThrow(r, 'roles synthesis only, lenses dead'))
+    ck(r.result.durable === true, 'roles: a synthesis role with every lens dead returns durable true')
+  // ---- S5: a roled stage omits its role's posture and keeps every protocol sentence.
+  const scanPosture = (run) => scanStage(run, 'find:').every((t) => t.prompt.indexOf('You are the ') === -1 && t.prompt.indexOf('No speculation, no style nits') === -1) &&
+    scanStage(run, 'verify:').every((t) => t.prompt.indexOf('You are an adversarial skeptic') === -1 && t.prompt.indexOf('try hard to REFUTE') === -1)
+  const scanProtocol = (run) => scanStage(run, 'verify:').length > 0 &&
+    scanStage(run, 'verify:').every((t) => t.prompt.indexOf('SEVERITY RUBRIC') !== -1 && t.prompt.indexOf('WHEN YOU CANNOT ESTABLISH A FINDING') !== -1)
+  if (rsf.result) {
+    const full = await runReview(Object.assign({}, ABSW, { roles: FULL }), ALL_OK)
+    ck(!full.threw && scanPosture(full) && scanPosture(rsf), 'roles: no roled finder or skeptic prompt restates its role\'s posture, on either kind')
+    ck(!full.threw && scanProtocol(full) && scanProtocol(rsf) && scanStage(full, 'find:').length === 5 &&
+      scanStage(full, 'find:').every((t) => t.prompt.indexOf('Review ONLY the diff named under SUBJECT above') !== -1 && t.prompt.indexOf('Nothing outside the diff.') !== -1) &&
+      scanStage(rsf, 'find:').every((t) => t.prompt.indexOf('For EACH subject listed under SUBJECT above') !== -1 && t.prompt.indexOf('PROBE POLICY') !== -1),
+      'roles: every roled prompt keeps the acquire step, the probe policy, the rubric and the cannot-establish rule')
+  }
+  if (rsk.result)
+    ck(scanStage(rsk, 'find:').length === 5 && scanStage(rsk, 'find:').every((t) => t.prompt.indexOf('You are the ') !== -1),
+      'roles: a skeptic role alone leaves every finder its identity sentence')
+  // ---- S6: only a judge role joins the key, as { find, verify }.
+  const deriveRolesKey = async (v) => {
+    const x = await runReview(v === undefined ? DIFF : Object.assign({}, DIFF, { roles: v }), ALL_OK)
+    return x.result ? x.result.key : 'threw: ' + x.threw
+  }
+  const kAbsent = await deriveRolesKey(undefined)
+  const kEmpty = await deriveRolesKey({})
+  const kSynth = await deriveRolesKey({ synthesis: 'gov-synthesizer' })
+  const kOther = await deriveRolesKey({ specFinder: 'gov-spec-reviewer' })
+  const kSkeptic = await deriveRolesKey({ skeptic: 'gov-skeptic' })
+  const kFullA = await deriveRolesKey(FULL)
+  const kFullB = await deriveRolesKey(Object.assign({}, FULL, { diffFinder: 'gov-other-reviewer' }))
+  ck(kAbsent.indexOf('threw') !== 0 && kAbsent === kEmpty && kAbsent === kSynth && kAbsent === kOther,
+    'roles: absent, empty, a synthesis role and the other kind\'s finder key all keep the classic key')
+  ck(kSkeptic.indexOf('threw') !== 0 && kSkeptic !== kAbsent && kFullA !== kFullB && kFullA.indexOf('threw') !== 0,
+    'roles: a skeptic role moves the key, and so does a different finder role')
+  // ---- S7: one log line per stage on every run, naming the type and its source.
+  r = await runReview(Object.assign({}, ABSW, { roles: { skeptic: 'gov-skeptic', specFinder: 'x' } }), ALL_OK)
+  if (checkNoThrow(r, 'roles logs')) {
+    ck(r.logs.indexOf('role find: Plan — workerType') !== -1 &&
+      r.logs.some((l) => l.indexOf('role verify: gov-skeptic') === 0 && l.indexOf('roles.skeptic') !== -1) &&
+      r.logs.some((l) => l.indexOf('role synthesis: ') === 0 && l.indexOf('no roles.synthesis') !== -1) &&
+      r.logs.indexOf('role find: roles.specFinder is not read on a diff-review') !== -1,
+      'roles: the log names each stage\'s type and source, and the other kind\'s finder key as not read')
+    ck(r.logs.some((l) => l.indexOf('judges under a named type') === 0 && l.indexOf('NOT durable') !== -1) && !r.logs.some((l) => l.indexOf('worker type') === 0),
+      'roles: a roled judge replaces the worker type line with the not-durable judges line')
+  }
+  r = await runReview(DIFF, ALL_OK)
+  if (checkNoThrow(r, 'roles classic logs'))
+    ck(r.logs.filter((l) => /^role (find|verify|synthesis): /.test(l)).length === 3 && r.logs.indexOf('role synthesis: the platform default — no roles.synthesis, as before roles') !== -1,
+      'roles: a classic run logs the three stage lines too')
+  // ---- S8: the synthesis record says the run ran under roles; a classic run's prompt carries no clause.
+  const extractSynthPrompt = (run) => (scanStage(run, 'synth')[0] || { prompt: '' }).prompt
+  if (rsy.result) {
+    const p = extractSynthPrompt(rsy)
+    ck(p.split('Roles: finders').length === 2 && p.indexOf('lens notes') !== -1 && p.indexOf('lens notes') < p.indexOf('Roles: finders'),
+      'roles: a synthesis role puts one Roles clause after the lens-notes clause')
+  }
+  ck(extractSynthPrompt(r).length > 0 && extractSynthPrompt(r).indexOf('Roles:') === -1, 'roles: a classic run\'s synthesis prompt carries no Roles clause')
 }
 
 runWholeScriptArms().then(() => {
@@ -1898,7 +2014,10 @@ printf '%s\n' "$out"
 # MERGED 240 -> 270 at the reconcile of local main into origin/main: base 240, plus aMendedFleet's 20
 # (260) and aGraftedHelix's 10 (250).
 # 270 -> 273, TOOL-dLadderedRemote-4: the three required-base arms, counted off a run of 273.
-FLOOR_ASSERTIONS=273
+# RAISED 273 -> 301 by TOOL-aOrientedCast-5: 28 assertions, counted off the `roles:` block — nine
+# refusals and the empty object (10), the stage routing (4), durability (4), the prompt variants (3),
+# the key (2), the logs (3) and the synthesis record's Roles clause (2).
+FLOOR_ASSERTIONS=301
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
