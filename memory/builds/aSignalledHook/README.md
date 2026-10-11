@@ -36,18 +36,18 @@ none
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aSignalledHook-1` | CLOSED | trap the hook's catchable signals into a refusal; the lander requires the hook's allow record |
+| 1 | `TOOL-aSignalledHook-1` | INPROGRESS | trap the hook's catchable signals into a refusal; the lander requires the hook's allow record |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-10-11 · streams tooling
+**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-10-11 · streams tooling
 ids TOOL-aSignalledHook-1 TOOL-aSignalledHook-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aSignalledHook-1 — a signal-killed pre-push hook refuses the push, and a success with no hook verdict is caught by the lander](spec/2026-10-11-spec-TOOL-aSignalledHook-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-11 |
+| [TOOL-aSignalledHook-1 — a signal-killed pre-push hook refuses the push, and a success with no hook verdict is caught by the lander](spec/2026-10-11-spec-TOOL-aSignalledHook-1.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-10-11 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 4 record folder(s).

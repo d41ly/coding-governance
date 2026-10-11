@@ -1,6 +1,6 @@
 # TOOL-aSignalledHook-1 — a signal-killed pre-push hook refuses the push, and a success with no hook verdict is caught by the lander
 
-**Status:** CLOSED · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 1 · advances TOOL-aSurfacedLexicon-25
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 1 · advances TOOL-aSurfacedLexicon-25
 
 <!-- gen:spec-records -->
 

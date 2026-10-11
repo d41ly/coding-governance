@@ -200,7 +200,7 @@ fi
 #      as the real hook does before its bar runs, and ends 0 with no allow record. The lander must say
 #      the push landed UNGATED, exit 4 and withhold the marker; before the record existed it wrote one.
 mkdir -p "$tmp/killed-hook"
-printf '#!/usr/bin/env bash\nprintf "default\\ttools/run-gates/run-gates.sh\\t0\\n" > "$(git rev-parse --git-dir)/pre-push-bar"\nexit 0\n' \
+printf '#!/usr/bin/env bash\nprintf "default\\tstub-bar.sh\\t0\\n" > "$(git rev-parse --git-dir)/pre-push-bar"\nexit 0\n' \
   > "$tmp/killed-hook/pre-push"
 chmod +x "$tmp/killed-hook/pre-push"
 git commit -q --allow-empty -m sg-ac3
