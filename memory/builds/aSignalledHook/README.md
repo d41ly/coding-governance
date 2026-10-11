@@ -50,7 +50,7 @@ ids TOOL-aSignalledHook-1
 | [TOOL-aSignalledHook-1 — a signal-killed pre-push hook refuses the push, and a success with no hook verdict is caught by the lander](spec/2026-10-11-spec-TOOL-aSignalledHook-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

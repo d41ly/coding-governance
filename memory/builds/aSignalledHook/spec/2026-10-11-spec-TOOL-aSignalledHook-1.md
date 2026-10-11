@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aSignalledHook-1-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSignalledHook-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aSignalledHook-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aSignalledHook-1-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
