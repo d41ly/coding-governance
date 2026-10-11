@@ -64,7 +64,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff
+**Build status:** SPECCED · 5 unit(s) · node a · opened 2026-10-11 · streams tooling+kickoff
 ids KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3 TOOL-aTrimmedHook-4 TOOL-aTrimmedHook-5 TOOL-aTrimmedHook-6 TOOL-aTrimmedHook-7
 
 <!-- gen:build-units -->
@@ -74,13 +74,14 @@ ids KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHoo
 | [TOOL-aTrimmedHook-1 — check 9 under `--staged` renders the build index only when the staged set can move it](spec/2026-10-11-spec-TOOL-aTrimmedHook-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aTrimmedHook-3 — `commit-msg` starts the unattended driver only when a run names the branch](spec/2026-10-11-spec-TOOL-aTrimmedHook-3.md) | 1 | 1 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aTrimmedHook-2 — the staged hygiene leg spends no process on a check its staged set cannot reach](spec/2026-10-11-spec-TOOL-aTrimmedHook-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-11 |
+| [TOOL-aTrimmedHook-4 — the staged classifier reads the index the hook was handed](spec/2026-10-11-spec-TOOL-aTrimmedHook-4.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
 Records: 10 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aTrimmedHook-4.
 
-Ids no `spec-audit` record has ever named: KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3.
+Ids no `spec-audit` record has ever named: KICK-aTrimmedHook-1 TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-2 TOOL-aTrimmedHook-3 TOOL-aTrimmedHook-4.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -89,6 +90,7 @@ Ids no `spec-audit` record has ever named: KICK-aTrimmedHook-1 TOOL-aTrimmedHook
 |---|---|---|
 | 1 | `KICK-aTrimmedHook-1`, `TOOL-aTrimmedHook-1`, `TOOL-aTrimmedHook-3` | yes |
 | 2 | `TOOL-aTrimmedHook-2` | no |
+| 3 | `TOOL-aTrimmedHook-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
