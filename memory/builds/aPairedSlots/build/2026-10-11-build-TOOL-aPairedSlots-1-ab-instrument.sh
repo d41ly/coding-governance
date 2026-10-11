@@ -82,12 +82,14 @@ cmd_init() { # root source base
   cat "$root/init.tsv"
 }
 
-# Bars this instrument did not start: every run-gates.sh process whose ppid chain does not reach
-# the arm-run's own pid, and which is not one of that pid's ANCESTORS — the `--hold` runner the arm
-# runs under is a run-gates.sh process and the arm's parent, not a foreign bar. A pid table that
-# errs can only over-count, which only marks contamination.
+# Bars this instrument did not start: every run-gates.sh process whose ppid chain reaches neither
+# the arm-run's own pid nor the PLAN's (`AB_ROOT_PID`, exported by `cmd_plan`), and which is not one
+# of the arm-run's ANCESTORS. The plan root is what covers the hold runner's heartbeat ticker: a
+# run-gates.sh subshell that is the hold's child, so neither an ancestor of the arm nor its
+# descendant. Without it the first launch read its own ticker as a foreign bar on every tick, so its
+# quiet wait could never pass. A pid table that errs can only over-count, which only marks contamination.
 scan_foreign_bars() { # own-pid -> stdout: the count
-  local own=$1 n=0 p q depth anc=" "
+  local own=$1 n=0 p q depth anc=" " top=${AB_ROOT_PID:-}
   q=$own; depth=0
   while [ -n "$q" ] && [ "$q" != 1 ] && [ "$depth" -lt 40 ]; do
     anc="$anc$q "; q=$(cat "/proc/$q/ppid" 2>/dev/null) || q=""; depth=$((depth+1))
@@ -96,11 +98,11 @@ scan_foreign_bars() { # own-pid -> stdout: the count
     case "$anc" in *" $p "*) continue ;; esac
     q=$p; depth=0
     while [ -n "$q" ] && [ "$q" != 1 ] && [ "$depth" -lt 40 ]; do
-      [ "$q" = "$own" ] && break
+      { [ "$q" = "$own" ] || { [ -n "$top" ] && [ "$q" = "$top" ]; }; } && break
       q=$(cat "/proc/$q/ppid" 2>/dev/null) || q=""
       depth=$((depth+1))
     done
-    [ "$q" = "$own" ] || n=$((n+1))
+    { [ "$q" = "$own" ] || { [ -n "$top" ] && [ "$q" = "$top" ]; }; } || n=$((n+1))
   done
   printf '%s\n' "$n"
 }
@@ -194,6 +196,7 @@ cmd_plan() { # root order
   # No bar knob of the calling shell reaches an arm: each arm sets the two it means, and the hold
   # exports the holder nonce itself.
   for v in $(compgen -v GATE_); do unset "$v"; done
+  export AB_ROOT_PID=$$
   for step in $order; do
     arm=${step%?}; rep=${step#?}
     printf '%s\t%s\t%s\tHOLD\n' "$(date +%s)" "$arm" "$rep" >> "$root/plan.log"
