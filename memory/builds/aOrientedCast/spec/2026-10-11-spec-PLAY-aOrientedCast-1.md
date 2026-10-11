@@ -1,6 +1,6 @@
 # PLAY-aOrientedCast-1 — the charter: every agent is handed a rendered role, and the main loop delegates
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams playbook · order 7
+**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams playbook · order 8 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -72,9 +72,9 @@ false.
 ### Edges
 
 - **consumes-from** `TOOL-aOrientedCast-8` — the `roles` registry entry the `kit:roles` fence and
-  the `kits` array both name. Without it the renderer refuses the fence and the array. Its order
-  sits after this unit's, which is §8 F1. The README the bullet points at is the catalogue unit's at
-  order 1, which that unit consumes in turn; no criterion here reads the README itself.
+  the `kits` array both name. Without it the renderer refuses the fence and the array. It lands at
+  order 7, before this unit, as §8 F1 resolved. The README the bullet points at is the catalogue
+  unit's at order 1, which that unit consumes in turn; no criterion here reads the README itself.
 
 ## 4. Design
 
@@ -212,7 +212,8 @@ None minted. The fence reuses the renderer's existing `kit:` namespace, and `rol
   fresh render and `grep -c "kit:roles" AGENTS.md` returns 0.
   Red when: the region drifts, a fence marker reaches the render, or the render refuses the fence
   because `roles` is not a registry entry.
-  fixture: the `roles` registry entry, which no unit ordered before this one registers (§8 F1).
+  fixture: the `roles` registry entry, which `TOOL-aOrientedCast-8` registers at order 7, before this
+  unit (§8 F1).
 - **AC3** — When `adopt-playbook.sh --target` renders two scratch fixtures under a short `%TEMP%`
   root, one whose `deploy.toml` `kits` omits `roles` and one that keeps it, the first renders the
   bullet 0 times and the second once, and both render the write-gate bullet exactly as their
@@ -264,10 +265,16 @@ This unit adds no gate arm.
   as written, and neither unit depends on anything at the other's old step. The header verbs here
   still read the roster's orders, because the roster is the build plan's and the cross-read of the
   whole set is where a plan moves; the two order joins of check 12 red until it does.
+  RESOLVED (agent, 2026-10-11, delegated): (a). The M2 cross-read decided it as the option with the
+  fewest open questions: it moves two headers and no content. This unit builds at order 8 and
+  `TOOL-aOrientedCast-8` at 7.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · §3 · AC2 · the M2 cross-read's finding 11: the header reads `order 8` and §8 F1
+  is resolved to option (a). The Edges sentence and AC2's fixture line, which said the registry entry
+  is ordered after this unit, now say it lands at order 7, before it.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-8 — the roles kit is an adopter default: installed, rendered and reported at install and update
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 8
+**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -264,8 +264,8 @@ which is the leg's question, and whether a house overlay is sensible, which is `
 
 ### Rollout
 
-- Lands at the order the roster names, 8; `PLAY-aOrientedCast-1` §8 F1 recommends 7, because the
-  charter's fence needs this unit's registry entry.
+- Lands at order 7, before `PLAY-aOrientedCast-1` at 8, because the charter's fence needs this
+  unit's registry entry; that spec's §8 F1 resolved the swap.
 - In gov, `adopt-roles.sh --scaffold` writes bytes identical to what the catalogue's renderers
   already committed, so gov's tree does not move; AC5 is that observation.
 - `tools/gate-legs.json` is watched, so the unit's commit re-stamps `last-audit` in the kickoff
@@ -414,6 +414,11 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC11 · copies of the adopter
   rule on, which is veto 2's public-surface clause and so not a delegated pick; (c) fails a criterion.
   The widening goes to the wrap-up as the owner's follow-up.
   RESOLVED (agent, 2026-10-11, delegated): (b), a `requires_if` row and a `check-wiring` note per absent harness.
+  Re-decided at rev-2 by the M2 cross-read's finding 9. As first written, the catalogue checker's R9
+  and the agent render refused a harness the tree does not hold, so (b) failed AC4 at every default
+  install. Both now admit it with a `note` line (`TOOL-aOrientedCast-1` R9, `TOOL-aOrientedCast-3`
+  S3), so (b) stands: `review-harness` stays optional and its absence is a `note` on all three
+  readers.
 - **F2 — Does `roles catalogue` ship to adopters, or stay gov's alone?**
   The checker grades the shipped role files against the adopter's own governing doc and the
   adopter's own house overlays, so its subject is the adopter's tree.
@@ -428,6 +433,10 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC11 · copies of the adopter
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · §4 · the M2 cross-read's findings 9 and 11. The header reads `order 7` and the
+  Rollout lands this unit at 7, before `PLAY-aOrientedCast-1`, as that spec's §8 F1 resolved. §8 F1
+  is re-decided by the catalogue checker's R9: `review-harness` stays optional, and its absence is a
+  `note`.
 
 ## 10. Reuse audit
 

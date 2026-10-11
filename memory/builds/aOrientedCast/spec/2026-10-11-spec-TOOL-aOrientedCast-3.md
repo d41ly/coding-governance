@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-3 — the role catalogue renders native agent types, trimmed of the charter
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 3 · ratified 2026-10-11
+**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 3 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -41,8 +41,11 @@ re-render reds the bar.
   `agent` is false gets no file. Observed by AC1 and AC4.
 - **S3** — `.claude/roles.json`, the generated index: every role with its `workflow`, `writes` and
   `agent`, and `harnesses`, the sorted, de-duplicated repo-relative paths of the `harness` of every
-  workflow whose `driver` is `workflow`, each resolved by the library's `resolve_harness_path`.
-  Observed by AC1 and AC5.
+  workflow whose `driver` is `workflow`, each resolved by the library's `resolve_harness_path`. A
+  harness the tree does not hold, the review harness in an adopter that did not install its kit, is
+  listed at the path that resolver names for it and printed on one `note` line; it refuses nothing,
+  so every mode still exits 0 on it and every file `--write` writes is whole. Observed by AC1, AC5
+  and AC6.
 - **S4** — Ownership. The files the renderer owns are the agent types its catalogue names plus every
   name the on-disk index lists. `--write` unlinks an owned file the catalogue no longer renders and
   rewrites the index; it never touches any other file under `.claude/agents/`. `--check` writes
@@ -206,7 +209,10 @@ plus one newline. Its shape, not its bytes, which are whatever that call emits:
 `roles` holds every role, `agent` false included, so the guards can tell a known non-agent role from
 an unknown name. `harnesses` is derived from the workflow table alone: the harness of each entry whose
 `driver` is `workflow`, resolved, folded to a forward-slashed path relative to the toplevel,
-de-duplicated and sorted. A `program` command and `none` contribute nothing.
+de-duplicated and sorted. A `program` command and `none` contribute nothing. A harness the resolver
+reports the tree does not hold is listed at the path it names, so the wiring check of
+`TOOL-aOrientedCast-8` reads the absence from the index, and every mode prints
+`render_agents: note — <path> is named by the workflow table and absent here; its kit is not installed`.
 
 ### The modes
 
@@ -247,6 +253,8 @@ spelled, and the governing doc is whatever `resolve_charter_path` answers.
    unlinks it while a foreign file beside it keeps its bytes.
 8. A zero-role catalogue exits 2.
 9. A CRLF copy of a correct render reads fresh.
+10. A `workflow` harness whose script the fixture does not hold prints the `note` line naming it, is
+    listed in `harnesses` at the resolver's path, and `--write` still writes every type and exits 0.
 
 ### The probe re-run
 
@@ -366,7 +374,7 @@ session before spawning it. S5's line says so at the moment it becomes true.
   AC7's controls and the recorded version are the only witness, and the README states the floor. A
   session that does not restart after a render spawns the old types; S5's line names that. A charter
   edit to a cited section reds the wiring leg until a re-render.
-- testing — `--selftest`'s nine arms, AC2's staged breaks on the real render, and AC7's live probe.
+- testing — `--selftest`'s ten arms, AC2's staged breaks on the real render, and AC7's live probe.
 - migration — None in gov beyond the first render. Adopters receive the render through
   `TOOL-aOrientedCast-8`.
 - user docs — The roles kit's README section of S10.
@@ -405,8 +413,10 @@ session before spawning it. S5's line says so at the moment it becomes true.
   Red when: the index lists a command or `none`, or a harness change leaves the index fresh.
 - **AC6** — When `render_agents.py --selftest` runs it exits 0 and its last line reads
   `PASS (<n> assertions)`; with the `omitClaudeMd` emission staged out of `render_agent_file` it exits
-  1 naming arm 1, and with the zero-role refusal staged out it exits 1 naming arm 8.
-  Red when: the arms pass over a renderer that has lost the trim or renders nothing as clean.
+  1 naming arm 1, with the zero-role refusal staged out it exits 1 naming arm 8, and with an absent
+  harness staged to raise instead of noting it exits 1 naming arm 10.
+  Red when: the arms pass over a renderer that has lost the trim, renders nothing as clean, or refuses
+  a harness the tree does not hold.
 - **AC7** — When the probe of §4 "The probe re-run" runs once, arms a2, a3, w1 and w2 are valid and
   pass, with `agent_type` reading `gov-builder` or `gov-spec-writer` on both of their lines and their
   files reading `NONE`, and the controls a1 and w3 are valid and read the codeword; the research
@@ -464,6 +474,9 @@ an arm.
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · S3 · §4 · AC6 · the M2 cross-read's finding 9, in step with the catalogue's
+  R9: a harness the tree does not hold is listed in `harnesses` at the resolver's path with a `note`
+  line, never a refusal, and self-test arm 10 holds it.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-2 — the handoff renderer: a role's constant block and a task block rendered from the card, the brief and the unit, into one prompt file
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -84,6 +84,8 @@ refuses by name, so an agent is never handed a prompt with a hole in it.
   verb, against which the spawn guard verifies an agent call's prompt.
 - **hands-off** `KICK-aOrientedCast-2` — the render and harness-arguments verbs the attended router
   composes every agent prompt and every harness call from.
+- **hands-off** `TOOL-aOrientedCast-9` — the harness-arguments verb the unattended Skill and verbs
+  pass on every harness call.
 
 ## 4. Design
 
@@ -328,7 +330,8 @@ bullet stands for the script this unit adds, `python tools/roles/handoff.py`.
   Red when: the task part carries other bytes, or its hash disagrees with the marker.
 - **AC8** — When `handoff.py harness-args tier2-review` runs, it prints
   `{"diffFinder":"gov-diff-reviewer","skeptic":"gov-skeptic","specFinder":"gov-spec-reviewer","synthesis":"gov-synthesizer"}`;
-  `unattended-build` prints `{"disposal":"gov-spec-writer","specWriter":"gov-spec-writer"}`;
+  `unattended-build` prints
+  `{"builder":"gov-builder","disposal":"gov-spec-writer","skeptic":"gov-skeptic","specFinder":"gov-spec-reviewer","specWriter":"gov-spec-writer","synthesis":"gov-synthesizer"}`;
   `unattended-unit` prints `{"builder":"gov-builder"}`; and `nope` exits 1. With the fixture's
   `spec-review` entry mapping `skeptic` to `gov-synthesizer`, `tier2-review` exits 1 naming `skeptic`.
   Red when: a mapping differs from the workflow table, or a conflict is resolved silently.
@@ -376,6 +379,10 @@ the close's bar grades the script through the legs above and through `roles cata
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · §3 · AC8 · the M2 cross-read's findings 2 and 5, in step with the catalogue's
+  stages table: `harness-args unattended-build` prints `builder` and the audit's three review roles
+  beside the spec writer and the disposal. The unattended caller, `TOOL-aOrientedCast-9`, joins the
+  hands-off edges.
 
 ## 10. Reuse audit
 

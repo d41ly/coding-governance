@@ -1,6 +1,6 @@
 # KICK-aOrientedCast-2 — the attended router: after kickoff's go, `/build` drives a code build through the harness pipeline
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams kickoff · order 6 · ratified 2026-10-11
+**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams kickoff · order 6 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -27,7 +27,8 @@ copying them; and one clause in the kickoff engine's Step 5 that hands a code bu
 
 - **S1** — A Skill template `tools/roles/SKILL.template.md` in the roles kit: front matter
   `name: build` and a `description`, the kit marker line, and a body routing the stages §4 "The
-  Skill" lays out, each a `## Stage <n> — <workflow>` heading. Observed by AC3, AC4, AC5 and AC11.
+  Skill" lays out, each a `## Stage <n> — <workflow>` heading. Observed by AC3, AC4, AC5, AC11 and
+  AC12.
 - **S2** — `tools/roles/adopt-roles.sh`, the kit's adopter, created here with two modes. `--scaffold`
   renders the template to `.claude/skills/build/SKILL.md` and prints the path. `--check` renders in
   memory and byte-compares with the file on disk, carriage returns stripped from both sides, exiting 1
@@ -68,7 +69,7 @@ copying them; and one clause in the kickoff engine's Step 5 that hands a code bu
   adopter's gate leg and the wiring check's report. All are `TOOL-aOrientedCast-8`'s; this unit lands
   the adopter with the Skill alone.
 - `/unattended`'s own Skill and verbs text. Changing how an unattended run composes its harness calls
-  is the owner's turn `TOOL-aOrientedCast-4` records.
+  is `TOOL-aOrientedCast-9`'s, which the M2 cross-read added for it.
 - A size ceiling and gate leg for the rendered Skill. AC11 measures it once; a declared row would need
   a manifest leg and a deployer exemption inside `TOOL-aOrientedCast-8`'s write set.
 - Splitting the kickoff engine, which the open ask `KICK-aReplayedCard-5` proposes for the edit after
@@ -76,8 +77,8 @@ copying them; and one clause in the kickoff engine's Step 5 that hands a code bu
 - Any edit to Steps 0 to 4 or Step 5b of the engine.
 - Landing. Merge and push stay the owner's explicit asks in an attended session.
 - The spawn guard that admits the Skill's harness calls and spawns. `TOOL-aOrientedCast-7` owns it,
-  and its Rollout section names this unit as a precondition of its landing. The edge is that
-  unit's to declare, as a consumes-from naming this one.
+  and its Rollout section names this unit as a precondition of its landing; the Edges below carry the
+  hands-off.
 
 ### Edges
 
@@ -95,6 +96,8 @@ copying them; and one clause in the kickoff engine's Step 5 that hands a code bu
 - **hands-off** `TOOL-aOrientedCast-8` — the agent-type render inside the adopter, its registration
   and placeholder declaration, the gate leg over its check mode, and the regression arms for the
   stage binding and the surviving-token refusal.
+- **hands-off** `TOOL-aOrientedCast-7` — the spawn guard, which admits only the rendered handoffs and
+  the harness calls carrying `roles` that this Skill composes, and refuses every other route.
 - **hands-off** external — aScoutedSeam's kickoff unit, whose opt-in spawns the scout and writes the
   card's reuse section that the Skill's stage 2 reads when present.
 
@@ -221,8 +224,8 @@ Until `--plan --paths` prints `next: none - every tracked spec is terminal`, for
    owner's go is the approval INPROGRESS records;
 2. append a `## route` naming the unit, as the brief skeleton's route lines say, through the kickoff
    check script's `--card --append`;
-3. call the hand-out's `dispatch.scriptPath` with `dispatch.args` plus `unitId`, `specPath` and
-   `briefPath`;
+3. call the hand-out's `dispatch.scriptPath` with `dispatch.args` plus `unitId`, `specPath`,
+   `briefPath`, and `roles` from `handoff.py harness-args unattended-unit`, on every dispatch;
 4. on `diverged: true`, write a revision record under the build's `prompts/` holding `## The brief`
    and no `## The prompt`, its Goal the builder's `why` verbatim and its other four sub-heads copied
    from the build's brief; spawn `gov-spec-writer` on it with `--input spec=<path> --input
@@ -362,8 +365,8 @@ under the scratchpad.
   heading and the entry for the first two and the fourth, exits 2 naming a dead probe for the third,
   and exits 1 naming the line for the fifth; each restored file exits 0.
   Red when: the Skill's stages can drift from the catalogue, or a brace reaches the render.
-- **AC3** — When `grep -c` counts each of `harness-args unattended-build`, `harness-args tier2-review`,
-  `--part task`, `mode: 'attended'`, `planState`, `diverged`, `INPROGRESS`, `## route`, `**Reuse:**`,
+- **AC3** — When `grep -c` counts each of `harness-args unattended-build`,
+  `harness-args unattended-unit`, `harness-args tier2-review`, `--part task`, `mode: 'attended'`, `planState`, `diverged`, `INPROGRESS`, `## route`, `**Reuse:**`,
   `BUILD-METHOD.md` and `UNATTENDED-VERBS.md` over the rendered Skill, each prints at least 1, and the
   headings `## Stage 1 — orient` through `## Stage 7 — gate-bar` appear once each, in order.
   Red when: a stage loses its pointer, or the router routes nowhere.
@@ -401,6 +404,22 @@ under the scratchpad.
   6144.
   Red when: the router grows into a procedure.
   figure: DERIVED at observation; the limit is PINNED here and is not a gate.
+- **AC12** — When the attended dry run runs in a fixture repository, a `git clone --local` of the
+  pass's HEAD under a short `%TEMP%` root holding a fixture build `zFixtureCast` (a README whose front
+  matter names `ids: TOOL-zFixtureCast-1`, that unit's spec, and a brief record under its `prompts/`)
+  and a card that `bash skills/session-kickoff/manifest-check.sh --card --write --session kx2` wrote
+  and `--card --append` filled with all eight task fields and a real READY line: the
+  `handoff.py render` line the rendered Skill's `## Before stage 3` section spells, run with
+  `CLAUDE_CODE_SESSION_ID=kx2` and its placeholders filled as `--role gov-builder`,
+  `--build zFixtureCast`, `--unit TOOL-zFixtureCast-1` and `--input spec=<that spec>`, its
+  `--part task` kept, exits 0 and prints a `gov:handoff` marker line and a `## Task` section;
+  `handoff.py check` on the file that marker's `path` names exits 0; and each
+  `handoff.py harness-args` call the Skill orders, for `unattended-build`, `unattended-unit` and
+  `tier2-review`, exits 0 and prints a non-empty JSON object.
+  Red when: the render line the Skill spells refuses on a complete card, the file it writes fails its
+  own check, or a harness the Skill calls has no roles to pass.
+  fixture: the renderer of `TOOL-aOrientedCast-2` and a card `KICK-aOrientedCast-1` grades, built
+  under `%TEMP%`; nothing in the tree holds one today.
 
 ## 7. Gates
 
@@ -445,6 +464,11 @@ and surviving-token refusals gain regression arms, in `TOOL-aOrientedCast-8`.
 - rev-1 · 2026-10-11 · initial draft, from the unattended adopter and Skill, the two build harnesses'
   attended mode, the kickoff engine's Step 5 and its byte budget, and the role catalogue, renderer,
   unit-harness and write-gate specs of this build.
+- rev-2 · 2026-10-11 · S1 · §3 · §4 · AC3 · AC12 · the M2 cross-read's findings 1 and 12. Stage 5
+  passes `roles` from `handoff.py harness-args unattended-unit` on every unit dispatch, and AC3 counts
+  that string. AC12 runs the attended dry run the build's acceptance names. The Edges declare the
+  hands-off to the spawn guard that its consumes-from now names, and the non-goal on `/unattended`'s
+  text names `TOOL-aOrientedCast-9` as its owner.
 
 ## 10. Reuse audit
 

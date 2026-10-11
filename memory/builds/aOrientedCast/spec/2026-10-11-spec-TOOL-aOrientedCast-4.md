@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-4 — the build harnesses spawn their stage agents as catalogue roles
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 4 · ratified 2026-10-11
+**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 4 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -28,10 +28,11 @@ builder stops writing its spec: a divergence comes back to the caller instead of
 ## 2. Scope (IN)
 
 - **S1** — `unattended-build.template.js` takes an optional `roles` argument: a plain object whose
-  keys are drawn from `specWriter`, `committer`, `disposal` and `builder`, each value a string matching
+  keys are drawn from `specWriter`, `committer`, `disposal`, `builder` (§8 F2), and the audit's
+  `specFinder`, `skeptic` and `synthesis` (§8 F3), each value a string matching
   `AGENT_TYPE_SHAPE`, a copy of the expression `tier2-review.template.js` tests `workerType` against,
   and unequal to `none`, the review harness's reserved untyped literal. An array, a string or `null`, a
-  key outside the four, and a value failing either test each refuse by name before any agent spawns.
+  key outside the seven, and a value failing either test each refuse by name before any agent spawns.
   `{}` and an absent `roles` both mean no stage is typed. Observed by AC2 and AC3.
 - **S2** — Each `agent()` call of a stage the object names carries `agentType: roles.<stage>`: every
   spec writer of the fan (`specWriter`), the spec commit (`committer`) and the disposal (`disposal`).
@@ -41,9 +42,10 @@ builder stops writing its spec: a divergence comes back to the caller instead of
   naming the type, and leaves out that stage's role spans, the table in §4 "The role spans"; every
   other sentence of it is unchanged. With the role absent, the prompt is byte-identical to base.
   Observed by AC1 and AC2.
-- **S4** — At its start the build harness logs one line per key of the four, naming the type it
+- **S4** — At its start the build harness logs one line per key of the seven, naming the type it
   spawns or forwards, or saying the stage spawns untyped with its role prose inline because no role
-  was passed. Observed by AC1 and AC2.
+  was passed; for an audit key, that the review harness keeps its own fallback for that stage.
+  Observed by AC1 and AC2.
 - **S5** — `dispatch.args` in the hand-out carries `roles: { builder: <type> }` when `roles.builder`
   was given, and carries no `roles` key otherwise, so a caller copying the object hands the child the
   type and nothing else. Observed by AC2.
@@ -64,22 +66,30 @@ builder stops writing its spec: a divergence comes back to the caller instead of
 - **S10** — The workflows kit's protocol-parity script gains the agent-type shape arm of §4: every
   literal a workflow script of the kit tests an agent type name against equals the one
   `tier2-review.template.js` owns. Observed by AC6.
-- **S11** — The arms of AC1 to AC4 live in `tools/workflows/unattended-build.test.sh`, whose `run_wf`
-  traces each agent call's `agentType`; each is observed RED on a staged break first, and
-  `FLOOR_ASSERTIONS` moves by the count added. Observed by AC1, AC2, AC3 and AC4.
+- **S11** — The arms of AC1 to AC4 and AC7 live in `tools/workflows/unattended-build.test.sh`, whose
+  `run_wf` traces each agent call's `agentType` and each `workflow()` call's `roles`; each is observed
+  RED on a staged break first, and `FLOOR_ASSERTIONS` moves by the count added. Observed by AC1, AC2,
+  AC3, AC4 and AC7.
 - **S12** — The template's `args` header block, the unit harness's header and a new
   `tools/workflows/README.md` section, headed "roles — stage agents spawned as catalogue roles",
   document `roles`, its keys, the fallback, the hand-back and the parity arm; the review harness's
   paragraph joins that section later. NOT OBSERVED by a criterion: prose. The review reads it
   against §4.
+- **S13** — The audit's `workflow()` call into the review harness carries `roles` holding those of
+  `specFinder`, `skeptic` and `synthesis` this harness was given, beside its `workerType: 'none'`, and
+  no `roles` key when it was given none of them. Its deferred-platform hand-back keeps the sentence
+  promising a reuse of every returned lens only when the review returned `durable: true`, and
+  otherwise says the re-run dispatches every judge again (§4 "The audit's roles"). Observed by AC2 and
+  AC7.
 
 ## 3. Non-goals (OUT)
 
 - The review harness's `roles`, its precedence over `workerType` and its resume key, which are
-  `TOOL-aOrientedCast-5`'s; and the build harness's own audit call into it, which keeps
-  `workerType: 'none'` and passes no `roles`. That unit edits `tier2-review.template.js` after this
-  one: the S10 arm reads the owner's literal in either of the two line forms §4 names and refuses by
-  name when it finds neither, so a refactor there is loud rather than silent.
+  `TOOL-aOrientedCast-5`'s. This unit's audit call forwards the audit's three review keys into it
+  (S13); that harness reads them from its landing at order 5 and ignores an argument it does not
+  know before then. That unit edits `tier2-review.template.js` after this one: the S10 arm reads the
+  owner's literal in either of the two line forms §4 names and refuses by name when it finds neither,
+  so a refactor there is loud rather than silent.
 - Choosing which role a stage takes. The workflow table's `stages` mapping and the verb that prints it
   are `TOOL-aOrientedCast-1`'s and `TOOL-aOrientedCast-2`'s; this unit checks a type's shape only.
 - The write gate that makes the builder's status-only flip the one spec edit it may make.
@@ -91,29 +101,32 @@ builder stops writing its spec: a divergence comes back to the caller instead of
 ### Edges
 
 - **consumes-from** `TOOL-aOrientedCast-1` — the spec-writer, disposal and builder craft the role files
-  now carry. Without it a role-typed prompt that leaves the spans out hands its agent less than today.
+  now carry, and the stage keys: the `spec-write` entry's `stages` table maps `builder` and the
+  audit's three review keys beside the spec writer and the disposal (§8 F2 and F3). Without it a
+  role-typed prompt that leaves the spans out hands its agent less than today.
 - **consumes-from** `TOOL-aOrientedCast-2` — the harness-arguments output a caller passes as `roles`
-  for each of the two harnesses. This unit checks that object's shape and nothing more, so the
-  mapping of a stage to a role stays the catalogue's.
+  for each of the two harnesses, whose `unattended-build` object carries all six typed stage keys.
+  This unit checks that object's shape and nothing more, so the mapping of a stage to a role stays the
+  catalogue's.
 - **consumes-from** `TOOL-aOrientedCast-3` — the rendered agent types a `roles` value names. The stub
   criteria here need none of them; a live run spawning a type needs it rendered in a session started
   after the render.
-- **hands-off** `TOOL-aOrientedCast-5` — the review harness's own `roles`, its hoisted copy of the
-  shape constant, which the parity arm here reads as the owner's one literal, and its paragraph in the
-  README section on `roles` this unit opens.
+- **hands-off** `TOOL-aOrientedCast-5` — the review harness's own `roles`, which reads the three keys
+  this unit's audit forwards, its hoisted copy of the shape constant, which the parity arm here reads
+  as the owner's one literal, and its paragraph in the README section on `roles` this unit opens.
 - **hands-off** `TOOL-aOrientedCast-6` — the write gate's role arm, which refuses the builder's spec
   content and admits the status-only flip this unit's builder prompt asks for.
 - **hands-off** `KICK-aOrientedCast-2` — the attended caller's composition: pass the harness arguments
   the catalogue prints for each harness, and on a unit returning diverged, dispatch a spec-writer
   revision of that unit's spec before dispatching the unit again.
-- **hands-off** external — the owner's turn on the unattended caller's composition, which must change.
-  From the spawn guard's landing a harness call carrying no roles is refused, so the unattended Skill's
-  "Drive the build as ONE program" bullet must pass roles from the catalogue's harness-arguments verb
-  and branch on diverged, where today it says a child returning uncommitted stops the loop. The text
-  is owned by the unattended kit's `VERBS.template.md` (rendered to `UNATTENDED-VERBS.md` by
-  `adopt-unattended.sh`) and its `SKILL.template.md` drive line. It edits a carrier of the unattended
-  protocol, which M3's veto 2 reserves for the owner, so this run records it as a parked decision for
-  the wrap-up.
+- **hands-off** `TOOL-aOrientedCast-9` — the unattended caller's composition, which must change, and
+  the unit that makes the unattended caller pass these stage keys. From the spawn guard's landing a
+  harness call carrying no roles is refused, so the unattended verbs' "Drive the build as ONE program"
+  bullet must pass roles from the catalogue's harness-arguments verb and branch on diverged, where
+  today it says a child returning uncommitted stops the loop. The M2 cross-read moved this from a
+  parked owner decision into that unit, inside the build's brief item 5.
+- **hands-off** `TOOL-aOrientedCast-7` — the `roles` argument the spawn guard requires on every call
+  to the two harnesses this unit teaches to read it.
 
 ## 4. Design
 
@@ -146,8 +159,15 @@ Read at `646d4a73` on 2026-10-11, node a.
   (`tools/workflows/unattended-build.template.js:448-450`). Whether the cache key also covers the
   options is UNVERIFIED; the stamp of S3 makes a typed prompt differ from an untyped one either way.
 - `TOOL-aOrientedCast-1` leaves the committer in no `stages` table, so the catalogue's verb types the
-  spec writers and the disposal as `gov-spec-writer` and the builder as `gov-builder`, and the
-  committer stays untyped; its role bodies carry the craft its §4 "What every body says" lists.
+  spec writers and the disposal as `gov-spec-writer`, the builder as `gov-builder` and the audit's
+  three review keys as `gov-spec-reviewer`, `gov-skeptic` and `gov-synthesizer`, and the committer
+  stays untyped; its role bodies carry the craft its §4 "What every body says" lists.
+- The audit calls the review harness with `workerType: 'none'` and no `roles`
+  (`tools/workflows/unattended-build.template.js:1454-1477`), and its deferred-platform hand-back
+  tells the caller the re-run "reuses every lens and skeptic batch that returned" (`:1520-1550`). The
+  review harness returns `durable` on every deferred return, false whenever a judge ran under a type
+  (`tools/workflows/tier2-review.template.js:213-216`, `:1143`), and at base it reads no `roles` and
+  refuses no argument it does not know.
 - `TOOL-aOrientedCast-6` resolves its status-flip fork to an edit of the status and date cells alone,
   admitted from a `product` role on its routed unit's spec, and leaves a WONTDO, whose tail pointer
   moves a cell, to the spec writer.
@@ -158,7 +178,7 @@ Read at `646d4a73` on 2026-10-11, node a.
 ```js
 // both harnesses, beside the other args refusals; the literal is copied, not retyped
 const AGENT_TYPE_SHAPE = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/ // owner: tier2-review.template.js `workerType`
-// unattended-build: ROLE_KEYS = ['specWriter', 'committer', 'disposal', 'builder']
+// unattended-build: ROLE_KEYS = ['specWriter', 'committer', 'disposal', 'builder', 'specFinder', 'skeptic', 'synthesis']
 // unattended-unit:  no ROLE_KEYS; Object.keys(roles).join(',') must be '' or 'builder'
 ```
 
@@ -223,6 +243,20 @@ The caller, not this harness, dispatches the revision: a workflow script has no 
 revision is a spec write, which is the spec-writer role's alone. §8 F1 is why the hand-back is tied to
 `roles.builder` and not unconditional.
 
+### The audit's roles
+
+§8 F3. The audit's `workflow()` call gains one spread after `workerType: 'none'`:
+`...(auditRoles ? { roles: auditRoles } : {})`, where `auditRoles` holds those of `specFinder`,
+`skeptic` and `synthesis` this harness was given, and is `null` when it was given none of them.
+`workerType: 'none'` stays: under the review harness's precedence it governs only a judge stage no
+role names.
+
+The deferred-platform hand-back reads the review's `durable`. When it is `false`, the clause "the
+review reuses every lens and skeptic batch that returned and dispatches only <pending>" of `next`
+becomes "this audit ran its judges under a role, so none wrote a lens or verify file and the re-run
+dispatches every judge again"; every other sentence of `next` and `note` is unchanged. When it is
+`true` or absent, `next` is base's byte for byte.
+
 ### The agent-type shape arm
 
 In the workflows kit's protocol-parity script, after the pair loop has passed and beside the
@@ -251,6 +285,7 @@ by-design arm, with no new shell function so the generated symbol map does not m
 | `roles` | harness argument, both harnesses | none: an argument key carries no naming cell |
 | `AGENT_TYPE_SHAPE` | regex constant, one copy per harness | none: no constant cell is declared in `.lexicon.conf` |
 | `ROLE_KEYS` | array constant, the build harness only | none: no constant cell is declared in `.lexicon.conf` |
+| `auditRoles` | local, the build harness's forwarded audit keys | none: a local carries no naming cell |
 | `diverged` | return field of the unit harness | none |
 | `DIVERGENCE:` | the `why` prefix the field keys on | none |
 
@@ -263,8 +298,8 @@ Lands at order 4, after the roles exist and their types are rendered. One commit
 harnesses, the re-render, the parity arm, the suite arms and the documentation. No caller passes
 `roles` in this run: this session's registry predates the rendered types, so its own passes call the
 harnesses untyped and see today's prompts byte for byte, which AC1 asserts. The attended router passes
-`roles` from its landing. The unattended Skill keeps calling untyped until the owner's turn in §3
-lands its composition; from the spawn guard's landing, that untyped call is refused at the tool call.
+`roles` from its landing, and the unattended Skill and verbs from `TOOL-aOrientedCast-9`'s, both at
+order 6; from the spawn guard's landing, an untyped call is refused at the tool call.
 
 ### Files touched (estimate)
 
@@ -300,7 +335,8 @@ lands its composition; from the spawn guard's landing, that untyped call is refu
   returns `diverged` as a field.
 - risks — A role file that lost the craft a span carried weakens a typed stage; the edge to
   `TOOL-aOrientedCast-1` and the review hold that pair. A caller that ignores `diverged` reads an
-  uncommitted unit as a stop, which is today's behaviour and not a regression.
+  uncommitted unit as a stop, which is today's behaviour and not a regression. A roled audit is not
+  durable, so a platform deferral re-dispatches every judge; S13's hand-back says so.
 - testing — The suite arms of S11 over the stub runtime, AC1's byte comparison against base, and the
   parity arm's staged breaks.
 - migration — None: `roles` is optional and absent from every caller today, and its absence is
@@ -312,16 +348,18 @@ lands its composition; from the spawn guard's landing, that untyped call is refu
 Every stub-run criterion evaluates the RENDER `tools/workflows/unattended-build.js` or
 `tools/workflows/unattended-unit.js` with `node`, in the `run_wf` AsyncFunction shape of the build
 harness's self-test, copied into a scratch script under the run's scratch directory and extended by
-one `type:<label>:<agentType or ->` trace line per agent call; it never runs the suite. The base
-copies are the same two files written from `git show 646d4a73:<path>` into the scratch directory.
-Inputs are the self-test's `UNITS`, `CHILD_ARGS` and `returns` doubles; `ROLES` is
-`{"specWriter":"gov-spec-writer","committer":"gov-x","disposal":"gov-spec-writer","builder":"gov-builder"}`.
+one `type:<label>:<agentType or ->` trace line per agent call and one `wfroles:<roles JSON or ->`
+line per `workflow()` call; it never runs the suite. The base copies are the same two files written
+from `git show 646d4a73:<path>` into the scratch directory. Inputs are the self-test's `UNITS`,
+`CHILD_ARGS` and `returns` doubles; `ROLES` is
+`{"specWriter":"gov-spec-writer","committer":"gov-x","disposal":"gov-spec-writer","builder":"gov-builder","specFinder":"gov-spec-reviewer","skeptic":"gov-skeptic","synthesis":"gov-synthesizer"}`.
 
 - **AC1** — When the stub runs `UNITS` with `returns CONVERGED 0`, `UNITS` without `subjects` and
   `UNITS` with `returns NON-CONVERGENT 2`, each with no `roles`, every `promptjson:` line equals the
-  base render's for the same input, byte for byte; every `type:` line reads `-`; the trace carries one
-  `log:` line per key of `ROLES` saying it is untyped; and the child under `CHILD_ARGS` with no `roles`
-  matches base the same way and logs one line saying its builder is untyped.
+  base render's for the same input, byte for byte; every `type:` and `wfroles:` line reads `-`; the
+  trace carries one `log:` line per key of `ROLES` saying it is untyped; and the child under
+  `CHILD_ARGS` with no `roles` matches base the same way and logs one line saying its builder is
+  untyped.
   Red when: any prompt byte moves with `roles` absent, a spawn carries a type nobody passed, or a stage
   falls back without a log line.
 - **AC2** — When the same three runs carry `ROLES`, the `type:` lines of every `spec:`, `commit:` and
@@ -329,10 +367,14 @@ Inputs are the self-test's `UNITS`, `CHILD_ARGS` and `returns` doubles; `ROLES` 
   `-`; each typed prompt carries the stamp naming its type; the `spec:` prompts lack `stalls for hours`,
   `DO NOT WRITE PRODUCT CODE` and `real probe rather than a claim` and still carry the `order` sentence
   and `Name every unit in`; the `dispose:` prompt lacks `the whole reason that join exists` and still
-  asks for `edges`; and the RESULT's `dispatch.args.roles` is `{"builder":"gov-builder"}`, while with
-  `ROLES` minus `builder` the RESULT's `dispatch.args` has no `roles` key.
+  asks for `edges`; the audit's `wfroles:` line reads
+  `{"skeptic":"gov-skeptic","specFinder":"gov-spec-reviewer","synthesis":"gov-synthesizer"}` while its
+  args still carry `workerType` `none`; and the RESULT's `dispatch.args.roles` is
+  `{"builder":"gov-builder"}`. With `ROLES` minus `builder` the RESULT's `dispatch.args` has no `roles`
+  key, and with `ROLES` minus the three audit keys the audit's `wfroles:` line reads `-`.
   Red when: a named stage spawns untyped, an unnamed one spawns typed, a span survives a typed prompt,
-  or the builder type is lost or invented on the way to the child.
+  the audit's review roles are dropped or invented, or the builder type is lost or invented on the way
+  to the child.
 - **AC3** — When `roles` is `[]`, `"gov-x"`, `{"specwriter":"gov-x"}`, `{"disposal":"bad name"}` or
   `{"committer":"none"}`, the parent stub THROWS a message opening `unattended-build:` that names
   `roles` or the offending key, and its trace holds no `agent:` line; when the child gets
@@ -358,12 +400,18 @@ Inputs are the self-test's `UNITS`, `CHILD_ARGS` and `returns` doubles; `ROLES` 
   and restored, it exits 0 printing the agreement line.
   Red when: a drifted copy reads in parity, or an owner that yields nothing passes.
   figure: DERIVED — both counts on the agreement line come from the population at observation time.
+- **AC7** — When the stub runs `UNITS` with `ROLES` and its `workflow` double returns
+  `{"exit":"deferred-platform","pending":["find:a"],"durable":false,"key":"k"}`, the RESULT's `exit` is
+  `deferred-platform` and its `next` carries `dispatches every judge again` and lacks
+  `reuses every lens`; when the same double returns `"durable":true` and the run carries no `roles`,
+  the RESULT's `next` equals the base render's for the same input, byte for byte.
+  Red when: a roled audit's deferral promises a reuse its judges never wrote, or an untyped one's moved.
 
 ## 7. Gates
 
 `unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `verifier fan-out` · `review-join ban (no ref-keyed join)` · `codebase-map coverage + freshness` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/workflows/unattended-build.test.sh · covers AC1 AC2 AC3 AC4 · the base harnesses, which read no roles, spawn every stage untyped and tell the builder to edit its spec · FLOOR_ASSERTIONS raised by the assertions added
+New arm: tools/workflows/unattended-build.test.sh · covers AC1 AC2 AC3 AC4 AC7 · the base harnesses, which read no roles, spawn every stage untyped and tell the builder to edit its spec · FLOOR_ASSERTIONS raised by the assertions added
 New arm: tools/workflows/check-protocol-parity.test.sh agent-type shape · covers AC6 · a copy widened to {0,64}, and an owner whose test is renamed away · none
 
 AC5 is a direct observation of the render and adds no arm.
@@ -382,10 +430,49 @@ AC5 is a direct observation of the render and adds no arm.
   Under the write gate an untyped builder's spec edit is refused anyway, so (a) loses nothing where
   the gate is armed.
   RESOLVED (agent, 2026-10-11, delegated): (a), S7 and §4 "The builder's hand-back".
+- **F2 — Does `unattended-build` take `builder` and forward it through `dispatch.args`?** Interface 10
+  of the build's spec brief pins `specWriter`, `committer` and `disposal` for this harness and
+  `builder` for the unit harness alone, while the brief's paragraph for this unit says the build
+  harness passes `roles.builder` on through `dispatch.args`. The M2 cross-read found the attended
+  router dispatching its units untyped in that gap.
+  - (a) Take `builder` and forward it as `dispatch.args.roles`, S1 and S5. A caller copying the
+    hand-out hands the child its type, and the catalogue's `spec-write` entry and the
+    harness-arguments verb print the key beside the other stage keys. Interface 10 gains one key for
+    this harness.
+  - (b) Keep interface 10. Every caller composes each unit dispatch's `roles` from a second verb call,
+    the `unattended-unit` object, which is the step the cross-read found missing.
+  Recommendation: (a). It satisfies this unit's own brief paragraph, which (b) cannot, and it widens
+  no surface beyond the optional object this unit adds.
+  RESOLVED (agent, 2026-10-11, delegated): (a), as S1 and S5 are written; the catalogue's stages
+  table and the harness-arguments verb print `builder` (`TOOL-aOrientedCast-1`,
+  `TOOL-aOrientedCast-2`).
+- **F3 — Does the audit stage spawn its review agents as catalogue roles?** Interface 10 names no
+  audit key for this harness, and the audit calls the review harness with `workerType: 'none'` and no
+  `roles`, so spec review would run outside role agents, against the build's goal that spec review
+  runs only in its role agents.
+  - (a) Forward `specFinder`, `skeptic` and `synthesis` from this harness's `roles` into the review
+    harness call's `roles`, keeping `workerType: 'none'` for a stage no role names, which is the
+    review harness's precedence (`TOOL-aOrientedCast-5` §8 F1). A roled judge writes no lens or verify
+    file (`TOOL-aOrientedCast-5` §8 F3), so the deferred-platform hand-back promises a reuse only when
+    the review returns `durable: true`.
+  - (b) Keep the audit untyped. Spec review stays outside role agents, which fails the build's goal.
+  - (c) Pass `workerType: 'gov-spec-reviewer'`. Finders and skeptics spawn as one type, the skeptic
+    not as `gov-skeptic` and the synthesis untyped, and the judges lose durability all the same.
+  Recommendation: (a), the most feature-rich: every audit stage runs as its catalogue role, and the
+  cost, a deferral that is not durable, is said in the hand-back rather than promised away. It adds no
+  surface beyond the `roles` object and widens no write: the reviewing roles hold no Write tool.
+  RESOLVED (agent, 2026-10-11, delegated): (a), S13 and §4 "The audit's roles"; interface 10 gains
+  the three keys for this harness.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · S1 · S4 · S11 · S13 · §3 · §4 · AC1 · AC2 · AC7 · the M2 cross-read's findings 2
+  and 5. §8 F2 raises and resolves `builder` on this harness against interface 10, and §8 F3 has the
+  audit forward its three review keys into the review harness, with the deferral hand-back following
+  the review's `durable`. The Edges name the catalogue and the renderer for the stage keys, and the
+  parked owner decision on the unattended verbs becomes a hands-off to `TOOL-aOrientedCast-9`, with
+  the reciprocal of the spawn guard's new consumes-from.
 
 ## 10. Reuse audit
 

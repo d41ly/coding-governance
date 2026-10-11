@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-6 — the write gate admits a spec write only from the spec-writer role and a product write only from the builder role
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 9 · ratified 2026-10-11
+**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 9 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -94,8 +94,14 @@ records outside the two classes are untouched.
 - **consumes-from** `TOOL-aOrientedCast-3` — the generated `.claude/roles.json` and its shape. Without
   it the arm reads an absent index in gov, and AC5 has nothing to observe.
 - **consumes-from** `TOOL-aOrientedCast-4` — the unit harness's builder prompt, which on a divergence
-  returns uncommitted instead of rev-bumping its spec, and flips its status by the S4 shape. Without it
-  every unattended unit pass meets this arm's refusal on its own spec at landing.
+  returns uncommitted instead of rev-bumping its spec, and flips its status by the S4 shape. That
+  prompt is the typed one: it holds only when a caller passes `roles.builder` (that unit's §8 F1),
+  and an untyped builder keeps today's text. An untyped unit pass is refused at landing either way,
+  because its builder reads `workflow-subagent`, which this arm refuses every spec write, the status
+  flip included, and every product write.
+- **consumes-from** `TOOL-aOrientedCast-9` — the unattended caller passing `roles.builder` on every
+  unit dispatch, so an unattended unit's builder writes as `gov-builder`. Without it every unattended
+  unit pass is refused its product writes from this arm's landing.
 - **hands-off** `TOOL-aOrientedCast-7` — the spawn half of the same rule, which reads the index through
   the exported `loadRoleIndex` rather than a second reader.
 - **hands-off** external — every other running session of this repository on the landing node, which
@@ -194,8 +200,10 @@ the session card's `## route`. A `spec` role needs no exemption, and every other
 `renderRoleDeny` follows `renderRouteDeny`'s shape. It names the tool and target, the class, and the
 writer: the main loop, a type the index does not name, or a role with another `writes`. It names the
 roles the index lets write that class and the index path. For a role in that class it gives the route
-that reaches it in one sentence: render its handoff with `handoff.py render --role <name> --part task`
-and pass the output as the prompt of an `Agent` call whose `subagent_type` is that role, or name the
+that reaches it in one sentence: render its handoff with
+`handoff.py render --role <name> --build <slug> --part task`, the slug filled from the target's build
+folder for a spec and from the routed unit's id for a product path, and pass the output as the prompt
+of an `Agent` call whose `subagent_type` is that role, or name the
 role in its harness's `roles` argument. The renderer is named by its bare file name, because a kit file
 names no sibling kit by literal. A spec refusal adds that a flip of the header's status and date cells
 is admitted from the main loop and from the routed unit's builder.
@@ -371,6 +379,11 @@ The close's bar runs the legs above once; no pass runs them.
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · §3 · §4 · the M2 cross-read's findings 7 and 10. The refusal's render command
+  spells `--build <slug>`, which the renderer requires. The edge to `TOOL-aOrientedCast-4` says the
+  builder's divergence and status behaviour holds only under `roles.builder` and that an untyped unit
+  pass is refused at landing either way, and the unattended caller, `TOOL-aOrientedCast-9`, joins the
+  consumes-from edges.
 
 ## 10. Reuse audit
 

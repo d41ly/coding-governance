@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-1 — the role catalogue: one owner-editable agent definition per role, the workflow table, and the checker that keeps them agreeing
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -152,7 +152,7 @@ One `[[workflow]]` per workflow, in stage order. The keys are the build's interf
 | `name` | one of `orient research reuse handoff spec-write spec-review build closing-review gate-bar bookkeeping` | each name exactly once |
 | `stage` | an integer, `0` for an any-time workflow | an integer at or above 0 |
 | `driver` | `agent`, `workflow`, `program` or `main-loop` | closed set |
-| `harness` | a `{prefix}`-relative script path, a command, or `none` | a `workflow` driver's harness is a `{prefix}/<home>/<file>.js` path that resolves |
+| `harness` | a `{prefix}`-relative script path, a command, or `none` | a `workflow` driver's harness is a `{prefix}/<home>/<file>.js` path; one the tree does not hold is a `note`, not a defect (R9) |
 | `roles` | a list of slot keys | each names a role file; an `agent` or `workflow` driver names one or more |
 | `stages` | optional inline table, harness stage key to slot key | only on a `workflow` driver; each value is in this entry's `roles` and names a role whose `agent` is true; each key matches `^[a-z][A-Za-z]*$` |
 | `enforced-by` | a list of entries, or the single string `none — <why>` | non-empty |
@@ -164,7 +164,7 @@ The ten entries:
 |---|---|---|---|---|---|
 | `orient` | 1 | `main-loop` | `/session-kickoff` | `gov-orienter` | none |
 | `reuse` | 2 | `agent` | `none` | `gov-reuse-scout` | none |
-| `spec-write` | 3 | `workflow` | `{prefix}/workflows/unattended-build.js` | `gov-spec-writer` | `specWriter`, `disposal` to `gov-spec-writer` |
+| `spec-write` | 3 | `workflow` | `{prefix}/workflows/unattended-build.js` | `gov-spec-writer gov-builder gov-spec-reviewer gov-skeptic gov-synthesizer` | `specWriter`, `disposal` to `gov-spec-writer`; `builder` to `gov-builder`; `specFinder`, `skeptic`, `synthesis` to `gov-spec-reviewer`, `gov-skeptic`, `gov-synthesizer` |
 | `spec-review` | 4 | `workflow` | `{prefix}/workflows/tier2-review.js` | `gov-spec-reviewer gov-skeptic gov-synthesizer` | `specFinder`, `skeptic`, `synthesis` |
 | `build` | 5 | `workflow` | `{prefix}/workflows/unattended-unit.js` | `gov-builder` | `builder` |
 | `closing-review` | 6 | `workflow` | `{prefix}/workflows/tier2-review.js` | `gov-diff-reviewer gov-skeptic gov-synthesizer` | `diffFinder`, `skeptic`, `synthesis` |
@@ -173,17 +173,23 @@ The ten entries:
 | `handoff` | 0 | `program` | `python {prefix}/roles/handoff.py render` | `gov-session` | none |
 | `bookkeeping` | 0 | `main-loop` | `none` | none | none |
 
-Each `stages` value maps to the role in the same position of that entry's `roles` list. The
-`unattended-build` harness's `committer` stage appears in no table: it authors nothing and commits
-through one Bash block, so it keeps today's spawn options and its harness logs that.
+Each `stages` value is a role its entry's `roles` lists. The `spec-write` entry lists `gov-builder`
+and the three review roles as well, as `spec-review` lists the skeptic and the synthesizer, because
+its harness forwards `builder` to the unit harness through `dispatch.args` and passes `specFinder`,
+`skeptic` and `synthesis` into its audit's review-harness call (`TOOL-aOrientedCast-4` §8 F2 and
+F3). The `unattended-build` harness's `committer` stage appears in no table: it authors nothing and
+commits through one Bash block, so it keeps today's spawn options and its harness logs that.
 
 `enforced-by` names, by description, what refuses a bypass once this build lands:
 `manifest-check.sh --card --append` for `orient`; the scratch guard's role arm for `spec-write` and
 `build`, beside the `routed commits name a specced unit` leg for `build`; the spawn guard in
-`agent-cap.js` for `research`, `handoff`, `spec-review` and `closing-review`; the pre-push hook for
-`gate-bar`; the `memory hygiene` leg for `bookkeeping`. `reuse` reads `none — the scout's trigger is
-the kickoff opt-in that aScoutedSeam owns`. `trigger` is one line per entry, written by the builder
-from the brief's architecture paragraph.
+`agent-cap.js` for `research` and `closing-review`; the pre-push hook for `gate-bar`; the
+`memory hygiene` leg for `bookkeeping`. `spec-review` names the spawn guard only because its audit
+runs under roles: the guard sees the build harness's `Workflow` call, whose `roles` carries the
+audit's three review keys, and never the audit's own call into the review harness. `handoff` reads
+`none — a session-to-session message is no tool call the spawn guard sees`, and `reuse` reads
+`none — the scout's trigger is the kickoff opt-in that aScoutedSeam owns`. `trigger` is one line per
+entry, written by the builder from the brief's architecture paragraph.
 
 The shape, pinned by one entry:
 
@@ -294,7 +300,7 @@ Stdlib only. Every text read and write names `encoding="utf-8"` and folds CRLF t
 | `load_roles(kit_dir)` | every `agents/*.agent.md`, parsed, keyed by slot |
 | `load_workflows(kit_dir)` | `workflows.toml` through `tomllib`, as a list in file order |
 | `render_role(kit_dir, name, memory_root)` | the base body with `{{MEMORY_ROOT}}` substituted, then, when the overlay is non-empty, a blank line, `## House rules`, a blank line and the overlay; any other `{{…}}` token raises |
-| `resolve_harness_path(tool_root, harness)` | a `{prefix}/<home>/<file>` harness resolved through the inline `resolve_kit_dir` copy, or raises |
+| `resolve_harness_path(tool_root, harness)` | a `{prefix}/<home>/<file>` harness resolved through the inline `resolve_kit_dir` copy, returned with whether the tree holds it; when no kit holding the file resolves, the path its first probe names, `<tool root>/<home>/<file>`, and false; a harness of any other shape raises |
 | `resolve_kit_dir` | the canonical block, carried inline between its markers |
 
 `render_role` is the one composition: the handoff renderer and the agent render both call it, so a
@@ -319,13 +325,14 @@ each overlay's bytes. Exit 0 clean, 1 on any defect, 2 when the check is unarmed
 | R6 | a workflow entry with an unknown, missing or repeated key, an unknown or repeated `name`, a missing name of the ten, a non-integer or negative `stage`, an unknown `driver`, or a `trigger` carrying a newline | 1 |
 | R7 | a role whose `workflow` names no entry, or an entry whose `roles` does not list it | 1 |
 | R8 | a `roles` entry naming no role file; an `agent` or `workflow` driver with no role; a role file no entry lists | 1 |
-| R9 | a `workflow` driver whose harness is not a `{prefix}/<home>/<file>.js` path that resolves; a `stages` table on another driver, a key outside its pattern, or a value outside the entry's `roles` or naming an `agent: false` role | 1 |
+| R9 | a `workflow` driver whose harness is not a `{prefix}/<home>/<file>.js` path; a `stages` table on another driver, a key outside its pattern, or a value outside the entry's `roles` or naming an `agent: false` role. A well-formed harness the tree does not hold is no defect: it prints one `roles: note:` line naming the harness and its workflow, and moves no exit | 1 |
 | R10 | a house overlay naming no role, or carrying a `# ` or `## ` line or a token other than `{{MEMORY_ROOT}}` | 1 |
 | R11 | the README's catalogue region absent, or different from a fresh render | 1 |
 
 `--write` renders the region and writes it, and touches nothing else. The checker's header states
 what it does not check: the meaning of a body, the truth of an `enforced-by` entry, a `tools:` name,
-and a command harness, which is graded for presence only.
+a command harness, which is graded for presence only, and whether the kit of a harness the tree does
+not hold should be installed, which is a `note` here and the wiring check's to report.
 
 ### The README's catalogue region
 
@@ -432,9 +439,11 @@ staged break is restored after its observation, and the checker exits 0 again on
   entry's `roles` names `gov-auditor`; a role file `gov-extra.agent.md` is added that no entry lists;
   the `build` entry's `roles` is emptied; the `build` entry's `stages` maps `builder` to
   `gov-skeptic`; an eleventh entry is added; or the `build` entry reads
-  `harness = "{prefix}/workflows/nope.js"` — `check_roles.py --root <fixture>` exits 1 naming the
-  rule, R6 to R9, for each.
-  Red when: any cross-reference break passes.
+  `harness = "workflows/unattended-unit.js"` — `check_roles.py --root <fixture>` exits 1 naming the
+  rule, R6 to R9, for each. When the `build` entry reads `harness = "{prefix}/workflows/nope.js"`
+  instead, it exits 0 and prints one `roles: note:` line naming that harness.
+  Red when: any cross-reference break passes, or a well-formed harness the tree does not hold
+  refuses.
 - **AC4** — When the fixture gains a house overlay for a slot `gov-ghost` that no role file names,
   or the `gov-builder` overlay gains a line `## Extra`, `check_roles.py --root <fixture>` exits 1
   naming R10; with the `gov-builder` overlay holding a plain paragraph, it exits 0 and the summary
@@ -513,6 +522,11 @@ New arm: check_roles.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 · each staged
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · §4 · AC3 · the M2 cross-read's findings 6 and 9, and the stage keys of its
+  findings 2 and 5. The `spec-write` entry's `stages` adds `builder` and the audit's three review
+  roles, and its `roles` lists them. `enforced-by` reads `none` for `handoff`, and names the spawn
+  guard for `spec-review` only through its audit's roles. R9 and the library's harness resolver admit
+  a harness the tree does not hold with a `note`, so AC3 stages a malformed harness instead.
 
 ## 10. Reuse audit
 

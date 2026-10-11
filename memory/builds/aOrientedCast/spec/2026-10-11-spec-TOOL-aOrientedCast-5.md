@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-5 — the review harness spawns each stage as the role its caller names
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 5 · ratified 2026-10-11
+**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 5 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -86,10 +86,9 @@ harness keeps only its stage protocol. With no `roles` the harness behaves exact
   durability writeup that needs a Write tool no reviewing role holds, and the brief puts them out.
 - Durable judges under a role. A role type is a named type, so its judges write no lens or verify file,
   §8 F3.
-- The build harness's AUDIT stage. It calls this harness with `workerType: 'none'` and no `roles`,
-  because interface 10 names no audit stage for `unattended-build`, so the spec lenses of an unattended
-  run's audit spawn unroled after this build. That is a gap in the build's goal, recorded here and in
-  the summary this pass returns, not closed here.
+- The build harness's AUDIT stage. Its call into this harness is `TOOL-aOrientedCast-4`'s, which the
+  M2 cross-read had forward `specFinder`, `skeptic` and `synthesis` beside its `workerType: 'none'`
+  (that spec's §8 F3), so the gap this bullet recorded at rev-1 is closed there and not here.
 - `REVIEW_SHAPE`. It does not move: a run with no judge role is byte-identical to BASE, and a run with
   one is keyed apart by S6 and writes no file a later run could reuse.
 - The review protocol and BUILD-METHOD M8's call shape. Neither changes here; once the spawn guard
@@ -97,8 +96,8 @@ harness keeps only its stage protocol. With no `roles` the harness behaves exact
   attended router's and the spawn guard's concern.
 - A kit-version bump. The review-harness kit moves once, after this build's last unit touching it.
 - The spawn guard's rule that a harness call carry a roles object. `TOOL-aOrientedCast-7` owns it, and
-  its Rollout section names this unit as a precondition of its landing. The edge is that
-  unit's to declare, as a consumes-from naming this one.
+  its Rollout section names this unit as a precondition of its landing; the Edges below carry the
+  hands-off.
 
 ### Edges
 
@@ -114,6 +113,10 @@ harness keeps only its stage protocol. With no `roles` the harness behaves exact
   arm, S2's single literal is held by nothing after this pass.
 - **hands-off** `KICK-aOrientedCast-2` — composing the closing review's call with a roles object
   printed by the handoff renderer's harness-arguments verb.
+- **hands-off** `TOOL-aOrientedCast-9` — the same composition for an unattended run's closing review,
+  which the unattended verbs carry.
+- **hands-off** `TOOL-aOrientedCast-7` — the `roles` argument the spawn guard requires on every call
+  to this harness.
 - **hands-off** external — giving the drift-audit harnesses roles. It needs a catalogue entry for them
   and a reviewing role that may write its own writeup, and both sit outside this build.
 
@@ -426,6 +429,10 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC3 AC4 AC5 AC6 AC8 
 
 - rev-1 · 2026-10-11 · initial draft, from the template and its render at base `646d4a73`, the
   self-test's stub runner, the role catalogue's workflow and role tables, and the agent-type probe.
+- rev-2 · 2026-10-11 · §3 · the M2 cross-read's findings 3 and 5, reciprocated here: the spawn guard
+  and the unattended caller each declare a consumes-from naming this unit, so the Edges carry both
+  hands-offs, and the audit non-goal names `TOOL-aOrientedCast-4` §8 F3 as where the audit's roles are
+  now forwarded. No design moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-7 — the spawn guard refuses an Agent or Workflow call that carries no rendered handoff
 
-**Status:** OPEN · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 10 · ratified 2026-10-11
+**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 10 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -56,8 +56,8 @@ its `args` hand that harness a `roles` object of known roles.
   already keeps. NOT OBSERVED by a criterion of its own: once every input is guarded no payload reaches
   a throw, so the catch is a backstop, and the builder stages a throw once when the arm goes RED first.
 - **S8** — Every refusal names the call, the reason, the `agent`-true roles or the harnesses, and the
-  route that passes: `handoff.py render --role <name> --part task` for a spawn, and `roles` from
-  `handoff.py harness-args <harness>` for a harness. Observed by AC2 and AC4.
+  route that passes: `handoff.py render --role <name> --build <slug> --part task` for a spawn, and
+  `roles` from `handoff.py harness-args <harness>` for a harness. Observed by AC2 and AC4.
 - **S9** — The file header gains rule 6, its order and its ceiling, and `tools/hooks/README.md` gains a
   section stating the same. NOT OBSERVED by a criterion: prose. The review reads it against §4.
 - **S10** — The arms live in `tools/hooks/agent-cap.test.sh` over a fixture repository the suite
@@ -98,6 +98,17 @@ type is refused. A repair owed after the landing merge therefore belongs to a fr
   its `harnesses` list. Without it gov's tree is unarmed and AC7 has nothing to observe.
 - **consumes-from** `TOOL-aOrientedCast-6` — `loadRoleIndex`, exported from `scratch-guard.js`, so the
   two hooks read the index once and identically.
+- **consumes-from** `TOOL-aOrientedCast-4` — the build and unit harnesses' `roles` argument, which this
+  rule requires on every call to them. Without it every build and unit call, attended or not, is
+  refused at landing.
+- **consumes-from** `TOOL-aOrientedCast-5` — the review harness's `roles` argument, which this rule
+  requires on every closing-review call. Without it no closing review can run.
+- **consumes-from** `KICK-aOrientedCast-2` — the attended router, which composes every agent prompt as
+  a rendered handoff and every harness call with `roles`. Without it an attended build has no route
+  this rule admits.
+- **consumes-from** `TOOL-aOrientedCast-9` — the unattended Skill and verbs passing `roles` on every
+  harness call. Without it every unattended build is refused from this rule's landing, gov's own
+  concurrent runs included.
 - **hands-off** external — making the drift-audit workflows and the orientation counterfactual into
   declared harnesses that take a roles argument, so the drift-audit Skill's two tiers and the stage-2
   matrix ask run again in an armed repository.
@@ -238,8 +249,9 @@ literal.
 
 Lands at order 10, the build's last unit. It needs `TOOL-aOrientedCast-2`'s renderer, gov's index from
 `TOOL-aOrientedCast-3`, `TOOL-aOrientedCast-4` and `TOOL-aOrientedCast-5` having the three harnesses take
-`roles`, and `KICK-aOrientedCast-2`'s router and the unattended verbs passing it, or gov's own builds
-are refused at landing. One commit carries the hook, its arms and its README section; no settings change.
+`roles`, and both callers passing it, both at order 6: `KICK-aOrientedCast-2`'s attended router and
+`TOOL-aOrientedCast-9`'s unattended Skill and verbs. Without them gov's own builds are refused at
+landing. One commit carries the hook, its arms and its README section; no settings change.
 A hook script is read afresh on every call, so the rule binds every session whose hooks run from a tree
 holding this commit, from its next spawn, as §3 says for this one. This is the hooks kit's last unit in
 the build: its version and five carriers move once after it, and `govkit.py epoch` reports the move as
@@ -398,6 +410,11 @@ once; no pass runs them.
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · S8 · §3 · §4 · the M2 cross-read's findings 3, 4 and 8. S8's render command
+  spells `--build <slug>`, as §4's refusal text already did. The Edges gain consumes-from lines for
+  `TOOL-aOrientedCast-4`, `TOOL-aOrientedCast-5`, `KICK-aOrientedCast-2` and `TOOL-aOrientedCast-9`,
+  and the Rollout's precondition on the unattended verbs is that last unit at its order 6, not an
+  unscheduled owner turn.
 
 ## 10. Reuse audit
 
