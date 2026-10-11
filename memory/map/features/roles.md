@@ -5,7 +5,7 @@ feature = "roles"
 title = "The role catalogue: one owner-editable agent definition per role with an empty house overlay beside it, the table of the workflows a governed session runs its LLM work through, the library every consumer reads them by, and the leg that holds the three and the governing doc to one another"
 status = "building"
 streams = ["tooling"]
-decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3"]
+decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2"]
 
 [claims]
 gate-legs = ["roles catalogue", "roles render selftest", "roles render wiring"]
@@ -14,7 +14,7 @@ git-hooks = []
 harness-hooks = []
 workflow-scripts = []
 skill-engines = []
-rendered-skills = []
+rendered-skills = ["build"]
 gotcha-classes = []
 guides = []
 backlog-shards = []
@@ -37,7 +37,10 @@ checks such a file's hashes, and prints the stage-to-role map a harness takes (T
 The agent-type renderer, `render_agents.py`, is its second: it renders each `agent`-true role into a
 Claude Code agent type under `.claude/agents/`, trimmed of the charter by `omitClaudeMd: true` and
 carrying the charter sections the role names instead, beside the generated index `.claude/roles.json`
-the hooks read; its `--check` is the `roles render wiring` leg (TOOL-aOrientedCast-3).
+the hooks read; its `--check` is the `roles render wiring` leg (TOOL-aOrientedCast-3). The kit's
+adopter, `adopt-roles.sh`, renders the `/build` Skill from `SKILL.template.md`: the router an
+attended session follows after kickoff's go, whose `## Stage` headings the render binds to the
+workflow table's stages, and whose `--check` byte-compares the committed render (KICK-aOrientedCast-2).
 
 ## Constraints & why
 

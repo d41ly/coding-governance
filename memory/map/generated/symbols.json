@@ -13750,6 +13750,11 @@
     {
       "id": "render_skill",
       "kind": "function",
+      "file": "tools/roles/adopt-roles.sh"
+    },
+    {
+      "id": "render_skill",
+      "kind": "function",
       "file": "tools/runlog/adopt-runlog.sh"
     },
     {

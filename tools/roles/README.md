@@ -97,6 +97,31 @@ CLI omits it only while a server flag it reads stays on and the caller supplies 
 its own, so a later CLI or a flag flip can re-admit the charter silently; the agent-type probe
 record in the build that shipped this renderer is the instrument to re-run.
 
+## The `/build` Skill
+
+`bash adopt-roles.sh --scaffold | --check` renders `SKILL.template.md` into
+`.claude/skills/build/SKILL.md`, the router an ATTENDED session follows after kickoff's READY card
+and the owner's go (KICK-aOrientedCast-2). It walks this catalogue's workflows in stage order and
+points at the carriers `/unattended` already follows (the build method, the verbs guide, the two
+build harnesses' attended mode, the review harness) instead of restating them; every agent it orders
+is spawned from a `handoff.py render` and every harness call carries `handoff.py harness-args`.
+
+The render substitutes three tokens literally: `{{KIT_DIR}}` and `{{TOOL_ROOT}}`, derived by the
+same `.git` walk the unattended adopter uses, and `{{MEMORY_ROOT}}`, read from `.memory-tree.conf`.
+An empty derivation, an absent conf or a blank key exits 2; a `{{` surviving the render exits 1
+naming its line.
+
+The render also BINDS the Skill's stages to `workflows.toml`: each `## Stage <n> — <workflow>`
+heading must name a workflow whose `stage` is `<n>`, the headings ascend strictly, and every
+workflow of stage 1 or more is named by exactly one heading. A disagreement exits 1 naming the
+heading and the entry; a catalogue read yielding zero workflows exits 2 as a dead probe. `--check`
+renders in memory and byte-compares with the file on disk, carriage returns stripped from both, so
+it grades exactly what `--scaffold` would write.
+
+**Restart.** Whether a running session lists a Skill written after it started is unverified on this
+CLI. `--scaffold` prints one line saying so when it creates the file: start a new session before
+invoking `/build`.
+
 ## The checker
 
 `python check_roles.py [--root <dir>] [--write]`, run as the `roles catalogue` gate leg. It grades

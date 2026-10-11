@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-11T12:07:25+03:00 @ 58c109be8c2bfc4f57afbd22d4b4136cf3baf963
+last-audit: 2026-10-11T14:37:31+03:00 @ 5692b36d7fc4a000374929082418a2fdca4b0f69
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 4617f259a88e844080669830383a5905f0279243
+last-body-change: 5692b36d7fc4a000374929082418a2fdca4b0f69
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -63,14 +63,15 @@ which restores it. The tier is §B's.
   `TOOL-aReplayedCard-1`) and one from a tree the card does not name: carry a scratch worktree's
   diff back as a patch. A write under `ROUTED_PATHS` needs a route naming a buildable unit
   (`TOOL-aRoutedQuill-2`); a pushed commit there names a specced unit (`TOOL-aRoutedQuill-3`).
+- **An attended code build runs through `/build` after kickoff's go** (`KICK-aOrientedCast-2`): the
+  role catalogue's workflows in stage order, rendered by `bash tools/roles/adopt-roles.sh --scaffold`.
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
-  worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
+  worktrees under `.claude/worktrees/<branch-slug>/`. A unit
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
 - **Remote · default branch:** `origin` · `main`.
 - **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit
   ask, or a committed build folder the run did not create. What "did not create" admits depends on the
-  ANCHOR the project declares, and this file does not paraphrase it — an earlier paraphrase here said
-  "committed before the run's branch existed", which describes one anchor and is false of the others.
+  ANCHOR the project declares, and this file does not paraphrase it:
   `memory/guides/UNATTENDED-PROTOCOL.md` section 1 is the condition.
 - **Governing docs:** `AGENTS.md` (the charter — authoritative) · `coding-governance-agents.template.md`
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + asks in `memory/builds/<slug>/BACKLOG.md`.
@@ -134,7 +135,7 @@ which restores it. The tier is §B's.
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
   `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one second. Hit twice:
   `tools/unattended/` on 2026-08-21, and `check-memory-hygiene.sh` on 2026-09-13 by two sessions
-  sharing node tag `c`, for 13 conflicts at the landing. Neither time did anyone run it. §3's rule
+  sharing node tag `c`, for 13 conflicts at the landing. §3's rule
   is own STREAMS not files, and a kit is the unit that rule is about.
 
 - **A finished or live unattended run ANSWERS QUESTIONS about itself** — `/runlog`, over the run's

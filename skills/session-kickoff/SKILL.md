@@ -194,8 +194,8 @@ slug per its rules and draft the ledger row for the user. No id scheme → skip 
 
 ## Step 5 — READY card, append it, then stop
 
-Echo a compact **READY card** — repo · remote/default branch · `## task` (the sealed fields:
-scope in/out · acceptance · gates · slug or "none") · `## manifest` (the audit delta line, when
+Echo a compact **READY card** — repo · remote/default branch · `## task` (every field
+`--task-skeleton` prints, and slug or "none") · `## manifest` (the audit delta line, when
 Step 2b ran a repair) · `## read` (governing docs + entrypoints) · `## records` (prior records +
 the `Recall terms used:` line) · `## classes` (the gotcha names) · `## open` (parked items, plus
 Step 3's answer, or what answered for it: `spec audit: declared <date>`,
@@ -207,6 +207,7 @@ AFTER that append, THEN hand control back:
 *"Ready — say go and I'll start, or adjust any field."* Do not start building until the user
 confirms. Quote that answer under the brief's `## Owner confirmation`; its skeleton says when to
 append its `## route`.
+On go, a code build continues in `/build` where the project ships it.
 
 ## Step 5b — the unattended hand-back (only inside a run actually started as one)
 

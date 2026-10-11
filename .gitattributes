@@ -121,6 +121,11 @@ tools/dead-path-waivers.txt text eol=lf
 .claude/agents/gov-*.md text eol=lf
 .claude/roles.json text eol=lf
 
+# The roles kit's rendered /build Skill and its template (KICK-aOrientedCast-2), for the unattended
+# Skill's reason: the adopter's `--check` byte-compares the render with CR stripped from both sides.
+.claude/skills/build/SKILL.md text eol=lf
+tools/roles/SKILL.template.md text eol=lf
+
 # The /session-kickoff engine. Pinned because a GATE now reads it — check 12 of the unattended leg
 # greps its text, which nothing did before. That leg strips CR anyway, and both halves are the point:
 # strip so the comparison is right, pin so the bytes are. Measured 2026-08-10: the engine came out of
