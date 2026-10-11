@@ -1,6 +1,6 @@
 # TOOL-aScoutedSeam-1 — the reuse scout: a checklist role and a harness running a code and a design pass, merged into a capped `## reuse` section
 
-**Status:** SPECCED · rev-4 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams tooling · order 1
+**Status:** SPECCED · rev-5 · 2026-10-11 · node a · Tier-2 · base d19938f3 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -119,6 +119,12 @@ from two measurements:
   `tools/roles/workflows.toml`, to the values of §4. The edit lands after aOrientedCast does and in
   the same commit as the rendered harness, so the row never names a script the tree lacks.
   aOrientedCast ruled on 2026-10-11 that the row's harness value is this unit's to write.
+
+  The same commit edits the attended router's stage 2, the orient and reuse stage, in
+  `tools/roles/SKILL.template.md`. That stage gains the `gen_map.py --house-index` step and the
+  `index` arg, and the commit re-renders the stage into `.claude/skills/build/SKILL.md` with
+  `adopt-roles.sh --scaffold`. aOrientedCast ruled on 2026-10-11 that this stage text is this unit's
+  to write, and its own stage 2 text stays as it is until then.
   - AC7 observes it.
 - **S10** — The house index: a new mode of the codebase-map kit, `gen_map.py --house-index [--host
   <tree>]... [--out <path>]`. It is deterministic, runs no agent, and prints one markdown document
@@ -152,8 +158,9 @@ from two measurements:
 - A second scout run unioned with the first. M1c's two runs agreed on every positive, so the union
   bought no primary at twice the cost.
 - Calling the harness at kickoff, writing the card or the brief: `KICK-aScoutedSeam-1`.
-- The catalogue's grammar, its other rows, the role file's front-matter grammar and the rendered
-  agent type: aOrientedCast's. This unit edits only the `reuse` row's values (S9).
+- The catalogue's grammar, its other rows, the role file's front-matter grammar, the rendered
+  agent type and the router's other stages: aOrientedCast's. This unit edits only the `reuse` row's
+  values and the router's stage 2 (S9).
 - A model override. `model` stays the catalogue's `inherit` until a measurement argues otherwise.
 
 ### Edges
@@ -169,9 +176,10 @@ from two measurements:
 - **consumes-from** external — aOrientedCast's role catalogue, LANDED: the `gov-reuse-scout` slot file
   and its front-matter grammar, the rendered native agent type, the `reuse` workflow row this unit
   edits, and `handoff.py harness-args`. Without them the harness has no agent type to spawn, the
-  spawn guard refuses its Workflow call, and S9 has no row to edit. The attended router's orient
-  stage, which is aOrientedCast's, passes `args.index` the way kickoff does (S10). That is a contract
-  delta from the working design and is recorded on the README for them.
+  spawn guard refuses its Workflow call, and S9 has no row to edit. `harness-args` prints only the
+  `roles` object, so `index` is composed beside it by the caller, as every other harness arg is. The
+  router's stage 2 is spelled by this unit (S9), and aOrientedCast confirmed on 2026-10-11 that the
+  arg is no conflict.
 
 ## 4. Design
 
@@ -264,6 +272,8 @@ Each function name leads with a declared verb; `boundedParallel` is the hook's a
 - `memory/map/generated/symbols.json`
 - `.lexicon.conf`
 - `tools/roles/workflows.toml` (the `reuse` row only)
+- `tools/roles/SKILL.template.md` (stage 2 only)
+- `.claude/skills/build/SKILL.md` (re-rendered)
 - `tools/codebase-map/gen_map.py`
 - `tools/codebase-map/selftest.py`
 - `tools/codebase-map/README.md`
@@ -350,9 +360,11 @@ calls it only on an owner opt-in, so landing this unit changes no session's beha
   figure: DERIVED by `bench.py grade` at observation time.
 - **AC7** — When aOrientedCast's catalogue checker reads `workflows.toml` after this unit lands, the
   `reuse` row names the rendered `reuse-scout.js` and the `scout` stage, and the checker notes no
-  harness the tree does not hold.
-  Red when: the row is edited in a commit that does not carry the rendered harness.
-  fixture: aOrientedCast's catalogue and checker, landed.
+  harness the tree does not hold. In the same commit, `adopt-roles.sh --check` passes, and the
+  rendered router's stage 2 names the house-index step and the `index` arg.
+  Red when: the row or the stage is edited in a commit that does not carry the rendered harness, or
+  the stage is edited in `SKILL.template.md` and not re-rendered.
+  fixture: aOrientedCast's catalogue, checker and router, landed.
 - **AC8** — When the stub suite's two lenses return the census choice `Section width` with different
   counts, plus three `edits` each, the section holds one `- convention Section width:` line, the code
   lens's, and no edit text. The return's `edits` holds all six.
@@ -367,7 +379,7 @@ calls it only on an owner opt-in, so landing this unit changes no session's beha
 
 ## 7. Gates
 
-`workflow script syntax` · `verifier fan-out` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `install-prefix (shipped surface)` · `review-protocol parity (kit vs dogfood)` · `memory hygiene` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `review-join self-test` · `straggler-guard arms` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e`
+`workflow script syntax` · `verifier fan-out` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `install-prefix (shipped surface)` · `review-protocol parity (kit vs dogfood)` · `memory hygiene` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `review-join self-test` · `straggler-guard arms` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `check-wiring self-test`
 
 New arm: tools/workflows/reuse-scout.test.sh · covers AC1 AC2 AC3 AC4 AC8 · stub lens returns staged per arm · none
 New arm: tools/codebase-map/selftest.py · covers AC9 · fixture trees with and without each index source, staged per arm · none
@@ -400,6 +412,9 @@ New arm: tools/codebase-map/selftest.py · covers AC9 · fixture trees with and 
   role becomes M1c's with the trial's three corrections. The section gains `convention` lines and
   the return gains `edits`. The house index is a new codebase-map mode the caller runs, and AC6's
   baseline moves to M1c.
+- rev-5 · 2026-10-11 · S9 · §3 · §4 · AC7 · aOrientedCast placed the router's stage 2 in this unit:
+  the `index` arg and the house-index step are spelled in `tools/roles/SKILL.template.md` and
+  re-rendered in the commit that edits the catalogue row.
 
 ## 10. Reuse audit
 

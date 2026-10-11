@@ -42,8 +42,9 @@ and the benchmark under [build/](build/2026-10-11-build-TOOL-aScoutedSeam-1-2-be
   `returns`, and the `reuse` harness. aOrientedCast owns the catalogue grammar, the renderer, the
   spawn guard, the harness wiring and `skills/session-kickoff/` until its KICK units land.
 - One delta from the contract agreed with aOrientedCast: the harness now takes `index`, the house
-  index path, so the attended router's orient stage runs `gen_map.py --house-index` before the
-  harness, as kickoff does (`TOOL-aScoutedSeam-1` S10).
+  index path. The attended router's stage 2 therefore runs `gen_map.py --house-index` before the
+  harness, as kickoff does. aOrientedCast confirmed the delta on 2026-10-11 and placed the stage 2
+  edit in `TOOL-aScoutedSeam-1` (S9 and S10).
 - The kickoff unit builds after aOrientedCast's KICK units; whoever lands second reconciles.
 - Opt-in is the owner's: a dated README key or a dated project default, never a run's own.
 - One kit-version bump per touched kit, after that kit's last unit.
@@ -70,7 +71,7 @@ ids DEPL-aScoutedSeam-1 KICK-aScoutedSeam-1 TOOL-aScoutedSeam-1 TOOL-aScoutedSea
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aScoutedSeam-1 — the reuse scout: a checklist role and a harness running a code and a design pass, merged into a capped `## reuse` section](spec/2026-10-11-spec-TOOL-aScoutedSeam-1.md) | 1 | 2 | SPECCED | rev-4 | 2026-10-11 |
+| [TOOL-aScoutedSeam-1 — the reuse scout: a checklist role and a harness running a code and a design pass, merged into a capped `## reuse` section](spec/2026-10-11-spec-TOOL-aScoutedSeam-1.md) | 1 | 2 | SPECCED | rev-5 | 2026-10-11 |
 | [KICK-aScoutedSeam-1 — kickoff asks once, runs the scout on opt-in, and carries its seams onto the card and into the brief](spec/2026-10-11-spec-KICK-aScoutedSeam-1.md) | 2 | 2 | SPECCED | rev-2 | 2026-10-11 |
 | [TOOL-aScoutedSeam-3 — the scout's diff mode: a landed diff checked against the tree and the `## reuse` seams](spec/2026-10-11-spec-TOOL-aScoutedSeam-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-11 |
 | [TOOL-aScoutedSeam-2 — a spec's §10 names every MUST seam its brief carries, or overrides it with a reason, and check 12 grades it](spec/2026-10-11-spec-TOOL-aScoutedSeam-2.md) | 4 | 2 | SPECCED | rev-1 | 2026-10-11 |
