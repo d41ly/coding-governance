@@ -395,7 +395,7 @@ esac
 # `.claude/**` is outside the govkit surface, outside the codebase-map inventories and outside both
 # <prefix>/-scoped JS gates, so nothing else in the bar notices the EXECUTED copy drifting from the
 # graded one. Absence must not satisfy it.
-ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null || echo "")
+ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null || echo "")
 # SELF-ARMING ON THE RESOLVED COPY COUNT — TOOL-dRetiredFork-14.
 # This arm asserted TWO copies and hard-FAILED when the second was absent. That became the CORRECT
 # state the moment the kit stopped shipping a second destination, so the arm failed on the shipped
@@ -516,8 +516,8 @@ else
 fi
 SG_CWD_FIX=$(cd "$SGFIX" && node -p 'process.cwd()')
 SG_CWD_WT=$(cd "$SGWT" && node -p 'process.cwd()')
-SG_TOP_FIX=$(git -C "$SGFIX" rev-parse --show-toplevel)     # git's spelling — what the writer's `tree —` cell carries
-SG_TOP_WT=$(git -C "$SGWT" rev-parse --show-toplevel)
+SG_TOP_FIX=$(unset GIT_DIR GIT_WORK_TREE; git -C "$SGFIX" rev-parse --show-toplevel)     # git's spelling — what the writer's `tree —` cell carries
+SG_TOP_WT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$SGWT" rev-parse --show-toplevel)
 SG_CARDS="$SGFIX/.git/orientation"
 SG_READY='READY — sgtest · node a · sg-wt · base 0000000 · Tier-1 · gates none'
 # The hook's one comparable form, read from the hook rather than re-spelled here — a second fold in

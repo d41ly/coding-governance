@@ -5216,7 +5216,7 @@ cp "$TMP/$KIT_REL/ASKS.template.md" "$ak/memory/guides/UNATTENDED-ASKS.md"
 # the recall kit's extractor and its conf reader, into a directory the declared RECALL_CLI names
 # FOUND by the file only that kit holds, never by a typed kit directory (the carried-prefix ban).
 _rk_rel=$(git -C "$HERE" ls-files --full-name -- ':(top)*recall_conf.py' | head -n 1)
-_rk_src="$(git -C "$HERE" rev-parse --show-toplevel)/${_rk_rel%/*}"
+_rk_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/${_rk_rel%/*}"
 cp "$_rk_src/extract.py" "$_rk_src/recall_conf.py" "$ak/rk/"
 n=$((n+1)); [ -f "$ak/rk/extract.py" ] || { echo "FAIL the ask block could not copy the recall kit's extractor, so every S3 arm below would grade a missing grammar"; st=1; }
 printf 'MEMORY_ROOT=memory\nFAMILIES="example:EXMP tooling:TOOL"\n' > "$ak/.memory-tree.conf"

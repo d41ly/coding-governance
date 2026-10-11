@@ -77,7 +77,7 @@ govkit — a declared kit population, and the selfcheck that keeps it honest
 - gate-legs 6: `govkit selfcheck`, `govkit selftest`, `govkit refusal join`, `govkit acceptance matrix`, `govkit runbook parity`, `kit epoch (shipped bytes move, the version moves)`
 - kits 1: `govkit`
 - skill-engines 1: `deploy-governance`
-- gotcha-classes 3: `fixture-lacks-a-gate-the-consumer-has.md`, `a-new-local-collides-in-a-long-function.md`, `guard-above-a-fold-makes-its-fallback-dead.md`
+- gotcha-classes 4: `fixture-lacks-a-gate-the-consumer-has.md`, `a-new-local-collides-in-a-long-function.md`, `guard-above-a-fold-makes-its-fallback-dead.md`, `verdict-printed-before-the-step-that-reverts-it.md`
 - globs 4: `tools/govkit/*`, `tools/govkit/entries/*`, `tools/*/kit.toml`, `skills/deploy-governance/*`
 
 ## install-prefix

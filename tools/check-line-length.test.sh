@@ -131,7 +131,7 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 _rkd_py=$(resolve_python) || { echo "check-line-length.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
 LIB_DIR=$(resolve_kit_dir "$_rkd_py" lib lib-selftest.sh "$HERE") || exit 2
 LIB="${LIB_DIR##*/}"
-ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
+ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
   echo "check-line-length.test: not a git work tree"; exit 2; }
 cd "$ROOT" || exit 2
 . "$ROOT/$LIB_DIR/lib-selftest.sh"

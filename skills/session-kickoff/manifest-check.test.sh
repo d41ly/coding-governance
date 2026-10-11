@@ -685,7 +685,7 @@ run "C11 does not police bullets outside the traps section" "$R" 0 -
 # write skips the `overlaps —` read rather than starting the real driver per card; that cell's own
 # arms run over a stub (KICK-aMendedFleet-2).
 NONCE="mfc$$"
-GOVROOT=$(git -C "$(dirname "$CHECK")" rev-parse --show-toplevel)
+GOVROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$(dirname "$CHECK")" rev-parse --show-toplevel)
 # THE READER IS FOUND THE WAY THE CHECKER FINDS IT (TOOL-aRepatriatedFork-18 S3): the checker's own
 # `resolve_id_reader` and `resolve_kit_dir`, read out of it and run here, never a second spelling of
 # where the memory-tree and memory-recall kits live. This suite ships beside the checker, and a
@@ -795,7 +795,7 @@ if cmp -s "$CARD_OUT" "$CARD_HOME/$NONCE-t1.md"; then echo "ok   AC1 stdout equa
   echo "FAIL AC1 stdout equals the card's bytes"; diff "$CARD_OUT" "$CARD_HOME/$NONCE-t1.md" | sed 's/^/    /'; fail=$((fail+1)); fi
 
 # AC2 — every startup cell, each derived by the suite from git and compared to the card.
-wt_top=$(git -C "$CWT" rev-parse --show-toplevel); wt_head=$(git -C "$CWT" rev-parse HEAD)
+wt_top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$CWT" rev-parse --show-toplevel); wt_head=$(git -C "$CWT" rev-parse HEAD)
 wt_dirty=$(git -C "$CWT" status --porcelain | wc -l | tr -d '[:space:]')
 check_eq "AC2 tree — the toplevel in git's own spelling, worktree, branch, BASE, dirty count" \
   "tree — $wt_top · worktree · branch card-wt · BASE $wt_head · dirty $wt_dirty" "$(read_cell tree "$NONCE-t1")"
@@ -918,7 +918,7 @@ run_card "AC9 --card --write in a repo whose remote is ahead, and with no manife
 check_eq "AC9 HEAD and origin/main are unchanged after the card" "$h_before $o_before" \
   "$(git -C "$TMP/aheadlocal" rev-parse HEAD) $(git -C "$TMP/aheadlocal" rev-parse origin/main)"
 [ ! -e "$TMP/aheadlocal/.git/FETCH_HEAD" ] && { echo "ok   AC9 no FETCH_HEAD was written"; pass=$((pass+1)); } || { echo "FAIL AC9 no FETCH_HEAD was written"; fail=$((fail+1)); }
-check_eq "AC9 a primary tree's card says primary" "tree — $(git -C "$TMP/aheadlocal" rev-parse --show-toplevel) · primary · branch main · BASE $h_before · clean" "$(grep -m1 '^tree — ' "$TMP/aheadlocal/.git/orientation/$NONCE-t9.md")"
+check_eq "AC9 a primary tree's card says primary" "tree — $(unset GIT_DIR GIT_WORK_TREE; git -C "$TMP/aheadlocal" rev-parse --show-toplevel) · primary · branch main · BASE $h_before · clean" "$(grep -m1 '^tree — ' "$TMP/aheadlocal/.git/orientation/$NONCE-t9.md")"
 
 # AC10 — no .memory-tree.conf: exit 0 and a skipped: live cell, never a refusal.
 mkrepo noconf; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
@@ -1213,7 +1213,7 @@ k2c_cap=$(( $(wc -c < "$K2CCARD" | tr -d '[:space:]') + $(render_big_body one | 
 render_big_body one | (cd "$CWT2" && CARD_CAP_BYTES=$k2c_cap bash "$CHECK" --card --append --session "$K2C" > "$CARD_OUT" 2>&1); got=$?
 check_eq "K2 AC10 the append from worktree B exits 0" "0" "$got"
 check_eq "K2 AC10 the tree cell names B's toplevel, kind, branch, BASE and dirty count" \
-  "tree — $(git -C "$CWT2" rev-parse --show-toplevel) · worktree · branch card-wt2 · BASE $b_head · $(n=$(git -C "$CWT2" status --porcelain | wc -l | tr -d '[:space:]'); [ "$n" = 0 ] && echo clean || echo "dirty $n")" \
+  "tree — $(unset GIT_DIR GIT_WORK_TREE; git -C "$CWT2" rev-parse --show-toplevel) · worktree · branch card-wt2 · BASE $b_head · $(n=$(git -C "$CWT2" status --porcelain | wc -l | tr -d '[:space:]'); [ "$n" = 0 ] && echo clean || echo "dirty $n")" \
   "$(grep -m1 '^tree — ' "$K2CCARD")"
 check_eq "K2 AC10 the other startup lines are byte-identical" \
   "$(head -n "$k2c_startup" "$TMP/k2c.before" | grep -v '^tree — ')" "$(head -n "$k2c_startup" "$K2CCARD" | grep -v '^tree — ')"
