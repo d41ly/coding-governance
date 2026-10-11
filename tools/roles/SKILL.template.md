@@ -22,7 +22,8 @@ before stage 3, and it wins any difference. The stages below are the workflows o
 - You write no freeform agent prompt. A direct spawn is an `Agent` call whose `subagent_type` is the
   role and whose `prompt` is the output of this line, unchanged:
   `python {{KIT_DIR}}/handoff.py render --role <role> --build <slug> --unit <id> --input <key>=<value> --part task`
-  Every harness call carries `roles`, the JSON `handoff.py harness-args <harness>` prints.
+  Every harness call carries `roles`, the JSON `handoff.py harness-args <harness>` prints, and
+  `efforts`, the JSON `handoff.py stage-efforts <workflow>` prints for the workflow that call runs.
 
 ## Stage 1 — orient
 
@@ -39,7 +40,8 @@ Read `unattended.sh --plan <slug> --paths`, then call `{{TOOL_ROOT}}workflows/un
 `scriptPath` as the verbs guide's "Drive the build as ONE program" bullet composes it
 (`{{MEMORY_ROOT}}/guides/UNATTENDED-VERBS.md`), with these differences: `mode: 'attended'`; every
 `units[]` entry carries its `planState` from that read; no `runStateExists`; `base` is the READY
-line's; `roles` from `handoff.py harness-args unattended-build`; `specAudit` only where the build
+line's; `roles` from `handoff.py harness-args unattended-build`; `efforts` from
+`handoff.py stage-efforts spec-write`; `specAudit` only where the build
 README declares `spec-audit:`. Act on its `nextAction`.
 
 ## Stage 4 — spec-review
@@ -55,7 +57,8 @@ Until `--plan --paths` prints `next: none - every tracked spec is terminal`, for
 2. append a `## route` naming the unit, as the brief skeleton's route lines say, through the kickoff
    check script's `--card --append`;
 3. call the hand-out's `dispatch.scriptPath` with `dispatch.args` plus `unitId`, `specPath`,
-   `briefPath`, and `roles` from `handoff.py harness-args unattended-unit`, on every dispatch;
+   `briefPath`, `roles` from `handoff.py harness-args unattended-unit` and `efforts` from
+   `handoff.py stage-efforts build`, on every dispatch;
 4. on `diverged: true`, write a revision record under the build's `prompts/` holding `## The brief`
    and no `## The prompt`, its Goal the builder's `why` verbatim and its other four sub-heads copied
    from the build's brief; spawn `gov-spec-writer` on it with `--input spec=<path> --input
@@ -65,7 +68,8 @@ Until `--plan --paths` prints `next: none - every tracked spec is terminal`, for
 ## Stage 6 — closing-review
 
 Call `{{TOOL_ROOT}}workflows/tier2-review.js` as M8 composes it, adding `roles` from
-`handoff.py harness-args tier2-review`. Each blocker's fix is a pass of the unit it lands in: write
+`handoff.py harness-args tier2-review` and `efforts` from `handoff.py stage-efforts closing-review`.
+Each blocker's fix is a pass of the unit it lands in: write
 the finding into a fix record under `prompts/`, set that unit back to INPROGRESS by the same
 status-only edit, and dispatch it with that record as `briefPath`. Then re-review the fix (M8).
 

@@ -28,14 +28,15 @@ version_from = { file = "roles_lib.py", pattern = "^KIT_ROLES_VERSION = " }
 include = "**"
 role = "engine"
 
-# THE HOUSE OVERLAYS ARE SEEDED. An adopter receives each once and owns it afterwards: it is where
-# that project's own rules for a role live, and `update` never rewrites a seed. EACH IS NAMED, because
+# THE HOUSE OVERLAYS ARE SEEDED, and so is the effort policy beside them (TOOL-aOrientedCast-10). An
+# adopter receives each once and owns it afterwards: it is where that project's own rules and levels
+# for a role live, and `update` never rewrites a seed. EACH IS NAMED, because
 # a LIST include claims literal paths only (the runlog descriptor records the measurement).
 [[files]]
 include = ["house/gov-builder.md", "house/gov-diff-reviewer.md", "house/gov-orienter.md",
            "house/gov-researcher.md", "house/gov-reuse-scout.md", "house/gov-session.md",
            "house/gov-skeptic.md", "house/gov-spec-reviewer.md", "house/gov-spec-writer.md",
-           "house/gov-synthesizer.md"]
+           "house/gov-synthesizer.md", "house/policy.toml"]
 role = "seed"
 
 # THE ADOPTER'S SELF-TEST IS WITHHELD, by claiming the destination (TOOL-aQuenchedHarness-3): its

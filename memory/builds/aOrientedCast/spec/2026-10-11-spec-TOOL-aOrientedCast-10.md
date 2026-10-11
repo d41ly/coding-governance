@@ -1,11 +1,12 @@
 # TOOL-aOrientedCast-10 — every role runs at its declared effort, from one owner-editable policy file
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 8 · ratified 2026-10-11
+**Status:** CLOSED · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 8 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aOrientedCast-10-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aOrientedCast-10-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aOrientedCast-10-0-owner-addendum.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-10-0-owner-addendum.md) | research | TOOL-aOrientedCast-11 |
 | [2026-10-11-prompt-TOOL-aOrientedCast-10-1-spec-brief.md](../prompts/2026-10-11-prompt-TOOL-aOrientedCast-10-1-spec-brief.md) | journal | TOOL-aOrientedCast-11 |
 
@@ -270,10 +271,12 @@ level, and carries the logger and the `Workflow` script as fenced blocks.
 
 ### Rollout
 
-Lands at order 8, beside `PLAY-aOrientedCast-1`, whose write set it does not touch. One commit
+Lands at order 8, beside `PLAY-aOrientedCast-1`, whose write set it does not touch. The pass commit
 carries the policy file, the library, the checker, the renderer, the handoff verb, the three harnesses
 and their renders, the two caller templates and their renders, the README, the descriptor row, the
-selftest pin, gov's re-render and the regenerated symbols. `gen_map.py --write` runs before the
+selftest pin and the regenerated symbols. Gov's re-render of `.claude/agents/` follows in a second
+commit of the same pass under its own `--dispatch`, because `--dispatch` refuses a declaration naming
+a generated index together with its generator (check 49), as `PLAY-aOrientedCast-1`'s re-render did. `gen_map.py --write` runs before the
 commit, because new functions stale `symbols.json`. The renderer's restart line then states the
 truth for this session: its registry predates every changed type, so no later pass of this run
 spawns at the new levels, and `TOOL-aOrientedCast-3`'s §4 "Rollout" already says what a new session
@@ -434,6 +437,7 @@ RED on its staged break and GREEN restored (M8). No pass runs a leg above.
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · §4 Rollout: gov's re-render of the agent types lands in a second commit of the pass, since `--dispatch` refused declaring `.claude/agents` beside `render_agents.py` (check 49); status CLOSED.
 
 ## 10. Reuse audit
 

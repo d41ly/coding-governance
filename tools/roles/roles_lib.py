@@ -29,6 +29,12 @@ READ_KEYS = frozenset(
     + ["brief:" + f for f in ("goal", "items", "acceptance", "gates", "non-goals")]
     + ["input:" + f for f in ("spec", "diff", "question", "prompt")])
 
+#: The reasoning-effort levels a role or a stage may take (TOOL-aOrientedCast-10). Read from Claude
+#: Code 2.1.292, whose agent loader and `Workflow` `agent()` options both take these five names; the
+#: integer form only the loader accepts is refused, so one level is legal on both carriers.
+EFFORT_LEVELS = tuple("low medium high xhigh max".split())
+POLICY_EFFORT_KEYS = ("default", "roles", "stages")
+
 #: The only render token a role body or an overlay may carry.
 MEMORY_ROOT_TOKEN = "{{MEMORY_ROOT}}"
 TOKEN_RE = re.compile(r"\{\{[^{}]*\}\}")
@@ -181,6 +187,97 @@ def load_workflows(kit_dir):
     if not isinstance(entries, list) or not all(isinstance(e, dict) for e in entries):
         raise RolesError("%s: R6 — 'workflow' is not an array of tables" % path.as_posix())
     return entries
+
+
+def load_policy(kit_dir, roles, workflows):
+    """The parsed `house/policy.toml`, validated against the roles and the workflow table.
+
+    Every defect is collected, then raised once as a RolesError with one line per defect, each
+    naming the file, the dotted key and the rule (R12). An absent or unparsable file refuses
+    (TOOL-aOrientedCast-10 §8 F3): no fallback level stands in for the owner's.
+    """
+    path = pathlib.Path(kit_dir) / "house" / "policy.toml"
+    where = path.as_posix()
+    try:
+        with open(path, "rb") as fh:
+            data = tomllib.load(fh)
+    except OSError as e:
+        raise RolesError("%s: R12 — the policy file cannot be read — %s" % (where, e.strerror))
+    except tomllib.TOMLDecodeError as e:
+        raise RolesError("%s: R12 — the policy file is not valid TOML — %s" % (where, e))
+    bad = []
+
+    def check_level(key, value):
+        if value not in EFFORT_LEVELS:
+            bad.append("%s: R12 — %s — %r is not a level; the levels are %s"
+                       % (where, key, value, ", ".join(EFFORT_LEVELS)))
+
+    for k in data:
+        if k != "effort":
+            bad.append("%s: R12 — %s — unknown top-level key; the one table is effort" % (where, k))
+    effort = data.get("effort", {})
+    if not isinstance(effort, dict):
+        effort = {}
+        bad.append("%s: R12 — effort — is not a table" % where)
+    for k in effort:
+        if k not in POLICY_EFFORT_KEYS:
+            bad.append("%s: R12 — effort.%s — unknown key; effort holds %s"
+                       % (where, k, ", ".join(POLICY_EFFORT_KEYS)))
+    if "default" not in effort:
+        bad.append("%s: R12 — effort.default — is absent" % where)
+    else:
+        check_level("effort.default", effort["default"])
+    role_levels = effort.get("roles", {})
+    if not isinstance(role_levels, dict):
+        role_levels = {}
+        bad.append("%s: R12 — effort.roles — is not a table" % where)
+    for slot, level in role_levels.items():
+        key = "effort.roles." + slot
+        check_level(key, level)
+        if slot not in roles:
+            bad.append("%s: R12 — %s — names no role file" % (where, key))
+        elif roles[slot]["keys"].get("agent", "true") == "false":
+            bad.append("%s: R12 — %s — names an agent: false role, so no agent type carries it"
+                       % (where, key))
+    stage_levels = effort.get("stages", {})
+    if not isinstance(stage_levels, dict):
+        stage_levels = {}
+        bad.append("%s: R12 — effort.stages — is not a table" % where)
+    by_name = {w.get("name"): w for w in workflows}
+    for name, table in stage_levels.items():
+        key = "effort.stages." + name
+        if not isinstance(table, dict):
+            bad.append("%s: R12 — %s — is not a table" % (where, key))
+            continue
+        if name not in by_name:
+            bad.append("%s: R12 — %s — names no workflow" % (where, key))
+            continue
+        held = by_name[name].get("stages")
+        if not isinstance(held, dict):
+            bad.append("%s: R12 — %s — the workflow %s has no stages table" % (where, key, name))
+            continue
+        for stage, level in table.items():
+            check_level("%s.%s" % (key, stage), level)
+            if stage not in held:
+                bad.append("%s: R12 — %s.%s — is not a stage key of %s, whose keys are %s"
+                           % (where, key, stage, name, ", ".join(sorted(held))))
+    if bad:
+        raise RolesError("\n".join(bad))
+    return data
+
+
+def resolve_effort(policy, slot):
+    """A role's level: its `[effort.roles]` entry, else `default`."""
+    effort = policy["effort"]
+    return effort.get("roles", {}).get(slot, effort["default"])
+
+
+def resolve_stage_efforts(policy, workflow):
+    """`{stage key: level}` for every key of a workflow entry's `stages` table: its
+    `[effort.stages.<workflow>]` entry, else the level of the slot the table maps it to."""
+    over = policy["effort"].get("stages", {}).get(workflow.get("name"), {})
+    return {key: over.get(key, resolve_effort(policy, slot))
+            for key, slot in (workflow.get("stages") or {}).items()}
 
 
 def render_role(kit_dir, name, memory_root):

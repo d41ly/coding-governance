@@ -27,6 +27,10 @@ touching nothing else, then grades as usual.
       `agent: false` role. A well-formed harness the tree does not hold prints one `roles: note:`
   R10 a house overlay naming no role, or carrying a `# `/`## ` line or a token other than {{MEMORY_ROOT}}
   R11 the README's catalogue region absent, or different from a fresh render
+  R12 a `house/policy.toml` defect, one line per line of `roles_lib.load_policy`'s refusal: the file
+      absent or not TOML, an unknown key, no `default`, a level outside the five, a role entry
+      naming no role file or an `agent: false` role, a stages table naming no workflow or a
+      workflow with no stages, or a stage key that workflow does not hold
 
 WHAT THIS DOES NOT CHECK, because a structural check reads as a semantic one to everybody who did not
 write it: the MEANING of a body; the truth of an `enforced-by` entry; a `tools:` name, which moves
@@ -255,6 +259,11 @@ def check_roles(root, kit_dir, write=False):
             add_defect(p, "R10", "overlay carries a '# ' or '## ' heading line")
         for token in sorted(set(lib.TOKEN_RE.findall(text)) - {lib.MEMORY_ROOT_TOKEN}):
             add_defect(p, "R10", "overlay carries the token %s; only %s renders" % (token, lib.MEMORY_ROOT_TOKEN))
+
+    try:
+        lib.load_policy(kit_dir, roles, workflows)
+    except lib.RolesError as e:
+        defects.extend("roles: %s" % ln for ln in str(e).split("\n"))
 
     readme = kit_dir / "README.md"
     region = render_catalogue_region(roles, workflows)

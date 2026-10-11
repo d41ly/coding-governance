@@ -8363,6 +8363,11 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
+      "id": "load_policy",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "load_project_layer",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -10466,6 +10471,11 @@
       "id": "print_spec_probes",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "print_stage_efforts",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
     },
     {
       "id": "print_stale_dossiers",
@@ -13268,6 +13278,26 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "renderStageOpts",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderStageOpts",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderStageOpts",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "renderStageOpts",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "renderStageShape",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -14256,6 +14286,11 @@
       "id": "resolve_drift_at",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "resolve_effort",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "resolve_entry",
@@ -15521,6 +15556,11 @@
       "id": "resolve_source",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
+    },
+    {
+      "id": "resolve_stage_efforts",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
     },
     {
       "id": "resolve_stand_down",

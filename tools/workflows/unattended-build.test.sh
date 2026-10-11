@@ -166,6 +166,9 @@ run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RES
       // TOOL-aOrientedCast-4 S11 - the agent type each spawn asked for, `-` for none: a stage named in
       // `roles` spawns typed and every other one exactly as before, and only the options can tell.
       trace.push("type:" + label + ":" + ((opts && opts.agentType) || "-"))
+      // TOOL-aOrientedCast-10 - the effort a spawn asked for, traced ONLY when its options carry the
+      // key, so every trace written before `efforts` existed stays byte for byte what it was.
+      if (opts && Object.prototype.hasOwnProperty.call(opts, "effort")) trace.push("effort:" + label + ":" + opts.effort)
       // TOOL-aStagedLane-2 - THE PROMPT IS TRACED, not just the label. The whole defect this unit
       // closes is what the agent is TOLD to run: the unattended BUILD prompt names three driver verbs
       // that refuse without a run-state file, and no gate downstream of here reads a prompt. A double
@@ -215,6 +218,8 @@ run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RES
       trace.push("wargs:" + JSON.stringify(wargs))
       // TOOL-aOrientedCast-4 S11 - the review roles the call forwards, keys sorted, `-` for none.
       trace.push("wfroles:" + (wargs && wargs.roles ? JSON.stringify(wargs.roles, Object.keys(wargs.roles).sort()) : "-"))
+      // TOOL-aOrientedCast-10 - the review levels the call forwards, traced only when it forwards any.
+      if (wargs && wargs.efforts) trace.push("wfefforts:" + JSON.stringify(wargs.efforts, Object.keys(wargs.efforts).sort()))
       return returns["workflow"] || {}
     }
     const budget = { total: null, spent: () => 0, remaining: () => Infinity }
@@ -2685,6 +2690,50 @@ if [ "$OC_BASE" = 1 ]; then
     "$(run_wf "$UNITS" "$(printf "$OC_DEF" true)" | grep '^RESULT')" "$(run_wf "$UNITS" "$(printf "$OC_DEF" true)" "$OC_BF" | grep '^RESULT')"
 fi
 
+# ---- TOOL-aOrientedCast-10: A STAGE `efforts` NAMES SPAWNS AT THAT REASONING EFFORT, independent of
+# ---- `roles`; the audit's three review keys travel to the review call and `builder` in dispatch.args.
+# ---- Every arm reads RED against the parent harnesses, which read no `efforts`: no refusal fires, no
+# ---- spawn carries an `effort` option, nothing is forwarded and no `effort ` line is logged. The same
+# ---- three runs as the roles block above, so every stage this harness spawns is reached.
+OC10_EFF='{"specWriter":"xhigh","committer":"low","disposal":"xhigh","builder":"high","skeptic":"medium","specFinder":"medium","synthesis":"medium"}'
+OC10_ALL=''
+for i in 0 1 2; do
+  t=$(run_wf "$(printf '%s' "${OC_A[$i]}" | sed 's#"slug":"tB",#"slug":"tB","efforts":'"$OC10_EFF"',#')" "${OC_R[$i]}")
+  has    "OC10 AC6 run $i: the harness returns under efforts" "$t" "RESULT "
+  [ "$i" = 0 ] && OC10_T0="$t"
+  OC10_ALL="$OC10_ALL$t
+"
+done
+has    "OC10 AC6 the spec writers spawn at their level" "$OC10_ALL" "effort:spec:tB:g0:xhigh"
+has    "OC10 AC6 the spec commit spawns at its level" "$OC10_ALL" "effort:commit:specs:tB:low"
+has    "OC10 AC6 the disposal spawns at its level" "$OC10_ALL" "effort:dispose:tB:xhigh"
+hasnt_ "OC10 AC6 the resolver and the round recorder carry no level" "$(printf '%s' "$OC10_ALL" | grep '^effort:audit:')" "effort:"
+has    "OC10 AC6 the audit forwards its three review levels" "$OC10_T0" 'wfefforts:{"skeptic":"medium","specFinder":"medium","synthesis":"medium"}'
+has    "OC10 AC6 the builder level travels to the child, alone" "$(printf '%s\n' "$OC10_T0" | grep '^RESULT')" '"efforts":{"builder":"high"}'
+has    "OC10 AC6 the log names each stage's level and source" "$OC10_T0" "log:effort specWriter: xhigh — efforts.specWriter"
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","efforts":{"skeptic":"medium"},#')" "$(returns CONVERGED 0)")
+has    "OC10 AC6 a skeptic level alone reaches the review call" "$o" 'wfefforts:{"skeptic":"medium"}'
+hasnt_ "OC10 AC6 ...and dispatch.args carries no efforts" "$(printf '%s\n' "$o" | grep '^RESULT')" '"efforts"'
+has    "OC10 AC6 ...and the log says the builder runs at its type's level" "$o" "log:effort builder: the agent type's own, else the session's — no efforts.builder"
+o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
+hasnt_ "OC10 AC6 absent: no spawn carries a level and nothing is forwarded" "$(printf '%s\n' "$o" | grep -E '^(effort|wfefforts):')" ":"
+for v in '[]' '{"finder":"high"}' '{"skeptic":"High"}' 'null'; do
+  o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","efforts":'"$v"',#')" '{}')
+  has    "OC10 AC6 the build harness REFUSES efforts $v" "$o" "THROW unattended-build: \`efforts\`"
+  hasnt_ "OC10 AC6 ...before any spawn for $v" "$o" "agent:"
+done
+o=$(run_wf "$(printf '%s' "$OC_CHILD" | sed 's#"slug":"tB",#"slug":"tB","efforts":{"builder":"max"},#')" '{}' "$C")
+same   "OC10 AC6 the unit harness spawns its builder at its level" "$(printf '%s\n' "$o" | grep '^effort:')" "effort:unit:A-tB-1:max"
+has    "OC10 AC6 ...and logs it" "$o" "log:effort builder: max — efforts.builder"
+o=$(run_wf "$(printf '%s' "$OC_CHILD" | sed 's#"slug":"tB",#"slug":"tB","roles":{"builder":"gov-builder"},"efforts":{"builder":"high"},#')" '{}' "$C")
+same   "OC10 AC6 a typed builder takes its level too" "$(printf '%s\n' "$o" | grep -E '^(type|effort):')" "type:unit:A-tB-1:gov-builder
+effort:unit:A-tB-1:high"
+for v in '[]' '{"finder":"high"}' '{"builder":"High"}'; do
+  o=$(run_wf "$(printf '%s' "$OC_CHILD" | sed 's#"slug":"tB",#"slug":"tB","efforts":'"$v"',#')" '{}' "$C")
+  has    "OC10 AC6 the unit harness REFUSES efforts $v" "$o" "THROW unattended-unit: \`efforts\`"
+  hasnt_ "OC10 AC6 ...before any spawn for $v" "$o" "agent:"
+done
+
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
 # over it, 326 at 1d8530e7 (TOOL-aWokenSentinel-21) — at ~10 % headroom, rounded down, because the
@@ -2750,7 +2799,11 @@ fi
 # 692 at the unit's parent and 741 after. The three left out compare against the harnesses at the
 # unit's base and skip out loud where that commit is absent. Its loops run them 74 times on a slice of
 # the block behind this prologue on node a, 2026-10-11, and 47 of those read RED on the base harnesses.
-FLOOR_ASSERTIONS=612
+# RAISED 612 -> 631 by TOOL-aOrientedCast-10: its 19 static sites, counted by hand off the OC10 block —
+# the three-run loop (1), the spawned levels and forwarding (7), the skeptic-only run (3), the absent
+# run (1), the build refusal loop (2), the unit's level, log and typed level (3) and its refusal loop
+# (2). Its loops run them 31 times. Not measured by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=631
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

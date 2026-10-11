@@ -120,11 +120,16 @@ function readOutputTokens() {
 //   workerType: "<agent type>" | "none",  // the type every finder and skeptic spawns as; absent -> Plan,
 //                                         // "none" -> the platform default. Under a type no judge writes a lens file,
 //                                         // so a deferred return's `durable` is false and a re-run re-dispatches every judge
-//   roles: { diffFinder, specFinder, skeptic, synthesis } } // TOOL-aOrientedCast-5: each an agent type
+//   roles: { diffFinder, specFinder, skeptic, synthesis }, // TOOL-aOrientedCast-5: each an agent type
 //                                         // name, never "none"; absent -> {}. A key names the type ITS stage spawns
 //                                         // as and wins over `workerType`, which keeps every judge stage no key
 //                                         // names; the synthesis takes its key or no type. Only this kind's finder
 //                                         // key is read. Any judge under a type makes the run not durable.
+//   efforts: { diffFinder, specFinder, skeptic, synthesis } } // TOOL-aOrientedCast-10: each a reasoning
+//                                         // effort level, lower-case letters; absent -> {}. A key sets ITS stage's
+//                                         // `effort` option, independent of `roles`; an unnamed stage runs at its
+//                                         // agent type's level, else the session's. The caller passes what
+//                                         // `handoff.py stage-efforts <workflow>` prints. Never the resume probe.
 // D9 - `kind` and `subjects` were added without extending this block, and BUILD-METHOD M4 sends a
 // reader HERE for the spec-audit spelling. An absent `kind` does not refuse - it defaults - so a
 // header missing the field buys exactly the failure M4 exists to prevent: a code-shaped review of a
@@ -239,9 +244,28 @@ const findType = roles[finderKey] || workerType
 const verifyType = roles.skeptic || workerType
 const synthType = roles.synthesis || ''
 const roledJudges = !!(roles[finderKey] || roles.skeptic)
-const findOpts = findType ? { agentType: findType } : {}
-const verifyOpts = verifyType ? { agentType: verifyType } : {}
-const synthOpts = synthType ? { agentType: synthType } : {}
+// TOOL-aOrientedCast-10 S7 - `efforts`, the reasoning effort each STAGE spawns at, keyed as `roles`
+// is. Refused before any agent when it is not a plain object, carries a key outside ROLE_KEYS, or a
+// value that is not lower-case letters. The level vocabulary is the roles library's, which the caller
+// read it from; this file grades the shape only, so no second copy of the vocabulary exists here.
+const EFFORT_SHAPE = /^[a-z]+$/
+const efforts = a.efforts === undefined ? {} : a.efforts
+if (!efforts || typeof efforts !== 'object' || Array.isArray(efforts) || Object.prototype.toString.call(efforts) !== '[object Object]')
+  throw new Error('tier2-review: `efforts` must be an object mapping a stage key to an effort level; legal keys: ' + ROLE_KEYS.join(' | ') +
+    ', each value matching ' + EFFORT_SHAPE.source + '. Got ' + JSON.stringify(a.efforts) + '.')
+for (const k of Object.keys(efforts)) {
+  if (ROLE_KEYS.indexOf(k) === -1)
+    throw new Error('tier2-review: `efforts` carries the key ' + JSON.stringify(k) + ', which names no stage; legal keys: ' + ROLE_KEYS.join(' | ') + '.')
+  if (typeof efforts[k] !== 'string' || !EFFORT_SHAPE.test(efforts[k]))
+    throw new Error('tier2-review: `efforts` key ' + k + ' must be an effort level matching ' + EFFORT_SHAPE.source +
+      ' (leave the key out to run at the agent type\'s own level); legal keys: ' + ROLE_KEYS.join(' | ') + '. Got ' + JSON.stringify(efforts[k]) + '.')
+}
+function renderStageOpts(type, key) {
+  return Object.assign(type ? { agentType: type } : {}, efforts[key] ? { effort: efforts[key] } : {})
+}
+const findOpts = renderStageOpts(findType, finderKey)
+const verifyOpts = renderStageOpts(verifyType, 'skeptic')
+const synthOpts = renderStageOpts(synthType, 'synthesis')
 // TOOL-aMendedFleet-111 S6 - whether the judges' results outlive this run. Under a named type no judge
 // writes its file, so every deferred note says a re-run dispatches every finder and skeptic again, and
 // every return carrying `pending` carries `durable` too, so a caller reads the fact, not the prose.
@@ -263,6 +287,11 @@ log(`role verify: ${verifyType || 'the platform default'} — ${roles.skeptic ? 
 log(`role synthesis: ${synthType || 'the platform default'} — ${roles.synthesis ? 'roles.synthesis' : 'no roles.synthesis, as before roles'}`)
 if (roles[otherFinderKey] !== undefined)
   log(`role find: roles.${otherFinderKey} is not read on a ${kind}`)
+// TOOL-aOrientedCast-10 S7 - one line per stage on every run, naming its effort and where it came from.
+for (const k of [finderKey, 'skeptic', 'synthesis'])
+  log(efforts[k] ? `effort ${k}: ${efforts[k]} — efforts.${k}` : `effort ${k}: the agent type's own, else the session's — no efforts.${k}`)
+if (efforts[otherFinderKey] !== undefined)
+  log(`effort ${otherFinderKey}: efforts.${otherFinderKey} is not read on a ${kind}`)
 // S7 - the context default is per-kind, and each is wrong if the other kind inherits it.
 const context = a.context || (isSpec ? 'the spec set under audit' : 'the cumulative diff landing on main')
 // `byDesign` is RESOLVED below, after the checklist's by-design block is cut out (TOOL-aGraftedHelix-3).

@@ -5,7 +5,7 @@ feature = "roles"
 title = "The role catalogue: one owner-editable agent definition per role with an empty house overlay beside it, the table of the workflows a governed session runs its LLM work through, the library every consumer reads them by, and the leg that holds the three and the governing doc to one another"
 status = "building"
 streams = ["tooling"]
-decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2", "TOOL-aOrientedCast-8"]
+decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2", "TOOL-aOrientedCast-8", "TOOL-aOrientedCast-10"]
 
 [claims]
 gate-legs = ["roles adopter self-test", "roles catalogue", "roles render selftest", "roles render wiring"]
@@ -45,6 +45,10 @@ kit is a default adopter kit: govkit installs it, seeds the house overlays once,
 renders all three artifacts at install and update behind the one `roles render wiring` leg; with no
 governing doc at `CHARTER` it renders the Skill alone and exits 3, an accepted outcome, and
 `check-wiring.sh` reports the install `UNWIRED` naming the doc (TOOL-aOrientedCast-8).
+Every agent type carries the reasoning effort the seeded `house/policy.toml` sets for its role,
+read by `roles_lib.load_policy` and graded as R12, and `handoff.py stage-efforts <workflow>` prints
+the per-stage levels a harness call passes as `efforts`, so one role runs at a workflow's own level
+(TOOL-aOrientedCast-10).
 
 ## Constraints & why
 
@@ -66,6 +70,11 @@ makes canonical; an absent key is an unarmed check, exit 2, rather than a guess.
 it from the slot name fails for most mappings (`synthesis` is the synthesizer, `disposal` spawns as
 the spec writer), and a renderer constant is a second home for a workflow fact this checker cannot
 see.
+
+**Effort lives in one seeded policy file, never in a role's front matter.** The owner edits one
+file an update keeps; a key in each role would be nine engine files an update overwrites and a
+second answer to one question. An absent file refuses rather than falling back, so a deleted seed
+cannot silently drop every level the owner set.
 
 **Body ceilings live in the checker, keyed by slot.** A bound an owner edits beside the body it
 bounds moves with the thing it bounds; a constant moves only by a reviewed change, and a slot with no

@@ -4,6 +4,7 @@
     python handoff.py render --role <name> --build <slug> [--unit <id>] [--card <path>]
                              [--input <key>=<value>]... [--out <path> | --stdout] [--part full|task]
     python handoff.py harness-args <harness>
+    python handoff.py stage-efforts <workflow>
     python handoff.py check <file>
 
 `render` composes the role as `roles_lib.render_role` renders it with a task block holding exactly
@@ -14,7 +15,9 @@ The marker carries two hashes, each the first 12 hex digits of the SHA-256 of on
 with CRLF folded to LF: `## Role` up to the byte before the `## Task` line, and `## Task` to the end
 of the file. `check` re-derives both and compares the marker's `path` with the file's own.
 `harness-args` prints, as one line of sorted JSON, the union of the `stages` tables of every
-workflow whose harness names that script.
+workflow whose harness names that script. `stage-efforts` prints, the same way, the reasoning effort
+`house/policy.toml` resolves for every stage key of ONE workflow's `stages` table: a harness call
+passes it as its `efforts` argument (TOOL-aOrientedCast-10).
 
 Sources, by key family: `task:` the card's `## task` field, read by the kickoff checker's grammar
 (stated above its `check_card_task`, and ported here because that one is shell); `card:` the lines
@@ -368,6 +371,23 @@ def print_harness_args(harness):
                                         ensure_ascii=False) + "\n").encode("utf-8"))
 
 
+def print_stage_efforts(workflow):
+    """Print the resolved level of every stage key of one workflow's `stages` table as one line of
+    sorted JSON (TOOL-aOrientedCast-10); RolesError on an unknown name, a workflow with no `stages`
+    table, or a policy defect. Keyed by workflow, not harness: a harness serving two workflows runs
+    one role at two levels, which a union cannot carry."""
+    workflows = lib.load_workflows(KIT_DIR)
+    policy = lib.load_policy(KIT_DIR, lib.load_roles(KIT_DIR), workflows)
+    entry = next((w for w in workflows if w.get("name") == workflow), None)
+    if entry is None:
+        raise lib.RolesError("no workflow named %s in workflows.toml" % workflow)
+    if not isinstance(entry.get("stages"), dict):
+        raise lib.RolesError("the workflow %s has no stages table, so no harness stage takes a level"
+                             % workflow)
+    sys.stdout.buffer.write((json.dumps(lib.resolve_stage_efforts(policy, entry), sort_keys=True,
+                                        separators=(",", ":"), ensure_ascii=False) + "\n").encode("utf-8"))
+
+
 def main(argv):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(prog="handoff.py", description="Render, check and map role handoffs.")
@@ -383,11 +403,15 @@ def main(argv):
     dest.add_argument("--stdout", action="store_true")
     r.add_argument("--part", choices=("full", "task"), default="full")
     sub.add_parser("harness-args").add_argument("harness")
+    sub.add_parser("stage-efforts").add_argument("workflow")
     sub.add_parser("check").add_argument("file")
     a = ap.parse_args(argv)
-    if a.verb == "harness-args":
+    if a.verb in ("harness-args", "stage-efforts"):
         try:
-            print_harness_args(a.harness)
+            if a.verb == "harness-args":
+                print_harness_args(a.harness)
+            else:
+                print_stage_efforts(a.workflow)
             return 0
         except lib.RolesError as e:
             print("handoff: %s" % e, file=sys.stderr)

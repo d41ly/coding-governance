@@ -4,7 +4,8 @@
     python render_agents.py --write | --check | --selftest
 
 `--write` renders one agent type per role whose `agent` is true, at `.claude/agents/<name>.md` under
-the repository root: the role's Claude keys, then `omitClaudeMd: true`, then gov's `workflow` and
+the repository root: the role's Claude keys, then `effort: <level>` as `roles_lib.resolve_effort`
+reads it from the kit's `house/policy.toml` (TOOL-aOrientedCast-10), then `omitClaudeMd: true`, then gov's `workflow` and
 `writes`, then a body that is `roles_lib.render_role`'s output followed, under `## Charter`, by one
 `### charter §<n>` block per id the role's `charter` key names. Beside them it writes the generated
 index `.claude/roles.json`: every role with its `workflow`, `writes` and `agent`, and `harnesses`, the
@@ -31,7 +32,7 @@ Every file is read through the kit's own `roles_lib.py`; nothing here parses a r
 workflow table, the conf or the governing doc itself.
 
 Exit 0 when written, fresh or passing; 1 on drift or a failed arm, every offending path named; 2 on
-usage, a `RolesError` from the library, or a catalogue holding zero roles, since a render of nothing
+usage, a `RolesError` from the library (a policy defect among them), or a catalogue holding zero roles, since a render of nothing
 compares clean against an empty directory.
 
 WHAT THIS DOES NOT CHECK: whether a role's text is any good, or whether its front matter obeys the
@@ -68,6 +69,8 @@ NOTE_LINE = ("render_agents: note — %s is named by the workflow table and abse
 FIXTURE_HARNESS = "{prefix}/workflows/a.js"
 FIXTURE_MISSING = "{prefix}/workflows/missing.js"
 FIXTURE_ROOT = "toolroot"
+#: Every fixture kit carries a policy, so an absent file never reads as the fixture's normal state.
+FIXTURE_POLICY = '[effort]\ndefault = "medium"\n'
 
 
 def derive_tool_root(script_dir):
@@ -100,16 +103,18 @@ def load_catalogue(kit_dir, target_root):
     if not memory_root:
         raise lib.RolesError("%s declares no MEMORY_ROOT, or is absent" % conf.as_posix())
     charter_path = lib.resolve_charter_path(target_root)
-    return {"roles": roles, "workflows": lib.load_workflows(kit_dir), "memory_root": memory_root,
-            "charter_path": charter_path,
+    workflows = lib.load_workflows(kit_dir)
+    return {"roles": roles, "workflows": workflows, "memory_root": memory_root,
+            "charter_path": charter_path, "policy": lib.load_policy(kit_dir, roles, workflows),
             "sections": lib.extract_charter_sections(lib.load_text(charter_path))}
 
 
-def render_agent_file(kit_dir, slot, role, memory_root, sections, charter_path):
-    """One agent type's text: Claude keys, the trim, gov's two keys, the rendered role, its charter blocks."""
+def render_agent_file(kit_dir, slot, role, memory_root, sections, charter_path, effort):
+    """One agent type's text: Claude keys, its effort, the trim, gov's two keys, the rendered role,
+    its charter blocks."""
     keys = role["keys"]
     head = ["---"] + ["%s: %s" % (k, keys[k]) for k in CLAUDE_KEYS if k in keys]
-    head += ["omitClaudeMd: true", "workflow: %s" % keys.get("workflow", ""),
+    head += ["effort: %s" % effort, "omitClaudeMd: true", "workflow: %s" % keys.get("workflow", ""),
              "writes: %s" % keys.get("writes", ""), "---"]
     text = "\n".join(head) + "\n" + lib.render_role(kit_dir, slot, memory_root)
     ids = [x.strip() for x in keys.get("charter", "").split(",") if x.strip()]
@@ -204,7 +209,8 @@ def run_mode(mode, kit_dir, tool_root, target_root):
         for slot, role in cat["roles"].items():
             if role["keys"].get("agent", "true") == "true":
                 rendered["%s/%s.md" % (AGENTS_REL, slot)] = render_agent_file(
-                    kit_dir, slot, role, cat["memory_root"], cat["sections"], cat["charter_path"])
+                    kit_dir, slot, role, cat["memory_root"], cat["sections"], cat["charter_path"],
+                    lib.resolve_effort(cat["policy"], slot))
         harnesses, absent = derive_harness_paths(cat["workflows"], tool_root, target_root)
         rendered[INDEX_REL] = render_roles_index(cat["roles"], harnesses)
     except lib.RolesError as e:
@@ -238,8 +244,8 @@ def run_mode(mode, kit_dir, tool_root, target_root):
     return 0
 
 
-def build_fixture(root, roles):
-    """A catalogue in <root>: kit, overlays, workflow table, conf, governing doc, stub harnesses."""
+def build_fixture(root, roles, policy=FIXTURE_POLICY):
+    """A catalogue in <root>: kit, overlays, policy, workflow table, conf, governing doc, stub harnesses."""
     root = pathlib.Path(root)
     kit = root / FIXTURE_ROOT / KIT_DIR.name
     stubs = (root / FIXTURE_HARNESS.format(prefix=FIXTURE_ROOT)).parent
@@ -250,6 +256,7 @@ def build_fixture(root, roles):
             "---\nname: %s\ndescription: d %s\ntools: Read, Write\nmodel: inherit\n%s---\n\n"
             "Body of %s, under {{MEMORY_ROOT}}.\n" % (slot, slot, extra, slot), encoding="utf-8")
         (kit / "house" / (slot + ".md")).write_text(overlay, encoding="utf-8")
+    (kit / "house" / "policy.toml").write_text(policy, encoding="utf-8")
     for stub in ("a.js", "b.js"):
         (stubs / stub).write_text("// stub\n", encoding="utf-8")
     (kit / "workflows.toml").write_text(
@@ -272,7 +279,7 @@ def check_arm(state, arm, ok, what):
 
 
 def run_selftest():
-    """The ten arms over a fixture catalogue; prints PASS or FAIL with the assertion count."""
+    """The eleven arms over fixture catalogues; prints PASS or FAIL with the assertion count."""
     state = {"n": 0, "fail": []}
     roles = {"r-one": ("maxTurns: 7\nworkflow: w1\nreads: input:spec\nwrites: product\n"
                        "charter: §2, §1\n", "Overlay line.\n"),
@@ -361,6 +368,29 @@ def run_selftest():
             with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                 rc = run_mode(mode, kit, tool_root, pathlib.Path(tmp))
             check_arm(state, 8, rc == 2, "a zero-role catalogue under --%s exited %d, not 2" % (mode, rc))
+    with tempfile.TemporaryDirectory() as tmp:
+        root = pathlib.Path(tmp)
+        policy = '[effort]\ndefault = "low"\n\n[effort.roles]\nr-one = "high"\n'
+        kit, tool_root = build_fixture(root, {s: roles[s] for s in ("r-one", "r-two")}, policy)
+        agents = root / ".claude" / "agents"
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            rc = run_mode("write", kit, tool_root, root)
+        for slot, level in (("r-one", "high"), ("r-two", "low")):
+            p = agents / (slot + ".md")
+            head = p.read_text(encoding="utf-8").split("\n") if p.is_file() else []
+            at = head.index("omitClaudeMd: true") if "omitClaudeMd: true" in head else 0
+            check_arm(state, 11, rc == 0 and at > 0 and head[at - 1] == "effort: %s" % level,
+                      "%s does not carry effort: %s on the line before omitClaudeMd" % (slot, level))
+        before = {p.name: p.read_bytes() for p in agents.glob("*")}
+        (kit / "house" / "policy.toml").write_text(policy + 'r-two = "extra"\n', encoding="utf-8")
+        err = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            rc = run_mode("write", kit, tool_root, root)
+        check_arm(state, 11, rc == 2 and "effort.roles.r-two" in err.getvalue()
+                  and ", ".join(lib.EFFORT_LEVELS) in err.getvalue(),
+                  "a refused level exited %d without naming r-two and the five levels" % rc)
+        check_arm(state, 11, {p.name: p.read_bytes() for p in agents.glob("*")} == before,
+                  "a refused level wrote a file")
     for line in state["fail"]:
         print("render_agents selftest: FAIL %s" % line)
     print("%s (%d assertions)" % ("FAIL" if state["fail"] else "PASS", state["n"]))

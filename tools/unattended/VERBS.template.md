@@ -725,8 +725,11 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   `scriptPath`, never by `name`: the fan-out guard's read-window narrowing is conditional on
   `scriptPath`. **Every harness call also carries `roles`**: the JSON the roles kit's
   `handoff.py harness-args <harness>` prints, `<harness>` being `unattended-build`, `unattended-unit`
-  or, for the closing review M8 composes, `tier2-review`. With no `.claude/roles.json` the roles kit
-  is not installed: pass no `roles`, and each harness logs its per-stage fallback. A session started
+  or, for the closing review M8 composes, `tier2-review`. **It also carries `efforts`**: the JSON
+  `handoff.py stage-efforts <workflow>` prints for the workflow that call runs — `spec-write` for
+  the build harness, `build` for the unit harness, `closing-review` for the closing review. With no
+  `.claude/roles.json` the roles kit is not installed: pass no `roles` and no `efforts`, and each
+  harness logs its per-stage fallback. A session started
   before the rendered agent types existed cannot spawn them: it passes none too, and once the spawn
   guard has landed it holds and a fresh session takes over. Read the build method WHOLE before the
   first call. The child runs no gate, suite or

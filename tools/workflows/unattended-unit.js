@@ -59,6 +59,9 @@
 // and the spawn options are byte-identical to the file without it, and a log line says it is untyped.
 // The shape is a COPY of the review harness's `workerType` test, because the parent's guard does not
 // travel to a child a caller composes args for; the protocol-parity leg holds the copies to one.
+//
+// `efforts` IS OPTIONAL (TOOL-aOrientedCast-10), with the same one key: `builder`, the reasoning
+// effort the builder spawns at, which the parent forwards in `dispatch.args` beside `roles`.
 export const meta = {
   name: 'unattended-unit',
   version: '1.1', // gov:kit unattended-unit@1.1 — engine identity (deployed verbatim)
@@ -171,6 +174,32 @@ if (roles.builder === 'none') {
   )
 }
 const builder = roleKeys === 'builder' ? roles.builder : ''
+
+// `efforts` IS OPTIONAL TOO (TOOL-aOrientedCast-10), keyed as `roles` is and independent of it: an
+// untyped builder still takes its level. Its one legal key is `builder`, a level of lower-case letters
+// the parent forwards in `dispatch.args`. The vocabulary is the roles library's; this file grades the
+// shape only. Absent, the spawn options are byte-identical to the file without it.
+const efforts = cfg.efforts === undefined ? {} : cfg.efforts
+if (!efforts || typeof efforts !== 'object' || Array.isArray(efforts)) {
+  throw new Error(
+    'unattended-unit: `efforts` must be a plain object mapping a stage key to an effort level, got ' +
+      (Array.isArray(efforts) ? 'array' : efforts === null ? 'null' : typeof efforts) + '.',
+  )
+}
+const effortKeys = Object.keys(efforts).join(',')
+if (effortKeys !== '' && effortKeys !== 'builder') {
+  throw new Error(
+    'unattended-unit: `efforts` carries `' + effortKeys + '`, and the one stage key of this harness is builder. ' +
+      'Refusing rather than ignoring it: a misspelt stage would run at the wrong level with nobody told.',
+  )
+}
+if (effortKeys === 'builder' && (typeof efforts.builder !== 'string' || !/^[a-z]+$/.test(efforts.builder))) {
+  throw new Error(
+    'unattended-unit: `efforts` key builder must be an effort level matching ^[a-z]+$ (leave the key out to run ' +
+      'at the agent type\'s own level). Got ' + JSON.stringify(efforts.builder) + '.',
+  )
+}
+const effort = effortKeys === 'builder' ? efforts.builder : ''
 
 // `why` is REQUIRED and is never an absence: an empty result with no reason is indistinguishable
 // from a clean pass over nothing.
@@ -287,12 +316,13 @@ if (cfg.prebuild !== undefined) log('unit ' + cfg.unitId + ': prebuild checklist
 log('unit ' + cfg.unitId + ': builder ' + (builder
   ? 'spawns as the ' + builder + ' agent type'
   : 'is untyped: no roles.builder was passed, so it spawns untyped with its role prose inline'))
+log(effort ? 'effort builder: ' + effort + ' — efforts.builder'
+  : 'effort builder: the agent type\'s own, else the session\'s — no efforts.builder')
 
 const r = await agent(
   PROMPT,
-  builder
-    ? { label: 'unit:' + cfg.unitId, schema: UNIT_SCHEMA, agentType: builder }
-    : { label: 'unit:' + cfg.unitId, schema: UNIT_SCHEMA },
+  Object.assign({ label: 'unit:' + cfg.unitId, schema: UNIT_SCHEMA },
+    builder ? { agentType: builder } : {}, effort ? { effort: effort } : {}),
 )
 
 log('unit ' + cfg.unitId + ': committed=' + String(!!(r && r.committed)) + ' sha=' + ((r && r.sha) || '-'))

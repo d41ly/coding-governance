@@ -395,6 +395,17 @@ harness's reserved untyped literal; an untyped stage is spelled by leaving its k
   judge writes no file and a re-run dispatches every finder and skeptic again; a synthesis role alone
   keeps a `none` run durable and its key. A judge role joins the review key; the synthesis role does not.
   Compose the object with `<prefix>/roles/handoff.py harness-args tier2-review` rather than by hand.
+- **The harnesses' efforts** (TOOL-aOrientedCast-10). Each harness takes `efforts` beside `roles`, keyed
+  by the same stage keys: a level of lower-case letters, set as that stage's `agent()` `effort` option.
+  It is independent of `roles`, so an untyped stage still takes its level; a stage it does not name
+  passes no `effort` and runs at its agent type's level, else the session's, and each harness logs one
+  `effort <key>:` line per stage saying which. The review harness never sets it on the resume probe;
+  the build harness spawns its spec writer, spec commit and disposal at theirs, forwards the audit's three
+  review keys as the review call's `efforts` and `builder` in `dispatch.args`. A malformed object, an
+  unknown key or a value off the shape refuses before any spawn. The vocabulary is the roles kit's, so
+  a harness grades the shape only. Compose it with `<prefix>/roles/handoff.py stage-efforts
+  <workflow>`, keyed by WORKFLOW: the review harness serves spec review and closing review, which run
+  one role at two levels.
 - **The parity arm.** A workflow script cannot import, so each harness that tests an agent type keeps its
   own copy of the shape. The protocol-parity leg's agent-type shape arm compares every copy in this kit
   with the one `tier2-review.template.js` owns, and reds on a difference or on an owner yielding none.

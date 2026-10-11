@@ -57,8 +57,32 @@ each section. `python handoff.py check <file>` re-derives both hashes and the ma
 `--part task` prints the marker and the task section alone, which is what a typed agent spawn
 carries. `python handoff.py harness-args <harness>` prints the `roles` object a harness takes: the
 union of the `stages` tables of every workflow whose harness is that script, as one line of JSON.
+`python handoff.py stage-efforts <workflow>` prints the `efforts` object a harness call takes for one
+workflow, as the next section states.
 Exit 0, 1 on a refusal, 2 on usage or an unarmed tree; the script's header states what it does not
 check.
+
+## The effort policy
+
+`house/policy.toml` sets the reasoning effort every role agent runs at (TOOL-aOrientedCast-10). It is
+seeded: an adopter receives it once and owns it, and `update` never rewrites it, so it is yours to
+edit. `roles_lib.load_policy` is its one reader and validator; `check_roles.py` reports its defects as
+R12 and every render refuses it with exit 2, so no level falls back silently.
+
+- `[effort]` holds `default`, the level of every role and stage the file does not name.
+- `[effort.roles]` holds one entry per role slot whose `agent` is true. `render_agents.py` writes the
+  resolved level into that agent type as `effort: <level>`, the line before `omitClaudeMd: true`.
+- `[effort.stages.<workflow>]` overrides a stage of one workflow, keyed by that workflow's `stages`
+  keys. `handoff.py stage-efforts <workflow>` prints each stage's level, its entry here else its
+  slot's, and a harness call passes that JSON as `efforts`, which wins over the agent type's level.
+  That is how `gov-skeptic` runs at `medium` in spec review and `high` in closing review.
+
+The levels are `low`, `medium`, `high`, `xhigh` and `max`, the names Claude Code 2.1.292 reads on both
+an agent type and a `Workflow` `agent()` call; the integer form only the agent loader takes is
+refused. The CLI silently runs `xhigh` and `max` as `high` on a model that lacks them. A changed level
+reaches an agent type after `render_agents.py --write` and a NEW session, since a session reads its
+agent registry at start; a harness `efforts` takes effect on the next call. The main session's own
+effort is the owner's setting, which no file here reaches.
 
 ## The agent types
 
@@ -135,7 +159,8 @@ type or role index on its eol line.
 and the owner's go (KICK-aOrientedCast-2). It walks this catalogue's workflows in stage order and
 points at the carriers `/unattended` already follows (the build method, the verbs guide, the two
 build harnesses' attended mode, the review harness) instead of restating them; every agent it orders
-is spawned from a `handoff.py render` and every harness call carries `handoff.py harness-args`.
+is spawned from a `handoff.py render` and every harness call carries `handoff.py harness-args` and
+`handoff.py stage-efforts`.
 
 The render substitutes three tokens literally: `{{KIT_DIR}}` and `{{TOOL_ROOT}}`, derived by the
 same `.git` walk the unattended adopter uses, and `{{MEMORY_ROOT}}`, read from `.memory-tree.conf`.

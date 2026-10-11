@@ -6153,8 +6153,11 @@ user_skills = "/tmp/gk-fake-skills"
             # 31 -> 32 and seed 3 -> 13, TOOL-aOrientedCast-8 S1: `roles` joined the default
             # selection; it withholds `adopt-roles.test.sh` and seeds its ten house overlays.
             # Measured by a default `plan` into a scratch target on 2026-10-11.
+            # seed 13 -> 14, TOOL-aOrientedCast-10 S9: `roles` seeds its effort policy
+            # `house/policy.toml` beside the overlays. Not measured in the pass (no suite runs there);
+            # the main loop observes it at the close.
             check("...and the playbook file previews as a seed WRITE, not as an order",
-                  marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 13
+                  marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 14
                   and marks.get("ORDER|project-owned") == 32,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",

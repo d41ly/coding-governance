@@ -200,6 +200,14 @@ function chunk(a, n) {
 //                                                   //   A named stage leaves out the craft its role carries;
 //                                                   //   an absent key keeps today's prompt byte for byte
 //                                                   //   and is logged as untyped. `{}` equals absent.
+//   efforts: { <stage key>: "<level>" }             // optional (TOOL-aOrientedCast-10): each stage's
+//                                                   //   reasoning effort, the keys of `roles`, values of
+//                                                   //   lower-case letters, as `handoff.py stage-efforts
+//                                                   //   <workflow>` prints them. specWriter, committer and
+//                                                   //   disposal spawn at it; builder is forwarded in
+//                                                   //   dispatch.args; the three review keys go to the
+//                                                   //   audit's review call. An absent key runs at the
+//                                                   //   agent type's own level, else the session's.
 // }
 // TOOL-aEvidencedLens-5 - the two fold args are REFUSED at a callee round of 1 (a fresh generation has
 // no previous round) and refused by name when malformed, before any agent spawns.
@@ -485,6 +493,45 @@ const ROLE_STAMP = ['This stage runs as the ', ' agent type: your role is your s
 let auditRoles = null
 for (const k of ['skeptic', 'specFinder', 'synthesis']) {
   if (roles[k]) { auditRoles = auditRoles || {}; auditRoles[k] = roles[k] }
+}
+// TOOL-aOrientedCast-10 S7 - `efforts`, the reasoning effort each stage spawns at, keyed as `roles`
+// is and independent of it: an untyped stage still takes its level. Refused before any agent spawns.
+// The level vocabulary is the roles library's, which the caller read it from; this file grades the
+// shape only. specWriter, committer and disposal spawn here at their level; the audit's three review
+// keys are forwarded as the review call's `efforts`, and `builder` in `dispatch.args`.
+const EFFORT_SHAPE = /^[a-z]+$/
+const efforts = a.efforts === undefined ? {} : a.efforts
+if (!efforts || typeof efforts !== 'object' || Array.isArray(efforts)) {
+  throw new Error(
+    'unattended-build: `efforts` must be a plain object mapping a stage key to an effort level, got ' +
+      (Array.isArray(efforts) ? 'array' : efforts === null ? 'null' : typeof efforts) + '.',
+  )
+}
+for (const k of Object.keys(efforts)) {
+  if (ROLE_KEYS.indexOf(k) === -1) {
+    throw new Error(
+      'unattended-build: `efforts` carries the key `' + k + '`, which is no stage of this harness; the keys are ' +
+        ROLE_KEYS.join(', ') + '. Refusing rather than ignoring it: a misspelt stage would run at the wrong level with nobody told.',
+    )
+  }
+  if (typeof efforts[k] !== 'string' || !EFFORT_SHAPE.test(efforts[k])) {
+    throw new Error(
+      'unattended-build: `efforts` key ' + k + ' must be an effort level matching ' + EFFORT_SHAPE.source +
+        ' (leave the key out to run at the agent type\'s own level). Got ' + JSON.stringify(efforts[k]) + '.',
+    )
+  }
+}
+for (const k of ROLE_KEYS)
+  log(efforts[k] ? 'effort ' + k + ': ' + efforts[k] + ' — efforts.' + k
+    : 'effort ' + k + ': the agent type\'s own, else the session\'s — no efforts.' + k)
+let auditEfforts = null
+for (const k of ['skeptic', 'specFinder', 'synthesis']) {
+  if (efforts[k]) { auditEfforts = auditEfforts || {}; auditEfforts[k] = efforts[k] }
+}
+// The options of a stage spawned HERE: its label, phase and schema, its role's type when one is named
+// and its effort when one is named, so a stage neither names is today's call byte for byte.
+function renderStageOpts(key, base) {
+  return Object.assign(base, roles[key] ? { agentType: roles[key] } : {}, efforts[key] ? { effort: efforts[key] } : {})
 }
 // S7 - warn and continue, which is the owner's ruling AGAINST this file's own recommendation to
 // refuse. A run under a mandate does not get to opt out of the mandate's enforcement by passing an
@@ -942,9 +989,7 @@ const specResults = await boundedParallel(
           'NAME every unit you could not spec, in `refused`, with the reason in your summary. ' +
           'Name every unit in `authored`, `alreadyPresent` and `refused` by its unit id, exactly as this ' +
           'roster spells it, never by a path.',
-        roles.specWriter
-          ? { label: 'spec:' + slug + ':g' + gi, phase: 'Spec', schema: SPEC_SCHEMA, agentType: roles.specWriter }
-          : { label: 'spec:' + slug + ':g' + gi, phase: 'Spec', schema: SPEC_SCHEMA },
+        renderStageOpts('specWriter', { label: 'spec:' + slug + ':g' + gi, phase: 'Spec', schema: SPEC_SCHEMA }),
       )
     }
   }),
@@ -1161,9 +1206,7 @@ if (!authoredIds.length) {
       '5. Return `sha` as the full 40-hex `git rev-parse HEAD`.\n' +
       '6. Run `' + SPEC_COMMIT_CHECKLIST + '` over the commit just made and return its stdout VERBATIM as ' +
       '`checklist`, whatever its exit status; an empty selection returns an empty string.',
-    roles.committer
-      ? { label: 'commit:specs:' + slug, phase: 'Spec', schema: SPEC_COMMIT_SCHEMA, agentType: roles.committer }
-      : { label: 'commit:specs:' + slug, phase: 'Spec', schema: SPEC_COMMIT_SCHEMA },
+    renderStageOpts('committer', { label: 'commit:specs:' + slug, phase: 'Spec', schema: SPEC_COMMIT_SCHEMA }),
   )
   // S3 — FIVE REFUSALS, in the order the spec's table states, each before the resolver can spawn and
   // each ending in the one remedy. Nothing past this line can verify the commit, so a return that
@@ -1545,6 +1588,8 @@ const auRaw = !specAudit ? null : await workflow(
     // TOOL-aOrientedCast-4 S13 - the audit's review keys, under the review harness's precedence: a
     // stage a role names spawns as that type, and `none` above governs only a judge stage none names.
     ...(auditRoles ? { roles: auditRoles } : {}),
+    // TOOL-aOrientedCast-10 S7 - and their levels, as the review call's `efforts`; no key when none.
+    ...(auditEfforts ? { efforts: auditEfforts } : {}),
     context: auditContext,
     specs: auditSpecs,
     ...(checklist !== null ? { checklist: checklist } : {}),
@@ -1994,9 +2039,7 @@ if (!specAudit) {
       'unit that promotion repairs, or the bare string `none`, and `order` is the integer you ' +
       'wrote into its status header. Both fields are REQUIRED, and `edges: []` is a declared ' +
       'absence rather than a missing key.',
-    roles.disposal
-      ? { label: 'dispose:' + slug, phase: 'Disposal', schema: DISPOSAL_SCHEMA, agentType: roles.disposal }
-      : { label: 'dispose:' + slug, phase: 'Disposal', schema: DISPOSAL_SCHEMA },
+    renderStageOpts('disposal', { label: 'dispose:' + slug, phase: 'Disposal', schema: DISPOSAL_SCHEMA }),
   )
   // NO PARTIAL HAND-OUT. Deciding which units a standing finding touches needs the tree, which this
   // runtime does not have, so an empty roster is the honest refusal. `d.disposed !== true` covers a
@@ -2367,6 +2410,8 @@ const handOut = {
     args: {
       repo: repo, slug: slug, scratch: scratch, mode: mode, driver: DRIVER, ground: GROUND, checklist: CHECKLIST,
       ...(roles.builder ? { roles: { builder: roles.builder } } : {}),
+      // TOOL-aOrientedCast-10 S7 - `efforts.builder` travels the same way, and alone.
+      ...(efforts.builder ? { efforts: { builder: efforts.builder } } : {}),
     },
     perUnit: ['unitId', 'specPath', 'briefPath'],
     resolvePathsWith: DRIVER + ' --plan ' + slug + ' --paths',

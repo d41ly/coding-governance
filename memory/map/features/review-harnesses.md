@@ -77,6 +77,14 @@ null agent makes the return `exit: 'deferred-platform'` with the `pending` label
 count, and the build harness returns that deferral instead of throwing. The drift-audit siblings
 keep the all-or-nothing fan. Nothing prunes old key directories.
 
+**Each stage's reasoning effort arrives in `efforts`, keyed as `roles` is (`TOOL-aOrientedCast-10`).**
+A named stage's `agent()` options carry `effort`; an unnamed one carries none and runs at its agent
+type's level, else the session's, and every stage's level is logged with its source. The harness
+grades the shape only, lower-case letters, because the vocabulary is the roles kit's and a script
+cannot import it. The resume probe never takes one, and `efforts` stays out of the review key: effort
+moves how hard a judge reasons, not what it was asked. The caller composes it per WORKFLOW with
+`handoff.py stage-efforts`, since this harness serves spec review and closing review at two levels.
+
 ## Shared seams
 
 `tools/workflows/check-review-join.sh` scans every `*.js` under `tools/` with NO marker filter, so a
