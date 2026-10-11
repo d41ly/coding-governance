@@ -49,6 +49,9 @@
 # 3 an OBSERVATION failure: not a repository, an undeterminable default branch, an `ls-remote` or a
 # fetch that did not answer. Two codes and not one, because a driver reads them differently: a 2
 # says its own invocation is wrong and no retry will help, a 3 says the clone or the network is.
+# 4 the push LANDED UNGATED: git reported success and the hook left no allow record for the pushed
+# commit, so no bar certified what is now on the remote (TOOL-aSignalledHook-1). Retrying cannot
+# help, because the push already happened; the landing needs a bar and a decision.
 # The no-argument invocation keeps BASE's codes, its own exit 2 included.
 set -u
 
@@ -184,6 +187,11 @@ refusal="$gd/pre-push-refusal"
 # hook once it has vetted the bar and before it runs it, cleared by it on every run and by this script
 # before every push. The lander marker is written only when it reads `default` or `tracked`.
 barfile="$gd/pre-push-bar"
+# THE HOOK'S ALLOW RECORD (TOOL-aSignalledHook-1): `<pushed sha><TAB><gate run id>`, written by the
+# hook only at its one success exit on a default-branch push, cleared by it on every run and by this
+# script before every push. git's exit 0 is not a verdict: on Git for Windows a hook that dies by a
+# signal, KILL included, is read as success, and the push lands with no bar. Read by check_push_allow.
+allowfile="$gd/pre-push-allow"
 
 # The marker is a SOFT advisory guard: a SIGKILL/OOM/power-loss during the gate can leak it (this
 # trap can't catch those). Worst case a later raw push skips reconcile-before-gate and wastes ONE
@@ -254,6 +262,11 @@ derive_push_failure() {  # -> refused | unreachable | unchanged | race on stdout
     head-moved)
       echo "push-main: the bar ran GREEN but HEAD moved while it ran, so the green does not describe the pushed tree — re-run push-main. ($msg)" >&2
       echo refused; return 0 ;;
+    signalled)
+      # TOOL-aSignalledHook-1: the hook was sent a signal, so a bar may have run and been stopped
+      # part-way. Nothing was pushed; whatever sent the signal decides whether to try again.
+      echo "push-main: the pre-push hook was sent a signal and refused, stopping any bar it had started, so nothing was pushed — re-run push-main when whatever stopped it is done. ($msg)" >&2
+      echo refused; return 0 ;;
     ?*)
       echo "push-main: pre-push refused the push ($tok) — a precondition; no leg ran: $msg" >&2
       echo refused; return 0 ;;
@@ -306,6 +319,30 @@ check_claim_push_clear() {  # -> 0 always, once no live lock holds this git dir 
 # only matches a double-quoted value read a DIFFERENT value than the reader did for any unquoted
 # or single-quoted declaration - one half honouring a key the other could not see. A subshell
 # source is the driver's exact semantics without polluting this script's namespace.
+# check_push_allow — after git reports a push successful, require the hook's allow record to name
+# the pushed commit (TOOL-aSignalledHook-1). Without it the push is on the remote and no bar
+# certified it: the hook was killed, and on Git for Windows a hook that dies by a signal reads as
+# success. The trap in the hook turns every catchable signal into a refusal, so what reaches this
+# line is a KILL or a TerminateProcess. It cannot be undone here, only refused the name `landed`:
+# no lander marker, a line saying what happened, and exit 4 from the caller. The lander's own EXIT
+# trap still clears its marker file.
+# THE PUSHED SHA AND THE REMOTE'S TIP ARE CAPTURED BEFORE THE PUSH and passed in, never re-read after
+# it: a commit landing in this tree during the upload would otherwise read as a push no hook allowed.
+# NOTHING PUSHED IS NOT UNGATED. When the remote already held the commit, git runs the hook with no ref
+# lines, the hook exits as `skip-nondefault` and writes no record, and git still exits 0; that
+# re-run of a landing that already happened is reported as such (closing review round 1).
+check_push_allow() {  # pushed sha · the remote's tip before the push -> 0 when the hook allowed it; else the UNGATED report and 1
+  local pushed=$1 was=$2 sha="" run=""
+  if [ "$pushed" = "$was" ]; then
+    echo "push-main: $remote/$def already held ${pushed:0:8} before this push, so nothing was pushed and no hook verdict is owed." >&2
+    return 0
+  fi
+  [ -f "$allowfile" ] && IFS=$'\t' read -r sha run < "$allowfile"
+  [ -n "$sha" ] && [ "$sha" = "$pushed" ] && return 0
+  echo "push-main: landed UNGATED — git reports ${pushed:0:8} pushed to $remote/$def, but the pre-push hook left no allow record for it${sha:+ (its record names ${sha:0:8})} in $allowfile. The hook was killed before it decided: on Git for Windows a hook that dies by a signal reads as success. The commit is on $remote and NO bar certified it; NOT writing the lander marker. Run the bar on $remote/$def and decide whether to keep it." >&2
+  return 1
+}
+
 write_lander_marker() {  # -> 1 when the push landed but the record could not be written
   local lm _gcd bar barpath barblob
   [ -f .unattended.conf ] || return 0
@@ -862,13 +899,14 @@ cmd_land() {
     check_claim_push_clear
     # The hook's verdict and the bar it vetted are cleared before every push, as the attended path
     # clears them, so a file an earlier push's hook wrote cannot be read as this one's answer.
-    rm -f "$refusal" "$barfile"
+    rm -f "$refusal" "$barfile" "$allowfile"
     echo "push-main: gating + pushing ${t:0:8} to $def (attempt $attempt/$max)..." >&2
     # HEAD, never refs/heads/<def>: the local default branch is shared by every build on this node,
     # and publishing it is the defect these flags close. Its output is SHOWN and never read (S2).
     git push "$remote" "HEAD:refs/heads/$def" >&2
     rc=$?
     if [ "$rc" -eq 0 ]; then
+      check_push_allow "$t" "$R" || exit 4
       write_lander_marker || exit 1
       run_post_merge
       cls=landed
@@ -989,14 +1027,17 @@ while [ "$attempt" -le "$max" ]; do
   # S10); the marker stays until the verdict files have been read.
   touch "$marker"
   check_claim_push_clear
-  rm -f "$refusal" "$barfile"
+  rm -f "$refusal" "$barfile" "$allowfile"
   echo "push-main: gating + pushing $def (attempt $attempt/$max)..." >&2
   # THE PUSH'S OUTPUT IS SHOWN, NEVER READ (S2). It carries the bar's own output, so classifying on
   # its words let any leg that printed `connection` report a red bar as an unreachable remote
   # (TOOL-aHonedRuleset-10), and any leg that printed `rejected` fake a race and re-run the bar.
+  pushed=$(git rev-parse --verify "refs/heads/$def")
+  was=$(git rev-parse -q --verify "refs/remotes/$remote/$def") || was=""
   git push "$remote" "$def" >&2
   rc=$?
   if [ "$rc" -eq 0 ]; then
+    check_push_allow "$pushed" "$was" || exit 4
     write_lander_marker || exit 1
     run_post_merge
     cls=landed

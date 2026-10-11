@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 105 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 108 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -82,12 +82,12 @@ Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `playbook validity gate` | playbook-mode |
 | `pre-push bar self-test` | run-gates |
 | `pre-push run-log line` | runlog |
-| `pre-push self-test` | baseline |
+| `pre-push self-test` | push-main |
 | `process-monitor adopter selftest` | process-monitor |
 | `process-monitor census selftest` | process-monitor |
 | `process-monitor wiring` | process-monitor |
 | `profile-bar selftest` | run-gates |
-| `push-main self-test` | baseline |
+| `push-main self-test` | push-main |
 | `pytest-guardrails self-test` | baseline |
 | `python resolver (behaviour + inline parity + idiom ban)` | baseline |
 | `recall floor` | memory-recall |
@@ -169,7 +169,7 @@ Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 |---|---|
 | `commit-msg` | memory-tree-hygiene |
 | `pre-commit` | baseline |
-| `pre-push` | baseline |
+| `pre-push` | push-main |
 | `pre-rebase` | memory-tree-hygiene |
 
 ## harness-hooks
@@ -275,6 +275,7 @@ Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `history-leg-graded-before-the-reconcile-commit.md` | memory-tree-hygiene |
 | `hookspath-resolves-into-another-checkout.md` | run-gates |
 | `id-matched-as-a-substring.md` | unattended |
+| `index-derivation-reads-a-half-staged-move-as-a-deletion.md` | memory-tree-hygiene |
 | `inherited-git-dir-pins-the-work-tree-to-the-cwd.md` | unattended-mandate |
 | `inline-fence-swallows-the-rest-of-the-file.md` | memory-tree-hygiene |
 | `inline-marker-breaks-a-line-continuation.md` | install-prefix |
@@ -287,6 +288,7 @@ Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `liveness-negative-from-another-population.md` | unattended-stops |
 | `merge-keeps-both-sides-of-one-derivation.md` | process-monitor |
 | `msys-grep-counts-cr-on-every-line.md` | session-kickoff |
+| `name-search-resolves-a-namesake.md` | memory-tree-hygiene |
 | `naming-leg-grades-what-python-named.md` | lexicon |
 | `node-check-is-not-a-syntax-gate.md` | review-harnesses |
 | `nt-against-a-missing-file-is-true.md` | runlog |
@@ -306,6 +308,7 @@ Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · 
 | `second-implementation-is-not-a-second-opinion.md` | unattended |
 | `settings-edit-takes-effect-mid-session.md` | agent-cap |
 | `shipped-checker-edit-is-an-adopter-contract-change.md` | session-kickoff |
+| `signal-killed-hook-reads-as-success.md` | push-main |
 | `signal-trap-runs-the-exit-handler-twice.md` | run-gates |
 | `sourced-conf-blank-overrides-the-default.md` | memory-tree-hygiene |
 | `spec-names-code-its-base-lacks.md` | unattended |

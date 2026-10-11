@@ -144,9 +144,9 @@ check-memory-hygiene.sh: the memory tree's structural gate, its per-class size c
 - gate-legs 11: `memory hygiene`, `memory-hygiene self-test`, `verdict epoch (kit version dates the engine)`, `verdict-epoch self-test`, `kit version markers`, `kit/dogfood doc parity`, `transition-audit arms`, `backlog migration selftest`, `straggler-guard arms`, `routed commits name a specced unit`, `routed-commits selftest`
 - kits 1: `memory-tree`
 - git-hooks 2: `commit-msg`, `pre-rebase`
-- gotcha-classes 12: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`
+- gotcha-classes 14: `a-grep-for-a-word-is-a-presence-probe.md`, `suite-edited-while-bash-executes-it.md`, `ledger-token-wrapped-across-a-line-joins-nothing.md`
 - globs 11: `tools/memory-tree/check-memory-hygiene.sh`
-- cut 19 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 21 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## memory-tree-merge-driver
 
@@ -189,6 +189,17 @@ identify, report and kill the processes an agent session launched and forgot
 - harness-hooks 2: `SessionStart tools/process-monitor/procmon-hook.js`, `PostToolUse tools/process-monitor/procmon-hook.js`
 - gotcha-classes 1: `merge-keeps-both-sides-of-one-derivation.md`
 - globs 2: `tools/process-monitor/**`, `.process-monitor.conf`
+
+## push-main
+
+the lander that reconciles, gates and pushes the default branch, and the pre-push hook that refuses any default-branch push it did not gate
+
+- status `shipped` · streams `tooling` · dossier `memory/map/features/push-main.md`
+- decisions 4: `TOOL-aLeasedGauntlet-1`, `TOOL-dLoggedFlight-4`, `TOOL-dDerivedDocket-26`, `TOOL-aSignalledHook-1`
+- gate-legs 2: `pre-push self-test`, `push-main self-test`
+- git-hooks 1: `pre-push`
+- gotcha-classes 1: `signal-killed-hook-reads-as-success.md`
+- globs 4: `tools/push-main.sh`, `tools/push-main.test.sh`, `.githooks/pre-push`, `.githooks/pre-push.test.sh`
 
 ## review-harnesses
 

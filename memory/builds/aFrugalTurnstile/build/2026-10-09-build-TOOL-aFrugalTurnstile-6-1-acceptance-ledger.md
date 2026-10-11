@@ -28,6 +28,6 @@ ceiling and budget row may need raising for the six to seven minutes these arms 
 - AC7 — `post-merge: REFUSING` — a commit only on a local feature branch exited 2, no probe file was written and the remote held no ref.
 - AC8 — `export GOV_GATE_CMD="bash bar.sh"` — exited 2 naming the line with no probe written; the single-quote, trailing-comment, CRLF and later-assignment forms each exited 0 with the record's `bar` reading `bash bar.sh` (the double-quote form is AC5's).
 - AC9 — `GOV_REMOTE` — two remotes and a detached HEAD exited 2 naming it; `--remote <second>` published c2 on the second remote and `git ls-remote` of the first showed none.
-- AC10 — `post-merge: usage:` — no argument, and a sha naming no commit, each exited 2 with the usage line and no `gate queue` line, so no bar ran.
+- AC10 — `post-merge: usage:` — `post-merge.sh` with no argument, and with a sha naming no commit, each exited 2 with the usage line and no `gate queue` line, so no bar ran.
 - AC11 — `WHAT THIS DOES NOT CHECK` — the grep in the kit directory printed one line, and `^## The post-merge bar` in `README.md` printed one line.
 - AC12 — `python tools/codebase-map/gen_map.py --check` — exited 0 after the regeneration, and `grep -c post-merge.sh memory/map/generated/symbols.json` printed a non-zero count.
