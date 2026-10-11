@@ -9,12 +9,22 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 63a43402c4f0c048d04160b131b3853ea5070734 · park · 0 touching
+asks-at-landing: TOOL-aFrugalTurnstile-18=OPEN
+units-at-landing: DEPL-aFrugalTurnstile-1 PLAY-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-1 TOOL-aFrugalTurnstile-10 TOOL-aFrugalTurnstile-2 TOOL-aFrugalTurnstile-3 TOOL-aFrugalTurnstile-5 TOOL-aFrugalTurnstile-11 TOOL-aFrugalTurnstile-4 TOOL-aFrugalTurnstile-6 TOOL-aFrugalTurnstile-7 TOOL-aFrugalTurnstile-8 TOOL-aFrugalTurnstile-9 TOOL-aFrugalTurnstile-12 TOOL-aFrugalTurnstile-14 TOOL-aFrugalTurnstile-17 TOOL-aFrugalTurnstile-13 TOOL-aFrugalTurnstile-15 TOOL-aFrugalTurnstile-16
+hold-run: 
+hold-streak: 1 · at c9fa75f2
+resume-owed: none · owner
+held-at: 2026-10-11T02:49:12Z
+hold-reason: the owner ordered the landing pushed with the hook bypassed; origin/main took the prepared merge 63a43402 over b6cd02bc with no bar
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
+refreshed-at: 63a43402c4f0c048d04160b131b3853ea5070734 · handoff · 0 touching
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 7f3940a0d4de818aa45716c1091259f45d5da8f0
-phase: VERIFYING
+witness: c9fa75f26eea3f5e317222e347b5754fa6b3db9b
+phase: HELD
 branch-sha: bef97330574caabfd43c374dbe8c39b26c560203
 branch-ref: refs/heads/branch/awesome-cannon-44b2b1
 may: none
@@ -156,3 +166,7 @@ base: bef97330574caabfd43c374dbe8c39b26c560203
 2026-10-10T21:15:59Z dispatch · item 9873a25f TOOL-aFrugalTurnstile-16 · reason memory/builds/aFrugalTurnstile/build/2026-10-10-build-TOOL-aFrugalTurnstile-16-1-acceptance-ledger.md
 
 2026-10-11T02:31:10Z decision · item land the build with the hook bypassed, no full bar · reason decided by the owner in chat on 2026-10-11, after the close's remote claim push timed out under host load; landed at 63a43402; a full bar on main and the kit self-tests stay owed
+
+2026-10-11T02:51:25Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug aFrugalTurnstile && bash tools/push-main.sh --land --slug aFrugalTurnstile && bash tools/unattended/unattended.sh --settle aFrugalTurnstile
+
+2026-10-11T02:51:27Z hold · item owner-decision · reason until owner · reaped 1100d7e1 · resume none(owner)
