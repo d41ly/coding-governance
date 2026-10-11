@@ -186,6 +186,46 @@ if [ "$rc9b" -eq 0 ] && grep -q "$(git rev-parse HEAD) by push-main bar tracked 
 else
   bad "9b a tracked-bar landing did not write its marker naming the bar (rc $rc9b): $out9b | $(cat "$gcd/unattended-landed" 2>/dev/null)"
 fi
+# SG AC4 (TOOL-aSignalledHook-1) — and the hook that allowed 9b's push says so: its allow record
+#      names the pushed commit, which is the record the lander now requires before it says landed.
+if [ "$(cut -f1 "$gitdir/pre-push-allow" 2>/dev/null)" = "$(git rev-parse HEAD)" ]; then
+  ok "SG AC4 a gated landing leaves the hook's allow record naming the pushed commit"
+else
+  bad "SG AC4 the allow record after 9b reads '$(cat "$gitdir/pre-push-allow" 2>/dev/null)', not $(git rev-parse --short HEAD)"
+fi
+
+# SG AC3 (TOOL-aSignalledHook-1) — A PUSH GIT CALLS SUCCESSFUL WITH NO HOOK VERDICT. On Git for Windows
+#      a hook killed by a signal, KILL included, reads to git as exit 0, and 69e0ff0f landed that way.
+#      The stand-in reproduces what such a hook leaves, on any platform: it vets the bar as `default`,
+#      as the real hook does before its bar runs, and ends 0 with no allow record. The lander must say
+#      the push landed UNGATED, exit 4 and withhold the marker; before the record existed it wrote one.
+mkdir -p "$tmp/killed-hook"
+printf '#!/usr/bin/env bash\nprintf "default\\tstub-bar.sh\\t0\\n" > "$(git rev-parse --git-dir)/pre-push-bar"\nexit 0\n' \
+  > "$tmp/killed-hook/pre-push"
+chmod +x "$tmp/killed-hook/pre-push"
+git commit -q --allow-empty -m sg-ac3
+rm -f "$gcd/unattended-landed"
+git config core.hooksPath "$tmp/killed-hook"
+outsg=$( ( unset GOV_GATE_CMD_TEST; bash "$lander" 2>&1 ) ); rcsg=$?
+git config core.hooksPath .githooks
+case "$rcsg|$([ -f "$gcd/unattended-landed" ] && echo marker || echo none)|$(git -C "$tmp/remote.git" rev-parse main)" in
+  "4|none|$(git rev-parse HEAD)")
+    case "$outsg" in
+      *"landed UNGATED"*) ok "SG AC3 a push with no hook allow record is reported landed UNGATED, exit 4, no lander marker" ;;
+      *) bad "SG AC3 exit 4 and no marker, but the UNGATED line is missing: $outsg" ;;
+    esac ;;
+  0*) bad "SG AC3 the lander called a push with no hook verdict landed (rc 0): $outsg" ;;
+  *) bad "SG AC3 expected rc 4, no marker and the remote at HEAD, got rc $rcsg marker $([ -f "$gcd/unattended-landed" ] && echo yes || echo no): $outsg" ;;
+esac
+# SG re-run (closing review round 1) — NOTHING PUSHED IS NOT UNGATED. The remote now holds HEAD, so git
+#      runs the real hook with no ref lines, it exits as skip-nondefault and writes no allow record, and
+#      git still exits 0. The lander must say nothing was pushed, not that a hook was killed.
+outre=$( ( unset GOV_GATE_CMD_TEST; bash "$lander" 2>&1 ) ); rcre=$?
+case "$rcre|$outre" in
+  *"landed UNGATED"*) bad "SG re-run a push of nothing was reported landed UNGATED (rc $rcre): $outre" ;;
+  "0|"*"already held"*"nothing was pushed"*) ok "SG re-run a lander with nothing to push says so and exits 0, not UNGATED" ;;
+  *) bad "SG re-run expected rc 0 and 'nothing was pushed', got rc $rcre: $outre" ;;
+esac
 
 # H1 — ONE CHANNEL (closing review round 1 H1). The hook and this lander used to answer "was the bar a
 #      stub?" from two environments, and the hook's includes whatever gate-env.sh sets. Here a
@@ -572,6 +612,24 @@ rem=$(git ls-remote "$tmp/remote2.git" refs/heads/main | awk '{print $1}')
   && git -C "$tmp/wt" merge-base --is-ancestor "$t20" "$rem" \
   && ok "20 raced, re-prepared, landed; the first prepared merge is an ancestor of the pushed tip" \
   || bad "20 rc=$rc20 $out20"
+
+# SG AC3b (TOOL-aSignalledHook-1, closing review round 1) — the --land path, the one 69e0ff0f took: a
+#      prepared merge pushed through the killed-hook stand-in from SG AC3 is reported landed UNGATED
+#      and exits 4. SG AC3 drives only the attended path, so this guard could be deleted unseen.
+build_main
+git -C "$tmp/wt" checkout -q -B feat "$(git -C "$tmp/work2" rev-parse refs/remotes/origin/main)"
+echo u3 > "$tmp/wt/src-u3.txt"; git -C "$tmp/wt" add src-u3.txt
+git -C "$tmp/wt" commit -q -m "TOOL-tFix-4: unit four"
+run_wt --prepare --slug tFix >/dev/null 2>&1
+t3b=$(git -C "$tmp/wt" rev-parse HEAD)
+git -C "$tmp/wt" config core.hooksPath "$tmp/killed-hook"
+out3b=$( ( unset GOV_GATE_CMD_TEST; run_wt --land --slug tFix 2>&1 ) ); rc3b=$?
+git -C "$tmp/wt" config core.hooksPath .githooks
+case "$rc3b|$(git ls-remote "$tmp/remote2.git" refs/heads/main | awk '{print $1}')|$out3b" in
+  "4|$t3b|"*"landed UNGATED"*) ok "SG AC3b --land through a hook that left no allow record reports landed UNGATED and exits 4" ;;
+  0*) bad "SG AC3b --land called a push with no hook verdict landed (rc 0): $out3b" ;;
+  *) bad "SG AC3b expected rc 4, the remote at ${t3b:0:8} and landed UNGATED, got rc $rc3b: $out3b" ;;
+esac
 
 # 21 — a MISTYPED flag refuses instead of falling through to the attended path, which from this tree
 #      would push the local default branch. Run where that fallthrough would actually land.

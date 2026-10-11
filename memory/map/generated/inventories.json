@@ -280,6 +280,7 @@
       "second-implementation-is-not-a-second-opinion.md",
       "settings-edit-takes-effect-mid-session.md",
       "shipped-checker-edit-is-an-adopter-contract-change.md",
+      "signal-killed-hook-reads-as-success.md",
       "signal-trap-runs-the-exit-handler-twice.md",
       "sourced-conf-blank-overrides-the-default.md",
       "spec-names-code-its-base-lacks.md",

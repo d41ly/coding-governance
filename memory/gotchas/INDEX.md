@@ -97,6 +97,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [second-implementation-is-not-a-second-opinion](second-implementation-is-not-a-second-opinion.md) | class | 5 |  | a gate that recomputes the driver's answer from the driver's inputs confirms it rather than checking it, and the same hole opens at the READ path |
 | [settings-edit-takes-effect-mid-session](settings-edit-takes-effect-mid-session.md) | class | 1 |  | an edit to the hooks settings file is live on the next tool call, not at the next session, so a throwaway hook fires on the call that checks for it |
 | [shipped-checker-edit-is-an-adopter-contract-change](shipped-checker-edit-is-an-adopter-contract-change.md) | class | 6 |  | the manifest checker in this repo is the copy every adopter installs, so an edit made for this repo's own kickoff changes what every adopter's gate demands on their next pull |
+| [signal-killed-hook-reads-as-success](signal-killed-hook-reads-as-success.md) | class | 4 |  | on Git for Windows a git hook that dies by a signal is read by git as exit 0, so an untrapped TERM, HUP or INT, a KILL or a TerminateProcess lands a push the hook was about to refuse |
 | [signal-trap-runs-the-exit-handler-twice](signal-trap-runs-the-exit-handler-twice.md) | class | 2 |  | a signal trap that calls the exit handler and then exits runs that handler twice, because the exit fires the EXIT trap too, so anything the handler appends is appended twice |
 | [sourced-conf-blank-overrides-the-default](sourced-conf-blank-overrides-the-default.md) | class | 3 |  | an engine that presets its keys and then SOURCES the conf over them lets a blank line override a default with blank, and blank is what every measured pin uses to mean skip |
 | [spec-names-code-its-base-lacks](spec-names-code-its-base-lacks.md) | class | 1 |  | a spec written from review records instead of from the code names machinery a commit ancestral to its own base already deleted |
@@ -112,7 +113,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [text-mode-read-eats-a-bare-cr](text-mode-read-eats-a-bare-cr.md) | class | 2 |  | reading a CRLF worktree file in text mode turns a bare CR inside a regex into a newline |
 | [trace-profile-measures-itself](trace-profile-measures-itself.md) | class | 1 |  | a per-line set -x profile charges its own write overhead to the next line, so its seconds rank by call count and an optimisation aimed at them moves nothing |
 | [trailing-comma-counted-as-an-element](trailing-comma-counted-as-an-element.md) | class | 5 |  | a counter scoring one-plus-every-top-level-comma reads a trailing comma as a real item, so every multi-line literal measures one too many |
-| [trapped-signal-waits-for-the-foreground-child](trapped-signal-waits-for-the-foreground-child.md) | class | 2 |  | a bash script that TRAPS TERM, HUP or INT runs the handler only after its foreground child returns, so a killed script outlives the kill for as long as that child runs |
+| [trapped-signal-waits-for-the-foreground-child](trapped-signal-waits-for-the-foreground-child.md) | class | 4 |  | a bash script that TRAPS TERM, HUP or INT runs the handler only after its foreground child returns, so a killed script outlives the kill for as long as that child runs |
 | [two-answers-to-one-question](two-answers-to-one-question.md) | class | 20 | yes | a fact stated in two places drifts, and the copies need not disagree loudly to be wrong |
 | [two-guards-one-question-two-answers](two-guards-one-question-two-answers.md) | class | 3 |  | two guards that ask one question different ways become jointly unsatisfiable, and the tree they wedge has no legal move left |
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
@@ -122,6 +123,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-107 record(s): 104 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+108 record(s): 105 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->
