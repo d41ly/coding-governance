@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-4 — the build harnesses spawn their stage agents as catalogue roles
 
-**Status:** OPEN · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 4 · ratified 2026-10-11
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base 646d4a73 · streams tooling · order 4 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
