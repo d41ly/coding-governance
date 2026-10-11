@@ -44,9 +44,9 @@ from dataclasses import dataclass, field
 from fnmatch import fnmatchcase
 from pathlib import Path
 
-#: gov:kit codebase-map@1.26 — engine identity. Bump on any engine/render change; mirrored into the
+#: gov:kit codebase-map@1.27 — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.26"
+KIT_CODEBASE_MAP_VERSION = "1.27"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where
@@ -911,7 +911,7 @@ def build_reference_index(
 
     ``stats``, when given, is FILLED with what this scan could and could not see — `files_scanned`,
     `parse_skips` and the sorted `extensions` it was filtered to. `TOOL-dTracedLattice-1` S6: a
-    fail-open skip that reports nothing is the liveness failure `AGENTS.md` §7 names, because a
+    fail-open skip that reports nothing is the liveness failure the charter's `[gate]` practice names, because a
     ranking over half a corpus is indistinguishable from a ranking over all of it. An out-parameter
     rather than a second return value, so no existing caller has to change to keep working — and it
     counts what the walk already knows rather than adding a pass."""
@@ -1182,7 +1182,7 @@ def load_dossier_texts(map_dir: Path) -> dict[str, str]:
 # Typed counts — a present-tense digit count of an inventory population in dossier prose
 # ======================================================================================
 #
-# The charter's §7: no count of a derived population is written in prose. The map derives every
+# The charter's [derive]: no count of a derived population is written in prose. The map derives every
 # inventory's size into MAP.md, so a dossier sentence saying "the 86 legs" is a second answer that
 # goes stale on the next leg. A candidate is a digit count followed by an inventory noun; it is
 # FROZEN, and passes, when its sentence reads as a past measurement (ANNOTATION-STYLE A4's first

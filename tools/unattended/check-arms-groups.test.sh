@@ -5,7 +5,7 @@
 #
 # EVERY RED IS OBSERVED ON A PLANTED COPY. The linter is a static scan, so each rule's failing case is
 # a violation planted into a scratch copy of the tracked suite and the copy is discarded — the
-# AGENTS.md §7 rule that a gate is not landed until its failing case has been seen, and it costs
+# charter [gate] rule that a gate is not landed until its failing case has been seen, and it costs
 # seconds. The tracked suite is run too, for its header and its liveness line, and its own verdict is
 # PRINTED here and never taken as this suite's: the spec's §3 forbids waiving a pre-existing
 # violation and the starting figures are the unit's acceptance ledger's to record, so a leg that

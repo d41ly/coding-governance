@@ -29,7 +29,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.35   # gov:kit run-gates@1.35
+KIT_RUN_GATES_VERSION=1.37   # gov:kit run-gates@1.37
 # 1.30 + 1.30 -> 1.31: merging local main's reconcile (a30f4589) into aGraftedHelix. Both lines bumped
 # 1.29 -> 1.30 with different bytes, so the number alone could not tell the two kits apart.
 # 1.29 -> 1.30: the shard-join comment in run-selftests.sh stops justifying its unported reverse half
@@ -97,6 +97,17 @@ case "$0" in
 esac
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "run-gates: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
+# `--hold -- <command…>` (TOOL-aFrugalTurnstile-5 S6): how a bar that is NOT this runner joins the
+# host turnstile. Parsed here, before anything reads `$1`: the words are kept in `TS_HOLD` and the
+# positional arguments cleared, so no verb test below can mistake a held command for its own. The
+# run then takes the turnstile like a bar and runs the words right after `gate queue: acquired`.
+TS_HOLD=()
+if [ "${1:-}" = "--hold" ]; then
+  if [ "${2:-}" != "--" ] || [ "$#" -lt 3 ]; then
+    echo "run-gates: --hold needs a command: run-gates.sh --hold -- <command…>" >&2; exit 2
+  fi
+  shift 2; TS_HOLD=("$@"); set --
+fi
 # The python-launcher resolver, INLINED byte-identically from resolve-python.sh in gov's lib dir. This
 # kit is deployable (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`), and gov's lib dir is gov-internal and never travels:
 # sourcing it made this runner exit 2 with zero legs run in any tree that did not have it.
@@ -987,7 +998,7 @@ PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t,
 # numbers above. The first — one more process on a spawn-bound machine — survives and is PRICED: at
 # `TS_TTL / 6` a 4000 s bar ticks about 13 times, two spawns each, at the 319 ms per-spawn cost
 # measured on node `a`; roughly 8 s against a bar that makes tens of thousands. That is the
-# supersession `AGENTS.md` §6 requires, written where the reversal happens.
+# supersession an append-only decision log requires, written where the reversal happens.
 if [ "${PROF_TIMEOUT:-0}" -gt 0 ]; then TS_TTL=$(( PROF_TIMEOUT * 3 ))
 else TS_TTL=${GATE_TURNSTILE_TTL:-1800}; fi
 # The bounded wait is a DECLARED MULTIPLE OF THE TTL, so it moves with the one number this unit
@@ -1087,21 +1098,55 @@ fi
 echo "run-gates: process-monitor: $PROCMON_WHY"
 
 
-# ---- the turnstile: one bar per repository at a time (the turnstile unit) -------------------------
+# The run id, derived ONCE here (TOOL-aFrugalTurnstile-5 S2): the beacon names it as `run`, and the
+# run record below opens its directory under the same id. `GATE_RUN_ID` pins it, for the hook and arms.
+TS_RUN="${GATE_RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)-$$}"
+
+# ---- the turnstile: one bar per HOST at a time (the turnstile unit, TOOL-aFrugalTurnstile-5) -----
 # Nothing coordinated two bars before this. `git worktree list` reports well into double figures on
 # this node, and the sibling profiling build measured three full bars running at once with CPU at
 # 39 %, both queues empty, and width 24 running 26 % SLOWER than width 8. The contended resource does
 # not parallelise, so two concurrent bars are worse than two sequential ones and serializing them is
 # the right shape for this machine rather than merely the polite one.
 #
-# THE KEY IS THE GIT COMMON DIR, resolved absolutely. Every worktree of one repository shares it, and
-# two different repositories never do — so "one bar per repo" falls out of the key derivation instead
-# of needing a predicate. The runner's per-worktree `$gd` resolutions above are deliberate and are
-# left exactly as they are: evidence is per-worktree, contention is per-repository.
+# THE KEY IS A HOST DIRECTORY, `GATE_TURNSTILE_DIR` or `~/.gov/gate-turnstile`, resolved absolutely.
+# It was the git common dir, which made two REPOSITORIES two keys: on 2026-10-09 three repositories'
+# bars ran at once on one host and starved each other into timeouts and load flakes. Only the beacon
+# and the queue moved; the health log, the scratch owner record and its sweep stay per common dir,
+# which is why `TS_COMMON` is still resolved. A host dir that cannot be created falls back to the
+# common dir for both, announced, which is the per-repository behaviour this replaced.
+#
+# THE BEACON NAMES ITS HOLDER: `heartbeat`, `pid`, `nonce`, and `repo` (the holder's top level), `run`
+# (its run id) and `ttl`. A waiter prints the holder from them and judges staleness against the
+# HOLDER's `ttl`, because two repositories may run different TTLs; an absent field, as from an older
+# runner's beacon, prints `-` and its TTL falls back to the waiter's own.
+#
+# NESTING. A holder exports `GATE_TURNSTILE_HOLDER`, its nonce, to its legs. A runner that inherits a
+# value EQUAL to the live beacon's nonce runs inside the bar that holds the host, so it takes no
+# ticket and records `queued_from` `nested`; without that, a suite's scratch-repo bar would queue
+# behind the very bar whose leg started it. Compared, not merely present, so a value a dead bar left
+# in some shell nests nothing once a successor holds. `--hold -- <command…>` takes the same turnstile
+# for a command that is not this runner. `queued_from` reads `held`, `nested`, `expired`,
+# `unticketed`, `off` or `unresolved`, assigned in the block after the queue.
+#
+# WHAT THIS DOES NOT CHECK: NESTING TRUSTS AN INHERITED NONCE, which any process on this host can read
+# from the beacon, so nesting decides contention and never a verdict; and a runner older than this
+# change keys on its common dir and does not see the host beacon.
 TS_COMMON=""; TS_DIR=""; TS_TICKET=""; TS_NONCE=""; TS_WAITED=0; TS_HELD=0; TS_Q=""; TS_UNTICKETED=0
+TS_HOST=""; TS_DIR_C=""; TS_NESTED=0
 if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
   TS_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || TS_COMMON=""
   [ -n "$TS_COMMON" ] && TS_COMMON=$(cd "$TS_COMMON" 2>/dev/null && pwd) || TS_COMMON=""
+  TS_HOST=${GATE_TURNSTILE_DIR:-$HOME/.gov/gate-turnstile}
+  if mkdir -p "$TS_HOST" 2>/dev/null && TS_HOST=$(cd "$TS_HOST" 2>/dev/null && pwd) && [ -n "$TS_HOST" ]; then
+    TS_DIR_C="$TS_HOST/gate-bar-beacon"; TS_Q="$TS_HOST/gate-bar-queue"
+  else
+    if [ -n "$TS_COMMON" ]; then
+      echo "run-gates: NOTE - the host turnstile directory '$TS_HOST' could not be created, so this bar queues per repository under $TS_COMMON" >&2
+      TS_DIR_C="$TS_COMMON/gate-bar-beacon"; TS_Q="$TS_COMMON/gate-bar-queue"
+    fi
+    TS_HOST=""
+  fi
 fi
 # THE HEALTH LOG (I3, TOOL-aGraftedHelix-8), derived from the common dir this runner already holds,
 # so no self-heal site below spawns git: the turnstile's here, WORK_COMMON's once it is resolved.
@@ -1193,10 +1238,15 @@ ts_tick_stop() {
 # other cannot: a dead PID is immediate and certain, and a stale heartbeat catches the holder whose
 # PID was recycled or which is alive but wedged.
 ts_try_reap() {
-  local hpid hb age
+  local hpid hb age httl
   [ -d "$TS_DIR_C" ] || return 1
   hpid=$(cat "$TS_DIR_C/pid" 2>/dev/null)
   hb=$(cat "$TS_DIR_C/heartbeat" 2>/dev/null)
+  # THE HOLDER'S TTL is the bound (TOOL-aFrugalTurnstile-5 S3): on a host-wide beacon the holder may be
+  # another repository running a longer one. Anything but a positive integer, as from an older
+  # runner's beacon, falls back to this waiter's own.
+  httl=$(cat "$TS_DIR_C/ttl" 2>/dev/null)
+  num_ok "$httl" || httl=$TS_TTL
   if [ -n "$hpid" ] && ! ts_alive "$hpid"; then
     printf 'run-gates: reaping the beacon of a dead holder (pid %s)\n' "$hpid" >&2
     rm -rf "$TS_DIR_C" 2>/dev/null
@@ -1204,10 +1254,10 @@ ts_try_reap() {
   fi
   case "$hb" in ''|*[!0-9]*) hb=0 ;; esac
   age=$(( $(ts_now) - hb ))
-  if [ "$hb" != 0 ] && [ "$age" -gt "$TS_TTL" ]; then
-    printf 'run-gates: reaping the beacon of a stalled holder (heartbeat %ss old, ttl %ss)\n' "$age" "$TS_TTL" >&2
+  if [ "$hb" != 0 ] && [ "$age" -gt "$httl" ]; then
+    printf 'run-gates: reaping the beacon of a stalled holder (heartbeat %ss old, ttl %ss)\n' "$age" "$httl" >&2
     rm -rf "$TS_DIR_C" 2>/dev/null
-    add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "stalled holder heartbeat ${age}s ttl ${TS_TTL}s"; return 0
+    add_health_event "$RG_HEALTH_LOG" run-gates beacon-reaped "stalled holder heartbeat ${age}s ttl ${httl}s"; return 0
   fi
   return 1
 }
@@ -1277,9 +1327,14 @@ ts_sweep_queue() {
   [ "$swept" = 1 ]
 }
 
-if [ -n "$TS_COMMON" ]; then
-  TS_DIR_C="$TS_COMMON/gate-bar-beacon"
-  TS_Q="$TS_COMMON/gate-bar-queue"
+# NESTED (S5): inside the bar that holds this host, as its exported nonce says, so no ticket is taken
+# and nothing is claimed; the inherited value stays exported for this run's own legs.
+if [ -n "$TS_DIR_C" ] && [ -n "${GATE_TURNSTILE_HOLDER:-}" ] \
+   && [ "$(cat "$TS_DIR_C/nonce" 2>/dev/null)" = "$GATE_TURNSTILE_HOLDER" ]; then
+  TS_NESTED=1
+  ts_hr=$(cat "$TS_DIR_C/run" 2>/dev/null); ts_hd=$(cat "$TS_DIR_C/repo" 2>/dev/null); ts_hp=$(cat "$TS_DIR_C/pid" 2>/dev/null)
+  echo "gate queue: nested under ${ts_hr:--} — ${ts_hd:--} pid ${ts_hp:--}"
+elif [ -n "$TS_DIR_C" ]; then
   TS_NONCE="$$-$(ts_now)-$RANDOM"
   mkdir -p "$TS_Q" 2>/dev/null || true
   # EVERY RUN TAKES A TICKET, including an uncontended one. A ticket whose name sorts by time is all
@@ -1346,8 +1401,16 @@ if [ -n "$TS_COMMON" ]; then
       TS_DIR="$TS_DIR_C"
       printf '%s' "$(ts_now)" > "$TS_DIR/heartbeat" 2>/dev/null || true
       printf '%s' "$$"        > "$TS_DIR/pid" 2>/dev/null || true
+      # The holder's name, for a waiter's queue line and a nested run's, and the TTL a waiter judges
+      # it by (S2, S3). Written before the nonce, so a run that matches the nonce reads all three.
+      printf '%s' "$ROOT"     > "$TS_DIR/repo" 2>/dev/null || true
+      printf '%s' "$TS_RUN"   > "$TS_DIR/run" 2>/dev/null || true
+      printf '%s' "$TS_TTL"   > "$TS_DIR/ttl" 2>/dev/null || true
       printf '%s' "$TS_NONCE" > "$TS_DIR/nonce" 2>/dev/null || true
       TS_HELD=1
+      # The nonce goes to every leg, so a runner one of them starts NESTS rather than queueing behind
+      # this bar (S5). Exported only on a hold: no other path owns the beacon it would name.
+      export GATE_TURNSTILE_HOLDER="$TS_NONCE"
       # STARTED HERE, after the nonce exists and before the traps below, because the ticker's first
       # act is to compare that nonce. Started earlier it would have nothing to compare against.
       ts_tick_start
@@ -1435,10 +1498,13 @@ if [ -n "$TS_COMMON" ]; then
       # from, nothing held the beacon at all and this line still named one, sending the reader to
       # hunt a holder that did not exist. The `queued at position N (waited Ns)` tail is byte-stable
       # because `run-gates.turnstile.test.sh` greps it; only the leading clause varies.
+      # The holder is NAMED from its beacon (TOOL-aFrugalTurnstile-5 S4): on a host key it may be
+      # another repository, and "someone holds this" sent the reader to search every one of them.
       if [ -d "$TS_DIR_C" ]; then
-        echo "run-gates: another bar holds this repository — queued at position $pos (waited ${TS_WAITED}s)" >&2
+        ts_hr=$(cat "$TS_DIR_C/run" 2>/dev/null); ts_hd=$(cat "$TS_DIR_C/repo" 2>/dev/null); ts_hp=$(cat "$TS_DIR_C/pid" 2>/dev/null)
+        echo "run-gates: another bar holds this host — ${ts_hd:--} run ${ts_hr:--} pid ${ts_hp:--} — queued at position $pos (waited ${TS_WAITED}s)" >&2
       else
-        echo "run-gates: no bar holds this repository, but a ticket sorts ahead of this one — queued at position $pos (waited ${TS_WAITED}s)" >&2
+        echo "run-gates: no bar holds this host, but a ticket sorts ahead of this one — queued at position $pos (waited ${TS_WAITED}s)" >&2
       fi
       [ -n "$gd" ] && printf 'position\t%s\nwaited\t%s\n' "$pos" "$TS_WAITED" > "$gd/gate-queue-status" 2>/dev/null || true
       ts_lastpos=$pos; ts_announced=1
@@ -1447,10 +1513,8 @@ if [ -n "$TS_COMMON" ]; then
   done
   ts_drop_ticket
   [ -n "$gd" ] && rm -f "$gd/gate-queue-status" 2>/dev/null || true
-  # A LINEAGE MARKER for any future nested caller. The primary path needs no exemption predicate —
-  # a nested run in a scratch repo resolves a different common dir and therefore a different beacon —
-  # but a caller that one day nests inside the SAME repo would deadlock against its own parent, and a
-  # marker it can read is cheaper than the incident.
+  # A LINEAGE MARKER, comma-joined and exported on every path out of the queue. It is NOT the nesting
+  # test: that is `GATE_TURNSTILE_HOLDER` compared with the live beacon, exported only on a hold.
   export GATE_TURNSTILE_HELD="${GATE_TURNSTILE_HELD:-}${GATE_TURNSTILE_HELD:+,}$TS_NONCE"
 fi
 
@@ -1475,13 +1539,18 @@ fi
 # keeps the invariant true as written rather than quietly falsifying it: `expired` still means the
 # bound was burned, and a `queued 0` is still unambiguous once the state word is read with it.
 #
+# `nested` (TOOL-aFrugalTurnstile-5) is a run inside the bar that holds the host: it took no ticket
+# and waited nothing, so its `queued 0` is exact rather than a held run's uncontended zero.
+#
 # WHAT THIS DOES NOT CHECK, stated here because a reader will assume otherwise: `unresolved` is
-# UNARMED. Reaching it needs `git rev-parse --git-common-dir` to fail while the runner is already
-# past its own repo guard, and breaking a linked worktree's `commondir` makes `--show-toplevel` fail
-# too, so the runner exits 2 before this line. No fixture in the turnstile suite can produce it.
+# UNARMED. Reaching it needs the host directory AND `git rev-parse --git-common-dir` to fail while
+# the runner is already past its own repo guard, and breaking a linked worktree's `commondir` makes
+# `--show-toplevel` fail too, so the runner exits 2 before this line. No fixture in the turnstile
+# suite can produce it.
 QUEUED="-"; QUEUED_FROM=off
 if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
-  if   [ -z "$TS_COMMON" ]; then QUEUED_FROM=unresolved
+  if   [ -z "$TS_DIR_C" ]; then QUEUED_FROM=unresolved
+  elif [ "$TS_NESTED" = 1 ]; then QUEUED=0; QUEUED_FROM=nested
   elif [ "$TS_HELD" = 1 ];  then QUEUED="$TS_WAITED"; QUEUED_FROM=held
   elif [ "$TS_UNTICKETED" = 1 ]; then QUEUED="$TS_WAITED"; QUEUED_FROM=unticketed
   else                            QUEUED="$TS_WAITED"; QUEUED_FROM=expired
@@ -1507,6 +1576,15 @@ echo "gate queue: waited ${TS_WAITED}s"
 # verdict prefix, so no wrapper counts it as a leg.
 ACQUIRED=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 echo "gate queue: acquired $ACQUIRED from $QUEUED_FROM"
+
+# `--hold` RUNS ITS COMMAND HERE and exits, before the scratch dir, so only the turnstile's own traps
+# are armed around it (TOOL-aFrugalTurnstile-5 S6). No run record, ledger row or stamp is written:
+# the held command is some other bar, and its verdict is its exit status, passed through.
+if [ "${#TS_HOLD[@]}" -gt 0 ]; then
+  "${TS_HOLD[@]}"; ts_rc=$?
+  ts_tick_stop; ts_release; ts_drop_ticket
+  exit "$ts_rc"
+fi
 
 # ---- the scratch dir: OWNED, REDIRECTED and SWEPT (TOOL-dDerivedDocket-25) -----------------------
 # Every hermetic leg makes its own `mktemp -d` scratch, and before this unit every one of them landed
@@ -1911,7 +1989,8 @@ if [ -n "$gd" ]; then
   # The id is seamed for the ARM, not for the runner: an arm that plants a stale completion file has
   # to know which directory the run will open, and without the seam the plant lands somewhere the run
   # never looks and the arm passes by finding nothing.
-  RUNID="${GATE_RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)-$$}"
+  # Derived ONCE, above the turnstile, which writes it into the beacon as `run` (TOOL-aFrugalTurnstile-5 S2).
+  RUNID="$TS_RUN"
   RUNROOT="$gd/gate-run"
   RUNDIR="$RUNROOT/$RUNID"
   if mkdir -p "$RUNDIR" 2>/dev/null; then
@@ -1934,6 +2013,11 @@ fi
 # uniqueness the paragraph above calls a correctness property. Read above, removed here, before any
 # leg starts.
 unset GATE_RUN_ID
+# THE REUSE MODE, read once and removed for the same reason (TOOL-aFrugalTurnstile-4 S4): the pre-push
+# hook exports `lineage` to THIS bar, and a leg's nested runner inheriting it would reuse inside a
+# scratch clone that asked for nothing. The header records the value as `reuse`.
+REUSE_MODE=${GATE_REUSE:-}
+unset GATE_REUSE
 
 FPRINT="$KITREL/gate-fingerprint.sh"
 fingerprint() { [ -f "$FPRINT" ] || { printf ''; return; }; bash "$FPRINT" "$@" 2>/dev/null; }
@@ -2217,18 +2301,22 @@ $dirt"
 # THE HEADER, written before the first leg dispatches, in a key-per-line grammar. It is what a
 # concurrent reader resolves through `gate-run/current` while the run is in flight, and what
 # survives a crash to say what the run WAS when the verdict never arrived.
+# The manifest blob and the graded sha, read ONCE: the header, every ledger row and the full-green
+# stamp carry them, and three reads of one fact are three chances to disagree (TOOL-aFrugalTurnstile-4).
+MANIFEST_BLOB=$(git hash-object -- "$LEGS_FILE" 2>/dev/null)
+HEAD_SHA=$(git rev-parse HEAD 2>/dev/null)
 if [ -n "$RUNDIR" ]; then
   {
     printf 'schema\t1\n'
     printf 'run_id\t%s\n' "$RUNID"
     printf 'started\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-    printf 'head\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"
+    printf 'head\t%s\n' "$HEAD_SHA"
     printf 'base\t%s\n' "$BASE"
     printf 'base_from\t%s\n' "${GATE_BASE:+GATE_BASE}${GATE_BASE:-$BASE_FROM_LADDER}"
     printf 'fingerprint\t%s\n' "$FPRINT_START"
     printf 'tree_clean\t%s\n' "$TREE_CLEAN"
     printf 'manifest\t%s\n' "$LEGS_FILE"
-    printf 'manifest_blob\t%s\n' "$(git hash-object -- "$LEGS_FILE" 2>/dev/null)"
+    printf 'manifest_blob\t%s\n' "$MANIFEST_BLOB"
     printf 'full\t%s\n' "${GATE_FULL:+1}"
     printf 'docs_base\t%s\n' "$DOCS_BASE"
     printf 'full_from\t%s\n' "${GATE_FULL:+GATE_FULL}"
@@ -2254,6 +2342,9 @@ if [ -n "$RUNDIR" ]; then
     # additive key breaks none, and a bump could not be armed because nothing reads the field.
     printf 'queued\t%s\n'      "$QUEUED"
     printf 'queued_from\t%s\n' "$QUEUED_FROM"
+    # The reuse mode as given, `lineage`, another value, or empty (TOOL-aFrugalTurnstile-4 S4). Outside
+    # the run-envelope block for the reason the queue keys above give.
+    printf 'reuse\t%s\n' "$REUSE_MODE"
     # THE ACQUIRE PAIR (TOOL-dDerivedDocket-26 S4), from the variables the stdout line printed, so the
     # header and the line cannot disagree about one run. Outside the envelope block for the reason above.
     printf 'acquired\t%s\n'      "$ACQUIRED"
@@ -2277,30 +2368,83 @@ if [ -n "$RUNDIR" ]; then
 fi
 
 # ---- reuse a proven green (the reuse unit) -------------------------------------------------
-# OPT-IN, and that is the boundary rule rather than caution: an advisory input may cause LESS work
-# only on a run that is not authoritative. `.githooks/pre-push` never sets this, so the run that
-# decides a landing always executes every leg it did not guard away.
+# TWO MODES OF ONE KNOB, read once into REUSE_MODE above. `lineage` is what `.githooks/pre-push`
+# exports on its own FULL decision for this runner (TOOL-aFrugalTurnstile-4, design D5, which
+# supersedes TOOL-aPacedTurnstile-6's rule that the boundary never reuses): it takes only a verdict a
+# FULL run on a CLEAN tree earned, on this same manifest blob, at an ancestor of HEAD, and a run whose
+# every reuse is of that kind may still stamp `gate-full-green`. Any other non-empty value is the
+# OPT-IN mode, which an advisory run asks for by hand and which can never stamp.
 #
 # A leg is reused when ALL of: reuse is asked for, the leg is not declared `impure`, its ledger row
-# says `ok`, that row carries a key, and the key equals the one computed THIS run. Any missing term
-# means execute — every failure mode of this block is "did more work", never "checked less".
-reuses=0
-if [ -n "${GATE_REUSE:-}" ] && [ -n "$LEDGER" ] && [ -s "$LEDGER" ]; then
+# says `ok`, that row carries a key, and the key equals the one computed THIS run; under `lineage`
+# also the row's `full` is `1`, its `manifest_blob` is this run's, and its `head` is an ancestor of
+# HEAD. Any missing term means execute — every failure mode of this block is "did more work", never
+# "checked less".
+#
+# WHAT LINEAGE REUSE DOES NOT CHECK: that a reused leg's guard names every input the leg reads, or
+# that its verdict depends on the tree alone. A reused verdict is only as good as its input key, so
+# a too-narrow guard or an undeclared `impure` leg is carried forward until its key moves, the
+# remote base moves, or a run without `GATE_REUSE` re-executes it — the post-merge full bar is that
+# run.
+#
+# ONE PASS over the ledger, in bash (S5), never a `grep` spawn per leg; the first row of a name wins,
+# as the `grep -m1` this replaced did. Each row's tabs are folded to US (0x1f) before the split:
+# `full` is empty on most rows, and a tab IFS collapses an empty field and shifts every field after it.
+# The lineage terms run CHEAPEST FIRST (S6): string compares; then the earning run's header `base`,
+# a file read, because `input_key` hashes BASE and another base can never match; then ancestry, one
+# git spawn per distinct head, memoized; and `input_key` last. A row whose run names no readable
+# header falls through to the key, so a swept record costs work and never a verdict.
+reuses=0; lineage_reuses=0
+if [ -n "$REUSE_MODE" ] && [ -n "$LEDGER" ] && [ -s "$LEDGER" ]; then
+  declare -A _lrow=() _rbase=()
+  while IFS= read -r _line || [ -n "$_line" ]; do
+    _n=${_line%%$'\t'*}
+    [ -n "$_n" ] && [ "$_n" != "$_line" ] && [ -z "${_lrow[$_n]+x}" ] && _lrow[$_n]=$_line
+  done < "$LEDGER"
+  _anc_yes=" "; _anc_no=" "
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
     [ -f "$WORK/$i.rc" ] && continue                 # already decided by the guard pass
     # An IMPURE leg is never reused, on any tree, however identical. Its verdict is a function of
     # something outside the tree, so a byte-identical tree is not the same question twice.
     [ -n "${impures[$i]}" ] && continue
-    _row=$(LC_ALL=C grep -m1 -F "${names[$i]}"$'\t' "$LEDGER" 2>/dev/null) || _row=
+    _row=${_lrow[${names[$i]}]-}
     [ -n "$_row" ] || continue
-    IFS=$'\t' read -r _n _sec _st _key _end <<<"$_row"
-    [ "$_n" = "${names[$i]}" ] || continue
-    [ "$_st" = ok ] || continue                      # a RED row is never reusable
+    _sec=; _st=; _key=; _end=; _run=; _full=; _blob=; _head=
+    # The row was found BY its name field, so no name check follows: it could never fail.
+    IFS=$'\x1f' read -r _n _sec _st _key _end _run _full _blob _head _ <<<"${_row//$'\t'/$'\x1f'}"
+    [ "$_st" = ok ] || continue                     # a RED row is never reusable
     [ -n "$_key" ] && [ "$_key" != "-" ] || continue # no key recorded is not a match, it is a gap
+    if [ "$REUSE_MODE" = lineage ]; then
+      [ "$_full" = 1 ] && [ -n "$_blob" ] && [ "$_blob" = "$MANIFEST_BLOB" ] || continue
+      # The run id names a path, so it is shape-checked first; one outside the shape is not refused,
+      # it only loses the shortcut. `?` memoizes "no header", `=<base>` the base it recorded.
+      case $_run in
+        ''|*[!A-Za-z0-9TZ-]*) ;;
+        *)
+          if [ -z "${_rbase[$_run]+x}" ]; then
+            _rbase[$_run]='?'
+            if [ -f "$RUNROOT/$_run/header" ]; then
+              while IFS=$'\t' read -r _hk _hv; do
+                [ "$_hk" = base ] && { _rbase[$_run]="=$_hv"; break; }
+              done < "$RUNROOT/$_run/header"
+            fi
+          fi
+          case ${_rbase[$_run]} in '?'|"=$BASE") ;; *) continue ;; esac ;;
+      esac
+      case $_head in ''|*[!0-9a-f]*) continue ;; esac
+      case $_anc_no in *" $_head "*) continue ;; esac
+      case $_anc_yes in
+        *" $_head "*) ;;
+        *) if git merge-base --is-ancestor "$_head" HEAD 2>/dev/null; then _anc_yes="$_anc_yes$_head "
+           else _anc_no="$_anc_no$_head "; continue; fi ;;
+      esac
+    fi
     [ "$_key" = "$(input_key "$i")" ] || continue
     printf 'reuse' > "$WORK/$i.rc"
+    [ "$REUSE_MODE" = lineage ] && lineage_reuses=$((lineage_reuses+1))
   done
+  unset _lrow _rbase
 fi
 
 # ---- CALIBRATION: THE SPAWN FLOOR. TOOL-dDerivedDocket-26 S5 ---------------------------------------
@@ -3638,17 +3782,27 @@ remove_census_watcher
 # this record exists to remove. Field 2 is still the duration, which is what lets the manifest
 # parser above read it as a dispatch hint with no edit at all.
 #
-# Rows: name, seconds, status, input key, ended-at. Advisory for dispatch, DURABLE for the reuse
-# unit that reads the key — a failed write costs wall clock, never a verdict.
+# Rows, nine tab-separated fields: name, seconds, status, input key, ended-at, run, full,
+# manifest_blob, head. The last four are the run that wrote the row: its id, `1` when it ran with
+# GATE_FULL on a CLEAN tree that did NOT move while the bar ran, and empty otherwise, the leg
+# manifest blob it read, and the sha it graded (TOOL-aFrugalTurnstile-4 S1). They are what
+# `GATE_REUSE=lineage` tests, and a carried-forward row keeps the run that EXECUTED it. Advisory for
+# dispatch, DURABLE for the reuse unit that reads the key — a failed write costs wall clock, never a
+# verdict. A moved tree blanks `full` (TOOL-aFrugalTurnstile-14 S1): its keys may describe content
+# other than what the leg graded, and a lineage reuse of them could stamp a full green.
+FPRINT_END=$(fingerprint)
+tree_moved=no
+[ -n "$FPRINT_START" ] && [ -n "$FPRINT_END" ] && [ "$FPRINT_START" != "$FPRINT_END" ] && tree_moved=yes
 if [ -n "$LEDGER" ]; then
   new="$WORK/ledger.new"; merged="$WORK/ledger.merged"; : > "$new"
+  lfull=""; [ -n "${GATE_FULL:-}" ] && [ "$TREE_CLEAN" = yes ] && [ "$tree_moved" = no ] && lfull=1
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
     [ -f "$WORK/$i.sec" ] || continue
     lst=ok; lkey=-; lend=""; lsec="$WORK/$i.sec"
     if [ -n "$RUNDIR" ] && [ -f "$RUNDIR/$i.leg" ]; then
       # THE TRAILING `_` takes field 8, `foreign` (TOOL-aGraftedHelix-5): without it the key read
-      # absorbed `<key>TAB<foreign>`, and a TAB inside the key breaks the ledger's five-field grammar.
+      # absorbed `<key>TAB<foreign>`, and a TAB inside the key breaks the ledger's nine-field grammar.
       IFS=$'\t' read -r _ lst _ _ _ lend lkey _ < "$RUNDIR/$i.leg" 2>/dev/null || { lst=ok; lkey=-; }
     fi
     # A RETRIED LEG takes its retry's seconds and the status `retried`, whatever the retry did
@@ -3664,7 +3818,8 @@ if [ -n "$LEDGER" ]; then
     # rather than leaving that rule to be re-implemented there. A key on a failed row would be a
     # true statement about the inputs and a dangerous one about the verdict.
     [ "$lst" = ok ] || lkey=-
-    printf '%s\t%s\t%s\t%s\t%s\n' "${names[$i]}" "$(cat "$lsec")" "$lst" "$lkey" "$lend" >> "$new"
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${names[$i]}" "$(cat "$lsec")" "$lst" "$lkey" "$lend" \
+      "$RUNID" "$lfull" "$MANIFEST_BLOB" "$HEAD_SHA" >> "$new"
   done
   # A guard-SKIPPED leg never enters runleg(), so it produces no .sec. Rewriting the file from this
   # run's rows alone therefore DELETED the cached duration of every skipped leg — and the runs where
@@ -3802,13 +3957,13 @@ if [ "$fails" = 0 ] && [ "$ran" -le 0 ] && [ "${ondemands:-0}" -gt 0 ] \
 fi
 
 # ---- the verdict, the full-green stamp, and the sweep --------------------------------------
-# `reuses` is the fourth full-green precondition, counted by the reuse verb above. A run that reused
-# ANY leg has not proven the whole bar this time, so it cannot stamp a full green — which is what
-# keeps the push boundary from ever resting on a verdict that was copied rather than earned.
-reuses=${reuses:-0}
-FPRINT_END=$(fingerprint)
-tree_moved=no
-[ -n "$FPRINT_START" ] && [ -n "$FPRINT_END" ] && [ "$FPRINT_START" != "$FPRINT_END" ] && tree_moved=yes
+# `reuses` feeds the fourth full-green precondition, counted by the reuse verb above. A run that
+# reused a leg in the OPT-IN mode has not proven the whole bar, so it cannot stamp a full green. A
+# `lineage` reuse is different in kind (TOOL-aFrugalTurnstile-4 S3): its verdict was EARNED by a full
+# run on a clean tree, same manifest, an ancestor of HEAD, under an equal input key, so the stamp asks
+# that every reuse was one of those. The inherited-green stamp keeps "reused nothing".
+reuses=${reuses:-0}; lineage_reuses=${lineage_reuses:-0}
+# `tree_moved` is computed ABOVE the ledger block, which reads it (TOOL-aFrugalTurnstile-14 S1).
 # THE BREACH IS READ HERE, from the marker and not from `fails`. A killed leg writes no `.rc`, so
 # whether `fails` moved at all is a RACE between the watcher's kill and the reader's report -- both
 # outcomes were reproduced. The marker is the only fact that is true on every path, so the durable
@@ -3866,8 +4021,8 @@ fi
 # An implementation that forgets ONE of them still passes every arm written for the others, which
 # is why each has its own negative control in the evidence harness.
 #
-#   failed nothing  · skipped nothing  · reused nothing  · the tree did not move  · the tree was
-#   CLEAN when the run started
+#   failed nothing  · skipped nothing  · reused nothing but lineage-qualified legs  · the tree did
+#   not move  · the tree was CLEAN when the run started
 #
 # The last one is the one a spec audit found missing. A developer's ordinary full run on a dirty
 # tree would otherwise stamp a green that the push boundary later treats as proof about a tree
@@ -3878,14 +4033,32 @@ fi
 # same state the bug corrupts is disabled by the bug it exists to catch.
 # A SEVENTH, TOOL-dDerivedDocket-26 S6: the verdict is GREEN and its file was WRITTEN. A bar that
 # refuses its own exit 0 below must not have left the stamp a later push trusts in its place.
-if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
+#
+# WHICH MANIFEST BOTH STAMPS RAN (TOOL-aFrugalTurnstile-1 S3, design D2). The blob alone cannot say
+# which file it hashed, so a nested runner inside an adopter's wrapper bar stamped a green of this
+# kit's subset that only an accidental blob mismatch kept the push boundary from trusting as the whole
+# bar. Repo-relative, the spelling the pre-push hook compares with its kit sibling: a leading `./` (a
+# root install's `dirname` answers `.`) is stripped; an absolute value is asked of git, in git's one
+# spelling, and loses the top-level prefix only where git places it inside THIS work tree; a value git
+# cannot place there stays absolute. The run header's own `manifest` key is a different record.
+LEGS_REL=${LEGS_FILE#./}
+case "$LEGS_REL" in
+  /*|?:*) _lr=$(unset GIT_DIR GIT_WORK_TREE; cd "${LEGS_REL%/*}" 2>/dev/null \
+                && [ "$(git rev-parse --show-toplevel 2>/dev/null)" = "$ROOT" ] \
+                && git rev-parse --show-prefix 2>/dev/null) && LEGS_REL=$_lr${LEGS_REL##*/} ;;
+esac
+if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = "$lineage_reuses" ] \
    && [ ! -f "$WORK/wall.breach" ] \
    && [ "$tree_moved" = no ] && [ "$TREE_CLEAN" = yes ] && [ -n "$FPRINT_START" ] \
    && [ "$gate_verdict" = GREEN ] && [ -f "$RUNDIR/verdict" ]; then
   {
     printf 'sha\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"
     printf 'fingerprint\t%s\n' "$FPRINT_START"
-    printf 'manifest_blob\t%s\n' "$(git hash-object -- "$LEGS_FILE" 2>/dev/null)"
+    printf 'manifest_blob\t%s\n' "$MANIFEST_BLOB"
+    printf 'manifest\t%s\n' "$LEGS_REL"
+    # How many legs this green carried forward rather than ran, `0` when none (S3). Evidence: no
+    # reader in `.githooks/pre-push` reads it.
+    printf 'reused\t%s\n' "$reuses"
     # WHAT THIS GREEN COVERED. Without it a record named `gate-full-green` cannot say
     # whether the kit-subject legs ran, and the push boundary would trust a partial bar as
     # a whole one. The READER of this field is TOOL-dUnstalledConvoy-27; written without
@@ -3932,6 +4105,7 @@ if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ "$ATTR_LANDABLE" = 1 ] \
     printf 'sha\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"
     printf 'fingerprint\t%s\n' "$FPRINT_START"
     printf 'manifest_blob\t%s\n' "$(git hash-object -- "$LEGS_FILE" 2>/dev/null)"
+    printf 'manifest\t%s\n' "$LEGS_REL"
     printf 'selftests\t%s\n' "${GATE_SELFTESTS:+1}"
     printf 'base\t%s\n' "$ATTR_RSHA"
     printf 'max_age\t%s\n' "$ATTR_MAX_AGE"

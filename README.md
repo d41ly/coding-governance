@@ -25,7 +25,8 @@ machines/sessions on the same repo.
   block (`last-audit` stamp · `watch` pathspecs · `verify-paths` anchors), the
   `manifest-check.sh` gate (placeholders · block parse · anchor sha · tracked anchors ·
   topological drift-vs-stamp · watch liveness; self-test `manifest-check.test.sh`), a kickoff
-  read-repair step in the engine, and a DoD write-back line in the playbook (v2.2). Spec + design
+  read-repair step in the engine, and the `kickoff-manifest ratchet` leg, whose refusals name the
+  write-back a unit owes. Spec + design
   history: `memory/builds/aRatchetForge/`.
 - **`tools/memory-tree/`** — an opt-in kit for a structured, machine-linted `memory/` tree: a FLAT
   `builds/<slug>/` per unit of work, one append-only `DECISIONS.md`, per-family backlog shards, index
@@ -36,7 +37,7 @@ machines/sessions on the same repo.
   build. Every check that has a population asserts that population is NON-EMPTY, because a
   mis-segmented path selector prints nothing and nothing is what a passing check prints. Project specifics live in one repo-root `.memory-tree.conf`; the scripts are identical
   across repos. Scaffold a fresh tree with `adopt-memory-tree.sh --scaffold`, or migrate an existing
-  one in a single landing. See `tools/memory-tree/README.md`. Operationalizes the playbook's §5/§6.
+  one in a single landing. See `tools/memory-tree/README.md`. Operationalizes the charter's `[memory]`, `[derive]` and `[records]` practices.
 - **`tools/pytest-parallel-guardrails/`** — bounded, attributable pytest-xdist runs: the four-knob
   ini recipe (`timeout` / `session_timeout` / `--max-worker-restart=0` / `faulthandler_timeout`,
   each documented by what it mechanically does), the `crashprobe.py` worker-death attribution
@@ -53,7 +54,7 @@ machines/sessions on the same repo.
 - **`tools/unattended/`** — the unattended-run kit: the binding protocol, the four-verb driver, and
   the gate leg that reads a project's `.unattended.conf` rather than restating it. A run that merges
   and pushes with no owner turn replaces the explicit-ask checkpoint with a committed standing
-  mandate, the charter's §1 Landing substitute. See `tools/unattended/README.md`.
+  mandate, the charter's `[land]` substitute. See `tools/unattended/README.md`.
 - **`tools/govkit/`** — the deployer. The installable population is a DECLARATION (a registry plus a
   descriptor per entry), asserted against the tracked surface in both directions, so a new moving
   part reds until something claims it. Runs on the deployer machine; never installed into a target.
@@ -76,7 +77,7 @@ machines/sessions on the same repo.
   site, at the helper's default parameter and at the `gov:bounded-fanout` width, and refuses a set
   `AGENT_CAP` rather than ignoring it — an environment override leaves no diff behind.
   Wire per WIRE-INTO-PROJECT §5; sanity-check with `tools/hooks/agent-cap.test.sh`.
-  Operationalizes the playbook's §8 concurrency rule; the binding text is
+  Operationalizes the charter's `[bound]` practice; the binding text is
   `memory/guides/REVIEW-PROTOCOL.md`.
 - **`tools/codebase-map/`** — an opt-in kit for a **self-verifying codebase map**: per-feature dossiers
   whose machine claims are CI-verified against live code inventories (a both-directions ratchet —
@@ -84,7 +85,7 @@ machines/sessions on the same repo.
   freshness-gated generated artifacts, and a `map_diff` git-range digest. Project specifics live in
   `.codebase-map.conf` + `tools/codebase-map/map_extractors.py`; the engine (`map_lib.py`, stdlib-only
   py≥3.11) is identical across repos. Adopt with `adopt-codebase-map.sh --scaffold`; see
-  `tools/codebase-map/README.md` + `tools/codebase-map/INVENTORY-DERIVATION.md`. Operationalizes the playbook's §5/§6
+  `tools/codebase-map/README.md` + `tools/codebase-map/INVENTORY-DERIVATION.md`. Operationalizes the charter's
   documentation-currency goals with machine enforcement.
 - **`tools/workflows/tier2-review.js`** — a ready, consolidated Tier-2 review harness (find → BATCHED
   verify → synth): five finder lenses, at most five batched verifiers, one synthesis pass — 7–11
