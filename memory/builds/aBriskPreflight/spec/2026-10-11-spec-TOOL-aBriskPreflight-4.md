@@ -1,6 +1,6 @@
 # TOOL-aBriskPreflight-4 — preflight starts its bounded probes together and collects each at its own check
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 2 · ratified 2026-10-11
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 2 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -322,9 +322,11 @@ driver. Each run is `bash <driver> --preflight tRun --keepalive-id k1` from the 
   Red when: `PREP-DONE` is absent because the verb returned while the probe ran, or `PREP-OUT`
   prints.
 - **AC6** — When fixture F5 runs new with `GATE_BOUND` at 2 and a `--prepared` that runs
-  `exec sleep 60`, its output holds `UNATTENDED check 61 FAILED` naming `bash lander.sh --prepared`,
-  the verb returns within 40 s, and `kill -0` on that row's pid fails afterwards.
+  `exec sleep 600`, its output holds `UNATTENDED check 61 FAILED` naming `bash lander.sh --prepared`,
+  the verb returns within 300 s, and `kill -0` on that row's pid fails afterwards.
   Red when: the probe outlives its bound, or outlives the verb.
+  figure: the 600 s sleeper and the 300 s hang backstop are PINNED; the verb's wall is DERIVED per run,
+  and the gap between them is the margin a loaded host's whole preflight spends.
 - **AC7** — When fixture F6 runs new with `WIRING_CHECK="bash wire.sh --session"`, where
   `wire.sh` creates `WIRE-RAN`, its output holds `WIRING_CHECK carries a flag this kit does not recognise as READ-ONLY`
   on an `UNATTENDED check 4 FAILED` line, `WIRE-RAN` does not exist, and the ledger has no
@@ -405,6 +407,10 @@ unit is terminal.
 
 - rev-1 · 2026-10-11 · initial draft, from the spec brief
   `2026-10-11-prompt-TOOL-aBriskPreflight-4-spec-brief.md`.
+- rev-2 · 2026-10-11 · AC6's sleeper 60 s -> 600 s and its wall 40 s -> 300 s. Observed in the pass on
+  node `a`: under a concurrent bar a whole fixture `--preflight` took 149 s to 516 s under both drivers,
+  so a 40 s wall reds for the host and not the bound. A 600 s sleeper keeps the arm red when the bound
+  does not fire, and 300 s is the hang backstop the sibling wiring-bound arm already uses.
 
 ## 10. Reuse audit
 
