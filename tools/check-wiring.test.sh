@@ -1013,6 +1013,22 @@ out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
   && ck "AC10 restoring the real grammar goes green again" 1 || ck "AC10 restoring the real grammar goes green again" 0
 
+# state 5f — the driver EXITS 0 having written %O over %A, so the rc test passes and only the
+# missing-id list can red. No other state reaches that list with a driver that exits 0, so this is
+# the arm that holds the one-awk count (TOOL-aBriskPreflight-1 S5). TWO families, so the list's
+# family-then-id ORDER is graded too; state 6 below needs the real driver, and reds without it.
+cp $KIT_REL/${MT_KIT}/merge-rows.py $KIT_REL/${MT_KIT}/merge-rows.py.away
+printf 'import shutil, sys\nshutil.copyfile(sys.argv[1], sys.argv[2])\n' > ${KP}${MT_KIT}/merge-rows.py
+cp .memory-tree.conf .memory-tree.conf.away
+printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL playbook:PLAY"\n' > .memory-tree.conf
+out=$(chk --check); rc=$?
+{ [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'cannot merge' \
+  && printf '%s' "$out" | grep -qF 'missing or duplicated: TOOL-002 TOOL-003 PLAY-002 PLAY-003 ('; } \
+  && ck "AC10 a driver that exits 0 and drops the new rows -> UNWIRED naming every -002 and -003, exit 1" 1 \
+  || ck "AC10 a driver that exits 0 and drops the new rows -> UNWIRED naming every -002 and -003, exit 1" 0
+mv -f .memory-tree.conf.away .memory-tree.conf
+mv -f $KIT_REL/${MT_KIT}/merge-rows.py.away $KIT_REL/${MT_KIT}/merge-rows.py
+
 # state 6 — a value somebody else set is REPORTED and never clobbered (the check_hooks rule)
 git config merge.rows.driver 'bash vendor/other-driver.sh %O %A %B %P'
 out=$(chk --check); rc=$?

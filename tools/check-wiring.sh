@@ -1011,19 +1011,20 @@ check_eol() {
   #
   # NUL-byte guard as well, because a bound stated in a glob is still a claim: a binary that lands
   # under .claude/skills/ with a .md name is skipped rather than rewritten.
-  # PER-PATH, not `xargs`: xargs word-splits on whitespace, so `.claude/skills/my skill/SKILL.md`
+  # `--stdin`, not `xargs`: xargs word-splits on whitespace, so `.claude/skills/my skill/SKILL.md`
   # reached `git check-attr` as two nonexistent paths, the population came back empty, and the arm
-  # printed a green `skip`. Reproduced — a folder name with a space is an ordinary thing to type. The
-  # population is two files; a fork each is not a cost worth a silent collapse.
+  # printed a green `skip`. Reproduced — a folder name with a space is an ordinary thing to type.
+  # `--stdin` reads ONE PATH PER LINE and never splits one, so the spaced path arrives whole, in one
+  # git for the whole population where a per-path loop paid a git and a sed per file
+  # (TOOL-aBriskPreflight-1). It also unquotes a C-quoted line, which never reaches it: `ls-files`
+  # quotes a path with unusual bytes, and the `^\.claude/` anchor below rejects a line opening `"`.
   # A SECOND NAMED GLOB, not a wider one (TOOL-aRepatriatedFork-19 S3): tracked `.claude/workflows/*.js`
   # carrying the pin. The review-harness kit pins those scripts because CR bytes made a shipped
   # harness unlaunchable, and nothing on the wiring side looked at them. It is named beside the Skill
   # glob, so the "every eol=lf path under .claude/" selector the paragraph above forbids stays unwritten.
   pop=$(git ls-files .claude/skills/ .claude/workflows/ 2>/dev/null \
-        | grep -E '^\.claude/skills/.*\.md$|^\.claude/workflows/[^/]*\.js$' | while IFS= read -r _p; do
-          [ -n "$_p" ] || continue
-          git check-attr eol -- "$_p" 2>/dev/null | sed -n 's/^\(.*\): eol: lf$/\1/p'
-        done)
+        | grep -E '^\.claude/skills/.*\.md$|^\.claude/workflows/[^/]*\.js$' \
+        | git check-attr --stdin eol 2>/dev/null | sed -n 's/^\(.*\): eol: lf$/\1/p')
   if [ -z "$pop" ]; then
     echo "skip     eol       — no tracked .claude/skills/**.md or .claude/workflows/*.js carries an eol=lf pin"
     return
@@ -1168,7 +1169,7 @@ check_merge_rows() {
   # through the keyed path. Per family, because a fixture built on one family goes green on drift in
   # any other. The ids use the FLAT era (`\d{3}`), which is in the grammar's `ERAS` unconditionally
   # and needs no node tag; the `- <id> | <text>` form is the shipped dash-anchor shape in ASCII.
-  local smoke rc_smoke=0 fams f n miss=""
+  local smoke rc_smoke=0 fams f miss=""
   # Sourced in a SUBSHELL so a project conf cannot redefine this script's own variables. Absent conf
   # -> a placeholder family: the driver then cannot resolve a grammar either, raises, and this arm
   # reports UNWIRED with a real reason rather than being special-cased into silence here.
@@ -1201,11 +1202,19 @@ check_merge_rows() {
   # rc alone is not enough: assert every row of all three inputs is in %A exactly once. A driver that
   # exits 0 without touching %A is the same silent take-ours by another route, and one that keys only
   # SOME families resolves the rest by line merge — which is the state this arm exists to name.
-  for f in $fams; do
-    for n in 001 002 003; do
-      [ "$(grep -c -- "^- $f-$n |" "$smoke/a" 2>/dev/null)" = 1 ] || miss="$miss $f-$n"
-    done
-  done
+  # ONE awk for every family and id, where a `grep -c` per family per id paid a process each
+  # (TOOL-aBriskPreflight-1). A LITERAL prefix compare, which is what "exactly once" means here; the
+  # BRE it replaced agreed for every family token the harvest below admits. %A is read by `getline`
+  # in BEGIN, so a driver that deleted it reads as zero rows — every id missing — never an awk fatal.
+  miss=$(awk 'BEGIN {
+      while ((getline l < ARGV[1]) > 0) row[++nr] = l
+      nf = split(ARGV[2], fam, " "); split("001 002 003", id, " ")
+      for (i = 1; i <= nf; i++) for (j = 1; j <= 3; j++) {
+        k = "- " fam[i] "-" id[j] " |"; c = 0
+        for (r = 1; r <= nr; r++) if (substr(row[r], 1, length(k)) == k) c++
+        if (c != 1) printf " %s-%s", fam[i], id[j]
+      }
+    }' "$smoke/a" "$fams" 2>/dev/null)
   if [ "$rc_smoke" != 0 ] || [ -n "$miss" ]; then
     echo "UNWIRED  merge     — the configured driver cannot merge: '$launcher' exited $rc_smoke on a per-family append collision, missing or duplicated:${miss:- none} ($(head -1 "$smoke/err" 2>/dev/null | tr -d '\r')). git prints CONFLICT and leaves the path holding OURS-only content with NO markers. Fix: restore the launcher beside $drv and the sibling memory-recall kit, check .memory-tree.conf FAMILIES, then re-run"
     unwired=$((unwired+1))
@@ -1221,9 +1230,17 @@ check_merge_rows() {
   # blobs returns rc 1. So the driver is BETTER than git while being completely inert on the ids it
   # exists to key, and every check above is green over it. The audit line's keyed/hashed split is
   # the only surviving signal, and this is where it is read.
-  local kd hs
-  kd=$(sed -n 's/.*written (\([0-9]*\) keyed.*/\1/p' "$smoke/err" | tail -1)
-  hs=$(sed -n 's/.*keyed, \([0-9]*\) hashed.*/\1/p' "$smoke/err" | tail -1)
+  # ONE sed carrying both expressions, where two `sed | tail -1` paid four processes
+  # (TOOL-aBriskPreflight-1): `h` holds the line, `g` hands the second expression the original, and
+  # each value is TAGGED so the loop keeps the last of each, as `tail -1` did. Capital tags, so
+  # neither reads as sed's own `h` command. The tag carries no space and the value is digits or
+  # empty, so each printed line is ONE word and a bare tag is an empty value, as `tail -1` of an
+  # empty line was. `for` over the words, not `while read` over a captured variable: the
+  # shell-hygiene leg follows that variable back to its substitution and refuses the loop.
+  local kd="" hs="" _w
+  for _w in $(sed -n 'h; s/.*written (\([0-9]*\) keyed.*/K\1/p; g; s/.*keyed, \([0-9]*\) hashed.*/H\1/p' "$smoke/err"); do
+    case $_w in K*) kd=${_w#K} ;; H*) hs=${_w#H} ;; esac
+  done
   if [ -z "$hs" ]; then
     echo "UNWIRED  merge     — the driver merged the smoke but printed no keyed/hashed audit line, so there is no way to tell whether it KEYED the rows or merely copied them; a driver whose anchor grammar is dead resolves this fixture too. Fix: the installed $drv predates the audit line — re-copy the kit, then re-run"
     unwired=$((unwired+1))
@@ -1245,10 +1262,30 @@ check_merge_rows() {
   # declared indexes are asked directly — harvest the family prefix each ROW LEADS with, and require
   # every harvested prefix to be declared. A prefix nothing declares is drift by definition; the
   # reverse (a declared family with no rows yet) is the ordinary empty-section state and is not.
+  #
+  # ONE sed per CHUNK of indexes, where a sed per index paid a process each (TOOL-aBriskPreflight-1).
+  # A chunk closes before a path would carry it past 8000 characters: a native sed.exe is started
+  # through CreateProcess, whose command line caps at 32767, and a character is at most 4 UTF-8
+  # bytes. Not `xargs`, whose limit subtracts the environment: past ~30 KB of it, xargs refuses
+  # before running anything, the harvest reads nothing, and the arm prints `ok`. The expression has
+  # no address and no hold space, so the chunks' output concatenated is the per-file output. `-e`
+  # before it, so a sed that stops at the first operand (BSD) still reads `--` as the end of options.
+  # Fed by a PIPE into one brace group, so the positional list outlives the loop for the remainder
+  # call. Not a here-document of `$declared`: it is assigned from a substitution above, and the
+  # shell-hygiene leg follows the expansion back one assignment and refuses that loop.
   local seen undeclared=""
-  seen=$(printf '%s\n' "$declared" | grep . | while IFS= read -r p; do
-           [ -f "$p" ] && sed -n 's/^[[:space:]]*[-*][[:space:]]\{1,\}[`*]*\([A-Z][A-Z0-9]\{1,\}\)-[A-Za-z0-9].*/\1/p' "$p"
-         done | LC_ALL=C sort -u)
+  seen=$(printf '%s\n' "$declared" | {
+      expr='s/^[[:space:]]*[-*][[:space:]]\{1,\}[`*]*\([A-Z][A-Z0-9]\{1,\}\)-[A-Za-z0-9].*/\1/p'
+      set --; len=0
+      while IFS= read -r p; do
+        [ -f "$p" ] || continue
+        if [ "$#" -gt 0 ] && [ $((len + ${#p} + 1)) -gt 8000 ]; then
+          sed -n -e "$expr" -- "$@"; set --; len=0
+        fi
+        set -- "$@" "$p"; len=$((len + ${#p} + 1))
+      done
+      [ "$#" = 0 ] || sed -n -e "$expr" -- "$@"
+    } | LC_ALL=C sort -u)
   for f in $seen; do
     case " $fams " in *" $f "*) ;; *) undeclared="$undeclared $f" ;; esac
   done
