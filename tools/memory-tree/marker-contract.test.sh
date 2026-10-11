@@ -42,7 +42,7 @@ cd "$ROOT" || exit 2
 # `$(cd … && pwd)` answers `/c/…` — so the strip silently does not strip and the kit path comes
 # out absolute in the wrong flavour. Measured here: every python case failed with
 # ModuleNotFoundError while the awk cases passed, so 3 of 4 readers still "agreed".
-KIT_MT="$(git -C "$(dirname "$0")" rev-parse --show-prefix)"; KIT_MT="${KIT_MT%/}"
+KIT_MT="$(unset GIT_DIR GIT_WORK_TREE; git -C "$(dirname "$0")" rev-parse --show-prefix)"; KIT_MT="${KIT_MT%/}"
 PY=""
 for c in "${GOV_PYTHON:-}" python3 python py; do
   [ -n "$c" ] || continue

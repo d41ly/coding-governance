@@ -118,11 +118,12 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [two-guards-one-question-two-answers](two-guards-one-question-two-answers.md) | class | 3 |  | two guards that ask one question different ways become jointly unsatisfiable, and the tree they wedge has no legal move left |
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
+| [verdict-printed-before-the-step-that-reverts-it](verdict-printed-before-the-step-that-reverts-it.md) | class | 2 |  | a verb prints a verdict about bytes it just wrote, and a later step of the same run can revert those bytes, so the operator reads a verdict about a tree the run did not leave |
 | [waiver-row-that-hides-nothing-reds](waiver-row-that-hides-nothing-reds.md) | class | 3 |  | a curation-debt row whose file would pass unwaived is itself a failure, and check 8's population is the backlog shards alone — so a row listed for a fault it does not earn reds instead of protecting |
 | [withheld-value-recovered-from-a-derived-one](withheld-value-recovered-from-a-derived-one.md) | class | 2 |  | a schema withholds a value by name and still publishes one derived from it, so a reader recovers the withheld value from the rendered one by arithmetic |
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-108 record(s): 105 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+109 record(s): 106 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->
