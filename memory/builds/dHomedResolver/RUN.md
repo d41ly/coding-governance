@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: fad16fd3d4fa94ac5ff54bf5c0fad67448dcde05 · park · 6 touching
 gates-run: unattended-17916787078768482032-5067 1f0fcca0
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 1fc89aa81cbc4d63fe9529aa070fe638c0759c45
@@ -58,3 +59,5 @@ base: b39dff78aae970c8428289aa781cf21f79c6fbff
 2026-10-11T06:26:07Z brief · item TOOL-dHomedResolver-8 · reason c6f3ad719622 memory/builds/dHomedResolver/prompts/2026-10-11-prompt-TOOL-dHomedResolver-8-1-build-brief.md
 
 2026-10-11T06:36:16Z dispatch · item 5c8d7625 TOOL-dHomedResolver-8 · reason .memory-tree.conf memory/LIVE.md memory/builds/dHomedResolver/README.md memory/builds/dHomedResolver/build/2026-10-11-build-TOOL-dHomedResolver-8-1-acceptance-ledger.md memory/builds/dHomedResolver/prompts/2026-10-11-prompt-TOOL-dHomedResolver-8-1-build-brief.md memory/builds/dHomedResolver/spec/2026-10-11-spec-TOOL-dHomedResolver-8.md memory/guides/SESSION-KICKOFF.md tools/memory-tree/check-memory-hygiene.test.sh tools/push-main.test.sh
+
+2026-10-11T08:42:03Z decision · item land the build with the hook bypassed, no full bar · reason decided by the owner in chat on 2026-10-11, while the third close's flagged bar was running; that bar was stopped unfinished. A full bar on main and the kit self-tests stay owed
