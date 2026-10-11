@@ -1023,7 +1023,7 @@ i23=0
 while ! grep -q 'queued at position' "$tmp/out23b" 2>/dev/null && ! grep -q '^ *2' "$S23/peaks" 2>/dev/null \
       && kill -0 "$w23" 2>/dev/null && [ "$i23" -lt 2400 ]; do sleep 0.1; i23=$((i23 + 1)); done
 : > "$S23/go"; wait "$w23" 2>/dev/null; wait "$h23" 2>/dev/null
-top23=$(cd "$R23a" && git rev-parse --show-toplevel); run23=$(hdrkey "$R23a" run_id)
+top23=$(unset GIT_DIR GIT_WORK_TREE; cd "$R23a" && git rev-parse --show-toplevel); run23=$(hdrkey "$R23a" run_id)
 [ -n "$f23_repo" ] && [ "$f23_repo" = "$top23" ] && ok "the host beacon's repo names the holder's top level" \
   || nope "the host beacon's repo read '$f23_repo', not the holder's top level '$top23'"
 [ -n "$f23_run" ] && [ "$f23_run" = "$run23" ] && ok "the host beacon's run is the holder's run id" \

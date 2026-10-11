@@ -14,10 +14,10 @@ set -u
 
 KIT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ADOPT="$KIT_DIR/adopt-process-monitor.sh"
-ROOT="$(cd "$KIT_DIR" && git rev-parse --show-toplevel)"
+ROOT="$(unset GIT_DIR GIT_WORK_TREE; cd "$KIT_DIR" && git rev-parse --show-toplevel)"
 # The kit's own prefix, DERIVED — a scratch adopter tree is built at it, and spelling it out
 # is exactly the literal the install-prefix ban refuses.
-KIT_REL="$(cd "$KIT_DIR" && git rev-parse --show-prefix)"; KIT_REL="${KIT_REL%/}"
+KIT_REL="$(unset GIT_DIR GIT_WORK_TREE; cd "$KIT_DIR" && git rev-parse --show-prefix)"; KIT_REL="${KIT_REL%/}"
 # PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).

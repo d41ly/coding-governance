@@ -180,6 +180,10 @@ memory/builds/aQuotedBrief/README.md
 memory/builds/aDistilledCharter/README.md
 memory/builds/aRoutedQuill/README.md
 memory/builds/dLadderedRemote/README.md
+memory/builds/dHomedResolver/README.md
 memory/builds/aBenchedProbe/README.md
+memory/builds/aSparedHolder/README.md
+memory/builds/aSignalledHook/README.md
 memory/builds/aFrugalTurnstile/README.md
 memory/builds/aPairedSlots/README.md
+memory/builds/dRemeasuredRender/README.md

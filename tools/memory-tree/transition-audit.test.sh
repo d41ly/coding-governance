@@ -33,7 +33,7 @@ ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 # ASK GIT for the repo-relative prefix; never subtract one path string from another. Under MSYS one
 # directory has two spellings and the strip silently does not strip.
-KIT_MT="$(git -C "$(dirname "$0")" rev-parse --show-prefix)"; KIT_MT="${KIT_MT%/}"
+KIT_MT="$(unset GIT_DIR GIT_WORK_TREE; git -C "$(dirname "$0")" rev-parse --show-prefix)"; KIT_MT="${KIT_MT%/}"
 [ -n "$KIT_MT" ] || { echo "FAIL cannot derive this kit's own directory"; exit 2; }
 TOOL_ROOT="$(dirname "$KIT_MT")"
 KIT_MR="$TOOL_ROOT/memory-recall"

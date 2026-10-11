@@ -19,7 +19,7 @@ every §7 leg, the pre-push self-test with those arms among them.
 - AC1 — `gate-bar-green.scoped` — after a FULL then a scoped wrapper-bar push, `gate-bar-green` held `kind full` at the first push's sha and `gate-bar-green.scoped` held `kind scoped` with that sha as its base.
 - AC2 — `gate-bar-green.scoped.shared` — the scoped push from a linked worktree left the common dir's copy byte-identical to the worktree's scoped record, by `cmp`.
 - AC3 — `scoped gate` — the third push from the same git dir read `scoped gate`, adopting the scoped record counted from its full base, where HEAD read `FULL gate`.
-- AC4 — `gate-bar-green.scoped` — a planted scoped record only in the scoped slot covered the push of its tree, the marker staying at 0 with `no bar runs`.
-- AC5 — `scoped bar green` — the line read `scoped bar green` at M `counted from its base` F and the bar ran with `GATE_BASE` M, where HEAD scoped from F.
+- AC4 — `gate-bar-green.scoped` — a planted `kind scoped` record only in the scoped slot covered the push of its tree, the marker staying at 0 with `no bar runs`.
+- AC5 — `scoped bar green` — with a `kind scoped` record at M, the line read `scoped bar green` at M `counted from its base` F and the bar ran with `GATE_BASE` M, where HEAD scoped from F.
 - AC6 — `gate-full-green` — with a runner stamp and a full bar record at one sha the line read `full green` from `this git dir's gate-full-green`; the `-le` break named `gate-bar-green`.
 - AC7 — `NEAREST ADOPTABLE GREEN WINS` — `grep -c` over the working hook printed `1`, and `0` over HEAD's.
