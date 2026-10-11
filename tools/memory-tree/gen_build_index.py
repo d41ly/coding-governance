@@ -3879,8 +3879,8 @@ def test_staged_render(arm) -> None:
         arm("TOOL-aTrimmedHook-1 AC4 — a staged conf edit renders", "True",
             lambda: str(write_staged(".memory-tree.conf", "\n")[0]))
         arm("TOOL-aTrimmedHook-1 AC4 — a file under the kit's own directory is structural", "True False",
-            lambda: "%s %s" % (check_index_input("tools/memory-tree/backlog.py", "memory", "tools/memory-tree"),
-                               check_index_input("tools/memory-treeX/x.py", "memory", "tools/memory-tree")))
+            lambda: "%s %s" % (check_index_input("pfx/kit/backlog.py", "memory", "pfx/kit"),
+                               check_index_input("pfx/kitX/x.py", "memory", "pfx/kit")))
         run("git", "reset", "-q", "--hard", cwd=t)
         fam = {pair.split(":")[1] for pair in conf["FAMILIES"].split() if ":" in pair}
         tracked = [p for p in run("git", "ls-files", "--", "memory/", cwd=t).split("\n") if p]

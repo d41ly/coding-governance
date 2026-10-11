@@ -1467,6 +1467,75 @@ grep -qF 'HYGIENE check 7' <<<"$outs7" \
   || { echo "FAIL --staged missed check 7 on the staged index file"; st=1; }
 git reset -q && git checkout -q -- memory/backlog/ARCH.md
 
+# ---- TOOL-aTrimmedHook-2: the NARROWED staged leg. Each pair stages one thing and asserts both halves:
+# ---- what the commit can break still reds, and what the narrowing skips announces itself instead of
+# ---- reading as a pass. This tree carries committed findings on purpose, which is what makes the
+# ---- negative halves able to fail: the whole-tree scans the narrowing removed would report them.
+# AC2 — an edit to an existing file stages no new NAME: the name checks say so and report nothing.
+n=$((n+1))
+git reset -q
+printf 'x\n' >> "$D/spec/2026-08-01-spec-tFixture-4.md"
+git add "$D/spec/2026-08-01-spec-tFixture-4.md"
+outnr=$(bash "$SCRIPT" --staged 2>/dev/null)
+grep -qF 'checks 1, 3, 4 and 5 grade path names, and this commit stages no new name' <<<"$outnr" \
+  || { echo "FAIL --staged did not announce that the name checks had no new name to grade"; st=1; }
+n=$((n+1))
+grep -qE 'HYGIENE check (1|3|4|5) FAILED' <<<"$outnr" \
+  && { echo "FAIL --staged graded a committed name the commit did not stage"; st=1; }
+# AC5 — check 10 is HELD when no archive and no live index is staged, though this tree carries an
+# unreferenced archive the full run reds.
+n=$((n+1))
+grep -qF 'check 10 HELD under --staged' <<<"$outnr" \
+  || { echo "FAIL --staged did not announce check 10 held"; st=1; }
+n=$((n+1))
+grep -qF 'memory/archive/DECISIONS.2026-08-01.md' <<<"$outnr" \
+  && { echo "FAIL --staged graded an archive the commit did not stage"; st=1; }
+# AC6 — the stale-line guard is HELD when neither list is staged, even with a dead entry on disk.
+git reset -q && git checkout -q -- "$D/spec/2026-08-01-spec-tFixture-4.md"
+cp memory/project/legacy-files.txt "$TMP/legacy.keep"
+printf '# legacy\nmemory/project/gone-forever.md\n' > memory/project/legacy-files.txt
+printf 'y\n' >> "$D/spec/2026-08-01-spec-tFixture-4.md"
+git add "$D/spec/2026-08-01-spec-tFixture-4.md"
+outnl=$(bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF 'legacy/debt stale-line guard is HELD under --staged' <<<"$outnl" \
+  || { echo "FAIL --staged did not announce the stale-line guard held"; st=1; }
+n=$((n+1))
+grep -qF 'gone-forever.md' <<<"$outnl" \
+  && { echo "FAIL --staged ran the stale-line guard with neither list staged"; st=1; }
+# ...and staged, the list IS graded.
+git add memory/project/legacy-files.txt
+outnl2=$(bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF 'legacy-files.txt lists paths that no longer exist (stale-line guard)' <<<"$outnl2" \
+  || { echo "FAIL --staged skipped the stale-line guard on a STAGED list naming a dead path"; st=1; }
+git reset -q && git checkout -q -- "$D/spec/2026-08-01-spec-tFixture-4.md"
+cp "$TMP/legacy.keep" memory/project/legacy-files.txt
+# AC2 — a NEW recording file with a malformed name is graded and reported.
+printf '# x\n' > "$D/spec/badly-named.md"
+git add "$D/spec/badly-named.md"
+outnn=$(bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -A3 -F 'HYGIENE check 5 FAILED' <<<"$outnn" | grep -qF "$D/spec/badly-named.md" \
+  || { echo "FAIL --staged missed check 5 on a NEW badly named recording file"; st=1; }
+git rm -q --cached "$D/spec/badly-named.md" && rm -f "$D/spec/badly-named.md"
+# AC3 — a staged file's broken relative link still reds check 2.
+printf '\n[gone](no-such-file.md)\n' >> "$D/spec/2026-08-01-spec-tFixture-4.md"
+git add "$D/spec/2026-08-01-spec-tFixture-4.md"
+outnk=$(bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF 'no-such-file.md' <<<"$outnk" \
+  || { echo "FAIL --staged missed check 2 on a staged broken link"; st=1; }
+git reset -q && git checkout -q -- "$D/spec/2026-08-01-spec-tFixture-4.md"
+# AC5 — a staged archive runs check 10 over the WHOLE listing, and the unreferenced one reds.
+printf 'z\n' >> memory/archive/DECISIONS.2026-08-01.md
+git add memory/archive/DECISIONS.2026-08-01.md
+outna=$(bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF 'memory/archive/DECISIONS.2026-08-01.md (not referenced' <<<"$outna" \
+  || { echo "FAIL --staged did not run check 10 on a STAGED archive its live index does not reference"; st=1; }
+git reset -q && git checkout -q -- memory/archive/DECISIONS.2026-08-01.md
+
 # ---- SOURCE-level assertions. These three hazards cannot be reached by any fixture on this
 # ---- platform, so they are asserted against the engine's text instead.
 #
@@ -3819,7 +3888,9 @@ esac
 # never skipped, because that fixture needs no sibling kit.
 # RAISED 542 -> 552 by TOOL-aRoutedQuill-1: its ten Tier-1 micro-spec arms, each top-level and
 # never skipped, because that fixture needs no sibling kit.
-FLOOR_ASSERTIONS=552
+# RAISED 552 -> 562 by TOOL-aTrimmedHook-2: its ten narrowed-staged-leg arms, each top-level and
+# never skipped, observed through a slice of the fixture prologue and the new block.
+FLOOR_ASSERTIONS=562
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

@@ -1,12 +1,14 @@
 # TOOL-aTrimmedHook-2 — the staged hygiene leg spends no process on a check its staged set cannot reach
 
-**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aTrimmedHook-2-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aTrimmedHook-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aTrimmedHook-1-brief.md](../prompts/2026-10-11-prompt-TOOL-aTrimmedHook-1-brief.md) | research | TOOL-aTrimmedHook-1 TOOL-aTrimmedHook-3 KICK-aTrimmedHook-1 |
+| [2026-10-11-prompt-TOOL-aTrimmedHook-2-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aTrimmedHook-2-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
