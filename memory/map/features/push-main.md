@@ -66,6 +66,8 @@ the hook pins and clears its own run id, and reads that run's `verdict` file.
   reports it after the fact and cannot unpush it.
 - A lander paired with a hook older than the allow record reports every landing as UNGATED. Under a
   relative `core.hooksPath` the two come from one tree.
+- `--land` names `HEAD` to the check, not the prepared merge: under in-place the close commits on top
+  of it, and that is the commit pushed (TOOL-aPrimedIndex-10).
 - The branch bar (`GOV_BRANCH_GATE_CMD`) still runs in the foreground, so a signal during it is
   handled when it returns.
 

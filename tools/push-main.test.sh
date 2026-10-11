@@ -766,13 +766,19 @@ else
 fi
 
 # ---- THE POST-MERGE BAR AFTER A LANDING — TOOL-aFrugalTurnstile-8 ---------------------------------
-# A sixth fixture with NO pre-push hook wired, so a landing costs seconds: a stub post-merge script in
+# A sixth fixture behind a stub pre-push hook that allows, so a landing costs seconds: a stub post-merge script in
 # a run-gates dir beside the fixture lander sleeps 8 s, then writes its argv to $MARK. Each case
 # commits its own gate-env declaration and lands; the markers are read once, after one wait. Observed
 # RED against the lander at bef97330 (no marker, no line in any case) and GREEN against the change.
 git init -q --bare "$tmp/remote6.git"
 setup_repo "$tmp/work6" origin "$tmp/remote6.git"
-git config --unset core.hooksPath
+# An ALLOWING stub hook, not none: the lander requires the hook's allow record (TOOL-aSignalledHook-1),
+# so a hookless push reads landed UNGATED and exits 4 (TOOL-aPrimedIndex-10).
+mkdir -p "$tmp/allow-hook"
+printf '#!/usr/bin/env bash\nwhile read -r _ sha _ _; do printf "%%s\\tstub\\n" "$sha" > "$(git rev-parse --git-dir)/pre-push-allow"; done\nexit 0\n' \
+  > "$tmp/allow-hook/pre-push"
+chmod +x "$tmp/allow-hook/pre-push"
+git config core.hooksPath "$tmp/allow-hook"
 pmk="./${KIT_REL}run-gates"   # the stub kit dir beside the fixture lander; spelled bare for the install-prefix ban
 mkdir -p "$pmk"
 printf '#!/usr/bin/env bash\nsleep 8\necho "$*" > "$MARK"\n' > "$pmk/post-merge.sh"
@@ -797,6 +803,7 @@ run_pm_case p6 ''; o6=$pm_out                       # R declares local, the land
 GATE_POST_MERGE=local run_pm_case p6e ''; o6e=$pm_out  # the environment says local, the tip says nothing
 git rm -q "$pmk/post-merge.sh"
 run_pm_case p7 $'GATE_POST_MERGE=local\n'; o7=$pm_out; r7=$pm_rc; h7=$pm_sha
+t7=$(git ls-remote "$tmp/remote6.git" refs/heads/main | cut -f1)   # now: pm8 lands on this remote before the reads
 git checkout -q HEAD~1 -- "$pmk/post-merge.sh"
 git add -A; git commit -q -m "stub back"; git push -q --no-verify origin main
 git worktree add -q "$tmp/wt6" -b feat6 main
@@ -832,7 +839,7 @@ case "$o5" in *"is 'yes', outside 'local ci'"*) l5=1 ;; *) l5=0 ;; esac
   || bad "pm6 markers='$(read_pm_mark p6)' '$(read_pm_mark p6e)' $o6 $o6e"
 # AC7 — no kit: a line, exit 0, the landing stands
 [ "$r7" = 0 ] && case "$o7" in *"no run-gates kit holding post-merge.sh"*) true ;; *) false ;; esac \
-  && [ "$(git ls-remote "$tmp/remote6.git" refs/heads/main | cut -f1)" = "$h7" ] \
+  && [ "$t7" = "$h7" ] \
   && ok "pm7 a missing post-merge script is one line and exit 0; the landing stands" || bad "pm7 rc=$r7 $o7"
 # AC8 — the in-place path starts it too, on the prepared merge
 [ "$(read_pm_mark p8)" = "$h8 --remote origin" ] && grep -q "^sha	$h8$" "$gcd6/gate-post-merge.start" \
@@ -870,18 +877,15 @@ if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ] && [ -n "$_mt_rc" ]; then
   out26=$(
     cd "$tmp/work26" || exit 1
     git config user.email t@e; git config user.name t; git config core.autocrlf false
+    git config core.hooksPath "$tmp/allow-hook"   # a clone wires no hook; the lander wants its allow record
     git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
     git push -q -f --no-verify origin main
     git -C "$tmp/remote26.git" symbolic-ref HEAD refs/heads/main
     R6=$(git rev-parse HEAD)
     write_unit_spec TOOL-tFix-26 || exit 1
     printf '# a comment line, push-main.test case 26\n' >> "${KIT_REL}$_mt_rl/extract.py"
-    # The unit needs a SPEC: the lander's mint names only an id a spec at HEAD defines
-    # (TOOL-aRoutedQuill-12 S2), so an unspecced id named no unit and this arm red at b726385f
-    # (TOOL-dHomedResolver-8).
-    mkdir -p memory/builds/tFix/spec
-    printf '# TOOL-tFix-26 — the unit push-main.test case 26 lands\n' \
-      > memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-26.md
+    # The unit's SPEC is write_unit_spec's, above (TOOL-dHomedResolver-8 found the same need): a new
+    # README-less build folder for it would make the lander's index regeneration refuse the landing.
     git add -A
     git commit -q --no-verify -m "TOOL-tFix-26: move runlog"
     unset GATE_PUSH_BASE; bash "$lander" >/dev/null 2>&1 || echo "rc=$?"
@@ -933,6 +937,7 @@ build_regen_fixture() { # remote dir · work dir -> a clone at SRC's HEAD on mai
   git clone -q "$1" "$2"
   cd "$2" || return 1
   git config user.email t@e; git config user.name t; git config core.autocrlf false
+  git config core.hooksPath "$tmp/allow-hook"   # a clone wires no hook; the lander wants its allow record
   git checkout -q -B main "$(git -C "$SRC" rev-parse HEAD)"
   git push -q -f --no-verify origin main
   git -C "$1" symbolic-ref HEAD refs/heads/main

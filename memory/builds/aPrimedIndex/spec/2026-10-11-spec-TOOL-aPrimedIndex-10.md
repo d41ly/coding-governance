@@ -1,6 +1,6 @@
 # TOOL-aPrimedIndex-10 — the in-place landing checks the allow record against what it pushed
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-1 · base c7604c36 · streams tooling · order 6
+**Status:** CLOSED · rev-2 · 2026-10-11 · node a · Tier-1 · base c7604c36 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -25,12 +25,19 @@ and 29 read exit 4 on a push that landed.
 - **S1** — `cmd_land` captures the sha it pushes, `HEAD`, before the push and passes it to
   `check_push_allow`. Observed by AC1.
 - **S2** — The `work6` fixture installs a stub pre-push hook that writes the allow record for the
-  pushed sha, instead of unsetting the hooks path. Observed by AC2.
+  pushed sha, instead of unsetting the hooks path, and the clones arms 26 and 28 to 32 land from
+  wire the same hook. Observed by AC2.
+- **S3** — pm7 reads the remote's tip right after its own landing, before pm8 lands on the same
+  remote. Observed by AC2.
+- **S4** — Arm 26 keeps one unit spec, `write_unit_spec`'s; the reconcile also carried main's copy into
+  a new README-less build folder, which the lander's index regeneration refuses. Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
 - `check_push_allow` and the hook's allow write are unchanged.
 - The attended path already reads the sha it pushes and is unchanged.
+- pm1's under-8-second capture is not changed: a landing takes 46 to 98 s on node `a`, origin/main
+  included, so it stays red there for the host and is named at the wrap-up.
 
 ### Edges
 
@@ -66,7 +73,8 @@ the file the lander clears and reads, as the real hook does at its success exit.
 - **AC1** — When arm 16 lands a prepared merge with a commit on top of it, `--land` exits 0.
   Red when: it exits 4 naming the prepared sha, as it does at c7604c36.
 - **AC2** — When the post-merge fixture lands behind its stub hook, pm1 to pm8, 26 and 29 read
-  exit 0 and no `landed UNGATED` line. Red when: any reads exit 4, as they do at c7604c36.
+  exit 0 and no `landed UNGATED` line, and pm7 compares its own landed tip. Red when: any reads
+  exit 4, as they do at c7604c36, or pm7 reads pm8's tip.
 
 ## 7. Gates
 
@@ -81,6 +89,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft, adopted from the lander suite's attribution after the reconcile.
+- rev-2 · 2026-10-11 · S2 widened to the clones of arms 26 and 28 to 32, and S3 added for pm7's read
+  order, both found by the first run over S1; pm1's host-bound timing named as a non-goal. S4 added
+  for arm 26's duplicate spec, found by reproducing the arm with its output kept.
 
 ## 10. Reuse audit
 

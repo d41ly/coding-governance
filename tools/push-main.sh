@@ -946,7 +946,7 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
 
 # `--land`: push the prepared merge, and only it, as the default branch.
 cmd_land() {
-  local attempt R t rc cls
+  local attempt R t rc cls pushed
   attempt=1
   while [ "$attempt" -le "$max" ]; do
     R=$(resolve_tip) || exit 3
@@ -968,10 +968,13 @@ cmd_land() {
     echo "push-main: gating + pushing ${t:0:8} to $def (attempt $attempt/$max)..." >&2
     # HEAD, never refs/heads/<def>: the local default branch is shared by every build on this node,
     # and publishing it is the defect these flags close. Its output is SHOWN and never read (S2).
+    # THE SHA PUSHED, NOT THE PREPARED ONE (TOOL-aPrimedIndex-10): under in-place the close commits its
+    # records on the prepared merge, so HEAD is what the hook vets and names in its allow record.
+    pushed=$(git rev-parse --verify HEAD)
     git push "$remote" "HEAD:refs/heads/$def" >&2
     rc=$?
     if [ "$rc" -eq 0 ]; then
-      check_push_allow "$t" "$R" || exit 4
+      check_push_allow "$pushed" "$R" || exit 4
       write_lander_marker || exit 1
       run_post_merge
       cls=landed
