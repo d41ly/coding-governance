@@ -52,6 +52,14 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
+# THE DRIVER'S START STAMP, in microseconds, read by `print_preflight_breach` (TOOL-aBriskPreflight-7
+# S3). Taken HERE, the first statement, so the wall it measures includes the library, the conf and
+# the `timeout` liveness spawn, which an external clock around the verb counts too. Fork-free, in
+# `write_runlog_start`'s spelling, and readonly so the conf sourced below cannot move it. `SECONDS`
+# is not used: bash imports it from the environment, so an inherited value would shift the figure.
+if [ -n "${EPOCHREALTIME:-}" ]; then DRIVER_T0_US=${EPOCHREALTIME//[!0-9]/}
+else printf -v DRIVER_T0_US '%(%s)T' -1; DRIVER_T0_US="${DRIVER_T0_US}000000"; fi
+readonly DRIVER_T0_US
 KIT_UNATTENDED_VERSION=1.97   # gov:kit unattended@1.97 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
@@ -639,6 +647,23 @@ esac
 read_bound_key RESUME_SCHEDULE_DELAY "$RESUME_SCHEDULE_DELAY_DEFAULT" seconds "a probe hold fires its restart at the kit default of ${RESUME_SCHEDULE_DELAY_DEFAULT}s after it was taken"
 read_bound_key RESUME_SCHEDULE_LIMIT "$RESUME_SCHEDULE_LIMIT_DEFAULT" holds "a run that cannot move stops owing restarts after the kit default of $RESUME_SCHEDULE_LIMIT_DEFAULT consecutive holds"
 read_bound_key GATE_BOUND "$GATE_BOUND_DEFAULT" seconds "a declared command is bounded at the kit default of ${GATE_BOUND_DEFAULT}s"
+# TOOL-aBriskPreflight-7 - THE TWO WALL-CLOCK CEILINGS, and the per-spawn cost both were derived to
+# tolerate. FILE CONSTANTS on REMOTE_BOUND's argument: a ceiling raisable from the environment leaves
+# no diff behind, and a conf key owes a protocol key-table row. Assigned AFTER the conf is sourced, so
+# a conf naming any of the three is overwritten. WIRING_CEILING kills the wiring child at the smaller
+# of it and GATE_BOUND and check 4 refuses naming it; PREFLIGHT_CEILING kills nothing, and a
+# --preflight over it prints a named breach line. Every input is DERIVED from after-arm rows by the
+# formula in this unit's spec — the measured wall plus every counted spawn and fork re-priced at the
+# worst per-process cost on record — except CEILING_SPAWN_MS's 2.5 s and the 0.91 s per-fork floor,
+# which are PINNED readings of node a, 2026-10-11. The rows and the instrument that prints these three
+# lines sit in this unit's build record; a changed value is a re-derivation there, never a retype here.
+WIRING_CEILING="570"
+PREFLIGHT_CEILING="3060"
+CEILING_SPAWN_MS="2500"
+# ...and SAID inert where the bound is, beside the NOTE above that names GATE_BOUND: that one prints
+# before this constant exists, and an inert ceiling that reads as a live one is a skip that looks
+# like a pass.
+[ "$GATE_BOUND_LIVE" = 1 ] || echo "unattended: NOTE - this node has no working 'timeout -k', so the ${WIRING_CEILING}s wall-clock ceiling on WIRING_CHECK is INERT too; a wiring check past it is not killed this session" >&2
 # TOOL-dDerivedDocket-27 S1 - THE UNATTENDED BAR'S WALL, the one number owner ruling D12-i7 lets a
 # project declare for it: a call, never a new `case`, and an EMPTY default, so a malformed value
 # refuses here and a blank one stays blank with the reader's NOTE. UNEXPORTED on the next line, so
@@ -2849,6 +2874,62 @@ check_wiring_runnable() { # -> 0 when the declared WIRING_CHECK may run; 1 with 
   return 0
 }
 
+# ---- THE WIRING CHILD'S BOUND, ONE ANSWER FOR TWO READERS (TOOL-aBriskPreflight-7 S2). The bound is
+# read where the child STARTS -- init_preflight_probes, or check_wiring's synchronous form -- and the
+# kill is read in check_wiring, so the comparison is spelled once here rather than twice. The smaller
+# of WIRING_CEILING and GATE_BOUND; an EQUAL pair is GATE_BOUND's, so its refusal keeps its bytes. A
+# GATE_BOUND of 0, which the conf reader refuses and only a hermetic test sets, is no bound at all,
+# so the ceiling alone applies. Fork-free: it runs on every preflight.
+WIRING_BOUND=0; WIRING_BOUND_BY=""
+derive_wiring_bound() { # -> WIRING_BOUND the effective bound in seconds, WIRING_BOUND_BY `ceiling` or `gate`
+  local _g=${GATE_BOUND:-0} _c=${WIRING_CEILING:-0}
+  if [ "$_c" -gt 0 ] && { [ "$_g" -le 0 ] || [ "$_c" -lt "$_g" ]; }; then
+    WIRING_BOUND=$_c; WIRING_BOUND_BY=ceiling
+  else
+    WIRING_BOUND=$_g; WIRING_BOUND_BY=gate
+  fi
+}
+
+# ---- ONE SPAWN'S COST, MEASURED AT A BREACH (TOOL-aBriskPreflight-7 S4). A wall-clock verdict on
+# this fleet must say whether it read load or regression (TOOL-aGradedMandate-12), so both breach
+# lines print this beside CEILING_SPAWN_MS. Five spawns of the external `true`, resolved on PATH
+# OUTSIDE the timed window -- the shape of the build's host-state instrument, so the figure compares
+# with its `spawn5` over five. Called on the two breach paths only and cached for the process, so a
+# run that does not breach pays nothing.
+SPAWN_COST=""
+measure_spawn_cost() { # -> SPAWN_COST: whole milliseconds per spawn, or an unmeasured phrase naming why
+  [ -z "$SPAWN_COST" ] || return 0
+  local _t _a _b _i
+  if [ -z "${EPOCHREALTIME:-}" ]; then SPAWN_COST="an unmeasured amount (this bash has no EPOCHREALTIME)"; return 0; fi
+  _t=$(type -P true 2>/dev/null)
+  if [ -z "$_t" ]; then SPAWN_COST="an unmeasured amount (no external true on PATH)"; return 0; fi
+  _a=${EPOCHREALTIME//[!0-9]/}
+  for _i in 1 2 3 4 5; do "$_t"; done
+  _b=${EPOCHREALTIME//[!0-9]/}
+  SPAWN_COST="$(( (10#$_b - 10#$_a) / 5000 ))ms"
+}
+
+# ---- PREFLIGHT'S OWN WALL AGAINST ITS CEILING (TOOL-aBriskPreflight-7 S3). Called after
+# verb_preflight on EVERY return path, refusals included, and it judges COST ONLY: it never calls
+# `fail`, never sets `status`, adds nothing to the run log's checks and writes no file -- the owner's
+# ruling "Name it, refuse only wiring", because a refused preflight costs a whole re-run. The clock is
+# read in DRIVER_T0_US's own spelling, so the stamp and the compare cannot disagree about units. Under
+# the ceiling it prints nothing: the run log's END line already carries every preflight's duration.
+print_preflight_breach() { # -> the breach line on stdout when the wall passed PREFLIGHT_CEILING; nothing under it
+  local _now _us _w
+  case "${DRIVER_T0_US:-}" in
+    ""|*[!0-9]*) printf '%s\n' "unattended: preflight ceiling not compared — the driver's start stamp is not a whole number, so this run's wall is unknown rather than within its ${PREFLIGHT_CEILING}s ceiling"
+                 return 0 ;;
+  esac
+  if [ -n "${EPOCHREALTIME:-}" ]; then _now=${EPOCHREALTIME//[!0-9]/}
+  else printf -v _now '%(%s)T' -1; _now="${_now}000000"; fi
+  _us=$(( 10#$_now - 10#$DRIVER_T0_US ))
+  [ "$_us" -gt $(( PREFLIGHT_CEILING * 1000000 )) ] || return 0
+  measure_spawn_cost
+  _w="$(( _us / 1000000 )).$(( _us % 1000000 / 100000 ))"
+  printf '%s\n' "unattended: preflight over its ceiling — it took ${_w}s against its own ${PREFLIGHT_CEILING}s wall-clock ceiling. One spawn cost ${SPAWN_COST} here against the ${CEILING_SPAWN_MS}ms the ceiling allows, so a figure far above that is this host's load and one near it is preflight's own cost. This line judges cost only: the exit status and the run-state file are what the checks above decided."
+}
+
 check_wiring() {
   if ! check_wiring_runnable; then
     [ -n "$WIRING_CHECK" ] || { fail 4 "WIRING_CHECK is not declared in .unattended.conf — an undeclared wiring probe is not a passing one"; return 1; }
@@ -2860,13 +2941,22 @@ check_wiring() {
   # BOUNDED, same helper. TOOL-aBoundedCeiling-6 and TOOL-aPromptedMandate-9: nothing in the
   # precondition chain had a timeout, and this seam was measured at 1m22s under load. Under
   # --preflight the child was STARTED by init_preflight_probes and is only read here; everywhere
-  # else, and when that start could not make its capture, it runs here as it always did.
+  # else, and when that start could not make its capture, it runs here as it always did. Either
+  # start ran under the bound `derive_wiring_bound` names, asked again here for the refusal's choice.
+  derive_wiring_bound
   # shellcheck disable=SC2086
-  if [ -n "$_wh" ]; then read_bounded "$_wh"; else run_bounded $WIRING_CHECK; fi && return 0
+  if [ -n "$_wh" ]; then read_bounded "$_wh"; else RB_BOUND=$WIRING_BOUND; run_bounded $WIRING_CHECK; fi
   local _wrc=$?
+  RB_BOUND=""
+  [ "$_wrc" = 0 ] && return 0
   wout=$RB_OUT
-  if { [ "$_wrc" = 124 ] || [ "$_wrc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
-    fail 4 "the declared wiring check did not answer within the declared ${GATE_BOUND}s bound and was killed after ${RB_TOOK}s, so preflight cannot tell a dormant hook from a slow one: $WIRING_CHECK"
+  if { [ "$_wrc" = 124 ] || [ "$_wrc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ] && [ "${WIRING_BOUND:-0}" -gt 0 ]; then
+    if [ "$WIRING_BOUND_BY" = ceiling ]; then
+      measure_spawn_cost
+      fail 4 "the declared wiring check ran past its own ${WIRING_CEILING}s wall-clock ceiling and was killed after ${RB_TOOK}s, so preflight refuses its cost rather than waiting it out; the ${GATE_BOUND}s GATE_BOUND is no longer this check's only kill. One spawn cost ${SPAWN_COST} at the kill against the ${CEILING_SPAWN_MS}ms the ceiling allows, so a figure far above that is this host's load and one near it is the check's own cost: $WIRING_CHECK"
+    else
+      fail 4 "the declared wiring check did not answer within the declared ${GATE_BOUND}s bound and was killed after ${RB_TOOK}s, so preflight cannot tell a dormant hook from a slow one: $WIRING_CHECK"
+    fi
     # WHATEVER IT MANAGED TO SAY BEFORE IT WAS KILLED, indented under the refusal. This branch
     # returns before the shared printer below, whose comment promises the declared check's output is
     # never discarded -- true of the ordinary-failure path and, until this line, false of this one.
@@ -2947,8 +3037,11 @@ PF_PROBE_WIRING=""; PF_PROBE_CARRY=""; PF_PROBE_PREPARED=""; PF_PROBE_PROFILE=""
 init_preflight_probes() { # slug -> each declared probe started, its handle in its own PF_PROBE_ variable
   PF_PROBE_WIRING=""; PF_PROBE_CARRY=""; PF_PROBE_PREPARED=""; PF_PROBE_PROFILE=""
   # The guard is asked BEFORE the start, so a repairing flag never runs (memory/gotchas/destructive-step-before-its-precondition.md).
+  derive_wiring_bound
+  RB_BOUND=$WIRING_BOUND
   # shellcheck disable=SC2086
   if check_wiring_runnable && init_bounded $WIRING_CHECK; then PF_PROBE_WIRING=$RB_HANDLE; fi
+  RB_BOUND=""
   if [ "$LANDER_MODE" = in-place ]; then
     # shellcheck disable=SC2086
     init_bounded $LANDER --carry --slug "$1" && PF_PROBE_CARRY=$RB_HANDLE
@@ -14130,7 +14223,7 @@ case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)
 [ -n "$VERB" ] || { usage; RUNLOG_CLEAN=1; exit 2; }
 
 case "$VERB" in
-  --preflight) verb_preflight "$SLUG" "$KID" ;;
+  --preflight) verb_preflight "$SLUG" "$KID"; print_preflight_breach ;;
   --status)    verb_status "$SLUG" ;;
   --audit)     print_audit "$SLUG" ;;
   --register-task) write_task_register "$SLUG" "$TK_NAME" "$TK_BEAT" ;;

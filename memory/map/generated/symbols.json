@@ -6743,6 +6743,11 @@
       "file": "tools/unattended/resume-tick.test.sh"
     },
     {
+      "id": "derive_wiring_bound",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "derive_worktree_root",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -9088,6 +9093,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "measure_spawn_cost",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "measure_timeline_events",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -10316,6 +10326,11 @@
       "id": "print_populations",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "print_preflight_breach",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "print_probe_populations",

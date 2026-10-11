@@ -8644,6 +8644,10 @@ fixture
 # ---- mechanism was never wrong: the breach message fired on every one of those runs.
 _t0=$(date +%s); out=$(run --preflight tRun --keepalive-id k1); _t1=$(date +%s)
 hit "$out" "the declared wiring check did not answer within the declared"
+# ...and a GATE_BOUND BELOW the wiring ceiling keeps its own refusal byte for byte: the bound is the
+# smaller of the two, so the ceiling never stands in for it (TOOL-aBriskPreflight-7 AC3).
+hit "$out" "the declared wiring check did not answer within the declared 2s bound"
+miss "$out" "wall-clock ceiling"
 # The DRIVER's number, extracted from its own message. `killed after <n>s` is what the bound saw.
 n=$((n+1))
 _rbt=$(printf '%s' "$out" | sed -n 's/.*killed after \([0-9][0-9]*\)s.*/\1/p' | head -1)
@@ -8677,6 +8681,108 @@ reset_tree
 fi   # ---- end the run_bounded host gate: the VERB arm needs it too, because with the bound INERT
      # ---- the wiring sleeper runs to completion, the check PASSES, and both assertions above red
      # ---- for a property of the box rather than a defect in the code.
+
+# ---- TOOL-aBriskPreflight-7: THE TWO DECLARED CEILINGS. The driver runs from a COPY inside the
+# ---- fixture, its constant rewritten through `mutate` and committed, so no arm waits out a real
+# ---- ceiling and no environment seam exists to lower one (spec §8 F2). Against a driver that
+# ---- declares no such constant the rewrite is a fixture no-op, and `mutate` reds. The instrument is
+# ---- the driver's own `killed after` and `it took` figures, never this harness's clock.
+_cl_kit="$HERE/unattended.sh $HERE/lib-unattended.sh $HERE/check-playbook.sh"
+# AC1 AC2 AC3: the wiring child killed at its own ceiling under a 600 s GATE_BOUND. HOST-GATED on the
+# run_bounded probe above: with no runnable `timeout -k` nothing can fire, and the sleeper passes.
+if [ "$RB_HAVE_TIMEOUT" != 1 ]; then
+  n=$((n+12))
+  echo "  SKIP the wiring-ceiling arms: this host has no runnable 'timeout -k', so the ceiling cannot fire; their 12 assertions are counted, not run"
+else
+  reset_tree
+  printf '#!/usr/bin/env bash\nsleep 30\n' > slowwire.sh
+  mkconf "bash slowwire.sh --check" "true" "" "600"     # WIRING_CHECK sleeps 30 s; GATE_BOUND=600
+  mkdir -p dk/u
+  # shellcheck disable=SC2086
+  cp $_cl_kit dk/u/
+  mutate dk/u/unattended.sh 's/^WIRING_CEILING="[0-9]*"$/WIRING_CEILING="2"/'
+  fixture
+  before=$(sum)
+  out=$(run_main_at_head bash dk/u/unattended.sh --preflight tRun --keepalive-id k1 2>&1)
+  hit "$out" "the declared wiring check ran past its own 2s wall-clock ceiling and was killed after"
+  hit "$out" "the 600s GATE_BOUND is no longer this check's only kill"
+  hit "$out" "at the kill against the"
+  hit "$out" "ms the ceiling allows, so a figure far above that is this host's load and one near it is the check's own cost: bash slowwire.sh --check"
+  hit "$out" "--preflight refused; the run-state file is unchanged"
+  same "BP7 AC1 a wiring check killed at its ceiling leaves the run-state file byte-identical" "$(sum)" "$before"
+  n=$((n+1))
+  _rbt=$(printf '%s' "$out" | sed -n 's/.*killed after \([0-9][0-9]*\)s.*/\1/p' | head -1)
+  { [ -n "$_rbt" ] && [ "$_rbt" -lt 25 ]; } \
+    || { echo "FAIL BP7 AC1 the driver reported killed after '${_rbt:-<no figure>}'s against a 2s WIRING_CEILING under a 600s GATE_BOUND — the ceiling does not reach the wiring child"; st=1; }
+  # AC2: a conf naming the constant is overwritten, because the constants are assigned after it.
+  printf 'WIRING_CEILING="9999"\n' >> .unattended.conf
+  fixture
+  out=$(run_main_at_head bash dk/u/unattended.sh --preflight tRun --keepalive-id k1 2>&1)
+  hit "$out" "the declared wiring check ran past its own 2s wall-clock ceiling"
+  # AC3: a wiring check inside its ceiling passes check 4.
+  mutate dk/u/unattended.sh 's/^WIRING_CEILING="2"$/WIRING_CEILING="20"/'
+  printf '#!/usr/bin/env bash\nsleep 1\n' > slowwire.sh
+  fixture
+  out=$(run_main_at_head bash dk/u/unattended.sh --preflight tRun --keepalive-id k1 2>&1)
+  hit "$out" "unattended: preflight OK"
+  miss "$out" "check 4 FAILED"
+  reset_tree
+fi
+
+# AC4 AC5 AC6: preflight over its own ceiling NAMES the breach after the verdict and moves nothing.
+# Three copies: `u` with PREFLIGHT_CEILING at 1 s, `v` unmodified, `w` with an unreadable stamp. The
+# 3 s wiring sleeper puts every run past 1 s, refusals included: check 2 refuses and the wiring check
+# still runs. No host gate, since nothing here is killed.
+reset_tree
+printf '#!/usr/bin/env bash\nsleep 3\n' > slowwire.sh
+mkconf "bash slowwire.sh --check"
+mkdir -p dk/u dk/v dk/w
+# shellcheck disable=SC2086
+{ cp $_cl_kit dk/u/; cp $_cl_kit dk/v/; cp $_cl_kit dk/w/; }
+mutate dk/u/unattended.sh 's/^PREFLIGHT_CEILING="[0-9]*"$/PREFLIGHT_CEILING="1"/'
+mutate dk/w/unattended.sh 's/^readonly DRIVER_T0_US$/DRIVER_T0_US=notanumber; readonly DRIVER_T0_US/'
+fixture
+_bp7=$(git rev-parse HEAD)
+out=$(run_main_at_head bash dk/u/unattended.sh --preflight tRun --keepalive-id k1 2>&1); _rc=$?
+hit "$out" "unattended: preflight over its ceiling — it took"
+hit "$out" "its own 1s wall-clock ceiling"
+hit "$out" "here against the"
+same "BP7 AC4 the breach line follows the verdict" "$(printf '%s\n' "$out" | grep -E '^unattended: preflight (OK|over its ceiling)' | sed 's/ —.*//' | tr '\n' '|')" "unattended: preflight OK|unattended: preflight over its ceiling|"
+same "BP7 AC4 a breach leaves the exit status to the checks" "$_rc" "0"
+same "BP7 AC4 a breach still writes and stages the run-state file" "$(git diff --cached --name-only -- memory/builds/tRun/RUN.md)" "memory/builds/tRun/RUN.md"
+n=$((n+1))
+_bpw=$(printf '%s' "$out" | sed -n 's/.*over its ceiling — it took \([0-9][0-9]*\)\.[0-9]s.*/\1/p' | head -1)
+{ [ -n "$_bpw" ] && [ "$_bpw" -ge 3 ]; } \
+  || { echo "FAIL BP7 AC4 the breach line reported a wall of '${_bpw:-<no figure>}' s, below the 3 s wiring sleeper it ran through"; st=1; }
+git reset -q --hard "$_bp7"; git clean -qfd
+out=$(run_main_at_head bash dk/v/unattended.sh --preflight tRun --keepalive-id k1 2>&1)
+hit "$out" "unattended: preflight OK"
+miss "$out" "preflight over its ceiling"
+# AC5: a REFUSED preflight reaches the compare too, and the line does not move its status.
+git reset -q --hard "$_bp7"; git clean -qfd
+: > bp7-untracked.txt
+out=$(run_main_at_head bash dk/u/unattended.sh --preflight tRun --keepalive-id k1 2>&1); _rcu=$?
+hit "$out" "the working tree is dirty, so the pinned BASE would name a state that is not what runs"
+hit "$out" "--preflight refused; the run-state file is unchanged"
+hit "$out" "unattended: preflight over its ceiling — it took"
+out=$(run_main_at_head bash dk/v/unattended.sh --preflight tRun --keepalive-id k1 2>&1); _rcv=$?
+miss "$out" "preflight over its ceiling"
+same "BP7 AC5 a breach on a refusal leaves the exit status the checks decided" "$_rcu" "$_rcv"
+# AC6: a stamp that is not a whole number says the compare could not run.
+git reset -q --hard "$_bp7"; git clean -qfd
+out=$(run_main_at_head bash dk/w/unattended.sh --preflight tRun --keepalive-id k1 2>&1); _rc=$?
+hit "$out" "unattended: preflight ceiling not compared — the driver's start stamp is not a whole number"
+same "BP7 AC6 an unreadable stamp leaves the exit status to the checks" "$_rc" "0"
+reset_tree
+
+# AC7: a host with no working `timeout -k` is told the wiring ceiling is inert too, beside the
+# GATE_BOUND NOTE, whose bytes do not move. The value is read off the driver, never retyped.
+mkdir -p "$TMP/bp7-shim"; printf '#!/bin/sh\nexit 1\n' > "$TMP/bp7-shim/timeout"; chmod +x "$TMP/bp7-shim/timeout"
+_bp7c=$(sed -n 's/^WIRING_CEILING="\([0-9][0-9]*\)"$/\1/p' "$SCRIPT")
+out=$(PATH="$TMP/bp7-shim:$PATH" bash "$SCRIPT" --version 2>&1 >/dev/null)
+hit "$out" "unattended: NOTE - this node has no working 'timeout -k', so the GATE_BOUND wall-clock bound on GATE_CMD and WIRING_CHECK is INERT; both run unbounded this session"
+hit "$out" "so the ${_bp7c:-<no WIRING_CEILING>}s wall-clock ceiling on WIRING_CHECK is INERT too"
+rm -rf "$TMP/bp7-shim"
 
 # ---- TOOL-aBriskPreflight-4: --preflight STARTS its four bounded probes together and READS each where
 # ---- it was read before. The wiring check, the lander's --carry and --prepared and the profile

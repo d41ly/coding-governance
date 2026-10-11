@@ -63,3 +63,7 @@ base: 271a90045723817f694de4d22c56f88dbcd0063e
 2026-10-11T15:02:48Z brief · item TOOL-aBriskPreflight-10 · reason 60d7c4d96e4b memory/builds/aBriskPreflight/prompts/2026-10-11-prompt-TOOL-aBriskPreflight-10-build-brief.md
 
 2026-10-11T15:27:11Z dispatch · item e4fd1b83 TOOL-aBriskPreflight-10 · reason .githooks/pre-commit memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-10.md memory/builds/aBriskPreflight/prompts/2026-10-11-prompt-TOOL-aBriskPreflight-10-build-brief.md memory/builds/aBriskPreflight/README.md memory/LIVE.md memory/ledger/2026-10.md
+
+2026-10-11T19:05:19Z dispatch · item b91d30f7 TOOL-aBriskPreflight-7 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/README.md memory/builds/aBriskPreflight/spec/2026-10-11-spec-TOOL-aBriskPreflight-7.md memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-7-ceilings.sh memory/builds/aBriskPreflight/build/2026-10-11-build-TOOL-aBriskPreflight-7-ceiling-rows.log memory/builds/aBriskPreflight/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/symbols.json
+
+2026-10-11T19:06:10Z brief · item TOOL-aBriskPreflight-7 · reason 0455d49e591f memory/builds/aBriskPreflight/prompts/2026-10-11-prompt-TOOL-aBriskPreflight-7-build-brief.md

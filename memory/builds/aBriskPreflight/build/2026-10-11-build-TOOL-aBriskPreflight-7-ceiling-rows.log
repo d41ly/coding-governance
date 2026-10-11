@@ -1,0 +1,16 @@
+host label=cw-after-1 at=19:07:02Z spawn5=4.48 fork=0.07 paged=19824MB nonpaged=6307MB committed=54038MB cpu=26%
+label=cw-after-1 rc=0 start=1791745629.829607 wall=142.2 spawn5=2.32
+proof label=cw-after-1 last=ok       straggler — no local branch still owes a backlog relocation
+host label=cw-after-2 at=19:10:41Z spawn5=5.33 fork=0.07 paged=19830MB nonpaged=6307MB committed=54143MB cpu=33%
+label=cw-after-2 rc=0 start=1791745851.178580 wall=137.6 spawn5=4.64
+proof label=cw-after-2 last=ok       straggler — no local branch still owes a backlog relocation
+host label=cw-after-3 at=19:13:50Z spawn5=4.77 fork=0.04 paged=19837MB nonpaged=6307MB committed=53987MB cpu=36%
+label=cw-after-3 rc=0 start=1791746037.593582 wall=136.9 spawn5=5.26
+proof label=cw-after-3 last=ok       straggler — no local branch still owes a backlog relocation
+count label=cw-after-traced subject=wiring execs=137 forks=193 source=cw-u12-traced, unit 3's wiring-scope record AC4 (trace-spawns over the tip's check-wiring.sh)
+count label=pf-after-traced subject=preflight execs=653 forks=762 source=pf-fixture-new-traced, the TOOL-aBriskPreflight-7 build brief (trace-spawns), refused at check 4 by the hook mode unit 10 fixed
+window label=cw-after-traced subject=wiring wait=check_backlog_stragglers timeout=60 window=69.0 source=unit 3's arm-windows over cw-u12-traced
+window label=pf-after-traced subject=preflight wait=check_backlog_stragglers timeout=60 window=69.0 source=unit 3's arm-windows over cw-u12-traced, the same check-wiring.sh
+window label=pf-after-traced subject=preflight wait=observe_remote-read-1 timeout=60 window=6.0 source=pf-fixture-new-traced trace line 2883, the observe_remote timeout row to its caller's next row
+window label=pf-after-traced subject=preflight wait=observe_remote-read-2 timeout=60 window=9.5 source=pf-fixture-new-traced trace line 2959, the observe_remote timeout row to its caller's next row
+window label=pf-after-traced subject=preflight wait=claim-write timeout=60 window=0.0 source=absent from pf-fixture-new-traced, which was refused before the claim write, so the whole bound counts

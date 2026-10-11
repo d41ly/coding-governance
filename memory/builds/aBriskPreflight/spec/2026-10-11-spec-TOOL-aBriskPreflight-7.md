@@ -1,6 +1,6 @@
 # TOOL-aBriskPreflight-7 — preflight and the wiring check each declare a wall-clock ceiling and name a breach
 
-**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 4 · ratified 2026-10-11
+**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 4 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
