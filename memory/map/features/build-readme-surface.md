@@ -123,6 +123,10 @@ second positional caller, so a bare signature change breaks a gate leg.
 slot sequence there is no well-defined "after the prose" point — and that is the branch every corpus
 write takes until the corpus is conformed.
 
+`check_archives_tracked` runs first in `--check`, `--write` and `--new-build`. Every artifact
+derives from `git ls-files`, so an untracked file under `archive/` is refused rather than rendered:
+a half-staged rotation's moved rows would read as deleted. `TOOL-dHomedResolver-2`, `-5`.
+
 The document inventory parses no part of a record's filename. Five files under `legacy-files.txt`
 carry grandfathered names, and a renderer that parsed names would have to waive them or degrade them.
 
