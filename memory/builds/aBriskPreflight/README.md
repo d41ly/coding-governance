@@ -74,7 +74,7 @@ ids TOOL-aBriskPreflight-1 TOOL-aBriskPreflight-2 TOOL-aBriskPreflight-3 TOOL-aB
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBriskPreflight-1 — check-wiring's per-item loops become one batched call per site](spec/2026-10-11-spec-TOOL-aBriskPreflight-1.md) | 1 | 1 | SPECCED | rev-1 | 2026-10-11 |
+| [TOOL-aBriskPreflight-1 — check-wiring's per-item loops become one batched call per site](spec/2026-10-11-spec-TOOL-aBriskPreflight-1.md) | 1 | 1 | SPECCED | rev-2 | 2026-10-11 |
 | [TOOL-aBriskPreflight-5 — the live-run count reads every record's phase in one pass and derives each record once](spec/2026-10-11-spec-TOOL-aBriskPreflight-5.md) | 1 | 1 | SPECCED | rev-1 | 2026-10-11 |
 | [TOOL-aBriskPreflight-6 — the pre-push hook sets up its straggler audit only when a pushed ref can carry a delta](spec/2026-10-11-spec-TOOL-aBriskPreflight-6.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-11 |
 | [TOOL-aBriskPreflight-2 — check-wiring reads the settings file and each fragment once, and resolves python once](spec/2026-10-11-spec-TOOL-aBriskPreflight-2.md) | 2 | 1 | SPECCED | rev-1 | 2026-10-11 |

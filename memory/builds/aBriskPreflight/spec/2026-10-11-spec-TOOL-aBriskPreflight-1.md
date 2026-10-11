@@ -1,6 +1,6 @@
 # TOOL-aBriskPreflight-1 — check-wiring's per-item loops become one batched call per site
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-10-11 · node a · Tier-1 · base b726385f · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -34,7 +34,8 @@ they are; only the number of processes behind them moves.
 - **S2** — The smoke assertion at `tools/check-wiring.sh:1204` becomes one `awk` over `$smoke/a`. It
   counts, for each family of `$fams` in order and each id of `001 002 003` in order, the lines that
   begin with the literal text `- <family>-<id> |`, and prints the ids whose count is not exactly 1.
-  That is the `miss` list, in the order the nested loop builds it today. Observed by AC3 and AC5.
+  That is the `miss` list, in the order the nested loop builds it today. A missing `$smoke/a` reads
+  as zero lines, so every id is in the list, as it is today. Observed by AC3 and AC5.
 - **S3** — The two audit-line reads at `tools/check-wiring.sh:1225` become one `sed` that carries
   both existing expressions verbatim. The line is held before the first and restored before the
   second, and each printed value is tagged; builtins take the last value of each tag, as `tail -1`
@@ -65,11 +66,15 @@ they are; only the number of processes behind them moves.
 
 Today, at `tools/check-wiring.sh:1249-1251`, a `while read` loop runs `[ -f "$p" ] && sed -n '…' "$p"`
 once per declared path, then `LC_ALL=C sort -u`. The new form keeps the loop and the `[ -f ]` test,
-collects existing paths into the positional list, and calls `sed -n "$expr" -- "$@"` whenever the
+collects existing paths into the positional list, and calls `sed -n -e "$expr" -- "$@"` whenever the
 next path would carry the list past the bound, and once more for the remainder. `$expr` is the
 current expression, held in one variable so both call sites spell it once. The `sort -u` is
-unchanged. The loop reads `$declared` through a here-document of the variable, which is the feed the
-shell-hygiene leg admits.
+unchanged. The loop is fed by a pipe from `printf '%s\n' "$declared"`, as today, into one brace
+group that holds the loop and the remainder call, so the positional list survives the loop. The
+`grep .` stage goes, because the `[ -f ]` test already skips an empty line. Not a here-document of
+`$declared`: `declared` is assigned from a command substitution at `tools/check-wiring.sh:1137`, and
+the shell-hygiene leg follows a here-document's expansion back one assignment and grades that
+shape as a loop fed by a command substitution. Its registry row for this file is shrink-only.
 
 **Why 8000 characters.** A native `sed.exe` on PATH is started through `CreateProcess`, whose command
 line caps at 32767 characters. Bash's `${#p}` counts characters, and a UTF-8 character is at most 4
@@ -88,10 +93,18 @@ tree holds one, the new reading is the correct one.
 ### The smoke count (S2)
 
 At `tools/check-wiring.sh:1204-1208` twelve `grep -c -- "^- $f-$n |"` calls each count one id. The
-`awk` takes `$fams` with `-v`, reads `$smoke/a` once, counts every line by the leading
-`- <family>-<id> |` it carries, and in its `END` walks the families and the three ids in the same
-nested order, printing ` <family>-<id>` for each count other than 1. The output is the `miss` string
-byte for byte, leading space included.
+`awk` is a `BEGIN` block alone. It reads `$smoke/a` once through `getline` from `ARGV[1]`, takes
+`$fams` as `ARGV[2]`, and walks the families and the three ids in the same nested order, counting
+the lines that open with each `- <family>-<id> |` and printing ` <family>-<id>` for each count other
+than 1. The output is the `miss` string byte for byte, leading space included. A program with only a
+`BEGIN` rule reads no operand as input, so `ARGV[2]` is never opened as a file.
+
+**Why `getline` in `BEGIN`, not a main rule and `END`.** GNU Awk 5.4.0 on node `a`, 2026-10-11,
+given a file operand that does not exist, prints `fatal: cannot open file` and exits 2 before `END`
+runs, so its stdout is empty. An empty `miss` reads as "every id present", and a driver that deleted
+%A and exited 0 would pass this assertion. Today's `grep -c` prints nothing there, which is not 1, so
+every id is listed. A failed `getline` returns -1 and the loop reads zero rows, which keeps today's
+reading.
 
 The grep pattern is a BRE and the awk compare is literal. They agree for every token the harvest
 regex admits as a family, `[A-Z][A-Z0-9]+`, because such a token holds no BRE metacharacter. A
@@ -101,11 +114,16 @@ compare is the reading the arm's comment states: every row of the three inputs i
 ### The audit line (S3)
 
 `kd` and `hs` are each a `sed -n … | tail -1` today, four processes. The new read is one
-`sed -n 'h; s/<kd expression>/K \1/p; g; s/<hs expression>/H \1/p'` over `$smoke/err`, with the two
+`sed -n 'h; s/<kd expression>/K\1/p; g; s/<hs expression>/H\1/p'` over `$smoke/err`, with the two
 expressions copied verbatim from `tools/check-wiring.sh:1225-1226`. `h` and `g` hand the second
-substitution the original line, since the first one rewrites the pattern space. Its output is
-captured into a variable, and a `while read` over that variable keeps the last `K` and the last `H`
-value. The tags are capital letters so neither reads as sed's own `h` command.
+substitution the original line, since the first one rewrites the pattern space. A `for` over the
+words of that substitution keeps the last `K` and the last `H` value, stripping the tag with
+`${w#K}` and `${w#H}`. Each printed value is one word, because the tag carries no space and the
+captured value is digits or empty; an empty capture prints the bare tag and reads as an empty value,
+which is what `tail -1` of an empty line gave. The tags are capital letters so neither reads as
+sed's own `h` command. Not a `while read` over a captured variable: that variable is assigned from a
+command substitution, and the shell-hygiene leg grades the here-document of it as a loop fed by one,
+as in the harvest above. This file already reads a substitution's words with `for` for that reason.
 
 ### The eol population (S4)
 
@@ -225,6 +243,12 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · the build pass found two design defects before commit. S1 and S3 fed their
+  loops from a here-document of a variable assigned by command substitution, which the
+  shell-hygiene leg's one-hop follow grades as a substitution-fed loop against a shrink-only row; S1
+  keeps today's pipe feed and S3 reads with `for` over words whose tag carries no space. S2's `-v` and `END` form
+  ends in an awk fatal with empty output when %A is gone, which reads as nothing missing; it reads
+  %A by `getline` in `BEGIN`. S1 gains `-e` before the expression.
 
 ## 9. Reuse audit
 
