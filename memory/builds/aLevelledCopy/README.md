@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: tooling+deployer
 roster: TOOL+DEPL
-ids: DEPL-aLevelledCopy-1 DEPL-aLevelledCopy-2 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4 TOOL-aLevelledCopy-5 TOOL-aLevelledCopy-6 TOOL-aLevelledCopy-7 TOOL-aLevelledCopy-8 TOOL-aLevelledCopy-9 TOOL-aLevelledCopy-10 TOOL-aLevelledCopy-11 TOOL-aLevelledCopy-12 TOOL-aLevelledCopy-13 TOOL-aLevelledCopy-14 TOOL-aLevelledCopy-15 TOOL-aLevelledCopy-16 TOOL-aLevelledCopy-17 TOOL-aLevelledCopy-18 TOOL-aLevelledCopy-19 TOOL-aLevelledCopy-20 TOOL-aLevelledCopy-21 TOOL-aLevelledCopy-22 TOOL-aLevelledCopy-23
+ids: DEPL-aLevelledCopy-1 DEPL-aLevelledCopy-2 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4 TOOL-aLevelledCopy-5 TOOL-aLevelledCopy-6 TOOL-aLevelledCopy-7 TOOL-aLevelledCopy-8 TOOL-aLevelledCopy-9 TOOL-aLevelledCopy-10 TOOL-aLevelledCopy-11 TOOL-aLevelledCopy-12 TOOL-aLevelledCopy-13 TOOL-aLevelledCopy-14 TOOL-aLevelledCopy-15 TOOL-aLevelledCopy-16 TOOL-aLevelledCopy-17 TOOL-aLevelledCopy-18 TOOL-aLevelledCopy-19 TOOL-aLevelledCopy-20 TOOL-aLevelledCopy-21 TOOL-aLevelledCopy-22 TOOL-aLevelledCopy-23 TOOL-aLevelledCopy-24
 authorized-by: prompt
 ---
 
@@ -61,7 +61,7 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-10-09 · streams tooling+deployer
 ids DEPL-aLevelledCopy-1 DEPL-aLevelledCopy-2 TOOL-aLevelledCopy-1 TOOL-aLevelledCopy-2 TOOL-aLevelledCopy-3 TOOL-aLevelledCopy-4 TOOL-aLevelledCopy-5 TOOL-aLevelledCopy-6 TOOL-aLevelledCopy-7 TOOL-aLevelledCopy-8 TOOL-aLevelledCopy-9 TOOL-aLevelledCopy-10 TOOL-aLevelledCopy-11 TOOL-aLevelledCopy-12
-ids TOOL-aLevelledCopy-13 TOOL-aLevelledCopy-14 TOOL-aLevelledCopy-15 TOOL-aLevelledCopy-16 TOOL-aLevelledCopy-17 TOOL-aLevelledCopy-18 TOOL-aLevelledCopy-19 TOOL-aLevelledCopy-20 TOOL-aLevelledCopy-21 TOOL-aLevelledCopy-22 TOOL-aLevelledCopy-23
+ids TOOL-aLevelledCopy-13 TOOL-aLevelledCopy-14 TOOL-aLevelledCopy-15 TOOL-aLevelledCopy-16 TOOL-aLevelledCopy-17 TOOL-aLevelledCopy-18 TOOL-aLevelledCopy-19 TOOL-aLevelledCopy-20 TOOL-aLevelledCopy-21 TOOL-aLevelledCopy-22 TOOL-aLevelledCopy-23 TOOL-aLevelledCopy-24
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -75,7 +75,7 @@ ids TOOL-aLevelledCopy-13 TOOL-aLevelledCopy-14 TOOL-aLevelledCopy-15 TOOL-aLeve
 | [TOOL-aLevelledCopy-8 — the ssh arm's failure states each get a verdict and an arm](spec/2026-10-09-spec-TOOL-aLevelledCopy-8.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-09 |
 <!-- /gen:build-units -->
 
-Records: 13 bound to this build, across 4 record folder(s).
+Records: 14 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

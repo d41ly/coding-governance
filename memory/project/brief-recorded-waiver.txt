@@ -37,3 +37,13 @@ TOOL-aLevelledCopy-3	late row: its --brief row is in RUN.md at bb6178eab, the re
 TOOL-aLevelledCopy-7	late row: its --brief row is in RUN.md at dae09ec1f, the records commit right after the pass, because the build brief said to stage declared paths only and the pass left RUN.md for the main loop
 TOOL-aLevelledCopy-9	late row: its --brief row is in RUN.md at 0a09d7a09, the records commit right after the pass, because the build brief said to stage declared paths only and the pass left RUN.md for the main loop
 TOOL-aLevelledCopy-8	late row: its --brief row is in RUN.md at 669816ae7, the records commit right after the pass, because the build brief said to stage declared paths only and the pass left RUN.md for the main loop
+#
+# THE aHomedAnchor ROWS are one kind, a GAP: all seven units were built inline by the run's main loop
+# and --brief never ran for any of them; the reconstruction sits under that build's prompts/.
+TOOL-aHomedAnchor-1	built without a recorded brief: built inline by the run's main loop and --brief never ran; a reconstructed brief sits at memory/builds/aHomedAnchor/prompts/2026-10-09-prompt-TOOL-aHomedAnchor-1-1-reconstructed-build-briefs.md
+TOOL-aHomedAnchor-2	built without a recorded brief: built inline by the run's main loop and --brief never ran; a reconstructed brief sits at memory/builds/aHomedAnchor/prompts/2026-10-09-prompt-TOOL-aHomedAnchor-1-1-reconstructed-build-briefs.md
+TOOL-aHomedAnchor-3	built without a recorded brief: built inline by the run's main loop and --brief never ran; a reconstructed brief sits at memory/builds/aHomedAnchor/prompts/2026-10-09-prompt-TOOL-aHomedAnchor-1-1-reconstructed-build-briefs.md
+TOOL-aHomedAnchor-4	built without a recorded brief: built inline by the run's main loop and --brief never ran; a reconstructed brief sits at memory/builds/aHomedAnchor/prompts/2026-10-09-prompt-TOOL-aHomedAnchor-1-1-reconstructed-build-briefs.md
+TOOL-aHomedAnchor-5	built without a recorded brief: built inline by the run's main loop and --brief never ran; a reconstructed brief sits at memory/builds/aHomedAnchor/prompts/2026-10-09-prompt-TOOL-aHomedAnchor-1-1-reconstructed-build-briefs.md
+TOOL-aHomedAnchor-6	built without a recorded brief: built inline by the run's main loop and --brief never ran; a reconstructed brief sits at memory/builds/aHomedAnchor/prompts/2026-10-09-prompt-TOOL-aHomedAnchor-1-1-reconstructed-build-briefs.md
+TOOL-aHomedAnchor-7	built without a recorded brief: built inline by the run's main loop and --brief never ran; a reconstructed brief sits at memory/builds/aHomedAnchor/prompts/2026-10-09-prompt-TOOL-aHomedAnchor-1-1-reconstructed-build-briefs.md

@@ -1,10 +1,15 @@
 # TOOL-aQuotedBrief-2 — a run that cannot start clean starts in a fresh worktree, and a first preflight refuses a carried branch
 
-**Status:** SPECCED · rev-2 · 2026-10-09 · node a · Tier-2 · base fa68a767 · streams tooling · order 1 · ratified 2026-10-09
+**Status:** CLOSED · rev-4 · 2026-10-09 · node a · Tier-2 · base fa68a767 · streams tooling · order 1 · ratified 2026-10-09
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-09-build-TOOL-aQuotedBrief-2-4-acceptance-ledger.md](../build/2026-10-09-build-TOOL-aQuotedBrief-2-4-acceptance-ledger.md) | journal | — |
+| [2026-10-09-prompt-TOOL-aQuotedBrief-2-3-build-brief.md](../prompts/2026-10-09-prompt-TOOL-aQuotedBrief-2-3-build-brief.md) | journal | — |
+| [2026-10-09-review-TOOL-aQuotedBrief-1-closing-diff-round2.md](../reviews/2026-10-09-review-TOOL-aQuotedBrief-1-closing-diff-round2.md) | diff-review | TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-3 |
+| [2026-10-09-review-TOOL-aQuotedBrief-3-closing-diff-round1.md](../reviews/2026-10-09-review-TOOL-aQuotedBrief-3-closing-diff-round1.md) | diff-review | TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-3 |
 
 <!-- /gen:spec-records -->
 
@@ -82,13 +87,24 @@ Read at `fa68a767` on 2026-10-09.
 ### The predicate
 
 ```
-git log --format=%h --name-only HEAD --not <anchor tip> [refs/heads/<default>]
+git -c core.quotepath=off log --no-renames --format=%x01%h --name-only HEAD --not <anchor tip> [refs/heads/<default>]
 ```
 
-The local default branch is excluded when it exists, so commits on a local default branch that is
+`--no-renames` lists a rename by both names: with rename detection on, a file moved off the default
+branch's tree into the build folder shows only its destination, which passes.
+
+The header line opens with a `\x01` byte, which git quotes in any path, so a path whose name looks
+like a short sha is never read as a commit, and a commit with no paths, such as an empty one, is not
+read as a path. `core.quotepath=off` keeps a non-ASCII name in the build folder unquoted, so it still
+matches its prefix. The local default branch is excluded when it exists, so commits on a local default branch that is
 ahead of the remote, already sanctioned by the charter's merge rule, are not counted as carried. This
 is a guard against accident, read once: it trusts local refs, which a protocol BASE may not, and it
 says so in its header. A merge commit lists no paths; the commits it brings in are listed themselves.
+
+The suite's other arms commit their conf edits on the run branch only because preflight refuses a
+dirty tree, and those edits stand for the project's own conf on the default branch. So the suite's
+driver helpers stand the fixture's local default branch at `HEAD` for a first preflight and put it
+back afterwards, which is the check's own exclusion, and only this unit's arms opt out of that.
 
 ### The fresh worktree
 
@@ -203,6 +219,12 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · th
 - rev-2 · 2026-10-09 · §1 · §3 · §4 · §8 · S4 · AC6 · owner resolved F1: a dirty tree starts the run in
   a fresh worktree; a clean tree whose branch carries commits takes the same route, and the recovery
   prints it.
+- rev-3 · 2026-10-09 · §4 · build: the predicate marks its header line with `%x01` and turns
+  `core.quotepath` off, because `%h` alone reads an empty commit's sha as a path; the suite's driver
+  helpers stand the local default branch at `HEAD` for every arm but this unit's, because about a
+  hundred first preflights commit a conf edit on the run branch.
+- rev-4 · 2026-10-09 · §4 · build: the predicate takes `--no-renames`, found by the gotchas pass over
+  rev-3's commit: rename detection showed a file moved into the build folder by its destination only.
 
 ## 10. Reuse audit
 

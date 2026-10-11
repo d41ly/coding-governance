@@ -432,6 +432,20 @@ hit "$(cat "$AV/.claude/skills/unattended/SKILL.md")" 'Only when the invocation 
 same "a non-default AUTH_PARAM leaves no trace of the kit default" \
   "$(grep -c -- '--prompt' "$AV/.claude/skills/unattended/SKILL.md" || true)" "0"
 
+# ---- TOOL-aHomedAnchor-5: THE THIRD ANCHOR RENDERS. `local` reaches the Skill as itself, and a value
+# ---- outside the closed set renders the strict anchor, the driver's own fallback. Delete the
+# ---- adopter's `local)` case arm and the first hit fails while every arm above still passes.
+AL="$TMP/anchorlocal"; seed "$AL"; printf 'ANCHOR_SCOPE="local"
+' >> "$AL/.unattended.conf"
+( cd "$AL" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
+same "a local ANCHOR_SCOPE adopts" "$?" "0"
+hit "$(cat "$AL/.claude/skills/unattended/SKILL.md")" "authorizes at this project's anchor, \`local\`"
+AX="$TMP/anchoroutside"; seed "$AX"; printf 'ANCHOR_SCOPE="nearby"
+' >> "$AX/.unattended.conf"
+( cd "$AX" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
+same "an ANCHOR_SCOPE outside the set adopts" "$?" "0"
+hit "$(cat "$AX/.claude/skills/unattended/SKILL.md")" "authorizes at this project's anchor, \`default-branch\`"
+
 # THE FOUR REFUSALS, each observed non-zero with nothing written. They are separately reachable: a
 # bare word trips the flag-shape arm, and the other three all begin with a hyphen and reach the
 # character arm. A guard arm that has only ever passed is an assertion about nothing.

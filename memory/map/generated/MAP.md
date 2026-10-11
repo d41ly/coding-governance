@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 128 · kits: 17 · git-hooks: 4 · harness-hooks: 10 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 105 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 130 · kits: 17 · git-hooks: 4 · harness-hooks: 11 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 107 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -99,6 +99,8 @@ Inventories: gate-legs: 128 · kits: 17 · git-hooks: 4 · harness-hooks: 10 · 
 | `review-join self-test` | review-harnesses |
 | `review-protocol parity (kit vs dogfood)` | agent-cap |
 | `review-replay selftest` | review-harnesses |
+| `routed commits name a specced unit` | memory-tree-hygiene |
+| `routed-commits selftest` | memory-tree-hygiene |
 | `row-driver view refusal` | memory-tree-merge-driver |
 | `row-grammar selftest` | row-grammar |
 | `row-keyed merge driver replay` | memory-tree-merge-driver |
@@ -184,6 +186,7 @@ Inventories: gate-legs: 128 · kits: 17 · git-hooks: 4 · harness-hooks: 10 · 
 | `SessionStart tools/process-monitor/procmon-hook.js` | process-monitor |
 | `Stop tools/unattended/stop-guard.js` | unattended |
 | `StopFailure tools/unattended/stall-recorder.js` | unattended |
+| `SubagentStart tools/hooks/scratch-guard.js` | agent-cap |
 
 ## workflow-scripts
 
@@ -269,6 +272,7 @@ Inventories: gate-legs: 128 · kits: 17 · git-hooks: 4 · harness-hooks: 10 · 
 | `guard-fed-the-value-it-supersedes.md` | unattended |
 | `hand-named-gate-list-green-while-the-bar-reds.md` | build-method |
 | `heredoc-escape-reaches-the-regex.md` | baseline |
+| `history-leg-graded-before-the-reconcile-commit.md` | memory-tree-hygiene |
 | `hookspath-resolves-into-another-checkout.md` | run-gates |
 | `id-matched-as-a-substring.md` | unattended |
 | `index-derivation-reads-a-half-staged-move-as-a-deletion.md` | memory-tree-hygiene |
@@ -278,6 +282,7 @@ Inventories: gate-legs: 128 · kits: 17 · git-hooks: 4 · harness-hooks: 10 · 
 | `inputs-inside-the-subjects-reach.md` | unattended |
 | `join-key-widened-by-a-shared-location.md` | runlog |
 | `ledger-token-wrapped-across-a-line-joins-nothing.md` | memory-tree-hygiene |
+| `line-claim-matched-over-the-whole-output.md` | memory-tree-hygiene |
 | `line-count-reads-empty-capture-as-one.md` | unattended |
 | `line-keyed-registry-reds-on-a-file-that-grew.md` | lexicon |
 | `liveness-negative-from-another-population.md` | unattended-stops |
