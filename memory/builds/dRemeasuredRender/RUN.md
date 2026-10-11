@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 692632c12a79d98f5614d9fe2d360a42412a0afc · park · 0 touching
 gates-run: unattended-179171228056387817732-1509 81b937f4
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
@@ -66,3 +67,5 @@ base: 17472e212ffd0d5e3be825502c6169bbeb2e952f
 2026-10-11T09:47:02Z dispatch · item 57a98c4f DEPL-dRemeasuredRender-4 · reason memory/builds/dRemeasuredRender/build/2026-10-11-build-DEPL-dRemeasuredRender-4-1-acceptance-ledger.md memory/builds/dRemeasuredRender/spec/2026-10-11-spec-DEPL-dRemeasuredRender-4.md memory/gotchas/INDEX.md memory/gotchas/verdict-printed-before-the-step-that-reverts-it.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json tools/govkit/govkit.py tools/govkit/selftest.py
 
 2026-10-11T09:47:49Z dispatch · item 57a98c4f DEPL-dRemeasuredRender-4 · reason memory/map/features/govkit.md
+
+2026-10-11T14:57:28Z decision · item land the build with the hook bypassed, no full bar · reason decided by the owner in chat on 2026-10-11, after the second close's bar hung in the run-gates canary's AC14 memory-pause arm (its FIFO writer gone, its inner bar blocked from 15:28); the owner said kill the hung bar and close it with no-verify; landed at 692632c1; a full bar on main and the six unattended suites stay owed
