@@ -1158,7 +1158,16 @@ TS_RUN="${GATE_RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)-$$}"
 # behind the very bar whose leg started it. Compared, not merely present, so a value a dead bar left
 # in some shell nests nothing once a successor holds. `--hold -- <command…>` takes the same turnstile
 # for a command that is not this runner. `queued_from` reads `held`, `nested`, `expired`,
-# `unticketed`, `off` or `unresolved`, assigned in the block after the queue.
+# `unticketed`, `docs`, `off` or `unresolved`, assigned in the block after the queue.
+#
+# THE DOCS KEY (TOOL-aPairedSlots-4). A DOC-ONLY bar — one whose `DOCS_BASE` resolved above, which
+# `GATE_FULL` empties — takes no ticket and claims no slot: it creates `gate-docs-beacon/<run id>`
+# beside the slots with the six beacon files a holder writes, exports its nonce, runs the ticker and
+# arms the same nonce-guarded traps, and is admitted at once. Nothing caps how many run (owner,
+# 2026-10-11). Non-doc waiters, the reap and the held count read the slots only, so a doc-only bar
+# never delays, narrows or is named by a non-doc bar; nesting reads its beacon too. A doc-only run
+# first sweeps the docs beacons of dead or stalled holders, nonce-guarded, since nothing else waits on
+# them to notice. `--hold` is never doc-only.
 #
 # A COUNTING SEMAPHORE OF `TS_SLOTS` HOLDERS (TOOL-aPairedSlots-2), the profile row's `slots`. Each
 # holder owns one beacon directory with its own six files: slot 1 is `gate-bar-beacon` itself, so a
@@ -1176,7 +1185,7 @@ TS_RUN="${GATE_RUN_ID:-$(date -u +%Y%m%dT%H%M%SZ)-$$}"
 # from the beacon, so nesting decides contention and never a verdict; and a runner older than this
 # change keys on its common dir and does not see the host beacon.
 TS_COMMON=""; TS_DIR=""; TS_TICKET=""; TS_NONCE=""; TS_WAITED=0; TS_HELD=0; TS_Q=""; TS_UNTICKETED=0
-TS_HOST=""; TS_DIR_C=""; TS_NESTED=0
+TS_HOST=""; TS_DIR_C=""; TS_NESTED=0; TS_DOCS=0
 if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
   TS_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || TS_COMMON=""
   [ -n "$TS_COMMON" ] && TS_COMMON=$(cd "$TS_COMMON" 2>/dev/null && pwd) || TS_COMMON=""
@@ -1208,6 +1217,28 @@ fi
 measure_held_slots() { # -> TS_HELD_N, how many of this runner's slot paths exist; builtin tests only
   local d; TS_HELD_N=0
   for d in ${TS_SLOT_DIRS[@]+"${TS_SLOT_DIRS[@]}"}; do [ -d "$d" ] && TS_HELD_N=$((TS_HELD_N + 1)); done
+  return 0
+}
+TS_DOCS_ROOT=""; [ -n "$TS_DIR_C" ] && TS_DOCS_ROOT="${TS_DIR_C%/*}/gate-docs-beacon"
+scan_dead_docs_beacons() { # -> removes each docs beacon whose pid is dead or whose heartbeat outlived its ttl, nonce-guarded
+  local d hpid hb hn httl age
+  [ -n "$TS_DOCS_ROOT" ] && [ -d "$TS_DOCS_ROOT" ] || return 0
+  for d in "$TS_DOCS_ROOT"/*; do
+    [ -d "$d" ] || continue
+    hpid=$(cat "$d/pid" 2>/dev/null); hb=$(cat "$d/heartbeat" 2>/dev/null); hn=$(cat "$d/nonce" 2>/dev/null)
+    httl=$(cat "$d/ttl" 2>/dev/null); num_ok "$httl" || httl=$TS_TTL
+    if [ -n "$hpid" ] && ! ts_alive "$hpid"; then
+      [ "$(cat "$d/nonce" 2>/dev/null)" = "$hn" ] || continue
+      printf 'run-gates: sweeping the docs beacon of a dead holder (pid %s)\n' "$hpid" >&2
+      rm -rf "$d" 2>/dev/null; continue
+    fi
+    case "$hb" in ''|*[!0-9]*) continue ;; esac
+    age=$(( $(ts_now) - hb ))
+    if [ "$age" -gt "$httl" ] && [ "$(cat "$d/nonce" 2>/dev/null)" = "$hn" ]; then
+      printf 'run-gates: sweeping the docs beacon of a stalled holder (heartbeat %ss old, ttl %ss)\n' "$age" "$httl" >&2
+      rm -rf "$d" 2>/dev/null
+    fi
+  done
   return 0
 }
 resolve_free_slot() { # -> rc 0 with TS_DIR and TS_SLOT set by the first slot whose mkdir succeeds, in slot order
@@ -1415,7 +1446,7 @@ ts_sweep_queue() {
 # started it must still find its parent's nonce. A builtin glob, so an unset holder costs nothing.
 TS_NEST_DIR=""
 if [ -n "$TS_DIR_C" ] && [ -n "${GATE_TURNSTILE_HOLDER:-}" ]; then
-  for _ts_d in "$TS_DIR_C" "$TS_DIR_C".*; do
+  for _ts_d in "$TS_DIR_C" "$TS_DIR_C".* ${TS_DOCS_ROOT:+"$TS_DOCS_ROOT"/*}; do
     [ -d "$_ts_d" ] || continue
     [ "$(cat "$_ts_d/nonce" 2>/dev/null)" = "$GATE_TURNSTILE_HOLDER" ] && { TS_NEST_DIR=$_ts_d; break; }
   done
@@ -1425,6 +1456,30 @@ if [ -n "$TS_NEST_DIR" ]; then
   TS_NESTED=1
   ts_hr=$(cat "$TS_NEST_DIR/run" 2>/dev/null); ts_hd=$(cat "$TS_NEST_DIR/repo" 2>/dev/null); ts_hp=$(cat "$TS_NEST_DIR/pid" 2>/dev/null)
   echo "gate queue: nested under ${ts_hr:--} — ${ts_hd:--} pid ${ts_hp:--}"
+elif [ -n "$TS_DIR_C" ] && [ -n "${DOCS_BASE:-}" ] && [ "${#TS_HOLD[@]}" = 0 ]; then
+  # THE DOCS KEY (TOOL-aPairedSlots-4): admitted at once, visible, nestable, released on every exit.
+  TS_DOCS=1
+  TS_NONCE="$$-$(ts_now)-$RANDOM"
+  scan_dead_docs_beacons
+  if mkdir -p "$TS_DOCS_ROOT" 2>/dev/null && mkdir "$TS_DOCS_ROOT/$TS_RUN" 2>/dev/null; then
+    TS_DIR="$TS_DOCS_ROOT/$TS_RUN"
+    printf '%s' "$(ts_now)" > "$TS_DIR/heartbeat" 2>/dev/null || true
+    printf '%s' "$$"        > "$TS_DIR/pid" 2>/dev/null || true
+    printf '%s' "$ROOT"     > "$TS_DIR/repo" 2>/dev/null || true
+    printf '%s' "$TS_RUN"   > "$TS_DIR/run" 2>/dev/null || true
+    printf '%s' "$TS_TTL"   > "$TS_DIR/ttl" 2>/dev/null || true
+    printf '%s' "$TS_NONCE" > "$TS_DIR/nonce" 2>/dev/null || true
+    export GATE_TURNSTILE_HOLDER="$TS_NONCE"
+    ts_tick_start
+    trap 'ts_tick_stop; ts_release; ts_drop_ticket' EXIT
+    trap 'ts_tick_stop; ts_release; ts_drop_ticket; exit 130' INT
+    trap 'ts_tick_stop; ts_release; ts_drop_ticket; exit 143' TERM
+    trap 'ts_tick_stop; ts_release; ts_drop_ticket; exit 129' HUP
+  else
+    echo "run-gates: NOTE - the docs beacon under '$TS_DOCS_ROOT' could not be created, so this doc-only bar runs UNQUEUED and unnamed" >&2
+  fi
+  echo "gate queue: docs-only — admitted on the docs key, not queued"
+  export GATE_TURNSTILE_HELD="${GATE_TURNSTILE_HELD:-}${GATE_TURNSTILE_HELD:+,}$TS_NONCE"
 elif [ -n "$TS_DIR_C" ]; then
   TS_NONCE="$$-$(ts_now)-$RANDOM"
   mkdir -p "$TS_Q" 2>/dev/null || true
@@ -1656,6 +1711,7 @@ QUEUED="-"; QUEUED_FROM=off
 if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
   if   [ -z "$TS_DIR_C" ]; then QUEUED_FROM=unresolved
   elif [ "$TS_NESTED" = 1 ]; then QUEUED=0; QUEUED_FROM=nested
+  elif [ "$TS_DOCS" = 1 ]; then QUEUED=0; QUEUED_FROM=docs
   elif [ "$TS_HELD" = 1 ];  then QUEUED="$TS_WAITED"; QUEUED_FROM=held
   elif [ "$TS_UNTICKETED" = 1 ]; then QUEUED="$TS_WAITED"; QUEUED_FROM=unticketed
   else                            QUEUED="$TS_WAITED"; QUEUED_FROM=expired

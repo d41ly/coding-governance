@@ -211,6 +211,24 @@ and the run record's header gains `slots` and `slot`; at one slot nothing printe
 A host whose repositories declare different counts admits the LARGEST, since every runner claims
 among its own slots and all share slot 1 and the queue: a runner older than this claims slot 1 alone.
 
+**A bar that acquires while another slot is held takes the shared width** (`TOOL-aPairedSlots-3`):
+the held count is read once, right after the acquire, and the constant `TS_SHARE_RULE` decides —
+`half` divides the width by the held count, `full` leaves it. The rule is the two-bar A/B's
+(`TOOL-aPairedSlots-9`), which sets it. `GATE_JOBS` is the operator's width and is never divided. The
+bar prints `gate profile: width <w> at dispatch — <k> of <n> bar slots held (<rule>)`, and the
+summary file and header record that width; a bar that acquires alone prints nothing and keeps its
+profile's width, and is not narrowed later when a neighbour arrives. The memory pause needs no
+counterpart: it reads a host-wide source, so two bars already pause on one reading.
+
+**A doc-only bar never queues** (`TOOL-aPairedSlots-4`). A run whose docs mode resolved — a
+`GATE_DOCS_BASE` naming a commit, with `GATE_FULL` unset — takes no ticket and claims no slot: it
+writes its beacon to `gate-docs-beacon/<run id>` beside the slots, exports its nonce so its legs'
+runners nest, runs the ticker, prints `gate queue: docs-only — admitted on the docs key, not queued`,
+and records `queued_from` `docs`. Nothing caps how many run at once (owner, 2026-10-11). Non-doc
+waiters, the reap and the held count read the slots only, so a doc-only bar never delays, narrows or
+is named by a non-doc bar. A doc-only run first sweeps the docs beacons of dead or stalled holders.
+`--hold` is never doc-only.
+
 The beacon holds `heartbeat`, `pid`, `nonce`, and the holder's name: `repo` (its top level), `run`
 (its run id) and `ttl`. A second run takes a time-sorted ticket and queues, announcing
 `another bar holds this host — <repo> run <id> pid <pid> — queued at position N (waited Ns)`, with
@@ -224,7 +242,8 @@ That line is not durable, and the status file beside it is deleted the moment th
 wait also reaches the RUN RECORD as the paired keys `queued` and `queued_from`, and the summary
 file as its own line. `queued_from` reads `held` (queued, then acquired), `nested` (ran inside the
 bar that holds the host, below), `expired` (burned the bounded wait and ran unqueued), `unticketed`
-(could not write a ticket and ran unqueued at once), `off` (the turnstile was disabled) or
+(could not write a ticket and ran unqueued at once), `docs` (a doc-only bar on the docs key, above),
+`off` (the turnstile was disabled) or
 `unresolved` (neither the host dir nor the common dir resolved). `off` and `unresolved` record a
 DASH rather than a zero, because a zero for a probe that never ran is a reassuring number about
 nothing. `unresolved` is UNARMED and the runner's comment says why.

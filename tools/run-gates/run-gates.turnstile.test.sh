@@ -1313,6 +1313,85 @@ for r37 in "$R37a" "$R37b"; do
   [ -s "$r37/.git/gate-run/$id37/pauses" ] && ok "bar ${r37##*/} paused on the shared host reading" \
     || nope "bar ${r37##*/} did not pause on the shared host reading"
 done
+
+# ================= TOOL-aPairedSlots-4: the docs key ===============================================
+# A doc-only bar is one whose GATE_DOCS_BASE resolves, with GATE_FULL unset. Each fixture repository
+# gets a second commit touching a doc path, so `GATE_DOCS_BASE=HEAD~1` names a real base. The non-doc
+# holder below runs at the kit default of one slot, so a doc-only bar that queued would wait behind it.
+mk_docs_repo() { # <dir> — mk_repo plus a second commit, so HEAD~1 resolves
+  mk_repo "$1" || return 1
+  printf 'doc\n' > "$1/NOTES.md"; ( cd "$1" && git add -A && git commit -qm doc ) >/dev/null 2>&1
+}
+# run_docs_bar <repo> <out> [VAR=value…] — a doc-only bar in the foreground
+run_docs_bar() {
+  local r=$1 o=$2; shift 2
+  ( cd "$r" && env GATE_FULL= GATE_DOCS_BASE=HEAD~1 GATE_TURNSTILE_TICK=1 "$@" bash $KIT_REL/run-gates.sh ) >"$o" 2>&1
+}
+DK=$GATE_TURNSTILE_DIR/gate-docs-beacon
+
+# ---- 38: a doc-only bar is admitted at once while a non-doc bar holds the only slot (AC1) ----------
+R38w=$tmp/docsW; R38d=$tmp/docsD; mk_repo "$R38w"; mk_docs_repo "$R38d"; S38=$tmp/shared38; mkdir -p "$S38"
+legs "$R38d" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+( cd "$R38w" && env TS_SHARED="$S38" GATE_FULL=1 GATE_TURNSTILE_SLOTS= GATE_TURNSTILE_TTL=600 GATE_TURNSTILE_TICK=1 \
+    GATE_LEGS="$tmp/holdS.json" bash $KIT_REL/run-gates.sh ) >"$tmp/out38w" 2>&1 &
+p38w=$!; wait_registered "$S38" 1 "$p38w"
+run_docs_bar "$R38d" "$tmp/out38d"
+held38=0; kill -0 "$p38w" 2>/dev/null && held38=1
+: > "$S38/go"; wait "$p38w" 2>/dev/null
+grep -q '^gate queue: docs-only — admitted on the docs key, not queued$' "$tmp/out38d" && [ "$held38" = 1 ] \
+  && ok "a doc-only bar was admitted on the docs key and finished while the non-doc holder still ran" \
+  || { nope "a doc-only bar was not admitted at once beside the non-doc holder (holder alive: $held38)"; grep -E 'gate queue|queued' "$tmp/out38d" | sed 's/^/      /'; }
+grep -q 'queued at position' "$tmp/out38d" && nope "the doc-only bar took a ticket and queued" || ok "the doc-only bar took no place in the queue"
+[ "$(hdrkey "$R38d" queued_from)" = docs ] && ok "its header records queued_from docs" \
+  || nope "its header records queued_from '$(hdrkey "$R38d" queued_from)'"
+
+# ---- 39: a doc-only bar's release frees its own run id and no other (AC2) --------------------------
+R39a=$tmp/docsA; R39b=$tmp/docsB; mk_docs_repo "$R39a"; mk_docs_repo "$R39b"; S39=$tmp/shared39; mkdir -p "$S39"
+legs "$R39b" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+( cd "$R39a" && env TS_SHARED="$S39" GATE_FULL= GATE_DOCS_BASE=HEAD~1 GATE_TURNSTILE_TICK=1 \
+    GATE_LEGS="$tmp/holdS.json" bash $KIT_REL/run-gates.sh ) >"$tmp/out39a" 2>&1 &
+p39a=$!; wait_registered "$S39" 1 "$p39a"
+run_docs_bar "$R39b" "$tmp/out39b"
+run39a=$(hdrkey "$R39a" run_id); run39b=$(hdrkey "$R39b" run_id)
+[ -n "$run39a" ] && [ -d "$DK/$run39a" ] && ok "the live doc-only bar's beacon stood while its neighbour released" \
+  || nope "the live doc-only bar's beacon was gone after its neighbour released"
+[ -n "$run39b" ] && [ ! -e "$DK/$run39b" ] && ok "the finished doc-only bar's own beacon is gone" \
+  || nope "the finished doc-only bar left its beacon behind"
+: > "$S39/go"; wait "$p39a" 2>/dev/null
+
+# ---- 40: a runner started by a doc-only bar's leg nests (AC3) --------------------------------------
+R40o=$tmp/docsO; R40i=$tmp/docsI; mk_docs_repo "$R40o"; mk_repo "$R40i"
+legs "$R40i" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+printf '#!/usr/bin/env bash\ncd "%s" && env -u GATE_LEGS GATE_TURNSTILE_TTL=5 bash %s/run-gates.sh > "%s" 2>&1\nexit 0\n' "$R40i" "$KIT_REL" "$tmp/out40in" > "$tmp/nest40.sh"
+printf '[ {"name": "nest", "argv": ["bash", "%s"]} ]\n' "$tmp/nest40.sh" > "$tmp/nest40.json"
+run_docs_bar "$R40o" "$tmp/out40o" GATE_LEGS="$tmp/nest40.json"
+grep -q '^gate queue: nested under ' "$tmp/out40in" 2>/dev/null && ok "a runner started by a doc-only bar's leg nests" \
+  || { nope "a runner started by a doc-only bar's leg did not nest"; tail -3 "$tmp/out40in" 2>/dev/null | sed 's/^/      /'; }
+
+# ---- 41: the docs key is not a slot, and a full bar is never doc-only (AC4) ------------------------
+R41d=$tmp/docsHold; R41n=$tmp/docsNon; R41f=$tmp/docsFull; mk_docs_repo "$R41d"; mk_repo "$R41n"; mk_docs_repo "$R41f"
+S41=$tmp/shared41; mkdir -p "$S41"
+legs "$R41n" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'; legs "$R41f" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+( cd "$R41d" && env TS_SHARED="$S41" GATE_FULL= GATE_DOCS_BASE=HEAD~1 GATE_TURNSTILE_TICK=1 \
+    GATE_LEGS="$tmp/holdS.json" bash $KIT_REL/run-gates.sh ) >"$tmp/out41d" 2>&1 &
+p41d=$!; wait_registered "$S41" 1 "$p41d"
+( cd "$R41n" && env GATE_FULL=1 GATE_TURNSTILE_SLOTS=2 bash $KIT_REL/run-gates.sh ) >"$tmp/out41n" 2>&1
+( cd "$R41f" && env GATE_FULL=1 GATE_DOCS_BASE=HEAD~1 GATE_TURNSTILE_SLOTS= bash $KIT_REL/run-gates.sh ) >"$tmp/out41f" 2>&1
+: > "$S41/go"; wait "$p41d" 2>/dev/null
+grep -q '^gate queue: waited 0s$' "$tmp/out41n" && ! grep -q 'at dispatch' "$tmp/out41n" \
+  && ok "a non-doc bar beside a doc-only holder waited 0s and took no shared width" \
+  || nope "a non-doc bar beside a doc-only holder waited or was narrowed"
+[ "$(hdrkey "$R41f" queued_from)" = held ] && ! grep -q 'docs-only' "$tmp/out41f" \
+  && ok "a full bar with GATE_DOCS_BASE set took a slot as a non-doc bar" \
+  || nope "a full bar with GATE_DOCS_BASE set took the docs key (queued_from '$(hdrkey "$R41f" queued_from)')"
+
+# ---- 42: a dead docs beacon is swept by the next doc-only bar (AC5) --------------------------------
+R42=$tmp/docsSweep; mk_docs_repo "$R42"; legs "$R42" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+sh -c 'exit 0' & dead42=$!; wait "$dead42" 2>/dev/null
+mkdir -p "$DK/planted42"; printf '%s' "$dead42" > "$DK/planted42/pid"; printf '%s' "$(date +%s)" > "$DK/planted42/heartbeat"; printf 'p42' > "$DK/planted42/nonce"
+run_docs_bar "$R42" "$tmp/out42"
+grep -q 'sweeping the docs beacon of a dead holder' "$tmp/out42" && [ ! -e "$DK/planted42" ] \
+  && ok "a dead docs beacon was swept by the next doc-only bar" || nope "a dead docs beacon was left standing"
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "turnstile: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }
 [ "$bad" = 0 ] && echo "PASS ($n assertions)"

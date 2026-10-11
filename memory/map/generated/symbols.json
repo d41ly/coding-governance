@@ -9238,6 +9238,11 @@
       "file": "tools/memory-tree/marker-contract.test.sh"
     },
     {
+      "id": "mk_docs_repo",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
       "id": "mk_legs",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
@@ -16033,6 +16038,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_docs_bar",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
       "id": "run_docs_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -16971,6 +16981,11 @@
       "id": "scan_dead_anchors",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "scan_dead_docs_beacons",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "scan_dead_work",

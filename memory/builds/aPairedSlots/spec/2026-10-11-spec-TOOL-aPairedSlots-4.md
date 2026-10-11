@@ -1,11 +1,12 @@
 # TOOL-aPairedSlots-4 — a doc-only bar takes its own key and never queues
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 4
+**Status:** CLOSED · rev-1 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aPairedSlots-4-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aPairedSlots-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1-1-build-brief.md) | journal | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 TOOL-aPairedSlots-7 TOOL-aPairedSlots-8 TOOL-aPairedSlots-9 |
 | [2026-10-11-prompt-TOOL-aPairedSlots-1.md](../prompts/2026-10-11-prompt-TOOL-aPairedSlots-1.md) | research | TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlots-5 TOOL-aPairedSlots-6 |
 
