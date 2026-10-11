@@ -1,6 +1,6 @@
 # TOOL-aPairedSlots-2 — the turnstile is a counting semaphore of `slots` beacons, each reaped and released on its own
 
-**Status:** INPROGRESS · rev-1 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 2
+**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base b6cd02bc · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -39,8 +39,10 @@ runner prints and writes.
   under its nonce; they now act on whichever slot `TS_DIR` names, and on nothing else. Observed by
   AC4.
 - **S5 — nesting reads every slot.** The nested test compares an inherited `GATE_TURNSTILE_HOLDER`
-  with the nonce of each existing slot from 1 to `TS_SLOTS`, and with the slot-1 path whatever the
-  count, and names the matching slot's holder in its line. Observed by AC5.
+  with the nonce of every slot beacon directory present on the host, slot 1 and every `.<k>` beside
+  it whatever this runner's own count, and names the matching slot's holder in its line. Reading
+  every one present, not 1 to `TS_SLOTS`, is what nests a fixture bar whose own table declares fewer
+  slots than the holder that started it. Observed by AC5.
 - **S6 — the queue line at two or more slots.** At `TS_SLOTS` 1 the two queue lines are unchanged.
   Above 1 the leading clause names how many slots are held and each holder, in the shape §4's
   Messages table gives; the tail `queued at position N (waited Ns)` is unchanged at every count.
@@ -96,8 +98,10 @@ slot 1 only, so the host admits at most the larger of the two counts.
 
 New shell variables: `TS_SLOTS` (the count) and `TS_SLOT` (the slot this run holds, or empty).
 Minted functions, each leading with a declared verb in the `sh.function` cell:
-`resolve_slot_dir` (slot number to path) and `measure_held_slots` (the count of slot paths that
-exist, read by TOOL-aPairedSlots-3). New header keys `slot` and `slots`, written above one slot
+`resolve_free_slot` (the claim: an `mkdir` on each slot path in order, setting `TS_DIR` and
+`TS_SLOT` on the first that succeeds) and `measure_held_slots` (the count of slot paths that
+exist, into `TS_HELD_N`, read by TOOL-aPairedSlots-3). The slot paths are built once into the
+array `TS_SLOT_DIRS`, so neither function forks per slot. New header keys `slot` and `slots`, written above one slot
 only.
 
 ### Rollout
@@ -178,6 +182,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-11 · initial draft.
+- rev-2 · 2026-10-11 · S5 · §4 · nesting reads every slot beacon present rather than 1 to the count;
+  the claim helper is `resolve_free_slot` over a once-built `TS_SLOT_DIRS`, replacing a per-slot
+  path function that would fork on every call.
 
 ## 10. Reuse audit
 

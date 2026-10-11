@@ -73,7 +73,7 @@ ids TOOL-aPairedSlots-1 TOOL-aPairedSlots-2 TOOL-aPairedSlots-3 TOOL-aPairedSlot
 | [TOOL-aPairedSlots-1 — a `slots=<n>` key on each profile row, kit default 1, overridable by `GATE_TURNSTILE_SLOTS`](spec/2026-10-11-spec-TOOL-aPairedSlots-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aPairedSlots-6 — the unattended driver's gate backstop stays correct with two holders](spec/2026-10-11-spec-TOOL-aPairedSlots-6.md) | 1 | 1 | CLOSED | rev-1 | 2026-10-11 |
 | [TOOL-aPairedSlots-8 — the process-monitor adopter self-test stamps a fixture's common dir, not the real one](spec/2026-10-11-spec-TOOL-aPairedSlots-8.md) | 1 | 1 | CLOSED | rev-2 | 2026-10-11 |
-| [TOOL-aPairedSlots-2 — the turnstile is a counting semaphore of `slots` beacons, each reaped and released on its own](spec/2026-10-11-spec-TOOL-aPairedSlots-2.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-10-11 |
+| [TOOL-aPairedSlots-2 — the turnstile is a counting semaphore of `slots` beacons, each reaped and released on its own](spec/2026-10-11-spec-TOOL-aPairedSlots-2.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-10-11 |
 | [TOOL-aPairedSlots-3 — a bar dispatched while another slot is held takes the shared width its rule names](spec/2026-10-11-spec-TOOL-aPairedSlots-3.md) | 3 | 2 | INPROGRESS | rev-2 | 2026-10-11 |
 | [TOOL-aPairedSlots-4 — a doc-only bar takes its own key and never queues](spec/2026-10-11-spec-TOOL-aPairedSlots-4.md) | 4 | 2 | INPROGRESS | rev-1 | 2026-10-11 |
 | [TOOL-aPairedSlots-5 — a worktree holds at most one slot, so every path under its git dir stays one bar's](spec/2026-10-11-spec-TOOL-aPairedSlots-5.md) | 5 | 2 | INPROGRESS | rev-1 | 2026-10-11 |
