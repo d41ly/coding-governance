@@ -14,7 +14,7 @@ the kit dir they exercise, so a records-only commit runs only the legs that chec
 state. Not all do, and the split is DERIVED from `tools/gate-legs.json` rather than counted here —
 an unguarded leg runs on every bar, which is the whole point of leaving it unguarded. `GATE_FULL=1` bypasses every guard, and `.githooks/pre-push` DECIDES whether to set it rather
 than setting it unconditionally, forcing a total run when no recorded full green covers the pushed tip, when that green is more than a declared
-number of commits behind it, when its tree fingerprint does not reproduce at the sha it names, when
+number of first-parent landings behind it, when its tree fingerprint does not reproduce at the sha it names, when
 the leg manifest itself moved, or when the push runs the kit self-tests and the recorded green was
 earned with them held. That last one is COVERAGE and not equality — a green that covered MORE still
 satisfies a push that needs less, and a stamp with no such key at all reads as HELD. A guard can therefore scope the authoritative run too, and a
@@ -27,7 +27,8 @@ the detected cores and RAM to a named row of knobs, the runner prints the row it
 first leg verdict, and `GATE_JOBS` overrides the width alone. That row also declares a whole-run
 `wall` (`GATE_WALL` overrides): a breach kills the outstanding legs and REDS naming them. Legs are safe together because each
 heavy one is hermetic — its own `mktemp -d` scratch repo, never the real tree. Order is
-scheduled longest-first from a timing cache the runner resolves and NAMES on its own profile line,
+scheduled longest-first from a timing cache the runner resolves and NAMES on its own profile line;
+a leg's own seconds, run by run, are rows of `<git-dir>/gate-ledger.tsv`, never a figure in prose,
 while REPORTING is
 always manifest order, so output is byte-stable whatever the width and a corrupt cache costs wall
 clock only. **A KIT'S SELF-TESTS ARE NOT ON THIS BAR.** Owner ruling, 2026-08-23, and the first kit to take it is
@@ -36,7 +37,7 @@ What stayed are the legs whose subject is the REPOSITORY rather than the
 kit, because those go stale with nobody editing it; which, and how many, are its
 `tools/unattended/` rows in `tools/gate-legs.json`. On demand:
 `bash tools/unattended/run-unattended-gates.sh --serial`. The compensating check is written into that kit's
-descriptor, because an exemption is not coverage (§7).
+descriptor, because an exemption is not coverage (charter `[gate]`).
 
 Do not read a leg COUNT out of this paragraph; `tools/gate-legs.json` owns it and prose beside a
 source that owns a number is the rule this file keeps breaking.
@@ -79,7 +80,7 @@ and no job is a required check.
   The marker grammar it enforces is `tools/hooks/README.md`. Ready-made harness:
   `tools/workflows/tier2-review.js`.
 - `memory/guides/UNATTENDED-PROTOCOL.md` — a run that will merge and push with no owner turn replaces
-  the explicit-ask checkpoint with a committed standing mandate, §1 Landing's one substitute.
+  the explicit-ask checkpoint with a committed standing mandate, the charter's `[land]` substitute.
   The BASE that mandate hangs on is OBSERVED from the remote's own HEAD advertisement, never read
   from a local ref and never named by the environment; both of those were reproduced bypasses. §9
   states plainly what a check running under the run's own uid can and cannot buy.

@@ -102,7 +102,7 @@ Windows the scratch roots are *inside* the home directory: `TEMP` is
 `<home>/.claude/` allowlist therefore denies every legitimate temp write. Measured over the real
 corpus of 23,966 historical Bash tool calls, the rev-1 predicate denied 123 commands of which **73
 were legitimate** `%TEMP%` or scratchpad writes — including `export TMPDIR=…/claude/gatetmp`, which is
-verbatim the workaround `memory/guides/SESSION-KICKOFF.md:225-226` prescribes and which unit 1's own
+verbatim the workaround `memory/guides/SESSION-KICKOFF.md` (lines 225-226 at this spec's base) prescribes and which unit 1's own
 AC9 bar run depends on.
 
 `resolveAllowedRoots()` therefore returns, normalised to every spelling above: the values of `TMPDIR`,
@@ -221,7 +221,7 @@ inside its own `TemporaryDirectory()` and never sees a new fragment on disk;
 grows is `install-prefix (shipped surface)`.
 
 **Precondition, recorded rather than assumed:** the full bar does not currently finish on node `a`
-under the ambient `TMPDIR` (`memory/guides/SESSION-KICKOFF.md:223-226`; measured this session at 6865
+under the ambient `TMPDIR` (`memory/guides/SESSION-KICKOFF.md` (lines 223-226 at this spec's base); measured this session at 6865
 entries, 4905 of them `mrecall-*`). AC14 is therefore run with an ad-hoc `TMPDIR` export, and the
 value used is recorded in the build record so unit 2's evidence is comparable. The allowlist in §4
 derives from `TMPDIR`, so the guard permits that export rather than blocking its own acceptance.

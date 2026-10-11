@@ -1,6 +1,6 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.26` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.27` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `<prefix>/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
 
@@ -209,7 +209,7 @@ Both `drift-audit-code.js` and `drift-audit-state.js` build their run `note` fro
 `deriveLiveness(counters)` and `renderLivenessNote(state, counters)`. **The sentence is a contract**
 (`TOOL-dRetiredFork-6`, ratified F1): a consumer gate re-derives it and byte-compares, which is what
 a hand-written string can never satisfy — and relaxing such a gate to a substring match makes it
-satisfiable by prose, the first class the charter's §7 names.
+satisfiable by prose, the first class the charter's `[gate]` practice names.
 
 Three states, three distinct sentences, and the split is the point:
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# gov:kit lexicon@1.20
+# gov:kit lexicon@1.22
 """lexicon.py — two naming predicates over a DECLARED vocabulary, plus one self-containment refusal.
 
 THE INVOCATIONS ARE NOT LISTED HERE. Run the file with no recognised mode and it prints them, with
@@ -87,7 +87,7 @@ from lexicon_conf import (ConfError, CONVENTIONS, PATTERN_PARTS, SURFACES, langs
 from subtokens import (check_convention, classify, leading_verb, read_stem,  # noqa: E402
                        render_convention, subtokens)
 
-KIT_LEXICON_VERSION = "1.20"
+KIT_LEXICON_VERSION = "1.22"
 
 CONF_NAME = ".lexicon.conf"
 WAIVER_FILES = {
@@ -4171,7 +4171,7 @@ def read_superseded(message: str) -> list:
 
 def check_merge_losses(root: Path, rng: str) -> int:
     """`--merge-losses <a>..<b>`: exit 1 when a two-parent merge in the range LOSES a definition a
-    parent carried. TOOL-aMendedFleet-3, mechanizing the charter's §1 Landing sentence "diff the
+    parent carried. TOOL-aMendedFleet-3, mechanizing the charter's [reconcile] practice, "diff the
     merge against BOTH parents" — merge `01c22e155` took one side and lost `write_ask_views`.
 
     THE RULE. For merge M with parents P1, P2 and base B, over the ARMED paths where M's tree differs
@@ -4429,4 +4429,6 @@ def main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8", errors="backslashreplace")
     raise SystemExit(main(sys.argv))

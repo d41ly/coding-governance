@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.141 -->
+<!-- gov:kit memory-tree@2.143 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -370,6 +370,49 @@ prints FORKED for the same bytes, reading this one declaration as text.
 
 **What it cannot see.** A fork written as a plain bullet INSIDE another F-item's span belongs to that
 span. The shape makes a declared fork gradeable; it cannot find an undeclared one.
+
+## Tiers — which review a change owes
+
+Carried from the charter's v3.5 review section when v4.0 cut it to one `[risk]` practice
+(PLAY-aDistilledCharter-2), and moved here from the review protocol so every adoption carries it
+(PLAY-aDistilledCharter-5).
+
+- **Tier 1** — a mechanical or additive change: no new write path, migration, auth, sanitization or
+  egress surface, and no shared-contract change. It owes the gates and one focused self-review of the
+  diff, and NO multi-agent review.
+- **Tier 2** — any of the above, or a cross-stream merge. It owes the adversarial find, verify and
+  synthesize pattern of the review protocol (`REVIEW-PROTOCOL.md`, review-harness kit), with the project's recurring bug-class checklist run as part of it.
+- A Tier-2 review reads the diff at an immutable sha plus its immediate callers and callees, ONCE, at
+  the integration boundary: the cumulative diff landing on the default branch. Per-increment reviews
+  re-scan overlapping code and never see the seam between two increments.
+
+## Security boundaries — the checklist for a new write path or surface
+
+Carried from the charter's v3.5 security section, one line per boundary. A Tier-2 review of a change
+that adds a write path, a stored-content class, an outbound call or an automation surface checks each.
+
+- Sanitize untrusted input at the WRITE boundary, once, and trust storage at render; re-check size
+  and shape caps AFTER any transform that can grow content, because sanitizers add attributes.
+- ONE composite write-guard — scrub, capability gate, sanitize — on EVERY path that stores renderable
+  or dangerous content, sibling paths included: templates, imports, saved or shared components.
+- The most dangerous sanctioned content class sits behind an explicit per-principal permission
+  checked at write time, distinct from and additional to sanitization.
+- One canonical URL normalizer shared by client AND server: strip control characters and whitespace,
+  fold `\` to `/`, reject protocol-relative `//host` and `/\host`, deny `javascript:`, `data:` and
+  `vbscript:`, and pin those evasions in tests on both sides.
+- Every outbound request is SSRF-guarded: https only, public IPs only, no redirect-following, signed
+  payloads, the same guard on retry and queue paths, and DNS resolution off the event loop.
+- Authorization lives in the shared core, deny-by-default and defined as code, so every adapter
+  inherits it; a service function a future adapter can reach re-checks authorization itself.
+- Automation runs as a dedicated non-login service principal with a deliberately narrow grant, never
+  a human or admin role, and its writes are draft-only until an explicit default-off gate allows more.
+- Keep PII and secrets off the automation surface structurally: payload and return types that cannot
+  carry a sensitive value, and an audit of value-bearing fields flowing to automated readers.
+- Full-document writes carry an optimistic-concurrency precondition and answer 409 when stale.
+- Document which production protections are OFF in the test environment, confirm each defaults ON in
+  production, and exercise each directly in a dedicated test.
+- Each guarded surface keeps a written security model in the decision log; read it BEFORE extending
+  that surface.
 
 ## The skeleton (copy everything below this line)
 

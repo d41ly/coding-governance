@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.95 -->
+<!-- gov:kit unattended@1.98 -->
 
 # Unattended runs
 
@@ -97,17 +97,17 @@ The prompt path: write from `memory/guides/PLAYBOOK-TEMPLATE.md`, validate with
 
 ## Produce pieces ATTENDED
 
-Not a run: the same two record verbs, with `-` for the slug and `--records-root <root>`.
+Not a run: the record verbs, slug `-`, `--records-root <root>`.
 
 ## While it runs
 
 - **A process not in the ledger is never killed**, whatever its command line says: it is reported
   and left to a person, never killed by name, age or spin rate (`UNATTENDED-STOPS.md` §14).
-- No merge bar and no self-test suite inside a pass.
+- No merge bar or self-test suite in a pass.
 
 ```bash
 unattended.sh --phase <slug> BUILDING --witness $(git rev-parse HEAD)
-unattended.sh --park <slug> --item "<the question>" --reason "<options, and why refused>"
+unattended.sh --park <slug> --item "<the question>" --reason "<options; why refused>"
 unattended.sh --propose <slug> --item "<amendment>" --step "<step>" --reason "<why>"
 unattended.sh --brief <slug> --unit <unit-id> --path <the brief file>
 unattended.sh --rescope <slug> --act retire|supersede|add|defer --item <unit-id> --reason "<why>"
@@ -115,6 +115,7 @@ unattended.sh --dispatch <slug> --pass <unit-id> --writes <path> --writes <path>
 unattended.sh --plan <slug> --paths
 unattended.sh --status <slug>
 unattended.sh --claims  # RUN_CLAIMS on
+unattended.sh --overlaps  # local
 unattended.sh --beat <slug>
 unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>
 python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD
