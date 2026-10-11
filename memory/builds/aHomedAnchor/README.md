@@ -4,7 +4,7 @@ node: a
 opened: 2026-10-09
 streams: tooling
 roster: TOOL
-ids: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7 TOOL-aHomedAnchor-8 TOOL-aHomedAnchor-9 TOOL-aHomedAnchor-10 TOOL-aHomedAnchor-11 TOOL-aHomedAnchor-12 TOOL-aHomedAnchor-13 TOOL-aHomedAnchor-14 TOOL-aHomedAnchor-15 TOOL-aHomedAnchor-16 TOOL-aHomedAnchor-17 TOOL-aHomedAnchor-18 TOOL-aHomedAnchor-19 TOOL-aHomedAnchor-20 TOOL-aHomedAnchor-21
+ids: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7 TOOL-aHomedAnchor-8 TOOL-aHomedAnchor-9 TOOL-aHomedAnchor-10 TOOL-aHomedAnchor-11 TOOL-aHomedAnchor-12 TOOL-aHomedAnchor-13 TOOL-aHomedAnchor-14 TOOL-aHomedAnchor-15 TOOL-aHomedAnchor-16 TOOL-aHomedAnchor-17 TOOL-aHomedAnchor-18 TOOL-aHomedAnchor-19 TOOL-aHomedAnchor-20 TOOL-aHomedAnchor-21 TOOL-aHomedAnchor-22 TOOL-aHomedAnchor-23 TOOL-aHomedAnchor-24 TOOL-aHomedAnchor-25
 authorized-by: prompt
 ---
 
@@ -60,13 +60,17 @@ None yet.
 | 4 | `TOOL-aHomedAnchor-4` | 1 | the pre-commit hook runs the wiring check on its inputs (HIGH id 17) |
 | 5 | `TOOL-aHomedAnchor-6` | 2 | the driver and doc minors, batched |
 | 5 | `TOOL-aHomedAnchor-7` | 2 | the leg minors, batched |
+| 6 | `TOOL-aHomedAnchor-22` | 1 | command-line entry points write UTF-8 (held asks -10, -11, -14) |
+| 6 | `TOOL-aHomedAnchor-23` | 1 | the launcher arm reads only invocations (held ask -18) |
+| 6 | `TOOL-aHomedAnchor-24` | 1 | `--overlaps` on both agent surfaces (held ask -20) |
+| 6 | `TOOL-aHomedAnchor-25` | 1 | two suite fixtures follow other builds' carriers |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 7 unit(s) · node a · opened 2026-10-09 · streams tooling
+**Build status:** INPROGRESS · 11 unit(s) · node a · opened 2026-10-09 · streams tooling
 ids TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7 TOOL-aHomedAnchor-8 TOOL-aHomedAnchor-9 TOOL-aHomedAnchor-10 TOOL-aHomedAnchor-11 TOOL-aHomedAnchor-12 TOOL-aHomedAnchor-13 TOOL-aHomedAnchor-14
-ids TOOL-aHomedAnchor-15 TOOL-aHomedAnchor-16 TOOL-aHomedAnchor-17 TOOL-aHomedAnchor-18 TOOL-aHomedAnchor-19 TOOL-aHomedAnchor-20 TOOL-aHomedAnchor-21
+ids TOOL-aHomedAnchor-15 TOOL-aHomedAnchor-16 TOOL-aHomedAnchor-17 TOOL-aHomedAnchor-18 TOOL-aHomedAnchor-19 TOOL-aHomedAnchor-20 TOOL-aHomedAnchor-21 TOOL-aHomedAnchor-22 TOOL-aHomedAnchor-23 TOOL-aHomedAnchor-24 TOOL-aHomedAnchor-25
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -78,13 +82,17 @@ ids TOOL-aHomedAnchor-15 TOOL-aHomedAnchor-16 TOOL-aHomedAnchor-17 TOOL-aHomedAn
 | [TOOL-aHomedAnchor-4 — the pre-commit hook runs the Skill wiring check when its inputs are staged](spec/2026-10-09-spec-TOOL-aHomedAnchor-4.md) | 4 | 1 | CLOSED | rev-1 | 2026-10-09 |
 | [TOOL-aHomedAnchor-6 — the closing review's driver and doc minors, batched](spec/2026-10-09-spec-TOOL-aHomedAnchor-6.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-09 |
 | [TOOL-aHomedAnchor-7 — the closing review's leg minors, batched](spec/2026-10-09-spec-TOOL-aHomedAnchor-7.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-09 |
+| [TOOL-aHomedAnchor-22 — command-line entry points write UTF-8 whatever the platform default](spec/2026-10-11-spec-TOOL-aHomedAnchor-22.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
+| [TOOL-aHomedAnchor-23 — the launcher arm reads an invocation, not a declaration, a string or a file extension](spec/2026-10-11-spec-TOOL-aHomedAnchor-23.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
+| [TOOL-aHomedAnchor-24 — the `--overlaps` verb is named on both surfaces an agent reads](spec/2026-10-11-spec-TOOL-aHomedAnchor-24.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
+| [TOOL-aHomedAnchor-25 — two suite fixtures follow the carriers other builds changed](spec/2026-10-11-spec-TOOL-aHomedAnchor-25.md) | 6 | 1 | INPROGRESS | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 4 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7.
+Ids no `spec-audit` record has ever named: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7 TOOL-aHomedAnchor-22 TOOL-aHomedAnchor-23 TOOL-aHomedAnchor-24 TOOL-aHomedAnchor-25.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -96,6 +104,7 @@ Ids no `spec-audit` record has ever named: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor
 | 3 | `TOOL-aHomedAnchor-3`, `TOOL-aHomedAnchor-5` | yes |
 | 4 | `TOOL-aHomedAnchor-4` | no |
 | 5 | `TOOL-aHomedAnchor-6`, `TOOL-aHomedAnchor-7` | yes |
+| 6 | `TOOL-aHomedAnchor-22`, `TOOL-aHomedAnchor-23`, `TOOL-aHomedAnchor-24`, `TOOL-aHomedAnchor-25` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
