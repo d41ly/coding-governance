@@ -1,11 +1,12 @@
 # TOOL-aSparedSpawn-6 — the unattended driver as a library, called in process by its suite
 
-**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aSparedSpawn-6-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-6-acceptance-ledger.md) | journal | — |
 | [2026-10-11-prompt-TOOL-aSparedSpawn-6-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-6-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

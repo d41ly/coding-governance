@@ -526,7 +526,41 @@ run_main_at_head() { # command... -> its output and status
   [ -z "$_ma_rs" ] || git update-ref refs/heads/main "$_ma_rs" 2>/dev/null
   return "$_ma_rc"
 }
-run() { run_main_at_head bash "$SCRIPT" "$@" 2>&1; }
+# ---- THE IN-PROCESS HARNESS (TOOL-aSparedSpawn-6) -----------------------------------------------
+# The driver is SOURCED once, here in the prologue every shard runs: it defines its functions and
+# returns, and `( load_driver_conf && main "$@" )` then runs one call in a subshell of this shell,
+# paying a fork where `bash "$SCRIPT"` pays a process and a parse of the whole driver. Every call this
+# suite makes through `run`, or through a wrapper ending in `run_driver`, goes through ONE body that
+# `UNATTENDED_HARNESS` steers: `inproc` runs the subshell, and `process`, the DEFAULT until the
+# owner's equivalence run has taken each shard in both modes, runs the process exactly as before.
+# The `( … )` is never elided: `$(run …; run …)` forms exist, and a bare `main` would let the first
+# call's `exit` end the rest of them. `run_proc` is the process whatever the mode, for the classes a
+# subshell cannot model: the hook path, a copy of the driver, a probe the driver runs at source time.
+# Each call appends one byte to its mode's tally FILE, because `out=$(run …)` runs `run` in a
+# subshell and a counter variable incremented there is lost; the tail prints both counts.
+. "$SCRIPT" || { echo "FAIL the driver did not source, so no arm below can run in process"; exit 2; }
+UNATTENDED_HARNESS=${UNATTENDED_HARNESS:-process}
+case "$UNATTENDED_HARNESS" in
+  process|inproc) ;;
+  *) echo "FAIL UNATTENDED_HARNESS is '$UNATTENDED_HARNESS', and the harness modes are process and inproc"; exit 2 ;;
+esac
+DRV_INPROC_TALLY="$TMP/harness-inproc.tally"; DRV_PROC_TALLY="$TMP/harness-proc.tally"
+: > "$DRV_INPROC_TALLY"; : > "$DRV_PROC_TALLY"
+# The driver's and its library's function names, and their definitions as sourced: the namespace arm
+# in the tail compares this shell's definitions against these, so a double an arm left behind, or a
+# function it unset, is named before it can answer an in-process call in the driver's place.
+DRV_FNS=$(grep -ohE '^[A-Za-z_][A-Za-z0-9_]*\(\)' "$SCRIPT" "$HERE/lib-unattended.sh" | tr -d '()' | sort -u | tr '\n' ' ')
+declare -f $DRV_FNS > "$TMP/harness-fns.sourced"
+run_inproc() { ( load_driver_conf && main "$@" ); }   # argv... -> one in-process call, uncounted
+run_driver() { # argv... -> the driver's output and status, in process or as a process per UNATTENDED_HARNESS
+  if [ "$UNATTENDED_HARNESS" = inproc ]; then
+    printf . >>"$DRV_INPROC_TALLY"; run_inproc "$@"
+  else
+    printf . >>"$DRV_PROC_TALLY"; bash "$SCRIPT" "$@"
+  fi
+}
+run() { run_main_at_head run_driver "$@" 2>&1; }
+run_proc() { printf . >>"$DRV_PROC_TALLY"; run_main_at_head bash "$SCRIPT" "$@" 2>&1; }
 
 # ---- EVERY `--dispatch` ARM NEEDS A COMMITTED, READY SPEC for the unit it names. The driver refuses
 # ---- a pass for a unit no tracked spec under the build defines (M2's MISSING, check 49) and one
@@ -2244,6 +2278,115 @@ same "a no-handle re-preflight left the recorded set intact" \
 _blk_max=$(awk '/^if in_shard [0-9]+; then/ { s = NR; next } /^fi   # ---- (end REGION|region [0-9]+ continues)/ && s { if (NR - s > m) m = NR - s; s = 0 } END { print m + 0 }' "$HERE/unattended.test.sh")
 same "no in_shard block of this suite exceeds 2500 lines (longest: $_blk_max)" "$([ "$_blk_max" -gt 0 ] && [ "$_blk_max" -le 2500 ] && echo ok || echo "too long: $_blk_max")" "ok"
 
+fi   # ---- region 1 continues below: the parity table is a block of its own, at a top-level seam
+if in_shard 1; then
+
+# ---- TOOL-aSparedSpawn-6 S7, AC7: THE PARITY TABLE. Each row runs the driver twice from one reset
+# ---- tree, once as a process and once in process, and the two must agree on their output through
+# ---- `render_stable`, their exit status, and the tree they leave through `derive_tree_digest`. The
+# ---- in-process side is `run_inproc`, called DIRECTLY whatever UNATTENDED_HARNESS says, so the dark
+# ---- default still grades in-process parity, and neither side counts toward the harness tally the
+# ---- liveness arm reads. Commit dates are pinned for the whole table and every UTC stamp, long number
+# ---- and abbreviated sha is normalised, so a difference is the driver's and never the clock's.
+# ---- A row is `label | setup | argv`: the setup runs after each reset, in this shell, and the argv is
+# ---- split on spaces. The rc-2 rows hold the conf refusals load_driver_conf owns: with one bound
+# ---- read moved out of it onto the executed path alone, the GATE_BOUND row's two sides disagree,
+# ---- which is the staged break this table answers (observed on a slice of the prologue and this block).
+render_stable() { # driver output on stdin -> the same text, every per-call value normalised
+  sed -E 's/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z/<utc>/g; s/[0-9]{9,}/<n>/g; s/(^|[^0-9A-Za-z])[0-9a-f]{7,40}([^0-9A-Za-z]|$)/\1<sha>\2/g'
+}
+derive_tree_digest() { # -> one hash over the refs' names, the status, and every worktree file's name and normalised bytes
+  { git for-each-ref --format='%(refname)'; git status --porcelain=v1 -uall
+    git ls-files -co --exclude-standard -z | xargs -0 -r awk 'FNR == 1 { print "== " FILENAME } { print }'
+  } 2>/dev/null | render_stable | git hash-object --stdin
+}
+PARITY_ROWS="version | : | --version
+usage, no verb | : |
+argv refusal | : | --no-such-verb
+slug refusal | : | --status ../etc
+status with no run | : | --status tRun
+plan | : | --plan tRun
+plan framed over two slugs | : | --plan tRun tNone --framed
+preflight | : | --preflight tRun --keepalive-id k1
+phase | : | --phase tRun BUILDING --witness abc
+audit | : | --audit tRun
+register-task | : | --register-task tRun --task t --heartbeat /no/such/beat
+release-task | : | --release-task tRun --task t
+liveness | : | --liveness tRun
+resume | : | --resume tRun
+close | : | --close tRun
+authorization | : | --authorization tRun
+landed | : | --landed tRun
+abort | : | --abort tRun --reason r --code external-prerequisite
+hold | : | --hold tRun --code host-degraded --until owner --reason r --reaped k1
+handoff | : | --handoff tRun --code owner-landing --reason r --reaped k1
+settle | : | --settle tRun
+park | : | --park tRun --item i --reason r
+propose | : | --propose tRun --item i --step s --reason r
+rescope | : | --rescope tRun --act retire --item ARCH-tRun-1 --reason r
+dispatch | : | --dispatch tRun --pass ARCH-tRun-1 --writes a.sh
+brief | : | --brief tRun --unit ARCH-tRun-1 --path x.md
+review | : | --review tRun --subject s --verdict CLEAN --blockers 0
+attest | : | --attest tRun --item keepalive-reaped
+record-piece | : | --record-piece tRun --path p --leg 1 --verdict PASS
+record-set | : | --record-set tRun --leg 1 --verdict PASS
+check-commit | printf 'x\\n' > .git/u6-msg | --check-commit .git/u6-msg
+claims | : | --claims
+beat | : | --beat tRun
+overlaps | : | --overlaps
+no conf, rc 2 | rm -f .unattended.conf | --status tRun
+a conf holding declare, rc 2 | printf 'declare LANDER_MODE=\"bogus\"\\n' >> .unattended.conf | --status tRun
+a malformed GATE_BOUND, rc 2 | printf 'GATE_BOUND=\"soon\"\\n' >> .unattended.conf | --status tRun"
+export GIT_AUTHOR_DATE="2026-10-11T00:00:00Z" GIT_COMMITTER_DATE="2026-10-11T00:00:00Z"
+_pt_rows=0; _pt_rc0=0; _pt_rc1=0; _pt_rc2=0
+while IFS='|' read -r _pt_l _pt_s _pt_a; do
+  _pt_l=${_pt_l% }; _pt_s=${_pt_s# }; _pt_a=${_pt_a# }
+  reset_tree; eval "$_pt_s"
+  _pt_po=$(run_main_at_head bash "$SCRIPT" $_pt_a 2>&1); _pt_pr=$?; _pt_pd=$(derive_tree_digest)
+  reset_tree; eval "$_pt_s"
+  _pt_io=$(run_main_at_head run_inproc $_pt_a 2>&1); _pt_ir=$?; _pt_id=$(derive_tree_digest)
+  same "parity $_pt_l: output" "$(printf '%s\n' "$_pt_io" | render_stable)" "$(printf '%s\n' "$_pt_po" | render_stable)"
+  same "parity $_pt_l: exit status" "$_pt_ir" "$_pt_pr"
+  same "parity $_pt_l: tree left behind" "$_pt_id" "$_pt_pd"
+  _pt_rows=$((_pt_rows + 1)); case "$_pt_pr" in 0) _pt_rc0=1 ;; 1) _pt_rc1=1 ;; 2) _pt_rc2=1 ;; esac
+done <<< "$PARITY_ROWS"
+unset GIT_AUTHOR_DATE GIT_COMMITTER_DATE
+rm -f .git/u6-msg
+# ...and the table is what it says: every row ran, and among them a pass, a refusal and a misconfiguration.
+same "parity: every declared row ran" "$_pt_rows" "$(printf '%s\n' "$PARITY_ROWS" | grep -c '|')"
+same "parity: the rows reach exit 0, 1 and 2" "$_pt_rc0$_pt_rc1$_pt_rc2" "111"
+# ...and every verb the dispatch carries is a row, so a verb added later is a row or a red.
+for _pt_v in $(verbs_all) --overlaps; do
+  n=$((n+1)); grep -qE -- "\| *$_pt_v( |\$)" <<< "$PARITY_ROWS" || { echo "FAIL parity: the verb $_pt_v has no row in the parity table"; st=1; }
+done
+
+# ---- TOOL-aSparedSpawn-6 S8, AC8: THE TOP-LEVEL EXIT ARM. An `exit` the driver runs at top level,
+# ---- outside every function, runs when this suite SOURCES it and ends this shell instead of a call.
+# ---- Each one is DECLARED below by a fragment of the refusal it ends, and that fragment must be
+# ---- asserted by an arm of this suite that runs the driver as a PROCESS (the missing-library arm, a
+# ---- copy run as `bash ./unattended.sh`). An undeclared exit reds naming its line; a declared fragment
+# ---- no top-level exit carries reds as stale, because a stale row silently widens what it exempts.
+TOPLEVEL_EXITS='the kit library is missing beside this script'
+_tx=$(awk '
+  /^[A-Za-z_][A-Za-z0-9_]*\(\) *\{.*\} *(#.*)?$/ && !f { next }
+  /^[A-Za-z_][A-Za-z0-9_]*\(\) *\{/ && !f { f = 1; next }
+  f && /^\}[[:space:]]*(#.*)?$/ { f = 0; next }
+  f { next }
+  /^[[:space:]]*#/ { next }
+  { c3 = c2; c2 = c1; c1 = $0 }
+  /(^|[;&|{( ])exit([ ;)}]|$)/ { gsub(/\t/, " ", c3); gsub(/\t/, " ", c2); printf "%d\t%s %s %s\n", NR, c3, c2, c1 }
+' "$SCRIPT")
+n=$((n+1)); [ -n "$_tx" ] || { echo "FAIL the top-level exit scan found no exit at all, and the missing-library refusal is one, so the scan reads nothing"; st=1; }
+while IFS=$'\t' read -r _tx_n _tx_c; do
+  [ -n "$_tx_n" ] || continue
+  _tx_ok=""
+  while IFS= read -r _tx_f; do case "$_tx_c" in *"$_tx_f"*) _tx_ok=1 ;; esac; done <<< "$TOPLEVEL_EXITS"
+  n=$((n+1)); [ -n "$_tx_ok" ] || { echo "FAIL the driver exits at top level on line $_tx_n, outside load_driver_conf and main, and no TOPLEVEL_EXITS row names it, so sourcing the driver can end this suite there"; st=1; }
+done <<< "$_tx"
+while IFS= read -r _tx_f; do
+  n=$((n+1)); grep -qF -- "$_tx_f" <<< "$_tx" || { echo "FAIL the TOPLEVEL_EXITS row '$_tx_f' names no top-level exit of the driver, so it is stale"; st=1; }
+  n=$((n+1)); [ "$(grep -cF -- "$_tx_f" "$HERE/unattended.test.sh")" -ge 2 ] || { echo "FAIL the TOPLEVEL_EXITS row '$_tx_f' is asserted by no arm of this suite"; st=1; }
+done <<< "$TOPLEVEL_EXITS"
 fi   # ---- end REGION ONE ----------------------------------------------------------------------
 
 # ---- REGIONS 2 TO `SHARD_ARITY` ------------------------------------------------------------------
@@ -8513,6 +8656,9 @@ n=$((n+1))
 [ "$_rc" = 3 ] || { echo "FAIL an INERT bound changed the command exit status to $_rc; 3 expected"; st=1; }
 hit "$RB_OUT" "ran-unbounded"
 rm -f "$rb_fn"
+# TOOL-aSparedSpawn-6: the block above left doubles of driver functions in this shell, or unset
+# them. Re-sourcing the driver restores every definition before an in-process call can meet one.
+. "$SCRIPT"
 
 # ...and the BOUND REACHES ITS VERBS, which the helper arms above cannot show. spec-6 AC1 and AC5.
 # Asserted as ELAPSED TIME against a 30 s sleeper with a 2 s bound: the message was always the
@@ -8678,6 +8824,9 @@ n=$((n+1))
 RB_ERR=""
 same "an empty notice stream yields no tail at all, not a bare header" "$(read_stderr_tail)" ""
 rm -f "$sp_fn"
+# TOOL-aSparedSpawn-6: the block above left doubles of driver functions in this shell, or unset
+# them. Re-sourcing the driver restores every definition before an in-process call can meet one.
+. "$SCRIPT"
 
 # ---- ...and the two-stream capture reaches the CALLERS that print it whole. TOOL-dDerivedDocket-48
 # ---- AC3. Each stub writes one known line to each stream and each refusal must quote BOTH: RB_OUT
@@ -10034,7 +10183,7 @@ SUR
 su_unit=$(git -C "$su_dir" rev-parse unit)
 su_base=$(git -C "$su_dir" rev-parse main)
 SU_R=memory/builds/tRun/RUN.md
-run_su() { ( cd "$su_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main bash "$SCRIPT" "$@" 2>&1 ); }
+run_su() { ( cd "$su_dir" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main && run_main_at_head run_driver "$@" 2>&1 ); }
 run_su_git() { git -C "$su_dir" "$@"; }
 run_su_leg() { ( cd "$su_dir" && GOV_UNATTENDED_REPORT=1 bash "$HERE/check-unattended.sh" --skip 28 2>&1 ); }
 read_su_sum() { run_su_git hash-object "${1:-$SU_R}"; }
@@ -10837,7 +10986,7 @@ G62_W="$ORIGIN_DIR/g62-wave"
 G62_LEDGER="$DD_CD/unattended/tRun.procs"
 add_wave_worktree() { rm -rf "$G62_W"; git worktree add -q -b wave "$G62_W" >/dev/null 2>&1 || { echo "FAIL fixture: git worktree add failed under $G62_W"; st=1; }; }
 remove_wave_worktree() { git worktree remove --force "$G62_W" >/dev/null 2>&1; git worktree prune; rm -rf "$G62_W"; git branch -q -D wave 2>/dev/null; }
-run_wave() { ( cd "$G62_W" && run_main_at_head bash "$SCRIPT" "$@" 2>&1 ); }
+run_wave() { ( cd "$G62_W" && run_main_at_head run_driver "$@" 2>&1 ); }
 G62_MAIN=$(git worktree list --porcelain | sed -n 's/^worktree //p' | head -n 1)
 
 # ---- AC4: from the sibling, the take-over and the no-id resume are refused at 58 naming the run's
@@ -11076,7 +11225,7 @@ ip_out=$(mktemp -d)
 # helper once carried was written through a heredoc that halved its backslash, and the literal
 # `\n` it left became an unquoted `n` - so `env` ran a command named `n` and every arm below it
 # graded the driver's absence.
-iprun() { ( cd "$ip_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" bash "$SCRIPT" "$@" 2>&1 ); }
+iprun() { ( cd "$ip_dir" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" && run_main_at_head run_driver "$@" 2>&1 ); }
 ipgit() { git -C "$ip_dir" "$@"; }
 ipreset() {
   # FORCED: a refused or `primary` close leaves its record staged, a plain checkout refuses over it,
@@ -12205,6 +12354,9 @@ AC15IDL
   cd "$TMP" || exit 2
   rm -rf "$ac15_dir"
 fi
+# TOOL-aSparedSpawn-6: the block above left doubles of driver functions in this shell, or unset
+# them. Re-sourcing the driver restores every definition before an in-process call can meet one.
+. "$SCRIPT"
 askreset
 
 fi   # ---- region 7 continues below: one compound block past about 3000 commands segfaults
@@ -12844,7 +12996,7 @@ DL_R=memory/builds/tRun/RUN.md
 # The node's LANDED LOG, where in-place `--landed` keeps its observation (TOOL-dDerivedDocket-61 S10);
 # it replaced the retired per-slug lease file this fixture used to reset.
 DL_LOG="$dl_dir/.git/unattended/landed.tRun.log"
-run_dl() { ( cd "$dl_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main DLOUT="$dl_out" bash "$SCRIPT" "$@" 2>&1 ); }
+run_dl() { ( cd "$dl_dir" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main DLOUT="$dl_out" && run_main_at_head run_driver "$@" 2>&1 ); }
 run_dl_git() { git -C "$dl_dir" "$@"; }
 read_dl_sum() { run_dl_git hash-object "$DL_R"; }
 init_dl_fixture() {
@@ -13314,7 +13466,7 @@ IHS
   git add -A >/dev/null && git commit -q -m base --no-verify
   git push -q origin main
 ) >/dev/null 2>&1
-run_ih() { ( cd "$ih_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IHOUT="$ih_out" IHMAN="$TOOL_REL/gate-legs.json" bash "$SCRIPT" "$@" 2>&1 ); }
+run_ih() { ( cd "$ih_dir" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main IHOUT="$ih_out" IHMAN="$TOOL_REL/gate-legs.json" && run_main_at_head run_driver "$@" 2>&1 ); }
 run_ih_repo() { git -C "$ih_dir" "$@"; }
 IHOVR="--override closing-review-recorded --reason fixture-has-no-review --override build-complete --reason fixture-unit-is-open"
 # R's policy body on main, pushed; a fresh unit branch on top of it, preflighted and attested; sets
@@ -13659,6 +13811,9 @@ hit  "$(cat "$f4_dir/memory/builds/tRun/BACKLOG.md")" "- KEEP · ARCH-tRun-1 · 
 hit  "$(cat "$f4_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the default branch"
 unset -f write_inherited_asks write_backlog_rows write_ask_rows read_leg_argv derive_ask_seq read_ask_back write_ask_views run_f4_filer seed_f4_tree
 rm -rf "$f4_dir" "$TMP/f4-authored.md" "$TMP/f4-not-a-dir" "$TMP/f4-shim"
+# TOOL-aSparedSpawn-6: the block above left doubles of driver functions in this shell, or unset
+# them. Re-sourcing the driver restores every definition before an in-process call can meet one.
+. "$SCRIPT"
 
 # TOOL-aMendedFleet-9: THE DAILY HELD JOB'S REDS. SLICED, with the reader shadowed and ASKS_CMD blank,
 # so the writer only PRINTS what it would file. The key is read at R: blank is DARK and a bad shape is
@@ -13708,6 +13863,9 @@ n=$((n+1)); [ ! -e "$h9_dir/memory/builds/tRun/BACKLOG.md" ] || { echo "FAIL hel
 unset -f write_held_asks read_policy_key read_roster_family readme_of read_leg_argv derive_ask_seq read_held_reds run_h9
 unset H9_ROWS
 rm -rf "$h9_dir"
+# TOOL-aSparedSpawn-6: the block above left doubles of driver functions in this shell, or unset
+# them. Re-sourcing the driver restores every definition before an in-process call can meet one.
+. "$SCRIPT"
 
 # AC21 and AC23: under park with the witness set, the rows are staged beside the hold line; commit,
 # push, reap and hold as the line says, and the hold is accepted. Resumed and closed again over the
@@ -14668,7 +14826,7 @@ GK_HOOKS=$(mktemp -d); GK_BIN=$(mktemp -d); GK_GIT=$(command -v git)
 GK_GD=$(git rev-parse --absolute-git-dir)
 GK_JOURNAL="$(cd "$(git rev-parse --git-common-dir)" && pwd)/runlog/pushes.log"
 cp "$GK_SRC" "$GK_HOOKS/pre-push"; chmod +x "$GK_HOOKS/pre-push"
-run_hooked() { run_main_at_head env -u GOV_DEFAULT_BRANCH -u GOV_RUNLOG -u GOV_BRANCH_GATE_CMD bash "$SCRIPT" "$@" 2>&1; }
+run_hooked() { ( unset GOV_DEFAULT_BRANCH GOV_RUNLOG GOV_BRANCH_GATE_CMD && run_proc "$@" ); }   # the hook path: a process in every mode
 build_hooked_fixture() { arm_claim_fixture; git config core.hooksPath "$GK_HOOKS"; git remote set-head origin -a >/dev/null 2>&1
           rm -f "$GK_BIN/git" "$GK_GD/pre-push-refusal" "$GK_JOURNAL"; }
 read_hooked_journal() { tail -n 1 "$GK_JOURNAL" 2>/dev/null; }
@@ -15665,6 +15823,9 @@ unset REMOTE_BOUND GH37_DATE GH37_FIND GH37_RM
 # shellcheck source=lib-unattended.sh
 . "$HERE/lib-unattended.sh"
 rm -rf "$gh_d"
+# TOOL-aSparedSpawn-6: the block above unset three driver functions and REMOTE_BOUND, which every
+# in-process remote observation reads. Re-sourcing the driver restores both before a call meets them.
+. "$SCRIPT"
 # ---- AC7: a finished record over a README missing its build-index close refuses at check 9 before the
 # ---- rotation; a live record missing its generated close refuses before the claim write.
 build_aborted_run() { run --preflight tRun --keepalive-id k1 >/dev/null; sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md; fixture; }
@@ -15897,7 +16058,7 @@ GWP
   git commit -q --allow-empty -m "unit work" --no-verify
 ) >/dev/null 2>&1
 gw_unit=$(git -C "$gw_dir" rev-parse unit)
-run_gw() { ( cd "$gw_dir" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main GWOUT="$gw_out" bash "$SCRIPT" "$@" 2>&1 ); }
+run_gw() { ( cd "$gw_dir" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main GWOUT="$gw_out" && run_main_at_head run_driver "$@" 2>&1 ); }
 run_gw_git() { git -C "$gw_dir" "$@"; }
 read_gw_record() { cat "$gw_dir/memory/builds/tRun/RUN.md"; }
 # THE MARGIN IS READ OUT OF THE DRIVER, never retyped, so a moved constant moves every expected line.
@@ -16231,7 +16392,7 @@ reset_tree
 # ---- three commits unfetched, so the tip is advertised and absent here. The suffix keeps each arm's
 # ---- commits distinct from every earlier arm's, so an unfetched tip is never present by accident.
 rx_root=$(mktemp -d); rx_seq=0
-run_rx() { ( cd "$rx_root/repo" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main bash "$SCRIPT" "$@" 2>&1 ); }
+run_rx() { ( cd "$rx_root/repo" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main && run_main_at_head run_driver "$@" 2>&1 ); }
 run_rx_git() { git -C "$rx_root/repo" "$@"; }
 read_rx_fact() { sed -n "s/^$1: //p" "$rx_root/repo/memory/builds/tRx/RUN.md" | head -1; }
 build_rx_fixture() { # fetch: yes|no -> RX_TIP, the remote's main after the three commits
@@ -16366,7 +16527,7 @@ LN_VALUE='a=desk-a/daily-agent d=compeeto/d41ly'
 LN_NB="COMPUTERNAME=desktop-3j1o6cd USERNAME=agent5"
 LN_ND="COMPUTERNAME=compeeto USERNAME=d41ly"
 LN_R=memory/builds/tLn/RUN.md
-run_ln() { local _e=$1; shift; ( cd "$ln_root/repo" && run_main_at_head env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main $_e bash "$SCRIPT" "$@" 2>&1 ); }
+run_ln() { local _e=$1; shift; ( cd "$ln_root/repo" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main && { [ -z "$_e" ] || export $_e; } && run_main_at_head run_driver "$@" 2>&1 ); }
 run_ln_git() { git -C "$ln_root/repo" "$@"; }
 read_ln_fact() { sed -n "s/^$1: //p" "$ln_root/repo/$LN_R" | head -1; }
 build_ln_fixture() { # LANDING_NODES at BASE, `-` for undeclared · the run's own committed value, `-` for BASE's · [older]
@@ -16782,6 +16943,27 @@ same "TOOL-dUnstuckLanding-27 L6 the record-alone fallback is announced once" \
   "$(printf '%s\n' "$out" | grep -c "unattended: NOTE - the bar's run record names no staged set, so the bar tie excludes the run-state file alone: $LN_R" || true)" "1"
 rm -rf "$ln_root"
 fi   # ---- end REGION 8 ------------------------------------------------------------------------
+
+# ---- THE HARNESS TAIL (TOOL-aSparedSpawn-6 S8, S9) - every shard, in every mode ---------------------
+# THE NAMESPACE ARM. Every driver and library function in this shell must still be the definition the
+# prologue sourced: an arm that doubles one and leaves it, or unsets one, has changed what every later
+# in-process call runs, in the driver's place and with no other signal. A static scan for a colliding
+# name cannot tell a double fenced in `( … )` or restored by re-sourcing from one that leaks, so this
+# compares the definitions themselves and names each that moved.
+declare -f $DRV_FNS > "$TMP/harness-fns.now" 2>/dev/null
+_hn=$(awk 'FNR == 1 { f++ }
+  /^[A-Za-z_][A-Za-z0-9_]* \(\) *$/ { fn = $1; seen[fn] = 1 }
+  fn != "" { b[f, fn] = b[f, fn] $0 "\n" }
+  END { for (k in seen) if (b[1, k] != b[2, k]) print k }' "$TMP/harness-fns.sourced" "$TMP/harness-fns.now" | sort | tr '\n' ' ')
+n=$((n+1)); [ -s "$TMP/harness-fns.sourced" ] || { echo "FAIL the namespace arm holds no sourced definitions, so it compares nothing"; st=1; }
+n=$((n+1)); [ -z "$_hn" ] || { echo "FAIL a driver or library function in this shell is no longer the definition the prologue sourced, so an in-process call after it runs a double or nothing: ${_hn% }"; st=1; }
+# THE LIVENESS LINE. One byte per call in each mode's tally; under UNATTENDED_HARNESS=inproc a run
+# that made NO in-process call claimed a harness it never exercised, and reds. Counted in both modes,
+# so a shard prints one assertion count whichever mode it ran in.
+_ha=$(wc -c < "$DRV_INPROC_TALLY"); _hb=$(wc -c < "$DRV_PROC_TALLY")
+echo "harness: $((_ha + 0)) in-process calls, $((_hb + 0)) process calls"
+n=$((n+1)); [ "$UNATTENDED_HARNESS" != inproc ] || [ "$((_ha + 0))" -gt 0 ] \
+  || { echo "FAIL UNATTENDED_HARNESS=inproc made 0 in-process calls, so this run graded the process and called it the harness"; st=1; }
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static

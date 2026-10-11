@@ -36,6 +36,9 @@
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
 #
+# SOURCED, it defines and returns: `. unattended.sh`, then `( load_driver_conf && main <argv> )` runs
+# one call in a subshell of the caller, which is how its own suite calls it (TOOL-aSparedSpawn-6).
+#
 # THE DRIVER DOES LESS THAN IT LOOKS LIKE IT SHOULD, ON PURPOSE. Three of its verbs were specified
 # with effects a script cannot produce, and the fix each time was to remove the effect rather than
 # fake it:
@@ -81,7 +84,7 @@ export GIT_GRAFT_FILE=/dev/null
 # the gate leg must answer identically — `GIT`, the anchored id tests, path containment, and "has
 # this pass committed yet". Sourced by absolute path derived from THIS file's location, because the
 # `cd` to the repo root happens below and a relative source would resolve against the caller's cwd.
-KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 [ -f "$KIT_DIR/lib-unattended.sh" ] || {
   echo "unattended: the kit library is missing beside this script, so the predicates it shares with its own gate leg are unavailable and no answer here would be trustworthy: $KIT_DIR/lib-unattended.sh" >&2
   exit 2
@@ -116,12 +119,15 @@ verb_list() { # -> "--a, --b and --c", for a human reading a refusal
 }
 # The usage text, READ FROM THIS FILE'S OWN HEADER. A second spelling of every verb's arguments is
 # the drift this block removes, and the header is the spelling that documents them. The self-read
-# assumes $0 names this file - which KIT_DIR above already assumes, so it adds no new one.
-SELF="$KIT_DIR/$(basename -- "$0")"
+# assumes BASH_SOURCE[0] names this file - which KIT_DIR above already assumes, so it adds no new one.
+SELF="$KIT_DIR/$(basename -- "${BASH_SOURCE[0]}")"
+# THE NAME A REMEDY LINE PRINTS for this file: `$0` when executed and `BASH_SOURCE[0]` when sourced.
+# Executed, the two are one string, so one spelling serves both entry shapes (TOOL-aSparedSpawn-6).
+DRIVER_ARGV0=${BASH_SOURCE[0]}
 usage() {
   local u; u=$(sed -n 's|^#   unattended[.]sh |  unattended.sh |p' "$SELF")
   # A PROBE THAT CANNOT MOVE SAYS SO. Read through a copy whose header was stripped, or through any
-  # invocation where $0 does not name this file, the sed above matches nothing - and a bare "usage:"
+  # invocation where BASH_SOURCE[0] does not name this file, the sed above matches nothing - and a bare "usage:"
   # over an empty list is indistinguishable from a driver with no verbs. Refuse into the derived set
   # instead, which is the one carrier that cannot go missing.
   [ -n "$u" ] || { echo "usage: cannot read this file's own header at $SELF, so the argument shapes are unavailable; the verbs are $(verb_list)"; return 0; }
@@ -403,30 +409,6 @@ REVIEW_ROUNDS_DEFAULT=1
 # TOOL-dDerivedDocket-5.
 RESUME_SCHEDULE_DELAY_DEFAULT=1800
 RESUME_SCHEDULE_LIMIT_DEFAULT=6
-# TOOL-dDerivedDocket-27 S4 - THE BACKSTOP'S MARGIN, the third term of the bar's bound: what a bar may
-# still take AFTER its own wall fired - the wall watcher's poll, at most 30 s, the kill of each leg's
-# tree and the verdict render. 600 s is twenty of those polls, PINNED 2026-09-14 from that one bound,
-# and every backstop line prints it beside the other two terms, so the sum re-derives on every run.
-# A SOURCE CONSTANT with an arm seam of the same name, which the suite shrinks to reach a kill in
-# seconds; it is not a conf key, because D12-i7 ruled ONE declared number and that number is the wall.
-GATE_BACKSTOP_MARGIN=${GATE_BACKSTOP_MARGIN:-600}
-case "$GATE_BACKSTOP_MARGIN" in
-  *[!0-9]*) echo "unattended: REFUSING - the GATE_BACKSTOP_MARGIN seam is '$GATE_BACKSTOP_MARGIN', which is not a whole number of seconds, so the merge bar's backstop cannot be summed." >&2
-            RUNLOG_CLEAN=1; exit 2 ;;
-esac
-GATE_BACKSTOP_MARGIN=$((10#$GATE_BACKSTOP_MARGIN))
-
-# LIVENESS, and spec-6 S5. The sibling notice above names the REMOTE bound only, so on a host with no
-# runnable `timeout -k` an operator was told the remote observation was inert while $GATE_CMD and
-# $WIRING_CHECK ran unbounded and three carriers said they were bounded. A probe that cannot move
-# says so.
-[ "$GATE_BOUND_LIVE" = 1 ] || echo "unattended: NOTE - this node has no working 'timeout -k', so the GATE_BOUND wall-clock bound on GATE_CMD and WIRING_CHECK is INERT; both run unbounded this session" >&2
-
-# AND IT SAYS SO, which the comment above has always required and the code did not do: the flag's
-# only reader was the `if` in observe_remote, so a node without a working `timeout -k` produced
-# byte-identical output while running unbounded. The transport options survive on that path.
-[ "$REMOTE_BOUND_LIVE" = 1 ] || echo "unattended: NOTE - this node has no working 'timeout -k', so the ${REMOTE_BOUND}s wall-clock bound on remote observation is INERT; http.lowSpeed and ssh ConnectTimeout still apply" >&2
-
 # EVERY remote observation goes through here, and the source-level arm asserts that no `ls-remote`
 # appears outside it. Three bounds, because no single mechanism covers every transport: the outer
 # wall clock catches blackholed packets, `http.lowSpeed*` catches an HTTP server that accepts and
@@ -475,6 +457,48 @@ observe_remote() { # <outfile> · <git args…> -> rc (124 = the bound fired)
   fi
   return "$rc"
 }
+
+# ------------------------------------------------------------------------------ THE CONF PREAMBLE
+# load_driver_conf - every top-level step that depends on the conf, the cwd or a per-call seam, in
+# the order it always ran: the backstop seam, the two NOTEs, the repo root and the `cd`, the conf
+# and its refusals, the closed sets and the bound reads, REVIEW_ROUNDS and its runaway check, and
+# the procfs seam. ONE FUNCTION so a SOURCED driver runs it once per call, in the subshell its caller
+# opens: `( load_driver_conf && main "$@" )`. It EXITS on a refusal, as it always did, which is why
+# that subshell belongs to every call. An EXECUTED driver calls it right below its definition, so
+# every top-level line after it still runs AFTER the conf, and a conf still cannot pre-set the state
+# those lines initialise. Nothing inside is re-indented, so the column-0 reads of its lines match.
+# TOOL-aSparedSpawn-6.
+load_driver_conf() { # -> the conf loaded into this shell, or an exit naming why it cannot be
+# THE DRIVER'S OWN PID, taken on the first line of the shell that IS the driver: the process when
+# executed, the caller's subshell when sourced. A pid site reads this and never `$BASHPID` in place,
+# because a site reached inside a subshell would record that subshell where the driver was meant.
+DRIVER_PID=$BASHPID
+# Re-derived per call, from the probe above: the suite assigns it at top level for its sliced
+# run_bounded arms, and an in-process call would otherwise inherit whatever the last arm left.
+GATE_BOUND_LIVE=$REMOTE_BOUND_LIVE
+# TOOL-dDerivedDocket-27 S4 - THE BACKSTOP'S MARGIN, the third term of the bar's bound: what a bar may
+# still take AFTER its own wall fired - the wall watcher's poll, at most 30 s, the kill of each leg's
+# tree and the verdict render. 600 s is twenty of those polls, PINNED 2026-09-14 from that one bound,
+# and every backstop line prints it beside the other two terms, so the sum re-derives on every run.
+# A SOURCE CONSTANT with an arm seam of the same name, which the suite shrinks to reach a kill in
+# seconds; it is not a conf key, because D12-i7 ruled ONE declared number and that number is the wall.
+GATE_BACKSTOP_MARGIN=${GATE_BACKSTOP_MARGIN:-600}
+case "$GATE_BACKSTOP_MARGIN" in
+  *[!0-9]*) echo "unattended: REFUSING - the GATE_BACKSTOP_MARGIN seam is '$GATE_BACKSTOP_MARGIN', which is not a whole number of seconds, so the merge bar's backstop cannot be summed." >&2
+            RUNLOG_CLEAN=1; exit 2 ;;
+esac
+GATE_BACKSTOP_MARGIN=$((10#$GATE_BACKSTOP_MARGIN))
+
+# LIVENESS, and spec-6 S5. The sibling notice above names the REMOTE bound only, so on a host with no
+# runnable `timeout -k` an operator was told the remote observation was inert while $GATE_CMD and
+# $WIRING_CHECK ran unbounded and three carriers said they were bounded. A probe that cannot move
+# says so.
+[ "$GATE_BOUND_LIVE" = 1 ] || echo "unattended: NOTE - this node has no working 'timeout -k', so the GATE_BOUND wall-clock bound on GATE_CMD and WIRING_CHECK is INERT; both run unbounded this session" >&2
+
+# AND IT SAYS SO, which the comment above has always required and the code did not do: the flag's
+# only reader was the `if` in observe_remote, so a node without a working `timeout -k` produced
+# byte-identical output while running unbounded. The transport options survive on that path.
+[ "$REMOTE_BOUND_LIVE" = 1 ] || echo "unattended: NOTE - this node has no working 'timeout -k', so the ${REMOTE_BOUND}s wall-clock bound on remote observation is INERT; http.lowSpeed and ssh ConnectTimeout still apply" >&2
 
 ROOT="$(GIT rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a GIT repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -678,6 +702,29 @@ if [ -n "$_two_key" ]; then
   RUNLOG_CLEAN=1; exit 2
 fi
 
+# THE RUNAWAY CEILING, and it is a BACKSTOP rather than the mechanism. A SPEC subject is bounded by
+# `REVIEW_ROUNDS` and exits in a disposition; the DIFF review is bounded by the convergence predicate;
+# this ceiling backstops both, so a defect in the predicate cannot produce an unbounded loop. It is
+# set well above any observed converging sequence, so REACHING it is itself a defect worth reporting
+# rather than a routine outcome — and under the owner resolution the run promotes and lands anyway
+# rather than halting, which is why it must be loud in two carriers.
+# A file constant, not a conf key and not an environment variable, on the argument this repo already
+# recorded for its agent fan-out bound: a ceiling raisable from the environment leaves no diff behind.
+RUNAWAY_CEILING="8"
+# THE ROUND BOUND FOR A SPEC SUBJECT, TOOL-aProbedUnit-6. The third caller of `read_bound_key`, placed
+# here and not beside the other two because the one arm those keys lack — the upper bound — IS the
+# constant above, and a comparison written above its definition reads an empty string. A tracked conf
+# key rather than a constant because a conf leaves a diff behind, the property the header above wants.
+read_bound_key REVIEW_ROUNDS "$REVIEW_ROUNDS_DEFAULT" rounds "a spec-audit subject exits BOUNDED after the kit default of ${REVIEW_ROUNDS_DEFAULT} round(s)"
+# STRICTLY BELOW. `review_state` tests the ceiling BEFORE the bound, so a bound EQUAL to the ceiling
+# is the one value the sentence below refuses and `-le` accepted: at that value the loud CEILING
+# exit fires and the declared bound is never reached, exactly as the sentence says.
+[ "$REVIEW_ROUNDS" -lt "$RUNAWAY_CEILING" ] || { echo "unattended: REFUSING - REVIEW_ROUNDS is $REVIEW_ROUNDS, at or above the runaway ceiling of $RUNAWAY_CEILING, so the ceiling would fire first and the declared bound could never be reached." >&2; exit 2; }
+# `UNATTENDED_PROCFS` is read per call, for the reason the process-ledger block below gives it.
+PROCFS_ROOT=${UNATTENDED_PROCFS:-/proc}
+}
+[ "${BASH_SOURCE[0]}" != "$0" ] || load_driver_conf
+
 status=0
 # TOOL-dLoggedFlight-2 - every refusal is also RECORDED, by number and in call order, for the run
 # log's END line. In a subshell the append is lost; that reaches only `--plan`, which is not journaled.
@@ -836,24 +883,6 @@ DOD_NO_OVERRIDE="authorization-reachable pieces-complete"
 #   gate-red-out-of-scope     a gate is red and its fix lies outside the mandate scope.
 #   claim-lost                another session holds this run's claim on the remote, so the run must
 #                             not drive its slug any more (TOOL-aGraftedHelix-1); check 108 names it.
-# THE RUNAWAY CEILING, and it is a BACKSTOP rather than the mechanism. A SPEC subject is bounded by
-# `REVIEW_ROUNDS` and exits in a disposition; the DIFF review is bounded by the convergence predicate;
-# this ceiling backstops both, so a defect in the predicate cannot produce an unbounded loop. It is
-# set well above any observed converging sequence, so REACHING it is itself a defect worth reporting
-# rather than a routine outcome — and under the owner resolution the run promotes and lands anyway
-# rather than halting, which is why it must be loud in two carriers.
-# A file constant, not a conf key and not an environment variable, on the argument this repo already
-# recorded for its agent fan-out bound: a ceiling raisable from the environment leaves no diff behind.
-RUNAWAY_CEILING="8"
-# THE ROUND BOUND FOR A SPEC SUBJECT, TOOL-aProbedUnit-6. The third caller of `read_bound_key`, placed
-# here and not beside the other two because the one arm those keys lack — the upper bound — IS the
-# constant above, and a comparison written above its definition reads an empty string. A tracked conf
-# key rather than a constant because a conf leaves a diff behind, the property the header above wants.
-read_bound_key REVIEW_ROUNDS "$REVIEW_ROUNDS_DEFAULT" rounds "a spec-audit subject exits BOUNDED after the kit default of ${REVIEW_ROUNDS_DEFAULT} round(s)"
-# STRICTLY BELOW. `review_state` tests the ceiling BEFORE the bound, so a bound EQUAL to the ceiling
-# is the one value the sentence below refuses and `-le` accepted: at that value the loud CEILING
-# exit fires and the declared bound is never reached, exactly as the sentence says.
-[ "$REVIEW_ROUNDS" -lt "$RUNAWAY_CEILING" ] || { echo "unattended: REFUSING - REVIEW_ROUNDS is $REVIEW_ROUNDS, at or above the runaway ceiling of $RUNAWAY_CEILING, so the ceiling would fire first and the declared bound could never be reached." >&2; exit 2; }
 # THE REVIEW VERDICT VOCABULARY, closed and kit-owned. Its CANONICAL home is the memory-tree kit,
 # which enforces review-record grammar and renders the build method; a copy-installed kit cannot
 # import across that boundary, so this is a STATED duplication whose drift is armed by a row in that
@@ -1469,7 +1498,7 @@ read_landed_observation() { # slug · landing commit -> 0 with LO_SHA and LO_UTC
 # `UNATTENDED_PROCFS` is the FIXTURE SEAM and nothing else: pointed away, every new record carries
 # `-` and nothing is ever reaped. A crafted directory could forge a token, and any reap it earned still
 # goes through the reaper's own fence.
-PROCFS_ROOT=${UNATTENDED_PROCFS:-/proc}
+# PROCFS_ROOT itself is read in load_driver_conf, once per call, because the seam above is per call.
 # 120 s: one census of the reaper's is bounded at 90 s inside it and a kill costs two, so this admits
 # one slow census and still ends a hung one. A pinned literal, chosen rather than measured, on
 # REMOTE_BOUND's argument that a bound raisable from the environment leaves no diff behind.
@@ -1515,8 +1544,8 @@ write_proc_record() { # pid · argv... -> one line appended to the running verb'
   # reads the pid, the tokens, the driver pid, the time and the argv); it is for the person reading.
   _k=$(fact "$(runmd_of "$SLUG")" keepalive 2>/dev/null) || _k=""
   _k=${_k:--}; _k=${_k//[[:space:]]/_}
-  read_proc_token "$$"
-  printf '%s %s %s %s %s %s%s\n' "$_pid" "$_t" "$$" "$PT_TOKEN" "$_k" "$(read_utc_now)" "$_a" >> "$_f" 2>/dev/null
+  read_proc_token "$DRIVER_PID"
+  printf '%s %s %s %s %s %s%s\n' "$_pid" "$_t" "$DRIVER_PID" "$PT_TOKEN" "$_k" "$(read_utc_now)" "$_a" >> "$_f" 2>/dev/null
   return 0
 }
 PL_FILE=""; PL_LINES=()
@@ -10610,8 +10639,8 @@ dod_met() { # slug · run-state file · item · checker
       # so the record the decision table below reads is the re-run's and never the moved one's.
       while :; do
         _gtry=$((_gtry + 1))
-        if [ -n "${EPOCHREALTIME:-}" ]; then _gid="unattended-${EPOCHREALTIME//[!0-9]/}${RANDOM}-$$"
-        else _gid="unattended-$(date -u +%Y%m%d%H%M%S)${RANDOM}-$$"; fi
+        if [ -n "${EPOCHREALTIME:-}" ]; then _gid="unattended-${EPOCHREALTIME//[!0-9]/}${RANDOM}-$DRIVER_PID"
+        else _gid="unattended-$(date -u +%Y%m%d%H%M%S)${RANDOM}-$DRIVER_PID"; fi
         _gdir=""
         if [ -n "$_ggd" ]; then _gdir="$_ggd/gate-run/$_gid"; rm -rf "$_gdir" 2>/dev/null; fi
         _genv=(GATE_RUN_ID="$_gid" GATE_INHERITED_RED="$GP_POLICY")
@@ -10692,7 +10721,7 @@ dod_met() { # slug · run-state file · item · checker
           _hold="the runner exited HOST"
           DOD_OUT="hold · host-degraded · until probe host · $_hold"
           DOD_OUT="$DOD_OUT"$'\n'"  every leg that failed timed out twice, the second time alone, while a spawn cost more than the runner's HOST ratio over this clone's floor, so the verdict is about the host and not the tree"
-          DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $0 --hold $slug --code host-degraded --until \"probe host\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
+          DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $DRIVER_ARGV0 --hold $slug --code host-degraded --until \"probe host\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
           DOD_OUT="$DOD_OUT"$'\n'"$_gout"
           return 1 ;;
         124|137)
@@ -10706,7 +10735,7 @@ dod_met() { # slug · run-state file · item · checker
               _hold="the bar was killed at its backstop before it acquired the repository"
               DOD_OUT="hold · host-degraded · until probe gate · $_hold"
               DOD_OUT="$DOD_OUT"$'\n'"  it was killed after ${RB_TOOK}s against its ${_gbound}s backstop (wall $GB_WALL + queue $GB_QUEUE + margin $GB_MARGIN) and never printed a gate queue: acquired line, so the host or another bar held the repository the whole time and no leg of this run was graded"
-              DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $0 --hold $slug --code host-degraded --until \"probe gate\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
+              DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $DRIVER_ARGV0 --hold $slug --code host-degraded --until \"probe gate\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
               return 1
             fi
             if [ "$_gbs" = 1 ]; then
@@ -10747,7 +10776,7 @@ dod_met() { # slug · run-state file · item · checker
                 _hold="$GR_LEGS red at ${_gr:0:8}, INHERITED; INHERITED_RED=$GP_POLICY"
                 DOD_OUT="hold · inherited-red · until probe gate · $_hold"
                 [ -z "$GR_WHY" ] || DOD_OUT="$DOD_OUT"$'\n'"  $GR_WHY"
-                DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $0 --hold $slug --code inherited-red --until \"probe gate\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
+                DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $DRIVER_ARGV0 --hold $slug --code inherited-red --until \"probe gate\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
                 DOD_OUT="$DOD_OUT"$'\n'"$_gout"
               fi ;;
           esac ;;
@@ -13426,7 +13455,7 @@ write_runlog_start() { # the caller's first argument · its second -> the START 
   local -a f=()
   if [ -n "${EPOCHREALTIME:-}" ]; then t=${EPOCHREALTIME/,/.}; d=${t//[!0-9]/}
   else printf -v t '%(%s)T' -1; d="${t}000000"; fi
-  RUNLOG_T0=$d; RUNLOG_N="$$.$d"
+  RUNLOG_T0=$d; RUNLOG_N="$DRIVER_PID.$d"
   case "$1" in
     ""|*[[:space:]]*) ;;
     *) case " $VERBS_SLUG $VERBS_INLINE " in *" $1 "*) RUNLOG_VERB=$1 ;; esac ;;
@@ -13442,7 +13471,7 @@ write_runlog_start() { # the caller's first argument · its second -> the START 
       && [ "$runmd" -nt "$RUNLOG_GITDIR/runlog-stamp-$RUNLOG_SLUG" ] && oob=1
   fi
   f=(v 1 t "$t" p driver ev start n "$RUNLOG_N" verb "$RUNLOG_VERB" slug "$RUNLOG_SLUG" wt "$ROOT"
-     kit "$KIT_UNATTENDED_VERSION" pid "$$" phase_from "$pf")
+     kit "$KIT_UNATTENDED_VERSION" pid "$DRIVER_PID" phase_from "$pf")
   [ -n "$oob" ] && f+=(oob 1)
   # The session NAMES, split in pure bash so a `*` in the declaration cannot glob. A value becomes
   # part of a line other tools parse, so it is shape-checked, and one that fails is written EMPTY and
@@ -13598,6 +13627,16 @@ write_run_record() { # slug -> 0 always; one line per miss
   return 0
 }
 
+# Refusal 1 of five, and it does NOT belong in verb_preflight's precondition block where this spec
+# first put it: that function never runs for another verb, so a guard there could never fire. It is a
+# DISPATCH guard, and it has to be evaluated inside the --plan and --phase arms too, because both of
+# those exit INSIDE the loop and a post-loop check alone never sees them.
+refuse_waive_unless_preflight() { # verb
+  [ "$WAIVE_SEEN" = 1 ] || return 0
+  local v="$1"
+  fail 37 "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question: $v"
+  return 1
+}
 # --------------------------------------------------------------------------------------- dispatch
 # TOOL-cBriefedPilot-1 - the PAIRED accumulator. `--override) OV="${2:-}"` stored a scalar, so a
 # second occurrence overwrote the first and `verb_close` blocked on the second unmet item forever,
@@ -13609,6 +13648,13 @@ write_run_record() { # slug -> 0 always; one line per miss
 # which is what `--abort <slug> --reason <text> --code <halt-code>` uses. A flag still pending when argv ends keeps the
 # EMPTY reason it was pushed with, so it meets the missing-reason refusal that already exists instead
 # of vanishing - the refusal is reached by the value, not by a second branch.
+main() { # argv... -> the verb, ending in `exit` (TOOL-aSparedSpawn-6)
+# A SOURCED DRIVER'S main RUNS IN A SUBSHELL OR NOT AT ALL. Every verb ends in `exit`, which in the
+# shell that sourced the driver would end that shell, so main refuses there with 2 and names why.
+if [ "${BASH_SOURCE[0]}" != "$0" ] && [ "$BASH_SUBSHELL" = 0 ]; then
+  echo "unattended: REFUSING - main was called in the shell that sourced the driver, where its first exit would end that shell; call it in a subshell: ( load_driver_conf && main <argv> )" >&2
+  return 2
+fi
 VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
 # --hold's own four, and --resume's one. Initialised here rather than in the conf-default block,
 # for the reason PK_ITEM is: a tracked .unattended.conf could otherwise pre-set one and satisfy a
@@ -13643,16 +13689,6 @@ fi
 # of this guard read the array and was unreachable for exactly the two verbs the spec named.
 WAIVE_SEEN=0
 for _a in "$@"; do [ "$_a" = "--waive" ] && WAIVE_SEEN=1; done
-# Refusal 1 of five, and it does NOT belong in verb_preflight's precondition block where this spec
-# first put it: that function never runs for another verb, so a guard there could never fire. It is a
-# DISPATCH guard, and it has to be evaluated inside the --plan and --phase arms too, because both of
-# those exit INSIDE the loop and a post-loop check alone never sees them.
-refuse_waive_unless_preflight() { # verb
-  [ "$WAIVE_SEEN" = 1 ] || return 0
-  local v="$1"
-  fail 37 "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question: $v"
-  return 1
-}
 # THE ARGUMENT LOOP IS FENCED by a bare argv sentinel pair, and the gate leg's check 26 reads every
 # `--<name>` token between them - sub-loops included - and joins it to this file's header lines and to
 # the sibling suite, both directions. A flag parsed here and documented nowhere reds that check, so a
@@ -13817,3 +13853,8 @@ case "$VERB" in
     fi ;;
 esac
 RUNLOG_CLEAN=1; exit "$status"
+}
+# THE ENTRY. A sourced driver has defined everything and returns; an executed one loaded its conf
+# below load_driver_conf and runs the verb.
+[ "${BASH_SOURCE[0]}" = "$0" ] || return 0
+main "$@"

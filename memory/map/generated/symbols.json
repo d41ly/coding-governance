@@ -6643,6 +6643,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "derive_tree_digest",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "derive_tree_holds",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -8228,6 +8233,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "load_driver_conf",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "load_fork_cutoff",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -8706,6 +8716,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/unattended/stop-guard.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "main",
@@ -13743,6 +13758,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_stable",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "render_staged",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -16008,6 +16028,11 @@
       "file": "tools/unattended/runlog-writer.test.sh"
     },
     {
+      "id": "run_driver",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_engine",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -16208,6 +16233,11 @@
       "file": "tools/govkit/matrix.py"
     },
     {
+      "id": "run_inproc",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_ir_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -16396,6 +16426,11 @@
       "id": "run_probe_scan",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "run_proc",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "run_push",

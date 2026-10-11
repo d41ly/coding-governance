@@ -57,3 +57,7 @@ base: e6585db4e125bb0919c0c1f18687eb9825ffed80
 2026-10-11T07:37:19Z dispatch · item 213f95fd TOOL-aSparedSpawn-6 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated/symbols.json memory/builds/aSparedSpawn/spec/2026-10-09-spec-TOOL-aSparedSpawn-6.md memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-6-acceptance-ledger.md memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-6-fork-probe.sh memory/builds/aSparedSpawn/README.md memory/guides/SESSION-KICKOFF.md
 
 2026-10-11T07:37:43Z brief · item TOOL-aSparedSpawn-6 · reason b1c4afc0fe4a memory/builds/aSparedSpawn/prompts/2026-10-11-prompt-TOOL-aSparedSpawn-6-build-brief.md
+
+2026-10-11T09:45:44Z dispatch · item 605f957e TOOL-aSparedSpawn-6 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/aSparedSpawn/spec/2026-10-09-spec-TOOL-aSparedSpawn-6.md memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-6-acceptance-ledger.md memory/builds/aSparedSpawn/build/2026-10-11-build-TOOL-aSparedSpawn-6-fork-probe.sh memory/builds/aSparedSpawn/README.md memory/guides/SESSION-KICKOFF.md
+
+2026-10-11T09:46:44Z brief · item TOOL-aSparedSpawn-6 · reason 5c03244cd692 memory/builds/aSparedSpawn/prompts/2026-10-11-prompt-TOOL-aSparedSpawn-6-build-brief.md
