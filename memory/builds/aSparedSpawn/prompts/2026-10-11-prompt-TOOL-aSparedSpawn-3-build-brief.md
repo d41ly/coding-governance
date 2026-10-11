@@ -44,3 +44,13 @@ a `**Serves:** journal TOOL-aSparedSpawn-3` line, then one `**Evidences:** TOOL-
 block holding one `- ACn — <check> — <what was observed>` line per criterion, each naming the
 backticked check that ran and stating plainly when a criterion is owed at VERIFYING instead.
 It rides the pass commit, which also sets the spec's status header to CLOSED.
+
+## Adopted discovery — the ledger carry-forward empties the ledger
+
+TOOL-aSparedSpawn-1's pass found it (that spec's rev-3, section 9). In `tools/run-gates/run-gates.sh`,
+the ledger merge's `awk -F'\t' 'NR==FNR{seen[$1]=1;next} !($1 in seen)' "$new" "$LEDGER"` carries
+nothing forward when `$new` is empty, which happens when a run reused or guard-skipped every leg: with
+an empty first file `NR==FNR` holds for every ledger line. That wipes `gate-ledger.tsv`, the input this
+unit's longest-first dispatch reads. Fold it into this unit: add it to the spec as a scope item with its
+own acceptance criterion in a rev bump, committed before the code, then fix it and observe the
+criterion red on the current awk and green after.
