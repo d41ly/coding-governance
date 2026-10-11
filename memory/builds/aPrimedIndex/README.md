@@ -2,9 +2,9 @@
 slug: aPrimedIndex
 node: a
 opened: 2026-10-11
-streams: tooling
-roster: TOOL
-ids: TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 TOOL-aPrimedIndex-5
+streams: tooling+deployer
+roster: TOOL+DEPL
+ids: DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 TOOL-aPrimedIndex-5 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-7 TOOL-aPrimedIndex-8
 authorized-by: prompt
 ---
 
@@ -41,6 +41,8 @@ mandate, recorded under [prompts/](prompts/2026-10-11-prompt-TOOL-aPrimedIndex-1
 - Ratchets, minted version carriers and node-local evidence are not regenerated: they are not
   derived from the tree alone. Unit 1's spec names each one.
 - Kit versions are minted by the lander; no unit bumps one by hand.
+- Units 5 to 8 are closing review r1's promotions (M4): one per HIGH, and the minors in two batches
+  over disjoint write sets. All four write disjoint files, and the inline author sequences them.
 
 ## Parked decisions
 
@@ -48,17 +50,21 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 
 <!-- roster:units -->
 
-| # | Unit | Status | Mechanism |
-|---|---|---|---|
-| 1 | `TOOL-aPrimedIndex-1` | OPEN | every generated output a bar leg grades declares its write and check commands in its kit's descriptor |
-| 2 | `TOOL-aPrimedIndex-2` | OPEN | one runner verb rewrites every declared output in stage order, and a second names each stale one |
-| 3 | `TOOL-aPrimedIndex-3` | OPEN | the runner refuses to start a bar while a declared output is stale, before it queues for the host |
-| 4 | `TOOL-aPrimedIndex-4` | OPEN | the lander regenerates the declared outputs over its merged tree and lands them with the merge |
+| # | Unit | Mechanism |
+|---|---|---|
+| 1 | `TOOL-aPrimedIndex-1` | every generated output a bar leg grades declares its write and check commands in its kit's descriptor |
+| 2 | `TOOL-aPrimedIndex-2` | one runner verb rewrites every declared output in stage order, and a second names each stale one |
+| 3 | `TOOL-aPrimedIndex-3` | the runner refuses to start a bar while a declared output is stale, before it queues for the host |
+| 4 | `TOOL-aPrimedIndex-4` | the lander regenerates the declared outputs over its merged tree and lands them with the merge |
+| 5 | `DEPL-aPrimedIndex-1` | govkit's verdict reader runs the target's runner with its generated-output preflight skipped |
+| 6 | `TOOL-aPrimedIndex-6` | the pre-push hook scrubs the preflight's skip knob from every bar it runs |
+| 7 | `TOOL-aPrimedIndex-7` | the regen verb's and the runner's review minors, batched |
+| 8 | `TOOL-aPrimedIndex-8` | the lander's review minors, batched, and the fixture that names a unit |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-10-11 · streams tooling
-ids TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 TOOL-aPrimedIndex-5
+**Build status:** OPEN · 8 unit(s) · node a · opened 2026-10-11 · streams tooling+deployer
+ids DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 TOOL-aPrimedIndex-5 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-7 TOOL-aPrimedIndex-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -67,13 +73,17 @@ ids TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedInde
 | [TOOL-aPrimedIndex-2 — one runner verb rewrites every declared output in stage order, and a second names each stale one](spec/2026-10-11-spec-TOOL-aPrimedIndex-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aPrimedIndex-3 — the runner refuses to start a bar while a declared output is stale, before it queues for the host](spec/2026-10-11-spec-TOOL-aPrimedIndex-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-11 |
 | [TOOL-aPrimedIndex-4 — the lander regenerates the declared outputs over its merged tree and lands them with the merge](spec/2026-10-11-spec-TOOL-aPrimedIndex-4.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-11 |
+| [DEPL-aPrimedIndex-1 — govkit's verdict reader runs the target's runner with its generated-output preflight skipped](spec/2026-10-11-spec-DEPL-aPrimedIndex-1.md) | 4 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPrimedIndex-6 — the pre-push hook scrubs the preflight's skip knob from every bar it runs](spec/2026-10-11-spec-TOOL-aPrimedIndex-6.md) | 4 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPrimedIndex-7 — the regen verb's and the runner's review minors, batched](spec/2026-10-11-spec-TOOL-aPrimedIndex-7.md) | 4 | 2 | OPEN | rev-1 | 2026-10-11 |
+| [TOOL-aPrimedIndex-8 — the lander's review minors, batched, and the fixture that names a unit](spec/2026-10-11-spec-TOOL-aPrimedIndex-8.md) | 4 | 2 | OPEN | rev-1 | 2026-10-11 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-7 TOOL-aPrimedIndex-8.
 
-Ids no `spec-audit` record has ever named: TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4.
+Ids no `spec-audit` record has ever named: DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-7 TOOL-aPrimedIndex-8.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -83,6 +93,7 @@ Ids no `spec-audit` record has ever named: TOOL-aPrimedIndex-1 TOOL-aPrimedIndex
 | 1 | `TOOL-aPrimedIndex-1` | no |
 | 2 | `TOOL-aPrimedIndex-2` | no |
 | 3 | `TOOL-aPrimedIndex-3`, `TOOL-aPrimedIndex-4` | yes |
+| 4 | `DEPL-aPrimedIndex-1`, `TOOL-aPrimedIndex-6`, `TOOL-aPrimedIndex-7`, `TOOL-aPrimedIndex-8` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

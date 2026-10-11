@@ -202,7 +202,7 @@ Cite ids, never line numbers.
 | [TOOL-aPooledSweep-5](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE WHOLE-POPULATION SWEEP IS UNMEASURED, and the 4.0x figure this… |
 | [TOOL-aPooledSweep-6](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE PEAK-CONCURRENCY ARM DOES NOT DISCRIMINATE THE COMPARISON IT EXISTS… |
 | [TOOL-aPooledSweep-7](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE PORT PROGRAMME TOOL-aQuenchedHarness-6 OPENED IS SUPERSEDED FOR… |
-| [TOOL-aPrimedIndex-5](../builds/aPrimedIndex/BACKLOG.md) | OPEN | LOW | — | 2026-10-11 | the held lander self-test's arm 26 expects the attended mint subject to… |
+| [TOOL-aPrimedIndex-5](../builds/aPrimedIndex/BACKLOG.md) | SPECCED | LOW | TOOL-aPrimedIndex-8 | 2026-10-11 | the held lander self-test's arm 26 expects the attended mint subject to… |
 | [TOOL-aProbedToolkit-2](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | A SKIP READS AS A PASS IN EVERY ADOPTER. check() at… |
 | [TOOL-aProbedToolkit-4](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE LEXICON RATCHET CAN ONLY LOOSEN, AND ITS REMEDY ANSWERS 1.5% OF… |
 | [TOOL-aProbedToolkit-5](../builds/aProbedToolkit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | THE LEXICON PREDICATE GRADES A POPULATION THE TABLE WAS NEVER WRITTEN… |

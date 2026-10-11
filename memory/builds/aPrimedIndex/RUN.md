@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: beabe0bcbcb54cdf5027ae06289d5acec5496a49
-phase: BUILDING
+witness: wf_118c9d70-8b1
+phase: REVIEWING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/enforce-index-regen-before-bars-acdde6
@@ -53,3 +53,13 @@ base: 15bbfa4f867262f3c862e2473688fc69d0566b7d
 2026-10-11T05:56:53Z dispatch · item 77c7a903 TOOL-aPrimedIndex-4 · reason tools/push-main.sh tools/push-main.test.sh tools/run-gates/README.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-4.md memory/builds/aPrimedIndex/build/2026-10-11-build-TOOL-aPrimedIndex-4-1-acceptance-ledger.md memory/builds/aPrimedIndex/README.md memory/map/generated/symbols.json
 
 2026-10-11T06:11:05Z dispatch · item 77c7a903 TOOL-aPrimedIndex-4 · reason memory/builds/aPrimedIndex/BACKLOG.md memory/backlog/TOOL.md
+
+2026-10-11T06:46:51Z review · item aPrimedIndex · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 2 · minors 18 · disposition promote
+
+2026-10-11T06:47:12Z rescope · item add DEPL-aPrimedIndex-1 · reason closing review r1 H1 (id 7): govkit apply's verdict reader gets empty maps from the new preflight's early exit and can certify an install it never compared
+
+2026-10-11T06:47:22Z rescope · item add TOOL-aPrimedIndex-6 · reason closing review r1 H2 (id 12): GATE_REGEN_CHECK is in no pre-push knob class, so the H49 arm reds and a caller can skip the preflight at the push boundary
+
+2026-10-11T06:47:34Z rescope · item add TOOL-aPrimedIndex-7 · reason closing review r1 minors batch, regen verb and runner: M1 M2 M4 M5 M6 M7 M10 L1 L3 L4 and the README halves of H1 and L2
+
+2026-10-11T06:47:49Z rescope · item add TOOL-aPrimedIndex-8 · reason closing review r1 minors batch, lander: M3 M8 M9 and the arms of L2; disjoint from TOOL-aPrimedIndex-7's write set
