@@ -69,6 +69,7 @@ Cite ids, never line numbers.
 | [TOOL-aEvidencedLens-16](../builds/aEvidencedLens/BACKLOG.md) | OPEN | MED | — | 2026-10-05 | the build harness's Disposal stage reads a §3 edge as one-ended when… |
 | [TOOL-aFlaggedScaffold-3](../builds/aFlaggedScaffold/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-29 | govkit update CANNOT LAND A SOURCE GOV STARTED SHIPPING. Its… |
 | [TOOL-aFlaggedScaffold-5](../builds/aFlaggedScaffold/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-29 | govkit check CALLS A KIT ADOPTED ON THE EXIT CODE ALONE and never runs… |
+| [TOOL-aFrugalTurnstile-18](../builds/aFrugalTurnstile/BACKLOG.md) | OPEN | LOW | — | 2026-10-11 | a post-merge full bar enters the host turnstile through run-gates.sh… |
 | [TOOL-aGradedDialect-6](../builds/aGradedDialect/BACKLOG.md) | OPEN | — | — | 2026-09-10 | a FIFTH copy of the lexicon armedness predicate lives outside the kit… |
 | [TOOL-aGradedDialect-7](../builds/aGradedDialect/BACKLOG.md) | OPEN | — | — | 2026-09-10 | two UNGUARDED load_conf calls in tools/lexicon/selftest.py, in the… |
 | [TOOL-aGradedDialect-9](../builds/aGradedDialect/BACKLOG.md) | OPEN | — | — | 2026-09-10 | NOTHING GATES A parser DECLARATION AGAINST A WHOLE FILE, and that gap… |
@@ -276,6 +277,7 @@ Cite ids, never line numbers.
 | [TOOL-aSiftedFork-6](../builds/aSiftedFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | THE CANARY'S CLAMP ARMS USE timeout UNGUARDED, so a host that has none… |
 | [TOOL-aSiftedFork-7](../builds/aSiftedFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-28 | THE RUN-GATES CANARY IS NON-DETERMINISTIC ON THIS HOST AND NAMES A… |
 | [TOOL-aSightedSkeptic-11](../builds/aSightedSkeptic/BACKLOG.md) | OPEN | HIGH | — | 2026-10-01 | inherited red: leg row-keyed merge driver replay red at ef1dcdb6,… |
+| [TOOL-aSignalledHook-2](../builds/aSignalledHook/BACKLOG.md) | OPEN | MED | — | 2026-10-11 | the unattended kit does not handle push-main's exit 4 (landed UNGATED):… |
 | [TOOL-aStagedLane-5](../builds/aStagedLane/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-05 | THE INDEX-VERSUS-COMMIT SHAPE SURVIVES ONE FILE OVER.… |
 | [TOOL-aStandingWrit-2](../builds/aStandingWrit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | SECURITY in landed code: the pinned BASE anchors on a remote-tracking… |
 | [TOOL-aStandingWrit-5](../builds/aStandingWrit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-11 | .githooks/pre-commit's branch guard fails CLOSED on a bogus… |

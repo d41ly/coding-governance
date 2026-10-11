@@ -242,14 +242,21 @@ fi
 # draft of this pair armed only the figure; the fix for it RELOCATED the defect to the formula half
 # and every criterion stayed green.
 #
-# THE FILE IS THE MERGE-BAR GUIDE, not `AGENTS.md`: PLAY-aMendedFleet-1 moved the charter's merge-bar
-# section there, and an arm reading the wrapper then redded on a pointer that had moved, not gone.
-CHARTER="$ROOT/memory/guides/MERGE-BAR.md"
+# THE SUBJECT MOVED at v4.0 (TOOL-aDistilledCharter-3). The charter states one line about the bar and
+# sends a reader to the merge-bar guide for how it behaves, so both claims are graded THERE, and one
+# more arm holds the pointer that makes the guide the charter's answer. Before the move this canary
+# read `AGENTS.md` for two strings it had stopped carrying, and would have redded on its next run.
+CHARTER="$ROOT/AGENTS.md"
+BAR_GUIDE="$ROOT/memory/guides/MERGE-BAR.md"
 a=$((a+1))
-if [ ! -f "$CHARTER" ]; then
-  echo "gov-canary: $CHARTER is absent, so the charter arms would pass by finding nothing — this is a refusal"
+if [ ! -f "$CHARTER" ] || [ ! -f "$BAR_GUIDE" ]; then
+  echo "gov-canary: $CHARTER or $BAR_GUIDE is absent, so the charter arms would pass by finding nothing — this is a refusal"
   fail=1
 else
+  a=$((a+1))
+  grep -qF 'memory/guides/MERGE-BAR.md' "$CHARTER" \
+    || { echo "gov-canary: $CHARTER no longer sends a reader to memory/guides/MERGE-BAR.md, so the arms below grade a guide nobody is told to read"; fail=1; }
+  CHARTER=$BAR_GUIDE
   # G4 — THE MEASUREMENT, AND THIS ARM STOPPED PINNING ONE. It used to require the charter to state a
   # specific wall/leg-sum pair, and that pair went stale three times in two days: 335s/95s, then
   # 393s/3085s, then 4926 s of leg-sum with a 1565 s floor, then ~265 s once seven legs left the bar.
@@ -261,8 +268,8 @@ else
   # the charter SENDS a reader there. The retired-figures arm below stays and grows: a figure quoted as
   # current is the defect, whichever figure it is.
   a=$((a+1))
-  if grep -qE '335s|~?95s|3085 s|393 s wall' "$CHARTER"; then
-    echo "gov-canary: $CHARTER quotes a retired bar timing as if it were current (335s / 95s / 3085 s / 393 s wall); the bar's per-leg seconds live in <git-dir>/gate-ledger.tsv and prose beside a source that owns a number is the rule this arm exists to hold"; fail=1
+  if grep -qE '335s|~?95s|3085 s|393 s wall' "$ROOT/AGENTS.md" "$BAR_GUIDE"; then
+    echo "gov-canary: AGENTS.md or $BAR_GUIDE quotes a retired bar timing as if it were current (335s / 95s / 3085 s / 393 s wall); the bar's per-leg seconds live in <git-dir>/gate-ledger.tsv and prose beside a source that owns a number is the rule this arm exists to hold"; fail=1
   fi
   a=$((a+1))
   grep -q 'gate-ledger.tsv' "$CHARTER" || { echo "gov-canary: $CHARTER no longer sends a reader to <git-dir>/gate-ledger.tsv for the bar's per-leg seconds, so the negative half above would pass on a charter that says nothing about cost at all — silence and a correct pointer are not the same answer"; fail=1; }
@@ -270,8 +277,8 @@ else
   # its width from a declared table now, so a charter naming a formula is telling a session something
   # it cannot verify anywhere in the tree.
   a=$((a+1))
-  if grep -qF 'min(8, nproc)' "$CHARTER"; then
-    echo "gov-canary: $CHARTER still states the built-in width formula; the width is declared in ${PFX}${KIT}/gate-profiles.txt and read from there"; fail=1
+  if grep -qF 'min(8, nproc)' "$ROOT/AGENTS.md" "$BAR_GUIDE"; then
+    echo "gov-canary: AGENTS.md or $BAR_GUIDE still states the built-in width formula; the width is declared in ${PFX}${KIT}/gate-profiles.txt and read from there"; fail=1
   fi
   a=$((a+1))
   grep -qF ''"${PFX}${KIT}/gate-profiles.txt"'' "$CHARTER" \

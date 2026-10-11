@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.140 -->
+<!-- gov:kit memory-tree@2.141 -->
 # {{MEMORY_ROOT}}/ retention & hygiene
 
 `{{MEMORY_ROOT}}/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -164,6 +164,30 @@ set membership rather than a `grep -qxF` per call, because that fork ran once pe
 MOST are scaffolded by `adopt-memory-tree.sh`, not all: a registry that arrives with the gate
 that reads it is scaffolded by nothing. "Absent" and "present and empty" read identically
 to every consumer, so a registry a gate names and nothing creates is invisible until the first row.
+
+## Ids — how a session mints them
+
+Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` practice
+(PLAY-aDistilledCharter-3). Checks 5, 13 and 14 below grade what these rules produce.
+
+- Every new tracked id is `FAMILY-<slug>-<seq>`, owned by the session that mints it, so nothing it
+  numbers can be contested.
+- The slug is the node's tag from the charter's node registry plus a fresh CamelCase adjective-noun,
+  `[A-Za-z]` only, minted ONCE per session; the tag's letter makes two nodes' slugs disjoint.
+- `<seq>` is a plain 1-up per session and family, unpadded: a label, never a rank. The next one is the
+  numeric maximum of YOUR ids in that family plus one, carried in session state, because an
+  uncommitted id is invisible to grep.
+- Before using a slug, grep the whole memory tree for `[A-Z]+-<slug>-[0-9]` at all times, archives
+  included, and scan the live rows of the work-state index; re-roll on any hit.
+- No reserve-above-a-marker, no shared counter and no renumber-on-merge: the slug is the guarantee.
+- A session is one continuous effort under one slug, across work-units and families; a resumed or
+  summarized session keeps its slug.
+- A fan-out child never mints: its orchestrator does, or the child takes a slug of its own.
+- The residual tie-break: the later to merge re-mints its slug for every UNMERGED id, and an id
+  already merged wins.
+- Legacy id eras are frozen: cite them verbatim, never renumber, never mint in their format.
+- Shorthand with the slug elided is for session prose only, never where ids are the permanent record,
+  because it is shape-identical to a frozen legacy id.
 
 ## The check catalog (all in `{{KIT_DIR}}/check-memory-hygiene.sh`; this file is the prose home)
 

@@ -3,7 +3,7 @@ name: lexicon
 description: Answer "what should I call this" from THIS repo's declared naming vocabulary, before writing the name. Use when about to name a new function, method, type, module or CLI subcommand; when a name will not fit and you are tempted to invent a verb; when renaming during a refactor; or when a gate has just refused a name and you need the replacement rather than the refusal. Also use before naming anything in an unfamiliar area, to see how the corpus already spells that concept. Routes through `python3 tools/lexicon/lexicon.py --suggest <identifier> --as <cell>`, which takes the SURFACE the name is for, reads the declaration at `.lexicon.conf` and the frozen canon beside it, and decides nothing. Do NOT use for ordinary code search — finding a symbol, a caller, a definition or a string is grep's job and this neither replaces nor intercepts it.
 ---
 
-<!-- gov:kit lexicon@1.21 · RENDERED from this kit's SKILL.template.md — do not edit -->
+<!-- gov:kit lexicon@1.22 · RENDERED from this kit's SKILL.template.md — do not edit -->
 
 # The declared lexicon
 
@@ -57,7 +57,7 @@ whole point.
 - `scan` — walk a population looking for matches — NOT `search`, which implies stopping at the first
 - `extract` — pull a declared shape out of a larger one — NOT `pluck`, pluck names the taking; extract names the declared shape taken
 - `measure` — count a population and report the number, deciding nothing — NOT `count`, count is the arithmetic; measure counts a population and decides nothing
-- `derive` — compute a value from a source so it never has to be authored — the §5 rule, as a verb — NOT `compute`, compute says a value was produced, not that it never has to be authored
+- `derive` — compute a value from a source so it never has to be authored — the charter's [derive] practice, as a verb — NOT `compute`, compute says a value was produced, not that it never has to be authored
 - `seed` — write an initial value the tool will not overwrite again — NOT `install`, install claims the tool owns the result after; a seed is never overwritten
 - `init` — set up state at construction — NOT `setup`
 - `run` — execute a process to completion and report its outcome — NOT `execute`, the same word twice, and this repo already runs processes

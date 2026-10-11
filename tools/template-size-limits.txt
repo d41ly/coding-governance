@@ -57,7 +57,12 @@ skills/session-kickoff/SKILL.md	18432
 # charter really did become 5 KB more expensive to read.
 #
 # The headroom's one known consumer is line-wrapping in the ruleset, which re-renders through here.
-AGENTS.md	64512
+#
+# LOWERED to 16384 (16 KiB) at v4.0, PLAY-aDistilledCharter-4: the charter became the rendered region
+# alone and measured 13151 bytes, so the old row priced 51 KB of growth nobody had asked for. 16 KiB
+# keeps the whole file well under the 32768 bytes a Codex agent reads
+# (the agent-instructions kit's CODEX_MAX), which v3.5 exceeded.
+AGENTS.md	16384
 
 # --- the build method, as rendered -------------------------------------------------------------
 # 27648 bytes = 27 KiB. SEEDED FROM THE MEASUREMENT PLUS THE WORK THIS BUILD FUNDS, 2026-09-05
@@ -114,7 +119,8 @@ memory/guides/BUILD-METHOD.md	30720
 # WHAT THIS DOES NOT COVER: the file's line count, which only the adopter's GUIDE_CAP_LINES reads.
 # RAISED 65692 -> 65842 by TOOL-aRoutedQuill-7: its section 8 row for PROMPT_BRIEF_SKELETON_CUTOFF,
 # 150 bytes, paid by the ceiling rather than by a trim of the protocol (owner, 2026-10-09).
-memory/guides/UNATTENDED-PROTOCOL.md	65842
+# 66860 at the reconcile of aFrugalTurnstile with aRoutedQuill: TOOL-aFrugalTurnstile-10's §6 landing rule (owner's prompt) plus that row, both kept.
+memory/guides/UNATTENDED-PROTOCOL.md	66860
 
 # --- the unattended Skill, as rendered ----------------------------------------------------------
 # 10240 bytes = 10 KiB, CR-stripped (TOOL-aMendedFleet-68 S5). The Skill is the first file every

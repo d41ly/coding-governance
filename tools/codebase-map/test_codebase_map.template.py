@@ -248,7 +248,7 @@ def test_dossier_prose_carries_no_typed_count() -> None:
     """No present-tense digit count of an inventory population in dossier prose.
 
     The map derives every inventory's size into MAP.md, so "the 86 legs" in a dossier is a second
-    answer that goes stale on the next leg (charter §7). A sentence reading as a past measurement
+    answer that goes stale on the next leg (charter [derive]). A sentence reading as a past measurement
     is frozen and passes. NOT checked: counts spelled as words, counts inside fences (the toml
     title included) or code spans, and nouns outside the map's inventories.
     """
