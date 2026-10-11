@@ -1,11 +1,14 @@
 # TOOL-aSparedSpawn-8 — fork-free readers, a spawn-idiom lint that stops regrowth, and a fork-count arm
 
-**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 1 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-4 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 1 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aSparedSpawn-8-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-8-acceptance-ledger.md) | journal | — |
+| [2026-10-11-build-TOOL-aSparedSpawn-8-arm-inventory.md](../build/2026-10-11-build-TOOL-aSparedSpawn-8-arm-inventory.md) | journal | — |
+| [2026-10-11-build-TOOL-aSparedSpawn-8-arm-inventory.sh](../build/2026-10-11-build-TOOL-aSparedSpawn-8-arm-inventory.sh) | journal | — |
 | [2026-10-11-prompt-TOOL-aSparedSpawn-8-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-8-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -79,7 +82,9 @@ as a falling ceiling and regrowth reds instead of costing the next build a day.
   run prints the `skipped` shape. No clock is read anywhere. Its ceilings live in
   `memory/project/fork-ceilings.txt`, one row per entrypoint and bash version holding the ceiling,
   the base count, an untraced setup that builds the fixture and the one traced command, so the kit
-  file names nothing outside itself. It scrubs the inherited `GIT_*`, `GATE_*` and `CLAUDE_*`
+  file names nothing outside itself. A site that grew by one ties with every other one-fork site and
+  can rank below the top ten, so `--sites` prints every site with its count for a diff against the
+  parent's run, and a growth red says so. It scrubs the inherited `GIT_*`, `GATE_*` and `CLAUDE_*`
   variables before a fixture is built, because a hook's `GIT_DIR` would point a fixture's `git` at
   the graded repository. Observed by AC9, AC10 and AC11.
 - **S9** — The declared entrypoints, the census's §2.5 ranking: `tools/unattended/unattended.sh` on
@@ -89,6 +94,8 @@ as a falling ceiling and regrowth reds instead of costing the next build a day.
   `tools/memory-tree/check-memory-hygiene.sh` on a scratch tree, `skills/session-kickoff/manifest-check.sh`
   over a scratch repository holding this repository's manifest, and `tools/check-wiring.sh --check`
   in an empty repository. Every fixture is built in scratch so a count does not move with the tree.
+  A runner row whose pool polls can read one fork apart on two runs; its ceiling is the highest of
+  the readings the pass took, and its reason says so.
   Each ceiling lands at the count measured after S1 to S5, and
   the count at the base is recorded beside it. Observed by AC12.
 - **S10** — After the product files, the three suite files the census ranks highest by leaf-pure
@@ -336,8 +343,9 @@ file per commit, each lowering its own suite rows.
   Red when: the two counts differ, or the edited declaration does not refuse.
 - **AC10** — When one `$(:)` is added to the prelude of `tools/unattended/unattended.sh` in a scratch
   clone, the arm reds for the driver entrypoint, printing measured, ceiling, delta and the top ten
-  `file:line` contributors with the added line among them.
-  Red when: the arm stays green, or prints a bare total.
+  `file:line` contributors, and the `--sites` tables of the scratch clone and of its unbroken twin
+  differ by the added line alone once the lines below it are shifted back by one.
+  Red when: the arm stays green, prints a bare total, or the `--sites` diff does not name the line.
 - **AC11** — When one ceiling row is raised to max(3, 5 %) plus one above its measured count, the arm
   reds naming the stale row; when an entrypoint's fixture cannot be built, it prints
   `skipped — <id> · <why>` and the run's summary does not count that row as passed.
@@ -434,6 +442,11 @@ held unattended driver and gate suites cover S1 and S2 at the owner's manual run
   they name this repository's paths, so §7 names the three govkit legs its registry row trips. The
   three suite files ride one pass commit, and the extractor
   keys an interpolated message on its literal words.
+- rev-4 · 2026-10-11 · §2 §6 S8 S9 AC10 · the build pass. One added fork ties with every one-fork site,
+  so a top-ten list cannot be relied on to name it: AC10 now reads the added line off the diff of two
+  `--sites` tables, a flag the counter gains for exactly that. The two-leg runner row read 95 three
+  times and 96 once, because the pool polls its workers, so its ceiling is the highest reading and
+  its reason says why.
 
 ## 10. Reuse audit
 
