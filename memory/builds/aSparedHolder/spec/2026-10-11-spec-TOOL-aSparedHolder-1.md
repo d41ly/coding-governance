@@ -112,7 +112,7 @@ accurate, since nothing moved.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `resume-tick.test.sh` runs its AC4 arm, a STALE fixture whose recorded pid is a live
+- **AC1** — When the tick runs over a STALE fixture whose recorded pid is a live
   `sleep` prints the `STALE OVER A LIVE PID` line, the sleep is still listed, the stub saw nothing,
   no attempt line exists, and the health log holds one `stale-live-pid` line naming the pid.
   Red when: the arm passes against the tick at BASE, which kills the sleep and launches attempt 1.
@@ -128,7 +128,7 @@ accurate, since nothing moved.
 
 ## 7. Gates
 
-`unattended kit gate` · `kit version markers` · `memory hygiene` · `unattended protocol size`
+`unattended kit gate` · `kit version markers` · `memory hygiene` · `unattended protocol size` · `recall floor` · `recall floor arms`
 
 New arm: tools/unattended/resume-tick.test.sh · covers AC1 · the tick at BASE kills the live sleep · none
 
