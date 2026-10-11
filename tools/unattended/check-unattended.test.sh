@@ -4118,6 +4118,38 @@ git add -A && git commit -q -m "lane" -m "Pass: ARCH-tRun-1" --no-verify
 _bc_want=$(git rev-parse HEAD)
 _bc_got=$(cd "$TMP" && . "$TMP/$KIT_REL/lib-unattended.sh" && build_commit "$_bc_base..HEAD" ARCH-tRun-1 memory/builds/tRun "" "")
 same "build_commit passes over a commit whose trailer pairs none with the unit" "$_bc_got" "$_bc_want"
+# ...and the WALK MEMO (TOOL-aSparedSpawn-11 S5, AC7). With `_BC_MEMO` declared, a second call over one
+# range answers from the memo and starts no second `rev-list`; a third call over ANOTHER range starts
+# its own and answers for that range, which is what reds a key staged to omit the range. With nothing
+# declared every call walks. The `git` that `GIT` runs is shadowed on PATH by a counting stub that
+# appends one line per `rev-list` to a file and execs the real git: the walk runs inside the
+# function's own `$(…)`, where a counter variable would die, and a second `GIT` definition would be a
+# second spelling of a name the naming leg grades. Every answer is compared against an undeclared
+# call's, through `_BC_OUT` as the checkers read it.
+reset_tree
+_bc_base=$(git rev-parse HEAD)
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "lane" -m "Pass: ARCH-tRun-1" --no-verify
+_bc_want=$(git rev-parse HEAD)
+rm -f "$TMP/bc-revlist.log"; mkdir -p "$TMP/bc-bin"
+printf '#!/usr/bin/env bash\ncase " $* " in *" rev-list "*) echo r >> "%s" ;; esac\nexec "%s" "$@"\n' \
+  "$TMP/bc-revlist.log" "$(command -v git)" > "$TMP/bc-bin/git"
+chmod +x "$TMP/bc-bin/git"
+_bc_got=$(cd "$TMP" && . "$TMP/$KIT_REL/lib-unattended.sh" && {
+  PATH="$TMP/bc-bin:$PATH"
+  build_commit "$_bc_base..HEAD" ARCH-tRun-1 memory/builds/tRun "" "" >/dev/null; _u1=$_BC_OUT
+  build_commit "$_bc_base..HEAD" ARCH-tRun-1 memory/builds/tRun "" "" >/dev/null; _u2=$_BC_OUT
+  _un=0; [ -f "$TMP/bc-revlist.log" ] && while IFS= read -r _l; do _un=$((_un+1)); done < "$TMP/bc-revlist.log"
+  rm -f "$TMP/bc-revlist.log"
+  declare -A _BC_MEMO=()
+  build_commit "$_bc_base..HEAD" ARCH-tRun-1 memory/builds/tRun "" "" >/dev/null; _m1=$_BC_OUT
+  build_commit "$_bc_base..HEAD" ARCH-tRun-1 memory/builds/tRun "" "" >/dev/null; _m2=$_BC_OUT
+  build_commit "$_bc_want..HEAD" ARCH-tRun-1 memory/builds/tRun "" "" >/dev/null; _m3=$_BC_OUT
+  _mn=0; [ -f "$TMP/bc-revlist.log" ] && while IFS= read -r _l; do _mn=$((_mn+1)); done < "$TMP/bc-revlist.log"
+  printf 'u=%s,%s m=%s,%s other=%s walks undeclared=%s declared=%s' "$_u1" "$_u2" "$_m1" "$_m2" "$_m3" "$_un" "$_mn"; })
+same "build_commit memoises its walk per range only where the caller declares _BC_MEMO" "$_bc_got" \
+  "u=$_bc_want,$_bc_want m=$_bc_want,$_bc_want other= walks undeclared=2 declared=2"
+rm -rf "$TMP/bc-revlist.log" "$TMP/bc-bin"
 
 # ---- THE SKIPS ANNOUNCE. A run with no declaration would otherwise be green over nothing, and the
 # ---- default run must still print nothing.

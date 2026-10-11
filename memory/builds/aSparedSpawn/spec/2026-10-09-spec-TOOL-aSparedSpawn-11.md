@@ -1,11 +1,13 @@
 # TOOL-aSparedSpawn-11 — per-suite levers: five suites stop paying a process for a question they ask once
 
-**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
+**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 2 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-11-build-TOOL-aSparedSpawn-11-acceptance-ledger.md](../build/2026-10-11-build-TOOL-aSparedSpawn-11-acceptance-ledger.md) | journal | — |
+| [2026-10-11-build-TOOL-aSparedSpawn-11-direct-checks.sh](../build/2026-10-11-build-TOOL-aSparedSpawn-11-direct-checks.sh) | journal | — |
 | [2026-10-11-prompt-TOOL-aSparedSpawn-11-build-brief.md](../prompts/2026-10-11-prompt-TOOL-aSparedSpawn-11-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

@@ -1123,12 +1123,33 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
   # know there was more.
   # Does the caller carry a subject cache? Asked ONCE, outside the walk.
   if declare -p _SUBJ >/dev/null 2>&1; then _bc_cache=1; else _bc_cache=0; fi
+  # THE ANSWER IS ALSO LEFT IN `_BC_OUT` (TOOL-aSparedSpawn-11 S5), so a caller can call this in its
+  # own shell and read the answer without a `$(…)`. It must, to keep a memo: a memo written inside a
+  # command substitution dies with the subshell.
+  _BC_OUT=""
   _bc_n=0; _bc_mc=""
   [ -n "$_bc_cap" ] && _bc_mc="--max-count=$((_bc_cap+1))"
-  for _bc_c in $(GIT rev-list $_bc_ord $_bc_mc $_bc_range 2>/dev/null); do
+  # THE WALK IS MEMOISED ONLY WHERE THE CALLER DECLARED `_BC_MEMO`, opt-in exactly as `_SUBJ` is. The
+  # two history checkers ask one range once per unit id, and HEAD does not move during a check, so
+  # every id after the first re-ran the same `rev-list`. The driver declares nothing, because it can
+  # commit between two calls, and a range naming symbolic HEAD would then answer from before the
+  # commit. The key is the WHOLE argument tuple that reaches `rev-list`, order and count included:
+  # the two windows walk in opposite directions over the same range string.
+  _bc_key="$_bc_ord|$_bc_mc|$_bc_range"
+  if declare -p _BC_MEMO >/dev/null 2>&1; then
+    if [ -n "${_BC_MEMO[$_bc_key]+set}" ]; then
+      _bc_list=${_BC_MEMO[$_bc_key]}
+    else
+      _bc_list=$(GIT rev-list $_bc_ord $_bc_mc $_bc_range 2>/dev/null)
+      _BC_MEMO[$_bc_key]=$_bc_list
+    fi
+  else
+    _bc_list=$(GIT rev-list $_bc_ord $_bc_mc $_bc_range 2>/dev/null)
+  fi
+  for _bc_c in $_bc_list; do
     _bc_n=$((_bc_n+1))
     # the (cap+1)-th commit is the SENTINEL: proof that more exists, never graded.
-    if [ -n "$_bc_cap" ] && [ "$_bc_n" -gt "$_bc_cap" ]; then printf 'TRUNCATED'; return 0; fi
+    if [ -n "$_bc_cap" ] && [ "$_bc_n" -gt "$_bc_cap" ]; then _BC_OUT=TRUNCATED; printf 'TRUNCATED'; return 0; fi
     # FROM THE CALLER'S SUBJECT CACHE WHEN THERE IS ONE, and this is not an optimisation you may drop.
     # `check-pass-order.sh` builds `_SUBJ` in one `git log` over all of HEAD and asserts its size
     # against `rev-list --count`, then walks 10,811 commits through here. Reading a subject per commit
@@ -1156,7 +1177,7 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
     # Did it touch anything outside this build's own record surface?
     if GIT show --pretty=format: --name-only "$_bc_c" 2>/dev/null \
        | grep -v '^$' | grep -qv -e "^$_bc_dir/" $_bc_ex; then
-      printf '%s' "$_bc_c"; return 0
+      _BC_OUT=$_bc_c; printf '%s' "$_bc_c"; return 0
     fi
   done
   return 1

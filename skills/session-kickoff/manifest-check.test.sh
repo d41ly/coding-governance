@@ -7,6 +7,13 @@ CHECK="$(cd "$(dirname "$0")" && pwd)/manifest-check.sh"
 TMP=$(mktemp -d "${TMPDIR:-/tmp}/mfcheck.XXXXXX")
 trap 'rm -rf "$TMP"' EXIT
 pass=0; fail=0
+# NO SESSION VERSION LEAKS INTO A CARD WRITE (TOOL-aSparedSpawn-11 S6). Every `--card --write` derives
+# the `cli —` cell, and under a Claude Code session `AI_AGENT` names a version, so each write started
+# the REAL `claude --version`, about a second apiece. Only the `cli —` block below asks that question,
+# and it sets and restores AI_AGENT itself. Whether the runner set one is kept, because the arm that
+# proves the unset can red only where there was something to unset.
+mf_aa_launched=${AI_AGENT+1}
+unset AI_AGENT
 echo 0 > "$TMP/.now"   # file-backed fake clock — stamp_line runs in subshells, so a plain
                        # variable would never advance and same-anchor re-stamps would no-op
 
@@ -972,6 +979,18 @@ export CARD_OVERLAP_BOUND=1
 run_card "overlaps cell: a driver past the bound is unknown, not none" "$R" 0 "overlaps — skipped: --overlaps did not answer within 1s" --card --write --session "$NONCE-t77d"
 unset CARD_OVERLAP_BOUND
 
+# TOOL-aSparedSpawn-11 S6, AC9 — a card write OUTSIDE the `cli —` block starts no `claude`. A stub that
+# appends to a log stands first on PATH for one write; the log must not exist after it. Staged red by
+# deleting the prologue's `unset AI_AGENT`, which this arm can observe only when the runner set
+# AI_AGENT (any Claude Code session does), so a run without one says so beside the verdict.
+mf_bin="$TMP/claudelog"; mf_log="$TMP/claude-calls.log"; mkdir -p "$mf_bin"
+printf '#!/usr/bin/env bash\necho call >> "%s"\necho "2.1.178 (Claude Code)"\n' "$mf_log" > "$mf_bin/claude"; chmod +x "$mf_bin/claude"
+mkrepo aaleak
+(export PATH="$mf_bin:$PATH"; cd "$R" && bash "$CHECK" --card --write --session "$NONCE-aa1" </dev/null >/dev/null 2>&1)
+if [ -e "$mf_log" ]; then mf_seen=called; else mf_seen=none; fi
+check_eq "a card write outside the cli block starts no claude" none "$mf_seen"
+[ -n "$mf_aa_launched" ] || echo "note this run's environment set no AI_AGENT, so the arm above cannot see the unset it guards; run it from a Claude Code session to arm it"
+
 # KICK-aMendedFleet-4 — the `cli —` cell over a stub `claude` first on PATH, under four AI_AGENT
 # values and an unset one, then a stub printing no number, no `claude` on PATH at all, and a stub
 # that outlives a one-second bound. Staged red by swapping the integer comparison for a string one,
@@ -1707,7 +1726,8 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # 248 = the base 180 + aMendedFleet's 36 + aGraftedHelix's 32, summed at their reconcile.
 # +31: KICK-aRoutedQuill-1's block — the skeleton verb, the route rules, the `## task` refusal —
 # counted off a scratch slice of the block; no suite ran in the pass.
-FLOOR_ASSERTIONS=279
+# +1: TOOL-aSparedSpawn-11's AI_AGENT-leak arm, one check_eq, counted off the block; no suite ran in the pass.
+FLOOR_ASSERTIONS=280
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

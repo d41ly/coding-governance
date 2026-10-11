@@ -125,16 +125,31 @@ bad() { n=$((n+1)); echo "FAIL $1"; st=1; }
 
 # A scratch clone of the tracked tree. `git archive` gives the INDEX, so a staged edit is included
 # and an unstaged scratch file is not — which is what makes these arms reproducible.
+#
+# BUILT ONCE PER RUN, reset per arm (TOOL-aSparedSpawn-11 S4). Each arm used to extract the whole tree
+# again — 3633 files, 78 MB — to edit one file in it. The first call builds the tree and records its
+# fixture commit; every call then restores that commit with `reset --hard` and drops whatever an arm
+# left untracked with `clean -fdx`, and leaves the tree in `d`. The reset names the RECORDED commit and
+# never `HEAD`, because arms commit their breaks and HEAD moves. No arm writes inside `.git` beyond
+# its own commits, which the reset leaves unreachable and harmless; an arm that did would survive it.
+# Called in the arm's own shell, never through `$(…)`, which would build the tree in a subshell and
+# lose both globals.
+SCR=""; FIX=""
+trap '[ -n "$SCR" ] && rm -rf "$SCR"' EXIT
 scratch() {
-  local d; d=$(mktemp -d)
-  ( cd "$ROOT" && git archive HEAD ) | tar -x -C "$d" 2>/dev/null
-  # overlay anything staged-but-uncommitted, so the arms grade what is about to land
-  ( cd "$ROOT" && git diff --cached --name-only 2>/dev/null ) | while IFS= read -r f; do
-    [ -n "$f" ] && [ -f "$ROOT/$f" ] && { mkdir -p "$d/$(dirname "$f")"; cp "$ROOT/$f" "$d/$f"; }
-  done
-  ( cd "$d" && git init -q . && git config user.email t@t && git config user.name t \
-      && git add -A && git commit -q -m fixture --no-verify ) >/dev/null 2>&1
-  echo "$d"
+  if [ -z "$SCR" ]; then
+    SCR=$(mktemp -d)
+    ( cd "$ROOT" && git archive HEAD ) | tar -x -C "$SCR" 2>/dev/null
+    # overlay anything staged-but-uncommitted, so the arms grade what is about to land
+    ( cd "$ROOT" && git diff --cached --name-only 2>/dev/null ) | while IFS= read -r f; do
+      [ -n "$f" ] && [ -f "$ROOT/$f" ] && { mkdir -p "$SCR/$(dirname "$f")"; cp "$ROOT/$f" "$SCR/$f"; }
+    done
+    ( cd "$SCR" && git init -q . && git config user.email t@t && git config user.name t \
+        && git add -A && git commit -q -m fixture --no-verify ) >/dev/null 2>&1
+    FIX=$(git -C "$SCR" rev-parse HEAD)
+  fi
+  git -C "$SCR" reset -q --hard "$FIX" && git -C "$SCR" clean -qfdx
+  d=$SCR
 }
 
 # ---- ARM 1: the shipped tree is clean ------------------------------------------------------------
@@ -143,7 +158,7 @@ if bash "$GATE" >/dev/null 2>&1; then ok "the shipped tree passes"; else bad "th
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 
 # ---- ARM 2: a fragment naming an undeclared destination REDS (AC4) -------------------------------
-d=$(scratch)
+scratch
 sed -i 's|{kit}/hooks/scratch-guard.js|'"$WITHDRAWN"'|' "$d/$HOOKS_DIR/scratch-guard.fragment.json"
 out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 [ "$rc" != 0 ] && ok "a fragment naming a withdrawn path REDS (rc=$rc)" \
@@ -151,13 +166,12 @@ out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 case "$out" in *"scratch-guard.fragment.json"*".claude/hooks/scratch-guard.js"*)
   ok "and the refusal names BOTH the fragment and the destination" ;;
   *) bad "the refusal does not name both: $(printf '%s' "$out" | head -2)" ;; esac
-rm -rf "$d"
 
 # ---- ARM 3: an adopter installing into an undeclared destination REDS ----------------------------
 # This is the state that actually existed: `adopt-memory-recall.sh --with-hook` re-created the copy
 # TOOL-dRetiredFork-14 withdrew. Arm 2 alone would NOT have caught it, because that installer reads
 # no fragment — a gate over declarations cannot see an installer.
-d=$(scratch)
+scratch
 printf '\ncp "$HERE/recall-opened.js" "$ROOT/.claude/hooks/recall-opened.js"\n' \
   >> "$d/$MEMORY_RECALL_DIR/adopt-memory-recall.sh"
 ( cd "$d" && git add -A && git commit -q -m break --no-verify ) >/dev/null 2>&1
@@ -166,37 +180,34 @@ out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
                || bad "an adopter re-creating the withdrawn copy was accepted"
 case "$out" in *"adopt-memory-recall.sh installs a hook"*) ok "and names the installer" ;;
   *) bad "the refusal does not name the installer" ;; esac
-rm -rf "$d"
 
 # ---- ARM 4: an EMPTY fragment population REFUSES (AC5) -------------------------------------------
 # Zero fragments and a clean tree print the same thing unless the gate says otherwise, and the
 # fragments are tracked, so zero means the selector broke.
-d=$(scratch)
+scratch
 ( cd "$d" && git rm -q $(git ls-files '*.fragment.json') && git commit -q -m nofrags --no-verify ) >/dev/null 2>&1
 out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 [ "$rc" != 0 ] && ok "an empty fragment population REFUSES (rc=$rc)" \
                || bad "a gate with no subject reported success"
 case "$out" in *"REFUSING"*"no subject"*) ok "and says it has no subject rather than printing a zero" ;;
   *) bad "the refusal does not explain itself: $(printf '%s' "$out" | head -2)" ;; esac
-rm -rf "$d"
 
 # ---- ARM 5: ANTI-VACUITY — the clean and broken trees must differ --------------------------------
 # Every arm above would also pass if the gate refused unconditionally. This pins that the verdicts
 # actually diverge on the same fixture shape.
-d=$(scratch)
+scratch
 a=$(cd "$d" && bash "${KP}check-hook-destinations.sh" >/dev/null 2>&1; echo $?)
 sed -i 's|{kit}/hooks/scratch-guard.js|'"$WITHDRAWN"'|' "$d/$HOOKS_DIR/scratch-guard.fragment.json"
 b=$(cd "$d" && bash "${KP}check-hook-destinations.sh" >/dev/null 2>&1; echo $?)
 [ "$a" = 0 ] && [ "$b" != 0 ] && ok "the same fixture passes clean and reds broken ($a then $b)" \
                               || bad "the gate does not discriminate (clean=$a broken=$b)"
-rm -rf "$d"
 
 # ---- ARM 6: a {here} fragment in a directory NO descriptor homes REFUSES (AC6) -------------------
 # TOOL-aReplayedCard-2, narrowed by TOOL-aRepatriatedFork-2 (gate repair at VERIFYING): a fragment
 # under a directory NO descriptor homes ships from nowhere, and the leg must say which directory.
 # Under a DIRECTORY kit's home, `{here}` is the kit dir at every prefix, so a shipped file passes
 # and an unshipped one reds — the memory-recall fragment is that shape in the shipped tree.
-d=$(scratch)
+scratch
 mkdir -p "$d/${KP}nohome"
 printf '{"name": "orphan", "event": "E", "matcher": "M", "marker": "agent-cap.js", "hook_path": "{here}/agent-cap.js"}\n' \
   > "$d/${KP}nohome/orphan.fragment.json"
@@ -207,8 +218,7 @@ out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 case "$out" in *"orphan.fragment.json"*"'${KP}nohome' is the home of NO descriptor"*)
   ok "and the refusal names the directory" ;;
   *) bad "the refusal does not name the directory: $(printf '%s' "$out" | grep orphan | head -2)" ;; esac
-rm -rf "$d"
-d=$(scratch)
+scratch
 printf '{"name": "dirkit", "event": "E", "matcher": "M", "marker": "agent-cap.js", "hook_path": "{here}/agent-cap.js"}\n' \
   > "$d/$HOOKS_DIR/dirkit.fragment.json"
 ( cd "$d" && git add -A && git commit -q -m dirkit --no-verify ) >/dev/null 2>&1
@@ -221,13 +231,12 @@ printf '{"name": "dirkit", "event": "E", "matcher": "M", "marker": "nobody.js", 
 out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 [ "$rc" != 0 ] && ok "a {here} fragment under a directory kit's home naming an unshipped file REDS (rc=$rc)" \
                || bad "a {here} fragment naming an unshipped file under a directory kit's home was accepted"
-rm -rf "$d"
 
 # ---- ARM 7: a {here} fragment under a SHARED flat home is judged at its adopter path (AC6) --------
 # `<prefix>/` is the home of several flat descriptors at once. That is not undecidable: the rule is "at
 # least one flat descriptor homes the directory", and `{prefix}/<file>` is then compared against the
 # WHOLE declared set. The fixture names a file a flat kit ships beside the fragment.
-d=$(scratch)
+scratch
 printf '{"name": "shared", "event": "E", "matcher": "M", "marker": "settings-merge.py", "hook_path": "{here}/settings-merge.py"}\n' \
   > "$d/${KP}shared-home.fragment.json"
 ( cd "$d" && git add -A && git commit -q -m shared --no-verify ) >/dev/null 2>&1
@@ -248,14 +257,13 @@ out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 case "$out" in *"unshipped.fragment.json"*"'${KP}nobody.sh' in the tree, which would ship as"*"'${KP}nobody.sh'"*)
   ok "and the refusal prints the in-tree and the adopter spelling" ;;
   *) bad "the refusal does not print both spellings: $(printf '%s' "$out" | grep unshipped | head -2)" ;; esac
-rm -rf "$d"
 
 # ---- ARM 8: the PARITY arm fires when the two readers disagree ----------------------------------
 # The gate reads `{kit}`/`{here}` from `check-wiring.sh --resolve-fragment` and from
 # `settings-merge.py --resolve-fragment` and refuses on a mismatch. Staged by breaking the shell
 # reader's `{here}` expansion in a COPY of the tree, so the two answers differ on every {here}
 # fragment and agree on every {kit} one.
-d=$(scratch)
+scratch
 sed -i 's#{here}/|${here:+$here/}|g#{here}/|elsewhere/|g#' "$d/${KP}check-wiring.sh"
 grep -q 'elsewhere/' "$d/${KP}check-wiring.sh" || bad "the parity fixture did not stage its break (the resolver's {here} line moved)"
 ( cd "$d" && git add -A && git commit -q -m parity --no-verify ) >/dev/null 2>&1
@@ -264,7 +272,6 @@ out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
                || bad "the gate accepted two readers that disagree"
 case "$out" in *"the two readers DISAGREE"*"elsewhere/"*) ok "and the refusal prints both readers' answers" ;;
   *) bad "the refusal does not name the disagreement: $(printf '%s' "$out" | grep -E 'FAIL' | head -2)" ;; esac
-rm -rf "$d"
 
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not the written one. An arm stranded
 # past an early exit disappears silently; the floor is what turns that into a failure instead of a

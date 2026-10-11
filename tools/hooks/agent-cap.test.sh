@@ -2093,56 +2093,177 @@ EOF
   # TOOL-aRepatriatedFork-7 F3: the nesting matrix joins the population, so no fixture of it that BASE
   # denied -- every flat control, and `depth-two` -- may be admitted now.
   cp "$TMP"/nest/*.js "$TMP/nrfix/" 2>/dev/null || true
-  cat > "$TMP/nr.py" <<'PYEOF'
-import json, subprocess, sys, pathlib
-base_hook, cur_hook, root, fixdir = sys.argv[1:5]
-root = pathlib.Path(root).resolve()
-files = subprocess.run(["git", "-C", str(root), "ls-files"], capture_output=True, text=True).stdout.split()
-pop = [root / f for f in files] + sorted(pathlib.Path(fixdir).glob("*.js"))
-lost, ratified, denied, n = [], [], 0, 0
-for p in pop:
-    try:
-        body = p.read_text(encoding="utf-8", errors="replace")
-    except Exception:
-        continue
-    payload = json.dumps({"tool_name": "Workflow", "tool_input": {"script": body}})
-    a = subprocess.run(["node", base_hook], input=payload, capture_output=True, text=True, timeout=120).returncode
-    n += 1
-    if a != 2:
-        continue
-    denied += 1
-    b = subprocess.run(["node", cur_hook], input=payload, capture_output=True, text=True, timeout=120).returncode
-    # ADMISSION IS `exit != 2`, not `exit == 0`. The hook BLOCKS only on 2, so a crash (1) or a
-    # timeout is an admission too — and scoring it as 0 made this arm blind to exactly the two
-    # defects the closing review found in the code it guards.
-    if b != 2:
-        # CLASS-SCOPED RATIFICATION (TOOL-dFoldedVerdict-4). A denial this hook no longer makes is
-        # ratified ONLY when the marker is what bought it: strip every `gov:sequential-agents` token
-        # from the bytes and re-run. Denial restored means the marker did it, and the loss is this
-        # unit's declared affordance. Denial NOT restored means something else changed, and that is a
-        # regression whatever it looks like. No path list and no BASE-sha bump: the ratification is
-        # keyed on the CLASS, so a file nobody thought to enumerate is graded the same way.
-        stripped = body.replace("gov:sequential-agents", "")
-        rp = json.dumps({"tool_name": "Workflow", "tool_input": {"script": stripped}})
-        r = subprocess.run(["node", cur_hook], input=rp, capture_output=True, text=True, timeout=120).returncode
-        if r == 2:
-            ratified.append("%s (exit %d, denial restored by removing the marker)" % (p, b))
-        else:
-            lost.append("%s (exit %d)" % (p, b))
-for f in lost:
-    print("LOST a denial: %s" % f)
-for f in ratified:
-    print("RATIFIED a marker-attributed loss: %s" % f)
-# REDS ON ZERO RATIFICATIONS, so the ratification branch cannot go unexercised and pass by never
-# running — which is the same could-not-fail shape as the empty-population guard beside it.
-print("population %d scanned, %d denied at BASE, %d denial(s) lost, %d ratified" % (n, denied, len(lost), len(ratified)))
-sys.exit(1 if lost or denied == 0 or not ratified else 0)
-PYEOF
-  "$TESTPY" "$TMP/nr.py" "$TMP/base-hook.js" "$HOOK" "$(git -C "$HERE" rev-parse --show-toplevel)" "$TMP/nrfix" > "$TMP/nr.out" 2>&1
+  # ONE NODE FOR THE WHOLE PROPERTY (TOOL-aSparedSpawn-11 S1, owner ruling F1 (a)). The loop below
+  # used to be Python starting `node` per population file and per hook, about 3700 processes and
+  # most of this suite's wall clock. The runner compiles each hook ONCE as a `vm.Script` and runs every
+  # payload in a FRESH context with the hook's own CommonJS arguments: the real `require`, except that
+  # `fs.readFileSync(0)` returns the payload; a `process` whose `exit` records the FIRST code and
+  # throws a sentinel; and an `argv` naming the hook as `node <hook>` would. An uncaught throw is 1,
+  # as real node exits, and a return with no exit is 0. The cwd and environment are this shell's, as
+  # the Python loop's were. What it reads is unchanged: every `git ls-files` path split on
+  # whitespace, plus the fixtures; each body decoded as UTF-8 with universal newlines, as Python's
+  # `read_text` did; admission is `exit != 2`; the ratification re-run strips every marker token;
+  # zero denials or zero ratifications red. The parity arm after it is the guard against the one
+  # risk this buys: an in-process verdict that real node would not give.
+  cat > "$TMP/nr.js" <<'JSEOF'
+'use strict'
+const fs = require('fs')
+const path = require('path')
+const vm = require('vm')
+const Module = require('module')
+const cp = require('child_process')
+const [mode, baseHook, curHook, root, fixdir, strideArg] = process.argv.slice(2)
+const BOUND_MS = 120000
+const STOP = { stop: 'process.exit' }
+
+function loadHook(file) {
+  const abs = path.resolve(file)
+  // A hashbang is legal only at the very start of a script, and the wrapper below is not the start.
+  // Blanking the line keeps every line number the hook's own.
+  const src = fs.readFileSync(abs, 'utf8').replace(/^#!.*/, '')
+  const wrapped = '(function (exports, require, module, __filename, __dirname, process, console) {' + src +
+    '\n}).apply(__nrArgs[0], __nrArgs)'
+  return { abs, script: new vm.Script(wrapped, { filename: abs }), req: Module.createRequire(abs) }
+}
+
+function runInProcess(hook, payload) {
+  let code = null
+  // Both views proxy an EMPTY target and read the real object inside the trap, so no proxy invariant
+  // ties a returned value to a non-configurable property of the real `fs` or `process`.
+  const fsView = new Proxy({}, {
+    get: (_t, k) => (k === 'readFileSync'
+      ? (fd, ...rest) => (fd === 0 ? payload : fs.readFileSync(fd, ...rest))
+      : fs[k]),
+    has: (_t, k) => k in fs,
+  })
+  const req = (id) => (id === 'fs' || id === 'node:fs' ? fsView : hook.req(id))
+  const sink = { write: () => true }
+  const proc = new Proxy({}, {
+    get: (_t, k) => {
+      if (k === 'exit') return (c) => { if (code === null) code = c === undefined ? 0 : c; throw STOP }
+      if (k === 'argv') return [process.execPath, hook.abs]
+      if (k === 'stdout' || k === 'stderr') return sink
+      const v = process[k]
+      return typeof v === 'function' ? v.bind(process) : v
+    },
+    has: (_t, k) => k in process,
+  })
+  const quiet = { log() {}, error() {}, warn() {}, info() {}, debug() {} }
+  const mod = { exports: {} }
+  const ctx = vm.createContext({ __nrArgs: [mod.exports, req, mod, hook.abs, path.dirname(hook.abs), proc, quiet] })
+  try {
+    hook.script.runInContext(ctx, { timeout: BOUND_MS })
+  } catch (e) {
+    if (e !== STOP && code === null) {
+      if (e && e.code === 'ERR_SCRIPT_EXECUTION_TIMEOUT') throw new Error('TIMEOUT after ' + BOUND_MS + ' ms')
+      code = 1
+    }
+  }
+  return code === null ? 0 : code
+}
+
+function runSpawned(hook, payload) {
+  const r = cp.spawnSync(process.execPath, [hook.abs], { input: payload, timeout: BOUND_MS, stdio: ['pipe', 'ignore', 'ignore'] })
+  return r.status === null ? 'killed' : r.status
+}
+
+function readBody(p) {
+  try {
+    return fs.readFileSync(p, 'utf8').replace(/\r\n?/g, '\n')
+  } catch {
+    return null
+  }
+}
+
+function buildPayload(body) {
+  return JSON.stringify({ tool_name: 'Workflow', tool_input: { script: body } })
+}
+
+const tracked = cp.execFileSync('git', ['-C', root, 'ls-files'], { encoding: 'utf8', maxBuffer: 1 << 28 })
+  .split(/\s+/).filter(Boolean).map((f) => path.join(path.resolve(root), f))
+const fixtures = fs.readdirSync(fixdir).filter((f) => f.endsWith('.js')).sort().map((f) => path.join(fixdir, f))
+const base = loadHook(baseHook)
+const cur = loadHook(curHook)
+
+try {
+  if (mode === 'property') {
+    const lost = []
+    const ratified = []
+    let denied = 0
+    let n = 0
+    for (const p of tracked.concat(fixtures)) {
+      const body = readBody(p)
+      if (body === null) continue
+      const payload = buildPayload(body)
+      const a = runInProcess(base, payload)
+      n += 1
+      if (a !== 2) continue
+      denied += 1
+      const b = runInProcess(cur, payload)
+      // ADMISSION IS `exit != 2`, not `exit == 0`: the hook BLOCKS only on 2, so a crash is an admission too.
+      if (b !== 2) {
+        // CLASS-SCOPED RATIFICATION (TOOL-dFoldedVerdict-4): denial restored by stripping every marker
+        // token means the marker bought the loss; anything else is a regression.
+        const r = runInProcess(cur, buildPayload(body.split('gov:sequential-agents').join('')))
+        if (r === 2) ratified.push(p + ' (exit ' + b + ', denial restored by removing the marker)')
+        else lost.push(p + ' (exit ' + b + ')')
+      }
+    }
+    for (const f of lost) console.log('LOST a denial: ' + f)
+    for (const f of ratified) console.log('RATIFIED a marker-attributed loss: ' + f)
+    console.log('population ' + n + ' scanned, ' + denied + ' denied at BASE, ' + lost.length +
+      ' denial(s) lost, ' + ratified.length + ' ratified')
+    process.exitCode = lost.length || denied === 0 || ratified.length === 0 ? 1 : 0
+  } else if (mode === 'parity') {
+    // ponytail: a fixed stride over the sorted tracked list keeps the sample a handful of spawns; a
+    // narrower stride buys coverage at about a second per spawn on a Windows node.
+    const stride = Number(strideArg)
+    const sample = fixtures.slice()
+    const sorted = tracked.slice().sort()
+    for (let i = 0; i < sorted.length; i += stride) sample.push(sorted[i])
+    const bad = []
+    let compared = 0
+    let denies = 0
+    for (const p of sample) {
+      const body = readBody(p)
+      if (body === null) continue
+      const payload = buildPayload(body)
+      for (const [name, hook] of [['BASE', base], ['current', cur]]) {
+        const inProc = runInProcess(hook, payload)
+        const real = runSpawned(hook, payload)
+        compared += 1
+        if (real === 2) denies += 1
+        if (inProc !== real) bad.push(name + ' hook on ' + p + ': in-process exit ' + inProc + ', node exit ' + real)
+      }
+    }
+    for (const b of bad) console.log('DISAGREE ' + b)
+    console.log('parity ' + compared + ' verdict(s) compared over ' + sample.length + ' payload(s), ' +
+      denies + ' deny verdict(s) from real node, ' + bad.length + ' disagreement(s)')
+    process.exitCode = bad.length || denies === 0 ? 1 : 0
+  } else {
+    console.log('nr.js: unknown mode ' + mode)
+    process.exitCode = 2
+  }
+} catch (e) {
+  console.log('nr.js: ' + (e && e.message ? e.message : String(e)))
+  process.exitCode = 1
+}
+JSEOF
+  node "$TMP/nr.js" property "$TMP/base-hook.js" "$HOOK" "$(git -C "$HERE" rev-parse --show-toplevel)" "$TMP/nrfix" > "$TMP/nr.out" 2>&1
   if [ $? = 0 ]; then
     echo "ok   no-regress: no denial lost against BASE ($(tail -1 "$TMP/nr.out"))"; pass=$((pass+1))
   else
     echo "FAIL no-regress: a denial the BASE hook made is gone"; sed 's/^/     /' "$TMP/nr.out"; fail=$((fail+1))
+  fi
+  # S2 — PARITY: every fixture above plus every 400th tracked path, through the in-process runner AND
+  # through a real `node` per hook. Any disagreement reds naming the payload, and so does a sample in
+  # which real node denied nothing, since a parity over admissions alone cannot see an exit stub that
+  # drops its code.
+  node "$TMP/nr.js" parity "$TMP/base-hook.js" "$HOOK" "$(git -C "$HERE" rev-parse --show-toplevel)" "$TMP/nrfix" 400 > "$TMP/nrp.out" 2>&1
+  if [ $? = 0 ]; then
+    echo "ok   no-regress parity: the in-process runner agrees with real node ($(tail -1 "$TMP/nrp.out"))"; pass=$((pass+1))
+  else
+    echo "FAIL no-regress parity: the in-process runner and real node disagree"; sed 's/^/     /' "$TMP/nrp.out"; fail=$((fail+1))
   fi
 else
   echo "skip no-regress property arm — the BASE blob does not resolve in this tree, so there is no shipped hook to compare verdicts against"

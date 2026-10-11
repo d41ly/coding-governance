@@ -8283,6 +8283,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "load_fixture_report",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "load_fork_cutoff",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -11966,6 +11971,11 @@
       "id": "read_offender_set",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "read_one_signal",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "read_oracle_answer",
@@ -19246,6 +19256,11 @@
       "id": "test_one_retirement_is_free",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_one_signal_matches_report",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_one_walk_two_callers",
