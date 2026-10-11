@@ -720,7 +720,14 @@ if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ] && [ -n "$_mt_rc" ]; then
     git -C "$tmp/remote6.git" symbolic-ref HEAD refs/heads/main
     R6=$(git rev-parse HEAD)
     printf '# a comment line, push-main.test case 26\n' >> "${KIT_REL}$_mt_rl/extract.py"
-    git commit -q --no-verify -am "TOOL-tFix-26: move runlog"
+    # The unit needs a SPEC: the lander's mint names only an id a spec at HEAD defines
+    # (TOOL-aRoutedQuill-12 S2), so an unspecced id named no unit and this arm red at b726385f
+    # (TOOL-dHomedResolver-8).
+    mkdir -p memory/builds/tFix/spec
+    printf '# TOOL-tFix-26 — the unit push-main.test case 26 lands\n' \
+      > memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-26.md
+    git add -A
+    git commit -q --no-verify -m "TOOL-tFix-26: move runlog"
     unset GATE_PUSH_BASE; bash "$lander" >/dev/null 2>&1 || echo "rc=$?"
     printf 'tip=%s\n' "$(git rev-parse origin/main)"
     printf 'head=%s\n' "$(git rev-parse HEAD)"

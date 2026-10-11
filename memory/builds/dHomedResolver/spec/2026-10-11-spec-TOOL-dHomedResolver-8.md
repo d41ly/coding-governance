@@ -1,10 +1,13 @@
 # TOOL-dHomedResolver-8 — the three reds the reconcile brought in, which this landing cannot carry
 
-**Status:** SPECCED · rev-1 · 2026-10-11 · node d · Tier-1 · base 584e6557 · streams tooling · order 6
+**Status:** CLOSED · rev-1 · 2026-10-11 · node d · Tier-1 · base 584e6557 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-11-build-TOOL-dHomedResolver-8-1-acceptance-ledger.md](../build/2026-10-11-build-TOOL-dHomedResolver-8-1-acceptance-ledger.md) | journal | — |
+| [2026-10-11-prompt-TOOL-dHomedResolver-8-1-build-brief.md](../prompts/2026-10-11-prompt-TOOL-dHomedResolver-8-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
