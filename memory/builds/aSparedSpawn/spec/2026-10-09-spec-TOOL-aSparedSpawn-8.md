@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-8 — fork-free readers, a spawn-idiom lint that stops regrowth, and a fork-count arm
 
-**Status:** INPROGRESS · rev-2 · 2026-10-10 · node a · Tier-2 · base 22efab65 · streams tooling · order 1 · ratified 2026-10-10
+**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 1 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -28,17 +28,24 @@ as a falling ceiling and regrowth reds instead of costing the next build a day.
   global, still prints, and clears the global first so a miss never leaves the previous answer. Every
   `$(fact …)`, `$(runmd_of …)` and `$(readme_of …)` site in the driver becomes `f … >/dev/null; v=$G`,
   keeping the `fact <file> <key>` spelling that check 39 of `tools/unattended/check-unattended.sh`
-  reads. Observed by AC1 and AC2.
+  reads. `main`'s one read of the phase after `--close` or `--abort` was spelled inside a `runmd_of`
+  substitution, which check 39's predicate cannot see; its fork-free form routes through
+  `read_recorded_phase`, which leaves `_fact` too, and `PHASE_RECORDED_FNS` names `main`.
+  Observed by AC1 and AC2.
 - **S2** — In `tools/unattended/check-unattended.sh`, `fact_of` takes the same convention, and
   `core_of` and `read_bare_const` read every driver constant through ONE `awk` pass into two
   associative arrays, first match winning and an absent key reading empty, as the loop does today.
-  Observed by AC3.
+  The readers leave `_fact_of`, `_core_of` and `_bare_const`. Observed by AC3.
 - **S3** — The other product leaf-pure readers the census ranks are converted the same way:
   `declared_scalar` and `declared_list` in `tools/unattended/check-playbook.sh` and the driver,
   `first_of` in `tools/check-wiring.sh`, `ask_home_of` and the residual `$(normpath …)` sites in
   `tools/unattended/lib-unattended.sh`. Each callee's body is read for `cd`, `set`, `trap`, `exit` and
   global writes first; a callee that has one keeps its substitution and carries a registry row whose
-  reason names the side effect. Observed by AC4.
+  reason names the side effect. `first_of`'s loop variable was a global write, so it becomes local.
+  `declared_scalar` and `declared_list` KEEP their substitution: check 28 of
+  `tools/unattended/check-unattended.sh` enumerates the refusing parser's call sites and binds each
+  template key to a parser read by the `$(declared_* ` spelling, so a converted call would leave that
+  check graded over nothing; their rows' reason names that gate. Observed by AC4.
 - **S4** — `tools/gate-lint/sh_hygiene.py` gains a third mode, `--spawn-idioms`, over the population
   of the location-probe mode (`. :!*.test.sh :!memory/`), reusing `extract_code`, the quoted-heredoc
   skip, `read_registry` and `check_registry`. Three classes are BANNED with no registry escape:
@@ -48,27 +55,41 @@ as a falling ceiling and regrowth reds instead of costing the next build a day.
 - **S5** — The product sites of the two non-empty BAN classes are drained in this unit. Each
   `$(date [-u] +%s)` becomes `$EPOCHSECONDS` and each `$(date +%s%N)` becomes `${EPOCHREALTIME/[.,]/}`
   scaled. Each `"$1" -c "$(cat <<'RKD'` wrapper reads its heredoc with `IFS= read -r -d ''` first,
-  and the byte-identical region between the `resolve_kit_dir` markers is untouched. Observed by AC6
-  and AC7.
+  and the byte-identical region between the `resolve_kit_dir` markers is untouched. The GH37 race
+  arms of `tools/unattended/unattended.test.sh` paused each writer inside the `date` its staleness
+  rule ran; with no `date` left there, each pause moves to the writer's next command — the guard's
+  `mkdir` and the lock's `rm` — where the verdict it used to pause inside is already taken. Those arms
+  are owed at VERIFYING. Observed by AC6 and AC7.
 - **S6** — The REGISTRY classes are counted per (path, class), set and count equal in both
   directions, in a new file under `memory/project/` that `.memory-tree.conf` adds to
-  `PROJECT_REGISTRY_EXTRA`: `pure-fn-subst`, `printf-subst`, `cat-file`, `path-subst`, `date-fmt` and
+  `PROJECT_REGISTRY_EXTRA`, `memory/project/spawn-idiom-sites.txt`: `pure-fn-subst`, `printf-subst`, `cat-file`, `path-subst`, `date-fmt` and
   `var-pipe`, with the predicates of the census's §4.1 table. Its rows land at what the scan measures
   after S1 to S5 and S10, suite rows included. Observed by AC6 and AC8.
 - **S7** — The mode is wired as a leg: a manifest row in `tools/gate-legs.json`, `subject = repo`, no
   guard, a declared ceiling; a `[[gate_leg]]` block in `tools/gate-lint/kit.toml`; and a line in the
-  gate-lint dossier `memory/map/features/gate-lint.md`. Observed by AC6.
-- **S8** — A fork-count arm, a bash script under `tools/gate-lint/`, counts forks per invocation of
+  gate-lint dossier `memory/map/features/gate-lint.md`. The S8 counter gets a manifest row too, and
+  its leg is an `[[exempt_leg]]` in `tools/govkit/registry.toml`: its ceilings name this repository's
+  entrypoints by path, while the script ships with the kit. Both legs take a row in
+  `tools/govkit/subject-pins.tsv`. Observed by AC6.
+- **S8** — A fork-count arm, `tools/gate-lint/fork-count.sh`, counts forks per invocation of
   each declared entrypoint through `env SHELLOPTS=xtrace BASH_XTRACEFD=<fd>` with a `PS4` carrying
   `${BASHPID}` and `${BASH_SOURCE##*/}:${LINENO}`. Forks are the distinct `BASHPID` values less one.
   It calibrates on a specimen first and refuses when the counter disagrees. It reds on growth above a
   declared ceiling and on a ceiling more than max(3, 5 %) above the count. An entrypoint it could not
-  run prints the `skipped` shape. No clock is read anywhere. Observed by AC9, AC10 and AC11.
+  run prints the `skipped` shape. No clock is read anywhere. Its ceilings live in
+  `memory/project/fork-ceilings.txt`, one row per entrypoint and bash version holding the ceiling,
+  the base count, an untraced setup that builds the fixture and the one traced command, so the kit
+  file names nothing outside itself. It scrubs the inherited `GIT_*`, `GATE_*` and `CLAUDE_*`
+  variables before a fixture is built, because a hook's `GIT_DIR` would point a fixture's `git` at
+  the graded repository. Observed by AC9, AC10 and AC11.
 - **S9** — The declared entrypoints, the census's §2.5 ranking: `tools/unattended/unattended.sh` on
   a cheap verb, `tools/unattended/check-unattended.sh` on a minimal fixture,
-  `tools/run-gates/run-gates.sh` on a one-leg and a two-leg `GATE_LEGS` manifest,
+  `tools/run-gates/run-gates.sh` on a one-leg and a two-leg `GATE_LEGS` manifest with the turnstile
+  off and one worker,
   `tools/memory-tree/check-memory-hygiene.sh` on a scratch tree, `skills/session-kickoff/manifest-check.sh`
-  and `tools/check-wiring.sh --check`. Each ceiling lands at the count measured after S1 to S5, and
+  over a scratch repository holding this repository's manifest, and `tools/check-wiring.sh --check`
+  in an empty repository. Every fixture is built in scratch so a count does not move with the tree.
+  Each ceiling lands at the count measured after S1 to S5, and
   the count at the base is recorded beside it. Observed by AC12.
 - **S10** — After the product files, the three suite files the census ranks highest by leaf-pure
   substitution sites (§2.2, by file: `tools/workflows/unattended-build.test.sh` 124,
@@ -79,13 +100,18 @@ as a falling ceiling and regrowth reds instead of costing the next build a day.
   checker inside a subshell (`tools/memory-tree/transition-audit.test.sh:134-141`). There `audit_rc`
   sets its status global with no capture at all, and `audit` captures inside its own body in place of
   the nested subshell, so each call still saves one fork. Every other suite site stays a registry row.
-  Observed by AC13.
+  The product conversions also move three suite lines that read the old spelling: check 39's first
+  arm in `tools/unattended/check-unattended.test.sh` anchors its staged break on the converted read,
+  and `tools/unattended/unattended.test.sh` greps the `_at` binding and stubs `readme_of`, which now
+  sets `_readme`. Observed by AC13.
 - **S11** — Each S10 file carries an arm-inventory comparison, before and after its conversion, kept
   in the build folder. The assertion-line multiset is the sorted list of (helper, message) pairs over
   every line calling a function whose body increments the suite's assertion counter, the helper set
   derived from the file and never typed. The PASS count is the figure in the file's
   `PASS (<n> assertions)` line. Both must be equal, and the file's `FLOOR_ASSERTIONS` must not move.
-  Observed by AC14.
+  The helper set is closed over the functions whose body calls a helper — `check_same` calls
+  `print_ok` — and every expansion inside the keyed argument reads as one `$...` token, so a message
+  that interpolates a value keys the same whichever spelling produced it. Observed by AC14.
 
 ## 3. Non-goals (OUT)
 
@@ -183,8 +209,8 @@ other suite there, and the next is `hygiene-parity.test.sh` at 32. Counts in the
 by `grep -c` agree in order: 54 lines calling `rec` or `review_out`, 52 calling `derive_sidecar`
 and 39 calling `audit` or `audit_rc`. They are PINNED to that sha and the scan in S6 re-derives them.
 
-Each file is converted only after S1 to S5 have landed, in its own commit, with its inventory pair
-taken from the parent and the child of that commit. The extractor that builds the multiset is a short
+Each file is converted after S1 to S5 in the same pass, and the three ride ONE pass commit: the
+inventory pair is taken from that commit's parent and child, which serves every file at once. The extractor that builds the multiset is a short
 `awk` over the file: it collects every function whose body increments `n` (in these three, `same`,
 `has`, `hasnt_`, `ok`, `bad` and their siblings, found rather than listed), then every line calling
 one, keyed by helper and first quoted argument. The PASS count needs a suite run, so both runs are
@@ -196,10 +222,12 @@ made once, after the conversion, on frozen clones of the parent and the child.
 |---|---|---|
 | `_fact`, `_runmd`, `_readme`, `_fact_of` | shell globals | none: globals are not graded |
 | `_CORE`, `_BARE` | shell associative arrays | none |
+| `_core_of`, `_bare_const`, `_ask_home`, `_first_of`, `_rp_base`, `_rp_pb`, `_fv1`… | shell globals | none: globals are not graded |
 | `_rec`, `_review_out`, `_sidecar`, `_audit`, `_audit_rc` | suite shell globals (S10) | none |
 | `--spawn-idioms` | CLI flag of `sh_hygiene.py` | none |
 | `scan_spawn_file`, `scan_spawn_tree`, `run_spawn_scan`, `print_spawn_populations` | Python functions | `lexicon naming predicates`, python cell |
-| `measure_forks`, `read_budgets`, `check_budgets`, `print_contributors` | shell functions | `lexicon naming predicates`, shell cell |
+| `measure_forks`, `read_budgets`, `check_budgets`, `print_contributors`, `run_traced`, `check_calibration`, `write_specimen`, `run_selftest` | shell functions | `lexicon naming predicates`, shell cell |
+| `read_substitution`, `build_unquoted`, `check_pure_body`, `read_code_lines`, `read_function_bodies`, `check_spawn_substitution`, `read_shell_sources`, `build_spawn_measured` | Python functions | `lexicon naming predicates`, python cell |
 | `shell hygiene (a fork spent on builtin work)` | leg name | none |
 | `spawn budget (forks per hot entrypoint)` | leg name | none |
 
@@ -220,7 +248,9 @@ Every name is confirmed through `python3 tools/lexicon/lexicon.py --suggest` at 
   `tools/workflows/check-review-join.sh`, `tools/workflows/check-verifier-fanout.sh`,
   `.githooks/pre-push`
 - S10's suites: `tools/workflows/unattended-build.test.sh`, `tools/unattended/stop-guard.test.sh`,
-  `tools/memory-tree/transition-audit.test.sh`
+  `tools/memory-tree/transition-audit.test.sh`; the suites coupled to a converted spelling,
+  `tools/unattended/check-unattended.test.sh` and `tools/unattended/unattended.test.sh`
+- the leg declarations: `tools/govkit/registry.toml` and `tools/govkit/subject-pins.tsv`
 - New, not yet tracked: the S11 inventory record under the build folder, the fork-count script under
   tools/gate-lint/, and two registries under memory/project/, one for spawn-idiom counts and one for
   fork ceilings.
@@ -277,9 +307,10 @@ file per commit, each lowering its own suite rows.
   absent key answering empty in both.
   Red when: any key differs, or a key declared twice answers its second value.
 - **AC4** — When `python3 tools/gate-lint/sh_hygiene.py --spawn-idioms` runs after the pass, no
-  `pure-fn-subst` row names a converted file unless its reason names the callee's `cd`, `set`,
-  `trap`, `exit` or global write.
-  Red when: a row for a converted file carries a reason naming no side effect.
+  `pure-fn-subst` site whose callee is a reader S1 to S3 name remains in a converted file unless that
+  file's row reason names the callee and its `cd`, `set`, `trap`, `exit`, global write, or the gate
+  that reads its spelling; every other callee a converted file still carries is named in its row.
+  Red when: a converted reader's site remains with a reason naming neither.
 - **AC5** — When `python3 tools/gate-lint/sh_hygiene.py --selftest` runs, each class in the §4 table
   fires on its specimen and stays silent on its near miss, and a registry row naming a BAN class is
   refused rather than honoured.
@@ -320,8 +351,8 @@ file per commit, each lowering its own suite rows.
   file after its conversion, it prints 0, and `--spawn-idioms` carries no `pure-fn-subst` row naming
   one of the three files. Red when: a site remains, or a converted helper leaves a trailing newline
   or the previous call's value in its global.
-- **AC14** — When the S11 extractor runs over each S10 file at the parent and the child of its
-  conversion commit, the two (helper, message) multisets are equal, the `PASS (<n> assertions)`
+- **AC14** — When the S11 extractor runs over each S10 file at the parent and the child of the
+  pass commit, the two (helper, message) multisets are equal, the `PASS (<n> assertions)`
   figures of one run at each are equal, and `FLOOR_ASSERTIONS` is unchanged. Red when: an assertion
   line vanished or doubled, or the PASS figure moved.
   cost: two runs per file; the manifest ceilings are 700 s and 900 s for two of them, and the third
@@ -337,6 +368,7 @@ file per commit, each lowering its own suite rows.
 `check-wiring self-test` · `codebase-map adopter e2e` · `codebase-map kit selftest` ·
 `corpus-ids selftest` · `dead-path carriers self-test` · `drift-audit selftest` ·
 `foreign-prefix parity (every self-test at three prefixes)` · `gotchas selftest` ·
+`govkit refusal join` · `govkit selftest` ·
 `install-prefix self-test` · `kit-placeholders self-test` · `kit/dogfood doc parity` ·
 `lexicon naming predicates` · `lexicon selftest` · `manifest-check self-test` ·
 `memory-hygiene self-test` · `memory-recall kit selftest` · `playbook parity selftest` ·
@@ -392,6 +424,16 @@ held unattended driver and gate suites cover S1 and S2 at the owner's manual run
   `audit_rc` found not leaf-pure; `.githooks/pre-push` added to the S5 drain; the suite
   `resolve_kit_dir` wrappers handed to `TOOL-aSparedSpawn-4`; check 39 and the check-unattended
   heredoc cites re-verified at `e6585db4`.
+- rev-3 · 2026-10-11 · §2 §4 §6 §7 S1 S2 S3 S5 S6 S7 S8 S9 S10 S11 AC4 AC14 · the build pass.
+  `declared_scalar` and `declared_list` keep their substitution, because check 28 of the unattended
+  gate reads that spelling to find the refusing parser's calls; AC4 is restated per callee, since a
+  converted file still carries callees outside the reader set and a row is per file. `main`'s phase
+  read, invisible to check 39 inside a nested substitution, routes through `read_recorded_phase`.
+  The GH37 race arms re-hook their pauses on `mkdir` and `rm`, the drain having left no `date` in the
+  staleness rule. The counter's ceilings hold each entrypoint's fixture, and its leg is exempt because
+  they name this repository's paths, so §7 names the two govkit legs its registry row trips. The
+  three suite files ride one pass commit, and the extractor
+  keys an interpolated message on its literal words.
 
 ## 10. Reuse audit
 
