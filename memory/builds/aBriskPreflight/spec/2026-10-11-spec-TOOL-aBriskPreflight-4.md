@@ -1,6 +1,6 @@
 # TOOL-aBriskPreflight-4 — preflight starts its bounded probes together and collects each at its own check
 
-**Status:** INPROGRESS · rev-2 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 2 · ratified 2026-10-11
+**Status:** INPROGRESS · rev-3 · 2026-10-11 · node a · Tier-2 · base b726385f · streams tooling · order 2 · ratified 2026-10-11
 
 <!-- gen:spec-records -->
 
@@ -317,10 +317,14 @@ driver. Each run is `bash <driver> --preflight tRun --keepalive-id k1` from the 
   `bash lander.sh --prepared` and `bash profile.sh`, and each names a pid and this driver's pid.
   Red when: a started child has no row.
 - **AC5** — When fixture F4 runs new, `PREP-DONE` exists when the verb returns, `PREP-OUT` is absent
-  from its output, and `kill -0` on the pid of the `--prepared` row fails. In F4, `--carry` exits 2
-  at once, and `--prepared` sleeps 5 s, creates `PREP-DONE`, prints `PREP-OUT` and exits 1.
+  from its output, and `kill -0` on the pid of the `--prepared` row fails. In F4, `--carry` records
+  the second it answered and exits 2 at once, and `--prepared` sleeps 30 s, creates `PREP-DONE`,
+  prints `PREP-OUT` and exits 1. When the verb returns more than 40 s after `--carry` answered, the
+  arm prints a NOTE that this run could not tell a probe read before the return from one left to
+  finish alone.
   Red when: `PREP-DONE` is absent because the verb returned while the probe ran, or `PREP-OUT`
   prints.
+  figure: the 30 s sleeper and the 40 s note threshold are PINNED; the verb's wall is DERIVED.
 - **AC6** — When fixture F5 runs new with `GATE_BOUND` at 2 and a `--prepared` that runs
   `exec sleep 600`, its output holds `UNATTENDED check 61 FAILED` naming `bash lander.sh --prepared`,
   the verb returns within 300 s, and `kill -0` on that row's pid fails afterwards.
@@ -411,6 +415,10 @@ unit is terminal.
   node `a`: under a concurrent bar a whole fixture `--preflight` took 149 s to 516 s under both drivers,
   so a 40 s wall reds for the host and not the bound. A 600 s sleeper keeps the arm red when the bound
   does not fire, and 300 s is the hang backstop the sibling wiring-bound arm already uses.
+- rev-3 · 2026-10-11 · AC5's sleeper 5 s -> 30 s, and a NOTE when the run cannot discriminate. A
+  staged break, the driver with its `read_preflight_probes` call deleted, passed AC5 at 5 s on node
+  `a`: the verb's own remainder after `--carry` outlasted the sleeper, so the unread probe finished
+  alone before the verb returned. The arm now says when that happened rather than reading as cover.
 
 ## 10. Reuse audit
 
