@@ -130,6 +130,34 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `check-receipt.py` | the leg `receipt sync (installed files match the receipt)`: every engine row of `.governance/install.json` still on disk and still hashing to its recorded sha256, or, where the raw bytes miss, hashing through the target's own clean filter to the row's `oid` while the raw bytes' blob does not: that row is graded clean and counted `eol-only` on the summary and `ok` lines, the rule `govkit check` applies, in one `git hash-object --stdin-paths` spawn for every such row. A row with no `oid`, a real edit, a CRLF copy no filter normalizes, a tampered `sha256` over bytes that are the blob, a tree with no `.git` and a git refusal all still red, the last two with a `GIT` line naming why. The INTEGRITY half only — it reads no `source`, `commit` or `gov_oid`, because those resolve against a gov checkout an adopter does not have, and it grades no `seed`, `merged`, `attributes` or `forked` row. A tree with no receipt is an announced `SKIP`, and the built-in fixture arms, the eol-only ones over real git repositories, run on every invocation so the leg has a verdict there too; its `fixtures:` line prints their count |
 | `kit.toml` | this entry, declared as data |
 
+## Generated outputs — declared by the kit that writes them
+
+A merge bar grades generated outputs for freshness: the build index, the bug-class index, the
+codebase map, and the Skills and guides the kits render from templates. Each one is declared in the
+descriptor of the kit that generates it, so the set is read from the kits and never kept as a list
+here (TOOL-aPrimedIndex-1).
+
+| table | keys that make a row an item | the item's check |
+|---|---|---|
+| `[[generated]]` | `write` and `check`, argv arrays, and `stage`, an integer; all three or none | the row's `check` |
+| `[[regenerate]]` | `stage`, plus an optional `check` argv | the row's `check`, else the kit's `[check]` argv |
+
+The argv tokens are the four the descriptors already spell: `{kit}`, `{prefix}`, `{memory_root}`
+and `{map_root}`. An argv beginning `python` or `python3` runs under the reader's own interpreter.
+Rows sharing one write and one check are one item.
+
+**Stages run in order, the items of one stage concurrently**, because one stage's outputs are
+disjoint and a later stage reads an earlier one's:
+
+| stage | what it holds |
+|---|---|
+| 1 | renders from kit templates: the Skills, the rendered guides and documents, the charter region |
+| 2 | indexes over the records: the build index and its views, the bug-class index |
+| 3 | the codebase map, which reads the output of both earlier stages |
+
+A row with none of the keys keeps exactly its old meaning: the unattended kit reads `[[generated]]`
+for its write-set rules and govkit runs `[[regenerate]]` argvs, and neither reads these keys.
+
 ## Reuse, and the baseline a guard diffs against
 
 `GATE_REUSE=1` skips a leg whose inputs are byte-identical to a recorded green: not declared

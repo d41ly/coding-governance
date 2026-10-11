@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 15bbfa4f867262f3c862e2473688fc69d0566b7d
-phase: RUNNING
+witness: beabe0bcbcb54cdf5027ae06289d5acec5496a49
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/enforce-index-regen-before-bars-acdde6
@@ -29,3 +29,15 @@ anchor-ref: refs/heads/main
 base: 15bbfa4f867262f3c862e2473688fc69d0566b7d
 
 ## Parked
+
+2026-10-11T01:55:22Z brief · item TOOL-aPrimedIndex-1 · reason 193a86e7bf62 memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-1-2-build-brief.md
+
+2026-10-11T01:55:58Z brief · item TOOL-aPrimedIndex-2 · reason 193a86e7bf62 memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-1-2-build-brief.md
+
+2026-10-11T01:56:38Z brief · item TOOL-aPrimedIndex-3 · reason 193a86e7bf62 memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-1-2-build-brief.md
+
+2026-10-11T01:57:26Z brief · item TOOL-aPrimedIndex-4 · reason 193a86e7bf62 memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-1-2-build-brief.md
+
+2026-10-11T02:01:46Z dispatch · item beabe0bc TOOL-aPrimedIndex-1 · reason tools/memory-tree/kit.toml tools/codebase-map/kit.toml tools/workflows/kit.toml tools/unattended/kit.toml tools/lexicon/kit.toml tools/memory-recall/kit.toml tools/drift-audit/kit.toml tools/runlog/kit.toml tools/playbook/kit.toml tools/run-gates/README.md memory/builds/aPrimedIndex/build/2026-10-11-build-TOOL-aPrimedIndex-1-1-acceptance-ledger.md memory/builds/aPrimedIndex/prompts/2026-10-11-prompt-TOOL-aPrimedIndex-1-2-build-brief.md
+
+2026-10-11T02:09:44Z dispatch · item beabe0bc TOOL-aPrimedIndex-1 · reason memory/builds/aPrimedIndex/README.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-1.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-2.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-3.md memory/builds/aPrimedIndex/spec/2026-10-11-spec-TOOL-aPrimedIndex-4.md
