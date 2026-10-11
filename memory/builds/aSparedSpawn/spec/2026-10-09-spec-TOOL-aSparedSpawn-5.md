@@ -1,6 +1,6 @@
 # TOOL-aSparedSpawn-5 — the held self-test tier in WSL2, from an ext4 mirror, with combined verdicts
 
-**Status:** CLOSED · rev-3 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 1 · ratified 2026-10-10
+**Status:** CLOSED · rev-4 · 2026-10-11 · node a · Tier-2 · base 22efab65 · streams tooling · order 1 · ratified 2026-10-10
 
 <!-- gen:spec-records -->
 
@@ -27,7 +27,8 @@ hours are expected to fall to tens of minutes (estimate, not measured; `research
   `GATE_FULL=1 GATE_SELFTESTS=1` and `GATE_REUSE` unset. Each partition row runs its leg through the
   wrapper's `--leg` shim, which unsets `GATE_LEGS` and resolves a `python`/`python3` launcher before
   `exec`: the runner exports `GATE_LEGS` to every leg, and the two canaries read it as their subject,
-  so the gov canary refused a subset and the run-gates canary graded one. Observed by AC1, AC6.
+  so the gov canary refused a subset and the run-gates canary graded one. Observed by AC1, AC6, and
+  the shim by the direct check the acceptance ledger records under AC3.
 - **S2** — The WSL mirror. A `--setup` mode clones once from the Windows primary into the declared
   ext4 path, points `origin` at the GitHub URL, and adds a remote `win` used only as a fetch source.
   Every run does `git fetch win` and a detached `git worktree add` at `S` inside the mirror. No WSL
@@ -136,7 +137,8 @@ undeclared distro runs `wsl.exe` with no `-d`, so WSL picks its own default.
 1. Refuse a dirty tree, since WSL sees committed objects only. Pin `S=$(git rev-parse HEAD)` and
    `FP` from `tools/run-gates/gate-fingerprint.sh`; its rev and working-tree forms agree on a clean
    tree (`gate-fingerprint.sh:13-17`).
-2. `held_halves.py --partition` writes the two manifests and prints both blobs.
+2. Each half runs `held_halves.py --partition` in its own tree at `S`, writing its manifest, and
+   records the full manifest's blob at its `HEAD` in its `meta`; the combiner compares both to `S`'s.
 3. WSL half: with `WSLENV` emptied, `wsl.exe -d <distro> -e git -C <mirror> fetch win` and a detached
    `worktree add` at `S`, then `wsl.exe -d <distro> -e bash <worktree>/tools/run-gates/run-held-wsl.sh
    --half <S> …`, so the half runs the wrapper as committed at `S` rather than the mirror's checkout.
@@ -290,6 +292,10 @@ New arm: tools/run-gates/held_halves.py --selftest · covers AC1 AC2 AC5 AC8 · 
   moves into the kit directory as `project-owned`, beside `selftest-budgets.txt`, so the kit
   descriptor rather than a registry exemption claims it. A paired run writes no `held-green`. The
   half directories and their `tar` hand-back are named.
+- rev-4 · 2026-10-11 · §2 §4 S1 · the post-commit checklist. Flow step 2 still said one call writes
+  both manifests and prints both blobs; each half partitions in its own tree and records its blob in
+  `meta`. S1's `--leg` shim is observed by the direct check the acceptance ledger records under AC3,
+  since no AC arm runs it.
 
 ## 10. Reuse audit
 
