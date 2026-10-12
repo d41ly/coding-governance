@@ -1,6 +1,6 @@
 # TOOL-aOrientedCast-15 — the closing review's minors: oracles that rot, readers that disagree, a verdict over a broken index
 
-**Status:** OPEN · rev-3 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 15 · ratified 2026-10-12
+**Status:** INPROGRESS · rev-3 · 2026-10-12 · node a · Tier-2 · base 646d4a73 · streams tooling · order 15 · ratified 2026-10-12
 
 <!-- gen:spec-records -->
 
